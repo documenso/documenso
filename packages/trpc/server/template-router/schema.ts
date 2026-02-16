@@ -30,6 +30,7 @@ import {
   ZTemplateManySchema,
   ZTemplateSchema,
 } from '@documenso/lib/types/template';
+import { parseCommaSeparatedValues } from '@documenso/lib/utils/params';
 import { LegacyTemplateDirectLinkSchema } from '@documenso/prisma/types/template-legacy-schema';
 import { ZDocumentExternalIdSchema } from '@documenso/trpc/server/document-router/schema';
 
@@ -289,7 +290,9 @@ export const ZUpdateTemplateRequestSchema = z.object({
 export const ZUpdateTemplateResponseSchema = ZTemplateLiteSchema;
 
 export const ZFindTemplatesRequestSchema = ZFindSearchParamsSchema.extend({
-  type: z.nativeEnum(TemplateType).describe('Filter templates by type.').optional(),
+  type: z
+    .preprocess(parseCommaSeparatedValues, z.array(z.nativeEnum(TemplateType)).optional())
+    .describe('Filter templates by type.'),
   folderId: z.string().describe('The ID of the folder to filter templates by.').optional(),
 });
 

@@ -4,33 +4,28 @@ import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { DocumentSource, DocumentStatus as DocumentStatusEnum } from '@prisma/client';
+import type { DocumentSource } from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useSearchParams } from 'react-router';
-import { z } from 'zod';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { trpc } from '@documenso/trpc/react';
+import { ZFindDocumentsInternalRequestSchema } from '@documenso/trpc/server/document-router/find-documents-internal.types';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
-import { SelectItem } from '@documenso/ui/primitives/select';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
-import { SearchParamSelector } from '~/components/forms/search-param-selector';
-import { DocumentSearch } from '~/components/general/document/document-search';
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { StackAvatarsWithTooltip } from '~/components/general/stack-avatars-with-tooltip';
 import { DocumentsTableActionButton } from '~/components/tables/documents-table-action-button';
 import { DocumentsTableActionDropdown } from '~/components/tables/documents-table-action-dropdown';
 import { DataTableTitle } from '~/components/tables/documents-table-title';
+import { TemplateDocumentsTableToolbar } from '~/components/tables/template-documents-table-toolbar';
 import { useCurrentTeam } from '~/providers/team';
-
-import { PeriodSelector } from '../period-selector';
 
 const DOCUMENT_SOURCE_LABELS: { [key in DocumentSource]: MessageDescriptor } = {
   DOCUMENT: msg`Document`,
@@ -38,15 +33,13 @@ const DOCUMENT_SOURCE_LABELS: { [key in DocumentSource]: MessageDescriptor } = {
   TEMPLATE_DIRECT_LINK: msg`Direct link`,
 };
 
-const ZDocumentSearchParamsSchema = ZUrlSearchParamsSchema.extend({
-  source: z
-    .nativeEnum(DocumentSource)
-    .optional()
-    .catch(() => undefined),
-  status: z
-    .nativeEnum(DocumentStatusEnum)
-    .optional()
-    .catch(() => undefined),
+const ZDocumentSearchParamsSchema = ZFindDocumentsInternalRequestSchema.pick({
+  page: true,
+  perPage: true,
+  query: true,
+  period: true,
+  status: true,
+  source: true,
 });
 
 type TemplatePageViewDocumentsTableProps = {
@@ -67,7 +60,7 @@ export const TemplatePageViewDocumentsTable = ({
     Object.fromEntries(searchParams ?? []),
   );
 
-  const { data, isLoading, isLoadingError } = trpc.document.find.useQuery(
+  const { data, isLoading, isLoadingError } = trpc.document.findDocumentsInternal.useQuery(
     {
       templateId,
       page: parsedSearchParams.page,
@@ -75,6 +68,7 @@ export const TemplatePageViewDocumentsTable = ({
       query: parsedSearchParams.query,
       source: parsedSearchParams.source,
       status: parsedSearchParams.status,
+      period: parsedSearchParams.period,
     },
     {
       placeholderData: (previousData) => previousData,
@@ -133,8 +127,8 @@ export const TemplatePageViewDocumentsTable = ({
                 <InfoIcon className="mx-2 h-4 w-4" />
               </TooltipTrigger>
 
-              <TooltipContent className="text-foreground max-w-md space-y-2 !p-0">
-                <ul className="text-muted-foreground space-y-0.5 divide-y [&>li]:p-4">
+              <TooltipContent className="max-w-md space-y-2 !p-0 text-foreground">
+                <ul className="space-y-0.5 divide-y text-muted-foreground [&>li]:p-4">
                   <li>
                     <h2 className="mb-2 flex flex-row items-center font-semibold">
                       <Trans>Template</Trans>
@@ -183,49 +177,8 @@ export const TemplatePageViewDocumentsTable = ({
   }, []);
 
   return (
-    <div>
-      <div className="mb-4 flex flex-row space-x-4">
-        <DocumentSearch />
-
-        <SearchParamSelector
-          paramKey="status"
-          isValueValid={(value) =>
-            [...DocumentStatusEnum.COMPLETED].includes(value as unknown as string)
-          }
-        >
-          <SelectItem value="all">
-            <Trans>Any Status</Trans>
-          </SelectItem>
-          <SelectItem value={DocumentStatusEnum.COMPLETED}>
-            <Trans>Completed</Trans>
-          </SelectItem>
-          <SelectItem value={DocumentStatusEnum.PENDING}>
-            <Trans>Pending</Trans>
-          </SelectItem>
-          <SelectItem value={DocumentStatusEnum.DRAFT}>
-            <Trans>Draft</Trans>
-          </SelectItem>
-        </SearchParamSelector>
-
-        <SearchParamSelector
-          paramKey="source"
-          isValueValid={(value) =>
-            [...DocumentSource.TEMPLATE].includes(value as unknown as string)
-          }
-        >
-          <SelectItem value="all">
-            <Trans>Any Source</Trans>
-          </SelectItem>
-          <SelectItem value={DocumentSource.TEMPLATE}>
-            <Trans>Template</Trans>
-          </SelectItem>
-          <SelectItem value={DocumentSource.TEMPLATE_DIRECT_LINK}>
-            <Trans>Direct Link</Trans>
-          </SelectItem>
-        </SearchParamSelector>
-
-        <PeriodSelector />
-      </div>
+    <div className="space-y-4">
+      <TemplateDocumentsTableToolbar />
 
       <DataTable
         columns={columns}

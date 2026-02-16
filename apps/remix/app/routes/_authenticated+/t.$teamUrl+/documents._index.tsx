@@ -1,36 +1,33 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
 import { FolderType, OrganisationType } from '@prisma/client';
 import { useParams, useSearchParams } from 'react-router';
-import { Link } from 'react-router';
 import { z } from 'zod';
 
 import { useSessionStorage } from '@documenso/lib/client-only/hooks/use-session-storage';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { parseToIntegerArray } from '@documenso/lib/utils/params';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { trpc } from '@documenso/trpc/react';
 import type { TFindDocumentsInternalResponse } from '@documenso/trpc/server/document-router/find-documents-internal.types';
 import { ZFindDocumentsInternalRequestSchema } from '@documenso/trpc/server/document-router/find-documents-internal.types';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import type { RowSelectionState } from '@documenso/ui/primitives/data-table';
-import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
+import type { DataTableFacetedFilterOption } from '@documenso/ui/primitives/data-table-faceted-filter';
 
 import { DocumentMoveToFolderDialog } from '~/components/dialogs/document-move-to-folder-dialog';
 import { EnvelopesBulkDeleteDialog } from '~/components/dialogs/envelopes-bulk-delete-dialog';
 import { EnvelopesBulkMoveDialog } from '~/components/dialogs/envelopes-bulk-move-dialog';
-import { DocumentSearch } from '~/components/general/document/document-search';
-import { DocumentStatus } from '~/components/general/document/document-status';
+import { FRIENDLY_STATUS_MAP } from '~/components/general/document/document-status';
 import { EnvelopeDropZoneWrapper } from '~/components/general/envelope/envelope-drop-zone-wrapper';
 import { FolderGrid } from '~/components/general/folder/folder-grid';
-import { PeriodSelector } from '~/components/general/period-selector';
 import { DocumentsTable } from '~/components/tables/documents-table';
 import { DocumentsTableEmptyState } from '~/components/tables/documents-table-empty-state';
-import { DocumentsTableSenderFilter } from '~/components/tables/documents-table-sender-filter';
+import { DocumentsTableToolbar } from '~/components/tables/documents-table-toolbar';
 import { EnvelopesTableBulkActionBar } from '~/components/tables/envelopes-table-bulk-action-bar';
 import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
@@ -50,6 +47,8 @@ const ZSearchParamsSchema = ZFindDocumentsInternalRequestSchema.pick({
 });
 
 export default function DocumentsPage() {
+  const { _ } = useLingui();
+
   const organisation = useCurrentOrganisation();
   const team = useCurrentTeam();
 
@@ -89,35 +88,37 @@ export default function DocumentsPage() {
     folderId,
   });
 
-  const getTabHref = (value: keyof typeof ExtendedDocumentStatus) => {
-    const params = new URLSearchParams(searchParams);
+  const statusOptions = useMemo<DataTableFacetedFilterOption[]>(() => {
+    return [
+      ExtendedDocumentStatus.INBOX,
+      ExtendedDocumentStatus.PENDING,
+      ExtendedDocumentStatus.COMPLETED,
+      ExtendedDocumentStatus.DRAFT,
+      ExtendedDocumentStatus.REJECTED,
+    ]
+      .filter((status) => {
+        if (organisation.type === OrganisationType.PERSONAL) {
+          return status !== ExtendedDocumentStatus.INBOX;
+        }
 
-    params.set('status', value);
+        return true;
+      })
+      .map((status) => {
+        const { label, icon, color } = FRIENDLY_STATUS_MAP[status];
 
-    if (value === ExtendedDocumentStatus.ALL) {
-      params.delete('status');
-    }
+        return {
+          label: _(label),
+          value: status,
+          icon,
+          iconClassName: color,
+        };
+      });
+  }, [organisation.type, _]);
 
-    if (value === ExtendedDocumentStatus.INBOX && organisation.type === OrganisationType.PERSONAL) {
-      params.delete('status');
-    }
+  const selectedStatuses = findDocumentSearchParams.status ?? [];
 
-    if (params.has('page')) {
-      params.delete('page');
-    }
-
-    let path = formatDocumentsPath(team.url);
-
-    if (folderId) {
-      path += `/f/${folderId}`;
-    }
-
-    if (params.toString()) {
-      path += `?${params.toString()}`;
-    }
-
-    return path;
-  };
+  const selectedStatus =
+    selectedStatuses.length === 1 ? selectedStatuses[0] : ExtendedDocumentStatus.ALL;
 
   useEffect(() => {
     if (data?.stats) {
@@ -143,60 +144,20 @@ export default function DocumentsPage() {
               <Trans>Documents</Trans>
             </h2>
           </div>
+        </div>
 
-          <div className="-m-1 flex flex-wrap gap-x-4 gap-y-6 overflow-hidden p-1">
-            <Tabs value={findDocumentSearchParams.status || 'ALL'} className="overflow-x-auto">
-              <TabsList>
-                {[
-                  ExtendedDocumentStatus.INBOX,
-                  ExtendedDocumentStatus.PENDING,
-                  ExtendedDocumentStatus.COMPLETED,
-                  ExtendedDocumentStatus.DRAFT,
-                  ExtendedDocumentStatus.ALL,
-                ]
-                  .filter((value) => {
-                    if (organisation.type === OrganisationType.PERSONAL) {
-                      return value !== ExtendedDocumentStatus.INBOX;
-                    }
-
-                    return true;
-                  })
-                  .map((value) => (
-                    <TabsTrigger
-                      key={value}
-                      className="min-w-[60px] hover:text-foreground"
-                      value={value}
-                      asChild
-                    >
-                      <Link to={getTabHref(value)} preventScrollReset>
-                        <DocumentStatus status={value} />
-
-                        {value !== ExtendedDocumentStatus.ALL && (
-                          <span className="ml-1 inline-block opacity-50">{stats[value]}</span>
-                        )}
-                      </Link>
-                    </TabsTrigger>
-                  ))}
-              </TabsList>
-            </Tabs>
-
-            {team && <DocumentsTableSenderFilter teamId={team.id} />}
-
-            <div className="flex w-48 flex-wrap items-center justify-between gap-x-2 gap-y-4">
-              <PeriodSelector />
-            </div>
-            <div className="flex w-48 flex-wrap items-center justify-between gap-x-2 gap-y-4">
-              <DocumentSearch initialValue={findDocumentSearchParams.query} />
-            </div>
-          </div>
+        <div className="mt-8">
+          <DocumentsTableToolbar
+            teamId={team?.id}
+            statusOptions={statusOptions}
+            statusCounts={stats}
+          />
         </div>
 
         <div className="mt-8">
           <div>
             {data && data.count === 0 ? (
-              <DocumentsTableEmptyState
-                status={findDocumentSearchParams.status || ExtendedDocumentStatus.ALL}
-              />
+              <DocumentsTableEmptyState status={selectedStatus} />
             ) : (
               <DocumentsTable
                 data={data}

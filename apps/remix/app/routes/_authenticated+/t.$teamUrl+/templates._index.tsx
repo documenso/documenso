@@ -10,6 +10,7 @@ import { FolderType } from '@documenso/lib/types/folder-type';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
+import { ZFindTemplatesRequestSchema } from '@documenso/trpc/server/template-router/schema';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import type { RowSelectionState } from '@documenso/ui/primitives/data-table';
 
@@ -19,6 +20,7 @@ import { EnvelopeDropZoneWrapper } from '~/components/general/envelope/envelope-
 import { FolderGrid } from '~/components/general/folder/folder-grid';
 import { EnvelopesTableBulkActionBar } from '~/components/tables/envelopes-table-bulk-action-bar';
 import { TemplatesTable } from '~/components/tables/templates-table';
+import { TemplatesTableToolbar } from '~/components/tables/templates-table-toolbar';
 import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
@@ -26,14 +28,24 @@ export function meta() {
   return appMetaTags('Templates');
 }
 
+const ZTemplatesSearchParamsSchema = ZFindTemplatesRequestSchema.pick({
+  query: true,
+  type: true,
+  page: true,
+  perPage: true,
+});
+
 export default function TemplatesPage() {
   const team = useCurrentTeam();
 
   const { folderId } = useParams();
   const [searchParams] = useSearchParams();
 
-  const page = Number(searchParams.get('page')) || 1;
-  const perPage = Number(searchParams.get('perPage')) || 10;
+  const findTemplatesSearchParams = useMemo(
+    () =>
+      ZTemplatesSearchParamsSchema.safeParse(Object.fromEntries(searchParams.entries())).data || {},
+    [searchParams],
+  );
 
   const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>(
     'templates-bulk-selection',
@@ -50,8 +62,7 @@ export default function TemplatesPage() {
   const templateRootPath = formatTemplatesPath(team.url);
 
   const { data, isLoading, isLoadingError } = trpc.template.findTemplates.useQuery({
-    page: page,
-    perPage: perPage,
+    ...findTemplatesSearchParams,
     folderId,
   });
 
@@ -72,6 +83,10 @@ export default function TemplatesPage() {
             <h1 className="truncate text-2xl font-semibold md:text-3xl">
               <Trans>Templates</Trans>
             </h1>
+          </div>
+
+          <div className="mt-8">
+            <TemplatesTableToolbar />
           </div>
 
           <div className="mt-8">

@@ -1,9 +1,13 @@
+import type { NavigateOptions } from 'react-router';
 import { useSearchParams } from 'react-router';
 
-export const useUpdateSearchParams = () => {
+type SearchParamValues = Record<string, string | number | boolean | null | undefined>;
+type UpdateSearchParamsOptions = Pick<NavigateOptions, 'preventScrollReset' | 'replace' | 'state'>;
+
+export const useUpdateSearchParams = (defaultOptions: UpdateSearchParamsOptions = {}) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  return (params: Record<string, string | number | boolean | null | undefined>) => {
+  return (params: SearchParamValues, options?: UpdateSearchParamsOptions) => {
     const nextSearchParams = new URLSearchParams(searchParams?.toString() ?? '');
 
     Object.entries(params).forEach(([key, value]) => {
@@ -14,6 +18,9 @@ export const useUpdateSearchParams = () => {
       }
     });
 
-    setSearchParams(nextSearchParams);
+    setSearchParams(nextSearchParams, {
+      ...defaultOptions,
+      ...options,
+    });
   };
 };

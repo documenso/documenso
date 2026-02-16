@@ -25,7 +25,7 @@ export const getStats = async ({
 }: GetStatsInput) => {
   let createdAt: Prisma.EnvelopeWhereInput['createdAt'];
 
-  if (period) {
+  if (period && period !== 'all') {
     const daysAgo = parseInt(period.replace(/d$/, ''), 10);
 
     const startOfPeriod = DateTime.now().minus({ days: daysAgo }).startOf('day');

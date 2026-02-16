@@ -10,7 +10,8 @@ import { getMemberRoles } from '../team/get-member-roles';
 export type FindTemplatesOptions = {
   userId: number;
   teamId: number;
-  type?: TemplateType;
+  type?: TemplateType | TemplateType[];
+  query?: string;
   page?: number;
   perPage?: number;
   folderId?: string;
@@ -20,11 +21,14 @@ export const findTemplates = async ({
   userId,
   teamId,
   type,
+  query = '',
   page = 1,
   perPage = 10,
   folderId,
 }: FindTemplatesOptions) => {
   const whereFilter: Prisma.EnvelopeWhereInput[] = [];
+
+  const templateTypeFilter = type ? { in: Array.isArray(type) ? type : [type] } : undefined;
 
   const { teamRole } = await getMemberRoles({
     teamId,
@@ -54,11 +58,30 @@ export const findTemplates = async ({
     whereFilter.push({ folderId: null });
   }
 
+  if (query) {
+    whereFilter.push({
+      OR: [
+        {
+          title: {
+            contains: query,
+            mode: 'insensitive',
+          },
+        },
+        {
+          externalId: {
+            contains: query,
+            mode: 'insensitive',
+          },
+        },
+      ],
+    });
+  }
+
   const [data, count] = await Promise.all([
     prisma.envelope.findMany({
       where: {
         type: EnvelopeType.TEMPLATE,
-        templateType: type,
+        templateType: templateTypeFilter,
         AND: whereFilter,
       },
       include: {
@@ -87,7 +110,7 @@ export const findTemplates = async ({
     prisma.envelope.count({
       where: {
         type: EnvelopeType.TEMPLATE,
-        templateType: type,
+        templateType: templateTypeFilter,
         AND: whereFilter,
       },
     }),
