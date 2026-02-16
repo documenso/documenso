@@ -1,16 +1,10 @@
 import { z } from 'zod';
 
-import {
-  ZClampedFieldHeightSchema,
-  ZClampedFieldPositionXSchema,
-  ZClampedFieldPositionYSchema,
-  ZClampedFieldWidthSchema,
-  ZFieldPageNumberSchema,
-  ZFieldSchema,
-} from '@documenso/lib/types/field';
+import { ZFieldSchema } from '@documenso/lib/types/field';
 import { ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 
 import type { TrpcRouteMeta } from '../../trpc';
+import { ZCoordinatePositionSchema } from './create-envelope-fields.types';
 
 export const updateEnvelopeFieldsMeta: TrpcRouteMeta = {
   openapi: {
@@ -22,22 +16,27 @@ export const updateEnvelopeFieldsMeta: TrpcRouteMeta = {
   },
 };
 
-const ZUpdateFieldSchema = ZEnvelopeFieldAndMetaSchema.and(
+const ZUpdateFieldBaseSchema = ZEnvelopeFieldAndMetaSchema.and(
   z.object({
     id: z.number().describe('The ID of the field to update.'),
+    recipientId: z.number().describe('The ID of the recipient to update the field for'),
     envelopeItemId: z
       .string()
       .optional()
       .describe(
         'The ID of the envelope item to put the field on. If not provided, field will be placed on the first item.',
       ),
-    page: ZFieldPageNumberSchema.optional(),
-    positionX: ZClampedFieldPositionXSchema.optional(),
-    positionY: ZClampedFieldPositionYSchema.optional(),
-    width: ZClampedFieldWidthSchema.optional(),
-    height: ZClampedFieldHeightSchema.optional(),
   }),
 );
+
+// !: Later on we should support placeholders for updates, but since we didn't do the
+// !: neccesary plumbing for updates in the initial release, we can hold off for now.
+// const ZUpdateFieldSchema = z.union([
+//   ZUpdateFieldBaseSchema.and(ZCoordinatePositionSchema),
+//   ZUpdateFieldBaseSchema.and(ZPlaceholderPositionSchema),
+// ]);
+
+const ZUpdateFieldSchema = ZUpdateFieldBaseSchema.and(ZCoordinatePositionSchema);
 
 export const ZUpdateEnvelopeFieldsRequestSchema = z.object({
   envelopeId: z.string(),
