@@ -4,6 +4,7 @@ description: Manage team resources, documents, and templates with team-scoped AP
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 <Callout type="warn">
@@ -52,10 +53,12 @@ API tokens in Documenso are always scoped to a specific team. When you create an
 
 ### Creating Team-Scoped Tokens
 
-1. Navigate to your team's settings
-2. Go to **API Tokens**
-3. Click **Create Token**
-4. The token will be scoped to the current team
+<Steps>
+  <Step>Navigate to your team's settings</Step>
+  <Step>Go to **API Tokens**</Step>
+  <Step>Click **Create Token**</Step>
+  <Step>The token will be scoped to the current team</Step>
+</Steps>
 
 <Callout type="info">
   To work with multiple teams via API, create separate tokens for each team.

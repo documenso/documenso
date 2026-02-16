@@ -47,7 +47,8 @@ Go to **Settings** and open the **API Tokens** tab.
 - Enter a descriptive name (e.g., `production-backend`, `zapier-integration`)
 - Select an expiration period: never expires, 7 days, 1 month, 3 months, 6 months, or 1 year
 - Click **Create Token**
-  </Step>
+
+</Step>
 
 <Step>
 ### Copy your token
@@ -164,10 +165,12 @@ There is currently no way to create tokens with limited scopes or permissions.
 
 To revoke a token:
 
-1. Go to **Settings** > **API Tokens**
-2. Find the token you want to revoke
-3. Click the delete icon next to the token
-4. Confirm the deletion
+<Steps>
+  <Step>Go to **Settings** > **API Tokens**</Step>
+  <Step>Find the token you want to revoke</Step>
+  <Step>Click the delete icon next to the token</Step>
+  <Step>Confirm the deletion</Step>
+</Steps>
 
 Revoked tokens stop working immediately. Any integrations using that token will receive `401 Unauthorized` errors.
 

@@ -151,9 +151,7 @@ http.ListenAndServe(":3000", nil)
   Always respond with a `200 OK` status within 30 seconds. Documenso will retry failed deliveries.
 </Callout>
 
-## Configuring Webhooks in Documenso
-
-### Using the Dashboard
+## Configuring Webhooks in Documenso via the Dashboard
 
 <Steps>
 <Step>
@@ -271,24 +269,42 @@ The test payload contains realistic sample data so you can verify your endpoint 
 
 Each webhook subscription maintains a log of all delivery attempts. To view logs:
 
-1. Go to **Team Settings > Webhooks**
-2. Click on a webhook to view its details
-3. The logs show each webhook call with:
-   - Status (success/failure)
-   - Event type
-   - Timestamp
-   - Response code
-   - Request and response bodies
+<Steps>
+<Step>
+Go to **Team Settings > Webhooks**
+</Step>
+<Step>
+Click on a webhook to view its details
+</Step>
+<Step>
+Review the logs
 
-Click on any individual call to see full details including headers and response data.
+Each webhook call shows the following details:
+- Status (success/failure)
+- Event type
+- Timestamp
+- Response code
+- Request and response bodies
+
+Click any call to see full details including headers and response data.
+</Step>
+</Steps>
 
 ### Resending Failed Webhooks
 
 If a webhook delivery fails, you can manually resend it:
 
-1. Navigate to the webhook call details page
-2. Click the **Resend** button
-3. Documenso will attempt to deliver the same payload again
+<Steps>
+<Step>
+Navigate to the webhook call details page
+</Step>
+<Step>
+Click the **Resend** button
+</Step>
+<Step>
+Documenso will attempt to deliver the same payload again
+</Step>
+</Steps>
 
 ## Retry Policy
 

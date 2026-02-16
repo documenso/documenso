@@ -3,6 +3,8 @@ title: Webhook Events
 description: Reference for all webhook event types and payloads.
 ---
 
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
 ## Event Payload Structure
 
 All webhook events share a common structure:
@@ -94,7 +96,7 @@ All webhook events share a common structure:
 
 These events track the document through its lifecycle.
 
-### document.created
+### `document.created`
 
 Triggered when a new document is uploaded.
 
@@ -160,7 +162,7 @@ Triggered when a new document is uploaded.
 }
 ```
 
-### document.sent
+### `document.sent`
 
 Triggered when a document is sent to recipients for signing.
 
@@ -228,75 +230,7 @@ The document status changes to `PENDING` and recipients have `sendStatus: "SENT"
 }
 ```
 
-### document.opened
-
-Triggered when a recipient opens the document for the first time.
-
-**Event name:** `DOCUMENT_OPENED`
-
-The recipient's `readStatus` changes to `OPENED`.
-
-```json
-{
-  "event": "DOCUMENT_OPENED",
-  "payload": {
-    "id": 10,
-    "externalId": null,
-    "userId": 1,
-    "authOptions": null,
-    "formValues": null,
-    "visibility": "EVERYONE",
-    "title": "contract.pdf",
-    "status": "PENDING",
-    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
-    "createdAt": "2024-04-22T11:44:43.341Z",
-    "updatedAt": "2024-04-22T11:48:07.569Z",
-    "completedAt": null,
-    "deletedAt": null,
-    "teamId": null,
-    "templateId": null,
-    "source": "DOCUMENT",
-    "documentMeta": {
-      "id": "doc_meta_123",
-      "subject": "Please sign this document",
-      "message": "Hello, please review and sign this document.",
-      "timezone": "UTC",
-      "password": null,
-      "dateFormat": "MM/DD/YYYY",
-      "redirectUrl": null,
-      "signingOrder": "PARALLEL",
-      "typedSignatureEnabled": true,
-      "language": "en",
-      "distributionMethod": "EMAIL",
-      "emailSettings": null
-    },
-    "Recipient": [
-      {
-        "id": 52,
-        "documentId": 10,
-        "templateId": null,
-        "email": "signer@example.com",
-        "name": "John Doe",
-        "token": "vbT8hi3jKQmrFP_LN1WcS",
-        "documentDeletedAt": null,
-        "expired": null,
-        "signedAt": null,
-        "authOptions": null,
-        "signingOrder": 1,
-        "rejectionReason": null,
-        "role": "SIGNER",
-        "readStatus": "OPENED",
-        "signingStatus": "NOT_SIGNED",
-        "sendStatus": "SENT"
-      }
-    ]
-  },
-  "createdAt": "2024-04-22T11:50:26.174Z",
-  "webhookEndpoint": "https://your-endpoint.com/webhook"
-}
-```
-
-### document.completed
+### `document.completed`
 
 Triggered when all recipients have completed their required actions.
 
@@ -388,7 +322,7 @@ The document status changes to `COMPLETED` and `completedAt` is set.
 }
 ```
 
-### document.rejected
+### `document.rejected`
 
 Triggered when a recipient rejects the document.
 
@@ -459,7 +393,7 @@ The recipient's `signingStatus` changes to `REJECTED` and `rejectionReason` cont
 }
 ```
 
-### document.cancelled
+### `document.cancelled`
 
 Triggered when the document owner cancels a pending document.
 
@@ -531,7 +465,75 @@ Triggered when the document owner cancels a pending document.
 
 Recipient events track individual signer actions. These events use the same payload structure as document events, but focus on a specific recipient's action.
 
-### document.signed
+### `document.opened`
+
+Triggered when a recipient opens the document for the first time.
+
+**Event name:** `DOCUMENT_OPENED`
+
+The recipient's `readStatus` changes to `OPENED`.
+
+```json
+{
+  "event": "DOCUMENT_OPENED",
+  "payload": {
+    "id": 10,
+    "externalId": null,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "contract.pdf",
+    "status": "PENDING",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:48:07.569Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "doc_meta_123",
+      "subject": "Please sign this document",
+      "message": "Hello, please review and sign this document.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 52,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer@example.com",
+        "name": "John Doe",
+        "token": "vbT8hi3jKQmrFP_LN1WcS",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": null,
+        "authOptions": null,
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T11:50:26.174Z",
+  "webhookEndpoint": "https://your-endpoint.com/webhook"
+}
+```
+
+### `document.signed`
 
 Triggered when a recipient signs the document.
 
@@ -622,10 +624,14 @@ The recipient's `signingStatus` changes to `SIGNED` and `signedAt` is populated.
 
 When processing webhook events:
 
-1. **Verify the signature** - Check the `X-Documenso-Secret` header matches your configured secret
-2. **Check event type** - Use the `event` field to determine the action
-3. **Process idempotently** - Webhooks may be retried, so handle duplicate events
-4. **Respond quickly** - Return a 200 status code within 30 seconds
+<Steps>
+  <Step>
+    **Verify the signature** — Check the `X-Documenso-Secret` header matches your configured secret
+  </Step>
+  <Step>**Check event type** — Use the `event` field to determine the action</Step>
+  <Step>**Process idempotently** — Webhooks may be retried, so handle duplicate events</Step>
+  <Step>**Respond quickly** — Return a 200 status code within 30 seconds</Step>
+</Steps>
 
 ```typescript
 app.post('/webhook', (req, res) => {

@@ -5,6 +5,7 @@ description: Verify webhook signatures for security.
 
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Overview
@@ -15,7 +16,7 @@ Verifying webhook requests ensures that incoming payloads originate from Documen
 
 When you configure a webhook with a secret, Documenso includes that secret in every webhook request via the `X-Documenso-Secret` header. Your server should compare this header value against your stored secret to authenticate the request.
 
-```
+```bash
 POST /your-webhook-endpoint HTTP/1.1
 Host: your-server.com
 Content-Type: application/json
@@ -34,10 +35,12 @@ The header contains your webhook secret as a plain string. If you did not config
 
 ## Verification Steps
 
-1. Extract the `X-Documenso-Secret` header from the incoming request
-2. Compare it against your stored webhook secret using a constant-time comparison
-3. Reject the request if the values do not match
-4. Process the webhook payload if verification succeeds
+<Steps>
+  <Step>Extract the `X-Documenso-Secret` header from the incoming request</Step>
+  <Step>Compare it against your stored webhook secret using a constant-time comparison</Step>
+  <Step>Reject the request if the values do not match</Step>
+  <Step>Process the webhook payload if verification succeeds</Step>
+</Steps>
 
 <Callout type="warn">
   Always use constant-time string comparison to prevent timing attacks. Standard equality operators
@@ -220,7 +223,8 @@ const WEBHOOK_SECRET = 'my-secret-key'; // Never do this
 2. Update your server to accept both old and new secrets temporarily
 3. Update the webhook configuration in Documenso
 4. Remove the old secret from your server
-   </Accordion>
+
+</Accordion>
 <Accordion title="Validate payload structure">
   After verifying the signature, validate the payload structure before processing:
 
