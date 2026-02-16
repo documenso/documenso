@@ -11,7 +11,11 @@ import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
 import { checkDocumentTabCount } from '../fixtures/documents';
-import { expectTextToBeVisible } from '../fixtures/generic';
+import {
+  expectTextToBeVisible,
+  expectToastTextToBeVisible,
+  openDropdownMenu,
+} from '../fixtures/generic';
 
 test('[TEAMS]: check team documents count', async ({ page }) => {
   const { team, teamOwner, teamMember2 } = await seedTeamDocuments();
@@ -239,21 +243,15 @@ test('[TEAMS]: resend pending team document', async ({ page }) => {
     redirectPath: `/t/${team.url}/documents?status=PENDING`,
   });
 
-  await expect(async () => {
-    await page.getByTestId('document-table-action-btn').first().click();
-
-    await page.waitForTimeout(1000);
-
-    await expect(page.getByRole('menuitem', { name: 'Resend' })).toBeVisible();
-  }).toPass();
-
-  await page.getByRole('menuitem').filter({ hasText: 'Resend' }).click();
+  const actionBtn = page.getByTestId('document-table-action-btn').first();
+  await expect(actionBtn).toBeAttached();
+  await openDropdownMenu(page, actionBtn);
+  await expect(page.getByRole('menuitem', { name: 'Resend' })).toBeVisible();
+  await page.getByRole('menuitem', { name: 'Resend' }).click();
   await page.getByLabel('test.documenso.com').first().click();
   await page.getByRole('button', { name: 'Send reminder' }).click();
 
-  await expect(
-    page.getByRole('status').filter({ hasText: 'Document re-sent' }).first(),
-  ).toBeVisible();
+  await expectToastTextToBeVisible(page, 'Document re-sent');
 });
 
 test('[TEAMS]: delete draft team document', async ({ page }) => {
@@ -265,14 +263,12 @@ test('[TEAMS]: delete draft team document', async ({ page }) => {
     redirectPath: `/t/${team.url}/documents?status=DRAFT`,
   });
 
-  await expect(async () => {
-    await page.getByTestId('document-table-action-btn').first().click();
-
-    await page.waitForTimeout(1000);
-
-    await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
-  }).toPass();
-
+  const actionBtn = page.getByTestId('document-table-action-btn').first();
+  await expect(actionBtn).toBeVisible({
+    timeout: 500,
+  });
+  await openDropdownMenu(page, actionBtn);
+  await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Delete' }).click();
   await page.getByRole('button', { name: 'Delete' }).click();
 
@@ -309,14 +305,12 @@ test('[TEAMS]: delete pending team document', async ({ page }) => {
     redirectPath: `/t/${team.url}/documents?status=PENDING`,
   });
 
-  await expect(async () => {
-    await page.getByTestId('document-table-action-btn').first().click();
-
-    await page.waitForTimeout(1000);
-
-    await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
-  }).toPass();
-
+  const actionBtn = page.getByTestId('document-table-action-btn').first();
+  await expect(actionBtn).toBeVisible({
+    timeout: 500,
+  });
+  await openDropdownMenu(page, actionBtn);
+  await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Delete' }).click({ force: true });
   await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
   await page.getByRole('button', { name: 'Delete' }).click({ force: true });
@@ -354,14 +348,12 @@ test('[TEAMS]: delete completed team document', async ({ page }) => {
     redirectPath: `/t/${team.url}/documents?status=COMPLETED`,
   });
 
-  await expect(async () => {
-    await page.getByTestId('document-table-action-btn').first().click();
-
-    await page.waitForTimeout(1000);
-
-    await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
-  }).toPass();
-
+  const actionBtn = page.getByTestId('document-table-action-btn').first();
+  await expect(actionBtn).toBeVisible({
+    timeout: 500,
+  });
+  await openDropdownMenu(page, actionBtn);
+  await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Delete' }).click({ force: true });
   await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
   await page.getByRole('button', { name: 'Delete' }).click({ force: true });

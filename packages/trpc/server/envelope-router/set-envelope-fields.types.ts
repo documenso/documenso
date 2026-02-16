@@ -6,6 +6,7 @@ import {
   ZClampedFieldPositionXSchema,
   ZClampedFieldPositionYSchema,
   ZClampedFieldWidthSchema,
+  ZEnvelopeFieldSchema,
 } from '@documenso/lib/types/field';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 
@@ -37,12 +38,9 @@ export const ZSetEnvelopeFieldsRequestSchema = z.object({
 });
 
 export const ZSetEnvelopeFieldsResponseSchema = z.object({
-  data: z
-    .object({
-      id: z.number(),
-      formId: z.string().optional(),
-    })
-    .array(),
+  data: ZEnvelopeFieldSchema.extend({
+    formId: z.string().optional(),
+  }).array(),
 });
 
 export type TSetEnvelopeFieldsRequest = z.infer<typeof ZSetEnvelopeFieldsRequestSchema>;

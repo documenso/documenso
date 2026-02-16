@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
-import { msg } from '@lingui/core/macro';
+import { msg, plural } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentStatus } from '@prisma/client';
 import { FileWarningIcon, GripVerticalIcon, Loader2 } from 'lucide-react';
@@ -226,7 +226,12 @@ export const EnvelopeEditorUploadPage = () => {
     }
 
     if (maximumEnvelopeItemCount <= localFiles.length) {
-      return msg`You cannot upload more than ${maximumEnvelopeItemCount} items per envelope.`;
+      return msg({
+        message: plural(maximumEnvelopeItemCount, {
+          one: `You cannot upload more than # item per envelope.`,
+          other: `You cannot upload more than # items per envelope.`,
+        }),
+      });
     }
 
     return null;
@@ -240,7 +245,10 @@ export const EnvelopeEditorUploadPage = () => {
 
     if (maxItemsReached) {
       toast({
-        title: t`You cannot upload more than ${maximumEnvelopeItemCount} items per envelope.`,
+        title: plural(maximumEnvelopeItemCount, {
+          one: `You cannot upload more than # item per envelope.`,
+          other: `You cannot upload more than # items per envelope.`,
+        }),
         duration: 5000,
         variant: 'destructive',
       });
@@ -298,7 +306,7 @@ export const EnvelopeEditorUploadPage = () => {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             style={provided.draggableProps.style}
-                            className={`bg-accent/50 flex items-center justify-between rounded-lg p-3 transition-shadow ${
+                            className={`flex items-center justify-between rounded-lg bg-accent/50 p-3 transition-shadow ${
                               snapshot.isDragging ? 'shadow-md' : ''
                             }`}
                           >
@@ -324,7 +332,7 @@ export const EnvelopeEditorUploadPage = () => {
                                   <p className="text-sm font-medium">{localFile.title}</p>
                                 )}
 
-                                <div className="text-muted-foreground text-xs">
+                                <div className="text-xs text-muted-foreground">
                                   {localFile.isUploading ? (
                                     <Trans>Uploading</Trans>
                                   ) : localFile.isError ? (
@@ -337,13 +345,13 @@ export const EnvelopeEditorUploadPage = () => {
                             <div className="flex items-center space-x-2">
                               {localFile.isUploading && (
                                 <div className="flex h-6 w-10 items-center justify-center">
-                                  <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
+                                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                                 </div>
                               )}
 
                               {localFile.isError && (
                                 <div className="flex h-6 w-10 items-center justify-center">
-                                  <FileWarningIcon className="text-destructive h-4 w-4" />
+                                  <FileWarningIcon className="h-4 w-4 text-destructive" />
                                 </div>
                               )}
 

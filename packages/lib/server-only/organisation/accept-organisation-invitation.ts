@@ -40,7 +40,10 @@ export const acceptOrganisationInvitation = async ({
 
   const user = await prisma.user.findFirst({
     where: {
-      email: organisationMemberInvite.email,
+      email: {
+        equals: organisationMemberInvite.email,
+        mode: 'insensitive',
+      },
     },
     select: {
       id: true,

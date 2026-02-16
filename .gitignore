@@ -60,3 +60,10 @@ CLAUDE.md
 
 # agents
 .specs
+
+# scripts
+scripts/output*
+
+# license
+.documenso-license.json
+.documenso-license-backup.json

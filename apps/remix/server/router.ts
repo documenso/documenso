@@ -10,11 +10,16 @@ import { tsRestHonoApp } from '@documenso/api/hono';
 import { auth } from '@documenso/auth/server';
 import { API_V2_BETA_URL, API_V2_URL } from '@documenso/lib/constants/app';
 import { jobsClient } from '@documenso/lib/jobs/client';
+import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import { TelemetryClient } from '@documenso/lib/server-only/telemetry/telemetry-client';
+import { migrateDeletedAccountServiceAccount } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
+import { migrateLegacyServiceAccount } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
 import { getIpAddress } from '@documenso/lib/universal/get-ip-address';
+import { env } from '@documenso/lib/utils/env';
 import { logger } from '@documenso/lib/utils/logger';
 import { openApiDocument } from '@documenso/trpc/server/open-api';
 
+import { aiRoute } from './api/ai/route';
 import { downloadRoute } from './api/download/download';
 import { filesRoute } from './api/files/files';
 import { type AppContext, appContext } from './context';
@@ -38,6 +43,21 @@ const app = new Hono<HonoEnv>();
 const rateLimitMiddleware = rateLimiter({
   windowMs: 60 * 1000, // 1 minute
   limit: 100, // 100 requests per window
+  keyGenerator: (c) => {
+    try {
+      return getIpAddress(c.req.raw);
+    } catch (error) {
+      return 'unknown';
+    }
+  },
+  message: {
+    error: 'Too many requests, please try again later.',
+  },
+});
+
+const aiRateLimitMiddleware = rateLimiter({
+  windowMs: 60 * 1000, // 1 minute
+  limit: 3, // 3 requests per window
   keyGenerator: (c) => {
     try {
       return getIpAddress(c.req.raw);
@@ -85,6 +105,10 @@ app.route('/api/auth', auth);
 // Files route.
 app.route('/api/files', filesRoute);
 
+// AI route.
+app.use('/api/ai/*', aiRateLimitMiddleware);
+app.route('/api/ai', aiRoute);
+
 // API servers.
 app.use(`/api/v1/*`, cors());
 app.route('/api/v1', tsRestHonoApp);
@@ -115,6 +139,14 @@ app.use(`${API_V2_BETA_URL}/*`, async (c) =>
 
 // Start telemetry client for anonymous usage tracking.
 // Can be disabled by setting DOCUMENSO_DISABLE_TELEMETRY=true
-void TelemetryClient.start();
+if (env('NODE_ENV') !== 'development') {
+  void TelemetryClient.start();
+}
+
+// Start license client to verify license on startup.
+void LicenseClient.start();
+
+void migrateDeletedAccountServiceAccount();
+void migrateLegacyServiceAccount();
 
 export default app;

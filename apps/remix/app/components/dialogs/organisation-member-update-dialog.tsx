@@ -148,8 +148,8 @@ export const OrganisationMemberUpdateDialog = ({
 
           <DialogDescription className="mt-4">
             <Trans>
-              You are currently updating{' '}
-              <span className="font-bold">{organisationMemberName}.</span>
+              You are currently updating <span className="font-bold">{organisationMemberName}</span>
+              .
             </Trans>
           </DialogDescription>
         </DialogHeader>

@@ -13,6 +13,7 @@ export default {
     title: 'API & Integration Guides',
   },
   'public-api': 'Public API',
-  embedding: 'Embedding',
+  embedding: 'Embedded Signing',
+  'embedded-authoring': 'Embedded Authoring',
   webhooks: 'Webhooks',
 };
