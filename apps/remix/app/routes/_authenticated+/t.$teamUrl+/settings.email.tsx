@@ -63,7 +63,7 @@ export default function TeamEmailSettingsGeneral() {
     <div className="max-w-2xl">
       <SettingsHeader
         title={t`Email Preferences`}
-        subtitle={t`You can manage your email preferences here`}
+        subtitle={t`You can manage your email preferences here.`}
       />
 
       <section>

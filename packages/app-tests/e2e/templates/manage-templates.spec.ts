@@ -5,6 +5,7 @@ import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedTemplate } from '@documenso/prisma/seed/templates';
 
 import { apiSignin } from '../fixtures/authentication';
+import { openDropdownMenu } from '../fixtures/generic';
 
 test('[TEMPLATES]: view templates', async ({ page }) => {
   const { team, owner, organisation } = await seedTeam({
@@ -71,13 +72,14 @@ test('[TEMPLATES]: delete template', async ({ page }) => {
   });
 
   for (const template of ['Team template 1', 'Team template 2']) {
-    await page
+    const actionBtn = page
       .getByRole('row', { name: template })
       .getByRole('cell', { name: 'Use Template' })
       .getByRole('button')
-      .nth(1)
-      .click();
+      .nth(1);
+    await openDropdownMenu(page, actionBtn);
 
+    await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
     await page.getByRole('menuitem', { name: 'Delete' }).click();
     await page.getByRole('button', { name: 'Delete' }).click();
     await expect(page.getByText('Template deleted').first()).toBeVisible();
@@ -110,7 +112,9 @@ test('[TEMPLATES]: duplicate template', async ({ page }) => {
   });
 
   // Duplicate team template.
-  await page.getByRole('cell', { name: 'Use Template' }).getByRole('button').nth(1).click();
+  const actionBtn = page.getByRole('cell', { name: 'Use Template' }).getByRole('button').nth(1);
+  await openDropdownMenu(page, actionBtn);
+  await expect(page.getByRole('menuitem', { name: 'Duplicate' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Duplicate' }).click();
   await page.getByRole('button', { name: 'Duplicate' }).click();
   await expect(page.getByText('Template duplicated').first()).toBeVisible();

@@ -1,6 +1,5 @@
-import sharp from 'sharp';
-
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
+import { loadLogo } from '@documenso/lib/utils/images/logo';
 import { prisma } from '@documenso/prisma';
 
 import type { Route } from './+types/branding.logo.organisation.$orgId';
@@ -63,16 +62,12 @@ export async function loader({ params }: Route.LoaderArgs) {
     );
   }
 
-  const img = await sharp(file)
-    .toFormat('png', {
-      quality: 80,
-    })
-    .toBuffer();
+  const { content, contentType } = await loadLogo(file);
 
-  return new Response(Buffer.from(img), {
+  return new Response(content, {
     headers: {
-      'Content-Type': 'image/png',
-      'Content-Length': img.length.toString(),
+      'Content-Type': contentType,
+      'Content-Length': content.length.toString(),
       // Stale while revalidate for 1 hours to 24 hours
       'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
     },

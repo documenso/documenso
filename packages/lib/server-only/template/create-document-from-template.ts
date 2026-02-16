@@ -19,9 +19,11 @@ import { prisma } from '@documenso/prisma';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { ZDefaultRecipientsSchema } from '../../types/default-recipients';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import type { TDocumentEmailSettings } from '../../types/document-email';
+import type { TDocumentFormValues } from '../../types/document-form-values';
 import type {
   TCheckboxFieldMeta,
   TDropdownFieldMeta,
@@ -42,7 +44,7 @@ import {
 } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
-import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
+import { putNormalizedPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
@@ -55,6 +57,7 @@ import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
+import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -117,6 +120,8 @@ export type CreateDocumentFromTemplateOptions = {
     uploadSignatureEnabled?: boolean;
     drawSignatureEnabled?: boolean;
   };
+
+  formValues?: TDocumentFormValues;
   requestMetadata: ApiRequestMetadata;
 };
 
@@ -303,6 +308,7 @@ export const createDocumentFromTemplate = async ({
   folderId,
   prefillFields,
   attachments,
+  formValues,
 }: CreateDocumentFromTemplateOptions) => {
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,
@@ -396,6 +402,30 @@ export const createDocumentFromTemplate = async ({
     };
   });
 
+  const defaultRecipients = settings.defaultRecipients
+    ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients)
+    : [];
+
+  const defaultRecipientsFinal: FinalRecipient[] = defaultRecipients.map((recipient) => {
+    const authOptions = ZRecipientAuthOptionsSchema.parse({});
+
+    return {
+      templateRecipientId: -1,
+      fields: [],
+      name: recipient.name || recipient.email,
+      email: recipient.email,
+      role: recipient.role,
+      signingOrder: null,
+      authOptions: createRecipientAuthOptions({
+        accessAuth: authOptions.accessAuth,
+        actionAuth: authOptions.actionAuth,
+      }),
+      token: nanoid(),
+    };
+  });
+
+  const allFinalRecipients = [...finalRecipients, ...defaultRecipientsFinal];
+
   // Key = original envelope item ID
   // Value = duplicated envelope item ID.
   const oldEnvelopeItemToNewEnvelopeItemIdMap: Record<string, string> = {};
@@ -431,11 +461,19 @@ export const createDocumentFromTemplate = async ({
         });
       }
 
-      const buffer = await getFileServerSide(documentDataToDuplicate);
+      let buffer = await getFileServerSide(documentDataToDuplicate);
 
       const titleToUse = item.title || finalEnvelopeTitle;
 
-      const duplicatedFile = await putPdfFileServerSide({
+      if (formValues) {
+        // eslint-disable-next-line require-atomic-updates
+        buffer = await insertFormValuesInPdf({
+          pdf: Buffer.from(buffer),
+          formValues,
+        });
+      }
+
+      const duplicatedFile = await putNormalizedPdfFileServerSide({
         name: titleToUse,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(buffer),
@@ -445,7 +483,7 @@ export const createDocumentFromTemplate = async ({
         data: {
           type: duplicatedFile.type,
           data: duplicatedFile.data,
-          initialData: duplicatedFile.initialData,
+          initialData: documentDataToDuplicate.data,
         },
       });
 
@@ -513,9 +551,10 @@ export const createDocumentFromTemplate = async ({
         visibility: template.visibility || settings.documentVisibility,
         useLegacyFieldInsertion: template.useLegacyFieldInsertion ?? false,
         documentMetaId: documentMeta.id,
+        formValues: formValues ?? undefined,
         recipients: {
           createMany: {
-            data: finalRecipients.map((recipient) => {
+            data: allFinalRecipients.map((recipient) => {
               const authOptions = ZRecipientAuthOptionsSchema.parse(recipient?.authOptions);
 
               return {
@@ -596,7 +635,7 @@ export const createDocumentFromTemplate = async ({
       }
     }
 
-    Object.values(finalRecipients).forEach(({ token, fields }) => {
+    Object.values(allFinalRecipients).forEach(({ token, fields }) => {
       const recipient = envelope.recipients.find((recipient) => recipient.token === token);
 
       if (!recipient) {

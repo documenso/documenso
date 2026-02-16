@@ -24,8 +24,8 @@ import {
   ZDocumentTitleSchema,
   ZDocumentVisibilitySchema,
 } from '../document-router/schema';
-import { ZCreateRecipientSchema } from '../recipient-router/schema';
 import type { TrpcRouteMeta } from '../trpc';
+import { ZCreateEnvelopeRecipientSchema } from './envelope-recipients/create-envelope-recipients.types';
 
 export const createEnvelopeMeta: TrpcRouteMeta = {
   openapi: {
@@ -41,6 +41,11 @@ export const createEnvelopeMeta: TrpcRouteMeta = {
 export const ZCreateEnvelopePayloadSchema = z.object({
   title: ZDocumentTitleSchema,
   type: z.nativeEnum(EnvelopeType),
+  delegatedDocumentOwner: z
+    .string()
+    .email()
+    .describe('The email of the user who will own the document.')
+    .optional(),
   externalId: ZDocumentExternalIdSchema.optional(),
   visibility: ZDocumentVisibilitySchema.optional(),
   globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional(),
@@ -54,7 +59,7 @@ export const ZCreateEnvelopePayloadSchema = z.object({
     .optional(),
   recipients: z
     .array(
-      ZCreateRecipientSchema.extend({
+      ZCreateEnvelopeRecipientSchema.extend({
         fields: ZEnvelopeFieldAndMetaSchema.and(
           z.object({
             identifier: z

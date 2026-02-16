@@ -1,5 +1,6 @@
 import { prisma } from '@documenso/prisma';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { hashString } from '../auth/hash';
 
 export const getUserByApiToken = async ({ token }: { token: string }) => {
@@ -19,14 +20,20 @@ export const getUserByApiToken = async ({ token }: { token: string }) => {
   });
 
   if (!user) {
-    throw new Error('Invalid token');
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'Invalid token',
+      statusCode: 401,
+    });
   }
 
   const retrievedToken = user.apiTokens.find((apiToken) => apiToken.token === hashedToken);
 
   // This should be impossible but we need to satisfy TypeScript
   if (!retrievedToken) {
-    throw new Error('Invalid token');
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'Invalid token',
+      statusCode: 401,
+    });
   }
 
   if (retrievedToken.expires && retrievedToken.expires < new Date()) {

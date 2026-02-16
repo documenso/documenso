@@ -30,6 +30,7 @@ import { mapEnvelopeToTemplateLite } from '@documenso/lib/utils/templates';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
+import { getTemplatesByIdsRoute } from './get-templates-by-ids';
 import {
   ZBulkSendTemplateMutationSchema,
   ZCreateDocumentFromDirectTemplateRequestSchema,
@@ -155,6 +156,11 @@ export const templateRouter = router({
     }),
 
   /**
+   * @public
+   */
+  getMany: getTemplatesByIdsRoute,
+
+  /**
    * Wait until RR7 so we can passthrough documents.
    *
    * @private
@@ -191,7 +197,9 @@ export const templateRouter = router({
         attachments,
       } = payload;
 
-      const { id: templateDocumentDataId } = await putNormalizedPdfFileServerSide(file);
+      const { id: templateDocumentDataId } = await putNormalizedPdfFileServerSide(file, {
+        flattenForm: false,
+      });
 
       ctx.logger.info({
         input: {
@@ -459,8 +467,10 @@ export const templateRouter = router({
         customDocumentDataId,
         folderId,
         prefillFields,
+        externalId,
         override,
         attachments,
+        formValues,
       } = input;
 
       ctx.logger.info({
@@ -497,8 +507,10 @@ export const templateRouter = router({
         requestMetadata: ctx.metadata,
         folderId,
         prefillFields,
+        externalId,
         override,
         attachments,
+        formValues,
       });
 
       if (distributeDocument) {

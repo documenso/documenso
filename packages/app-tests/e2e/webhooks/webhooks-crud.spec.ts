@@ -7,7 +7,7 @@ import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
-import { expectTextToBeVisible } from '../fixtures/generic';
+import { expectTextToBeVisible, openDropdownMenu } from '../fixtures/generic';
 
 /**
  * Helper function to seed a webhook directly in the database for testing.
@@ -147,9 +147,11 @@ test('[WEBHOOKS]: delete webhook', async ({ page }) => {
 
   // Find the row with the webhook and click the action dropdown
   const webhookRow = page.locator('tr', { hasText: webhookUrl });
-  await webhookRow.getByTestId('webhook-table-action-btn').click();
+  const actionBtn = webhookRow.getByTestId('webhook-table-action-btn');
+  await openDropdownMenu(page, actionBtn);
 
   // Click Delete menu item
+  await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Delete' }).click();
 
   // Fill in confirmation field
@@ -196,9 +198,11 @@ test('[WEBHOOKS]: update webhook', async ({ page }) => {
 
   // Find the row with the webhook and click the action dropdown
   const webhookRow = page.locator('tr', { hasText: originalWebhookUrl });
-  await webhookRow.getByTestId('webhook-table-action-btn').click();
+  const actionBtn = webhookRow.getByTestId('webhook-table-action-btn');
+  await openDropdownMenu(page, actionBtn);
 
   // Click Edit menu item
+  await expect(page.getByRole('menuitem', { name: 'Edit' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Edit' }).click();
 
   // Wait for dialog to open

@@ -3,8 +3,14 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentMeta, EnvelopeItem, Recipient, Signature } from '@prisma/client';
-import { type Field, FieldType } from '@prisma/client';
+import {
+  type DocumentMeta,
+  type EnvelopeItem,
+  type Field,
+  FieldType,
+  type Recipient,
+  type Signature,
+} from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useSearchParams } from 'react-router';
@@ -18,6 +24,7 @@ import {
   isRequiredField,
 } from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { trpc } from '@documenso/trpc/react';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
@@ -96,7 +103,7 @@ export const EmbedDirectTemplateClientPage = ({
 
   const highestPendingPageNumber = Math.max(...pendingFields.map((field) => field.page));
 
-  const hasSignatureField = localFields.some((field) => field.type === FieldType.SIGNATURE);
+  const hasSignatureField = localFields.some((field) => isSignatureFieldType(field.type));
 
   const signatureValid = !hasSignatureField || (signature && signature.trim() !== '');
 
@@ -438,6 +445,7 @@ export const EmbedDirectTemplateClientPage = ({
                       className="mt-2"
                       disabled={isThrottled || isSubmitting}
                       disableAnimation
+                      fullName={fullName}
                       value={signature ?? ''}
                       onChange={(v) => setSignature(v ?? '')}
                       typedSignatureEnabled={metadata?.typedSignatureEnabled}
@@ -491,7 +499,9 @@ export const EmbedDirectTemplateClientPage = ({
 
       {!hidePoweredBy && (
         <div className="fixed bottom-0 left-0 z-40 rounded-tr bg-primary px-2 py-1 text-xs font-medium text-primary-foreground opacity-60 hover:opacity-100">
-          <span>Powered by</span>
+          <span>
+            <Trans>Powered by</Trans>
+          </span>
           <BrandingLogo className="ml-2 inline-block h-[14px]" />
         </div>
       )}

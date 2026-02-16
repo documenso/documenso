@@ -1,5 +1,6 @@
 import { type ReactNode, useState } from 'react';
 
+import { plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
@@ -115,19 +116,21 @@ export const EnvelopeDropZoneWrapper = ({
           ? formatDocumentsPath(team.url)
           : formatTemplatesPath(team.url);
 
-      await navigate(`${pathPrefix}/${id}/edit`);
+      const aiQueryParam = team.preferences.aiFeaturesEnabled ? '?ai=true' : '';
+
+      await navigate(`${pathPrefix}/${id}/edit${aiQueryParam}`);
     } catch (err) {
       const error = AppError.parseError(err);
 
       const errorMessage = match(error.code)
-        .with('INVALID_DOCUMENT_FILE', () => t`You cannot upload encrypted PDFs`)
+        .with('INVALID_DOCUMENT_FILE', () => t`You cannot upload encrypted PDFs.`)
         .with(
           AppErrorCode.LIMIT_EXCEEDED,
           () => t`You have reached your document limit for this month. Please upgrade your plan.`,
         )
         .with(
           'ENVELOPE_ITEM_LIMIT_EXCEEDED',
-          () => t`You have reached the limit of the number of files per envelope`,
+          () => t`You have reached the limit of the number of files per envelope.`,
         )
         .otherwise(() => t`An error occurred during upload.`);
 
@@ -153,7 +156,10 @@ export const EnvelopeDropZoneWrapper = ({
 
     if (maxItemsReached) {
       toast({
-        title: t`You cannot upload more than ${maximumEnvelopeItemCount} items per envelope.`,
+        title: plural(maximumEnvelopeItemCount, {
+          one: `You cannot upload more than # item per envelope.`,
+          other: `You cannot upload more than # items per envelope.`,
+        }),
         duration: 5000,
         variant: 'destructive',
       });
@@ -220,9 +226,9 @@ export const EnvelopeDropZoneWrapper = ({
       {children}
 
       {isDragActive && (
-        <div className="bg-muted/60 fixed left-0 top-0 z-[9999] h-full w-full backdrop-blur-[4px]">
+        <div className="fixed left-0 top-0 z-[9999] h-full w-full bg-muted/60 backdrop-blur-[4px]">
           <div className="pointer-events-none flex h-full w-full flex-col items-center justify-center">
-            <h2 className="text-foreground text-2xl font-semibold">
+            <h2 className="text-2xl font-semibold text-foreground">
               {type === EnvelopeType.DOCUMENT ? (
                 <Trans>Upload Document</Trans>
               ) : (
@@ -230,7 +236,7 @@ export const EnvelopeDropZoneWrapper = ({
               )}
             </h2>
 
-            <p className="text-muted-foreground text-md mt-4">
+            <p className="text-md mt-4 text-muted-foreground">
               <Trans>Drag and drop your PDF file here</Trans>
             </p>
 
@@ -247,7 +253,7 @@ export const EnvelopeDropZoneWrapper = ({
               team?.id === undefined &&
               remaining.documents > 0 &&
               Number.isFinite(remaining.documents) && (
-                <p className="text-muted-foreground/80 mt-4 text-sm">
+                <p className="mt-4 text-sm text-muted-foreground/80">
                   <Trans>
                     {remaining.documents} of {quota.documents} documents remaining this month.
                   </Trans>
@@ -258,10 +264,10 @@ export const EnvelopeDropZoneWrapper = ({
       )}
 
       {isLoading && (
-        <div className="bg-muted/30 absolute inset-0 z-50 backdrop-blur-[2px]">
+        <div className="absolute inset-0 z-50 bg-muted/30 backdrop-blur-[2px]">
           <div className="pointer-events-none flex h-1/2 w-full flex-col items-center justify-center">
-            <Loader className="text-primary h-12 w-12 animate-spin" />
-            <p className="text-foreground mt-8 font-medium">
+            <Loader className="h-12 w-12 animate-spin text-primary" />
+            <p className="mt-8 font-medium text-foreground">
               <Trans>Uploading</Trans>
             </p>
           </div>

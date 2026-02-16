@@ -185,7 +185,7 @@ export const createDocumentFromDirectTemplate = async ({
       documentAuth: directTemplateEnvelope.authOptions,
     });
 
-  const directRecipientName = user?.name || initialDirectRecipientName;
+  let directRecipientName = user?.name || initialDirectRecipientName;
 
   // Ensure typesafety when we add more options.
   const isAccessAuthValid = match(derivedRecipientAccessAuth.at(0))
@@ -238,7 +238,7 @@ export const createDocumentFromDirectTemplate = async ({
       }
 
       if (templateField.type === FieldType.NAME && directRecipientName === undefined) {
-        directRecipientName === signedFieldValue?.value;
+        directRecipientName = signedFieldValue?.value;
       }
 
       const derivedRecipientActionAuth = await validateFieldAuth({
