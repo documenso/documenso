@@ -5,23 +5,24 @@ description: Embed document and template creation directly in your application.
 
 import { Callout } from 'fumadocs-ui/components/callout';
 
-In addition to embedding signing, Documenso supports embedded authoring - letting your users create and edit documents and templates without leaving your application.
+In addition to embedding signing, Documenso supports embedded authoring. It allows your users to create and edit documents and templates without leaving your application.
 
 <Callout type="warn">
-  Embedded authoring is included with **Enterprise** plans. It is also available as a paid add-on
-  for the **Platform Plan**. Contact [sales](https://documen.so/sales) for access.
+  Embedded authoring is included with [Enterprise](https://documen.so/enterprise-cta) plans. It is
+  also available as a paid add-on for the [Platform Plan](https://documen.so/platform-cta-pricing).
+  Contact sales for access.
 </Callout>
 
 ## Components
 
 The SDK provides four authoring components:
 
-| Component               | Purpose                  |
-| ----------------------- | ------------------------ |
-| `EmbedCreateDocumentV1` | Create new documents.    |
-| `EmbedCreateTemplateV1` | Create new templates.    |
-| `EmbedUpdateDocumentV1` | Edit existing documents. |
-| `EmbedUpdateTemplateV1` | Edit existing templates. |
+| Component               | Purpose                 |
+| ----------------------- | ----------------------- |
+| `EmbedCreateDocumentV1` | Create new documents    |
+| `EmbedCreateTemplateV1` | Create new templates    |
+| `EmbedUpdateDocumentV1` | Edit existing documents |
+| `EmbedUpdateTemplateV1` | Edit existing templates |
 
 All authoring components require a **presign token** for authentication instead of a regular token.
 
@@ -140,24 +141,24 @@ const TemplateEditor = ({ presignToken, templateId }) => {
 
 ### All Authoring Components
 
-| Prop               | Type      | Description                                               |
-| ------------------ | --------- | --------------------------------------------------------- |
-| `presignToken`     | `string`  | **Required.** Authentication token from your backend.     |
-| `externalId`       | `string`  | Your reference ID to link with the document or template.  |
-| `host`             | `string`  | Custom host URL. Defaults to `https://app.documenso.com`. |
-| `css`              | `string`  | Custom CSS string (Platform Plan).                        |
-| `cssVars`          | `object`  | CSS variable overrides (Platform Plan).                   |
-| `darkModeDisabled` | `boolean` | Disable dark mode (Platform Plan).                        |
-| `className`        | `string`  | CSS class for the iframe.                                 |
-| `features`         | `object`  | Feature toggles for the authoring experience.             |
+| Prop               | Type      | Required | Description                                              |
+| ------------------ | --------- | -------- | -------------------------------------------------------- |
+| `presignToken`     | `string`  | Yes      | Authentication token from your backend                   |
+| `externalId`       | `string`  | No       | Your reference ID to link with the document or template  |
+| `host`             | `string`  | No       | Custom host URL. Defaults to `https://app.documenso.com` |
+| `css`              | `string`  | No       | Custom CSS string (Platform Plan)                        |
+| `cssVars`          | `object`  | No       | CSS variable overrides (Platform Plan)                   |
+| `darkModeDisabled` | `boolean` | No       | Disable dark mode (Platform Plan)                        |
+| `className`        | `string`  | No       | CSS class for the iframe                                 |
+| `features`         | `object`  | No       | Feature toggles for the authoring experience             |
 
 ### Update Components Only
 
-| Prop             | Type      | Description                                                 |
-| ---------------- | --------- | ----------------------------------------------------------- |
-| `documentId`     | `number`  | **Required for document update.** The document ID to edit.  |
-| `templateId`     | `number`  | **Required for template update.** The template ID to edit.  |
-| `onlyEditFields` | `boolean` | Restrict editing to fields only, skipping recipient config. |
+| Prop             | Type      | Required | Description                                                |
+| ---------------- | --------- | -------- | ---------------------------------------------------------- |
+| `documentId`     | `number`  | Yes      | The document ID to edit (for document update component)    |
+| `templateId`     | `number`  | Yes      | The template ID to edit (for template update component)    |
+| `onlyEditFields` | `boolean` | No       | Restrict editing to fields only, skipping recipient config |
 
 ---
 
@@ -185,10 +186,10 @@ Customize what options are available in the authoring experience:
 
 All creation callbacks receive:
 
-| Field                        | Type     | Description                              |
-| ---------------------------- | -------- | ---------------------------------------- |
-| `documentId` or `templateId` | `number` | The ID of the created or updated item.   |
-| `externalId`                 | `string` | Your external reference ID, if provided. |
+| Field                        | Type     | Description                             |
+| ---------------------------- | -------- | --------------------------------------- |
+| `documentId` or `templateId` | `number` | The ID of the created or updated item   |
+| `externalId`                 | `string` | Your external reference ID, if provided |
 
 ---
 

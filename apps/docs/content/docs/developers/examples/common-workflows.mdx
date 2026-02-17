@@ -3,12 +3,24 @@ title: Common Workflows
 description: Complete code examples for common document signing workflows, with error handling that can be adapted for your specific use case.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Workflow 1: Send a Document for Signature
 
 The most common workflow: upload a PDF, add recipients with signature fields, and send for signing.
+
+<Steps>
+  <Step>Build the recipient payload with signature and date fields</Step>
+  <Step>
+    Create the envelope via <code>POST /envelope/create</code> with the PDF and payload
+  </Step>
+  <Step>
+    Distribute the document via <code>POST /envelope/distribute</code> to send signing links
+  </Step>
+</Steps>
 
 <Tabs items={['TypeScript', 'curl']}>
 <Tab value="TypeScript">
@@ -36,7 +48,6 @@ filename: string,
 title: string,
 recipients: Recipient[]
 ): Promise<CreateAndSendResult> {
-// Build recipient payload with signature fields
 const recipientPayload = recipients.map((recipient, index) => ({
 email: recipient.email,
 name: recipient.name,
@@ -45,29 +56,12 @@ signingOrder: index + 1,
 fields:
 recipient.role === 'SIGNER'
 ? [
-{
-identifier: 0,
-type: 'SIGNATURE',
-page: 1,
-positionX: 10,
-positionY: 80 - index * 10,
-width: 30,
-height: 5,
-},
-{
-identifier: 0,
-type: 'DATE',
-page: 1,
-positionX: 50,
-positionY: 80 - index * 10,
-width: 20,
-height: 3,
-},
+{ identifier: 0, type: 'SIGNATURE', page: 1, positionX: 10, positionY: 80 - index * 10, width: 30, height: 5 },
+{ identifier: 0, type: 'DATE', page: 1, positionX: 50, positionY: 80 - index * 10, width: 20, height: 3 },
 ]
 : [],
 }));
 
-// Create envelope with recipients and fields
 const formData = new FormData();
 formData.append(
 'payload',
@@ -96,7 +90,6 @@ throw new Error(`Failed to create envelope: ${error.message}`);
 
 const { id: envelopeId } = await createResponse.json();
 
-// Distribute (send) the document
 const distributeResponse = await fetch(`${BASE_URL}/envelope/distribute`, {
 method: 'POST',
 headers: {
@@ -122,7 +115,6 @@ signingUrl: r.signingUrl,
 };
 }
 
-// Usage
 const fs = require('fs');
 const pdfBuffer = fs.readFileSync('./contract.pdf');
 
@@ -228,6 +220,17 @@ echo $DISTRIBUTE_RESPONSE | jq '.recipients[] | {email, signingUrl}'
 
 Use templates for repeatable document workflows. This example creates an employment contract with prefilled data.
 
+<Steps>
+  <Step>Fetch the template to get recipient and field IDs</Step>
+  <Step>
+    Map template fields by label and build a <code>prefillFields</code> array
+  </Step>
+  <Step>
+    Call <code>POST /template/use</code> with recipients, prefill data, and{' '}
+    <code>distributeDocument: true</code>
+  </Step>
+</Steps>
+
 <Tabs items={['TypeScript', 'curl']}>
 <Tab value="TypeScript">
 ```typescript
@@ -259,7 +262,6 @@ async function sendEmploymentContract(
 templateId: number,
 employee: EmployeeData
 ): Promise<{ documentId: string; signingUrl: string }> {
-// 1. Fetch template to get recipient and field IDs
 const templateResponse = await fetch(`${BASE_URL}/template/${templateId}`, {
 headers: { Authorization: API_TOKEN },
 });
@@ -270,7 +272,6 @@ throw new Error('Template not found');
 
 const template = await templateResponse.json();
 
-// 2. Find the employee recipient slot (first signer)
 const employeeRecipient = template.recipients.find(
 (r: TemplateRecipient) => r.role === 'SIGNER' && r.signingOrder === 1
 );
@@ -279,7 +280,6 @@ if (!employeeRecipient) {
 throw new Error('Template missing employee recipient');
 }
 
-// 3. Map fields by label for prefilling
 const fieldsByLabel = new Map<string, TemplateField>();
 template.fields.forEach((field: TemplateField) => {
 if (field.fieldMeta?.label) {
@@ -287,7 +287,6 @@ fieldsByLabel.set(field.fieldMeta.label.toLowerCase(), field);
 }
 });
 
-// 4. Build prefill array
 const prefillFields = [];
 
 const positionField = fieldsByLabel.get('position') || fieldsByLabel.get('job title');
@@ -310,7 +309,6 @@ if (departmentField) {
 prefillFields.push({ id: departmentField.id, type: 'dropdown', value: employee.department });
 }
 
-// 5. Create document from template
 const createResponse = await fetch(`${BASE_URL}/template/use`, {
 method: 'POST',
 headers: {
@@ -320,11 +318,7 @@ Authorization: API_TOKEN,
 body: JSON.stringify({
 templateId,
 recipients: [
-{
-id: employeeRecipient.id,
-email: employee.email,
-name: employee.name,
-},
+{ id: employeeRecipient.id, email: employee.email, name: employee.name },
 ],
 prefillFields,
 override: {
@@ -350,7 +344,6 @@ signingUrl: document.recipients[0].signingUrl,
 };
 }
 
-// Usage
 const result = await sendEmploymentContract(123, {
 email: 'alice.johnson@example.com',
 name: 'Alice Johnson',
@@ -430,6 +423,17 @@ echo $RESPONSE | jq '{id, signingUrl: .recipients[0].signingUrl}'
 
 Send the same document to multiple recipients in parallel. Useful for policy acknowledgments, NDAs, or announcements.
 
+<Steps>
+  <Step>Fetch the template and get the signer recipient slot ID</Step>
+  <Step>
+    For each recipient, call <code>POST /template/use</code> with{' '}
+    <code>distributeDocument: true</code>
+  </Step>
+  <Step>
+    Process in batches with a short delay to respect rate limits (e.g. 100 requests/minute)
+  </Step>
+</Steps>
+
 <Tabs items={['TypeScript', 'curl']}>
 <Tab value="TypeScript">
 ```typescript
@@ -451,7 +455,6 @@ templateId: number,
 recipients: BulkRecipient[],
 concurrency = 5
 ): Promise<BulkSendResult> {
-// Fetch template to get recipient slot ID
 const templateResponse = await fetch(`${BASE_URL}/template/${templateId}`, {
 headers: { Authorization: API_TOKEN },
 });
@@ -461,9 +464,7 @@ throw new Error('Template not found');
 }
 
 const template = await templateResponse.json();
-const signerSlot = template.recipients.find(
-(r: { role: string }) => r.role === 'SIGNER'
-);
+const signerSlot = template.recipients.find((r: { role: string }) => r.role === 'SIGNER');
 
 if (!signerSlot) {
 throw new Error('Template has no signer recipient');
@@ -471,7 +472,6 @@ throw new Error('Template has no signer recipient');
 
 const results: BulkSendResult = { successful: [], failed: [] };
 
-// Process in batches for rate limiting
 for (let i = 0; i < recipients.length; i += concurrency) {
 const batch = recipients.slice(i, i + concurrency);
 
@@ -486,11 +486,7 @@ const batch = recipients.slice(i, i + concurrency);
           body: JSON.stringify({
             templateId,
             recipients: [
-              {
-                id: signerSlot.id,
-                email: recipient.email,
-                name: recipient.name,
-              },
+              { id: signerSlot.id, email: recipient.email, name: recipient.name },
             ],
             distributeDocument: true,
             externalId: `bulk-${Date.now()}-${recipient.email}`,
@@ -522,7 +518,6 @@ const batch = recipients.slice(i, i + concurrency);
       }
     });
 
-    // Rate limit delay between batches
     if (i + concurrency < recipients.length) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
@@ -532,19 +527,16 @@ const batch = recipients.slice(i, i + concurrency);
 return results;
 }
 
-// Usage
 const recipients = [
 { email: 'employee1@company.com', name: 'Employee One' },
 { email: 'employee2@company.com', name: 'Employee Two' },
 { email: 'employee3@company.com', name: 'Employee Three' },
-// ... more recipients
 ];
 
 const results = await bulkSendFromTemplate(456, recipients);
 
 console.log(`Sent: ${results.successful.length}`);
 console.log(`Failed: ${results.failed.length}`);
-
 results.failed.forEach((f) => console.error(`${f.email}: ${f.error}`));
 
 ````
@@ -614,11 +606,24 @@ done
 
 Set up webhooks to receive real-time notifications when documents are signed or completed.
 
-### Step 1: Create a Webhook Endpoint
+<Steps>
+  <Step>
+    **Create a webhook endpoint**: Implement an HTTP handler that verifies the signature and
+    processes events
+  </Step>
+  <Step>
+    **Register the webhook**: Add your endpoint URL and secret in Team Settings → Webhooks
+  </Step>
+  <Step>
+    **Optional: poll as fallback**: For critical workflows, poll envelope status if webhooks are
+    unreliable
+  </Step>
+</Steps>
+
+### Create a Webhook Endpoint
 
 ```typescript
 // Express.js webhook handler
-import crypto from 'crypto';
 import express from 'express';
 
 const app = express();
@@ -694,27 +699,35 @@ app.post('/webhooks/documenso', (req, res) => {
 async function handleDocumentCompleted(payload: WebhookPayload['payload']) {
   // Example: Update order status, send confirmation, download PDF
   console.log(`Processing completed document: ${payload.externalId || payload.id}`);
-
   // Your business logic here
 }
 
 app.listen(3000, () => console.log('Webhook server running on port 3000'));
 ```
 
-### Step 2: Register the Webhook
+### Register the Webhook
 
 Register your endpoint in the Documenso dashboard:
 
-1. Go to **Team Settings** > **Webhooks**
-2. Click **Create Webhook**
-3. Enter your webhook URL (e.g., `https://your-app.com/webhooks/documenso`)
-4. Select which events to subscribe to: `DOCUMENT_SENT`, `DOCUMENT_OPENED`, `DOCUMENT_SIGNED`, `DOCUMENT_COMPLETED`, `DOCUMENT_REJECTED`
-5. Enter your webhook secret (the same value stored in `DOCUMENSO_WEBHOOK_SECRET`)
-6. Click **Create Webhook**
+<Steps>
+  <Step>Go to **Team Settings** → **Webhooks**</Step>
+  <Step>Click **Create Webhook**</Step>
+  <Step>
+    Enter your webhook URL (e.g. <code>https://your-app.com/webhooks/documenso</code>)
+  </Step>
+  <Step>
+    Select which events to subscribe to: <code>DOCUMENT_SENT</code>, <code>DOCUMENT_OPENED</code>,{' '}
+    <code>DOCUMENT_SIGNED</code>, <code>DOCUMENT_COMPLETED</code>, <code>DOCUMENT_REJECTED</code>
+  </Step>
+  <Step>
+    Enter your webhook secret (the same value stored in <code>DOCUMENSO_WEBHOOK_SECRET</code>)
+  </Step>
+  <Step>Click **Create Webhook**</Step>
+</Steps>
 
 See [Webhook Setup](/docs/developers/webhooks/setup) for detailed instructions.
 
-### Step 3: Poll as Fallback
+### Poll as Fallback
 
 For critical workflows, implement polling as a fallback in case webhooks fail:
 
@@ -754,6 +767,17 @@ async function pollForCompletion(
 
 After a document is completed, download the signed PDF with all signatures embedded.
 
+<Steps>
+  <Step>
+    Get the envelope with <code>GET /envelope/:envelopeId</code> and confirm status is{' '}
+    <code>COMPLETED</code>
+  </Step>
+  <Step>
+    Use <code>envelopeItems[0].id</code> and call{' '}
+    <code>GET /envelope/item/:itemId/download?version=signed</code>
+  </Step>
+</Steps>
+
 <Tabs items={['TypeScript', 'curl']}>
 <Tab value="TypeScript">
 ```typescript
@@ -766,7 +790,6 @@ async function downloadDocument(
 envelopeId: string,
 version: DownloadVersion = 'signed'
 ): Promise<{ buffer: Buffer; filename: string }> {
-// First, get the envelope to find the envelope item ID
 const envelopeResponse = await fetch(`${BASE_URL}/envelope/${envelopeId}`, {
 headers: { Authorization: API_TOKEN },
 });
@@ -777,23 +800,18 @@ throw new Error('Envelope not found');
 
 const envelope = await envelopeResponse.json();
 
-// Check document is completed before downloading signed version
 if (version === 'signed' && envelope.status !== 'COMPLETED') {
 throw new Error('Document must be completed to download signed version');
 }
 
-// Get the first envelope item (PDF)
 const envelopeItem = envelope.envelopeItems[0];
 if (!envelopeItem) {
 throw new Error('No document found in envelope');
 }
 
-// Download the document
 const downloadResponse = await fetch(
 `${BASE_URL}/envelope/item/${envelopeItem.id}/download?version=${version}`,
-{
-headers: { Authorization: API_TOKEN },
-}
+{ headers: { Authorization: API_TOKEN } }
 );
 
 if (!downloadResponse.ok) {
@@ -811,7 +829,6 @@ async function downloadAllCompletedDocuments(outputDir: string): Promise<void> {
 const fs = require('fs');
 const path = require('path');
 
-// Fetch all completed documents
 let page = 1;
 let hasMore = true;
 
@@ -832,8 +849,6 @@ const response = await fetch(
       } catch (error) {
         console.error(`Failed to download ${envelope.id}:`, error);
       }
-
-      // Rate limiting
       await new Promise((resolve) => setTimeout(resolve, 500));
     }
 
@@ -843,11 +858,9 @@ const response = await fetch(
 }
 }
 
-// Usage: Download single document
 const { buffer, filename } = await downloadDocument('envelope_abc123', 'signed');
 require('fs').writeFileSync(`./downloads/${filename}`, buffer);
 
-// Usage: Download all completed documents
 await downloadAllCompletedDocuments('./downloads');
 
 ````
@@ -909,7 +922,9 @@ echo "Downloaded: ${OUTPUT_DIR}/${ORIG_FILENAME}"
 
 Implement robust error handling for production integrations.
 
-### Retry with Exponential Backoff
+<Accordions type="multiple">
+  <Accordion title="Retry with Exponential Backoff">
+    Retry on 429 (rate limit) and 5xx errors with exponential backoff; respect <code>Retry-After</code> when present.
 
 ```typescript
 type RetryOptions = {
@@ -961,7 +976,9 @@ async function fetchWithRetry(
 }
 ```
 
-### Error Response Handling
+  </Accordion>
+  <Accordion title="Error Response Handling">
+    Parse API errors into a typed class and handle by status code (400, 401, 404, 429, etc.).
 
 ```typescript
 type ApiError = {
@@ -1034,7 +1051,9 @@ try {
 }
 ```
 
-### Validation Before API Calls
+  </Accordion>
+  <Accordion title="Validation Before API Calls">
+    Validate recipients (email, name, role) and PDF (magic bytes, size) before calling the API.
 
 ```typescript
 function validateRecipients(recipients: Array<{ email: string; name: string; role: string }>) {
@@ -1074,6 +1093,9 @@ function validatePdfFile(buffer: Buffer, maxSizeMb = 10) {
   }
 }
 ```
+
+  </Accordion>
+</Accordions>
 
 ---
 

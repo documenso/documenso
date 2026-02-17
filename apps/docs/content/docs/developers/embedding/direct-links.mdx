@@ -4,15 +4,18 @@ description: Share a URL or embed an iframe to let users sign documents without 
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## What Are Direct Links?
 
 Direct links are unique URLs tied to a template that allow anyone to:
 
-1. View and sign a document without receiving an email invitation
-2. Enter their own name and email address
-3. Complete signature fields and submit the document
+<Steps>
+  <Step>View and sign a document without receiving an email invitation</Step>
+  <Step>Enter their own name and email address</Step>
+  <Step>Complete signature fields and submit the document</Step>
+</Steps>
 
 When someone uses a direct link, Documenso creates a new document from the template with that person as the signer.
 
@@ -35,16 +38,29 @@ Before embedding, you need a template with direct links enabled.
 
 ### Via the Dashboard
 
-1. Go to **Templates** and create or select a template
+<Steps>
+<Step>
+Go to **Templates** and create or select a template
 
 ![Team templates](/embedding/team-templates.png)
 
-2. Click the three-dot menu and select **Direct link**
-3. Click **Enable direct link signing**
-4. Choose which recipient in your template will use the direct link
-5. Copy the generated URL
+</Step>
+<Step>
+Click the three-dot menu and select **Direct link**
+</Step>
+<Step>
+Click **Enable direct link signing**
+</Step>
+<Step>
+Choose which recipient in your template will use the direct link
 
 ![Enable direct link](/embedding/enable-direct-link.png)
+
+</Step>
+<Step>
+Copy the generated URL
+</Step>
+</Steps>
 
 ### Via the API
 
@@ -111,7 +127,7 @@ https://app.documenso.com/d/{token}
 
 ---
 
-## Embedding in an Iframe
+## Embedding in an iframe
 
 Embed the signing experience directly in your application using an iframe.
 
@@ -158,7 +174,7 @@ function DocumentSigner({ token }: { token: string }) {
 
 <Callout type="info">
   The embed URL uses `/embed/direct/{token}` instead of `/d/{token}`. The embed version is optimized
-  for iframe embedding with reduced navigation chrome.
+  for iframe embedding with reduced navigation.
 </Callout>
 
 ---
@@ -179,9 +195,11 @@ function redirectToSigning(token: string) {
 
 Configure a redirect URL in your template settings to return users to your application after signing:
 
-1. Edit your template
-2. Go to **Advanced Settings**
-3. Set **Redirect URL** to your desired return URL (e.g., `https://yourapp.com/signed`)
+<Steps>
+  <Step>Edit your template</Step>
+  <Step>Go to **Advanced Settings**</Step>
+  <Step>Set **Redirect URL** to your desired return URL (e.g., `https://yourapp.com/signed`)</Step>
+</Steps>
 
 Or set it via API when creating the template:
 
@@ -365,7 +383,7 @@ const response = await fetch(`${BASE_URL}/template/update`, {
 
 ### White-labeling
 
-Enterprise plans support white-label embedding with the "Powered by Documenso" badge removed. Contact sales for details.
+Enterprise plans support white-label embedding with the "Powered by Documenso" badge removed. [Contact sales](mailto:support@documenso.com) for details.
 
 ---
 

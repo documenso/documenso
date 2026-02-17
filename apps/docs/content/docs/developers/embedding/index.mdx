@@ -4,6 +4,9 @@ description: Embed document signing experiences directly in your application usi
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+## Overview
 
 Documenso provides official embedding SDKs for all popular JavaScript frameworks. Install the package for your framework and embed document signing with a few lines of code.
 
@@ -11,7 +14,7 @@ Documenso provides official embedding SDKs for all popular JavaScript frameworks
 
 Embedding is available on **Teams Plan** and above, as well as for **Early Adopters** within a team (Early Adopters can create a team for free).
 
-The **Platform Plan** adds enhanced customization:
+The [Platform Plan](https://documen.so/platform-cta-pricing) adds enhanced customization:
 
 - Custom CSS and styling variables
 - Dark mode controls
@@ -68,17 +71,24 @@ import { EmbedSignDocument } from '@documenso/embed-react';
 
 ### Direct Template Token
 
-1. Navigate to your team's templates in Documenso
+<Steps>
+<Step>
+Navigate to your team's templates in Documenso
 
 ![Team Templates](/embedding/team-templates.png)
 
-2. Click on a direct link template to copy its URL. The token is the last segment of the URL.
+</Step>
+<Step>
+Click on a direct link template to copy its URL. The token is the last segment of the URL.
 
 For example, `https://app.documenso.com/d/-WoSwWVT-fYOERS2MI37k` has the token `-WoSwWVT-fYOERS2MI37k`.
 
 If your template is not a direct link template yet, select **Direct Link** from the three-dot menu on the templates table to enable it.
 
 ![Enable Direct Link Template](/embedding/enable-direct-link.png)
+
+</Step>
+</Steps>
 
 ### Signing Token
 
