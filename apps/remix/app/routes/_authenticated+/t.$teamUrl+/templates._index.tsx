@@ -1,16 +1,18 @@
 import { useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
+import type { TemplateType } from '@prisma/client';
 import { EnvelopeType } from '@prisma/client';
 import { Bird } from 'lucide-react';
 import { useParams, useSearchParams } from 'react-router';
 
 import { useSessionStorage } from '@documenso/lib/client-only/hooks/use-session-storage';
 import { FolderType } from '@documenso/lib/types/folder-type';
+import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
+import { parseToStringArray } from '@documenso/lib/utils/params';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
-import { ZFindTemplatesRequestSchema } from '@documenso/trpc/server/template-router/schema';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import type { RowSelectionState } from '@documenso/ui/primitives/data-table';
 
@@ -28,9 +30,8 @@ export function meta() {
   return appMetaTags('Templates');
 }
 
-const ZTemplatesSearchParamsSchema = ZFindTemplatesRequestSchema.pick({
+const ZTemplatesSearchParamsSchema = ZFindSearchParamsSchema.pick({
   query: true,
-  type: true,
   page: true,
   perPage: true,
 });
@@ -46,6 +47,11 @@ export default function TemplatesPage() {
       ZTemplatesSearchParamsSchema.safeParse(Object.fromEntries(searchParams.entries())).data || {},
     [searchParams],
   );
+
+  const typeFilter = useMemo(() => {
+    const selected = parseToStringArray(searchParams.get('type'));
+    return selected.length === 1 ? (selected[0] as TemplateType) : undefined;
+  }, [searchParams]);
 
   const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>(
     'templates-bulk-selection',
@@ -63,6 +69,7 @@ export default function TemplatesPage() {
 
   const { data, isLoading, isLoadingError } = trpc.template.findTemplates.useQuery({
     ...findTemplatesSearchParams,
+    type: typeFilter,
     folderId,
   });
 
