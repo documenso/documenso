@@ -32,7 +32,7 @@ export const createEnvelopeRoute = authenticatedProcedure
       userId: ctx.user.id,
       teamId: ctx.teamId,
       input,
-      requestMetadata: ctx.metadata,
+      apiRequestMetadata: ctx.metadata,
     });
   });
 
@@ -47,14 +47,19 @@ type CreateEnvelopeRouteOptions = {
    */
   teamId: number;
   input: TCreateEnvelopeRequest;
-  requestMetadata: ApiRequestMetadata;
+  apiRequestMetadata: ApiRequestMetadata;
+
+  options?: {
+    bypassDefaultRecipients?: boolean;
+  };
 };
 
 export const createEnvelopeRouteCaller = async ({
   userId,
   teamId,
   input,
-  requestMetadata,
+  apiRequestMetadata,
+  options = {},
 }: CreateEnvelopeRouteOptions) => {
   const { payload, files } = input;
 
@@ -116,6 +121,7 @@ export const createEnvelopeRouteCaller = async ({
         flattenForm: type !== EnvelopeType.TEMPLATE,
       });
 
+      // Todo: Embeds - Does this need to be done on the frontend?
       const { cleanedPdf, placeholders } = await extractPdfPlaceholders(normalized);
 
       const { id: documentDataId } = await putPdfFileServerSide({
@@ -188,7 +194,8 @@ export const createEnvelopeRouteCaller = async ({
     },
     attachments,
     meta,
-    requestMetadata,
+    requestMetadata: apiRequestMetadata,
+    bypassDefaultRecipients: options.bypassDefaultRecipients,
   });
 
   return {

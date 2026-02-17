@@ -32,6 +32,10 @@ export const createEmbeddingEnvelopeRoute = procedure
       userId,
       teamId,
       input,
-      requestMetadata: ctx.metadata,
+      options: {
+        // Default recipients should be added on the frontend automatically for embeds.
+        bypassDefaultRecipients: true,
+      },
+      apiRequestMetadata: ctx.metadata,
     });
   });
