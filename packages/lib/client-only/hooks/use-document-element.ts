@@ -14,7 +14,10 @@ export const useDocumentElement = () => {
     const target = event.target;
 
     const $page =
-      target.closest<HTMLElement>(pageSelector) ?? target.querySelector<HTMLElement>(pageSelector);
+      target.closest<HTMLElement>(pageSelector) ??
+      document
+        .elementsFromPoint(event.clientX, event.clientY)
+        .find((el) => el.matches(pageSelector));
 
     if (!$page) {
       return null;

@@ -28,7 +28,14 @@ export const getDocumentByTokenRoute = authenticatedProcedure
       include: {
         envelopeItems: {
           include: {
-            documentData: true,
+            documentData: {
+              select: {
+                id: true,
+                type: true,
+                data: true,
+                initialData: true,
+              },
+            },
           },
         },
       },
