@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/react/macro';
 import { Outlet, isRouteErrorResponse, useRouteError } from 'react-router';
 
 import {
@@ -89,5 +90,9 @@ export function ErrorBoundary({ loaderData }: Route.ErrorBoundaryProps) {
     }
   }
 
-  return <div>Not Found</div>;
+  return (
+    <div>
+      <Trans>Not Found</Trans>
+    </div>
+  );
 }
