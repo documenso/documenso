@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-02-16 03:01\n"
+"PO-Revision-Date: 2026-02-16 06:23\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -4303,6 +4303,22 @@ msgstr "E-Mail-Präferenzen"
 msgid "Email preferences updated"
 msgstr "E-Mail-Präferenzen aktualisiert"
 
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email recipients when a pending document is deleted"
+msgstr "Empfänger per E-Mail benachrichtigen, wenn ein ausstehendes Dokument gelöscht wird"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email recipients when the document is completed"
+msgstr "Empfänger per E-Mail benachrichtigen, wenn das Dokument abgeschlossen ist"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email recipients when they're removed from a pending document"
+msgstr "Empfänger per E-Mail benachrichtigen, wenn sie von einem ausstehenden Dokument entfernt werden"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email recipients with a signing request"
+msgstr "Empfänger per E-Mail mit einer Signaturanfrage benachrichtigen"
+
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
 msgid "Email resent"
@@ -4327,6 +4343,18 @@ msgstr "E-Mail gesendet!"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Email Settings"
 msgstr "E-Mail-Einstellungen"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email the owner when a recipient signs"
+msgstr "Eigentümer per E-Mail benachrichtigen, wenn ein Empfänger unterschreibt"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email the owner when the document is completed"
+msgstr "Eigentümer per E-Mail benachrichtigen, wenn das Dokument abgeschlossen ist"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email the signer if the document is still pending"
+msgstr "Unterzeichner per E-Mail benachrichtigen, wenn das Dokument noch aussteht"
 
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Email verification"
@@ -8169,22 +8197,6 @@ msgstr "Dokument senden"
 msgid "Send Document"
 msgstr "Dokument senden"
 
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send document completed email"
-msgstr "E-Mail über den Abschluss des Dokuments senden"
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send document completed email to the owner"
-msgstr "E-Mail über den Abschluss des Dokuments an den Eigentümer senden"
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send document deleted email"
-msgstr "E-Mail über das Löschen des Dokuments senden"
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send document pending email"
-msgstr "E-Mail über ausstehende Dokumente senden"
-
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Send documents on behalf of the team using the email address"
 msgstr "Dokumente im Namen des Teams über die E-Mail-Adresse senden"
@@ -8196,18 +8208,6 @@ msgstr "Dokumente sofort an Empfänger senden"
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Send on Behalf of Team"
 msgstr "Im Namen des Teams senden"
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send recipient removed email"
-msgstr "E-Mail über entfernten Empfänger senden"
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send recipient signed email"
-msgstr "E-Mail über Empfänger-unterschrieben senden"
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send recipient signing request email"
-msgstr "E-Mail über Unterzeichnungsanfrage des Empfängers senden"
 
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx

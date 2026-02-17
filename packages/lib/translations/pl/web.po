@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-02-16 03:01\n"
+"PO-Revision-Date: 2026-02-17 00:20\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -748,7 +748,7 @@ msgstr "Resetowanie weryfikacji dwuetapowej"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 msgid "2FA token"
-msgstr "Token 2FA"
+msgstr "Kod weryfikacyjny"
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "3 months"
@@ -4303,6 +4303,22 @@ msgstr "Ustawienia adresu e-mail"
 msgid "Email preferences updated"
 msgstr "Ustawienia adresu e-mail zostały zaktualizowane"
 
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email recipients when a pending document is deleted"
+msgstr "Wyślij odbiorcom wiadomość, gdy oczekujący dokument zostanie usunięty"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email recipients when the document is completed"
+msgstr "Wyślij odbiorcom wiadomość po zakończeniu dokumentu"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email recipients when they're removed from a pending document"
+msgstr "Wyślij odbiorcom wiadomość, jeśli zostaną usunięci z oczekującego dokumentu"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email recipients with a signing request"
+msgstr "Wyślij odbiorcom wiadomość z prośbą o podpisanie"
+
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
 msgid "Email resent"
@@ -4327,6 +4343,18 @@ msgstr "Wiadomość została wysłana!"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Email Settings"
 msgstr "Ustawienia adresu e-mail"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email the owner when a recipient signs"
+msgstr "Wyślij właścicielowi potwierdzenie podpisania"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email the owner when the document is completed"
+msgstr "Wyślij właścicielowi wiadomość po zakończeniu dokumentu"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email the signer if the document is still pending"
+msgstr "Wyślij podpisującemu wiadomość, jeśli dokument jest nadal oczekujący"
 
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Email verification"
@@ -8169,22 +8197,6 @@ msgstr "Wyślij dokument"
 msgid "Send Document"
 msgstr "Wyślij dokument"
 
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send document completed email"
-msgstr "Wyślij zakończony dokument"
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send document completed email to the owner"
-msgstr "Wyślij zakończony dokument właścicielowi"
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send document deleted email"
-msgstr "Wyślij usunięty dokument"
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send document pending email"
-msgstr "Wyślij oczekujący dokument"
-
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Send documents on behalf of the team using the email address"
 msgstr "Wysyłanie dokumentów za pomocą Twojego adresu e-mail"
@@ -8196,18 +8208,6 @@ msgstr "Wyślij dokumenty do odbiorców natychmiast"
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Send on Behalf of Team"
 msgstr "Wyślij w imieniu zespołu"
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send recipient removed email"
-msgstr "Wyślij usuniętemu odbiorcy"
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send recipient signed email"
-msgstr "Wyślij potwierdzenie podpisania"
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send recipient signing request email"
-msgstr "Wyślij prośbę o podpisanie"
 
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
@@ -9921,38 +9921,38 @@ msgstr "Aby dodać użytkowników do zespołu, najpierw musisz dodać ich do org
 #. placeholder {0}: recipient.email
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To approve this document, you need to be logged in as <0>{0}</0>"
-msgstr "Aby zatwierdzić ten dokument, musisz być zalogowany jako <0>{0}</0>"
+msgstr "Aby zatwierdzić dokument, musisz być zalogowany jako <0>{0}</0>"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To approve this document, you need to be logged in."
-msgstr "Aby zatwierdzić ten dokument, musisz być zalogowany."
+msgstr "Aby zatwierdzić dokument, musisz być zalogowany."
 
 #. placeholder {0}: recipient.email
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To approve this field, you need to be logged in as <0>{0}</0>"
-msgstr "Aby zatwierdzić to pole, musisz być zalogowany jako <0>{0}</0>"
+msgstr "Aby zatwierdzić pole, musisz być zalogowany jako <0>{0}</0>"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To approve this field, you need to be logged in."
-msgstr "Aby zatwierdzić to pole, musisz być zalogowany."
+msgstr "Aby zatwierdzić pole, musisz być zalogowany."
 
 #. placeholder {0}: recipient.email
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To assist with this document, you need to be logged in as <0>{0}</0>"
-msgstr "Aby pomóc przy tym dokumencie, musisz być zalogowany jako <0>{0}</0>"
+msgstr "Aby przygotować dokument, musisz być zalogowany jako <0>{0}</0>"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To assist with this document, you need to be logged in."
-msgstr "Aby pomóc przy tym dokumencie, musisz być zalogowany."
+msgstr "Aby przygotować dokument, musisz być zalogowany."
 
 #. placeholder {0}: recipient.email
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To assist with this field, you need to be logged in as <0>{0}</0>"
-msgstr "Aby pomóc przy tym polu, musisz być zalogowany jako <0>{0}</0>"
+msgstr "Aby przygotować pole, musisz być zalogowany jako <0>{0}</0>"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To assist with this field, you need to be logged in."
-msgstr "Aby pomóc przy tym polu, musisz być zalogowany."
+msgstr "Aby przygotować pole, musisz być zalogowany."
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "To be able to add members to a team, you must first add them to the organisation. For more information, please see the <0>documentation</0>."
@@ -10004,20 +10004,20 @@ msgstr "Aby kontynuować, ustaw co najmniej jedną wartość do pola {0}."
 #. placeholder {0}: recipient.email
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To sign this document, you need to be logged in as <0>{0}</0>"
-msgstr "Aby podpisać ten dokument, musisz być zalogowany jako <0>{0}</0>"
+msgstr "Aby podpisać dokument, musisz być zalogowany jako <0>{0}</0>"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To sign this document, you need to be logged in."
-msgstr "Aby podpisać ten dokument, musisz być zalogowany."
+msgstr "Aby podpisać dokument, musisz być zalogowany."
 
 #. placeholder {0}: recipient.email
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To sign this field, you need to be logged in as <0>{0}</0>"
-msgstr "Aby podpisać to pole, musisz być zalogowany jako <0>{0}</0>"
+msgstr "Aby podpisać pole, musisz być zalogowany jako <0>{0}</0>"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To sign this field, you need to be logged in."
-msgstr "Aby podpisać to pole, musisz być zalogowany."
+msgstr "Aby podpisać pole, musisz być zalogowany."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "To use our electronic signature service, you must have access to:"
@@ -10030,22 +10030,22 @@ msgstr "Aby wyświetlić dokument, musisz zalogować się na swoje konto."
 #. placeholder {0}: recipient.email
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To view this document, you need to be logged in as <0>{0}</0>"
-msgstr "Aby wyświetlić ten dokument, musisz być zalogowany jako <0>{0}</0>"
+msgstr "Aby wyświetlić dokument, musisz być zalogowany jako <0>{0}</0>"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To view this document, you need to be logged in."
-msgstr "Aby wyświetlić ten dokument, musisz być zalogowany."
+msgstr "Aby wyświetlić dokument, musisz być zalogowany."
 
 #. placeholder {0}: recipient.email
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To view this field, you need to be logged in as <0>{0}</0>"
-msgstr "Aby wyświetlić to pole, musisz być zalogowany jako <0>{0}</0>"
+msgstr "Aby wyświetlić pole, musisz być zalogowany jako <0>{0}</0>"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To view this field, you need to be logged in."
-msgstr "Aby wyświetlić to pole, musisz być zalogowany."
+msgstr "Aby wyświetlić pole, musisz być zalogowany."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Toggle the switch to hide your profile from the public."
@@ -11936,77 +11936,77 @@ msgstr "Musisz być zalogowany, aby zobaczyć tę stronę."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 msgid "You need to setup 2FA to approve this document."
-msgstr "Musisz skonfigurować weryfikację dwuetapową (2FA), aby zatwierdzić ten dokument."
+msgstr "Aby zatwierdzić dokument, musisz skonfigurować weryfikację dwuetapową."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 msgid "You need to setup 2FA to approve this field."
-msgstr "Musisz skonfigurować weryfikację dwuetapową (2FA), aby zatwierdzić to pole."
+msgstr "Aby zatwierdzić pole, musisz skonfigurować weryfikację dwuetapową."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 msgid "You need to setup 2FA to assist with this document."
-msgstr "Musisz skonfigurować weryfikację dwuetapową (2FA), aby asystować przy tym dokumencie."
+msgstr "Aby przygotować dokument, musisz skonfigurować weryfikację dwuetapową."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 msgid "You need to setup 2FA to assist with this field."
-msgstr "Musisz skonfigurować weryfikację dwuetapową (2FA), aby asystować przy tym polu."
+msgstr "Aby przygotować pole, musisz skonfigurować weryfikację dwuetapową."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 msgid "You need to setup 2FA to mark this document as viewed."
-msgstr "Musisz skonfigurować weryfikację dwuetapową, aby oznaczyć dokument jako przeczytany."
+msgstr "Aby oznaczyć dokument jako wyświetlony, musisz skonfigurować weryfikację dwuetapową."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 msgid "You need to setup 2FA to sign this document."
-msgstr "Musisz skonfigurować weryfikację dwuetapową (2FA), aby podpisać ten dokument."
+msgstr "Aby podpisać dokument, musisz skonfigurować weryfikację dwuetapową."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 msgid "You need to setup 2FA to sign this field."
-msgstr "Musisz skonfigurować weryfikację dwuetapową (2FA), aby podpisać to pole."
+msgstr "Aby podpisać pole, musisz skonfigurować weryfikację dwuetapową."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 msgid "You need to setup 2FA to view this document."
-msgstr "Musisz skonfigurować weryfikację dwuetapową (2FA), aby wyświetlić ten dokument."
+msgstr "Aby wyświetlić dokument, musisz skonfigurować weryfikację dwuetapową."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 msgid "You need to setup 2FA to view this field."
-msgstr "Musisz skonfigurować weryfikację dwuetapową (2FA), aby wyświetlić to pole."
+msgstr "Aby wyświetlić pole, musisz skonfigurować weryfikację dwuetapową."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "You need to setup a passkey to approve this document."
-msgstr "Musisz skonfigurować klucz dostępu (passkey), aby zatwierdzić ten dokument."
+msgstr "Aby zatwierdzić dokument, musisz skonfigurować klucz dostępu."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "You need to setup a passkey to approve this field."
-msgstr "Musisz skonfigurować klucz dostępu (passkey), aby zatwierdzić to pole."
+msgstr "Aby zatwierdzić pole, musisz skonfigurować klucz dostępu."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "You need to setup a passkey to assist with this document."
-msgstr "Musisz skonfigurować klucz dostępu (passkey), aby asystować przy tym dokumencie."
+msgstr "Aby przygotować dokument, musisz skonfigurować klucz dostępu."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "You need to setup a passkey to assist with this field."
-msgstr "Musisz skonfigurować klucz dostępu (passkey), aby asystować przy tym polu."
+msgstr "Aby przygotować pole, musisz skonfigurować klucz dostępu."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "You need to setup a passkey to mark this document as viewed."
-msgstr "Musisz skonfigurować klucz dostępu (passkey), aby oznaczyć ten dokument jako wyświetlony."
+msgstr "Aby oznaczyć dokument jako wyświetlony, musisz skonfigurować klucz dostępu."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "You need to setup a passkey to sign this document."
-msgstr "Musisz skonfigurować klucz dostępu (passkey), aby podpisać ten dokument."
+msgstr "Aby podpisać dokument, musisz skonfigurować klucz dostępu."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "You need to setup a passkey to sign this field."
-msgstr "Musisz skonfigurować klucz dostępu (passkey), aby podpisać to pole."
+msgstr "Aby podpisać pole, musisz skonfigurować klucz dostępu."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "You need to setup a passkey to view this document."
-msgstr "Musisz skonfigurować klucz dostępu (passkey), aby wyświetlić ten dokument."
+msgstr "Aby wyświetlić dokument, musisz skonfigurować klucz dostępu."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "You need to setup a passkey to view this field."
-msgstr "Musisz skonfigurować klucz dostępu (passkey), aby wyświetlić to pole."
+msgstr "Aby wyświetlić pole, musisz skonfigurować klucz dostępu."
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "You opened the document"
@@ -12147,40 +12147,40 @@ msgstr "Ustawienia brandingu zostały zaktualizowane"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Your browser does not support passkeys, which is required to approve this document."
-msgstr "Twoja przeglądarka nie obsługuje kluczy dostępu (passkeys), które są wymagane do zatwierdzenia tego dokumentu."
+msgstr "Twoja przeglądarka nie obsługuje kluczy dostępu, które są wymagane do zatwierdzenia dokumentu."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Your browser does not support passkeys, which is required to approve this field."
-msgstr "Twoja przeglądarka nie obsługuje kluczy dostępu (passkeys), które są wymagane do zatwierdzenia tego pola."
+msgstr "Twoja przeglądarka nie obsługuje kluczy dostępu, które są wymagane do zatwierdzenia pola."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Your browser does not support passkeys, which is required to assist with this document."
-msgstr "Twoja przeglądarka nie obsługuje kluczy dostępu (passkeys), które są wymagane, aby asystować przy tym dokumencie."
+msgstr "Twoja przeglądarka nie obsługuje kluczy dostępu, które są wymagane do przygotowania dokumentu."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Your browser does not support passkeys, which is required to assist with this field."
-msgstr "Twoja przeglądarka nie obsługuje kluczy dostępu (passkeys), które są wymagane, aby asystować przy tym polu."
+msgstr "Twoja przeglądarka nie obsługuje kluczy dostępu, które są wymagane do przygotowania pole."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Your browser does not support passkeys, which is required to mark this document as viewed."
-msgstr "Twoja przeglądarka nie obsługuje kluczy dostępu (passkeys), które są wymagane, aby oznaczyć ten dokument jako wyświetlony."
+msgstr "Twoja przeglądarka nie obsługuje kluczy dostępu, które są wymagane do oznaczenia dokumentu jako wyświetlonego."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Your browser does not support passkeys, which is required to sign this document."
-msgstr "Twoja przeglądarka nie obsługuje kluczy dostępu (passkeys), które są wymagane do podpisania tego dokumentu."
+msgstr "Twoja przeglądarka nie obsługuje kluczy dostępu, które są wymagane do podpisania dokumentu."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Your browser does not support passkeys, which is required to sign this field."
-msgstr "Twoja przeglądarka nie obsługuje kluczy dostępu (passkeys), które są wymagane do podpisania tego pola."
+msgstr "Twoja przeglądarka nie obsługuje kluczy dostępu, które są wymagane do podpisania pola."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Your browser does not support passkeys, which is required to view this document."
-msgstr "Twoja przeglądarka nie obsługuje kluczy dostępu (passkeys), które są wymagane, aby wyświetlić ten dokument."
+msgstr "Twoja przeglądarka nie obsługuje kluczy dostępu, które są wymagane do wyświetlenia dokumentu."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Your browser does not support passkeys, which is required to view this field."
-msgstr "Twoja przeglądarka nie obsługuje kluczy dostępu (passkeys), które są wymagane, aby wyświetlić to pole."
+msgstr "Twoja przeglądarka nie obsługuje kluczy dostępu, które są wymagane do wyświetlenia pola."
 
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Your bulk send has been initiated. You will receive an email notification upon completion."
