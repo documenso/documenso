@@ -19,7 +19,6 @@ export const updateEnvelopeFieldsMeta: TrpcRouteMeta = {
 const ZUpdateFieldBaseSchema = ZEnvelopeFieldAndMetaSchema.and(
   z.object({
     id: z.number().describe('The ID of the field to update.'),
-    recipientId: z.number().describe('The ID of the recipient to update the field for'),
     envelopeItemId: z
       .string()
       .optional()
@@ -36,7 +35,7 @@ const ZUpdateFieldBaseSchema = ZEnvelopeFieldAndMetaSchema.and(
 //   ZUpdateFieldBaseSchema.and(ZPlaceholderPositionSchema),
 // ]);
 
-const ZUpdateFieldSchema = ZUpdateFieldBaseSchema.and(ZCoordinatePositionSchema);
+const ZUpdateFieldSchema = ZUpdateFieldBaseSchema.and(ZCoordinatePositionSchema.partial());
 
 export const ZUpdateEnvelopeFieldsRequestSchema = z.object({
   envelopeId: z.string(),
