@@ -1,5 +1,6 @@
 import { useLayoutEffect } from 'react';
 
+import { Trans } from '@lingui/react/macro';
 import { Outlet, useLoaderData } from 'react-router';
 
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
@@ -75,7 +76,11 @@ export default function AuthoringLayout() {
   }, []);
 
   if (!hasValidToken) {
-    return <div>Invalid embedding presign token provided</div>;
+    return (
+      <div>
+        <Trans>Invalid embedding presign token provided</Trans>
+      </div>
+    );
   }
 
   return (
