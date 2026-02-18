@@ -37,7 +37,7 @@ const ZCreateFieldBaseSchema = ZEnvelopeFieldAndMetaSchema.and(
 /**
  * Position a field using explicit percentage-based coordinates.
  */
-const ZCoordinatePositionSchema = z.object({
+export const ZCoordinatePositionSchema = z.object({
   page: ZFieldPageNumberSchema,
   positionX: ZClampedFieldPositionXSchema,
   positionY: ZClampedFieldPositionYSchema,
@@ -52,7 +52,7 @@ const ZCoordinatePositionSchema = z.object({
  * placed at the bounding box of that match. Width and height can optionally be
  * overridden; when omitted the dimensions of the placeholder text are used.
  */
-const ZPlaceholderPositionSchema = z.object({
+export const ZPlaceholderPositionSchema = z.object({
   placeholder: z
     .string()
     .describe(
@@ -72,9 +72,10 @@ const ZPlaceholderPositionSchema = z.object({
     ),
 });
 
-const ZCreateFieldSchema = ZCreateFieldBaseSchema.and(
-  z.union([ZCoordinatePositionSchema, ZPlaceholderPositionSchema]),
-);
+const ZCreateFieldSchema = z.union([
+  ZCreateFieldBaseSchema.and(ZCoordinatePositionSchema),
+  ZCreateFieldBaseSchema.and(ZPlaceholderPositionSchema),
+]);
 
 export const ZCreateEnvelopeFieldsRequestSchema = z.object({
   envelopeId: z.string(),
