@@ -9,6 +9,7 @@ export const ZDocumentAuthTypesSchema = z.enum([
   'ACCOUNT',
   'PASSKEY',
   'TWO_FACTOR_AUTH',
+  'EXTERNAL_TWO_FACTOR_AUTH',
   'PASSWORD',
   'EXPLICIT_NONE',
 ]);
@@ -40,6 +41,10 @@ const ZDocumentAuth2FASchema = z.object({
   method: z.enum(['email', 'authenticator']).default('authenticator').optional(),
 });
 
+const ZDocumentAuthExternal2FASchema = z.object({
+  type: z.literal(DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH),
+});
+
 /**
  * All the document auth methods for both accessing and actioning.
  */
@@ -48,6 +53,7 @@ export const ZDocumentAuthMethodsSchema = z.discriminatedUnion('type', [
   ZDocumentAuthExplicitNoneSchema,
   ZDocumentAuthPasskeySchema,
   ZDocumentAuth2FASchema,
+  ZDocumentAuthExternal2FASchema,
   ZDocumentAuthPasswordSchema,
 ]);
 
@@ -73,6 +79,7 @@ export const ZDocumentActionAuthSchema = z.discriminatedUnion('type', [
   ZDocumentAuthAccountSchema,
   ZDocumentAuthPasskeySchema,
   ZDocumentAuth2FASchema,
+  ZDocumentAuthExternal2FASchema,
   ZDocumentAuthPasswordSchema,
 ]);
 export const ZDocumentActionAuthTypesSchema = z
@@ -80,6 +87,7 @@ export const ZDocumentActionAuthTypesSchema = z
     DocumentAuth.ACCOUNT,
     DocumentAuth.PASSKEY,
     DocumentAuth.TWO_FACTOR_AUTH,
+    DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH,
     DocumentAuth.PASSWORD,
   ])
   .describe(
@@ -108,6 +116,7 @@ export const ZRecipientActionAuthSchema = z.discriminatedUnion('type', [
   ZDocumentAuthAccountSchema,
   ZDocumentAuthPasskeySchema,
   ZDocumentAuth2FASchema,
+  ZDocumentAuthExternal2FASchema,
   ZDocumentAuthPasswordSchema,
   ZDocumentAuthExplicitNoneSchema,
 ]);
@@ -116,6 +125,7 @@ export const ZRecipientActionAuthTypesSchema = z
     DocumentAuth.ACCOUNT,
     DocumentAuth.PASSKEY,
     DocumentAuth.TWO_FACTOR_AUTH,
+    DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH,
     DocumentAuth.PASSWORD,
     DocumentAuth.EXPLICIT_NONE,
   ])

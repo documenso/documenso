@@ -66,13 +66,13 @@ export const useRequiredDocumentSigningAuthContext = () => {
   return context;
 };
 
-export interface DocumentSigningAuthProviderProps {
+export type DocumentSigningAuthProviderProps = {
   documentAuthOptions: Envelope['authOptions'];
   recipient: SigningAuthRecipient;
   isDirectTemplate?: boolean;
   user?: SessionUser | null;
   children: React.ReactNode;
-}
+};
 
 export const DocumentSigningAuthProvider = ({
   documentAuthOptions: initialDocumentAuthOptions,
@@ -181,11 +181,14 @@ export const DocumentSigningAuthProvider = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [passkeyData.passkeys]);
 
-  // Assume that a user must be logged in for any auth requirements.
+  const authMethodsRequiringLogin = derivedRecipientActionAuth?.filter(
+    (method) =>
+      method !== DocumentAuth.EXPLICIT_NONE && method !== DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH,
+  );
+
   const isAuthRedirectRequired = Boolean(
-    derivedRecipientActionAuth &&
-      derivedRecipientActionAuth.length > 0 &&
-      !derivedRecipientActionAuth.includes(DocumentAuth.EXPLICIT_NONE) &&
+    authMethodsRequiringLogin &&
+      authMethodsRequiringLogin.length > 0 &&
       user?.email !== recipient.email,
   );
 

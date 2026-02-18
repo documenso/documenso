@@ -182,6 +182,7 @@ export const signEnvelopeFieldRoute = procedure
       field,
       userId: user?.id,
       authOptions,
+      recipientToken: token,
     });
 
     const assistant = recipient.role === RecipientRole.ASSISTANT ? recipient : undefined;

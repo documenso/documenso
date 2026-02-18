@@ -50,6 +50,14 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_ACCESS_AUTH_2FA_REQUESTED', // When ACCESS AUTH 2FA is requested.
   'DOCUMENT_ACCESS_AUTH_2FA_VALIDATED', // When ACCESS AUTH 2FA is successfully validated.
   'DOCUMENT_ACCESS_AUTH_2FA_FAILED', // When ACCESS AUTH 2FA validation fails.
+
+  // External signing 2FA events.
+  'EXTERNAL_2FA_TOKEN_ISSUED',
+  'EXTERNAL_2FA_TOKEN_ISSUE_DENIED',
+  'EXTERNAL_2FA_TOKEN_VERIFY_SUCCEEDED',
+  'EXTERNAL_2FA_TOKEN_VERIFY_FAILED',
+  'EXTERNAL_2FA_TOKEN_CONSUMED',
+  'EXTERNAL_2FA_TOKEN_REVOKED',
 ]);
 
 export const ZDocumentAuditLogEmailTypeSchema = z.enum([
@@ -694,6 +702,59 @@ export const ZDocumentAuditLogEventDocumentDelegatedOwnerCreatedSchema = z.objec
   }),
 });
 
+const ZExternal2FARecipientDataSchema = z.object({
+  recipientId: z.number(),
+  recipientEmail: z.string(),
+  recipientName: z.string(),
+});
+
+export const ZDocumentAuditLogEventExternal2FATokenIssuedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.EXTERNAL_2FA_TOKEN_ISSUED),
+  data: ZExternal2FARecipientDataSchema.extend({
+    tokenId: z.string(),
+    reasonCode: z.string().optional(),
+  }),
+});
+
+export const ZDocumentAuditLogEventExternal2FATokenIssueDeniedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.EXTERNAL_2FA_TOKEN_ISSUE_DENIED),
+  data: ZExternal2FARecipientDataSchema.extend({
+    reasonCode: z.string(),
+  }),
+});
+
+export const ZDocumentAuditLogEventExternal2FATokenVerifySucceededSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.EXTERNAL_2FA_TOKEN_VERIFY_SUCCEEDED),
+  data: ZExternal2FARecipientDataSchema.extend({
+    tokenId: z.string(),
+  }),
+});
+
+export const ZDocumentAuditLogEventExternal2FATokenVerifyFailedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.EXTERNAL_2FA_TOKEN_VERIFY_FAILED),
+  data: ZExternal2FARecipientDataSchema.extend({
+    tokenId: z.string(),
+    reasonCode: z.string(),
+    attemptsUsed: z.number(),
+    attemptLimit: z.number(),
+  }),
+});
+
+export const ZDocumentAuditLogEventExternal2FATokenConsumedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.EXTERNAL_2FA_TOKEN_CONSUMED),
+  data: ZExternal2FARecipientDataSchema.extend({
+    tokenId: z.string(),
+  }),
+});
+
+export const ZDocumentAuditLogEventExternal2FATokenRevokedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.EXTERNAL_2FA_TOKEN_REVOKED),
+  data: ZExternal2FARecipientDataSchema.extend({
+    tokenId: z.string(),
+    reasonCode: z.string(),
+  }),
+});
+
 export const ZDocumentAuditLogBaseSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
@@ -739,6 +800,12 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventRecipientAddedSchema,
     ZDocumentAuditLogEventRecipientUpdatedSchema,
     ZDocumentAuditLogEventRecipientRemovedSchema,
+    ZDocumentAuditLogEventExternal2FATokenIssuedSchema,
+    ZDocumentAuditLogEventExternal2FATokenIssueDeniedSchema,
+    ZDocumentAuditLogEventExternal2FATokenVerifySucceededSchema,
+    ZDocumentAuditLogEventExternal2FATokenVerifyFailedSchema,
+    ZDocumentAuditLogEventExternal2FATokenConsumedSchema,
+    ZDocumentAuditLogEventExternal2FATokenRevokedSchema,
   ]),
 );
 
