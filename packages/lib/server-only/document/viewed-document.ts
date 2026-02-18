@@ -1,5 +1,4 @@
-import { EnvelopeType, ReadStatus, SendStatus } from '@prisma/client';
-import { WebhookTriggerEvents } from '@prisma/client';
+import { EnvelopeType, ReadStatus, SendStatus, WebhookTriggerEvents } from '@prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -54,6 +53,13 @@ export const viewedDocument = async ({
         accessAuth: recipientAccessAuth ?? [],
       },
     }),
+  });
+
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_VIEWED,
+    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
+    userId: envelope.userId,
+    teamId: envelope.teamId,
   });
 
   // Early return if already opened.

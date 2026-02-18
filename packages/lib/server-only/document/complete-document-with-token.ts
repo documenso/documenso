@@ -106,7 +106,9 @@ export const completeDocumentWithToken = async ({
   }
 
   if (envelope.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL) {
-    const isRecipientsTurn = await getIsRecipientsTurnToSign({ token: recipient.token });
+    const isRecipientsTurn = await getIsRecipientsTurnToSign({
+      token: recipient.token,
+    });
 
     if (!isRecipientsTurn) {
       throw new Error(
@@ -195,6 +197,18 @@ export const completeDocumentWithToken = async ({
         }),
       });
 
+      const envelopeForFailure = await prisma.envelope.findUniqueOrThrow({
+        where: { id: envelope.id },
+        include: { documentMeta: true, recipients: true },
+      });
+
+      await triggerWebhook({
+        event: WebhookTriggerEvents.RECIPIENT_AUTHENTICATION_FAILED,
+        data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelopeForFailure)),
+        userId: envelope.userId,
+        teamId: envelope.teamId,
+      });
+
       throw new AppError(AppErrorCode.TWO_FACTOR_AUTH_FAILED, {
         message: 'Invalid 2FA authentication',
       });
@@ -281,6 +295,18 @@ export const completeDocumentWithToken = async ({
         },
       }),
     });
+  });
+
+  const envelopeWithRelations = await prisma.envelope.findUniqueOrThrow({
+    where: { id: envelope.id },
+    include: { documentMeta: true, recipients: true },
+  });
+
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_RECIPIENT_COMPLETED,
+    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelopeWithRelations)),
+    userId: envelope.userId,
+    teamId: envelope.teamId,
   });
 
   await jobs.triggerJob({
