@@ -37,7 +37,7 @@ export const DocumentEmailCheckboxes = ({
           className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
           htmlFor={DocumentEmailEvents.RecipientSigned}
         >
-          <Trans>Send recipient signed email</Trans>
+          <Trans>Email the owner when a recipient signs</Trans>
 
           <Tooltip>
             <TooltipTrigger>
@@ -75,7 +75,7 @@ export const DocumentEmailCheckboxes = ({
           className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
           htmlFor={DocumentEmailEvents.RecipientSigningRequest}
         >
-          <Trans>Send recipient signing request email</Trans>
+          <Trans>Email recipients with a signing request</Trans>
 
           <Tooltip>
             <TooltipTrigger>
@@ -113,7 +113,7 @@ export const DocumentEmailCheckboxes = ({
           className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
           htmlFor={DocumentEmailEvents.RecipientRemoved}
         >
-          <Trans>Send recipient removed email</Trans>
+          <Trans>Email recipients when they're removed from a pending document</Trans>
 
           <Tooltip>
             <TooltipTrigger>
@@ -151,7 +151,7 @@ export const DocumentEmailCheckboxes = ({
           className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
           htmlFor={DocumentEmailEvents.DocumentPending}
         >
-          <Trans>Send document pending email</Trans>
+          <Trans>Email the signer if the document is still pending</Trans>
 
           <Tooltip>
             <TooltipTrigger>
@@ -190,7 +190,7 @@ export const DocumentEmailCheckboxes = ({
           className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
           htmlFor={DocumentEmailEvents.DocumentCompleted}
         >
-          <Trans>Send document completed email</Trans>
+          <Trans>Email recipients when the document is completed</Trans>
 
           <Tooltip>
             <TooltipTrigger>
@@ -228,7 +228,7 @@ export const DocumentEmailCheckboxes = ({
           className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
           htmlFor={DocumentEmailEvents.DocumentDeleted}
         >
-          <Trans>Send document deleted email</Trans>
+          <Trans>Email recipients when a pending document is deleted</Trans>
 
           <Tooltip>
             <TooltipTrigger>
@@ -266,7 +266,7 @@ export const DocumentEmailCheckboxes = ({
           className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
           htmlFor={DocumentEmailEvents.OwnerDocumentCompleted}
         >
-          <Trans>Send document completed email to the owner</Trans>
+          <Trans>Email the owner when the document is completed</Trans>
 
           <Tooltip>
             <TooltipTrigger>

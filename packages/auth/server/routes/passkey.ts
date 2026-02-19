@@ -5,6 +5,8 @@ import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { Hono } from 'hono';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
+import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
 import type { TAuthenticationResponseJSONSchema } from '@documenso/lib/types/webauthn';
 import { ZAuthenticationResponseJSONSchema } from '@documenso/lib/types/webauthn';
 import { getAuthenticatorOptions } from '@documenso/lib/utils/authenticator';
@@ -73,6 +75,13 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
     }
 
     const user = passkey.user;
+
+    if (
+      user.email.toLowerCase() === legacyServiceAccountEmail() ||
+      user.email.toLowerCase() === deletedServiceAccountEmail()
+    ) {
+      return c.text('FORBIDDEN', 403);
+    }
 
     const { rpId, origin } = getAuthenticatorOptions();
 

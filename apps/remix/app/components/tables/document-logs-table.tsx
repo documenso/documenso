@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { DateTime } from 'luxon';
 import type { DateTimeFormatOptions } from 'luxon';
 import { useSearchParams } from 'react-router';
@@ -88,7 +89,9 @@ export const DocumentLogsTable = ({ documentId, userId }: DocumentLogsTableProps
               )}
             </div>
           ) : (
-            <p>N/A</p>
+            <p>
+              <Trans>N/A</Trans>
+            </p>
           ),
       },
       {

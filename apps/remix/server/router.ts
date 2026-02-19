@@ -12,6 +12,8 @@ import { API_V2_BETA_URL, API_V2_URL } from '@documenso/lib/constants/app';
 import { jobsClient } from '@documenso/lib/jobs/client';
 import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import { TelemetryClient } from '@documenso/lib/server-only/telemetry/telemetry-client';
+import { migrateDeletedAccountServiceAccount } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
+import { migrateLegacyServiceAccount } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
 import { getIpAddress } from '@documenso/lib/universal/get-ip-address';
 import { env } from '@documenso/lib/utils/env';
 import { logger } from '@documenso/lib/utils/logger';
@@ -148,5 +150,8 @@ void LicenseClient.start();
 // Start cron scheduler for background jobs (e.g. envelope expiration sweep).
 // No-op for Inngest provider which handles cron externally.
 jobsClient.startCron();
+
+void migrateDeletedAccountServiceAccount();
+void migrateLegacyServiceAccount();
 
 export default app;

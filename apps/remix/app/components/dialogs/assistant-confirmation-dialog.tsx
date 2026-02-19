@@ -116,9 +116,11 @@ export function AssistantConfirmationDialog({
                     {!isEditingNextSigner && (
                       <div>
                         <p className="text-muted-foreground text-sm">
-                          The next recipient to sign this document will be{' '}
-                          <span className="font-semibold">{form.watch('name')}</span> (
-                          <span className="font-semibold">{form.watch('email')}</span>).
+                          <Trans>
+                            The next recipient to sign this document will be{' '}
+                            <span className="font-semibold">{form.watch('name')}</span> (
+                            <span className="font-semibold">{form.watch('email')}</span>).
+                          </Trans>
                         </p>
 
                         <Button

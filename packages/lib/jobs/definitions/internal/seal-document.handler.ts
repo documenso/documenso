@@ -15,11 +15,11 @@ import { groupBy } from 'remeda';
 import { addRejectionStampToPdf } from '@documenso/lib/server-only/pdf/add-rejection-stamp-to-pdf';
 import { generateAuditLogPdf } from '@documenso/lib/server-only/pdf/generate-audit-log-pdf';
 import { generateCertificatePdf } from '@documenso/lib/server-only/pdf/generate-certificate-pdf';
+import { getLastPageDimensions } from '@documenso/lib/server-only/pdf/get-page-size';
 import { prisma } from '@documenso/prisma';
 import { signPdf } from '@documenso/signing';
 
 import { NEXT_PRIVATE_USE_PLAYWRIGHT_PDF } from '../../../constants/app';
-import { PDF_SIZE_A4_72PPI } from '../../../constants/pdf';
 import { AppError, AppErrorCode } from '../../../errors/app-error';
 import { sendCompletedEmail } from '../../../server-only/document/send-completed-email';
 import { getAuditLogsPdf } from '../../../server-only/htmltopdf/get-audit-logs-pdf';
@@ -29,7 +29,10 @@ import { insertFieldInPDFV2 } from '../../../server-only/pdf/insert-field-in-pdf
 import { legacy_insertFieldInPDF } from '../../../server-only/pdf/legacy-insert-field-in-pdf';
 import { getTeamSettings } from '../../../server-only/team/get-team-settings';
 import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-webhook';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
+import {
+  DOCUMENT_AUDIT_LOG_TYPE,
+  type TDocumentAuditLog,
+} from '../../../types/document-audit-logs';
 import {
   ZWebhookDocumentSchema,
   mapEnvelopeToWebhookDocumentPayload,
@@ -169,56 +172,38 @@ export const run = async ({
       });
     }
 
-    let certificateDoc: PDF | null = null;
-    let auditLogDoc: PDF | null = null;
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const envelopeCompletedAuditLog = createDocumentAuditLogData({
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
+      envelopeId: envelope.id,
+      requestMetadata,
+      user: null,
+      data: {
+        transactionId: nanoid(),
+        ...(isRejected ? { isRejected: true, rejectionReason: rejectionReason } : {}),
+      },
+    });
 
-    if (settings.includeSigningCertificate || settings.includeAuditLog) {
-      const certificatePayload = {
-        envelope,
-        recipients: envelope.recipients, // Need to use the recipients from envelope which contains ALL recipients.
-        fields,
-        language: envelope.documentMeta.language,
-        envelopeOwner: {
-          email: envelope.user.email,
-          name: envelope.user.name || '',
-        },
-        envelopeItems: envelopeItems.map((item) => item.title),
-        pageWidth: PDF_SIZE_A4_72PPI.width,
-        pageHeight: PDF_SIZE_A4_72PPI.height,
-      };
+    const finalEnvelopeStatus = isRejected ? DocumentStatus.REJECTED : DocumentStatus.COMPLETED;
 
-      // Use Playwright-based PDF generation if enabled, otherwise use Konva-based generation.
-      // This is a temporary toggle while we validate the Konva-based approach.
-      const usePlaywrightPdf = NEXT_PRIVATE_USE_PLAYWRIGHT_PDF();
+    // Pre-fetch all PDF data so we can read dimensions and pass it
+    // to decorateAndSignPdf without fetching again.
+    const prefetchedItems = await Promise.all(
+      envelopeItems.map(async (envelopeItem) => {
+        const pdfData = await getFileServerSide(envelopeItem.documentData);
 
-      const makeCertificatePdf = async () =>
-        usePlaywrightPdf
-          ? getCertificatePdf({
-              documentId,
-              language: envelope.documentMeta.language,
-            }).then(async (buffer) => PDF.load(buffer))
-          : generateCertificatePdf(certificatePayload);
+        return { envelopeItem, pdfData };
+      }),
+    );
 
-      const makeAuditLogPdf = async () =>
-        usePlaywrightPdf
-          ? getAuditLogsPdf({
-              documentId,
-              language: envelope.documentMeta.language,
-            }).then(async (buffer) => PDF.load(buffer))
-          : generateAuditLogPdf(certificatePayload);
+    const usePlaywrightPdf = NEXT_PRIVATE_USE_PLAYWRIGHT_PDF();
 
-      const [createdCertificatePdf, createdAuditLogPdf] = await Promise.all([
-        settings.includeSigningCertificate ? makeCertificatePdf() : null,
-        settings.includeAuditLog ? makeAuditLogPdf() : null,
-      ]);
-
-      certificateDoc = createdCertificatePdf;
-      auditLogDoc = createdAuditLogPdf;
-    }
+    const needsCertificate = settings.includeSigningCertificate;
+    const needsAuditLog = settings.includeAuditLog;
 
     const newDocumentData: Array<{ oldDocumentDataId: string; newDocumentDataId: string }> = [];
 
-    for (const envelopeItem of envelopeItems) {
+    for (const { envelopeItem, pdfData } of prefetchedItems) {
       const envelopeItemFields = envelope.envelopeItems.find(
         (item) => item.id === envelopeItem.id,
       )?.field;
@@ -227,12 +212,70 @@ export const run = async ({
         throw new Error(`Envelope item fields not found for envelope item ${envelopeItem.id}`);
       }
 
+      let certificateDoc: PDF | null = null;
+      let auditLogDoc: PDF | null = null;
+
+      if (needsCertificate || needsAuditLog) {
+        const pdfDoc = await PDF.load(pdfData);
+
+        const { width: pageWidth, height: pageHeight } = getLastPageDimensions(pdfDoc);
+
+        const additionalAuditLogs = [
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          {
+            ...envelopeCompletedAuditLog,
+            id: '',
+            createdAt: new Date(),
+          } as TDocumentAuditLog,
+        ];
+
+        const certificatePayload = {
+          envelope: {
+            ...envelope,
+            status: finalEnvelopeStatus,
+          },
+          recipients: envelope.recipients,
+          fields,
+          language: envelope.documentMeta.language,
+          envelopeOwner: {
+            email: envelope.user.email,
+            name: envelope.user.name || '',
+          },
+          envelopeItems: envelopeItems.map((item) => item.title),
+          pageWidth,
+          pageHeight,
+          additionalAuditLogs,
+        };
+
+        const makeCertificatePdf = async () =>
+          usePlaywrightPdf
+            ? getCertificatePdf({
+                documentId,
+                language: envelope.documentMeta.language,
+              }).then(async (buffer) => PDF.load(buffer))
+            : generateCertificatePdf(certificatePayload);
+
+        const makeAuditLogPdf = async () =>
+          usePlaywrightPdf
+            ? getAuditLogsPdf({
+                documentId,
+                language: envelope.documentMeta.language,
+              }).then(async (buffer) => PDF.load(buffer))
+            : generateAuditLogPdf(certificatePayload);
+
+        [certificateDoc, auditLogDoc] = await Promise.all([
+          needsCertificate ? makeCertificatePdf() : null,
+          needsAuditLog ? makeAuditLogPdf() : null,
+        ]);
+      }
+
       const result = await decorateAndSignPdf({
         envelope,
         envelopeItem,
         envelopeItemFields,
         isRejected,
         rejectionReason,
+        pdfData,
         certificateDoc,
         auditLogDoc,
       });
@@ -263,22 +306,13 @@ export const run = async ({
           id: envelope.id,
         },
         data: {
-          status: isRejected ? DocumentStatus.REJECTED : DocumentStatus.COMPLETED,
+          status: finalEnvelopeStatus,
           completedAt: new Date(),
         },
       });
 
       await tx.documentAuditLog.create({
-        data: createDocumentAuditLogData({
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
-          envelopeId: envelope.id,
-          requestMetadata,
-          user: null,
-          data: {
-            transactionId: nanoid(),
-            ...(isRejected ? { isRejected: true, rejectionReason: rejectionReason } : {}),
-          },
-        }),
+        data: envelopeCompletedAuditLog,
       });
     });
 
@@ -330,12 +364,13 @@ type DecorateAndSignPdfOptions = {
   envelopeItemFields: Field[];
   isRejected: boolean;
   rejectionReason: string;
+  pdfData: Uint8Array;
   certificateDoc: PDF | null;
   auditLogDoc: PDF | null;
 };
 
 /**
- * Fetch, normalize, flatten and insert fields into a PDF document.
+ * Normalize, flatten and insert fields into a PDF document.
  */
 const decorateAndSignPdf = async ({
   envelope,
@@ -343,11 +378,10 @@ const decorateAndSignPdf = async ({
   envelopeItemFields,
   isRejected,
   rejectionReason,
+  pdfData,
   certificateDoc,
   auditLogDoc,
 }: DecorateAndSignPdfOptions) => {
-  const pdfData = await getFileServerSide(envelopeItem.documentData);
-
   let pdfDoc = await PDF.load(pdfData);
 
   // Normalize and flatten layers that could cause issues with the signature
