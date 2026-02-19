@@ -78,6 +78,17 @@ async function handleV1Loader({ params, request }: Route.LoaderArgs) {
     );
   }
 
+  if (recipient.expiresAt && new Date() > recipient.expiresAt) {
+    throw data(
+      {
+        type: 'embed-recipient-expired',
+      },
+      {
+        status: 403,
+      },
+    );
+  }
+
   const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
   });
@@ -190,7 +201,7 @@ async function handleV2Loader({ params, request }: Route.LoaderArgs) {
     );
   }
 
-  const { envelope, recipient, isRecipientsTurn } = envelopeForSigning;
+  const { envelope, recipient, isRecipientsTurn, isExpired } = envelopeForSigning;
 
   const organisationClaim = await getOrganisationClaimByTeamId({ teamId: envelope.teamId });
 
@@ -201,6 +212,17 @@ async function handleV2Loader({ params, request }: Route.LoaderArgs) {
     throw data(
       {
         type: 'embed-paywall',
+      },
+      {
+        status: 403,
+      },
+    );
+  }
+
+  if (isExpired) {
+    throw data(
+      {
+        type: 'embed-recipient-expired',
       },
       {
         status: 403,

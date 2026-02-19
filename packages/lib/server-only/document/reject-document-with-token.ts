@@ -1,4 +1,4 @@
-import { EnvelopeType, SigningStatus } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
 
 import { jobs } from '@documenso/lib/jobs/client';
 import { prisma } from '@documenso/prisma';
@@ -39,6 +39,18 @@ export async function rejectDocumentWithToken({
   if (!recipient || !envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document or recipient not found',
+    });
+  }
+
+  if (envelope.status !== DocumentStatus.PENDING) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `Document ${envelope.id} must be pending to reject`,
+    });
+  }
+
+  if (recipient.expiresAt && recipient.expiresAt <= new Date()) {
+    throw new AppError(AppErrorCode.RECIPIENT_EXPIRED, {
+      message: 'Recipient signing window has expired',
     });
   }
 

@@ -36,15 +36,18 @@ export class InngestJobProvider extends BaseJobProvider {
 
   public defineJob<N extends string, T>(job: JobDefinition<N, T>): void {
     console.log('defining job', job.id);
+
+    const triggerConfig: { cron: string } | { event: N } = job.trigger.cron
+      ? { cron: job.trigger.cron }
+      : { event: job.trigger.name };
+
     const fn = this._client.createFunction(
       {
         id: job.id,
         name: job.name,
         optimizeParallelism: job.optimizeParallelism ?? false,
       },
-      {
-        event: job.trigger.name,
-      },
+      triggerConfig,
       async (ctx) => {
         const io = this.convertInngestIoToJobRunIo(ctx);
 

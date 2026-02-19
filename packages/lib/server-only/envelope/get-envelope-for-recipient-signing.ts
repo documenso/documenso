@@ -56,7 +56,9 @@ export const ZEnvelopeForSigningResponse = z.object({
       email: true,
       name: true,
       documentDeletedAt: true,
-      expired: true,
+      expired: true, //!: deprecated Not in use. To be removed in a future migration.
+      expiresAt: true,
+      expirationNotifiedAt: true,
       signedAt: true,
       authOptions: true,
       signingOrder: true,
@@ -102,7 +104,8 @@ export const ZEnvelopeForSigningResponse = z.object({
     email: true,
     name: true,
     documentDeletedAt: true,
-    expired: true,
+    expiresAt: true,
+    expirationNotifiedAt: true,
     signedAt: true,
     authOptions: true,
     token: true,
@@ -126,6 +129,7 @@ export const ZEnvelopeForSigningResponse = z.object({
 
   isCompleted: z.boolean(),
   isRejected: z.boolean(),
+  isExpired: z.boolean(),
   isRecipientsTurn: z.boolean(),
 
   sender: z.object({
@@ -291,6 +295,7 @@ export const getEnvelopeForRecipientSigning = async ({
     isRejected:
       recipient.signingStatus === SigningStatus.REJECTED ||
       envelope.status === DocumentStatus.REJECTED,
+    isExpired: recipient.expiresAt !== null && new Date() > recipient.expiresAt,
     sender,
     settings: {
       includeSenderDetails: settings.includeSenderDetails,

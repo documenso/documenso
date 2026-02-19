@@ -538,6 +538,13 @@ export const formatDocumentAuditLogAction = (
       }),
       identified: msg`The document ownership was delegated to ${data.delegatedOwnerName || data.delegatedOwnerEmail} on behalf of ${data.teamName}`,
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_EXPIRED }, ({ data }) => ({
+      anonymous: msg({
+        message: `Recipient signing window expired`,
+        context: `Audit log format`,
+      }),
+      identified: msg`Signing window expired for ${data.recipientName || data.recipientEmail}`,
+    }))
     .exhaustive();
 
   return {

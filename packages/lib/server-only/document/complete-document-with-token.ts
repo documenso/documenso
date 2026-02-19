@@ -94,6 +94,12 @@ export const completeDocumentWithToken = async ({
 
   const [recipient] = envelope.recipients;
 
+  if (recipient.expiresAt && recipient.expiresAt <= new Date()) {
+    throw new AppError(AppErrorCode.RECIPIENT_EXPIRED, {
+      message: 'Recipient signing window has expired',
+    });
+  }
+
   if (recipient.signingStatus === SigningStatus.SIGNED) {
     throw new Error(`Recipient ${recipient.id} has already signed`);
   }
