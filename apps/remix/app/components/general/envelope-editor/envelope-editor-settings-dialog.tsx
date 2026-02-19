@@ -673,7 +673,6 @@ export const EnvelopeEditorSettingsDialog = ({
                                 value={field.value}
                                 onChange={field.onChange}
                                 disabled={envelopeHasBeenSent}
-                                inheritLabel={t`Inherit from team`}
                               />
                             </FormControl>
 
