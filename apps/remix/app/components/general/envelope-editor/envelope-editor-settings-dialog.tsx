@@ -190,10 +190,6 @@ export const EnvelopeEditorSettingsDialog = ({
   });
 
   const createDefaultValues = () => {
-    console.log(
-      'envelope.documentMeta.envelopeExpirationPeriod:',
-      envelope.documentMeta.envelopeExpirationPeriod,
-    );
     return {
       externalId: envelope.externalId || '',
       visibility: envelope.visibility || '',
