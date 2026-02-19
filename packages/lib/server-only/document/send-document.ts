@@ -261,12 +261,16 @@ export const sendDocument = async ({
     const expiresAt = resolveExpiresAt(envelope.documentMeta?.envelopeExpirationPeriod ?? null);
 
     // Set expiresAt on each recipient that hasn't already signed/rejected.
+    // Exclude CC recipients since they don't sign and shouldn't be subject to expiry.
     if (expiresAt) {
       await tx.recipient.updateMany({
         where: {
           envelopeId: envelope.id,
           signingStatus: {
             notIn: [SigningStatus.SIGNED, SigningStatus.REJECTED],
+          },
+          role: {
+            not: RecipientRole.CC,
           },
         },
         data: {

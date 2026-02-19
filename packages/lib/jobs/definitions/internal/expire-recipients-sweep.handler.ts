@@ -40,7 +40,7 @@ export const run = async ({
 
   io.logger.info(`Found ${expiredRecipients.length} expired recipients`);
 
-  await Promise.all(
+  await Promise.allSettled(
     expiredRecipients.map(async (recipient) => {
       await jobs.triggerJob({
         name: 'internal.process-recipient-expired',

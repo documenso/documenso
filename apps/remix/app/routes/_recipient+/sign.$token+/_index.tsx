@@ -25,6 +25,7 @@ import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settin
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { isRecipientExpired } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
 
@@ -140,7 +141,7 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
     throw redirect(`/sign/${token}/rejected`);
   }
 
-  if (recipient.expiresAt && new Date() > recipient.expiresAt) {
+  if (isRecipientExpired(recipient)) {
     throw redirect(`/sign/${token}/expired`);
   }
 

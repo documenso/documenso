@@ -14,7 +14,6 @@ import { prisma } from '@documenso/prisma';
 import { AUTO_SIGNABLE_FIELD_TYPES } from '../../constants/autosign';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
-import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { TRecipientActionAuth } from '../../types/document-auth';
 import {
@@ -26,6 +25,7 @@ import {
 } from '../../types/field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { assertRecipientNotExpired } from '../../utils/recipients';
 import { validateFieldAuth } from '../document/validate-field-auth';
 
 export type SignFieldWithTokenOptions = {
@@ -109,11 +109,7 @@ export const signFieldWithToken = async ({
     throw new Error(`Document ${envelope.id} must be pending for signing`);
   }
 
-  if (recipient.expiresAt && recipient.expiresAt <= new Date()) {
-    throw new AppError(AppErrorCode.RECIPIENT_EXPIRED, {
-      message: 'Recipient signing window has expired',
-    });
-  }
+  assertRecipientNotExpired(recipient);
 
   if (
     recipient.signingStatus === SigningStatus.SIGNED ||

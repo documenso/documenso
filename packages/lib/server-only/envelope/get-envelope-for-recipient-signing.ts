@@ -13,6 +13,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAuthMethods } from '../../types/document-auth';
 import { ZEnvelopeFieldSchema, ZFieldSchema } from '../../types/field';
 import { ZRecipientLiteSchema } from '../../types/recipient';
+import { isRecipientExpired } from '../../utils/recipients';
 import { isRecipientAuthorized } from '../document/is-recipient-authorized';
 import { getTeamSettings } from '../team/get-team-settings';
 
@@ -295,7 +296,7 @@ export const getEnvelopeForRecipientSigning = async ({
     isRejected:
       recipient.signingStatus === SigningStatus.REJECTED ||
       envelope.status === DocumentStatus.REJECTED,
-    isExpired: recipient.expiresAt !== null && new Date() > recipient.expiresAt,
+    isExpired: isRecipientExpired(recipient),
     sender,
     settings: {
       includeSenderDetails: settings.includeSenderDetails,

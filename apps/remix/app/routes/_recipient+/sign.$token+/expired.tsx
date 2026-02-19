@@ -90,12 +90,12 @@ export default function ExpiredSigningPage({ loaderData }: Route.ComponentProps)
           <TimerOffIcon className="h-10 w-10 text-orange-500" />
 
           <h2 className="max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
-            <Trans>Document Expired</Trans>
+            <Trans>Signing Deadline Expired</Trans>
           </h2>
         </div>
 
         <div className="mt-4 flex items-center text-center text-sm text-orange-500">
-          <Trans>This document has expired</Trans>
+          <Trans>The signing deadline for this document has passed</Trans>
         </div>
 
         <p className="mt-6 max-w-[60ch] text-center text-sm text-muted-foreground">
@@ -103,10 +103,6 @@ export default function ExpiredSigningPage({ loaderData }: Route.ComponentProps)
             The signing deadline for this document has passed. Please contact the document owner if
             you need a new copy to sign.
           </Trans>
-        </p>
-
-        <p className="mt-2 max-w-[60ch] text-center text-sm text-muted-foreground">
-          <Trans>No further action is required from you at this time.</Trans>
         </p>
 
         {user && (

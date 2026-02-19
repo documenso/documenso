@@ -701,6 +701,8 @@ export const DocumentPreferencesForm = ({
                     expires. After expiration, recipients can no longer sign the document.
                   </Trans>
                 </FormDescription>
+
+                <FormMessage />
               </FormItem>
             )}
           />

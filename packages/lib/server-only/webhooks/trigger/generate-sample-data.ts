@@ -498,7 +498,7 @@ export const generateSampleWebhookPayload = (
   }
 
   if (event === WebhookTriggerEvents.RECIPIENT_EXPIRED) {
-    const expiredAt = new Date(now.getTime() - 60 * 1000); // Expired 1 minute ago
+    const expiresAt = new Date(now.getTime() - 60 * 1000); // Expired 1 minute ago
 
     return {
       event,
@@ -512,7 +512,7 @@ export const generateSampleWebhookPayload = (
             name: 'Signer 1',
             sendStatus: SendStatus.SENT,
             documentDeletedAt: null,
-            expiresAt: expiredAt,
+            expiresAt,
             expirationNotifiedAt: now,
             signedAt: null,
             authOptions: null,
@@ -529,7 +529,7 @@ export const generateSampleWebhookPayload = (
             name: 'Signer 1',
             sendStatus: SendStatus.SENT,
             documentDeletedAt: null,
-            expiresAt: expiredAt,
+            expiresAt,
             expirationNotifiedAt: now,
             signedAt: null,
             authOptions: null,

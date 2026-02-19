@@ -22,53 +22,58 @@ export const run = async ({
 }) => {
   const { recipientId } = payload;
 
-  const recipient = await prisma.recipient.findFirst({
-    where: {
-      id: recipientId,
-      expirationNotifiedAt: null,
-      signingStatus: {
-        notIn: [SigningStatus.SIGNED, SigningStatus.REJECTED],
+  // Atomic idempotency guard — only one concurrent worker wins.
+  // Wrapping in runTask caches the result so that on retry the claim is not
+  // re-evaluated and subsequent steps can still proceed.
+  const claimedCount = await io.runTask('claim-recipient', async () => {
+    const result = await prisma.recipient.updateMany({
+      where: {
+        id: recipientId,
+        expirationNotifiedAt: null,
+        signingStatus: { notIn: [SigningStatus.SIGNED, SigningStatus.REJECTED] },
       },
-    },
-    include: {
-      envelope: {
-        include: {
-          recipients: true,
-          documentMeta: true,
-        },
-      },
-    },
+      data: { expirationNotifiedAt: new Date() },
+    });
+
+    return result.count;
   });
 
-  if (!recipient) {
+  if (claimedCount === 0) {
     io.logger.info(`Recipient ${recipientId} already processed or no longer eligible, skipping`);
     return;
   }
 
-  const { envelope } = recipient;
-
-  // Set expirationNotifiedAt to make this idempotent.
-  await prisma.recipient.update({
+  // Fetch recipient (now marked) with its envelope for downstream steps.
+  // Re-fetch after claiming so that expirationNotifiedAt reflects the updated value
+  // and webhook consumers see consistent state.
+  const recipient = await prisma.recipient.findUniqueOrThrow({
     where: { id: recipientId },
-    data: {
-      expirationNotifiedAt: new Date(),
+    include: {
+      envelope: {
+        include: { recipients: true, documentMeta: true },
+      },
     },
   });
+
+  const { envelope } = recipient;
 
   io.logger.info(
     `Recipient ${recipientId} (${recipient.email}) expired on envelope ${recipient.envelopeId}`,
   );
 
-  // Create audit log entry.
-  await prisma.documentAuditLog.create({
-    data: createDocumentAuditLogData({
-      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_EXPIRED,
-      envelopeId: recipient.envelopeId,
-      data: {
-        recipientEmail: recipient.email,
-        recipientName: recipient.name,
-      },
-    }),
+  // Create audit log entry — wrapped so a retry skips this if it already succeeded.
+  await io.runTask('create-audit-log', async () => {
+    await prisma.documentAuditLog.create({
+      data: createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_EXPIRED,
+        envelopeId: recipient.envelopeId,
+        data: {
+          recipientEmail: recipient.email,
+          recipientName: recipient.name,
+          recipientId: recipient.id,
+        },
+      }),
+    });
   });
 
   // Trigger webhook for recipient expiration.

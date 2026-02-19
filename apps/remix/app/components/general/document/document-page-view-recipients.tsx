@@ -16,13 +16,14 @@ import {
   PlusIcon,
   UserIcon,
 } from 'lucide-react';
+import { DateTime } from 'luxon';
 import { Link, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import type { TEnvelope } from '@documenso/lib/types/envelope';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { formatSigningLink } from '@documenso/lib/utils/recipients';
+import { formatSigningLink, isRecipientExpired } from '@documenso/lib/utils/recipients';
 import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button';
 import { SignatureIcon } from '@documenso/ui/icons/signature';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
@@ -45,7 +46,7 @@ export const DocumentPageViewRecipients = ({
   envelope,
   documentRootPath,
 }: DocumentPageViewRecipientsProps) => {
-  const { _ } = useLingui();
+  const { _, i18n } = useLingui();
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -156,8 +157,7 @@ export const DocumentPageViewRecipients = ({
 
               {envelope.status !== DocumentStatus.DRAFT &&
                 recipient.signingStatus === SigningStatus.NOT_SIGNED &&
-                recipient.expiresAt &&
-                new Date(recipient.expiresAt) <= new Date() && (
+                isRecipientExpired(recipient) && (
                   <Badge variant="destructive">
                     <Clock8Icon className="mr-1 h-3 w-3" />
                     <Trans>Expired</Trans>
@@ -166,7 +166,7 @@ export const DocumentPageViewRecipients = ({
 
               {envelope.status !== DocumentStatus.DRAFT &&
                 recipient.signingStatus === SigningStatus.NOT_SIGNED &&
-                !(recipient.expiresAt && new Date(recipient.expiresAt) <= new Date()) &&
+                !isRecipientExpired(recipient) &&
                 (recipient.expiresAt ? (
                   <PopoverHover
                     trigger={
@@ -179,11 +179,9 @@ export const DocumentPageViewRecipients = ({
                     <p className="text-xs text-muted-foreground">
                       <Trans>
                         Expires{' '}
-                        {new Date(recipient.expiresAt).toLocaleDateString(undefined, {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        })}
+                        {recipient.expiresAt
+                          ? i18n.date(recipient.expiresAt, DateTime.DATETIME_MED)
+                          : 'N/A'}
                       </Trans>
                     </p>
                   </PopoverHover>
@@ -216,7 +214,8 @@ export const DocumentPageViewRecipients = ({
 
               {envelope.status === DocumentStatus.PENDING &&
                 recipient.signingStatus === SigningStatus.NOT_SIGNED &&
-                recipient.role !== RecipientRole.CC && (
+                recipient.role !== RecipientRole.CC &&
+                !isRecipientExpired(recipient) && (
                   <TooltipProvider>
                     <Tooltip open={shouldHighlightCopyButtons && i === 0}>
                       <TooltipTrigger asChild>

@@ -100,7 +100,9 @@ export const resendDocument = async ({
 
   const recipientsToRemind = envelope.recipients.filter(
     (recipient) =>
-      recipients.includes(recipient.id) && recipient.signingStatus === SigningStatus.NOT_SIGNED,
+      recipients.includes(recipient.id) &&
+      recipient.signingStatus === SigningStatus.NOT_SIGNED &&
+      recipient.role !== RecipientRole.CC,
   );
 
   // Extend the expiration deadline for recipients being resent.

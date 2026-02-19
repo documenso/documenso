@@ -19,6 +19,7 @@ import { getRecipientsForAssistant } from '@documenso/lib/server-only/recipient/
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { isRecipientExpired } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 
 import { EmbedSignDocumentV1ClientPage } from '~/components/embed/embed-document-signing-page-v1';
@@ -78,7 +79,7 @@ async function handleV1Loader({ params, request }: Route.LoaderArgs) {
     );
   }
 
-  if (recipient.expiresAt && new Date() > recipient.expiresAt) {
+  if (isRecipientExpired(recipient)) {
     throw data(
       {
         type: 'embed-recipient-expired',

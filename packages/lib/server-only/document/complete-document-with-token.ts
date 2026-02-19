@@ -29,6 +29,7 @@ import {
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToDocumentId, unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
+import { assertRecipientNotExpired } from '../../utils/recipients';
 import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { isRecipientAuthorized } from './is-recipient-authorized';
@@ -94,11 +95,7 @@ export const completeDocumentWithToken = async ({
 
   const [recipient] = envelope.recipients;
 
-  if (recipient.expiresAt && recipient.expiresAt <= new Date()) {
-    throw new AppError(AppErrorCode.RECIPIENT_EXPIRED, {
-      message: 'Recipient signing window has expired',
-    });
-  }
+  assertRecipientNotExpired(recipient);
 
   if (recipient.signingStatus === SigningStatus.SIGNED) {
     throw new Error(`Recipient ${recipient.id} has already signed`);

@@ -35,8 +35,6 @@ export class InngestJobProvider extends BaseJobProvider {
   }
 
   public defineJob<N extends string, T>(job: JobDefinition<N, T>): void {
-    console.log('defining job', job.id);
-
     const triggerConfig: { cron: string } | { event: N } = job.trigger.cron
       ? { cron: job.trigger.cron }
       : { event: job.trigger.name };

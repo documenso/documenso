@@ -703,6 +703,7 @@ export const ZDocumentAuditLogEventRecipientExpiredSchema = z.object({
   data: z.object({
     recipientEmail: z.string(),
     recipientName: z.string(),
+    recipientId: z.number(),
   }),
 });
 

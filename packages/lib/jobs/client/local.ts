@@ -64,16 +64,20 @@ export class LocalJobProvider extends BaseJobProvider {
     };
 
     if (definition.trigger.cron && definition.enabled !== false) {
-      this._cronJobs.push({
-        definition: {
-          ...definition,
-          enabled: definition.enabled ?? true,
-        },
-        cron: definition.trigger.cron,
-        lastTickAt: new Date(),
-      });
+      const alreadyRegistered = this._cronJobs.some((job) => job.definition.id === definition.id);
 
-      console.log(`[JOBS]: Registered cron job ${definition.id} (${definition.trigger.cron})`);
+      if (!alreadyRegistered) {
+        this._cronJobs.push({
+          definition: {
+            ...definition,
+            enabled: definition.enabled ?? true,
+          },
+          cron: definition.trigger.cron,
+          lastTickAt: new Date(),
+        });
+
+        console.log(`[JOBS]: Registered cron job ${definition.id} (${definition.trigger.cron})`);
+      }
     }
   }
 

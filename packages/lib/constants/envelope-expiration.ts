@@ -1,3 +1,4 @@
+import type { DurationLikeObject } from 'luxon';
 import { Duration } from 'luxon';
 import { z } from 'zod';
 
@@ -18,7 +19,10 @@ export const ZEnvelopeExpirationPeriod = z.union([
 export type TEnvelopeExpirationPeriod = z.infer<typeof ZEnvelopeExpirationPeriod>;
 export type TEnvelopeExpirationDurationPeriod = z.infer<typeof ZEnvelopeExpirationDurationPeriod>;
 
-const UNIT_TO_LUXON_KEY: Record<TEnvelopeExpirationDurationPeriod['unit'], string> = {
+const UNIT_TO_LUXON_KEY: Record<
+  TEnvelopeExpirationDurationPeriod['unit'],
+  keyof DurationLikeObject
+> = {
   day: 'days',
   week: 'weeks',
   month: 'months',

@@ -1,9 +1,9 @@
 import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
+import { assertRecipientNotExpired } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 
 export type RemovedSignedFieldWithTokenOptions = {
@@ -57,11 +57,7 @@ export const removeSignedFieldWithToken = async ({
     throw new Error(`Document ${envelope.id} must be pending`);
   }
 
-  if (recipient?.expiresAt && recipient.expiresAt <= new Date()) {
-    throw new AppError(AppErrorCode.RECIPIENT_EXPIRED, {
-      message: 'Recipient signing window has expired',
-    });
-  }
+  assertRecipientNotExpired(recipient);
 
   if (
     recipient?.signingStatus === SigningStatus.SIGNED ||

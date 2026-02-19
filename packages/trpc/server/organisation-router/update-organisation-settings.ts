@@ -149,7 +149,8 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
             drawSignatureEnabled,
             defaultRecipients: defaultRecipients === null ? Prisma.DbNull : defaultRecipients,
             delegateDocumentOwnership: derivedDelegateDocumentOwnership,
-            envelopeExpirationPeriod,
+            envelopeExpirationPeriod:
+              envelopeExpirationPeriod === null ? Prisma.DbNull : envelopeExpirationPeriod,
 
             // Branding related settings.
             brandingEnabled,
