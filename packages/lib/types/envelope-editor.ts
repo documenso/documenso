@@ -10,6 +10,12 @@ import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSche
 import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
 import { ZBaseEmbedDataSchema } from '@documenso/remix/app/types/embed-base-schemas';
 
+/**
+ * DO NOT MAKE ANY BREAKING BACKWARD CHANGES HERE UNLESS YOu'RE SURE
+ * IT WON'T BREAK EMBEDDINGS.
+ *
+ * Keep this in sync with the embedded repo (the types + schema)
+ */
 export const ZEnvelopeEditorSettingsSchema = z.object({
   /**
    * Generic editor related configurations.
@@ -92,15 +98,109 @@ export const ZEnvelopeEditorSettingsSchema = z.object({
 
 export type TEnvelopeEditorSettings = z.infer<typeof ZEnvelopeEditorSettingsSchema>;
 
+/**
+ * The default editor configuration for normal flows.
+ */
+export const DEFAULT_EDITOR_CONFIG: EnvelopeEditorConfig = {
+  general: {
+    allowConfigureEnvelopeTitle: true,
+    allowUploadAndRecipientStep: true,
+    allowAddFieldsStep: true,
+    allowPreviewStep: true,
+    minimizeLeftSidebar: false,
+  },
+  settings: {
+    allowConfigureSignatureTypes: true,
+    allowConfigureLanguage: true,
+    allowConfigureDateFormat: true,
+    allowConfigureTimezone: true,
+    allowConfigureRedirectUrl: true,
+    allowConfigureDistribution: true,
+  },
+  actions: {
+    allowAttachments: true,
+    allowDistributing: true,
+    allowDirectLink: true,
+    allowDuplication: true,
+    allowDownloadPDF: true,
+    allowDeletion: true,
+    allowReturnToPreviousPage: true,
+  },
+  envelopeItems: {
+    allowConfigureTitle: true,
+    allowConfigureOrder: true,
+    allowUpload: true,
+    allowDelete: true,
+  },
+  recipients: {
+    allowAIDetection: true,
+    allowConfigureSigningOrder: true,
+    allowConfigureDictateNextSigner: true,
+
+    allowApproverRole: true,
+    allowViewerRole: true,
+    allowCCerRole: true,
+    allowAssistantRole: true,
+  },
+  fields: {
+    allowAIDetection: true,
+  },
+};
+
+export const DEFAULT_EMBEDDED_EDITOR_CONFIG = {
+  general: {
+    allowConfigureEnvelopeTitle: true,
+    allowUploadAndRecipientStep: true,
+    allowAddFieldsStep: true,
+    allowPreviewStep: true,
+    minimizeLeftSidebar: true,
+  },
+  settings: {
+    allowConfigureSignatureTypes: true,
+    allowConfigureLanguage: true,
+    allowConfigureDateFormat: true,
+    allowConfigureTimezone: true,
+    allowConfigureRedirectUrl: true,
+    allowConfigureDistribution: true,
+  },
+  actions: {
+    allowAttachments: true,
+    allowDistributing: false,
+    allowDirectLink: false,
+    allowDuplication: false,
+    allowDownloadPDF: false,
+    allowDeletion: false,
+    allowReturnToPreviousPage: true,
+  },
+  envelopeItems: {
+    allowConfigureTitle: true,
+    allowConfigureOrder: true,
+    allowUpload: true,
+    allowDelete: true,
+  },
+  recipients: {
+    allowAIDetection: true,
+    allowConfigureSigningOrder: true,
+    allowConfigureDictateNextSigner: true,
+    allowApproverRole: true,
+    allowViewerRole: true,
+    allowCCerRole: true,
+    allowAssistantRole: true,
+  },
+  fields: {
+    allowAIDetection: true,
+  },
+} as const satisfies EnvelopeEditorConfig;
+
 export const ZEmbedCreateEnvelopeAuthoringSchema = ZBaseEmbedDataSchema.extend({
   externalId: z.string().optional(),
   type: z.nativeEnum(EnvelopeType),
-  features: ZEnvelopeEditorSettingsSchema,
+  features: z.object({}).passthrough().optional().default(DEFAULT_EMBEDDED_EDITOR_CONFIG),
 });
 
 export const ZEmbedEditEnvelopeAuthoringSchema = ZBaseEmbedDataSchema.extend({
   externalId: z.string().optional(),
-  features: ZEnvelopeEditorSettingsSchema,
+  features: z.object({}).passthrough().optional().default(DEFAULT_EMBEDDED_EDITOR_CONFIG),
 });
 
 export type TEmbedCreateEnvelopeAuthoring = z.infer<typeof ZEmbedCreateEnvelopeAuthoringSchema>;
@@ -188,53 +288,4 @@ export type EnvelopeEditorConfig = TEnvelopeEditorSettings & {
     onUpdate?: (envelope: TEditorEnvelope) => void;
     customBrandingLogo?: boolean;
   };
-};
-
-/**
- * The default editor configuration for normal flows.
- */
-export const DEFAULT_EDITOR_CONFIG: EnvelopeEditorConfig = {
-  general: {
-    allowConfigureEnvelopeTitle: true,
-    allowUploadAndRecipientStep: true,
-    allowAddFieldsStep: true,
-    allowPreviewStep: true,
-    minimizeLeftSidebar: false,
-  },
-  settings: {
-    allowConfigureSignatureTypes: true,
-    allowConfigureLanguage: true,
-    allowConfigureDateFormat: true,
-    allowConfigureTimezone: true,
-    allowConfigureRedirectUrl: true,
-    allowConfigureDistribution: true,
-  },
-  actions: {
-    allowAttachments: true,
-    allowDistributing: true,
-    allowDirectLink: true,
-    allowDuplication: true,
-    allowDownloadPDF: true,
-    allowDeletion: true,
-    allowReturnToPreviousPage: true,
-  },
-  envelopeItems: {
-    allowConfigureTitle: true,
-    allowConfigureOrder: true,
-    allowUpload: true,
-    allowDelete: true,
-  },
-  recipients: {
-    allowAIDetection: true,
-    allowConfigureSigningOrder: true,
-    allowConfigureDictateNextSigner: true,
-
-    allowApproverRole: true,
-    allowViewerRole: true,
-    allowCCerRole: true,
-    allowAssistantRole: true,
-  },
-  fields: {
-    allowAIDetection: true,
-  },
 };

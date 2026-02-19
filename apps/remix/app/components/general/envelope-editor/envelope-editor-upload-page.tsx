@@ -108,7 +108,7 @@ export const EnvelopeEditorUploadPage = () => {
   );
 
   const onFileDrop = async (files: File[]) => {
-    const newUploadingFiles: (LocalFile & { file: File; data: ArrayBuffer | null })[] =
+    const newUploadingFiles: (LocalFile & { file: File; data: Uint8Array<ArrayBuffer> | null })[] =
       await Promise.all(
         files.map(async (file) => {
           return {
@@ -118,7 +118,7 @@ export const EnvelopeEditorUploadPage = () => {
             file,
             isUploading: isEmbedded ? false : true,
             // Clone the buffer so it can be read multiple times (File.arrayBuffer() consumes the stream once)
-            data: isEmbedded ? (await file.arrayBuffer()).slice(0) : null,
+            data: isEmbedded ? new Uint8Array((await file.arrayBuffer()).slice(0)) : null,
             isError: false,
           };
         }),
@@ -226,6 +226,30 @@ export const EnvelopeEditorUploadPage = () => {
   };
 
   const debouncedUpdateEnvelopeItems = useDebounceFunction((files: LocalFile[]) => {
+    if (isEmbedded) {
+      const nextEnvelopeItems = files
+        .filter((item) => item.envelopeItemId)
+        .map((item, index) => {
+          const originalEnvelopeItem = envelope.envelopeItems.find(
+            (envelopeItem) => envelopeItem.id === item.envelopeItemId,
+          );
+
+          return {
+            id: item.envelopeItemId || '',
+            title: item.title,
+            order: index + 1,
+            envelopeId: envelope.id,
+            data: originalEnvelopeItem?.data,
+          };
+        });
+
+      setLocalEnvelope({
+        envelopeItems: nextEnvelopeItems,
+      });
+
+      return;
+    }
+
     void updateEnvelopeItems({
       envelopeId: envelope.id,
       data: files
@@ -310,6 +334,7 @@ export const EnvelopeEditorUploadPage = () => {
         <CardContent>
           {uploadConfig?.allowUpload && (
             <DocumentDropzone
+              data-testid="envelope-item-dropzone"
               onDrop={onFileDrop}
               allowMultiple
               className="pb-4 pt-6"
@@ -326,7 +351,12 @@ export const EnvelopeEditorUploadPage = () => {
             <DragDropContext onDragEnd={onDragEnd}>
               <Droppable droppableId="files">
                 {(provided) => (
-                  <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                  <div
+                    data-testid="envelope-items-list"
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="space-y-2"
+                  >
                     {localFiles.map((localFile, index) => (
                       <Draggable
                         key={localFile.id}
@@ -340,6 +370,7 @@ export const EnvelopeEditorUploadPage = () => {
                       >
                         {(provided, snapshot) => (
                           <div
+                            data-testid={`envelope-item-row-${localFile.id}`}
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             style={provided.draggableProps.style}
@@ -351,6 +382,7 @@ export const EnvelopeEditorUploadPage = () => {
                               {uploadConfig?.allowConfigureOrder && (
                                 <div
                                   {...provided.dragHandleProps}
+                                  data-testid={`envelope-item-drag-handle-${localFile.id}`}
                                   className="cursor-grab active:cursor-grabbing"
                                 >
                                   <GripVerticalIcon className="h-5 w-5 flex-shrink-0 opacity-40" />
@@ -365,6 +397,7 @@ export const EnvelopeEditorUploadPage = () => {
                                       !uploadConfig?.allowConfigureTitle
                                     }
                                     value={localFile.title}
+                                    dataTestId={`envelope-item-title-input-${localFile.id}`}
                                     placeholder={t`Document Title`}
                                     onChange={(title) => {
                                       onEnvelopeItemTitleChange(localFile.envelopeItemId!, title);
@@ -399,7 +432,17 @@ export const EnvelopeEditorUploadPage = () => {
 
                               {!localFile.isUploading &&
                                 localFile.envelopeItemId &&
-                                uploadConfig?.allowDelete && (
+                                uploadConfig?.allowDelete &&
+                                (isEmbedded ? (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    data-testid={`envelope-item-remove-button-${localFile.id}`}
+                                    onClick={() => onFileDelete(localFile.envelopeItemId!)}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                ) : (
                                   <EnvelopeItemDeleteDialog
                                     canItemBeDeleted={canItemsBeModified}
                                     envelopeId={envelope.id}
@@ -407,12 +450,16 @@ export const EnvelopeEditorUploadPage = () => {
                                     envelopeItemTitle={localFile.title}
                                     onDelete={onFileDelete}
                                     trigger={
-                                      <Button variant="ghost" size="sm">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        data-testid={`envelope-item-remove-button-${localFile.id}`}
+                                      >
                                         <X className="h-4 w-4" />
                                       </Button>
                                     }
                                   />
-                                )}
+                                ))}
                             </div>
                           </div>
                         )}
