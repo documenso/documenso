@@ -23,13 +23,8 @@ export const handleTextFieldClick = async (
     });
   }
 
-  if (field.inserted) {
-    return {
-      type: FieldType.TEXT,
-      value: null,
-    };
-  }
-
+  // When field is already inserted, open dialog to edit (with current value) instead of unsigning.
+  // This preserves the user's entered value when they click the field again.
   let textToInsert = text;
 
   if (!textToInsert) {
@@ -45,6 +40,14 @@ export const handleTextFieldClick = async (
 
   if (!textToInsert) {
     return null;
+  }
+
+  // If user cleared the value and field was inserted, treat as unsign.
+  if (field.inserted && textToInsert.trim() === '') {
+    return {
+      type: FieldType.TEXT,
+      value: null,
+    };
   }
 
   return {

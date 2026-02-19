@@ -100,9 +100,10 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     }
   }
 
-  // Override everything with value if it's inserted.
+  // Override everything with value if it's inserted (signed value always wins over prefill).
   if (field.inserted) {
-    textToRender = field.customText;
+    textToRender =
+      typeof field.customText === 'string' ? field.customText : String(field.customText ?? '');
 
     textAlign = fieldMeta?.textAlign || FIELD_DEFAULT_GENERIC_ALIGN;
 

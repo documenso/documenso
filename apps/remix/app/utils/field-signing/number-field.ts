@@ -23,13 +23,7 @@ export const handleNumberFieldClick = async (
     });
   }
 
-  if (field.inserted) {
-    return {
-      type: FieldType.NUMBER,
-      value: null,
-    };
-  }
-
+  // When field is already inserted, open dialog to edit (with current value) instead of unsigning.
   let numberToInsert = number;
 
   if (!numberToInsert) {
@@ -45,6 +39,13 @@ export const handleNumberFieldClick = async (
 
   if (!numberToInsert) {
     return null;
+  }
+
+  if (field.inserted && numberToInsert.trim() === '') {
+    return {
+      type: FieldType.NUMBER,
+      value: null,
+    };
   }
 
   return {
