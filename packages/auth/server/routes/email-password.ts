@@ -17,7 +17,10 @@ import { viewBackupCodes } from '@documenso/lib/server-only/2fa/view-backup-code
 import { createUser } from '@documenso/lib/server-only/user/create-user';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
 import { getMostRecentEmailVerificationToken } from '@documenso/lib/server-only/user/get-most-recent-email-verification-token';
+import { getUserByResetToken } from '@documenso/lib/server-only/user/get-user-by-reset-token';
 import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
+import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
+import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { verifyEmail } from '@documenso/lib/server-only/user/verify-email';
 import { env } from '@documenso/lib/utils/env';
@@ -55,6 +58,13 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       throw new AppError(AuthenticationErrorCode.InvalidRequest, {
         message: 'Invalid CSRF token',
       });
+    }
+
+    if (
+      email.toLowerCase() === legacyServiceAccountEmail() ||
+      email.toLowerCase() === deletedServiceAccountEmail()
+    ) {
+      return c.text('FORBIDDEN', 403);
     }
 
     const user = await prisma.user.findFirst({
@@ -241,6 +251,13 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   .post('/forgot-password', sValidator('json', ZForgotPasswordSchema), async (c) => {
     const { email } = c.req.valid('json');
 
+    if (
+      email.toLowerCase() === legacyServiceAccountEmail() ||
+      email.toLowerCase() === deletedServiceAccountEmail()
+    ) {
+      return c.text('FORBIDDEN', 403);
+    }
+
     await forgotPassword({
       email,
     });
@@ -252,6 +269,15 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
    */
   .post('/reset-password', sValidator('json', ZResetPasswordSchema), async (c) => {
     const { token, password } = c.req.valid('json');
+
+    const user = await getUserByResetToken({ token });
+
+    if (
+      user.email.toLowerCase() === legacyServiceAccountEmail() ||
+      user.email.toLowerCase() === deletedServiceAccountEmail()
+    ) {
+      return c.text('FORBIDDEN', 403);
+    }
 
     const requestMetadata = c.get('requestMetadata');
 

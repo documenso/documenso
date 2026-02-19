@@ -96,7 +96,9 @@ export const AdminDocumentLogsTable = ({ envelopeId }: AdminDocumentLogsTablePro
               )}
             </div>
           ) : (
-            <p>N/A</p>
+            <p>
+              <Trans>N/A</Trans>
+            </p>
           ),
       },
       {

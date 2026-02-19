@@ -30,7 +30,7 @@ export type AuditLogRecipient = {
 };
 
 type GenerateAuditLogsOptions = {
-  envelope: Envelope & {
+  envelope: Omit<Envelope, 'completedAt'> & {
     documentMeta: DocumentMeta;
   };
   envelopeItems: string[];
@@ -168,7 +168,7 @@ const renderVerticalLabelAndText = (options: RenderVerticalLabelAndTextOptions) 
 };
 
 type RenderOverviewCardOptions = {
-  envelope: Envelope & {
+  envelope: Omit<Envelope, 'completedAt'> & {
     documentMeta: DocumentMeta;
   };
   envelopeItems: string[];
