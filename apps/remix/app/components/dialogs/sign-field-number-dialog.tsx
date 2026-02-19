@@ -28,10 +28,11 @@ import { Input } from '@documenso/ui/primitives/input';
 
 export type SignFieldNumberDialogProps = {
   fieldMeta: TNumberFieldMeta;
+  initialValue?: string;
 };
 
 export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, string | null>(
-  ({ call, fieldMeta }) => {
+  ({ call, fieldMeta, initialValue }) => {
     const { t } = useLingui();
 
     // Needs to be inside dialog for translation purposes.
@@ -98,7 +99,7 @@ export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, 
     const form = useForm<z.infer<typeof ZSignFieldNumberFormSchema>>({
       resolver: zodResolver(ZSignFieldNumberFormSchema),
       defaultValues: {
-        number: undefined,
+        number: initialValue ?? undefined,
       },
     });
 
