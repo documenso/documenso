@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 
+import { Trans } from '@lingui/react/macro';
 import { type PDFDocumentProxy } from 'pdfjs-dist';
 
 import type { PdfViewerRendererMode } from './pdf-viewer-konva';
@@ -17,7 +18,13 @@ const EnvelopePdfViewer = lazy(async () => import('./pdf-viewer-konva'));
 
 export const PDFViewerKonvaLazy = (props: PDFViewerProps) => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense
+      fallback={
+        <div>
+          <Trans>Loading...</Trans>
+        </div>
+      }
+    >
       <EnvelopePdfViewer {...props} />
     </Suspense>
   );

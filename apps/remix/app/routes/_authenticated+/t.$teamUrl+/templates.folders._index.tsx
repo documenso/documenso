@@ -66,7 +66,9 @@ export default function TemplatesFoldersPage() {
             onClick={() => navigateToFolder(null)}
           >
             <HomeIcon className="h-4 w-4" />
-            <span>Home</span>
+            <span>
+              <Trans>Home</Trans>
+            </span>
           </Button>
         </div>
 

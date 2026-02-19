@@ -1,5 +1,6 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { WebhookTriggerEvents } from '@prisma/client';
 
 import { WEBHOOK_EVENT_TRANSLATIONS } from '@documenso/lib/universal/webhook/to-friendly-webhook-event-name';
@@ -41,7 +42,11 @@ export const WebhookMultiSelectCombobox = ({
       placeholder={_(msg`Select triggers`)}
       hideClearAllButton
       hidePlaceholderWhenSelected
-      emptyIndicator={<p className="text-center text-sm">No triggers available</p>}
+      emptyIndicator={
+        <p className="text-center text-sm">
+          <Trans>No triggers available</Trans>
+        </p>
+      }
     />
   );
 };
