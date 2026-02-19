@@ -5,6 +5,7 @@ description: Configure PostgreSQL connection strings, pooling, SSL, migrations, 
 
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Supported Databases
 
@@ -211,102 +212,118 @@ npx prisma migrate deploy
 
 <Accordions type="multiple">
   <Accordion title="Migration failed midway">
-    Check the `_prisma_migrations` table: `SELECT * FROM _prisma_migrations WHERE finished_at IS
-    NULL;`. To retry: fix the underlying issue (disk space, permissions, etc.), mark as rolled back:
-    `UPDATE _prisma_migrations SET rolled_back_at = NOW() WHERE migration_name =
-    'failed_migration_name';`, run migrations again.
+    Check the `_prisma_migrations` table:
+    
+    ```sql
+    SELECT * FROM _prisma_migrations WHERE finished_at IS NULL;
+    ```
+
+    To retry, fix the underlying issue (disk space, permissions, etc.), mark as rolled back:
+
+    ```sql
+    UPDATE _prisma_migrations SET rolled_back_at = NOW() WHERE migration_name = 'failed_migration_name';
+    ```
+
+    Run migrations again.
+
   </Accordion>
   <Accordion title="Connection timeout during migration">
     Use the direct database URL and increase timeout:
-    `NEXT_PRIVATE_DIRECT_DATABASE_URL="postgresql://user:password@host:5432/documenso?connect_timeout=60"`.
+    
+    ```bash
+    NEXT_PRIVATE_DIRECT_DATABASE_URL="postgresql://user:password@host:5432/documenso?connect_timeout=60"
+    ```
   </Accordion>
 </Accordions>
 
 ## Managed Database Services
 
-### Supabase
+<Accordions type="multiple">
+  <Accordion title="Supabase">
+    Supabase provides PostgreSQL with built-in connection pooling via Supavisor.
 
-Supabase provides PostgreSQL with built-in connection pooling via Supavisor.
+    **Configuration:**
 
-**Configuration:**
+    ```bash
+    # Pooled connection (Session mode - port 5432)
+    NEXT_PRIVATE_DATABASE_URL=postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres
 
-```bash
-# Pooled connection (Session mode - port 5432)
-NEXT_PRIVATE_DATABASE_URL=postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres
+    # Direct connection for migrations (port 5432, direct host)
+    NEXT_PRIVATE_DIRECT_DATABASE_URL=postgresql://postgres:[password]@db.[project-ref].supabase.co:5432/postgres
+    ```
 
-# Direct connection for migrations (port 5432, direct host)
-NEXT_PRIVATE_DIRECT_DATABASE_URL=postgresql://postgres:[password]@db.[project-ref].supabase.co:5432/postgres
-```
+    Find your connection strings in the Supabase dashboard under **Settings > Database > Connection string**.
 
-Find your connection strings in the Supabase dashboard under **Settings > Database > Connection string**.
+  </Accordion>
+  <Accordion title="Neon">
+    Neon provides serverless PostgreSQL with automatic scaling.
 
-### Neon
+    **Configuration:**
 
-Neon provides serverless PostgreSQL with automatic scaling.
+    ```bash
+    # Pooled connection
+    NEXT_PRIVATE_DATABASE_URL=postgresql://[user]:[password]@[endpoint]-pooler.region.aws.neon.tech/documenso?sslmode=require
 
-**Configuration:**
+    # Direct connection for migrations
+    NEXT_PRIVATE_DIRECT_DATABASE_URL=postgresql://[user]:[password]@[endpoint].region.aws.neon.tech/documenso?sslmode=require
+    ```
 
-```bash
-# Pooled connection
-NEXT_PRIVATE_DATABASE_URL=postgresql://[user]:[password]@[endpoint]-pooler.region.aws.neon.tech/documenso?sslmode=require
+    The pooler endpoint includes `-pooler` in the hostname.
 
-# Direct connection for migrations
-NEXT_PRIVATE_DIRECT_DATABASE_URL=postgresql://[user]:[password]@[endpoint].region.aws.neon.tech/documenso?sslmode=require
-```
+  </Accordion>
+  <Accordion title="AWS RDS">
+    **Configuration:**
 
-The pooler endpoint includes `-pooler` in the hostname.
+    ```bash
+    NEXT_PRIVATE_DATABASE_URL=postgresql://documenso:[password]@your-instance.region.rds.amazonaws.com:5432/documenso?sslmode=require
+    NEXT_PRIVATE_DIRECT_DATABASE_URL=postgresql://documenso:[password]@your-instance.region.rds.amazonaws.com:5432/documenso?sslmode=require
+    ```
 
-### AWS RDS
+    **Recommended settings:**
 
-**Configuration:**
+    - Instance class: `db.t3.medium` or larger for production
+    - Storage: General Purpose SSD (gp3), minimum 20GB
+    - Enable automated backups with 7+ day retention
+    - Enable Multi-AZ for high availability
 
-```bash
-NEXT_PRIVATE_DATABASE_URL=postgresql://documenso:[password]@your-instance.region.rds.amazonaws.com:5432/documenso?sslmode=require
-NEXT_PRIVATE_DIRECT_DATABASE_URL=postgresql://documenso:[password]@your-instance.region.rds.amazonaws.com:5432/documenso?sslmode=require
-```
+  </Accordion>
+  <Accordion title="Google Cloud SQL">
+    **Configuration:**
 
-**Recommended settings:**
+    ```bash
+    NEXT_PRIVATE_DATABASE_URL=postgresql://documenso:[password]@/documenso?host=/cloudsql/[project]:[region]:[instance]
+    ```
 
-- Instance class: `db.t3.medium` or larger for production
-- Storage: General Purpose SSD (gp3), minimum 20GB
-- Enable automated backups with 7+ day retention
-- Enable Multi-AZ for high availability
+    When connecting via Cloud SQL Proxy, use Unix socket connections.
 
-### Google Cloud SQL
+    For public IP connections:
 
-**Configuration:**
+    ```bash
+    NEXT_PRIVATE_DATABASE_URL=postgresql://documenso:[password]@[public-ip]:5432/documenso?sslmode=require
+    ```
 
-```bash
-NEXT_PRIVATE_DATABASE_URL=postgresql://documenso:[password]@/documenso?host=/cloudsql/[project]:[region]:[instance]
-```
+  </Accordion>
+  <Accordion title="Azure Database for PostgreSQL">
+    **Configuration:**
 
-When connecting via Cloud SQL Proxy, use Unix socket connections.
+    ```bash
+    NEXT_PRIVATE_DATABASE_URL=postgresql://documenso@[server-name]:[password]@[server-name].postgres.database.azure.com:5432/documenso?sslmode=require
+    ```
 
-For public IP connections:
+    Note: Azure requires the username format `user@servername`.
 
-```bash
-NEXT_PRIVATE_DATABASE_URL=postgresql://documenso:[password]@[public-ip]:5432/documenso?sslmode=require
-```
+  </Accordion>
+  <Accordion title="DigitalOcean Managed Databases">
+    **Configuration:**
 
-### Azure Database for PostgreSQL
+    ```bash
+    NEXT_PRIVATE_DATABASE_URL=postgresql://doadmin:[password]@[cluster-host]:25060/documenso?sslmode=require
+    ```
 
-**Configuration:**
+    DigitalOcean uses port 25060 by default and requires SSL.
 
-```bash
-NEXT_PRIVATE_DATABASE_URL=postgresql://documenso@[server-name]:[password]@[server-name].postgres.database.azure.com:5432/documenso?sslmode=require
-```
-
-Note: Azure requires the username format `user@servername`.
-
-### DigitalOcean Managed Databases
-
-**Configuration:**
-
-```bash
-NEXT_PRIVATE_DATABASE_URL=postgresql://doadmin:[password]@[cluster-host]:25060/documenso?sslmode=require
-```
-
-DigitalOcean uses port 25060 by default and requires SSL.
+  </Accordion>
+</Accordions>
 
 ## Backup Recommendations
 
@@ -336,11 +353,13 @@ pg_restore -h host -U user -d documenso -c documenso_backup.dump
 
 Most managed database services provide automated backups:
 
-- **Supabase**: Daily backups with point-in-time recovery (Pro plan)
-- **Neon**: Automatic branching for instant recovery
-- **AWS RDS**: Automated backups with configurable retention
-- **Google Cloud SQL**: Automated and on-demand backups
-- **Azure**: Automatic backups with geo-redundancy options
+<Tabs items={['Supabase', 'Neon', 'AWS RDS', 'Google Cloud SQL', 'Azure']}>
+  <Tab value="Supabase">Daily backups with point-in-time recovery (Pro plan)</Tab>
+  <Tab value="Neon">Automatic branching for instant recovery</Tab>
+  <Tab value="AWS RDS">Automated backups with configurable retention</Tab>
+  <Tab value="Google Cloud SQL">Automated and on-demand backups</Tab>
+  <Tab value="Azure">Automatic backups with geo-redundancy options</Tab>
+</Tabs>
 
 <Callout type="warn">
   Always test your backup restoration process. Untested backups may not work when needed.
@@ -402,29 +421,62 @@ Monitor these metrics:
 
 <Accordions type="multiple">
   <Accordion title="Connection refused">
-    Causes: PostgreSQL not running, incorrect host or port, firewall blocking. Solutions: verify
+    Causes:
+    - PostgreSQL not running
+    - Incorrect host or port
+    - Firewall blocking
+    
+    Solutions:
+    - Verify PostgreSQL is running with `pg_isready -h host -p 5432`
+    - Check the connection string
+    - Verify firewall rules
     with `pg_isready -h host -p 5432`, check the connection string, verify firewall rules.
   </Accordion>
   <Accordion title="Authentication failed">
-    Causes: incorrect password, user doesn't exist, password contains special characters. Solutions:
-    verify credentials in `pg_hba.conf`, URL-encode special characters, reset: `ALTER USER documenso
-    WITH PASSWORD 'newpassword';`.
+    Causes: 
+    - Incorrect password
+    - User doesn't exist
+    - Password contains special characters
+    
+    Solutions:
+    - Reset password with `ALTER USER documenso WITH PASSWORD 'newpassword';`
+    - Verify credentials in `pg_hba.conf`
+    - Verify URL-encoded special characters
   </Accordion>
   <Accordion title="SSL connection required">
     Add SSL mode to your connection string:
-    `postgresql://user:password@host:5432/documenso?sslmode=require`.
+
+    ```bash
+    postgresql://user:password@host:5432/documenso?sslmode=require
+    ```
+
   </Accordion>
   <Accordion title="Too many connections">
-    Causes: connection pool exhausted, connections not released, multiple instances exceeding
-    limits. Solutions: reduce `connection_limit`, increase `max_connections`, implement PgBouncer.
+    Causes: 
+    - Connection pool exhausted
+    - Connections not released
+    - Multiple instances exceeding limits
+    
+    Solutions:
+    - Reduce `connection_limit`
+    - Increase `max_connections`
+    - Implement PgBouncer
   </Accordion>
   <Accordion title="Database does not exist">
-    Create the database: `CREATE DATABASE documenso;` and `GRANT ALL PRIVILEGES ON DATABASE
-    documenso TO documenso;`.
+    Create the database:
+    
+    ```sql
+    CREATE DATABASE documenso;
+    GRANT ALL PRIVILEGES ON DATABASE documenso TO documenso;
+    ```
   </Accordion>
   <Accordion title="Permission denied">
-    Grant permissions: `GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO documenso;` and
-    `GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO documenso;`.
+    Grant permissions:
+    
+    ```sql
+    GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO documenso;
+    GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO documenso;
+    ```
   </Accordion>
 </Accordions>
 

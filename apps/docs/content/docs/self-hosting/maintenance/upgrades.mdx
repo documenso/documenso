@@ -6,6 +6,7 @@ description: Upgrade your self-hosted Documenso installation to get the latest f
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Version Policy
 
@@ -38,23 +39,29 @@ For production deployments, pin to a specific version tag to avoid unexpected up
 
 Check your running Documenso version:
 
-**Docker:**
+<Tabs items={['Docker', 'Docker Compose', 'Kubernetes']}>
+<Tab value="Docker">
 
 ```bash
 docker inspect documenso --format='{{.Config.Image}}'
 ```
 
-**Docker Compose:**
+</Tab>
+<Tab value="Docker Compose">
 
 ```bash
 docker compose images
 ```
 
-**Kubernetes:**
+</Tab>
+<Tab value="Kubernetes">
 
 ```bash
 kubectl get deployment documenso -n documenso -o jsonpath='{.spec.template.spec.containers[0].image}'
 ```
+
+</Tab>
+</Tabs>
 
 ### Check for New Releases
 
@@ -70,13 +77,22 @@ Or visit the [releases page](https://github.com/documenso/documenso/releases).
 
 List available image tags:
 
-```bash
-# DockerHub
-curl -s https://hub.docker.com/v2/repositories/documenso/documenso/tags | jq -r '.results[].name'
+<Tabs items={['DockerHub', 'GitHub Container Registry']}>
+<Tab value="DockerHub">
 
-# GitHub Container Registry
+```bash
+curl -s https://hub.docker.com/v2/repositories/documenso/documenso/tags | jq -r '.results[].name'
+```
+
+</Tab>
+<Tab value="GitHub Container Registry">
+
+```bash
 curl -s https://api.github.com/orgs/documenso/packages/container/documenso/versions | jq -r '.[].metadata.container.tags[]'
 ```
+
+</Tab>
+</Tabs>
 
 ## Backup Before Upgrading
 
@@ -87,19 +103,22 @@ curl -s https://api.github.com/orgs/documenso/packages/container/documenso/versi
 
 ### Database Backup
 
-**Docker Compose:**
+<Tabs items={['Docker Compose', 'Kubernetes', 'External Database']}>
+<Tab value="Docker Compose">
 
 ```bash
 docker compose exec database pg_dump -U documenso documenso > backup-$(date +%Y%m%d-%H%M%S).sql
 ```
 
-**Kubernetes:**
+</Tab>
+<Tab value="Kubernetes">
 
 ```bash
 kubectl exec -n documenso deploy/postgres -- pg_dump -U documenso documenso > backup-$(date +%Y%m%d-%H%M%S).sql
 ```
 
-**External Database:**
+</Tab>
+<Tab value="External Database">
 
 Use your database provider's backup tools or `pg_dump`:
 
@@ -107,20 +126,32 @@ Use your database provider's backup tools or `pg_dump`:
 pg_dump "postgresql://user:password@host:5432/documenso" > backup-$(date +%Y%m%d-%H%M%S).sql
 ```
 
+</Tab>
+</Tabs>
+
 ### Configuration Backup
 
 Back up your environment configuration:
+
+<Tabs items={['Docker / env file', 'Kubernetes']}>
+<Tab value="Docker / env file">
 
 ```bash
 cp .env .env.backup-$(date +%Y%m%d)
 ```
 
-For Kubernetes, export your secrets and configmaps:
+</Tab>
+<Tab value="Kubernetes">
+
+Export your secrets and configmaps:
 
 ```bash
 kubectl get secret documenso-secrets -n documenso -o yaml > secrets-backup.yaml
 kubectl get configmap documenso-config -n documenso -o yaml > configmap-backup.yaml
 ```
+
+</Tab>
+</Tabs>
 
 See [Backups](/docs/self-hosting/maintenance/backups) for automated backup strategies.
 
@@ -310,26 +341,53 @@ Documenso runs database migrations automatically when the container starts. No m
 
 ### Migration Process
 
-1. Container starts and connects to the database
-2. Prisma checks for pending migrations
-3. Migrations are applied in order
-4. Application starts after migrations complete
+<Steps>
+<Step>
+### Container starts
+
+The container starts and connects to the database.
+
+</Step>
+<Step>
+### Prisma checks for migrations
+
+Prisma checks for pending migrations.
+
+</Step>
+<Step>
+### Migrations run
+
+Migrations are applied in order.
+
+</Step>
+<Step>
+### Application starts
+
+The application starts after migrations complete.
+
+</Step>
+</Steps>
 
 ### Checking Migration Status
 
 View migration logs:
 
-**Docker/Docker Compose:**
+<Tabs items={['Docker / Docker Compose', 'Kubernetes']}>
+<Tab value="Docker / Docker Compose">
 
 ```bash
 docker logs documenso 2>&1 | grep -i migration
 ```
 
-**Kubernetes:**
+</Tab>
+<Tab value="Kubernetes">
 
 ```bash
 kubectl logs -l app.kubernetes.io/name=documenso -n documenso | grep -i migration
 ```
+
+</Tab>
+</Tabs>
 
 ### Slow Migrations
 
@@ -337,8 +395,20 @@ Large databases may take longer to migrate. The startup probe in Kubernetes allo
 
 If migrations take longer:
 
-1. Increase `failureThreshold` on the startup probe
-2. Consider running migrations separately before upgrading
+<Steps>
+<Step>
+### Adjust startup probe
+
+Increase `failureThreshold` on the startup probe.
+
+</Step>
+<Step>
+### Run migrations separately (optional)
+
+Consider running migrations manually before upgrading (see Manual Migration below).
+
+</Step>
+</Steps>
 
 ### Manual Migration (Advanced)
 
@@ -365,11 +435,38 @@ Major version upgrades may include breaking changes that require manual steps.
 
 ### Before a Major Upgrade
 
-1. Read the [release notes](https://github.com/documenso/documenso/releases) carefully
-2. Check for required environment variable changes
-3. Review any configuration deprecations
-4. Back up your database
-5. Plan for potential downtime
+<Steps>
+<Step>
+### Read release notes
+
+Read the [release notes](https://github.com/documenso/documenso/releases) carefully.
+
+</Step>
+<Step>
+### Check environment variables
+
+Check for required environment variable changes.
+
+</Step>
+<Step>
+### Review configuration
+
+Review any configuration deprecations.
+
+</Step>
+<Step>
+### Back up database
+
+Back up your database.
+
+</Step>
+<Step>
+### Plan for downtime
+
+Plan for potential downtime.
+
+</Step>
+</Steps>
 
 ### Common Breaking Changes
 
@@ -397,7 +494,10 @@ diff .env .env.example
 
 If an upgrade fails, roll back to the previous version.
 
-### Docker Rollback
+### Container Rollback
+
+<Tabs items={['Docker', 'Docker Compose', 'Kubernetes']}>
+<Tab value="Docker">
 
 ```bash
 # Stop the new container
@@ -413,7 +513,8 @@ docker run -d \
   documenso/documenso:1.5.0
 ```
 
-### Docker Compose Rollback
+</Tab>
+<Tab value="Docker Compose">
 
 ```bash
 # Revert the image tag in compose.yml or .env
@@ -421,7 +522,8 @@ docker run -d \
 docker compose --env-file .env up -d
 ```
 
-### Kubernetes Rollback
+</Tab>
+<Tab value="Kubernetes">
 
 ```bash
 # View rollout history
@@ -434,6 +536,9 @@ kubectl rollout undo deployment/documenso -n documenso
 kubectl rollout undo deployment/documenso -n documenso --to-revision=2
 ```
 
+</Tab>
+</Tabs>
+
 ### Database Rollback
 
 <Callout type="error">
@@ -443,38 +548,74 @@ kubectl rollout undo deployment/documenso -n documenso --to-revision=2
 
 Restore from backup:
 
-**Docker Compose:**
+<Tabs items={['Docker Compose', 'External Database']}>
+<Tab value="Docker Compose">
 
 ```bash
 docker compose exec -T database psql -U documenso documenso < backup-20240115-120000.sql
 ```
 
-**External Database:**
+</Tab>
+<Tab value="External Database">
 
 ```bash
 psql "postgresql://user:password@host:5432/documenso" < backup-20240115-120000.sql
 ```
 
+</Tab>
+</Tabs>
+
 ## Troubleshooting Upgrades
 
 <Accordions type="multiple">
   <Accordion title="Container fails to start after upgrade">
-    Check logs for error messages: `docker logs documenso`
+    **Check logs:** `docker logs documenso`
 
-Common causes: Missing env variable (check release notes for new required variables), database connection error (verify database is accessible and credentials are valid), migration failure (check logs for specific migration error), certificate error (verify certificate mount and passphrase).
+    **Common causes:**
+    - Missing env variable: check release notes for new required variables
+    - Database connection error: verify database is accessible and credentials are valid
+    - Migration failure: check logs for the specific migration error
+    - Certificate error: verify certificate mount and passphrase
 
   </Accordion>
   <Accordion title="Migration errors">
-    If migrations fail: check the specific error in the logs, verify database connectivity, ensure the database user has ALTER permissions, and check for sufficient disk space on the database server. Test connectivity with: `docker run --rm postgres:15 psql "postgresql://user:password@host:5432/documenso" -c "SELECT 1"`
+    **What to do:**
+    - Check the specific error in the logs
+    - Verify database connectivity
+    - Ensure the database user has `ALTER` permissions
+    - Check for sufficient disk space on the database server
+
+    **Test connectivity:**
+
+    ```bash
+    docker run --rm postgres:15 psql "postgresql://user:password@host:5432/documenso" -c "SELECT 1"
+    ```
+
   </Accordion>
   <Accordion title="Application errors after upgrade">
-    If the application starts but behaves unexpectedly: clear browser cache and cookies, check for new environment variables in release notes, verify all environment variables are correctly set, and check application logs for warnings with: `docker logs documenso 2>&1 | grep -i -E "(warn|error)"`
+    **If the application starts but behaves unexpectedly:**
+    - Clear browser cache and cookies
+    - Check for new environment variables in release notes
+    - Verify all environment variables are correctly set
+    - Check application logs: 
+    
+    ```bash
+    docker logs documenso 2>&1 | grep -i -E "(warn|error)"
+    ```
   </Accordion>
   <Accordion title="Performance issues after upgrade">
-    If performance degrades: check for any new indexes being created (normal, temporary slowdown), monitor database CPU and memory usage, review release notes for known performance impacts, and allow time for database query plans to stabilize.
+    **If performance degrades:**
+    - New indexes being created can cause temporary slowdown (normal)
+    - Monitor database CPU and memory usage
+    - Review release notes for known performance impacts
+    - Allow time for database query plans to stabilize
   </Accordion>
   <Accordion title="Rollback failed">
-    If rollback also fails: verify the old image tag exists and is accessible, check that your backup is valid and complete, review environment configuration for any changes, and consider restoring to a clean database from backup.
+    **If rollback also fails:**
+    - Verify the old image tag exists and is accessible
+    - Check that your backup is valid and complete
+    - Review environment configuration for any changes
+    - Consider restoring to a clean database from backup
   </Accordion>
 </Accordions>
 

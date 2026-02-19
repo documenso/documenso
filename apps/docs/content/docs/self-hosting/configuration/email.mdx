@@ -3,7 +3,9 @@ title: Email Configuration
 description: Configure email delivery for notifications and document signing invitations.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 ## Supported Email Transports
 
@@ -174,10 +176,32 @@ NEXT_PRIVATE_SMTP_FROM_NAME="Documenso"
 
 **Setup Steps:**
 
-1. Create an account at [resend.com](https://resend.com)
-2. Add and verify your sending domain
-3. Create an API key in the Resend dashboard
-4. Configure the environment variables above
+<Steps>
+<Step>
+### Create an account
+
+Sign up at [resend.com](https://resend.com).
+
+</Step>
+<Step>
+### Add and verify your sending domain
+
+Configure your domain in the Resend dashboard so you can send from your own address.
+
+</Step>
+<Step>
+### Create an API key
+
+Generate an API key in the Resend dashboard for Documenso to use.
+
+</Step>
+<Step>
+### Configure environment variables
+
+Set the variables in the table above, including `NEXT_PRIVATE_RESEND_API_KEY` and your sender address.
+
+</Step>
+</Steps>
 
 ## MailChannels Configuration
 
@@ -309,9 +333,26 @@ Replace `_spf.example.com` with your email provider's SPF include. Common exampl
 
 DKIM (DomainKeys Identified Mail) adds a digital signature to emails. Configuration varies by provider:
 
-1. Generate DKIM keys in your email provider's dashboard
-2. Add the provided TXT record to your DNS
-3. Enable DKIM signing in your provider settings
+<Steps>
+<Step>
+### Generate DKIM keys
+
+Create DKIM keys in your email provider's dashboard.
+
+</Step>
+<Step>
+### Add the TXT record to DNS
+
+Add the provided TXT record to your DNS.
+
+</Step>
+<Step>
+### Enable DKIM signing
+
+Enable DKIM signing in your provider settings.
+
+</Step>
+</Steps>
 
 For MailChannels, configure DKIM directly in Documenso using the environment variables described above.
 
@@ -335,87 +376,90 @@ Start with `p=none` to monitor, then move to stricter policies once deliverabili
 
 ## Common Issues
 
-### Emails Not Sending
+<Accordions type="multiple">
+  <Accordion title="Emails Not Sending">
+    **Symptoms:** No emails received, no errors in logs.
 
-**Symptoms:** No emails received, no errors in logs.
+    **Possible causes:**
 
-**Possible causes:**
+    - Incorrect SMTP credentials
+    - Firewall blocking outbound SMTP ports
+    - From address not authorized
 
-1. Incorrect SMTP credentials
-2. Firewall blocking outbound SMTP ports
-3. From address not authorized
+    **Solutions:**
 
-**Solutions:**
+    - Verify credentials with your email provider
+    - Check that ports 25, 465, or 587 are open outbound
+    - Verify the from address is authorized to send
 
-1. Verify credentials with your email provider
-2. Check that ports 25, 465, or 587 are open outbound
-3. Verify the from address is authorized to send
+  </Accordion>
+  <Accordion title="Connection Timeout">
+    **Symptoms:** Error logs show connection timeout to SMTP server.
 
-### Connection Timeout
+    **Possible causes:**
 
-**Symptoms:** Error logs show connection timeout to SMTP server.
+    - Incorrect hostname or port
+    - Firewall blocking connection
+    - SMTP server down
 
-**Possible causes:**
+    **Solutions:**
 
-1. Incorrect hostname or port
-2. Firewall blocking connection
-3. SMTP server down
+    - Verify hostname and port match provider documentation
+    - Test connectivity: `telnet smtp.example.com 587`
+    - Check provider status page
 
-**Solutions:**
+  </Accordion>
+  <Accordion title="Authentication Failed">
+    **Symptoms:** Error logs show authentication failure.
 
-1. Verify hostname and port match provider documentation
-2. Test connectivity: `telnet smtp.example.com 587`
-3. Check provider status page
+    **Possible causes:**
 
-### Authentication Failed
+    - Wrong username or password
+    - Account requires app-specific password
+    - Account security restrictions
 
-**Symptoms:** Error logs show authentication failure.
+    **Solutions:**
 
-**Possible causes:**
+    - Double-check credentials
+    - Generate an app password if using Gmail or Microsoft with 2FA
+    - Check for account security alerts from your provider
 
-1. Wrong username or password
-2. Account requires app-specific password
-3. Account security restrictions
+  </Accordion>
+  <Accordion title="Emails Going to Spam">
+    **Symptoms:** Emails deliver but land in spam folders.
 
-**Solutions:**
+    **Possible causes:**
 
-1. Double-check credentials
-2. Generate an app password if using Gmail or Microsoft with 2FA
-3. Check for account security alerts from your provider
+    - Missing or incorrect SPF record
+    - Missing DKIM signature
+    - No DMARC policy
+    - Poor sender reputation
 
-### Emails Going to Spam
+    **Solutions:**
 
-**Symptoms:** Emails deliver but land in spam folders.
+    - Configure SPF, DKIM, and DMARC as described above
+    - Use a reputable email provider
+    - Verify your domain with your email provider
+    - Monitor deliverability with tools like [mail-tester.com](https://www.mail-tester.com)
 
-**Possible causes:**
+  </Accordion>
+  <Accordion title="TLS/SSL Errors">
+    **Symptoms:** Errors mentioning TLS, SSL, or certificate issues.
 
-1. Missing or incorrect SPF record
-2. Missing DKIM signature
-3. No DMARC policy
-4. Poor sender reputation
+    **Possible causes:**
 
-**Solutions:**
+    - Server requires TLS but `NEXT_PRIVATE_SMTP_SECURE` is false
+    - Self-signed certificate on SMTP server
+    - Port mismatch (465 for implicit TLS, 587 for STARTTLS)
 
-1. Configure SPF, DKIM, and DMARC as described above
-2. Use a reputable email provider
-3. Verify your domain with your email provider
-4. Monitor deliverability with tools like [mail-tester.com](https://www.mail-tester.com)
+    **Solutions:**
 
-### TLS/SSL Errors
+    - Set `NEXT_PRIVATE_SMTP_SECURE="true"` for port 465
+    - Keep `NEXT_PRIVATE_SMTP_SECURE="false"` for port 587 (STARTTLS)
+    - As a last resort, set `NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS="true"` (not recommended for production)
 
-**Symptoms:** Errors mentioning TLS, SSL, or certificate issues.
-
-**Possible causes:**
-
-1. Server requires TLS but `NEXT_PRIVATE_SMTP_SECURE` is false
-2. Self-signed certificate on SMTP server
-3. Port mismatch (465 for implicit TLS, 587 for STARTTLS)
-
-**Solutions:**
-
-1. Set `NEXT_PRIVATE_SMTP_SECURE="true"` for port 465
-2. Keep `NEXT_PRIVATE_SMTP_SECURE="false"` for port 587 (STARTTLS)
-3. As a last resort, set `NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS="true"` (not recommended for production)
+  </Accordion>
+</Accordions>
 
 ---
 

@@ -7,7 +7,7 @@ import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-# AI Recipient & Field Detection (Self-hosting)
+## Overview
 
 This guide covers how to enable the AI recipient and field detection features when you self-host Documenso.
 
@@ -51,28 +51,32 @@ GOOGLE_VERTEX_LOCATION="global"
 Once the service is running with the Vertex env vars:
 
 <Steps>
-
 <Step>
 ### Organisation settings
 
-Go to **Settings -> Document Preferences -> AI Features** and set to **Enabled**. Teams that inherit organisation defaults will pick this up.
+Go to **Settings** → **Document Preferences** → **AI Features** and set to **Enabled**.
+
+Teams that inherit organisation defaults will get this automatically.
 
 </Step>
-
 <Step>
 ### Team settings
 
-If a team overrides organisation defaults, go to **Team Settings -> Document Preferences -> AI Features** and choose **Enabled** (or **Inherit** to follow the organisation).
+If a team overrides organisation defaults:
+
+- Go to **Team Settings** → **Document Preferences** → **AI Features**
+- Choose **Enabled**, or **Inherit** to follow the organisation
 
 </Step>
-
 <Step>
 ### Verify in the editor
 
-Open a draft envelope. In **Recipients**, you should see the sparkle button for AI detection. In **Fields**, you should see **Detect with AI** available.
+Open a draft envelope and check:
+
+- **Recipients**: sparkle button for AI detection is visible
+- **Fields**: **Detect with AI** is available
 
 </Step>
-
 </Steps>
 
 ## Troubleshooting

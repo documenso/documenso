@@ -5,6 +5,8 @@ description: Diagnose and resolve common issues with your self-hosted Documenso 
 
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## General Debugging
 
@@ -12,23 +14,29 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 Application logs are your primary source of debugging information.
 
-**Docker:**
+<Tabs items={['Docker', 'Docker Compose', 'Kubernetes']}>
+<Tab value="Docker">
 
 ```bash
 docker logs documenso
 ```
 
-**Docker Compose:**
+</Tab>
+<Tab value="Docker Compose">
 
 ```bash
 docker compose logs -f documenso
 ```
 
-**Kubernetes:**
+</Tab>
+<Tab value="Kubernetes">
 
 ```bash
 kubectl logs -l app.kubernetes.io/name=documenso -n documenso -f
 ```
+
+</Tab>
+</Tabs>
 
 ### Filtering Logs
 
@@ -55,43 +63,60 @@ curl http://localhost:3000/api/health
 
 A healthy response returns HTTP 200. If the health check fails:
 
-1. Check application logs for startup errors
-2. Verify database connectivity
-3. Confirm environment variables are set correctly
+<Steps>
+  <Step>Check application logs for startup errors</Step>
+  <Step>Verify database connectivity</Step>
+  <Step>Confirm environment variables are set correctly</Step>
+</Steps>
 
 ### Container Status
 
 Check if containers are running and healthy:
 
-**Docker:**
+<Tabs items={['Docker', 'Docker Compose', 'Kubernetes']}>
+<Tab value="Docker">
 
 ```bash
 docker ps -a | grep documenso
 ```
 
-**Docker Compose:**
+</Tab>
+<Tab value="Docker Compose">
 
 ```bash
 docker compose ps
 ```
 
-**Kubernetes:**
+</Tab>
+<Tab value="Kubernetes">
 
 ```bash
 kubectl get pods -n documenso -o wide
 ```
 
+</Tab>
+</Tabs>
+
 ### Environment Variable Verification
 
 Verify environment variables are set correctly inside the container:
 
-```bash
-# Docker
-docker exec documenso printenv | grep NEXT
+<Tabs items={['Docker', 'Docker Compose']}>
+<Tab value="Docker">
 
-# Docker Compose
+```bash
+docker exec documenso printenv | grep NEXT
+```
+
+</Tab>
+<Tab value="Docker Compose">
+
+```bash
 docker compose exec documenso printenv | grep NEXT
 ```
+
+</Tab>
+</Tabs>
 
 <Callout type="warn">
   Be cautious when printing environment variables as they may contain sensitive information like
@@ -146,9 +171,11 @@ kubectl top pod -n documenso
 
 **Solutions:**
 
-1. Increase memory limits in Docker or Kubernetes configuration
-2. Check for memory leaks in custom integrations
-3. Review application logs around the time of crash
+<Steps>
+  <Step>Increase memory limits in Docker or Kubernetes configuration</Step>
+  <Step>Check for memory leaks in custom integrations</Step>
+  <Step>Review application logs around the time of crash</Step>
+</Steps>
 
 ### Startup Timeout in Kubernetes
 
@@ -185,8 +212,10 @@ netstat -tlnp | grep 3000
 
 **Solutions:**
 
-1. Stop the conflicting service
-2. Change Documenso's port mapping: `-p 3001:3000`
+<Steps>
+  <Step>Stop the conflicting service</Step>
+  <Step>Change Documenso's port mapping: `-p 3001:3000`</Step>
+</Steps>
 
 ---
 
@@ -207,7 +236,9 @@ Error: connect ECONNREFUSED 127.0.0.1:5432
 
 **Solutions:**
 
-1. Verify PostgreSQL is running:
+<Steps>
+  <Step>
+    Verify PostgreSQL is running:
 
 ```bash
 # Direct PostgreSQL
@@ -217,9 +248,17 @@ pg_isready -h localhost -p 5432
 docker compose ps database
 ```
 
-2. Check connection string host matches database location
-3. For Docker Compose, ensure the database service is defined and started
-4. Verify network connectivity between containers
+  </Step>
+  <Step>
+    Check connection string host matches database location
+  </Step>
+  <Step>
+    For Docker Compose, ensure the database service is defined and started
+  </Step>
+  <Step>
+    Verify network connectivity between containers
+  </Step>
+</Steps>
 
 ### Authentication Failed
 
@@ -235,13 +274,22 @@ Error: password authentication failed for user "documenso"
 
 **Solutions:**
 
-1. URL-encode special characters in password (`@` becomes `%40`, `#` becomes `%23`)
-2. Verify credentials match database configuration
-3. Reset the password:
+<Steps>
+  <Step>
+    URL-encode special characters in password (`@` becomes `%40`, `#` becomes `%23`)
+  </Step>
+  <Step>
+    Verify credentials match database configuration
+  </Step>
+  <Step>
+    Reset the password:
 
 ```sql
 ALTER USER documenso WITH PASSWORD 'newpassword';
 ```
+
+  </Step>
+</Steps>
 
 ### Database Does Not Exist
 
@@ -270,14 +318,22 @@ Error: too many connections for role "documenso"
 
 **Solutions:**
 
-1. Reduce connection pool size in connection string:
+<Steps>
+  <Step>
+    Reduce connection pool size in connection string:
 
 ```
 postgresql://user:password@host:5432/documenso?connection_limit=5
 ```
 
-2. Increase PostgreSQL `max_connections`
-3. Implement connection pooling with PgBouncer
+  </Step>
+  <Step>
+    Increase PostgreSQL `max_connections`
+  </Step>
+  <Step>
+    Implement connection pooling with PgBouncer
+  </Step>
+</Steps>
 
 ### Migration Failures
 
@@ -300,14 +356,22 @@ SELECT * FROM _prisma_migrations WHERE finished_at IS NULL;
 
 **Retry failed migration:**
 
-1. Fix the underlying issue
-2. Mark migration as rolled back:
+<Steps>
+  <Step>
+    Fix the underlying issue
+  </Step>
+  <Step>
+    Mark migration as rolled back:
 
 ```sql
 UPDATE _prisma_migrations SET rolled_back_at = NOW() WHERE migration_name = 'failed_migration';
 ```
 
-3. Restart the application
+  </Step>
+  <Step>
+    Restart the application
+  </Step>
+</Steps>
 
 ### SSL Required
 
@@ -331,13 +395,17 @@ postgresql://user:password@host:5432/documenso?sslmode=require
 
 **Diagnostic steps:**
 
-1. Check email configuration:
+<Steps>
+  <Step>
+    Check email configuration:
 
 ```bash
 docker exec documenso printenv | grep SMTP
 ```
 
-2. Verify all required variables are set:
+  </Step>
+  <Step>
+    Verify all required variables are set:
 
 | Variable                         | Required |
 | -------------------------------- | -------- |
@@ -345,12 +413,17 @@ docker exec documenso printenv | grep SMTP
 | `NEXT_PRIVATE_SMTP_FROM_ADDRESS` | Yes      |
 | `NEXT_PRIVATE_SMTP_FROM_NAME`    | Yes      |
 
-3. Test SMTP connectivity:
+  </Step>
+  <Step>
+    Test SMTP connectivity:
 
 ```bash
 # Test connection to SMTP server
 telnet smtp.example.com 587
 ```
+
+  </Step>
+</Steps>
 
 ### SMTP Connection Timeout
 
@@ -366,13 +439,22 @@ Error: Connection timeout
 
 **Solutions:**
 
-1. Verify hostname and port match provider documentation
-2. Check outbound firewall rules for ports 25, 465, 587
-3. Test connectivity from the container:
+<Steps>
+  <Step>
+    Verify hostname and port match provider documentation
+  </Step>
+  <Step>
+    Check outbound firewall rules for ports 25, 465, 587
+  </Step>
+  <Step>
+    Test connectivity from the container:
 
 ```bash
 docker exec documenso nc -zv smtp.example.com 587
 ```
+
+  </Step>
+</Steps>
 
 ### SMTP Authentication Failed
 
@@ -388,9 +470,11 @@ Error: Invalid login or authentication failed
 
 **Solutions:**
 
-1. Double-check credentials
-2. For Gmail/Microsoft with 2FA, generate an app password
-3. Check provider for security alerts or blocked sign-ins
+<Steps>
+  <Step>Double-check credentials</Step>
+  <Step>For Gmail/Microsoft with 2FA, generate an app password</Step>
+  <Step>Check provider for security alerts or blocked sign-ins</Step>
+</Steps>
 
 ### Emails Going to Spam
 
@@ -403,11 +487,13 @@ Error: Invalid login or authentication failed
 
 **Solutions:**
 
-1. Configure SPF record for your domain
-2. Set up DKIM signing with your email provider
-3. Add a DMARC policy
-4. Use a reputable email provider
-5. Test deliverability at [mail-tester.com](https://www.mail-tester.com)
+<Steps>
+  <Step>Configure SPF record for your domain</Step>
+  <Step>Set up DKIM signing with your email provider</Step>
+  <Step>Add a DMARC policy</Step>
+  <Step>Use a reputable email provider</Step>
+  <Step>Test deliverability at [mail-tester.com](https://www.mail-tester.com)</Step>
+</Steps>
 
 ### From Address Not Authorized
 
@@ -419,9 +505,11 @@ Error: Sender address rejected
 
 **Solutions:**
 
-1. Verify the domain in your email provider's settings
-2. Use an email address from a verified domain
-3. Check provider-specific sender authorization requirements
+<Steps>
+  <Step>Verify the domain in your email provider's settings</Step>
+  <Step>Use an email address from a verified domain</Step>
+  <Step>Check provider-specific sender authorization requirements</Step>
+</Steps>
 
 ---
 
@@ -441,19 +529,27 @@ Error: No certificate found for local signing
 
 **Solutions:**
 
-1. Verify certificate configuration:
+<Steps>
+  <Step>
+    Verify certificate configuration:
 
 ```bash
 docker exec documenso printenv | grep SIGNING
 ```
 
-2. Check file exists at configured path:
+  </Step>
+  <Step>
+    Check file exists at configured path:
 
 ```bash
 docker exec documenso ls -la /opt/documenso/cert.p12
 ```
 
-3. Ensure either `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH` or `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` is set
+  </Step>
+  <Step>
+    Ensure either `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH` or `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` is set
+  </Step>
+</Steps>
 
 ### Certificate Permission Denied
 
@@ -481,13 +577,22 @@ Error: mac verify failure
 
 **Solutions:**
 
-1. Verify `NEXT_PRIVATE_SIGNING_PASSPHRASE` matches the certificate password
-2. Check for trailing whitespace or encoding issues
-3. Test the password:
+<Steps>
+  <Step>
+    Verify `NEXT_PRIVATE_SIGNING_PASSPHRASE` matches the certificate password
+  </Step>
+  <Step>
+    Check for trailing whitespace or encoding issues
+  </Step>
+  <Step>
+    Test the password:
 
 ```bash
 openssl pkcs12 -in certificate.p12 -noout
 ```
+
+  </Step>
+</Steps>
 
 ### Failed to Get Private Key
 
@@ -519,14 +624,22 @@ Error: Certificate has expired
 
 **Solution:**
 
-1. Check expiration date:
+<Steps>
+  <Step>
+    Check expiration date:
 
 ```bash
 openssl pkcs12 -in certificate.p12 -nokeys | openssl x509 -noout -dates
 ```
 
-2. Generate a new certificate or obtain a renewed one from your CA
-3. Update the certificate file and restart Documenso
+  </Step>
+  <Step>
+    Generate a new certificate or obtain a renewed one from your CA
+  </Step>
+  <Step>
+    Update the certificate file and restart Documenso
+  </Step>
+</Steps>
 
 ### Base64 Decode Error
 
@@ -564,7 +677,9 @@ Error: Access Denied
 
 **Solutions:**
 
-1. Verify IAM user has required permissions:
+<Steps>
+  <Step>
+    Verify IAM user has required permissions:
 
 ```json
 {
@@ -574,8 +689,14 @@ Error: Access Denied
 }
 ```
 
-2. Configure CORS for presigned URL uploads
-3. Verify credentials are correct and not expired
+  </Step>
+  <Step>
+    Configure CORS for presigned URL uploads
+  </Step>
+  <Step>
+    Verify credentials are correct and not expired
+  </Step>
+</Steps>
 
 ### S3 Bucket Not Found
 
@@ -591,14 +712,22 @@ Error: The specified bucket does not exist
 
 **Solutions:**
 
-1. Verify bucket exists:
+<Steps>
+  <Step>
+    Verify bucket exists:
 
 ```bash
 aws s3 ls s3://your-bucket
 ```
 
-2. Check `NEXT_PRIVATE_UPLOAD_REGION` matches bucket region
-3. Create the bucket if it doesn't exist
+  </Step>
+  <Step>
+    Check `NEXT_PRIVATE_UPLOAD_REGION` matches bucket region
+  </Step>
+  <Step>
+    Create the bucket if it doesn't exist
+  </Step>
+</Steps>
 
 ### Signature Mismatch
 
@@ -613,8 +742,12 @@ Error: SignatureDoesNotMatch
 
 **Solutions:**
 
-1. Verify credentials are correct
-2. Synchronize server time using NTP:
+<Steps>
+  <Step>
+    Verify credentials are correct
+  </Step>
+  <Step>
+    Synchronize server time using NTP:
 
 ```bash
 # Check time
@@ -623,6 +756,9 @@ date
 # Sync time (Linux)
 sudo ntpdate pool.ntp.org
 ```
+
+  </Step>
+</Steps>
 
 ### Path-Style Access Required
 
@@ -650,9 +786,11 @@ NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true
 
 **Solutions:**
 
-1. Check configured upload limit: `NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT`
-2. Increase reverse proxy timeout (nginx `client_body_timeout`)
-3. For very large files, verify S3 multipart upload is working
+<Steps>
+  <Step>Check configured upload limit: `NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT`</Step>
+  <Step>Increase reverse proxy timeout (nginx `client_body_timeout`)</Step>
+  <Step>For very large files, verify S3 multipart upload is working</Step>
+</Steps>
 
 ---
 
@@ -662,13 +800,17 @@ NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true
 
 **Diagnostic steps:**
 
-1. Check container resource usage:
+<Steps>
+  <Step>
+    Check container resource usage:
 
 ```bash
 docker stats documenso
 ```
 
-2. Monitor database performance:
+  </Step>
+  <Step>
+    Monitor database performance:
 
 ```sql
 SELECT query, calls, mean_time
@@ -677,7 +819,11 @@ ORDER BY mean_time DESC
 LIMIT 10;
 ```
 
-3. Check for memory pressure or CPU throttling
+  </Step>
+  <Step>
+    Check for memory pressure or CPU throttling
+  </Step>
+</Steps>
 
 **Common causes and solutions:**
 
@@ -694,7 +840,9 @@ LIMIT 10;
 
 **Solutions:**
 
-1. Increase memory limits:
+<Steps>
+  <Step>
+    Increase memory limits:
 
 ```yaml
 # Docker Compose
@@ -706,8 +854,14 @@ services:
           memory: 2G
 ```
 
-2. If using database storage, switch to S3 for large files
-3. Review and optimize any custom integrations
+  </Step>
+  <Step>
+    If using database storage, switch to S3 for large files
+  </Step>
+  <Step>
+    Review and optimize any custom integrations
+  </Step>
+</Steps>
 
 ### Database Performance Degradation
 
@@ -730,15 +884,25 @@ ORDER BY duration DESC;
 
 **Solutions:**
 
-1. Run VACUUM ANALYZE to update statistics:
+<Steps>
+  <Step>
+    Run VACUUM ANALYZE to update statistics:
 
 ```sql
 VACUUM ANALYZE;
 ```
 
-2. Check for missing indexes on frequently queried columns
-3. Consider upgrading database resources
-4. Archive old documents and audit logs
+  </Step>
+  <Step>
+    Check for missing indexes on frequently queried columns
+  </Step>
+  <Step>
+    Consider upgrading database resources
+  </Step>
+  <Step>
+    Archive old documents and audit logs
+  </Step>
+</Steps>
 
 ### Slow Document Signing
 
@@ -752,9 +916,11 @@ VACUUM ANALYZE;
 
 **Solutions:**
 
-1. Use a faster timestamp server or one geographically closer
-2. Optimize PDF file sizes before upload
-3. Verify certificate is valid and not causing retries
+<Steps>
+  <Step>Use a faster timestamp server or one geographically closer</Step>
+  <Step>Optimize PDF file sizes before upload</Step>
+  <Step>Verify certificate is valid and not causing retries</Step>
+</Steps>
 
 ---
 
@@ -764,23 +930,32 @@ VACUUM ANALYZE;
 
 **Diagnostic steps:**
 
-1. Verify container is running and port is exposed:
+<Steps>
+  <Step>
+    Verify container is running and port is exposed:
 
 ```bash
 docker ps | grep documenso
 ```
 
-2. Check port binding:
+  </Step>
+  <Step>
+    Check port binding:
 
 ```bash
 netstat -tlnp | grep 3000
 ```
 
-3. Test local connectivity:
+  </Step>
+  <Step>
+    Test local connectivity:
 
 ```bash
 curl http://localhost:3000/api/health
 ```
+
+  </Step>
+</Steps>
 
 ### Reverse Proxy Issues
 
@@ -788,9 +963,15 @@ curl http://localhost:3000/api/health
 
 **Solutions:**
 
-1. Verify upstream is reachable from the proxy
-2. Check proxy configuration points to correct port
-3. Ensure headers are forwarded correctly:
+<Steps>
+  <Step>
+    Verify upstream is reachable from the proxy
+  </Step>
+  <Step>
+    Check proxy configuration points to correct port
+  </Step>
+  <Step>
+    Ensure headers are forwarded correctly:
 
 ```nginx
 proxy_set_header Host $host;
@@ -798,6 +979,9 @@ proxy_set_header X-Real-IP $remote_addr;
 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 proxy_set_header X-Forwarded-Proto $scheme;
 ```
+
+  </Step>
+</Steps>
 
 ### WebSocket Connection Failures
 
@@ -827,14 +1011,22 @@ Error: getaddrinfo ENOTFOUND hostname
 
 **Solutions:**
 
-1. Verify hostname is correct
-2. Check DNS configuration:
+<Steps>
+  <Step>
+    Verify hostname is correct
+  </Step>
+  <Step>
+    Check DNS configuration:
 
 ```bash
 docker exec documenso cat /etc/resolv.conf
 ```
 
-3. For Docker Compose, use service names for inter-container communication
+  </Step>
+  <Step>
+    For Docker Compose, use service names for inter-container communication
+  </Step>
+</Steps>
 
 ---
 
@@ -844,32 +1036,46 @@ docker exec documenso cat /etc/resolv.conf
 
 Gather this information before seeking support:
 
-1. **Documenso version:**
+<Steps>
+  <Step>
+    **Documenso version:**
 
 ```bash
 docker inspect documenso --format='{{.Config.Image}}'
 ```
 
-2. **Deployment method:** Docker, Docker Compose, Kubernetes, or other
-3. **Relevant logs:** Filter to show errors around the issue
-4. **Steps to reproduce:** What actions trigger the problem
-5. **Environment:** Cloud provider, OS, database type
+  </Step>
+  <Step>
+    **Deployment method:** Docker, Docker Compose, Kubernetes, or other
+  </Step>
+  <Step>
+    **Relevant logs:** Filter to show errors around the issue
+  </Step>
+  <Step>
+    **Steps to reproduce:** What actions trigger the problem
+  </Step>
+  <Step>
+    **Environment:** Cloud provider, OS, database type
+  </Step>
+</Steps>
 
 ### Community Support
 
-- **GitHub Discussions:** [github.com/documenso/documenso/discussions](https://github.com/documenso/documenso/discussions)
-- **Discord:** Join the Documenso community Discord
-- **GitHub Issues:** For confirmed bugs, open an issue at [github.com/documenso/documenso/issues](https://github.com/documenso/documenso/issues)
+- **[GitHub Discussions](https://github.com/documenso/documenso/discussions)**
+- **[Discord](https://documen.so/discord)**: Join the Documenso community Discord
+- **[GitHub Issues](https://github.com/documenso/documenso/issues)**: For confirmed bugs, open an issue
 
 ### Reporting Bugs
 
 When reporting bugs, include:
 
-1. Clear description of the expected vs actual behavior
-2. Steps to reproduce
-3. Documenso version
-4. Relevant logs (redact sensitive information)
-5. Environment details
+<Steps>
+  <Step>Clear description of the expected vs actual behavior</Step>
+  <Step>Steps to reproduce</Step>
+  <Step>Documenso version</Step>
+  <Step>Relevant logs (redact sensitive information)</Step>
+  <Step>Environment details</Step>
+</Steps>
 
 ### Security Issues
 

@@ -79,16 +79,28 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Create Your First Account
 
-1. Click **Sign Up** on the login page
-2. Enter your email address and create a password
-3. Check the Docker logs for the verification email (emails are not sent in development mode):
+<Steps>
+  <Step>
+    Click **Sign Up** on the login page
+  </Step>
+  <Step>
+    Enter your email address and create a password
+  </Step>
+  <Step>
+    Check the Docker logs for the verification email (emails are not sent in development mode):
 
 ```bash
 docker compose -f docker/development/compose.yml logs -f
 ```
 
-4. Copy the verification link from the logs and open it in your browser
-5. Log in with your credentials
+  </Step>
+  <Step>
+    Copy the verification link from the logs and open it in your browser
+  </Step>
+  <Step>
+    Log in with your credentials
+  </Step>
+</Steps>
 
 <Callout type="info">
   In development mode, all emails are logged to the console instead of being sent. Look for the

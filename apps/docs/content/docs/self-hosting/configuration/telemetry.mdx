@@ -3,7 +3,10 @@ title: Telemetry
 description: Learn about the telemetry data that Documenso collects from self-hosted instances.
 ---
 
-# Telemetry
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Overview
 
 Documenso collects anonymous telemetry data from self-hosted instances to help us understand how the software is being used and make improvements to the product. This telemetry is enabled by default, but you can easily disable it if you prefer.
 
@@ -32,13 +35,24 @@ We do **not** collect any of the following:
 
 The telemetry data we collect serves several important purposes:
 
-1. **Product Improvement**: Understanding which versions are in use helps us prioritize bug fixes and security updates for the versions that matter most.
-
-2. **Support Planning**: Knowing how many installations exist and their deployment patterns helps us plan support resources and documentation.
-
-3. **Feature Development**: Understanding deployment patterns (like cluster sizes) helps us make better architectural decisions for future features.
-
-4. **Community Health**: Tracking adoption helps us understand the growth of the self-hosted community and allocate resources accordingly.
+<Accordions type="multiple">
+  <Accordion title="Product Improvement">
+    Understanding which versions are in use helps us prioritize bug fixes and security updates for
+    the versions that matter most.
+  </Accordion>
+  <Accordion title="Support Planning">
+    Knowing how many installations exist and their deployment patterns helps us plan support
+    resources and documentation.
+  </Accordion>
+  <Accordion title="Feature Development">
+    Understanding deployment patterns (like cluster sizes) helps us make better architectural
+    decisions for future features.
+  </Accordion>
+  <Accordion title="Community Health">
+    Tracking adoption helps us understand the growth of the self-hosted community and allocate
+    resources accordingly.
+  </Accordion>
+</Accordions>
 
 All of this is done anonymously and in aggregate. We cannot identify you, your organization, or your users from the telemetry data we collect.
 
@@ -46,9 +60,18 @@ All of this is done anonymously and in aggregate. We cannot identify you, your o
 
 We track two simple events:
 
-- **Server Startup**: Captured once when your server starts. This tells us when installations are first set up or restarted.
+<Tabs items={['Server Startup', 'Server Heartbeat']}>
+<Tab value="Server Startup">
 
-- **Server Heartbeat**: Captured every hour while your server is running. This helps us understand how many active installations exist and their uptime patterns.
+Captured once when your server starts. This tells us when installations are first set up or restarted.
+
+</Tab>
+<Tab value="Server Heartbeat">
+
+Captured every hour while your server is running. This helps us understand how many active installations exist and their uptime patterns.
+
+</Tab>
+</Tabs>
 
 ## How to Disable Telemetry
 
@@ -83,7 +106,10 @@ docker run -e DOCUMENSO_DISABLE_TELEMETRY=true ...
 
 Once you set `DOCUMENSO_DISABLE_TELEMETRY=true` and restart your server, no telemetry data will be sent. The telemetry client will not initialize, and no network requests will be made to our telemetry servers.
 
-Note: If you previously had telemetry enabled, the installation ID stored in your database will remain, but it will no longer be used or sent anywhere.
+<Callout type="info">
+  If you previously had telemetry enabled, the installation ID stored in your database will remain,
+  but it will no longer be used or sent anywhere.
+</Callout>
 
 ## Questions or Concerns
 

@@ -12,7 +12,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
   the application starts normally but document signing fails.
 </Callout>
 
-Documenso does **not** bundle a signing certificate in the Docker image. You must provide one yourself using one of two methods:
+Documenso does **not** bundle a [signing certificate](/docs/self-hosting/configuration/signing-certificate) in the Docker image. You must provide one yourself using one of two methods:
 
 ### Volume Mount (Recommended)
 
@@ -82,7 +82,7 @@ Documenso exposes two endpoints for monitoring:
 | `/api/health`             | Returns 200 if the application is up |
 | `/api/certificate-status` | Detailed signing certificate status  |
 
-Use `/api/health` for container orchestration health checks (Docker, Kubernetes). Use `/api/certificate-status` to debug signing issues — it reports whether a certificate is configured, its type, and any errors.
+Use `/api/health` for container orchestration health checks (Docker, Kubernetes). Use `/api/certificate-status` to debug signing issues. It reports whether a certificate is configured, its type, and any errors.
 
 ---
 
@@ -106,13 +106,13 @@ Check the [GitHub releases](https://github.com/documenso/documenso/releases) pag
 
 The Docker container runs `prisma migrate deploy` every time it starts. This means:
 
-- **Upgrades are simple** — pull the new image, restart the container, and migrations apply automatically.
-- **Always back up your database before upgrading** — if a migration fails, you need a way to restore.
-- **First startup takes longer** — the initial migration creates all tables.
+- **Upgrades are simple**: pull the new image, restart the container, and migrations apply automatically.
+- **Always back up your database before upgrading**: if a migration fails, you need a way to restore.
+- **First startup takes longer**: the initial migration creates all tables.
 
 ---
 
-## Set NEXT_PRIVATE_INTERNAL_WEBAPP_URL for Background Jobs
+## Set Internal Webapp URL for Background Jobs
 
 Background jobs work by Documenso sending HTTP requests to itself. If your reverse proxy or network setup causes issues with the app reaching its own public URL, set the internal URL:
 

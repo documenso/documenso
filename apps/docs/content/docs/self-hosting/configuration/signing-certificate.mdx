@@ -6,6 +6,7 @@ description: Configure the X.509 signing certificate used for digital signatures
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Overview
 
@@ -19,41 +20,44 @@ Self-hosted Documenso instances require a signing certificate. You can generate 
 
 ## Certificate Options
 
-### Self-Signed Certificate
+<Tabs items={['Self-Signed', 'CA-Issued', 'Google Cloud HSM']}>
+  <Tab value="Self-Signed">
+    A self-signed certificate is sufficient for most use cases where your industry has no special signing regulations.
 
-A self-signed certificate is sufficient for most use cases where your industry has no special signing regulations.
+    **Advantages:**
 
-**Advantages:**
+    - Free to create
+    - Full control over certificate details
+    - Works for internal and business documents
 
-- Free to create
-- Full control over certificate details
-- Works for internal and business documents
+    **Limitations:**
 
-**Limitations:**
+    - PDF readers like Adobe Acrobat will not show a green checkmark
+    - Not recognized by Adobe's trust list
+    - Recipients see a warning that the signature cannot be verified
 
-- PDF readers like Adobe Acrobat will not show a green checkmark
-- Not recognized by Adobe's trust list
-- Recipients see a warning that the signature cannot be verified
+    The certificate still includes your organization details and guarantees document integrity.
 
-The certificate still includes your organization details and guarantees document integrity.
+  </Tab>
+  <Tab value="CA-Issued">
+    Purchase a certificate from a Certificate Authority if you need:
 
-### CA-Issued Certificate
+    - Green checkmark in Adobe PDF readers
+    - Industry-specific compliance requirements
+    - Third-party signature validation
 
-Purchase a certificate from a Certificate Authority if you need:
+    For Adobe recognition, choose a vendor from the [Adobe Approved Trust List](https://helpx.adobe.com/acrobat/kb/approved-trust-list1.html).
 
-- Green checkmark in Adobe PDF readers
-- Industry-specific compliance requirements
-- Third-party signature validation
+  </Tab>
+  <Tab value="Google Cloud HSM">
+    For organizations requiring hardware-based key protection, Documenso supports Google Cloud HSM. This provides:
 
-For Adobe recognition, choose a vendor from the [Adobe Approved Trust List](https://helpx.adobe.com/acrobat/kb/approved-trust-list1.html).
+    - FIPS 140-2 Level 3 certified key storage
+    - Keys never leave the HSM
+    - Audit logging of all cryptographic operations
 
-### Google Cloud HSM
-
-For organizations requiring hardware-based key protection, Documenso supports Google Cloud HSM. This provides:
-
-- FIPS 140-2 Level 3 certified key storage
-- Keys never leave the HSM
-- Audit logging of all cryptographic operations
+  </Tab>
+</Tabs>
 
 ## Generating a Self-Signed Certificate
 
@@ -146,44 +150,47 @@ Keep `certificate.p12` and the password secure.
 
 If you have an existing certificate from a CA, convert it to PKCS#12 format.
 
-### From PEM Files
+<Tabs items={['From PEM files', 'From other formats']}>
+  <Tab value="From PEM files">
+    If you have separate certificate and key files:
 
-If you have separate certificate and key files:
+    ```bash
+    openssl pkcs12 -export -out certificate.p12 \
+        -inkey private.key \
+        -in certificate.crt \
+        -certfile chain.crt \
+        -keypbe PBE-SHA1-3DES \
+        -certpbe PBE-SHA1-3DES \
+        -macalg sha1
+    ```
 
-```bash
-openssl pkcs12 -export -out certificate.p12 \
-    -inkey private.key \
-    -in certificate.crt \
-    -certfile chain.crt \
-    -keypbe PBE-SHA1-3DES \
-    -certpbe PBE-SHA1-3DES \
-    -macalg sha1
-```
+    Include `-certfile chain.crt` if you have intermediate certificates.
 
-Include `-certfile chain.crt` if you have intermediate certificates.
+  </Tab>
+  <Tab value="From other formats">
+    **Convert from DER to PEM first:**
 
-### From Other Formats
+    ```bash
+    openssl x509 -inform DER -in certificate.der -out certificate.crt
+    openssl rsa -inform DER -in private.der -out private.key
+    ```
 
-**Convert from DER to PEM first:**
+    **Convert from PFX (already PKCS#12):**
 
-```bash
-openssl x509 -inform DER -in certificate.der -out certificate.crt
-openssl rsa -inform DER -in private.der -out private.key
-```
+    PFX files are the same format as P12. Rename or re-export with the correct encryption:
 
-**Convert from PFX (already PKCS#12):**
+    ```bash
+    # Extract, then re-package with compatible encryption
+    openssl pkcs12 -in certificate.pfx -out temp.pem -nodes
+    openssl pkcs12 -export -in temp.pem -out certificate.p12 \
+        -keypbe PBE-SHA1-3DES \
+        -certpbe PBE-SHA1-3DES \
+        -macalg sha1
+    rm temp.pem
+    ```
 
-PFX files are the same format as P12. Rename or re-export with the correct encryption:
-
-```bash
-# Extract, then re-package with compatible encryption
-openssl pkcs12 -in certificate.pfx -out temp.pem -nodes
-openssl pkcs12 -export -in temp.pem -out certificate.p12 \
-    -keypbe PBE-SHA1-3DES \
-    -certpbe PBE-SHA1-3DES \
-    -macalg sha1
-rm temp.pem
-```
+  </Tab>
+</Tabs>
 
 ## Local File Configuration
 
@@ -191,12 +198,12 @@ Configure Documenso to use a local certificate file.
 
 ### Environment Variables
 
-| Variable                                   | Description                                                     |
-| ------------------------------------------ | --------------------------------------------------------------- |
-| `NEXT_PRIVATE_SIGNING_TRANSPORT`           | Set to `local` (default).                                       |
-| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`     | Path to the `.p12` certificate file.                            |
-| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` | Base64-encoded `.p12` file contents (alternative to file path). |
-| `NEXT_PRIVATE_SIGNING_PASSPHRASE`          | Passphrase for the certificate.                                 |
+| Variable                                   | Description                                                    |
+| ------------------------------------------ | -------------------------------------------------------------- |
+| `NEXT_PRIVATE_SIGNING_TRANSPORT`           | Set to `local` (default)                                       |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`     | Path to the `.p12` certificate file                            |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` | Base64-encoded `.p12` file contents (alternative to file path) |
+| `NEXT_PRIVATE_SIGNING_PASSPHRASE`          | Passphrase for the certificate                                 |
 
 ### Using File Path
 
@@ -262,23 +269,45 @@ Google Cloud HSM provides hardware-based key protection. The private key never l
 
 ### Prerequisites
 
-1. Google Cloud project with Cloud KMS enabled
-2. HSM key ring and asymmetric signing key created
-3. Service account with `cloudkms.signerVerifier` role
-4. Public certificate exported from the HSM
+<Steps>
+<Step>
+### Enable Cloud KMS
+ 
+Create or use a Google Cloud project and enable the Cloud KMS API.
+
+</Step>
+<Step>
+### Create HSM key
+
+Create an HSM key ring and an asymmetric signing key in Cloud KMS (see "[Creating an HSM Key](/docs/self-hosting/configuration/signing-certificate#creating-an-hsm-key)" below).
+
+</Step>
+<Step>
+### Create service account
+
+Create a service account with the `cloudkms.signerVerifier` role so Documenso can use the key.
+
+</Step>
+<Step>
+### Export public certificate
+
+Export the public certificate from the HSM key; Documenso needs it to embed in signatures.
+
+</Step>
+</Steps>
 
 ### Environment Variables
 
-| Variable                                                       | Description                                           |
-| -------------------------------------------------------------- | ----------------------------------------------------- |
-| `NEXT_PRIVATE_SIGNING_TRANSPORT`                               | Set to `gcloud-hsm`.                                  |
-| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_KEY_PATH`                     | Full resource path to the HSM key version.            |
-| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_PATH`         | Path to the public certificate file.                  |
-| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS`     | Base64-encoded public certificate.                    |
-| `NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS` | Base64-encoded Google Cloud service account JSON.     |
-| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_FILE_PATH`         | Path to the certificate chain file.                   |
-| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_CONTENTS`          | Base64-encoded certificate chain.                     |
-| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_SECRET_MANAGER_CERT_PATH`     | Google Secret Manager path for certificate retrieval. |
+| Variable                                                       | Description                                          |
+| -------------------------------------------------------------- | ---------------------------------------------------- |
+| `NEXT_PRIVATE_SIGNING_TRANSPORT`                               | Set to `gcloud-hsm`                                  |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_KEY_PATH`                     | Full resource path to the HSM key version            |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_PATH`         | Path to the public certificate file                  |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS`     | Base64-encoded public certificate                    |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS` | Base64-encoded Google Cloud service account JSON     |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_FILE_PATH`         | Path to the certificate chain file                   |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_CONTENTS`          | Base64-encoded certificate chain                     |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_SECRET_MANAGER_CERT_PATH`     | Google Secret Manager path for certificate retrieval |
 
 ### Configuration Example
 
@@ -361,9 +390,9 @@ Timestamp servers add a trusted timestamp to signatures, proving when the docume
 
 ### Environment Variable
 
-| Variable                                   | Description                                       |
-| ------------------------------------------ | ------------------------------------------------- |
-| `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY` | Comma-separated list of timestamp authority URLs. |
+| Variable                                   | Description                                      |
+| ------------------------------------------ | ------------------------------------------------ |
+| `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY` | Comma-separated list of timestamp authority URLs |
 
 ### Configuration
 
@@ -412,10 +441,10 @@ For compatibility with older PDF readers, use the legacy signature subfilter:
 NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER=true
 ```
 
-| Subfilter             | Default | Description                   |
-| --------------------- | ------- | ----------------------------- |
-| `ETSI.CAdES.detached` | Yes     | Modern CAdES-based signatures |
-| `adbe.pkcs7.detached` | No      | Legacy PKCS#7 signatures      |
+| Subfilter             | Description                   | Default |
+| --------------------- | ----------------------------- | ------- |
+| `ETSI.CAdES.detached` | Modern CAdES-based signatures | Yes     |
+| `adbe.pkcs7.detached` | Legacy PKCS#7 signatures      | No      |
 
 Use the legacy format only if recipients report compatibility issues with older software.
 
@@ -423,38 +452,86 @@ Use the legacy format only if recipients report compatibility issues with older 
 
 <Accordions type="multiple">
   <Accordion title="Failed to get private key bags">
-    Cause: certificate has no password or incompatible encryption. Solution: verify the certificate
-    has a password set, re-create with `openssl pkcs12 -export -out new-certificate.p12 -inkey
-    private.key -in certificate.crt -keypbe PBE-SHA1-3DES -certpbe PBE-SHA1-3DES -macalg sha1`.
+    Cause:
+    - Certificate has no password or incompatible encryption
+
+    Solution:
+    - Verify the certificate has a password set
+    - Re-create with compatible encryption:
+
+    ```bash
+    openssl pkcs12 -export -out new-certificate.p12 -inkey private.key -in certificate.crt -keypbe PBE-SHA1-3DES -certpbe PBE-SHA1-3DES -macalg sha1
+    ```
+
   </Accordion>
   <Accordion title="No certificate found for local signing">
-    Cause: certificate path or contents not configured. Solution: verify
-    `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH` or `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` is set,
-    check the file exists at the configured path, verify file permissions allow reading.
+    Cause:
+    - Certificate path or contents not configured
+
+    Solution:
+    - Verify that `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH` or `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` is set
+    - Check the file exists at the configured path
+    - Verify file permissions allow reading
+
   </Accordion>
   <Accordion title="Permission denied reading certificate">
-    Cause: application cannot read the certificate file. Solution: for Docker, run `sudo chown 1001
-    certificate.p12` and `chmod 400 certificate.p12` on the host before mounting.
+    Cause:
+    - Application cannot read the certificate file
+
+    Solution:
+    - For Docker, run `sudo chown 1001 certificate.p12` and `chmod 400 certificate.p12` on the host before mounting
+
   </Accordion>
   <Accordion title="Invalid password (mac verify failure)">
-    Cause: incorrect passphrase. Solution: verify `NEXT_PRIVATE_SIGNING_PASSPHRASE` matches the
-    certificate password, check for trailing whitespace, test with `openssl pkcs12 -in
-    certificate.p12 -noout`.
+    Cause:
+    - Incorrect passphrase
+
+    Solution:
+    - Verify `NEXT_PRIVATE_SIGNING_PASSPHRASE` matches the certificate password
+    - Check for trailing whitespace
+    - Test with `openssl pkcs12 -in certificate.p12 -noout`
+
   </Accordion>
   <Accordion title="Certificate has expired">
-    Cause: certificate validity period has ended. Solution: generate a new certificate or obtain a
-    renewed one, update the certificate file and restart Documenso. Check expiration: `openssl
-    pkcs12 -in certificate.p12 -nokeys | openssl x509 -noout -dates`.
+    Cause:
+    - Certificate validity period has ended
+
+    Solution:
+    - Generate a new certificate or obtain a renewed one
+    - Update the certificate file and restart Documenso
+    - Check expiration:
+
+    ```bash
+    openssl pkcs12 -in certificate.p12 -nokeys | openssl x509 -noout -dates
+    ```
+
   </Accordion>
   <Accordion title="Base64 decode error">
-    Cause: incorrect base64 encoding or line breaks. Solution: encode without line breaks (macOS:
-    `base64 -i certificate.p12 | tr -d '\n'`; Linux: `base64 -w 0 certificate.p12`). Ensure the
-    entire base64 string is on one line.
+    Cause:
+    - Incorrect base64 encoding or line breaks
+
+    Solution:
+    - Encode without line breaks:
+
+    ```bash
+    # macOS
+    base64 -i certificate.p12 | tr -d '\n'
+
+    # Linux
+    base64 -w 0 certificate.p12
+    ```
+    - Ensure the entire base64 string is on one line
+
   </Accordion>
   <Accordion title="Google Cloud HSM authentication failed">
-    Cause: Google Cloud credentials not configured or invalid. Solution: verify
-    `NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS` is set, check the service account
-    has `cloudkms.signerVerifier` role, verify the base64 encoding of the service account JSON.
+    Cause:
+    - Google Cloud credentials not configured or invalid
+
+    Solution:
+    - Verify that `NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS` is set
+    - Check the service account has `cloudkms.signerVerifier` role
+    - Verify the base64 encoding of the service account JSON
+
   </Accordion>
 </Accordions>
 

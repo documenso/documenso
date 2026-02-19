@@ -5,6 +5,7 @@ description: Run Documenso as a standalone Docker container with an external dat
 
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 ## Prerequisites
 
@@ -27,13 +28,13 @@ docker --version
 
 Documenso publishes official images to both DockerHub and GitHub Container Registry.
 
-**From DockerHub:**
+From DockerHub:
 
 ```bash
 docker pull documenso/documenso:latest
 ```
 
-**From GitHub Container Registry:**
+From GitHub Container Registry:
 
 ```bash
 docker pull ghcr.io/documenso/documenso:latest
@@ -57,25 +58,25 @@ docker pull ghcr.io/documenso/documenso:latest
 
 These variables must be set for Documenso to start:
 
-| Variable                                | Description                                                                  | Default     |
-| --------------------------------------- | ---------------------------------------------------------------------------- | ----------- |
-| `NEXTAUTH_SECRET`                       | Secret key for session encryption. Generate with `openssl rand -base64 32`.  | -           |
-| `NEXT_PRIVATE_ENCRYPTION_KEY`           | Primary encryption key (minimum 32 characters).                              | -           |
-| `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY` | Secondary encryption key (minimum 32 characters).                            | -           |
-| `NEXT_PUBLIC_WEBAPP_URL`                | Public URL where Documenso is accessible (e.g., `https://sign.example.com`). | -           |
-| `NEXT_PRIVATE_DATABASE_URL`             | PostgreSQL connection string.                                                | -           |
-| `NEXT_PRIVATE_SMTP_TRANSPORT`           | Email transport: `smtp-auth`, `smtp-api`, `resend`, or `mailchannels`.       | `smtp-auth` |
-| `NEXT_PRIVATE_SMTP_FROM_NAME`           | Sender name for outgoing emails.                                             | -           |
-| `NEXT_PRIVATE_SMTP_FROM_ADDRESS`        | Sender email address.                                                        | -           |
+| Variable                                | Description                                                                 | Default     |
+| --------------------------------------- | --------------------------------------------------------------------------- | ----------- |
+| `NEXTAUTH_SECRET`                       | Secret key for session encryption. Generate with `openssl rand -base64 32`  | -           |
+| `NEXT_PRIVATE_ENCRYPTION_KEY`           | Primary encryption key (minimum 32 characters)                              | -           |
+| `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY` | Secondary encryption key (minimum 32 characters)                            | -           |
+| `NEXT_PUBLIC_WEBAPP_URL`                | Public URL where Documenso is accessible (e.g., `https://sign.example.com`) | -           |
+| `NEXT_PRIVATE_DATABASE_URL`             | PostgreSQL connection string                                                | -           |
+| `NEXT_PRIVATE_SMTP_TRANSPORT`           | Email transport: `smtp-auth`, `smtp-api`, `resend`, or `mailchannels`       | `smtp-auth` |
+| `NEXT_PRIVATE_SMTP_FROM_NAME`           | Sender name for outgoing emails                                             | -           |
+| `NEXT_PRIVATE_SMTP_FROM_ADDRESS`        | Sender email address                                                        | -           |
 
 ### Database Connection
 
 Documenso requires two database connection strings:
 
-| Variable                           | Required     | Default                     | Description                        |
-| ---------------------------------- | ------------ | --------------------------- | ---------------------------------- |
-| `NEXT_PRIVATE_DATABASE_URL`        | Yes          | -                           | Pooled connection for app queries. |
-| `NEXT_PRIVATE_DIRECT_DATABASE_URL` | When pooling | `NEXT_PRIVATE_DATABASE_URL` | Direct connection for migrations.  |
+| Variable                           | Required     | Default                     | Description                       |
+| ---------------------------------- | ------------ | --------------------------- | --------------------------------- |
+| `NEXT_PRIVATE_DATABASE_URL`        | Yes          | -                           | Pooled connection for app queries |
+| `NEXT_PRIVATE_DIRECT_DATABASE_URL` | When pooling | `NEXT_PRIVATE_DATABASE_URL` | Direct connection for migrations  |
 
 Connection string format:
 
@@ -89,13 +90,13 @@ If you're not using a connection pooler like PgBouncer, both variables can use t
 
 For `smtp-auth` transport:
 
-| Variable                     | Required | Default     | Description                            |
-| ---------------------------- | -------- | ----------- | -------------------------------------- |
-| `NEXT_PRIVATE_SMTP_HOST`     | Yes      | `127.0.0.1` | SMTP server hostname.                  |
-| `NEXT_PRIVATE_SMTP_PORT`     | Yes      | `587`       | SMTP server port (usually 587 or 465). |
-| `NEXT_PRIVATE_SMTP_USERNAME` | Yes      | -           | SMTP username.                         |
-| `NEXT_PRIVATE_SMTP_PASSWORD` | Yes      | -           | SMTP password.                         |
-| `NEXT_PRIVATE_SMTP_SECURE`   | No       | `false`     | Set to `true` to force TLS.            |
+| Variable                     | Required | Default     | Description                           |
+| ---------------------------- | -------- | ----------- | ------------------------------------- |
+| `NEXT_PRIVATE_SMTP_HOST`     | Yes      | `127.0.0.1` | SMTP server hostname                  |
+| `NEXT_PRIVATE_SMTP_PORT`     | Yes      | `587`       | SMTP server port (usually 587 or 465) |
+| `NEXT_PRIVATE_SMTP_USERNAME` | Yes      | -           | SMTP username                         |
+| `NEXT_PRIVATE_SMTP_PASSWORD` | Yes      | -           | SMTP password                         |
+| `NEXT_PRIVATE_SMTP_SECURE`   | No       | `false`     | Set to `true` to force TLS            |
 
 See [Email Configuration](/docs/self-hosting/configuration/email) for other transport options.
 
@@ -238,20 +239,26 @@ docker inspect --format='{{.State.Health.Status}}' documenso
 
 To update Documenso to a new version:
 
-1. Pull the new image:
+<Steps>
+  <Step>
+    Pull the new image:
 
 ```bash
 docker pull documenso/documenso:latest
 ```
 
-2. Stop and remove the existing container:
+  </Step>
+  <Step>
+    Stop and remove the existing container:
 
 ```bash
 docker stop documenso
 docker rm documenso
 ```
 
-3. Start a new container with the same configuration:
+  </Step>
+  <Step>
+    Start a new container with the same configuration:
 
 ```bash
 docker run -d \
@@ -261,6 +268,9 @@ docker run -d \
   -v /path/to/cert.p12:/opt/documenso/cert.p12:ro \
   documenso/documenso:latest
 ```
+
+  </Step>
+</Steps>
 
 <Callout type="info">
   Database migrations run automatically when the container starts. Back up your database before

@@ -57,14 +57,18 @@ The template automatically generates secure values for `NEXTAUTH_SECRET`, `NEXT_
 <Step>
 ### Deploy
 
-Click "Deploy" to start the deployment. Railway builds the application from the Dockerfile and provisions the database. This takes approximately 5-10 minutes for the initial build.
+Click "Deploy" to start the deployment. Railway builds the application from the Dockerfile and provisions the database.
+
+This takes approximately 5-10 minutes for the initial build.
 
 </Step>
 
 <Step>
 ### Access your deployment
 
-Once deployed, Railway provides a URL like `documenso-production.up.railway.app`. Click the URL in the Railway dashboard to access your Documenso instance.
+Once deployed, Railway provides a URL like `documenso-production.up.railway.app`.
+
+Click the URL in the Railway dashboard to access your Documenso instance.
 
 </Step>
 </Steps>
@@ -77,11 +81,11 @@ If you prefer more control over the setup, deploy Documenso manually:
 <Step>
 ### Create a new project
 
-1. Log in to [Railway](https://railway.app/)
-2. Click "New Project"
-3. Select "Deploy from GitHub repo"
-4. Connect your GitHub account if not already connected
-5. Fork or select the [Documenso repository](https://github.com/documenso/documenso)
+- Log in to [Railway](https://railway.app/)
+- Click "New Project"
+- Select "Deploy from GitHub repo"
+- Connect your GitHub account if not already connected
+- Fork or select the [Documenso repository](https://github.com/documenso/documenso)
 
 </Step>
 
@@ -103,10 +107,10 @@ No additional build configuration is needed.
 <Step>
 ### Add PostgreSQL database
 
-1. In your project, click "New"
-2. Select "Database"
-3. Choose "PostgreSQL"
-4. Railway provisions the database and automatically sets `DATABASE_URL`
+- In your project, click "New"
+- Select "Database"
+- Choose "PostgreSQL"
+- Railway provisions the database and automatically sets `DATABASE_URL`
 
 </Step>
 
@@ -193,9 +197,26 @@ Documenso runs database migrations automatically on startup.
 
 To connect directly to your database for debugging or maintenance:
 
-1. Go to your PostgreSQL service in Railway
-2. Click the "Connect" tab
-3. Use the provided connection string with your preferred PostgreSQL client
+<Steps>
+<Step>
+### Open the PostgreSQL service
+
+In your Railway project dashboard, select the PostgreSQL service.
+
+</Step>
+<Step>
+### Open the Connect tab
+
+The "Connect" tab shows the connection string and credentials.
+
+</Step>
+<Step>
+### Connect with your client
+
+Use the provided connection string with your preferred PostgreSQL client.
+
+</Step>
+</Steps>
 
 ## Custom Domain
 
@@ -205,18 +226,18 @@ Railway provides a generated URL by default. To use your own domain:
 <Step>
 ### Generate a domain
 
-1. Click on your Documenso service
-2. Go to "Settings" > "Networking"
-3. Click "Generate Domain" to get a Railway subdomain, or proceed to add a custom domain
+- Click on your Documenso service
+- Go to "Settings" > "Networking"
+- Click "Generate Domain" to get a Railway subdomain, or proceed to add a custom domain
 
 </Step>
 
 <Step>
 ### Add custom domain
 
-1. In "Settings" > "Networking", click "Custom Domain"
-2. Enter your domain (e.g., `sign.yourdomain.com`)
-3. Railway provides DNS records to configure
+- In "Settings" > "Networking", click "Custom Domain"
+- Enter your domain (e.g., `sign.yourdomain.com`)
+- Railway provides DNS records to configure
 
 </Step>
 
@@ -255,19 +276,51 @@ Railway provides several options for scaling your Documenso deployment:
 
 Increase resources for your service:
 
-1. Click on your Documenso service
-2. Go to "Settings"
-3. Adjust memory and CPU limits
+<Steps>
+<Step>
+### Open your Documenso service
 
-Railway automatically scales within your configured limits based on demand.
+In the Railway dashboard, select the Documenso service.
+
+</Step>
+<Step>
+### Open Settings
+
+In "Settings" you can change the resource limits for the service.
+
+</Step>
+<Step>
+### Adjust memory and CPU
+
+Raise the memory and CPU limits; Railway will scale within these limits based on demand.
+
+</Step>
+</Steps>
 
 ### Horizontal Scaling
 
 Railway supports horizontal scaling through replicas:
 
-1. Go to service "Settings"
-2. Enable "Horizontal Scaling"
-3. Set the number of replicas
+<Steps>
+<Step>
+### Open service Settings
+
+In the Railway dashboard, select your Documenso service and open "Settings".
+
+</Step>
+<Step>
+### Enable Horizontal Scaling
+
+Turn on "Horizontal Scaling" so Railway can run multiple instances.
+
+</Step>
+<Step>
+### Set replicas
+
+Choose how many replicas to run; Railway will load-balance traffic across them.
+
+</Step>
+</Steps>
 
 <Callout type="warn">
   Documenso stores sessions in the database, so horizontal scaling works without additional
@@ -327,18 +380,29 @@ Documenso generates a self-signed certificate automatically if none is provided.
 
 For production use, provide your own certificate:
 
-1. Base64-encode your certificate:
+<Steps>
+<Step>
+### Base64-encode your certificate
+
+Run this and copy the output (single line, no newlines):
 
 ```bash
 base64 -i your-cert.p12 | tr -d '\n'
 ```
 
-2. Add environment variables in Railway:
+</Step>
+<Step>
+### Add environment variables in Railway
+
+In your Documenso service variables, set:
 
 ```bash
 NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS=<base64-encoded-certificate>
 NEXT_PRIVATE_SIGNING_PASSPHRASE=<certificate-password>
 ```
+
+</Step>
+</Steps>
 
 <Callout type="warn">
   Your certificate must have a password. Certificates without passwords cause signing errors.
@@ -374,7 +438,14 @@ See [Signing Certificate Configuration](/docs/self-hosting/configuration/signing
 
 ### Koyeb
 
-[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=documenso-app&builder=dockerfile&dockerfile=/docker/Dockerfile)
+<a href="https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=documenso-app&builder=dockerfile&dockerfile=/docker/Dockerfile">
+  <img
+    src="https://www.koyeb.com/static/images/deploy/button.svg"
+    alt="Deploy to Koyeb"
+    width="193"
+    height="34"
+  />
+</a>
 
 ---
 

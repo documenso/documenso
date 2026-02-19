@@ -186,13 +186,17 @@ Documenso requires a `.p12` certificate file to sign documents. You have two opt
 
 This method avoids file permission issues:
 
-1. Start the containers first:
+<Steps>
+  <Step>
+    Start the containers first:
 
 ```bash
 docker compose --env-file .env up -d
 ```
 
-2. Generate the certificate inside the container:
+  </Step>
+  <Step>
+    Generate the certificate inside the container:
 
 ```bash
 # Set certificate password securely
@@ -213,42 +217,58 @@ docker exec -e CERT_PASS="$CERT_PASS" -it documenso-production-documenso-1 bash 
 "
 ```
 
-3. Add the passphrase to your `.env` file:
+  </Step>
+  <Step>
+    Add the passphrase to your `.env` file:
 
 ```bash
 NEXT_PRIVATE_SIGNING_PASSPHRASE=your-certificate-password
 ```
 
-4. Restart the container:
+  </Step>
+  <Step>
+    Restart the container:
 
 ```bash
 docker compose --env-file .env restart documenso
 ```
 
+  </Step>
+</Steps>
+
 ### Option B: Use an Existing Certificate
 
 If you have an existing `.p12` certificate:
 
-1. Place the certificate on your host system:
+<Steps>
+  <Step>
+    Place the certificate on your host system:
 
 ```bash
 sudo mkdir -p /opt/documenso
 sudo cp /path/to/your/cert.p12 /opt/documenso/cert.p12
 ```
 
-2. Set proper permissions:
+  </Step>
+  <Step>
+    Set proper permissions:
 
 ```bash
 sudo chmod 644 /opt/documenso/cert.p12
 sudo chown 1001:1001 /opt/documenso/cert.p12
 ```
 
-3. Update your `.env` file:
+  </Step>
+  <Step>
+    Update your `.env` file:
 
 ```bash
 NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
 NEXT_PRIVATE_SIGNING_PASSPHRASE=your-certificate-password
 ```
+
+  </Step>
+</Steps>
 
 <Callout type="error">
   The certificate must have a password. Certificates without passwords cause "Failed to get private
@@ -296,9 +316,11 @@ Once the containers are running:
 
 ### First Account Setup
 
-1. Navigate to the signup page
-2. Create your admin account
-3. Verify your email (check container logs if emails aren't delivered)
+<Steps>
+  <Step>Navigate to the signup page</Step>
+  <Step>Create your admin account</Step>
+  <Step>Verify your email (check container logs if emails aren't delivered)</Step>
+</Steps>
 
 <Callout type="info">
   The first account created has full access. Consider disabling public signups after creating admin
@@ -362,17 +384,24 @@ docker compose down -v
 
 ### Update Documenso
 
-1. Pull the latest image:
+<Steps>
+  <Step>
+    Pull the latest image:
 
 ```bash
 docker compose pull
 ```
 
-2. Recreate containers:
+  </Step>
+  <Step>
+    Recreate containers:
 
 ```bash
 docker compose --env-file .env up -d
 ```
+
+  </Step>
+</Steps>
 
 Database migrations run automatically on container startup.
 
@@ -453,13 +482,20 @@ services:
 
 For production, consider using a managed PostgreSQL service:
 
-1. Remove the `database` service from `compose.yml`
-2. Update environment variables:
+<Steps>
+  <Step>
+    Remove the `database` service from `compose.yml`
+  </Step>
+  <Step>
+    Update environment variables:
 
 ```bash
 NEXT_PRIVATE_DATABASE_URL=postgresql://user:password@your-db-host:5432/documenso
 NEXT_PRIVATE_DIRECT_DATABASE_URL=postgresql://user:password@your-db-host:5432/documenso
 ```
+
+  </Step>
+</Steps>
 
 ### S3 Storage
 
