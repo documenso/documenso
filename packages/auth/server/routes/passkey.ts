@@ -5,6 +5,8 @@ import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { Hono } from 'hono';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { rateLimitResponse } from '@documenso/lib/server-only/rate-limit/rate-limit-middleware';
+import { passkeyRateLimit } from '@documenso/lib/server-only/rate-limit/rate-limits';
 import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
 import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
 import type { TAuthenticationResponseJSONSchema } from '@documenso/lib/types/webauthn';
@@ -22,6 +24,16 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
    */
   .post('/authorize', sValidator('json', ZPasskeyAuthorizeSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
+
+    const passkeyLimitResult = await passkeyRateLimit.check({
+      ip: requestMetadata.ipAddress ?? 'unknown',
+    });
+
+    const passkeyLimited = rateLimitResponse(c, passkeyLimitResult);
+
+    if (passkeyLimited) {
+      return passkeyLimited;
+    }
 
     const { csrfToken, credential } = c.req.valid('json');
 

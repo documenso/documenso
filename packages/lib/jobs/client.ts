@@ -11,6 +11,7 @@ import { SEND_SIGNING_EMAIL_JOB_DEFINITION } from './definitions/emails/send-sig
 import { SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION } from './definitions/emails/send-team-deleted-email';
 import { BACKPORT_SUBSCRIPTION_CLAIM_JOB_DEFINITION } from './definitions/internal/backport-subscription-claims';
 import { BULK_SEND_TEMPLATE_JOB_DEFINITION } from './definitions/internal/bulk-send-template';
+import { CLEANUP_RATE_LIMITS_JOB_DEFINITION } from './definitions/internal/cleanup-rate-limits';
 import { EXECUTE_WEBHOOK_JOB_DEFINITION } from './definitions/internal/execute-webhook';
 import { EXPIRE_RECIPIENTS_SWEEP_JOB_DEFINITION } from './definitions/internal/expire-recipients-sweep';
 import { PROCESS_RECIPIENT_EXPIRED_JOB_DEFINITION } from './definitions/internal/process-recipient-expired';
@@ -37,6 +38,7 @@ export const jobsClient = new JobClient([
   EXECUTE_WEBHOOK_JOB_DEFINITION,
   EXPIRE_RECIPIENTS_SWEEP_JOB_DEFINITION,
   PROCESS_RECIPIENT_EXPIRED_JOB_DEFINITION,
+  CLEANUP_RATE_LIMITS_JOB_DEFINITION,
 ] as const);
 
 export const jobs = jobsClient;

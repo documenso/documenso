@@ -14,6 +14,15 @@ import { isTwoFactorAuthenticationEnabled } from '@documenso/lib/server-only/2fa
 import { setupTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/setup-2fa';
 import { validateTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/validate-2fa';
 import { viewBackupCodes } from '@documenso/lib/server-only/2fa/view-backup-codes';
+import { rateLimitResponse } from '@documenso/lib/server-only/rate-limit/rate-limit-middleware';
+import {
+  forgotPasswordRateLimit,
+  loginRateLimit,
+  resendVerifyEmailRateLimit,
+  resetPasswordRateLimit,
+  signupRateLimit,
+  verifyEmailRateLimit,
+} from '@documenso/lib/server-only/rate-limit/rate-limits';
 import { createUser } from '@documenso/lib/server-only/user/create-user';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
 import { getMostRecentEmailVerificationToken } from '@documenso/lib/server-only/user/get-most-recent-email-verification-token';
@@ -50,6 +59,17 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     const requestMetadata = c.get('requestMetadata');
 
     const { email, password, totpCode, backupCode, csrfToken } = c.req.valid('json');
+
+    const loginLimitResult = await loginRateLimit.check({
+      ip: requestMetadata.ipAddress ?? 'unknown',
+      identifier: email,
+    });
+
+    const loginLimited = rateLimitResponse(c, loginLimitResult);
+
+    if (loginLimited) {
+      return loginLimited;
+    }
 
     const csrfCookieToken = await getCsrfCookie(c);
 
@@ -152,6 +172,8 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
    * Signup endpoint.
    */
   .post('/signup', sValidator('json', ZSignUpSchema), async (c) => {
+    const requestMetadata = c.get('requestMetadata');
+
     if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
       throw new AppError('SIGNUP_DISABLED', {
         message: 'Signups are disabled.',
@@ -159,6 +181,16 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     }
 
     const { name, email, password, signature } = c.req.valid('json');
+
+    const signupLimitResult = await signupRateLimit.check({
+      ip: requestMetadata.ipAddress ?? 'unknown',
+    });
+
+    const signupLimited = rateLimitResponse(c, signupLimitResult);
+
+    if (signupLimited) {
+      return signupLimited;
+    }
 
     const user = await createUser({ name, email, password, signature }).catch((err) => {
       console.error(err);
@@ -219,7 +251,22 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
    * Verify email endpoint.
    */
   .post('/verify-email', sValidator('json', ZVerifyEmailSchema), async (c) => {
-    const { state, userId } = await verifyEmail({ token: c.req.valid('json').token });
+    const requestMetadata = c.get('requestMetadata');
+
+    const { token } = c.req.valid('json');
+
+    const verifyLimitResult = await verifyEmailRateLimit.check({
+      ip: requestMetadata.ipAddress ?? 'unknown',
+      identifier: token,
+    });
+
+    const verifyLimited = rateLimitResponse(c, verifyLimitResult);
+
+    if (verifyLimited) {
+      return verifyLimited;
+    }
+
+    const { state, userId } = await verifyEmail({ token });
 
     // If email is verified, automatically authenticate user.
     if (state === EMAIL_VERIFICATION_STATE.VERIFIED && userId !== null) {
@@ -234,7 +281,20 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
    * Resend verification email endpoint.
    */
   .post('/resend-verify-email', sValidator('json', ZResendVerifyEmailSchema), async (c) => {
+    const requestMetadata = c.get('requestMetadata');
+
     const { email } = c.req.valid('json');
+
+    const resendLimitResult = await resendVerifyEmailRateLimit.check({
+      ip: requestMetadata.ipAddress ?? 'unknown',
+      identifier: email,
+    });
+
+    const resendLimited = rateLimitResponse(c, resendLimitResult);
+
+    if (resendLimited) {
+      return resendLimited;
+    }
 
     await jobsClient.triggerJob({
       name: 'send.signup.confirmation.email',
@@ -249,7 +309,20 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
    * Forgot password endpoint.
    */
   .post('/forgot-password', sValidator('json', ZForgotPasswordSchema), async (c) => {
+    const requestMetadata = c.get('requestMetadata');
+
     const { email } = c.req.valid('json');
+
+    const forgotLimitResult = await forgotPasswordRateLimit.check({
+      ip: requestMetadata.ipAddress ?? 'unknown',
+      identifier: email,
+    });
+
+    const forgotLimited = rateLimitResponse(c, forgotLimitResult);
+
+    if (forgotLimited) {
+      return forgotLimited;
+    }
 
     if (
       email.toLowerCase() === legacyServiceAccountEmail() ||
@@ -268,7 +341,20 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
    * Reset password endpoint.
    */
   .post('/reset-password', sValidator('json', ZResetPasswordSchema), async (c) => {
+    const requestMetadata = c.get('requestMetadata');
+
     const { token, password } = c.req.valid('json');
+
+    const resetLimitResult = await resetPasswordRateLimit.check({
+      ip: requestMetadata.ipAddress ?? 'unknown',
+      identifier: token,
+    });
+
+    const resetLimited = rateLimitResponse(c, resetLimitResult);
+
+    if (resetLimited) {
+      return resetLimited;
+    }
 
     const user = await getUserByResetToken({ token });
 
@@ -278,8 +364,6 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     ) {
       return c.text('FORBIDDEN', 403);
     }
-
-    const requestMetadata = c.get('requestMetadata');
 
     const { userId } = await resetPassword({
       token,

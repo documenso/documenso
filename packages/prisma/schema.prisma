@@ -1086,3 +1086,15 @@ model Counter {
   id    String @id
   value Int
 }
+
+model RateLimit {
+  key    String
+  action String
+  bucket DateTime
+  count  Int      @default(1)
+
+  createdAt DateTime @default(now())
+
+  @@id([key, action, bucket])
+  @@index([createdAt])
+}
