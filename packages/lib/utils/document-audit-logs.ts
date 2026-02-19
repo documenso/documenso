@@ -576,7 +576,8 @@ export const formatDocumentAuditLogAction = (
         message: `Recipient signing window expired`,
         context: `Audit log format`,
       }),
-      identified: msg`Signing window expired for ${data.recipientName || data.recipientEmail}`,
+      you: msg`Signing window expired for ${data.recipientName || data.recipientEmail}`,
+      user: msg`Signing window expired for ${data.recipientName || data.recipientEmail}`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELEGATED_OWNER_CREATED }, ({ data }) => {
       const message = msg({
