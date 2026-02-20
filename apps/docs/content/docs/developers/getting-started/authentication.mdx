@@ -19,6 +19,7 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 ## Create an API Token
 
+{/* prettier-ignore */}
 <Steps>
 <Step>
 ### Open settings
@@ -165,11 +166,20 @@ There is currently no way to create tokens with limited scopes or permissions.
 
 To revoke a token:
 
+{/* prettier-ignore */}
 <Steps>
-  <Step>Go to **Settings** > **API Tokens**</Step>
-  <Step>Find the token you want to revoke</Step>
-  <Step>Click the delete icon next to the token</Step>
-  <Step>Confirm the deletion</Step>
+  <Step>
+    Go to **Settings** > **API Tokens**
+  </Step>
+  <Step>
+    Find the token you want to revoke
+  </Step>
+  <Step>
+    Click the delete icon next to the token
+  </Step>
+  <Step>
+    Confirm the deletion
+  </Step>
 </Steps>
 
 Revoked tokens stop working immediately. Any integrations using that token will receive `401 Unauthorized` errors.

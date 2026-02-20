@@ -63,10 +63,17 @@ curl http://localhost:3000/api/health
 
 A healthy response returns HTTP 200. If the health check fails:
 
+{/* prettier-ignore */}
 <Steps>
-  <Step>Check application logs for startup errors</Step>
-  <Step>Verify database connectivity</Step>
-  <Step>Confirm environment variables are set correctly</Step>
+  <Step>
+    Check application logs for startup errors
+  </Step>
+  <Step>
+    Verify database connectivity
+  </Step>
+  <Step>
+    Confirm environment variables are set correctly
+  </Step>
 </Steps>
 
 ### Container Status
@@ -171,10 +178,17 @@ kubectl top pod -n documenso
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
-  <Step>Increase memory limits in Docker or Kubernetes configuration</Step>
-  <Step>Check for memory leaks in custom integrations</Step>
-  <Step>Review application logs around the time of crash</Step>
+  <Step>
+    Increase memory limits in Docker or Kubernetes configuration
+  </Step>
+  <Step>
+    Check for memory leaks in custom integrations
+  </Step>
+  <Step>
+    Review application logs around the time of crash
+  </Step>
 </Steps>
 
 ### Startup Timeout in Kubernetes
@@ -212,9 +226,14 @@ netstat -tlnp | grep 3000
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
-  <Step>Stop the conflicting service</Step>
-  <Step>Change Documenso's port mapping: `-p 3001:3000`</Step>
+  <Step>
+    Stop the conflicting service
+  </Step>
+  <Step>
+    Change Documenso's port mapping: `-p 3001:3000`
+  </Step>
 </Steps>
 
 ---
@@ -236,6 +255,7 @@ Error: connect ECONNREFUSED 127.0.0.1:5432
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Verify PostgreSQL is running:
@@ -274,6 +294,7 @@ Error: password authentication failed for user "documenso"
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     URL-encode special characters in password (`@` becomes `%40`, `#` becomes `%23`)
@@ -318,6 +339,7 @@ Error: too many connections for role "documenso"
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Reduce connection pool size in connection string:
@@ -356,6 +378,7 @@ SELECT * FROM _prisma_migrations WHERE finished_at IS NULL;
 
 **Retry failed migration:**
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Fix the underlying issue
@@ -395,6 +418,7 @@ postgresql://user:password@host:5432/documenso?sslmode=require
 
 **Diagnostic steps:**
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Check email configuration:
@@ -439,6 +463,7 @@ Error: Connection timeout
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Verify hostname and port match provider documentation
@@ -470,10 +495,17 @@ Error: Invalid login or authentication failed
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
-  <Step>Double-check credentials</Step>
-  <Step>For Gmail/Microsoft with 2FA, generate an app password</Step>
-  <Step>Check provider for security alerts or blocked sign-ins</Step>
+  <Step>
+    Double-check credentials
+  </Step>
+  <Step>
+    For Gmail/Microsoft with 2FA, generate an app password
+  </Step>
+  <Step>
+    Check provider for security alerts or blocked sign-ins
+  </Step>
 </Steps>
 
 ### Emails Going to Spam
@@ -487,12 +519,23 @@ Error: Invalid login or authentication failed
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
-  <Step>Configure SPF record for your domain</Step>
-  <Step>Set up DKIM signing with your email provider</Step>
-  <Step>Add a DMARC policy</Step>
-  <Step>Use a reputable email provider</Step>
-  <Step>Test deliverability at [mail-tester.com](https://www.mail-tester.com)</Step>
+  <Step>
+    Configure SPF record for your domain
+  </Step>
+  <Step>
+    Set up DKIM signing with your email provider
+  </Step>
+  <Step>
+    Add a DMARC policy
+  </Step>
+  <Step>
+    Use a reputable email provider
+  </Step>
+  <Step>
+    Test deliverability at [mail-tester.com](https://www.mail-tester.com)
+  </Step>
 </Steps>
 
 ### From Address Not Authorized
@@ -505,10 +548,17 @@ Error: Sender address rejected
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
-  <Step>Verify the domain in your email provider's settings</Step>
-  <Step>Use an email address from a verified domain</Step>
-  <Step>Check provider-specific sender authorization requirements</Step>
+  <Step>
+    Verify the domain in your email provider's settings
+  </Step>
+  <Step>
+    Use an email address from a verified domain
+  </Step>
+  <Step>
+    Check provider-specific sender authorization requirements
+  </Step>
 </Steps>
 
 ---
@@ -529,6 +579,7 @@ Error: No certificate found for local signing
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Verify certificate configuration:
@@ -577,6 +628,7 @@ Error: mac verify failure
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Verify `NEXT_PRIVATE_SIGNING_PASSPHRASE` matches the certificate password
@@ -624,6 +676,7 @@ Error: Certificate has expired
 
 **Solution:**
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Check expiration date:
@@ -677,6 +730,7 @@ Error: Access Denied
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Verify IAM user has required permissions:
@@ -712,6 +766,7 @@ Error: The specified bucket does not exist
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Verify bucket exists:
@@ -742,6 +797,7 @@ Error: SignatureDoesNotMatch
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Verify credentials are correct
@@ -786,10 +842,17 @@ NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
-  <Step>Check configured upload limit: `NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT`</Step>
-  <Step>Increase reverse proxy timeout (nginx `client_body_timeout`)</Step>
-  <Step>For very large files, verify S3 multipart upload is working</Step>
+  <Step>
+    Check configured upload limit: `NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT`
+  </Step>
+  <Step>
+    Increase reverse proxy timeout (nginx `client_body_timeout`)
+  </Step>
+  <Step>
+    For very large files, verify S3 multipart upload is working
+  </Step>
 </Steps>
 
 ---
@@ -800,6 +863,7 @@ NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true
 
 **Diagnostic steps:**
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Check container resource usage:
@@ -840,6 +904,7 @@ LIMIT 10;
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Increase memory limits:
@@ -884,6 +949,7 @@ ORDER BY duration DESC;
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Run VACUUM ANALYZE to update statistics:
@@ -916,10 +982,17 @@ VACUUM ANALYZE;
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
-  <Step>Use a faster timestamp server or one geographically closer</Step>
-  <Step>Optimize PDF file sizes before upload</Step>
-  <Step>Verify certificate is valid and not causing retries</Step>
+  <Step>
+    Use a faster timestamp server or one geographically closer
+  </Step>
+  <Step>
+    Optimize PDF file sizes before upload
+  </Step>
+  <Step>
+    Verify certificate is valid and not causing retries
+  </Step>
 </Steps>
 
 ---
@@ -930,6 +1003,7 @@ VACUUM ANALYZE;
 
 **Diagnostic steps:**
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Verify container is running and port is exposed:
@@ -963,6 +1037,7 @@ curl http://localhost:3000/api/health
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Verify upstream is reachable from the proxy
@@ -1011,6 +1086,7 @@ Error: getaddrinfo ENOTFOUND hostname
 
 **Solutions:**
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Verify hostname is correct
@@ -1036,6 +1112,7 @@ docker exec documenso cat /etc/resolv.conf
 
 Gather this information before seeking support:
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     **Documenso version:**
@@ -1069,12 +1146,23 @@ docker inspect documenso --format='{{.Config.Image}}'
 
 When reporting bugs, include:
 
+{/* prettier-ignore */}
 <Steps>
-  <Step>Clear description of the expected vs actual behavior</Step>
-  <Step>Steps to reproduce</Step>
-  <Step>Documenso version</Step>
-  <Step>Relevant logs (redact sensitive information)</Step>
-  <Step>Environment details</Step>
+  <Step>
+    Clear description of the expected vs actual behavior
+  </Step>
+  <Step>
+    Steps to reproduce
+  </Step>
+  <Step>
+    Documenso version
+  </Step>
+  <Step>
+    Relevant logs (redact sensitive information)
+  </Step>
+  <Step>
+    Environment details
+  </Step>
 </Steps>
 
 ### Security Issues

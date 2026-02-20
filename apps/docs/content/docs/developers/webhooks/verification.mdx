@@ -35,11 +35,20 @@ The header contains your webhook secret as a plain string. If you did not config
 
 ## Verification Steps
 
+{/* prettier-ignore */}
 <Steps>
-  <Step>Extract the `X-Documenso-Secret` header from the incoming request</Step>
-  <Step>Compare it against your stored webhook secret using a constant-time comparison</Step>
-  <Step>Reject the request if the values do not match</Step>
-  <Step>Process the webhook payload if verification succeeds</Step>
+  <Step>
+    Extract the `X-Documenso-Secret` header from the incoming request
+  </Step>
+  <Step>
+    Compare it against your stored webhook secret using a constant-time comparison
+  </Step>
+  <Step>
+    Reject the request if the values do not match
+  </Step>
+  <Step>
+    Process the webhook payload if verification succeeds
+  </Step>
 </Steps>
 
 <Callout type="warn">

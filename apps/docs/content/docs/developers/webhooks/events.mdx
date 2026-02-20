@@ -624,13 +624,20 @@ The recipient's `signingStatus` changes to `SIGNED` and `signedAt` is populated.
 
 When processing webhook events:
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     **Verify the signature** — Check the `X-Documenso-Secret` header matches your configured secret
   </Step>
-  <Step>**Check event type** — Use the `event` field to determine the action</Step>
-  <Step>**Process idempotently** — Webhooks may be retried, so handle duplicate events</Step>
-  <Step>**Respond quickly** — Return a 200 status code within 30 seconds</Step>
+  <Step>
+    **Check event type** — Use the `event` field to determine the action
+  </Step>
+  <Step>
+    **Process idempotently** — Webhooks may be retried, so handle duplicate events
+  </Step>
+  <Step>
+    **Respond quickly** — Return a 200 status code within 30 seconds
+  </Step>
 </Steps>
 
 ```typescript

@@ -12,8 +12,11 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 The most common workflow: upload a PDF, add recipients with signature fields, and send for signing.
 
+{/* prettier-ignore */}
 <Steps>
-  <Step>Build the recipient payload with signature and date fields</Step>
+  <Step>
+    Build the recipient payload with signature and date fields
+  </Step>
   <Step>
     Create the envelope via <code>POST /envelope/create</code> with the PDF and payload
   </Step>
@@ -220,8 +223,11 @@ echo $DISTRIBUTE_RESPONSE | jq '.recipients[] | {email, signingUrl}'
 
 Use templates for repeatable document workflows. This example creates an employment contract with prefilled data.
 
+{/* prettier-ignore */}
 <Steps>
-  <Step>Fetch the template to get recipient and field IDs</Step>
+  <Step>
+    Fetch the template to get recipient and field IDs
+  </Step>
   <Step>
     Map template fields by label and build a <code>prefillFields</code> array
   </Step>
@@ -423,8 +429,11 @@ echo $RESPONSE | jq '{id, signingUrl: .recipients[0].signingUrl}'
 
 Send the same document to multiple recipients in parallel. Useful for policy acknowledgments, NDAs, or announcements.
 
+{/* prettier-ignore */}
 <Steps>
-  <Step>Fetch the template and get the signer recipient slot ID</Step>
+  <Step>
+    Fetch the template and get the signer recipient slot ID
+  </Step>
   <Step>
     For each recipient, call <code>POST /template/use</code> with{' '}
     <code>distributeDocument: true</code>
@@ -606,6 +615,7 @@ done
 
 Set up webhooks to receive real-time notifications when documents are signed or completed.
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     **Create a webhook endpoint**: Implement an HTTP handler that verifies the signature and
@@ -709,9 +719,14 @@ app.listen(3000, () => console.log('Webhook server running on port 3000'));
 
 Register your endpoint in the Documenso dashboard:
 
+{/* prettier-ignore */}
 <Steps>
-  <Step>Go to **Team Settings** → **Webhooks**</Step>
-  <Step>Click **Create Webhook**</Step>
+  <Step>
+    Go to **Team Settings** → **Webhooks**
+  </Step>
+  <Step>
+    Click **Create Webhook**
+  </Step>
   <Step>
     Enter your webhook URL (e.g. <code>https://your-app.com/webhooks/documenso</code>)
   </Step>
@@ -722,7 +737,9 @@ Register your endpoint in the Documenso dashboard:
   <Step>
     Enter your webhook secret (the same value stored in <code>DOCUMENSO_WEBHOOK_SECRET</code>)
   </Step>
-  <Step>Click **Create Webhook**</Step>
+  <Step>
+    Click **Create Webhook**
+  </Step>
 </Steps>
 
 See [Webhook Setup](/docs/developers/webhooks/setup) for detailed instructions.
@@ -767,6 +784,7 @@ async function pollForCompletion(
 
 After a document is completed, download the signed PDF with all signatures embedded.
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Get the envelope with <code>GET /envelope/:envelopeId</code> and confirm status is{' '}

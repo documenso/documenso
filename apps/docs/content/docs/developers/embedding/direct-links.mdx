@@ -11,10 +11,17 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 Direct links are unique URLs tied to a template that allow anyone to:
 
+{/* prettier-ignore */}
 <Steps>
-  <Step>View and sign a document without receiving an email invitation</Step>
-  <Step>Enter their own name and email address</Step>
-  <Step>Complete signature fields and submit the document</Step>
+  <Step>
+    View and sign a document without receiving an email invitation
+  </Step>
+  <Step>
+    Enter their own name and email address
+  </Step>
+  <Step>
+    Complete signature fields and submit the document
+  </Step>
 </Steps>
 
 When someone uses a direct link, Documenso creates a new document from the template with that person as the signer.
@@ -38,6 +45,7 @@ Before embedding, you need a template with direct links enabled.
 
 ### Via the Dashboard
 
+{/* prettier-ignore */}
 <Steps>
 <Step>
 Go to **Templates** and create or select a template
@@ -195,10 +203,17 @@ function redirectToSigning(token: string) {
 
 Configure a redirect URL in your template settings to return users to your application after signing:
 
+{/* prettier-ignore */}
 <Steps>
-  <Step>Edit your template</Step>
-  <Step>Go to **Advanced Settings**</Step>
-  <Step>Set **Redirect URL** to your desired return URL (e.g., `https://yourapp.com/signed`)</Step>
+  <Step>
+    Edit your template
+  </Step>
+  <Step>
+    Go to **Advanced Settings**
+  </Step>
+  <Step>
+    Set **Redirect URL** to your desired return URL (e.g., `https://yourapp.com/signed`)
+  </Step>
 </Steps>
 
 Or set it via API when creating the template:

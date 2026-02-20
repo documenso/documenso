@@ -26,6 +26,7 @@ docker compose version
 
 ## Clone and Configure
 
+{/* prettier-ignore */}
 <Steps>
 <Step>
 ### Download the compose file
@@ -186,6 +187,7 @@ Documenso requires a `.p12` certificate file to sign documents. You have two opt
 
 This method avoids file permission issues:
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Start the containers first:
@@ -240,6 +242,7 @@ docker compose --env-file .env restart documenso
 
 If you have an existing `.p12` certificate:
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Place the certificate on your host system:
@@ -316,10 +319,17 @@ Once the containers are running:
 
 ### First Account Setup
 
+{/* prettier-ignore */}
 <Steps>
-  <Step>Navigate to the signup page</Step>
-  <Step>Create your admin account</Step>
-  <Step>Verify your email (check container logs if emails aren't delivered)</Step>
+  <Step>
+    Navigate to the signup page
+  </Step>
+  <Step>
+    Create your admin account
+  </Step>
+  <Step>
+    Verify your email (check container logs if emails aren't delivered)
+  </Step>
 </Steps>
 
 <Callout type="info">
@@ -384,6 +394,7 @@ docker compose down -v
 
 ### Update Documenso
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Pull the latest image:
@@ -482,6 +493,7 @@ services:
 
 For production, consider using a managed PostgreSQL service:
 
+{/* prettier-ignore */}
 <Steps>
   <Step>
     Remove the `database` service from `compose.yml`
