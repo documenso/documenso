@@ -205,8 +205,8 @@ Remove any organization members who signed up with passwords, then re-invite the
 
 ## Troubleshooting
 
-{/* prettier-ignore */}
 <Accordions type="multiple">
+  {/* prettier-ignore */}
   <Accordion title="Invalid issuer URL">
     - Verify the URL is correct and publicly accessible
     
@@ -214,23 +214,31 @@ Remove any organization members who signed up with passwords, then re-invite the
     
     - Check that the URL includes the full path (usually ending in `/.well-known/openid-configuration`)
   </Accordion>
-
-<Accordion title="Client authentication failed">
-  - Verify the client ID and secret match your identity provider exactly - Check that the OIDC
-  application hasn't been deleted or disabled. - Regenerate the client secret if you suspect it's
-  incorrect.
+  {/* prettier-ignore */}
+  <Accordion title="Client authentication failed">
+  - Verify the client ID and secret match your identity provider exactly 
+  
+  - Check that the OIDC application hasn't been deleted or disabled. 
+  
+  - Regenerate the client secret if you suspect it's incorrect.
 </Accordion>
-
-<Accordion title="Redirect URI mismatch">
-  - Copy the redirect URI exactly from Documenso's SSO settings - Check for trailing slashes. They
-  must match exactly. - Ensure you're using HTTPS.
+  {/* prettier-ignore */}
+  <Accordion title="Redirect URI mismatch">
+  - Copy the redirect URI exactly from Documenso's SSO settings
+  
+  - Check for trailing slashes. They must match exactly. 
+  
+  - Ensure you're using HTTPS.
 </Accordion>
-
-<Accordion title="User not provisioned">
-  - Verify the user's email domain is in the allowed domains list - Check that the user exists in
-  your identity provider - Ensure the user's account in your identity provider has an email address
+  {/* prettier-ignore */}
+  <Accordion title="User not provisioned">
+  - Verify the user's email domain is in the allowed domains list
+  
+  - Check that the user exists in your identity provider
+  
+  - Ensure the user's account in your identity provider has an email address
 </Accordion>
-
+  {/* prettier-ignore */}
   <Accordion title="User already exists">
     If a user already has a Documenso account with the same email, their existing account will be linked to your team and they can sign in through your SSO portal going forward.
   </Accordion>
