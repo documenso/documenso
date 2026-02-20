@@ -180,15 +180,19 @@ Control authentication requirements for accessing and signing the document.
 
 **Document-level access control:**
 
-- **Require account**: The recipient must have an account and be signed in to view the document
-- **Require 2FA**: The recipient must use two-factor authentication
-- **None**: The document can be accessed directly via the signing link
+| Option              | Description                                                              |
+| ------------------- | ------------------------------------------------------------------------ |
+| **Require account** | The recipient must have an account and be signed in to view the document |
+| **Require 2FA**     | The recipient must use two-factor authentication                         |
+| **None**            | The document can be accessed directly via the signing link               |
 
 **Recipient Authentication** allows you to require additional verification when a recipient signs a signature field:
 
-- **Require passkey**: The recipient must have a passkey configured
-- **Require 2FA**: The recipient must have 2FA enabled
-- **None**: No additional authentication
+| Option              | Description                                  |
+| ------------------- | -------------------------------------------- |
+| **Require passkey** | The recipient must have a passkey configured |
+| **Require 2FA**     | The recipient must have 2FA enabled          |
+| **None**            | No additional authentication                 |
 
 You can set authentication at the document level and override it per recipient.
 
