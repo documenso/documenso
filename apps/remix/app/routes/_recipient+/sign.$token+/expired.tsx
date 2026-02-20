@@ -94,10 +94,6 @@ export default function ExpiredSigningPage({ loaderData }: Route.ComponentProps)
           </h2>
         </div>
 
-        <div className="mt-4 flex items-center text-center text-sm text-orange-500">
-          <Trans>The signing deadline for this document has passed</Trans>
-        </div>
-
         <p className="mt-6 max-w-[60ch] text-center text-sm text-muted-foreground">
           <Trans>
             The signing deadline for this document has passed. Please contact the document owner if

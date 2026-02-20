@@ -30,7 +30,7 @@ test('[ENVELOPE_EXPIRATION]: expired recipient is redirected to expired page', a
   await page.goto(`/sign/${recipient.token}`);
   await page.waitForURL(`/sign/${recipient.token}/expired`);
 
-  await expect(page.getByText('Document Expired')).toBeVisible();
+  await expect(page.getByText('Signing Deadline Expired')).toBeVisible();
   await expect(page.getByText('The signing deadline for this document has passed')).toBeVisible();
 });
 
