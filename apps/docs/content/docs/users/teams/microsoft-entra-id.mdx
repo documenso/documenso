@@ -23,20 +23,18 @@ Microsoft Entra ID (formerly Azure Active Directory) is a popular identity provi
 <Step>
 ### Access Azure portal
 
-1. Navigate to the Azure Portal
-2. Sign in with your Microsoft Entra ID administrator account
-3. Search for "Azure Active Directory" or "Microsoft Entra ID" in the search bar
-4. Click on "Microsoft Entra ID" from the results
-
-</Step>
+- Navigate to the Azure Portal
+- Sign in with your Microsoft Entra ID administrator account
+- Search for "Azure Active Directory" or "Microsoft Entra ID" in the search bar
+- Click on "Microsoft Entra ID" from the results
+  </Step>
 
 <Step>
 ### Create app registration
 
-1. In the left sidebar, click on "App registrations"
-2. Click the "New registration" button
-
-</Step>
+- In the left sidebar, click on "App registrations"
+- Click the "New registration" button
+  </Step>
 
 <Step>
 ### Configure app registration
@@ -61,11 +59,11 @@ After registration, you'll be taken to the app's overview page. The **Applicatio
 <Step>
 ### Create client secret
 
-1. In the left sidebar, click on "Certificates & secrets"
-2. Click "New client secret"
-3. Add a description (e.g., "Documenso SSO Secret")
-4. Choose an expiration period (recommended 12-24 months)
-5. Click "Add"
+- In the left sidebar, click on "Certificates & secrets"
+- Click "New client secret"
+- Add a description (e.g., "Documenso SSO Secret")
+- Choose an expiration period (recommended 12-24 months)
+- Click "Add"
 
 <Callout type="info">
   Copy the **Secret value**, not the **Secret ID**. You won't be able to access it again after you
@@ -108,9 +106,11 @@ Copy the **OpenID Connect metadata document** value.
 
 Now you have all the information needed to configure your Documenso SSO portal:
 
-- **Issuer URL**: The "OpenID Connect metadata document" value from the previous step
-- **Client ID**: The Application (client) ID from your app registration
-- **Client Secret**: The secret value you copied during creation
+| Field             | Value                                                               |
+| ----------------- | ------------------------------------------------------------------- |
+| **Issuer URL**    | The "OpenID Connect metadata document" value from the previous step |
+| **Client ID**     | The Application (client) ID from your app registration              |
+| **Client Secret** | The secret value you copied during creation                         |
 
 ## See Also
 

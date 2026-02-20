@@ -5,6 +5,7 @@ description: Upload documents to Documenso to prepare them for signing. Covers s
 
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 ## Limitations
 
@@ -28,16 +29,55 @@ You can upload documents in two ways:
 
 ### Drag and Drop
 
-1. Go to your [Documents dashboard](https://app.documenso.com/documents)
-2. Drag a PDF file from your computer and drop it anywhere on the page
-3. Wait for the upload to complete
+<Steps>
+  <Step>
+    ### Go to the Documents dashboard
+
+    Open your [Documents dashboard](https://app.documenso.com/documents).
+
+  </Step>
+  <Step>
+    ### Drag and drop your PDF
+
+    Drag a PDF file from your computer and drop it anywhere on the page.
+
+  </Step>
+  <Step>
+    ### Wait for the upload to complete
+
+    The document will process and the editor will open when ready.
+
+  </Step>
+</Steps>
 
 ### File Picker
 
-1. Go to your [Documents dashboard](https://app.documenso.com/documents)
-2. Click **Upload Document** in the top right
-3. Select a PDF file from your computer
-4. Wait for the upload to complete
+<Steps>
+  <Step>
+    ### Go to the Documents dashboard
+
+    Open your [Documents dashboard](https://app.documenso.com/documents).
+
+  </Step>
+  <Step>
+    ### Open the upload dialog
+
+    Click **Upload Document** in the top right.
+
+  </Step>
+  <Step>
+    ### Select your file
+
+    Choose a PDF file from your computer.
+
+  </Step>
+  <Step>
+    ### Wait for the upload to complete
+
+    The document will process and the editor will open when ready.
+
+  </Step>
+</Steps>
 
 ## Uploading Multiple Documents
 
@@ -45,8 +85,8 @@ You can upload multiple PDF files at once to create a single envelope containing
 
 To upload multiple files:
 
-1. Select multiple PDF files when using the file picker, or
-2. Drag and drop multiple PDF files at once
+- Select multiple PDF files when using the file picker, or
+- Drag and drop multiple PDF files at once
 
 All files in the same upload become part of the same envelope and share the same recipients and signing workflow.
 
@@ -58,9 +98,9 @@ All files in the same upload become part of the same envelope and share the same
 
 When you upload a document:
 
-1. **Processing** - Documenso validates the PDF and extracts page information
-2. **Draft created** - A new document is created in `Draft` status
-3. **Editor opens** - You're taken to the document editor to add recipients and fields
+1. **Processing**: Documenso validates the PDF and extracts page information
+2. **Draft created**: A new document is created in `Draft` status
+3. **Editor opens**: You're taken to the document editor to add recipients and fields
 
 ![Document editor overview](/document-signing/editor-overview.webp)
 

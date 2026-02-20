@@ -15,11 +15,11 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Limitations
 
-- **Team name**: 3-30 characters
-- **Team URL**: 3-30 characters, lowercase letters, numbers, dashes, and underscores only
-- **Team URL** cannot start or end with dashes or underscores
-- **Team URL** cannot contain consecutive dashes or underscores
-- Maximum number of teams depends on your plan
+| Field         | Constraint                                                                                                                                                                 |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Team name** | 3-30 characters                                                                                                                                                            |
+| **Team URL**  | 3-30 characters; lowercase letters, numbers, dashes, and underscores only.<br />Cannot start or end with dashes or underscores.<br />No consecutive dashes or underscores. |
+| **Teams**     | Maximum number depends on your plan                                                                                                                                        |
 
 ## Create a Team
 
@@ -27,8 +27,8 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 <Step>
 ### Open the create team dialog
 
-1. Go to your organization page
-2. Click **Create team**
+- Go to your organization page
+- Click **Create team**
 
 ![Team creation button on the organization page](/teams/team-create.webp)
 
@@ -39,8 +39,8 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 Fill in the required information:
 
-- **Team Name** - A display name for your team (3-30 characters)
-- **Team URL** - A unique identifier used in URLs like `app.documenso.com/t/your-team-url`
+- **Team Name**: A display name for your team (3-30 characters)
+- **Team URL**: A unique identifier used in URLs like `app.documenso.com/t/your-team-url`
 
 The Team URL is automatically generated from your team name, but you can customize it.
 
@@ -56,7 +56,8 @@ Choose whether to allow all organization members to access this team:
 <Tabs items={['Checked', 'Unchecked']}>
   <Tab value="Checked">All current and future organization members can access team documents.</Tab>
   <Tab value="Unchecked">
-    Only organization admins and managers are added initially; you control member access manually.
+    Only organization admins and managers are added initially. You can control member access
+    manually later.
   </Tab>
 </Tabs>
 
@@ -78,18 +79,22 @@ After creating a team, you can configure additional settings from **Team Setting
 
 <Tabs items={['General', 'Branding', 'Other']}>
   <Tab value="General">
-    - **Team Name** - Update the display name
-    - **Team URL** - Change the URL identifier (this changes all team links)
-    - **Team Avatar** - Upload an image to identify your team
-    - **Team Email** - Add an email address for your team (see [Team Email](#team-email) below)
+    | Setting | Description |
+    | ------- | ----------- |
+    | **Team Name** | Update the display name. |
+    | **Team URL** | Change the URL identifier (this changes all team links). |
+    | **Team Avatar** | Upload an image to identify your team. |
+    | **Team Email** | Add an email address for your team (see [Team Email](#team-email) below). |
   </Tab>
   <Tab value="Branding">
     Customize how your team's documents appear to recipients:
 
-    - **Enable Custom Branding** - Turn branding on/off, or inherit from organization settings
-    - **Branding Logo** - Upload your logo (max 5MB, JPG, PNG, or WebP) to display on signing pages
-    - **Brand Website** - Link your logo to your website
-    - **Brand Details** - Additional information shown at the bottom of emails
+    | Setting | Description |
+    | ------- | ----------- |
+    | **Enable Custom Branding** | Turn branding on/off, or inherit from organization settings. |
+    | **Branding Logo** | Upload your logo (max 5MB, JPG, PNG, or WebP) to display on signing pages. |
+    | **Brand Website** | Link your logo to your website. |
+    | **Brand Details** | Additional information shown at the bottom of emails. |
 
     <Callout type="info">
       Team branding settings can inherit from your organization. Select "Inherit from organization" to
@@ -98,11 +103,13 @@ After creating a team, you can configure additional settings from **Team Setting
 
   </Tab>
   <Tab value="Other">
-    - **Document Preferences** - Default settings for new documents
-    - **Email Preferences** - Customize email notifications
-    - **Public Profile** - Configure your team's public presence
-    - **API Tokens** - Generate tokens for API access
-    - **Webhooks** - Set up integrations with external services
+    | Setting | Description |
+    | ------- | ----------- |
+    | **Document Preferences** | Default settings for new documents. |
+    | **Email Preferences** | Customize email notifications. |
+    | **Public Profile** | Configure your team's public presence. |
+    | **API Tokens** | Generate tokens for API access. |
+    | **Webhooks** | Set up integrations with external services. |
   </Tab>
 </Tabs>
 
@@ -112,22 +119,20 @@ After creating a team, you can configure additional settings from **Team Setting
 
 Adding a team email address enables several capabilities:
 
-<Tabs items={['Team Inbox', 'Send on behalf', 'Track documents', 'Consistent branding']}>
-  <Tab value="Team Inbox">View signing requests sent to this email address.</Tab>
-  <Tab value="Send on behalf">
-    Documents sent from the team appear to come from the team email rather than your personal email.
-  </Tab>
-  <Tab value="Track documents">See documents sent from this email in the team's document list.</Tab>
-  <Tab value="Consistent branding">
-    Recipients see the team identity rather than individual sender details.
-  </Tab>
-</Tabs>
+| Capability              | Description                                                                                      |
+| ----------------------- | ------------------------------------------------------------------------------------------------ |
+| **Team Inbox**          | View signing requests sent to this email address.                                                |
+| **Send on behalf**      | Documents sent from the team appear to come from the team email rather than your personal email. |
+| **Track documents**     | See documents sent from this email in the team's document list.                                  |
+| **Consistent branding** | Recipients see the team identity rather than individual sender details.                          |
 
 To configure a team email:
 
-1. Go to **Team Settings** > **General**
-2. Enter the email address in the **Team Email** field
-3. Click **Update** to save
+<Steps>
+  <Step>Go to **Team Settings** > **General**.</Step>
+  <Step>Enter the email address in the **Team Email** field.</Step>
+  <Step>Click **Update** to save.</Step>
+</Steps>
 
 <Callout type="info">
   The team email is used as the sender identity for documents sent from the team. Recipients will

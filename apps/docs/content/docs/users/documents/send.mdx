@@ -4,6 +4,7 @@ description: Send your document for signing, customize email notifications, and 
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Prerequisites
@@ -16,12 +17,15 @@ Before sending, ensure your document has:
 
 ## Send a Document
 
-1. Click **Send Document** in the document editor
-2. Choose the distribution method:
-   - **Email** - Recipients receive email notifications with signing links
-   - **None** - No emails sent; you receive signing links to share manually
-3. Configure email settings (if using email distribution)
-4. Click **Send** or **Generate Links**
+<Steps>
+  <Step>Click **Send Document** in the document editor.</Step>
+  <Step>
+    Choose the distribution method: **Email** (recipients get signing links by email) or **None**
+    (you get links to share manually).
+  </Step>
+  <Step>If using email, configure subject, message, and reply-to as needed.</Step>
+  <Step>Click **Send** or **Generate Links**.</Step>
+</Steps>
 
 Once sent, the document status changes from **Draft** to **Pending**.
 
@@ -97,11 +101,11 @@ You can track progress from the document detail page, which shows each recipient
 
 If a recipient hasn't acted on the document, you can send them a reminder:
 
-1. Open the document from your Documents page
-2. Click the actions menu (three dots)
-3. Select **Resend**
-4. Check the recipients you want to remind
-5. Click **Send reminder**
+<Steps>
+  <Step>Open the document from your Documents page.</Step>
+  <Step>Click the actions menu (three dots) and select **Resend**.</Step>
+  <Step>Check the recipients you want to remind, then click **Send reminder**.</Step>
+</Steps>
 
 Reminders are only available for:
 
@@ -114,11 +118,11 @@ The reminder email includes "Reminder:" prefixed to the subject line and uses th
 
 To stop a signing process and remove a document:
 
-1. Open the document
-2. Click the actions menu (three dots)
-3. Select **Delete**
-4. Type "delete" to confirm
-5. Click **Delete**
+<Steps>
+  <Step>Open the document from your Documents page.</Step>
+  <Step>Click the actions menu (three dots) and select **Delete**.</Step>
+  <Step>Type "delete" to confirm, then click **Delete**.</Step>
+</Steps>
 
 <Callout type="warn">
   Deleting a pending document is irreversible. The document is permanently deleted, all signatures
@@ -155,15 +159,15 @@ Control authentication requirements for accessing and signing the document.
 
 **Document-level access control:**
 
-- **Require account** - The recipient must be signed in to view the document
-- **Require 2FA** - The recipient must use two-factor authentication
-- **None** - The document can be accessed directly via the signing link
+- **Require account**: The recipient must have an account and be signed in to view the document
+- **Require 2FA**: The recipient must use two-factor authentication
+- **None**: The document can be accessed directly via the signing link
 
 **Recipient Authentication** allows you to require additional verification when a recipient signs a signature field:
 
-- **Require passkey** - The recipient must have a passkey configured
-- **Require 2FA** - The recipient must have 2FA enabled
-- **None** - No additional authentication
+- **Require passkey**: The recipient must have a passkey configured
+- **Require 2FA**: The recipient must have 2FA enabled
+- **None**: No additional authentication
 
 You can set authentication at the document level and override it per recipient.
 
@@ -180,9 +184,13 @@ Configure document attachments from the right-hand side of the editor header. At
 
 If you choose **None** as the distribution method:
 
-1. The document is sent without notifying recipients
-2. You're redirected to the document page with signing links displayed
-3. Copy the links and share them through your preferred channel
+<Steps>
+  <Step>The document is sent without notifying recipients.</Step>
+  <Step>You're redirected to the document page where signing links are displayed.</Step>
+  <Step>
+    Copy the links and share them through your preferred channel (SMS, messaging app, etc.).
+  </Step>
+</Steps>
 
 This is useful when you want to:
 

@@ -5,6 +5,7 @@ description: Use Documenso's AI helpers to detect recipients and fields in draft
 
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Overview
@@ -21,15 +22,27 @@ Documenso can suggest recipients and place fields automatically using Google Ver
 
 <Tabs items={['Organisation Settings', 'Team Settings']}>
   <Tab value="Organisation Settings">
-    1. Go to **Settings** > **Document Preferences** > **AI Features**
-    2. Set to **Enabled**
+    <Steps>
+      <Step>
+        Go to **Settings** > **Document Preferences** > **AI Features**.
+      </Step>
+      <Step>
+        Set to **Enabled**.
+      </Step>
+    </Steps>
 
     _This applies to teams that inherit organisation defaults._
 
   </Tab>
   <Tab value="Team Settings">
-    1. Go to **Team Settings** > **Document Preferences** > **AI Features**
-    2. Choose **Enabled**, **Disabled**, or **Inherit**
+    <Steps>
+      <Step>
+        Go to **Team Settings** > **Document Preferences** > **AI Features**.
+      </Step>
+      <Step>
+        Choose **Enabled**, **Disabled**, or **Inherit**.
+      </Step>
+    </Steps>
   </Tab>
 </Tabs>
 
@@ -37,13 +50,23 @@ Documenso can suggest recipients and place fields automatically using Google Ver
 
 Use this to identify who needs to sign or approve.
 
-1. Open a draft document/template and go to the **Recipients** panel.
-2. Select the **sparkle** button to start detection. If AI is enabled, uploads launched from the dashboard will open the detector automatically.
+<Steps>
+  <Step>
+    Open a draft document or template and go to the **Recipients** panel.
+  </Step>
+  <Step>
+    Select the **sparkle** button to start detection. If AI is enabled, uploads from the dashboard may open the detector automatically.
 
-![Detect recipients with AI button in the Recipients panel](/document-signing/ai-recipient-detect-button.webp)
+    ![Detect recipients with AI button in the Recipients panel](/document-signing/ai-recipient-detect-button.webp)
 
-3. Wait for progress to finish, then review the suggested recipients.
-4. Remove any incorrect entries, then **Add recipients** to apply them. Existing recipients and duplicates are preserved.
+  </Step>
+  <Step>
+    Wait for progress to finish, then review the suggested recipients.
+  </Step>
+  <Step>
+    Remove any incorrect entries, then click **Add recipients** to apply. Existing recipients and duplicates are preserved.
+  </Step>
+</Steps>
 
 <Callout type="info">
   Detection is unavailable once an envelope is completed. You can re-run detection if you update the
@@ -54,17 +77,25 @@ Use this to identify who needs to sign or approve.
 
 Use this to auto-place fields on the pages of a draft.
 
-1. Open the envelope editor and switch to the **Fields** tab.
-2. Select **Detect with AI**.
+<Steps>
+  <Step>
+    Open the envelope editor and switch to the **Fields** tab.
+  </Step>
+  <Step>
+    Select **Detect with AI**. Optionally provide context (e.g., "Alice is the tenant, Bob is the landlord") to improve recipient assignment.
 
-![AI field detection dialog with context input](/document-signing/ai-field-detection-button.webp)
+    ![AI field detection button](/document-signing/ai-field-detection-button.webp)
 
-Provide optional context (e.g., "Alice is the tenant, Bob is the landlord") to improve recipient assignment.
+    ![AI field detection dialog with context input](/document-signing/ai-field-detection-dialog.webp)
 
-![AI field detection dialog with context input](/document-signing/ai-field-detection-dialog.webp)
-
-3. Watch the progress indicators; they update per page and total fields found.
-4. Review the summary and choose **Add fields** to place them in the editor.
+  </Step>
+  <Step>
+    Watch the progress indicators (per page and total fields found).
+  </Step>
+  <Step>
+    Review the summary and choose **Add fields** to place them in the editor.
+  </Step>
+</Steps>
 
 <Callout type="info">
   Works only for draft envelopes and teams with AI features enabled. Existing fields are masked

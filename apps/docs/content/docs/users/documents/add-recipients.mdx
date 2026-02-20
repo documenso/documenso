@@ -5,6 +5,7 @@ description: Add signers, approvers, viewers, and CC recipients to your document
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Add a Recipient
 
@@ -32,9 +33,9 @@ In the Recipients section, click **+ Add Signer** to add a new recipient row.
 
 Fill in the following information:
 
-- **Email** - The recipient's email address (required)
-- **Name** - The recipient's name (optional, but recommended for clarity)
-- **Role** - What the recipient needs to do (see [Recipient Roles](/docs/concepts/recipient-roles))
+- **Email**: The recipient's email address (required)
+- **Name**: The recipient's name (optional, but recommended for clarity)
+- **Role**: What the recipient needs to do (see [Recipient Roles](/docs/concepts/recipient-roles))
 
 </Step>
 </Steps>
@@ -81,10 +82,19 @@ You can add as many recipients as you need. Click **+ Add Signer** for each addi
 
 Common scenarios:
 
-- **Two-party agreement** - Add yourself and the other party as signers
-- **Contract with witness** - Add the main signer plus a viewer as witness
-- **Approval workflow** - Add an approver first, then signers
-- **Keep stakeholders informed** - Add CC recipients who receive the final document
+<Tabs
+  items={[
+    'Two-party agreement',
+    'Contract with witness',
+    'Approval workflow',
+    'Keep stakeholders informed',
+  ]}
+>
+  <Tab value="Two-party agreement">Add yourself and the other party as signers.</Tab>
+  <Tab value="Contract with witness">Add the main signer plus a viewer as witness.</Tab>
+  <Tab value="Approval workflow">Add an approver first, then signers.</Tab>
+  <Tab value="Keep stakeholders informed">Add CC recipients who receive the final document.</Tab>
+</Tabs>
 
 ## Signing Order
 
@@ -104,9 +114,26 @@ Recipients receive the document one at a time, in the order you specify. Each pe
 
 To enable sequential signing:
 
-1. Toggle on **Enable signing order** in the Recipients section
-2. Set the order number for each recipient (1, 2, 3, etc.)
-3. Recipients with the same number act simultaneously at that step
+<Steps>
+  <Step>
+    ### Enable signing order
+
+    Toggle on **Enable signing order** in the Recipients section.
+
+  </Step>
+  <Step>
+    ### Set the order for each recipient
+
+    Assign an order number to each recipient (1, 2, 3, etc.).
+
+  </Step>
+  <Step>
+    ### Use the same number for parallel steps
+
+    Recipients with the same order number act simultaneously at that step.
+
+  </Step>
+</Steps>
 
 <Callout type="info">
   Sequential signing is required to use the Assistant role. Assistants must act before the signers
@@ -134,9 +161,9 @@ In this example:
 
 You can modify recipient details anytime before sending the document:
 
-- **Change email or name** - Click on the field and type the new value
-- **Change role** - Select a different role from the dropdown
-- **Change signing order** - Adjust the order number (if sequential signing is enabled)
+- **Change email or name**: Click on the field and type the new value
+- **Change role**: Select a different role from the dropdown
+- **Change signing order**: Adjust the order number (if sequential signing is enabled)
 
 <Callout type="warn">
   After sending a document, you cannot change recipients. If you need different recipients, you'll

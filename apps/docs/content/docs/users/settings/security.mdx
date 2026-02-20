@@ -13,22 +13,12 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 If you signed up with email and password (not Google or another provider), you can change your password at any time.
 
 <Steps>
-<Step>
-### Go to security settings
-
-Click on your avatar in the top right corner, then navigate to **Settings** > **Security** tab.
-
-</Step>
-
-<Step>
-### Update your password
-
-- Enter your current password
-- Enter your new password
-- Confirm the new password
-- Click **Update password**
-
-</Step>
+  <Step>Click your avatar in the top right corner.</Step>
+  <Step>Go to **Settings**.</Step>
+  <Step>Open the **Security** tab.</Step>
+  <Step>
+    Enter your current password, new password, and confirmation, then click **Update password**.
+  </Step>
 </Steps>
 
 <Callout type="info">
@@ -47,28 +37,24 @@ Two-factor authentication adds a second layer of security by requiring a code fr
 ### Enable 2FA
 
 <Steps>
-<Step>
-### Open the 2FA setup
+  <Step>
+    ### Open 2FA setup
 
-Go to **Settings** > **Security**, find the Two factor authentication section, then click **Enable 2FA**.
+    Go to **Settings**, open the **Security** tab, find the Two factor authentication section, and click **Enable 2FA**.
 
-</Step>
+  </Step>
+  <Step>
+    ### Scan the QR code
 
-<Step>
-### Scan the QR code
+    Open your authenticator app (Google Authenticator, Authy, 1Password, etc.) and scan the QR code. If you can't scan, reveal the setup key and enter it manually.
 
-Open your authenticator app (Google Authenticator, Authy, 1Password, etc.), then scan the QR code displayed on screen. If you cannot scan, click to reveal the setup key and enter it manually.
+  </Step>
+  <Step>
+    ### Verify and save
 
-</Step>
+    Enter the 6-digit code from your app, click **Enable**, then save your recovery codes (see [Recovery Codes](#recovery-codes) below).
 
-<Step>
-### Verify and confirm
-
-- Enter the 6-digit code from your authenticator app
-- Click **Enable**
-- Save your recovery codes (see [Recovery Codes](#recovery-codes) below)
-
-</Step>
+  </Step>
 </Steps>
 
 <Callout type="info">
@@ -85,21 +71,11 @@ Open your authenticator app (Google Authenticator, Authy, 1Password, etc.), then
 ### Disable 2FA
 
 <Steps>
-<Step>
-### Open security settings
-
-Navigate to **Settings** > **Security**.
-
-</Step>
-
-<Step>
-### Disable 2FA
-
-- Click **Disable 2FA**
-- Enter a code from your authenticator app to confirm
-- Click **Disable**
-
-</Step>
+  <Step>Go to **Settings**.</Step>
+  <Step>Open the **Security** tab.</Step>
+  <Step>
+    Click **Disable 2FA**, enter a code from your authenticator app, then click **Disable**.
+  </Step>
 </Steps>
 
 ## Recovery Codes
@@ -109,19 +85,10 @@ Recovery codes let you access your account if you lose access to your authentica
 ### View Recovery Codes
 
 <Steps>
-<Step>
-### Open recovery codes
-
-Go to **Settings** > **Security**, then click **View Codes** in the Recovery codes section.
-
-</Step>
-
-<Step>
-### Verify and view
-
-Enter a code from your authenticator app. Your recovery codes are displayed.
-
-</Step>
+  <Step>Go to **Settings**.</Step>
+  <Step>Open the **Security** tab.</Step>
+  <Step>Click **View Codes** in the Recovery codes section.</Step>
+  <Step>Enter a code from your authenticator app to view your recovery codes.</Step>
 </Steps>
 
 ### Store Recovery Codes Safely
@@ -144,21 +111,18 @@ Passkeys provide passwordless authentication using biometrics, hardware security
 ### Add a Passkey
 
 <Steps>
-<Step>
-### Open passkeys
+  <Step>
+    ### Open passkeys
 
-Navigate to **Settings** > **Security**, then click **Manage passkeys**.
+    Go to **Settings**, open the **Security** tab, then click **Manage passkeys**.
 
-</Step>
+  </Step>
+  <Step>
+    ### Add and name your passkey
 
-<Step>
-### Add passkey
+    Click **Add passkey**, enter a name (e.g. "MacBook Touch ID", "YubiKey"), then follow your browser's prompts to complete registration.
 
-- Click **Add passkey**
-- Enter a name (e.g. "MacBook Touch ID", "YubiKey")
-- Follow your browser's prompts to complete registration
-
-</Step>
+  </Step>
 </Steps>
 
 ![Add passkey dialog](/get-started-images/documenso-add-passkey-box.webp)
@@ -180,7 +144,7 @@ View and manage all devices currently logged into your account.
 
 ### View Sessions
 
-Go to **Settings** > **Security**, then click **Manage sessions**.
+Go to **Settings**, open the **Security** tab, then click **Manage sessions**.
 
 The sessions table shows events:
 
@@ -205,7 +169,7 @@ Your current session is marked with a "Current" badge.
 
 ## Security Activity
 
-Monitor recent security-related events on your account. Go to **Settings** > **Security**, then click **View activity**.
+Monitor recent security-related events on your account. Go to **Settings**, open the **Security** tab, then click **View activity**.
 
 The activity log shows the events that have occurred on your account. Examples include:
 
@@ -218,24 +182,15 @@ The activity log shows the events that have occurred on your account. Examples i
 
 ## Linked Accounts
 
-View and manage login methods connected to your account (Google, email/password, etc.). Go to **Settings** > **Security** and click **Manage linked accounts**.
+View and manage login methods connected to your account (Google, email/password, etc.). Go to **Settings**, open the **Security** tab, and click **Manage linked accounts**.
 
 To remove a login method:
 
 <Steps>
-<Step>
-### Find the provider
-
-Find the provider in the list.
-
-</Step>
-
-<Step>
-### Unlink
-
-Click **Unlink** and confirm the action.
-
-</Step>
+  <Step>Go to **Settings**.</Step>
+  <Step>Open the **Security** tab.</Step>
+  <Step>Click **Manage linked accounts**.</Step>
+  <Step>Find the provider in the list, click **Unlink**, and confirm.</Step>
 </Steps>
 
 <Callout type="warn">
@@ -261,27 +216,10 @@ Account deletion permanently removes all your data, including documents, signatu
 ### Delete Your Account
 
 <Steps>
-<Step>
-### Open profile
-
-Go to **Settings** > **Profile**, then scroll to the **Delete Account** section.
-
-</Step>
-
-<Step>
-### Delete account
-
-Click **Delete Account**.
-
-</Step>
-
-<Step>
-### Confirm
-
-- Type your email address to confirm
-- Click **Confirm Deletion**
-
-</Step>
+  <Step>Go to **Settings**.</Step>
+  <Step>Open the **Profile** tab and scroll to the **Delete Account** section.</Step>
+  <Step>Click **Delete Account**.</Step>
+  <Step>Type your email address to confirm and click **Confirm Deletion**.</Step>
 </Steps>
 
 <Callout type="error">
