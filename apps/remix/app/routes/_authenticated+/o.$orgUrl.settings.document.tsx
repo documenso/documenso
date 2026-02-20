@@ -60,6 +60,7 @@ export default function OrganisationSettingsDocumentPage() {
         defaultRecipients,
         delegateDocumentOwnership,
         aiFeaturesEnabled,
+        envelopeExpirationPeriod,
       } = data;
 
       if (
@@ -90,6 +91,7 @@ export default function OrganisationSettingsDocumentPage() {
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
           delegateDocumentOwnership: delegateDocumentOwnership,
           aiFeaturesEnabled,
+          envelopeExpirationPeriod: envelopeExpirationPeriod ?? undefined,
         },
       });
 

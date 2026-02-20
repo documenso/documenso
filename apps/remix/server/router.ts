@@ -86,6 +86,7 @@ app.use(async (c, next) => {
 
   const honoLogger = logger.child({
     requestId: c.var.requestId,
+    requestPath: c.req.path,
     ipAddress: metadata.ipAddress,
     userAgent: metadata.userAgent,
   });
@@ -145,6 +146,10 @@ if (env('NODE_ENV') !== 'development') {
 
 // Start license client to verify license on startup.
 void LicenseClient.start();
+
+// Start cron scheduler for background jobs (e.g. envelope expiration sweep).
+// No-op for Inngest provider which handles cron externally.
+jobsClient.startCron();
 
 void migrateDeletedAccountServiceAccount();
 void migrateLegacyServiceAccount();
