@@ -82,38 +82,36 @@ export const run = async ({
       isRecipientEmailValidForSending(recipient),
   );
 
-  await io.runTask('send-cancellation-emails', async () => {
-    await Promise.all(
-      recipientsToNotify.map(async (recipient) => {
-        const template = createElement(DocumentCancelTemplate, {
-          documentName: envelope.title,
-          inviterName: documentOwner.name || undefined,
-          inviterEmail: documentOwner.email,
-          assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
-          cancellationReason: cancellationReason || 'The document has been cancelled.',
-        });
+  await Promise.all(
+    recipientsToNotify.map(async (recipient) => {
+      const template = createElement(DocumentCancelTemplate, {
+        documentName: envelope.title,
+        inviterName: documentOwner.name || undefined,
+        inviterEmail: documentOwner.email,
+        assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
+        cancellationReason: cancellationReason || 'The document has been cancelled.',
+      });
 
-        const [html, text] = await Promise.all([
-          renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-          renderEmailWithI18N(template, {
-            lang: emailLanguage,
-            branding,
-            plainText: true,
-          }),
-        ]);
+      const [html, text] = await Promise.all([
+        renderEmailWithI18N(template, { lang: emailLanguage, branding }),
+        renderEmailWithI18N(template, {
+          lang: emailLanguage,
+          branding,
+          plainText: true,
+        }),
+      ]);
 
-        await mailer.sendMail({
-          to: {
-            name: recipient.name,
-            address: recipient.email,
-          },
-          from: senderEmail,
-          replyTo: replyToEmail,
-          subject: i18n._(msg`Document "${envelope.title}" Cancelled`),
-          html,
-          text,
-        });
-      }),
-    );
-  });
+      await mailer.sendMail({
+        to: {
+          name: recipient.name,
+          address: recipient.email,
+        },
+        from: senderEmail,
+        replyTo: replyToEmail,
+        subject: i18n._(msg`Document "${envelope.title}" Cancelled`),
+        html,
+        text,
+      });
+    }),
+  );
 };

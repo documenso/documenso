@@ -1,5 +1,4 @@
 import { adminSuperDeleteDocument } from '@documenso/lib/server-only/admin/admin-super-delete-document';
-import { sendDeleteEmail } from '@documenso/lib/server-only/document/send-delete-email';
 
 import { adminProcedure } from '../trpc';
 import {
@@ -19,10 +18,9 @@ export const deleteDocumentRoute = adminProcedure
       },
     });
 
-    await sendDeleteEmail({ envelopeId: id, reason });
-
     await adminSuperDeleteDocument({
       envelopeId: id,
+      reason,
       requestMetadata: ctx.metadata.requestMetadata,
     });
   });

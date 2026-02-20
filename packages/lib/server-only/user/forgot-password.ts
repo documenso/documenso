@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import { prisma } from '@documenso/prisma';
 
 import { ONE_DAY } from '../../constants/time';
-import { sendForgotPassword } from '../auth/send-forgot-password';
+import { jobs } from '../../jobs/client';
 
 export const forgotPassword = async ({ email }: { email: string }) => {
   const user = await prisma.user.findFirst({
@@ -46,7 +46,10 @@ export const forgotPassword = async ({ email }: { email: string }) => {
     },
   });
 
-  await sendForgotPassword({
-    userId: user.id,
-  }).catch((err) => console.error(err));
+  await jobs.triggerJob({
+    name: 'send.forgot.password.email',
+    payload: {
+      userId: user.id,
+    },
+  });
 };

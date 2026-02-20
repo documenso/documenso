@@ -105,25 +105,23 @@ export const run = async ({
     assetBaseUrl,
   });
 
-  await io.runTask('send-recipient-signed-email', async () => {
-    const [html, text] = await Promise.all([
-      renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-      renderEmailWithI18N(template, {
-        lang: emailLanguage,
-        branding,
-        plainText: true,
-      }),
-    ]);
+  const [html, text] = await Promise.all([
+    renderEmailWithI18N(template, { lang: emailLanguage, branding }),
+    renderEmailWithI18N(template, {
+      lang: emailLanguage,
+      branding,
+      plainText: true,
+    }),
+  ]);
 
-    await mailer.sendMail({
-      to: {
-        name: owner.name ?? '',
-        address: owner.email,
-      },
-      from: senderEmail,
-      subject: i18n._(msg`${recipientReference} has signed "${envelope.title}"`),
-      html,
-      text,
-    });
+  await mailer.sendMail({
+    to: {
+      name: owner.name ?? '',
+      address: owner.email,
+    },
+    from: senderEmail,
+    subject: i18n._(msg`${recipientReference} has signed "${envelope.title}"`),
+    html,
+    text,
   });
 };

@@ -21,7 +21,6 @@ import { signPdf } from '@documenso/signing';
 
 import { NEXT_PRIVATE_USE_PLAYWRIGHT_PDF } from '../../../constants/app';
 import { AppError, AppErrorCode } from '../../../errors/app-error';
-import { sendCompletedEmail } from '../../../server-only/document/send-completed-email';
 import { getAuditLogsPdf } from '../../../server-only/htmltopdf/get-audit-logs-pdf';
 import { getCertificatePdf } from '../../../server-only/htmltopdf/get-certificate-pdf';
 import { insertFieldInPDFV1 } from '../../../server-only/pdf/insert-field-in-pdf-v1';
@@ -323,20 +322,21 @@ export const run = async ({
     };
   });
 
-  await io.runTask('send-completed-email', async () => {
-    let shouldSendCompletedEmail = sendEmail && !isResealing && !isRejected;
+  let shouldSendCompletedEmail = sendEmail && !isResealing && !isRejected;
 
-    if (isResealing && !isDocumentCompleted(envelopeStatus)) {
-      shouldSendCompletedEmail = sendEmail;
-    }
+  if (isResealing && !isDocumentCompleted(envelopeStatus)) {
+    shouldSendCompletedEmail = sendEmail;
+  }
 
-    if (shouldSendCompletedEmail) {
-      await sendCompletedEmail({
-        id: { type: 'envelopeId', id: envelopeId },
+  if (shouldSendCompletedEmail) {
+    await io.triggerJob('trigger-send-completed-email', {
+      name: 'send.document.completed.email',
+      payload: {
+        envelopeId,
         requestMetadata,
-      });
-    }
-  });
+      },
+    });
+  }
 
   const updatedEnvelope = await prisma.envelope.findFirstOrThrow({
     where: {
