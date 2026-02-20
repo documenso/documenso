@@ -2,6 +2,7 @@ import { sValidator } from '@hono/standard-validator';
 import { compare } from '@node-rs/bcrypt';
 import { UserSecurityAuditLogType } from '@prisma/client';
 import { Hono } from 'hono';
+import { HTTPException } from 'hono/http-exception';
 import { DateTime } from 'luxon';
 import { z } from 'zod';
 
@@ -68,7 +69,9 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     const loginLimited = rateLimitResponse(c, loginLimitResult);
 
     if (loginLimited) {
-      return loginLimited;
+      throw new HTTPException(429, {
+        res: loginLimited,
+      });
     }
 
     const csrfCookieToken = await getCsrfCookie(c);
@@ -189,7 +192,9 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     const signupLimited = rateLimitResponse(c, signupLimitResult);
 
     if (signupLimited) {
-      return signupLimited;
+      throw new HTTPException(429, {
+        res: signupLimited,
+      });
     }
 
     const user = await createUser({ name, email, password, signature }).catch((err) => {
@@ -263,7 +268,9 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     const verifyLimited = rateLimitResponse(c, verifyLimitResult);
 
     if (verifyLimited) {
-      return verifyLimited;
+      throw new HTTPException(429, {
+        res: verifyLimited,
+      });
     }
 
     const { state, userId } = await verifyEmail({ token });
@@ -293,7 +300,9 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     const resendLimited = rateLimitResponse(c, resendLimitResult);
 
     if (resendLimited) {
-      return resendLimited;
+      throw new HTTPException(429, {
+        res: resendLimited,
+      });
     }
 
     await jobsClient.triggerJob({
@@ -321,7 +330,9 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     const forgotLimited = rateLimitResponse(c, forgotLimitResult);
 
     if (forgotLimited) {
-      return forgotLimited;
+      throw new HTTPException(429, {
+        res: forgotLimited,
+      });
     }
 
     if (
@@ -353,7 +364,9 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     const resetLimited = rateLimitResponse(c, resetLimitResult);
 
     if (resetLimited) {
-      return resetLimited;
+      throw new HTTPException(429, {
+        res: resetLimited,
+      });
     }
 
     const user = await getUserByResetToken({ token });

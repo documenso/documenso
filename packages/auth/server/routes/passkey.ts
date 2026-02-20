@@ -3,6 +3,7 @@ import { UserSecurityAuditLogType } from '@prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { Hono } from 'hono';
+import { HTTPException } from 'hono/http-exception';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { rateLimitResponse } from '@documenso/lib/server-only/rate-limit/rate-limit-middleware';
@@ -32,7 +33,9 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
     const passkeyLimited = rateLimitResponse(c, passkeyLimitResult);
 
     if (passkeyLimited) {
-      return passkeyLimited;
+      throw new HTTPException(429, {
+        res: passkeyLimited,
+      });
     }
 
     const { csrfToken, credential } = c.req.valid('json');
