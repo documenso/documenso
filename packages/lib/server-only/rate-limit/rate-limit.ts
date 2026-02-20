@@ -104,7 +104,7 @@ export const createRateLimit = (config: RateLimitConfig) => {
           ipCheckLimit = config.max;
         }
 
-        if (ipCheckLimit && ipResult.count >= ipCheckLimit) {
+        if (ipCheckLimit && ipResult.count > ipCheckLimit) {
           logger.warn({
             msg: 'Rate limit exceeded',
             action: config.action,
@@ -143,7 +143,7 @@ export const createRateLimit = (config: RateLimitConfig) => {
             },
           });
 
-          if (identifierResult.count >= config.max) {
+          if (identifierResult.count > config.max) {
             logger.warn({
               msg: 'Rate limit exceeded',
               action: config.action,
