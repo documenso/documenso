@@ -67,6 +67,15 @@ export const createRateLimit = (config: RateLimitConfig) => {
       const reset = new Date(bucket.getTime() + windowMs);
       const ipLimit = config.globalMax ?? config.max;
 
+      if (process.env.DANGEROUS_BYPASS_RATE_LIMITS === 'true') {
+        return {
+          isLimited: false,
+          remaining: ipLimit,
+          limit: ipLimit,
+          reset,
+        };
+      }
+
       try {
         // Always upsert the IP counter.
         const ipResult = await prisma.rateLimit.upsert({

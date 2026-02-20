@@ -7,7 +7,6 @@ import type { Logger } from 'pino';
 
 import { tsRestHonoApp } from '@documenso/api/hono';
 import { auth } from '@documenso/auth/server';
-import { API_V2_BETA_URL, API_V2_URL } from '@documenso/lib/constants/app';
 import { jobsClient } from '@documenso/lib/jobs/client';
 import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import { createRateLimitMiddleware } from '@documenso/lib/server-only/rate-limit/rate-limit-middleware';
@@ -77,9 +76,13 @@ app.use(async (c, next) => {
   await next();
 });
 
-// Apply rate limits to API routes.
+// Apply cors and rate limits to API routes.
+app.use(`/api/v1/*`, cors());
 app.use('/api/v1/*', apiV1RateLimitMiddleware);
+app.use(`/api/v2/*`, cors());
 app.use('/api/v2/*', apiV2RateLimitMiddleware);
+app.use(`/api/v2-beta/*`, cors());
+app.use('/api/v2-beta/*', apiV2RateLimitMiddleware);
 
 // Auth server.
 app.route('/api/auth', auth);
@@ -94,29 +97,26 @@ app.use('/api/ai/*', aiRateLimitMiddleware);
 app.route('/api/ai', aiRoute);
 
 // API servers.
-app.use(`/api/v1/*`, cors());
 app.route('/api/v1', tsRestHonoApp);
 app.use('/api/jobs/*', jobsClient.getApiHandler());
 app.use('/api/trpc/*', trpcRateLimitMiddleware);
 app.use('/api/trpc/*', reactRouterTrpcServer);
 
 // Unstable API server routes. Order matters for these two.
-app.get(`${API_V2_URL}/openapi.json`, (c) => c.json(openApiDocument));
-app.use(`${API_V2_URL}/*`, cors());
+app.get(`/api/v2/openapi.json`, (c) => c.json(openApiDocument));
 // Shadows the download routes that tRPC defines since tRPC-to-openapi doesn't support their return types.
-app.route(`${API_V2_URL}`, downloadRoute);
-app.use(`${API_V2_URL}/*`, async (c) =>
+app.route(`/api/v2`, downloadRoute);
+app.use(`/api/v2/*`, async (c) =>
   openApiTrpcServerHandler(c, {
     isBeta: false,
   }),
 );
 
 // Unstable API server routes. Order matters for these two.
-app.get(`${API_V2_BETA_URL}/openapi.json`, (c) => c.json(openApiDocument));
-app.use(`${API_V2_BETA_URL}/*`, cors());
+app.get(`/api/v2-beta/openapi.json`, (c) => c.json(openApiDocument));
 // Shadows the download routes that tRPC defines since tRPC-to-openapi doesn't support their return types.
-app.route(`${API_V2_BETA_URL}`, downloadRoute);
-app.use(`${API_V2_BETA_URL}/*`, async (c) =>
+app.route(`/api/v2-beta`, downloadRoute);
+app.use(`/api/v2-beta/*`, async (c) =>
   openApiTrpcServerHandler(c, {
     isBeta: true,
   }),
