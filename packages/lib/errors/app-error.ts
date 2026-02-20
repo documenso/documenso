@@ -64,6 +64,11 @@ type AppErrorOptions = {
    * Mainly used for API -> Frontend communication and logging filtering.
    */
   statusCode?: number;
+
+  /**
+   * Optional headers to include when this error is returned in an API response.
+   */
+  headers?: Record<string, string>;
 };
 
 export class AppError extends Error {
@@ -82,6 +87,8 @@ export class AppError extends Error {
    */
   statusCode?: number;
 
+  headers?: Record<string, string>;
+
   name = 'AppError';
 
   /**
@@ -97,6 +104,7 @@ export class AppError extends Error {
     this.code = errorCode;
     this.userMessage = options?.userMessage;
     this.statusCode = options?.statusCode;
+    this.headers = options?.headers;
   }
 
   /**
