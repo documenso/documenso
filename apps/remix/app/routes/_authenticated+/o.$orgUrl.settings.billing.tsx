@@ -70,36 +70,62 @@ export default function TeamsSettingBillingPage() {
               match(organisationSubscription.status)
                 .with('ACTIVE', () => (
                   <p>
-                    {currentProductName ? (
-                      <span>
-                        You are currently subscribed to{' '}
-                        <span className="font-semibold">{currentProductName}</span>
-                      </span>
-                    ) : (
-                      <span>You currently have an active plan</span>
-                    )}
-
-                    {organisationSubscription.periodEnd && (
-                      <span>
-                        {' '}
-                        which is set to{' '}
-                        {organisationSubscription.cancelAtPeriodEnd ? (
-                          <span>
-                            end on{' '}
+                    {match([
+                      organisationSubscription.cancelAtPeriodEnd,
+                      !!organisationSubscription.periodEnd,
+                    ])
+                      .with([true, true], () =>
+                        currentProductName ? (
+                          <Trans>
+                            You are currently subscribed to{' '}
+                            <span className="font-semibold">{currentProductName}</span> which is set
+                            to end on{' '}
                             <span className="font-semibold">
-                              {i18n.date(organisationSubscription.periodEnd)}.
+                              {i18n.date(organisationSubscription.periodEnd!)}
                             </span>
-                          </span>
+                            .
+                          </Trans>
                         ) : (
-                          <span>
-                            automatically renew on{' '}
+                          <Trans>
+                            You currently have an active plan which is set to end on{' '}
                             <span className="font-semibold">
-                              {i18n.date(organisationSubscription.periodEnd)}.
+                              {i18n.date(organisationSubscription.periodEnd!)}
                             </span>
-                          </span>
-                        )}
-                      </span>
-                    )}
+                            .
+                          </Trans>
+                        ),
+                      )
+                      .with([false, true], () =>
+                        currentProductName ? (
+                          <Trans>
+                            You are currently subscribed to{' '}
+                            <span className="font-semibold">{currentProductName}</span> which is set
+                            to automatically renew on{' '}
+                            <span className="font-semibold">
+                              {i18n.date(organisationSubscription.periodEnd!)}
+                            </span>
+                            .
+                          </Trans>
+                        ) : (
+                          <Trans>
+                            You currently have an active plan which is set to automatically renew on{' '}
+                            <span className="font-semibold">
+                              {i18n.date(organisationSubscription.periodEnd!)}
+                            </span>
+                            .
+                          </Trans>
+                        ),
+                      )
+                      .otherwise(() =>
+                        currentProductName ? (
+                          <Trans>
+                            You are currently subscribed to{' '}
+                            <span className="font-semibold">{currentProductName}</span>.
+                          </Trans>
+                        ) : (
+                          <Trans>You currently have an active plan.</Trans>
+                        ),
+                      )}
                   </p>
                 ))
                 .with('INACTIVE', () => (
@@ -107,7 +133,7 @@ export default function TeamsSettingBillingPage() {
                     {currentProductName ? (
                       <Trans>
                         You currently have an inactive{' '}
-                        <span className="font-semibold">{currentProductName}</span> subscription
+                        <span className="font-semibold">{currentProductName}</span> subscription.
                       </Trans>
                     ) : (
                       <Trans>Your current plan is inactive.</Trans>
