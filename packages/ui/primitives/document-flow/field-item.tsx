@@ -14,7 +14,7 @@ import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '@documenso/lib/types/field-meta';
 
-import { useRecipientColors } from '../../lib/recipient-colors';
+import { getRecipientColorStyles } from '../../lib/recipient-colors';
 import { cn } from '../../lib/utils';
 import { FieldContent } from './field-content';
 import type { TDocumentFlowFormSchema } from './types';
@@ -89,7 +89,7 @@ export const FieldItem = ({
     `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`,
   );
 
-  const signerStyles = useRecipientColors(recipientIndex);
+  const signerStyles = getRecipientColorStyles(recipientIndex);
 
   const isDevMode = searchParams.get('devmode') === 'true';
 
