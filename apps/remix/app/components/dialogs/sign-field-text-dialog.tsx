@@ -34,16 +34,17 @@ type TSignFieldTextFormSchema = z.infer<typeof ZSignFieldTextFormSchema>;
 
 export type SignFieldTextDialogProps = {
   fieldMeta?: TTextFieldMeta;
+  initialValue?: string;
 };
 
 export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, string | null>(
-  ({ call, fieldMeta }) => {
+  ({ call, fieldMeta, initialValue }) => {
     const { t } = useLingui();
 
     const form = useForm<TSignFieldTextFormSchema>({
       resolver: zodResolver(ZSignFieldTextFormSchema),
       defaultValues: {
-        text: '',
+        text: initialValue ?? '',
       },
     });
 
