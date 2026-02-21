@@ -2759,6 +2759,10 @@ msgstr "Continue by viewing the document."
 msgid "Continue to login"
 msgstr "Continue to login"
 
+#: apps/remix/app/components/forms/document-preferences-form.tsx
+msgid "Controls how long recipients have to complete signing before the document expires. After expiration, recipients can no longer sign the document."
+msgstr "Controls how long recipients have to complete signing before the document expires. After expiration, recipients can no longer sign the document."
+
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Controls the default email settings when new documents or templates are created"
 msgstr "Controls the default email settings when new documents or templates are created"
@@ -3118,6 +3122,10 @@ msgstr "Currently email domains can only be configured for Platform and above pl
 msgid "Custom {0} MB file"
 msgstr "Custom {0} MB file"
 
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "Custom duration"
+msgstr "Custom duration"
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Custom Organisation Groups"
 msgstr "Custom Organisation Groups"
@@ -3160,6 +3168,10 @@ msgstr "Date Settings"
 msgid "David is the Employee, Lucas is the Manager"
 msgstr "David is the Employee, Lucas is the Manager"
 
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "Days"
+msgstr "Days"
+
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 #: packages/email/templates/organisation-invite.tsx
@@ -3185,6 +3197,10 @@ msgstr "Default Email"
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Default Email Settings"
 msgstr "Default Email Settings"
+
+#: apps/remix/app/components/forms/document-preferences-form.tsx
+msgid "Default Envelope Expiration"
+msgstr "Default Envelope Expiration"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Default file"
@@ -3938,6 +3954,7 @@ msgstr "Documentation"
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 #: apps/remix/app/components/general/skeletons/document-edit-skeleton.tsx
+#: apps/remix/app/components/general/user-profile-skeleton.tsx
 #: apps/remix/app/components/general/user-profile-timur.tsx
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
@@ -4298,6 +4315,22 @@ msgstr "Email Preferences"
 msgid "Email preferences updated"
 msgstr "Email preferences updated"
 
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email recipients when a pending document is deleted"
+msgstr "Email recipients when a pending document is deleted"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email recipients when the document is completed"
+msgstr "Email recipients when the document is completed"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email recipients when they're removed from a pending document"
+msgstr "Email recipients when they're removed from a pending document"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email recipients with a signing request"
+msgstr "Email recipients with a signing request"
+
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
 msgid "Email resent"
@@ -4322,6 +4355,18 @@ msgstr "Email sent!"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Email Settings"
 msgstr "Email Settings"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email the owner when a recipient signs"
+msgstr "Email the owner when a recipient signs"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email the owner when the document is completed"
+msgstr "Email the owner when the document is completed"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Email the signer if the document is still pending"
+msgstr "Email the signer if the document is still pending"
 
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Email verification"
@@ -4698,6 +4743,11 @@ msgstr "Everyone has signed! You will receive an email copy of the signed docume
 msgid "Exceeded timeout"
 msgstr "Exceeded timeout"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+msgid "Expiration"
+msgstr "Expiration"
+
+#: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._index.tsx
 msgid "Expired"
 msgstr "Expired"
@@ -4710,6 +4760,11 @@ msgstr "Expired"
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Expires"
 msgstr "Expires"
+
+#. placeholder {0}: recipient.expiresAt ? i18n.date(recipient.expiresAt, DateTime.DATETIME_MED) : 'N/A'
+#: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+msgid "Expires {0}"
+msgstr "Expires {0}"
 
 #. placeholder {0}: DateTime.fromMillis(Math.max(millisecondsRemaining, 0)).toFormat( 'mm:ss', )
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
@@ -5250,6 +5305,10 @@ msgstr "Home (No Folder)"
 msgid "Horizontal"
 msgstr "Horizontal"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+msgid "How long recipients have to complete this document after it is sent. Uses the team default when set to inherit."
+msgstr "How long recipients have to complete this document after it is sent. Uses the team default when set to inherit."
+
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "I agree to link my account with this organization"
 msgstr "I agree to link my account with this organization"
@@ -5352,6 +5411,10 @@ msgstr "Include the Audit Logs in the Document"
 msgid "Include the Signing Certificate in the Document"
 msgstr "Include the Signing Certificate in the Document"
 
+#: apps/remix/app/components/general/billing-plans.tsx
+msgid "Includes:"
+msgstr "Includes:"
+
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 msgid "Information"
@@ -5362,6 +5425,7 @@ msgid "Inherit authentication method"
 msgstr "Inherit authentication method"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
+#: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
@@ -5427,6 +5491,10 @@ msgstr "Invalid domains"
 #: packages/ui/primitives/document-flow/add-signers.types.ts
 msgid "Invalid email"
 msgstr "Invalid email"
+
+#: apps/remix/app/routes/embed+/v1+/authoring+/_layout.tsx
+msgid "Invalid embedding presign token provided"
+msgstr "Invalid embedding presign token provided"
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Invalid License Key"
@@ -5781,6 +5849,8 @@ msgstr "Loading suggestions..."
 #: apps/remix/app/components/embed/embed-client-loading.tsx
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
+#: packages/ui/components/pdf-viewer/pdf-viewer-konva-lazy.tsx
+#: packages/ui/primitives/pdf-viewer/lazy.tsx
 msgid "Loading..."
 msgstr "Loading..."
 
@@ -6087,6 +6157,10 @@ msgstr "Monthly Active Users: Users that created at least one Document"
 msgid "Monthly Active Users: Users that had at least one of their documents completed"
 msgstr "Monthly Active Users: Users that had at least one of their documents completed"
 
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "Months"
+msgstr "Months"
+
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
@@ -6207,6 +6281,10 @@ msgstr "Never"
 #: apps/remix/app/components/forms/token.tsx
 msgid "Never expire"
 msgstr "Never expire"
+
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "Never expires"
+msgstr "Never expires"
 
 #: apps/remix/app/components/forms/password.tsx
 msgid "New Password"
@@ -6408,6 +6486,10 @@ msgstr "None (Overrides global settings)"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Not found"
 msgstr "Not found"
+
+#: apps/remix/app/routes/embed+/_v0+/_layout.tsx
+msgid "Not Found"
+msgstr "Not Found"
 
 #: apps/remix/app/components/forms/signin.tsx
 msgid "Not supported"
@@ -6820,6 +6902,7 @@ msgid "PDF Document"
 msgstr "PDF Document"
 
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+#: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
@@ -6934,6 +7017,7 @@ msgid "Please check the CSV file and make sure it is according to our format"
 msgstr "Please check the CSV file and make sure it is according to our format"
 
 #: apps/remix/app/components/embed/embed-document-waiting-for-turn.tsx
+#: apps/remix/app/components/embed/embed-recipient-expired.tsx
 msgid "Please check with the parent application for more information."
 msgstr "Please check with the parent application for more information."
 
@@ -7373,6 +7457,10 @@ msgstr "Recipient CC'd the document"
 msgid "Recipient completed their task"
 msgstr "Recipient completed their task"
 
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Recipient expired email"
+msgstr "Recipient expired email"
+
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Recipient failed to validate a 2FA token for the document"
 msgstr "Recipient failed to validate a 2FA token for the document"
@@ -7400,6 +7488,11 @@ msgstr "Recipient signed the document"
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Recipient signing request email"
 msgstr "Recipient signing request email"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
+msgid "Recipient signing window expired"
+msgstr "Recipient signing window expired"
 
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 msgid "Recipient updated"
@@ -7756,6 +7849,7 @@ msgstr "Retry"
 msgid "Return"
 msgstr "Return"
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/expired.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/rejected.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/waiting.tsx
 msgid "Return Home"
@@ -8164,22 +8258,6 @@ msgstr "Send document"
 msgid "Send Document"
 msgstr "Send Document"
 
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send document completed email"
-msgstr "Send document completed email"
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send document completed email to the owner"
-msgstr "Send document completed email to the owner"
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send document deleted email"
-msgstr "Send document deleted email"
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send document pending email"
-msgstr "Send document pending email"
-
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Send documents on behalf of the team using the email address"
 msgstr "Send documents on behalf of the team using the email address"
@@ -8193,16 +8271,8 @@ msgid "Send on Behalf of Team"
 msgstr "Send on Behalf of Team"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send recipient removed email"
-msgstr "Send recipient removed email"
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send recipient signed email"
-msgstr "Send recipient signed email"
-
-#: packages/ui/components/document/document-email-checkboxes.tsx
-msgid "Send recipient signing request email"
-msgstr "Send recipient signing request email"
+msgid "Send recipient expired email to the owner"
+msgstr "Send recipient expired email to the owner"
 
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
@@ -8511,6 +8581,10 @@ msgstr "Signing certificate provided by"
 msgid "Signing Complete!"
 msgstr "Signing Complete!"
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/expired.tsx
+msgid "Signing Deadline Expired"
+msgstr "Signing Deadline Expired"
+
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 msgid "Signing for"
 msgstr "Signing for"
@@ -8534,6 +8608,26 @@ msgstr "Signing links have been generated for this document."
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "Signing order is enabled."
 msgstr "Signing order is enabled."
+
+#: apps/remix/app/components/embed/embed-recipient-expired.tsx
+msgid "Signing Window Expired"
+msgstr "Signing Window Expired"
+
+#. placeholder {0}: recipient.name || recipient.email
+#. placeholder {1}: envelope.title
+#: packages/lib/jobs/definitions/emails/send-owner-recipient-expired-email.handler.ts
+msgid "Signing window expired for \"{0}\" on \"{1}\""
+msgstr "Signing window expired for \"{0}\" on \"{1}\""
+
+#: packages/email/template-components/template-recipient-expired.tsx
+msgid "Signing window expired for \"{displayName}\" on \"{documentName}\""
+msgstr "Signing window expired for \"{displayName}\" on \"{documentName}\""
+
+#. placeholder {0}: data.recipientName || data.recipientEmail
+#: packages/lib/utils/document-audit-logs.ts
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Signing window expired for {0}"
+msgstr "Signing window expired for {0}"
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Signups are disabled."
@@ -9484,12 +9578,24 @@ msgstr "The signer's email"
 msgid "The signer's name"
 msgstr "The signer's name"
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/expired.tsx
+msgid "The signing deadline for this document has passed. Please contact the document owner if you need a new copy to sign."
+msgstr "The signing deadline for this document has passed. Please contact the document owner if you need a new copy to sign."
+
 #: apps/remix/app/components/general/avatar-with-recipient.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "The signing link has been copied to your clipboard."
 msgstr "The signing link has been copied to your clipboard."
+
+#: packages/email/templates/recipient-expired.tsx
+msgid "The signing window for \"{recipientName}\" on document \"{documentName}\" has expired."
+msgstr "The signing window for \"{recipientName}\" on document \"{documentName}\" has expired."
+
+#: packages/email/template-components/template-recipient-expired.tsx
+msgid "The signing window for {displayName} on document \"{documentName}\" has expired. You can resend the document to extend their deadline or cancel the document."
+msgstr "The signing window for {displayName} on document \"{documentName}\" has expired. You can resend the document to extend their deadline or cancel the document."
 
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "The site banner is a message that is shown at the top of the site. It can be used to display important information to your users."
@@ -9855,6 +9961,10 @@ msgstr "This will be sent to all recipients once the document has been fully com
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "This will be sent to the document owner once the document has been fully completed."
 msgstr "This will be sent to the document owner once the document has been fully completed."
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "This will be sent to the document owner when a recipient's signing window has expired."
+msgstr "This will be sent to the document owner when a recipient's signing window has expired."
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "This will check and sync the status of all email domains for this organisation"
@@ -10787,6 +10897,7 @@ msgstr "View document"
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
 #: packages/email/template-components/template-document-invite.tsx
 #: packages/email/template-components/template-document-rejected.tsx
+#: packages/email/template-components/template-recipient-expired.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
@@ -11314,6 +11425,10 @@ msgstr "Webhook URL"
 msgid "Webhooks"
 msgstr "Webhooks"
 
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "Weeks"
+msgstr "Weeks"
+
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Welcome"
 msgstr "Welcome"
@@ -11398,6 +11513,10 @@ msgstr "Write a description to display on your public profile"
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Yearly"
 msgstr "Yearly"
+
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "Years"
+msgstr "Years"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
@@ -12372,6 +12491,10 @@ msgstr "Your recovery code has been copied to your clipboard."
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 msgid "Your recovery codes are listed below. Please store them in a safe place."
 msgstr "Your recovery codes are listed below. Please store them in a safe place."
+
+#: apps/remix/app/components/embed/embed-recipient-expired.tsx
+msgid "Your signing window for this document has expired. Please contact the sender for a new invitation."
+msgstr "Your signing window for this document has expired. Please contact the sender for a new invitation."
 
 #: apps/remix/app/components/forms/support-ticket-form.tsx
 msgid "Your support request has been submitted. We'll get back to you soon!"
