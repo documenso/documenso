@@ -22,6 +22,8 @@ import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { formatDocumentsPath } from '../../utils/teams';
 import { getEmailContext } from '../email/get-email-context';
 
+const TWENTY_MB_IN_BYTES = 20 * 1024 * 1024;
+
 export interface SendDocumentOptions {
   id: EnvelopeIdOptions;
   requestMetadata?: RequestMetadata;
@@ -81,7 +83,7 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
 
   const { user: owner } = envelope;
 
-  const completedDocumentEmailAttachments = await Promise.all(
+  let completedDocumentEmailAttachments = await Promise.all(
     envelope.envelopeItems.map(async (envelopeItem) => {
       const file = await getFileServerSide(envelopeItem.documentData);
 
@@ -96,6 +98,16 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
       };
     }),
   );
+
+  const allAttachmentsSize = completedDocumentEmailAttachments.reduce(
+    (acc, attachment) => acc + attachment.content.length,
+    0,
+  );
+
+  // If the total size of attachments exceeds 20MB, do not include attachments and instead provide a download link in the email body.
+  if (allAttachmentsSize > TWENTY_MB_IN_BYTES) {
+    completedDocumentEmailAttachments = [];
+  }
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 

@@ -1,6 +1,3 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
 import type { Field, Signature } from '@prisma/client';
 import {
   DocumentSigningOrder,
@@ -18,14 +15,11 @@ import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
-import { mailer } from '@documenso/email/mailer';
-import { DocumentCreatedFromDirectTemplateEmailTemplate } from '@documenso/email/templates/document-created-from-direct-template';
+import { jobs } from '@documenso/lib/jobs/client';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
 
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE, RECIPIENT_DIFF_TYPE } from '../../types/document-audit-logs';
 import type { TRecipientActionAuthTypes } from '../../types/document-auth';
@@ -48,8 +42,6 @@ import {
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { formatDocumentsPath } from '../../utils/teams';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
 import { getEmailContext } from '../email/get-email-context';
@@ -156,7 +148,7 @@ export const createDocumentFromDirectTemplate = async ({
     });
   }
 
-  const { branding, settings, senderEmail, emailLanguage } = await getEmailContext({
+  const { settings } = await getEmailContext({
     emailType: 'INTERNAL',
     source: {
       type: 'team',
@@ -164,7 +156,7 @@ export const createDocumentFromDirectTemplate = async ({
     },
   });
 
-  const { recipients, directLink, user: templateOwner } = directTemplateEnvelope;
+  const { recipients, directLink } = directTemplateEnvelope;
 
   const directTemplateRecipient = recipients.find(
     (recipient) => recipient.id === directLink.directTemplateRecipientId,
@@ -755,42 +747,22 @@ export const createDocumentFromDirectTemplate = async ({
       });
     }
 
-    // Send email to template owner.
-    const emailTemplate = createElement(DocumentCreatedFromDirectTemplateEmailTemplate, {
-      recipientName: directRecipientEmail,
-      recipientRole: directTemplateRecipient.role,
-      documentLink: `${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(createdEnvelope.team?.url)}/${
-        createdEnvelope.id
-      }`,
-      documentName: createdEnvelope.title,
-      assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000',
-    });
-
-    const [html, text] = await Promise.all([
-      renderEmailWithI18N(emailTemplate, { lang: emailLanguage, branding }),
-      renderEmailWithI18N(emailTemplate, { lang: emailLanguage, branding, plainText: true }),
-    ]);
-
-    const i18n = await getI18nInstance(emailLanguage);
-
-    await mailer.sendMail({
-      to: [
-        {
-          name: templateOwner.name || '',
-          address: templateOwner.email,
-        },
-      ],
-      from: senderEmail,
-      subject: i18n._(msg`Document created from direct template`),
-      html,
-      text,
-    });
-
     return {
       createdEnvelope,
       token: createdDirectRecipient.token,
       recipientId: createdDirectRecipient.id,
     };
+  });
+
+  // Dispatch the email notification to the template owner as a background job.
+  // This is outside the transaction so email failures don't roll back document creation.
+  await jobs.triggerJob({
+    name: 'send.direct.template.created.email',
+    payload: {
+      envelopeId: createdEnvelope.id,
+      teamId: createdEnvelope.teamId,
+      directRecipientId: recipientId,
+    },
   });
 
   try {

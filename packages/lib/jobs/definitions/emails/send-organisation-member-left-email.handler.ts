@@ -75,40 +75,35 @@ export const run = async ({
       continue;
     }
 
-    await io.runTask(
-      `send-organisation-member-left-email--${oldMember.id}_${member.id}`,
-      async () => {
-        const emailContent = createElement(OrganisationLeaveEmailTemplate, {
-          assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
-          baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
-          memberName: oldMember.name || '',
-          memberEmail: oldMember.email,
-          organisationName: organisation.name,
-          organisationUrl: organisation.url,
-        });
+    const emailContent = createElement(OrganisationLeaveEmailTemplate, {
+      assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
+      baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
+      memberName: oldMember.name || '',
+      memberEmail: oldMember.email,
+      organisationName: organisation.name,
+      organisationUrl: organisation.url,
+    });
 
-        const [html, text] = await Promise.all([
-          renderEmailWithI18N(emailContent, {
-            lang: emailLanguage,
-            branding,
-          }),
-          renderEmailWithI18N(emailContent, {
-            lang: emailLanguage,
-            branding,
-            plainText: true,
-          }),
-        ]);
+    const [html, text] = await Promise.all([
+      renderEmailWithI18N(emailContent, {
+        lang: emailLanguage,
+        branding,
+      }),
+      renderEmailWithI18N(emailContent, {
+        lang: emailLanguage,
+        branding,
+        plainText: true,
+      }),
+    ]);
 
-        const i18n = await getI18nInstance(emailLanguage);
+    const i18n = await getI18nInstance(emailLanguage);
 
-        await mailer.sendMail({
-          to: member.user.email,
-          from: senderEmail,
-          subject: i18n._(msg`A member has left your organisation`),
-          html,
-          text,
-        });
-      },
-    );
+    await mailer.sendMail({
+      to: member.user.email,
+      from: senderEmail,
+      subject: i18n._(msg`A member has left your organisation`),
+      html,
+      text,
+    });
   }
 };
