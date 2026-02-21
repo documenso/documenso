@@ -1,0 +1,12 @@
+{
+  "title": "Teams",
+  "pages": [
+    "organisations",
+    "create-team",
+    "members",
+    "groups",
+    "billing",
+    "single-sign-on",
+    "microsoft-entra-id"
+  ]
+}
