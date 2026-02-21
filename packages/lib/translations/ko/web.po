@@ -12447,3 +12447,186 @@ msgstr "인증 코드:"
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
 
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.created"
+msgstr "문서 생성됨"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.sent"
+msgstr "문서 전송됨"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.opened"
+msgstr "문서 열림"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.signed"
+msgstr "문서 서명됨"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.completed"
+msgstr "문서 완료됨"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.rejected"
+msgstr "문서 거부됨"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.cancelled"
+msgstr "문서 취소됨"
+
+#: packages/lib/types/subscription.ts
+msgid "Unlimited documents"
+msgstr "무제한 문서"
+
+#: packages/lib/types/subscription.ts
+msgid "Branding"
+msgstr "브랜딩"
+
+#: packages/lib/types/subscription.ts
+msgid "Hide Documenso branding by"
+msgstr "Documenso 브랜딩 숨기기"
+
+#: packages/lib/types/subscription.ts
+msgid "Email domains"
+msgstr "이메일 도메인"
+
+#: packages/lib/types/subscription.ts
+msgid "Embed authoring"
+msgstr "임베디드 작성"
+
+#: packages/lib/types/subscription.ts
+msgid "Embed signing"
+msgstr "임베디드 서명"
+
+#: packages/lib/types/subscription.ts
+msgid "White label for embed authoring"
+msgstr "임베디드 작성용 화이트 라벨"
+
+#: packages/lib/types/subscription.ts
+msgid "White label for embed signing"
+msgstr "임베디드 서명용 화이트 라벨"
+
+#: packages/lib/types/subscription.ts
+msgid "21 CFR"
+msgstr "21 CFR"
+
+#: packages/lib/types/subscription.ts
+msgid "Authentication portal"
+msgstr "인증 포털"
+
+#: packages/lib/types/subscription.ts
+msgid "Allow Legacy Envelopes"
+msgstr "레거시 봉투 허용"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Admins only"
+msgstr "관리자만"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Everyone"
+msgstr "모든 사람"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Managers and above"
+msgstr "매니저 이상"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require account"
+msgstr "계정 필요"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require passkey"
+msgstr "패스키 필요"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require 2FA"
+msgstr "2FA 필요"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require password"
+msgstr "비밀번호 필요"
+
+#: packages/lib/constants/document-auth.ts
+msgid "None (Overrides global settings)"
+msgstr "없음 (전역 설정 무시)"
+
+#: packages/lib/constants/billing.ts
+msgid "Active"
+msgstr "활성"
+
+#: packages/lib/constants/billing.ts
+msgid "Inactive"
+msgstr "비활성"
+
+#: packages/lib/constants/billing.ts
+msgid "Past Due"
+msgstr "연체"
+
+#: packages/lib/constants/roles.ts
+msgid "User"
+msgstr "사용자"
+
+#: packages/lib/constants/roles.ts
+msgid "Admin"
+msgstr "관리자"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "German"
+msgstr "독일어"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "English"
+msgstr "영어"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Spanish"
+msgstr "스페인어"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "French"
+msgstr "프랑스어"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Italian"
+msgstr "이탈리아어"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Japanese"
+msgstr "일본어"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Korean"
+msgstr "한국어"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Dutch"
+msgstr "네덜란드어"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Polish"
+msgstr "폴란드어"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Portuguese (Brazil)"
+msgstr "포르투갈어（브라질）"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Portuguese (Portugal)"
+msgstr "포르투갈어（포르투갈）"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Chinese"
+msgstr "중국어"

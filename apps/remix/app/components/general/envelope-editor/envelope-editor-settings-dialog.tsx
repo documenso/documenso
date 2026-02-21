@@ -421,7 +421,7 @@ export const EnvelopeEditorSettingsDialog = ({
                                 <SelectContent>
                                   {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
                                     <SelectItem key={code} value={code}>
-                                      {language.full}
+                                      {language.nativeName || t(language.name)}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>

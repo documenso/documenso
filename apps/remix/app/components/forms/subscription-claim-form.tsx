@@ -152,6 +152,33 @@ export const SubscriptionClaimForm = ({
             </FormLabel>
 
             <div className="mt-2 space-y-2 rounded-md border p-4">
+              {Object.values(SUBSCRIPTION_CLAIM_FEATURE_FLAGS).map(({ key, label }) => (
+                <FormField
+                  key={key}
+                  control={form.control}
+                  name={`flags.${key}`}
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-x-2">
+                      <FormControl>
+                        <div className="flex items-center">
+                          <Checkbox
+                            id={`flag-${key}`}
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+
+                          <label
+                            className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
+                            htmlFor={`flag-${key}`}
+                          >
+                            {t(label)}
+                          </label>
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              ))}
               {Object.values(SUBSCRIPTION_CLAIM_FEATURE_FLAGS).map(
                 ({ key, label, isEnterprise }) => {
                   const isRestrictedFeature =

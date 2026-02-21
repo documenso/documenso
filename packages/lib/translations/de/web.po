@@ -1331,7 +1331,7 @@ msgstr "Administrator"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Admin Actions"
-msgstr "Admin-Aktionen"
+msgstr "Administrator-Aktionen"
 
 #: apps/remix/app/components/general/menu-switcher.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
@@ -12447,3 +12447,186 @@ msgstr "Ihr Verifizierungscode:"
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
 
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.created"
+msgstr "Dokument Erstellt"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.sent"
+msgstr "Dokument Gesendet"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.opened"
+msgstr "Dokument Geöffnet"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.signed"
+msgstr "Dokument Unterzeichnet"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.completed"
+msgstr "Dokument Abgeschlossen"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.rejected"
+msgstr "Dokument Abgelehnt"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.cancelled"
+msgstr "Dokument Storniert"
+
+#: packages/lib/types/subscription.ts
+msgid "Unlimited documents"
+msgstr "Unbegrenzte Dokumente"
+
+#: packages/lib/types/subscription.ts
+msgid "Branding"
+msgstr "Markenbildung"
+
+#: packages/lib/types/subscription.ts
+msgid "Hide Documenso branding by"
+msgstr "Documenso-Branding ausblenden"
+
+#: packages/lib/types/subscription.ts
+msgid "Email domains"
+msgstr "E-Mail-Domains"
+
+#: packages/lib/types/subscription.ts
+msgid "Embed authoring"
+msgstr "Eingebettete Erstellung"
+
+#: packages/lib/types/subscription.ts
+msgid "Embed signing"
+msgstr "Eingebettete Signierung"
+
+#: packages/lib/types/subscription.ts
+msgid "White label for embed authoring"
+msgstr "White Label für eingebettete Erstellung"
+
+#: packages/lib/types/subscription.ts
+msgid "White label for embed signing"
+msgstr "White Label für eingebettete Signierung"
+
+#: packages/lib/types/subscription.ts
+msgid "21 CFR"
+msgstr "21 CFR"
+
+#: packages/lib/types/subscription.ts
+msgid "Authentication portal"
+msgstr "Authentifizierungsportal"
+
+#: packages/lib/types/subscription.ts
+msgid "Allow Legacy Envelopes"
+msgstr "Legacy-Umschläge zulassen"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Admins only"
+msgstr "Nur Administratoren"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Everyone"
+msgstr "Alle"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Managers and above"
+msgstr "Manager und höher"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require account"
+msgstr "Konto erforderlich"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require passkey"
+msgstr "Passkey erforderlich"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require 2FA"
+msgstr "2FA erforderlich"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require password"
+msgstr "Passwort erforderlich"
+
+#: packages/lib/constants/document-auth.ts
+msgid "None (Overrides global settings)"
+msgstr "Keine (Überschreibt globale Einstellungen)"
+
+#: packages/lib/constants/billing.ts
+msgid "Active"
+msgstr "Aktiv"
+
+#: packages/lib/constants/billing.ts
+msgid "Inactive"
+msgstr "Inaktiv"
+
+#: packages/lib/constants/billing.ts
+msgid "Past Due"
+msgstr "Überfällig"
+
+#: packages/lib/constants/roles.ts
+msgid "User"
+msgstr "Benutzer"
+
+#: packages/lib/constants/roles.ts
+msgid "Admin"
+msgstr "Administrator"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "German"
+msgstr "Deutsch"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "English"
+msgstr "Englisch"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Spanish"
+msgstr "Spanisch"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "French"
+msgstr "Französisch"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Italian"
+msgstr "Italienisch"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Japanese"
+msgstr "Japanisch"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Korean"
+msgstr "Koreanisch"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Dutch"
+msgstr "Niederländisch"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Polish"
+msgstr "Polnisch"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Portuguese (Brazil)"
+msgstr "Portugiesisch (Brasilien)"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Portuguese (Portugal)"
+msgstr "Portugiesisch (Portugal)"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Chinese"
+msgstr "Chinesisch"

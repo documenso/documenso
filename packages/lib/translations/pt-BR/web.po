@@ -115,7 +115,7 @@ msgstr ""
 #. placeholder {0}: detectedRecipients.length
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
 msgid "{0, plural, one {# recipient have been added from AI detection.} other {# recipients have been added from AI detection.}}"
-msgstr ""
+msgstr "{0, plural, one {# destinatário foi adicionado pela detecção de IA.} other {# destinatários foram adicionados pela detecção de IA.}}"
 
 #. placeholder {0}: template.recipients.length
 #: apps/remix/app/routes/_recipient+/d.$token+/_index.tsx
@@ -174,7 +174,7 @@ msgstr "{0, plural, one {1 Destinatário} other {# Destinatários}}"
 #. placeholder {4}: progress.totalPages
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 msgid "{0, plural, one {Page {1} of {2} - # field found} other {Page {3} of {4} - # fields found}}"
-msgstr ""
+msgstr "{0, plural, one {Página {1} de {2} - # campo encontrado} other {Página {3} de {4} - # campos encontrados}}"
 
 #. placeholder {0}: progress.recipientsDetected
 #. placeholder {1}: progress.pagesProcessed
@@ -183,12 +183,12 @@ msgstr ""
 #. placeholder {4}: progress.totalPages
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "{0, plural, one {Page {1} of {2} - # recipient found} other {Page {3} of {4} - # recipients found}}"
-msgstr ""
+msgstr "{0, plural, one {Página {1} de {2} - # destinatário encontrado} other {Página {3} de {4} - # destinatários encontrados}}"
 
 #. placeholder {0}: detectedRecipients.length
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
 msgid "{0, plural, one {Recipient added} other {Recipients added}}"
-msgstr ""
+msgstr "{0, plural, one {Destinatário adicionado} other {Destinatários adicionados}}"
 
 #. placeholder {0}: envelopeIds.length
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
@@ -208,12 +208,12 @@ msgstr "{0, plural, one {Aguardando 1 destinatário} other {Aguardando # destina
 #. placeholder {0}: detectedFields.length
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 msgid "{0, plural, one {We found # field in your document.} other {We found # fields in your document.}}"
-msgstr ""
+msgstr "{0, plural, one {Encontramos # campo no seu documento.} other {Encontramos # campos no seu documento.}}"
 
 #. placeholder {0}: detectedRecipients.length
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "{0, plural, one {We found # recipient in your document.} other {We found # recipients in your document.}}"
-msgstr ""
+msgstr "{0, plural, one {Encontramos # destinatário no seu documento.} other {Encontramos # destinatários no seu documento.}}"
 
 #. placeholder {0}: envelopeIds.length
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
@@ -1322,11 +1322,11 @@ msgstr "Informações adicionais da marca para exibir na parte inferior dos e-ma
 #: packages/lib/constants/organisations-translations.ts
 #: packages/lib/constants/teams-translations.ts
 msgid "Admin"
-msgstr "Admin"
+msgstr "Administrador"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Admin Actions"
-msgstr "Ações de Admin"
+msgstr "Ações de Administrador"
 
 #: apps/remix/app/components/general/menu-switcher.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
@@ -1372,7 +1372,7 @@ msgstr "Recursos de IA"
 
 #: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
 msgid "AI features are disabled for your team. Please ask your team owner or organisation owner to enable them."
-msgstr ""
+msgstr "Os recursos de IA estão desativados para sua equipe. Peça ao proprietário da equipe ou da organização para ativá-los."
 
 #: apps/remix/app/components/general/document/document-status.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
@@ -1878,7 +1878,7 @@ msgstr "Tem certeza de que deseja concluir o documento? Esta ação não pode se
 
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "Are you sure you want to delete the following claim?"
-msgstr "Tem certeza de que deseja excluir a seguinte reivindicação?"
+msgstr "Tem certeza de que deseja excluir o seguinte plano?"
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "Are you sure you want to delete this folder?"
@@ -2391,7 +2391,7 @@ msgstr "Caixa de seleção"
 
 #: packages/ui/primitives/document-flow/field-content.tsx
 msgid "Checkbox option"
-msgstr ""
+msgstr "Opção de caixa de seleção"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Checkbox Settings"
@@ -2442,7 +2442,7 @@ msgstr "Reivindicar conta"
 
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 msgid "Claims"
-msgstr "Reivindicações"
+msgstr "Assinaturas"
 
 #: packages/ui/primitives/data-table.tsx
 msgid "Clear filters"
@@ -2921,11 +2921,11 @@ msgstr "Criar como pendente"
 
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Create claim"
-msgstr "Criar reivindicação"
+msgstr "Criar plano"
 
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Create Claim"
-msgstr "Criar Reivindicação"
+msgstr "Criar Plano"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Create Direct Link"
@@ -3004,7 +3004,7 @@ msgstr "Criar assinatura"
 
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Create Subscription Claim"
-msgstr "Criar Reivindicação de Assinatura"
+msgstr "Criar Plano de Assinatura"
 
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
@@ -3213,7 +3213,7 @@ msgstr "Valor Padrão"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Delegate Document Ownership"
-msgstr ""
+msgstr "Delegar Propriedade do Documento"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "delete"
@@ -3335,7 +3335,7 @@ msgstr "Excluir passkey"
 
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "Delete Subscription Claim"
-msgstr "Excluir Reivindicação de Assinatura"
+msgstr "Excluir Plano de Assinatura"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._index.tsx
 msgid "Delete team"
@@ -3448,7 +3448,7 @@ msgstr "Dispositivo"
 
 #: packages/email/templates/reset-password.tsx
 msgid "Didn't request a password change? We are here to help you secure your account, just <0>contact us</0>."
-msgstr ""
+msgstr "Não solicitou alteração de senha? Estamos aqui para ajudar a proteger sua conta, apenas <0>entre em contato</0>."
 
 #: apps/remix/app/components/general/template/template-direct-link-badge.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
@@ -3801,6 +3801,11 @@ msgctxt "Audit log format"
 msgid "Document opened"
 msgstr "Documento aberto"
 
+#: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
+msgid "Document ownership delegated"
+msgstr "Propriedade do documento delegada"
+
 #: apps/remix/app/components/general/document/document-status.tsx
 msgid "Document pending"
 msgstr "Documento pendente"
@@ -4011,7 +4016,7 @@ msgstr "Não tem uma conta? <0>Inscreva-se</0>"
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 msgid "Don't transfer (Delete all documents)"
-msgstr ""
+msgstr "Não transferir (Excluir todos os documentos)"
 
 #: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
@@ -4372,12 +4377,12 @@ msgstr "Ativar Conta"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
 msgid "Enable AI detection"
-msgstr ""
+msgstr "Ativar detecção de IA"
 
 #: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
 msgid "Enable AI features"
-msgstr ""
+msgstr "Ativar recursos de IA"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Enable AI-powered features such as automatic recipient detection. When enabled, document content will be sent to AI providers. We only use providers that do not retain data for training and prefer European regions where available."
@@ -4421,7 +4426,7 @@ msgstr "Ativar portal SSO"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Enable team API tokens to delegate document ownership to another team member."
-msgstr ""
+msgstr "Permitir que tokens de API da equipe deleguem a propriedade do documento para outro membro da equipe."
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
@@ -4442,7 +4447,7 @@ msgstr "Documento Anexo"
 
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Enclosed Documents"
-msgstr ""
+msgstr "Documentos anexos"
 
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
@@ -4458,7 +4463,7 @@ msgstr "Digite um nome para sua nova pasta. As pastas ajudam você a organizar s
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Enter claim name"
-msgstr "Digite o nome da reivindicação"
+msgstr "Digite o nome do plano"
 
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 msgid "Enter Email"
@@ -4746,7 +4751,7 @@ msgstr "Falha ao criar pasta"
 
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Failed to create subscription claim."
-msgstr "Falha ao criar reivindicação de assinatura."
+msgstr "Falha ao criar plano de assinatura."
 
 #: apps/remix/app/components/forms/support-ticket-form.tsx
 msgid "Failed to create support ticket"
@@ -4758,7 +4763,7 @@ msgstr "Falha ao excluir pasta"
 
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "Failed to delete subscription claim."
-msgstr "Falha ao excluir reivindicação de assinatura."
+msgstr "Falha ao excluir plano de assinatura."
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 msgid "Failed to load document"
@@ -4802,7 +4807,7 @@ msgstr "Falha ao atualizar destinatário"
 
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
 msgid "Failed to update subscription claim."
-msgstr "Falha ao atualizar reivindicação de assinatura."
+msgstr "Falha ao atualizar plano de assinatura."
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
 msgid "Failed to update template"
@@ -4906,7 +4911,7 @@ msgstr "O tamanho do arquivo excede o limite de {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}
 
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Fill in the details to create a new subscription claim."
-msgstr "Preencha os detalhes para criar uma nova reivindicação de assinatura."
+msgstr "Preencha os detalhes para criar um novo plano de assinatura."
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
@@ -4964,7 +4969,7 @@ msgstr "Para cada destinatário, forneça seu e-mail (obrigatório) e nome (opci
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "For example, if the claim has a new flag \"FLAG_1\" set to true, then this organisation will get that flag added."
-msgstr "Por exemplo, se a reivindicação tiver um novo sinalizador \"FLAG_1\" definido como verdadeiro, essa organização terá esse sinalizador adicionado."
+msgstr "Por exemplo, se o plano tiver um novo sinalizador \"FLAG_1\" definido como verdadeiro, essa organização terá esse sinalizador adicionado."
 
 #: packages/lib/server-only/auth/send-forgot-password.ts
 msgid "Forgot Password?"
@@ -5078,15 +5083,15 @@ msgstr "Ir para o documento"
 
 #: packages/ui/primitives/data-table-pagination.tsx
 msgid "Go to first page"
-msgstr ""
+msgstr "Ir para primeira página"
 
 #: packages/ui/primitives/data-table-pagination.tsx
 msgid "Go to last page"
-msgstr ""
+msgstr "Ir para última página"
 
 #: packages/ui/primitives/data-table-pagination.tsx
 msgid "Go to next page"
-msgstr ""
+msgstr "Ir para próxima página"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Go to owner"
@@ -5094,7 +5099,7 @@ msgstr "Ir para o proprietário"
 
 #: packages/ui/primitives/data-table-pagination.tsx
 msgid "Go to previous page"
-msgstr ""
+msgstr "Ir para página anterior"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Go to team"
@@ -5182,7 +5187,7 @@ msgstr "Aqui você pode definir preferências de marca para sua organização. A
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 msgid "Here you can set branding preferences for your team."
-msgstr ""
+msgstr "Aqui você pode definir preferências de marca para sua equipe."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
 msgid "Here you can set document preferences for your organisation. Teams will inherit these settings by default."
@@ -5198,11 +5203,11 @@ msgstr "Aqui você pode definir preferências e padrões para sua equipe."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 msgid "Here you can set your general branding preferences."
-msgstr ""
+msgstr "Aqui você pode definir suas preferências gerais de marca."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
 msgid "Here you can set your general document preferences."
-msgstr ""
+msgstr "Aqui você pode definir suas preferências gerais de documento."
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Here's how it works:"
@@ -5385,7 +5390,7 @@ msgstr "Herdar membros da organização"
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Inherited subscription claim"
-msgstr "Reivindicação de assinatura herdada"
+msgstr "Plano de assinatura herdado"
 
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
@@ -5828,7 +5833,7 @@ msgstr "Gerencie todas as organizações com as quais você está associado atua
 
 #: apps/remix/app/routes/_authenticated+/admin+/claims.tsx
 msgid "Manage all subscription claims"
-msgstr "Gerenciar todas as reivindicações de assinatura"
+msgstr "Gerenciar todos os planos de assinatura"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Manage and view template"
@@ -5870,7 +5875,7 @@ msgstr "Gerenciar organização"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Manage Organisation"
-msgstr ""
+msgstr "Gerenciar Organização"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations._index.tsx
 msgid "Manage organisations"
@@ -6072,7 +6077,7 @@ msgstr "Modificar destinatários"
 
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
 msgid "Modify the details of the subscription claim."
-msgstr "Modifique os detalhes da reivindicação de assinatura."
+msgstr "Modifique os detalhes do plano de assinatura."
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
@@ -6478,7 +6483,7 @@ msgstr "Depois de escanear o código QR ou inserir o código manualmente, insira
 
 #: apps/remix/app/components/dialogs/organisation-email-domain-records-dialog.tsx
 msgid "Once you update your DNS records, it may take up to 48 hours for it to be propogated. Once the DNS propagation is complete you will need to come back and press the \"Sync\" domains button."
-msgstr ""
+msgstr "Após atualizar seus registros DNS, pode levar até 48 horas para serem propagados. Quando a propagação DNS estiver completa, você precisará voltar e pressionar o botão \"Sincronizar\" domínios."
 
 #: packages/lib/constants/template.ts
 msgid "Once your template is set up, share the link anywhere you want. The person who opens the link will be able to enter their information in the direct link recipient field and complete any other fields assigned to them."
@@ -6514,7 +6519,7 @@ msgstr "Ops! Algo deu errado."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Open menu"
-msgstr ""
+msgstr "Abrir menu"
 
 #: apps/remix/app/components/general/stack-avatars-with-tooltip.tsx
 msgid "Opened"
@@ -7603,7 +7608,7 @@ msgstr "Responder ao e-mail"
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "Reply To Email <0>(Optional)</0>"
-msgstr ""
+msgstr "E-mail para resposta <0>(Opcional)</0>"
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Request"
@@ -7759,7 +7764,7 @@ msgstr "Retornar"
 #: apps/remix/app/routes/_recipient+/sign.$token+/rejected.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/waiting.tsx
 msgid "Return Home"
-msgstr ""
+msgstr "Voltar ao início"
 
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
 msgid "Return to Documenso sign in page here"
@@ -7870,7 +7875,7 @@ msgstr "Pesquisar e gerenciar todas as organizações"
 
 #: apps/remix/app/routes/_authenticated+/admin+/claims.tsx
 msgid "Search by claim ID or name"
-msgstr "Pesquisar por ID ou nome da reivindicação"
+msgstr "Pesquisar por ID ou nome do plano"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
 msgid "Search by document title"
@@ -8782,7 +8787,7 @@ msgstr "Reivindicação de assinatura atualizada com sucesso."
 
 #: apps/remix/app/routes/_authenticated+/admin+/claims.tsx
 msgid "Subscription Claims"
-msgstr "Reivindicações de Assinatura"
+msgstr "Planos de Assinatura"
 
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "Subscription invalid"
@@ -9296,7 +9301,7 @@ msgstr "O proprietário do documento foi notificado sobre sua decisão. Eles pod
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
 msgid "The document ownership was delegated to {0} on behalf of {1}"
-msgstr ""
+msgstr "A propriedade do documento foi delegada para {0} em nome de {1}"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "The document was created but could not be sent to recipients."
@@ -9333,7 +9338,7 @@ msgstr "O domínio de e-mail que você está procurando pode ter sido removido, 
 
 #: apps/remix/app/components/forms/signin.tsx
 msgid "The email or password provided is incorrect."
-msgstr ""
+msgstr "O e-mail ou senha fornecidos estão incorretos."
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
@@ -9542,7 +9547,7 @@ msgstr "O token que você usou para redefinir sua senha expirou ou nunca existiu
 
 #: apps/remix/app/components/forms/signin.tsx
 msgid "The two-factor authentication code provided is incorrect."
-msgstr ""
+msgstr "O código de autenticação de dois fatores fornecido está incorreto."
 
 #: apps/remix/app/components/forms/editor/editor-field-signature-form.tsx
 msgid "The typed signature font size"
@@ -9642,7 +9647,7 @@ msgstr "Isso pode levar um ou dois minutos, dependendo do tamanho do seu documen
 
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "This claim is locked and cannot be deleted."
-msgstr "Esta reivindicação está bloqueada e não pode ser excluída."
+msgstr "Este plano está bloqueado e não pode ser excluído."
 
 #: packages/email/template-components/template-document-super-delete.tsx
 msgid "This document can not be recovered, if you would like to dispute the reason for future documents please contact support."
@@ -9713,7 +9718,7 @@ msgstr "Este documento foi criado usando um link direto."
 
 #: packages/email/template-components/template-footer.tsx
 msgid "This document was sent using <0>Documenso</0>."
-msgstr ""
+msgstr "Este documento foi enviado usando <0>Documenso</0>."
 
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 msgid "This document will be duplicated."
@@ -9766,7 +9771,7 @@ msgstr "É assim que o documento chegará aos destinatários quando estiver pron
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "This is the claim that this organisation was initially created with. Any feature flag changes to this claim will be backported into this organisation."
-msgstr "Esta é a reivindicação com a qual esta organização foi criada inicialmente. Quaisquer alterações de sinalizador de recurso nesta reivindicação serão transferidas para esta organização."
+msgstr "Este é o plano com o qual esta organização foi criada inicialmente. Quaisquer alterações de sinalizador de recurso neste plano serão transferidas para esta organização."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "This is the required scopes you must set in your provider's settings"
@@ -9862,7 +9867,7 @@ msgstr "Isso verificará e sincronizará o status de todos os domínios de e-mai
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "This will ONLY backport feature flags which are set to true, anything disabled in the initial claim will not be backported"
-msgstr "Isso APENAS transferirá sinalizadores de recurso definidos como verdadeiro, qualquer coisa desativada na reivindicação inicial não será transferida"
+msgstr "Isso APENAS transferirá sinalizadores de recurso definidos como verdadeiro, qualquer coisa desativada no plano inicial não será transferida"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "This will remove all emails associated with this email domain"
@@ -10113,7 +10118,7 @@ msgstr "Total de Usuários"
 
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 msgid "Transfer documents to a different team"
-msgstr ""
+msgstr "Transferir documentos para uma equipe diferente"
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
@@ -10129,7 +10134,7 @@ msgstr "Tente novamente"
 
 #: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
 msgid "Turn on AI detection to automatically find recipients and fields in your documents. AI providers do not retain your data for training."
-msgstr ""
+msgstr "Ative a detecção de IA para encontrar automaticamente destinatários e campos em seus documentos. Os provedores de IA não retêm seus dados para treinamento."
 
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "Two factor authentication"
@@ -10286,7 +10291,7 @@ msgstr "Não concluído"
 
 #: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
 msgid "Undo"
-msgstr ""
+msgstr "Desfazer"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
@@ -10422,7 +10427,7 @@ msgstr "Atualizar função"
 
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
 msgid "Update Subscription Claim"
-msgstr "Atualizar Reivindicação de Assinatura"
+msgstr "Atualizar Plano de Assinatura"
 
 #: apps/remix/app/components/forms/team-update-form.tsx
 msgid "Update team"
@@ -10909,7 +10914,7 @@ msgstr "Aguardando Sua Vez"
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 msgid "Want to send slick signing links like this one? <0>Check out Documenso</0>."
-msgstr ""
+msgstr "Quer enviar links de assinatura elegantes como este? <0>Confira o Documenso</0>."
 
 #: apps/remix/app/routes/_profile+/_layout.tsx
 msgid "Want your own public profile?"
@@ -10946,7 +10951,7 @@ msgstr "Não conseguimos criar um cliente Stripe. Por favor, tente novamente."
 
 #: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
 msgid "We couldn't enable AI features right now. Please try again."
-msgstr ""
+msgstr "Não foi possível ativar os recursos de IA agora. Tente novamente."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "We couldn't update the group. Please try again."
@@ -11534,12 +11539,12 @@ msgstr "Você está atualizando <0>{0}</0>"
 
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 msgid "You are currently updating <0>{memberName}</0>."
-msgstr ""
+msgstr "Você está atualizando <0>{memberName}</0>."
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
 msgid "You are currently updating <0>{organisationMemberName}</0>."
-msgstr ""
+msgstr "Você está atualizando <0>{organisationMemberName}</0>."
 
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 msgid "You are currently updating the <0>{passkeyName}</0> passkey."
@@ -11605,7 +11610,7 @@ msgstr "Você pode ativar o acesso para permitir que todos os membros da organiz
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.email.tsx
 msgid "You can manage your email preferences here."
-msgstr ""
+msgstr "Você pode gerenciar suas preferências de e-mail aqui."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "You can only detect fields in draft envelopes"
@@ -11613,7 +11618,7 @@ msgstr "Você só pode detectar campos em envelopes de rascunho"
 
 #: packages/email/templates/confirm-team-email.tsx
 msgid "You can revoke access at any time in your team settings on Documenso <0>here</0>."
-msgstr ""
+msgstr "Você pode revogar o acesso a qualquer momento nas configurações da equipe no Documenso <0>aqui</0>."
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "You can update the profile URL by updating the team URL in the general settings page."
@@ -11647,7 +11652,7 @@ msgstr "Você não pode excluir um grupo que tem uma função superior à sua."
 
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
 msgid "You cannot delete this item because the document has been sent to recipients."
-msgstr ""
+msgstr "Você não pode excluir este item porque o documento foi enviado aos destinatários."
 
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
 msgid "You cannot modify a group which has a higher role than you."
@@ -11674,7 +11679,7 @@ msgstr "Você não pode enviar documentos neste momento."
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
 msgid "You cannot upload encrypted PDFs."
-msgstr ""
+msgstr "Você não pode enviar PDFs criptografados."
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "You CC'd the document"
@@ -11712,7 +11717,7 @@ msgstr ""
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "You do not have permission to create a token for this team."
-msgstr ""
+msgstr "Você não tem permissão para criar um token para esta equipe."
 
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgid "You don't manage billing for any organisations."
@@ -11786,7 +11791,7 @@ msgstr "Você ainda não criou ou recebeu nenhum documento. Para criar um docume
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
 msgid "You have reached the limit of the number of files per envelope."
-msgstr ""
+msgstr "Você atingiu o limite do número de arquivos por envelope."
 
 #. placeholder {0}: quota.directTemplates
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
@@ -12108,7 +12113,7 @@ msgstr "Você receberá uma cópia por e-mail do documento assinado assim que to
 
 #: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
 msgid "You're an admin. You can enable AI features for this team right away. Everyone on the team will see AI detection once enabled."
-msgstr ""
+msgstr "Você é um administrador. Você pode ativar os recursos de IA para esta equipe imediatamente. Todos na equipe verão a detecção de IA quando ativada."
 
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
@@ -12212,7 +12217,7 @@ msgstr "Seus modelos de assinatura direta"
 
 #: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
 msgid "Your document content will be sent securely to our AI provider solely for detection and will not be stored or used for training."
-msgstr ""
+msgstr "O conteúdo do seu documento será enviado com segurança ao nosso provedor de IA apenas para detecção e não será armazenado ou usado para treinamento."
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 #: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
@@ -12441,3 +12446,318 @@ msgstr "Seu código de verificação:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "seu-dominio.com outro-dominio.com"
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.created"
+msgstr "Documento Criado"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.sent"
+msgstr "Documento Enviado"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.opened"
+msgstr "Documento Aberto"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.signed"
+msgstr "Documento Assinado"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.completed"
+msgstr "Documento Concluído"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.rejected"
+msgstr "Documento Rejeitado"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.cancelled"
+msgstr "Documento Cancelado"
+
+#: packages/lib/types/subscription.ts
+msgid "Unlimited documents"
+msgstr "Documentos ilimitados"
+
+#: packages/lib/types/subscription.ts
+msgid "Branding"
+msgstr "Marca personalizada"
+
+#: packages/lib/types/subscription.ts
+msgid "Hide Documenso branding by"
+msgstr "Ocultar marca Documenso"
+
+#: packages/lib/types/subscription.ts
+msgid "Email domains"
+msgstr "Domínios de e-mail"
+
+#: packages/lib/types/subscription.ts
+msgid "Embed authoring"
+msgstr "Criação incorporada"
+
+#: packages/lib/types/subscription.ts
+msgid "Embed signing"
+msgstr "Assinatura incorporada"
+
+#: packages/lib/types/subscription.ts
+msgid "White label for embed authoring"
+msgstr "Marca branca para criação incorporada"
+
+#: packages/lib/types/subscription.ts
+msgid "White label for embed signing"
+msgstr "Marca branca para assinatura incorporada"
+
+#: packages/lib/types/subscription.ts
+msgid "21 CFR"
+msgstr "21 CFR"
+
+#: packages/lib/types/subscription.ts
+msgid "Authentication portal"
+msgstr "Portal de autenticação"
+
+#: packages/lib/types/subscription.ts
+msgid "Allow Legacy Envelopes"
+msgstr "Permitir envelopes legados"
+
+msgid "{0, plural, one {# recipient have been added from AI detection.} other {# recipients have been added from AI detection.}}"
+msgstr "{0, plural, one {# destinatário foi adicionado pela detecção de IA.} other {# destinatários foram adicionados pela detecção de IA.}}"
+
+msgid "{0, plural, one {Page {1} of {2} - # field found} other {Page {3} of {4} - # fields found}}"
+msgstr "{0, plural, one {Página {1} de {2} - # campo encontrado} other {Página {3} de {4} - # campos encontrados}}"
+
+msgid "{0, plural, one {Page {1} of {2} - # recipient found} other {Page {3} of {4} - # recipients found}}"
+msgstr "{0, plural, one {Página {1} de {2} - # destinatário encontrado} other {Página {3} de {4} - # destinatários encontrados}}"
+
+msgid "{0, plural, one {Recipient added} other {Recipients added}}"
+msgstr "{0, plural, one {Destinatário adicionado} other {Destinatários adicionados}}"
+
+msgid "{0, plural, one {We found # field in your document.} other {We found # fields in your document.}}"
+msgstr "{0, plural, one {Encontramos # campo no seu documento.} other {Encontramos # campos no seu documento.}}"
+
+msgid "{0, plural, one {We found # recipient in your document.} other {We found # recipients in your document.}}"
+msgstr "{0, plural, one {Encontramos # destinatário no seu documento.} other {Encontramos # destinatários no seu documento.}}"
+
+msgid "AI features are disabled for your team. Please ask your team owner or organisation owner to enable them."
+msgstr "Os recursos de IA estão desativados para sua equipe. Peça ao proprietário da equipe ou da organização para ativá-los."
+
+msgid "Checkbox option"
+msgstr "Opção de caixa de seleção"
+
+msgid "Didn't request a password change? We are here to help you secure your account, just <0>contact us</0>."
+msgstr "Não solicitou alteração de senha? Estamos aqui para ajudar a proteger sua conta, apenas <0>entre em contato</0>."
+
+msgid "Don't transfer (Delete all documents)"
+msgstr "Não transferir (Excluir todos os documentos)"
+
+msgid "Enable AI detection"
+msgstr "Ativar detecção de IA"
+
+msgid "Enable AI features"
+msgstr "Ativar recursos de IA"
+
+msgid "Enclosed Documents"
+msgstr "Documentos anexos"
+
+msgid "Go to first page"
+msgstr "Ir para primeira página"
+
+msgid "Go to last page"
+msgstr "Ir para última página"
+
+msgid "Go to next page"
+msgstr "Ir para próxima página"
+
+msgid "Go to previous page"
+msgstr "Ir para página anterior"
+
+msgid "Here you can set branding preferences for your team."
+msgstr "Aqui você pode definir preferências de marca para sua equipe."
+
+msgid "Here you can set your general branding preferences."
+msgstr "Aqui você pode definir suas preferências gerais de marca."
+
+msgid "Here you can set your general document preferences."
+msgstr "Aqui você pode definir suas preferências gerais de documento."
+
+msgid "Manage Organisation"
+msgstr "Gerenciar Organização"
+
+msgid "Once you update your DNS records, it may take up to 48 hours for it to be propogated. Once the DNS propagation is complete you will need to come back and press the \"Sync\" domains button."
+msgstr "Após atualizar seus registros DNS, pode levar até 48 horas para serem propagados. Quando a propagação DNS estiver completa, você precisará voltar e pressionar o botão \"Sincronizar\" domínios."
+
+msgid "Open menu"
+msgstr "Abrir menu"
+
+msgid "Reply To Email <0>(Optional)</0>"
+msgstr "E-mail para resposta <0>(Opcional)</0>"
+
+msgid "Return Home"
+msgstr "Voltar ao início"
+
+msgid "The document ownership was delegated to {0} on behalf of {1}"
+msgstr "A propriedade do documento foi delegada para {0} em nome de {1}"
+
+msgid "The email or password provided is incorrect."
+msgstr "O e-mail ou senha fornecidos estão incorretos."
+
+msgid "The two-factor authentication code provided is incorrect."
+msgstr "O código de autenticação de dois fatores fornecido está incorreto."
+
+msgid "This document was sent using <0>Documenso</0>."
+msgstr "Este documento foi enviado usando <0>Documenso</0>."
+
+msgid "Transfer documents to a different team"
+msgstr "Transferir documentos para uma equipe diferente"
+
+msgid "Turn on AI detection to automatically find recipients and fields in your documents. AI providers do not retain your data for training."
+msgstr "Ative a detecção de IA para encontrar automaticamente destinatários e campos em seus documentos. Os provedores de IA não retêm seus dados para treinamento."
+
+msgid "Undo"
+msgstr "Desfazer"
+
+msgid "Want to send slick signing links like this one? <0>Check out Documenso</0>."
+msgstr "Quer enviar links de assinatura elegantes como este? <0>Confira o Documenso</0>."
+
+msgid "We couldn't enable AI features right now. Please try again."
+msgstr "Não foi possível ativar os recursos de IA agora. Tente novamente."
+
+msgid "You are currently updating <0>{memberName}</0>."
+msgstr "Você está atualizando <0>{memberName}</0>."
+
+msgid "You are currently updating <0>{organisationMemberName}</0>."
+msgstr "Você está atualizando <0>{organisationMemberName}</0>."
+
+msgid "You can manage your email preferences here."
+msgstr "Você pode gerenciar suas preferências de e-mail aqui."
+
+msgid "You can revoke access at any time in your team settings on Documenso <0>here</0>."
+msgstr "Você pode revogar o acesso a qualquer momento nas configurações da equipe no Documenso <0>aqui</0>."
+
+msgid "You cannot delete this item because the document has been sent to recipients."
+msgstr "Você não pode excluir este item porque o documento foi enviado aos destinatários."
+
+msgid "You cannot upload encrypted PDFs."
+msgstr "Você não pode enviar PDFs criptografados."
+
+msgid "You do not have permission to create a token for this team."
+msgstr "Você não tem permissão para criar um token para esta equipe."
+
+msgid "You have reached the limit of the number of files per envelope."
+msgstr "Você atingiu o limite do número de arquivos por envelope."
+
+msgid "You're an admin. You can enable AI features for this team right away. Everyone on the team will see AI detection once enabled."
+msgstr "Você é um administrador. Você pode ativar os recursos de IA para esta equipe imediatamente. Todos na equipe verão a detecção de IA quando ativada."
+
+msgid "Your document content will be sent securely to our AI provider solely for detection and will not be stored or used for training."
+msgstr "O conteúdo do seu documento será enviado com segurança ao nosso provedor de IA apenas para detecção e não será armazenado ou usado para treinamento."
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Admins only"
+msgstr "Apenas administradores"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Everyone"
+msgstr "Todos"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Managers and above"
+msgstr "Gerentes e acima"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require account"
+msgstr "Requer conta"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require passkey"
+msgstr "Requer passkey"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require 2FA"
+msgstr "Requer 2FA"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require password"
+msgstr "Requer senha"
+
+#: packages/lib/constants/document-auth.ts
+msgid "None (Overrides global settings)"
+msgstr "Nenhum (Sobrepõe configurações globais)"
+
+#: packages/lib/constants/billing.ts
+msgid "Active"
+msgstr "Ativo"
+
+#: packages/lib/constants/billing.ts
+msgid "Inactive"
+msgstr "Inativo"
+
+#: packages/lib/constants/billing.ts
+msgid "Past Due"
+msgstr "Vencido"
+
+#: packages/lib/constants/roles.ts
+msgid "User"
+msgstr "Usuário"
+
+#: packages/lib/constants/roles.ts
+msgid "Admin"
+msgstr "Administrador"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "German"
+msgstr "Alemão"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "English"
+msgstr "Inglês"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Spanish"
+msgstr "Espanhol"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "French"
+msgstr "Francês"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Italian"
+msgstr "Italiano"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Japanese"
+msgstr "Japonês"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Korean"
+msgstr "Coreano"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Dutch"
+msgstr "Holandês"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Polish"
+msgstr "Polonês"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Portuguese (Brazil)"
+msgstr "Português (Brasil)"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Portuguese (Portugal)"
+msgstr "Português (Portugal)"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Chinese"
+msgstr "Chinês"

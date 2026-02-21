@@ -12447,3 +12447,186 @@ msgstr "您的验证码："
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
 
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.created"
+msgstr "文档已创建"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.sent"
+msgstr "文档已发送"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.opened"
+msgstr "文档已打开"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.signed"
+msgstr "文档已签署"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.completed"
+msgstr "文档已完成"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.rejected"
+msgstr "文档已拒绝"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.cancelled"
+msgstr "文档已取消"
+
+#: packages/lib/types/subscription.ts
+msgid "Unlimited documents"
+msgstr "无限文档"
+
+#: packages/lib/types/subscription.ts
+msgid "Branding"
+msgstr "品牌定制"
+
+#: packages/lib/types/subscription.ts
+msgid "Hide Documenso branding by"
+msgstr "隐藏Documenso品牌"
+
+#: packages/lib/types/subscription.ts
+msgid "Email domains"
+msgstr "电子邮件域"
+
+#: packages/lib/types/subscription.ts
+msgid "Embed authoring"
+msgstr "嵌入式创作"
+
+#: packages/lib/types/subscription.ts
+msgid "Embed signing"
+msgstr "嵌入式签署"
+
+#: packages/lib/types/subscription.ts
+msgid "White label for embed authoring"
+msgstr "嵌入式创作白标"
+
+#: packages/lib/types/subscription.ts
+msgid "White label for embed signing"
+msgstr "嵌入式签署白标"
+
+#: packages/lib/types/subscription.ts
+msgid "21 CFR"
+msgstr "21 CFR"
+
+#: packages/lib/types/subscription.ts
+msgid "Authentication portal"
+msgstr "认证门户"
+
+#: packages/lib/types/subscription.ts
+msgid "Allow Legacy Envelopes"
+msgstr "允许旧版信封"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Admins only"
+msgstr "仅管理员"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Everyone"
+msgstr "所有人"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Managers and above"
+msgstr "经理及以上"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require account"
+msgstr "需要账户"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require passkey"
+msgstr "需要通行密钥"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require 2FA"
+msgstr "需要2FA"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require password"
+msgstr "需要密码"
+
+#: packages/lib/constants/document-auth.ts
+msgid "None (Overrides global settings)"
+msgstr "无（覆盖全局设置）"
+
+#: packages/lib/constants/billing.ts
+msgid "Active"
+msgstr "活跃"
+
+#: packages/lib/constants/billing.ts
+msgid "Inactive"
+msgstr "不活跃"
+
+#: packages/lib/constants/billing.ts
+msgid "Past Due"
+msgstr "逾期"
+
+#: packages/lib/constants/roles.ts
+msgid "User"
+msgstr "用户"
+
+#: packages/lib/constants/roles.ts
+msgid "Admin"
+msgstr "管理员"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "German"
+msgstr "德语"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "English"
+msgstr "英语"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Spanish"
+msgstr "西班牙语"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "French"
+msgstr "法语"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Italian"
+msgstr "意大利语"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Japanese"
+msgstr "日语"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Korean"
+msgstr "韩语"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Dutch"
+msgstr "荷兰语"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Polish"
+msgstr "波兰语"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Portuguese (Brazil)"
+msgstr "葡萄牙语（巴西）"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Portuguese (Portugal)"
+msgstr "葡萄牙语（葡萄牙）"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Chinese"
+msgstr "中文"
