@@ -1,13 +1,16 @@
 import { useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
+import type { TemplateType } from '@prisma/client';
 import { EnvelopeType } from '@prisma/client';
 import { Bird } from 'lucide-react';
 import { useParams, useSearchParams } from 'react-router';
 
 import { useSessionStorage } from '@documenso/lib/client-only/hooks/use-session-storage';
 import { FolderType } from '@documenso/lib/types/folder-type';
+import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
+import { parseToStringArray } from '@documenso/lib/utils/params';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
@@ -19,6 +22,7 @@ import { EnvelopeDropZoneWrapper } from '~/components/general/envelope/envelope-
 import { FolderGrid } from '~/components/general/folder/folder-grid';
 import { EnvelopesTableBulkActionBar } from '~/components/tables/envelopes-table-bulk-action-bar';
 import { TemplatesTable } from '~/components/tables/templates-table';
+import { TemplatesTableToolbar } from '~/components/tables/templates-table-toolbar';
 import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
@@ -26,14 +30,28 @@ export function meta() {
   return appMetaTags('Templates');
 }
 
+const ZTemplatesSearchParamsSchema = ZFindSearchParamsSchema.pick({
+  query: true,
+  page: true,
+  perPage: true,
+});
+
 export default function TemplatesPage() {
   const team = useCurrentTeam();
 
   const { folderId } = useParams();
   const [searchParams] = useSearchParams();
 
-  const page = Number(searchParams.get('page')) || 1;
-  const perPage = Number(searchParams.get('perPage')) || 10;
+  const findTemplatesSearchParams = useMemo(
+    () =>
+      ZTemplatesSearchParamsSchema.safeParse(Object.fromEntries(searchParams.entries())).data || {},
+    [searchParams],
+  );
+
+  const typeFilter = useMemo(() => {
+    const selected = parseToStringArray(searchParams.get('type'));
+    return selected.length === 1 ? (selected[0] as TemplateType) : undefined;
+  }, [searchParams]);
 
   const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>(
     'templates-bulk-selection',
@@ -50,8 +68,8 @@ export default function TemplatesPage() {
   const templateRootPath = formatTemplatesPath(team.url);
 
   const { data, isLoading, isLoadingError } = trpc.template.findTemplates.useQuery({
-    page: page,
-    perPage: perPage,
+    ...findTemplatesSearchParams,
+    type: typeFilter,
     folderId,
   });
 
@@ -72,6 +90,10 @@ export default function TemplatesPage() {
             <h1 className="truncate text-2xl font-semibold md:text-3xl">
               <Trans>Templates</Trans>
             </h1>
+          </div>
+
+          <div className="mt-8">
+            <TemplatesTableToolbar />
           </div>
 
           <div className="mt-8">
