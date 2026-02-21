@@ -69,7 +69,7 @@ const ZProviderFormSchema = ZUpdateOrganisationAuthenticationPortalRequestSchema
 type TProviderFormSchema = z.infer<typeof ZProviderFormSchema>;
 
 export function meta() {
-  return appMetaTags('Organisation SSO Portal');
+  return appMetaTags(msg`Organisation SSO Portal`);
 }
 
 export default function OrganisationSettingSSOLoginPage() {

@@ -1,12 +1,27 @@
+import type { MessageDescriptor } from '@lingui/core';
+import { i18n } from '@lingui/core';
+
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 
-export const appMetaTags = (title?: string) => {
+/**
+ * Generate meta tags for the application.
+ *
+ * @param title - The page title. Can be a string or a MessageDescriptor for i18n support.
+ */
+export const appMetaTags = (title?: string | MessageDescriptor) => {
   const description =
     'Join Documenso, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.';
 
+  // Resolve the title - if it's a MessageDescriptor, translate it
+  const resolvedTitle = title
+    ? typeof title === 'string'
+      ? title
+      : i18n._(title)
+    : undefined;
+
   return [
     {
-      title: title ? `${title} - Documenso` : 'Documenso',
+      title: resolvedTitle ? `${resolvedTitle} - Documenso` : 'Documenso',
     },
     {
       name: 'description',
