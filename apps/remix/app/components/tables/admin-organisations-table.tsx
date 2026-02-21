@@ -131,7 +131,7 @@ export const AdminOrganisationsTable = ({
               target="_blank"
               className="flex flex-row items-center gap-2"
             >
-              {SUBSCRIPTION_STATUS_MAP[row.original.subscription.status]}
+              {i18n._(SUBSCRIPTION_STATUS_MAP[row.original.subscription.status])}
               <ExternalLinkIcon className="h-4 w-4" />
             </Link>
           ) : (
@@ -177,7 +177,7 @@ export const AdminOrganisationsTable = ({
         ),
       },
     ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
-  }, []);
+  }, [i18n, t, memberUserId, showOwnerColumn]);
 
   return (
     <div>
