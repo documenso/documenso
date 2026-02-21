@@ -47,6 +47,8 @@ export const ZBaseFieldMeta = z.object({
   required: z.boolean().optional(),
   readOnly: z.boolean().optional(),
   fontSize: z.number().min(8).max(96).default(DEFAULT_FIELD_FONT_SIZE).optional(),
+  // rsu87custom
+  fieldId: z.string().optional(),
 });
 
 export type TBaseFieldMeta = z.infer<typeof ZBaseFieldMeta>;
@@ -292,6 +294,7 @@ export const FIELD_TEXT_META_DEFAULT_VALUES: TTextFieldMeta = {
   label: '',
   placeholder: '',
   text: '',
+  fieldId: '',
   required: false,
   readOnly: false,
 };

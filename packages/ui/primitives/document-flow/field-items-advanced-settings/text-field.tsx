@@ -27,8 +27,11 @@ export const TextFieldAdvancedSettings = ({
 }: TextFieldAdvancedSettingsProps) => {
   const { t } = useLingui();
 
+  console.log('TextFieldAdvancedSettings fieldState:', fieldState);
+
   const handleInput = (field: keyof TextFieldMeta, value: string | boolean) => {
     const text = field === 'text' ? String(value) : (fieldState.text ?? '');
+    const fieldId = field === 'fieldId' ? String(value) : (fieldState.fieldId ?? '');
     const limit =
       field === 'characterLimit' ? Number(value) : Number(fieldState.characterLimit ?? 0);
     const fontSize = field === 'fontSize' ? Number(value) : Number(fieldState.fontSize ?? 14);
@@ -55,7 +58,7 @@ export const TextFieldAdvancedSettings = ({
         </Label>
         <Input
           id="label"
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={t`Field label`}
           value={fieldState.label}
           onChange={(e) => handleFieldChange('label', e.target.value)}
@@ -67,7 +70,7 @@ export const TextFieldAdvancedSettings = ({
         </Label>
         <Input
           id="placeholder"
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={t`Field placeholder`}
           value={fieldState.placeholder}
           onChange={(e) => handleFieldChange('placeholder', e.target.value)}
@@ -80,7 +83,7 @@ export const TextFieldAdvancedSettings = ({
         </Label>
         <Textarea
           id="text"
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={t`Add text to the field`}
           value={fieldState.text}
           onChange={(e) => handleInput('text', e.target.value)}
@@ -95,10 +98,23 @@ export const TextFieldAdvancedSettings = ({
           id="characterLimit"
           type="number"
           min={0}
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={t`Field character limit`}
           value={fieldState.characterLimit}
           onChange={(e) => handleInput('characterLimit', e.target.value)}
+        />
+      </div>
+
+      <div>
+        <Label className="mt-4">
+          <Trans>Field ID</Trans>
+        </Label>
+        <Input
+          id="fieldId"
+          className="mt-2 bg-background"
+          placeholder={t`Unique field identifier`}
+          value={fieldState.fieldId ?? ''}
+          onChange={(e) => handleInput('fieldId', e.target.value)}
         />
       </div>
 
@@ -109,7 +125,7 @@ export const TextFieldAdvancedSettings = ({
         <Input
           id="fontSize"
           type="number"
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={t`Field font size`}
           value={fieldState.fontSize}
           onChange={(e) => handleInput('fontSize', e.target.value)}
@@ -133,7 +149,7 @@ export const TextFieldAdvancedSettings = ({
             handleInput('textAlign', value);
           }}
         >
-          <SelectTrigger className="bg-background mt-2">
+          <SelectTrigger className="mt-2 bg-background">
             <SelectValue placeholder={t`Select text align`} />
           </SelectTrigger>
 

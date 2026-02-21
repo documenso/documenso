@@ -96,6 +96,7 @@ const getDefaultState = (fieldType: FieldType): FieldMeta => {
         label: '',
         placeholder: '',
         text: '',
+        fieldId: '',
         characterLimit: 0,
         fontSize: 14,
         required: false,

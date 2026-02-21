@@ -39,6 +39,7 @@ const ZTextFieldFormSchema = ZTextFieldMeta.pick({
   label: true,
   placeholder: true,
   text: true,
+  fieldId: true,
   characterLimit: true,
   fontSize: true,
   textAlign: true,
@@ -80,6 +81,7 @@ export const EditorFieldTextForm = ({
       label: value.label || '',
       placeholder: value.placeholder || '',
       text: value.text || '',
+      fieldId: value.fieldId || '',
       characterLimit: value.characterLimit || 0,
       fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
       textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
@@ -217,6 +219,22 @@ export const EditorFieldTextForm = ({
                       }
                     }}
                   />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="fieldId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Field ID</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input placeholder={t`Unique field identifier`} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

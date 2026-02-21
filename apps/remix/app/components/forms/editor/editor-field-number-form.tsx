@@ -48,6 +48,7 @@ const ZNumberFieldFormSchema = ZNumberFieldMeta.pick({
   label: true,
   placeholder: true,
   value: true,
+  fieldId: true,
   numberFormat: true,
   fontSize: true,
   textAlign: true,
@@ -109,6 +110,7 @@ export const EditorFieldNumberForm = ({
       label: value.label || '',
       placeholder: value.placeholder || '',
       value: value.value || '',
+      fieldId: value.fieldId || '',
       numberFormat: value.numberFormat || null,
       fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
       textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
@@ -203,7 +205,7 @@ export const EditorFieldNumberForm = ({
                     value={field.value === null ? '-1' : field.value}
                     onValueChange={(value) => field.onChange(value === '-1' ? null : value)}
                   >
-                    <SelectTrigger className="text-muted-foreground bg-background w-full">
+                    <SelectTrigger className="w-full bg-background text-muted-foreground">
                       <SelectValue placeholder={t`Field format`} />
                     </SelectTrigger>
                     <SelectContent position="popper">
@@ -218,6 +220,26 @@ export const EditorFieldNumberForm = ({
                       </SelectItem>
                     </SelectContent>
                   </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="fieldId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Field ID</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    className="bg-background"
+                    placeholder={t`Unique field identifier`}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

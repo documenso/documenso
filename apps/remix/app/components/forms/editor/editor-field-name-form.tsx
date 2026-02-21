@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { useForm, useWatch } from 'react-hook-form';
 import type { z } from 'zod';
 
@@ -10,7 +11,15 @@ import {
   type TNameFieldMeta as NameFieldMeta,
   ZNameFieldMeta,
 } from '@documenso/lib/types/field-meta';
-import { Form } from '@documenso/ui/primitives/form/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@documenso/ui/primitives/form/form';
+import { Input } from '@documenso/ui/primitives/input';
 
 import {
   EditorGenericFontSizeField,
@@ -20,6 +29,7 @@ import {
 const ZNameFieldFormSchema = ZNameFieldMeta.pick({
   fontSize: true,
   textAlign: true,
+  fieldId: true,
 });
 
 type TNameFieldFormSchema = z.infer<typeof ZNameFieldFormSchema>;
@@ -35,12 +45,15 @@ export const EditorFieldNameForm = ({
   },
   onValueChange,
 }: EditorFieldNameFormProps) => {
+  const { t } = useLingui();
+
   const form = useForm<TNameFieldFormSchema>({
     resolver: zodResolver(ZNameFieldFormSchema),
     mode: 'onChange',
     defaultValues: {
       fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
       textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
+      fieldId: value.fieldId || '',
     },
   });
 
@@ -69,6 +82,22 @@ export const EditorFieldNameForm = ({
           <EditorGenericFontSizeField formControl={form.control} />
 
           <EditorGenericTextAlignField formControl={form.control} />
+
+          <FormField
+            control={form.control}
+            name="fieldId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Field ID</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input placeholder={t`Unique field identifier`} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </fieldset>
       </form>
     </Form>
