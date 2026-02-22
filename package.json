@@ -86,7 +86,7 @@
   "dependencies": {
     "@ai-sdk/google-vertex": "3.0.81",
     "@documenso/prisma": "*",
-    "@libpdf/core": "^0.2.5",
+    "@libpdf/core": "^0.2.9",
     "@lingui/conf": "^5.6.0",
     "@lingui/core": "^5.6.0",
     "ai": "^5.0.104",
