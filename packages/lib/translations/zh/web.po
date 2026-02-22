@@ -8,7 +8,7 @@ msgstr ""
 "Language: zh\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-02-16 06:23\n"
+"PO-Revision-Date: 2026-02-20 02:58\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -2764,6 +2764,10 @@ msgstr "继续查看文档。"
 msgid "Continue to login"
 msgstr "继续登录"
 
+#: apps/remix/app/components/forms/document-preferences-form.tsx
+msgid "Controls how long recipients have to complete signing before the document expires. After expiration, recipients can no longer sign the document."
+msgstr "控制收件人在文档过期前完成签署的时间长度。过期后，收件人将无法再签署该文档。"
+
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Controls the default email settings when new documents or templates are created"
 msgstr "控制新建文档或模板时的默认邮件设置"
@@ -3123,6 +3127,10 @@ msgstr "目前仅 Platform 及以上套餐可以配置邮箱域名。"
 msgid "Custom {0} MB file"
 msgstr "自定义 {0} MB 文件"
 
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "Custom duration"
+msgstr "自定义时长"
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Custom Organisation Groups"
 msgstr "自定义组织组"
@@ -3165,6 +3173,10 @@ msgstr "日期设置"
 msgid "David is the Employee, Lucas is the Manager"
 msgstr "David 是员工，Lucas 是经理"
 
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "Days"
+msgstr "天"
+
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 #: packages/email/templates/organisation-invite.tsx
@@ -3190,6 +3202,10 @@ msgstr "默认邮箱"
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Default Email Settings"
 msgstr "默认邮件设置"
+
+#: apps/remix/app/components/forms/document-preferences-form.tsx
+msgid "Default Envelope Expiration"
+msgstr "默认信封过期时间"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Default file"
@@ -3943,6 +3959,7 @@ msgstr "文档"
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 #: apps/remix/app/components/general/skeletons/document-edit-skeleton.tsx
+#: apps/remix/app/components/general/user-profile-skeleton.tsx
 #: apps/remix/app/components/general/user-profile-timur.tsx
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
@@ -4731,6 +4748,11 @@ msgstr "所有人都已签署！您将收到一份已签署文档的电子邮件
 msgid "Exceeded timeout"
 msgstr "超时"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+msgid "Expiration"
+msgstr "过期设置"
+
+#: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._index.tsx
 msgid "Expired"
 msgstr "已过期"
@@ -4743,6 +4765,11 @@ msgstr "已过期"
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Expires"
 msgstr "到期时间"
+
+#. placeholder {0}: recipient.expiresAt ? i18n.date(recipient.expiresAt, DateTime.DATETIME_MED) : 'N/A'
+#: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+msgid "Expires {0}"
+msgstr "于 {0} 到期"
 
 #. placeholder {0}: DateTime.fromMillis(Math.max(millisecondsRemaining, 0)).toFormat( 'mm:ss', )
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
@@ -5283,6 +5310,10 @@ msgstr "首页（无文件夹）"
 msgid "Horizontal"
 msgstr "水平"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+msgid "How long recipients have to complete this document after it is sent. Uses the team default when set to inherit."
+msgstr "设置此文档在发送后，收件人可完成签署的时间长度。当设置为继承时，将使用团队默认值。"
+
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "I agree to link my account with this organization"
 msgstr "我同意将我的账户与此组织关联"
@@ -5385,6 +5416,10 @@ msgstr "在文档中包含审计日志"
 msgid "Include the Signing Certificate in the Document"
 msgstr "在文档中包含签署证书"
 
+#: apps/remix/app/components/general/billing-plans.tsx
+msgid "Includes:"
+msgstr "包含："
+
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 msgid "Information"
@@ -5395,6 +5430,7 @@ msgid "Inherit authentication method"
 msgstr "继承认证方式"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
+#: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
@@ -5460,6 +5496,10 @@ msgstr "无效的域名"
 #: packages/ui/primitives/document-flow/add-signers.types.ts
 msgid "Invalid email"
 msgstr "邮箱无效"
+
+#: apps/remix/app/routes/embed+/v1+/authoring+/_layout.tsx
+msgid "Invalid embedding presign token provided"
+msgstr "提供的嵌入预签名令牌无效"
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Invalid License Key"
@@ -5814,6 +5854,8 @@ msgstr "正在加载建议…"
 #: apps/remix/app/components/embed/embed-client-loading.tsx
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
+#: packages/ui/components/pdf-viewer/pdf-viewer-konva-lazy.tsx
+#: packages/ui/primitives/pdf-viewer/lazy.tsx
 msgid "Loading..."
 msgstr "正在加载..."
 
@@ -6120,6 +6162,10 @@ msgstr "月活跃用户：至少创建过一份文档的用户"
 msgid "Monthly Active Users: Users that had at least one of their documents completed"
 msgstr "月活跃用户：至少有一份文档被完成的用户"
 
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "Months"
+msgstr "月"
+
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
@@ -6239,6 +6285,10 @@ msgstr "从不"
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "Never expire"
+msgstr "永不过期"
+
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "Never expires"
 msgstr "永不过期"
 
 #: apps/remix/app/components/forms/password.tsx
@@ -6440,6 +6490,10 @@ msgstr "无（覆盖全局设置）"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.edit.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Not found"
+msgstr "未找到"
+
+#: apps/remix/app/routes/embed+/_v0+/_layout.tsx
+msgid "Not Found"
 msgstr "未找到"
 
 #: apps/remix/app/components/forms/signin.tsx
@@ -6853,6 +6907,7 @@ msgid "PDF Document"
 msgstr "PDF 文档"
 
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+#: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
@@ -6967,6 +7022,7 @@ msgid "Please check the CSV file and make sure it is according to our format"
 msgstr "请检查 CSV 文件并确保其符合我们的格式要求"
 
 #: apps/remix/app/components/embed/embed-document-waiting-for-turn.tsx
+#: apps/remix/app/components/embed/embed-recipient-expired.tsx
 msgid "Please check with the parent application for more information."
 msgstr "更多信息请查看父应用程序。"
 
@@ -7406,6 +7462,10 @@ msgstr "收件人已将此文档加入抄送"
 msgid "Recipient completed their task"
 msgstr "收件人已完成其任务"
 
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Recipient expired email"
+msgstr "收件人过期邮件"
+
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Recipient failed to validate a 2FA token for the document"
 msgstr "收件人未能验证此文档的双重验证 (2FA) 令牌"
@@ -7433,6 +7493,11 @@ msgstr "收件人已签署此文档"
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Recipient signing request email"
 msgstr "收件人签署请求邮件"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
+msgid "Recipient signing window expired"
+msgstr "收件人签署时间窗口已过期"
 
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 msgid "Recipient updated"
@@ -7789,6 +7854,7 @@ msgstr "重试"
 msgid "Return"
 msgstr "返回"
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/expired.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/rejected.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/waiting.tsx
 msgid "Return Home"
@@ -8209,6 +8275,10 @@ msgstr "立即将文档发送给收件人"
 msgid "Send on Behalf of Team"
 msgstr "以团队名义发送"
 
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Send recipient expired email to the owner"
+msgstr "向所有者发送收件人过期邮件"
+
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
 msgid "Send reminder"
@@ -8516,6 +8586,10 @@ msgstr "签署证书由以下机构提供"
 msgid "Signing Complete!"
 msgstr "签署完成！"
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/expired.tsx
+msgid "Signing Deadline Expired"
+msgstr "签署截止日期已过期"
+
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 msgid "Signing for"
 msgstr "代签对象"
@@ -8539,6 +8613,26 @@ msgstr "已为此文档生成签署链接。"
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "Signing order is enabled."
 msgstr "签署顺序已启用。"
+
+#: apps/remix/app/components/embed/embed-recipient-expired.tsx
+msgid "Signing Window Expired"
+msgstr "签署时间窗口已过期"
+
+#. placeholder {0}: recipient.name || recipient.email
+#. placeholder {1}: envelope.title
+#: packages/lib/jobs/definitions/emails/send-owner-recipient-expired-email.handler.ts
+msgid "Signing window expired for \"{0}\" on \"{1}\""
+msgstr "“{0}”在“{1}”的签署时间窗口已过期"
+
+#: packages/email/template-components/template-recipient-expired.tsx
+msgid "Signing window expired for \"{displayName}\" on \"{documentName}\""
+msgstr "{displayName} 在“{documentName}”的签署时间窗口已过期"
+
+#. placeholder {0}: data.recipientName || data.recipientEmail
+#: packages/lib/utils/document-audit-logs.ts
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Signing window expired for {0}"
+msgstr "{0} 的签署时间窗口已过期"
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Signups are disabled."
@@ -9489,12 +9583,24 @@ msgstr "签署人的邮箱"
 msgid "The signer's name"
 msgstr "签署人的姓名"
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/expired.tsx
+msgid "The signing deadline for this document has passed. Please contact the document owner if you need a new copy to sign."
+msgstr "此文档的签署截止日期已过。若您需要新的签署副本，请联系文档所有者。"
+
 #: apps/remix/app/components/general/avatar-with-recipient.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "The signing link has been copied to your clipboard."
 msgstr "签署链接已复制到剪贴板。"
+
+#: packages/email/templates/recipient-expired.tsx
+msgid "The signing window for \"{recipientName}\" on document \"{documentName}\" has expired."
+msgstr "收件人 “{recipientName}” 在文档 “{documentName}” 的签署时间窗口已过期。"
+
+#: packages/email/template-components/template-recipient-expired.tsx
+msgid "The signing window for {displayName} on document \"{documentName}\" has expired. You can resend the document to extend their deadline or cancel the document."
+msgstr "{displayName} 在文档 “{documentName}” 的签署时间窗口已过期。您可以重新发送文档以延长其截止日期，或取消该文档。"
 
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "The site banner is a message that is shown at the top of the site. It can be used to display important information to your users."
@@ -9860,6 +9966,10 @@ msgstr "当文档完全完成后，将向所有收件人发送此邮件。"
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "This will be sent to the document owner once the document has been fully completed."
 msgstr "当文档完全完成后，将向文档所有者发送此邮件。"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "This will be sent to the document owner when a recipient's signing window has expired."
+msgstr "当收件人的签署时间窗口过期时，将向文档所有者发送此邮件。"
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "This will check and sync the status of all email domains for this organisation"
@@ -10792,6 +10902,7 @@ msgstr "查看文档"
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
 #: packages/email/template-components/template-document-invite.tsx
 #: packages/email/template-components/template-document-rejected.tsx
+#: packages/email/template-components/template-recipient-expired.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
@@ -11319,6 +11430,10 @@ msgstr "Webhook URL"
 msgid "Webhooks"
 msgstr "Webhooks"
 
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "Weeks"
+msgstr "周"
+
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Welcome"
 msgstr "欢迎"
@@ -11403,6 +11518,10 @@ msgstr "撰写将在您的公共主页上展示的简介"
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Yearly"
 msgstr "按年"
+
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "Years"
+msgstr "年"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
@@ -12377,6 +12496,10 @@ msgstr "你的恢复代码已复制到剪贴板。"
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 msgid "Your recovery codes are listed below. Please store them in a safe place."
 msgstr "你的恢复代码列在下方。请妥善保存。"
+
+#: apps/remix/app/components/embed/embed-recipient-expired.tsx
+msgid "Your signing window for this document has expired. Please contact the sender for a new invitation."
+msgstr "您在此文档上的签署时间窗口已过期。请联系发送方以获取新的邀请。"
 
 #: apps/remix/app/components/forms/support-ticket-form.tsx
 msgid "Your support request has been submitted. We'll get back to you soon!"

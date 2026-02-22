@@ -8,7 +8,7 @@ msgstr ""
 "Language: ko\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-02-16 06:23\n"
+"PO-Revision-Date: 2026-02-20 02:58\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -2764,6 +2764,10 @@ msgstr "문서를 열람하여 계속 진행하세요."
 msgid "Continue to login"
 msgstr "로그인으로 이동"
 
+#: apps/remix/app/components/forms/document-preferences-form.tsx
+msgid "Controls how long recipients have to complete signing before the document expires. After expiration, recipients can no longer sign the document."
+msgstr "수신자가 문서가 만료되기 전에 서명을 완료할 수 있는 기간을 제어합니다. 만료 후에는 수신자가 더 이상 이 문서에 서명할 수 없습니다."
+
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Controls the default email settings when new documents or templates are created"
 msgstr "새 문서 또는 템플릿을 생성할 때 사용할 기본 이메일 설정을 제어합니다."
@@ -3123,6 +3127,10 @@ msgstr "현재 이메일 도메인은 Platform 요금제 이상에서만 구성�
 msgid "Custom {0} MB file"
 msgstr "사용자 정의 {0} MB 파일"
 
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "Custom duration"
+msgstr "사용자 지정 기간"
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Custom Organisation Groups"
 msgstr "사용자 지정 조직 그룹"
@@ -3165,6 +3173,10 @@ msgstr "날짜 설정"
 msgid "David is the Employee, Lucas is the Manager"
 msgstr "David는 직원이고, Lucas는 관리자입니다."
 
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "Days"
+msgstr "일"
+
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 #: packages/email/templates/organisation-invite.tsx
@@ -3190,6 +3202,10 @@ msgstr "기본 이메일"
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Default Email Settings"
 msgstr "기본 이메일 설정"
+
+#: apps/remix/app/components/forms/document-preferences-form.tsx
+msgid "Default Envelope Expiration"
+msgstr "기본 봉투 만료 기간"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Default file"
@@ -3943,6 +3959,7 @@ msgstr "문서"
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 #: apps/remix/app/components/general/skeletons/document-edit-skeleton.tsx
+#: apps/remix/app/components/general/user-profile-skeleton.tsx
 #: apps/remix/app/components/general/user-profile-timur.tsx
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
@@ -4731,6 +4748,11 @@ msgstr "모두 서명했습니다! 서명된 문서의 사본이 이메일로 �
 msgid "Exceeded timeout"
 msgstr "시간 초과됨"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+msgid "Expiration"
+msgstr "만료"
+
+#: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._index.tsx
 msgid "Expired"
 msgstr "만료됨"
@@ -4743,6 +4765,11 @@ msgstr "만료됨"
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Expires"
 msgstr "만료일"
+
+#. placeholder {0}: recipient.expiresAt ? i18n.date(recipient.expiresAt, DateTime.DATETIME_MED) : 'N/A'
+#: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+msgid "Expires {0}"
+msgstr "만료일 {0}"
 
 #. placeholder {0}: DateTime.fromMillis(Math.max(millisecondsRemaining, 0)).toFormat( 'mm:ss', )
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
@@ -5283,6 +5310,10 @@ msgstr "홈(폴더 없음)"
 msgid "Horizontal"
 msgstr "가로"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+msgid "How long recipients have to complete this document after it is sent. Uses the team default when set to inherit."
+msgstr "이 문서가 전송된 후 수신자가 이를 완료할 수 있는 기간입니다. 상속으로 설정된 경우 팀 기본값을 사용합니다."
+
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "I agree to link my account with this organization"
 msgstr "이 조직과 계정을 연결하는 데 동의합니다"
@@ -5385,6 +5416,10 @@ msgstr "문서에 감사 로그 포함"
 msgid "Include the Signing Certificate in the Document"
 msgstr "문서에 서명 인증서 포함"
 
+#: apps/remix/app/components/general/billing-plans.tsx
+msgid "Includes:"
+msgstr "포함 사항:"
+
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 msgid "Information"
@@ -5395,6 +5430,7 @@ msgid "Inherit authentication method"
 msgstr "인증 방식 상속"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
+#: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
@@ -5460,6 +5496,10 @@ msgstr "잘못된 도메인"
 #: packages/ui/primitives/document-flow/add-signers.types.ts
 msgid "Invalid email"
 msgstr "유효한 이메일이 아닙니다."
+
+#: apps/remix/app/routes/embed+/v1+/authoring+/_layout.tsx
+msgid "Invalid embedding presign token provided"
+msgstr "잘못된 임베딩 사전 서명 토큰이 제공되었습니다."
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Invalid License Key"
@@ -5814,6 +5854,8 @@ msgstr "제안 불러오는 중..."
 #: apps/remix/app/components/embed/embed-client-loading.tsx
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
+#: packages/ui/components/pdf-viewer/pdf-viewer-konva-lazy.tsx
+#: packages/ui/primitives/pdf-viewer/lazy.tsx
 msgid "Loading..."
 msgstr "로딩 중..."
 
@@ -6120,6 +6162,10 @@ msgstr "월간 활성 사용자: 문서를 하나 이상 생성한 사용자"
 msgid "Monthly Active Users: Users that had at least one of their documents completed"
 msgstr "월간 활성 사용자: 문서가 하나 이상 완료된 사용자"
 
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "Months"
+msgstr "개월"
+
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
@@ -6239,6 +6285,10 @@ msgstr "없음"
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "Never expire"
+msgstr "만료되지 않음"
+
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "Never expires"
 msgstr "만료되지 않음"
 
 #: apps/remix/app/components/forms/password.tsx
@@ -6440,6 +6490,10 @@ msgstr "없음(전역 설정 무시)"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.edit.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Not found"
+msgstr "찾을 수 없음"
+
+#: apps/remix/app/routes/embed+/_v0+/_layout.tsx
+msgid "Not Found"
 msgstr "찾을 수 없음"
 
 #: apps/remix/app/components/forms/signin.tsx
@@ -6853,6 +6907,7 @@ msgid "PDF Document"
 msgstr "PDF 문서"
 
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+#: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
@@ -6967,6 +7022,7 @@ msgid "Please check the CSV file and make sure it is according to our format"
 msgstr "CSV 파일 형식을 확인하고, 안내된 형식과 일치하는지 확인해 주세요"
 
 #: apps/remix/app/components/embed/embed-document-waiting-for-turn.tsx
+#: apps/remix/app/components/embed/embed-recipient-expired.tsx
 msgid "Please check with the parent application for more information."
 msgstr "자세한 정보는 상위 애플리케이션에서 확인해 주세요."
 
@@ -7406,6 +7462,10 @@ msgstr "수신자가 문서의 참조(CC) 수신자가 되었습니다"
 msgid "Recipient completed their task"
 msgstr "수신자가 자신의 작업을 완료했습니다"
 
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Recipient expired email"
+msgstr "수신자 만료 이메일"
+
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Recipient failed to validate a 2FA token for the document"
 msgstr "수신자가 문서에 대한 2FA 토큰 검증에 실패했습니다"
@@ -7433,6 +7493,11 @@ msgstr "수신자가 문서에 서명했습니다"
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Recipient signing request email"
 msgstr "수신자 서명 요청 이메일"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
+msgid "Recipient signing window expired"
+msgstr "수신자 서명 가능 기간 만료"
 
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 msgid "Recipient updated"
@@ -7789,6 +7854,7 @@ msgstr "재시도"
 msgid "Return"
 msgstr "돌아가기"
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/expired.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/rejected.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/waiting.tsx
 msgid "Return Home"
@@ -8209,6 +8275,10 @@ msgstr "생성된 문서를 즉시 수신자에게 전송"
 msgid "Send on Behalf of Team"
 msgstr "팀을 대신해 발송"
 
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Send recipient expired email to the owner"
+msgstr "소유자에게 수신자 만료 이메일 보내기"
+
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
 msgid "Send reminder"
@@ -8516,6 +8586,10 @@ msgstr "서명 인증서 제공자"
 msgid "Signing Complete!"
 msgstr "서명이 완료되었습니다!"
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/expired.tsx
+msgid "Signing Deadline Expired"
+msgstr "서명 마감 기한 만료"
+
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 msgid "Signing for"
 msgstr "대리 서명 대상"
@@ -8539,6 +8613,26 @@ msgstr "이 문서에 대한 서명 링크가 생성되었습니다."
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "Signing order is enabled."
 msgstr "서명 순서가 활성화되어 있습니다."
+
+#: apps/remix/app/components/embed/embed-recipient-expired.tsx
+msgid "Signing Window Expired"
+msgstr "서명 가능 기간 만료"
+
+#. placeholder {0}: recipient.name || recipient.email
+#. placeholder {1}: envelope.title
+#: packages/lib/jobs/definitions/emails/send-owner-recipient-expired-email.handler.ts
+msgid "Signing window expired for \"{0}\" on \"{1}\""
+msgstr "\"{0}\" 님의 \"{1}\" 문서에 대한 서명 가능 기간이 만료되었습니다"
+
+#: packages/email/template-components/template-recipient-expired.tsx
+msgid "Signing window expired for \"{displayName}\" on \"{documentName}\""
+msgstr "\"{displayName}\" 님의 \"{documentName}\" 문서에 대한 서명 가능 기간이 만료되었습니다"
+
+#. placeholder {0}: data.recipientName || data.recipientEmail
+#: packages/lib/utils/document-audit-logs.ts
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Signing window expired for {0}"
+msgstr "{0} 님의 서명 가능 기간이 만료되었습니다"
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Signups are disabled."
@@ -9489,12 +9583,24 @@ msgstr "서명자의 이메일"
 msgid "The signer's name"
 msgstr "서명자의 이름"
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/expired.tsx
+msgid "The signing deadline for this document has passed. Please contact the document owner if you need a new copy to sign."
+msgstr "이 문서의 서명 마감 기한이 지났습니다. 새로 서명할 수 있는 사본이 필요하시면 문서 소유자에게 문의하세요."
+
 #: apps/remix/app/components/general/avatar-with-recipient.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "The signing link has been copied to your clipboard."
 msgstr "서명 링크가 클립보드에 복사되었습니다."
+
+#: packages/email/templates/recipient-expired.tsx
+msgid "The signing window for \"{recipientName}\" on document \"{documentName}\" has expired."
+msgstr "문서 \"{documentName}\" 에서 \"{recipientName}\" 님의 서명 가능 기간이 만료되었습니다."
+
+#: packages/email/template-components/template-recipient-expired.tsx
+msgid "The signing window for {displayName} on document \"{documentName}\" has expired. You can resend the document to extend their deadline or cancel the document."
+msgstr "문서 \"{documentName}\" 에서 {displayName} 님의 서명 가능 기간이 만료되었습니다. 마감 기한을 연장하기 위해 문서를 다시 보내거나 문서를 취소할 수 있습니다."
 
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "The site banner is a message that is shown at the top of the site. It can be used to display important information to your users."
@@ -9860,6 +9966,10 @@ msgstr "문서가 완전히 완료되면 모든 수신자에게 이 메일이 �
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "This will be sent to the document owner once the document has been fully completed."
 msgstr "문서가 완전히 완료되면 문서 소유자에게 이 메일이 전송됩니다."
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "This will be sent to the document owner when a recipient's signing window has expired."
+msgstr "수신자의 서명 가능 기간이 만료되면 이 메일이 문서 소유자에게 전송됩니다."
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "This will check and sync the status of all email domains for this organisation"
@@ -10792,6 +10902,7 @@ msgstr "문서 보기"
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
 #: packages/email/template-components/template-document-invite.tsx
 #: packages/email/template-components/template-document-rejected.tsx
+#: packages/email/template-components/template-recipient-expired.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
@@ -11319,6 +11430,10 @@ msgstr "웹훅 URL"
 msgid "Webhooks"
 msgstr "웹훅"
 
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "Weeks"
+msgstr "주"
+
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Welcome"
 msgstr "환영합니다"
@@ -11403,6 +11518,10 @@ msgstr "공개 프로필에 표시될 설명을 작성하세요."
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Yearly"
 msgstr "연간"
+
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "Years"
+msgstr "년"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
@@ -12377,6 +12496,10 @@ msgstr "복구 코드가 클립보드에 복사되었습니다."
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 msgid "Your recovery codes are listed below. Please store them in a safe place."
 msgstr "아래에 복구 코드가 표시됩니다. 안전한 곳에 보관해 주세요."
+
+#: apps/remix/app/components/embed/embed-recipient-expired.tsx
+msgid "Your signing window for this document has expired. Please contact the sender for a new invitation."
+msgstr "이 문서에 대한 귀하의 서명 가능 기간이 만료되었습니다. 새 초대장을 받으려면 발신자에게 문의하세요."
 
 #: apps/remix/app/components/forms/support-ticket-form.tsx
 msgid "Your support request has been submitted. We'll get back to you soon!"
