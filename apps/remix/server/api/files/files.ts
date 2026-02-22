@@ -31,6 +31,24 @@ export const filesRoute = new Hono<HonoEnv>()
    */
   .post('/upload-pdf', sValidator('form', ZUploadPdfRequestSchema), async (c) => {
     try {
+      const session = await getOptionalSession(c);
+      const authHeader = c.req.header('authorization');
+      const presignToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+
+      if (!session.user && !presignToken) {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+
+      if (presignToken && !session.user) {
+        const verified = await verifyEmbeddingPresignToken({ token: presignToken }).catch(
+          () => null,
+        );
+
+        if (!verified) {
+          return c.json({ error: 'Unauthorized' }, 401);
+        }
+      }
+
       const { file } = c.req.valid('form');
 
       if (!file) {
@@ -58,6 +76,24 @@ export const filesRoute = new Hono<HonoEnv>()
     const { fileName, contentType } = c.req.valid('json');
 
     try {
+      const session = await getOptionalSession(c);
+      const authHeader = c.req.header('authorization');
+      const presignToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+
+      if (!session.user && !presignToken) {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+
+      if (presignToken && !session.user) {
+        const verified = await verifyEmbeddingPresignToken({ token: presignToken }).catch(
+          () => null,
+        );
+
+        if (!verified) {
+          return c.json({ error: 'Unauthorized' }, 401);
+        }
+      }
+
       const { key, url } = await getPresignPostUrl(fileName, contentType);
 
       return c.json({ key, url } satisfies TGetPresignedPostUrlResponse);

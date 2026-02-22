@@ -17,7 +17,7 @@ type File = {
   arrayBuffer: () => Promise<ArrayBuffer>;
 };
 
-export const putPdfFile = async (file: File) => {
+export const putPdfFile = async (file: File, options?: { token?: string }) => {
   const formData = new FormData();
 
   // Create a proper File object from the data
@@ -27,8 +27,15 @@ export const putPdfFile = async (file: File) => {
 
   formData.append('file', properFile);
 
+  const headers: Record<string, string> = {};
+
+  if (options?.token) {
+    headers['authorization'] = `Bearer ${options.token}`;
+  }
+
   const response = await fetch('/api/files/upload-pdf', {
     method: 'POST',
+    headers,
     body: formData,
   });
 
@@ -45,11 +52,11 @@ export const putPdfFile = async (file: File) => {
 /**
  * Uploads a file to the appropriate storage location.
  */
-export const putFile = async (file: File) => {
+export const putFile = async (file: File, options?: { token?: string }) => {
   const NEXT_PUBLIC_UPLOAD_TRANSPORT = env('NEXT_PUBLIC_UPLOAD_TRANSPORT');
 
   return await match(NEXT_PUBLIC_UPLOAD_TRANSPORT)
-    .with('s3', async () => putFileInS3(file))
+    .with('s3', async () => putFileInS3(file, options))
     .otherwise(async () => putFileInDatabase(file));
 };
 
@@ -66,14 +73,20 @@ const putFileInDatabase = async (file: File) => {
   };
 };
 
-const putFileInS3 = async (file: File) => {
+const putFileInS3 = async (file: File, options?: { token?: string }) => {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (options?.token) {
+    headers['authorization'] = `Bearer ${options.token}`;
+  }
+
   const getPresignedUrlResponse = await fetch(
     `${NEXT_PUBLIC_WEBAPP_URL()}/api/files/presigned-post-url`,
     {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({
         fileName: file.name,
         contentType: file.type,

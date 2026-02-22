@@ -1,7 +1,7 @@
 import { useLayoutEffect, useState } from 'react';
 
 import { useLingui } from '@lingui/react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
@@ -24,6 +24,8 @@ export default function EmbeddingAuthoringDocumentCreatePage() {
 
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
 
   const [configuration, setConfiguration] = useState<TConfigureEmbedFormSchema | null>(null);
   const [fields, setFields] = useState<TConfigureFieldsFormSchema | null>(null);
@@ -60,11 +62,14 @@ export default function EmbeddingAuthoringDocumentCreatePage() {
 
       const fields = data.fields;
 
-      const documentData = await putPdfFile({
-        arrayBuffer: async () => Promise.resolve(configuration.documentData!.data.buffer),
-        name: configuration.documentData.name,
-        type: configuration.documentData.type,
-      });
+      const documentData = await putPdfFile(
+        {
+          arrayBuffer: async () => Promise.resolve(configuration.documentData!.data.buffer),
+          name: configuration.documentData.name,
+          type: configuration.documentData.type,
+        },
+        { token: token ?? undefined },
+      );
 
       // Use the externalId from the URL fragment if available
       const documentExternalId = externalId || configuration.meta.externalId;
