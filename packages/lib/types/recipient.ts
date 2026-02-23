@@ -23,7 +23,9 @@ export const ZRecipientSchema = RecipientSchema.pick({
   name: true,
   token: true,
   documentDeletedAt: true,
-  expired: true,
+  expired: true, // deprecated Not in use. To be removed in a future migration.
+  expiresAt: true,
+  expirationNotifiedAt: true,
   signedAt: true,
   authOptions: true,
   signingOrder: true,
@@ -50,7 +52,9 @@ export const ZRecipientLiteSchema = RecipientSchema.pick({
   name: true,
   token: true,
   documentDeletedAt: true,
-  expired: true,
+  expired: true, // !: deprecated Not in use. To be removed in a future migration.
+  expiresAt: true,
+  expirationNotifiedAt: true,
   signedAt: true,
   authOptions: true,
   signingOrder: true,
@@ -75,7 +79,9 @@ export const ZRecipientManySchema = RecipientSchema.pick({
   name: true,
   token: true,
   documentDeletedAt: true,
-  expired: true,
+  expired: true, // !: deprecated Not in use. To be removed in a future migration.
+  expiresAt: true,
+  expirationNotifiedAt: true,
   signedAt: true,
   authOptions: true,
   signingOrder: true,

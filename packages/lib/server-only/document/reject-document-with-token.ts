@@ -1,4 +1,4 @@
-import { EnvelopeType, SigningStatus } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
 
 import { jobs } from '@documenso/lib/jobs/client';
 import { prisma } from '@documenso/prisma';
@@ -9,6 +9,7 @@ import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToDocumentId, unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
+import { assertRecipientNotExpired } from '../../utils/recipients';
 
 export type RejectDocumentWithTokenOptions = {
   token: string;
@@ -41,6 +42,14 @@ export async function rejectDocumentWithToken({
       message: 'Document or recipient not found',
     });
   }
+
+  if (envelope.status !== DocumentStatus.PENDING) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `Document ${envelope.id} must be pending to reject`,
+    });
+  }
+
+  assertRecipientNotExpired(recipient);
 
   // Update the recipient status to rejected
   const [updatedRecipient] = await prisma.$transaction([

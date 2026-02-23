@@ -26,4 +26,15 @@ export class JobClient<T extends ReadonlyArray<JobDefinition> = []> {
   public getApiHandler() {
     return this._provider.getApiHandler();
   }
+
+  /**
+   * Start the cron scheduler for any registered cron jobs.
+   *
+   * Call this once at application startup after the instance is ready to
+   * process requests. No-op for providers that handle cron externally
+   * (e.g. Inngest).
+   */
+  public startCron() {
+    this._provider.startCron();
+  }
 }
