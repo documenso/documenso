@@ -70,46 +70,46 @@ app.use(express.json());
 const WEBHOOK_SECRET = process.env.DOCUMENSO_WEBHOOK_SECRET;
 
 function verifyWebhookSignature(receivedSecret, expectedSecret) {
-if (!expectedSecret) {
-// No secret configured, skip verification
-// Not recommended for production
-return true;
-}
+  if (!expectedSecret) {
+    // No secret configured, skip verification
+    // Not recommended for production
+    return true;
+  }
 
-if (!receivedSecret) {
-return false;
-}
+  if (!receivedSecret) {
+    return false;
+  }
 
-// Use constant-time comparison to prevent timing attacks
-try {
-return crypto.timingSafeEqual(
-Buffer.from(receivedSecret),
-Buffer.from(expectedSecret),
-);
-} catch {
-return false;
-}
+  // Use constant-time comparison to prevent timing attacks
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(receivedSecret),
+      Buffer.from(expectedSecret),
+    );
+  } catch {
+    return false;
+  }
 }
 
 app.post('/webhooks/documenso', (req, res) => {
-const receivedSecret = req.headers['x-documenso-secret'];
+  const receivedSecret = req.headers['x-documenso-secret'];
 
-if (!verifyWebhookSignature(receivedSecret, WEBHOOK_SECRET)) {
-console.error('Webhook verification failed');
-return res.status(401).json({ error: 'Invalid signature' });
-}
+  if (!verifyWebhookSignature(receivedSecret, WEBHOOK_SECRET)) {
+    console.error('Webhook verification failed');
+    return res.status(401).json({ error: 'Invalid signature' });
+  }
 
-// Signature verified, process the webhook
-const { event, payload } = req.body;
-console.log(`Verified webhook: ${event}`);
+  // Signature verified, process the webhook
+  const { event, payload } = req.body;
+  console.log(`Verified webhook: ${event}`);
 
-// Process the event...
+  // Process the event...
 
-res.status(200).json({ received: true });
+  res.status(200).json({ received: true });
 });
 
 app.listen(3000, () => {
-console.log('Webhook server running on port 3000');
+  console.log('Webhook server running on port 3000');
 });
 
 ````

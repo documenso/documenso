@@ -15,3 +15,6 @@ packages/lib/translations/**/*.js
 .prettierignore
 .DS_Store
 .eslintignore
+
+# Docs MDX - Prettier strips indentation from code blocks inside components
+apps/docs/content/**/*.mdx

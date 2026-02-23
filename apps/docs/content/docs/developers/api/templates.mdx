@@ -218,15 +218,14 @@ curl -X GET "https://app.documenso.com/api/v2/template/123" \
 const templateId = 123;
 
 const response = await fetch(`https://app.documenso.com/api/v2/template/${templateId}`, {
-method: 'GET',
-headers: {
-Authorization: 'api_xxxxxxxxxxxxxxxx',
-},
+  method: 'GET',
+  headers: {
+    Authorization: 'api_xxxxxxxxxxxxxxxx',
+  },
 });
 
 const template = await response.json();
 console.log(template.title, template.recipients.length);
-
 ```
 </Tab>
 </Tabs>
@@ -339,28 +338,28 @@ const BASE_URL = 'https://app.documenso.com/api/v2';
 
 // Create document from template
 const response = await fetch(`${BASE_URL}/template/use`, {
-method: 'POST',
-headers: {
-Authorization: API_TOKEN,
-'Content-Type': 'application/json',
-},
-body: JSON.stringify({
-templateId: 123,
-recipients: [
-{
-id: 1,
-email: 'john.doe@example.com',
-name: 'John Doe',
-},
-{
-id: 2,
-email: 'jane.smith@company.com',
-name: 'Jane Smith',
-},
-],
-distributeDocument: true,
-externalId: 'contract-2025-001',
-}),
+  method: 'POST',
+  headers: {
+    Authorization: API_TOKEN,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    templateId: 123,
+    recipients: [
+      {
+        id: 1,
+        email: 'john.doe@example.com',
+        name: 'John Doe',
+      },
+      {
+        id: 2,
+        email: 'jane.smith@company.com',
+        name: 'Jane Smith',
+      },
+    ],
+    distributeDocument: true,
+    externalId: 'contract-2025-001',
+  }),
 });
 
 const document = await response.json();
@@ -368,43 +367,42 @@ console.log('Created document:', document.id);
 
 // Create document with prefilled fields
 const prefillResponse = await fetch(`${BASE_URL}/template/use`, {
-method: 'POST',
-headers: {
-Authorization: API_TOKEN,
-'Content-Type': 'application/json',
-},
-body: JSON.stringify({
-templateId: 123,
-recipients: [
-{
-id: 1,
-email: 'john.doe@example.com',
-name: 'John Doe',
-},
-],
-prefillFields: [
-{
-id: 101,
-type: 'text',
-value: 'Senior Software Engineer',
-},
-{
-id: 102,
-type: 'number',
-value: '85000',
-},
-{
-id: 103,
-type: 'date',
-value: '2025-02-01',
-},
-],
-distributeDocument: true,
-}),
+  method: 'POST',
+  headers: {
+    Authorization: API_TOKEN,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    templateId: 123,
+    recipients: [
+      {
+        id: 1,
+        email: 'john.doe@example.com',
+        name: 'John Doe',
+      },
+    ],
+    prefillFields: [
+      {
+        id: 101,
+        type: 'text',
+        value: 'Senior Software Engineer',
+      },
+      {
+        id: 102,
+        type: 'number',
+        value: '85000',
+      },
+      {
+        id: 103,
+        type: 'date',
+        value: '2025-02-01',
+      },
+    ],
+    distributeDocument: true,
+  }),
 });
 
 const prefilledDocument = await prefillResponse.json();
-
 ````
 </Tab>
 </Tabs>

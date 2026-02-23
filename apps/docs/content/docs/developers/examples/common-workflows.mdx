@@ -32,127 +32,126 @@ const API_TOKEN = process.env.DOCUMENSO_API_TOKEN;
 const BASE_URL = 'https://app.documenso.com/api/v2';
 
 type Recipient = {
-email: string;
-name: string;
-role: 'SIGNER' | 'APPROVER' | 'CC' | 'VIEWER';
+  email: string;
+  name: string;
+  role: 'SIGNER' | 'APPROVER' | 'CC' | 'VIEWER';
 };
 
 type CreateAndSendResult = {
-envelopeId: string;
-recipients: Array<{
-email: string;
-signingUrl: string;
-}>;
+  envelopeId: string;
+  recipients: Array<{
+    email: string;
+    signingUrl: string;
+  }>;
 };
 
 async function createAndSendDocument(
-pdfBuffer: Buffer,
-filename: string,
-title: string,
-recipients: Recipient[],
+  pdfBuffer: Buffer,
+  filename: string,
+  title: string,
+  recipients: Recipient[],
 ): Promise<CreateAndSendResult> {
-const recipientPayload = recipients.map((recipient, index) => ({
-email: recipient.email,
-name: recipient.name,
-role: recipient.role,
-signingOrder: index + 1,
-fields:
-recipient.role === 'SIGNER'
-? [
-{
-identifier: 0,
-type: 'SIGNATURE',
-page: 1,
-positionX: 10,
-positionY: 80 - index * 10,
-width: 30,
-height: 5,
-},
-{
-identifier: 0,
-type: 'DATE',
-page: 1,
-positionX: 50,
-positionY: 80 - index * 10,
-width: 20,
-height: 3,
-},
-]
-: [],
-}));
+  const recipientPayload = recipients.map((recipient, index) => ({
+    email: recipient.email,
+    name: recipient.name,
+    role: recipient.role,
+    signingOrder: index + 1,
+    fields:
+      recipient.role === 'SIGNER'
+        ? [
+            {
+              identifier: 0,
+              type: 'SIGNATURE',
+              page: 1,
+              positionX: 10,
+              positionY: 80 - index * 10,
+              width: 30,
+              height: 5,
+            },
+            {
+              identifier: 0,
+              type: 'DATE',
+              page: 1,
+              positionX: 50,
+              positionY: 80 - index * 10,
+              width: 20,
+              height: 3,
+            },
+          ]
+        : [],
+  }));
 
-const formData = new FormData();
-formData.append(
-'payload',
-JSON.stringify({
-type: 'DOCUMENT',
-title,
-recipients: recipientPayload,
-meta: {
-subject: `Please sign: ${title}`,
-message: 'Please review and sign the attached document.',
-},
-}),
-);
-formData.append('files', new Blob([pdfBuffer], { type: 'application/pdf' }), filename);
+  const formData = new FormData();
+  formData.append(
+    'payload',
+    JSON.stringify({
+      type: 'DOCUMENT',
+      title,
+      recipients: recipientPayload,
+      meta: {
+        subject: `Please sign: ${title}`,
+        message: 'Please review and sign the attached document.',
+      },
+    }),
+  );
+  formData.append('files', new Blob([pdfBuffer], { type: 'application/pdf' }), filename);
 
-const createResponse = await fetch(`${BASE_URL}/envelope/create`, {
-method: 'POST',
-headers: { Authorization: API_TOKEN },
-body: formData,
-});
+  const createResponse = await fetch(`${BASE_URL}/envelope/create`, {
+    method: 'POST',
+    headers: { Authorization: API_TOKEN },
+    body: formData,
+  });
 
-if (!createResponse.ok) {
-const error = await createResponse.json();
-throw new Error(`Failed to create envelope: ${error.message}`);
-}
+  if (!createResponse.ok) {
+    const error = await createResponse.json();
+    throw new Error(`Failed to create envelope: ${error.message}`);
+  }
 
-const { id: envelopeId } = await createResponse.json();
+  const { id: envelopeId } = await createResponse.json();
 
-const distributeResponse = await fetch(`${BASE_URL}/envelope/distribute`, {
-method: 'POST',
-headers: {
-Authorization: API_TOKEN,
-'Content-Type': 'application/json',
-},
-body: JSON.stringify({ envelopeId }),
-});
+  const distributeResponse = await fetch(`${BASE_URL}/envelope/distribute`, {
+    method: 'POST',
+    headers: {
+      Authorization: API_TOKEN,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ envelopeId }),
+  });
 
-if (!distributeResponse.ok) {
-const error = await distributeResponse.json();
-throw new Error(`Failed to send document: ${error.message}`);
-}
+  if (!distributeResponse.ok) {
+    const error = await distributeResponse.json();
+    throw new Error(`Failed to send document: ${error.message}`);
+  }
 
-const distributeResult = await distributeResponse.json();
+  const distributeResult = await distributeResponse.json();
 
-return {
-envelopeId,
-recipients: distributeResult.recipients.map(
-(r: { email: string; signingUrl: string }) => ({
-email: r.email,
-signingUrl: r.signingUrl,
-}),
-),
-};
+  return {
+    envelopeId,
+    recipients: distributeResult.recipients.map(
+      (r: { email: string; signingUrl: string }) => ({
+        email: r.email,
+        signingUrl: r.signingUrl,
+      }),
+    ),
+  };
 }
 
 const fs = require('fs');
 const pdfBuffer = fs.readFileSync('./contract.pdf');
 
 const result = await createAndSendDocument(
-pdfBuffer,
-'contract.pdf',
-'Service Agreement',
-[
-{ email: 'client@example.com', name: 'John Smith', role: 'SIGNER' },
-{ email: 'manager@company.com', name: 'Jane Doe', role: 'SIGNER' },
-{ email: 'legal@company.com', name: 'Legal Team', role: 'CC' },
-],
+  pdfBuffer,
+  'contract.pdf',
+  'Service Agreement',
+  [
+    { email: 'client@example.com', name: 'John Smith', role: 'SIGNER' },
+    { email: 'manager@company.com', name: 'Jane Doe', role: 'SIGNER' },
+    { email: 'legal@company.com', name: 'Legal Team', role: 'CC' },
+  ],
 );
 
 console.log('Document sent:', result.envelopeId);
 result.recipients.forEach((r) => console.log(`${r.email}: ${r.signingUrl}`));
-
 ````
 </Tab>
 <Tab value="curl">
@@ -267,136 +266,135 @@ const API_TOKEN = process.env.DOCUMENSO_API_TOKEN;
 const BASE_URL = 'https://app.documenso.com/api/v2';
 
 type EmployeeData = {
-email: string;
-name: string;
-position: string;
-salary: number;
-startDate: string; // ISO 8601 format: YYYY-MM-DD
-department: string;
+  email: string;
+  name: string;
+  position: string;
+  salary: number;
+  startDate: string; // ISO 8601 format: YYYY-MM-DD
+  department: string;
 };
 
 type TemplateField = {
-id: number;
-type: string;
-fieldMeta?: { label?: string };
+  id: number;
+  type: string;
+  fieldMeta?: { label?: string };
 };
 
 type TemplateRecipient = {
-id: number;
-role: string;
-signingOrder: number;
+  id: number;
+  role: string;
+  signingOrder: number;
 };
 
 async function sendEmploymentContract(
-templateId: number,
-employee: EmployeeData,
+  templateId: number,
+  employee: EmployeeData,
 ): Promise<{ documentId: string; signingUrl: string }> {
-const templateResponse = await fetch(`${BASE_URL}/template/${templateId}`, {
-headers: { Authorization: API_TOKEN },
-});
+  const templateResponse = await fetch(`${BASE_URL}/template/${templateId}`, {
+    headers: { Authorization: API_TOKEN },
+  });
 
-if (!templateResponse.ok) {
-throw new Error('Template not found');
-}
+  if (!templateResponse.ok) {
+    throw new Error('Template not found');
+  }
 
-const template = await templateResponse.json();
+  const template = await templateResponse.json();
 
-const employeeRecipient = template.recipients.find(
-(r: TemplateRecipient) => r.role === 'SIGNER' && r.signingOrder === 1,
-);
+  const employeeRecipient = template.recipients.find(
+    (r: TemplateRecipient) => r.role === 'SIGNER' && r.signingOrder === 1,
+  );
 
-if (!employeeRecipient) {
-throw new Error('Template missing employee recipient');
-}
+  if (!employeeRecipient) {
+    throw new Error('Template missing employee recipient');
+  }
 
-const fieldsByLabel = new Map<string, TemplateField>();
-template.fields.forEach((field: TemplateField) => {
-if (field.fieldMeta?.label) {
-fieldsByLabel.set(field.fieldMeta.label.toLowerCase(), field);
-}
-});
+  const fieldsByLabel = new Map<string, TemplateField>();
+  template.fields.forEach((field: TemplateField) => {
+    if (field.fieldMeta?.label) {
+      fieldsByLabel.set(field.fieldMeta.label.toLowerCase(), field);
+    }
+  });
 
-const prefillFields = [];
+  const prefillFields = [];
 
-const positionField = fieldsByLabel.get('position') || fieldsByLabel.get('job title');
-if (positionField) {
-prefillFields.push({ id: positionField.id, type: 'text', value: employee.position });
-}
+  const positionField = fieldsByLabel.get('position') || fieldsByLabel.get('job title');
+  if (positionField) {
+    prefillFields.push({ id: positionField.id, type: 'text', value: employee.position });
+  }
 
-const salaryField = fieldsByLabel.get('salary') || fieldsByLabel.get('compensation');
-if (salaryField) {
-prefillFields.push({
-id: salaryField.id,
-type: 'number',
-value: employee.salary.toString(),
-});
-}
+  const salaryField = fieldsByLabel.get('salary') || fieldsByLabel.get('compensation');
+  if (salaryField) {
+    prefillFields.push({
+      id: salaryField.id,
+      type: 'number',
+      value: employee.salary.toString(),
+    });
+  }
 
-const startDateField = fieldsByLabel.get('start date');
-if (startDateField) {
-prefillFields.push({
-id: startDateField.id,
-type: 'date',
-value: employee.startDate,
-});
-}
+  const startDateField = fieldsByLabel.get('start date');
+  if (startDateField) {
+    prefillFields.push({
+      id: startDateField.id,
+      type: 'date',
+      value: employee.startDate,
+    });
+  }
 
-const departmentField = fieldsByLabel.get('department');
-if (departmentField) {
-prefillFields.push({
-id: departmentField.id,
-type: 'dropdown',
-value: employee.department,
-});
-}
+  const departmentField = fieldsByLabel.get('department');
+  if (departmentField) {
+    prefillFields.push({
+      id: departmentField.id,
+      type: 'dropdown',
+      value: employee.department,
+    });
+  }
 
-const createResponse = await fetch(`${BASE_URL}/template/use`, {
-method: 'POST',
-headers: {
-Authorization: API_TOKEN,
-'Content-Type': 'application/json',
-},
-body: JSON.stringify({
-templateId,
-recipients: [
-{ id: employeeRecipient.id, email: employee.email, name: employee.name },
-],
-prefillFields,
-override: {
-title: `Employment Contract - ${employee.name}`,
-subject: `Your Employment Contract at ${employee.department}`,
-message: `Hi ${employee.name},\n\nPlease review and sign your employment contract for the ${employee.position} position.\n\nStart date: ${employee.startDate}`,
-},
-distributeDocument: true,
-externalId: `emp-${Date.now()}-${employee.email.split('@')[0]}`,
-}),
-});
+  const createResponse = await fetch(`${BASE_URL}/template/use`, {
+    method: 'POST',
+    headers: {
+      Authorization: API_TOKEN,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      templateId,
+      recipients: [
+        { id: employeeRecipient.id, email: employee.email, name: employee.name },
+      ],
+      prefillFields,
+      override: {
+        title: `Employment Contract - ${employee.name}`,
+        subject: `Your Employment Contract at ${employee.department}`,
+        message: `Hi ${employee.name},\n\nPlease review and sign your employment contract for the ${employee.position} position.\n\nStart date: ${employee.startDate}`,
+      },
+      distributeDocument: true,
+      externalId: `emp-${Date.now()}-${employee.email.split('@')[0]}`,
+    }),
+  });
 
-if (!createResponse.ok) {
-const error = await createResponse.json();
-throw new Error(`Failed to create document: ${error.message}`);
-}
+  if (!createResponse.ok) {
+    const error = await createResponse.json();
+    throw new Error(`Failed to create document: ${error.message}`);
+  }
 
-const document = await createResponse.json();
+  const document = await createResponse.json();
 
-return {
-documentId: document.id,
-signingUrl: document.recipients[0].signingUrl,
-};
+  return {
+    documentId: document.id,
+    signingUrl: document.recipients[0].signingUrl,
+  };
 }
 
 const result = await sendEmploymentContract(123, {
-email: 'alice.johnson@example.com',
-name: 'Alice Johnson',
-position: 'Senior Engineer',
-salary: 120000,
-startDate: '2025-03-01',
-department: 'Engineering',
+  email: 'alice.johnson@example.com',
+  name: 'Alice Johnson',
+  position: 'Senior Engineer',
+  salary: 120000,
+  startDate: '2025-03-01',
+  department: 'Engineering',
 });
 
 console.log('Contract sent:', result.documentId);
 console.log('Signing URL:', result.signingUrl);
-
 ````
 </Tab>
 <Tab value="curl">
@@ -485,41 +483,41 @@ const API_TOKEN = process.env.DOCUMENSO_API_TOKEN;
 const BASE_URL = 'https://app.documenso.com/api/v2';
 
 type BulkRecipient = {
-email: string;
-name: string;
+  email: string;
+  name: string;
 };
 
 type BulkSendResult = {
-successful: Array<{ email: string; envelopeId: string; signingUrl: string }>;
-failed: Array<{ email: string; error: string }>;
+  successful: Array<{ email: string; envelopeId: string; signingUrl: string }>;
+  failed: Array<{ email: string; error: string }>;
 };
 
 async function bulkSendFromTemplate(
-templateId: number,
-recipients: BulkRecipient[],
-concurrency = 5,
+  templateId: number,
+  recipients: BulkRecipient[],
+  concurrency = 5,
 ): Promise<BulkSendResult> {
-const templateResponse = await fetch(`${BASE_URL}/template/${templateId}`, {
-headers: { Authorization: API_TOKEN },
-});
+  const templateResponse = await fetch(`${BASE_URL}/template/${templateId}`, {
+    headers: { Authorization: API_TOKEN },
+  });
 
-if (!templateResponse.ok) {
-throw new Error('Template not found');
-}
+  if (!templateResponse.ok) {
+    throw new Error('Template not found');
+  }
 
-const template = await templateResponse.json();
-const signerSlot = template.recipients.find(
-(r: { role: string }) => r.role === 'SIGNER',
-);
+  const template = await templateResponse.json();
+  const signerSlot = template.recipients.find(
+    (r: { role: string }) => r.role === 'SIGNER',
+  );
 
-if (!signerSlot) {
-throw new Error('Template has no signer recipient');
-}
+  if (!signerSlot) {
+    throw new Error('Template has no signer recipient');
+  }
 
-const results: BulkSendResult = { successful: [], failed: [] };
+  const results: BulkSendResult = { successful: [], failed: [] };
 
-for (let i = 0; i < recipients.length; i += concurrency) {
-const batch = recipients.slice(i, i + concurrency);
+  for (let i = 0; i < recipients.length; i += concurrency) {
+    const batch = recipients.slice(i, i + concurrency);
 
     const batchResults = await Promise.allSettled(
       batch.map(async (recipient) => {
@@ -567,16 +565,15 @@ const batch = recipients.slice(i, i + concurrency);
     if (i + concurrency < recipients.length) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
+  }
 
-}
-
-return results;
+  return results;
 }
 
 const recipients = [
-{ email: 'employee1@company.com', name: 'Employee One' },
-{ email: 'employee2@company.com', name: 'Employee Two' },
-{ email: 'employee3@company.com', name: 'Employee Three' },
+  { email: 'employee1@company.com', name: 'Employee One' },
+  { email: 'employee2@company.com', name: 'Employee Two' },
+  { email: 'employee3@company.com', name: 'Employee Three' },
 ];
 
 const results = await bulkSendFromTemplate(456, recipients);
@@ -584,7 +581,6 @@ const results = await bulkSendFromTemplate(456, recipients);
 console.log(`Sent: ${results.successful.length}`);
 console.log(`Failed: ${results.failed.length}`);
 results.failed.forEach((f) => console.error(`${f.email}: ${f.error}`));
-
 ````
 </Tab>
 <Tab value="curl">
@@ -842,56 +838,56 @@ const BASE_URL = 'https://app.documenso.com/api/v2';
 type DownloadVersion = 'signed' | 'original';
 
 async function downloadDocument(
-envelopeId: string,
-version: DownloadVersion = 'signed',
+  envelopeId: string,
+  version: DownloadVersion = 'signed',
 ): Promise<{ buffer: Buffer; filename: string }> {
-const envelopeResponse = await fetch(`${BASE_URL}/envelope/${envelopeId}`, {
-headers: { Authorization: API_TOKEN },
-});
+  const envelopeResponse = await fetch(`${BASE_URL}/envelope/${envelopeId}`, {
+    headers: { Authorization: API_TOKEN },
+  });
 
-if (!envelopeResponse.ok) {
-throw new Error('Envelope not found');
-}
+  if (!envelopeResponse.ok) {
+    throw new Error('Envelope not found');
+  }
 
-const envelope = await envelopeResponse.json();
+  const envelope = await envelopeResponse.json();
 
-if (version === 'signed' && envelope.status !== 'COMPLETED') {
-throw new Error('Document must be completed to download signed version');
-}
+  if (version === 'signed' && envelope.status !== 'COMPLETED') {
+    throw new Error('Document must be completed to download signed version');
+  }
 
-const envelopeItem = envelope.envelopeItems[0];
-if (!envelopeItem) {
-throw new Error('No document found in envelope');
-}
+  const envelopeItem = envelope.envelopeItems[0];
+  if (!envelopeItem) {
+    throw new Error('No document found in envelope');
+  }
 
-const downloadResponse = await fetch(
-`${BASE_URL}/envelope/item/${envelopeItem.id}/download?version=${version}`,
-{ headers: { Authorization: API_TOKEN } },
-);
+  const downloadResponse = await fetch(
+    `${BASE_URL}/envelope/item/${envelopeItem.id}/download?version=${version}`,
+    { headers: { Authorization: API_TOKEN } },
+  );
 
-if (!downloadResponse.ok) {
-const error = await downloadResponse.json();
-throw new Error(`Download failed: ${error.message}`);
-}
+  if (!downloadResponse.ok) {
+    const error = await downloadResponse.json();
+    throw new Error(`Download failed: ${error.message}`);
+  }
 
-const buffer = Buffer.from(await downloadResponse.arrayBuffer());
-const filename = `${envelope.title.replace(/[^a-z0-9]/gi, '_')}_${version}.pdf`;
+  const buffer = Buffer.from(await downloadResponse.arrayBuffer());
+  const filename = `${envelope.title.replace(/[^a-z0-9]/gi, '_')}_${version}.pdf`;
 
-return { buffer, filename };
+  return { buffer, filename };
 }
 
 async function downloadAllCompletedDocuments(outputDir: string): Promise<void> {
-const fs = require('fs');
-const path = require('path');
+  const fs = require('fs');
+  const path = require('path');
 
-let page = 1;
-let hasMore = true;
+  let page = 1;
+  let hasMore = true;
 
-while (hasMore) {
-const response = await fetch(
-`${BASE_URL}/envelope?status=COMPLETED&type=DOCUMENT&page=${page}&perPage=50`,
-{ headers: { Authorization: API_TOKEN } },
-);
+  while (hasMore) {
+    const response = await fetch(
+      `${BASE_URL}/envelope?status=COMPLETED&type=DOCUMENT&page=${page}&perPage=50`,
+      { headers: { Authorization: API_TOKEN } },
+    );
 
     const { data, pagination } = await response.json();
 
@@ -909,15 +905,13 @@ const response = await fetch(
 
     hasMore = page < pagination.totalPages;
     page++;
-
-}
+  }
 }
 
 const { buffer, filename } = await downloadDocument('envelope_abc123', 'signed');
 require('fs').writeFileSync(`./downloads/${filename}`, buffer);
 
 await downloadAllCompletedDocuments('./downloads');
-
 ````
 </Tab>
 <Tab value="curl">

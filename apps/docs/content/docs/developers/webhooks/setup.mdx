@@ -36,29 +36,29 @@ const app = express();
 app.use(express.json());
 
 app.post('/webhooks/documenso', (req, res) => {
-const { event, payload, createdAt } = req.body;
+  const { event, payload, createdAt } = req.body;
 
-console.log(`Received event: ${event}`);
-console.log(`Document ID: ${payload.id}`);
-console.log(`Document title: ${payload.title}`);
+  console.log(`Received event: ${event}`);
+  console.log(`Document ID: ${payload.id}`);
+  console.log(`Document title: ${payload.title}`);
 
-// Process the webhook event
-switch (event) {
-case 'DOCUMENT_COMPLETED':
-// Handle completed document
-break;
-case 'DOCUMENT_SIGNED':
-// Handle signed document
-break;
-// Handle other events...
-}
+  // Process the webhook event
+  switch (event) {
+    case 'DOCUMENT_COMPLETED':
+      // Handle completed document
+      break;
+    case 'DOCUMENT_SIGNED':
+      // Handle signed document
+      break;
+    // Handle other events...
+  }
 
-// Respond with 200 OK to acknowledge receipt
-res.status(200).json({ received: true });
+  // Respond with 200 OK to acknowledge receipt
+  res.status(200).json({ received: true });
 });
 
 app.listen(3000, () => {
-console.log('Webhook server running on port 3000');
+  console.log('Webhook server running on port 3000');
 });
 
 ````
@@ -107,41 +107,40 @@ import (
 )
 
 type WebhookPayload struct {
-Event string `json:"event"`
-Payload map[string]interface{} `json:"payload"`
-CreatedAt string `json:"createdAt"`
+	Event     string                 `json:"event"`
+	Payload   map[string]interface{} `json:"payload"`
+	CreatedAt string                 `json:"createdAt"`
 }
 
-func webhookHandler(w http.ResponseWriter, r \*http.Request) {
-var data WebhookPayload
-if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-http.Error(w, "Invalid payload", http.StatusBadRequest)
-return
-}
+func webhookHandler(w http.ResponseWriter, r *http.Request) {
+	var data WebhookPayload
+	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+		http.Error(w, "Invalid payload", http.StatusBadRequest)
+		return
+	}
 
-    fmt.Printf("Received event: %s\n", data.Event)
-    fmt.Printf("Document ID: %v\n", data.Payload["id"])
-    fmt.Printf("Document title: %v\n", data.Payload["title"])
+	fmt.Printf("Received event: %s\n", data.Event)
+	fmt.Printf("Document ID: %v\n", data.Payload["id"])
+	fmt.Printf("Document title: %v\n", data.Payload["title"])
 
-    // Process the webhook event
-    switch data.Event {
-    case "DOCUMENT_COMPLETED":
-    	// Handle completed document
-    case "DOCUMENT_SIGNED":
-    	// Handle signed document
-    }
+	// Process the webhook event
+	switch data.Event {
+	case "DOCUMENT_COMPLETED":
+		// Handle completed document
+	case "DOCUMENT_SIGNED":
+		// Handle signed document
+	}
 
-    // Respond with 200 OK to acknowledge receipt
-    w.Header().Set("Content-Type", "application/json")
-    w.WriteHeader(http.StatusOK)
-    json.NewEncoder(w).Encode(map[string]bool{"received": true})
-
+	// Respond with 200 OK to acknowledge receipt
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]bool{"received": true})
 }
 
 func main() {
-http.HandleFunc("/webhooks/documenso", webhookHandler)
-fmt.Println("Webhook server running on port 3000")
-http.ListenAndServe(":3000", nil)
+	http.HandleFunc("/webhooks/documenso", webhookHandler)
+	fmt.Println("Webhook server running on port 3000")
+	http.ListenAndServe(":3000", nil)
 }
 
 ```

@@ -234,15 +234,14 @@ curl -X GET "https://app.documenso.com/api/v2/envelope/envelope_abc123" \
 const envelopeId = 'envelope_abc123';
 
 const response = await fetch(`https://app.documenso.com/api/v2/envelope/${envelopeId}`, {
-method: 'GET',
-headers: {
-Authorization: 'api_xxxxxxxxxxxxxxxx',
-},
+  method: 'GET',
+  headers: {
+    Authorization: 'api_xxxxxxxxxxxxxxxx',
+  },
 });
 
 const document = await response.json();
 console.log(document.title, document.status);
-
 ````
 </Tab>
 </Tabs>
@@ -352,59 +351,58 @@ import FormData from 'form-data';
 const form = new FormData();
 
 const payload = {
-type: 'DOCUMENT',
-title: 'Service Agreement',
-externalId: 'contract-2025-001',
-recipients: [
-{
-email: 'signer@example.com',
-name: 'John Smith',
-role: 'SIGNER',
-fields: [
-{
-identifier: 0,
-type: 'SIGNATURE',
-page: 1,
-positionX: 10,
-positionY: 80,
-width: 30,
-height: 5,
-},
-{
-identifier: 0,
-type: 'DATE',
-page: 1,
-positionX: 50,
-positionY: 80,
-width: 20,
-height: 3,
-},
-],
-},
-],
-meta: {
-subject: 'Please sign this agreement',
-message: 'Hi John, please review and sign the attached agreement.',
-redirectUrl: 'https://example.com/thank-you',
-},
+  type: 'DOCUMENT',
+  title: 'Service Agreement',
+  externalId: 'contract-2025-001',
+  recipients: [
+    {
+      email: 'signer@example.com',
+      name: 'John Smith',
+      role: 'SIGNER',
+      fields: [
+        {
+          identifier: 0,
+          type: 'SIGNATURE',
+          page: 1,
+          positionX: 10,
+          positionY: 80,
+          width: 30,
+          height: 5,
+        },
+        {
+          identifier: 0,
+          type: 'DATE',
+          page: 1,
+          positionX: 50,
+          positionY: 80,
+          width: 20,
+          height: 3,
+        },
+      ],
+    },
+  ],
+  meta: {
+    subject: 'Please sign this agreement',
+    message: 'Hi John, please review and sign the attached agreement.',
+    redirectUrl: 'https://example.com/thank-you',
+  },
 };
 
 form.append('payload', JSON.stringify(payload));
 form.append('files', fs.createReadStream('./contract.pdf'), {
-contentType: 'application/pdf',
+  contentType: 'application/pdf',
 });
 
 const response = await fetch('https://app.documenso.com/api/v2/envelope/create', {
-method: 'POST',
-headers: {
-Authorization: 'api_xxxxxxxxxxxxxxxx',
-},
-body: form,
+  method: 'POST',
+  headers: {
+    Authorization: 'api_xxxxxxxxxxxxxxxx',
+  },
+  body: form,
 });
 
 const { id } = await response.json();
 console.log('Created document:', id);
-
 ````
 </Tab>
 </Tabs>
@@ -588,7 +586,7 @@ const { id, recipients } = await response.json();
 
 // Recipients now include signing URLs
 recipients.forEach((r) => {
-console.log(`${r.email}: ${r.signingUrl}`);
+  console.log(`${r.email}: ${r.signingUrl}`);
 });
 
 ````

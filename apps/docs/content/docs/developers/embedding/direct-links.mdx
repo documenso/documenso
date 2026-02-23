@@ -93,21 +93,20 @@ const API_TOKEN = process.env.DOCUMENSO_API_TOKEN;
 const BASE_URL = 'https://app.documenso.com/api/v2';
 
 const response = await fetch(`${BASE_URL}/template/direct/create`, {
-method: 'POST',
-headers: {
-Authorization: API_TOKEN,
-'Content-Type': 'application/json',
-},
-body: JSON.stringify({
-templateId: 123,
-directRecipientId: 1, // Optional: specific recipient to use
-}),
+  method: 'POST',
+  headers: {
+    Authorization: API_TOKEN,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    templateId: 123,
+    directRecipientId: 1, // Optional: specific recipient to use
+  }),
 });
 
 const directLink = await response.json();
 console.log('Direct link token:', directLink.token);
 // URL: https://app.documenso.com/d/{token}
-
 ````
 </Tab>
 </Tabs>
