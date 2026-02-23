@@ -84,7 +84,7 @@ return false;
 try {
 return crypto.timingSafeEqual(
 Buffer.from(receivedSecret),
-Buffer.from(expectedSecret)
+Buffer.from(expectedSecret),
 );
 } catch {
 return false;

@@ -49,7 +49,7 @@ async function createAndSendDocument(
 pdfBuffer: Buffer,
 filename: string,
 title: string,
-recipients: Recipient[]
+recipients: Recipient[],
 ): Promise<CreateAndSendResult> {
 const recipientPayload = recipients.map((recipient, index) => ({
 email: recipient.email,
@@ -59,8 +59,24 @@ signingOrder: index + 1,
 fields:
 recipient.role === 'SIGNER'
 ? [
-{ identifier: 0, type: 'SIGNATURE', page: 1, positionX: 10, positionY: 80 - index * 10, width: 30, height: 5 },
-{ identifier: 0, type: 'DATE', page: 1, positionX: 50, positionY: 80 - index * 10, width: 20, height: 3 },
+{
+identifier: 0,
+type: 'SIGNATURE',
+page: 1,
+positionX: 10,
+positionY: 80 - index * 10,
+width: 30,
+height: 5,
+},
+{
+identifier: 0,
+type: 'DATE',
+page: 1,
+positionX: 50,
+positionY: 80 - index * 10,
+width: 20,
+height: 3,
+},
 ]
 : [],
 }));
@@ -76,7 +92,7 @@ meta: {
 subject: `Please sign: ${title}`,
 message: 'Please review and sign the attached document.',
 },
-})
+}),
 );
 formData.append('files', new Blob([pdfBuffer], { type: 'application/pdf' }), filename);
 
@@ -111,21 +127,28 @@ const distributeResult = await distributeResponse.json();
 
 return {
 envelopeId,
-recipients: distributeResult.recipients.map((r: { email: string; signingUrl: string }) => ({
+recipients: distributeResult.recipients.map(
+(r: { email: string; signingUrl: string }) => ({
 email: r.email,
 signingUrl: r.signingUrl,
-})),
+}),
+),
 };
 }
 
 const fs = require('fs');
 const pdfBuffer = fs.readFileSync('./contract.pdf');
 
-const result = await createAndSendDocument(pdfBuffer, 'contract.pdf', 'Service Agreement', [
+const result = await createAndSendDocument(
+pdfBuffer,
+'contract.pdf',
+'Service Agreement',
+[
 { email: 'client@example.com', name: 'John Smith', role: 'SIGNER' },
 { email: 'manager@company.com', name: 'Jane Doe', role: 'SIGNER' },
 { email: 'legal@company.com', name: 'Legal Team', role: 'CC' },
-]);
+],
+);
 
 console.log('Document sent:', result.envelopeId);
 result.recipients.forEach((r) => console.log(`${r.email}: ${r.signingUrl}`));
@@ -266,7 +289,7 @@ signingOrder: number;
 
 async function sendEmploymentContract(
 templateId: number,
-employee: EmployeeData
+employee: EmployeeData,
 ): Promise<{ documentId: string; signingUrl: string }> {
 const templateResponse = await fetch(`${BASE_URL}/template/${templateId}`, {
 headers: { Authorization: API_TOKEN },
@@ -279,7 +302,7 @@ throw new Error('Template not found');
 const template = await templateResponse.json();
 
 const employeeRecipient = template.recipients.find(
-(r: TemplateRecipient) => r.role === 'SIGNER' && r.signingOrder === 1
+(r: TemplateRecipient) => r.role === 'SIGNER' && r.signingOrder === 1,
 );
 
 if (!employeeRecipient) {
@@ -302,17 +325,29 @@ prefillFields.push({ id: positionField.id, type: 'text', value: employee.positio
 
 const salaryField = fieldsByLabel.get('salary') || fieldsByLabel.get('compensation');
 if (salaryField) {
-prefillFields.push({ id: salaryField.id, type: 'number', value: employee.salary.toString() });
+prefillFields.push({
+id: salaryField.id,
+type: 'number',
+value: employee.salary.toString(),
+});
 }
 
 const startDateField = fieldsByLabel.get('start date');
 if (startDateField) {
-prefillFields.push({ id: startDateField.id, type: 'date', value: employee.startDate });
+prefillFields.push({
+id: startDateField.id,
+type: 'date',
+value: employee.startDate,
+});
 }
 
 const departmentField = fieldsByLabel.get('department');
 if (departmentField) {
-prefillFields.push({ id: departmentField.id, type: 'dropdown', value: employee.department });
+prefillFields.push({
+id: departmentField.id,
+type: 'dropdown',
+value: employee.department,
+});
 }
 
 const createResponse = await fetch(`${BASE_URL}/template/use`, {
@@ -462,7 +497,7 @@ failed: Array<{ email: string; error: string }>;
 async function bulkSendFromTemplate(
 templateId: number,
 recipients: BulkRecipient[],
-concurrency = 5
+concurrency = 5,
 ): Promise<BulkSendResult> {
 const templateResponse = await fetch(`${BASE_URL}/template/${templateId}`, {
 headers: { Authorization: API_TOKEN },
@@ -473,7 +508,9 @@ throw new Error('Template not found');
 }
 
 const template = await templateResponse.json();
-const signerSlot = template.recipients.find((r: { role: string }) => r.role === 'SIGNER');
+const signerSlot = template.recipients.find(
+(r: { role: string }) => r.role === 'SIGNER',
+);
 
 if (!signerSlot) {
 throw new Error('Template has no signer recipient');
@@ -513,7 +550,7 @@ const batch = recipients.slice(i, i + concurrency);
           envelopeId: document.id,
           signingUrl: document.recipients[0].signingUrl,
         };
-      })
+      }),
     );
 
     batchResults.forEach((result, index) => {
@@ -806,7 +843,7 @@ type DownloadVersion = 'signed' | 'original';
 
 async function downloadDocument(
 envelopeId: string,
-version: DownloadVersion = 'signed'
+version: DownloadVersion = 'signed',
 ): Promise<{ buffer: Buffer; filename: string }> {
 const envelopeResponse = await fetch(`${BASE_URL}/envelope/${envelopeId}`, {
 headers: { Authorization: API_TOKEN },
@@ -829,7 +866,7 @@ throw new Error('No document found in envelope');
 
 const downloadResponse = await fetch(
 `${BASE_URL}/envelope/item/${envelopeItem.id}/download?version=${version}`,
-{ headers: { Authorization: API_TOKEN } }
+{ headers: { Authorization: API_TOKEN } },
 );
 
 if (!downloadResponse.ok) {
@@ -853,7 +890,7 @@ let hasMore = true;
 while (hasMore) {
 const response = await fetch(
 `${BASE_URL}/envelope?status=COMPLETED&type=DOCUMENT&page=${page}&perPage=50`,
-{ headers: { Authorization: API_TOKEN } }
+{ headers: { Authorization: API_TOKEN } },
 );
 
     const { data, pagination } = await response.json();

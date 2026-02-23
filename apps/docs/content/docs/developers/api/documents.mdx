@@ -233,15 +233,12 @@ curl -X GET "https://app.documenso.com/api/v2/envelope/envelope_abc123" \
 ```typescript
 const envelopeId = 'envelope_abc123';
 
-const response = await fetch(
-`https://app.documenso.com/api/v2/envelope/${envelopeId}`,
-{
+const response = await fetch(`https://app.documenso.com/api/v2/envelope/${envelopeId}`, {
 method: 'GET',
 headers: {
 Authorization: 'api_xxxxxxxxxxxxxxxx',
 },
-}
-);
+});
 
 const document = await response.json();
 console.log(document.title, document.status);

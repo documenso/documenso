@@ -217,15 +217,12 @@ curl -X GET "https://app.documenso.com/api/v2/template/123" \
 ```typescript
 const templateId = 123;
 
-const response = await fetch(
-`https://app.documenso.com/api/v2/template/${templateId}`,
-{
+const response = await fetch(`https://app.documenso.com/api/v2/template/${templateId}`, {
 method: 'GET',
 headers: {
 Authorization: 'api_xxxxxxxxxxxxxxxx',
 },
-}
-);
+});
 
 const template = await response.json();
 console.log(template.title, template.recipients.length);

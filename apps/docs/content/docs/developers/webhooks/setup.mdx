@@ -119,22 +119,23 @@ http.Error(w, "Invalid payload", http.StatusBadRequest)
 return
 }
 
-fmt.Printf("Received event: %s\n", data.Event)
-fmt.Printf("Document ID: %v\n", data.Payload["id"])
-fmt.Printf("Document title: %v\n", data.Payload["title"])
+    fmt.Printf("Received event: %s\n", data.Event)
+    fmt.Printf("Document ID: %v\n", data.Payload["id"])
+    fmt.Printf("Document title: %v\n", data.Payload["title"])
 
-// Process the webhook event
-switch data.Event {
-case "DOCUMENT_COMPLETED":
-// Handle completed document
-case "DOCUMENT_SIGNED":
-// Handle signed document
-}
+    // Process the webhook event
+    switch data.Event {
+    case "DOCUMENT_COMPLETED":
+    	// Handle completed document
+    case "DOCUMENT_SIGNED":
+    	// Handle signed document
+    }
 
-// Respond with 200 OK to acknowledge receipt
-w.Header().Set("Content-Type", "application/json")
-w.WriteHeader(http.StatusOK)
-json.NewEncoder(w).Encode(map[string]bool{"received": true})
+    // Respond with 200 OK to acknowledge receipt
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+    json.NewEncoder(w).Encode(map[string]bool{"received": true})
+
 }
 
 func main() {
