@@ -6,10 +6,9 @@ import { FieldType } from '@prisma/client';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
-
-import type { TEnvelope } from '../../types/envelope';
 
 export const ZLocalFieldSchema = z.object({
   // This is the actual ID of the field if created.
@@ -37,7 +36,7 @@ const ZEditorFieldsFormSchema = z.object({
 export type TEditorFieldsFormSchema = z.infer<typeof ZEditorFieldsFormSchema>;
 
 type EditorFieldsProps = {
-  envelope: TEnvelope;
+  envelope: TEditorEnvelope;
   handleFieldsUpdate: (fields: TLocalField[]) => unknown;
 };
 

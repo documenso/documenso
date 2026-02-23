@@ -205,6 +205,7 @@ export const EnvelopeEditorPreviewPage = () => {
     <EnvelopeRenderProvider
       version="current"
       envelope={envelope}
+      envelopeItems={envelope.envelopeItems}
       token={undefined}
       fields={fieldsWithPlaceholders}
       recipients={envelope.recipients.map((recipient) => ({

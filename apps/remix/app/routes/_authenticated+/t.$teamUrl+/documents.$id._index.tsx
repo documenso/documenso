@@ -10,6 +10,7 @@ import { match } from 'ts-pattern';
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
@@ -56,9 +57,14 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
     data: envelope,
     isLoading: isLoadingEnvelope,
     isError: isErrorEnvelope,
-  } = trpc.envelope.get.useQuery({
-    envelopeId: params.id,
-  });
+  } = trpc.envelope.get.useQuery(
+    {
+      envelopeId: params.id,
+    },
+    {
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    },
+  );
 
   if (isLoadingEnvelope) {
     return (
@@ -157,6 +163,7 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
             <EnvelopeRenderProvider
               version="current"
               envelope={envelope}
+              envelopeItems={envelope.envelopeItems}
               token={undefined}
               fields={envelope.fields}
               recipients={envelope.recipients}

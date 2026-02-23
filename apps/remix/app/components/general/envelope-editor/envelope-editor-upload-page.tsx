@@ -8,7 +8,6 @@ import { DocumentStatus } from '@prisma/client';
 import { FileWarningIcon, GripVerticalIcon, Loader2 } from 'lucide-react';
 import { X } from 'lucide-react';
 import { ErrorCode as DropzoneErrorCode, type FileRejection } from 'react-dropzone';
-import { Link } from 'react-router';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import {
@@ -17,7 +16,9 @@ import {
 } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
+import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
 import { nanoid } from '@documenso/lib/universal/id';
+import { PRESIGNED_ENVELOPE_ITEM_ID_PREFIX } from '@documenso/lib/utils/embed-config';
 import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
 import { trpc } from '@documenso/trpc/react';
 import type { TCreateEnvelopeItemsPayload } from '@documenso/trpc/server/envelope-router/create-envelope-items.types';
@@ -49,9 +50,13 @@ export const EnvelopeEditorUploadPage = () => {
   const organisation = useCurrentOrganisation();
 
   const { t } = useLingui();
-  const { envelope, setLocalEnvelope, relativePath, editorFields } = useCurrentEnvelopeEditor();
   const { maximumEnvelopeItemCount, remaining } = useLimits();
   const { toast } = useToast();
+
+  const { envelope, setLocalEnvelope, editorFields, editorConfig, isEmbedded, navigateToStep } =
+    useCurrentEnvelopeEditor();
+
+  const { envelopeItems: uploadConfig } = editorConfig;
 
   const [localFiles, setLocalFiles] = useState<LocalFile[]>(
     envelope.envelopeItems
@@ -103,16 +108,44 @@ export const EnvelopeEditorUploadPage = () => {
   );
 
   const onFileDrop = async (files: File[]) => {
-    const newUploadingFiles: (LocalFile & { file: File })[] = files.map((file) => ({
-      id: nanoid(),
-      envelopeItemId: null,
-      title: file.name,
-      file,
-      isUploading: true,
-      isError: false,
-    }));
+    const newUploadingFiles: (LocalFile & {
+      file: File;
+      data: TEditorEnvelope['envelopeItems'][number]['data'] | null;
+    })[] = await Promise.all(
+      files.map(async (file) => {
+        return {
+          id: nanoid(),
+          envelopeItemId: isEmbedded ? `${PRESIGNED_ENVELOPE_ITEM_ID_PREFIX}${nanoid()}` : null,
+          title: file.name,
+          file,
+          isUploading: isEmbedded ? false : true,
+          // Clone the buffer so it can be read multiple times (File.arrayBuffer() consumes the stream once)
+          data: isEmbedded ? new Uint8Array((await file.arrayBuffer()).slice(0)) : null,
+          isError: false,
+        };
+      }),
+    );
 
     setLocalFiles((prev) => [...prev, ...newUploadingFiles]);
+
+    // Directly commit the files for embedded documents since those are not uploaded
+    // until the end of the embedded flow.
+    if (isEmbedded) {
+      setLocalEnvelope({
+        envelopeItems: [
+          ...envelope.envelopeItems,
+          ...newUploadingFiles.map((file) => ({
+            id: file.envelopeItemId!,
+            title: file.title,
+            order: envelope.envelopeItems.length + 1,
+            envelopeId: envelope.id,
+            data: file.data!,
+          })),
+        ],
+      });
+
+      return;
+    }
 
     const payload = {
       envelopeId: envelope.id,
@@ -163,7 +196,9 @@ export const EnvelopeEditorUploadPage = () => {
    * Hide the envelope item from the list on deletion.
    */
   const onFileDelete = (envelopeItemId: string) => {
-    setLocalFiles((prev) => prev.filter((uploadingFile) => uploadingFile.id !== envelopeItemId));
+    setLocalFiles((prev) =>
+      prev.filter((uploadingFile) => uploadingFile.envelopeItemId !== envelopeItemId),
+    );
 
     const fieldsWithoutDeletedItem = envelope.fields.filter(
       (field) => field.envelopeItemId !== envelopeItemId,
@@ -195,6 +230,30 @@ export const EnvelopeEditorUploadPage = () => {
   };
 
   const debouncedUpdateEnvelopeItems = useDebounceFunction((files: LocalFile[]) => {
+    if (isEmbedded) {
+      const nextEnvelopeItems = files
+        .filter((item) => item.envelopeItemId)
+        .map((item, index) => {
+          const originalEnvelopeItem = envelope.envelopeItems.find(
+            (envelopeItem) => envelopeItem.id === item.envelopeItemId,
+          );
+
+          return {
+            id: item.envelopeItemId || '',
+            title: item.title,
+            order: index + 1,
+            envelopeId: envelope.id,
+            data: originalEnvelopeItem?.data,
+          };
+        });
+
+      setLocalEnvelope({
+        envelopeItems: nextEnvelopeItems,
+      });
+
+      return;
+    }
+
     void updateEnvelopeItems({
       envelopeId: envelope.id,
       data: files
@@ -277,32 +336,45 @@ export const EnvelopeEditorUploadPage = () => {
         </CardHeader>
 
         <CardContent>
-          <DocumentDropzone
-            onDrop={onFileDrop}
-            allowMultiple
-            className="pb-4 pt-6"
-            disabled={dropzoneDisabledMessage !== null}
-            disabledMessage={dropzoneDisabledMessage || undefined}
-            disabledHeading={msg`Upload disabled`}
-            maxFiles={maximumEnvelopeItemCount - localFiles.length}
-            onDropRejected={onFileDropRejected}
-          />
+          {uploadConfig?.allowUpload && (
+            <DocumentDropzone
+              data-testid="envelope-item-dropzone"
+              onDrop={onFileDrop}
+              allowMultiple
+              className="pb-4 pt-6"
+              disabled={dropzoneDisabledMessage !== null}
+              disabledMessage={dropzoneDisabledMessage || undefined}
+              disabledHeading={msg`Upload disabled`}
+              maxFiles={maximumEnvelopeItemCount - localFiles.length}
+              onDropRejected={onFileDropRejected}
+            />
+          )}
 
           {/* Uploaded Files List */}
           <div className="mt-4">
             <DragDropContext onDragEnd={onDragEnd}>
               <Droppable droppableId="files">
                 {(provided) => (
-                  <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                  <div
+                    data-testid="envelope-items-list"
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="space-y-2"
+                  >
                     {localFiles.map((localFile, index) => (
                       <Draggable
                         key={localFile.id}
-                        isDragDisabled={isCreatingEnvelopeItems || !canItemsBeModified}
+                        isDragDisabled={
+                          isCreatingEnvelopeItems ||
+                          !canItemsBeModified ||
+                          !uploadConfig?.allowConfigureOrder
+                        }
                         draggableId={localFile.id}
                         index={index}
                       >
                         {(provided, snapshot) => (
                           <div
+                            data-testid={`envelope-item-row-${localFile.id}`}
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             style={provided.draggableProps.style}
@@ -311,18 +383,25 @@ export const EnvelopeEditorUploadPage = () => {
                             }`}
                           >
                             <div className="flex items-center space-x-3">
-                              <div
-                                {...provided.dragHandleProps}
-                                className="cursor-grab active:cursor-grabbing"
-                              >
-                                <GripVerticalIcon className="h-5 w-5 flex-shrink-0 opacity-40" />
-                              </div>
+                              {uploadConfig?.allowConfigureOrder && (
+                                <div
+                                  {...provided.dragHandleProps}
+                                  data-testid={`envelope-item-drag-handle-${localFile.id}`}
+                                  className="cursor-grab active:cursor-grabbing"
+                                >
+                                  <GripVerticalIcon className="h-5 w-5 flex-shrink-0 opacity-40" />
+                                </div>
+                              )}
 
                               <div>
                                 {localFile.envelopeItemId !== null ? (
                                   <EnvelopeItemTitleInput
-                                    disabled={envelope.status !== DocumentStatus.DRAFT}
+                                    disabled={
+                                      envelope.status !== DocumentStatus.DRAFT ||
+                                      !uploadConfig?.allowConfigureTitle
+                                    }
                                     value={localFile.title}
+                                    dataTestId={`envelope-item-title-input-${localFile.id}`}
                                     placeholder={t`Document Title`}
                                     onChange={(title) => {
                                       onEnvelopeItemTitleChange(localFile.envelopeItemId!, title);
@@ -355,20 +434,36 @@ export const EnvelopeEditorUploadPage = () => {
                                 </div>
                               )}
 
-                              {!localFile.isUploading && localFile.envelopeItemId && (
-                                <EnvelopeItemDeleteDialog
-                                  canItemBeDeleted={canItemsBeModified}
-                                  envelopeId={envelope.id}
-                                  envelopeItemId={localFile.envelopeItemId}
-                                  envelopeItemTitle={localFile.title}
-                                  onDelete={onFileDelete}
-                                  trigger={
-                                    <Button variant="ghost" size="sm">
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  }
-                                />
-                              )}
+                              {!localFile.isUploading &&
+                                localFile.envelopeItemId &&
+                                uploadConfig?.allowDelete &&
+                                (isEmbedded ? (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    data-testid={`envelope-item-remove-button-${localFile.id}`}
+                                    onClick={() => onFileDelete(localFile.envelopeItemId!)}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                ) : (
+                                  <EnvelopeItemDeleteDialog
+                                    canItemBeDeleted={canItemsBeModified}
+                                    envelopeId={envelope.id}
+                                    envelopeItemId={localFile.envelopeItemId}
+                                    envelopeItemTitle={localFile.title}
+                                    onDelete={onFileDelete}
+                                    trigger={
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        data-testid={`envelope-item-remove-button-${localFile.id}`}
+                                      >
+                                        <X className="h-4 w-4" />
+                                      </Button>
+                                    }
+                                  />
+                                ))}
                             </div>
                           </div>
                         )}
@@ -385,14 +480,13 @@ export const EnvelopeEditorUploadPage = () => {
 
       {/* Recipients Section */}
       <EnvelopeEditorRecipientForm />
-
-      <div className="flex justify-end">
-        <Button asChild>
-          <Link to={`${relativePath.editorPath}?step=addFields`}>
+      {editorConfig.general.allowAddFieldsStep && (
+        <div className="flex justify-end">
+          <Button type="button" onClick={() => void navigateToStep('addFields')}>
             <Trans>Add Fields</Trans>
-          </Link>
-        </Button>
-      </div>
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

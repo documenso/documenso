@@ -382,7 +382,12 @@ const EmbedSignDocumentPageV2 = ({
         recipient={recipient}
         user={user}
       >
-        <EnvelopeRenderProvider version="current" envelope={envelope} token={token}>
+        <EnvelopeRenderProvider
+          version="current"
+          envelope={envelope}
+          envelopeItems={envelope.envelopeItems}
+          token={token}
+        >
           <EmbedSignDocumentV2ClientPage
             hidePoweredBy={hidePoweredBy}
             allowWhitelabelling={allowEmbedSigningWhitelabel}

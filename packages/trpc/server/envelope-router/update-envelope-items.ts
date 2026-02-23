@@ -54,6 +54,9 @@ export const updateEnvelopeItemsRoute = authenticatedProcedure
       });
     }
 
+    // Note: This logic is duplicated in many places. If we plan to allow changing title/order
+    // even after the envelope has been sent, make sure to update it everywhere including
+    // embedding routes.
     if (!canEnvelopeItemsBeModified(envelope, envelope.recipients)) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Envelope item is not editable',
@@ -71,30 +74,51 @@ export const updateEnvelopeItemsRoute = authenticatedProcedure
       });
     }
 
-    const updatedEnvelopeItems = await Promise.all(
-      data.map(async ({ envelopeItemId, order, title }) =>
-        prisma.envelopeItem.update({
-          where: {
-            envelopeId: envelope.id,
-            id: envelopeItemId,
-          },
-          data: {
-            order,
-            title,
-          },
-          select: {
-            id: true,
-            order: true,
-            title: true,
-            envelopeId: true,
-          },
-        }),
-      ),
-    );
-
-    // Todo: Envelope [AUDIT_LOGS]
+    const updatedEnvelopeItems = await UNSAFE_updateEnvelopeItems({
+      envelopeId,
+      data,
+    });
 
     return {
       data: updatedEnvelopeItems,
     };
   });
+
+type UnsafeUpdateEnvelopeItemsOptions = {
+  envelopeId: string;
+  data: {
+    envelopeItemId: string;
+    order?: number;
+    title?: string;
+  }[];
+};
+
+export const UNSAFE_updateEnvelopeItems = async ({
+  envelopeId,
+  data,
+}: UnsafeUpdateEnvelopeItemsOptions) => {
+  // Todo: Envelope [AUDIT_LOGS]
+
+  const updatedEnvelopeItems = await Promise.all(
+    data.map(async ({ envelopeItemId, order, title }) =>
+      prisma.envelopeItem.update({
+        where: {
+          envelopeId,
+          id: envelopeItemId,
+        },
+        data: {
+          order,
+          title,
+        },
+        select: {
+          id: true,
+          order: true,
+          title: true,
+          envelopeId: true,
+        },
+      }),
+    ),
+  );
+
+  return updatedEnvelopeItems;
+};

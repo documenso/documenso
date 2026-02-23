@@ -60,6 +60,15 @@ export const verifyEmbeddingPresignToken = async ({
     where: {
       id: tokenId,
     },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
   });
 
   if (!apiToken) {
@@ -69,7 +78,7 @@ export const verifyEmbeddingPresignToken = async ({
   }
 
   // This should never happen but we need to narrow types
-  if (!apiToken.userId) {
+  if (!apiToken.userId || !apiToken.user) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'Invalid presign token: API token does not have a user attached',
     });
@@ -119,5 +128,10 @@ export const verifyEmbeddingPresignToken = async ({
   return {
     ...apiToken,
     userId,
+    user: {
+      id: apiToken.user.id,
+      name: apiToken.user.name,
+      email: apiToken.user.email,
+    },
   };
 };

@@ -1,4 +1,3 @@
-import { msg } from '@lingui/core/macro';
 import { z } from 'zod';
 
 import { RecipientSchema } from '@documenso/prisma/generated/zod/modelSchema/RecipientSchema';
@@ -114,10 +113,5 @@ export const ZEnvelopeRecipientManySchema = ZRecipientManySchema.omit({
 
 export const ZRecipientEmailSchema = z.union([
   z.literal(''),
-  z
-    .string()
-    .trim()
-    .toLowerCase()
-    .email({ message: msg`Invalid email`.id })
-    .max(254),
+  z.string().trim().toLowerCase().email({ message: 'Invalid email' }).max(254),
 ]);
