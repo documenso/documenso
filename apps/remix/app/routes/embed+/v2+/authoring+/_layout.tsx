@@ -10,6 +10,7 @@ import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client
 import { OrganisationProvider } from '@documenso/lib/client-only/providers/organisation';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
+import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
 import { TrpcProvider } from '@documenso/trpc/react';
 import type { OrganisationSession } from '@documenso/trpc/server/organisation-router/get-organisation-session.types';
 
@@ -38,16 +39,24 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     teamId: result.teamId,
   });
 
+  const teamSettings = await getTeamSettings({
+    userId: result.userId,
+    teamId: result.teamId,
+  });
+
   return {
     token,
     userId: result.userId,
     teamId: result.teamId,
     organisationClaim,
+    preferences: {
+      aiFeaturesEnabled: teamSettings.aiFeaturesEnabled,
+    },
   };
 };
 
 export default function AuthoringLayout() {
-  const { token, teamId, organisationClaim } = useLoaderData<typeof loader>();
+  const { token, teamId, organisationClaim, preferences } = useLoaderData<typeof loader>();
 
   const allowEmbedAuthoringWhiteLabel = organisationClaim.flags.embedAuthoringWhiteLabel ?? false;
 
@@ -88,9 +97,9 @@ export default function AuthoringLayout() {
     createdAt: new Date(),
     avatarImageId: null,
     organisationId: '',
-    currentTeamRole: TeamMemberRole.MEMBER,
+    currentTeamRole: TeamMemberRole.ADMIN,
     preferences: {
-      aiFeaturesEnabled: true, // Todo: Embed
+      aiFeaturesEnabled: preferences.aiFeaturesEnabled,
     },
   };
 
@@ -114,10 +123,6 @@ export default function AuthoringLayout() {
   };
 
   return (
-    // Todo: Embed
-    // Session provider? fuck me
-    // If someone ever uses useSession it's going to break
-    // We need E2E Tests
     <OrganisationProvider organisation={organisation}>
       <TeamProvider team={team}>
         <TrpcProvider

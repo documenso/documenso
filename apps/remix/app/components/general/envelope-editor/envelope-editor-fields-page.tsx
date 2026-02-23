@@ -6,7 +6,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
 import { FileTextIcon, SparklesIcon } from 'lucide-react';
-import { Link, useRevalidator, useSearchParams } from 'react-router';
+import { useRevalidator, useSearchParams } from 'react-router';
 import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
 
@@ -75,7 +75,7 @@ export const EnvelopeEditorFieldsPage = () => {
 
   const scrollableContainerRef = useRef<HTMLDivElement>(null);
 
-  const { envelope, editorFields, relativePath, editorConfig } = useCurrentEnvelopeEditor();
+  const { envelope, editorFields, navigateToStep, editorConfig } = useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem } = useCurrentEnvelopeRender();
 
@@ -172,10 +172,8 @@ export const EnvelopeEditorFieldsPage = () => {
                 </AlertDescription>
               </div>
 
-              <Button asChild variant="outline">
-                <Link to={`${relativePath.editorPath}`}>
-                  <Trans>Add Recipients</Trans>
-                </Link>
+              <Button variant="outline" onClick={() => void navigateToStep('upload')}>
+                <Trans>Add Recipients</Trans>
               </Button>
             </Alert>
           )}

@@ -1,9 +1,17 @@
 import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType, Prisma, ReadStatus, SendStatus, SigningStatus } from '@prisma/client';
+import { useSearchParams } from 'react-router';
 
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
+import {
+  DEFAULT_EDITOR_CONFIG,
+  type EnvelopeEditorConfig,
+  type TEditorEnvelope,
+} from '@documenso/lib/types/envelope-editor';
 import { trpc } from '@documenso/trpc/react';
+import type { TSetEnvelopeFieldsResponse } from '@documenso/trpc/server/envelope-router/set-envelope-fields.types';
 import type { TSetEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/set-envelope-recipients.types';
 import type { TUpdateEnvelopeRequest } from '@documenso/trpc/server/envelope-router/update-envelope.types';
 import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
@@ -11,7 +19,6 @@ import { AVAILABLE_RECIPIENT_COLORS } from '@documenso/ui/lib/recipient-colors';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import type { TDocumentEmailSettings } from '../../types/document-email';
-import type { TEnvelope } from '../../types/envelope';
 import { formatDocumentsPath, formatTemplatesPath } from '../../utils/teams';
 import { useEditorFields } from '../hooks/use-editor-fields';
 import type { TLocalField } from '../hooks/use-editor-fields';
@@ -38,14 +45,20 @@ export const useDebounceFunction = <Args extends unknown[]>(
   );
 };
 
+export type EnvelopeEditorStep = 'upload' | 'addFields' | 'preview';
+
 type UpdateEnvelopePayload = Pick<TUpdateEnvelopeRequest, 'data' | 'meta'>;
 
 type EnvelopeEditorProviderValue = {
-  envelope: TEnvelope;
+  editorConfig: EnvelopeEditorConfig;
+
+  envelope: TEditorEnvelope;
+
+  isEmbedded: boolean;
   isDocument: boolean;
   isTemplate: boolean;
-  setLocalEnvelope: (localEnvelope: Partial<TEnvelope>) => void;
 
+  setLocalEnvelope: (localEnvelope: Partial<TEditorEnvelope>) => void;
   updateEnvelope: (envelopeUpdates: UpdateEnvelopePayload) => void;
   updateEnvelopeAsync: (envelopeUpdates: UpdateEnvelopePayload) => Promise<void>;
   setRecipientsDebounced: (recipients: TSetEnvelopeRecipientsRequest['recipients']) => void;
@@ -57,7 +70,7 @@ type EnvelopeEditorProviderValue = {
   editorRecipients: ReturnType<typeof useEditorRecipients>;
 
   isAutosaving: boolean;
-  flushAutosave: () => Promise<void>;
+  flushAutosave: () => Promise<TEditorEnvelope>;
   autosaveError: boolean;
 
   relativePath: {
@@ -68,12 +81,14 @@ type EnvelopeEditorProviderValue = {
     templateRootPath: string;
   };
 
+  navigateToStep: (step: EnvelopeEditorStep) => Promise<void>;
   syncEnvelope: () => Promise<void>;
 };
 
 interface EnvelopeEditorProviderProps {
   children: React.ReactNode;
-  initialEnvelope: TEnvelope;
+  editorConfig?: EnvelopeEditorConfig;
+  initialEnvelope: TEditorEnvelope;
 }
 
 const EnvelopeEditorContext = createContext<EnvelopeEditorProviderValue | null>(null);
@@ -90,13 +105,28 @@ export const useCurrentEnvelopeEditor = () => {
 
 export const EnvelopeEditorProvider = ({
   children,
+  editorConfig = DEFAULT_EDITOR_CONFIG,
   initialEnvelope,
 }: EnvelopeEditorProviderProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
 
-  const [envelope, setEnvelope] = useState(initialEnvelope);
+  const [_searchParams, setSearchParams] = useSearchParams();
+
+  const [envelope, _setEnvelope] = useState(initialEnvelope);
   const [autosaveError, setAutosaveError] = useState<boolean>(false);
+
+  const envelopeRef = useRef(initialEnvelope);
+
+  const setEnvelope: typeof _setEnvelope = (action) => {
+    _setEnvelope((prev) => {
+      const next = typeof action === 'function' ? action(prev) : action;
+      envelopeRef.current = next;
+      return next;
+    });
+  };
+
+  const isEmbedded = editorConfig.embeded !== undefined;
 
   const editorFields = useEditorFields({
     envelope,
@@ -107,61 +137,35 @@ export const EnvelopeEditorProvider = ({
     envelope,
   });
 
-  const envelopeUpdateMutationQuery = trpc.envelope.update.useMutation({
-    onSuccess: (response, input) => {
-      setEnvelope({
-        ...envelope,
-        ...response,
-        documentMeta: {
-          ...envelope.documentMeta,
-          ...input.meta,
-          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-          emailSettings: (input.meta?.emailSettings ||
-            null) as unknown as TDocumentEmailSettings | null,
-        },
-      });
+  const setRecipientsMutation = trpc.envelope.recipient.set.useMutation();
+  const setFieldsMutation = trpc.envelope.field.set.useMutation();
+  const updateEnvelopeMutation = trpc.envelope.update.useMutation();
 
-      setAutosaveError(false);
-    },
-    onError: (err) => {
-      console.error(err);
+  /**
+   * Handles debouncing the recipients updates to the server.
+   *
+   * Will set the local envelope recipients and fields after the update is complete.
+   */
+  const {
+    triggerSave: setRecipientsDebounced,
+    flush: flushSetRecipients,
+    isPending: isRecipientsMutationPending,
+  } = useEnvelopeAutosave(async (localRecipients: TSetEnvelopeRecipientsRequest['recipients']) => {
+    try {
+      let recipients: TEditorEnvelope['recipients'] = [];
 
-      setAutosaveError(true);
+      if (!isEmbedded) {
+        const response = await setRecipientsMutation.mutateAsync({
+          envelopeId: envelope.id,
+          envelopeType: envelope.type,
+          recipients: localRecipients,
+        });
 
-      toast({
-        title: t`Save failed`,
-        description: t`We encountered an error while attempting to save your changes. Your changes cannot be saved at this time.`,
-        variant: 'destructive',
-        duration: 7500,
-      });
-    },
-  });
+        recipients = response.data;
+      } else {
+        recipients = mapLocalRecipientsToRecipients({ envelope, localRecipients });
+      }
 
-  const envelopeFieldSetMutationQuery = trpc.envelope.field.set.useMutation({
-    onSuccess: ({ data: fields }) => {
-      setEnvelope((prev) => ({
-        ...prev,
-        fields,
-      }));
-
-      setAutosaveError(false);
-    },
-    onError: (err) => {
-      console.error(err);
-
-      setAutosaveError(true);
-
-      toast({
-        title: t`Save failed`,
-        description: t`We encountered an error while attempting to save your changes. Your changes cannot be saved at this time.`,
-        variant: 'destructive',
-        duration: 7500,
-      });
-    },
-  });
-
-  const envelopeRecipientSetMutationQuery = trpc.envelope.recipient.set.useMutation({
-    onSuccess: ({ data: recipients }) => {
       setEnvelope((prev) => ({
         ...prev,
         recipients,
@@ -178,8 +182,7 @@ export const EnvelopeEditorProvider = ({
       );
 
       setAutosaveError(false);
-    },
-    onError: (err) => {
+    } catch (err) {
       console.error(err);
 
       setAutosaveError(true);
@@ -190,58 +193,137 @@ export const EnvelopeEditorProvider = ({
         variant: 'destructive',
         duration: 7500,
       });
-    },
-  });
-
-  const {
-    triggerSave: setRecipientsDebounced,
-    flush: setRecipientsAsync,
-    isPending: isRecipientsMutationPending,
-  } = useEnvelopeAutosave(async (recipients: TSetEnvelopeRecipientsRequest['recipients']) => {
-    await envelopeRecipientSetMutationQuery.mutateAsync({
-      envelopeId: envelope.id,
-      envelopeType: envelope.type,
-      recipients,
-    });
+    }
   }, 1000);
 
+  const setRecipientsAsync = async (
+    localRecipients: TSetEnvelopeRecipientsRequest['recipients'],
+  ) => {
+    setRecipientsDebounced(localRecipients);
+    await flushSetRecipients();
+  };
+
+  /**
+   * Handles debouncing the fields updates to the server.
+   *
+   * Will set the local envelope fields after the update is complete.
+   */
   const {
     triggerSave: setFieldsDebounced,
-    flush: setFieldsAsync,
+    flush: flushSetFields,
     isPending: isFieldsMutationPending,
   } = useEnvelopeAutosave(async (localFields: TLocalField[]) => {
-    const envelopeFields = await envelopeFieldSetMutationQuery.mutateAsync({
-      envelopeId: envelope.id,
-      envelopeType: envelope.type,
-      fields: localFields,
-    });
+    try {
+      let fields: TSetEnvelopeFieldsResponse['data'] = [];
 
-    // Insert the IDs into the local fields.
-    envelopeFields.data.forEach((field) => {
-      const localField = localFields.find((localField) => localField.formId === field.formId);
+      if (!isEmbedded) {
+        const response = await setFieldsMutation.mutateAsync({
+          envelopeId: envelope.id,
+          envelopeType: envelope.type,
+          fields: localFields,
+        });
 
-      if (localField && !localField.id) {
-        localField.id = field.id;
-
-        editorFields.setFieldId(localField.formId, field.id);
+        fields = response.data;
+      } else {
+        fields = mapLocalFieldsToFields({ envelope, localFields });
       }
-    });
+
+      setEnvelope((prev) => ({
+        ...prev,
+        fields,
+      }));
+
+      setAutosaveError(false);
+
+      // Insert the IDs into the local fields.
+      fields.forEach((field) => {
+        const localField = localFields.find((localField) => localField.formId === field.formId);
+
+        if (localField && !localField.id) {
+          localField.id = field.id;
+
+          editorFields.setFieldId(localField.formId, field.id);
+        }
+      });
+    } catch (err) {
+      console.error(err);
+
+      setAutosaveError(true);
+
+      toast({
+        title: t`Save failed`,
+        description: t`We encountered an error while attempting to save your changes. Your changes cannot be saved at this time.`,
+        variant: 'destructive',
+        duration: 7500,
+      });
+    }
   }, 2000);
 
+  const setFieldsAsync = async (localFields: TLocalField[]) => {
+    setFieldsDebounced(localFields);
+    await flushSetFields();
+  };
+
+  /**
+   * Handles debouncing the envelope updates to the server.
+   *
+   * Will set the local envelope after the update is complete.
+   */
   const {
-    triggerSave: setEnvelopeDebounced,
-    flush: setEnvelopeAsync,
+    triggerSave: updateEnvelopeDebounced,
+    flush: flushUpdateEnvelope,
     isPending: isEnvelopeMutationPending,
-  } = useEnvelopeAutosave(async (envelopeUpdates: UpdateEnvelopePayload) => {
-    await envelopeUpdateMutationQuery.mutateAsync({
-      envelopeId: envelope.id,
-      data: envelopeUpdates.data,
-      meta: envelopeUpdates.meta,
-    });
+  } = useEnvelopeAutosave(async ({ data, meta }: UpdateEnvelopePayload) => {
+    try {
+      const response = !isEmbedded
+        ? await updateEnvelopeMutation.mutateAsync({
+            envelopeId: envelope.id,
+            data,
+            meta,
+          })
+        : {};
+
+      setEnvelope((prev) => ({
+        ...prev,
+        ...data,
+        authOptions: {
+          globalAccessAuth: data?.globalAccessAuth || [],
+          globalActionAuth: data?.globalActionAuth || [],
+        },
+        ...response,
+        documentMeta: {
+          ...prev.documentMeta,
+          ...meta,
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          emailSettings: (meta?.emailSettings || null) as unknown as TDocumentEmailSettings | null,
+        },
+      }));
+
+      setAutosaveError(false);
+    } catch (err) {
+      console.error(err);
+
+      setAutosaveError(true);
+
+      toast({
+        title: t`Save failed`,
+        description: t`We encountered an error while attempting to save your changes. Your changes cannot be saved at this time.`,
+        variant: 'destructive',
+        duration: 7500,
+      });
+    }
   }, 1000);
+
+  const updateEnvelopeAsync = async (envelopeUpdates: UpdateEnvelopePayload) => {
+    updateEnvelopeDebounced(envelopeUpdates);
+    await flushUpdateEnvelope();
+  };
 
   /**
    * Updates the local envelope and debounces the update to the server.
+   *
+   * Use this when you want to update the local envelope immediately while debouncing
+   * the actual update to the server.
    */
   const updateEnvelope = (envelopeUpdates: UpdateEnvelopePayload) => {
     setEnvelope((prev) => ({
@@ -253,14 +335,7 @@ export const EnvelopeEditorProvider = ({
       },
     }));
 
-    setEnvelopeDebounced(envelopeUpdates);
-  };
-
-  const updateEnvelopeAsync = async (envelopeUpdates: UpdateEnvelopePayload) => {
-    await envelopeUpdateMutationQuery.mutateAsync({
-      envelopeId: envelope.id,
-      ...envelopeUpdates,
-    });
+    updateEnvelopeDebounced(envelopeUpdates);
   };
 
   const getRecipientColorKey = useCallback(
@@ -276,12 +351,13 @@ export const EnvelopeEditorProvider = ({
     [envelope.recipients],
   );
 
-  const { refetch: reloadEnvelope, isLoading: isReloadingEnvelope } = trpc.envelope.get.useQuery(
+  const { refetch: reloadEnvelope } = trpc.envelope.get.useQuery(
     {
       envelopeId: envelope.id,
     },
     {
-      initialData: envelope,
+      enabled: !isEmbedded,
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     },
   );
 
@@ -293,6 +369,11 @@ export const EnvelopeEditorProvider = ({
   const syncEnvelope = async () => {
     await flushAutosave();
 
+    // Bypass syncing for embedded mode.
+    if (isEmbedded) {
+      return;
+    }
+
     const fetchedEnvelopeData = await reloadEnvelope();
 
     if (fetchedEnvelopeData.data) {
@@ -302,55 +383,89 @@ export const EnvelopeEditorProvider = ({
         recipients: fetchedEnvelopeData.data.recipients,
         documentMeta: fetchedEnvelopeData.data.documentMeta,
       });
+
       editorFields.resetForm(fetchedEnvelopeData.data.fields);
     }
   };
 
-  const setLocalEnvelope = (localEnvelope: Partial<TEnvelope>) => {
+  const setLocalEnvelope = (localEnvelope: Partial<TEditorEnvelope>) => {
     setEnvelope((prev) => ({ ...prev, ...localEnvelope }));
   };
 
   const isAutosaving = useMemo(() => {
-    return (
-      envelopeFieldSetMutationQuery.isPending ||
-      envelopeRecipientSetMutationQuery.isPending ||
-      envelopeUpdateMutationQuery.isPending ||
-      isFieldsMutationPending ||
-      isRecipientsMutationPending ||
-      isEnvelopeMutationPending
-    );
-  }, [
-    envelopeFieldSetMutationQuery.isPending,
-    envelopeRecipientSetMutationQuery.isPending,
-    envelopeUpdateMutationQuery.isPending,
-    isFieldsMutationPending,
-    isRecipientsMutationPending,
-    isEnvelopeMutationPending,
-  ]);
+    return isFieldsMutationPending || isRecipientsMutationPending || isEnvelopeMutationPending;
+  }, [isFieldsMutationPending, isRecipientsMutationPending, isEnvelopeMutationPending]);
 
   const relativePath = useMemo(() => {
-    const documentRootPath = formatDocumentsPath(envelope.team.url);
-    const templateRootPath = formatTemplatesPath(envelope.team.url);
+    let documentRootPath = formatDocumentsPath(envelope.team.url);
+    let templateRootPath = formatTemplatesPath(envelope.team.url);
 
     const basePath = envelope.type === EnvelopeType.DOCUMENT ? documentRootPath : templateRootPath;
+    let envelopePath = `${basePath}/${envelope.id}`;
+    let editorPath = `${basePath}/${envelope.id}/edit`;
+
+    if (editorConfig.embeded) {
+      let embeddedEditorPath =
+        editorConfig.embeded.mode === 'edit'
+          ? `/embed/v2/authoring/envelope/edit/${envelope.id}`
+          : `/embed/v2/authoring/envelope/create`;
+
+      embeddedEditorPath += `?token=${editorConfig.embeded.presignToken}`;
+
+      // Todo: Embeds - This should be thought about more.
+      envelopePath = embeddedEditorPath;
+      editorPath = embeddedEditorPath;
+      documentRootPath = embeddedEditorPath;
+      templateRootPath = embeddedEditorPath;
+    }
 
     return {
       basePath,
-      envelopePath: `${basePath}/${envelope.id}`,
-      editorPath: `${basePath}/${envelope.id}/edit`,
+      envelopePath,
+      editorPath,
       documentRootPath,
       templateRootPath,
     };
   }, [envelope.type, envelope.id]);
 
-  const flushAutosave = async (): Promise<void> => {
-    await Promise.all([setFieldsAsync(), setRecipientsAsync(), setEnvelopeAsync()]);
+  const navigateToStep = async (step: EnvelopeEditorStep) => {
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+
+      if (step === 'upload') {
+        newParams.delete('step');
+      } else {
+        newParams.set('step', step);
+      }
+
+      return newParams;
+    });
+
+    await flushAutosave();
+
+    resetForms();
+  };
+
+  const resetForms = () => {
+    editorRecipients.resetForm({
+      recipients: envelopeRef.current.recipients,
+      documentMeta: envelopeRef.current.documentMeta,
+    });
+
+    editorFields.resetForm(envelopeRef.current.fields);
+  };
+
+  const flushAutosave = async (): Promise<TEditorEnvelope> => {
+    await Promise.all([flushSetFields(), flushSetRecipients(), flushUpdateEnvelope()]);
+    return envelopeRef.current;
   };
 
   return (
     <EnvelopeEditorContext.Provider
       value={{
+        editorConfig,
         envelope,
+        isEmbedded,
         isDocument: envelope.type === EnvelopeType.DOCUMENT,
         isTemplate: envelope.type === EnvelopeType.TEMPLATE,
         setLocalEnvelope,
@@ -366,9 +481,107 @@ export const EnvelopeEditorProvider = ({
         isAutosaving,
         relativePath,
         syncEnvelope,
+        navigateToStep,
       }}
     >
       {children}
     </EnvelopeEditorContext.Provider>
   );
+};
+
+type MapLocalRecipientsToRecipientsOptions = {
+  envelope: TEditorEnvelope;
+  localRecipients: TSetEnvelopeRecipientsRequest['recipients'];
+};
+
+const mapLocalRecipientsToRecipients = ({
+  envelope,
+  localRecipients,
+}: MapLocalRecipientsToRecipientsOptions): TEditorEnvelope['recipients'] => {
+  let smallestRecipientId = localRecipients.reduce((min, recipient) => {
+    if (recipient.id && recipient.id < min) {
+      return recipient.id;
+    }
+
+    return min;
+  }, -1);
+
+  return localRecipients.map((recipient) => {
+    const foundRecipient = envelope.recipients.find((recipient) => recipient.id === recipient.id);
+
+    let recipientId = recipient.id;
+
+    if (recipientId === undefined) {
+      recipientId = smallestRecipientId;
+      smallestRecipientId--;
+    }
+
+    return {
+      id: recipientId,
+      envelopeId: envelope.id,
+      email: recipient.email,
+      name: recipient.name,
+      token: foundRecipient?.token || '',
+      documentDeletedAt: foundRecipient?.documentDeletedAt || null,
+      expired: foundRecipient?.expired || null,
+      signedAt: foundRecipient?.signedAt || null,
+      authOptions:
+        recipient.actionAuth.length > 0
+          ? { actionAuth: recipient.actionAuth, accessAuth: [] }
+          : null,
+      signingOrder: recipient.signingOrder ?? null,
+      rejectionReason: foundRecipient?.rejectionReason || null,
+      role: recipient.role,
+      readStatus: foundRecipient?.readStatus || ReadStatus.NOT_OPENED,
+      signingStatus: foundRecipient?.signingStatus || SigningStatus.NOT_SIGNED,
+      sendStatus: foundRecipient?.sendStatus || SendStatus.NOT_SENT,
+    };
+  });
+};
+
+type MapLocalFieldsToFieldsOptions = {
+  localFields: TLocalField[];
+  envelope: TEditorEnvelope;
+};
+
+const mapLocalFieldsToFields = ({
+  envelope,
+  localFields,
+}: MapLocalFieldsToFieldsOptions): TSetEnvelopeFieldsResponse['data'] => {
+  let smallestFieldId = localFields.reduce((min, field) => {
+    if (field.id && field.id < min) {
+      return field.id;
+    }
+
+    return min;
+  }, -1);
+
+  return localFields.map((field) => {
+    const foundField = envelope.fields.find((envelopeField) => envelopeField.id === field.id);
+
+    let fieldId = field.id;
+
+    if (fieldId === undefined) {
+      fieldId = smallestFieldId;
+      smallestFieldId--;
+    }
+
+    return {
+      ...field,
+      formId: field.formId,
+      id: fieldId,
+      envelopeId: envelope.id,
+      envelopeItemId: field.envelopeItemId,
+      type: field.type,
+      recipientId: field.recipientId,
+      positionX: new Prisma.Decimal(field.positionX),
+      positionY: new Prisma.Decimal(field.positionY),
+      width: new Prisma.Decimal(field.width),
+      height: new Prisma.Decimal(field.height),
+      secondaryId: foundField?.secondaryId || '',
+      inserted: foundField?.inserted || false,
+      customText: foundField?.customText || '',
+      fieldMeta: field.fieldMeta || null,
+    };
+  });
 };

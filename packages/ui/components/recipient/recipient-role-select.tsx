@@ -33,7 +33,7 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
     ref,
   ) => (
     <Select {...props}>
-      <SelectTrigger ref={ref} className="w-[50px] bg-background p-2">
+      <SelectTrigger ref={ref} className="w-[50px] bg-background p-2" title={props.value}>
         {/* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */}
         {ROLE_ICONS[props.value as RecipientRole]}
       </SelectTrigger>

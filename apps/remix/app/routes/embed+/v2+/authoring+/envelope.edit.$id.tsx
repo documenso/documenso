@@ -46,7 +46,7 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   }
 
   // We also know that the token is valid, but we need the userId + teamId
-  const result = await verifyEmbeddingPresignToken({ token, scope: `envelope:${id}` }).catch(
+  const result = await verifyEmbeddingPresignToken({ token, scope: `envelopeId:${id}` }).catch(
     () => null,
   );
 
@@ -169,7 +169,7 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
         id: item.id,
         title: item.title,
         order: item.order,
-        index: item.data ? files.length - 1 : undefined, // Todo: Embed why not use the ID instead?
+        index: item.data ? files.length - 1 : undefined,
       };
     });
 

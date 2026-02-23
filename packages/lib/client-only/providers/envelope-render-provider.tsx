@@ -11,6 +11,8 @@ import React from 'react';
 
 import type { Field, Recipient } from '@prisma/client';
 
+import { PDF_IMAGE_RENDER_SCALE } from '@documenso/lib/constants/pdf-viewer';
+import { PRESIGNED_ENVELOPE_ITEM_ID_PREFIX } from '@documenso/lib/utils/embed-config';
 import type { TGetEnvelopeItemsMetaResponse } from '@documenso/remix/server/api/files/files.types';
 import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import { AVAILABLE_RECIPIENT_COLORS } from '@documenso/ui/lib/recipient-colors';
@@ -48,7 +50,13 @@ type EnvelopeRenderOverrideSettings = {
   showRecipientSigningStatus?: boolean;
 };
 
-type EnvelopeRenderItem = TEnvelope['envelopeItems'][number];
+type EnvelopeRenderItem = {
+  id: string;
+  title: string;
+  order: number;
+  envelopeId: string;
+  data?: Uint8Array | null;
+};
 
 type EnvelopeRenderProviderValue = {
   version: DocumentDataVersion;
@@ -76,7 +84,12 @@ interface EnvelopeRenderProviderProps {
    */
   version: DocumentDataVersion;
 
-  envelope: Pick<TEnvelope, 'id' | 'envelopeItems' | 'status' | 'type'>;
+  envelope: Pick<TEnvelope, 'id' | 'status' | 'type'>;
+
+  /**
+   * The envelope items to render.
+   */
+  envelopeItems: EnvelopeRenderItem[];
 
   /**
    * Optional fields which are passed down to renderers for custom rendering needs.
@@ -99,6 +112,13 @@ interface EnvelopeRenderProviderProps {
    * If not provided, it will be assumed that the current user can access the document.
    */
   token: string | undefined;
+
+  /**
+   * The presign token to access the envelope.
+   *
+   * If not provided, it will be assumed that the current user can access the document.
+   */
+  presignToken?: string | undefined;
 
   /**
    * Custom override settings for generic page renderers.
@@ -124,8 +144,10 @@ export const useCurrentEnvelopeRender = () => {
 export const EnvelopeRenderProvider = ({
   children,
   envelope,
+  envelopeItems: envelopeItemsFromProps,
   fields,
   token,
+  presignToken,
   recipients = [],
   version,
   overrideSettings,
@@ -144,12 +166,12 @@ export const EnvelopeRenderProvider = ({
   const fetchStartedAtRef = useRef<number>(0);
 
   const envelopeItems = useMemo(
-    () => envelope.envelopeItems.sort((a, b) => a.order - b.order),
-    [envelope.envelopeItems],
+    () => envelopeItemsFromProps.sort((a, b) => a.order - b.order),
+    [envelopeItemsFromProps],
   );
 
   const [currentItem, setCurrentItem] = useState<EnvelopeRenderItem | null>(
-    envelope.envelopeItems[0] ?? null,
+    envelopeItems[0] ?? null,
   );
 
   /**
@@ -157,10 +179,23 @@ export const EnvelopeRenderProvider = ({
    */
   useEffect(() => {
     void fetchEnvelopeRenderData();
-  }, [envelope.id, envelope.envelopeItems.length, token, version]);
+  }, [envelope.id, envelopeItems.length, token, version]);
 
   const fetchEnvelopeRenderData = async () => {
-    if (!envelope.id || envelope.envelopeItems.length === 0) {
+    if (envelopeItems.length === 0) {
+      return;
+    }
+
+    // Render certain envelope items locally, such as embedded.
+    // No envelope ID means it's in embedded create mode.
+    if (
+      !envelope.id ||
+      envelopeItems.some(
+        (item) => item.id.startsWith(PRESIGNED_ENVELOPE_ITEM_ID_PREFIX) && item.data,
+      )
+    ) {
+      await handleLocalFileFetch();
+
       return;
     }
 
@@ -175,6 +210,7 @@ export const EnvelopeRenderProvider = ({
       const metaUrl = getEnvelopeItemMetaUrl({
         envelopeId: envelope.id,
         token,
+        presignToken,
       });
 
       const response = await fetch(metaUrl);
@@ -201,6 +237,7 @@ export const EnvelopeRenderProvider = ({
             documentDataId: item.documentDataId,
             pageIndex,
             token,
+            presignToken,
             version,
           });
 
@@ -228,8 +265,49 @@ export const EnvelopeRenderProvider = ({
     }
   };
 
+  const handleLocalFileFetch = async () => {
+    setEnvelopeItemsMetaLoadingState('loading');
+
+    try {
+      // Build a map of envelope items by ID
+      const metaMap: Record<string, BasePageRenderData[]> = {};
+
+      // Dynamically import "pdfToImagesClientSide" function to prevent bundling.
+      const { pdfToImagesClientSide } = await import(
+        '@documenso/lib/server-only/ai/pdf-to-images.client'
+      );
+
+      for (const item of envelopeItems) {
+        if (item.data) {
+          // Clone the buffer so PDF.js can transfer it to its worker without detaching the one in state
+          const pdfBytes = new Uint8Array(structuredClone(item.data));
+
+          const pdfImages = await pdfToImagesClientSide(pdfBytes, {
+            scale: PDF_IMAGE_RENDER_SCALE,
+          });
+
+          metaMap[item.id] = pdfImages.map((image) => ({
+            envelopeItemId: item.id,
+            documentDataId: item.id,
+            pageIndex: image.pageIndex,
+            pageNumber: image.pageIndex + 1,
+            pageWidth: image.width,
+            pageHeight: image.height,
+            imageUrl: image.image,
+          }));
+        }
+      }
+
+      setEnvelopeItemsMeta(metaMap);
+      setEnvelopeItemsMetaLoadingState('loaded');
+    } catch (error) {
+      console.error('Failed to load envelope data:', error);
+      setEnvelopeItemsMetaLoadingState('error');
+    }
+  };
+
   const setCurrentEnvelopeItem = (envelopeItemId: string) => {
-    const foundItem = envelope.envelopeItems.find((item) => item.id === envelopeItemId);
+    const foundItem = envelopeItems.find((item) => item.id === envelopeItemId);
 
     setCurrentItem(foundItem ?? null);
   };

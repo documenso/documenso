@@ -22,6 +22,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
+import type { EnvelopeEditorStep } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
@@ -42,8 +43,6 @@ import { EnvelopeEditorFieldsPage } from './envelope-editor-fields-page';
 import EnvelopeEditorHeader from './envelope-editor-header';
 import { EnvelopeEditorPreviewPage } from './envelope-editor-preview-page';
 import { EnvelopeEditorUploadPage } from './envelope-editor-upload-page';
-
-type EnvelopeEditorStep = 'upload' | 'addFields' | 'preview';
 
 type EnvelopeEditorStepData = {
   id: string;
@@ -83,14 +82,12 @@ export const EnvelopeEditor = () => {
     editorConfig,
     isDocument,
     isTemplate,
-    isAutosaving,
-    flushAutosave,
     relativePath,
     syncEnvelope,
+    navigateToStep,
   } = useCurrentEnvelopeEditor();
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const [isStepLoading, setIsStepLoading] = useState(false);
 
   const {
     general: {
@@ -130,47 +127,25 @@ export const EnvelopeEditor = () => {
     }));
   }, [editorConfig]);
 
-  const [currentStep, setCurrentStep] = useState<EnvelopeEditorStep>(() => {
-    const searchParamStep = searchParams.get('step') as EnvelopeEditorStep | undefined;
+  const [currentStep, setCurrentStep] = useState<{ step: EnvelopeEditorStep; isLoading: boolean }>(
+    () => {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      const searchParamStep = searchParams.get('step') as EnvelopeEditorStep | undefined;
 
-    // Empty URL param equals upload, otherwise use the step URL param
-    if (!searchParamStep) {
-      return 'upload';
-    }
+      // Empty URL param equals upload, otherwise use the step URL param
+      if (!searchParamStep) {
+        return { step: 'upload', isLoading: false };
+      }
 
-    const validSteps: EnvelopeEditorStep[] = ['upload', 'addFields', 'preview'];
+      const validSteps: EnvelopeEditorStep[] = ['upload', 'addFields', 'preview'];
 
-    if (validSteps.includes(searchParamStep)) {
-      return searchParamStep;
-    }
+      if (validSteps.includes(searchParamStep)) {
+        return { step: searchParamStep, isLoading: false };
+      }
 
-    return 'upload';
-  });
-
-  const navigateToStep = (step: EnvelopeEditorStep) => {
-    setCurrentStep(step);
-
-    void flushAutosave();
-
-    if (!isStepLoading && isAutosaving) {
-      setIsStepLoading(true);
-    }
-
-    // Update URL params: empty for upload, otherwise set the step
-    if (step === 'upload') {
-      setSearchParams((prev) => {
-        const newParams = new URLSearchParams(prev);
-        newParams.delete('step');
-        return newParams;
-      });
-    } else {
-      setSearchParams((prev) => {
-        const newParams = new URLSearchParams(prev);
-        newParams.set('step', step);
-        return newParams;
-      });
-    }
-  };
+      return { step: 'upload', isLoading: false };
+    },
+  );
 
   // Watch the URL params and setStep if the step changes.
   useEffect(() => {
@@ -178,20 +153,19 @@ export const EnvelopeEditor = () => {
 
     const foundStep = envelopeEditorSteps.find((step) => step.id === stepParam);
 
-    if (foundStep && foundStep.id !== currentStep) {
+    if (foundStep && foundStep.id !== currentStep.step) {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      navigateToStep(foundStep.id as EnvelopeEditorStep);
+      void navigateToStep(foundStep.id as EnvelopeEditorStep).then(() => {
+        setCurrentStep({
+          step: foundStep.id as EnvelopeEditorStep,
+          isLoading: false,
+        });
+      });
     }
   }, [searchParams]);
 
-  useEffect(() => {
-    if (!isAutosaving) {
-      setIsStepLoading(false);
-    }
-  }, [isAutosaving]);
-
   const currentStepData =
-    envelopeEditorSteps.find((step) => step.id === currentStep) || envelopeEditorSteps[0];
+    envelopeEditorSteps.find((step) => step.id === currentStep.step) || envelopeEditorSteps[0];
 
   return (
     <div className="h-screen w-screen bg-gray-50 dark:bg-background">
@@ -285,11 +259,12 @@ export const EnvelopeEditor = () => {
           >
             {envelopeEditorSteps.map((step) => {
               const Icon = step.icon;
-              const isActive = currentStep === step.id;
+              const isActive = currentStep.step === step.id;
 
               return (
                 <button
                   key={step.id}
+                  data-testid={`envelope-editor-step-${step.id}`}
                   type="button"
                   className={cn(
                     `cursor-pointer rounded-lg text-left transition-colors ${
@@ -301,7 +276,7 @@ export const EnvelopeEditor = () => {
                       'p-3': !minimizeLeftSidebar,
                     },
                   )}
-                  onClick={() => navigateToStep(step.id as EnvelopeEditorStep)}
+                  onClick={() => void navigateToStep(step.id as EnvelopeEditorStep)}
                 >
                   <div className="flex items-center space-x-3">
                     <div
@@ -574,10 +549,13 @@ export const EnvelopeEditor = () => {
         </div>
 
         {/* Main Content - Changes based on current step */}
-        <AnimateGenericFadeInOut className="flex-1 overflow-y-auto" key={currentStep}>
+        <AnimateGenericFadeInOut
+          className="flex-1 overflow-y-auto"
+          key={currentStep.isLoading ? `loading-${currentStep.step}` : currentStep.step}
+        >
           {match({
-            currentStep,
-            isStepLoading,
+            isStepLoading: currentStep.isLoading,
+            currentStep: currentStep.step,
             allowUploadAndRecipientStep,
             allowAddFieldsStep,
             allowPreviewStep,

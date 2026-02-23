@@ -25,7 +25,7 @@ export const ZCreateEmbeddingPresignTokenRequestSchema = z.object({
     .string()
     .optional()
     .describe(
-      'Resource restriction. V1 embeds only support documentId:1, templateId:2. V2 embeds only support envelope:envelope_123',
+      'Resource restriction. V1 embeds only support documentId:1, templateId:2. V2 embeds only support envelopeId:envelope_123',
     ),
 });
 

@@ -175,7 +175,7 @@ export const EnvelopeEditorSettingsDialog = ({
   const { t, i18n } = useLingui();
   const { toast } = useToast();
 
-  const { envelope, updateEnvelopeAsync, editorConfig } = useCurrentEnvelopeEditor();
+  const { envelope, updateEnvelopeAsync, editorConfig, isEmbedded } = useCurrentEnvelopeEditor();
 
   const { settings } = editorConfig;
 
@@ -286,11 +286,13 @@ export const EnvelopeEditorSettingsDialog = ({
 
       setOpen(false);
 
-      toast({
-        title: t`Success`,
-        description: t`Envelope updated`,
-        duration: 5000,
-      });
+      if (!isEmbedded) {
+        toast({
+          title: t`Success`,
+          description: t`Envelope updated`,
+          duration: 5000,
+        });
+      }
     } catch (err) {
       const error = AppError.parseError(err);
 
@@ -348,7 +350,7 @@ export const EnvelopeEditorSettingsDialog = ({
       <DialogContent className="flex w-full !max-w-5xl flex-row gap-0 p-0">
         {/* Sidebar. */}
         <div className="flex w-80 flex-col border-r bg-accent/20">
-          <DialogHeader className="p-6 pb-4">
+          <DialogHeader className="p-6 pb-4" data-testid="envelope-editor-settings-dialog-header">
             <DialogTitle>
               <Trans>Document Settings</Trans>
             </DialogTitle>

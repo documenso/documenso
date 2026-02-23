@@ -147,6 +147,14 @@ export const DEFAULT_EDITOR_CONFIG: EnvelopeEditorConfig = {
   },
 };
 
+/**
+ * The default configuration for the embedded editor. This is merged with whatever is provided
+ * by the embedded hash.
+ *
+ * This is duplicated in the embedded repo playground
+ *
+ * /playground/src/components/embedddings/envelope-feature.ts
+ */
 export const DEFAULT_EMBEDDED_EDITOR_CONFIG = {
   general: {
     allowConfigureEnvelopeTitle: true,
@@ -179,7 +187,7 @@ export const DEFAULT_EMBEDDED_EDITOR_CONFIG = {
     allowDelete: true,
   },
   recipients: {
-    allowAIDetection: true,
+    allowAIDetection: false,
     allowConfigureSigningOrder: true,
     allowConfigureDictateNextSigner: true,
     allowApproverRole: true,
@@ -188,7 +196,7 @@ export const DEFAULT_EMBEDDED_EDITOR_CONFIG = {
     allowAssistantRole: true,
   },
   fields: {
-    allowAIDetection: true,
+    allowAIDetection: false,
   },
 } as const satisfies EnvelopeEditorConfig;
 
@@ -258,6 +266,7 @@ export const ZEditorEnvelopeSchema = EnvelopeSchema.pick({
     order: true,
   })
     .extend({
+      // Only used for embedded.
       data: z.instanceof(Uint8Array).optional(),
     })
     .array(),

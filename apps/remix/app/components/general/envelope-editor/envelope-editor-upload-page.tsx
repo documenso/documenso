@@ -8,7 +8,6 @@ import { DocumentStatus } from '@prisma/client';
 import { FileWarningIcon, GripVerticalIcon, Loader2 } from 'lucide-react';
 import { X } from 'lucide-react';
 import { ErrorCode as DropzoneErrorCode, type FileRejection } from 'react-dropzone';
-import { Link } from 'react-router';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import {
@@ -17,6 +16,7 @@ import {
 } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
+import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
 import { nanoid } from '@documenso/lib/universal/id';
 import { PRESIGNED_ENVELOPE_ITEM_ID_PREFIX } from '@documenso/lib/utils/embed-config';
 import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
@@ -53,7 +53,7 @@ export const EnvelopeEditorUploadPage = () => {
   const { maximumEnvelopeItemCount, remaining } = useLimits();
   const { toast } = useToast();
 
-  const { envelope, setLocalEnvelope, relativePath, editorFields, editorConfig, isEmbedded } =
+  const { envelope, setLocalEnvelope, editorFields, editorConfig, isEmbedded, navigateToStep } =
     useCurrentEnvelopeEditor();
 
   const { envelopeItems: uploadConfig } = editorConfig;
@@ -108,21 +108,23 @@ export const EnvelopeEditorUploadPage = () => {
   );
 
   const onFileDrop = async (files: File[]) => {
-    const newUploadingFiles: (LocalFile & { file: File; data: Uint8Array<ArrayBuffer> | null })[] =
-      await Promise.all(
-        files.map(async (file) => {
-          return {
-            id: nanoid(),
-            envelopeItemId: isEmbedded ? `${PRESIGNED_ENVELOPE_ITEM_ID_PREFIX}${nanoid()}` : null,
-            title: file.name,
-            file,
-            isUploading: isEmbedded ? false : true,
-            // Clone the buffer so it can be read multiple times (File.arrayBuffer() consumes the stream once)
-            data: isEmbedded ? new Uint8Array((await file.arrayBuffer()).slice(0)) : null,
-            isError: false,
-          };
-        }),
-      );
+    const newUploadingFiles: (LocalFile & {
+      file: File;
+      data: TEditorEnvelope['envelopeItems'][number]['data'] | null;
+    })[] = await Promise.all(
+      files.map(async (file) => {
+        return {
+          id: nanoid(),
+          envelopeItemId: isEmbedded ? `${PRESIGNED_ENVELOPE_ITEM_ID_PREFIX}${nanoid()}` : null,
+          title: file.name,
+          file,
+          isUploading: isEmbedded ? false : true,
+          // Clone the buffer so it can be read multiple times (File.arrayBuffer() consumes the stream once)
+          data: isEmbedded ? new Uint8Array((await file.arrayBuffer()).slice(0)) : null,
+          isError: false,
+        };
+      }),
+    );
 
     setLocalFiles((prev) => [...prev, ...newUploadingFiles]);
 
@@ -194,7 +196,9 @@ export const EnvelopeEditorUploadPage = () => {
    * Hide the envelope item from the list on deletion.
    */
   const onFileDelete = (envelopeItemId: string) => {
-    setLocalFiles((prev) => prev.filter((uploadingFile) => uploadingFile.id !== envelopeItemId));
+    setLocalFiles((prev) =>
+      prev.filter((uploadingFile) => uploadingFile.envelopeItemId !== envelopeItemId),
+    );
 
     const fieldsWithoutDeletedItem = envelope.fields.filter(
       (field) => field.envelopeItemId !== envelopeItemId,
@@ -476,13 +480,10 @@ export const EnvelopeEditorUploadPage = () => {
 
       {/* Recipients Section */}
       <EnvelopeEditorRecipientForm />
-
       {editorConfig.general.allowAddFieldsStep && (
         <div className="flex justify-end">
-          <Button asChild>
-            <Link to={`${relativePath.editorPath}?step=addFields`}>
-              <Trans>Add Fields</Trans>
-            </Link>
+          <Button type="button" onClick={() => void navigateToStep('addFields')}>
+            <Trans>Add Fields</Trans>
           </Button>
         </div>
       )}

@@ -141,6 +141,7 @@ export const EnvelopeEditorRecipientForm = () => {
     },
     {
       enabled: debouncedRecipientSearchQuery.length > 1,
+      retry: false,
     },
   );
 
