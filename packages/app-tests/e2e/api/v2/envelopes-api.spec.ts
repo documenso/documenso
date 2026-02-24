@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { type APIRequestContext, expect, test } from '@playwright/test';
 import type { Team, User } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -27,6 +27,7 @@ import type {
 import type { TDistributeEnvelopeRequest } from '@documenso/trpc/server/envelope-router/distribute-envelope.types';
 import type { TCreateEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/envelope-recipients/create-envelope-recipients.types';
 import type { TUpdateEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/envelope-recipients/update-envelope-recipients.types';
+import type { TFindEnvelopesResponse } from '@documenso/trpc/server/envelope-router/find-envelopes.types';
 import type { TGetEnvelopeResponse } from '@documenso/trpc/server/envelope-router/get-envelope.types';
 import type { TUpdateEnvelopeRequest } from '@documenso/trpc/server/envelope-router/update-envelope.types';
 
@@ -170,6 +171,7 @@ test.describe('API V2 Envelopes', () => {
                 positionY: 0,
                 width: 0,
                 height: 0,
+                fieldMeta: { type: 'signature' },
               },
               {
                 type: FieldType.SIGNATURE,
@@ -179,6 +181,7 @@ test.describe('API V2 Envelopes', () => {
                 positionY: 0,
                 width: 0,
                 height: 0,
+                fieldMeta: { type: 'signature' },
               },
             ],
           },
@@ -204,6 +207,7 @@ test.describe('API V2 Envelopes', () => {
             documentPending: false,
             documentCompleted: false,
             documentDeleted: false,
+            ownerRecipientExpired: true,
             ownerDocumentCompleted: true,
           },
         },
@@ -559,6 +563,200 @@ test.describe('API V2 Envelopes', () => {
     console.log({
       createdEnvelopeId: finalEnvelope.id,
       userEmail: userA.email,
+    });
+  });
+
+  test.describe('Envelope find endpoint', () => {
+    const createEnvelope = async (
+      request: APIRequestContext,
+      token: string,
+      payload: TCreateEnvelopePayload,
+    ) => {
+      const formData = new FormData();
+      formData.append('payload', JSON.stringify(payload));
+
+      const pdfData = fs.readFileSync(
+        path.join(__dirname, '../../../../../assets/field-font-alignment.pdf'),
+      );
+      formData.append('files', new File([pdfData], 'test.pdf', { type: 'application/pdf' }));
+
+      const res = await request.post(`${baseUrl}/envelope/create`, {
+        headers: { Authorization: `Bearer ${token}` },
+        multipart: formData,
+      });
+
+      expect(res.ok()).toBeTruthy();
+      return (await res.json()) as TCreateEnvelopeResponse;
+    };
+
+    test('should find envelopes with pagination', async ({ request }) => {
+      // Create 3 envelopes
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.DOCUMENT,
+        title: 'Document 1',
+      });
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.DOCUMENT,
+        title: 'Document 2',
+      });
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.TEMPLATE,
+        title: 'Template 1',
+      });
+
+      // Find all envelopes
+      const res = await request.get(`${baseUrl}/envelope`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      expect(res.ok()).toBeTruthy();
+      expect(res.status()).toBe(200);
+
+      const response = (await res.json()) as TFindEnvelopesResponse;
+
+      expect(response.data.length).toBe(3);
+      expect(response.count).toBe(3);
+      expect(response.currentPage).toBe(1);
+      expect(response.totalPages).toBe(1);
+
+      // Test pagination
+      const paginatedRes = await request.get(`${baseUrl}/envelope?perPage=2&page=1`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      expect(paginatedRes.ok()).toBeTruthy();
+      const paginatedResponse = (await paginatedRes.json()) as TFindEnvelopesResponse;
+
+      expect(paginatedResponse.data.length).toBe(2);
+      expect(paginatedResponse.count).toBe(3);
+      expect(paginatedResponse.totalPages).toBe(2);
+    });
+
+    test('should filter envelopes by type', async ({ request }) => {
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.DOCUMENT,
+        title: 'Document Only',
+      });
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.TEMPLATE,
+        title: 'Template Only',
+      });
+
+      // Filter by DOCUMENT type
+      const documentRes = await request.get(`${baseUrl}/envelope?type=DOCUMENT`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      expect(documentRes.ok()).toBeTruthy();
+      const documentResponse = (await documentRes.json()) as TFindEnvelopesResponse;
+
+      expect(documentResponse.data.every((e) => e.type === EnvelopeType.DOCUMENT)).toBe(true);
+
+      // Filter by TEMPLATE type
+      const templateRes = await request.get(`${baseUrl}/envelope?type=TEMPLATE`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      expect(templateRes.ok()).toBeTruthy();
+      const templateResponse = (await templateRes.json()) as TFindEnvelopesResponse;
+
+      expect(templateResponse.data.every((e) => e.type === EnvelopeType.TEMPLATE)).toBe(true);
+    });
+
+    test('should filter envelopes by status', async ({ request }) => {
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.DOCUMENT,
+        title: 'Draft Document',
+      });
+
+      // Filter by DRAFT status (default for new envelopes)
+      const res = await request.get(`${baseUrl}/envelope?status=DRAFT`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      expect(res.ok()).toBeTruthy();
+      const response = (await res.json()) as TFindEnvelopesResponse;
+
+      expect(response.data.every((e) => e.status === DocumentStatus.DRAFT)).toBe(true);
+    });
+
+    test('should search envelopes by query', async ({ request }) => {
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.DOCUMENT,
+        title: 'Unique Searchable Title',
+      });
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.DOCUMENT,
+        title: 'Another Document',
+      });
+
+      const res = await request.get(`${baseUrl}/envelope?query=Unique%20Searchable`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      expect(res.ok()).toBeTruthy();
+      const response = (await res.json()) as TFindEnvelopesResponse;
+
+      expect(response.data.length).toBe(1);
+      expect(response.data[0].title).toBe('Unique Searchable Title');
+    });
+
+    test('should not return envelopes from other users', async ({ request }) => {
+      // Create envelope for userA
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.DOCUMENT,
+        title: 'UserA Document',
+      });
+
+      // Create envelope for userB
+      await createEnvelope(request, tokenB, {
+        type: EnvelopeType.DOCUMENT,
+        title: 'UserB Document',
+      });
+
+      // userA should only see their own envelopes
+      const resA = await request.get(`${baseUrl}/envelope`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      expect(resA.ok()).toBeTruthy();
+      const responseA = (await resA.json()) as TFindEnvelopesResponse;
+
+      expect(responseA.data.every((e) => e.title !== 'UserB Document')).toBe(true);
+
+      // userB should only see their own envelopes
+      const resB = await request.get(`${baseUrl}/envelope`, {
+        headers: { Authorization: `Bearer ${tokenB}` },
+      });
+
+      expect(resB.ok()).toBeTruthy();
+      const responseB = (await resB.json()) as TFindEnvelopesResponse;
+
+      expect(responseB.data.every((e) => e.title !== 'UserA Document')).toBe(true);
+    });
+
+    test('should return envelope with expected schema fields', async ({ request }) => {
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.DOCUMENT,
+        title: 'Schema Test Document',
+      });
+
+      const res = await request.get(`${baseUrl}/envelope`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      expect(res.ok()).toBeTruthy();
+      const response = (await res.json()) as TFindEnvelopesResponse;
+
+      const envelope = response.data.find((e) => e.title === 'Schema Test Document');
+
+      expect(envelope).toBeDefined();
+      expect(envelope?.id).toBeDefined();
+      expect(envelope?.type).toBe(EnvelopeType.DOCUMENT);
+      expect(envelope?.status).toBe(DocumentStatus.DRAFT);
+      expect(envelope?.recipients).toBeDefined();
+      expect(envelope?.user).toBeDefined();
+      expect(envelope?.team).toBeDefined();
     });
   });
 

@@ -171,7 +171,7 @@ export const SignInForm = ({
 
       const { options, sessionId } = await createPasskeySigninOptions();
 
-      const credential = await startAuthentication(options);
+      const credential = await startAuthentication({ optionsJSON: options });
 
       await authClient.passkey.signIn({
         credential: JSON.stringify(credential),
@@ -368,7 +368,7 @@ export const SignInForm = ({
                 <p className="mt-2 text-right">
                   <Link
                     to="/forgot-password"
-                    className="text-muted-foreground text-sm duration-200 hover:opacity-70"
+                    className="text-sm text-muted-foreground duration-200 hover:opacity-70"
                   >
                     <Trans>Forgot your password?</Trans>
                   </Link>
@@ -390,11 +390,11 @@ export const SignInForm = ({
             <>
               {hasSocialAuthEnabled && (
                 <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-                  <div className="bg-border h-px flex-1" />
-                  <span className="text-muted-foreground bg-transparent">
+                  <div className="h-px flex-1 bg-border" />
+                  <span className="bg-transparent text-muted-foreground">
                     <Trans>Or continue with</Trans>
                   </span>
-                  <div className="bg-border h-px flex-1" />
+                  <div className="h-px flex-1 bg-border" />
                 </div>
               )}
 
@@ -403,7 +403,7 @@ export const SignInForm = ({
                   type="button"
                   size="lg"
                   variant="outline"
-                  className="bg-background text-muted-foreground border"
+                  className="border bg-background text-muted-foreground"
                   disabled={isSubmitting}
                   onClick={onSignInWithGoogleClick}
                 >
@@ -417,7 +417,7 @@ export const SignInForm = ({
                   type="button"
                   size="lg"
                   variant="outline"
-                  className="bg-background text-muted-foreground border"
+                  className="border bg-background text-muted-foreground"
                   disabled={isSubmitting}
                   onClick={onSignInWithMicrosoftClick}
                 >
@@ -435,7 +435,7 @@ export const SignInForm = ({
                   type="button"
                   size="lg"
                   variant="outline"
-                  className="bg-background text-muted-foreground border"
+                  className="border bg-background text-muted-foreground"
                   disabled={isSubmitting}
                   onClick={onSignInWithOIDCClick}
                 >
@@ -452,7 +452,7 @@ export const SignInForm = ({
             variant="outline"
             disabled={isSubmitting}
             loading={isPasskeyLoading}
-            className="bg-background text-muted-foreground border"
+            className="border bg-background text-muted-foreground"
             onClick={onSignInWithPasskey}
           >
             {!isPasskeyLoading && <KeyRoundIcon className="-ml-1 mr-1 h-5 w-5" />}

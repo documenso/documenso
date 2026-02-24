@@ -221,7 +221,7 @@ test.describe('Document Access API V1', () => {
       );
 
       expect(resB.ok()).toBeFalsy();
-      expect(resB.status()).toBe(500);
+      expect(resB.status()).toBe(404);
     });
 
     test('should allow authorized access to document send endpoint', async ({ request }) => {

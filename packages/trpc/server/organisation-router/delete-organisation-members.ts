@@ -100,13 +100,15 @@ export const deleteOrganisationMembers = async ({
         organisationId,
       },
     });
+  });
 
+  for (const member of membersToDelete) {
     await jobs.triggerJob({
       name: 'send.organisation-member-left.email',
       payload: {
         organisationId,
-        memberUserId: userId,
+        memberUserId: member.userId,
       },
     });
-  });
+  }
 };

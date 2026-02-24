@@ -40,10 +40,12 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_VIEWED', // When the document is viewed by a recipient.
   'DOCUMENT_RECIPIENT_REJECTED', // When a recipient rejects the document.
   'DOCUMENT_RECIPIENT_COMPLETED', // When a recipient completes all their required tasks for the document.
+  'DOCUMENT_RECIPIENT_EXPIRED', // When a recipient's signing window expires.
   'DOCUMENT_SENT', // When the document transitions from DRAFT to PENDING.
   'DOCUMENT_TITLE_UPDATED', // When the document title is updated.
   'DOCUMENT_EXTERNAL_ID_UPDATED', // When the document external ID is updated.
   'DOCUMENT_MOVED_TO_TEAM', // When the document is moved to a team.
+  'DOCUMENT_DELEGATED_OWNER_CREATED', // When the document delegated owner is created.
 
   // ACCESS AUTH 2FA events.
   'DOCUMENT_ACCESS_AUTH_2FA_REQUESTED', // When ACCESS AUTH 2FA is requested.
@@ -681,6 +683,30 @@ export const ZDocumentAuditLogEventDocumentMovedToTeamSchema = z.object({
   }),
 });
 
+/**
+ * Event: Document delegated owner created.
+ */
+export const ZDocumentAuditLogEventDocumentDelegatedOwnerCreatedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELEGATED_OWNER_CREATED),
+  data: z.object({
+    delegatedOwnerName: z.string().nullable(),
+    delegatedOwnerEmail: z.string(),
+    teamName: z.string(),
+  }),
+});
+
+/**
+ * Event: Recipient's signing window expired.
+ */
+export const ZDocumentAuditLogEventRecipientExpiredSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_EXPIRED),
+  data: z.object({
+    recipientEmail: z.string(),
+    recipientName: z.string(),
+    recipientId: z.number(),
+  }),
+});
+
 export const ZDocumentAuditLogBaseSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
@@ -701,6 +727,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventDocumentCreatedSchema,
     ZDocumentAuditLogEventDocumentDeletedSchema,
     ZDocumentAuditLogEventDocumentMovedToTeamSchema,
+    ZDocumentAuditLogEventDocumentDelegatedOwnerCreatedSchema,
     ZDocumentAuditLogEventDocumentFieldsAutoInsertedSchema,
     ZDocumentAuditLogEventDocumentFieldInsertedSchema,
     ZDocumentAuditLogEventDocumentFieldUninsertedSchema,
@@ -725,6 +752,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventRecipientAddedSchema,
     ZDocumentAuditLogEventRecipientUpdatedSchema,
     ZDocumentAuditLogEventRecipientRemovedSchema,
+    ZDocumentAuditLogEventRecipientExpiredSchema,
   ]),
 );
 
@@ -745,3 +773,5 @@ export type DocumentAuditLogByType<T = TDocumentAuditLog['type']> = Extract<
   TDocumentAuditLog,
   { type: T }
 >;
+
+export type TDocumentAuditLogBaseSchema = z.infer<typeof ZDocumentAuditLogBaseSchema>;

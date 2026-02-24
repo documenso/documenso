@@ -15,6 +15,7 @@ import type { TEnvelope } from '../../types/envelope';
 import { formatDocumentsPath, formatTemplatesPath } from '../../utils/teams';
 import { useEditorFields } from '../hooks/use-editor-fields';
 import type { TLocalField } from '../hooks/use-editor-fields';
+import { useEditorRecipients } from '../hooks/use-editor-recipients';
 import { useEnvelopeAutosave } from '../hooks/use-envelope-autosave';
 
 export const useDebounceFunction = <Args extends unknown[]>(
@@ -53,6 +54,7 @@ type EnvelopeEditorProviderValue = {
   getRecipientColorKey: (recipientId: number) => TRecipientColor;
 
   editorFields: ReturnType<typeof useEditorFields>;
+  editorRecipients: ReturnType<typeof useEditorRecipients>;
 
   isAutosaving: boolean;
   flushAutosave: () => Promise<void>;
@@ -99,6 +101,10 @@ export const EnvelopeEditorProvider = ({
   const editorFields = useEditorFields({
     envelope,
     handleFieldsUpdate: (fields) => setFieldsDebounced(fields),
+  });
+
+  const editorRecipients = useEditorRecipients({
+    envelope,
   });
 
   const envelopeUpdateMutationQuery = trpc.envelope.update.useMutation({
@@ -291,6 +297,12 @@ export const EnvelopeEditorProvider = ({
 
     if (fetchedEnvelopeData.data) {
       setEnvelope(fetchedEnvelopeData.data);
+
+      editorRecipients.resetForm({
+        recipients: fetchedEnvelopeData.data.recipients,
+        documentMeta: fetchedEnvelopeData.data.documentMeta,
+      });
+      editorFields.resetForm(fetchedEnvelopeData.data.fields);
     }
   };
 
@@ -348,6 +360,7 @@ export const EnvelopeEditorProvider = ({
         setRecipientsDebounced,
         setRecipientsAsync,
         editorFields,
+        editorRecipients,
         autosaveError,
         flushAutosave,
         isAutosaving,

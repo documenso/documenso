@@ -84,7 +84,7 @@ export default function DocumentEditPage() {
 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
-      <Link to={documentRootPath} className="flex items-center text-[#7AC455] hover:opacity-80">
+      <Link to={documentRootPath} className="flex items-center text-documenso-700 hover:opacity-80">
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         <Trans>Documents</Trans>
       </Link>
@@ -106,7 +106,7 @@ export default function DocumentEditPage() {
             />
 
             {recipients.length > 0 && (
-              <div className="text-muted-foreground flex items-center">
+              <div className="flex items-center text-muted-foreground">
                 <Users2 className="mr-2 h-5 w-5" />
 
                 <StackAvatarsWithTooltip

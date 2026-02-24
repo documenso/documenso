@@ -32,8 +32,8 @@ export const insertFieldInPDFV2 = async ({
     ['Noto Sans Korean']: [path.join(fontPath, 'noto-sans-korean.ttf')],
   });
 
-  const stage = new Konva.Stage({ width: pageWidth, height: pageHeight });
-  const layer = new Konva.Layer();
+  let stage: Konva.Stage | null = new Konva.Stage({ width: pageWidth, height: pageHeight });
+  let layer: Konva.Layer | null = new Konva.Layer();
 
   // Render the fields onto the layer.
   for (const field of fields) {
@@ -61,5 +61,13 @@ export const insertFieldInPDFV2 = async ({
   const canvas = layer.canvas._canvas as unknown as Canvas;
 
   // Embed the SVG into the PDF
-  return await canvas.toBuffer('pdf');
+  const pdf = await canvas.toBuffer('pdf');
+
+  stage.destroy();
+  layer.destroy();
+
+  stage = null;
+  layer = null;
+
+  return pdf;
 };

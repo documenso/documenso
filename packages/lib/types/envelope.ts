@@ -55,6 +55,7 @@ export const ZEnvelopeSchema = EnvelopeSchema.pick({
     emailSettings: true,
     emailId: true,
     emailReplyTo: true,
+    envelopeExpirationPeriod: true,
   }),
   recipients: ZEnvelopeRecipientLiteSchema.array(),
   fields: ZEnvelopeFieldSchema.array(),
@@ -115,5 +116,40 @@ export type TEnvelopeLite = z.infer<typeof ZEnvelopeLiteSchema>;
 /**
  * A version of the envelope response schema when returning multiple envelopes at once from a single API endpoint.
  */
-// export const ZEnvelopeManySchema = X
-// export type TEnvelopeMany = z.infer<typeof ZEnvelopeManySchema>;
+export const ZEnvelopeManySchema = EnvelopeSchema.pick({
+  internalVersion: true,
+  type: true,
+  status: true,
+  source: true,
+  visibility: true,
+  templateType: true,
+  id: true,
+  secondaryId: true,
+  externalId: true,
+  createdAt: true,
+  updatedAt: true,
+  completedAt: true,
+  deletedAt: true,
+  title: true,
+  authOptions: true,
+  formValues: true,
+  publicTitle: true,
+  publicDescription: true,
+  userId: true,
+  teamId: true,
+  folderId: true,
+  templateId: true,
+}).extend({
+  user: z.object({
+    id: z.number(),
+    name: z.string(),
+    email: z.string(),
+  }),
+  recipients: ZEnvelopeRecipientLiteSchema.array(),
+  team: TeamSchema.pick({
+    id: true,
+    url: true,
+  }).nullable(),
+});
+
+export type TEnvelopeMany = z.infer<typeof ZEnvelopeManySchema>;
