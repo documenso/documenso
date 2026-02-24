@@ -2,8 +2,8 @@ import { EnvelopeType } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import { DateTime } from 'luxon';
 
+import { jobs } from '@documenso/lib/jobs/client';
 import { TWO_FACTOR_EMAIL_EXPIRATION_MINUTES } from '@documenso/lib/server-only/2fa/email/constants';
-import { send2FATokenEmail } from '@documenso/lib/server-only/2fa/email/send-2fa-token-email';
 import { assertRateLimit } from '@documenso/lib/server-only/rate-limit/rate-limit-middleware';
 import { request2FAEmailRateLimit } from '@documenso/lib/server-only/rate-limit/rate-limits';
 import { DocumentAuth } from '@documenso/lib/types/document-auth';
@@ -29,8 +29,6 @@ export const accessAuthRequest2FAEmailRoute = procedure
       });
 
       assertRateLimit(rateLimitResult);
-
-      const user = ctx.user;
 
       // Get document and recipient by token
       const envelope = await prisma.envelope.findFirst({
@@ -72,18 +70,14 @@ export const accessAuthRequest2FAEmailRoute = procedure
         });
       }
 
-      // if (user && recipient.email !== user.email) {
-      //   throw new TRPCError({
-      //     code: 'UNAUTHORIZED',
-      //     message: 'User does not match recipient',
-      //   });
-      // }
-
       const expiresAt = DateTime.now().plus({ minutes: TWO_FACTOR_EMAIL_EXPIRATION_MINUTES });
 
-      await send2FATokenEmail({
-        token,
-        envelopeId: envelope.id,
+      await jobs.triggerJob({
+        name: 'send.2fa.token.email',
+        payload: {
+          envelopeId: envelope.id,
+          recipientId: recipient.id,
+        },
       });
 
       return {
