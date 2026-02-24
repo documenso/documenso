@@ -1,7 +1,4 @@
-import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
+import { Plural, Trans } from '@lingui/react/macro';
 
 import type {
   TEnvelopeExpirationDurationPeriod,
@@ -15,16 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@documenso/ui/primitives/select';
-
-const EXPIRATION_UNITS: Array<{
-  value: TEnvelopeExpirationDurationPeriod['unit'];
-  label: MessageDescriptor;
-}> = [
-  { value: 'day', label: msg`Days` },
-  { value: 'week', label: msg`Weeks` },
-  { value: 'month', label: msg`Months` },
-  { value: 'year', label: msg`Years` },
-];
 
 type ExpirationMode = 'duration' | 'disabled' | 'inherit';
 
@@ -71,8 +58,6 @@ export const ExpirationPeriodPicker = ({
   disabled = false,
   inheritLabel,
 }: ExpirationPeriodPickerProps) => {
-  const { _ } = useLingui();
-
   const mode = getMode(value);
   const amount = getAmount(value);
   const unit = getUnit(value);
@@ -139,11 +124,18 @@ export const ExpirationPeriodPicker = ({
             </SelectTrigger>
 
             <SelectContent>
-              {EXPIRATION_UNITS.map((u) => (
-                <SelectItem key={u.value} value={u.value}>
-                  {_(u.label)}
-                </SelectItem>
-              ))}
+              <SelectItem value="day">
+                <Plural value={amount} one="Day" other="Days" />
+              </SelectItem>
+              <SelectItem value="week">
+                <Plural value={amount} one="Week" other="Weeks" />
+              </SelectItem>
+              <SelectItem value="month">
+                <Plural value={amount} one="Month" other="Months" />
+              </SelectItem>
+              <SelectItem value="year">
+                <Plural value={amount} one="Year" other="Years" />
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
