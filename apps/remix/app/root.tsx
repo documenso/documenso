@@ -12,6 +12,10 @@ import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes'
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
+import {
+  NEXT_PUBLIC_CUSTOM_CSS_URL,
+  NEXT_PUBLIC_CUSTOM_JS_URL,
+} from '@documenso/lib/constants/app';
 import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
 import { createPublicEnv } from '@documenso/lib/utils/env';
 import { extractLocaleData } from '@documenso/lib/utils/i18n';
@@ -74,6 +78,8 @@ export async function loader({ request }: Route.LoaderArgs) {
           }
         : null,
       publicEnv: createPublicEnv(),
+      customCssUrl: NEXT_PUBLIC_CUSTOM_CSS_URL() || null,
+      customJsUrl: NEXT_PUBLIC_CUSTOM_JS_URL() || null,
     },
     {
       headers: {
@@ -94,7 +100,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export function LayoutContent({ children }: { children: React.ReactNode }) {
-  const { publicEnv, session, lang, disableAnimations, ...data } =
+  const { publicEnv, session, lang, disableAnimations, customCssUrl, customJsUrl, ...data } =
     useLoaderData<typeof loader>() || {};
 
   const [theme] = useTheme();
@@ -121,6 +127,9 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
             }}
           />
         )}
+
+        {customCssUrl && <link rel="stylesheet" href={customCssUrl} />}
+        {customJsUrl && <script src={customJsUrl} defer />}
 
         {/* Fix: https://stackoverflow.com/questions/21147149/flash-of-unstyled-content-fouc-in-firefox-only-is-ff-slow-renderer */}
         <script>0</script>
