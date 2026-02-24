@@ -1,9 +1,11 @@
 import * as React from 'react';
 
+import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Role } from '@prisma/client';
 import { Check, ChevronsUpDown } from 'lucide-react';
 
+import { ROLE_MAP } from '@documenso/lib/constants/roles';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -21,6 +23,7 @@ type ComboboxProps = {
 };
 
 const MultiSelectRoleCombobox = ({ listValues, onChange }: ComboboxProps) => {
+  const { _ } = useLingui();
   const [open, setOpen] = React.useState(false);
   const [selectedValues, setSelectedValues] = React.useState<string[]>([]);
   const dbRoles = Object.values(Role);
@@ -44,6 +47,15 @@ const MultiSelectRoleCombobox = ({ listValues, onChange }: ComboboxProps) => {
     setOpen(false);
   };
 
+  const getTranslatedRoles = () => {
+    return selectedValues
+      .map((value) => {
+        const roleKey = value as Role;
+        return ROLE_MAP[roleKey] ? _(ROLE_MAP[roleKey]) : value;
+      })
+      .join(', ');
+  };
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -53,28 +65,33 @@ const MultiSelectRoleCombobox = ({ listValues, onChange }: ComboboxProps) => {
           aria-expanded={open}
           className="w-[200px] justify-between"
         >
-          {selectedValues.length > 0 ? selectedValues.join(', ') : 'Select values...'}
+          {selectedValues.length > 0 ? getTranslatedRoles() : 'Select values...'}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder={selectedValues.join(', ')} />
+          <CommandInput placeholder={getTranslatedRoles()} />
           <CommandEmpty>
             <Trans>No value found.</Trans>
           </CommandEmpty>
           <CommandGroup>
-            {allRoles.map((value: string, i: number) => (
-              <CommandItem key={i} onSelect={() => handleSelect(value)}>
-                <Check
-                  className={cn(
-                    'mr-2 h-4 w-4',
-                    selectedValues.includes(value) ? 'opacity-100' : 'opacity-0',
-                  )}
-                />
-                {value}
-              </CommandItem>
-            ))}
+            {allRoles.map((value: string, i: number) => {
+              const roleKey = value as Role;
+              const displayValue = ROLE_MAP[roleKey] ? _(ROLE_MAP[roleKey]) : value;
+
+              return (
+                <CommandItem key={i} onSelect={() => handleSelect(value)}>
+                  <Check
+                    className={cn(
+                      'mr-2 h-4 w-4',
+                      selectedValues.includes(value) ? 'opacity-100' : 'opacity-0',
+                    )}
+                  />
+                  {displayValue}
+                </CommandItem>
+              );
+            })}
           </CommandGroup>
         </Command>
       </PopoverContent>

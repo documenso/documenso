@@ -242,13 +242,15 @@ export const DocumentPreferencesForm = ({
                     <SelectContent>
                       {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
                         <SelectItem key={code} value={code}>
-                          {language.full}
+                          {language.nativeName || t(language.name)}
                         </SelectItem>
                       ))}
 
-                      <SelectItem value={'-1'}>
-                        <Trans>Inherit from organisation</Trans>
-                      </SelectItem>
+                      {canInherit && (
+                        <SelectItem value={'-1'}>
+                          <Trans>Inherit from organisation</Trans>
+                        </SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </FormControl>

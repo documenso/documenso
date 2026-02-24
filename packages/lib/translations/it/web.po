@@ -12447,3 +12447,338 @@ msgstr "Il tuo codice di verifica:"
 msgid "your-domain.com another-domain.com"
 msgstr "tuo-dominio.com altro-dominio.com"
 
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.created"
+msgstr "Documento Creato"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.sent"
+msgstr "Documento Inviato"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.opened"
+msgstr "Documento Aperto"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.signed"
+msgstr "Documento Firmato"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.completed"
+msgstr "Documento Completato"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.rejected"
+msgstr "Documento Rifiutato"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.cancelled"
+msgstr "Documento Annullato"
+
+#: packages/lib/types/subscription.ts
+msgid "Unlimited documents"
+msgstr "Documenti illimitati"
+
+#: packages/lib/types/subscription.ts
+msgid "Branding"
+msgstr "Marchio personalizzato"
+
+#: packages/lib/types/subscription.ts
+msgid "Hide Documenso branding by"
+msgstr "Nascondi marchio Documenso"
+
+#: packages/lib/types/subscription.ts
+msgid "Email domains"
+msgstr "Domini email"
+
+#: packages/lib/types/subscription.ts
+msgid "Embed authoring"
+msgstr "Creazione incorporata"
+
+#: packages/lib/types/subscription.ts
+msgid "Embed signing"
+msgstr "Firma incorporata"
+
+#: packages/lib/types/subscription.ts
+msgid "White label for embed authoring"
+msgstr "Etichetta bianca per creazione incorporata"
+
+#: packages/lib/types/subscription.ts
+msgid "White label for embed signing"
+msgstr "Etichetta bianca per firma incorporata"
+
+#: packages/lib/types/subscription.ts
+msgid "21 CFR"
+msgstr "21 CFR"
+
+#: packages/lib/types/subscription.ts
+msgid "Authentication portal"
+msgstr "Portale di autenticazione"
+
+#: packages/lib/types/subscription.ts
+msgid "Allow Legacy Envelopes"
+msgstr "Consenti buste legacy"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Admins only"
+msgstr "Solo amministratori"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Everyone"
+msgstr "Tutti"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Managers and above"
+msgstr "Manager e superiori"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require account"
+msgstr "Richiedi account"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require passkey"
+msgstr "Richiedi passkey"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require 2FA"
+msgstr "Richiedi 2FA"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require password"
+msgstr "Richiedi password"
+
+#: packages/lib/constants/document-auth.ts
+msgid "None (Overrides global settings)"
+msgstr "Nessuno (Sostituisce impostazioni globali)"
+
+#: packages/lib/constants/billing.ts
+msgid "Active"
+msgstr "Attivo"
+
+#: packages/lib/constants/billing.ts
+msgid "Inactive"
+msgstr "Inattivo"
+
+#: packages/lib/constants/billing.ts
+msgid "Past Due"
+msgstr "Scaduto"
+
+#: packages/lib/constants/roles.ts
+msgid "User"
+msgstr "Utente"
+
+#: packages/lib/constants/roles.ts
+msgid "Admin"
+msgstr "Amministratore"
+
+#: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
+msgid "AI features are disabled for your team. Please ask your team owner or organisation owner to enable them."
+msgstr "Le funzionalità IA sono disabilitate per il tuo team. Chiedi al proprietario del team o dell'organizzazione di attivarle."
+
+#: apps/remix/app/components/dialogs/sign-field-dropdown-dialog.tsx
+msgid "Checkbox option"
+msgstr "Opzione casella di controllo"
+
+#: packages/email/template-components/template-password-reset.tsx
+msgid "Didn't request a password change? We are here to help you secure your account, just <0>contact us</0>."
+msgstr "Non hai richiesto un cambio password? Siamo qui per aiutarti a proteggere il tuo account, basta <0>contattarci</0>."
+
+#: apps/remix/app/components/dialogs/team-transfer-ownership-dialog.tsx
+msgid "Don't transfer (Delete all documents)"
+msgstr "Non trasferire (Elimina tutti i documenti)"
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
+msgid "Enable AI detection"
+msgstr "Abilita rilevamento IA"
+
+#: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
+msgid "Enable AI features"
+msgstr "Abilita funzionalità IA"
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
+msgid "Enclosed Documents"
+msgstr "Documenti allegati"
+
+#: packages/ui/primitives/data-table-pagination.tsx
+msgid "Go to first page"
+msgstr "Vai alla prima pagina"
+
+#: packages/ui/primitives/data-table-pagination.tsx
+msgid "Go to last page"
+msgstr "Vai all'ultima pagina"
+
+#: packages/ui/primitives/data-table-pagination.tsx
+msgid "Go to next page"
+msgstr "Vai alla pagina successiva"
+
+#: packages/ui/primitives/data-table-pagination.tsx
+msgid "Go to previous page"
+msgstr "Vai alla pagina precedente"
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+msgid "Here you can set branding preferences for your team."
+msgstr "Qui puoi impostare le preferenze di branding per il tuo team."
+
+#: apps/remix/app/routes/_authenticated+/settings+/branding.tsx
+msgid "Here you can set your general branding preferences."
+msgstr "Qui puoi impostare le tue preferenze generali di branding."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
+msgid "Here you can set your general document preferences."
+msgstr "Qui puoi impostare le tue preferenze generali sui documenti."
+
+#: apps/remix/app/components/general/organisation-switcher.tsx
+msgid "Manage Organisation"
+msgstr "Gestisci organizzazione"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
+msgid "Once you update your DNS records, it may take up to 48 hours for it to be propogated. Once the DNS propagation is complete you will need to come back and press the \"Sync\" domains button."
+msgstr "Dopo aver aggiornato i record DNS, potrebbero essere necessarie fino a 48 ore per la propagazione. Una volta completata la propagazione DNS, dovrai tornare e premere il pulsante \"Sincronizza\" domini."
+
+#: packages/ui/primitives/data-table-pagination.tsx
+msgid "Open menu"
+msgstr "Apri menu"
+
+#: apps/remix/app/components/forms/email-preferences-form.tsx
+msgid "Reply To Email <0>(Optional)</0>"
+msgstr "Email di risposta <0>(Facoltativo)</0>"
+
+#: apps/remix/app/components/general/generic-error-layout.tsx
+msgid "Return Home"
+msgstr "Torna alla home"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "The document ownership was delegated to {0} on behalf of {1}"
+msgstr "La proprietà del documento è stata delegata a {0} per conto di {1}"
+
+#: apps/remix/app/routes/_unauthenticated+/signin.tsx
+msgid "The email or password provided is incorrect."
+msgstr "L'email o la password fornite sono errate."
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
+msgid "The two-factor authentication code provided is incorrect."
+msgstr "Il codice di autenticazione a due fattori fornito non è corretto."
+
+#: packages/email/template-components/template-document-generic.tsx
+msgid "This document was sent using <0>Documenso</0>."
+msgstr "Questo documento è stato inviato utilizzando <0>Documenso</0>."
+
+#: apps/remix/app/components/dialogs/team-transfer-ownership-dialog.tsx
+msgid "Transfer documents to a different team"
+msgstr "Trasferisci documenti a un altro team"
+
+#: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
+msgid "Turn on AI detection to automatically find recipients and fields in your documents. AI providers do not retain your data for training."
+msgstr "Attiva il rilevamento IA per trovare automaticamente destinatari e campi nei tuoi documenti. I fornitori di IA non conservano i tuoi dati per l'addestramento."
+
+#: packages/ui/primitives/document-flow/add-settings.tsx
+msgid "Undo"
+msgstr "Annulla"
+
+#: packages/email/template-components/template-direct-template.tsx
+msgid "Want to send slick signing links like this one? <0>Check out Documenso</0>."
+msgstr "Vuoi inviare link di firma eleganti come questo? <0>Scopri Documenso</0>."
+
+#: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
+msgid "We couldn't enable AI features right now. Please try again."
+msgstr "Non siamo riusciti ad abilitare le funzionalità IA in questo momento. Riprova."
+
+#: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
+msgid "You are currently updating <0>{memberName}</0>."
+msgstr "Stai attualmente aggiornando <0>{memberName}</0>."
+
+#: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
+msgid "You are currently updating <0>{organisationMemberName}</0>."
+msgstr "Stai attualmente aggiornando <0>{organisationMemberName}</0>."
+
+#: apps/remix/app/components/forms/email-preferences-form.tsx
+msgid "You can manage your email preferences here."
+msgstr "Puoi gestire le tue preferenze email qui."
+
+#: apps/remix/app/components/forms/team-token-page-view.tsx
+msgid "You can revoke access at any time in your team settings on Documenso <0>here</0>."
+msgstr "Puoi revocare l'accesso in qualsiasi momento nelle impostazioni del team su Documenso <0>qui</0>."
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
+msgid "You cannot delete this item because the document has been sent to recipients."
+msgstr "Non puoi eliminare questo elemento perché il documento è stato inviato ai destinatari."
+
+#: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
+msgid "You cannot upload encrypted PDFs."
+msgstr "Non puoi caricare PDF crittografati."
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
+msgid "You do not have permission to create a token for this team."
+msgstr "Non hai il permesso di creare un token per questo team."
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
+msgid "You have reached the limit of the number of files per envelope."
+msgstr "Hai raggiunto il limite del numero di file per busta."
+
+#: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
+msgid "You're an admin. You can enable AI features for this team right away. Everyone on the team will see AI detection once enabled."
+msgstr "Sei un amministratore. Puoi abilitare le funzionalità IA per questo team immediatamente. Tutti nel team vedranno il rilevamento IA una volta attivato."
+
+#: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
+msgid "Your document content will be sent securely to our AI provider solely for detection and will not be stored or used for training."
+msgstr "Il contenuto del tuo documento verrà inviato in modo sicuro al nostro fornitore di IA esclusivamente per il rilevamento e non verrà archiviato o utilizzato per l'addestramento."
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "German"
+msgstr "Tedesco"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "English"
+msgstr "Inglese"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Spanish"
+msgstr "Spagnolo"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "French"
+msgstr "Francese"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Italian"
+msgstr "Italiano"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Japanese"
+msgstr "Giapponese"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Korean"
+msgstr "Coreano"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Dutch"
+msgstr "Olandese"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Polish"
+msgstr "Polacco"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Portuguese (Brazil)"
+msgstr "Portoghese (Brasile)"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Portuguese (Portugal)"
+msgstr "Portoghese (Portogallo)"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Chinese"
+msgstr "Cinese"

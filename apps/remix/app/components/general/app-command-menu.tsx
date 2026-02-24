@@ -364,18 +364,18 @@ const LanguageCommands = () => {
     setIsLoading(false);
   };
 
-  return Object.values(SUPPORTED_LANGUAGES).map((language) => (
+  return Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
     <CommandItem
       disabled={isLoading}
-      key={language.full}
-      onSelect={async () => setLanguage(language.short)}
+      key={code}
+      onSelect={async () => setLanguage(code)}
       className="-my-1 mx-2 rounded-lg first:mt-2 last:mb-2"
     >
       <CheckIcon
-        className={cn('mr-2 h-4 w-4', i18n.locale === language.short ? 'opacity-100' : 'opacity-0')}
+        className={cn('mr-2 h-4 w-4', i18n.locale === code ? 'opacity-100' : 'opacity-0')}
       />
 
-      {language.full}
+      {language.nativeName || _(language.name)}
     </CommandItem>
   ));
 };

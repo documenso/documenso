@@ -20,18 +20,66 @@ export async function dynamicActivate(locale: string) {
   i18n.loadAndActivate({ locale, messages });
 }
 
+/**
+ * Maps browser language codes to our supported language codes.
+ * Handles both full locales (pt-BR) and language-only codes (pt).
+ */
+const BROWSER_LANGUAGE_MAP: Record<string, SupportedLanguageCodes> = {
+  'de': 'de',
+  'de-DE': 'de',
+  'de-AT': 'de',
+  'de-CH': 'de',
+  'en': 'en',
+  'en-US': 'en',
+  'en-GB': 'en',
+  'en-CA': 'en',
+  'en-AU': 'en',
+  'es': 'es',
+  'es-ES': 'es',
+  'es-MX': 'es',
+  'es-AR': 'es',
+  'fr': 'fr',
+  'fr-FR': 'fr',
+  'fr-CA': 'fr',
+  'fr-BE': 'fr',
+  'it': 'it',
+  'it-IT': 'it',
+  'ja': 'ja',
+  'ja-JP': 'ja',
+  'ko': 'ko',
+  'ko-KR': 'ko',
+  'nl': 'nl',
+  'nl-NL': 'nl',
+  'nl-BE': 'nl',
+  'pl': 'pl',
+  'pl-PL': 'pl',
+  'pt': 'pt-BR',
+  'pt-BR': 'pt-BR',
+  'pt-PT': 'pt-PT', // Map Portugal Portuguese to Portugal Portuguese
+  'zh': 'zh',
+  'zh-CN': 'zh',
+  'zh-TW': 'zh',
+  'zh-HK': 'zh',
+};
+
 const parseLanguageFromLocale = (locale: string): SupportedLanguageCodes | null => {
-  const [language, _country] = locale.split('-');
+  // Clean locale string (remove quality values like ;q=0.9)
+  const cleanLocale = locale.split(';')[0].trim();
 
-  const foundSupportedLanguage = APP_I18N_OPTIONS.supportedLangs.find(
-    (lang): lang is SupportedLanguageCodes => lang === language,
-  );
-
-  if (!foundSupportedLanguage) {
-    return null;
+  // Try exact match first (e.g., 'pt-BR')
+  const exactMatch = BROWSER_LANGUAGE_MAP[cleanLocale];
+  if (exactMatch) {
+    return exactMatch;
   }
 
-  return foundSupportedLanguage;
+  // Try language-only match (e.g., 'pt' from 'pt-BR')
+  const langOnly = cleanLocale.split('-')[0];
+  const langMatch = BROWSER_LANGUAGE_MAP[langOnly];
+  if (langMatch) {
+    return langMatch;
+  }
+
+  return null;
 };
 
 /**

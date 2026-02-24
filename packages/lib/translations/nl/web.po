@@ -12447,3 +12447,186 @@ msgstr "Uw verificatiecode:"
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
 
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.created"
+msgstr "Document Aangemaakt"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.sent"
+msgstr "Document Verzonden"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.opened"
+msgstr "Document Geopend"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.signed"
+msgstr "Document Ondertekend"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.completed"
+msgstr "Document Voltooid"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.rejected"
+msgstr "Document Afgewezen"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.cancelled"
+msgstr "Document Geannuleerd"
+
+#: packages/lib/types/subscription.ts
+msgid "Unlimited documents"
+msgstr "Onbeperkte documenten"
+
+#: packages/lib/types/subscription.ts
+msgid "Branding"
+msgstr "Merkidentiteit"
+
+#: packages/lib/types/subscription.ts
+msgid "Hide Documenso branding by"
+msgstr "Verberg Documenso merkidentiteit"
+
+#: packages/lib/types/subscription.ts
+msgid "Email domains"
+msgstr "E-maildomeinen"
+
+#: packages/lib/types/subscription.ts
+msgid "Embed authoring"
+msgstr "Ingebedde creatie"
+
+#: packages/lib/types/subscription.ts
+msgid "Embed signing"
+msgstr "Ingebedde ondertekening"
+
+#: packages/lib/types/subscription.ts
+msgid "White label for embed authoring"
+msgstr "White label voor ingebedde creatie"
+
+#: packages/lib/types/subscription.ts
+msgid "White label for embed signing"
+msgstr "White label voor ingebedde ondertekening"
+
+#: packages/lib/types/subscription.ts
+msgid "21 CFR"
+msgstr "21 CFR"
+
+#: packages/lib/types/subscription.ts
+msgid "Authentication portal"
+msgstr "Authenticatieportaal"
+
+#: packages/lib/types/subscription.ts
+msgid "Allow Legacy Envelopes"
+msgstr "Legacy enveloppen toestaan"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Admins only"
+msgstr "Alleen beheerders"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Everyone"
+msgstr "Iedereen"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Managers and above"
+msgstr "Managers en hoger"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require account"
+msgstr "Account vereist"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require passkey"
+msgstr "Passkey vereist"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require 2FA"
+msgstr "2FA vereist"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require password"
+msgstr "Wachtwoord vereist"
+
+#: packages/lib/constants/document-auth.ts
+msgid "None (Overrides global settings)"
+msgstr "Geen (Overschrijft globale instellingen)"
+
+#: packages/lib/constants/billing.ts
+msgid "Active"
+msgstr "Actief"
+
+#: packages/lib/constants/billing.ts
+msgid "Inactive"
+msgstr "Inactief"
+
+#: packages/lib/constants/billing.ts
+msgid "Past Due"
+msgstr "Verlopen"
+
+#: packages/lib/constants/roles.ts
+msgid "User"
+msgstr "Gebruiker"
+
+#: packages/lib/constants/roles.ts
+msgid "Admin"
+msgstr "Beheerder"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "German"
+msgstr "Duits"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "English"
+msgstr "Engels"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Spanish"
+msgstr "Spaans"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "French"
+msgstr "Frans"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Italian"
+msgstr "Italiaans"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Japanese"
+msgstr "Japans"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Korean"
+msgstr "Koreaans"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Dutch"
+msgstr "Nederlands"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Polish"
+msgstr "Pools"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Portuguese (Brazil)"
+msgstr "Portugees (Brazilië)"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Portuguese (Portugal)"
+msgstr "Portugees (Portugal)"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Chinese"
+msgstr "Chinees"

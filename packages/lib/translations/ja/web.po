@@ -12447,3 +12447,186 @@ msgstr "認証コード:"
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
 
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.created"
+msgstr "ドキュメント作成済み"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.sent"
+msgstr "ドキュメント送信済み"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.opened"
+msgstr "ドキュメント開封済み"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.signed"
+msgstr "ドキュメント署名済み"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.completed"
+msgstr "ドキュメント完了済み"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.rejected"
+msgstr "ドキュメント拒否済み"
+
+#: packages/lib/universal/webhook/to-friendly-webhook-event-name.ts
+msgid "document.cancelled"
+msgstr "ドキュメントキャンセル済み"
+
+#: packages/lib/types/subscription.ts
+msgid "Unlimited documents"
+msgstr "無制限ドキュメント"
+
+#: packages/lib/types/subscription.ts
+msgid "Branding"
+msgstr "ブランディング"
+
+#: packages/lib/types/subscription.ts
+msgid "Hide Documenso branding by"
+msgstr "Documensoブランディングを非表示"
+
+#: packages/lib/types/subscription.ts
+msgid "Email domains"
+msgstr "メールドメイン"
+
+#: packages/lib/types/subscription.ts
+msgid "Embed authoring"
+msgstr "埋め込み作成"
+
+#: packages/lib/types/subscription.ts
+msgid "Embed signing"
+msgstr "埋め込み署名"
+
+#: packages/lib/types/subscription.ts
+msgid "White label for embed authoring"
+msgstr "埋め込み作成用ホワイトラベル"
+
+#: packages/lib/types/subscription.ts
+msgid "White label for embed signing"
+msgstr "埋め込み署名用ホワイトラベル"
+
+#: packages/lib/types/subscription.ts
+msgid "21 CFR"
+msgstr "21 CFR"
+
+#: packages/lib/types/subscription.ts
+msgid "Authentication portal"
+msgstr "認証ポータル"
+
+#: packages/lib/types/subscription.ts
+msgid "Allow Legacy Envelopes"
+msgstr "レガシーエンベロープを許可"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Admins only"
+msgstr "管理者のみ"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Everyone"
+msgstr "全員"
+
+#: packages/lib/constants/document-visibility.ts
+msgid "Managers and above"
+msgstr "マネージャー以上"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require account"
+msgstr "アカウント必須"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require passkey"
+msgstr "パスキー必須"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require 2FA"
+msgstr "2FA必須"
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require password"
+msgstr "パスワード必須"
+
+#: packages/lib/constants/document-auth.ts
+msgid "None (Overrides global settings)"
+msgstr "なし（グローバル設定を上書き）"
+
+#: packages/lib/constants/billing.ts
+msgid "Active"
+msgstr "アクティブ"
+
+#: packages/lib/constants/billing.ts
+msgid "Inactive"
+msgstr "非アクティブ"
+
+#: packages/lib/constants/billing.ts
+msgid "Past Due"
+msgstr "期限切れ"
+
+#: packages/lib/constants/roles.ts
+msgid "User"
+msgstr "ユーザー"
+
+#: packages/lib/constants/roles.ts
+msgid "Admin"
+msgstr "管理者"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "German"
+msgstr "ドイツ語"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "English"
+msgstr "英語"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Spanish"
+msgstr "スペイン語"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "French"
+msgstr "フランス語"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Italian"
+msgstr "イタリア語"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Japanese"
+msgstr "日本語"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Korean"
+msgstr "韓国語"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Dutch"
+msgstr "オランダ語"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Polish"
+msgstr "ポーランド語"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Portuguese (Brazil)"
+msgstr "ポルトガル語（ブラジル）"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Portuguese (Portugal)"
+msgstr "ポルトガル語（ポルトガル）"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Chinese"
+msgstr "中国語"

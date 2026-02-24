@@ -42,19 +42,19 @@ export const LanguageSwitcherDialog = ({ open, setOpen }: LanguageSwitcherDialog
 
       <CommandList>
         <CommandGroup>
-          {Object.values(SUPPORTED_LANGUAGES).map((language) => (
+          {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
             <CommandItem
-              key={language.short}
-              value={language.full}
-              onSelect={async () => setLanguage(language.short)}
+              key={code}
+              value={language.nativeName || _(language.name)}
+              onSelect={async () => setLanguage(code)}
             >
               <CheckIcon
                 className={cn(
                   'mr-2 h-4 w-4',
-                  i18n.locale === language.short ? 'opacity-100' : 'opacity-0',
+                  i18n.locale === code ? 'opacity-100' : 'opacity-0',
                 )}
               />
-              {SUPPORTED_LANGUAGES[language.short].full}
+              {language.nativeName || _(language.name)}
             </CommandItem>
           ))}
         </CommandGroup>
