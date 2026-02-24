@@ -1,3 +1,4 @@
+import { DocumentDataType } from '@prisma/client';
 import { z } from 'zod';
 
 import DocumentDataSchema from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
@@ -76,6 +77,7 @@ export type TGetEnvelopeItemFileTokenDownloadRequestParams = z.infer<
 export const ZGetEnvelopeItemMetaSchema = z.object({
   envelopeItemId: z.string(),
   documentDataId: z.string(),
+  documentDataType: z.nativeEnum(DocumentDataType),
   pages: z
     .object({
       originalWidth: z.number(),

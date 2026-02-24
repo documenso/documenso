@@ -1,7 +1,9 @@
+import { DocumentDataType } from '@prisma/client';
 import { z } from 'zod';
 
 export const ZDocumentDataMetaSchema = z.object({
   // Could store other things such as PDF size, etc here.
+  documentDataType: z.nativeEnum(DocumentDataType),
   pages: z
     .object({
       originalWidth: z.number().describe('Original PDF page width'),

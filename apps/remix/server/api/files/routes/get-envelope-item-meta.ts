@@ -110,10 +110,12 @@ export const handleEnvelopeItemsMetaRequest = async ({
         const pdfPageMetadata: TDocumentDataMeta['pages'] = await extractAndStorePdfImages(
           new Uint8Array(pdfBytes).buffer,
           item.documentData.id,
+          item.documentData.type,
         );
 
         pageMetadata = {
           pages: pdfPageMetadata,
+          documentDataType: item.documentData.type,
         };
       }
 
@@ -122,6 +124,7 @@ export const handleEnvelopeItemsMetaRequest = async ({
       return {
         envelopeItemId: item.id,
         documentDataId: item.documentData.id,
+        documentDataType: item.documentData.type,
         pages: pages.map((page) => ({
           originalWidth: page.originalWidth,
           originalHeight: page.originalHeight,

@@ -49,7 +49,7 @@ export const putPdfFileServerSide = async (file: File) => {
 
   const newDocumentData = await createDocumentData({ type, data });
 
-  void extractAndStorePdfImages(arrayBuffer, newDocumentData.id).catch((err) => {
+  void extractAndStorePdfImages(arrayBuffer, newDocumentData.id, type).catch((err) => {
     console.error(`Error extracting and storing PDF images: ${err}`);
 
     // Do nothing.
@@ -64,6 +64,7 @@ export const putPdfFileServerSide = async (file: File) => {
 export const extractAndStorePdfImages = async (
   arrayBuffer: ArrayBuffer,
   documentDataId: string,
+  documentDataType: DocumentDataType,
 ): Promise<TDocumentDataMeta['pages']> => {
   const images = await pdfToImages(new Uint8Array(arrayBuffer));
 
@@ -77,6 +78,7 @@ export const extractAndStorePdfImages = async (
 
   const documentDataMetadata = ZDocumentDataMetaSchema.parse({
     pages: pageMetadata,
+    documentDataType,
   } satisfies TDocumentDataMeta);
 
   // Only update metadata (page dimensions). Never update type, data, or initialData:
@@ -140,7 +142,7 @@ export const putNormalizedPdfFileServerSide = async (
     data: documentData.data,
   });
 
-  void extractAndStorePdfImages(normalized, newDocumentData.id).catch((err) => {
+  void extractAndStorePdfImages(normalized, newDocumentData.id, documentData.type).catch((err) => {
     console.error(`Error extracting and storing PDF images: ${err}`);
 
     // Do nothing.
