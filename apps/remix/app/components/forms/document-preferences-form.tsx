@@ -12,6 +12,10 @@ import { useSession } from '@documenso/lib/client-only/providers/session';
 import { DATE_FORMATS } from '@documenso/lib/constants/date-formats';
 import { DOCUMENT_SIGNATURE_TYPES, DocumentSignatureType } from '@documenso/lib/constants/document';
 import {
+  type TEnvelopeExpirationPeriod,
+  ZEnvelopeExpirationPeriod,
+} from '@documenso/lib/constants/envelope-expiration';
+import {
   SUPPORTED_LANGUAGES,
   SUPPORTED_LANGUAGE_CODES,
   isValidLanguageCode,
@@ -27,6 +31,7 @@ import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import { extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
 import { DocumentSignatureSettingsTooltip } from '@documenso/ui/components/document/document-signature-settings-tooltip';
+import { ExpirationPeriodPicker } from '@documenso/ui/components/document/expiration-period-picker';
 import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
 import { Alert } from '@documenso/ui/primitives/alert';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
@@ -70,6 +75,7 @@ export type TDocumentPreferencesFormSchema = {
   defaultRecipients: TDefaultRecipients | null;
   delegateDocumentOwnership: boolean | null;
   aiFeaturesEnabled: boolean | null;
+  envelopeExpirationPeriod: TEnvelopeExpirationPeriod | null;
 };
 
 type SettingsSubset = Pick<
@@ -87,6 +93,7 @@ type SettingsSubset = Pick<
   | 'defaultRecipients'
   | 'delegateDocumentOwnership'
   | 'aiFeaturesEnabled'
+  | 'envelopeExpirationPeriod'
 >;
 
 export type DocumentPreferencesFormProps = {
@@ -126,6 +133,7 @@ export const DocumentPreferencesForm = ({
     defaultRecipients: ZDefaultRecipientsSchema.nullable(),
     delegateDocumentOwnership: z.boolean().nullable(),
     aiFeaturesEnabled: z.boolean().nullable(),
+    envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullable(),
   });
 
   const form = useForm<TDocumentPreferencesFormSchema>({
@@ -146,6 +154,7 @@ export const DocumentPreferencesForm = ({
         : null,
       delegateDocumentOwnership: settings.delegateDocumentOwnership,
       aiFeaturesEnabled: settings.aiFeaturesEnabled,
+      envelopeExpirationPeriod: settings.envelopeExpirationPeriod ?? null,
     },
     resolver: zodResolver(ZDocumentPreferencesFormSchema),
   });
@@ -667,6 +676,35 @@ export const DocumentPreferencesForm = ({
                     Enable team API tokens to delegate document ownership to another team member.
                   </Trans>
                 </FormDescription>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="envelopeExpirationPeriod"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>
+                  <Trans>Default Envelope Expiration</Trans>
+                </FormLabel>
+
+                <FormControl>
+                  <ExpirationPeriodPicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    inheritLabel={canInherit ? t`Inherit from organisation` : undefined}
+                  />
+                </FormControl>
+
+                <FormDescription>
+                  <Trans>
+                    Controls how long recipients have to complete signing before the document
+                    expires. After expiration, recipients can no longer sign the document.
+                  </Trans>
+                </FormDescription>
+
+                <FormMessage />
               </FormItem>
             )}
           />
