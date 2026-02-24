@@ -347,7 +347,6 @@ export const FIELD_CHECKBOX_META_DEFAULT_VALUES: TCheckboxFieldMeta = {
 export const FIELD_DROPDOWN_META_DEFAULT_VALUES: TDropdownFieldMeta = {
   type: 'dropdown',
   fontSize: DEFAULT_FIELD_FONT_SIZE,
-  values: [{ value: 'Option 1' }],
   defaultValue: '',
   required: false,
   readOnly: false,
