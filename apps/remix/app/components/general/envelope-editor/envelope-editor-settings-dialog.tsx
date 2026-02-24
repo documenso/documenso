@@ -23,6 +23,7 @@ import {
   DOCUMENT_DISTRIBUTION_METHODS,
   DOCUMENT_SIGNATURE_TYPES,
 } from '@documenso/lib/constants/document';
+import { ZEnvelopeExpirationPeriod } from '@documenso/lib/constants/envelope-expiration';
 import {
   SUPPORTED_LANGUAGES,
   SUPPORTED_LANGUAGE_CODES,
@@ -63,6 +64,7 @@ import {
   DocumentVisibilitySelect,
   DocumentVisibilityTooltip,
 } from '@documenso/ui/components/document/document-visibility-select';
+import { ExpirationPeriodPicker } from '@documenso/ui/components/document/expiration-period-picker';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { CardDescription, CardHeader, CardTitle } from '@documenso/ui/primitives/card';
@@ -136,6 +138,7 @@ export const ZAddSettingsFormSchema = z.object({
     signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(1, {
       message: msg`At least one signature type must be enabled`.id,
     }),
+    envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullish(),
   }),
 });
 
@@ -208,6 +211,7 @@ export const EnvelopeEditorSettingsDialog = ({
         emailReplyTo: envelope.documentMeta.emailReplyTo ?? undefined,
         emailSettings: ZDocumentEmailSettingsSchema.parse(envelope.documentMeta.emailSettings),
         signatureTypes: extractTeamSignatureSettings(envelope.documentMeta),
+        envelopeExpirationPeriod: envelope.documentMeta?.envelopeExpirationPeriod ?? null,
       },
     };
   };
@@ -246,6 +250,7 @@ export const EnvelopeEditorSettingsDialog = ({
       message,
       subject,
       emailReplyTo,
+      envelopeExpirationPeriod,
     } = data.meta;
 
     const parsedGlobalAccessAuth = z
@@ -274,6 +279,7 @@ export const EnvelopeEditorSettingsDialog = ({
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
+          envelopeExpirationPeriod,
         },
       });
 
@@ -374,7 +380,7 @@ export const EnvelopeEditorSettingsDialog = ({
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onFormSubmit)}>
               <fieldset
-                className="flex h-[45rem] max-h-[calc(100vh-14rem)] w-full flex-col space-y-6 overflow-y-auto px-6 pt-6"
+                className="flex h-[45rem] max-h-[calc(100vh-14rem)] w-full flex-col space-y-6 overflow-y-auto px-6 py-6"
                 disabled={form.formState.isSubmitting}
                 key={activeTab}
               >
@@ -634,6 +640,40 @@ export const EnvelopeEditorSettingsDialog = ({
                                 </SelectContent>
                               </Select>
                             </FormControl>
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="meta.envelopeExpirationPeriod"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex flex-row items-center">
+                              <Trans>Expiration</Trans>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <InfoIcon className="mx-2 h-4 w-4" />
+                                </TooltipTrigger>
+
+                                <TooltipContent className="max-w-xs text-muted-foreground">
+                                  <Trans>
+                                    How long recipients have to complete this document after it is
+                                    sent. Uses the team default when set to inherit.
+                                  </Trans>
+                                </TooltipContent>
+                              </Tooltip>
+                            </FormLabel>
+
+                            <FormControl>
+                              <ExpirationPeriodPicker
+                                value={field.value}
+                                onChange={field.onChange}
+                                disabled={envelopeHasBeenSent}
+                              />
+                            </FormControl>
+
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
