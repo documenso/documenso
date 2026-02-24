@@ -297,19 +297,31 @@ export const EnvelopeEditorFieldsPage = () => {
 
                       <div className="space-y-2 rounded-md border border-border bg-muted/50 p-3 text-sm text-foreground">
                         <p>
-                          <span className="min-w-12 text-muted-foreground">Pos X:&nbsp;</span>
+                          <span className="min-w-12 text-muted-foreground">
+                            <Trans>Pos X:</Trans>
+                          </span>
+                          &nbsp;
                           {selectedField.positionX.toFixed(2)}
                         </p>
                         <p>
-                          <span className="min-w-12 text-muted-foreground">Pos Y:&nbsp;</span>
+                          <span className="min-w-12 text-muted-foreground">
+                            <Trans>Pos Y:</Trans>
+                          </span>
+                          &nbsp;
                           {selectedField.positionY.toFixed(2)}
                         </p>
                         <p>
-                          <span className="min-w-12 text-muted-foreground">Width:&nbsp;</span>
+                          <span className="min-w-12 text-muted-foreground">
+                            <Trans>Width:</Trans>
+                          </span>
+                          &nbsp;
                           {selectedField.width.toFixed(2)}
                         </p>
                         <p>
-                          <span className="min-w-12 text-muted-foreground">Height:&nbsp;</span>
+                          <span className="min-w-12 text-muted-foreground">
+                            <Trans>Height:</Trans>
+                          </span>
+                          &nbsp;
                           {selectedField.height.toFixed(2)}
                         </p>
                       </div>

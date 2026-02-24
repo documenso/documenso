@@ -500,7 +500,9 @@ export const EmbedDirectTemplateClientPage = ({
 
       {!hidePoweredBy && (
         <div className="fixed bottom-0 left-0 z-40 rounded-tr bg-primary px-2 py-1 text-xs font-medium text-primary-foreground opacity-60 hover:opacity-100">
-          <span>Powered by</span>
+          <span>
+            <Trans>Powered by</Trans>
+          </span>
           <BrandingLogo className="ml-2 inline-block h-[14px]" />
         </div>
       )}

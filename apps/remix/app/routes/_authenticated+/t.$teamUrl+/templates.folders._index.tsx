@@ -66,7 +66,9 @@ export default function TemplatesFoldersPage() {
             onClick={() => navigateToFolder(null)}
           >
             <HomeIcon className="h-4 w-4" />
-            <span>Home</span>
+            <span>
+              <Trans>Home</Trans>
+            </span>
           </Button>
         </div>
 
@@ -76,7 +78,7 @@ export default function TemplatesFoldersPage() {
       </div>
 
       <div className="relative w-full max-w-md py-6">
-        <SearchIcon className="text-muted-foreground absolute left-2 top-9 h-4 w-4" />
+        <SearchIcon className="absolute left-2 top-9 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder={t`Search folders...`}
           value={searchTerm}
@@ -91,7 +93,7 @@ export default function TemplatesFoldersPage() {
 
       {isFoldersLoading ? (
         <div className="mt- flex justify-center">
-          <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       ) : (
         <>
@@ -126,7 +128,7 @@ export default function TemplatesFoldersPage() {
 
           <div>
             {searchTerm && foldersData?.folders.filter(isFolderMatchingSearch).length === 0 && (
-              <div className="text-muted-foreground mt-6 text-center">
+              <div className="mt-6 text-center text-muted-foreground">
                 <Trans>No folders found matching "{searchTerm}"</Trans>
               </div>
             )}

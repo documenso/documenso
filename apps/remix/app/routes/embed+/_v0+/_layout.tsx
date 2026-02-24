@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/react/macro';
 import { Outlet, isRouteErrorResponse, useRouteError } from 'react-router';
 
 import {
@@ -12,6 +13,7 @@ import { EmbedDocumentCompleted } from '~/components/embed/embed-document-comple
 import { EmbedDocumentRejected } from '~/components/embed/embed-document-rejected';
 import { EmbedDocumentWaitingForTurn } from '~/components/embed/embed-document-waiting-for-turn';
 import { EmbedPaywall } from '~/components/embed/embed-paywall';
+import { EmbedRecipientExpired } from '~/components/embed/embed-recipient-expired';
 
 import type { Route } from './+types/_layout';
 
@@ -78,6 +80,10 @@ export function ErrorBoundary({ loaderData }: Route.ErrorBoundaryProps) {
       return <EmbedDocumentWaitingForTurn />;
     }
 
+    if (error.status === 403 && error.data.type === 'embed-recipient-expired') {
+      return <EmbedRecipientExpired />;
+    }
+
     // !: Not used at the moment, may be removed in the future.
     if (error.status === 403 && error.data.type === 'embed-document-rejected') {
       return <EmbedDocumentRejected />;
@@ -89,5 +95,9 @@ export function ErrorBoundary({ loaderData }: Route.ErrorBoundaryProps) {
     }
   }
 
-  return <div>Not Found</div>;
+  return (
+    <div>
+      <Trans>Not Found</Trans>
+    </div>
+  );
 }
