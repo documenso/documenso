@@ -258,7 +258,7 @@ export const EditorFieldNumberForm = ({
                     <FormControl>
                       <Input
                         className="bg-background"
-                        placeholder="E.g. 0"
+                        placeholder={t`E.g. 0`}
                         {...field}
                         value={field.value ?? ''}
                         onChange={(e) =>
@@ -282,7 +282,7 @@ export const EditorFieldNumberForm = ({
                     <FormControl>
                       <Input
                         className="bg-background"
-                        placeholder="E.g. 100"
+                        placeholder={t`E.g. 100`}
                         {...field}
                         value={field.value ?? ''}
                         onChange={(e) =>
