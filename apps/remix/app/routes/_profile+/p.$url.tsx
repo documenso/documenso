@@ -184,7 +184,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
                           </p>
                         </div>
 
-                        <Button asChild className="w-20">
+                        <Button asChild className="w-fit">
                           <Link to={formatDirectTemplatePath(template.directLink.token)}>
                             <Trans>Sign</Trans>
                           </Link>
