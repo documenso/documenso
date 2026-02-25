@@ -172,6 +172,7 @@ enum WebhookTriggerEvents {
   DOCUMENT_COMPLETED
   DOCUMENT_REJECTED
   DOCUMENT_CANCELLED
+  RECIPIENT_EXPIRED
 }
 
 model Webhook {
@@ -500,7 +501,7 @@ enum DocumentDistributionMethod {
   NONE
 }
 
-/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';"])
+/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZEnvelopeExpirationPeriod as ZEnvelopeExpirationPeriodSchema } from '@documenso/lib/constants/envelope-expiration';"])
 model DocumentMeta {
   id                     String               @id @default(cuid())
   subject                String?
@@ -521,6 +522,8 @@ model DocumentMeta {
   emailSettings Json? /// [DocumentEmailSettings] @zod.custom.use(ZDocumentEmailSettingsSchema)
   emailReplyTo  String?
   emailId       String?
+
+  envelopeExpirationPeriod Json? /// [EnvelopeExpirationPeriod] @zod.custom.use(ZEnvelopeExpirationPeriodSchema)
 
   envelope Envelope?
 }
@@ -569,29 +572,32 @@ enum RecipientRole {
 
 /// @zod.import(["import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';"])
 model Recipient {
-  id                Int           @id @default(autoincrement())
-  envelopeId        String
-  email             String        @db.VarChar(255)
-  name              String        @default("") @db.VarChar(255)
-  token             String
-  documentDeletedAt DateTime?
-  expired           DateTime?
-  signedAt          DateTime?
-  authOptions       Json? /// [RecipientAuthOptions] @zod.custom.use(ZRecipientAuthOptionsSchema)
-  signingOrder      Int? /// @zod.number.describe("The order in which the recipient should sign the document. Only works if the document is set to sequential signing.")
-  rejectionReason   String?
-  role              RecipientRole @default(SIGNER)
-  readStatus        ReadStatus    @default(NOT_OPENED)
-  signingStatus     SigningStatus @default(NOT_SIGNED)
-  sendStatus        SendStatus    @default(NOT_SENT)
-  envelope          Envelope      @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
-  fields            Field[]
-  signatures        Signature[]
+  id                   Int           @id @default(autoincrement())
+  envelopeId           String
+  email                String        @db.VarChar(255)
+  name                 String        @default("") @db.VarChar(255)
+  token                String
+  documentDeletedAt    DateTime?
+  expired              DateTime? // deprecated Not in use. To be removed in a future migration.
+  expiresAt            DateTime?
+  expirationNotifiedAt DateTime?
+  signedAt             DateTime?
+  authOptions          Json? /// [RecipientAuthOptions] @zod.custom.use(ZRecipientAuthOptionsSchema)
+  signingOrder         Int? /// @zod.number.describe("The order in which the recipient should sign the document. Only works if the document is set to sequential signing.")
+  rejectionReason      String?
+  role                 RecipientRole @default(SIGNER)
+  readStatus           ReadStatus    @default(NOT_OPENED)
+  signingStatus        SigningStatus @default(NOT_SIGNED)
+  sendStatus           SendStatus    @default(NOT_SENT)
+  envelope             Envelope      @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  fields               Field[]
+  signatures           Signature[]
 
   @@index([token])
   @@index([email])
   @@index([envelopeId])
   @@index([signedAt])
+  @@index([expiresAt])
 }
 
 enum FieldType {
@@ -808,7 +814,7 @@ enum OrganisationMemberInviteStatus {
   DECLINED
 }
 
-/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';"])
+/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';", "import { ZEnvelopeExpirationPeriod as ZEnvelopeExpirationPeriodSchema } from '@documenso/lib/constants/envelope-expiration';"])
 model OrganisationGlobalSettings {
   id           String        @id
   organisation Organisation?
@@ -840,11 +846,13 @@ model OrganisationGlobalSettings {
   brandingUrl            String  @default("")
   brandingCompanyDetails String  @default("")
 
+  envelopeExpirationPeriod Json? /// [EnvelopeExpirationPeriod] @zod.custom.use(ZEnvelopeExpirationPeriodSchema)
+
   // AI features settings.
   aiFeaturesEnabled Boolean @default(false)
 }
 
-/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';"])
+/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';", "import { ZEnvelopeExpirationPeriod as ZEnvelopeExpirationPeriodSchema } from '@documenso/lib/constants/envelope-expiration';"])
 model TeamGlobalSettings {
   id   String @id
   team Team?
@@ -876,6 +884,8 @@ model TeamGlobalSettings {
   brandingLogo           String?
   brandingUrl            String?
   brandingCompanyDetails String?
+
+  envelopeExpirationPeriod Json? /// [EnvelopeExpirationPeriod] @zod.custom.use(ZEnvelopeExpirationPeriodSchema)
 
   // AI features settings.
   aiFeaturesEnabled Boolean?
@@ -1075,4 +1085,16 @@ model OrganisationAuthenticationPortal {
 model Counter {
   id    String @id
   value Int
+}
+
+model RateLimit {
+  key    String
+  action String
+  bucket DateTime
+  count  Int      @default(1)
+
+  createdAt DateTime @default(now())
+
+  @@id([key, action, bucket])
+  @@index([createdAt])
 }

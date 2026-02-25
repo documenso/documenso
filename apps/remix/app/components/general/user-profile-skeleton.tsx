@@ -51,7 +51,7 @@ export const UserProfileSkeleton = ({ className, user, rows = 2 }: UserProfileSk
       <div className="mt-8 w-full">
         <div className="dark:divide-foreground/30 dark:border-foreground/30 divide-y-2 divide-neutral-200 overflow-hidden rounded-lg border-2 border-neutral-200">
           <div className="text-muted-foreground dark:bg-foreground/20 bg-neutral-50 p-4 font-medium">
-            Documents
+            <Trans>Documents</Trans>
           </div>
 
           {Array(rows)

@@ -19,6 +19,7 @@ import { getRecipientsForAssistant } from '@documenso/lib/server-only/recipient/
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { isRecipientExpired } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 
 import { EmbedSignDocumentV1ClientPage } from '~/components/embed/embed-document-signing-page-v1';
@@ -71,6 +72,17 @@ async function handleV1Loader({ params, request }: Route.LoaderArgs) {
     throw data(
       {
         type: 'embed-paywall',
+      },
+      {
+        status: 403,
+      },
+    );
+  }
+
+  if (isRecipientExpired(recipient)) {
+    throw data(
+      {
+        type: 'embed-recipient-expired',
       },
       {
         status: 403,
@@ -190,7 +202,7 @@ async function handleV2Loader({ params, request }: Route.LoaderArgs) {
     );
   }
 
-  const { envelope, recipient, isRecipientsTurn } = envelopeForSigning;
+  const { envelope, recipient, isRecipientsTurn, isExpired } = envelopeForSigning;
 
   const organisationClaim = await getOrganisationClaimByTeamId({ teamId: envelope.teamId });
 
@@ -201,6 +213,17 @@ async function handleV2Loader({ params, request }: Route.LoaderArgs) {
     throw data(
       {
         type: 'embed-paywall',
+      },
+      {
+        status: 403,
+      },
+    );
+  }
+
+  if (isExpired) {
+    throw data(
+      {
+        type: 'embed-recipient-expired',
       },
       {
         status: 403,

@@ -17,6 +17,7 @@ import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
+import type { TEnvelopeExpirationPeriod } from '../../constants/envelope-expiration';
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { ZDefaultRecipientsSchema } from '../../types/default-recipients';
@@ -119,6 +120,7 @@ export type CreateDocumentFromTemplateOptions = {
     typedSignatureEnabled?: boolean;
     uploadSignatureEnabled?: boolean;
     drawSignatureEnabled?: boolean;
+    envelopeExpirationPeriod?: TEnvelopeExpirationPeriod | null;
   };
 
   formValues?: TDocumentFormValues;
@@ -521,6 +523,8 @@ export const createDocumentFromTemplate = async ({
         override?.drawSignatureEnabled ?? template.documentMeta?.drawSignatureEnabled,
       allowDictateNextSigner:
         override?.allowDictateNextSigner ?? template.documentMeta?.allowDictateNextSigner,
+      envelopeExpirationPeriod:
+        override?.envelopeExpirationPeriod ?? template.documentMeta?.envelopeExpirationPeriod,
     }),
   });
 

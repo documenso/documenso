@@ -107,7 +107,11 @@ export default function OrganisationGroupSettingsPage({
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <Link to={`/admin/users/${row.original.user.id}`}>{row.original.user.name}</Link>
-            {row.original.user.id === organisation?.ownerUserId && <Badge>Owner</Badge>}
+            {row.original.user.id === organisation?.ownerUserId && (
+              <Badge>
+                <Trans>Owner</Trans>
+              </Badge>
+            )}
           </div>
         ),
       },
@@ -208,7 +212,9 @@ export default function OrganisationGroupSettingsPage({
                 {SUBSCRIPTION_STATUS_MAP[organisation.subscription.status]} subscription found
               </span>
             ) : (
-              <span>No subscription found</span>
+              <span>
+                <Trans>No subscription found</Trans>
+              </span>
             )}
           </AlertDescription>
         </div>

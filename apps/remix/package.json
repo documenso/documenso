@@ -46,7 +46,6 @@
     "content-disposition": "^1.0.1",
     "framer-motion": "^12.23.24",
     "hono": "4.11.4",
-    "hono-rate-limiter": "^0.4.2",
     "hono-react-router-adapter": "^0.6.5",
     "input-otp": "^1.4.2",
     "isbot": "^5.1.32",
@@ -106,5 +105,5 @@
     "vite-plugin-babel-macros": "^1.0.6",
     "vite-tsconfig-paths": "^5.1.4"
   },
-  "version": "2.6.0"
+  "version": "2.6.1"
 }
