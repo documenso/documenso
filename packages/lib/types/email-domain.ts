@@ -18,6 +18,7 @@ export const ZEmailDomainSchema = EmailDomainSchema.pick({
   publicKey: true,
   createdAt: true,
   updatedAt: true,
+  lastVerifiedAt: true,
 }).extend({
   emails: ZOrganisationEmailLiteSchema.array(),
 });
@@ -35,6 +36,7 @@ export const ZEmailDomainManySchema = EmailDomainSchema.pick({
   selector: true,
   createdAt: true,
   updatedAt: true,
+  lastVerifiedAt: true,
 });
 
 export type TEmailDomainMany = z.infer<typeof ZEmailDomainManySchema>;
