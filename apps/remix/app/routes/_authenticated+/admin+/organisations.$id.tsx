@@ -4,9 +4,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
+import { OrganisationMemberRole } from '@prisma/client';
 import { ExternalLinkIcon, InfoIcon, Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
+import { match } from 'ts-pattern';
 import type { z } from 'zod';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
@@ -15,6 +17,7 @@ import { AppError } from '@documenso/lib/errors/app-error';
 import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import type { TLicenseClaim } from '@documenso/lib/types/license';
 import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '@documenso/lib/types/subscription';
+import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import type { TGetAdminOrganisationResponse } from '@documenso/trpc/server/admin-router/get-admin-organisation.types';
 import { ZUpdateAdminOrganisationRequestSchema } from '@documenso/trpc/server/admin-router/update-admin-organisation.types';
@@ -94,6 +97,13 @@ export default function OrganisationGroupSettingsPage({
         accessorKey: 'name',
       },
       {
+        header: t`Team ID`,
+        accessorKey: 'id',
+        cell: ({ row }) => (
+          <span className="font-mono text-xs text-muted-foreground">{row.original.id}</span>
+        ),
+      },
+      {
         header: t`Team url`,
         accessorKey: 'url',
       },
@@ -107,11 +117,6 @@ export default function OrganisationGroupSettingsPage({
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <Link to={`/admin/users/${row.original.user.id}`}>{row.original.user.name}</Link>
-            {row.original.user.id === organisation?.ownerUserId && (
-              <Badge>
-                <Trans>Owner</Trans>
-              </Badge>
-            )}
           </div>
         ),
       },
@@ -120,6 +125,32 @@ export default function OrganisationGroupSettingsPage({
         cell: ({ row }) => (
           <Link to={`/admin/users/${row.original.user.id}`}>{row.original.user.email}</Link>
         ),
+      },
+      {
+        header: t`Role`,
+        cell: ({ row }) => {
+          if (!organisation) {
+            return null;
+          }
+
+          const isOwner = row.original.userId === organisation.ownerUserId;
+
+          if (isOwner) {
+            return <Badge>{t`Owner`}</Badge>;
+          }
+
+          const highestRole = getHighestOrganisationRoleInGroup(
+            row.original.organisationGroupMembers.map((ogm) => ogm.group),
+          );
+
+          const roleLabel = match(highestRole)
+            .with(OrganisationMemberRole.ADMIN, () => t`Admin`)
+            .with(OrganisationMemberRole.MANAGER, () => t`Manager`)
+            .with(OrganisationMemberRole.MEMBER, () => t`Member`)
+            .exhaustive();
+
+          return <Badge variant="secondary">{roleLabel}</Badge>;
+        },
       },
       {
         header: t`Actions`,
