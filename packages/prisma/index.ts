@@ -75,11 +75,14 @@ export const prismaWithReplicas = remember('prismaWithReplicas', () => {
     url.trim(),
   );
 
+  // !: Nasty hack, means we can't do any fancy $primary/$replica queries
+  // !: but it is acceptable since not all setups will have replicas anyway.
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   return prisma.$extends(
     readReplicas({
       url: replicaUrls,
     }),
-  );
+  ) as unknown as typeof prisma;
 });
 
 export { prismaWithReplicas as prisma };
