@@ -16,6 +16,7 @@ import { EXECUTE_WEBHOOK_JOB_DEFINITION } from './definitions/internal/execute-w
 import { EXPIRE_RECIPIENTS_SWEEP_JOB_DEFINITION } from './definitions/internal/expire-recipients-sweep';
 import { PROCESS_RECIPIENT_EXPIRED_JOB_DEFINITION } from './definitions/internal/process-recipient-expired';
 import { SEAL_DOCUMENT_JOB_DEFINITION } from './definitions/internal/seal-document';
+import { SYNC_EMAIL_DOMAINS_JOB_DEFINITION } from './definitions/internal/sync-email-domains';
 
 /**
  * The `as const` assertion is load bearing as it provides the correct level of type inference for
@@ -39,6 +40,7 @@ export const jobsClient = new JobClient([
   EXPIRE_RECIPIENTS_SWEEP_JOB_DEFINITION,
   PROCESS_RECIPIENT_EXPIRED_JOB_DEFINITION,
   CLEANUP_RATE_LIMITS_JOB_DEFINITION,
+  SYNC_EMAIL_DOMAINS_JOB_DEFINITION,
 ] as const);
 
 export const jobs = jobsClient;

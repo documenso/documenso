@@ -1037,10 +1037,11 @@ model EmailDomain {
 
   status EmailDomainStatus @default(PENDING)
 
-  selector   String @unique
-  domain     String @unique
-  publicKey  String
-  privateKey String
+  selector       String    @unique
+  domain         String    @unique
+  publicKey      String
+  privateKey     String
+  lastVerifiedAt DateTime?
 
   organisationId String
   organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
