@@ -1,5 +1,6 @@
 /// <reference types="@documenso/prisma/types/types.d.ts" />
 import { PrismaClient } from '@prisma/client';
+import { readReplicas } from '@prisma/extension-read-replicas';
 import { Kysely, PostgresAdapter, PostgresIntrospector, PostgresQueryCompiler } from 'kysely';
 import kyselyExtension from 'prisma-extension-kysely';
 
@@ -7,7 +8,7 @@ import type { DB } from './generated/types';
 import { getDatabaseUrl } from './helper';
 import { remember } from './utils/remember';
 
-export const prisma = remember(
+const prisma = remember(
   'prisma',
   () =>
     new PrismaClient({
@@ -64,5 +65,23 @@ export const prismaWithLogging = remember('prismaWithLogging', () => {
 
   return client;
 });
+
+export const prismaWithReplicas = remember('prismaWithReplicas', () => {
+  if (!process.env.NEXT_PRIVATE_DATABASE_REPLICA_URLS) {
+    return prisma;
+  }
+
+  const replicaUrls = process.env.NEXT_PRIVATE_DATABASE_REPLICA_URLS.split(',').map((url) =>
+    url.trim(),
+  );
+
+  return prisma.$extends(
+    readReplicas({
+      url: replicaUrls,
+    }),
+  );
+});
+
+export { prismaWithReplicas as prisma };
 
 export { sql } from 'kysely';
