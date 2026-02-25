@@ -98,7 +98,7 @@ export default function EnvelopeSignerPageRenderer({ pageData }: { pageData: Pag
     return fieldsToRender.filter(
       (field) => field.page === pageNumber && field.envelopeItemId === currentEnvelopeItem?.id,
     );
-  }, [recipientFields, selectedAssistantRecipientFields, pageNumber]);
+  }, [recipientFields, selectedAssistantRecipientFields, pageNumber, currentEnvelopeItem?.id]);
 
   /**
    * Returns fields that have been fully signed by other recipients for this specific

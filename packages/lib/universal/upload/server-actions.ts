@@ -129,7 +129,8 @@ export const deleteS3File = async (key: string) => {
  * frontend to ever pull a file from S3 directly.
  */
 export const UNSAFE_getS3File = async (key: string) => {
-  // Additional safeguard to prevent path traversal.
+  // Basic safeguard to prevent path traversal.
+  // Key should never be user-controlled.
   if (key.includes('..') || key.startsWith('/')) {
     throw new Error('Invalid S3 key');
   }
@@ -143,7 +144,7 @@ export const UNSAFE_getS3File = async (key: string) => {
     }),
   );
 
-  return response.Body;
+  return response.Body || null;
 };
 
 const getS3Client = () => {

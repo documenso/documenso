@@ -51,10 +51,6 @@ route.get(
       return c.json({ error: 'Not found' }, 404);
     }
 
-    // We can hard cache this since since it's a unique URL for a given recipient.
-    // Might be dicey if the handler returns a cacheable error code.
-    c.header('Cache-Control', 'public, max-age=31536000, immutable');
-
     return await handleEnvelopeItemPageRequest({
       c,
       envelopeItem,

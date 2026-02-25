@@ -8,7 +8,7 @@ import { EAGER_LOAD_PAGE_COUNT, type PageRenderData } from '../providers/envelop
 
 type RenderFunction = (props: { stage: Konva.Stage; pageLayer: Konva.Layer }) => void;
 
-export function usePageRenderer(renderFunction: RenderFunction, pageData: PageRenderData) {
+export const usePageRenderer = (renderFunction: RenderFunction, pageData: PageRenderData) => {
   const { pageWidth, pageHeight, scale, imageUrl, pageNumber } = pageData;
 
   const konvaContainer = useRef<HTMLDivElement>(null);
@@ -70,7 +70,7 @@ export function usePageRenderer(renderFunction: RenderFunction, pageData: PageRe
       src: imageUrl,
       'data-page-number': pageNumber,
     }),
-    [renderViewport, scaledViewport],
+    [renderViewport, scaledViewport, imageUrl],
   );
 
   useEffect(() => {
@@ -120,4 +120,4 @@ export function usePageRenderer(renderFunction: RenderFunction, pageData: PageRe
     renderStatus,
     setRenderStatus,
   };
-}
+};

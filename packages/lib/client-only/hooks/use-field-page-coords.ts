@@ -64,13 +64,19 @@ export const useFieldPageCoords = (
     const pageSelector = `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`;
 
     let resizeObserver: ResizeObserver | null = null;
+    let observedElement: HTMLElement | null = null;
 
     const attachResizeObserver = ($page: HTMLElement) => {
+      if ($page === observedElement) {
+        return;
+      }
+
       resizeObserver?.disconnect();
       resizeObserver = new ResizeObserver(() => {
         calculateCoords();
       });
       resizeObserver.observe($page);
+      observedElement = $page;
     };
 
     // Try to attach immediately if the page already exists.
@@ -99,6 +105,7 @@ export const useFieldPageCoords = (
     return () => {
       mutationObserver.disconnect();
       resizeObserver?.disconnect();
+      observedElement = null;
     };
   }, [calculateCoords, field.page]);
 

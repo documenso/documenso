@@ -491,11 +491,14 @@ const decorateAndSignPdf = async ({
   // Add suffix based on document status
   const suffix = isRejected ? '_rejected.pdf' : '_signed.pdf';
 
-  const newDocumentData = await putPdfFileServerSide({
-    name: `${name}${suffix}`,
-    type: 'application/pdf',
-    arrayBuffer: async () => Promise.resolve(pdfBytes),
-  });
+  const newDocumentData = await putPdfFileServerSide(
+    {
+      name: `${name}${suffix}`,
+      type: 'application/pdf',
+      arrayBuffer: async () => Promise.resolve(pdfBytes),
+    },
+    envelopeItem.documentData.initialData,
+  );
 
   return {
     oldDocumentDataId: envelopeItem.documentData.id,

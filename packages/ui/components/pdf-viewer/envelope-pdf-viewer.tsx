@@ -123,11 +123,7 @@ export const EnvelopePdfViewer = ({
 
       {/* No current item selected */}
       {envelopeItemsMetaLoadingState === 'loaded' && !currentEnvelopeItem && (
-        <div
-          className={cn(
-            'flex h-[80vh] max-h-[60rem] w-full flex-col items-center justify-center overflow-hidden rounded',
-          )}
-        >
+        <div className="flex h-[80vh] max-h-[60rem] w-full flex-col items-center justify-center overflow-hidden rounded">
           <p className="text-sm text-muted-foreground">
             <Trans>No document selected</Trans>
           </p>

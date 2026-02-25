@@ -73,5 +73,11 @@ export const getEnvelopeItemPageImageS3Key = (
 
   const baseKey = documentDataId.split('/')[0];
 
+  // Basic safeguard to prevent path traversal.
+  // Key should never be user-controlled.
+  if (baseKey.includes('..') || baseKey.startsWith('/')) {
+    throw new Error('Invalid S3 key');
+  }
+
   return `${baseKey}/${pageIndex}.jpeg`;
 };

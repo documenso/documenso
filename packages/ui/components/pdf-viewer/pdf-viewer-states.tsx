@@ -1,15 +1,10 @@
 import { Trans } from '@lingui/react/macro';
 
-import { cn } from '@documenso/ui/lib/utils';
 import { Spinner } from '@documenso/ui/primitives/spinner';
 
 export const PdfViewerLoadingState = () => {
   return (
-    <div
-      className={cn(
-        'flex h-[80vh] max-h-[60rem] w-full flex-col items-center justify-center overflow-hidden',
-      )}
-    >
+    <div className="flex h-[80vh] max-h-[60rem] w-full flex-col items-center justify-center overflow-hidden">
       <Spinner />
     </div>
   );

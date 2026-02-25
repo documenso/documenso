@@ -29,9 +29,6 @@ import { getEnvelopeItemMetaUrl, getEnvelopeItemPageImageUrl } from '../../utils
  */
 export const EAGER_LOAD_PAGE_COUNT = 5;
 
-// Todo: Embeds
-export const PRESIGNED_ENVELOPE_ITEM_ID_PREFIX = 'PRESIGNED_';
-
 export type PageRenderData = BasePageRenderData & {
   scale: number;
 };
@@ -170,7 +167,7 @@ export const EnvelopeRenderProvider = ({
   const fetchStartedAtRef = useRef<number>(0);
 
   const envelopeItems = useMemo(
-    () => envelopeItemsFromProps.sort((a, b) => a.order - b.order),
+    () => [...envelopeItemsFromProps].sort((a, b) => a.order - b.order),
     [envelopeItemsFromProps],
   );
 
@@ -183,7 +180,7 @@ export const EnvelopeRenderProvider = ({
    */
   useEffect(() => {
     void fetchEnvelopeRenderData();
-  }, [envelope.id, envelopeItems, token, version]);
+  }, [envelope.id, envelopeItems, token, version, presignToken]);
 
   const fetchEnvelopeRenderData = useCallback(async () => {
     if (envelopeItems.length === 0) {
@@ -331,19 +328,6 @@ export const EnvelopeRenderProvider = ({
           },
           { concurrency: 10 },
         );
-      }
-
-      // Append all local embedding files.
-      const localFiles = envelopeItems.filter(
-        (item) => item.id.startsWith(PRESIGNED_ENVELOPE_ITEM_ID_PREFIX) && item.data,
-      );
-
-      for (const item of localFiles) {
-        if (!item.data) {
-          throw new Error('Not possible');
-        }
-
-        // Handle local files
       }
 
       setEnvelopeItemsMeta(metaMap);

@@ -133,16 +133,17 @@ export const handleEnvelopeItemPageRequest = async ({
   const documentDataToUse =
     version === 'current' ? envelopeItem.documentData.data : envelopeItem.documentData.initialData;
 
-  c.header('Content-Type', 'image/jpeg');
-  c.header('Cache-Control', `${cacheStrategy}, max-age=31536000, immutable`);
-
   // Return the image if it already exists in S3.
   if (envelopeItem.documentData.type === 'S3_PATH') {
     const s3Key = getEnvelopeItemPageImageS3Key(documentDataToUse, pageIndex);
 
-    const image = await UNSAFE_getS3File(s3Key);
+    const image = await UNSAFE_getS3File(s3Key).catch(() => null);
 
     if (image) {
+      // Note: Only set these headers on success.
+      c.header('Content-Type', 'image/jpeg');
+      c.header('Cache-Control', `${cacheStrategy}, max-age=31536000, immutable`);
+
       return c.body(image);
     }
   }
@@ -168,6 +169,10 @@ export const handleEnvelopeItemPageRequest = async ({
   if (!image) {
     return c.json({ error: 'Failed to render page to image' }, 500);
   }
+
+  // Note: Only set these headers on success.
+  c.header('Content-Type', 'image/jpeg');
+  c.header('Cache-Control', `${cacheStrategy}, max-age=31536000, immutable`);
 
   return c.body(image);
 };

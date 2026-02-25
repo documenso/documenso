@@ -62,7 +62,7 @@ export default function EnvelopeEditorFieldsPageRenderer({
       editorFields.localFields.filter(
         (field) => field.page === pageNumber && field.envelopeItemId === currentEnvelopeItem?.id,
       ),
-    [editorFields.localFields, pageNumber],
+    [editorFields.localFields, pageNumber, currentEnvelopeItem?.id],
   );
 
   const handleResizeOrMove = (event: KonvaEventObject<Event>) => {
