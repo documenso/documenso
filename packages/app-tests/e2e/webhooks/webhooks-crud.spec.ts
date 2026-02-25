@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import { WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { alphaid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -279,8 +280,8 @@ test('[WEBHOOKS]: cannot see unrelated webhooks', async ({ page }) => {
   const user1Data = await seedUser();
   const user2Data = await seedUser();
 
-  const webhookUrl1 = `https://example.com/webhook-team1-${Date.now()}`;
-  const webhookUrl2 = `https://example.com/webhook-team2-${Date.now()}`;
+  const webhookUrl1 = `https://example.com/webhook-team1-${alphaid(12)}`;
+  const webhookUrl2 = `https://example.com/webhook-team2-${alphaid(12)}`;
 
   // Create webhooks for both teams with DOCUMENT_CREATED event
   const webhook1 = await seedWebhook({

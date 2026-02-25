@@ -142,6 +142,7 @@ export const createEmailDomain = async ({ domain, organisationId }: CreateEmailD
         publicKey: true,
         createdAt: true,
         updatedAt: true,
+        lastVerifiedAt: true,
         emails: true,
       },
     });
