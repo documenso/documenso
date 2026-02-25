@@ -16,6 +16,7 @@ import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/al
 import type { ScrollTarget } from '../virtual-list/use-virtual-list';
 import { useVirtualList } from '../virtual-list/use-virtual-list';
 import { PdfViewerErrorState, PdfViewerLoadingState } from './pdf-viewer-states';
+import { useScrollToPage } from './use-scroll-to-page';
 
 export type EnvelopePdfViewerProps = {
   className?: string;
@@ -156,7 +157,7 @@ const VirtualizedPageList = ({
 }: VirtualizedPageListProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const { virtualItems, totalSize, constraintWidth } = useVirtualList({
+  const { virtualItems, totalSize, constraintWidth, scrollToItem } = useVirtualList({
     scrollRef: scrollParentRef,
     constraintRef,
     contentRef,
@@ -174,9 +175,12 @@ const VirtualizedPageList = ({
     overscan: 10,
   });
 
+  useScrollToPage(contentRef, scrollToItem);
+
   return (
     <div
       ref={contentRef}
+      data-pdf-content=""
       style={{
         height: `${totalSize}px`,
         width: '100%',

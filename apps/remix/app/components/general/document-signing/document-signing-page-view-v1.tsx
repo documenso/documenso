@@ -162,8 +162,6 @@ export const DocumentSigningPageViewV1 = ({
       : undefined;
   }, [document.documentMeta?.signingOrder, allRecipients, recipient.id]);
 
-  const highestPageNumber = Math.max(...fields.map((field) => field.page));
-
   const pendingFields = fieldsRequiringValidation.filter((field) => !field.inserted);
   const hasPendingFields = pendingFields.length > 0;
 
@@ -401,9 +399,7 @@ export const DocumentSigningPageViewV1 = ({
           <DocumentSigningAutoSign recipient={recipient} fields={fields} />
         )}
 
-        <ElementVisible
-          target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}
-        >
+        <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
           {fields
             .filter(
               (field) =>

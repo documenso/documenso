@@ -101,8 +101,6 @@ export const EmbedDirectTemplateClientPage = ({
     localFields.filter((field) => field.inserted),
   ];
 
-  const highestPendingPageNumber = Math.max(...pendingFields.map((field) => field.page));
-
   const hasSignatureField = localFields.some((field) => isSignatureFieldType(field.type));
 
   const signatureValid = !hasSignatureField || (signature && signature.trim() !== '');
@@ -479,9 +477,7 @@ export const EmbedDirectTemplateClientPage = ({
           </div>
         </div>
 
-        <ElementVisible
-          target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPendingPageNumber}"]`}
-        >
+        <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
           {showPendingFieldTooltip && pendingFields.length > 0 && (
             <FieldToolTip key={pendingFields[0].id} field={pendingFields[0]} color="warning">
               <Trans>Click to insert field</Trans>

@@ -23,25 +23,44 @@ export const sortFieldsByPosition = (fields: Field[]): Field[] => {
  */
 export const validateFieldsInserted = (fields: Field[]): boolean => {
   const fieldCardElements = document.getElementsByClassName('field-card-container');
+  const pdfContent = document.querySelector('[data-pdf-content]');
 
-  // Attach validate attribute on all fields.
+  const uninsertedFields = sortFieldsByPosition(fields.filter((field) => !field.inserted));
+
+  // All fields are inserted — clear the validation signal.
+  if (uninsertedFields.length === 0) {
+    pdfContent?.removeAttribute('data-validate-fields');
+    return true;
+  }
+
+  // Attach validate attribute on all fields currently in the DOM.
   Array.from(fieldCardElements).forEach((element) => {
     element.setAttribute('data-validate', 'true');
   });
 
-  const uninsertedFields = sortFieldsByPosition(fields.filter((field) => !field.inserted));
+  // Also set a signal on the PDF viewer container so that field elements that
+  // mount later (e.g. after the virtual list scrolls to a new page) can pick
+  // up the validation state.
+  pdfContent?.setAttribute('data-validate-fields', 'true');
 
   const firstUninsertedField = uninsertedFields[0];
 
-  const firstUninsertedFieldElement =
-    firstUninsertedField && document.getElementById(`field-${firstUninsertedField.id}`);
+  if (firstUninsertedField) {
+    // Try direct element scroll first (works if the field's page is currently rendered).
+    const firstUninsertedFieldElement = document.getElementById(`field-${firstUninsertedField.id}`);
 
-  if (firstUninsertedFieldElement) {
-    firstUninsertedFieldElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    return false;
+    if (firstUninsertedFieldElement) {
+      firstUninsertedFieldElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      // Field not in DOM (page virtualized away) — signal the PDF viewer to
+      // scroll to the correct page via the data attribute.
+      if (pdfContent) {
+        pdfContent.setAttribute('data-scroll-to-page', String(firstUninsertedField.page));
+      }
+    }
   }
 
-  return uninsertedFields.length === 0;
+  return false;
 };
 
 export const validateFieldsUninserted = (): boolean => {

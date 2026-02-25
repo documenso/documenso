@@ -34,6 +34,14 @@ export type VirtualListResult = {
   virtualItems: VirtualItem[];
   totalSize: number;
   constraintWidth: number;
+
+  /**
+   * Scroll the scroll container so that the item at the given index is visible.
+   *
+   * The scroll position is calculated from the precomputed item offsets and
+   * adjusted for any content offset (e.g. headers above the virtual list).
+   */
+  scrollToItem: (index: number) => void;
 };
 
 /**
@@ -292,9 +300,56 @@ export const useVirtualList = (options: VirtualListOptions): VirtualListResult =
     findStartIndex,
   ]);
 
+  /**
+   * Imperatively scroll the scroll container so that the item at the given
+   * index is at the top of the viewport.
+   */
+  const scrollToItem = useCallback(
+    (index: number) => {
+      if (index < 0 || index >= itemCount) {
+        return;
+      }
+
+      const itemOffset = offsets[index] ?? 0;
+
+      if (scrollRef === 'window') {
+        const contentEl = contentRef?.current;
+        const contentTop = contentEl ? contentEl.getBoundingClientRect().top + window.scrollY : 0;
+
+        window.scrollTo({
+          top: contentTop + itemOffset,
+          behavior: 'smooth',
+        });
+      } else {
+        const scrollEl = scrollRef.current;
+
+        if (!scrollEl) {
+          return;
+        }
+
+        // Recalculate content offset to get the most up-to-date value.
+        const contentEl = contentRef?.current;
+        let contentOffset = 0;
+
+        if (contentEl) {
+          const scrollRect = scrollEl.getBoundingClientRect();
+          const contentRect = contentEl.getBoundingClientRect();
+          contentOffset = contentRect.top - scrollRect.top + scrollEl.scrollTop;
+        }
+
+        scrollEl.scrollTo({
+          top: contentOffset + itemOffset,
+          behavior: 'smooth',
+        });
+      }
+    },
+    [scrollRef, contentRef, offsets, itemCount],
+  );
+
   return {
     virtualItems,
     totalSize,
     constraintWidth,
+    scrollToItem,
   };
 };

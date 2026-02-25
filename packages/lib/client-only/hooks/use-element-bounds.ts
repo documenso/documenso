@@ -17,7 +17,7 @@ export const useElementBounds = (elementOrSelector: HTMLElement | string, withSc
         : elementOrSelector;
 
     if (!$el) {
-      throw new Error('Element not found');
+      return { top: 0, left: 0, width: 0, height: 0 };
     }
 
     if (withScroll) {
