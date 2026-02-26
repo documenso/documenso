@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
+import { msg, t } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { TeamGlobalSettings } from '@prisma/client';
 import { DocumentVisibility, OrganisationType, type RecipientRole } from '@prisma/client';
@@ -109,7 +109,7 @@ export const DocumentPreferencesForm = ({
   canInherit,
   isAiFeaturesConfigured = false,
 }: DocumentPreferencesFormProps) => {
-  const { t } = useLingui();
+  const { _ } = useLingui();
   const { user, organisations } = useSession();
   const currentOrganisation = useCurrentOrganisation();
   const optionalTeam = useOptionalCurrentTeam();
@@ -242,7 +242,7 @@ export const DocumentPreferencesForm = ({
                     <SelectContent>
                       {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
                         <SelectItem key={code} value={code}>
-                          {language.full}
+                          {_(language.full)}
                         </SelectItem>
                       ))}
 
@@ -342,7 +342,7 @@ export const DocumentPreferencesForm = ({
                 <FormControl>
                   <MultiSelectCombobox
                     options={Object.values(DOCUMENT_SIGNATURE_TYPES).map((option) => ({
-                      label: t(option.label),
+                      label: _(option.label),
                       value: option.value,
                     }))}
                     selectedValues={field.value}
