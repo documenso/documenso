@@ -113,7 +113,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
           )}
         </div>
 
-        <div className="text-muted-foreground mt-4 space-y-1">
+        <div className="text-muted-foreground mt-4 max-h-32 space-y-1 overflow-y-auto">
           {(profile.bio ?? '').split('\n').map((line, index) => (
             <p
               key={index}
