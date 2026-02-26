@@ -8,7 +8,7 @@ msgstr ""
 "Language: es\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-02-16 06:23\n"
+"PO-Revision-Date: 2026-02-25 04:37\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -1082,6 +1082,7 @@ msgstr "Acción"
 #: apps/remix/app/components/tables/team-members-table.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
@@ -1090,6 +1091,9 @@ msgid "Actions"
 msgstr "Acciones"
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.members.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._index.tsx
 msgid "Active"
@@ -1330,6 +1334,7 @@ msgid "Admin"
 msgstr "Administrador"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Admin Actions"
 msgstr "Acciones Administrativas"
 
@@ -1437,6 +1442,10 @@ msgstr "Todas las firmas han sido anuladas."
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
 msgid "All signing links have been copied to your clipboard."
 msgstr "Todos los enlaces de firma se han copiado en su portapapeles."
+
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+msgid "All Statuses"
+msgstr "Todos los estados"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "All templates"
@@ -2315,6 +2324,7 @@ msgstr "¿No puedes encontrar a alguien?"
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
@@ -2766,7 +2776,7 @@ msgstr "Continuar con el inicio de sesión"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Controls how long recipients have to complete signing before the document expires. After expiration, recipients can no longer sign the document."
-msgstr ""
+msgstr "Controla cuánto tiempo tienen los destinatarios para completar la firma antes de que el documento caduque. Después de la caducidad, los destinatarios ya no podrán firmar el documento."
 
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Controls the default email settings when new documents or templates are created"
@@ -2831,6 +2841,7 @@ msgstr "Campo copiado al portapapeles"
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 #: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 #: packages/ui/components/document/document-share-button.tsx
@@ -2863,6 +2874,10 @@ msgstr "Copiar enlaces de firma"
 #: apps/remix/app/components/forms/token.tsx
 msgid "Copy token"
 msgstr "Copiar token"
+
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Copy Value"
+msgstr "Copiar valor"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
@@ -3064,6 +3079,9 @@ msgstr "Crea tu cuenta y comienza a utilizar la firma de documentos de última g
 #: apps/remix/app/components/tables/settings-security-passkey-table.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 msgid "Created"
@@ -3129,7 +3147,7 @@ msgstr "Archivo personalizado de {0} MB"
 
 #: packages/ui/components/document/expiration-period-picker.tsx
 msgid "Custom duration"
-msgstr ""
+msgstr "Duración personalizada"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Custom Organisation Groups"
@@ -3175,7 +3193,7 @@ msgstr "David es el empleado, Lucas es el gerente"
 
 #: packages/ui/components/document/expiration-period-picker.tsx
 msgid "Days"
-msgstr ""
+msgstr "Días"
 
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
@@ -3205,7 +3223,7 @@ msgstr "Configuración de correo predeterminada"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Envelope Expiration"
-msgstr ""
+msgstr "Vencimiento predeterminado del sobre"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Default file"
@@ -3579,6 +3597,7 @@ msgstr "Discord"
 
 #: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Display Name"
 msgstr "Nombre a mostrar"
 
@@ -3598,6 +3617,7 @@ msgstr "Método de Distribución"
 msgid "DKIM records generated. Please add the DNS records to verify your domain."
 msgstr "Registros DKIM generados. Por favor, añade los registros DNS para verificar tu dominio."
 
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "DNS Records"
 msgstr "Registros DNS"
@@ -4010,6 +4030,7 @@ msgid "Documents Viewed"
 msgstr "Documentos vistos"
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 msgid "Domain"
 msgstr "Dominio"
 
@@ -4024,6 +4045,10 @@ msgstr "Dominio ya en uso"
 #: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
 msgid "Domain Name"
 msgstr "Nombre del dominio"
+
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Domain re-registered"
+msgstr "Dominio registrado de nuevo"
 
 #: apps/remix/app/routes/_unauthenticated+/reset-password.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/signin.tsx
@@ -4234,6 +4259,7 @@ msgstr "Divulgación de Firma Electrónica"
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
@@ -4283,6 +4309,10 @@ msgstr "¡Correo electrónico confirmado!"
 msgid "Email Created"
 msgstr "Correo creado"
 
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Email Domain"
+msgstr "Dominio de correo electrónico"
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "Email domain not found"
 msgstr "Dominio de correo electrónico no encontrado"
@@ -4291,6 +4321,8 @@ msgstr "Dominio de correo electrónico no encontrado"
 msgid "Email Domain Settings"
 msgstr "Configuración de dominio de correo electrónico"
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
@@ -4386,6 +4418,8 @@ msgid "Email verification has been resent"
 msgstr "La verificación de correo electrónico ha sido reenviada"
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "Emails"
 msgstr "Correos electrónicos"
@@ -4692,6 +4726,7 @@ msgstr "Sobre actualizado"
 #: apps/remix/app/components/general/template/template-edit-form.tsx
 #: apps/remix/app/components/general/verify-email-banner.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
@@ -4750,7 +4785,7 @@ msgstr "Tiempo de espera excedido"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Expiration"
-msgstr ""
+msgstr "Vencimiento"
 
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._index.tsx
@@ -4769,7 +4804,7 @@ msgstr "Vence"
 #. placeholder {0}: recipient.expiresAt ? i18n.date(recipient.expiresAt, DateTime.DATETIME_MED) : 'N/A'
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 msgid "Expires {0}"
-msgstr ""
+msgstr "Expira el {0}"
 
 #. placeholder {0}: DateTime.fromMillis(Math.max(millisecondsRemaining, 0)).toFormat( 'mm:ss', )
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
@@ -4827,6 +4862,10 @@ msgstr "Error al cargar el documento"
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "Failed to move folder"
 msgstr "Error al mover la carpeta"
+
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Failed to re-register email domain"
+msgstr "Error al volver a registrar el dominio de correo electrónico"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Failed to reseal document"
@@ -4967,6 +5006,10 @@ msgstr "El tamaño del archivo excede el límite de {APP_DOCUMENT_UPLOAD_SIZE_LI
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Fill in the details to create a new subscription claim."
 msgstr "Rellena los detalles para crear una nueva reclamación de suscripción."
+
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+msgid "Filter by status"
+msgstr "Filtrar por estado"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
@@ -5312,7 +5355,7 @@ msgstr "Horizontal"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "How long recipients have to complete this document after it is sent. Uses the team default when set to inherit."
-msgstr ""
+msgstr "Tiempo que tienen los destinatarios para completar este documento después de que se envía. Usa el valor predeterminado del equipo cuando está configurado como heredado."
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "I agree to link my account with this organization"
@@ -5354,6 +5397,7 @@ msgstr "¡Estoy seguro! Elimínalo"
 #: apps/remix/app/components/tables/admin-claims-table.tsx
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "ID"
 msgstr "ID"
 
@@ -5418,7 +5462,7 @@ msgstr "Incluir el certificado de firma en el documento"
 
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Includes:"
-msgstr ""
+msgstr "Incluye:"
 
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
@@ -5499,7 +5543,7 @@ msgstr "Email inválido"
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/_layout.tsx
 msgid "Invalid embedding presign token provided"
-msgstr ""
+msgstr "Se proporcionó un token de pre-firma de inserción no válido"
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Invalid License Key"
@@ -5712,6 +5756,11 @@ msgstr "Última actualización el"
 msgid "Last used"
 msgstr "Último uso"
 
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Last Verified"
+msgstr "Última verificación"
+
 #: apps/remix/app/components/filters/date-range-filter.tsx
 msgid "Last Year"
 msgstr "Último año"
@@ -5854,6 +5903,7 @@ msgstr "Cargando sugerencias..."
 #: apps/remix/app/components/embed/embed-client-loading.tsx
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: packages/ui/components/pdf-viewer/pdf-viewer-konva-lazy.tsx
 #: packages/ui/primitives/pdf-viewer/lazy.tsx
 msgid "Loading..."
@@ -6164,7 +6214,7 @@ msgstr "Usuarios activos mensuales: Usuarios que completaron al menos uno de sus
 
 #: packages/ui/components/document/expiration-period-picker.tsx
 msgid "Months"
-msgstr ""
+msgstr "Meses"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
@@ -6241,6 +6291,7 @@ msgstr "N/A"
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 #: packages/lib/utils/fields.ts
@@ -6289,7 +6340,7 @@ msgstr "Nunca expira"
 
 #: packages/ui/components/document/expiration-period-picker.tsx
 msgid "Never expires"
-msgstr ""
+msgstr "Nunca vence"
 
 #: apps/remix/app/components/forms/password.tsx
 msgid "New Password"
@@ -6337,6 +6388,10 @@ msgstr "No se encontraron documentos"
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "No email detected"
 msgstr "No se detectó ningún correo electrónico"
+
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "No emails configured for this domain."
+msgstr "No hay correos electrónicos configurados para este dominio."
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "No features enabled"
@@ -6494,7 +6549,7 @@ msgstr "No Encontrado"
 
 #: apps/remix/app/routes/embed+/_v0+/_layout.tsx
 msgid "Not Found"
-msgstr ""
+msgstr "No encontrado"
 
 #: apps/remix/app/components/forms/signin.tsx
 msgid "Not supported"
@@ -6632,6 +6687,8 @@ msgstr "O continúa con"
 #: apps/remix/app/components/tables/admin-user-teams-table.tsx
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 #: apps/remix/app/components/tables/user-organisations-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "Organisation"
 msgstr "Organización"
@@ -6912,6 +6969,9 @@ msgstr "Documento PDF"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.members.tsx
 #: packages/lib/constants/document.ts
 #: packages/ui/components/document/document-read-only-fields.tsx
@@ -6938,6 +6998,10 @@ msgstr "Los documentos pendientes cancelarán su proceso de firma"
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 msgid "Pending invitations"
 msgstr "Invitaciones pendientes"
+
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Pending since"
+msgstr "Pendiente desde"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
@@ -7358,6 +7422,15 @@ msgstr "Configuración de radio"
 msgid "Radio values"
 msgstr "Valores de radio"
 
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Re-register"
+msgstr "Volver a registrar"
+
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Re-register Email Domain"
+msgstr "Volver a registrar dominio de correo electrónico"
+
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
@@ -7464,7 +7537,7 @@ msgstr "El destinatario completó su tarea"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Recipient expired email"
-msgstr ""
+msgstr "Correo electrónico de destinatario vencido"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Recipient failed to validate a 2FA token for the document"
@@ -7497,7 +7570,7 @@ msgstr "Correo electrónico de solicitud de firma de destinatario"
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
 msgid "Recipient signing window expired"
-msgstr ""
+msgstr "La ventana de firma del destinatario ha vencido"
 
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 msgid "Recipient updated"
@@ -7537,6 +7610,10 @@ msgstr "Los destinatarios podrán firmar el documento una vez enviado"
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "Recipients will still retain their copy of the document"
 msgstr "Los destinatarios aún conservarán su copia del documento"
+
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Record"
+msgstr "Registro"
 
 #: apps/remix/app/components/dialogs/organisation-email-domain-records-dialog.tsx
 msgid "Record Name"
@@ -7975,6 +8052,10 @@ msgstr "Buscar por ID de reclamo o nombre"
 msgid "Search by document title"
 msgstr "Buscar por título del documento"
 
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+msgid "Search by domain or organisation name"
+msgstr "Buscar por dominio o nombre de organización"
+
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Search by ID"
 msgstr "Buscar por ID"
@@ -8235,6 +8316,10 @@ msgstr "Destinatario seleccionado"
 msgid "Selected templates will be permanently deleted"
 msgstr "Las plantillas seleccionadas se eliminarán de forma permanente"
 
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Selector"
+msgstr "Selector"
+
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
@@ -8277,7 +8362,7 @@ msgstr "Enviar en nombre del equipo"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Send recipient expired email to the owner"
-msgstr ""
+msgstr "Enviar correo electrónico de destinatario vencido al propietario"
 
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
@@ -8588,7 +8673,7 @@ msgstr "¡Firma completa!"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/expired.tsx
 msgid "Signing Deadline Expired"
-msgstr ""
+msgstr "Fecha límite de firma vencida"
 
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 msgid "Signing for"
@@ -8616,23 +8701,23 @@ msgstr "El orden de firma está habilitado."
 
 #: apps/remix/app/components/embed/embed-recipient-expired.tsx
 msgid "Signing Window Expired"
-msgstr ""
+msgstr "Ventana de firma vencida"
 
 #. placeholder {0}: recipient.name || recipient.email
 #. placeholder {1}: envelope.title
 #: packages/lib/jobs/definitions/emails/send-owner-recipient-expired-email.handler.ts
 msgid "Signing window expired for \"{0}\" on \"{1}\""
-msgstr ""
+msgstr "La ventana de firma ha vencido para \"{0}\" en \"{1}\""
 
 #: packages/email/template-components/template-recipient-expired.tsx
 msgid "Signing window expired for \"{displayName}\" on \"{documentName}\""
-msgstr ""
+msgstr "La ventana de firma ha vencido para \"{displayName}\" en \"{documentName}\""
 
 #. placeholder {0}: data.recipientName || data.recipientEmail
 #: packages/lib/utils/document-audit-logs.ts
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Signing window expired for {0}"
-msgstr ""
+msgstr "La ventana de firma ha vencido para {0}"
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Signups are disabled."
@@ -8806,6 +8891,7 @@ msgstr "Estadísticas"
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
@@ -9567,6 +9653,10 @@ msgstr "El destinatario debe firmar el documento para que se complete."
 msgid "The recipient is required to view the document for it to be completed."
 msgstr "El destinatario debe ver el documento para que se complete."
 
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "The SES identity has been deleted and recreated with the same keys. DNS records remain unchanged."
+msgstr "La identidad de SES se ha eliminado y vuelto a crear con las mismas claves. Los registros DNS permanecen sin cambios."
+
 #: packages/ui/components/document/document-share-button.tsx
 msgid "The sharing link could not be created at this time. Please try again."
 msgstr "El enlace de compartición no se pudo crear en este momento. Por favor, inténtelo de nuevo."
@@ -9585,7 +9675,7 @@ msgstr "El nombre del firmante"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/expired.tsx
 msgid "The signing deadline for this document has passed. Please contact the document owner if you need a new copy to sign."
-msgstr ""
+msgstr "La fecha límite de firma de este documento ha pasado. Ponte en contacto con el propietario del documento si necesitas una nueva copia para firmar."
 
 #: apps/remix/app/components/general/avatar-with-recipient.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
@@ -9596,11 +9686,11 @@ msgstr "El enlace de firma ha sido copiado a tu portapapeles."
 
 #: packages/email/templates/recipient-expired.tsx
 msgid "The signing window for \"{recipientName}\" on document \"{documentName}\" has expired."
-msgstr ""
+msgstr "La ventana de firma para \"{recipientName}\" en el documento \"{documentName}\" ha vencido."
 
 #: packages/email/template-components/template-recipient-expired.tsx
 msgid "The signing window for {displayName} on document \"{documentName}\" has expired. You can resend the document to extend their deadline or cancel the document."
-msgstr ""
+msgstr "La ventana de firma para {displayName} en el documento \"{documentName}\" ha vencido. Puedes reenviar el documento para ampliar su fecha límite o cancelar el documento."
 
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "The site banner is a message that is shown at the top of the site. It can be used to display important information to your users."
@@ -9969,11 +10059,16 @@ msgstr "Esto se enviará al propietario del documento una vez que el documento s
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "This will be sent to the document owner when a recipient's signing window has expired."
-msgstr ""
+msgstr "Esto se enviará al propietario del documento cuando la ventana de firma de un destinatario haya vencido."
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "This will check and sync the status of all email domains for this organisation"
 msgstr "Esto verificará y sincronizará el estado de todos los dominios de correo electrónico para esta organización."
+
+#. placeholder {0}: emailDomain.domain
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "This will delete the existing SES identity for <0>{0}</0> and recreate it using the same DKIM keys. The user will not need to update their DNS records. The domain status will be reset to Pending."
+msgstr "Esto eliminará la identidad de SES existente para <0>{0}</0> y la volverá a crear usando las mismas claves DKIM. El usuario no tendrá que actualizar sus registros DNS. El estado del dominio se restablecerá a Pendiente."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "This will ONLY backport feature flags which are set to true, anything disabled in the initial claim will not be backported"
@@ -10778,6 +10873,7 @@ msgstr "Validación fallida"
 #: apps/remix/app/components/forms/editor/editor-field-number-form.tsx
 #: apps/remix/app/components/forms/editor/editor-field-number-form.tsx
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "Value"
@@ -10843,6 +10939,7 @@ msgstr "Alineación vertical"
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/organisation-billing-invoices-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 msgid "View"
 msgstr "Ver"
 
@@ -11432,7 +11529,7 @@ msgstr "Webhooks"
 
 #: packages/ui/components/document/expiration-period-picker.tsx
 msgid "Weeks"
-msgstr ""
+msgstr "Semanas"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Welcome"
@@ -11521,7 +11618,7 @@ msgstr "Anual"
 
 #: packages/ui/components/document/expiration-period-picker.tsx
 msgid "Years"
-msgstr ""
+msgstr "Años"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
@@ -12499,7 +12596,7 @@ msgstr "Tus códigos de recuperación se enumeran a continuación. Por favor, gu
 
 #: apps/remix/app/components/embed/embed-recipient-expired.tsx
 msgid "Your signing window for this document has expired. Please contact the sender for a new invitation."
-msgstr ""
+msgstr "Tu ventana de firma para este documento ha vencido. Ponte en contacto con el remitente para recibir una nueva invitación."
 
 #: apps/remix/app/components/forms/support-ticket-form.tsx
 msgid "Your support request has been submitted. We'll get back to you soon!"
@@ -12569,3 +12666,4 @@ msgstr "Su código de verificación:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "su-dominio.com otro-dominio.com"
+

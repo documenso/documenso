@@ -8,7 +8,7 @@ msgstr ""
 "Language: nl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-02-16 06:23\n"
+"PO-Revision-Date: 2026-02-25 04:37\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -1082,6 +1082,7 @@ msgstr "Actie"
 #: apps/remix/app/components/tables/team-members-table.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
@@ -1090,6 +1091,9 @@ msgid "Actions"
 msgstr "Acties"
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.members.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._index.tsx
 msgid "Active"
@@ -1330,6 +1334,7 @@ msgid "Admin"
 msgstr "Beheerder"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Admin Actions"
 msgstr "Beheerdersacties"
 
@@ -1437,6 +1442,10 @@ msgstr "Alle handtekeningen zijn ongeldig gemaakt."
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
 msgid "All signing links have been copied to your clipboard."
 msgstr "Alle ondertekeningslinks zijn naar je klembord gekopieerd."
+
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+msgid "All Statuses"
+msgstr "Alle statussen"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "All templates"
@@ -2315,6 +2324,7 @@ msgstr "Kunt u niemand vinden?"
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
@@ -2766,7 +2776,7 @@ msgstr "Doorgaan naar inloggen"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Controls how long recipients have to complete signing before the document expires. After expiration, recipients can no longer sign the document."
-msgstr ""
+msgstr "Bepaalt hoe lang ontvangers de tijd hebben om te ondertekenen voordat het document verloopt. Na de vervaldatum kunnen ontvangers het document niet meer ondertekenen."
 
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Controls the default email settings when new documents or templates are created"
@@ -2831,6 +2841,7 @@ msgstr "Veld naar klembord gekopieerd"
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 #: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 #: packages/ui/components/document/document-share-button.tsx
@@ -2863,6 +2874,10 @@ msgstr "Ondertekeningslinks kopiëren"
 #: apps/remix/app/components/forms/token.tsx
 msgid "Copy token"
 msgstr "Token kopiëren"
+
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Copy Value"
+msgstr "Waarde kopiëren"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
@@ -3064,6 +3079,9 @@ msgstr "Maak je account aan en begin met het gebruik van moderne documentenonder
 #: apps/remix/app/components/tables/settings-security-passkey-table.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 msgid "Created"
@@ -3129,7 +3147,7 @@ msgstr "Aangepast {0} MB-bestand"
 
 #: packages/ui/components/document/expiration-period-picker.tsx
 msgid "Custom duration"
-msgstr ""
+msgstr "Aangepaste duur"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Custom Organisation Groups"
@@ -3175,7 +3193,7 @@ msgstr "David is de werknemer, Lucas is de manager"
 
 #: packages/ui/components/document/expiration-period-picker.tsx
 msgid "Days"
-msgstr ""
+msgstr "Dagen"
 
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
@@ -3205,7 +3223,7 @@ msgstr "Standaarde-mailinstellingen"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Envelope Expiration"
-msgstr ""
+msgstr "Standaardvervaldatum voor enveloppen"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Default file"
@@ -3579,6 +3597,7 @@ msgstr "Discord"
 
 #: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Display Name"
 msgstr "Weergavenaam"
 
@@ -3598,6 +3617,7 @@ msgstr "Distributiemethode"
 msgid "DKIM records generated. Please add the DNS records to verify your domain."
 msgstr "DKIM-records gegenereerd. Voeg de DNS-records toe om je domein te verifiëren."
 
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "DNS Records"
 msgstr "DNS-records"
@@ -4010,6 +4030,7 @@ msgid "Documents Viewed"
 msgstr "Bekeken documenten"
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 msgid "Domain"
 msgstr "Domein"
 
@@ -4024,6 +4045,10 @@ msgstr "Domein al in gebruik"
 #: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
 msgid "Domain Name"
 msgstr "Domeinnaam"
+
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Domain re-registered"
+msgstr "Domein opnieuw geregistreerd"
 
 #: apps/remix/app/routes/_unauthenticated+/reset-password.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/signin.tsx
@@ -4234,6 +4259,7 @@ msgstr "Kennisgeving elektronische handtekening"
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
@@ -4283,6 +4309,10 @@ msgstr "E‑mail bevestigd!"
 msgid "Email Created"
 msgstr "E-mail aangemaakt"
 
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Email Domain"
+msgstr "E-maildomein"
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "Email domain not found"
 msgstr "E-maildomein niet gevonden"
@@ -4291,6 +4321,8 @@ msgstr "E-maildomein niet gevonden"
 msgid "Email Domain Settings"
 msgstr "Instellingen e-maildomein"
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
@@ -4386,6 +4418,8 @@ msgid "Email verification has been resent"
 msgstr "E‑mailverificatie is opnieuw verzonden"
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "Emails"
 msgstr "E-mails"
@@ -4692,6 +4726,7 @@ msgstr "Envelope bijgewerkt"
 #: apps/remix/app/components/general/template/template-edit-form.tsx
 #: apps/remix/app/components/general/verify-email-banner.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
@@ -4750,7 +4785,7 @@ msgstr "Time‑out overschreden"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Expiration"
-msgstr ""
+msgstr "Vervaldatum"
 
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._index.tsx
@@ -4769,7 +4804,7 @@ msgstr "Verloopt"
 #. placeholder {0}: recipient.expiresAt ? i18n.date(recipient.expiresAt, DateTime.DATETIME_MED) : 'N/A'
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 msgid "Expires {0}"
-msgstr ""
+msgstr "Verloopt op {0}"
 
 #. placeholder {0}: DateTime.fromMillis(Math.max(millisecondsRemaining, 0)).toFormat( 'mm:ss', )
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
@@ -4827,6 +4862,10 @@ msgstr "Document laden mislukt"
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "Failed to move folder"
 msgstr "Map verplaatsen mislukt"
+
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Failed to re-register email domain"
+msgstr "Opnieuw registreren van e-maildomein is mislukt"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Failed to reseal document"
@@ -4967,6 +5006,10 @@ msgstr "Bestandsgrootte overschrijdt de limiet van {APP_DOCUMENT_UPLOAD_SIZE_LIM
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Fill in the details to create a new subscription claim."
 msgstr "Vul de gegevens in om een nieuwe abonnementsclaim aan te maken."
+
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+msgid "Filter by status"
+msgstr "Filteren op status"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
@@ -5312,7 +5355,7 @@ msgstr "Horizontaal"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "How long recipients have to complete this document after it is sent. Uses the team default when set to inherit."
-msgstr ""
+msgstr "Hoe lang ontvangers de tijd hebben om dit document te voltooien nadat het is verzonden. Gebruikt de standaardinstelling van het team wanneer overnemen is geselecteerd."
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "I agree to link my account with this organization"
@@ -5354,6 +5397,7 @@ msgstr "Ik weet het zeker! Verwijder het"
 #: apps/remix/app/components/tables/admin-claims-table.tsx
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "ID"
 msgstr "ID"
 
@@ -5418,7 +5462,7 @@ msgstr "Het ondertekeningscertificaat opnemen in het document"
 
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Includes:"
-msgstr ""
+msgstr "Bevat:"
 
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
@@ -5499,7 +5543,7 @@ msgstr "Ongeldig e-mailadres"
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/_layout.tsx
 msgid "Invalid embedding presign token provided"
-msgstr ""
+msgstr "Ongeldige embedding-presign-token opgegeven"
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Invalid License Key"
@@ -5712,6 +5756,11 @@ msgstr "Laatst bijgewerkt op"
 msgid "Last used"
 msgstr "Laatst gebruikt"
 
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Last Verified"
+msgstr "Laatst geverifieerd"
+
 #: apps/remix/app/components/filters/date-range-filter.tsx
 msgid "Last Year"
 msgstr "Afgelopen jaar"
@@ -5854,6 +5903,7 @@ msgstr "Suggesties laden..."
 #: apps/remix/app/components/embed/embed-client-loading.tsx
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: packages/ui/components/pdf-viewer/pdf-viewer-konva-lazy.tsx
 #: packages/ui/primitives/pdf-viewer/lazy.tsx
 msgid "Loading..."
@@ -6164,7 +6214,7 @@ msgstr "Maandelijks actieve gebruikers: gebruikers van wie ten minste één docu
 
 #: packages/ui/components/document/expiration-period-picker.tsx
 msgid "Months"
-msgstr ""
+msgstr "Maanden"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
@@ -6241,6 +6291,7 @@ msgstr "n.v.t."
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 #: packages/lib/utils/fields.ts
@@ -6289,7 +6340,7 @@ msgstr "Nooit verlopen"
 
 #: packages/ui/components/document/expiration-period-picker.tsx
 msgid "Never expires"
-msgstr ""
+msgstr "Verloopt nooit"
 
 #: apps/remix/app/components/forms/password.tsx
 msgid "New Password"
@@ -6337,6 +6388,10 @@ msgstr "Geen documenten gevonden"
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "No email detected"
 msgstr "Geen e-mailadres gedetecteerd"
+
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "No emails configured for this domain."
+msgstr "Er zijn geen e-mailadressen geconfigureerd voor dit domein."
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "No features enabled"
@@ -6494,7 +6549,7 @@ msgstr "Niet gevonden"
 
 #: apps/remix/app/routes/embed+/_v0+/_layout.tsx
 msgid "Not Found"
-msgstr ""
+msgstr "Niet gevonden"
 
 #: apps/remix/app/components/forms/signin.tsx
 msgid "Not supported"
@@ -6632,6 +6687,8 @@ msgstr "Of ga verder met"
 #: apps/remix/app/components/tables/admin-user-teams-table.tsx
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 #: apps/remix/app/components/tables/user-organisations-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "Organisation"
 msgstr "Organisatie"
@@ -6912,6 +6969,9 @@ msgstr "PDF-document"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.members.tsx
 #: packages/lib/constants/document.ts
 #: packages/ui/components/document/document-read-only-fields.tsx
@@ -6938,6 +6998,10 @@ msgstr "Bij in behandeling zijnde documenten wordt het ondertekeningsproces gean
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 msgid "Pending invitations"
 msgstr "Openstaande uitnodigingen"
+
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Pending since"
+msgstr "In behandeling sinds"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
@@ -7358,6 +7422,15 @@ msgstr "Radio-instellingen"
 msgid "Radio values"
 msgstr "Radiowaarden"
 
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Re-register"
+msgstr "Opnieuw registreren"
+
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Re-register Email Domain"
+msgstr "E-maildomein opnieuw registreren"
+
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
@@ -7464,7 +7537,7 @@ msgstr "Ontvanger heeft zijn taak voltooid"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Recipient expired email"
-msgstr ""
+msgstr "E-mail over verlopen ondertekenaar"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Recipient failed to validate a 2FA token for the document"
@@ -7497,7 +7570,7 @@ msgstr "E-mail voor ondertekeningsverzoek aan ontvanger"
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
 msgid "Recipient signing window expired"
-msgstr ""
+msgstr "Ondertekenvenster verlopen"
 
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 msgid "Recipient updated"
@@ -7537,6 +7610,10 @@ msgstr "Ontvangers kunnen het document ondertekenen zodra het is verzonden"
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "Recipients will still retain their copy of the document"
 msgstr "Ontvangers behouden nog steeds hun kopie van het document"
+
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Record"
+msgstr "Record"
 
 #: apps/remix/app/components/dialogs/organisation-email-domain-records-dialog.tsx
 msgid "Record Name"
@@ -7975,6 +8052,10 @@ msgstr "Zoeken op claim-ID of naam"
 msgid "Search by document title"
 msgstr "Zoeken op documenttitel"
 
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
+msgid "Search by domain or organisation name"
+msgstr "Zoeken op domein- of organisatienaam"
+
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Search by ID"
 msgstr "Zoek op ID"
@@ -8235,6 +8316,10 @@ msgstr "Geselecteerde ontvanger"
 msgid "Selected templates will be permanently deleted"
 msgstr "Geselecteerde templates worden permanent verwijderd"
 
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "Selector"
+msgstr "Selector"
+
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
@@ -8277,7 +8362,7 @@ msgstr "Verzenden namens team"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Send recipient expired email to the owner"
-msgstr ""
+msgstr "Stuur e-mail over verlopen ondertekenaar naar de eigenaar"
 
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
@@ -8588,7 +8673,7 @@ msgstr "Ondertekening voltooid!"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/expired.tsx
 msgid "Signing Deadline Expired"
-msgstr ""
+msgstr "Onderteken-deadline verstreken"
 
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 msgid "Signing for"
@@ -8616,23 +8701,23 @@ msgstr "Ondertekeningsvolgorde is ingeschakeld."
 
 #: apps/remix/app/components/embed/embed-recipient-expired.tsx
 msgid "Signing Window Expired"
-msgstr ""
+msgstr "Ondertekenvenster verlopen"
 
 #. placeholder {0}: recipient.name || recipient.email
 #. placeholder {1}: envelope.title
 #: packages/lib/jobs/definitions/emails/send-owner-recipient-expired-email.handler.ts
 msgid "Signing window expired for \"{0}\" on \"{1}\""
-msgstr ""
+msgstr "Ondertekenvenster verlopen voor \"{0}\" voor \"{1}\""
 
 #: packages/email/template-components/template-recipient-expired.tsx
 msgid "Signing window expired for \"{displayName}\" on \"{documentName}\""
-msgstr ""
+msgstr "Ondertekenvenster verlopen voor \"{displayName}\" voor \"{documentName}\""
 
 #. placeholder {0}: data.recipientName || data.recipientEmail
 #: packages/lib/utils/document-audit-logs.ts
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Signing window expired for {0}"
-msgstr ""
+msgstr "Ondertekenvenster verlopen voor {0}"
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Signups are disabled."
@@ -8806,6 +8891,7 @@ msgstr "Statistieken"
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
@@ -9567,6 +9653,10 @@ msgstr "De ontvanger moet het document ondertekenen voordat het kan worden volto
 msgid "The recipient is required to view the document for it to be completed."
 msgstr "De ontvanger moet het document bekijken voordat het kan worden voltooid."
 
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "The SES identity has been deleted and recreated with the same keys. DNS records remain unchanged."
+msgstr "De SES-identiteit is verwijderd en opnieuw aangemaakt met dezelfde sleutels. De DNS-records blijven ongewijzigd."
+
 #: packages/ui/components/document/document-share-button.tsx
 msgid "The sharing link could not be created at this time. Please try again."
 msgstr "De deellink kon op dit moment niet worden aangemaakt. Probeer het opnieuw."
@@ -9585,7 +9675,7 @@ msgstr "De naam van de ondertekenaar"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/expired.tsx
 msgid "The signing deadline for this document has passed. Please contact the document owner if you need a new copy to sign."
-msgstr ""
+msgstr "De onderteken-deadline voor dit document is verstreken. Neem contact op met de documenteigenaar als je een nieuw exemplaar nodig hebt om te ondertekenen."
 
 #: apps/remix/app/components/general/avatar-with-recipient.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
@@ -9596,11 +9686,11 @@ msgstr "De ondertekeningslink is naar je klembord gekopieerd."
 
 #: packages/email/templates/recipient-expired.tsx
 msgid "The signing window for \"{recipientName}\" on document \"{documentName}\" has expired."
-msgstr ""
+msgstr "Het ondertekenvenster voor \"{recipientName}\" voor document \"{documentName}\" is verlopen."
 
 #: packages/email/template-components/template-recipient-expired.tsx
 msgid "The signing window for {displayName} on document \"{documentName}\" has expired. You can resend the document to extend their deadline or cancel the document."
-msgstr ""
+msgstr "Het ondertekenvenster voor {displayName} voor document \"{documentName}\" is verlopen. Je kunt het document opnieuw versturen om hun deadline te verlengen of het document annuleren."
 
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "The site banner is a message that is shown at the top of the site. It can be used to display important information to your users."
@@ -9969,11 +10059,16 @@ msgstr "Dit wordt verzonden naar de documenteigenaar zodra het document volledig
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "This will be sent to the document owner when a recipient's signing window has expired."
-msgstr ""
+msgstr "Dit wordt naar de documenteigenaar gestuurd wanneer het ondertekenvenster van een ontvanger is verlopen."
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "This will check and sync the status of all email domains for this organisation"
 msgstr "Hiermee wordt de status van alle e-maildomeinen voor deze organisatie gecontroleerd en gesynchroniseerd"
+
+#. placeholder {0}: emailDomain.domain
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+msgid "This will delete the existing SES identity for <0>{0}</0> and recreate it using the same DKIM keys. The user will not need to update their DNS records. The domain status will be reset to Pending."
+msgstr "Dit verwijdert de bestaande SES-identiteit voor <0>{0}</0> en maakt deze opnieuw aan met dezelfde DKIM-sleutels. De gebruiker hoeft de DNS-records niet bij te werken. De domeinstatus wordt teruggezet naar In behandeling."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "This will ONLY backport feature flags which are set to true, anything disabled in the initial claim will not be backported"
@@ -10778,6 +10873,7 @@ msgstr "Validatie mislukt"
 #: apps/remix/app/components/forms/editor/editor-field-number-form.tsx
 #: apps/remix/app/components/forms/editor/editor-field-number-form.tsx
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "Value"
@@ -10843,6 +10939,7 @@ msgstr "Verticaal uitlijnen"
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/organisation-billing-invoices-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 msgid "View"
 msgstr "Bekijken"
 
@@ -11432,7 +11529,7 @@ msgstr "Webhooks"
 
 #: packages/ui/components/document/expiration-period-picker.tsx
 msgid "Weeks"
-msgstr ""
+msgstr "Weken"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Welcome"
@@ -11521,7 +11618,7 @@ msgstr "Jaarlijks"
 
 #: packages/ui/components/document/expiration-period-picker.tsx
 msgid "Years"
-msgstr ""
+msgstr "Jaren"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
@@ -12499,7 +12596,7 @@ msgstr "Je herstelcodes staan hieronder. Bewaar ze op een veilige plek."
 
 #: apps/remix/app/components/embed/embed-recipient-expired.tsx
 msgid "Your signing window for this document has expired. Please contact the sender for a new invitation."
-msgstr ""
+msgstr "Je ondertekenvenster voor dit document is verlopen. Neem contact op met de verzender voor een nieuwe uitnodiging."
 
 #: apps/remix/app/components/forms/support-ticket-form.tsx
 msgid "Your support request has been submitted. We'll get back to you soon!"
@@ -12569,3 +12666,4 @@ msgstr "Uw verificatiecode:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
