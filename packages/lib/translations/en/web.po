@@ -4904,6 +4904,20 @@ msgstr "Field font size"
 msgid "Field format"
 msgstr "Field format"
 
+#: apps/remix/app/components/forms/editor/editor-field-checkbox-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-date-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-dropdown-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-email-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-initials-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-name-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-number-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-radio-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-signature-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
+msgid "Field ID"
+msgstr "Field ID"
+
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
@@ -10397,6 +10411,19 @@ msgstr "Uncompleted"
 #: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
 msgid "Undo"
 msgstr "Undo"
+
+#: apps/remix/app/components/forms/editor/editor-field-date-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-dropdown-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-email-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-initials-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-name-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-number-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-radio-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-signature-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
+msgid "Unique field identifier"
+msgstr "Unique field identifier"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx

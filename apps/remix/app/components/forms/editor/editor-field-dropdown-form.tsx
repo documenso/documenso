@@ -38,6 +38,7 @@ import {
 
 const ZDropdownFieldFormSchema = z.object({
   defaultValue: z.string().optional(),
+  fieldId: z.string().optional(),
   values: z
     .object({
       value: z.string().min(1, {
@@ -96,6 +97,7 @@ export const EditorFieldDropdownForm = ({
     mode: 'onChange',
     defaultValues: {
       defaultValue: value.defaultValue,
+      fieldId: value.fieldId || '',
       values: value.values || [{ value: 'Option 1' }],
       required: value.required || false,
       readOnly: value.readOnly || false,
@@ -176,7 +178,7 @@ export const EditorFieldDropdownForm = ({
                     value={field.value ?? '-1'}
                     onValueChange={(value) => field.onChange(value === '-1' ? undefined : value)}
                   >
-                    <SelectTrigger className="text-muted-foreground bg-background w-full">
+                    <SelectTrigger className="w-full bg-background text-muted-foreground">
                       <SelectValue placeholder={t`Default Value`} />
                     </SelectTrigger>
                     <SelectContent position="popper">
@@ -204,6 +206,22 @@ export const EditorFieldDropdownForm = ({
           </div>
 
           <EditorGenericReadOnlyField formControl={form.control} />
+
+          <FormField
+            control={form.control}
+            name="fieldId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Field ID</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input placeholder={t`Unique field identifier`} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <section className="space-y-2">
             <div className="-mx-4 mb-4 mt-2">

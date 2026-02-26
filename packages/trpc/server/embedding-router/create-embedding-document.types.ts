@@ -48,6 +48,15 @@ export const ZCreateEmbeddingDocumentRequestSchema = z.object({
           height: ZFieldHeightSchema,
         }),
       )
+        .transform((field) => {
+          const { fieldMeta } = field;
+          if (fieldMeta && 'fieldId' in fieldMeta) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { fieldId: _, ...restMeta } = fieldMeta as Record<string, unknown>;
+            return { ...field, fieldMeta: restMeta } as typeof field;
+          }
+          return field;
+        })
         .array()
         .optional(),
     }),

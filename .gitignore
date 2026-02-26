@@ -67,3 +67,7 @@ scripts/output*
 # license
 .documenso-license.json
 .documenso-license-backup.json
+
+# local sensitive files
+.env.bk
+cert.p12

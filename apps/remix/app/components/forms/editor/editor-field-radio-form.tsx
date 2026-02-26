@@ -38,6 +38,7 @@ import {
 
 const ZRadioFieldFormSchema = ZRadioFieldMeta.pick({
   label: true,
+  fieldId: true,
   direction: true,
   values: true,
   required: true,
@@ -79,6 +80,7 @@ export const EditorFieldRadioForm = ({
     mode: 'onChange',
     defaultValues: {
       label: value.label || '',
+      fieldId: value.fieldId || '',
       values: value.values || [{ id: 1, checked: false, value: 'Default value' }],
       required: value.required || false,
       readOnly: value.readOnly || false,
@@ -140,7 +142,7 @@ export const EditorFieldRadioForm = ({
                 </FormLabel>
                 <FormControl>
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="text-muted-foreground bg-background w-full">
+                    <SelectTrigger className="w-full bg-background text-muted-foreground">
                       <SelectValue placeholder={t`Select direction`} />
                     </SelectTrigger>
                     <SelectContent position="popper">
@@ -161,6 +163,22 @@ export const EditorFieldRadioForm = ({
           <EditorGenericRequiredField formControl={form.control} />
 
           <EditorGenericReadOnlyField formControl={form.control} />
+
+          <FormField
+            control={form.control}
+            name="fieldId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Field ID</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input placeholder={t`Unique field identifier`} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <section className="space-y-2">
             <div className="-mx-4 mb-4 mt-2">
@@ -187,7 +205,7 @@ export const EditorFieldRadioForm = ({
                       <FormItem>
                         <FormControl>
                           <Checkbox
-                            className="data-[state=checked]:bg-primary border-foreground/30 h-5 w-5"
+                            className="h-5 w-5 border-foreground/30 data-[state=checked]:bg-primary"
                             checked={field.value}
                             onCheckedChange={(value) => {
                               // Uncheck all other values.
