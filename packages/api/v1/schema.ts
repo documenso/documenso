@@ -37,9 +37,7 @@ export const ZGetDocumentsQuerySchema = z.object({
   perPage: z.coerce.number().min(1).optional().default(10),
   folderId: z
     .string()
-    .describe(
-      'Filter documents by folder ID. When omitted, returns all documents regardless of folder.',
-    )
+    .describe('Filter documents by folder ID. When omitted, returns root documents.')
     .optional(),
 });
 

@@ -68,7 +68,6 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       userId: user.id,
       teamId: team.id,
       folderId: args.query.folderId,
-      skipFolderFilter: args.query.folderId === undefined,
     });
 
     return {
