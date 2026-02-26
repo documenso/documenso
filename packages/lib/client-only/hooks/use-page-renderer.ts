@@ -61,8 +61,8 @@ export const usePageRenderer = (renderFunction: RenderFunction, pageData: PageRe
   const imageProps = useMemo(
     (): React.ImgHTMLAttributes<HTMLImageElement> & Record<string, unknown> & { alt: '' } => ({
       className: PDF_VIEWER_PAGE_CLASSNAME,
-      width: `${Math.floor(scaledViewport.width)}px`,
-      height: `${Math.floor(scaledViewport.height)}px`,
+      width: Math.floor(scaledViewport.width),
+      height: Math.floor(scaledViewport.height),
       alt: '',
       onLoad: () => setRenderStatus('loaded'),
       // Purposely not using lazy here since we can use the virtual list overscan to let us prerender images.

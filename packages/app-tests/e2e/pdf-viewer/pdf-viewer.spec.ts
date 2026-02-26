@@ -262,8 +262,6 @@ test.describe('PDF Viewer Rendering', () => {
 
       await fileChooser.setFiles(path.join(__dirname, '../../../../assets/example.pdf'));
 
-      await page.waitForTimeout(2000);
-
       await page.getByRole('button', { name: 'Continue' }).click();
 
       await expect(page.locator(PDF_PAGE_SELECTOR).first()).toBeVisible({ timeout: 30_000 });

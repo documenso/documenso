@@ -91,10 +91,19 @@ export const useFieldPageCoords = (
     const mutationObserver = new MutationObserver(() => {
       const $page = document.querySelector<HTMLElement>(pageSelector);
 
-      if ($page) {
-        calculateCoords();
-        attachResizeObserver($page);
+      if (!$page) {
+        return;
       }
+
+      // Only recalculate when the observed page element has changed (e.g. new
+      // element appeared after virtual list scroll). Skip when mutations are
+      // from elsewhere in the DOM and the page element is unchanged.
+      if ($page === observedElement) {
+        return;
+      }
+
+      calculateCoords();
+      attachResizeObserver($page);
     });
 
     mutationObserver.observe(document.body, {
