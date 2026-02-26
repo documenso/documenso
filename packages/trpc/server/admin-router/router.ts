@@ -15,6 +15,7 @@ import { findEmailDomainsRoute } from './find-email-domains';
 import { findSubscriptionClaimsRoute } from './find-subscription-claims';
 import { findUserTeamsRoute } from './find-user-teams';
 import { getAdminOrganisationRoute } from './get-admin-organisation';
+import { getAdminTeamRoute } from './get-admin-team';
 import { getEmailDomainRoute } from './get-email-domain';
 import { getUserRoute } from './get-user';
 import { promoteMemberToOwnerRoute } from './promote-member-to-owner';
@@ -75,6 +76,9 @@ export const adminRouter = router({
     find: findEmailDomainsRoute,
     get: getEmailDomainRoute,
     reregister: reregisterEmailDomainRoute,
+  },
+  team: {
+    get: getAdminTeamRoute,
   },
   updateSiteSetting: updateSiteSettingRoute,
 });

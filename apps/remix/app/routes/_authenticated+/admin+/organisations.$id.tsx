@@ -5,7 +5,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import { OrganisationMemberRole } from '@prisma/client';
-import { ExternalLinkIcon, InfoIcon, Loader } from 'lucide-react';
+import { CopyIcon, ExternalLinkIcon, InfoIcon, Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
@@ -40,6 +40,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
+import { DetailsCard, DetailsValue, formatIsoDate } from '~/components/general/admin-details';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { SettingsHeader } from '~/components/general/settings-header';
 
@@ -90,11 +91,24 @@ export default function OrganisationGroupSettingsPage({
       },
     });
 
+  const onCopyToClipboard = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+
+    toast({
+      title: t`Copied to clipboard`,
+    });
+  };
+
   const teamsColumns = useMemo(() => {
     return [
       {
         header: t`Team`,
         accessorKey: 'name',
+        cell: ({ row }) => (
+          <Link className="font-medium hover:underline" to={`/admin/teams/${row.original.id}`}>
+            {row.original.name}
+          </Link>
+        ),
       },
       {
         header: t`Team ID`,
@@ -106,6 +120,18 @@ export default function OrganisationGroupSettingsPage({
       {
         header: t`Team url`,
         accessorKey: 'url',
+        cell: ({ row }) => <span className="font-mono text-xs">{row.original.url}</span>,
+      },
+      {
+        header: t`Created`,
+        accessorKey: 'createdAt',
+        cell: ({ row }) => {
+          return (
+            <span className="whitespace-nowrap font-mono text-xs text-muted-foreground">
+              {formatIsoDate(row.original.createdAt)}
+            </span>
+          );
+        },
       },
     ] satisfies DataTableColumnDef<TGetAdminOrganisationResponse['teams'][number]>[];
   }, []);
@@ -115,15 +141,26 @@ export default function OrganisationGroupSettingsPage({
       {
         header: t`Member`,
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
-            <Link to={`/admin/users/${row.original.user.id}`}>{row.original.user.name}</Link>
+          <div className="space-y-1">
+            <Link
+              className="font-medium hover:underline"
+              to={`/admin/users/${row.original.user.id}`}
+            >
+              {row.original.user.name ?? row.original.user.email}
+            </Link>
+            {row.original.user.name && (
+              <div className="font-mono text-xs text-muted-foreground">
+                {row.original.user.email}
+              </div>
+            )}
           </div>
         ),
       },
       {
-        header: t`Email`,
+        header: t`User ID`,
+        accessorKey: 'userId',
         cell: ({ row }) => (
-          <Link to={`/admin/users/${row.original.user.id}`}>{row.original.user.email}</Link>
+          <span className="font-mono text-xs text-muted-foreground">{row.original.userId}</span>
         ),
       },
       {
@@ -150,6 +187,17 @@ export default function OrganisationGroupSettingsPage({
             .exhaustive();
 
           return <Badge variant="secondary">{roleLabel}</Badge>;
+        },
+      },
+      {
+        header: t`Joined`,
+        accessorKey: 'createdAt',
+        cell: ({ row }) => {
+          return (
+            <span className="whitespace-nowrap font-mono text-xs text-muted-foreground">
+              {formatIsoDate(row.original.createdAt)}
+            </span>
+          );
         },
       },
       {
@@ -221,6 +269,51 @@ export default function OrganisationGroupSettingsPage({
       </SettingsHeader>
 
       <GenericOrganisationAdminForm organisation={organisation} />
+
+      <div className="mt-6 rounded-lg border p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-medium">
+              <Trans>Organisation details</Trans>
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              <Trans>Key identifiers and relationships for this organisation.</Trans>
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
+          <DetailsCard
+            label={<Trans>Organisation ID</Trans>}
+            action={
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-8 w-8 shrink-0 p-0"
+                onClick={() => void onCopyToClipboard(organisation.id)}
+                title={t`Copy organisation ID`}
+              >
+                <CopyIcon className="h-4 w-4" />
+              </Button>
+            }
+          >
+            <DetailsValue isSelectable>{organisation.id}</DetailsValue>
+          </DetailsCard>
+
+          <DetailsCard label={<Trans>Type</Trans>}>
+            <DetailsValue isMono={false}>
+              <Badge variant="secondary">{organisation.type}</Badge>
+            </DetailsValue>
+          </DetailsCard>
+
+          <DetailsCard label={<Trans>Created</Trans>}>
+            <DetailsValue>
+              <span className="text-muted-foreground">{formatIsoDate(organisation.createdAt)}</span>
+            </DetailsValue>
+          </DetailsCard>
+        </div>
+      </div>
 
       <SettingsHeader
         title={t`Manage subscription`}

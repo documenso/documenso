@@ -62,7 +62,14 @@ export const OrganisationInsightsTable = ({
     {
       header: _(msg`Team Name`),
       accessorKey: 'name',
-      cell: ({ row }) => <span className="block max-w-full truncate">{row.getValue('name')}</span>,
+      cell: ({ row }) => (
+        <Link
+          className="block max-w-full truncate hover:underline"
+          to={`/admin/teams/${row.original.id}`}
+        >
+          {row.getValue('name')}
+        </Link>
+      ),
       size: 240,
     },
     {
