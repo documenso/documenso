@@ -2,5 +2,5 @@
   "title": "Users",
   "description": "Send and sign documents",
   "root": true,
-  "pages": ["getting-started", "documents", "templates", "teams", "settings"]
+  "pages": ["getting-started", "documents", "templates", "organisations", "settings"]
 }

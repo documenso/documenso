@@ -32,13 +32,21 @@ NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
 Database storage is the default option and requires no additional configuration. Documents are stored as base64-encoded data directly in PostgreSQL.
 
 <Tabs items={['Advantages', 'Limitations']}>
-  <Tab value="Advantages">
-    - No external dependencies - Simple deployment - Automatic backups with database
-  </Tab>
-  <Tab value="Limitations">
-    - Increases database size significantly - Slower for large files - Database backup/restore takes
-    longer - Not recommended for files larger than 10MB
-  </Tab>
+<Tab value="Advantages">
+
+- No external dependencies
+- Simple deployment
+- Automatic backups with database
+
+</Tab>
+<Tab value="Limitations">
+
+- Increases database size significantly
+- Slower for large files
+- Database backup/restore takes longer
+- Not recommended for files larger than 10MB
+
+</Tab>
 </Tabs>
 
 ### Configuration
@@ -474,11 +482,21 @@ This value is in megabytes. The default is 5MB.
 Ensure your infrastructure supports the configured limit:
 
 <Tabs items={['Nginx', 'S3', 'CloudFront']}>
-  <Tab value="Nginx">Set `client_max_body_size` to match or exceed your upload limit.</Tab>
-  <Tab value="S3">
-    Default object size limit is 5GB; multipart upload may be required for large files.
-  </Tab>
-  <Tab value="CloudFront">Default limit is 50MB per request.</Tab>
+<Tab value="Nginx">
+
+Set `client_max_body_size` to match or exceed your upload limit.
+
+</Tab>
+<Tab value="S3">
+
+Default object size limit is 5GB; multipart upload may be required for large files.
+
+</Tab>
+<Tab value="CloudFront">
+
+Default limit is 50MB per request.
+
+</Tab>
 </Tabs>
 
 ---

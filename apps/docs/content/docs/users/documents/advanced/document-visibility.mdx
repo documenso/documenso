@@ -10,7 +10,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 The default document visibility option allows you to control who can view and access the documents uploaded within a team.
 
-This value can either be set in the [document preferences](/docs/users/documents/document-preferences), or when you [create the document](/docs/users/documents/send)
+This value can either be set in the [document preferences](/docs/users/organisations/preferences/document), or when you [create the document](/docs/users/documents/send)
 
 ## Document Visibility Options
 
@@ -32,18 +32,23 @@ The default is Everyone. Change it in document preferences.
 When you create a document, its visibility depends on your role and the team's default. Select your role:
 
 <Tabs items={['Member', 'Manager', 'Admin']}>
-  <Tab value="Member">
-    New documents use the team's default visibility. You cannot change the visibility in the document editor.
-  </Tab>
-  <Tab value="Manager">
-    **If the default is "Everyone" or "Managers and above":** New documents use that setting. You can change it in the editor to "Everyone" or "Managers and above" (not "Admins only").
+<Tab value="Member">
 
-    **If the default is "Admins only":** New documents are admins-only. You cannot change it.
+New documents use the team's default visibility. You cannot change the visibility in the document editor.
 
-  </Tab>
-  <Tab value="Admin">
-    New documents use the team's default. You can change the visibility to any option in the document editor.
-  </Tab>
+</Tab>
+<Tab value="Manager">
+
+**If the default is "Everyone" or "Managers and above":** New documents use that setting. You can change it in the editor to "Everyone" or "Managers and above" (not "Admins only").
+
+**If the default is "Admins only":** New documents are admins-only. You cannot change it.
+
+</Tab>
+<Tab value="Admin">
+
+New documents use the team's default. You can change the visibility to any option in the document editor.
+
+</Tab>
 </Tabs>
 
 You can change visibility at any time by editing the document and choosing a different option.
@@ -64,6 +69,6 @@ The `recipient` (the user who receives the document for signature, approval, etc
 
 ## See Also
 
-- [Document Preferences](/docs/users/documents/document-preferences) - Configure default document settings
-- [Team Members](/docs/users/teams/members) - Understand team member roles
+- [Document Preferences](/docs/users/organisations/preferences/document) - Configure default document settings
+- [Team Members](/docs/users/organisations/members) - Understand team member roles
 - [Send Documents](/docs/users/documents/send) - Send documents for signing

@@ -16,19 +16,13 @@ A document can be in one of four states:
 | **Completed** | All recipients have completed their required actions              |
 | **Rejected**  | A recipient has rejected the document (when rejection is enabled) |
 
-## State Transitions
+## How a Document Moves Through States
 
-```
-┌─────────┐      Send      ┌─────────┐
-│  Draft  │ ─────────────► │ Pending │
-└─────────┘                └─────────┘
-                                │
-                 ┌──────────────┼──────────────┐
-                 │              │              │
-                 ▼              │              ▼
-           ┌───────────┐       │        ┌──────────┐
-           │ Completed │ ◄─────┘        │ Rejected │
-           └───────────┘                └──────────┘
+```mermaid
+flowchart LR
+    Draft -- Send --> Pending
+    Pending -- All recipients complete --> Completed
+    Pending -- Recipient rejects --> Rejected
 ```
 
 ## Draft

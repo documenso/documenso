@@ -1,14 +1,12 @@
 ---
-title: Profile Settings
-description: Manage your profile, signature, and preferences.
+title: Profile
+description: Manage your profile information and signature.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-## Update Your Profile Information
-
-### Avatar
+## Avatar
 
 Your avatar appears on documents you send and in your public profile.
 
@@ -24,7 +22,7 @@ Your avatar appears on documents you send and in your public profile.
 
 To remove your avatar, hover over the image and click **Remove**.
 
-### Name
+## Name
 
 Your name appears on documents and email notifications sent to recipients.
 
@@ -38,11 +36,11 @@ Your name appears on documents and email notifications sent to recipients.
   </Step>
 </Steps>
 
-### Email
+## Email
 
 Your email address is shown as read-only on the profile page. To change your email address, contact support.
 
-## Manage Your Signature
+## Signature
 
 Your signature is used as the default when you sign documents. You can create your signature using three methods:
 
@@ -71,91 +69,10 @@ Your signature is used as the default when you sign documents. You can create yo
   changing your default signature.
 </Callout>
 
-## Configure Your Public Profile
-
-Your public profile allows others to view your information and access templates you share publicly. Your profile is accessible at:
-
-```
-https://app.documenso.com/p/<your-username>
-```
-
-![Enable public profile](/public-profile/documenso-enable-public-profile-settings.webp)
-
-{/* prettier-ignore */}
-<Steps>
-  <Step>
-    Go to **Settings** > **Public Profile**.
-  </Step>
-  <Step>
-    Toggle **Show/Hide** to control profile visibility.
-  </Step>
-  <Step>
-    Set your **Public profile URL** (personal accounts only) and add a **Bio** if desired.
-  </Step>
-  <Step>
-    Click **Update** to save.
-  </Step>
-</Steps>
-
-![Public profile settings](/public-profile/documenso-public-profile-settings.webp)
-
-### Link Templates to Your Public Profile
-
-Display templates on your public profile so visitors can sign documents directly:
-
-{/* prettier-ignore */}
-<Steps>
-  <Step>
-    Go to **Settings** > **Public Profile**.
-  </Step>
-  <Step>
-    Click **Link template** in the Templates section and select templates that have direct links
-    enabled.
-  </Step>
-  <Step>
-    Linked templates will appear on your public profile page.
-  </Step>
-</Steps>
-
-<Callout type="info">
-  Only templates with direct links enabled can be added to your public profile. See [Direct
-  Links](/docs/users/documents/direct-links) to learn more.
-</Callout>
-
-<Callout type="info">A free Documenso account gives you 5 free signatures per month.</Callout>
-
-## Delete Your Account
-
-You can permanently delete your account and all associated data.
-
-<Callout type="warn">
-  Account deletion is irreversible. All documents, signatures, and templates will be permanently
-  removed. Any active subscription will be cancelled.
-</Callout>
-
-To delete your account:
-
-{/* prettier-ignore */}
-<Steps>
-  <Step>
-    Go to **Settings** > **Profile** and scroll to the **Delete Account** section.
-  </Step>
-  <Step>
-    Click **Delete Account**.
-  </Step>
-  <Step>
-    Type your email address to confirm and click **Confirm Deletion**.
-  </Step>
-</Steps>
-
-<Callout type="info">
-  If you have two-factor authentication enabled, you must disable it before deleting your account.
-</Callout>
-
 ---
 
 ## See Also
 
-- [Security Settings](/docs/users/settings/security) - Enable two-factor authentication and passkeys
-- [Branding](/docs/users/settings/branding) - Customize emails and signing pages with your brand
-- [Create a Team](/docs/users/teams/create-team) - Collaborate with others on documents
+- [Public Profile](/docs/users/settings/public-profile) - Share your profile and link templates
+- [Security Settings](/docs/users/settings/security) - Manage passwords, 2FA, and passkeys
+- [Delete Account](/docs/users/settings/delete-account) - Permanently delete your account

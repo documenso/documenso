@@ -11,17 +11,9 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 A typical signing workflow follows these steps:
 
-```
-┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│   Prepare    │ ──► │     Send     │ ──► │   Notify     │
-│   Document   │     │   Document   │     │  Recipients  │
-└──────────────┘     └──────────────┘     └──────────────┘
-                                                 │
-                                                 ▼
-┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│   Document   │ ◄── │    Seal &    │ ◄── │  Recipients  │
-│  Completed   │     │   Finalize   │     │     Sign     │
-└──────────────┘     └──────────────┘     └──────────────┘
+```mermaid
+flowchart LR
+  A[Prepare Document] --> B[Send Document] --> C[Notify Recipients] --> D[Recipients Sign] --> E[Seal & Finalize] --> F[Document Completed]
 ```
 
 1. **Prepare** - Upload the document, add recipients, and place fields

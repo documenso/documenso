@@ -61,6 +61,11 @@ Add the required configuration (see [Environment Configuration](#environment-con
 </Step>
 </Steps>
 
+<Callout type="warn">
+  The `compose.yml` in the repository may be outdated. Use it as a starting point and verify the
+  configuration against the environment variables documented here.
+</Callout>
+
 ## Docker Compose File Overview
 
 The production `compose.yml` includes two services:
@@ -125,6 +130,7 @@ NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=your-secondary-key-min-32-characters
 
 # Public URL where Documenso is accessible
 NEXT_PUBLIC_WEBAPP_URL=https://sign.example.com
+NEXT_PRIVATE_INTERNAL_WEBAPP_URL=http://localhost:3000
 
 # Database connection (uses Docker service name)
 NEXT_PRIVATE_DATABASE_URL=postgresql://documenso:your-secure-database-password@database:5432/documenso
@@ -150,9 +156,6 @@ NEXT_PRIVATE_SIGNING_PASSPHRASE=your-certificate-password
 
 # Disable public signups
 NEXT_PUBLIC_DISABLE_SIGNUP=false
-
-# Disable telemetry
-DOCUMENSO_DISABLE_TELEMETRY=false
 ```
 
 <Callout type="info">Generate secure secrets using: `openssl rand -base64 32`</Callout>
@@ -175,110 +178,34 @@ echo "NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=$(openssl rand -base64 32)"
 echo "POSTGRES_PASSWORD=$(openssl rand -base64 24)"
 ```
 
-## Signing Certificate Setup
+## Signing Certificate
 
-<Callout type="warn">
-  The signing certificate is a common source of issues. Follow these steps carefully.
-</Callout>
+A signing certificate is required for document signing. Generate a `.p12` certificate on your host machine and mount it into the container. See [Local Certificate](/docs/self-hosting/configuration/signing-certificate/local) for how to generate one.
 
-Documenso requires a `.p12` certificate file to sign documents. You have two options:
-
-### Option A: Generate Certificate Inside Container (Recommended)
-
-This method avoids file permission issues:
-
-{/* prettier-ignore */}
-<Steps>
-  <Step>
-    Start the containers first:
-
-```bash
-docker compose --env-file .env up -d
-```
-
-  </Step>
-  <Step>
-    Generate the certificate inside the container:
-
-```bash
-# Set certificate password securely
-read -s -p "Enter certificate password: " CERT_PASS
-echo
-
-# Generate certificate
-docker exec -e CERT_PASS="$CERT_PASS" -it documenso-production-documenso-1 bash -c "
-  mkdir -p /opt/documenso && \
-  openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-    -keyout /tmp/private.key \
-    -out /tmp/certificate.crt \
-    -subj '/C=US/ST=State/L=City/O=Organization/CN=localhost' && \
-  openssl pkcs12 -export -out /opt/documenso/cert.p12 \
-    -inkey /tmp/private.key -in /tmp/certificate.crt \
-    -passout env:CERT_PASS && \
-  rm /tmp/private.key /tmp/certificate.crt
-"
-```
-
-  </Step>
-  <Step>
-    Add the passphrase to your `.env` file:
-
-```bash
-NEXT_PRIVATE_SIGNING_PASSPHRASE=your-certificate-password
-```
-
-  </Step>
-  <Step>
-    Restart the container:
-
-```bash
-docker compose --env-file .env restart documenso
-```
-
-  </Step>
-</Steps>
-
-### Option B: Use an Existing Certificate
-
-If you have an existing `.p12` certificate:
-
-{/* prettier-ignore */}
-<Steps>
-  <Step>
-    Place the certificate on your host system:
+Place the certificate on the host and set permissions so the container can read it (UID 1001):
 
 ```bash
 sudo mkdir -p /opt/documenso
 sudo cp /path/to/your/cert.p12 /opt/documenso/cert.p12
-```
-
-  </Step>
-  <Step>
-    Set proper permissions:
-
-```bash
-sudo chmod 644 /opt/documenso/cert.p12
 sudo chown 1001:1001 /opt/documenso/cert.p12
+sudo chmod 400 /opt/documenso/cert.p12
 ```
 
-  </Step>
-  <Step>
-    Update your `.env` file:
+The `compose.yml` mounts this path into the container. Add the passphrase to your `.env` file:
 
 ```bash
-NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
 NEXT_PRIVATE_SIGNING_PASSPHRASE=your-certificate-password
 ```
 
-  </Step>
-</Steps>
+If file mounting is not available, you can set `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` with the base64-encoded certificate string instead.
 
-<Callout type="error">
-  The certificate must have a password. Certificates without passwords cause "Failed to get private
-  key bags" errors.
+For production deployments that require Adobe Approved Trust List recognition, consider using a [Google Cloud HSM](/docs/self-hosting/configuration/signing-certificate/google-cloud-hsm) or another external HSM.
+
+<Callout type="warn">
+  Do not generate or store the signing certificate inside the container. If the container is
+  destroyed and rebuilt, or if you run multiple instances, the certificate will be lost or
+  inconsistent. Always provide the certificate externally.
 </Callout>
-
-For detailed certificate configuration, see [Signing Certificate Configuration](/docs/self-hosting/configuration/signing-certificate).
 
 ## Starting Services
 
@@ -319,22 +246,12 @@ Once the containers are running:
 
 ### First Account Setup
 
-{/* prettier-ignore */}
-<Steps>
-  <Step>
-    Navigate to the signup page
-  </Step>
-  <Step>
-    Create your admin account
-  </Step>
-  <Step>
-    Verify your email (check container logs if emails aren't delivered)
-  </Step>
-</Steps>
+Navigate to the signup page and create your account. Verify your email address — if emails are not being delivered, check the container logs for SMTP errors.
 
 <Callout type="info">
-  The first account created has full access. Consider disabling public signups after creating admin
-  accounts by setting `NEXT_PUBLIC_DISABLE_SIGNUP=true`.
+  All accounts created through signup are regular user accounts. Admin access must be granted
+  directly in the database. Once your accounts are set up, consider disabling public signups by
+  setting `NEXT_PUBLIC_DISABLE_SIGNUP=true`.
 </Callout>
 
 ## Managing Services

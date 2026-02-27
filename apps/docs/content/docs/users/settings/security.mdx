@@ -1,12 +1,10 @@
 ---
-title: Security Settings
-description: Manage your password, enable two-factor authentication (2FA), configure passkeys, and monitor account activity.
+title: Security
+description: Manage your password, enable two-factor authentication (2FA), and configure passkeys.
 ---
 
-import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
-import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Change Your Password
 
@@ -100,10 +98,7 @@ Recovery codes let you access your account if you lose access to your authentica
 {/* prettier-ignore */}
 <Steps>
   <Step>
-    Go to **Settings**.
-  </Step>
-  <Step>
-    Open the **Security** tab.
+    Go to **Settings**, open the **Security** tab.
   </Step>
   <Step>
     Click **View Codes** in the Recovery codes section.
@@ -161,144 +156,11 @@ From the passkeys page, you can:
   Passkeys are device-specific. If you use multiple devices, add a passkey on each one.
 </Callout>
 
-## Active Sessions
-
-View and manage all devices currently logged into your account.
-
-### View Sessions
-
-Go to **Settings**, open the **Security** tab, then click **Manage sessions**.
-
-The sessions table shows events:
-
-| Column      | Description                    |
-| ----------- | ------------------------------ |
-| Device      | Browser and operating system   |
-| IP Address  | The IP address of the session  |
-| Last Active | When the session was last used |
-| Created     | When the session started       |
-
-Your current session is marked with a "Current" badge.
-
-### Revoke a Session
-
-<Tabs items={['Revoke one session', 'Log out all']}>
-  <Tab value="Revoke one session">Find the session in the list and click **Revoke**.</Tab>
-  <Tab value="Log out all">
-    Click **Log out all** at the top of the page and confirm. Your current session stays active; all
-    others are terminated.
-  </Tab>
-</Tabs>
-
-## Security Activity
-
-Monitor recent security-related events on your account. Go to **Settings**, open the **Security** tab, then click **View activity**.
-
-The activity log shows the events that have occurred on your account. Examples include:
-
-| Event            | Description                           |
-| ---------------- | ------------------------------------- |
-| Sign-in attempts | Login attempts to your account        |
-| Password changes | When your password was changed        |
-| 2FA changes      | When 2FA was enabled or disabled      |
-| Session changes  | When sessions were created or revoked |
-
-## Linked Accounts
-
-View and manage login methods connected to your account (Google, email/password, etc.). Go to **Settings**, open the **Security** tab, and click **Manage linked accounts**.
-
-To remove a login method:
-
-{/* prettier-ignore */}
-<Steps>
-  <Step>
-    Go to **Settings**.
-  </Step>
-  <Step>
-    Open the **Security** tab.
-  </Step>
-  <Step>
-    Click **Manage linked accounts**.
-  </Step>
-  <Step>
-    Find the provider in the list, click **Unlink**, and confirm.
-  </Step>
-</Steps>
-
-<Callout type="warn">
-  Ensure you have at least one login method available before unlinking an account.
-</Callout>
-
-## API Tokens
-
-API tokens allow external applications to access your Documenso account programmatically.
-
-For instructions on creating and managing API tokens, see the [Authentication](/docs/developers/getting-started/authentication) guide in the developer documentation.
-
-## Delete Your Account
-
-Account deletion permanently removes all your data, including documents, signatures, and settings. This action cannot be undone.
-
-### Before Deleting
-
-- Download any documents you need to keep
-- Cancel any active subscriptions
-- Disable 2FA (required before deletion)
-
-### Delete Your Account
-
-{/* prettier-ignore */}
-<Steps>
-  <Step>
-    Go to **Settings**.
-  </Step>
-  <Step>
-    Open the **Profile** tab and scroll to the **Delete Account** section.
-  </Step>
-  <Step>
-    Click **Delete Account**.
-  </Step>
-  <Step>
-    Type your email address to confirm and click **Confirm Deletion**.
-  </Step>
-</Steps>
-
-<Callout type="error">
-  Account deletion is permanent and irreversible. All documents, signatures, and account data will
-  be permanently deleted.
-</Callout>
-
-## Security Best Practices
-
-<Accordions type="multiple">
-  <Accordion title="Use a strong, unique password">
-    Avoid reusing passwords from other services.
-  </Accordion>
-  <Accordion title="Enable two-factor authentication">
-    2FA significantly reduces the risk of unauthorized access.
-  </Accordion>
-  <Accordion title="Store recovery codes securely">
-    Keep them in a password manager or other secure location.
-  </Accordion>
-  <Accordion title="Add passkeys on trusted devices">
-    Passkeys provide phishing-resistant authentication.
-  </Accordion>
-  <Accordion title="Review active sessions regularly">
-    Revoke any sessions you don't recognize.
-  </Accordion>
-  <Accordion title="Monitor security activity">Check for unexpected sign-ins or changes.</Accordion>
-  <Accordion title="Use separate API tokens per integration">
-    If one is compromised, revoke only that token.
-  </Accordion>
-  <Accordion title="Set expiration dates on API tokens">
-    Shorter lifespans reduce risk if a token is leaked.
-  </Accordion>
-</Accordions>
-
 ---
 
 ## See Also
 
-- [Profile Settings](/docs/users/settings/profile) - Update your name, email, and signature
-- [Branding](/docs/users/settings/branding) - Customize emails and signing pages
-- [Create an Account](/docs/users/getting-started/create-account) - Initial account setup
+- [Sessions & Activity](/docs/users/settings/sessions) - View active sessions and security activity
+- [API Tokens](/docs/users/settings/api-tokens) - Manage programmatic access tokens
+- [Profile](/docs/users/settings/profile) - Update your name, email, and signature
+- [Delete Account](/docs/users/settings/delete-account) - Permanently delete your account

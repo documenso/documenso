@@ -28,30 +28,15 @@ kubectl get nodes
 
 A typical Documenso Kubernetes deployment consists of:
 
-```
-                    ┌─────────────────┐
-                    │     Ingress     │
-                    │  (TLS term.)    │
-                    └────────┬────────┘
-                             │
-                    ┌────────▼────────┐
-                    │     Service     │
-                    │  (ClusterIP)    │
-                    └────────┬────────┘
-                             │
-              ┌──────────────┼──────────────┐
-              │              │              │
-      ┌───────▼───────┐ ┌───────▼───────┐ ┌───────▼───────┐
-      │   Pod (app)   │ │   Pod (app)   │ │   Pod (app)   │
-      └───────┬───────┘ └───────┬───────┘ └───────┬───────┘
-              │              │              │
-              └──────────────┼──────────────┘
-                             │
-                    ┌────────▼────────┐
-                    │   PostgreSQL    │
-                    │   (external or  │
-                    │    in-cluster)  │
-                    └─────────────────┘
+```mermaid
+flowchart TD
+  A["Ingress (TLS termination)"] --> B["Service (ClusterIP)"]
+  B --> C1["Pod (app)"]
+  B --> C2["Pod (app)"]
+  B --> C3["Pod (app)"]
+  C1 --> D["PostgreSQL (external or in-cluster)"]
+  C2 --> D
+  C3 --> D
 ```
 
 ## Namespace Setup
@@ -145,9 +130,9 @@ data:
   NEXT_PRIVATE_SMTP_PORT: '587'
   NEXT_PRIVATE_SMTP_FROM_NAME: 'Documenso'
   NEXT_PRIVATE_SMTP_FROM_ADDRESS: 'noreply@example.com'
+  NEXT_PRIVATE_INTERNAL_WEBAPP_URL: 'http://localhost:3000'
   NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: '/opt/documenso/cert.p12'
   NEXT_PUBLIC_UPLOAD_TRANSPORT: 'database'
-  DOCUMENSO_DISABLE_TELEMETRY: 'false'
 ```
 
 Apply the ConfigMap:
@@ -511,49 +496,6 @@ stringData:
 
 See [Storage Configuration](/docs/self-hosting/configuration/storage) for detailed S3 setup instructions.
 
-## Health Probes
-
-The deployment includes three probe types:
-
-| Probe Type       | Purpose                          | Endpoint      |
-| ---------------- | -------------------------------- | ------------- |
-| `livenessProbe`  | Restart container if unhealthy   | `/api/health` |
-| `readinessProbe` | Remove from service if not ready | `/api/health` |
-| `startupProbe`   | Allow time for initial startup   | `/api/health` |
-
-### Probe Configuration
-
-Adjust probe timings based on your environment:
-
-```yaml
-livenessProbe:
-  httpGet:
-    path: /api/health
-    port: http
-  initialDelaySeconds: 30 # Wait before first check
-  periodSeconds: 10 # Check every 10 seconds
-  timeoutSeconds: 5 # Timeout for each check
-  failureThreshold: 3 # Restart after 3 failures
-
-readinessProbe:
-  httpGet:
-    path: /api/health
-    port: http
-  initialDelaySeconds: 10
-  periodSeconds: 5
-  timeoutSeconds: 3
-  failureThreshold: 3
-
-startupProbe:
-  httpGet:
-    path: /api/health
-    port: http
-  initialDelaySeconds: 10
-  periodSeconds: 5
-  timeoutSeconds: 3
-  failureThreshold: 30 # 30 * 5s = 150s max startup time
-```
-
 ## Scaling
 
 ### Horizontal Pod Autoscaler (HPA)
@@ -639,61 +581,6 @@ Apply the PDB:
 
 ```bash
 kubectl apply -f pdb.yaml
-```
-
-## Monitoring
-
-### Prometheus ServiceMonitor
-
-If using Prometheus Operator:
-
-```yaml
-# servicemonitor.yaml
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: documenso
-  namespace: documenso
-  labels:
-    app.kubernetes.io/name: documenso
-spec:
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: documenso
-  endpoints:
-    - port: http
-      path: /api/health
-      interval: 30s
-```
-
-### Resource Monitoring
-
-Check current resource usage:
-
-```bash
-# Pod resource usage
-kubectl top pods -n documenso
-
-# Deployment status
-kubectl get deployment documenso -n documenso
-
-# HPA status
-kubectl get hpa documenso -n documenso
-```
-
-### Logging
-
-View application logs:
-
-```bash
-# All pods
-kubectl logs -l app.kubernetes.io/name=documenso -n documenso -f
-
-# Specific pod
-kubectl logs documenso-<pod-id> -n documenso -f
-
-# Previous container (if restarted)
-kubectl logs documenso-<pod-id> -n documenso --previous
 ```
 
 ## Troubleshooting
@@ -811,6 +698,7 @@ data:
   NEXT_PRIVATE_SMTP_PORT: '587'
   NEXT_PRIVATE_SMTP_FROM_NAME: 'Documenso'
   NEXT_PRIVATE_SMTP_FROM_ADDRESS: 'noreply@example.com'
+  NEXT_PRIVATE_INTERNAL_WEBAPP_URL: 'http://localhost:3000'
   NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: '/opt/documenso/cert.p12'
   NEXT_PUBLIC_UPLOAD_TRANSPORT: 'database'
 ---

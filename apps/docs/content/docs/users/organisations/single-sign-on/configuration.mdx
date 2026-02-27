@@ -1,5 +1,5 @@
 ---
-title: Single Sign-On (SSO)
+title: Configuration
 description: Configure Single Sign-On for your team using any OpenID Connect (OIDC) identity provider.
 ---
 
@@ -23,14 +23,14 @@ Documenso supports any identity provider that implements the OpenID Connect (OID
 
 ## Setting Up SSO
 
-<Callout type="info">You must be an organization admin or manager to configure SSO.</Callout>
+<Callout type="info">You must be an organisation admin or manager to configure SSO.</Callout>
 
 {/* prettier-ignore */}
 <Steps>
 <Step>
 ### Access SSO settings
 
-1. Navigate to your organization settings
+1. Navigate to your organisation settings
 2. Select **Single Sign-On** from the sidebar
 
 ![SSO settings page](/organisations/organisations-sso-settings.webp)
@@ -109,14 +109,14 @@ The OpenID Connect discovery endpoint for your identity provider.
   provider.
 </Callout>
 
-### Default Organization Role
+### Default Organisation Role
 
 The role assigned to users when they first sign in through SSO. You can change individual roles after they've joined.
 
 <Tabs items={['Member', 'Manager', 'Admin']}>
   <Tab value="Member">Can view and sign documents shared with them.</Tab>
-  <Tab value="Manager">Can manage documents and organization settings.</Tab>
-  <Tab value="Admin">Full access to organization configuration.</Tab>
+  <Tab value="Manager">Can manage documents and organisation settings.</Tab>
+  <Tab value="Admin">Full access to organisation configuration.</Tab>
 </Tabs>
 
 ### Allowed Email Domains
@@ -153,15 +153,15 @@ A new account is created, or linked if the email already exists.
 
 </Step>
 <Step>
-### Add to organization
+### Add to organisation
 
-The user is added to your organization with the default role.
+The user is added to your organisation with the default role.
 
 </Step>
 <Step>
 ### Grant access
 
-They can immediately access organization documents.
+They can immediately access organisation documents.
 
 </Step>
 </Steps>
@@ -172,35 +172,12 @@ Users provisioned through SSO:
 - Cannot set a Documenso password (they must use SSO)
 - Are removed from SSO access if removed from your identity provider
 
-## SSO-Only Enforcement
+## Signing In with SSO
 
-Once SSO is enabled, you can share your organization's SSO portal URL with members (displayed at the top of the SSO settings page). To enforce SSO-only authentication:
-
-{/* prettier-ignore */}
-<Steps>
-<Step>
-### Share portal URL only
-
-Share only the SSO portal URL with organization members (not the main Documenso login).
-
-</Step>
-<Step>
-### Restrict domains
-
-Restrict allowed email domains to your organization.
-
-</Step>
-<Step>
-### Remove password users
-
-Remove any organization members who signed up with passwords, then re-invite them through the SSO portal.
-
-</Step>
-</Steps>
+Once SSO is enabled, your organisation's SSO portal URL is displayed at the top of the SSO settings page. Share this URL with your members so they can sign in through your identity provider.
 
 <Callout type="info">
-  Users who joined before SSO was enabled can still sign in with their original method. To enforce
-  SSO for existing users, remove and re-invite them through the SSO portal.
+  SSO-only enforcement is not currently available. Users who have an existing Documenso account with a password can still sign in with their original method in addition to SSO.
 </Callout>
 
 ## Troubleshooting
@@ -278,5 +255,5 @@ To reduce friction for your users, create a custom subdomain that redirects to y
 
 ## See Also
 
-- [Manage Members](/docs/users/teams/members) - Configure team member roles and permissions
-- [Create a Team](/docs/users/teams/create-team) - Set up additional teams in your organization
+- [Manage Members](/docs/users/organisations/members) - Configure team member roles and permissions
+- [Create a Team](/docs/users/organisations/create-team) - Set up additional teams in your organisation

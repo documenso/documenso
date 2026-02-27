@@ -1,0 +1,95 @@
+---
+title: Google Cloud HSM
+description: Configure Google Cloud HSM for hardware-based signing key protection.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+Google Cloud HSM provides hardware-based key protection. The private key never leaves the HSM.
+
+## Prerequisites
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Enable Cloud KMS
+
+Create or use a Google Cloud project and enable the Cloud KMS API.
+
+</Step>
+<Step>
+### Create HSM key
+
+Create an HSM key ring and an asymmetric signing key in Cloud KMS (see [Creating an HSM Key](#creating-an-hsm-key) below).
+
+</Step>
+<Step>
+### Create service account
+
+Create a service account with the `cloudkms.signerVerifier` role so Documenso can use the key.
+
+</Step>
+<Step>
+### Export public certificate
+
+Export the public certificate from the HSM key; Documenso needs it to embed in signatures.
+
+</Step>
+</Steps>
+
+## Environment Variables
+
+| Variable                                                       | Description                                          |
+| -------------------------------------------------------------- | ---------------------------------------------------- |
+| `NEXT_PRIVATE_SIGNING_TRANSPORT`                               | Set to `gcloud-hsm`                                  |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_KEY_PATH`                     | Full resource path to the HSM key version            |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_PATH`         | Path to the public certificate file                  |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS`     | Base64-encoded public certificate                    |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS` | Base64-encoded Google Cloud service account JSON     |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_FILE_PATH`         | Path to the certificate chain file                   |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_CONTENTS`          | Base64-encoded certificate chain                     |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_SECRET_MANAGER_CERT_PATH`     | Google Secret Manager path for certificate retrieval |
+
+## Configuration Example
+
+```bash
+NEXT_PRIVATE_SIGNING_TRANSPORT=gcloud-hsm
+NEXT_PRIVATE_SIGNING_GCLOUD_HSM_KEY_PATH=projects/my-project/locations/global/keyRings/documenso/cryptoKeys/signing-key/cryptoKeyVersions/1
+NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_PATH=/opt/documenso/public.crt
+NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS=eyJ0eXBlIjoic2VydmljZV9hY2NvdW50Ii...
+```
+
+## Key Path Format
+
+The HSM key path follows this format:
+
+```
+projects/{project}/locations/{location}/keyRings/{keyring}/cryptoKeys/{key}/cryptoKeyVersions/{version}
+```
+
+Example:
+
+```
+projects/my-company/locations/us-east1/keyRings/document-signing/cryptoKeys/prod-signing/cryptoKeyVersions/1
+```
+
+## Creating an HSM Key
+
+Using gcloud CLI:
+
+```bash
+# Create a key ring
+gcloud kms keyrings create document-signing \
+    --location=us-east1 \
+    --project=my-project
+
+# Create an asymmetric signing key
+gcloud kms keys create prod-signing \
+    --keyring=document-signing \
+    --location=us-east1 \
+    --purpose=asymmetric-signing \
+    --default-algorithm=rsa-sign-pkcs1-2048-sha256 \
+    --protection-level=hsm \
+    --project=my-project
+```

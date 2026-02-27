@@ -82,32 +82,43 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 {/* prettier-ignore */}
 <Steps>
-  <Step>
-    Click **Sign Up** on the login page
-  </Step>
-  <Step>
-    Enter your email address and create a password
-  </Step>
-  <Step>
-    Check the Docker logs for the verification email (emails are not sent in development mode):
+<Step>
+
+### Sign up
+
+Click **Sign Up** on the login page and enter your email address and password.
+
+</Step>
+<Step>
+
+### Verify your email
+
+In development mode, emails are logged to the console instead of being sent. Check the Docker logs for the verification link:
 
 ```bash
 docker compose -f docker/development/compose.yml logs -f
 ```
 
-  </Step>
-  <Step>
-    Copy the verification link from the logs and open it in your browser
-  </Step>
-  <Step>
-    Log in with your credentials
-  </Step>
+Copy the verification link from the logs and open it in your browser.
+
+</Step>
+<Step>
+
+### Log in
+
+Log in with your credentials.
+
+</Step>
 </Steps>
 
-<Callout type="info">
-  In development mode, all emails are logged to the console instead of being sent. Look for the
-  verification link in the container logs.
-</Callout>
+### Granting Admin Access
+
+All accounts created through signup are regular user accounts. To grant admin access, update the user's role directly in the database:
+
+```bash
+docker compose -f docker/development/compose.yml exec database \
+  psql -U documenso -d documenso -c "UPDATE \"User\" SET roles = '{ADMIN}' WHERE email = 'your@email.com';"
+```
 
 ## What's Included
 

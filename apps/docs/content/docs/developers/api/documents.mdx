@@ -737,10 +737,11 @@ const documents = await response.json();
 
 ### Status Transitions
 
-```text
-DRAFT → PENDING → COMPLETED
-↘ REJECTED
-````
+```mermaid
+flowchart LR
+  DRAFT --> PENDING --> COMPLETED
+  PENDING --> REJECTED
+```
 
 - **DRAFT to PENDING**: Call the distribute endpoint
 - **PENDING to COMPLETED**: All recipients complete their signing

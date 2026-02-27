@@ -1,164 +1,56 @@
 ---
 title: Fair Use Policy
-description: Fair use guidelines for Documenso Cloud to ensure reliable service for all users. Self-hosted deployments are not subject to these limits.
+description: Fair use guidelines for Documenso Cloud to keep things sustainable for everyone.
 ---
 
-import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
-import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-## Cloud Service Guidelines
+We like to overdeliver, but we cannot overcommit.
 
-Documenso Cloud is designed for standard document signing workflows. The following guidelines apply to all cloud plans:
+Our plans are designed to be generous and flexible without forcing customers into rigid volume limits they may never use. Estimating usage at scale is hard, especially over short periods. This fair use policy exists to keep plans sustainable while allowing us to add more value wherever possible without overformalising restrictions.
 
-- Use the service for its intended purpose: sending documents for signature
-- Respect the limits associated with your subscription plan
-- Do not use automated systems to circumvent usage limits
-- Do not share account credentials to bypass per-user limits
+We offer our plans without limits on signing or API volume because we want users and customers to make the most of their accounts. If you are on one of these plans, we ask you to abide by this fair use policy.
 
-Fair use is evaluated based on typical usage patterns for document signing. Occasional spikes in usage are expected and accommodated.
+## Spirit of the Plan
+
+Use the limitless plans as much as you like. They are meant to offer a lot. Please respect the spirit and intended scope of the account.
+
+**What happens if I go beyond the scope of this policy?** We will ask you to upgrade to a fitting plan or custom pricing. We will not block your account without reaching out. You can message us with any questions.
+
+### Do
+
+- Sign as many documents as you need with the individual plan for your single business or organisation
+- Use the API and automation tools to automate your signing workflows
+- Experiment with plans and integrations while testing what you want to build
+
+### Don't
+
+- Use an individual account API to power a platform or product
+- Run a large company signing thousands of documents per day on a small team plan
+- Expect enterprise-level support on a fair support plan
+- Overthink this policy — if you are a paying customer, we want you to win
 
 ## Rate Limits
 
-API and application requests are rate-limited to protect service availability.
+API and application requests are rate-limited to protect service availability. Limits apply per user or API token.
 
-| Endpoint Type     | Limit                  | Window     |
-| ----------------- | ---------------------- | ---------- |
-| API requests      | 100 requests           | Per minute |
-| Document creation | 50 documents           | Per hour   |
-| Email sending     | 200 emails             | Per hour   |
-| Bulk operations   | 20 concurrent requests | Per minute |
+When a limit is reached, requests return a `429 Too Many Requests` response with a `Retry-After` header indicating when to retry.
 
-Rate limits apply per user or API token. When a limit is reached, requests return a `429 Too Many Requests` response. The response includes a `Retry-After` header indicating when to retry.
+| Action | Limit | Window |
+| --- | --- | --- |
+| API requests (v1 and v2) | 100 requests | 1 minute |
+| File uploads | 20 requests | 1 minute |
+| AI features | 3 requests | 1 minute |
+
+Authentication endpoints (login, signup, password reset, etc.) are also rate-limited to protect against abuse.
 
 <Callout type="info">
-  Rate limits may vary by plan. Enterprise plans include higher limits. Contact
+  Rate limits may vary by plan. Enterprise plans can include higher or custom limits. Contact
   [sales](https://documen.so/sales) for details.
 </Callout>
 
-## Storage Limits
-
-Document storage is subject to the following guidelines:
-
-| Plan       | Document Storage | Retention                |
-| ---------- | ---------------- | ------------------------ |
-| Free       | 10 documents     | 60 days after completion |
-| Individual | Unlimited        | Until deleted            |
-| Teams      | Unlimited        | Until deleted            |
-| Enterprise | Unlimited        | Configurable retention   |
-
-### Storage Guidelines
-
-- **Document size**: Maximum 20 MB per PDF file
-- **Page count**: Maximum 500 pages per document
-- **Recipients**: Maximum 50 recipients per document
-- **Fields**: Maximum 500 fields per document
-
-Documents exceeding these limits may fail to upload or process.
-
-## Acceptable Use
-
-<Tabs items={['Permitted', 'Prohibited']}>
-  <Tab value="Permitted">
-    The following uses are permitted under fair use:
-
-    - Sending contracts, agreements, and forms for signature
-    - Using templates for recurring document types
-    - Integrating with business applications via the API
-    - Automating document workflows within rate limits
-
-  </Tab>
-  <Tab value="Prohibited">
-    The following uses violate fair use and may result in account action:
-
-    - **Bulk email**: Using document signing as a mass email delivery system
-    - **Storage abuse**: Uploading documents without intent to sign them
-    - **API abuse**: Automated scraping, excessive polling, or denial-of-service patterns
-    - **Credential sharing**: Sharing login credentials to exceed per-seat limits
-    - **Circumvention**: Using multiple accounts to bypass usage limits
-
-  </Tab>
-</Tabs>
-
-<Callout type="warn">
-  Violation of acceptable use policies may result in rate limiting, account suspension, or
-  termination. See [Terms of Service](/docs/policies/terms) for details.
-</Callout>
-
-## Limit Exceeded Actions
-
-When usage exceeds fair use limits, Documenso may take the following actions:
-
-<Accordions type="multiple">
-  <Accordion title="Soft Limits">
-    For minor or temporary limit violations:
-
-    1. **Warning notification**: Email notification about the exceeded limit
-    2. **Temporary throttling**: Reduced rate limits until usage normalizes
-    3. **Grace period**: Time to reduce usage or upgrade your plan
-
-  </Accordion>
-  <Accordion title="Hard Limits">
-    For significant or repeated violations:
-
-    1. **Service restriction**: Affected features are disabled until resolved
-    2. **Account review**: Manual review of usage patterns
-    3. **Account suspension**: Temporary suspension pending resolution
-    4. **Termination**: Permanent account closure for severe or repeated abuse
-
-    Before taking action, Documenso will attempt to contact you at your registered email address. You will have an opportunity to explain unusual usage or upgrade your plan.
-
-  </Accordion>
-  <Accordion title="Disputing Actions">
-    If you believe an action was taken in error:
-
-    1. Reply to the notification email with details about your usage
-    2. Provide context for any unusual patterns
-    3. Request a review of the decision
-
-    Disputes are reviewed within 5 business days.
-
-  </Accordion>
-</Accordions>
-
-## Enterprise Options
-
-Enterprise plans include higher limits and custom configurations:
-
-| Feature            | Standard Plans | Enterprise          |
-| ------------------ | -------------- | ------------------- |
-| API rate limits    | Standard       | Custom limits       |
-| Document storage   | Plan limits    | Unlimited           |
-| Document size      | 20 MB          | Up to 100 MB        |
-| Recipients per doc | 50             | Up to 200           |
-| Bulk operations    | Standard       | Priority processing |
-| SLA                | Best effort    | Guaranteed uptime   |
-
-<Accordions type="multiple">
-  <Accordion title="Custom Limits">
-    Enterprise customers can request custom limits for:
-
-    - API request rates
-    - Document processing throughput
-    - Storage retention policies
-    - Concurrent operations
-
-  </Accordion>
-  <Accordion title="Dedicated Resources">
-    Enterprise plans can include:
-
-    - Dedicated infrastructure
-    - Priority processing queues
-    - Custom rate limit configurations
-    - Direct technical support
-
-  </Accordion>
-</Accordions>
-
-Contact [sales](https://documen.so/enterprise) to discuss enterprise options.
-
 <Callout type="info">
-  Self-hosted deployments have no cloud-imposed limits. You control all limits based on your
+  Self-hosted deployments can configure their own rate limits. You control all limits based on your
   infrastructure capacity. See [Self-Hosting](/docs/self-hosting) for deployment options.
 </Callout>
 
@@ -168,12 +60,9 @@ Fair support includes reasonable application-level help for self-hosted users. W
 
 We are not your operations team and cannot take responsibility for running, monitoring, or maintaining your infrastructure.
 
-If you are unsure whether something falls within fair use or fair support, reach out. We are happy to help clarify.
+If you are unsure whether something falls within fair use or fair support, reach out. We are happy to talk it through.
 
 ## Related
 
-- [Terms of Service](/docs/policies/terms) - Service terms and acceptable use
-- [Privacy Policy](/docs/policies/privacy) - Data handling and retention
-- [Support](/docs/policies/support) - Getting help with usage questions
-- [Enterprise Edition](/docs/policies/enterprise-edition) - Commercial licensing
-- [Self-Hosting](/docs/self-hosting) - Deploy without cloud limits
+- [Enterprise Edition](/docs/policies/enterprise-edition) - Commercial licensing and custom limits
+- [Self-Hosting](/docs/self-hosting) - Deploy without cloud-imposed limits
