@@ -1,0 +1,68 @@
+---
+title: Fair Use Policy
+description: Fair use guidelines for Documenso Cloud to keep things sustainable for everyone.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+We like to overdeliver, but we cannot overcommit.
+
+Our plans are designed to be generous and flexible without forcing customers into rigid volume limits they may never use. Estimating usage at scale is hard, especially over short periods. This fair use policy exists to keep plans sustainable while allowing us to add more value wherever possible without overformalising restrictions.
+
+We offer our plans without limits on signing or API volume because we want users and customers to make the most of their accounts. If you are on one of these plans, we ask you to abide by this fair use policy.
+
+## Spirit of the Plan
+
+Use the limitless plans as much as you like. They are meant to offer a lot. Please respect the spirit and intended scope of the account.
+
+**What happens if I go beyond the scope of this policy?** We will ask you to upgrade to a fitting plan or custom pricing. We will not block your account without reaching out. You can message us with any questions.
+
+### Do
+
+- Sign as many documents as you need with the individual plan for your single business or organisation
+- Use the API and automation tools to automate your signing workflows
+- Experiment with plans and integrations while testing what you want to build
+
+### Don't
+
+- Use an individual account API to power a platform or product
+- Run a large company signing thousands of documents per day on a small team plan
+- Expect enterprise-level support on a fair support plan
+- Overthink this policy — if you are a paying customer, we want you to win
+
+## Rate Limits
+
+API and application requests are rate-limited to protect service availability. Limits apply per user or API token.
+
+When a limit is reached, requests return a `429 Too Many Requests` response with a `Retry-After` header indicating when to retry.
+
+| Action | Limit | Window |
+| --- | --- | --- |
+| API requests (v1 and v2) | 100 requests | 1 minute |
+| File uploads | 20 requests | 1 minute |
+| AI features | 3 requests | 1 minute |
+
+Authentication endpoints (login, signup, password reset, etc.) are also rate-limited to protect against abuse.
+
+<Callout type="info">
+  Rate limits may vary by plan. Enterprise plans can include higher or custom limits. Contact
+  [sales](https://documen.so/sales) for details.
+</Callout>
+
+<Callout type="info">
+  Self-hosted deployments can configure their own rate limits. You control all limits based on your
+  infrastructure capacity. See [Self-Hosting](/docs/self-hosting) for deployment options.
+</Callout>
+
+## Fair Support
+
+Fair support includes reasonable application-level help for self-hosted users. We will help you get unstuck and point you in the right direction when issues come up. Support is provided in good faith and within reasonable time and effort limits.
+
+We are not your operations team and cannot take responsibility for running, monitoring, or maintaining your infrastructure.
+
+If you are unsure whether something falls within fair use or fair support, reach out. We are happy to talk it through.
+
+## Related
+
+- [Enterprise Edition](/docs/policies/enterprise-edition) - Commercial licensing and custom limits
+- [Self-Hosting](/docs/self-hosting) - Deploy without cloud-imposed limits

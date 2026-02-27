@@ -1,0 +1,150 @@
+---
+title: Groups
+description: Learn how to manage your team's global preferences.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Overview
+
+Organisation groups lets you manage users across your organisation efficiently. Instead of assigning users to teams one by one, groups allow you to manage access at scale with consistent permissions.
+
+## Key Benefits
+
+<Tabs items={['Instant Access', 'Bulk Operations', 'Role Consistency', 'Audit Trail']}>
+<Tab value="Instant Access">
+
+New hires get immediate, appropriate access across all relevant teams.
+
+</Tab>
+<Tab value="Bulk Operations">
+
+Remove an entire group (e.g. a departing contractor team) and all members lose access simultaneously.
+
+</Tab>
+<Tab value="Role Consistency">
+
+The same role is applied consistently across teams. Avoid accidentally giving admin access when member access was intended.
+
+</Tab>
+<Tab value="Audit Trail">
+
+Easily track which groups have access to which teams.
+
+</Tab>
+</Tabs>
+
+## Example: Legal Compliance Team
+
+A legal team needs access across **Sales**, **Marketing**, **HR**, and **Operations**. Instead of adding each person to every team:
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Create the group
+
+Create a **Legal Compliance** group with **Member** organisation role.
+
+</Step>
+<Step>
+### Add members
+
+Add legal team members to the group.
+
+</Step>
+<Step>
+### Assign to teams
+
+Assign the group to the required teams.
+
+</Step>
+</Steps>
+
+<Callout type="info">
+  When someone joins, add them to the group and they will get access to all assigned teams. When
+  they leave, remove them and access is revoked everywhere.
+</Callout>
+
+## Getting Started
+
+Go to the **Groups** section in your organisation settings.
+
+### Role Types
+
+<Tabs items={['Organisation Role', 'Team Role']}>
+<Tab value="Organisation Role">
+
+A global role for all members of the group. Set to **Organisation Member** in most cases, otherwise members get access to all teams by default.
+
+</Tab>
+<Tab value="Team Role">
+
+The team role you select when assigning the group to a team (e.g. Member, Manager).
+
+</Tab>
+</Tabs>
+
+### Create a Group
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Name the group
+
+Give it a descriptive name (e.g. "Legal Compliance").
+
+</Step>
+<Step>
+### Set organisation role
+
+Define the default role for group members.
+
+</Step>
+<Step>
+### Add members
+
+Include organisation members in the group.
+
+</Step>
+</Steps>
+
+![Organisation group creation](/organisations/organisation-group-create.webp)
+
+### Assign a Group to a Team
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Open team settings
+
+Go to the team and click **Settings** > **Groups** tab.
+
+</Step>
+<Step>
+### Add the group
+
+Click **Add groups** and select the group. Members are automatically added to the team.
+
+</Step>
+</Steps>
+
+![Organisation group assignment](/organisations/organisation-group-assignment.webp)
+
+### Manage Groups
+
+Click **Manage** on a group to view which teams it's assigned to and edit its settings.
+
+![Organisation group management](/organisations/organisation-group-manage.webp)
+
+## What's Next?
+
+- [Create Your First Team](/docs/users/organisations/create-team)
+- [Document Preferences](/docs/users/organisations/preferences/document)
+
+## See Also
+
+- [Team Members](/docs/users/organisations/members) - Manage individual team members and roles
+- [Create a Team](/docs/users/organisations/create-team) - Set up a new team in your organisation
+- [Document Preferences](/docs/users/organisations/preferences/document) - Manage default document settings

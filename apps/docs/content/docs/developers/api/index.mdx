@@ -1,0 +1,72 @@
+---
+title: API Reference
+description: Complete reference for the Documenso REST API.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+<Callout type="warn">
+  The guides below cover common API patterns but may not reflect the latest endpoints or parameters.
+  For an always up-to-date reference, see the [OpenAPI Reference](https://openapi.documenso.com).
+</Callout>
+
+## Base URL
+
+```
+https://app.documenso.com/api/v2
+```
+
+For self-hosted instances, replace with your instance URL.
+
+---
+
+## Authentication
+
+All requests require an API key in the `Authorization` header:
+
+```
+Authorization: api_xxxxxxxxxxxxxxxx
+```
+
+<Callout type="info">
+  See [Authentication](/docs/developers/getting-started/authentication) for details.
+</Callout>
+
+---
+
+## Endpoints
+
+<Cards>
+  <Card
+    title="Documents"
+    description="Create, retrieve, update, and delete documents."
+    href="/docs/developers/api/documents"
+  />
+  <Card
+    title="Recipients"
+    description="Manage document recipients and signers."
+    href="/docs/developers/api/recipients"
+  />
+  <Card
+    title="Fields"
+    description="Add and configure signature fields."
+    href="/docs/developers/api/fields"
+  />
+  <Card
+    title="Templates"
+    description="Work with document templates."
+    href="/docs/developers/api/templates"
+  />
+  <Card
+    title="Teams"
+    description="Manage teams and team members."
+    href="/docs/developers/api/teams"
+  />
+</Cards>
+
+---
+
+## See Also
+
+- [First API Call](/docs/developers/getting-started/first-api-call) - Quick start example
+- [Webhooks](/docs/developers/webhooks) - Get notified about document events

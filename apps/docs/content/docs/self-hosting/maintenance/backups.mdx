@@ -1,0 +1,674 @@
+---
+title: Backups
+description: Backup strategies for Documenso data.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## What to Back Up
+
+Documenso stores data in three locations:
+
+| Component             | Location                      | Contains                                           |
+| --------------------- | ----------------------------- | -------------------------------------------------- |
+| PostgreSQL database   | Database server               | Users, documents, signatures, audit logs, settings |
+| Signing certificate   | File system or secret manager | Private key for signing documents                  |
+| Document storage (S3) | S3 bucket or database         | Uploaded PDFs and signed documents                 |
+
+<Callout type="warn">
+  The signing certificate is critical. If lost, you cannot sign new documents until a new
+  certificate is configured. Back it up securely.
+</Callout>
+
+### Data Stored in PostgreSQL
+
+The database contains:
+
+- User accounts and authentication data
+- Teams and organisation settings
+- Document metadata (recipients, fields, status)
+- Signatures and signing history
+- Audit logs and activity records
+- Templates and template settings
+- API tokens and webhook configurations
+
+If using database storage (`NEXT_PUBLIC_UPLOAD_TRANSPORT=database`), the database also contains the actual PDF files.
+
+---
+
+## Database Backups
+
+### Using pg_dump
+
+Create a logical backup with `pg_dump`:
+
+| Flag   | Description                                           |
+| ------ | ----------------------------------------------------- |
+| `-h`   | Database host                                         |
+| `-U`   | Database user                                         |
+| `-d`   | Database name                                         |
+| `-F c` | Custom format (compressed, supports parallel restore) |
+| `-f`   | Output file                                           |
+
+<Tabs items={['Direct', 'Docker Compose']}>
+<Tab value="Direct">
+
+```bash
+pg_dump -h localhost -U documenso -d documenso -F c -f documenso_backup.dump
+```
+
+</Tab>
+<Tab value="Docker Compose">
+
+```bash
+docker compose exec database pg_dump -U documenso -F c documenso > documenso_backup.dump
+```
+
+</Tab>
+</Tabs>
+
+### Backup with Timestamp
+
+Include timestamps in backup filenames for easier management:
+
+```bash
+pg_dump -h localhost -U documenso -d documenso -F c \
+  -f "documenso_$(date +%Y%m%d_%H%M%S).dump"
+```
+
+### Plain SQL Backup
+
+For human-readable backups or cross-version compatibility:
+
+```bash
+pg_dump -h localhost -U documenso -d documenso -F p -f documenso_backup.sql
+```
+
+### Compressed Backup
+
+Compress backups to save storage space:
+
+```bash
+pg_dump -h localhost -U documenso -d documenso | gzip > documenso_backup.sql.gz
+```
+
+---
+
+## Certificate Backups
+
+The signing certificate (`.p12` file) is required to sign documents. Store backups securely.
+
+### Locate Your Certificate
+
+Check your environment configuration for the certificate location:
+
+<Tabs items={['File path', 'Base64 contents']}>
+<Tab value="File path">
+
+```bash
+echo $NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH
+```
+
+</Tab>
+<Tab value="Base64 contents">
+
+```bash
+echo $NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS
+```
+
+</Tab>
+</Tabs>
+
+### Back Up Certificate
+
+<Tabs items={['From file', 'From environment']}>
+<Tab value="From file">
+
+Copy the certificate to a secure backup location:
+
+```bash
+cp /opt/documenso/cert.p12 /backup/documenso/cert.p12
+```
+
+</Tab>
+<Tab value="From environment">
+
+If using base64-encoded certificate contents:
+
+```bash
+echo "$NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS" | base64 -d > /backup/documenso/cert.p12
+```
+
+</Tab>
+</Tabs>
+
+### Store Certificate Passphrase
+
+Document the certificate passphrase (`NEXT_PRIVATE_SIGNING_PASSPHRASE`) in a secure password manager or secrets vault. The certificate is unusable without it.
+
+<Callout type="error">
+  Store certificate backups separately from database backups. Use encryption for certificate backup
+  storage.
+</Callout>
+
+---
+
+## Storage Backups (S3)
+
+If using S3 storage (`NEXT_PUBLIC_UPLOAD_TRANSPORT=s3`), back up your S3 bucket.
+
+<Tabs items={['AWS S3', 'S3-Compatible (MinIO, etc.)']}>
+<Tab value="AWS S3">
+
+Enable versioning on your bucket:
+
+```bash
+aws s3api put-bucket-versioning \
+  --bucket your-documenso-bucket \
+  --versioning-configuration Status=Enabled
+```
+
+Sync to a backup location or download locally:
+
+```bash
+aws s3 sync s3://your-documenso-bucket s3://your-backup-bucket
+# or
+aws s3 sync s3://your-documenso-bucket /backup/documenso/documents/
+```
+
+</Tab>
+<Tab value="S3-Compatible (MinIO, etc.)">
+
+Use the same commands with the `--endpoint-url` flag:
+
+```bash
+aws s3 sync s3://your-bucket /backup/documenso/documents/ \
+  --endpoint-url https://your-s3-endpoint.com
+```
+
+</Tab>
+</Tabs>
+
+### Cross-Region Replication
+
+For disaster recovery, enable cross-region replication on your S3 bucket. This automatically copies objects to a bucket in another region.
+
+---
+
+## Automated Backup Script
+
+Create a script to back up all Documenso components:
+
+<Tabs items={['Standalone', 'Docker Compose']}>
+<Tab value="Standalone">
+
+```bash
+#!/bin/bash
+# documenso-backup.sh
+
+set -e
+
+# Configuration
+BACKUP_DIR="/backup/documenso"
+RETENTION_DAYS=30
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+# Database connection
+DB_HOST="localhost"
+DB_USER="documenso"
+DB_NAME="documenso"
+
+# S3 configuration (if applicable)
+S3_BUCKET="your-documenso-bucket"
+
+# Create backup directory
+mkdir -p "$BACKUP_DIR/$TIMESTAMP"
+
+echo "Starting Documenso backup: $TIMESTAMP"
+
+# Database backup
+echo "Backing up database..."
+PGPASSWORD="$DB_PASSWORD" pg_dump -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -F c \
+  -f "$BACKUP_DIR/$TIMESTAMP/database.dump"
+
+# Certificate backup (if file exists)
+if [ -f "/opt/documenso/cert.p12" ]; then
+  echo "Backing up certificate..."
+  cp /opt/documenso/cert.p12 "$BACKUP_DIR/$TIMESTAMP/cert.p12"
+fi
+
+# S3 backup (if configured)
+if [ -n "$S3_BUCKET" ]; then
+  echo "Backing up S3 documents..."
+  aws s3 sync "s3://$S3_BUCKET" "$BACKUP_DIR/$TIMESTAMP/documents/" --quiet
+fi
+
+# Compress backup
+echo "Compressing backup..."
+tar -czf "$BACKUP_DIR/documenso_$TIMESTAMP.tar.gz" -C "$BACKUP_DIR" "$TIMESTAMP"
+rm -rf "$BACKUP_DIR/$TIMESTAMP"
+
+# Calculate checksum
+sha256sum "$BACKUP_DIR/documenso_$TIMESTAMP.tar.gz" > "$BACKUP_DIR/documenso_$TIMESTAMP.sha256"
+
+# Remove old backups
+echo "Removing backups older than $RETENTION_DAYS days..."
+find "$BACKUP_DIR" -name "documenso_*.tar.gz" -mtime +$RETENTION_DAYS -delete
+find "$BACKUP_DIR" -name "documenso_*.sha256" -mtime +$RETENTION_DAYS -delete
+
+echo "Backup completed: documenso_$TIMESTAMP.tar.gz"
+```
+
+</Tab>
+<Tab value="Docker Compose">
+
+```bash
+#!/bin/bash
+# documenso-backup-docker.sh
+
+set -e
+
+BACKUP_DIR="/backup/documenso"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+COMPOSE_PROJECT="documenso-production"
+
+mkdir -p "$BACKUP_DIR"
+
+echo "Starting backup: $TIMESTAMP"
+
+# Database backup via Docker
+docker compose -p "$COMPOSE_PROJECT" exec -T database \
+  pg_dump -U documenso -F c documenso > "$BACKUP_DIR/database_$TIMESTAMP.dump"
+
+# Certificate backup (copy from container if needed)
+docker compose -p "$COMPOSE_PROJECT" cp \
+  documenso:/opt/documenso/cert.p12 "$BACKUP_DIR/cert_$TIMESTAMP.p12" 2>/dev/null || true
+
+echo "Backup completed"
+```
+
+</Tab>
+</Tabs>
+
+Make the script executable:
+
+```bash
+chmod +x /usr/local/bin/documenso-backup.sh
+```
+
+---
+
+## Backup Retention
+
+Implement a retention policy to balance storage costs with recovery needs.
+
+### Recommended Retention Schedule
+
+| Backup Type | Retention | Use Case                |
+| ----------- | --------- | ----------------------- |
+| Hourly      | 24 hours  | Recent changes recovery |
+| Daily       | 7 days    | Short-term recovery     |
+| Weekly      | 4 weeks   | Medium-term recovery    |
+| Monthly     | 12 months | Long-term archival      |
+
+### Retention Script
+
+Add retention logic to your backup script:
+
+```bash
+# Remove hourly backups older than 24 hours
+find "$BACKUP_DIR/hourly" -name "*.dump" -mtime +1 -delete
+
+# Remove daily backups older than 7 days
+find "$BACKUP_DIR/daily" -name "*.dump" -mtime +7 -delete
+
+# Remove weekly backups older than 4 weeks
+find "$BACKUP_DIR/weekly" -name "*.dump" -mtime +28 -delete
+
+# Remove monthly backups older than 12 months
+find "$BACKUP_DIR/monthly" -name "*.dump" -mtime +365 -delete
+```
+
+### Schedule Backups
+
+<Tabs items={['Cron', 'Systemd timer']}>
+<Tab value="Cron">
+
+Add to crontab (`crontab -e`):
+
+```
+# Daily backup at 2:00 AM
+0 2 * * * /usr/local/bin/documenso-backup.sh >> /var/log/documenso-backup.log 2>&1
+
+# Hourly backup (for high-activity instances)
+0 * * * * /usr/local/bin/documenso-backup-hourly.sh >> /var/log/documenso-backup.log 2>&1
+```
+
+</Tab>
+<Tab value="Systemd timer">
+
+Create `/etc/systemd/system/documenso-backup.service`:
+
+```ini
+[Unit]
+Description=Documenso Backup
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/documenso-backup.sh
+User=root
+```
+
+Create `/etc/systemd/system/documenso-backup.timer`:
+
+```ini
+[Unit]
+Description=Daily Documenso Backup
+
+[Timer]
+OnCalendar=*-*-* 02:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+
+Enable the timer:
+
+```bash
+systemctl daemon-reload
+systemctl enable --now documenso-backup.timer
+```
+
+</Tab>
+</Tabs>
+
+---
+
+## Restore Procedures
+
+### Restore Database
+
+<Tabs items={['Custom format', 'Plain SQL']}>
+<Tab value="Custom format">
+
+| Flag | Description                            |
+| ---- | -------------------------------------- |
+| `-c` | Drop existing objects before restoring |
+| `-d` | Target database                        |
+
+Direct:
+
+```bash
+pg_restore -h localhost -U documenso -d documenso -c documenso_backup.dump
+```
+
+Docker Compose:
+
+```bash
+docker compose exec -T database pg_restore -U documenso -d documenso -c < documenso_backup.dump
+```
+
+</Tab>
+<Tab value="Plain SQL">
+
+```bash
+psql -h localhost -U documenso -d documenso < documenso_backup.sql
+```
+
+For compressed backups:
+
+```bash
+gunzip -c documenso_backup.sql.gz | psql -h localhost -U documenso -d documenso
+```
+
+</Tab>
+</Tabs>
+
+### Restore Certificate
+
+Copy the certificate back to the expected location:
+
+```bash
+cp /backup/documenso/cert.p12 /opt/documenso/cert.p12
+chmod 644 /opt/documenso/cert.p12
+chown 1001:1001 /opt/documenso/cert.p12
+```
+
+### Restore S3 Documents
+
+Sync documents back to S3:
+
+```bash
+aws s3 sync /backup/documenso/documents/ s3://your-documenso-bucket
+```
+
+### Full Restore Procedure
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Stop Documenso
+
+```bash
+docker compose stop documenso
+```
+
+</Step>
+<Step>
+### Restore the database
+
+```bash
+docker compose exec -T database pg_restore -U documenso -d documenso -c < backup.dump
+```
+
+</Step>
+<Step>
+### Restore the certificate
+
+```bash
+docker compose cp cert.p12 documenso:/opt/documenso/cert.p12
+```
+
+</Step>
+<Step>
+### Restore S3 documents (if applicable)
+
+```bash
+aws s3 sync /backup/documents/ s3://your-bucket
+```
+
+</Step>
+<Step>
+### Start Documenso
+
+```bash
+docker compose start documenso
+```
+
+</Step>
+<Step>
+### Verify the restore
+
+```bash
+curl http://localhost:3000/api/health
+```
+
+</Step>
+</Steps>
+
+---
+
+## Testing Backups
+
+<Callout type="warn">
+  Untested backups are not backups. Regularly verify that you can restore from your backups.
+</Callout>
+
+### Monthly Restore Test
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Create a test environment
+
+Use a separate database and different port.
+
+</Step>
+<Step>
+### Restore backup
+
+Restore your backup to the test environment.
+
+</Step>
+<Step>
+### Verify
+
+- Users can log in
+- Documents display correctly
+- Signing works with the restored certificate
+
+</Step>
+<Step>
+### Document any issues
+
+Record any problems found during the test.
+
+</Step>
+<Step>
+### Tear down
+
+Remove the test environment when done.
+
+</Step>
+</Steps>
+
+### Automated Restore Verification
+
+Add verification to your backup script:
+
+```bash
+#!/bin/bash
+# verify-backup.sh
+
+BACKUP_FILE="$1"
+TEST_DB="documenso_restore_test"
+
+# Create test database
+psql -h localhost -U postgres -c "CREATE DATABASE $TEST_DB"
+
+# Restore backup
+pg_restore -h localhost -U postgres -d "$TEST_DB" "$BACKUP_FILE"
+
+# Verify table counts
+USERS=$(psql -h localhost -U postgres -d "$TEST_DB" -t -c "SELECT COUNT(*) FROM \"User\"")
+DOCUMENTS=$(psql -h localhost -U postgres -d "$TEST_DB" -t -c "SELECT COUNT(*) FROM \"Document\"")
+
+echo "Verified backup contains: $USERS users, $DOCUMENTS documents"
+
+# Cleanup
+psql -h localhost -U postgres -c "DROP DATABASE $TEST_DB"
+```
+
+### Backup Integrity Checks
+
+Verify backup file integrity:
+
+```bash
+# Check checksum
+sha256sum -c documenso_backup.sha256
+
+# Verify pg_dump format
+pg_restore --list documenso_backup.dump > /dev/null && echo "Backup is valid"
+```
+
+---
+
+## Managed Database Backups
+
+If using a managed PostgreSQL service, configure their backup features.
+
+<Tabs items={['AWS RDS', 'Supabase', 'Neon', 'DigitalOcean']}>
+<Tab value="AWS RDS">
+
+- Enable automated backups (Settings > Backup)
+- Set retention period (7-35 days)
+- Enable Point-in-Time Recovery
+
+</Tab>
+<Tab value="Supabase">
+
+- Daily backups included (Pro plan)
+- Point-in-Time Recovery available
+- Access via Dashboard > Settings > Database
+
+</Tab>
+<Tab value="Neon">
+
+- Automatic branching for instant snapshots
+- Create branches for backup purposes
+
+</Tab>
+<Tab value="DigitalOcean">
+
+- Daily backups with 7-day retention
+- Enable in control panel
+
+</Tab>
+</Tabs>
+
+<Callout type="info">
+  Managed services handle backup automation, but you should still perform occasional manual backups
+  to your own storage for additional protection.
+</Callout>
+
+---
+
+## Off-Site Backup Storage
+
+Store backups in a separate location from your production system.
+
+### Options
+
+| Storage Type    | Pros                                | Cons                   |
+| --------------- | ----------------------------------- | ---------------------- |
+| AWS S3          | Durable, versioned, lifecycle rules | Cost for large backups |
+| Backblaze B2    | Low cost, S3-compatible             | Egress fees            |
+| rsync to remote | Simple, no vendor lock-in           | Requires server        |
+| Encrypted USB   | Air-gapped, no network required     | Manual process         |
+
+### Off-Site Upload
+
+<Tabs items={['Upload to S3', 'Encrypt before upload']}>
+<Tab value="Upload to S3">
+
+```bash
+aws s3 cp documenso_backup.tar.gz s3://your-backup-bucket/documenso/
+```
+
+</Tab>
+<Tab value="Encrypt before upload">
+
+Encrypt backups before storing off-site:
+
+```bash
+# Encrypt
+gpg --symmetric --cipher-algo AES256 documenso_backup.tar.gz
+
+# Decrypt
+gpg --decrypt documenso_backup.tar.gz.gpg > documenso_backup.tar.gz
+```
+
+</Tab>
+</Tabs>
+
+---
+
+## See Also
+
+- [Upgrades](/docs/self-hosting/maintenance/upgrades) - Backup before upgrading
+- [Troubleshooting](/docs/self-hosting/maintenance/troubleshooting) - Common backup issues
+- [Database Configuration](/docs/self-hosting/configuration/database) - Database setup reference
+- [Storage Configuration](/docs/self-hosting/configuration/storage) - S3 storage setup

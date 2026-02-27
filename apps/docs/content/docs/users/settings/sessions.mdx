@@ -1,0 +1,82 @@
+---
+title: Sessions & Activity
+description: View active sessions, monitor security activity, and manage linked accounts.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Active Sessions
+
+View and manage all devices currently logged into your account.
+
+### View Sessions
+
+Go to **Settings**, open the **Security** tab, then click **Manage sessions**.
+
+The sessions table shows:
+
+| Column      | Description                    |
+| ----------- | ------------------------------ |
+| Device      | Browser and operating system   |
+| IP Address  | The IP address of the session  |
+| Last Active | When the session was last used |
+| Created     | When the session started       |
+
+Your current session is marked with a "Current" badge.
+
+### Revoke a Session
+
+<Tabs items={['Revoke one session', 'Log out all']}>
+<Tab value="Revoke one session">
+
+Find the session in the list and click **Revoke**.
+
+</Tab>
+<Tab value="Log out all">
+
+Click **Log out all** at the top of the page and confirm. Your current session stays active; all others are terminated.
+
+</Tab>
+</Tabs>
+
+## Security Activity
+
+Monitor recent security-related events on your account. Go to **Settings**, open the **Security** tab, then click **View activity**.
+
+The activity log shows events such as:
+
+| Event            | Description                           |
+| ---------------- | ------------------------------------- |
+| Sign-in attempts | Login attempts to your account        |
+| Password changes | When your password was changed        |
+| 2FA changes      | When 2FA was enabled or disabled      |
+| Session changes  | When sessions were created or revoked |
+
+## Linked Accounts
+
+View and manage login methods connected to your account (Google, email/password, etc.). Go to **Settings**, open the **Security** tab, and click **Manage linked accounts**.
+
+To remove a login method:
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Find the provider in the list under **Manage linked accounts**.
+  </Step>
+  <Step>
+    Click **Unlink** and confirm.
+  </Step>
+</Steps>
+
+<Callout type="warn">
+  Ensure you have at least one login method available before unlinking an account.
+</Callout>
+
+---
+
+## See Also
+
+- [Security Settings](/docs/users/settings/security) - Manage passwords, 2FA, and passkeys
+- [API Tokens](/docs/users/settings/api-tokens) - Manage programmatic access tokens

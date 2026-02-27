@@ -1,0 +1,469 @@
+---
+title: Railway
+description: Deploy Documenso on Railway with automatic builds from Git, managed PostgreSQL, and built-in networking. Use the one-click template or manual setup.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+<Callout type="warn">
+  This guide is a community contribution and may be outdated. If you run into issues, check the
+  [GitHub Discussions](https://github.com/documenso/documenso/discussions) for help.
+</Callout>
+
+## Prerequisites
+
+Before deploying, you need:
+
+- A [Railway account](https://railway.app/) (free tier available)
+- SMTP credentials for sending emails (required for document signing requests)
+- A custom domain (optional but recommended for production)
+
+## One-Click Deploy
+
+The fastest way to deploy Documenso on Railway is using the official template:
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/bG6D4p)
+
+This template automatically provisions:
+
+- Documenso application service
+- PostgreSQL database
+- Required environment variables with secure defaults
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Click the deploy button
+
+Click the "Deploy on Railway" button above. You'll be redirected to Railway and prompted to log in if needed.
+
+</Step>
+
+<Step>
+### Configure environment variables
+
+Railway will prompt you to configure required variables. At minimum, set:
+
+| Variable                         | Description                                                                                                        |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_WEBAPP_URL`         | The public URL for your deployment (use the Railway-provided URL initially, update later if using a custom domain) |
+| `NEXT_PRIVATE_SMTP_HOST`         | Your SMTP server hostname                                                                                          |
+| `NEXT_PRIVATE_SMTP_PORT`         | SMTP port (typically 587 or 465)                                                                                   |
+| `NEXT_PRIVATE_SMTP_USERNAME`     | SMTP username                                                                                                      |
+| `NEXT_PRIVATE_SMTP_PASSWORD`     | SMTP password                                                                                                      |
+| `NEXT_PRIVATE_SMTP_FROM_ADDRESS` | Sender email address                                                                                               |
+| `NEXT_PRIVATE_SMTP_FROM_NAME`    | Sender display name                                                                                                |
+
+The template automatically generates secure values for `NEXTAUTH_SECRET`, `NEXT_PRIVATE_ENCRYPTION_KEY`, and `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY`.
+
+</Step>
+
+<Step>
+### Deploy
+
+Click "Deploy" to start the deployment. Railway builds the application from the Dockerfile and provisions the database.
+
+This takes approximately 5-10 minutes for the initial build.
+
+</Step>
+
+<Step>
+### Access your deployment
+
+Once deployed, Railway provides a URL like `documenso-production.up.railway.app`.
+
+Click the URL in the Railway dashboard to access your Documenso instance.
+
+</Step>
+</Steps>
+
+## Manual Deployment
+
+If you prefer more control over the setup, deploy Documenso manually:
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Create a new project
+
+- Log in to [Railway](https://railway.app/)
+- Click "New Project"
+- Select "Deploy from GitHub repo"
+- Connect your GitHub account if not already connected
+- Fork or select the [Documenso repository](https://github.com/documenso/documenso)
+
+</Step>
+
+<Step>
+### Configure the build
+
+Railway automatically detects the `railway.toml` configuration file in the repository, which specifies:
+
+```toml
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "/docker/Dockerfile"
+```
+
+No additional build configuration is needed.
+
+</Step>
+
+<Step>
+### Add PostgreSQL database
+
+- In your project, click "New"
+- Select "Database"
+- Choose "PostgreSQL"
+- Railway provisions the database and automatically sets `DATABASE_URL`
+
+</Step>
+
+<Step>
+### Configure environment variables
+
+Click on the Documenso service and go to the "Variables" tab. Add the following variables:
+
+**Required variables:**
+
+```bash
+NEXTAUTH_SECRET=<generate with: openssl rand -base64 32>
+NEXT_PRIVATE_ENCRYPTION_KEY=<minimum 32 character random string>
+NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=<minimum 32 character random string>
+NEXT_PUBLIC_WEBAPP_URL=https://<your-railway-url>.up.railway.app
+NEXT_PRIVATE_DATABASE_URL=${{Postgres.DATABASE_URL}}
+NEXT_PRIVATE_DIRECT_DATABASE_URL=${{Postgres.DATABASE_URL}}
+NEXT_PRIVATE_SMTP_TRANSPORT=smtp-auth
+NEXT_PRIVATE_SMTP_HOST=<your-smtp-host>
+NEXT_PRIVATE_SMTP_PORT=587
+NEXT_PRIVATE_SMTP_USERNAME=<your-smtp-username>
+NEXT_PRIVATE_SMTP_PASSWORD=<your-smtp-password>
+NEXT_PRIVATE_SMTP_FROM_NAME=Documenso
+NEXT_PRIVATE_SMTP_FROM_ADDRESS=noreply@yourdomain.com
+```
+
+<Callout type="info">
+  Use `${{Postgres.DATABASE_URL}}` to reference the Railway-managed PostgreSQL connection string. Railway automatically resolves this reference.
+</Callout>
+
+**Optional variables:**
+
+| Variable                          | Description                        | Default |
+| --------------------------------- | ---------------------------------- | ------- |
+| `PORT`                            | Application port                   | `3000`  |
+| `NEXT_PUBLIC_DISABLE_SIGNUP`      | Disable public signups             | `false` |
+| `NEXT_PRIVATE_SIGNING_PASSPHRASE` | Passphrase for signing certificate | -       |
+| `DOCUMENSO_DISABLE_TELEMETRY`     | Disable anonymous telemetry        | `false` |
+
+</Step>
+
+<Step>
+### Deploy
+
+Click "Deploy" or push a commit to trigger a new deployment. Railway builds and deploys the application automatically.
+
+</Step>
+</Steps>
+
+## Environment Variables
+
+Railway manages environment variables through its dashboard. The full list of configuration options is documented in [Environment Variables](/docs/self-hosting/configuration/environment).
+
+### Referencing Railway Services
+
+Railway allows referencing other services in your project using the `${{ServiceName.VARIABLE}}` syntax:
+
+```bash
+NEXT_PRIVATE_DATABASE_URL=${{Postgres.DATABASE_URL}}
+```
+
+This ensures connection strings stay in sync when Railway updates service configurations.
+
+## Database Setup
+
+Railway's managed PostgreSQL handles database provisioning automatically. The database:
+
+- Runs PostgreSQL 15 by default
+- Includes automatic backups on paid plans
+- Provides connection pooling via the internal network
+
+### Database Connection
+
+For Railway deployments, use the same connection string for both pooled and direct connections:
+
+```bash
+NEXT_PRIVATE_DATABASE_URL=${{Postgres.DATABASE_URL}}
+NEXT_PRIVATE_DIRECT_DATABASE_URL=${{Postgres.DATABASE_URL}}
+```
+
+Documenso runs database migrations automatically on startup.
+
+### Accessing the Database
+
+To connect directly to your database for debugging or maintenance:
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Open the PostgreSQL service
+
+In your Railway project dashboard, select the PostgreSQL service.
+
+</Step>
+<Step>
+### Open the Connect tab
+
+The "Connect" tab shows the connection string and credentials.
+
+</Step>
+<Step>
+### Connect with your client
+
+Use the provided connection string with your preferred PostgreSQL client.
+
+</Step>
+</Steps>
+
+## Custom Domain
+
+Railway provides a generated URL by default. To use your own domain:
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Generate a domain
+
+- Click on your Documenso service
+- Go to "Settings" > "Networking"
+- Click "Generate Domain" to get a Railway subdomain, or proceed to add a custom domain
+
+</Step>
+
+<Step>
+### Add custom domain
+
+- In "Settings" > "Networking", click "Custom Domain"
+- Enter your domain (e.g., `sign.yourdomain.com`)
+- Railway provides DNS records to configure
+
+</Step>
+
+<Step>
+### Configure DNS
+
+Add the following DNS records at your domain registrar:
+
+| Type  | Name | Value                           |
+| ----- | ---- | ------------------------------- |
+| CNAME | sign | `<your-project>.up.railway.app` |
+
+DNS propagation can take up to 24 hours.
+
+</Step>
+
+<Step>
+### Update environment variable
+
+Update `NEXT_PUBLIC_WEBAPP_URL` to match your custom domain:
+
+```bash
+NEXT_PUBLIC_WEBAPP_URL=https://sign.yourdomain.com
+```
+
+Railway automatically provisions and renews SSL certificates for custom domains.
+
+</Step>
+</Steps>
+
+## Scaling Options
+
+Railway provides several options for scaling your Documenso deployment:
+
+### Vertical Scaling
+
+Increase resources for your service:
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Open your Documenso service
+
+In the Railway dashboard, select the Documenso service.
+
+</Step>
+<Step>
+### Open Settings
+
+In "Settings" you can change the resource limits for the service.
+
+</Step>
+<Step>
+### Adjust memory and CPU
+
+Raise the memory and CPU limits; Railway will scale within these limits based on demand.
+
+</Step>
+</Steps>
+
+### Horizontal Scaling
+
+Railway supports horizontal scaling through replicas:
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Open service Settings
+
+In the Railway dashboard, select your Documenso service and open "Settings".
+
+</Step>
+<Step>
+### Enable Horizontal Scaling
+
+Turn on "Horizontal Scaling" so Railway can run multiple instances.
+
+</Step>
+<Step>
+### Set replicas
+
+Choose how many replicas to run; Railway will load-balance traffic across them.
+
+</Step>
+</Steps>
+
+<Callout type="warn">
+  Documenso stores sessions in the database, so horizontal scaling works without additional
+  configuration. However, ensure your database can handle the increased connection load.
+</Callout>
+
+### Database Scaling
+
+For high-traffic deployments:
+
+- Upgrade to a larger PostgreSQL instance in Railway
+- Consider using connection pooling with PgBouncer
+- Configure read replicas for read-heavy workloads
+
+## Cost Estimate
+
+Railway uses usage-based pricing. Estimated monthly costs for Documenso:
+
+| Tier  | Resources                          | Estimated Cost |
+| ----- | ---------------------------------- | -------------- |
+| Trial | $5 credit, limited hours           | Free           |
+| Hobby | 512MB RAM, shared CPU              | $5-10/month    |
+| Pro   | 2GB RAM, dedicated CPU             | $20-40/month   |
+| Team  | Custom resources, priority support | $50+/month     |
+
+Actual costs depend on:
+
+- Application memory usage (typically 500MB-1GB)
+- Database size and query volume
+- Egress bandwidth
+- Number of deployments
+
+<Callout type="info">
+  Railway charges based on actual resource consumption. Monitor usage in the Railway dashboard to
+  optimize costs.
+</Callout>
+
+### Free Tier Limitations
+
+Railway's trial tier includes:
+
+- $5 of free credit
+- 500 hours of execution time per month
+- Limited to 512MB RAM per service
+
+This is sufficient for testing but not recommended for production.
+
+## Signing Certificate
+
+Documenso requires a signing certificate to sign documents. On Railway, you can:
+
+### Option 1: Use Generated Certificate (Default)
+
+Documenso generates a self-signed certificate automatically if none is provided. This works for testing but shows generic certificate information in signed documents.
+
+### Option 2: Mount Custom Certificate
+
+For production use, provide your own certificate:
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Base64-encode your certificate
+
+Run this and copy the output (single line, no newlines):
+
+```bash
+base64 -i your-cert.p12 | tr -d '\n'
+```
+
+</Step>
+<Step>
+### Add environment variables in Railway
+
+In your Documenso service variables, set:
+
+```bash
+NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS=<base64-encoded-certificate>
+NEXT_PRIVATE_SIGNING_PASSPHRASE=<certificate-password>
+```
+
+</Step>
+</Steps>
+
+<Callout type="warn">
+  Your certificate must have a password. Certificates without passwords cause signing errors.
+</Callout>
+
+See [Signing Certificate Configuration](/docs/self-hosting/configuration/signing-certificate) for detailed instructions.
+
+## Troubleshooting
+
+<Accordions type="multiple">
+  <Accordion title="Build fails">
+    Check the build logs in Railway for specific errors. Common causes: out of memory (increase the build memory limit in service settings), Docker build timeout (Railway has a 20-minute build timeout; ensure your build completes within this limit).
+  </Accordion>
+  <Accordion title="Application crashes on startup">
+    View the deployment logs: click your service, go to Deployments, click the failed deployment. Common issues: missing environment variables (verify all required variables are set), database connection failed (check `NEXT_PRIVATE_DATABASE_URL` references the correct PostgreSQL service), invalid encryption keys (ensure keys are at least 32 characters).
+  </Accordion>
+  <Accordion title="Emails not sending">
+    Verify SMTP configuration: check `NEXT_PRIVATE_SMTP_TRANSPORT` is set to `smtp-auth`, verify SMTP credentials are correct, ensure your SMTP provider allows connections from Railway's IP addresses.
+  </Accordion>
+  <Accordion title="Database connection errors">
+    Verify PostgreSQL service is running, check the variable reference syntax `${{Postgres.DATABASE_URL}}`, try redeploying the application.
+  </Accordion>
+  <Accordion title="Slow performance">
+    Increase memory allocation for the service, check database query performance in Railway's metrics, consider upgrading to a larger PostgreSQL instance.
+  </Accordion>
+</Accordions>
+
+## Other One-Click Deployment Options
+
+### Render
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
+
+### Koyeb
+
+<a href="https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=documenso-app&builder=dockerfile&dockerfile=/docker/Dockerfile">
+  <img
+    src="https://www.koyeb.com/static/images/deploy/button.svg"
+    alt="Deploy to Koyeb"
+    width="193"
+    height="34"
+  />
+</a>
+
+---
+
+## See Also
+
+- [Email Configuration](/docs/self-hosting/configuration/email) - Configure email providers
+- [Signing Certificate](/docs/self-hosting/configuration/signing-certificate) - Set up document signing
+- [Storage Configuration](/docs/self-hosting/configuration/storage) - Configure S3 storage for documents
+- [Environment Variables](/docs/self-hosting/configuration/environment) - Full configuration reference

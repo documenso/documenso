@@ -1,0 +1,136 @@
+---
+title: React
+description: Embed Documenso signing in your React application using the official SDK.
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Installation
+
+<Tabs items={['npm', 'yarn', 'pnpm']}>
+  <Tab value="npm">``` npm install @documenso/embed-react ```</Tab>
+  <Tab value="yarn">``` yarn add @documenso/embed-react ```</Tab>
+  <Tab value="pnpm">``` pnpm add @documenso/embed-react ```</Tab>
+</Tabs>
+
+---
+
+## Direct Template
+
+```tsx
+import { EmbedDirectTemplate } from '@documenso/embed-react';
+
+const SigningPage = () => {
+  return (
+    <EmbedDirectTemplate
+      token="your-template-token"
+      name="John Doe"
+      email="john@example.com"
+      lockEmail={true}
+      externalId="order-12345"
+      onDocumentReady={() => console.log('Ready')}
+      onDocumentCompleted={(data) => {
+        console.log('Signed:', data.documentId);
+      }}
+      onDocumentError={() => console.error('Error')}
+    />
+  );
+};
+```
+
+---
+
+## Signing Token
+
+```tsx
+import { EmbedSignDocument } from '@documenso/embed-react';
+
+const SigningPage = ({ token }: { token: string }) => {
+  return (
+    <EmbedSignDocument
+      token={token}
+      onDocumentCompleted={(data) => {
+        console.log('Signed:', data.documentId);
+      }}
+    />
+  );
+};
+```
+
+---
+
+## Styling (Platform Plan)
+
+```tsx
+import { EmbedDirectTemplate } from '@documenso/embed-react';
+
+const StyledEmbed = () => {
+  return (
+    <EmbedDirectTemplate
+      token="your-token"
+      css={`
+        .documenso-embed {
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+      `}
+      cssVars={{
+        primary: '#0000FF',
+        background: '#F5F5F5',
+        radius: '8px',
+      }}
+      darkModeDisabled={true}
+    />
+  );
+};
+```
+
+See [CSS Variables](/docs/developers/embedding/css-variables) for all available variables.
+
+---
+
+## Complete Example
+
+```tsx
+import { useState } from 'react';
+
+import { EmbedDirectTemplate } from '@documenso/embed-react';
+
+type Status = 'loading' | 'ready' | 'completed' | 'error';
+
+const DocumentSigning = ({ token }: { token: string }) => {
+  const [status, setStatus] = useState<Status>('loading');
+
+  if (status === 'completed') {
+    return <p>Thank you for signing the document.</p>;
+  }
+
+  if (status === 'error') {
+    return <p>An error occurred. Please try again.</p>;
+  }
+
+  return (
+    <div style={{ position: 'relative', height: '100vh' }}>
+      {status === 'loading' && (
+        <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center' }}>
+          Loading...
+        </div>
+      )}
+      <EmbedDirectTemplate
+        token={token}
+        onDocumentReady={() => setStatus('ready')}
+        onDocumentCompleted={() => setStatus('completed')}
+        onDocumentError={() => setStatus('error')}
+      />
+    </div>
+  );
+};
+```
+
+---
+
+## See Also
+
+- [Embedding Overview](/docs/developers/embedding) - Props reference and concepts
+- [CSS Variables](/docs/developers/embedding/css-variables) - Customize appearance
+- [Authoring](/docs/developers/embedding/authoring) - Embed document creation

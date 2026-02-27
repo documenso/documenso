@@ -1,0 +1,92 @@
+---
+title: Angular
+description: Embed Documenso signing in your Angular application using the official SDK.
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Installation
+
+<Tabs items={['npm', 'yarn', 'pnpm']}>
+  <Tab value="npm">``` npm install @documenso/embed-angular ```</Tab>
+  <Tab value="yarn">``` yarn add @documenso/embed-angular ```</Tab>
+  <Tab value="pnpm">``` pnpm add @documenso/embed-angular ```</Tab>
+</Tabs>
+
+---
+
+## Direct Template
+
+```typescript
+import { Component } from '@angular/core';
+import { EmbedDirectTemplate } from '@documenso/embed-angular';
+
+@Component({
+  selector: 'app-signing',
+  standalone: true,
+  imports: [EmbedDirectTemplate],
+  template: `
+    <embed-direct-template
+      [token]="token"
+      [name]="'John Doe'"
+      [email]="'john@example.com'"
+      [lockEmail]="true"
+      [externalId]="'order-12345'"
+      (documentReady)="onReady()"
+      (documentCompleted)="onCompleted($event)"
+      (documentError)="onError()"
+    />
+  `,
+})
+export class SigningComponent {
+  token = 'your-template-token';
+
+  onReady() {
+    console.log('Ready');
+  }
+
+  onCompleted(data: { documentId: number }) {
+    console.log('Signed:', data.documentId);
+  }
+
+  onError() {
+    console.error('Error');
+  }
+}
+```
+
+---
+
+## Signing Token
+
+```typescript
+import { Component, Input } from '@angular/core';
+import { EmbedSignDocument } from '@documenso/embed-angular';
+
+@Component({
+  selector: 'app-signing',
+  standalone: true,
+  imports: [EmbedSignDocument],
+  template: `
+    <embed-sign-document
+      [token]="token"
+      (documentCompleted)="onCompleted($event)"
+    />
+  `,
+})
+export class SigningComponent {
+  @Input() token = '';
+
+  onCompleted(data: { documentId: number }) {
+    console.log('Signed:', data.documentId);
+  }
+}
+```
+
+---
+
+## See Also
+
+- [Embedding Overview](/docs/developers/embedding) - Props reference and concepts
+- [CSS Variables](/docs/developers/embedding/css-variables) - Customize appearance
+- [Authoring](/docs/developers/embedding/authoring) - Embed document creation

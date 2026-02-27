@@ -1,0 +1,215 @@
+---
+title: Create Templates
+description: Build reusable document templates for contracts, agreements, and other documents you send frequently.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+## Overview
+
+Templates are reusable document configurations that save you from recreating the same setup every time you send a similar document. A template stores your PDF, recipient roles, field placements, and settings so you can generate new documents with a few clicks.
+
+Use templates when you:
+
+- Send the same type of document regularly (contracts, NDAs, onboarding forms)
+- Need consistent field placement across documents
+- Want to pre-configure recipients and signing workflows
+- Plan to use [direct links](/docs/users/documents/direct-links) for public signing
+
+## Create a Template from Scratch
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Go to templates
+
+Navigate to **Templates** in the sidebar and click **Upload Template**.
+
+![Templates page](/templates/documenso-template-page.webp)
+
+</Step>
+
+<Step>
+### Upload your document
+
+Select one or more PDF files to upload. If you select multiple files, they're combined into a single template.
+
+After uploading, you'll enter the template editor where you can configure recipients, fields, and settings.
+
+![Template with uploaded document](/templates/documenso-template-page-uploaded-document.webp)
+
+</Step>
+
+<Step>
+### Add recipients
+
+Add the people who will interact with documents created from this template. For each recipient, specify:
+
+- **Email**: Use a real email if the recipient is always the same person, or a placeholder email (like `client@placeholder.com`) if it changes each time
+- **Name**: Optional, but helps identify recipients
+- **Role**: What the recipient needs to do (Signer, Approver, Viewer, CC)
+
+![Template recipients](/templates/documenso-template-recipients.webp)
+
+</Step>
+
+<Step>
+### Add fields
+
+Drag fields from the field palette onto your document and assign them to recipients. At minimum, each signer needs one signature field.
+
+See [Add Fields](/docs/users/documents/add-fields) for detailed guidance on field types and configuration.
+
+</Step>
+
+<Step>
+### Save the template
+
+Click **Save Template** to finish. Your template appears in the Templates list, ready to use.
+
+</Step>
+</Steps>
+
+---
+
+## Placeholder Recipients
+
+Templates often need placeholder recipients - people whose actual email addresses you won't know until you use the template. For example, a sales contract template might have:
+
+- **You** (your real email) - Always signs as the company representative
+- **Client** (placeholder) - Different person for each contract
+
+### Setting up placeholders
+
+Use any email format that's clearly a placeholder:
+
+- `client@placeholder.com`
+- `signer1@example.com`
+- `recipient@documenso.com`
+
+When you [use the template](/docs/users/templates/use), you'll replace these placeholders with actual recipient emails.
+
+### When to use real emails
+
+Use real email addresses when the recipient is always the same person:
+
+- Your own email for documents you always sign
+- A team member who reviews all contracts
+- A compliance officer who needs to approve every agreement
+
+---
+
+## Template Settings
+
+Click the settings icon in the template editor to configure these options:
+
+### Title
+
+The template name shown in your Templates list. Use a descriptive name like "Standard NDA" or "Freelance Contract - Hourly" so you can find it quickly.
+
+The title also becomes the default document name when you create documents from the template. Recipients see this name in their signing invitation.
+
+### External ID
+
+An optional identifier for integrating with external systems. Use this to:
+
+- Match templates to records in your CRM or contract management system
+- Track which template generated a document in your analytics
+- Reference templates in API calls
+
+The external ID has no effect on document signing - it's purely for your reference.
+
+### Global settings
+
+Additional options that apply to all documents created from this template:
+
+| Setting      | Description                                                      |
+| ------------ | ---------------------------------------------------------------- |
+| Date format  | How dates appear in Date fields (e.g., MM/DD/YYYY or DD/MM/YYYY) |
+| Time zone    | Time zone used for date calculations                             |
+| Redirect URL | Where to send recipients after they finish signing               |
+| Language     | Language for the signing interface and emails                    |
+
+---
+
+## Template Visibility
+
+All templates are created in a team context. Team members can see, edit, delete, and use the templates in that team. See [Organisations](/docs/users/organisations) to learn about creating and managing organisations.
+
+---
+
+## Edit a Template
+
+To modify an existing template:
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Go to **Templates** and find the template you want to edit.
+  </Step>
+  <Step>
+    Click on the template to open it in the editor.
+  </Step>
+  <Step>
+    Make your changes to recipients, fields, or settings.
+  </Step>
+  <Step>
+    Click **Save Template**.
+  </Step>
+</Steps>
+
+Changes only affect future documents created from the template. Documents already created from this template are not updated.
+
+---
+
+## Duplicate a Template
+
+To create a copy of an existing template:
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Go to **Templates** and find the template.
+  </Step>
+  <Step>
+    Click the three-dot menu and select **Duplicate**.
+  </Step>
+  <Step>
+    The copy opens in the editor; make any changes and save with a new name.
+  </Step>
+</Steps>
+
+This is useful when you need a variation of an existing template without modifying the original.
+
+---
+
+## Delete a Template
+
+To delete a template:
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Go to **Templates** and find the template.
+  </Step>
+  <Step>
+    Click the three-dot menu and select **Delete**.
+  </Step>
+  <Step>
+    Confirm the deletion.
+  </Step>
+</Steps>
+
+<Callout type="warn">
+  Deleting a template is permanent. Documents already created from the template are not affected,
+  but you won't be able to create new documents from it.
+</Callout>
+
+---
+
+## See Also
+
+- [Use a Template](/docs/users/templates/use) - Create documents from your template
+- [Direct Links](/docs/users/documents/direct-links) - Share a signing link without knowing recipient emails
+- [API: Templates](/docs/developers/api/templates) - Create and use templates programmatically

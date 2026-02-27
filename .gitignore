@@ -67,3 +67,6 @@ scripts/output*
 # license
 .documenso-license.json
 .documenso-license-backup.json
+
+# tmp
+tmp/

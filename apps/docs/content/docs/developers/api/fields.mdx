@@ -1,0 +1,738 @@
+---
+title: Fields API
+description: Add signature and form fields to documents via API.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+<Callout type="warn">
+  This guide may not reflect the latest endpoints or parameters. For an always up-to-date reference,
+  see the [OpenAPI Reference](https://openapi.documenso.com).
+</Callout>
+
+## Field Object
+
+| Property         | Type           | Description                                  |
+| ---------------- | -------------- | -------------------------------------------- |
+| `id`             | number         | Unique field identifier                      |
+| `secondaryId`    | string         | Secondary identifier for audit logs          |
+| `type`           | string         | Field type (see [Field Types](#field-types)) |
+| `recipientId`    | number         | ID of the recipient assigned to this field   |
+| `envelopeId`     | number         | ID of the parent envelope                    |
+| `envelopeItemId` | string         | ID of the PDF item the field is placed on    |
+| `page`           | number         | Page number (1-indexed)                      |
+| `positionX`      | number         | X coordinate as percentage (0-100)           |
+| `positionY`      | number         | Y coordinate as percentage (0-100)           |
+| `width`          | number         | Width as percentage of page (0-100)          |
+| `height`         | number         | Height as percentage of page (0-100)         |
+| `customText`     | string         | Value entered by the recipient               |
+| `inserted`       | boolean        | Whether the field has been completed         |
+| `fieldMeta`      | object \| null | Type-specific configuration options          |
+
+### Example Field Object
+
+```json
+{
+  "id": 456,
+  "secondaryId": "field_abc123",
+  "type": "SIGNATURE",
+  "recipientId": 123,
+  "envelopeId": 789,
+  "envelopeItemId": "envelope_item_xyz",
+  "page": 1,
+  "positionX": 10,
+  "positionY": 80,
+  "width": 30,
+  "height": 5,
+  "customText": "",
+  "inserted": false,
+  "fieldMeta": {
+    "type": "signature",
+    "required": true
+  }
+}
+```
+
+---
+
+## Field Types
+
+| Type             | Description                               | Auto-filled |
+| ---------------- | ----------------------------------------- | ----------- |
+| `SIGNATURE`      | Drawn, typed, or uploaded signature       | No          |
+| `FREE_SIGNATURE` | Unrestricted signature without validation | No          |
+| `INITIALS`       | Recipient's initials                      | No          |
+| `NAME`           | Recipient's full name                     | Yes         |
+| `EMAIL`          | Recipient's email address                 | Yes         |
+| `DATE`           | Date the field was completed              | Yes         |
+| `TEXT`           | Free-form text input                      | No          |
+| `NUMBER`         | Numeric input with optional validation    | No          |
+| `RADIO`          | Single selection from options             | No          |
+| `CHECKBOX`       | Multiple selections from options          | No          |
+| `DROPDOWN`       | Single selection from a dropdown menu     | No          |
+
+---
+
+## Get Field
+
+Retrieve a single field by ID.
+
+```
+GET /envelope/field/{fieldId}
+```
+
+### Path Parameters
+
+| Parameter | Type   | Description  |
+| --------- | ------ | ------------ |
+| `fieldId` | number | The field ID |
+
+### Code Examples
+
+<Tabs items={['curl', 'TypeScript']}>
+<Tab value="curl">
+```bash
+curl -X GET "https://app.documenso.com/api/v2/envelope/field/456" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx"
+```
+</Tab>
+<Tab value="TypeScript">
+```typescript
+const response = await fetch(
+  'https://app.documenso.com/api/v2/envelope/field/456',
+  {
+    method: 'GET',
+    headers: {
+      Authorization: 'api_xxxxxxxxxxxxxxxx',
+    },
+  }
+);
+
+const field = await response.json();
+console.log(field.type, field.page);
+
+```
+</Tab>
+</Tabs>
+
+### Response
+
+Returns the field object.
+
+---
+
+## Create Fields
+
+Add one or more fields to a document.
+
+```
+
+POST /envelope/field/create-many
+
+````
+
+### Request Body
+
+| Field       | Type   | Required | Description                     |
+| ----------- | ------ | -------- | ------------------------------- |
+| `documentId`| number | Yes      | The document ID                 |
+| `fields`    | array  | Yes      | Array of field configurations   |
+
+### Code Examples
+
+<Tabs items={['curl', 'TypeScript']}>
+<Tab value="curl">
+```bash
+curl -X POST "https://app.documenso.com/api/v2/envelope/field/create-many" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "documentId": 123,
+    "fields": [
+      {
+        "type": "SIGNATURE",
+        "recipientId": 456,
+        "pageNumber": 1,
+        "pageX": 10,
+        "pageY": 80,
+        "width": 30,
+        "height": 5
+      },
+      {
+        "type": "DATE",
+        "recipientId": 456,
+        "pageNumber": 1,
+        "pageX": 50,
+        "pageY": 80,
+        "width": 20,
+        "height": 3
+      },
+      {
+        "type": "TEXT",
+        "recipientId": 456,
+        "pageNumber": 1,
+        "pageX": 10,
+        "pageY": 70,
+        "width": 40,
+        "height": 4,
+        "fieldMeta": {
+          "type": "text",
+          "label": "Job Title",
+          "placeholder": "Enter your job title",
+          "required": true
+        }
+      }
+    ]
+  }'
+````
+
+</Tab>
+<Tab value="TypeScript">
+```typescript
+const response = await fetch(
+  'https://app.documenso.com/api/v2/envelope/field/create-many',
+  {
+    method: 'POST',
+    headers: {
+      Authorization: 'api_xxxxxxxxxxxxxxxx',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      documentId: 123,
+      fields: [
+        {
+          type: 'SIGNATURE',
+          recipientId: 456,
+          pageNumber: 1,
+          pageX: 10,
+          pageY: 80,
+          width: 30,
+          height: 5,
+        },
+        {
+          type: 'DATE',
+          recipientId: 456,
+          pageNumber: 1,
+          pageX: 50,
+          pageY: 80,
+          width: 20,
+          height: 3,
+        },
+        {
+          type: 'TEXT',
+          recipientId: 456,
+          pageNumber: 1,
+          pageX: 10,
+          pageY: 70,
+          width: 40,
+          height: 4,
+          fieldMeta: {
+            type: 'text',
+            label: 'Job Title',
+            placeholder: 'Enter your job title',
+            required: true,
+          },
+        },
+      ],
+    }),
+  }
+);
+
+const { fields } = await response.json();
+console.log(`Created ${fields.length} fields`);
+
+````
+</Tab>
+</Tabs>
+
+### Response
+
+```json
+{
+  "fields": [
+    {
+      "id": 101,
+      "type": "SIGNATURE",
+      "recipientId": 456,
+      "page": 1,
+      "positionX": 10,
+      "positionY": 80,
+      "width": 30,
+      "height": 5
+    },
+    {
+      "id": 102,
+      "type": "DATE",
+      "recipientId": 456,
+      "page": 1,
+      "positionX": 50,
+      "positionY": 80,
+      "width": 20,
+      "height": 3
+    },
+    {
+      "id": 103,
+      "type": "TEXT",
+      "recipientId": 456,
+      "page": 1,
+      "positionX": 10,
+      "positionY": 70,
+      "width": 40,
+      "height": 4
+    }
+  ]
+}
+````
+
+---
+
+## Update Fields
+
+Update one or more fields in a single request.
+
+```
+POST /envelope/field/update-many
+```
+
+### Request Body
+
+| Field        | Type   | Required | Description                   |
+| ------------ | ------ | -------- | ----------------------------- |
+| `documentId` | number | Yes      | The document ID               |
+| `fields`     | array  | Yes      | Array of field update objects |
+
+### Code Examples
+
+<Tabs items={['curl', 'TypeScript']}>
+<Tab value="curl">
+```bash
+curl -X POST "https://app.documenso.com/api/v2/envelope/field/update-many" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "documentId": 123,
+    "fields": [
+      {
+        "id": 101,
+        "type": "SIGNATURE",
+        "pageY": 85
+      },
+      {
+        "id": 102,
+        "type": "DATE",
+        "pageY": 85
+      }
+    ]
+  }'
+```
+</Tab>
+<Tab value="TypeScript">
+```typescript
+const response = await fetch(
+  'https://app.documenso.com/api/v2/envelope/field/update-many',
+  {
+    method: 'POST',
+    headers: {
+      Authorization: 'api_xxxxxxxxxxxxxxxx',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      documentId: 123,
+      fields: [
+        { id: 101, type: 'SIGNATURE', pageY: 85 },
+        { id: 102, type: 'DATE', pageY: 85 },
+      ],
+    }),
+  }
+);
+
+const { fields } = await response.json();
+
+````
+</Tab>
+</Tabs>
+
+### Response
+
+```json
+{
+  "fields": [
+    { "id": 101, "type": "SIGNATURE", "positionY": 85 },
+    { "id": 102, "type": "DATE", "positionY": 85 }
+  ]
+}
+````
+
+---
+
+## Delete Field
+
+Remove a field from a document.
+
+```
+POST /envelope/field/delete
+```
+
+### Request Body
+
+| Field     | Type   | Required | Description  |
+| --------- | ------ | -------- | ------------ |
+| `fieldId` | number | Yes      | The field ID |
+
+### Code Examples
+
+<Tabs items={['curl', 'TypeScript']}>
+<Tab value="curl">
+```bash
+curl -X POST "https://app.documenso.com/api/v2/envelope/field/delete" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fieldId": 456
+  }'
+```
+</Tab>
+<Tab value="TypeScript">
+```typescript
+const response = await fetch(
+  'https://app.documenso.com/api/v2/envelope/field/delete',
+  {
+    method: 'POST',
+    headers: {
+      Authorization: 'api_xxxxxxxxxxxxxxxx',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      fieldId: 456,
+    }),
+  }
+);
+
+const { success } = await response.json();
+
+````
+</Tab>
+</Tabs>
+
+### Response
+
+```json
+{
+  "success": true
+}
+````
+
+---
+
+## Field Positioning
+
+Fields use percentage-based coordinates relative to the PDF page dimensions.
+
+| Property    | Range | Description                                        |
+| ----------- | ----- | -------------------------------------------------- |
+| `positionX` | 0-100 | Horizontal position from left edge (0 = left edge) |
+| `positionY` | 0-100 | Vertical position from top edge (0 = top edge)     |
+| `width`     | 0-100 | Field width as percentage of page width            |
+| `height`    | 0-100 | Field height as percentage of page height          |
+| `page`      | 1+    | Page number (1-indexed)                            |
+
+### Coordinate System
+
+```
+(0,0) ─────────────────────────── (100,0)
+  │                                   │
+  │    ┌─────────┐                    │
+  │    │  Field  │ (pageX: 10,        │
+  │    │         │  pageY: 20,        │
+  │    └─────────┘  width: 30,        │
+  │                 height: 5)        │
+  │                                   │
+(0,100) ─────────────────────────(100,100)
+```
+
+### Example: Position a Signature at Bottom Right
+
+```typescript
+const field = {
+  type: 'SIGNATURE',
+  recipientId: 123,
+  pageNumber: 1,
+  pageX: 60, // 60% from left
+  pageY: 85, // 85% from top (near bottom)
+  width: 30, // 30% of page width
+  height: 8, // 8% of page height
+};
+```
+
+---
+
+## Placeholder-Based Field Positioning
+
+Instead of specifying exact coordinates, you can position fields using placeholder text embedded in your PDF. Include placeholder markers such as `{{signature, r1}}` in your document, and Documenso will create fields at those locations when the document is uploaded.
+
+This approach is useful when generating PDFs programmatically or using templates with consistent layouts.
+
+See the [PDF Placeholders](/docs/users/documents/advanced/pdf-placeholders) guide for the full placeholder format reference, including supported field types, recipient identifiers, and field options.
+
+---
+
+## Field Meta Options
+
+Each field type supports specific configuration through `fieldMeta`.
+
+### Common Options
+
+All field types support these base options:
+
+| Option        | Type    | Description                             |
+| ------------- | ------- | --------------------------------------- |
+| `label`       | string  | Display text shown near the field       |
+| `placeholder` | string  | Hint text when field is empty           |
+| `required`    | boolean | Whether field must be completed         |
+| `readOnly`    | boolean | Lock field with a pre-filled value      |
+| `fontSize`    | number  | Text size in pixels (8-96, default: 12) |
+
+### Signature Field
+
+```json
+{
+  "type": "SIGNATURE",
+  "fieldMeta": {
+    "type": "signature",
+    "required": true
+  }
+}
+```
+
+### Text Field
+
+```json
+{
+  "type": "TEXT",
+  "fieldMeta": {
+    "type": "text",
+    "label": "Company Name",
+    "placeholder": "Enter company name",
+    "text": "Default value",
+    "characterLimit": 100,
+    "textAlign": "left",
+    "required": true
+  }
+}
+```
+
+| Option           | Type   | Description                        |
+| ---------------- | ------ | ---------------------------------- |
+| `text`           | string | Default value                      |
+| `characterLimit` | number | Maximum characters allowed         |
+| `textAlign`      | string | `left`, `center`, or `right`       |
+| `lineHeight`     | number | Spacing between lines (1-10)       |
+| `letterSpacing`  | number | Spacing between characters (0-100) |
+
+### Number Field
+
+```json
+{
+  "type": "NUMBER",
+  "fieldMeta": {
+    "type": "number",
+    "label": "Quantity",
+    "minValue": 1,
+    "maxValue": 100,
+    "value": "10",
+    "required": true
+  }
+}
+```
+
+| Option         | Type   | Description           |
+| -------------- | ------ | --------------------- |
+| `value`        | string | Default value         |
+| `minValue`     | number | Minimum allowed value |
+| `maxValue`     | number | Maximum allowed value |
+| `numberFormat` | string | Display format        |
+
+### Date Field
+
+```json
+{
+  "type": "DATE",
+  "fieldMeta": {
+    "type": "date",
+    "textAlign": "left",
+    "required": true
+  }
+}
+```
+
+### Checkbox Field
+
+```json
+{
+  "type": "CHECKBOX",
+  "fieldMeta": {
+    "type": "checkbox",
+    "label": "Agreements",
+    "values": [
+      { "id": 1, "value": "Terms of Service", "checked": false },
+      { "id": 2, "value": "Privacy Policy", "checked": false }
+    ],
+    "validationRule": "min",
+    "validationLength": 1,
+    "direction": "vertical",
+    "required": true
+  }
+}
+```
+
+| Option             | Type   | Description                       |
+| ------------------ | ------ | --------------------------------- |
+| `values`           | array  | List of checkbox options          |
+| `validationRule`   | string | Validation type for selections    |
+| `validationLength` | number | Number for validation rule        |
+| `direction`        | string | `vertical` or `horizontal` layout |
+
+### Radio Field
+
+```json
+{
+  "type": "RADIO",
+  "fieldMeta": {
+    "type": "radio",
+    "label": "Payment Method",
+    "values": [
+      { "id": 1, "value": "Credit Card", "checked": false },
+      { "id": 2, "value": "Bank Transfer", "checked": true },
+      { "id": 3, "value": "Check", "checked": false }
+    ],
+    "direction": "vertical",
+    "required": true
+  }
+}
+```
+
+### Dropdown Field
+
+```json
+{
+  "type": "DROPDOWN",
+  "fieldMeta": {
+    "type": "dropdown",
+    "label": "Country",
+    "values": [{ "value": "United States" }, { "value": "Canada" }, { "value": "United Kingdom" }],
+    "defaultValue": "United States",
+    "required": true
+  }
+}
+```
+
+| Option         | Type   | Description              |
+| -------------- | ------ | ------------------------ |
+| `values`       | array  | List of dropdown options |
+| `defaultValue` | string | Pre-selected option      |
+
+---
+
+## Complete Example
+
+Create a document with a signature block containing multiple field types:
+
+```typescript
+async function addSignatureBlock(documentId: number, recipientId: number) {
+  const fields = [
+    // Signature
+    {
+      type: 'SIGNATURE',
+      recipientId,
+      pageNumber: 1,
+      pageX: 10,
+      pageY: 80,
+      width: 30,
+      height: 8,
+      fieldMeta: {
+        type: 'signature',
+        required: true,
+      },
+    },
+    // Printed name
+    {
+      type: 'NAME',
+      recipientId,
+      pageNumber: 1,
+      pageX: 10,
+      pageY: 90,
+      width: 30,
+      height: 4,
+      fieldMeta: {
+        type: 'name',
+        label: 'Printed Name',
+      },
+    },
+    // Date
+    {
+      type: 'DATE',
+      recipientId,
+      pageNumber: 1,
+      pageX: 50,
+      pageY: 80,
+      width: 20,
+      height: 4,
+      fieldMeta: {
+        type: 'date',
+        label: 'Date',
+      },
+    },
+    // Job title
+    {
+      type: 'TEXT',
+      recipientId,
+      pageNumber: 1,
+      pageX: 50,
+      pageY: 90,
+      width: 30,
+      height: 4,
+      fieldMeta: {
+        type: 'text',
+        label: 'Title',
+        placeholder: 'Enter your job title',
+      },
+    },
+  ];
+
+  const response = await fetch('https://app.documenso.com/api/v2/envelope/field/create-many', {
+    method: 'POST',
+    headers: {
+      Authorization: 'api_xxxxxxxxxxxxxxxx',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ documentId, fields }),
+  });
+
+  return response.json();
+}
+```
+
+---
+
+## Error Responses
+
+| Status | Description                                          |
+| ------ | ---------------------------------------------------- |
+| `400`  | Invalid field configuration or document already sent |
+| `401`  | Invalid or missing API key                           |
+| `404`  | Document, recipient, or field not found              |
+| `500`  | Server error                                         |
+
+<Callout type="warn">
+  Fields cannot be modified after a document is sent for signing. Make all field changes while the
+  document is in `DRAFT` status.
+</Callout>
+
+---
+
+## See Also
+
+- [Documents API](/docs/developers/api/documents) - Create and manage documents
+- [Recipients API](/docs/developers/api/recipients) - Add signers to documents
+- [Field Types](/docs/concepts/field-types) - Detailed field type reference

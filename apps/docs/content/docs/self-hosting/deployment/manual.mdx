@@ -1,0 +1,162 @@
+---
+title: Manual Deployment
+description: Deploy Documenso on a Linux server without Docker using Node.js and systemd.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+<Callout type="warn">
+  This guide is a community contribution and may not always reflect the latest changes. If you
+  encounter issues, please refer to the [Docker](/docs/self-hosting/deployment/docker) or [Docker
+  Compose](/docs/self-hosting/deployment/docker-compose) guides which are actively maintained.
+</Callout>
+
+## Prerequisites
+
+- Node.js 20 or later
+- npm
+- PostgreSQL 14 or later
+- A Linux server (for systemd service setup)
+
+## Install and Build
+
+{/* prettier-ignore */}
+<Steps>
+
+<Step>
+### Clone the repository
+
+```bash
+git clone https://github.com/documenso/documenso.git
+```
+
+</Step>
+
+<Step>
+### Configure environment variables
+
+Navigate to the `documenso` folder and create a `.env` file:
+
+```bash
+cp .env.example .env
+```
+
+Open the `.env` file and configure the required variables:
+
+```bash
+NEXTAUTH_SECRET="your-secret-here"
+NEXT_PRIVATE_ENCRYPTION_KEY="your-encryption-key-min-32-chars"
+NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="your-secondary-key-min-32-chars"
+NEXT_PUBLIC_WEBAPP_URL="https://your-domain.com"
+NEXT_PRIVATE_INTERNAL_WEBAPP_URL="http://localhost:3000"
+NEXT_PRIVATE_DATABASE_URL="postgresql://user:password@localhost:5432/documenso"
+NEXT_PRIVATE_DIRECT_DATABASE_URL="postgresql://user:password@localhost:5432/documenso"
+NEXT_PRIVATE_SMTP_FROM_NAME="Documenso"
+NEXT_PRIVATE_SMTP_FROM_ADDRESS="noreply@your-domain.com"
+```
+
+<Callout type="info">
+  If you use a reverse proxy in front of Documenso, set `NEXT_PUBLIC_WEBAPP_URL` to the public URL
+  that users will access.
+</Callout>
+
+</Step>
+
+<Step>
+### Install dependencies and build
+
+```bash
+npm ci
+npm run build
+npm run prisma:migrate-deploy
+```
+
+</Step>
+
+<Step>
+### Start the application
+
+```bash
+npm run start
+```
+
+The server starts on `localhost:3000` by default. To use a different port, set the `PORT` environment variable in your `.env` file:
+
+```bash
+PORT=3500
+```
+
+</Step>
+
+</Steps>
+
+## Run as a systemd Service
+
+Create a service file to run Documenso as a background service on Linux:
+
+```ini
+# /etc/systemd/system/documenso.service
+
+[Unit]
+Description=Documenso
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/documenso
+EnvironmentFile=/var/www/documenso/.env
+ExecStart=/usr/bin/node apps/remix/build/server/main.js
+TimeoutSec=15
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+The `EnvironmentFile` directive loads your `.env` file, so configuration (including `PORT`) is managed in one place. Alternatively, you can set environment variables directly in the service file with `Environment=` directives.
+
+Enable and start the service:
+
+```bash
+sudo systemctl enable documenso
+sudo systemctl start documenso
+```
+
+## Reverse Proxy with Nginx
+
+A minimal Nginx configuration for proxying to Documenso:
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+<Callout type="info">
+  For production, configure SSL termination with Let's Encrypt or your preferred certificate
+  provider.
+</Callout>
+
+---
+
+## See Also
+
+- [Docker Deployment](/docs/self-hosting/deployment/docker) - Deploy using a standalone Docker container
+- [Docker Compose](/docs/self-hosting/deployment/docker-compose) - Deploy with Docker Compose
+- [Environment Variables](/docs/self-hosting/configuration/environment) - All configuration options
+- [Signing Certificate](/docs/self-hosting/configuration/signing-certificate) - Configure document signing certificates

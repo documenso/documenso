@@ -1,0 +1,504 @@
+---
+title: Recipients API
+description: Add and manage envelope recipients via API.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+<Callout type="warn">
+  This guide may not reflect the latest endpoints or parameters. For an always up-to-date reference,
+  see the [OpenAPI Reference](https://openapi.documenso.com).
+</Callout>
+
+## Recipient Object
+
+```json
+{
+  "id": 123,
+  "envelopeId": "clu1abc2def3ghi4jkl",
+  "email": "signer@example.com",
+  "name": "John Doe",
+  "role": "SIGNER",
+  "signingOrder": 1,
+  "token": "abc123...",
+  "signedAt": "2024-01-15T10:30:00Z",
+  "readStatus": "OPENED",
+  "signingStatus": "SIGNED",
+  "sendStatus": "SENT"
+}
+```
+
+| Field           | Type           | Description                           |
+| --------------- | -------------- | ------------------------------------- |
+| `id`            | number         | Unique recipient identifier           |
+| `envelopeId`    | string         | ID of the associated envelope         |
+| `email`         | string         | Recipient's email address             |
+| `name`          | string         | Recipient's display name              |
+| `role`          | string         | Recipient role (see below)            |
+| `signingOrder`  | number \| null | Order in sequential signing           |
+| `token`         | string         | Unique token for signing URL          |
+| `signedAt`      | string \| null | ISO timestamp when signed             |
+| `readStatus`    | string         | `NOT_OPENED` or `OPENED`              |
+| `signingStatus` | string         | `NOT_SIGNED`, `SIGNED`, or `REJECTED` |
+| `sendStatus`    | string         | `NOT_SENT` or `SENT`                  |
+
+---
+
+## Recipient Roles
+
+| Role        | Description                                                    |
+| ----------- | -------------------------------------------------------------- |
+| `SIGNER`    | Must sign the document. Required fields must be completed.     |
+| `APPROVER`  | Must approve the document before signers can proceed.          |
+| `VIEWER`    | Can view the document but takes no action.                     |
+| `CC`        | Receives a copy of the completed document. No action required. |
+| `ASSISTANT` | Can fill in fields on behalf of another recipient.             |
+
+---
+
+## Get Recipient
+
+Retrieve a single recipient by ID.
+
+```
+GET /api/v2/envelope/recipient/{recipientId}
+```
+
+### Example
+
+<Tabs items={['curl', 'TypeScript']}>
+<Tab value="curl">
+```bash
+curl "https://app.documenso.com/api/v2/envelope/recipient/789" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx"
+```
+</Tab>
+<Tab value="TypeScript">
+```typescript
+const response = await fetch(
+  'https://app.documenso.com/api/v2/envelope/recipient/789',
+  {
+    headers: {
+      Authorization: 'api_xxxxxxxxxxxxxxxx',
+    },
+  },
+);
+
+const recipient = await response.json();
+
+```
+</Tab>
+</Tabs>
+
+### Response
+
+Returns the full recipient object including fields.
+
+---
+
+## Create Recipients
+
+Add one or more recipients to an envelope.
+
+```
+
+POST /api/v2/envelope/recipient/create-many
+
+````
+
+### Request Body
+
+| Field        | Type   | Required | Description                             |
+| ------------ | ------ | -------- | --------------------------------------- |
+| `envelopeId` | string | Yes      | ID of the envelope to add recipients to |
+| `data`       | array  | Yes      | Array of recipient objects              |
+
+Each item in the `data` array:
+
+| Field          | Type     | Required | Description                                |
+| -------------- | -------- | -------- | ------------------------------------------ |
+| `email`        | string   | Yes      | Recipient's email address                  |
+| `name`         | string   | Yes      | Recipient's display name (max 255 chars)   |
+| `role`         | string   | Yes      | Recipient role (see Recipient Roles above) |
+| `signingOrder` | number   | No       | Position in sequential signing             |
+| `accessAuth`   | string[] | No       | Access authentication types                |
+| `actionAuth`   | string[] | No       | Action authentication types                |
+
+### Example
+
+<Tabs items={['curl', 'TypeScript']}>
+<Tab value="curl">
+```bash
+curl -X POST "https://app.documenso.com/api/v2/envelope/recipient/create-many" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "envelopeId": "clu1abc2def3ghi4jkl",
+    "data": [
+      {
+        "email": "signer@example.com",
+        "name": "John Doe",
+        "role": "SIGNER",
+        "signingOrder": 1
+      },
+      {
+        "email": "approver@example.com",
+        "name": "Jane Smith",
+        "role": "APPROVER",
+        "signingOrder": 0
+      }
+    ]
+  }'
+````
+
+</Tab>
+<Tab value="TypeScript">
+```typescript
+const response = await fetch(
+  'https://app.documenso.com/api/v2/envelope/recipient/create-many',
+  {
+    method: 'POST',
+    headers: {
+      Authorization: 'api_xxxxxxxxxxxxxxxx',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      envelopeId: 'clu1abc2def3ghi4jkl',
+      data: [
+        {
+          email: 'signer@example.com',
+          name: 'John Doe',
+          role: 'SIGNER',
+          signingOrder: 1,
+        },
+        {
+          email: 'approver@example.com',
+          name: 'Jane Smith',
+          role: 'APPROVER',
+          signingOrder: 0,
+        },
+      ],
+    }),
+  },
+);
+
+const { data: recipients } = await response.json();
+
+````
+</Tab>
+</Tabs>
+
+### Response
+
+```json
+{
+  "data": [
+    {
+      "id": 789,
+      "envelopeId": "clu1abc2def3ghi4jkl",
+      "email": "signer@example.com",
+      "name": "John Doe",
+      "role": "SIGNER",
+      "signingOrder": 1,
+      "token": "abc123def456",
+      "signedAt": null,
+      "readStatus": "NOT_OPENED",
+      "signingStatus": "NOT_SIGNED",
+      "sendStatus": "NOT_SENT"
+    },
+    {
+      "id": 790,
+      "envelopeId": "clu1abc2def3ghi4jkl",
+      "email": "approver@example.com",
+      "name": "Jane Smith",
+      "role": "APPROVER",
+      "signingOrder": 0,
+      "token": "def456ghi789",
+      "signedAt": null,
+      "readStatus": "NOT_OPENED",
+      "signingStatus": "NOT_SIGNED",
+      "sendStatus": "NOT_SENT"
+    }
+  ]
+}
+````
+
+---
+
+## Update Recipients
+
+Update one or more recipients on an envelope. Only available for envelopes that are not yet completed.
+
+```
+POST /api/v2/envelope/recipient/update-many
+```
+
+### Request Body
+
+| Field        | Type   | Required | Description                                  |
+| ------------ | ------ | -------- | -------------------------------------------- |
+| `envelopeId` | string | Yes      | ID of the envelope containing the recipients |
+| `data`       | array  | Yes      | Array of recipient update objects            |
+
+Each item in the `data` array:
+
+| Field          | Type     | Required | Description                        |
+| -------------- | -------- | -------- | ---------------------------------- |
+| `id`           | number   | Yes      | ID of the recipient to update      |
+| `email`        | string   | No       | New email address                  |
+| `name`         | string   | No       | New display name (max 255 chars)   |
+| `role`         | string   | No       | New recipient role                 |
+| `signingOrder` | number   | No       | New position in sequential signing |
+| `accessAuth`   | string[] | No       | Access authentication types        |
+| `actionAuth`   | string[] | No       | Action authentication types        |
+
+### Example
+
+<Tabs items={['curl', 'TypeScript']}>
+<Tab value="curl">
+```bash
+curl -X POST "https://app.documenso.com/api/v2/envelope/recipient/update-many" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "envelopeId": "clu1abc2def3ghi4jkl",
+    "data": [
+      {
+        "id": 789,
+        "name": "Jane Doe",
+        "signingOrder": 2
+      }
+    ]
+  }'
+```
+</Tab>
+<Tab value="TypeScript">
+```typescript
+const response = await fetch(
+  'https://app.documenso.com/api/v2/envelope/recipient/update-many',
+  {
+    method: 'POST',
+    headers: {
+      Authorization: 'api_xxxxxxxxxxxxxxxx',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      envelopeId: 'clu1abc2def3ghi4jkl',
+      data: [
+        {
+          id: 789,
+          name: 'Jane Doe',
+          signingOrder: 2,
+        },
+      ],
+    }),
+  },
+);
+
+const { data: updatedRecipients } = await response.json();
+
+```
+</Tab>
+</Tabs>
+
+### Response
+
+Returns the updated recipient objects in a `data` array.
+
+---
+
+## Delete Recipient
+
+Remove a recipient from an envelope. Only available for envelopes that are not yet completed.
+
+```
+
+POST /api/v2/envelope/recipient/delete
+
+````
+
+### Request Body
+
+| Field         | Type   | Required | Description                     |
+| ------------- | ------ | -------- | ------------------------------- |
+| `recipientId` | number | Yes      | ID of the recipient to remove   |
+
+### Example
+
+<Tabs items={['curl', 'TypeScript']}>
+<Tab value="curl">
+```bash
+curl -X POST "https://app.documenso.com/api/v2/envelope/recipient/delete" \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "recipientId": 789
+  }'
+````
+
+</Tab>
+<Tab value="TypeScript">
+```typescript
+const response = await fetch(
+  'https://app.documenso.com/api/v2/envelope/recipient/delete',
+  {
+    method: 'POST',
+    headers: {
+      Authorization: 'api_xxxxxxxxxxxxxxxx',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      recipientId: 789,
+    }),
+  },
+);
+
+const result = await response.json();
+// { "success": true }
+
+````
+</Tab>
+</Tabs>
+
+### Response
+
+```json
+{
+  "success": true
+}
+````
+
+---
+
+## Signing Order
+
+When an envelope uses sequential signing, recipients sign in a specific order defined by `signingOrder`.
+
+### Setting Signing Order
+
+When creating recipients, assign `signingOrder` values to control the sequence:
+
+```typescript
+const response = await fetch('https://app.documenso.com/api/v2/envelope/recipient/create-many', {
+  method: 'POST',
+  headers: {
+    Authorization: 'api_xxxxxxxxxxxxxxxx',
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    envelopeId: 'clu1abc2def3ghi4jkl',
+    data: [
+      {
+        email: 'approver@example.com',
+        name: 'Approver',
+        role: 'APPROVER',
+        signingOrder: 0, // Approvers typically go first
+      },
+      {
+        email: 'first@example.com',
+        name: 'First Signer',
+        role: 'SIGNER',
+        signingOrder: 1,
+      },
+      {
+        email: 'second@example.com',
+        name: 'Second Signer',
+        role: 'SIGNER',
+        signingOrder: 2,
+      },
+    ],
+  }),
+});
+```
+
+<Callout type="info">
+  To enable sequential signing, set `signingOrder` to `SEQUENTIAL` in the envelope metadata when
+  creating or updating the envelope. See the [Documents API](/docs/developers/api/documents) for
+  details.
+</Callout>
+
+### Signing Order Behavior
+
+- Recipients with lower `signingOrder` values sign first
+- Recipients with the same `signingOrder` can sign simultaneously
+- `CC` recipients receive the document after all signing is complete
+- `APPROVER` recipients must approve before signers with higher order values
+
+---
+
+## Authentication Options
+
+For enhanced security, you can require additional authentication when recipients access or sign a document.
+
+### Access Authentication
+
+Controls who can view the document:
+
+| Type              | Description                    |
+| ----------------- | ------------------------------ |
+| `ACCOUNT`         | Recipient must be logged in    |
+| `TWO_FACTOR_AUTH` | Recipient must verify with 2FA |
+
+### Action Authentication
+
+Controls who can sign the document:
+
+| Type              | Description                              |
+| ----------------- | ---------------------------------------- |
+| `ACCOUNT`         | Recipient must be logged in              |
+| `PASSKEY`         | Require passkey authentication           |
+| `TWO_FACTOR_AUTH` | Require 2FA code                         |
+| `PASSWORD`        | Require password verification            |
+| `EXPLICIT_NONE`   | Explicitly disable action authentication |
+
+### Example
+
+```typescript
+const response = await fetch('https://app.documenso.com/api/v2/envelope/recipient/create-many', {
+  method: 'POST',
+  headers: {
+    Authorization: 'api_xxxxxxxxxxxxxxxx',
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    envelopeId: 'clu1abc2def3ghi4jkl',
+    data: [
+      {
+        email: 'signer@example.com',
+        name: 'John Doe',
+        role: 'SIGNER',
+        accessAuth: ['ACCOUNT'],
+        actionAuth: ['PASSKEY', 'TWO_FACTOR_AUTH'],
+      },
+    ],
+  }),
+});
+```
+
+---
+
+## Error Responses
+
+| Status | Description                                      |
+| ------ | ------------------------------------------------ |
+| `400`  | Invalid request body or recipient already exists |
+| `400`  | Envelope is already completed                    |
+| `401`  | Invalid or missing API key                       |
+| `404`  | Envelope or recipient not found                  |
+| `500`  | Server error                                     |
+
+### Example Error Response
+
+```json
+{
+  "message": "Recipient already exists"
+}
+```
+
+---
+
+## See Also
+
+- [Documents API](/docs/developers/api/documents) - Create and manage envelopes
+- [Fields API](/docs/developers/api/fields) - Add signature fields for recipients

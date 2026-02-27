@@ -1,0 +1,4 @@
+{
+  "title": "Settings",
+  "pages": ["profile", "public-profile", "security", "sessions", "api-tokens", "delete-account"]
+}

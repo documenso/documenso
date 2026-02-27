@@ -1,0 +1,473 @@
+---
+title: Email Configuration
+description: Configure email delivery for notifications and document signing invitations.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+## Supported Email Transports
+
+Documenso supports four email transport methods:
+
+| Transport      | Use Case                              | Configuration Complexity |
+| -------------- | ------------------------------------- | ------------------------ |
+| `smtp-auth`    | Standard SMTP with username/password  | Low                      |
+| `smtp-api`     | SMTP with API key authentication      | Low                      |
+| `resend`       | Resend.com email API                  | Low                      |
+| `mailchannels` | MailChannels API (Cloudflare Workers) | Medium                   |
+
+Select a transport by setting the `NEXT_PRIVATE_SMTP_TRANSPORT` environment variable. The default is `smtp-auth`.
+
+## Sender Configuration
+
+All transports require sender configuration:
+
+| Variable                         | Description                       | Required |
+| -------------------------------- | --------------------------------- | -------- |
+| `NEXT_PRIVATE_SMTP_FROM_ADDRESS` | Email address shown as the sender | Yes      |
+| `NEXT_PRIVATE_SMTP_FROM_NAME`    | Display name shown as the sender  | Yes      |
+
+```bash
+NEXT_PRIVATE_SMTP_FROM_ADDRESS="noreply@example.com"
+NEXT_PRIVATE_SMTP_FROM_NAME="Documenso"
+```
+
+<Callout type="warn">
+  The sender address must be authorized to send from your email provider. Using an unauthorized
+  address will cause delivery failures.
+</Callout>
+
+## SMTP Configuration
+
+SMTP is the most common email transport. Documenso supports two SMTP authentication methods.
+
+### SMTP with Username/Password (smtp-auth)
+
+Use this for standard SMTP servers that authenticate with username and password.
+
+**Environment Variables:**
+
+| Variable                              | Description                               | Default     |
+| ------------------------------------- | ----------------------------------------- | ----------- |
+| `NEXT_PRIVATE_SMTP_TRANSPORT`         | Set to `smtp-auth`                        | `smtp-auth` |
+| `NEXT_PRIVATE_SMTP_HOST`              | SMTP server hostname                      | `127.0.0.1` |
+| `NEXT_PRIVATE_SMTP_PORT`              | SMTP server port                          | `587`       |
+| `NEXT_PRIVATE_SMTP_USERNAME`          | Authentication username                   |             |
+| `NEXT_PRIVATE_SMTP_PASSWORD`          | Authentication password                   |             |
+| `NEXT_PRIVATE_SMTP_SECURE`            | Use TLS on connection (`true` or `false`) | `false`     |
+| `NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS` | Disable TLS entirely (not recommended)    | `false`     |
+| `NEXT_PRIVATE_SMTP_SERVICE`           | Nodemailer service preset (e.g., `gmail`) |             |
+
+**Example Configuration:**
+
+```bash
+NEXT_PRIVATE_SMTP_TRANSPORT="smtp-auth"
+NEXT_PRIVATE_SMTP_HOST="smtp.example.com"
+NEXT_PRIVATE_SMTP_PORT="587"
+NEXT_PRIVATE_SMTP_USERNAME="your-username"
+NEXT_PRIVATE_SMTP_PASSWORD="your-password"
+NEXT_PRIVATE_SMTP_FROM_ADDRESS="noreply@example.com"
+NEXT_PRIVATE_SMTP_FROM_NAME="Documenso"
+```
+
+### Common SMTP Provider Examples
+
+**Gmail / Google Workspace:**
+
+```bash
+NEXT_PRIVATE_SMTP_TRANSPORT="smtp-auth"
+NEXT_PRIVATE_SMTP_HOST="smtp.gmail.com"
+NEXT_PRIVATE_SMTP_PORT="587"
+NEXT_PRIVATE_SMTP_USERNAME="your-email@gmail.com"
+NEXT_PRIVATE_SMTP_PASSWORD="your-app-password"
+NEXT_PRIVATE_SMTP_FROM_ADDRESS="your-email@gmail.com"
+NEXT_PRIVATE_SMTP_FROM_NAME="Documenso"
+```
+
+<Callout type="info">
+  Gmail requires an App Password when 2FA is enabled. Generate one at [Google Account
+  Security](https://myaccount.google.com/apppasswords).
+</Callout>
+
+**Microsoft 365 / Outlook:**
+
+```bash
+NEXT_PRIVATE_SMTP_TRANSPORT="smtp-auth"
+NEXT_PRIVATE_SMTP_HOST="smtp.office365.com"
+NEXT_PRIVATE_SMTP_PORT="587"
+NEXT_PRIVATE_SMTP_USERNAME="your-email@yourdomain.com"
+NEXT_PRIVATE_SMTP_PASSWORD="your-password"
+NEXT_PRIVATE_SMTP_FROM_ADDRESS="your-email@yourdomain.com"
+NEXT_PRIVATE_SMTP_FROM_NAME="Documenso"
+```
+
+**Amazon SES:**
+
+```bash
+NEXT_PRIVATE_SMTP_TRANSPORT="smtp-auth"
+NEXT_PRIVATE_SMTP_HOST="email-smtp.us-east-1.amazonaws.com"
+NEXT_PRIVATE_SMTP_PORT="587"
+NEXT_PRIVATE_SMTP_USERNAME="your-ses-smtp-username"
+NEXT_PRIVATE_SMTP_PASSWORD="your-ses-smtp-password"
+NEXT_PRIVATE_SMTP_FROM_ADDRESS="noreply@yourdomain.com"
+NEXT_PRIVATE_SMTP_FROM_NAME="Documenso"
+```
+
+**Postmark:**
+
+```bash
+NEXT_PRIVATE_SMTP_TRANSPORT="smtp-auth"
+NEXT_PRIVATE_SMTP_HOST="smtp.postmarkapp.com"
+NEXT_PRIVATE_SMTP_PORT="587"
+NEXT_PRIVATE_SMTP_USERNAME="your-postmark-server-api-token"
+NEXT_PRIVATE_SMTP_PASSWORD="your-postmark-server-api-token"
+NEXT_PRIVATE_SMTP_FROM_ADDRESS="noreply@yourdomain.com"
+NEXT_PRIVATE_SMTP_FROM_NAME="Documenso"
+```
+
+### SMTP with API Key (smtp-api)
+
+Some providers use API key authentication instead of username/password. Use this transport for services like SendGrid.
+
+**Environment Variables:**
+
+| Variable                        | Description           | Default  |
+| ------------------------------- | --------------------- | -------- |
+| `NEXT_PRIVATE_SMTP_TRANSPORT`   | Set to `smtp-api`     |          |
+| `NEXT_PRIVATE_SMTP_HOST`        | SMTP server hostname  |          |
+| `NEXT_PRIVATE_SMTP_PORT`        | SMTP server port      | `587`    |
+| `NEXT_PRIVATE_SMTP_APIKEY_USER` | API key username      | `apikey` |
+| `NEXT_PRIVATE_SMTP_APIKEY`      | API key value         |          |
+| `NEXT_PRIVATE_SMTP_SECURE`      | Use TLS on connection | `false`  |
+
+**SendGrid Example:**
+
+```bash
+NEXT_PRIVATE_SMTP_TRANSPORT="smtp-api"
+NEXT_PRIVATE_SMTP_HOST="smtp.sendgrid.net"
+NEXT_PRIVATE_SMTP_PORT="587"
+NEXT_PRIVATE_SMTP_APIKEY_USER="apikey"
+NEXT_PRIVATE_SMTP_APIKEY="SG.xxxxxxxxxxxxxxxxxxxx"
+NEXT_PRIVATE_SMTP_FROM_ADDRESS="noreply@yourdomain.com"
+NEXT_PRIVATE_SMTP_FROM_NAME="Documenso"
+```
+
+## Resend Configuration
+
+[Resend](https://resend.com) provides a developer-friendly email API with excellent deliverability.
+
+**Environment Variables:**
+
+| Variable                      | Description         |
+| ----------------------------- | ------------------- |
+| `NEXT_PRIVATE_SMTP_TRANSPORT` | Set to `resend`     |
+| `NEXT_PRIVATE_RESEND_API_KEY` | Your Resend API key |
+
+**Example Configuration:**
+
+```bash
+NEXT_PRIVATE_SMTP_TRANSPORT="resend"
+NEXT_PRIVATE_RESEND_API_KEY="re_xxxxxxxxxxxxxxxxxxxx"
+NEXT_PRIVATE_SMTP_FROM_ADDRESS="noreply@yourdomain.com"
+NEXT_PRIVATE_SMTP_FROM_NAME="Documenso"
+```
+
+**Setup Steps:**
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Create an account
+
+Sign up at [resend.com](https://resend.com).
+
+</Step>
+<Step>
+### Add and verify your sending domain
+
+Configure your domain in the Resend dashboard so you can send from your own address.
+
+</Step>
+<Step>
+### Create an API key
+
+Generate an API key in the Resend dashboard for Documenso to use.
+
+</Step>
+<Step>
+### Configure environment variables
+
+Set the variables in the table above, including `NEXT_PRIVATE_RESEND_API_KEY` and your sender address.
+
+</Step>
+</Steps>
+
+## MailChannels Configuration
+
+[MailChannels](https://www.mailchannels.com) is an email delivery service often used with Cloudflare Workers.
+
+**Environment Variables:**
+
+| Variable                                     | Description                            | Default                                   |
+| -------------------------------------------- | -------------------------------------- | ----------------------------------------- |
+| `NEXT_PRIVATE_SMTP_TRANSPORT`                | Set to `mailchannels`                  |                                           |
+| `NEXT_PRIVATE_MAILCHANNELS_API_KEY`          | API key for authentication             |                                           |
+| `NEXT_PRIVATE_MAILCHANNELS_ENDPOINT`         | Custom API endpoint (for proxy setups) | `https://api.mailchannels.net/tx/v1/send` |
+| `NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN`      | Domain for DKIM signing                |                                           |
+| `NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR`    | DKIM selector                          |                                           |
+| `NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY` | DKIM private key for signing           |                                           |
+
+**Example Configuration:**
+
+```bash
+NEXT_PRIVATE_SMTP_TRANSPORT="mailchannels"
+NEXT_PRIVATE_MAILCHANNELS_API_KEY="your-api-key"
+NEXT_PRIVATE_SMTP_FROM_ADDRESS="noreply@yourdomain.com"
+NEXT_PRIVATE_SMTP_FROM_NAME="Documenso"
+```
+
+**With DKIM Signing:**
+
+```bash
+NEXT_PRIVATE_SMTP_TRANSPORT="mailchannels"
+NEXT_PRIVATE_MAILCHANNELS_API_KEY="your-api-key"
+NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN="yourdomain.com"
+NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR="mailchannels"
+NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"
+NEXT_PRIVATE_SMTP_FROM_ADDRESS="noreply@yourdomain.com"
+NEXT_PRIVATE_SMTP_FROM_NAME="Documenso"
+```
+
+## Email Templates
+
+Documenso uses React Email templates for all outgoing emails. The templates are located in `packages/email/templates/` and include:
+
+| Template                  | Purpose                                   |
+| ------------------------- | ----------------------------------------- |
+| `document-invite.tsx`     | Signing invitation sent to recipients     |
+| `document-completed.tsx`  | Notification when all parties have signed |
+| `document-pending.tsx`    | Reminder for pending signatures           |
+| `document-cancel.tsx`     | Notification when a document is cancelled |
+| `document-rejected.tsx`   | Notification when a recipient rejects     |
+| `confirm-email.tsx`       | Email verification for new accounts       |
+| `forgot-password.tsx`     | Password reset request                    |
+| `reset-password.tsx`      | Password reset confirmation               |
+| `organisation-invite.tsx` | Team/organisation invitation              |
+
+### Branding Customization
+
+Email templates support branding customization through organisation settings. When branding is enabled:
+
+- Custom logo replaces the Documenso logo
+- Branding colors are applied to email elements
+
+Configure branding in the application under **Organisation Settings > Preferences > Branding**.
+
+<Callout type="info">
+  Template modifications require rebuilding the application. For simple customizations, use the
+  branding settings instead.
+</Callout>
+
+## Testing Email Delivery
+
+### Verify Configuration
+
+Test your email configuration by creating an account or resetting a password. These actions trigger emails that confirm delivery is working.
+
+### Using a Test SMTP Server
+
+For development or testing, use a local SMTP server like [Mailhog](https://github.com/mailhog/MailHog) or [Mailpit](https://github.com/axllent/mailpit):
+
+```bash
+# Using Docker
+docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
+```
+
+Configure Documenso to use the test server:
+
+```bash
+NEXT_PRIVATE_SMTP_TRANSPORT="smtp-auth"
+NEXT_PRIVATE_SMTP_HOST="localhost"
+NEXT_PRIVATE_SMTP_PORT="1025"
+NEXT_PRIVATE_SMTP_FROM_ADDRESS="test@localhost"
+NEXT_PRIVATE_SMTP_FROM_NAME="Documenso Test"
+```
+
+View sent emails at `http://localhost:8025`.
+
+### Checking Logs
+
+Email sending errors appear in the application logs. Check container or server logs for messages containing `mailer` or `email`:
+
+```bash
+# Docker
+docker logs documenso 2>&1 | grep -i email
+
+# Docker Compose
+docker compose logs app 2>&1 | grep -i email
+```
+
+## Email Deliverability
+
+### SPF Configuration
+
+SPF (Sender Policy Framework) authorizes servers to send email for your domain. Add a TXT record to your DNS:
+
+```
+v=spf1 include:_spf.example.com ~all
+```
+
+Replace `_spf.example.com` with your email provider's SPF include. Common examples:
+
+| Provider      | SPF Include                          |
+| ------------- | ------------------------------------ |
+| Gmail         | `include:_spf.google.com`            |
+| Microsoft 365 | `include:spf.protection.outlook.com` |
+| SendGrid      | `include:sendgrid.net`               |
+| Amazon SES    | `include:amazonses.com`              |
+| Resend        | `include:_spf.resend.com`            |
+| Postmark      | `include:spf.mtasv.net`              |
+
+### DKIM Configuration
+
+DKIM (DomainKeys Identified Mail) adds a digital signature to emails. Configuration varies by provider:
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Generate DKIM keys
+
+Create DKIM keys in your email provider's dashboard.
+
+</Step>
+<Step>
+### Add the TXT record to DNS
+
+Add the provided TXT record to your DNS.
+
+</Step>
+<Step>
+### Enable DKIM signing
+
+Enable DKIM signing in your provider settings.
+
+</Step>
+</Steps>
+
+For MailChannels, configure DKIM directly in Documenso using the environment variables described above.
+
+### DMARC Configuration
+
+DMARC (Domain-based Message Authentication, Reporting, and Conformance) tells receiving servers how to handle emails that fail SPF or DKIM checks. Add a TXT record:
+
+```
+_dmarc.yourdomain.com  TXT  "v=DMARC1; p=quarantine; rua=mailto:dmarc@yourdomain.com"
+```
+
+DMARC policies:
+
+| Policy         | Behavior                       |
+| -------------- | ------------------------------ |
+| `p=none`       | Monitor only, no action taken  |
+| `p=quarantine` | Move failing emails to spam    |
+| `p=reject`     | Reject failing emails entirely |
+
+Start with `p=none` to monitor, then move to stricter policies once deliverability is confirmed.
+
+## Common Issues
+
+<Accordions type="multiple">
+  <Accordion title="Emails Not Sending">
+    **Symptoms:** No emails received, no errors in logs.
+
+    **Possible causes:**
+
+    - Incorrect SMTP credentials
+    - Firewall blocking outbound SMTP ports
+    - From address not authorized
+
+    **Solutions:**
+
+    - Verify credentials with your email provider
+    - Check that ports 25, 465, or 587 are open outbound
+    - Verify the from address is authorized to send
+
+  </Accordion>
+  <Accordion title="Connection Timeout">
+    **Symptoms:** Error logs show connection timeout to SMTP server.
+
+    **Possible causes:**
+
+    - Incorrect hostname or port
+    - Firewall blocking connection
+    - SMTP server down
+
+    **Solutions:**
+
+    - Verify hostname and port match provider documentation
+    - Test connectivity: `telnet smtp.example.com 587`
+    - Check provider status page
+
+  </Accordion>
+  <Accordion title="Authentication Failed">
+    **Symptoms:** Error logs show authentication failure.
+
+    **Possible causes:**
+
+    - Wrong username or password
+    - Account requires app-specific password
+    - Account security restrictions
+
+    **Solutions:**
+
+    - Double-check credentials
+    - Generate an app password if using Gmail or Microsoft with 2FA
+    - Check for account security alerts from your provider
+
+  </Accordion>
+  <Accordion title="Emails Going to Spam">
+    **Symptoms:** Emails deliver but land in spam folders.
+
+    **Possible causes:**
+
+    - Missing or incorrect SPF record
+    - Missing DKIM signature
+    - No DMARC policy
+    - Poor sender reputation
+
+    **Solutions:**
+
+    - Configure SPF, DKIM, and DMARC as described above
+    - Use a reputable email provider
+    - Verify your domain with your email provider
+    - Monitor deliverability with tools like [mail-tester.com](https://www.mail-tester.com)
+
+  </Accordion>
+  <Accordion title="TLS/SSL Errors">
+    **Symptoms:** Errors mentioning TLS, SSL, or certificate issues.
+
+    **Possible causes:**
+
+    - Server requires TLS but `NEXT_PRIVATE_SMTP_SECURE` is false
+    - Self-signed certificate on SMTP server
+    - Port mismatch (465 for implicit TLS, 587 for STARTTLS)
+
+    **Solutions:**
+
+    - Set `NEXT_PRIVATE_SMTP_SECURE="true"` for port 465
+    - Keep `NEXT_PRIVATE_SMTP_SECURE="false"` for port 587 (STARTTLS)
+    - As a last resort, set `NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS="true"` (not recommended for production)
+
+  </Accordion>
+</Accordions>
+
+---
+
+## See Also
+
+- [Environment Variables](/docs/self-hosting/configuration/environment) - Complete configuration reference
+- [Storage Configuration](/docs/self-hosting/configuration/storage) - Set up document storage
+- [Signing Certificate](/docs/self-hosting/configuration/signing-certificate) - Configure document signing
+- [Troubleshooting](/docs/self-hosting/maintenance/troubleshooting) - Common issues and solutions
