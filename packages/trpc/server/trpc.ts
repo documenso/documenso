@@ -37,7 +37,7 @@ const t = initTRPC
   .create({
     transformer: dataTransformer,
     errorFormatter(opts) {
-      const { shape, error } = opts;
+      const { shape, error, ctx } = opts;
 
       const originalError = error.cause;
 
@@ -46,6 +46,12 @@ const t = initTRPC
       // Default unknown errors to 400, since if you're throwing an AppError it is expected
       // that you already know what you're doing.
       if (originalError instanceof AppError) {
+        if (originalError.headers && ctx) {
+          for (const [headerKey, headerValue] of Object.entries(originalError.headers)) {
+            ctx.res.headers.append(headerKey, headerValue);
+          }
+        }
+
         data = {
           ...data,
           appError: AppError.toJSON(originalError),

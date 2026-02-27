@@ -13,7 +13,7 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "@aws-sdk/client-sesv2": "^3.936.0",
+    "@aws-sdk/client-sesv2": "^3.998.0",
     "@documenso/lib": "*",
     "@documenso/prisma": "*",
     "luxon": "^3.7.2",

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { Trans, useLingui } from '@lingui/react/macro';
+import { msg, t } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import {
   DocumentDistributionMethod,
   DocumentVisibility,
@@ -22,6 +23,7 @@ import {
   DOCUMENT_DISTRIBUTION_METHODS,
   DOCUMENT_SIGNATURE_TYPES,
 } from '@documenso/lib/constants/document';
+import { ZEnvelopeExpirationPeriod } from '@documenso/lib/constants/envelope-expiration';
 import {
   SUPPORTED_LANGUAGES,
   SUPPORTED_LANGUAGE_CODES,
@@ -62,6 +64,7 @@ import {
   DocumentVisibilitySelect,
   DocumentVisibilityTooltip,
 } from '@documenso/ui/components/document/document-visibility-select';
+import { ExpirationPeriodPicker } from '@documenso/ui/components/document/expiration-period-picker';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { CardDescription, CardHeader, CardTitle } from '@documenso/ui/primitives/card';
@@ -135,6 +138,7 @@ export const ZAddSettingsFormSchema = z.object({
     signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(1, {
       message: msg`At least one signature type must be enabled`.id,
     }),
+    envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullish(),
   }),
 });
 
@@ -151,13 +155,13 @@ const tabs = [
     id: 'email',
     title: msg`Email`,
     icon: MailIcon,
-    description: msg`Configure email settings for the document`,
+    description: msg`Configure email settings for the document.`,
   },
   {
     id: 'security',
     title: msg`Security`,
     icon: ShieldIcon,
-    description: msg`Configure security settings for the document`,
+    description: msg`Configure security settings for the document.`,
   },
 ] as const;
 
@@ -171,7 +175,7 @@ export const EnvelopeEditorSettingsDialog = ({
   trigger,
   ...props
 }: EnvelopeEditorSettingsDialogProps) => {
-  const { t, i18n } = useLingui();
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const { envelope, updateEnvelopeAsync } = useCurrentEnvelopeEditor();
@@ -207,6 +211,7 @@ export const EnvelopeEditorSettingsDialog = ({
         emailReplyTo: envelope.documentMeta.emailReplyTo ?? undefined,
         emailSettings: ZDocumentEmailSettingsSchema.parse(envelope.documentMeta.emailSettings),
         signatureTypes: extractTeamSignatureSettings(envelope.documentMeta),
+        envelopeExpirationPeriod: envelope.documentMeta?.envelopeExpirationPeriod ?? null,
       },
     };
   };
@@ -245,6 +250,7 @@ export const EnvelopeEditorSettingsDialog = ({
       message,
       subject,
       emailReplyTo,
+      envelopeExpirationPeriod,
     } = data.meta;
 
     const parsedGlobalAccessAuth = z
@@ -273,6 +279,7 @@ export const EnvelopeEditorSettingsDialog = ({
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
+          envelopeExpirationPeriod,
         },
       });
 
@@ -357,7 +364,7 @@ export const EnvelopeEditorSettingsDialog = ({
                 })}
               >
                 <tab.icon className="mr-2 h-5 w-5" />
-                {t(tab.title)}
+                {_(tab.title)}
               </Button>
             ))}
           </nav>
@@ -366,14 +373,14 @@ export const EnvelopeEditorSettingsDialog = ({
         {/* Content. */}
         <div className="flex w-full flex-col">
           <CardHeader className="border-b pb-4">
-            <CardTitle>{t(selectedTab?.title ?? '')}</CardTitle>
-            <CardDescription>{t(selectedTab?.description ?? '')}</CardDescription>
+            <CardTitle>{selectedTab ? _(selectedTab.title) : ''}</CardTitle>
+            <CardDescription>{selectedTab ? _(selectedTab.description) : ''}</CardDescription>
           </CardHeader>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onFormSubmit)}>
               <fieldset
-                className="flex h-[45rem] max-h-[calc(100vh-14rem)] w-full flex-col space-y-6 overflow-y-auto px-6 pt-6"
+                className="flex h-[45rem] max-h-[calc(100vh-14rem)] w-full flex-col space-y-6 overflow-y-auto px-6 py-6"
                 disabled={form.formState.isSubmitting}
                 key={activeTab}
               >
@@ -415,7 +422,7 @@ export const EnvelopeEditorSettingsDialog = ({
                                 <SelectContent>
                                   {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
                                     <SelectItem key={code} value={code}>
-                                      {language.full}
+                                      {_(language.full)}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -438,7 +445,7 @@ export const EnvelopeEditorSettingsDialog = ({
                             <FormControl>
                               <MultiSelectCombobox
                                 options={Object.values(DOCUMENT_SIGNATURE_TYPES).map((option) => ({
-                                  label: t(option.label),
+                                  label: _(option.label),
                                   value: option.value,
                                 }))}
                                 selectedValues={field.value}
@@ -626,13 +633,47 @@ export const EnvelopeEditorSettingsDialog = ({
                                   {Object.values(DOCUMENT_DISTRIBUTION_METHODS).map(
                                     ({ value, description }) => (
                                       <SelectItem key={value} value={value}>
-                                        {i18n._(description)}
+                                        {_(description)}
                                       </SelectItem>
                                     ),
                                   )}
                                 </SelectContent>
                               </Select>
                             </FormControl>
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="meta.envelopeExpirationPeriod"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex flex-row items-center">
+                              <Trans>Expiration</Trans>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <InfoIcon className="mx-2 h-4 w-4" />
+                                </TooltipTrigger>
+
+                                <TooltipContent className="max-w-xs text-muted-foreground">
+                                  <Trans>
+                                    How long recipients have to complete this document after it is
+                                    sent. Uses the team default when set to inherit.
+                                  </Trans>
+                                </TooltipContent>
+                              </Tooltip>
+                            </FormLabel>
+
+                            <FormControl>
+                              <ExpirationPeriodPicker
+                                value={field.value}
+                                onChange={field.onChange}
+                                disabled={envelopeHasBeenSent}
+                              />
+                            </FormControl>
+
+                            <FormMessage />
                           </FormItem>
                         )}
                       />

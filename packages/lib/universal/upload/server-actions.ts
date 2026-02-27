@@ -20,7 +20,20 @@ export const getPresignPostUrl = async (fileName: string, contentType: string, u
   // Get the basename and extension for the file
   const { name, ext } = path.parse(fileName);
 
-  let key = `${alphaid(12)}/${slugify(name)}${ext}`;
+  let slugified = slugify(name);
+
+  // If the slugified name is empty or too long, generate a random string instead
+  //
+  // This is fine since we don't really need the filename in s3 since we store it
+  // in the database and can always get the original filename from there.
+  //
+  // The slugified name can be empty when a string contains only CJK or other
+  // special characters.
+  if (slugified.length === 0 || slugified.length > 100) {
+    slugified = alphaid(8);
+  }
+
+  let key = `${alphaid(12)}/${slugified}${ext}`;
 
   if (userId) {
     key = `${userId}/${key}`;

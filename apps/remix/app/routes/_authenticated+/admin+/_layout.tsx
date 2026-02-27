@@ -3,6 +3,7 @@ import {
   BarChart3,
   Building2Icon,
   FileStack,
+  MailIcon,
   Settings,
   Trophy,
   Users,
@@ -119,6 +120,20 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
             <Link to="/admin/documents">
               <FileStack className="mr-2 h-5 w-5" />
               <Trans>Documents</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/email-domains') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/email-domains">
+              <MailIcon className="mr-2 h-5 w-5" />
+              <Trans>Email Domains</Trans>
             </Link>
           </Button>
 

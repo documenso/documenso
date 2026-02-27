@@ -115,7 +115,9 @@ export const ConfigureFieldsView = ({
       templateId: null,
       token: '',
       documentDeletedAt: null,
-      expired: null,
+      expired: null, // !: deprecated Not in use. To be removed in a future migration.
+      expiresAt: null,
+      expirationNotifiedAt: null,
       signedAt: null,
       authOptions: null,
       rejectionReason: null,
