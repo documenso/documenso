@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import {
@@ -9,6 +10,12 @@ import {
   ShieldCheckIcon,
   UserIcon,
 } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Documenso Docs',
+  description:
+    'The official documentation for Documenso, the open-source document signing platform. Send documents for signatures, integrate with the API, or self-host with full control.',
+};
 
 export default function HomePage() {
   return (
