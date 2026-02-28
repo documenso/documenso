@@ -174,12 +174,12 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
                         strokeWidth={1.5}
                       />
 
-                      <div className="flex flex-1 flex-col gap-4 overflow-hidden md:flex-row md:items-start md:justify-between">
-                        <div>
+                      <div className="flex min-w-0 flex-1 flex-col gap-4 overflow-hidden md:flex-row md:items-start md:justify-between">
+                        <div className="min-w-0">
                           <p className="text-foreground text-sm font-semibold leading-none">
                             {template.publicTitle}
                           </p>
-                          <p className="text-muted-foreground mt-1 line-clamp-3 max-w-[70ch] whitespace-normal text-xs">
+                          <p className="text-muted-foreground mt-1 line-clamp-3 max-w-[70ch] break-words whitespace-normal text-xs">
                             {template.publicDescription}
                           </p>
                         </div>
