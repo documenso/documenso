@@ -1,0 +1,83 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+catalog:
+  # Core
+  react: ^18
+  react-dom: ^18
+  typescript: 5.6.2
+  zod: ^3.25.76
+
+  # Shared utilities
+  ts-pattern: ^5.9.0
+  luxon: ^3.7.2
+  nanoid: ^5.1.6
+  remeda: ^2.32.0
+  superjson: ^2.2.5
+
+  # AWS
+  '@aws-sdk/client-s3': ^3.998.0
+  '@aws-sdk/client-sesv2': ^3.998.0
+  '@aws-sdk/cloudfront-signer': ^3.998.0
+  '@aws-sdk/s3-request-presigner': ^3.998.0
+  '@aws-sdk/signature-v4-crt': ^3.998.0
+
+  # Framework
+  hono: ^4.12.2
+  '@hono/standard-validator': ^0.2.0
+  '@tanstack/react-query': 5.90.10
+  '@trpc/client': 11.8.1
+  '@trpc/react-query': 11.8.1
+  '@trpc/server': 11.8.1
+  '@ts-rest/core': ^3.52.1
+  '@ts-rest/open-api': ^3.52.1
+  '@ts-rest/serverless': ^3.52.1
+
+  # UI
+  framer-motion: ^12.23.24
+  lucide-react: ^0.554.0
+  react-hook-form: ^7.66.1
+  '@hookform/resolvers': ^3
+  react-rnd: ^10.5.2
+  react-pdf: ^10.3.0
+  konva: ^10.0.9
+  '@napi-rs/canvas': ^0.1.83
+  tailwindcss: ^3.4.18
+  autoprefixer: ^10.4.22
+  tailwindcss-animate: ^1.0.7
+
+  # i18n
+  '@lingui/core': ^5.6.0
+  '@lingui/macro': ^5.6.0
+  '@lingui/react': ^5.6.0
+
+  # Auth
+  '@simplewebauthn/server': ^13.2.2
+  '@oslojs/crypto': ^1.0.1
+  '@oslojs/encoding': ^1.1.0
+
+  # Crypto
+  '@scure/base': ^1.2.6
+
+  # Observability
+  posthog-node: 4.18.0
+  posthog-js: ^1.297.2
+
+  # Database
+  kysely: 0.28.8
+  '@prisma/client': ^6.19.0
+  prisma: ^6.19.0
+
+  # Build tools
+  tsx: ^4.20.6
+  vite: ^7.2.4
+  eslint: ^8.57.0
+  prettier: ^3.6.2
+
+  # Types
+  '@types/react': 18.3.27
+  '@types/react-dom': ^18
+  '@types/node': ^20
+  '@types/luxon': ^3.7.1
+  '@types/formidable': ^3.4.6

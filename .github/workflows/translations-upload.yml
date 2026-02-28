@@ -25,7 +25,7 @@ jobs:
       - uses: ./.github/actions/node-install
 
       - name: Extract translations
-        run: npm run translate:extract
+        run: pnpm run translate:extract
 
       - name: Commit changes and push to reserved branch
         env:
@@ -78,7 +78,7 @@ jobs:
 
       - name: Compile translations
         id: compile_translations
-        run: npm run translate:compile -- -- --strict
+        run: pnpm run translate:compile -- -- --strict
         continue-on-error: true
 
       - name: Upload missing translations

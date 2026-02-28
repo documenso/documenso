@@ -31,7 +31,7 @@ jobs:
       - uses: ./.github/actions/node-install
 
       - name: Build app
-        run: npm run build
+        run: pnpm run build
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3

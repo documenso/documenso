@@ -1,4 +1,3 @@
-import { WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
 import { z } from 'zod';
 
 import WebhookCallSchema from '@documenso/prisma/generated/zod/modelSchema/WebhookCallSchema';

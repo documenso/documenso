@@ -15,15 +15,15 @@
     "v1/"
   ],
   "dependencies": {
-    "@documenso/lib": "*",
-    "@documenso/prisma": "*",
-    "@ts-rest/core": "^3.52.1",
-    "@ts-rest/open-api": "^3.52.1",
-    "@ts-rest/serverless": "^3.52.1",
+    "@documenso/lib": "workspace:*",
+    "@documenso/prisma": "workspace:*",
+    "@ts-rest/core": "catalog:",
+    "@ts-rest/open-api": "catalog:",
+    "@ts-rest/serverless": "catalog:",
     "@types/swagger-ui-react": "^5.18.0",
-    "luxon": "^3.7.2",
-    "superjson": "^2.2.5",
-    "ts-pattern": "^5.9.0",
-    "zod": "^3.25.76"
+    "luxon": "catalog:",
+    "superjson": "catalog:",
+    "ts-pattern": "catalog:",
+    "zod": "catalog:"
   }
 }
