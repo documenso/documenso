@@ -28,6 +28,7 @@ export type DocumentShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
   token?: string;
   documentId: number;
   trigger?: (_props: { loading: boolean; disabled: boolean }) => React.ReactNode;
+  onDialogClose?: () => void;
 };
 
 export const DocumentShareButton = ({
@@ -35,6 +36,7 @@ export const DocumentShareButton = ({
   documentId,
   className,
   trigger,
+  onDialogClose,
 }: DocumentShareButtonProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -72,6 +74,10 @@ export const DocumentShareButton = ({
       });
     }
 
+    if (!nextOpen) {
+      onDialogClose?.();
+    }
+
     setIsOpen(nextOpen);
   };
 
@@ -86,6 +92,7 @@ export const DocumentShareButton = ({
     }
 
     setIsOpen(false);
+    onDialogClose?.();
   };
 
   const onTweetClick = async () => {
@@ -115,15 +122,27 @@ export const DocumentShareButton = ({
     );
 
     setIsOpen(false);
+    onDialogClose?.();
   };
+
+  const triggerContent = trigger?.({
+    disabled: !documentId,
+    loading: isLoading,
+  });
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
-        {trigger?.({
-          disabled: !documentId,
-          loading: isLoading,
-        }) || (
+      {triggerContent ? (
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpen(true);
+          }}
+        >
+          {triggerContent}
+        </div>
+      ) : (
+        <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
           <Button
             variant="outline"
             disabled={!token || !documentId}
@@ -133,12 +152,12 @@ export const DocumentShareButton = ({
             {!isLoading && <Sparkles className="mr-2 h-5 w-5" />}
             <Trans>Share</Trans>
           </Button>
-        )}
-      </DialogTrigger>
+        </DialogTrigger>
+      )}
 
       <DialogContent position="end">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="break-words text-lg font-semibold">
             <Trans>Share your signing experience!</Trans>
           </DialogTitle>
 
@@ -166,7 +185,7 @@ export const DocumentShareButton = ({
             </span>
             <div
               className={cn(
-                'bg-muted/40 mt-4 aspect-[1200/630] overflow-hidden rounded-lg border',
+                'mt-4 aspect-[1200/630] overflow-hidden rounded-lg border bg-muted/40',
                 {
                   'animate-pulse': !shareLink?.slug,
                 },
