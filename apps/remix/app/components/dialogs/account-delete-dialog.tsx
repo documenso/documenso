@@ -35,13 +35,14 @@ export const AccountDeleteDialog = ({ className }: AccountDeleteDialogProps) => 
   const hasTwoFactorAuthentication = user.twoFactorEnabled;
 
   const [enteredEmail, setEnteredEmail] = useState<string>('');
+  const [enteredPassword, setEnteredPassword] = useState<string>('');
 
   const { mutateAsync: deleteAccount, isPending: isDeletingAccount } =
     trpc.profile.deleteAccount.useMutation();
 
   const onDeleteAccount = async () => {
     try {
-      await deleteAccount();
+      await deleteAccount({ password: enteredPassword });
 
       toast({
         title: _(msg`Account deleted`),
@@ -136,12 +137,26 @@ export const AccountDeleteDialog = ({ className }: AccountDeleteDialogProps) => 
                   />
                 </div>
               )}
+
+              <div>
+                <Label>
+                  <Trans>Enter your password to confirm deletion.</Trans>
+                </Label>
+
+                <Input
+                  type="password"
+                  className="mt-2"
+                  aria-label="Confirm Password"
+                  value={enteredPassword}
+                  onChange={(e) => setEnteredPassword(e.target.value)}
+                />
+              </div>
               <DialogFooter>
                 <Button
                   onClick={onDeleteAccount}
                   loading={isDeletingAccount}
                   variant="destructive"
-                  disabled={hasTwoFactorAuthentication || enteredEmail !== user.email}
+                  disabled={hasTwoFactorAuthentication || enteredEmail !== user.email || !enteredPassword}
                 >
                   {isDeletingAccount ? _(msg`Deleting account...`) : _(msg`Confirm Deletion`)}
                 </Button>
