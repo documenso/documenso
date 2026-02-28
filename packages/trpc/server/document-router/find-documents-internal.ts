@@ -37,8 +37,10 @@ export const findDocumentsInternalRoute = authenticatedProcedure
       folderId,
     };
 
+    let team: Awaited<ReturnType<typeof getTeamById>> | undefined;
+
     if (teamId) {
-      const team = await getTeamById({ userId: user.id, teamId });
+      team = await getTeamById({ userId: user.id, teamId });
 
       getStatOptions.team = {
         teamId: team.id,
@@ -55,6 +57,7 @@ export const findDocumentsInternalRoute = authenticatedProcedure
       findDocuments({
         userId: user.id,
         teamId,
+        team,
         query,
         templateId,
         page,

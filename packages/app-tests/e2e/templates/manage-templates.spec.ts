@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
-import { TeamMemberRole } from '@prisma/client';
+import { TeamMemberRole, TemplateType } from '@prisma/client';
 
+import { prisma } from '@documenso/prisma';
 import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedTemplate } from '@documenso/prisma/seed/templates';
 
@@ -39,6 +40,56 @@ test('[TEMPLATES]: view templates', async ({ page }) => {
 
   // Owner should see both team templates.
   await expect(page.getByTestId('data-table-count')).toContainText('Showing 2 results');
+});
+
+test('[TEMPLATES]: supports search and multi-type filtering', async ({ page }) => {
+  const { team, owner } = await seedTeam({
+    createTeamMembers: 1,
+  });
+
+  const publicTemplate = await seedTemplate({
+    title: 'Public Team Template',
+    userId: owner.id,
+    teamId: team.id,
+  });
+
+  const privateTemplate = await seedTemplate({
+    title: 'Private Team Template',
+    userId: owner.id,
+    teamId: team.id,
+  });
+
+  await prisma.envelope.update({
+    where: {
+      id: publicTemplate.id,
+    },
+    data: {
+      templateType: TemplateType.PUBLIC,
+    },
+  });
+
+  await prisma.envelope.update({
+    where: {
+      id: privateTemplate.id,
+    },
+    data: {
+      templateType: TemplateType.PRIVATE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: owner.email,
+    redirectPath: `/t/${team.url}/templates?query=Public&type=PUBLIC`,
+  });
+
+  await expect(page.getByRole('link', { name: 'Public Team Template' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Private Team Template' })).not.toBeVisible();
+
+  await page.goto(`/t/${team.url}/templates?type=PUBLIC,PRIVATE`);
+
+  await expect(page.getByRole('link', { name: 'Public Team Template' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Private Team Template' })).toBeVisible();
 });
 
 test('[TEMPLATES]: delete template', async ({ page }) => {

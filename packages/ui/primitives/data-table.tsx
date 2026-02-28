@@ -18,7 +18,7 @@ export type DataTableChildren<TData> = (_table: TTable<TData>) => React.ReactNod
 
 export type { ColumnDef as DataTableColumnDef, RowSelectionState } from '@tanstack/react-table';
 
-export interface DataTableProps<TData, TValue> {
+export type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[];
   columnVisibility?: VisibilityState;
   data: TData[];
@@ -45,7 +45,7 @@ export interface DataTableProps<TData, TValue> {
   rowSelection?: RowSelectionState;
   onRowSelectionChange?: (selection: RowSelectionState) => void;
   getRowId?: (row: TData) => string;
-}
+};
 
 export function DataTable<TData, TValue>({
   columns,
@@ -167,7 +167,7 @@ export function DataTable<TData, TValue>({
                 )}
               </TableRow>
             ) : skeleton?.enable ? (
-              Array.from({ length: skeleton.rows }).map((_, i) => (
+              Array.from({ length: skeleton.rows }, (_, i) => (
                 <TableRow key={`skeleton-row-${i}`}>{skeleton.component ?? <Skeleton />}</TableRow>
               ))
             ) : (
@@ -181,6 +181,7 @@ export function DataTable<TData, TValue>({
 
                       {hasFilters && onClearFilters !== undefined && (
                         <button
+                          type="button"
                           onClick={() => onClearFilters()}
                           className="mt-1 text-sm text-foreground"
                         >

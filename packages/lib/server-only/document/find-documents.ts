@@ -11,14 +11,15 @@ import { type FindResultResponse } from '../../types/search-params';
 import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
 import { getTeamById } from '../team/get-team';
 
-export type PeriodSelectorValue = '' | '7d' | '14d' | '30d';
+export type PeriodSelectorValue = '' | 'all' | '7d' | '14d' | '30d';
 
 export type FindDocumentsOptions = {
   userId: number;
   teamId?: number;
+  team?: Awaited<ReturnType<typeof getTeamById>>;
   templateId?: number;
-  source?: DocumentSource;
-  status?: ExtendedDocumentStatus;
+  source?: DocumentSource | DocumentSource[];
+  status?: ExtendedDocumentStatus | ExtendedDocumentStatus[];
   page?: number;
   perPage?: number;
   orderBy?: {
@@ -34,9 +35,10 @@ export type FindDocumentsOptions = {
 export const findDocuments = async ({
   userId,
   teamId,
+  team: preloadedTeam,
   templateId,
   source,
-  status = ExtendedDocumentStatus.ALL,
+  status,
   page = 1,
   perPage = 10,
   orderBy,
@@ -45,29 +47,25 @@ export const findDocuments = async ({
   query = '',
   folderId,
 }: FindDocumentsOptions) => {
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-    },
-  });
-
-  let team = null;
-
-  if (teamId !== undefined) {
-    team = await getTeamById({
-      userId,
-      teamId,
-    });
-  }
+  const [user, team] = await Promise.all([
+    prisma.user.findFirstOrThrow({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
+    }),
+    preloadedTeam ?? (teamId !== undefined ? getTeamById({ userId, teamId }) : null),
+  ]);
 
   const orderByColumn = orderBy?.column ?? 'createdAt';
   const orderByDirection = orderBy?.direction ?? 'desc';
   const teamMemberRole = team?.currentTeamRole ?? null;
+
+  const normalizedStatuses = normalizeStatuses(status);
 
   const searchFilter: Prisma.EnvelopeWhereInput = {
     OR: [
@@ -111,10 +109,16 @@ export const findDocuments = async ({
     },
   ];
 
-  let filters: Prisma.EnvelopeWhereInput | null = findDocumentsFilter(status, user, folderId);
+  let filters: Prisma.EnvelopeWhereInput | null = mergeStatusFilters(
+    normalizedStatuses.map((currentStatus) => findDocumentsFilter(currentStatus, user, folderId)),
+  );
 
   if (team) {
-    filters = findTeamDocumentsFilter(status, team, visibilityFilters, folderId);
+    filters = mergeStatusFilters(
+      normalizedStatuses.map((currentStatus) =>
+        findTeamDocumentsFilter(currentStatus, team, visibilityFilters, folderId),
+      ),
+    );
   }
 
   if (filters === null) {
@@ -193,8 +197,12 @@ export const findDocuments = async ({
   }
 
   if (source) {
+    const sources = Array.isArray(source) ? source : [source];
+
     whereAndClause.push({
-      source,
+      source: {
+        in: sources,
+      },
     });
   }
 
@@ -203,7 +211,7 @@ export const findDocuments = async ({
     AND: whereAndClause,
   };
 
-  if (period) {
+  if (period && period !== 'all') {
     const daysAgo = parseInt(period.replace(/d$/, ''), 10);
 
     const startOfPeriod = DateTime.now().minus({ days: daysAgo }).startOf('day');
@@ -219,11 +227,7 @@ export const findDocuments = async ({
     };
   }
 
-  if (folderId !== undefined) {
-    whereClause.folderId = folderId;
-  } else {
-    whereClause.folderId = null;
-  }
+  whereClause.folderId = folderId ?? null;
 
   const [data, count] = await Promise.all([
     prisma.envelope.findMany({
@@ -277,6 +281,39 @@ export const findDocuments = async ({
     perPage,
     totalPages: Math.ceil(count / perPage),
   } satisfies FindResultResponse<typeof data>;
+};
+
+const normalizeStatuses = (status: FindDocumentsOptions['status']) => {
+  if (!status) {
+    return [ExtendedDocumentStatus.ALL];
+  }
+
+  const statuses = Array.isArray(status) ? status : [status];
+  const dedupedStatuses = Array.from(new Set(statuses));
+
+  if (dedupedStatuses.includes(ExtendedDocumentStatus.ALL)) {
+    return [ExtendedDocumentStatus.ALL];
+  }
+
+  return dedupedStatuses;
+};
+
+const mergeStatusFilters = (filters: Array<Prisma.EnvelopeWhereInput | null>) => {
+  const validFilters = filters.filter(
+    (filter): filter is Prisma.EnvelopeWhereInput => filter !== null,
+  );
+
+  if (validFilters.length === 0) {
+    return null;
+  }
+
+  if (validFilters.length === 1) {
+    return validFilters[0];
+  }
+
+  return {
+    OR: validFilters,
+  } satisfies Prisma.EnvelopeWhereInput;
 };
 
 const findDocumentsFilter = (
