@@ -36,14 +36,14 @@ export const DropdownFieldAdvancedSettings = ({
   const { _ } = useLingui();
 
   const [showValidation, setShowValidation] = useState(false);
-  const [values, setValues] = useState(fieldState.values ?? [{ value: 'Option 1' }]);
+  const [values, setValues] = useState(fieldState.values ?? [{ value: _(msg`Option 1`) }]);
   const [readOnly, setReadOnly] = useState(fieldState.readOnly ?? false);
   const [required, setRequired] = useState(fieldState.required ?? false);
-  const [defaultValue, setDefaultValue] = useState(fieldState.defaultValue ?? 'Option 1');
+  const [defaultValue, setDefaultValue] = useState(fieldState.defaultValue ?? _(msg`Option 1`));
 
   const addValue = () => {
-    setValues([...values, { value: 'New option' }]);
-    handleFieldChange('values', [...values, { value: 'New option' }]);
+    setValues([...values, { value: _(msg`New option`) }]);
+    handleFieldChange('values', [...values, { value: _(msg`New option`) }]);
   };
 
   const removeValue = (index: number) => {
@@ -90,11 +90,11 @@ export const DropdownFieldAdvancedSettings = ({
   }, [values]);
 
   useEffect(() => {
-    setValues(fieldState.values ?? [{ value: 'Option 1' }]);
+    setValues(fieldState.values ?? [{ value: _(msg`Option 1`) }]);
   }, [fieldState.values]);
 
   useEffect(() => {
-    setDefaultValue(fieldState.defaultValue ?? 'Option 1');
+    setDefaultValue(fieldState.defaultValue ?? _(msg`Option 1`));
   }, [fieldState.defaultValue]);
 
   return (

@@ -96,7 +96,7 @@ export const EditorFieldDropdownForm = ({
     mode: 'onChange',
     defaultValues: {
       defaultValue: value.defaultValue,
-      values: value.values || [{ value: 'Option 1' }],
+      values: [{ value: t`Option 1` }],
       required: value.required || false,
       readOnly: value.readOnly || false,
       fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
@@ -110,13 +110,13 @@ export const EditorFieldDropdownForm = ({
   const addValue = () => {
     const currentValues = form.getValues('values') || [];
 
-    let newValue = 'New option';
+    let newValue = t`New option`;
 
     // Iterate to create a unique value
     for (let i = 0; i < currentValues.length; i++) {
-      newValue = `New option ${i + 1}`;
-      if (currentValues.some((item) => item.value === `New option ${i + 1}`)) {
-        newValue = `New option ${i + 1}`;
+      newValue = t`New option ${i + 1}`;
+      if (currentValues.some((item) => item.value === t`New option ${i + 1}`)) {
+        newValue = t`New option ${i + 1}`;
       } else {
         break;
       }
