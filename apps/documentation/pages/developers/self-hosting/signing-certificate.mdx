@@ -71,3 +71,53 @@ Configure your instance to use the new certificate by configuring the following 
 | `NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER`                    | Set to "true" to use the legacy adbe.pkcs7.detached subfilter instead of ETSI.CAdES.detached. This field is optional.                     |
 
 </Steps>
+
+## Using Trusted Signatures
+
+Trusted Signatures is a cloud-based signing service that provides Adobe-trusted digital signatures without
+the need to manage your own certificates or HSM infrastructure.
+
+### Benefits
+
+- Adobe-trusted signatures with green checkmark in PDF readers
+- No need to purchase or manage your own certificates
+- Secure cloud-based HSM for key storage
+- Pay-as-you-go pricing
+
+### Technical Process
+
+<Steps>
+
+### Sign up for Trusted Signatures
+
+Create an account at [trusted-signatures.com](https://trusted-signatures.com) and create an API Key. You can
+use a test certificate for free (but it is self-signed), or you can sign up and use an AATL and eIDAS approved
+certificate for a small fee.
+
+### Configure Documenso to use Trusted Signatures
+
+Configure your instance to use Trusted Signatures by adding the following environment variables to your `.env` file:
+
+| Environment Variable                 | Description                                                       |
+| :----------------------------------- | :---------------------------------------------------------------- |
+| `NEXT_PRIVATE_SIGNING_TRANSPORT`     | Set to `trusted-signatures` to use the Trusted Signatures service |
+| `NEXT_PRIVATE_SIGNING_TS_API_KEY_ID` | Your Trusted Signatures API Key ID                                |
+| `NEXT_PRIVATE_SIGNING_TS_API_KEY`    | Your Trusted Signatures API Key (in hexadecimal format)           |
+| `NEXT_PRIVATE_SIGNING_TS_TIMESTAMP`  | Set to `true` to include a TSA timestamp in the signature         |
+
+### Test your integration
+
+Send a test document through your Documenso instance to verify the integration is working correctly.
+If you used an API Key associated with a test certificate, the document will be signed but the
+certificate will not be recognized.
+
+If you used our AATL/eIDAS signing key, the signed document should display a green checkmark in Adobe Reader
+and other PDF viewers that recognize Adobe-trusted certificates.
+
+</Steps>
+
+<Callout type="info" emoji="ℹ️">
+  Trusted Signatures is a paid service with various pricing tiers based on your signing volume.
+  Visit [trusted-signatures.com/pricing](https://trusted-signatures.com/pricing) for current pricing
+  information.
+</Callout>

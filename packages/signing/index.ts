@@ -9,6 +9,9 @@ import {
 } from '@documenso/lib/constants/app';
 import { env } from '@documenso/lib/utils/env';
 
+import { signWithGoogleCloudHSM } from './transports/google-cloud-hsm';
+import { signWithLocalCert } from './transports/local-cert';
+import { signWithTrustedSignatures } from './transports/trusted-signatures';
 import { getTimestampAuthority } from './helpers/tsa';
 import { createGoogleCloudSigner } from './transports/google-cloud';
 import { createLocalSigner } from './transports/local';
@@ -30,6 +33,7 @@ const getSigner = async () => {
   signer = await match(transport)
     .with('local', async () => await createLocalSigner())
     .with('gcloud-hsm', async () => await createGoogleCloudSigner())
+    .with('trusted-signatures', async () => signWithTrustedSignatures({ pdf }))
     .otherwise(() => {
       throw new Error(`Unsupported signing transport: ${transport}`);
     });
