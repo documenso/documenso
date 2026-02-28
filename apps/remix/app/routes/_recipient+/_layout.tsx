@@ -11,6 +11,13 @@ import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 
 import type { Route } from './+types/_layout';
 
+export function meta() {
+  return [
+    { title: 'Sign Document - Documenso' },
+    { name: 'robots', content: 'noindex, nofollow, noarchive, nosnippet, noimageindex' },
+  ];
+}
+
 /**
  * A layout to handle scenarios where the user is a recipient of a given resource
  * where we do not care whether they are authenticated or not.
