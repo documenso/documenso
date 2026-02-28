@@ -119,16 +119,15 @@ git clone https://github.com/<your-username>/documenso
 
 2. Set up your `.env` file using the recommendations in the `.env.example` file. Alternatively, just run `cp .env.example .env` to get started with our handpicked defaults.
 
-3. Run `npm run dx` in the root directory
-
+3. Run `pnpm run dx` in the root directory
    - This will spin up a postgres database and inbucket mailserver in a docker container.
 
-4. Run `npm run dev` in the root directory
+4. Run `pnpm run dev` in the root directory
 
 5. Want it even faster? Just use
 
 ```sh
-npm run d
+pnpm run d
 ```
 
 #### Access Points for Your Application
@@ -136,7 +135,6 @@ npm run d
 1. **App** - http://localhost:3000
 2. **Incoming Mail Access** - http://localhost:9000
 3. **Database Connection Details**
-
    - **Port**: 54320
    - **Connection**: Use your favorite database client to connect using the provided port.
 
@@ -156,12 +154,11 @@ After forking the repository, clone it to your local device by using the followi
 git clone https://github.com/<your-username>/documenso
 ```
 
-2. Run `npm i` in the root directory
+2. Run `pnpm install` in the root directory
 
 3. Create your `.env` from the `.env.example`. You can use `cp .env.example .env` to get started with our handpicked defaults.
 
 4. Set the following environment variables:
-
    - NEXTAUTH_SECRET
    - NEXT_PUBLIC_WEBAPP_URL
    - NEXT_PRIVATE_DATABASE_URL
@@ -169,17 +166,17 @@ git clone https://github.com/<your-username>/documenso
    - NEXT_PRIVATE_SMTP_FROM_NAME
    - NEXT_PRIVATE_SMTP_FROM_ADDRESS
 
-5. Create the database schema by running `npm run prisma:migrate-dev`
+5. Create the database schema by running `pnpm run prisma:migrate-dev`
 
-6. Run `npm run translate:compile` in the root directory to compile lingui
+6. Run `pnpm run translate:compile` in the root directory to compile lingui
 
-7. Run `npm run dev` in the root directory to start
+7. Run `pnpm run dev` in the root directory to start
 
 8. Register a new user at http://localhost:3000/signup
 
 ---
 
-- Optional: Seed the database using `npm run prisma:seed -w @documenso/prisma` to create a test user and document.
+- Optional: Seed the database using `pnpm run prisma:seed -w @documenso/prisma` to create a test user and document.
 - Optional: Create your own signing certificate.
   - To generate your own using these steps and a Linux Terminal or Windows Subsystem for Linux (WSL), see **[Create your own signing certificate](./SIGNING.md)**.
 
@@ -244,16 +241,16 @@ The following environment variables must be set:
 Now you can install the dependencies and build it:
 
 ```
-npm i
-npm run build
-npm run prisma:migrate-deploy
+pnpm install
+pnpm run build
+pnpm run prisma:migrate-deploy
 ```
 
 Finally, you can start it with:
 
 ```
 cd apps/remix
-npm run start
+pnpm run start
 ```
 
 This will start the server on `localhost:3000`. For now, any reverse proxy can then do the frontend and SSL termination.
@@ -313,7 +310,7 @@ If you are deploying to a cluster that uses only IPv6, You can use a custom comm
 For local docker run
 
 ```bash
-docker run -it documenso:latest npm run start -- -H ::
+docker run -it documenso:latest pnpm run start -- -H ::
 ```
 
 For k8s or docker-compose
@@ -324,7 +321,7 @@ containers:
     image: documenso:latest
     imagePullPolicy: IfNotPresent
     command:
-      - npm
+      - pnpm
     args:
       - run
       - start
@@ -338,13 +335,13 @@ containers:
 Wrap your package script with the `with:env` script like such:
 
 ```
-npm run with:env -- npm run myscript
+pnpm run with:env -- pnpm run myscript
 ```
 
-The same can be done when using `npx` for one of the bin scripts:
+The same can be done when using `pnpm exec` for one of the bin scripts:
 
 ```
-npm run with:env -- npx myscript
+pnpm run with:env -- pnpm exec myscript
 ```
 
 This will load environment variables from your `.env` and `.env.local` files.

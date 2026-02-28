@@ -17,8 +17,8 @@ You are creating proper MDX documentation for a module or feature in Documenso u
 
 Create documentation in the appropriate location:
 
-- **Developer docs**: `apps/documentation/pages/developers/`
-- **User docs**: `apps/documentation/pages/users/`
+- **Developer docs**: `apps/docs/`
+- **User docs**: `apps/docs/`
 
 ### File Format
 
@@ -66,7 +66,7 @@ Brief description of what this module/feature does and when to use it.
 If there are specific packages or imports needed:
 
 ```bash
-npm install @documenso/package-name
+pnpm install @documenso/package-name
 ```
 
 ## Quick Start

@@ -55,9 +55,9 @@ You are implementing a specification from the `.agents/plans/` directory. Work a
 Work continuously through these steps:
 
 1. **Implement** - Write the code for the current task
-2. **Typecheck** - Run `npm run typecheck -w @documenso/remix` to verify types
-3. **Lint** - Run `npm run lint:fix` to fix linting issues
-4. **Test** - If non-trivial, run E2E tests: `npm run test:dev -w @documenso/app-tests`
+2. **Typecheck** - Run `pnpm run typecheck -w @documenso/remix` to verify types
+3. **Lint** - Run `pnpm run lint:fix` to fix linting issues
+4. **Test** - If non-trivial, run E2E tests: `pnpm run test:dev -w @documenso/app-tests`
 5. **Fix** - If tests fail, fix and re-run
 6. **Repeat** - Move to next task
 
@@ -81,18 +81,18 @@ Work continuously through these steps:
 
 ```bash
 # Type checking
-npm run typecheck -w @documenso/remix
+pnpm run typecheck -w @documenso/remix
 
 # Linting
-npm run lint:fix
+pnpm run lint:fix
 
 # E2E Tests (only for non-trivial work)
-npm run test:dev -w @documenso/app-tests              # Run E2E tests in dev mode
-npm run test-ui:dev -w @documenso/app-tests            # Run E2E tests with UI
-npm run test:e2e                                       # Run full E2E test suite
+pnpm run test:dev -w @documenso/app-tests              # Run E2E tests in dev mode
+pnpm run test-ui:dev -w @documenso/app-tests            # Run E2E tests with UI
+pnpm run test:e2e                                       # Run full E2E test suite
 
 # Development
-npm run dev                                            # Start dev server
+pnpm run dev                                            # Start dev server
 ```
 
 ## Begin

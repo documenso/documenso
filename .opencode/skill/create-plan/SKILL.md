@@ -21,13 +21,13 @@ I help you create new plan files in the `.agents/plans/` directory. Each plan fi
 Run the script with a slug and content:
 
 ```bash
-npx tsx scripts/create-plan.ts "feature-name" "Plan content here"
+pnpm exec tsx scripts/create-plan.ts "feature-name" "Plan content here"
 ```
 
 Or use heredoc for multi-line content:
 
 ```bash
-npx tsx scripts/create-plan.ts "feature-name" << HEREDOC
+pnpm exec tsx scripts/create-plan.ts "feature-name" << HEREDOC
 Multi-line
 plan content
 goes here

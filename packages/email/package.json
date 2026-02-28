@@ -16,7 +16,7 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "@documenso/tailwind-config": "*",
+    "@documenso/tailwind-config": "workspace:*",
     "@documenso/nodemailer-resend": "4.0.0",
     "@react-email/body": "0.2.0",
     "@react-email/button": "0.2.0",
@@ -42,7 +42,7 @@
     "resend": "^6.5.2"
   },
   "devDependencies": {
-    "@documenso/tsconfig": "*",
+    "@documenso/tsconfig": "workspace:*",
     "@types/nodemailer": "^7.0.4"
   }
 }
