@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useEffect, useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 import { useTheme } from 'next-themes';
 
@@ -18,48 +18,50 @@ export const Mermaid = ({ chart }: { chart: string }) => {
   return <MermaidContent chart={chart} />;
 };
 
-const cache = new Map<string, Promise<unknown>>();
-
-const cachePromise = async <T,>(key: string, setPromise: () => Promise<T>): Promise<T> => {
-  const cached = cache.get(key);
-
-  if (cached) {
-    return cached as Promise<T>;
-  }
-
-  const promise = setPromise();
-  cache.set(key, promise);
-
-  return promise;
-};
-
 const MermaidContent = ({ chart }: { chart: string }) => {
   const id = useId();
+  const containerRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
-  const { default: mermaid } = use(cachePromise('mermaid', async () => import('mermaid')));
+  const [svg, setSvg] = useState<string | null>(null);
 
-  mermaid.initialize({
-    startOnLoad: false,
-    securityLevel: 'loose',
-    fontFamily: 'inherit',
-    themeCSS: 'margin: 1.5rem auto 0;',
-    theme: resolvedTheme === 'dark' ? 'dark' : 'default',
-  });
+  useEffect(() => {
+    let cancelled = false;
 
-  const { svg, bindFunctions } = use(
-    cachePromise(`${chart}-${resolvedTheme}`, async () => {
-      return mermaid.render(id, chart.replaceAll('\\n', '\n'));
-    }),
-  );
+    const render = async () => {
+      const mermaid = (await import('mermaid')).default;
 
-  return (
-    <div
-      ref={(container) => {
-        if (container) {
-          bindFunctions?.(container);
+      mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: 'loose',
+        fontFamily: 'inherit',
+        themeCSS: 'margin: 1.5rem auto 0;',
+        theme: resolvedTheme === 'dark' ? 'dark' : 'default',
+      });
+
+      const { svg: rendered, bindFunctions } = await mermaid.render(
+        id.replaceAll(':', ''),
+        chart.replaceAll('\\n', '\n'),
+      );
+
+      if (!cancelled) {
+        setSvg(rendered);
+
+        if (containerRef.current) {
+          bindFunctions?.(containerRef.current);
         }
-      }}
-      dangerouslySetInnerHTML={{ __html: svg }}
-    />
-  );
+      }
+    };
+
+    void render();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [chart, id, resolvedTheme]);
+
+  if (!svg) {
+    return null;
+  }
+
+  return <div ref={containerRef} dangerouslySetInnerHTML={{ __html: svg }} />;
 };
