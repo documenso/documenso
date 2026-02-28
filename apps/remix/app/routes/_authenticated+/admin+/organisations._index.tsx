@@ -6,6 +6,7 @@ import { useLocation, useSearchParams } from 'react-router';
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { Input } from '@documenso/ui/primitives/input';
 
+import { AdminOrganisationWithUserCreateDialog } from '~/components/dialogs/admin-organisation-with-user-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { AdminOrganisationsTable } from '~/components/tables/admin-organisations-table';
 
@@ -48,12 +49,15 @@ export default function Organisations() {
       />
 
       <div className="mt-4">
-        <Input
-          defaultValue={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={t`Search by organisation ID, name, customer ID or owner email`}
-          className="mb-4"
-        />
+        <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <Input
+            defaultValue={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t`Search by organisation ID, name, customer ID or owner email`}
+            className="flex-1"
+          />
+          <AdminOrganisationWithUserCreateDialog />
+        </div>
 
         <AdminOrganisationsTable />
       </div>
