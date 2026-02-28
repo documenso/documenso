@@ -4,7 +4,7 @@ import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import Konva from 'konva';
-import { Loader } from 'lucide-react';
+import { Loader, ZoomIn, ZoomOut } from 'lucide-react';
 import { type PDFDocumentProxy } from 'pdfjs-dist';
 import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
 
@@ -78,6 +78,7 @@ export const PdfViewerKonva = ({
 
   const { getPdfBuffer, currentEnvelopeItem, renderError } = useCurrentEnvelopeRender();
 
+  const [scale, setScale] = useState(1.0);
   const [width, setWidth] = useState(0);
   const [numPages, setNumPages] = useState(0);
   const [pdfError, setPdfError] = useState(false);
@@ -134,7 +135,7 @@ export const PdfViewerKonva = ({
       {envelopeItemFile && Konva ? (
         <PDFDocument
           file={envelopeItemFile}
-          className={cn('w-full rounded', {
+          className={cn('group w-full rounded', {
             'h-[80vh] max-h-[60rem]': numPages === 0,
           })}
           onLoadSuccess={(d) => onDocumentLoaded(d)}
@@ -173,12 +174,34 @@ export const PdfViewerKonva = ({
             </div>
           }
           options={pdfViewerOptions}
+          scale={scale}
         >
           {Array(numPages)
             .fill(null)
             .map((_, i) => (
-              <div key={i} className="last:-mb-2">
-                <div className="rounded border border-border will-change-transform">
+              <div key={i} className="relative last:-mb-2">
+                <div className="absolute right-2 z-10 mt-2 text-primary-foreground opacity-10 group-hover:opacity-80">
+                  <button
+                    className="mr-1 disabled:text-gray-500"
+                    disabled={scale <= 1}
+                    onClick={() => setScale((prevScale) => prevScale - 0.25)}
+                  >
+                    <ZoomOut size={20} />
+                  </button>
+                  <button
+                    className="disabled:text-gray-500"
+                    disabled={scale >= 2.0}
+                    onClick={() => setScale((prevScale) => prevScale + 0.25)}
+                  >
+                    <ZoomIn size={20} />
+                  </button>
+                </div>
+                <div
+                  className={cn(
+                    'overflow-hidden rounded border border-border will-change-transform',
+                    { 'overflow-x-auto': scale > 1.0 },
+                  )}
+                >
                   <PDFPage
                     pageNumber={i + 1}
                     width={width}

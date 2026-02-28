@@ -5,7 +5,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { EnvelopeItem } from '@prisma/client';
 import { base64 } from '@scure/base';
-import { Loader } from 'lucide-react';
+import { Loader, ZoomIn, ZoomOut } from 'lucide-react';
 import { type PDFDocumentProxy } from 'pdfjs-dist';
 import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
 
@@ -88,6 +88,7 @@ export const PDFViewer = ({
     overrideData ? base64.decode(overrideData) : null,
   );
 
+  const [scale, setScale] = useState(1.0);
   const [width, setWidth] = useState(0);
   const [numPages, setNumPages] = useState(0);
   const [pdfError, setPdfError] = useState(false);
@@ -217,7 +218,7 @@ export const PDFViewer = ({
         <>
           <PDFDocument
             file={envelopeItemFile}
-            className={cn('w-full overflow-hidden rounded', {
+            className={cn('group w-full overflow-hidden rounded', {
               'h-[80vh] max-h-[60rem]': numPages === 0,
             })}
             onLoadSuccess={(d) => onDocumentLoaded(d)}
@@ -256,12 +257,34 @@ export const PDFViewer = ({
               </div>
             }
             options={pdfViewerOptions}
+            scale={scale}
           >
             {Array(numPages)
               .fill(null)
               .map((_, i) => (
-                <div key={i} className="last:-mb-2">
-                  <div className="overflow-hidden rounded border border-border will-change-transform">
+                <div key={i} className="relative last:-mb-2">
+                  <div className="absolute right-2 z-10 mt-2 text-gray-900 opacity-10 group-hover:opacity-80">
+                    <button
+                      className="mr-1 disabled:text-gray-500"
+                      disabled={scale <= 1}
+                      onClick={() => setScale((prevScale) => prevScale - 0.25)}
+                    >
+                      <ZoomOut size={20} />
+                    </button>
+                    <button
+                      className="disabled:text-gray-500"
+                      disabled={scale >= 2.0}
+                      onClick={() => setScale((prevScale) => prevScale + 0.25)}
+                    >
+                      <ZoomIn size={20} />
+                    </button>
+                  </div>
+                  <div
+                    className={cn(
+                      'overflow-hidden rounded border border-border will-change-transform',
+                      { 'overflow-x-auto': scale > 1.0 },
+                    )}
+                  >
                     <PDFPage
                       pageNumber={i + 1}
                       width={width}
