@@ -1,46 +1,45 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import Konva from 'konva';
-import type { RenderParameters } from 'pdfjs-dist/types/src/display/api';
-import { usePageContext } from 'react-pdf';
+
+import { PDF_VIEWER_PAGE_CLASSNAME } from '@documenso/lib/constants/pdf-viewer';
+
+import { EAGER_LOAD_PAGE_COUNT, type PageRenderData } from '../providers/envelope-render-provider';
 
 type RenderFunction = (props: { stage: Konva.Stage; pageLayer: Konva.Layer }) => void;
 
-export function usePageRenderer(renderFunction: RenderFunction) {
-  const pageContext = usePageContext();
+export const usePageRenderer = (renderFunction: RenderFunction, pageData: PageRenderData) => {
+  const { pageWidth, pageHeight, scale, imageUrl, pageNumber } = pageData;
 
-  if (!pageContext) {
-    throw new Error('Unable to find Page context.');
-  }
-
-  const { page, rotate, scale } = pageContext;
-
-  if (!page) {
-    throw new Error('Attempted to render page canvas, but no page was specified.');
-  }
-
-  const canvasElement = useRef<HTMLCanvasElement>(null);
   const konvaContainer = useRef<HTMLDivElement>(null);
 
   const stage = useRef<Konva.Stage | null>(null);
   const pageLayer = useRef<Konva.Layer | null>(null);
 
-  const [renderError, setRenderError] = useState<boolean>(false);
+  const [renderStatus, setRenderStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
 
   /**
    * The raw viewport with no scaling. Basically the actual PDF size.
    */
   const unscaledViewport = useMemo(
-    () => page.getViewport({ scale: 1, rotation: rotate }),
-    [page, rotate, scale],
+    () => ({
+      scale: 1,
+      width: pageWidth,
+      height: pageHeight,
+    }),
+    [pageWidth, pageHeight],
   );
 
   /**
    * The viewport scaled according to page width.
    */
   const scaledViewport = useMemo(
-    () => page.getViewport({ scale, rotation: rotate }),
-    [page, rotate, scale],
+    () => ({
+      scale,
+      width: pageWidth * scale,
+      height: pageHeight * scale,
+    }),
+    [pageWidth, pageHeight, scale],
   );
 
   /**
@@ -48,88 +47,77 @@ export function usePageRenderer(renderFunction: RenderFunction) {
    * in a higher resolution.
    */
   const renderViewport = useMemo(
-    () => page.getViewport({ scale: scale * window.devicePixelRatio, rotation: rotate }),
-    [page, rotate, scale],
+    () => ({
+      scale: scale * window.devicePixelRatio,
+      width: pageWidth * scale * window.devicePixelRatio,
+      height: pageHeight * scale * window.devicePixelRatio,
+    }),
+    [pageWidth, pageHeight, scale],
   );
 
   /**
-   * Render the PDF and create the scaled Konva stage.
+   * The props for the image element which will render the page.
    */
-  useEffect(
-    function drawPageOnCanvas() {
-      if (!page) {
-        return;
-      }
-
-      const { current: canvas } = canvasElement;
-      const { current: kContainer } = konvaContainer;
-
-      if (!canvas || !kContainer) {
-        return;
-      }
-
-      canvas.width = renderViewport.width;
-      canvas.height = renderViewport.height;
-
-      canvas.style.width = `${Math.floor(scaledViewport.width)}px`;
-      canvas.style.height = `${Math.floor(scaledViewport.height)}px`;
-
-      const renderContext: RenderParameters = {
-        canvas,
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        canvasContext: canvas.getContext('2d', { alpha: false }) as CanvasRenderingContext2D,
-        viewport: renderViewport,
-      };
-
-      const cancellable = page.render(renderContext);
-      const runningTask = cancellable;
-
-      cancellable.promise.catch(() => {
-        // Intentionally empty
-      });
-
-      void cancellable.promise.then(() => {
-        stage.current = new Konva.Stage({
-          container: kContainer,
-          width: scaledViewport.width,
-          height: scaledViewport.height,
-          scale: {
-            x: scale,
-            y: scale,
-          },
-        });
-
-        // Create the main layer for interactive elements.
-        pageLayer.current = new Konva.Layer();
-
-        stage.current.add(pageLayer.current);
-
-        renderFunction({
-          stage: stage.current,
-          pageLayer: pageLayer.current,
-        });
-
-        void document.fonts.ready.then(function () {
-          pageLayer.current?.batchDraw();
-        });
-      });
-
-      return () => {
-        runningTask.cancel();
-      };
-    },
-    [page, scaledViewport],
+  const imageProps = useMemo(
+    (): React.ImgHTMLAttributes<HTMLImageElement> & Record<string, unknown> & { alt: '' } => ({
+      className: PDF_VIEWER_PAGE_CLASSNAME,
+      width: Math.floor(scaledViewport.width),
+      height: Math.floor(scaledViewport.height),
+      alt: '',
+      onLoad: () => setRenderStatus('loaded'),
+      // Purposely not using lazy here since we can use the virtual list overscan to let us prerender images.
+      loading: pageNumber < EAGER_LOAD_PAGE_COUNT ? 'eager' : undefined,
+      src: imageUrl,
+      'data-page-number': pageNumber,
+    }),
+    [renderViewport, scaledViewport, imageUrl],
   );
 
+  useEffect(() => {
+    const { current: container } = konvaContainer;
+
+    if (renderStatus !== 'loaded' || !container) {
+      return;
+    }
+
+    stage.current = new Konva.Stage({
+      container,
+      width: scaledViewport.width,
+      height: scaledViewport.height,
+      scale: {
+        x: scale,
+        y: scale,
+      },
+    });
+
+    // Create the main layer for interactive elements.
+    pageLayer.current = new Konva.Layer();
+
+    stage.current.add(pageLayer.current);
+
+    renderFunction({
+      stage: stage.current,
+      pageLayer: pageLayer.current,
+    });
+
+    void document.fonts.ready.then(function () {
+      pageLayer.current?.batchDraw();
+    });
+
+    return () => {
+      stage.current?.destroy();
+      stage.current = null;
+    };
+  }, [renderStatus, imageProps]);
+
   return {
-    canvasElement,
     konvaContainer,
+    imageProps,
     stage,
     pageLayer,
     unscaledViewport,
     scaledViewport,
-    pageContext,
-    renderError,
-    setRenderError,
+    renderStatus,
+    setRenderStatus,
   };
-}
+};

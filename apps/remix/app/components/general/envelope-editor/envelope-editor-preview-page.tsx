@@ -1,4 +1,4 @@
-import { lazy, useEffect, useMemo, useState } from 'react';
+import { lazy, useEffect, useMemo, useRef, useState } from 'react';
 
 import { faker } from '@faker-js/faker/locale/en';
 import { Trans } from '@lingui/react/macro';
@@ -11,12 +11,13 @@ import {
   EnvelopeRenderProvider,
   useCurrentEnvelopeRender,
 } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
 import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
 import { toCheckboxCustomText } from '@documenso/lib/utils/fields';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
-import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
+import { EnvelopePdfViewer } from '@documenso/ui/components/pdf-viewer/envelope-pdf-viewer';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { RecipientSelector } from '@documenso/ui/primitives/recipient-selector';
 import { Separator } from '@documenso/ui/primitives/separator';
@@ -32,6 +33,8 @@ export const EnvelopeEditorPreviewPage = () => {
   const { envelope, editorFields } = useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem, fields } = useCurrentEnvelopeRender();
+
+  const scrollableContainerRef = useRef<HTMLDivElement>(null);
 
   const [selectedPreviewMode, setSelectedPreviewMode] = useState<'recipient' | 'signed'>(
     'recipient',
@@ -200,7 +203,9 @@ export const EnvelopeEditorPreviewPage = () => {
   // Override the parent renderer provider so we can inject custom fields.
   return (
     <EnvelopeRenderProvider
+      version="current"
       envelope={envelope}
+      envelopeItems={envelope.envelopeItems}
       token={undefined}
       fields={fieldsWithPlaceholders}
       recipients={envelope.recipients.map((recipient) => ({
@@ -212,12 +217,12 @@ export const EnvelopeEditorPreviewPage = () => {
       }}
     >
       <div className="relative flex h-full">
-        <div className="flex w-full flex-col overflow-y-auto">
+        <div className="flex w-full flex-col overflow-y-auto" ref={scrollableContainerRef}>
           {/* Horizontal envelope item selector */}
           <EnvelopeRendererFileSelector fields={editorFields.localFields} />
 
           {/* Document View */}
-          <div className="mt-4 flex flex-col items-center justify-center">
+          <div className="mt-4 flex h-full flex-col items-center justify-center">
             <Alert variant="warning" className="mb-4 max-w-[800px]">
               <AlertTitle>
                 <Trans>Preview Mode</Trans>
@@ -228,9 +233,10 @@ export const EnvelopeEditorPreviewPage = () => {
             </Alert>
 
             {currentEnvelopeItem !== null ? (
-              <PDFViewerKonvaLazy
-                renderer="editor"
+              <EnvelopePdfViewer
                 customPageRenderer={EnvelopeGenericPageRenderer}
+                scrollParentRef={scrollableContainerRef}
+                errorMessage={PDF_VIEWER_ERROR_MESSAGES.preview}
               />
             ) : (
               <div className="flex flex-col items-center justify-center py-32">

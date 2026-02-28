@@ -333,7 +333,7 @@ export const sendDocument = async ({
 
 const injectFormValuesIntoDocument = async (
   envelope: Envelope,
-  envelopeItem: Pick<EnvelopeItem, 'id'> & { documentData: DocumentData },
+  envelopeItem: Pick<EnvelopeItem, 'id'> & { documentData: Omit<DocumentData, 'metadata'> },
 ) => {
   const file = await getFileServerSide(envelopeItem.documentData);
 

@@ -14,7 +14,10 @@ import type { KonvaEventObject } from 'konva/lib/Node';
 import { match } from 'ts-pattern';
 
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
-import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import {
+  type PageRenderData,
+  useCurrentEnvelopeRender,
+} from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { DIRECT_TEMPLATE_RECIPIENT_EMAIL } from '@documenso/lib/constants/direct-templates';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
@@ -44,12 +47,13 @@ import { handleTextFieldClick } from '~/utils/field-signing/text-field';
 
 import { useRequiredDocumentSigningAuthContext } from '../document-signing/document-signing-auth-provider';
 import { useRequiredEnvelopeSigningContext } from '../document-signing/envelope-signing-provider';
+import { EnvelopePageImage } from '../envelope/envelope-page-image';
 
 type GenericLocalField = TEnvelope['fields'][number] & {
   recipient: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>;
 };
 
-export default function EnvelopeSignerPageRenderer() {
+export default function EnvelopeSignerPageRenderer({ pageData }: { pageData: PageRenderData }) {
   const { t, i18n } = useLingui();
   const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
   const { sessionData } = useOptionalSession();
@@ -77,17 +81,10 @@ export default function EnvelopeSignerPageRenderer() {
 
   const { onFieldSigned, onFieldUnsigned } = useEmbedSigningContext() || {};
 
-  const {
-    stage,
-    pageLayer,
-    canvasElement,
-    konvaContainer,
-    pageContext,
-    scaledViewport,
-    unscaledViewport,
-  } = usePageRenderer(({ stage, pageLayer }) => createPageCanvas(stage, pageLayer));
+  const { stage, pageLayer, imageProps, konvaContainer, unscaledViewport, renderStatus } =
+    usePageRenderer(({ stage, pageLayer }) => createPageCanvas(stage, pageLayer), pageData);
 
-  const { _className, scale } = pageContext;
+  const { scale, pageNumber } = pageData;
 
   const { envelope } = envelopeData;
 
@@ -99,10 +96,9 @@ export default function EnvelopeSignerPageRenderer() {
     }
 
     return fieldsToRender.filter(
-      (field) =>
-        field.page === pageContext.pageNumber && field.envelopeItemId === currentEnvelopeItem?.id,
+      (field) => field.page === pageNumber && field.envelopeItemId === currentEnvelopeItem?.id,
     );
-  }, [recipientFields, selectedAssistantRecipientFields, pageContext.pageNumber]);
+  }, [recipientFields, selectedAssistantRecipientFields, pageNumber, currentEnvelopeItem?.id]);
 
   /**
    * Returns fields that have been fully signed by other recipients for this specific
@@ -117,7 +113,7 @@ export default function EnvelopeSignerPageRenderer() {
       return recipient.fields
         .filter(
           (field) =>
-            field.page === pageContext.pageNumber &&
+            field.page === pageNumber &&
             field.envelopeItemId === currentEnvelopeItem?.id &&
             (field.inserted || field.fieldMeta?.readOnly),
         )
@@ -132,7 +128,7 @@ export default function EnvelopeSignerPageRenderer() {
           },
         }));
     });
-  }, [envelope.recipients, pageContext.pageNumber]);
+  }, [envelope.recipients, pageNumber]);
 
   const unsafeRenderFieldOnLayer = (unparsedField: Field & { signature?: Signature | null }) => {
     if (!pageLayer.current) {
@@ -534,14 +530,11 @@ export default function EnvelopeSignerPageRenderer() {
   }
 
   return (
-    <div
-      className="relative w-full"
-      key={`${currentEnvelopeItem.id}-renderer-${pageContext.pageNumber}`}
-    >
+    <div className="relative w-full" key={`${currentEnvelopeItem.id}-renderer-${pageNumber}`}>
       {showPendingFieldTooltip &&
         recipientFieldsRemaining.length > 0 &&
         recipientFieldsRemaining[0]?.envelopeItemId === currentEnvelopeItem?.id &&
-        recipientFieldsRemaining[0]?.page === pageContext.pageNumber && (
+        recipientFieldsRemaining[0]?.page === pageNumber && (
           <EnvelopeFieldToolTip
             key={recipientFieldsRemaining[0].id}
             field={recipientFieldsRemaining[0]}
@@ -563,13 +556,7 @@ export default function EnvelopeSignerPageRenderer() {
       {/* The element Konva will inject it's canvas into. */}
       <div className="konva-container absolute inset-0 z-10 w-full" ref={konvaContainer}></div>
 
-      {/* Canvas the PDF will be rendered on. */}
-      <canvas
-        className={`${_className}__canvas z-0`}
-        ref={canvasElement}
-        height={scaledViewport.height}
-        width={scaledViewport.width}
-      />
+      <EnvelopePageImage renderStatus={renderStatus} imageProps={imageProps} />
     </div>
   );
 }

@@ -31,11 +31,11 @@ import type {
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
+import { PDFViewer } from '@documenso/ui/components/pdf-viewer/pdf-viewer';
 import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -100,8 +100,6 @@ export const EmbedDirectTemplateClientPage = ({
     localFields.filter((field) => isFieldUnsignedAndRequired(field)),
     localFields.filter((field) => field.inserted),
   ];
-
-  const highestPendingPageNumber = Math.max(...pendingFields.map((field) => field.page));
 
   const hasSignatureField = localFields.some((field) => isSignatureFieldType(field.type));
 
@@ -341,10 +339,11 @@ export const EmbedDirectTemplateClientPage = ({
       <div className="relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
         {/* Viewer */}
         <div className="flex-1">
-          <PDFViewerLazy
+          <PDFViewer
             envelopeItem={envelopeItems[0]}
             token={recipient.token}
-            version="signed"
+            version="current"
+            scrollParentRef="window"
             onDocumentLoad={() => setHasDocumentLoaded(true)}
           />
         </div>
@@ -478,9 +477,7 @@ export const EmbedDirectTemplateClientPage = ({
           </div>
         </div>
 
-        <ElementVisible
-          target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPendingPageNumber}"]`}
-        >
+        <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
           {showPendingFieldTooltip && pendingFields.length > 0 && (
             <FieldToolTip key={pendingFields[0].id} field={pendingFields[0]} color="warning">
               <Trans>Click to insert field</Trans>

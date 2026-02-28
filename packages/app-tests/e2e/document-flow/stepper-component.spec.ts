@@ -9,6 +9,7 @@ import {
 import { DateTime } from 'luxon';
 import path from 'node:path';
 
+import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { prisma } from '@documenso/prisma';
 import {
   seedBlankDocument,
@@ -92,7 +93,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document', async ({ page }) =>
   await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Signature' }).click();
-  await page.locator('canvas').click({
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
     position: {
       x: 100,
       y: 100,
@@ -100,7 +101,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document', async ({ page }) =>
   });
 
   await page.getByRole('button', { name: 'Email' }).click();
-  await page.locator('canvas').click({
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
     position: {
       x: 100,
       y: 200,
@@ -158,7 +159,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Signature' }).click();
-  await page.locator('canvas').click({
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
     position: {
       x: 100,
       y: 100,
@@ -166,7 +167,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   });
 
   await page.getByRole('button', { name: 'Email' }).click();
-  await page.locator('canvas').click({
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
     position: {
       x: 100,
       y: 200,
@@ -177,7 +178,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   await page.getByText('User 2 (user2@example.com)').click();
 
   await page.getByRole('button', { name: 'Signature' }).click();
-  await page.locator('canvas').click({
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
     position: {
       x: 500,
       y: 100,
@@ -185,7 +186,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   });
 
   await page.getByRole('button', { name: 'Email' }).click();
-  await page.locator('canvas').click({
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
     position: {
       x: 500,
       y: 200,
@@ -256,7 +257,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   await page.getByRole('option', { name: 'User 1 (user1@example.com)' }).click();
 
   await page.getByRole('button', { name: 'Signature' }).click();
-  await page.locator('canvas').click({
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
     position: {
       x: 100,
       y: 100,
@@ -264,7 +265,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   });
 
   await page.getByRole('button', { name: 'Email' }).click();
-  await page.locator('canvas').click({
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
     position: {
       x: 100,
       y: 200,
@@ -275,7 +276,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   await page.getByRole('option', { name: 'User 3 (user3@example.com)' }).click();
 
   await page.getByRole('button', { name: 'Signature' }).click();
-  await page.locator('canvas').click({
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
     position: {
       x: 500,
       y: 100,
@@ -283,7 +284,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   });
 
   await page.getByRole('button', { name: 'Email' }).click();
-  await page.locator('canvas').click({
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
     position: {
       x: 500,
       y: 200,
@@ -576,7 +577,7 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
     }
 
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 100 * i,

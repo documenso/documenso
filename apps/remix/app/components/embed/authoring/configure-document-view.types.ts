@@ -46,6 +46,13 @@ export const ZConfigureEmbedFormSchema = z.object({
       type: z.string(),
       size: z.number(),
       data: z.instanceof(Uint8Array), // UInt8Array can't be directly validated by zod
+      images: z
+        .object({
+          width: z.number(),
+          height: z.number(),
+          image: z.string(),
+        })
+        .array(),
     })
     .optional(),
 });

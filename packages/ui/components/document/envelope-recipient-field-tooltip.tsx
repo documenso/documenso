@@ -191,7 +191,7 @@ export function EnvelopeRecipientFieldTooltip({
           </span>
         </p>
 
-        <p className="text-muted-foreground mt-1 text-center text-xs">
+        <p className="mt-1 text-center text-xs text-muted-foreground">
           {getRecipientDisplayText(field.recipient)}
         </p>
 

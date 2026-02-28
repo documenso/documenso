@@ -9,6 +9,7 @@ import { match } from 'ts-pattern';
 
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
@@ -16,12 +17,12 @@ import {
   DocumentReadOnlyFields,
   mapFieldsWithRecipients,
 } from '@documenso/ui/components/document/document-read-only-fields';
-import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
+import { EnvelopePdfViewer } from '@documenso/ui/components/pdf-viewer/envelope-pdf-viewer';
+import { PDFViewer } from '@documenso/ui/components/pdf-viewer/pdf-viewer';
 import { cn } from '@documenso/ui/lib/utils';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { Spinner } from '@documenso/ui/primitives/spinner';
 
 import { DocumentPageViewButton } from '~/components/general/document/document-page-view-button';
@@ -154,7 +155,9 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
         {envelope.internalVersion === 2 ? (
           <div className="relative col-span-12 lg:col-span-6 xl:col-span-7">
             <EnvelopeRenderProvider
+              version="current"
               envelope={envelope}
+              envelopeItems={envelope.envelopeItems}
               token={undefined}
               fields={envelope.fields}
               recipients={envelope.recipients}
@@ -169,9 +172,10 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
 
               <Card className="rounded-xl before:rounded-xl" gradient>
                 <CardContent className="p-2">
-                  <PDFViewerKonvaLazy
-                    renderer="preview"
+                  <EnvelopePdfViewer
                     customPageRenderer={EnvelopeGenericPageRenderer}
+                    scrollParentRef="window"
+                    errorMessage={PDF_VIEWER_ERROR_MESSAGES.preview}
                   />
                 </CardContent>
               </Card>
@@ -193,11 +197,12 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
                 />
               )}
 
-              <PDFViewerLazy
+              <PDFViewer
                 envelopeItem={envelope.envelopeItems[0]}
                 token={undefined}
                 key={envelope.envelopeItems[0].id}
-                version="signed"
+                version="current"
+                scrollParentRef="window"
               />
             </CardContent>
           </Card>

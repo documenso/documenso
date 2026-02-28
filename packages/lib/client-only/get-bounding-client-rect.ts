@@ -1,4 +1,4 @@
-export const getBoundingClientRect = (element: HTMLElement) => {
+export const getBoundingClientRect = (element: HTMLElement | Element) => {
   const rect = element.getBoundingClientRect();
 
   const { width, height } = rect;

@@ -64,7 +64,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
   return (
     <div className="flex flex-col items-center justify-center py-4 sm:py-32">
       <div className="flex flex-col items-center">
-        <Avatar className="dark:border-border h-24 w-24 border-2 border-solid">
+        <Avatar className="h-24 w-24 border-2 border-solid dark:border-border">
           {publicProfile.avatarImageId && (
             <AvatarImage src={formatAvatarUrl(publicProfile.avatarImageId)} />
           )}
@@ -99,10 +99,10 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
                 />
 
                 <div className="ml-2">
-                  <p className="text-foreground text-base font-semibold">
+                  <p className="text-base font-semibold text-foreground">
                     {BADGE_DATA[publicProfile.badge.type].name}
                   </p>
-                  <p className="text-muted-foreground mt-0.5 text-sm">
+                  <p className="mt-0.5 text-sm text-muted-foreground">
                     <Trans>
                       Since {DateTime.fromJSDate(publicProfile.badge.since).toFormat('LLL ‘yy')}
                     </Trans>
@@ -113,7 +113,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
           )}
         </div>
 
-        <div className="text-muted-foreground mt-4 space-y-1">
+        <div className="mt-4 space-y-1 text-muted-foreground">
           {(profile.bio ?? '').split('\n').map((line, index) => (
             <p
               key={index}
@@ -127,7 +127,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
 
       {templates.length === 0 && (
         <div className="mt-4 w-full max-w-xl border-t pt-4">
-          <p className="text-muted-foreground max-w-[60ch] whitespace-pre-wrap break-words text-center text-sm leading-relaxed">
+          <p className="max-w-[60ch] whitespace-pre-wrap break-words text-center text-sm leading-relaxed text-muted-foreground">
             <Trans>
               It looks like {publicProfile.name} hasn't added any documents to their profile yet.
             </Trans>{' '}
@@ -167,19 +167,19 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
             <TableBody>
               {templates.map((template) => (
                 <TableRow key={template.id}>
-                  <TableCell className="text-muted-foreground flex flex-col justify-between overflow-hidden text-sm sm:flex-row">
+                  <TableCell className="flex flex-col justify-between overflow-hidden text-sm text-muted-foreground sm:flex-row">
                     <div className="flex flex-1 items-start justify-start gap-2">
                       <FileIcon
-                        className="text-muted-foreground/40 h-8 w-8 flex-shrink-0"
+                        className="h-8 w-8 flex-shrink-0 text-muted-foreground/40"
                         strokeWidth={1.5}
                       />
 
                       <div className="flex flex-1 flex-col gap-4 overflow-hidden md:flex-row md:items-start md:justify-between">
                         <div>
-                          <p className="text-foreground text-sm font-semibold leading-none">
+                          <p className="text-sm font-semibold leading-none text-foreground">
                             {template.publicTitle}
                           </p>
-                          <p className="text-muted-foreground mt-1 line-clamp-3 max-w-[70ch] whitespace-normal text-xs">
+                          <p className="mt-1 line-clamp-3 max-w-[70ch] whitespace-normal text-xs text-muted-foreground">
                             {template.publicDescription}
                           </p>
                         </div>

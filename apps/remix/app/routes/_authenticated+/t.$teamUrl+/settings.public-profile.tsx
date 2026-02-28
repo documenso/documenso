@@ -143,7 +143,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
           <TooltipTrigger asChild>
             <div
               className={cn(
-                'text-muted-foreground/50 flex flex-row items-center justify-center space-x-2 text-xs',
+                'flex flex-row items-center justify-center space-x-2 text-xs text-muted-foreground/50',
                 {
                   '[&>*:first-child]:text-muted-foreground': !isPublicProfileVisible,
                   '[&>*:last-child]:text-muted-foreground': isPublicProfileVisible,
@@ -164,7 +164,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
             </div>
           </TooltipTrigger>
 
-          <TooltipContent className="text-muted-foreground max-w-[40ch] space-y-2 py-2">
+          <TooltipContent className="max-w-[40ch] space-y-2 py-2 text-muted-foreground">
             {isPublicProfileVisible ? (
               <>
                 <p>

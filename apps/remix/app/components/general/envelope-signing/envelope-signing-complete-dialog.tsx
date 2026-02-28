@@ -71,6 +71,14 @@ export const EnvelopeSignerCompleteDialog = () => {
 
         if (fieldTooltip) {
           fieldTooltip.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          // Tooltip not in DOM (page virtualized away) — signal the PDF viewer
+          // to scroll to the correct page via the data attribute.
+          const pdfContent = document.querySelector('[data-pdf-content]');
+
+          if (pdfContent) {
+            pdfContent.setAttribute('data-scroll-to-page', String(nextField.page));
+          }
         }
       },
       isEnvelopeItemSwitch ? 150 : 50,

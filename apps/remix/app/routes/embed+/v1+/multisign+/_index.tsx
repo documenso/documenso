@@ -283,7 +283,7 @@ export default function MultisignPage() {
         </DocumentSigningProvider>
 
         {!hidePoweredBy && (
-          <div className="bg-primary text-primary-foreground fixed bottom-0 left-0 z-40 rounded-tr px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100">
+          <div className="fixed bottom-0 left-0 z-40 rounded-tr bg-primary px-2 py-1 text-xs font-medium text-primary-foreground opacity-60 hover:opacity-100">
             <span>
               <Trans>Powered by</Trans>
             </span>
@@ -300,7 +300,7 @@ export default function MultisignPage() {
       <MultiSignDocumentList envelopes={envelopes} onDocumentSelect={onSelectDocument} />
 
       {!hidePoweredBy && (
-        <div className="bg-primary text-primary-foreground fixed bottom-0 left-0 z-40 rounded-tr px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100">
+        <div className="fixed bottom-0 left-0 z-40 rounded-tr bg-primary px-2 py-1 text-xs font-medium text-primary-foreground opacity-60 hover:opacity-100">
           <span>
             <Trans>Powered by</Trans>
           </span>
