@@ -102,12 +102,8 @@ export const RecipientSelector = ({
           role="combobox"
           className={cn(
             'bg-background text-muted-foreground hover:text-foreground justify-between font-normal',
-            getRecipientColorStyles(
-              Math.max(
-                recipients.findIndex((r) => r.id === selectedRecipient?.id),
-                0,
-              ),
-            ).comboxBoxTrigger,
+            getRecipientColorStyles(recipients.findIndex((r) => r.id === selectedRecipient?.id))
+              .comboBoxTrigger,
             className,
           )}
         >
@@ -151,12 +147,8 @@ export const RecipientSelector = ({
                   key={recipient.id}
                   className={cn(
                     'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
-                    getRecipientColorStyles(
-                      Math.max(
-                        recipients.findIndex((r) => r.id === recipient.id),
-                        0,
-                      ),
-                    ).comboxBoxItem,
+                    getRecipientColorStyles(recipients.findIndex((r) => r.id === recipient.id))
+                      .comboBoxItem,
                     {
                       'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
                     },
