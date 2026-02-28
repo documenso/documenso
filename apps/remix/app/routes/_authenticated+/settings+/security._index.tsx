@@ -19,7 +19,7 @@ import { appMetaTags } from '~/utils/meta';
 import type { Route } from './+types/security._index';
 
 export function meta() {
-  return appMetaTags('Security');
+  return appMetaTags(msg`Security`);
 }
 
 export async function loader({ request }: Route.LoaderArgs) {

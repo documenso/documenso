@@ -24,7 +24,7 @@ import { appMetaTags } from '~/utils/meta';
 import type { Route } from './+types/settings._layout';
 
 export function meta() {
-  return appMetaTags('Team Settings');
+  return appMetaTags(msg`Team Settings`);
 }
 
 export async function loader({ request, params }: Route.LoaderArgs) {

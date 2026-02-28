@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { type TemplateDirectLink, TemplateType } from '@prisma/client';
 
@@ -31,7 +33,7 @@ type DirectTemplate = FindTemplateRow & {
 };
 
 export function meta() {
-  return appMetaTags('Public Profile');
+  return appMetaTags(msg`Public Profile`);
 }
 
 // Todo: This can be optimized.
