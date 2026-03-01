@@ -335,13 +335,13 @@ containers:
 Wrap your package script with the `with:env` script like such:
 
 ```
-pnpm run with:env -- pnpm run myscript
+pnpm run with:env pnpm run myscript
 ```
 
 The same can be done when using `pnpm exec` for one of the bin scripts:
 
 ```
-pnpm run with:env -- pnpm exec myscript
+pnpm run with:env pnpm exec myscript
 ```
 
 This will load environment variables from your `.env` and `.env.local` files.
