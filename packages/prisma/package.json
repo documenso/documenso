@@ -25,16 +25,16 @@
     "kysely": "catalog:",
     "nanoid": "catalog:",
     "prisma": "catalog:",
-    "prisma-extension-kysely": "^3.0.0",
-    "prisma-kysely": "^2.3.0",
-    "prisma-json-types-generator": "^3.6.2",
+    "prisma-extension-kysely": "catalog:",
+    "prisma-kysely": "catalog:",
+    "prisma-json-types-generator": "catalog:",
     "ts-pattern": "catalog:",
     "zod": "catalog:",
-    "zod-prisma-types": "3.3.5"
+    "zod-prisma-types": "catalog:"
   },
   "devDependencies": {
-    "dotenv": "^17.2.3",
-    "dotenv-cli": "^11.0.0",
+    "dotenv": "catalog:",
+    "dotenv-cli": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:"
   }

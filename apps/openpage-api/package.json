@@ -12,7 +12,9 @@
   "dependencies": {
     "@documenso/prisma": "workspace:*",
     "luxon": "catalog:",
-    "next": "16.1.6"
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",

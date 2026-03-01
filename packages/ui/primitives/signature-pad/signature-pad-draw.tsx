@@ -17,7 +17,7 @@ import { getSvgPathFromStroke } from './helper';
 import { Point } from './point';
 import { SignaturePadColorPicker } from './signature-pad-color-picker';
 
-const checkSignatureValidity = (element: RefObject<HTMLCanvasElement>) => {
+const checkSignatureValidity = (element: RefObject<HTMLCanvasElement | null>) => {
   if (!element.current) {
     return false;
   }
@@ -291,10 +291,10 @@ export const SignaturePadDraw = ({
 
       <SignaturePadColorPicker selectedColor={selectedColor} setSelectedColor={setSelectedColor} />
 
-      <div className="absolute bottom-3 right-3 flex gap-2">
+      <div className="absolute right-3 bottom-3 flex gap-2">
         <button
           type="button"
-          className="rounded-full p-0 text-[0.688rem] text-muted-foreground/60 ring-offset-background hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="text-muted-foreground/60 ring-offset-background hover:text-muted-foreground focus-visible:ring-ring rounded-full p-0 text-[0.688rem] focus-visible:ring-2 focus-visible:outline-none"
           onClick={() => onClearClick()}
         >
           <Trans>Clear Signature</Trans>
@@ -303,7 +303,7 @@ export const SignaturePadDraw = ({
 
       {isSignatureValid === false && (
         <div className="absolute bottom-4 left-4 flex gap-2">
-          <span className="text-xs text-destructive">
+          <span className="text-destructive text-xs">
             <Trans>Signature is too small</Trans>
           </span>
         </div>
@@ -314,7 +314,7 @@ export const SignaturePadDraw = ({
           <button
             type="button"
             title="undo"
-            className="rounded-full p-0 text-[0.688rem] text-muted-foreground/60 ring-offset-background hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="text-muted-foreground/60 ring-offset-background hover:text-muted-foreground focus-visible:ring-ring rounded-full p-0 text-[0.688rem] focus-visible:ring-2 focus-visible:outline-none"
             onClick={onUndoClick}
           >
             <Undo2 className="h-4 w-4" />

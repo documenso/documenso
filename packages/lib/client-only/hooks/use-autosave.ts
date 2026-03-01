@@ -11,7 +11,7 @@ export const useAutoSave = <T, R = void>(
 ) => {
   const { delay = 2000 } = options;
 
-  const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  const saveTimeoutRef = useRef<NodeJS.Timeout>(undefined);
   const saveQueueRef = useRef<SaveRequest<T, R>[]>([]);
   const isProcessingRef = useRef(false);
 

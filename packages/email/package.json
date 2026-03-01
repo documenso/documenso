@@ -37,7 +37,7 @@
     "@react-email/section": "0.0.16",
     "@react-email/tailwind": "^2.0.1",
     "@react-email/text": "0.1.5",
-    "nodemailer": "^7.0.10",
+    "nodemailer": "catalog:",
     "react-email": "^5.0.6",
     "resend": "^6.5.2"
   },
