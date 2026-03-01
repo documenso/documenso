@@ -22,7 +22,7 @@ export const useDebounceFunction = <Args extends unknown[]>(
   callback: (...args: Args) => void,
   delay: number,
 ) => {
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout>(undefined);
 
   return useCallback(
     (...args: Args) => {
