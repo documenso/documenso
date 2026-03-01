@@ -1,13 +1,13 @@
 import { PDFDocument } from '@cantoo/pdf-lib';
 import { PDF } from '@libpdf/core';
-import type { DocumentData, Envelope, EnvelopeItem, Field } from '@prisma/client';
+import type { DocumentData, Envelope, EnvelopeItem, Field } from '@documenso/prisma/client';
 import {
   DocumentStatus,
   EnvelopeType,
   RecipientRole,
   SigningStatus,
   WebhookTriggerEvents,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 import { nanoid } from 'nanoid';
 import path from 'node:path';
 import { groupBy } from 'remeda';

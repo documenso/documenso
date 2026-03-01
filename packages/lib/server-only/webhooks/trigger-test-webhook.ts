@@ -1,4 +1,4 @@
-import type { WebhookTriggerEvents } from '@prisma/client';
+import type { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { getWebhookById } from './get-webhook-by-id';
 import { generateSampleWebhookPayload } from './trigger/generate-sample-data';

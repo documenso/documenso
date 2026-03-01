@@ -1,7 +1,7 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
-import { EnvelopeType, SendStatus } from '@prisma/client';
+import { EnvelopeType, SendStatus } from '@documenso/prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import RecipientRemovedFromDocumentTemplate from '@documenso/email/templates/recipient-removed-from-document';

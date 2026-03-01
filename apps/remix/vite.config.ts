@@ -53,7 +53,7 @@ export default defineConfig({
     external: [
       '@napi-rs/canvas',
       '@node-rs/bcrypt',
-      '@prisma/client',
+      '@documenso/prisma',
       '@documenso/tailwind-config',
       'playwright',
       'playwright-core',
@@ -78,11 +78,11 @@ export default defineConfig({
       https: 'node:https',
       '.prisma/client/default': path.resolve(
         __dirname,
-        '../../node_modules/.prisma/client/default.js',
+        '../../packages/prisma/generated/client/default.js',
       ),
       '.prisma/client/index-browser': path.resolve(
         __dirname,
-        '../../node_modules/.prisma/client/index-browser.js',
+        '../../packages/prisma/generated/client/index-browser.js',
       ),
       canvas: path.resolve(__dirname, './app/types/empty-module.ts'),
     },

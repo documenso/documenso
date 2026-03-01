@@ -1,4 +1,4 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 import { P, match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';

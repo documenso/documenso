@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { EmailDomainStatus } from '@prisma/client';
+import { EmailDomainStatus } from '@documenso/prisma/client';
 import { CheckCircle2Icon, ClockIcon, Loader } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';

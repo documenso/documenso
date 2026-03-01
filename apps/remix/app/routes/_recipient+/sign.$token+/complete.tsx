@@ -1,6 +1,6 @@
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
+import { DocumentStatus, FieldType, RecipientRole } from '@documenso/prisma/client';
 import { CheckCircle2, Clock8, DownloadIcon, Loader2 } from 'lucide-react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';

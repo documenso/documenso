@@ -5,7 +5,7 @@ import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
+import { DocumentSigningOrder, RecipientRole } from '@documenso/prisma/client';
 import { motion } from 'framer-motion';
 import { GripVertical, HelpCircle, Plus, Trash } from 'lucide-react';
 import { nanoid } from 'nanoid';

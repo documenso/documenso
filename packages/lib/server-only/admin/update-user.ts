@@ -1,4 +1,4 @@
-import type { Role } from '@prisma/client';
+import type { Role } from '@documenso/prisma/client';
 
 import { prisma } from '@documenso/prisma';
 

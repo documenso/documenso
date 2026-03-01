@@ -1,5 +1,5 @@
-import type { Recipient } from '@prisma/client';
-import { EnvelopeType, RecipientRole } from '@prisma/client';
+import type { Recipient } from '@documenso/prisma/client';
+import { EnvelopeType, RecipientRole } from '@documenso/prisma/client';
 
 import {
   DIRECT_TEMPLATE_RECIPIENT_EMAIL,

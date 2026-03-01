@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { FolderType } from '@prisma/client';
+import { FolderType } from '@documenso/prisma/client';
 import { FolderIcon, HomeIcon } from 'lucide-react';
 import { Link } from 'react-router';
 

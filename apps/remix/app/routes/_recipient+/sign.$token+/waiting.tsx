@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/react/macro';
-import type { Team } from '@prisma/client';
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
+import type { Team } from '@documenso/prisma/client';
+import { DocumentStatus, EnvelopeType } from '@documenso/prisma/client';
 import { Link, redirect } from 'react-router';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';

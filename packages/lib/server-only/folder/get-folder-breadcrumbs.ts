@@ -1,4 +1,4 @@
-import { TeamMemberRole } from '@prisma/client';
+import { TeamMemberRole } from '@documenso/prisma/client';
 import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';

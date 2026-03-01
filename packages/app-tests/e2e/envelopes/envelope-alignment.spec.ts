@@ -1,7 +1,7 @@
 import { createCanvas } from '@napi-rs/canvas';
 import type { TestInfo } from '@playwright/test';
 import { expect, test } from '@playwright/test';
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
+import { DocumentStatus, EnvelopeType } from '@documenso/prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';

@@ -1,4 +1,4 @@
-import { UserSecurityAuditLogType } from '@prisma/client';
+import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 import { OAuth2Client, decodeIdToken } from 'arctic';
 import type { Context } from 'hono';
 import { deleteCookie } from 'hono/cookie';

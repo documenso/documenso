@@ -1,4 +1,4 @@
-import type { EnvelopeItem } from '@prisma/client';
+import type { EnvelopeItem } from '@documenso/prisma/client';
 
 import { getEnvelopeItemPdfUrl } from '../utils/envelope-download';
 import { downloadFile } from './download-file';

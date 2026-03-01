@@ -1,6 +1,6 @@
 import { PDF } from '@libpdf/core';
 import { expect, test } from '@playwright/test';
-import { DocumentStatus, FieldType } from '@prisma/client';
+import { DocumentStatus, FieldType } from '@documenso/prisma/client';
 
 import { getDocumentByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';

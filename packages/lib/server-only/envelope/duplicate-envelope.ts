@@ -1,4 +1,4 @@
-import { DocumentSource, EnvelopeType, WebhookTriggerEvents } from '@prisma/client';
+import { DocumentSource, EnvelopeType, WebhookTriggerEvents } from '@documenso/prisma/client';
 import { omit } from 'remeda';
 
 import { prisma } from '@documenso/prisma';

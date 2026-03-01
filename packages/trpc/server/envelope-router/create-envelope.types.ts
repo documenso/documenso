@@ -1,4 +1,4 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 import { z } from 'zod';
 import { zfd } from 'zod-form-data';
 

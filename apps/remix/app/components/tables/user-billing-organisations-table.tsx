@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { Trans, useLingui } from '@lingui/react/macro';
-import { SubscriptionStatus } from '@prisma/client';
+import { SubscriptionStatus } from '@documenso/prisma/client';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 

@@ -1,4 +1,4 @@
-import { OrganisationMemberInviteStatus } from '@prisma/client';
+import { OrganisationMemberInviteStatus } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { OrganisationMemberInviteSchema } from '@documenso/prisma/generated/zod/modelSchema/OrganisationMemberInviteSchema';

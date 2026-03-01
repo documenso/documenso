@@ -1,9 +1,9 @@
-import type { Organisation, OrganisationGlobalSettings, Prisma } from '@prisma/client';
+import type { Organisation, OrganisationGlobalSettings, Prisma } from '@documenso/prisma/client';
 import {
   DocumentVisibility,
   type OrganisationGroup,
   type OrganisationMemberRole,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 
 import type { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
 

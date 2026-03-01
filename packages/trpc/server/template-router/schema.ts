@@ -1,4 +1,4 @@
-import { DocumentSigningOrder, DocumentVisibility, TemplateType } from '@prisma/client';
+import { DocumentSigningOrder, DocumentVisibility, TemplateType } from '@documenso/prisma/client';
 import { z } from 'zod';
 import { zfd } from 'zod-form-data';
 

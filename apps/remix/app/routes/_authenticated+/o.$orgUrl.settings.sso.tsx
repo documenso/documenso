@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { OrganisationMemberRole } from '@prisma/client';
+import { OrganisationMemberRole } from '@documenso/prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 

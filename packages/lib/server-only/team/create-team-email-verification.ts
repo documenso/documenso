@@ -1,8 +1,8 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
-import type { Team } from '@prisma/client';
-import { Prisma } from '@prisma/client';
+import type { Team } from '@documenso/prisma/client';
+import { Prisma } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { mailer } from '@documenso/email/mailer';

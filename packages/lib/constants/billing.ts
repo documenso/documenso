@@ -1,4 +1,4 @@
-import { SubscriptionStatus } from '@prisma/client';
+import { SubscriptionStatus } from '@documenso/prisma/client';
 
 export enum STRIPE_PLAN_TYPE {
   FREE = 'free',

@@ -1,5 +1,5 @@
-import type { DocumentMeta } from '@prisma/client';
-import { type Field, FieldType } from '@prisma/client';
+import type { DocumentMeta } from '@documenso/prisma/client';
+import { type Field, FieldType } from '@documenso/prisma/client';
 import { match } from 'ts-pattern';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';

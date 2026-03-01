@@ -1,4 +1,4 @@
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
+import { DocumentStatus, EnvelopeType } from '@documenso/prisma/client';
 
 import type { DateRange } from '@documenso/lib/types/search-params';
 import { kyselyPrisma, sql } from '@documenso/prisma';

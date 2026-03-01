@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus } from '@documenso/prisma/client';
 import { P, match } from 'ts-pattern';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';

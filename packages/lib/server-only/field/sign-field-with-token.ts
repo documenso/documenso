@@ -1,4 +1,4 @@
-import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
+import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import { DateTime } from 'luxon';
 import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';

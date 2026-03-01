@@ -1,5 +1,5 @@
 import { Trans, useLingui } from '@lingui/react/macro';
-import { OrganisationGroupType, OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
+import { OrganisationGroupType, OrganisationMemberRole, TeamMemberRole } from '@documenso/prisma/client';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { trpc } from '@documenso/trpc/react';

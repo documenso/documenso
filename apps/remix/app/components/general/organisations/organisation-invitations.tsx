@@ -1,7 +1,7 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Plural, Trans } from '@lingui/react/macro';
-import { OrganisationMemberInviteStatus } from '@prisma/client';
+import { OrganisationMemberInviteStatus } from '@documenso/prisma/client';
 import { AnimatePresence } from 'framer-motion';
 import { BellIcon } from 'lucide-react';
 

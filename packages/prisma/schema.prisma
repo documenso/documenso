@@ -4,7 +4,7 @@ generator kysely {
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../../node_modules/.prisma/client"
+  output   = "./generated/client"
 }
 
 generator json {

@@ -50,8 +50,8 @@ interface CreateDocumentOptions {
 
 ```typescript
 // ✅ Use `type` keyword for type-only imports
-import type { Document, Recipient } from '@prisma/client';
-import { DocumentStatus } from '@prisma/client';
+import type { Document, Recipient } from '@documenso/prisma/client';
+import { DocumentStatus } from '@documenso/prisma/client';
 
 // Types in function signatures
 export const findDocuments = async ({ userId, teamId }: FindDocumentsOptions) => {
@@ -86,13 +86,13 @@ import { useCallback, useEffect, useMemo } from 'react';
 // 2. Third-party library imports (alphabetically)
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans } from '@lingui/react/macro';
-import type { Document, Recipient } from '@prisma/client';
-import { DocumentStatus, RecipientRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 // 3. Internal package imports (from @documenso/*)
 import { AppError } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
+import type { Document, Recipient } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 
 // 4. Relative imports
@@ -105,8 +105,7 @@ import type { FindResultResponse } from './types';
 ```typescript
 // ✅ Destructure specific exports
 // ✅ Use type imports for types
-import type { Document } from '@prisma/client';
-
+import type { Document } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
 ```

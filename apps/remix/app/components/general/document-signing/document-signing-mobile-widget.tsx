@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Plural, Trans } from '@lingui/react/macro';
-import { RecipientRole } from '@prisma/client';
+import { RecipientRole } from '@documenso/prisma/client';
 import { motion } from 'framer-motion';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { match } from 'ts-pattern';

@@ -1,4 +1,4 @@
-import { DocumentSource, DocumentStatus } from '@prisma/client';
+import { DocumentSource, DocumentStatus } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { ZDocumentManySchema } from '@documenso/lib/types/document';

@@ -1,4 +1,4 @@
-import { EnvelopeType, type Field, FieldType } from '@prisma/client';
+import { EnvelopeType, type Field, FieldType } from '@documenso/prisma/client';
 import { isDeepEqual } from 'remeda';
 
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';

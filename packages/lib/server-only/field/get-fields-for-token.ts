@@ -1,4 +1,4 @@
-import { EnvelopeType, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
+import { EnvelopeType, FieldType, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 
 import { prisma } from '@documenso/prisma';
 

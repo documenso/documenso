@@ -1,4 +1,4 @@
-import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
+import { DocumentSigningOrder, RecipientRole } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';

@@ -1,4 +1,4 @@
-import { UserSecurityAuditLogType } from '@prisma/client';
+import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 import type { Context } from 'hono';
 
 import { ORGANISATION_USER_ACCOUNT_TYPE } from '@documenso/lib/constants/organisations';

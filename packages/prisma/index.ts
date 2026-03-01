@@ -1,9 +1,9 @@
 /// <reference types="@documenso/prisma/types/types.d.ts" />
-import { PrismaClient } from '@prisma/client';
 import { readReplicas } from '@prisma/extension-read-replicas';
 import { Kysely, PostgresAdapter, PostgresIntrospector, PostgresQueryCompiler } from 'kysely';
 import kyselyExtension from 'prisma-extension-kysely';
 
+import { PrismaClient } from './generated/client';
 import type { DB } from './generated/types';
 import { getDatabaseUrl } from './helper';
 import { remember } from './utils/remember';

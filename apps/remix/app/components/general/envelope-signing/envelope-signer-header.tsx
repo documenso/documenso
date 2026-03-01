@@ -1,5 +1,5 @@
 import { Plural, Trans } from '@lingui/react/macro';
-import { EnvelopeType, RecipientRole } from '@prisma/client';
+import { EnvelopeType, RecipientRole } from '@documenso/prisma/client';
 import { BanIcon, DownloadCloudIcon } from 'lucide-react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';

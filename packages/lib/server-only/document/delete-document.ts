@@ -1,8 +1,8 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
-import type { DocumentMeta, Envelope, Recipient, User } from '@prisma/client';
-import { DocumentStatus, EnvelopeType, SendStatus, WebhookTriggerEvents } from '@prisma/client';
+import type { DocumentMeta, Envelope, Recipient, User } from '@documenso/prisma/client';
+import { DocumentStatus, EnvelopeType, SendStatus, WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';

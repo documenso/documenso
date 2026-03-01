@@ -1,4 +1,4 @@
-import { OrganisationMemberRole } from '@prisma/client';
+import { OrganisationMemberRole } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 // export const createOrganisationGroupMeta: TrpcOpenApiMeta = {

@@ -1,4 +1,4 @@
-import type { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from './generated/client';
 
 export function addPrismaMiddleware(prisma: PrismaClient) {
   prisma.$use(async (params, next) => {

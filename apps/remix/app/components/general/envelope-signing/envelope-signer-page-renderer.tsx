@@ -8,7 +8,7 @@ import {
   RecipientRole,
   type Signature,
   SigningStatus,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { match } from 'ts-pattern';

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
-import type { TeamEmail } from '@prisma/client';
+import type { TeamEmail } from '@documenso/prisma/client';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
 import { useRevalidator } from 'react-router';

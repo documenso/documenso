@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { RecipientRole } from '@prisma/client';
+import { RecipientRole } from '@documenso/prisma/client';
 import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
 import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';

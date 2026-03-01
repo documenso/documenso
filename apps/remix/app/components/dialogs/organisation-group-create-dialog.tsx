@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import { OrganisationMemberRole } from '@prisma/client';
+import { OrganisationMemberRole } from '@documenso/prisma/client';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';

@@ -1,4 +1,4 @@
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { DEFAULT_SIGNATURE_TEXT_FONT_SIZE } from '../constants/pdf';

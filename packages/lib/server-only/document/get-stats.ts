@@ -1,5 +1,5 @@
-import type { Prisma, User } from '@prisma/client';
-import { DocumentVisibility, EnvelopeType, SigningStatus, TeamMemberRole } from '@prisma/client';
+import type { Prisma, User } from '@documenso/prisma/client';
+import { DocumentVisibility, EnvelopeType, SigningStatus, TeamMemberRole } from '@documenso/prisma/client';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 

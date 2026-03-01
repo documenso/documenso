@@ -1,4 +1,4 @@
-import { OrganisationMemberInviteStatus } from '@prisma/client';
+import { OrganisationMemberInviteStatus } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';

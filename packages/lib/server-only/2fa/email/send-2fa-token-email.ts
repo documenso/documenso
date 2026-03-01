@@ -1,7 +1,7 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import { AccessAuth2FAEmailTemplate } from '@documenso/email/templates/access-auth-2fa';

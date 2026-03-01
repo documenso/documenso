@@ -2,7 +2,7 @@
 import type { PDFDocument } from '@cantoo/pdf-lib';
 import { RotationTypes, degrees, radiansToDegrees, rgb } from '@cantoo/pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 import { P, match } from 'ts-pattern';
 
 import {

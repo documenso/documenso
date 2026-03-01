@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { EnvelopeItem } from '@prisma/client';
+import type { EnvelopeItem } from '@documenso/prisma/client';
 import { base64 } from '@scure/base';
 import { Loader } from 'lucide-react';
 import { type PDFDocumentProxy } from 'pdfjs-dist';

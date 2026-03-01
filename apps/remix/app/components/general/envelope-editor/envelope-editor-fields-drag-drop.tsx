@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 import {
   CalendarIcon,
   CheckSquareIcon,

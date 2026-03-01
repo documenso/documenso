@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { type Field, type Recipient, type Signature, SigningStatus } from '@prisma/client';
+import { type Field, type Recipient, type Signature, SigningStatus } from '@documenso/prisma/client';
 import { useForm } from 'react-hook-form';
 import { useRevalidator } from 'react-router';
 import { z } from 'zod';

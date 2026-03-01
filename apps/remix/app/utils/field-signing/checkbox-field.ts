@@ -1,4 +1,4 @@
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 
 import { validateCheckboxLength } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';

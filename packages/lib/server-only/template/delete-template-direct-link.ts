@@ -1,4 +1,4 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 
 import { generateAvaliableRecipientPlaceholder } from '@documenso/lib/utils/templates';
 import { prisma } from '@documenso/prisma';

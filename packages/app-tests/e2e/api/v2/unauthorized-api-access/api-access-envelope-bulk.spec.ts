@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
-import type { Team, User } from '@prisma/client';
-import { EnvelopeType, FolderType } from '@prisma/client';
+import type { Team, User } from '@documenso/prisma/client';
+import { EnvelopeType, FolderType } from '@documenso/prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';

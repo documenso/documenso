@@ -1,4 +1,4 @@
-import { EnvelopeType, FieldType } from '@prisma/client';
+import { EnvelopeType, FieldType } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import {

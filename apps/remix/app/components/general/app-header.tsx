@@ -1,6 +1,6 @@
 import { type HTMLAttributes, useEffect, useState } from 'react';
 
-import { ReadStatus } from '@prisma/client';
+import { ReadStatus } from '@documenso/prisma/client';
 import { InboxIcon, MenuIcon, SearchIcon } from 'lucide-react';
 import { Link, useParams } from 'react-router';
 

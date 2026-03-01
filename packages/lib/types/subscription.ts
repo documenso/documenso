@@ -1,4 +1,4 @@
-import type { SubscriptionClaim } from '@prisma/client';
+import type { SubscriptionClaim } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { ZOrganisationNameSchema } from '@documenso/trpc/server/organisation-router/create-organisation.types';

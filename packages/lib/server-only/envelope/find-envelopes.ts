@@ -4,7 +4,7 @@ import type {
   Envelope,
   EnvelopeType,
   Prisma,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 
 import { prisma } from '@documenso/prisma';
 

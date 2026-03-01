@@ -1,7 +1,7 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
-import { DocumentSource, EnvelopeType } from '@prisma/client';
+import { DocumentSource, EnvelopeType } from '@documenso/prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import { DocumentCompletedEmailTemplate } from '@documenso/email/templates/document-completed';

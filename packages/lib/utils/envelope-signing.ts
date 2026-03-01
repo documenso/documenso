@@ -1,5 +1,5 @@
-import type { Field } from '@prisma/client';
-import { FieldType } from '@prisma/client';
+import type { Field } from '@documenso/prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 import { DateTime } from 'luxon';
 import { P, match } from 'ts-pattern';
 import { z } from 'zod';

@@ -1,5 +1,5 @@
 import { Trans } from '@lingui/react/macro';
-import { DocumentSource } from '@prisma/client';
+import { DocumentSource } from '@documenso/prisma/client';
 import { Loader } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link } from 'react-router';

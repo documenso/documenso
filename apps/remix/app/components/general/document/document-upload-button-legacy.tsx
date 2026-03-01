@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 import { useNavigate, useParams } from 'react-router';
 import { match } from 'ts-pattern';
 

@@ -1,6 +1,6 @@
-import type { DocumentMeta, DocumentVisibility, Prisma, TemplateType } from '@prisma/client';
-import { EnvelopeType, FolderType } from '@prisma/client';
-import { DocumentStatus } from '@prisma/client';
+import type { DocumentMeta, DocumentVisibility, Prisma, TemplateType } from '@documenso/prisma/client';
+import { EnvelopeType, FolderType } from '@documenso/prisma/client';
+import { DocumentStatus } from '@documenso/prisma/client';
 import { isDeepEqual } from 'remeda';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';

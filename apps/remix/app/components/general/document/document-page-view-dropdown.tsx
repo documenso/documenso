@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus } from '@documenso/prisma/client';
 import {
   Copy,
   Download,

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
-import type { FolderType } from '@prisma/client';
+import type { FolderType } from '@documenso/prisma/client';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { FolderPlusIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';

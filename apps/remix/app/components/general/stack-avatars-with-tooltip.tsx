@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { type DocumentStatus, type Recipient } from '@prisma/client';
+import { type DocumentStatus, type Recipient } from '@documenso/prisma/client';
 
 import { RecipientStatusType, getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';

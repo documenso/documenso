@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
-import { FolderType, OrganisationType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
+import { FolderType, OrganisationType } from '@documenso/prisma/client';
 import { useParams, useSearchParams } from 'react-router';
 import { Link } from 'react-router';
 import { z } from 'zod';

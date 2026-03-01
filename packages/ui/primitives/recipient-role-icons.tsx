@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { RecipientRole } from '@prisma/client';
+import type { RecipientRole } from '@documenso/prisma/client';
 import { BadgeCheck, Copy, Eye, PencilLine, User } from 'lucide-react';
 
 export const ROLE_ICONS: Record<RecipientRole, React.ReactNode> = {

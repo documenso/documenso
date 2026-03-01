@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans } from '@lingui/react/macro';
-import { DocumentDistributionMethod, DocumentSigningOrder, RecipientRole } from '@prisma/client';
+import { DocumentDistributionMethod, DocumentSigningOrder, RecipientRole } from '@documenso/prisma/client';
 import { nanoid } from 'nanoid';
 import { useForm } from 'react-hook-form';
 

@@ -1,4 +1,4 @@
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus } from '@documenso/prisma/client';
 import type { ImagePart, ModelMessage } from 'ai';
 import { generateObject } from 'ai';
 import { chunk } from 'remeda';

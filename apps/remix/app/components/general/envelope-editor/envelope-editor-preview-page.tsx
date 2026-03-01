@@ -2,7 +2,7 @@ import { lazy, useEffect, useMemo, useState } from 'react';
 
 import { faker } from '@faker-js/faker/locale/en';
 import { Trans } from '@lingui/react/macro';
-import { FieldType, SigningStatus } from '@prisma/client';
+import { FieldType, SigningStatus } from '@documenso/prisma/client';
 import { FileTextIcon } from 'lucide-react';
 import { match } from 'ts-pattern';
 

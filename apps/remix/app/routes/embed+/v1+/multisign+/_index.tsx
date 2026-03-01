@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { SigningStatus } from '@prisma/client';
+import { SigningStatus } from '@documenso/prisma/client';
 import { useRevalidator } from 'react-router';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';

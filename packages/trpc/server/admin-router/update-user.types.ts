@@ -1,4 +1,4 @@
-import { Role } from '@prisma/client';
+import { Role } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 export const ZUpdateUserRequestSchema = z.object({

@@ -1,4 +1,4 @@
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 
 import { toCheckboxCustomText } from '@documenso/lib/utils/fields';
 import {

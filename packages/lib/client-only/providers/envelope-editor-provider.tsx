@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 
 import { trpc } from '@documenso/trpc/react';
 import type { TSetEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/set-envelope-recipients.types';

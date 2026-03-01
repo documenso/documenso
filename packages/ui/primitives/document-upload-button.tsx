@@ -2,7 +2,7 @@ import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 import { Upload } from 'lucide-react';
 import type { DropEvent, FileRejection } from 'react-dropzone';
 import { useDropzone } from 'react-dropzone';

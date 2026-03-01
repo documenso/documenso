@@ -1,4 +1,4 @@
-import type { DocumentData, Envelope, EnvelopeItem, Field } from '@prisma/client';
+import type { DocumentData, Envelope, EnvelopeItem, Field } from '@documenso/prisma/client';
 import {
   DocumentSigningOrder,
   DocumentStatus,
@@ -8,7 +8,7 @@ import {
   SendStatus,
   SigningStatus,
   WebhookTriggerEvents,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 
 import { resolveExpiresAt } from '@documenso/lib/constants/envelope-expiration';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';

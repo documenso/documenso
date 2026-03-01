@@ -1,4 +1,4 @@
-import type { User } from '@prisma/client';
+import type { User } from '@documenso/prisma/client';
 import { base32 } from '@scure/base';
 import { generateHOTP } from 'oslo/otp';
 

@@ -1,4 +1,4 @@
-import type { SubscriptionClaim } from '@prisma/client';
+import type { SubscriptionClaim } from '@documenso/prisma/client';
 
 import { DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT } from '@documenso/ee/server-only/limits/constants';
 

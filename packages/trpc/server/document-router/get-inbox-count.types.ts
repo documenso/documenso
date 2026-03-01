@@ -1,5 +1,5 @@
 // import type { OpenApiMeta } from 'trpc-to-openapi';
-import { ReadStatus } from '@prisma/client';
+import { ReadStatus } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 export const ZGetInboxCountRequestSchema = z

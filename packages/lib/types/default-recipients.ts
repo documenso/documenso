@@ -1,4 +1,4 @@
-import { RecipientRole } from '@prisma/client';
+import { RecipientRole } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 export const ZDefaultRecipientSchema = z.object({

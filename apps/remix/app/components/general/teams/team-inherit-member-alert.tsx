@@ -1,5 +1,5 @@
 import { Trans } from '@lingui/react/macro';
-import type { TeamGroup } from '@prisma/client';
+import type { TeamGroup } from '@documenso/prisma/client';
 
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 

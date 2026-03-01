@@ -1,4 +1,4 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 
 import { findAttachmentsByEnvelopeId } from '@documenso/lib/server-only/envelope-attachment/find-attachments-by-envelope-id';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';

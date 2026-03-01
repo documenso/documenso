@@ -1,4 +1,4 @@
-import { OrganisationType, Role } from '@prisma/client';
+import { OrganisationType, Role } from '../generated/client';
 import { customAlphabet } from 'nanoid';
 
 import { hashSync } from '@documenso/lib/server-only/auth/hash';

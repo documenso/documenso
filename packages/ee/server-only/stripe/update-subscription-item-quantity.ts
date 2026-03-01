@@ -1,4 +1,4 @@
-import type { OrganisationClaim, Subscription } from '@prisma/client';
+import type { OrganisationClaim, Subscription } from '@documenso/prisma/client';
 import type Stripe from 'stripe';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';

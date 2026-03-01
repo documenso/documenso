@@ -1,5 +1,5 @@
 import { Trans, useLingui } from '@lingui/react/macro';
-import type { TeamGroup } from '@prisma/client';
+import type { TeamGroup } from '@documenso/prisma/client';
 
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';

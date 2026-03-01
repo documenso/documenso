@@ -1,4 +1,4 @@
-import type { DocumentData, Envelope, Recipient } from '@prisma/client';
+import type { DocumentData, Envelope, Recipient } from '../generated/client';
 
 export type EnvelopeWithRecipients = Envelope & {
   recipients: Recipient[];

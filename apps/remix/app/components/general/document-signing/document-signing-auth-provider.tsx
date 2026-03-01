@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-import { type Envelope, FieldType, type Passkey, type Recipient } from '@prisma/client';
+import { type Envelope, FieldType, type Passkey, type Recipient } from '@documenso/prisma/client';
 
 import type { SessionUser } from '@documenso/auth/server/lib/session/session';
 import { MAXIMUM_PASSKEYS } from '@documenso/lib/constants/auth';

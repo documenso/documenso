@@ -5,7 +5,7 @@ import {
   FieldType,
   RecipientRole,
   SigningStatus,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 
 import { prisma } from '@documenso/prisma';
 import { seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';

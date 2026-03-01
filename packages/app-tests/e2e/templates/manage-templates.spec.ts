@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { TeamMemberRole } from '@prisma/client';
+import { TeamMemberRole } from '@documenso/prisma/client';
 
 import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedTemplate } from '@documenso/prisma/seed/templates';

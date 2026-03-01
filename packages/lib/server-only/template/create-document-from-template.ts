@@ -1,4 +1,4 @@
-import type { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
+import type { DocumentDistributionMethod, DocumentSigningOrder } from '@documenso/prisma/client';
 import {
   DocumentSource,
   EnvelopeType,
@@ -9,7 +9,7 @@ import {
   SendStatus,
   SigningStatus,
   WebhookTriggerEvents,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 

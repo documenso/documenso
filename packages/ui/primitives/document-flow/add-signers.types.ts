@@ -1,5 +1,5 @@
 import { msg } from '@lingui/core/macro';
-import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
+import { DocumentSigningOrder, RecipientRole } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';

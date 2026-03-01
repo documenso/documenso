@@ -1,4 +1,4 @@
-import { EnvelopeType, type FieldType } from '@prisma/client';
+import { EnvelopeType, type FieldType } from '@documenso/prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';

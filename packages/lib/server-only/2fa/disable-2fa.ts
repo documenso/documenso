@@ -1,5 +1,5 @@
-import type { User } from '@prisma/client';
-import { UserSecurityAuditLogType } from '@prisma/client';
+import type { User } from '@documenso/prisma/client';
+import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 
 import { prisma } from '@documenso/prisma';
 

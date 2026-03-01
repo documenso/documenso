@@ -1,5 +1,5 @@
 import { compare, hash } from '@node-rs/bcrypt';
-import { UserSecurityAuditLogType } from '@prisma/client';
+import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 
 import { SALT_ROUNDS } from '@documenso/lib/constants/auth';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';

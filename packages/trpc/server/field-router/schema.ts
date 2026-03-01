@@ -1,4 +1,4 @@
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { ZRecipientActionAuthSchema } from '@documenso/lib/types/document-auth';

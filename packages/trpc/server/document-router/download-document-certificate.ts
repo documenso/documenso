@@ -1,4 +1,4 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 
 import { PDF_SIZE_A4_72PPI } from '@documenso/lib/constants/pdf';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';

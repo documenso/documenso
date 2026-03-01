@@ -1,4 +1,4 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 import pMap from 'p-map';
 
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';

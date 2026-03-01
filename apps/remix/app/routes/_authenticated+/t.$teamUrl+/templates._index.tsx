@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 import { Bird } from 'lucide-react';
 import { useParams, useSearchParams } from 'react-router';
 

@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, type EnvelopeItem } from '@prisma/client';
+import { DocumentStatus, type EnvelopeItem } from '@documenso/prisma/client';
 import { DownloadIcon, FileTextIcon } from 'lucide-react';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';

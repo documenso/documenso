@@ -1,4 +1,4 @@
-import { DocumentVisibility as DocumentVisibilityEnum } from '@prisma/client';
+import { DocumentVisibility as DocumentVisibilityEnum } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 export const ZDocumentVisibilitySchema = z.nativeEnum(DocumentVisibilityEnum);

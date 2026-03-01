@@ -1,4 +1,4 @@
-import type { Team, User } from '@prisma/client';
+import type { Team, User } from '@documenso/prisma/client';
 import type { TsRestRequest } from '@ts-rest/serverless';
 import type { Logger } from 'pino';
 

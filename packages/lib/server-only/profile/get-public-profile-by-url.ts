@@ -1,5 +1,5 @@
-import type { Envelope, TemplateDirectLink } from '@prisma/client';
-import { EnvelopeType, type TeamProfile, TemplateType } from '@prisma/client';
+import type { Envelope, TemplateDirectLink } from '@documenso/prisma/client';
+import { EnvelopeType, type TeamProfile, TemplateType } from '@documenso/prisma/client';
 
 import { prisma } from '@documenso/prisma';
 

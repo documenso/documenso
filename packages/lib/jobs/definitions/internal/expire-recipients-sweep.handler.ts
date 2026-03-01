@@ -1,4 +1,4 @@
-import { DocumentStatus, SigningStatus } from '@prisma/client';
+import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { prisma } from '@documenso/prisma';
 

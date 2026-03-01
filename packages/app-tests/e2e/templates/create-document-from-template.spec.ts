@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { DocumentDataType, TeamMemberRole } from '@prisma/client';
+import { DocumentDataType, TeamMemberRole } from '@documenso/prisma/client';
 import path from 'path';
 
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';

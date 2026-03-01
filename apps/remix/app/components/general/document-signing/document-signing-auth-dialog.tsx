@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import type { FieldType } from '@prisma/client';
+import type { FieldType } from '@documenso/prisma/client';
 import { ChevronLeftIcon } from 'lucide-react';
 import { P, match } from 'ts-pattern';
 

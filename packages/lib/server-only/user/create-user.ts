@@ -1,5 +1,5 @@
 import { hash } from '@node-rs/bcrypt';
-import type { User } from '@prisma/client';
+import type { User } from '@documenso/prisma/client';
 
 import { prisma } from '@documenso/prisma';
 

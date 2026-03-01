@@ -1,4 +1,4 @@
-import type { WebhookTriggerEvents } from '@prisma/client';
+import type { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { jobs } from '../../../jobs/client';
 import { getAllWebhooksByEventTrigger } from '../get-all-webhooks-by-event-trigger';

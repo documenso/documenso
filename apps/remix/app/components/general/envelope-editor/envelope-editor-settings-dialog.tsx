@@ -9,7 +9,7 @@ import {
   DocumentVisibility,
   EnvelopeType,
   SendStatus,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { InfoIcon, MailIcon, SettingsIcon, ShieldIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';

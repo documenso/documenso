@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
-import { SubscriptionStatus } from '@prisma/client';
+import { SubscriptionStatus } from '@documenso/prisma/client';
 import { Link, Outlet } from 'react-router';
 
 import {

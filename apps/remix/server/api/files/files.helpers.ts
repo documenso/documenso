@@ -1,4 +1,4 @@
-import { type DocumentDataType, DocumentStatus } from '@prisma/client';
+import { type DocumentDataType, DocumentStatus } from '@documenso/prisma/client';
 import contentDisposition from 'content-disposition';
 import { type Context } from 'hono';
 

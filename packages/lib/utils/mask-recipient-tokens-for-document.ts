@@ -1,4 +1,4 @@
-import type { User } from '@prisma/client';
+import type { User } from '@documenso/prisma/client';
 
 import type { EnvelopeWithRecipients } from '@documenso/prisma/types/document-with-recipient';
 

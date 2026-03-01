@@ -1,5 +1,5 @@
-import type { Envelope, Prisma } from '@prisma/client';
-import { DocumentStatus, EnvelopeType, RecipientRole } from '@prisma/client';
+import type { Envelope, Prisma } from '@documenso/prisma/client';
+import { DocumentStatus, EnvelopeType, RecipientRole } from '@documenso/prisma/client';
 
 import type { FindResultResponse } from '@documenso/lib/types/search-params';
 import { mapEnvelopesToDocumentMany } from '@documenso/lib/utils/document';

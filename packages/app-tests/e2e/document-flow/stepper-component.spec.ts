@@ -5,7 +5,7 @@ import {
   FieldType,
   RecipientRole,
   SigningStatus,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 import { DateTime } from 'luxon';
 import path from 'node:path';
 

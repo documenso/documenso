@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { Signature } from '@prisma/client';
+import type { Signature } from '@documenso/prisma/client';
 import { animate, motion, useMotionTemplate, useMotionValue, useTransform } from 'framer-motion';
 import { P, match } from 'ts-pattern';
 

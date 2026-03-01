@@ -1,4 +1,4 @@
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
 

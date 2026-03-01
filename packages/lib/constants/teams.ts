@@ -1,4 +1,4 @@
-import { DocumentVisibility, OrganisationGroupType, TeamMemberRole } from '@prisma/client';
+import { DocumentVisibility, OrganisationGroupType, TeamMemberRole } from '@documenso/prisma/client';
 
 export const TEAM_URL_ROOT_REGEX = new RegExp('^/t/[^/]+/?$');
 export const TEAM_URL_REGEX = new RegExp('^/t/[^/]+');

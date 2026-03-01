@@ -1,4 +1,4 @@
-import { type DocumentAuditLog, EnvelopeType, type Prisma } from '@prisma/client';
+import { type DocumentAuditLog, EnvelopeType, type Prisma } from '@documenso/prisma/client';
 
 import { prisma } from '@documenso/prisma';
 

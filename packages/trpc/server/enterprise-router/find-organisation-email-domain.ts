@@ -1,5 +1,5 @@
-import type { EmailDomainStatus } from '@prisma/client';
-import { Prisma } from '@prisma/client';
+import type { EmailDomainStatus } from '@documenso/prisma/client';
+import { Prisma } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { FindResultResponse } from '@documenso/lib/types/search-params';

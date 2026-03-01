@@ -1,4 +1,4 @@
-import { OrganisationGroupType, OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
+import { OrganisationGroupType, OrganisationMemberRole, TeamMemberRole } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';

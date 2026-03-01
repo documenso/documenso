@@ -1,4 +1,4 @@
-import type { User } from '@prisma/client';
+import type { User } from '@documenso/prisma/client';
 
 import { AppError } from '../../errors/app-error';
 import { getBackupCodes } from './get-backup-code';

@@ -1,4 +1,4 @@
-import { EnvelopeType, RecipientRole } from '@prisma/client';
+import { EnvelopeType, RecipientRole } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';

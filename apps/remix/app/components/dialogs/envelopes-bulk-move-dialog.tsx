@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plural, useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { FolderIcon, HomeIcon, Loader2, Search } from 'lucide-react';
 import { useForm } from 'react-hook-form';

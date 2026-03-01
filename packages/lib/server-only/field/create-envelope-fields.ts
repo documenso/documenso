@@ -1,5 +1,5 @@
 import { PDF } from '@libpdf/core';
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TFieldAndMeta } from '@documenso/lib/types/field-meta';

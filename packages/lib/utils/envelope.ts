@@ -1,11 +1,11 @@
-import type { Envelope, Recipient } from '@prisma/client';
+import type { Envelope, Recipient } from '@documenso/prisma/client';
 import {
   DocumentStatus,
   EnvelopeType,
   RecipientRole,
   SendStatus,
   SigningStatus,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 

@@ -1,5 +1,5 @@
 import { sValidator } from '@hono/standard-validator';
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '@documenso/prisma/client';
 import { Hono } from 'hono';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';

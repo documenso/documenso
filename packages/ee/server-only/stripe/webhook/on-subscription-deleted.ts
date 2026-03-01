@@ -1,4 +1,4 @@
-import { SubscriptionStatus } from '@prisma/client';
+import { SubscriptionStatus } from '@documenso/prisma/client';
 
 import { createOrganisationClaimUpsertData } from '@documenso/lib/server-only/organisation/create-organisation';
 import type { Stripe } from '@documenso/lib/server-only/stripe';

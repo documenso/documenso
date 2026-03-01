@@ -1,5 +1,5 @@
-import type { Signature } from '@prisma/client';
-import { type Field, FieldType } from '@prisma/client';
+import type { Signature } from '@documenso/prisma/client';
+import { type Field, FieldType } from '@documenso/prisma/client';
 import type Konva from 'konva';
 import { match } from 'ts-pattern';
 

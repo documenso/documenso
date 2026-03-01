@@ -1,4 +1,4 @@
-import { EnvelopeType, type Webhook } from '@prisma/client';
+import { EnvelopeType, type Webhook } from '@documenso/prisma/client';
 
 import { prisma } from '@documenso/prisma';
 

@@ -4,7 +4,7 @@
  */
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import type { OrganisationMemberRole } from '@prisma/client';
+import type { OrganisationMemberRole } from '@documenso/prisma/client';
 
 export const ORGANISATION_MEMBER_ROLE_MAP: Record<
   keyof typeof OrganisationMemberRole,

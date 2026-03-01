@@ -1,5 +1,5 @@
-import { Prisma } from '@prisma/client';
-import { OrganisationType } from '@prisma/client';
+import { Prisma } from '@documenso/prisma/client';
+import { OrganisationType } from '@documenso/prisma/client';
 
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';

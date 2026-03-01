@@ -1,5 +1,5 @@
 import { CreateEmailIdentityCommand, SESv2Client } from '@aws-sdk/client-sesv2';
-import { EmailDomainStatus } from '@prisma/client';
+import { EmailDomainStatus } from '@documenso/prisma/client';
 import { generateKeyPair } from 'crypto';
 import { promisify } from 'util';
 

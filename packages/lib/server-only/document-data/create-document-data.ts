@@ -1,4 +1,4 @@
-import type { DocumentDataType } from '@prisma/client';
+import type { DocumentDataType } from '@documenso/prisma/client';
 
 import { prisma } from '@documenso/prisma';
 

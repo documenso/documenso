@@ -1,4 +1,4 @@
-import { SigningStatus, WebhookTriggerEvents } from '@prisma/client';
+import { SigningStatus, WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { prisma } from '@documenso/prisma';
 

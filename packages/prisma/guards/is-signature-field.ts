@@ -1,4 +1,4 @@
-import { FieldType } from '@prisma/client';
+import { FieldType } from '../generated/client';
 
 const SignatureFieldTypes = [FieldType.SIGNATURE, FieldType.FREE_SIGNATURE] as const;
 

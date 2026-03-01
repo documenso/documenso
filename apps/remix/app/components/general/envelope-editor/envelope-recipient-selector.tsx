@@ -4,8 +4,8 @@ import type { I18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import type { Field, Recipient } from '@prisma/client';
-import { RecipientRole, SendStatus } from '@prisma/client';
+import type { Field, Recipient } from '@documenso/prisma/client';
+import { RecipientRole, SendStatus } from '@documenso/prisma/client';
 import { Check, ChevronsUpDown, Info } from 'lucide-react';
 import { sortBy } from 'remeda';
 

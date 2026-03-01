@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, EnvelopeType, type Recipient, SigningStatus } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, type Recipient, SigningStatus } from '@documenso/prisma/client';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 

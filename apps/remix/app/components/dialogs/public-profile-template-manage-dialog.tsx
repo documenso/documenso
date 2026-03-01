@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Plural, Trans } from '@lingui/react/macro';
-import { type TemplateDirectLink, TemplateType } from '@prisma/client';
+import { type TemplateDirectLink, TemplateType } from '@documenso/prisma/client';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { CheckCircle2Icon, CircleIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';

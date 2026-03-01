@@ -1,7 +1,7 @@
 import type { I18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import type { DocumentMeta } from '@prisma/client';
-import type { Envelope, RecipientRole } from '@prisma/client';
+import type { DocumentMeta } from '@documenso/prisma/client';
+import type { Envelope, RecipientRole } from '@documenso/prisma/client';
 import Konva from 'konva';
 import 'konva/skia-backend';
 import type { DateTimeFormatOptions } from 'luxon';

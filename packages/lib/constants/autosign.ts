@@ -1,4 +1,4 @@
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 
 export const AUTO_SIGNABLE_FIELD_TYPES: FieldType[] = [
   FieldType.NAME,

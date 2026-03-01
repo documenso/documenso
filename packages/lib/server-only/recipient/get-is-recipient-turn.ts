@@ -1,4 +1,4 @@
-import { DocumentSigningOrder, EnvelopeType, SigningStatus } from '@prisma/client';
+import { DocumentSigningOrder, EnvelopeType, SigningStatus } from '@documenso/prisma/client';
 
 import { prisma } from '@documenso/prisma';
 

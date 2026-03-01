@@ -1,6 +1,6 @@
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';

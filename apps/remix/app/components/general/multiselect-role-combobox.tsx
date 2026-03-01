@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { Role } from '@prisma/client';
+import { Role } from '@documenso/prisma/client';
 import { Check, ChevronsUpDown } from 'lucide-react';
 
 import { cn } from '@documenso/ui/lib/utils';

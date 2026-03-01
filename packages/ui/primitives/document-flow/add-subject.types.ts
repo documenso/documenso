@@ -1,4 +1,4 @@
-import { DocumentDistributionMethod } from '@prisma/client';
+import { DocumentDistributionMethod } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';

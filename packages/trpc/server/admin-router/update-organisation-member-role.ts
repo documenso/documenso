@@ -1,4 +1,4 @@
-import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
+import { OrganisationGroupType, OrganisationMemberRole } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { generateDatabaseId } from '@documenso/lib/universal/id';

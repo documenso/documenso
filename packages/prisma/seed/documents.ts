@@ -1,4 +1,4 @@
-import type { Team, User } from '@prisma/client';
+import type { Team, User } from '../generated/client';
 import { nanoid } from 'nanoid';
 import fs from 'node:fs';
 import path from 'node:path';

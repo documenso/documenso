@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
-import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
+import { OrganisationGroupType, OrganisationMemberRole } from '@documenso/prisma/client';
 import { useLocation, useSearchParams } from 'react-router';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';

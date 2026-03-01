@@ -1,7 +1,7 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import type { Recipient } from '@prisma/client';
-import { DocumentStatus } from '@prisma/client';
+import type { Recipient } from '@documenso/prisma/client';
+import { DocumentStatus } from '@documenso/prisma/client';
 
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';

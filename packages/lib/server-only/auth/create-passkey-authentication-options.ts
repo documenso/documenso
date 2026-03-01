@@ -1,4 +1,4 @@
-import type { Passkey } from '@prisma/client';
+import type { Passkey } from '@documenso/prisma/client';
 import { generateAuthenticationOptions } from '@simplewebauthn/server';
 import type { AuthenticatorTransportFuture } from '@simplewebauthn/server';
 import { isoBase64URL } from '@simplewebauthn/server/helpers';

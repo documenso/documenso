@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import { WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
+import { WebhookCallStatus, WebhookTriggerEvents } from '@documenso/prisma/client';
 import {
   CheckCircle2Icon,
   ChevronRightIcon,

@@ -4,8 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Field, Recipient } from '@prisma/client';
-import { FieldType, Prisma, RecipientRole, SendStatus } from '@prisma/client';
+import type { Field, Recipient } from '@documenso/prisma/client';
+import { FieldType, Prisma, RecipientRole, SendStatus } from '@documenso/prisma/client';
 import {
   CalendarDays,
   CheckSquare,

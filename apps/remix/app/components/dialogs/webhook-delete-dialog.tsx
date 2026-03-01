@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Webhook } from '@prisma/client';
+import type { Webhook } from '@documenso/prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 

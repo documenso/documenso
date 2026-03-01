@@ -1,5 +1,5 @@
-import type { Envelope } from '@prisma/client';
-import { EnvelopeType } from '@prisma/client';
+import type { Envelope } from '@documenso/prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 import { customAlphabet } from 'nanoid';
 
 import { mapSecondaryIdToDocumentId, mapSecondaryIdToTemplateId } from '../utils/envelope';

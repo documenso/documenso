@@ -1,7 +1,7 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
-import type { Field, Signature } from '@prisma/client';
+import type { Field, Signature } from '@documenso/prisma/client';
 import {
   DocumentSigningOrder,
   DocumentSource,
@@ -13,7 +13,7 @@ import {
   SendStatus,
   SigningStatus,
   WebhookTriggerEvents,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 import { z } from 'zod';

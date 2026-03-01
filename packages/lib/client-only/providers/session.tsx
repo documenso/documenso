@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import React from 'react';
 
-import type { Session } from '@prisma/client';
+import type { Session } from '@documenso/prisma/client';
 import { useLocation } from 'react-router';
 
 import { authClient } from '@documenso/auth/client';

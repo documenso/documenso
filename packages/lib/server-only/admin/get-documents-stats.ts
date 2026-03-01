@@ -1,4 +1,4 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 
 import { prisma } from '@documenso/prisma';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';

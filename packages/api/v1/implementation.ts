@@ -1,4 +1,4 @@
-import { DocumentDataType, EnvelopeType, SigningStatus } from '@prisma/client';
+import { DocumentDataType, EnvelopeType, SigningStatus } from '@documenso/prisma/client';
 import { tsr } from '@ts-rest/serverless/fetch';
 import { match } from 'ts-pattern';
 

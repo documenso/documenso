@@ -1,5 +1,5 @@
-import { EnvelopeType, ReadStatus, SendStatus } from '@prisma/client';
-import { WebhookTriggerEvents } from '@prisma/client';
+import { EnvelopeType, ReadStatus, SendStatus } from '@documenso/prisma/client';
+import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';

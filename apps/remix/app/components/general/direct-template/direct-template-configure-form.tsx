@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
-import type { Field } from '@prisma/client';
+import type { Recipient } from '@documenso/prisma/client';
+import type { Field } from '@documenso/prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 

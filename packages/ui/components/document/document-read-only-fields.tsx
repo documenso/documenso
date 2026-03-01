@@ -2,8 +2,8 @@ import { useState } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentMeta, Field, Recipient } from '@prisma/client';
-import { SigningStatus } from '@prisma/client';
+import type { DocumentMeta, Field, Recipient } from '@documenso/prisma/client';
+import { SigningStatus } from '@documenso/prisma/client';
 import { Clock, EyeOffIcon } from 'lucide-react';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';

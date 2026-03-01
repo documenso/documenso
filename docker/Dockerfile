@@ -20,6 +20,9 @@ WORKDIR /app
 
 COPY . .
 
+# Install dependencies so turbo is available for pruning
+RUN pnpm install --frozen-lockfile
+
 # Outputs to the /out folder
 # source: https://turbo.build/repo/docs/reference/command-line-reference/prune#--docker
 RUN pnpm exec turbo prune @documenso/remix --docker
@@ -119,12 +122,11 @@ RUN pnpm install --frozen-lockfile --prod
 COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/build ./apps/remix/build
 COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/public ./apps/remix/public
 
-# Copy the prisma binary, schema and migrations
+# Copy the prisma schema, migrations, and generated client
 COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
 COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/migrations ./packages/prisma/migrations
-
-# Generate the prisma client again
-RUN pnpm exec prisma generate --schema ./packages/prisma/schema.prisma
+COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/generated ./packages/prisma/generated
+COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/client.ts ./packages/prisma/client.ts
 
 
 # Get the start script from docker/

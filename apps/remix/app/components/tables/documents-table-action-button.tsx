@@ -1,5 +1,5 @@
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
+import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import { CheckCircle, Download, Edit, EyeIcon, Pencil } from 'lucide-react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';

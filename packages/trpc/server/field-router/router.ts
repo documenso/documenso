@@ -1,4 +1,4 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 
 import { createEnvelopeFields } from '@documenso/lib/server-only/field/create-envelope-fields';
 import { deleteDocumentField } from '@documenso/lib/server-only/field/delete-document-field';

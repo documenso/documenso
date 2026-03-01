@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { DocumentStatus, OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
+import { DocumentStatus, OrganisationMemberRole, TeamMemberRole } from '@documenso/prisma/client';
 
 import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';

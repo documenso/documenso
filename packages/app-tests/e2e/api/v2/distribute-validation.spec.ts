@@ -1,5 +1,5 @@
 import { type APIRequestContext, expect, test } from '@playwright/test';
-import type { Team, User } from '@prisma/client';
+import type { Team, User } from '@documenso/prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
 

@@ -1,4 +1,4 @@
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus } from '../generated/client';
 
 export const ExtendedDocumentStatus = {
   ...DocumentStatus,

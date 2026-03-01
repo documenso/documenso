@@ -10,7 +10,7 @@ import {
   FieldType,
   type Recipient,
   type Signature,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useSearchParams } from 'react-router';

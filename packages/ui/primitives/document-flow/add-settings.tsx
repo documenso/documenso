@@ -9,7 +9,7 @@ import {
   type Recipient,
   SendStatus,
   TeamMemberRole,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
