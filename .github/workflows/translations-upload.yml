@@ -78,7 +78,7 @@ jobs:
 
       - name: Compile translations
         id: compile_translations
-        run: pnpm run translate:compile -- -- --strict
+        run: pnpm run translate:compile -- --strict
         continue-on-error: true
 
       - name: Upload missing translations
