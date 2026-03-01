@@ -78,11 +78,11 @@ export default defineConfig({
       https: 'node:https',
       '.prisma/client/default': path.resolve(
         __dirname,
-        '../../packages/prisma/generated/client/default.js',
+        '../../node_modules/.prisma/client/default.js',
       ),
       '.prisma/client/index-browser': path.resolve(
         __dirname,
-        '../../packages/prisma/generated/client/index-browser.js',
+        '../../node_modules/.prisma/client/index-browser.js',
       ),
       canvas: path.resolve(__dirname, './app/types/empty-module.ts'),
     },
@@ -93,6 +93,9 @@ export default defineConfig({
    * See rollup.config.mjs which is used for that.
    */
   build: {
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
     rollupOptions: {
       external: [
         '@napi-rs/canvas',

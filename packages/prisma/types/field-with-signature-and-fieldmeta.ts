@@ -1,4 +1,4 @@
-import type { Field, Signature } from '../generated/client';
+import type { Field, Signature } from '@prisma/client';
 
 import { type TFieldMetaSchema as FieldMeta } from '@documenso/lib/types/field-meta';
 

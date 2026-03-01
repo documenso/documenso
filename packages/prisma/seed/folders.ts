@@ -1,5 +1,5 @@
-import type { User } from '../generated/client';
-import { FolderType } from '../generated/client';
+import type { User } from '@prisma/client';
+import { FolderType } from '@prisma/client';
 
 import { prisma } from '..';
 import type { Prisma } from '../client';

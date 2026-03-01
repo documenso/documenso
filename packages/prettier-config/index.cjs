@@ -1,3 +1,5 @@
+const path = require('path');
+
 /** @type {import('prettier').Config} */
 module.exports = {
   arrowParens: 'always',
@@ -21,6 +23,8 @@ module.exports = {
   // !: Waiting for these to make it upstream
   // importOrderMergeDuplicateImports: true,
   // importOrderCombineTypeAndValueImports: true,
+
+  // tailwindStylesheet: path.join(__dirname, '../ui/styles/theme.css'),
 
   plugins: [
     '@trivago/prettier-plugin-sort-imports',
