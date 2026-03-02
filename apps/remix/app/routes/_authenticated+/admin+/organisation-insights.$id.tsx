@@ -54,6 +54,7 @@ export default function OrganisationInsights({ loaderData }: Route.ComponentProp
           </Link>
         </Button>
       </div>
+
       <div className="mt-8">
         <OrganisationInsightsTable
           insights={insights}
