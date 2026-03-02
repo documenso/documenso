@@ -104,13 +104,13 @@ export const getPresignGetUrl = async (key: string) => {
 /**
  * Uploads a file to S3.
  */
-export const uploadS3File = async (file: File, keyOverride?: string) => {
+export const uploadS3File = async (file: File) => {
   const client = getS3Client();
 
   // Get the basename and extension for the file
   const { name, ext } = path.parse(file.name);
 
-  const key = keyOverride ?? `${alphaid(12)}/${slugify(name)}${ext}`;
+  const key = `${alphaid(12)}/${slugify(name)}${ext}`;
 
   const fileBuffer = await file.arrayBuffer();
 
