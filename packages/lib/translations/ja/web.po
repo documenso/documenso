@@ -2378,9 +2378,17 @@ msgstr "Cc 受信者"
 msgid "Center"
 msgstr "中央"
 
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Change language"
+msgstr ""
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
 msgid "Change Recipient"
 msgstr "受信者を変更"
+
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Change theme"
+msgstr ""
 
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
 msgid "Character limit"
@@ -2422,6 +2430,10 @@ msgstr "チェックボックスの値"
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Checkout"
 msgstr "チェックアウト"
+
+#: packages/lib/constants/i18n.ts
+msgid "Chinese"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Choose an existing recipient from below to continue"
@@ -2630,8 +2642,8 @@ msgid "Configure document settings and options before sending."
 msgstr "送信前に、ドキュメント設定とオプションを構成します。"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
-msgid "Configure email settings for the document"
-msgstr "このドキュメントのメール設定を構成"
+msgid "Configure email settings for the document."
+msgstr ""
 
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
@@ -2648,8 +2660,8 @@ msgid "Configure general settings for the template."
 msgstr "このテンプレートの一般設定を構成します。"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
-msgid "Configure security settings for the document"
-msgstr "このドキュメントのセキュリティ設定を構成"
+msgid "Configure security settings for the document."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "Configure template"
@@ -4187,6 +4199,10 @@ msgstr "テンプレートを複製"
 msgid "Duplicate values are not allowed"
 msgstr "同じ値を重複して使用することはできません"
 
+#: packages/lib/constants/i18n.ts
+msgid "Dutch"
+msgstr ""
+
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "E.g. 0"
 msgstr "例: 0"
@@ -4527,6 +4543,10 @@ msgstr "同封文書"
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Enclosed Documents"
 msgstr "同封された文書"
+
+#: packages/lib/constants/i18n.ts
+msgid "English"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
@@ -5099,6 +5119,10 @@ msgstr "フリー署名"
 msgid "Free Signature Settings"
 msgstr "手書き署名の設定"
 
+#: packages/lib/constants/i18n.ts
+msgid "French"
+msgstr ""
+
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
@@ -5130,6 +5154,10 @@ msgstr "DKIM レコードを生成"
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Generate Links"
 msgstr "リンクを生成"
+
+#: packages/lib/constants/i18n.ts
+msgid "German"
+msgstr ""
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 msgid "Global recipient action authentication"
@@ -5668,6 +5696,14 @@ msgstr "現在はあなたの署名順ではありません。まもなくこの
 msgid "It's currently not your turn to sign. You will receive an email with instructions once it's your turn to sign the document."
 msgstr "現在はあなたの署名順ではありません。順番が来ると、文書への署名方法を記載したメールが届きます。"
 
+#: packages/lib/constants/i18n.ts
+msgid "Italian"
+msgstr ""
+
+#: packages/lib/constants/i18n.ts
+msgid "Japanese"
+msgstr ""
+
 #: packages/email/templates/organisation-invite.tsx
 msgid "Join {organisationName} on Documenso"
 msgstr "{organisationName} に Documenso で参加"
@@ -5684,6 +5720,10 @@ msgstr "参加日"
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Joined {0}"
 msgstr "{0} に参加"
+
+#: packages/lib/constants/i18n.ts
+msgid "Korean"
+msgstr ""
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
@@ -7269,6 +7309,14 @@ msgstr "続行するには文書をアップロードしてください"
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Please upload a logo"
 msgstr "ロゴをアップロードしてください"
+
+#: packages/lib/constants/i18n.ts
+msgid "Polish"
+msgstr ""
+
+#: packages/lib/constants/i18n.ts
+msgid "Portuguese (Brazil)"
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: packages/ui/primitives/document-flow/field-item.tsx
@@ -8872,6 +8920,10 @@ msgstr "ソース"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Space-separated list of domains. Leave empty to allow all domains."
 msgstr "ドメインを半角スペース区切りで入力します。空のままにするとすべてのドメインが許可されます。"
+
+#: packages/lib/constants/i18n.ts
+msgid "Spanish"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 msgid "SSO"
@@ -12666,4 +12718,3 @@ msgstr "認証コード:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
-

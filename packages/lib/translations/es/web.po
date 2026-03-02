@@ -2378,9 +2378,17 @@ msgstr "Ccers"
 msgid "Center"
 msgstr "Centro"
 
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Change language"
+msgstr ""
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
 msgid "Change Recipient"
 msgstr "Cambiar destinatario"
+
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Change theme"
+msgstr ""
 
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
 msgid "Character limit"
@@ -2422,6 +2430,10 @@ msgstr "Valores de Checkbox"
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Checkout"
 msgstr "Checkout"
+
+#: packages/lib/constants/i18n.ts
+msgid "Chinese"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Choose an existing recipient from below to continue"
@@ -2630,8 +2642,8 @@ msgid "Configure document settings and options before sending."
 msgstr "Configura la configuración del documento y las opciones antes de enviar."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
-msgid "Configure email settings for the document"
-msgstr "Configura las opciones de correo electrónico para el documento"
+msgid "Configure email settings for the document."
+msgstr ""
 
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
@@ -2648,8 +2660,8 @@ msgid "Configure general settings for the template."
 msgstr "Configurar ajustes generales para la plantilla."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
-msgid "Configure security settings for the document"
-msgstr "Configura la configuración de seguridad del documento"
+msgid "Configure security settings for the document."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "Configure template"
@@ -4187,6 +4199,10 @@ msgstr "Plantilla Duplicada"
 msgid "Duplicate values are not allowed"
 msgstr "No se permiten valores duplicados"
 
+#: packages/lib/constants/i18n.ts
+msgid "Dutch"
+msgstr ""
+
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "E.g. 0"
 msgstr "Ej.: 0"
@@ -4527,6 +4543,10 @@ msgstr "Documento Adjunto"
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Enclosed Documents"
 msgstr "Documentos adjuntos"
+
+#: packages/lib/constants/i18n.ts
+msgid "English"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
@@ -5099,6 +5119,10 @@ msgstr "Firma gratuita"
 msgid "Free Signature Settings"
 msgstr "Configuración de Firma Gratuita"
 
+#: packages/lib/constants/i18n.ts
+msgid "French"
+msgstr ""
+
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
@@ -5130,6 +5154,10 @@ msgstr "Generar registros DKIM"
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Generate Links"
 msgstr "Generar enlaces"
+
+#: packages/lib/constants/i18n.ts
+msgid "German"
+msgstr ""
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 msgid "Global recipient action authentication"
@@ -5668,6 +5696,14 @@ msgstr "Actualmente no es tu turno para firmar. Por favor, vuelve pronto ya que 
 msgid "It's currently not your turn to sign. You will receive an email with instructions once it's your turn to sign the document."
 msgstr "Actualmente no es tu turno para firmar. Recibirás un correo electrónico con instrucciones una vez sea tu turno para firmar el documento."
 
+#: packages/lib/constants/i18n.ts
+msgid "Italian"
+msgstr ""
+
+#: packages/lib/constants/i18n.ts
+msgid "Japanese"
+msgstr ""
+
 #: packages/email/templates/organisation-invite.tsx
 msgid "Join {organisationName} on Documenso"
 msgstr "Únete a {organisationName} en Documenso"
@@ -5684,6 +5720,10 @@ msgstr "Unido"
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Joined {0}"
 msgstr "Se unió a {0}"
+
+#: packages/lib/constants/i18n.ts
+msgid "Korean"
+msgstr ""
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
@@ -7269,6 +7309,14 @@ msgstr "Por favor, carga un documento para continuar"
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Please upload a logo"
 msgstr "Por favor, suba un logotipo"
+
+#: packages/lib/constants/i18n.ts
+msgid "Polish"
+msgstr ""
+
+#: packages/lib/constants/i18n.ts
+msgid "Portuguese (Brazil)"
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: packages/ui/primitives/document-flow/field-item.tsx
@@ -8872,6 +8920,10 @@ msgstr "Fuente"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Space-separated list of domains. Leave empty to allow all domains."
 msgstr "Lista de dominios separados por espacios. Deje vacío para permitir todos los dominios."
+
+#: packages/lib/constants/i18n.ts
+msgid "Spanish"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 msgid "SSO"
@@ -12666,4 +12718,3 @@ msgstr "Su código de verificación:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "su-dominio.com otro-dominio.com"
-
