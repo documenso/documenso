@@ -1,5 +1,5 @@
 import { type APIRequestContext, type Page, expect, test } from '@playwright/test';
-import { DocumentStatus, EnvelopeType, FieldType } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, FieldType } from '@documenso/prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';

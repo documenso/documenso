@@ -23,21 +23,21 @@ jobs:
       - uses: ./.github/actions/node-install
 
       - name: Start Services
-        run: npm run dx:up
+        run: pnpm run dx:up
 
       - uses: ./.github/actions/playwright-install
 
       - name: Create the database
-        run: npm run prisma:migrate-dev
+        run: pnpm run prisma:migrate-dev
 
       - name: Seed the database
-        run: npm run prisma:seed
+        run: pnpm run prisma:seed
 
       - name: Install playwright browsers
-        run: npx playwright install --with-deps
+        run: pnpm exec playwright install --with-deps
 
       - name: Run Playwright tests
-        run: npm run ci
+        run: pnpm run ci
         env:
           # Needed since we use next start which will set the NODE_ENV to production
           NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: './example/cert.p12'

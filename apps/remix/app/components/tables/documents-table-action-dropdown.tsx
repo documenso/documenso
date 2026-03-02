@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, RecipientRole } from '@prisma/client';
+import { DocumentStatus, RecipientRole } from '@documenso/prisma/client';
 import {
   CheckCircle,
   Copy,

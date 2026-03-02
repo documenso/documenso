@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
-import { DocumentDistributionMethod, type Field, type Recipient } from '@prisma/client';
+import { DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
+import { DocumentDistributionMethod, type Field, type Recipient } from '@documenso/prisma/client';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';

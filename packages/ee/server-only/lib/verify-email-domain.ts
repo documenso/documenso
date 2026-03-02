@@ -1,5 +1,5 @@
 import { GetEmailIdentityCommand } from '@aws-sdk/client-sesv2';
-import { EmailDomainStatus } from '@prisma/client';
+import { EmailDomainStatus } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';

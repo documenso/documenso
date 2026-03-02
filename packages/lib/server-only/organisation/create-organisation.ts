@@ -1,6 +1,6 @@
-import { Prisma } from '@prisma/client';
-import { OrganisationType } from '@prisma/client';
-import { OrganisationMemberRole } from '@prisma/client';
+import { Prisma } from '@documenso/prisma/client';
+import { OrganisationType } from '@documenso/prisma/client';
+import { OrganisationMemberRole } from '@documenso/prisma/client';
 
 import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
 import { prisma } from '@documenso/prisma';

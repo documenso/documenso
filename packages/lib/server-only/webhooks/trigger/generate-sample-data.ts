@@ -9,7 +9,7 @@ import {
   SendStatus,
   SigningStatus,
   WebhookTriggerEvents,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 
 import type { WebhookPayload } from '../../../types/webhook-payload';
 

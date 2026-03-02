@@ -1,4 +1,4 @@
-import { OrganisationType } from '@prisma/client';
+import { OrganisationType } from '@documenso/prisma/client';
 
 import { createCheckoutSession } from '@documenso/ee/server-only/stripe/create-checkout-session';
 import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';

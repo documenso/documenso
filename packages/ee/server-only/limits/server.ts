@@ -1,4 +1,4 @@
-import { DocumentSource, EnvelopeType, SubscriptionStatus } from '@prisma/client';
+import { DocumentSource, EnvelopeType, SubscriptionStatus } from '@documenso/prisma/client';
 import { DateTime } from 'luxon';
 
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';

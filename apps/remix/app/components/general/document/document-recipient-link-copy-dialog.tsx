@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
-import { RecipientRole } from '@prisma/client';
+import type { Recipient } from '@documenso/prisma/client';
+import { RecipientRole } from '@documenso/prisma/client';
 import { useSearchParams } from 'react-router';
 
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';

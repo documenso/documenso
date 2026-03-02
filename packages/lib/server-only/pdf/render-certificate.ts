@@ -1,8 +1,8 @@
 import type { I18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import type { Field, Signature } from '@prisma/client';
-import { SigningStatus } from '@prisma/client';
-import type { RecipientRole } from '@prisma/client';
+import type { Field, Signature } from '@documenso/prisma/client';
+import { SigningStatus } from '@documenso/prisma/client';
+import type { RecipientRole } from '@documenso/prisma/client';
 import Konva from 'konva';
 import 'konva/skia-backend';
 import { DateTime } from 'luxon';

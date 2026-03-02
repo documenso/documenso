@@ -3,7 +3,7 @@ import type {
   OrganisationGlobalSettings,
   Prisma,
   TeamGlobalSettings,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 
 import type { TeamGroup } from '@documenso/prisma/generated/types';
 import type { TeamMemberRole } from '@documenso/prisma/generated/types';

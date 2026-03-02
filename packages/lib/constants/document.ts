@@ -1,6 +1,6 @@
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import { DocumentDistributionMethod, DocumentStatus } from '@prisma/client';
+import { DocumentDistributionMethod, DocumentStatus } from '@documenso/prisma/client';
 
 /**
  * Workaround for E2E tests to not import `msg`.

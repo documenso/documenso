@@ -1,6 +1,6 @@
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import type { TeamMemberRole } from '@prisma/client';
+import type { TeamMemberRole } from '@documenso/prisma/client';
 
 export const TEAM_MEMBER_ROLE_MAP: Record<keyof typeof TeamMemberRole, MessageDescriptor> = {
   ADMIN: msg`Admin`,

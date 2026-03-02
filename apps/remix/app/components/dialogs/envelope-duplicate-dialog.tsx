@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 import { useNavigate } from 'react-router';
 
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';

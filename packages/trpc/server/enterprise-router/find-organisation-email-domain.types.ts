@@ -1,4 +1,4 @@
-import { EmailDomainStatus } from '@prisma/client';
+import { EmailDomainStatus } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { ZEmailDomainManySchema } from '@documenso/lib/types/email-domain';

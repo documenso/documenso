@@ -1,5 +1,5 @@
 import { type Page, expect, test } from '@playwright/test';
-import type { Document, Team } from '@prisma/client';
+import type { Document, Team } from '@documenso/prisma/client';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { prisma } from '@documenso/prisma';

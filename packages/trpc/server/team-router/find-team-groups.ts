@@ -1,5 +1,5 @@
-import type { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
-import { Prisma } from '@prisma/client';
+import type { OrganisationGroupType, OrganisationMemberRole } from '@documenso/prisma/client';
+import { Prisma } from '@documenso/prisma/client';
 import { unique } from 'remeda';
 
 import type { FindResultResponse } from '@documenso/lib/types/search-params';

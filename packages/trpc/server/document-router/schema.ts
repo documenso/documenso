@@ -1,4 +1,4 @@
-import { DocumentVisibility } from '@prisma/client';
+import { DocumentVisibility } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 export const ZDocumentTitleSchema = z

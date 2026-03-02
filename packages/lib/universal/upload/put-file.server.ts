@@ -1,5 +1,5 @@
 import { PDF } from '@libpdf/core';
-import { DocumentDataType } from '@prisma/client';
+import { DocumentDataType } from '@documenso/prisma/client';
 import { base64 } from '@scure/base';
 import { match } from 'ts-pattern';
 

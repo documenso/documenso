@@ -1,4 +1,4 @@
-import type { User } from '@prisma/client';
+import type { User } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { DOCUMENSO_ENCRYPTION_KEY } from '../../constants/crypto';

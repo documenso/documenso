@@ -1,4 +1,4 @@
-import type { EnvelopeType, Prisma } from '@prisma/client';
+import type { EnvelopeType, Prisma } from '@documenso/prisma/client';
 
 import { prisma } from '@documenso/prisma';
 

@@ -1,7 +1,7 @@
 import type { I18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import type { DocumentAuditLog, DocumentMeta, Field, Recipient } from '@prisma/client';
-import { RecipientRole } from '@prisma/client';
+import type { DocumentAuditLog, DocumentMeta, Field, Recipient } from '@documenso/prisma/client';
+import { RecipientRole } from '@documenso/prisma/client';
 import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
 

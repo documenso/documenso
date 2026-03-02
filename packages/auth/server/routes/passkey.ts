@@ -1,5 +1,5 @@
 import { sValidator } from '@hono/standard-validator';
-import { UserSecurityAuditLogType } from '@prisma/client';
+import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { Hono } from 'hono';

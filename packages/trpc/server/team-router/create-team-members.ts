@@ -1,4 +1,4 @@
-import { OrganisationGroupType, TeamMemberRole } from '@prisma/client';
+import { OrganisationGroupType, TeamMemberRole } from '@documenso/prisma/client';
 import { match } from 'ts-pattern';
 
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';

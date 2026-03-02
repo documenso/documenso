@@ -1,4 +1,4 @@
-import { TeamMemberRole } from '@prisma/client';
+import { TeamMemberRole } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { orphanEnvelopes } from '@documenso/lib/server-only/envelope/orphan-envelopes';

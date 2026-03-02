@@ -2,7 +2,7 @@ import { useLayoutEffect, useMemo, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { DocumentDistributionMethod, DocumentSigningOrder, SigningStatus } from '@prisma/client';
+import { DocumentDistributionMethod, DocumentSigningOrder, SigningStatus } from '@documenso/prisma/client';
 import { redirect, useLoaderData } from 'react-router';
 
 import {

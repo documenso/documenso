@@ -1,5 +1,5 @@
 import { Trans } from '@lingui/react/macro';
-import { OrganisationMemberInviteStatus } from '@prisma/client';
+import { OrganisationMemberInviteStatus } from '@documenso/prisma/client';
 import { Link } from 'react-router';
 
 import { prisma } from '@documenso/prisma';

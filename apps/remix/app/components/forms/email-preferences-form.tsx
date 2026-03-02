@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans } from '@lingui/react/macro';
-import type { TeamGlobalSettings } from '@prisma/client';
+import type { TeamGlobalSettings } from '@documenso/prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 

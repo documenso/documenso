@@ -10,24 +10,24 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "@documenso/lib": "*",
-    "@documenso/prisma": "*",
-    "@simplewebauthn/server": "^13.2.2",
-    "@tanstack/react-query": "5.90.10",
-    "@trpc/client": "11.8.1",
-    "@trpc/react-query": "11.8.1",
-    "@trpc/server": "11.8.1",
-    "@ts-rest/core": "^3.52.1",
+    "@documenso/lib": "workspace:*",
+    "@documenso/prisma": "workspace:*",
+    "@simplewebauthn/server": "catalog:",
+    "@tanstack/react-query": "catalog:",
+    "@trpc/client": "catalog:",
+    "@trpc/react-query": "catalog:",
+    "@trpc/server": "catalog:",
+    "@ts-rest/core": "catalog:",
     "formidable": "^3.5.4",
-    "luxon": "^3.7.2",
-    "superjson": "^2.2.5",
+    "luxon": "catalog:",
+    "superjson": "catalog:",
     "trpc-to-openapi": "^2.1.5",
-    "ts-pattern": "^5.9.0",
-    "zod": "^3.25.76",
+    "ts-pattern": "catalog:",
+    "zod": "catalog:",
     "zod-form-data": "^2.0.8",
-    "zod-openapi": "^4.2.4"
+    "zod-openapi": "catalog:"
   },
   "devDependencies": {
-    "@types/formidable": "^3.4.6"
+    "@types/formidable": "catalog:"
   }
 }

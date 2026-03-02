@@ -1,5 +1,5 @@
-import type { Envelope } from '@prisma/client';
-import { DocumentDataType, EnvelopeType } from '@prisma/client';
+import type { Envelope } from '@documenso/prisma/client';
+import { DocumentDataType, EnvelopeType } from '@documenso/prisma/client';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';

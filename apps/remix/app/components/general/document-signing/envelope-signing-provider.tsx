@@ -7,7 +7,7 @@ import {
   type Recipient,
   RecipientRole,
   SigningStatus,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 import { prop, sortBy } from 'remeda';
 
 import { isBase64Image } from '@documenso/lib/constants/signatures';

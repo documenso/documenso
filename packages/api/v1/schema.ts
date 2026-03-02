@@ -8,8 +8,8 @@ import {
   RecipientRole,
   SendStatus,
   SigningStatus,
-} from '@prisma/client';
-import { TemplateType } from '@prisma/client';
+} from '@documenso/prisma/client';
+import { TemplateType } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';

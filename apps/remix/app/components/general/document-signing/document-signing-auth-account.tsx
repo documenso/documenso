@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { Trans, useLingui } from '@lingui/react/macro';
-import { RecipientRole } from '@prisma/client';
+import { RecipientRole } from '@documenso/prisma/client';
 import { match } from 'ts-pattern';
 
 import { authClient } from '@documenso/auth/client';

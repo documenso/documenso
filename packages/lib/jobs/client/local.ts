@@ -1,5 +1,5 @@
 import { sha256 } from '@noble/hashes/sha2';
-import { BackgroundJobStatus, Prisma } from '@prisma/client';
+import { BackgroundJobStatus, Prisma } from '@documenso/prisma/client';
 import { CronExpressionParser } from 'cron-parser';
 import type { Context as HonoContext } from 'hono';
 

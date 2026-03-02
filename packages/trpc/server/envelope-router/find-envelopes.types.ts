@@ -1,4 +1,4 @@
-import { DocumentSource, DocumentStatus, EnvelopeType } from '@prisma/client';
+import { DocumentSource, DocumentStatus, EnvelopeType } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { ZEnvelopeManySchema } from '@documenso/lib/types/envelope';

@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import type { Field, Recipient, Signature } from '@prisma/client';
-import { FieldType } from '@prisma/client';
+import type { Field, Recipient, Signature } from '@documenso/prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 

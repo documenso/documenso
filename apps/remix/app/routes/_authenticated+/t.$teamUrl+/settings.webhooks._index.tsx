@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { msg } from '@lingui/core/macro';
 import { Plural, useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import type { Webhook } from '@prisma/client';
+import type { Webhook } from '@documenso/prisma/client';
 import {
   CheckCircle2Icon,
   EditIcon,

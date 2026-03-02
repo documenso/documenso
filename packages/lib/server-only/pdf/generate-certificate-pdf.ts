@@ -1,9 +1,9 @@
 import { PDF } from '@libpdf/core';
 import { i18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import type { DocumentMeta } from '@prisma/client';
-import type { Envelope, Field, Recipient, Signature } from '@prisma/client';
-import { FieldType } from '@prisma/client';
+import type { DocumentMeta } from '@documenso/prisma/client';
+import type { Envelope, Field, Recipient, Signature } from '@documenso/prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 import { prop, sortBy } from 'remeda';
 import { match } from 'ts-pattern';
 

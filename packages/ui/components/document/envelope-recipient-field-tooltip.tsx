@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { Trans, useLingui } from '@lingui/react/macro';
-import { SigningStatus } from '@prisma/client';
-import type { Field, Recipient } from '@prisma/client';
+import { SigningStatus } from '@documenso/prisma/client';
+import type { Field, Recipient } from '@documenso/prisma/client';
 import { ClockIcon, EyeOffIcon, LockIcon } from 'lucide-react';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';

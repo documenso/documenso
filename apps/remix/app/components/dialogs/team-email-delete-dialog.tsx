@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '@documenso/prisma/client';
 import { useRevalidator } from 'react-router';
 
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';

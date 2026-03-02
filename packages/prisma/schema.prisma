@@ -6,6 +6,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator client_node_modules {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/.prisma/client"
+}
+
 generator json {
   provider = "prisma-json-types-generator"
 }

@@ -9,7 +9,7 @@ import {
 } from '@hello-pangea/dnd';
 import { plural } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { DocumentSigningOrder, EnvelopeType, RecipientRole, SendStatus } from '@prisma/client';
+import { DocumentSigningOrder, EnvelopeType, RecipientRole, SendStatus } from '@documenso/prisma/client';
 import { motion } from 'framer-motion';
 import { GripVerticalIcon, HelpCircleIcon, PlusIcon, SparklesIcon, TrashIcon } from 'lucide-react';
 import { useFieldArray, useWatch } from 'react-hook-form';

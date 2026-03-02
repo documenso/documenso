@@ -1,4 +1,4 @@
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 import z from 'zod';
 
 export const DETECTABLE_FIELD_TYPES = [

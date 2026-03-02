@@ -1,7 +1,7 @@
 import { lazy, useMemo } from 'react';
 
 import { Plural, Trans } from '@lingui/react/macro';
-import { EnvelopeType, RecipientRole } from '@prisma/client';
+import { EnvelopeType, RecipientRole } from '@documenso/prisma/client';
 import { motion } from 'framer-motion';
 import { ArrowLeftIcon, BanIcon, DownloadCloudIcon, PaperclipIcon } from 'lucide-react';
 import { Link } from 'react-router';

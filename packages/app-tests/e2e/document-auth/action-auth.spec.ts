@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import {

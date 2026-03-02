@@ -5,8 +5,8 @@ import type {
   Recipient,
   Team,
   User,
-} from '@prisma/client';
-import { DocumentDistributionMethod, DocumentSigningOrder, DocumentStatus } from '@prisma/client';
+} from '@documenso/prisma/client';
+import { DocumentDistributionMethod, DocumentSigningOrder, DocumentStatus } from '@documenso/prisma/client';
 
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../constants/time-zones';
 import type { TDocumentLite, TDocumentMany } from '../types/document';

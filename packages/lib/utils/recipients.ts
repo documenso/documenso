@@ -1,5 +1,5 @@
-import type { Envelope } from '@prisma/client';
-import { type Field, type Recipient, RecipientRole, SigningStatus } from '@prisma/client';
+import type { Envelope } from '@documenso/prisma/client';
+import { type Field, type Recipient, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';

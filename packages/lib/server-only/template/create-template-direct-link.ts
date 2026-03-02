@@ -1,4 +1,4 @@
-import { EnvelopeType, type Recipient } from '@prisma/client';
+import { EnvelopeType, type Recipient } from '@documenso/prisma/client';
 import { nanoid } from 'nanoid';
 
 import {

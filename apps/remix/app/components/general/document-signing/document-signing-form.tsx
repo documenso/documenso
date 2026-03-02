@@ -3,7 +3,7 @@ import { useId, useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { type Field, type Recipient, RecipientRole } from '@prisma/client';
+import { type Field, type Recipient, RecipientRole } from '@documenso/prisma/client';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 

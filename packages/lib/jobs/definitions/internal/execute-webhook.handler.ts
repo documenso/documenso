@@ -1,4 +1,4 @@
-import { Prisma, WebhookCallStatus } from '@prisma/client';
+import { Prisma, WebhookCallStatus } from '@documenso/prisma/client';
 
 import { prisma } from '@documenso/prisma';
 

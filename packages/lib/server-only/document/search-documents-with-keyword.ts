@@ -1,6 +1,6 @@
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
-import type { Envelope, Recipient, User } from '@prisma/client';
-import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
+import { DocumentStatus, EnvelopeType } from '@documenso/prisma/client';
+import type { Envelope, Recipient, User } from '@documenso/prisma/client';
+import { DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
 import { match } from 'ts-pattern';
 
 import {

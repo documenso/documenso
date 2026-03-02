@@ -1,4 +1,4 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 import { match } from 'ts-pattern';
 
 import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';

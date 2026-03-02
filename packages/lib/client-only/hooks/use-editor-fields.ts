@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { Field, Recipient } from '@prisma/client';
-import { FieldType } from '@prisma/client';
+import type { Field, Recipient } from '@documenso/prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 

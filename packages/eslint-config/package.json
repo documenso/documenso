@@ -9,12 +9,12 @@
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
-    "eslint": "^8.57.0",
+    "eslint": "catalog:",
     "eslint-config-next": "^15",
-    "eslint-config-turbo": "^1.13.4",
+    "eslint-config-turbo": "^2.8.12",
     "eslint-plugin-package-json": "^0.85.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-unused-imports": "^4.3.0",
-    "typescript": "5.6.2"
+    "typescript": "catalog:"
   }
 }

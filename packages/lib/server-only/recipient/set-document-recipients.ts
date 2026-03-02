@@ -1,9 +1,9 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
-import type { Recipient } from '@prisma/client';
-import { EnvelopeType, RecipientRole } from '@prisma/client';
-import { SendStatus, SigningStatus } from '@prisma/client';
+import type { Recipient } from '@documenso/prisma/client';
+import { EnvelopeType, RecipientRole } from '@documenso/prisma/client';
+import { SendStatus, SigningStatus } from '@documenso/prisma/client';
 import { isDeepEqual } from 'remeda';
 
 import { mailer } from '@documenso/email/mailer';

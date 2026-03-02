@@ -1,4 +1,4 @@
-import type { Envelope, Recipient } from '@prisma/client';
+import type { Envelope, Recipient } from '@documenso/prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { match } from 'ts-pattern';

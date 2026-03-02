@@ -1,4 +1,4 @@
-import { FieldType, ReadStatus, SigningStatus } from '@prisma/client';
+import { FieldType, ReadStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getDocumentByToken } from '@documenso/lib/server-only/document/get-document-by-token';

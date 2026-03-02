@@ -1,5 +1,5 @@
 import { createCanvas, loadImage } from '@napi-rs/canvas';
-import { DocumentStatus, type Field, RecipientRole } from '@prisma/client';
+import { DocumentStatus, type Field, RecipientRole } from '@documenso/prisma/client';
 import { generateObject } from 'ai';
 import pMap from 'p-map';
 

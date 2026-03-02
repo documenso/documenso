@@ -1,6 +1,6 @@
 import { sValidator } from '@hono/standard-validator';
 import { compare } from '@node-rs/bcrypt';
-import { UserSecurityAuditLogType } from '@prisma/client';
+import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { DateTime } from 'luxon';

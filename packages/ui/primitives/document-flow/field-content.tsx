@@ -1,7 +1,7 @@
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentMeta, Signature } from '@prisma/client';
-import { FieldType } from '@prisma/client';
+import type { DocumentMeta, Signature } from '@documenso/prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 import { ChevronDown } from 'lucide-react';
 
 import {

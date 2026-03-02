@@ -7,7 +7,7 @@ import {
   SendStatus,
   SigningStatus,
   WebhookTriggerEvents,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 
 import {
   DOCUMENT_AUDIT_LOG_TYPE,

@@ -1,6 +1,6 @@
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 import { ChevronLeftIcon } from 'lucide-react';
 import { Link, Outlet, isRouteErrorResponse, redirect } from 'react-router';
 

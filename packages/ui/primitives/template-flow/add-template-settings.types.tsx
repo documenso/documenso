@@ -1,6 +1,6 @@
 import { msg } from '@lingui/core/macro';
-import { DocumentDistributionMethod } from '@prisma/client';
-import { DocumentVisibility } from '@prisma/client';
+import { DocumentDistributionMethod } from '@documenso/prisma/client';
+import { DocumentVisibility } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';

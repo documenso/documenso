@@ -1,5 +1,5 @@
-import type { FieldType, Signature } from '@prisma/client';
-import { type Field } from '@prisma/client';
+import type { FieldType, Signature } from '@documenso/prisma/client';
+import { type Field } from '@documenso/prisma/client';
 import type Konva from 'konva';
 
 import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';

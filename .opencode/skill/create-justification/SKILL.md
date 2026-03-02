@@ -21,13 +21,13 @@ I help you create new justification files in the `.agents/justifications/` direc
 Run the script with a slug and content:
 
 ```bash
-npx tsx scripts/create-justification.ts "decision-name" "Justification content here"
+pnpm exec tsx scripts/create-justification.ts "decision-name" "Justification content here"
 ```
 
 Or use heredoc for multi-line content:
 
 ```bash
-npx tsx scripts/create-justification.ts "decision-name" << HEREDOC
+pnpm exec tsx scripts/create-justification.ts "decision-name" << HEREDOC
 Multi-line
 justification content
 goes here

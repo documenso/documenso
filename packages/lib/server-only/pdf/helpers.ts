@@ -1,5 +1,5 @@
-import { FieldType } from '@prisma/client';
-import type { Recipient } from '@prisma/client';
+import { FieldType } from '@documenso/prisma/client';
+import type { Recipient } from '@documenso/prisma/client';
 import { match } from 'ts-pattern';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';

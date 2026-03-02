@@ -53,7 +53,7 @@ export default defineConfig({
     external: [
       '@napi-rs/canvas',
       '@node-rs/bcrypt',
-      '@prisma/client',
+      '@documenso/prisma',
       '@documenso/tailwind-config',
       'playwright',
       'playwright-core',
@@ -93,6 +93,9 @@ export default defineConfig({
    * See rollup.config.mjs which is used for that.
    */
   build: {
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
     rollupOptions: {
       external: [
         '@napi-rs/canvas',

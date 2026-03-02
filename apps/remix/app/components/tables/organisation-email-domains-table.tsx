@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { Trans, useLingui } from '@lingui/react/macro';
-import { EmailDomainStatus } from '@prisma/client';
+import { EmailDomainStatus } from '@documenso/prisma/client';
 import { CheckCircle2Icon, ClockIcon } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';

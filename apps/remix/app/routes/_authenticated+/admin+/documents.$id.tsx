@@ -1,7 +1,7 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
+import { EnvelopeType, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
 

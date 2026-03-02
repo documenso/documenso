@@ -1,7 +1,7 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
-import { OrganisationGroupType, type Team } from '@prisma/client';
+import { OrganisationGroupType, type Team } from '@documenso/prisma/client';
 import { uniqueBy } from 'remeda';
 
 import { mailer } from '@documenso/email/mailer';

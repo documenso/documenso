@@ -1,6 +1,6 @@
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { OrganisationType, RecipientRole } from '@prisma/client';
+import { OrganisationType, RecipientRole } from '@documenso/prisma/client';
 import { P, match } from 'ts-pattern';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';

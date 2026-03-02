@@ -1,4 +1,4 @@
-import { TeamMemberRole } from '@prisma/client';
+import { TeamMemberRole } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 // export const updateTeamMemberMeta: TrpcOpenApiMeta = {

@@ -1,6 +1,6 @@
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { SubscriptionStatus } from '@prisma/client';
+import { SubscriptionStatus } from '@documenso/prisma/client';
 import { Loader } from 'lucide-react';
 import type Stripe from 'stripe';
 import { match } from 'ts-pattern';

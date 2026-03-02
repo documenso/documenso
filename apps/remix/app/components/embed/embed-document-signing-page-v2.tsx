@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 
 import { useLingui } from '@lingui/react';
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 

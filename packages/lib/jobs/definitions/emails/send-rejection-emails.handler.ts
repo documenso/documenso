@@ -1,7 +1,7 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
-import { EnvelopeType, SendStatus, SigningStatus } from '@prisma/client';
+import { EnvelopeType, SendStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import DocumentRejectedEmail from '@documenso/email/templates/document-rejected';

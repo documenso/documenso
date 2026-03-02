@@ -1,4 +1,4 @@
-import { WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
+import { WebhookCallStatus, WebhookTriggerEvents } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';

@@ -1,7 +1,7 @@
 import { lazy, useEffect, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { type DocumentData, DocumentStatus, type EnvelopeItem, EnvelopeType } from '@prisma/client';
+import { type DocumentData, DocumentStatus, type EnvelopeItem, EnvelopeType } from '@documenso/prisma/client';
 import { DownloadIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
 

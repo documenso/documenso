@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import { OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
+import { OrganisationMemberRole, TeamMemberRole } from '@documenso/prisma/client';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { trpc } from '@documenso/trpc/react';

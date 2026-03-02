@@ -1,5 +1,5 @@
 import { sValidator } from '@hono/standard-validator';
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 import { Hono } from 'hono';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';

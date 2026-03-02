@@ -1,4 +1,4 @@
-import type { TeamProfile } from '@prisma/client';
+import type { TeamProfile } from '@documenso/prisma/client';
 
 import { prisma } from '@documenso/prisma';
 

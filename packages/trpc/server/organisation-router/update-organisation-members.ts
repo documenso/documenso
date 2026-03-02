@@ -1,4 +1,4 @@
-import { OrganisationGroupType } from '@prisma/client';
+import { OrganisationGroupType } from '@documenso/prisma/client';
 
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';

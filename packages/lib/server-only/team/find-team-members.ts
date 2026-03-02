@@ -1,5 +1,5 @@
-import type { OrganisationMember } from '@prisma/client';
-import { Prisma } from '@prisma/client';
+import type { OrganisationMember } from '@documenso/prisma/client';
+import { Prisma } from '@documenso/prisma/client';
 import { P, match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';

@@ -14,6 +14,7 @@ You are creating a new justification file in the `.agents/justifications/` direc
 ## Usage
 
 The script will automatically:
+
 - Generate a unique three-word ID (e.g., `swift-emerald-river`)
 - Create frontmatter with current date and formatted title
 - Save the file as `{id}-{slug}.md` in `.agents/justifications/`
@@ -25,7 +26,7 @@ The script will automatically:
 If you have the content ready, run:
 
 ```bash
-npx tsx scripts/create-justification.ts "$ARGUMENTS" "Your justification content here"
+pnpm exec tsx scripts/create-justification.ts "$ARGUMENTS" "Your justification content here"
 ```
 
 ### Option 2: Multi-line Content (Heredoc)
@@ -33,7 +34,7 @@ npx tsx scripts/create-justification.ts "$ARGUMENTS" "Your justification content
 For multi-line content, use heredoc:
 
 ```bash
-npx tsx scripts/create-justification.ts "$ARGUMENTS" << HEREDOC
+pnpm exec tsx scripts/create-justification.ts "$ARGUMENTS" << HEREDOC
 Your multi-line
 justification content
 goes here
@@ -45,7 +46,7 @@ HEREDOC
 You can also pipe content:
 
 ```bash
-echo "Your content" | npx tsx scripts/create-justification.ts "$ARGUMENTS"
+echo "Your content" | pnpm exec tsx scripts/create-justification.ts "$ARGUMENTS"
 ```
 
 ## File Format

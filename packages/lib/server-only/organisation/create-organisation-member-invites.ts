@@ -1,8 +1,8 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
-import type { Organisation, Prisma } from '@prisma/client';
-import { OrganisationMemberInviteStatus } from '@prisma/client';
+import type { Organisation, Prisma } from '@documenso/prisma/client';
+import { OrganisationMemberInviteStatus } from '@documenso/prisma/client';
 import { nanoid } from 'nanoid';
 
 import { syncMemberCountWithStripeSeatPlan } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';

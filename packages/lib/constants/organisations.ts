@@ -1,4 +1,4 @@
-import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
+import { OrganisationGroupType, OrganisationMemberRole } from '@documenso/prisma/client';
 
 export const ORGANISATION_URL_ROOT_REGEX = new RegExp('^/t/[^/]+/?$');
 export const ORGANISATION_URL_REGEX = new RegExp('^/t/[^/]+');

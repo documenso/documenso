@@ -2,16 +2,16 @@
 
 ## Build/Test/Lint Commands
 
-- `npm run build` - Build all packages
-- `npm run lint` - Lint all packages
-- `npm run lint:fix` - Auto-fix linting issues
-- `npm run test:e2e` - Run E2E tests with Playwright
-- `npm run test:dev -w @documenso/app-tests` - Run single E2E test in dev mode
-- `npm run test-ui:dev -w @documenso/app-tests` - Run E2E tests with UI
-- `npm run format` - Format code with Prettier
-- `npm run dev` - Start development server for Remix app
+- `pnpm run build` - Build all packages
+- `pnpm run lint` - Lint all packages
+- `pnpm run lint:fix` - Auto-fix linting issues
+- `pnpm run test:e2e` - Run E2E tests with Playwright
+- `pnpm run test:dev -w @documenso/app-tests` - Run single E2E test in dev mode
+- `pnpm run test-ui:dev -w @documenso/app-tests` - Run E2E tests with UI
+- `pnpm run format` - Format code with Prettier
+- `pnpm run dev` - Start development server for Remix app
 
-**Important:** Do not run `npm run build` to verify changes unless explicitly asked. Builds take a long time (~2 minutes). Use `npx tsc --noEmit` for type checking specific packages if needed.
+**Important:** Do not run `pnpm run build` to verify changes unless explicitly asked. Builds take a long time (~2 minutes). Use `pnpm exec tsc --noEmit` for type checking specific packages if needed.
 
 ## Code Style Guidelines
 

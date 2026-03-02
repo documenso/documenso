@@ -1,4 +1,4 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 import { TRPCError } from '@trpc/server';
 import { DateTime } from 'luxon';
 

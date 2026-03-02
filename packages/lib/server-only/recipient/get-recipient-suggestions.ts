@@ -1,4 +1,4 @@
-import { EnvelopeType, Prisma } from '@prisma/client';
+import { EnvelopeType, Prisma } from '@documenso/prisma/client';
 
 import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';

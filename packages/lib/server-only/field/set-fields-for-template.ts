@@ -1,4 +1,4 @@
-import { EnvelopeType, FieldType } from '@prisma/client';
+import { EnvelopeType, FieldType } from '@documenso/prisma/client';
 
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';

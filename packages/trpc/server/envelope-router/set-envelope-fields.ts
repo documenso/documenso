@@ -1,4 +1,4 @@
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType } from '@documenso/prisma/client';
 import { match } from 'ts-pattern';
 
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';

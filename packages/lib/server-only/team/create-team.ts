@@ -3,7 +3,7 @@ import {
   OrganisationMemberRole,
   Prisma,
   TeamMemberRole,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 import { match } from 'ts-pattern';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';

@@ -2,7 +2,7 @@ import { lazy } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { DocumentSigningOrder, SigningStatus } from '@prisma/client';
+import { DocumentSigningOrder, SigningStatus } from '@documenso/prisma/client';
 import { ChevronLeft, LucideEdit } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
 

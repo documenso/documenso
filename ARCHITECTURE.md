@@ -4,7 +4,7 @@ This document provides a high-level overview of the Documenso codebase to help h
 
 ## Overview
 
-Documenso is an open-source document signing platform built as a **monorepo** using npm workspaces and Turborepo. The application enables users to create, send, and sign documents electronically.
+Documenso is an open-source document signing platform built as a **monorepo** using pnpm workspaces and Turborepo. The application enables users to create, send, and sign documents electronically.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -324,19 +324,19 @@ documenso/
 
 ```bash
 # Full setup (install, docker, migrate, seed, dev)
-npm run d
+pnpm run d
 
 # Start development server
-npm run dev
+pnpm run dev
 
 # Database GUI
-npm run prisma:studio
+pnpm run prisma:studio
 
 # Type checking (faster than build)
-npx tsc --noEmit
+pnpm exec tsc --noEmit
 
 # E2E tests
-npm run test:e2e
+pnpm run test:e2e
 ```
 
 ### Docker Services (Development)

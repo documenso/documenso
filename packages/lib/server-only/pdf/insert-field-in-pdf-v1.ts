@@ -9,7 +9,7 @@ import {
   setFontAndSize,
 } from '@cantoo/pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 import { P, match } from 'ts-pattern';
 
 import {

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import { ReadStatus } from '@prisma/client';
+import { ReadStatus } from '@documenso/prisma/client';
 import { Link } from 'react-router';
 
 import LogoImage from '@documenso/assets/logo.png';

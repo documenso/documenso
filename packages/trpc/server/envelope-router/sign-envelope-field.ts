@@ -1,4 +1,4 @@
-import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
+import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import { match } from 'ts-pattern';
 
 import { isBase64Image } from '@documenso/lib/constants/signatures';

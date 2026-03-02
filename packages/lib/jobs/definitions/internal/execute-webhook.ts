@@ -1,4 +1,4 @@
-import { WebhookTriggerEvents } from '@prisma/client';
+import { WebhookTriggerEvents } from '@documenso/prisma/client';
 import { z } from 'zod';
 
 import { ZRequestMetadataSchema } from '../../../universal/extract-request-metadata';

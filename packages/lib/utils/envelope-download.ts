@@ -1,4 +1,4 @@
-import type { EnvelopeItem } from '@prisma/client';
+import type { EnvelopeItem } from '@documenso/prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 

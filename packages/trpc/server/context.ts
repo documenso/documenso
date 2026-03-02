@@ -1,4 +1,4 @@
-import type { Session } from '@prisma/client';
+import type { Session } from '@documenso/prisma/client';
 import type { Context } from 'hono';
 import type { Logger } from 'pino';
 import { z } from 'zod';

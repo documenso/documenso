@@ -1,4 +1,4 @@
-import type { DocumentMeta, DocumentVisibility, TemplateType } from '@prisma/client';
+import type { DocumentMeta, DocumentVisibility, TemplateType } from '@documenso/prisma/client';
 import {
   DocumentSource,
   EnvelopeType,
@@ -7,7 +7,7 @@ import {
   SendStatus,
   SigningStatus,
   WebhookTriggerEvents,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { PlaceholderInfo } from '@documenso/lib/server-only/pdf/auto-place-fields';

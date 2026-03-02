@@ -2,8 +2,8 @@ import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
-import type { Webhook } from '@prisma/client';
-import { WebhookTriggerEvents } from '@prisma/client';
+import type { Webhook } from '@documenso/prisma/client';
+import { WebhookTriggerEvents } from '@documenso/prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 

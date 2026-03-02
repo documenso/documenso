@@ -1,4 +1,4 @@
-import { UserSecurityAuditLogType } from '@prisma/client';
+import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 
 import { getOrganisationAuthenticationPortalOptions } from '@documenso/auth/server/lib/utils/organisation-portal';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';

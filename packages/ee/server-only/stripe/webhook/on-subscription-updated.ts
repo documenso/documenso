@@ -1,4 +1,4 @@
-import { OrganisationType, SubscriptionStatus } from '@prisma/client';
+import { OrganisationType, SubscriptionStatus } from '@documenso/prisma/client';
 import { match } from 'ts-pattern';
 
 import { createOrganisationClaimUpsertData } from '@documenso/lib/server-only/organisation/create-organisation';

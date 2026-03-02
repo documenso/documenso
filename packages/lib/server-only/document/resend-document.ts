@@ -7,7 +7,7 @@ import {
   OrganisationType,
   RecipientRole,
   SigningStatus,
-} from '@prisma/client';
+} from '@documenso/prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';

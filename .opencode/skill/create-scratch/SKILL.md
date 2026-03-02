@@ -21,13 +21,13 @@ I help you create new scratch files in the `.agents/scratches/` directory. Each 
 Run the script with a slug and content:
 
 ```bash
-npx tsx scripts/create-scratch.ts "note-name" "Scratch content here"
+pnpm exec tsx scripts/create-scratch.ts "note-name" "Scratch content here"
 ```
 
 Or use heredoc for multi-line content:
 
 ```bash
-npx tsx scripts/create-scratch.ts "note-name" << HEREDOC
+pnpm exec tsx scripts/create-scratch.ts "note-name" << HEREDOC
 Multi-line
 scratch content
 goes here

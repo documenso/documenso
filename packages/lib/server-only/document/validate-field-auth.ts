@@ -1,5 +1,5 @@
-import type { Envelope, Field, Recipient } from '@prisma/client';
-import { FieldType } from '@prisma/client';
+import type { Envelope, Field, Recipient } from '@documenso/prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TRecipientActionAuth } from '../../types/document-auth';

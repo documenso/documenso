@@ -1,5 +1,5 @@
-import type { OrganisationMemberInviteStatus } from '@prisma/client';
-import { Prisma } from '@prisma/client';
+import type { OrganisationMemberInviteStatus } from '@documenso/prisma/client';
+import { Prisma } from '@documenso/prisma/client';
 
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';

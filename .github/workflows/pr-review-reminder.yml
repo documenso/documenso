@@ -16,14 +16,17 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: npm
 
       - name: Install Octokit
-        run: npm install @octokit/rest@18
+        run: pnpm install @octokit/rest@18
 
       - name: Check user's PRs awaiting review
         id: parse-prs

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
+import { WebhookCallStatus, WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { alphaid } from '@documenso/lib/universal/id';

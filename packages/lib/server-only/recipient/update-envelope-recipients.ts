@@ -1,4 +1,4 @@
-import { EnvelopeType, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
+import { EnvelopeType, RecipientRole, SendStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';

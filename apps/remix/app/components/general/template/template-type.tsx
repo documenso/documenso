@@ -3,7 +3,7 @@ import type { HTMLAttributes } from 'react';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import type { TemplateType as TemplateTypePrisma } from '@prisma/client';
+import type { TemplateType as TemplateTypePrisma } from '@documenso/prisma/client';
 import { Globe2, Lock } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react/dist/lucide-react';
 

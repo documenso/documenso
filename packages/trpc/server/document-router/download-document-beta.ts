@@ -1,5 +1,5 @@
-import type { DocumentData } from '@prisma/client';
-import { DocumentDataType, EnvelopeType } from '@prisma/client';
+import type { DocumentData } from '@documenso/prisma/client';
+import { DocumentDataType, EnvelopeType } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';

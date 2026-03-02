@@ -1,5 +1,5 @@
 import { Trans } from '@lingui/react/macro';
-import { FieldType } from '@prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 import { XCircle } from 'lucide-react';
 import { Link } from 'react-router';
 
