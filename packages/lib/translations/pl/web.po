@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-02-25 12:12\n"
+"PO-Revision-Date: 2026-02-26 12:13\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -2378,9 +2378,17 @@ msgstr "Pobierający kopię"
 msgid "Center"
 msgstr "Wyśrodkuj"
 
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Change language"
+msgstr "Zmień język"
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
 msgid "Change Recipient"
 msgstr "Zmień odbiorcę"
+
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Change theme"
+msgstr "Zmień motyw"
 
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
 msgid "Character limit"
@@ -2422,6 +2430,10 @@ msgstr "Opcje pola wyboru"
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Checkout"
 msgstr "Zamów"
+
+#: packages/lib/constants/i18n.ts
+msgid "Chinese"
+msgstr "Chiński"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Choose an existing recipient from below to continue"
@@ -2630,7 +2642,7 @@ msgid "Configure document settings and options before sending."
 msgstr "Skonfiguruj ustawienia dokumentu przed ich wysłaniem."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
-msgid "Configure email settings for the document"
+msgid "Configure email settings for the document."
 msgstr "Skonfiguruj ustawienia powiadomień dla dokumentu."
 
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
@@ -2648,7 +2660,7 @@ msgid "Configure general settings for the template."
 msgstr "Skonfiguruj ogólne ustawienia szablonu."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
-msgid "Configure security settings for the document"
+msgid "Configure security settings for the document."
 msgstr "Skonfiguruj ustawienia zabezpieczeń dokumentu."
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
@@ -4187,6 +4199,10 @@ msgstr "Duplikuj szablon"
 msgid "Duplicate values are not allowed"
 msgstr "Zduplikowane wartości nie są dozwolone"
 
+#: packages/lib/constants/i18n.ts
+msgid "Dutch"
+msgstr "Holenderski"
+
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "E.g. 0"
 msgstr "Np. 0"
@@ -4527,6 +4543,10 @@ msgstr "Załączony dokument"
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Enclosed Documents"
 msgstr "Załączniki"
+
+#: packages/lib/constants/i18n.ts
+msgid "English"
+msgstr "Angielski"
 
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
@@ -5099,6 +5119,10 @@ msgstr "Swobodny podpis"
 msgid "Free Signature Settings"
 msgstr "Ustawienia swobodnego podpisu"
 
+#: packages/lib/constants/i18n.ts
+msgid "French"
+msgstr "Francuski"
+
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
@@ -5130,6 +5154,10 @@ msgstr "Wygeneruj rekordy DKIM"
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Generate Links"
 msgstr "Wygeneruj linki"
+
+#: packages/lib/constants/i18n.ts
+msgid "German"
+msgstr "Niemiecki"
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 msgid "Global recipient action authentication"
@@ -5668,6 +5696,14 @@ msgstr "Obecnie nie jest Twoja kolej na podpisanie dokumentu. Sprawdź dokument 
 msgid "It's currently not your turn to sign. You will receive an email with instructions once it's your turn to sign the document."
 msgstr "To nie jest Twoja kolej na podpisanie dokumentu. Gdy nadejdzie Twoja kolej, otrzymasz wiadomość z instrukcjami."
 
+#: packages/lib/constants/i18n.ts
+msgid "Italian"
+msgstr "Włoski"
+
+#: packages/lib/constants/i18n.ts
+msgid "Japanese"
+msgstr "Japoński"
+
 #: packages/email/templates/organisation-invite.tsx
 msgid "Join {organisationName} on Documenso"
 msgstr "Dołącz do organizacji {organisationName} w Documenso"
@@ -5684,6 +5720,10 @@ msgstr "Dołączył"
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Joined {0}"
 msgstr "Dołączył {0}"
+
+#: packages/lib/constants/i18n.ts
+msgid "Korean"
+msgstr "Koreański"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
@@ -7269,6 +7309,14 @@ msgstr "Prześlij dokument, aby kontynuować"
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Please upload a logo"
 msgstr "Prześlij logo"
+
+#: packages/lib/constants/i18n.ts
+msgid "Polish"
+msgstr "Polski"
+
+#: packages/lib/constants/i18n.ts
+msgid "Portuguese (Brazil)"
+msgstr "Portugalski (Brazylia)"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: packages/ui/primitives/document-flow/field-item.tsx
@@ -8872,6 +8920,10 @@ msgstr "Źródło"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Space-separated list of domains. Leave empty to allow all domains."
 msgstr "Lista domen oddzielonych spacjami. Pozostaw puste pole, aby zezwolić na wszystkie domeny."
+
+#: packages/lib/constants/i18n.ts
+msgid "Spanish"
+msgstr "Hiszpański"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 msgid "SSO"

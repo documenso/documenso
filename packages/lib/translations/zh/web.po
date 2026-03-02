@@ -8,7 +8,7 @@ msgstr ""
 "Language: zh\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-02-25 04:37\n"
+"PO-Revision-Date: 2026-02-26 02:58\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -2378,9 +2378,17 @@ msgstr "抄送人"
 msgid "Center"
 msgstr "居中"
 
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Change language"
+msgstr "更改语言"
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
 msgid "Change Recipient"
 msgstr "更改收件人"
+
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Change theme"
+msgstr "更改主题"
 
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
 msgid "Character limit"
@@ -2422,6 +2430,10 @@ msgstr "复选框值"
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Checkout"
 msgstr "结账"
+
+#: packages/lib/constants/i18n.ts
+msgid "Chinese"
+msgstr "中文"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Choose an existing recipient from below to continue"
@@ -2630,8 +2642,8 @@ msgid "Configure document settings and options before sending."
 msgstr "在发送前配置文档设置和选项。"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
-msgid "Configure email settings for the document"
-msgstr "为文档配置邮件设置"
+msgid "Configure email settings for the document."
+msgstr "为文档配置电子邮件设置。"
 
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
@@ -2648,8 +2660,8 @@ msgid "Configure general settings for the template."
 msgstr "配置模板的一般设置。"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
-msgid "Configure security settings for the document"
-msgstr "为文档配置安全设置"
+msgid "Configure security settings for the document."
+msgstr "为文档配置安全设置。"
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "Configure template"
@@ -4187,6 +4199,10 @@ msgstr "复制模板"
 msgid "Duplicate values are not allowed"
 msgstr "不允许重复的值"
 
+#: packages/lib/constants/i18n.ts
+msgid "Dutch"
+msgstr "荷兰语"
+
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "E.g. 0"
 msgstr "例如：0"
@@ -4527,6 +4543,10 @@ msgstr "随附文档"
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Enclosed Documents"
 msgstr "随附文件"
+
+#: packages/lib/constants/i18n.ts
+msgid "English"
+msgstr "英语"
 
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
@@ -5099,6 +5119,10 @@ msgstr "自由签名"
 msgid "Free Signature Settings"
 msgstr "免费签名设置"
 
+#: packages/lib/constants/i18n.ts
+msgid "French"
+msgstr "法语"
+
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
@@ -5130,6 +5154,10 @@ msgstr "生成 DKIM 记录"
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Generate Links"
 msgstr "生成链接"
+
+#: packages/lib/constants/i18n.ts
+msgid "German"
+msgstr "德语"
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 msgid "Global recipient action authentication"
@@ -5668,6 +5696,14 @@ msgstr "当前还不是您签署的顺序。请稍后再来查看，此文档很
 msgid "It's currently not your turn to sign. You will receive an email with instructions once it's your turn to sign the document."
 msgstr "现在还不是你签署的顺序。轮到你签署时，你会收到一封包含说明的邮件。"
 
+#: packages/lib/constants/i18n.ts
+msgid "Italian"
+msgstr "意大利语"
+
+#: packages/lib/constants/i18n.ts
+msgid "Japanese"
+msgstr "日语"
+
 #: packages/email/templates/organisation-invite.tsx
 msgid "Join {organisationName} on Documenso"
 msgstr "加入 {organisationName}，使用 Documenso"
@@ -5684,6 +5720,10 @@ msgstr "加入时间"
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Joined {0}"
 msgstr "加入时间 {0}"
+
+#: packages/lib/constants/i18n.ts
+msgid "Korean"
+msgstr "韩语"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
@@ -7269,6 +7309,14 @@ msgstr "请上传文档后继续"
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Please upload a logo"
 msgstr "请上传一个 Logo"
+
+#: packages/lib/constants/i18n.ts
+msgid "Polish"
+msgstr "波兰语"
+
+#: packages/lib/constants/i18n.ts
+msgid "Portuguese (Brazil)"
+msgstr "葡萄牙语（巴西）"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: packages/ui/primitives/document-flow/field-item.tsx
@@ -8872,6 +8920,10 @@ msgstr "来源"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Space-separated list of domains. Leave empty to allow all domains."
 msgstr "以空格分隔的域名列表。留空则允许所有域名。"
+
+#: packages/lib/constants/i18n.ts
+msgid "Spanish"
+msgstr "西班牙语"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 msgid "SSO"
