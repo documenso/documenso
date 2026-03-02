@@ -325,7 +325,10 @@ export default function EmbeddingAuthoringTemplateEditPage() {
           <ConfigureFieldsView
             configData={configuration!}
             presignToken={token}
-            envelopeItem={template.envelopeItems[0]}
+            envelopeItem={{
+              ...template.envelopeItems[0],
+              documentDataId: template.templateDocumentDataId,
+            }}
             defaultValues={fields ?? undefined}
             onBack={canGoBack ? handleBackToConfig : undefined}
             onSubmit={handleConfigureFieldsSubmit}

@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 
 import { useElementBounds } from '@documenso/lib/client-only/hooks/use-element-bounds';
 import { useFieldPageCoords } from '@documenso/lib/client-only/hooks/use-field-page-coords';
+import { useIsPageInDom } from '@documenso/lib/client-only/hooks/use-is-page-in-dom';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 
@@ -81,11 +82,28 @@ export function FieldRootContainer({
   readonly,
 }: FieldRootContainerProps) {
   const [isValidating, setIsValidating] = useState(false);
+  const isPageInDom = useIsPageInDom(field.page);
+
   const ref = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!ref.current) {
       return;
+    }
+
+    // Check the validation signal on the PDF viewer container. When a field
+    // mounts after the virtual list scrolls to its page, the per-element
+    // `data-validate` attribute will not have been set yet. The signal on the
+    // `[data-pdf-content]` container bridges this gap so newly-rendered fields
+    // pick up the validation state immediately.
+    const pdfContent = document.querySelector('[data-pdf-content]');
+
+    if (
+      pdfContent?.getAttribute('data-validate-fields') === 'true' &&
+      isFieldUnsignedAndRequired(field)
+    ) {
+      ref.current.setAttribute('data-validate', 'true');
+      setIsValidating(true);
     }
 
     const observer = new MutationObserver((_mutations) => {
@@ -101,7 +119,11 @@ export function FieldRootContainer({
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [isPageInDom]);
+
+  if (!isPageInDom) {
+    return null;
+  }
 
   return (
     <FieldContainerPortal field={field}>

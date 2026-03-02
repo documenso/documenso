@@ -2,6 +2,7 @@ import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 import { EnvelopeType } from '@prisma/client';
 
+import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -28,7 +29,7 @@ export const setupDocumentAndNavigateToSubjectStep = async (page: Page) => {
   await page.getByRole('button', { name: 'Continue' }).click();
 
   await page.getByRole('button', { name: 'Signature' }).click();
-  await page.locator('canvas').click({
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
     position: {
       x: 100,
       y: 100,
@@ -108,7 +109,9 @@ test.describe('AutoSave Subject Step', () => {
     // Toggle some email settings checkboxes (randomly - some checked, some unchecked)
     await page.getByText('Email the owner when a recipient signs').click();
     await page.getByText("Email recipients when they're removed from a pending document").click();
-    await page.getByText('Email recipients when the document is completed', { exact: true }).click();
+    await page
+      .getByText('Email recipients when the document is completed', { exact: true })
+      .click();
     await page.getByText('Email recipients when a pending document is deleted').click();
 
     await triggerAutosave(page);
@@ -139,16 +142,20 @@ test.describe('AutoSave Subject Step', () => {
       ).toBeChecked({
         checked: emailSettings?.documentCompleted,
       });
-      await expect(page.getByText('Email recipients when a pending document is deleted')).toBeChecked({
+      await expect(
+        page.getByText('Email recipients when a pending document is deleted'),
+      ).toBeChecked({
         checked: emailSettings?.documentDeleted,
       });
 
       await expect(page.getByText('Email recipients with a signing request')).toBeChecked({
         checked: emailSettings?.recipientSigningRequest,
       });
-      await expect(page.getByText('Email the signer if the document is still pending')).toBeChecked({
-        checked: emailSettings?.documentPending,
-      });
+      await expect(page.getByText('Email the signer if the document is still pending')).toBeChecked(
+        {
+          checked: emailSettings?.documentPending,
+        },
+      );
       await expect(page.getByText('Email the owner when the document is completed')).toBeChecked({
         checked: emailSettings?.ownerDocumentCompleted,
       });
@@ -167,7 +174,9 @@ test.describe('AutoSave Subject Step', () => {
 
     await page.getByText('Email the owner when a recipient signs').click();
     await page.getByText("Email recipients when they're removed from a pending document").click();
-    await page.getByText('Email recipients when the document is completed', { exact: true }).click();
+    await page
+      .getByText('Email recipients when the document is completed', { exact: true })
+      .click();
     await page.getByText('Email recipients when a pending document is deleted').click();
 
     await triggerAutosave(page);
@@ -207,16 +216,20 @@ test.describe('AutoSave Subject Step', () => {
       ).toBeChecked({
         checked: retrievedDocumentData.documentMeta?.emailSettings?.documentCompleted,
       });
-      await expect(page.getByText('Email recipients when a pending document is deleted')).toBeChecked({
+      await expect(
+        page.getByText('Email recipients when a pending document is deleted'),
+      ).toBeChecked({
         checked: retrievedDocumentData.documentMeta?.emailSettings?.documentDeleted,
       });
 
       await expect(page.getByText('Email recipients with a signing request')).toBeChecked({
         checked: retrievedDocumentData.documentMeta?.emailSettings?.recipientSigningRequest,
       });
-      await expect(page.getByText('Email the signer if the document is still pending')).toBeChecked({
-        checked: retrievedDocumentData.documentMeta?.emailSettings?.documentPending,
-      });
+      await expect(page.getByText('Email the signer if the document is still pending')).toBeChecked(
+        {
+          checked: retrievedDocumentData.documentMeta?.emailSettings?.documentPending,
+        },
+      );
       await expect(page.getByText('Email the owner when the document is completed')).toBeChecked({
         checked: retrievedDocumentData.documentMeta?.emailSettings?.ownerDocumentCompleted,
       });

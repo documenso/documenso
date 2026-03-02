@@ -9,6 +9,7 @@ import { P, match } from 'ts-pattern';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -22,9 +23,10 @@ import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
 
 import { useRequiredDocumentSigningContext } from '../../general/document-signing/document-signing-provider';
 import { DocumentSigningRejectDialog } from '../../general/document-signing/document-signing-reject-dialog';
@@ -92,8 +94,6 @@ export const MultiSignDocumentSigningView = ({
     document?.fields.filter((field) => field.recipient.signingStatus === SigningStatus.SIGNED) ??
       [],
   ];
-
-  const highestPendingPageNumber = Math.max(...pendingFields.map((field) => field.page));
 
   const uninsertedFields = document?.fields.filter((field) => !field.inserted) ?? [];
 
@@ -226,10 +226,16 @@ export const MultiSignDocumentSigningView = ({
                     'md:mx-auto md:max-w-2xl': document.status === DocumentStatus.COMPLETED,
                   })}
                 >
-                  <PDFViewerLazy
-                    envelopeItem={document.envelopeItems[0]}
-                    token={token}
-                    version="signed"
+                  <PDFViewer
+                    data={getDocumentDataUrl({
+                      envelopeId: document.envelopeId,
+                      envelopeItemId: document.envelopeItems[0].id,
+                      documentDataId: document.documentData.id,
+                      version: 'current',
+                      token,
+                      presignToken: undefined,
+                    })}
+                    scrollParentRef="window"
                     onDocumentLoad={() => {
                       setHasDocumentLoaded(true);
                       onDocumentReady?.();
@@ -363,9 +369,7 @@ export const MultiSignDocumentSigningView = ({
               </div>
 
               {hasDocumentLoaded && (
-                <ElementVisible
-                  target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPendingPageNumber}"]`}
-                >
+                <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
                   {showPendingFieldTooltip && pendingFields.length > 0 && (
                     <FieldToolTip
                       key={pendingFields[0].id}

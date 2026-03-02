@@ -20,7 +20,7 @@ type File = {
  * Uploads a document file to the appropriate storage location and creates
  * a document data record.
  */
-export const putPdfFileServerSide = async (file: File) => {
+export const putPdfFileServerSide = async (file: File, initialData?: string) => {
   const isEncryptedDocumentsAllowed = false; // Was feature flag.
 
   const arrayBuffer = await file.arrayBuffer();
@@ -41,7 +41,7 @@ export const putPdfFileServerSide = async (file: File) => {
 
   const { type, data } = await putFileServerSide(file);
 
-  return await createDocumentData({ type, data });
+  return await createDocumentData({ type, data, initialData });
 };
 
 /**
