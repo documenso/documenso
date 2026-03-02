@@ -2,8 +2,7 @@ import { useMemo } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { OrganisationMemberRole } from '@prisma/client';
 import { CopyIcon, ExternalLinkIcon, InfoIcon, Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -21,6 +20,12 @@ import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisa
 import { trpc } from '@documenso/trpc/react';
 import type { TGetAdminOrganisationResponse } from '@documenso/trpc/server/admin-router/get-admin-organisation.types';
 import { ZUpdateAdminOrganisationRequestSchema } from '@documenso/trpc/server/admin-router/update-admin-organisation.types';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@documenso/ui/primitives/accordion';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
@@ -40,7 +45,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
-import { DetailsCard, DetailsValue, formatIsoDate } from '~/components/general/admin-details';
+import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
+import { AdminGlobalSettingsSection } from '~/components/general/admin-global-settings-section';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { SettingsHeader } from '~/components/general/settings-header';
 
@@ -60,7 +66,7 @@ export default function OrganisationGroupSettingsPage({
 }: Route.ComponentProps) {
   const { licenseFlags } = loaderData;
 
-  const { t } = useLingui();
+  const { i18n, t } = useLingui();
   const { toast } = useToast();
 
   const navigate = useNavigate();
@@ -128,13 +134,13 @@ export default function OrganisationGroupSettingsPage({
         cell: ({ row }) => {
           return (
             <span className="whitespace-nowrap font-mono text-xs text-muted-foreground">
-              {formatIsoDate(row.original.createdAt)}
+              {i18n.date(row.original.createdAt)}
             </span>
           );
         },
       },
     ] satisfies DataTableColumnDef<TGetAdminOrganisationResponse['teams'][number]>[];
-  }, []);
+  }, [i18n, t]);
 
   const organisationMembersColumns = useMemo(() => {
     return [
@@ -195,7 +201,7 @@ export default function OrganisationGroupSettingsPage({
         cell: ({ row }) => {
           return (
             <span className="whitespace-nowrap font-mono text-xs text-muted-foreground">
-              {formatIsoDate(row.original.createdAt)}
+              {i18n.date(row.original.createdAt)}
             </span>
           );
         },
@@ -222,7 +228,7 @@ export default function OrganisationGroupSettingsPage({
         },
       },
     ] satisfies DataTableColumnDef<TGetAdminOrganisationResponse['members'][number]>[];
-  }, [organisation]);
+  }, [organisation, i18n, t]);
 
   if (isLoadingOrganisation) {
     return (
@@ -302,17 +308,35 @@ export default function OrganisationGroupSettingsPage({
           </DetailsCard>
 
           <DetailsCard label={<Trans>Type</Trans>}>
-            <DetailsValue isMono={false}>
-              <Badge variant="secondary">{organisation.type}</Badge>
-            </DetailsValue>
+            <DetailsValue>{organisation.type}</DetailsValue>
           </DetailsCard>
 
           <DetailsCard label={<Trans>Created</Trans>}>
-            <DetailsValue>
-              <span className="text-muted-foreground">{formatIsoDate(organisation.createdAt)}</span>
-            </DetailsValue>
+            <DetailsValue>{i18n.date(organisation.createdAt)}</DetailsValue>
           </DetailsCard>
         </div>
+      </div>
+
+      <div className="mt-6 rounded-lg border p-4">
+        <Accordion type="single" collapsible>
+          <AccordionItem value="global-settings" className="border-b-0">
+            <AccordionTrigger className="py-0">
+              <div className="text-left">
+                <p className="text-sm font-medium">
+                  <Trans>Global Settings</Trans>
+                </p>
+                <p className="mt-1 text-sm font-normal text-muted-foreground">
+                  <Trans>Default settings applied to this organisation.</Trans>
+                </p>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="mt-4">
+                <AdminGlobalSettingsSection settings={organisation.organisationGlobalSettings} />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
 
       <SettingsHeader

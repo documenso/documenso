@@ -2,10 +2,6 @@ import type { ReactNode } from 'react';
 
 import { cn } from '@documenso/ui/lib/utils';
 
-export const formatIsoDate = (value: Date | string | number) => {
-  return new Date(value).toISOString().slice(0, 10);
-};
-
 export type DetailsCardProps = {
   label: ReactNode;
   action?: ReactNode;
@@ -38,7 +34,7 @@ export const DetailsValue = ({
   return (
     <div
       className={cn(
-        'flex min-h-10 items-center break-all rounded-md bg-muted px-3 py-2 text-xs',
+        'flex min-h-10 items-center break-all rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground',
         isMono && 'font-mono',
         isSelectable && 'select-all',
       )}
