@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { Trans, useLingui } from '@lingui/react/macro';
+import { msg, t } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import {
   DocumentDistributionMethod,
   DocumentVisibility,
@@ -154,13 +155,13 @@ const tabs = [
     id: 'email',
     title: msg`Email`,
     icon: MailIcon,
-    description: msg`Configure email settings for the document`,
+    description: msg`Configure email settings for the document.`,
   },
   {
     id: 'security',
     title: msg`Security`,
     icon: ShieldIcon,
-    description: msg`Configure security settings for the document`,
+    description: msg`Configure security settings for the document.`,
   },
 ] as const;
 
@@ -174,7 +175,7 @@ export const EnvelopeEditorSettingsDialog = ({
   trigger,
   ...props
 }: EnvelopeEditorSettingsDialogProps) => {
-  const { t, i18n } = useLingui();
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const { envelope, updateEnvelopeAsync } = useCurrentEnvelopeEditor();
@@ -363,7 +364,7 @@ export const EnvelopeEditorSettingsDialog = ({
                 })}
               >
                 <tab.icon className="mr-2 h-5 w-5" />
-                {t(tab.title)}
+                {_(tab.title)}
               </Button>
             ))}
           </nav>
@@ -372,8 +373,8 @@ export const EnvelopeEditorSettingsDialog = ({
         {/* Content. */}
         <div className="flex w-full flex-col">
           <CardHeader className="border-b pb-4">
-            <CardTitle>{t(selectedTab?.title ?? '')}</CardTitle>
-            <CardDescription>{t(selectedTab?.description ?? '')}</CardDescription>
+            <CardTitle>{selectedTab ? _(selectedTab.title) : ''}</CardTitle>
+            <CardDescription>{selectedTab ? _(selectedTab.description) : ''}</CardDescription>
           </CardHeader>
 
           <Form {...form}>
@@ -421,7 +422,7 @@ export const EnvelopeEditorSettingsDialog = ({
                                 <SelectContent>
                                   {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
                                     <SelectItem key={code} value={code}>
-                                      {language.full}
+                                      {_(language.full)}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -444,7 +445,7 @@ export const EnvelopeEditorSettingsDialog = ({
                             <FormControl>
                               <MultiSelectCombobox
                                 options={Object.values(DOCUMENT_SIGNATURE_TYPES).map((option) => ({
-                                  label: t(option.label),
+                                  label: _(option.label),
                                   value: option.value,
                                 }))}
                                 selectedValues={field.value}
@@ -632,7 +633,7 @@ export const EnvelopeEditorSettingsDialog = ({
                                   {Object.values(DOCUMENT_DISTRIBUTION_METHODS).map(
                                     ({ value, description }) => (
                                       <SelectItem key={value} value={value}>
-                                        {i18n._(description)}
+                                        {_(description)}
                                       </SelectItem>
                                     ),
                                   )}

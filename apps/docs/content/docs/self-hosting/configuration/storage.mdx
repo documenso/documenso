@@ -1,0 +1,569 @@
+---
+title: Storage Configuration
+description: Configure file storage for uploaded documents and signed PDFs using database storage (default) or S3-compatible object storage.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Storage Options
+
+| Backend    | Best For                         | Scalability | Configuration |
+| ---------- | -------------------------------- | ----------- | ------------- |
+| `database` | Small deployments, simplicity    | Limited     | None required |
+| `s3`       | Production, large files, backups | High        | Required      |
+
+Select the storage backend with the `NEXT_PUBLIC_UPLOAD_TRANSPORT` environment variable:
+
+```bash
+# Database storage (default)
+NEXT_PUBLIC_UPLOAD_TRANSPORT=database
+
+# S3-compatible storage
+NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
+```
+
+---
+
+## Database Storage
+
+Database storage is the default option and requires no additional configuration. Documents are stored as base64-encoded data directly in PostgreSQL.
+
+<Tabs items={['Advantages', 'Limitations']}>
+<Tab value="Advantages">
+
+- No external dependencies
+- Simple deployment
+- Automatic backups with database
+
+</Tab>
+<Tab value="Limitations">
+
+- Increases database size significantly
+- Slower for large files
+- Database backup/restore takes longer
+- Not recommended for files larger than 10MB
+
+</Tab>
+</Tabs>
+
+### Configuration
+
+No configuration required. Database storage is enabled when `NEXT_PUBLIC_UPLOAD_TRANSPORT` is unset or set to `database`.
+
+---
+
+## S3 Configuration
+
+S3 storage is recommended for production deployments. Documenso supports AWS S3 and any S3-compatible storage service.
+
+### Required Variables
+
+| Variable                                | Description                       |
+| --------------------------------------- | --------------------------------- |
+| `NEXT_PUBLIC_UPLOAD_TRANSPORT`          | Set to `s3`                       |
+| `NEXT_PRIVATE_UPLOAD_BUCKET`            | S3 bucket name                    |
+| `NEXT_PRIVATE_UPLOAD_REGION`            | AWS region (default: `us-east-1`) |
+| `NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID`     | AWS access key ID                 |
+| `NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY` | AWS secret access key             |
+
+### Optional Variables
+
+| Variable                               | Description                                   | Default     |
+| -------------------------------------- | --------------------------------------------- | ----------- |
+| `NEXT_PRIVATE_UPLOAD_ENDPOINT`         | Custom S3 endpoint for S3-compatible services |             |
+| `NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE` | Use path-style URLs instead of virtual-hosted | `false`     |
+| `NEXT_PRIVATE_UPLOAD_REGION`           | S3 region                                     | `us-east-1` |
+
+---
+
+## AWS S3 Setup
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Create an S3 Bucket
+
+Create a bucket in the AWS Console or using the CLI:
+
+```bash
+aws s3 mb s3://your-documenso-bucket --region us-east-1
+```
+
+</Step>
+<Step>
+### Configure Bucket Policy
+
+Block public access and configure CORS for presigned URL uploads:
+
+**CORS Configuration:**
+
+```json
+[
+  {
+    "AllowedHeaders": ["*"],
+    "AllowedMethods": ["GET", "PUT", "POST"],
+    "AllowedOrigins": ["https://your-documenso-domain.com"],
+    "ExposeHeaders": ["ETag"]
+  }
+]
+```
+
+Apply via AWS Console (Bucket > Permissions > CORS configuration) or CLI:
+
+```bash
+aws s3api put-bucket-cors --bucket your-documenso-bucket --cors-configuration file://cors.json
+```
+
+</Step>
+<Step>
+### Create IAM User
+
+Create an IAM user with programmatic access and attach this policy:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::your-documenso-bucket/*"
+    }
+  ]
+}
+```
+
+</Step>
+<Step>
+### Configure Environment Variables
+
+```bash
+NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
+NEXT_PRIVATE_UPLOAD_BUCKET=your-documenso-bucket
+NEXT_PRIVATE_UPLOAD_REGION=us-east-1
+NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+```
+
+</Step>
+</Steps>
+
+---
+
+## MinIO Setup
+
+MinIO is a self-hosted S3-compatible object storage server.
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Deploy MinIO
+
+Using Docker:
+
+```bash
+docker run -d \
+  --name minio \
+  -p 9000:9000 \
+  -p 9001:9001 \
+  -e MINIO_ROOT_USER=minioadmin \
+  -e MINIO_ROOT_PASSWORD=minioadmin \
+  -v minio_data:/data \
+  minio/minio server /data --console-address ":9001"
+```
+
+Using Docker Compose with Documenso:
+
+```yaml
+services:
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+
+volumes:
+  minio_data:
+```
+
+</Step>
+<Step>
+### Create a Bucket
+
+Access the MinIO Console at `http://localhost:9001` and create a bucket, or use the CLI:
+
+```bash
+# Install MinIO client
+mc alias set myminio http://localhost:9000 minioadmin minioadmin
+
+# Create bucket
+mc mb myminio/documenso
+```
+
+</Step>
+<Step>
+### Configure Environment Variables
+
+```bash
+NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
+NEXT_PRIVATE_UPLOAD_BUCKET=documenso
+NEXT_PRIVATE_UPLOAD_ENDPOINT=http://minio:9000
+NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true
+NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=minioadmin
+NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=minioadmin
+NEXT_PRIVATE_UPLOAD_REGION=us-east-1
+```
+
+</Step>
+</Steps>
+
+<Callout type="info">
+  Set `NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true` for MinIO and other S3-compatible services that
+  don't support virtual-hosted bucket URLs.
+</Callout>
+
+---
+
+## Other S3-Compatible Services
+
+Documenso works with any S3-compatible storage service. Configure the endpoint and enable path-style URLs if required.
+
+### Cloudflare R2
+
+```bash
+NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
+NEXT_PRIVATE_UPLOAD_BUCKET=documenso
+NEXT_PRIVATE_UPLOAD_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
+NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=your-r2-access-key
+NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=your-r2-secret-key
+NEXT_PRIVATE_UPLOAD_REGION=auto
+```
+
+### DigitalOcean Spaces
+
+```bash
+NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
+NEXT_PRIVATE_UPLOAD_BUCKET=documenso
+NEXT_PRIVATE_UPLOAD_ENDPOINT=https://nyc3.digitaloceanspaces.com
+NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=your-spaces-key
+NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=your-spaces-secret
+NEXT_PRIVATE_UPLOAD_REGION=nyc3
+```
+
+### Backblaze B2
+
+```bash
+NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
+NEXT_PRIVATE_UPLOAD_BUCKET=documenso
+NEXT_PRIVATE_UPLOAD_ENDPOINT=https://s3.us-west-004.backblazeb2.com
+NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=your-b2-key-id
+NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=your-b2-application-key
+NEXT_PRIVATE_UPLOAD_REGION=us-west-004
+```
+
+### Wasabi
+
+```bash
+NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
+NEXT_PRIVATE_UPLOAD_BUCKET=documenso
+NEXT_PRIVATE_UPLOAD_ENDPOINT=https://s3.us-east-1.wasabisys.com
+NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=your-wasabi-key
+NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=your-wasabi-secret
+NEXT_PRIVATE_UPLOAD_REGION=us-east-1
+```
+
+---
+
+## CloudFront CDN (Optional)
+
+Use Amazon CloudFront to serve documents with lower latency and reduced S3 costs. CloudFront integration uses signed URLs for secure access.
+
+### Prerequisites
+
+- An S3 bucket configured for Documenso
+- A CloudFront distribution with the S3 bucket as origin
+- A CloudFront key pair for signing URLs
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Create a CloudFront Distribution
+
+- Go to CloudFront in the AWS Console
+- Create a distribution with your S3 bucket as the origin
+- Configure Origin Access Control (OAC) to restrict direct S3 access
+- Set the default cache behavior to allow GET requests
+
+</Step>
+<Step>
+### Create a Key Pair
+
+CloudFront signed URLs require a key pair:
+
+- Go to CloudFront > Key management > Public keys
+- Create a new public key
+- Create a key group containing the public key
+- Associate the key group with your distribution
+
+Keep the private key secure - you'll need it for the environment variable.
+
+</Step>
+<Step>
+### Configure Environment Variables
+
+```bash
+# CloudFront distribution domain (without https://)
+NEXT_PRIVATE_UPLOAD_DISTRIBUTION_DOMAIN=d1234567890.cloudfront.net
+
+# CloudFront key pair ID
+NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_ID=K1234567890ABC
+
+# Private key contents (PEM format)
+NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_CONTENTS="-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA...
+-----END RSA PRIVATE KEY-----"
+```
+
+<Callout type="warn">
+  Store the private key securely. Use environment variables or secrets management rather than
+  committing it to version control.
+</Callout>
+
+</Step>
+</Steps>
+
+### How It Works
+
+When CloudFront is configured:
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Uploads
+
+File uploads still go directly to S3 via presigned URLs.
+
+</Step>
+<Step>
+### Downloads
+
+File downloads use CloudFront signed URLs.
+
+</Step>
+<Step>
+### Caching
+
+CloudFront caches files at edge locations.
+
+</Step>
+<Step>
+### Expiration
+
+Signed URLs expire after 1 hour.
+
+</Step>
+</Steps>
+
+---
+
+## Migration Between Storage Backends
+
+Documenso does not provide automatic migration between storage backends. Each document's storage location is recorded in the database.
+
+<Callout type="warn">
+  Documents uploaded to one storage backend cannot be automatically migrated to another. Plan your
+  storage strategy before deploying to production.
+</Callout>
+
+### Manual Migration Process
+
+To migrate existing documents from database to S3 storage:
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Export documents
+
+Extract document blobs from the database (e.g. via a script querying `DocumentData` where `type` is `BYTES_64`).
+
+</Step>
+<Step>
+### Upload to S3
+
+Upload each exported file to your S3 bucket and note the resulting object keys or paths.
+
+</Step>
+<Step>
+### Update DocumentData records
+
+Point each record to the new S3 location by updating `DocumentData` with the S3 path and setting `type` to `S3_PATH`.
+
+</Step>
+</Steps>
+
+This requires custom scripts and database modifications.
+
+<Callout type="info">
+  For production deployments, we recommend starting with S3 storage from the beginning.
+</Callout>
+
+### Hybrid Operation
+
+During migration, Documenso can read from both backends. The `DocumentData.type` field indicates where each document is stored.
+
+- `BYTES_64`: Stored in database
+- `S3_PATH`: Stored in S3
+
+New uploads use the configured `NEXT_PUBLIC_UPLOAD_TRANSPORT` backend.
+
+---
+
+## Storage Sizing
+
+### Database Storage Estimates
+
+When using database storage, plan for significant database growth:
+
+| Documents/Month | Avg Size | Monthly Growth | Annual Growth |
+| --------------- | -------- | -------------- | ------------- |
+| 100             | 500KB    | ~50MB          | ~600MB        |
+| 1,000           | 500KB    | ~500MB         | ~6GB          |
+| 10,000          | 500KB    | ~5GB           | ~60GB         |
+
+Database storage includes base64 encoding overhead (~33% increase).
+
+### S3 Storage Estimates
+
+S3 stores files without encoding overhead:
+
+| Documents/Month | Avg Size | Monthly Growth | Annual Growth |
+| --------------- | -------- | -------------- | ------------- |
+| 100             | 500KB    | ~50MB          | ~600MB        |
+| 1,000           | 500KB    | ~500MB         | ~6GB          |
+| 10,000          | 500KB    | ~5GB           | ~60GB         |
+
+### Cost Comparison
+
+For high-volume deployments, S3 is more cost-effective:
+
+| Aspect        | Database Storage             | S3 Storage              |
+| ------------- | ---------------------------- | ----------------------- |
+| Storage cost  | Database pricing (~$0.10/GB) | S3 pricing (~$0.023/GB) |
+| Transfer cost | Database I/O                 | S3 requests + egress    |
+| Backup cost   | Larger database backups      | Separate S3 backups     |
+| Performance   | Degrades with size           | Consistent              |
+
+---
+
+## Upload Size Limits
+
+Configure the maximum upload size displayed to users:
+
+```bash
+NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT=10
+```
+
+This value is in megabytes. The default is 5MB.
+
+<Callout type="info">
+  This environment variable controls the UI display. Actual limits may also be enforced by your
+  reverse proxy, web server, or S3 configuration.
+</Callout>
+
+Ensure your infrastructure supports the configured limit:
+
+<Tabs items={['Nginx', 'S3', 'CloudFront']}>
+<Tab value="Nginx">
+
+Set `client_max_body_size` to match or exceed your upload limit.
+
+</Tab>
+<Tab value="S3">
+
+Default object size limit is 5GB; multipart upload may be required for large files.
+
+</Tab>
+<Tab value="CloudFront">
+
+Default limit is 50MB per request.
+
+</Tab>
+</Tabs>
+
+---
+
+## Troubleshooting
+
+<Accordions type="multiple">
+  <Accordion title="Access Denied when uploading">
+    Causes:
+    - Incorrect IAM credentials
+    - Bucket policy doesn't allow required operations
+    - CORS not configured for presigned URL uploads
+
+    Solutions:
+    - Verify IAM user has `s3:PutObject` permission
+    - Check bucket policy allows writes
+    - Configure CORS to allow your domain
+
+  </Accordion>
+  <Accordion title="Invalid endpoint (getaddrinfo ENOTFOUND)">
+    Causes:
+    - Incorrect region configuration
+    - Bucket doesn't exist
+    - Network connectivity issues
+
+    Solutions:
+    - Verify the bucket exists in the specified region
+    - Check the endpoint URL is correct
+    - Verify network access to S3
+
+  </Accordion>
+  <Accordion title="SignatureDoesNotMatch">
+    Causes:
+    - Incorrect secret access key
+    - Clock skew between server and S3
+
+    Solutions:
+    - Verify credentials are correct and not expired
+    - Ensure server time is synchronized (use NTP)
+
+  </Accordion>
+  <Accordion title="Path-style access required">
+    Set path-style access for S3-compatible services:
+
+    ```bash
+    NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true
+    ```
+
+  </Accordion>
+  <Accordion title="CloudFront signed URL errors (Missing required key 'Key')">
+    Causes:
+    - Key pair not configured correctly
+    - Private key format invalid
+
+    Solutions:
+    - Verify the key pair ID matches the CloudFront configuration
+    - Ensure the private key is in PEM format
+    - Check for whitespace or encoding issues in the key contents
+
+  </Accordion>
+</Accordions>
+
+---
+
+## See Also
+
+- [Database Configuration](/docs/self-hosting/configuration/database) - Configure PostgreSQL
+- [Environment Variables](/docs/self-hosting/configuration/environment) - Complete configuration reference
+- [Backups](/docs/self-hosting/maintenance/backups) - Backup strategies for both storage backends
+- [Docker Compose](/docs/self-hosting/deployment/docker-compose) - Deploy with MinIO for local storage
