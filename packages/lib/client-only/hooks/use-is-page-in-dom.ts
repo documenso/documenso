@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import {
+  PDF_VIEWER_CONTENT_SELECTOR,
+  PDF_VIEWER_PAGE_SELECTOR,
+} from '@documenso/lib/constants/pdf-viewer';
 
 /**
  * Returns whether the PDF page element for the given page number is currently
@@ -20,7 +23,9 @@ export const useIsPageInDom = (pageNumber: number) => {
       setIsPageInDom(document.querySelector(selector) !== null);
     });
 
-    observer.observe(document.body, {
+    const $container = document.querySelector(PDF_VIEWER_CONTENT_SELECTOR) ?? document.body;
+
+    observer.observe($container, {
       childList: true,
       subtree: true,
     });
