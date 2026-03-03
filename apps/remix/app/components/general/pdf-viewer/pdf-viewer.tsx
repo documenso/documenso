@@ -29,6 +29,7 @@ type PageMeta = {
 type LoadingState = 'loading' | 'loaded' | 'error';
 
 const LOW_RENDER_RESOLUTION = 1;
+const HIGH_RENDER_RESOLUTION = 2;
 const IDLE_RENDER_DELAY = 200;
 
 export type PDFViewerProps = {
@@ -350,14 +351,6 @@ const usePdfPageImage = ({
   useEffect(() => {
     let isCancelled = false;
 
-    const getHighResolution = () => {
-      if (typeof window === 'undefined') {
-        return 2;
-      }
-
-      return window.devicePixelRatio || 2;
-    };
-
     const cancelRenderTask = () => {
       if (!renderTaskRef.current) {
         return;
@@ -447,10 +440,8 @@ const usePdfPageImage = ({
 
     void renderAtResolution(LOW_RENDER_RESOLUTION);
 
-    const highResolution = getHighResolution();
-
     idleTimerRef.current = setTimeout(() => {
-      void renderAtResolution(highResolution);
+      void renderAtResolution(HIGH_RENDER_RESOLUTION);
     }, IDLE_RENDER_DELAY);
 
     return () => {
