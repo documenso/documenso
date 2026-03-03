@@ -11,14 +11,40 @@ type RecipientPlaceholderInfo = {
 };
 
 /*
+  Short aliases for field types.
+  Keys are lowercase; values are the canonical uppercase field type strings
+  accepted by the match() block in parseFieldTypeFromPlaceholder.
+
+    s   → signature       fs  → free_signature
+    i   → initials        n   → name
+    e   → email           d   → date
+    t   → text            num → number
+    r   → radio           cb  → checkbox
+    dd  → dropdown
+*/
+const SHORT_FIELD_TYPE_MAP: Record<string, string> = {
+  s: 'SIGNATURE',
+  fs: 'FREE_SIGNATURE',
+  i: 'INITIALS',
+  n: 'NAME',
+  e: 'EMAIL',
+  d: 'DATE',
+  t: 'TEXT',
+  num: 'NUMBER',
+  r: 'RADIO',
+  cb: 'CHECKBOX',
+  dd: 'DROPDOWN',
+};
+
+/*
   Parse field type string to FieldType enum.
-  Normalizes the input (uppercase, trim) and validates it's a valid field type.
-  This ensures we handle case variations and whitespace, and provides clear error messages.
+  Accepts both the full canonical name (case-insensitive) and short aliases.
 */
 export const parseFieldTypeFromPlaceholder = (fieldTypeString: string): FieldType => {
-  const normalizedType = fieldTypeString.toUpperCase().trim();
+  const trimmed = fieldTypeString.trim();
+  const expandedType = (SHORT_FIELD_TYPE_MAP[trimmed.toLowerCase()] ?? trimmed).toUpperCase();
 
-  return match(normalizedType)
+  return match(expandedType)
     .with('SIGNATURE', () => FieldType.SIGNATURE)
     .with('FREE_SIGNATURE', () => FieldType.FREE_SIGNATURE)
     .with('INITIALS', () => FieldType.INITIALS)
@@ -38,9 +64,133 @@ export const parseFieldTypeFromPlaceholder = (fieldTypeString: string): FieldTyp
 };
 
 /*
+  Short aliases for option keys (both = and : are accepted as separators).
+
+  Common (all fields):
+    r   → required          ro  → readOnly
+    f   → fontSize          l   → label
+    p   → placeholder       id  → fieldId
+
+  Text / Number / Initials / Name / Email / Date:
+    ta  → textAlign         va  → verticalAlign
+    lh  → lineHeight        ls  → letterSpacing
+
+  Text only:
+    t   → text              cl  → characterLimit
+
+  Number only:
+    v   → value             nf  → numberFormat
+    min → minValue          max → maxValue
+
+  Radio / Checkbox:
+    dir → direction
+
+  Checkbox only:
+    vr  → validationRule    vl  → validationLength
+
+  Dropdown only:
+    dv  → defaultValue
+*/
+const SHORT_OPTION_KEY_MAP: Record<string, string> = {
+  // Common
+  r: 'required',
+  ro: 'readOnly',
+  f: 'fontSize',
+  l: 'label',
+  p: 'placeholder',
+  id: 'fieldId',
+  // Text / Number layout
+  ta: 'textAlign',
+  va: 'verticalAlign',
+  lh: 'lineHeight',
+  ls: 'letterSpacing',
+  // Text
+  t: 'text',
+  cl: 'characterLimit',
+  // Number
+  v: 'value',
+  nf: 'numberFormat',
+  min: 'minValue',
+  max: 'maxValue',
+  // Radio / Checkbox
+  dir: 'direction',
+  // Checkbox
+  vr: 'validationRule',
+  vl: 'validationLength',
+  // Dropdown
+  dv: 'defaultValue',
+};
+
+/*
+  Short value aliases for the textAlign property.
+    l → left    r → right    c → center
+*/
+const SHORT_TEXT_ALIGN_MAP: Record<string, string> = {
+  l: 'left',
+  r: 'right',
+  c: 'center',
+};
+
+/*
+  Short value aliases for the verticalAlign property.
+    t → top    m → middle    b → bottom
+*/
+const SHORT_VERTICAL_ALIGN_MAP: Record<string, string> = {
+  t: 'top',
+  m: 'middle',
+  b: 'bottom',
+};
+
+/*
+  Short value aliases for the direction property (Radio / Checkbox).
+    v → vertical    h → horizontal
+*/
+const SHORT_DIRECTION_MAP: Record<string, string> = {
+  v: 'vertical',
+  h: 'horizontal',
+};
+
+/*
+  Properties whose values are coerced to numbers.
+*/
+const NUMERIC_FIELDS = new Set([
+  'fontSize',
+  'minValue',
+  'maxValue',
+  'characterLimit',
+  'lineHeight',
+  'letterSpacing',
+  'validationLength',
+]);
+
+/*
+  String fields whose values are decoded from underscore-encoded form.
+  Underscores are replaced with spaces and the result is title-cased.
+  e.g. "my_field_name" → "My Field Name"
+
+  Only applies to human-readable display strings, not identifiers or
+  format strings (numberFormat, defaultValue, value, fieldId, etc.).
+*/
+const TITLE_CASE_FIELDS = new Set(['label', 'placeholder', 'text']);
+
+const toTitleCase = (value: string): string =>
+  value.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+/*
   Transform raw field metadata from placeholder format to schema format.
-  Users should provide properly capitalized property names (e.g., readOnly, fontSize, textAlign).
-  Converts string values to proper types (booleans, numbers).
+  Accepts both full property names and short aliases (see SHORT_OPTION_KEY_MAP).
+  Both = and : are accepted as key/value separators (handled upstream).
+
+  Short boolean values:      t → true,     f → false
+  Short textAlign values:    l → left,     r → right,    c → center
+  Short verticalAlign values:t → top,      m → middle,   b → bottom
+  Short direction values:    v → vertical, h → horizontal
+
+  Label / placeholder / text values are decoded from underscore-encoded form:
+  underscores are replaced with spaces and every word is title-cased,
+  e.g. "my_label" → "My Label".
+
+  Note: signature and free_signature fields do not support fieldMeta options.
 */
 export const parseFieldMetaFromPlaceholder = (
   rawFieldMeta: Record<string, string>,
@@ -60,29 +210,38 @@ export const parseFieldMetaFromPlaceholder = (
     type: fieldTypeString,
   };
 
-  /*
-    rawFieldMeta is an object with string keys and string values.
-    It contains string values because the PDF parser returns the values as strings.
+  // Expand short keys to their full property names.
+  const expandedMeta: Record<string, string> = {};
 
-    E.g. { 'required': 'true', 'fontSize': '12', 'maxValue': '100', 'minValue': '0', 'characterLimit': '100' }
-  */
-  const rawFieldMetaEntries = Object.entries(rawFieldMeta);
+  for (const [key, value] of Object.entries(rawFieldMeta)) {
+    const expandedKey = SHORT_OPTION_KEY_MAP[key] ?? key;
+    expandedMeta[expandedKey] = value;
+  }
 
-  for (const [property, value] of rawFieldMetaEntries) {
+  for (const [property, value] of Object.entries(expandedMeta)) {
     if (property === 'readOnly' || property === 'required') {
-      parsedFieldMeta[property] = value === 'true';
-    } else if (
-      property === 'fontSize' ||
-      property === 'maxValue' ||
-      property === 'minValue' ||
-      property === 'characterLimit'
-    ) {
+      // Accept "true"/"false" (long form) and "t"/"f" (short form).
+      parsedFieldMeta[property] = value === 'true' || value === 't';
+    } else if (property === 'textAlign') {
+      // Accept "left"/"right"/"center" and "l"/"r"/"c".
+      parsedFieldMeta[property] = SHORT_TEXT_ALIGN_MAP[value] ?? value;
+    } else if (property === 'verticalAlign') {
+      // Accept "top"/"middle"/"bottom" and "t"/"m"/"b".
+      parsedFieldMeta[property] = SHORT_VERTICAL_ALIGN_MAP[value] ?? value;
+    } else if (property === 'direction') {
+      // Accept "vertical"/"horizontal" and "v"/"h".
+      parsedFieldMeta[property] = SHORT_DIRECTION_MAP[value] ?? value;
+    } else if (NUMERIC_FIELDS.has(property)) {
       const numValue = Number(value);
 
       if (!Number.isNaN(numValue)) {
         parsedFieldMeta[property] = numValue;
       }
+    } else if (TITLE_CASE_FIELDS.has(property)) {
+      // Decode underscore-encoded display strings: "my_label" → "My Label".
+      parsedFieldMeta[property] = toTitleCase(value);
     } else {
+      // Pass through as string: value, numberFormat, defaultValue, fieldId, etc.
       parsedFieldMeta[property] = value;
     }
   }

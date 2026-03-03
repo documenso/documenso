@@ -113,7 +113,13 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
 
       const recipient = recipientOrMeta;
 
-      const rawFieldMeta = Object.fromEntries(fieldMetaData.map((property) => property.split('=')));
+      const rawFieldMeta = Object.fromEntries(
+        fieldMetaData.map((property) => {
+          const separatorIdx = property.search(/[=:]/);
+          if (separatorIdx === -1) return [property, ''];
+          return [property.slice(0, separatorIdx), property.slice(separatorIdx + 1)];
+        }),
+      );
 
       const parsedFieldMeta = parseFieldMetaFromPlaceholder(rawFieldMeta, fieldType);
 
