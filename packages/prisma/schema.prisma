@@ -598,6 +598,11 @@ model Recipient {
   @@index([envelopeId])
   @@index([signedAt])
   @@index([expiresAt])
+  @@index([email, documentDeletedAt, envelopeId], map: "Recipient_email_documentDeletedAt_envelopeId_idx")
+  @@index([email, envelopeId], map: "Recipient_email_envelopeId_idx")
+  @@index([email, signingStatus, envelopeId, role], map: "Recipient_email_signingStatus_envelopeId_role_idx")
+  @@index([email(ops: raw("gin_trgm_ops"))], map: "Recipient_email_trgm_idx", type: Gin)
+  @@index([name(ops: raw("gin_trgm_ops"))], map: "Recipient_name_trgm_idx", type: Gin)
 }
 
 enum FieldType {
