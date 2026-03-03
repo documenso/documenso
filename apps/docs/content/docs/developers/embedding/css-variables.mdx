@@ -1,0 +1,215 @@
+---
+title: CSS Variables
+description: Customize the appearance of embedded signing experiences with CSS variables and class targets.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+<Callout type="info">
+  Custom CSS and CSS variables are available on the [Platform
+  Plan](https://documen.so/platform-cta-pricing).
+</Callout>
+
+## CSS Variables
+
+Use the `cssVars` prop on any embed component to override default colors, spacing, and more.
+
+```jsx
+<EmbedDirectTemplate
+  token="your-token"
+  cssVars={{
+    background: '#ffffff',
+    foreground: '#000000',
+    primary: '#0000ff',
+    primaryForeground: '#ffffff',
+    radius: '0.5rem',
+  }}
+/>
+```
+
+### Colors
+
+| Variable                | Description                       |
+| ----------------------- | --------------------------------- |
+| `background`            | Base background color             |
+| `foreground`            | Base text color                   |
+| `muted`                 | Muted/subtle background color     |
+| `mutedForeground`       | Muted/subtle text color           |
+| `popover`               | Popover/dropdown background color |
+| `popoverForeground`     | Popover/dropdown text color       |
+| `card`                  | Card background color             |
+| `cardBorder`            | Card border color                 |
+| `cardBorderTint`        | Card border tint/highlight color  |
+| `cardForeground`        | Card text color                   |
+| `fieldCard`             | Field card background color       |
+| `fieldCardBorder`       | Field card border color           |
+| `fieldCardForeground`   | Field card text color             |
+| `widget`                | Widget background color           |
+| `widgetForeground`      | Widget text color                 |
+| `border`                | Default border color              |
+| `input`                 | Input field border color          |
+| `primary`               | Primary action/button color       |
+| `primaryForeground`     | Primary action/button text color  |
+| `secondary`             | Secondary action/button color     |
+| `secondaryForeground`   | Secondary button text color       |
+| `accent`                | Accent/highlight color            |
+| `accentForeground`      | Accent/highlight text color       |
+| `destructive`           | Destructive/danger action color   |
+| `destructiveForeground` | Destructive/danger text color     |
+| `ring`                  | Focus ring color                  |
+| `warning`               | Warning/alert color               |
+
+### Spacing
+
+| Variable | Description                        |
+| -------- | ---------------------------------- |
+| `radius` | Border radius size (e.g. `0.5rem`) |
+
+### Framework Usage
+
+Pass `cssVars` to any embed component. The syntax varies by framework:
+
+```jsx
+// React / Preact
+<EmbedDirectTemplate token={token} cssVars={cssVars} />
+
+// Vue
+<EmbedDirectTemplate :token="token" :cssVars="cssVars" />
+
+// Svelte
+<EmbedDirectTemplate {token} cssVars={cssVars} />
+
+// Solid
+<EmbedDirectTemplate token={token} cssVars={cssVars} />
+```
+
+### Color Formats
+
+Colors can be specified in any valid CSS format:
+
+- Hex: `#ff0000`
+- RGB: `rgb(255, 0, 0)`
+- HSL: `hsl(0, 100%, 50%)`
+- Named: `red`
+
+---
+
+## Custom CSS
+
+Use the `css` prop to inject a CSS string for more targeted control:
+
+```jsx
+<EmbedDirectTemplate
+  token="your-token"
+  css={`
+    .documenso-embed {
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  `}
+/>
+```
+
+---
+
+## CSS Class Targets
+
+Specific parts of the embed can be targeted with CSS classes for granular styling.
+
+### Component Classes
+
+| Class                             | Description                                   |
+| --------------------------------- | --------------------------------------------- |
+| `.embed--Root`                    | Main container for the embedded experience    |
+| `.embed--DocumentContainer`       | Container for the document and signing widget |
+| `.embed--DocumentViewer`          | Container for the document viewer             |
+| `.embed--DocumentWidget`          | The signing widget container                  |
+| `.embed--DocumentWidgetContainer` | Outer container for the signing widget        |
+| `.embed--DocumentWidgetHeader`    | Header section of the signing widget          |
+| `.embed--DocumentWidgetContent`   | Main content area of the signing widget       |
+| `.embed--DocumentWidgetForm`      | Form section within the signing widget        |
+| `.embed--DocumentWidgetFooter`    | Footer section of the signing widget          |
+| `.embed--WaitingForTurn`          | Waiting screen when it is not the user's turn |
+| `.embed--DocumentCompleted`       | Completion screen after signing               |
+| `.field--FieldRootContainer`      | Base container for document fields            |
+
+### Field Data Attributes
+
+Fields expose data attributes for state-based styling:
+
+| Attribute           | Values                                         | Description                          |
+| ------------------- | ---------------------------------------------- | ------------------------------------ |
+| `[data-field-type]` | `SIGNATURE`, `TEXT`, `CHECKBOX`, `RADIO`, etc. | The type of field                    |
+| `[data-inserted]`   | `true`, `false`                                | Whether the field has been filled    |
+| `[data-validate]`   | `true`, `false`                                | Whether the field is being validated |
+
+### Example
+
+```css
+/* Style signature fields */
+.field--FieldRootContainer[data-field-type='SIGNATURE'] {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Style filled fields */
+.field--FieldRootContainer[data-inserted='true'] {
+  background-color: var(--primary);
+  opacity: 0.2;
+}
+
+/* Custom widget styling */
+.embed--DocumentWidget {
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+```
+
+### Additional Examples
+
+```css
+/* Style all field containers with transitions */
+.field--FieldRootContainer {
+  transition: all 200ms ease;
+}
+
+/* Custom styles for the waiting screen */
+.embed--WaitingForTurn {
+  background-color: #f9fafb;
+  padding: 2rem;
+}
+
+/* Responsive adjustments for the document container */
+@media (min-width: 768px) {
+  .embed--DocumentContainer {
+    gap: 2rem;
+  }
+}
+```
+
+---
+
+## Best Practices
+
+<Accordions type="multiple">
+  <Accordion title="Maintain contrast">
+    Ensure sufficient contrast between background and foreground colors for accessibility.
+  </Accordion>
+  <Accordion title="Test dark mode">
+    If dark mode is not disabled, verify your variables work in both modes.
+  </Accordion>
+  <Accordion title="Match your brand">
+    Align `primary` and `accent` colors with your brand for a cohesive look.
+  </Accordion>
+  <Accordion title="Consistent radius">
+    Use a border radius that matches your application's design system.
+  </Accordion>
+</Accordions>
+
+---
+
+## See Also
+
+- [Embedding Overview](/docs/developers/embedding) - Props reference and concepts
+- [React](/docs/developers/embedding/sdks/react) - React SDK usage
+- [Vue](/docs/developers/embedding/sdks/vue) - Vue SDK usage

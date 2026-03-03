@@ -1,0 +1,205 @@
+---
+title: Community Edition
+description: The open-source version of Documenso, available under the AGPL-3.0 license. Includes core document signing functionality and can be self-hosted.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+## AGPL-3.0 License Overview
+
+The GNU Affero General Public License version 3 (AGPL-3.0) is a copyleft license designed to ensure software freedom. It is similar to GPL-3.0 but includes an additional "network clause" that addresses software-as-a-service use cases.
+
+Key characteristics:
+
+- **Copyleft**: Derivative works must use the same license
+- **Network clause**: Network access triggers the same obligations as distribution
+- **Source availability**: Users must be able to access the source code
+
+The full license text is available in the [LICENSE file](https://github.com/documenso/documenso/blob/main/LICENSE) in the repository.
+
+## What You Can Do
+
+Under the AGPL-3.0 license, you are permitted to:
+
+| Action             | Description                                                   |
+| ------------------ | ------------------------------------------------------------- |
+| **Use**            | Run Documenso for any purpose, including commercial use       |
+| **Study**          | Access and examine the complete source code                   |
+| **Modify**         | Make changes and customizations to the software               |
+| **Distribute**     | Share copies of the original or modified software             |
+| **Self-host**      | Deploy on your own servers, cloud infrastructure, or locally  |
+| **Offer services** | Provide document signing services to users (with obligations) |
+
+## What You Must Do
+
+When using or distributing the Community Edition, you must comply with these requirements:
+
+<Accordions type="multiple">
+  <Accordion title="Source Code Disclosure">
+    If you modify Documenso and make it available over a network, you must:
+
+    - Provide access to the complete source code of your modified version
+    - Make the source available through the same network interface, or provide a written offer to supply it
+    - Include all scripts and instructions needed to build and install the software
+
+    <Callout type="warn">
+      The network clause is the distinguishing feature of AGPL-3.0. If users interact with your modified
+      Documenso instance over a network (whether internal or external), you must provide them access to
+      the source code.
+    </Callout>
+
+  </Accordion>
+  <Accordion title="Attribution">
+    You must maintain proper attribution:
+
+    - Keep all copyright notices intact in the source code
+    - Include a copy of the AGPL-3.0 license with any distribution
+    - Clearly state any modifications you have made
+    - Preserve author attributions and license headers
+
+  </Accordion>
+  <Accordion title="License Continuity">
+    Derivative works must be licensed under AGPL-3.0:
+
+    - Forks must use the same license
+    - Modifications cannot be made proprietary
+    - Combined works that incorporate Documenso code are subject to AGPL-3.0
+
+  </Accordion>
+  <Accordion title="Enterprise Edition Boundary">
+    Features located in the `packages/ee/` directory of the codebase are not licensed under AGPL-3.0 and require an active [Enterprise license](/docs/policies/enterprise-edition) to use. If you are self-hosting the Community Edition, do not enable or use features from the `packages/ee/` folder without an enterprise license.
+  </Accordion>
+</Accordions>
+
+## Features Included
+
+The Community Edition includes the core Documenso functionality:
+
+<Accordions type="multiple">
+  <Accordion title="Document Management">
+    - Upload and prepare PDF documents for signing
+    - Add multiple recipients with different roles (signer, approver, viewer, etc.)
+    - Configure signing order and workflow
+    - Track document status and completion
+  </Accordion>
+  <Accordion title="Field Types">
+    - Signature fields (draw, type, or upload)
+    - Initial fields
+    - Text fields
+    - Date fields
+    - Checkbox fields
+    - Number fields
+    - Dropdown/select fields
+    - Radio button fields
+  </Accordion>
+  <Accordion title="Signing Experience">
+    - Email-based signing workflow
+    - Direct signing links
+    - Signing certificate integration
+    - Completed document download
+  </Accordion>
+  <Accordion title="Templates">
+    - Create reusable document templates
+    - Pre-configure recipients and fields
+    - Generate documents from templates via UI or API
+  </Accordion>
+  <Accordion title="API Access">
+    - REST API for document operations
+    - Webhook notifications for events
+    - API token authentication
+  </Accordion>
+  <Accordion title="Self-Hosting">
+    - Docker and Docker Compose deployment
+    - Kubernetes deployment option
+    - Railway one-click deployment
+    - PostgreSQL database support
+    - S3-compatible storage support
+    - SMTP email configuration
+
+    For the complete list of configuration options, see the [Self-Hosting Guide](/docs/self-hosting).
+
+  </Accordion>
+</Accordions>
+
+## Support Options
+
+Community Edition users have access to community-based support:
+
+<Accordions type="multiple">
+  <Accordion title="Discord">
+    The Documenso Discord server is the primary community support channel. You can:
+
+    - Ask questions and get help from other users
+    - Share your use cases and solutions
+    - Report issues and discuss features
+
+  </Accordion>
+  <Accordion title="GitHub">
+    - **[GitHub Discussions](https://github.com/documenso/documenso/discussions)**: For questions, ideas, and general discussion
+    - **[GitHub Issues](https://github.com/documenso/documenso/issues)**: For confirmed bug reports with reproducible steps
+  </Accordion>
+  <Accordion title="Documentation">
+    - [Self-Hosting Guide](/docs/self-hosting) for deployment and configuration
+    - [Developer Guide](/docs/developers) for API integration
+    - [Troubleshooting Guide](/docs/self-hosting/maintenance/troubleshooting) for common issues
+  </Accordion>
+</Accordions>
+
+<Callout type="info">
+  Community support is provided on a best-effort basis by volunteers and Documenso team members. For
+  guaranteed response times and dedicated support, consider the Enterprise Edition.
+</Callout>
+
+## Contributing Back
+
+Contributions to Documenso are welcome and appreciated. You can contribute in several ways:
+
+<Accordions type="multiple">
+  <Accordion title="Code Contributions">
+    1. Fork the [Documenso repository](https://github.com/documenso/documenso)
+    2. Create a branch for your changes
+    3. Submit a pull request with a clear description
+    4. Respond to code review feedback
+
+    All contributions are licensed under AGPL-3.0.
+
+  </Accordion>
+  <Accordion title="Other Contributions">
+    - Report bugs with detailed reproduction steps
+    - Suggest features through GitHub Discussions
+    - Improve documentation
+    - Help other users in Discord or GitHub Discussions
+    - Translate the interface to other languages
+  </Accordion>
+  <Accordion title="Contributor Guidelines">
+    Before contributing, review:
+
+    - The [CONTRIBUTING.md](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md) file in the repository
+    - Existing issues and discussions to avoid duplicates
+    - The coding standards used in the project
+
+  </Accordion>
+</Accordions>
+
+## When to Consider Enterprise Edition
+
+The Community Edition is appropriate for many use cases. However, you may need the Enterprise Edition if you:
+
+- Cannot comply with AGPL-3.0 source disclosure requirements
+- Need to keep modifications proprietary
+- Require dedicated support with guaranteed response times
+- Need enterprise-specific features (SSO, advanced audit logs, etc.)
+- Have corporate policies that prohibit AGPL-licensed software
+
+See [Enterprise Edition](/docs/policies/enterprise-edition) for details on commercial licensing.
+
+## Related
+
+- [Licenses](/docs/policies/licenses) - Overview of both licensing options
+- [Licenses](/docs/policies/licenses) - Detailed AGPL-3.0 explanation
+- [Enterprise Edition](/docs/policies/enterprise-edition) - Commercial license details
+- [Self-Hosting Guide](/docs/self-hosting) - Deploy your own instance
+- [Support](/docs/policies/support) - All support options
+- [Full AGPL-3.0 License Text](https://www.gnu.org/licenses/agpl-3.0.html) - Complete license terms
+- [GitHub Repository](https://github.com/documenso/documenso) - Source code and LICENSE file
