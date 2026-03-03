@@ -24,7 +24,7 @@ import {
   isRequiredField,
 } from '@documenso/lib/utils/advanced-fields-helpers';
 import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
-import { validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -98,7 +98,7 @@ export const EmbedDirectTemplateClientPage = ({
   const [localFields, setLocalFields] = useState<DirectTemplateLocalField[]>(() => fields);
 
   const [pendingFields, _completedFields] = [
-    localFields.filter((field) => isFieldUnsignedAndRequired(field)),
+    sortFieldsByPosition(localFields.filter((field) => isFieldUnsignedAndRequired(field))),
     localFields.filter((field) => field.inserted),
   ];
 
@@ -483,13 +483,15 @@ export const EmbedDirectTemplateClientPage = ({
           </div>
         </div>
 
-        <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
-          {showPendingFieldTooltip && pendingFields.length > 0 && (
+        {showPendingFieldTooltip && pendingFields.length > 0 && (
+          <ElementVisible
+            target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${pendingFields[0].page}"]`}
+          >
             <FieldToolTip key={pendingFields[0].id} field={pendingFields[0]} color="warning">
               <Trans>Click to insert field</Trans>
             </FieldToolTip>
-          )}
-        </ElementVisible>
+          </ElementVisible>
+        )}
 
         {/* Fields */}
         <EmbedDocumentFields

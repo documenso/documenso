@@ -11,7 +11,7 @@ import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn'
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
-import { validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
@@ -101,8 +101,10 @@ export const EmbedSignDocumentV1ClientPage = ({
   const [throttledOnCompleteClick, isThrottled] = useThrottleFn(() => void onCompleteClick(), 500);
 
   const [pendingFields, _completedFields] = [
-    fields.filter(
-      (field) => field.recipientId === recipient.id && isFieldUnsignedAndRequired(field),
+    sortFieldsByPosition(
+      fields.filter(
+        (field) => field.recipientId === recipient.id && isFieldUnsignedAndRequired(field),
+      ),
     ),
     fields.filter((field) => field.inserted),
   ];
@@ -496,13 +498,15 @@ export const EmbedSignDocumentV1ClientPage = ({
             </div>
           </div>
 
-          <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
-            {showPendingFieldTooltip && pendingFields.length > 0 && (
+          {showPendingFieldTooltip && pendingFields.length > 0 && (
+            <ElementVisible
+              target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${pendingFields[0].page}"]`}
+            >
               <FieldToolTip key={pendingFields[0].id} field={pendingFields[0]} color="warning">
                 <Trans>Click to insert field</Trans>
               </FieldToolTip>
-            )}
-          </ElementVisible>
+            </ElementVisible>
+          )}
 
           {/* Fields */}
           <EmbedDocumentFields fields={fields} metadata={metadata} />

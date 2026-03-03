@@ -10,6 +10,7 @@ import { P, match } from 'ts-pattern';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
+import { sortFieldsByPosition } from '@documenso/lib/utils/fields';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -89,8 +90,10 @@ export const MultiSignDocumentSigningView = ({
   const hasSignatureField = document?.fields.some((field) => isSignatureFieldType(field.type));
 
   const [pendingFields, completedFields] = [
-    document?.fields.filter((field) => field.recipient.signingStatus !== SigningStatus.SIGNED) ??
-      [],
+    sortFieldsByPosition(
+      document?.fields.filter((field) => field.recipient.signingStatus !== SigningStatus.SIGNED) ??
+        [],
+    ),
     document?.fields.filter((field) => field.recipient.signingStatus === SigningStatus.SIGNED) ??
       [],
   ];
@@ -368,17 +371,13 @@ export const MultiSignDocumentSigningView = ({
                 )}
               </div>
 
-              {hasDocumentLoaded && (
-                <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
-                  {showPendingFieldTooltip && pendingFields.length > 0 && (
-                    <FieldToolTip
-                      key={pendingFields[0].id}
-                      field={pendingFields[0]}
-                      color="warning"
-                    >
-                      <Trans>Click to insert field</Trans>
-                    </FieldToolTip>
-                  )}
+              {hasDocumentLoaded && showPendingFieldTooltip && pendingFields.length > 0 && (
+                <ElementVisible
+                  target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${pendingFields[0].page}"]`}
+                >
+                  <FieldToolTip key={pendingFields[0].id} field={pendingFields[0]} color="warning">
+                    <Trans>Click to insert field</Trans>
+                  </FieldToolTip>
                 </ElementVisible>
               )}
 
