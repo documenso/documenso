@@ -6,6 +6,7 @@ import { FieldType } from '@prisma/client';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { getPdfPagesCount } from '@documenso/lib/constants/pdf-viewer';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
 
@@ -222,14 +223,16 @@ export const useEditorFields = ({
 
   const duplicateFieldToAllPages = useCallback(
     (field: TLocalField): TLocalField[] => {
-      const pages = Array.from(document.querySelectorAll('[data-page-number]'));
+      const totalPages = getPdfPagesCount();
       const newFields: TLocalField[] = [];
 
-      pages.forEach((_, index) => {
-        const pageNumber = index + 1;
+      if (totalPages < 1) {
+        return newFields;
+      }
 
+      for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
         if (pageNumber === field.page) {
-          return;
+          continue;
         }
 
         const newField: TLocalField = {
@@ -241,7 +244,7 @@ export const useEditorFields = ({
 
         append(newField);
         newFields.push(newField);
-      });
+      }
 
       triggerFieldsUpdate();
       return newFields;

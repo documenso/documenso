@@ -220,6 +220,7 @@ const VirtualizedPageList = ({
       ref={contentRef}
       // Note: This is actually used.
       data-pdf-content=""
+      data-page-count={numPages}
       style={{
         height: `${totalSize}px`,
         width: '100%',

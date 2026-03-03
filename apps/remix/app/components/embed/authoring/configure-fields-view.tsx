@@ -11,7 +11,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { PDF_VIEWER_PAGE_SELECTOR, getPdfPagesCount } from '@documenso/lib/constants/pdf-viewer';
 import { type TFieldMetaSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
 import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
@@ -203,13 +203,15 @@ export const ConfigureFieldsView = ({
         }
 
         if (duplicateAll) {
-          const pages = Array.from(document.querySelectorAll(PDF_VIEWER_PAGE_SELECTOR));
+          const totalPages = getPdfPagesCount();
 
-          pages.forEach((_, index) => {
-            const pageNumber = index + 1;
+          if (totalPages < 1) {
+            return;
+          }
 
+          for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
             if (pageNumber === lastActiveField.pageNumber) {
-              return;
+              continue;
             }
 
             const newField: TConfigureFieldsFormSchema['fields'][0] = {
@@ -222,7 +224,7 @@ export const ConfigureFieldsView = ({
             };
 
             append(newField);
-          });
+          }
 
           return;
         }
