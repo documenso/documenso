@@ -73,7 +73,7 @@ route.get(
       c,
       envelopeItem,
       version,
-      cacheStrategy: 'public',
+      cacheStrategy: 'private',
     });
   },
 );
