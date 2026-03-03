@@ -1,4 +1,4 @@
-import { lazy, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 
 import { Plural, Trans } from '@lingui/react/macro';
 import { EnvelopeType, RecipientRole } from '@prisma/client';
@@ -23,6 +23,7 @@ import { SignFieldNumberDialog } from '~/components/dialogs/sign-field-number-di
 import { SignFieldSignatureDialog } from '~/components/dialogs/sign-field-signature-dialog';
 import { SignFieldTextDialog } from '~/components/dialogs/sign-field-text-dialog';
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
+import { EnvelopeSignerPageRenderer } from '~/components/general/envelope-signing/envelope-signer-page-renderer';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
 
 import { BrandingLogo } from '../branding-logo';
@@ -33,10 +34,6 @@ import { EnvelopeSignerHeader } from '../envelope-signing/envelope-signer-header
 import { DocumentSigningMobileWidget } from './document-signing-mobile-widget';
 import { DocumentSigningRejectDialog } from './document-signing-reject-dialog';
 import { useRequiredEnvelopeSigningContext } from './envelope-signing-provider';
-
-const EnvelopeSignerPageRenderer = lazy(
-  async () => import('~/components/general/envelope-signing/envelope-signer-page-renderer'),
-);
 
 export const DocumentSigningPageViewV2 = () => {
   const { envelopeItems, currentEnvelopeItem, setCurrentEnvelopeItem } = useCurrentEnvelopeRender();

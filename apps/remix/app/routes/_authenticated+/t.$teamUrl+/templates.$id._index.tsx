@@ -1,5 +1,3 @@
-import { lazy } from 'react';
-
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentSigningOrder, SigningStatus } from '@prisma/client';
@@ -23,6 +21,7 @@ import { TemplateBulkSendDialog } from '~/components/dialogs/template-bulk-send-
 import { TemplateDirectLinkDialog } from '~/components/dialogs/template-direct-link-dialog';
 import { TemplateUseDialog } from '~/components/dialogs/template-use-dialog';
 import { EnvelopeRendererFileSelector } from '~/components/general/envelope-editor/envelope-file-selector';
+import { EnvelopeGenericPageRenderer } from '~/components/general/envelope-editor/envelope-generic-page-renderer';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
 import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
@@ -36,10 +35,6 @@ import { TemplatesTableActionDropdown } from '~/components/tables/templates-tabl
 import { useCurrentTeam } from '~/providers/team';
 
 import type { Route } from './+types/templates.$id._index';
-
-const EnvelopeGenericPageRenderer = lazy(
-  async () => import('~/components/general/envelope-editor/envelope-generic-page-renderer'),
-);
 
 export default function TemplatePage({ params }: Route.ComponentProps) {
   const { t } = useLingui();

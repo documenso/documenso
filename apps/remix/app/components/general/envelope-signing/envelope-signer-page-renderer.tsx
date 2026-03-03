@@ -52,7 +52,7 @@ type GenericLocalField = TEnvelope['fields'][number] & {
   recipient: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>;
 };
 
-export default function EnvelopeSignerPageRenderer({ pageData }: { pageData: PageRenderData }) {
+export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
   const { t, i18n } = useLingui();
   const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
   const { sessionData } = useOptionalSession();
@@ -558,4 +558,4 @@ export default function EnvelopeSignerPageRenderer({ pageData }: { pageData: Pag
       <div className="konva-container absolute inset-0 z-10 w-full" ref={konvaContainer}></div>
     </>
   );
-}
+};
