@@ -102,7 +102,7 @@ export const ConfigureFieldsView = ({
     }
 
     return configData.documentData.data;
-  }, [configData.documentData]);
+  }, [configData.documentData, envelopeItem, presignToken]);
 
   const recipients = useMemo(() => {
     return configData.signers.map<Recipient>((signer, index) => ({

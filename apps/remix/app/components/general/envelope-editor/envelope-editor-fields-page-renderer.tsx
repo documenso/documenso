@@ -28,11 +28,7 @@ import { CommandDialog } from '@documenso/ui/primitives/command';
 import { fieldButtonList } from './envelope-editor-fields-drag-drop';
 import { EnvelopeRecipientSelectorCommand } from './envelope-recipient-selector';
 
-export default function EnvelopeEditorFieldsPageRenderer({
-  pageData,
-}: {
-  pageData: PageRenderData;
-}) {
+export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
   const { t, i18n } = useLingui();
   const { envelope, editorFields, getRecipientColorKey } = useCurrentEnvelopeEditor();
   const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
@@ -633,7 +629,7 @@ export default function EnvelopeEditorFieldsPageRenderer({
       <div className="konva-container absolute inset-0 z-10 w-full" ref={konvaContainer}></div>
     </>
   );
-}
+};
 
 type FieldActionButtonsProps = React.HTMLAttributes<HTMLDivElement> & {
   handleDuplicateSelectedFields: () => void;

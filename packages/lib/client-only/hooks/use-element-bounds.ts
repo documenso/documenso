@@ -36,7 +36,7 @@ export const useElementBounds = (elementOrSelector: HTMLElement | string, withSc
 
   useEffect(() => {
     setBounds(calculateBounds());
-  }, []);
+  }, [calculateBounds]);
 
   useEffect(() => {
     const onResize = () => {
@@ -48,7 +48,7 @@ export const useElementBounds = (elementOrSelector: HTMLElement | string, withSc
     return () => {
       window.removeEventListener('resize', onResize);
     };
-  }, []);
+  }, [calculateBounds]);
 
   useEffect(() => {
     const $el =
@@ -69,7 +69,7 @@ export const useElementBounds = (elementOrSelector: HTMLElement | string, withSc
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [elementOrSelector, calculateBounds]);
 
   return bounds;
 };

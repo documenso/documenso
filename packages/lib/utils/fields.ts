@@ -2,6 +2,8 @@ import type { I18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { type Envelope, type Field, FieldType } from '@prisma/client';
 
+import { PDF_VIEWER_CONTENT_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+
 import { extractLegacyIds } from '../universal/id';
 
 /**
@@ -23,7 +25,7 @@ export const sortFieldsByPosition = (fields: Field[]): Field[] => {
  */
 export const validateFieldsInserted = (fields: Field[]): boolean => {
   const fieldCardElements = document.getElementsByClassName('field-card-container');
-  const pdfContent = document.querySelector('[data-pdf-content]');
+  const pdfContent = document.querySelector(PDF_VIEWER_CONTENT_SELECTOR);
 
   const uninsertedFields = sortFieldsByPosition(fields.filter((field) => !field.inserted));
 

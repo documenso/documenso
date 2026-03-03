@@ -18,7 +18,7 @@ type GenericLocalField = TEnvelope['fields'][number] & {
   recipient: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>;
 };
 
-export default function EnvelopeGenericPageRenderer({ pageData }: { pageData: PageRenderData }) {
+export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
   const { i18n } = useLingui();
 
   const {
@@ -70,7 +70,7 @@ export default function EnvelopeGenericPageRenderer({ pageData }: { pageData: Pa
           (recipient.signingStatus === SigningStatus.SIGNED ? inserted : true) ||
           fieldMeta?.readOnly,
       );
-  }, [fields, pageNumber, currentEnvelopeItem?.id, recipients]);
+  }, [fields, pageNumber, currentEnvelopeItem?.id, recipients, envelopeStatus]);
 
   const unsafeRenderFieldOnLayer = (field: GenericLocalField) => {
     if (!pageLayer.current) {
@@ -173,4 +173,4 @@ export default function EnvelopeGenericPageRenderer({ pageData }: { pageData: Pa
       <div className="konva-container absolute inset-0 z-10 w-full" ref={konvaContainer}></div>
     </>
   );
-}
+};

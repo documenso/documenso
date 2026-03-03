@@ -1,4 +1,4 @@
-import { lazy, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { type DocumentData, DocumentStatus, type EnvelopeItem, EnvelopeType } from '@prisma/client';
@@ -28,10 +28,7 @@ import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-
 import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
 
 import { EnvelopeRendererFileSelector } from '../envelope-editor/envelope-file-selector';
-
-const EnvelopeGenericPageRenderer = lazy(
-  async () => import('~/components/general/envelope-editor/envelope-generic-page-renderer'),
-);
+import { EnvelopeGenericPageRenderer } from '../envelope-editor/envelope-generic-page-renderer';
 
 export type DocumentCertificateQRViewProps = {
   documentId: number;

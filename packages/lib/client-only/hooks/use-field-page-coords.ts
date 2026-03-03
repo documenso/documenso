@@ -3,7 +3,10 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Field } from '@prisma/client';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import {
+  PDF_VIEWER_CONTENT_SELECTOR,
+  PDF_VIEWER_PAGE_SELECTOR,
+} from '@documenso/lib/constants/pdf-viewer';
 
 export const useFieldPageCoords = (
   field: Pick<Field, 'positionX' | 'positionY' | 'width' | 'height' | 'page'>,
@@ -88,6 +91,8 @@ export const useFieldPageCoords = (
 
     // Watch for DOM mutations to detect when the page element appears (e.g.
     // after the virtual list scrolls to a new page and renders it).
+    // Scope to the PDF viewer content container to avoid firing on unrelated
+    // DOM changes elsewhere in the document.
     const mutationObserver = new MutationObserver(() => {
       const $page = document.querySelector<HTMLElement>(pageSelector);
 
@@ -95,9 +100,6 @@ export const useFieldPageCoords = (
         return;
       }
 
-      // Only recalculate when the observed page element has changed (e.g. new
-      // element appeared after virtual list scroll). Skip when mutations are
-      // from elsewhere in the DOM and the page element is unchanged.
       if ($page === observedElement) {
         return;
       }
@@ -106,7 +108,9 @@ export const useFieldPageCoords = (
       attachResizeObserver($page);
     });
 
-    mutationObserver.observe(document.body, {
+    const $container = document.querySelector(PDF_VIEWER_CONTENT_SELECTOR) ?? document.body;
+
+    mutationObserver.observe($container, {
       childList: true,
       subtree: true,
     });

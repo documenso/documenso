@@ -6,7 +6,10 @@ import { createPortal } from 'react-dom';
 import { useElementBounds } from '@documenso/lib/client-only/hooks/use-element-bounds';
 import { useFieldPageCoords } from '@documenso/lib/client-only/hooks/use-field-page-coords';
 import { useIsPageInDom } from '@documenso/lib/client-only/hooks/use-is-page-in-dom';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import {
+  PDF_VIEWER_CONTENT_SELECTOR,
+  PDF_VIEWER_PAGE_SELECTOR,
+} from '@documenso/lib/constants/pdf-viewer';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 
 import type { RecipientColorStyles } from '../../lib/recipient-colors';
@@ -96,7 +99,7 @@ export function FieldRootContainer({
     // `data-validate` attribute will not have been set yet. The signal on the
     // `[data-pdf-content]` container bridges this gap so newly-rendered fields
     // pick up the validation state immediately.
-    const pdfContent = document.querySelector('[data-pdf-content]');
+    const pdfContent = document.querySelector(PDF_VIEWER_CONTENT_SELECTOR);
 
     if (
       pdfContent?.getAttribute('data-validate-fields') === 'true' &&

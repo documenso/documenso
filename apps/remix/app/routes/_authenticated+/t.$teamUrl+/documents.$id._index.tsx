@@ -1,5 +1,3 @@
-import { lazy } from 'react';
-
 import { msg } from '@lingui/core/macro';
 import { Plural, Trans, useLingui } from '@lingui/react/macro';
 import { DocumentStatus } from '@prisma/client';
@@ -35,6 +33,7 @@ import {
   FRIENDLY_STATUS_MAP,
 } from '~/components/general/document/document-status';
 import { EnvelopeRendererFileSelector } from '~/components/general/envelope-editor/envelope-file-selector';
+import { EnvelopeGenericPageRenderer } from '~/components/general/envelope-editor/envelope-generic-page-renderer';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
 import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
@@ -42,10 +41,6 @@ import { StackAvatarsWithTooltip } from '~/components/general/stack-avatars-with
 import { useCurrentTeam } from '~/providers/team';
 
 import type { Route } from './+types/documents.$id._index';
-
-const EnvelopeGenericPageRenderer = lazy(
-  async () => import('~/components/general/envelope-editor/envelope-generic-page-renderer'),
-);
 
 export default function DocumentPage({ params }: Route.ComponentProps) {
   const { t } = useLingui();

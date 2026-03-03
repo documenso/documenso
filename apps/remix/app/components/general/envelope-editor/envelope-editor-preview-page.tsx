@@ -1,4 +1,4 @@
-import { lazy, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { faker } from '@faker-js/faker/locale/en';
 import { Trans } from '@lingui/react/macro';
@@ -21,13 +21,10 @@ import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/al
 import { RecipientSelector } from '@documenso/ui/primitives/recipient-selector';
 import { Separator } from '@documenso/ui/primitives/separator';
 
+import { EnvelopeGenericPageRenderer } from '~/components/general/envelope-editor/envelope-generic-page-renderer';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
 
 import { EnvelopeRendererFileSelector } from './envelope-file-selector';
-
-const EnvelopeGenericPageRenderer = lazy(
-  async () => import('~/components/general/envelope-editor/envelope-generic-page-renderer'),
-);
 
 // Todo: Envelopes - Dynamically import faker
 export const EnvelopeEditorPreviewPage = () => {

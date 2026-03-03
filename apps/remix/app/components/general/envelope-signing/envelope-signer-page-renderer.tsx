@@ -129,7 +129,7 @@ export default function EnvelopeSignerPageRenderer({ pageData }: { pageData: Pag
           },
         }));
     });
-  }, [envelope.recipients, pageNumber]);
+  }, [envelope.recipients, pageNumber, currentEnvelopeItem?.id]);
 
   const unsafeRenderFieldOnLayer = (unparsedField: Field & { signature?: Signature | null }) => {
     if (!pageLayer.current) {

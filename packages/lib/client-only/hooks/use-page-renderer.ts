@@ -73,7 +73,7 @@ export const usePageRenderer = (renderFunction: RenderFunction, pageData: PageRe
       stage.current?.destroy();
       stage.current = null;
     };
-  }, [imageLoadingState]);
+  }, [imageLoadingState, scaledViewport]);
 
   return {
     konvaContainer,

@@ -50,7 +50,7 @@ import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-
 import { useCurrentTeam } from '~/providers/team';
 
 import { EnvelopeEditorFieldDragDrop } from './envelope-editor-fields-drag-drop';
-import EnvelopeEditorFieldsPageRenderer from './envelope-editor-fields-page-renderer';
+import { EnvelopeEditorFieldsPageRenderer } from './envelope-editor-fields-page-renderer';
 import { EnvelopeRendererFileSelector } from './envelope-file-selector';
 import { EnvelopeRecipientSelector } from './envelope-recipient-selector';
 

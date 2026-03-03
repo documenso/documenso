@@ -153,7 +153,7 @@ export const EnvelopeRenderProvider = ({
           const pdfUrl = getDocumentDataUrl({
             envelopeId: envelope.id,
             envelopeItemId: item.id,
-            documentDataId: item.documentDataId ?? '',
+            documentDataId: item.documentDataId,
             version,
             token,
             presignToken,
