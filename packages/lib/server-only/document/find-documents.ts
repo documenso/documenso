@@ -32,6 +32,11 @@ export type FindDocumentsOptions = {
   senderIds?: number[];
   query?: string;
   folderId?: string;
+  /**
+   * When true (default), use a windowed count that caps early for faster pagination.
+   * When false, use a full COUNT(*) for exact totals — preferred for external API consumers.
+   */
+  useWindowedCount?: boolean;
 };
 
 /**
@@ -106,6 +111,7 @@ export const findDocuments = async ({
   senderIds,
   query = '',
   folderId,
+  useWindowedCount = true,
 }: FindDocumentsOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: { id: userId },
@@ -541,7 +547,6 @@ export const findDocuments = async ({
   }
 
   const offset = Math.max(page - 1, 0) * perPage;
-  const countLimit = offset + COUNT_WINDOW_SIZE * perPage + 1;
 
   // Data query: paginated, executed directly via Kysely query builder
   const dataQuery = filteredQuery
@@ -549,11 +554,16 @@ export const findDocuments = async ({
     .limit(perPage)
     .offset(offset);
 
-  // Count query: wrap the filtered query as a subquery with a LIMIT window,
-  // then COUNT the result. This avoids scanning all qualifying rows.
-  const countQuery = kyselyPrisma.$kysely
-    .selectFrom(filteredQuery.clearSelect().select('Envelope.id').limit(countLimit).as('windowed'))
-    .select(({ fn }) => fn.count<number>('id').as('total'));
+  // Count query: either windowed (fast, capped) or full (exact, for API consumers).
+  const baseCountQuery = filteredQuery.clearSelect().select('Envelope.id');
+
+  const countQuery = useWindowedCount
+    ? kyselyPrisma.$kysely
+        .selectFrom(baseCountQuery.limit(offset + COUNT_WINDOW_SIZE * perPage + 1).as('windowed'))
+        .select(({ fn }) => fn.count<number>('id').as('total'))
+    : kyselyPrisma.$kysely
+        .selectFrom(baseCountQuery.as('filtered'))
+        .select(({ fn }) => fn.count<number>('id').as('total'));
 
   const [dataResult, countResult] = await Promise.all([
     dataQuery.execute(),
@@ -561,7 +571,10 @@ export const findDocuments = async ({
   ]);
 
   const ids = dataResult.map((row) => row.id);
-  const totalCount = Math.min(Number(countResult.total ?? 0), offset + COUNT_WINDOW_SIZE * perPage);
+
+  const totalCount = useWindowedCount
+    ? Math.min(Number(countResult.total ?? 0), offset + COUNT_WINDOW_SIZE * perPage)
+    : Number(countResult.total ?? 0);
 
   // ─── Hydrate with Prisma ─────────────────────────────────────────────
 
