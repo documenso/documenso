@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
 import { CheckCircle2, Clock8, DownloadIcon, EyeIcon, Loader2 } from 'lucide-react';
@@ -106,7 +105,6 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 }
 
 export default function CompletedSigningPage({ loaderData }: Route.ComponentProps) {
-  const { _ } = useLingui();
   const revalidator = useRevalidator();
 
   const { sessionData } = useOptionalSession();
@@ -159,8 +157,12 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
     });
 
     setQrRetryCount(nextRetryCount);
-    await revalidator.revalidate();
-    setIsRetryingQrLink(false);
+
+    try {
+      await revalidator.revalidate();
+    } finally {
+      setIsRetryingQrLink(false);
+    }
   }, [isDocumentAccessValid, qrRetryCount, revalidator]);
 
   const isFullyCompleted = isDocumentAccessValid && signingStatus === 'COMPLETED';
@@ -296,7 +298,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
           <div className="mt-8 flex w-full max-w-xs flex-col items-stretch gap-4 md:w-auto md:max-w-none md:flex-row md:items-center">
             {isFullyCompleted && hasQrToken && (
               <Button asChild variant="secondary" className="w-full">
-                <Link to={`/share/${document.qrToken}`}>
+                <Link to={`/share/${document.qrToken}`} target="_blank" rel="noopener noreferrer">
                   <EyeIcon className="mr-2 h-5 w-5" />
                   <Trans>View completed PDF</Trans>
                 </Link>

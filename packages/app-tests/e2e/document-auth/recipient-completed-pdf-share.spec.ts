@@ -8,6 +8,8 @@ import { seedUser } from '@documenso/prisma/seed/users';
 
 import { signSignaturePad } from '../fixtures/signature';
 
+test.describe.configure({ mode: 'parallel', timeout: 60000 });
+
 const completeSigningForRecipient = async ({
   page,
   token,
@@ -113,7 +115,7 @@ test('[DOCUMENT_AUTH]: recipient cannot access final view action before full com
 test('[DOCUMENT_AUTH]: invalid QR share token is denied', async ({ page }) => {
   await page.goto('/share/qr_invalid_token');
 
-  await expect(page.getByRole('heading', { name: 'Unable to open this document' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Unable to Open Document' })).toBeVisible();
   await expect(page.getByText('Support code:')).toBeVisible();
 });
 
@@ -186,7 +188,7 @@ test('[DOCUMENT_AUTH]: disabling public completed-document access revokes QR sha
   });
 
   await page.goto(`/share/${completedEnvelope.qrToken}`);
-  await expect(page.getByRole('heading', { name: 'Unable to open this document' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Unable to Open Document' })).toBeVisible();
   await expect(
     page.getByText('Public completed-document access is currently disabled.'),
   ).toBeVisible();

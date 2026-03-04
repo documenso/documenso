@@ -1,7 +1,8 @@
 import { Trans } from '@lingui/react/macro';
 import { AlertCircle } from 'lucide-react';
 import { nanoid } from 'nanoid';
-import { Link, isRouteErrorResponse, redirect, useLoaderData, useRouteError } from 'react-router';
+import { Link, isRouteErrorResponse, redirect, useLoaderData } from 'react-router';
+import { match } from 'ts-pattern';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -64,27 +65,23 @@ export function meta({ params: { slug }, loaderData }: Route.MetaArgs) {
 
 type TQrShareErrorPayload = {
   code: string;
-  message: string;
   correlationId: string;
 };
 
 const createQrShareErrorResponse = ({
   status,
   code,
-  message,
   correlationId,
   headers,
 }: {
   status: number;
   code: string;
-  message: string;
   correlationId: string;
   headers?: HeadersInit;
 }) => {
   return new Response(
     JSON.stringify({
       code,
-      message,
       correlationId,
     } satisfies TQrShareErrorPayload),
     {
@@ -106,11 +103,7 @@ const parseQrShareErrorPayload = (value: unknown): TQrShareErrorPayload | null =
   try {
     const parsed = JSON.parse(value);
 
-    if (
-      typeof parsed.code === 'string' &&
-      typeof parsed.message === 'string' &&
-      typeof parsed.correlationId === 'string'
-    ) {
+    if (typeof parsed.code === 'string' && typeof parsed.correlationId === 'string') {
       return parsed;
     }
 
@@ -148,7 +141,6 @@ export const loader = async ({ request, params: { slug } }: Route.LoaderArgs) =>
       throw createQrShareErrorResponse({
         status: 429,
         code: 'QR_VIEW_RATE_LIMITED',
-        message: 'Too many requests. Please try again shortly.',
         correlationId,
         headers: {
           'Retry-After': retryAfter,
@@ -180,27 +172,24 @@ export const loader = async ({ request, params: { slug } }: Route.LoaderArgs) =>
     } catch (error) {
       const appError = AppError.parseError(error);
 
-      let status = 500;
-      let code = 'QR_VIEW_INTERNAL_ERROR';
-      let message = 'An unexpected error occurred while opening this document.';
-
-      if (appError.code === AppErrorCode.NOT_FOUND) {
-        status = 404;
-        code = 'QR_VIEW_NOT_FOUND';
-        message = 'The shared document could not be found.';
-      } else if (appError.code === AppErrorCode.INVALID_REQUEST || appError.statusCode === 409) {
-        status = 409;
-        code = 'QR_VIEW_NOT_COMPLETED';
-        message = 'This document is not fully completed yet.';
-      } else if (appError.code === AppErrorCode.UNAUTHORIZED && appError.statusCode === 403) {
-        status = 403;
-        code = 'QR_VIEW_DISABLED';
-        message = 'Public completed-document access is currently disabled.';
-      } else if (appError.code === AppErrorCode.UNAUTHORIZED) {
-        status = 401;
-        code = 'QR_VIEW_UNAUTHORIZED';
-        message = 'You are not authorized to view this document.';
-      }
+      const { status, code } = match(appError)
+        .when(
+          (e) => e.code === AppErrorCode.NOT_FOUND,
+          () => ({ status: 404, code: 'QR_VIEW_NOT_FOUND' }),
+        )
+        .when(
+          (e) => e.code === AppErrorCode.INVALID_REQUEST,
+          () => ({ status: 409, code: 'QR_VIEW_NOT_COMPLETED' }),
+        )
+        .when(
+          (e) => e.code === AppErrorCode.UNAUTHORIZED && e.statusCode === 403,
+          () => ({ status: 403, code: 'QR_VIEW_DISABLED' }),
+        )
+        .when(
+          (e) => e.code === AppErrorCode.UNAUTHORIZED,
+          () => ({ status: 401, code: 'QR_VIEW_UNAUTHORIZED' }),
+        )
+        .otherwise(() => ({ status: 500, code: 'QR_VIEW_INTERNAL_ERROR' }));
 
       logger.warn({
         msg: 'QR share access denied',
@@ -216,7 +205,6 @@ export const loader = async ({ request, params: { slug } }: Route.LoaderArgs) =>
       throw createQrShareErrorResponse({
         status,
         code,
-        message,
         correlationId,
       });
     }
@@ -250,11 +238,23 @@ export default function SharePage() {
     );
   }
 
-  return <div></div>;
+  return null;
 }
 
-export function ErrorBoundary() {
-  const error = useRouteError();
+const qrShareErrorMessage = (code: string | undefined) =>
+  match(code)
+    .with('QR_VIEW_NOT_FOUND', () => <Trans>The shared document could not be found.</Trans>)
+    .with('QR_VIEW_NOT_COMPLETED', () => <Trans>This document is not fully completed yet.</Trans>)
+    .with('QR_VIEW_DISABLED', () => (
+      <Trans>Public completed-document access is currently disabled.</Trans>
+    ))
+    .with('QR_VIEW_UNAUTHORIZED', () => (
+      <Trans>You are not authorized to view this document.</Trans>
+    ))
+    .with('QR_VIEW_RATE_LIMITED', () => <Trans>Too many requests. Please try again shortly.</Trans>)
+    .otherwise(() => <Trans>Something went wrong while opening this shared view.</Trans>);
+
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   const payload = isRouteErrorResponse(error) ? parseQrShareErrorPayload(error.data) : null;
 
   return (
@@ -266,11 +266,7 @@ export function ErrorBoundary() {
           <h2 className="text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
             <Trans>Unable to Open Document</Trans>
           </h2>
-          <p className="text-sm text-muted-foreground">
-            {payload?.message ?? (
-              <Trans>Something went wrong while opening this shared view.</Trans>
-            )}
-          </p>
+          <p className="text-sm text-muted-foreground">{qrShareErrorMessage(payload?.code)}</p>
 
           {payload?.correlationId && (
             <p className="mt-4 text-xs font-medium uppercase tracking-wide text-muted-foreground">

@@ -437,6 +437,7 @@ model Envelope {
   @@index([teamId])
   @@index([folderId])
   @@index([createdAt])
+  @@index([qrToken])
 }
 
 model EnvelopeItem {

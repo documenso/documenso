@@ -23,7 +23,6 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
       type: EnvelopeType.DOCUMENT,
       qrToken: token,
     },
-    // Do not provide extra information that is not needed.
     select: {
       id: true,
       secondaryId: true,
@@ -96,10 +95,13 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
     });
   }
 
-  const firstDocumentData = result.envelopeItems[0].documentData;
+  const firstEnvelopeItem = result.envelopeItems[0];
 
-  if (!firstDocumentData) {
-    throw new Error('Missing document data');
+  if (!firstEnvelopeItem?.documentData) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Missing document data for QR token',
+      statusCode: 404,
+    });
   }
 
   return {
@@ -109,6 +111,6 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
     completedAt: result.completedAt,
     envelopeItems: result.envelopeItems,
     recipientCount: result._count.recipients,
-    documentTeamUrl: result.team?.url ?? '',
+    documentTeamUrl: result.team.url,
   };
 };

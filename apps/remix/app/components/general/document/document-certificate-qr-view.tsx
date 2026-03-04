@@ -9,6 +9,7 @@ import {
   EnvelopeRenderProvider,
   useCurrentEnvelopeRender,
 } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
@@ -52,9 +53,12 @@ export const DocumentCertificateQRView = ({
   completedDate,
   token,
 }: DocumentCertificateQRViewProps) => {
-  const { data: documentViaUser } = trpc.document.get.useQuery({
-    documentId,
-  });
+  const { sessionData } = useOptionalSession();
+
+  const { data: documentViaUser } = trpc.document.get.useQuery(
+    { documentId },
+    { enabled: !!sessionData?.user },
+  );
 
   const [isDialogOpen, setIsDialogOpen] = useState(() => !!documentViaUser);
 

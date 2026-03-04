@@ -1,8 +1,6 @@
 import { sValidator } from '@hono/standard-validator';
-import { DocumentStatus } from '@prisma/client';
-import type { Prisma } from '@prisma/client';
-import { Hono } from 'hono';
-import type { Context } from 'hono';
+import { DocumentStatus, type Prisma } from '@prisma/client';
+import { type Context, Hono } from 'hono';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
@@ -58,7 +56,7 @@ const envelopeItemTokenInclude = {
 } as const;
 
 const maybeApplyQrRateLimit = async (c: Context<HonoEnv>, token: string) => {
-  let ip = 'unknown';
+  let ip: string;
 
   try {
     ip = getIpAddress(c.req.raw);
@@ -72,6 +70,65 @@ const maybeApplyQrRateLimit = async (c: Context<HonoEnv>, token: string) => {
   });
 
   return rateLimitResponse(c, result);
+};
+
+const getEnvelopeItemByToken = async (
+  c: Context<HonoEnv>,
+  token: string,
+  envelopeItemId: string,
+) => {
+  const isQrToken = token.startsWith('qr_');
+
+  if (isQrToken) {
+    const limited = await maybeApplyQrRateLimit(c, token);
+
+    if (limited) {
+      return { limited } as const;
+    }
+  }
+
+  const envelopeWhereQuery: Prisma.EnvelopeItemWhereUniqueInput = isQrToken
+    ? {
+        id: envelopeItemId,
+        envelope: {
+          qrToken: token,
+          status: DocumentStatus.COMPLETED,
+        },
+      }
+    : {
+        id: envelopeItemId,
+        envelope: {
+          recipients: {
+            some: {
+              token,
+            },
+          },
+        },
+      };
+
+  const envelopeItem = await prisma.envelopeItem.findUnique({
+    where: envelopeWhereQuery,
+    include: envelopeItemTokenInclude,
+  });
+
+  if (!envelopeItem) {
+    return { error: c.json({ error: 'Envelope item not found' }, 404) } as const;
+  }
+
+  if (isQrToken && !isPublicDocumentAccessEnabled(envelopeItem.envelope.team)) {
+    return {
+      error: c.json(
+        { error: 'Public completed-document access is disabled for this document' },
+        403,
+      ),
+    } as const;
+  }
+
+  if (!envelopeItem.documentData) {
+    return { error: c.json({ error: 'Document data not found' }, 404) } as const;
+  }
+
+  return { envelopeItem, isQrToken } as const;
 };
 
 export const filesRoute = new Hono<HonoEnv>()
@@ -270,61 +327,21 @@ export const filesRoute = new Hono<HonoEnv>()
     sValidator('param', ZGetEnvelopeItemFileTokenRequestParamsSchema),
     async (c) => {
       const { token, envelopeItemId } = c.req.valid('param');
-      const isQrToken = token.startsWith('qr_');
 
-      if (isQrToken) {
-        const limited = await maybeApplyQrRateLimit(c, token);
+      const result = await getEnvelopeItemByToken(c, token, envelopeItemId);
 
-        if (limited) {
-          return limited;
-        }
+      if ('limited' in result) {
+        return result.limited;
       }
 
-      let envelopeWhereQuery: Prisma.EnvelopeItemWhereUniqueInput = {
-        id: envelopeItemId,
-        envelope: {
-          recipients: {
-            some: {
-              token,
-            },
-          },
-        },
-      };
-
-      if (isQrToken) {
-        envelopeWhereQuery = {
-          id: envelopeItemId,
-          envelope: {
-            qrToken: token,
-            status: DocumentStatus.COMPLETED,
-          },
-        };
-      }
-
-      const envelopeItem = await prisma.envelopeItem.findUnique({
-        where: envelopeWhereQuery,
-        include: envelopeItemTokenInclude,
-      });
-
-      if (!envelopeItem) {
-        return c.json({ error: 'Envelope item not found' }, 404);
-      }
-
-      if (isQrToken && !isPublicDocumentAccessEnabled(envelopeItem.envelope.team)) {
-        return c.json(
-          { error: 'Public completed-document access is disabled for this document' },
-          403,
-        );
-      }
-
-      if (!envelopeItem.documentData) {
-        return c.json({ error: 'Document data not found' }, 404);
+      if ('error' in result) {
+        return result.error;
       }
 
       return await handleEnvelopeItemFileRequest({
-        title: envelopeItem.title,
-        status: envelopeItem.envelope.status,
-        documentData: envelopeItem.documentData,
+        title: result.envelopeItem.title,
+        status: result.envelopeItem.envelope.status,
+        documentData: result.envelopeItem.documentData!,
         version: 'signed',
         isDownload: false,
         context: c,
@@ -336,62 +353,23 @@ export const filesRoute = new Hono<HonoEnv>()
     sValidator('param', ZGetEnvelopeItemFileTokenDownloadRequestParamsSchema),
     async (c) => {
       const { token, envelopeItemId, version } = c.req.valid('param');
-      const isQrToken = token.startsWith('qr_');
-      const effectiveVersion = isQrToken ? 'signed' : version;
 
-      if (isQrToken) {
-        const limited = await maybeApplyQrRateLimit(c, token);
+      const result = await getEnvelopeItemByToken(c, token, envelopeItemId);
 
-        if (limited) {
-          return limited;
-        }
+      if ('limited' in result) {
+        return result.limited;
       }
 
-      let envelopeWhereQuery: Prisma.EnvelopeItemWhereUniqueInput = {
-        id: envelopeItemId,
-        envelope: {
-          recipients: {
-            some: {
-              token,
-            },
-          },
-        },
-      };
-
-      if (isQrToken) {
-        envelopeWhereQuery = {
-          id: envelopeItemId,
-          envelope: {
-            qrToken: token,
-            status: DocumentStatus.COMPLETED,
-          },
-        };
+      if ('error' in result) {
+        return result.error;
       }
 
-      const envelopeItem = await prisma.envelopeItem.findUnique({
-        where: envelopeWhereQuery,
-        include: envelopeItemTokenInclude,
-      });
-
-      if (!envelopeItem) {
-        return c.json({ error: 'Envelope item not found' }, 404);
-      }
-
-      if (isQrToken && !isPublicDocumentAccessEnabled(envelopeItem.envelope.team)) {
-        return c.json(
-          { error: 'Public completed-document access is disabled for this document' },
-          403,
-        );
-      }
-
-      if (!envelopeItem.documentData) {
-        return c.json({ error: 'Document data not found' }, 404);
-      }
+      const effectiveVersion = result.isQrToken ? 'signed' : version;
 
       return await handleEnvelopeItemFileRequest({
-        title: envelopeItem.title,
-        status: envelopeItem.envelope.status,
-        documentData: envelopeItem.documentData,
+        title: result.envelopeItem.title,
+        status: result.envelopeItem.envelope.status,
+        documentData: result.envelopeItem.documentData!,
         version: effectiveVersion,
         isDownload: true,
         context: c,
