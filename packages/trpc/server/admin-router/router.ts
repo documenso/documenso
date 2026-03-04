@@ -22,6 +22,7 @@ import { reregisterEmailDomainRoute } from './reregister-email-domain';
 import { resealDocumentRoute } from './reseal-document';
 import { resetTwoFactorRoute } from './reset-two-factor-authentication';
 import { resyncLicenseRoute } from './resync-license';
+import { swapOrganisationSubscriptionRoute } from './swap-organisation-subscription';
 import { updateAdminOrganisationRoute } from './update-admin-organisation';
 import { updateOrganisationMemberRoleRoute } from './update-organisation-member-role';
 import { updateRecipientRoute } from './update-recipient';
@@ -35,6 +36,7 @@ export const adminRouter = router({
     get: getAdminOrganisationRoute,
     create: createAdminOrganisationRoute,
     update: updateAdminOrganisationRoute,
+    swapSubscription: swapOrganisationSubscriptionRoute,
   },
   organisationMember: {
     promoteToOwner: promoteMemberToOwnerRoute,
