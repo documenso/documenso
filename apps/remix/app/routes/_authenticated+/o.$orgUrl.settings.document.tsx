@@ -55,6 +55,7 @@ export default function OrganisationSettingsDocumentPage() {
         documentDateFormat,
         includeSenderDetails,
         includeSigningCertificate,
+        allowPublicCompletedDocumentAccess,
         includeAuditLog,
         signatureTypes,
         defaultRecipients,
@@ -69,6 +70,7 @@ export default function OrganisationSettingsDocumentPage() {
         documentDateFormat === null ||
         includeSenderDetails === null ||
         includeSigningCertificate === null ||
+        allowPublicCompletedDocumentAccess === null ||
         includeAuditLog === null ||
         aiFeaturesEnabled === null
       ) {
@@ -84,6 +86,7 @@ export default function OrganisationSettingsDocumentPage() {
           documentDateFormat,
           includeSenderDetails,
           includeSigningCertificate,
+          allowPublicCompletedDocumentAccess,
           includeAuditLog,
           defaultRecipients,
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),

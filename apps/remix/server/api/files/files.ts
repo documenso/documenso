@@ -1,12 +1,17 @@
 import { sValidator } from '@hono/standard-validator';
+import { DocumentStatus } from '@prisma/client';
 import type { Prisma } from '@prisma/client';
 import { Hono } from 'hono';
+import type { Context } from 'hono';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+import { qrShareViewRateLimit } from '@documenso/lib/server-only/rate-limit/rate-limits';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
+import { sha256 } from '@documenso/lib/universal/crypto';
+import { getIpAddress } from '@documenso/lib/universal/get-ip-address';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 import { prisma } from '@documenso/prisma';
@@ -23,6 +28,63 @@ import {
   ZGetPresignedPostUrlRequestSchema,
   ZUploadPdfRequestSchema,
 } from './files.types';
+
+const isQrSharingEnabledForEnvelopeItem = (envelopeItem: {
+  envelope: {
+    team: {
+      teamGlobalSettings: {
+        allowPublicCompletedDocumentAccess: boolean | null;
+      } | null;
+      organisation: {
+        organisationGlobalSettings: {
+          allowPublicCompletedDocumentAccess: boolean;
+        };
+      };
+    } | null;
+  };
+}) => {
+  const team = envelopeItem.envelope.team;
+
+  if (!team) {
+    return true;
+  }
+
+  return (
+    team.teamGlobalSettings?.allowPublicCompletedDocumentAccess ??
+    team.organisation.organisationGlobalSettings.allowPublicCompletedDocumentAccess
+  );
+};
+
+const maybeApplyQrRateLimit = async ({ c, token }: { c: Context<HonoEnv>; token: string }) => {
+  let ip = 'unknown';
+
+  try {
+    ip = getIpAddress(c.req.raw);
+  } catch {
+    ip = 'unknown';
+  }
+
+  const tokenFingerprint = Buffer.from(sha256(token)).toString('hex').slice(0, 16);
+  const result = await qrShareViewRateLimit.check({
+    ip,
+    identifier: tokenFingerprint,
+  });
+
+  c.header('X-RateLimit-Limit', String(result.limit));
+  c.header('X-RateLimit-Remaining', String(result.remaining));
+  c.header('X-RateLimit-Reset', String(Math.ceil(result.reset.getTime() / 1000)));
+
+  if (!result.isLimited) {
+    return null;
+  }
+
+  c.header(
+    'Retry-After',
+    String(Math.max(1, Math.ceil((result.reset.getTime() - Date.now()) / 1000))),
+  );
+
+  return c.json({ error: 'Too many requests, please try again later.' }, 429);
+};
 
 export const filesRoute = new Hono<HonoEnv>()
   /**
@@ -220,6 +282,15 @@ export const filesRoute = new Hono<HonoEnv>()
     sValidator('param', ZGetEnvelopeItemFileTokenRequestParamsSchema),
     async (c) => {
       const { token, envelopeItemId } = c.req.valid('param');
+      const isQrToken = token.startsWith('qr_');
+
+      if (isQrToken) {
+        const rateLimitResponse = await maybeApplyQrRateLimit({ c, token });
+
+        if (rateLimitResponse) {
+          return rateLimitResponse;
+        }
+      }
 
       let envelopeWhereQuery: Prisma.EnvelopeItemWhereUniqueInput = {
         id: envelopeItemId,
@@ -232,11 +303,12 @@ export const filesRoute = new Hono<HonoEnv>()
         },
       };
 
-      if (token.startsWith('qr_')) {
+      if (isQrToken) {
         envelopeWhereQuery = {
           id: envelopeItemId,
           envelope: {
             qrToken: token,
+            status: DocumentStatus.COMPLETED,
           },
         };
       }
@@ -244,13 +316,41 @@ export const filesRoute = new Hono<HonoEnv>()
       const envelopeItem = await prisma.envelopeItem.findUnique({
         where: envelopeWhereQuery,
         include: {
-          envelope: true,
+          envelope: {
+            include: {
+              team: {
+                include: {
+                  teamGlobalSettings: {
+                    select: {
+                      allowPublicCompletedDocumentAccess: true,
+                    },
+                  },
+                  organisation: {
+                    include: {
+                      organisationGlobalSettings: {
+                        select: {
+                          allowPublicCompletedDocumentAccess: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
           documentData: true,
         },
       });
 
       if (!envelopeItem) {
         return c.json({ error: 'Envelope item not found' }, 404);
+      }
+
+      if (isQrToken && !isQrSharingEnabledForEnvelopeItem(envelopeItem)) {
+        return c.json(
+          { error: 'Public completed-document access is disabled for this document' },
+          403,
+        );
       }
 
       if (!envelopeItem.documentData) {
@@ -272,6 +372,16 @@ export const filesRoute = new Hono<HonoEnv>()
     sValidator('param', ZGetEnvelopeItemFileTokenDownloadRequestParamsSchema),
     async (c) => {
       const { token, envelopeItemId, version } = c.req.valid('param');
+      const isQrToken = token.startsWith('qr_');
+      const effectiveVersion = isQrToken ? 'signed' : version;
+
+      if (isQrToken) {
+        const rateLimitResponse = await maybeApplyQrRateLimit({ c, token });
+
+        if (rateLimitResponse) {
+          return rateLimitResponse;
+        }
+      }
 
       let envelopeWhereQuery: Prisma.EnvelopeItemWhereUniqueInput = {
         id: envelopeItemId,
@@ -284,11 +394,12 @@ export const filesRoute = new Hono<HonoEnv>()
         },
       };
 
-      if (token.startsWith('qr_')) {
+      if (isQrToken) {
         envelopeWhereQuery = {
           id: envelopeItemId,
           envelope: {
             qrToken: token,
+            status: DocumentStatus.COMPLETED,
           },
         };
       }
@@ -296,13 +407,41 @@ export const filesRoute = new Hono<HonoEnv>()
       const envelopeItem = await prisma.envelopeItem.findUnique({
         where: envelopeWhereQuery,
         include: {
-          envelope: true,
+          envelope: {
+            include: {
+              team: {
+                include: {
+                  teamGlobalSettings: {
+                    select: {
+                      allowPublicCompletedDocumentAccess: true,
+                    },
+                  },
+                  organisation: {
+                    include: {
+                      organisationGlobalSettings: {
+                        select: {
+                          allowPublicCompletedDocumentAccess: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
           documentData: true,
         },
       });
 
       if (!envelopeItem) {
         return c.json({ error: 'Envelope item not found' }, 404);
+      }
+
+      if (isQrToken && !isQrSharingEnabledForEnvelopeItem(envelopeItem)) {
+        return c.json(
+          { error: 'Public completed-document access is disabled for this document' },
+          403,
+        );
       }
 
       if (!envelopeItem.documentData) {
@@ -313,7 +452,7 @@ export const filesRoute = new Hono<HonoEnv>()
         title: envelopeItem.title,
         status: envelopeItem.envelope.status,
         documentData: envelopeItem.documentData,
-        version,
+        version: effectiveVersion,
         isDownload: true,
         context: c,
       });

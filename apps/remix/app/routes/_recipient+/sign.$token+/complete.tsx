@@ -1,8 +1,10 @@
+import { useCallback, useEffect, useState } from 'react';
+
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
-import { CheckCircle2, Clock8, DownloadIcon, Loader2 } from 'lucide-react';
-import { Link } from 'react-router';
+import { CheckCircle2, Clock8, DownloadIcon, EyeIcon, Loader2 } from 'lucide-react';
+import { Link, useRevalidator } from 'react-router';
 import { match } from 'ts-pattern';
 
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
@@ -103,29 +105,25 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
 export default function CompletedSigningPage({ loaderData }: Route.ComponentProps) {
   const { _ } = useLingui();
+  const revalidator = useRevalidator();
 
   const { sessionData } = useOptionalSession();
   const user = sessionData?.user;
 
-  const {
-    isDocumentAccessValid,
-    canSignUp,
-    recipientName,
-    signatures,
-    document,
-    recipient,
-    recipientEmail,
-    returnToHomePath,
-  } = loaderData;
+  const { isDocumentAccessValid, recipientEmail } = loaderData;
+  const signingStatusToken = isDocumentAccessValid ? loaderData.recipient.token : '';
+  const initialSigningStatus = isDocumentAccessValid
+    ? loaderData.document.status
+    : DocumentStatus.PENDING;
 
   // Poll signing status every few seconds
   const { data: signingStatusData } = trpc.envelope.signingStatus.useQuery(
     {
-      token: recipient?.token || '',
+      token: signingStatusToken,
     },
     {
       refetchInterval: 3000,
-      initialData: match(document?.status)
+      initialData: match(initialSigningStatus)
         .with(DocumentStatus.COMPLETED, () => ({ status: 'COMPLETED' }) as const)
         .with(DocumentStatus.REJECTED, () => ({ status: 'REJECTED' }) as const)
         .with(DocumentStatus.PENDING, () => ({ status: 'PENDING' }) as const)
@@ -135,10 +133,60 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
 
   // Use signing status from query if available, otherwise fall back to document status
   const signingStatus = signingStatusData?.status ?? 'PENDING';
+  const MAX_QR_RETRY_COUNT = 4;
+
+  const [qrRetryCount, setQrRetryCount] = useState(0);
+  const [isRetryingQrLink, setIsRetryingQrLink] = useState(false);
+
+  const onRetryQrLink = useCallback(async () => {
+    if (!isDocumentAccessValid) {
+      return;
+    }
+
+    if (qrRetryCount >= MAX_QR_RETRY_COUNT) {
+      return;
+    }
+
+    setIsRetryingQrLink(true);
+
+    const nextRetryCount = qrRetryCount + 1;
+    const retryDelay = Math.min(250 * 2 ** nextRetryCount, 3000);
+
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, retryDelay);
+    });
+
+    setQrRetryCount(nextRetryCount);
+    await revalidator.revalidate();
+    setIsRetryingQrLink(false);
+  }, [isDocumentAccessValid, qrRetryCount, revalidator]);
+
+  const isFullyCompleted = isDocumentAccessValid && signingStatus === 'COMPLETED';
+  const hasQrToken = isDocumentAccessValid && Boolean(loaderData.document.qrToken);
+  const supportCode = isDocumentAccessValid
+    ? `QR-${loaderData.document.id}-${loaderData.recipient.id}`
+    : '';
+
+  useEffect(() => {
+    if (
+      !isFullyCompleted ||
+      hasQrToken ||
+      isRetryingQrLink ||
+      revalidator.state !== 'idle' ||
+      qrRetryCount >= MAX_QR_RETRY_COUNT
+    ) {
+      return;
+    }
+
+    void onRetryQrLink();
+  }, [hasQrToken, isFullyCompleted, isRetryingQrLink, onRetryQrLink, qrRetryCount, revalidator]);
 
   if (!isDocumentAccessValid) {
     return <DocumentSigningAuthPageView email={recipientEmail} />;
   }
+
+  const { canSignUp, recipientName, signatures, document, recipient, returnToHomePath } =
+    loaderData;
 
   return (
     <div
@@ -244,6 +292,42 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
             ))}
 
           <div className="mt-8 flex w-full max-w-xs flex-col items-stretch gap-4 md:w-auto md:max-w-none md:flex-row md:items-center">
+            {isFullyCompleted && hasQrToken && (
+              <Button asChild variant="secondary" className="w-full">
+                <Link to={`/share/${document.qrToken}`}>
+                  <EyeIcon className="mr-2 h-5 w-5" />
+                  <Trans>View completed PDF</Trans>
+                </Link>
+              </Button>
+            )}
+
+            {isFullyCompleted && !hasQrToken && (
+              <div className="w-full rounded-md border border-orange-200 bg-orange-50 p-3 text-left text-sm text-orange-900 md:max-w-sm">
+                <p>
+                  <Trans>
+                    We are preparing your online PDF view. If it does not appear, retry below.
+                  </Trans>
+                </p>
+
+                <div className="mt-2 flex items-center justify-between gap-2">
+                  <span className="text-xs font-medium uppercase tracking-wide text-orange-700">
+                    <Trans>Support code</Trans>: {supportCode}
+                  </span>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    loading={isRetryingQrLink || revalidator.state === 'loading'}
+                    disabled={qrRetryCount >= MAX_QR_RETRY_COUNT}
+                    onClick={() => void onRetryQrLink()}
+                  >
+                    <Trans>Retry</Trans>
+                  </Button>
+                </div>
+              </div>
+            )}
+
             <DocumentShareButton
               documentId={document.id}
               token={recipient.token}
