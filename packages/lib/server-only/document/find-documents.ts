@@ -118,15 +118,10 @@ export const findDocuments = async ({
     select: { id: true, email: true, name: true },
   });
 
-  let team: (Team & { teamEmail: TeamEmail | null; currentTeamRole: TeamMemberRole }) | null = null;
+  let team = null;
 
   if (teamId !== undefined) {
-    const fullTeam = await getTeamById({ userId, teamId });
-
-    team = {
-      ...fullTeam,
-      currentTeamRole: fullTeam.currentTeamRole ?? TeamMemberRole.MEMBER,
-    };
+    team = await getTeamById({ userId, teamId });
   }
 
   const orderByColumn = orderBy?.column ?? 'createdAt';
