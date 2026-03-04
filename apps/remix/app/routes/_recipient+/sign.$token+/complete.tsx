@@ -31,6 +31,8 @@ import { DocumentSigningAuthPageView } from '~/components/general/document-signi
 
 import type { Route } from './+types/complete';
 
+const MAX_QR_RETRY_COUNT = 4;
+
 export async function loader({ params, request }: Route.LoaderArgs) {
   const { user } = await getOptionalSession(request);
 
@@ -116,13 +118,15 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
     ? loaderData.document.status
     : DocumentStatus.PENDING;
 
-  // Poll signing status every few seconds
   const { data: signingStatusData } = trpc.envelope.signingStatus.useQuery(
     {
       token: signingStatusToken,
     },
     {
-      refetchInterval: 3000,
+      refetchInterval: (query) => {
+        const status = query.state.data?.status;
+        return status === 'COMPLETED' || status === 'REJECTED' ? false : 3000;
+      },
       initialData: match(initialSigningStatus)
         .with(DocumentStatus.COMPLETED, () => ({ status: 'COMPLETED' }) as const)
         .with(DocumentStatus.REJECTED, () => ({ status: 'REJECTED' }) as const)
@@ -131,9 +135,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
     },
   );
 
-  // Use signing status from query if available, otherwise fall back to document status
   const signingStatus = signingStatusData?.status ?? 'PENDING';
-  const MAX_QR_RETRY_COUNT = 4;
 
   const [qrRetryCount, setQrRetryCount] = useState(0);
   const [isRetryingQrLink, setIsRetryingQrLink] = useState(false);

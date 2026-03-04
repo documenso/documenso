@@ -7,7 +7,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getDocumentByAccessToken } from '@documenso/lib/server-only/document/get-document-by-access-token';
 import { qrShareViewRateLimit } from '@documenso/lib/server-only/rate-limit/rate-limits';
-import { sha256 } from '@documenso/lib/universal/crypto';
+import { tokenFingerprint } from '@documenso/lib/universal/crypto';
 import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { logger } from '@documenso/lib/utils/logger';
 import { Button } from '@documenso/ui/primitives/button';
@@ -124,11 +124,9 @@ export const loader = async ({ request, params: { slug } }: Route.LoaderArgs) =>
   if (slug.startsWith('qr_')) {
     const correlationId = request.headers.get('x-request-id') ?? nanoid(12);
     const requestMetadata = extractRequestMetadata(request);
-    const tokenFingerprint = Buffer.from(sha256(slug)).toString('hex').slice(0, 16);
-
     const rateLimitResult = await qrShareViewRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
-      identifier: tokenFingerprint,
+      identifier: tokenFingerprint(slug),
     });
 
     if (rateLimitResult.isLimited) {
@@ -190,21 +188,15 @@ export const loader = async ({ request, params: { slug } }: Route.LoaderArgs) =>
         status = 404;
         code = 'QR_VIEW_NOT_FOUND';
         message = 'The shared document could not be found.';
-      }
-
-      if (appError.code === AppErrorCode.INVALID_REQUEST || appError.statusCode === 409) {
+      } else if (appError.code === AppErrorCode.INVALID_REQUEST || appError.statusCode === 409) {
         status = 409;
         code = 'QR_VIEW_NOT_COMPLETED';
         message = 'This document is not fully completed yet.';
-      }
-
-      if (appError.code === AppErrorCode.UNAUTHORIZED && appError.statusCode === 403) {
+      } else if (appError.code === AppErrorCode.UNAUTHORIZED && appError.statusCode === 403) {
         status = 403;
         code = 'QR_VIEW_DISABLED';
         message = 'Public completed-document access is currently disabled.';
-      }
-
-      if (appError.code === AppErrorCode.UNAUTHORIZED && appError.statusCode !== 403) {
+      } else if (appError.code === AppErrorCode.UNAUTHORIZED) {
         status = 401;
         code = 'QR_VIEW_UNAUTHORIZED';
         message = 'You are not authorized to view this document.';

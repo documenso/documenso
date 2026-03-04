@@ -1,6 +1,7 @@
 import { DocumentStatus, EnvelopeType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { isPublicDocumentAccessEnabled } from '@documenso/lib/universal/document-access';
 import { prisma } from '@documenso/prisma';
 
 import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
@@ -88,12 +89,7 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
     });
   }
 
-  const allowPublicCompletedDocumentAccess =
-    result.team?.teamGlobalSettings?.allowPublicCompletedDocumentAccess ??
-    result.team?.organisation.organisationGlobalSettings.allowPublicCompletedDocumentAccess ??
-    true;
-
-  if (!allowPublicCompletedDocumentAccess) {
+  if (!isPublicDocumentAccessEnabled(result.team)) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'Public completed-document access is disabled for this document',
       statusCode: 403,

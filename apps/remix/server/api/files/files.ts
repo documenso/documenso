@@ -8,9 +8,11 @@ import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+import { rateLimitResponse } from '@documenso/lib/server-only/rate-limit/rate-limit-middleware';
 import { qrShareViewRateLimit } from '@documenso/lib/server-only/rate-limit/rate-limits';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
-import { sha256 } from '@documenso/lib/universal/crypto';
+import { tokenFingerprint } from '@documenso/lib/universal/crypto';
+import { isPublicDocumentAccessEnabled } from '@documenso/lib/universal/document-access';
 import { getIpAddress } from '@documenso/lib/universal/get-ip-address';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
@@ -29,33 +31,33 @@ import {
   ZUploadPdfRequestSchema,
 } from './files.types';
 
-const isQrSharingEnabledForEnvelopeItem = (envelopeItem: {
+const envelopeItemTokenInclude = {
   envelope: {
-    team: {
-      teamGlobalSettings: {
-        allowPublicCompletedDocumentAccess: boolean | null;
-      } | null;
-      organisation: {
-        organisationGlobalSettings: {
-          allowPublicCompletedDocumentAccess: boolean;
-        };
-      };
-    } | null;
-  };
-}) => {
-  const team = envelopeItem.envelope.team;
+    include: {
+      team: {
+        include: {
+          teamGlobalSettings: {
+            select: {
+              allowPublicCompletedDocumentAccess: true,
+            },
+          },
+          organisation: {
+            include: {
+              organisationGlobalSettings: {
+                select: {
+                  allowPublicCompletedDocumentAccess: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  documentData: true,
+} as const;
 
-  if (!team) {
-    return true;
-  }
-
-  return (
-    team.teamGlobalSettings?.allowPublicCompletedDocumentAccess ??
-    team.organisation.organisationGlobalSettings.allowPublicCompletedDocumentAccess
-  );
-};
-
-const maybeApplyQrRateLimit = async ({ c, token }: { c: Context<HonoEnv>; token: string }) => {
+const maybeApplyQrRateLimit = async (c: Context<HonoEnv>, token: string) => {
   let ip = 'unknown';
 
   try {
@@ -64,26 +66,12 @@ const maybeApplyQrRateLimit = async ({ c, token }: { c: Context<HonoEnv>; token:
     ip = 'unknown';
   }
 
-  const tokenFingerprint = Buffer.from(sha256(token)).toString('hex').slice(0, 16);
   const result = await qrShareViewRateLimit.check({
     ip,
-    identifier: tokenFingerprint,
+    identifier: tokenFingerprint(token),
   });
 
-  c.header('X-RateLimit-Limit', String(result.limit));
-  c.header('X-RateLimit-Remaining', String(result.remaining));
-  c.header('X-RateLimit-Reset', String(Math.ceil(result.reset.getTime() / 1000)));
-
-  if (!result.isLimited) {
-    return null;
-  }
-
-  c.header(
-    'Retry-After',
-    String(Math.max(1, Math.ceil((result.reset.getTime() - Date.now()) / 1000))),
-  );
-
-  return c.json({ error: 'Too many requests, please try again later.' }, 429);
+  return rateLimitResponse(c, result);
 };
 
 export const filesRoute = new Hono<HonoEnv>()
@@ -285,10 +273,10 @@ export const filesRoute = new Hono<HonoEnv>()
       const isQrToken = token.startsWith('qr_');
 
       if (isQrToken) {
-        const rateLimitResponse = await maybeApplyQrRateLimit({ c, token });
+        const limited = await maybeApplyQrRateLimit(c, token);
 
-        if (rateLimitResponse) {
-          return rateLimitResponse;
+        if (limited) {
+          return limited;
         }
       }
 
@@ -315,38 +303,14 @@ export const filesRoute = new Hono<HonoEnv>()
 
       const envelopeItem = await prisma.envelopeItem.findUnique({
         where: envelopeWhereQuery,
-        include: {
-          envelope: {
-            include: {
-              team: {
-                include: {
-                  teamGlobalSettings: {
-                    select: {
-                      allowPublicCompletedDocumentAccess: true,
-                    },
-                  },
-                  organisation: {
-                    include: {
-                      organisationGlobalSettings: {
-                        select: {
-                          allowPublicCompletedDocumentAccess: true,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-          documentData: true,
-        },
+        include: envelopeItemTokenInclude,
       });
 
       if (!envelopeItem) {
         return c.json({ error: 'Envelope item not found' }, 404);
       }
 
-      if (isQrToken && !isQrSharingEnabledForEnvelopeItem(envelopeItem)) {
+      if (isQrToken && !isPublicDocumentAccessEnabled(envelopeItem.envelope.team)) {
         return c.json(
           { error: 'Public completed-document access is disabled for this document' },
           403,
@@ -376,10 +340,10 @@ export const filesRoute = new Hono<HonoEnv>()
       const effectiveVersion = isQrToken ? 'signed' : version;
 
       if (isQrToken) {
-        const rateLimitResponse = await maybeApplyQrRateLimit({ c, token });
+        const limited = await maybeApplyQrRateLimit(c, token);
 
-        if (rateLimitResponse) {
-          return rateLimitResponse;
+        if (limited) {
+          return limited;
         }
       }
 
@@ -406,38 +370,14 @@ export const filesRoute = new Hono<HonoEnv>()
 
       const envelopeItem = await prisma.envelopeItem.findUnique({
         where: envelopeWhereQuery,
-        include: {
-          envelope: {
-            include: {
-              team: {
-                include: {
-                  teamGlobalSettings: {
-                    select: {
-                      allowPublicCompletedDocumentAccess: true,
-                    },
-                  },
-                  organisation: {
-                    include: {
-                      organisationGlobalSettings: {
-                        select: {
-                          allowPublicCompletedDocumentAccess: true,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-          documentData: true,
-        },
+        include: envelopeItemTokenInclude,
       });
 
       if (!envelopeItem) {
         return c.json({ error: 'Envelope item not found' }, 404);
       }
 
-      if (isQrToken && !isQrSharingEnabledForEnvelopeItem(envelopeItem)) {
+      if (isQrToken && !isPublicDocumentAccessEnabled(envelopeItem.envelope.team)) {
         return c.json(
           { error: 'Public completed-document access is disabled for this document' },
           403,
