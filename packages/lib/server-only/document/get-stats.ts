@@ -24,6 +24,7 @@ type EnvelopeQueryBuilder = SelectQueryBuilder<DB, 'Envelope', any>;
 
 // Expression builder type scoped to Envelope table context.
 type EnvelopeExpressionBuilder = ExpressionBuilder<DB, 'Envelope'>;
+type RecipientExpressionBuilder = ExpressionBuilder<DB, 'Recipient'>;
 
 /**
  * Reusable EXISTS subquery: checks that a Recipient row exists for the given
@@ -32,7 +33,7 @@ type EnvelopeExpressionBuilder = ExpressionBuilder<DB, 'Envelope'>;
 const recipientExists = (
   eb: EnvelopeExpressionBuilder,
   email: string,
-  extra?: (qb: ExpressionBuilder<DB, 'Recipient'>) => Expression<SqlBool>,
+  extra?: (qb: RecipientExpressionBuilder) => Expression<SqlBool>,
 ) => {
   let sub = eb
     .selectFrom('Recipient')
@@ -203,7 +204,7 @@ export const getStats = async ({
 
   // DRAFT: team-owned drafts visible to the user
   const draftQuery = buildBaseQuery()
-    .where(() => sql`"Envelope"."status" = ${DocumentStatus.DRAFT}::"DocumentStatus"`)
+    .where('Envelope.status', '=', sql<DocumentStatus>`${DocumentStatus.DRAFT}::"DocumentStatus"`)
     .where((eb) => {
       const accessBranches = [eb('Envelope.teamId', '=', team.id)];
 
@@ -216,7 +217,7 @@ export const getStats = async ({
 
   // PENDING: team-owned pending + team-email signed-pending docs
   const pendingQuery = buildBaseQuery()
-    .where(() => sql`"Envelope"."status" = ${DocumentStatus.PENDING}::"DocumentStatus"`)
+    .where('Envelope.status', '=', sql<DocumentStatus>`${DocumentStatus.PENDING}::"DocumentStatus"`)
     .where((eb) => {
       const accessBranches = [eb('Envelope.teamId', '=', team.id)];
 
@@ -241,7 +242,11 @@ export const getStats = async ({
 
   // COMPLETED: team-owned completed + team-email received completed
   const completedQuery = buildBaseQuery()
-    .where(() => sql`"Envelope"."status" = ${DocumentStatus.COMPLETED}::"DocumentStatus"`)
+    .where(
+      'Envelope.status',
+      '=',
+      sql<DocumentStatus>`${DocumentStatus.COMPLETED}::"DocumentStatus"`,
+    )
     .where((eb) => {
       const accessBranches = [eb('Envelope.teamId', '=', team.id)];
 
@@ -255,7 +260,11 @@ export const getStats = async ({
 
   // REJECTED: team-owned rejected + team-email rejected docs
   const rejectedQuery = buildBaseQuery()
-    .where(() => sql`"Envelope"."status" = ${DocumentStatus.REJECTED}::"DocumentStatus"`)
+    .where(
+      'Envelope.status',
+      '=',
+      sql<DocumentStatus>`${DocumentStatus.REJECTED}::"DocumentStatus"`,
+    )
     .where((eb) => {
       const accessBranches = [eb('Envelope.teamId', '=', team.id)];
 
@@ -279,7 +288,11 @@ export const getStats = async ({
   // Returns 0 if the team has no team email.
   const inboxQuery = teamEmail
     ? buildBaseQuery()
-        .where(() => sql`"Envelope"."status" != ${DocumentStatus.DRAFT}::"DocumentStatus"`)
+        .where(
+          'Envelope.status',
+          '!=',
+          sql<DocumentStatus>`${DocumentStatus.DRAFT}::"DocumentStatus"`,
+        )
         .where((eb) =>
           eb.and([
             visibilityFilter(eb),

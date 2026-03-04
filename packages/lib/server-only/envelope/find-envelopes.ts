@@ -59,6 +59,7 @@ type EnvelopeQueryBuilder = SelectQueryBuilder<DB, 'Envelope', any>;
 
 // Expression builder type scoped to Envelope table context.
 type EnvelopeExpressionBuilder = ExpressionBuilder<DB, 'Envelope'>;
+type RecipientExpressionBuilder = ExpressionBuilder<DB, 'Recipient'>;
 
 /**
  * Reusable EXISTS subquery: checks that a Recipient row exists for the given
@@ -67,7 +68,7 @@ type EnvelopeExpressionBuilder = ExpressionBuilder<DB, 'Envelope'>;
 const recipientExists = (
   eb: EnvelopeExpressionBuilder,
   email: string,
-  extra?: (qb: ExpressionBuilder<DB, 'Recipient'>) => Expression<SqlBool>,
+  extra?: (qb: RecipientExpressionBuilder) => Expression<SqlBool>,
 ) => {
   let sub = eb
     .selectFrom('Recipient')
@@ -107,16 +108,12 @@ export const findEnvelopes = async ({
   folderId,
   useWindowedCount = true,
 }: FindEnvelopesOptions) => {
-  const t0 = performance.now();
-
   const user = await prisma.user.findFirstOrThrow({
     where: { id: userId },
     select: { id: true, email: true, name: true },
   });
 
   const team = await getTeamById({ userId, teamId });
-
-  const t1 = performance.now();
 
   const orderByColumn = orderBy?.column ?? 'createdAt';
   const orderByDirection = orderBy?.direction ?? 'desc';
@@ -253,15 +250,9 @@ export const findEnvelopes = async ({
     ? Math.min(Number(countResult.total ?? 0), offset + COUNT_WINDOW_SIZE * perPage)
     : Number(countResult.total ?? 0);
 
-  const t2 = performance.now();
-
   // ─── Hydrate with Prisma ─────────────────────────────────────────────
 
   if (ids.length === 0) {
-    console.log(
-      `[findEnvelopes] auth=${(t1 - t0).toFixed(1)}ms, query=${(t2 - t1).toFixed(1)}ms, total=${(t2 - t0).toFixed(1)}ms, results=0`,
-    );
-
     return {
       data: [],
       count: totalCount,
@@ -285,8 +276,6 @@ export const findEnvelopes = async ({
   const idOrder = new Map(ids.map((id, index) => [id, index]));
   data.sort((a, b) => (idOrder.get(a.id) ?? 0) - (idOrder.get(b.id) ?? 0));
 
-  const t3 = performance.now();
-
   const maskedData = data.map((envelope) =>
     maskRecipientTokensForDocument({
       document: envelope,
@@ -303,10 +292,6 @@ export const findEnvelopes = async ({
       email: envelope.user.email,
     },
   }));
-
-  console.log(
-    `[findEnvelopes] auth=${(t1 - t0).toFixed(1)}ms, query=${(t2 - t1).toFixed(1)}ms, hydrate=${(t3 - t2).toFixed(1)}ms, total=${(t3 - t0).toFixed(1)}ms, results=${ids.length}`,
-  );
 
   return {
     data: mappedData,
