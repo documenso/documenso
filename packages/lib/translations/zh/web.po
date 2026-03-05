@@ -8,7 +8,7 @@ msgstr ""
 "Language: zh\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-02-25 04:37\n"
+"PO-Revision-Date: 2026-03-04 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -2236,6 +2236,7 @@ msgstr "找不到某个人？"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
@@ -2378,9 +2379,17 @@ msgstr "抄送人"
 msgid "Center"
 msgstr "居中"
 
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Change language"
+msgstr "更改语言"
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
 msgid "Change Recipient"
 msgstr "更改收件人"
+
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Change theme"
+msgstr "更改主题"
 
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
 msgid "Character limit"
@@ -2422,6 +2431,10 @@ msgstr "复选框值"
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Checkout"
 msgstr "结账"
+
+#: packages/lib/constants/i18n.ts
+msgid "Chinese"
+msgstr "中文"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Choose an existing recipient from below to continue"
@@ -2630,8 +2643,8 @@ msgid "Configure document settings and options before sending."
 msgstr "在发送前配置文档设置和选项。"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
-msgid "Configure email settings for the document"
-msgstr "为文档配置邮件设置"
+msgid "Configure email settings for the document."
+msgstr "为文档配置电子邮件设置。"
 
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
@@ -2648,8 +2661,8 @@ msgid "Configure general settings for the template."
 msgstr "配置模板的一般设置。"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
-msgid "Configure security settings for the document"
-msgstr "为文档配置安全设置"
+msgid "Configure security settings for the document."
+msgstr "为文档配置安全设置。"
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "Configure template"
@@ -4187,6 +4200,10 @@ msgstr "复制模板"
 msgid "Duplicate values are not allowed"
 msgstr "不允许重复的值"
 
+#: packages/lib/constants/i18n.ts
+msgid "Dutch"
+msgstr "荷兰语"
+
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "E.g. 0"
 msgstr "例如：0"
@@ -4528,6 +4545,10 @@ msgstr "随附文档"
 msgid "Enclosed Documents"
 msgstr "随附文件"
 
+#: packages/lib/constants/i18n.ts
+msgid "English"
+msgstr "英语"
+
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
@@ -4662,6 +4683,7 @@ msgstr "信封标题"
 msgid "Envelope updated"
 msgstr "信封已更新"
 
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-disable-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-enable-dialog.tsx
@@ -4862,6 +4884,10 @@ msgstr "加载文档失败"
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "Failed to move folder"
 msgstr "移动文件夹失败"
+
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Failed to move subscription. Please try again."
+msgstr "移动订阅失败。请重试。"
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Failed to re-register email domain"
@@ -5099,6 +5125,10 @@ msgstr "自由签名"
 msgid "Free Signature Settings"
 msgstr "免费签名设置"
 
+#: packages/lib/constants/i18n.ts
+msgid "French"
+msgstr "法语"
+
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
@@ -5130,6 +5160,10 @@ msgstr "生成 DKIM 记录"
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Generate Links"
 msgstr "生成链接"
+
+#: packages/lib/constants/i18n.ts
+msgid "German"
+msgstr "德语"
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 msgid "Global recipient action authentication"
@@ -5668,6 +5702,14 @@ msgstr "当前还不是您签署的顺序。请稍后再来查看，此文档很
 msgid "It's currently not your turn to sign. You will receive an email with instructions once it's your turn to sign the document."
 msgstr "现在还不是你签署的顺序。轮到你签署时，你会收到一封包含说明的邮件。"
 
+#: packages/lib/constants/i18n.ts
+msgid "Italian"
+msgstr "意大利语"
+
+#: packages/lib/constants/i18n.ts
+msgid "Japanese"
+msgstr "日语"
+
 #: packages/email/templates/organisation-invite.tsx
 msgid "Join {organisationName} on Documenso"
 msgstr "加入 {organisationName}，使用 Documenso"
@@ -5684,6 +5726,10 @@ msgstr "加入时间"
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Joined {0}"
 msgstr "加入时间 {0}"
+
+#: packages/lib/constants/i18n.ts
+msgid "Korean"
+msgstr "韩语"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
@@ -6240,6 +6286,12 @@ msgstr "将文档移动到文件夹"
 msgid "Move Folder"
 msgstr "移动文件夹"
 
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+#: apps/remix/app/components/tables/admin-organisations-table.tsx
+msgid "Move Subscription"
+msgstr "移动订阅"
+
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "Move Template to Folder"
 msgstr "将模板移动到文件夹"
@@ -6247,6 +6299,10 @@ msgstr "将模板移动到文件夹"
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "Move Templates to Folder"
 msgstr "将模板移动到文件夹"
+
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Move the subscription from \"{sourceOrganisationName}\" to another organisation owned by this user."
+msgstr "将订阅从“{sourceOrganisationName}”移动到该用户拥有的另一家组织。"
 
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
@@ -6384,6 +6440,10 @@ msgstr "没有活动草稿"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 msgid "No documents found"
 msgstr "未找到文档"
+
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "No eligible organisations found. The target must be on the free plan."
+msgstr "未找到符合条件的组织。目标组织必须使用免费方案。"
 
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "No email detected"
@@ -7269,6 +7329,14 @@ msgstr "请上传文档后继续"
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Please upload a logo"
 msgstr "请上传一个 Logo"
+
+#: packages/lib/constants/i18n.ts
+msgid "Polish"
+msgstr "波兰语"
+
+#: packages/lib/constants/i18n.ts
+msgid "Portuguese (Brazil)"
+msgstr "葡萄牙语（巴西）"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: packages/ui/primitives/document-flow/field-item.tsx
@@ -8173,6 +8241,10 @@ msgstr "选择一个事件类型"
 msgid "Select an option"
 msgstr "选择一个选项"
 
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Select an organisation"
+msgstr "选择一个组织"
+
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 msgid "Select an organisation to view teams"
 msgstr "选择一个组织以查看团队"
@@ -8873,6 +8945,10 @@ msgstr "来源"
 msgid "Space-separated list of domains. Leave empty to allow all domains."
 msgstr "以空格分隔的域名列表。留空则允许所有域名。"
 
+#: packages/lib/constants/i18n.ts
+msgid "Spanish"
+msgstr "西班牙语"
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 msgid "SSO"
 msgstr "SSO"
@@ -8973,12 +9049,17 @@ msgstr "订阅声明"
 msgid "Subscription invalid"
 msgstr "订阅无效"
 
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Subscription moved successfully"
+msgstr "订阅已成功移动"
+
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgid "Subscription Status"
 msgstr "订阅状态"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
@@ -9092,6 +9173,10 @@ msgstr "系统要求"
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "System Theme"
 msgstr "系统主题"
+
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Target Organisation"
+msgstr "目标组织"
 
 #: apps/remix/app/components/tables/admin-user-teams-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
@@ -10069,6 +10154,11 @@ msgstr "这将检查并同步此组织所有邮箱域名的状态"
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "This will delete the existing SES identity for <0>{0}</0> and recreate it using the same DKIM keys. The user will not need to update their DNS records. The domain status will be reset to Pending."
 msgstr "这将删除 <0>{0}</0> 的现有 SES 身份，并使用相同的 DKIM 密钥重新创建。用户无需更新其 DNS 记录。域名状态将被重置为“待处理”。"
+
+#. placeholder {0}: selectedOrg.name
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "This will move the subscription from \"{sourceOrganisationName}\" to \"{0}\". The source organisation will be reset to the free plan."
+msgstr "这将把订阅从“{sourceOrganisationName}”移动到“{0}”。源组织将被重置为免费方案。"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "This will ONLY backport feature flags which are set to true, anything disabled in the initial claim will not be backported"

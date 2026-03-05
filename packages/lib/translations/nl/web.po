@@ -8,7 +8,7 @@ msgstr ""
 "Language: nl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-02-25 04:37\n"
+"PO-Revision-Date: 2026-03-04 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -2236,6 +2236,7 @@ msgstr "Kunt u niemand vinden?"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
@@ -2378,9 +2379,17 @@ msgstr "Ccers"
 msgid "Center"
 msgstr "Centreren"
 
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Change language"
+msgstr "Taal wijzigen"
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
 msgid "Change Recipient"
 msgstr "Ontvanger wijzigen"
+
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Change theme"
+msgstr "Thema wijzigen"
 
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
 msgid "Character limit"
@@ -2422,6 +2431,10 @@ msgstr "Waarden selectievakje"
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Checkout"
 msgstr "Afrekenen"
+
+#: packages/lib/constants/i18n.ts
+msgid "Chinese"
+msgstr "Chinees"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Choose an existing recipient from below to continue"
@@ -2630,8 +2643,8 @@ msgid "Configure document settings and options before sending."
 msgstr "Configureer documentinstellingen en opties voordat je verzendt."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
-msgid "Configure email settings for the document"
-msgstr "E-mailinstellingen voor het document configureren"
+msgid "Configure email settings for the document."
+msgstr "E-mailinstellingen voor het document configureren."
 
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
@@ -2648,8 +2661,8 @@ msgid "Configure general settings for the template."
 msgstr "Configureer algemene instellingen voor de sjabloon."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
-msgid "Configure security settings for the document"
-msgstr "Beveiligingsinstellingen voor het document configureren"
+msgid "Configure security settings for the document."
+msgstr "Beveiligingsinstellingen voor het document configureren."
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "Configure template"
@@ -4187,6 +4200,10 @@ msgstr "Sjabloon dupliceren"
 msgid "Duplicate values are not allowed"
 msgstr "Dubbele waarden zijn niet toegestaan"
 
+#: packages/lib/constants/i18n.ts
+msgid "Dutch"
+msgstr "Nederlands"
+
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "E.g. 0"
 msgstr "Bijv. 0"
@@ -4528,6 +4545,10 @@ msgstr "Bijgevoegd document"
 msgid "Enclosed Documents"
 msgstr "Bijgevoegde documenten"
 
+#: packages/lib/constants/i18n.ts
+msgid "English"
+msgstr "Engels"
+
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
@@ -4662,6 +4683,7 @@ msgstr "Enveloptitel"
 msgid "Envelope updated"
 msgstr "Envelope bijgewerkt"
 
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-disable-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-enable-dialog.tsx
@@ -4862,6 +4884,10 @@ msgstr "Document laden mislukt"
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "Failed to move folder"
 msgstr "Map verplaatsen mislukt"
+
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Failed to move subscription. Please try again."
+msgstr "Het verplaatsen van het abonnement is mislukt. Probeer het opnieuw."
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Failed to re-register email domain"
@@ -5099,6 +5125,10 @@ msgstr "Vrije handtekening"
 msgid "Free Signature Settings"
 msgstr "Gratis handtekening-instellingen"
 
+#: packages/lib/constants/i18n.ts
+msgid "French"
+msgstr "Frans"
+
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
@@ -5130,6 +5160,10 @@ msgstr "DKIM-records genereren"
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Generate Links"
 msgstr "Links genereren"
+
+#: packages/lib/constants/i18n.ts
+msgid "German"
+msgstr "Duits"
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 msgid "Global recipient action authentication"
@@ -5668,6 +5702,14 @@ msgstr "Het is momenteel niet jouw beurt om te ondertekenen. Kom binnenkort teru
 msgid "It's currently not your turn to sign. You will receive an email with instructions once it's your turn to sign the document."
 msgstr "Het is momenteel niet jouw beurt om te ondertekenen. Je ontvangt een e‑mail met instructies zodra jij aan de beurt bent om het document te ondertekenen."
 
+#: packages/lib/constants/i18n.ts
+msgid "Italian"
+msgstr "Italiaans"
+
+#: packages/lib/constants/i18n.ts
+msgid "Japanese"
+msgstr "Japans"
+
 #: packages/email/templates/organisation-invite.tsx
 msgid "Join {organisationName} on Documenso"
 msgstr "Word lid van {organisationName} op Documenso"
@@ -5684,6 +5726,10 @@ msgstr "Lid geworden"
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Joined {0}"
 msgstr "Toegetreden {0}"
+
+#: packages/lib/constants/i18n.ts
+msgid "Korean"
+msgstr "Koreaans"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
@@ -6240,6 +6286,12 @@ msgstr "Documenten naar map verplaatsen"
 msgid "Move Folder"
 msgstr "Map verplaatsen"
 
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+#: apps/remix/app/components/tables/admin-organisations-table.tsx
+msgid "Move Subscription"
+msgstr "Abonnement verplaatsen"
+
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "Move Template to Folder"
 msgstr "Sjabloon naar map verplaatsen"
@@ -6247,6 +6299,10 @@ msgstr "Sjabloon naar map verplaatsen"
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "Move Templates to Folder"
 msgstr "Templates naar map verplaatsen"
+
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Move the subscription from \"{sourceOrganisationName}\" to another organisation owned by this user."
+msgstr "Verplaats het abonnement van \"{sourceOrganisationName}\" naar een andere organisatie die eigendom is van deze gebruiker."
 
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
@@ -6384,6 +6440,10 @@ msgstr "Geen actieve concepten"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 msgid "No documents found"
 msgstr "Geen documenten gevonden"
+
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "No eligible organisations found. The target must be on the free plan."
+msgstr "Geen geschikte organisaties gevonden. De doelorganisatie moet op het gratis abonnement staan."
 
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "No email detected"
@@ -7269,6 +7329,14 @@ msgstr "Upload een document om door te gaan"
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Please upload a logo"
 msgstr "Upload een logo"
+
+#: packages/lib/constants/i18n.ts
+msgid "Polish"
+msgstr "Pools"
+
+#: packages/lib/constants/i18n.ts
+msgid "Portuguese (Brazil)"
+msgstr "Portugees (Brazilië)"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: packages/ui/primitives/document-flow/field-item.tsx
@@ -8173,6 +8241,10 @@ msgstr "Selecteer een gebeurtenistype"
 msgid "Select an option"
 msgstr "Selecteer een optie"
 
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Select an organisation"
+msgstr "Selecteer een organisatie"
+
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 msgid "Select an organisation to view teams"
 msgstr "Selecteer een organisatie om teams te bekijken"
@@ -8873,6 +8945,10 @@ msgstr "Bron"
 msgid "Space-separated list of domains. Leave empty to allow all domains."
 msgstr "Door spaties gescheiden lijst met domeinen. Laat leeg om alle domeinen toe te staan."
 
+#: packages/lib/constants/i18n.ts
+msgid "Spanish"
+msgstr "Spaans"
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 msgid "SSO"
 msgstr "SSO"
@@ -8973,12 +9049,17 @@ msgstr "Abonnementsclaims"
 msgid "Subscription invalid"
 msgstr "Abonnement ongeldig"
 
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Subscription moved successfully"
+msgstr "Abonnement is verplaatst"
+
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgid "Subscription Status"
 msgstr "Abonnementsstatus"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
@@ -9092,6 +9173,10 @@ msgstr "Systeemvereisten"
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "System Theme"
 msgstr "Systeemthema"
+
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Target Organisation"
+msgstr "Doelorganisatie"
 
 #: apps/remix/app/components/tables/admin-user-teams-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
@@ -10069,6 +10154,11 @@ msgstr "Hiermee wordt de status van alle e-maildomeinen voor deze organisatie ge
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "This will delete the existing SES identity for <0>{0}</0> and recreate it using the same DKIM keys. The user will not need to update their DNS records. The domain status will be reset to Pending."
 msgstr "Dit verwijdert de bestaande SES-identiteit voor <0>{0}</0> en maakt deze opnieuw aan met dezelfde DKIM-sleutels. De gebruiker hoeft de DNS-records niet bij te werken. De domeinstatus wordt teruggezet naar In behandeling."
+
+#. placeholder {0}: selectedOrg.name
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "This will move the subscription from \"{sourceOrganisationName}\" to \"{0}\". The source organisation will be reset to the free plan."
+msgstr "Dit zal het abonnement verplaatsen van \"{sourceOrganisationName}\" naar \"{0}\". De bronorganisatie wordt teruggezet naar het gratis abonnement."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "This will ONLY backport feature flags which are set to true, anything disabled in the initial claim will not be backported"

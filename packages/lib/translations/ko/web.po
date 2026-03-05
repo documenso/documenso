@@ -8,7 +8,7 @@ msgstr ""
 "Language: ko\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-02-25 04:37\n"
+"PO-Revision-Date: 2026-03-04 12:09\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -2236,6 +2236,7 @@ msgstr "누군가를 찾을 수 없나요?"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
@@ -2378,9 +2379,17 @@ msgstr "Cc 수신자"
 msgid "Center"
 msgstr "가운데"
 
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Change language"
+msgstr "언어 변경하기"
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
 msgid "Change Recipient"
 msgstr "수신자 변경"
+
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Change theme"
+msgstr "테마 변경하기"
 
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
 msgid "Character limit"
@@ -2422,6 +2431,10 @@ msgstr "체크박스 값"
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Checkout"
 msgstr "결제하기"
+
+#: packages/lib/constants/i18n.ts
+msgid "Chinese"
+msgstr "중국어"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Choose an existing recipient from below to continue"
@@ -2630,7 +2643,7 @@ msgid "Configure document settings and options before sending."
 msgstr "문서를 보내기 전에 설정 및 옵션을 구성합니다."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
-msgid "Configure email settings for the document"
+msgid "Configure email settings for the document."
 msgstr "문서의 이메일 설정을 구성합니다."
 
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
@@ -2648,7 +2661,7 @@ msgid "Configure general settings for the template."
 msgstr "템플릿의 일반 설정을 구성합니다."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
-msgid "Configure security settings for the document"
+msgid "Configure security settings for the document."
 msgstr "문서의 보안 설정을 구성합니다."
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
@@ -4187,6 +4200,10 @@ msgstr "템플릿 복제"
 msgid "Duplicate values are not allowed"
 msgstr "중복 값은 허용되지 않습니다"
 
+#: packages/lib/constants/i18n.ts
+msgid "Dutch"
+msgstr "네덜란드어"
+
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "E.g. 0"
 msgstr "예: 0"
@@ -4528,6 +4545,10 @@ msgstr "동봉 문서"
 msgid "Enclosed Documents"
 msgstr "동봉된 문서들"
 
+#: packages/lib/constants/i18n.ts
+msgid "English"
+msgstr "영어"
+
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
@@ -4662,6 +4683,7 @@ msgstr "봉투 제목"
 msgid "Envelope updated"
 msgstr "봉투가 업데이트되었습니다"
 
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-disable-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-enable-dialog.tsx
@@ -4862,6 +4884,10 @@ msgstr "문서를 불러오지 못했습니다."
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "Failed to move folder"
 msgstr "폴더를 이동하지 못했습니다."
+
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Failed to move subscription. Please try again."
+msgstr "구독을 이동하지 못했습니다. 다시 시도해 주세요."
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Failed to re-register email domain"
@@ -5099,6 +5125,10 @@ msgstr "자유 서명"
 msgid "Free Signature Settings"
 msgstr "무료 서명 설정"
 
+#: packages/lib/constants/i18n.ts
+msgid "French"
+msgstr "프랑스어"
+
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
@@ -5130,6 +5160,10 @@ msgstr "DKIM 레코드 생성"
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Generate Links"
 msgstr "링크 생성"
+
+#: packages/lib/constants/i18n.ts
+msgid "German"
+msgstr "독일어"
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 msgid "Global recipient action authentication"
@@ -5668,6 +5702,14 @@ msgstr "현재는 귀하의 서명 순서가 아닙니다. 곧 이 문서에 서
 msgid "It's currently not your turn to sign. You will receive an email with instructions once it's your turn to sign the document."
 msgstr "현재는 귀하의 서명 순서가 아닙니다. 순서가 되면 문서 서명 방법이 안내된 이메일을 받게 됩니다."
 
+#: packages/lib/constants/i18n.ts
+msgid "Italian"
+msgstr "이탈리아어"
+
+#: packages/lib/constants/i18n.ts
+msgid "Japanese"
+msgstr "일본어"
+
 #: packages/email/templates/organisation-invite.tsx
 msgid "Join {organisationName} on Documenso"
 msgstr "Documenso에서 {organisationName} 조직에 참여하세요."
@@ -5684,6 +5726,10 @@ msgstr "가입일"
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Joined {0}"
 msgstr "{0}에 가입함"
+
+#: packages/lib/constants/i18n.ts
+msgid "Korean"
+msgstr "한국어"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
@@ -6240,6 +6286,12 @@ msgstr "문서를 폴더로 이동"
 msgid "Move Folder"
 msgstr "폴더 이동"
 
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+#: apps/remix/app/components/tables/admin-organisations-table.tsx
+msgid "Move Subscription"
+msgstr "구독 이동"
+
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "Move Template to Folder"
 msgstr "템플릿을 폴더로 이동"
@@ -6247,6 +6299,10 @@ msgstr "템플릿을 폴더로 이동"
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "Move Templates to Folder"
 msgstr "템플릿을 폴더로 이동"
+
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Move the subscription from \"{sourceOrganisationName}\" to another organisation owned by this user."
+msgstr "\"{sourceOrganisationName}\"의 구독을 이 사용자가 소유한 다른 조직으로 이동합니다."
 
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
@@ -6384,6 +6440,10 @@ msgstr "활성 초안 없음"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 msgid "No documents found"
 msgstr "문서를 찾을 수 없습니다"
+
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "No eligible organisations found. The target must be on the free plan."
+msgstr "적합한 조직을 찾을 수 없습니다. 대상 조직은 무료 플랜이어야 합니다."
 
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "No email detected"
@@ -7269,6 +7329,14 @@ msgstr "계속하려면 문서를 업로드하세요"
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Please upload a logo"
 msgstr "로고를 업로드해 주세요."
+
+#: packages/lib/constants/i18n.ts
+msgid "Polish"
+msgstr "폴란드어"
+
+#: packages/lib/constants/i18n.ts
+msgid "Portuguese (Brazil)"
+msgstr "포르투갈어(브라질)"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: packages/ui/primitives/document-flow/field-item.tsx
@@ -8173,6 +8241,10 @@ msgstr "이벤트 유형을 선택하세요"
 msgid "Select an option"
 msgstr "옵션을 선택하세요."
 
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Select an organisation"
+msgstr "조직 선택"
+
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 msgid "Select an organisation to view teams"
 msgstr "조직을 선택하여 팀을 확인하세요."
@@ -8873,6 +8945,10 @@ msgstr "소스"
 msgid "Space-separated list of domains. Leave empty to allow all domains."
 msgstr "도메인을 공백으로 구분하여 입력하세요. 비워 두면 모든 도메인이 허용됩니다."
 
+#: packages/lib/constants/i18n.ts
+msgid "Spanish"
+msgstr "스페인어"
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 msgid "SSO"
 msgstr "SSO"
@@ -8973,12 +9049,17 @@ msgstr "구독 클레임"
 msgid "Subscription invalid"
 msgstr "구독이 유효하지 않습니다."
 
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Subscription moved successfully"
+msgstr "구독이 성공적으로 이동되었습니다."
+
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgid "Subscription Status"
 msgstr "구독 상태"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
@@ -9092,6 +9173,10 @@ msgstr "시스템 요구 사항"
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "System Theme"
 msgstr "시스템 테마"
+
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Target Organisation"
+msgstr "대상 조직"
 
 #: apps/remix/app/components/tables/admin-user-teams-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
@@ -10069,6 +10154,11 @@ msgstr "이 작업은 이 조직의 모든 이메일 도메인 상태를 확인�
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "This will delete the existing SES identity for <0>{0}</0> and recreate it using the same DKIM keys. The user will not need to update their DNS records. The domain status will be reset to Pending."
 msgstr "이 작업은 <0>{0}</0>에 대한 기존 SES ID를 삭제하고 동일한 DKIM 키를 사용하여 다시 생성합니다. 사용자는 DNS 레코드를 수정할 필요가 없습니다. 도메인 상태는 \"보류 중\"으로 초기화됩니다."
+
+#. placeholder {0}: selectedOrg.name
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "This will move the subscription from \"{sourceOrganisationName}\" to \"{0}\". The source organisation will be reset to the free plan."
+msgstr "이 작업을 수행하면 구독이 \"{sourceOrganisationName}\"에서 \"{0}\"(으)로 이동됩니다. 원본 조직은 무료 플랜으로 재설정됩니다."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "This will ONLY backport feature flags which are set to true, anything disabled in the initial claim will not be backported"
