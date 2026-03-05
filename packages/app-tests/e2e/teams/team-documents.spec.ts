@@ -36,7 +36,7 @@ test('[TEAMS]: check team documents count', async ({ page }) => {
     await checkDocumentTabCount(page, 'All', 5);
 
     // Apply filter.
-    await page.locator('button').filter({ hasText: 'Sender: All' }).click();
+    await page.getByRole('button', { name: /Sender/ }).click();
     await page.getByRole('option', { name: teamMember2.name ?? '' }).click();
     await page.waitForURL(/senderIds/);
 
@@ -49,6 +49,21 @@ test('[TEAMS]: check team documents count', async ({ page }) => {
 
     await apiSignout({ page });
   }
+});
+
+test('[TEAMS]: supports filtering documents by multiple statuses', async ({ page }) => {
+  const { team, teamOwner } = await seedTeamDocuments();
+
+  await apiSignin({
+    page,
+    email: teamOwner.email,
+    redirectPath: `/t/${team.url}/documents?status=PENDING,DRAFT`,
+  });
+
+  await expect(page).toHaveURL(/status=PENDING,DRAFT/);
+  await expect(page.getByTestId('data-table-count')).toContainText('Showing 4');
+
+  await apiSignout({ page });
 });
 
 test('[TEAMS]: check team documents count with internal team email', async ({ page }) => {
@@ -135,7 +150,7 @@ test('[TEAMS]: check team documents count with internal team email', async ({ pa
     await checkDocumentTabCount(page, 'All', 11);
 
     // Apply filter.
-    await page.locator('button').filter({ hasText: 'Sender: All' }).click();
+    await page.getByRole('button', { name: /Sender/ }).click();
     await page.getByRole('option', { name: teamMember2.name ?? '' }).click();
     await page.waitForURL(/senderIds/);
 
@@ -222,7 +237,7 @@ test('[TEAMS]: check team documents count with external team email', async ({ pa
   await checkDocumentTabCount(page, 'All', 9);
 
   // Apply filter.
-  await page.locator('button').filter({ hasText: 'Sender: All' }).click();
+  await page.getByRole('button', { name: /Sender/ }).click();
   await page.getByRole('option', { name: teamMember2.name ?? '' }).click();
   await page.waitForURL(/senderIds/);
 
