@@ -9,8 +9,8 @@
   "scripts": {
     "postinstall": "patch-package",
     "build": "turbo run build",
-    "dev": "turbo run dev --filter=@documenso/remix",
-    "dev:remix": "turbo run dev --filter=@documenso/remix",
+    "dev": "npm run translate:compile && turbo run dev --filter=@documenso/remix",
+    "dev:remix": "npm run translate:compile && turbo run dev --filter=@documenso/remix",
     "dev:docs": "turbo run dev --filter=@documenso/documentation",
     "dev:openpage-api": "turbo run dev --filter=@documenso/openpage-api",
     "start": "turbo run start --filter=@documenso/remix --filter=@documenso/documentation --filter=@documenso/openpage-api",
