@@ -142,11 +142,7 @@ export const findDocuments = async ({
       .select(['Envelope.id', 'Envelope.createdAt']);
 
     // Type must be DOCUMENT (enum cast requires raw sql — this is the one escape hatch)
-    qb = qb.where(
-      'Envelope.type',
-      '=',
-      sql<EnvelopeType>`${EnvelopeType.DOCUMENT}::"EnvelopeType"`,
-    );
+    qb = qb.where('Envelope.type', '=', sql.lit(EnvelopeType.DOCUMENT));
 
     // Folder filter
     qb =
@@ -169,7 +165,7 @@ export const findDocuments = async ({
 
     // Source filter (enum cast)
     if (source) {
-      qb = qb.where('Envelope.source', '=', sql<DocumentSource>`${source}::"DocumentSource"`);
+      qb = qb.where('Envelope.source', '=', sql.lit(source));
     }
 
     // Template filter
@@ -225,8 +221,8 @@ export const findDocuments = async ({
               eb('Envelope.userId', '=', user.id),
               eb.and([
                 eb('Envelope.status', 'in', [
-                  sql<DocumentStatus>`${DocumentStatus.COMPLETED}::"DocumentStatus"`,
-                  sql<DocumentStatus>`${DocumentStatus.PENDING}::"DocumentStatus"`,
+                  sql.lit(DocumentStatus.COMPLETED),
+                  sql.lit(DocumentStatus.PENDING),
                 ]),
                 recipientExists(eb, user.email),
               ]),
@@ -235,47 +231,29 @@ export const findDocuments = async ({
         ),
       )
       .with(ExtendedDocumentStatus.INBOX, () =>
-        qb
-          .where(
-            'Envelope.status',
-            '!=',
-            sql<DocumentStatus>`${ExtendedDocumentStatus.DRAFT}::"DocumentStatus"`,
-          )
-          .where((eb) =>
-            // Single EXISTS check: the recipient must be NOT_SIGNED, non-CC, and
-            // not soft-deleted. This replaces the previous personalDeletedFilter +
-            // separate recipientExists pair, eliminating a hashed SubPlan that
-            // materialised all recipient rows for this email (~125k for heavy users).
-            recipientExists(eb, user.email, (reb) =>
-              reb.and([
-                reb('Recipient.documentDeletedAt', 'is', null),
-                reb(
-                  'signingStatus',
-                  '=',
-                  sql<SigningStatus>`${SigningStatus.NOT_SIGNED}::"SigningStatus"`,
-                ),
-                reb('role', '!=', sql<RecipientRole>`${RecipientRole.CC}::"RecipientRole"`),
-              ]),
-            ),
+        qb.where('Envelope.status', '!=', sql.lit(ExtendedDocumentStatus.DRAFT)).where((eb) =>
+          // Single EXISTS check: the recipient must be NOT_SIGNED, non-CC, and
+          // not soft-deleted. This replaces the previous personalDeletedFilter +
+          // separate recipientExists pair, eliminating a hashed SubPlan that
+          // materialised all recipient rows for this email (~125k for heavy users).
+          recipientExists(eb, user.email, (reb) =>
+            reb.and([
+              reb('Recipient.documentDeletedAt', 'is', null),
+              reb('signingStatus', '=', sql.lit(SigningStatus.NOT_SIGNED)),
+              reb('role', '!=', sql.lit(RecipientRole.CC)),
+            ]),
           ),
+        ),
       )
       .with(ExtendedDocumentStatus.DRAFT, () =>
         qb
           .where('Envelope.userId', '=', user.id)
           .where('Envelope.deletedAt', 'is', null)
-          .where(
-            'Envelope.status',
-            '=',
-            sql<DocumentStatus>`${DocumentStatus.DRAFT}::"DocumentStatus"`,
-          ),
+          .where('Envelope.status', '=', sql.lit(DocumentStatus.DRAFT)),
       )
       .with(ExtendedDocumentStatus.PENDING, () =>
         qb
-          .where(
-            'Envelope.status',
-            '=',
-            sql<DocumentStatus>`${DocumentStatus.PENDING}::"DocumentStatus"`,
-          )
+          .where('Envelope.status', '=', sql.lit(DocumentStatus.PENDING))
           .where((eb) =>
             eb.and([
               personalDeletedFilter(eb),
@@ -283,16 +261,8 @@ export const findDocuments = async ({
                 eb('Envelope.userId', '=', user.id),
                 recipientExists(eb, user.email, (reb) =>
                   reb.and([
-                    reb(
-                      'Recipient.signingStatus',
-                      '=',
-                      sql<SigningStatus>`${SigningStatus.SIGNED}::"SigningStatus"`,
-                    ),
-                    reb(
-                      'Recipient.role',
-                      '!=',
-                      sql<RecipientRole>`${RecipientRole.CC}::"RecipientRole"`,
-                    ),
+                    reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.SIGNED)),
+                    reb('Recipient.role', '!=', sql.lit(RecipientRole.CC)),
                   ]),
                 ),
               ]),
@@ -301,9 +271,7 @@ export const findDocuments = async ({
       )
       .with(ExtendedDocumentStatus.COMPLETED, () =>
         qb
-          .where(
-            () => sql`"Envelope"."status" = ${ExtendedDocumentStatus.COMPLETED}::"DocumentStatus"`,
-          )
+          .where('Envelope.status', '=', sql.lit(ExtendedDocumentStatus.COMPLETED))
           .where((eb) =>
             eb.and([
               personalDeletedFilter(eb),
@@ -313,20 +281,14 @@ export const findDocuments = async ({
       )
       .with(ExtendedDocumentStatus.REJECTED, () =>
         qb
-          .where(
-            () => sql`"Envelope"."status" = ${ExtendedDocumentStatus.REJECTED}::"DocumentStatus"`,
-          )
+          .where('Envelope.status', '=', sql.lit(ExtendedDocumentStatus.REJECTED))
           .where((eb) =>
             eb.and([
               personalDeletedFilter(eb),
               eb.or([
                 eb('Envelope.userId', '=', user.id),
                 recipientExists(eb, user.email, (reb) =>
-                  reb(
-                    'Recipient.signingStatus',
-                    '=',
-                    sql<SigningStatus>`${SigningStatus.REJECTED}::"SigningStatus"`,
-                  ),
+                  reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.REJECTED)),
                 ),
               ]),
             ]),
@@ -361,7 +323,7 @@ export const findDocuments = async ({
         eb(
           'Envelope.visibility',
           'in',
-          allowedVisibilities.map((v) => sql<DocumentVisibility>`${v}::"DocumentVisibility"`),
+          allowedVisibilities.map((v) => sql.lit(v)),
         ),
         eb('Envelope.userId', '=', user.id),
         recipientExists(eb, user.email),
@@ -392,11 +354,7 @@ export const findDocuments = async ({
             accessBranches.push(senderEmailIs(eb, teamEmail));
             accessBranches.push(
               eb.and([
-                eb(
-                  'status',
-                  '!=',
-                  sql<DocumentStatus>`${ExtendedDocumentStatus.DRAFT}::"DocumentStatus"`,
-                ),
+                eb('status', '!=', sql.lit(ExtendedDocumentStatus.DRAFT)),
                 recipientExists(eb, teamEmail),
               ]),
             );
@@ -411,9 +369,7 @@ export const findDocuments = async ({
         }
 
         return qb
-          .where(
-            () => sql`"Envelope"."status" != ${ExtendedDocumentStatus.DRAFT}::"DocumentStatus"`,
-          )
+          .where('Envelope.status', '!=', sql.lit(ExtendedDocumentStatus.DRAFT))
           .where((eb) =>
             eb.and([
               visibilityFilter(eb),
@@ -423,104 +379,70 @@ export const findDocuments = async ({
               recipientExists(eb, teamEmail, (reb) =>
                 reb.and([
                   reb('Recipient.documentDeletedAt', 'is', null),
-                  reb(
-                    'Recipient.signingStatus',
-                    '=',
-                    sql<SigningStatus>`${SigningStatus.NOT_SIGNED}::"SigningStatus"`,
-                  ),
-                  reb(
-                    'Recipient.role',
-                    '!=',
-                    sql<RecipientRole>`${RecipientRole.CC}::"RecipientRole"`,
-                  ),
+                  reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.NOT_SIGNED)),
+                  reb('Recipient.role', '!=', sql.lit(RecipientRole.CC)),
                 ]),
               ),
             ]),
           );
       })
       .with(ExtendedDocumentStatus.DRAFT, () =>
-        qb
-          .where(() => sql`"Envelope"."status" = ${ExtendedDocumentStatus.DRAFT}::"DocumentStatus"`)
-          .where((eb) => {
-            const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
+        qb.where('Envelope.status', '=', sql.lit(ExtendedDocumentStatus.DRAFT)).where((eb) => {
+          const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
 
-            if (teamEmail) {
-              accessBranches.push(senderEmailIs(eb, teamEmail));
-            }
+          if (teamEmail) {
+            accessBranches.push(senderEmailIs(eb, teamEmail));
+          }
 
-            return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
-          }),
+          return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
+        }),
       )
       .with(ExtendedDocumentStatus.PENDING, () =>
-        qb
-          .where(
-            () => sql`"Envelope"."status" = ${ExtendedDocumentStatus.PENDING}::"DocumentStatus"`,
-          )
-          .where((eb) => {
-            const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
+        qb.where('Envelope.status', '=', sql.lit(ExtendedDocumentStatus.PENDING)).where((eb) => {
+          const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
 
-            if (teamEmail) {
-              accessBranches.push(senderEmailIs(eb, teamEmail));
-              accessBranches.push(
-                recipientExists(eb, teamEmail, (reb) =>
-                  reb.and([
-                    reb(
-                      'Recipient.signingStatus',
-                      '=',
-                      sql<SigningStatus>`${SigningStatus.SIGNED}::"SigningStatus"`,
-                    ),
-                    reb(
-                      'Recipient.role',
-                      '!=',
-                      sql<RecipientRole>`${RecipientRole.CC}::"RecipientRole"`,
-                    ),
-                  ]),
-                ),
-              );
-            }
+          if (teamEmail) {
+            accessBranches.push(senderEmailIs(eb, teamEmail));
+            accessBranches.push(
+              recipientExists(eb, teamEmail, (reb) =>
+                reb.and([
+                  reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.SIGNED)),
+                  reb('Recipient.role', '!=', sql.lit(RecipientRole.CC)),
+                ]),
+              ),
+            );
+          }
 
-            return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
-          }),
+          return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
+        }),
       )
       .with(ExtendedDocumentStatus.COMPLETED, () =>
-        qb
-          .where(
-            () => sql`"Envelope"."status" = ${ExtendedDocumentStatus.COMPLETED}::"DocumentStatus"`,
-          )
-          .where((eb) => {
-            const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
+        qb.where('Envelope.status', '=', sql.lit(ExtendedDocumentStatus.COMPLETED)).where((eb) => {
+          const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
 
-            if (teamEmail) {
-              accessBranches.push(senderEmailIs(eb, teamEmail));
-              accessBranches.push(recipientExists(eb, teamEmail));
-            }
+          if (teamEmail) {
+            accessBranches.push(senderEmailIs(eb, teamEmail));
+            accessBranches.push(recipientExists(eb, teamEmail));
+          }
 
-            return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
-          }),
+          return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
+        }),
       )
       .with(ExtendedDocumentStatus.REJECTED, () =>
-        qb
-          .where(
-            () => sql`"Envelope"."status" = ${ExtendedDocumentStatus.REJECTED}::"DocumentStatus"`,
-          )
-          .where((eb) => {
-            const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
+        qb.where('Envelope.status', '=', sql.lit(ExtendedDocumentStatus.REJECTED)).where((eb) => {
+          const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
 
-            if (teamEmail) {
-              accessBranches.push(senderEmailIs(eb, teamEmail));
-              accessBranches.push(
-                recipientExists(eb, teamEmail, (reb) =>
-                  reb(
-                    'Recipient.signingStatus',
-                    '=',
-                    sql<SigningStatus>`${SigningStatus.REJECTED}::"SigningStatus"`,
-                  ),
-                ),
-              );
-            }
+          if (teamEmail) {
+            accessBranches.push(senderEmailIs(eb, teamEmail));
+            accessBranches.push(
+              recipientExists(eb, teamEmail, (reb) =>
+                reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.REJECTED)),
+              ),
+            );
+          }
 
-            return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
-          }),
+          return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
+        }),
       )
       .exhaustive();
   };

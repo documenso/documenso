@@ -1,10 +1,4 @@
-import type {
-  DocumentSource,
-  DocumentStatus,
-  DocumentVisibility,
-  Envelope,
-  EnvelopeType,
-} from '@prisma/client';
+import type { DocumentSource, DocumentStatus, Envelope, EnvelopeType } from '@prisma/client';
 import type { Expression, ExpressionBuilder, SelectQueryBuilder, SqlBool } from 'kysely';
 
 import { kyselyPrisma, prisma, sql } from '@documenso/prisma';
@@ -141,7 +135,7 @@ export const findEnvelopes = async ({
 
   // Type filter (enum cast)
   if (type) {
-    qb = qb.where('Envelope.type', '=', sql<EnvelopeType>`${type}::"EnvelopeType"`);
+    qb = qb.where('Envelope.type', '=', sql.lit(type));
   }
 
   // Template filter
@@ -151,12 +145,12 @@ export const findEnvelopes = async ({
 
   // Source filter (enum cast)
   if (source) {
-    qb = qb.where('Envelope.source', '=', sql<DocumentSource>`${source}::"DocumentSource"`);
+    qb = qb.where('Envelope.source', '=', sql.lit(source));
   }
 
   // Status filter (enum cast)
   if (status) {
-    qb = qb.where('Envelope.status', '=', sql<DocumentStatus>`${status}::"DocumentStatus"`);
+    qb = qb.where('Envelope.status', '=', sql.lit(status));
   }
 
   // Search filter: title, externalId, or recipient match via capped subquery
@@ -197,7 +191,7 @@ export const findEnvelopes = async ({
       eb(
         'Envelope.visibility',
         'in',
-        allowedVisibilities.map((v) => sql<DocumentVisibility>`${v}::"DocumentVisibility"`),
+        allowedVisibilities.map((v) => sql.lit(v)),
       ),
       // Owner always sees their own docs within this team
       eb('Envelope.userId', '=', user.id),

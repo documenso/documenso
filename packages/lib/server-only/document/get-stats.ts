@@ -1,4 +1,3 @@
-import type { DocumentVisibility } from '@prisma/client';
 import {
   DocumentStatus,
   EnvelopeType,
@@ -119,11 +118,7 @@ export const getStats = async ({
       .select('Envelope.id');
 
     // Type = DOCUMENT
-    qb = qb.where(
-      'Envelope.type',
-      '=',
-      sql<EnvelopeType>`${EnvelopeType.DOCUMENT}::"EnvelopeType"`,
-    );
+    qb = qb.where('Envelope.type', '=', sql.lit(EnvelopeType.DOCUMENT));
 
     // Folder filter
     qb =
@@ -179,7 +174,7 @@ export const getStats = async ({
       eb(
         'Envelope.visibility',
         'in',
-        allowedVisibilities.map((v) => sql<DocumentVisibility>`${v}::"DocumentVisibility"`),
+        allowedVisibilities.map((v) => sql.lit(v)),
       ),
       eb('Envelope.userId', '=', user.id),
       recipientExists(eb, user.email),
@@ -204,7 +199,7 @@ export const getStats = async ({
 
   // DRAFT: team-owned drafts visible to the user
   const draftQuery = buildBaseQuery()
-    .where('Envelope.status', '=', sql<DocumentStatus>`${DocumentStatus.DRAFT}::"DocumentStatus"`)
+    .where('Envelope.status', '=', sql.lit(DocumentStatus.DRAFT))
     .where((eb) => {
       const accessBranches = [eb('Envelope.teamId', '=', team.id)];
 
@@ -217,7 +212,7 @@ export const getStats = async ({
 
   // PENDING: team-owned pending + team-email signed-pending docs
   const pendingQuery = buildBaseQuery()
-    .where('Envelope.status', '=', sql<DocumentStatus>`${DocumentStatus.PENDING}::"DocumentStatus"`)
+    .where('Envelope.status', '=', sql.lit(DocumentStatus.PENDING))
     .where((eb) => {
       const accessBranches = [eb('Envelope.teamId', '=', team.id)];
 
@@ -226,12 +221,8 @@ export const getStats = async ({
         accessBranches.push(
           recipientExists(eb, teamEmail, (reb) =>
             reb.and([
-              reb(
-                'Recipient.signingStatus',
-                '=',
-                sql<SigningStatus>`${SigningStatus.SIGNED}::"SigningStatus"`,
-              ),
-              reb('Recipient.role', '!=', sql<RecipientRole>`${RecipientRole.CC}::"RecipientRole"`),
+              reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.SIGNED)),
+              reb('Recipient.role', '!=', sql.lit(RecipientRole.CC)),
             ]),
           ),
         );
@@ -242,11 +233,7 @@ export const getStats = async ({
 
   // COMPLETED: team-owned completed + team-email received completed
   const completedQuery = buildBaseQuery()
-    .where(
-      'Envelope.status',
-      '=',
-      sql<DocumentStatus>`${DocumentStatus.COMPLETED}::"DocumentStatus"`,
-    )
+    .where('Envelope.status', '=', sql.lit(DocumentStatus.COMPLETED))
     .where((eb) => {
       const accessBranches = [eb('Envelope.teamId', '=', team.id)];
 
@@ -260,11 +247,7 @@ export const getStats = async ({
 
   // REJECTED: team-owned rejected + team-email rejected docs
   const rejectedQuery = buildBaseQuery()
-    .where(
-      'Envelope.status',
-      '=',
-      sql<DocumentStatus>`${DocumentStatus.REJECTED}::"DocumentStatus"`,
-    )
+    .where('Envelope.status', '=', sql.lit(DocumentStatus.REJECTED))
     .where((eb) => {
       const accessBranches = [eb('Envelope.teamId', '=', team.id)];
 
@@ -272,11 +255,7 @@ export const getStats = async ({
         accessBranches.push(senderEmailIs(eb, teamEmail));
         accessBranches.push(
           recipientExists(eb, teamEmail, (reb) =>
-            reb(
-              'Recipient.signingStatus',
-              '=',
-              sql<SigningStatus>`${SigningStatus.REJECTED}::"SigningStatus"`,
-            ),
+            reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.REJECTED)),
           ),
         );
       }
@@ -288,27 +267,15 @@ export const getStats = async ({
   // Returns 0 if the team has no team email.
   const inboxQuery = teamEmail
     ? buildBaseQuery()
-        .where(
-          'Envelope.status',
-          '!=',
-          sql<DocumentStatus>`${DocumentStatus.DRAFT}::"DocumentStatus"`,
-        )
+        .where('Envelope.status', '!=', sql.lit(DocumentStatus.DRAFT))
         .where((eb) =>
           eb.and([
             visibilityFilter(eb),
             recipientExists(eb, teamEmail, (reb) =>
               reb.and([
                 reb('Recipient.documentDeletedAt', 'is', null),
-                reb(
-                  'Recipient.signingStatus',
-                  '=',
-                  sql<SigningStatus>`${SigningStatus.NOT_SIGNED}::"SigningStatus"`,
-                ),
-                reb(
-                  'Recipient.role',
-                  '!=',
-                  sql<RecipientRole>`${RecipientRole.CC}::"RecipientRole"`,
-                ),
+                reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.NOT_SIGNED)),
+                reb('Recipient.role', '!=', sql.lit(RecipientRole.CC)),
               ]),
             ),
           ]),
