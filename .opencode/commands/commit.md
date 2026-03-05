@@ -51,19 +51,64 @@ Create a git commit for the current changes using the Conventional Commits stand
 
 ## Examples
 
-Simple change:
-
+**Simple fix (no body):**
 ```
 fix: handle empty input in parser without throwing
 ```
 
-With body:
-
+**Feature with body (explains why):**
 ```
 feat: add streaming response support
 
 Large responses were causing memory issues in production.
 Streaming allows processing chunks incrementally.
+```
+
+**Docs change:**
+```
+docs: add API usage examples to token exchange README
+```
+
+**Refactor:**
+```
+refactor: extract exchange logic into separate module
+```
+
+**Chore / maintenance:**
+```
+chore: update dependencies and remove deprecated config
+```
+
+**Performance:**
+```
+perf: cache trusted token lookups to reduce DB round-trips
+```
+
+**Test:**
+```
+test: add E2E tests for token exchange flow
+```
+
+**Build / CI:**
+```
+build: bump Next.js to v15 for React 19 support
+```
+```
+ci: add pre-push lint check for staged files
+```
+
+**Style (code formatting only):**
+```
+style: run prettier on token-exchange route handlers
+```
+
+**Multi-file change with body:**
+```
+feat: support trusted token exchange via API route
+
+Adds route handler and lib functions for exchanging tokens
+with trusted issuers. Enables external apps to authenticate
+without user-facing OAuth flow.
 ```
 
 ## Rules

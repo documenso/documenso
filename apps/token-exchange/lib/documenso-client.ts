@@ -86,14 +86,25 @@ export async function getTemplates(
   return res.json() as Promise<GetTemplatesResponse>;
 }
 
+/**
+ * Encodes embed params for the authoring URL hash.
+ * The authoring pages expect: base64(encodeURIComponent(JSON.stringify(params)))
+ */
+function encodeEmbedAuthoringHash(params: Record<string, unknown> = {}): string {
+  const json = JSON.stringify(params);
+  return Buffer.from(encodeURIComponent(json), 'utf-8').toString('base64');
+}
+
 export function buildTemplateAuthoringLink(presignToken: string): string {
   const baseUrl = getDocumensoUrl();
-  return `${baseUrl}/embed/v1/authoring/template/create?token=${encodeURIComponent(presignToken)}`;
+  const hash = encodeEmbedAuthoringHash({});
+  return `${baseUrl}/embed/v1/authoring/template/create?token=${encodeURIComponent(presignToken)}#${hash}`;
 }
 
 export function buildTemplateEditAuthoringLink(id: number, presignToken: string): string {
   const baseUrl = getDocumensoUrl();
-  return `${baseUrl}/embed/v1/authoring/template/edit/${id}?token=${encodeURIComponent(presignToken)}`;
+  const hash = encodeEmbedAuthoringHash({});
+  return `${baseUrl}/embed/v1/authoring/template/edit/${id}?token=${encodeURIComponent(presignToken)}#${hash}`;
 }
 
 export type CreateEnvelopeRequest = {
