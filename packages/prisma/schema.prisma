@@ -437,6 +437,7 @@ model Envelope {
   @@index([teamId])
   @@index([folderId])
   @@index([createdAt])
+  @@index([qrToken])
 }
 
 model EnvelopeItem {
@@ -823,6 +824,7 @@ model OrganisationGlobalSettings {
   documentLanguage          String             @default("en")
   includeSenderDetails      Boolean            @default(true)
   includeSigningCertificate Boolean            @default(true)
+  allowPublicCompletedDocumentAccess Boolean   @default(true)
   includeAuditLog           Boolean            @default(false)
   documentTimezone          String? // Nullable to allow using local timezones if not set.
   documentDateFormat        String             @default("yyyy-MM-dd hh:mm a")
@@ -865,6 +867,7 @@ model TeamGlobalSettings {
 
   includeSenderDetails      Boolean?
   includeSigningCertificate Boolean?
+  allowPublicCompletedDocumentAccess Boolean?
   includeAuditLog           Boolean?
 
   typedSignatureEnabled  Boolean?

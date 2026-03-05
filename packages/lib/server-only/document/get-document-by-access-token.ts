@@ -1,5 +1,7 @@
 import { DocumentStatus, EnvelopeType } from '@prisma/client';
 
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { isPublicDocumentAccessEnabled } from '@documenso/lib/universal/document-access';
 import { prisma } from '@documenso/prisma';
 
 import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
@@ -10,25 +12,41 @@ export type GetDocumentByAccessTokenOptions = {
 
 export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTokenOptions) => {
   if (!token) {
-    throw new Error('Missing token');
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'Missing QR access token',
+      statusCode: 401,
+    });
   }
 
-  const result = await prisma.envelope.findFirstOrThrow({
+  const result = await prisma.envelope.findFirst({
     where: {
       type: EnvelopeType.DOCUMENT,
-      status: DocumentStatus.COMPLETED,
       qrToken: token,
     },
-    // Do not provide extra information that is not needed.
     select: {
       id: true,
       secondaryId: true,
+      status: true,
       internalVersion: true,
       title: true,
       completedAt: true,
       team: {
         select: {
           url: true,
+          organisation: {
+            select: {
+              organisationGlobalSettings: {
+                select: {
+                  allowPublicCompletedDocumentAccess: true,
+                },
+              },
+            },
+          },
+          teamGlobalSettings: {
+            select: {
+              allowPublicCompletedDocumentAccess: true,
+            },
+          },
         },
       },
       envelopeItems: {
@@ -56,10 +74,34 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
     },
   });
 
-  const firstDocumentData = result.envelopeItems[0].documentData;
+  if (!result) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'QR token not found',
+      statusCode: 404,
+    });
+  }
 
-  if (!firstDocumentData) {
-    throw new Error('Missing document data');
+  if (result.status !== DocumentStatus.COMPLETED) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Document is not fully completed',
+      statusCode: 409,
+    });
+  }
+
+  if (!isPublicDocumentAccessEnabled(result.team)) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'Public completed-document access is disabled for this document',
+      statusCode: 403,
+    });
+  }
+
+  const firstEnvelopeItem = result.envelopeItems[0];
+
+  if (!firstEnvelopeItem?.documentData) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Missing document data for QR token',
+      statusCode: 404,
+    });
   }
 
   return {
