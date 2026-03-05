@@ -139,7 +139,7 @@ export const CheckboxFieldAdvancedSettings = ({
         </Label>
         <Input
           id="label"
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={_(msg`Field label`)}
           value={fieldState.label}
           onChange={(e) => handleFieldChange('label', e.target.value)}
@@ -154,7 +154,7 @@ export const CheckboxFieldAdvancedSettings = ({
           value={fieldState.direction ?? 'vertical'}
           onValueChange={(val) => handleToggleChange('direction', val)}
         >
-          <SelectTrigger className="text-muted-foreground bg-background mt-2 w-full">
+          <SelectTrigger className="mt-2 w-full bg-background text-muted-foreground">
             <SelectValue placeholder={_(msg`Select direction`)} />
           </SelectTrigger>
           <SelectContent position="popper">
@@ -177,7 +177,7 @@ export const CheckboxFieldAdvancedSettings = ({
             value={fieldState.validationRule}
             onValueChange={(val) => handleToggleChange('validationRule', val)}
           >
-            <SelectTrigger className="text-muted-foreground bg-background mt-2 w-full">
+            <SelectTrigger className="mt-2 w-full bg-background text-muted-foreground">
               <SelectValue placeholder={_(msg`Select at least`)} />
             </SelectTrigger>
             <SelectContent position="popper">
@@ -194,7 +194,7 @@ export const CheckboxFieldAdvancedSettings = ({
             value={fieldState.validationLength ? String(fieldState.validationLength) : ''}
             onValueChange={(val) => handleToggleChange('validationLength', val)}
           >
-            <SelectTrigger className="text-muted-foreground bg-background mt-2 w-full">
+            <SelectTrigger className="mt-2 w-full bg-background text-muted-foreground">
               <SelectValue placeholder={_(msg`Pick a number`)} />
             </SelectTrigger>
             <SelectContent position="popper">
@@ -230,7 +230,7 @@ export const CheckboxFieldAdvancedSettings = ({
         </div>
       </div>
       <Button
-        className="bg-foreground/10 hover:bg-foreground/5 border-foreground/10 mt-2 border"
+        className="mt-2 border border-foreground/10 bg-foreground/10 hover:bg-foreground/5"
         variant="outline"
         onClick={() => setShowValidation((prev) => !prev)}
       >
@@ -247,7 +247,7 @@ export const CheckboxFieldAdvancedSettings = ({
           {values.map((value, index) => (
             <div key={index} className="mt-2 flex items-center gap-4">
               <Checkbox
-                className="data-[state=checked]:bg-primary border-foreground/30 h-5 w-5"
+                className="h-5 w-5 border-foreground/30 data-[state=checked]:bg-primary"
                 checked={value.checked}
                 onCheckedChange={(checked) => handleCheckboxValue(index, 'checked', checked)}
               />
@@ -266,7 +266,7 @@ export const CheckboxFieldAdvancedSettings = ({
             </div>
           ))}
           <Button
-            className="bg-foreground/10 hover:bg-foreground/5 border-foreground/10 ml-9 mt-4 border"
+            className="ml-9 mt-4 border border-foreground/10 bg-foreground/10 hover:bg-foreground/5"
             variant="outline"
             onClick={addValue}
           >

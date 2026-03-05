@@ -10,8 +10,8 @@
     "universal/"
   ],
   "scripts": {
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "oxlint --type-aware .",
+    "lint:fix": "oxlint --type-aware --fix .",
     "clean": "rimraf node_modules"
   },
   "dependencies": {

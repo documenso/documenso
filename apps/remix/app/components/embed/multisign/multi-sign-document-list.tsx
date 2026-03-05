@@ -60,27 +60,27 @@ export function MultiSignDocumentList({ envelopes, onDocumentSelect }: MultiSign
     return (
       <div className="mx-auto mt-16 flex w-full max-w-lg flex-col md:mt-16 md:rounded-2xl md:border md:px-8 md:py-16 md:shadow-lg">
         <div className="flex items-center justify-center">
-          <XCircle className="text-destructive h-16 w-16 md:h-24 md:w-24" strokeWidth={1.2} />
+          <XCircle className="h-16 w-16 text-destructive md:h-24 md:w-24" strokeWidth={1.2} />
         </div>
 
         <h2 className="mt-12 text-xl font-bold md:text-2xl">
           <Trans>It looks like we ran into an issue!</Trans>
         </h2>
 
-        <p className="text-muted-foreground mt-6">
+        <p className="mt-6 text-muted-foreground">
           <Trans>
             One of the documents in the current bundle has a signing role that is not compatible
             with the current signing experience.
           </Trans>
         </p>
 
-        <p className="text-muted-foreground mt-2">
+        <p className="mt-2 text-muted-foreground">
           <Trans>
             Assistants and Copy roles are currently not compatible with the multi-sign experience.
           </Trans>
         </p>
 
-        <p className="text-muted-foreground mt-2">
+        <p className="mt-2 text-muted-foreground">
           <Trans>Please contact the site owner for further assistance.</Trans>
         </p>
       </div>
@@ -88,12 +88,12 @@ export function MultiSignDocumentList({ envelopes, onDocumentSelect }: MultiSign
   }
 
   return (
-    <div className="bg-background mx-auto w-full max-w-lg md:my-12 md:rounded-2xl md:border md:p-8 md:shadow-lg">
-      <h2 className="text-foreground mb-1 text-lg font-semibold">
+    <div className="mx-auto w-full max-w-lg bg-background md:my-12 md:rounded-2xl md:border md:p-8 md:shadow-lg">
+      <h2 className="mb-1 text-lg font-semibold text-foreground">
         <Trans>Sign Documents</Trans>
       </h2>
 
-      <p className="text-muted-foreground text-sm">
+      <p className="text-sm text-muted-foreground">
         <Trans>
           You have been requested to sign the following documents. Review each document carefully
           and complete the signing process.
@@ -103,7 +103,7 @@ export function MultiSignDocumentList({ envelopes, onDocumentSelect }: MultiSign
       {/* Progress Section */}
       <div className="mt-6">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground font-medium">
+          <span className="font-medium text-muted-foreground">
             <Trans>Progress</Trans>
           </span>
           <span className="text-muted-foreground">
@@ -120,9 +120,9 @@ export function MultiSignDocumentList({ envelopes, onDocumentSelect }: MultiSign
         {envelopes.map((envelope) => (
           <div
             key={envelope.document.id}
-            className="border-border flex items-center gap-4 rounded-lg border px-4 py-2"
+            className="flex items-center gap-4 rounded-lg border border-border px-4 py-2"
           >
-            <span className="text-foreground flex-1 truncate text-sm font-medium">
+            <span className="flex-1 truncate text-sm font-medium text-foreground">
               {envelope.document.title}
             </span>
 

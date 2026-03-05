@@ -55,7 +55,7 @@ export const TextFieldAdvancedSettings = ({
         </Label>
         <Input
           id="label"
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={t`Field label`}
           value={fieldState.label}
           onChange={(e) => handleFieldChange('label', e.target.value)}
@@ -67,7 +67,7 @@ export const TextFieldAdvancedSettings = ({
         </Label>
         <Input
           id="placeholder"
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={t`Field placeholder`}
           value={fieldState.placeholder}
           onChange={(e) => handleFieldChange('placeholder', e.target.value)}
@@ -80,7 +80,7 @@ export const TextFieldAdvancedSettings = ({
         </Label>
         <Textarea
           id="text"
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={t`Add text to the field`}
           value={fieldState.text}
           onChange={(e) => handleInput('text', e.target.value)}
@@ -95,7 +95,7 @@ export const TextFieldAdvancedSettings = ({
           id="characterLimit"
           type="number"
           min={0}
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={t`Field character limit`}
           value={fieldState.characterLimit}
           onChange={(e) => handleInput('characterLimit', e.target.value)}
@@ -109,7 +109,7 @@ export const TextFieldAdvancedSettings = ({
         <Input
           id="fontSize"
           type="number"
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={t`Field font size`}
           value={fieldState.fontSize}
           onChange={(e) => handleInput('fontSize', e.target.value)}
@@ -133,7 +133,7 @@ export const TextFieldAdvancedSettings = ({
             handleInput('textAlign', value);
           }}
         >
-          <SelectTrigger className="bg-background mt-2">
+          <SelectTrigger className="mt-2 bg-background">
             <SelectValue placeholder={t`Select text align`} />
           </SelectTrigger>
 

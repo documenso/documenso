@@ -122,7 +122,7 @@ export const AccountDeleteDialog = ({ className }: AccountDeleteDialogProps) => 
                   <Label>
                     <Trans>
                       Please type{' '}
-                      <span className="text-muted-foreground font-semibold">{user.email}</span> to
+                      <span className="font-semibold text-muted-foreground">{user.email}</span> to
                       confirm.
                     </Trans>
                   </Label>

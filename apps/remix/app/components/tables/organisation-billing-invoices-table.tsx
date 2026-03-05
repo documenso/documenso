@@ -59,7 +59,7 @@ export const OrganisationBillingInvoicesTable = ({
           <div className="flex max-w-xs items-center gap-2">
             <File className="h-6 w-6" />
 
-            <div className="text-foreground/80 text-sm font-semibold">
+            <div className="text-sm font-semibold text-foreground/80">
               {DateTime.fromSeconds(row.original.created).toFormat('MMMM yyyy')}
             </div>
           </div>

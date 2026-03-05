@@ -79,7 +79,7 @@ export const DocumentUploadButton = ({
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button className="hover:bg-warning/80 bg-warning" asChild>
+            <Button className="bg-warning hover:bg-warning/80" asChild>
               <Link
                 to={
                   isPersonalLayoutMode

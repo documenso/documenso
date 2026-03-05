@@ -16,7 +16,7 @@ export default function ForgotPasswordPage() {
           <Trans>Forgot your password?</Trans>
         </h1>
 
-        <p className="text-muted-foreground mt-2 text-sm">
+        <p className="mt-2 text-sm text-muted-foreground">
           <Trans>
             No worries, it happens! Enter your email and we'll email you a special link to reset
             your password.
@@ -25,7 +25,7 @@ export default function ForgotPasswordPage() {
 
         <ForgotPasswordForm className="mt-4" />
 
-        <p className="text-muted-foreground mt-6 text-center text-sm">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           <Trans>
             Remembered your password?{' '}
             <Link to="/signin" className="text-primary duration-200 hover:opacity-70">

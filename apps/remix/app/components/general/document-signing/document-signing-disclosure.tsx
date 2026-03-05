@@ -12,7 +12,7 @@ export const DocumentSigningDisclosure = ({
   ...props
 }: DocumentSigningDisclosureProps) => {
   return (
-    <p className={cn('text-muted-foreground text-xs', className)} {...props}>
+    <p className={cn('text-xs text-muted-foreground', className)} {...props}>
       <Trans>
         By proceeding with your electronic signature, you acknowledge and consent that it will be
         used to sign the given document and holds the same legal validity as a handwritten

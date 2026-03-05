@@ -90,7 +90,7 @@ export const OrganisationInvitations = ({ className }: { className?: string }) =
                             className="w-full max-w-none py-4"
                             avatarFallback={invitation.organisation.name.slice(0, 1)}
                             primaryText={
-                              <span className="text-foreground/80 font-semibold">
+                              <span className="font-semibold text-foreground/80">
                                 {invitation.organisation.name}
                               </span>
                             }

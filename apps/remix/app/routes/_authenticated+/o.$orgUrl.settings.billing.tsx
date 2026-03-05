@@ -31,7 +31,7 @@ export default function TeamsSettingBillingPage() {
   if (isLoadingSubscription || !subscriptionQuery) {
     return (
       <div className="flex items-center justify-center rounded-lg py-32">
-        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
+        <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -57,7 +57,7 @@ export default function TeamsSettingBillingPage() {
             <Trans>Billing</Trans>
           </h3>
 
-          <div className="text-muted-foreground mt-2 text-sm">
+          <div className="mt-2 text-sm text-muted-foreground">
             {!organisationSubscription && (
               <p>
                 <Trans>

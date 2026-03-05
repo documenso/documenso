@@ -198,7 +198,7 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
                                 })),
                               );
                             }}
-                            className="bg-background w-full"
+                            className="w-full bg-background"
                             emptySelectionPlaceholder={t`Select groups`}
                           />
                         </FormControl>

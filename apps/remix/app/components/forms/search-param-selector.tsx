@@ -41,7 +41,7 @@ export const SearchParamSelector = ({ children, paramKey, isValueValid }: Search
 
   return (
     <Select defaultValue={value} onValueChange={onValueChange}>
-      <SelectTrigger className="text-muted-foreground max-w-[200px]">
+      <SelectTrigger className="max-w-[200px] text-muted-foreground">
         <SelectValue />
       </SelectTrigger>
 

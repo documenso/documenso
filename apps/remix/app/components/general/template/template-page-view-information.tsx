@@ -54,7 +54,7 @@ export const TemplatePageViewInformation = ({
   }, [isMounted, template, userId]);
 
   return (
-    <section className="dark:bg-background text-foreground border-border bg-widget flex flex-col rounded-xl border">
+    <section className="flex flex-col rounded-xl border border-border bg-widget text-foreground dark:bg-background">
       <h1 className="px-4 py-3 font-medium">
         <Trans>Information</Trans>
       </h1>

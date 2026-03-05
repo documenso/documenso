@@ -170,7 +170,7 @@ export const DocumentSigningRadioField = ({
               {!item.value.includes('empty-value-') && item.value && (
                 <Label
                   htmlFor={`option-${field.id}-${item.id}`}
-                  className="text-foreground ml-1.5 text-xs font-normal"
+                  className="ml-1.5 text-xs font-normal text-foreground"
                 >
                   {item.value}
                 </Label>
@@ -194,7 +194,7 @@ export const DocumentSigningRadioField = ({
               {!item.value.includes('empty-value-') && item.value && (
                 <Label
                   htmlFor={`option-${field.id}-${item.id}`}
-                  className="text-foreground ml-1.5 text-xs font-normal"
+                  className="ml-1.5 text-xs font-normal text-foreground"
                 >
                   {item.value}
                 </Label>

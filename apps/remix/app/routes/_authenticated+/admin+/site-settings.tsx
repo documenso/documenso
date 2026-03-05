@@ -106,7 +106,7 @@ export default function AdminBannerPage({ loaderData }: Route.ComponentProps) {
           <h2 className="font-semibold">
             <Trans>Site Banner</Trans>
           </h2>
-          <p className="text-muted-foreground mt-2 text-sm">
+          <p className="mt-2 text-sm text-muted-foreground">
             <Trans>
               The site banner is a message that is shown at the top of the site. It can be used to
               display important information to your users.

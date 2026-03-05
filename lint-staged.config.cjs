@@ -1,15 +1,14 @@
 const path = require('path');
 
-const eslint = (filenames) =>
-  `eslint --fix ${filenames.map((f) => `"${path.relative(process.cwd(), f)}"`).join(' ')}`;
+const oxlint = (filenames) =>
+  `oxlint --fix ${filenames.map((f) => `"${path.relative(process.cwd(), f)}"`).join(' ')}`;
 
-const prettier = (filenames) =>
-  `prettier --write ${filenames.map((f) => `"${path.relative(process.cwd(), f)}"`).join(' ')}`;
+const oxfmt = (filenames) =>
+  `oxfmt --write ${filenames.map((f) => `"${path.relative(process.cwd(), f)}"`).join(' ')}`;
 
-/** @type {import('lint-staged').Config} */
 module.exports = {
-  '**/*.{ts,tsx,cts,mts}': [eslint, prettier],
-  '**/*.{js,jsx,cjs,mjs}': [prettier],
-  '**/*.{yml,mdx}': [prettier],
+  '**/*.{ts,tsx,cts,mts}': [oxlint, oxfmt],
+  '**/*.{js,jsx,cjs,mjs}': [oxfmt],
+  '**/*.{yml,mdx}': [oxfmt],
   '**/*/package.json': 'npm run precommit',
 };

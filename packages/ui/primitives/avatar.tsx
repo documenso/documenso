@@ -37,7 +37,7 @@ const AvatarFallback = React.forwardRef<
   <AvatarPrimitive.Fallback
     ref={ref}
     className={cn(
-      'bg-muted flex h-full w-full items-center justify-center rounded-full',
+      'flex h-full w-full items-center justify-center rounded-full bg-muted',
       className,
     )}
     {...props}
@@ -70,7 +70,7 @@ const AvatarWithText = ({
 }: AvatarWithTextProps) => (
   <div className={cn('flex w-full max-w-xs items-center gap-2', className)}>
     <Avatar
-      className={cn('dark:border-border h-10 w-10 border-2 border-solid border-white', avatarClass)}
+      className={cn('h-10 w-10 border-2 border-solid border-white dark:border-border', avatarClass)}
     >
       {avatarSrc && <AvatarImage src={avatarSrc} />}
       <AvatarFallback className="text-xs text-gray-400">{avatarFallback}</AvatarFallback>
@@ -79,8 +79,8 @@ const AvatarWithText = ({
     <div
       className={cn('flex flex-col truncate text-left text-sm font-normal', textSectionClassName)}
     >
-      <span className="text-foreground truncate">{primaryText}</span>
-      <span className="text-muted-foreground truncate text-xs">{secondaryText}</span>
+      <span className="truncate text-foreground">{primaryText}</span>
+      <span className="truncate text-xs text-muted-foreground">{secondaryText}</span>
     </div>
 
     {rightSideComponent}

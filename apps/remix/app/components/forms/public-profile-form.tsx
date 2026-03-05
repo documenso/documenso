@@ -155,7 +155,7 @@ export const PublicProfileForm = ({
                 </FormControl>
 
                 {!isPersonalLayoutMode && (
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-xs text-muted-foreground">
                     <Trans>
                       You can update the profile URL by updating the team URL in the general
                       settings page.
@@ -165,7 +165,7 @@ export const PublicProfileForm = ({
 
                 <div className="h-8">
                   {!form.formState.errors.url && (
-                    <div className="text-muted-foreground h-8 text-sm">
+                    <div className="h-8 text-sm text-muted-foreground">
                       {field.value ? (
                         <div>
                           <Button
@@ -229,7 +229,7 @@ export const PublicProfileForm = ({
                   </FormControl>
 
                   {!form.formState.errors.profileBio && (
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       {remaningLength >= 0 ? (
                         <Plural
                           value={remaningLength}

@@ -88,11 +88,11 @@ export const ConfigureDocumentView = ({
   return (
     <div className="flex w-full flex-col space-y-8">
       <div>
-        <h2 className="text-foreground mb-1 text-xl font-semibold">
+        <h2 className="mb-1 text-xl font-semibold text-foreground">
           {isTemplate ? <Trans>Configure Template</Trans> : <Trans>Configure Document</Trans>}
         </h2>
 
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           {isTemplate ? (
             <Trans>Set up your template properties and recipient information</Trans>
           ) : (

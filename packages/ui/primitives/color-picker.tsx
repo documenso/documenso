@@ -45,7 +45,7 @@ export const ColorPicker = ({
         <button
           type="button"
           disabled={disabled}
-          className="bg-background h-12 w-12 rounded-md border p-1 disabled:pointer-events-none disabled:opacity-50"
+          className="h-12 w-12 rounded-md border bg-background p-1 disabled:pointer-events-none disabled:opacity-50"
         >
           <div className="h-full w-full rounded-sm" style={{ backgroundColor: color }} />
         </button>

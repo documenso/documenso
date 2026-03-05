@@ -1,0 +1,50 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "import", "react", "nextjs", "promise"],
+  "env": { "browser": true, "node": true, "es2022": true },
+  "categories": { "correctness": "error" },
+  "rules": {
+    "eslint/no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_",
+        "destructuredArrayIgnorePattern": "^_"
+      }
+    ],
+
+    "eslint/no-promise-executor-return": "error",
+    "eslint/prefer-promise-reject-errors": "error",
+    "eslint/no-unreachable": "error",
+
+    "typescript/no-floating-promises": "error",
+    "typescript/no-misused-promises": ["error", { "checksVoidReturn": { "attributes": false } }],
+    "typescript/promise-function-async": "error",
+    "typescript/require-await": "error",
+    "typescript/consistent-type-assertions": ["warn", { "assertionStyle": "never" }],
+    "typescript/consistent-type-imports": [
+      "warn",
+      {
+        "prefer": "type-imports",
+        "fixStyle": "separate-type-imports",
+        "disallowTypeAnnotations": false
+      }
+    ],
+
+    "react/no-unescaped-entities": "off",
+    "react/exhaustive-deps": "off",
+    "nextjs/no-html-link-for-pages": "off",
+    "nextjs/no-img-element": "off"
+  },
+  "ignorePatterns": [
+    "*.config.js",
+    "*.config.cjs",
+    "apps/*/public/*.js",
+    "apps/*/public/*.cjs",
+    "scripts/",
+    "lingui.config.ts",
+    "packages/lib/translations/**/*.js"
+  ]
+}

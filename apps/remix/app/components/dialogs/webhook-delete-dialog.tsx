@@ -132,7 +132,7 @@ export const WebhookDeleteDialog = ({ webhook, children }: WebhookDeleteDialogPr
                     <FormLabel>
                       <Trans>
                         Confirm by typing:{' '}
-                        <span className="font-sm text-destructive font-semibold">
+                        <span className="font-sm font-semibold text-destructive">
                           {deleteMessage}
                         </span>
                       </Trans>

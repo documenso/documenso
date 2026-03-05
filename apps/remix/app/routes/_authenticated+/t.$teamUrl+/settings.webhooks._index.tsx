@@ -64,9 +64,9 @@ export default function WebhookPage() {
         header: t`Webhook`,
         cell: ({ row }) => (
           <Link to={`/t/${team.url}/settings/webhooks/${row.original.id}`}>
-            <p className="text-muted-foreground text-xs">{row.original.id}</p>
+            <p className="text-xs text-muted-foreground">{row.original.id}</p>
             <p
-              className="text-foreground max-w-sm truncate text-xs font-semibold"
+              className="max-w-sm truncate text-xs font-semibold text-foreground"
               title={row.original.webhookUrl}
             >
               {row.original.webhookUrl}
@@ -130,7 +130,7 @@ export default function WebhookPage() {
           enable: isError,
         }}
         emptyState={
-          <div className="text-muted-foreground/60 flex h-60 flex-col items-center justify-center gap-y-4">
+          <div className="flex h-60 flex-col items-center justify-center gap-y-4 text-muted-foreground/60">
             <p>
               <Trans>
                 You have no webhooks yet. Your webhooks will be shown here once you create them.
@@ -172,7 +172,7 @@ const WebhookTableActionDropdown = ({ webhook }: { webhook: Webhook }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger data-testid="webhook-table-action-btn">
-        <MoreHorizontalIcon className="text-muted-foreground h-5 w-5" />
+        <MoreHorizontalIcon className="h-5 w-5 text-muted-foreground" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" forceMount>

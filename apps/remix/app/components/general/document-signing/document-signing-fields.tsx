@@ -4,15 +4,15 @@ import { cn } from '@documenso/ui/lib/utils';
 
 export const DocumentSigningFieldsLoader = () => {
   return (
-    <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
-      <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
+    <div className="absolute inset-0 flex items-center justify-center rounded-md bg-background">
+      <Loader className="h-5 w-5 animate-spin text-primary md:h-8 md:w-8" />
     </div>
   );
 };
 
 export const DocumentSigningFieldsUninserted = ({ children }: { children: React.ReactNode }) => {
   return (
-    <p className="text-foreground group-hover:text-recipient-green whitespace-pre-wrap text-[clamp(0.425rem,25cqw,0.825rem)] duration-200">
+    <p className="whitespace-pre-wrap text-[clamp(0.425rem,25cqw,0.825rem)] text-foreground duration-200 group-hover:text-recipient-green">
       {children}
     </p>
   );
@@ -37,7 +37,7 @@ export const DocumentSigningFieldsInserted = ({
     <div className="flex h-full w-full items-center overflow-hidden">
       <p
         className={cn(
-          'text-foreground w-full whitespace-pre-wrap text-left text-[clamp(0.425rem,25cqw,0.825rem)] duration-200',
+          'w-full whitespace-pre-wrap text-left text-[clamp(0.425rem,25cqw,0.825rem)] text-foreground duration-200',
           {
             '!text-center': textAlign === 'center',
             '!text-right': textAlign === 'right',

@@ -57,7 +57,7 @@ export const UserBillingOrganisationsTable = () => {
               avatarClass="h-12 w-12"
               avatarFallback={row.original.name.slice(0, 1).toUpperCase()}
               primaryText={
-                <span className="text-foreground/80 font-semibold">{row.original.name}</span>
+                <span className="font-semibold text-foreground/80">{row.original.name}</span>
               }
               secondaryText={`${NEXT_PUBLIC_WEBAPP_URL()}/o/${row.original.url}`}
             />
@@ -91,7 +91,7 @@ export const UserBillingOrganisationsTable = () => {
 
   if (billingOrganisations.length === 0) {
     return (
-      <div className="text-muted-foreground flex flex-col items-center justify-center rounded-lg border border-dashed py-12 text-center">
+      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12 text-center text-muted-foreground">
         <p className="text-sm">
           <Trans>You don't manage billing for any organisations.</Trans>
         </p>

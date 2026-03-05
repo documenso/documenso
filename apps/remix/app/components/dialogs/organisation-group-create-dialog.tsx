@@ -178,7 +178,7 @@ export const OrganisationGroupCreateDialog = ({
                     </FormLabel>
                     <FormControl>
                       <Select {...field} onValueChange={field.onChange}>
-                        <SelectTrigger className="text-muted-foreground w-full">
+                        <SelectTrigger className="w-full text-muted-foreground">
                           <SelectValue />
                         </SelectTrigger>
 
@@ -217,7 +217,7 @@ export const OrganisationGroupCreateDialog = ({
                         loading={isLoadingMembers}
                         selectedValues={field.value}
                         onChange={field.onChange}
-                        className="bg-background w-full"
+                        className="w-full bg-background"
                         emptySelectionPlaceholder={t`Select members`}
                       />
                     </FormControl>

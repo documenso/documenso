@@ -26,7 +26,7 @@ export const AdminStatsSignerConversionChart = ({
 
   return (
     <div className={className}>
-      <div className="border-border flex flex-1 flex-col justify-center rounded-2xl border p-6 pl-2">
+      <div className="flex flex-1 flex-col justify-center rounded-2xl border border-border p-6 pl-2">
         <div className="mb-6 flex px-4">
           <h3 className="text-lg font-semibold">{title}</h3>
         </div>

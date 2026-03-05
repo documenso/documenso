@@ -203,7 +203,7 @@ export const EditorFieldNumberForm = ({
                     value={field.value === null ? '-1' : field.value}
                     onValueChange={(value) => field.onChange(value === '-1' ? null : value)}
                   >
-                    <SelectTrigger className="text-muted-foreground bg-background w-full">
+                    <SelectTrigger className="w-full bg-background text-muted-foreground">
                       <SelectValue placeholder={t`Field format`} />
                     </SelectTrigger>
                     <SelectContent position="popper">

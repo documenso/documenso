@@ -255,7 +255,7 @@ export const EditorGenericRequiredField = ({
                 onCheckedChange={field.onChange}
               />
 
-              <label className="text-muted-foreground ml-2 text-sm" htmlFor="field-required">
+              <label className="ml-2 text-sm text-muted-foreground" htmlFor="field-required">
                 <Trans>Required Field</Trans>
               </label>
             </div>
@@ -298,7 +298,7 @@ export const EditorGenericReadOnlyField = ({
                 onCheckedChange={field.onChange}
               />
 
-              <label className="text-muted-foreground ml-2 text-sm" htmlFor="field-read-only">
+              <label className="ml-2 text-sm text-muted-foreground" htmlFor="field-read-only">
                 <Trans>Read Only</Trans>
               </label>
             </div>

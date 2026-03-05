@@ -131,7 +131,7 @@ export const OrganisationUpdateForm = () => {
                   <Input className="bg-background" {...field} />
                 </FormControl>
                 {!form.formState.errors.url && (
-                  <span className="text-foreground/50 text-xs font-normal">
+                  <span className="text-xs font-normal text-foreground/50">
                     {field.value ? (
                       `${NEXT_PUBLIC_WEBAPP_URL()}/o/${field.value}`
                     ) : (

@@ -86,7 +86,7 @@ export const TeamGroupsTable = () => {
         cell: ({ row }) => (
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <MoreHorizontalIcon className="text-muted-foreground h-5 w-5" />
+              <MoreHorizontalIcon className="h-5 w-5 text-muted-foreground" />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent className="w-52" align="start" forceMount>
@@ -139,7 +139,7 @@ export const TeamGroupsTable = () => {
         enable: isLoadingError,
       }}
       emptyState={
-        <div className="text-muted-foreground/60 flex h-60 flex-col items-center justify-center gap-y-4">
+        <div className="flex h-60 flex-col items-center justify-center gap-y-4 text-muted-foreground/60">
           <p>
             <Trans>No team groups found</Trans>
           </p>

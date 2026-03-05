@@ -60,7 +60,7 @@ export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) 
               </Trans>
             </AlertDescription>
 
-            <hr className="border-border/50 mt-2" />
+            <hr className="mt-2 border-border/50" />
 
             <div className="flex flex-row items-center justify-between pt-4">
               <AvatarWithText
@@ -70,7 +70,7 @@ export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) 
                   (team.teamEmail?.name || team.emailVerification?.name) ?? '',
                 )}
                 primaryText={
-                  <span className="text-foreground/80 text-sm font-semibold">
+                  <span className="text-sm font-semibold text-foreground/80">
                     {team.teamEmail?.name || team.emailVerification?.name}
                   </span>
                 }
@@ -82,7 +82,7 @@ export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) 
               />
 
               <div className="flex flex-row items-center pr-2">
-                <div className="text-muted-foreground mr-4 flex flex-row items-center text-sm xl:mr-8">
+                <div className="mr-4 flex flex-row items-center text-sm text-muted-foreground xl:mr-8">
                   {match({
                     teamEmail: team.teamEmail,
                     emailVerification: team.emailVerification,
@@ -133,7 +133,7 @@ export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) 
               </AlertTitle>
 
               <AlertDescription className="mr-2">
-                <ul className="text-muted-foreground mt-0.5 list-inside list-disc text-sm">
+                <ul className="mt-0.5 list-inside list-disc text-sm text-muted-foreground">
                   {/* Feature not available yet. */}
                   {/* <li>Display this name and email when sending documents</li> */}
                   {/* <li>View documents associated with this email</li> */}

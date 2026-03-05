@@ -168,7 +168,7 @@ export const AvatarImageForm = ({ className, team, organisation }: AvatarImageFo
                       {hasAvatarImage && (
                         <button
                           type="button"
-                          className="bg-background/70 text-destructive absolute inset-0 flex cursor-pointer items-center justify-center text-xs opacity-0 transition-opacity hover:opacity-100"
+                          className="absolute inset-0 flex cursor-pointer items-center justify-center bg-background/70 text-xs text-destructive opacity-0 transition-opacity hover:opacity-100"
                           disabled={form.formState.isSubmitting}
                           onClick={() => void onFormSubmit({ bytes: null })}
                         >

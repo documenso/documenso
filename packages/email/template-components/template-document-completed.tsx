@@ -37,7 +37,7 @@ export const TemplateDocumentCompleted = ({
           </Column>
         </Section>
 
-        <Text className="text-primary mb-0 text-center text-lg font-semibold">
+        <Text className="mb-0 text-center text-lg font-semibold text-primary">
           {customBody || <Trans>“{documentName}” was signed by all signers</Trans>}
         </Text>
 

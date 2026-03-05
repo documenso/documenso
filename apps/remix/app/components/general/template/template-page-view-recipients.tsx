@@ -24,9 +24,9 @@ export const TemplatePageViewRecipients = ({
   const { _ } = useLingui();
 
   return (
-    <section className="dark:bg-background border-border bg-widget flex flex-col rounded-xl border">
+    <section className="flex flex-col rounded-xl border border-border bg-widget dark:bg-background">
       <div className="flex flex-row items-center justify-between px-4 py-3">
-        <h1 className="text-foreground font-medium">
+        <h1 className="font-medium text-foreground">
           <Trans>Recipients</Trans>
         </h1>
 
@@ -43,7 +43,7 @@ export const TemplatePageViewRecipients = ({
         </Link>
       </div>
 
-      <ul className="text-muted-foreground divide-y border-t">
+      <ul className="divide-y border-t text-muted-foreground">
         {recipients.length === 0 && (
           <li className="flex flex-col items-center justify-center py-6 text-sm">
             <Trans>No recipients</Trans>
@@ -60,13 +60,13 @@ export const TemplatePageViewRecipients = ({
               }
               primaryText={
                 isTemplateRecipientEmailPlaceholder(recipient.email) ? (
-                  <p className="text-muted-foreground text-sm">{recipient.name}</p>
+                  <p className="text-sm text-muted-foreground">{recipient.name}</p>
                 ) : (
-                  <p className="text-muted-foreground text-sm">{recipient.email}</p>
+                  <p className="text-sm text-muted-foreground">{recipient.email}</p>
                 )
               }
               secondaryText={
-                <p className="text-muted-foreground/70 text-xs">
+                <p className="text-xs text-muted-foreground/70">
                   {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
                 </p>
               }

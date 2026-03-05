@@ -150,7 +150,7 @@ export const SignaturePadUpload = ({
       >
         {!value && (
           <motion.div>
-            <div className="text-muted-foreground flex flex-col items-center justify-center">
+            <div className="flex flex-col items-center justify-center text-muted-foreground">
               <div className="flex flex-col items-center">
                 <UploadCloudIcon className="h-8 w-8" />
                 <span className="text-lg font-semibold">

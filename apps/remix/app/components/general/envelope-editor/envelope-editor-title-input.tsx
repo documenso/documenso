@@ -72,7 +72,7 @@ export const EnvelopeItemTitleInput = ({
         disabled={disabled}
         style={{ width: `${inputWidth}px` }}
         className={cn(
-          'text-foreground hover:outline-muted-foreground focus:outline-muted-foreground rounded-sm border-0 bg-transparent p-1 text-sm font-medium outline-none hover:outline hover:outline-1 focus:outline focus:outline-1',
+          'rounded-sm border-0 bg-transparent p-1 text-sm font-medium text-foreground outline-none hover:outline hover:outline-1 hover:outline-muted-foreground focus:outline focus:outline-1 focus:outline-muted-foreground',
           className,
           {
             'outline-red-500': isError,

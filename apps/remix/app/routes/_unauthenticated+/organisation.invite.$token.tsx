@@ -84,7 +84,7 @@ export default function AcceptInvitationPage({ loaderData }: Route.ComponentProp
             <Trans>Invalid token</Trans>
           </h1>
 
-          <p className="text-muted-foreground mb-4 mt-2 text-sm">
+          <p className="mb-4 mt-2 text-sm text-muted-foreground">
             <Trans>
               This token is invalid or has expired. Please contact your team for a new invitation.
             </Trans>
@@ -107,14 +107,14 @@ export default function AcceptInvitationPage({ loaderData }: Route.ComponentProp
           <Trans>Organisation invitation</Trans>
         </h1>
 
-        <p className="text-muted-foreground mt-2 text-sm">
+        <p className="mt-2 text-sm text-muted-foreground">
           <Trans>
             You have been invited by <strong>{data.organisationName}</strong> to join their
             organisation.
           </Trans>
         </p>
 
-        <p className="text-muted-foreground mb-4 mt-1 text-sm">
+        <p className="mb-4 mt-1 text-sm text-muted-foreground">
           <Trans>To accept this invitation you must create an account.</Trans>
         </p>
 
@@ -133,7 +133,7 @@ export default function AcceptInvitationPage({ loaderData }: Route.ComponentProp
         <Trans>Invitation accepted!</Trans>
       </h1>
 
-      <p className="text-muted-foreground mb-4 mt-2 text-sm">
+      <p className="mb-4 mt-2 text-sm text-muted-foreground">
         <Trans>
           You have accepted an invitation from <strong>{data.organisationName}</strong> to join
           their organisation.

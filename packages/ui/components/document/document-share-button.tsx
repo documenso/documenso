@@ -154,8 +154,7 @@ export const DocumentShareButton = ({
         <div className="flex w-full flex-col">
           <div className="rounded-md border p-4">
             I just {token ? 'signed' : 'sent'} a document in style with{' '}
-            <span className="font-medium text-blue-400">@documenso</span>
-            . Check it out!
+            <span className="font-medium text-blue-400">@documenso</span>. Check it out!
             <span className="mt-2 block" />
             <span
               className={cn('break-all font-medium text-blue-400', {
@@ -166,7 +165,7 @@ export const DocumentShareButton = ({
             </span>
             <div
               className={cn(
-                'bg-muted/40 mt-4 aspect-[1200/630] overflow-hidden rounded-lg border',
+                'mt-4 aspect-[1200/630] overflow-hidden rounded-lg border bg-muted/40',
                 {
                   'animate-pulse': !shareLink?.slug,
                 },

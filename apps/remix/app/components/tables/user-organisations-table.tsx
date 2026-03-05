@@ -55,7 +55,7 @@ export const UserOrganisationsTable = () => {
               avatarClass="h-12 w-12"
               avatarFallback={row.original.name.slice(0, 1).toUpperCase()}
               primaryText={
-                <span className="text-foreground/80 font-semibold">
+                <span className="font-semibold text-foreground/80">
                   {isPersonalLayoutMode
                     ? _(
                         msg({

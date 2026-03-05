@@ -129,7 +129,7 @@ export const TeamEmailDeleteDialog = ({ trigger, teamName, team }: TeamEmailDele
               (team.teamEmail?.name || team.emailVerification?.name) ?? '',
             )}
             primaryText={
-              <span className="text-foreground/80 text-sm font-semibold">
+              <span className="text-sm font-semibold text-foreground/80">
                 {team.teamEmail?.name || team.emailVerification?.name}
               </span>
             }

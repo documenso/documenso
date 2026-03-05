@@ -71,7 +71,7 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
         <>
           <PasswordForm user={user} />
 
-          <hr className="border-border/50 mt-6" />
+          <hr className="mt-6 border-border/50" />
         </>
       )}
 

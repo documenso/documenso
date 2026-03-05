@@ -176,14 +176,14 @@ export const OrganisationEmailCreateDialog = ({
                           }}
                           placeholder={t`support`}
                         />
-                        <div className="bg-muted text-muted-foreground absolute bottom-0 right-0 top-0 flex items-center rounded-r-md border px-3 py-2 text-sm">
+                        <div className="absolute bottom-0 right-0 top-0 flex items-center rounded-r-md border bg-muted px-3 py-2 text-sm text-muted-foreground">
                           @{emailDomain.domain}
                         </div>
                       </div>
                     </FormControl>
                     <FormMessage />
                     {!form.formState.errors.email && (
-                      <span className="text-foreground/50 text-xs font-normal">
+                      <span className="text-xs font-normal text-foreground/50">
                         {field.value ? (
                           field.value
                         ) : (

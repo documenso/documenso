@@ -83,7 +83,7 @@ export const LegacyFieldWarningPopover = ({
         </Button>
       }
     >
-      <p className="text-muted-foreground text-sm">
+      <p className="text-sm text-muted-foreground">
         {type === 'document' ? (
           <Trans>
             This document is using legacy field insertion, we recommend using the new field

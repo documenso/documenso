@@ -54,7 +54,7 @@ export const DocumentSigningAuthPageView = ({
           <Trans>Authentication required</Trans>
         </h1>
 
-        <p className="text-muted-foreground mt-2 text-sm">
+        <p className="mt-2 text-sm text-muted-foreground">
           {email ? (
             <Trans>
               You need to be logged in as <strong>{email}</strong> to view this page.

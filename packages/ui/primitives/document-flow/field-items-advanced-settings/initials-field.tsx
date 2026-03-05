@@ -41,7 +41,7 @@ export const InitialsFieldAdvancedSettings = ({
         <Input
           id="fontSize"
           type="number"
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={t`Field font size`}
           value={fieldState.fontSize}
           onChange={(e) => handleInput('fontSize', e.target.value)}
@@ -59,7 +59,7 @@ export const InitialsFieldAdvancedSettings = ({
           value={fieldState.textAlign}
           onValueChange={(value) => handleInput('textAlign', value)}
         >
-          <SelectTrigger className="bg-background mt-2">
+          <SelectTrigger className="mt-2 bg-background">
             <SelectValue placeholder={t`Select text align`} />
           </SelectTrigger>
 

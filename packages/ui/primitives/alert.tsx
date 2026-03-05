@@ -6,18 +6,18 @@ import { cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
 const alertVariants = cva(
-  'relative w-full rounded-lg p-4 [&>svg]:absolute [&>svg]:text-foreground [&>svg]:left-4 [&>svg]:top-4 [&>svg+div]:translate-y-[-3px] [&>svg~*]:pl-8',
+  'relative w-full rounded-lg p-4 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-8',
   {
     variants: {
       variant: {
         default:
-          'bg-green-50 text-green-700 [&_.alert-title]:text-green-800 [&>svg]:text-green-400',
+          'bg-green-50 text-green-700 [&>svg]:text-green-400 [&_.alert-title]:text-green-800',
         neutral:
-          'bg-gray-50 dark:bg-neutral-900/20 text-muted-foreground [&_.alert-title]:text-foreground',
-        secondary: 'bg-blue-50 text-blue-700 [&_.alert-title]:text-blue-800 [&>svg]:text-blue-400',
-        destructive: 'bg-red-50 text-red-700 [&_.alert-title]:text-red-800 [&>svg]:text-red-400',
+          'bg-gray-50 text-muted-foreground dark:bg-neutral-900/20 [&_.alert-title]:text-foreground',
+        secondary: 'bg-blue-50 text-blue-700 [&>svg]:text-blue-400 [&_.alert-title]:text-blue-800',
+        destructive: 'bg-red-50 text-red-700 [&>svg]:text-red-400 [&_.alert-title]:text-red-800',
         warning:
-          'bg-yellow-50 text-yellow-700 [&_.alert-title]:text-yellow-800 [&>svg]:text-yellow-400',
+          'bg-yellow-50 text-yellow-700 [&>svg]:text-yellow-400 [&_.alert-title]:text-yellow-800',
       },
       padding: {
         tighter: 'p-2',

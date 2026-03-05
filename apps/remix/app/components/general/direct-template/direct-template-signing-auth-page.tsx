@@ -38,7 +38,7 @@ export const DirectTemplateAuthPageView = () => {
           <Trans>Authentication required</Trans>
         </h1>
 
-        <p className="text-muted-foreground mt-2 text-sm">
+        <p className="mt-2 text-sm text-muted-foreground">
           <Trans>You need to be logged in to view this page.</Trans>
         </p>
 

@@ -6,7 +6,7 @@
     "dev": "next dev -p 3003",
     "build": "next build",
     "start": "next start -p 3003",
-    "lint:fix": "next lint --fix",
+    "lint:fix": "oxlint --type-aware --fix .",
     "clean": "rimraf .next && rimraf node_modules"
   },
   "dependencies": {

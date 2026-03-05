@@ -140,7 +140,7 @@ export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps)
                 <h4 className="mb-2 text-sm font-medium">
                   <Trans>Webhook URL</Trans>
                 </h4>
-                <p className="text-muted-foreground break-all text-sm">{webhook.webhookUrl}</p>
+                <p className="break-all text-sm text-muted-foreground">{webhook.webhookUrl}</p>
               </div>
 
               <DialogFooter>

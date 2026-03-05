@@ -108,7 +108,7 @@ export const OrganisationMemberInvitesTable = () => {
               avatarClass="h-12 w-12"
               avatarFallback={row.original.email.slice(0, 1).toUpperCase()}
               primaryText={
-                <span className="text-foreground/80 font-semibold">{row.original.email}</span>
+                <span className="font-semibold text-foreground/80">{row.original.email}</span>
               }
             />
           );
@@ -129,7 +129,7 @@ export const OrganisationMemberInvitesTable = () => {
         cell: ({ row }) => (
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <MoreHorizontal className="text-muted-foreground h-5 w-5" />
+              <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent className="w-52" align="start" forceMount>

@@ -36,13 +36,13 @@ export default function ResetPasswordPage({ loaderData }: Route.ComponentProps) 
           <Trans>Reset Password</Trans>
         </h1>
 
-        <p className="text-muted-foreground mt-2 text-sm">
+        <p className="mt-2 text-sm text-muted-foreground">
           <Trans>Please choose your new password</Trans>
         </p>
 
         <ResetPasswordForm token={token} className="mt-4" />
 
-        <p className="text-muted-foreground mt-6 text-center text-sm">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           <Trans>
             Don't have an account?{' '}
             <Link to="/signup" className="text-primary duration-200 hover:opacity-70">

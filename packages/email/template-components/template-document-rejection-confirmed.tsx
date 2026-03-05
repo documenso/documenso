@@ -22,7 +22,7 @@ export function TemplateDocumentRejectionConfirmed({
           <Trans>Rejection Confirmed</Trans>
         </Heading>
 
-        <Text className="text-primary text-base">
+        <Text className="text-base text-primary">
           <Trans>
             This email confirms that you have rejected the document{' '}
             <strong className="font-bold">"{documentName}"</strong> sent by {documentOwnerName}.

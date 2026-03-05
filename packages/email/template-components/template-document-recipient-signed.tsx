@@ -39,7 +39,7 @@ export const TemplateDocumentRecipientSigned = ({
           </Column>
         </Section>
 
-        <Text className="text-primary mb-0 text-center text-lg font-semibold">
+        <Text className="mb-0 text-center text-lg font-semibold text-primary">
           <Trans>
             {recipientReference} has signed "{documentName}"
           </Trans>

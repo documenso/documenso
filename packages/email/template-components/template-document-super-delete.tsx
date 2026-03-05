@@ -19,7 +19,7 @@ export const TemplateDocumentDelete = ({
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
       <Section>
-        <Text className="text-primary mb-0 mt-6 text-left text-lg font-semibold">
+        <Text className="mb-0 mt-6 text-left text-lg font-semibold text-primary">
           <Trans>Your document has been deleted by an admin!</Trans>
         </Text>
 

@@ -47,7 +47,7 @@ export const StackAvatar = ({ first, zIndex, fallbackText = '', type }: StackAva
 
   return (
     <Avatar
-      className={` ${zIndexClass} ${firstClass} dark:border-border h-10 w-10 border-2 border-solid border-white`}
+      className={` ${zIndexClass} ${firstClass} h-10 w-10 border-2 border-solid border-white dark:border-border`}
     >
       <AvatarFallback className={classes}>{fallbackText}</AvatarFallback>
     </Avatar>

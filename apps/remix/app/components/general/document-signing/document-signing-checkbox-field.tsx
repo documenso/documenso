@@ -265,8 +265,8 @@ export const DocumentSigningCheckboxField = ({
       type="Checkbox"
     >
       {isLoading && (
-        <div className="bg-background absolute inset-0 z-20 flex items-center justify-center rounded-md">
-          <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
+        <div className="absolute inset-0 z-20 flex items-center justify-center rounded-md bg-background">
+          <Loader className="h-5 w-5 animate-spin text-primary md:h-8 md:w-8" />
         </div>
       )}
 
@@ -300,7 +300,7 @@ export const DocumentSigningCheckboxField = ({
                   {!item.value.includes('empty-value-') && item.value && (
                     <Label
                       htmlFor={`checkbox-${field.id}-${item.id}`}
-                      className="text-foreground ml-1.5 text-xs font-normal"
+                      className="ml-1.5 text-xs font-normal text-foreground"
                     >
                       {item.value}
                     </Label>
@@ -334,7 +334,7 @@ export const DocumentSigningCheckboxField = ({
                 {!item.value.includes('empty-value-') && item.value && (
                   <Label
                     htmlFor={`checkbox-${field.id}-${item.id}`}
-                    className="text-foreground ml-1.5 text-xs font-normal"
+                    className="ml-1.5 text-xs font-normal text-foreground"
                   >
                     {item.value}
                   </Label>

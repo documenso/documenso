@@ -68,7 +68,7 @@ interface TabsListProps extends React.HTMLAttributes<HTMLDivElement> {
 export function TabsList({ children, className, ...props }: TabsListProps) {
   return (
     <div
-      className={cn('border-border flex flex-wrap border-b', className)}
+      className={cn('flex flex-wrap border-b border-border', className)}
       role="tabslist"
       {...props}
     >
@@ -96,7 +96,7 @@ export function TabsTrigger({ value, icon, children, className, ...props }: Tabs
       onClick={() => onValueChange(value)}
       className={cn(
         'relative flex items-center px-4 py-3 text-sm font-medium transition-all',
-        'focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         isSelected ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
         className,
       )}
@@ -107,7 +107,7 @@ export function TabsTrigger({ value, icon, children, className, ...props }: Tabs
       {isSelected && (
         <motion.div
           layoutId="activeTabIndicator"
-          className="bg-foreground/40 absolute bottom-0 left-0 h-0.5 w-full rounded-full"
+          className="absolute bottom-0 left-0 h-0.5 w-full rounded-full bg-foreground/40"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{

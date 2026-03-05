@@ -132,7 +132,7 @@ export const SigningCard3D = ({
       style={{ perspective: 800 }}
     >
       <motion.div
-        className="bg-background w-full rounded-lg [--sheen-color:180_180_180] dark:[--sheen-color:200_200_200]"
+        className="w-full rounded-lg bg-background [--sheen-color:180_180_180] dark:[--sheen-color:200_200_200]"
         ref={cardRef}
         style={{
           perspective: '800',
@@ -169,7 +169,7 @@ const SigningCardContent = ({ className, name, signature }: SigningCardContentPr
       gradient
     >
       <CardContent
-        className="font-signature p-6 text-center"
+        className="p-6 text-center font-signature"
         style={{
           container: 'main',
         }}
@@ -184,7 +184,7 @@ const SigningCardContent = ({ className, name, signature }: SigningCardContentPr
           ))
           .with({ typedSignature: P.string }, (signature) => (
             <span
-              className="text-muted-foreground/60 group-hover:text-primary/80 break-all font-semibold duration-300"
+              className="break-all font-semibold text-muted-foreground/60 duration-300 group-hover:text-primary/80"
               style={{
                 fontSize: `max(min(4rem, ${(100 / signature.typedSignature.length / 2).toFixed(
                   4,
@@ -196,7 +196,7 @@ const SigningCardContent = ({ className, name, signature }: SigningCardContentPr
           ))
           .otherwise(() => (
             <span
-              className="text-muted-foreground/60 group-hover:text-primary/80 break-all font-semibold duration-300"
+              className="break-all font-semibold text-muted-foreground/60 duration-300 group-hover:text-primary/80"
               style={{
                 fontSize: `max(min(4rem, ${(100 / name.length / 2).toFixed(4)}cqw), 1.875rem)`,
               }}

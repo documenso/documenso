@@ -88,7 +88,7 @@ export const DocumentRecipientLinkCopyDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <ul className="text-muted-foreground divide-y rounded-lg border">
+        <ul className="divide-y rounded-lg border text-muted-foreground">
           {recipients.length === 0 && (
             <li className="flex flex-col items-center justify-center py-6 text-sm">
               <Trans>No recipients</Trans>
@@ -99,9 +99,9 @@ export const DocumentRecipientLinkCopyDialog = ({
             <li key={recipient.id} className="flex items-center justify-between px-4 py-3 text-sm">
               <AvatarWithText
                 avatarFallback={recipient.email.slice(0, 1).toUpperCase()}
-                primaryText={<p className="text-muted-foreground text-sm">{recipient.email}</p>}
+                primaryText={<p className="text-sm text-muted-foreground">{recipient.email}</p>}
                 secondaryText={
-                  <p className="text-muted-foreground/70 text-xs">
+                  <p className="text-xs text-muted-foreground/70">
                     {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
                   </p>
                 }
