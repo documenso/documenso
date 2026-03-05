@@ -46,6 +46,14 @@ export const run = async ({ io }: { payload: TSyncEmailDomainsJobDefinition; io:
       batch.map(async (domain) => {
         const shouldReregister = domain.createdAt < reregisterCutoff;
 
+        const { isVerified } = await verifyEmailDomain(domain.id);
+
+        if (isVerified) {
+          io.logger.info(`Domain "${domain.domain}" is verified`);
+
+          return 'verified' as const;
+        }
+
         if (shouldReregister) {
           io.logger.info(
             `Domain "${domain.domain}" has been pending since ${domain.createdAt.toISOString()}, attempting re-registration`,
@@ -55,9 +63,7 @@ export const run = async ({ io }: { payload: TSyncEmailDomainsJobDefinition; io:
           return 'reregistered' as const;
         }
 
-        const { isVerified } = await verifyEmailDomain(domain.id);
-
-        return isVerified ? ('verified' as const) : ('pending' as const);
+        return 'pending' as const;
       }),
     );
 
