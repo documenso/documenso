@@ -634,7 +634,7 @@ test.describe('Find Envelopes API - Team Context', () => {
     expect(titles).not.toContain('Admin Created Doc');
   });
 
-  test('recipient should see document regardless of visibility restriction', async ({
+  test('manager recipient sees ADMIN-visible document but not ADMIN document without them as recipient', async ({
     request,
   }) => {
     const { team, owner } = await seedTeam();
@@ -665,11 +665,9 @@ test.describe('Find Envelopes API - Team Context', () => {
 
     const { json } = await findEnvelopes(request, managerToken);
     const titles = json!.data.map((d) => d.title);
-    // findEnvelopes visibility OR uses userId match — but manager is recipient, not userId owner.
-    // The OR clause is: (teamId + visibility) OR (userId) OR (teamEmail).
-    // Being a recipient does NOT override visibility in findEnvelopes.
-    // This is actually a behavioral difference from findDocuments!
-    // Let's test what actually happens:
+    // Manager who is a recipient should see the ADMIN-visible document
+    expect(titles).toContain('ADMIN Doc With Manager Recipient');
+    // Manager should NOT see the ADMIN document where they are not a recipient
     expect(titles).not.toContain('ADMIN Doc Without Manager');
   });
 });
