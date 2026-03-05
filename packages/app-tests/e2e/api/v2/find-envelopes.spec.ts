@@ -634,9 +634,7 @@ test.describe('Find Envelopes API - Team Context', () => {
     expect(titles).not.toContain('Admin Created Doc');
   });
 
-  test('manager recipient sees ADMIN-visible document but not ADMIN document without them as recipient', async ({
-    request,
-  }) => {
+  test('being a recipient does not override ADMIN visibility in the API', async ({ request }) => {
     const { team, owner } = await seedTeam();
     const manager = await seedTeamMember({ teamId: team.id, role: TeamMemberRole.MANAGER });
 
@@ -665,9 +663,8 @@ test.describe('Find Envelopes API - Team Context', () => {
 
     const { json } = await findEnvelopes(request, managerToken);
     const titles = json!.data.map((d) => d.title);
-    // Manager who is a recipient should see the ADMIN-visible document
-    expect(titles).toContain('ADMIN Doc With Manager Recipient');
-    // Manager should NOT see the ADMIN document where they are not a recipient
+    // Unlike findDocuments (UI), the API does not let recipient status bypass visibility
+    expect(titles).not.toContain('ADMIN Doc With Manager Recipient');
     expect(titles).not.toContain('ADMIN Doc Without Manager');
   });
 });

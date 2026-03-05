@@ -88,6 +88,13 @@ const senderEmailIs = (eb: EnvelopeExpressionBuilder, email: string) =>
       .select(sql.lit(1).as('one')),
   );
 
+/**
+ * Find envelopes visible to the requesting user within a team.
+ *
+ * Unlike `findDocuments` (used by the UI), being a recipient does NOT override
+ * document visibility. A user will only see an envelope if its visibility level
+ * is within their role's threshold, or they are the document owner.
+ */
 export const findEnvelopes = async ({
   userId,
   teamId,
@@ -181,10 +188,9 @@ export const findEnvelopes = async ({
   // ─── Access control ──────────────────────────────────────────────────
   //
   // An envelope is visible if ANY of:
-  //   1. It belongs to this team AND meets the visibility threshold
-  //   2. It belongs to this team AND the requesting user is the owner
-  //   3. (If team email) The sender's email matches the team email
-  //   4. (If team email) A recipient's email matches the team email
+  //   1. It belongs to this team AND (meets the visibility threshold OR the requesting user is the owner)
+  //   2. (If team email) The sender's email matches the team email
+  //   3. (If team email) A recipient's email matches the team email
 
   const visibilityFilter = (eb: EnvelopeExpressionBuilder) =>
     eb.or([
