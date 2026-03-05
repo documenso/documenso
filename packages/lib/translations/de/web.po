@@ -2004,11 +2004,11 @@ msgstr "Mindestens ein Signaturtyp muss aktiviert sein"
 
 #: apps/remix/app/components/general/document/document-attachments-popover.tsx
 msgid "Attachment added successfully."
-msgstr "Anlage erfolgreich hinzugefügt."
+msgstr "Anhang erfolgreich hinzugefügt."
 
 #: apps/remix/app/components/general/document/document-attachments-popover.tsx
 msgid "Attachment removed successfully."
-msgstr "<<<<<<< Updated upstream======="
+msgstr "Anhang erfolgreich entfernt."
 
 #: apps/remix/app/components/general/document-signing/document-signing-attachments-popover.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-attachments-popover.tsx
