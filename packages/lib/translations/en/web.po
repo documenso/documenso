@@ -2003,7 +2003,7 @@ msgstr "Attachment added successfully."
 
 #: apps/remix/app/components/general/document/document-attachments-popover.tsx
 msgid "Attachment removed successfully."
-msgstr "Attachment removed successfully.<<<<<<< Updated upstream======="
+msgstr "Attachment removed successfully."
 
 #: apps/remix/app/components/general/document-signing/document-signing-attachments-popover.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-attachments-popover.tsx
