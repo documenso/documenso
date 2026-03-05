@@ -240,6 +240,10 @@ Returns the full template object including recipients, fields, and metadata.
 
 Create a new document using a template. This is the primary way to use templates programmatically.
 
+<Callout type="info">
+  This endpoint does not support [PDF placeholder parsing](/docs/users/documents/advanced/pdf-placeholders). Use `POST /envelope/create` for placeholder-based field positioning.
+</Callout>
+
 ```
 
 POST /template/use

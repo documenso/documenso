@@ -1,5 +1,6 @@
 import { Trans } from '@lingui/react/macro';
 import {
+  AlertTriangleIcon,
   BarChart3,
   Building2Icon,
   FileStack,
@@ -120,6 +121,20 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
             <Link to="/admin/documents">
               <FileStack className="mr-2 h-5 w-5" />
               <Trans>Documents</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/unsealed-documents') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/unsealed-documents">
+              <AlertTriangleIcon className="mr-2 h-5 w-5" />
+              <Trans>Unsealed Documents</Trans>
             </Link>
           </Button>
 

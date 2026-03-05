@@ -8,6 +8,7 @@ import { validateRadioField } from '@documenso/lib/advanced-fields-validation/va
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import {
+  FIELD_META_DEFAULT_VALUES,
   type TFieldMetaSchema as FieldMeta,
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
@@ -143,7 +144,7 @@ export const setFieldsForDocument = async ({
 
         const parsedFieldMeta = field.fieldMeta
           ? ZFieldMetaSchema.parse(field.fieldMeta)
-          : undefined;
+          : FIELD_META_DEFAULT_VALUES[field.type];
 
         if (field.type === FieldType.TEXT && field.fieldMeta) {
           const textFieldParsedMeta = ZTextFieldMeta.parse(field.fieldMeta);
