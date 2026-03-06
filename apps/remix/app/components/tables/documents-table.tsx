@@ -10,6 +10,7 @@ import { match } from 'ts-pattern';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import { findRecipientByEmail } from '@documenso/lib/utils/recipients';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import type { TFindDocumentsResponse } from '@documenso/trpc/server/document-router/find-documents.types';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
@@ -225,9 +226,11 @@ type DataTableTitleProps = {
 const DataTableTitle = ({ row, teamUrl, teamEmail }: DataTableTitleProps) => {
   const { user } = useSession();
 
-  const recipient = row.recipients.find(
-    (recipient) => recipient.email === user.email || (teamEmail && recipient.email === teamEmail),
-  );
+  const recipient = findRecipientByEmail({
+    recipients: row.recipients,
+    userEmail: user.email,
+    teamEmail,
+  });
 
   const isOwner = row.user.id === user.id;
   const isRecipient = !!recipient;

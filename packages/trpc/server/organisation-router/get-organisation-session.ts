@@ -51,7 +51,7 @@ export const getOrganisationSession = async ({
         where: buildTeamWhereQuery({ teamId: undefined, userId }),
         include: {
           teamGlobalSettings: true,
-          teamEmail: true,
+          teamEmail: { select: { email: true } },
           teamGroups: {
             where: {
               organisationGroup: {
