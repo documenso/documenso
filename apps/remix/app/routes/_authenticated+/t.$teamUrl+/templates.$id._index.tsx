@@ -7,7 +7,6 @@ import { Link, useNavigate } from 'react-router';
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
-import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
@@ -48,14 +47,9 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
     data: envelope,
     isLoading: isLoadingEnvelope,
     isError: isErrorEnvelope,
-  } = trpc.envelope.get.useQuery(
-    {
-      envelopeId: params.id,
-    },
-    {
-      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-    },
-  );
+  } = trpc.envelope.get.useQuery({
+    envelopeId: params.id,
+  });
 
   if (isLoadingEnvelope) {
     return (
