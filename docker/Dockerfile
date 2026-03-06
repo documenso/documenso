@@ -8,17 +8,31 @@ RUN apk add --no-cache font-freefont
 RUN corepack enable pnpm
 
 
-###########################
-#    BUILDER CONTAINER    #
-###########################
-FROM base AS builder
+#############################
+#  DEVELOPMENT CONTAINER   #
+#############################
+FROM base AS development
+
+ENV HUSKY 0
+ENV DOCKER_OUTPUT 1
 
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk add --no-cache libc6-compat
 RUN apk add --no-cache jq
+RUN apk add --no-cache make cmake g++ openssl bash
+
 WORKDIR /app
 
+RUN pnpm install --frozen-lockfile
+
+###########################
+#    BUILDER CONTAINER    #
+###########################
+FROM development AS builder
+
 COPY . .
+
+RUN pnpm install --frozen-lockfile
 
 # Outputs to the /out folder
 # source: https://turbo.build/repo/docs/reference/command-line-reference/prune#--docker
@@ -27,20 +41,7 @@ RUN pnpm exec turbo prune @documenso/remix --docker
 ###########################
 #   INSTALLER CONTAINER   #
 ###########################
-FROM base AS installer
-
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
-RUN apk add --no-cache jq
-# Required for node_modules/aws-crt
-RUN apk add --no-cache make cmake g++ openssl bash
-
-WORKDIR /app
-
-# Disable husky from installing hooks
-ENV HUSKY 0
-ENV DOCKER_OUTPUT 1
-ENV NEXT_TELEMETRY_DISABLED 1
+FROM development AS installer
 
 # Encryption keys
 ARG NEXT_PRIVATE_ENCRYPTION_KEY="CAFEBABE"
