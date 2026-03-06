@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
 import { Bird } from 'lucide-react';
 import { useParams, useSearchParams } from 'react-router';
 
+import { useSessionStorage } from '@documenso/lib/client-only/hooks/use-session-storage';
 import { FolderType } from '@documenso/lib/types/folder-type';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
@@ -34,7 +35,10 @@ export default function TemplatesPage() {
   const page = Number(searchParams.get('page')) || 1;
   const perPage = Number(searchParams.get('perPage')) || 10;
 
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>(
+    'templates-bulk-selection',
+    {},
+  );
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
 
@@ -50,11 +54,6 @@ export default function TemplatesPage() {
     perPage: perPage,
     folderId,
   });
-
-  // Clear selection when navigation or filters change
-  useEffect(() => {
-    setRowSelection({});
-  }, [folderId, page, perPage]);
 
   return (
     <EnvelopeDropZoneWrapper type={EnvelopeType.TEMPLATE}>

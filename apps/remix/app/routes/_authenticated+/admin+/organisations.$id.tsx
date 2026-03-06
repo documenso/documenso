@@ -56,7 +56,7 @@ export default function OrganisationGroupSettingsPage({
 }: Route.ComponentProps) {
   const { licenseFlags } = loaderData;
 
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const { toast } = useToast();
 
   const navigate = useNavigate();
@@ -98,7 +98,7 @@ export default function OrganisationGroupSettingsPage({
         accessorKey: 'url',
       },
     ] satisfies DataTableColumnDef<TGetAdminOrganisationResponse['teams'][number]>[];
-  }, []);
+  }, [t]);
 
   const organisationMembersColumns = useMemo(() => {
     return [
@@ -107,7 +107,11 @@ export default function OrganisationGroupSettingsPage({
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <Link to={`/admin/users/${row.original.user.id}`}>{row.original.user.name}</Link>
-            {row.original.user.id === organisation?.ownerUserId && <Badge>Owner</Badge>}
+            {row.original.user.id === organisation?.ownerUserId && (
+              <Badge>
+                <Trans>Owner</Trans>
+              </Badge>
+            )}
           </div>
         ),
       },
@@ -139,7 +143,7 @@ export default function OrganisationGroupSettingsPage({
         },
       },
     ] satisfies DataTableColumnDef<TGetAdminOrganisationResponse['members'][number]>[];
-  }, [organisation]);
+  }, [organisation, t]);
 
   if (isLoadingOrganisation) {
     return (
@@ -205,10 +209,13 @@ export default function OrganisationGroupSettingsPage({
           <AlertDescription className="mr-2">
             {organisation.subscription ? (
               <span>
-                {SUBSCRIPTION_STATUS_MAP[organisation.subscription.status]} subscription found
+                {i18n._(SUBSCRIPTION_STATUS_MAP[organisation.subscription.status])} subscription
+                found
               </span>
             ) : (
-              <span>No subscription found</span>
+              <span>
+                <Trans>No subscription found</Trans>
+              </span>
             )}
           </AlertDescription>
         </div>

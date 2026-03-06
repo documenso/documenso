@@ -21,14 +21,7 @@ export type SetTemplateRecipientsOptions = {
   userId: number;
   teamId: number;
   id: EnvelopeIdOptions;
-  recipients: {
-    id?: number;
-    email: string;
-    name: string;
-    role: RecipientRole;
-    signingOrder?: number | null;
-    actionAuth?: TRecipientActionAuthTypes[];
-  }[];
+  recipients: RecipientData[];
 };
 
 export const setTemplateRecipients = async ({
@@ -183,7 +176,10 @@ export const setTemplateRecipients = async ({
           });
         }
 
-        return upsertedRecipient;
+        return {
+          ...upsertedRecipient,
+          clientId: recipient.clientId,
+        };
       }),
     );
   });
@@ -199,7 +195,7 @@ export const setTemplateRecipients = async ({
   }
 
   // Filter out recipients that have been removed or have been updated.
-  const filteredRecipients: Recipient[] = existingRecipients.filter((recipient) => {
+  const filteredRecipients: RecipientDataWithClientId[] = existingRecipients.filter((recipient) => {
     const isRemoved = removedRecipients.find(
       (removedRecipient) => removedRecipient.id === recipient.id,
     );
@@ -217,4 +213,18 @@ export const setTemplateRecipients = async ({
       templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
     })),
   };
+};
+
+type RecipientData = {
+  id?: number;
+  clientId?: string | null;
+  email: string;
+  name: string;
+  role: RecipientRole;
+  signingOrder?: number | null;
+  actionAuth?: TRecipientActionAuthTypes[];
+};
+
+type RecipientDataWithClientId = Recipient & {
+  clientId?: string | null;
 };

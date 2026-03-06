@@ -5,12 +5,12 @@
     "apps/*",
     "packages/*"
   ],
-  "version": "2.6.0",
+  "version": "2.7.1",
   "scripts": {
     "postinstall": "patch-package",
     "build": "turbo run build",
-    "dev": "turbo run dev --filter=@documenso/remix",
-    "dev:remix": "turbo run dev --filter=@documenso/remix",
+    "dev": "npm run translate:compile && turbo run dev --filter=@documenso/remix",
+    "dev:remix": "npm run translate:compile && turbo run dev --filter=@documenso/remix",
     "dev:docs": "turbo run dev --filter=@documenso/documentation",
     "dev:openpage-api": "turbo run dev --filter=@documenso/openpage-api",
     "start": "turbo run start --filter=@documenso/remix --filter=@documenso/documentation --filter=@documenso/openpage-api",
@@ -86,10 +86,12 @@
   "dependencies": {
     "@ai-sdk/google-vertex": "3.0.81",
     "@documenso/prisma": "*",
-    "@libpdf/core": "^0.2.5",
+    "@libpdf/core": "^0.2.12",
     "@lingui/conf": "^5.6.0",
     "@lingui/core": "^5.6.0",
+    "@prisma/extension-read-replicas": "^0.4.1",
     "ai": "^5.0.104",
+    "cron-parser": "^5.5.0",
     "luxon": "^3.7.2",
     "patch-package": "^8.0.1",
     "posthog-node": "4.18.0",
@@ -98,8 +100,12 @@
     "zod": "^3.25.76"
   },
   "overrides": {
+    "lodash": "4.17.23",
     "pdfjs-dist": "5.4.296",
     "typescript": "5.6.2",
-    "zod": "^3.25.76"
+    "zod": "$zod",
+    "fumadocs-mdx": {
+      "zod": "^4.3.5"
+    }
   }
 }

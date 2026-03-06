@@ -36,7 +36,7 @@ export const getSignerConversionMonthly = async (type: 'count' | 'cumulative' = 
     ],
   };
 
-  return addZeroMonth(transformedData);
+  return addZeroMonth(transformedData, type === 'cumulative');
 };
 
 export type GetSignerConversionMonthlyResult = Awaited<

@@ -1,12 +1,13 @@
 import { useLayoutEffect } from 'react';
 
+import { Trans } from '@lingui/react/macro';
 import { Outlet, useLoaderData } from 'react-router';
 
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
+import { ZBaseEmbedAuthoringSchema } from '@documenso/lib/types/embed-authoring-base-schema';
 import { TrpcProvider } from '@documenso/trpc/react';
 
-import { ZBaseEmbedAuthoringSchema } from '~/types/embed-authoring-base-schema';
 import { injectCss } from '~/utils/css-vars';
 
 import type { Route } from './+types/_layout';
@@ -75,7 +76,11 @@ export default function AuthoringLayout() {
   }, []);
 
   if (!hasValidToken) {
-    return <div>Invalid embedding presign token provided</div>;
+    return (
+      <div>
+        <Trans>Invalid embedding presign token provided</Trans>
+      </div>
+    );
   }
 
   return (

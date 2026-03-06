@@ -50,6 +50,7 @@ export const EditorGenericFontSizeField = ({
           </FormLabel>
           <FormControl>
             <Input
+              data-testid="field-form-fontSize"
               type="number"
               min={8}
               max={96}
@@ -88,7 +89,7 @@ export const EditorGenericTextAlignField = ({
           </FormLabel>
           <FormControl>
             <Select {...field} onValueChange={field.onChange}>
-              <SelectTrigger>
+              <SelectTrigger data-testid="field-form-textAlign">
                 <SelectValue placeholder={t`Select text align`} />
               </SelectTrigger>
               <SelectContent>
@@ -131,7 +132,7 @@ export const EditorGenericVerticalAlignField = ({
           </FormLabel>
           <FormControl>
             <Select {...field} onValueChange={field.onChange}>
-              <SelectTrigger>
+              <SelectTrigger data-testid="field-form-verticalAlign">
                 <SelectValue placeholder={t`Select vertical align`} />
               </SelectTrigger>
               <SelectContent>
@@ -174,6 +175,7 @@ export const EditorGenericLineHeightField = ({
           </FormLabel>
           <FormControl>
             <Input
+              data-testid="field-form-lineHeight"
               type="number"
               min={FIELD_MIN_LINE_HEIGHT}
               max={FIELD_MAX_LINE_HEIGHT}
@@ -209,6 +211,7 @@ export const EditorGenericLetterSpacingField = ({
           </FormLabel>
           <FormControl>
             <Input
+              data-testid="field-form-letterSpacing"
               type="number"
               min={FIELD_MIN_LETTER_SPACING}
               max={FIELD_MAX_LETTER_SPACING}
@@ -250,12 +253,13 @@ export const EditorGenericRequiredField = ({
           <FormControl>
             <div className="flex items-center">
               <Checkbox
+                data-testid="field-form-required"
                 id="field-required"
                 checked={field.value}
                 onCheckedChange={field.onChange}
               />
 
-              <label className="text-muted-foreground ml-2 text-sm" htmlFor="field-required">
+              <label className="ml-2 text-sm text-muted-foreground" htmlFor="field-required">
                 <Trans>Required Field</Trans>
               </label>
             </div>
@@ -293,12 +297,13 @@ export const EditorGenericReadOnlyField = ({
           <FormControl>
             <div className="flex items-center">
               <Checkbox
+                data-testid="field-form-readOnly"
                 id="field-read-only"
                 checked={field.value}
                 onCheckedChange={field.onChange}
               />
 
-              <label className="text-muted-foreground ml-2 text-sm" htmlFor="field-read-only">
+              <label className="ml-2 text-sm text-muted-foreground" htmlFor="field-read-only">
                 <Trans>Read Only</Trans>
               </label>
             </div>
@@ -329,7 +334,7 @@ export const EditorGenericLabelField = ({
             <Trans>Label</Trans>
           </FormLabel>
           <FormControl>
-            <Input placeholder={t`Field label`} {...field} />
+            <Input data-testid="field-form-label" placeholder={t`Field label`} {...field} />
           </FormControl>
           <FormMessage />
         </FormItem>
