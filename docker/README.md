@@ -31,10 +31,11 @@ POSTGRES_USER="<your-postgres-user>"
 POSTGRES_PASSWORD="<your-postgres-password>"
 POSTGRES_DB="<your-postgres-db-name>"
 
-# Internal database URLs (required by Documenso)
+# Internal database URLs (required by Documenso; direct URL is optional in compose)
 # Use "database" as the host because that is the PostgreSQL service name in compose.yml
 NEXT_PRIVATE_DATABASE_URL="postgres://<your-postgres-user>:<your-postgres-password>@database:5432/<your-postgres-db-name>"
-NEXT_PRIVATE_DIRECT_DATABASE_URL="postgres://<your-postgres-user>:<your-postgres-password>@database:5432/<your-postgres-db-name>"
+# Optional: compose.yml falls back to NEXT_PRIVATE_DATABASE_URL when NEXT_PRIVATE_DIRECT_DATABASE_URL is not set.
+# NEXT_PRIVATE_DIRECT_DATABASE_URL="postgres://<your-postgres-user>:<your-postgres-password>@database:5432/<your-postgres-db-name>"
 
 # SMTP Configuration
 NEXT_PRIVATE_SMTP_TRANSPORT="smtp-auth"
