@@ -10,7 +10,8 @@ import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
-import { validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
+import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
@@ -23,12 +24,12 @@ import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
+import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
 import { injectCss } from '~/utils/css-vars';
 
 import { ZSignDocumentEmbedDataSchema } from '../../types/embed-document-sign-schema';
@@ -45,7 +46,7 @@ export type EmbedSignDocumentV1ClientPageProps = {
   token: string;
   documentId: number;
   envelopeId: string;
-  envelopeItems: Pick<EnvelopeItem, 'id' | 'envelopeId'>[];
+  envelopeItems: (Pick<EnvelopeItem, 'id' | 'envelopeId'> & { documentData: { id: string } })[];
   recipient: RecipientWithFields;
   fields: Field[];
   completedFields: DocumentField[];
@@ -100,13 +101,13 @@ export const EmbedSignDocumentV1ClientPage = ({
   const [throttledOnCompleteClick, isThrottled] = useThrottleFn(() => void onCompleteClick(), 500);
 
   const [pendingFields, _completedFields] = [
-    fields.filter(
-      (field) => field.recipientId === recipient.id && isFieldUnsignedAndRequired(field),
+    sortFieldsByPosition(
+      fields.filter(
+        (field) => field.recipientId === recipient.id && isFieldUnsignedAndRequired(field),
+      ),
     ),
     fields.filter((field) => field.inserted),
   ];
-
-  const highestPendingPageNumber = Math.max(...pendingFields.map((field) => field.page));
 
   const { mutateAsync: completeDocumentWithToken, isPending: isSubmitting } =
     trpc.recipient.completeDocumentWithToken.useMutation();
@@ -287,10 +288,16 @@ export const EmbedSignDocumentV1ClientPage = ({
         <div className="embed--DocumentContainer relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
           {/* Viewer */}
           <div className="embed--DocumentViewer flex-1">
-            <PDFViewerLazy
-              envelopeItem={envelopeItems[0]}
-              token={token}
-              version="signed"
+            <PDFViewer
+              data={getDocumentDataUrl({
+                envelopeId: envelopeItems[0].envelopeId,
+                envelopeItemId: envelopeItems[0].id,
+                documentDataId: envelopeItems[0].documentData.id,
+                version: 'current',
+                token: token,
+                presignToken: undefined,
+              })}
+              scrollParentRef="window"
               onDocumentLoad={() => setHasDocumentLoaded(true)}
             />
           </div>
@@ -491,15 +498,15 @@ export const EmbedSignDocumentV1ClientPage = ({
             </div>
           </div>
 
-          <ElementVisible
-            target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPendingPageNumber}"]`}
-          >
-            {showPendingFieldTooltip && pendingFields.length > 0 && (
+          {showPendingFieldTooltip && pendingFields.length > 0 && (
+            <ElementVisible
+              target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${pendingFields[0].page}"]`}
+            >
               <FieldToolTip key={pendingFields[0].id} field={pendingFields[0]} color="warning">
                 <Trans>Click to insert field</Trans>
               </FieldToolTip>
-            )}
-          </ElementVisible>
+            </ElementVisible>
+          )}
 
           {/* Fields */}
           <EmbedDocumentFields fields={fields} metadata={metadata} />

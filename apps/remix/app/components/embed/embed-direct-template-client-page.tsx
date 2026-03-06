@@ -23,7 +23,8 @@ import {
   isFieldUnsignedAndRequired,
   isRequiredField,
 } from '@documenso/lib/utils/advanced-fields-helpers';
-import { validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
+import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -35,11 +36,11 @@ import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
+import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
 import { ZDirectTemplateEmbedDataSchema } from '~/types/embed-direct-template-schema';
 import { injectCss } from '~/utils/css-vars';
 
@@ -54,7 +55,7 @@ export type EmbedDirectTemplateClientPageProps = {
   token: string;
   envelopeId: string;
   updatedAt: Date;
-  envelopeItems: Pick<EnvelopeItem, 'id' | 'envelopeId'>[];
+  envelopeItems: Pick<EnvelopeItem, 'id' | 'envelopeId' | 'documentDataId'>[];
   recipient: Recipient;
   fields: Field[];
   metadata?: DocumentMeta | null;
@@ -97,11 +98,9 @@ export const EmbedDirectTemplateClientPage = ({
   const [localFields, setLocalFields] = useState<DirectTemplateLocalField[]>(() => fields);
 
   const [pendingFields, _completedFields] = [
-    localFields.filter((field) => isFieldUnsignedAndRequired(field)),
+    sortFieldsByPosition(localFields.filter((field) => isFieldUnsignedAndRequired(field))),
     localFields.filter((field) => field.inserted),
   ];
-
-  const highestPendingPageNumber = Math.max(...pendingFields.map((field) => field.page));
 
   const hasSignatureField = localFields.some((field) => isSignatureFieldType(field.type));
 
@@ -341,10 +340,16 @@ export const EmbedDirectTemplateClientPage = ({
       <div className="relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
         {/* Viewer */}
         <div className="flex-1">
-          <PDFViewerLazy
-            envelopeItem={envelopeItems[0]}
-            token={recipient.token}
-            version="signed"
+          <PDFViewer
+            data={getDocumentDataUrl({
+              envelopeId: envelopeItems[0].envelopeId,
+              envelopeItemId: envelopeItems[0].id,
+              documentDataId: envelopeItems[0].documentDataId,
+              version: 'current',
+              token: recipient.token,
+              presignToken: undefined,
+            })}
+            scrollParentRef="window"
             onDocumentLoad={() => setHasDocumentLoaded(true)}
           />
         </div>
@@ -478,15 +483,15 @@ export const EmbedDirectTemplateClientPage = ({
           </div>
         </div>
 
-        <ElementVisible
-          target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPendingPageNumber}"]`}
-        >
-          {showPendingFieldTooltip && pendingFields.length > 0 && (
+        {showPendingFieldTooltip && pendingFields.length > 0 && (
+          <ElementVisible
+            target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${pendingFields[0].page}"]`}
+          >
             <FieldToolTip key={pendingFields[0].id} field={pendingFields[0]} color="warning">
               <Trans>Click to insert field</Trans>
             </FieldToolTip>
-          )}
-        </ElementVisible>
+          </ElementVisible>
+        )}
 
         {/* Fields */}
         <EmbedDocumentFields

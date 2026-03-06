@@ -13,12 +13,12 @@ import {
 } from '@documenso/lib/constants/trpc';
 import { ZDocumentAccessAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import type { TTemplate } from '@documenso/lib/types/template';
+import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { AddTemplateFieldsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-fields';
 import type { TAddTemplateFieldsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-fields.types';
@@ -28,6 +28,7 @@ import { AddTemplateSettingsFormPartial } from '@documenso/ui/primitives/templat
 import type { TAddTemplateSettingsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-settings.types';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
 import { useCurrentTeam } from '~/providers/team';
 
 export type TemplateEditFormProps = {
@@ -312,11 +313,17 @@ export const TemplateEditForm = ({
         gradient
       >
         <CardContent className="p-2">
-          <PDFViewerLazy
+          <PDFViewer
             key={template.envelopeItems[0].id}
-            envelopeItem={template.envelopeItems[0]}
-            token={undefined}
-            version="signed"
+            data={getDocumentDataUrl({
+              envelopeId: template.envelopeId,
+              envelopeItemId: template.envelopeItems[0].id,
+              documentDataId: initialTemplate.templateDocumentDataId,
+              version: 'current',
+              token: undefined,
+              presignToken: undefined,
+            })}
+            scrollParentRef="window"
             onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
           />
         </CardContent>

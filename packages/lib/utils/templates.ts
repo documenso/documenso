@@ -51,7 +51,7 @@ export const mapEnvelopeToTemplateLite = (envelope: Envelope): TTemplateLite => 
 
   return {
     id: legacyTemplateId,
-    envelopeId: envelope.secondaryId,
+    envelopeId: envelope.id,
     type: envelope.templateType,
     visibility: envelope.visibility,
     externalId: envelope.externalId,

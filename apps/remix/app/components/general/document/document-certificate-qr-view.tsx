@@ -1,4 +1,4 @@
-import { lazy, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { type DocumentData, DocumentStatus, type EnvelopeItem, EnvelopeType } from '@prisma/client';
@@ -9,9 +9,10 @@ import {
   EnvelopeRenderProvider,
   useCurrentEnvelopeRender,
 } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
+import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
-import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -21,15 +22,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
+import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
+import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
 
 import { EnvelopeRendererFileSelector } from '../envelope-editor/envelope-file-selector';
-
-const EnvelopeGenericPageRenderer = lazy(
-  async () => import('~/components/general/envelope-editor/envelope-generic-page-renderer'),
-);
+import { EnvelopeGenericPageRenderer } from '../envelope-editor/envelope-generic-page-renderer';
 
 export type DocumentCertificateQRViewProps = {
   documentId: number;
@@ -104,11 +103,13 @@ export const DocumentCertificateQRView = ({
 
       {internalVersion === 2 ? (
         <EnvelopeRenderProvider
+          version="current"
           envelope={{
-            envelopeItems,
+            id: envelopeItems[0].envelopeId,
             status: DocumentStatus.COMPLETED,
             type: EnvelopeType.DOCUMENT,
           }}
+          envelopeItems={envelopeItems}
           token={token}
         >
           <DocumentCertificateQrV2
@@ -149,11 +150,17 @@ export const DocumentCertificateQRView = ({
           </div>
 
           <div className="mt-12 w-full">
-            <PDFViewerLazy
+            <PDFViewer
               key={envelopeItems[0].id}
-              envelopeItem={envelopeItems[0]}
-              token={token}
-              version="signed"
+              data={getDocumentDataUrl({
+                envelopeId: envelopeItems[0].envelopeId,
+                envelopeItemId: envelopeItems[0].id,
+                documentDataId: envelopeItems[0].documentDataId,
+                version: 'current',
+                token,
+                presignToken: undefined,
+              })}
+              scrollParentRef="window"
             />
           </div>
         </>
@@ -175,7 +182,9 @@ const DocumentCertificateQrV2 = ({
   formattedDate,
   token,
 }: DocumentCertificateQrV2Props) => {
-  const { currentEnvelopeItem, envelopeItems } = useCurrentEnvelopeRender();
+  const { envelopeItems } = useCurrentEnvelopeRender();
+
+  const scrollableContainerRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="flex min-h-screen flex-col items-start">
@@ -207,10 +216,14 @@ const DocumentCertificateQrV2 = ({
         />
       </div>
 
-      <div className="mt-12 w-full">
+      <div className="mt-12 max-h-[80vh] w-full overflow-y-auto" ref={scrollableContainerRef}>
         <EnvelopeRendererFileSelector className="mb-4 p-0" fields={[]} secondaryOverride={''} />
 
-        <PDFViewerKonvaLazy renderer="preview" customPageRenderer={EnvelopeGenericPageRenderer} />
+        <EnvelopePdfViewer
+          customPageRenderer={EnvelopeGenericPageRenderer}
+          scrollParentRef={scrollableContainerRef}
+          errorMessage={PDF_VIEWER_ERROR_MESSAGES.preview}
+        />
       </div>
     </div>
   );
