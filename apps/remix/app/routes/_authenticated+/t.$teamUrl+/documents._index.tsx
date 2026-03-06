@@ -9,6 +9,7 @@ import { z } from 'zod';
 
 import { useSessionStorage } from '@documenso/lib/client-only/hooks/use-session-storage';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { STATS_COUNT_CAP } from '@documenso/lib/constants/document';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { parseToIntegerArray } from '@documenso/lib/utils/params';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
@@ -172,7 +173,11 @@ export default function DocumentsPage() {
                         <DocumentStatus status={value} />
 
                         {value !== ExtendedDocumentStatus.ALL && (
-                          <span className="ml-1 inline-block opacity-50">{stats[value]}</span>
+                          <span className="ml-1 inline-block opacity-50">
+                            {stats[value] >= STATS_COUNT_CAP
+                              ? `${STATS_COUNT_CAP.toLocaleString()}+`
+                              : stats[value]}
+                          </span>
                         )}
                       </Link>
                     </TabsTrigger>

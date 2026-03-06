@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { ZCssVarsSchema } from '../utils/css-vars';
+import { ZCssVarsSchema } from './css-vars';
 
 export const ZBaseEmbedDataSchema = z.object({
   darkModeDisabled: z.boolean().optional().default(false),

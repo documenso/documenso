@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 
-import { addZeroMonth } from './add-zero-month';
+import { type TransformedData, addZeroMonth } from './add-zero-month';
 
 type MetricKeys = {
   stars: number;
@@ -12,14 +12,6 @@ type MetricKeys = {
 
 type DataEntry = {
   [key: string]: MetricKeys;
-};
-
-type TransformData = {
-  labels: string[];
-  datasets: {
-    label: string;
-    data: number[];
-  }[];
 };
 
 type MetricKey = keyof MetricKeys;
@@ -38,7 +30,7 @@ export function transformData({
 }: {
   data: DataEntry;
   metric: MetricKey;
-}): TransformData {
+}): TransformedData {
   try {
     if (!data || Object.keys(data).length === 0) {
       return {
@@ -103,7 +95,7 @@ export function transformData({
       ],
     };
 
-    return addZeroMonth(transformedData);
+    return addZeroMonth(transformedData, true);
   } catch (error) {
     return {
       labels: [],
@@ -111,6 +103,3 @@ export function transformData({
     };
   }
 }
-
-// To be on the safer side
-export const transformRepoStats = transformData;

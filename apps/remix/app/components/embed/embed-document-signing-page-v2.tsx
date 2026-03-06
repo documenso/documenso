@@ -3,9 +3,9 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import { useLingui } from '@lingui/react';
 import { EnvelopeType } from '@prisma/client';
 
+import { ZSignDocumentEmbedDataSchema } from '@documenso/lib/types/embed-document-sign-schema';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 
-import { ZSignDocumentEmbedDataSchema } from '~/types/embed-document-sign-schema';
 import { injectCss } from '~/utils/css-vars';
 
 import { DocumentSigningPageViewV2 } from '../general/document-signing/document-signing-page-view-v2';

@@ -181,3 +181,5 @@ export const ZDocumentManySchema = LegacyDocumentSchema.pick({
 });
 
 export type TDocumentMany = z.infer<typeof ZDocumentManySchema>;
+
+export type DocumentDataVersion = 'initial' | 'current';
