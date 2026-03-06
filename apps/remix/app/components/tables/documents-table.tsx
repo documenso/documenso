@@ -91,7 +91,13 @@ export const DocumentsTable = ({
       },
       {
         header: _(msg`Title`),
-        cell: ({ row }) => <DataTableTitle row={row.original} teamUrl={team?.url} />,
+        cell: ({ row }) => (
+          <DataTableTitle
+            row={row.original}
+            teamUrl={team?.url}
+            teamEmail={team?.teamEmail?.email}
+          />
+        ),
       },
       {
         id: 'sender',
@@ -213,12 +219,15 @@ export const DocumentsTable = ({
 type DataTableTitleProps = {
   row: DocumentsTableRow;
   teamUrl: string;
+  teamEmail?: string;
 };
 
-const DataTableTitle = ({ row, teamUrl }: DataTableTitleProps) => {
+const DataTableTitle = ({ row, teamUrl, teamEmail }: DataTableTitleProps) => {
   const { user } = useSession();
 
-  const recipient = row.recipients.find((recipient) => recipient.email === user.email);
+  const recipient = row.recipients.find(
+    (recipient) => recipient.email === user.email || (teamEmail && recipient.email === teamEmail),
+  );
 
   const isOwner = row.user.id === user.id;
   const isRecipient = !!recipient;

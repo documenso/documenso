@@ -57,7 +57,11 @@ export const DocumentsTableActionDropdown = ({
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
 
-  const recipient = row.recipients.find((recipient) => recipient.email === user.email);
+  const teamEmail = team.teamEmail?.email;
+
+  const recipient = row.recipients.find(
+    (recipient) => recipient.email === user.email || (teamEmail && recipient.email === teamEmail),
+  );
 
   const isOwner = row.user.id === user.id;
   // const isRecipient = !!recipient;
@@ -76,7 +80,7 @@ export const DocumentsTableActionDropdown = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger data-testid="document-table-action-btn">
-        <MoreHorizontal className="text-muted-foreground h-5 w-5" />
+        <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-52" align="start" forceMount>
