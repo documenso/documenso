@@ -4,6 +4,7 @@ import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
+import { keepPreviousData } from '@tanstack/react-query';
 import { CheckIcon, Loader, Monitor, Moon, Sun } from 'lucide-react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useNavigate } from 'react-router';
@@ -67,14 +68,14 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
   const debouncedSearch = useDebouncedValue(search, 200);
   const hasValidSearch = debouncedSearch.trim().length > 0;
 
-  const { data: searchDocumentsData, isPending: isSearchingDocuments } =
+  const { data: searchDocumentsData, isFetching: isFetchingDocuments } =
     trpcReact.document.search.useQuery(
       {
         query: debouncedSearch,
       },
       {
-        enabled: hasValidSearch,
-        placeholderData: (previousData) => previousData,
+        enabled: open === true && hasValidSearch,
+        placeholderData: keepPreviousData,
         // Do not batch this due to relatively long request time compared to
         // other queries which are generally batched with this.
         ...SKIP_QUERY_BATCH_META,
@@ -82,14 +83,14 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
       },
     );
 
-  const { data: searchTemplatesData, isPending: isSearchingTemplates } =
+  const { data: searchTemplatesData, isFetching: isFetchingTemplates } =
     trpcReact.template.search.useQuery(
       {
         query: debouncedSearch,
       },
       {
-        enabled: hasValidSearch,
-        placeholderData: (previousData) => previousData,
+        enabled: open === true && hasValidSearch,
+        placeholderData: keepPreviousData,
         ...SKIP_QUERY_BATCH_META,
         ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
       },
@@ -149,31 +150,23 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
     ];
   }, [currentTeam, organisations]);
 
-  const documentSearchResults = useMemo(() => {
-    if (!searchDocumentsData) {
-      return [];
-    }
+  const documentSearchResults =
+    hasValidSearch && searchDocumentsData
+      ? searchDocumentsData.map((document) => ({
+          label: document.title,
+          path: document.path,
+          value: document.value,
+        }))
+      : [];
 
-    return searchDocumentsData.map((document) => ({
-      label: document.title,
-      path: document.path,
-      value: document.value,
-    }));
-  }, [searchDocumentsData]);
-
-  const templateSearchResults = useMemo(() => {
-    if (!searchTemplatesData) {
-      return [];
-    }
-
-    return searchTemplatesData.map((template) => ({
-      label: template.title,
-      path: template.path,
-      value: template.value,
-    }));
-  }, [searchTemplatesData]);
-
-  const isSearching = hasValidSearch && (isSearchingDocuments || isSearchingTemplates);
+  const templateSearchResults =
+    hasValidSearch && searchTemplatesData
+      ? searchTemplatesData.map((template) => ({
+          label: template.title,
+          path: template.path,
+          value: template.value,
+        }))
+      : [];
 
   const currentPage = pages[pages.length - 1];
 
@@ -251,19 +244,9 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
       />
 
       <CommandList>
-        {isSearching ? (
-          <CommandEmpty>
-            <div className="flex items-center justify-center">
-              <span className="animate-spin">
-                <Loader />
-              </span>
-            </div>
-          </CommandEmpty>
-        ) : (
-          <CommandEmpty>
-            <Trans>No results found.</Trans>
-          </CommandEmpty>
-        )}
+        <CommandEmpty>
+          <Trans>No results found.</Trans>
+        </CommandEmpty>
 
         {!currentPage && (
           <>
@@ -292,15 +275,27 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
               </CommandItem>
             </CommandGroup>
 
-            {documentSearchResults.length > 0 && (
+            {(isFetchingDocuments || documentSearchResults.length > 0) && (
               <CommandGroup className="mx-2 p-0 pb-2" heading={_(msg`Your documents`)}>
-                <Commands push={push} pages={documentSearchResults} />
+                {isFetchingDocuments ? (
+                  <div className="flex items-center justify-center py-2">
+                    <Loader className="h-4 w-4 animate-spin" />
+                  </div>
+                ) : (
+                  <Commands push={push} pages={documentSearchResults} />
+                )}
               </CommandGroup>
             )}
 
-            {templateSearchResults.length > 0 && (
+            {(isFetchingTemplates || templateSearchResults.length > 0) && (
               <CommandGroup className="mx-2 p-0 pb-2" heading={_(msg`Your templates`)}>
-                <Commands push={push} pages={templateSearchResults} />
+                {isFetchingTemplates ? (
+                  <div className="flex items-center justify-center py-2">
+                    <Loader className="h-4 w-4 animate-spin" />
+                  </div>
+                ) : (
+                  <Commands push={push} pages={templateSearchResults} />
+                )}
               </CommandGroup>
             )}
           </>
