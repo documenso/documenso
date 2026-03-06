@@ -24,8 +24,6 @@ RUN apk add --no-cache make cmake g++ openssl bash
 
 WORKDIR /app
 
-RUN pnpm install --frozen-lockfile
-
 ###########################
 #    BUILDER CONTAINER    #
 ###########################
