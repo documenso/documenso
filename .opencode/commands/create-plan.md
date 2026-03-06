@@ -26,7 +26,7 @@ The script will automatically:
 If you have the content ready, run:
 
 ```bash
-npx tsx scripts/create-plan.ts "$ARGUMENTS" "Your plan content here"
+pnpm exec tsx scripts/create-plan.ts "$ARGUMENTS" "Your plan content here"
 ```
 
 ### Option 2: Multi-line Content (Heredoc)
@@ -34,7 +34,7 @@ npx tsx scripts/create-plan.ts "$ARGUMENTS" "Your plan content here"
 For multi-line content, use heredoc:
 
 ```bash
-npx tsx scripts/create-plan.ts "$ARGUMENTS" << HEREDOC
+pnpm exec tsx scripts/create-plan.ts "$ARGUMENTS" << HEREDOC
 Your multi-line
 plan content
 goes here
@@ -46,7 +46,7 @@ HEREDOC
 You can also pipe content:
 
 ```bash
-echo "Your content" | npx tsx scripts/create-plan.ts "$ARGUMENTS"
+echo "Your content" | pnpm exec tsx scripts/create-plan.ts "$ARGUMENTS"
 ```
 
 ## File Format

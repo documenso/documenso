@@ -162,7 +162,7 @@ export const PDFViewer = ({
   if (!data) {
     return (
       <div ref={$el} className={cn('h-full w-full', className)} {...props}>
-        <p className="py-32 text-center text-sm text-muted-foreground">
+        <p className="text-muted-foreground py-32 text-center text-sm">
           <Trans>No document found</Trans>
         </p>
       </div>
@@ -194,7 +194,7 @@ export const PDFViewer = ({
 
 type VirtualizedPageListProps = {
   scrollParentRef: ScrollTarget;
-  constraintRef: React.RefObject<HTMLDivElement>;
+  constraintRef: React.RefObject<HTMLDivElement | null>;
   pages: PageMeta[];
   numPages: number;
   pdf: pdfjsLib.PDFDocumentProxy;
@@ -278,7 +278,7 @@ const VirtualizedPageList = ({
               customPageRenderer={customPageRenderer}
             />
 
-            <p className="my-2 text-center text-[11px] text-muted-foreground/80">
+            <p className="text-muted-foreground/80 my-2 text-center text-[11px]">
               <Trans>
                 Page {pageNumber} of {numPages}
               </Trans>
@@ -323,7 +323,7 @@ const PdfViewerPage = ({
 
   return (
     <div
-      className="relative w-full rounded border border-border"
+      className="border-border relative w-full rounded border"
       style={{ width: scaledWidth, height: scaledHeight }}
     >
       {CustomPageRenderer && imageLoadingState === 'loaded' && (

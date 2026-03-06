@@ -48,7 +48,7 @@ export const SigningCard3D = ({
 
   const [trackMouse, setTrackMouse] = useState(false);
 
-  const timeoutRef = useRef<number | undefined>();
+  const timeoutRef = useRef<number | undefined>(undefined);
 
   const cardX = useMotionValue(0);
   const cardY = useMotionValue(0);
@@ -184,7 +184,7 @@ const SigningCardContent = ({ className, name, signature }: SigningCardContentPr
           ))
           .with({ typedSignature: P.string }, (signature) => (
             <span
-              className="text-muted-foreground/60 group-hover:text-primary/80 break-all font-semibold duration-300"
+              className="text-muted-foreground/60 group-hover:text-primary/80 font-semibold break-all duration-300"
               style={{
                 fontSize: `max(min(4rem, ${(100 / signature.typedSignature.length / 2).toFixed(
                   4,
@@ -196,7 +196,7 @@ const SigningCardContent = ({ className, name, signature }: SigningCardContentPr
           ))
           .otherwise(() => (
             <span
-              className="text-muted-foreground/60 group-hover:text-primary/80 break-all font-semibold duration-300"
+              className="text-muted-foreground/60 group-hover:text-primary/80 font-semibold break-all duration-300"
               style={{
                 fontSize: `max(min(4rem, ${(100 / name.length / 2).toFixed(4)}cqw), 1.875rem)`,
               }}

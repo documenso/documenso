@@ -6,42 +6,41 @@ FROM node:22-alpine3.22 AS base
 RUN apk add --no-cache openssl
 RUN apk add --no-cache font-freefont
 
+RUN npm install -g pnpm
 
-###########################
-#    BUILDER CONTAINER    #
-###########################
-FROM base AS builder
 
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
-RUN apk add --no-cache jq
-WORKDIR /app
+#############################
+#  DEVELOPMENT CONTAINER   #
+#############################
+FROM base AS development
 
-COPY . .
-
-RUN npm install -g "turbo@^1.9.3"
-
-# Outputs to the /out folder
-# source: https://turbo.build/repo/docs/reference/command-line-reference/prune#--docker
-RUN turbo prune --scope=@documenso/remix --docker
-
-###########################
-#   INSTALLER CONTAINER   #
-###########################
-FROM base AS installer
+ENV HUSKY 0
+ENV DOCKER_OUTPUT 1
 
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk add --no-cache libc6-compat
 RUN apk add --no-cache jq
-# Required for node_modules/aws-crt
 RUN apk add --no-cache make cmake g++ openssl bash
 
 WORKDIR /app
 
-# Disable husky from installing hooks
-ENV HUSKY 0
-ENV DOCKER_OUTPUT 1
-ENV NEXT_TELEMETRY_DISABLED 1
+###########################
+#    BUILDER CONTAINER    #
+###########################
+FROM development AS builder
+
+COPY . .
+
+RUN pnpm install --frozen-lockfile
+
+# Outputs to the /out folder
+# source: https://turbo.build/repo/docs/reference/command-line-reference/prune#--docker
+RUN pnpm exec turbo prune @documenso/remix --docker
+
+###########################
+#   INSTALLER CONTAINER   #
+###########################
+FROM development AS installer
 
 # Encryption keys
 ARG NEXT_PRIVATE_ENCRYPTION_KEY="CAFEBABE"
@@ -67,21 +66,20 @@ ENV NEXT_PRIVATE_TELEMETRY_HOST="$NEXT_PRIVATE_TELEMETRY_HOST"
 # First install the dependencies (as they change less often)
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
-COPY --from=builder /app/out/package-lock.json ./package-lock.json
+COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 
 COPY --from=builder /app/lingui.config.ts ./lingui.config.ts
 COPY --from=builder /app/patches ./patches
+COPY --from=builder /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
-RUN npm ci
+RUN pnpm install --frozen-lockfile
 
 # Then copy all the source code (as it changes more often)
 COPY --from=builder /app/out/full/ .
 # Finally copy the turbo.json file so that we can run turbo commands
 COPY turbo.json turbo.json
 
-RUN npm install -g "turbo@^1.9.3"
-
-RUN turbo run build --filter=@documenso/remix...
+RUN pnpm exec turbo run build --filter=@documenso/remix...
 
 ###########################
 #     RUNNER CONTAINER    #
@@ -111,8 +109,10 @@ COPY --from=builder --chown=nodejs:nodejs /app/out/json/ .
 COPY --from=builder --chown=nodejs:nodejs /app/out/full/packages/tailwind-config ./packages/tailwind-config
 # Copy the patches across
 COPY --from=builder --chown=nodejs:nodejs /app/patches ./patches
+# Copy workspace config
+COPY --from=builder --chown=nodejs:nodejs /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
-RUN npm ci --only=production
+RUN pnpm install --frozen-lockfile --prod
 
 # Automatically leverage output traces to reduce image size
 # https://nodejs.org/docs/advanced-features/output-file-tracing
@@ -124,7 +124,7 @@ COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/schema.prisma .
 COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/migrations ./packages/prisma/migrations
 
 # Generate the prisma client again
-RUN npx prisma generate --schema ./packages/prisma/schema.prisma
+RUN pnpm exec prisma generate --schema ./packages/prisma/schema.prisma
 
 
 # Get the start script from docker/
