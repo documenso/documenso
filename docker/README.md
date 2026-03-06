@@ -15,7 +15,7 @@ This setup includes a PostgreSQL database and the Documenso application. You wil
 
 1. Download the Docker Compose file from the Documenso repository: [compose.yml](https://raw.githubusercontent.com/documenso/documenso/release/docker/production/compose.yml)
 2. Navigate to the directory containing the `compose.yml` file.
-3. Create a `.env` file in the same directory and add your SMTP details as well as a few extra environment variables, following the example below:
+3. Create a `.env` file in the same directory and add the required environment variables (database, app, SMTP, and signing), following the example below:
 
 ```
 # Generate random secrets (you can use: openssl rand -hex 32)
@@ -25,6 +25,16 @@ NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="<your-secondary-key>"
 
 # Your application URL
 NEXT_PUBLIC_WEBAPP_URL="<your-url>"
+
+# PostgreSQL service configuration (required by compose.yml)
+POSTGRES_USER="<your-postgres-user>"
+POSTGRES_PASSWORD="<your-postgres-password>"
+POSTGRES_DB="<your-postgres-db-name>"
+
+# Internal database URLs (required by Documenso)
+# Use "database" as the host because that is the PostgreSQL service name in compose.yml
+NEXT_PRIVATE_DATABASE_URL="postgres://<your-postgres-user>:<your-postgres-password>@database:5432/<your-postgres-db-name>"
+NEXT_PRIVATE_DIRECT_DATABASE_URL="postgres://<your-postgres-user>:<your-postgres-password>@database:5432/<your-postgres-db-name>"
 
 # SMTP Configuration
 NEXT_PRIVATE_SMTP_TRANSPORT="smtp-auth"
