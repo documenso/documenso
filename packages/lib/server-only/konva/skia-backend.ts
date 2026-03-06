@@ -27,6 +27,7 @@ Konva.Util['createCanvasElement'] = () => {
     get: () => node,
   });
 
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   return node as unknown as HTMLCanvasElement;
 };
 
@@ -34,6 +35,7 @@ Konva.Util.createImageElement = () => {
   const node = new Image();
   node.toString = () => '[object HTMLImageElement]';
 
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   return node as unknown as HTMLImageElement;
 };
 

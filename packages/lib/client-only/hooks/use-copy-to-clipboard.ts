@@ -14,13 +14,16 @@ export function useCopyToClipboard(): [CopiedValue, CopyFn] {
       return false;
     }
 
-    const isClipboardApiSupported = Boolean(typeof ClipboardItem && navigator.clipboard.write);
+    const isClipboardApiSupported =
+      typeof ClipboardItem !== 'undefined' && typeof navigator.clipboard.write === 'function';
 
     // Try to save to clipboard then save it in the state if worked
     try {
-      isClipboardApiSupported
-        ? await handleClipboardApiCopy(text, blobType)
-        : await handleWriteTextCopy(text);
+      if (isClipboardApiSupported) {
+        await handleClipboardApiCopy(text, blobType);
+      } else {
+        await handleWriteTextCopy(text);
+      }
 
       setCopiedText(await text);
       return true;
@@ -41,7 +44,7 @@ export function useCopyToClipboard(): [CopiedValue, CopyFn] {
   const handleClipboardApiCopy = async (value: CopyValue, blobType = 'text/plain') => {
     try {
       await navigator.clipboard.write([new ClipboardItem({ [blobType]: value })]);
-    } catch (e) {
+    } catch {
       // Fallback attempt.
       await handleWriteTextCopy(value);
     }

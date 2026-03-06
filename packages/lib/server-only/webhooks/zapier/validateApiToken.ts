@@ -14,7 +14,7 @@ export const validateApiToken = async ({ authorization }: ValidateApiTokenOption
     }
 
     return await getApiTokenByToken({ token });
-  } catch (err) {
+  } catch {
     throw new Error(`Failed to validate API token`);
   }
 };

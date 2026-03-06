@@ -4,6 +4,7 @@ import { omit } from 'remeda';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { ZFieldMetaSchema } from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
   mapEnvelopeToWebhookDocumentPayload,
@@ -158,7 +159,7 @@ export const duplicateEnvelope = async ({ id, userId, teamId }: DuplicateEnvelop
               height: field.height,
               customText: '',
               inserted: false,
-              fieldMeta: field.fieldMeta as PrismaJson.FieldMeta,
+              fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
             })),
           },
         },

@@ -193,12 +193,12 @@ export const updateEnvelope = async ({
     isDeepEqual(documentGlobalActionAuth, newGlobalActionAuth);
   const isDocumentVisibilitySame =
     data.visibility === undefined || data.visibility === envelope.visibility;
-  const isFolderSame = data.folderId === undefined || data.folderId === envelope.folderId;
-  const isTemplateTypeSame =
+  const _isFolderSame = data.folderId === undefined || data.folderId === envelope.folderId;
+  const _isTemplateTypeSame =
     data.templateType === undefined || data.templateType === envelope.templateType;
-  const isPublicDescriptionSame =
+  const _isPublicDescriptionSame =
     data.publicDescription === undefined || data.publicDescription === envelope.publicDescription;
-  const isPublicTitleSame =
+  const _isPublicTitleSame =
     data.publicTitle === undefined || data.publicTitle === envelope.publicTitle;
 
   const auditLogs: CreateDocumentAuditLogDataResponse[] = [];

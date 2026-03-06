@@ -5,7 +5,7 @@ import { cn } from '../../lib/utils';
 
 export type FormErrorMessageProps = {
   className?: string;
-  error: { message?: string } | undefined | unknown;
+  error: unknown;
 };
 
 const isErrorWithMessage = (error: unknown): error is { message?: string } => {

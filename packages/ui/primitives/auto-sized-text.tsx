@@ -37,7 +37,7 @@ function getBaseFontSize(): number {
     }
 
     return parsed;
-  } catch (error) {
+  } catch {
     // Fallback to browser default if anything goes wrong
     return 16;
   }

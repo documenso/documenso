@@ -25,7 +25,7 @@ export type GetRecipientEnvelopeByTokenOptions = {
 export const getEnvelopeForDirectTemplateSigning = async ({
   token,
   userId,
-  accessAuth,
+  accessAuth: _accessAuth,
 }: GetRecipientEnvelopeByTokenOptions): Promise<EnvelopeForSigningResponse> => {
   if (!token) {
     throw new AppError(AppErrorCode.NOT_FOUND, {

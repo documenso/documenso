@@ -545,5 +545,5 @@ export const generateSampleWebhookPayload = (
     };
   }
 
-  throw new Error(`Unsupported event type: ${event}`);
+  throw new Error('Unsupported event type');
 };

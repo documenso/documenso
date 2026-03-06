@@ -28,7 +28,7 @@ export type FieldRenderMode = 'edit' | 'sign' | 'export';
 
 export type FieldToRender = Pick<
   Field,
-  'envelopeItemId' | 'recipientId' | 'type' | 'page' | 'customText' | 'inserted' | 'recipientId'
+  'envelopeItemId' | 'recipientId' | 'type' | 'page' | 'customText' | 'inserted'
 > & {
   renderId: string; // A unique ID for the field in the render.
   width: number;

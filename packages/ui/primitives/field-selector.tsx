@@ -23,7 +23,7 @@ export interface FieldSelectorProps {
 }
 
 export const FieldSelector = ({
-  className,
+  className: _className,
   selectedField,
   onSelectedFieldChange,
   disabled = false,
@@ -104,10 +104,10 @@ export const FieldSelector = ({
               )}
             >
               <CardContent className="relative flex items-center justify-center gap-x-2 px-6 py-4">
-                {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
+                {Icon && <Icon className="text-muted-foreground h-4 w-4" />}
                 <span
                   className={cn(
-                    'text-sm text-muted-foreground group-data-[selected]:text-foreground',
+                    'text-muted-foreground group-data-[selected]:text-foreground text-sm',
                     field.type === FieldType.SIGNATURE && 'invisible',
                   )}
                 >
@@ -115,7 +115,7 @@ export const FieldSelector = ({
                 </span>
 
                 {field.type === FieldType.SIGNATURE && (
-                  <div className="absolute inset-0 flex items-center justify-center font-signature text-lg text-muted-foreground">
+                  <div className="font-signature text-muted-foreground absolute inset-0 flex items-center justify-center text-lg">
                     <Trans>Signature</Trans>
                   </div>
                 )}

@@ -13,7 +13,7 @@ export type GetFileOptions = {
  *
  * - Lucas, 2025-11-04
  */
-const getFile = async ({ type, data }: GetFileOptions) => {
+const _getFile = async ({ type, data }: GetFileOptions) => {
   return await match(type)
     .with(DocumentDataType.BYTES, () => getFileFromBytes(data))
     .with(DocumentDataType.BYTES_64, () => getFileFromBytes64(data))

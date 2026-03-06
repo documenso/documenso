@@ -53,8 +53,8 @@ export const validateFieldsUninserted = (): boolean => {
     const innerDiv = element.querySelector('div');
     const hasError = innerDiv?.getAttribute('data-error') === 'true';
 
-    if (hasError) {
-      errorElements.push(element as HTMLElement);
+    if (hasError && element instanceof HTMLElement) {
+      errorElements.push(element);
     } else {
       element.removeAttribute('data-error');
     }

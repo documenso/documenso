@@ -27,7 +27,8 @@ export const renderRadioFieldElement = (
 ) => {
   const { pageWidth, pageHeight, pageLayer, mode, color } = options;
 
-  const radioMeta: TRadioFieldMeta | null = (field.fieldMeta as TRadioFieldMeta) || null;
+  const radioMeta: TRadioFieldMeta | null =
+    field.fieldMeta?.type === 'radio' ? field.fieldMeta : null;
   const radioValues = radioMeta?.values || [];
 
   const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);
@@ -122,6 +123,7 @@ export const renderRadioFieldElement = (
   });
 
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
+  const isReadOnly = radioMeta?.readOnly ?? false;
 
   radioValues.forEach(({ value, checked }, index) => {
     const isRadioValueChecked = match(mode)
@@ -129,7 +131,7 @@ export const renderRadioFieldElement = (
       .with('sign', () => index.toString() === field.customText)
       .with('export', () => {
         // If it's read-only, check the originally checked state.
-        if (radioMeta.readOnly) {
+        if (isReadOnly) {
           return checked;
         }
 

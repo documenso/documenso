@@ -31,7 +31,7 @@ export type DocumentUploadButtonProps = {
 };
 
 export const DocumentUploadButton = ({
-  className,
+  className: _className,
   loading,
   onDrop,
   onDropRejected,

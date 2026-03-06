@@ -64,7 +64,7 @@ export const Stepper: FC<StepperProps> = ({
 
   const nextStep = () => {
     if (currentStep < totalSteps) {
-      void handleStepChange(currentStep + 1);
+      handleStepChange(currentStep + 1);
     } else {
       void handleComplete();
     }
@@ -72,7 +72,7 @@ export const Stepper: FC<StepperProps> = ({
 
   const previousStep = () => {
     if (currentStep > 1) {
-      void handleStepChange(currentStep - 1);
+      handleStepChange(currentStep - 1);
     }
   };
 

@@ -189,7 +189,7 @@ export const EnvelopeRenderProvider = ({
   }, [envelope.envelopeItems]);
 
   const recipientIds = useMemo(
-    () => recipients.map((recipient) => recipient.id).sort(),
+    () => recipients.map((recipient) => recipient.id).sort((left, right) => left - right),
     [recipients],
   );
 

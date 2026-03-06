@@ -276,7 +276,7 @@ export const EnvelopeEditorProvider = ({
     [envelope.recipients],
   );
 
-  const { refetch: reloadEnvelope, isLoading: isReloadingEnvelope } = trpc.envelope.get.useQuery(
+  const { refetch: reloadEnvelope, isLoading: _isReloadingEnvelope } = trpc.envelope.get.useQuery(
     {
       envelopeId: envelope.id,
     },

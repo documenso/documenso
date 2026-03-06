@@ -5,7 +5,6 @@ import type { MessageDescriptor } from '@lingui/core';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { motion } from 'framer-motion';
 
-import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import { Dialog, DialogClose, DialogContent, DialogFooter } from '@documenso/ui/primitives/dialog';
 
 import { cn } from '../../lib/utils';
@@ -45,7 +44,7 @@ export const SignaturePadDialog = ({
   return (
     <div
       className={cn(
-        'relative block aspect-signature-pad w-full select-none rounded-lg border bg-background',
+        'aspect-signature-pad bg-background relative block w-full rounded-lg border select-none',
         className,
         {
           'pointer-events-none opacity-50': disabled,
@@ -140,7 +139,11 @@ export const SignaturePadDialog = ({
               }}
             >
               {dialogConfirmText ? (
-                parseMessageDescriptor(i18n._, dialogConfirmText)
+                typeof dialogConfirmText === 'string' ? (
+                  dialogConfirmText
+                ) : (
+                  i18n._(dialogConfirmText)
+                )
               ) : (
                 <Trans>Next</Trans>
               )}

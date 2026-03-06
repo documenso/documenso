@@ -39,17 +39,13 @@ export const DocumentGlobalAuthAccessSelect = ({
     })),
   ];
 
-  // Convert string array to Option array for MultiSelect
-  const selectedOptions =
-    (value
-      ?.map((val) => authOptions.find((option) => option.value === val))
-      .filter(Boolean) as Option[]) || [];
+  const getSelectedOptions = (selectedValues?: string[]) =>
+    selectedValues
+      ?.map((selectedValue) => authOptions.find((option) => option.value === selectedValue))
+      .filter((option): option is Option => option !== undefined) ?? [];
 
-  // Convert default value to Option array
-  const defaultOptions =
-    (defaultValue
-      ?.map((val) => authOptions.find((option) => option.value === val))
-      .filter(Boolean) as Option[]) || [];
+  const selectedOptions = getSelectedOptions(value);
+  const defaultOptions = getSelectedOptions(defaultValue);
 
   const handleChange = (options: Option[]) => {
     const values = options.map((option) => option.value);
@@ -79,7 +75,7 @@ export const DocumentGlobalAuthAccessTooltip = () => (
       <InfoIcon className="mx-2 h-4 w-4" />
     </TooltipTrigger>
 
-    <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+    <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
       <h2>
         <strong>
           <Trans>Document access</Trans>

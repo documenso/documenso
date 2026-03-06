@@ -13,7 +13,7 @@ export const deletedServiceAccountEmail = () => {
     const { hostname } = new URL(process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000');
 
     return `deleted-account@${hostname}`;
-  } catch (error) {
+  } catch {
     return LEGACY_DELETED_ACCOUNT_EMAIL;
   }
 };

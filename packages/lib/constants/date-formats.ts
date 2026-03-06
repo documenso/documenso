@@ -170,5 +170,8 @@ export const convertToLocalSystemFormat = (
 };
 
 export const isValidDateFormat = (dateFormat: unknown): dateFormat is ValidDateFormat => {
-  return VALID_DATE_FORMAT_VALUES.includes(dateFormat as ValidDateFormat);
+  return (
+    typeof dateFormat === 'string' &&
+    VALID_DATE_FORMAT_VALUES.some((validDateFormat) => validDateFormat === dateFormat)
+  );
 };

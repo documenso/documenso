@@ -56,7 +56,7 @@ export function EnvelopeRecipientFieldTooltip({
   field,
   showFieldStatus = false,
   showRecipientTooltip = false,
-  showRecipientColors = false,
+  showRecipientColors: _showRecipientColors = false,
 }: EnvelopeRecipientFieldTooltipProps) {
   const { t } = useLingui();
 
@@ -145,7 +145,7 @@ export function EnvelopeRecipientFieldTooltip({
     >
       <PopoverHover
         trigger={
-          <Avatar className="absolute -left-3 -top-3 z-50 h-6 w-6 border-2 border-solid border-gray-200/50 transition-colors hover:border-gray-200">
+          <Avatar className="absolute -top-3 -left-3 z-50 h-6 w-6 border-2 border-solid border-gray-200/50 transition-colors hover:border-gray-200">
             <AvatarFallback className="bg-neutral-50 text-xs text-gray-400">
               {extractInitials(field.recipient.name || field.recipient.email)}
             </AvatarFallback>
@@ -191,12 +191,12 @@ export function EnvelopeRecipientFieldTooltip({
           </span>
         </p>
 
-        <p className="mt-1 text-center text-xs text-muted-foreground">
+        <p className="text-muted-foreground mt-1 text-center text-xs">
           {getRecipientDisplayText(field.recipient)}
         </p>
 
         <button
-          className="absolute right-0 top-0 my-1 p-2 focus:outline-none focus-visible:ring-0"
+          className="absolute top-0 right-0 my-1 p-2 focus:outline-none focus-visible:ring-0"
           onClick={() => setHideField(true)}
           title="Hide field"
         >

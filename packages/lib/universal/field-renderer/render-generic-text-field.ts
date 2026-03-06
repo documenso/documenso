@@ -20,12 +20,29 @@ import { calculateFieldPosition } from './field-renderer';
 
 const DEFAULT_TEXT_X_PADDING = 6;
 
+const getGenericTextFieldMeta = (field: FieldToRender): GenericTextFieldTypeMetas | undefined => {
+  const fieldMeta = field.fieldMeta;
+
+  if (
+    fieldMeta?.type === 'initials' ||
+    fieldMeta?.type === 'name' ||
+    fieldMeta?.type === 'email' ||
+    fieldMeta?.type === 'date' ||
+    fieldMeta?.type === 'text' ||
+    fieldMeta?.type === 'number'
+  ) {
+    return fieldMeta;
+  }
+
+  return undefined;
+};
+
 const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOptions): Konva.Text => {
   const { pageWidth, pageHeight, mode = 'edit', pageLayer, translations } = options;
 
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
-  const fieldMeta = field.fieldMeta as GenericTextFieldTypeMetas | undefined;
+  const fieldMeta = getGenericTextFieldMeta(field);
 
   const fieldTypeName = translations?.[field.type] || field.type;
 

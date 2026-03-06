@@ -47,7 +47,7 @@ export type PdfToImagesOptions = {
 export const pdfToImages = async (pdfBytes: Uint8Array, options: PdfToImagesOptions = {}) => {
   const { scale = 2 } = options;
 
-  const task = await pdfjsLib.getDocument({
+  const task = pdfjsLib.getDocument({
     data: pdfBytes,
     CanvasFactory: SkiaCanvasFactory,
   });

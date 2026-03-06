@@ -75,13 +75,13 @@ const getDevice = (userAgent?: string | null): string => {
   return `${result.os.name} - ${result.browser.name} ${result.browser.version}`;
 };
 
-const textMutedForegroundLight = '#929DAE';
-const textForeground = '#000';
+const _textMutedForegroundLight = '#929DAE';
+const _textForeground = '#000';
 const textMutedForeground = '#64748B';
 const textRejectedRed = '#dc2626';
 const textBase = 10;
 const textSm = 9;
-const textXs = 8;
+const _textXs = 8;
 const fontMedium = '500';
 
 const columnWidthPercentages = [30, 30, 40];

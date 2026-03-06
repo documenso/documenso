@@ -54,13 +54,11 @@ export class MailChannelsTransport implements Transport<SentMessageInfo> {
     const mailCc = this.toMailChannelsAddresses(mail.data.cc);
     const mailBcc = this.toMailChannelsAddresses(mail.data.bcc);
 
-    const from: MailChannelsAddress =
-      typeof mail.data.from === 'string'
-        ? { email: mail.data.from }
-        : {
-            email: mail.data.from?.address,
-            name: mail.data.from?.name,
-          };
+    const [from] = this.toMailChannelsAddresses(mail.data.from);
+
+    if (!from) {
+      return callback(new Error('Missing required field "from"'), null);
+    }
 
     const requestHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -70,56 +68,15 @@ export class MailChannelsTransport implements Transport<SentMessageInfo> {
       requestHeaders['X-Auth-Token'] = this._options.apiKey;
     }
 
-    fetch(this._options.endpoint, {
-      method: 'POST',
-      headers: requestHeaders,
-      body: JSON.stringify({
-        from: from,
-        subject: mail.data.subject,
-        personalizations: [
-          {
-            to: mailTo,
-            cc: mailCc.length > 0 ? mailCc : undefined,
-            bcc: mailBcc.length > 0 ? mailBcc : undefined,
-            dkim_domain: env('NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN') || undefined,
-            dkim_selector: env('NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR') || undefined,
-            dkim_private_key: env('NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY') || undefined,
-          },
-        ],
-        content: [
-          {
-            type: 'text/plain',
-            value: mail.data.text?.toString('utf-8') ?? '',
-          },
-          {
-            type: 'text/html',
-            value: mail.data.html?.toString('utf-8') ?? '',
-          },
-        ],
-      }),
-    })
-      .then((res) => {
-        if (res.status >= 200 && res.status <= 299) {
-          return callback(null, {
-            messageId: '',
-            envelope: {
-              from: mail.data.from,
-              to: mail.data.to,
-            },
-            accepted: mail.data.to,
-            rejected: [],
-            pending: [],
-          });
-        }
-
-        res
-          .json()
-          .then((data) => callback(new Error(`MailChannels error: ${data.message}`), null))
-          .catch((err) => callback(err, null));
-      })
-      .catch((err) => {
-        return callback(err, null);
-      });
+    void this.sendMailRequest({
+      callback,
+      from,
+      mail,
+      mailBcc,
+      mailCc,
+      mailTo,
+      requestHeaders,
+    });
   }
 
   /**
@@ -153,5 +110,73 @@ export class MailChannelsTransport implements Transport<SentMessageInfo> {
         name: address.name,
       },
     ];
+  }
+
+  private async sendMailRequest({
+    callback,
+    from,
+    mail,
+    mailBcc,
+    mailCc,
+    mailTo,
+    requestHeaders,
+  }: {
+    callback: (_err: Error | null, _info: SentMessageInfo) => void;
+    from: MailChannelsAddress;
+    mail: MailMessage;
+    mailBcc: Array<MailChannelsAddress>;
+    mailCc: Array<MailChannelsAddress>;
+    mailTo: Array<MailChannelsAddress>;
+    requestHeaders: Record<string, string>;
+  }) {
+    try {
+      const response = await fetch(this._options.endpoint, {
+        method: 'POST',
+        headers: requestHeaders,
+        body: JSON.stringify({
+          from,
+          subject: mail.data.subject,
+          personalizations: [
+            {
+              to: mailTo,
+              cc: mailCc.length > 0 ? mailCc : undefined,
+              bcc: mailBcc.length > 0 ? mailBcc : undefined,
+              dkim_domain: env('NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN') || undefined,
+              dkim_selector: env('NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR') || undefined,
+              dkim_private_key: env('NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY') || undefined,
+            },
+          ],
+          content: [
+            {
+              type: 'text/plain',
+              value: mail.data.text?.toString('utf-8') ?? '',
+            },
+            {
+              type: 'text/html',
+              value: mail.data.html?.toString('utf-8') ?? '',
+            },
+          ],
+        }),
+      });
+
+      if (response.status >= 200 && response.status <= 299) {
+        return callback(null, {
+          messageId: '',
+          envelope: {
+            from: mail.data.from,
+            to: mail.data.to,
+          },
+          accepted: mail.data.to,
+          rejected: [],
+          pending: [],
+        });
+      }
+
+      const data = await response.json();
+
+      return callback(new Error(`MailChannels error: ${data.message}`), null);
+    } catch (error) {
+      return callback(error instanceof Error ? error : new Error('Failed to send email'), null);
+    }
   }
 }

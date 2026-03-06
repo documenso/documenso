@@ -51,24 +51,18 @@ export const RecipientSelector = ({
   }, [recipients]);
 
   const recipientsByRoleToDisplay = useMemo(() => {
-    return Object.entries(recipientsByRole)
-      .filter(
-        ([role]) =>
-          role !== RecipientRole.CC &&
-          role !== RecipientRole.VIEWER &&
-          role !== RecipientRole.ASSISTANT,
-      )
-      .map(
-        ([role, roleRecipients]) =>
-          [
-            role,
-            sortBy(
-              roleRecipients,
-              [(r) => r.signingOrder || Number.MAX_SAFE_INTEGER, 'asc'],
-              [(r) => r.id, 'asc'],
-            ),
-          ] as [RecipientRole, Recipient[]],
-      );
+    return [RecipientRole.SIGNER, RecipientRole.APPROVER].map((role) => {
+      const roleRecipients = recipientsByRole[role];
+
+      return [
+        role,
+        sortBy(
+          roleRecipients,
+          [(r) => r.signingOrder || Number.MAX_SAFE_INTEGER, 'asc'],
+          [(r) => r.id, 'asc'],
+        ),
+      ] satisfies [RecipientRole, Recipient[]];
+    });
   }, [recipientsByRole]);
 
   const getRecipientLabel = useCallback(
@@ -101,7 +95,7 @@ export const RecipientSelector = ({
           variant="outline"
           role="combobox"
           className={cn(
-            'justify-between bg-background font-normal text-muted-foreground hover:text-foreground',
+            'bg-background text-muted-foreground hover:text-foreground justify-between font-normal',
             getRecipientColorStyles(
               Math.max(
                 recipients.findIndex((r) => r.id === selectedRecipient?.id),
@@ -126,21 +120,21 @@ export const RecipientSelector = ({
           <CommandInput />
 
           <CommandEmpty>
-            <span className="inline-block px-4 text-muted-foreground">
+            <span className="text-muted-foreground inline-block px-4">
               <Trans>No recipient matching this description was found.</Trans>
             </span>
           </CommandEmpty>
 
           {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
             <CommandGroup key={roleIndex}>
-              <div className="mb-1 ml-2 mt-2 text-xs font-medium text-muted-foreground">
+              <div className="text-muted-foreground mt-2 mb-1 ml-2 text-xs font-medium">
                 {_(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
               </div>
 
               {roleRecipients.length === 0 && (
                 <div
                   key={`${role}-empty`}
-                  className="px-4 pb-4 pt-2.5 text-center text-xs text-muted-foreground/80"
+                  className="text-muted-foreground/80 px-4 pt-2.5 pb-4 text-center text-xs"
                 >
                   <Trans>No recipients with this role</Trans>
                 </div>
@@ -168,7 +162,7 @@ export const RecipientSelector = ({
                   disabled={recipient.signingStatus !== SigningStatus.NOT_SIGNED}
                 >
                   <span
-                    className={cn('truncate text-foreground/70', {
+                    className={cn('text-foreground/70 truncate', {
                       'text-foreground/80': recipient.id === selectedRecipient?.id,
                     })}
                   >
@@ -190,7 +184,7 @@ export const RecipientSelector = ({
                           <Info className="ml-2 h-4 w-4" />
                         </TooltipTrigger>
 
-                        <TooltipContent className="max-w-xs text-muted-foreground">
+                        <TooltipContent className="text-muted-foreground max-w-xs">
                           <Trans>
                             This document has already been sent to this recipient. You can no longer
                             edit this recipient.

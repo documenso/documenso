@@ -6,7 +6,7 @@ import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
  * Adds a rejection stamp to each page of a PDF document.
  * The stamp is placed in the center of the page.
  */
-export async function addRejectionStampToPdf(pdf: PDF, reason: string): Promise<PDF> {
+export async function addRejectionStampToPdf(pdf: PDF, _reason: string): Promise<PDF> {
   const pages = pdf.getPages();
 
   const fontBytes = await fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(

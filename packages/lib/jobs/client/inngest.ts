@@ -91,11 +91,11 @@ export class InngestJobProvider extends BaseJobProvider {
     return {
       wait: step.sleep,
       logger: {
-        info: ctx.logger.info,
-        debug: ctx.logger.debug,
-        error: ctx.logger.error,
-        warn: ctx.logger.warn,
-        log: ctx.logger.info,
+        info: (...args) => ctx.logger.info(...args),
+        debug: (...args) => ctx.logger.debug(...args),
+        error: (...args) => ctx.logger.error(...args),
+        warn: (...args) => ctx.logger.warn(...args),
+        log: (...args) => ctx.logger.info(...args),
       },
       runTask: async (cacheKey, callback) => {
         const result = await step.run(cacheKey, callback);

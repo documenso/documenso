@@ -99,7 +99,7 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
       html,
       text,
     });
-  } catch (e) {
+  } catch {
     // Todo: Teams - Alert us.
     // We don't want to prevent a user from revoking access because an email could not be sent.
   }

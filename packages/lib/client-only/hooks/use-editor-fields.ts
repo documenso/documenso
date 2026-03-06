@@ -251,7 +251,7 @@ export const useEditorFields = ({
 
   const getFieldByFormId = useCallback(
     (formId: string): TLocalField | undefined => {
-      return localFields.find((field) => field.formId === formId) as TLocalField | undefined;
+      return localFields.find((field) => field.formId === formId);
     },
     [localFields],
   );

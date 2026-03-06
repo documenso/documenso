@@ -7,7 +7,7 @@ import type { TExecuteWebhookJobDefinition } from './execute-webhook';
 
 export const run = async ({
   payload,
-  io,
+  io: _io,
 }: {
   payload: TExecuteWebhookJobDefinition;
   io: JobRunIO;
@@ -28,10 +28,11 @@ export const run = async ({
     createdAt: new Date().toISOString(),
     webhookEndpoint: url,
   };
+  const requestBody: Prisma.InputJsonValue = JSON.parse(JSON.stringify(payloadData));
 
   const response = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify(payloadData),
+    body: JSON.stringify(requestBody),
     headers: {
       'Content-Type': 'application/json',
       'X-Documenso-Secret': secret ?? '',
@@ -44,7 +45,7 @@ export const run = async ({
 
   try {
     responseBody = JSON.parse(body);
-  } catch (err) {
+  } catch {
     responseBody = body;
   }
 
@@ -53,7 +54,7 @@ export const run = async ({
       url,
       event,
       status: response.ok ? WebhookCallStatus.SUCCESS : WebhookCallStatus.FAILED,
-      requestBody: payloadData as Prisma.InputJsonValue,
+      requestBody,
       responseCode: response.status,
       responseBody,
       responseHeaders: Object.fromEntries(response.headers.entries()),

@@ -172,7 +172,9 @@ export class Canvas {
       event.preventDefault();
     }
 
-    event.buttons === 1 && this.onMouseDown(event);
+    if (event.buttons === 1) {
+      this.onMouseDown(event);
+    }
   }
 
   private onMouseLeave(event: MouseEvent): void {

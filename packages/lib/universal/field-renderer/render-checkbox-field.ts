@@ -30,7 +30,8 @@ export const renderCheckboxFieldElement = (
 
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
-  const checkboxMeta: TCheckboxFieldMeta | null = (field.fieldMeta as TCheckboxFieldMeta) || null;
+  const checkboxMeta: TCheckboxFieldMeta | null =
+    field.fieldMeta?.type === 'checkbox' ? field.fieldMeta : null;
   const checkboxValues = checkboxMeta?.values || [];
 
   const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);
@@ -131,6 +132,7 @@ export const renderCheckboxFieldElement = (
   });
 
   const checkedValues: number[] = field.customText ? parseCheckboxCustomText(field.customText) : [];
+  const isReadOnly = checkboxMeta?.readOnly ?? false;
 
   checkboxValues.forEach(({ value, checked }, index) => {
     const isCheckboxChecked = match(mode)
@@ -138,7 +140,7 @@ export const renderCheckboxFieldElement = (
       .with('sign', () => checkedValues.includes(index))
       .with('export', () => {
         // If it's read-only, check the originally checked state.
-        if (checkboxMeta.readOnly) {
+        if (isReadOnly) {
           return checked;
         }
 

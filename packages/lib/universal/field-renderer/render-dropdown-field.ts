@@ -54,7 +54,8 @@ export const renderDropdownFieldElement = (
 
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
-  const dropdownMeta: TDropdownFieldMeta | null = (field.fieldMeta as TDropdownFieldMeta) || null;
+  const dropdownMeta: TDropdownFieldMeta | null =
+    field.fieldMeta?.type === 'dropdown' ? field.fieldMeta : null;
 
   let selectedValue = translations?.[FieldType.DROPDOWN] || 'Select Option';
 

@@ -99,17 +99,24 @@ function transToGroupOption(options: Option[], groupBy?: string) {
 
   const groupOption: GroupOption = {};
   options.forEach((option) => {
-    const key = (option[groupBy] as string) || '';
+    const groupValue = option[groupBy];
+    const key = typeof groupValue === 'string' ? groupValue : groupValue ? String(groupValue) : '';
+
     if (!groupOption[key]) {
       groupOption[key] = [];
     }
+
     groupOption[key].push(option);
   });
   return groupOption;
 }
 
 function removePickedOption(groupOption: GroupOption, picked: Option[]) {
-  const cloneOption = JSON.parse(JSON.stringify(groupOption)) as GroupOption;
+  const cloneOption: GroupOption = {};
+
+  for (const [key, value] of Object.entries(groupOption)) {
+    cloneOption[key] = [...value];
+  }
 
   for (const [key, value] of Object.entries(cloneOption)) {
     cloneOption[key] = value.filter((val) => !picked.find((p) => p.value === val.value));
@@ -186,11 +193,17 @@ const MultiSelect = ({
   const debouncedSearchTerm = useDebounce(inputValue, delay || 500);
 
   const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+    const target = event.target;
+
+    if (!(target instanceof Node)) {
+      return;
+    }
+
     if (
       dropdownRef.current &&
-      !dropdownRef.current.contains(event.target as Node) &&
+      !dropdownRef.current.contains(target) &&
       inputRef.current &&
-      !inputRef.current.contains(event.target as Node)
+      !inputRef.current.contains(target)
     ) {
       setOpen(false);
       inputRef.current.blur();
@@ -408,7 +421,7 @@ const MultiSelect = ({
     >
       <div
         className={cn(
-          'has-aria-invalid:ring-destructive/20 dark:has-aria-invalid:ring-destructive/40 has-aria-invalid:border-destructive has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:opacity-50 relative min-h-[38px] rounded-md border border-input text-sm outline-none transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50',
+          'has-aria-invalid:ring-destructive/20 dark:has-aria-invalid:ring-destructive/40 has-aria-invalid:border-destructive border-input focus-within:border-ring focus-within:ring-ring/50 relative min-h-[38px] rounded-md border text-sm transition-[color,box-shadow] outline-none focus-within:ring-[3px] has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:opacity-50',
           {
             'p-1': selected.length !== 0,
             'cursor-text': !disabled && selected.length !== 0,
@@ -427,7 +440,7 @@ const MultiSelect = ({
               <div
                 key={option.value}
                 className={cn(
-                  'animate-fadeIn data-fixed:pe-2 relative inline-flex h-7 cursor-default items-center rounded-md border bg-background pe-7 pl-2 ps-2 text-xs font-medium text-secondary-foreground transition-all hover:bg-background disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
+                  'animate-fadeIn bg-background text-secondary-foreground hover:bg-background relative inline-flex h-7 cursor-default items-center rounded-md border ps-2 pe-7 pl-2 text-xs font-medium transition-all disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-fixed:pe-2',
                   badgeClassName,
                 )}
                 data-fixed={option.fixed}
@@ -435,7 +448,7 @@ const MultiSelect = ({
               >
                 {option.label}
                 <button
-                  className="absolute -inset-y-px -end-px flex size-7 items-center justify-center rounded-e-md border border-transparent p-0 text-muted-foreground/80 outline-none transition-[color,box-shadow] hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                  className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute -inset-y-px -end-px flex size-7 items-center justify-center rounded-e-md border border-transparent p-0 transition-[color,box-shadow] outline-none focus-visible:ring-[3px]"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       handleUnselect(option);
@@ -478,7 +491,7 @@ const MultiSelect = ({
             }}
             placeholder={hidePlaceholderWhenSelected && selected.length !== 0 ? '' : placeholder}
             className={cn(
-              'flex-1 bg-transparent outline-none placeholder:text-muted-foreground/70 disabled:cursor-not-allowed',
+              'placeholder:text-muted-foreground/70 flex-1 bg-transparent outline-none disabled:cursor-not-allowed',
               {
                 'w-full': hidePlaceholderWhenSelected,
                 'px-3 py-2': selected.length === 0,
@@ -494,7 +507,7 @@ const MultiSelect = ({
               onChange?.(selected.filter((s) => s.fixed));
             }}
             className={cn(
-              'absolute end-0 top-0 flex size-9 items-center justify-center rounded-md border border-transparent text-muted-foreground/80 outline-none transition-[color,box-shadow] hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
+              'text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute end-0 top-0 flex size-9 items-center justify-center rounded-md border border-transparent transition-[color,box-shadow] outline-none focus-visible:ring-[3px]',
               (hideClearAllButton ||
                 disabled ||
                 selected.length < 1 ||
@@ -510,7 +523,7 @@ const MultiSelect = ({
       <div className="relative">
         <div
           className={cn(
-            'absolute top-2 z-10 w-full overflow-hidden rounded-md border border-input',
+            'border-input absolute top-2 z-10 w-full overflow-hidden rounded-md border',
             'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
             !open && 'hidden',
           )}

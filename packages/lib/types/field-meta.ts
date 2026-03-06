@@ -418,5 +418,3 @@ export const ZEnvelopeFieldAndMetaSchema = z.discriminatedUnion('type', [
     fieldMeta: ZDropdownFieldMeta.optional().default(FIELD_DROPDOWN_META_DEFAULT_VALUES),
   }),
 ]);
-
-type TEnvelopeFieldAndMeta = z.infer<typeof ZEnvelopeFieldAndMetaSchema>;

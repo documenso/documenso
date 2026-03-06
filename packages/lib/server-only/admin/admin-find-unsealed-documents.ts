@@ -91,9 +91,13 @@ export const adminFindUnsealedDocuments = async ({
   ]);
 
   const count = Number(countResult[0]?.count ?? 0);
+  const formattedData: AdminUnsealedDocument[] = data.map((document) => ({
+    ...document,
+    id: String(document.id),
+  }));
 
   return {
-    data: data as unknown as AdminUnsealedDocument[],
+    data: formattedData,
     count,
     currentPage: Math.max(page, 1),
     perPage,

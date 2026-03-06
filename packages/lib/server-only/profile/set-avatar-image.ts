@@ -33,7 +33,7 @@ export const setAvatarImage = async ({
   userId,
   target,
   bytes,
-  requestMetadata,
+  requestMetadata: _requestMetadata,
 }: SetAvatarImageOptions) => {
   let oldAvatarImageId: string | null = null;
 

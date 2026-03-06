@@ -32,7 +32,7 @@ export type TeamInsights = {
 
 export type UserInsights = {
   id: number;
-  name: string;
+  name: string | null;
   email: string;
   documentCount: number;
   signedDocumentCount: number;
@@ -98,7 +98,7 @@ export async function getOrganisationDetailedInsights({
       case 'documents':
         return await getDocumentInsights(organisationId, offset, perPage, createdAtFrom);
       default:
-        throw new Error(`Invalid view: ${view}`);
+        throw new Error('Invalid view');
     }
   })();
 
@@ -149,9 +149,14 @@ async function getTeamInsights(
 
   const [teams, countResult] = await Promise.all([teamsQuery.execute(), countQuery.execute()]);
   const count = Number(countResult[0]?.count || 0);
+  const teamInsights: TeamInsights[] = teams.map((team) => ({
+    ...team,
+    memberCount: Number(team.memberCount),
+    documentCount: Number(team.documentCount),
+  }));
 
   return {
-    teams: teams as TeamInsights[],
+    teams: teamInsights,
     users: [],
     documents: [],
     totalPages: Math.ceil(Number(count) / perPage),
@@ -208,10 +213,15 @@ async function getUserInsights(
 
   const [users, countResult] = await Promise.all([usersQuery.execute(), countQuery.execute()]);
   const count = Number(countResult[0]?.count || 0);
+  const userInsights: UserInsights[] = users.map((user) => ({
+    ...user,
+    documentCount: Number(user.documentCount),
+    signedDocumentCount: Number(user.signedDocumentCount),
+  }));
 
   return {
     teams: [],
-    users: users as UserInsights[],
+    users: userInsights,
     documents: [],
     totalPages: Math.ceil(Number(count) / perPage),
   };
@@ -223,18 +233,13 @@ async function getDocumentInsights(
   perPage: number,
   createdAtFrom: Date | null,
 ): Promise<OrganisationDetailedInsights> {
-  let documentsQuery = kyselyPrisma.$kysely
+  const documentsQuery = kyselyPrisma.$kysely
     .selectFrom('Envelope as e')
     .innerJoin('Team as t', 'e.teamId', 't.id')
     .where('t.organisationId', '=', organisationId)
     .where('e.deletedAt', 'is', null)
-    .where(() => sql`e.type = ${EnvelopeType.DOCUMENT}::"EnvelopeType"`);
-
-  if (createdAtFrom) {
-    documentsQuery = documentsQuery.where('e.createdAt', '>=', createdAtFrom);
-  }
-
-  documentsQuery = documentsQuery
+    .where(() => sql`e.type = ${EnvelopeType.DOCUMENT}::"EnvelopeType"`)
+    .$if(!!createdAtFrom, (qb) => qb.where('e.createdAt', '>=', createdAtFrom!))
     .select([
       'e.id as id',
       'e.title as title',
@@ -247,33 +252,33 @@ async function getDocumentInsights(
     .limit(perPage)
     .offset(offset);
 
-  let countQuery = kyselyPrisma.$kysely
+  const countQuery = kyselyPrisma.$kysely
     .selectFrom('Envelope as e')
     .innerJoin('Team as t', 'e.teamId', 't.id')
     .where('t.organisationId', '=', organisationId)
     .where('e.deletedAt', 'is', null)
-    .where(() => sql`e.type = ${EnvelopeType.DOCUMENT}::"EnvelopeType"`);
-
-  if (createdAtFrom) {
-    countQuery = countQuery.where('e.createdAt', '>=', createdAtFrom);
-  }
-
-  countQuery = countQuery.select(({ fn }) => [fn.countAll().as('count')]);
+    .where(() => sql`e.type = ${EnvelopeType.DOCUMENT}::"EnvelopeType"`)
+    .$if(!!createdAtFrom, (qb) => qb.where('e.createdAt', '>=', createdAtFrom!))
+    .select(sql<number>`count(*)`.as('count'));
 
   const [documents, countResult] = await Promise.all([
     documentsQuery.execute(),
-    countQuery.execute(),
+    countQuery.executeTakeFirst(),
   ]);
-
-  const count = Number((countResult[0] as { count: number })?.count || 0);
+  const count = Number(countResult?.count || 0);
+  const documentInsights: DocumentInsights[] = documents.map((document) => ({
+    title: document.title,
+    status: document.status,
+    createdAt: document.createdAt,
+    completedAt: document.completedAt,
+    teamName: document.teamName,
+    id: String(document.id),
+  }));
 
   return {
     teams: [],
     users: [],
-    documents: documents.map((doc) => ({
-      ...doc,
-      id: String((doc as { id: number }).id),
-    })) as DocumentInsights[],
+    documents: documentInsights,
     totalPages: Math.ceil(Number(count) / perPage),
   };
 }

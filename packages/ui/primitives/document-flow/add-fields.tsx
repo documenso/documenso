@@ -101,7 +101,7 @@ export const AddFieldsFormPartial = ({
   onAutoSave,
   canGoBack = false,
   isDocumentPdfLoaded,
-  teamId,
+  teamId: _teamId,
 }: AddFieldsFormProps) => {
   const { toast } = useToast();
   const { _ } = useLingui();
@@ -535,22 +535,6 @@ export const AddFieldsFormPartial = ({
     );
   }, [recipients]);
 
-  const recipientsByRole = useMemo(() => {
-    const recipientsByRole: Record<RecipientRole, Recipient[]> = {
-      CC: [],
-      VIEWER: [],
-      SIGNER: [],
-      APPROVER: [],
-      ASSISTANT: [],
-    };
-
-    recipients.forEach((recipient) => {
-      recipientsByRole[recipient.role].push(recipient);
-    });
-
-    return recipientsByRole;
-  }, [recipients]);
-
   const handleAdvancedSettings = () => {
     setShowAdvancedSettings((prev) => !prev);
   };
@@ -623,10 +607,10 @@ export const AddFieldsFormPartial = ({
               {selectedField && (
                 <div
                   className={cn(
-                    'dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white text-muted-foreground ring-2 transition duration-200 [container-type:size]',
+                    'dark:text-muted-background text-muted-foreground [container-type:size] pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white ring-2 transition duration-200',
                     selectedSignerStyles?.base,
                     {
-                      '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
+                      'scale-90 -rotate-6 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
                       'dark:text-black/60': isFieldWithinBounds,
                     },
                   )}
@@ -703,7 +687,7 @@ export const AddFieldsFormPartial = ({
                   selectedRecipient={selectedSigner}
                   onSelectedRecipientChange={setSelectedSigner}
                   recipients={recipients}
-                  className="mb-12 mt-2"
+                  className="mt-2 mb-12"
                 />
               )}
 
@@ -725,7 +709,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 font-signature text-lg font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'font-signature text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-lg font-normal',
                             )}
                           >
                             <Trans>Signature</Trans>
@@ -749,7 +733,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
                             )}
                           >
                             <Contact className="h-4 w-4" />
@@ -774,7 +758,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
                             )}
                           >
                             <Mail className="h-4 w-4" />
@@ -799,7 +783,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
                             )}
                           >
                             <User className="h-4 w-4" />
@@ -824,7 +808,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
                             )}
                           >
                             <CalendarDays className="h-4 w-4" />
@@ -849,7 +833,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
                             )}
                           >
                             <Type className="h-4 w-4" />
@@ -874,7 +858,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
                             )}
                           >
                             <Hash className="h-4 w-4" />
@@ -899,7 +883,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
                             )}
                           >
                             <Disc className="h-4 w-4" />
@@ -924,7 +908,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
                             )}
                           >
                             <CheckSquare className="h-4 w-4" />
@@ -949,7 +933,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
                             )}
                           >
                             <ChevronDown className="h-4 w-4" />
