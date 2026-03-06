@@ -22,6 +22,7 @@ import { Link } from 'react-router';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import type { TDocumentMany as TDocumentRow } from '@documenso/lib/types/document';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import { findRecipientByEmail } from '@documenso/lib/utils/recipients';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import {
@@ -57,7 +58,11 @@ export const DocumentsTableActionDropdown = ({
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
 
-  const recipient = row.recipients.find((recipient) => recipient.email === user.email);
+  const recipient = findRecipientByEmail({
+    recipients: row.recipients,
+    userEmail: user.email,
+    teamEmail: team.teamEmail?.email,
+  });
 
   const isOwner = row.user.id === user.id;
   // const isRecipient = !!recipient;
@@ -76,7 +81,7 @@ export const DocumentsTableActionDropdown = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger data-testid="document-table-action-btn">
-        <MoreHorizontal className="text-muted-foreground h-5 w-5" />
+        <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-52" align="start" forceMount>
