@@ -9,6 +9,7 @@ import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { ZSignDocumentEmbedDataSchema } from '@documenso/lib/types/embed-document-sign-schema';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
@@ -32,7 +33,6 @@ import { BrandingLogo } from '~/components/general/branding-logo';
 import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
 import { injectCss } from '~/utils/css-vars';
 
-import { ZSignDocumentEmbedDataSchema } from '../../types/embed-document-sign-schema';
 import { DocumentSigningAttachmentsPopover } from '../general/document-signing/document-signing-attachments-popover';
 import { useRequiredDocumentSigningContext } from '../general/document-signing/document-signing-provider';
 import { DocumentSigningRecipientProvider } from '../general/document-signing/document-signing-recipient-provider';

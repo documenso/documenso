@@ -8,12 +8,12 @@ import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
+import { ZSignDocumentEmbedDataSchema } from '@documenso/lib/types/embed-document-sign-schema';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
 import { DocumentSigningAuthProvider } from '~/components/general/document-signing/document-signing-auth-provider';
 import { DocumentSigningProvider } from '~/components/general/document-signing/document-signing-provider';
 import { DocumentSigningRecipientProvider } from '~/components/general/document-signing/document-signing-recipient-provider';
-import { ZSignDocumentEmbedDataSchema } from '~/types/embed-document-sign-schema';
 import { injectCss } from '~/utils/css-vars';
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
@@ -283,7 +283,7 @@ export default function MultisignPage() {
         </DocumentSigningProvider>
 
         {!hidePoweredBy && (
-          <div className="bg-primary text-primary-foreground fixed bottom-0 left-0 z-40 rounded-tr px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100">
+          <div className="fixed bottom-0 left-0 z-40 rounded-tr bg-primary px-2 py-1 text-xs font-medium text-primary-foreground opacity-60 hover:opacity-100">
             <span>
               <Trans>Powered by</Trans>
             </span>
@@ -300,7 +300,7 @@ export default function MultisignPage() {
       <MultiSignDocumentList envelopes={envelopes} onDocumentSelect={onSelectDocument} />
 
       {!hidePoweredBy && (
-        <div className="bg-primary text-primary-foreground fixed bottom-0 left-0 z-40 rounded-tr px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100">
+        <div className="fixed bottom-0 left-0 z-40 rounded-tr bg-primary px-2 py-1 text-xs font-medium text-primary-foreground opacity-60 hover:opacity-100">
           <span>
             <Trans>Powered by</Trans>
           </span>

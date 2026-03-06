@@ -11,11 +11,11 @@ import { OrganisationProvider } from '@documenso/lib/client-only/providers/organ
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
+import { ZBaseEmbedDataSchema } from '@documenso/lib/types/embed-base-schemas';
 import { TrpcProvider } from '@documenso/trpc/react';
 import type { OrganisationSession } from '@documenso/trpc/server/organisation-router/get-organisation-session.types';
 
 import { TeamProvider } from '~/providers/team';
-import { ZBaseEmbedDataSchema } from '~/types/embed-base-schemas';
 import { injectCss } from '~/utils/css-vars';
 
 import type { Route } from './+types/_layout';

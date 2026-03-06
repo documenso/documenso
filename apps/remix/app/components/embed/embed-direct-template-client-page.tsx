@@ -19,6 +19,7 @@ import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn'
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
+import { ZDirectTemplateEmbedDataSchema } from '@documenso/lib/types/embed-direct-template-schema';
 import {
   isFieldUnsignedAndRequired,
   isRequiredField,
@@ -41,7 +42,6 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
 import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
-import { ZDirectTemplateEmbedDataSchema } from '~/types/embed-direct-template-schema';
 import { injectCss } from '~/utils/css-vars';
 
 import type { DirectTemplateLocalField } from '../general/direct-template/direct-template-signing-form';
