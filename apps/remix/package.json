@@ -26,7 +26,7 @@
     "@documenso/ui": "workspace:*",
     "@epic-web/remember": "^1.1.0",
     "@faker-js/faker": "^10.1.0",
-    "@hono/node-server": "^1.19.6",
+    "@hono/node-server": "catalog:",
     "@hono/standard-validator": "catalog:",
     "@hono/trpc-server": "^0.4.0",
     "@hookform/resolvers": "catalog:",

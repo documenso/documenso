@@ -25,7 +25,8 @@ catalog:
 
   # Framework
   next: 16.1.6
-  hono: ^4.12.2
+  hono: ^4.12.4
+  '@hono/node-server': ^1.19.10
   '@hono/standard-validator': ^0.2.0
   '@tanstack/react-query': 5.90.10
   '@trpc/client': 11.8.1

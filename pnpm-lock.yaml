@@ -24,6 +24,9 @@ catalogs:
     '@aws-sdk/signature-v4-crt':
       specifier: ^3.998.0
       version: 3.998.0
+    '@hono/node-server':
+      specifier: ^1.19.10
+      version: 1.19.11
     '@hono/standard-validator':
       specifier: ^0.2.0
       version: 0.2.0
@@ -193,8 +196,8 @@ catalogs:
       specifier: ^12.23.24
       version: 12.23.24
     hono:
-      specifier: ^4.12.2
-      version: 4.12.2
+      specifier: ^4.12.4
+      version: 4.12.5
     konva:
       specifier: ^10.0.9
       version: 10.0.11
@@ -390,8 +393,8 @@ importers:
         specifier: ^9.1.7
         version: 9.1.7
       inngest-cli:
-        specifier: ^1.16.1
-        version: 1.16.1
+        specifier: ^1.17.2
+        version: 1.17.2
       lint-staged:
         specifier: ^16.2.7
         version: 16.2.7
@@ -468,7 +471,7 @@ importers:
         specifier: 'catalog:'
         version: 0.563.0(react@19.2.4)
       mermaid:
-        specifier: ^11.12.2
+        specifier: ^11.12.3
         version: 11.12.3
       next:
         specifier: 'catalog:'
@@ -581,14 +584,14 @@ importers:
         specifier: ^10.1.0
         version: 10.1.0
       '@hono/node-server':
-        specifier: ^1.19.6
-        version: 1.19.6(hono@4.12.2)
+        specifier: 'catalog:'
+        version: 1.19.11(hono@4.12.5)
       '@hono/standard-validator':
         specifier: 'catalog:'
-        version: 0.2.0(@standard-schema/spec@1.0.0)(hono@4.12.2)
+        version: 0.2.0(@standard-schema/spec@1.0.0)(hono@4.12.5)
       '@hono/trpc-server':
         specifier: ^0.4.0
-        version: 0.4.0(@trpc/server@11.8.1(typescript@5.6.2))(hono@4.12.2)
+        version: 0.4.0(@trpc/server@11.8.1(typescript@5.6.2))(hono@4.12.5)
       '@hookform/resolvers':
         specifier: 'catalog:'
         version: 3.10.0(react-hook-form@7.66.1(react@19.2.4))
@@ -639,10 +642,10 @@ importers:
         version: 12.23.24(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       hono:
         specifier: 'catalog:'
-        version: 4.12.2
+        version: 4.12.5
       hono-react-router-adapter:
         specifier: ^0.6.5
-        version: 0.6.5(hono@4.12.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.6.2)
+        version: 0.6.5(hono@4.12.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.6.2)
       input-otp:
         specifier: ^1.4.2
         version: 1.4.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -886,7 +889,7 @@ importers:
         version: link:../prisma
       '@hono/standard-validator':
         specifier: 'catalog:'
-        version: 0.2.0(@standard-schema/spec@1.0.0)(hono@4.12.2)
+        version: 0.2.0(@standard-schema/spec@1.0.0)(hono@4.12.5)
       '@oslojs/crypto':
         specifier: 'catalog:'
         version: 1.0.1
@@ -901,7 +904,7 @@ importers:
         version: 3.7.0
       hono:
         specifier: 'catalog:'
-        version: 4.12.2
+        version: 4.12.5
       luxon:
         specifier: 'catalog:'
         version: 3.7.2
@@ -1130,7 +1133,7 @@ importers:
         version: 6.1.0
       inngest:
         specifier: ^3.45.1
-        version: 3.45.1(@opentelemetry/core@2.5.1(@opentelemetry/api@1.9.0))(express@4.22.1)(h3@1.15.5)(hono@4.12.2)(next@16.1.6(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.6.2)(zod@3.25.76)
+        version: 3.45.1(@opentelemetry/core@2.5.1(@opentelemetry/api@1.9.0))(express@4.22.1)(h3@1.15.5)(hono@4.12.5)(next@16.1.6(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.6.2)(zod@3.25.76)
       jose:
         specifier: ^6.1.2
         version: 6.1.2
@@ -2521,8 +2524,8 @@ packages:
   '@hexagon/base64@1.1.28':
     resolution: {integrity: sha512-lhqDEAvWixy3bZ+UOYbPwUbBkwBq5C1LAJ/xPC8Oi+lL54oyakv/npbA0aU2hgCsx/1NUd4IBvV03+aUBWxerw==}
 
-  '@hono/node-server@1.19.6':
-    resolution: {integrity: sha512-Shz/KjlIeAhfiuE93NDKVdZ7HdBVLQAfdbaXEaoAVO3ic9ibRSLGIQGkcBbFyuLr+7/1D5ZCINM8B+6IvXeMtw==}
+  '@hono/node-server@1.19.11':
+    resolution: {integrity: sha512-dr8/3zEaB+p0D2n/IUrlPF1HZm586qgJNXK1a9fhg/PzdtkK7Ksd5l312tJX2yBuALqDYBlG20QEbayqPyxn+g==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
@@ -8007,8 +8010,8 @@ packages:
     peerDependencies:
       hono: '*'
 
-  hono@4.12.2:
-    resolution: {integrity: sha512-gJnaDHXKDayjt8ue0n8Gs0A007yKXj4Xzb8+cNjZeYsSzzwKc0Lr+OZgYwVfB0pHfUs17EPoLvrOsEaJ9mj+Tg==}
+  hono@4.12.5:
+    resolution: {integrity: sha512-3qq+FUBtlTHhtYxbxheZgY8NIFnkkC/MR8u5TTsr7YZ3wixryQ3cCwn3iZbg8p8B88iDBBAYSfZDS75t8MN7Vg==}
     engines: {node: '>=16.9.0'}
 
   html-entities@2.6.0:
@@ -8108,8 +8111,8 @@ packages:
   inline-style-parser@0.2.7:
     resolution: {integrity: sha512-Nb2ctOyNR8DqQoR0OwRG95uNWIC0C1lCgf5Naz5H6Ji72KZ8OcFZLz2P5sNgwlyoJ8Yif11oMuYs5pBQa86csA==}
 
-  inngest-cli@1.16.1:
-    resolution: {integrity: sha512-B5Z2vgidh6HM7HVsQFZSffJpnTKB0Rm20NDL1qOjBtF8ZZgun+mJNjUYAcqOU4l8SVVEG0nfPnphsWPLZHXdsA==}
+  inngest-cli@1.17.2:
+    resolution: {integrity: sha512-dvQcXPjP5Byc/8Q/aBLCaKSeKNu85hFKb4CfbfWeVpHXu3TFvPIyv1qyvRklvA7JUvew74f2hND3WUwrrORNdw==}
     hasBin: true
 
   inngest@3.45.1:
@@ -12612,24 +12615,24 @@ snapshots:
 
   '@hexagon/base64@1.1.28': {}
 
-  '@hono/node-server@1.19.6(hono@4.12.2)':
+  '@hono/node-server@1.19.11(hono@4.12.5)':
     dependencies:
-      hono: 4.12.2
+      hono: 4.12.5
 
-  '@hono/standard-validator@0.2.0(@standard-schema/spec@1.0.0)(hono@4.12.2)':
+  '@hono/standard-validator@0.2.0(@standard-schema/spec@1.0.0)(hono@4.12.5)':
     dependencies:
       '@standard-schema/spec': 1.0.0
-      hono: 4.12.2
+      hono: 4.12.5
 
-  '@hono/trpc-server@0.4.0(@trpc/server@11.8.1(typescript@5.6.2))(hono@4.12.2)':
+  '@hono/trpc-server@0.4.0(@trpc/server@11.8.1(typescript@5.6.2))(hono@4.12.5)':
     dependencies:
       '@trpc/server': 11.8.1(typescript@5.6.2)
-      hono: 4.12.2
+      hono: 4.12.5
 
-  '@hono/vite-dev-server@0.18.3(hono@4.12.2)':
+  '@hono/vite-dev-server@0.18.3(hono@4.12.5)':
     dependencies:
-      '@hono/node-server': 1.19.6(hono@4.12.2)
-      hono: 4.12.2
+      '@hono/node-server': 1.19.11(hono@4.12.5)
+      hono: 4.12.5
       minimatch: 9.0.9
 
   '@hookform/resolvers@3.10.0(react-hook-form@7.66.1(react@19.2.4))':
@@ -18803,13 +18806,13 @@ snapshots:
     dependencies:
       react-is: 16.13.1
 
-  hono-react-router-adapter@0.6.5(hono@4.12.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.6.2):
+  hono-react-router-adapter@0.6.5(hono@4.12.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.6.2):
     dependencies:
-      '@hono/vite-dev-server': 0.18.3(hono@4.12.2)
-      hono: 4.12.2
+      '@hono/vite-dev-server': 0.18.3(hono@4.12.5)
+      hono: 4.12.5
       react-router: 7.12.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
     optionalDependencies:
-      '@hono/node-server': 1.19.6(hono@4.12.2)
+      '@hono/node-server': 1.19.11(hono@4.12.5)
       '@react-router/node': 7.12.0(react-router@7.12.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.6.2)
     transitivePeerDependencies:
       - miniflare
@@ -18818,7 +18821,7 @@ snapshots:
       - typescript
       - wrangler
 
-  hono@4.12.2: {}
+  hono@4.12.5: {}
 
   html-entities@2.6.0: {}
 
@@ -18931,7 +18934,7 @@ snapshots:
 
   inline-style-parser@0.2.7: {}
 
-  inngest-cli@1.16.1:
+  inngest-cli@1.17.2:
     dependencies:
       adm-zip: 0.5.16
       debug: 4.4.3
@@ -18941,7 +18944,7 @@ snapshots:
       - encoding
       - supports-color
 
-  inngest@3.45.1(@opentelemetry/core@2.5.1(@opentelemetry/api@1.9.0))(express@4.22.1)(h3@1.15.5)(hono@4.12.2)(next@16.1.6(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.6.2)(zod@3.25.76):
+  inngest@3.45.1(@opentelemetry/core@2.5.1(@opentelemetry/api@1.9.0))(express@4.22.1)(h3@1.15.5)(hono@4.12.5)(next@16.1.6(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.6.2)(zod@3.25.76):
     dependencies:
       '@bufbuild/protobuf': 2.10.1
       '@inngest/ai': 0.1.7
@@ -18970,7 +18973,7 @@ snapshots:
     optionalDependencies:
       express: 4.22.1
       h3: 1.15.5
-      hono: 4.12.2
+      hono: 4.12.5
       next: 16.1.6(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       typescript: 5.6.2
     transitivePeerDependencies:

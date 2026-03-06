@@ -55,7 +55,7 @@
     "dotenv-cli": "catalog:",
     "eslint": "catalog:",
     "husky": "^9.1.7",
-    "inngest-cli": "^1.16.1",
+    "inngest-cli": "^1.17.2",
     "lint-staged": "^16.2.7",
     "nanoid": "catalog:",
     "nodemailer": "catalog:",
