@@ -39,8 +39,10 @@ export type PDFViewerProps = {
    * The PDF data to render.
    *
    * If it's a URL, it will be fetched and rendered.
+   *
+   * If null will render an empty state.
    */
-  data: Uint8Array | string;
+  data: Uint8Array | string | null;
 
   /**
    * Ref to the scrollable parent container that handles scrolling.
@@ -80,6 +82,10 @@ export const PDFViewer = ({
   const [pages, setPages] = useState<PageMeta[]>([]);
 
   useEffect(() => {
+    if (!data) {
+      return;
+    }
+
     const fetchMetadata = async () => {
       try {
         setLoadingState('loading');
@@ -152,6 +158,16 @@ export const PDFViewer = ({
 
   const isLoading = loadingState === 'loading';
   const hasError = loadingState === 'error';
+
+  if (!data) {
+    return (
+      <div ref={$el} className={cn('h-full w-full', className)} {...props}>
+        <p className="py-32 text-center text-sm text-muted-foreground">
+          <Trans>No document found</Trans>
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div ref={$el} className={cn('h-full w-full', className)} {...props}>

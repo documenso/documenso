@@ -43,7 +43,7 @@ export const EnvelopePdfViewer = ({
         ) : (
           <div className="flex h-[80vh] max-h-[60rem] w-full flex-col items-center justify-center overflow-hidden rounded">
             <p className="text-sm text-muted-foreground">
-              <Trans>No document selected</Trans>
+              <Trans>No document found</Trans>
             </p>
           </div>
         )}

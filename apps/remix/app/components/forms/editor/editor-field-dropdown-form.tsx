@@ -176,7 +176,10 @@ export const EditorFieldDropdownForm = ({
                     value={field.value ?? '-1'}
                     onValueChange={(value) => field.onChange(value === '-1' ? undefined : value)}
                   >
-                    <SelectTrigger className="text-muted-foreground bg-background w-full">
+                    <SelectTrigger
+                      data-testid="field-form-defaultValue"
+                      className="w-full bg-background text-muted-foreground"
+                    >
                       <SelectValue placeholder={t`Default Value`} />
                     </SelectTrigger>
                     <SelectContent position="popper">
@@ -215,7 +218,7 @@ export const EditorFieldDropdownForm = ({
                 <Trans>Dropdown values</Trans>
               </p>
 
-              <button type="button" onClick={addValue}>
+              <button type="button" data-testid="field-form-values-add" onClick={addValue}>
                 <PlusIcon className="h-4 w-4" />
               </button>
             </div>
@@ -229,7 +232,7 @@ export const EditorFieldDropdownForm = ({
                     render={({ field }) => (
                       <FormItem className="w-full">
                         <FormControl>
-                          <Input {...field} />
+                          <Input data-testid={`field-form-values-${index}-value`} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -238,6 +241,7 @@ export const EditorFieldDropdownForm = ({
 
                   <button
                     type="button"
+                    data-testid={`field-form-values-${index}-remove`}
                     className="flex h-10 w-10 items-center justify-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
                     onClick={() => removeValue(index)}
                   >

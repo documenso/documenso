@@ -6,13 +6,14 @@ import { EnvelopeType } from '@prisma/client';
 import { Link, useNavigate } from 'react-router';
 
 import { EnvelopeEditorProvider } from '@documenso/lib/client-only/providers/envelope-editor-provider';
-import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Spinner } from '@documenso/ui/primitives/spinner';
 
-import EnvelopeEditor from '~/components/general/envelope-editor/envelope-editor';
+import { EnvelopeEditor } from '~/components/general/envelope-editor/envelope-editor';
+import { EnvelopeEditorRenderProviderWrapper } from '~/components/general/envelope-editor/envelope-editor-renderer-provider-wrapper';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { useCurrentTeam } from '~/providers/team';
 
@@ -26,12 +27,13 @@ export default function EnvelopeEditorPage({ params }: Route.ComponentProps) {
     data: envelope,
     isLoading: isLoadingEnvelope,
     isError: isErrorEnvelope,
-  } = trpc.envelope.get.useQuery(
+  } = trpc.envelope.editor.get.useQuery(
     {
       envelopeId: params.id,
     },
     {
       retry: false,
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     },
   );
 
@@ -98,16 +100,9 @@ export default function EnvelopeEditorPage({ params }: Route.ComponentProps) {
 
   return (
     <EnvelopeEditorProvider initialEnvelope={envelope}>
-      <EnvelopeRenderProvider
-        version="current"
-        envelope={envelope}
-        envelopeItems={envelope.envelopeItems}
-        token={undefined}
-        fields={envelope.fields}
-        recipients={envelope.recipients}
-      >
+      <EnvelopeEditorRenderProviderWrapper>
         <EnvelopeEditor />
-      </EnvelopeRenderProvider>
+      </EnvelopeEditorRenderProviderWrapper>
     </EnvelopeEditorProvider>
   );
 }

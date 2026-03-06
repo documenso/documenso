@@ -13,7 +13,7 @@ import {
 } from '@documenso/lib/constants/trpc';
 import { ZDocumentAccessAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import type { TTemplate } from '@documenso/lib/types/template';
-import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
+import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -314,10 +314,10 @@ export const TemplateEditForm = ({
       >
         <CardContent className="p-2">
           <PDFViewer
-            key={template.envelopeItems[0].id}
-            data={getDocumentDataUrl({
+            key={template.envelopeItems[0]?.id}
+            data={getDocumentDataUrlForPdfViewer({
               envelopeId: template.envelopeId,
-              envelopeItemId: template.envelopeItems[0].id,
+              envelopeItemId: template.envelopeItems[0]?.id,
               documentDataId: initialTemplate.templateDocumentDataId,
               version: 'current',
               token: undefined,

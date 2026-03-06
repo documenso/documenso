@@ -72,3 +72,18 @@ export const getDocumentDataUrl = (options: DocumentDataUrlOptions) => {
 
   return baseUrl;
 };
+
+/**
+ * Gets a PDF url for the PDF viewer.
+ *
+ * Returns `null` if invalid.
+ */
+export const getDocumentDataUrlForPdfViewer = (options: DocumentDataUrlOptions): string | null => {
+  const { envelopeId, envelopeItemId, documentDataId } = options;
+
+  if (!envelopeId || !envelopeItemId || !documentDataId) {
+    return null;
+  }
+
+  return getDocumentDataUrl(options);
+};

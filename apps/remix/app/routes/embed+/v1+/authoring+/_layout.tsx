@@ -5,9 +5,9 @@ import { Outlet, useLoaderData } from 'react-router';
 
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
+import { ZBaseEmbedAuthoringSchema } from '@documenso/lib/types/embed-authoring-base-schema';
 import { TrpcProvider } from '@documenso/trpc/react';
 
-import { ZBaseEmbedAuthoringSchema } from '~/types/embed-authoring-base-schema';
 import { injectCss } from '~/utils/css-vars';
 
 import type { Route } from './+types/_layout';

@@ -19,11 +19,12 @@ import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn'
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
+import { ZDirectTemplateEmbedDataSchema } from '@documenso/lib/types/embed-direct-template-schema';
 import {
   isFieldUnsignedAndRequired,
   isRequiredField,
 } from '@documenso/lib/utils/advanced-fields-helpers';
-import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
+import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { trpc } from '@documenso/trpc/react';
@@ -41,7 +42,6 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
 import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
-import { ZDirectTemplateEmbedDataSchema } from '~/types/embed-direct-template-schema';
 import { injectCss } from '~/utils/css-vars';
 
 import type { DirectTemplateLocalField } from '../general/direct-template/direct-template-signing-form';
@@ -341,10 +341,10 @@ export const EmbedDirectTemplateClientPage = ({
         {/* Viewer */}
         <div className="flex-1">
           <PDFViewer
-            data={getDocumentDataUrl({
-              envelopeId: envelopeItems[0].envelopeId,
-              envelopeItemId: envelopeItems[0].id,
-              documentDataId: envelopeItems[0].documentDataId,
+            data={getDocumentDataUrlForPdfViewer({
+              envelopeId: envelopeItems[0]?.envelopeId,
+              envelopeItemId: envelopeItems[0]?.id,
+              documentDataId: envelopeItems[0]?.documentDataId,
               version: 'current',
               token: recipient.token,
               presignToken: undefined,
