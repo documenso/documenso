@@ -283,7 +283,13 @@ export default function EmbedPlaygroundPage() {
         ? '/embed/v2/authoring/envelope/create'
         : `/embed/v2/authoring/envelope/edit/${envelopeId}`;
 
-    setIframeSrc(`${basePath}?token=${presignToken}#${hash}`);
+    const buildIframeSrc = (path: string, tokenValue: string, hashValue: string): string => {
+      // Ensure the token is treated strictly as a query parameter value.
+      const encodedToken = encodeURIComponent(tokenValue);
+      return `${path}?token=${encodedToken}#${hashValue}`;
+    };
+
+    setIframeSrc(buildIframeSrc(basePath, presignToken, hash));
     setIframeKey((prev) => prev + 1);
 
     updateQueryParams({ token: inputToken, externalId, mode, envelopeId, envelopeType });
