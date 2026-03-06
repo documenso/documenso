@@ -1,4 +1,5 @@
 import { useLingui } from '@lingui/react';
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { TeamMemberRole } from '@prisma/client';
 import { DateTime } from 'luxon';
@@ -15,7 +16,7 @@ import { useOptionalCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('API Tokens');
+  return appMetaTags(msg`API Tokens`);
 }
 
 export default function ApiTokensPage() {

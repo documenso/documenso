@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { redirect } from 'react-router';
 
 import {
@@ -14,7 +15,7 @@ import { appMetaTags } from '~/utils/meta';
 import type { Route } from './+types/signup';
 
 export function meta() {
-  return appMetaTags('Sign Up');
+  return appMetaTags(msg`Sign Up`);
 }
 
 export function loader({ request }: Route.LoaderArgs) {
