@@ -30,3 +30,9 @@ export const ZSubmitSupportTicketMutationSchema = z.object({
 });
 
 export type TSupportTicketRequest = z.infer<typeof ZSubmitSupportTicketMutationSchema>;
+
+export const ZDeleteAccountMutationSchema = z.object({
+  password: z.string().min(1, 'Password is required'),
+});
+
+export type TDeleteAccountMutationSchema = z.infer<typeof ZDeleteAccountMutationSchema>;
