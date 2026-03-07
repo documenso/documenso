@@ -135,20 +135,22 @@ export const SettingsPublicProfileTemplatesTable = () => {
             key={template.id}
             className="bg-background flex items-center justify-between gap-x-6 p-4"
           >
-            <div className="flex gap-x-2">
+            <div className="flex min-w-0 gap-x-2">
               <FileIcon
                 className="text-muted-foreground/40 h-8 w-8 flex-shrink-0"
                 strokeWidth={1.5}
               />
 
-              <div>
-                <p className="text-sm">{template.publicTitle}</p>
-                <p className="text-xs text-neutral-400">{template.publicDescription}</p>
+              <div className="min-w-0">
+                <p className="truncate text-sm">{template.publicTitle}</p>
+                <p className="line-clamp-3 break-words text-xs text-neutral-400">
+                  {template.publicDescription}
+                </p>
               </div>
             </div>
 
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger className="flex-shrink-0">
                 <MoreHorizontalIcon className="text-muted-foreground h-5 w-5" />
               </DropdownMenuTrigger>
 
