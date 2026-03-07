@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Trans, useLingui } from '@lingui/react/macro';
 import pMap from 'p-map';
+import * as pdfjsLib from 'pdfjs-dist';
+import PdfWorker from 'pdfjs-dist/build/pdf.worker?worker';
 
 import type {
   ImageLoadingState,
@@ -11,13 +13,13 @@ import { PDF_VIEWER_PAGE_CLASSNAME } from '@documenso/lib/constants/pdf-viewer';
 import { cn } from '@documenso/ui/lib/utils';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { pdfjsLib } from '~/utils/pdfjs';
-
 import type { ScrollTarget } from '../virtual-list/use-virtual-list';
 import { useVirtualList } from '../virtual-list/use-virtual-list';
 import { PdfViewerPageImage } from './pdf-viewer-page-image';
 import { PdfViewerErrorState, PdfViewerLoadingState } from './pdf-viewer-states';
 import { useScrollToPage } from './use-scroll-to-page';
+
+pdfjsLib.GlobalWorkerOptions.workerPort = new PdfWorker();
 
 type PageMeta = {
   width: number;
@@ -60,14 +62,14 @@ export type PDFViewerProps = {
   customPageRenderer?: React.FunctionComponent<{ pageData: PageRenderData }>;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export const PDFViewer = ({
+export default function PDFViewer({
   className,
   data,
   scrollParentRef,
   onDocumentLoad,
   customPageRenderer,
   ...props
-}: PDFViewerProps) => {
+}: PDFViewerProps) {
   const { t } = useLingui();
   const { toast } = useToast();
 
@@ -216,7 +218,7 @@ export const PDFViewer = ({
       )}
     </div>
   );
-};
+}
 
 type VirtualizedPageListProps = {
   scrollParentRef: ScrollTarget;

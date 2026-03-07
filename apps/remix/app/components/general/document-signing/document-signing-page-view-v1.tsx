@@ -46,7 +46,7 @@ import { DocumentSigningRadioField } from '~/components/general/document-signing
 import { DocumentSigningRejectDialog } from '~/components/general/document-signing/document-signing-reject-dialog';
 import { DocumentSigningSignatureField } from '~/components/general/document-signing/document-signing-signature-field';
 import { DocumentSigningTextField } from '~/components/general/document-signing/document-signing-text-field';
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer.client';
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningCompleteDialog } from './document-signing-complete-dialog';
@@ -273,7 +273,7 @@ export const DocumentSigningPageViewV1 = ({
           <div className="flex-1">
             <Card className="rounded-xl before:rounded-xl" gradient>
               <CardContent className="p-2">
-                <PDFViewer
+                <PDFViewerLazy
                   key={document.envelopeItems[0]?.id}
                   data={getDocumentDataUrlForPdfViewer({
                     envelopeId: document.envelopeId,

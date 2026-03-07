@@ -37,7 +37,7 @@ import { EnvelopeRendererFileSelector } from '~/components/general/envelope-edit
 import { EnvelopeGenericPageRenderer } from '~/components/general/envelope-editor/envelope-generic-page-renderer';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer.client';
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 import { StackAvatarsWithTooltip } from '~/components/general/stack-avatars-with-tooltip';
 import { useCurrentTeam } from '~/providers/team';
 
@@ -199,7 +199,7 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
                 />
               )}
 
-              <PDFViewer
+              <PDFViewerLazy
                 data={getDocumentDataUrlForPdfViewer({
                   envelopeId: envelope.id,
                   envelopeItemId: envelope.envelopeItems[0]?.id,
