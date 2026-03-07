@@ -25,7 +25,7 @@ import {
 
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 
 import { EnvelopeRendererFileSelector } from '../envelope-editor/envelope-file-selector';
 import { EnvelopeGenericPageRenderer } from '../envelope-editor/envelope-generic-page-renderer';
@@ -150,7 +150,7 @@ export const DocumentCertificateQRView = ({
           </div>
 
           <div className="mt-12 w-full">
-            <PDFViewer
+            <PDFViewerLazy
               key={envelopeItems[0]?.id}
               data={getDocumentDataUrlForPdfViewer({
                 envelopeId: envelopeItems[0]?.envelopeId,

@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import pMap from 'p-map';
 import * as pdfjsLib from 'pdfjs-dist';
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker?url';
+import PdfWorker from 'pdfjs-dist/build/pdf.worker?worker';
 
 import type {
   ImageLoadingState,
@@ -19,7 +19,7 @@ import { PdfViewerPageImage } from './pdf-viewer-page-image';
 import { PdfViewerErrorState, PdfViewerLoadingState } from './pdf-viewer-states';
 import { useScrollToPage } from './use-scroll-to-page';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+pdfjsLib.GlobalWorkerOptions.workerPort = new PdfWorker();
 
 type PageMeta = {
   width: number;
@@ -62,14 +62,14 @@ export type PDFViewerProps = {
   customPageRenderer?: React.FunctionComponent<{ pageData: PageRenderData }>;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export const PDFViewer = ({
+export default function PDFViewer({
   className,
   data,
   scrollParentRef,
   onDocumentLoad,
   customPageRenderer,
   ...props
-}: PDFViewerProps) => {
+}: PDFViewerProps) {
   const { t } = useLingui();
   const { toast } = useToast();
 
@@ -77,7 +77,7 @@ export const PDFViewer = ({
 
   const [loadingState, setLoadingState] = useState<LoadingState>('loading');
 
-  const [pdf, setPdf] = useState<pdfjsLib.PDFDocumentProxy | null>(null);
+  const pdfRef = useRef<pdfjsLib.PDFDocumentProxy | null>(null);
 
   const [pages, setPages] = useState<PageMeta[]>([]);
 
@@ -86,10 +86,16 @@ export const PDFViewer = ({
       return;
     }
 
+    let isCancelled = false;
+
     const fetchMetadata = async () => {
       try {
         setLoadingState('loading');
         setPages([]);
+
+        if (isCancelled) {
+          return;
+        }
 
         let result: Uint8Array | null = typeof data === 'string' ? null : new Uint8Array(data);
 
@@ -103,13 +109,24 @@ export const PDFViewer = ({
           result = new Uint8Array(await response.arrayBuffer());
         }
 
-        const loadedPdf = await pdfjsLib.getDocument({ data: result! }).promise;
-
-        if (pdf) {
-          await pdf.destroy();
+        if (isCancelled) {
+          return;
         }
 
-        setPdf(loadedPdf);
+        const loadedPdf = await pdfjsLib.getDocument({ data: result! }).promise;
+
+        if (isCancelled) {
+          await loadedPdf.destroy();
+          return;
+        }
+
+        // Destroy previous PDF if it exists
+        if (pdfRef.current) {
+          await pdfRef.current.destroy();
+        }
+
+        // eslint-disable-next-line require-atomic-updates
+        pdfRef.current = loadedPdf;
 
         // Fetch the pages
         const pages = await pMap(
@@ -125,10 +142,18 @@ export const PDFViewer = ({
           },
         );
 
+        if (isCancelled) {
+          return;
+        }
+
         setPages(pages);
 
         setLoadingState('loaded');
       } catch (err) {
+        if (isCancelled) {
+          return;
+        }
+
         console.error(err);
         setLoadingState('error');
 
@@ -143,8 +168,11 @@ export const PDFViewer = ({
     void fetchMetadata();
 
     return () => {
-      if (pdf) {
-        void pdf.destroy();
+      isCancelled = true;
+
+      if (pdfRef.current) {
+        void pdfRef.current.destroy();
+        pdfRef.current = null;
       }
     };
   }, [data]);
@@ -178,19 +206,19 @@ export const PDFViewer = ({
       {hasError && <PdfViewerErrorState />}
 
       {/* Loaded State */}
-      {loadingState === 'loaded' && pages.length > 0 && pdf && (
+      {loadingState === 'loaded' && pages.length > 0 && pdfRef.current && (
         <VirtualizedPageList
           scrollParentRef={scrollParentRef}
           constraintRef={$el}
           numPages={pages.length}
           pages={pages}
-          pdf={pdf}
+          pdf={pdfRef.current}
           customPageRenderer={customPageRenderer}
         />
       )}
     </div>
   );
-};
+}
 
 type VirtualizedPageListProps = {
   scrollParentRef: ScrollTarget;

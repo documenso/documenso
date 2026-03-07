@@ -27,7 +27,7 @@ import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 
 import { useRequiredDocumentSigningContext } from '../../general/document-signing/document-signing-provider';
 import { DocumentSigningRejectDialog } from '../../general/document-signing/document-signing-reject-dialog';
@@ -229,7 +229,7 @@ export const MultiSignDocumentSigningView = ({
                     'md:mx-auto md:max-w-2xl': document.status === DocumentStatus.COMPLETED,
                   })}
                 >
-                  <PDFViewer
+                  <PDFViewerLazy
                     data={getDocumentDataUrlForPdfViewer({
                       envelopeId: document.envelopeId,
                       envelopeItemId: document.envelopeItems[0]?.id,

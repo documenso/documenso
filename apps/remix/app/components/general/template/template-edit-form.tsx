@@ -28,7 +28,7 @@ import { AddTemplateSettingsFormPartial } from '@documenso/ui/primitives/templat
 import type { TAddTemplateSettingsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-settings.types';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 import { useCurrentTeam } from '~/providers/team';
 
 export type TemplateEditFormProps = {
@@ -313,7 +313,7 @@ export const TemplateEditForm = ({
         gradient
       >
         <CardContent className="p-2">
-          <PDFViewer
+          <PDFViewerLazy
             key={template.envelopeItems[0]?.id}
             data={getDocumentDataUrlForPdfViewer({
               envelopeId: template.envelopeId,
