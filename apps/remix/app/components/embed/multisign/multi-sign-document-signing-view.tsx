@@ -27,7 +27,7 @@ import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
+import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer.client';
 
 import { useRequiredDocumentSigningContext } from '../../general/document-signing/document-signing-provider';
 import { DocumentSigningRejectDialog } from '../../general/document-signing/document-signing-reject-dialog';

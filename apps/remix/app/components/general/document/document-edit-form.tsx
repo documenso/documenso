@@ -31,7 +31,7 @@ import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/ty
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
+import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer.client';
 import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentEditFormProps = {

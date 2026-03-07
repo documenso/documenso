@@ -28,7 +28,7 @@ import { AddTemplateSettingsFormPartial } from '@documenso/ui/primitives/templat
 import type { TAddTemplateSettingsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-settings.types';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
+import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer.client';
 import { useCurrentTeam } from '~/providers/team';
 
 export type TemplateEditFormProps = {

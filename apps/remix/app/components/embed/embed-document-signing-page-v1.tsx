@@ -30,7 +30,7 @@ import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signa
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
+import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer.client';
 import { injectCss } from '~/utils/css-vars';
 
 import { DocumentSigningAttachmentsPopover } from '../general/document-signing/document-signing-attachments-popover';

@@ -25,7 +25,7 @@ import {
 
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
+import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer.client';
 
 import { EnvelopeRendererFileSelector } from '../envelope-editor/envelope-file-selector';
 import { EnvelopeGenericPageRenderer } from '../envelope-editor/envelope-generic-page-renderer';

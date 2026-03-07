@@ -215,21 +215,21 @@ export const EnvelopeEditorPreviewPage = () => {
       }}
     >
       <div className="relative flex h-full">
-        <div className="flex w-full flex-col overflow-y-auto" ref={scrollableContainerRef}>
+        <div className="flex w-full flex-col overflow-y-auto px-2" ref={scrollableContainerRef}>
           {/* Horizontal envelope item selector */}
-          <EnvelopeRendererFileSelector fields={editorFields.localFields} />
+          <EnvelopeRendererFileSelector className="px-0" fields={editorFields.localFields} />
+
+          <Alert variant="warning" className="mx-auto max-w-[800px]">
+            <AlertTitle>
+              <Trans>Preview Mode</Trans>
+            </AlertTitle>
+            <AlertDescription>
+              <Trans>Preview what the signed document will look like with placeholder data</Trans>
+            </AlertDescription>
+          </Alert>
 
           {/* Document View */}
           <div className="mt-4 flex h-full flex-col items-center justify-center">
-            <Alert variant="warning" className="mb-4 max-w-[800px]">
-              <AlertTitle>
-                <Trans>Preview Mode</Trans>
-              </AlertTitle>
-              <AlertDescription>
-                <Trans>Preview what the signed document will look like with placeholder data</Trans>
-              </AlertDescription>
-            </Alert>
-
             {currentEnvelopeItem !== null ? (
               <EnvelopePdfViewer
                 customPageRenderer={EnvelopeGenericPageRenderer}

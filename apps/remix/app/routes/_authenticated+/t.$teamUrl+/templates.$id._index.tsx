@@ -24,7 +24,7 @@ import { EnvelopeRendererFileSelector } from '~/components/general/envelope-edit
 import { EnvelopeGenericPageRenderer } from '~/components/general/envelope-editor/envelope-generic-page-renderer';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
+import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer.client';
 import { TemplateDirectLinkBadge } from '~/components/general/template/template-direct-link-badge';
 import { TemplatePageViewDocumentsTable } from '~/components/general/template/template-page-view-documents-table';
 import { TemplatePageViewInformation } from '~/components/general/template/template-page-view-information';

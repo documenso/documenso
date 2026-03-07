@@ -8,7 +8,7 @@ import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i
 import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 
-import { PDFViewer, type PDFViewerProps } from './pdf-viewer';
+import { PDFViewer, type PDFViewerProps } from './pdf-viewer.client';
 
 export type EnvelopePdfViewerProps = {
   /**
@@ -53,6 +53,7 @@ export const EnvelopePdfViewer = ({
 
   return (
     <PDFViewer
+      key={`${currentEnvelopeItem.envelopeId}-${currentEnvelopeItem.id}`}
       {...props}
       className={cn('h-full w-full max-w-[800px]', className)}
       data={currentEnvelopeItem.data}

@@ -28,7 +28,14 @@ export const PdfViewerPageImage = ({ imageLoadingState, imageProps }: PdfViewerP
       )}
 
       {/* The PDF image. */}
-      {imageProps.src && <img {...imageProps} className={cn(imageProps.className, '')} alt="" />}
+      {imageProps.src && (
+        <img
+          {...imageProps}
+          className={cn(imageProps.className, 'select-none')}
+          draggable={false}
+          alt=""
+        />
+      )}
     </>
   );
 };

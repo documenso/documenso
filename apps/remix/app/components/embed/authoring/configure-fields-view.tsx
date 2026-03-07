@@ -29,7 +29,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@documenso/ui/primitives/shee
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { FieldAdvancedSettingsDrawer } from '~/components/embed/authoring/field-advanced-settings-drawer';
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
+import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer.client';
 
 import type { TConfigureEmbedFormSchema } from './configure-document-view.types';
 import type { TConfigureFieldsFormSchema } from './configure-fields-view.types';
