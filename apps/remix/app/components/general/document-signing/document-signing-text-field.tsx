@@ -230,7 +230,9 @@ export const DocumentSigningTextField = ({
   const labelDisplay = parsedField?.label;
   const textDisplay = parsedField?.text;
 
-  const fieldDisplayName = labelDisplay ? labelDisplay : textDisplay;
+  // Prefer showing the prefilled text value first. Use the label only as a
+  // fallback/placeholder when no text value exists.
+  const fieldDisplayName = textDisplay ? textDisplay : labelDisplay;
   const charactersRemaining = (parsedFieldMeta?.characterLimit ?? 0) - (localText.length ?? 0);
 
   return (
@@ -279,7 +281,7 @@ export const DocumentSigningTextField = ({
           {parsedFieldMeta?.characterLimit !== undefined &&
             parsedFieldMeta?.characterLimit > 0 &&
             !userInputHasErrors && (
-              <div className="text-muted-foreground text-sm">
+              <div className="text-sm text-muted-foreground">
                 <Plural
                   value={charactersRemaining}
                   one="1 character remaining"

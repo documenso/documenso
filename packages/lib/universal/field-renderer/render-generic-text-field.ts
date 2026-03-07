@@ -82,9 +82,28 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     }
   }
 
-  // Override everything with value if it's inserted.
+  // In sign mode, show prefilled value from fieldMeta when field is not yet inserted.
+  if (
+    mode === 'sign' &&
+    !field.inserted &&
+    (fieldMeta?.type === 'text' || fieldMeta?.type === 'number')
+  ) {
+    const value = fieldMeta?.type === 'text' ? fieldMeta.text : fieldMeta.value;
+
+    if (value) {
+      textToRender = value;
+
+      textVerticalAlign = fieldMeta.verticalAlign || FIELD_DEFAULT_GENERIC_VERTICAL_ALIGN;
+      textAlign = fieldMeta.textAlign || FIELD_DEFAULT_GENERIC_ALIGN;
+      textLetterSpacing = fieldMeta.letterSpacing || FIELD_DEFAULT_LETTER_SPACING;
+      textLineHeight = fieldMeta.lineHeight || FIELD_DEFAULT_LINE_HEIGHT;
+    }
+  }
+
+  // Override everything with value if it's inserted (signed value always wins over prefill).
   if (field.inserted) {
-    textToRender = field.customText;
+    textToRender =
+      typeof field.customText === 'string' ? field.customText : String(field.customText ?? '');
 
     textAlign = fieldMeta?.textAlign || FIELD_DEFAULT_GENERIC_ALIGN;
 
