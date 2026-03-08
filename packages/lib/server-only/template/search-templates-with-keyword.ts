@@ -6,7 +6,7 @@ import { formatTemplatesPath, getHighestTeamRoleInGroup } from '@documenso/lib/u
 import { prisma } from '@documenso/prisma';
 
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
-import { getUserTeamIds } from '../team/get-user-team-ids';
+import { getUserTeamGroups } from '../team/get-user-team-groups';
 
 export type SearchTemplatesWithKeywordOptions = {
   query: string;
@@ -23,14 +23,16 @@ export const searchTemplatesWithKeyword = async ({
     return [];
   }
 
-  const [user, teamIds] = await Promise.all([
+  const [user, teamGroupsByTeamId] = await Promise.all([
     prisma.user.findFirstOrThrow({
       where: {
         id: userId,
       },
     }),
-    getUserTeamIds({ userId }),
+    getUserTeamGroups({ userId }),
   ]);
+
+  const teamIds = [...teamGroupsByTeamId.keys()];
 
   const filters: Prisma.EnvelopeWhereInput[] = [
     // Templates owned by the user matching title or recipient email.
@@ -53,7 +55,14 @@ export const searchTemplatesWithKeyword = async ({
     filters.push({
       teamId: { in: teamIds },
       deletedAt: null,
-      title: { contains: query, mode: 'insensitive' },
+      OR: [
+        { title: { contains: query, mode: 'insensitive' } },
+        {
+          recipients: {
+            some: { email: { contains: query, mode: 'insensitive' } },
+          },
+        },
+      ],
     });
   }
 
@@ -77,19 +86,6 @@ export const searchTemplatesWithKeyword = async ({
       team: {
         select: {
           url: true,
-          teamGroups: {
-            where: {
-              organisationGroup: {
-                organisationGroupMembers: {
-                  some: {
-                    organisationMember: {
-                      userId,
-                    },
-                  },
-                },
-              },
-            },
-          },
         },
       },
     },
@@ -107,9 +103,8 @@ export const searchTemplatesWithKeyword = async ({
         return true;
       }
 
-      const teamMemberRole = getHighestTeamRoleInGroup(
-        envelope.team.teamGroups.filter((tg) => tg.teamId === envelope.teamId),
-      );
+      const teamGroups = teamGroupsByTeamId.get(envelope.teamId) ?? [];
+      const teamMemberRole = getHighestTeamRoleInGroup(teamGroups);
 
       if (!teamMemberRole) {
         return false;

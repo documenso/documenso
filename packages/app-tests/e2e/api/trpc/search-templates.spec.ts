@@ -171,13 +171,16 @@ test.describe('Template Search - Cross-Team Isolation', () => {
 // ─── Recipient Email Search ──────────────────────────────────────────────────
 
 test.describe('Template Search - Recipient Email', () => {
-  test('should find own templates by recipient email but not cross-user', async ({ page }) => {
-    const { team, owner } = await seedTeam();
-    const adminUser = await seedTeamMember({ teamId: team.id, role: TeamMemberRole.ADMIN });
+  test('should find templates by recipient email within team but not cross-team', async ({
+    page,
+  }) => {
+    const { team: teamA, owner: ownerA } = await seedTeam();
+    const adminUserA = await seedTeamMember({ teamId: teamA.id, role: TeamMemberRole.ADMIN });
+    const { team: teamB, owner: ownerB } = await seedTeam();
 
     const { user: uniqueRecipient } = await seedUser();
 
-    const template = await seedBlankTemplate(owner, team.id, {
+    const template = await seedBlankTemplate(ownerA, teamA.id, {
       createTemplateOptions: { title: 'Template with Unique Recipient' },
     });
 
@@ -190,23 +193,24 @@ test.describe('Template Search - Recipient Email', () => {
       },
     });
 
-    await apiSignin({ page, email: owner.email });
-
-    const { data: ownerData } = await trpcTemplateSearch(page, uniqueRecipient.email);
-
-    expect(ownerData).not.toBeNull();
-    expect(ownerData).toHaveLength(1);
-    expect(ownerData![0].title).toBe('Template with Unique Recipient');
-
-    await apiSignout({ page });
-
-    // Team template search only matches by title, not recipient email, for non-owners.
-    await apiSignin({ page, email: adminUser.email });
+    // Team admin can find the template by recipient email.
+    await apiSignin({ page, email: adminUserA.email });
 
     const { data: adminData } = await trpcTemplateSearch(page, uniqueRecipient.email);
 
     expect(adminData).not.toBeNull();
-    expect(adminData).toHaveLength(0);
+    expect(adminData).toHaveLength(1);
+    expect(adminData![0].title).toBe('Template with Unique Recipient');
+
+    await apiSignout({ page });
+
+    // Owner of a different team cannot find it.
+    await apiSignin({ page, email: ownerB.email });
+
+    const { data: otherTeamData } = await trpcTemplateSearch(page, uniqueRecipient.email);
+
+    expect(otherTeamData).not.toBeNull();
+    expect(otherTeamData).toHaveLength(0);
 
     await apiSignout({ page });
   });

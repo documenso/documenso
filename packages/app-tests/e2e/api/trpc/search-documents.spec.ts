@@ -145,6 +145,7 @@ test.describe('Document Search - Visibility', () => {
       },
     ]);
 
+    // Admin can find the ADMIN-visibility document by recipient email.
     await apiSignin({ page, email: adminUser.email });
 
     const { data: adminData } = await trpcDocumentSearch(page, uniqueRecipient.email);
@@ -155,6 +156,7 @@ test.describe('Document Search - Visibility', () => {
 
     await apiSignout({ page });
 
+    // Member cannot find the ADMIN-visibility document by recipient email.
     await apiSignin({ page, email: memberUser.email });
 
     const { data: memberData } = await trpcDocumentSearch(page, uniqueRecipient.email);

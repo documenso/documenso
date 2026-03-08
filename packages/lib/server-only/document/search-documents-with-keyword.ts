@@ -6,7 +6,7 @@ import { formatDocumentsPath, getHighestTeamRoleInGroup } from '@documenso/lib/u
 import { prisma } from '@documenso/prisma';
 
 import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
-import { getUserTeamIds } from '../team/get-user-team-ids';
+import { getUserTeamGroups } from '../team/get-user-team-groups';
 
 export type SearchDocumentsWithKeywordOptions = {
   query: string;
@@ -23,14 +23,16 @@ export const searchDocumentsWithKeyword = async ({
     return [];
   }
 
-  const [user, teamIds] = await Promise.all([
+  const [user, teamGroupsByTeamId] = await Promise.all([
     prisma.user.findFirstOrThrow({
       where: {
         id: userId,
       },
     }),
-    getUserTeamIds({ userId }),
+    getUserTeamGroups({ userId }),
   ]);
+
+  const teamIds = [...teamGroupsByTeamId.keys()];
 
   const filters: Prisma.EnvelopeWhereInput[] = [
     // Documents owned by the user matching title, externalId, or recipient email.
@@ -64,6 +66,11 @@ export const searchDocumentsWithKeyword = async ({
       OR: [
         { title: { contains: query, mode: 'insensitive' } },
         { externalId: { contains: query, mode: 'insensitive' } },
+        {
+          recipients: {
+            some: { email: { contains: query, mode: 'insensitive' } },
+          },
+        },
       ],
     });
   }
@@ -89,19 +96,6 @@ export const searchDocumentsWithKeyword = async ({
       team: {
         select: {
           url: true,
-          teamGroups: {
-            where: {
-              organisationGroup: {
-                organisationGroupMembers: {
-                  some: {
-                    organisationMember: {
-                      userId,
-                    },
-                  },
-                },
-              },
-            },
-          },
         },
       },
     },
@@ -119,9 +113,8 @@ export const searchDocumentsWithKeyword = async ({
         return true;
       }
 
-      const teamMemberRole = getHighestTeamRoleInGroup(
-        envelope.team.teamGroups.filter((tg) => tg.teamId === envelope.teamId),
-      );
+      const teamGroups = teamGroupsByTeamId.get(envelope.teamId) ?? [];
+      const teamMemberRole = getHighestTeamRoleInGroup(teamGroups);
 
       if (!teamMemberRole) {
         return false;
@@ -142,7 +135,10 @@ export const searchDocumentsWithKeyword = async ({
 
       let path: string;
 
-      if (envelope.userId === user.id || (envelope.teamId && envelope.team.teamGroups.length > 0)) {
+      if (
+        envelope.userId === user.id ||
+        (envelope.teamId && teamGroupsByTeamId.has(envelope.teamId))
+      ) {
         path = `${formatDocumentsPath(envelope.team.url)}/${legacyDocumentId}`;
       } else {
         const signingToken = envelope.recipients.find((r) => r.email === user.email)?.token;
