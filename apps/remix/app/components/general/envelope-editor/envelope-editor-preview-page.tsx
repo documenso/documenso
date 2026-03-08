@@ -27,7 +27,7 @@ import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-
 import { EnvelopeRendererFileSelector } from './envelope-file-selector';
 
 export const EnvelopeEditorPreviewPage = () => {
-  const { envelope, editorFields } = useCurrentEnvelopeEditor();
+  const { envelope, editorFields, editorConfig } = useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem, fields } = useCurrentEnvelopeRender();
 
@@ -222,6 +222,7 @@ export const EnvelopeEditorPreviewPage = () => {
         ...recipient,
         signingStatus: SigningStatus.SIGNED,
       }))}
+      presignToken={editorConfig?.embedded?.presignToken}
       overrideSettings={{
         mode: 'export',
       }}
