@@ -126,7 +126,7 @@ export const handleEnvelopeItemPdfRequest = async ({
   const etag = Buffer.from(sha256(documentDataToUse)).toString('hex');
 
   if (c.req.header('If-None-Match') === etag) {
-    return c.body(null, 304);
+    return c.status(304);
   }
 
   const file = await getFileServerSide({

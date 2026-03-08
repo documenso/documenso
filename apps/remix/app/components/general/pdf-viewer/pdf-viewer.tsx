@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import pMap from 'p-map';
 import * as pdfjsLib from 'pdfjs-dist';
-import PdfWorker from 'pdfjs-dist/build/pdf.worker?worker';
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker?url';
 
 import type {
   ImageLoadingState,
@@ -19,7 +19,7 @@ import { PdfViewerPageImage } from './pdf-viewer-page-image';
 import { PdfViewerErrorState, PdfViewerLoadingState } from './pdf-viewer-states';
 import { useScrollToPage } from './use-scroll-to-page';
 
-pdfjsLib.GlobalWorkerOptions.workerPort = new PdfWorker();
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 type PageMeta = {
   width: number;
