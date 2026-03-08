@@ -3,7 +3,7 @@ import { useLayoutEffect, useMemo, useState } from 'react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
 import { CheckCircle2Icon } from 'lucide-react';
-import { redirect } from 'react-router';
+import { type ShouldRevalidateFunctionArgs, redirect } from 'react-router';
 
 import { EnvelopeEditorProvider } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import type { SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
@@ -29,6 +29,10 @@ import { EnvelopeEditorRenderProviderWrapper } from '~/components/general/envelo
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/envelope.edit.$id';
+
+export const shouldRevalidate = ({ currentParams, nextParams }: ShouldRevalidateFunctionArgs) => {
+  return currentParams.id !== nextParams.id;
+};
 
 export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const url = new URL(request.url);

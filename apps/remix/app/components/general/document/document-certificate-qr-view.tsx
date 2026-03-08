@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { type DocumentData, DocumentStatus, type EnvelopeItem, EnvelopeType } from '@prisma/client';
@@ -25,7 +25,7 @@ import {
 
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 
 import { EnvelopeRendererFileSelector } from '../envelope-editor/envelope-file-selector';
 import { EnvelopeGenericPageRenderer } from '../envelope-editor/envelope-generic-page-renderer';
@@ -150,7 +150,7 @@ export const DocumentCertificateQRView = ({
           </div>
 
           <div className="mt-12 w-full">
-            <PDFViewer
+            <PDFViewerLazy
               key={envelopeItems[0]?.id}
               data={getDocumentDataUrlForPdfViewer({
                 envelopeId: envelopeItems[0]?.envelopeId,
@@ -184,8 +184,6 @@ const DocumentCertificateQrV2 = ({
 }: DocumentCertificateQrV2Props) => {
   const { envelopeItems } = useCurrentEnvelopeRender();
 
-  const scrollableContainerRef = useRef<HTMLDivElement>(null);
-
   return (
     <div className="flex min-h-screen flex-col items-start">
       <div className="flex w-full flex-col justify-between gap-4 md:flex-row md:items-end">
@@ -216,12 +214,12 @@ const DocumentCertificateQrV2 = ({
         />
       </div>
 
-      <div className="mt-12 max-h-[80vh] w-full overflow-y-auto" ref={scrollableContainerRef}>
+      <div className="mt-12 w-full">
         <EnvelopeRendererFileSelector className="mb-4 p-0" fields={[]} secondaryOverride={''} />
 
         <EnvelopePdfViewer
+          scrollParentRef="window"
           customPageRenderer={EnvelopeGenericPageRenderer}
-          scrollParentRef={scrollableContainerRef}
           errorMessage={PDF_VIEWER_ERROR_MESSAGES.preview}
         />
       </div>

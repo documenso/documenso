@@ -30,7 +30,7 @@ import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signa
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 import { injectCss } from '~/utils/css-vars';
 
 import { DocumentSigningAttachmentsPopover } from '../general/document-signing/document-signing-attachments-popover';
@@ -288,7 +288,7 @@ export const EmbedSignDocumentV1ClientPage = ({
         <div className="embed--DocumentContainer relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
           {/* Viewer */}
           <div className="embed--DocumentViewer flex-1">
-            <PDFViewer
+            <PDFViewerLazy
               data={getDocumentDataUrlForPdfViewer({
                 envelopeId: envelopeItems[0]?.envelopeId,
                 envelopeItemId: envelopeItems[0]?.id,

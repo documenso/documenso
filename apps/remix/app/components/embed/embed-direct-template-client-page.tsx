@@ -41,7 +41,7 @@ import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signa
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 import { injectCss } from '~/utils/css-vars';
 
 import type { DirectTemplateLocalField } from '../general/direct-template/direct-template-signing-form';
@@ -340,7 +340,7 @@ export const EmbedDirectTemplateClientPage = ({
       <div className="relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
         {/* Viewer */}
         <div className="flex-1">
-          <PDFViewer
+          <PDFViewerLazy
             data={getDocumentDataUrlForPdfViewer({
               envelopeId: envelopeItems[0]?.envelopeId,
               envelopeItemId: envelopeItems[0]?.id,

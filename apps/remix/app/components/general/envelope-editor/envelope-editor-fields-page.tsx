@@ -152,9 +152,12 @@ export const EnvelopeEditorFieldsPage = () => {
 
   return (
     <div className="relative flex h-full">
-      <div className="flex h-full w-full flex-col overflow-y-auto" ref={scrollableContainerRef}>
+      <div
+        className="flex h-full w-full flex-col overflow-y-auto px-2"
+        ref={scrollableContainerRef}
+      >
         {/* Horizontal envelope item selector */}
-        <EnvelopeRendererFileSelector fields={editorFields.localFields} />
+        <EnvelopeRendererFileSelector className="px-0" fields={editorFields.localFields} />
 
         {/* Document View */}
         <div className="mt-4 flex h-full flex-col items-center justify-center">
