@@ -7,6 +7,7 @@ import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import type { DocumentDataVersion } from '@documenso/lib/types/document';
+import { sha256 } from '@documenso/lib/universal/crypto';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { prisma } from '@documenso/prisma';
 
@@ -122,6 +123,12 @@ export const handleEnvelopeItemPdfRequest = async ({
   const documentDataToUse =
     version === 'current' ? envelopeItem.documentData.data : envelopeItem.documentData.initialData;
 
+  const etag = Buffer.from(sha256(documentDataToUse)).toString('hex');
+
+  if (c.req.header('If-None-Match') === etag) {
+    return c.body(null, 304);
+  }
+
   const file = await getFileServerSide({
     type: envelopeItem.documentData.type,
     data: documentDataToUse,
@@ -137,6 +144,7 @@ export const handleEnvelopeItemPdfRequest = async ({
 
   // Note: Only set these headers on success.
   c.header('Content-Type', 'application/pdf');
+  c.header('ETag', etag);
   c.header('Cache-Control', `${cacheStrategy}, max-age=31536000, immutable`);
 
   return c.body(file);
