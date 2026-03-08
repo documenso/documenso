@@ -1,24 +1,24 @@
 import type { Prisma } from '@prisma/client';
-import { DocumentStatus, DocumentVisibility, EnvelopeType, TeamMemberRole } from '@prisma/client';
+import { DocumentVisibility, EnvelopeType, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
-import { formatDocumentsPath, getHighestTeamRoleInGroup } from '@documenso/lib/utils/teams';
+import { formatTemplatesPath, getHighestTeamRoleInGroup } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
-import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
+import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { getUserTeamGroups } from '../team/get-user-team-groups';
 
-export type SearchDocumentsWithKeywordOptions = {
+export type SearchTemplatesWithKeywordOptions = {
   query: string;
   userId: number;
   limit?: number;
 };
 
-export const searchDocumentsWithKeyword = async ({
+export const searchTemplatesWithKeyword = async ({
   query,
   userId,
   limit = 20,
-}: SearchDocumentsWithKeywordOptions) => {
+}: SearchTemplatesWithKeywordOptions) => {
   if (!query.trim()) {
     return [];
   }
@@ -35,13 +35,12 @@ export const searchDocumentsWithKeyword = async ({
   const teamIds = [...teamGroupsByTeamId.keys()];
 
   const filters: Prisma.EnvelopeWhereInput[] = [
-    // Documents owned by the user matching title, externalId, or recipient email.
+    // Templates owned by the user matching title or recipient email.
     {
       userId,
       deletedAt: null,
       OR: [
         { title: { contains: query, mode: 'insensitive' } },
-        { externalId: { contains: query, mode: 'insensitive' } },
         {
           recipients: {
             some: { email: { contains: query, mode: 'insensitive' } },
@@ -49,23 +48,15 @@ export const searchDocumentsWithKeyword = async ({
         },
       ],
     },
-    // Documents where the user is a recipient (completed or pending).
-    {
-      status: { in: [DocumentStatus.COMPLETED, DocumentStatus.PENDING] },
-      recipients: { some: { email: user.email } },
-      title: { contains: query, mode: 'insensitive' },
-      deletedAt: null,
-    },
   ];
 
-  // Team documents the user has access to.
+  // Team templates the user has access to.
   if (teamIds.length > 0) {
     filters.push({
       teamId: { in: teamIds },
       deletedAt: null,
       OR: [
         { title: { contains: query, mode: 'insensitive' } },
-        { externalId: { contains: query, mode: 'insensitive' } },
         {
           recipients: {
             some: { email: { contains: query, mode: 'insensitive' } },
@@ -77,7 +68,7 @@ export const searchDocumentsWithKeyword = async ({
 
   const envelopes = await prisma.envelope.findMany({
     where: {
-      type: EnvelopeType.DOCUMENT,
+      type: EnvelopeType.TEMPLATE,
       OR: filters,
     },
     select: {
@@ -90,7 +81,6 @@ export const searchDocumentsWithKeyword = async ({
       recipients: {
         select: {
           email: true,
-          token: true,
         },
       },
       team: {
@@ -103,7 +93,7 @@ export const searchDocumentsWithKeyword = async ({
     orderBy: {
       createdAt: 'desc',
     },
-    // Over-fetch to compensate for post-query visibility filtering on team documents.
+    // Over-fetch to compensate for post-query visibility filtering on team templates.
     take: limit * 3,
   });
 
@@ -131,19 +121,8 @@ export const searchDocumentsWithKeyword = async ({
     })
     .slice(0, limit)
     .map((envelope) => {
-      const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
-
-      let path: string;
-
-      if (
-        envelope.userId === user.id ||
-        (envelope.teamId && teamGroupsByTeamId.has(envelope.teamId))
-      ) {
-        path = `${formatDocumentsPath(envelope.team.url)}/${legacyDocumentId}`;
-      } else {
-        const signingToken = envelope.recipients.find((r) => r.email === user.email)?.token;
-        path = `/sign/${signingToken}`;
-      }
+      const legacyTemplateId = mapSecondaryIdToTemplateId(envelope.secondaryId);
+      const path = `${formatTemplatesPath(envelope.team.url)}/${legacyTemplateId}`;
 
       return {
         title: envelope.title,
