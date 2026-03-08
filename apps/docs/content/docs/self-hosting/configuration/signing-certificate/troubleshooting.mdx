@@ -1,0 +1,91 @@
+---
+title: Troubleshooting
+description: Common signing certificate errors and their solutions.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+
+<Accordions type="multiple">
+  <Accordion title="Failed to get private key bags">
+    Cause:
+    - Certificate has no password set
+
+    Solution:
+    - Verify the certificate has a password set
+    - Re-create with a password:
+
+    ```bash
+    openssl pkcs12 -export -out new-certificate.p12 -inkey private.key -in certificate.crt
+    ```
+
+  </Accordion>
+  <Accordion title="No certificate found for local signing">
+    Cause:
+    - Certificate path or contents not configured
+
+    Solution:
+    - Verify that `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH` or `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` is set
+    - Check the file exists at the configured path
+    - Verify file permissions allow reading
+
+  </Accordion>
+  <Accordion title="Permission denied reading certificate">
+    Cause:
+    - Application cannot read the certificate file
+
+    Solution:
+    - For Docker, run `sudo chown 1001 certificate.p12` and `chmod 400 certificate.p12` on the host before mounting
+
+  </Accordion>
+  <Accordion title="Invalid password (mac verify failure)">
+    Cause:
+    - Incorrect passphrase
+
+    Solution:
+    - Verify `NEXT_PRIVATE_SIGNING_PASSPHRASE` matches the certificate password
+    - Check for trailing whitespace
+    - Test with `openssl pkcs12 -in certificate.p12 -noout`
+
+  </Accordion>
+  <Accordion title="Certificate has expired">
+    Cause:
+    - Certificate validity period has ended
+
+    Solution:
+    - Generate a new certificate or obtain a renewed one
+    - Update the certificate file and restart Documenso
+    - Check expiration:
+
+    ```bash
+    openssl pkcs12 -in certificate.p12 -nokeys | openssl x509 -noout -dates
+    ```
+
+  </Accordion>
+  <Accordion title="Base64 decode error">
+    Cause:
+    - Incorrect base64 encoding or line breaks
+
+    Solution:
+    - Encode without line breaks:
+
+    ```bash
+    # macOS
+    base64 -i certificate.p12 | tr -d '\n'
+
+    # Linux
+    base64 -w 0 certificate.p12
+    ```
+    - Ensure the entire base64 string is on one line
+
+  </Accordion>
+  <Accordion title="Google Cloud HSM authentication failed">
+    Cause:
+    - Google Cloud credentials not configured or invalid
+
+    Solution:
+    - Verify that `NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS` is set
+    - Check the service account has `cloudkms.signerVerifier` role
+    - Verify the base64 encoding of the service account JSON
+
+  </Accordion>
+</Accordions>

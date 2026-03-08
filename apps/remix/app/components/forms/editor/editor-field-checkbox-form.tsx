@@ -184,7 +184,10 @@ export const EditorFieldCheckboxForm = ({
                 </FormLabel>
                 <FormControl>
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="text-muted-foreground bg-background w-full">
+                    <SelectTrigger
+                      data-testid="field-form-direction"
+                      className="w-full bg-background text-muted-foreground"
+                    >
                       <SelectValue placeholder={t`Select direction`} />
                     </SelectTrigger>
                     <SelectContent position="popper">
@@ -214,7 +217,10 @@ export const EditorFieldCheckboxForm = ({
                     </FormLabel>
                     <FormControl>
                       <Select {...field} onValueChange={field.onChange}>
-                        <SelectTrigger className="text-muted-foreground bg-background w-full">
+                        <SelectTrigger
+                          data-testid="field-form-validationRule"
+                          className="w-full bg-background text-muted-foreground"
+                        >
                           <SelectValue placeholder={t`Select at least`} />
                         </SelectTrigger>
                         <SelectContent position="popper">
@@ -260,7 +266,10 @@ export const EditorFieldCheckboxForm = ({
                           void form.trigger();
                         }}
                       >
-                        <SelectTrigger className="text-muted-foreground bg-background mt-5 w-full">
+                        <SelectTrigger
+                          data-testid="field-form-validationLength"
+                          className="mt-5 w-full bg-background text-muted-foreground"
+                        >
                           <SelectValue placeholder={t`Pick a number`} />
                         </SelectTrigger>
                         <SelectContent position="popper">
@@ -295,7 +304,7 @@ export const EditorFieldCheckboxForm = ({
                 <Trans>Checkbox values</Trans>
               </p>
 
-              <button type="button" onClick={() => addValue()}>
+              <button type="button" data-testid="field-form-values-add" onClick={() => addValue()}>
                 <PlusIcon className="h-4 w-4" />
               </button>
             </div>
@@ -310,7 +319,8 @@ export const EditorFieldCheckboxForm = ({
                       <FormItem>
                         <FormControl>
                           <Checkbox
-                            className="data-[state=checked]:bg-primary border-foreground/30 h-5 w-5"
+                            data-testid={`field-form-values-${index}-checked`}
+                            className="h-5 w-5 border-foreground/30 data-[state=checked]:bg-primary"
                             checked={field.value}
                             onCheckedChange={field.onChange}
                           />
@@ -325,7 +335,11 @@ export const EditorFieldCheckboxForm = ({
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <Input className="w-full" {...field} />
+                          <Input
+                            data-testid={`field-form-values-${index}-value`}
+                            className="w-full"
+                            {...field}
+                          />
                         </FormControl>
                       </FormItem>
                     )}
@@ -333,6 +347,7 @@ export const EditorFieldCheckboxForm = ({
 
                   <button
                     type="button"
+                    data-testid={`field-form-values-${index}-remove`}
                     className="flex h-10 w-10 items-center justify-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
                     onClick={() => removeValue(index)}
                   >
