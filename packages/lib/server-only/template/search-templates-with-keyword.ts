@@ -1,16 +1,12 @@
-import { EnvelopeType } from '@prisma/client';
-import type { Envelope, User } from '@prisma/client';
-import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
+import { DocumentVisibility, EnvelopeType, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
-import {
-  buildTeamWhereQuery,
-  formatTemplatesPath,
-  getHighestTeamRoleInGroup,
-} from '@documenso/lib/utils/teams';
+import { formatTemplatesPath, getHighestTeamRoleInGroup } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { getUserTeamIds } from '../team/get-user-team-ids';
 
 export type SearchTemplatesWithKeywordOptions = {
   query: string;
@@ -27,48 +23,57 @@ export const searchTemplatesWithKeyword = async ({
     return [];
   }
 
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
+  const [user, teamIds] = await Promise.all([
+    prisma.user.findFirstOrThrow({
+      where: {
+        id: userId,
+      },
+    }),
+    getUserTeamIds({ userId }),
+  ]);
+
+  const filters: Prisma.EnvelopeWhereInput[] = [
+    // Templates owned by the user matching title or recipient email.
+    {
+      userId,
+      deletedAt: null,
+      OR: [
+        { title: { contains: query, mode: 'insensitive' } },
+        {
+          recipients: {
+            some: { email: { contains: query, mode: 'insensitive' } },
+          },
+        },
+      ],
     },
-  });
+  ];
+
+  // Team templates the user has access to.
+  if (teamIds.length > 0) {
+    filters.push({
+      teamId: { in: teamIds },
+      deletedAt: null,
+      title: { contains: query, mode: 'insensitive' },
+    });
+  }
 
   const envelopes = await prisma.envelope.findMany({
     where: {
       type: EnvelopeType.TEMPLATE,
-      OR: [
-        {
-          title: {
-            contains: query,
-            mode: 'insensitive',
-          },
-          userId: userId,
-          deletedAt: null,
-        },
-        {
-          recipients: {
-            some: {
-              email: {
-                contains: query,
-                mode: 'insensitive',
-              },
-            },
-          },
-          userId: userId,
-          deletedAt: null,
-        },
-        {
-          title: {
-            contains: query,
-            mode: 'insensitive',
-          },
-          team: buildTeamWhereQuery({ teamId: undefined, userId }),
-          deletedAt: null,
-        },
-      ],
+      OR: filters,
     },
-    include: {
-      recipients: true,
+    select: {
+      id: true,
+      userId: true,
+      teamId: true,
+      title: true,
+      secondaryId: true,
+      visibility: true,
+      recipients: {
+        select: {
+          email: true,
+        },
+      },
       team: {
         select: {
           url: true,
@@ -92,14 +97,13 @@ export const searchTemplatesWithKeyword = async ({
     orderBy: {
       createdAt: 'desc',
     },
-    take: limit,
+    // Over-fetch to compensate for post-query visibility filtering on team templates.
+    take: limit * 3,
   });
 
-  const isOwner = (envelope: Envelope, user: User) => envelope.userId === user.id;
-
-  const filteredTemplates = envelopes
+  const results = envelopes
     .filter((envelope) => {
-      if (!envelope.teamId || isOwner(envelope, user)) {
+      if (!envelope.teamId || envelope.userId === user.id) {
         return true;
       }
 
@@ -111,7 +115,7 @@ export const searchTemplatesWithKeyword = async ({
         return false;
       }
 
-      const canAccessTemplate = match([envelope.visibility, teamMemberRole])
+      return match([envelope.visibility, teamMemberRole])
         .with([DocumentVisibility.EVERYONE, TeamMemberRole.ADMIN], () => true)
         .with([DocumentVisibility.EVERYONE, TeamMemberRole.MANAGER], () => true)
         .with([DocumentVisibility.EVERYONE, TeamMemberRole.MEMBER], () => true)
@@ -119,19 +123,18 @@ export const searchTemplatesWithKeyword = async ({
         .with([DocumentVisibility.MANAGER_AND_ABOVE, TeamMemberRole.MANAGER], () => true)
         .with([DocumentVisibility.ADMIN, TeamMemberRole.ADMIN], () => true)
         .otherwise(() => false);
-
-      return canAccessTemplate;
     })
+    .slice(0, limit)
     .map((envelope) => {
       const legacyTemplateId = mapSecondaryIdToTemplateId(envelope.secondaryId);
-      const templatePath = `${formatTemplatesPath(envelope.team.url)}/${legacyTemplateId}`;
+      const path = `${formatTemplatesPath(envelope.team.url)}/${legacyTemplateId}`;
 
       return {
         title: envelope.title,
-        path: templatePath,
+        path,
         value: [envelope.id, envelope.title, ...envelope.recipients.map((r) => r.email)].join(' '),
       };
     });
 
-  return filteredTemplates;
+  return results;
 };

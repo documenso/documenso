@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const ZSearchDocumentRequestSchema = z.object({
-  query: z.string(),
+  query: z.string().trim().min(1),
 });
 
 export const ZSearchDocumentResponseSchema = z
