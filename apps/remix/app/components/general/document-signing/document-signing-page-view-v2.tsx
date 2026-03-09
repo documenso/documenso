@@ -1,4 +1,4 @@
-import { lazy, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { Plural, Trans, useLingui } from '@lingui/react/macro';
 import { EnvelopeType, RecipientRole } from '@prisma/client';
