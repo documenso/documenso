@@ -280,12 +280,17 @@ class BrandingResolver:
                 confidence=ConfidenceLevel.HIGH,
             )
 
-        # flag_for_review
+        # flag_for_review — keep conflict markers in the file and stage it
+        # so the PR contains the unresolved conflict for human review.
+        conflict_content = self._read_file_with_conflicts(file_path)
+        if conflict_content is not None:
+            self._write_resolution(file_path, conflict_content)
+
         return Resolution(
             file_path=file_path,
             category=category,
             action="flag_for_review",
-            content=result.get("suggested_resolution", ""),
+            content=conflict_content or result.get("suggested_resolution", ""),
             explanation=result.get("reason", ""),
             confidence=ConfidenceLevel.LOW,
         )
@@ -382,3 +387,12 @@ class BrandingResolver:
             check=True,
             capture_output=True,
         )
+
+    def _read_file_with_conflicts(self, file_path: str) -> str | None:
+        """Read a file that may contain conflict markers from the working tree."""
+        full_path = self.repo_path / file_path
+        try:
+            return full_path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            logger.warning("Could not read conflict file: %s", file_path)
+            return None

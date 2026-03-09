@@ -136,6 +136,28 @@ def main(argv: list[str] | None = None) -> int:
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / "confidence.txt").write_text(f"{overall_confidence:.2f}")
 
+    # Write flagged files JSON for Jenkins to post inline PR comments.
+    import json  # noqa: PLC0415
+
+    flagged = []
+    for res in result.resolutions:
+        if res.action == "flag_for_review":
+            # Find the first conflict marker line number
+            line = 1
+            if res.content:
+                for i, content_line in enumerate(res.content.splitlines(), 1):
+                    if content_line.startswith("<<<<<<<"):
+                        line = i
+                        break
+            flagged.append({
+                "path": res.file_path,
+                "line": line,
+                "body": f"**Flagged for manual review**\n\n{res.explanation}",
+            })
+    (output_dir / "flagged_reviews.json").write_text(
+        json.dumps(flagged, indent=2), encoding="utf-8"
+    )
+
     # Write PR body if requested.
     if args.output_pr_body:
         from .output import generate_pr_body  # noqa: PLC0415

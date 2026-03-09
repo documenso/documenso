@@ -291,6 +291,34 @@ for t in touched:
                             returnStdout: true
                         ).trim()
 
+                        // Post inline review comments on flagged files
+                        if (fileExists('sync-output/flagged_reviews.json')) {
+                            def prNumber = sh(
+                                script: "gh pr view ${env.SYNC_BRANCH} --repo ${FORK_REPO} --json number -q .number",
+                                returnStdout: true
+                            ).trim()
+
+                            def flaggedJson = readFile('sync-output/flagged_reviews.json')
+                            def flagged = readJSON text: flaggedJson
+
+                            def commitSha = sh(
+                                script: 'git rev-parse HEAD',
+                                returnStdout: true
+                            ).trim()
+
+                            flagged.each { review ->
+                                def body = review.body.replace('"', '\\"').replace('\n', '\\n')
+                                sh(script: """
+                                    curl -s -X POST \
+                                        -H "Authorization: token \${GITHUB_TOKEN}" \
+                                        -H "Accept: application/vnd.github+json" \
+                                        https://api.github.com/repos/${FORK_REPO}/pulls/${prNumber}/comments \
+                                        -d '{"body":"${body}","commit_id":"${commitSha}","path":"${review.path}","line":${review.line},"side":"RIGHT"}'
+                                """, returnStatus: true)
+                                echo "Posted review comment on ${review.path}:${review.line}"
+                            }
+                        }
+
                         sh(script: """
                             curl -s -X POST "\${TEAMS_WEBHOOK_URL}" \
                                 -H "Content-Type: application/json" \
