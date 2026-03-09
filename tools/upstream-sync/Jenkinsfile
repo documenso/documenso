@@ -306,20 +306,7 @@ for t in touched:
                             // Post a PR comment listing all flagged files
                             sh(script: '''
                                 . .venv/bin/activate
-                                PYTHONPATH=tools/upstream-sync python3 -c "
-import json
-
-flagged = json.load(open('sync-output/flagged_reviews.json'))
-lines = ['## Files Flagged for Manual Review\\n']
-for r in flagged:
-    lines.append(f'### `{r[\"path\"]}`')
-    lines.append(f'{r[\"body\"]}')
-    lines.append(f'> See conflict markers starting at line {r[\"line\"]}')
-    lines.append('')
-
-with open('sync-output/review_comment.md', 'w') as f:
-    f.write('\\n'.join(lines))
-"
+                                PYTHONPATH=tools/upstream-sync python3 -m branding_resolver.post_review
                                 gh pr comment ${SYNC_BRANCH} \
                                     --repo ${FORK_REPO} \
                                     --body-file sync-output/review_comment.md
