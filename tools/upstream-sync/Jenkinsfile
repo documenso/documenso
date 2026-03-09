@@ -173,22 +173,26 @@ for t in touched:
                 }
             }
             steps {
-                sh '''
-                    . .venv/bin/activate
-                    PYTHONPATH=tools/upstream-sync python3 -m branding_resolver \
-                        --repo . \
-                        --our-branch origin/main \
-                        --upstream-branch upstream/main \
-                        --output-pr-body sync-output/pr_body.md \
-                        --verbose
-                '''
                 script {
+                    // Exit code 1 = files flagged for review (not a real failure).
+                    // The confidence score drives auto-merge vs draft PR.
+                    def rc = sh(script: '''
+                        . .venv/bin/activate
+                        PYTHONPATH=tools/upstream-sync python3 -m branding_resolver \
+                            --repo . \
+                            --our-branch origin/main \
+                            --upstream-branch upstream/main \
+                            --output-pr-body sync-output/pr_body.md \
+                            --verbose
+                    ''', returnStatus: true)
+
                     if (fileExists('sync-output/confidence.txt')) {
                         env.CONFIDENCE = readFile('sync-output/confidence.txt').trim()
                         echo "Agent confidence score: ${env.CONFIDENCE}"
+                    } else if (rc != 0) {
+                        error "Branding resolver failed (exit ${rc}) without producing confidence score"
                     } else {
                         env.CONFIDENCE = '0.0'
-                        echo "No confidence score produced. Defaulting to 0.0"
                     }
                 }
             }
