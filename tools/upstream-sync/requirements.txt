@@ -1,0 +1,4 @@
+openai>=1.40.0
+pydantic>=2.6.0
+pydantic-settings>=2.2.0
+pyyaml>=6.0

@@ -1,0 +1,318 @@
+pipeline {
+    agent { label 'dev-jenkinsrunner-01.davincisolutions.ai' }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '30'))
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+    }
+
+    triggers {
+        cron('H 6 * * *')
+    }
+
+    parameters {
+        string(name: 'UPSTREAM_REF', defaultValue: '', description: 'Specific upstream ref to sync (tag, SHA, or branch). Leave empty for upstream/main HEAD.')
+        booleanParam(name: 'FORCE_CLAUDE', defaultValue: false, description: 'Force AI resolution even when merge is clean (useful for branding drift detection)')
+        booleanParam(name: 'DRY_RUN', defaultValue: false, description: 'Run the full pipeline without pushing or creating PRs')
+    }
+
+    environment {
+        OPENROUTER_API_KEY  = credentials('openrouter-api-key')
+        OPENROUTER_MODEL    = 'google/gemini-3-flash-preview'
+        GITHUB_TOKEN        = credentials('github-token')
+        TEAMS_WEBHOOK_URL   = credentials('teams-webhook-url')
+        UPSTREAM_URL        = 'https://github.com/documenso/documenso.git'
+        FORK_REPO           = 'Davinci-Technology/documenso'
+        AUTO_MERGE_THRESHOLD = '0.95'
+        GIT_CREDENTIAL_ID   = 'f1b484af-24eb-4f28-a57a-66db51117a73'
+    }
+
+    stages {
+        stage('Setup') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    extensions: [
+                        [$class: 'CloneOption', depth: 0, shallow: false],
+                        [$class: 'SubmoduleOption', disableSubmodules: true]
+                    ],
+                    userRemoteConfigs: [[
+                        url: "https://github.com/${FORK_REPO}.git",
+                        credentialsId: env.GIT_CREDENTIAL_ID
+                    ]]
+                ])
+                sh '''
+                    git config user.email "ci@davincisolutions.ai"
+                    git config user.name "Davinci CI"
+
+                    # Configure upstream remote
+                    git remote get-url upstream 2>/dev/null || git remote add upstream "${UPSTREAM_URL}"
+                    git fetch upstream --quiet
+                    git fetch origin --quiet
+
+                    # Create Python venv and install deps
+                    python3 -m venv .venv
+                    . .venv/bin/activate
+                    pip install --quiet -r tools/upstream-sync/requirements.txt
+                '''
+            }
+        }
+
+        stage('Detect Changes') {
+            steps {
+                script {
+                    def upstreamRef = params.UPSTREAM_REF?.trim() ? params.UPSTREAM_REF.trim() : 'upstream/main'
+
+                    def mergeBase = sh(
+                        script: "git merge-base origin/main ${upstreamRef}",
+                        returnStdout: true
+                    ).trim()
+
+                    def commitCount = sh(
+                        script: "git rev-list --count ${mergeBase}..${upstreamRef}",
+                        returnStdout: true
+                    ).trim().toInteger()
+
+                    echo "Merge base: ${mergeBase}"
+                    echo "Upstream commits since last sync: ${commitCount}"
+
+                    if (commitCount == 0 && !params.FORCE_CLAUDE) {
+                        echo "No upstream changes detected. Nothing to sync."
+                        env.SKIP_SYNC = 'true'
+                    } else {
+                        env.SKIP_SYNC = 'false'
+                        env.MERGE_BASE = mergeBase
+                        env.UPSTREAM_REF = upstreamRef
+                        env.COMMIT_COUNT = commitCount.toString()
+
+                        def today = sh(script: 'date +%Y-%m-%d', returnStdout: true).trim()
+                        env.SYNC_BRANCH = "upstream-sync/${today}"
+
+                        sh 'mkdir -p sync-output'
+                        sh "git diff --name-only ${mergeBase}..${upstreamRef} > sync-output/changed_files.txt"
+
+                        echo "Sync branch will be: ${env.SYNC_BRANCH}"
+                    }
+                }
+            }
+        }
+
+        stage('Attempt Merge') {
+            when {
+                expression { env.SKIP_SYNC != 'true' }
+            }
+            steps {
+                script {
+                    sh "git checkout -b ${env.SYNC_BRANCH} origin/main"
+
+                    def mergeResult = sh(
+                        script: "git merge ${env.UPSTREAM_REF} --no-edit",
+                        returnStatus: true
+                    )
+
+                    if (mergeResult == 0) {
+                        echo "Merge completed cleanly."
+                        env.MERGE_CLEAN = 'true'
+                    } else {
+                        echo "Merge has conflicts."
+                        env.MERGE_CLEAN = 'false'
+                        sh 'git diff --name-only --diff-filter=U > sync-output/conflicted_files.txt'
+                    }
+
+                    sh '''
+                        . .venv/bin/activate
+                        python3 -c "
+import yaml, pathlib, fnmatch
+
+config = yaml.safe_load(pathlib.Path('tools/upstream-sync/config.yaml').read_text())
+changed = pathlib.Path('sync-output/changed_files.txt').read_text().strip().splitlines()
+
+branding_patterns = (
+    config['classification']['branding_only_patterns'] +
+    config['classification']['branding_text_patterns']
+)
+
+touched = []
+for f in changed:
+    for pat in branding_patterns:
+        if fnmatch.fnmatch(f, pat):
+            touched.append(f)
+            break
+
+pathlib.Path('sync-output/branding_touched.txt').write_text('\\n'.join(touched))
+print(f'Branding files touched by upstream: {len(touched)}')
+for t in touched:
+    print(f'  - {t}')
+"
+                    '''
+
+                    def brandingCount = sh(
+                        script: 'wc -l < sync-output/branding_touched.txt',
+                        returnStdout: true
+                    ).trim().toInteger()
+
+                    env.BRANDING_FILES_TOUCHED = (brandingCount > 0) ? 'true' : 'false'
+                    echo "Branding files touched: ${brandingCount}"
+                }
+            }
+        }
+
+        stage('Agent Resolution') {
+            when {
+                allOf {
+                    expression { env.SKIP_SYNC != 'true' }
+                    expression {
+                        env.MERGE_CLEAN != 'true' ||
+                        env.BRANDING_FILES_TOUCHED == 'true' ||
+                        params.FORCE_CLAUDE
+                    }
+                }
+            }
+            steps {
+                sh '''
+                    . .venv/bin/activate
+                    python3 -m branding_resolver \
+                        --repo . \
+                        --our-branch origin/main \
+                        --upstream-branch upstream/main \
+                        --output-pr-body sync-output/pr_body.md \
+                        --verbose
+                '''
+                script {
+                    if (fileExists('sync-output/confidence.txt')) {
+                        env.CONFIDENCE = readFile('sync-output/confidence.txt').trim()
+                        echo "Agent confidence score: ${env.CONFIDENCE}"
+                    } else {
+                        env.CONFIDENCE = '0.0'
+                        echo "No confidence score produced. Defaulting to 0.0"
+                    }
+                }
+            }
+        }
+
+        stage('Validate') {
+            when {
+                expression { env.SKIP_SYNC != 'true' }
+            }
+            environment {
+                NEXT_PRIVATE_ENCRYPTION_KEY = '0000000000000000000000000000000000000000000000000000000000000000'
+                NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY = '1111111111111111111111111111111111111111111111111111111111111111'
+            }
+            steps {
+                sh '''
+                    npm ci --ignore-scripts
+                    npx tsc --noEmit
+                '''
+            }
+        }
+
+        stage('Auto-Merge or PR') {
+            when {
+                allOf {
+                    expression { env.SKIP_SYNC != 'true' }
+                    expression { !params.DRY_RUN }
+                }
+            }
+            steps {
+                script {
+                    def confidence = (env.CONFIDENCE ?: '0.0').toFloat()
+                    def threshold = env.AUTO_MERGE_THRESHOLD.toFloat()
+                    def mergeClean = (env.MERGE_CLEAN == 'true')
+                    def agentRan = (env.BRANDING_FILES_TOUCHED == 'true' || !mergeClean || params.FORCE_CLAUDE)
+
+                    if (mergeClean && !agentRan) {
+                        confidence = 1.0
+                    }
+
+                    echo "Final confidence: ${confidence}, threshold: ${threshold}"
+
+                    // Push the sync branch
+                    withCredentials([usernamePassword(
+                        credentialsId: env.GIT_CREDENTIAL_ID,
+                        usernameVariable: 'GIT_USER',
+                        passwordVariable: 'GIT_PASS'
+                    )]) {
+                        sh """
+                            git remote set-url origin https://\${GIT_USER}:\${GIT_PASS}@github.com/${FORK_REPO}.git
+                            git push origin ${env.SYNC_BRANCH} --force
+                        """
+                    }
+
+                    if (confidence >= threshold) {
+                        echo "Confidence ${confidence} >= threshold ${threshold}. Auto-merging to main."
+
+                        sh """
+                            curl -s -X POST \
+                                -H "Authorization: token \${GITHUB_TOKEN}" \
+                                -H "Accept: application/vnd.github+json" \
+                                https://api.github.com/repos/${FORK_REPO}/merges \
+                                -d '{"base":"main","head":"${env.SYNC_BRANCH}","commit_message":"chore: upstream sync ${env.SYNC_BRANCH} (auto-merged, confidence ${confidence})"}'
+                        """
+
+                        sh """
+                            curl -s -X POST "\${TEAMS_WEBHOOK_URL}" \
+                                -H "Content-Type: application/json" \
+                                -d '{
+                                    "title": "Upstream Sync Auto-Merged",
+                                    "text": "Branch **${env.SYNC_BRANCH}** merged to main.\\n\\nCommits synced: ${env.COMMIT_COUNT}\\nConfidence: ${confidence}",
+                                    "themeColor": "00CC00"
+                                }'
+                        """
+                    } else {
+                        echo "Confidence ${confidence} < threshold ${threshold}. Creating draft PR for review."
+
+                        def prBody = ''
+                        if (fileExists('sync-output/pr_body.md')) {
+                            prBody = readFile('sync-output/pr_body.md')
+                        } else {
+                            prBody = "Automated upstream sync from ${env.UPSTREAM_REF}.\\n\\nCommits: ${env.COMMIT_COUNT}\\nConfidence: ${confidence}"
+                        }
+
+                        writeFile file: 'sync-output/gh_pr_body.md', text: prBody
+
+                        sh """
+                            gh pr create \
+                                --repo ${FORK_REPO} \
+                                --base main \
+                                --head ${env.SYNC_BRANCH} \
+                                --title "chore: upstream sync ${env.SYNC_BRANCH}" \
+                                --body-file sync-output/gh_pr_body.md \
+                                --draft
+                        """
+
+                        def prUrl = sh(
+                            script: "gh pr view ${env.SYNC_BRANCH} --repo ${FORK_REPO} --json url -q .url",
+                            returnStdout: true
+                        ).trim()
+
+                        sh """
+                            curl -s -X POST "\${TEAMS_WEBHOOK_URL}" \
+                                -H "Content-Type: application/json" \
+                                -d '{
+                                    "title": "Upstream Sync PR Created (Draft)",
+                                    "text": "Branch **${env.SYNC_BRANCH}** needs manual review.\\n\\nCommits: ${env.COMMIT_COUNT}\\nConfidence: ${confidence}\\n[Review PR](${prUrl})",
+                                    "themeColor": "FFA500"
+                                }'
+                        """
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        failure {
+            sh """
+                curl -s -X POST "\${TEAMS_WEBHOOK_URL}" \
+                    -H "Content-Type: application/json" \
+                    -d '{
+                        "title": "Upstream Sync FAILED",
+                        "text": "Pipeline failed at stage: ${env.STAGE_NAME}\\n\\nBuild: ${env.BUILD_URL}",
+                        "themeColor": "FF0000"
+                    }'
+            """
+        }
+    }
+}
