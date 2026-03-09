@@ -148,14 +148,14 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
           </TooltipProvider>
         </SessionProvider>
 
-        <ScrollRestoration />
-        <Scripts />
-
         <script
           dangerouslySetInnerHTML={{
             __html: `window.__ENV__ = ${JSON.stringify(publicEnv)}`,
           }}
         />
+
+        <ScrollRestoration />
+        <Scripts />
       </body>
     </html>
   );
