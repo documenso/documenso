@@ -1,3 +1,21 @@
+def notifyTeams(String title, String text, String color) {
+    try {
+        withCredentials([string(credentialsId: 'teams-webhook-url', variable: 'TEAMS_WEBHOOK_URL')]) {
+            sh(script: """
+                curl -s -X POST "\${TEAMS_WEBHOOK_URL}" \
+                    -H "Content-Type: application/json" \
+                    -d '{
+                        "title": "${title}",
+                        "text": "${text}",
+                        "themeColor": "${color}"
+                    }'
+            """, returnStatus: true)
+        }
+    } catch (Exception e) {
+        echo "Teams notification skipped (credential 'teams-webhook-url' not configured): ${e.message}"
+    }
+}
+
 pipeline {
     agent { label 'dev-jenkinsrunner-01.davincisolutions.ai' }
 
@@ -21,7 +39,6 @@ pipeline {
         OPENROUTER_API_KEY  = credentials('openrouter-api-key')
         OPENROUTER_MODEL    = 'google/gemini-3-flash-preview'
         GITHUB_TOKEN        = credentials('github-token')
-        TEAMS_WEBHOOK_URL   = credentials('teams-webhook-url')
         UPSTREAM_URL        = 'https://github.com/documenso/documenso.git'
         FORK_REPO           = 'Davinci-Technology/documenso'
         AUTO_MERGE_THRESHOLD = '0.95'
@@ -259,15 +276,9 @@ for t in touched:
                                 -d '{"base":"main","head":"${env.SYNC_BRANCH}","commit_message":"chore: upstream sync ${env.SYNC_BRANCH} (auto-merged, confidence ${confidence})"}'
                         """
 
-                        sh(script: """
-                            curl -s -X POST "\${TEAMS_WEBHOOK_URL}" \
-                                -H "Content-Type: application/json" \
-                                -d '{
-                                    "title": "Upstream Sync Auto-Merged",
-                                    "text": "Branch **${env.SYNC_BRANCH}** merged to main.\\n\\nCommits synced: ${env.COMMIT_COUNT}\\nConfidence: ${confidence}",
-                                    "themeColor": "00CC00"
-                                }'
-                        """, returnStatus: true)
+                        notifyTeams("Upstream Sync Auto-Merged",
+                            "Branch **${env.SYNC_BRANCH}** merged to main.\\n\\nCommits synced: ${env.COMMIT_COUNT}\\nConfidence: ${confidence}",
+                            "00CC00")
                     } else {
                         echo "Confidence ${confidence} < threshold ${threshold}. Creating draft PR for review."
 
@@ -320,15 +331,9 @@ for t in touched:
                             ''', returnStatus: true)
                         }
 
-                        sh(script: """
-                            curl -s -X POST "\${TEAMS_WEBHOOK_URL}" \
-                                -H "Content-Type: application/json" \
-                                -d '{
-                                    "title": "Upstream Sync PR Created (Draft)",
-                                    "text": "Branch **${env.SYNC_BRANCH}** needs manual review.\\n\\nCommits: ${env.COMMIT_COUNT}\\nConfidence: ${confidence}\\n[Review PR](${prUrl})",
-                                    "themeColor": "FFA500"
-                                }'
-                        """, returnStatus: true)
+                        notifyTeams("Upstream Sync PR Created (Draft)",
+                            "Branch **${env.SYNC_BRANCH}** needs manual review.\\n\\nCommits: ${env.COMMIT_COUNT}\\nConfidence: ${confidence}\\n[Review PR](${prUrl})",
+                            "FFA500")
                     }
                 }
             }
@@ -337,15 +342,11 @@ for t in touched:
 
     post {
         failure {
-            sh(script: """
-                curl -s -X POST "\${TEAMS_WEBHOOK_URL}" \
-                    -H "Content-Type: application/json" \
-                    -d '{
-                        "title": "Upstream Sync FAILED",
-                        "text": "Pipeline failed at stage: ${env.STAGE_NAME}\\n\\nBuild: ${env.BUILD_URL}",
-                        "themeColor": "FF0000"
-                    }'
-            """, returnStatus: true)
+            node('dev-jenkinsrunner-01.davincisolutions.ai') {
+                notifyTeams("Upstream Sync FAILED",
+                    "Pipeline failed at stage: ${env.STAGE_NAME}\\n\\nBuild: ${env.BUILD_URL}",
+                    "FF0000")
+            }
         }
     }
 }
