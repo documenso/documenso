@@ -298,25 +298,47 @@ for t in touched:
                                 returnStdout: true
                             ).trim()
 
-                            def flaggedJson = readFile('sync-output/flagged_reviews.json')
-                            def flagged = readJSON text: flaggedJson
-
                             def commitSha = sh(
                                 script: 'git rev-parse HEAD',
                                 returnStdout: true
                             ).trim()
 
-                            flagged.each { review ->
-                                def body = review.body.replace('"', '\\"').replace('\n', '\\n')
-                                sh(script: """
-                                    curl -s -X POST \
-                                        -H "Authorization: token \${GITHUB_TOKEN}" \
-                                        -H "Accept: application/vnd.github+json" \
-                                        https://api.github.com/repos/${FORK_REPO}/pulls/${prNumber}/comments \
-                                        -d '{"body":"${body}","commit_id":"${commitSha}","path":"${review.path}","line":${review.line},"side":"RIGHT"}'
-                                """, returnStatus: true)
-                                echo "Posted review comment on ${review.path}:${review.line}"
-                            }
+                            // Use Python to read JSON and post comments via GitHub API
+                            sh(script: """
+                                . .venv/bin/activate
+                                PYTHONPATH=tools/upstream-sync python3 -c "
+import json, urllib.request, ssl, os
+
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
+
+token = os.environ['GITHUB_TOKEN']
+flagged = json.load(open('sync-output/flagged_reviews.json'))
+
+for review in flagged:
+    body = json.dumps({
+        'body': review['body'],
+        'commit_id': '${commitSha}',
+        'path': review['path'],
+        'line': review['line'],
+        'side': 'RIGHT',
+    })
+    req = urllib.request.Request(
+        'https://api.github.com/repos/${FORK_REPO}/pulls/${prNumber}/comments',
+        data=body.encode(),
+        method='POST',
+    )
+    req.add_header('Authorization', f'token {token}')
+    req.add_header('Accept', 'application/vnd.github+json')
+    req.add_header('Content-Type', 'application/json')
+    try:
+        resp = urllib.request.urlopen(req, context=ctx)
+        print(f'Posted review comment on {review[\"path\"]}:{review[\"line\"]}')
+    except Exception as e:
+        print(f'Warning: Failed to post comment on {review[\"path\"]}: {e}')
+"
+                            """, returnStatus: true)
                         }
 
                         sh(script: """
