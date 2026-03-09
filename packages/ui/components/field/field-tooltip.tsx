@@ -65,7 +65,7 @@ export function FieldToolTip({ children, color, className = '', field }: FieldTo
           <TooltipTrigger className="absolute inset-0 w-full"></TooltipTrigger>
 
           <TooltipContent
-            className={tooltipVariants({ color, className })}
+            className={tooltipVariants({ color, className: cn(className, 'z-40') })}
             sideOffset={2}
             onClick={onTooltipContentClick}
           >

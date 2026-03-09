@@ -61,6 +61,7 @@ export const ZEnvelopeSchema = EnvelopeSchema.pick({
   fields: ZEnvelopeFieldSchema.array(),
   envelopeItems: EnvelopeItemSchema.pick({
     envelopeId: true,
+    documentDataId: true,
     id: true,
     title: true,
     order: true,

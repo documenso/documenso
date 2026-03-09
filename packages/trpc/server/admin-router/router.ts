@@ -13,6 +13,7 @@ import { findDocumentJobsRoute } from './find-document-jobs';
 import { findDocumentsRoute } from './find-documents';
 import { findEmailDomainsRoute } from './find-email-domains';
 import { findSubscriptionClaimsRoute } from './find-subscription-claims';
+import { findUnsealedDocumentsRoute } from './find-unsealed-documents';
 import { findUserTeamsRoute } from './find-user-teams';
 import { getAdminOrganisationRoute } from './get-admin-organisation';
 import { getEmailDomainRoute } from './get-email-domain';
@@ -22,6 +23,7 @@ import { reregisterEmailDomainRoute } from './reregister-email-domain';
 import { resealDocumentRoute } from './reseal-document';
 import { resetTwoFactorRoute } from './reset-two-factor-authentication';
 import { resyncLicenseRoute } from './resync-license';
+import { swapOrganisationSubscriptionRoute } from './swap-organisation-subscription';
 import { updateAdminOrganisationRoute } from './update-admin-organisation';
 import { updateOrganisationMemberRoleRoute } from './update-organisation-member-role';
 import { updateRecipientRoute } from './update-recipient';
@@ -35,6 +37,7 @@ export const adminRouter = router({
     get: getAdminOrganisationRoute,
     create: createAdminOrganisationRoute,
     update: updateAdminOrganisationRoute,
+    swapSubscription: swapOrganisationSubscriptionRoute,
   },
   organisationMember: {
     promoteToOwner: promoteMemberToOwnerRoute,
@@ -63,6 +66,7 @@ export const adminRouter = router({
   },
   document: {
     find: findDocumentsRoute,
+    findUnsealed: findUnsealedDocumentsRoute,
     delete: deleteDocumentRoute,
     reseal: resealDocumentRoute,
     findJobs: findDocumentJobsRoute,

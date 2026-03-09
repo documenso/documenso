@@ -285,18 +285,13 @@ export const run = async ({
 
     await prisma.$transaction(async (tx) => {
       for (const { oldDocumentDataId, newDocumentDataId } of newDocumentData) {
-        const newData = await tx.documentData.findFirstOrThrow({
+        await tx.envelopeItem.update({
           where: {
-            id: newDocumentDataId,
-          },
-        });
-
-        await tx.documentData.update({
-          where: {
-            id: oldDocumentDataId,
+            envelopeId: envelope.id,
+            documentDataId: oldDocumentDataId,
           },
           data: {
-            data: newData.data,
+            documentDataId: newDocumentDataId,
           },
         });
       }
@@ -496,11 +491,14 @@ const decorateAndSignPdf = async ({
   // Add suffix based on document status
   const suffix = isRejected ? '_rejected.pdf' : '_signed.pdf';
 
-  const newDocumentData = await putPdfFileServerSide({
-    name: `${name}${suffix}`,
-    type: 'application/pdf',
-    arrayBuffer: async () => Promise.resolve(pdfBytes),
-  });
+  const newDocumentData = await putPdfFileServerSide(
+    {
+      name: `${name}${suffix}`,
+      type: 'application/pdf',
+      arrayBuffer: async () => Promise.resolve(pdfBytes),
+    },
+    envelopeItem.documentData.initialData,
+  );
 
   return {
     oldDocumentDataId: envelopeItem.documentData.id,

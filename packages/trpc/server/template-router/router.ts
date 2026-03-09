@@ -55,6 +55,7 @@ import {
   ZUpdateTemplateRequestSchema,
   ZUpdateTemplateResponseSchema,
 } from './schema';
+import { searchTemplateRoute } from './search-template';
 
 export const templateRouter = router({
   /**
@@ -159,6 +160,8 @@ export const templateRouter = router({
    * @public
    */
   getMany: getTemplatesByIdsRoute,
+
+  search: searchTemplateRoute,
 
   /**
    * Wait until RR7 so we can passthrough documents.

@@ -16,6 +16,7 @@ import { EXECUTE_WEBHOOK_JOB_DEFINITION } from './definitions/internal/execute-w
 import { EXPIRE_RECIPIENTS_SWEEP_JOB_DEFINITION } from './definitions/internal/expire-recipients-sweep';
 import { PROCESS_RECIPIENT_EXPIRED_JOB_DEFINITION } from './definitions/internal/process-recipient-expired';
 import { SEAL_DOCUMENT_JOB_DEFINITION } from './definitions/internal/seal-document';
+import { SEAL_DOCUMENT_SWEEP_JOB_DEFINITION } from './definitions/internal/seal-document-sweep';
 import { SYNC_EMAIL_DOMAINS_JOB_DEFINITION } from './definitions/internal/sync-email-domains';
 
 /**
@@ -29,6 +30,7 @@ export const jobsClient = new JobClient([
   SEND_ORGANISATION_MEMBER_LEFT_EMAIL_JOB_DEFINITION,
   SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION,
   SEAL_DOCUMENT_JOB_DEFINITION,
+  SEAL_DOCUMENT_SWEEP_JOB_DEFINITION,
   SEND_PASSWORD_RESET_SUCCESS_EMAIL_JOB_DEFINITION,
   SEND_SIGNING_REJECTION_EMAILS_JOB_DEFINITION,
   SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION,

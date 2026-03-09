@@ -1,4 +1,4 @@
-import { lazy, useMemo, useState } from 'react';
+import { lazy, useMemo, useRef, useState } from 'react';
 
 import { Plural, Trans, useLingui } from '@lingui/react/macro';
 import { EnvelopeType, RecipientRole } from '@prisma/client';
@@ -15,8 +15,8 @@ import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
-import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
@@ -31,6 +31,8 @@ import { SignFieldNumberDialog } from '~/components/dialogs/sign-field-number-di
 import { SignFieldSignatureDialog } from '~/components/dialogs/sign-field-signature-dialog';
 import { SignFieldTextDialog } from '~/components/dialogs/sign-field-text-dialog';
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
+import { EnvelopeSignerPageRenderer } from '~/components/general/envelope-signing/envelope-signer-page-renderer';
+import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
 
 import { BrandingLogo } from '../branding-logo';
 import { DocumentSigningAttachmentsPopover } from '../document-signing/document-signing-attachments-popover';
@@ -41,12 +43,10 @@ import { DocumentSigningMobileWidget } from './document-signing-mobile-widget';
 import { DocumentSigningRejectDialog } from './document-signing-reject-dialog';
 import { useRequiredEnvelopeSigningContext } from './envelope-signing-provider';
 
-const EnvelopeSignerPageRenderer = lazy(
-  async () => import('~/components/general/envelope-signing/envelope-signer-page-renderer'),
-);
-
 export const DocumentSigningPageViewV2 = () => {
   const { envelopeItems, currentEnvelopeItem, setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
+
+  const scrollableContainerRef = useRef<HTMLDivElement>(null);
 
   const {
     isDirectTemplate,
@@ -246,7 +246,10 @@ export const DocumentSigningPageViewV2 = () => {
           </div>
         </div>
 
-        <div className="embed--DocumentContainer min-w-0 flex-1 overflow-y-auto">
+        <div
+          className="embed--DocumentContainer min-w-0 flex-1 overflow-y-auto"
+          ref={scrollableContainerRef}
+        >
           <div className="flex flex-col">
             {/* Horizontal envelope item selector */}
             {envelopeItems.length > 1 && (
@@ -275,15 +278,16 @@ export const DocumentSigningPageViewV2 = () => {
             {/* Document View */}
             <div className="embed--DocumentViewer flex flex-col items-center justify-center p-2 sm:mt-4 sm:p-4">
               {currentEnvelopeItem ? (
-                <PDFViewerKonvaLazy
-                  renderer="signing"
+                <EnvelopePdfViewer
                   key={currentEnvelopeItem.id}
                   customPageRenderer={EnvelopeSignerPageRenderer}
+                  scrollParentRef={scrollableContainerRef}
+                  errorMessage={PDF_VIEWER_ERROR_MESSAGES.signing}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center py-32">
                   <p className="text-sm text-foreground">
-                    <Trans>No documents found</Trans>
+                    <Trans>No document selected</Trans>
                   </p>
                 </div>
               )}

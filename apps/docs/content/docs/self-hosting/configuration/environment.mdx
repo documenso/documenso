@@ -271,6 +271,8 @@ Documenso uses a PostgreSQL-based job queue by default. Jobs (email delivery, do
 | ----------------------------- | -------------------------------------------- | ------- |
 | `DOCUMENSO_DISABLE_TELEMETRY` | Set to `true` to disable anonymous telemetry | `false` |
 
+Telemetry also auto-disables when `NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY` is configured.
+
 Telemetry collects only: app version, installation ID, and node ID. No personal data is collected.
 
 ---

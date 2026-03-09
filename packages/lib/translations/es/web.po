@@ -8,7 +8,7 @@ msgstr ""
 "Language: es\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-02-25 04:37\n"
+"PO-Revision-Date: 2026-03-06 03:26\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -52,6 +52,10 @@ msgstr "\"{documentTitle}\" ha sido eliminado con éxito"
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "\"{placeholderEmail}\" on behalf of \"Team Name\" has invited you to sign \"example document\"."
 msgstr "\"{placeholderEmail}\" en nombre de \"Team Name\" te ha invitado a firmar \"example document\"."
+
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
+msgid "\"{title}\" has been successfully deleted"
+msgstr "\"{title}\" ha sido eliminado con éxito"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "\"Team Name\" has invited you to sign \"example document\"."
@@ -283,6 +287,29 @@ msgstr "{0} en nombre de \"{1}\" te ha invitado a {recipientActionVerb} el docum
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "{0} Teams"
 msgstr "{0} Equipos"
+
+#. placeholder {0}: currentStepData.order
+#. placeholder {1}: envelopeEditorSteps.length
+#: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
+msgctxt "The step counter"
+msgid "{0}/{1}"
+msgstr "{0}/{1}"
+
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "{amount, plural, one {Day} other {Days}}"
+msgstr "{amount, plural, one {Día} other {Días}}"
+
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "{amount, plural, one {Month} other {Months}}"
+msgstr "{amount, plural, one {Mes} other {Meses}}"
+
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "{amount, plural, one {Week} other {Weeks}}"
+msgstr "{amount, plural, one {Semana} other {Semanas}}"
+
+#: packages/ui/components/document/expiration-period-picker.tsx
+msgid "{amount, plural, one {Year} other {Years}}"
+msgstr "{amount, plural, one {Año} other {Años}}"
 
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
@@ -1084,6 +1111,7 @@ msgstr "Acción"
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
@@ -1101,6 +1129,7 @@ msgstr "Activo"
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
+#: packages/lib/constants/billing.ts
 msgctxt "Subscription status"
 msgid "Active"
 msgstr "Activa"
@@ -1116,6 +1145,7 @@ msgstr "Suscripciones Activas"
 
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 #: apps/remix/app/components/general/document/document-attachments-popover.tsx
+#: apps/remix/app/components/general/document/embedded-editor-attachment-popover.tsx
 msgid "Add"
 msgstr "Agregar"
 
@@ -1179,6 +1209,7 @@ msgid "Add another value"
 msgstr "Agregar otro valor"
 
 #: apps/remix/app/components/general/document/document-attachments-popover.tsx
+#: apps/remix/app/components/general/document/embedded-editor-attachment-popover.tsx
 msgid "Add Attachment"
 msgstr "Agregar adjunto"
 
@@ -1220,6 +1251,7 @@ msgid "Add groups"
 msgstr "Agregar grupos"
 
 #: apps/remix/app/components/general/document/document-attachments-popover.tsx
+#: apps/remix/app/components/general/document/embedded-editor-attachment-popover.tsx
 msgid "Add links to relevant documents or resources."
 msgstr "Agregar enlaces a documentos o recursos relevantes."
 
@@ -1415,6 +1447,7 @@ msgid "All Folders"
 msgstr "Todas las carpetas"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "All inserted signatures will be voided"
 msgstr "Todas las firmas insertadas serán anuladas"
 
@@ -1427,6 +1460,7 @@ msgid "All recipients have signed. The document is being processed and you will 
 msgstr "Todos los destinatarios han firmado. El documento se está procesando y recibirás una copia por correo electrónico en breve."
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "All recipients will be notified"
 msgstr "Todos los destinatarios serán notificados"
@@ -1536,6 +1570,7 @@ msgstr "Ya existe un correo electrónico con esta dirección."
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
+#: apps/remix/app/routes/embed+/v2+/authoring+/_layout.tsx
 msgid "An error occurred"
 msgstr "Ocurrió un error"
 
@@ -1625,7 +1660,7 @@ msgstr "Ocurrió un error al habilitar la firma de enlace directo."
 msgid "An error occurred while enabling the user."
 msgstr "Se produjo un error al habilitar al usuario."
 
-#: packages/ui/primitives/pdf-viewer/base.tsx
+#: apps/remix/app/components/general/pdf-viewer/pdf-viewer.tsx
 msgid "An error occurred while loading the document."
 msgstr "Se produjo un error al cargar el documento."
 
@@ -1919,6 +1954,7 @@ msgid "Are you sure you wish to delete this team?"
 msgstr "¿Estás seguro de que deseas eliminar este equipo?"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-email-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
@@ -2002,18 +2038,22 @@ msgid "At least one signature type must be enabled"
 msgstr "Al menos un tipo de firma debe estar habilitado"
 
 #: apps/remix/app/components/general/document/document-attachments-popover.tsx
+#: apps/remix/app/components/general/document/embedded-editor-attachment-popover.tsx
 msgid "Attachment added successfully."
 msgstr "Adjunto añadido exitosamente."
 
 #: apps/remix/app/components/general/document/document-attachments-popover.tsx
+#: apps/remix/app/components/general/document/embedded-editor-attachment-popover.tsx
 msgid "Attachment removed successfully."
-msgstr "<<<<<<< Updated upstream======="
+msgstr "Adjunto eliminado exitosamente."
 
 #: apps/remix/app/components/general/document-signing/document-signing-attachments-popover.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-attachments-popover.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
 #: apps/remix/app/components/general/document/document-attachments-popover.tsx
 #: apps/remix/app/components/general/document/document-attachments-popover.tsx
+#: apps/remix/app/components/general/document/embedded-editor-attachment-popover.tsx
+#: apps/remix/app/components/general/document/embedded-editor-attachment-popover.tsx
 msgid "Attachments"
 msgstr "Adjuntos"
 
@@ -2203,6 +2243,7 @@ msgid "By accepting this request, you will be granting <0>{teamName}</0> access 
 msgstr "Al aceptar esta solicitud, estarás concediendo a <0>{teamName}</0> acceso a:"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "By deleting this document, the following will occur:"
 msgstr "Al eliminar este documento, ocurrirá lo siguiente:"
 
@@ -2236,6 +2277,7 @@ msgstr "¿No puedes encontrar a alguien?"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
@@ -2246,6 +2288,7 @@ msgstr "¿No puedes encontrar a alguien?"
 #: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
@@ -2320,6 +2363,7 @@ msgstr "¿No puedes encontrar a alguien?"
 #: apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
 #: apps/remix/app/components/general/document/document-attachments-popover.tsx
+#: apps/remix/app/components/general/document/embedded-editor-attachment-popover.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
@@ -2378,9 +2422,17 @@ msgstr "Ccers"
 msgid "Center"
 msgstr "Centro"
 
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Change language"
+msgstr "Cambiar idioma"
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
 msgid "Change Recipient"
 msgstr "Cambiar destinatario"
+
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Change theme"
+msgstr "Cambiar tema"
 
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
 msgid "Character limit"
@@ -2422,6 +2474,10 @@ msgstr "Valores de Checkbox"
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Checkout"
 msgstr "Checkout"
+
+#: packages/lib/constants/i18n.ts
+msgid "Chinese"
+msgstr "Chino"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Choose an existing recipient from below to continue"
@@ -2602,9 +2658,10 @@ msgstr "Documentos Completados"
 msgid "Completed on {formattedDate}"
 msgstr "Completado el {formattedDate}"
 
-#: packages/ui/components/pdf-viewer/pdf-viewer-konva.tsx
-#: packages/ui/components/pdf-viewer/pdf-viewer-konva.tsx
-#: packages/ui/components/pdf-viewer/pdf-viewer-konva.tsx
+#: packages/lib/constants/pdf-viewer-i18n.ts
+#: packages/lib/constants/pdf-viewer-i18n.ts
+#: packages/lib/constants/pdf-viewer-i18n.ts
+#: packages/lib/constants/pdf-viewer-i18n.ts
 msgid "Configuration Error"
 msgstr "Error de configuración"
 
@@ -2630,8 +2687,8 @@ msgid "Configure document settings and options before sending."
 msgstr "Configura la configuración del documento y las opciones antes de enviar."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
-msgid "Configure email settings for the document"
-msgstr "Configura las opciones de correo electrónico para el documento"
+msgid "Configure email settings for the document."
+msgstr "Configura los ajustes de correo electrónico para el documento."
 
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
@@ -2648,8 +2705,8 @@ msgid "Configure general settings for the template."
 msgstr "Configurar ajustes generales para la plantilla."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
-msgid "Configure security settings for the document"
-msgstr "Configura la configuración de seguridad del documento"
+msgid "Configure security settings for the document."
+msgstr "Configura los ajustes de seguridad para el documento."
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "Configure template"
@@ -2959,6 +3016,10 @@ msgstr "Crear enlace directo"
 msgid "Create Direct Signing Link"
 msgstr "Crear enlace de firma directo"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
+msgid "Create Document"
+msgstr "Crear documento"
+
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Create document from template"
 msgstr "Crear documento a partir de la plantilla"
@@ -3041,6 +3102,10 @@ msgstr "Crear equipo"
 msgid "Create Team"
 msgstr "Crear Equipo"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
+msgid "Create Template"
+msgstr "Crear plantilla"
+
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Create the document as pending and ready to sign."
 msgstr "Crear el documento como pendiente y listo para firmar."
@@ -3082,6 +3147,7 @@ msgstr "Crea tu cuenta y comienza a utilizar la firma de documentos de última g
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 msgid "Created"
@@ -3107,6 +3173,14 @@ msgstr "Creado el"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "Created on {0}"
 msgstr "Creado el {0}"
+
+#: apps/remix/app/routes/embed+/v2+/authoring+/envelope.create._index.tsx
+msgid "Creating Document"
+msgstr "Creando documento"
+
+#: apps/remix/app/routes/embed+/v2+/authoring+/envelope.create._index.tsx
+msgid "Creating Template"
+msgstr "Creando plantilla"
 
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "CSV Structure"
@@ -3191,10 +3265,6 @@ msgstr "Configuración de Fecha"
 msgid "David is the Employee, Lucas is the Manager"
 msgstr "David es el empleado, Lucas es el gerente"
 
-#: packages/ui/components/document/expiration-period-picker.tsx
-msgid "Days"
-msgstr "Días"
-
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 #: packages/email/templates/organisation-invite.tsx
@@ -3245,6 +3315,12 @@ msgstr "Configuraciones de Firma por Defecto"
 msgid "Default Time Zone"
 msgstr "Zona horaria predeterminada"
 
+#: apps/remix/app/components/forms/editor/editor-field-radio-form.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx
+msgid "Default value"
+msgstr "Valor predeterminado"
+
 #: apps/remix/app/components/forms/editor/editor-field-dropdown-form.tsx
 #: apps/remix/app/components/forms/editor/editor-field-dropdown-form.tsx
 msgid "Default Value"
@@ -3255,11 +3331,13 @@ msgid "Delegate Document Ownership"
 msgstr "Delegar la propiedad del documento"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "delete"
 msgstr "eliminar"
 
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
@@ -3351,6 +3429,10 @@ msgstr "Eliminar dominio de correo electrónico"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "Delete Email Domain"
 msgstr "Eliminar dominio de correo"
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
+msgid "Delete Envelope"
+msgstr "Eliminar sobre"
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "Delete Folder"
@@ -3499,6 +3581,7 @@ msgstr "enlace directo"
 msgid "Direct link"
 msgstr "Enlace directo"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
@@ -3727,6 +3810,7 @@ msgid "Document created"
 msgstr "Documento creado"
 
 #: apps/remix/app/routes/embed+/v1+/authoring_.completed.create.tsx
+#: apps/remix/app/routes/embed+/v2+/authoring+/envelope.create._index.tsx
 msgid "Document Created"
 msgstr "Documento Creado"
 
@@ -3750,6 +3834,7 @@ msgstr "Creación de documento"
 
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 msgid "Document deleted"
 msgstr "Documento eliminado"
@@ -3900,6 +3985,7 @@ msgid "Document signing auth updated"
 msgstr "Se actualizó la autenticación de firma del documento"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Document signing process will be cancelled"
 msgstr "El proceso de firma del documento será cancelado"
 
@@ -3923,6 +4009,10 @@ msgstr "Título del documento actualizado"
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
 msgid "Document updated"
+msgstr "Documento actualizado"
+
+#: apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
+msgid "Document Updated"
 msgstr "Documento actualizado"
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
@@ -3967,6 +4057,7 @@ msgid "Document Volume"
 msgstr "Volumen del documento"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Document will be permanently deleted"
 msgstr "El documento será eliminado permanentemente"
 
@@ -4029,6 +4120,10 @@ msgstr "Los documentos que requieren tu atención aparecerán aquí"
 msgid "Documents Viewed"
 msgstr "Documentos vistos"
 
+#: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
+msgid "Documents where all recipients have signed but the document has not been sealed. Documents stuck for more than 6 hours are no longer retried by the sweep job."
+msgstr "Documentos en los que todos los destinatarios han firmado pero el documento no se ha sellado. Los documentos atascados durante más de 6 horas ya no se vuelven a procesar mediante la tarea de barrido."
+
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 msgid "Domain"
@@ -4088,6 +4183,7 @@ msgid "Download Files"
 msgstr "Descargar archivos"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
+#: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 #: apps/remix/app/components/general/envelope-signing/envelope-signer-header.tsx
 msgid "Download PDF"
@@ -4173,6 +4269,10 @@ msgstr "Duplicar"
 msgid "Duplicate Document"
 msgstr "Documento Duplicado"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
+msgid "Duplicate Envelope"
+msgstr "Duplicar sobre (envelope)"
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
 #: packages/ui/primitives/document-flow/field-item.tsx
 msgid "Duplicate on all pages"
@@ -4187,10 +4287,16 @@ msgstr "Plantilla Duplicada"
 msgid "Duplicate values are not allowed"
 msgstr "No se permiten valores duplicados"
 
+#: packages/lib/constants/i18n.ts
+msgid "Dutch"
+msgstr "Neerlandés"
+
+#: apps/remix/app/components/forms/editor/editor-field-number-form.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "E.g. 0"
 msgstr "Ej.: 0"
 
+#: apps/remix/app/components/forms/editor/editor-field-number-form.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "E.g. 100"
 msgstr "Ej.: 100"
@@ -4528,6 +4634,14 @@ msgstr "Documento Adjunto"
 msgid "Enclosed Documents"
 msgstr "Documentos adjuntos"
 
+#: packages/lib/constants/i18n.ts
+msgid "English"
+msgstr "Inglés"
+
+#: apps/remix/app/routes/embed+/v2+/authoring+/_layout.tsx
+msgid "Ensure that you are using the embedding token, not the API token"
+msgstr "Asegúrate de que estás utilizando el token de incrustación, no el token de la API"
+
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
@@ -4662,6 +4776,7 @@ msgstr "Título del Sobre"
 msgid "Envelope updated"
 msgstr "Sobre actualizado"
 
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-disable-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-enable-dialog.tsx
@@ -4718,6 +4833,7 @@ msgstr "Sobre actualizado"
 #: apps/remix/app/components/general/envelope-signing/envelope-signer-page-renderer.tsx
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+#: apps/remix/app/components/general/pdf-viewer/pdf-viewer.tsx
 #: apps/remix/app/components/general/template/template-edit-form.tsx
 #: apps/remix/app/components/general/template/template-edit-form.tsx
 #: apps/remix/app/components/general/template/template-edit-form.tsx
@@ -4735,8 +4851,9 @@ msgstr "Sobre actualizado"
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
 #: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
 #: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
+#: apps/remix/app/routes/embed+/v2+/authoring+/envelope.create._index.tsx
+#: apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
-#: packages/ui/primitives/pdf-viewer/base.tsx
 msgid "Error"
 msgstr "Error"
 
@@ -4747,6 +4864,10 @@ msgstr "Error al rechazar el enlace de cuenta"
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "Error linking account"
 msgstr "Error al vincular la cuenta"
+
+#: apps/remix/app/components/general/pdf-viewer/pdf-viewer-page-image.tsx
+msgid "Error loading page"
+msgstr "Error al cargar la página"
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Error uploading file"
@@ -4835,6 +4956,10 @@ msgstr "Error"
 msgid "Failed to complete the document. Please try again."
 msgstr "No se pudo completar el documento. Inténtalo de nuevo."
 
+#: apps/remix/app/routes/embed+/v2+/authoring+/envelope.create._index.tsx
+msgid "Failed to create document. Please try again."
+msgstr "No se pudo crear el documento. Inténtalo de nuevo."
+
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Failed to create folder"
 msgstr "No se pudo crear la carpeta"
@@ -4863,6 +4988,10 @@ msgstr "Error al cargar el documento"
 msgid "Failed to move folder"
 msgstr "Error al mover la carpeta"
 
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Failed to move subscription. Please try again."
+msgstr "No se pudo mover la suscripción. Inténtalo de nuevo."
+
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Failed to re-register email domain"
 msgstr "Error al volver a registrar el dominio de correo electrónico"
@@ -4887,6 +5016,10 @@ msgstr "Error al cerrar sesión en todas las sesiones"
 msgid "Failed to sync license"
 msgstr "Error al sincronizar la licencia"
 
+#: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
+msgid "Failed to trigger seal"
+msgstr "Error al activar el sellado"
+
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 msgid "Failed to unlink account"
 msgstr "No se pudo desvincular la cuenta"
@@ -4894,6 +5027,10 @@ msgstr "No se pudo desvincular la cuenta"
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
 msgid "Failed to update document"
 msgstr "No se pudo actualizar el documento"
+
+#: apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
+msgid "Failed to update envelope. Please try again."
+msgstr "No se pudo actualizar el sobre (envelope). Inténtalo de nuevo."
 
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 msgid "Failed to update recipient"
@@ -5099,6 +5236,10 @@ msgstr "Firma gratuita"
 msgid "Free Signature Settings"
 msgstr "Configuración de Firma Gratuita"
 
+#: packages/lib/constants/i18n.ts
+msgid "French"
+msgstr "Francés"
+
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
@@ -5130,6 +5271,10 @@ msgstr "Generar registros DKIM"
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Generate Links"
 msgstr "Generar enlaces"
+
+#: packages/lib/constants/i18n.ts
+msgid "German"
+msgstr "Alemán"
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 msgid "Global recipient action authentication"
@@ -5328,6 +5473,7 @@ msgid "Hi, {userName} <0>({userEmail})</0>"
 msgstr "Hola, {userName} <0>({userEmail})</0>"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Hide"
@@ -5417,6 +5563,10 @@ msgstr "Identificando destinatarios"
 msgid "If there is any issue with your subscription, please contact us at <0>{SUPPORT_EMAIL}</0>."
 msgstr "Si tienes algún problema con tu suscripción, por favor contáctanos en <0>{SUPPORT_EMAIL}</0>."
 
+#: apps/remix/app/routes/embed+/v2+/authoring+/_layout.tsx
+msgid "If you are using staging, ensure that you have set the host prop on the embedding component to the staging domain (https://stg-app.documenso.com)"
+msgstr "Si estás utilizando el entorno de pruebas (staging), asegúrate de haber establecido la propiedad host del componente de incrustación al dominio de staging (https://stg-app.documenso.com)"
+
 #: packages/email/template-components/template-access-auth-2fa.tsx
 msgid "If you didn't request this verification code, you can safely ignore this email."
 msgstr "Si no solicitaste este código de verificación, puedes ignorar este correo electrónico con seguridad."
@@ -5438,6 +5588,7 @@ msgid "Important: What This Means"
 msgstr "Importante: Lo que esto significa"
 
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
+#: packages/lib/constants/billing.ts
 msgctxt "Subscription status"
 msgid "Inactive"
 msgstr "Inactiva"
@@ -5536,10 +5687,14 @@ msgid "Invalid domains"
 msgstr "Dominios no válidos"
 
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
-#: packages/lib/types/recipient.ts
 #: packages/ui/primitives/document-flow/add-signers.types.ts
 msgid "Invalid email"
 msgstr "Email inválido"
+
+#: apps/remix/app/routes/embed+/v2+/authoring+/envelope.create._index.tsx
+#: apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
+msgid "Invalid Embedding Parameters"
+msgstr "Parámetros de incrustación no válidos"
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/_layout.tsx
 msgid "Invalid embedding presign token provided"
@@ -5668,6 +5823,14 @@ msgstr "Actualmente no es tu turno para firmar. Por favor, vuelve pronto ya que 
 msgid "It's currently not your turn to sign. You will receive an email with instructions once it's your turn to sign the document."
 msgstr "Actualmente no es tu turno para firmar. Recibirás un correo electrónico con instrucciones una vez sea tu turno para firmar el documento."
 
+#: packages/lib/constants/i18n.ts
+msgid "Italian"
+msgstr "Italiano"
+
+#: packages/lib/constants/i18n.ts
+msgid "Japanese"
+msgstr "Japonés"
+
 #: packages/email/templates/organisation-invite.tsx
 msgid "Join {organisationName} on Documenso"
 msgstr "Únete a {organisationName} en Documenso"
@@ -5685,9 +5848,14 @@ msgstr "Unido"
 msgid "Joined {0}"
 msgstr "Se unió a {0}"
 
+#: packages/lib/constants/i18n.ts
+msgid "Korean"
+msgstr "Coreano"
+
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
 #: apps/remix/app/components/general/document/document-attachments-popover.tsx
+#: apps/remix/app/components/general/document/embedded-editor-attachment-popover.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
@@ -5737,6 +5905,10 @@ msgstr "Última modificación"
 #: apps/remix/app/components/tables/admin-document-jobs-table.tsx
 msgid "Last Retried"
 msgstr "Último reintento"
+
+#: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
+msgid "Last Signed"
+msgstr "Última firma"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
@@ -5886,12 +6058,9 @@ msgstr "Cargando"
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 #: apps/remix/app/components/general/skeletons/document-edit-skeleton.tsx
-#: packages/ui/components/pdf-viewer/pdf-viewer-konva.tsx
-#: packages/ui/primitives/pdf-viewer/base.tsx
 msgid "Loading document..."
 msgstr "Cargando documento..."
 
-#: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
 #: apps/remix/app/components/general/skeletons/document-edit-skeleton.tsx
 msgid "Loading Document..."
 msgstr "Cargando Documento..."
@@ -5904,8 +6073,6 @@ msgstr "Cargando sugerencias..."
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
-#: packages/ui/components/pdf-viewer/pdf-viewer-konva-lazy.tsx
-#: packages/ui/primitives/pdf-viewer/lazy.tsx
 msgid "Loading..."
 msgstr "Cargando..."
 
@@ -6212,10 +6379,6 @@ msgstr "Usuarios activos mensuales: Usuarios que crearon al menos un documento"
 msgid "Monthly Active Users: Users that had at least one of their documents completed"
 msgstr "Usuarios activos mensuales: Usuarios que completaron al menos uno de sus documentos"
 
-#: packages/ui/components/document/expiration-period-picker.tsx
-msgid "Months"
-msgstr "Meses"
-
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
@@ -6240,6 +6403,12 @@ msgstr "Mover documentos a la carpeta"
 msgid "Move Folder"
 msgstr "Mover Carpeta"
 
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+#: apps/remix/app/components/tables/admin-organisations-table.tsx
+msgid "Move Subscription"
+msgstr "Mover suscripción"
+
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "Move Template to Folder"
 msgstr "Mover Plantilla a Carpeta"
@@ -6247,6 +6416,10 @@ msgstr "Mover Plantilla a Carpeta"
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "Move Templates to Folder"
 msgstr "Mover plantillas a la carpeta"
+
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Move the subscription from \"{sourceOrganisationName}\" to another organisation owned by this user."
+msgstr "Mover la suscripción de \"{sourceOrganisationName}\" a otra organización propiedad de este usuario."
 
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
@@ -6342,6 +6515,19 @@ msgstr "Nunca expira"
 msgid "Never expires"
 msgstr "Nunca vence"
 
+#: apps/remix/app/components/forms/editor/editor-field-dropdown-form.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
+msgid "New option"
+msgstr "Nueva opción"
+
+#. placeholder {0}: i + 1
+#: apps/remix/app/components/forms/editor/editor-field-dropdown-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-dropdown-form.tsx
+#: apps/remix/app/components/forms/editor/editor-field-dropdown-form.tsx
+msgid "New option {0}"
+msgstr "Nueva opción {0}"
+
 #: apps/remix/app/components/forms/password.tsx
 msgid "New Password"
 msgstr "Nueva Contraseña"
@@ -6379,11 +6565,23 @@ msgstr "No"
 msgid "No active drafts"
 msgstr "No hay borradores activos"
 
+#: apps/remix/app/components/general/pdf-viewer/envelope-pdf-viewer.tsx
+#: apps/remix/app/components/general/pdf-viewer/pdf-viewer.tsx
+msgid "No document found"
+msgstr "No se encontró ningún documento"
+
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
+msgid "No document selected"
+msgstr "Ningún documento seleccionado"
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 msgid "No documents found"
 msgstr "No se encontraron documentos"
+
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "No eligible organisations found. The target must be on the free plan."
+msgstr "No se encontraron organizaciones aptas. El destino debe estar en el plan gratuito."
 
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "No email detected"
@@ -6606,6 +6804,7 @@ msgid "On this page, you can create new Webhooks and manage the existing ones."
 msgstr "En esta página, puedes editar el webhook y sus configuraciones."
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Once confirmed, the following will occur:"
 msgstr "Una vez confirmado, ocurrirá lo siguiente:"
@@ -6661,6 +6860,14 @@ msgstr "Abrir menú"
 #: apps/remix/app/components/general/stack-avatars-with-tooltip.tsx
 msgid "Opened"
 msgstr "Abierto"
+
+#: apps/remix/app/components/forms/editor/editor-field-dropdown-form.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
+msgid "Option 1"
+msgstr "Opción 1"
 
 #: apps/remix/app/components/forms/editor/editor-field-dropdown-form.tsx
 msgid "Option value cannot be empty"
@@ -6840,6 +7047,7 @@ msgstr "Anular la configuración de la organización"
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
@@ -6857,11 +7065,9 @@ msgstr "Propiedad transferida a {organisationMemberName}."
 msgid "Page {0} of {1}"
 msgstr "Página {0} de {1}"
 
-#. placeholder {0}: i + 1
-#: packages/ui/components/pdf-viewer/pdf-viewer-konva.tsx
-#: packages/ui/primitives/pdf-viewer/base.tsx
-msgid "Page {0} of {numPages}"
-msgstr "Página {0} de {numPages}"
+#: apps/remix/app/components/general/pdf-viewer/pdf-viewer.tsx
+msgid "Page {pageNumber} of {numPages}"
+msgstr "Página {pageNumber} de {numPages}"
 
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 msgctxt "Subscription status"
@@ -6950,6 +7156,7 @@ msgstr "¡Contraseña actualizada!"
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
+#: packages/lib/constants/billing.ts
 msgctxt "Subscription status"
 msgid "Past Due"
 msgstr "Vencida"
@@ -7118,6 +7325,7 @@ msgid "Please confirm your email address"
 msgstr "Por favor confirma tu dirección de correo electrónico"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Please contact support if you would like to revert this action."
 msgstr "Por favor, contacta al soporte si deseas revertir esta acción."
 
@@ -7176,13 +7384,19 @@ msgid "Please note that proceeding will remove direct linking recipient and turn
 msgstr "Por favor, ten en cuenta que proceder eliminará el destinatario de enlace directo y lo convertirá en un marcador de posición."
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Please note that this action is <0>irreversible</0>."
 msgstr "Por favor, ten en cuenta que esta acción es <0>irreversible</0>."
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Please note that this action is <0>irreversible</0>. Once confirmed, this document will be permanently deleted."
 msgstr "Por favor, ten en cuenta que esta acción es <0>irreversible</0>. Una vez confirmada, este documento será eliminado permanentemente."
+
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
+msgid "Please note that this action is <0>irreversible</0>. Once confirmed, this template will be permanently deleted."
+msgstr "Ten en cuenta que esta acción es <0>irreversible</0>. Una vez confirmada, esta plantilla se eliminará permanentemente."
 
 #: apps/remix/app/components/dialogs/template-delete-dialog.tsx
 msgid "Please note that this action is irreversible. Once confirmed, your template will be permanently deleted."
@@ -7244,15 +7458,14 @@ msgstr "Por favor, intenta con un dominio diferente."
 msgid "Please try again and make sure you enter the correct email address."
 msgstr "Por favor, intenta de nuevo y asegúrate de ingresar la dirección de correo electrónico correcta."
 
-#: packages/ui/components/pdf-viewer/pdf-viewer-konva.tsx
-#: packages/ui/components/pdf-viewer/pdf-viewer-konva.tsx
-#: packages/ui/primitives/pdf-viewer/base.tsx
-#: packages/ui/primitives/pdf-viewer/base.tsx
+#: apps/remix/app/components/general/pdf-viewer/pdf-viewer-states.tsx
 msgid "Please try again or contact our support."
 msgstr "Por favor, inténtalo de nuevo o contacta a nuestro soporte."
 
 #. placeholder {0}: `'${_(deleteMessage)}'`
+#. placeholder {0}: `'${t(deleteMessage)}'`
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Please type {0} to confirm"
 msgstr "Por favor, escriba {0} para confirmar"
 
@@ -7269,6 +7482,14 @@ msgstr "Por favor, carga un documento para continuar"
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Please upload a logo"
 msgstr "Por favor, suba un logotipo"
+
+#: packages/lib/constants/i18n.ts
+msgid "Polish"
+msgstr "Polaco"
+
+#: packages/lib/constants/i18n.ts
+msgid "Portuguese (Brazil)"
+msgstr "Portugués (Brasil)"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: packages/ui/primitives/document-flow/field-item.tsx
@@ -7608,6 +7829,7 @@ msgid "Recipients will be able to sign the document once sent"
 msgstr "Los destinatarios podrán firmar el documento una vez enviado"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Recipients will still retain their copy of the document"
 msgstr "Los destinatarios aún conservarán su copia del documento"
 
@@ -7820,6 +8042,10 @@ msgstr "Campo obligatorio"
 msgid "Required scopes"
 msgstr "Ámbitos requeridos"
 
+#: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
+msgid "Reseal"
+msgstr "Volver a sellar"
+
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Reseal document"
 msgstr "Re-sellar documento"
@@ -7844,6 +8070,10 @@ msgstr "Reenviar correo de confirmación"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Resend Document"
 msgstr "Reenviar documento"
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
+msgid "Resend Envelope"
+msgstr "Reenviar sobre (envelope)"
 
 #: apps/remix/app/components/general/teams/team-email-dropdown.tsx
 msgid "Resend verification"
@@ -8026,6 +8256,10 @@ msgstr "Guardado fallido"
 msgid "Save Template"
 msgstr "Guardar plantilla"
 
+#: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
+msgid "Seal job triggered"
+msgstr "Tarea de sellado activada"
+
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Sealing job started"
 msgstr "Se inició el trabajo de sellado"
@@ -8172,6 +8406,10 @@ msgstr "Selecciona un tipo de evento"
 #: packages/ui/primitives/combobox.tsx
 msgid "Select an option"
 msgstr "Seleccionar una opción"
+
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Select an organisation"
+msgstr "Seleccionar una organización"
 
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 msgid "Select an organisation to view teams"
@@ -8356,6 +8594,10 @@ msgstr "Enviar documentos en nombre del equipo usando la dirección de correo el
 msgid "Send documents to recipients immediately"
 msgstr "Enviar documentos a los destinatarios inmediatamente"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
+msgid "Send Envelope"
+msgstr "Enviar sobre (envelope)"
+
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Send on Behalf of Team"
 msgstr "Enviar en nombre del equipo"
@@ -8419,6 +8661,7 @@ msgstr "Configura las propiedades de tu plantilla y la información del destinat
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+#: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 #: apps/remix/app/components/general/folder/folder-card.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
@@ -8749,6 +8992,7 @@ msgstr "Algunos firmantes no han sido asignados a un campo de firma. Asigne al m
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
@@ -8808,10 +9052,7 @@ msgstr "Algo salió mal al detectar los campos."
 msgid "Something went wrong while detecting recipients."
 msgstr "Algo salió mal al detectar los destinatarios."
 
-#: packages/ui/components/pdf-viewer/pdf-viewer-konva.tsx
-#: packages/ui/components/pdf-viewer/pdf-viewer-konva.tsx
-#: packages/ui/primitives/pdf-viewer/base.tsx
-#: packages/ui/primitives/pdf-viewer/base.tsx
+#: apps/remix/app/components/general/pdf-viewer/pdf-viewer-states.tsx
 msgid "Something went wrong while loading the document."
 msgstr "Algo salió mal al cargar el documento."
 
@@ -8819,8 +9060,12 @@ msgstr "Algo salió mal al cargar el documento."
 msgid "Something went wrong while loading your passkeys."
 msgstr "Algo salió mal al cargar tus claves de acceso."
 
-#: packages/ui/components/pdf-viewer/pdf-viewer-konva.tsx
-#: packages/ui/components/pdf-viewer/pdf-viewer-konva.tsx
+#: packages/lib/constants/pdf-viewer-i18n.ts
+msgid "Something went wrong while rendering the document, please try again or contact our support."
+msgstr "Se ha producido un error al renderizar el documento, inténtalo de nuevo o contacta con nuestro soporte."
+
+#: packages/lib/constants/pdf-viewer-i18n.ts
+#: packages/lib/constants/pdf-viewer-i18n.ts
 msgid "Something went wrong while rendering the document, some fields may be missing or corrupted."
 msgstr "Algo salió mal al renderizar el documento, algunos campos pueden faltar o estar corruptos."
 
@@ -8873,6 +9118,10 @@ msgstr "Fuente"
 msgid "Space-separated list of domains. Leave empty to allow all domains."
 msgstr "Lista de dominios separados por espacios. Deje vacío para permitir todos los dominios."
 
+#: packages/lib/constants/i18n.ts
+msgid "Spanish"
+msgstr "Español"
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 msgid "SSO"
 msgstr "SSO"
@@ -8921,6 +9170,10 @@ msgstr "Cliente de Stripe creado con éxito"
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Stripe Customer ID"
 msgstr "ID de Cliente de Stripe"
+
+#: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
+msgid "Stuck For"
+msgstr "Atascado durante"
 
 #: apps/remix/app/components/forms/support-ticket-form.tsx
 msgid "Subject"
@@ -8973,12 +9226,17 @@ msgstr "Reclamos de suscripción"
 msgid "Subscription invalid"
 msgstr "Suscripción inválida"
 
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Subscription moved successfully"
+msgstr "La suscripción se movió correctamente"
+
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgid "Subscription Status"
 msgstr "Estado de la suscripción"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
@@ -9013,6 +9271,8 @@ msgstr "Estado de la suscripción"
 #: apps/remix/app/components/forms/team-update-form.tsx
 #: apps/remix/app/components/general/document/document-attachments-popover.tsx
 #: apps/remix/app/components/general/document/document-attachments-popover.tsx
+#: apps/remix/app/components/general/document/embedded-editor-attachment-popover.tsx
+#: apps/remix/app/components/general/document/embedded-editor-attachment-popover.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
@@ -9092,6 +9352,10 @@ msgstr "Requisitos del Sistema"
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "System Theme"
 msgstr "Tema del sistema"
+
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "Target Organisation"
+msgstr "Organización de destino"
 
 #: apps/remix/app/components/tables/admin-user-teams-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
@@ -9266,6 +9530,7 @@ msgid "Template (Legacy)"
 msgstr "Plantilla (Legado)"
 
 #: apps/remix/app/routes/embed+/v1+/authoring_.completed.create.tsx
+#: apps/remix/app/routes/embed+/v2+/authoring+/envelope.create._index.tsx
 msgid "Template Created"
 msgstr "Plantilla Creada"
 
@@ -9316,6 +9581,10 @@ msgstr "Configuración de plantillas"
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "Template title"
 msgstr "Título de plantilla"
+
+#: apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
+msgid "Template Updated"
+msgstr "Plantilla actualizada"
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
 msgid "Template updated successfully"
@@ -9488,6 +9757,7 @@ msgid "The document was created but could not be sent to recipients."
 msgstr "El documento fue creado pero no se pudo enviar a los destinatarios."
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "The document will be hidden from your account"
 msgstr "El documento será ocultado de tu cuenta"
 
@@ -9798,7 +10068,7 @@ msgstr "Aún no hay documentos completados. Los documentos que hayas creado o re
 msgid "There was an error uploading your file. Please try again."
 msgstr "Hubo un error al cargar tu archivo. Por favor, intenta de nuevo."
 
-#: packages/ui/components/pdf-viewer/pdf-viewer-konva.tsx
+#: packages/lib/constants/pdf-viewer-i18n.ts
 msgid "There was an issue rendering some fields, please review the fields and try again."
 msgstr "Hubo un problema renderizando algunos campos, por favor revise los campos e intente nuevamente."
 
@@ -9854,6 +10124,7 @@ msgid "This document cannot be changed"
 msgstr "Este documento no se puede cambiar"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "This document could not be deleted at this time. Please try again."
 msgstr "Este documento no se pudo eliminar en este momento. Por favor, inténtalo de nuevo."
 
@@ -10070,6 +10341,11 @@ msgstr "Esto verificará y sincronizará el estado de todos los dominios de corr
 msgid "This will delete the existing SES identity for <0>{0}</0> and recreate it using the same DKIM keys. The user will not need to update their DNS records. The domain status will be reset to Pending."
 msgstr "Esto eliminará la identidad de SES existente para <0>{0}</0> y la volverá a crear usando las mismas claves DKIM. El usuario no tendrá que actualizar sus registros DNS. El estado del dominio se restablecerá a Pendiente."
 
+#. placeholder {0}: selectedOrg.name
+#: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
+msgid "This will move the subscription from \"{sourceOrganisationName}\" to \"{0}\". The source organisation will be reset to the free plan."
+msgstr "Esto moverá la suscripción de \"{sourceOrganisationName}\" a \"{0}\". La organización de origen se restablecerá al plan gratuito."
+
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "This will ONLY backport feature flags which are set to true, anything disabled in the initial claim will not be backported"
 msgstr "Esto solo retroalimentará las banderas de características que estén configuradas como verdaderas, cualquier cosa desactivada en la reclamo inicial no será retroalimentada"
@@ -10107,6 +10383,7 @@ msgstr "Zona horaria"
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
 #: packages/ui/primitives/document-flow/add-settings.tsx
 msgid "Title"
 msgstr "Título"
@@ -10291,6 +10568,10 @@ msgstr "El token ha expirado. Por favor, inténtelo de nuevo."
 #: apps/remix/app/components/forms/token.tsx
 msgid "Token name"
 msgstr "Nombre del token"
+
+#: apps/remix/app/routes/embed+/v2+/authoring+/_layout.tsx
+msgid "Token Not Found"
+msgstr "Token no encontrado"
 
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
@@ -10539,6 +10820,11 @@ msgstr "Desvincular"
 msgid "Unpin"
 msgstr "Desanclar"
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
+msgid "Unsealed Documents"
+msgstr "Documentos sin sellar"
+
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Untitled Group"
 msgstr "Grupo sin título"
@@ -10586,6 +10872,10 @@ msgstr "Actualizar reclamo"
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Update current organisation"
 msgstr "Actualizar organización actual"
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
+msgid "Update Document"
+msgstr "Actualizar documento"
 
 #: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
 msgid "Update email"
@@ -10653,6 +10943,10 @@ msgstr "Actualizar grupo de equipo"
 msgid "Update team member"
 msgstr "Actualizar miembro del equipo"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
+msgid "Update Template"
+msgstr "Actualizar plantilla"
+
 #: packages/lib/constants/template.ts
 msgid "Update the role and add fields as required for the direct recipient. The individual who uses the direct link will sign the document as the direct recipient."
 msgstr "Actualizar el rol y agregar campos según sea necesario para el destinatario directo. La persona que utilice el enlace directo firmará el documento como destinatario directo."
@@ -10665,9 +10959,17 @@ msgstr "Actualizar usuario"
 msgid "Updated {organisationMemberName} to {roleLabel}."
 msgstr "Actualizado {organisationMemberName} a {roleLabel}."
 
+#: apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
+msgid "Updating Document"
+msgstr "Actualizando documento"
+
 #: apps/remix/app/components/forms/password.tsx
 msgid "Updating password..."
 msgstr "Actualizando contraseña..."
+
+#: apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
+msgid "Updating Template"
+msgstr "Actualizando plantilla"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Updating Your Information"
@@ -10781,6 +11083,7 @@ msgid "Uploading"
 msgstr "Subiendo"
 
 #: apps/remix/app/components/general/document/document-attachments-popover.tsx
+#: apps/remix/app/components/general/document/embedded-editor-attachment-popover.tsx
 msgid "URL"
 msgstr "URL"
 
@@ -11527,10 +11830,6 @@ msgstr "URL del Webhook"
 msgid "Webhooks"
 msgstr "Webhooks"
 
-#: packages/ui/components/document/expiration-period-picker.tsx
-msgid "Weeks"
-msgstr "Semanas"
-
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Welcome"
 msgstr "Bienvenido"
@@ -11616,10 +11915,6 @@ msgstr "Escribe una descripción para mostrar en tu perfil público"
 msgid "Yearly"
 msgstr "Anual"
 
-#: packages/ui/components/document/expiration-period-picker.tsx
-msgid "Years"
-msgstr "Años"
-
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
@@ -11666,6 +11961,10 @@ msgstr "Está a punto de completar la visualización del siguiente documento"
 msgid "You are about to delete <0>\"{documentTitle}\"</0>"
 msgstr "Estás a punto de eliminar <0>\"{documentTitle}\"</0>"
 
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
+msgid "You are about to delete <0>\"{title}\"</0>"
+msgstr "Estás a punto de eliminar <0>\"{title}\"</0>"
+
 #. placeholder {0}: organisation.name
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 msgid "You are about to delete <0>{0}</0>. All data related to this organisation such as teams, documents, and all other resources will be deleted. This action is irreversible."
@@ -11682,6 +11981,10 @@ msgstr "Estás a punto de dar acceso a todos los miembros de la organización a 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "You are about to hide <0>\"{documentTitle}\"</0>"
 msgstr "Estás a punto de ocultar <0>\"{documentTitle}\"</0>"
+
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
+msgid "You are about to hide <0>\"{title}\"</0>"
+msgstr "Estás a punto de ocultar <0>\"{title}\"</0>"
 
 #: apps/remix/app/components/dialogs/organisation-leave-dialog.tsx
 msgid "You are about to leave the following organisation."
@@ -12445,6 +12748,7 @@ msgid "Your document has been created from the template successfully."
 msgstr "Tu documento se ha creado exitosamente a partir de la plantilla."
 
 #: apps/remix/app/routes/embed+/v1+/authoring_.completed.create.tsx
+#: apps/remix/app/routes/embed+/v2+/authoring+/envelope.create._index.tsx
 msgid "Your document has been created successfully"
 msgstr "Tu documento se ha creado exitosamente"
 
@@ -12463,6 +12767,10 @@ msgstr "Tu documento ha sido enviado con éxito."
 #: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
 msgid "Your document has been successfully duplicated."
 msgstr "Tu documento ha sido duplicado con éxito."
+
+#: apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
+msgid "Your document has been updated successfully"
+msgstr "Tu documento se ha actualizado correctamente"
 
 #: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
@@ -12615,6 +12923,7 @@ msgid "Your team has been successfully updated."
 msgstr "Tu equipo ha sido actualizado con éxito."
 
 #: apps/remix/app/routes/embed+/v1+/authoring_.completed.create.tsx
+#: apps/remix/app/routes/embed+/v2+/authoring+/envelope.create._index.tsx
 msgid "Your template has been created successfully"
 msgstr "Tu plantilla se ha creado exitosamente"
 
@@ -12625,6 +12934,10 @@ msgstr "Tu plantilla ha sido duplicada con éxito."
 #: apps/remix/app/components/dialogs/template-delete-dialog.tsx
 msgid "Your template has been successfully deleted."
 msgstr "Tu plantilla ha sido eliminada con éxito."
+
+#: apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
+msgid "Your template has been updated successfully"
+msgstr "Tu plantilla se ha actualizado correctamente"
 
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
