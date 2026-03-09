@@ -13,7 +13,7 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
     throw new Error('Missing token');
   }
 
-  const result = await prisma.envelope.findFirstOrThrow({
+  const result = await prisma.envelope.findFirst({
     where: {
       type: EnvelopeType.DOCUMENT,
       status: DocumentStatus.COMPLETED,
@@ -56,10 +56,14 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
     },
   });
 
-  const firstDocumentData = result.envelopeItems[0].documentData;
+  if (!result) {
+    return null;
+  }
+
+  const firstDocumentData = result.envelopeItems[0]?.documentData;
 
   if (!firstDocumentData) {
-    throw new Error('Missing document data');
+    return null;
   }
 
   return {
