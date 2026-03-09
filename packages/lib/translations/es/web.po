@@ -12948,6 +12948,10 @@ msgstr "Su plantilla ha sido subida exitosamente."
 msgid "Your template will be duplicated."
 msgstr "Tu plantilla será duplicada."
 
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Your templates"
+msgstr ""
+
 #: apps/remix/app/components/general/template/template-edit-form.tsx
 msgid "Your templates has been saved successfully."
 msgstr "Tus plantillas han sido guardadas con éxito."
@@ -12979,4 +12983,3 @@ msgstr "Su código de verificación:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "su-dominio.com otro-dominio.com"
-

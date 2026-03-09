@@ -12948,6 +12948,10 @@ msgstr "템플릿이 성공적으로 업로드되었습니다."
 msgid "Your template will be duplicated."
 msgstr "템플릿이 복제됩니다."
 
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Your templates"
+msgstr ""
+
 #: apps/remix/app/components/general/template/template-edit-form.tsx
 msgid "Your templates has been saved successfully."
 msgstr "템플릿이 성공적으로 저장되었습니다."
@@ -12979,4 +12983,3 @@ msgstr "인증 코드:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
-
