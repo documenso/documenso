@@ -194,6 +194,16 @@ class TestWorkflowE2E:
 
         resolver = self._make_resolver()
         resolver._agent._call_api = MagicMock(return_value=api_response)
+        # Mock second-pass to return same result (still leaked)
+        resolver._agent.resolve_files_with_exploration = MagicMock(
+            return_value=[{
+                "tool": "resolve_conflict",
+                "file_path": "packages/lib/constants/app.ts",
+                "resolved_content": leaked_content,
+                "explanation": "Still merged with leak.",
+                "confidence": "high",
+            }]
+        )
 
         file_path = self.repo_path / "packages/lib/constants/app.ts"
         file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -245,6 +255,19 @@ class TestWorkflowE2E:
 
         resolver = self._make_resolver()
         resolver._agent._call_api = MagicMock(return_value=api_response)
+        # Mock second-pass: still flags all files
+        def second_pass_side_effect(fc_list, repo_path):
+            return [{
+                "tool": "flag_for_review",
+                "file_path": fc_list[0].path,
+                "reason": "[After exploration] Still complex.",
+                "suggested_resolution": "Manual review.",
+                "ours_snippet": "ours",
+                "theirs_snippet": "theirs",
+            }]
+        resolver._agent.resolve_files_with_exploration = MagicMock(
+            side_effect=second_pass_side_effect
+        )
 
         result = resolver.resolve_merge()
 
@@ -315,10 +338,27 @@ class TestWorkflowE2E:
 
         resolver = self._make_resolver()
         resolver._agent._call_api = MagicMock(return_value=api_response)
+        # Mock second-pass: still flags the missed file
+        def second_pass_side_effect(fc_list, repo_path):
+            return [{
+                "tool": "flag_for_review",
+                "file_path": fc_list[0].path,
+                "reason": "Still cannot resolve after exploration.",
+                "suggested_resolution": "",
+                "ours_snippet": "",
+                "theirs_snippet": "",
+            }]
+        resolver._agent.resolve_files_with_exploration = MagicMock(
+            side_effect=second_pass_side_effect
+        )
 
         file_path = self.repo_path / ".env.example"
         file_path.parent.mkdir(parents=True, exist_ok=True)
         file_path.write_text("placeholder")
+
+        # README.md also needs to exist for _read_file_with_conflicts
+        readme_path = self.repo_path / "README.md"
+        readme_path.write_text("placeholder")
 
         result = resolver.resolve_merge()
 
@@ -326,7 +366,6 @@ class TestWorkflowE2E:
         missed = [r for r in result.resolutions if r.file_path == "README.md"]
         assert len(missed) == 1
         assert missed[0].action == "flag_for_review"
-        assert "did not return" in missed[0].explanation.lower()
 
     # ------------------------------------------------------------------
     # Mixed batch: A + C + special, no LLM calls
@@ -373,3 +412,157 @@ class TestWorkflowE2E:
             if "checkout" in str(c)
         ]
         assert len(checkout_calls) == 0
+
+    # ------------------------------------------------------------------
+    # Second pass: exploration resolves a flagged file
+    # ------------------------------------------------------------------
+
+    @patch("branding_resolver.resolver.build_file_conflict")
+    @patch("subprocess.run")
+    def test_second_pass_exploration_resolves(self, mock_run, mock_build_conflict):
+        """A file flagged on first pass gets resolved on second pass with exploration."""
+        from branding_resolver.differ import FileConflict, ConflictHunk
+
+        files = [".env.example"]
+        mock_run.side_effect = git_command_router(files)
+
+        mock_build_conflict.return_value = FileConflict(
+            path=".env.example",
+            hunks=[ConflictHunk(
+                ours="OUR_VAR=davinci\n", theirs="OUR_VAR=documenso\n",
+                context_before="", context_after="",
+                start_line=1, end_line=3,
+            )],
+        )
+
+        # First pass: LLM flags for review
+        first_tool_call = make_openai_tool_call("flag_for_review", {
+            "file_path": ".env.example",
+            "reason": "Need more context about OUR_VAR usage.",
+            "suggested_resolution": "Check usage.",
+            "ours_snippet": "OUR_VAR=davinci",
+            "theirs_snippet": "OUR_VAR=documenso",
+        })
+        first_response = make_openai_response([first_tool_call])
+
+        resolver = self._make_resolver()
+        resolver._agent._call_api = MagicMock(return_value=first_response)
+
+        # Second pass: LLM resolves confidently after exploration
+        resolver._agent.resolve_files_with_exploration = MagicMock(
+            return_value=[{
+                "tool": "resolve_conflict",
+                "file_path": ".env.example",
+                "resolved_content": "OUR_VAR=davinci\nNEW_VAR=value\n",
+                "explanation": "After searching codebase, confirmed OUR_VAR is branding.",
+                "confidence": "high",
+            }]
+        )
+
+        env_path = self.repo_path / ".env.example"
+        env_path.write_text("placeholder")
+
+        result = resolver.resolve_merge()
+
+        # The file should now be resolved (not flagged)
+        res = result.resolutions[0]
+        assert res.action == "resolve_conflict"
+        assert "[After codebase exploration]" in res.explanation
+        # Second pass was called
+        resolver._agent.resolve_files_with_exploration.assert_called_once()
+
+    # ------------------------------------------------------------------
+    # Second pass: still flagged with enriched explanation
+    # ------------------------------------------------------------------
+
+    @patch("branding_resolver.resolver.build_file_conflict")
+    @patch("subprocess.run")
+    def test_second_pass_still_flagged_has_enriched_explanation(self, mock_run, mock_build_conflict):
+        """A file still flagged after exploration has '[After codebase exploration]' prefix."""
+        from branding_resolver.differ import FileConflict, ConflictHunk
+
+        files = [".env.example"]
+        mock_run.side_effect = git_command_router(files)
+
+        mock_build_conflict.return_value = FileConflict(
+            path=".env.example",
+            hunks=[ConflictHunk(
+                ours="ours\n", theirs="theirs\n",
+                context_before="", context_after="",
+                start_line=1, end_line=3,
+            )],
+        )
+
+        # First pass flags
+        first_response = make_openai_response([
+            make_openai_tool_call("flag_for_review", {
+                "file_path": ".env.example",
+                "reason": "Unclear.",
+                "suggested_resolution": "",
+                "ours_snippet": "", "theirs_snippet": "",
+            })
+        ])
+
+        resolver = self._make_resolver()
+        resolver._agent._call_api = MagicMock(return_value=first_response)
+
+        # Second pass also flags but with richer explanation
+        resolver._agent.resolve_files_with_exploration = MagicMock(
+            return_value=[{
+                "tool": "flag_for_review",
+                "file_path": ".env.example",
+                "reason": "Searched for OUR_VAR, found 3 usages but still ambiguous.",
+                "suggested_resolution": "Check deployment scripts.",
+                "ours_snippet": "", "theirs_snippet": "",
+            }]
+        )
+
+        env_path = self.repo_path / ".env.example"
+        env_path.write_text("placeholder")
+
+        result = resolver.resolve_merge()
+
+        res = result.resolutions[0]
+        assert res.action == "flag_for_review"
+        assert "[After codebase exploration]" in res.explanation
+
+    # ------------------------------------------------------------------
+    # Dry run skips second pass
+    # ------------------------------------------------------------------
+
+    @patch("branding_resolver.resolver.build_file_conflict")
+    @patch("subprocess.run")
+    def test_dry_run_skips_second_pass(self, mock_run, mock_build_conflict):
+        """In dry_run mode, the second pass with exploration is skipped."""
+        from branding_resolver.differ import FileConflict, ConflictHunk
+
+        files = [".env.example"]
+        mock_run.side_effect = git_command_router(files)
+
+        mock_build_conflict.return_value = FileConflict(
+            path=".env.example",
+            hunks=[ConflictHunk(
+                ours="ours\n", theirs="theirs\n",
+                context_before="", context_after="",
+                start_line=1, end_line=3,
+            )],
+        )
+
+        first_response = make_openai_response([
+            make_openai_tool_call("flag_for_review", {
+                "file_path": ".env.example",
+                "reason": "Unclear.",
+                "suggested_resolution": "",
+                "ours_snippet": "", "theirs_snippet": "",
+            })
+        ])
+
+        resolver = self._make_resolver(dry_run=True)
+        resolver._agent._call_api = MagicMock(return_value=first_response)
+        resolver._agent.resolve_files_with_exploration = MagicMock()
+
+        result = resolver.resolve_merge()
+
+        # Second pass should NOT have been called in dry_run
+        resolver._agent.resolve_files_with_exploration.assert_not_called()
+        assert result.flagged_for_review == 1

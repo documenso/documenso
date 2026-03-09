@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import time
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
 import openai
@@ -12,6 +13,7 @@ from pydantic import BaseModel, Field
 
 from .confidence import ConfidenceLevel
 from .exceptions import APIError
+from .tool_executor import execute_tool_call
 
 if TYPE_CHECKING:
     from .config import BrandingConfig
@@ -24,9 +26,14 @@ logger = logging.getLogger(__name__)
 _MAX_RETRIES = 3
 _BACKOFF_SECONDS = (5, 15, 60)
 
+# Maximum exploration turns before the LLM must resolve.
+_MAX_EXPLORATION_TURNS = 5
+
 # ---------------------------------------------------------------------------
 # Pydantic models for tool input schemas
 # ---------------------------------------------------------------------------
+
+# --- Resolution tools (terminate the conversation for a file) ---
 
 
 class ResolveConflictInput(BaseModel):
@@ -72,16 +79,73 @@ class FlagForReviewInput(BaseModel):
     theirs_snippet: str = Field(description="Key snippet from upstream version.")
 
 
+# --- Exploration tools (continue the conversation) ---
+
+
+class SearchCodebaseInput(BaseModel):
+    """Search the codebase for symbol definitions, usages, or references.
+    Use this when you need more context about a symbol, type, constant,
+    or function referenced in a conflict.  Returns matching lines with
+    file paths and line numbers."""
+
+    pattern: str = Field(
+        description=(
+            "Search pattern (e.g., 'DOCUMENT_DISTRIBUTION_METHODS', "
+            "'export const.*DistributionMethod', 'interface EnvelopeSettings'). "
+            "Supports basic regex."
+        )
+    )
+    file_glob: str = Field(
+        default="",
+        description=(
+            "Optional glob to limit search scope "
+            "(e.g., '*.ts', 'packages/lib/**'). Empty = search all files."
+        ),
+    )
+
+
+class ReadFileInput(BaseModel):
+    """Read the contents of a specific file from the codebase (our version).
+    Use this when you found a relevant file via search_codebase and need
+    to see more of it for context."""
+
+    file_path: str = Field(
+        description="Relative path to the file (e.g., 'packages/lib/constants/distribution.ts')"
+    )
+    start_line: int = Field(
+        default=1,
+        description="Starting line number (1-indexed). Default: 1.",
+    )
+    end_line: int = Field(
+        default=100,
+        description="Ending line number (inclusive). Default: 100. Max range: 200 lines.",
+    )
+
+
 # ---------------------------------------------------------------------------
 # Auto-generated tool definitions from Pydantic models
 # ---------------------------------------------------------------------------
 
-TOOL_DEFINITIONS = [
+RESOLUTION_TOOLS = [
     openai.pydantic_function_tool(ResolveConflictInput, name="resolve_conflict"),
     openai.pydantic_function_tool(KeepOursInput, name="keep_ours"),
     openai.pydantic_function_tool(AcceptTheirsInput, name="accept_theirs"),
     openai.pydantic_function_tool(FlagForReviewInput, name="flag_for_review"),
 ]
+
+EXPLORATION_TOOLS = [
+    openai.pydantic_function_tool(SearchCodebaseInput, name="search_codebase"),
+    openai.pydantic_function_tool(ReadFileInput, name="read_file"),
+]
+
+# First-pass uses resolution tools only (fast, single call).
+TOOL_DEFINITIONS = RESOLUTION_TOOLS
+
+# Second-pass uses all tools (exploration + resolution).
+ALL_TOOLS = EXPLORATION_TOOLS + RESOLUTION_TOOLS
+
+EXPLORATION_TOOL_NAMES = {"search_codebase", "read_file"}
+RESOLUTION_TOOL_NAMES = {"resolve_conflict", "keep_ours", "accept_theirs", "flag_for_review"}
 
 
 class BrandingAgent:
@@ -164,6 +228,15 @@ For each conflicted file, use exactly ONE of the provided tools:
 
 Call one tool per file.  Do NOT skip any file.
 
+## Exploration Tools
+Before resolving a file, you may use these tools to gather additional context:
+- `search_codebase` — Search for symbol definitions, type declarations, or usages
+- `read_file` — Read a specific file to understand types, interfaces, or constants
+
+Use these when a conflict references symbols, types, or constants you don't have
+enough context to resolve confidently.  You have up to 5 exploration calls before
+you must resolve.  When you have enough context, call one of the resolution tools.
+
 ## Quality Standards
 - The resolved file must compile / parse correctly (no syntax errors).
 - No leftover merge conflict markers (<<<<<<, =======, >>>>>>>).
@@ -217,6 +290,119 @@ Call one tool per file.  Do NOT skip any file.
         return results
 
     # ------------------------------------------------------------------
+    # Second-pass resolution with exploration tools
+    # ------------------------------------------------------------------
+
+    def resolve_files_with_exploration(
+        self,
+        files: list[FileConflict],
+        repo_path: Path,
+    ) -> list[dict[str, Any]]:
+        """Resolve files with agentic codebase exploration.
+
+        The LLM can call ``search_codebase`` and ``read_file`` to gather
+        context before calling a resolution tool.  The loop caps at
+        ``_MAX_EXPLORATION_TURNS`` to prevent runaway costs.
+
+        Args:
+            files: File conflicts to resolve (usually a single file).
+            repo_path: Path to the git repository root.
+
+        Returns:
+            Resolution dicts, one per file, in the same format as
+            ``resolve_files()``.
+        """
+        if not files:
+            return []
+
+        user_message = self._build_user_message(files)
+        system_prompt = self.build_system_prompt(self.config)
+        messages: list[dict[str, Any]] = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_message},
+        ]
+
+        resolution_results: list[dict[str, Any]] = []
+        resolved_paths: set[str] = set()
+
+        for turn in range(_MAX_EXPLORATION_TURNS):
+            response = self._call_api_with_messages(messages, ALL_TOOLS)
+
+            message = response.choices[0].message
+            if not message.tool_calls:
+                break
+
+            # Process each tool call in this turn.
+            tool_responses: list[dict[str, str]] = []
+            has_exploration = False
+
+            for tool_call in message.tool_calls:
+                name = tool_call.function.name
+                try:
+                    args = json.loads(tool_call.function.arguments)
+                except json.JSONDecodeError:
+                    args = {}
+
+                if name in EXPLORATION_TOOL_NAMES:
+                    has_exploration = True
+                    result_text = execute_tool_call(name, args, repo_path)
+                    tool_responses.append({
+                        "tool_call_id": tool_call.id,
+                        "content": result_text,
+                    })
+                    log_key = args.get("pattern", args.get("file_path", ""))
+                    logger.info(
+                        "Exploration [turn %d]: %s(%s) → %d chars",
+                        turn + 1, name, log_key, len(result_text),
+                    )
+                else:
+                    # Resolution tool — collect and acknowledge.
+                    resolution_results.append({"tool": name, **args})
+                    resolved_paths.add(args.get("file_path", ""))
+                    tool_responses.append({
+                        "tool_call_id": tool_call.id,
+                        "content": "Resolution recorded.",
+                    })
+
+            # If all files resolved, we're done.
+            if len(resolved_paths) >= len(files):
+                break
+
+            # If no exploration tools were called this turn, stop looping.
+            if not has_exploration:
+                break
+
+            # Append assistant message + tool results for next turn.
+            messages.append({"role": "assistant", "tool_calls": message.tool_calls})
+            for tr in tool_responses:
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tr["tool_call_id"],
+                    "content": tr["content"],
+                })
+
+        # Safety: flag any files the LLM missed.
+        for f in files:
+            if f.path not in resolved_paths:
+                logger.warning(
+                    "LLM did not resolve %s within %d exploration turns — flagging",
+                    f.path, _MAX_EXPLORATION_TURNS,
+                )
+                resolution_results.append({
+                    "tool": "flag_for_review",
+                    "file_path": f.path,
+                    "reason": (
+                        "LLM did not resolve this file within the exploration "
+                        f"limit ({_MAX_EXPLORATION_TURNS} turns)."
+                    ),
+                    "suggested_resolution": "",
+                    "ours_snippet": "",
+                    "theirs_snippet": "",
+                })
+
+        return resolution_results
+
+    # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
 
@@ -254,7 +440,22 @@ Call one tool per file.  Do NOT skip any file.
         return "\n".join(parts)
 
     def _call_api(self, system_prompt: str, user_message: str) -> Any:
-        """Make the API call with retry logic.
+        """Make a single-turn API call (system + user → response).
+
+        Delegates to ``_call_api_with_messages`` with resolution-only tools.
+        """
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_message},
+        ]
+        return self._call_api_with_messages(messages, TOOL_DEFINITIONS)
+
+    def _call_api_with_messages(
+        self,
+        messages: list[dict[str, Any]],
+        tools: list[Any],
+    ) -> Any:
+        """Make an API call with a full message history and retry logic.
 
         Retries on rate-limit (429) and server errors (5xx) with exponential
         backoff.  Raises APIError after exhausting all retries.
@@ -268,11 +469,8 @@ Call one tool per file.  Do NOT skip any file.
                 response = self._client.chat.completions.create(
                     model=self.model,
                     max_tokens=16384,
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_message},
-                    ],
-                    tools=TOOL_DEFINITIONS,
+                    messages=messages,
+                    tools=tools,
                     tool_choice="required",
                 )
 

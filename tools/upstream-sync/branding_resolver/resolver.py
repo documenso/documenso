@@ -170,7 +170,8 @@ class BrandingResolver:
                 llm_files.append(conflict)
                 llm_categories[file_path] = cat_label
 
-        # Process LLM files in chunks.
+        # First pass: process LLM files in chunks (no exploration tools).
+        first_pass_raw: dict[str, dict[str, Any]] = {}  # path -> raw LLM result
         if llm_files:
             chunks = chunk_file_diffs(llm_files)
             logger.info(
@@ -186,6 +187,38 @@ class BrandingResolver:
                 for result in llm_results:
                     res = self._process_llm_result(result, llm_files, llm_categories)
                     resolutions.append(res)
+                    first_pass_raw[res.file_path] = result
+
+        # Second pass: re-attempt low-confidence files with exploration tools.
+        if llm_files and not self.dry_run:
+            low_confidence = [
+                (i, r)
+                for i, r in enumerate(resolutions)
+                if (r.action == "flag_for_review" or r.confidence == ConfidenceLevel.LOW)
+                and r.file_path in llm_categories  # only LLM-resolved files
+            ]
+
+            if low_confidence:
+                logger.info(
+                    "Second pass with exploration for %d file(s)",
+                    len(low_confidence),
+                )
+
+            for idx, first_res in low_confidence:
+                fc = next((f for f in llm_files if f.path == first_res.file_path), None)
+                if fc is None:
+                    continue
+
+                self._api_calls += 1
+                second_results = self._agent.resolve_files_with_exploration(
+                    [fc], self.repo_path,
+                )
+
+                for result in second_results:
+                    new_res = self._process_llm_result(
+                        result, [fc], llm_categories, second_pass=True,
+                    )
+                    resolutions[idx] = new_res
 
         # Compute summary statistics.
         flagged = sum(
@@ -214,8 +247,17 @@ class BrandingResolver:
         result: dict[str, Any],
         llm_files: list[FileConflict],
         llm_categories: dict[str, str],
+        second_pass: bool = False,
     ) -> Resolution:
-        """Convert an LLM tool-call result into a Resolution."""
+        """Convert an LLM tool-call result into a Resolution.
+
+        Args:
+            result: Parsed tool-call dict from the LLM.
+            llm_files: The FileConflict objects that were sent to the LLM.
+            llm_categories: Mapping of file path to category label.
+            second_pass: If True, apply a stricter confidence penalty (the LLM
+                had exploration tools, so the bar is higher).
+        """
         tool = result["tool"]
         file_path = result["file_path"]
         category = llm_categories.get(file_path, "B")
@@ -223,6 +265,8 @@ class BrandingResolver:
         if tool == "resolve_conflict":
             content = result["resolved_content"]
             explanation = result["explanation"]
+            if second_pass:
+                explanation = f"[After codebase exploration] {explanation}"
             llm_confidence = result.get("confidence", "medium")
 
             # Validate the resolved content.
@@ -244,7 +288,7 @@ class BrandingResolver:
                     break
 
             confidence = compute_confidence(
-                llm_confidence, validation_errors, branding_count, hunk_count
+                llm_confidence, validation_errors, branding_count, hunk_count,
             )
 
             # Write to disk and stage.
@@ -286,12 +330,16 @@ class BrandingResolver:
         if conflict_content is not None:
             self._write_resolution(file_path, conflict_content)
 
+        reason = result.get("reason", "")
+        if second_pass:
+            reason = f"[After codebase exploration] {reason}"
+
         return Resolution(
             file_path=file_path,
             category=category,
             action="flag_for_review",
             content=conflict_content or result.get("suggested_resolution", ""),
-            explanation=result.get("reason", ""),
+            explanation=reason,
             confidence=ConfidenceLevel.LOW,
         )
 

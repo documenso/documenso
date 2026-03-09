@@ -38,6 +38,7 @@ def compute_confidence(
     validation_errors: list[str],
     branding_strings_in_diff: int,
     hunk_count: int,
+    second_pass_penalty: float = 0.0,
 ) -> ConfidenceLevel:
     """Compute an overall confidence level from multiple signals.
 
@@ -46,11 +47,14 @@ def compute_confidence(
         validation_errors: Errors found by the validator.
         branding_strings_in_diff: Number of branding-related strings in the diff.
         hunk_count: Number of diff hunks in the file.
+        second_pass_penalty: Extra penalty for second-pass resolutions (default 0.0).
+            The LLM had exploration tools available, so the bar is higher.
 
     Returns:
         A ConfidenceLevel enum value.
     """
     score = _LLM_SCORE.get(llm_confidence.lower(), 0.4)
+    score -= second_pass_penalty
 
     # Penalise validation errors (up to MAX_VALIDATION_ERRORS counted).
     error_count = min(len(validation_errors), _MAX_VALIDATION_ERRORS)
