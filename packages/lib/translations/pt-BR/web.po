@@ -12943,6 +12943,10 @@ msgstr "Seu modelo foi enviado com sucesso."
 msgid "Your template will be duplicated."
 msgstr "Seu modelo será duplicado."
 
+#: apps/remix/app/components/general/app-command-menu.tsx
+msgid "Your templates"
+msgstr ""
+
 #: apps/remix/app/components/general/template/template-edit-form.tsx
 msgid "Your templates has been saved successfully."
 msgstr "Seus modelos foram salvos com sucesso."

@@ -234,6 +234,15 @@
   scrollbar-gutter: stable;
 }
 
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
 /* .custom-scrollbar::-webkit-scrollbar-track {
   border-radius: 10px;
 }

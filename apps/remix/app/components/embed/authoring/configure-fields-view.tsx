@@ -29,7 +29,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@documenso/ui/primitives/shee
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { FieldAdvancedSettingsDrawer } from '~/components/embed/authoring/field-advanced-settings-drawer';
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 
 import type { TConfigureEmbedFormSchema } from './configure-document-view.types';
 import type { TConfigureFieldsFormSchema } from './configure-fields-view.types';
@@ -547,7 +547,7 @@ export const ConfigureFieldsView = ({
             <Form {...form}>
               <div>
                 {normalizedDocumentData && (
-                  <PDFViewer data={normalizedDocumentData} scrollParentRef="window" />
+                  <PDFViewerLazy data={normalizedDocumentData} scrollParentRef="window" />
                 )}
 
                 <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>

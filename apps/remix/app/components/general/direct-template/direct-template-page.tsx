@@ -19,7 +19,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentSigningAuthContext } from '~/components/general/document-signing/document-signing-auth-provider';
 import { useRequiredDocumentSigningContext } from '~/components/general/document-signing/document-signing-provider';
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 
 import {
   DirectTemplateConfigureForm,
@@ -152,7 +152,7 @@ export const DirectTemplatePageView = ({
         gradient
       >
         <CardContent className="p-2">
-          <PDFViewer
+          <PDFViewerLazy
             key={template.id}
             data={getDocumentDataUrlForPdfViewer({
               envelopeId: template.envelopeId,
