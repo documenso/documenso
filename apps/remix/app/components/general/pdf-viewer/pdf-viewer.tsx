@@ -113,7 +113,8 @@ export default function PDFViewer({
           return;
         }
 
-        const loadedPdf = await pdfjsLib.getDocument({ data: result! }).promise;
+        const loadedPdf = await pdfjsLib.getDocument({ data: result!, cMapUrl: '/static/cmaps/' })
+          .promise;
 
         if (isCancelled) {
           await loadedPdf.destroy();
