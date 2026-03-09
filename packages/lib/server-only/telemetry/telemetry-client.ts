@@ -9,7 +9,12 @@ import { prefixedId } from '../../universal/id';
 import { getSiteSetting } from '../site-settings/get-site-setting';
 import { SITE_SETTINGS_TELEMETRY_ID } from '../site-settings/schemas/telemetry';
 import { upsertSiteSetting } from '../site-settings/upsert-site-setting';
-import { getTelemetryStartupDecision } from './telemetry-startup-decision';
+
+const HAS_LICENSE_KEY = !!process.env.NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY;
+
+const TELEMETRY_KEY = process.env.NEXT_PRIVATE_TELEMETRY_KEY;
+const TELEMETRY_HOST = process.env.NEXT_PRIVATE_TELEMETRY_HOST;
+const TELEMETRY_DISABLED = !!process.env.DOCUMENSO_DISABLE_TELEMETRY || HAS_LICENSE_KEY;
 
 const NODE_ID_FILENAME = '.documenso-node-id';
 const HEARTBEAT_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
@@ -17,19 +22,8 @@ const HEARTBEAT_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 // Version is hardcoded to avoid rollup JSON import issues
 const APP_VERSION = version;
 
-const DISABLED_REASON_MESSAGES = {
-  disabled_by_env:
-    '[Telemetry] Telemetry is disabled. To enable, remove the DOCUMENSO_DISABLE_TELEMETRY environment variable.',
-  disabled_by_license_key: '[Telemetry] Telemetry is disabled because a license key is configured.',
-  missing_credentials:
-    '[Telemetry] Telemetry credentials not configured. Telemetry will not be sent.',
-} as const;
-
 export class TelemetryClient {
   private static instance: TelemetryClient | null = null;
-
-  private telemetryKey: string;
-  private telemetryHost: string;
 
   private client: PostHog | null = null;
 
@@ -38,16 +32,7 @@ export class TelemetryClient {
   private installationId: string | null = null;
   private nodeId: string | null = null;
 
-  private constructor({
-    telemetryKey,
-    telemetryHost,
-  }: {
-    telemetryKey: string;
-    telemetryHost: string;
-  }) {
-    this.telemetryKey = telemetryKey;
-    this.telemetryHost = telemetryHost;
-  }
+  private constructor() {}
 
   /**
    * Start the telemetry client.
@@ -55,35 +40,27 @@ export class TelemetryClient {
    * This will initialize the PostHog client, load or create the installation ID and node ID,
    * capture a startup event, and start a heartbeat interval.
    *
-   * If telemetry is disabled via `DOCUMENSO_DISABLE_TELEMETRY`, a configured license key,
-   * or missing credentials, this will be a no-op.
+   * If telemetry is disabled via `DOCUMENSO_DISABLE_TELEMETRY=true` or credentials are not
+   * provided, this will be a no-op.
    */
   public static async start(): Promise<void> {
+    if (TELEMETRY_DISABLED && !HAS_LICENSE_KEY) {
+      console.log(
+        '[Telemetry] Telemetry is disabled. To enable, remove the DOCUMENSO_DISABLE_TELEMETRY environment variable.',
+      );
+      return;
+    }
+
+    if (!TELEMETRY_KEY || !TELEMETRY_HOST) {
+      console.log('[Telemetry] Telemetry credentials not configured. Telemetry will not be sent.');
+      return;
+    }
+
     if (TelemetryClient.instance) {
       return;
     }
 
-    const telemetryKey = process.env.NEXT_PRIVATE_TELEMETRY_KEY;
-    const telemetryHost = process.env.NEXT_PRIVATE_TELEMETRY_HOST;
-    const telemetryDisabled = process.env.DOCUMENSO_DISABLE_TELEMETRY;
-    const licenseKey = process.env.NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY;
-
-    const startupDecision = getTelemetryStartupDecision({
-      telemetryKey,
-      telemetryHost,
-      telemetryDisabled,
-      licenseKey,
-    });
-
-    if (!startupDecision.shouldStart) {
-      console.log(DISABLED_REASON_MESSAGES[startupDecision.reason]);
-      return;
-    }
-
-    const instance = new TelemetryClient({
-      telemetryKey: startupDecision.telemetryKey,
-      telemetryHost: startupDecision.telemetryHost,
-    });
+    const instance = new TelemetryClient();
 
     TelemetryClient.instance = instance;
 
@@ -114,8 +91,8 @@ export class TelemetryClient {
   }
 
   private async initialize(): Promise<void> {
-    this.client = new PostHog(this.telemetryKey, {
-      host: this.telemetryHost,
+    this.client = new PostHog(TELEMETRY_KEY!, {
+      host: TELEMETRY_HOST,
       disableGeoip: false,
     });
 
@@ -133,7 +110,7 @@ export class TelemetryClient {
       '[Telemetry] To disable telemetry, set DOCUMENSO_DISABLE_TELEMETRY=true in your environment variables.',
     );
     console.log(
-      '[Telemetry] Learn more: https://docs.documenso.com/docs/self-hosting/configuration/telemetry',
+      '[Telemetry] Learn more: https://documenso.com/docs/developers/self-hosting/telemetry',
     );
 
     // Capture startup event
