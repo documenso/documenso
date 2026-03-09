@@ -303,42 +303,27 @@ for t in touched:
                                 returnStdout: true
                             ).trim()
 
-                            // Use Python to read JSON and post comments via GitHub API
-                            sh(script: """
+                            // Post a PR comment listing all flagged files
+                            sh(script: '''
                                 . .venv/bin/activate
                                 PYTHONPATH=tools/upstream-sync python3 -c "
-import json, urllib.request, ssl, os
+import json
 
-ctx = ssl.create_default_context()
-ctx.check_hostname = False
-ctx.verify_mode = ssl.CERT_NONE
-
-token = os.environ['GITHUB_TOKEN']
 flagged = json.load(open('sync-output/flagged_reviews.json'))
+lines = ['## Files Flagged for Manual Review\\n']
+for r in flagged:
+    lines.append(f'### `{r[\"path\"]}`')
+    lines.append(f'{r[\"body\"]}')
+    lines.append(f'> See conflict markers starting at line {r[\"line\"]}')
+    lines.append('')
 
-for review in flagged:
-    body = json.dumps({
-        'body': review['body'],
-        'commit_id': '${commitSha}',
-        'path': review['path'],
-        'line': review['line'],
-        'side': 'RIGHT',
-    })
-    req = urllib.request.Request(
-        'https://api.github.com/repos/${FORK_REPO}/pulls/${prNumber}/comments',
-        data=body.encode(),
-        method='POST',
-    )
-    req.add_header('Authorization', f'token {token}')
-    req.add_header('Accept', 'application/vnd.github+json')
-    req.add_header('Content-Type', 'application/json')
-    try:
-        resp = urllib.request.urlopen(req, context=ctx)
-        print(f'Posted review comment on {review[\"path\"]}:{review[\"line\"]}')
-    except Exception as e:
-        print(f'Warning: Failed to post comment on {review[\"path\"]}: {e}')
+with open('sync-output/review_comment.md', 'w') as f:
+    f.write('\\n'.join(lines))
 "
-                            """, returnStatus: true)
+                                gh pr comment ${SYNC_BRANCH} \
+                                    --repo ${FORK_REPO} \
+                                    --body-file sync-output/review_comment.md
+                            ''', returnStatus: true)
                         }
 
                         sh(script: """
