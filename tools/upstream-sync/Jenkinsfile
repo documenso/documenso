@@ -14,7 +14,7 @@ pipeline {
     parameters {
         string(name: 'UPSTREAM_REF', defaultValue: '', description: 'Specific upstream ref to sync (tag, SHA, or branch). Leave empty for upstream/main HEAD.')
         booleanParam(name: 'FORCE_CLAUDE', defaultValue: false, description: 'Force AI resolution even when merge is clean (useful for branding drift detection)')
-        booleanParam(name: 'DRY_RUN', defaultValue: false, description: 'Run the full pipeline without pushing or creating PRs')
+        booleanParam(name: 'DRY_RUN', defaultValue: true, description: 'Run the full pipeline without pushing or creating PRs')
     }
 
     environment {
