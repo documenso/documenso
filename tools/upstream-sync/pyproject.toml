@@ -1,0 +1,30 @@
+[project]
+name = "branding-resolver"
+version = "0.1.0"
+description = "AI-powered branding conflict resolver for Davinci Sign fork"
+requires-python = ">=3.11"
+dependencies = [
+    "openai>=1.40.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-mock>=3.12",
+]
+
+[project.scripts]
+branding-resolver = "branding_resolver.__main__:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

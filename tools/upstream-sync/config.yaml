@@ -1,0 +1,110 @@
+upstream:
+  remote_name: upstream
+  remote_url: https://github.com/documenso/documenso.git
+  default_branch: main
+
+fork:
+  remote_name: origin
+  main_branch: main
+  branding_guide: BRANDING.md
+
+sync:
+  branch_prefix: upstream-sync
+  branch_format: "{prefix}/{date}"
+  cron: "H 6 * * *"
+
+classification:
+  branding_only_patterns:
+    - "packages/assets/**"
+    - "packages/email/static/**"
+    - "apps/remix/public/favicon*"
+    - "apps/remix/public/apple-touch-icon.png"
+    - "apps/remix/public/android-chrome-*"
+    - "apps/remix/public/opengraph-image.jpg"
+    - "apps/remix/public/static/logo.png"
+    - "apps/documentation/public/favicon*"
+    - "apps/documentation/public/apple-touch-icon.png"
+    - "davinci-icon.svg"
+    - "BRANDING.md"
+
+  branding_text_patterns:
+    - "packages/lib/constants/email.ts"
+    - "packages/lib/constants/auth.ts"
+    - "packages/lib/constants/app.ts"
+    - "packages/lib/server-only/2fa/setup-2fa.ts"
+    - "packages/lib/utils/authenticator.ts"
+    - "packages/lib/jobs/definitions/internal/execute-webhook.handler.ts"
+    - "packages/trpc/server/webhook-router/resend-webhook-call.ts"
+    - "packages/email/template-components/template-footer.tsx"
+    - "packages/email/template-components/template-confirmation-email.tsx"
+    - "packages/tailwind-config/index.cjs"
+    - "packages/ui/styles/theme.css"
+    - "apps/remix/app/utils/meta.ts"
+    - "apps/documentation/theme.config.tsx"
+    - "packages/api/v1/openapi.ts"
+    - "packages/trpc/server/open-api.ts"
+    - "docker/build.sh"
+    - "docker/buildx.sh"
+    - "docker/buildx-and-push.sh"
+    - "docker/Dockerfile.chromium"
+    - "docker/production/compose.yml"
+    - "docker/development/compose.yml"
+    - "docker/testing/compose.yml"
+    - "docker/start.sh"
+    - "docker/README.md"
+    - ".env.example"
+    - ".devcontainer/devcontainer.json"
+    - "README.md"
+    - "apps/remix/app/components/general/branding-logo.tsx"
+    - "packages/lib/server-only/cert/cert-status.ts"
+    - "apps/documentation/pages/developers/webhooks.mdx"
+
+  branding_replacements:
+    - old: "Documenso, Inc."
+      new: "Davinci AI Solutions"
+      context: "company legal name"
+    - old: "Documenso"
+      new: "Davinci Sign"
+      context: "product name"
+    - old: "@documenso.com"
+      new: "@davincisolutions.ai"
+      context: "email domain"
+    - old: "documenso.com"
+      new: "davincisolutions.ai"
+      context: "web domain"
+    - old: "#7AC455"
+      new: "#1A98CF"
+      context: "brand color hex"
+    - old: "97 51% 55%"
+      new: "197 79% 46%"
+      context: "brand color HSL"
+    - old: "documenso/documenso"
+      new: "davinci/davinci-sign"
+      context: "Docker image name"
+    - old: "X-Documenso-Secret"
+      new: "X-Davinci-Secret"
+      context: "webhook header"
+    - old: "DOCUMENSO_INTERNAL_EMAIL"
+      new: "DAVINCI_INTERNAL_EMAIL"
+      context: "TypeScript symbol"
+    - old: "documenso-development"
+      new: "davinci-sign-development"
+      context: "Docker container name"
+    - old: "documenso-production"
+      new: "davinci-sign-production"
+      context: "Docker container name"
+    - old: "/opt/documenso/"
+      new: "/opt/davinci-sign/"
+      context: "certificate path"
+
+confidence:
+  auto_merge_threshold: 0.95
+  high_confidence_threshold: 0.80
+  low_confidence_threshold: 0.50
+
+agent:
+  model: "claude-sonnet-4-20250514"
+  max_tokens: 8192
+  temperature: 0.0
+  max_retries: 3
+  max_files_per_batch: 15
