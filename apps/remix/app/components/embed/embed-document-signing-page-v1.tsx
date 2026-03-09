@@ -74,7 +74,7 @@ export const EmbedSignDocumentV1ClientPage = ({
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const { fullName, email, signature, setFullName, setSignature } =
+  const { fullName, email, signature, setFullName, setEmail, setSignature } =
     useRequiredDocumentSigningContext();
 
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
@@ -89,6 +89,7 @@ export const EmbedSignDocumentV1ClientPage = ({
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [isNameLocked, setIsNameLocked] = useState(false);
+  const [isEmailLocked, setIsEmailLocked] = useState(!!email);
   const [showPendingFieldTooltip, setShowPendingFieldTooltip] = useState(false);
   const [_showOtherRecipientsCompletedFields, setShowOtherRecipientsCompletedFields] =
     useState(false);
@@ -205,13 +206,19 @@ export const EmbedSignDocumentV1ClientPage = ({
     try {
       const data = ZSignDocumentEmbedDataSchema.parse(JSON.parse(decodeURIComponent(atob(hash))));
 
-      if (!isCompleted && data.name) {
+      if (!isCompleted && data.name && !fullName) {
         setFullName(data.name);
       }
 
       // Since a recipient can be provided a name we can lock it without requiring
       // a to be provided by the parent application, unlike direct templates.
       setIsNameLocked(!!data.lockName);
+
+      if (!isCompleted && data.email && !email) {
+        setEmail(data.email);
+        setIsEmailLocked(!!data.lockEmail);
+      }
+
       setAllowDocumentRejection(!!data.allowDocumentRejection);
       setShowOtherRecipientsCompletedFields(!!data.showOtherRecipientsCompletedFields);
 
@@ -449,7 +456,8 @@ export const EmbedSignDocumentV1ClientPage = ({
                           id="email"
                           className="mt-2 bg-background"
                           value={email}
-                          disabled
+                          onChange={(e) => setEmail(e.target.value)}
+                          disabled={isEmailLocked}
                         />
                       </div>
 
