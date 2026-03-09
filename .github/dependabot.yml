@@ -12,11 +12,10 @@ updates:
     open-pull-requests-limit: 0
 
   - package-ecosystem: 'npm'
-    directory: '/apps/web'
+    directory: '/'
     schedule:
       interval: 'weekly'
     target-branch: 'main'
     labels:
-      - 'npm dependencies'
-      - 'frontend'
+      - 'dependencies'
     open-pull-requests-limit: 0

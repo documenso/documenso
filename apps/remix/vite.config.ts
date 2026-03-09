@@ -94,6 +94,9 @@ export default defineConfig({
    * See rollup.config.mjs which is used for that.
    */
   build: {
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
     rollupOptions: {
       external: [
         '@napi-rs/canvas',

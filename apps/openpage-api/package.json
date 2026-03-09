@@ -6,17 +6,19 @@
     "dev": "next dev -p 3003",
     "build": "next build",
     "start": "next start -p 3003",
-    "lint:fix": "next lint --fix",
+    "lint:fix": "eslint . --fix",
     "clean": "rimraf .next && rimraf node_modules"
   },
   "dependencies": {
-    "@documenso/prisma": "*",
-    "luxon": "^3.7.2",
-    "next": "15.5.12"
+    "@documenso/prisma": "workspace:*",
+    "luxon": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "18.3.27",
-    "typescript": "5.6.2"
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "typescript": "catalog:"
   }
 }

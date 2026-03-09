@@ -10,17 +10,17 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "@documenso/lib": "*",
-    "@documenso/prisma": "*",
-    "@hono/standard-validator": "^0.2.0",
-    "@oslojs/crypto": "^1.0.1",
-    "@oslojs/encoding": "^1.1.0",
-    "@simplewebauthn/server": "^13.2.2",
+    "@documenso/lib": "workspace:*",
+    "@documenso/prisma": "workspace:*",
+    "@hono/standard-validator": "catalog:",
+    "@oslojs/crypto": "catalog:",
+    "@oslojs/encoding": "catalog:",
+    "@simplewebauthn/server": "catalog:",
     "arctic": "^3.7.0",
-    "hono": "^4.12.2",
-    "luxon": "^3.7.2",
-    "nanoid": "^5.1.6",
-    "ts-pattern": "^5.9.0",
-    "zod": "^3.25.76"
+    "hono": "catalog:",
+    "luxon": "catalog:",
+    "nanoid": "catalog:",
+    "ts-pattern": "catalog:",
+    "zod": "catalog:"
   }
 }
