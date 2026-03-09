@@ -8,7 +8,7 @@ msgstr ""
 "Language: ja\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-06 03:26\n"
+"PO-Revision-Date: 2026-03-09 00:18\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -12950,7 +12950,7 @@ msgstr "テンプレートは複製されます。"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Your templates"
-msgstr ""
+msgstr "あなたのテンプレート"
 
 #: apps/remix/app/components/general/template/template-edit-form.tsx
 msgid "Your templates has been saved successfully."
@@ -12983,3 +12983,4 @@ msgstr "認証コード:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
