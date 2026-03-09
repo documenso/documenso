@@ -25,7 +25,6 @@ pipeline {
         UPSTREAM_URL        = 'https://github.com/documenso/documenso.git'
         FORK_REPO           = 'Davinci-Technology/documenso'
         AUTO_MERGE_THRESHOLD = '0.95'
-        GIT_CREDENTIAL_ID   = 'f1b484af-24eb-4f28-a57a-66db51117a73'
     }
 
     stages {
@@ -39,8 +38,7 @@ pipeline {
                         [$class: 'SubmoduleOption', disableSubmodules: true]
                     ],
                     userRemoteConfigs: [[
-                        url: "https://github.com/${FORK_REPO}.git",
-                        credentialsId: env.GIT_CREDENTIAL_ID
+                        url: "https://x-access-token:${GITHUB_TOKEN}@github.com/${FORK_REPO}.git"
                     ]]
                 ])
                 sh '''
@@ -235,17 +233,11 @@ for t in touched:
 
                     echo "Final confidence: ${confidence}, threshold: ${threshold}"
 
-                    // Push the sync branch
-                    withCredentials([usernamePassword(
-                        credentialsId: env.GIT_CREDENTIAL_ID,
-                        usernameVariable: 'GIT_USER',
-                        passwordVariable: 'GIT_PASS'
-                    )]) {
-                        sh """
-                            git remote set-url origin https://\${GIT_USER}:\${GIT_PASS}@github.com/${FORK_REPO}.git
-                            git push origin ${env.SYNC_BRANCH} --force
-                        """
-                    }
+                    // Push the sync branch using GitHub token
+                    sh """
+                        git remote set-url origin https://x-access-token:\${GITHUB_TOKEN}@github.com/${FORK_REPO}.git
+                        git push origin ${env.SYNC_BRANCH} --force
+                    """
 
                     if (confidence >= threshold) {
                         echo "Confidence ${confidence} >= threshold ${threshold}. Auto-merging to main."
