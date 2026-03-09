@@ -148,9 +148,6 @@ export const EditorFieldDropdownForm = ({
     const validatedFormValues = ZDropdownFieldFormSchema.safeParse(formValues);
 
     if (validatedFormValues.success) {
-      console.log({
-        validatedFormValues,
-      });
       onValueChange({
         type: 'dropdown',
         ...validatedFormValues.data,
