@@ -38,7 +38,7 @@ pipeline {
                         [$class: 'SubmoduleOption', disableSubmodules: true]
                     ],
                     userRemoteConfigs: [[
-                        url: "https://x-access-token:${GITHUB_TOKEN}@github.com/${FORK_REPO}.git"
+                        url: "https://github.com/${FORK_REPO}.git"
                     ]]
                 ])
                 sh '''
@@ -192,6 +192,11 @@ for t in touched:
                     } else {
                         env.CONFIDENCE = '0.0'
                     }
+
+                    // Finalize the merge commit — resolver staged resolved files,
+                    // now complete the interrupted merge.
+                    sh 'git add -A'
+                    sh 'git commit --no-edit || true'
                 }
             }
         }
