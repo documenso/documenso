@@ -276,6 +276,9 @@ for t in touched:
 
                         writeFile file: 'sync-output/gh_pr_body.md', text: prBody
 
+                        // Close any existing PR for this sync branch
+                        sh(script: "gh pr close ${env.SYNC_BRANCH} --repo ${FORK_REPO} 2>/dev/null || true", returnStatus: true)
+
                         sh """
                             gh pr create \
                                 --repo ${FORK_REPO} \
