@@ -173,7 +173,7 @@ for t in touched:
             steps {
                 sh '''
                     . .venv/bin/activate
-                    python3 -m branding_resolver \
+                    PYTHONPATH=tools/upstream-sync python3 -m branding_resolver \
                         --repo . \
                         --our-branch origin/main \
                         --upstream-branch upstream/main \
