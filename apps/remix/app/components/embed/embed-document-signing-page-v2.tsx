@@ -26,7 +26,7 @@ export const EmbedSignDocumentV2ClientPage = ({
 }: EmbedSignDocumentV2ClientPageProps) => {
   const { _ } = useLingui();
 
-  const { envelope, recipient, envelopeData, setFullName, setEmail, fullName } =
+  const { envelope, recipient, envelopeData, setFullName, setEmail, fullName, email } =
     useRequiredEnvelopeSigningContext();
 
   const { isCompleted, isRejected, recipientSignature } = envelopeData;
@@ -36,7 +36,9 @@ export const EmbedSignDocumentV2ClientPage = ({
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
   const [allowDocumentRejection, setAllowDocumentRejection] = useState(false);
   const [isNameLocked, setIsNameLocked] = useState(false);
-  const [isEmailLocked, setIsEmailLocked] = useState(envelope.type === EnvelopeType.DOCUMENT);
+  const [isEmailLocked, setIsEmailLocked] = useState(
+    envelope.type === EnvelopeType.DOCUMENT && !!email,
+  );
 
   const onDocumentCompleted = (data: {
     token: string;
@@ -128,19 +130,22 @@ export const EmbedSignDocumentV2ClientPage = ({
       const data = ZSignDocumentEmbedDataSchema.parse(JSON.parse(decodeURIComponent(atob(hash))));
 
       if (!isCompleted && data.name) {
-        setFullName(data.name);
+        // For documents, only use the hash name if the recipient doesn't already have one.
+        // For templates, always allow the hash name to be used.
+        if (envelope.type === EnvelopeType.TEMPLATE || !fullName) {
+          setFullName(data.name);
+        }
       }
 
       // Since a recipient can be provided a name we can lock it without requiring
       // a to be provided by the parent application, unlike direct templates.
       setIsNameLocked(!!data.lockName);
 
-      if (envelope.type === EnvelopeType.TEMPLATE) {
-        if (!isCompleted && data.email) {
+      if (!isCompleted && data.email) {
+        // For documents, only use the hash email if the recipient doesn't already have one.
+        // For templates, always allow the hash email to be used.
+        if (envelope.type === EnvelopeType.TEMPLATE || !email) {
           setEmail(data.email);
-        }
-
-        if (data.email) {
           setIsEmailLocked(!!data.lockEmail);
         }
       }
