@@ -105,6 +105,8 @@ pipeline {
             }
             steps {
                 script {
+                    // Clean up any leftover sync branch from a previous run
+                    sh "git branch -D ${env.SYNC_BRANCH} 2>/dev/null || true"
                     sh "git checkout -b ${env.SYNC_BRANCH} origin/main"
 
                     def mergeResult = sh(
