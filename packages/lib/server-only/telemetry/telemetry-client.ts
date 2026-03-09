@@ -44,10 +44,13 @@ export class TelemetryClient {
    * provided, this will be a no-op.
    */
   public static async start(): Promise<void> {
-    if (TELEMETRY_DISABLED && !HAS_LICENSE_KEY) {
-      console.log(
-        '[Telemetry] Telemetry is disabled. To enable, remove the DOCUMENSO_DISABLE_TELEMETRY environment variable.',
-      );
+    if (TELEMETRY_DISABLED) {
+      if (!HAS_LICENSE_KEY) {
+        console.log(
+          '[Telemetry] Telemetry is disabled. To enable, remove the DOCUMENSO_DISABLE_TELEMETRY environment variable.',
+        );
+      }
+
       return;
     }
 
