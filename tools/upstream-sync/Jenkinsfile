@@ -195,7 +195,11 @@ for t in touched:
 
                     // Finalize the merge commit — resolver staged resolved files,
                     // now complete the interrupted merge.
-                    sh 'git add -A'
+                    // Exclude .venv and sync-output from staging to keep the
+                    // commit clean (git add -A would pick them up).
+                    sh 'git reset HEAD -- .venv sync-output 2>/dev/null || true'
+                    sh 'git checkout -- .venv 2>/dev/null || true'
+                    sh 'git add -A -- . ":!.venv" ":!sync-output"'
                     sh 'git commit --no-edit || true'
                 }
             }
