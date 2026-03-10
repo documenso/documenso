@@ -663,16 +663,6 @@ export const EnvelopeEditorSettingsDialog = ({
                                     <SelectValue data-testid="documentDistributionMethodSelectValue" />
                                   </SelectTrigger>
 
-<<<<<<< HEAD
-                                  <SelectContent>
-                                    {emails.map((email) => (
-                                      <SelectItem key={email.id} value={email.id}>
-                                        {email.email}
-                                      </SelectItem>
-                                    ))}
-
-                                    <SelectItem value={'-1'}>Davinci Sign</SelectItem>
-=======
                                   <SelectContent position="popper">
                                     {Object.values(DOCUMENT_DISTRIBUTION_METHODS).map(
                                       ({ value, description }) => (
@@ -681,7 +671,6 @@ export const EnvelopeEditorSettingsDialog = ({
                                         </SelectItem>
                                       ),
                                     )}
->>>>>>> upstream/main
                                   </SelectContent>
                                 </Select>
                               </FormControl>
@@ -764,7 +753,7 @@ export const EnvelopeEditorSettingsDialog = ({
                                           </SelectItem>
                                         ))}
 
-                                        <SelectItem value={'-1'}>Documenso</SelectItem>
+                                        <SelectItem value={'-1'}>Davinci Sign</SelectItem>
                                       </SelectContent>
                                     </Select>
                                   </FormControl>
