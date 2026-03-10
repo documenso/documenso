@@ -159,10 +159,12 @@ export const sendDocument = async ({
   );
 
   if (recipientsWithMissingFields.length > 0) {
-    const missingRecipientIds = recipientsWithMissingFields.map((r) => r.id).join(', ');
+    const missingRecipientDescriptions = recipientsWithMissingFields
+      .map((r) => (r.name ? `${r.name} (${r.email}, id: ${r.id})` : `${r.email} (id: ${r.id})`))
+      .join(', ');
 
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: `The following recipients are missing required fields: ${missingRecipientIds}. Signers must have at least one signature field.`,
+      message: `The following recipients are missing required fields: ${missingRecipientDescriptions}. Signers must have at least one signature field.`,
     });
   }
 
