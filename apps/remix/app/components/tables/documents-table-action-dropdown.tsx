@@ -38,6 +38,7 @@ import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialo
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
 import { useCurrentTeam } from '~/providers/team';
 
+import { DocumentRenameDialog } from '../dialogs/document-rename-dialog';
 import { EnvelopeDownloadDialog } from '../dialogs/envelope-download-dialog';
 
 export type DocumentsTableActionDropdownProps = {
@@ -56,6 +57,7 @@ export const DocumentsTableActionDropdown = ({
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  const [isRenameDialogOpen, setRenameDialogOpen] = useState(false);
 
   const recipient = row.recipients.find((recipient) => recipient.email === user.email);
 
@@ -76,7 +78,7 @@ export const DocumentsTableActionDropdown = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger data-testid="document-table-action-btn">
-        <MoreHorizontal className="text-muted-foreground h-5 w-5" />
+        <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-52" align="start" forceMount>
@@ -120,6 +122,13 @@ export const DocumentsTableActionDropdown = ({
             <Trans>Edit</Trans>
           </Link>
         </DropdownMenuItem>
+
+        {canManageDocument && (
+          <DropdownMenuItem onClick={() => setRenameDialogOpen(true)}>
+            <Pencil className="mr-2 h-4 w-4" />
+            <Trans>Rename</Trans>
+          </DropdownMenuItem>
+        )}
 
         <EnvelopeDownloadDialog
           envelopeId={row.envelopeId}
@@ -206,6 +215,13 @@ export const DocumentsTableActionDropdown = ({
         token={recipient?.token}
         open={isDuplicateDialogOpen}
         onOpenChange={setDuplicateDialogOpen}
+      />
+
+      <DocumentRenameDialog
+        id={row.id}
+        initialTitle={row.title}
+        open={isRenameDialogOpen}
+        onOpenChange={setRenameDialogOpen}
       />
     </DropdownMenu>
   );

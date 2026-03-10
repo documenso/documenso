@@ -1,5 +1,5 @@
 import type { DocumentMeta, DocumentVisibility, Prisma, TemplateType } from '@prisma/client';
-import { DocumentStatus, EnvelopeType, FolderType, WebhookTriggerEvents } from '@prisma/client';
+import { EnvelopeType, FolderType } from '@prisma/client';
 import { isDeepEqual } from 'remeda';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -206,12 +206,6 @@ export const updateEnvelope = async ({
     data.publicTitle === undefined || data.publicTitle === envelope.publicTitle;
 
   const auditLogs: CreateDocumentAuditLogDataResponse[] = [];
-
-  if (!isTitleSame && envelope.status !== DocumentStatus.DRAFT) {
-    throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: 'You cannot update the title if the envelope has been sent',
-    });
-  }
 
   if (!isTitleSame) {
     auditLogs.push(
