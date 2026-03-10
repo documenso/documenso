@@ -1,0 +1,260 @@
+---
+title: Signing Workflow
+description: The complete process from preparing a document to collecting signatures and sealing the final PDF.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Workflow Overview
+
+A typical signing workflow follows these steps:
+
+```mermaid
+flowchart LR
+  A[Prepare Document] --> B[Send Document] --> C[Notify Recipients] --> D[Recipients Sign] --> E[Seal & Finalize] --> F[Document Completed]
+```
+
+1. **Prepare** - Upload the document, add recipients, and place fields
+2. **Send** - Distribute the document to recipients
+3. **Notify** - Recipients receive signing requests
+4. **Sign** - Recipients complete their assigned fields
+5. **Complete** - Document is sealed and distributed to all parties
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Prepare the document
+
+Document preparation involves three main tasks: uploading, adding recipients, and placing fields.
+
+**Upload the document**
+
+Start by uploading a PDF. You can upload directly:
+
+- from your device
+- create from an existing template
+- or duplicate a previously sent document.
+
+Once uploaded, the document enters the **Draft** state.
+
+**Add recipients**
+
+Add the people who need to interact with the document. Each recipient needs:
+
+- an email address
+- a name
+- a role
+
+Available roles are:
+
+| Role      | Purpose                                             |
+| --------- | --------------------------------------------------- |
+| Signer    | Must sign the document                              |
+| Approver  | Must approve (signature optional)                   |
+| Viewer    | Must confirm they viewed the document               |
+| Assistant | Pre-fills fields for other recipients               |
+| CC        | Receives a copy after completion (no action needed) |
+
+**Place fields**
+
+Add fields that recipients will complete. At minimum, each signer needs one signature field. You can also add:
+
+- name
+- email
+- date
+- text
+- number
+- dropdown
+- checkbox
+- radio
+- initials fields
+
+Each field is assigned to a specific recipient, indicated by color coding in the editor.
+
+<Callout type="info">
+  The document cannot be sent until every signer has at least one signature field assigned to them.
+</Callout>
+
+</Step>
+
+<Step>
+### Send the document
+
+When the document is ready, you send it to recipients. You have two distribution options:
+
+<Tabs items={['Email distribution', 'Manual distribution']}>
+  <Tab value="Email distribution">
+
+Recipients receive an email notification with a link to sign.
+
+You can customize the email:
+
+- subject line
+- message body with personalized variables
+- reply-to address for recipient responses
+
+</Tab>
+  <Tab value="Manual distribution">
+
+Generate signing links without sending emails.
+
+Use this when you want to:
+
+- send links via SMS or messaging apps
+- embed links in your own application
+- control notification timing yourself
+
+</Tab>
+</Tabs>
+
+After sending, the document moves from **Draft** to **Pending** status.
+
+</Step>
+
+<Step>
+### Recipients are notified
+
+When you send a document via email, each recipient receives a notification containing:
+
+- the document title
+- your name and email (or team name)
+- your custom message (or a role-specific default)
+- a unique signing link
+
+The signing link is specific to each recipient and cannot be used by others. Links remain active until the document is completed, deleted, or expired.
+
+**Signing order**
+
+By default, all recipients are notified simultaneously (parallel signing). If you enable sequential signing, only recipients in the first signing position receive notifications initially. When they complete their actions, the next group is notified.
+
+This continues until all recipients have been notified and completed their actions.
+
+</Step>
+
+<Step>
+### Recipients sign
+
+When a recipient clicks their signing link, they see the document with their assigned fields highlighted. The signing experience depends on their role:
+
+<Tabs items={['Signer', 'Approver', 'Viewer']}>
+  <Tab value="Signer">
+
+Signers must complete all required fields before they can finish. For signature fields, they can:
+
+- draw a signature using mouse or touchscreen
+- type their name and select a font style
+- upload an image of their existing signature
+
+After completing all fields, the signer clicks a button to submit. They receive a confirmation and can download a copy of the document showing their completed fields.
+
+</Tab>
+  <Tab value="Approver">
+
+Approvers review the document and must explicitly approve it. If signature fields are assigned, they can optionally sign.
+
+The document cannot proceed until all approvers have given approval.
+
+</Tab>
+  <Tab value="Viewer">
+
+Viewers see the full document and must confirm they have viewed it. They cannot add signatures or modify any content.
+
+</Tab>
+</Tabs>
+
+**Authentication**
+
+You can require recipients to verify their identity before signing through:
+
+- email verification (confirm access to the email address)
+- access code (enter a code you provide separately)
+- passkey (authenticate with a hardware or software passkey)
+
+</Step>
+
+<Step>
+### Document is completed
+
+Once all recipients with required actions have completed them, the document is finalized.
+
+| Aspect           | Description                                                                                                                                                                                                                                                |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Sealing**      | The completed document is sealed with a digital certificate that cryptographically signs the PDF, prevents modification without detection, and provides proof of authenticity.                                                                             |
+| **Audit trail**  | An audit log is generated and can be attached to the document. It records when the document was created and sent, when each recipient viewed and signed, IP addresses and timestamps for each action, and any authentication methods used.                 |
+| **Distribution** | All parties receive the completed document: signers, approvers, and viewers receive their copy via email; CC recipients receive their first notification with the completed document; the document owner can download the signed PDF from their dashboard. |
+
+</Step>
+</Steps>
+
+## Workflow Variations
+
+Documenso supports several workflow variations to handle different signing scenarios.
+
+<Tabs items={['Sequential signing', 'Approval workflows', 'Assistants for pre-filling', 'Direct links']}>
+  <Tab value="Sequential signing">
+
+When recipients must sign in a specific order, enable signing order:
+
+1. Assign each recipient a signing position (1, 2, 3, etc.)
+2. Recipients at position 1 sign first
+3. Recipients at position 2 are notified only after position 1 completes
+4. Multiple recipients can share the same position to sign in parallel within that step
+
+Use sequential signing when later signers:
+
+- need to see what earlier signers entered
+- approval must happen before final signatures
+- company policy requires a specific signing order
+
+</Tab>
+  <Tab value="Approval workflows">
+
+Combine approver and signer roles to create approval workflows:
+
+1. Add approvers at signing position 1
+2. Add signers at signing position 2
+3. Approvers review and approve first
+4. Signers are notified only after approval is complete
+
+<Callout type="warn">
+  If an approver rejects the document (when rejection is enabled), the workflow stops and signers
+  are never notified.
+</Callout>
+
+</Tab>
+  <Tab value="Assistants for pre-filling">
+
+Use assistants to have one person prepare the document for another:
+
+1. Add an assistant at signing position 1
+2. Add the final signer at signing position 2
+3. The assistant pre-fills fields with suggested values
+4. The signer reviews and completes their signature
+
+This is useful when administrative staff prepare documents for executives or when gathering information from one person while another signs.
+
+<Callout type="info">
+  The Assistant role is only available when sequential signing is enabled.
+</Callout>
+
+</Tab>
+  <Tab value="Direct links">
+
+For high-volume signing scenarios, you can create direct links that allow anyone to sign without receiving an individual invitation:
+
+- Generate a public signing link for a document or template
+- Share the link on your website, in emails, or through other channels
+- Each person who accesses the link creates their own signing instance
+- Useful for waivers, consent forms, and public agreements
+
+</Tab>
+</Tabs>
+
+## Related Concepts
+
+- [Document Lifecycle](/docs/concepts/document-lifecycle) - Understanding document states from draft to completion
+- [Recipient Roles](/docs/concepts/recipient-roles) - Detailed explanation of each role type
+- [Field Types](/docs/concepts/field-types) - All available field types and their configuration options
+- [Signing Certificates](/docs/concepts/signing-certificates) - How documents are digitally sealed

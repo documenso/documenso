@@ -14,6 +14,7 @@ import {
 } from '@documenso/lib/constants/trpc';
 import type { TDocument } from '@documenso/lib/types/document';
 import { ZDocumentAccessAuthTypesSchema } from '@documenso/lib/types/document-auth';
+import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -27,10 +28,10 @@ import { AddSubjectFormPartial } from '@documenso/ui/primitives/document-flow/ad
 import type { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
 import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentEditFormProps = {
@@ -441,10 +442,16 @@ export const DocumentEditForm = ({
       >
         <CardContent className="p-2">
           <PDFViewerLazy
-            key={document.envelopeItems[0].id}
-            envelopeItem={document.envelopeItems[0]}
-            token={undefined}
-            version="signed"
+            key={document.envelopeItems[0]?.id}
+            data={getDocumentDataUrlForPdfViewer({
+              envelopeId: document.envelopeId,
+              envelopeItemId: document.envelopeItems[0]?.id,
+              documentDataId: initialDocument.documentDataId,
+              version: 'current',
+              token: undefined,
+              presignToken: undefined,
+            })}
+            scrollParentRef="window"
             onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
           />
         </CardContent>

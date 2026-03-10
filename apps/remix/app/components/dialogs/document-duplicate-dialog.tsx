@@ -13,7 +13,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useCurrentTeam } from '~/providers/team';
@@ -37,19 +36,6 @@ export const DocumentDuplicateDialog = ({
   const { _ } = useLingui();
 
   const team = useCurrentTeam();
-
-  const { data: envelopeItemsPayload, isLoading: isLoadingEnvelopeItems } =
-    trpcReact.envelope.item.getManyByToken.useQuery(
-      {
-        envelopeId: id,
-        access: token ? { type: 'recipient', token } : { type: 'user' },
-      },
-      {
-        enabled: open,
-      },
-    );
-
-  const envelopeItems = envelopeItemsPayload?.data || [];
 
   const documentsPath = formatDocumentsPath(team.url);
 
@@ -88,22 +74,6 @@ export const DocumentDuplicateDialog = ({
             <Trans>Duplicate</Trans>
           </DialogTitle>
         </DialogHeader>
-        {isLoadingEnvelopeItems || !envelopeItems || envelopeItems.length === 0 ? (
-          <div className="mx-auto -mt-4 flex w-full max-w-screen-xl flex-col px-4 md:px-8">
-            <h1 className="mt-4 grow-0 truncate text-2xl font-semibold md:text-3xl">
-              <Trans>Loading Document...</Trans>
-            </h1>
-          </div>
-        ) : (
-          <div className="p-2 [&>div]:h-[50vh] [&>div]:overflow-y-scroll">
-            <PDFViewerLazy
-              key={envelopeItems[0].id}
-              envelopeItem={envelopeItems[0]}
-              token={undefined}
-              version="original"
-            />
-          </div>
-        )}
 
         <DialogFooter>
           <div className="flex w-full flex-1 flex-nowrap gap-4">

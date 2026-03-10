@@ -298,8 +298,15 @@ test('field placement visual regression', async ({ page, request }, testInfo) =>
  *
  * DON'T COMMIT THIS WITHOUT THE "SKIP" COMMAND.
  */
-test.skip('download envelope images', async ({ page }) => {
+test.skip('download envelope images', async ({ page, request }) => {
   const { user, team } = await seedUser();
+
+  const { token: apiToken } = await createApiToken({
+    userId: user.id,
+    teamId: team.id,
+    tokenName: 'test',
+    expiresIn: null,
+  });
 
   const envelope = await seedAlignmentTestDocument({
     userId: user.id,
@@ -307,8 +314,17 @@ test.skip('download envelope images', async ({ page }) => {
     recipientName: user.name || '',
     recipientEmail: user.email,
     insertFields: true,
-    status: DocumentStatus.PENDING,
+    status: DocumentStatus.DRAFT,
   });
+
+  const distributeEnvelopeRequest = await request.post(`${baseUrl}/envelope/distribute`, {
+    headers: { Authorization: `Bearer ${apiToken}` },
+    data: {
+      envelopeId: envelope.id,
+    } satisfies TDistributeEnvelopeRequest,
+  });
+
+  expect(distributeEnvelopeRequest.ok()).toBeTruthy();
 
   const token = envelope.recipients[0].token;
 

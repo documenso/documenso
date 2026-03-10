@@ -16,7 +16,14 @@ import { getOrganisationClaimByTeamId } from '../organisation/get-organisation-c
 import { renderCertificate } from './render-certificate';
 
 export type GenerateCertificatePdfOptions = {
-  envelope: Envelope & {
+  /**
+   * Note: completedAt is not included since it's not real at this point in time.
+   *
+   * If we actually need it here in the future, we will need to preserve the
+   * completedAt value and pass it to the final `envelope.update` function when
+   * the document is initially sealed.
+   */
+  envelope: Omit<Envelope, 'completedAt'> & {
     documentMeta: DocumentMeta;
   };
   envelopeOwner: {

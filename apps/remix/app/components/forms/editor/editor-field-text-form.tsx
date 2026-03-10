@@ -134,7 +134,7 @@ export const EditorFieldTextForm = ({
                   <Trans>Label</Trans>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder={t`Field label`} {...field} />
+                  <Input data-testid="field-form-label" placeholder={t`Field label`} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -150,7 +150,11 @@ export const EditorFieldTextForm = ({
                   <Trans>Placeholder</Trans>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder={t`Field placeholder`} {...field} />
+                  <Input
+                    data-testid="field-form-placeholder"
+                    placeholder={t`Field placeholder`}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -167,6 +171,7 @@ export const EditorFieldTextForm = ({
                 </FormLabel>
                 <FormControl>
                   <Textarea
+                    data-testid="field-form-text"
                     className="h-auto"
                     placeholder={t`Add text to the field`}
                     {...field}
@@ -200,6 +205,7 @@ export const EditorFieldTextForm = ({
                 </FormLabel>
                 <FormControl>
                   <Input
+                    data-testid="field-form-characterLimit"
                     className="bg-background"
                     placeholder={t`Character limit`}
                     {...field}

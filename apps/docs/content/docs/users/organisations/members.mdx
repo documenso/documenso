@@ -1,0 +1,183 @@
+---
+title: Team Members
+description: Manage team member roles, invite and remove members, and configure access permissions.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+## Organisation Roles
+
+Organisation members have different permission levels that determine what they can do across the organisation.
+
+| Role        | Manage Settings | Manage Teams | Manage Members | Billing | Delete Organisation |
+| ----------- | --------------- | ------------ | -------------- | ------- | ------------------- |
+| **Owner**   | Yes             | Yes          | Yes            | Yes     | Yes                 |
+| **Admin**   | Yes             | Yes          | Yes            | Yes     | Yes                 |
+| **Manager** | Yes             | Yes          | Yes            | No      | No                  |
+| **Member**  | No              | No           | No             | No      | No                  |
+
+<Callout type="info">
+  Organisation Admins and Managers automatically receive Team Admin access to all teams in the
+  organisation.
+</Callout>
+
+## Team Member Roles
+
+Teams have three roles with different permission levels:
+
+| Role        | Permissions                                                                                            |
+| ----------- | ------------------------------------------------------------------------------------------------------ |
+| **Admin**   | Full access to team settings, can manage all members, delete the team, and control document visibility |
+| **Manager** | Can manage team members (at or below their role level) and access manager-level documents              |
+| **Member**  | Can access team documents shared with all members                                                      |
+
+### Role hierarchy
+
+Higher roles can manage users at or below their level:
+
+- Admins can add, update, or remove **Admins**, **Managers**, and **Members**
+- Managers can add, update, or remove **Managers** and **Members**
+- Members cannot manage other team members
+
+## Adding Team Members
+
+Before adding someone to a team, they must first be a member of your organisation.
+
+### Add existing organisation members
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Go to your team settings and click **Add members**.
+  </Step>
+  <Step>
+    Select organisation members from the list and click **Next**.
+  </Step>
+  <Step>
+    Assign a team role to each member, then click **Add Members**.
+  </Step>
+</Steps>
+
+<Callout type="info">
+  If you can't find someone in the member list, they need to be invited to your organisation first.
+  You can do this directly from the team member dialog.
+</Callout>
+
+### Invite new organisation members
+
+If the person you want to add isn't in your organisation yet:
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    In the **Add members** dialog, click **Invite them to the organisation first**.
+  </Step>
+  <Step>
+    Enter their email address and organisation role, then click **Send invite**.
+  </Step>
+  <Step>
+    Once they accept, return to add them to the team.
+  </Step>
+</Steps>
+
+### Bulk invite via CSV
+
+You can invite multiple members at once by uploading a CSV file. The CSV should have the following structure:
+
+| Email address       | Role    |
+| ------------------- | ------- |
+| admin@example.com   | Admin   |
+| manager@example.com | Manager |
+| member@example.com  | Member  |
+
+## Accepting Invitations
+
+When someone invites you to an organisation:
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Check your email for the invitation and click the link.
+  </Step>
+  <Step>
+    Sign in or create a Documenso account.
+  </Step>
+  <Step>
+    Accept the invitation.
+  </Step>
+</Steps>
+
+After joining the organisation, a team admin or manager can add you to specific teams.
+
+## Changing Member Roles
+
+To change a team member's role:
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Go to your team settings and find the member in the list.
+  </Step>
+  <Step>
+    Click the actions menu (three dots) and select **Update role**.
+  </Step>
+  <Step>
+    Choose the new role and click **Update**.
+  </Step>
+</Steps>
+
+<Callout type="warn">
+  You can only change roles for members at or below your own role level. For example, managers
+  cannot change an admin's role.
+</Callout>
+
+## Removing Members
+
+To remove someone from a team:
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Go to your team settings and find the member in the list.
+  </Step>
+  <Step>
+    Click the actions menu (three dots) and select **Remove from team**.
+  </Step>
+  <Step>
+    Confirm the removal.
+  </Step>
+</Steps>
+
+Removing someone from a team doesn't remove them from the organisation. They can be re-added to the team later.
+
+## Member Limits
+
+Member limits depend on your plan. The Platform plan includes unlimited members but is limited to a single team. The Teams plan includes 5 organisation members, with additional members charged per seat.
+
+| Plan           | Included Members | Teams  | Additional Members |
+| -------------- | ---------------- | ------ | ------------------ |
+| **Platform**   | Unlimited        | 1      | N/A                |
+| **Teams**      | 5                | Custom | Per-seat pricing   |
+| **Enterprise** | Custom           | Custom | Per agreement      |
+
+When you invite new members on a seat-based plan, your billing automatically adjusts. Check your organisation's billing settings to see your current member count and limits.
+
+## Document Visibility
+
+Team documents have visibility settings that control which roles can access them:
+
+| Visibility            | Who can see         |
+| --------------------- | ------------------- |
+| **Admin only**        | Only team admins    |
+| **Manager and above** | Admins and managers |
+| **Everyone**          | All team members    |
+
+Admins can set default visibility for new documents in team settings.
+
+---
+
+## See Also
+
+- [Single Sign-On](/docs/users/organisations/single-sign-on) - Configure SSO for your organisation
+- [Create a Team](/docs/users/organisations/create-team) - Set up additional teams

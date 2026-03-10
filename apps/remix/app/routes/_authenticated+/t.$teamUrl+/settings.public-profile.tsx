@@ -207,7 +207,9 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
             directTemplates={enabledPrivateDirectTemplates}
             trigger={
               <Button variant="outline">
-                <Trans>Link template</Trans>
+                <Trans context="Action button to link template to public profile">
+                  Link template
+                </Trans>
               </Button>
             }
           />

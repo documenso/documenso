@@ -1,0 +1,307 @@
+---
+title: Docker
+description: Run Documenso as a standalone Docker container with an external database. Ideal for container platforms like AWS ECS, Google Cloud Run, or Azure Container Instances.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+## Prerequisites
+
+For a self-contained setup that includes PostgreSQL, see [Docker Compose Deployment](/docs/self-hosting/deployment/docker-compose).
+
+Before starting, ensure you have:
+
+- [Docker](https://docs.docker.com/get-docker/) 20.10 or later installed
+- A PostgreSQL 14+ database accessible from your Docker host
+- SMTP credentials for sending emails
+- At least 1GB of available RAM
+
+Verify Docker is installed:
+
+```bash
+docker --version
+```
+
+## Pulling the Docker Image
+
+```bash
+docker pull documenso/documenso:latest
+```
+
+### Available Tags
+
+| Tag       | Description                      |
+| --------- | -------------------------------- |
+| `latest`  | Latest stable release            |
+| `x.y.z`   | Specific version (e.g., `1.5.0`) |
+| `release` | Latest release branch build      |
+
+<Callout type="info">
+  Pin to a specific version tag in production to avoid unexpected updates.
+</Callout>
+
+## Environment Variables
+
+### Required Variables
+
+These variables must be set for Documenso to start:
+
+| Variable                                | Description                                                                 | Default                       |
+| --------------------------------------- | --------------------------------------------------------------------------- | ----------------------------- |
+| `NEXTAUTH_SECRET`                       | Secret key for session encryption. Generate with `openssl rand -base64 32`  | -                             |
+| `NEXT_PRIVATE_ENCRYPTION_KEY`           | Primary encryption key (minimum 32 characters)                              | -                             |
+| `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY` | Secondary encryption key (minimum 32 characters)                            | -                             |
+| `NEXT_PUBLIC_WEBAPP_URL`                | Public URL where Documenso is accessible (e.g., `https://sign.example.com`) | -                             |
+| `NEXT_PRIVATE_INTERNAL_WEBAPP_URL`      | Internal URL the app uses to call itself (for background jobs)              | Same as `NEXT_PUBLIC_WEBAPP_URL` |
+| `NEXT_PRIVATE_DATABASE_URL`             | PostgreSQL connection string                                                | -                             |
+| `NEXT_PRIVATE_SMTP_TRANSPORT`           | Email transport: `smtp-auth`, `smtp-api`, `resend`, or `mailchannels`       | `smtp-auth`                   |
+| `NEXT_PRIVATE_SMTP_FROM_NAME`           | Sender name for outgoing emails                                             | -                             |
+| `NEXT_PRIVATE_SMTP_FROM_ADDRESS`        | Sender email address                                                        | -                             |
+
+### Database Connection
+
+Documenso requires two database connection strings:
+
+| Variable                           | Required     | Default                     | Description                       |
+| ---------------------------------- | ------------ | --------------------------- | --------------------------------- |
+| `NEXT_PRIVATE_DATABASE_URL`        | Yes          | -                           | Pooled connection for app queries |
+| `NEXT_PRIVATE_DIRECT_DATABASE_URL` | When pooling | `NEXT_PRIVATE_DATABASE_URL` | Direct connection for migrations  |
+
+Connection string format:
+
+```
+postgresql://user:password@host:5432/database
+```
+
+If you're not using a connection pooler like PgBouncer, both variables can use the same connection string.
+
+### SMTP Configuration
+
+For `smtp-auth` transport:
+
+| Variable                     | Required | Default     | Description                           |
+| ---------------------------- | -------- | ----------- | ------------------------------------- |
+| `NEXT_PRIVATE_SMTP_HOST`     | Yes      | `127.0.0.1` | SMTP server hostname                  |
+| `NEXT_PRIVATE_SMTP_PORT`     | Yes      | `587`       | SMTP server port (usually 587 or 465) |
+| `NEXT_PRIVATE_SMTP_USERNAME` | Yes      | -           | SMTP username                         |
+| `NEXT_PRIVATE_SMTP_PASSWORD` | Yes      | -           | SMTP password                         |
+| `NEXT_PRIVATE_SMTP_SECURE`   | No       | `false`     | Set to `true` to force TLS            |
+
+See [Email Configuration](/docs/self-hosting/configuration/email) for other transport options.
+
+### Optional Variables
+
+| Variable                                    | Description                                                    | Default                   |
+| ------------------------------------------- | -------------------------------------------------------------- | ------------------------- |
+| `PORT`                                      | Port the application listens on                                | `3000`                    |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`      | Path to signing certificate inside container                   | `/opt/documenso/cert.p12` |
+| `NEXT_PRIVATE_SIGNING_PASSPHRASE`           | Passphrase for the signing certificate                         | -                         |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS`  | Base64-encoded `.p12` certificate (alternative to file path)   | -                         |
+| `NEXT_PUBLIC_UPLOAD_TRANSPORT`              | Document storage: `database` or `s3`                           | `database`                |
+| `NEXT_PUBLIC_DISABLE_SIGNUP`                | Disable public signups                                         | `false`                   |
+
+For the complete list, see [Environment Variables](/docs/self-hosting/configuration/environment).
+
+## Running with Docker
+
+### Minimum Example
+
+```bash
+docker run -d \
+  --name documenso \
+  -p 3000:3000 \
+  -v /path/to/cert.p12:/opt/documenso/cert.p12:ro \
+  -e NEXTAUTH_SECRET="$(openssl rand -base64 32)" \
+  -e NEXT_PRIVATE_ENCRYPTION_KEY="your-encryption-key-min-32-chars" \
+  -e NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="your-secondary-key-min-32-chars" \
+  -e NEXT_PUBLIC_WEBAPP_URL="https://sign.example.com" \
+  -e NEXT_PRIVATE_INTERNAL_WEBAPP_URL="http://localhost:3000" \
+  -e NEXT_PRIVATE_DATABASE_URL="postgresql://user:password@db-host:5432/documenso" \
+  -e NEXT_PRIVATE_SIGNING_PASSPHRASE="your-certificate-password" \
+  -e NEXT_PRIVATE_SMTP_TRANSPORT="smtp-auth" \
+  -e NEXT_PRIVATE_SMTP_HOST="smtp.example.com" \
+  -e NEXT_PRIVATE_SMTP_PORT="587" \
+  -e NEXT_PRIVATE_SMTP_USERNAME="your-smtp-user" \
+  -e NEXT_PRIVATE_SMTP_PASSWORD="your-smtp-password" \
+  -e NEXT_PRIVATE_SMTP_FROM_NAME="Documenso" \
+  -e NEXT_PRIVATE_SMTP_FROM_ADDRESS="noreply@example.com" \
+  documenso/documenso:latest
+```
+
+### Signing Certificate
+
+A signing certificate is required for document signing. You have two options for providing one:
+
+- **Volume mount** — mount a `.p12` file from the host into the container at `/opt/documenso/cert.p12` (shown above). This is the simplest approach for small to moderate deployments.
+- **Base64-encoded contents** — set `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` with the base64-encoded certificate string. Use this when file mounting is not available (e.g., Railway, Vercel).
+
+For production deployments that require Adobe Approved Trust List recognition, consider using a [Google Cloud HSM](/docs/self-hosting/configuration/signing-certificate/google-cloud-hsm) or another external HSM.
+
+<Callout type="warn">
+  Do not generate or store the signing certificate inside the container. If the container is
+  destroyed and rebuilt, or if you run multiple instances, the certificate will be lost or
+  inconsistent. Always provide the certificate externally.
+</Callout>
+
+See [Signing Certificate Configuration](/docs/self-hosting/configuration/signing-certificate) for generating certificates and detailed setup.
+
+### Using an Environment File
+
+For easier management, use an environment file:
+
+Create `.env`:
+
+```bash
+NEXTAUTH_SECRET=your-secret-here
+NEXT_PRIVATE_ENCRYPTION_KEY=your-encryption-key-min-32-chars
+NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=your-secondary-key-min-32-chars
+NEXT_PUBLIC_WEBAPP_URL=https://sign.example.com
+NEXT_PRIVATE_INTERNAL_WEBAPP_URL=http://localhost:3000
+NEXT_PRIVATE_DATABASE_URL=postgresql://user:password@db-host:5432/documenso
+NEXT_PRIVATE_DIRECT_DATABASE_URL=postgresql://user:password@db-host:5432/documenso
+NEXT_PRIVATE_SIGNING_PASSPHRASE=your-certificate-password
+NEXT_PRIVATE_SMTP_TRANSPORT=smtp-auth
+NEXT_PRIVATE_SMTP_HOST=smtp.example.com
+NEXT_PRIVATE_SMTP_PORT=587
+NEXT_PRIVATE_SMTP_USERNAME=your-smtp-user
+NEXT_PRIVATE_SMTP_PASSWORD=your-smtp-password
+NEXT_PRIVATE_SMTP_FROM_NAME=Documenso
+NEXT_PRIVATE_SMTP_FROM_ADDRESS=noreply@example.com
+```
+
+Run with the environment file:
+
+```bash
+docker run -d \
+  --name documenso \
+  -p 3000:3000 \
+  --env-file .env \
+  -v /path/to/cert.p12:/opt/documenso/cert.p12:ro \
+  documenso/documenso:latest
+```
+
+## Health Checks
+
+Documenso provides health check endpoints for monitoring:
+
+| Endpoint                  | Purpose                                                        |
+| ------------------------- | -------------------------------------------------------------- |
+| `/api/health`             | Checks database connectivity and certificate status            |
+| `/api/certificate-status` | Returns whether a signing certificate is configured and usable |
+
+### Docker Health Check
+
+Add a health check to your container:
+
+```bash
+docker run -d \
+  --name documenso \
+  -p 3000:3000 \
+  --health-cmd="curl -f http://localhost:3000/api/health || exit 1" \
+  --health-interval=30s \
+  --health-timeout=10s \
+  --health-retries=3 \
+  --env-file .env \
+  documenso/documenso:latest
+```
+
+Check container health status:
+
+```bash
+docker inspect --format='{{.State.Health.Status}}' documenso
+```
+
+## Updating the Container
+
+To update Documenso to a new version:
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+
+### Pull the new image
+
+```bash
+docker pull documenso/documenso:latest
+```
+
+</Step>
+<Step>
+
+### Stop and remove the existing container
+
+```bash
+docker stop documenso
+docker rm documenso
+```
+
+</Step>
+<Step>
+
+### Start a new container with the same configuration
+
+```bash
+docker run -d \
+  --name documenso \
+  -p 3000:3000 \
+  --env-file .env \
+  -v /path/to/cert.p12:/opt/documenso/cert.p12:ro \
+  documenso/documenso:latest
+```
+
+</Step>
+</Steps>
+
+<Callout type="info">
+  Database migrations run automatically when the container starts. Back up your database before
+  upgrading.
+</Callout>
+
+## Persistence
+
+The Documenso container is stateless. All persistent data is stored in the PostgreSQL database.
+
+By default, documents are also stored in the database. For high-volume deployments, configure S3-compatible storage instead. See [Storage Configuration](/docs/self-hosting/configuration/storage) for S3 setup.
+
+## Troubleshooting
+
+<Accordions type="multiple">
+  <Accordion title="Container fails to start">
+    Check the container logs: `docker logs documenso`. Common causes: missing required environment
+    variables (ensure all required variables are set), database connection failed (verify the
+    database URL and network connectivity), port already in use (change the host port or stop the
+    conflicting service).
+  </Accordion>
+  <Accordion title="Database connection errors">
+    Test connectivity: `docker run --rm postgres:15 psql
+    "postgresql://user:password@host:5432/database" -c "SELECT 1"`. If using Docker networks, ensure
+    the container can reach the database.
+  </Accordion>
+  <Accordion title="Certificate errors">
+    Check certificate status: `curl http://localhost:3000/api/certificate-status`. Common issues:
+    file not found (verify the volume mount path), permission denied (ensure the file is readable,
+    UID 1001 inside the container), no password (the certificate must have a password set). Fix
+    permissions: `chmod 644 /path/to/cert.p12` and `chown 1001:1001 /path/to/cert.p12`.
+  </Accordion>
+  <Accordion title="Emails not sending">
+    Verify SMTP configuration: check `NEXT_PRIVATE_SMTP_TRANSPORT` matches your configuration, for
+    `smtp-auth` ensure host, port, username, and password are correct, check if your SMTP provider
+    requires TLS (`NEXT_PRIVATE_SMTP_SECURE=true`).
+  </Accordion>
+  <Accordion title="Container runs but application is inaccessible">
+    Verify port mapping `-p 3000:3000`, check if `NEXT_PUBLIC_WEBAPP_URL` matches how you're
+    accessing the application, ensure no firewall is blocking the port.
+  </Accordion>
+</Accordions>
+
+---
+
+## See Also
+
+- [Docker Compose Deployment](/docs/self-hosting/deployment/docker-compose) - Multi-container setup with PostgreSQL included
+- [Environment Variables](/docs/self-hosting/configuration/environment) - Full configuration reference
+- [Signing Certificate](/docs/self-hosting/configuration/signing-certificate) - Set up document signing
+- [Email Configuration](/docs/self-hosting/configuration/email) - Configure SMTP providers
+- [Storage Configuration](/docs/self-hosting/configuration/storage) - Set up S3-compatible storage

@@ -9,6 +9,12 @@ import { DocumentSignatureType } from '@documenso/lib/utils/teams';
 
 export { DocumentSignatureType };
 
+/**
+ * Maximum count returned per status bucket in document stats. The server clamps
+ * each count to this value; the UI should display "10,000+" when it sees it.
+ */
+export const STATS_COUNT_CAP = 10_000;
+
 export const DOCUMENT_STATUS: {
   [status in DocumentStatus]: { description: MessageDescriptor };
 } = {

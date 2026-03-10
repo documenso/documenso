@@ -1,16 +1,12 @@
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
-import type { Envelope, Recipient, User } from '@prisma/client';
-import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
+import { DocumentStatus, DocumentVisibility, EnvelopeType, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
-import {
-  buildTeamWhereQuery,
-  formatDocumentsPath,
-  getHighestTeamRoleInGroup,
-} from '@documenso/lib/utils/teams';
+import { formatDocumentsPath, getHighestTeamRoleInGroup } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
 import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
+import { getUserTeamGroups } from '../team/get-user-team-groups';
 
 export type SearchDocumentsWithKeywordOptions = {
   query: string;
@@ -23,105 +19,83 @@ export const searchDocumentsWithKeyword = async ({
   userId,
   limit = 20,
 }: SearchDocumentsWithKeywordOptions) => {
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
+  if (!query.trim()) {
+    return [];
+  }
+
+  const [user, teamGroupsByTeamId] = await Promise.all([
+    prisma.user.findFirstOrThrow({
+      where: {
+        id: userId,
+      },
+    }),
+    getUserTeamGroups({ userId }),
+  ]);
+
+  const teamIds = [...teamGroupsByTeamId.keys()];
+
+  const filters: Prisma.EnvelopeWhereInput[] = [
+    // Documents owned by the user matching title, externalId, or recipient email.
+    {
+      userId,
+      deletedAt: null,
+      OR: [
+        { title: { contains: query, mode: 'insensitive' } },
+        { externalId: { contains: query, mode: 'insensitive' } },
+        {
+          recipients: {
+            some: { email: { contains: query, mode: 'insensitive' } },
+          },
+        },
+      ],
     },
-  });
+    // Documents where the user is a recipient (completed or pending).
+    {
+      status: { in: [DocumentStatus.COMPLETED, DocumentStatus.PENDING] },
+      recipients: { some: { email: user.email } },
+      title: { contains: query, mode: 'insensitive' },
+      deletedAt: null,
+    },
+  ];
+
+  // Team documents the user has access to.
+  if (teamIds.length > 0) {
+    filters.push({
+      teamId: { in: teamIds },
+      deletedAt: null,
+      OR: [
+        { title: { contains: query, mode: 'insensitive' } },
+        { externalId: { contains: query, mode: 'insensitive' } },
+        {
+          recipients: {
+            some: { email: { contains: query, mode: 'insensitive' } },
+          },
+        },
+      ],
+    });
+  }
 
   const envelopes = await prisma.envelope.findMany({
     where: {
       type: EnvelopeType.DOCUMENT,
-      OR: [
-        {
-          title: {
-            contains: query,
-            mode: 'insensitive',
-          },
-          userId: userId,
-          deletedAt: null,
-        },
-        {
-          externalId: {
-            contains: query,
-            mode: 'insensitive',
-          },
-          userId: userId,
-          deletedAt: null,
-        },
-        {
-          recipients: {
-            some: {
-              email: {
-                contains: query,
-                mode: 'insensitive',
-              },
-            },
-          },
-          userId: userId,
-          deletedAt: null,
-        },
-        {
-          status: DocumentStatus.COMPLETED,
-          recipients: {
-            some: {
-              email: user.email,
-            },
-          },
-          title: {
-            contains: query,
-            mode: 'insensitive',
-          },
-        },
-        {
-          status: DocumentStatus.PENDING,
-          recipients: {
-            some: {
-              email: user.email,
-            },
-          },
-          title: {
-            contains: query,
-            mode: 'insensitive',
-          },
-          deletedAt: null,
-        },
-        {
-          title: {
-            contains: query,
-            mode: 'insensitive',
-          },
-          team: buildTeamWhereQuery({ teamId: undefined, userId }),
-          deletedAt: null,
-        },
-        {
-          externalId: {
-            contains: query,
-            mode: 'insensitive',
-          },
-          team: buildTeamWhereQuery({ teamId: undefined, userId }),
-          deletedAt: null,
-        },
-      ],
+      OR: filters,
     },
-    include: {
-      recipients: true,
+    select: {
+      id: true,
+      userId: true,
+      teamId: true,
+      title: true,
+      secondaryId: true,
+      visibility: true,
+      recipients: {
+        select: {
+          email: true,
+          token: true,
+        },
+      },
       team: {
         select: {
           url: true,
-          teamGroups: {
-            where: {
-              organisationGroup: {
-                organisationGroupMembers: {
-                  some: {
-                    organisationMember: {
-                      userId,
-                    },
-                  },
-                },
-              },
-            },
-          },
         },
       },
     },
@@ -129,29 +103,24 @@ export const searchDocumentsWithKeyword = async ({
     orderBy: {
       createdAt: 'desc',
     },
-    take: limit,
+    // Over-fetch to compensate for post-query visibility filtering on team documents.
+    take: limit * 3,
   });
 
-  const isOwner = (envelope: Envelope, user: User) => envelope.userId === user.id;
-
-  const getSigningLink = (recipients: Recipient[], user: User) =>
-    `/sign/${recipients.find((r) => r.email === user.email)?.token}`;
-
-  const maskedDocuments = envelopes
+  const results = envelopes
     .filter((envelope) => {
-      if (!envelope.teamId || isOwner(envelope, user)) {
+      if (!envelope.teamId || envelope.userId === user.id) {
         return true;
       }
 
-      const teamMemberRole = getHighestTeamRoleInGroup(
-        envelope.team.teamGroups.filter((tg) => tg.teamId === envelope.teamId),
-      );
+      const teamGroups = teamGroupsByTeamId.get(envelope.teamId) ?? [];
+      const teamMemberRole = getHighestTeamRoleInGroup(teamGroups);
 
       if (!teamMemberRole) {
         return false;
       }
 
-      const canAccessDocument = match([envelope.visibility, teamMemberRole])
+      return match([envelope.visibility, teamMemberRole])
         .with([DocumentVisibility.EVERYONE, TeamMemberRole.ADMIN], () => true)
         .with([DocumentVisibility.EVERYONE, TeamMemberRole.MANAGER], () => true)
         .with([DocumentVisibility.EVERYONE, TeamMemberRole.MEMBER], () => true)
@@ -159,34 +128,29 @@ export const searchDocumentsWithKeyword = async ({
         .with([DocumentVisibility.MANAGER_AND_ABOVE, TeamMemberRole.MANAGER], () => true)
         .with([DocumentVisibility.ADMIN, TeamMemberRole.ADMIN], () => true)
         .otherwise(() => false);
-
-      return canAccessDocument;
     })
+    .slice(0, limit)
     .map((envelope) => {
-      const { recipients, ...documentWithoutRecipient } = envelope;
-
-      let documentPath;
-
       const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 
-      if (isOwner(envelope, user)) {
-        documentPath = `${formatDocumentsPath(envelope.team.url)}/${legacyDocumentId}`;
-      } else if (envelope.teamId && envelope.team.teamGroups.length > 0) {
-        documentPath = `${formatDocumentsPath(envelope.team.url)}/${legacyDocumentId}`;
+      let path: string;
+
+      if (
+        envelope.userId === user.id ||
+        (envelope.teamId && teamGroupsByTeamId.has(envelope.teamId))
+      ) {
+        path = `${formatDocumentsPath(envelope.team.url)}/${legacyDocumentId}`;
       } else {
-        documentPath = getSigningLink(recipients, user);
+        const signingToken = envelope.recipients.find((r) => r.email === user.email)?.token;
+        path = `/sign/${signingToken}`;
       }
 
       return {
-        ...documentWithoutRecipient,
-        team: {
-          id: envelope.teamId,
-          url: envelope.team.url,
-        },
-        path: documentPath,
+        title: envelope.title,
+        path,
         value: [envelope.id, envelope.title, ...envelope.recipients.map((r) => r.email)].join(' '),
       };
     });
 
-  return maskedDocuments;
+  return results;
 };

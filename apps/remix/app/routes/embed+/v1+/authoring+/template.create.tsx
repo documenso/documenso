@@ -3,6 +3,10 @@ import { useLayoutEffect, useState } from 'react';
 import { useLingui } from '@lingui/react';
 import { useNavigate } from 'react-router';
 
+import {
+  type TBaseEmbedAuthoringSchema,
+  ZBaseEmbedAuthoringSchema,
+} from '@documenso/lib/types/embed-authoring-base-schema';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { trpc } from '@documenso/trpc/react';
 import { Stepper } from '@documenso/ui/primitives/stepper';
@@ -13,10 +17,6 @@ import { ConfigureDocumentView } from '~/components/embed/authoring/configure-do
 import type { TConfigureEmbedFormSchema } from '~/components/embed/authoring/configure-document-view.types';
 import { ConfigureFieldsView } from '~/components/embed/authoring/configure-fields-view';
 import type { TConfigureFieldsFormSchema } from '~/components/embed/authoring/configure-fields-view.types';
-import {
-  type TBaseEmbedAuthoringSchema,
-  ZBaseEmbedAuthoringSchema,
-} from '~/types/embed-authoring-base-schema';
 
 export default function EmbeddingAuthoringTemplateCreatePage() {
   const { _ } = useLingui();

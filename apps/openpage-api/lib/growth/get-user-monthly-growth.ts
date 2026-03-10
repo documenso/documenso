@@ -17,8 +17,7 @@ export const getUserMonthlyGrowth = async (type: 'count' | 'cumulative' = 'count
         .as('cume_count'),
     ])
     .groupBy('month')
-    .orderBy('month', 'desc')
-    .limit(12);
+    .orderBy('month', 'desc');
 
   const result = await qb.execute();
 
@@ -34,7 +33,7 @@ export const getUserMonthlyGrowth = async (type: 'count' | 'cumulative' = 'count
     ],
   };
 
-  return addZeroMonth(transformedData);
+  return addZeroMonth(transformedData, type === 'cumulative');
 };
 
 export type GetUserMonthlyGrowthResult = Awaited<ReturnType<typeof getUserMonthlyGrowth>>;

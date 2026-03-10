@@ -1,0 +1,56 @@
+---
+title: Authoring
+description: Embed document, template, and envelope creation directly in your application.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+In addition to embedding signing, Documenso supports embedded authoring. It allows your users to create and edit documents, templates, and envelopes without leaving your application.
+
+<Callout type="warn">
+  Embedded authoring is included with [Enterprise](https://documen.so/enterprise-cta) plans. It is
+  also available as a paid add-on for the [Platform Plan](https://documen.so/platform-cta-pricing).
+  Contact sales for access.
+</Callout>
+
+## Versions
+
+Embedded authoring is available in two versions:
+
+- **[V1 Authoring](/docs/developers/embedding/authoring/v1)** — Works with V1 Documents and Templates.
+- **[V2 Authoring](/docs/developers/embedding/authoring/v2)** — Works with Envelopes, which are the unified model for documents and templates.
+
+### Comparison
+
+| Aspect | V1 | V2 |
+| --- | --- | --- |
+| Entity model | Documents and Templates (separate) | Envelopes (unified, can be documents or templates) |
+| API compatibility | V1 Documents/Templates API | V2 Envelopes API |
+| Customization | 6 simple boolean flags | Rich structured settings with sections (general, settings, actions, envelope items, recipients) |
+
+---
+
+## Presign Tokens
+
+Before using any authoring component, obtain a presign token from your backend:
+
+```
+POST /api/v2/embedding/create-presign-token
+```
+
+This endpoint requires your Documenso API key. The token has a default expiration of 1 hour.
+
+See the [API documentation](https://openapi.documenso.com/reference#tag/embedding) for full details.
+
+<Callout type="warn">
+  Presign tokens should be created server-side. Never expose your API key in client-side code.
+</Callout>
+
+---
+
+## Next Steps
+
+- [V1 Authoring](/docs/developers/embedding/authoring/v1) — Create and edit documents and templates using V1 components
+- [V2 Authoring](/docs/developers/embedding/authoring/v2) — Create and edit envelopes using V2 components
+- [CSS Variables](/docs/developers/embedding/css-variables) — Customize the appearance of embedded components
+- [SDKs](/docs/developers/embedding/sdks) — Framework-specific SDK documentation

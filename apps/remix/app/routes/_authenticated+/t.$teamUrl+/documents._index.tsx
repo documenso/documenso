@@ -7,7 +7,10 @@ import { useParams, useSearchParams } from 'react-router';
 import { Link } from 'react-router';
 import { z } from 'zod';
 
+import { useSessionStorage } from '@documenso/lib/client-only/hooks/use-session-storage';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { STATS_COUNT_CAP } from '@documenso/lib/constants/document';
+import { SKIP_QUERY_BATCH_META } from '@documenso/lib/constants/trpc';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { parseToIntegerArray } from '@documenso/lib/utils/params';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
@@ -58,7 +61,10 @@ export default function DocumentsPage() {
   const [isMovingDocument, setIsMovingDocument] = useState(false);
   const [documentToMove, setDocumentToMove] = useState<number | null>(null);
 
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>(
+    'documents-bulk-selection',
+    {},
+  );
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
 
@@ -80,10 +86,15 @@ export default function DocumentsPage() {
     [searchParams],
   );
 
-  const { data, isLoading, isLoadingError } = trpc.document.findDocumentsInternal.useQuery({
-    ...findDocumentSearchParams,
-    folderId,
-  });
+  const { data, isLoading, isLoadingError } = trpc.document.findDocumentsInternal.useQuery(
+    {
+      ...findDocumentSearchParams,
+      folderId,
+    },
+    {
+      ...SKIP_QUERY_BATCH_META,
+    },
+  );
 
   const getTabHref = (value: keyof typeof ExtendedDocumentStatus) => {
     const params = new URLSearchParams(searchParams);
@@ -120,11 +131,6 @@ export default function DocumentsPage() {
       setStats(data.stats);
     }
   }, [data?.stats]);
-
-  // Clear selection when navigation or filters change
-  useEffect(() => {
-    setRowSelection({});
-  }, [folderId, findDocumentSearchParams]);
 
   return (
     <EnvelopeDropZoneWrapper type={EnvelopeType.DOCUMENT}>
@@ -173,7 +179,11 @@ export default function DocumentsPage() {
                         <DocumentStatus status={value} />
 
                         {value !== ExtendedDocumentStatus.ALL && (
-                          <span className="ml-1 inline-block opacity-50">{stats[value]}</span>
+                          <span className="ml-1 inline-block opacity-50">
+                            {stats[value] >= STATS_COUNT_CAP
+                              ? `${STATS_COUNT_CAP.toLocaleString()}+`
+                              : stats[value]}
+                          </span>
                         )}
                       </Link>
                     </TabsTrigger>

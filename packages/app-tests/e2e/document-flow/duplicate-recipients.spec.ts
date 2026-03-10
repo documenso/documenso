@@ -44,21 +44,21 @@ const completeDocumentFlowWithDuplicateRecipients = async (options: {
   // Step 3: Add fields for each recipient
   // Add signature field for first duplicate recipient
   await page.getByRole('button', { name: 'Signature' }).click();
-  await page.locator('canvas').click({ position: { x: 100, y: 100 } });
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 100, y: 100 } });
 
   await page.getByText('Duplicate Recipient 1 (duplicate@example.com)').click();
 
   // Switch to second duplicate recipient and add their field
   await page.getByText('Duplicate Recipient 2 (duplicate@example.com)').click();
   await page.getByRole('button', { name: 'Signature' }).click();
-  await page.locator('canvas').click({ position: { x: 200, y: 100 } });
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 200, y: 100 } });
 
   await page.getByText('Duplicate Recipient 2 (duplicate@example.com)').click();
 
   // Switch to unique recipient and add their field
   await page.getByText('Unique Recipient (unique@example.com)').click();
   await page.getByRole('button', { name: 'Signature' }).click();
-  await page.locator('canvas').click({ position: { x: 300, y: 100 } });
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 300, y: 100 } });
 
   // Continue to subject
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -122,7 +122,7 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
     await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({ position: { x: 100, y: 100 } });
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 100, y: 100 } });
 
     // Save the document by going to subject
     await page.getByRole('button', { name: 'Continue' }).click();
@@ -149,7 +149,7 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
     await page.getByText('Test Recipient Duplicate (test@example.com)').first().click();
 
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({ position: { x: 200, y: 100 } });
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 200, y: 100 } });
 
     // Complete the flow
     await page.getByRole('button', { name: 'Continue' }).click();
@@ -270,24 +270,24 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
 
     // Add signature for first recipient
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({ position: { x: 100, y: 100 } });
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 100, y: 100 } });
 
     // Add name field for second recipient
     await page.getByRole('combobox').first().click();
 
     await page.getByText('Approver Role (signer@example.com)').first().click();
     await page.getByRole('button', { name: 'Name' }).click();
-    await page.locator('canvas').click({ position: { x: 200, y: 100 } });
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 200, y: 100 } });
 
     // Add date field for second recipient
     await page.getByRole('button', { name: 'Date' }).click();
-    await page.locator('canvas').click({ position: { x: 200, y: 150 } });
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 200, y: 150 } });
 
     // If second recipient is still a SIGNER (role change wasn't available),
     // add a signature field for them to pass validation
     if (!secondRecipientIsApprover) {
       await page.getByRole('button', { name: 'Signature' }).click();
-      await page.locator('canvas').click({ position: { x: 200, y: 200 } });
+      await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 200, y: 200 } });
     }
 
     // Complete the document
@@ -349,7 +349,7 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
 
     // Add another field to the second duplicate
     await page.getByRole('button', { name: 'Name' }).click();
-    await page.locator('canvas').click({ position: { x: 250, y: 150 } });
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 250, y: 150 } });
 
     // Save changes
     await page.getByRole('button', { name: 'Continue' }).click();

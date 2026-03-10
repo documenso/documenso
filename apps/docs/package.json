@@ -1,0 +1,36 @@
+{
+  "name": "@documenso/docs",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "start": "next start",
+    "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
+    "postinstall": "fumadocs-mdx"
+  },
+  "dependencies": {
+    "@radix-ui/react-tabs": "^1.1.13",
+    "fumadocs-core": "16.5.0",
+    "fumadocs-mdx": "14.2.6",
+    "fumadocs-ui": "16.5.0",
+    "lucide-react": "^0.563.0",
+    "mermaid": "^11.12.2",
+    "next": "16.1.6",
+    "next-plausible": "^3.12.5",
+    "next-themes": "^0.4.6",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwind-merge": "^3.4.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/mdx": "^2.0.13",
+    "@types/node": "^25.1.0",
+    "@types/react": "^19.2.10",
+    "@types/react-dom": "^19.2.3",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3"
+  }
+}

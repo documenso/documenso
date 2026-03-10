@@ -1,0 +1,6 @@
+{
+  "title": "Self-Hosting",
+  "description": "Run your own instance",
+  "root": true,
+  "pages": ["getting-started", "deployment", "configuration", "maintenance"]
+}

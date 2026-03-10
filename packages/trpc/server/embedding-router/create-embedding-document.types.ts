@@ -41,7 +41,6 @@ export const ZCreateEmbeddingDocumentRequestSchema = z.object({
       // Search: "map<any>" to find it
       fields: ZFieldAndMetaSchema.and(
         z.object({
-          id: z.number().optional(),
           pageNumber: ZFieldPageNumberSchema,
           pageX: ZFieldPageXSchema,
           pageY: ZFieldPageYSchema,

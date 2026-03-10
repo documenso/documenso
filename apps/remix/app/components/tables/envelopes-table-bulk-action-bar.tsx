@@ -24,7 +24,7 @@ export const EnvelopesTableBulkActionBar = ({
   }
 
   return (
-    <div className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-x-4 rounded-lg border border-border bg-widget px-4 py-3 shadow-lg">
+    <div className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-x-4 rounded-lg border border-border bg-background px-4 py-3 shadow-lg">
       <span className="text-sm font-medium">
         <Trans>{selectedCount} selected</Trans>
       </span>
@@ -36,13 +36,7 @@ export const EnvelopesTableBulkActionBar = ({
         <Trans>Move to Folder</Trans>
       </Button>
 
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={onDeleteClick}
-        className="text-destructive hover:text-destructive"
-      >
+      <Button type="button" variant="destructive" size="sm" onClick={onDeleteClick}>
         <Trash2Icon className="mr-2 h-4 w-4" />
         <Trans>Delete</Trans>
       </Button>

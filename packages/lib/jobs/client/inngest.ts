@@ -26,6 +26,7 @@ export class InngestJobProvider extends BaseJobProvider {
       const client = new InngestClient({
         id: env('NEXT_PRIVATE_INNGEST_APP_ID') || 'documenso-app',
         eventKey: env('INNGEST_EVENT_KEY') || env('NEXT_PRIVATE_INNGEST_EVENT_KEY'),
+        logger: console,
       });
 
       this._instance = new InngestJobProvider({ client });
@@ -35,16 +36,17 @@ export class InngestJobProvider extends BaseJobProvider {
   }
 
   public defineJob<N extends string, T>(job: JobDefinition<N, T>): void {
-    console.log('defining job', job.id);
+    const triggerConfig: { cron: string } | { event: N } = job.trigger.cron
+      ? { cron: job.trigger.cron }
+      : { event: job.trigger.name };
+
     const fn = this._client.createFunction(
       {
         id: job.id,
         name: job.name,
         optimizeParallelism: job.optimizeParallelism ?? false,
       },
-      {
-        event: job.trigger.name,
-      },
+      triggerConfig,
       async (ctx) => {
         const io = this.convertInngestIoToJobRunIo(ctx);
 
@@ -89,7 +91,10 @@ export class InngestJobProvider extends BaseJobProvider {
     return {
       wait: step.sleep,
       logger: {
-        ...ctx.logger,
+        info: ctx.logger.info,
+        debug: ctx.logger.debug,
+        error: ctx.logger.error,
+        warn: ctx.logger.warn,
         log: ctx.logger.info,
       },
       runTask: async (cacheKey, callback) => {

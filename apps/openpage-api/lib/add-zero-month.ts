@@ -1,15 +1,20 @@
 import { DateTime } from 'luxon';
 
-export interface TransformedData {
+export type TransformedData = {
   labels: string[];
   datasets: Array<{
     label: string;
     data: number[];
   }>;
-}
+};
 
-export function addZeroMonth(transformedData: TransformedData): TransformedData {
-  const result = {
+const FORMAT = 'MMM yyyy';
+
+export const addZeroMonth = (
+  transformedData: TransformedData,
+  isCumulative = false,
+): TransformedData => {
+  const result: TransformedData = {
     labels: [...transformedData.labels],
     datasets: transformedData.datasets.map((dataset) => ({
       label: dataset.label,
@@ -21,34 +26,28 @@ export function addZeroMonth(transformedData: TransformedData): TransformedData 
     return result;
   }
 
-  if (result.datasets.every((dataset) => dataset.data[0] === 0)) {
-    return result;
-  }
-
-  try {
-    let firstMonth = DateTime.fromFormat(result.labels[0], 'MMM yyyy');
+  if (!result.datasets.every((dataset) => dataset.data[0] === 0)) {
+    const firstMonth = DateTime.fromFormat(result.labels[0], FORMAT);
     if (!firstMonth.isValid) {
-      const formats = ['MMM yyyy', 'MMMM yyyy', 'MM/yyyy', 'yyyy-MM'];
-
-      for (const format of formats) {
-        firstMonth = DateTime.fromFormat(result.labels[0], format);
-        if (firstMonth.isValid) break;
-      }
-
-      if (!firstMonth.isValid) {
-        console.warn(`Could not parse date: "${result.labels[0]}"`);
-        return transformedData;
-      }
+      console.warn(`Could not parse date: "${result.labels[0]}"`);
+      return transformedData;
     }
 
-    const zeroMonth = firstMonth.minus({ months: 1 }).toFormat('MMM yyyy');
-    result.labels.unshift(zeroMonth);
+    result.labels.unshift(firstMonth.minus({ months: 1 }).toFormat(FORMAT));
     result.datasets.forEach((dataset) => {
       dataset.data.unshift(0);
     });
-
-    return result;
-  } catch (error) {
-    return transformedData;
   }
-}
+
+  const now = DateTime.now().startOf('month');
+  const lastMonth = DateTime.fromFormat(result.labels[result.labels.length - 1], FORMAT);
+
+  if (lastMonth.isValid && lastMonth.startOf('month') < now) {
+    result.labels.push(now.toFormat(FORMAT));
+    result.datasets.forEach((dataset) => {
+      dataset.data.push(isCumulative ? dataset.data[dataset.data.length - 1] : 0);
+    });
+  }
+
+  return result;
+};

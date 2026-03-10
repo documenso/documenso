@@ -7,7 +7,7 @@ import type { TrpcContext } from '../server/context';
 
 // Parameters<NonNullable<Parameters<typeof trpcServer>[0]['onError']>>[0], // :-)
 export const handleTrpcRouterError = (
-  { error, ctx }: Pick<ErrorHandlerOptions<TrpcContext>, 'error' | 'path' | 'ctx'>,
+  { error, ctx, path }: Pick<ErrorHandlerOptions<TrpcContext>, 'error' | 'path' | 'ctx'>,
   _source: 'trpc' | 'apiV1' | 'apiV2',
 ) => {
   const appError = AppError.parseError(error.cause || error);
@@ -26,6 +26,7 @@ export const handleTrpcRouterError = (
   const errorLogger = (ctx?.logger || logger).child({
     status: 'error',
     appError: AppError.toJSON(appError),
+    path,
   });
 
   // Only fully log the error on certain conditions since some errors are expected.

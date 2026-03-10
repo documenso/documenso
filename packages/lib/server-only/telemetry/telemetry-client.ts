@@ -10,9 +10,11 @@ import { getSiteSetting } from '../site-settings/get-site-setting';
 import { SITE_SETTINGS_TELEMETRY_ID } from '../site-settings/schemas/telemetry';
 import { upsertSiteSetting } from '../site-settings/upsert-site-setting';
 
+const HAS_LICENSE_KEY = !!process.env.NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY;
+
 const TELEMETRY_KEY = process.env.NEXT_PRIVATE_TELEMETRY_KEY;
 const TELEMETRY_HOST = process.env.NEXT_PRIVATE_TELEMETRY_HOST;
-const TELEMETRY_DISABLED = !!process.env.DOCUMENSO_DISABLE_TELEMETRY;
+const TELEMETRY_DISABLED = !!process.env.DOCUMENSO_DISABLE_TELEMETRY || HAS_LICENSE_KEY;
 
 const NODE_ID_FILENAME = '.documenso-node-id';
 const HEARTBEAT_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
@@ -43,9 +45,12 @@ export class TelemetryClient {
    */
   public static async start(): Promise<void> {
     if (TELEMETRY_DISABLED) {
-      console.log(
-        '[Telemetry] Telemetry is disabled. To enable, remove the DOCUMENSO_DISABLE_TELEMETRY environment variable.',
-      );
+      if (!HAS_LICENSE_KEY) {
+        console.log(
+          '[Telemetry] Telemetry is disabled. To enable, remove the DOCUMENSO_DISABLE_TELEMETRY environment variable.',
+        );
+      }
+
       return;
     }
 
