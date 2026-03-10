@@ -60,6 +60,12 @@ export const ZUpdateEmbeddingEnvelopePayloadSchema = z.object({
          * The file index for items that are not yet uploaded.
          */
         index: z.number().int().min(0).optional(),
+
+        /**
+         * The file index for existing items that need their PDF replaced.
+         * Only applicable to items with real IDs (not PRESIGNED_ prefix).
+         */
+        replaceFileIndex: z.number().int().min(0).optional(),
       })
       .array(),
 

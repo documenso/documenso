@@ -6,6 +6,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { UNSAFE_createEnvelopeItems } from '@documenso/lib/server-only/envelope-item/create-envelope-items';
 import { UNSAFE_deleteEnvelopeItem } from '@documenso/lib/server-only/envelope-item/delete-envelope-item';
+import { UNSAFE_replaceEnvelopeItemPdf } from '@documenso/lib/server-only/envelope-item/replace-envelope-item-pdf';
 import { UNSAFE_updateEnvelopeItems } from '@documenso/lib/server-only/envelope-item/update-envelope-items';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
@@ -95,8 +96,9 @@ export const updateEmbeddingEnvelopeRoute = procedure
     // Step 1: Update the envelope items.
     const envelopeItemsToUpdate: EnvelopeItemUpdateOptions[] = [];
     const envelopeItemsToCreate: EnvelopeItemCreateOptions[] = [];
+    const envelopeItemsToReplace: EnvelopeItemReplaceOptions[] = [];
 
-    // Sort and group envelope items to update and create.
+    // Sort and group envelope items to update, create, and replace.
     data.envelopeItems.forEach((item) => {
       const isNewEnvelopeItem = item.id.startsWith(PRESIGNED_ENVELOPE_ITEM_ID_PREFIX);
 
@@ -110,6 +112,27 @@ export const updateEmbeddingEnvelopeRoute = procedure
           throw new AppError(AppErrorCode.NOT_FOUND, {
             message: 'Envelope item not found',
           });
+        }
+
+        // Check if this existing item has a replacement file.
+        if (item.replaceFileIndex !== undefined) {
+          const replaceFile = files[item.replaceFileIndex];
+
+          if (!replaceFile) {
+            throw new AppError(AppErrorCode.INVALID_BODY, {
+              message: 'Invalid replace file index',
+            });
+          }
+
+          envelopeItemsToReplace.push({
+            envelopeItemId: envelopeItem.id,
+            oldDocumentDataId: envelopeItem.documentDataId,
+            title: item.title,
+            order: item.order,
+            file: replaceFile,
+          });
+
+          return;
         }
 
         const hasEnvelopeItemChanged =
@@ -152,7 +175,8 @@ export const updateEmbeddingEnvelopeRoute = procedure
     const willEnvelopeItemsBeModified =
       envelopeItemIdsToDelete.length > 0 ||
       envelopeItemsToCreate.length > 0 ||
-      envelopeItemsToUpdate.length > 0;
+      envelopeItemsToUpdate.length > 0 ||
+      envelopeItemsToReplace.length > 0;
 
     const organisationClaim = envelope.team.organisation.organisationClaim;
     const resultingEnvelopeItemCount =
@@ -230,6 +254,32 @@ export const updateEmbeddingEnvelopeRoute = procedure
         envelopeId: envelope.id,
         data: envelopeItemsToUpdate,
       });
+    }
+
+    // Replace PDFs for existing envelope items.
+    // Note: UNSAFE_replaceEnvelopeItemPdf handles out-of-bounds field deletion
+    // internally. In the embed flow, fields are set later in Step 4 (via
+    // setFieldsForDocument/setFieldsForTemplate) which overwrites all fields
+    // anyway, so the deleted fields are naturally excluded.
+    if (envelopeItemsToReplace.length > 0) {
+      await pMap(
+        envelopeItemsToReplace,
+        async (item) => {
+          await UNSAFE_replaceEnvelopeItemPdf({
+            envelope,
+            envelopeItemId: item.envelopeItemId,
+            oldDocumentDataId: item.oldDocumentDataId,
+            data: {
+              title: item.title,
+              order: item.order,
+              file: item.file,
+            },
+            user: apiToken.user,
+            apiRequestMetadata: ctx.metadata,
+          });
+        },
+        { concurrency: 2 },
+      );
     }
 
     // Step 2: Update the general envelope data and meta.
@@ -422,6 +472,14 @@ type EnvelopeItemUpdateOptions = {
 
 type EnvelopeItemCreateOptions = {
   embeddedEnvelopeItemId: string;
+  title: string;
+  order: number;
+  file: File;
+};
+
+type EnvelopeItemReplaceOptions = {
+  envelopeItemId: string;
+  oldDocumentDataId: string;
   title: string;
   order: number;
   file: File;
