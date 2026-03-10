@@ -20,6 +20,8 @@ import { injectCss } from '~/utils/css-vars';
 
 import type { Route } from './+types/_layout';
 
+export const shouldRevalidate = () => false;
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const url = new URL(request.url);
 

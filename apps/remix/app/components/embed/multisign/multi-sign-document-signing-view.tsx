@@ -27,7 +27,7 @@ import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 
 import { useRequiredDocumentSigningContext } from '../../general/document-signing/document-signing-provider';
 import { DocumentSigningRejectDialog } from '../../general/document-signing/document-signing-reject-dialog';
@@ -181,8 +181,8 @@ export const MultiSignDocumentSigningView = ({
   };
 
   return (
-    <div className="min-h-screen overflow-hidden bg-background">
-      <div id="document-field-portal-root" className="relative h-full w-full overflow-y-auto p-8">
+    <div className="min-h-screen bg-background">
+      <div className="relative h-full w-full p-8">
         {match({ isLoading, document })
           .with({ isLoading: true }, () => (
             <div className="flex min-h-[400px] w-full items-center justify-center">
@@ -229,7 +229,7 @@ export const MultiSignDocumentSigningView = ({
                     'md:mx-auto md:max-w-2xl': document.status === DocumentStatus.COMPLETED,
                   })}
                 >
-                  <PDFViewer
+                  <PDFViewerLazy
                     data={getDocumentDataUrlForPdfViewer({
                       envelopeId: document.envelopeId,
                       envelopeItemId: document.envelopeItems[0]?.id,
@@ -369,35 +369,39 @@ export const MultiSignDocumentSigningView = ({
                     </div>
                   </div>
                 )}
+
+                {hasDocumentLoaded && showPendingFieldTooltip && pendingFields.length > 0 && (
+                  <ElementVisible
+                    target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${pendingFields[0].page}"]`}
+                  >
+                    <FieldToolTip
+                      key={pendingFields[0].id}
+                      field={pendingFields[0]}
+                      color="warning"
+                    >
+                      <Trans>Click to insert field</Trans>
+                    </FieldToolTip>
+                  </ElementVisible>
+                )}
+
+                {/* Fields */}
+                {hasDocumentLoaded && (
+                  <EmbedDocumentFields
+                    fields={pendingFields}
+                    metadata={document.documentMeta}
+                    onSignField={onSignField}
+                    onUnsignField={onUnsignField}
+                  />
+                )}
+
+                {/* Completed fields */}
+                {document.status !== DocumentStatus.COMPLETED && (
+                  <DocumentReadOnlyFields
+                    documentMeta={document.documentMeta ?? undefined}
+                    fields={completedFields}
+                  />
+                )}
               </div>
-
-              {hasDocumentLoaded && showPendingFieldTooltip && pendingFields.length > 0 && (
-                <ElementVisible
-                  target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${pendingFields[0].page}"]`}
-                >
-                  <FieldToolTip key={pendingFields[0].id} field={pendingFields[0]} color="warning">
-                    <Trans>Click to insert field</Trans>
-                  </FieldToolTip>
-                </ElementVisible>
-              )}
-
-              {/* Fields */}
-              {hasDocumentLoaded && (
-                <EmbedDocumentFields
-                  fields={pendingFields}
-                  metadata={document.documentMeta}
-                  onSignField={onSignField}
-                  onUnsignField={onUnsignField}
-                />
-              )}
-
-              {/* Completed fields */}
-              {document.status !== DocumentStatus.COMPLETED && (
-                <DocumentReadOnlyFields
-                  documentMeta={document.documentMeta ?? undefined}
-                  fields={completedFields}
-                />
-              )}
             </>
           ))
           .otherwise(() => null)}
