@@ -219,6 +219,14 @@ When resolving conflicts, apply these brand substitutions:
    Only the color VALUES should be Davinci Blue (#1A98CF and its palette).
 4. Keep HSL values: Primary 197 79% 46%, foreground 197 79% 10%.
 
+## UI Customisations
+These are intentional application-level branding changes in our fork:
+- In the Email Sender dropdown (`meta.emailId`), the default/fallback option
+  label is "Davinci Sign" (upstream uses "Documenso"). This appears as
+  `<SelectItem value={{'-1'}}>Davinci Sign</SelectItem>` in the settings dialog.
+- The `DOCUMENT_DISTRIBUTION_METHODS` constant and its usage are upstream
+  functional code — do NOT replace with email sender options.
+
 ## Your Task
 For each conflicted file, use exactly ONE of the provided tools:
 - `resolve_conflict` — when you can intelligently merge both sides

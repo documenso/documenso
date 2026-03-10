@@ -58,6 +58,7 @@ classification:
     - "apps/remix/app/components/general/branding-logo.tsx"
     - "packages/lib/server-only/cert/cert-status.ts"
     - "apps/documentation/pages/developers/webhooks.mdx"
+    - "apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx"
 
   branding_replacements:
     - old: "Documenso, Inc."
