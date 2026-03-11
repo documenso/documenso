@@ -5,6 +5,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
 import { trpc as trpcReact } from '@documenso/trpc/react';
+import { DOCUMENT_TITLE_MAX_LENGTH } from '@documenso/trpc/server/document-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -64,8 +65,10 @@ export const DocumentRenameDialog = ({
     },
   });
 
+  const trimmedTitle = title.trim();
+
   const onRename = () => {
-    if (!title.trim() || title === initialTitle) {
+    if (!trimmedTitle || trimmedTitle === initialTitle) {
       onOpenChange(false);
       return;
     }
@@ -73,7 +76,7 @@ export const DocumentRenameDialog = ({
     updateDocument({
       documentId: id,
       data: {
-        title: title.trim(),
+        title: trimmedTitle,
       },
     });
   };
@@ -96,6 +99,7 @@ export const DocumentRenameDialog = ({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             disabled={isPending}
+            maxLength={DOCUMENT_TITLE_MAX_LENGTH}
             className="w-full"
             autoFocus
           />
@@ -114,7 +118,7 @@ export const DocumentRenameDialog = ({
 
             <Button
               type="button"
-              disabled={isPending || !title.trim() || title === initialTitle}
+              disabled={isPending || !trimmedTitle || trimmedTitle === initialTitle}
               loading={isPending}
               onClick={() => void onRename()}
               className="flex-1"
