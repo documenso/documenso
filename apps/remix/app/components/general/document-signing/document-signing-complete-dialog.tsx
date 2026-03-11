@@ -157,6 +157,10 @@ export const DocumentSigningCompleteDialog = ({
         }
 
         recipientOverridePayload = recipientForm.getValues();
+      } else if (recipientPayload && recipientPayload.email && !recipient.email) {
+        // Form is hidden because we have an email (e.g. from embed context),
+        // but the DB recipient doesn't have one yet — send the override.
+        recipientOverridePayload = recipientPayload;
       }
 
       // Check if 2FA is required
