@@ -60,6 +60,10 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
     return null;
   }
 
+  if (result.envelopeItems.length === 0) {
+    throw new Error('Completed envelope has no items');
+  }
+
   const firstDocumentData = result.envelopeItems[0].documentData;
 
   if (!firstDocumentData) {
