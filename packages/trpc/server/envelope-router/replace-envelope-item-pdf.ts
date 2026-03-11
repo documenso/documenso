@@ -10,13 +10,19 @@ import {
   ZReplaceEnvelopeItemPdfResponseSchema,
 } from './replace-envelope-item-pdf.types';
 
+/**
+ * Keep this internal for the envelope editor.
+ *
+ * If we want to make this public then create a separate one that only allows
+ * the PDF to be replaced & doesn't return deleted fields, etc.
+ */
 export const replaceEnvelopeItemPdfRoute = authenticatedProcedure
   .input(ZReplaceEnvelopeItemPdfRequestSchema)
   .output(ZReplaceEnvelopeItemPdfResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { user, teamId, metadata } = ctx;
     const { payload, file } = input;
-    const { envelopeId, envelopeItemId } = payload;
+    const { envelopeId, envelopeItemId, title } = payload;
 
     ctx.logger.info({
       input: {
@@ -79,6 +85,7 @@ export const replaceEnvelopeItemPdfRoute = authenticatedProcedure
       oldDocumentDataId: envelopeItem.documentDataId,
       data: {
         file,
+        title,
       },
       user: {
         id: user.id,

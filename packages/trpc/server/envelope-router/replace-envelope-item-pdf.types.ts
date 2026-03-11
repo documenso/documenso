@@ -4,21 +4,12 @@ import { zfd } from 'zod-form-data';
 import EnvelopeItemSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
 
 import { zodFormData } from '../../utils/zod-form-data';
-
-// export const replaceEnvelopeItemPdfMeta: TrpcRouteMeta = {
-//   openapi: {
-//     method: 'POST',
-//     path: '/envelope/item/replace', // Todo: replace or replace-pdf?
-//     summary: 'Replace envelope item PDF',
-//     contentTypes: ['multipart/form-data'],
-//     description: 'Replace the PDF file of an existing envelope item',
-//     tags: ['Envelope Items'],
-//   },
-// };
+import { ZDocumentTitleSchema } from '../document-router/schema';
 
 export const ZReplaceEnvelopeItemPdfPayloadSchema = z.object({
   envelopeId: z.string(),
   envelopeItemId: z.string(),
+  title: ZDocumentTitleSchema.optional(),
 });
 
 export const ZReplaceEnvelopeItemPdfRequestSchema = zodFormData({

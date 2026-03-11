@@ -5,7 +5,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
-import { FileTextIcon, SparklesIcon } from 'lucide-react';
+import { FileTextIcon, PencilIcon, SparklesIcon } from 'lucide-react';
 import { useRevalidator, useSearchParams } from 'react-router';
 import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
@@ -28,14 +28,17 @@ import {
   type TSignatureFieldMeta,
   type TTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
+import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
+import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
 
 import { AiFeaturesEnableDialog } from '~/components/dialogs/ai-features-enable-dialog';
 import { AiFieldDetectionDialog } from '~/components/dialogs/ai-field-detection-dialog';
+import { EnvelopeItemEditDialog } from '~/components/dialogs/envelope-item-edit-dialog';
 import { EditorFieldCheckboxForm } from '~/components/forms/editor/editor-field-checkbox-form';
 import { EditorFieldDateForm } from '~/components/forms/editor/editor-field-date-form';
 import { EditorFieldDropdownForm } from '~/components/forms/editor/editor-field-dropdown-form';
@@ -84,6 +87,11 @@ export const EnvelopeEditorFieldsPage = () => {
   const [isAiFieldDialogOpen, setIsAiFieldDialogOpen] = useState(false);
   const [isAiEnableDialogOpen, setIsAiEnableDialogOpen] = useState(false);
   const { revalidate } = useRevalidator();
+
+  const canItemsBeModified = useMemo(
+    () => canEnvelopeItemsBeModified(envelope, envelope.recipients),
+    [envelope, envelope.recipients],
+  );
 
   const selectedField = useMemo(
     () => structuredClone(editorFields.selectedField),
@@ -157,7 +165,41 @@ export const EnvelopeEditorFieldsPage = () => {
         ref={scrollableContainerRef}
       >
         {/* Horizontal envelope item selector */}
-        <EnvelopeRendererFileSelector className="px-0" fields={editorFields.localFields} />
+        <EnvelopeRendererFileSelector
+          className="px-0"
+          fields={editorFields.localFields}
+          renderItemAction={
+            editorConfig.envelopeItems !== null &&
+            (editorConfig.envelopeItems.allowConfigureTitle ||
+              editorConfig.envelopeItems.allowReplace) &&
+            canItemsBeModified
+              ? (item) => (
+                  <div className="relative flex h-5 w-5 flex-shrink-0 items-center justify-center">
+                    <div
+                      className={cn(
+                        'h-2 w-2 rounded-full transition-opacity duration-150 group-hover:opacity-0',
+                        { 'bg-green-500': currentEnvelopeItem?.id === item.id },
+                      )}
+                    />
+                    <EnvelopeItemEditDialog
+                      envelopeItem={item}
+                      allowConfigureTitle={editorConfig.envelopeItems?.allowConfigureTitle ?? false}
+                      allowReplace={editorConfig.envelopeItems?.allowReplace ?? false}
+                      trigger={
+                        <span
+                          className="absolute inset-0 flex cursor-pointer items-center justify-center opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+                          onClick={(e) => e.stopPropagation()}
+                          data-testid={`envelope-item-edit-button-${item.id}`}
+                        >
+                          <PencilIcon className="h-3.5 w-3.5" />
+                        </span>
+                      }
+                    />
+                  </div>
+                )
+              : undefined
+          }
+        />
 
         {/* Document View */}
         <div className="mt-4 flex h-full flex-col items-center justify-center">
