@@ -117,7 +117,7 @@ export const DocumentSigningCompleteDialog = ({
 
   const recipientForm = useForm<TDirectRecipientFormSchema>({
     resolver: zodResolver(ZDirectRecipientFormSchema),
-    defaultValues: {
+    values: {
       name: recipientPayload?.name ?? '',
       email: recipientPayload?.email ?? '',
     },
