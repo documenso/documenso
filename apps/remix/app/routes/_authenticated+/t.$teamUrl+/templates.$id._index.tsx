@@ -84,6 +84,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
 
   const documentRootPath = formatDocumentsPath(team.url);
   const templateRootPath = formatTemplatesPath(team.url);
+  const isOwnTeamTemplate = envelope.teamId === team?.id;
 
   // Remap to fit the DocumentReadOnlyFields component.
   const readOnlyFields = envelope.fields.map((field) => {
@@ -146,23 +147,27 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
         </div>
 
         <div className="mt-2 flex flex-row space-x-4 sm:mt-0 sm:self-end">
-          <TemplateDirectLinkDialog
-            templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
-            directLink={envelope.directLink}
-            recipients={envelope.recipients}
-          />
+          {isOwnTeamTemplate && (
+            <>
+              <TemplateDirectLinkDialog
+                templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
+                directLink={envelope.directLink}
+                recipients={envelope.recipients}
+              />
 
-          <TemplateBulkSendDialog
-            templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
-            recipients={envelope.recipients}
-          />
+              <TemplateBulkSendDialog
+                templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
+                recipients={envelope.recipients}
+              />
 
-          <Button className="w-full" asChild>
-            <Link to={`${templateRootPath}/${envelope.id}/edit`}>
-              <LucideEdit className="mr-1.5 h-3.5 w-3.5" />
-              <Trans>Edit Template</Trans>
-            </Link>
-          </Button>
+              <Button className="w-full" asChild>
+                <Link to={`${templateRootPath}/${envelope.id}/edit`}>
+                  <LucideEdit className="mr-1.5 h-3.5 w-3.5" />
+                  <Trans>Edit Template</Trans>
+                </Link>
+              </Button>
+            </>
+          )}
         </div>
       </div>
 

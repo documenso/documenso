@@ -1,4 +1,4 @@
-import type { TemplateType } from '@prisma/client';
+import { TemplateType } from '@prisma/client';
 import { EnvelopeType, type Prisma } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
@@ -24,8 +24,6 @@ export const findTemplates = async ({
   perPage = 10,
   folderId,
 }: FindTemplatesOptions) => {
-  const whereFilter: Prisma.EnvelopeWhereInput[] = [];
-
   const { teamRole } = await getMemberRoles({
     teamId,
     reference: {
@@ -34,50 +32,77 @@ export const findTemplates = async ({
     },
   });
 
-  whereFilter.push(
-    { teamId },
-    {
-      OR: [
-        {
-          visibility: {
-            in: TEAM_DOCUMENT_VISIBILITY_MAP[teamRole],
+  // Build filter for own-team templates (existing behaviour).
+  const ownTeamFilter: Prisma.EnvelopeWhereInput = {
+    type: EnvelopeType.TEMPLATE,
+    templateType: type,
+    AND: [
+      { teamId },
+      {
+        OR: [
+          {
+            visibility: {
+              in: TEAM_DOCUMENT_VISIBILITY_MAP[teamRole],
+            },
           },
-        },
-        { userId, teamId },
-      ],
-    },
-  );
+          { userId, teamId },
+        ],
+      },
+      folderId ? { folderId } : { folderId: null },
+    ],
+  };
 
-  if (folderId) {
-    whereFilter.push({ folderId });
-  } else {
-    whereFilter.push({ folderId: null });
+  // Include ORGANISATION templates from sibling teams in the same org.
+  // Only on root view (no folder) and when the type filter doesn't exclude ORGANISATION.
+  const shouldIncludeOrgTemplates =
+    !folderId && (type === undefined || type === TemplateType.ORGANISATION);
+
+  let orgFilter: Prisma.EnvelopeWhereInput | undefined;
+
+  if (shouldIncludeOrgTemplates) {
+    const team = await prisma.team.findUniqueOrThrow({
+      where: { id: teamId },
+      select: { organisationId: true },
+    });
+
+    orgFilter = {
+      type: EnvelopeType.TEMPLATE,
+      templateType: TemplateType.ORGANISATION,
+      folderId: null,
+      teamId: { not: teamId },
+      team: {
+        organisationId: team.organisationId,
+      },
+    };
   }
+
+  const combinedWhere: Prisma.EnvelopeWhereInput = orgFilter
+    ? { OR: [ownTeamFilter, orgFilter] }
+    : ownTeamFilter;
+
+  const templateInclude = {
+    team: {
+      select: {
+        id: true,
+        url: true,
+        name: true,
+      },
+    },
+    fields: true,
+    recipients: true,
+    documentMeta: true,
+    directLink: {
+      select: {
+        token: true,
+        enabled: true,
+      },
+    },
+  } as const;
 
   const [data, count] = await Promise.all([
     prisma.envelope.findMany({
-      where: {
-        type: EnvelopeType.TEMPLATE,
-        templateType: type,
-        AND: whereFilter,
-      },
-      include: {
-        team: {
-          select: {
-            id: true,
-            url: true,
-          },
-        },
-        fields: true,
-        recipients: true,
-        documentMeta: true,
-        directLink: {
-          select: {
-            token: true,
-            enabled: true,
-          },
-        },
-      },
+      where: combinedWhere,
+      include: templateInclude,
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
       orderBy: {
@@ -85,11 +110,7 @@ export const findTemplates = async ({
       },
     }),
     prisma.envelope.count({
-      where: {
-        type: EnvelopeType.TEMPLATE,
-        templateType: type,
-        AND: whereFilter,
-      },
+      where: combinedWhere,
     }),
   ]);
 

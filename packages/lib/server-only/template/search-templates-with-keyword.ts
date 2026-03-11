@@ -1,5 +1,5 @@
 import type { Prisma } from '@prisma/client';
-import { DocumentVisibility, EnvelopeType, TeamMemberRole } from '@prisma/client';
+import { DocumentVisibility, EnvelopeType, TeamMemberRole, TemplateType } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { formatTemplatesPath, getHighestTeamRoleInGroup } from '@documenso/lib/utils/teams';
@@ -34,19 +34,23 @@ export const searchTemplatesWithKeyword = async ({
 
   const teamIds = [...teamGroupsByTeamId.keys()];
 
+  const titleOrRecipientMatch: Prisma.EnvelopeWhereInput = {
+    OR: [
+      { title: { contains: query, mode: 'insensitive' } },
+      {
+        recipients: {
+          some: { email: { contains: query, mode: 'insensitive' } },
+        },
+      },
+    ],
+  };
+
   const filters: Prisma.EnvelopeWhereInput[] = [
     // Templates owned by the user matching title or recipient email.
     {
       userId,
       deletedAt: null,
-      OR: [
-        { title: { contains: query, mode: 'insensitive' } },
-        {
-          recipients: {
-            some: { email: { contains: query, mode: 'insensitive' } },
-          },
-        },
-      ],
+      ...titleOrRecipientMatch,
     },
   ];
 
@@ -55,15 +59,26 @@ export const searchTemplatesWithKeyword = async ({
     filters.push({
       teamId: { in: teamIds },
       deletedAt: null,
-      OR: [
-        { title: { contains: query, mode: 'insensitive' } },
-        {
-          recipients: {
-            some: { email: { contains: query, mode: 'insensitive' } },
-          },
-        },
-      ],
+      ...titleOrRecipientMatch,
     });
+
+    // ORGANISATION templates from sibling teams in the same org.
+    const orgIds = await prisma.team
+      .findMany({
+        where: { id: { in: teamIds } },
+        select: { organisationId: true },
+        distinct: ['organisationId'],
+      })
+      .then((teams) => teams.map((t) => t.organisationId));
+
+    if (orgIds.length > 0) {
+      filters.push({
+        templateType: TemplateType.ORGANISATION,
+        deletedAt: null,
+        team: { organisationId: { in: orgIds } },
+        ...titleOrRecipientMatch,
+      });
+    }
   }
 
   const envelopes = await prisma.envelope.findMany({
@@ -78,6 +93,7 @@ export const searchTemplatesWithKeyword = async ({
       title: true,
       secondaryId: true,
       visibility: true,
+      templateType: true,
       recipients: {
         select: {
           email: true,
@@ -99,6 +115,11 @@ export const searchTemplatesWithKeyword = async ({
 
   const results = envelopes
     .filter((envelope) => {
+      // ORGANISATION templates are visible to all org members.
+      if (envelope.templateType === TemplateType.ORGANISATION) {
+        return true;
+      }
+
       if (!envelope.teamId || envelope.userId === user.id) {
         return true;
       }

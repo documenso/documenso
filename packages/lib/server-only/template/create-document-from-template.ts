@@ -56,7 +56,7 @@ import {
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { buildTeamWhereQuery } from '../../utils/teams';
-import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { getOrgTemplateReadWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { getTeamSettings } from '../team/get-team-settings';
@@ -312,7 +312,7 @@ export const createDocumentFromTemplate = async ({
   attachments,
   formValues,
 }: CreateDocumentFromTemplateOptions) => {
-  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+  const { envelopeWhereInput } = await getOrgTemplateReadWhereInput({
     id,
     type: EnvelopeType.TEMPLATE,
     userId,
@@ -541,7 +541,7 @@ export const createDocumentFromTemplate = async ({
         templateId: legacyTemplateId, // The template this envelope was created from.
         userId,
         folderId,
-        teamId: template.teamId,
+        teamId,
         title: finalEnvelopeTitle,
         envelopeItems: {
           createMany: {

@@ -5,7 +5,7 @@ import { prisma } from '@documenso/prisma';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
-import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { getOrgTemplateReadWhereInput } from '../envelope/get-envelope-by-id';
 
 export type GetTemplateByIdOptions = {
   id: EnvelopeIdOptions;
@@ -14,7 +14,7 @@ export type GetTemplateByIdOptions = {
 };
 
 export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOptions) => {
-  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+  const { envelopeWhereInput } = await getOrgTemplateReadWhereInput({
     id,
     type: EnvelopeType.TEMPLATE,
     userId,
