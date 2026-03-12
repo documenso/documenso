@@ -71,10 +71,30 @@ export const SessionProvider = ({ children, initialSession }: SessionProviderPro
 
     const organisations = await trpc.organisation.internal.getOrganisationSession
       .query(undefined, SKIP_QUERY_BATCH_META.trpc)
-      .catch(() => {
+      .catch((e) => {
+        const isNetworkError =
+          e.name === 'AbortError' ||
+          (typeof e.message === 'string' &&
+            (e.message.includes('NetworkError') ||
+              e.message.includes('Failed to fetch') ||
+              e.message.includes('network') ||
+              e.message.includes('abort')));
+
+        // If the error is a transient network/abort error (e.g. page refresh while
+        // fetch was in-flight), return null to signal we should skip the state update.
+        if (isNetworkError) {
+          return null;
+        }
+
         // Todo: (RR7) Log
         return [];
       });
+
+    // Skip session update if the organisation fetch was aborted due to a transient
+    // network error, or if the page is no longer visible (e.g. during a refresh).
+    if (organisations === null || document.visibilityState === 'hidden') {
+      return;
+    }
 
     setSession({
       session: newSession.session,
