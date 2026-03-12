@@ -72,13 +72,10 @@ export const SessionProvider = ({ children, initialSession }: SessionProviderPro
     const organisations = await trpc.organisation.internal.getOrganisationSession
       .query(undefined, SKIP_QUERY_BATCH_META.trpc)
       .catch((e) => {
+        const errorMessage = typeof e.message === 'string' ? e.message.toLowerCase() : '';
+
         const isNetworkError =
-          e.name === 'AbortError' ||
-          (typeof e.message === 'string' &&
-            (e.message.includes('NetworkError') ||
-              e.message.includes('Failed to fetch') ||
-              e.message.includes('network') ||
-              e.message.includes('abort')));
+          errorMessage.includes('networkerror') || errorMessage.includes('failed to fetch');
 
         // If the error is a transient network/abort error (e.g. page refresh while
         // fetch was in-flight), return null to signal we should skip the state update.
