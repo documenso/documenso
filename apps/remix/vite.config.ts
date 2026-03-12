@@ -1,3 +1,5 @@
+import { transformAsync } from '@babel/core';
+import linguiMacroPlugin from '@lingui/babel-plugin-lingui-macro';
 import { lingui } from '@lingui/vite-plugin';
 import { reactRouter } from '@react-router/dev/vite';
 import autoprefixer from 'autoprefixer';
@@ -6,14 +8,58 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import tailwindcss from 'tailwindcss';
 import { defineConfig, normalizePath } from 'vite';
-import macrosPlugin from 'vite-plugin-babel-macros';
+import type { Plugin } from 'vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 const require = createRequire(import.meta.url);
 
 const pdfjsDistPath = path.dirname(require.resolve('pdfjs-dist/package.json'));
 const cMapsDir = normalizePath(path.join(pdfjsDistPath, 'cmaps'));
+
+/**
+ * Targeted Lingui macro compilation plugin.
+ *
+ * Replaces the generic `vite-plugin-babel-macros` which ran a full Babel
+ * parse + transform on every single .ts/.tsx file. This plugin:
+ *
+ * 1. Skips files that don't contain lingui macro imports (fast string check).
+ * 2. Uses `@lingui/babel-plugin-lingui-macro` directly instead of going
+ *    through the generic `babel-plugin-macros` wrapper.
+ */
+const linguiMacroRE = /@lingui\/(core\/macro|react\/macro|macro)/;
+
+function linguiMacro(): Plugin {
+  return {
+    name: 'vite-plugin-lingui-macro',
+    enforce: 'pre',
+    async transform(code, id) {
+      if (id.includes('/node_modules/')) return;
+
+      const [filepath] = id.split('?');
+      if (!/\.(tsx?|jsx?)$/.test(filepath)) return;
+
+      // Fast bail-out: skip files that don't reference lingui macros.
+      if (!linguiMacroRE.test(code)) return;
+
+      const result = await transformAsync(code, {
+        babelrc: false,
+        configFile: false,
+        filename: id,
+        sourceFileName: filepath,
+        parserOpts: {
+          sourceType: 'module',
+          allowAwaitOutsideFunction: true,
+          plugins: ['typescript', 'jsx'],
+        },
+        plugins: [linguiMacroPlugin],
+        sourceMaps: true,
+      });
+
+      if (!result?.code) return;
+      return { code: result.code, map: result.map };
+    },
+  };
+}
 
 /**
  * Note: We load the env variables externally so we can have runtime enviroment variables
@@ -41,15 +87,18 @@ export default defineConfig({
       ],
     }),
     reactRouter(),
-    macrosPlugin(),
-    lingui(),
-    tsconfigPaths(),
+    linguiMacro(),
+    // lingui() returns two plugins: a macro error reporter and the .po catalog
+    // compiler. The error reporter adds a resolveId hook on every module to
+    // detect uncompiled macros — redundant since linguiMacro() already compiles
+    // them, and it was consuming 51% of plugin time in the build.
+    ...lingui().filter((p) => 'name' in p && p.name !== 'vite-plugin-lingui-report-macro-error'),
     serverAdapter({
       entry: 'server/router.ts',
     }),
   ],
   ssr: {
-    noExternal: ['react-dropzone', 'plausible-tracker'],
+    noExternal: ['react-dropzone'],
     external: [
       '@napi-rs/canvas',
       '@node-rs/bcrypt',
@@ -62,10 +111,12 @@ export default defineConfig({
     ],
   },
   optimizeDeps: {
-    entries: ['./app/**/*', '../../packages/ui/**/*', '../../packages/lib/**/*'],
+    // Only scan the app directory — workspace packages (ui, lib) are
+    // discovered transitively through app imports. The previous config
+    // scanned ~1,000 files including server-only code from packages/lib.
+    entries: ['./app/**/*'],
     include: ['prop-types', 'file-selector', 'attr-accept'],
     exclude: [
-      'node_modules',
       '@napi-rs/canvas',
       '@node-rs/bcrypt',
       'sharp',
@@ -75,6 +126,7 @@ export default defineConfig({
     ],
   },
   resolve: {
+    tsconfigPaths: true,
     alias: {
       https: 'node:https',
       '.prisma/client/default': path.resolve(
@@ -89,11 +141,15 @@ export default defineConfig({
     },
   },
   /**
-   * Note: Re run rollup again to build the server afterwards.
+   * Note: Re run rolldown again to build the server afterwards.
    *
-   * See rollup.config.mjs which is used for that.
+   * See rolldown.config.mjs which is used for that.
    */
   build: {
+    // LightningCSS (Vite 8 default) is stricter and rejects nested @page
+    // rules and some Tailwind theme() edge cases. Use esbuild for CSS
+    // minification until LightningCSS support matures or the CSS is updated.
+    cssMinify: 'esbuild',
     rollupOptions: {
       external: [
         '@napi-rs/canvas',
