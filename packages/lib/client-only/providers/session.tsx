@@ -91,8 +91,8 @@ export const SessionProvider = ({ children, initialSession }: SessionProviderPro
       });
 
     // Skip session update if the organisation fetch was aborted due to a transient
-    // network error, or if the page is no longer visible (e.g. during a refresh).
-    if (organisations === null || document.visibilityState === 'hidden') {
+    // network error (e.g. page refresh while fetch was in-flight).
+    if (organisations === null) {
       return;
     }
 
