@@ -9,19 +9,21 @@ import {
   AlertTriangle,
   CheckIcon,
   Clock,
+  Clock8Icon,
   MailIcon,
   MailOpenIcon,
   PenIcon,
   PlusIcon,
   UserIcon,
 } from 'lucide-react';
+import { DateTime } from 'luxon';
 import { Link, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import type { TEnvelope } from '@documenso/lib/types/envelope';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { formatSigningLink } from '@documenso/lib/utils/recipients';
+import { formatSigningLink, isRecipientExpired } from '@documenso/lib/utils/recipients';
 import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button';
 import { SignatureIcon } from '@documenso/ui/icons/signature';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
@@ -44,7 +46,7 @@ export const DocumentPageViewRecipients = ({
   envelope,
   documentRootPath,
 }: DocumentPageViewRecipientsProps) => {
-  const { _ } = useLingui();
+  const { _, i18n } = useLingui();
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -66,9 +68,9 @@ export const DocumentPageViewRecipients = ({
   }, [searchParams, setSearchParams]);
 
   return (
-    <section className="dark:bg-background border-border bg-widget flex flex-col rounded-xl border">
+    <section className="flex flex-col rounded-xl border border-border bg-widget dark:bg-background">
       <div className="flex flex-row items-center justify-between px-4 py-3">
-        <h1 className="text-foreground font-medium">
+        <h1 className="font-medium text-foreground">
           <Trans>Recipients</Trans>
         </h1>
 
@@ -87,7 +89,7 @@ export const DocumentPageViewRecipients = ({
         )}
       </div>
 
-      <ul className="text-muted-foreground divide-y border-t">
+      <ul className="divide-y border-t text-muted-foreground">
         {recipients.length === 0 && (
           <li className="flex flex-col items-center justify-center py-6 text-sm">
             <Trans>No recipients</Trans>
@@ -98,9 +100,9 @@ export const DocumentPageViewRecipients = ({
           <li key={recipient.id} className="flex items-center justify-between px-4 py-2.5 text-sm">
             <AvatarWithText
               avatarFallback={recipient.email.slice(0, 1).toUpperCase()}
-              primaryText={<p className="text-muted-foreground text-sm">{recipient.email}</p>}
+              primaryText={<p className="text-sm text-muted-foreground">{recipient.email}</p>}
               secondaryText={
-                <p className="text-muted-foreground/70 text-xs">
+                <p className="text-xs text-muted-foreground/70">
                   {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
                 </p>
               }
@@ -154,12 +156,41 @@ export const DocumentPageViewRecipients = ({
                 )}
 
               {envelope.status !== DocumentStatus.DRAFT &&
-                recipient.signingStatus === SigningStatus.NOT_SIGNED && (
+                recipient.signingStatus === SigningStatus.NOT_SIGNED &&
+                isRecipientExpired(recipient) && (
+                  <Badge variant="destructive">
+                    <Clock8Icon className="mr-1 h-3 w-3" />
+                    <Trans>Expired</Trans>
+                  </Badge>
+                )}
+
+              {envelope.status !== DocumentStatus.DRAFT &&
+                recipient.signingStatus === SigningStatus.NOT_SIGNED &&
+                !isRecipientExpired(recipient) &&
+                (recipient.expiresAt ? (
+                  <PopoverHover
+                    trigger={
+                      <Badge variant="secondary">
+                        <Clock className="mr-1 h-3 w-3" />
+                        <Trans>Pending</Trans>
+                      </Badge>
+                    }
+                  >
+                    <p className="text-xs text-muted-foreground">
+                      <Trans>
+                        Expires{' '}
+                        {recipient.expiresAt
+                          ? i18n.date(recipient.expiresAt, DateTime.DATETIME_MED)
+                          : 'N/A'}
+                      </Trans>
+                    </p>
+                  </PopoverHover>
+                ) : (
                   <Badge variant="secondary">
                     <Clock className="mr-1 h-3 w-3" />
                     <Trans>Pending</Trans>
                   </Badge>
-                )}
+                ))}
 
               {envelope.status !== DocumentStatus.DRAFT &&
                 recipient.signingStatus === SigningStatus.REJECTED && (
@@ -175,7 +206,7 @@ export const DocumentPageViewRecipients = ({
                       <Trans>Reason for rejection: </Trans>
                     </p>
 
-                    <p className="text-muted-foreground mt-1 text-sm">
+                    <p className="mt-1 text-sm text-muted-foreground">
                       {recipient.rejectionReason}
                     </p>
                   </PopoverHover>
@@ -183,7 +214,8 @@ export const DocumentPageViewRecipients = ({
 
               {envelope.status === DocumentStatus.PENDING &&
                 recipient.signingStatus === SigningStatus.NOT_SIGNED &&
-                recipient.role !== RecipientRole.CC && (
+                recipient.role !== RecipientRole.CC &&
+                !isRecipientExpired(recipient) && (
                   <TooltipProvider>
                     <Tooltip open={shouldHighlightCopyButtons && i === 0}>
                       <TooltipTrigger asChild>

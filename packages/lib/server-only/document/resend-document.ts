@@ -11,6 +11,7 @@ import {
 
 import { mailer } from '@documenso/email/mailer';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
+import { resolveExpiresAt } from '@documenso/lib/constants/envelope-expiration';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
@@ -94,10 +95,30 @@ export const resendDocument = async ({
     throw new Error('Can not send completed document');
   }
 
+  // Refresh the expiresAt on each resent recipient.
+  const expiresAt = resolveExpiresAt(envelope.documentMeta?.envelopeExpirationPeriod ?? null);
+
   const recipientsToRemind = envelope.recipients.filter(
     (recipient) =>
-      recipients.includes(recipient.id) && recipient.signingStatus === SigningStatus.NOT_SIGNED,
+      recipients.includes(recipient.id) &&
+      recipient.signingStatus === SigningStatus.NOT_SIGNED &&
+      recipient.role !== RecipientRole.CC,
   );
+
+  // Extend the expiration deadline for recipients being resent.
+  if (expiresAt && recipientsToRemind.length > 0) {
+    await prisma.recipient.updateMany({
+      where: {
+        id: {
+          in: recipientsToRemind.map((r) => r.id),
+        },
+      },
+      data: {
+        expiresAt,
+        expirationNotifiedAt: null,
+      },
+    });
+  }
 
   const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
     envelope.documentMeta,

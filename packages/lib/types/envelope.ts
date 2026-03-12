@@ -55,11 +55,13 @@ export const ZEnvelopeSchema = EnvelopeSchema.pick({
     emailSettings: true,
     emailId: true,
     emailReplyTo: true,
+    envelopeExpirationPeriod: true,
   }),
   recipients: ZEnvelopeRecipientLiteSchema.array(),
   fields: ZEnvelopeFieldSchema.array(),
   envelopeItems: EnvelopeItemSchema.pick({
     envelopeId: true,
+    documentDataId: true,
     id: true,
     title: true,
     order: true,

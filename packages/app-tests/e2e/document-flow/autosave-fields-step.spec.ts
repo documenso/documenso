@@ -1,6 +1,7 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
+import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { prisma } from '@documenso/prisma';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -46,7 +47,7 @@ test.describe('AutoSave Fields Step', () => {
     await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 100,
@@ -54,7 +55,7 @@ test.describe('AutoSave Fields Step', () => {
     });
 
     await page.getByRole('button', { name: 'Text' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 200,
@@ -74,7 +75,7 @@ test.describe('AutoSave Fields Step', () => {
     await page.getByRole('option', { name: 'Recipient 2 (recipient2@documenso.com)' }).click();
 
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 500,
@@ -100,7 +101,7 @@ test.describe('AutoSave Fields Step', () => {
     await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 100,
@@ -108,7 +109,7 @@ test.describe('AutoSave Fields Step', () => {
     });
 
     await page.getByRole('button', { name: 'Text' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 200,
@@ -128,7 +129,7 @@ test.describe('AutoSave Fields Step', () => {
     await page.getByRole('option', { name: 'Recipient 2 (recipient2@documenso.com)' }).click();
 
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 500,
@@ -162,7 +163,7 @@ test.describe('AutoSave Fields Step', () => {
     await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 100,
@@ -170,7 +171,7 @@ test.describe('AutoSave Fields Step', () => {
     });
 
     await page.getByRole('button', { name: 'Text' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 200,
@@ -190,7 +191,7 @@ test.describe('AutoSave Fields Step', () => {
     await page.getByRole('option', { name: 'Recipient 2 (recipient2@documenso.com)' }).click();
 
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 500,
@@ -224,7 +225,7 @@ test.describe('AutoSave Fields Step', () => {
     await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 100,
@@ -232,7 +233,7 @@ test.describe('AutoSave Fields Step', () => {
     });
 
     await page.getByRole('button', { name: 'Text' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 200,

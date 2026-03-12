@@ -1,0 +1,355 @@
+---
+title: Webhook Setup
+description: Configure webhooks to receive real-time notifications about document events.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Overview
+
+Webhooks are HTTP callbacks triggered by specific events in Documenso. When an event occurs (such as a document being signed), Documenso sends an HTTP POST request to your configured URL with details about the event.
+
+Common use cases include:
+
+- Syncing document status with your database
+- Triggering automated workflows when documents are signed
+- Integrating with CRM systems or other third-party services
+- Sending custom notifications to stakeholders
+
+<Callout type="info">
+  Webhooks are available for teams only. Personal accounts cannot configure webhooks.
+</Callout>
+
+## Creating a Webhook Endpoint
+
+Before configuring a webhook in Documenso, you need an endpoint that can receive HTTP POST requests. Here's a minimal example:
+
+<Tabs items={['Node.js (Express)', 'Python (Flask)', 'Go']}>
+<Tab value="Node.js (Express)">
+```javascript
+const express = require('express');
+const app = express();
+
+app.use(express.json());
+
+app.post('/webhooks/documenso', (req, res) => {
+  const { event, payload, createdAt } = req.body;
+
+  console.log(`Received event: ${event}`);
+  console.log(`Document ID: ${payload.id}`);
+  console.log(`Document title: ${payload.title}`);
+
+  // Process the webhook event
+  switch (event) {
+    case 'DOCUMENT_COMPLETED':
+      // Handle completed document
+      break;
+    case 'DOCUMENT_SIGNED':
+      // Handle signed document
+      break;
+    // Handle other events...
+  }
+
+  // Respond with 200 OK to acknowledge receipt
+  res.status(200).json({ received: true });
+});
+
+app.listen(3000, () => {
+  console.log('Webhook server running on port 3000');
+});
+
+````
+</Tab>
+<Tab value="Python (Flask)">
+```python
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/webhooks/documenso', methods=['POST'])
+def handle_webhook():
+    data = request.get_json()
+
+    event = data.get('event')
+    payload = data.get('payload')
+
+    print(f"Received event: {event}")
+    print(f"Document ID: {payload.get('id')}")
+    print(f"Document title: {payload.get('title')}")
+
+    # Process the webhook event
+    if event == 'DOCUMENT_COMPLETED':
+        # Handle completed document
+        pass
+    elif event == 'DOCUMENT_SIGNED':
+        # Handle signed document
+        pass
+
+    # Respond with 200 OK to acknowledge receipt
+    return jsonify({'received': True}), 200
+
+if __name__ == '__main__':
+    app.run(port=3000)
+````
+
+</Tab>
+<Tab value="Go">
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+)
+
+type WebhookPayload struct {
+	Event     string                 `json:"event"`
+	Payload   map[string]interface{} `json:"payload"`
+	CreatedAt string                 `json:"createdAt"`
+}
+
+func webhookHandler(w http.ResponseWriter, r *http.Request) {
+	var data WebhookPayload
+	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+		http.Error(w, "Invalid payload", http.StatusBadRequest)
+		return
+	}
+
+	fmt.Printf("Received event: %s\n", data.Event)
+	fmt.Printf("Document ID: %v\n", data.Payload["id"])
+	fmt.Printf("Document title: %v\n", data.Payload["title"])
+
+	// Process the webhook event
+	switch data.Event {
+	case "DOCUMENT_COMPLETED":
+		// Handle completed document
+	case "DOCUMENT_SIGNED":
+		// Handle signed document
+	}
+
+	// Respond with 200 OK to acknowledge receipt
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]bool{"received": true})
+}
+
+func main() {
+	http.HandleFunc("/webhooks/documenso", webhookHandler)
+	fmt.Println("Webhook server running on port 3000")
+	http.ListenAndServe(":3000", nil)
+}
+
+```
+</Tab>
+</Tabs>
+
+<Callout type="warn">
+  Always respond with a `200 OK` status within 30 seconds. Documenso will retry failed deliveries.
+</Callout>
+
+## Configuring Webhooks in Documenso via the Dashboard
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Navigate to team settings
+
+Click your avatar in the top right corner and select **Team settings** from the dropdown menu.
+</Step>
+
+<Step>
+### Open the webhooks tab
+
+Navigate to the **Webhooks** tab in the team settings sidebar.
+
+![Webhooks settings page](/webhook-images/webhooks-page.webp)
+</Step>
+
+<Step>
+### Create a new webhook
+
+Click the **Create Webhook** button to open the configuration dialog.
+
+![Create webhook dialog](/webhook-images/create-webhook-dialog.webp)
+</Step>
+
+<Step>
+### Configure the webhook
+
+Fill in the following fields:
+
+| Field | Description |
+| ----- | ----------- |
+| **Webhook URL** | The HTTPS endpoint that will receive webhook events |
+| **Events** | Select which events should trigger this webhook |
+| **Secret** (optional) | A secret key used to sign the payload for verification |
+</Step>
+
+<Step>
+### Save the webhook
+
+Click **Create Webhook** to save your configuration. The webhook is now active and will receive events.
+</Step>
+</Steps>
+
+## Webhook URL Requirements
+
+Your webhook endpoint must meet these requirements:
+
+| Requirement | Details |
+| ----------- | ------- |
+| **Protocol** | HTTPS required (HTTP not allowed in production) |
+| **Response** | Must return `2xx` status code within 30 seconds |
+| **Method** | Must accept HTTP POST requests |
+| **Content-Type** | Must accept `application/json` payloads |
+| **Availability** | Must be publicly accessible from the internet |
+
+<Callout type="info">
+  For local development, use a tunneling service like [ngrok](https://ngrok.com) or [localtunnel](https://localtunnel.me) to expose your local server.
+</Callout>
+
+## Selecting Events
+
+When creating a webhook, you can subscribe to one or more events:
+
+| Event | Trigger |
+| ----- | ------- |
+| `DOCUMENT_CREATED` | A new document is created |
+| `DOCUMENT_SENT` | A document is sent to recipients |
+| `DOCUMENT_OPENED` | A recipient opens the document |
+| `DOCUMENT_SIGNED` | A recipient signs the document |
+| `DOCUMENT_COMPLETED` | All recipients have signed the document |
+| `DOCUMENT_REJECTED` | A recipient rejects the document |
+| `DOCUMENT_CANCELLED` | The document owner cancels the document |
+
+You can subscribe to all events or select specific ones based on your needs. For example, if you only need to know when documents are fully signed, subscribe only to `DOCUMENT_COMPLETED`.
+
+See [Webhook Events](/docs/developers/webhooks/events) for detailed payload information for each event type.
+
+## Testing Webhooks
+
+Documenso provides a built-in testing feature to verify your webhook endpoint works correctly.
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Navigate to webhook details
+
+Go to **Team Settings > Webhooks** and click on the webhook you want to test.
+
+![Webhook detail page](/webhook-images/webhook-detail-page.webp)
+</Step>
+
+<Step>
+### Click test
+
+Click the **Test** button in the webhook details page.
+</Step>
+
+<Step>
+### Select an event type
+
+Choose which event type you want to simulate from the dropdown.
+</Step>
+
+<Step>
+### Send test payload
+
+Click **Send** to dispatch a test webhook with sample data to your endpoint.
+
+![Webhook test trigger](/webhook-images/webhook-test-trigger.webp)
+</Step>
+</Steps>
+
+The test payload contains realistic sample data so you can verify your endpoint processes events correctly. After sending, you can view the response in the webhook call logs.
+
+### Viewing Webhook Logs
+
+Each webhook subscription maintains a log of all delivery attempts. To view logs:
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+Go to **Team Settings > Webhooks**
+</Step>
+<Step>
+Click on a webhook to view its details
+</Step>
+<Step>
+Review the logs
+
+Each webhook call shows the following details:
+- Status (success/failure)
+- Event type
+- Timestamp
+- Response code
+- Request and response bodies
+
+Click any call to see full details including headers and response data.
+</Step>
+</Steps>
+
+### Resending Failed Webhooks
+
+If a webhook delivery fails, you can manually resend it:
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+Navigate to the webhook call details page
+</Step>
+<Step>
+Click the **Resend** button
+</Step>
+<Step>
+Documenso will attempt to deliver the same payload again
+</Step>
+</Steps>
+
+## Retry Policy
+
+When a webhook delivery fails (non-2xx response or timeout), Documenso automatically retries with exponential backoff:
+
+| Attempt | Delay |
+| ------- | ----- |
+| 1 | Immediate |
+| 2 | 1 minute |
+| 3 | 5 minutes |
+| 4 | 30 minutes |
+| 5 | 2 hours |
+
+After 5 failed attempts, the webhook is marked as failed and no further automatic retries occur. You can manually resend failed webhooks from the dashboard.
+
+<Callout type="warn">
+  If your endpoint consistently fails, consider reviewing your server logs and ensuring your endpoint meets all [URL requirements](#webhook-url-requirements).
+</Callout>
+
+## Security Best Practices
+
+<Accordions type="multiple">
+  <Accordion title="Use HTTPS">
+    Always use HTTPS endpoints in production.
+  </Accordion>
+  <Accordion title="Verify signatures">
+    Use a webhook secret and verify the `X-Documenso-Secret` header (see [Verification](/docs/developers/webhooks/verification)).
+  </Accordion>
+  <Accordion title="Validate payloads">
+    Validate incoming data before processing.
+  </Accordion>
+  <Accordion title="Respond quickly">
+    Return 200 OK immediately, then process asynchronously.
+  </Accordion>
+  <Accordion title="Idempotency">
+    Handle duplicate deliveries gracefully.
+  </Accordion>
+</Accordions>
+
+## Next Steps
+
+- [Webhook Events](/docs/developers/webhooks/events) - Detailed payload structure for each event type
+- [Webhook Verification](/docs/developers/webhooks/verification) - Secure your webhooks with signature verification
+```

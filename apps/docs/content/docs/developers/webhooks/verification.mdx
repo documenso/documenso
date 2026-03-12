@@ -1,0 +1,290 @@
+---
+title: Webhook Verification
+description: Verify webhook signatures for security.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Overview
+
+Verifying webhook requests ensures that incoming payloads originate from Documenso and have not been tampered with. Without verification, attackers could forge requests to your endpoint and trigger unintended actions.
+
+## How Documenso Signs Webhooks
+
+When you configure a webhook with a secret, Documenso includes that secret in every webhook request via the `X-Documenso-Secret` header. Your server should compare this header value against your stored secret to authenticate the request.
+
+```bash
+POST /your-webhook-endpoint HTTP/1.1
+Host: your-server.com
+Content-Type: application/json
+X-Documenso-Secret: your_webhook_secret_here
+
+{"event": "DOCUMENT_COMPLETED", "payload": {...}}
+```
+
+## Signature Header Format
+
+| Header               | Description                                             |
+| -------------------- | ------------------------------------------------------- |
+| `X-Documenso-Secret` | The secret key you configured when creating the webhook |
+
+The header contains your webhook secret as a plain string. If you did not configure a secret, the header will be an empty string.
+
+## Verification Steps
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Extract the `X-Documenso-Secret` header from the incoming request
+  </Step>
+  <Step>
+    Compare it against your stored webhook secret using a constant-time comparison
+  </Step>
+  <Step>
+    Reject the request if the values do not match
+  </Step>
+  <Step>
+    Process the webhook payload if verification succeeds
+  </Step>
+</Steps>
+
+<Callout type="warn">
+  Always use constant-time string comparison to prevent timing attacks. Standard equality operators
+  (`===` or `==`) can leak information about the secret through response time variations.
+</Callout>
+
+## Code Examples
+
+<Tabs items={['Node.js (Express)', 'Python (Flask)']}>
+<Tab value="Node.js (Express)">
+```javascript
+const express = require('express');
+const crypto = require('crypto');
+
+const app = express();
+app.use(express.json());
+
+const WEBHOOK_SECRET = process.env.DOCUMENSO_WEBHOOK_SECRET;
+
+function verifyWebhookSignature(receivedSecret, expectedSecret) {
+  if (!expectedSecret) {
+    // No secret configured, skip verification
+    // Not recommended for production
+    return true;
+  }
+
+  if (!receivedSecret) {
+    return false;
+  }
+
+  // Use constant-time comparison to prevent timing attacks
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(receivedSecret),
+      Buffer.from(expectedSecret),
+    );
+  } catch {
+    return false;
+  }
+}
+
+app.post('/webhooks/documenso', (req, res) => {
+  const receivedSecret = req.headers['x-documenso-secret'];
+
+  if (!verifyWebhookSignature(receivedSecret, WEBHOOK_SECRET)) {
+    console.error('Webhook verification failed');
+    return res.status(401).json({ error: 'Invalid signature' });
+  }
+
+  // Signature verified, process the webhook
+  const { event, payload } = req.body;
+  console.log(`Verified webhook: ${event}`);
+
+  // Process the event...
+
+  res.status(200).json({ received: true });
+});
+
+app.listen(3000, () => {
+  console.log('Webhook server running on port 3000');
+});
+
+````
+</Tab>
+<Tab value="Python (Flask)">
+```python
+import hmac
+import os
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+WEBHOOK_SECRET = os.environ.get('DOCUMENSO_WEBHOOK_SECRET')
+
+def verify_webhook_signature(received_secret, expected_secret):
+    """Verify the webhook signature using constant-time comparison."""
+    if not expected_secret:
+        # No secret configured, skip verification
+        # Not recommended for production
+        return True
+
+    if not received_secret:
+        return False
+
+    # Use constant-time comparison to prevent timing attacks
+    return hmac.compare_digest(received_secret, expected_secret)
+
+@app.route('/webhooks/documenso', methods=['POST'])
+def handle_webhook():
+    received_secret = request.headers.get('X-Documenso-Secret', '')
+
+    if not verify_webhook_signature(received_secret, WEBHOOK_SECRET):
+        print('Webhook verification failed')
+        return jsonify({'error': 'Invalid signature'}), 401
+
+    # Signature verified, process the webhook
+    data = request.get_json()
+    event = data.get('event')
+    payload = data.get('payload')
+
+    print(f'Verified webhook: {event}')
+
+    # Process the event...
+
+    return jsonify({'received': True}), 200
+
+if __name__ == '__main__':
+    app.run(port=3000)
+````
+
+</Tab>
+</Tabs>
+
+## Handling Verification Failures
+
+When verification fails, follow these practices:
+
+| Action              | Description                                                        |
+| ------------------- | ------------------------------------------------------------------ |
+| Return 401 status   | Respond with `401 Unauthorized` to indicate authentication failure |
+| Log the attempt     | Record failed attempts for security monitoring                     |
+| Do not process      | Never process the payload if verification fails                    |
+| Do not leak details | Avoid exposing information about why verification failed           |
+
+```javascript
+app.post('/webhooks/documenso', (req, res) => {
+  const receivedSecret = req.headers['x-documenso-secret'];
+
+  if (!verifyWebhookSignature(receivedSecret, WEBHOOK_SECRET)) {
+    // Log for monitoring but don't expose details
+    console.error('Webhook verification failed', {
+      timestamp: new Date().toISOString(),
+      ip: req.ip,
+    });
+
+    // Generic error response
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  // Continue processing...
+});
+```
+
+### Common Verification Issues
+
+| Issue           | Cause                                   | Solution                                                           |
+| --------------- | --------------------------------------- | ------------------------------------------------------------------ |
+| Secret mismatch | Webhook secret changed or misconfigured | Verify the secret in your environment matches the one in Documenso |
+| Empty header    | Webhook created without a secret        | Add a secret to the webhook configuration in Documenso             |
+| Encoding issues | String encoding mismatch                | Ensure both secrets use the same encoding (UTF-8)                  |
+
+## Security Best Practices
+
+<Accordions type="multiple">
+  <Accordion title="Use strong secrets">
+    Generate a cryptographically secure random string for your webhook secret:
+
+```bash
+# Generate a 32-byte random secret
+openssl rand -hex 32
+```
+
+  </Accordion>
+  <Accordion title="Store secrets securely">
+    Never hardcode secrets in your source code. Use environment variables or a secrets manager:
+
+```javascript
+// Good: Environment variable
+const WEBHOOK_SECRET = process.env.DOCUMENSO_WEBHOOK_SECRET;
+
+// Bad: Hardcoded
+const WEBHOOK_SECRET = 'my-secret-key'; // Never do this
+```
+
+  </Accordion>
+  <Accordion title="Rotate secrets periodically">
+    Update your webhook secret periodically:
+
+1. Generate a new secret
+2. Update your server to accept both old and new secrets temporarily
+3. Update the webhook configuration in Documenso
+4. Remove the old secret from your server
+
+</Accordion>
+<Accordion title="Validate payload structure">
+  After verifying the signature, validate the payload structure before processing:
+
+```javascript
+const { event, payload, createdAt } = req.body;
+
+if (!event || !payload) {
+  return res.status(400).json({ error: 'Invalid payload structure' });
+}
+
+// Validate event is a known type
+const validEvents = [
+  'DOCUMENT_CREATED',
+  'DOCUMENT_SENT',
+  'DOCUMENT_OPENED',
+  'DOCUMENT_SIGNED',
+  'DOCUMENT_COMPLETED',
+  'DOCUMENT_REJECTED',
+  'DOCUMENT_CANCELLED',
+];
+
+if (!validEvents.includes(event)) {
+  console.warn(`Unknown event type: ${event}`);
+}
+```
+
+  </Accordion>
+  <Accordion title="Use HTTPS">
+    Always use HTTPS endpoints in production to encrypt data in transit, including the secret header.
+  </Accordion>
+  <Accordion title="Implement rate limiting">
+    Protect your endpoint from abuse with rate limiting:
+
+```javascript
+const rateLimit = require('express-rate-limit');
+
+const webhookLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 100, // 100 requests per minute
+  message: { error: 'Too many requests' },
+});
+
+app.post('/webhooks/documenso', webhookLimiter, (req, res) => {
+  // Handle webhook...
+});
+```
+
+  </Accordion>
+</Accordions>
+
+## See Also
+
+- [Webhook Setup](/docs/developers/webhooks/setup) - Configure webhook endpoints and secrets
+- [Webhook Events](/docs/developers/webhooks/events) - Event types and payload structure

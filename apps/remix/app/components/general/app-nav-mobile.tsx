@@ -97,13 +97,13 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
           {menuNavigationLinks.map(({ href, text }) => (
             <Link
               key={href}
-              className="flex items-center gap-2 text-2xl font-semibold text-foreground hover:text-foreground/80"
+              className="text-foreground hover:text-foreground/80 flex items-center gap-2 text-2xl font-semibold"
               to={href}
               onClick={() => handleMenuItemClick()}
             >
               {text}
               {href === '/inbox' && unreadCountData && unreadCountData.count > 0 && (
-                <span className="flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground">
+                <span className="bg-primary text-primary-foreground flex h-6 min-w-[1.5rem] items-center justify-center rounded-full px-1.5 text-xs font-semibold">
                   {unreadCountData.count > 99 ? '99+' : unreadCountData.count}
                 </span>
               )}
@@ -111,7 +111,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
           ))}
 
           <button
-            className="text-2xl font-semibold text-foreground hover:text-foreground/80"
+            className="text-foreground hover:text-foreground/80 text-2xl font-semibold"
             onClick={async () => authClient.signOut()}
           >
             <Trans>Sign Out</Trans>
@@ -123,8 +123,10 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
             <ThemeSwitcher />
           </div>
 
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Davinci AI Solutions <br /> All rights reserved.
+          <p className="text-muted-foreground text-sm">
+            © {new Date().getFullYear()} Davinci AI Solutions
+            <br />
+            <Trans>All rights reserved.</Trans>
           </p>
         </div>
       </SheetContent>

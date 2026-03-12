@@ -33,6 +33,7 @@ export const ZCreateEnvelopeItemsResponseSchema = z.object({
     title: true,
     envelopeId: true,
     order: true,
+    documentDataId: true,
   }).array(),
 });
 

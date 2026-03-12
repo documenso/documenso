@@ -1,0 +1,259 @@
+---
+title: Configuration
+description: Configure Single Sign-On for your team using any OpenID Connect (OIDC) identity provider.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+<Callout type="warn">SSO is only available on the Enterprise plan.</Callout>
+
+## Supported Providers
+
+Documenso supports any identity provider that implements the OpenID Connect (OIDC) protocol. Common providers include:
+
+- Microsoft Entra ID (formerly Azure AD)
+- Google Workspace
+- Okta
+- Auth0
+- OneLogin
+- JumpCloud
+
+## Setting Up SSO
+
+<Callout type="info">You must be an organisation admin or manager to configure SSO.</Callout>
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Access SSO settings
+
+1. Navigate to your organisation settings
+2. Select **Single Sign-On** from the sidebar
+
+![SSO settings page](/organisations/organisations-sso-settings.webp)
+
+</Step>
+
+<Step>
+### Get your redirect URI
+
+At the top of the SSO settings page, you'll find the **Redirect URI** and **Required Scopes**. Copy these values - you'll need them when configuring your identity provider.
+
+</Step>
+
+<Step>
+### Configure your identity provider
+
+In your identity provider's admin console, create a new OIDC application with:
+
+- **Redirect URI**: The value from the Documenso SSO settings page
+- **Scopes**: `openid`, `email`, `profile`
+
+After creating the application, note down:
+
+- Client ID
+- Client Secret
+- OpenID Connect discovery URL (also called "well-known" URL)
+
+</Step>
+
+<Step>
+### Enter SSO configuration
+
+Back in Documenso, enter the following:
+
+- **Issuer URL**: Your provider's OpenID Connect discovery endpoint
+- **Client ID**: The application client ID from your provider
+- **Client Secret**: The application secret from your provider
+
+</Step>
+
+<Step>
+### Set allowed domains and default role
+
+Configure which email domains can authenticate and what role new users receive (see sections below).
+
+</Step>
+
+<Step>
+### Enable SSO
+
+Toggle **Enable SSO portal** and click **Update** to activate SSO for your team.
+
+</Step>
+</Steps>
+
+## SSO Configuration Settings
+
+### Issuer URL
+
+The OpenID Connect discovery endpoint for your identity provider.
+
+| Provider           | Issuer URL Format                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------- |
+| Google Workspace   | `https://accounts.google.com/.well-known/openid-configuration`                        |
+| Microsoft Entra ID | `https://login.microsoftonline.com/{tenant-id}/v2.0/.well-known/openid-configuration` |
+| Okta               | `https://{your-domain}.okta.com/.well-known/openid-configuration`                     |
+| Auth0              | `https://{your-domain}.auth0.com/.well-known/openid-configuration`                    |
+
+### Client Credentials
+
+- **Client ID**: The unique identifier for your OIDC application
+- **Client Secret**: The secret key used to authenticate your application
+
+<Callout type="warn">
+  Store your client secret securely. If compromised, regenerate it immediately in your identity
+  provider.
+</Callout>
+
+### Default Organisation Role
+
+The role assigned to users when they first sign in through SSO. You can change individual roles after they've joined.
+
+<Tabs items={['Member', 'Manager', 'Admin']}>
+  <Tab value="Member">Can view and sign documents shared with them.</Tab>
+  <Tab value="Manager">Can manage documents and organisation settings.</Tab>
+  <Tab value="Admin">Full access to organisation configuration.</Tab>
+</Tabs>
+
+### Allowed Email Domains
+
+Restrict which email domains can authenticate through your SSO portal. Enter domains separated by spaces:
+
+```
+example.com subsidiary.example.com
+```
+
+Leave empty to allow any domain authenticated by your identity provider.
+
+<Callout type="warn">
+  Without domain restrictions, anyone who can authenticate with your identity provider can join your
+  team.
+</Callout>
+
+## User Provisioning
+
+When a user signs in through your SSO portal for the first time:
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Verify identity
+
+Documenso verifies their identity with your provider.
+
+</Step>
+<Step>
+### Create or link account
+
+A new account is created, or linked if the email already exists.
+
+</Step>
+<Step>
+### Add to organisation
+
+The user is added to your organisation with the default role.
+
+</Step>
+<Step>
+### Grant access
+
+They can immediately access organisation documents.
+
+</Step>
+</Steps>
+
+Users provisioned through SSO:
+
+- Cannot change their email address
+- Cannot set a Documenso password (they must use SSO)
+- Are removed from SSO access if removed from your identity provider
+
+## Signing In with SSO
+
+Once SSO is enabled, your organisation's SSO portal URL is displayed at the top of the SSO settings page. Share this URL with your members so they can sign in through your identity provider.
+
+<Callout type="info">
+  SSO-only enforcement is not currently available. Users who have an existing Documenso account with a password can still sign in with their original method in addition to SSO.
+</Callout>
+
+## Troubleshooting
+
+<Accordions type="multiple">
+  {/* prettier-ignore */}
+  <Accordion title="Invalid issuer URL">
+    - Verify the URL is correct and publicly accessible
+    
+    - Ensure the URL points to an OpenID Connect discovery document
+    
+    - Check that the URL includes the full path (usually ending in `/.well-known/openid-configuration`)
+  </Accordion>
+  {/* prettier-ignore */}
+  <Accordion title="Client authentication failed">
+  - Verify the client ID and secret match your identity provider exactly 
+  
+  - Check that the OIDC application hasn't been deleted or disabled. 
+  
+  - Regenerate the client secret if you suspect it's incorrect.
+</Accordion>
+  {/* prettier-ignore */}
+  <Accordion title="Redirect URI mismatch">
+  - Copy the redirect URI exactly from Documenso's SSO settings
+  
+  - Check for trailing slashes. They must match exactly. 
+  
+  - Ensure you're using HTTPS.
+</Accordion>
+  {/* prettier-ignore */}
+  <Accordion title="User not provisioned">
+  - Verify the user's email domain is in the allowed domains list
+  
+  - Check that the user exists in your identity provider
+  
+  - Ensure the user's account in your identity provider has an email address
+</Accordion>
+  {/* prettier-ignore */}
+  <Accordion title="User already exists">
+    If a user already has a Documenso account with the same email, their existing account will be linked to your team and they can sign in through your SSO portal going forward.
+  </Accordion>
+</Accordions>
+
+## Testing Your SSO Portal
+
+After configuring SSO, verify it works correctly:
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Open portal
+
+Navigate to your portal URL (found at the top of the organisation SSO settings page).
+
+</Step>
+<Step>
+### Sign in
+
+Sign in with a test account from your configured domain.
+
+</Step>
+<Step>
+### Verify provisioning
+
+Verify the user is provisioned with the correct organisation role.
+
+</Step>
+</Steps>
+
+### Custom Subdomain
+
+To reduce friction for your users, create a custom subdomain that redirects to your SSO portal link. For example, `documenso.your-organisation.com` can redirect to the portal URL shown in your SSO settings.
+
+---
+
+## See Also
+
+- [Manage Members](/docs/users/organisations/members) - Configure team member roles and permissions
+- [Create a Team](/docs/users/organisations/create-team) - Set up additional teams in your organisation

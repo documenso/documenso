@@ -5,7 +5,10 @@ import { DocumentStatus, type Recipient, SigningStatus } from '@prisma/client';
 import type Konva from 'konva';
 
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
-import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import {
+  type PageRenderData,
+  useCurrentEnvelopeRender,
+} from '@documenso/lib/client-only/providers/envelope-render-provider';
 import type { TEnvelope } from '@documenso/lib/types/envelope';
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
@@ -15,7 +18,7 @@ type GenericLocalField = TEnvelope['fields'][number] & {
   recipient: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>;
 };
 
-export default function EnvelopeGenericPageRenderer() {
+export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
   const { i18n } = useLingui();
 
   const {
@@ -28,19 +31,14 @@ export default function EnvelopeGenericPageRenderer() {
     overrideSettings,
   } = useCurrentEnvelopeRender();
 
-  const {
-    stage,
-    pageLayer,
-    canvasElement,
-    konvaContainer,
-    pageContext,
-    scaledViewport,
-    unscaledViewport,
-  } = usePageRenderer(({ stage, pageLayer }) => {
-    createPageCanvas(stage, pageLayer);
-  });
+  const { stage, pageLayer, konvaContainer, unscaledViewport } = usePageRenderer(
+    ({ stage, pageLayer }) => {
+      createPageCanvas(stage, pageLayer);
+    },
+    pageData,
+  );
 
-  const { _className, scale } = pageContext;
+  const { scale, pageNumber } = pageData;
 
   const localPageFields = useMemo((): GenericLocalField[] => {
     if (envelopeStatus === DocumentStatus.COMPLETED) {
@@ -49,8 +47,7 @@ export default function EnvelopeGenericPageRenderer() {
 
     return fields
       .filter(
-        (field) =>
-          field.page === pageContext.pageNumber && field.envelopeItemId === currentEnvelopeItem?.id,
+        (field) => field.page === pageNumber && field.envelopeItemId === currentEnvelopeItem?.id,
       )
       .map((field) => {
         const recipient = recipients.find((recipient) => recipient.id === field.recipientId);
@@ -73,7 +70,7 @@ export default function EnvelopeGenericPageRenderer() {
           (recipient.signingStatus === SigningStatus.SIGNED ? inserted : true) ||
           fieldMeta?.readOnly,
       );
-  }, [fields, pageContext.pageNumber, currentEnvelopeItem?.id, recipients]);
+  }, [fields, pageNumber, currentEnvelopeItem?.id, recipients, envelopeStatus]);
 
   const unsafeRenderFieldOnLayer = (field: GenericLocalField) => {
     if (!pageLayer.current) {
@@ -160,11 +157,9 @@ export default function EnvelopeGenericPageRenderer() {
   }
 
   return (
-    <div
-      className="relative w-full"
-      key={`${currentEnvelopeItem.id}-renderer-${pageContext.pageNumber}`}
-    >
+    <>
       {overrideSettings?.showRecipientTooltip &&
+        pageData.imageLoadingState === 'loaded' &&
         localPageFields.map((field) => (
           <EnvelopeRecipientFieldTooltip
             key={field.id}
@@ -176,14 +171,6 @@ export default function EnvelopeGenericPageRenderer() {
 
       {/* The element Konva will inject it's canvas into. */}
       <div className="konva-container absolute inset-0 z-10 w-full" ref={konvaContainer}></div>
-
-      {/* Canvas the PDF will be rendered on. */}
-      <canvas
-        className={`${_className}__canvas z-0`}
-        ref={canvasElement}
-        height={scaledViewport.height}
-        width={scaledViewport.width}
-      />
-    </div>
+    </>
   );
-}
+};

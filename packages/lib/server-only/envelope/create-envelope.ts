@@ -97,6 +97,14 @@ export type CreateEnvelopeOptions = {
     data: string;
     type?: TEnvelopeAttachmentType;
   }>;
+
+  /**
+   * Whether to bypass adding default recipients.
+   *
+   * Defaults to false.
+   */
+  bypassDefaultRecipients?: boolean;
+
   meta?: Partial<Omit<DocumentMeta, 'id'>>;
   requestMetadata: ApiRequestMetadata;
 };
@@ -110,6 +118,7 @@ export const createEnvelope = async ({
   meta,
   requestMetadata,
   internalVersion,
+  bypassDefaultRecipients = false,
 }: CreateEnvelopeOptions) => {
   const {
     type,
@@ -355,9 +364,10 @@ export const createEnvelope = async ({
 
     const firstEnvelopeItem = envelope.envelopeItems[0];
 
-    const defaultRecipients = settings.defaultRecipients
-      ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients)
-      : [];
+    const defaultRecipients =
+      settings.defaultRecipients && !bypassDefaultRecipients
+        ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients)
+        : [];
 
     const mappedDefaultRecipients: CreateEnvelopeRecipientOptions[] = defaultRecipients.map(
       (recipient) => ({

@@ -35,6 +35,7 @@ export const verifyEmailDomain = async (emailDomainId: string) => {
     },
     data: {
       status: isVerified ? EmailDomainStatus.ACTIVE : EmailDomainStatus.PENDING,
+      lastVerifiedAt: new Date(),
     },
   });
 

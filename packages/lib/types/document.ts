@@ -71,6 +71,7 @@ export const ZDocumentSchema = LegacyDocumentSchema.pick({
     emailSettings: true,
     emailId: true,
     emailReplyTo: true,
+    envelopeExpirationPeriod: true,
   }).extend({
     password: z.string().nullable().default(null),
     documentId: z.number().default(-1).optional(),
@@ -180,3 +181,5 @@ export const ZDocumentManySchema = LegacyDocumentSchema.pick({
 });
 
 export type TDocumentMany = z.infer<typeof ZDocumentManySchema>;
+
+export type DocumentDataVersion = 'initial' | 'current';

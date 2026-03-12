@@ -10,6 +10,7 @@ import {
   WebhookTriggerEvents,
 } from '@prisma/client';
 
+import { resolveExpiresAt } from '@documenso/lib/constants/envelope-expiration';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
@@ -158,10 +159,12 @@ export const sendDocument = async ({
   );
 
   if (recipientsWithMissingFields.length > 0) {
-    const missingRecipientIds = recipientsWithMissingFields.map((r) => r.id).join(', ');
+    const missingRecipientDescriptions = recipientsWithMissingFields
+      .map((r) => (r.name ? `${r.name} (${r.email}, id: ${r.id})` : `${r.email} (id: ${r.id})`))
+      .join(', ');
 
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: `The following recipients are missing required fields: ${missingRecipientIds}. Signers must have at least one signature field.`,
+      message: `The following recipients are missing required fields: ${missingRecipientDescriptions}. Signers must have at least one signature field.`,
     });
   }
 
@@ -254,6 +257,28 @@ export const sendDocument = async ({
           },
           // Don't put metadata or user here since it's a system event.
         }),
+      });
+    }
+
+    const expiresAt = resolveExpiresAt(envelope.documentMeta?.envelopeExpirationPeriod ?? null);
+
+    // Set expiresAt on each recipient that hasn't already signed/rejected.
+    // Exclude CC recipients since they don't sign and shouldn't be subject to expiry.
+    if (expiresAt) {
+      await tx.recipient.updateMany({
+        where: {
+          envelopeId: envelope.id,
+          signingStatus: {
+            notIn: [SigningStatus.SIGNED, SigningStatus.REJECTED],
+          },
+          role: {
+            not: RecipientRole.CC,
+          },
+        },
+        data: {
+          expiresAt,
+          expirationNotifiedAt: null,
+        },
       });
     }
 

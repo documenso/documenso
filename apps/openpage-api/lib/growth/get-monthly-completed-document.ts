@@ -21,8 +21,7 @@ export const getCompletedDocumentsMonthly = async (type: 'count' | 'cumulative' 
     .where(() => sql`"Envelope"."status" = ${DocumentStatus.COMPLETED}::"DocumentStatus"`)
     .where(() => sql`"Envelope"."type" = ${EnvelopeType.DOCUMENT}::"EnvelopeType"`)
     .groupBy('month')
-    .orderBy('month', 'desc')
-    .limit(12);
+    .orderBy('month', 'desc');
 
   const result = await qb.execute();
 
@@ -38,7 +37,7 @@ export const getCompletedDocumentsMonthly = async (type: 'count' | 'cumulative' 
     ],
   };
 
-  return addZeroMonth(transformedData);
+  return addZeroMonth(transformedData, type === 'cumulative');
 };
 
 export type GetCompletedDocumentsMonthlyResult = Awaited<

@@ -1,4 +1,5 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { UNSAFE_updateEnvelopeItems } from '@documenso/lib/server-only/envelope-item/update-envelope-items';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
@@ -54,6 +55,9 @@ export const updateEnvelopeItemsRoute = authenticatedProcedure
       });
     }
 
+    // Note: This logic is duplicated in many places. If we plan to allow changing title/order
+    // even after the envelope has been sent, make sure to update it everywhere including
+    // embedding routes.
     if (!canEnvelopeItemsBeModified(envelope, envelope.recipients)) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Envelope item is not editable',
@@ -71,28 +75,10 @@ export const updateEnvelopeItemsRoute = authenticatedProcedure
       });
     }
 
-    const updatedEnvelopeItems = await Promise.all(
-      data.map(async ({ envelopeItemId, order, title }) =>
-        prisma.envelopeItem.update({
-          where: {
-            envelopeId: envelope.id,
-            id: envelopeItemId,
-          },
-          data: {
-            order,
-            title,
-          },
-          select: {
-            id: true,
-            order: true,
-            title: true,
-            envelopeId: true,
-          },
-        }),
-      ),
-    );
-
-    // Todo: Envelope [AUDIT_LOGS]
+    const updatedEnvelopeItems = await UNSAFE_updateEnvelopeItems({
+      envelopeId,
+      data,
+    });
 
     return {
       data: updatedEnvelopeItems,

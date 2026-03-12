@@ -1,4 +1,4 @@
-import { SigningStatus } from '@prisma/client';
+import { type RecipientRole, SigningStatus } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
@@ -6,9 +6,10 @@ export type UpdateRecipientOptions = {
   id: number;
   name: string | undefined;
   email: string | undefined;
+  role: RecipientRole | undefined;
 };
 
-export const updateRecipient = async ({ id, name, email }: UpdateRecipientOptions) => {
+export const updateRecipient = async ({ id, name, email, role }: UpdateRecipientOptions) => {
   const recipient = await prisma.recipient.findFirstOrThrow({
     where: {
       id,
@@ -26,6 +27,7 @@ export const updateRecipient = async ({ id, name, email }: UpdateRecipientOption
     data: {
       name,
       email,
+      role,
     },
   });
 };

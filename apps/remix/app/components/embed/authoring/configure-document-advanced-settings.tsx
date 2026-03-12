@@ -1,4 +1,6 @@
-import { Trans, useLingui } from '@lingui/react/macro';
+import { t } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { DocumentDistributionMethod } from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
 import type { Control } from 'react-hook-form';
@@ -44,7 +46,7 @@ export const ConfigureDocumentAdvancedSettings = ({
   control,
   isSubmitting,
 }: ConfigureDocumentAdvancedSettingsProps) => {
-  const { t } = useLingui();
+  const { _ } = useLingui();
 
   const form = useFormContext<TConfigureEmbedFormSchema>();
   const { features } = useConfigureDocument();
@@ -93,7 +95,7 @@ export const ConfigureDocumentAdvancedSettings = ({
                     <FormControl>
                       <MultiSelectCombobox
                         options={Object.values(DOCUMENT_SIGNATURE_TYPES).map((option) => ({
-                          label: t(option.label),
+                          label: _(option.label),
                           value: option.value,
                         }))}
                         selectedValues={field.value}
@@ -125,7 +127,7 @@ export const ConfigureDocumentAdvancedSettings = ({
                         <SelectContent>
                           {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
                             <SelectItem key={code} value={code}>
-                              {language.full}
+                              {_(language.full)}
                             </SelectItem>
                           ))}
                         </SelectContent>

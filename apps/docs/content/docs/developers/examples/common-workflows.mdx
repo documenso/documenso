@@ -1,0 +1,1157 @@
+---
+title: Common Workflows
+description: Complete code examples for common document signing workflows, with error handling that can be adapted for your specific use case.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Workflow 1: Send a Document for Signature
+
+The most common workflow: upload a PDF, add recipients with signature fields, and send for signing.
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Build the recipient payload with signature and date fields
+  </Step>
+  <Step>
+    Create the envelope via <code>POST /envelope/create</code> with the PDF and payload
+  </Step>
+  <Step>
+    Distribute the document via <code>POST /envelope/distribute</code> to send signing links
+  </Step>
+</Steps>
+
+<Tabs items={['TypeScript', 'curl']}>
+<Tab value="TypeScript">
+```typescript
+const API_TOKEN = process.env.DOCUMENSO_API_TOKEN;
+const BASE_URL = 'https://app.documenso.com/api/v2';
+
+type Recipient = {
+  email: string;
+  name: string;
+  role: 'SIGNER' | 'APPROVER' | 'CC' | 'VIEWER';
+};
+
+type CreateAndSendResult = {
+  envelopeId: string;
+  recipients: Array<{
+    email: string;
+    signingUrl: string;
+  }>;
+};
+
+async function createAndSendDocument(
+  pdfBuffer: Buffer,
+  filename: string,
+  title: string,
+  recipients: Recipient[],
+): Promise<CreateAndSendResult> {
+  const recipientPayload = recipients.map((recipient, index) => ({
+    email: recipient.email,
+    name: recipient.name,
+    role: recipient.role,
+    signingOrder: index + 1,
+    fields:
+      recipient.role === 'SIGNER'
+        ? [
+            {
+              identifier: 0,
+              type: 'SIGNATURE',
+              page: 1,
+              positionX: 10,
+              positionY: 80 - index * 10,
+              width: 30,
+              height: 5,
+            },
+            {
+              identifier: 0,
+              type: 'DATE',
+              page: 1,
+              positionX: 50,
+              positionY: 80 - index * 10,
+              width: 20,
+              height: 3,
+            },
+          ]
+        : [],
+  }));
+
+  const formData = new FormData();
+  formData.append(
+    'payload',
+    JSON.stringify({
+      type: 'DOCUMENT',
+      title,
+      recipients: recipientPayload,
+      meta: {
+        subject: `Please sign: ${title}`,
+        message: 'Please review and sign the attached document.',
+      },
+    }),
+  );
+  formData.append('files', new Blob([pdfBuffer], { type: 'application/pdf' }), filename);
+
+  const createResponse = await fetch(`${BASE_URL}/envelope/create`, {
+    method: 'POST',
+    headers: { Authorization: API_TOKEN },
+    body: formData,
+  });
+
+  if (!createResponse.ok) {
+    const error = await createResponse.json();
+    throw new Error(`Failed to create envelope: ${error.message}`);
+  }
+
+  const { id: envelopeId } = await createResponse.json();
+
+  const distributeResponse = await fetch(`${BASE_URL}/envelope/distribute`, {
+    method: 'POST',
+    headers: {
+      Authorization: API_TOKEN,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ envelopeId }),
+  });
+
+  if (!distributeResponse.ok) {
+    const error = await distributeResponse.json();
+    throw new Error(`Failed to send document: ${error.message}`);
+  }
+
+  const distributeResult = await distributeResponse.json();
+
+  return {
+    envelopeId,
+    recipients: distributeResult.recipients.map(
+      (r: { email: string; signingUrl: string }) => ({
+        email: r.email,
+        signingUrl: r.signingUrl,
+      }),
+    ),
+  };
+}
+
+const fs = require('fs');
+const pdfBuffer = fs.readFileSync('./contract.pdf');
+
+const result = await createAndSendDocument(
+  pdfBuffer,
+  'contract.pdf',
+  'Service Agreement',
+  [
+    { email: 'client@example.com', name: 'John Smith', role: 'SIGNER' },
+    { email: 'manager@company.com', name: 'Jane Doe', role: 'SIGNER' },
+    { email: 'legal@company.com', name: 'Legal Team', role: 'CC' },
+  ],
+);
+
+console.log('Document sent:', result.envelopeId);
+result.recipients.forEach((r) => console.log(`${r.email}: ${r.signingUrl}`));
+````
+</Tab>
+<Tab value="curl">
+```bash
+#!/bin/bash
+set -e
+
+API_TOKEN="YOUR_API_TOKEN"
+BASE_URL="https://app.documenso.com/api/v2"
+PDF_FILE="./contract.pdf"
+
+# Step 1: Create envelope with recipients and fields
+echo "Creating envelope..."
+ENVELOPE_RESPONSE=$(curl -s -X POST "${BASE_URL}/envelope/create" \
+  -H "Authorization: ${API_TOKEN}" \
+  -F 'payload={
+    "type": "DOCUMENT",
+    "title": "Service Agreement",
+    "recipients": [
+      {
+        "email": "client@example.com",
+        "name": "John Smith",
+        "role": "SIGNER",
+        "signingOrder": 1,
+        "fields": [
+          {
+            "identifier": 0,
+            "type": "SIGNATURE",
+            "page": 1,
+            "positionX": 10,
+            "positionY": 80,
+            "width": 30,
+            "height": 5
+          },
+          {
+            "identifier": 0,
+            "type": "DATE",
+            "page": 1,
+            "positionX": 50,
+            "positionY": 80,
+            "width": 20,
+            "height": 3
+          }
+        ]
+      },
+      {
+        "email": "manager@company.com",
+        "name": "Jane Doe",
+        "role": "SIGNER",
+        "signingOrder": 2,
+        "fields": [
+          {
+            "identifier": 0,
+            "type": "SIGNATURE",
+            "page": 1,
+            "positionX": 10,
+            "positionY": 70,
+            "width": 30,
+            "height": 5
+          }
+        ]
+      }
+    ],
+    "meta": {
+      "subject": "Please sign: Service Agreement",
+      "message": "Please review and sign the attached document."
+    }
+  }' \
+  -F "files=@${PDF_FILE};type=application/pdf")
+
+ENVELOPE_ID=$(echo $ENVELOPE_RESPONSE | jq -r '.id')
+echo "Created envelope: ${ENVELOPE_ID}"
+
+# Step 2: Distribute (send) the document
+echo "Sending document..."
+DISTRIBUTE_RESPONSE=$(curl -s -X POST "${BASE_URL}/envelope/distribute" \
+  -H "Authorization: ${API_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d "{\"envelopeId\": \"${ENVELOPE_ID}\"}")
+
+echo "Document sent!"
+echo $DISTRIBUTE_RESPONSE | jq '.recipients[] | {email, signingUrl}'
+````
+
+</Tab>
+</Tabs>
+
+---
+
+## Workflow 2: Create Document from Template with Custom Data
+
+Use templates for repeatable document workflows. This example creates an employment contract with prefilled data.
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Fetch the template to get recipient and field IDs
+  </Step>
+  <Step>
+    Map template fields by label and build a <code>prefillFields</code> array
+  </Step>
+  <Step>
+    Call <code>POST /template/use</code> with recipients, prefill data, and{' '}
+    <code>distributeDocument: true</code>
+  </Step>
+</Steps>
+
+<Tabs items={['TypeScript', 'curl']}>
+<Tab value="TypeScript">
+```typescript
+const API_TOKEN = process.env.DOCUMENSO_API_TOKEN;
+const BASE_URL = 'https://app.documenso.com/api/v2';
+
+type EmployeeData = {
+  email: string;
+  name: string;
+  position: string;
+  salary: number;
+  startDate: string; // ISO 8601 format: YYYY-MM-DD
+  department: string;
+};
+
+type TemplateField = {
+  id: number;
+  type: string;
+  fieldMeta?: { label?: string };
+};
+
+type TemplateRecipient = {
+  id: number;
+  role: string;
+  signingOrder: number;
+};
+
+async function sendEmploymentContract(
+  templateId: number,
+  employee: EmployeeData,
+): Promise<{ documentId: string; signingUrl: string }> {
+  const templateResponse = await fetch(`${BASE_URL}/template/${templateId}`, {
+    headers: { Authorization: API_TOKEN },
+  });
+
+  if (!templateResponse.ok) {
+    throw new Error('Template not found');
+  }
+
+  const template = await templateResponse.json();
+
+  const employeeRecipient = template.recipients.find(
+    (r: TemplateRecipient) => r.role === 'SIGNER' && r.signingOrder === 1,
+  );
+
+  if (!employeeRecipient) {
+    throw new Error('Template missing employee recipient');
+  }
+
+  const fieldsByLabel = new Map<string, TemplateField>();
+  template.fields.forEach((field: TemplateField) => {
+    if (field.fieldMeta?.label) {
+      fieldsByLabel.set(field.fieldMeta.label.toLowerCase(), field);
+    }
+  });
+
+  const prefillFields = [];
+
+  const positionField = fieldsByLabel.get('position') || fieldsByLabel.get('job title');
+  if (positionField) {
+    prefillFields.push({ id: positionField.id, type: 'text', value: employee.position });
+  }
+
+  const salaryField = fieldsByLabel.get('salary') || fieldsByLabel.get('compensation');
+  if (salaryField) {
+    prefillFields.push({
+      id: salaryField.id,
+      type: 'number',
+      value: employee.salary.toString(),
+    });
+  }
+
+  const startDateField = fieldsByLabel.get('start date');
+  if (startDateField) {
+    prefillFields.push({
+      id: startDateField.id,
+      type: 'date',
+      value: employee.startDate,
+    });
+  }
+
+  const departmentField = fieldsByLabel.get('department');
+  if (departmentField) {
+    prefillFields.push({
+      id: departmentField.id,
+      type: 'dropdown',
+      value: employee.department,
+    });
+  }
+
+  const createResponse = await fetch(`${BASE_URL}/template/use`, {
+    method: 'POST',
+    headers: {
+      Authorization: API_TOKEN,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      templateId,
+      recipients: [
+        { id: employeeRecipient.id, email: employee.email, name: employee.name },
+      ],
+      prefillFields,
+      override: {
+        title: `Employment Contract - ${employee.name}`,
+        subject: `Your Employment Contract at ${employee.department}`,
+        message: `Hi ${employee.name},\n\nPlease review and sign your employment contract for the ${employee.position} position.\n\nStart date: ${employee.startDate}`,
+      },
+      distributeDocument: true,
+      externalId: `emp-${Date.now()}-${employee.email.split('@')[0]}`,
+    }),
+  });
+
+  if (!createResponse.ok) {
+    const error = await createResponse.json();
+    throw new Error(`Failed to create document: ${error.message}`);
+  }
+
+  const document = await createResponse.json();
+
+  return {
+    documentId: document.id,
+    signingUrl: document.recipients[0].signingUrl,
+  };
+}
+
+const result = await sendEmploymentContract(123, {
+  email: 'alice.johnson@example.com',
+  name: 'Alice Johnson',
+  position: 'Senior Engineer',
+  salary: 120000,
+  startDate: '2025-03-01',
+  department: 'Engineering',
+});
+
+console.log('Contract sent:', result.documentId);
+console.log('Signing URL:', result.signingUrl);
+````
+</Tab>
+<Tab value="curl">
+```bash
+#!/bin/bash
+set -e
+
+API_TOKEN="YOUR_API_TOKEN"
+BASE_URL="https://app.documenso.com/api/v2"
+TEMPLATE_ID=123
+
+# Variables
+EMPLOYEE_EMAIL="alice.johnson@example.com"
+EMPLOYEE_NAME="Alice Johnson"
+POSITION="Senior Engineer"
+SALARY="120000"
+START_DATE="2025-03-01"
+DEPARTMENT="Engineering"
+
+# Fetch template to get recipient ID
+TEMPLATE=$(curl -s -X GET "${BASE_URL}/template/${TEMPLATE_ID}" \
+  -H "Authorization: ${API_TOKEN}")
+
+# Extract first signer recipient ID
+RECIPIENT_ID=$(echo $TEMPLATE | jq '.recipients[] | select(.role == "SIGNER" and .signingOrder == 1) | .id')
+
+# Create document from template with prefilled data
+RESPONSE=$(curl -s -X POST "${BASE_URL}/template/use" \
+  -H "Authorization: ${API_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"templateId\": ${TEMPLATE_ID},
+    \"recipients\": [
+      {
+        \"id\": ${RECIPIENT_ID},
+        \"email\": \"${EMPLOYEE_EMAIL}\",
+        \"name\": \"${EMPLOYEE_NAME}\"
+      }
+    ],
+    \"prefillFields\": [
+      {\"id\": 101, \"type\": \"text\", \"value\": \"${POSITION}\"},
+      {\"id\": 102, \"type\": \"number\", \"value\": \"${SALARY}\"},
+      {\"id\": 103, \"type\": \"date\", \"value\": \"${START_DATE}\"},
+      {\"id\": 104, \"type\": \"dropdown\", \"value\": \"${DEPARTMENT}\"}
+    ],
+    \"override\": {
+      \"title\": \"Employment Contract - ${EMPLOYEE_NAME}\",
+      \"subject\": \"Your Employment Contract\",
+      \"message\": \"Please review and sign your employment contract.\"
+    },
+    \"distributeDocument\": true,
+    \"externalId\": \"emp-$(date +%s)-alice\"
+  }")
+
+echo "Document created:"
+echo $RESPONSE | jq '{id, signingUrl: .recipients[0].signingUrl}'
+````
+
+</Tab>
+</Tabs>
+
+---
+
+## Workflow 3: Bulk Send Documents
+
+Send the same document to multiple recipients in parallel. Useful for policy acknowledgments, NDAs, or announcements.
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Fetch the template and get the signer recipient slot ID
+  </Step>
+  <Step>
+    For each recipient, call <code>POST /template/use</code> with{' '}
+    <code>distributeDocument: true</code>
+  </Step>
+  <Step>
+    Process in batches with a short delay to respect rate limits (e.g. 100 requests/minute)
+  </Step>
+</Steps>
+
+<Tabs items={['TypeScript', 'curl']}>
+<Tab value="TypeScript">
+```typescript
+const API_TOKEN = process.env.DOCUMENSO_API_TOKEN;
+const BASE_URL = 'https://app.documenso.com/api/v2';
+
+type BulkRecipient = {
+  email: string;
+  name: string;
+};
+
+type BulkSendResult = {
+  successful: Array<{ email: string; envelopeId: string; signingUrl: string }>;
+  failed: Array<{ email: string; error: string }>;
+};
+
+async function bulkSendFromTemplate(
+  templateId: number,
+  recipients: BulkRecipient[],
+  concurrency = 5,
+): Promise<BulkSendResult> {
+  const templateResponse = await fetch(`${BASE_URL}/template/${templateId}`, {
+    headers: { Authorization: API_TOKEN },
+  });
+
+  if (!templateResponse.ok) {
+    throw new Error('Template not found');
+  }
+
+  const template = await templateResponse.json();
+  const signerSlot = template.recipients.find(
+    (r: { role: string }) => r.role === 'SIGNER',
+  );
+
+  if (!signerSlot) {
+    throw new Error('Template has no signer recipient');
+  }
+
+  const results: BulkSendResult = { successful: [], failed: [] };
+
+  for (let i = 0; i < recipients.length; i += concurrency) {
+    const batch = recipients.slice(i, i + concurrency);
+
+    const batchResults = await Promise.allSettled(
+      batch.map(async (recipient) => {
+        const response = await fetch(`${BASE_URL}/template/use`, {
+          method: 'POST',
+          headers: {
+            Authorization: API_TOKEN,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            templateId,
+            recipients: [
+              { id: signerSlot.id, email: recipient.email, name: recipient.name },
+            ],
+            distributeDocument: true,
+            externalId: `bulk-${Date.now()}-${recipient.email}`,
+          }),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Unknown error');
+        }
+
+        const document = await response.json();
+        return {
+          email: recipient.email,
+          envelopeId: document.id,
+          signingUrl: document.recipients[0].signingUrl,
+        };
+      }),
+    );
+
+    batchResults.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        results.successful.push(result.value);
+      } else {
+        results.failed.push({
+          email: batch[index].email,
+          error: result.reason.message,
+        });
+      }
+    });
+
+    if (i + concurrency < recipients.length) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
+
+  return results;
+}
+
+const recipients = [
+  { email: 'employee1@company.com', name: 'Employee One' },
+  { email: 'employee2@company.com', name: 'Employee Two' },
+  { email: 'employee3@company.com', name: 'Employee Three' },
+];
+
+const results = await bulkSendFromTemplate(456, recipients);
+
+console.log(`Sent: ${results.successful.length}`);
+console.log(`Failed: ${results.failed.length}`);
+results.failed.forEach((f) => console.error(`${f.email}: ${f.error}`));
+````
+</Tab>
+<Tab value="curl">
+```bash
+#!/bin/bash
+
+API_TOKEN="YOUR_API_TOKEN"
+BASE_URL="https://app.documenso.com/api/v2"
+TEMPLATE_ID=456
+
+# Get signer slot ID from template
+SIGNER_ID=$(curl -s -X GET "${BASE_URL}/template/${TEMPLATE_ID}" \
+  -H "Authorization: ${API_TOKEN}" | jq '.recipients[] | select(.role == "SIGNER") | .id')
+
+# Recipients to process
+RECIPIENTS=(
+  "employee1@company.com:Employee One"
+  "employee2@company.com:Employee Two"
+  "employee3@company.com:Employee Three"
+)
+
+# Send to each recipient
+for RECIPIENT in "${RECIPIENTS[@]}"; do
+  EMAIL=$(echo $RECIPIENT | cut -d: -f1)
+  NAME=$(echo $RECIPIENT | cut -d: -f2)
+
+  echo "Sending to ${EMAIL}..."
+
+  RESPONSE=$(curl -s -X POST "${BASE_URL}/template/use" \
+    -H "Authorization: ${API_TOKEN}" \
+    -H "Content-Type: application/json" \
+    -d "{
+      \"templateId\": ${TEMPLATE_ID},
+      \"recipients\": [{
+        \"id\": ${SIGNER_ID},
+        \"email\": \"${EMAIL}\",
+        \"name\": \"${NAME}\"
+      }],
+      \"distributeDocument\": true,
+      \"externalId\": \"bulk-$(date +%s)-${EMAIL}\"
+    }")
+
+  if echo $RESPONSE | jq -e '.id' > /dev/null 2>&1; then
+    echo "  Success: $(echo $RESPONSE | jq -r '.id')"
+  else
+    echo "  Failed: $(echo $RESPONSE | jq -r '.message')"
+  fi
+
+  # Rate limiting delay
+  sleep 0.5
+done
+````
+
+</Tab>
+</Tabs>
+
+<Callout type="info">
+  The API allows 100 requests per minute. For large batches, implement rate limiting with delays
+  between requests to avoid hitting limits.
+</Callout>
+
+---
+
+## Workflow 4: Wait for Completion with Webhooks
+
+Set up webhooks to receive real-time notifications when documents are signed or completed.
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    **Create a webhook endpoint**: Implement an HTTP handler that verifies the signature and
+    processes events
+  </Step>
+  <Step>
+    **Register the webhook**: Add your endpoint URL and secret in Team Settings → Webhooks
+  </Step>
+  <Step>
+    **Optional: poll as fallback**: For critical workflows, poll envelope status if webhooks are
+    unreliable
+  </Step>
+</Steps>
+
+### Create a Webhook Endpoint
+
+```typescript
+// Express.js webhook handler
+import express from 'express';
+
+const app = express();
+app.use(express.json());
+
+const WEBHOOK_SECRET = process.env.DOCUMENSO_WEBHOOK_SECRET;
+
+type WebhookPayload = {
+  event: string;
+  payload: {
+    id: number;
+    externalId: string | null;
+    status: string;
+    title: string;
+    completedAt: string | null;
+    Recipient: Array<{
+      id: number;
+      email: string;
+      name: string;
+      signingStatus: string;
+      signedAt: string | null;
+      rejectionReason: string | null;
+    }>;
+  };
+  createdAt: string;
+};
+
+app.post('/webhooks/documenso', (req, res) => {
+  // Verify webhook signature
+  const secret = req.headers['x-documenso-secret'] as string;
+
+  if (secret !== WEBHOOK_SECRET) {
+    console.error('Invalid webhook secret');
+    return res.status(401).send('Unauthorized');
+  }
+
+  const { event, payload } = req.body as WebhookPayload;
+
+  switch (event) {
+    case 'DOCUMENT_SENT':
+      console.log(`Document ${payload.id} sent to recipients`);
+      // Update your database, notify users, etc.
+      break;
+
+    case 'DOCUMENT_OPENED':
+      const opener = payload.Recipient.find((r) => r.signingStatus === 'NOT_SIGNED');
+      console.log(`${opener?.name} opened document ${payload.id}`);
+      break;
+
+    case 'DOCUMENT_SIGNED':
+      const signer = payload.Recipient.find((r) => r.signingStatus === 'SIGNED' && r.signedAt);
+      console.log(`${signer?.name} signed document ${payload.id}`);
+      // Trigger next steps in your workflow
+      break;
+
+    case 'DOCUMENT_COMPLETED':
+      console.log(`Document ${payload.id} completed at ${payload.completedAt}`);
+      // All signatures collected - trigger fulfillment
+      handleDocumentCompleted(payload);
+      break;
+
+    case 'DOCUMENT_REJECTED':
+      const rejecter = payload.Recipient.find((r) => r.signingStatus === 'REJECTED');
+      console.log(`${rejecter?.name} rejected: ${rejecter?.rejectionReason}`);
+      // Handle rejection - notify admin, restart process, etc.
+      break;
+  }
+
+  // Always respond 200 quickly
+  res.status(200).send('OK');
+});
+
+async function handleDocumentCompleted(payload: WebhookPayload['payload']) {
+  // Example: Update order status, send confirmation, download PDF
+  console.log(`Processing completed document: ${payload.externalId || payload.id}`);
+  // Your business logic here
+}
+
+app.listen(3000, () => console.log('Webhook server running on port 3000'));
+```
+
+### Register the Webhook
+
+Register your endpoint in the Documenso dashboard:
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Go to **Team Settings** → **Webhooks**
+  </Step>
+  <Step>
+    Click **Create Webhook**
+  </Step>
+  <Step>
+    Enter your webhook URL (e.g. <code>https://your-app.com/webhooks/documenso</code>)
+  </Step>
+  <Step>
+    Select which events to subscribe to: <code>DOCUMENT_SENT</code>, <code>DOCUMENT_OPENED</code>,{' '}
+    <code>DOCUMENT_SIGNED</code>, <code>DOCUMENT_COMPLETED</code>, <code>DOCUMENT_REJECTED</code>
+  </Step>
+  <Step>
+    Enter your webhook secret (the same value stored in <code>DOCUMENSO_WEBHOOK_SECRET</code>)
+  </Step>
+  <Step>
+    Click **Create Webhook**
+  </Step>
+</Steps>
+
+See [Webhook Setup](/docs/developers/webhooks/setup) for detailed instructions.
+
+### Poll as Fallback
+
+For critical workflows, implement polling as a fallback in case webhooks fail:
+
+```typescript
+async function pollForCompletion(
+  envelopeId: string,
+  timeoutMs = 86400000, // 24 hours
+  intervalMs = 60000, // 1 minute
+): Promise<boolean> {
+  const startTime = Date.now();
+
+  while (Date.now() - startTime < timeoutMs) {
+    const response = await fetch(`${BASE_URL}/envelope/${envelopeId}`, {
+      headers: { Authorization: API_TOKEN },
+    });
+
+    const envelope = await response.json();
+
+    if (envelope.status === 'COMPLETED') {
+      return true;
+    }
+
+    if (envelope.status === 'REJECTED') {
+      throw new Error('Document was rejected');
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+  }
+
+  return false;
+}
+```
+
+---
+
+## Workflow 5: Download Signed Documents
+
+After a document is completed, download the signed PDF with all signatures embedded.
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Get the envelope with <code>GET /envelope/:envelopeId</code> and confirm status is{' '}
+    <code>COMPLETED</code>
+  </Step>
+  <Step>
+    Use <code>envelopeItems[0].id</code> and call{' '}
+    <code>GET /envelope/item/:itemId/download?version=signed</code>
+  </Step>
+</Steps>
+
+<Tabs items={['TypeScript', 'curl']}>
+<Tab value="TypeScript">
+```typescript
+const API_TOKEN = process.env.DOCUMENSO_API_TOKEN;
+const BASE_URL = 'https://app.documenso.com/api/v2';
+
+type DownloadVersion = 'signed' | 'original';
+
+async function downloadDocument(
+  envelopeId: string,
+  version: DownloadVersion = 'signed',
+): Promise<{ buffer: Buffer; filename: string }> {
+  const envelopeResponse = await fetch(`${BASE_URL}/envelope/${envelopeId}`, {
+    headers: { Authorization: API_TOKEN },
+  });
+
+  if (!envelopeResponse.ok) {
+    throw new Error('Envelope not found');
+  }
+
+  const envelope = await envelopeResponse.json();
+
+  if (version === 'signed' && envelope.status !== 'COMPLETED') {
+    throw new Error('Document must be completed to download signed version');
+  }
+
+  const envelopeItem = envelope.envelopeItems[0];
+  if (!envelopeItem) {
+    throw new Error('No document found in envelope');
+  }
+
+  const downloadResponse = await fetch(
+    `${BASE_URL}/envelope/item/${envelopeItem.id}/download?version=${version}`,
+    { headers: { Authorization: API_TOKEN } },
+  );
+
+  if (!downloadResponse.ok) {
+    const error = await downloadResponse.json();
+    throw new Error(`Download failed: ${error.message}`);
+  }
+
+  const buffer = Buffer.from(await downloadResponse.arrayBuffer());
+  const filename = `${envelope.title.replace(/[^a-z0-9]/gi, '_')}_${version}.pdf`;
+
+  return { buffer, filename };
+}
+
+async function downloadAllCompletedDocuments(outputDir: string): Promise<void> {
+  const fs = require('fs');
+  const path = require('path');
+
+  let page = 1;
+  let hasMore = true;
+
+  while (hasMore) {
+    const response = await fetch(
+      `${BASE_URL}/envelope?status=COMPLETED&type=DOCUMENT&page=${page}&perPage=50`,
+      { headers: { Authorization: API_TOKEN } },
+    );
+
+    const { data, pagination } = await response.json();
+
+    for (const envelope of data) {
+      try {
+        const { buffer, filename } = await downloadDocument(envelope.id, 'signed');
+        const filepath = path.join(outputDir, filename);
+        fs.writeFileSync(filepath, buffer);
+        console.log(`Downloaded: ${filename}`);
+      } catch (error) {
+        console.error(`Failed to download ${envelope.id}:`, error);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+
+    hasMore = page < pagination.totalPages;
+    page++;
+  }
+}
+
+const { buffer, filename } = await downloadDocument('envelope_abc123', 'signed');
+require('fs').writeFileSync(`./downloads/${filename}`, buffer);
+
+await downloadAllCompletedDocuments('./downloads');
+````
+</Tab>
+<Tab value="curl">
+```bash
+#!/bin/bash
+
+API_TOKEN="YOUR_API_TOKEN"
+BASE_URL="https://app.documenso.com/api/v2"
+ENVELOPE_ID="envelope_abc123"
+OUTPUT_DIR="./downloads"
+
+mkdir -p $OUTPUT_DIR
+
+# Get envelope details
+ENVELOPE=$(curl -s -X GET "${BASE_URL}/envelope/${ENVELOPE_ID}" \
+  -H "Authorization: ${API_TOKEN}")
+
+STATUS=$(echo $ENVELOPE | jq -r '.status')
+TITLE=$(echo $ENVELOPE | jq -r '.title')
+ITEM_ID=$(echo $ENVELOPE | jq -r '.envelopeItems[0].id')
+
+# Check if completed
+if [ "$STATUS" != "COMPLETED" ]; then
+  echo "Error: Document status is ${STATUS}, must be COMPLETED to download signed version"
+  exit 1
+fi
+
+# Download signed document
+FILENAME="${TITLE// /_}_signed.pdf"
+curl -s -X GET "${BASE_URL}/envelope/item/${ITEM_ID}/download?version=signed" \
+  -H "Authorization: ${API_TOKEN}" \
+  -o "${OUTPUT_DIR}/${FILENAME}"
+
+echo "Downloaded: ${OUTPUT_DIR}/${FILENAME}"
+
+# Download original (optional)
+ORIG_FILENAME="${TITLE// /_}_original.pdf"
+curl -s -X GET "${BASE_URL}/envelope/item/${ITEM_ID}/download?version=original" \
+  -H "Authorization: ${API_TOKEN}" \
+  -o "${OUTPUT_DIR}/${ORIG_FILENAME}"
+
+echo "Downloaded: ${OUTPUT_DIR}/${ORIG_FILENAME}"
+````
+
+</Tab>
+</Tabs>
+
+<Callout type="warn">
+  The signed PDF is only available after all recipients have completed signing (document status is
+  `COMPLETED`). Attempting to download before completion returns the original document without
+  signatures.
+</Callout>
+
+---
+
+## Error Handling Patterns
+
+Implement robust error handling for production integrations.
+
+<Accordions type="multiple">
+  <Accordion title="Retry with Exponential Backoff">
+    Retry on 429 (rate limit) and 5xx errors with exponential backoff; respect <code>Retry-After</code> when present.
+
+```typescript
+type RetryOptions = {
+  maxRetries?: number;
+  baseDelayMs?: number;
+  maxDelayMs?: number;
+};
+
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  retryOptions: RetryOptions = {},
+): Promise<Response> {
+  const { maxRetries = 3, baseDelayMs = 1000, maxDelayMs = 30000 } = retryOptions;
+
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await fetch(url, options);
+
+      // Retry on rate limit
+      if (response.status === 429) {
+        const retryAfter = response.headers.get('Retry-After');
+        const delay = retryAfter ? parseInt(retryAfter) * 1000 : baseDelayMs * Math.pow(2, attempt);
+        console.log(`Rate limited, waiting ${delay}ms...`);
+        await new Promise((resolve) => setTimeout(resolve, Math.min(delay, maxDelayMs)));
+        continue;
+      }
+
+      // Retry on server errors
+      if (response.status >= 500) {
+        const delay = baseDelayMs * Math.pow(2, attempt);
+        console.log(`Server error ${response.status}, retrying in ${delay}ms...`);
+        await new Promise((resolve) => setTimeout(resolve, Math.min(delay, maxDelayMs)));
+        continue;
+      }
+
+      return response;
+    } catch (error) {
+      lastError = error as Error;
+      const delay = baseDelayMs * Math.pow(2, attempt);
+      console.log(`Network error, retrying in ${delay}ms...`, error);
+      await new Promise((resolve) => setTimeout(resolve, Math.min(delay, maxDelayMs)));
+    }
+  }
+
+  throw lastError || new Error('Max retries exceeded');
+}
+```
+
+  </Accordion>
+  <Accordion title="Error Response Handling">
+    Parse API errors into a typed class and handle by status code (400, 401, 404, 429, etc.).
+
+```typescript
+type ApiError = {
+  message: string;
+  code?: string;
+  statusCode: number;
+  details?: Record<string, unknown>;
+};
+
+class DocumensoApiError extends Error {
+  code?: string;
+  statusCode: number;
+  details?: Record<string, unknown>;
+
+  constructor(error: ApiError) {
+    super(error.message);
+    this.name = 'DocumensoApiError';
+    this.code = error.code;
+    this.statusCode = error.statusCode;
+    this.details = error.details;
+  }
+}
+
+async function handleApiResponse<T>(response: Response): Promise<T> {
+  if (!response.ok) {
+    const error = await response.json();
+    throw new DocumensoApiError({
+      message: error.message || 'Unknown error',
+      code: error.code,
+      statusCode: response.status,
+      details: error.details,
+    });
+  }
+
+  return response.json();
+}
+
+// Usage with specific error handling
+try {
+  const response = await fetch(`${BASE_URL}/envelope/create`, {
+    method: 'POST',
+    headers: { Authorization: API_TOKEN },
+    body: formData,
+  });
+
+  const envelope = await handleApiResponse<{ id: string }>(response);
+  console.log('Created:', envelope.id);
+} catch (error) {
+  if (error instanceof DocumensoApiError) {
+    switch (error.statusCode) {
+      case 400:
+        console.error('Invalid request:', error.message);
+        // Fix request and retry
+        break;
+      case 401:
+        console.error('Authentication failed - check API token');
+        break;
+      case 404:
+        console.error('Resource not found:', error.message);
+        break;
+      case 429:
+        console.error('Rate limited - slow down requests');
+        break;
+      default:
+        console.error('API error:', error.message);
+    }
+  } else {
+    console.error('Network or unknown error:', error);
+  }
+}
+```
+
+  </Accordion>
+  <Accordion title="Validation Before API Calls">
+    Validate recipients (email, name, role) and PDF (magic bytes, size) before calling the API.
+
+```typescript
+function validateRecipients(recipients: Array<{ email: string; name: string; role: string }>) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const validRoles = ['SIGNER', 'APPROVER', 'CC', 'VIEWER'];
+
+  const errors: string[] = [];
+
+  recipients.forEach((recipient, index) => {
+    if (!recipient.email || !emailRegex.test(recipient.email)) {
+      errors.push(`Recipient ${index + 1}: Invalid email address`);
+    }
+    if (!recipient.name || recipient.name.trim().length === 0) {
+      errors.push(`Recipient ${index + 1}: Name is required`);
+    }
+    if (!validRoles.includes(recipient.role)) {
+      errors.push(`Recipient ${index + 1}: Invalid role "${recipient.role}"`);
+    }
+  });
+
+  if (errors.length > 0) {
+    throw new Error(`Validation failed:\n${errors.join('\n')}`);
+  }
+}
+
+function validatePdfFile(buffer: Buffer, maxSizeMb = 10) {
+  // Check PDF magic bytes
+  const pdfHeader = buffer.slice(0, 5).toString();
+  if (pdfHeader !== '%PDF-') {
+    throw new Error('File is not a valid PDF');
+  }
+
+  // Check file size
+  const sizeMb = buffer.length / (1024 * 1024);
+  if (sizeMb > maxSizeMb) {
+    throw new Error(`File size ${sizeMb.toFixed(2)}MB exceeds limit of ${maxSizeMb}MB`);
+  }
+}
+```
+
+  </Accordion>
+</Accordions>
+
+---
+
+## See Also
+
+- [API Reference](https://openapi.documenso.com/) - Full endpoint documentation
+- [Documents API](/docs/developers/api/documents) - Document operations
+- [Templates API](/docs/developers/api/templates) - Template management
+- [Webhooks](/docs/developers/webhooks/setup) - Webhook configuration
+- [Webhook Events](/docs/developers/webhooks/events) - Event payload reference

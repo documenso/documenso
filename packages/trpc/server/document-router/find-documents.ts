@@ -38,6 +38,7 @@ export const findDocumentsRoute = authenticatedProcedure
       perPage,
       folderId,
       orderBy: orderByColumn ? { column: orderByColumn, direction: orderByDirection } : undefined,
+      useWindowedCount: false,
     });
 
     return {

@@ -1,7 +1,7 @@
 import { PDF, rgb } from '@libpdf/core';
 import type { FieldType, Recipient } from '@prisma/client';
 
-import { type TFieldAndMeta, ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
+import { type TFieldAndMeta, ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 
 import { parseFieldMetaFromPlaceholder, parseFieldTypeFromPlaceholder } from './helpers';
 
@@ -117,7 +117,7 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
 
       const parsedFieldMeta = parseFieldMetaFromPlaceholder(rawFieldMeta, fieldType);
 
-      const fieldAndMeta: TFieldAndMeta = ZFieldAndMetaSchema.parse({
+      const fieldAndMeta: TFieldAndMeta = ZEnvelopeFieldAndMetaSchema.parse({
         type: fieldType,
         fieldMeta: parsedFieldMeta,
       });

@@ -22,6 +22,7 @@ import {
 } from '@documenso/lib/types/field-meta';
 import type { CompletedField } from '@documenso/lib/types/fields';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
+import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
@@ -30,7 +31,6 @@ import { DocumentReadOnlyFields } from '@documenso/ui/components/document/docume
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 
 import { DocumentSigningAttachmentsPopover } from '~/components/general/document-signing/document-signing-attachments-popover';
 import { DocumentSigningAutoSign } from '~/components/general/document-signing/document-signing-auto-sign';
@@ -46,6 +46,7 @@ import { DocumentSigningRadioField } from '~/components/general/document-signing
 import { DocumentSigningRejectDialog } from '~/components/general/document-signing/document-signing-reject-dialog';
 import { DocumentSigningSignatureField } from '~/components/general/document-signing/document-signing-signature-field';
 import { DocumentSigningTextField } from '~/components/general/document-signing/document-signing-text-field';
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningCompleteDialog } from './document-signing-complete-dialog';
@@ -162,8 +163,6 @@ export const DocumentSigningPageViewV1 = ({
       : undefined;
   }, [document.documentMeta?.signingOrder, allRecipients, recipient.id]);
 
-  const highestPageNumber = Math.max(...fields.map((field) => field.page));
-
   const pendingFields = fieldsRequiringValidation.filter((field) => !field.inserted);
   const hasPendingFields = pendingFields.length > 0;
 
@@ -275,10 +274,16 @@ export const DocumentSigningPageViewV1 = ({
             <Card className="rounded-xl before:rounded-xl" gradient>
               <CardContent className="p-2">
                 <PDFViewerLazy
-                  key={document.envelopeItems[0].id}
-                  envelopeItem={document.envelopeItems[0]}
-                  token={recipient.token}
-                  version="signed"
+                  key={document.envelopeItems[0]?.id}
+                  data={getDocumentDataUrlForPdfViewer({
+                    envelopeId: document.envelopeId,
+                    envelopeItemId: document.envelopeItems[0]?.id,
+                    documentDataId: document.envelopeItems[0]?.documentData.id,
+                    version: 'current',
+                    token: recipient.token,
+                    presignToken: undefined,
+                  })}
+                  scrollParentRef="window"
                 />
               </CardContent>
             </Card>
@@ -400,9 +405,7 @@ export const DocumentSigningPageViewV1 = ({
           <DocumentSigningAutoSign recipient={recipient} fields={fields} />
         )}
 
-        <ElementVisible
-          target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}
-        >
+        <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
           {fields
             .filter(
               (field) =>

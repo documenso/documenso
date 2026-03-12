@@ -23,8 +23,6 @@ import { Input } from '@documenso/ui/primitives/input';
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 
 export type DocumentSigningAuthPasswordProps = {
-  actionTarget?: 'FIELD' | 'DOCUMENT';
-  actionVerb?: string;
   open: boolean;
   onOpenChange: (value: boolean) => void;
   onReauthFormSubmit: (values?: TRecipientActionAuth) => Promise<void> | void;
@@ -40,8 +38,6 @@ const ZPasswordAuthFormSchema = z.object({
 type TPasswordAuthFormSchema = z.infer<typeof ZPasswordAuthFormSchema>;
 
 export const DocumentSigningAuthPassword = ({
-  actionTarget = 'FIELD',
-  actionVerb = 'sign',
   onReauthFormSubmit,
   open,
   onOpenChange,

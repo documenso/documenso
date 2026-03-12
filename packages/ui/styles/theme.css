@@ -137,6 +137,8 @@
     /* Surface */
     --new-surface-black: 0, 0%, 0%;
     --new-surface-white: 0, 0%, 91%;
+
+    --envelope-editor-background: 210 40% 98.04%;
   }
 
   .dark:not(.dark-mode-disabled) {
@@ -181,6 +183,8 @@
     --warning: 54 96% 45%;
 
     --gold: 47.9 95.8% 53.1%;
+
+    --envelope-editor-background: 0 0% 14.9%;
   }
 }
 
@@ -228,6 +232,15 @@
   background: transparent;
   border-radius: 10px;
   scrollbar-gutter: stable;
+}
+
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
 }
 
 /* .custom-scrollbar::-webkit-scrollbar-track {

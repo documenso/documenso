@@ -205,9 +205,13 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Reply to email' }).fill('organisation@documenso.com');
 
   // Update email document settings by enabling/disabling some checkboxes
-  await page.getByRole('checkbox', { name: 'Send recipient signed email' }).uncheck();
-  await page.getByRole('checkbox', { name: 'Send document pending email' }).uncheck();
-  await page.getByRole('checkbox', { name: 'Send document deleted email' }).uncheck();
+  await page.getByRole('checkbox', { name: 'Email the owner when a recipient signs' }).uncheck();
+  await page
+    .getByRole('checkbox', { name: 'Email the signer if the document is still pending' })
+    .uncheck();
+  await page
+    .getByRole('checkbox', { name: 'Email recipients when a pending document is deleted' })
+    .uncheck();
 
   await page.getByRole('button', { name: 'Update' }).first().click();
   await expect(page.getByText('Your email preferences have been updated').first()).toBeVisible();
@@ -225,6 +229,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentPending: false, // unchecked
     documentCompleted: true,
     documentDeleted: false, // unchecked
+    ownerRecipientExpired: true,
     ownerDocumentCompleted: true,
   });
 
@@ -240,12 +245,12 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   await page.getByRole('option', { name: 'Override organisation settings' }).click();
 
   // Update some email settings
-  await page.getByRole('checkbox', { name: 'Send recipient signing request email' }).uncheck();
+  await page.getByRole('checkbox', { name: 'Email recipients with a signing request' }).uncheck();
   await page
-    .getByRole('checkbox', { name: 'Send document completed email', exact: true })
+    .getByRole('checkbox', { name: 'Email recipients when the document is completed', exact: true })
     .uncheck();
   await page
-    .getByRole('checkbox', { name: 'Send document completed email to the owner' })
+    .getByRole('checkbox', { name: 'Email the owner when the document is completed' })
     .uncheck();
 
   await page.getByRole('button', { name: 'Update' }).first().click();
@@ -264,6 +269,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentPending: true,
     documentCompleted: false,
     documentDeleted: true,
+    ownerRecipientExpired: true,
     ownerDocumentCompleted: false,
   });
 
@@ -284,6 +290,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentPending: true,
     documentCompleted: false,
     documentDeleted: true,
+    ownerRecipientExpired: true,
     ownerDocumentCompleted: false,
   });
 
@@ -309,6 +316,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentPending: false,
     documentCompleted: true,
     documentDeleted: false,
+    ownerRecipientExpired: true,
     ownerDocumentCompleted: true,
   });
 
@@ -329,6 +337,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentPending: false,
     documentCompleted: true,
     documentDeleted: false,
+    ownerRecipientExpired: true,
     ownerDocumentCompleted: true,
   });
 });
