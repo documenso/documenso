@@ -203,9 +203,13 @@ export const updateEnvelope = async ({
 
   const auditLogs: CreateDocumentAuditLogDataResponse[] = [];
 
-  if (!isTitleSame && envelope.status !== DocumentStatus.DRAFT) {
+  if (
+    !isTitleSame &&
+    envelope.status !== DocumentStatus.DRAFT &&
+    envelope.status !== DocumentStatus.PENDING
+  ) {
     throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: 'You cannot update the title if the envelope has been sent',
+      message: 'Envelope title can only be updated while in draft or pending status',
     });
   }
 

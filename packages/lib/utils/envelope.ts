@@ -244,28 +244,60 @@ export const mapSecondaryIdToTemplateId = (secondaryId: string) => {
   return parseInt(parsed.data.split('_')[1]);
 };
 
-export const canEnvelopeItemsBeModified = (
+export type EnvelopeItemPermissions = {
+  canTitleBeChanged: boolean;
+  canFileBeChanged: boolean;
+  canOrderBeChanged: boolean;
+};
+
+export const getEnvelopeItemPermissions = (
   envelope: Pick<Envelope, 'completedAt' | 'deletedAt' | 'type' | 'status'>,
   recipients: Recipient[],
-) => {
-  if (envelope.completedAt || envelope.deletedAt || envelope.status !== DocumentStatus.DRAFT) {
-    return false;
+): EnvelopeItemPermissions => {
+  const noPermissions: EnvelopeItemPermissions = {
+    canTitleBeChanged: false,
+    canFileBeChanged: false,
+    canOrderBeChanged: false,
+  };
+
+  // Always block completed and deleted envelopes.
+  if (envelope.completedAt || envelope.deletedAt) {
+    return noPermissions;
   }
 
+  // Title edits are allowed on DRAFT and PENDING envelopes.
+  const canTitleBeChanged =
+    envelope.status === DocumentStatus.DRAFT || envelope.status === DocumentStatus.PENDING;
+
+  // File and order changes require DRAFT status.
+  if (envelope.status !== DocumentStatus.DRAFT) {
+    return {
+      canTitleBeChanged,
+      canFileBeChanged: false,
+      canOrderBeChanged: false,
+    };
+  }
+
+  // Templates in DRAFT can always be modified.
   if (envelope.type === EnvelopeType.TEMPLATE) {
-    return true;
+    return {
+      canTitleBeChanged,
+      canFileBeChanged: true,
+      canOrderBeChanged: true,
+    };
   }
 
-  if (
-    recipients.some(
-      (recipient) =>
-        recipient.role !== RecipientRole.CC &&
-        (recipient.signingStatus === SigningStatus.SIGNED ||
-          recipient.sendStatus === SendStatus.SENT),
-    )
-  ) {
-    return false;
-  }
+  // Block file and order changes if any non-CC recipient has signed or been sent.
+  const hasActiveRecipients = recipients.some(
+    (recipient) =>
+      recipient.role !== RecipientRole.CC &&
+      (recipient.signingStatus === SigningStatus.SIGNED ||
+        recipient.sendStatus === SendStatus.SENT),
+  );
 
-  return true;
+  return {
+    canTitleBeChanged,
+    canFileBeChanged: !hasActiveRecipients,
+    canOrderBeChanged: !hasActiveRecipients,
+  };
 };

@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentStatus, EnvelopeType } from '@prisma/client';
 import {
@@ -12,7 +14,10 @@ import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
-import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
+import {
+  getEnvelopeItemPermissions,
+  mapSecondaryIdToTemplateId,
+} from '@documenso/lib/utils/envelope';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
@@ -49,6 +54,11 @@ export default function EnvelopeEditorHeader() {
     actions: { allowAttachments, allowDistributing },
   } = editorConfig;
 
+  const envelopeItemPermissions = useMemo(
+    () => getEnvelopeItemPermissions(envelope, envelope.recipients),
+    [envelope, envelope.recipients],
+  );
+
   const handleCreateEmbeddedEnvelope = async () => {
     const latestEnvelope = await flushAutosave();
 
@@ -80,7 +90,8 @@ export default function EnvelopeEditorHeader() {
 
           <div className="flex items-center space-x-2">
             <EnvelopeItemTitleInput
-              disabled={envelope.status !== DocumentStatus.DRAFT || !allowConfigureEnvelopeTitle}
+              dataTestId="envelope-title-input"
+              disabled={!envelopeItemPermissions.canTitleBeChanged || !allowConfigureEnvelopeTitle}
               value={envelope.title}
               onChange={(title) => {
                 updateEnvelope({
