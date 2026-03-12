@@ -440,6 +440,7 @@ export const generateSampleWebhookPayload = (
             documentCompleted: true,
             ownerDocumentCompleted: true,
             ownerRecipientExpired: true,
+            ownerDocumentCreated: true,
             recipientSigningRequest: true,
           },
         },

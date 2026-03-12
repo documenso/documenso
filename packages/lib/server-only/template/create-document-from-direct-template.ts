@@ -30,6 +30,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE, RECIPIENT_DIFF_TYPE } from '../../types/document-audit-logs';
 import type { TRecipientActionAuthTypes } from '../../types/document-auth';
 import { DocumentAccessAuth, ZRecipientAuthOptionsSchema } from '../../types/document-auth';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { ZFieldMetaSchema } from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
@@ -755,36 +756,39 @@ export const createDocumentFromDirectTemplate = async ({
       });
     }
 
-    // Send email to template owner.
-    const emailTemplate = createElement(DocumentCreatedFromDirectTemplateEmailTemplate, {
-      recipientName: directRecipientEmail,
-      recipientRole: directTemplateRecipient.role,
-      documentLink: `${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(createdEnvelope.team?.url)}/${
-        createdEnvelope.id
-      }`,
-      documentName: createdEnvelope.title,
-      assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000',
-    });
+    const emailSettings = extractDerivedDocumentEmailSettings(documentMeta);
 
-    const [html, text] = await Promise.all([
-      renderEmailWithI18N(emailTemplate, { lang: emailLanguage, branding }),
-      renderEmailWithI18N(emailTemplate, { lang: emailLanguage, branding, plainText: true }),
-    ]);
+    if (emailSettings.ownerDocumentCreated) {
+      const emailTemplate = createElement(DocumentCreatedFromDirectTemplateEmailTemplate, {
+        recipientName: directRecipientEmail,
+        recipientRole: directTemplateRecipient.role,
+        documentLink: `${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(createdEnvelope.team?.url)}/${
+          createdEnvelope.id
+        }`,
+        documentName: createdEnvelope.title,
+        assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000',
+      });
 
-    const i18n = await getI18nInstance(emailLanguage);
+      const [html, text] = await Promise.all([
+        renderEmailWithI18N(emailTemplate, { lang: emailLanguage, branding }),
+        renderEmailWithI18N(emailTemplate, { lang: emailLanguage, branding, plainText: true }),
+      ]);
 
-    await mailer.sendMail({
-      to: [
-        {
-          name: templateOwner.name || '',
-          address: templateOwner.email,
-        },
-      ],
-      from: senderEmail,
-      subject: i18n._(msg`Document created from direct template`),
-      html,
-      text,
-    });
+      const i18n = await getI18nInstance(emailLanguage);
+
+      await mailer.sendMail({
+        to: [
+          {
+            name: templateOwner.name || '',
+            address: templateOwner.email,
+          },
+        ],
+        from: senderEmail,
+        subject: i18n._(msg`Document created from direct template`),
+        html,
+        text,
+      });
+    }
 
     return {
       createdEnvelope,
