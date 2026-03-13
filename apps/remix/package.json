@@ -74,26 +74,6 @@
     "ua-parser-js": "^1.0.41",
     "uqr": "^0.1.2"
   },
-  "devDependencies": {
-    "@babel/core": "^7.28.5",
-    "@lingui/babel-plugin-lingui-macro": "^5.6.0",
-    "@lingui/vite-plugin": "^5.6.0",
-    "@react-router/dev": "^7.12.0",
-    "@react-router/remix-routes-option-adapter": "^7.12.0",
-    "@types/content-disposition": "^0.5.9",
-    "@types/formidable": "^3.4.6",
-    "@types/luxon": "^3.7.1",
-    "@types/node": "^20",
-    "@types/papaparse": "^5.5.0",
-    "@types/react": "18.3.27",
-    "@types/react-dom": "^18",
-    "@types/ua-parser-js": "^0.7.39",
-    "cross-env": "^10.1.0",
-    "esbuild": "^0.27.0",
-    "remix-flat-routes": "^0.8.5",
-    "tsx": "^4.20.6",
-    "typescript": "5.6.2",
-    "vite": "^8.0.0"
-  },
+  "devDependencies": {},
   "version": "2.8.0"
 }
