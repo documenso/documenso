@@ -54,6 +54,8 @@ export const searchTemplatesWithKeyword = async ({
     },
   ];
 
+  const orgIdToUserTeamUrl = new Map<string, string>();
+
   // Team templates the user has access to.
   if (teamIds.length > 0) {
     filters.push({
@@ -63,13 +65,18 @@ export const searchTemplatesWithKeyword = async ({
     });
 
     // ORGANISATION templates from sibling teams in the same org.
-    const orgIds = await prisma.team
-      .findMany({
-        where: { id: { in: teamIds } },
-        select: { organisationId: true },
-        distinct: ['organisationId'],
-      })
-      .then((teams) => teams.map((t) => t.organisationId));
+    const userTeams = await prisma.team.findMany({
+      where: { id: { in: teamIds } },
+      select: { id: true, url: true, organisationId: true },
+    });
+
+    const orgIds = [...new Set(userTeams.map((t) => t.organisationId))];
+
+    for (const t of userTeams) {
+      if (!orgIdToUserTeamUrl.has(t.organisationId)) {
+        orgIdToUserTeamUrl.set(t.organisationId, t.url);
+      }
+    }
 
     if (orgIds.length > 0) {
       filters.push({
@@ -101,7 +108,9 @@ export const searchTemplatesWithKeyword = async ({
       },
       team: {
         select: {
+          id: true,
           url: true,
+          organisationId: true,
         },
       },
     },
@@ -143,7 +152,16 @@ export const searchTemplatesWithKeyword = async ({
     .slice(0, limit)
     .map((envelope) => {
       const legacyTemplateId = mapSecondaryIdToTemplateId(envelope.secondaryId);
-      const path = `${formatTemplatesPath(envelope.team.url)}/${legacyTemplateId}`;
+
+      const isOrgTemplateFromSiblingTeam =
+        envelope.templateType === TemplateType.ORGANISATION &&
+        !teamGroupsByTeamId.has(envelope.team.id);
+
+      const teamUrl = isOrgTemplateFromSiblingTeam
+        ? (orgIdToUserTeamUrl.get(envelope.team.organisationId) ?? envelope.team.url)
+        : envelope.team.url;
+
+      const path = `${formatTemplatesPath(teamUrl)}/${legacyTemplateId}`;
 
       return {
         title: envelope.title,

@@ -277,7 +277,7 @@ export const EnvelopeEditorSettingsDialog = ({
     try {
       await updateEnvelopeAsync({
         data: {
-          templateType: data.templateType,
+          templateType: envelope.type === EnvelopeType.TEMPLATE ? data.templateType : undefined,
           externalId: data.externalId || null,
           visibility: data.visibility,
           globalAccessAuth: parsedGlobalAccessAuth.success ? parsedGlobalAccessAuth.data : [],

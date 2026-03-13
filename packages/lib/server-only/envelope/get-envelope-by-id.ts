@@ -32,7 +32,7 @@ export type GetEnvelopeByIdOptions = {
 };
 
 export const getEnvelopeById = async ({ id, userId, teamId, type }: GetEnvelopeByIdOptions) => {
-  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+  const { envelopeWhereInput } = await getOrgTemplateReadWhereInput({
     id,
     userId,
     teamId,
