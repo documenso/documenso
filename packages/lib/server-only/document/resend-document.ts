@@ -213,43 +213,40 @@ export const resendDocument = async ({
         }),
       ]);
 
-      await prisma.$transaction(
-        async (tx) => {
-          await mailer.sendMail({
-            to: {
-              address: email,
-              name,
-            },
-            from: senderEmail,
-            replyTo: replyToEmail,
-            subject: envelope.documentMeta.subject
-              ? renderCustomEmailTemplate(
-                  i18n._(msg`Reminder: ${envelope.documentMeta.subject}`),
-                  customEmailTemplate,
-                )
-              : emailSubject,
-            html,
-            text,
-          });
-
-          await tx.documentAuditLog.create({
-            data: createDocumentAuditLogData({
-              type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
-              envelopeId: envelope.id,
-              metadata: requestMetadata,
-              data: {
-                emailType: recipientEmailType,
-                recipientEmail: recipient.email,
-                recipientName: recipient.name,
-                recipientRole: recipient.role,
-                recipientId: recipient.id,
-                isResending: true,
-              },
-            }),
-          });
+      // Send email outside any transaction to avoid holding a connection
+      // open during network I/O.
+      await mailer.sendMail({
+        to: {
+          address: email,
+          name,
         },
-        { timeout: 30_000 },
-      );
+        from: senderEmail,
+        replyTo: replyToEmail,
+        subject: envelope.documentMeta.subject
+          ? renderCustomEmailTemplate(
+              i18n._(msg`Reminder: ${envelope.documentMeta.subject}`),
+              customEmailTemplate,
+            )
+          : emailSubject,
+        html,
+        text,
+      });
+
+      await prisma.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
+          envelopeId: envelope.id,
+          metadata: requestMetadata,
+          data: {
+            emailType: recipientEmailType,
+            recipientEmail: recipient.email,
+            recipientName: recipient.name,
+            recipientRole: recipient.role,
+            recipientId: recipient.id,
+            isResending: true,
+          },
+        }),
+      });
     }),
   );
 

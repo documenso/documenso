@@ -2595,6 +2595,10 @@ msgstr "Segredo do Cliente é obrigatório"
 msgid "Close"
 msgstr "Fechar"
 
+#: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
+msgid "Collapse sidebar"
+msgstr ""
+
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 msgid "Communication"
 msgstr "Comunicação"
@@ -2634,6 +2638,10 @@ msgstr "Preencha os campos para os seguintes signatários."
 #: packages/lib/constants/document.ts
 msgid "Completed"
 msgstr "Concluído"
+
+#: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
+msgid "Completed At"
+msgstr ""
 
 #: packages/email/templates/document-completed.tsx
 #: packages/email/templates/document-self-signed.tsx
@@ -4166,6 +4174,7 @@ msgid "Download"
 msgstr "Baixar"
 
 #: apps/remix/app/components/general/document/document-audit-log-download-button.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Download Audit Logs"
 msgstr "Baixar Logs de Auditoria"
 
@@ -4899,6 +4908,10 @@ msgstr "Todos assinaram! Você receberá uma cópia do documento assinado por e-
 msgid "Exceeded timeout"
 msgstr "Tempo limite excedido"
 
+#: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
+msgid "Expand sidebar"
+msgstr ""
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Expiration"
 msgstr ""
@@ -4974,6 +4987,10 @@ msgstr "Falha ao excluir pasta"
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "Failed to delete subscription claim."
 msgstr "Falha ao excluir reivindicação de assinatura."
+
+#: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
+msgid "Failed to download audit logs. Please try again later."
+msgstr ""
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 msgid "Failed to load document"
@@ -5473,6 +5490,10 @@ msgstr "Olá, {userName} <0>({userEmail})</0>"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Hide"
 msgstr "Ocultar"
+
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "Hide license key"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 #: apps/remix/app/components/general/folder/folder-grid.tsx
@@ -7664,6 +7685,10 @@ msgstr "Somente Leitura"
 msgid "Read our documentation to get started with Documenso."
 msgstr "Leia nossa documentação para começar com o Documenso."
 
+#: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
+msgid "Read Status"
+msgstr ""
+
 #: apps/remix/app/components/general/document-signing/document-signing-disclosure.tsx
 msgid "Read the full <0>signature disclosure</0>."
 msgstr "Leia a <0>divulgação de assinatura</0> completa."
@@ -8212,6 +8237,7 @@ msgstr "Direita"
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
+#: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 #: apps/remix/app/components/tables/admin-user-teams-table.tsx
 #: apps/remix/app/components/tables/organisation-groups-table.tsx
@@ -8610,6 +8636,10 @@ msgstr "Enviar lembrete"
 msgid "Send reminders to the following recipients"
 msgstr "Enviar lembretes para os seguintes destinatários"
 
+#: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
+msgid "Send Status"
+msgstr ""
+
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
 msgid "Sender"
@@ -8696,6 +8726,10 @@ msgstr "Mostrar"
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "Show advanced settings"
 msgstr "Mostrar configurações avançadas"
+
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "Show license key"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Show templates in your public profile for your audience to sign and get started quickly"
@@ -8937,6 +8971,10 @@ msgstr "Links de assinatura foram gerados para este documento."
 msgid "Signing order is enabled."
 msgstr "A ordem de assinatura está habilitada."
 
+#: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
+msgid "Signing Status"
+msgstr ""
+
 #: apps/remix/app/components/embed/embed-recipient-expired.tsx
 msgid "Signing Window Expired"
 msgstr ""
@@ -9025,6 +9063,7 @@ msgstr "Alguns signatários não receberam um campo de assinatura. Por favor, at
 #: apps/remix/app/components/tables/organisation-member-invites-table.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
@@ -11279,6 +11318,10 @@ msgstr "Visualizar e gerenciar todas as sessões ativas da sua conta."
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 msgid "View and manage all login methods linked to your account."
 msgstr "Visualizar e gerenciar todos os métodos de login vinculados à sua conta."
+
+#: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
+msgid "View Audit Logs"
+msgstr ""
 
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 msgid "View Codes"
