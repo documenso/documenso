@@ -32,7 +32,6 @@ export const findTemplates = async ({
     },
   });
 
-  // Build filter for own-team templates (existing behaviour).
   const ownTeamFilter: Prisma.EnvelopeWhereInput = {
     type: EnvelopeType.TEMPLATE,
     templateType: type,
@@ -52,8 +51,6 @@ export const findTemplates = async ({
     ],
   };
 
-  // Include ORGANISATION templates from sibling teams in the same org.
-  // Only on root view (no folder) and when the type filter doesn't exclude ORGANISATION.
   const shouldIncludeOrgTemplates =
     !folderId && (type === undefined || type === TemplateType.ORGANISATION);
 

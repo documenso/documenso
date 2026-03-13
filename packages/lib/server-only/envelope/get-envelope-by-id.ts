@@ -199,30 +199,20 @@ export const getEnvelopeWhereInput = async ({
   };
 };
 
-/**
- * Build a read-only where input for an ORGANISATION template that may belong to a sibling team
- * within the same organisation. Falls back to the standard `getEnvelopeWhereInput` when the
- * template belongs to the caller's own team.
- *
- * This should ONLY be used for read/use operations, never for mutations like edit/delete.
- */
 export const getOrgTemplateReadWhereInput = async ({
   id,
   userId,
   teamId,
   type,
 }: GetEnvelopeWhereInputOptions) => {
-  // First try the standard path (own-team access).
   try {
     return await getEnvelopeWhereInput({ id, userId, teamId, type });
   } catch {
     // Fall through to org-level access check.
   }
 
-  // Validate the user belongs to the calling team.
   const callerTeam = await getTeamById({ teamId, userId });
 
-  // Build a where input that only matches ORGANISATION templates within the same org.
   const envelopeWhereInput: Prisma.EnvelopeWhereUniqueInput = {
     ...unsafeBuildEnvelopeIdQuery(id, type),
     templateType: TemplateType.ORGANISATION,
