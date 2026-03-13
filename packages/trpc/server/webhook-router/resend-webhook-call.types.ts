@@ -5,4 +5,7 @@ export const ZResendWebhookCallRequestSchema = z.object({
   webhookCallId: z.string(),
 });
 
+export const ZResendWebhookCallResponseSchema = z.void();
+
 export type TResendWebhookRequest = z.infer<typeof ZResendWebhookCallRequestSchema>;
+export type TResendWebhookResponse = z.infer<typeof ZResendWebhookCallResponseSchema>;

@@ -19,11 +19,9 @@ export type WebhookLogsSheetProps = {
 };
 
 export const WebhookLogsSheet = createCallable<WebhookLogsSheetProps, string | null>(
-  ({ call, webhookCall: initialWebhookCall }) => {
+  ({ call, webhookCall }) => {
     const { t } = useLingui();
     const { toast } = useToast();
-
-    const [webhookCall, setWebhookCall] = useState(initialWebhookCall);
 
     const [activeTab, setActiveTab] = useState<'request' | 'response'>('request');
 
@@ -82,7 +80,7 @@ export const WebhookLogsSheet = createCallable<WebhookLogsSheetProps, string | n
 
                 <Button
                   onClick={() =>
-                    resendWebhookCall({
+                    void resendWebhookCall({
                       webhookId: webhookCall.webhookId,
                       webhookCallId: webhookCall.id,
                     })
