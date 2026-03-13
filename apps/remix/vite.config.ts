@@ -49,7 +49,7 @@ export default defineConfig({
         plugins: ['typescript', 'jsx'],
       },
     }),
-    lingui(),
+    lingui().filter((plugin) => plugin.name === 'vite-plugin-lingui'),
     reactRouter(),
     serverAdapter({
       entry: 'server/router.ts',
