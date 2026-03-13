@@ -1,8 +1,5 @@
-import { transformAsync } from '@babel/core';
-import linguiMacroPlugin from '@lingui/babel-plugin-lingui-macro';
+import babel from '@rolldown/plugin-babel';
 import { defineConfig } from 'rolldown';
-
-const linguiMacroRE = /@lingui\/(core\/macro|react\/macro|macro)/;
 
 /**
  * Rolldown config for building the Hono server entry.
@@ -30,28 +27,11 @@ export default defineConfig({
     tsconfigFilename: 'tsconfig.json',
   },
   plugins: [
-    {
-      name: 'lingui-macro',
-      async transform(code, id) {
-        if (!/\.(tsx?|jsx?)$/.test(id)) return;
-        if (!linguiMacroRE.test(code)) return;
-
-        const result = await transformAsync(code, {
-          babelrc: false,
-          configFile: false,
-          filename: id,
-          parserOpts: {
-            sourceType: 'module',
-            allowAwaitOutsideFunction: true,
-            plugins: ['typescript', 'jsx'],
-          },
-          plugins: [linguiMacroPlugin],
-          sourceMaps: true,
-        });
-
-        if (!result?.code) return;
-        return { code: result.code, map: result.map };
+    babel({
+      plugins: ['@lingui/babel-plugin-lingui-macro'],
+      parserOpts: {
+        plugins: ['typescript', 'jsx'],
       },
-    },
+    }),
   ],
 });
