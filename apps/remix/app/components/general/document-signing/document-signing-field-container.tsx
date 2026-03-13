@@ -9,7 +9,7 @@ import { type TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { FieldRootContainer } from '@documenso/ui/components/field/field';
-import { RECIPIENT_COLOR_STYLES } from '@documenso/ui/lib/recipient-colors';
+import { getRecipientColorStyles } from '@documenso/ui/lib/recipient-colors';
 import { cn } from '@documenso/ui/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
@@ -131,18 +131,16 @@ export const DocumentSigningFieldContainer = ({
 
   return (
     <FieldRootContainer
-      color={
-        field.fieldMeta?.readOnly ? RECIPIENT_COLOR_STYLES.readOnly : RECIPIENT_COLOR_STYLES.green
-      }
-      field={field}
-    >
-      {!field.inserted && !loading && !readOnlyField && (
-        <button
-          type="submit"
-          className="absolute inset-0 z-10 h-full w-full rounded-[2px]"
-          onClick={async () => handleInsertField()}
-        />
-      )}
+        color={getRecipientColorStyles(field.fieldMeta?.readOnly ? 'readOnly' : 0)}
+        field={field}
+      >
+        {!field.inserted && !loading && !readOnlyField && (
+          <button
+            type="submit"
+            className="absolute inset-0 z-10 h-full w-full rounded-[2px]"
+            onClick={async () => handleInsertField()}
+          />
+        )}
 
       {type === 'Checkbox' && field.inserted && !loading && !readOnlyField && (
         <button

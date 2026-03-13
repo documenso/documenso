@@ -8,6 +8,7 @@ export const ZLicenseClaimSchema = z.object({
   embedAuthoring: z.boolean().optional(),
   embedAuthoringWhiteLabel: z.boolean().optional(),
   cfr21: z.boolean().optional(),
+  hipaa: z.boolean().optional(),
   authenticationPortal: z.boolean().optional(),
   billing: z.boolean().optional(),
 });

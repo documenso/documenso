@@ -528,7 +528,7 @@ export const createDocumentFromTemplate = async ({
     }),
   });
 
-  return await prisma.$transaction(async (tx) => {
+  const { envelope, createdEnvelope } = await prisma.$transaction(async (tx) => {
     const envelope = await tx.envelope.create({
       data: {
         id: prefixedId('envelope'),
@@ -761,13 +761,17 @@ export const createDocumentFromTemplate = async ({
       throw new Error('Document not found');
     }
 
-    await triggerWebhook({
-      event: WebhookTriggerEvents.DOCUMENT_CREATED,
-      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
-      userId,
-      teamId,
-    });
-
-    return envelope;
+    return { envelope, createdEnvelope };
   });
+
+  // Trigger webhook outside the transaction to avoid holding the connection
+  // open during network I/O.
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_CREATED,
+    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
+    userId,
+    teamId,
+  });
+
+  return envelope;
 };

@@ -13,6 +13,10 @@ const prisma = remember(
   () =>
     new PrismaClient({
       datasourceUrl: getDatabaseUrl(),
+      transactionOptions: {
+        maxWait: 5000,
+        timeout: 10000,
+      },
     }),
 );
 

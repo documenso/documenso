@@ -367,16 +367,16 @@ export const completeDocumentWithToken = async ({
               : {}),
           },
         });
+      });
 
-        await jobs.triggerJob({
-          name: 'send.signing.requested.email',
-          payload: {
-            userId: envelope.userId,
-            documentId: legacyDocumentId,
-            recipientId: nextRecipient.id,
-            requestMetadata,
-          },
-        });
+      await jobs.triggerJob({
+        name: 'send.signing.requested.email',
+        payload: {
+          userId: envelope.userId,
+          documentId: legacyDocumentId,
+          recipientId: nextRecipient.id,
+          requestMetadata,
+        },
       });
     }
   }
