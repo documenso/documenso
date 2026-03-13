@@ -582,7 +582,7 @@ export const createEnvelope = async ({
       });
     }
 
-    // Only create audit logs and webhook events for documents.
+    // Only create audit logs for documents.
     if (type === EnvelopeType.DOCUMENT) {
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({
@@ -619,17 +619,21 @@ export const createEnvelope = async ({
           }),
         });
       }
-
-      await triggerWebhook({
-        event: WebhookTriggerEvents.DOCUMENT_CREATED,
-        data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
-        userId,
-        teamId,
-      });
     }
 
     return createdEnvelope;
   });
+
+  // Trigger webhook outside the transaction to avoid holding the connection
+  // open during network I/O.
+  if (type === EnvelopeType.DOCUMENT) {
+    await triggerWebhook({
+      event: WebhookTriggerEvents.DOCUMENT_CREATED,
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
+      userId,
+      teamId,
+    });
+  }
 
   return createdEnvelope;
 };
