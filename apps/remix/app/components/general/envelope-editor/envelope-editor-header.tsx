@@ -1,5 +1,5 @@
 import { Trans, useLingui } from '@lingui/react/macro';
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, TemplateType } from '@prisma/client';
 import {
   AlertTriangleIcon,
   Building2Icon,
@@ -95,19 +95,19 @@ export default function EnvelopeEditorHeader() {
 
             {envelope.type === EnvelopeType.TEMPLATE && (
               <>
-                {envelope.templateType === 'PRIVATE' && (
+                {envelope.templateType === TemplateType.PRIVATE && (
                   <Badge variant="secondary">
                     <LockIcon className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-300" />
                     <Trans>Private Template</Trans>
                   </Badge>
                 )}
-                {envelope.templateType === 'ORGANISATION' && (
+                {envelope.templateType === TemplateType.ORGANISATION && (
                   <Badge variant="secondary">
                     <Building2Icon className="mr-2 h-4 w-4 text-orange-500 dark:text-orange-300" />
                     <Trans>Organisation Template</Trans>
                   </Badge>
                 )}
-                {envelope.templateType === 'PUBLIC' && (
+                {envelope.templateType === TemplateType.PUBLIC && (
                   <Badge variant="default">
                     <Globe2Icon className="mr-2 h-4 w-4 text-green-500 dark:text-green-300" />
                     <Trans>Public Template</Trans>

@@ -92,6 +92,7 @@ export const updateEnvelope = async ({
     if (teamCount < 2) {
       throw new AppError(AppErrorCode.INVALID_BODY, {
         message: 'Organisation templates require at least 2 teams in the organisation',
+        userMessage: 'Organisation templates require at least 2 teams in the organisation',
       });
     }
   }
