@@ -48,6 +48,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",
+    "@types/babel__core": "^7.20.5",
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
     "@datadog/pprof": "^5.13.5",
