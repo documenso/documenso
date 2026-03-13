@@ -8,7 +8,7 @@ msgstr ""
 "Language: ko\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-09 00:18\n"
+"PO-Revision-Date: 2026-03-13 04:15\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -2602,7 +2602,7 @@ msgstr "닫기"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
 msgid "Collapse sidebar"
-msgstr ""
+msgstr "사이드바 접기"
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 msgid "Communication"
@@ -2646,7 +2646,7 @@ msgstr "완료됨"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Completed At"
-msgstr ""
+msgstr "완료 일시"
 
 #: packages/email/templates/document-completed.tsx
 #: packages/email/templates/document-self-signed.tsx
@@ -3828,7 +3828,7 @@ msgid "Document created by <0>{0}</0>"
 msgstr "문서가 <0>{0}</0>에 의해 생성되었습니다"
 
 #: packages/email/templates/document-created-from-direct-template.tsx
-#: packages/lib/server-only/template/create-document-from-direct-template.ts
+#: packages/lib/jobs/definitions/emails/send-document-created-from-direct-template-email.handler.ts
 msgid "Document created from direct template"
 msgstr "직접 템플릿에서 생성된 문서"
 
@@ -4915,7 +4915,7 @@ msgstr "시간 초과됨"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
 msgid "Expand sidebar"
-msgstr ""
+msgstr "사이드바 펼치기"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Expiration"
@@ -4995,7 +4995,7 @@ msgstr "구독 클레임을 삭제하지 못했습니다."
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Failed to download audit logs. Please try again later."
-msgstr ""
+msgstr "감사 로그를 다운로드하지 못했습니다. 잠시 후 다시 시도해 주세요."
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 msgid "Failed to load document"
@@ -5498,7 +5498,7 @@ msgstr "숨기기"
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Hide license key"
-msgstr ""
+msgstr "라이선스 키 숨기기"
 
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 #: apps/remix/app/components/general/folder/folder-grid.tsx
@@ -7692,7 +7692,7 @@ msgstr "문서를 읽고 Documenso 사용을 시작하세요."
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Read Status"
-msgstr ""
+msgstr "열람 상태"
 
 #: apps/remix/app/components/general/document-signing/document-signing-disclosure.tsx
 msgid "Read the full <0>signature disclosure</0>."
@@ -8643,7 +8643,7 @@ msgstr "다음 수신자에게 알림을 전송합니다"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Send Status"
-msgstr ""
+msgstr "발송 상태"
 
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
@@ -8734,7 +8734,7 @@ msgstr "고급 설정 표시"
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Show license key"
-msgstr ""
+msgstr "라이선스 키 표시하기"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Show templates in your public profile for your audience to sign and get started quickly"
@@ -8978,7 +8978,7 @@ msgstr "서명 순서가 활성화되어 있습니다."
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Signing Status"
-msgstr ""
+msgstr "서명 상태"
 
 #: apps/remix/app/components/embed/embed-recipient-expired.tsx
 msgid "Signing Window Expired"
@@ -11326,7 +11326,7 @@ msgstr "계정에 연결된 모든 로그인 방식을 보고 관리하세요."
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "View Audit Logs"
-msgstr ""
+msgstr "감사 로그 보기"
 
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 msgid "View Codes"
@@ -11854,8 +11854,8 @@ msgid "Webhook not found"
 msgstr "웹후크를 찾을 수 없습니다."
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
-msgid "Webhook successfully sent"
-msgstr "웹후크가 성공적으로 전송되었습니다."
+msgid "Webhook queued for resend"
+msgstr "웹훅 재전송 대기열에 추가됨"
 
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
 msgid "Webhook updated"
@@ -13026,3 +13026,4 @@ msgstr "인증 코드:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
