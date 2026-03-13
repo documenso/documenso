@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-09 00:18\n"
+"PO-Revision-Date: 2026-03-13 04:15\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -2602,7 +2602,7 @@ msgstr "Schließen"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
 msgid "Collapse sidebar"
-msgstr ""
+msgstr "Seitenleiste einklappen"
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 msgid "Communication"
@@ -2646,7 +2646,7 @@ msgstr "Abgeschlossen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Completed At"
-msgstr ""
+msgstr "Abgeschlossen am"
 
 #: packages/email/templates/document-completed.tsx
 #: packages/email/templates/document-self-signed.tsx
@@ -3828,7 +3828,7 @@ msgid "Document created by <0>{0}</0>"
 msgstr "Dokument erstellt von <0>{0}</0>"
 
 #: packages/email/templates/document-created-from-direct-template.tsx
-#: packages/lib/server-only/template/create-document-from-direct-template.ts
+#: packages/lib/jobs/definitions/emails/send-document-created-from-direct-template-email.handler.ts
 msgid "Document created from direct template"
 msgstr "Dokument erstellt aus direkter Vorlage"
 
@@ -4915,7 +4915,7 @@ msgstr "Zeitüberschreitung überschritten"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
 msgid "Expand sidebar"
-msgstr ""
+msgstr "Seitenleiste ausklappen"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Expiration"
@@ -4995,7 +4995,7 @@ msgstr "Fehler beim Löschen des Abonnementsanspruchs."
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Failed to download audit logs. Please try again later."
-msgstr ""
+msgstr "Audit-Logs konnten nicht heruntergeladen werden. Bitte versuchen Sie es später erneut."
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 msgid "Failed to load document"
@@ -5498,7 +5498,7 @@ msgstr "Ausblenden"
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Hide license key"
-msgstr ""
+msgstr "Lizenzschlüssel ausblenden"
 
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 #: apps/remix/app/components/general/folder/folder-grid.tsx
@@ -7692,7 +7692,7 @@ msgstr "Lesen Sie unsere Dokumentation, um mit Documenso zu beginnen."
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Read Status"
-msgstr ""
+msgstr "Lesestatus"
 
 #: apps/remix/app/components/general/document-signing/document-signing-disclosure.tsx
 msgid "Read the full <0>signature disclosure</0>."
@@ -8643,7 +8643,7 @@ msgstr "Erinnerungen an die folgenden Empfänger senden"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Send Status"
-msgstr ""
+msgstr "Sendestatus"
 
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
@@ -8734,7 +8734,7 @@ msgstr "Erweiterte Einstellungen anzeigen"
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Show license key"
-msgstr ""
+msgstr "Lizenzschlüssel anzeigen"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Show templates in your public profile for your audience to sign and get started quickly"
@@ -8978,7 +8978,7 @@ msgstr "Unterzeichnungsreihenfolge ist aktiviert."
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Signing Status"
-msgstr ""
+msgstr "Signaturstatus"
 
 #: apps/remix/app/components/embed/embed-recipient-expired.tsx
 msgid "Signing Window Expired"
@@ -11326,7 +11326,7 @@ msgstr "Anzeigen und Verwalten aller mit Ihrem Konto verbundenen Anmeldemethoden
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "View Audit Logs"
-msgstr ""
+msgstr "Audit-Protokolle anzeigen"
 
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 msgid "View Codes"
@@ -11854,8 +11854,8 @@ msgid "Webhook not found"
 msgstr "Webhook nicht gefunden"
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
-msgid "Webhook successfully sent"
-msgstr "Webhook erfolgreich gesendet"
+msgid "Webhook queued for resend"
+msgstr "Webhook zur erneuten Zustellung in die Warteschlange gestellt"
 
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
 msgid "Webhook updated"
@@ -13026,3 +13026,4 @@ msgstr "Ihr Verifizierungscode:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
