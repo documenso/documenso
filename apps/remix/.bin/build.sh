@@ -19,6 +19,9 @@ start_time=$(date +%s)
 echo "[Build]: Extracting and compiling translations"
 npm run translate --prefix ../../
 
+echo "[Build]: Typechecking app"
+npm run typecheck
+
 echo "[Build]: Building app"
 npm run build:app
 
