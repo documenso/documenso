@@ -9,6 +9,7 @@ import {
   DocumentVisibility,
   EnvelopeType,
   SendStatus,
+  TemplateType,
 } from '@prisma/client';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { InfoIcon, MailIcon, SettingsIcon, ShieldIcon } from 'lucide-react';
@@ -102,6 +103,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { useCurrentTeam } from '~/providers/team';
 
 export const ZAddSettingsFormSchema = z.object({
+  templateType: z.nativeEnum(TemplateType).optional(),
   externalId: z.string().optional(),
   visibility: z.nativeEnum(DocumentVisibility).optional(),
   globalAccessAuth: z
@@ -196,6 +198,7 @@ export const EnvelopeEditorSettingsDialog = ({
 
   const createDefaultValues = () => {
     return {
+      templateType: envelope.templateType || TemplateType.PRIVATE,
       externalId: envelope.externalId || '',
       visibility: envelope.visibility || '',
       globalAccessAuth: documentAuthOption?.globalAccessAuth || [],
@@ -270,6 +273,7 @@ export const EnvelopeEditorSettingsDialog = ({
     try {
       await updateEnvelopeAsync({
         data: {
+          templateType: data.templateType,
           externalId: data.externalId || null,
           visibility: data.visibility,
           globalAccessAuth: parsedGlobalAccessAuth.success ? parsedGlobalAccessAuth.data : [],
@@ -605,6 +609,74 @@ export const EnvelopeEditorSettingsDialog = ({
                           </FormItem>
                         )}
                       />
+
+                      {envelope.type === EnvelopeType.TEMPLATE && (
+                        <FormField
+                          control={form.control}
+                          name="templateType"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="flex flex-row items-center">
+                                <Trans>Template type</Trans>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <InfoIcon className="mx-2 h-4 w-4" />
+                                  </TooltipTrigger>
+
+                                  <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+                                    <p>
+                                      <Trans>
+                                        <strong>Private</strong> templates can only be used by your
+                                        team.
+                                      </Trans>
+                                    </p>
+                                    <p>
+                                      <Trans>
+                                        <strong>Public</strong> templates are linked to your public
+                                        profile.
+                                      </Trans>
+                                    </p>
+                                    {organisation.teams.length >= 2 && (
+                                      <p>
+                                        <Trans>
+                                          <strong>Organisation</strong> templates are shared across
+                                          all teams in your organisation but can only be edited by
+                                          the owning team.
+                                        </Trans>
+                                      </p>
+                                    )}
+                                  </TooltipContent>
+                                </Tooltip>
+                              </FormLabel>
+
+                              <FormControl>
+                                <Select
+                                  value={field.value}
+                                  disabled={field.disabled}
+                                  onValueChange={field.onChange}
+                                >
+                                  <SelectTrigger className="bg-background">
+                                    <SelectValue />
+                                  </SelectTrigger>
+
+                                  <SelectContent>
+                                    <SelectItem value={TemplateType.PRIVATE}>
+                                      {t`Private`}
+                                    </SelectItem>
+                                    <SelectItem value={TemplateType.PUBLIC}>{t`Public`}</SelectItem>
+                                    {(organisation.teams.length >= 2 ||
+                                      field.value === TemplateType.ORGANISATION) && (
+                                      <SelectItem value={TemplateType.ORGANISATION}>
+                                        {t`Organisation`}
+                                      </SelectItem>
+                                    )}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      )}
 
                       {settings.allowConfigureDistribution && (
                         <FormField

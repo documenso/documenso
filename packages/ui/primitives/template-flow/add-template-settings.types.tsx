@@ -1,6 +1,6 @@
 import { msg } from '@lingui/core/macro';
 import { DocumentDistributionMethod } from '@prisma/client';
-import { DocumentVisibility } from '@prisma/client';
+import { DocumentVisibility, TemplateType } from '@prisma/client';
 import { z } from 'zod';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
@@ -21,6 +21,7 @@ import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 export const ZAddTemplateSettingsFormSchema = z.object({
   title: z.string().trim().min(1, { message: "Title can't be empty" }),
   externalId: z.string().optional(),
+  templateType: z.nativeEnum(TemplateType).optional(),
   visibility: z.nativeEnum(DocumentVisibility).optional(),
   globalAccessAuth: z
     .array(z.union([ZDocumentAccessAuthTypesSchema, z.literal('-1')]))

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
+import { DocumentVisibility, TeamMemberRole, TemplateType } from '@prisma/client';
 import { DocumentDistributionMethod, type Field, type Recipient } from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -109,6 +109,7 @@ export const AddTemplateSettingsFormPartial = ({
     defaultValues: {
       title: template.title,
       externalId: template.externalId || undefined,
+      templateType: template.type || TemplateType.PRIVATE,
       visibility: template.visibility || '',
       globalAccessAuth: documentAuthOption?.globalAccessAuth || [],
       globalActionAuth: documentAuthOption?.globalActionAuth || [],
@@ -324,6 +325,69 @@ export const AddTemplateSettingsFormPartial = ({
                 )}
               />
             )}
+
+            <FormField
+              control={form.control}
+              name="templateType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex flex-row items-center">
+                    <Trans>Template type</Trans>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <InfoIcon className="mx-2 h-4 w-4" />
+                      </TooltipTrigger>
+
+                      <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+                        <p>
+                          <Trans>
+                            <strong>Private</strong> templates can only be used by your team.
+                          </Trans>
+                        </p>
+                        <p>
+                          <Trans>
+                            <strong>Public</strong> templates are linked to your public profile.
+                          </Trans>
+                        </p>
+                        {organisation.teams.length >= 2 && (
+                          <p>
+                            <Trans>
+                              <strong>Organisation</strong> templates are shared across all teams in
+                              your organisation but can only be edited by the owning team.
+                            </Trans>
+                          </p>
+                        )}
+                      </TooltipContent>
+                    </Tooltip>
+                  </FormLabel>
+
+                  <FormControl>
+                    <Select
+                      {...field}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        void handleAutoSave();
+                      }}
+                    >
+                      <SelectTrigger className="bg-background">
+                        <SelectValue />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        <SelectItem value={TemplateType.PRIVATE}>{t`Private`}</SelectItem>
+                        <SelectItem value={TemplateType.PUBLIC}>{t`Public`}</SelectItem>
+                        {(organisation.teams.length >= 2 ||
+                          field.value === TemplateType.ORGANISATION) && (
+                          <SelectItem value={TemplateType.ORGANISATION}>
+                            {t`Organisation`}
+                          </SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}

@@ -5,7 +5,6 @@ import type { Recipient, TemplateDirectLink } from '@prisma/client';
 import { Copy, Edit, FolderIcon, MoreHorizontal, Share2Icon, Trash2, Upload } from 'lucide-react';
 import { Link } from 'react-router';
 
-import { useSession } from '@documenso/lib/client-only/providers/session';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,15 +41,12 @@ export const TemplatesTableActionDropdown = ({
   teamId,
   onDelete,
 }: TemplatesTableActionDropdownProps) => {
-  const { user } = useSession();
-
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
   const [isMoveToFolderDialogOpen, setMoveToFolderDialogOpen] = useState(false);
 
-  const isOwner = row.userId === user.id;
   const isTeamTemplate = row.teamId === teamId;
-  const canMutate = isOwner || isTeamTemplate;
+  const canMutate = isTeamTemplate;
 
   const formatPath = `${templateRootPath}/${row.envelopeId}/edit`;
 
