@@ -1,0 +1,36 @@
+diff --git a/node_modules/@lingui/vite-plugin/dist/index.cjs b/node_modules/@lingui/vite-plugin/dist/index.cjs
+index cb4db5d..c0a881a 100644
+--- a/node_modules/@lingui/vite-plugin/dist/index.cjs
++++ b/node_modules/@lingui/vite-plugin/dist/index.cjs
+@@ -114,8 +114,12 @@ You see this error because \`failOnMissing=true\` in Vite Plugin configuration.`
+           }
+           return {
+             code,
+-            map: null
++            map: null,
+             // provide source map if available
++            // Vite 8+ (Rolldown) auto-detects module types by file extension.
++            // Since .po files are transformed to JS, we must explicitly declare
++            // the module type to avoid misinterpretation.
++            moduleType: "js"
+           };
+         }
+       }
+diff --git a/node_modules/@lingui/vite-plugin/dist/index.mjs b/node_modules/@lingui/vite-plugin/dist/index.mjs
+index 609d48d..66fa6cc 100644
+--- a/node_modules/@lingui/vite-plugin/dist/index.mjs
++++ b/node_modules/@lingui/vite-plugin/dist/index.mjs
+@@ -106,8 +106,12 @@ You see this error because \`failOnMissing=true\` in Vite Plugin configuration.`
+           }
+           return {
+             code,
+-            map: null
++            map: null,
+             // provide source map if available
++            // Vite 8+ (Rolldown) auto-detects module types by file extension.
++            // Since .po files are transformed to JS, we must explicitly declare
++            // the module type to avoid misinterpretation.
++            moduleType: "js"
+           };
+         }
+       }

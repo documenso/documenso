@@ -12,6 +12,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: ./.github/actions/node-install
+
+      - name: Typecheck
+        run: npm run typecheck -w @documenso/remix
+
   build_app:
     name: Build App
     runs-on: ubuntu-latest

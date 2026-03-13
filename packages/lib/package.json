@@ -64,7 +64,6 @@
   },
   "devDependencies": {
     "@playwright/browser-chromium": "1.56.1",
-    "@types/luxon": "^3.7.1",
     "@types/pg": "^8.15.6"
   }
 }

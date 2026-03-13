@@ -1,14 +1,13 @@
 import { lingui } from '@lingui/vite-plugin';
 import { reactRouter } from '@react-router/dev/vite';
+import babel from '@rolldown/plugin-babel';
 import autoprefixer from 'autoprefixer';
 import serverAdapter from 'hono-react-router-adapter/vite';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import tailwindcss from 'tailwindcss';
 import { defineConfig, normalizePath } from 'vite';
-import macrosPlugin from 'vite-plugin-babel-macros';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 const require = createRequire(import.meta.url);
 
@@ -40,16 +39,24 @@ export default defineConfig({
         },
       ],
     }),
+    babel({
+      plugins: ['@lingui/babel-plugin-lingui-macro'],
+      // @rolldown/plugin-babel's built-in TypeScript parser overrides use
+      // `test: "**/*.tsx"` globs which fail to match when React Router appends
+      // query strings (e.g. `?__react-router-build-client-route`) to module IDs.
+      // Specify parser plugins explicitly so they apply unconditionally.
+      parserOpts: {
+        plugins: ['typescript', 'jsx'],
+      },
+    }),
+    lingui().filter((plugin) => plugin.name === 'vite-plugin-lingui'),
     reactRouter(),
-    macrosPlugin(),
-    lingui(),
-    tsconfigPaths(),
     serverAdapter({
       entry: 'server/router.ts',
     }),
   ],
   ssr: {
-    noExternal: ['react-dropzone', 'plausible-tracker'],
+    noExternal: ['react-dropzone'],
     external: [
       '@napi-rs/canvas',
       '@node-rs/bcrypt',
@@ -62,10 +69,8 @@ export default defineConfig({
     ],
   },
   optimizeDeps: {
-    entries: ['./app/**/*', '../../packages/ui/**/*', '../../packages/lib/**/*'],
     include: ['prop-types', 'file-selector', 'attr-accept'],
     exclude: [
-      'node_modules',
       '@napi-rs/canvas',
       '@node-rs/bcrypt',
       'sharp',
@@ -75,6 +80,7 @@ export default defineConfig({
     ],
   },
   resolve: {
+    tsconfigPaths: true,
     alias: {
       https: 'node:https',
       '.prisma/client/default': path.resolve(
@@ -89,11 +95,15 @@ export default defineConfig({
     },
   },
   /**
-   * Note: Re run rollup again to build the server afterwards.
+   * Note: Re run rolldown again to build the server afterwards.
    *
-   * See rollup.config.mjs which is used for that.
+   * See rolldown.config.mjs which is used for that.
    */
   build: {
+    // LightningCSS (Vite 8 default) is stricter and rejects nested @page
+    // rules and some Tailwind theme() edge cases. Use esbuild for CSS
+    // minification until LightningCSS support matures or the CSS is updated.
+    cssMinify: 'esbuild',
     rollupOptions: {
       external: [
         '@napi-rs/canvas',

@@ -19,6 +19,9 @@ start_time=$(date +%s)
 echo "[Build]: Extracting and compiling translations"
 npm run translate --prefix ../../
 
+echo "[Build]: Typechecking app"
+npm run typecheck
+
 echo "[Build]: Building app"
 npm run build:app
 
@@ -28,7 +31,8 @@ npm run build:server
 # Copy over the entry point for the server.
 cp server/main.js build/server/main.js
 
-# Copy over all web.js translations
+# Copy over all web.js translations.
+# Rolldown preserveModules mirrors the source tree under build/server/hono/.
 cp -r ../../packages/lib/translations build/server/hono/packages/lib/translations
 
 # Time taken
