@@ -82,8 +82,6 @@ export const DirectTemplateSigningForm = ({
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const highestPageNumber = Math.max(...localFields.map((field) => field.page));
-
   const fieldsRequiringValidation = useMemo(() => {
     return localFields.filter((field) => isFieldUnsignedAndRequired(field));
   }, [localFields]);
@@ -250,9 +248,7 @@ export const DirectTemplateSigningForm = ({
       <DocumentFlowFormContainerHeader title={flowStep.title} description={flowStep.description} />
 
       <DocumentFlowFormContainerContent>
-        <ElementVisible
-          target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}
-        >
+        <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
           {validateUninsertedFields && uninsertedFields[0] && (
             <FieldToolTip key={uninsertedFields[0].id} field={uninsertedFields[0]} color="warning">
               <Trans>Click to insert field</Trans>

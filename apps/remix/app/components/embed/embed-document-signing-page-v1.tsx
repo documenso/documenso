@@ -9,8 +9,10 @@ import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { ZSignDocumentEmbedDataSchema } from '@documenso/lib/types/embed-document-sign-schema';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
-import { validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
+import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
@@ -23,15 +25,14 @@ import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 import { injectCss } from '~/utils/css-vars';
 
-import { ZSignDocumentEmbedDataSchema } from '../../types/embed-document-sign-schema';
 import { DocumentSigningAttachmentsPopover } from '../general/document-signing/document-signing-attachments-popover';
 import { useRequiredDocumentSigningContext } from '../general/document-signing/document-signing-provider';
 import { DocumentSigningRecipientProvider } from '../general/document-signing/document-signing-recipient-provider';
@@ -45,7 +46,7 @@ export type EmbedSignDocumentV1ClientPageProps = {
   token: string;
   documentId: number;
   envelopeId: string;
-  envelopeItems: Pick<EnvelopeItem, 'id' | 'envelopeId'>[];
+  envelopeItems: (Pick<EnvelopeItem, 'id' | 'envelopeId'> & { documentData: { id: string } })[];
   recipient: RecipientWithFields;
   fields: Field[];
   completedFields: DocumentField[];
@@ -73,7 +74,7 @@ export const EmbedSignDocumentV1ClientPage = ({
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const { fullName, email, signature, setFullName, setSignature } =
+  const { fullName, email, signature, setFullName, setEmail, setSignature } =
     useRequiredDocumentSigningContext();
 
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
@@ -88,6 +89,7 @@ export const EmbedSignDocumentV1ClientPage = ({
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [isNameLocked, setIsNameLocked] = useState(false);
+  const [isEmailLocked, setIsEmailLocked] = useState(!!email);
   const [showPendingFieldTooltip, setShowPendingFieldTooltip] = useState(false);
   const [_showOtherRecipientsCompletedFields, setShowOtherRecipientsCompletedFields] =
     useState(false);
@@ -100,13 +102,13 @@ export const EmbedSignDocumentV1ClientPage = ({
   const [throttledOnCompleteClick, isThrottled] = useThrottleFn(() => void onCompleteClick(), 500);
 
   const [pendingFields, _completedFields] = [
-    fields.filter(
-      (field) => field.recipientId === recipient.id && isFieldUnsignedAndRequired(field),
+    sortFieldsByPosition(
+      fields.filter(
+        (field) => field.recipientId === recipient.id && isFieldUnsignedAndRequired(field),
+      ),
     ),
     fields.filter((field) => field.inserted),
   ];
-
-  const highestPendingPageNumber = Math.max(...pendingFields.map((field) => field.page));
 
   const { mutateAsync: completeDocumentWithToken, isPending: isSubmitting } =
     trpc.recipient.completeDocumentWithToken.useMutation();
@@ -204,13 +206,19 @@ export const EmbedSignDocumentV1ClientPage = ({
     try {
       const data = ZSignDocumentEmbedDataSchema.parse(JSON.parse(decodeURIComponent(atob(hash))));
 
-      if (!isCompleted && data.name) {
+      if (!isCompleted && data.name && !fullName) {
         setFullName(data.name);
       }
 
       // Since a recipient can be provided a name we can lock it without requiring
       // a to be provided by the parent application, unlike direct templates.
       setIsNameLocked(!!data.lockName);
+
+      if (!isCompleted && data.email && !email) {
+        setEmail(data.email);
+        setIsEmailLocked(!!data.lockEmail);
+      }
+
       setAllowDocumentRejection(!!data.allowDocumentRejection);
       setShowOtherRecipientsCompletedFields(!!data.showOtherRecipientsCompletedFields);
 
@@ -288,9 +296,15 @@ export const EmbedSignDocumentV1ClientPage = ({
           {/* Viewer */}
           <div className="embed--DocumentViewer flex-1">
             <PDFViewerLazy
-              envelopeItem={envelopeItems[0]}
-              token={token}
-              version="signed"
+              data={getDocumentDataUrlForPdfViewer({
+                envelopeId: envelopeItems[0]?.envelopeId,
+                envelopeItemId: envelopeItems[0]?.id,
+                documentDataId: envelopeItems[0]?.documentData.id,
+                version: 'current',
+                token: token,
+                presignToken: undefined,
+              })}
+              scrollParentRef="window"
               onDocumentLoad={() => setHasDocumentLoaded(true)}
             />
           </div>
@@ -442,7 +456,8 @@ export const EmbedSignDocumentV1ClientPage = ({
                           id="email"
                           className="mt-2 bg-background"
                           value={email}
-                          disabled
+                          onChange={(e) => setEmail(e.target.value)}
+                          disabled={isEmailLocked}
                         />
                       </div>
 
@@ -491,15 +506,15 @@ export const EmbedSignDocumentV1ClientPage = ({
             </div>
           </div>
 
-          <ElementVisible
-            target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPendingPageNumber}"]`}
-          >
-            {showPendingFieldTooltip && pendingFields.length > 0 && (
+          {showPendingFieldTooltip && pendingFields.length > 0 && (
+            <ElementVisible
+              target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${pendingFields[0].page}"]`}
+            >
               <FieldToolTip key={pendingFields[0].id} field={pendingFields[0]} color="warning">
                 <Trans>Click to insert field</Trans>
               </FieldToolTip>
-            )}
-          </ElementVisible>
+            </ElementVisible>
+          )}
 
           {/* Fields */}
           <EmbedDocumentFields fields={fields} metadata={metadata} />

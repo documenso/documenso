@@ -229,6 +229,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentPending: false, // unchecked
     documentCompleted: true,
     documentDeleted: false, // unchecked
+    ownerRecipientExpired: true,
     ownerDocumentCompleted: true,
   });
 
@@ -244,9 +245,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   await page.getByRole('option', { name: 'Override organisation settings' }).click();
 
   // Update some email settings
-  await page
-    .getByRole('checkbox', { name: 'Email recipients with a signing request' })
-    .uncheck();
+  await page.getByRole('checkbox', { name: 'Email recipients with a signing request' }).uncheck();
   await page
     .getByRole('checkbox', { name: 'Email recipients when the document is completed', exact: true })
     .uncheck();
@@ -270,6 +269,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentPending: true,
     documentCompleted: false,
     documentDeleted: true,
+    ownerRecipientExpired: true,
     ownerDocumentCompleted: false,
   });
 
@@ -290,6 +290,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentPending: true,
     documentCompleted: false,
     documentDeleted: true,
+    ownerRecipientExpired: true,
     ownerDocumentCompleted: false,
   });
 
@@ -315,6 +316,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentPending: false,
     documentCompleted: true,
     documentDeleted: false,
+    ownerRecipientExpired: true,
     ownerDocumentCompleted: true,
   });
 
@@ -335,6 +337,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentPending: false,
     documentCompleted: true,
     documentDeleted: false,
+    ownerRecipientExpired: true,
     ownerDocumentCompleted: true,
   });
 });
