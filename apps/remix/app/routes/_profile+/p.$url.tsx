@@ -176,15 +176,15 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
 
                       <div className="flex flex-1 flex-col gap-4 overflow-hidden md:flex-row md:items-start md:justify-between">
                         <div>
-                          <p className="text-foreground text-sm font-semibold leading-none">
+                          <p className="text-foreground text-sm font-semibold leading-none break-all">
                             {template.publicTitle}
                           </p>
-                          <p className="text-muted-foreground mt-1 line-clamp-3 max-w-[70ch] whitespace-normal text-xs">
+                          <p className="text-muted-foreground mt-1 line-clamp-3 max-w-[70ch] whitespace-normal text-xs break-all">
                             {template.publicDescription}
                           </p>
                         </div>
 
-                        <Button asChild className="w-20">
+                        <Button asChild className="w-fit">
                           <Link to={formatDirectTemplatePath(template.directLink.token)}>
                             <Trans>Sign</Trans>
                           </Link>

@@ -12,7 +12,8 @@ import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/org
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 import type { TFindTemplatesResponse } from '@documenso/trpc/server/template-router/schema';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
-import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
+import { Checkbox } from '@documenso/ui/primitives/checkbox';
+import type { DataTableColumnDef, RowSelectionState } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
@@ -32,6 +33,9 @@ type TemplatesTableProps = {
   isLoadingError?: boolean;
   documentRootPath: string;
   templateRootPath: string;
+  enableSelection?: boolean;
+  rowSelection?: RowSelectionState;
+  onRowSelectionChange?: (selection: RowSelectionState) => void;
 };
 
 type TemplatesTableRow = TFindTemplatesResponse['data'][number];
@@ -42,6 +46,9 @@ export const TemplatesTable = ({
   isLoadingError,
   documentRootPath,
   templateRootPath,
+  enableSelection,
+  rowSelection,
+  onRowSelectionChange,
 }: TemplatesTableProps) => {
   const { _, i18n } = useLingui();
   const { remaining } = useLimits();
@@ -60,7 +67,34 @@ export const TemplatesTable = ({
   };
 
   const columns = useMemo(() => {
-    return [
+    const cols: DataTableColumnDef<TemplatesTableRow>[] = [];
+
+    if (enableSelection) {
+      cols.push({
+        id: 'select',
+        header: ({ table }) => (
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected()}
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label={_(msg`Select all`)}
+            onClick={(e) => e.stopPropagation()}
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label={_(msg`Select row`)}
+            onClick={(e) => e.stopPropagation()}
+          />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+        size: 40,
+      });
+    }
+
+    cols.push(
       {
         header: _(msg`Created`),
         accessorKey: 'createdAt',
@@ -86,8 +120,8 @@ export const TemplatesTable = ({
                 <InfoIcon className="mx-2 h-4 w-4" />
               </TooltipTrigger>
 
-              <TooltipContent className="text-foreground max-w-md space-y-2 !p-0">
-                <ul className="text-muted-foreground space-y-0.5 divide-y [&>li]:p-4">
+              <TooltipContent className="max-w-md space-y-2 !p-0 text-foreground">
+                <ul className="space-y-0.5 divide-y text-muted-foreground [&>li]:p-4">
                   <li>
                     <h2 className="mb-2 flex flex-row items-center font-semibold">
                       <Globe2Icon className="mr-2 h-5 w-5 text-green-500 dark:text-green-300" />
@@ -176,8 +210,10 @@ export const TemplatesTable = ({
           );
         },
       },
-    ] satisfies DataTableColumnDef<TemplatesTableRow>[];
-  }, [documentRootPath, team?.id, templateRootPath]);
+    );
+
+    return cols;
+  }, [documentRootPath, team?.id, templateRootPath, enableSelection]);
 
   const onPaginationChange = (page: number, perPage: number) => {
     startTransition(() => {
@@ -224,6 +260,10 @@ export const TemplatesTable = ({
         currentPage={results.currentPage}
         totalPages={results.totalPages}
         onPaginationChange={onPaginationChange}
+        enableRowSelection={enableSelection}
+        rowSelection={rowSelection}
+        onRowSelectionChange={onRowSelectionChange}
+        getRowId={(row) => row.envelopeId}
         error={{
           enable: isLoadingError || false,
         }}
@@ -232,6 +272,11 @@ export const TemplatesTable = ({
           rows: 5,
           component: (
             <>
+              {enableSelection && (
+                <TableCell className="w-10">
+                  <Skeleton className="h-4 w-4 rounded" />
+                </TableCell>
+              )}
               <TableCell>
                 <Skeleton className="h-4 w-40 rounded-full" />
               </TableCell>

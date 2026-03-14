@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { msg } from '@lingui/core/macro';
+import { msg, plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
@@ -108,7 +108,9 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
           ? formatDocumentsPath(team.url)
           : formatTemplatesPath(team.url);
 
-      await navigate(`${pathPrefix}/${id}/edit`);
+      const aiQueryParam = team.preferences.aiFeaturesEnabled ? '?ai=true' : '';
+
+      await navigate(`${pathPrefix}/${id}/edit${aiQueryParam}`);
 
       toast({
         title: type === EnvelopeType.DOCUMENT ? t`Document uploaded` : t`Template uploaded`,
@@ -124,14 +126,14 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
       console.error(err);
 
       const errorMessage = match(error.code)
-        .with('INVALID_DOCUMENT_FILE', () => t`You cannot upload encrypted PDFs`)
+        .with('INVALID_DOCUMENT_FILE', () => t`You cannot upload encrypted PDFs.`)
         .with(
           AppErrorCode.LIMIT_EXCEEDED,
           () => t`You have reached your document limit for this month. Please upgrade your plan.`,
         )
         .with(
           'ENVELOPE_ITEM_LIMIT_EXCEEDED',
-          () => t`You have reached the limit of the number of files per envelope`,
+          () => t`You have reached the limit of the number of files per envelope.`,
         )
         .otherwise(() => t`An error occurred while uploading your document.`);
 
@@ -153,7 +155,10 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
 
     if (maxItemsReached) {
       toast({
-        title: t`You cannot upload more than ${maximumEnvelopeItemCount} items per envelope.`,
+        title: plural(maximumEnvelopeItemCount, {
+          one: `You cannot upload more than # item per envelope.`,
+          other: `You cannot upload more than # items per envelope.`,
+        }),
         duration: 5000,
         variant: 'destructive',
       });

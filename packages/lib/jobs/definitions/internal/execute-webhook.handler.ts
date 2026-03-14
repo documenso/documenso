@@ -1,5 +1,7 @@
-import { Prisma, WebhookCallStatus } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
+import { WebhookCallStatus } from '@prisma/client';
 
+import { executeWebhookCall } from '@documenso/lib/server-only/webhooks/execute-webhook-call';
 import { prisma } from '@documenso/prisma';
 
 import type { JobRunIO } from '../../client/_internal/job';
@@ -7,7 +9,7 @@ import type { TExecuteWebhookJobDefinition } from './execute-webhook';
 
 export const run = async ({
   payload,
-  io,
+  io: _io,
 }: {
   payload: TExecuteWebhookJobDefinition;
   io: JobRunIO;
@@ -29,44 +31,28 @@ export const run = async ({
     webhookEndpoint: url,
   };
 
-  const response = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify(payloadData),
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Documenso-Secret': secret ?? '',
-    },
-  });
-
-  const body = await response.text();
-
-  let responseBody: Prisma.InputJsonValue | Prisma.JsonNullValueInput = Prisma.JsonNull;
-
-  try {
-    responseBody = JSON.parse(body);
-  } catch (err) {
-    responseBody = body;
-  }
+  const result = await executeWebhookCall({ url, body: payloadData, secret });
 
   await prisma.webhookCall.create({
     data: {
       url,
       event,
-      status: response.ok ? WebhookCallStatus.SUCCESS : WebhookCallStatus.FAILED,
+      status: result.success ? WebhookCallStatus.SUCCESS : WebhookCallStatus.FAILED,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       requestBody: payloadData as Prisma.InputJsonValue,
-      responseCode: response.status,
-      responseBody,
-      responseHeaders: Object.fromEntries(response.headers.entries()),
+      responseCode: result.responseCode,
+      responseBody: result.responseBody,
+      responseHeaders: result.responseHeaders,
       webhookId: webhook.id,
     },
   });
 
-  if (!response.ok) {
-    throw new Error(`Webhook execution failed with status ${response.status}`);
+  if (!result.success) {
+    throw new Error(`Webhook execution failed with status ${result.responseCode}`);
   }
 
   return {
-    success: response.ok,
-    status: response.status,
+    success: true,
+    status: result.responseCode,
   };
 };

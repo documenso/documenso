@@ -66,7 +66,7 @@ export const setEnvelopeFieldsRoute = authenticatedProcedure
 
     return {
       data: result.fields.map((field) => ({
-        id: field.id,
+        ...field,
         formId: field.formId,
       })),
     };

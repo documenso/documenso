@@ -17,10 +17,11 @@ export const verifyEmbeddingPresignTokenRoute = procedure
   .output(ZVerifyEmbeddingPresignTokenResponseSchema)
   .mutation(async ({ input }) => {
     try {
-      const { token } = input;
+      const { token, scope } = input;
 
       const apiToken = await verifyEmbeddingPresignToken({
         token,
+        scope,
       }).catch(() => null);
 
       return { success: !!apiToken };

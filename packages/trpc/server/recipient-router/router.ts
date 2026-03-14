@@ -561,7 +561,7 @@ export const recipientRouter = router({
   completeDocumentWithToken: procedure
     .input(ZCompleteDocumentWithTokenMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      const { token, documentId, accessAuthOptions, nextSigner } = input;
+      const { token, documentId, accessAuthOptions, nextSigner, recipientOverride } = input;
 
       ctx.logger.info({
         input: {
@@ -577,6 +577,7 @@ export const recipientRouter = router({
         },
         accessAuthOptions,
         nextSigner,
+        recipientOverride,
         userId: ctx.user?.id,
         requestMetadata: ctx.metadata.requestMetadata,
       });

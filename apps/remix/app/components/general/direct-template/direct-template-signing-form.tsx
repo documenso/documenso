@@ -82,8 +82,6 @@ export const DirectTemplateSigningForm = ({
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const highestPageNumber = Math.max(...localFields.map((field) => field.page));
-
   const fieldsRequiringValidation = useMemo(() => {
     return localFields.filter((field) => isFieldUnsignedAndRequired(field));
   }, [localFields]);
@@ -250,9 +248,7 @@ export const DirectTemplateSigningForm = ({
       <DocumentFlowFormContainerHeader title={flowStep.title} description={flowStep.description} />
 
       <DocumentFlowFormContainerContent>
-        <ElementVisible
-          target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}
-        >
+        <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
           {validateUninsertedFields && uninsertedFields[0] && (
             <FieldToolTip key={uninsertedFields[0].id} field={uninsertedFields[0]} color="warning">
               <Trans>Click to insert field</Trans>
@@ -417,6 +413,7 @@ export const DirectTemplateSigningForm = ({
               <SignaturePadDialog
                 className="mt-2"
                 disabled={isSubmitting}
+                fullName={fullName}
                 value={signature ?? ''}
                 onChange={(value) => setSignature(value)}
                 typedSignatureEnabled={template.templateMeta?.typedSignatureEnabled}
@@ -433,7 +430,7 @@ export const DirectTemplateSigningForm = ({
 
         <div className="mt-4 flex gap-x-4">
           <Button
-            className="dark:bg-muted dark:hover:bg-muted/80 w-full bg-black/5 hover:bg-black/10"
+            className="w-full bg-black/5 hover:bg-black/10 dark:bg-muted dark:hover:bg-muted/80"
             size="lg"
             variant="secondary"
             disabled={isSubmitting}

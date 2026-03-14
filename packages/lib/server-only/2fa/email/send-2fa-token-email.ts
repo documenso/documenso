@@ -5,6 +5,7 @@ import { EnvelopeType } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import { AccessAuth2FAEmailTemplate } from '@documenso/email/templates/access-auth-2fa';
+import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
@@ -69,6 +70,12 @@ export const send2FATokenEmail = async ({ token, envelopeId }: Send2FATokenEmail
     });
   }
 
+  if (!isRecipientEmailValidForSending(recipient)) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Recipient is missing email address',
+    });
+  }
+
   const twoFactorTokenToken = await generateTwoFactorTokenFromEmail({
     envelopeId,
     email: recipient.email,
@@ -101,32 +108,29 @@ export const send2FATokenEmail = async ({ token, envelopeId }: Send2FATokenEmail
     renderEmailWithI18N(template, { lang: emailLanguage, branding, plainText: true }),
   ]);
 
-  await prisma.$transaction(
-    async (tx) => {
-      await mailer.sendMail({
-        to: {
-          address: recipient.email,
-          name: recipient.name,
-        },
-        from: senderEmail,
-        replyTo: replyToEmail,
-        subject,
-        html,
-        text,
-      });
-
-      await tx.documentAuditLog.create({
-        data: createDocumentAuditLogData({
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_REQUESTED,
-          envelopeId: envelope.id,
-          data: {
-            recipientEmail: recipient.email,
-            recipientName: recipient.name,
-            recipientId: recipient.id,
-          },
-        }),
-      });
+  // Send email outside any transaction to avoid holding a connection
+  // open during network I/O.
+  await mailer.sendMail({
+    to: {
+      address: recipient.email,
+      name: recipient.name,
     },
-    { timeout: 30_000 },
-  );
+    from: senderEmail,
+    replyTo: replyToEmail,
+    subject,
+    html,
+    text,
+  });
+
+  await prisma.documentAuditLog.create({
+    data: createDocumentAuditLogData({
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_REQUESTED,
+      envelopeId: envelope.id,
+      data: {
+        recipientEmail: recipient.email,
+        recipientName: recipient.name,
+        recipientId: recipient.id,
+      },
+    }),
+  });
 };

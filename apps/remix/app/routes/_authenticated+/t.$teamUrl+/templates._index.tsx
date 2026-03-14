@@ -1,16 +1,23 @@
+import { useMemo, useState } from 'react';
+
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
 import { Bird } from 'lucide-react';
 import { useParams, useSearchParams } from 'react-router';
 
+import { useSessionStorage } from '@documenso/lib/client-only/hooks/use-session-storage';
 import { FolderType } from '@documenso/lib/types/folder-type';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
+import type { RowSelectionState } from '@documenso/ui/primitives/data-table';
 
+import { EnvelopesBulkDeleteDialog } from '~/components/dialogs/envelopes-bulk-delete-dialog';
+import { EnvelopesBulkMoveDialog } from '~/components/dialogs/envelopes-bulk-move-dialog';
 import { EnvelopeDropZoneWrapper } from '~/components/general/envelope/envelope-drop-zone-wrapper';
 import { FolderGrid } from '~/components/general/folder/folder-grid';
+import { EnvelopesTableBulkActionBar } from '~/components/tables/envelopes-table-bulk-action-bar';
 import { TemplatesTable } from '~/components/tables/templates-table';
 import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
@@ -28,6 +35,17 @@ export default function TemplatesPage() {
   const page = Number(searchParams.get('page')) || 1;
   const perPage = Number(searchParams.get('perPage')) || 10;
 
+  const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>(
+    'templates-bulk-selection',
+    {},
+  );
+  const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
+
+  const selectedEnvelopeIds = useMemo(() => {
+    return Object.keys(rowSelection).filter((id) => rowSelection[id]);
+  }, [rowSelection]);
+
   const documentRootPath = formatDocumentsPath(team.url);
   const templateRootPath = formatTemplatesPath(team.url);
 
@@ -44,9 +62,9 @@ export default function TemplatesPage() {
 
         <div className="mt-8">
           <div className="flex flex-row items-center">
-            <Avatar className="dark:border-border mr-3 h-12 w-12 border-2 border-solid border-white">
+            <Avatar className="mr-3 h-12 w-12 border-2 border-solid border-white dark:border-border">
               {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
-              <AvatarFallback className="text-muted-foreground text-xs">
+              <AvatarFallback className="text-xs text-muted-foreground">
                 {team.name.slice(0, 1)}
               </AvatarFallback>
             </Avatar>
@@ -58,7 +76,7 @@ export default function TemplatesPage() {
 
           <div className="mt-8">
             {data && data.count === 0 ? (
-              <div className="text-muted-foreground/60 flex h-96 flex-col items-center justify-center gap-y-4">
+              <div className="flex h-96 flex-col items-center justify-center gap-y-4 text-muted-foreground/60">
                 <Bird className="h-12 w-12" strokeWidth={1.5} />
 
                 <div className="text-center">
@@ -81,10 +99,37 @@ export default function TemplatesPage() {
                 isLoadingError={isLoadingError}
                 documentRootPath={documentRootPath}
                 templateRootPath={templateRootPath}
+                enableSelection
+                rowSelection={rowSelection}
+                onRowSelectionChange={setRowSelection}
               />
             )}
           </div>
         </div>
+
+        <EnvelopesTableBulkActionBar
+          selectedCount={selectedEnvelopeIds.length}
+          onMoveClick={() => setIsBulkMoveDialogOpen(true)}
+          onDeleteClick={() => setIsBulkDeleteDialogOpen(true)}
+          onClearSelection={() => setRowSelection({})}
+        />
+
+        <EnvelopesBulkMoveDialog
+          envelopeIds={selectedEnvelopeIds}
+          envelopeType={EnvelopeType.TEMPLATE}
+          open={isBulkMoveDialogOpen}
+          currentFolderId={folderId}
+          onOpenChange={setIsBulkMoveDialogOpen}
+          onSuccess={() => setRowSelection({})}
+        />
+
+        <EnvelopesBulkDeleteDialog
+          envelopeIds={selectedEnvelopeIds}
+          envelopeType={EnvelopeType.TEMPLATE}
+          open={isBulkDeleteDialogOpen}
+          onOpenChange={setIsBulkDeleteDialogOpen}
+          onSuccess={() => setRowSelection({})}
+        />
       </div>
     </EnvelopeDropZoneWrapper>
   );

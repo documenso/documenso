@@ -1,6 +1,3 @@
-> 🚨 🚨 🚨
-> Documenso 2.0.0 is live on Product Hunt 🎉 <a href="https://documen.so/launch" target="_blank" rel="noopener noreferrer" style="text-decoration: underline;">Join us to celebrate the best Documenso yet 🪩</a>
-
 <img src="https://github.com/documenso/documenso/assets/13398220/a643571f-0239-46a6-a73e-6bef38d1228b" alt="Documenso Logo">
 
 <p align="center" style="margin-top: 20px">

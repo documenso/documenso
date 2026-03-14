@@ -171,6 +171,12 @@ export const ZCompleteDocumentWithTokenMutationSchema = z.object({
       name: z.string().min(1).max(255),
     })
     .optional(),
+  recipientOverride: z
+    .object({
+      email: z.string().trim().toLowerCase().email().max(254).optional(),
+      name: z.string().max(255).optional(),
+    })
+    .optional(),
 });
 
 export type TCompleteDocumentWithTokenMutationSchema = z.infer<

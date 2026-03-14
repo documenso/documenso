@@ -2,12 +2,13 @@ import { expect, test } from '@playwright/test';
 import { WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { alphaid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
-import { expectTextToBeVisible } from '../fixtures/generic';
+import { expectTextToBeVisible, openDropdownMenu } from '../fixtures/generic';
 
 /**
  * Helper function to seed a webhook directly in the database for testing.
@@ -147,9 +148,11 @@ test('[WEBHOOKS]: delete webhook', async ({ page }) => {
 
   // Find the row with the webhook and click the action dropdown
   const webhookRow = page.locator('tr', { hasText: webhookUrl });
-  await webhookRow.getByTestId('webhook-table-action-btn').click();
+  const actionBtn = webhookRow.getByTestId('webhook-table-action-btn');
+  await openDropdownMenu(page, actionBtn);
 
   // Click Delete menu item
+  await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Delete' }).click();
 
   // Fill in confirmation field
@@ -196,9 +199,11 @@ test('[WEBHOOKS]: update webhook', async ({ page }) => {
 
   // Find the row with the webhook and click the action dropdown
   const webhookRow = page.locator('tr', { hasText: originalWebhookUrl });
-  await webhookRow.getByTestId('webhook-table-action-btn').click();
+  const actionBtn = webhookRow.getByTestId('webhook-table-action-btn');
+  await openDropdownMenu(page, actionBtn);
 
   // Click Edit menu item
+  await expect(page.getByRole('menuitem', { name: 'Edit' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Edit' }).click();
 
   // Wait for dialog to open
@@ -275,8 +280,8 @@ test('[WEBHOOKS]: cannot see unrelated webhooks', async ({ page }) => {
   const user1Data = await seedUser();
   const user2Data = await seedUser();
 
-  const webhookUrl1 = `https://example.com/webhook-team1-${Date.now()}`;
-  const webhookUrl2 = `https://example.com/webhook-team2-${Date.now()}`;
+  const webhookUrl1 = `https://example.com/webhook-team1-${alphaid(12)}`;
+  const webhookUrl2 = `https://example.com/webhook-team2-${alphaid(12)}`;
 
   // Create webhooks for both teams with DOCUMENT_CREATED event
   const webhook1 = await seedWebhook({

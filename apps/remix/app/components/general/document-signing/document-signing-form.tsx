@@ -3,7 +3,7 @@ import { useId, useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { type Field, FieldType, type Recipient, RecipientRole } from '@prisma/client';
+import { type Field, type Recipient, RecipientRole } from '@prisma/client';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
@@ -11,6 +11,7 @@ import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-
 import type { TRecipientAccessAuth } from '@documenso/lib/types/document-auth';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { sortFieldsByPosition } from '@documenso/lib/utils/fields';
+import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { Button } from '@documenso/ui/primitives/button';
@@ -78,7 +79,7 @@ export const DocumentSigningForm = ({
     [fields],
   );
 
-  const hasSignatureField = fields.some((field) => field.type === FieldType.SIGNATURE);
+  const hasSignatureField = fields.some((field) => isSignatureFieldType(field.type));
 
   const uninsertedFields = useMemo(() => {
     return sortFieldsByPosition(fieldsRequiringValidation.filter((field) => !field.inserted));
@@ -108,8 +109,8 @@ export const DocumentSigningForm = ({
       await completeDocument({ nextSigner });
     } catch (err) {
       toast({
-        title: 'Error',
-        description: 'An error occurred while completing the document. Please try again.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while completing the document. Please try again.`),
         variant: 'destructive',
       });
 
@@ -280,6 +281,7 @@ export const DocumentSigningForm = ({
                       <SignaturePadDialog
                         className="mt-2"
                         disabled={isSubmitting}
+                        fullName={fullName}
                         value={signature ?? ''}
                         onChange={(v) => setSignature(v ?? '')}
                         typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}

@@ -1,0 +1,147 @@
+---
+title: Use Templates
+description: Create documents from your templates by filling in recipient details and optionally sending immediately.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Create a Document from a Template
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Open the template
+
+Navigate to **Templates** in the sidebar and find the template you want to use. Click on the template to open its detail page, or click the three-dot menu and select **Use Template**.
+
+![Templates page](/templates/documenso-template-page.webp)
+
+</Step>
+
+<Step>
+### Click use template
+
+From the template detail page, click the **Use Template** button. A dialog opens where you configure the document.
+
+![Using a template dialog](/templates/documenso-use-template.webp)
+
+</Step>
+
+<Step>
+### Fill in recipient details
+
+For each recipient defined in the template, enter their:
+
+- **Email** (required): The recipient's email address
+- **Name** (optional): The recipient's display name
+
+If the template has pre-filled recipient information, those fields appear with the existing values. You can modify them or leave them as-is.
+
+</Step>
+
+<Step>
+### Choose how to create the document
+
+<Tabs items={['Create as draft', 'Create and send']}>
+<Tab value="Create as draft">
+
+Creates the document without sending. You can review and edit it before sending. Leave the **Send document** checkbox unchecked.
+
+</Tab>
+<Tab value="Create and send">
+
+Creates the document and immediately sends it to recipients. Check the **Send document** checkbox to send immediately.
+
+</Tab>
+</Tabs>
+
+</Step>
+
+<Step>
+### New document
+
+Click **Create as draft** or **Create and send** depending on what you want to do. You are then redirected to the new document.
+
+</Step>
+</Steps>
+
+## Upload a Custom Document
+
+You can replace the template's PDF with a different document when creating from a template. This keeps all the field positions and recipient settings but uses your uploaded file.
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    In the Use Template dialog, check **Upload custom document**.
+  </Step>
+  <Step>
+    Click **Upload** next to each document you want to replace and select a PDF from your computer.
+  </Step>
+  <Step>
+    Complete the rest of the form and create the document.
+  </Step>
+</Steps>
+
+<Callout type="info">
+  The uploaded document must be a PDF. Field positions are preserved from the template, so the new
+  document should have a similar layout.
+</Callout>
+
+## Sequential Signing
+
+If the template uses sequential signing, recipients receive the document in order. The signing order displays next to each recipient in the dialog and cannot be changed when using the template.
+
+To modify the signing order, edit the template itself before creating documents from it.
+
+## Distribution Methods
+
+How recipients receive the document depends on the template's distribution method:
+
+| Distribution method | What happens                                                |
+| ------------------- | ----------------------------------------------------------- |
+| **Email**           | Recipients receive an email with a link to sign             |
+| **None**            | No emails sent. You receive signing links to share manually |
+
+When using a template with no email distribution and selecting **Create as pending**, you're redirected to the document page where signing links are displayed for you to copy and share.
+
+## Template vs Document Differences
+
+When you create a document from a template, the document becomes independent. Changes you make to the document don't affect the template, and changes to the template don't affect existing documents.
+
+| What you can change | Template | Document created from template   |
+| ------------------- | -------- | -------------------------------- |
+| Recipients          | Yes      | Yes (before sending)             |
+| Fields              | Yes      | Yes (before sending)             |
+| PDF content         | Yes      | Only at creation (custom upload) |
+| Settings            | Yes      | Yes (before sending)             |
+
+Documents created from a template are tracked on the template's detail page under **Documents created from template**.
+
+## Bulk Send
+
+To create multiple documents from one template with different recipients, use bulk send:
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Go to the template detail page or templates list.
+  </Step>
+  <Step>
+    Click the three-dot menu and select **Bulk send**.
+  </Step>
+  <Step>
+    Upload a CSV file with recipient information. Each row creates a separate document.
+  </Step>
+</Steps>
+
+This is useful for sending the same document to many people, such as offer letters or agreements.
+
+---
+
+## See Also
+
+- [Create a Template](/docs/users/templates/create) - Build reusable templates from your documents
+- [Direct Links](/docs/users/documents/direct-links) - Let recipients sign without knowing their email upfront
+- [Send Documents](/docs/users/documents/send) - Sending options and email customization

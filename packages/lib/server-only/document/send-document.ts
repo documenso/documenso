@@ -10,6 +10,7 @@ import {
   WebhookTriggerEvents,
 } from '@prisma/client';
 
+import { resolveExpiresAt } from '@documenso/lib/constants/envelope-expiration';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
@@ -33,10 +34,15 @@ import {
   mapEnvelopeToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
-import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
+import { putNormalizedPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { isDocumentCompleted } from '../../utils/document';
+import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { toCheckboxCustomText, toRadioCustomText } from '../../utils/fields';
+import {
+  getRecipientsWithMissingFields,
+  isRecipientEmailValidForSending,
+} from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -128,30 +134,39 @@ export const sendDocument = async ({
     );
   }
 
-  // Commented out server side checks for minimum 1 signature per signer now since we need to
-  // decide if we want to enforce this for API & templates.
-  // const fields = await getFieldsForDocument({
-  //   documentId: documentId,
-  //   userId: userId,
-  // });
+  // Validate that recipients with auth requirements have a valid email.
+  envelope.recipients.forEach((recipient) => {
+    const auth = extractDocumentAuthMethods({
+      documentAuth: envelope.authOptions,
+      recipientAuth: recipient.authOptions,
+    });
 
-  // const fieldsWithSignerEmail = fields.map((field) => ({
-  //   ...field,
-  //   signerEmail:
-  //     envelope.Recipient.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
-  // }));
+    if (
+      recipient.role !== RecipientRole.CC &&
+      (auth.recipientAccessAuthRequired || auth.recipientActionAuthRequired) &&
+      !isRecipientEmailValidForSending(recipient)
+    ) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Recipient ${recipient.id} requires an email because they have auth requirements.`,
+      });
+    }
+  });
 
-  // const everySignerHasSignature = document?.Recipient.every(
-  //   (recipient) =>
-  //     recipient.role !== RecipientRole.SIGNER ||
-  //     fieldsWithSignerEmail.some(
-  //       (field) => field.type === 'SIGNATURE' && field.signerEmail === recipient.email,
-  //     ),
-  // );
+  // Validate that recipients who require fields (e.g., signers need signature fields) have them.
+  const recipientsWithMissingFields = getRecipientsWithMissingFields(
+    envelope.recipients,
+    envelope.fields,
+  );
 
-  // if (!everySignerHasSignature) {
-  //   throw new Error('Some signers have not been assigned a signature field.');
-  // }
+  if (recipientsWithMissingFields.length > 0) {
+    const missingRecipientDescriptions = recipientsWithMissingFields
+      .map((r) => (r.name ? `${r.name} (${r.email}, id: ${r.id})` : `${r.email} (id: ${r.id})`))
+      .join(', ');
+
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `The following recipients are missing required fields: ${missingRecipientDescriptions}. Signers must have at least one signature field.`,
+    });
+  }
 
   const allRecipientsHaveNoActionToTake = envelope.recipients.every(
     (recipient) =>
@@ -245,6 +260,28 @@ export const sendDocument = async ({
       });
     }
 
+    const expiresAt = resolveExpiresAt(envelope.documentMeta?.envelopeExpirationPeriod ?? null);
+
+    // Set expiresAt on each recipient that hasn't already signed/rejected.
+    // Exclude CC recipients since they don't sign and shouldn't be subject to expiry.
+    if (expiresAt) {
+      await tx.recipient.updateMany({
+        where: {
+          envelopeId: envelope.id,
+          signingStatus: {
+            notIn: [SigningStatus.SIGNED, SigningStatus.REJECTED],
+          },
+          role: {
+            not: RecipientRole.CC,
+          },
+        },
+        data: {
+          expiresAt,
+          expirationNotifiedAt: null,
+        },
+      });
+    }
+
     return await tx.envelope.update({
       where: {
         id: envelope.id,
@@ -314,7 +351,7 @@ const injectFormValuesIntoDocument = async (
     fileName = `${envelope.title}.pdf`;
   }
 
-  const newDocumentData = await putPdfFileServerSide({
+  const newDocumentData = await putNormalizedPdfFileServerSide({
     name: fileName,
     type: 'application/pdf',
     arrayBuffer: async () => Promise.resolve(prefilled),

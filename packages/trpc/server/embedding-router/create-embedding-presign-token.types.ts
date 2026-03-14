@@ -21,6 +21,12 @@ export const ZCreateEmbeddingPresignTokenRequestSchema = z.object({
     .optional()
     .default(60)
     .describe('Expiration time in minutes (default: 60, max: 10,080)'),
+  scope: z
+    .string()
+    .optional()
+    .describe(
+      'Resource restriction. V1 embeds only support documentId:1, templateId:2. V2 embeds only support envelopeId:envelope_123',
+    ),
 });
 
 export const ZCreateEmbeddingPresignTokenResponseSchema = z.object({

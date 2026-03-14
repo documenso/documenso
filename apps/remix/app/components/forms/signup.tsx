@@ -395,7 +395,7 @@ export const SignUpForm = ({
               size="lg"
               className="mt-6 w-full"
             >
-              <Trans>Complete</Trans>
+              <Trans>Create account</Trans>
             </Button>
           </form>
         </Form>

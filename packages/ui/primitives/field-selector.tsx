@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/react/macro';
 import { FieldType } from '@prisma/client';
 import {
   CalendarDays,
@@ -115,7 +116,7 @@ export const FieldSelector = ({
 
                 {field.type === FieldType.SIGNATURE && (
                   <div className="text-muted-foreground font-signature absolute inset-0 flex items-center justify-center text-lg">
-                    Signature
+                    <Trans>Signature</Trans>
                   </div>
                 )}
               </CardContent>

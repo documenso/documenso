@@ -22,7 +22,9 @@ export const ZRecipientSchema = RecipientSchema.pick({
   name: true,
   token: true,
   documentDeletedAt: true,
-  expired: true,
+  expired: true, // deprecated Not in use. To be removed in a future migration.
+  expiresAt: true,
+  expirationNotifiedAt: true,
   signedAt: true,
   authOptions: true,
   signingOrder: true,
@@ -49,7 +51,9 @@ export const ZRecipientLiteSchema = RecipientSchema.pick({
   name: true,
   token: true,
   documentDeletedAt: true,
-  expired: true,
+  expired: true, // !: deprecated Not in use. To be removed in a future migration.
+  expiresAt: true,
+  expirationNotifiedAt: true,
   signedAt: true,
   authOptions: true,
   signingOrder: true,
@@ -74,7 +78,9 @@ export const ZRecipientManySchema = RecipientSchema.pick({
   name: true,
   token: true,
   documentDeletedAt: true,
-  expired: true,
+  expired: true, // !: deprecated Not in use. To be removed in a future migration.
+  expiresAt: true,
+  expirationNotifiedAt: true,
   signedAt: true,
   authOptions: true,
   signingOrder: true,
@@ -110,3 +116,8 @@ export const ZEnvelopeRecipientManySchema = ZRecipientManySchema.omit({
   documentId: true,
   templateId: true,
 });
+
+export const ZRecipientEmailSchema = z.union([
+  z.literal(''),
+  z.string().trim().toLowerCase().email({ message: 'Invalid email' }).max(254),
+]);

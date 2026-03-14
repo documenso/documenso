@@ -73,7 +73,9 @@ export const PasskeyCreateDialog = ({ trigger, onSuccess, ...props }: PasskeyCre
     try {
       const passkeyRegistrationOptions = await createPasskeyRegistrationOptions();
 
-      const registrationResult = await startRegistration(passkeyRegistrationOptions);
+      const registrationResult = await startRegistration({
+        optionsJSON: passkeyRegistrationOptions,
+      });
 
       await createPasskey({
         passkeyName,

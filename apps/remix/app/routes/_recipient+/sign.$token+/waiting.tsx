@@ -78,14 +78,14 @@ export default function WaitingForTurnToSignPage({ loaderData }: Route.Component
           <Trans>Waiting for Your Turn</Trans>
         </h2>
 
-        <p className="text-muted-foreground mt-2 text-sm">
+        <p className="mt-2 text-sm text-muted-foreground">
           <Trans>
             It's currently not your turn to sign. You will receive an email with instructions once
             it's your turn to sign the document.
           </Trans>
         </p>
 
-        <p className="text-muted-foreground mt-4 text-sm">
+        <p className="mt-4 text-sm text-muted-foreground">
           <Trans>Please check your email for updates.</Trans>
         </p>
 
@@ -98,7 +98,9 @@ export default function WaitingForTurnToSignPage({ loaderData }: Route.Component
             </Button>
           ) : (
             <Button variant="link" asChild>
-              <Link to="/">Return Home</Link>
+              <Link to="/">
+                <Trans>Return Home</Trans>
+              </Link>
             </Button>
           )}
         </div>

@@ -77,12 +77,16 @@ export const resetPassword = async ({ token, password, requestMetadata }: ResetP
         ipAddress: requestMetadata?.ipAddress,
       },
     });
-
-    await jobsClient.triggerJob({
-      name: 'send.password.reset.success.email',
-      payload: {
-        userId: foundToken.userId,
-      },
-    });
   });
+
+  await jobsClient.triggerJob({
+    name: 'send.password.reset.success.email',
+    payload: {
+      userId: foundToken.userId,
+    },
+  });
+
+  return {
+    userId: foundToken.userId,
+  };
 };

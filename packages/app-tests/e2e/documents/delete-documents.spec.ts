@@ -9,6 +9,7 @@ import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
 import { checkDocumentTabCount } from '../fixtures/documents';
+import { expectToastTextToBeVisible, openDropdownMenu } from '../fixtures/generic';
 
 test.describe.configure({ mode: 'serial' });
 
@@ -83,14 +84,13 @@ test('[DOCUMENTS]: deleting a completed document should not remove it from recip
   });
 
   // Open document action menu.
-  await page
+  const documentActionBtn = page
     .locator('tr', { hasText: 'Document 1 - Completed' })
-    .getByTestId('document-table-action-btn')
-    .click();
-
-  await page.waitForTimeout(200);
+    .getByTestId('document-table-action-btn');
+  await openDropdownMenu(page, documentActionBtn);
 
   // delete document
+  await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Delete' }).click();
   await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
   await page.getByRole('button', { name: 'Delete' }).click();
@@ -128,14 +128,13 @@ test('[DOCUMENTS]: deleting a pending document should remove it from recipients'
   });
 
   // Open document action menu.
-  await page
+  const documentActionBtn = page
     .locator('tr', { hasText: 'Document 1 - Pending' })
-    .getByTestId('document-table-action-btn')
-    .click();
-
-  await page.waitForTimeout(200);
+    .getByTestId('document-table-action-btn');
+  await openDropdownMenu(page, documentActionBtn);
 
   // delete document
+  await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Delete' }).click();
   await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
   await page.getByRole('button', { name: 'Delete' }).click();
@@ -169,19 +168,17 @@ test('[DOCUMENTS]: deleting draft documents should permanently remove it', async
   });
 
   // Open document action menu.
-  await page
+  const documentActionBtn = page
     .locator('tr', { hasText: 'Document 1 - Draft' })
-    .getByTestId('document-table-action-btn')
-    .click();
+    .getByTestId('document-table-action-btn');
+  await openDropdownMenu(page, documentActionBtn);
 
-  await page.waitForTimeout(200);
-
-  // delete document
+  await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible(); // Required to reduce flakiness.
   await page.getByRole('menuitem', { name: 'Delete' }).click();
   await expect(page.getByPlaceholder("Type 'delete' to confirm")).not.toBeVisible();
   await page.getByRole('button', { name: 'Delete' }).click();
 
-  await page.waitForTimeout(2500);
+  await expectToastTextToBeVisible(page, 'Document deleted');
 
   await expect(page.getByRole('row', { name: /Document 1 - Draft/ })).not.toBeVisible();
 
@@ -203,14 +200,13 @@ test('[DOCUMENTS]: deleting pending documents should permanently remove it', asy
   });
 
   // Open document action menu.
-  await page
+  const documentActionBtn = page
     .locator('tr', { hasText: 'Document 1 - Pending' })
-    .getByTestId('document-table-action-btn')
-    .click();
-
-  await page.waitForTimeout(200);
+    .getByTestId('document-table-action-btn');
+  await openDropdownMenu(page, documentActionBtn);
 
   // Delete document.
+  await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Delete' }).click();
   await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
   await page.getByRole('button', { name: 'Delete' }).click();
@@ -239,14 +235,13 @@ test('[DOCUMENTS]: deleting completed documents as an owner should hide it from 
   });
 
   // Open document action menu.
-  await page
+  const documentActionBtn = page
     .locator('tr', { hasText: 'Document 1 - Completed' })
-    .getByTestId('document-table-action-btn')
-    .click();
-
-  await page.waitForTimeout(200);
+    .getByTestId('document-table-action-btn');
+  await openDropdownMenu(page, documentActionBtn);
 
   // Delete document.
+  await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Delete' }).click();
   await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
   await page.getByRole('button', { name: 'Delete' }).click();
@@ -292,36 +287,24 @@ test('[DOCUMENTS]: deleting documents as a recipient should only hide it for the
   });
 
   // Open document action menu.
-  await expect(async () => {
-    await page
-      .locator('tr', { hasText: 'Document 1 - Completed' })
-      .getByTestId('document-table-action-btn')
-      .click();
-
-    await page.waitForTimeout(1000);
-
-    await expect(page.getByRole('menuitem', { name: 'Hide' })).toBeVisible();
-  }).toPass();
+  const completedDocActionBtn = page
+    .locator('tr', { hasText: 'Document 1 - Completed' })
+    .getByTestId('document-table-action-btn');
+  await openDropdownMenu(page, completedDocActionBtn);
 
   // Delete document.
-  await page.getByRole('menuitem', { name: 'Hide' }).waitFor({ state: 'visible' });
+  await expect(page.getByRole('menuitem', { name: 'Hide' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Hide' }).click({ force: true });
   await page.getByRole('button', { name: 'Hide' }).click({ force: true });
   await page.waitForTimeout(2000);
 
-  await expect(async () => {
-    await page
-      .locator('tr', { hasText: 'Document 1 - Pending' })
-      .getByTestId('document-table-action-btn')
-      .click();
-
-    await page.waitForTimeout(1000);
-
-    await expect(page.getByRole('menuitem', { name: 'Hide' })).toBeVisible();
-  }).toPass();
+  const pendingDocActionBtn = page
+    .locator('tr', { hasText: 'Document 1 - Pending' })
+    .getByTestId('document-table-action-btn');
+  await openDropdownMenu(page, pendingDocActionBtn);
 
   // Delete document.
-  await page.getByRole('menuitem', { name: 'Hide' }).waitFor({ state: 'visible' });
+  await expect(page.getByRole('menuitem', { name: 'Hide' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Hide' }).click({ force: true });
   await page.getByRole('button', { name: 'Hide' }).click({ force: true });
 

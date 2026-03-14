@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { DateTime } from 'luxon';
 import type { DateTimeFormatOptions } from 'luxon';
 import { useSearchParams } from 'react-router';
@@ -19,6 +20,7 @@ import { TableCell } from '@documenso/ui/primitives/table';
 
 export type DocumentLogsTableProps = {
   documentId: number;
+  userId?: number;
 };
 
 const dateFormat: DateTimeFormatOptions = {
@@ -26,7 +28,7 @@ const dateFormat: DateTimeFormatOptions = {
   hourCycle: 'h12',
 };
 
-export const DocumentLogsTable = ({ documentId }: DocumentLogsTableProps) => {
+export const DocumentLogsTable = ({ documentId, userId }: DocumentLogsTableProps) => {
   const { _, i18n } = useLingui();
 
   const [searchParams] = useSearchParams();
@@ -87,13 +89,17 @@ export const DocumentLogsTable = ({ documentId }: DocumentLogsTableProps) => {
               )}
             </div>
           ) : (
-            <p>N/A</p>
+            <p>
+              <Trans>N/A</Trans>
+            </p>
           ),
       },
       {
         header: _(msg`Action`),
         accessorKey: 'type',
-        cell: ({ row }) => <span>{formatDocumentAuditLogAction(_, row.original).description}</span>,
+        cell: ({ row }) => (
+          <span>{formatDocumentAuditLogAction(i18n, row.original, userId).description}</span>
+        ),
       },
       {
         header: _(msg`IP Address`),

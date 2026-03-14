@@ -2,12 +2,14 @@ import { DocumentSigningOrder, DocumentVisibility, TemplateType } from '@prisma/
 import { z } from 'zod';
 import { zfd } from 'zod-form-data';
 
+import { ZEnvelopeExpirationPeriod } from '@documenso/lib/constants/envelope-expiration';
 import { ZDocumentSchema } from '@documenso/lib/types/document';
 import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
@@ -22,6 +24,7 @@ import {
 } from '@documenso/lib/types/document-meta';
 import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
 import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
+import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import {
   ZTemplateLiteSchema,
@@ -29,6 +32,7 @@ import {
   ZTemplateSchema,
 } from '@documenso/lib/types/template';
 import { LegacyTemplateDirectLinkSchema } from '@documenso/prisma/types/template-legacy-schema';
+import { ZDocumentExternalIdSchema } from '@documenso/trpc/server/document-router/schema';
 
 import { zodFormData } from '../../utils/zod-form-data';
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
@@ -96,11 +100,12 @@ export const ZCreateDocumentFromDirectTemplateRequestSchema = z.object({
 
 export const ZCreateDocumentFromTemplateRequestSchema = z.object({
   templateId: z.number(),
+  externalId: ZDocumentExternalIdSchema.optional(),
   recipients: z
     .array(
       z.object({
         id: z.number().describe('The ID of the recipient in the template.'),
-        email: z.string().email().max(254),
+        email: ZRecipientEmailSchema,
         name: z.string().max(255).optional(),
       }),
     )
@@ -156,6 +161,7 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
       uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
       drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
       allowDictateNextSigner: z.boolean().optional(),
+      envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullish(),
     })
     .describe('Override values from the template for the created document.')
     .optional(),
@@ -169,6 +175,8 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
       }),
     )
     .optional(),
+
+  formValues: ZDocumentFormValuesSchema.optional(),
 });
 
 export const ZCreateDocumentFromTemplateResponseSchema = ZDocumentSchema;

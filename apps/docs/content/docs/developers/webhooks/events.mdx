@@ -1,0 +1,679 @@
+---
+title: Webhook Events
+description: Reference for all webhook event types and payloads.
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+## Event Payload Structure
+
+All webhook events share a common structure:
+
+```json
+{
+  "event": "DOCUMENT_COMPLETED",
+  "payload": {
+    // Document data with recipients
+  },
+  "createdAt": "2024-04-22T11:52:18.277Z",
+  "webhookEndpoint": "https://your-endpoint.com/webhook"
+}
+```
+
+### Top-Level Fields
+
+| Field             | Type     | Description                                      |
+| ----------------- | -------- | ------------------------------------------------ |
+| `event`           | string   | Event type identifier (e.g., `DOCUMENT_CREATED`) |
+| `payload`         | object   | Document object with metadata and recipients     |
+| `createdAt`       | datetime | When the webhook event was created               |
+| `webhookEndpoint` | string   | The URL receiving this webhook                   |
+
+### Payload Fields
+
+| Field            | Type      | Description                                            |
+| ---------------- | --------- | ------------------------------------------------------ |
+| `id`             | number    | Document ID                                            |
+| `externalId`     | string?   | External identifier for integration                    |
+| `userId`         | number    | Owner's user ID                                        |
+| `authOptions`    | object?   | Document-level authentication options                  |
+| `formValues`     | object?   | PDF form values associated with the document           |
+| `title`          | string    | Document title                                         |
+| `status`         | string    | Current status: `DRAFT`, `PENDING`, `COMPLETED`        |
+| `documentDataId` | string    | Reference to the document's PDF data                   |
+| `visibility`     | string    | Document visibility setting                            |
+| `createdAt`      | datetime  | Document creation timestamp                            |
+| `updatedAt`      | datetime  | Last modification timestamp                            |
+| `completedAt`    | datetime? | Completion timestamp (when all recipients have signed) |
+| `deletedAt`      | datetime? | Deletion timestamp                                     |
+| `teamId`         | number?   | Team ID if document belongs to a team                  |
+| `templateId`     | number?   | Template ID if created from a template                 |
+| `source`         | string    | Source: `DOCUMENT` or `TEMPLATE`                       |
+| `documentMeta`   | object    | Document metadata (subject, message, signing options)  |
+| `Recipient`      | array     | List of recipient objects                              |
+
+### Document Metadata Fields
+
+| Field                   | Type    | Description                             |
+| ----------------------- | ------- | --------------------------------------- |
+| `id`                    | string  | Metadata record identifier              |
+| `subject`               | string? | Email subject line                      |
+| `message`               | string? | Email message body                      |
+| `timezone`              | string  | Timezone for date display               |
+| `password`              | string? | Document access password (if set)       |
+| `dateFormat`            | string  | Date format string                      |
+| `redirectUrl`           | string? | URL to redirect after signing           |
+| `signingOrder`          | string  | `PARALLEL` or `SEQUENTIAL`              |
+| `typedSignatureEnabled` | boolean | Whether typed signatures are allowed    |
+| `language`              | string  | Document language code                  |
+| `distributionMethod`    | string  | How document is distributed             |
+| `emailSettings`         | object? | Custom email settings for this document |
+
+### Recipient Fields
+
+| Field               | Type      | Description                                |
+| ------------------- | --------- | ------------------------------------------ |
+| `id`                | number    | Recipient ID                               |
+| `documentId`        | number    | Parent document ID                         |
+| `templateId`        | number?   | Template ID if created from a template     |
+| `email`             | string    | Recipient email address                    |
+| `name`              | string    | Recipient name                             |
+| `token`             | string    | Unique signing token                       |
+| `documentDeletedAt` | datetime? | When the document was deleted (if deleted) |
+| `expired`           | boolean?  | Whether the recipient's link has expired   |
+| `signedAt`          | datetime? | When recipient signed                      |
+| `authOptions`       | object?   | Per-recipient authentication options       |
+| `role`              | string    | Role: `SIGNER`, `VIEWER`, `APPROVER`, `CC` |
+| `signingOrder`      | number?   | Position in signing sequence               |
+| `readStatus`        | string    | `NOT_OPENED` or `OPENED`                   |
+| `signingStatus`     | string    | `NOT_SIGNED`, `SIGNED`, or `REJECTED`      |
+| `sendStatus`        | string    | `NOT_SENT` or `SENT`                       |
+| `rejectionReason`   | string?   | Reason if recipient rejected               |
+
+---
+
+## Document Lifecycle Events
+
+These events track the document through its lifecycle.
+
+### `document.created`
+
+Triggered when a new document is uploaded.
+
+**Event name:** `DOCUMENT_CREATED`
+
+```json
+{
+  "event": "DOCUMENT_CREATED",
+  "payload": {
+    "id": 10,
+    "externalId": null,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "contract.pdf",
+    "status": "DRAFT",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:44:43.341Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "doc_meta_123",
+      "subject": "Please sign this document",
+      "message": "Hello, please review and sign this document.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 52,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer@example.com",
+        "name": "John Doe",
+        "token": "vbT8hi3jKQmrFP_LN1WcS",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": null,
+        "authOptions": null,
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "NOT_OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "NOT_SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T11:44:44.779Z",
+  "webhookEndpoint": "https://your-endpoint.com/webhook"
+}
+```
+
+### `document.sent`
+
+Triggered when a document is sent to recipients for signing.
+
+**Event name:** `DOCUMENT_SENT`
+
+The document status changes to `PENDING` and recipients have `sendStatus: "SENT"`.
+
+```json
+{
+  "event": "DOCUMENT_SENT",
+  "payload": {
+    "id": 10,
+    "externalId": null,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "contract.pdf",
+    "status": "PENDING",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:48:07.569Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "doc_meta_123",
+      "subject": "Please sign this document",
+      "message": "Hello, please review and sign this document.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 52,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer@example.com",
+        "name": "John Doe",
+        "token": "vbT8hi3jKQmrFP_LN1WcS",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": null,
+        "authOptions": null,
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "NOT_OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T11:48:07.945Z",
+  "webhookEndpoint": "https://your-endpoint.com/webhook"
+}
+```
+
+### `document.completed`
+
+Triggered when all recipients have completed their required actions.
+
+**Event name:** `DOCUMENT_COMPLETED`
+
+The document status changes to `COMPLETED` and `completedAt` is set.
+
+```json
+{
+  "event": "DOCUMENT_COMPLETED",
+  "payload": {
+    "id": 10,
+    "externalId": null,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "contract.pdf",
+    "status": "COMPLETED",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:52:05.708Z",
+    "completedAt": "2024-04-22T11:52:05.707Z",
+    "deletedAt": null,
+    "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "doc_meta_123",
+      "subject": "Please sign this document",
+      "message": "Hello, please review and sign this document.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 50,
+        "documentId": 10,
+        "templateId": null,
+        "email": "reviewer@example.com",
+        "name": "Jane Smith",
+        "token": "vbT8hi3jKQmrFP_LN1WcS",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": "2024-04-22T11:51:10.055Z",
+        "authOptions": {
+          "accessAuth": null,
+          "actionAuth": null
+        },
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "VIEWER",
+        "readStatus": "OPENED",
+        "signingStatus": "SIGNED",
+        "sendStatus": "SENT"
+      },
+      {
+        "id": 51,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer@example.com",
+        "name": "John Doe",
+        "token": "HkrptwS42ZBXdRKj1TyUo",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": "2024-04-22T11:52:05.688Z",
+        "authOptions": {
+          "accessAuth": null,
+          "actionAuth": null
+        },
+        "signingOrder": 2,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "OPENED",
+        "signingStatus": "SIGNED",
+        "sendStatus": "SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T11:52:18.277Z",
+  "webhookEndpoint": "https://your-endpoint.com/webhook"
+}
+```
+
+### `document.rejected`
+
+Triggered when a recipient rejects the document.
+
+**Event name:** `DOCUMENT_REJECTED`
+
+The recipient's `signingStatus` changes to `REJECTED` and `rejectionReason` contains their reason.
+
+```json
+{
+  "event": "DOCUMENT_REJECTED",
+  "payload": {
+    "id": 10,
+    "externalId": null,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "contract.pdf",
+    "status": "PENDING",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:48:07.569Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "doc_meta_123",
+      "subject": "Please sign this document",
+      "message": "Hello, please review and sign this document.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 52,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer@example.com",
+        "name": "John Doe",
+        "token": "vbT8hi3jKQmrFP_LN1WcS",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": "2024-04-22T11:48:07.569Z",
+        "authOptions": {
+          "accessAuth": null,
+          "actionAuth": null
+        },
+        "signingOrder": 1,
+        "rejectionReason": "I do not agree with the terms",
+        "role": "SIGNER",
+        "readStatus": "OPENED",
+        "signingStatus": "REJECTED",
+        "sendStatus": "SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T11:48:07.945Z",
+  "webhookEndpoint": "https://your-endpoint.com/webhook"
+}
+```
+
+### `document.cancelled`
+
+Triggered when the document owner cancels a pending document.
+
+**Event name:** `DOCUMENT_CANCELLED`
+
+```json
+{
+  "event": "DOCUMENT_CANCELLED",
+  "payload": {
+    "id": 7,
+    "externalId": null,
+    "userId": 3,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "contract.pdf",
+    "status": "PENDING",
+    "documentDataId": "cm6exvn93006hi02ru90a265a",
+    "createdAt": "2025-01-27T11:02:14.393Z",
+    "updatedAt": "2025-01-27T11:03:16.387Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "cm6exvn96006ji02rqvzjvwoy",
+      "subject": "",
+      "message": "",
+      "timezone": "Etc/UTC",
+      "password": null,
+      "dateFormat": "yyyy-MM-dd hh:mm a",
+      "redirectUrl": "",
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 7,
+        "documentId": 7,
+        "templateId": null,
+        "email": "signer@example.com",
+        "name": "John Doe",
+        "token": "XkKx1HCs6Znm2UBJA2j6o",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": null,
+        "authOptions": { "accessAuth": null, "actionAuth": null },
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "NOT_OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "SENT"
+      }
+    ]
+  },
+  "createdAt": "2025-01-27T11:03:27.730Z",
+  "webhookEndpoint": "https://your-endpoint.com/webhook"
+}
+```
+
+---
+
+## Recipient Events
+
+Recipient events track individual signer actions. These events use the same payload structure as document events, but focus on a specific recipient's action.
+
+### `document.opened`
+
+Triggered when a recipient opens the document for the first time.
+
+**Event name:** `DOCUMENT_OPENED`
+
+The recipient's `readStatus` changes to `OPENED`.
+
+```json
+{
+  "event": "DOCUMENT_OPENED",
+  "payload": {
+    "id": 10,
+    "externalId": null,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "contract.pdf",
+    "status": "PENDING",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:48:07.569Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "doc_meta_123",
+      "subject": "Please sign this document",
+      "message": "Hello, please review and sign this document.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 52,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer@example.com",
+        "name": "John Doe",
+        "token": "vbT8hi3jKQmrFP_LN1WcS",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": null,
+        "authOptions": null,
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T11:50:26.174Z",
+  "webhookEndpoint": "https://your-endpoint.com/webhook"
+}
+```
+
+### `document.signed`
+
+Triggered when a recipient signs the document.
+
+**Event name:** `DOCUMENT_SIGNED`
+
+The recipient's `signingStatus` changes to `SIGNED` and `signedAt` is populated.
+
+```json
+{
+  "event": "DOCUMENT_SIGNED",
+  "payload": {
+    "id": 10,
+    "externalId": null,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "contract.pdf",
+    "status": "COMPLETED",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:52:05.708Z",
+    "completedAt": "2024-04-22T11:52:05.707Z",
+    "deletedAt": null,
+    "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "doc_meta_123",
+      "subject": "Please sign this document",
+      "message": "Hello, please review and sign this document.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 51,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer@example.com",
+        "name": "John Doe",
+        "token": "HkrptwS42ZBXdRKj1TyUo",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": "2024-04-22T11:52:05.688Z",
+        "authOptions": {
+          "accessAuth": null,
+          "actionAuth": null
+        },
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "OPENED",
+        "signingStatus": "SIGNED",
+        "sendStatus": "SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T11:52:18.577Z",
+  "webhookEndpoint": "https://your-endpoint.com/webhook"
+}
+```
+
+---
+
+## Event Summary
+
+| Event                | Trigger                         | Key Changes                                                  |
+| -------------------- | ------------------------------- | ------------------------------------------------------------ |
+| `DOCUMENT_CREATED`   | Document uploaded               | `status: "DRAFT"`                                            |
+| `DOCUMENT_SENT`      | Document sent to recipients     | `status: "PENDING"`, recipients `sendStatus: "SENT"`         |
+| `DOCUMENT_OPENED`    | Recipient opens document        | Recipient `readStatus: "OPENED"`                             |
+| `DOCUMENT_SIGNED`    | Recipient signs document        | Recipient `signingStatus: "SIGNED"`, `signedAt` set          |
+| `DOCUMENT_COMPLETED` | All recipients complete actions | `status: "COMPLETED"`, `completedAt` set                     |
+| `DOCUMENT_REJECTED`  | Recipient rejects document      | Recipient `signingStatus: "REJECTED"`, `rejectionReason` set |
+| `DOCUMENT_CANCELLED` | Owner cancels document          | Document cancelled while pending                             |
+
+---
+
+## Handling Events
+
+When processing webhook events:
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    **Verify the signature** — Check the `X-Documenso-Secret` header matches your configured secret
+  </Step>
+  <Step>
+    **Check event type** — Use the `event` field to determine the action
+  </Step>
+  <Step>
+    **Process idempotently** — Webhooks may be retried, so handle duplicate events
+  </Step>
+  <Step>
+    **Respond quickly** — Return a 200 status code within 30 seconds
+  </Step>
+</Steps>
+
+```typescript
+app.post('/webhook', (req, res) => {
+  const secret = req.headers['x-documenso-secret'];
+
+  if (secret !== process.env.WEBHOOK_SECRET) {
+    return res.status(401).send('Unauthorized');
+  }
+
+  const { event, payload } = req.body;
+
+  switch (event) {
+    case 'DOCUMENT_COMPLETED':
+      // Handle completed document
+      console.log(`Document ${payload.id} completed`);
+      break;
+    case 'DOCUMENT_SIGNED':
+      // Handle signature
+      const signer = payload.Recipient.find((r) => r.signingStatus === 'SIGNED');
+      console.log(`${signer?.name} signed document ${payload.id}`);
+      break;
+    case 'DOCUMENT_REJECTED':
+      // Handle rejection
+      const rejecter = payload.Recipient.find((r) => r.signingStatus === 'REJECTED');
+      console.log(`${rejecter?.name} rejected: ${rejecter?.rejectionReason}`);
+      break;
+  }
+
+  res.status(200).send('OK');
+});
+```
+
+---
+
+## See Also
+
+- [Webhook Setup](/docs/developers/webhooks/setup) - Configure webhook endpoints
+- [Webhook Verification](/docs/developers/webhooks/verification) - Verify webhook signatures

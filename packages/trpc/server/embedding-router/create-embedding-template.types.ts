@@ -22,6 +22,7 @@ import {
   ZFieldWidthSchema,
 } from '@documenso/lib/types/field';
 import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
+import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 
 import { ZDocumentTitleSchema } from '../document-router/schema';
 
@@ -30,7 +31,7 @@ export const ZCreateEmbeddingTemplateRequestSchema = z.object({
   documentDataId: z.string(),
   recipients: z.array(
     z.object({
-      email: z.union([z.string().length(0), z.string().email()]),
+      email: ZRecipientEmailSchema,
       name: z.string(),
       role: z.nativeEnum(RecipientRole),
       signingOrder: z.number().optional(),
@@ -38,7 +39,6 @@ export const ZCreateEmbeddingTemplateRequestSchema = z.object({
       // Search: "map<any>" to find it
       fields: ZFieldAndMetaSchema.and(
         z.object({
-          id: z.number().optional(),
           pageNumber: ZFieldPageNumberSchema,
           pageX: ZFieldPageXSchema,
           pageY: ZFieldPageYSchema,
