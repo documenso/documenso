@@ -59,20 +59,21 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
     throw new Error('Invalid token');
   }
 
-  const settings = await getTeamSettings({
-    userId: result.userId,
-    teamId: result.teamId,
-  });
-
-  const envelope = await getEditorEnvelopeById({
-    id: {
-      type: 'envelopeId',
-      id,
-    },
-    type: null,
-    userId: result.userId,
-    teamId: result.teamId,
-  }).catch(() => null);
+  const [settings, envelope] = await Promise.all([
+    getTeamSettings({
+      userId: result.userId,
+      teamId: result.teamId,
+    }),
+    getEditorEnvelopeById({
+      id: {
+        type: 'envelopeId',
+        id,
+      },
+      type: null,
+      userId: result.userId,
+      teamId: result.teamId,
+    }).catch(() => null),
+  ]);
 
   if (!envelope) {
     throw redirect(`/embed/v2/authoring/error/not-found`);
