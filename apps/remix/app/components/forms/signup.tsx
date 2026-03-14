@@ -54,9 +54,8 @@ export const ZSignUpFormSchema = z
     },
   );
 
-export const signupErrorMessages: Record<string, MessageDescriptor> = {
-  SIGNUP_DISABLED: msg`Signups are disabled.`,
-  SIGNUP_DOMAIN_NOT_ALLOWED: msg`Signups are restricted to specific email domains.`,
+export const SIGNUP_ERROR_MESSAGES: Record<string, MessageDescriptor> = {
+  SIGNUP_DISABLED: msg`Signup is currently disabled or not available for your email domain.`,
   [AppErrorCode.ALREADY_EXISTS]: msg`User with this email already exists. Please use a different email address.`,
   [AppErrorCode.INVALID_REQUEST]: msg`We were unable to create your account. Please review the information you provided and try again.`,
 };
@@ -70,7 +69,6 @@ export type SignUpFormProps = {
   isMicrosoftSSOEnabled?: boolean;
   isOIDCSSOEnabled?: boolean;
   returnTo?: string;
-  allowedSignupDomains?: string[];
 };
 
 export const SignUpForm = ({
@@ -80,7 +78,6 @@ export const SignUpForm = ({
   isMicrosoftSSOEnabled,
   isOIDCSSOEnabled,
   returnTo,
-  allowedSignupDomains = [],
 }: SignUpFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -133,7 +130,8 @@ export const SignUpForm = ({
     } catch (err) {
       const error = AppError.parseError(err);
 
-      const errorMessage = signupErrorMessages[error.code] ?? signupErrorMessages.INVALID_REQUEST;
+      const errorMessage =
+        SIGNUP_ERROR_MESSAGES[error.code] ?? SIGNUP_ERROR_MESSAGES.INVALID_REQUEST;
 
       toast({
         title: _(msg`An error occurred`),
@@ -238,15 +236,6 @@ export const SignUpForm = ({
               beautiful signing is within your grasp.
             </Trans>
           </p>
-
-          {allowedSignupDomains.length > 0 && (
-            <p className="mt-2 text-xs text-muted-foreground">
-              <Trans>
-                Sign up is restricted to:{' '}
-                <span className="font-medium">{allowedSignupDomains.join(', ')}</span>
-              </Trans>
-            </p>
-          )}
         </div>
 
         <hr className="-mx-6 my-4" />

@@ -75,7 +75,7 @@ export const getCookieDomain = () => {
  * Returns empty array if not set (meaning all domains allowed).
  */
 export const getAllowedSignupDomains = (): string[] => {
-  const domains = env('NEXT_PUBLIC_ALLOWED_SIGNUP_DOMAINS');
+  const domains = env('NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS');
 
   if (!domains) {
     return [];

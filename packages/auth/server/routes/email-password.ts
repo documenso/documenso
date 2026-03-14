@@ -148,15 +148,14 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   .post('/signup', sValidator('json', ZSignUpSchema), async (c) => {
     if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
       throw new AppError(AuthenticationErrorCode.SignupDisabled, {
-        message: 'Signups are disabled.',
+        statusCode: 400,
       });
     }
 
     const { name, email, password, signature } = c.req.valid('json');
 
     if (!isEmailDomainAllowedForSignup(email)) {
-      throw new AppError(AuthenticationErrorCode.SignupDomainNotAllowed, {
-        message: 'Signups are restricted to specific email domains.',
+      throw new AppError(AuthenticationErrorCode.SignupDisabled, {
         statusCode: 400,
       });
     }

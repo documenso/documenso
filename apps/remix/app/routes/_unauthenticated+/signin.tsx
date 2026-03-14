@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Link, redirect, useSearchParams } from 'react-router';
 
@@ -15,6 +16,7 @@ import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-vali
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 
 import { SignInForm } from '~/components/forms/signin';
+import { SIGNUP_ERROR_MESSAGES } from '~/components/forms/signup';
 import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types/signin';
@@ -58,11 +60,13 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
     returnTo,
   } = loaderData;
 
+  const { _ } = useLingui();
+
   const [searchParams] = useSearchParams();
   const [isEmbeddedRedirect, setIsEmbeddedRedirect] = useState(false);
 
   const errorParam = searchParams.get('error');
-  const isSignupDomainNotAllowed = errorParam === 'SIGNUP_DOMAIN_NOT_ALLOWED';
+  const signupError = errorParam ? SIGNUP_ERROR_MESSAGES[errorParam] : undefined;
 
   useEffect(() => {
     const hash = window.location.hash.slice(1);
@@ -75,13 +79,9 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
   return (
     <div className="w-screen max-w-lg px-4">
       <div className="z-10 rounded-xl border border-border bg-neutral-100 p-6 dark:bg-background">
-        {isSignupDomainNotAllowed && (
+        {signupError && (
           <Alert variant="destructive" className="mb-4">
-            <AlertDescription>
-              <Trans>
-                Signups are restricted to specific email domains. Your email domain is not allowed.
-              </Trans>
-            </AlertDescription>
+            <AlertDescription>{_(signupError)}</AlertDescription>
           </Alert>
         )}
 
