@@ -766,12 +766,20 @@ export const createDocumentFromTemplate = async ({
 
   // Trigger webhook outside the transaction to avoid holding the connection
   // open during network I/O.
-  await triggerWebhook({
-    event: WebhookTriggerEvents.DOCUMENT_CREATED,
-    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
-    userId,
-    teamId,
-  });
+  await Promise.allSettled([
+    triggerWebhook({
+      event: WebhookTriggerEvents.DOCUMENT_CREATED,
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
+      userId,
+      teamId,
+    }),
+    triggerWebhook({
+      event: WebhookTriggerEvents.TEMPLATE_USED,
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
+      userId,
+      teamId,
+    }),
+  ]);
 
   return envelope;
 };
