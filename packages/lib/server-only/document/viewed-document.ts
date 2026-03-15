@@ -103,13 +103,6 @@ export const viewedDocument = async ({
   });
 
   await triggerWebhook({
-    event: WebhookTriggerEvents.DOCUMENT_VIEWED,
-    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
-    userId: envelope.userId,
-    teamId: envelope.teamId,
-  });
-
-  await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_OPENED,
     data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
     userId: envelope.userId,

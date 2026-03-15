@@ -545,30 +545,6 @@ export const generateSampleWebhookPayload = (
     };
   }
 
-  if (event === WebhookTriggerEvents.DOCUMENT_VIEWED) {
-    return {
-      event,
-      payload: {
-        ...basePayload,
-        status: DocumentStatus.PENDING,
-        recipients: [
-          {
-            ...basePayload.recipients[0],
-            readStatus: ReadStatus.OPENED,
-          },
-        ],
-        Recipient: [
-          {
-            ...basePayload.recipients[0],
-            readStatus: ReadStatus.OPENED,
-          },
-        ],
-      },
-      createdAt: now.toISOString(),
-      webhookEndpoint: webhookUrl,
-    };
-  }
-
   if (event === WebhookTriggerEvents.DOCUMENT_RECIPIENT_COMPLETED) {
     return {
       event,

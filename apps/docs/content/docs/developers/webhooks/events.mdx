@@ -315,37 +315,6 @@ The recipient's `readStatus` changes to `OPENED`.
 }
 ```
 
-### `document.viewed`
-
-Triggered when a recipient views the document. Unlike `document.opened`, this event fires every time the document is viewed, not just the first time.
-
-**Event name:** `DOCUMENT_VIEWED`
-
-```json
-{
-  "event": "DOCUMENT_VIEWED",
-  "payload": {
-    "id": 10,
-    "status": "PENDING",
-    "title": "contract.pdf",
-    "source": "DOCUMENT",
-    "recipients": [
-      {
-        "id": 52,
-        "email": "signer@example.com",
-        "name": "John Doe",
-        "role": "SIGNER",
-        "readStatus": "OPENED",
-        "signingStatus": "NOT_SIGNED",
-        "sendStatus": "SENT"
-      }
-    ]
-  },
-  "createdAt": "2024-04-22T11:50:30.000Z",
-  "webhookEndpoint": "https://your-endpoint.com/webhook"
-}
-```
-
 ### `document.signed`
 
 Triggered when a recipient signs the document. This fires for each individual signature, not just when the document is fully completed.
@@ -818,7 +787,6 @@ Triggered when a document is created from a template. This event fires alongside
 | `DOCUMENT_CREATED`           | Document uploaded or created from template   | `status: "DRAFT"`                                            |
 | `DOCUMENT_SENT`              | Document sent to recipients                  | `status: "PENDING"`, recipients `sendStatus: "SENT"`         |
 | `DOCUMENT_OPENED`            | Recipient opens document for the first time  | Recipient `readStatus: "OPENED"`                             |
-| `DOCUMENT_VIEWED`            | Recipient views the document                 | Recipient `readStatus: "OPENED"`                             |
 | `DOCUMENT_SIGNED`            | Recipient signs document                     | Recipient `signingStatus: "SIGNED"`, `signedAt` set          |
 | `DOCUMENT_RECIPIENT_COMPLETED` | Recipient completes their action           | Recipient `signingStatus: "SIGNED"`, `signedAt` set          |
 | `DOCUMENT_COMPLETED`         | All recipients complete actions               | `status: "COMPLETED"`, `completedAt` set                     |
