@@ -335,6 +335,10 @@ export const updateEnvelope = async ({
           },
         },
       },
+      include: {
+        documentMeta: true,
+        recipients: true,
+      },
     });
 
     if (envelope.type === EnvelopeType.DOCUMENT) {
@@ -347,20 +351,20 @@ export const updateEnvelope = async ({
   });
 
   if (envelope.type === EnvelopeType.TEMPLATE) {
-    const envelopeWithRelations = await prisma.envelope.findUniqueOrThrow({
-      where: { id: updatedEnvelope.id },
-      include: { documentMeta: true, recipients: true },
-    });
-
-    void triggerWebhook({
+    await triggerWebhook({
       event: WebhookTriggerEvents.TEMPLATE_UPDATED,
-      data: ZWebhookDocumentSchema.parse(
-        mapEnvelopeToWebhookDocumentPayload(envelopeWithRelations),
-      ),
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(updatedEnvelope)),
       userId,
       teamId,
     });
   }
 
-  return updatedEnvelope;
+  // deconstruct to remove the recipients and documentMeta from the returned object since they aren't needed and can be large.
+  const {
+    recipients: _recipients,
+    documentMeta: _documentMeta,
+    ...finalEnvelope
+  } = updatedEnvelope;
+
+  return finalEnvelope;
 };
