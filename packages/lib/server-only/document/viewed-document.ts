@@ -55,13 +55,6 @@ export const viewedDocument = async ({
     }),
   });
 
-  await triggerWebhook({
-    event: WebhookTriggerEvents.DOCUMENT_VIEWED,
-    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
-    userId: envelope.userId,
-    teamId: envelope.teamId,
-  });
-
   // Early return if already opened.
   if (recipient.readStatus === ReadStatus.OPENED) {
     return;
@@ -107,6 +100,13 @@ export const viewedDocument = async ({
       documentMeta: true,
       recipients: true,
     },
+  });
+
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_VIEWED,
+    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
+    userId: envelope.userId,
+    teamId: envelope.teamId,
   });
 
   await triggerWebhook({
