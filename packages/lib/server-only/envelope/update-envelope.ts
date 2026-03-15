@@ -313,8 +313,8 @@ export const updateEnvelope = async ({
   //   return envelope;
   // }
 
-  return await prisma.$transaction(async (tx) => {
-    const updatedEnvelope = await tx.envelope.update({
+  const updatedEnvelope = await prisma.$transaction(async (tx) => {
+    const result = await tx.envelope.update({
       where: {
         id: envelope.id,
       },
@@ -343,22 +343,24 @@ export const updateEnvelope = async ({
       });
     }
 
-    if (envelope.type === EnvelopeType.TEMPLATE) {
-      const envelopeWithRelations = await tx.envelope.findUniqueOrThrow({
-        where: { id: updatedEnvelope.id },
-        include: { documentMeta: true, recipients: true },
-      });
-
-      void triggerWebhook({
-        event: WebhookTriggerEvents.TEMPLATE_UPDATED,
-        data: ZWebhookDocumentSchema.parse(
-          mapEnvelopeToWebhookDocumentPayload(envelopeWithRelations),
-        ),
-        userId,
-        teamId,
-      });
-    }
-
-    return updatedEnvelope;
+    return result;
   });
+
+  if (envelope.type === EnvelopeType.TEMPLATE) {
+    const envelopeWithRelations = await prisma.envelope.findUniqueOrThrow({
+      where: { id: updatedEnvelope.id },
+      include: { documentMeta: true, recipients: true },
+    });
+
+    void triggerWebhook({
+      event: WebhookTriggerEvents.TEMPLATE_UPDATED,
+      data: ZWebhookDocumentSchema.parse(
+        mapEnvelopeToWebhookDocumentPayload(envelopeWithRelations),
+      ),
+      userId,
+      teamId,
+    });
+  }
+
+  return updatedEnvelope;
 };

@@ -200,18 +200,6 @@ export const completeDocumentWithToken = async ({
         }),
       });
 
-      const envelopeForFailure = await prisma.envelope.findUniqueOrThrow({
-        where: { id: envelope.id },
-        include: { documentMeta: true, recipients: true },
-      });
-
-      await triggerWebhook({
-        event: WebhookTriggerEvents.RECIPIENT_AUTHENTICATION_FAILED,
-        data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelopeForFailure)),
-        userId: envelope.userId,
-        teamId: envelope.teamId,
-      });
-
       throw new AppError(AppErrorCode.TWO_FACTOR_AUTH_FAILED, {
         message: 'Invalid 2FA authentication',
       });

@@ -597,35 +597,6 @@ export const generateSampleWebhookPayload = (
     };
   }
 
-  if (event === WebhookTriggerEvents.DOCUMENT_DOWNLOADED) {
-    return {
-      event,
-      payload: {
-        ...basePayload,
-        status: DocumentStatus.COMPLETED,
-        completedAt: now,
-        recipients: [
-          {
-            ...basePayload.recipients[0],
-            readStatus: ReadStatus.OPENED,
-            signingStatus: SigningStatus.SIGNED,
-            signedAt: now,
-          },
-        ],
-        Recipient: [
-          {
-            ...basePayload.recipients[0],
-            readStatus: ReadStatus.OPENED,
-            signingStatus: SigningStatus.SIGNED,
-            signedAt: now,
-          },
-        ],
-      },
-      createdAt: now.toISOString(),
-      webhookEndpoint: webhookUrl,
-    };
-  }
-
   if (event === WebhookTriggerEvents.DOCUMENT_REMINDER_SENT) {
     return {
       event,
@@ -643,32 +614,6 @@ export const generateSampleWebhookPayload = (
           {
             ...basePayload.recipients[0],
             sendStatus: SendStatus.SENT,
-            signingStatus: SigningStatus.NOT_SIGNED,
-          },
-        ],
-      },
-      createdAt: now.toISOString(),
-      webhookEndpoint: webhookUrl,
-    };
-  }
-
-  if (event === WebhookTriggerEvents.RECIPIENT_AUTHENTICATION_FAILED) {
-    return {
-      event,
-      payload: {
-        ...basePayload,
-        status: DocumentStatus.PENDING,
-        recipients: [
-          {
-            ...basePayload.recipients[0],
-            readStatus: ReadStatus.NOT_OPENED,
-            signingStatus: SigningStatus.NOT_SIGNED,
-          },
-        ],
-        Recipient: [
-          {
-            ...basePayload.recipients[0],
-            readStatus: ReadStatus.NOT_OPENED,
             signingStatus: SigningStatus.NOT_SIGNED,
           },
         ],

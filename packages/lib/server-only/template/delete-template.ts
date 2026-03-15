@@ -29,6 +29,10 @@ export const deleteTemplate = async ({ id, userId, teamId }: DeleteTemplateOptio
     include: { documentMeta: true, recipients: true },
   });
 
+  const deletedTemplate = await prisma.envelope.delete({
+    where: envelopeWhereInput,
+  });
+
   await triggerWebhook({
     event: WebhookTriggerEvents.TEMPLATE_DELETED,
     data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(templateToDelete)),
@@ -36,7 +40,5 @@ export const deleteTemplate = async ({ id, userId, teamId }: DeleteTemplateOptio
     teamId,
   });
 
-  return await prisma.envelope.delete({
-    where: envelopeWhereInput,
-  });
+  return deletedTemplate;
 };
