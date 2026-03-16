@@ -100,6 +100,9 @@ export const EnvelopeEditorUploadPage = () => {
       }
     },
     onDropRejected: (fileRejections) => void onFileDropRejected(fileRejections),
+    onFileDialogCancel: () => {
+      replacingItemIdRef.current = null;
+    },
   });
 
   const { mutateAsync: createEnvelopeItems, isPending: isCreatingEnvelopeItems } =
