@@ -69,7 +69,7 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <MoreHorizontal className="text-muted-foreground h-5 w-5" />
+        <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-52" align="end" forceMount>
@@ -79,7 +79,7 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
 
         {(isOwner || isCurrentTeamDocument) && !isComplete && (
           <DropdownMenuItem asChild>
-            <Link to={`${documentsPath}/${envelope.id}/edit`}>
+            <Link prefetch="intent" to={`${documentsPath}/${envelope.id}/edit`}>
               <Edit className="mr-2 h-4 w-4" />
               <Trans>Edit</Trans>
             </Link>
@@ -102,7 +102,7 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
         />
 
         <DropdownMenuItem asChild>
-          <Link to={`${documentsPath}/${envelope.id}/logs`}>
+          <Link prefetch="intent" to={`${documentsPath}/${envelope.id}/logs`}>
             <ScrollTextIcon className="mr-2 h-4 w-4" />
             <Trans>Audit Logs</Trans>
           </Link>

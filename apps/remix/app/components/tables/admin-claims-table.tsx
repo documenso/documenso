@@ -78,7 +78,7 @@ export const AdminClaimsTable = ({ licenseFlags }: AdminClaimsTableProps) => {
         header: t`Name`,
         accessorKey: 'name',
         cell: ({ row }) => (
-          <Link to={`/admin/organisations?query=claim:${row.original.id}`}>
+          <Link prefetch="intent" to={`/admin/organisations?query=claim:${row.original.id}`}>
             {row.original.name}
           </Link>
         ),

@@ -166,7 +166,7 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
         </TooltipProvider>
 
         <Button variant="outline" asChild>
-          <Link to={`/admin/users/${envelope.userId}`}>
+          <Link prefetch="intent" to={`/admin/users/${envelope.userId}`}>
             <Trans>Go to owner</Trans>
           </Link>
         </Button>

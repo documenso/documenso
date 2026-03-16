@@ -86,7 +86,9 @@ export const AdminOrganisationsTable = ({
         header: t`Organisation`,
         accessorKey: 'name',
         cell: ({ row }) => (
-          <Link to={`/admin/organisations/${row.original.id}`}>{row.original.name}</Link>
+          <Link prefetch="intent" to={`/admin/organisations/${row.original.id}`}>
+            {row.original.name}
+          </Link>
         ),
       },
       {
@@ -98,7 +100,9 @@ export const AdminOrganisationsTable = ({
         header: t`Owner`,
         accessorKey: 'owner',
         cell: ({ row }) => (
-          <Link to={`/admin/users/${row.original.owner.id}`}>{row.original.owner.name}</Link>
+          <Link prefetch="intent" to={`/admin/users/${row.original.owner.id}`}>
+            {row.original.owner.name}
+          </Link>
         ),
       },
       {
@@ -161,14 +165,14 @@ export const AdminOrganisationsTable = ({
               </DropdownMenuLabel>
 
               <DropdownMenuItem asChild>
-                <Link to={`/admin/organisations/${row.original.id}`}>
+                <Link prefetch="intent" to={`/admin/organisations/${row.original.id}`}>
                   <SettingsIcon className="mr-2 h-4 w-4" />
                   <Trans>Manage</Trans>
                 </Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem asChild>
-                <Link to={`/admin/users/${row.original.owner.id}`}>
+                <Link prefetch="intent" to={`/admin/users/${row.original.owner.id}`}>
                   <UserIcon className="mr-2 h-4 w-4" />
                   <Trans>View owner</Trans>
                 </Link>

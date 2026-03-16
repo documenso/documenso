@@ -71,7 +71,7 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
         <>
           <PasswordForm user={user} />
 
-          <hr className="border-border/50 mt-6" />
+          <hr className="mt-6 border-border/50" />
         </>
       )}
 
@@ -145,7 +145,7 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
         </div>
 
         <Button asChild variant="outline" className="bg-background">
-          <Link to="/settings/security/passkeys">
+          <Link prefetch="intent" to="/settings/security/passkeys">
             <Trans>Manage passkeys</Trans>
           </Link>
         </Button>
@@ -166,7 +166,7 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
         </div>
 
         <Button asChild variant="outline" className="bg-background">
-          <Link to="/settings/security/activity">
+          <Link prefetch="intent" to="/settings/security/activity">
             <Trans>View activity</Trans>
           </Link>
         </Button>
@@ -187,7 +187,7 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
         </div>
 
         <Button asChild variant="outline" className="bg-background">
-          <Link to="/settings/security/sessions">
+          <Link prefetch="intent" to="/settings/security/sessions">
             <Trans>Manage sessions</Trans>
           </Link>
         </Button>
@@ -208,7 +208,7 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
         </div>
 
         <Button asChild variant="outline" className="bg-background">
-          <Link to="/settings/security/linked-accounts">
+          <Link prefetch="intent" to="/settings/security/linked-accounts">
             <Trans>Manage linked accounts</Trans>
           </Link>
         </Button>

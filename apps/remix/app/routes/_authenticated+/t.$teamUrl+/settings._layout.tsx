@@ -116,7 +116,7 @@ export default function TeamsSettingsLayout() {
         }}
         primaryButton={
           <Button asChild>
-            <Link to={`/t/${team.url}`}>
+            <Link prefetch="intent" to={`/t/${team.url}`}>
               <Trans>Go Back</Trans>
             </Link>
           </Button>
