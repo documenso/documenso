@@ -265,18 +265,6 @@ export const createEnvelope = async ({
   // for uploads from the frontend
   const timezoneToUse = meta?.timezone || settings.documentTimezone || userTimezone;
 
-  const documentMeta = await prisma.documentMeta.create({
-    data: extractDerivedDocumentMeta(settings, {
-      ...meta,
-      timezone: timezoneToUse,
-    }),
-  });
-
-  const secondaryId =
-    type === EnvelopeType.DOCUMENT
-      ? await incrementDocumentId().then((v) => v.formattedDocumentId)
-      : await incrementTemplateId().then((v) => v.formattedTemplateId);
-
   const getValidatedDelegatedOwner = async () => {
     if (
       !settings.delegateDocumentOwnership ||
@@ -311,7 +299,18 @@ export const createEnvelope = async ({
     return delegatedOwner;
   };
 
-  const delegatedOwner = await getValidatedDelegatedOwner();
+  const [documentMeta, secondaryId, delegatedOwner] = await Promise.all([
+    prisma.documentMeta.create({
+      data: extractDerivedDocumentMeta(settings, {
+        ...meta,
+        timezone: timezoneToUse,
+      }),
+    }),
+    type === EnvelopeType.DOCUMENT
+      ? incrementDocumentId().then((v) => v.formattedDocumentId)
+      : incrementTemplateId().then((v) => v.formattedTemplateId),
+    getValidatedDelegatedOwner(),
+  ]);
   const envelopeOwnerId = delegatedOwner?.id ?? userId;
 
   const createdEnvelope = await prisma.$transaction(async (tx) => {
@@ -629,6 +628,13 @@ export const createEnvelope = async ({
   if (type === EnvelopeType.DOCUMENT) {
     await triggerWebhook({
       event: WebhookTriggerEvents.DOCUMENT_CREATED,
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
+      userId,
+      teamId,
+    });
+  } else if (type === EnvelopeType.TEMPLATE) {
+    await triggerWebhook({
+      event: WebhookTriggerEvents.TEMPLATE_CREATED,
       data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
       userId,
       teamId,
