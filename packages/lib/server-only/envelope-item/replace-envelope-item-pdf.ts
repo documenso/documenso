@@ -1,4 +1,3 @@
-import { PDF } from '@libpdf/core';
 import type { Envelope } from '@prisma/client';
 
 import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
@@ -62,12 +61,8 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
     flattenForm: envelope.type !== 'TEMPLATE',
   });
 
-  // Count the pages to remove out of bound fields.
-  const pdfDoc = await PDF.load(normalized);
-  const newPageCount = pdfDoc.getPageCount();
-
   // Upload the new PDF and get a new DocumentData record.
-  const { id: newDocumentDataId } = await putPdfFileServerSide({
+  const { documentData: newDocumentData, filePageCount } = await putPdfFileServerSide({
     name: data.file.name,
     type: 'application/pdf',
     arrayBuffer: async () => Promise.resolve(normalized),
@@ -80,7 +75,7 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
         envelopeId: envelope.id,
       },
       data: {
-        documentDataId: newDocumentDataId,
+        documentDataId: newDocumentData.id,
         title: data.title,
         order: data.order,
       },
@@ -94,7 +89,7 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
         envelopeId: envelope.id,
         envelopeItemId,
         page: {
-          gt: newPageCount,
+          gt: filePageCount,
         },
       },
       select: {
