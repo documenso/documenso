@@ -43,10 +43,18 @@ export default function DocumentsFoldersPage() {
     parentId: parentId,
   });
 
-  const isFolderMatchingSearch = (folder: TFolderWithSubfolders) =>
-    folder.name.toLowerCase().includes(searchTerm.toLowerCase());
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
 
-  const formatBreadCrumbPath = (folderId: string) => {
+  const isFolderMatchingSearch = (folder: TFolderWithSubfolders) =>
+    folder.name.toLowerCase().includes(normalizedSearchTerm);
+
+  const filteredFolders = foldersData?.folders.filter(isFolderMatchingSearch) ?? [];
+  const pinnedFolders = filteredFolders.filter((folder) => folder.pinned);
+  const unpinnedFolders = filteredFolders.filter((folder) => !folder.pinned);
+  const hasFolders = (foldersData?.folders.length ?? 0) > 0;
+  const hasSearchResults = filteredFolders.length > 0;
+
+  const formatBreadcrumbPath = (folderId: string) => {
     const documentsPath = formatDocumentsPath(team.url);
 
     return `${documentsPath}/f/${folderId}`;
@@ -68,7 +76,7 @@ export default function DocumentsFoldersPage() {
             <div key={folder.id} className="flex items-center">
               <span className="px-3">/</span>
               <Link
-                to={formatBreadCrumbPath(folder.id)}
+                to={formatBreadcrumbPath(folder.id)}
                 className="flex items-center hover:text-muted-foreground/80"
               >
                 <FolderIcon className="mr-2 h-4 w-4" />
@@ -103,46 +111,10 @@ export default function DocumentsFoldersPage() {
         </div>
       ) : (
         <>
-          {foldersData?.folders?.some(
-            (folder) => folder.pinned && isFolderMatchingSearch(folder),
-          ) && (
+          {pinnedFolders.length > 0 && (
             <div className="mt-6">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {foldersData.folders
-                  .filter((folder) => folder.pinned && isFolderMatchingSearch(folder))
-                  .map((folder) => (
-                    <FolderCard
-                      key={folder.id}
-                      folder={folder}
-                      onMove={(folder) => {
-                        setFolderToMove(folder);
-                        setIsMovingFolder(true);
-                      }}
-                      onSettings={(folder) => {
-                        setFolderToSettings(folder);
-                        setIsSettingsFolderOpen(true);
-                      }}
-                      onDelete={(folder) => {
-                        setFolderToDelete(folder);
-                        setIsDeletingFolder(true);
-                      }}
-                    />
-                  ))}
-              </div>
-            </div>
-          )}
-
-          <div>
-            {searchTerm && foldersData?.folders.filter(isFolderMatchingSearch).length === 0 && (
-              <div className="mt-6 text-center text-muted-foreground">
-                <Trans>No folders found matching "{searchTerm}"</Trans>
-              </div>
-            )}
-
-            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {foldersData?.folders
-                .filter((folder) => !folder.pinned && isFolderMatchingSearch(folder))
-                .map((folder) => (
+                {pinnedFolders.map((folder) => (
                   <FolderCard
                     key={folder.id}
                     folder={folder}
@@ -160,6 +132,42 @@ export default function DocumentsFoldersPage() {
                     }}
                   />
                 ))}
+              </div>
+            </div>
+          )}
+
+          <div>
+            {searchTerm && !hasSearchResults && (
+              <div className="mt-6 text-center text-muted-foreground">
+                <Trans>No folders found matching "{searchTerm}"</Trans>
+              </div>
+            )}
+
+            {!searchTerm && !hasFolders && (
+              <div className="mt-6 text-center text-muted-foreground">
+                <Trans>No folders yet.</Trans>
+              </div>
+            )}
+
+            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {unpinnedFolders.map((folder) => (
+                <FolderCard
+                  key={folder.id}
+                  folder={folder}
+                  onMove={(folder) => {
+                    setFolderToMove(folder);
+                    setIsMovingFolder(true);
+                  }}
+                  onSettings={(folder) => {
+                    setFolderToSettings(folder);
+                    setIsSettingsFolderOpen(true);
+                  }}
+                  onDelete={(folder) => {
+                    setFolderToDelete(folder);
+                    setIsDeletingFolder(true);
+                  }}
+                />
+              ))}
             </div>
           </div>
         </>

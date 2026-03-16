@@ -197,7 +197,7 @@ test.describe('Template Field Prefill API v2', () => {
 
     // 7. Navigate to the template
     await page.goto(
-      `${WEBAPP_BASE_URL}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}`,
+      `${WEBAPP_BASE_URL}/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}`,
     );
 
     // 8. Create a document from the template with prefilled fields using v2 API
@@ -485,7 +485,7 @@ test.describe('Template Field Prefill API v2', () => {
 
     // 7. Navigate to the template
     await page.goto(
-      `${WEBAPP_BASE_URL}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}`,
+      `${WEBAPP_BASE_URL}/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}`,
     );
 
     // 8. Create a document from the template without prefilled fields using v2 API

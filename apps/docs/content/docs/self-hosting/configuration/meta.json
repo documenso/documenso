@@ -1,0 +1,12 @@
+{
+  "title": "Configuration",
+  "pages": [
+    "environment",
+    "database",
+    "email",
+    "storage",
+    "signing-certificate",
+    "telemetry",
+    "advanced"
+  ]
+}

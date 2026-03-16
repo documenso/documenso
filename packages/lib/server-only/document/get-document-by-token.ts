@@ -96,6 +96,7 @@ export const getDocumentAndSenderByToken = async ({
           title: true,
           order: true,
           envelopeId: true,
+          documentDataId: true,
           documentData: true,
         },
       },

@@ -9,7 +9,6 @@ import { DateTime } from 'luxon';
 import fs from 'node:fs';
 import path from 'node:path';
 import type { Canvas } from 'skia-canvas';
-import { FontLibrary } from 'skia-canvas';
 import { Image as SkiaImage } from 'skia-canvas';
 import { match } from 'ts-pattern';
 import { P } from 'ts-pattern';
@@ -21,6 +20,7 @@ import { RECIPIENT_ROLES_DESCRIPTION } from '../../constants/recipient-roles';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { TDocumentAuditLog } from '../../types/document-audit-logs';
 import { formatDocumentAuditLogAction } from '../../utils/document-audit-logs';
+import { ensureFontLibrary } from './helpers';
 
 export type AuditLogRecipient = {
   id: number;
@@ -30,7 +30,7 @@ export type AuditLogRecipient = {
 };
 
 type GenerateAuditLogsOptions = {
-  envelope: Envelope & {
+  envelope: Omit<Envelope, 'completedAt'> & {
     documentMeta: DocumentMeta;
   };
   envelopeItems: string[];
@@ -168,7 +168,7 @@ const renderVerticalLabelAndText = (options: RenderVerticalLabelAndTextOptions) 
 };
 
 type RenderOverviewCardOptions = {
-  envelope: Envelope & {
+  envelope: Omit<Envelope, 'completedAt'> & {
     documentMeta: DocumentMeta;
   };
   envelopeItems: string[];
@@ -575,13 +575,7 @@ export async function renderAuditLogs({
   i18n,
   hidePoweredBy,
 }: GenerateAuditLogsOptions) {
-  const fontPath = path.join(process.cwd(), 'public/fonts');
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  FontLibrary.use({
-    ['Caveat']: [path.join(fontPath, 'caveat.ttf')],
-    ['Inter']: [path.join(fontPath, 'inter-variablefont_opsz,wght.ttf')],
-  });
+  ensureFontLibrary();
 
   const minimumMargin = 10;
 

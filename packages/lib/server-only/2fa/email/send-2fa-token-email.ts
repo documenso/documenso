@@ -108,32 +108,29 @@ export const send2FATokenEmail = async ({ token, envelopeId }: Send2FATokenEmail
     renderEmailWithI18N(template, { lang: emailLanguage, branding, plainText: true }),
   ]);
 
-  await prisma.$transaction(
-    async (tx) => {
-      await mailer.sendMail({
-        to: {
-          address: recipient.email,
-          name: recipient.name,
-        },
-        from: senderEmail,
-        replyTo: replyToEmail,
-        subject,
-        html,
-        text,
-      });
-
-      await tx.documentAuditLog.create({
-        data: createDocumentAuditLogData({
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_REQUESTED,
-          envelopeId: envelope.id,
-          data: {
-            recipientEmail: recipient.email,
-            recipientName: recipient.name,
-            recipientId: recipient.id,
-          },
-        }),
-      });
+  // Send email outside any transaction to avoid holding a connection
+  // open during network I/O.
+  await mailer.sendMail({
+    to: {
+      address: recipient.email,
+      name: recipient.name,
     },
-    { timeout: 30_000 },
-  );
+    from: senderEmail,
+    replyTo: replyToEmail,
+    subject,
+    html,
+    text,
+  });
+
+  await prisma.documentAuditLog.create({
+    data: createDocumentAuditLogData({
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_REQUESTED,
+      envelopeId: envelope.id,
+      data: {
+        recipientEmail: recipient.email,
+        recipientName: recipient.name,
+        recipientId: recipient.id,
+      },
+    }),
+  });
 };
