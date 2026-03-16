@@ -5,6 +5,7 @@ import { customAlphabet } from 'nanoid';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createTeam } from '@documenso/lib/server-only/team/create-team';
+import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import { seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
@@ -80,6 +81,30 @@ const trpcQuery = async (
   }
 
   const res = await page.context().request.get(url, { headers });
+
+  return { res, json: res.ok() ? await res.json() : null };
+};
+
+const trpcMutation = async (
+  page: Page,
+  procedure: string,
+  input: Record<string, unknown>,
+  teamId?: number,
+) => {
+  const url = `${WEBAPP_BASE_URL}/api/trpc/${procedure}`;
+
+  const headers: Record<string, string> = {
+    'content-type': 'application/json',
+  };
+
+  if (teamId) {
+    headers['x-team-id'] = teamId.toString();
+  }
+
+  const res = await page.context().request.post(url, {
+    data: JSON.stringify({ json: input }),
+    headers,
+  });
 
   return { res, json: res.ok() ? await res.json() : null };
 };
@@ -386,9 +411,9 @@ test.describe('Organisation Templates - Use from different team', () => {
 
     await apiSignin({ page, email: memberB.email });
 
-    const templateId = Number(orgTemplateWithRecipients.secondaryId.replace('T-', ''));
+    const templateId = mapSecondaryIdToTemplateId(orgTemplateWithRecipients.secondaryId);
 
-    const { res } = await trpcQuery(
+    const { res } = await trpcMutation(
       page,
       'template.createDocumentFromTemplate',
       {

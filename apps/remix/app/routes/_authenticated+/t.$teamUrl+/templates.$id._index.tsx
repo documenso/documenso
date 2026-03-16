@@ -42,14 +42,19 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
 
   const team = useCurrentTeam();
 
-  // Fetch from both endpoints in parallel and coalesce.
-  const teamTemplateQuery = trpc.envelope.get.useQuery({ envelopeId: params.id });
-  const orgTemplateQuery = trpc.template.getOrganisationTemplateById.useQuery({
-    envelopeId: params.id,
-  });
+  // Try fetching as a team template first; only fall back to the org endpoint if the team
+  // query has definitively failed (i.e. this template belongs to a sibling team).
+  // We disable retries on the team query so the org fallback kicks in immediately.
+  const teamTemplateQuery = trpc.envelope.get.useQuery({ envelopeId: params.id }, { retry: false });
+  const orgTemplateQuery = trpc.template.getOrganisationTemplateById.useQuery(
+    { envelopeId: params.id },
+    { enabled: teamTemplateQuery.isError, retry: false },
+  );
 
   const envelope = teamTemplateQuery.data ?? orgTemplateQuery.data;
-  const isLoadingEnvelope = teamTemplateQuery.isLoading && orgTemplateQuery.isLoading;
+  const isLoadingEnvelope =
+    teamTemplateQuery.isLoading ||
+    (teamTemplateQuery.isError && !orgTemplateQuery.isError && !orgTemplateQuery.data);
   const isErrorEnvelope = teamTemplateQuery.isError && orgTemplateQuery.isError;
 
   if (isLoadingEnvelope) {
