@@ -1,4 +1,5 @@
 import { DocumentSource, EnvelopeType, WebhookTriggerEvents } from '@prisma/client';
+import pMap from 'p-map';
 import { omit } from 'remeda';
 
 import { prisma } from '@documenso/prisma';
@@ -136,8 +137,9 @@ export const duplicateEnvelope = async ({ id, userId, teamId }: DuplicateEnvelop
     }),
   );
 
-  await Promise.all(
-    envelope.recipients.map((recipient) =>
+  await pMap(
+    envelope.recipients,
+    (recipient) =>
       prisma.recipient.create({
         data: {
           envelopeId: duplicatedEnvelope.id,
@@ -165,7 +167,7 @@ export const duplicateEnvelope = async ({ id, userId, teamId }: DuplicateEnvelop
           },
         },
       }),
-    ),
+    { concurrency: 5 },
   );
 
   if (duplicatedEnvelope.type === EnvelopeType.DOCUMENT) {
