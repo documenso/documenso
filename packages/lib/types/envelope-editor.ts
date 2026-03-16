@@ -213,6 +213,7 @@ export const DEFAULT_EMBEDDED_EDITOR_CONFIG = {
 export const ZEmbedCreateEnvelopeAuthoringSchema = ZBaseEmbedDataSchema.extend({
   externalId: z.string().optional(),
   type: z.nativeEnum(EnvelopeType),
+  folderId: z.string().optional(),
   features: z.object({}).passthrough().optional().default(DEFAULT_EMBEDDED_EDITOR_CONFIG),
 });
 

@@ -36,6 +36,7 @@ export default function EmbedPlaygroundPage() {
   const [envelopeType, setEnvelopeType] = useState<'DOCUMENT' | 'TEMPLATE'>(
     () => (searchParams.get('envelopeType') as 'DOCUMENT' | 'TEMPLATE') || 'DOCUMENT',
   );
+  const [folderId, setFolderId] = useState(() => searchParams.get('folderId') || '');
 
   // Auto-launch if query params are present on mount
   const [iframeSrc, setIframeSrc] = useState<string | null>(null);
@@ -202,6 +203,7 @@ export default function EmbedPlaygroundPage() {
     mode: string;
     envelopeId: string;
     envelopeType: string;
+    folderId: string;
   }) => {
     const newParams = new URLSearchParams();
 
@@ -223,6 +225,10 @@ export default function EmbedPlaygroundPage() {
 
     if (params.envelopeType && params.envelopeType !== 'DOCUMENT') {
       newParams.set('envelopeType', params.envelopeType);
+    }
+
+    if (params.folderId) {
+      newParams.set('folderId', params.folderId);
     }
 
     const qs = newParams.toString();
@@ -264,6 +270,7 @@ export default function EmbedPlaygroundPage() {
     const hashData = {
       externalId: externalId || undefined,
       type: mode === 'create' ? envelopeType : undefined,
+      folderId: mode === 'create' && folderId ? folderId : undefined,
       darkModeDisabled: darkModeDisabled || undefined,
       css: rawCss || undefined,
       cssVars: Object.keys(filteredCssVars).length > 0 ? filteredCssVars : undefined,
@@ -293,7 +300,7 @@ export default function EmbedPlaygroundPage() {
     setIframeSrc(buildIframeSrc(basePath, presignToken, hash));
     setIframeKey((prev) => prev + 1);
 
-    updateQueryParams({ token: inputToken, externalId, mode, envelopeId, envelopeType });
+    updateQueryParams({ token: inputToken, externalId, mode, envelopeId, envelopeType, folderId });
   };
 
   const handleSubmit = useCallback(
@@ -307,6 +314,7 @@ export default function EmbedPlaygroundPage() {
       mode,
       envelopeId,
       envelopeType,
+      folderId,
       generalFeatures,
       settingsFeatures,
       actionsFeatures,
@@ -325,6 +333,7 @@ export default function EmbedPlaygroundPage() {
     setMode('create');
     setEnvelopeId('');
     setEnvelopeType('DOCUMENT');
+    setFolderId('');
     setIframeSrc(null);
     setMessages([]);
     setTokenError(null);
@@ -423,19 +432,34 @@ export default function EmbedPlaygroundPage() {
           </div>
 
           {mode === 'create' && (
-            <div style={{ marginBottom: '8px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold' }}>
-                Envelope Type
-              </label>
-              <select
-                value={envelopeType}
-                onChange={(e) => setEnvelopeType(e.target.value as 'DOCUMENT' | 'TEMPLATE')}
-                style={{ width: '100%', padding: '4px', fontSize: '12px' }}
-              >
-                <option value="DOCUMENT">Document</option>
-                <option value="TEMPLATE">Template</option>
-              </select>
-            </div>
+            <>
+              <div style={{ marginBottom: '8px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold' }}>
+                  Envelope Type
+                </label>
+                <select
+                  value={envelopeType}
+                  onChange={(e) => setEnvelopeType(e.target.value as 'DOCUMENT' | 'TEMPLATE')}
+                  style={{ width: '100%', padding: '4px', fontSize: '12px' }}
+                >
+                  <option value="DOCUMENT">Document</option>
+                  <option value="TEMPLATE">Template</option>
+                </select>
+              </div>
+
+              <div style={{ marginBottom: '8px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold' }}>
+                  Folder ID (optional)
+                </label>
+                <input
+                  type="text"
+                  value={folderId}
+                  onChange={(e) => setFolderId(e.target.value)}
+                  style={{ width: '100%', padding: '4px', fontSize: '12px' }}
+                  placeholder="folder cuid"
+                />
+              </div>
+            </>
           )}
 
           {mode === 'edit' && (

@@ -115,9 +115,10 @@ const EnvelopeEditor = ({ presignToken, envelopeId }) => {
 
 ### Create Component Only
 
-| Prop   | Type                           | Required | Description                                         |
-| ------ | ------------------------------ | -------- | --------------------------------------------------- |
-| `type` | `"DOCUMENT"` \| `"TEMPLATE"`  | Yes      | Whether to create a document or template envelope   |
+| Prop       | Type                           | Required | Description                                                                                                                                                      |
+| ---------- | ------------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`     | `"DOCUMENT"` \| `"TEMPLATE"`  | Yes      | Whether to create a document or template envelope                                                                                                                |
+| `folderId` | `string`                       | No       | The ID of the folder to create the envelope in. If not provided, the envelope is created in the root folder. The folder must match the envelope type and team.   |
 
 ### Update Component Only
 
