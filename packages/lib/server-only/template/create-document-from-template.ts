@@ -56,11 +56,9 @@ import {
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { buildTeamWhereQuery } from '../../utils/teams';
-import { getOrgTemplateReadWhereInput } from '../envelope/get-envelope-by-id';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
-import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
-import { getTeamSettings } from '../team/get-team-settings';
-import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
+import { getOrganisationTemplateWhereInput } from './get-organisation-template-by-id';
 
 type FinalRecipient = Pick<
   Recipient,
@@ -312,29 +310,40 @@ export const createDocumentFromTemplate = async ({
   attachments,
   formValues,
 }: CreateDocumentFromTemplateOptions) => {
-  const { envelopeWhereInput } = await getOrgTemplateReadWhereInput({
+  const templateInclude = {
+    recipients: {
+      include: {
+        fields: true,
+      },
+    },
+    envelopeItems: {
+      include: {
+        documentData: true,
+      },
+    },
+    documentMeta: true,
+  } as const;
+
+  const { envelopeWhereInput, team: callerTeam } = await getEnvelopeWhereInput({
     id,
     type: EnvelopeType.TEMPLATE,
     userId,
     teamId,
   });
 
-  const template = await prisma.envelope.findUnique({
-    where: envelopeWhereInput,
-    include: {
-      recipients: {
-        include: {
-          fields: true,
-        },
-      },
-      envelopeItems: {
-        include: {
-          documentData: true,
-        },
-      },
-      documentMeta: true,
-    },
-  });
+  const template =
+    (await prisma.envelope.findUnique({
+      where: envelopeWhereInput,
+      include: templateInclude,
+    })) ??
+    (await prisma.envelope.findFirst({
+      where: getOrganisationTemplateWhereInput({
+        id,
+        organisationId: callerTeam.organisationId,
+        teamRole: callerTeam.currentTeamRole,
+      }),
+      include: templateInclude,
+    }));
 
   if (!template) {
     throw new AppError(AppErrorCode.NOT_FOUND, {

@@ -1,5 +1,5 @@
 import { msg } from '@lingui/core/macro';
-import { Trans, useLingui } from '@lingui/react/macro';
+import { Trans } from '@lingui/react/macro';
 import { DocumentSigningOrder, SigningStatus } from '@prisma/client';
 import { ChevronLeft, LucideEdit } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
@@ -37,19 +37,20 @@ import { useCurrentTeam } from '~/providers/team';
 import type { Route } from './+types/templates.$id._index';
 
 export default function TemplatePage({ params }: Route.ComponentProps) {
-  const { t } = useLingui();
   const { user } = useSession();
   const navigate = useNavigate();
 
   const team = useCurrentTeam();
 
-  const {
-    data: envelope,
-    isLoading: isLoadingEnvelope,
-    isError: isErrorEnvelope,
-  } = trpc.envelope.get.useQuery({
+  // Fetch from both endpoints in parallel and coalesce.
+  const teamTemplateQuery = trpc.envelope.get.useQuery({ envelopeId: params.id });
+  const orgTemplateQuery = trpc.template.getOrganisationTemplateById.useQuery({
     envelopeId: params.id,
   });
+
+  const envelope = teamTemplateQuery.data ?? orgTemplateQuery.data;
+  const isLoadingEnvelope = teamTemplateQuery.isLoading && orgTemplateQuery.isLoading;
+  const isErrorEnvelope = teamTemplateQuery.isError && orgTemplateQuery.isError;
 
   if (isLoadingEnvelope) {
     return (
@@ -241,22 +242,28 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
                   <Trans>Template</Trans>
                 </h3>
 
-                <div>
-                  <TemplatesTableActionDropdown
-                    row={{
-                      ...envelope,
-                      id: mapSecondaryIdToTemplateId(envelope.secondaryId),
-                      envelopeId: envelope.id,
-                    }}
-                    teamId={team?.id}
-                    templateRootPath={templateRootPath}
-                    onDelete={async () => navigate(templateRootPath)}
-                  />
-                </div>
+                {isOwnTeamTemplate && (
+                  <div>
+                    <TemplatesTableActionDropdown
+                      row={{
+                        ...envelope,
+                        id: mapSecondaryIdToTemplateId(envelope.secondaryId),
+                        envelopeId: envelope.id,
+                      }}
+                      teamId={team?.id}
+                      templateRootPath={templateRootPath}
+                      onDelete={async () => navigate(templateRootPath)}
+                    />
+                  </div>
+                )}
               </div>
 
               <p className="mt-2 px-4 text-sm text-muted-foreground">
-                <Trans>Manage and view template</Trans>
+                {isOwnTeamTemplate ? (
+                  <Trans>Manage and view template</Trans>
+                ) : (
+                  <Trans>View organisation template</Trans>
+                )}
               </p>
 
               <div className="mt-4 border-t px-4 pt-4">
@@ -283,6 +290,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
               recipients={envelope.recipients}
               envelopeId={envelope.id}
               templateRootPath={templateRootPath}
+              readOnly={!isOwnTeamTemplate}
             />
 
             {/* Recent activity section. */}

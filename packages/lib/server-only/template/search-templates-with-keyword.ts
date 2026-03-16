@@ -1,5 +1,5 @@
 import type { Prisma } from '@prisma/client';
-import { DocumentVisibility, EnvelopeType, TeamMemberRole, TemplateType } from '@prisma/client';
+import { DocumentVisibility, EnvelopeType, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { formatTemplatesPath, getHighestTeamRoleInGroup } from '@documenso/lib/utils/teams';
@@ -54,8 +54,6 @@ export const searchTemplatesWithKeyword = async ({
     },
   ];
 
-  const orgIdToUserTeamUrl = new Map<string, string>();
-
   // Team templates the user has access to.
   if (teamIds.length > 0) {
     filters.push({
@@ -63,29 +61,6 @@ export const searchTemplatesWithKeyword = async ({
       deletedAt: null,
       ...titleOrRecipientMatch,
     });
-
-    // ORGANISATION templates from sibling teams in the same org.
-    const userTeams = await prisma.team.findMany({
-      where: { id: { in: teamIds } },
-      select: { id: true, url: true, organisationId: true },
-    });
-
-    const orgIds = [...new Set(userTeams.map((t) => t.organisationId))];
-
-    for (const t of userTeams) {
-      if (!orgIdToUserTeamUrl.has(t.organisationId)) {
-        orgIdToUserTeamUrl.set(t.organisationId, t.url);
-      }
-    }
-
-    if (orgIds.length > 0) {
-      filters.push({
-        templateType: TemplateType.ORGANISATION,
-        deletedAt: null,
-        team: { organisationId: { in: orgIds } },
-        ...titleOrRecipientMatch,
-      });
-    }
   }
 
   const envelopes = await prisma.envelope.findMany({
@@ -100,7 +75,6 @@ export const searchTemplatesWithKeyword = async ({
       title: true,
       secondaryId: true,
       visibility: true,
-      templateType: true,
       recipients: {
         select: {
           email: true,
@@ -110,7 +84,6 @@ export const searchTemplatesWithKeyword = async ({
         select: {
           id: true,
           url: true,
-          organisationId: true,
         },
       },
     },
@@ -124,11 +97,6 @@ export const searchTemplatesWithKeyword = async ({
 
   const results = envelopes
     .filter((envelope) => {
-      // ORGANISATION templates are visible to all org members.
-      if (envelope.templateType === TemplateType.ORGANISATION) {
-        return true;
-      }
-
       if (!envelope.teamId || envelope.userId === user.id) {
         return true;
       }
@@ -153,15 +121,7 @@ export const searchTemplatesWithKeyword = async ({
     .map((envelope) => {
       const legacyTemplateId = mapSecondaryIdToTemplateId(envelope.secondaryId);
 
-      const isOrgTemplateFromSiblingTeam =
-        envelope.templateType === TemplateType.ORGANISATION &&
-        !teamGroupsByTeamId.has(envelope.team.id);
-
-      const teamUrl = isOrgTemplateFromSiblingTeam
-        ? (orgIdToUserTeamUrl.get(envelope.team.organisationId) ?? envelope.team.url)
-        : envelope.team.url;
-
-      const path = `${formatTemplatesPath(teamUrl)}/${legacyTemplateId}`;
+      const path = `${formatTemplatesPath(envelope.team.url)}/${legacyTemplateId}`;
 
       return {
         title: envelope.title,

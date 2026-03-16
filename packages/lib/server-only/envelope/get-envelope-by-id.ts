@@ -1,6 +1,4 @@
-import type { Prisma } from '@prisma/client';
-import type { EnvelopeType } from '@prisma/client';
-import { TemplateType } from '@prisma/client';
+import type { EnvelopeType, Prisma } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
@@ -32,7 +30,7 @@ export type GetEnvelopeByIdOptions = {
 };
 
 export const getEnvelopeById = async ({ id, userId, teamId, type }: GetEnvelopeByIdOptions) => {
-  const { envelopeWhereInput } = await getOrgTemplateReadWhereInput({
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,
     userId,
     teamId,
@@ -196,33 +194,5 @@ export const getEnvelopeWhereInput = async ({
   return {
     envelopeWhereInput,
     team,
-  };
-};
-
-export const getOrgTemplateReadWhereInput = async ({
-  id,
-  userId,
-  teamId,
-  type,
-}: GetEnvelopeWhereInputOptions) => {
-  try {
-    return await getEnvelopeWhereInput({ id, userId, teamId, type });
-  } catch {
-    // Fall through to org-level access check.
-  }
-
-  const callerTeam = await getTeamById({ teamId, userId });
-
-  const envelopeWhereInput: Prisma.EnvelopeWhereUniqueInput = {
-    ...unsafeBuildEnvelopeIdQuery(id, type),
-    templateType: TemplateType.ORGANISATION,
-    team: {
-      organisationId: callerTeam.organisationId,
-    },
-  };
-
-  return {
-    envelopeWhereInput,
-    team: callerTeam,
   };
 };
