@@ -90,6 +90,11 @@ export const duplicateEnvelope = async ({ id, userId, teamId }: DuplicateEnvelop
     }),
   ]);
 
+  const duplicatedTemplateType =
+    envelope.templateType === 'ORGANISATION' && envelope.teamId !== teamId
+      ? 'PRIVATE'
+      : envelope.templateType ?? undefined;
+
   const duplicatedEnvelope = await prisma.envelope.create({
     data: {
       id: prefixedId('envelope'),
@@ -102,7 +107,7 @@ export const duplicateEnvelope = async ({ id, userId, teamId }: DuplicateEnvelop
       documentMetaId: createdDocumentMeta.id,
       authOptions: envelope.authOptions || undefined,
       visibility: envelope.visibility,
-      templateType: envelope.templateType ?? undefined,
+      templateType: duplicatedTemplateType,
       publicTitle: envelope.publicTitle ?? undefined,
       publicDescription: envelope.publicDescription ?? undefined,
       source:
