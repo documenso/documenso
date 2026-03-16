@@ -34,7 +34,7 @@ import {
 import { LegacyTemplateDirectLinkSchema } from '@documenso/prisma/types/template-legacy-schema';
 import { ZDocumentExternalIdSchema } from '@documenso/trpc/server/document-router/schema';
 
-import { zodFormData } from '../../utils/zod-form-data';
+import { zfdFile, zodFormData } from '../../utils/zod-form-data';
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
 
 export const MAX_TEMPLATE_PUBLIC_TITLE_LENGTH = 50;
@@ -266,7 +266,7 @@ export const ZCreateTemplatePayloadSchema = ZCreateTemplateV2RequestSchema;
 
 export const ZCreateTemplateMutationSchema = zodFormData({
   payload: zfd.json(ZCreateTemplatePayloadSchema),
-  file: zfd.file(),
+  file: zfdFile(),
 });
 
 export const ZUpdateTemplateRequestSchema = z.object({

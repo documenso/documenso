@@ -3,7 +3,7 @@ import { zfd } from 'zod-form-data';
 
 import EnvelopeItemSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
 
-import { zodFormData } from '../../utils/zod-form-data';
+import { zfdFile, zodFormData } from '../../utils/zod-form-data';
 import { ZDocumentTitleSchema } from '../document-router/schema';
 
 export const ZReplaceEnvelopeItemPdfPayloadSchema = z.object({
@@ -14,7 +14,7 @@ export const ZReplaceEnvelopeItemPdfPayloadSchema = z.object({
 
 export const ZReplaceEnvelopeItemPdfRequestSchema = zodFormData({
   payload: zfd.json(ZReplaceEnvelopeItemPdfPayloadSchema),
-  file: zfd.file(),
+  file: zfdFile(),
 });
 
 export const ZReplaceEnvelopeItemPdfResponseSchema = z.object({

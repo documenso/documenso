@@ -148,7 +148,7 @@ export const EnvelopeItemEditDialog = ({
         pageCount: pdfDoc.getPageCount(),
       });
     } catch (err) {
-      // noop
+      console.error(err);
 
       toast({
         title: t`Failed to read file`,
