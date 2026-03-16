@@ -73,7 +73,7 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
     arrayBuffer: async () => Promise.resolve(normalized),
   });
 
-  return await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     const updatedItem = await tx.envelopeItem.update({
       where: {
         id: envelopeItemId,
@@ -87,13 +87,6 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
     });
 
     // Todo: Audit log if we're updating the title or order.
-
-    // Delete the old DocumentData (now orphaned).
-    await tx.documentData.delete({
-      where: {
-        id: oldDocumentDataId,
-      },
-    });
 
     // Delete fields that reference pages beyond the new PDF's page count.
     const outOfBoundsFields = await tx.field.findMany({
@@ -142,4 +135,13 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
       deletedFieldIds,
     };
   });
+
+  // Delete the old DocumentData (now orphaned).
+  await prisma.documentData.delete({
+    where: {
+      id: oldDocumentDataId,
+    },
+  });
+
+  return result;
 };
