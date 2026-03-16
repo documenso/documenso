@@ -3,7 +3,15 @@ import { useMemo, useTransition } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { AlertTriangle, Globe2Icon, InfoIcon, Link2Icon, Loader, LockIcon } from 'lucide-react';
+import {
+  AlertTriangle,
+  Building2Icon,
+  Globe2Icon,
+  InfoIcon,
+  Link2Icon,
+  Loader,
+  LockIcon,
+} from 'lucide-react';
 import { Link } from 'react-router';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
@@ -166,25 +174,48 @@ export const TemplatesTable = ({
                       )}
                     </p>
                   </li>
+                  <li>
+                    <h2 className="mb-2 flex flex-row items-center font-semibold">
+                      <Building2Icon className="mr-2 h-5 w-5 text-orange-500 dark:text-orange-300" />
+                      <Trans>Organisation</Trans>
+                    </h2>
+
+                    <p>
+                      <Trans>
+                        Organisation templates are shared across all teams within the same
+                        organisation. Only the owning team can edit them.
+                      </Trans>
+                    </p>
+                  </li>
                 </ul>
               </TooltipContent>
             </Tooltip>
           </div>
         ),
         accessorKey: 'type',
-        cell: ({ row }) => (
-          <div className="flex flex-row items-center">
-            <TemplateType type={row.original.type} />
+        cell: ({ row }) => {
+          const isFromOtherTeam = row.original.teamId !== team?.id;
 
-            {row.original.directLink?.token && (
-              <TemplateDirectLinkBadge
-                className="ml-2"
-                token={row.original.directLink.token}
-                enabled={row.original.directLink.enabled}
-              />
-            )}
-          </div>
-        ),
+          return (
+            <div className="flex flex-row items-center">
+              <TemplateType type={row.original.type} />
+
+              {isFromOtherTeam && row.original.team?.name && (
+                <span className="ml-2 text-xs text-muted-foreground">
+                  ({row.original.team.name})
+                </span>
+              )}
+
+              {row.original.directLink?.token && (
+                <TemplateDirectLinkBadge
+                  className="ml-2"
+                  token={row.original.directLink.token}
+                  enabled={row.original.directLink.enabled}
+                />
+              )}
+            </div>
+          );
+        },
       },
       {
         header: _(msg`Actions`),

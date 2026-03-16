@@ -34,19 +34,23 @@ export const searchTemplatesWithKeyword = async ({
 
   const teamIds = [...teamGroupsByTeamId.keys()];
 
+  const titleOrRecipientMatch: Prisma.EnvelopeWhereInput = {
+    OR: [
+      { title: { contains: query, mode: 'insensitive' } },
+      {
+        recipients: {
+          some: { email: { contains: query, mode: 'insensitive' } },
+        },
+      },
+    ],
+  };
+
   const filters: Prisma.EnvelopeWhereInput[] = [
     // Templates owned by the user matching title or recipient email.
     {
       userId,
       deletedAt: null,
-      OR: [
-        { title: { contains: query, mode: 'insensitive' } },
-        {
-          recipients: {
-            some: { email: { contains: query, mode: 'insensitive' } },
-          },
-        },
-      ],
+      ...titleOrRecipientMatch,
     },
   ];
 
@@ -55,14 +59,7 @@ export const searchTemplatesWithKeyword = async ({
     filters.push({
       teamId: { in: teamIds },
       deletedAt: null,
-      OR: [
-        { title: { contains: query, mode: 'insensitive' } },
-        {
-          recipients: {
-            some: { email: { contains: query, mode: 'insensitive' } },
-          },
-        },
-      ],
+      ...titleOrRecipientMatch,
     });
   }
 
@@ -85,6 +82,7 @@ export const searchTemplatesWithKeyword = async ({
       },
       team: {
         select: {
+          id: true,
           url: true,
         },
       },
@@ -122,6 +120,7 @@ export const searchTemplatesWithKeyword = async ({
     .slice(0, limit)
     .map((envelope) => {
       const legacyTemplateId = mapSecondaryIdToTemplateId(envelope.secondaryId);
+
       const path = `${formatTemplatesPath(envelope.team.url)}/${legacyTemplateId}`;
 
       return {

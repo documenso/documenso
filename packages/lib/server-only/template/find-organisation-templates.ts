@@ -1,54 +1,45 @@
-import type { TemplateType } from '@prisma/client';
-import { EnvelopeType, type Prisma } from '@prisma/client';
+import { EnvelopeType, type Prisma, TemplateType } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import { type FindResultResponse } from '../../types/search-params';
 import { getMemberRoles } from '../team/get-member-roles';
+import { getTeamById } from '../team/get-team';
 
-export type FindTemplatesOptions = {
+export type FindOrganisationTemplatesOptions = {
   userId: number;
   teamId: number;
-  type?: TemplateType;
   page?: number;
   perPage?: number;
-  folderId?: string;
 };
 
-export const findTemplates = async ({
+export const findOrganisationTemplates = async ({
   userId,
   teamId,
-  type,
   page = 1,
   perPage = 10,
-  folderId,
-}: FindTemplatesOptions) => {
-  const { teamRole } = await getMemberRoles({
-    teamId,
-    reference: {
-      type: 'User',
-      id: userId,
-    },
-  });
+}: FindOrganisationTemplatesOptions) => {
+  const [team, { teamRole }] = await Promise.all([
+    getTeamById({ teamId, userId }),
+    getMemberRoles({
+      teamId,
+      reference: {
+        type: 'User',
+        id: userId,
+      },
+    }),
+  ]);
 
   const where: Prisma.EnvelopeWhereInput = {
     type: EnvelopeType.TEMPLATE,
-    templateType: type,
-    AND: [
-      { teamId },
-      {
-        OR: [
-          {
-            visibility: {
-              in: TEAM_DOCUMENT_VISIBILITY_MAP[teamRole],
-            },
-          },
-          { userId, teamId },
-        ],
-      },
-      folderId ? { folderId } : { folderId: null },
-    ],
+    templateType: TemplateType.ORGANISATION,
+    visibility: {
+      in: TEAM_DOCUMENT_VISIBILITY_MAP[teamRole],
+    },
+    team: {
+      organisationId: team.organisationId,
+    },
   };
 
   const templateInclude = {
