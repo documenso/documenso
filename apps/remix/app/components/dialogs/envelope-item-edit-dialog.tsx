@@ -63,8 +63,7 @@ export const EnvelopeItemEditDialog = ({
   const { t, i18n } = useLingui();
   const { toast } = useToast();
 
-  const { envelope, editorFields, setLocalEnvelope, isEmbedded, registerPendingMutation } =
-    useCurrentEnvelopeEditor();
+  const { envelope, editorFields, setLocalEnvelope, isEmbedded } = useCurrentEnvelopeEditor();
 
   const [isOpen, setIsOpen] = useState(false);
   const [replacementFile, setReplacementFile] = useState<{ file: File; pageCount: number } | null>(
@@ -193,10 +192,7 @@ export const EnvelopeItemEditDialog = ({
         formData.append('payload', JSON.stringify(payload));
         formData.append('file', file);
 
-        const replacePromise = replaceEnvelopeItemPdf(formData);
-        registerPendingMutation(replacePromise);
-
-        await replacePromise;
+        await replaceEnvelopeItemPdf(formData);
       }
 
       setIsOpen(false);
