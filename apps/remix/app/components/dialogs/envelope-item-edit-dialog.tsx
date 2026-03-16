@@ -45,17 +45,18 @@ const ZEditEnvelopeItemFormSchema = z.object({
 
 type TEditEnvelopeItemFormSchema = z.infer<typeof ZEditEnvelopeItemFormSchema>;
 
+/**
+ * Note: This should only be visible if the envelope item is editable.
+ */
 export type EnvelopeItemEditDialogProps = {
   envelopeItem: { id: string; title: string };
   allowConfigureTitle: boolean;
-  allowReplace: boolean;
   trigger: React.ReactNode;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 export const EnvelopeItemEditDialog = ({
   envelopeItem,
   allowConfigureTitle,
-  allowReplace,
   trigger,
   ...props
 }: EnvelopeItemEditDialogProps) => {
@@ -75,18 +76,6 @@ export const EnvelopeItemEditDialog = ({
     resolver: zodResolver(ZEditEnvelopeItemFormSchema),
     defaultValues: {
       title: envelopeItem.title,
-    },
-  });
-
-  const { mutateAsync: updateEnvelopeItems } = trpc.envelope.item.updateMany.useMutation({
-    onSuccess: ({ data }) => {
-      setLocalEnvelope({
-        envelopeItems: envelope.envelopeItems.map((item) => {
-          const updated = data.find((d) => d.id === item.id);
-
-          return updated ? { ...item, ...updated } : item;
-        }),
-      });
     },
   });
 
@@ -170,59 +159,44 @@ export const EnvelopeItemEditDialog = ({
   });
 
   const onSubmit = async (data: TEditEnvelopeItemFormSchema) => {
-    if (isDropping) {
+    if (isDropping || !replacementFile) {
       return;
     }
 
     try {
-      if (replacementFile) {
-        const { file, pageCount } = replacementFile;
+      const { file, pageCount } = replacementFile;
 
-        if (isEmbedded) {
-          const arrayBuffer = await file.arrayBuffer();
-          const fileData = new Uint8Array(arrayBuffer.slice(0));
+      if (isEmbedded) {
+        const arrayBuffer = await file.arrayBuffer();
+        const fileData = new Uint8Array(arrayBuffer.slice(0));
 
-          const remainingFields = envelope.fields.filter(
-            (field) => field.envelopeItemId !== envelopeItem.id || field.page <= pageCount,
-          );
+        const remainingFields = envelope.fields.filter(
+          (field) => field.envelopeItemId !== envelopeItem.id || field.page <= pageCount,
+        );
 
-          setLocalEnvelope({
-            envelopeItems: envelope.envelopeItems.map((item) =>
-              item.id === envelopeItem.id ? { ...item, title: data.title, data: fileData } : item,
-            ),
-            fields: remainingFields,
-          });
+        setLocalEnvelope({
+          envelopeItems: envelope.envelopeItems.map((item) =>
+            item.id === envelopeItem.id ? { ...item, title: data.title, data: fileData } : item,
+          ),
+          fields: remainingFields,
+        });
 
-          editorFields.resetForm(remainingFields);
-        } else {
-          const payload = {
-            envelopeId: envelope.id,
-            envelopeItemId: envelopeItem.id,
-            title: data.title,
-          } satisfies TReplaceEnvelopeItemPdfPayload;
-
-          const formData = new FormData();
-          formData.append('payload', JSON.stringify(payload));
-          formData.append('file', file);
-
-          const replacePromise = replaceEnvelopeItemPdf(formData);
-          registerPendingMutation(replacePromise);
-
-          await replacePromise;
-        }
+        editorFields.resetForm(remainingFields);
       } else {
-        if (isEmbedded) {
-          setLocalEnvelope({
-            envelopeItems: envelope.envelopeItems.map((item) =>
-              item.id === envelopeItem.id ? { ...item, title: data.title } : item,
-            ),
-          });
-        } else {
-          await updateEnvelopeItems({
-            envelopeId: envelope.id,
-            data: [{ envelopeItemId: envelopeItem.id, title: data.title }],
-          });
-        }
+        const payload = {
+          envelopeId: envelope.id,
+          envelopeItemId: envelopeItem.id,
+          title: data.title,
+        } satisfies TReplaceEnvelopeItemPdfPayload;
+
+        const formData = new FormData();
+        formData.append('payload', JSON.stringify(payload));
+        formData.append('file', file);
+
+        const replacePromise = replaceEnvelopeItemPdf(formData);
+        registerPendingMutation(replacePromise);
+
+        await replacePromise;
       }
 
       setIsOpen(false);
@@ -299,85 +273,83 @@ export const EnvelopeItemEditDialog = ({
                 )}
               />
 
-              {allowReplace && (
-                <div>
-                  <FormLabel>
-                    <Trans>Replace PDF</Trans>
-                  </FormLabel>
+              <div>
+                <FormLabel>
+                  <Trans>Replace PDF</Trans>
+                </FormLabel>
 
-                  {replacementFile ? (
-                    <div className="mt-1.5 space-y-2">
-                      <div
-                        data-testid="envelope-item-edit-selected-file"
-                        className="flex items-center justify-between rounded-md border border-border bg-muted/50 px-3 py-2"
-                      >
-                        <div className="flex min-w-0 items-center space-x-2">
-                          <FileIcon className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
-                          <div className="min-w-0">
-                            <p className="truncate text-sm font-medium">
-                              {replacementFile.file.name}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {formatFileSize(replacementFile.file.size)}
-                              {isDropping ? ' · …' : ' · '}
-                              {!isDropping && replacementFile.pageCount !== null && (
-                                <Plural
-                                  one="1 page"
-                                  other="# pages"
-                                  value={replacementFile.pageCount}
-                                />
-                              )}
-                            </p>
-                          </div>
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          data-testid="envelope-item-edit-clear-file"
-                          onClick={() => {
-                            setReplacementFile(null);
-                          }}
-                        >
-                          <XIcon className="h-4 w-4" />
-                        </Button>
-                      </div>
-
-                      {fieldsOnExcessPages.length > 0 && (
-                        <Alert variant="warning" padding="tight">
-                          <AlertTriangleIcon className="h-4 w-4" />
-                          <AlertDescription data-testid="envelope-item-edit-field-warning">
-                            <Plural
-                              one="1 field will be deleted because the new PDF has fewer pages than the current one."
-                              other="# fields will be deleted because the new PDF has fewer pages than the current one."
-                              value={fieldsOnExcessPages.length}
-                            />
-                          </AlertDescription>
-                        </Alert>
-                      )}
-                    </div>
-                  ) : (
+                {replacementFile ? (
+                  <div className="mt-1.5 space-y-2">
                     <div
-                      data-testid="envelope-item-edit-dropzone"
-                      {...getRootProps()}
-                      className={cn(
-                        'mt-1.5 flex cursor-pointer items-center justify-center rounded-md border border-dashed border-border px-4 py-4 transition-colors',
-                        isDragActive
-                          ? 'border-primary/50 bg-primary/5'
-                          : 'hover:border-muted-foreground/50 hover:bg-muted/50',
-                      )}
+                      data-testid="envelope-item-edit-selected-file"
+                      className="flex items-center justify-between rounded-md border border-border bg-muted/50 px-3 py-2"
                     >
-                      <input {...getInputProps()} />
-                      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                        <UploadIcon className="h-4 w-4" />
-                        <span>
-                          <Trans>Drop PDF here or click to select</Trans>
-                        </span>
+                      <div className="flex min-w-0 items-center space-x-2">
+                        <FileIcon className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-medium">
+                            {replacementFile.file.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatFileSize(replacementFile.file.size)}
+                            {isDropping ? ' · …' : ' · '}
+                            {!isDropping && replacementFile.pageCount !== null && (
+                              <Plural
+                                one="1 page"
+                                other="# pages"
+                                value={replacementFile.pageCount}
+                              />
+                            )}
+                          </p>
+                        </div>
                       </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        data-testid="envelope-item-edit-clear-file"
+                        onClick={() => {
+                          setReplacementFile(null);
+                        }}
+                      >
+                        <XIcon className="h-4 w-4" />
+                      </Button>
                     </div>
-                  )}
-                </div>
-              )}
+
+                    {fieldsOnExcessPages.length > 0 && (
+                      <Alert variant="warning" padding="tight">
+                        <AlertTriangleIcon className="h-4 w-4" />
+                        <AlertDescription data-testid="envelope-item-edit-field-warning">
+                          <Plural
+                            one="1 field will be deleted because the new PDF has fewer pages than the current one."
+                            other="# fields will be deleted because the new PDF has fewer pages than the current one."
+                            value={fieldsOnExcessPages.length}
+                          />
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
+                ) : (
+                  <div
+                    data-testid="envelope-item-edit-dropzone"
+                    {...getRootProps()}
+                    className={cn(
+                      'mt-1.5 flex cursor-pointer items-center justify-center rounded-md border border-dashed border-border px-4 py-4 transition-colors',
+                      isDragActive
+                        ? 'border-primary/50 bg-primary/5'
+                        : 'hover:border-muted-foreground/50 hover:bg-muted/50',
+                    )}
+                  >
+                    <input {...getInputProps()} />
+                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                      <UploadIcon className="h-4 w-4" />
+                      <span>
+                        <Trans>Drop PDF here or click to select</Trans>
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               <DialogFooter>
                 <DialogClose asChild>
@@ -389,7 +361,7 @@ export const EnvelopeItemEditDialog = ({
                 <Button
                   type="submit"
                   loading={form.formState.isSubmitting}
-                  disabled={isDropping}
+                  disabled={isDropping || !replacementFile}
                   data-testid="envelope-item-edit-update-button"
                 >
                   <Trans>Update</Trans>

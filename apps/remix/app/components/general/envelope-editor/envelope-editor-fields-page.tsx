@@ -170,8 +170,7 @@ export const EnvelopeEditorFieldsPage = () => {
           fields={editorFields.localFields}
           renderItemAction={
             editorConfig.envelopeItems !== null &&
-            (editorConfig.envelopeItems.allowConfigureTitle ||
-              editorConfig.envelopeItems.allowReplace) &&
+            editorConfig.envelopeItems.allowReplace &&
             canItemsBeModified
               ? (item) => (
                   <div className="relative flex h-5 w-5 flex-shrink-0 items-center justify-center">
@@ -184,7 +183,6 @@ export const EnvelopeEditorFieldsPage = () => {
                     <EnvelopeItemEditDialog
                       envelopeItem={item}
                       allowConfigureTitle={editorConfig.envelopeItems?.allowConfigureTitle ?? false}
-                      allowReplace={editorConfig.envelopeItems?.allowReplace ?? false}
                       trigger={
                         <span
                           className="absolute inset-0 flex cursor-pointer items-center justify-center opacity-0 transition-opacity duration-150 group-hover:opacity-100"
