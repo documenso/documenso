@@ -105,7 +105,10 @@ export const OrganisationEmailDomainsDataTable = () => {
         cell: ({ row }) => (
           <div className="flex justify-end space-x-2">
             <Button asChild variant="outline">
-              <Link to={`/o/${organisation.url}/settings/email-domains/${row.original.id}`}>
+              <Link
+                prefetch="intent"
+                to={`/o/${organisation.url}/settings/email-domains/${row.original.id}`}
+              >
                 Manage
               </Link>
             </Button>

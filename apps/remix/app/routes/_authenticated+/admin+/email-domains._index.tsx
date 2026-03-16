@@ -68,6 +68,7 @@ export default function AdminEmailDomainsPage() {
         accessorKey: 'domain',
         cell: ({ row }) => (
           <Link
+            prefetch="intent"
             to={`/admin/email-domains/${row.original.id}`}
             className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[15rem]"
           >
@@ -80,6 +81,7 @@ export default function AdminEmailDomainsPage() {
         accessorKey: 'organisation',
         cell: ({ row }) => (
           <Link
+            prefetch="intent"
             to={`/admin/organisations/${row.original.organisation.id}`}
             className="hover:underline"
           >
@@ -126,7 +128,7 @@ export default function AdminEmailDomainsPage() {
         header: _(msg`Actions`),
         cell: ({ row }) => (
           <Button asChild variant="outline" size="sm">
-            <Link to={`/admin/email-domains/${row.original.id}`}>
+            <Link prefetch="intent" to={`/admin/email-domains/${row.original.id}`}>
               <Trans>View</Trans>
             </Link>
           </Button>

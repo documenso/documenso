@@ -39,7 +39,7 @@ export const SettingsMobileNav = ({ className, ...props }: SettingsMobileNavProp
       className={cn('flex flex-wrap items-center justify-start gap-x-2 gap-y-4', className)}
       {...props}
     >
-      <Link to="/settings/profile">
+      <Link prefetch="intent" to="/settings/profile">
         <Button
           variant="ghost"
           className={cn(
@@ -54,7 +54,7 @@ export const SettingsMobileNav = ({ className, ...props }: SettingsMobileNavProp
 
       {isPersonalLayoutMode && (
         <>
-          <Link to="/settings/document">
+          <Link prefetch="intent" to="/settings/document">
             <Button
               variant="ghost"
               className={cn(
@@ -67,7 +67,7 @@ export const SettingsMobileNav = ({ className, ...props }: SettingsMobileNavProp
             </Button>
           </Link>
 
-          <Link to="/settings/branding">
+          <Link prefetch="intent" to="/settings/branding">
             <Button
               variant="ghost"
               className={cn(
@@ -80,7 +80,7 @@ export const SettingsMobileNav = ({ className, ...props }: SettingsMobileNavProp
             </Button>
           </Link>
 
-          <Link to="/settings/email">
+          <Link prefetch="intent" to="/settings/email">
             <Button
               variant="ghost"
               className={cn(
@@ -93,7 +93,7 @@ export const SettingsMobileNav = ({ className, ...props }: SettingsMobileNavProp
             </Button>
           </Link>
 
-          <Link to="/settings/public-profile">
+          <Link prefetch="intent" to="/settings/public-profile">
             <Button
               variant="ghost"
               className={cn(
@@ -106,7 +106,7 @@ export const SettingsMobileNav = ({ className, ...props }: SettingsMobileNavProp
             </Button>
           </Link>
 
-          <Link to="/settings/tokens">
+          <Link prefetch="intent" to="/settings/tokens">
             <Button
               variant="ghost"
               className={cn(
@@ -119,7 +119,7 @@ export const SettingsMobileNav = ({ className, ...props }: SettingsMobileNavProp
             </Button>
           </Link>
 
-          <Link to="/settings/webhooks">
+          <Link prefetch="intent" to="/settings/webhooks">
             <Button
               variant="ghost"
               className={cn(
@@ -134,7 +134,7 @@ export const SettingsMobileNav = ({ className, ...props }: SettingsMobileNavProp
         </>
       )}
 
-      <Link to="/settings/organisations">
+      <Link prefetch="intent" to="/settings/organisations">
         <Button
           variant="ghost"
           className={cn(
@@ -148,7 +148,10 @@ export const SettingsMobileNav = ({ className, ...props }: SettingsMobileNavProp
       </Link>
 
       {IS_BILLING_ENABLED() && hasManageableBillingOrgs && (
-        <Link to={isPersonalLayoutMode ? '/settings/billing-personal' : `/settings/billing`}>
+        <Link
+          prefetch="intent"
+          to={isPersonalLayoutMode ? '/settings/billing-personal' : `/settings/billing`}
+        >
           <Button
             variant="ghost"
             className={cn(
@@ -162,7 +165,7 @@ export const SettingsMobileNav = ({ className, ...props }: SettingsMobileNavProp
         </Link>
       )}
 
-      <Link to="/settings/security">
+      <Link prefetch="intent" to="/settings/security">
         <Button
           variant="ghost"
           className={cn(

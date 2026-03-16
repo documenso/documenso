@@ -106,7 +106,9 @@ export default function OrganisationGroupSettingsPage({
         header: t`Member`,
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
-            <Link to={`/admin/users/${row.original.user.id}`}>{row.original.user.name}</Link>
+            <Link prefetch="intent" to={`/admin/users/${row.original.user.id}`}>
+              {row.original.user.name}
+            </Link>
             {row.original.user.id === organisation?.ownerUserId && (
               <Badge>
                 <Trans>Owner</Trans>
@@ -118,7 +120,9 @@ export default function OrganisationGroupSettingsPage({
       {
         header: t`Email`,
         cell: ({ row }) => (
-          <Link to={`/admin/users/${row.original.user.id}`}>{row.original.user.email}</Link>
+          <Link prefetch="intent" to={`/admin/users/${row.original.user.id}`}>
+            {row.original.user.email}
+          </Link>
         ),
       },
       {
@@ -166,7 +170,7 @@ export default function OrganisationGroupSettingsPage({
         }}
         primaryButton={
           <Button asChild>
-            <Link to={`/admin/organisations`}>
+            <Link prefetch="intent" to={`/admin/organisations`}>
               <Trans>Go back</Trans>
             </Link>
           </Button>
@@ -183,7 +187,7 @@ export default function OrganisationGroupSettingsPage({
         subtitle={t`Manage the ${organisation.name} organisation`}
       >
         <Button variant="outline" asChild>
-          <Link to={`/admin/organisation-insights/${organisationId}`}>
+          <Link prefetch="intent" to={`/admin/organisation-insights/${organisationId}`}>
             <Trans>View insights</Trans>
           </Link>
         </Button>

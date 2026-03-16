@@ -64,7 +64,7 @@ export const OrganisationTeamsTable = () => {
               avatarClass="h-12 w-12"
               avatarFallback={row.original.name.slice(0, 1).toUpperCase()}
               primaryText={
-                <span className="text-foreground/80 font-semibold">{row.original.name}</span>
+                <span className="font-semibold text-foreground/80">{row.original.name}</span>
               }
               secondaryText={`${NEXT_PUBLIC_WEBAPP_URL()}/t/${row.original.url}`}
             />
@@ -81,7 +81,7 @@ export const OrganisationTeamsTable = () => {
         cell: ({ row }) => (
           <div className="flex justify-end space-x-2">
             <Button variant="outline" asChild>
-              <Link to={`/t/${row.original.url}/settings`}>
+              <Link prefetch="intent" to={`/t/${row.original.url}/settings`}>
                 <Trans>Manage</Trans>
               </Link>
             </Button>

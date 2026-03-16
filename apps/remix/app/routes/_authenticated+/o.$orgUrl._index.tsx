@@ -120,7 +120,7 @@ export default function OrganisationSettingsTeamsPage() {
         </div>
 
         <Button asChild>
-          <Link to={`/o/${organisation.url}/settings`}>
+          <Link prefetch="intent" to={`/o/${organisation.url}/settings`}>
             <Trans>Manage Organisation</Trans>
           </Link>
         </Button>
@@ -128,7 +128,7 @@ export default function OrganisationSettingsTeamsPage() {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {organisation.teams.map((team) => (
-          <Link to={`/t/${team.url}`} key={team.id}>
+          <Link prefetch="intent" to={`/t/${team.url}`} key={team.id}>
             <Card className="h-full border border-border transition-all hover:bg-muted/50">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
@@ -187,19 +187,19 @@ const TeamDropdownMenu = ({ team }: { team: TGetOrganisationSessionResponse[0]['
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
         <DropdownMenuItem asChild>
-          <Link to={`/t/${team.url}`}>
+          <Link prefetch="intent" to={`/t/${team.url}`}>
             <ArrowRight className="mr-2 h-4 w-4" />
             <Trans>Go to team</Trans>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link to={`/t/${team.url}/settings`}>
+          <Link prefetch="intent" to={`/t/${team.url}/settings`}>
             <SettingsIcon className="mr-2 h-4 w-4" />
             <Trans>Settings</Trans>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link to={`/t/${team.url}/settings/members`}>
+          <Link prefetch="intent" to={`/t/${team.url}/settings/members`}>
             <UsersIcon className="mr-2 h-4 w-4" />
             <Trans>Members</Trans>
           </Link>

@@ -56,14 +56,14 @@ export const TemplatesTableActionDropdown = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger data-testid="template-table-action-btn">
-        <MoreHorizontal className="text-muted-foreground h-5 w-5" />
+        <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-52" align="start" forceMount>
         <DropdownMenuLabel>Action</DropdownMenuLabel>
 
         <DropdownMenuItem disabled={!isOwner && !isTeamTemplate} asChild>
-          <Link to={formatPath}>
+          <Link prefetch="intent" to={formatPath}>
             <Edit className="mr-2 h-4 w-4" />
             <Trans>Edit</Trans>
           </Link>
@@ -84,7 +84,7 @@ export const TemplatesTableActionDropdown = ({
           trigger={
             <div
               data-testid="template-direct-link"
-              className="hover:bg-accent hover:text-accent-foreground relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors"
+              className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground"
             >
               <Share2Icon className="mr-2 h-4 w-4" />
               <Trans>Direct link</Trans>
@@ -101,7 +101,7 @@ export const TemplatesTableActionDropdown = ({
           templateId={row.id}
           recipients={row.recipients}
           trigger={
-            <div className="hover:bg-accent hover:text-accent-foreground relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors">
+            <div className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground">
               <Upload className="mr-2 h-4 w-4" />
               <Trans>Bulk Send via CSV</Trans>
             </div>

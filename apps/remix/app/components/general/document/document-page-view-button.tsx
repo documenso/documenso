@@ -64,7 +64,7 @@ export const DocumentPageViewButton = ({ envelope }: DocumentPageViewButtonProps
     ))
     .with({ isComplete: false }, () => (
       <Button className="w-full" asChild>
-        <Link to={formatPath}>
+        <Link prefetch="intent" to={formatPath}>
           <Trans>Edit</Trans>
         </Link>
       </Button>
