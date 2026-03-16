@@ -80,9 +80,9 @@ export const EnvelopeEditorUploadPage = () => {
       })),
   );
 
-  const [replacingItemId, setReplacingItemId] = useState<string | null>(null);
+  const replacingItemIdRef = useRef<string | null>(null);
 
-  const { open: openReplaceFilePicker } = useDropzone({
+  const { open: openReplaceFilePicker, getInputProps: getReplaceInputProps } = useDropzone({
     accept: { 'application/pdf': ['.pdf'] },
     maxFiles: 1,
     maxSize: megabytesToBytes(APP_DOCUMENT_UPLOAD_SIZE_LIMIT),
@@ -92,10 +92,11 @@ export const EnvelopeEditorUploadPage = () => {
     noDrag: true,
     onDrop: (acceptedFiles) => {
       const file = acceptedFiles[0];
+      const replacingItemId = replacingItemIdRef.current;
 
       if (file && replacingItemId) {
         void onReplacePdf(replacingItemId, file);
-        setReplacingItemId(null);
+        replacingItemIdRef.current = null;
       }
     },
     onDropRejected: (fileRejections) => void onFileDropRejected(fileRejections),
@@ -470,6 +471,7 @@ export const EnvelopeEditorUploadPage = () => {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-8">
+      <input {...getReplaceInputProps()} />
       <Card backdropBlur={false} className="border">
         <CardHeader className="pb-3">
           <CardTitle>
@@ -568,6 +570,12 @@ export const EnvelopeEditorUploadPage = () => {
                               </div>
                             </div>
                             <div className="flex items-center space-x-2">
+                              {localFile.isUploading && (
+                                <div className="flex h-6 w-10 items-center justify-center">
+                                  <Loader2Icon className="h-4 w-4 animate-spin text-muted-foreground" />
+                                </div>
+                              )}
+
                               {localFile.isError && (
                                 <div className="flex h-6 w-10 items-center justify-center">
                                   <FileWarningIcon className="h-4 w-4 text-destructive" />
@@ -583,7 +591,7 @@ export const EnvelopeEditorUploadPage = () => {
                                     data-testid={`envelope-item-replace-button-${localFile.id}`}
                                     disabled={localFile.isReplacing || localFile.isUploading}
                                     onClick={() => {
-                                      setReplacingItemId(localFile.envelopeItemId);
+                                      replacingItemIdRef.current = localFile.envelopeItemId;
                                       openReplaceFilePicker();
                                     }}
                                   >
