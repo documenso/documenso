@@ -88,11 +88,8 @@ export default function TemplatesPage() {
 
   const activeQuery = isOrgView ? orgTemplatesQuery : teamTemplatesQuery;
 
-  const isTemplateView = (value: string): value is TemplateView =>
-    (TEMPLATE_VIEWS satisfies readonly string[]).includes(value);
-
   const handleViewChange = (newView: string) => {
-    if (!isTemplateView(newView)) {
+    if (newView !== 'team' && newView !== 'organisation') {
       return;
     }
 
