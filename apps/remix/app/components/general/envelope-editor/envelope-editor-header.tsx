@@ -102,8 +102,8 @@ export default function EnvelopeEditorHeader() {
                   </Badge>
                 )}
                 {envelope.templateType === TemplateType.ORGANISATION && (
-                  <Badge variant="secondary">
-                    <Building2Icon className="mr-2 h-4 w-4 text-orange-500 dark:text-orange-300" />
+                  <Badge variant="orange">
+                    <Building2Icon className="mr-2 size-4" />
                     <Trans>Organisation Template</Trans>
                   </Badge>
                 )}

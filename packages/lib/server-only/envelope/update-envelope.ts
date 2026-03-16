@@ -1,5 +1,5 @@
-import type { DocumentMeta, DocumentVisibility, Prisma } from '@prisma/client';
-import { DocumentStatus, EnvelopeType, FolderType, TemplateType, WebhookTriggerEvents } from '@prisma/client';
+import type { DocumentMeta, DocumentVisibility, Prisma, TemplateType } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, FolderType, WebhookTriggerEvents } from '@prisma/client';
 import { isDeepEqual } from 'remeda';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -86,19 +86,6 @@ export const updateEnvelope = async ({
     throw new AppError(AppErrorCode.INVALID_BODY, {
       message: 'You cannot update the template fields for document type envelopes',
     });
-  }
-
-  if (data.templateType === TemplateType.ORGANISATION) {
-    const teamCount = await prisma.team.count({
-      where: { organisationId: envelope.team.organisationId },
-    });
-
-    if (teamCount < 2) {
-      throw new AppError(AppErrorCode.INVALID_BODY, {
-        message: 'Organisation templates require at least 2 teams in the organisation',
-        userMessage: 'Organisation templates require at least 2 teams in the organisation',
-      });
-    }
   }
 
   // If no data just return the document since this function is normally chained after a meta update.

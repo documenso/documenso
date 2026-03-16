@@ -342,7 +342,6 @@ export const AddTemplateSettingsFormPartial = ({
 
                   <FormControl>
                     <TemplateTypeSelect
-                      organisationTeamCount={organisation.teams.length}
                       {...field}
                       onValueChange={(value) => {
                         field.onChange(value);

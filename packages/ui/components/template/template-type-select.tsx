@@ -16,12 +16,10 @@ import {
 } from '@documenso/ui/primitives/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
-export type TemplateTypeSelectProps = SelectProps & {
-  organisationTeamCount: number;
-};
+export type TemplateTypeSelectProps = SelectProps;
 
 export const TemplateTypeSelect = forwardRef<HTMLButtonElement, TemplateTypeSelectProps>(
-  ({ organisationTeamCount, ...props }, ref) => {
+  ({ ...props }, ref) => {
     useLingui();
 
     return (
@@ -33,9 +31,7 @@ export const TemplateTypeSelect = forwardRef<HTMLButtonElement, TemplateTypeSele
         <SelectContent>
           <SelectItem value={TemplateType.PRIVATE}>{t`Private`}</SelectItem>
           <SelectItem value={TemplateType.PUBLIC}>{t`Public`}</SelectItem>
-          {(organisationTeamCount >= 2 || props.value === TemplateType.ORGANISATION) && (
-            <SelectItem value={TemplateType.ORGANISATION}>{t`Organisation`}</SelectItem>
-          )}
+          <SelectItem value={TemplateType.ORGANISATION}>{t`Organisation`}</SelectItem>
         </SelectContent>
       </Select>
     );

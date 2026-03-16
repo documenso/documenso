@@ -331,19 +331,22 @@ export const createDocumentFromTemplate = async ({
     teamId,
   });
 
-  const template =
-    (await prisma.envelope.findUnique({
+  const [teamTemplate, organisationTemplate] = await Promise.all([
+    prisma.envelope.findFirst({
       where: envelopeWhereInput,
       include: templateInclude,
-    })) ??
-    (await prisma.envelope.findFirst({
+    }),
+    prisma.envelope.findFirst({
       where: getOrganisationTemplateWhereInput({
         id,
         organisationId: callerTeam.organisationId,
         teamRole: callerTeam.currentTeamRole,
       }),
       include: templateInclude,
-    }));
+    }),
+  ]);
+
+  const template = teamTemplate ?? organisationTemplate;
 
   if (!template) {
     throw new AppError(AppErrorCode.NOT_FOUND, {

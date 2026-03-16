@@ -629,7 +629,6 @@ export const EnvelopeEditorSettingsDialog = ({
 
                               <FormControl>
                                 <TemplateTypeSelect
-                                  organisationTeamCount={organisation.teams.length}
                                   value={field.value}
                                   disabled={field.disabled}
                                   onValueChange={field.onChange}
