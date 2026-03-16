@@ -5,13 +5,13 @@ import { z } from 'zod';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
-import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import type { DocumentDataVersion } from '@documenso/lib/types/document';
 import { sha256 } from '@documenso/lib/universal/crypto';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { prisma } from '@documenso/prisma';
 
 import type { HonoEnv } from '../../../router';
+import { checkEnvelopeFileAccess } from '../files.helpers';
 
 const route = new Hono<HonoEnv>();
 
@@ -67,7 +67,9 @@ route.get(
         envelope: {
           select: {
             id: true,
+            type: true,
             teamId: true,
+            templateType: true,
           },
         },
       },
@@ -78,12 +80,14 @@ route.get(
     }
 
     // Check whether the user has access to the document.
-    const team = await getTeamById({
+    const hasAccess = await checkEnvelopeFileAccess({
       userId,
       teamId: envelopeItem.envelope.teamId,
-    }).catch(() => null);
+      envelopeType: envelopeItem.envelope.type,
+      templateType: envelopeItem.envelope.templateType,
+    });
 
-    if (!team) {
+    if (!hasAccess) {
       return c.json({ error: 'Not found' }, 404);
     }
 

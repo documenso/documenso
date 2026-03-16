@@ -954,6 +954,7 @@ model TeamEmailVerification {
 enum TemplateType {
   PUBLIC
   PRIVATE
+  ORGANISATION
 }
 
 model TemplateDirectLink {

@@ -146,6 +146,7 @@ export const ZTemplateManySchema = TemplateSchema.pick({
   team: TeamSchema.pick({
     id: true,
     url: true,
+    name: true,
   }).nullable(),
   fields: ZFieldSchema.array(),
   recipients: ZRecipientLiteSchema.array(),

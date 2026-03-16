@@ -22,6 +22,7 @@ import {
   ZDocumentMetaTypedSignatureEnabledSchema,
   ZDocumentMetaUploadSignatureEnabledSchema,
 } from '@documenso/lib/types/document-meta';
+import { ZEnvelopeSchema } from '@documenso/lib/types/envelope';
 import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
 import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
 import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
@@ -295,6 +296,8 @@ export const ZFindTemplatesRequestSchema = ZFindSearchParamsSchema.extend({
   folderId: z.string().describe('The ID of the folder to filter templates by.').optional(),
 });
 
+export const ZFindOrganisationTemplatesRequestSchema = ZFindSearchParamsSchema;
+
 export const ZFindTemplatesResponseSchema = ZFindResultResponse.extend({
   data: ZTemplateManySchema.array(),
 });
@@ -307,6 +310,12 @@ export const ZGetTemplateByIdRequestSchema = z.object({
 });
 
 export const ZGetTemplateByIdResponseSchema = ZTemplateSchema;
+
+export const ZGetOrganisationTemplateByIdRequestSchema = z.object({
+  envelopeId: z.string(),
+});
+
+export const ZGetOrganisationTemplateByIdResponseSchema = ZEnvelopeSchema;
 
 export const ZBulkSendTemplateMutationSchema = z.object({
   templateId: z.number(),

@@ -53,6 +53,7 @@
     "lucide-react": "^0.554.0",
     "luxon": "^3.7.2",
     "nanoid": "^5.1.6",
+    "nuqs": "^2.8.9",
     "papaparse": "^5.5.3",
     "posthog-js": "^1.297.2",
     "posthog-node": "4.18.0",
