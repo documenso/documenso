@@ -59,6 +59,8 @@ export default defineConfig({
       'playwright-core',
       '@playwright/browser-chromium',
       'pdfjs-dist',
+      '@google-cloud/kms',
+      '@google-cloud/secret-manager',
     ],
   },
   optimizeDeps: {

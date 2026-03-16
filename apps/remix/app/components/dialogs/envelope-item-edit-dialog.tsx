@@ -137,15 +137,26 @@ export const EnvelopeItemEditDialog = ({
 
     setIsDropping(true);
 
-    const arrayBuffer = await file.arrayBuffer();
-    const fileData = new Uint8Array(arrayBuffer.slice(0));
-    const { PDF } = await import('@libpdf/core');
-    const pdfDoc = await PDF.load(fileData);
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const fileData = new Uint8Array(arrayBuffer.slice(0));
+      const { PDF } = await import('@libpdf/core');
+      const pdfDoc = await PDF.load(fileData);
 
-    setReplacementFile({
-      file,
-      pageCount: pdfDoc.getPageCount(),
-    });
+      setReplacementFile({
+        file,
+        pageCount: pdfDoc.getPageCount(),
+      });
+    } catch (err) {
+      // noop
+
+      toast({
+        title: t`Failed to read file`,
+        description: t`The file is not a valid PDF.`,
+        variant: 'destructive',
+      });
+    }
+
     setIsDropping(false);
   };
 
@@ -336,11 +347,11 @@ export const EnvelopeItemEditDialog = ({
                         <Alert variant="warning" padding="tight">
                           <AlertTriangleIcon className="h-4 w-4" />
                           <AlertDescription data-testid="envelope-item-edit-field-warning">
-                            <Trans>
-                              {fieldsOnExcessPages.length}{' '}
-                              {fieldsOnExcessPages.length === 1 ? 'field' : 'fields'} will be
-                              deleted because the new PDF has fewer pages than the current one.
-                            </Trans>
+                            <Plural
+                              one="1 field will be deleted because the new PDF has fewer pages than the current one."
+                              other="# fields will be deleted because the new PDF has fewer pages than the current one."
+                              value={fieldsOnExcessPages.length}
+                            />
                           </AlertDescription>
                         </Alert>
                       )}

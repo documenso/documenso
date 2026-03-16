@@ -79,8 +79,11 @@ const replaceEnvelopeItemPdf = async (root: Page, index: number, file: TestFileP
 
   await fileChooser.setFiles(file);
 
-  // Wait for the replace to finish (button becomes visible again).
-  await expect(replaceButton).toBeVisible({ timeout: 15000 });
+  // The button stays in the DOM but becomes disabled while the replace
+  // mutation is in flight, then re-enables once the mutation completes.
+  // Wait for both transitions to guarantee the replace has fully finished.
+  await expect(replaceButton).toBeDisabled({ timeout: 15000 });
+  await expect(replaceButton).toBeEnabled({ timeout: 15000 });
 };
 
 const assertPdfPageCount = async (root: Page, expectedCount: number) => {

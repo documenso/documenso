@@ -6,14 +6,16 @@ import { msg, plural } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentStatus } from '@prisma/client';
 import { FileWarningIcon, GripVerticalIcon, Loader2Icon, PencilIcon, XIcon } from 'lucide-react';
-import { ErrorCode as DropzoneErrorCode, type FileRejection } from 'react-dropzone';
+import { ErrorCode as DropzoneErrorCode, type FileRejection, useDropzone } from 'react-dropzone';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useEnvelopeAutosave } from '@documenso/lib/client-only/hooks/use-envelope-autosave';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
 import { nanoid } from '@documenso/lib/universal/id';
+import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 import { PRESIGNED_ENVELOPE_ITEM_ID_PREFIX } from '@documenso/lib/utils/embed-config';
 import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
 import { trpc } from '@documenso/trpc/react';
@@ -78,8 +80,26 @@ export const EnvelopeEditorUploadPage = () => {
       })),
   );
 
-  const replaceFileInputRef = useRef<HTMLInputElement>(null);
   const [replacingItemId, setReplacingItemId] = useState<string | null>(null);
+
+  const { open: openReplaceFilePicker } = useDropzone({
+    accept: { 'application/pdf': ['.pdf'] },
+    maxFiles: 1,
+    maxSize: megabytesToBytes(APP_DOCUMENT_UPLOAD_SIZE_LIMIT),
+    multiple: false,
+    noClick: true,
+    noKeyboard: true,
+    noDrag: true,
+    onDrop: (acceptedFiles) => {
+      const file = acceptedFiles[0];
+
+      if (file && replacingItemId) {
+        void onReplacePdf(replacingItemId, file);
+        setReplacingItemId(null);
+      }
+    },
+    onDropRejected: (fileRejections) => void onFileDropRejected(fileRejections),
+  });
 
   const { mutateAsync: createEnvelopeItems, isPending: isCreatingEnvelopeItems } =
     trpc.envelope.item.createMany.useMutation({
@@ -564,7 +584,7 @@ export const EnvelopeEditorUploadPage = () => {
                                     disabled={localFile.isReplacing || localFile.isUploading}
                                     onClick={() => {
                                       setReplacingItemId(localFile.envelopeItemId);
-                                      replaceFileInputRef.current?.click();
+                                      openReplaceFilePicker();
                                     }}
                                   >
                                     {localFile.isReplacing ? (
@@ -630,24 +650,6 @@ export const EnvelopeEditorUploadPage = () => {
           </Button>
         </div>
       )}
-
-      <input
-        ref={replaceFileInputRef}
-        data-testid="replace-file-input"
-        type="file"
-        accept="application/pdf"
-        className="hidden"
-        onChange={async (e) => {
-          const file = e.target.files?.[0];
-
-          e.target.value = '';
-
-          if (file && replacingItemId) {
-            await onReplacePdf(replacingItemId, file);
-            setReplacingItemId(null);
-          }
-        }}
-      />
     </div>
   );
 };
