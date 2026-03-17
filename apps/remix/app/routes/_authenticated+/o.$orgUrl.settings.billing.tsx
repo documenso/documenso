@@ -3,7 +3,7 @@ import { Trans } from '@lingui/react/macro';
 import { SubscriptionStatus } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import type Stripe from 'stripe';
-import { match } from 'ts-pattern';
+import { P, match } from 'ts-pattern';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
@@ -31,7 +31,7 @@ export default function TeamsSettingBillingPage() {
   if (isLoadingSubscription || !subscriptionQuery) {
     return (
       <div className="flex items-center justify-center rounded-lg py-32">
-        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
+        <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -57,7 +57,7 @@ export default function TeamsSettingBillingPage() {
             <Trans>Billing</Trans>
           </h3>
 
-          <div className="text-muted-foreground mt-2 text-sm">
+          <div className="mt-2 text-sm text-muted-foreground">
             {!organisationSubscription && (
               <p>
                 <Trans>
@@ -70,51 +70,40 @@ export default function TeamsSettingBillingPage() {
               match(organisationSubscription.status)
                 .with('ACTIVE', () => (
                   <p>
-                    {match([
-                      organisationSubscription.cancelAtPeriodEnd,
-                      !!organisationSubscription.periodEnd,
-                    ])
-                      .with([true, true], () =>
-                        currentProductName ? (
-                          <Trans>
-                            You are currently subscribed to{' '}
-                            <span className="font-semibold">{currentProductName}</span> which is set
-                            to end on{' '}
-                            <span className="font-semibold">
-                              {i18n.date(organisationSubscription.periodEnd!)}
-                            </span>
-                            .
-                          </Trans>
-                        ) : (
-                          <Trans>
-                            You currently have an active plan which is set to end on{' '}
-                            <span className="font-semibold">
-                              {i18n.date(organisationSubscription.periodEnd!)}
-                            </span>
-                            .
-                          </Trans>
-                        ),
+                    {match(organisationSubscription)
+                      .with(
+                        { cancelAtPeriodEnd: true, periodEnd: P.nonNullable },
+                        ({ periodEnd }) =>
+                          currentProductName ? (
+                            <Trans>
+                              You are currently subscribed to{' '}
+                              <span className="font-semibold">{currentProductName}</span> which is
+                              set to end on{' '}
+                              <span className="font-semibold">{i18n.date(periodEnd)}</span>.
+                            </Trans>
+                          ) : (
+                            <Trans>
+                              You currently have an active plan which is set to end on{' '}
+                              <span className="font-semibold">{i18n.date(periodEnd)}</span>.
+                            </Trans>
+                          ),
                       )
-                      .with([false, true], () =>
-                        currentProductName ? (
-                          <Trans>
-                            You are currently subscribed to{' '}
-                            <span className="font-semibold">{currentProductName}</span> which is set
-                            to automatically renew on{' '}
-                            <span className="font-semibold">
-                              {i18n.date(organisationSubscription.periodEnd!)}
-                            </span>
-                            .
-                          </Trans>
-                        ) : (
-                          <Trans>
-                            You currently have an active plan which is set to automatically renew on{' '}
-                            <span className="font-semibold">
-                              {i18n.date(organisationSubscription.periodEnd!)}
-                            </span>
-                            .
-                          </Trans>
-                        ),
+                      .with(
+                        { cancelAtPeriodEnd: false, periodEnd: P.nonNullable },
+                        ({ periodEnd }) =>
+                          currentProductName ? (
+                            <Trans>
+                              You are currently subscribed to{' '}
+                              <span className="font-semibold">{currentProductName}</span> which is
+                              set to automatically renew on{' '}
+                              <span className="font-semibold">{i18n.date(periodEnd)}</span>.
+                            </Trans>
+                          ) : (
+                            <Trans>
+                              You currently have an active plan which is set to automatically renew
+                              on <span className="font-semibold">{i18n.date(periodEnd)}</span>.
+                            </Trans>
+                          ),
                       )
                       .otherwise(() =>
                         currentProductName ? (
