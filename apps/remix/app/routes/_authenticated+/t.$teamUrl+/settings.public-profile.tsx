@@ -67,6 +67,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
   const { data } = trpc.template.findTemplates.useQuery({
+    type: TemplateType.PRIVATE,
     perPage: 100,
   });
 
@@ -82,8 +83,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
   const enabledPrivateDirectTemplates = useMemo(
     () =>
       (data?.data ?? []).filter(
-        (template): template is DirectTemplate =>
-          template.directLink?.enabled === true && template.type !== TemplateType.PUBLIC,
+        (template): template is DirectTemplate => template.directLink?.enabled === true,
       ),
     [data],
   );
