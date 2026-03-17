@@ -121,6 +121,22 @@ const runRenameFlow = async (surface: TEnvelopeEditorSurface) => {
   await titleInput.clear();
   await titleInput.fill('Renamed Document');
 
+  // Update button should be disabled without a replacement file.
+  await expect(getEditDialogUpdateButton(surface.root)).toBeDisabled();
+
+  // A replacement file is required for the Update button to be enabled.
+  const dropzone = getEditDialogDropzone(surface.root);
+  await expect(dropzone).toBeVisible();
+
+  const fileInput = dropzone.locator('input[type="file"]');
+  await fileInput.setInputFiles({
+    name: 'example.pdf',
+    mimeType: 'application/pdf',
+    buffer: examplePdfBuffer,
+  });
+
+  await expect(getEditDialogSelectedFile(surface.root)).toBeVisible();
+
   await getEditDialogUpdateButton(surface.root).click();
 
   // Dialog should close.
