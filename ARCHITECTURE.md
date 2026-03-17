@@ -344,7 +344,7 @@ npm run test:e2e
 | Service         | Port       |
 | --------------- | ---------- |
 | PostgreSQL      | 54320      |
-| Inbucket (Mail) | 9000       |
+| Inbucket (Mail) | 9005       |
 | MinIO (S3)      | 9001, 9002 |
 
 ## Environment Variables Summary

@@ -134,7 +134,7 @@ npm run d
 #### Access Points for Your Application
 
 1. **App** - http://localhost:3000
-2. **Incoming Mail Access** - http://localhost:9000
+2. **Incoming Mail Access** - http://localhost:9005
 3. **Database Connection Details**
 
    - **Port**: 54320
@@ -304,7 +304,7 @@ WantedBy=multi-user.target
 
 When using the developer quickstart, an [Inbucket](https://inbucket.org/) server will be spun up in a docker container that will store all outgoing emails locally for you to view.
 
-The Web UI can be found at http://localhost:9000, while the SMTP port will be on localhost:2500.
+The Web UI can be found at http://localhost:9005, while the SMTP port will be on localhost:2500.
 
 ### Support IPv6
 
