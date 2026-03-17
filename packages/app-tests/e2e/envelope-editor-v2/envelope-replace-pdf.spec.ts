@@ -66,7 +66,12 @@ const updateExternalId = async (surface: TEnvelopeEditorSurface, externalId: str
   }
 };
 
-const replaceEnvelopeItemPdf = async (root: Page, index: number, file: TestFilePayload) => {
+const replaceEnvelopeItemPdf = async (
+  root: Page,
+  index: number,
+  file: TestFilePayload,
+  options?: { isEmbedded?: boolean },
+) => {
   const replaceButton = getEnvelopeItemReplaceButtons(root).nth(index);
   await expect(replaceButton).toBeVisible();
 
@@ -82,7 +87,14 @@ const replaceEnvelopeItemPdf = async (root: Page, index: number, file: TestFileP
   // The button stays in the DOM but becomes disabled while the replace
   // mutation is in flight, then re-enables once the mutation completes.
   // Wait for both transitions to guarantee the replace has fully finished.
-  await expect(replaceButton).toBeDisabled({ timeout: 15000 });
+  //
+  // For embedded surfaces the replacement is purely local state with no
+  // network round-trip, so it can complete before Playwright observes the
+  // disabled state. Skip the disabled assertion for embedded surfaces.
+  if (!options?.isEmbedded) {
+    await expect(replaceButton).toBeDisabled({ timeout: 15000 });
+  }
+
   await expect(replaceButton).toBeEnabled({ timeout: 15000 });
 };
 
@@ -215,7 +227,7 @@ const runBasicReplaceFlow = async (
   await expect(root.getByRole('heading', { name: 'Documents' })).toBeVisible();
 
   // Replace the PDF.
-  await replaceEnvelopeItemPdf(root, 0, createPdfPayload('replace-test-new.pdf'));
+  await replaceEnvelopeItemPdf(root, 0, createPdfPayload('replace-test-new.pdf'), { isEmbedded });
 
   // Navigate to addFields step to verify the PDF loaded correctly.
   await clickEnvelopeEditorStep(root, 'addFields');
@@ -313,7 +325,9 @@ const runFieldCleanupReplaceFlow = async (
     await uploadMultiPagePdf(root);
   } else {
     // All other surfaces: replace the existing 1-page PDF with the 3-page one.
-    await replaceEnvelopeItemPdf(root, 0, createPdfPayload('multi-page.pdf', multiPagePdfBuffer));
+    await replaceEnvelopeItemPdf(root, 0, createPdfPayload('multi-page.pdf', multiPagePdfBuffer), {
+      isEmbedded,
+    });
   }
 
   await updateExternalId(surface, externalId);
@@ -344,7 +358,7 @@ const runFieldCleanupReplaceFlow = async (
   await expect(root.getByRole('heading', { name: 'Documents' })).toBeVisible();
 
   // Step 7: Replace with 1-page PDF.
-  await replaceEnvelopeItemPdf(root, 0, createPdfPayload('single-page.pdf'));
+  await replaceEnvelopeItemPdf(root, 0, createPdfPayload('single-page.pdf'), { isEmbedded });
 
   // Step 8: Navigate to addFields step to verify.
   await clickEnvelopeEditorStep(root, 'addFields');
