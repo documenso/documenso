@@ -201,7 +201,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
         res: signupLimited,
       });
     }
-    
+
     if (!isEmailDomainAllowedForSignup(email)) {
       throw new AppError(AuthenticationErrorCode.SignupDisabled, {
         statusCode: 400,
