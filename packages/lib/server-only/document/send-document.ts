@@ -118,7 +118,7 @@ export const sendDocument = async ({
 
     // Secondary filter so we aren't resending if the current active recipient has already
     // received the envelope.
-    recipientsToNotify.filter((r) => r.sendStatus !== SendStatus.SENT);
+    recipientsToNotify = recipientsToNotify.filter((r) => r.sendStatus !== SendStatus.SENT);
   }
 
   if (envelope.envelopeItems.length === 0) {

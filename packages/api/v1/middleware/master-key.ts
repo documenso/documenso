@@ -26,20 +26,20 @@ export const masterKeyMiddleware = <
       args.headers['x-suiteop-master-key'] ||
       args.headers.authorization?.replace('Bearer ', '').replace('bearer ', '');
 
-    if (!masterKey || masterKey !== SUITEOP_MASTER_KEY) {
-      return {
-        status: 401,
-        body: {
-          message: 'Invalid master key',
-        },
-      } as const;
-    }
-
     if (!SUITEOP_MASTER_KEY) {
       return {
         status: 500,
         body: {
           message: 'Master key not configured',
+        },
+      } as const;
+    }
+
+    if (!masterKey || masterKey !== SUITEOP_MASTER_KEY) {
+      return {
+        status: 401,
+        body: {
+          message: 'Invalid master key',
         },
       } as const;
     }
