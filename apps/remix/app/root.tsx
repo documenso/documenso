@@ -1,3 +1,4 @@
+import { NuqsAdapter } from 'nuqs/adapters/react-router/v7';
 import {
   Links,
   Meta,
@@ -7,7 +8,6 @@ import {
   data,
   isRouteErrorResponse,
   useLoaderData,
-  useLocation,
 } from 'react-router';
 import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
 
@@ -87,8 +87,6 @@ export async function loader({ request }: Route.LoaderArgs) {
 export function Layout({ children }: { children: React.ReactNode }) {
   const { theme } = useLoaderData<typeof loader>() || {};
 
-  const location = useLocation();
-
   return (
     <ThemeProvider specifiedTheme={theme} themeAction="/api/theme">
       <LayoutContent>{children}</LayoutContent>
@@ -129,24 +127,38 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
         <script>0</script>
       </head>
       <body>
-        <SessionProvider initialSession={session}>
-          <TooltipProvider>
-            <TrpcProvider>
-              {children}
+        {/* Global license banner currently disabled. Need to wait until after a few releases. */}
+        {/* {licenseStatus === '?' && (
+          <div className="bg-destructive text-destructive-foreground">
+            <div className="mx-auto flex h-auto max-w-screen-xl items-center justify-center px-4 py-3 text-sm font-medium">
+              <div className="flex items-center">
+                <AlertTriangleIcon className="mr-2 h-4 w-4" />
+                <Trans>This is an expired license instance of Documenso</Trans>
+              </div>
+            </div>
+          </div>
+        )} */}
 
-              <Toaster />
-            </TrpcProvider>
-          </TooltipProvider>
-        </SessionProvider>
+        <NuqsAdapter>
+          <SessionProvider initialSession={session}>
+            <TooltipProvider>
+              <TrpcProvider>
+                {children}
 
-        <ScrollRestoration />
-        <Scripts />
+                <Toaster />
+              </TrpcProvider>
+            </TooltipProvider>
+          </SessionProvider>
+        </NuqsAdapter>
 
         <script
           dangerouslySetInnerHTML={{
             __html: `window.__ENV__ = ${JSON.stringify(publicEnv)}`,
           }}
         />
+
+        <ScrollRestoration />
+        <Scripts />
       </body>
     </html>
   );

@@ -103,61 +103,59 @@ export const linkOrganisationAccount = async ({
     return;
   }
 
-  await prisma.$transaction(
-    async (tx) => {
-      // Link the user if not linked yet.
-      if (!userAlreadyLinked) {
-        await tx.account.create({
-          data: {
-            type: ORGANISATION_USER_ACCOUNT_TYPE,
-            provider: clientOptions.id,
-            providerAccountId: oauthConfig.providerAccountId,
-            access_token: oauthConfig.accessToken,
-            expires_at: oauthConfig.expiresAt,
-            token_type: 'Bearer',
-            id_token: oauthConfig.idToken,
-            userId: user.id,
-          },
-        });
-
-        // Log link event.
-        await tx.userSecurityAuditLog.create({
-          data: {
-            userId: user.id,
-            ipAddress: requestMeta.ipAddress,
-            userAgent: requestMeta.userAgent,
-            type: UserSecurityAuditLogType.ORGANISATION_SSO_LINK,
-          },
-        });
-
-        // If account already exists in an unverified state, remove the password to ensure
-        // they cannot sign in using that method since we cannot confirm the password
-        // was set by the user.
-        if (!user.emailVerified) {
-          await tx.user.update({
-            where: {
-              id: user.id,
-            },
-            data: {
-              emailVerified: new Date(),
-              password: null,
-              // Todo: (RR7) Will need to update the "password" account after the migration.
-            },
-          });
-        }
-      }
-
-      // Only add the user to the organisation if they are not already a member.
-      if (!organisationMember) {
-        await addUserToOrganisation({
+  // Link the user if not linked yet.
+  if (!userAlreadyLinked) {
+    await prisma.$transaction(async (tx) => {
+      await tx.account.create({
+        data: {
+          type: ORGANISATION_USER_ACCOUNT_TYPE,
+          provider: clientOptions.id,
+          providerAccountId: oauthConfig.providerAccountId,
+          access_token: oauthConfig.accessToken,
+          expires_at: oauthConfig.expiresAt,
+          token_type: 'Bearer',
+          id_token: oauthConfig.idToken,
           userId: user.id,
-          organisationId: tokenMetadata.data.organisationId,
-          organisationGroups: organisation.groups,
-          organisationMemberRole:
-            organisation.organisationAuthenticationPortal.defaultOrganisationRole,
+        },
+      });
+
+      // Log link event.
+      await tx.userSecurityAuditLog.create({
+        data: {
+          userId: user.id,
+          ipAddress: requestMeta.ipAddress,
+          userAgent: requestMeta.userAgent,
+          type: UserSecurityAuditLogType.ORGANISATION_SSO_LINK,
+        },
+      });
+
+      // If account already exists in an unverified state, remove the password to ensure
+      // they cannot sign in using that method since we cannot confirm the password
+      // was set by the user.
+      if (!user.emailVerified) {
+        await tx.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            emailVerified: new Date(),
+            password: null,
+            // Todo: (RR7) Will need to update the "password" account after the migration.
+          },
         });
       }
-    },
-    { timeout: 30_000 },
-  );
+    });
+  }
+
+  // Only add the user to the organisation if they are not already a member.
+  // Done outside the above transaction to avoid nested transactions and
+  // holding connections during the job trigger network I/O.
+  if (!organisationMember) {
+    await addUserToOrganisation({
+      userId: user.id,
+      organisationId: tokenMetadata.data.organisationId,
+      organisationGroups: organisation.groups,
+      organisationMemberRole: organisation.organisationAuthenticationPortal.defaultOrganisationRole,
+    });
+  }
 };

@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
+import { msg, t } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { TeamGlobalSettings } from '@prisma/client';
-import { DocumentVisibility, OrganisationType } from '@prisma/client';
+import { DocumentVisibility, OrganisationType, type RecipientRole } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -12,19 +12,29 @@ import { useSession } from '@documenso/lib/client-only/providers/session';
 import { DATE_FORMATS } from '@documenso/lib/constants/date-formats';
 import { DOCUMENT_SIGNATURE_TYPES, DocumentSignatureType } from '@documenso/lib/constants/document';
 import {
+  type TEnvelopeExpirationPeriod,
+  ZEnvelopeExpirationPeriod,
+} from '@documenso/lib/constants/envelope-expiration';
+import {
   SUPPORTED_LANGUAGES,
   SUPPORTED_LANGUAGE_CODES,
   isValidLanguageCode,
 } from '@documenso/lib/constants/i18n';
 import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
+import type { TDefaultRecipients } from '@documenso/lib/types/default-recipients';
+import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
 import {
   type TDocumentMetaDateFormat,
   ZDocumentMetaTimezoneSchema,
 } from '@documenso/lib/types/document-meta';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
+import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import { extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
 import { DocumentSignatureSettingsTooltip } from '@documenso/ui/components/document/document-signature-settings-tooltip';
+import { ExpirationPeriodPicker } from '@documenso/ui/components/document/expiration-period-picker';
+import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
 import { Alert } from '@documenso/ui/primitives/alert';
+import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
 import { Combobox } from '@documenso/ui/primitives/combobox';
 import {
@@ -45,6 +55,10 @@ import {
   SelectValue,
 } from '@documenso/ui/primitives/select';
 
+import { useOptionalCurrentTeam } from '~/providers/team';
+
+import { DefaultRecipientsMultiSelectCombobox } from '../general/default-recipients-multiselect-combobox';
+
 /**
  * Can't infer this from the schema since we need to keep the schema inside the component to allow
  * it to be dynamic.
@@ -58,8 +72,10 @@ export type TDocumentPreferencesFormSchema = {
   includeSigningCertificate: boolean | null;
   includeAuditLog: boolean | null;
   signatureTypes: DocumentSignatureType[];
+  defaultRecipients: TDefaultRecipients | null;
   delegateDocumentOwnership: boolean | null;
   aiFeaturesEnabled: boolean | null;
+  envelopeExpirationPeriod: TEnvelopeExpirationPeriod | null;
 };
 
 type SettingsSubset = Pick<
@@ -74,8 +90,10 @@ type SettingsSubset = Pick<
   | 'typedSignatureEnabled'
   | 'uploadSignatureEnabled'
   | 'drawSignatureEnabled'
+  | 'defaultRecipients'
   | 'delegateDocumentOwnership'
   | 'aiFeaturesEnabled'
+  | 'envelopeExpirationPeriod'
 >;
 
 export type DocumentPreferencesFormProps = {
@@ -91,9 +109,10 @@ export const DocumentPreferencesForm = ({
   canInherit,
   isAiFeaturesConfigured = false,
 }: DocumentPreferencesFormProps) => {
-  const { t } = useLingui();
+  const { _ } = useLingui();
   const { user, organisations } = useSession();
   const currentOrganisation = useCurrentOrganisation();
+  const optionalTeam = useOptionalCurrentTeam();
 
   const isPersonalLayoutMode = isPersonalLayout(organisations);
   const isPersonalOrganisation = currentOrganisation.type === OrganisationType.PERSONAL;
@@ -111,8 +130,10 @@ export const DocumentPreferencesForm = ({
     signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(canInherit ? 0 : 1, {
       message: msg`At least one signature type must be enabled`.id,
     }),
+    defaultRecipients: ZDefaultRecipientsSchema.nullable(),
     delegateDocumentOwnership: z.boolean().nullable(),
     aiFeaturesEnabled: z.boolean().nullable(),
+    envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullable(),
   });
 
   const form = useForm<TDocumentPreferencesFormSchema>({
@@ -128,8 +149,12 @@ export const DocumentPreferencesForm = ({
       includeSigningCertificate: settings.includeSigningCertificate,
       includeAuditLog: settings.includeAuditLog,
       signatureTypes: extractTeamSignatureSettings({ ...settings }),
+      defaultRecipients: settings.defaultRecipients
+        ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients)
+        : null,
       delegateDocumentOwnership: settings.delegateDocumentOwnership,
       aiFeaturesEnabled: settings.aiFeaturesEnabled,
+      envelopeExpirationPeriod: settings.envelopeExpirationPeriod ?? null,
     },
     resolver: zodResolver(ZDocumentPreferencesFormSchema),
   });
@@ -217,7 +242,7 @@ export const DocumentPreferencesForm = ({
                     <SelectContent>
                       {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
                         <SelectItem key={code} value={code}>
-                          {language.full}
+                          {_(language.full)}
                         </SelectItem>
                       ))}
 
@@ -317,7 +342,7 @@ export const DocumentPreferencesForm = ({
                 <FormControl>
                   <MultiSelectCombobox
                     options={Object.values(DOCUMENT_SIGNATURE_TYPES).map((option) => ({
-                      label: t(option.label),
+                      label: _(option.label),
                       value: option.value,
                     }))}
                     selectedValues={field.value}
@@ -521,6 +546,94 @@ export const DocumentPreferencesForm = ({
 
           <FormField
             control={form.control}
+            name="defaultRecipients"
+            render={({ field }) => {
+              const recipients = field.value ?? [];
+
+              return (
+                <FormItem className="flex-1">
+                  <FormLabel>
+                    <Trans>Default Recipients</Trans>
+                  </FormLabel>
+
+                  {canInherit && (
+                    <Select
+                      value={field.value === null ? '-1' : '0'}
+                      onValueChange={(value) => field.onChange(value === '-1' ? null : [])}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={'-1'}>
+                          <Trans>Inherit from organisation</Trans>
+                        </SelectItem>
+                        <SelectItem value={'0'}>
+                          <Trans>Override organisation settings</Trans>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+
+                  {(field.value !== null || !canInherit) && (
+                    <div className="space-y-4">
+                      <DefaultRecipientsMultiSelectCombobox
+                        listValues={recipients}
+                        onChange={field.onChange}
+                        organisationId={!canInherit ? currentOrganisation.id : undefined}
+                        teamId={canInherit ? optionalTeam?.id : undefined}
+                      />
+
+                      {recipients.map((recipient, index) => {
+                        return (
+                          <div
+                            key={recipient.email}
+                            className="flex items-center justify-between gap-3 rounded-lg border p-3"
+                          >
+                            <AvatarWithText
+                              avatarFallback={recipientAbbreviation(recipient)}
+                              primaryText={
+                                <span className="text-sm font-medium">
+                                  {recipient.name || recipient.email}
+                                </span>
+                              }
+                              secondaryText={
+                                recipient.name ? (
+                                  <span className="text-xs text-muted-foreground">
+                                    {recipient.email}
+                                  </span>
+                                ) : undefined
+                              }
+                              className="flex-1"
+                            />
+                            <div className="flex items-center gap-2">
+                              <RecipientRoleSelect
+                                value={recipient.role}
+                                onValueChange={(role: RecipientRole) => {
+                                  field.onChange(
+                                    recipients.map((recipient, idx) =>
+                                      idx === index ? { ...recipient, role } : recipient,
+                                    ),
+                                  );
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  <FormDescription>
+                    <Trans>Recipients that will be automatically added to new documents.</Trans>
+                  </FormDescription>
+                </FormItem>
+              );
+            }}
+          />
+
+          <FormField
+            control={form.control}
             name="delegateDocumentOwnership"
             render={({ field }) => (
               <FormItem className="flex-1">
@@ -561,6 +674,35 @@ export const DocumentPreferencesForm = ({
                     Enable team API tokens to delegate document ownership to another team member.
                   </Trans>
                 </FormDescription>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="envelopeExpirationPeriod"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>
+                  <Trans>Default Envelope Expiration</Trans>
+                </FormLabel>
+
+                <FormControl>
+                  <ExpirationPeriodPicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    inheritLabel={canInherit ? t`Inherit from organisation` : undefined}
+                  />
+                </FormControl>
+
+                <FormDescription>
+                  <Trans>
+                    Controls how long recipients have to complete signing before the document
+                    expires. After expiration, recipients can no longer sign the document.
+                  </Trans>
+                </FormDescription>
+
+                <FormMessage />
               </FormItem>
             )}
           />

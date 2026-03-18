@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { FieldType } from '@prisma/client';
 import { CopyPlus, Settings2, SquareStack, Trash } from 'lucide-react';
 import { createPortal } from 'react-dom';
@@ -9,11 +10,12 @@ import { Rnd } from 'react-rnd';
 import { useSearchParams } from 'react-router';
 
 import { useElementBounds } from '@documenso/lib/client-only/hooks/use-element-bounds';
+import { useIsPageInDom } from '@documenso/lib/client-only/hooks/use-is-page-in-dom';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '@documenso/lib/types/field-meta';
 
-import { useRecipientColors } from '../../lib/recipient-colors';
+import { getRecipientColorStyles } from '../../lib/recipient-colors';
 import { cn } from '../../lib/utils';
 import { FieldContent } from './field-content';
 import type { TDocumentFlowFormSchema } from './types';
@@ -49,7 +51,17 @@ export type FieldItemProps = {
 /**
  * The item when editing fields??
  */
-export const FieldItem = ({
+export const FieldItem = (props: FieldItemProps) => {
+  const isPageInDom = useIsPageInDom(props.field.pageNumber);
+
+  if (!isPageInDom) {
+    return null;
+  }
+
+  return <FieldItemInner {...props} />;
+};
+
+const FieldItemInner = ({
   fieldClassName,
   field,
   passive,
@@ -88,7 +100,7 @@ export const FieldItem = ({
     `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`,
   );
 
-  const signerStyles = useRecipientColors(recipientIndex);
+  const signerStyles = getRecipientColorStyles(recipientIndex);
 
   const isDevMode = searchParams.get('devmode') === 'true';
 
@@ -324,19 +336,31 @@ export const FieldItem = ({
           <div className="absolute -top-20 left-1/2 z-50 -translate-x-1/2 rounded-md border border-border bg-background/95 px-2 py-1 shadow-sm backdrop-blur-sm">
             <div className="flex flex-col gap-0.5 text-[9px]">
               <span>
-                <span className="text-muted-foreground">Pos X:&nbsp;</span>
+                <span className="text-muted-foreground">
+                  <Trans>Pos X:</Trans>
+                </span>
+                &nbsp;
                 <span className="font-mono text-foreground">{field.pageX.toFixed(2)}</span>
               </span>
               <span>
-                <span className="text-muted-foreground">Pos Y:&nbsp;</span>
+                <span className="text-muted-foreground">
+                  <Trans>Pos Y:</Trans>
+                </span>
+                &nbsp;
                 <span className="font-mono text-foreground">{field.pageY.toFixed(2)}</span>
               </span>
               <span>
-                <span className="text-muted-foreground">Width:&nbsp;</span>
+                <span className="text-muted-foreground">
+                  <Trans>Width:</Trans>
+                </span>
+                &nbsp;
                 <span className="font-mono text-foreground">{field.pageWidth.toFixed(2)}</span>
               </span>
               <span>
-                <span className="text-muted-foreground">Height:&nbsp;</span>
+                <span className="text-muted-foreground">
+                  <Trans>Height:</Trans>
+                </span>
+                &nbsp;
                 <span className="font-mono text-foreground">{field.pageHeight.toFixed(2)}</span>
               </span>
             </div>

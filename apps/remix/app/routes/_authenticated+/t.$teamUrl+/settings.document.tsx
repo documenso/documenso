@@ -50,8 +50,10 @@ export default function TeamsSettingsPage() {
         includeSigningCertificate,
         includeAuditLog,
         signatureTypes,
+        defaultRecipients,
         delegateDocumentOwnership,
         aiFeaturesEnabled,
+        envelopeExpirationPeriod,
       } = data;
 
       await updateTeamSettings({
@@ -64,7 +66,9 @@ export default function TeamsSettingsPage() {
           includeSenderDetails,
           includeSigningCertificate,
           includeAuditLog,
+          defaultRecipients,
           aiFeaturesEnabled,
+          envelopeExpirationPeriod,
           ...(signatureTypes.length === 0
             ? {
                 typedSignatureEnabled: null,

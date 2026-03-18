@@ -533,7 +533,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
 
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <span className="text-muted-foreground ml-1 cursor-help">
+                        <span className="ml-1 cursor-help text-muted-foreground">
                           <HelpCircle className="h-3.5 w-3.5" />
                         </span>
                       </TooltipTrigger>
@@ -586,7 +586,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             className={cn('py-1', {
-                              'bg-widget-foreground pointer-events-none rounded-md pt-2':
+                              'pointer-events-none rounded-md bg-widget-foreground pt-2':
                                 snapshot.isDragging,
                             })}
                           >
@@ -754,7 +754,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                             handleRoleChange(index, value as RecipientRole);
                                           }}
                                           disabled={isSubmitting}
-                                          hideCCRecipients={isSignerDirectRecipient(signer)}
+                                          hideCCerRole={isSignerDirectRecipient(signer)}
                                         />
                                       </FormControl>
 
@@ -768,11 +768,11 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                     <TooltipTrigger className="col-span-1 mt-auto inline-flex h-10 w-10 items-center justify-center text-slate-500 hover:opacity-80">
                                       <Link2Icon className="h-4 w-4" />
                                     </TooltipTrigger>
-                                    <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                                      <h3 className="text-foreground text-lg font-semibold">
+                                    <TooltipContent className="z-9999 max-w-md p-4 text-foreground">
+                                      <h3 className="text-lg font-semibold text-foreground">
                                         <Trans>Direct link receiver</Trans>
                                       </h3>
-                                      <p className="text-muted-foreground mt-1">
+                                      <p className="mt-1 text-muted-foreground">
                                         <Trans>
                                           This field cannot be modified or deleted. When you share
                                           this template's direct link or add it to your public
@@ -829,7 +829,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
 
               <Button
                 type="button"
-                className="dark:bg-muted dark:hover:bg-muted/80 bg-black/5 hover:bg-black/10"
+                className="bg-black/5 hover:bg-black/10 dark:bg-muted dark:hover:bg-muted/80"
                 variant="secondary"
                 disabled={
                   isSubmitting ||
@@ -852,7 +852,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                 />
 
                 <label
-                  className="text-muted-foreground ml-2 text-sm"
+                  className="ml-2 text-sm text-muted-foreground"
                   htmlFor="showAdvancedRecipientSettings"
                 >
                   <Trans>Show advanced settings</Trans>

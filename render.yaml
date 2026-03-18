@@ -117,6 +117,18 @@ services:
         sync: false
       - key: NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS
         sync: false
+      - key: NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_FILE_PATH
+        sync: false
+      - key: NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_CONTENTS
+        sync: false
+      - key: NEXT_PRIVATE_SIGNING_GCLOUD_HSM_SECRET_MANAGER_CERT_PATH
+        sync: false
+      - key: NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY
+        sync: false
+      - key: NEXT_PUBLIC_SIGNING_CONTACT_INFO
+        sync: false
+      - key: NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER
+        sync: false
 
       # SMTP Optional
       - key: NEXT_PRIVATE_SMTP_APIKEY_USER

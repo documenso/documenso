@@ -23,7 +23,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { PDF_VIEWER_PAGE_SELECTOR, getPdfPagesCount } from '@documenso/lib/constants/pdf-viewer';
 import {
   type TFieldMetaSchema as FieldMeta,
   ZFieldMetaSchema,
@@ -35,10 +35,11 @@ import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import {
   canRecipientBeModified,
   canRecipientFieldsBeModified,
+  getRecipientsWithMissingFields,
 } from '@documenso/lib/utils/recipients';
 
 import { FieldToolTip } from '../../components/field/field-tooltip';
-import { useRecipientColors } from '../../lib/recipient-colors';
+import { getRecipientColorStyles } from '../../lib/recipient-colors';
 import { cn } from '../../lib/utils';
 import { Alert, AlertDescription } from '../alert';
 import { Card, CardContent } from '../card';
@@ -179,9 +180,7 @@ export const AddFieldsFormPartial = ({
     null,
   );
   const selectedSignerIndex = recipients.findIndex((r) => r.id === selectedSigner?.id);
-  const selectedSignerStyles = useRecipientColors(
-    selectedSignerIndex === -1 ? 0 : selectedSignerIndex,
-  );
+  const selectedSignerStyles = getRecipientColorStyles(selectedSignerIndex);
 
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
@@ -430,13 +429,15 @@ export const AddFieldsFormPartial = ({
         }
 
         if (duplicateAll) {
-          const pages = Array.from(document.querySelectorAll(PDF_VIEWER_PAGE_SELECTOR));
+          const totalPages = getPdfPagesCount();
 
-          pages.forEach((_, index) => {
-            const pageNumber = index + 1;
+          if (totalPages < 1) {
+            return;
+          }
 
+          for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
             if (pageNumber === lastActiveField.pageNumber) {
-              return;
+              continue;
             }
 
             const newField: TAddFieldsFormSchema['fields'][0] = {
@@ -449,7 +450,7 @@ export const AddFieldsFormPartial = ({
             };
 
             append(newField);
-          });
+          }
 
           return;
         }
@@ -555,15 +556,11 @@ export const AddFieldsFormPartial = ({
   };
 
   const handleGoNextClick = () => {
-    const everySignerHasSignature = recipientsByRole.SIGNER.every((signer) =>
-      localFields.some(
-        (field) =>
-          (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) &&
-          field.signerEmail === signer.email,
-      ),
-    );
+    // localFields already have recipientId set correctly (see field creation at line 338)
+    // Using the existing recipientId is important for handling duplicate email recipients
+    const recipientsMissingFields = getRecipientsWithMissingFields(recipients, localFields);
 
-    if (!everySignerHasSignature) {
+    if (recipientsMissingFields.length > 0) {
       setIsMissingSignatureDialogVisible(true);
       return;
     }
@@ -756,7 +753,7 @@ export const AddFieldsFormPartial = ({
                             )}
                           >
                             <Contact className="h-4 w-4" />
-                            Initials
+                            <Trans>Initials</Trans>
                           </p>
                         </CardContent>
                       </Card>
@@ -906,7 +903,7 @@ export const AddFieldsFormPartial = ({
                             )}
                           >
                             <Disc className="h-4 w-4" />
-                            Radio
+                            <Trans>Radio</Trans>
                           </p>
                         </CardContent>
                       </Card>
@@ -931,8 +928,7 @@ export const AddFieldsFormPartial = ({
                             )}
                           >
                             <CheckSquare className="h-4 w-4" />
-                            {/* Not translated on purpose. */}
-                            Checkbox
+                            <Trans>Checkbox</Trans>
                           </p>
                         </CardContent>
                       </Card>

@@ -70,7 +70,7 @@ export const getServerLimits = async ({
   }
 
   // Early return for users with an expired subscription.
-  if (subscription && subscription.status !== SubscriptionStatus.ACTIVE) {
+  if (subscription && subscription.status === SubscriptionStatus.INACTIVE) {
     return {
       quota: INACTIVE_PLAN_LIMITS,
       remaining: INACTIVE_PLAN_LIMITS,

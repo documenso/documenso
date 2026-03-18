@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import {
+  ArrowRightLeftIcon,
   CreditCardIcon,
   ExternalLinkIcon,
   MoreHorizontalIcon,
@@ -29,6 +30,8 @@ import {
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 
+import { AdminSwapSubscriptionDialog } from '~/components/dialogs/admin-swap-subscription-dialog';
+
 type AdminOrganisationsTableOptions = {
   ownerUserId?: number;
   memberUserId?: number;
@@ -43,6 +46,12 @@ export const AdminOrganisationsTable = ({
   hidePaginationUntilOverflow,
 }: AdminOrganisationsTableOptions) => {
   const { t, i18n } = useLingui();
+
+  const [swapSource, setSwapSource] = useState<{
+    id: string;
+    name: string;
+    ownerId: number;
+  } | null>(null);
 
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
@@ -131,7 +140,7 @@ export const AdminOrganisationsTable = ({
               target="_blank"
               className="flex flex-row items-center gap-2"
             >
-              {SUBSCRIPTION_STATUS_MAP[row.original.subscription.status]}
+              {i18n._(SUBSCRIPTION_STATUS_MAP[row.original.subscription.status])}
               <ExternalLinkIcon className="h-4 w-4" />
             </Link>
           ) : (
@@ -143,7 +152,7 @@ export const AdminOrganisationsTable = ({
         cell: ({ row }) => (
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <MoreHorizontalIcon className="text-muted-foreground h-5 w-5" />
+              <MoreHorizontalIcon className="h-5 w-5 text-muted-foreground" />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent className="w-52" align="start" forceMount>
@@ -172,12 +181,29 @@ export const AdminOrganisationsTable = ({
                   {!row.original.customerId && <span>&nbsp;(N/A)</span>}
                 </Link>
               </DropdownMenuItem>
+
+              {row.original.subscription &&
+                (row.original.subscription.status === 'ACTIVE' ||
+                  row.original.subscription.status === 'PAST_DUE') && (
+                  <DropdownMenuItem
+                    onClick={() =>
+                      setSwapSource({
+                        id: row.original.id,
+                        name: row.original.name,
+                        ownerId: row.original.owner.id,
+                      })
+                    }
+                  >
+                    <ArrowRightLeftIcon className="mr-2 h-4 w-4" />
+                    <Trans>Move Subscription</Trans>
+                  </DropdownMenuItem>
+                )}
             </DropdownMenuContent>
           </DropdownMenu>
         ),
       },
     ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
-  }, []);
+  }, [i18n, t, memberUserId, showOwnerColumn]);
 
   return (
     <div>
@@ -227,6 +253,20 @@ export const AdminOrganisationsTable = ({
           ) : null
         }
       </DataTable>
+
+      {swapSource && (
+        <AdminSwapSubscriptionDialog
+          sourceOrganisationId={swapSource.id}
+          sourceOrganisationName={swapSource.name}
+          userId={swapSource.ownerId}
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) {
+              setSwapSource(null);
+            }
+          }}
+        />
+      )}
     </div>
   );
 };

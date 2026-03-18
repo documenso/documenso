@@ -29,6 +29,8 @@ export const ZClaimFlagsSchema = z.object({
 
   cfr21: z.boolean().optional(),
 
+  hipaa: z.boolean().optional(),
+
   authenticationPortal: z.boolean().optional(),
 
   allowLegacyEnvelopes: z.boolean().optional(),
@@ -42,6 +44,7 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   {
     label: string;
     key: keyof TClaimFlags;
+    isEnterprise?: boolean;
   }
 > = {
   unlimitedDocuments: {
@@ -59,10 +62,12 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   emailDomains: {
     key: 'emailDomains',
     label: 'Email domains',
+    isEnterprise: true,
   },
   embedAuthoring: {
     key: 'embedAuthoring',
     label: 'Embed authoring',
+    isEnterprise: true,
   },
   embedSigning: {
     key: 'embedSigning',
@@ -71,6 +76,7 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   embedAuthoringWhiteLabel: {
     key: 'embedAuthoringWhiteLabel',
     label: 'White label for embed authoring',
+    isEnterprise: true,
   },
   embedSigningWhiteLabel: {
     key: 'embedSigningWhiteLabel',
@@ -79,10 +85,17 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   cfr21: {
     key: 'cfr21',
     label: '21 CFR',
+    isEnterprise: true,
+  },
+  hipaa: {
+    key: 'hipaa',
+    label: 'HIPAA',
+    isEnterprise: true,
   },
   authenticationPortal: {
     key: 'authenticationPortal',
     label: 'Authentication portal',
+    isEnterprise: true,
   },
   allowLegacyEnvelopes: {
     key: 'allowLegacyEnvelopes',

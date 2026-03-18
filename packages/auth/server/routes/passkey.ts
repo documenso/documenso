@@ -1,9 +1,15 @@
 import { sValidator } from '@hono/standard-validator';
 import { UserSecurityAuditLogType } from '@prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
+import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { Hono } from 'hono';
+import { HTTPException } from 'hono/http-exception';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { rateLimitResponse } from '@documenso/lib/server-only/rate-limit/rate-limit-middleware';
+import { passkeyRateLimit } from '@documenso/lib/server-only/rate-limit/rate-limits';
+import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
+import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
 import type { TAuthenticationResponseJSONSchema } from '@documenso/lib/types/webauthn';
 import { ZAuthenticationResponseJSONSchema } from '@documenso/lib/types/webauthn';
 import { getAuthenticatorOptions } from '@documenso/lib/utils/authenticator';
@@ -19,6 +25,18 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
    */
   .post('/authorize', sValidator('json', ZPasskeyAuthorizeSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
+
+    const passkeyLimitResult = await passkeyRateLimit.check({
+      ip: requestMetadata.ipAddress ?? 'unknown',
+    });
+
+    const passkeyLimited = rateLimitResponse(c, passkeyLimitResult);
+
+    if (passkeyLimited) {
+      throw new HTTPException(429, {
+        res: passkeyLimited,
+      });
+    }
 
     const { csrfToken, credential } = c.req.valid('json');
 
@@ -73,6 +91,13 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
 
     const user = passkey.user;
 
+    if (
+      user.email.toLowerCase() === legacyServiceAccountEmail() ||
+      user.email.toLowerCase() === deletedServiceAccountEmail()
+    ) {
+      return c.text('FORBIDDEN', 403);
+    }
+
     const { rpId, origin } = getAuthenticatorOptions();
 
     const verification = await verifyAuthenticationResponse({
@@ -80,9 +105,9 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
       expectedChallenge: challengeToken.token,
       expectedOrigin: origin,
       expectedRPID: rpId,
-      authenticator: {
-        credentialID: new Uint8Array(Array.from(passkey.credentialId)),
-        credentialPublicKey: new Uint8Array(passkey.credentialPublicKey),
+      credential: {
+        id: isoBase64URL.fromBuffer(passkey.credentialId),
+        publicKey: new Uint8Array(passkey.credentialPublicKey),
         counter: Number(passkey.counter),
       },
     }).catch(() => null);

@@ -171,6 +171,7 @@ test.describe('API V2 Envelopes', () => {
                 positionY: 0,
                 width: 0,
                 height: 0,
+                fieldMeta: { type: 'signature' },
               },
               {
                 type: FieldType.SIGNATURE,
@@ -180,6 +181,7 @@ test.describe('API V2 Envelopes', () => {
                 positionY: 0,
                 width: 0,
                 height: 0,
+                fieldMeta: { type: 'signature' },
               },
             ],
           },
@@ -205,6 +207,7 @@ test.describe('API V2 Envelopes', () => {
             documentPending: false,
             documentCompleted: false,
             documentDeleted: false,
+            ownerRecipientExpired: true,
             ownerDocumentCompleted: true,
           },
         },

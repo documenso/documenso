@@ -1,9 +1,17 @@
-import { type DocumentDataType, DocumentStatus } from '@prisma/client';
+import {
+  type DocumentDataType,
+  DocumentStatus,
+  type EnvelopeType,
+  type TemplateType,
+} from '@prisma/client';
+import { EnvelopeType as EnvelopeTypeEnum, TemplateType as TemplateTypeEnum } from '@prisma/client';
 import contentDisposition from 'content-disposition';
 import { type Context } from 'hono';
 
+import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { sha256 } from '@documenso/lib/universal/crypto';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
+import { prisma } from '@documenso/prisma';
 
 import type { HonoEnv } from '../../router';
 
@@ -78,4 +86,64 @@ export const handleEnvelopeItemFileRequest = async ({
   }
 
   return c.body(file);
+};
+
+type CheckEnvelopeFileAccessOptions = {
+  userId: number;
+  teamId: number;
+  envelopeType: EnvelopeType;
+  templateType: TemplateType;
+};
+
+/**
+ * Check whether a user has access to an envelope's file.
+ *
+ * First checks team membership. If that fails and the envelope is an
+ * ORGANISATION template (not a document), falls back to checking whether
+ * the user belongs to any team in the same organisation.
+ */
+export const checkEnvelopeFileAccess = async ({
+  userId,
+  teamId,
+  envelopeType,
+  templateType,
+}: CheckEnvelopeFileAccessOptions): Promise<boolean> => {
+  const team = await getTeamById({ userId, teamId }).catch(() => null);
+
+  if (team) {
+    return true;
+  }
+
+  if (
+    envelopeType === EnvelopeTypeEnum.TEMPLATE &&
+    templateType === TemplateTypeEnum.ORGANISATION
+  ) {
+    const orgAccess = await prisma.team.findFirst({
+      where: {
+        id: teamId,
+        organisation: {
+          teams: {
+            some: {
+              teamGroups: {
+                some: {
+                  organisationGroup: {
+                    organisationGroupMembers: {
+                      some: {
+                        organisationMember: { userId },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      select: { id: true },
+    });
+
+    return orgAccess !== null;
+  }
+
+  return false;
 };

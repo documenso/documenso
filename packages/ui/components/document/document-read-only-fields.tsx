@@ -98,10 +98,8 @@ export const DocumentReadOnlyFields = ({
     setHiddenFieldIds((prev) => ({ ...prev, [fieldId]: true }));
   };
 
-  const highestPageNumber = Math.max(...fields.map((field) => field.page));
-
   return (
-    <ElementVisible target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}>
+    <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
       {fields.map(
         (field) =>
           !hiddenFieldIds[field.secondaryId] && (
@@ -112,10 +110,7 @@ export const DocumentReadOnlyFields = ({
               color={
                 showRecipientColors
                   ? getRecipientColorStyles(
-                      Math.max(
-                        recipientIds.findIndex((id) => id === field.recipientId),
-                        0,
-                      ),
+                      recipientIds.findIndex((id) => id === field.recipientId),
                     )
                   : undefined
               }
@@ -163,7 +158,7 @@ export const DocumentReadOnlyFields = ({
                       </span>
                     </p>
 
-                    <p className="text-muted-foreground mt-1 text-center text-xs">
+                    <p className="mt-1 text-center text-xs text-muted-foreground">
                       {getRecipientDisplayText(field.recipient)}
                     </p>
 

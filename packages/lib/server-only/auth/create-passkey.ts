@@ -1,6 +1,7 @@
 import { UserSecurityAuditLogType } from '@prisma/client';
 import { verifyRegistrationResponse } from '@simplewebauthn/server';
-import type { RegistrationResponseJSON } from '@simplewebauthn/types';
+import type { RegistrationResponseJSON } from '@simplewebauthn/server';
+import { isoBase64URL } from '@simplewebauthn/server/helpers';
 
 import { prisma } from '@documenso/prisma';
 
@@ -83,20 +84,19 @@ export const createPasskey = async ({
     });
   }
 
-  const { credentialPublicKey, credentialID, counter, credentialDeviceType, credentialBackedUp } =
-    verification.registrationInfo;
+  const { credentialDeviceType, credentialBackedUp, credential } = verification.registrationInfo;
 
   await prisma.$transaction(async (tx) => {
     await tx.passkey.create({
       data: {
         userId,
         name: passkeyName,
-        credentialId: Buffer.from(credentialID),
-        credentialPublicKey: Buffer.from(credentialPublicKey),
-        counter,
+        credentialId: Buffer.from(isoBase64URL.toBuffer(credential.id)),
+        credentialPublicKey: Buffer.from(credential.publicKey),
+        counter: credential.counter,
         credentialDeviceType,
         credentialBackedUp,
-        transports: verificationResponse.response.transports,
+        transports: credential.transports,
       },
     });
 
