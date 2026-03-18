@@ -79,6 +79,7 @@ export default function EmbedPlaygroundPage() {
     allowConfigureOrder: true,
     allowUpload: true,
     allowDelete: true,
+    allowReplace: true,
   });
 
   const [recipientsFeatures, setRecipientsFeatures] = useState({

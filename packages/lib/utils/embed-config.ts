@@ -110,6 +110,9 @@ export const buildEmbeddedFeatures = (
             allowDelete:
               features.envelopeItems?.allowDelete ??
               DEFAULT_EMBEDDED_EDITOR_CONFIG.envelopeItems.allowDelete,
+            allowReplace:
+              features.envelopeItems?.allowReplace ??
+              DEFAULT_EMBEDDED_EDITOR_CONFIG.envelopeItems.allowReplace,
           }
         : null,
 

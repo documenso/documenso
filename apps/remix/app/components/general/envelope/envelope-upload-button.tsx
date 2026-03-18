@@ -11,12 +11,12 @@ import { match } from 'ts-pattern';
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
-import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import type { TCreateEnvelopePayload } from '@documenso/trpc/server/envelope-router/create-envelope.types';
+import { buildDropzoneRejectionDescription } from '@documenso/ui/lib/handle-dropzone-rejection';
 import { cn } from '@documenso/ui/lib/utils';
 import { DocumentUploadButton } from '@documenso/ui/primitives/document-upload-button';
 import {
@@ -39,7 +39,7 @@ export type EnvelopeUploadButtonProps = {
  * Upload an envelope
  */
 export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUploadButtonProps) => {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const { toast } = useToast();
   const { user } = useSession();
 
@@ -168,7 +168,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
 
     toast({
       title: t`Upload failed`,
-      description: t`File cannot be larger than ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB`,
+      description: i18n._(buildDropzoneRejectionDescription(fileRejections)),
       duration: 5000,
       variant: 'destructive',
     });
