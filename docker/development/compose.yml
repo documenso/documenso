@@ -22,7 +22,7 @@ services:
     image: inbucket/inbucket
     container_name: mailserver
     ports:
-      - 9005:9000
+      - 9000:9000
       - 2500:2500
       - 1100:1100
 

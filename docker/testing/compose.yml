@@ -18,7 +18,7 @@ services:
   inbucket:
     image: inbucket/inbucket
     ports:
-      - 9005:9000
+      - 9000:9000
       - 2500:2500
       - 1100:1100
 
