@@ -1,3 +1,4 @@
+import type { GetFileOptions } from '@documenso/lib/universal/upload/get-file.server';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { loadLogo } from '@documenso/lib/utils/images/logo';
 import { prisma } from '@documenso/prisma';
@@ -56,7 +57,7 @@ export async function loader({ params }: Route.LoaderArgs) {
     return Response.json({ status: 'error', message: 'Invalid logo data' }, { status: 500 });
   }
 
-  const file = await getFileServerSide(parsedLogo).catch(() => undefined);
+  const file = await getFileServerSide(parsedLogo as GetFileOptions).catch(() => undefined);
 
   if (!file) {
     return Response.json(
