@@ -856,6 +856,7 @@ model OrganisationGlobalSettings {
   brandingLogo           String  @default("")
   brandingUrl            String  @default("")
   brandingCompanyDetails String  @default("")
+  brandingLogoSize       String  @default("h-16")
 
   envelopeExpirationPeriod Json? /// [EnvelopeExpirationPeriod] @zod.custom.use(ZEnvelopeExpirationPeriodSchema)
 
@@ -895,6 +896,7 @@ model TeamGlobalSettings {
   brandingLogo           String?
   brandingUrl            String?
   brandingCompanyDetails String?
+  brandingLogoSize       String?
 
   envelopeExpirationPeriod Json? /// [EnvelopeExpirationPeriod] @zod.custom.use(ZEnvelopeExpirationPeriodSchema)
 

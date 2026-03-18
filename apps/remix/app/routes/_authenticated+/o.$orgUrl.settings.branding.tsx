@@ -45,12 +45,23 @@ export default function OrganisationSettingsBrandingPage() {
 
   const onBrandingPreferencesFormSubmit = async (data: TBrandingPreferencesFormSchema) => {
     try {
-      const { brandingEnabled, brandingLogo, brandingUrl, brandingCompanyDetails } = data;
+      const {
+        brandingEnabled,
+        brandingLogo,
+        brandingLogoSize,
+        brandingUrl,
+        brandingCompanyDetails,
+      } = data;
 
-      let uploadedBrandingLogo: string | undefined = '';
+      let uploadedBrandingLogo: string | undefined =
+        organisationWithSettings?.organisationGlobalSettings?.brandingLogo ?? undefined;
 
       if (brandingLogo) {
         uploadedBrandingLogo = JSON.stringify(await putFile(brandingLogo));
+      }
+
+      if (brandingLogo === null) {
+        uploadedBrandingLogo = '';
       }
 
       await updateOrganisationSettings({
@@ -58,6 +69,7 @@ export default function OrganisationSettingsBrandingPage() {
         data: {
           brandingEnabled: brandingEnabled ?? undefined,
           brandingLogo: uploadedBrandingLogo,
+          brandingLogoSize: brandingLogoSize ?? undefined,
           brandingUrl,
           brandingCompanyDetails,
         },

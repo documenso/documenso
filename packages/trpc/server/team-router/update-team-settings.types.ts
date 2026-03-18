@@ -34,6 +34,7 @@ export const ZUpdateTeamSettingsRequestSchema = z.object({
     // Branding related settings.
     brandingEnabled: z.boolean().nullish(),
     brandingLogo: z.string().nullish(),
+    brandingLogoSize: z.string().nullish(),
     brandingUrl: z.string().nullish(),
     brandingCompanyDetails: z.string().nullish(),
 
