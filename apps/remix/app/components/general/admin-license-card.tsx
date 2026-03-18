@@ -1,7 +1,11 @@
+import { useState } from 'react';
+
 import { Trans, useLingui } from '@lingui/react/macro';
 import {
   ArrowRightIcon,
   CheckCircle2Icon,
+  EyeIcon,
+  EyeOffIcon,
   KeyRoundIcon,
   Loader2Icon,
   RefreshCwIcon,
@@ -32,6 +36,7 @@ type AdminLicenseCardProps = {
 
 export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
   const { t, i18n } = useLingui();
+  const [isLicenseKeyVisible, setIsLicenseKeyVisible] = useState(false);
 
   const { license } = licenseData || {};
 
@@ -53,6 +58,7 @@ export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
                   <p className="text-sm font-medium text-destructive">
                     <Trans>Invalid License Key</Trans>
                   </p>
+                  {/* Don't need to hide invalid license keys. */}
                   <p className="text-xs text-muted-foreground">{licenseData.requestedLicenseKey}</p>
                 </>
               ) : (
@@ -135,7 +141,26 @@ export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
           <p className="text-sm font-medium text-foreground">
             <Trans>License Key</Trans>
           </p>
-          <p className="mt-0.5 text-xs text-muted-foreground">{license.licenseKey}</p>
+          <div className="mt-0.5 flex items-center gap-1">
+            <p className="min-w-0 break-all text-xs text-muted-foreground">
+              {isLicenseKeyVisible ? license.licenseKey : '•'.repeat(license.licenseKey.length)}
+            </p>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 text-muted-foreground"
+              aria-label={isLicenseKeyVisible ? t`Hide license key` : t`Show license key`}
+              onClick={() => setIsLicenseKeyVisible((prevState) => !prevState)}
+            >
+              {isLicenseKeyVisible ? (
+                <EyeOffIcon className="h-3.5 w-3.5" />
+              ) : (
+                <EyeIcon className="h-3.5 w-3.5" />
+              )}
+            </Button>
+          </div>
         </div>
 
         <div>
