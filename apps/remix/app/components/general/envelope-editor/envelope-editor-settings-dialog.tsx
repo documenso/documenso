@@ -9,6 +9,7 @@ import {
   DocumentVisibility,
   EnvelopeType,
   SendStatus,
+  TemplateType,
 } from '@prisma/client';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { InfoIcon, MailIcon, SettingsIcon, ShieldIcon } from 'lucide-react';
@@ -66,6 +67,10 @@ import {
   DocumentVisibilityTooltip,
 } from '@documenso/ui/components/document/document-visibility-select';
 import { ExpirationPeriodPicker } from '@documenso/ui/components/document/expiration-period-picker';
+import {
+  TemplateTypeSelect,
+  TemplateTypeTooltip,
+} from '@documenso/ui/components/template/template-type-select';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { CardDescription, CardHeader, CardTitle } from '@documenso/ui/primitives/card';
@@ -102,6 +107,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { useCurrentTeam } from '~/providers/team';
 
 export const ZAddSettingsFormSchema = z.object({
+  templateType: z.nativeEnum(TemplateType).optional(),
   externalId: z.string().optional(),
   visibility: z.nativeEnum(DocumentVisibility).optional(),
   globalAccessAuth: z
@@ -196,6 +202,7 @@ export const EnvelopeEditorSettingsDialog = ({
 
   const createDefaultValues = () => {
     return {
+      templateType: envelope.templateType || TemplateType.PRIVATE,
       externalId: envelope.externalId || '',
       visibility: envelope.visibility || '',
       globalAccessAuth: documentAuthOption?.globalAccessAuth || [],
@@ -270,6 +277,7 @@ export const EnvelopeEditorSettingsDialog = ({
     try {
       await updateEnvelopeAsync({
         data: {
+          templateType: envelope.type === EnvelopeType.TEMPLATE ? data.templateType : undefined,
           externalId: data.externalId || null,
           visibility: data.visibility,
           globalAccessAuth: parsedGlobalAccessAuth.success ? parsedGlobalAccessAuth.data : [],
@@ -605,6 +613,31 @@ export const EnvelopeEditorSettingsDialog = ({
                           </FormItem>
                         )}
                       />
+
+                      {envelope.type === EnvelopeType.TEMPLATE && (
+                        <FormField
+                          control={form.control}
+                          name="templateType"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="flex flex-row items-center">
+                                <Trans>Template type</Trans>
+                                <TemplateTypeTooltip
+                                  organisationTeamCount={organisation.teams.length}
+                                />
+                              </FormLabel>
+
+                              <FormControl>
+                                <TemplateTypeSelect
+                                  value={field.value}
+                                  disabled={field.disabled}
+                                  onValueChange={field.onChange}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      )}
 
                       {settings.allowConfigureDistribution && (
                         <FormField

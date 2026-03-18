@@ -167,7 +167,7 @@ export const DocumentSigningAutoSign = ({ recipient, fields }: DocumentSigningAu
           </DialogTitle>
         </DialogHeader>
 
-        <div className="text-muted-foreground max-w-[50ch]">
+        <div className="max-w-[50ch] text-muted-foreground">
           <p>
             <Trans>
               When you sign a document, we can automatically fill in and sign the following fields

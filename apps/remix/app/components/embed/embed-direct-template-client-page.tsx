@@ -17,6 +17,7 @@ import { useSearchParams } from 'react-router';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { ZDirectTemplateEmbedDataSchema } from '@documenso/lib/types/embed-direct-template-schema';
@@ -26,6 +27,7 @@ import {
 } from '@documenso/lib/utils/advanced-fields-helpers';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -290,11 +292,18 @@ export const EmbedDirectTemplateClientPage = ({
           cssVars: data.cssVars,
         });
       }
+
+      if (data.language && data.language !== APP_I18N_OPTIONS.sourceLang) {
+        void dynamicActivate(data.language).finally(() => {
+          setHasFinishedInit(true);
+        });
+      } else {
+        setHasFinishedInit(true);
+      }
     } catch (err) {
       console.error(err);
+      setHasFinishedInit(true);
     }
-
-    setHasFinishedInit(true);
 
     // !: While the two setters are stable we still want to ensure we're avoiding
     // !: re-renders.
