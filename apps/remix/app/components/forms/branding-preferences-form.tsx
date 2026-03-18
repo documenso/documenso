@@ -5,6 +5,7 @@ import {
   BRANDING_LOGO_MAX_SIZE_BYTES,
   BRANDING_LOGO_MAX_SIZE_MB,
 } from '@documenso/lib/constants/branding';
+import { BRANDING_LOGO_SIZE_OPTIONS } from '@documenso/lib/constants/organisations';
 import { DEFAULT_BRAND_COLORS, DEFAULT_BRAND_RADIUS } from '@documenso/lib/constants/theme';
 import { ZCssVarsSchema } from '@documenso/lib/types/css-vars';
 import { cn } from '@documenso/ui/lib/utils';
@@ -22,7 +23,6 @@ import { Loader } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
 import { useOptionalCurrentTeam } from '~/providers/team';
 import { useCspNonce } from '~/utils/nonce';
 
@@ -39,6 +39,7 @@ const ZBrandingPreferencesFormSchema = z.object({
     .refine((file) => BRANDING_LOGO_ALLOWED_TYPES.includes(file.type), 'Only .jpg, .png, and .webp files are accepted')
     .nullish(),
   brandingUrl: z.string().url().optional().or(z.literal('')),
+  brandingLogoSize: z.enum(['h-6', 'h-8', 'h-12', 'h-16']).optional(),
   brandingCompanyDetails: z.string().max(500).optional(),
   brandingColors: ZCssVarsSchema.default({}),
   brandingCss: z.string().max(10_000).default(''),
@@ -48,7 +49,13 @@ export type TBrandingPreferencesFormSchema = z.infer<typeof ZBrandingPreferences
 
 type SettingsSubset = Pick<
   TeamGlobalSettings,
-  'brandingEnabled' | 'brandingLogo' | 'brandingUrl' | 'brandingCompanyDetails' | 'brandingColors' | 'brandingCss'
+  | 'brandingEnabled'
+  | 'brandingLogo'
+  | 'brandingUrl'
+  | 'brandingCompanyDetails'
+  | 'brandingColors'
+  | 'brandingCss'
+  | 'brandingLogoSize'
 >;
 
 export type BrandingPreferencesFormProps = {
@@ -84,6 +91,7 @@ export function BrandingPreferencesForm({
     brandingEnabled: settings.brandingEnabled ?? null,
     brandingUrl: settings.brandingUrl ?? '',
     brandingLogo: undefined,
+    brandingLogoSize: (settings.brandingLogoSize ?? undefined) as 'h-6' | 'h-8' | 'h-12' | 'h-16' | undefined,
     brandingCompanyDetails: settings.brandingCompanyDetails ?? '',
     brandingColors: initialColors,
     brandingCss: settings.brandingCss ?? '',
@@ -305,6 +313,45 @@ export function BrandingPreferencesForm({
                         </span>
                       )}
                     </FormDescription>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="brandingLogoSize"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            <Trans>Logo Size</Trans>
+                          </FormLabel>
+
+                          <FormControl>
+                            <Select
+                              {...field}
+                              value={field.value ?? ''}
+                              onValueChange={(value) => field.onChange(value)}
+                              disabled={!isBrandingEnabled}
+                            >
+                              <SelectTrigger className="bg-background text-muted-foreground">
+                                <SelectValue />
+                              </SelectTrigger>
+
+                              <SelectContent className="z-[9999]">
+                                {BRANDING_LOGO_SIZE_OPTIONS.map((option) => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+
+                          <FormDescription>
+                            <Trans>Select the size for your branding logo in emails</Trans>
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
                   </div>
                 </FormItem>
               )}

@@ -172,7 +172,7 @@ export const buildTeamWhereQuery = ({
  * Majority of these are null which lets us inherit from the organisation settings.
  */
 export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | 'team'> => {
-  return {
+  const defaults: Omit<TeamGlobalSettings, 'id' | 'team'> = {
     documentVisibility: null,
     documentLanguage: null,
     documentTimezone: null,
@@ -189,6 +189,7 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
 
     brandingEnabled: null,
     brandingLogo: null,
+    brandingLogoSize: null,
     brandingUrl: null,
     brandingCompanyDetails: null,
     brandingColors: null,
@@ -207,6 +208,7 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
 
     aiFeaturesEnabled: null,
   };
+  return defaults;
 };
 
 /**
@@ -215,6 +217,14 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
  * @param organisationSettings The organisation settings to inherit values from
  * @param teamSettings The team settings which can override the organisation settings
  */
+const BRANDING_KEYS = new Set<string>([
+  'brandingEnabled',
+  'brandingLogo',
+  'brandingLogoSize',
+  'brandingUrl',
+  'brandingCompanyDetails',
+]);
+
 export const extractDerivedTeamSettings = (
   organisationSettings: Omit<OrganisationGlobalSettings, 'id'>,
   teamSettings: Omit<TeamGlobalSettings, 'id'>,
@@ -223,8 +233,17 @@ export const extractDerivedTeamSettings = (
     ...organisationSettings,
   };
 
+  // When brandingEnabled is null the team inherits all branding from the org.
+  // Treat branding as an atomic group: if any override is present the team must
+  // also have explicitly set brandingEnabled (non-null).
+  const teamOverridesBranding = teamSettings.brandingEnabled !== null;
+
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   for (const key of Object.keys(derivedSettings) as (keyof typeof derivedSettings)[]) {
+    if (BRANDING_KEYS.has(key) && !teamOverridesBranding) {
+      continue;
+    }
+
     const teamValue = teamSettings[key];
 
     if (teamValue !== null) {

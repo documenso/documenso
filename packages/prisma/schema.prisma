@@ -983,6 +983,7 @@ model OrganisationGlobalSettings {
   brandingLogo           String  @default("")
   brandingUrl            String  @default("")
   brandingCompanyDetails String  @default("")
+  brandingLogoSize       String  @default("h-6")
   brandingColors         Json? /// [TCssVarsSchema] @zod.custom.use(ZCssVarsSchema)
   brandingCss            String  @default("")
 
@@ -1026,6 +1027,7 @@ model TeamGlobalSettings {
   brandingLogo           String?
   brandingUrl            String?
   brandingCompanyDetails String?
+  brandingLogoSize       String?
   brandingColors         Json? /// [TCssVarsSchema] @zod.custom.use(ZCssVarsSchema)
   brandingCss            String?
 

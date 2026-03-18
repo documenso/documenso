@@ -52,7 +52,15 @@ export default function OrganisationSettingsBrandingPage() {
 
   const onBrandingPreferencesFormSubmit = async (data: TBrandingPreferencesFormSchema) => {
     try {
-      const { brandingEnabled, brandingLogo, brandingUrl, brandingCompanyDetails, brandingColors, brandingCss } = data;
+      const {
+        brandingEnabled,
+        brandingLogo,
+        brandingLogoSize,
+        brandingUrl,
+        brandingCompanyDetails,
+        brandingColors,
+        brandingCss,
+      } = data;
 
       // Upload (or clear) the logo through the dedicated, server-validated route.
       if (brandingLogo instanceof File || brandingLogo === null) {
@@ -71,6 +79,7 @@ export default function OrganisationSettingsBrandingPage() {
         organisationId: organisation.id,
         data: {
           brandingEnabled: brandingEnabled ?? undefined,
+          brandingLogoSize: brandingLogoSize ?? undefined,
           brandingUrl,
           brandingCompanyDetails,
           brandingColors,
