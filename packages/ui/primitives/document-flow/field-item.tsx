@@ -10,11 +10,12 @@ import { Rnd } from 'react-rnd';
 import { useSearchParams } from 'react-router';
 
 import { useElementBounds } from '@documenso/lib/client-only/hooks/use-element-bounds';
+import { useIsPageInDom } from '@documenso/lib/client-only/hooks/use-is-page-in-dom';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '@documenso/lib/types/field-meta';
 
-import { useRecipientColors } from '../../lib/recipient-colors';
+import { getRecipientColorStyles } from '../../lib/recipient-colors';
 import { cn } from '../../lib/utils';
 import { FieldContent } from './field-content';
 import type { TDocumentFlowFormSchema } from './types';
@@ -50,7 +51,17 @@ export type FieldItemProps = {
 /**
  * The item when editing fields??
  */
-export const FieldItem = ({
+export const FieldItem = (props: FieldItemProps) => {
+  const isPageInDom = useIsPageInDom(props.field.pageNumber);
+
+  if (!isPageInDom) {
+    return null;
+  }
+
+  return <FieldItemInner {...props} />;
+};
+
+const FieldItemInner = ({
   fieldClassName,
   field,
   passive,
@@ -89,7 +100,7 @@ export const FieldItem = ({
     `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`,
   );
 
-  const signerStyles = useRecipientColors(recipientIndex);
+  const signerStyles = getRecipientColorStyles(recipientIndex);
 
   const isDevMode = searchParams.get('devmode') === 'true';
 

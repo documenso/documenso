@@ -2,6 +2,7 @@ import { DocumentSigningOrder, DocumentVisibility, TemplateType } from '@prisma/
 import { z } from 'zod';
 import { zfd } from 'zod-form-data';
 
+import { ZEnvelopeExpirationPeriod } from '@documenso/lib/constants/envelope-expiration';
 import { ZDocumentSchema } from '@documenso/lib/types/document';
 import {
   ZDocumentAccessAuthTypesSchema,
@@ -21,6 +22,7 @@ import {
   ZDocumentMetaTypedSignatureEnabledSchema,
   ZDocumentMetaUploadSignatureEnabledSchema,
 } from '@documenso/lib/types/document-meta';
+import { ZEnvelopeSchema } from '@documenso/lib/types/envelope';
 import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
 import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
 import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
@@ -160,6 +162,7 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
       uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
       drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
       allowDictateNextSigner: z.boolean().optional(),
+      envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullish(),
     })
     .describe('Override values from the template for the created document.')
     .optional(),
@@ -293,6 +296,8 @@ export const ZFindTemplatesRequestSchema = ZFindSearchParamsSchema.extend({
   folderId: z.string().describe('The ID of the folder to filter templates by.').optional(),
 });
 
+export const ZFindOrganisationTemplatesRequestSchema = ZFindSearchParamsSchema;
+
 export const ZFindTemplatesResponseSchema = ZFindResultResponse.extend({
   data: ZTemplateManySchema.array(),
 });
@@ -305,6 +310,12 @@ export const ZGetTemplateByIdRequestSchema = z.object({
 });
 
 export const ZGetTemplateByIdResponseSchema = ZTemplateSchema;
+
+export const ZGetOrganisationTemplateByIdRequestSchema = z.object({
+  envelopeId: z.string(),
+});
+
+export const ZGetOrganisationTemplateByIdResponseSchema = ZEnvelopeSchema;
 
 export const ZBulkSendTemplateMutationSchema = z.object({
   templateId: z.number(),

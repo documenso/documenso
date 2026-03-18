@@ -95,6 +95,7 @@ export const findOrganisationEmailDomains = async ({
         selector: true,
         createdAt: true,
         updatedAt: true,
+        lastVerifiedAt: true,
         _count: {
           select: {
             emails: true,

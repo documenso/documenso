@@ -34,7 +34,7 @@ export const DocumentEmailCheckboxes = ({
         />
 
         <label
-          className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
+          className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
           htmlFor={DocumentEmailEvents.RecipientSigned}
         >
           <Trans>Email the owner when a recipient signs</Trans>
@@ -44,7 +44,7 @@ export const DocumentEmailCheckboxes = ({
               <InfoIcon className="mx-2 h-4 w-4" />
             </TooltipTrigger>
 
-            <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+            <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
               <h2>
                 <strong>
                   <Trans>Recipient signed email</Trans>
@@ -72,7 +72,7 @@ export const DocumentEmailCheckboxes = ({
         />
 
         <label
-          className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
+          className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
           htmlFor={DocumentEmailEvents.RecipientSigningRequest}
         >
           <Trans>Email recipients with a signing request</Trans>
@@ -82,7 +82,7 @@ export const DocumentEmailCheckboxes = ({
               <InfoIcon className="mx-2 h-4 w-4" />
             </TooltipTrigger>
 
-            <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+            <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
               <h2>
                 <strong>
                   <Trans>Recipient signing request email</Trans>
@@ -110,7 +110,7 @@ export const DocumentEmailCheckboxes = ({
         />
 
         <label
-          className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
+          className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
           htmlFor={DocumentEmailEvents.RecipientRemoved}
         >
           <Trans>Email recipients when they're removed from a pending document</Trans>
@@ -120,7 +120,7 @@ export const DocumentEmailCheckboxes = ({
               <InfoIcon className="mx-2 h-4 w-4" />
             </TooltipTrigger>
 
-            <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+            <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
               <h2>
                 <strong>
                   <Trans>Recipient removed email</Trans>
@@ -148,7 +148,7 @@ export const DocumentEmailCheckboxes = ({
         />
 
         <label
-          className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
+          className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
           htmlFor={DocumentEmailEvents.DocumentPending}
         >
           <Trans>Email the signer if the document is still pending</Trans>
@@ -158,7 +158,7 @@ export const DocumentEmailCheckboxes = ({
               <InfoIcon className="mx-2 h-4 w-4" />
             </TooltipTrigger>
 
-            <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+            <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
               <h2>
                 <strong>
                   <Trans>Document pending email</Trans>
@@ -187,7 +187,7 @@ export const DocumentEmailCheckboxes = ({
         />
 
         <label
-          className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
+          className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
           htmlFor={DocumentEmailEvents.DocumentCompleted}
         >
           <Trans>Email recipients when the document is completed</Trans>
@@ -197,7 +197,7 @@ export const DocumentEmailCheckboxes = ({
               <InfoIcon className="mx-2 h-4 w-4" />
             </TooltipTrigger>
 
-            <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+            <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
               <h2>
                 <strong>
                   <Trans>Document completed email</Trans>
@@ -225,7 +225,7 @@ export const DocumentEmailCheckboxes = ({
         />
 
         <label
-          className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
+          className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
           htmlFor={DocumentEmailEvents.DocumentDeleted}
         >
           <Trans>Email recipients when a pending document is deleted</Trans>
@@ -235,7 +235,7 @@ export const DocumentEmailCheckboxes = ({
               <InfoIcon className="mx-2 h-4 w-4" />
             </TooltipTrigger>
 
-            <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+            <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
               <h2>
                 <strong>
                   <Trans>Document deleted email</Trans>
@@ -263,7 +263,7 @@ export const DocumentEmailCheckboxes = ({
         />
 
         <label
-          className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
+          className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
           htmlFor={DocumentEmailEvents.OwnerDocumentCompleted}
         >
           <Trans>Email the owner when the document is completed</Trans>
@@ -273,7 +273,7 @@ export const DocumentEmailCheckboxes = ({
               <InfoIcon className="mx-2 h-4 w-4" />
             </TooltipTrigger>
 
-            <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+            <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
               <h2>
                 <strong>
                   <Trans>Document completed email</Trans>
@@ -284,6 +284,45 @@ export const DocumentEmailCheckboxes = ({
                 <Trans>
                   This will be sent to the document owner once the document has been fully
                   completed.
+                </Trans>
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </label>
+      </div>
+
+      <div className="flex flex-row items-center">
+        <Checkbox
+          id={DocumentEmailEvents.OwnerRecipientExpired}
+          className="h-5 w-5"
+          checked={value.ownerRecipientExpired}
+          onCheckedChange={(checked) =>
+            onChange({ ...value, [DocumentEmailEvents.OwnerRecipientExpired]: Boolean(checked) })
+          }
+        />
+
+        <label
+          className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
+          htmlFor={DocumentEmailEvents.OwnerRecipientExpired}
+        >
+          <Trans>Send recipient expired email to the owner</Trans>
+
+          <Tooltip>
+            <TooltipTrigger>
+              <InfoIcon className="mx-2 h-4 w-4" />
+            </TooltipTrigger>
+
+            <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+              <h2>
+                <strong>
+                  <Trans>Recipient expired email</Trans>
+                </strong>
+              </h2>
+
+              <p>
+                <Trans>
+                  This will be sent to the document owner when a recipient's signing window has
+                  expired.
                 </Trans>
               </p>
             </TooltipContent>

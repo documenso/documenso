@@ -2,17 +2,28 @@ import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
 import { ChevronLeftIcon } from 'lucide-react';
-import { Link, Outlet, isRouteErrorResponse, redirect } from 'react-router';
+import {
+  Link,
+  Outlet,
+  type ShouldRevalidateFunctionArgs,
+  isRouteErrorResponse,
+  redirect,
+} from 'react-router';
 
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
+import { getOrganisationTemplateById } from '@documenso/lib/server-only/template/get-organisation-template-by-id';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 
 import type { Route } from './+types/settings._layout';
+
+export const shouldRevalidate = ({ currentParams, nextParams }: ShouldRevalidateFunctionArgs) => {
+  return currentParams.id !== nextParams.id;
+};
 
 /**
  * This file is very similar for documents as well. Any changes here should also be adjusted there as well.
@@ -33,18 +44,36 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       teamUrl: params.teamUrl,
     });
 
+    // Try the team endpoint first, then fall back to the org endpoint.
     const envelope = await getEnvelopeById({
-      id: {
-        type: 'templateId',
-        id: templateId,
-      },
+      id: { type: 'templateId', id: templateId },
       type: EnvelopeType.TEMPLATE,
       userId: user.id,
       teamId: team.id,
     }).catch((err) => {
       const error = AppError.parseError(err);
 
-      if (error.code === AppErrorCode.NOT_FOUND) {
+      if (error.code === AppErrorCode.NOT_FOUND || error.code === AppErrorCode.UNAUTHORIZED) {
+        return null;
+      }
+
+      throw err;
+    });
+
+    if (envelope) {
+      const url = new URL(request.url);
+
+      throw redirect(url.pathname.replace(`/templates/${id}`, `/templates/${envelope.id}`));
+    }
+
+    const orgEnvelope = await getOrganisationTemplateById({
+      id: { type: 'templateId', id: templateId },
+      userId: user.id,
+      teamId: team.id,
+    }).catch((err) => {
+      const error = AppError.parseError(err);
+
+      if (error.code === AppErrorCode.NOT_FOUND || error.code === AppErrorCode.UNAUTHORIZED) {
         throw new Response('Not Found', { status: 404 });
       }
 
@@ -53,7 +82,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
     const url = new URL(request.url);
 
-    throw redirect(url.pathname.replace(`/templates/${id}`, `/templates/${envelope.id}`));
+    throw redirect(url.pathname.replace(`/templates/${id}`, `/templates/${orgEnvelope.id}`));
   }
 }
 

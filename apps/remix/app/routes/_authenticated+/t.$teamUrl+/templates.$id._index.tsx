@@ -1,29 +1,30 @@
-import { lazy } from 'react';
-
 import { msg } from '@lingui/core/macro';
-import { Trans, useLingui } from '@lingui/react/macro';
+import { Trans } from '@lingui/react/macro';
 import { DocumentSigningOrder, SigningStatus } from '@prisma/client';
 import { ChevronLeft, LucideEdit } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
 
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
+import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
-import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { Spinner } from '@documenso/ui/primitives/spinner';
 
 import { TemplateBulkSendDialog } from '~/components/dialogs/template-bulk-send-dialog';
 import { TemplateDirectLinkDialog } from '~/components/dialogs/template-direct-link-dialog';
 import { TemplateUseDialog } from '~/components/dialogs/template-use-dialog';
 import { EnvelopeRendererFileSelector } from '~/components/general/envelope-editor/envelope-file-selector';
+import { EnvelopeGenericPageRenderer } from '~/components/general/envelope-editor/envelope-generic-page-renderer';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
+import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 import { TemplateDirectLinkBadge } from '~/components/general/template/template-direct-link-badge';
 import { TemplatePageViewDocumentsTable } from '~/components/general/template/template-page-view-documents-table';
 import { TemplatePageViewInformation } from '~/components/general/template/template-page-view-information';
@@ -35,24 +36,26 @@ import { useCurrentTeam } from '~/providers/team';
 
 import type { Route } from './+types/templates.$id._index';
 
-const EnvelopeGenericPageRenderer = lazy(
-  async () => import('~/components/general/envelope-editor/envelope-generic-page-renderer'),
-);
-
 export default function TemplatePage({ params }: Route.ComponentProps) {
-  const { t } = useLingui();
   const { user } = useSession();
   const navigate = useNavigate();
 
   const team = useCurrentTeam();
 
-  const {
-    data: envelope,
-    isLoading: isLoadingEnvelope,
-    isError: isErrorEnvelope,
-  } = trpc.envelope.get.useQuery({
-    envelopeId: params.id,
-  });
+  // Try fetching as a team template first; only fall back to the org endpoint if the team
+  // query has definitively failed (i.e. this template belongs to a sibling team).
+  // We disable retries on the team query so the org fallback kicks in immediately.
+  const teamTemplateQuery = trpc.envelope.get.useQuery({ envelopeId: params.id }, { retry: false });
+  const orgTemplateQuery = trpc.template.getOrganisationTemplateById.useQuery(
+    { envelopeId: params.id },
+    { enabled: teamTemplateQuery.isError, retry: false },
+  );
+
+  const envelope = teamTemplateQuery.data ?? orgTemplateQuery.data;
+  const isLoadingEnvelope =
+    teamTemplateQuery.isLoading ||
+    (teamTemplateQuery.isError && !orgTemplateQuery.isError && !orgTemplateQuery.data);
+  const isErrorEnvelope = teamTemplateQuery.isError && orgTemplateQuery.isError;
 
   if (isLoadingEnvelope) {
     return (
@@ -87,6 +90,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
 
   const documentRootPath = formatDocumentsPath(team.url);
   const templateRootPath = formatTemplatesPath(team.url);
+  const isOwnTeamTemplate = envelope.teamId === team?.id;
 
   // Remap to fit the DocumentReadOnlyFields component.
   const readOnlyFields = envelope.fields.map((field) => {
@@ -149,23 +153,27 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
         </div>
 
         <div className="mt-2 flex flex-row space-x-4 sm:mt-0 sm:self-end">
-          <TemplateDirectLinkDialog
-            templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
-            directLink={envelope.directLink}
-            recipients={envelope.recipients}
-          />
+          {isOwnTeamTemplate && (
+            <>
+              <TemplateDirectLinkDialog
+                templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
+                directLink={envelope.directLink}
+                recipients={envelope.recipients}
+              />
 
-          <TemplateBulkSendDialog
-            templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
-            recipients={envelope.recipients}
-          />
+              <TemplateBulkSendDialog
+                templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
+                recipients={envelope.recipients}
+              />
 
-          <Button className="w-full" asChild>
-            <Link to={`${templateRootPath}/${envelope.id}/edit`}>
-              <LucideEdit className="mr-1.5 h-3.5 w-3.5" />
-              <Trans>Edit Template</Trans>
-            </Link>
-          </Button>
+              <Button className="w-full" asChild>
+                <Link to={`${templateRootPath}/${envelope.id}/edit`}>
+                  <LucideEdit className="mr-1.5 h-3.5 w-3.5" />
+                  <Trans>Edit Template</Trans>
+                </Link>
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -173,7 +181,9 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
         {envelope.internalVersion === 2 ? (
           <div className="relative col-span-12 lg:col-span-6 xl:col-span-7">
             <EnvelopeRenderProvider
+              version="current"
               envelope={envelope}
+              envelopeItems={envelope.envelopeItems}
               token={undefined}
               fields={envelope.fields}
               recipients={envelope.recipients}
@@ -187,9 +197,10 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
 
               <Card className="rounded-xl before:rounded-xl" gradient>
                 <CardContent className="p-2">
-                  <PDFViewerKonvaLazy
-                    renderer="preview"
+                  <EnvelopePdfViewer
                     customPageRenderer={EnvelopeGenericPageRenderer}
+                    scrollParentRef="window"
+                    errorMessage={PDF_VIEWER_ERROR_MESSAGES.preview}
                   />
                 </CardContent>
               </Card>
@@ -211,10 +222,16 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
               />
 
               <PDFViewerLazy
-                envelopeItem={envelope.envelopeItems[0]}
-                token={undefined}
-                version="signed"
-                key={envelope.envelopeItems[0].id}
+                data={getDocumentDataUrlForPdfViewer({
+                  envelopeId: envelope.id,
+                  envelopeItemId: envelope.envelopeItems[0]?.id,
+                  documentDataId: envelope.envelopeItems[0]?.documentDataId,
+                  version: 'current',
+                  token: undefined,
+                  presignToken: undefined,
+                })}
+                key={envelope.envelopeItems[0]?.id}
+                scrollParentRef="window"
               />
             </CardContent>
           </Card>
@@ -230,22 +247,28 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
                   <Trans>Template</Trans>
                 </h3>
 
-                <div>
-                  <TemplatesTableActionDropdown
-                    row={{
-                      ...envelope,
-                      id: mapSecondaryIdToTemplateId(envelope.secondaryId),
-                      envelopeId: envelope.id,
-                    }}
-                    teamId={team?.id}
-                    templateRootPath={templateRootPath}
-                    onDelete={async () => navigate(templateRootPath)}
-                  />
-                </div>
+                {isOwnTeamTemplate && (
+                  <div>
+                    <TemplatesTableActionDropdown
+                      row={{
+                        ...envelope,
+                        id: mapSecondaryIdToTemplateId(envelope.secondaryId),
+                        envelopeId: envelope.id,
+                      }}
+                      teamId={team?.id}
+                      templateRootPath={templateRootPath}
+                      onDelete={async () => navigate(templateRootPath)}
+                    />
+                  </div>
+                )}
               </div>
 
               <p className="mt-2 px-4 text-sm text-muted-foreground">
-                <Trans>Manage and view template</Trans>
+                {isOwnTeamTemplate ? (
+                  <Trans>Manage and view template</Trans>
+                ) : (
+                  <Trans>View organisation template</Trans>
+                )}
               </p>
 
               <div className="mt-4 border-t px-4 pt-4">
@@ -272,6 +295,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
               recipients={envelope.recipients}
               envelopeId={envelope.id}
               templateRootPath={templateRootPath}
+              readOnly={!isOwnTeamTemplate}
             />
 
             {/* Recent activity section. */}

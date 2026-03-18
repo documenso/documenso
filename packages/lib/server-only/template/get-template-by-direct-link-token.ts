@@ -90,6 +90,7 @@ export const getTemplateByDirectLinkToken = async ({
     envelopeItems: envelope.envelopeItems.map((item) => ({
       id: item.id,
       envelopeId: item.envelopeId,
+      documentDataId: item.documentDataId,
     })),
   };
 };

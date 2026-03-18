@@ -29,6 +29,8 @@ export const ZClaimFlagsSchema = z.object({
 
   cfr21: z.boolean().optional(),
 
+  hipaa: z.boolean().optional(),
+
   authenticationPortal: z.boolean().optional(),
 
   allowLegacyEnvelopes: z.boolean().optional(),
@@ -83,6 +85,11 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   cfr21: {
     key: 'cfr21',
     label: '21 CFR',
+    isEnterprise: true,
+  },
+  hipaa: {
+    key: 'hipaa',
+    label: 'HIPAA',
     isEnterprise: true,
   },
   authenticationPortal: {

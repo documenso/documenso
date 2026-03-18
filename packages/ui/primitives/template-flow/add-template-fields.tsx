@@ -24,7 +24,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { PDF_VIEWER_PAGE_SELECTOR, getPdfPagesCount } from '@documenso/lib/constants/pdf-viewer';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
 import {
@@ -57,7 +57,7 @@ import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/type
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { getRecipientColorStyles, useRecipientColors } from '../../lib/recipient-colors';
+import { getRecipientColorStyles } from '../../lib/recipient-colors';
 import type { FieldFormType } from '../document-flow/add-fields';
 import { FieldAdvancedSettings } from '../document-flow/field-item-advanced-settings';
 import { Form } from '../form/form';
@@ -158,9 +158,7 @@ export const AddTemplateFieldsFormPartial = ({
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
   const selectedSignerIndex = recipients.findIndex((r) => r.id === selectedSigner?.id);
-  const selectedSignerStyles = useRecipientColors(
-    selectedSignerIndex === -1 ? 0 : selectedSignerIndex,
-  );
+  const selectedSignerStyles = getRecipientColorStyles(selectedSignerIndex);
 
   const onFieldCopy = useCallback(
     (event?: KeyboardEvent | null, options?: { duplicate?: boolean; duplicateAll?: boolean }) => {
@@ -188,13 +186,15 @@ export const AddTemplateFieldsFormPartial = ({
         }
 
         if (duplicateAll) {
-          const pages = Array.from(document.querySelectorAll(PDF_VIEWER_PAGE_SELECTOR));
+          const totalPages = getPdfPagesCount();
 
-          pages.forEach((_, index) => {
-            const pageNumber = index + 1;
+          if (totalPages < 1) {
+            return;
+          }
 
+          for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
             if (pageNumber === lastActiveField.pageNumber) {
-              return;
+              continue;
             }
 
             const newField: TAddTemplateFieldsFormSchema['fields'][0] = {
@@ -208,7 +208,7 @@ export const AddTemplateFieldsFormPartial = ({
             };
 
             append(newField);
-          });
+          }
 
           void handleAutoSave();
           return;
@@ -651,7 +651,7 @@ export const AddTemplateFieldsFormPartial = ({
                     role="combobox"
                     className={cn(
                       'mb-12 mt-2 justify-between bg-background font-normal text-muted-foreground hover:text-foreground',
-                      selectedSignerStyles?.comboxBoxTrigger,
+                      selectedSignerStyles?.comboBoxTrigger,
                     )}
                   >
                     {selectedSigner?.email &&
@@ -708,11 +708,8 @@ export const AddTemplateFieldsFormPartial = ({
                             className={cn(
                               'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
                               getRecipientColorStyles(
-                                Math.max(
-                                  recipients.findIndex((r) => r.id === recipient.id),
-                                  0,
-                                ),
-                              )?.comboxBoxItem,
+                                recipients.findIndex((r) => r.id === recipient.id),
+                              )?.comboBoxItem,
                             )}
                             onSelect={() => {
                               setSelectedSigner(recipient);

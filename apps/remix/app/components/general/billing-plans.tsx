@@ -118,7 +118,9 @@ export const BillingPlans = ({ plans }: BillingPlansProps) => {
 
                 {price.product.features && price.product.features.length > 0 && (
                   <div className="mt-4 text-muted-foreground">
-                    <div className="text-sm font-medium">Includes:</div>
+                    <div className="text-sm font-medium">
+                      <Trans>Includes:</Trans>
+                    </div>
 
                     <ul className="mt-1 divide-y text-sm">
                       {price.product.features.map((feature, index) => (
