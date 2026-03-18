@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 import { getRecipientSuggestions } from '@documenso/lib/server-only/recipient/get-recipient-suggestions';
 
 import { authenticatedProcedure } from '../trpc';
@@ -30,11 +28,7 @@ export const findRecipientSuggestionsRoute = authenticatedProcedure
       query,
     });
 
-    const validSuggestions = suggestions.filter((item) => {
-      return z.string().email().safeParse(item.email).success;
-    });
-
     return {
-      results: validSuggestions,
+      results: suggestions,
     };
   });
