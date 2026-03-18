@@ -71,6 +71,7 @@ export const ZEnvelopeEditorSettingsSchema = z.object({
       allowConfigureOrder: z.boolean(),
       allowUpload: z.boolean(),
       allowDelete: z.boolean(),
+      allowReplace: z.boolean(),
     })
     .nullable(),
 
@@ -136,6 +137,7 @@ export const DEFAULT_EDITOR_CONFIG: EnvelopeEditorConfig = {
     allowConfigureOrder: true,
     allowUpload: true,
     allowDelete: true,
+    allowReplace: true,
   },
   recipients: {
     allowAIDetection: true,
@@ -192,6 +194,7 @@ export const DEFAULT_EMBEDDED_EDITOR_CONFIG = {
     allowConfigureOrder: true,
     allowUpload: true,
     allowDelete: true,
+    allowReplace: true,
   },
   recipients: {
     allowAIDetection: false, // These are not supported for embeds, and are directly excluded in the embedded repo.
