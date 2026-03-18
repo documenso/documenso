@@ -224,11 +224,31 @@ For detailed certificate setup, see [Signing Certificate](/docs/self-hosting/con
 
 ## Feature Flags
 
-| Variable                              | Description                                     | Default |
-| ------------------------------------- | ----------------------------------------------- | ------- |
-| `NEXT_PUBLIC_DISABLE_SIGNUP`          | Disable public user registration                | `false` |
-| `NEXT_PUBLIC_POSTHOG_KEY`             | PostHog API key for analytics and feature flags |         |
-| `NEXT_PUBLIC_FEATURE_BILLING_ENABLED` | Enable billing features                         | `false` |
+| Variable                              | Description                                                                         | Default |
+| ------------------------------------- | ----------------------------------------------------------------------------------- | ------- |
+| `NEXT_PUBLIC_DISABLE_SIGNUP`          | Disable public user registration entirely                                           | `false` |
+| `NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS` | Comma-separated list of email domains allowed to sign up (e.g., `example.com,acme.org`) |         |
+| `NEXT_PUBLIC_POSTHOG_KEY`             | PostHog API key for analytics and feature flags                                     |         |
+| `NEXT_PUBLIC_FEATURE_BILLING_ENABLED` | Enable billing features                                                             | `false` |
+
+### Signup Restrictions
+
+You can control who is allowed to create accounts on your instance using two environment variables:
+
+- **`NEXT_PUBLIC_DISABLE_SIGNUP`**: Set to `true` to block all new signups. Existing users can still sign in. This applies to both email/password and OAuth signups.
+- **`NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS`**: Restrict signups to specific email domains. When set, only users whose email address matches one of the listed domains can create an account. Leave empty to allow all domains.
+
+Both restrictions apply to email/password registration and OAuth (Google, Microsoft, OIDC). If a user attempts to sign up via OAuth with a disallowed domain, they are redirected to the sign-in page with an error.
+
+When both variables are set, `NEXT_PUBLIC_DISABLE_SIGNUP` takes precedence. Signups are blocked regardless of the domain list.
+
+```bash
+# Allow signups only from specific domains
+NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS="example.com,acme.org"
+
+# Or disable signups entirely
+NEXT_PUBLIC_DISABLE_SIGNUP="true"
+```
 
 ---
 
@@ -328,6 +348,10 @@ NEXT_PRIVATE_SMTP_FROM_ADDRESS="noreply@example.com"
 
 # Signing (certificate must be configured)
 NEXT_PRIVATE_SIGNING_PASSPHRASE="your-certificate-password"
+
+# Signup restrictions (optional)
+# NEXT_PUBLIC_DISABLE_SIGNUP="true"
+# NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS="example.com,acme.org"
 ```
 
 ---

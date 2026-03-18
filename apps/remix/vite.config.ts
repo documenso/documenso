@@ -72,6 +72,8 @@ export default defineConfig({
       'playwright',
       'playwright-core',
       '@playwright/browser-chromium',
+      'lightningcss',
+      'fsevents',
     ],
   },
   resolve: {

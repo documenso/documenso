@@ -52,36 +52,35 @@ export const createTeamEmailVerification = async ({
       });
     }
 
-    await prisma.$transaction(
-      async (tx) => {
-        const existingTeamEmail = await tx.teamEmail.findFirst({
-          where: {
-            email: data.email,
-          },
+    const { token, expiresAt } = createTokenVerification({ hours: 1 });
+
+    await prisma.$transaction(async (tx) => {
+      const existingTeamEmail = await tx.teamEmail.findFirst({
+        where: {
+          email: data.email,
+        },
+      });
+
+      if (existingTeamEmail) {
+        throw new AppError(AppErrorCode.ALREADY_EXISTS, {
+          message: 'Email already taken by another team.',
         });
+      }
 
-        if (existingTeamEmail) {
-          throw new AppError(AppErrorCode.ALREADY_EXISTS, {
-            message: 'Email already taken by another team.',
-          });
-        }
+      await tx.teamEmailVerification.create({
+        data: {
+          token,
+          expiresAt,
+          email: data.email,
+          name: data.name,
+          teamId,
+        },
+      });
+    });
 
-        const { token, expiresAt } = createTokenVerification({ hours: 1 });
-
-        await tx.teamEmailVerification.create({
-          data: {
-            token,
-            expiresAt,
-            email: data.email,
-            name: data.name,
-            teamId,
-          },
-        });
-
-        await sendTeamEmailVerificationEmail(data.email, token, team);
-      },
-      { timeout: 30_000 },
-    );
+    // Send email outside the transaction to avoid holding a connection
+    // open during network I/O.
+    await sendTeamEmailVerificationEmail(data.email, token, team);
   } catch (err) {
     console.error(err);
 
