@@ -166,13 +166,16 @@ export const EmbedSignDocumentV2ClientPage = ({
       }
 
       if (data.language && data.language !== APP_I18N_OPTIONS.sourceLang) {
-        void dynamicActivate(data.language);
+        void dynamicActivate(data.language).then(() => {
+          setHasFinishedInit(true);
+        });
+      } else {
+        setHasFinishedInit(true);
       }
     } catch (err) {
       console.error(err);
+      setHasFinishedInit(true);
     }
-
-    setHasFinishedInit(true);
 
     // !: While the setters are stable we still want to ensure we're avoiding
     // !: re-renders.
