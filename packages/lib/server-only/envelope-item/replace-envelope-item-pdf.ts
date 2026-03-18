@@ -135,6 +135,8 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
           },
         },
       });
+
+      didFieldsChange = true;
     }
 
     if (recipients.length > 0 && placeholders.length > 0) {
