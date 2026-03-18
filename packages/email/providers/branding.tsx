@@ -5,6 +5,7 @@ type BrandingContextValue = {
   brandingEnabled: boolean;
   brandingUrl: string;
   brandingLogo: string;
+  brandingLogoSize?: string | null;
   brandingCompanyDetails: string;
   brandingHidePoweredBy: boolean;
   brandingColors?: EmailBrandingColors;
