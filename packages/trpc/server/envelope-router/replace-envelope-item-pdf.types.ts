@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { zfd } from 'zod-form-data';
 
+import { ZEnvelopeFieldSchema } from '@documenso/lib/types/field';
 import EnvelopeItemSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
 
 import { zfdFile, zodFormData } from '../../utils/zod-form-data';
@@ -25,7 +26,15 @@ export const ZReplaceEnvelopeItemPdfResponseSchema = z.object({
     order: true,
     documentDataId: true,
   }),
-  deletedFieldIds: z.array(z.number()),
+  /**
+   * The full list of fields for the envelope after the replacement.
+   *
+   * This is only populated if fields have been changed or deleted. It will
+   * return undefined otherwise.
+   *
+   * Done this way to reduce number of queries.
+   */
+  fields: ZEnvelopeFieldSchema.array().optional(),
 });
 
 export type TReplaceEnvelopeItemPdfPayload = z.infer<typeof ZReplaceEnvelopeItemPdfPayloadSchema>;

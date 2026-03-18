@@ -256,17 +256,15 @@ export const updateEmbeddingEnvelopeRoute = procedure
       });
     }
 
-    // Replace PDFs for existing envelope items.
-    // Note: UNSAFE_replaceEnvelopeItemPdf handles out-of-bounds field deletion
-    // internally. In the embed flow, fields are set later in Step 4 (via
-    // setFieldsForDocument/setFieldsForTemplate) which overwrites all fields
-    // anyway, so the deleted fields are naturally excluded.
+    // Replace PDFs for existing envelope items without creating placeholder fields
+    // field cleanup is handled in later steps.
     if (envelopeItemsToReplace.length > 0) {
       await pMap(
         envelopeItemsToReplace,
         async (item) => {
           await UNSAFE_replaceEnvelopeItemPdf({
             envelope,
+            recipients: [],
             envelopeItemId: item.envelopeItemId,
             oldDocumentDataId: item.oldDocumentDataId,
             data: {

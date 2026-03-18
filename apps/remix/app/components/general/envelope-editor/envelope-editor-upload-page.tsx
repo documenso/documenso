@@ -138,7 +138,7 @@ export const EnvelopeEditorUploadPage = () => {
   });
 
   const { mutateAsync: replaceEnvelopeItemPdf } = trpc.envelope.item.replacePdf.useMutation({
-    onSuccess: ({ data, deletedFieldIds }) => {
+    onSuccess: ({ data, fields }) => {
       // Update the envelope item with the new documentDataId.
       setLocalEnvelope({
         envelopeItems: envelope.envelopeItems.map((item) =>
@@ -146,18 +146,11 @@ export const EnvelopeEditorUploadPage = () => {
         ),
       });
 
-      // Remove any fields that were deleted because they were on pages
-      // that no longer exist in the new PDF.
-      if (deletedFieldIds.length > 0) {
-        const remainingFields = envelope.fields.filter(
-          (field) => !deletedFieldIds.includes(field.id),
-        );
-
-        setLocalEnvelope({
-          fields: remainingFields,
-        });
-
-        editorFields.resetForm(remainingFields);
+      // When fields were created or deleted during the replacement,
+      // the server returns the full updated field list.
+      if (fields) {
+        setLocalEnvelope({ fields });
+        editorFields.resetForm(fields);
       }
     },
   });

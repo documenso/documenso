@@ -79,7 +79,7 @@ export const EnvelopeItemEditDialog = ({
   });
 
   const { mutateAsync: replaceEnvelopeItemPdf } = trpc.envelope.item.replacePdf.useMutation({
-    onSuccess: ({ data, deletedFieldIds }) => {
+    onSuccess: ({ data, fields }) => {
       setLocalEnvelope({
         envelopeItems: envelope.envelopeItems.map((item) =>
           item.id === data.id
@@ -88,13 +88,9 @@ export const EnvelopeItemEditDialog = ({
         ),
       });
 
-      if (deletedFieldIds.length > 0) {
-        const remainingFields = envelope.fields.filter(
-          (field) => !deletedFieldIds.includes(field.id),
-        );
-
-        setLocalEnvelope({ fields: remainingFields });
-        editorFields.resetForm(remainingFields);
+      if (fields) {
+        setLocalEnvelope({ fields });
+        editorFields.resetForm(fields);
       }
     },
   });
