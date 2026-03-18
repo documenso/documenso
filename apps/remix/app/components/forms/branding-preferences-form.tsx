@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { BRANDING_LOGO_SIZE_OPTIONS } from '@documenso/lib/constants/organisations';
 import { useOptionalCurrentTeam } from '~/providers/team';
 import { useCspNonce } from '~/utils/nonce';
 
@@ -43,7 +44,13 @@ export type TBrandingPreferencesFormSchema = z.infer<typeof ZBrandingPreferences
 
 type SettingsSubset = Pick<
   TeamGlobalSettings,
-  'brandingEnabled' | 'brandingLogo' | 'brandingUrl' | 'brandingCompanyDetails' | 'brandingLogoSize' | 'brandingColors' | 'brandingCss'
+  | 'brandingEnabled'
+  | 'brandingLogo'
+  | 'brandingUrl'
+  | 'brandingCompanyDetails'
+  | 'brandingLogoSize'
+  | 'brandingColors'
+  | 'brandingCss'
 >;
 
 export type BrandingPreferencesFormProps = {
@@ -87,6 +94,13 @@ export function BrandingPreferencesForm({
         | undefined,
       brandingColors: initialColors,
       brandingCss: settings.brandingCss ?? '',
+      brandingLogoSize: (settings.brandingLogoSize ?? undefined) as
+        | 'h-6'
+        | 'h-8'
+        | 'h-12'
+        | 'h-16'
+        | undefined,
+    },
     },
     resolver: zodResolver(ZBrandingPreferencesFormSchema),
   });
@@ -191,7 +205,7 @@ export function BrandingPreferencesForm({
                       {previewUrl ? (
                         <img src={previewUrl} alt="Logo preview" className="h-full w-full object-contain p-4" />
                       ) : (
-                        <div className="relative flex h-full w-full items-center justify-center bg-muted/20 text-muted-foreground text-sm dark:bg-muted">
+                        <div className="relative flex h-full w-full items-center justify-center bg-muted/20 text-sm text-muted-foreground dark:bg-muted">
                           <Trans>Please upload a logo</Trans>
 
                           {!hasLoadedPreview && (
@@ -241,7 +255,7 @@ export function BrandingPreferencesForm({
                           type="button"
                           variant="link"
                           size="sm"
-                          className="text-destructive text-xs"
+                          className="text-xs text-destructive"
                           onClick={() => {
                             setPreviewUrl('');
                             onChange(null);

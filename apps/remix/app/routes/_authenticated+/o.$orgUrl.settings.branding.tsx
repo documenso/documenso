@@ -61,7 +61,8 @@ export default function OrganisationSettingsBrandingPage() {
         brandingCss,
       } = data;
 
-      let uploadedBrandingLogo: string | undefined;
+      let uploadedBrandingLogo: string | undefined =
+        organisationWithSettings?.organisationGlobalSettings?.brandingLogo ?? undefined;
 
       if (brandingLogo) {
         uploadedBrandingLogo = JSON.stringify(await putFile(brandingLogo));

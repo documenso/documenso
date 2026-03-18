@@ -51,7 +51,7 @@ export default function TeamsSettingsPage() {
         brandingCss,
       } = data;
 
-      let uploadedBrandingLogo: string | undefined;
+      let uploadedBrandingLogo: string | undefined = teamWithSettings?.teamSettings?.brandingLogo ?? undefined;
 
       if (brandingLogo) {
         uploadedBrandingLogo = JSON.stringify(await putFile(brandingLogo));
