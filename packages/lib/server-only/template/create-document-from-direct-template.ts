@@ -319,18 +319,10 @@ export const createDocumentFromDirectTemplate = async ({
 
       const titleToUse = item.title || directTemplateEnvelope.title;
 
-      const duplicatedFile = await putPdfFileServerSide({
+      const { documentData: newDocumentData } = await putPdfFileServerSide({
         name: titleToUse,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(buffer),
-      });
-
-      const newDocumentData = await prisma.documentData.create({
-        data: {
-          type: duplicatedFile.type,
-          data: duplicatedFile.data,
-          initialData: duplicatedFile.initialData,
-        },
       });
 
       const newEnvelopeItemId = prefixedId('envelope_item');
