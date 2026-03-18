@@ -236,7 +236,7 @@ export const EmbedSignDocumentV1ClientPage = ({
       }
 
       if (data.language && data.language !== APP_I18N_OPTIONS.sourceLang) {
-        void dynamicActivate(data.language).then(() => {
+        void dynamicActivate(data.language).finally(() => {
           setHasFinishedInit(true);
         });
       } else {

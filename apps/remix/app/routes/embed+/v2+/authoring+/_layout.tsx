@@ -92,7 +92,7 @@ export default function AuthoringLayout() {
       }
 
       if (language && language !== APP_I18N_OPTIONS.sourceLang) {
-        void dynamicActivate(language).then(() => {
+        void dynamicActivate(language).finally(() => {
           setHasFinishedInit(true);
         });
       } else {
