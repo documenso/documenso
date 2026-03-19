@@ -56,6 +56,7 @@ import { prisma } from '@documenso/prisma';
 
 import { ApiContractV1 } from './contract';
 import { authenticatedMiddleware } from './middleware/authenticated';
+import { masterKeyMiddleware } from './middleware/master-key';
 
 export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
   getDocuments: authenticatedMiddleware(async (args, user, team) => {
@@ -1681,5 +1682,32 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       status: 200,
       body: remappedField,
     };
+  }),
+
+  getSuiteOpCode: masterKeyMiddleware(async (args) => {
+    const { claimCode } = args.body;
+
+    const { claimAuthorization } = await import(
+      '@documenso/lib/server-only/suiteop/claim-authorization'
+    );
+
+    const result = await claimAuthorization({ claimCode });
+
+    return {
+      status: 200,
+      body: result,
+    };
+  }),
+
+  getSuiteOpInfo: authenticatedMiddleware(async (args, user, team) => {
+    // eslint-disable-next-line @typescript-eslint/require-await
+    return Promise.resolve({
+      status: 200 as const,
+      body: {
+        teamId: team.id,
+        teamName: team.name,
+        valid: true,
+      },
+    });
   }),
 });

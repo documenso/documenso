@@ -8,10 +8,11 @@ import {
   isRouteErrorResponse,
   useLoaderData,
 } from 'react-router';
-import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
+import { PreventFlashOnWrongTheme, type Theme, ThemeProvider, useTheme } from 'remix-themes';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
+import { getCookieDomain, useSecureCookies } from '@documenso/lib/constants/auth';
 import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
 import { createPublicEnv } from '@documenso/lib/utils/env';
 import { extractLocaleData } from '@documenso/lib/utils/i18n';
@@ -30,7 +31,9 @@ import { appMetaTags } from './utils/meta';
 export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: stylesheet }];
 
 export function meta() {
-  return appMetaTags();
+  // Don't return a title here - let child routes set their own titles
+  // This prevents React Router from merging titles inconsistently in dev mode
+  return appMetaTags().filter((tag) => !('title' in tag));
 }
 
 /**
@@ -43,7 +46,19 @@ export const shouldRevalidate = () => false;
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await getOptionalSession(request);
 
-  const { getTheme } = await themeSessionResolver(request);
+  // Handle theme cookie parsing with error handling for corrupted cookies
+  let theme: Theme | null = null;
+  let clearThemeCookie = false;
+  try {
+    const { getTheme } = await themeSessionResolver(request);
+    theme = getTheme();
+  } catch (error) {
+    // If cookie is corrupted, use default theme and clear the bad cookie
+    console.warn('Failed to parse theme cookie, clearing and using default theme:', error);
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    theme = 'system' as Theme;
+    clearThemeCookie = true;
+  }
 
   const cookieHeader = request.headers.get('cookie') ?? '';
 
@@ -61,10 +76,24 @@ export async function loader({ request }: Route.LoaderArgs) {
     organisations = await getOrganisationSession({ userId: session.user.id });
   }
 
+  const headers = new Headers();
+  headers.set('Set-Cookie', await langCookie.serialize(lang));
+
+  // Clear corrupted theme cookie if needed
+  if (clearThemeCookie) {
+    // Manually clear the corrupted cookie by setting it to empty with expired date
+    const cookieDomain = getCookieDomain();
+    const secureFlag = useSecureCookies ? '; Secure' : '';
+    headers.append(
+      'Set-Cookie',
+      `theme=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax; Domain=${cookieDomain}${secureFlag}`,
+    );
+  }
+
   return data(
     {
       lang,
-      theme: getTheme(),
+      theme,
       disableAnimations,
       session: session.isAuthenticated
         ? {
@@ -76,9 +105,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       publicEnv: createPublicEnv(),
     },
     {
-      headers: {
-        'Set-Cookie': await langCookie.serialize(lang),
-      },
+      headers,
     },
   );
 }

@@ -96,9 +96,10 @@ export const authenticatedMiddleware = <
         { metadata, logger: apiLogger },
       );
     } catch (err) {
-      console.log({ err });
-
-      apiLogger.info(infoToLog);
+      apiLogger.error({
+        ...infoToLog,
+        errorCode: err instanceof AppError ? err.code : 'UNKNOWN_ERROR',
+      });
 
       let message = 'Unauthorized';
 

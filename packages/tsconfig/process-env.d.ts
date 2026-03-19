@@ -89,6 +89,12 @@ declare namespace NodeJS {
     NEXT_PRIVATE_INNGEST_APP_ID?: string;
     NEXT_PRIVATE_INNGEST_EVENT_KEY?: string;
 
+    /**
+     * SuiteOp OAuth configuration
+     */
+    NEXT_PRIVATE_SUITEOP_MASTER_KEY?: string;
+    NEXT_PRIVATE_SUITEOP_REDIRECT_URL?: string;
+
     POSTGRES_URL?: string;
     DATABASE_URL?: string;
     POSTGRES_PRISMA_URL?: string;
@@ -99,6 +105,10 @@ declare namespace NodeJS {
      */
     GOOGLE_VERTEX_PROJECT_ID?: string;
     GOOGLE_VERTEX_LOCATION?: string;
-    GOOGLE_VERTEX_API_KEY?: string;
+    /**
+     * Service account credentials for Vertex AI authentication (required for AI features)
+     */
+    GOOGLE_CLIENT_EMAIL?: string;
+    GOOGLE_PRIVATE_KEY?: string;
   }
 }

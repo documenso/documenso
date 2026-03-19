@@ -25,8 +25,9 @@ export const SUPPORT_EMAIL = env('NEXT_PUBLIC_SUPPORT_EMAIL') ?? 'support@docume
 export const USE_INTERNAL_URL_BROWSERLESS = () =>
   env('NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS') === 'true';
 
+// SuiteOp: Using service account auth instead of API key
 export const IS_AI_FEATURES_CONFIGURED = () =>
-  !!env('GOOGLE_VERTEX_PROJECT_ID') && !!env('GOOGLE_VERTEX_API_KEY');
+  !!env('GOOGLE_VERTEX_PROJECT_ID') && !!env('GOOGLE_CLIENT_EMAIL') && !!env('GOOGLE_PRIVATE_KEY');
 
 /**
  * Temporary flag to toggle between Playwright-based and Konva-based PDF generation
@@ -39,3 +40,14 @@ export const NEXT_PRIVATE_USE_PLAYWRIGHT_PDF = () =>
 
 export const NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY = () =>
   env('NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY');
+
+// Global webhook configuration for SuiteOp
+export const GLOBAL_WEBHOOK_URL =
+  env('NEXT_PRIVATE_GLOBAL_WEBHOOK_URL') ?? 'https://events.suiteop.com/jkhgcu4kx5sec3';
+export const GLOBAL_WEBHOOK_SECRET = env('NEXT_PRIVATE_GLOBAL_WEBHOOK_SECRET') ?? '';
+export const GLOBAL_WEBHOOK_EVENTS = ['DOCUMENT_SIGNED', 'DOCUMENT_COMPLETED'] as const;
+
+// SuiteOp OAuth configuration
+export const SUITEOP_MASTER_KEY = env('NEXT_PRIVATE_SUITEOP_MASTER_KEY') ?? '';
+export const SUITEOP_REDIRECT_URL =
+  env('NEXT_PRIVATE_SUITEOP_REDIRECT_URL') ?? 'https://app.suiteop.com/oauth/callback';

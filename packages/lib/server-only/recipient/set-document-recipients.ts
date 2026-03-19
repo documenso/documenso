@@ -85,11 +85,11 @@ export const setDocumentRecipients = async ({
   });
 
   if (!envelope) {
-    throw new Error('Document not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Document not found' });
   }
 
   if (envelope.completedAt) {
-    throw new Error('Document already complete');
+    throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Document already complete' });
   }
 
   const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({

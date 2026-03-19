@@ -67,5 +67,11 @@ export const formatSecureCookieName = (name: string) => `${secureCookiePrefix}${
 export const getCookieDomain = () => {
   const url = new URL(NEXT_PUBLIC_WEBAPP_URL());
 
+  // Browsers reject cookies with Domain=localhost or Domain=127.0.0.1.
+  // Omitting the domain attribute lets the browser use the host-only flag instead.
+  if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+    return undefined;
+  }
+
   return url.hostname;
 };

@@ -34,10 +34,7 @@ export const stripeWebhookHandler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const signature =
-      typeof req.headers.get('stripe-signature') === 'string'
-        ? req.headers.get('stripe-signature')
-        : '';
+    const signature = req.headers.get('stripe-signature');
 
     if (!signature) {
       return Response.json(

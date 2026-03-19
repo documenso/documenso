@@ -30,7 +30,7 @@ export const RECIPIENT_COLOR_STYLES = {
     fieldItem: 'group/field-item rounded-[2px]',
     fieldItemInitials: '',
     comboxBoxTrigger:
-      'ring-2 ring-recipient-green shadow-[0_0_0_5px_hsl(var(--recipient-green)/10%),0_0_0_2px_hsl(var(--recipient-green)/60%),0_0_0_0.5px_hsl(var(--recipient-green))]',
+      'ring-2 ring-recipient-purple shadow-[0_0_0_5px_hsl(var(--recipient-purple)/10%),0_0_0_2px_hsl(var(--recipient-purple)/60%),0_0_0_0.5px_hsl(var(--recipient-purple))]',
     comboxBoxItem: '',
   },
 
@@ -62,9 +62,9 @@ export const RECIPIENT_COLOR_STYLES = {
 
   purple: {
     base: 'ring-recipient-purple hover:bg-recipient-purple/30',
-    baseRing: 'rgba(151, 71, 255, 1)',
-    baseRingHover: 'rgba(151, 71, 255, 0.3)',
-    baseTextHover: 'rgba(151, 71, 255, 1)',
+    baseRing: 'rgba(133, 133, 255, 1)',
+    baseRingHover: 'rgba(133, 133, 255, 0.3)',
+    baseTextHover: 'rgba(133, 133, 255, 1)',
     fieldButton: 'hover:border-recipient-purple hover:bg-recipient-purple/30',
     fieldItem: 'group/field-item rounded-[2px]',
     fieldItemInitials: 'group-hover/field-item:bg-recipient-purple',
@@ -116,9 +116,9 @@ export const RECIPIENT_COLOR_STYLES = {
 export type TRecipientColor = keyof typeof RECIPIENT_COLOR_STYLES;
 
 export const AVAILABLE_RECIPIENT_COLORS = [
-  'green',
-  'blue',
   'purple',
+  'blue',
+  'green',
   'orange',
   'yellow',
   'pink',
