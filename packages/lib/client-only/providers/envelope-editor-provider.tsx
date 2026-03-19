@@ -357,6 +357,7 @@ export const EnvelopeEditorProvider = ({
     },
     {
       enabled: !isEmbedded,
+      gcTime: 0,
       ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     },
   );
