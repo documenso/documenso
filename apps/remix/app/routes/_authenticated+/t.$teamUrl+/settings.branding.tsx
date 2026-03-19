@@ -32,7 +32,13 @@ export default function TeamsSettingsPage() {
 
   const onBrandingPreferencesFormSubmit = async (data: TBrandingPreferencesFormSchema) => {
     try {
-      const { brandingEnabled, brandingLogo, brandingUrl, brandingCompanyDetails } = data;
+      const {
+        brandingEnabled,
+        brandingLogo,
+        brandingLogoSize,
+        brandingUrl,
+        brandingCompanyDetails,
+      } = data;
 
       let uploadedBrandingLogo = teamWithSettings?.teamSettings?.brandingLogo;
 
@@ -49,6 +55,7 @@ export default function TeamsSettingsPage() {
         data: {
           brandingEnabled,
           brandingLogo: uploadedBrandingLogo || null,
+          brandingLogoSize: brandingLogoSize || null,
           brandingUrl: brandingUrl || null,
           brandingCompanyDetails: brandingCompanyDetails || null,
         },

@@ -1,5 +1,14 @@
 import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
 
+export const BRANDING_LOGO_SIZE_OPTIONS = [
+  { value: 'h-6', label: 'Small' },
+  { value: 'h-8', label: 'Medium' },
+  { value: 'h-12', label: 'Large' },
+  { value: 'h-16', label: 'Extra large' },
+] as const;
+
+export const DEFAULT_BRANDING_LOGO_SIZE = BRANDING_LOGO_SIZE_OPTIONS[0].value;
+
 export const ORGANISATION_URL_ROOT_REGEX = new RegExp('^/t/[^/]+/?$');
 export const ORGANISATION_URL_REGEX = new RegExp('^/t/[^/]+');
 
