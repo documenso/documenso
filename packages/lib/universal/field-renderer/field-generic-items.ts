@@ -2,7 +2,7 @@ import Konva from 'konva';
 
 import {
   DEFAULT_RECT_BACKGROUND,
-  RECIPIENT_COLOR_STYLES,
+  getRecipientColorStyles,
 } from '@documenso/ui/lib/recipient-colors';
 
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
@@ -70,7 +70,7 @@ export const upsertFieldRect = (
     width: fieldWidth,
     height: fieldHeight,
     fill: DEFAULT_RECT_BACKGROUND,
-    stroke: color ? RECIPIENT_COLOR_STYLES[color].baseRing : '#e5e7eb',
+    stroke: color ? getRecipientColorStyles(color).baseRing : '#e5e7eb',
     strokeWidth: 2,
     cornerRadius: 2,
     strokeScaleEnabled: false,
@@ -150,7 +150,7 @@ export const createFieldHoverInteraction = ({
     return;
   }
 
-  const hoverColor = RECIPIENT_COLOR_STYLES[options.color].baseRingHover;
+  const hoverColor = getRecipientColorStyles(options.color).baseRingHover;
 
   fieldGroup.on('mouseover', () => {
     const layer = fieldRect.getLayer();

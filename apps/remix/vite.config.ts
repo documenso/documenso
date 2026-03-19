@@ -59,6 +59,8 @@ export default defineConfig({
       'playwright-core',
       '@playwright/browser-chromium',
       'pdfjs-dist',
+      '@google-cloud/kms',
+      '@google-cloud/secret-manager',
     ],
   },
   optimizeDeps: {
@@ -72,6 +74,8 @@ export default defineConfig({
       'playwright',
       'playwright-core',
       '@playwright/browser-chromium',
+      'lightningcss',
+      'fsevents',
     ],
   },
   resolve: {
@@ -99,6 +103,8 @@ export default defineConfig({
         '@napi-rs/canvas',
         '@node-rs/bcrypt',
         '@aws-sdk/cloudfront-signer',
+        '@google-cloud/kms',
+        '@google-cloud/secret-manager',
         'nodemailer',
         /playwright/,
         '@playwright/browser-chromium',

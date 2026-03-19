@@ -220,11 +220,17 @@ When creating a webhook, you can subscribe to one or more events:
 | ----- | ------- |
 | `DOCUMENT_CREATED` | A new document is created |
 | `DOCUMENT_SENT` | A document is sent to recipients |
-| `DOCUMENT_OPENED` | A recipient opens the document |
+| `DOCUMENT_OPENED` | A recipient opens the document for the first time |
 | `DOCUMENT_SIGNED` | A recipient signs the document |
-| `DOCUMENT_COMPLETED` | All recipients have signed the document |
+| `DOCUMENT_RECIPIENT_COMPLETED` | A recipient completes their required action |
+| `DOCUMENT_COMPLETED` | All recipients have completed their actions |
 | `DOCUMENT_REJECTED` | A recipient rejects the document |
-| `DOCUMENT_CANCELLED` | The document owner cancels the document |
+| `DOCUMENT_CANCELLED` | The document owner deletes the document |
+| `DOCUMENT_REMINDER_SENT` | A reminder email is sent to a recipient |
+| `TEMPLATE_CREATED` | A new template is created |
+| `TEMPLATE_UPDATED` | A template is modified |
+| `TEMPLATE_DELETED` | A template is deleted |
+| `TEMPLATE_USED` | A document is created from a template |
 
 You can subscribe to all events or select specific ones based on your needs. For example, if you only need to know when documents are fully signed, subscribe only to `DOCUMENT_COMPLETED`.
 

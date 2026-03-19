@@ -115,7 +115,7 @@ export function AssistantConfirmationDialog({
                   <div className="mt-4 flex flex-col gap-4">
                     {!isEditingNextSigner && (
                       <div>
-                        <p className="text-muted-foreground text-sm">
+                        <p className="text-sm text-muted-foreground">
                           <Trans>
                             The next recipient to sign this document will be{' '}
                             <span className="font-semibold">{form.watch('name')}</span> (

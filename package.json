@@ -5,15 +5,15 @@
     "apps/*",
     "packages/*"
   ],
-  "version": "2.8.0",
+  "version": "2.8.1",
   "scripts": {
     "postinstall": "patch-package",
     "build": "turbo run build",
     "dev": "npm run translate:compile && turbo run dev --filter=@documenso/remix",
     "dev:remix": "npm run translate:compile && turbo run dev --filter=@documenso/remix",
-    "dev:docs": "turbo run dev --filter=@documenso/documentation",
+    "dev:docs": "turbo run dev --filter=@documenso/docs",
     "dev:openpage-api": "turbo run dev --filter=@documenso/openpage-api",
-    "start": "turbo run start --filter=@documenso/remix --filter=@documenso/documentation --filter=@documenso/openpage-api",
+    "start": "turbo run start --filter=@documenso/remix --filter=@documenso/docs --filter=@documenso/openpage-api",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "format": "prettier --write \"**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,mdx}\"",

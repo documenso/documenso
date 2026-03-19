@@ -24,6 +24,7 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'ENVELOPE_ITEM_CREATED',
   'ENVELOPE_ITEM_DELETED',
   'ENVELOPE_ITEM_UPDATED',
+  'ENVELOPE_ITEM_PDF_REPLACED',
 
   // Document events.
   'DOCUMENT_COMPLETED', // When the document is sealed and fully completed.
@@ -224,6 +225,17 @@ export const ZDocumentAuditLogEventEnvelopeItemUpdatedSchema = z.object({
         to: z.string(),
       }),
     ),
+  }),
+});
+
+/**
+ * Event: Envelope item PDF replaced.
+ */
+export const ZDocumentAuditLogEventEnvelopeItemPdfReplacedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_PDF_REPLACED),
+  data: z.object({
+    envelopeItemId: z.string(),
+    envelopeItemTitle: z.string(),
   }),
 });
 
@@ -741,6 +753,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventEnvelopeItemCreatedSchema,
     ZDocumentAuditLogEventEnvelopeItemDeletedSchema,
     ZDocumentAuditLogEventEnvelopeItemUpdatedSchema,
+    ZDocumentAuditLogEventEnvelopeItemPdfReplacedSchema,
     ZDocumentAuditLogEventEmailSentSchema,
     ZDocumentAuditLogEventDocumentCompletedSchema,
     ZDocumentAuditLogEventDocumentCreatedSchema,

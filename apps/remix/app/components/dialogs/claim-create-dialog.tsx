@@ -57,7 +57,7 @@ export const ClaimCreateDialog = ({ licenseFlags }: ClaimCreateDialogProps) => {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="scrollbar-hidden max-h-[90vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
             <Trans>Create Subscription Claim</Trans>
