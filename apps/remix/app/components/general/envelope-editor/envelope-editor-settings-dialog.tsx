@@ -8,6 +8,7 @@ import {
   DocumentDistributionMethod,
   DocumentVisibility,
   EnvelopeType,
+  RecipientRole,
   SendStatus,
   TemplateType,
 } from '@prisma/client';
@@ -234,7 +235,10 @@ export const EnvelopeEditorSettingsDialog = ({
 
   const envelopeHasBeenSent =
     envelope.type === EnvelopeType.DOCUMENT &&
-    envelope.recipients.some((recipient) => recipient.sendStatus === SendStatus.SENT);
+    envelope.recipients.some(
+      (recipient) =>
+        recipient.role !== RecipientRole.CC && recipient.sendStatus === SendStatus.SENT,
+    );
 
   const emailSettings = form.watch('meta.emailSettings');
 
