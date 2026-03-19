@@ -55,7 +55,7 @@ const WebhookSearchParamsSchema = ZUrlSearchParamsSchema.extend({
 });
 
 export function meta() {
-  return appMetaTags('Webhooks');
+  return appMetaTags(msg`Webhooks`);
 }
 
 export default function WebhookPage({ params }: Route.ComponentProps) {
@@ -151,10 +151,10 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
         accessorKey: 'event',
         cell: ({ row }) => (
           <div>
-            <p className="text-foreground text-sm font-semibold">
+            <p className="text-sm font-semibold text-foreground">
               {toFriendlyWebhookEventName(row.original.event)}
             </p>
-            <p className="text-muted-foreground text-xs">{row.original.id}</p>
+            <p className="text-xs text-muted-foreground">{row.original.id}</p>
           </div>
         ),
       },
@@ -276,17 +276,17 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
 
           <Tabs value={parsedSearchParams.status || ''} className="flex-shrink-0">
             <TabsList>
-              <TabsTrigger className="hover:text-foreground min-w-[60px]" value="" asChild>
+              <TabsTrigger className="min-w-[60px] hover:text-foreground" value="" asChild>
                 <Link to={getTabHref('')}>
                   <Trans>All</Trans>
                 </Link>
               </TabsTrigger>
-              <TabsTrigger className="hover:text-foreground min-w-[60px]" value="SUCCESS" asChild>
+              <TabsTrigger className="min-w-[60px] hover:text-foreground" value="SUCCESS" asChild>
                 <Link to={getTabHref(WebhookCallStatus.SUCCESS)}>
                   <Trans>Success</Trans>
                 </Link>
               </TabsTrigger>
-              <TabsTrigger className="hover:text-foreground min-w-[60px]" value="FAILED" asChild>
+              <TabsTrigger className="min-w-[60px] hover:text-foreground" value="FAILED" asChild>
                 <Link to={getTabHref(WebhookCallStatus.FAILED)}>
                   <Trans>Failed</Trans>
                 </Link>
@@ -375,7 +375,7 @@ const WebhookEventCombobox = () => {
   return (
     <MultiSelectCombobox
       emptySelectionPlaceholder={
-        <p className="text-muted-foreground font-normal">
+        <p className="font-normal text-muted-foreground">
           <Trans>
             <span className="text-muted-foreground/70">Events:</span> All
           </Trans>
