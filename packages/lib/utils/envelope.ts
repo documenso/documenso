@@ -254,40 +254,29 @@ export const getEnvelopeItemPermissions = (
   envelope: Pick<Envelope, 'completedAt' | 'deletedAt' | 'type' | 'status'>,
   recipients: Recipient[],
 ): EnvelopeItemPermissions => {
-  const noPermissions: EnvelopeItemPermissions = {
-    canTitleBeChanged: false,
-    canFileBeChanged: false,
-    canOrderBeChanged: false,
-  };
-
-  // Always block completed and deleted envelopes.
-  if (envelope.completedAt || envelope.deletedAt) {
-    return noPermissions;
-  }
-
-  // Title edits are allowed on DRAFT and PENDING envelopes.
-  const canTitleBeChanged =
-    envelope.status === DocumentStatus.DRAFT || envelope.status === DocumentStatus.PENDING;
-
-  // File and order changes require DRAFT status.
-  if (envelope.status !== DocumentStatus.DRAFT) {
+  // Always reject completed/rejected/deleted envelopes.
+  if (
+    envelope.completedAt ||
+    envelope.deletedAt ||
+    envelope.status === DocumentStatus.REJECTED ||
+    envelope.status === DocumentStatus.COMPLETED
+  ) {
     return {
-      canTitleBeChanged,
+      canTitleBeChanged: false,
       canFileBeChanged: false,
       canOrderBeChanged: false,
     };
   }
 
-  // Templates in DRAFT can always be modified.
+  // Templates can always be modified.
   if (envelope.type === EnvelopeType.TEMPLATE) {
     return {
-      canTitleBeChanged,
+      canTitleBeChanged: true,
       canFileBeChanged: true,
       canOrderBeChanged: true,
     };
   }
 
-  // Block file and order changes if any non-CC recipient has signed or been sent.
   const hasActiveRecipients = recipients.some(
     (recipient) =>
       recipient.role !== RecipientRole.CC &&
@@ -295,9 +284,16 @@ export const getEnvelopeItemPermissions = (
         recipient.sendStatus === SendStatus.SENT),
   );
 
-  return {
-    canTitleBeChanged,
-    canFileBeChanged: !hasActiveRecipients,
-    canOrderBeChanged: !hasActiveRecipients,
-  };
+  return match(envelope.status)
+    .with(DocumentStatus.DRAFT, () => ({
+      canTitleBeChanged: true,
+      canFileBeChanged: true,
+      canOrderBeChanged: true,
+    }))
+    .with(DocumentStatus.PENDING, () => ({
+      canTitleBeChanged: true,
+      canFileBeChanged: false,
+      canOrderBeChanged: !hasActiveRecipients, // Only allow order changes if no active recipients.
+    }))
+    .exhaustive();
 };
