@@ -8,7 +8,7 @@ msgstr ""
 "Language: ko\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-13 04:15\n"
+"PO-Revision-Date: 2026-03-19 04:39\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -162,7 +162,7 @@ msgstr "{0, plural, other {#개 필드 남음}}"
 #. placeholder {0}: fieldsOnExcessPages.length
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "{0, plural, one {1 field will be deleted because the new PDF has fewer pages than the current one.} other {# fields will be deleted because the new PDF has fewer pages than the current one.}}"
-msgstr ""
+msgstr "{0, plural, other {새 PDF의 페이지 수가 현재 PDF보다 적어서 필드 #개가 삭제됩니다.}}"
 
 #. placeholder {0}: fields.filter((field) => field.envelopeItemId === doc.id).length
 #. placeholder {0}: remainingFields.filter((field) => field.envelopeItemId === doc.id).length
@@ -179,7 +179,7 @@ msgstr "{0, plural, other {#개의 일치하는 필드}}"
 #. placeholder {0}: replacementFile.pageCount
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "{0, plural, one {1 page} other {# pages}}"
-msgstr ""
+msgstr "{0, plural, other {#페이지}}"
 
 #. placeholder {0}: recipients.length
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.legacy_editor.tsx
@@ -517,7 +517,7 @@ msgstr "{user}가 수신자를 제거했습니다"
 #. placeholder {0}: data.envelopeItemTitle
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{user} replaced the PDF for envelope item {0}"
-msgstr ""
+msgstr "{user} 님이 봉투 항목 {0}의 PDF를 교체했습니다"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{user} requested a 2FA token for the document"
@@ -559,7 +559,7 @@ msgstr "{user}가 수신자를 업데이트했습니다"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{user} updated an envelope item"
-msgstr ""
+msgstr "{user}님이 봉투 항목을 수정했습니다."
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{user} updated the document"
@@ -735,15 +735,15 @@ msgstr "<0>참고</0> - 링크를 직접 템플릿과 함께 사용하는 경우
 
 #: packages/ui/components/template/template-type-select.tsx
 msgid "<0>Organisation</0> templates are shared across all teams in your organisation but can only be edited by the owning team."
-msgstr ""
+msgstr "<0>조직</0> 템플릿은 조직 내 모든 팀과 공유되지만, 소유 팀만 편집할 수 있습니다."
 
 #: packages/ui/components/template/template-type-select.tsx
 msgid "<0>Private</0> templates can only be used by your team."
-msgstr ""
+msgstr "<0>비공개</0> 템플릿은 귀하의 팀만 사용할 수 있습니다."
 
 #: packages/ui/components/template/template-type-select.tsx
 msgid "<0>Public</0> templates are linked to your public profile."
-msgstr ""
+msgstr "<0>공개</0> 템플릿은 귀하의 공개 프로필에 연결됩니다."
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx
@@ -4266,7 +4266,7 @@ msgstr "그리기"
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Drop PDF here or click to select"
-msgstr ""
+msgstr "여기에 PDF를 끌어다 놓거나 클릭하여 선택하세요"
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Drop your document here"
@@ -4358,7 +4358,7 @@ msgstr "편집"
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Edit Item"
-msgstr ""
+msgstr "항목 편집"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Edit Template"
@@ -4813,12 +4813,12 @@ msgstr "봉투 항목이 삭제되었습니다"
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
 msgid "Envelope item PDF replaced"
-msgstr ""
+msgstr "봉투 항목 PDF가 교체되었습니다"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
 msgid "Envelope item updated"
-msgstr ""
+msgstr "봉투 항목이 수정되었습니다."
 
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
 msgid "Envelope resent"
@@ -5062,7 +5062,7 @@ msgstr "이메일 도메인 재등록에 실패했습니다."
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Failed to read file"
-msgstr ""
+msgstr "파일을 읽지 못했습니다"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Failed to reseal document"
@@ -5102,7 +5102,7 @@ msgstr "봉투 업데이트에 실패했습니다. 다시 시도해 주세요."
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Failed to update item"
-msgstr ""
+msgstr "항목을 업데이트하지 못했습니다"
 
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 msgid "Failed to update recipient"
@@ -6682,7 +6682,7 @@ msgstr "\"{searchTerm}\"과(와) 일치하는 폴더가 없습니다."
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.folders._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.folders._index.tsx
 msgid "No folders yet."
-msgstr ""
+msgstr "아직 폴더가 없습니다."
 
 #: apps/remix/app/components/embed/embed-document-rejected.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/rejected.tsx
@@ -6703,7 +6703,7 @@ msgstr "사용 가능한 조직 구성원이 없습니다."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 msgid "No organisation templates are shared with your team yet."
-msgstr ""
+msgstr "아직 귀하의 팀과 공유된 조직 템플릿이 없습니다."
 
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "No organisations found"
@@ -7075,11 +7075,11 @@ msgstr "조직 팀"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
 msgid "Organisation Template"
-msgstr ""
+msgstr "조직 템플릿"
 
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Organisation templates are shared across all teams within the same organisation. Only the owning team can edit them."
-msgstr ""
+msgstr "조직 템플릿은 동일한 조직 내의 모든 팀에서 공유됩니다. 소유 팀만 이를 수정할 수 있습니다."
 
 #: apps/remix/app/components/forms/organisation-update-form.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -8089,11 +8089,11 @@ msgstr "비밀번호 재입력"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 msgid "Replace failed"
-msgstr ""
+msgstr "교체에 실패했습니다"
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Replace PDF"
-msgstr ""
+msgstr "PDF 교체"
 
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Reply to email"
@@ -9081,7 +9081,7 @@ msgstr "{0} 님의 서명 가능 기간이 만료되었습니다"
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Signup is currently disabled or not available for your email domain."
-msgstr ""
+msgstr "회원가입이 현재 비활성화되어 있거나, 사용자의 이메일 도메인에서는 사용할 수 없습니다."
 
 #. placeholder {0}: DateTime.fromJSDate(publicProfile.badge.since).toFormat('LLL ‘yy')
 #: apps/remix/app/routes/_profile+/p.$url.tsx
@@ -9189,7 +9189,7 @@ msgstr "문서를 렌더링하는 동안 문제가 발생하여 일부 필드가
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 msgid "Something went wrong while replacing the PDF"
-msgstr ""
+msgstr "PDF를 교체하는 동안 문제가 발생했습니다."
 
 #: apps/remix/app/components/general/verify-email-banner.tsx
 msgid "Something went wrong while sending the confirmation email."
@@ -9197,7 +9197,7 @@ msgstr "확인 이메일을 보내는 중 문제가 발생했습니다."
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Something went wrong while updating the envelope item."
-msgstr ""
+msgstr "봉투 항목을 업데이트하는 동안 문제가 발생했습니다."
 
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 msgid "Something went wrong while updating the team billing subscription, please contact support."
@@ -9712,7 +9712,7 @@ msgstr "템플릿 제목"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "Template type"
-msgstr ""
+msgstr "템플릿 유형"
 
 #: apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
 msgid "Template Updated"
@@ -9933,7 +9933,7 @@ msgstr "필드가 새로운 필드 삽입 방식으로 성공적으로 업데이
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "The file is not a valid PDF."
-msgstr ""
+msgstr "이 파일은 유효한 PDF가 아닙니다."
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "The folder you are trying to delete does not exist."
@@ -11090,7 +11090,7 @@ msgstr "다이렉트 수신자에게 필요한 역할을 설정하고 필드를 
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Update the title or replace the PDF file."
-msgstr ""
+msgstr "제목을 업데이트하거나 PDF 파일을 교체하세요."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "Update user"
@@ -11407,7 +11407,7 @@ msgstr "계정으로 전송된 모든 문서를 확인합니다"
 
 #: apps/remix/app/components/general/folder/folder-grid.tsx
 msgid "View all folders"
-msgstr ""
+msgstr "전체 폴더 보기"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "View all recent security activity related to your account."
@@ -11497,7 +11497,7 @@ msgstr "다음 문서 보기"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "View organisation template"
-msgstr ""
+msgstr "조직 템플릿 보기"
 
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 msgid "View owner"
@@ -12208,16 +12208,16 @@ msgstr "현재 <0>무료 플랜</0>을 사용 중입니다."
 #. placeholder {0}: i18n.date(periodEnd)
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You are currently subscribed to <0>{currentProductName}</0> which is set to automatically renew on <1>{0}</1>."
-msgstr ""
+msgstr "현재 <0>{currentProductName}</0> 구독 중이며, <1>{0}</1>에 자동으로 갱신되도록 설정되어 있습니다."
 
 #. placeholder {0}: i18n.date(periodEnd)
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You are currently subscribed to <0>{currentProductName}</0> which is set to end on <1>{0}</1>."
-msgstr ""
+msgstr "현재 <0>{currentProductName}</0> 구독 중이며, <1>{0}</1>에 종료되도록 설정되어 있습니다."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You are currently subscribed to <0>{currentProductName}</0>."
-msgstr ""
+msgstr "현재 <0>{currentProductName}</0> 구독 중입니다."
 
 #. placeholder {0}: organisationEmail.email
 #: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
@@ -12388,20 +12388,20 @@ msgstr "문서를 생성했습니다"
 #. placeholder {0}: i18n.date(periodEnd)
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You currently have an active plan which is set to automatically renew on <0>{0}</0>."
-msgstr ""
+msgstr "현재 활성 요금제가 있으며, <0>{0}</0>에 자동으로 갱신되도록 설정되어 있습니다."
 
 #. placeholder {0}: i18n.date(periodEnd)
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You currently have an active plan which is set to end on <0>{0}</0>."
-msgstr ""
+msgstr "현재 활성 요금제가 있으며, <0>{0}</0>에 종료되도록 설정되어 있습니다."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You currently have an active plan."
-msgstr ""
+msgstr "현재 활성 요금제가 있습니다."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You currently have an inactive <0>{currentProductName}</0> subscription."
-msgstr ""
+msgstr "현재 비활성 상태인 <0>{currentProductName}</0> 구독이 있습니다."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "You currently have no access to any teams within this organisation. Please contact your organisation to request access."
@@ -12732,7 +12732,7 @@ msgstr "수신자를 제거했습니다"
 #. placeholder {0}: data.envelopeItemTitle
 #: packages/lib/utils/document-audit-logs.ts
 msgid "You replaced the PDF for envelope item {0}"
-msgstr ""
+msgstr "봉투 항목 {0}에 대한 PDF를 교체했습니다."
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "You requested a 2FA token for the document"
@@ -12774,7 +12774,7 @@ msgstr "수신자를 업데이트했습니다"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "You updated an envelope item"
-msgstr ""
+msgstr "사용자가 봉투 항목을 수정했습니다."
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "You updated the document"
@@ -13174,3 +13174,4 @@ msgstr "인증 코드:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
