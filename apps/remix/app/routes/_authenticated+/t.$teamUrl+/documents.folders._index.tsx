@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { FolderIcon, HomeIcon, Loader2, SearchIcon } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router';
@@ -19,7 +20,7 @@ import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Documents');
+  return appMetaTags(msg`Documents`);
 }
 
 export default function DocumentsFoldersPage() {
