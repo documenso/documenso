@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-19 04:39\n"
+"PO-Revision-Date: 2026-03-19 04:58\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -1167,7 +1167,7 @@ msgstr "Aktive Sitzungen"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Active Sessions"
-msgstr ""
+msgstr "Aktive Sitzungen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Active Subscriptions"
@@ -5290,11 +5290,11 @@ msgstr "Wenn der Anspruch zum Beispiel das neue Flag 'FLAG_1' hat, das auf wahr 
 
 #: apps/remix/app/routes/_unauthenticated+/check-email.tsx
 msgid "Forgot password"
-msgstr ""
+msgstr "Passwort vergessen"
 
 #: apps/remix/app/routes/_unauthenticated+/forgot-password.tsx
 msgid "Forgot Password"
-msgstr ""
+msgstr "Passwort vergessen"
 
 #: packages/lib/server-only/auth/send-forgot-password.ts
 msgid "Forgot Password?"
@@ -8956,7 +8956,7 @@ msgstr "Registrieren"
 
 #: apps/remix/app/routes/_unauthenticated+/signup.tsx
 msgid "Sign Up"
-msgstr ""
+msgstr "Registrieren"
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Sign Up with Google"
@@ -11396,7 +11396,7 @@ msgstr "Domain verifizieren"
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email._index.tsx
 msgid "Verify Email"
-msgstr ""
+msgstr "E-Mail bestätigen"
 
 #: apps/remix/app/components/general/verify-email-banner.tsx
 msgid "Verify Now"

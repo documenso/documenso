@@ -8,7 +8,7 @@ msgstr ""
 "Language: ja\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-19 04:39\n"
+"PO-Revision-Date: 2026-03-19 04:58\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -1167,7 +1167,7 @@ msgstr "アクティブなセッション"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Active Sessions"
-msgstr ""
+msgstr "アクティブなセッション"
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Active Subscriptions"
@@ -5290,11 +5290,11 @@ msgstr "たとえば、クレームに新しいフラグ「FLAG_1」が true で
 
 #: apps/remix/app/routes/_unauthenticated+/check-email.tsx
 msgid "Forgot password"
-msgstr ""
+msgstr "パスワードをお忘れの方"
 
 #: apps/remix/app/routes/_unauthenticated+/forgot-password.tsx
 msgid "Forgot Password"
-msgstr ""
+msgstr "パスワードをお忘れですか？"
 
 #: packages/lib/server-only/auth/send-forgot-password.ts
 msgid "Forgot Password?"
@@ -8956,7 +8956,7 @@ msgstr "サインアップ"
 
 #: apps/remix/app/routes/_unauthenticated+/signup.tsx
 msgid "Sign Up"
-msgstr ""
+msgstr "登録する"
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Sign Up with Google"
@@ -11396,7 +11396,7 @@ msgstr "ドメインを検証"
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email._index.tsx
 msgid "Verify Email"
-msgstr ""
+msgstr "メールアドレスを確認"
 
 #: apps/remix/app/components/general/verify-email-banner.tsx
 msgid "Verify Now"

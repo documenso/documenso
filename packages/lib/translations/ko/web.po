@@ -8,7 +8,7 @@ msgstr ""
 "Language: ko\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-19 04:39\n"
+"PO-Revision-Date: 2026-03-19 04:58\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -1167,7 +1167,7 @@ msgstr "활성 세션"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Active Sessions"
-msgstr ""
+msgstr "활성 세션"
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Active Subscriptions"
@@ -5290,11 +5290,11 @@ msgstr "예를 들어, 클레임에 새 플래그 \"FLAG_1\"이 true로 설정�
 
 #: apps/remix/app/routes/_unauthenticated+/check-email.tsx
 msgid "Forgot password"
-msgstr ""
+msgstr "비밀번호를 잊으셨나요?"
 
 #: apps/remix/app/routes/_unauthenticated+/forgot-password.tsx
 msgid "Forgot Password"
-msgstr ""
+msgstr "비밀번호 재설정"
 
 #: packages/lib/server-only/auth/send-forgot-password.ts
 msgid "Forgot Password?"
@@ -8956,7 +8956,7 @@ msgstr "가입"
 
 #: apps/remix/app/routes/_unauthenticated+/signup.tsx
 msgid "Sign Up"
-msgstr ""
+msgstr "가입하기"
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Sign Up with Google"
@@ -11396,7 +11396,7 @@ msgstr "도메인 인증"
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email._index.tsx
 msgid "Verify Email"
-msgstr ""
+msgstr "이메일 확인"
 
 #: apps/remix/app/components/general/verify-email-banner.tsx
 msgid "Verify Now"
