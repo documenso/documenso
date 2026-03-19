@@ -8,7 +8,7 @@ msgstr ""
 "Language: nl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-13 04:15\n"
+"PO-Revision-Date: 2026-03-19 04:39\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -162,7 +162,7 @@ msgstr "{0, plural, one {1 veld resterend} other {# velden resterend}}"
 #. placeholder {0}: fieldsOnExcessPages.length
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "{0, plural, one {1 field will be deleted because the new PDF has fewer pages than the current one.} other {# fields will be deleted because the new PDF has fewer pages than the current one.}}"
-msgstr ""
+msgstr "{0, plural, one {1 veld wordt verwijderd omdat de nieuwe pdf minder pagina&#39;s heeft dan de huidige.} other {# velden worden verwijderd omdat de nieuwe pdf minder pagina&#39;s heeft dan de huidige.}}"
 
 #. placeholder {0}: fields.filter((field) => field.envelopeItemId === doc.id).length
 #. placeholder {0}: remainingFields.filter((field) => field.envelopeItemId === doc.id).length
@@ -179,7 +179,7 @@ msgstr "{0, plural, one {1 overeenkomend veld} other {# overeenkomende velden}}"
 #. placeholder {0}: replacementFile.pageCount
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "{0, plural, one {1 page} other {# pages}}"
-msgstr ""
+msgstr "{0, plural, one {1 pagina} other {# pagina&#39;s}}"
 
 #. placeholder {0}: recipients.length
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.legacy_editor.tsx
@@ -517,7 +517,7 @@ msgstr "{user} heeft een ontvanger verwijderd"
 #. placeholder {0}: data.envelopeItemTitle
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{user} replaced the PDF for envelope item {0}"
-msgstr ""
+msgstr "{user} heeft de pdf vervangen voor envelopitem {0}"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{user} requested a 2FA token for the document"
@@ -559,7 +559,7 @@ msgstr "{user} heeft een ontvanger bijgewerkt"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{user} updated an envelope item"
-msgstr ""
+msgstr "{user} heeft een envelopitem bijgewerkt"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{user} updated the document"
@@ -735,15 +735,15 @@ msgstr "<0>Let op</0> - Als je Links gebruikt in combinatie met directe sjablone
 
 #: packages/ui/components/template/template-type-select.tsx
 msgid "<0>Organisation</0> templates are shared across all teams in your organisation but can only be edited by the owning team."
-msgstr ""
+msgstr "<0>Organisatie</0>-sjablonen worden gedeeld met alle teams in je organisatie, maar kunnen alleen worden bewerkt door het eigenaarsteam."
 
 #: packages/ui/components/template/template-type-select.tsx
 msgid "<0>Private</0> templates can only be used by your team."
-msgstr ""
+msgstr "<0>Privé</0>-sjablonen kunnen alleen door je team worden gebruikt."
 
 #: packages/ui/components/template/template-type-select.tsx
 msgid "<0>Public</0> templates are linked to your public profile."
-msgstr ""
+msgstr "<0>Openbare</0>-sjablonen zijn gekoppeld aan je openbare profiel."
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx
@@ -4281,7 +4281,7 @@ msgstr "Tekenen"
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Drop PDF here or click to select"
-msgstr ""
+msgstr "Zet de pdf hier neer of klik om te selecteren"
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Drop your document here"
@@ -4373,7 +4373,7 @@ msgstr "Bewerken"
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Edit Item"
-msgstr ""
+msgstr "Item bewerken"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Edit Template"
@@ -4830,12 +4830,12 @@ msgstr "Envelopitem verwijderd"
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
 msgid "Envelope item PDF replaced"
-msgstr ""
+msgstr "Pdf voor envelopitem vervangen"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
 msgid "Envelope item updated"
-msgstr ""
+msgstr "Envelopitem bijgewerkt"
 
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
 msgid "Envelope resent"
@@ -5079,7 +5079,7 @@ msgstr "Opnieuw registreren van e-maildomein is mislukt"
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Failed to read file"
-msgstr ""
+msgstr "Bestand lezen mislukt"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Failed to reseal document"
@@ -5119,7 +5119,7 @@ msgstr "De envelope kon niet worden bijgewerkt. Probeer het opnieuw."
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Failed to update item"
-msgstr ""
+msgstr "Item bijwerken mislukt"
 
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 msgid "Failed to update recipient"
@@ -6709,7 +6709,7 @@ msgstr "Geen mappen gevonden die overeenkomen met \"{searchTerm}\""
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.folders._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.folders._index.tsx
 msgid "No folders yet."
-msgstr ""
+msgstr "Nog geen mappen."
 
 #: apps/remix/app/components/embed/embed-document-rejected.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/rejected.tsx
@@ -6730,7 +6730,7 @@ msgstr "Geen organisatieleden beschikbaar"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 msgid "No organisation templates are shared with your team yet."
-msgstr ""
+msgstr "Er worden nog geen organisatiesjablonen met je team gedeeld."
 
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "No organisations found"
@@ -7104,11 +7104,11 @@ msgstr "Organisatieteams"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
 msgid "Organisation Template"
-msgstr ""
+msgstr "Organisatiesjabloon"
 
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Organisation templates are shared across all teams within the same organisation. Only the owning team can edit them."
-msgstr ""
+msgstr "Organisatiesjablonen worden gedeeld tussen alle teams binnen dezelfde organisatie. Alleen het eigenaarsteam kan ze bewerken."
 
 #: apps/remix/app/components/forms/organisation-update-form.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -8122,11 +8122,11 @@ msgstr "Wachtwoord herhalen"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 msgid "Replace failed"
-msgstr ""
+msgstr "Vervangen mislukt"
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Replace PDF"
-msgstr ""
+msgstr "Pdf vervangen"
 
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Reply to email"
@@ -9127,7 +9127,7 @@ msgstr "Ondertekenvenster verlopen voor {0}"
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Signup is currently disabled or not available for your email domain."
-msgstr ""
+msgstr "Registratie is momenteel uitgeschakeld of niet beschikbaar voor jouw e‑maildomein."
 
 #. placeholder {0}: DateTime.fromJSDate(publicProfile.badge.since).toFormat('LLL ‘yy')
 #: apps/remix/app/routes/_profile+/p.$url.tsx
@@ -9235,7 +9235,7 @@ msgstr "Er is iets misgegaan bij het renderen van het document, sommige velden k
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 msgid "Something went wrong while replacing the PDF"
-msgstr ""
+msgstr "Er is iets misgegaan bij het vervangen van de PDF."
 
 #: apps/remix/app/components/general/verify-email-banner.tsx
 msgid "Something went wrong while sending the confirmation email."
@@ -9243,7 +9243,7 @@ msgstr "Er is iets misgegaan bij het verzenden van de bevestigingsmail."
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Something went wrong while updating the envelope item."
-msgstr ""
+msgstr "Er is iets misgegaan bij het bijwerken van het envelopitem."
 
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 msgid "Something went wrong while updating the team billing subscription, please contact support."
@@ -9760,7 +9760,7 @@ msgstr "Titel sjabloon"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "Template type"
-msgstr ""
+msgstr "Sjabloontype"
 
 #: apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
 msgid "Template Updated"
@@ -9983,7 +9983,7 @@ msgstr "De velden zijn succesvol bijgewerkt naar de nieuwe methode voor veldinvo
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "The file is not a valid PDF."
-msgstr ""
+msgstr "Het bestand is geen geldige PDF."
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "The folder you are trying to delete does not exist."
@@ -11140,7 +11140,7 @@ msgstr "Werk de rol bij en voeg velden toe zoals nodig voor de directe ontvanger
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Update the title or replace the PDF file."
-msgstr ""
+msgstr "Werk de titel bij of vervang het PDF-bestand."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "Update user"
@@ -11461,7 +11461,7 @@ msgstr "Bekijk alle documenten die naar je account zijn verzonden"
 
 #: apps/remix/app/components/general/folder/folder-grid.tsx
 msgid "View all folders"
-msgstr ""
+msgstr "Alle mappen bekijken"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "View all recent security activity related to your account."
@@ -11551,7 +11551,7 @@ msgstr "Volgend document bekijken"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "View organisation template"
-msgstr ""
+msgstr "Organisatiesjabloon bekijken"
 
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 msgid "View owner"
@@ -12264,16 +12264,16 @@ msgstr "Je zit momenteel in het <0>Gratis abonnement</0>."
 #. placeholder {0}: i18n.date(periodEnd)
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You are currently subscribed to <0>{currentProductName}</0> which is set to automatically renew on <1>{0}</1>."
-msgstr ""
+msgstr "U hebt momenteel een abonnement op <0>{currentProductName}</0> dat automatisch wordt verlengd op <1>{0}</1>."
 
 #. placeholder {0}: i18n.date(periodEnd)
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You are currently subscribed to <0>{currentProductName}</0> which is set to end on <1>{0}</1>."
-msgstr ""
+msgstr "U hebt momenteel een abonnement op <0>{currentProductName}</0> dat afloopt op <1>{0}</1>."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You are currently subscribed to <0>{currentProductName}</0>."
-msgstr ""
+msgstr "U hebt momenteel een abonnement op <0>{currentProductName}</0>."
 
 #. placeholder {0}: organisationEmail.email
 #: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
@@ -12444,20 +12444,20 @@ msgstr "Je hebt het document aangemaakt"
 #. placeholder {0}: i18n.date(periodEnd)
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You currently have an active plan which is set to automatically renew on <0>{0}</0>."
-msgstr ""
+msgstr "U hebt momenteel een actief abonnement dat automatisch wordt verlengd op <0>{0}</0>."
 
 #. placeholder {0}: i18n.date(periodEnd)
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You currently have an active plan which is set to end on <0>{0}</0>."
-msgstr ""
+msgstr "U hebt momenteel een actief abonnement dat afloopt op <0>{0}</0>."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You currently have an active plan."
-msgstr ""
+msgstr "U hebt momenteel een actief abonnement."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You currently have an inactive <0>{currentProductName}</0> subscription."
-msgstr ""
+msgstr "U hebt momenteel een inactief <0>{currentProductName}</0>-abonnement."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "You currently have no access to any teams within this organisation. Please contact your organisation to request access."
@@ -12788,7 +12788,7 @@ msgstr "Je hebt een ontvanger verwijderd"
 #. placeholder {0}: data.envelopeItemTitle
 #: packages/lib/utils/document-audit-logs.ts
 msgid "You replaced the PDF for envelope item {0}"
-msgstr ""
+msgstr "U hebt de PDF vervangen voor envelopitem {0}"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "You requested a 2FA token for the document"
@@ -12830,7 +12830,7 @@ msgstr "Je hebt een ontvanger bijgewerkt"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "You updated an envelope item"
-msgstr ""
+msgstr "Je hebt een envelopitem bijgewerkt"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "You updated the document"
@@ -13230,3 +13230,4 @@ msgstr "Uw verificatiecode:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
