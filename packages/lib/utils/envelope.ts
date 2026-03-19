@@ -281,6 +281,7 @@ export const getEnvelopeItemPermissions = (
     (recipient) =>
       recipient.role !== RecipientRole.CC &&
       (recipient.signingStatus === SigningStatus.SIGNED ||
+        recipient.signingStatus === SigningStatus.REJECTED ||
         recipient.sendStatus === SendStatus.SENT),
   );
 
