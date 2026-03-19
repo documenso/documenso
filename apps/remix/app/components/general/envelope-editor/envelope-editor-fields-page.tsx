@@ -28,7 +28,7 @@ import {
   type TSignatureFieldMeta,
   type TTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
-import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
+import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { cn } from '@documenso/ui/lib/utils';
@@ -88,8 +88,8 @@ export const EnvelopeEditorFieldsPage = () => {
   const [isAiEnableDialogOpen, setIsAiEnableDialogOpen] = useState(false);
   const { revalidate } = useRevalidator();
 
-  const canItemsBeModified = useMemo(
-    () => canEnvelopeItemsBeModified(envelope, envelope.recipients),
+  const envelopeItemPermissions = useMemo(
+    () => getEnvelopeItemPermissions(envelope, envelope.recipients),
     [envelope, envelope.recipients],
   );
 
@@ -171,7 +171,7 @@ export const EnvelopeEditorFieldsPage = () => {
           renderItemAction={
             editorConfig.envelopeItems !== null &&
             editorConfig.envelopeItems.allowReplace &&
-            canItemsBeModified
+            envelopeItemPermissions.canFileBeChanged
               ? (item) => (
                   <div className="relative flex h-5 w-5 flex-shrink-0 items-center justify-center">
                     <div

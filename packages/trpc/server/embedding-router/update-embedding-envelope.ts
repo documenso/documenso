@@ -16,7 +16,7 @@ import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-
 import { setTemplateRecipients } from '@documenso/lib/server-only/recipient/set-template-recipients';
 import { nanoid } from '@documenso/lib/universal/id';
 import { PRESIGNED_ENVELOPE_ITEM_ID_PREFIX } from '@documenso/lib/utils/embed-config';
-import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
+import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 
 import { procedure } from '../trpc';
@@ -191,10 +191,36 @@ export const updateEmbeddingEnvelopeRoute = procedure
 
     // Should be safe to use stale envelope.recipients since only signed or sent
     // recipients affect the outcome.
-    if (willEnvelopeItemsBeModified && !canEnvelopeItemsBeModified(envelope, envelope.recipients)) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Envelope item is not editable',
+    if (willEnvelopeItemsBeModified) {
+      const permissions = getEnvelopeItemPermissions(envelope, envelope.recipients);
+
+      const hasFileChange = envelopeItemIdsToDelete.length > 0 || envelopeItemsToCreate.length > 0;
+
+      const hasOrderChange = envelopeItemsToUpdate.some((item) => {
+        const existing = envelope.envelopeItems.find((e) => e.id === item.envelopeItemId);
+
+        return !existing || item.order !== existing.order;
       });
+
+      const hasTitleChange = envelopeItemsToUpdate.some((item) => item.title !== undefined);
+
+      if (hasFileChange && !permissions.canFileBeChanged) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Envelope item files are not editable',
+        });
+      }
+
+      if (hasOrderChange && !permissions.canOrderBeChanged) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Envelope item order is not editable',
+        });
+      }
+
+      if (hasTitleChange && !permissions.canTitleBeChanged) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Envelope item title is not editable',
+        });
+      }
     }
 
     if (envelopeItemIdsToDelete.length > 0) {
@@ -252,7 +278,14 @@ export const updateEmbeddingEnvelopeRoute = procedure
     if (envelopeItemsToUpdate.length > 0) {
       await UNSAFE_updateEnvelopeItems({
         envelopeId: envelope.id,
+        envelopeType: envelope.type,
+        existingEnvelopeItems: envelope.envelopeItems,
         data: envelopeItemsToUpdate,
+        user: {
+          name: apiToken.user.name,
+          email: apiToken.user.email,
+        },
+        apiRequestMetadata: ctx.metadata,
       });
     }
 
