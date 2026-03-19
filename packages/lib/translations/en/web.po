@@ -1160,6 +1160,10 @@ msgstr "Active"
 msgid "Active sessions"
 msgstr "Active sessions"
 
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+msgid "Active Sessions"
+msgstr "Active Sessions"
+
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Active Subscriptions"
 msgstr "Active Subscriptions"
@@ -1381,6 +1385,7 @@ msgstr "Additional brand information to display at the bottom of emails"
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: packages/lib/constants/organisations-translations.ts
 #: packages/lib/constants/teams-translations.ts
 msgid "Admin"
@@ -1887,6 +1892,7 @@ msgstr "Any Status"
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "API Tokens"
 msgstr "API Tokens"
 
@@ -2172,6 +2178,8 @@ msgstr "Before you get started, please confirm your email address by clicking th
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/billing.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/billing.tsx
 msgid "Billing"
 msgstr "Billing"
@@ -2209,6 +2217,8 @@ msgstr "Branding Logo"
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Branding Preferences"
 msgstr "Branding Preferences"
@@ -3262,6 +3272,7 @@ msgid "Dark Mode"
 msgstr "Dark Mode"
 
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
+#: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Dashboard"
 msgstr "Dashboard"
 
@@ -3967,6 +3978,8 @@ msgstr "Document pending email"
 
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.document.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.document.tsx
 msgid "Document Preferences"
 msgstr "Document Preferences"
@@ -4109,8 +4122,10 @@ msgstr "Documentation"
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.legacy_editor.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.folders._index.tsx
 #: apps/remix/app/routes/_profile+/p.$url.tsx
 msgid "Documents"
 msgstr "Documents"
@@ -4473,6 +4488,7 @@ msgstr "Email Domain Settings"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
 msgid "Email Domains"
 msgstr "Email Domains"
 
@@ -4489,6 +4505,7 @@ msgid "Email Options"
 msgstr "Email Options"
 
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.email.tsx
 msgid "Email Preferences"
@@ -5265,6 +5282,14 @@ msgstr "For each recipient, provide their email (required) and name (optional) i
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "For example, if the claim has a new flag \"FLAG_1\" set to true, then this organisation will get that flag added."
 msgstr "For example, if the claim has a new flag \"FLAG_1\" set to true, then this organisation will get that flag added."
+
+#: apps/remix/app/routes/_unauthenticated+/check-email.tsx
+msgid "Forgot password"
+msgstr "Forgot password"
+
+#: apps/remix/app/routes/_unauthenticated+/forgot-password.tsx
+msgid "Forgot Password"
+msgstr "Forgot Password"
 
 #: packages/lib/server-only/auth/send-forgot-password.ts
 msgid "Forgot Password?"
@@ -6095,6 +6120,7 @@ msgstr "Link your Documenso account"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 msgid "Linked Accounts"
 msgstr "Linked Accounts"
 
@@ -6233,6 +6259,7 @@ msgid "Manage organisations"
 msgstr "Manage organisations"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.passkeys.tsx
 msgid "Manage passkeys"
 msgstr "Manage passkeys"
 
@@ -7057,9 +7084,11 @@ msgid "Organisation settings"
 msgstr "Organisation settings"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 msgid "Organisation Settings"
 msgstr "Organisation Settings"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Organisation SSO Portal"
 msgstr "Organisation SSO Portal"
@@ -7318,6 +7347,7 @@ msgstr "Personal Account"
 #: apps/remix/app/components/general/menu-switcher.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
+#: apps/remix/app/routes/_authenticated+/inbox.tsx
 #: apps/remix/app/routes/_authenticated+/inbox.tsx
 msgid "Personal Inbox"
 msgstr "Personal Inbox"
@@ -7655,6 +7685,8 @@ msgstr "Processing document"
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/profile.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/profile.tsx
+#: apps/remix/app/routes/_profile+/_layout.tsx
 msgid "Profile"
 msgstr "Profile"
 
@@ -7692,6 +7724,7 @@ msgstr "Public"
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Public Profile"
 msgstr "Public Profile"
@@ -8195,6 +8228,8 @@ msgstr "Reset email sent"
 
 #: apps/remix/app/components/forms/forgot-password.tsx
 #: apps/remix/app/components/forms/reset-password.tsx
+#: apps/remix/app/routes/_unauthenticated+/reset-password._index.tsx
+#: apps/remix/app/routes/_unauthenticated+/reset-password.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/reset-password.$token.tsx
 #: packages/email/template-components/template-forgot-password.tsx
 msgid "Reset Password"
@@ -8431,9 +8466,11 @@ msgstr "Secret"
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "Security"
 msgstr "Security"
 
+#: apps/remix/app/routes/_authenticated+/settings+/security.activity.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.activity.tsx
 msgid "Security activity"
 msgstr "Security activity"
@@ -8769,7 +8806,10 @@ msgstr "Set up your template properties and recipient information"
 #: apps/remix/app/components/general/folder/folder-card.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.general.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.email.tsx
 msgid "Settings"
 msgstr "Settings"
 
@@ -8877,6 +8917,8 @@ msgstr "Sign Here"
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
+#: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
+#: apps/remix/app/routes/_unauthenticated+/signin.tsx
 #: packages/email/template-components/template-reset-password.tsx
 msgid "Sign In"
 msgstr "Sign In"
@@ -8906,6 +8948,10 @@ msgstr "Sign the document to complete the process."
 #: apps/remix/app/components/general/document-signing/document-signing-auth-page.tsx
 msgid "Sign up"
 msgstr "Sign up"
+
+#: apps/remix/app/routes/_unauthenticated+/signup.tsx
+msgid "Sign Up"
+msgstr "Sign Up"
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Sign Up with Google"
@@ -9436,6 +9482,7 @@ msgstr "support"
 #: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Support"
 msgstr "Support"
 
@@ -9603,6 +9650,7 @@ msgid "Team settings"
 msgstr "Team settings"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 msgid "Team Settings"
 msgstr "Team Settings"
 
@@ -9727,7 +9775,9 @@ msgstr "Template uploaded"
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.folders._index.tsx
 msgid "Templates"
 msgstr "Templates"
 
@@ -11339,6 +11389,10 @@ msgstr "Verify & Complete"
 msgid "Verify Domain"
 msgstr "Verify Domain"
 
+#: apps/remix/app/routes/_unauthenticated+/verify-email._index.tsx
+msgid "Verify Email"
+msgstr "Verify Email"
+
 #: apps/remix/app/components/general/verify-email-banner.tsx
 msgid "Verify Now"
 msgstr "Verify Now"
@@ -11976,6 +12030,8 @@ msgstr "Webhook URL"
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Webhooks"
 msgstr "Webhooks"
 

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType, OrganisationType } from '@prisma/client';
 import { Bird } from 'lucide-react';
@@ -30,7 +31,7 @@ const TEMPLATE_VIEWS = ['team', 'organisation'] as const;
 type TemplateView = (typeof TEMPLATE_VIEWS)[number];
 
 export function meta() {
-  return appMetaTags('Templates');
+  return appMetaTags(msg`Templates`);
 }
 
 export default function TemplatesPage() {
