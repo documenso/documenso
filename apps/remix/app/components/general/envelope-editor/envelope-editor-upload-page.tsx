@@ -4,7 +4,6 @@ import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
 import { msg, plural } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { DocumentStatus } from '@prisma/client';
 import { FileWarningIcon, GripVerticalIcon, Loader2Icon, PencilIcon, XIcon } from 'lucide-react';
 import { ErrorCode as DropzoneErrorCode, type FileRejection, useDropzone } from 'react-dropzone';
 
@@ -17,7 +16,7 @@ import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
 import { nanoid } from '@documenso/lib/universal/id';
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 import { PRESIGNED_ENVELOPE_ITEM_ID_PREFIX } from '@documenso/lib/utils/embed-config';
-import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
+import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { trpc } from '@documenso/trpc/react';
 import type { TCreateEnvelopeItemsPayload } from '@documenso/trpc/server/envelope-router/create-envelope-items.types';
 import type { TReplaceEnvelopeItemPdfPayload } from '@documenso/trpc/server/envelope-router/replace-envelope-item-pdf.types';
@@ -137,6 +136,11 @@ export const EnvelopeEditorUploadPage = () => {
     },
   });
 
+  const envelopeItemPermissions = useMemo(
+    () => getEnvelopeItemPermissions(envelope, envelope.recipients),
+    [envelope, envelope.recipients],
+  );
+
   const { mutateAsync: replaceEnvelopeItemPdf } = trpc.envelope.item.replacePdf.useMutation({
     onSuccess: ({ data, fields }) => {
       // Update the envelope item with the new documentDataId.
@@ -154,11 +158,6 @@ export const EnvelopeEditorUploadPage = () => {
       }
     },
   });
-
-  const canItemsBeModified = useMemo(
-    () => canEnvelopeItemsBeModified(envelope, envelope.recipients),
-    [envelope, envelope.recipients],
-  );
 
   const onFileDrop = async (files: File[]) => {
     const newUploadingFiles: (LocalFile & {
@@ -418,7 +417,7 @@ export const EnvelopeEditorUploadPage = () => {
   };
 
   const dropzoneDisabledMessage = useMemo(() => {
-    if (!canItemsBeModified) {
+    if (!envelopeItemPermissions.canFileBeChanged) {
       return msg`Cannot upload items after the document has been sent`;
     }
 
@@ -509,8 +508,8 @@ export const EnvelopeEditorUploadPage = () => {
                         key={localFile.id}
                         isDragDisabled={
                           isCreatingEnvelopeItems ||
+                          !envelopeItemPermissions.canOrderBeChanged ||
                           localFile.isReplacing ||
-                          !canItemsBeModified ||
                           !uploadConfig?.allowConfigureOrder
                         }
                         draggableId={localFile.id}
@@ -541,7 +540,7 @@ export const EnvelopeEditorUploadPage = () => {
                                 {localFile.envelopeItemId !== null ? (
                                   <EnvelopeItemTitleInput
                                     disabled={
-                                      envelope.status !== DocumentStatus.DRAFT ||
+                                      !envelopeItemPermissions.canTitleBeChanged ||
                                       !uploadConfig?.allowConfigureTitle ||
                                       localFile.isReplacing
                                     }
@@ -579,7 +578,7 @@ export const EnvelopeEditorUploadPage = () => {
                               )}
 
                               {localFile.envelopeItemId &&
-                                canItemsBeModified &&
+                                envelopeItemPermissions.canFileBeChanged &&
                                 uploadConfig?.allowReplace && (
                                   <Button
                                     variant="ghost"
@@ -613,7 +612,7 @@ export const EnvelopeEditorUploadPage = () => {
                                   </Button>
                                 ) : (
                                   <EnvelopeItemDeleteDialog
-                                    canItemBeDeleted={canItemsBeModified}
+                                    canItemBeDeleted={envelopeItemPermissions.canFileBeChanged}
                                     envelopeId={envelope.id}
                                     envelopeItemId={localFile.envelopeItemId}
                                     envelopeItemTitle={localFile.title}
