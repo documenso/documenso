@@ -1,5 +1,6 @@
 import { prisma } from '@documenso/prisma';
 
+import { GLOBAL_WEBHOOK_EVENTS, GLOBAL_WEBHOOK_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type ClaimAuthorizationOptions = {
@@ -45,15 +46,29 @@ export const claimAuthorization = async ({ claimCode }: ClaimAuthorizationOption
     });
   }
 
-  // Mark as claimed and clear plaintext token
-  await prisma.suiteOpAuthorization.update({
-    where: {
-      id: authorization.id,
-    },
-    data: {
-      claimed: true,
-      plaintextToken: '', // Clear plaintext token after claiming
-    },
+  // Mark as claimed and clear plaintext token, and create webhook in a transaction
+  await prisma.$transaction(async (tx) => {
+    await tx.suiteOpAuthorization.update({
+      where: {
+        id: authorization.id,
+      },
+      data: {
+        claimed: true,
+        plaintextToken: '',
+      },
+    });
+
+    // Create a webhook so SuiteOp receives document events for this team
+    await tx.webhook.create({
+      data: {
+        webhookUrl: GLOBAL_WEBHOOK_URL,
+        eventTriggers: [...GLOBAL_WEBHOOK_EVENTS],
+        secret: null,
+        enabled: true,
+        userId: authorization.userId,
+        teamId: authorization.teamId,
+      },
+    });
   });
 
   return {

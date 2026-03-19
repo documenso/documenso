@@ -7,10 +7,15 @@ import { APP_I18N_OPTIONS } from '../constants/i18n';
 import { env } from './env';
 
 export async function getTranslations(locale: string) {
-  const extension = env('NODE_ENV') === 'development' ? 'po' : 'mjs';
+  // On the server in development, import .po files directly (handled by Lingui Vite plugin).
+  // In the browser (or production), import the compiled .mjs files.
+  // Splitting into two branches lets Vite statically analyze each import glob pattern.
+  if (env('NODE_ENV') === 'development' && typeof window === 'undefined') {
+    const { messages } = await import(`../translations/${locale}/web.po`);
+    return messages;
+  }
 
-  const { messages } = await import(`../translations/${locale}/web.${extension}`);
-
+  const { messages } = await import(`../translations/${locale}/web.mjs`);
   return messages;
 }
 
