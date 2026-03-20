@@ -26,9 +26,9 @@
     "@documenso/ui": "*",
     "@epic-web/remember": "^1.1.0",
     "@faker-js/faker": "^10.1.0",
-    "@hono/node-server": "^1.19.6",
-    "@hono/trpc-server": "^0.4.0",
+    "@hono/node-server": "^1.19.11",
     "@hono/standard-validator": "^0.2.0",
+    "@hono/trpc-server": "^0.4.0",
     "@hookform/resolvers": "^3",
     "@lingui/core": "^5.6.0",
     "@lingui/detect-locale": "^5.6.0",
@@ -45,8 +45,7 @@
     "colord": "^2.9.3",
     "content-disposition": "^1.0.1",
     "framer-motion": "^12.23.24",
-    "hono": "4.11.4",
-    "hono-rate-limiter": "^0.4.2",
+    "hono": "^4.12.5",
     "hono-react-router-adapter": "^0.6.5",
     "input-otp": "^1.4.2",
     "isbot": "^5.1.32",
@@ -54,6 +53,7 @@
     "lucide-react": "^0.554.0",
     "luxon": "^3.7.2",
     "nanoid": "^5.1.6",
+    "nuqs": "^2.8.9",
     "papaparse": "^5.5.3",
     "posthog-js": "^1.297.2",
     "posthog-node": "4.18.0",
@@ -106,5 +106,5 @@
     "vite-plugin-babel-macros": "^1.0.6",
     "vite-tsconfig-paths": "^5.1.4"
   },
-  "version": "2.6.0"
+  "version": "2.8.1"
 }

@@ -16,4 +16,14 @@ export abstract class BaseJobProvider {
   public getApiHandler(): (req: HonoContext) => Promise<Response | void> {
     throw new Error('Not implemented');
   }
+
+  /**
+   * Start the cron scheduler for any registered cron jobs.
+   *
+   * No-op for providers that handle cron scheduling externally (e.g. Inngest).
+   * Must be called explicitly at application startup.
+   */
+  public startCron(): void {
+    // No-op by default — providers override if needed.
+  }
 }

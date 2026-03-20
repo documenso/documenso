@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
+import { AppError, AppErrorCode } from '../errors/app-error';
 import { extractLegacyIds } from '../universal/id';
 
 /**
@@ -93,4 +94,24 @@ export const mapRecipientToLegacyRecipient = (
 
 export const isRecipientEmailValidForSending = (recipient: Pick<Recipient, 'email'>) => {
   return z.string().email().safeParse(recipient.email).success;
+};
+
+/**
+ * Whether the recipient's signing window has expired.
+ */
+export const isRecipientExpired = (recipient: { expiresAt: Date | null }) => {
+  return Boolean(recipient.expiresAt && new Date(recipient.expiresAt) <= new Date());
+};
+
+/**
+ * Asserts that the recipient's signing window has not expired.
+ *
+ * Throws an AppError with RECIPIENT_EXPIRED if the expiration date has passed.
+ */
+export const assertRecipientNotExpired = (recipient: { expiresAt: Date | null }) => {
+  if (isRecipientExpired(recipient)) {
+    throw new AppError(AppErrorCode.RECIPIENT_EXPIRED, {
+      message: 'Recipient signing window has expired',
+    });
+  }
 };

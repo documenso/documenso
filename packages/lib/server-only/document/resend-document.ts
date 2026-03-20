@@ -7,10 +7,12 @@ import {
   OrganisationType,
   RecipientRole,
   SigningStatus,
+  WebhookTriggerEvents,
 } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
+import { resolveExpiresAt } from '@documenso/lib/constants/envelope-expiration';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
@@ -24,12 +26,17 @@ import { prisma } from '@documenso/prisma';
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
+import {
+  ZWebhookDocumentSchema,
+  mapEnvelopeToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import { isDocumentCompleted } from '../../utils/document';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type ResendDocumentOptions = {
   id: EnvelopeIdOptions;
@@ -94,10 +101,30 @@ export const resendDocument = async ({
     throw new Error('Can not send completed document');
   }
 
+  // Refresh the expiresAt on each resent recipient.
+  const expiresAt = resolveExpiresAt(envelope.documentMeta?.envelopeExpirationPeriod ?? null);
+
   const recipientsToRemind = envelope.recipients.filter(
     (recipient) =>
-      recipients.includes(recipient.id) && recipient.signingStatus === SigningStatus.NOT_SIGNED,
+      recipients.includes(recipient.id) &&
+      recipient.signingStatus === SigningStatus.NOT_SIGNED &&
+      recipient.role !== RecipientRole.CC,
   );
+
+  // Extend the expiration deadline for recipients being resent.
+  if (expiresAt && recipientsToRemind.length > 0) {
+    await prisma.recipient.updateMany({
+      where: {
+        id: {
+          in: recipientsToRemind.map((r) => r.id),
+        },
+      },
+      data: {
+        expiresAt,
+        expirationNotifiedAt: null,
+      },
+    });
+  }
 
   const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
     envelope.documentMeta,
@@ -192,45 +219,49 @@ export const resendDocument = async ({
         }),
       ]);
 
-      await prisma.$transaction(
-        async (tx) => {
-          await mailer.sendMail({
-            to: {
-              address: email,
-              name,
-            },
-            from: senderEmail,
-            replyTo: replyToEmail,
-            subject: envelope.documentMeta.subject
-              ? renderCustomEmailTemplate(
-                  i18n._(msg`Reminder: ${envelope.documentMeta.subject}`),
-                  customEmailTemplate,
-                )
-              : emailSubject,
-            html,
-            text,
-          });
-
-          await tx.documentAuditLog.create({
-            data: createDocumentAuditLogData({
-              type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
-              envelopeId: envelope.id,
-              metadata: requestMetadata,
-              data: {
-                emailType: recipientEmailType,
-                recipientEmail: recipient.email,
-                recipientName: recipient.name,
-                recipientRole: recipient.role,
-                recipientId: recipient.id,
-                isResending: true,
-              },
-            }),
-          });
+      // Send email outside any transaction to avoid holding a connection
+      // open during network I/O.
+      await mailer.sendMail({
+        to: {
+          address: email,
+          name,
         },
-        { timeout: 30_000 },
-      );
+        from: senderEmail,
+        replyTo: replyToEmail,
+        subject: envelope.documentMeta.subject
+          ? renderCustomEmailTemplate(
+              i18n._(msg`Reminder: ${envelope.documentMeta.subject}`),
+              customEmailTemplate,
+            )
+          : emailSubject,
+        html,
+        text,
+      });
+
+      await prisma.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
+          envelopeId: envelope.id,
+          metadata: requestMetadata,
+          data: {
+            emailType: recipientEmailType,
+            recipientEmail: recipient.email,
+            recipientName: recipient.name,
+            recipientRole: recipient.role,
+            recipientId: recipient.id,
+            isResending: true,
+          },
+        }),
+      });
     }),
   );
+
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_REMINDER_SENT,
+    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
+    userId: envelope.userId,
+    teamId: envelope.teamId,
+  });
 
   return envelope;
 };

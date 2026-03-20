@@ -23,6 +23,8 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
 
   'ENVELOPE_ITEM_CREATED',
   'ENVELOPE_ITEM_DELETED',
+  'ENVELOPE_ITEM_UPDATED',
+  'ENVELOPE_ITEM_PDF_REPLACED',
 
   // Document events.
   'DOCUMENT_COMPLETED', // When the document is sealed and fully completed.
@@ -40,6 +42,7 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_VIEWED', // When the document is viewed by a recipient.
   'DOCUMENT_RECIPIENT_REJECTED', // When a recipient rejects the document.
   'DOCUMENT_RECIPIENT_COMPLETED', // When a recipient completes all their required tasks for the document.
+  'DOCUMENT_RECIPIENT_EXPIRED', // When a recipient's signing window expires.
   'DOCUMENT_SENT', // When the document transitions from DRAFT to PENDING.
   'DOCUMENT_TITLE_UPDATED', // When the document title is updated.
   'DOCUMENT_EXTERNAL_ID_UPDATED', // When the document external ID is updated.
@@ -202,6 +205,34 @@ export const ZDocumentAuditLogEventEnvelopeItemCreatedSchema = z.object({
  */
 export const ZDocumentAuditLogEventEnvelopeItemDeletedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_DELETED),
+  data: z.object({
+    envelopeItemId: z.string(),
+    envelopeItemTitle: z.string(),
+  }),
+});
+
+/**
+ * Event: Envelope item updated.
+ */
+export const ZDocumentAuditLogEventEnvelopeItemUpdatedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_UPDATED),
+  data: z.object({
+    envelopeItemId: z.string(),
+    changes: z.array(
+      z.object({
+        field: z.string(),
+        from: z.string(),
+        to: z.string(),
+      }),
+    ),
+  }),
+});
+
+/**
+ * Event: Envelope item PDF replaced.
+ */
+export const ZDocumentAuditLogEventEnvelopeItemPdfReplacedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_PDF_REPLACED),
   data: z.object({
     envelopeItemId: z.string(),
     envelopeItemTitle: z.string(),
@@ -694,6 +725,18 @@ export const ZDocumentAuditLogEventDocumentDelegatedOwnerCreatedSchema = z.objec
   }),
 });
 
+/**
+ * Event: Recipient's signing window expired.
+ */
+export const ZDocumentAuditLogEventRecipientExpiredSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_EXPIRED),
+  data: z.object({
+    recipientEmail: z.string(),
+    recipientName: z.string(),
+    recipientId: z.number(),
+  }),
+});
+
 export const ZDocumentAuditLogBaseSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
@@ -709,6 +752,8 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
   z.union([
     ZDocumentAuditLogEventEnvelopeItemCreatedSchema,
     ZDocumentAuditLogEventEnvelopeItemDeletedSchema,
+    ZDocumentAuditLogEventEnvelopeItemUpdatedSchema,
+    ZDocumentAuditLogEventEnvelopeItemPdfReplacedSchema,
     ZDocumentAuditLogEventEmailSentSchema,
     ZDocumentAuditLogEventDocumentCompletedSchema,
     ZDocumentAuditLogEventDocumentCreatedSchema,
@@ -739,6 +784,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventRecipientAddedSchema,
     ZDocumentAuditLogEventRecipientUpdatedSchema,
     ZDocumentAuditLogEventRecipientRemovedSchema,
+    ZDocumentAuditLogEventRecipientExpiredSchema,
   ]),
 );
 

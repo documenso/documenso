@@ -1,6 +1,7 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { UNSAFE_updateEnvelopeItems } from '@documenso/lib/server-only/envelope-item/update-envelope-items';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
-import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
+import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
@@ -54,9 +55,40 @@ export const updateEnvelopeItemsRoute = authenticatedProcedure
       });
     }
 
-    if (!canEnvelopeItemsBeModified(envelope, envelope.recipients)) {
+    const permissions = getEnvelopeItemPermissions(envelope, envelope.recipients);
+
+    const hasOrderChange = data.some((item) => {
+      if (item.order === undefined) {
+        return false;
+      }
+
+      const existingItem = envelope.envelopeItems.find((e) => e.id === item.envelopeItemId);
+
+      return !existingItem || existingItem.order !== item.order;
+    });
+
+    const hasTitleChange = data.some((item) => item.title !== undefined);
+
+    if (!hasTitleChange && !hasOrderChange) {
+      return {
+        data: envelope.envelopeItems.map((item) => ({
+          id: item.id,
+          order: item.order,
+          title: item.title,
+          envelopeId: item.envelopeId,
+        })),
+      };
+    }
+
+    if (hasTitleChange && !permissions.canTitleBeChanged) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Envelope item is not editable',
+        message: 'Envelope item title is not editable',
+      });
+    }
+
+    if (hasOrderChange && !permissions.canOrderBeChanged) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Envelope item order is not editable',
       });
     }
 
@@ -71,28 +103,17 @@ export const updateEnvelopeItemsRoute = authenticatedProcedure
       });
     }
 
-    const updatedEnvelopeItems = await Promise.all(
-      data.map(async ({ envelopeItemId, order, title }) =>
-        prisma.envelopeItem.update({
-          where: {
-            envelopeId: envelope.id,
-            id: envelopeItemId,
-          },
-          data: {
-            order,
-            title,
-          },
-          select: {
-            id: true,
-            order: true,
-            title: true,
-            envelopeId: true,
-          },
-        }),
-      ),
-    );
-
-    // Todo: Envelope [AUDIT_LOGS]
+    const updatedEnvelopeItems = await UNSAFE_updateEnvelopeItems({
+      envelopeId,
+      envelopeType: envelope.type,
+      existingEnvelopeItems: envelope.envelopeItems,
+      data,
+      user: {
+        name: user.name,
+        email: user.email,
+      },
+      apiRequestMetadata: ctx.metadata,
+    });
 
     return {
       data: updatedEnvelopeItems,

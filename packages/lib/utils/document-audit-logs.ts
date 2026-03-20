@@ -571,6 +571,30 @@ export const formatDocumentAuditLogAction = (
       you: msg`You deleted an envelope item with title ${data.envelopeItemTitle}`,
       user: msg`${user} deleted an envelope item with title ${data.envelopeItemTitle}`,
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_UPDATED }, () => ({
+      anonymous: msg({
+        message: `Envelope item updated`,
+        context: `Audit log format`,
+      }),
+      you: msg`You updated an envelope item`,
+      user: msg`${user} updated an envelope item`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_PDF_REPLACED }, ({ data }) => ({
+      anonymous: msg({
+        message: `Envelope item PDF replaced`,
+        context: `Audit log format`,
+      }),
+      you: msg`You replaced the PDF for envelope item ${data.envelopeItemTitle}`,
+      user: msg`${user} replaced the PDF for envelope item ${data.envelopeItemTitle}`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_EXPIRED }, ({ data }) => ({
+      anonymous: msg({
+        message: `Recipient signing window expired`,
+        context: `Audit log format`,
+      }),
+      you: msg`Signing window expired for ${data.recipientName || data.recipientEmail}`,
+      user: msg`Signing window expired for ${data.recipientName || data.recipientEmail}`,
+    }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELEGATED_OWNER_CREATED }, ({ data }) => {
       const message = msg({
         message: `The document ownership was delegated to ${data.delegatedOwnerName || data.delegatedOwnerEmail} on behalf of ${data.teamName}`,

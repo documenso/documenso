@@ -13,6 +13,7 @@ import * as z from 'zod';
 
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { getRecipientsWithMissingFields } from '@documenso/lib/utils/recipients';
 import { trpc, trpc as trpcReact } from '@documenso/trpc/react';
@@ -116,10 +117,15 @@ export const EnvelopeDistributeDialog = ({
   } = form;
 
   const { data: emailData, isLoading: isLoadingEmails } =
-    trpc.enterprise.organisation.email.find.useQuery({
-      organisationId: organisation.id,
-      perPage: 100,
-    });
+    trpc.enterprise.organisation.email.find.useQuery(
+      {
+        organisationId: organisation.id,
+        perPage: 100,
+      },
+      {
+        ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+      },
+    );
 
   const emails = emailData?.data || [];
 

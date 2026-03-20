@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
 import { FolderType, OrganisationType } from '@prisma/client';
@@ -9,6 +10,8 @@ import { z } from 'zod';
 
 import { useSessionStorage } from '@documenso/lib/client-only/hooks/use-session-storage';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { STATS_COUNT_CAP } from '@documenso/lib/constants/document';
+import { SKIP_QUERY_BATCH_META } from '@documenso/lib/constants/trpc';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { parseToIntegerArray } from '@documenso/lib/utils/params';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
@@ -36,7 +39,7 @@ import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Documents');
+  return appMetaTags(msg`Documents`);
 }
 
 const ZSearchParamsSchema = ZFindDocumentsInternalRequestSchema.pick({
@@ -84,10 +87,15 @@ export default function DocumentsPage() {
     [searchParams],
   );
 
-  const { data, isLoading, isLoadingError } = trpc.document.findDocumentsInternal.useQuery({
-    ...findDocumentSearchParams,
-    folderId,
-  });
+  const { data, isLoading, isLoadingError } = trpc.document.findDocumentsInternal.useQuery(
+    {
+      ...findDocumentSearchParams,
+      folderId,
+    },
+    {
+      ...SKIP_QUERY_BATCH_META,
+    },
+  );
 
   const getTabHref = (value: keyof typeof ExtendedDocumentStatus) => {
     const params = new URLSearchParams(searchParams);
@@ -172,7 +180,11 @@ export default function DocumentsPage() {
                         <DocumentStatus status={value} />
 
                         {value !== ExtendedDocumentStatus.ALL && (
-                          <span className="ml-1 inline-block opacity-50">{stats[value]}</span>
+                          <span className="ml-1 inline-block opacity-50">
+                            {stats[value] >= STATS_COUNT_CAP
+                              ? `${STATS_COUNT_CAP.toLocaleString()}+`
+                              : stats[value]}
+                          </span>
                         )}
                       </Link>
                     </TabsTrigger>

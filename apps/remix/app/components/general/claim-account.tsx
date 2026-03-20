@@ -23,7 +23,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { signupErrorMessages } from '~/components/forms/signup';
+import { SIGNUP_ERROR_MESSAGES } from '~/components/forms/signup';
 
 export type ClaimAccountProps = {
   defaultName: string;
@@ -90,7 +90,8 @@ export const ClaimAccount = ({ defaultName, defaultEmail }: ClaimAccountProps) =
     } catch (err) {
       const error = AppError.parseError(err);
 
-      const errorMessage = signupErrorMessages[error.code] ?? signupErrorMessages.INVALID_REQUEST;
+      const errorMessage =
+        SIGNUP_ERROR_MESSAGES[error.code] ?? SIGNUP_ERROR_MESSAGES.INVALID_REQUEST;
 
       toast({
         title: _(msg`An error occurred`),

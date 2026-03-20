@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
 import { useLoaderData } from 'react-router';
@@ -16,7 +17,7 @@ import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Document Preferences');
+  return appMetaTags(msg`Document Preferences`);
 }
 
 export const loader = () => {
@@ -53,6 +54,7 @@ export default function TeamsSettingsPage() {
         defaultRecipients,
         delegateDocumentOwnership,
         aiFeaturesEnabled,
+        envelopeExpirationPeriod,
       } = data;
 
       await updateTeamSettings({
@@ -67,6 +69,7 @@ export default function TeamsSettingsPage() {
           includeAuditLog,
           defaultRecipients,
           aiFeaturesEnabled,
+          envelopeExpirationPeriod,
           ...(signatureTypes.length === 0
             ? {
                 typedSignatureEnabled: null,

@@ -6,6 +6,7 @@ import { validateNumberField } from '@documenso/lib/advanced-fields-validation/v
 import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import {
+  FIELD_META_DEFAULT_VALUES,
   type TFieldMetaSchema as FieldMeta,
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
@@ -116,7 +117,9 @@ export const setFieldsForTemplate = async ({
     // Disabling as wrapping promises here causes type issues
     // eslint-disable-next-line @typescript-eslint/promise-function-async
     linkedFields.map(async (field) => {
-      const parsedFieldMeta = field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined;
+      const parsedFieldMeta = field.fieldMeta
+        ? ZFieldMetaSchema.parse(field.fieldMeta)
+        : FIELD_META_DEFAULT_VALUES[field.type];
 
       if (field.type === FieldType.TEXT && field.fieldMeta) {
         const textFieldParsedMeta = ZTextFieldMeta.parse(field.fieldMeta);
