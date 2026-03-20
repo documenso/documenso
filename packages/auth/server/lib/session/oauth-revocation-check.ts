@@ -15,15 +15,15 @@ const oauthStatusCache = new Map<number, { lastChecked: number; valid: boolean }
 /**
  * Validate that a user's OAuth grant is still active.
  *
- * Returns true if:
+ * Returns true (session valid) if:
  * - User has no OAuth accounts (email/password user)
- * - OAuth token has not expired
- * - OAuth provider confirms the token is still valid
+ * - Token is expired (natural expiry is NOT revocation — fail-open)
+ * - Provider confirms the token is still valid (200)
  * - Check was performed recently and cached as valid
+ * - Provider is unreachable (fail-open)
  *
- * Returns false if:
- * - OAuth token is expired and no refresh token exists
- * - OAuth provider rejects the token (revoked)
+ * Returns false (session killed) only if:
+ * - Provider explicitly rejects the token (401/403 = revoked)
  */
 export const validateOAuthGrant = async (userId: number): Promise<boolean> => {
   // Check cache first
@@ -41,7 +41,6 @@ export const validateOAuthGrant = async (userId: number): Promise<boolean> => {
     select: {
       provider: true,
       access_token: true,
-      refresh_token: true,
       expires_at: true,
     },
   });
@@ -53,35 +52,32 @@ export const validateOAuthGrant = async (userId: number): Promise<boolean> => {
   }
 
   for (const account of accounts) {
-    // If token has an expiry and it's in the past
+    // If token has expired, we cannot introspect it — the provider will reject it
+    // for being expired, not necessarily revoked. Token expiry is natural and does
+    // NOT indicate revocation. Fail-open.
     if (account.expires_at) {
       const expiresAtMs = account.expires_at * 1000;
 
       if (Date.now() > expiresAtMs) {
-        // Token expired — if no refresh token, the grant is effectively revoked
-        if (!account.refresh_token) {
-          oauthStatusCache.set(userId, { lastChecked: Date.now(), valid: false });
-          return false;
-        }
-
-        // Has refresh token — attempt to validate with provider
-        const isValid = await introspectOAuthToken(account.provider, account.access_token);
-        if (!isValid) {
-          oauthStatusCache.set(userId, { lastChecked: Date.now(), valid: false });
-          return false;
-        }
+        // Expired token — skip introspection, fail-open.
+        // The user will get a fresh token on their next OAuth login.
+        continue;
       }
     }
 
-    // Token not expired — validate with provider if we haven't checked recently
+    // Token is still within its validity window — check with provider
     if (account.access_token) {
       const isValid = await introspectOAuthToken(account.provider, account.access_token);
-      oauthStatusCache.set(userId, { lastChecked: Date.now(), valid: isValid });
-      return isValid;
+
+      if (!isValid) {
+        // Provider explicitly rejected the token — this is a real revocation
+        oauthStatusCache.set(userId, { lastChecked: Date.now(), valid: false });
+        return false;
+      }
     }
   }
 
-  // Default: valid (fail-open to avoid locking out users on provider downtime)
+  // All accounts checked — no revocations detected
   oauthStatusCache.set(userId, { lastChecked: Date.now(), valid: true });
   return true;
 };
@@ -90,62 +86,58 @@ export const validateOAuthGrant = async (userId: number): Promise<boolean> => {
  * Check with the OAuth provider whether a token is still valid.
  *
  * For Google: uses the tokeninfo endpoint.
- * For other providers: checks the userinfo endpoint (standard OIDC).
+ * For Microsoft: checks the Graph /me endpoint.
+ * For other providers: skip introspection (fail-open).
  *
- * Returns false if the provider rejects the token (revoked/expired).
- * Returns true if the provider confirms it or if the check fails (fail-open).
+ * Returns false ONLY if the provider explicitly rejects the token (401/403).
+ * Returns true for all other cases (200, network error, timeout, unknown provider).
  */
 const introspectOAuthToken = async (
   provider: string,
   accessToken: string | null,
 ): Promise<boolean> => {
   if (!accessToken) {
-    return false;
+    // No token stored — cannot introspect, fail-open
+    return true;
   }
 
   try {
     let introspectUrl: string;
+    const headers: Record<string, string> = {};
 
     switch (provider) {
       case 'google':
-        introspectUrl = `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${accessToken}`;
+        introspectUrl = `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${encodeURIComponent(accessToken)}`;
         break;
       case 'microsoft':
         introspectUrl = 'https://graph.microsoft.com/v1.0/me';
+        headers['Authorization'] = `Bearer ${accessToken}`;
         break;
       default:
-        // For unknown providers, skip introspection (fail-open)
+        // Unknown provider — skip introspection (fail-open)
         return true;
     }
 
     const response = await fetch(introspectUrl, {
-      method: provider === 'google' ? 'GET' : 'GET',
-      headers:
-        provider !== 'google'
-          ? { Authorization: `Bearer ${accessToken}` }
-          : {},
+      method: 'GET',
+      headers,
       signal: AbortSignal.timeout(5000),
     });
 
+    // 401/403 = token has been explicitly revoked or is invalid
     if (response.status === 401 || response.status === 403) {
-      // Token has been revoked or is invalid
       return false;
     }
 
-    if (response.status === 400) {
-      // Google returns 400 for invalid/expired tokens
+    // Google returns 400 for invalid/expired tokens with specific error
+    if (response.status === 400 && provider === 'google') {
       const body = await response.json().catch(() => null);
       if (body && body.error === 'invalid_token') {
         return false;
       }
     }
 
-    // 200 = token is valid
-    if (response.ok) {
-      return true;
-    }
-
-    // On unexpected errors, fail-open to avoid locking users out
+    // 200 = token is valid. Any other status = fail-open.
     return true;
   } catch {
     // Network error, timeout, etc. — fail-open
