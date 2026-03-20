@@ -44,7 +44,7 @@ test('[COMMAND_MENU]: should be able to search by recipient', async ({ page }) =
 
   await apiSignin({
     page,
-    email: recipient.email,
+    email: user.email,
   });
 
   await page.keyboard.press('Meta+K');

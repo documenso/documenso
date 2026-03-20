@@ -1,4 +1,6 @@
-import { Trans, useLingui } from '@lingui/react/macro';
+import { t } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { DocumentDistributionMethod } from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
 import type { Control } from 'react-hook-form';
@@ -44,7 +46,7 @@ export const ConfigureDocumentAdvancedSettings = ({
   control,
   isSubmitting,
 }: ConfigureDocumentAdvancedSettingsProps) => {
-  const { t } = useLingui();
+  const { _ } = useLingui();
 
   const form = useFormContext<TConfigureEmbedFormSchema>();
   const { features } = useConfigureDocument();
@@ -58,11 +60,11 @@ export const ConfigureDocumentAdvancedSettings = ({
 
   return (
     <div>
-      <h3 className="text-foreground mb-1 text-lg font-medium">
+      <h3 className="mb-1 text-lg font-medium text-foreground">
         <Trans>Advanced Settings</Trans>
       </h3>
 
-      <p className="text-muted-foreground mb-6 text-sm">
+      <p className="mb-6 text-sm text-muted-foreground">
         <Trans>Configure additional options and preferences</Trans>
       </p>
 
@@ -93,12 +95,12 @@ export const ConfigureDocumentAdvancedSettings = ({
                     <FormControl>
                       <MultiSelectCombobox
                         options={Object.values(DOCUMENT_SIGNATURE_TYPES).map((option) => ({
-                          label: t(option.label),
+                          label: _(option.label),
                           value: option.value,
                         }))}
                         selectedValues={field.value}
                         onChange={field.onChange}
-                        className="bg-background w-full"
+                        className="w-full bg-background"
                         emptySelectionPlaceholder={t`Select signature types`}
                       />
                     </FormControl>
@@ -125,7 +127,7 @@ export const ConfigureDocumentAdvancedSettings = ({
                         <SelectContent>
                           {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
                             <SelectItem key={code} value={code}>
-                              {language.full}
+                              {_(language.full)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -202,7 +204,7 @@ export const ConfigureDocumentAdvancedSettings = ({
                         <TooltipTrigger>
                           <InfoIcon className="mx-2 h-4 w-4" />
                         </TooltipTrigger>
-                        <TooltipContent className="text-muted-foreground max-w-xs">
+                        <TooltipContent className="max-w-xs text-muted-foreground">
                           <Trans>
                             Add a URL to redirect the user to once the document is signed
                           </Trans>
@@ -277,7 +279,7 @@ export const ConfigureDocumentAdvancedSettings = ({
                       <FormControl>
                         <Input
                           id="subject"
-                          className="bg-background mt-2"
+                          className="mt-2 bg-background"
                           disabled={isSubmitting || !isEmailDistribution}
                           {...field}
                         />
@@ -300,7 +302,7 @@ export const ConfigureDocumentAdvancedSettings = ({
                       <FormControl>
                         <Textarea
                           id="message"
-                          className="bg-background mt-2 h-32 resize-none"
+                          className="mt-2 h-32 resize-none bg-background"
                           disabled={isSubmitting || !isEmailDistribution}
                           {...field}
                         />

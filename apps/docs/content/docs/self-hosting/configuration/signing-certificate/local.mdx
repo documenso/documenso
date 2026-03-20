@@ -1,0 +1,202 @@
+---
+title: Local Certificate
+description: Generate or convert a .p12 certificate and configure it for document signing.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Generating a Self-Signed Certificate
+
+Create a self-signed certificate using OpenSSL. These commands work on Linux, macOS, and Windows Subsystem for Linux (WSL).
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+
+### Generate a private key
+
+Create a 2048-bit RSA private key:
+
+```bash
+openssl genrsa -out private.key 2048
+```
+
+</Step>
+<Step>
+
+### Create a self-signed certificate
+
+Generate a certificate valid for one year:
+
+```bash
+openssl req -new -x509 -key private.key -out certificate.crt -days 365
+```
+
+When prompted, enter your organisation details:
+
+| Field               | Example                 |
+| ------------------- | ----------------------- |
+| Country Name        | US                      |
+| State or Province   | California              |
+| Locality Name       | San Francisco           |
+| Organization Name   | Your Company Inc        |
+| Organizational Unit | Engineering             |
+| Common Name         | Your Company Signing CA |
+| Email Address       | admin@example.com       |
+
+</Step>
+<Step>
+
+### Create the .p12 certificate
+
+Combine the private key and certificate into a PKCS#12 (.p12) file:
+
+```bash
+openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt
+```
+
+<Callout type="warn">
+  You must set a password when prompted. Certificates without passwords cause signing failures with
+  the error "Failed to get private key bags".
+</Callout>
+
+To set the password non-interactively:
+
+```bash
+# Set password securely (won't appear in command history)
+read -s -p "Enter certificate password: " CERT_PASS
+echo
+
+openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt \
+    -password env:CERT_PASS
+```
+
+</Step>
+<Step>
+
+### Clean up
+
+Remove the intermediate files:
+
+```bash
+rm private.key certificate.crt
+```
+
+Keep `certificate.p12` and the password secure.
+
+</Step>
+</Steps>
+
+## Using an Existing Certificate
+
+If you have an existing certificate from a CA, convert it to PKCS#12 format.
+
+<Tabs items={['From PEM files', 'From other formats']}>
+<Tab value="From PEM files">
+
+If you have separate certificate and key files:
+
+```bash
+openssl pkcs12 -export -out certificate.p12 \
+    -inkey private.key \
+    -in certificate.crt \
+    -certfile chain.crt
+```
+
+Include `-certfile chain.crt` if you have intermediate certificates.
+
+</Tab>
+<Tab value="From other formats">
+
+**Convert from DER to PEM first:**
+
+```bash
+openssl x509 -inform DER -in certificate.der -out certificate.crt
+openssl rsa -inform DER -in private.der -out private.key
+```
+
+**PFX files** are the same format as P12. You can use them directly by renaming to `.p12`.
+
+</Tab>
+</Tabs>
+
+## Certificate Validation
+
+Verify your certificate is valid:
+
+```bash
+# Check certificate details
+openssl pkcs12 -in certificate.p12 -info -nokeys
+
+# Verify password works
+openssl pkcs12 -in certificate.p12 -noout
+```
+
+## Environment Variables
+
+| Variable                                   | Description                                                    |
+| ------------------------------------------ | -------------------------------------------------------------- |
+| `NEXT_PRIVATE_SIGNING_TRANSPORT`           | Set to `local` (default)                                       |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`     | Path to the `.p12` certificate file                            |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` | Base64-encoded `.p12` file contents (alternative to file path) |
+| `NEXT_PRIVATE_SIGNING_PASSPHRASE`          | Passphrase for the certificate                                 |
+
+## Using File Path
+
+Mount the certificate file and set the path:
+
+```bash
+NEXT_PRIVATE_SIGNING_TRANSPORT=local
+NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
+NEXT_PRIVATE_SIGNING_PASSPHRASE=your-certificate-password
+```
+
+**Docker example:**
+
+```bash
+docker run -d \
+  -v /path/to/certificate.p12:/opt/documenso/cert.p12:ro \
+  -e NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12 \
+  -e NEXT_PRIVATE_SIGNING_PASSPHRASE="your-certificate-password" \
+  documenso/documenso:latest
+```
+
+## Using Base64-Encoded Contents
+
+For environments where file mounting is not available (e.g., Railway, Vercel):
+
+```bash
+# Encode the certificate
+base64 -i certificate.p12
+```
+
+Set the encoded string as an environment variable:
+
+```bash
+NEXT_PRIVATE_SIGNING_TRANSPORT=local
+NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS=MIIKEQIBAzCCCdcGCSqGSIb3DQEHAaCCCcg...
+NEXT_PRIVATE_SIGNING_PASSPHRASE=your-certificate-password
+```
+
+<Callout type="info">
+  The `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` variable takes precedence over
+  `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH` if both are set.
+</Callout>
+
+## Docker File Permissions
+
+When running in Docker, the application runs as user 1001. The certificate file must be readable:
+
+```bash
+# On the host, before mounting
+sudo chown 1001 certificate.p12
+chmod 400 certificate.p12
+```
+
+Or mount as read-only and ensure group readability:
+
+```bash
+chmod 440 certificate.p12
+```

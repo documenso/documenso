@@ -111,40 +111,40 @@ export const createEmailDomain = async ({ domain, organisationId }: CreateEmailD
     data: privateKeyFlattened,
   });
 
-  const emailDomain = await prisma.$transaction(async (tx) => {
-    await verifyDomainWithDKIM(domain, selector, privateKeyFlattened).catch((err) => {
-      if (err.name === 'AlreadyExistsException') {
-        throw new AppError(AppErrorCode.ALREADY_EXISTS, {
-          message: 'Domain already exists in SES',
-        });
-      }
+  // Verify domain with SES outside a transaction to avoid holding a
+  // connection open during the external API call.
+  await verifyDomainWithDKIM(domain, selector, privateKeyFlattened).catch((err) => {
+    if (err.name === 'AlreadyExistsException') {
+      throw new AppError(AppErrorCode.ALREADY_EXISTS, {
+        message: 'Domain already exists in SES',
+      });
+    }
 
-      throw err;
-    });
+    throw err;
+  });
 
-    // Create email domain record.
-    return await tx.emailDomain.create({
-      data: {
-        id: generateDatabaseId('email_domain'),
-        domain,
-        status: EmailDomainStatus.PENDING,
-        organisationId,
-        selector: recordName,
-        publicKey: publicKeyFlattened,
-        privateKey: encryptedPrivateKey,
-      },
-      select: {
-        id: true,
-        status: true,
-        organisationId: true,
-        domain: true,
-        selector: true,
-        publicKey: true,
-        createdAt: true,
-        updatedAt: true,
-        emails: true,
-      },
-    });
+  const emailDomain = await prisma.emailDomain.create({
+    data: {
+      id: generateDatabaseId('email_domain'),
+      domain,
+      status: EmailDomainStatus.PENDING,
+      organisationId,
+      selector: recordName,
+      publicKey: publicKeyFlattened,
+      privateKey: encryptedPrivateKey,
+    },
+    select: {
+      id: true,
+      status: true,
+      organisationId: true,
+      domain: true,
+      selector: true,
+      publicKey: true,
+      createdAt: true,
+      updatedAt: true,
+      lastVerifiedAt: true,
+      emails: true,
+    },
   });
 
   return {

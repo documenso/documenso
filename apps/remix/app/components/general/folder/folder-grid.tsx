@@ -53,6 +53,10 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
     const rootPath =
       type === FolderType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
 
+    if (parentId) {
+      return `${rootPath}/folders?parentId=${parentId}`;
+    }
+
     return `${rootPath}/folders`;
   };
 
@@ -189,13 +193,13 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
               </div>
             )}
 
-            {foldersData.folders.length > 12 && (
+            {unpinnedFolders.length > 12 && (
               <div className="mt-2 flex items-center justify-center">
                 <Link
                   className="text-sm font-medium text-muted-foreground hover:text-foreground"
                   to={formatViewAllFoldersPath()}
                 >
-                  View all folders
+                  <Trans>View all folders</Trans>
                 </Link>
               </div>
             )}

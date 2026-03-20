@@ -6,13 +6,12 @@ import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
-import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 import { prisma } from '@documenso/prisma';
 
 import type { HonoEnv } from '../../router';
-import { handleEnvelopeItemFileRequest } from './files.helpers';
+import { checkEnvelopeFileAccess, handleEnvelopeItemFileRequest } from './files.helpers';
 import {
   type TGetPresignedPostUrlResponse,
   ZGetEnvelopeItemFileDownloadRequestParamsSchema,
@@ -23,6 +22,8 @@ import {
   ZGetPresignedPostUrlRequestSchema,
   ZUploadPdfRequestSchema,
 } from './files.types';
+import getEnvelopeItemPdfRoute from './routes/get-envelope-item-pdf';
+import getEnvelopeItemPdfByTokenRoute from './routes/get-envelope-item-pdf-by-token';
 
 export const filesRoute = new Hono<HonoEnv>()
   /**
@@ -117,16 +118,14 @@ export const filesRoute = new Hono<HonoEnv>()
         return c.json({ error: 'Envelope item not found' }, 404);
       }
 
-      const team = await getTeamById({
-        userId: userId,
+      const hasAccess = await checkEnvelopeFileAccess({
+        userId,
         teamId: envelope.teamId,
-      }).catch((error) => {
-        console.error(error);
-
-        return null;
+        envelopeType: envelope.type,
+        templateType: envelope.templateType,
       });
 
-      if (!team) {
+      if (!hasAccess) {
         return c.json(
           { error: 'User does not have access to the team that this envelope is associated with' },
           403,
@@ -185,16 +184,14 @@ export const filesRoute = new Hono<HonoEnv>()
         return c.json({ error: 'Envelope item not found' }, 404);
       }
 
-      const team = await getTeamById({
+      const hasDownloadAccess = await checkEnvelopeFileAccess({
         userId: session.user.id,
         teamId: envelope.teamId,
-      }).catch((error) => {
-        console.error(error);
-
-        return null;
+        envelopeType: envelope.type,
+        templateType: envelope.templateType,
       });
 
-      if (!team) {
+      if (!hasDownloadAccess) {
         return c.json(
           { error: 'User does not have access to the team that this envelope is associated with' },
           403,
@@ -319,3 +316,8 @@ export const filesRoute = new Hono<HonoEnv>()
       });
     },
   );
+
+// PDF routes for both tokens and auth based
+// Is different to the other file endpoints since it uses documentDataId for hard caching.
+filesRoute.route('/', getEnvelopeItemPdfRoute);
+filesRoute.route('/', getEnvelopeItemPdfByTokenRoute);

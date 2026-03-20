@@ -12,6 +12,7 @@ export async function GET(request: Request) {
       status: 200,
       headers: {
         'content-type': 'application/json',
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
       },
     }),
   );

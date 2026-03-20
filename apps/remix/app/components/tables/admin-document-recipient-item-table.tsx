@@ -3,7 +3,13 @@ import { useMemo } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { type Field, type Recipient, type Signature, SigningStatus } from '@prisma/client';
+import {
+  type Field,
+  type Recipient,
+  RecipientRole,
+  type Signature,
+  SigningStatus,
+} from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { useRevalidator } from 'react-router';
 import { z } from 'zod';
@@ -21,11 +27,27 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+const RECIPIENT_ROLE_LABELS: Record<RecipientRole, string> = {
+  [RecipientRole.SIGNER]: 'Signer',
+  [RecipientRole.APPROVER]: 'Approver',
+  [RecipientRole.CC]: 'CC',
+  [RecipientRole.VIEWER]: 'Viewer',
+  [RecipientRole.ASSISTANT]: 'Assistant',
+};
 
 const ZAdminUpdateRecipientFormSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
+  role: z.nativeEnum(RecipientRole),
 });
 
 type TAdminUpdateRecipientFormSchema = z.infer<typeof ZAdminUpdateRecipientFormSchema>;
@@ -49,6 +71,7 @@ export const AdminDocumentRecipientItemTable = ({ recipient }: RecipientItemProp
     defaultValues: {
       name: recipient.name,
       email: recipient.email,
+      role: recipient.role,
     },
   });
 
@@ -98,12 +121,17 @@ export const AdminDocumentRecipientItemTable = ({ recipient }: RecipientItemProp
     ] satisfies DataTableColumnDef<(typeof recipient)['fields'][number]>[];
   }, []);
 
-  const onUpdateRecipientFormSubmit = async ({ name, email }: TAdminUpdateRecipientFormSchema) => {
+  const onUpdateRecipientFormSubmit = async ({
+    name,
+    email,
+    role,
+  }: TAdminUpdateRecipientFormSchema) => {
     try {
       await updateRecipient({
         id: recipient.id,
         name,
         email,
+        role,
       });
 
       toast({
@@ -160,6 +188,43 @@ export const AdminDocumentRecipientItemTable = ({ recipient }: RecipientItemProp
 
                   <FormControl>
                     <Input type="email" {...field} />
+                  </FormControl>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel required>
+                    <Trans>Role</Trans>
+                  </FormLabel>
+
+                  <FormControl>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={
+                        form.formState.isSubmitting ||
+                        recipient.signingStatus === SigningStatus.SIGNED
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        {Object.values(RecipientRole).map((role) => (
+                          <SelectItem key={role} value={role}>
+                            {RECIPIENT_ROLE_LABELS[role]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
 
                   <FormMessage />

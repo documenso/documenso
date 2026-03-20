@@ -15,6 +15,10 @@ import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones'
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import {
+  type TBaseEmbedAuthoringSchema,
+  ZBaseEmbedAuthoringEditSchema,
+} from '@documenso/lib/types/embed-authoring-base-schema';
 import { nanoid } from '@documenso/lib/universal/id';
 import { trpc } from '@documenso/trpc/react';
 import { Stepper } from '@documenso/ui/primitives/stepper';
@@ -25,10 +29,6 @@ import { ConfigureDocumentView } from '~/components/embed/authoring/configure-do
 import type { TConfigureEmbedFormSchema } from '~/components/embed/authoring/configure-document-view.types';
 import { ConfigureFieldsView } from '~/components/embed/authoring/configure-fields-view';
 import type { TConfigureFieldsFormSchema } from '~/components/embed/authoring/configure-fields-view.types';
-import {
-  type TBaseEmbedAuthoringSchema,
-  ZBaseEmbedAuthoringEditSchema,
-} from '~/types/embed-authoring-base-schema';
 
 import type { Route } from './+types/document.edit.$id';
 
@@ -325,7 +325,10 @@ export default function EmbeddingAuthoringTemplateEditPage() {
           <ConfigureFieldsView
             configData={configuration!}
             presignToken={token}
-            envelopeItem={template.envelopeItems[0]}
+            envelopeItem={{
+              ...template.envelopeItems[0],
+              documentDataId: template.templateDocumentDataId,
+            }}
             defaultValues={fields ?? undefined}
             onBack={canGoBack ? handleBackToConfig : undefined}
             onSubmit={handleConfigureFieldsSubmit}
