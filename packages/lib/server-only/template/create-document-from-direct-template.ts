@@ -45,8 +45,8 @@ import {
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
-import { getEmailContext } from '../email/get-email-context';
 import { incrementDocumentId } from '../envelope/increment-id';
+import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentFromDirectTemplateOptions = {
@@ -149,12 +149,9 @@ export const createDocumentFromDirectTemplate = async ({
     });
   }
 
-  const { settings } = await getEmailContext({
-    emailType: 'INTERNAL',
-    source: {
-      type: 'team',
-      teamId: directTemplateEnvelope.teamId,
-    },
+  const settings = await getTeamSettings({
+    userId: directTemplateEnvelope.userId,
+    teamId: directTemplateEnvelope.teamId,
   });
 
   const { recipients, directLink } = directTemplateEnvelope;
