@@ -8,7 +8,10 @@ import {
   SigningStatus,
   WebhookTriggerEvents,
 } from '@prisma/client';
+import { DateTime } from 'luxon';
 
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import {
   DOCUMENT_AUDIT_LOG_TYPE,
   RECIPIENT_DIFF_TYPE,
@@ -120,12 +123,78 @@ export const completeDocumentWithToken = async ({
     }
   }
 
-  const fields = await prisma.field.findMany({
+  let fields = await prisma.field.findMany({
     where: {
       envelopeId: envelope.id,
       recipientId: recipient.id,
     },
   });
+
+  // This should be scoped to the current recipient.
+  const uninsertedDateFields = fields.filter(
+    (field) => field.type === FieldType.DATE && !field.inserted,
+  );
+
+  // Auto-insert all un-inserted date fields for V2 envelopes at completion time.
+  if (envelope.internalVersion === 2 && uninsertedDateFields.length > 0) {
+    const formattedDate = DateTime.now()
+      .setZone(envelope.documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
+      .toFormat(envelope.documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
+
+    const newDateFieldValues = {
+      customText: formattedDate,
+      inserted: true,
+    };
+
+    await prisma.field.updateMany({
+      where: {
+        id: {
+          in: uninsertedDateFields.map((field) => field.id),
+        },
+      },
+      data: {
+        ...newDateFieldValues,
+      },
+    });
+
+    // Create audit log entries for each auto-inserted date field.
+    for (const field of uninsertedDateFields) {
+      await prisma.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
+          envelopeId: envelope.id,
+          user: {
+            email: recipient.email,
+            name: recipient.name,
+          },
+          requestMetadata,
+          data: {
+            recipientEmail: recipient.email,
+            recipientId: recipient.id,
+            recipientName: recipient.name,
+            recipientRole: recipient.role,
+            fieldId: field.secondaryId,
+            field: {
+              type: FieldType.DATE,
+              data: formattedDate,
+            },
+          },
+        }),
+      });
+    }
+
+    // Update the local fields array so the subsequent validation check passes.
+    fields = fields.map((field) => {
+      if (field.type === FieldType.DATE && !field.inserted) {
+        return {
+          ...field,
+          ...newDateFieldValues,
+        };
+      }
+
+      return field;
+    });
+  }
 
   if (fieldsContainUnsignedRequiredField(fields)) {
     throw new Error(`Recipient ${recipient.id} has unsigned fields`);

@@ -1,4 +1,4 @@
-import type { DocumentData, Envelope, EnvelopeItem, Field } from '@prisma/client';
+import type { DocumentData, Envelope, EnvelopeItem, Field, Recipient } from '@prisma/client';
 import {
   DocumentSigningOrder,
   DocumentStatus,
@@ -207,7 +207,7 @@ export const sendDocument = async ({
         });
       }
 
-      const fieldToAutoInsert = extractFieldAutoInsertValues(unknownField);
+      const fieldToAutoInsert = extractFieldAutoInsertValues(unknownField, recipient);
 
       // Only auto-insert fields if the recipient has not been sent the document yet.
       if (fieldToAutoInsert && recipient.sendStatus !== SendStatus.SENT) {
@@ -374,6 +374,7 @@ const injectFormValuesIntoDocument = async (
  */
 export const extractFieldAutoInsertValues = (
   unknownField: Field,
+  recipient: Pick<Recipient, 'email'>,
 ): { fieldId: number; customText: string } | null => {
   const parsedField = ZFieldAndMetaSchema.safeParse(unknownField);
 
@@ -385,6 +386,14 @@ export const extractFieldAutoInsertValues = (
 
   const field = parsedField.data;
   const fieldId = unknownField.id;
+
+  // Auto insert email fields if an recipient email exists.
+  if (field.type === FieldType.EMAIL && recipient.email) {
+    return {
+      fieldId,
+      customText: recipient.email,
+    };
+  }
 
   // Auto insert text fields with prefilled values.
   if (field.type === FieldType.TEXT) {
