@@ -198,8 +198,10 @@ export const run = async ({
 
     const usePlaywrightPdf = NEXT_PRIVATE_USE_PLAYWRIGHT_PDF();
 
-    const needsCertificate = settings.includeSigningCertificate;
-    const needsAuditLog = settings.includeAuditLog;
+    const needsCertificate =
+      envelope.documentMeta?.includeSigningCertificate ?? settings.includeSigningCertificate;
+    const needsAuditLog =
+      envelope.documentMeta?.includeAuditLog ?? settings.includeAuditLog;
 
     const newDocumentData: Array<{ oldDocumentDataId: string; newDocumentDataId: string }> = [];
 

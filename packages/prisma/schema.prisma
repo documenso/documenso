@@ -531,6 +531,9 @@ model DocumentMeta {
 
   envelopeExpirationPeriod Json? /// [EnvelopeExpirationPeriod] @zod.custom.use(ZEnvelopeExpirationPeriodSchema)
 
+  includeSigningCertificate Boolean?
+  includeAuditLog           Boolean?
+
   envelope Envelope?
 }
 

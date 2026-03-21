@@ -540,6 +540,10 @@ export const createDocumentFromTemplate = async ({
         override?.allowDictateNextSigner ?? template.documentMeta?.allowDictateNextSigner,
       envelopeExpirationPeriod:
         override?.envelopeExpirationPeriod ?? template.documentMeta?.envelopeExpirationPeriod,
+      includeSigningCertificate:
+        template.documentMeta?.includeSigningCertificate,
+      includeAuditLog:
+        template.documentMeta?.includeAuditLog,
     }),
   });
 
