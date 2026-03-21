@@ -2,38 +2,72 @@ import { expect, test } from '@playwright/test';
 import { DocumentStatus, FieldType } from '@prisma/client';
 import { DateTime } from 'luxon';
 
-import { PDF_PAGE_SELECTOR } from '@documenso/app-tests/e2e/pdf-viewer/pdf-viewer.spec';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { prisma } from '@documenso/prisma';
-import { seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
-import { seedUser } from '@documenso/prisma/seed/users';
+
+import { apiSeedPendingDocument } from '../fixtures/api-seeds';
+
+const PDF_PAGE_SELECTOR = 'img[data-page-number]';
 
 test.describe('V2 envelope field insertion during signing', () => {
-  test('date fields are auto-inserted when completing a V2 envelope', async ({ page }) => {
-    const { user, team } = await seedUser();
-
+  test('date fields are auto-inserted when completing a V2 envelope', async ({ page, request }) => {
     const now = DateTime.now().setZone(DEFAULT_DOCUMENT_TIME_ZONE);
 
-    const { document, recipients } = await seedPendingDocumentWithFullFields({
-      teamId: team.id,
-      owner: user,
-      recipients: ['signer-date@test.documenso.com'],
-      fields: [FieldType.DATE],
-      updateDocumentOptions: { internalVersion: 2 },
+    const { envelope, distributeResult } = await apiSeedPendingDocument(request, {
+      recipients: [{ email: 'signer-date@test.documenso.com', name: 'Date Signer' }],
+      fieldsPerRecipient: [
+        [
+          { type: FieldType.DATE, page: 1, positionX: 5, positionY: 5, width: 5, height: 5 },
+          { type: FieldType.SIGNATURE, page: 1, positionX: 5, positionY: 15, width: 5, height: 5 },
+        ],
+      ],
     });
 
-    const { token } = recipients[0];
+    const { token } = distributeResult.recipients[0];
 
     await page.goto(`/sign/${token}`);
 
-    // V2 signing page shows the envelope title in the hea
-    // Date fields are auto-filled, so "0 Fields Remaining" should be shown
-    // and the Complete button should be immediately available.
-    await expect(page.getByText('0 Fields Remaining').first()).toBeVisible();
-
     // wait for PDF to be visible
     await expect(page.locator(PDF_PAGE_SELECTOR).first()).toBeVisible({ timeout: 30_000 });
+
+    // Wait for the Konva canvas to be ready.
+    const canvas = page.locator('.konva-container canvas').first();
+    await expect(canvas).toBeVisible({ timeout: 30_000 });
+
+    // DATE is auto-filled, but SIGNATURE still needs manual interaction.
+    await expect(page.getByText('1 Field Remaining').first()).toBeVisible();
+
+    // Set up a signature via the sidebar form.
+    await page.getByTestId('signature-pad-dialog-button').click();
+    await page.getByRole('tab', { name: 'Type' }).click();
+    await page.getByTestId('signature-pad-type-input').fill('Signature');
+    await page.getByRole('button', { name: 'Next' }).click();
+
+    // Click the signature field on the canvas.
+    const canvasBox = await canvas.boundingBox();
+
+    if (!canvasBox) {
+      throw new Error('Canvas bounding box not found');
+    }
+
+    const sigField = envelope.fields.find((f) => f.type === FieldType.SIGNATURE);
+
+    if (!sigField) {
+      throw new Error('Signature field not found');
+    }
+
+    const x =
+      (Number(sigField.positionX) / 100) * canvasBox.width +
+      ((Number(sigField.width) / 100) * canvasBox.width) / 2;
+    const y =
+      (Number(sigField.positionY) / 100) * canvasBox.height +
+      ((Number(sigField.height) / 100) * canvasBox.height) / 2;
+
+    await canvas.click({ position: { x, y } });
+    await page.waitForTimeout(500);
+
+    await expect(page.getByText('0 Fields Remaining').first()).toBeVisible({ timeout: 10_000 });
 
     await page.getByRole('button', { name: 'Complete' }).click();
     await expect(page.getByRole('heading', { name: 'Are you sure?' })).toBeVisible();
@@ -45,7 +79,7 @@ test.describe('V2 envelope field insertion during signing', () => {
     // Verify the date field was inserted in the database with the correct format.
     const dateField = await prisma.field.findFirstOrThrow({
       where: {
-        envelopeId: document.id,
+        envelopeId: envelope.id,
         type: FieldType.DATE,
       },
     });
@@ -63,30 +97,45 @@ test.describe('V2 envelope field insertion during signing', () => {
 
     // Verify the document reached COMPLETED status.
     await expect(async () => {
-      const envelope = await prisma.envelope.findUniqueOrThrow({
-        where: { id: document.id },
+      const dbEnvelope = await prisma.envelope.findUniqueOrThrow({
+        where: { id: envelope.id },
       });
 
-      expect(envelope.status).toBe(DocumentStatus.COMPLETED);
+      expect(dbEnvelope.status).toBe(DocumentStatus.COMPLETED);
     }).toPass();
   });
 
   test('date and email fields are inserted when completing a V2 envelope with multiple field types', async ({
     page,
+    request,
   }) => {
-    const { user, team } = await seedUser();
-
     const now = DateTime.now().setZone(DEFAULT_DOCUMENT_TIME_ZONE);
 
-    const { document, recipients } = await seedPendingDocumentWithFullFields({
-      teamId: team.id,
-      owner: user,
-      recipients: ['signer-multi@test.documenso.com'],
-      fields: [FieldType.DATE, FieldType.EMAIL, FieldType.NAME, FieldType.SIGNATURE],
-      updateDocumentOptions: { internalVersion: 2 },
+    const recipientEmail = 'signer-multi@test.documenso.com';
+
+    const { envelope, distributeResult } = await apiSeedPendingDocument(request, {
+      recipients: [{ email: recipientEmail, name: 'Multi Signer' }],
+      fieldsPerRecipient: [
+        [
+          { type: FieldType.DATE, page: 1, positionX: 5, positionY: 5, width: 5, height: 5 },
+          { type: FieldType.EMAIL, page: 1, positionX: 5, positionY: 10, width: 5, height: 5 },
+          { type: FieldType.NAME, page: 1, positionX: 5, positionY: 15, width: 5, height: 5 },
+          {
+            type: FieldType.SIGNATURE,
+            page: 1,
+            positionX: 5,
+            positionY: 20,
+            width: 5,
+            height: 5,
+          },
+        ],
+      ],
     });
 
-    const { token, fields } = recipients[0];
+    const { token } = distributeResult.recipients[0];
+
+    // Resolve the fields from the envelope for position calculations.
+    const fields = envelope.fields;
 
     await page.goto(`/sign/${token}`);
 
@@ -97,9 +146,8 @@ test.describe('V2 envelope field insertion during signing', () => {
     const canvas = page.locator('.konva-container canvas').first();
     await expect(canvas).toBeVisible({ timeout: 30_000 });
 
-    // The date field is auto-filled, so only EMAIL, NAME, and SIGNATURE remain.
-    // That means 3 fields remaining.
-    await expect(page.getByText('3 Fields Remaining').first()).toBeVisible();
+    // DATE and EMAIL fields are auto-filled, so only NAME and SIGNATURE remain.
+    await expect(page.getByText('2 Fields Remaining').first()).toBeVisible();
 
     // Set up a signature via the sidebar form.
     await page.getByTestId('signature-pad-dialog-button').click();
@@ -108,12 +156,7 @@ test.describe('V2 envelope field insertion during signing', () => {
     await page.getByRole('button', { name: 'Next' }).click();
 
     // Click each non-date field on the Konva canvas to insert it.
-    // Fields are seeded with positions based on their index:
-    //   positionX = (recipientIndex + 1) * 5 = 5 (as percentage)
-    //   positionY = (fieldIndex + 1) * 5 (as percentage)
-    // DATE is index 0 (positionY=5%), EMAIL is index 1 (positionY=10%),
-    // NAME is index 2 (positionY=15%), SIGNATURE is index 3 (positionY=20%).
-    //
+    // Fields are seeded with positions as percentages of the page.
     // We need to convert these percentages to pixel positions on the canvas.
     const canvasBox = await canvas.boundingBox();
 
@@ -121,9 +164,12 @@ test.describe('V2 envelope field insertion during signing', () => {
       throw new Error('Canvas bounding box not found');
     }
 
-    const nonDateFields = fields.filter((f) => f.type !== FieldType.DATE);
+    // Only NAME and SIGNATURE fields need manual interaction (DATE and EMAIL are auto-filled).
+    const manualFields = fields.filter(
+      (f) => f.type !== FieldType.DATE && f.type !== FieldType.EMAIL,
+    );
 
-    for (const field of nonDateFields) {
+    for (const field of manualFields) {
       const x =
         (Number(field.positionX) / 100) * canvasBox.width +
         ((Number(field.width) / 100) * canvasBox.width) / 2;
@@ -132,32 +178,6 @@ test.describe('V2 envelope field insertion during signing', () => {
         ((Number(field.height) / 100) * canvasBox.height) / 2;
 
       await canvas.click({ position: { x, y } });
-
-      // EMAIL and NAME fields may open a dialog — handle accordingly.
-      if (field.type === FieldType.EMAIL) {
-        // The email dialog may pre-fill with the recipient's email. Click Save/confirm.
-        const emailDialog = page.getByRole('dialog');
-        const isDialogVisible = await emailDialog.isVisible().catch(() => false);
-
-        if (isDialogVisible) {
-          // Fill the email if the input is empty or visible.
-          const emailInput = emailDialog
-            .locator('input[type="email"], input[name="email"]')
-            .first();
-          const isInputVisible = await emailInput.isVisible().catch(() => false);
-
-          if (isInputVisible) {
-            await emailInput.fill('signer-multi@test.documenso.com');
-          }
-
-          const saveButton = emailDialog.getByRole('button', { name: 'Save' });
-          const isButtonVisible = await saveButton.isVisible().catch(() => false);
-
-          if (isButtonVisible) {
-            await saveButton.click();
-          }
-        }
-      }
 
       if (field.type === FieldType.NAME) {
         const nameDialog = page.getByRole('dialog');
@@ -197,7 +217,7 @@ test.describe('V2 envelope field insertion during signing', () => {
     // Verify the date field was auto-inserted with the correct format.
     const dateField = await prisma.field.findFirstOrThrow({
       where: {
-        envelopeId: document.id,
+        envelopeId: envelope.id,
         type: FieldType.DATE,
       },
     });
@@ -215,17 +235,17 @@ test.describe('V2 envelope field insertion during signing', () => {
     // Verify the email field was inserted with the recipient's email.
     const emailField = await prisma.field.findFirstOrThrow({
       where: {
-        envelopeId: document.id,
+        envelopeId: envelope.id,
         type: FieldType.EMAIL,
       },
     });
 
     expect(emailField.inserted).toBe(true);
-    expect(emailField.customText).toBe('signer-multi@test.documenso.com');
+    expect(emailField.customText).toBe(recipientEmail);
 
     // Verify all fields are inserted.
     const allFields = await prisma.field.findMany({
-      where: { envelopeId: document.id },
+      where: { envelopeId: envelope.id },
     });
 
     for (const field of allFields) {
@@ -234,11 +254,11 @@ test.describe('V2 envelope field insertion during signing', () => {
 
     // Verify the document reached COMPLETED status.
     await expect(async () => {
-      const envelope = await prisma.envelope.findUniqueOrThrow({
-        where: { id: document.id },
+      const dbEnvelope = await prisma.envelope.findUniqueOrThrow({
+        where: { id: envelope.id },
       });
 
-      expect(envelope.status).toBe(DocumentStatus.COMPLETED);
+      expect(dbEnvelope.status).toBe(DocumentStatus.COMPLETED);
     }).toPass();
   });
 });
