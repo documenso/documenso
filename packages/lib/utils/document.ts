@@ -66,6 +66,11 @@ export const extractDerivedDocumentMeta = (
     // Envelope expiration.
     envelopeExpirationPeriod:
       meta.envelopeExpirationPeriod ?? settings.envelopeExpirationPeriod ?? null,
+
+    // Certificate and audit log settings.
+    includeSigningCertificate:
+      meta.includeSigningCertificate ?? settings.includeSigningCertificate ?? null,
+    includeAuditLog: meta.includeAuditLog ?? settings.includeAuditLog ?? null,
   } satisfies Omit<DocumentMeta, 'id'>;
 };
 
