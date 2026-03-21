@@ -66,6 +66,10 @@ export const extractDerivedDocumentMeta = (
     // Envelope expiration.
     envelopeExpirationPeriod:
       meta.envelopeExpirationPeriod ?? settings.envelopeExpirationPeriod ?? null,
+
+    // Rejection settings.
+    allowDocumentRejection:
+      meta.allowDocumentRejection ?? settings.allowDocumentRejection ?? null,
   } satisfies Omit<DocumentMeta, 'id'>;
 };
 

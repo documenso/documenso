@@ -200,7 +200,9 @@ export const DocumentSigningPageViewV2 = () => {
                   }
                 />
 
-                {envelope.type === EnvelopeType.DOCUMENT && allowDocumentRejection && (
+                {envelope.type === EnvelopeType.DOCUMENT &&
+                  allowDocumentRejection &&
+                  (envelope.documentMeta.allowDocumentRejection ?? true) && (
                   <DocumentSigningRejectDialog
                     documentId={mapSecondaryIdToDocumentId(envelope.secondaryId)}
                     token={recipient.token}
