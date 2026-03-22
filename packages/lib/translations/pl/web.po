@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-19 04:58\n"
+"PO-Revision-Date: 2026-03-20 18:11\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -162,7 +162,7 @@ msgstr "{0, plural, one {Pozostało 1 pole} few {Pozostały # pola} many {Pozost
 #. placeholder {0}: fieldsOnExcessPages.length
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "{0, plural, one {1 field will be deleted because the new PDF has fewer pages than the current one.} other {# fields will be deleted because the new PDF has fewer pages than the current one.}}"
-msgstr "{0, plural, one {1 pole zostanie usunięte, ponieważ nowy plik PDF ma mniej stron niż bieżący.} few {# pola zostaną usunięte, ponieważ nowy plik PDF ma mniej stron niż bieżący.} many {# pól zostanie usuniętych, ponieważ nowy plik PDF ma mniej stron niż bieżący.} other {# pól zostanie usuniętych, ponieważ nowy plik PDF ma mniej stron niż bieżący.}}"
+msgstr "{0, plural, one {1 pole zostanie usunięte, ponieważ nowy plik PDF ma mniejszą liczbę stron niż obecny.} few {# pola zostaną usunięte, ponieważ nowy plik PDF ma mniejszą liczbę stron niż obecny.} many {# pól zostanie usuniętych, ponieważ nowy plik PDF ma mniejszą liczbę stron niż obecny.} other {# pola zostanie usuniętych, ponieważ nowy plik PDF ma mniejszą liczbę stron niż obecny.}}"
 
 #. placeholder {0}: fields.filter((field) => field.envelopeItemId === doc.id).length
 #. placeholder {0}: remainingFields.filter((field) => field.envelopeItemId === doc.id).length
@@ -179,7 +179,7 @@ msgstr "{0, plural, one {1 pasujące pole} few {# pasujące pola} many {# pasuj�
 #. placeholder {0}: replacementFile.pageCount
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "{0, plural, one {1 page} other {# pages}}"
-msgstr "{0, plural, one {1 strona} few {# strony} many {# stron} other {# stron}}"
+msgstr "{0, plural, one {1 strona} few {# strony} many {# stron} other {# strony}}"
 
 #. placeholder {0}: recipients.length
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.legacy_editor.tsx
@@ -517,7 +517,7 @@ msgstr "Użytkownik {user} usunął odbiorcę"
 #. placeholder {0}: data.envelopeItemTitle
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{user} replaced the PDF for envelope item {0}"
-msgstr "{user} zastąpił plik PDF dla elementu koperty {0}"
+msgstr "Użytkownik {user} zastąpił plik PDF elementu koperty {0}"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{user} requested a 2FA token for the document"
@@ -735,15 +735,15 @@ msgstr "<0>Uwaga</0> – Jeśli używasz linków w połączeniu z bezpośrednimi
 
 #: packages/ui/components/template/template-type-select.tsx
 msgid "<0>Organisation</0> templates are shared across all teams in your organisation but can only be edited by the owning team."
-msgstr "Szablony <0>organizacji</0> są współdzielone ze wszystkimi zespołami w Twojej organizacji, ale mogą być edytowane tylko przez zespół, który je posiada."
+msgstr "Szablony <0>organizacji</0> są współdzielone ze wszystkimi zespołami w Twojej organizacji, ale mogą być edytowane tylko przez zespół właściciela."
 
 #: packages/ui/components/template/template-type-select.tsx
 msgid "<0>Private</0> templates can only be used by your team."
-msgstr "Szablony <0>prywatne</0> mogą być używane wyłącznie przez Twój zespół."
+msgstr "Szablony <0>prywatne</0> mogą być używane tylko przez Twój zespół."
 
 #: packages/ui/components/template/template-type-select.tsx
 msgid "<0>Public</0> templates are linked to your public profile."
-msgstr "Szablony <0>publiczne</0> są powiązane z Twoim publicznym profilem."
+msgstr "Szablony <0>publiczne</0> są połączone z Twoim profilem publicznym."
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx
@@ -5290,11 +5290,11 @@ msgstr "Na przykład, jeśli subskrypcja ma nową flagę „FLAG_1” ustawioną
 
 #: apps/remix/app/routes/_unauthenticated+/check-email.tsx
 msgid "Forgot password"
-msgstr "Nie pamiętasz hasła"
+msgstr "Resetowanie hasła"
 
 #: apps/remix/app/routes/_unauthenticated+/forgot-password.tsx
 msgid "Forgot Password"
-msgstr "Nie pamiętasz hasła"
+msgstr "Resetowanie hasła"
 
 #: packages/lib/server-only/auth/send-forgot-password.ts
 msgid "Forgot Password?"
@@ -6730,7 +6730,7 @@ msgstr "Brak dostępnych użytkowników organizacji"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 msgid "No organisation templates are shared with your team yet."
-msgstr "Żadne szablony organizacji nie są jeszcze współdzielone z Twoim zespołem."
+msgstr "Żadne szablony organizacyjne nie są udostępniane Twojemu zespołowi."
 
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "No organisations found"
@@ -7108,7 +7108,7 @@ msgstr "Szablon organizacji"
 
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Organisation templates are shared across all teams within the same organisation. Only the owning team can edit them."
-msgstr "Szablony organizacji są współdzielone pomiędzy wszystkimi zespołami w ramach tej samej organizacji. Tylko zespół będący ich właścicielem może je edytować."
+msgstr "Szablony organizacji są współdzielone ze wszystkimi zespołami w Twojej organizacji. Mogą być edytowane tylko przez zespół właściciela."
 
 #: apps/remix/app/components/forms/organisation-update-form.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -9235,7 +9235,7 @@ msgstr "Coś poszło nie tak podczas renderowania dokumentu. Niektóre pola mog�
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 msgid "Something went wrong while replacing the PDF"
-msgstr "Coś poszło nie tak podczas zastępowania pliku PDF"
+msgstr "Coś poszło nie tak podczas zastępowania pliku PDF."
 
 #: apps/remix/app/components/general/verify-email-banner.tsx
 msgid "Something went wrong while sending the confirmation email."
@@ -9760,7 +9760,7 @@ msgstr "Tytuł szablonu"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "Template type"
-msgstr "Typ szablonu"
+msgstr "Rodzaj szablonu"
 
 #: apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
 msgid "Template Updated"
@@ -9983,7 +9983,7 @@ msgstr "Pola zostały pomyślnie zaktualizowane do nowej metody wstawiania."
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "The file is not a valid PDF."
-msgstr "Plik nie jest prawidłowym plikiem PDF."
+msgstr "Plik PDF nie jest prawidłowy."
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "The folder you are trying to delete does not exist."
@@ -11140,7 +11140,7 @@ msgstr "Zaktualizuj rolę i dodaj wymagane pola dla bezpośredniego odbiorcy. Os
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Update the title or replace the PDF file."
-msgstr "Zaktualizuj tytuł lub zamień plik PDF."
+msgstr "Zaktualizuj tytuł lub zastąp plik PDF."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "Update user"
@@ -11461,7 +11461,7 @@ msgstr "Wyświetlać wszystkie dokumenty wysłane na Twoje konto"
 
 #: apps/remix/app/components/general/folder/folder-grid.tsx
 msgid "View all folders"
-msgstr "Zobacz wszystkie foldery"
+msgstr "Wyświetl wszystkie foldery"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "View all recent security activity related to your account."
@@ -12264,16 +12264,16 @@ msgstr "Masz <0>plan darmowy</0>."
 #. placeholder {0}: i18n.date(periodEnd)
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You are currently subscribed to <0>{currentProductName}</0> which is set to automatically renew on <1>{0}</1>."
-msgstr "Obecnie masz subskrypcję <0>{currentProductName}</0>, która zostanie automatycznie odnowiona dnia <1>{0}</1>."
+msgstr "Subskrybujesz plan <0>{currentProductName}</0>, który zostanie automatycznie odnowiony <1>{0}</1>."
 
 #. placeholder {0}: i18n.date(periodEnd)
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You are currently subscribed to <0>{currentProductName}</0> which is set to end on <1>{0}</1>."
-msgstr "Obecnie masz subskrypcję <0>{currentProductName}</0>, która zakończy się dnia <1>{0}</1>."
+msgstr "Subskrybujesz plan <0>{currentProductName}</0>, który zakończy się <1>{0}</1>."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You are currently subscribed to <0>{currentProductName}</0>."
-msgstr "Obecnie masz subskrypcję <0>{currentProductName}</0>."
+msgstr "Subskrybujesz plan <0>{currentProductName}</0>."
 
 #. placeholder {0}: organisationEmail.email
 #: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
@@ -12444,20 +12444,20 @@ msgstr "Utworzyłeś dokument"
 #. placeholder {0}: i18n.date(periodEnd)
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You currently have an active plan which is set to automatically renew on <0>{0}</0>."
-msgstr "Obecnie masz aktywny plan, który zostanie automatycznie odnowiony dnia <0>{0}</0>."
+msgstr "Masz aktywny plan, który zostanie automatycznie odnowiony <0>{0}</0>."
 
 #. placeholder {0}: i18n.date(periodEnd)
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You currently have an active plan which is set to end on <0>{0}</0>."
-msgstr "Obecnie masz aktywny plan, który zakończy się dnia <0>{0}</0>."
+msgstr "Masz aktywny plan, który zakończy się <0>{0}</0>."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You currently have an active plan."
-msgstr "Obecnie masz aktywny plan."
+msgstr "Masz aktywny plan."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You currently have an inactive <0>{currentProductName}</0> subscription."
-msgstr "Obecnie masz nieaktywną subskrypcję <0>{currentProductName}</0>."
+msgstr "Masz nieaktywną subskrypcję <0>{currentProductName}</0>."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "You currently have no access to any teams within this organisation. Please contact your organisation to request access."
@@ -12788,7 +12788,7 @@ msgstr "Usunąłeś odbiorcę"
 #. placeholder {0}: data.envelopeItemTitle
 #: packages/lib/utils/document-audit-logs.ts
 msgid "You replaced the PDF for envelope item {0}"
-msgstr "Zastąpiłeś plik PDF dla elementu koperty {0}"
+msgstr "Zastąpiłeś plik PDF elementu koperty {0}"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "You requested a 2FA token for the document"
