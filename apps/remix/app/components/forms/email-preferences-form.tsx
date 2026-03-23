@@ -219,7 +219,8 @@ export const EmailPreferencesForm = ({
 
                 <FormDescription>
                   <Trans>
-                    Controls the default email settings when new documents or templates are created
+                    Controls the default email settings when new documents or templates are created.
+                    Updating these settings will not affect existing documents or templates.
                   </Trans>
                 </FormDescription>
               </FormItem>

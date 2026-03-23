@@ -231,6 +231,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentDeleted: false, // unchecked
     ownerRecipientExpired: true,
     ownerDocumentCompleted: true,
+    ownerDocumentCreated: true,
   });
 
   // Edit the team email settings
@@ -271,6 +272,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentDeleted: true,
     ownerRecipientExpired: true,
     ownerDocumentCompleted: false,
+    ownerDocumentCreated: true,
   });
 
   // Verify that a document can be created successfully with the team email settings
@@ -292,6 +294,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentDeleted: true,
     ownerRecipientExpired: true,
     ownerDocumentCompleted: false,
+    ownerDocumentCreated: true,
   });
 
   // Test inheritance by setting team back to inherit from organisation
@@ -318,6 +321,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentDeleted: false,
     ownerRecipientExpired: true,
     ownerDocumentCompleted: true,
+    ownerDocumentCreated: true,
   });
 
   // Verify that a document can be created successfully with the email settings
@@ -339,5 +343,6 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentDeleted: false,
     ownerRecipientExpired: true,
     ownerDocumentCompleted: true,
+    ownerDocumentCreated: true,
   });
 });
