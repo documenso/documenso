@@ -36,9 +36,10 @@ function validateRedirectUrl(redirectUrl: string | null): string {
   try {
     const url = new URL(redirectUrl);
 
-    // Must be on app.suiteop.com domain
-    if (url.hostname !== 'app.suiteop.com') {
-      throw new Error('Redirect URL must be on app.suiteop.com domain');
+    // Must be on app.suiteop.com domain or localhost (dev)
+    const allowedHosts = ['app.suiteop.com', 'localhost', '127.0.0.1'];
+    if (!allowedHosts.includes(url.hostname)) {
+      throw new Error('Redirect URL must be on an allowed domain');
     }
 
     return redirectUrl;
@@ -189,7 +190,7 @@ export default function OAuthSuiteOpAuthorizePage({ loaderData }: Route.Componen
                 <label
                   key={team.id}
                   htmlFor={`team-${team.id}`}
-                  className="hover:bg-muted/50 flex cursor-pointer items-center space-x-3 rounded-lg border p-4"
+                  className="flex cursor-pointer items-center space-x-3 rounded-lg border p-4 hover:bg-muted/50"
                 >
                   <RadioGroupItem value={team.id.toString()} id={`team-${team.id}`} />
                   <div className="flex-1">
