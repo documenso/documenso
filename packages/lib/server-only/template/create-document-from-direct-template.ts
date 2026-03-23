@@ -24,6 +24,7 @@ import { jobs } from '../../jobs/client';
 import { DOCUMENT_AUDIT_LOG_TYPE, RECIPIENT_DIFF_TYPE } from '../../types/document-audit-logs';
 import type { TRecipientActionAuthTypes } from '../../types/document-auth';
 import { DocumentAccessAuth, ZRecipientAuthOptionsSchema } from '../../types/document-auth';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { ZFieldMetaSchema } from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
@@ -743,14 +744,17 @@ export const createDocumentFromDirectTemplate = async ({
     };
   });
 
-  // Send email to template owner via background job.
-  await jobs.triggerJob({
-    name: 'send.document.created.from.direct.template.email',
-    payload: {
-      envelopeId: createdEnvelope.id,
-      recipientId,
-    },
-  });
+  const emailSettings = extractDerivedDocumentEmailSettings(documentMeta);
+
+  if (emailSettings.ownerDocumentCreated) {
+    await jobs.triggerJob({
+      name: 'send.document.created.from.direct.template.email',
+      payload: {
+        envelopeId: createdEnvelope.id,
+        recipientId,
+      },
+    });
+  }
 
   try {
     // This handles sending emails and sealing the document if required.
