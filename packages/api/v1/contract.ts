@@ -46,6 +46,9 @@ import {
 
 const c = initContract();
 
+const deprecatedDescription =
+  'This endpoint is deprecated, but will continue to be supported. For more details, see https://docs.documenso.com/developers/public-api.';
+
 export const ApiContractV1 = c.router(
   {
     getDocuments: {
@@ -58,6 +61,8 @@ export const ApiContractV1 = c.router(
         404: ZUnsuccessfulResponseSchema,
       },
       summary: 'Get all documents',
+      deprecated: true,
+      description: deprecatedDescription,
     },
 
     getDocument: {
@@ -69,6 +74,8 @@ export const ApiContractV1 = c.router(
         404: ZUnsuccessfulResponseSchema,
       },
       summary: 'Get a single document',
+      deprecated: true,
+      description: deprecatedDescription,
     },
 
     downloadSignedDocument: {
@@ -81,6 +88,8 @@ export const ApiContractV1 = c.router(
         404: ZUnsuccessfulResponseSchema,
       },
       summary: 'Download a signed document when the storage transport is S3',
+      deprecated: true,
+      description: deprecatedDescription,
     },
 
     createDocument: {
@@ -93,6 +102,8 @@ export const ApiContractV1 = c.router(
         404: ZUnsuccessfulResponseSchema,
       },
       summary: 'Upload a new document and get a presigned URL',
+      deprecated: true,
+      description: deprecatedDescription,
     },
 
     createTemplate: {
@@ -105,6 +116,8 @@ export const ApiContractV1 = c.router(
         404: ZUnsuccessfulResponseSchema,
       },
       summary: 'Create a new template and get a presigned URL',
+      deprecated: true,
+      description: deprecatedDescription,
     },
 
     deleteTemplate: {
@@ -117,6 +130,8 @@ export const ApiContractV1 = c.router(
         404: ZUnsuccessfulResponseSchema,
       },
       summary: 'Delete a template',
+      deprecated: true,
+      description: deprecatedDescription,
     },
 
     getTemplate: {
@@ -128,6 +143,8 @@ export const ApiContractV1 = c.router(
         404: ZUnsuccessfulResponseSchema,
       },
       summary: 'Get a single template',
+      deprecated: true,
+      description: deprecatedDescription,
     },
 
     getTemplates: {
@@ -140,6 +157,8 @@ export const ApiContractV1 = c.router(
         404: ZUnsuccessfulResponseSchema,
       },
       summary: 'Get all templates',
+      deprecated: true,
+      description: deprecatedDescription,
     },
 
     createDocumentFromTemplate: {
@@ -153,7 +172,7 @@ export const ApiContractV1 = c.router(
       },
       summary: 'Create a new document from an existing template',
       deprecated: true,
-      description: `This has been deprecated in favour of "/api/v1/templates/:templateId/generate-document". You may face unpredictable behavior using this endpoint as it is no longer maintained.`,
+      description: `${deprecatedDescription} \n\nIf you must use the V1 API, use "/api/v1/templates/:templateId/generate-document" instead.`,
     },
 
     generateDocumentFromTemplate: {
@@ -168,8 +187,8 @@ export const ApiContractV1 = c.router(
         500: ZUnsuccessfulResponseSchema,
       },
       summary: 'Create a new document from an existing template',
-      description:
-        'Create a new document from an existing template. Passing in values for title and meta will override the original values defined in the template. If you do not pass in values for recipients, it will use the values defined in the template.',
+      deprecated: true,
+      description: `${deprecatedDescription} \n\nCreate a new document from an existing template. Passing in values for title and meta will override the original values defined in the template. If you do not pass in values for recipients, it will use the values defined in the template.`,
     },
 
     sendDocument: {
@@ -184,9 +203,8 @@ export const ApiContractV1 = c.router(
         500: ZUnsuccessfulResponseSchema,
       },
       summary: 'Send a document for signing',
-      // I'm aware this should be in the variable itself, which it is, however it's difficult for users to find in our current UI.
-      description:
-        'Notes\n\n`sendEmail` - Whether to send an email to the recipients asking them to action the document. If you disable this, you will need to manually distribute the document to the recipients using the generated signing links. Defaults to true',
+      deprecated: true,
+      description: `${deprecatedDescription} \n\nNotes\n\nsendEmail - Whether to send an email to the recipients asking them to action the document. If you disable this, you will need to manually distribute the document to the recipients using the generated signing links. Defaults to true`,
     },
 
     resendDocument: {
@@ -201,6 +219,8 @@ export const ApiContractV1 = c.router(
         500: ZUnsuccessfulResponseSchema,
       },
       summary: 'Re-send a document for signing',
+      deprecated: true,
+      description: deprecatedDescription,
     },
 
     deleteDocument: {
@@ -213,6 +233,8 @@ export const ApiContractV1 = c.router(
         404: ZUnsuccessfulResponseSchema,
       },
       summary: 'Delete a document',
+      deprecated: true,
+      description: deprecatedDescription,
     },
 
     createRecipient: {
@@ -227,6 +249,8 @@ export const ApiContractV1 = c.router(
         500: ZUnsuccessfulResponseSchema,
       },
       summary: 'Create a recipient for a document',
+      deprecated: true,
+      description: deprecatedDescription,
     },
 
     updateRecipient: {
@@ -241,6 +265,8 @@ export const ApiContractV1 = c.router(
         500: ZUnsuccessfulResponseSchema,
       },
       summary: 'Update a recipient for a document',
+      deprecated: true,
+      description: deprecatedDescription,
     },
 
     deleteRecipient: {
@@ -255,6 +281,8 @@ export const ApiContractV1 = c.router(
         500: ZUnsuccessfulResponseSchema,
       },
       summary: 'Delete a recipient from a document',
+      deprecated: true,
+      description: deprecatedDescription,
     },
 
     createField: {
@@ -269,6 +297,8 @@ export const ApiContractV1 = c.router(
         500: ZUnsuccessfulResponseSchema,
       },
       summary: 'Create a field for a document',
+      deprecated: true,
+      description: deprecatedDescription,
     },
 
     updateField: {
@@ -283,6 +313,8 @@ export const ApiContractV1 = c.router(
         500: ZUnsuccessfulResponseSchema,
       },
       summary: 'Update a field for a document',
+      deprecated: true,
+      description: deprecatedDescription,
     },
 
     deleteField: {
@@ -297,6 +329,8 @@ export const ApiContractV1 = c.router(
         500: ZUnsuccessfulResponseSchema,
       },
       summary: 'Delete a field from a document',
+      deprecated: true,
+      description: deprecatedDescription,
     },
 
     getSuiteOpCode: {

@@ -1,0 +1,107 @@
+---
+title: Vue
+description: Embed Documenso signing in your Vue application using the official SDK.
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Installation
+
+<Tabs items={['npm', 'yarn', 'pnpm']}>
+  <Tab value="npm">``` npm install @documenso/embed-vue ```</Tab>
+  <Tab value="yarn">``` yarn add @documenso/embed-vue ```</Tab>
+  <Tab value="pnpm">``` pnpm add @documenso/embed-vue ```</Tab>
+</Tabs>
+
+---
+
+## Direct Template
+
+```html
+<script setup lang="ts">
+  import { EmbedDirectTemplate } from '@documenso/embed-vue';
+
+  const token = 'your-template-token';
+
+  function onCompleted(data: { documentId: number }) {
+    console.log('Signed:', data.documentId);
+  }
+</script>
+
+<template>
+  <EmbedDirectTemplate
+    :token="token"
+    name="John Doe"
+    email="john@example.com"
+    :lockEmail="true"
+    externalId="order-12345"
+    @document-completed="onCompleted"
+    @document-ready="() => console.log('Ready')"
+    @document-error="() => console.error('Error')"
+  />
+</template>
+```
+
+---
+
+## Signing Token
+
+```html
+<script setup lang="ts">
+  import { EmbedSignDocument } from '@documenso/embed-vue';
+
+  const props = defineProps<{ token: string }>();
+
+  function onCompleted(data: { documentId: number }) {
+    console.log('Signed:', data.documentId);
+  }
+</script>
+
+<template>
+  <EmbedSignDocument :token="props.token" @document-completed="onCompleted" />
+</template>
+```
+
+---
+
+## Styling (Platform Plan)
+
+```html
+<script setup lang="ts">
+  import { EmbedDirectTemplate } from '@documenso/embed-vue';
+
+  const token = 'your-token';
+
+  const customCss = `
+  .documenso-embed {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+`;
+
+  const cssVars = {
+    primary: '#0000FF',
+    background: '#F5F5F5',
+    radius: '8px',
+  };
+</script>
+
+<template>
+  <EmbedDirectTemplate
+    :token="token"
+    :css="customCss"
+    :cssVars="cssVars"
+    :darkModeDisabled="true"
+  />
+</template>
+```
+
+See [CSS Variables](/docs/developers/embedding/css-variables) for all available variables.
+
+---
+
+## See Also
+
+- [Embedding Overview](/docs/developers/embedding) - Props reference and concepts
+- [CSS Variables](/docs/developers/embedding/css-variables) - Customize appearance
+- [Authoring](/docs/developers/embedding/authoring) - Embed document creation

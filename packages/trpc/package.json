@@ -21,7 +21,7 @@
     "formidable": "^3.5.4",
     "luxon": "^3.7.2",
     "superjson": "^2.2.5",
-    "trpc-to-openapi": "2.4.0",
+    "trpc-to-openapi": "^2.1.5",
     "ts-pattern": "^5.9.0",
     "zod": "^3.25.76",
     "zod-form-data": "^2.0.8",

@@ -42,21 +42,21 @@ const completeTemplateFlowWithDuplicateRecipients = async (options: {
   // Step 3: Add fields for each recipient instance
   // Add signature field for first instance
   await page.getByRole('button', { name: 'Signature' }).click();
-  await page.locator('canvas').click({ position: { x: 100, y: 100 } });
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 100, y: 100 } });
 
   // Switch to second instance and add their field
   await page.getByRole('combobox').first().click();
   await page.getByText('Second Instance').first().click();
   await page.getByRole('button', { name: 'Signature' }).click();
-  await page.locator('canvas').click({ position: { x: 200, y: 100 } });
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 200, y: 100 } });
 
   // Switch to different recipient and add their fields
   await page.getByRole('combobox').first().click();
   await page.getByText('Different Recipient').first().click();
   await page.getByRole('button', { name: 'Signature' }).click();
-  await page.locator('canvas').click({ position: { x: 300, y: 100 } });
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 300, y: 100 } });
   await page.getByRole('button', { name: 'Name' }).click();
-  await page.locator('canvas').click({ position: { x: 300, y: 150 } });
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 300, y: 150 } });
 
   // Save template
   await page.getByRole('button', { name: 'Save Template' }).click();
@@ -209,17 +209,17 @@ test.describe('[TEMPLATE_FLOW]: Duplicate Recipients', () => {
 
     // Add fields for each recipient
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({ position: { x: 100, y: 100 } });
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 100, y: 100 } });
 
     await page.getByRole('combobox').first().click();
     await page.getByText('Duplicate Recipient 2').first().click();
     await page.getByRole('button', { name: 'Date' }).click();
-    await page.locator('canvas').click({ position: { x: 200, y: 100 } });
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 200, y: 100 } });
 
     await page.getByRole('combobox').first().click();
     await page.getByText('Different Recipient').first().click();
     await page.getByRole('button', { name: 'Name' }).click();
-    await page.locator('canvas').click({ position: { x: 100, y: 200 } });
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 100, y: 200 } });
 
     // Save template
     await page.getByRole('button', { name: 'Save Template' }).click();
@@ -272,7 +272,7 @@ test.describe('[TEMPLATE_FLOW]: Duplicate Recipients', () => {
     await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: 'First Instance' }).first().click();
     await page.getByRole('button', { name: 'Name' }).click();
-    await page.locator('canvas').click({ position: { x: 100, y: 300 } });
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 100, y: 300 } });
 
     await page.waitForTimeout(2500);
 

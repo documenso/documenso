@@ -78,6 +78,7 @@ export const createDocumentRoute = authenticatedProcedure
         visibility,
         globalAccessAuth,
         globalActionAuth,
+        formValues,
         recipients: (recipients || []).map((recipient) => ({
           ...recipient,
           fields: (recipient.fields || []).map((field) => ({

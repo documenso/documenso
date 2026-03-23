@@ -8,8 +8,6 @@ export const DOCUMENSO_INTERNAL_EMAIL = {
   address: FROM_ADDRESS,
 };
 
-export const SERVICE_USER_EMAIL = 'serviceaccount@documenso.com';
-
 export const EMAIL_VERIFICATION_STATE = {
   NOT_FOUND: 'NOT_FOUND',
   VERIFIED: 'VERIFIED',

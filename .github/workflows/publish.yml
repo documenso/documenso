@@ -3,6 +3,12 @@ name: Publish Docker
 on:
   push:
     branches: ['release']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Git tag to build and publish (e.g., v1.0.0)'
+        required: true
+        type: string
 
 jobs:
   build_and_publish_platform_containers:
@@ -18,6 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.tag || github.ref }}
           fetch-tags: true
 
       - name: Login to DockerHub
@@ -38,8 +45,11 @@ jobs:
           BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
           NEXT_PRIVATE_TELEMETRY_KEY: ${{ secrets.NEXT_PRIVATE_TELEMETRY_KEY }}
           NEXT_PRIVATE_TELEMETRY_HOST: ${{ secrets.NEXT_PRIVATE_TELEMETRY_HOST }}
+          APP_VERSION: ${{ inputs.tag || '' }}
         run: |
-          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          if [ -z "$APP_VERSION" ]; then
+            APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          fi
           GIT_SHA="$(git rev-parse HEAD)"
 
           docker build \
@@ -65,47 +75,6 @@ jobs:
         env:
           BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
 
-      - name: Build the chromium docker image
-        env:
-          BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
-        run: |
-          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
-          GIT_SHA="$(git rev-parse HEAD)"
-
-          docker build \
-            -f ./docker/Dockerfile.chromium \
-            --progress=plain \
-            --build-arg TAG="$GIT_SHA" \
-            -t "documenso/documenso-$BUILD_PLATFORM:latest-chromium" \
-            -t "documenso/documenso-$BUILD_PLATFORM:$GIT_SHA-chromium" \
-            -t "documenso/documenso-$BUILD_PLATFORM:$APP_VERSION-chromium" \
-            -t "ghcr.io/documenso/documenso-$BUILD_PLATFORM:latest-chromium" \
-            -t "ghcr.io/documenso/documenso-$BUILD_PLATFORM:$GIT_SHA-chromium" \
-            -t "ghcr.io/documenso/documenso-$BUILD_PLATFORM:$APP_VERSION-chromium" \
-            .
-
-      - name: Push the chromium docker image to DockerHub
-        env:
-          BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
-        run: |
-          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
-          GIT_SHA="$(git rev-parse HEAD)"
-
-          docker push "documenso/documenso-$BUILD_PLATFORM:latest-chromium"
-          docker push "documenso/documenso-$BUILD_PLATFORM:$GIT_SHA-chromium"
-          docker push "documenso/documenso-$BUILD_PLATFORM:$APP_VERSION-chromium" \
-
-      - name: Push the chromium docker image to GitHub Container Registry
-        env:
-          BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
-        run: |
-          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
-          GIT_SHA="$(git rev-parse HEAD)"
-
-          docker push "ghcr.io/documenso/documenso-$BUILD_PLATFORM:latest-chromium"
-          docker push "ghcr.io/documenso/documenso-$BUILD_PLATFORM:$GIT_SHA-chromium"
-          docker push "ghcr.io/documenso/documenso-$BUILD_PLATFORM:$APP_VERSION-chromium"
-
   create_and_publish_manifest:
     name: Create and publish manifest
     runs-on: ubuntu-latest
@@ -114,6 +83,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.tag || github.ref }}
           fetch-tags: true
 
       - name: Login to DockerHub
@@ -130,8 +100,12 @@ jobs:
           password: ${{ secrets.GH_TOKEN }}
 
       - name: Create and push DockerHub manifest
+        env:
+          APP_VERSION: ${{ inputs.tag || '' }}
         run: |
-          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          if [ -z "$APP_VERSION" ]; then
+            APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          fi
           GIT_SHA="$(git rev-parse HEAD)"
 
           # Check if the version is stable (no rc or beta in the version)
@@ -166,46 +140,13 @@ jobs:
           docker manifest push documenso/documenso:$GIT_SHA
           docker manifest push documenso/documenso:$APP_VERSION
 
-      - name: Create and push DockerHub chromium manifest
-        run: |
-          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
-          GIT_SHA="$(git rev-parse HEAD)"
-
-          # Check if the version is stable (no rc or beta in the version)
-          if [[ "$APP_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            docker manifest create \
-              documenso/documenso:latest-chromium \
-              --amend documenso/documenso-amd64:latest-chromium \
-              --amend documenso/documenso-arm64:latest-chromium
-
-            docker manifest push documenso/documenso:latest-chromium
-          fi
-
-          if [[ "$APP_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]]; then
-            docker manifest create \
-              documenso/documenso:rc-chromium \
-              --amend documenso/documenso-amd64:rc-chromium \
-              --amend documenso/documenso-arm64:rc-chromium
-
-            docker manifest push documenso/documenso:rc-chromium
-          fi
-
-          docker manifest create \
-            documenso/documenso:$GIT_SHA-chromium \
-            --amend documenso/documenso-amd64:$GIT_SHA-chromium \
-            --amend documenso/documenso-arm64:$GIT_SHA-chromium
-
-          docker manifest create \
-            documenso/documenso:$APP_VERSION-chromium \
-            --amend documenso/documenso-amd64:$APP_VERSION-chromium \
-            --amend documenso/documenso-arm64:$APP_VERSION-chromium
-
-          docker manifest push documenso/documenso:$GIT_SHA-chromium
-          docker manifest push documenso/documenso:$APP_VERSION-chromium
-
       - name: Create and push Github Container Registry manifest
+        env:
+          APP_VERSION: ${{ inputs.tag || '' }}
         run: |
-          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          if [ -z "$APP_VERSION" ]; then
+            APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          fi
           GIT_SHA="$(git rev-parse HEAD)"
 
           # Check if the version is stable (no rc or beta in the version)
@@ -239,40 +180,3 @@ jobs:
 
           docker manifest push ghcr.io/documenso/documenso:$GIT_SHA
           docker manifest push ghcr.io/documenso/documenso:$APP_VERSION
-
-      - name: Create and push Github Container Registry chromium manifest
-        run: |
-          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
-          GIT_SHA="$(git rev-parse HEAD)"
-
-          # Check if the version is stable (no rc or beta in the version)
-          if [[ "$APP_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            docker manifest create \
-              ghcr.io/documenso/documenso:latest-chromium \
-              --amend ghcr.io/documenso/documenso-amd64:latest-chromium \
-              --amend ghcr.io/documenso/documenso-arm64:latest-chromium
-
-            docker manifest push ghcr.io/documenso/documenso:latest-chromium
-          fi
-
-          if [[ "$APP_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]]; then
-            docker manifest create \
-              ghcr.io/documenso/documenso:rc-chromium \
-              --amend ghcr.io/documenso/documenso-amd64:rc-chromium \
-              --amend ghcr.io/documenso/documenso-arm64:rc-chromium
-
-            docker manifest push ghcr.io/documenso/documenso:rc-chromium
-          fi
-
-          docker manifest create \
-            ghcr.io/documenso/documenso:$GIT_SHA-chromium \
-            --amend ghcr.io/documenso/documenso-amd64:$GIT_SHA-chromium \
-            --amend ghcr.io/documenso/documenso-arm64:$GIT_SHA-chromium
-
-          docker manifest create \
-            ghcr.io/documenso/documenso:$APP_VERSION-chromium \
-            --amend ghcr.io/documenso/documenso-amd64:$APP_VERSION-chromium \
-            --amend ghcr.io/documenso/documenso-arm64:$APP_VERSION-chromium
-
-          docker manifest push ghcr.io/documenso/documenso:$GIT_SHA-chromium
-          docker manifest push ghcr.io/documenso/documenso:$APP_VERSION-chromium

@@ -1,368 +1,307 @@
-import type { Prisma, User } from '@prisma/client';
-import { DocumentVisibility, EnvelopeType, SigningStatus, TeamMemberRole } from '@prisma/client';
+import {
+  DocumentStatus,
+  EnvelopeType,
+  RecipientRole,
+  SigningStatus,
+  TeamMemberRole,
+} from '@prisma/client';
+import type { Expression, ExpressionBuilder, SelectQueryBuilder, SqlBool } from 'kysely';
 import { DateTime } from 'luxon';
-import { match } from 'ts-pattern';
 
 import type { PeriodSelectorValue } from '@documenso/lib/server-only/document/find-documents';
-import { prisma } from '@documenso/prisma';
-import { isExtendedDocumentStatus } from '@documenso/prisma/guards/is-extended-document-status';
+import { kyselyPrisma, prisma, sql } from '@documenso/prisma';
+import type { DB } from '@documenso/prisma/generated/types';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
+import { STATS_COUNT_CAP } from '../../constants/document';
+import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
+import { getTeamById } from '../team/get-team';
+
+// Kysely query builder type for Envelope queries.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type EnvelopeQueryBuilder = SelectQueryBuilder<DB, 'Envelope', any>;
+
+// Expression builder type scoped to Envelope table context.
+type EnvelopeExpressionBuilder = ExpressionBuilder<DB, 'Envelope'>;
+type RecipientExpressionBuilder = ExpressionBuilder<DB, 'Recipient'>;
+
+/**
+ * Reusable EXISTS subquery: checks that a Recipient row exists for the given
+ * envelope with the given email, plus optional extra conditions.
+ */
+const recipientExists = (
+  eb: EnvelopeExpressionBuilder,
+  email: string,
+  extra?: (qb: RecipientExpressionBuilder) => Expression<SqlBool>,
+) => {
+  let sub = eb
+    .selectFrom('Recipient')
+    .whereRef('Recipient.envelopeId', '=', 'Envelope.id')
+    .where('Recipient.email', '=', email);
+
+  if (extra) {
+    sub = sub.where(extra);
+  }
+
+  return eb.exists(sub.select(sql.lit(1).as('one')));
+};
+
+/**
+ * Reusable EXISTS subquery: checks that the envelope's sender (User) has the given email.
+ */
+const senderEmailIs = (eb: EnvelopeExpressionBuilder, email: string) =>
+  eb.exists(
+    eb
+      .selectFrom('User')
+      .whereRef('User.id', '=', 'Envelope.userId')
+      .where('User.email', '=', email)
+      .select(sql.lit(1).as('one')),
+  );
+
 export type GetStatsInput = {
-  user: Pick<User, 'id' | 'email'>;
-  team?: Omit<GetTeamCountsOption, 'createdAt'>;
+  userId: number;
+  teamId: number;
   period?: PeriodSelectorValue;
   search?: string;
   folderId?: string;
+  senderIds?: number[];
+};
+
+/**
+ * Builds a capped count from a query builder: wraps it as
+ * `SELECT COUNT(*) FROM (SELECT id FROM ... LIMIT cap+1) sub`
+ * and clamps the result to STATS_COUNT_CAP.
+ */
+const cappedCount = async (qb: EnvelopeQueryBuilder): Promise<number> => {
+  const result = await kyselyPrisma.$kysely
+    .selectFrom(
+      qb
+        .clearSelect()
+        .select('Envelope.id')
+        .limit(STATS_COUNT_CAP + 1)
+        .as('capped'),
+    )
+    .select(({ fn }) => fn.count<number>('id').as('total'))
+    .executeTakeFirstOrThrow();
+
+  return Math.min(Number(result.total ?? 0), STATS_COUNT_CAP);
 };
 
 export const getStats = async ({
-  user,
+  userId,
+  teamId,
   period,
   search = '',
   folderId,
-  ...options
+  senderIds,
 }: GetStatsInput) => {
-  let createdAt: Prisma.EnvelopeWhereInput['createdAt'];
+  const user = await prisma.user.findFirstOrThrow({
+    where: { id: userId },
+    select: { id: true, email: true },
+  });
 
-  if (period) {
-    const daysAgo = parseInt(period.replace(/d$/, ''), 10);
+  const team = await getTeamById({ userId, teamId });
 
-    const startOfPeriod = DateTime.now().minus({ days: daysAgo }).startOf('day');
+  const teamEmail = team.teamEmail?.email ?? null;
+  const currentTeamRole = team.currentTeamRole ?? TeamMemberRole.MEMBER;
+  const allowedVisibilities = TEAM_DOCUMENT_VISIBILITY_MAP[currentTeamRole];
 
-    createdAt = {
-      gte: startOfPeriod.toJSDate(),
-    };
-  }
+  const searchQuery = search.trim();
+  const hasSearch = searchQuery.length > 0;
+  const searchPattern = `%${searchQuery}%`;
 
-  const [ownerCounts, notSignedCounts, hasSignedCounts] = await (options.team
-    ? getTeamCounts({
-        ...options.team,
-        createdAt,
-        currentUserEmail: user.email,
-        userId: user.id,
-        search,
-        folderId,
-      })
-    : getCounts({ user, createdAt, search, folderId }));
+  // ─── Base query builder ──────────────────────────────────────────────
+
+  const buildBaseQuery = (): EnvelopeQueryBuilder => {
+    let qb: EnvelopeQueryBuilder = kyselyPrisma.$kysely
+      .selectFrom('Envelope')
+      .select('Envelope.id');
+
+    // Type = DOCUMENT
+    qb = qb.where('Envelope.type', '=', sql.lit(EnvelopeType.DOCUMENT));
+
+    // Folder filter
+    qb =
+      folderId !== undefined
+        ? qb.where('Envelope.folderId', '=', folderId)
+        : qb.where('Envelope.folderId', 'is', null);
+
+    // Period filter
+    if (period) {
+      const daysAgo = parseInt(period.replace(/d$/, ''), 10);
+      const startOfPeriod = DateTime.now().minus({ days: daysAgo }).startOf('day');
+
+      qb = qb.where('Envelope.createdAt', '>=', startOfPeriod.toJSDate());
+    }
+
+    // Sender filter
+    if (senderIds && senderIds.length > 0) {
+      qb = qb.where('Envelope.userId', 'in', senderIds);
+    }
+
+    // Search filter
+    if (hasSearch) {
+      qb = qb.where(({ or, eb }) =>
+        or([
+          eb('Envelope.title', 'ilike', searchPattern),
+          eb('Envelope.externalId', 'ilike', searchPattern),
+          eb(
+            'Envelope.id',
+            'in',
+            eb
+              .selectFrom('Recipient')
+              .select('Recipient.envelopeId')
+              .where(({ or: innerOr, eb: innerEb }) =>
+                innerOr([
+                  innerEb('Recipient.email', 'ilike', searchPattern),
+                  innerEb('Recipient.name', 'ilike', searchPattern),
+                ]),
+              )
+              .distinct()
+              .limit(1000),
+          ),
+        ]),
+      );
+    }
+
+    return qb;
+  };
+
+  // ─── Shared filter helpers ───────────────────────────────────────────
+
+  const visibilityFilter = (eb: EnvelopeExpressionBuilder) =>
+    eb.or([
+      eb(
+        'Envelope.visibility',
+        'in',
+        allowedVisibilities.map((v) => sql.lit(v)),
+      ),
+      eb('Envelope.userId', '=', user.id),
+      recipientExists(eb, user.email),
+    ]);
+
+  const teamDeletedFilter = (eb: EnvelopeExpressionBuilder) => {
+    const branches = [
+      eb.and([eb('Envelope.teamId', '=', team.id), eb('Envelope.deletedAt', 'is', null)]),
+    ];
+
+    if (teamEmail) {
+      branches.push(eb.and([senderEmailIs(eb, teamEmail), eb('Envelope.deletedAt', 'is', null)]));
+      branches.push(
+        recipientExists(eb, teamEmail, (reb) => reb('Recipient.documentDeletedAt', 'is', null)),
+      );
+    }
+
+    return eb.or(branches);
+  };
+
+  // ─── Per-status query builders ───────────────────────────────────────
+
+  // DRAFT: team-owned drafts visible to the user
+  const draftQuery = buildBaseQuery()
+    .where('Envelope.status', '=', sql.lit(DocumentStatus.DRAFT))
+    .where((eb) => {
+      const accessBranches = [eb('Envelope.teamId', '=', team.id)];
+
+      if (teamEmail) {
+        accessBranches.push(senderEmailIs(eb, teamEmail));
+      }
+
+      return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
+    });
+
+  // PENDING: team-owned pending + team-email signed-pending docs
+  const pendingQuery = buildBaseQuery()
+    .where('Envelope.status', '=', sql.lit(DocumentStatus.PENDING))
+    .where((eb) => {
+      const accessBranches = [eb('Envelope.teamId', '=', team.id)];
+
+      if (teamEmail) {
+        accessBranches.push(senderEmailIs(eb, teamEmail));
+        accessBranches.push(
+          recipientExists(eb, teamEmail, (reb) =>
+            reb.and([
+              reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.SIGNED)),
+              reb('Recipient.role', '!=', sql.lit(RecipientRole.CC)),
+            ]),
+          ),
+        );
+      }
+
+      return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
+    });
+
+  // COMPLETED: team-owned completed + team-email received completed
+  const completedQuery = buildBaseQuery()
+    .where('Envelope.status', '=', sql.lit(DocumentStatus.COMPLETED))
+    .where((eb) => {
+      const accessBranches = [eb('Envelope.teamId', '=', team.id)];
+
+      if (teamEmail) {
+        accessBranches.push(senderEmailIs(eb, teamEmail));
+        accessBranches.push(recipientExists(eb, teamEmail));
+      }
+
+      return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
+    });
+
+  // REJECTED: team-owned rejected + team-email rejected docs
+  const rejectedQuery = buildBaseQuery()
+    .where('Envelope.status', '=', sql.lit(DocumentStatus.REJECTED))
+    .where((eb) => {
+      const accessBranches = [eb('Envelope.teamId', '=', team.id)];
+
+      if (teamEmail) {
+        accessBranches.push(senderEmailIs(eb, teamEmail));
+        accessBranches.push(
+          recipientExists(eb, teamEmail, (reb) =>
+            reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.REJECTED)),
+          ),
+        );
+      }
+
+      return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
+    });
+
+  // INBOX: non-draft docs where team email is a NOT_SIGNED, non-CC recipient
+  // Returns 0 if the team has no team email.
+  const inboxQuery = teamEmail
+    ? buildBaseQuery()
+        .where('Envelope.status', '!=', sql.lit(DocumentStatus.DRAFT))
+        .where((eb) =>
+          eb.and([
+            visibilityFilter(eb),
+            recipientExists(eb, teamEmail, (reb) =>
+              reb.and([
+                reb('Recipient.documentDeletedAt', 'is', null),
+                reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.NOT_SIGNED)),
+                reb('Recipient.role', '!=', sql.lit(RecipientRole.CC)),
+              ]),
+            ),
+          ]),
+        )
+    : null;
+
+  // ─── Execute all counts in parallel ──────────────────────────────────
+
+  const [draft, pending, completed, rejected, inbox] = await Promise.all([
+    cappedCount(draftQuery),
+    cappedCount(pendingQuery),
+    cappedCount(completedQuery),
+    cappedCount(rejectedQuery),
+    inboxQuery ? cappedCount(inboxQuery) : Promise.resolve(0),
+  ]);
+
+  const all = Math.min(draft + pending + completed + rejected + inbox, STATS_COUNT_CAP);
 
   const stats: Record<ExtendedDocumentStatus, number> = {
-    [ExtendedDocumentStatus.DRAFT]: 0,
-    [ExtendedDocumentStatus.PENDING]: 0,
-    [ExtendedDocumentStatus.COMPLETED]: 0,
-    [ExtendedDocumentStatus.REJECTED]: 0,
-    [ExtendedDocumentStatus.INBOX]: 0,
-    [ExtendedDocumentStatus.ALL]: 0,
+    [ExtendedDocumentStatus.DRAFT]: draft,
+    [ExtendedDocumentStatus.PENDING]: pending,
+    [ExtendedDocumentStatus.COMPLETED]: completed,
+    [ExtendedDocumentStatus.REJECTED]: rejected,
+    [ExtendedDocumentStatus.INBOX]: inbox,
+    [ExtendedDocumentStatus.ALL]: all,
   };
-
-  ownerCounts.forEach((stat) => {
-    stats[stat.status] = stat._count._all;
-  });
-
-  notSignedCounts.forEach((stat) => {
-    stats[ExtendedDocumentStatus.INBOX] += stat._count._all;
-  });
-
-  hasSignedCounts.forEach((stat) => {
-    if (stat.status === ExtendedDocumentStatus.COMPLETED) {
-      stats[ExtendedDocumentStatus.COMPLETED] += stat._count._all;
-    }
-
-    if (stat.status === ExtendedDocumentStatus.PENDING) {
-      stats[ExtendedDocumentStatus.PENDING] += stat._count._all;
-    }
-
-    if (stat.status === ExtendedDocumentStatus.REJECTED) {
-      stats[ExtendedDocumentStatus.REJECTED] += stat._count._all;
-    }
-  });
-
-  Object.keys(stats).forEach((key) => {
-    if (key !== ExtendedDocumentStatus.ALL && isExtendedDocumentStatus(key)) {
-      stats[ExtendedDocumentStatus.ALL] += stats[key];
-    }
-  });
 
   return stats;
-};
-
-type GetCountsOption = {
-  user: Pick<User, 'id' | 'email'>;
-  createdAt: Prisma.EnvelopeWhereInput['createdAt'];
-  search?: string;
-  folderId?: string | null;
-};
-
-const getCounts = async ({ user, createdAt, search, folderId }: GetCountsOption) => {
-  const searchFilter: Prisma.EnvelopeWhereInput = {
-    OR: [
-      { title: { contains: search, mode: 'insensitive' } },
-      { recipients: { some: { name: { contains: search, mode: 'insensitive' } } } },
-      { recipients: { some: { email: { contains: search, mode: 'insensitive' } } } },
-    ],
-  };
-
-  const rootPageFilter = folderId === undefined ? { folderId: null } : {};
-
-  return Promise.all([
-    // Owner counts.
-    prisma.envelope.groupBy({
-      by: ['status'],
-      _count: {
-        _all: true,
-      },
-      where: {
-        type: EnvelopeType.DOCUMENT,
-        userId: user.id,
-        createdAt,
-        deletedAt: null,
-        AND: [searchFilter, rootPageFilter, folderId ? { folderId } : {}],
-      },
-    }),
-    // Not signed counts.
-    prisma.envelope.groupBy({
-      by: ['status'],
-      _count: {
-        _all: true,
-      },
-      where: {
-        type: EnvelopeType.DOCUMENT,
-        status: ExtendedDocumentStatus.PENDING,
-        recipients: {
-          some: {
-            email: user.email,
-            signingStatus: SigningStatus.NOT_SIGNED,
-            documentDeletedAt: null,
-          },
-        },
-        createdAt,
-        AND: [searchFilter, rootPageFilter, folderId ? { folderId } : {}],
-      },
-    }),
-    // Has signed counts.
-    prisma.envelope.groupBy({
-      by: ['status'],
-      _count: {
-        _all: true,
-      },
-      where: {
-        type: EnvelopeType.DOCUMENT,
-        createdAt,
-        user: {
-          email: {
-            not: user.email,
-          },
-        },
-        OR: [
-          {
-            status: ExtendedDocumentStatus.PENDING,
-            recipients: {
-              some: {
-                email: user.email,
-                signingStatus: SigningStatus.SIGNED,
-                documentDeletedAt: null,
-              },
-            },
-          },
-          {
-            status: ExtendedDocumentStatus.COMPLETED,
-            recipients: {
-              some: {
-                email: user.email,
-                signingStatus: SigningStatus.SIGNED,
-                documentDeletedAt: null,
-              },
-            },
-          },
-        ],
-        AND: [searchFilter, rootPageFilter, folderId ? { folderId } : {}],
-      },
-    }),
-  ]);
-};
-
-type GetTeamCountsOption = {
-  teamId: number;
-  teamEmail?: string;
-  senderIds?: number[];
-  currentUserEmail: string;
-  userId: number;
-  createdAt: Prisma.EnvelopeWhereInput['createdAt'];
-  currentTeamMemberRole?: TeamMemberRole;
-  search?: string;
-  folderId?: string | null;
-};
-
-const getTeamCounts = async (options: GetTeamCountsOption) => {
-  const { createdAt, teamId, teamEmail, folderId } = options;
-
-  const senderIds = options.senderIds ?? [];
-
-  const userIdWhereClause: Prisma.EnvelopeWhereInput['userId'] =
-    senderIds.length > 0
-      ? {
-          in: senderIds,
-        }
-      : undefined;
-
-  const searchFilter: Prisma.EnvelopeWhereInput = {
-    OR: [
-      { title: { contains: options.search, mode: 'insensitive' } },
-      { recipients: { some: { name: { contains: options.search, mode: 'insensitive' } } } },
-      { recipients: { some: { email: { contains: options.search, mode: 'insensitive' } } } },
-    ],
-  };
-
-  const rootPageFilter = folderId === undefined ? { folderId: null } : {};
-
-  let ownerCountsWhereInput: Prisma.EnvelopeWhereInput = {
-    type: EnvelopeType.DOCUMENT,
-    userId: userIdWhereClause,
-    createdAt,
-    teamId,
-    deletedAt: null,
-  };
-
-  let notSignedCountsGroupByArgs = null;
-  let hasSignedCountsGroupByArgs = null;
-
-  const visibilityFiltersWhereInput: Prisma.EnvelopeWhereInput = {
-    AND: [
-      { deletedAt: null },
-      {
-        OR: [
-          match(options.currentTeamMemberRole)
-            .with(TeamMemberRole.ADMIN, () => ({
-              visibility: {
-                in: [
-                  DocumentVisibility.EVERYONE,
-                  DocumentVisibility.MANAGER_AND_ABOVE,
-                  DocumentVisibility.ADMIN,
-                ],
-              },
-            }))
-            .with(TeamMemberRole.MANAGER, () => ({
-              visibility: {
-                in: [DocumentVisibility.EVERYONE, DocumentVisibility.MANAGER_AND_ABOVE],
-              },
-            }))
-            .otherwise(() => ({
-              visibility: {
-                equals: DocumentVisibility.EVERYONE,
-              },
-            })),
-          {
-            OR: [
-              { userId: options.userId },
-              { recipients: { some: { email: options.currentUserEmail } } },
-            ],
-          },
-        ],
-      },
-    ],
-  };
-
-  ownerCountsWhereInput = {
-    ...ownerCountsWhereInput,
-    AND: [
-      ...(Array.isArray(visibilityFiltersWhereInput.AND)
-        ? visibilityFiltersWhereInput.AND
-        : visibilityFiltersWhereInput.AND
-          ? [visibilityFiltersWhereInput.AND]
-          : []),
-      searchFilter,
-      rootPageFilter,
-      folderId ? { folderId } : {},
-    ],
-  };
-
-  if (teamEmail) {
-    ownerCountsWhereInput = {
-      type: EnvelopeType.DOCUMENT,
-      userId: userIdWhereClause,
-      createdAt,
-      OR: [
-        {
-          teamId,
-        },
-        {
-          user: {
-            email: teamEmail,
-          },
-        },
-      ],
-      deletedAt: null,
-      AND: [searchFilter, rootPageFilter, folderId ? { folderId } : {}],
-    };
-
-    notSignedCountsGroupByArgs = {
-      by: ['status'],
-      _count: {
-        _all: true,
-      },
-      where: {
-        type: EnvelopeType.DOCUMENT,
-        userId: userIdWhereClause,
-        createdAt,
-        status: ExtendedDocumentStatus.PENDING,
-        recipients: {
-          some: {
-            email: teamEmail,
-            signingStatus: SigningStatus.NOT_SIGNED,
-            documentDeletedAt: null,
-          },
-        },
-        deletedAt: null,
-        AND: [searchFilter, rootPageFilter, folderId ? { folderId } : {}],
-      },
-    } satisfies Prisma.EnvelopeGroupByArgs;
-
-    hasSignedCountsGroupByArgs = {
-      by: ['status'],
-      _count: {
-        _all: true,
-      },
-      where: {
-        type: EnvelopeType.DOCUMENT,
-        userId: userIdWhereClause,
-        createdAt,
-        OR: [
-          {
-            status: ExtendedDocumentStatus.PENDING,
-            recipients: {
-              some: {
-                email: teamEmail,
-                signingStatus: SigningStatus.SIGNED,
-                documentDeletedAt: null,
-              },
-            },
-            deletedAt: null,
-          },
-          {
-            status: ExtendedDocumentStatus.COMPLETED,
-            recipients: {
-              some: {
-                email: teamEmail,
-                signingStatus: SigningStatus.SIGNED,
-                documentDeletedAt: null,
-              },
-            },
-          },
-        ],
-        AND: [searchFilter, rootPageFilter, folderId ? { folderId } : {}],
-      },
-    } satisfies Prisma.EnvelopeGroupByArgs;
-  }
-
-  return Promise.all([
-    prisma.envelope.groupBy({
-      by: ['status'],
-      _count: {
-        _all: true,
-      },
-      where: ownerCountsWhereInput,
-    }),
-    notSignedCountsGroupByArgs ? prisma.envelope.groupBy(notSignedCountsGroupByArgs) : [],
-    hasSignedCountsGroupByArgs ? prisma.envelope.groupBy(hasSignedCountsGroupByArgs) : [],
-  ]);
 };

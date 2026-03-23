@@ -79,6 +79,7 @@ export const findTemplates = async ({
         },
       },
       skip: Math.max(page - 1, 0) * perPage,
+      take: perPage,
       orderBy: {
         createdAt: 'desc',
       },

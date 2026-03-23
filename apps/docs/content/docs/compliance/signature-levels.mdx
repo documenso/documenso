@@ -1,0 +1,284 @@
+---
+title: Signature Levels
+description: Understand the three eIDAS signature levels — SES, AES, and QES — their requirements, legal effect, and when to use each.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+<Callout type="info">
+  Documenso seals all signed documents cryptographically, regardless of signature level, to prevent
+  any alterations after signing.
+</Callout>
+
+### Compliance Status Overview
+
+| Regulation   | Status    |
+| ------------ | --------- |
+| ESIGN / UETA | Compliant |
+| eIDAS SES    | Compliant |
+| eIDAS AES    | Planned   |
+| eIDAS QES    | Planned   |
+| ZertES       | Planned   |
+
+## U.S. ESIGN Act
+
+<Callout type="info">Status: Compliant</Callout>
+
+The Electronic Signatures in Global and National Commerce Act (ESIGN Act) is a U.S. federal law that ensures the legal validity and enforceability of electronic signatures and records in commerce.
+
+### Main Requirements
+
+- **Intent to Sign** - Parties must demonstrate their intent to sign
+- **Consent** - All parties must consent to the use of electronic signatures and records
+- **Consumer Disclosures** - Financial institutions must provide clear statements informing consumers before obtaining consent
+- **Record Retention** - Electronic records must be maintained for later access by signers
+- **Security** - Parties must take reasonable steps to ensure the security and integrity of electronic signatures and records
+
+## UETA (Uniform Electronic Transactions Act)
+
+<Callout type="info">Status: Compliant</Callout>
+
+The Uniform Electronic Transactions Act provides a legal framework for the use of electronic signatures and records in electronic transactions, ensuring they have the same validity and enforceability as paper documents and handwritten signatures.
+
+UETA shares the same core requirements as the [ESIGN Act](#us-esign-act).
+
+## Simple Electronic Signatures (SES)
+
+A Simple Electronic Signature is the most basic form of electronic signature. It includes any data in electronic form that is attached to or logically associated with other electronic data and used by the signatory to sign.
+
+### Characteristics
+
+| Aspect                     | Description                                                                           |
+| -------------------------- | ------------------------------------------------------------------------------------- |
+| **Technical Requirements** | No specific technical requirements beyond demonstrating intent to sign                |
+| **Identity Verification**  | None required; relies on email delivery or other indirect identification              |
+| **Legal Status**           | Admissible as evidence; cannot be denied legal effect solely because it is electronic |
+| **Examples**               | Typed name, scanned signature image, checkbox acceptance, click-to-sign               |
+
+### When SES Is Appropriate
+
+SES is suitable for many common business transactions:
+
+- Standard contracts and agreements
+- Internal approvals and sign-offs
+- Terms of service acceptance
+- Non-disclosure agreements
+- Purchase orders and invoices
+- Employment documents (in most jurisdictions)
+
+The legal validity of SES depends on the specific transaction and jurisdiction. Many everyday business documents do not require higher signature levels.
+
+---
+
+## Advanced Electronic Signatures (AES)
+
+An Advanced Electronic Signature meets additional technical and procedural requirements that provide stronger evidence of the signer's identity and the document's integrity.
+
+### Requirements
+
+Under eIDAS, an AES must satisfy four criteria:
+
+1. **Uniquely linked to the signatory** - The signature is associated with a specific individual
+2. **Capable of identifying the signatory** - The signature data reveals who signed
+3. **Created using signature creation data under the signatory's sole control** - Only the signer can create the signature (e.g., private key, secure device)
+4. **Linked to the data in such a way that any subsequent change is detectable** - Tampering invalidates the signature
+
+### Characteristics
+
+| Aspect                     | Description                                                                |
+| -------------------------- | -------------------------------------------------------------------------- |
+| **Technical Requirements** | Cryptographic signature with signer identification                         |
+| **Identity Verification**  | Required; must establish signer identity through verification process      |
+| **Legal Status**           | Higher evidentiary weight than SES; stronger presumption of validity       |
+| **Implementation**         | Typically requires identity verification service and personal certificates |
+
+### Compliance Status
+
+<Callout type="warn">
+  Status: [Planned](https://github.com/documenso/backlog/issues/9) via third party until [Let's
+  Sign](https://github.com/documenso/backlog/issues/21) is realized.
+</Callout>
+
+Current AES progress:
+
+- Cryptographic signature sealing the document against tampering
+- Signing using dedicated hardware (Hardware Security Module)
+- Embedding signer identity in the cryptographic signature (planned)
+- Being a government-audited trusted qualified services provider (planned)
+
+### When AES Is Appropriate
+
+AES is used when stronger proof of identity and intent is needed:
+
+- Financial services agreements
+- Real estate transactions (in some jurisdictions)
+- Healthcare consent forms
+- Government submissions
+- High-value contracts
+- Cross-border agreements within the EU
+
+---
+
+## Qualified Electronic Signatures (QES)
+
+A Qualified Electronic Signature is the highest level of electronic signature under eIDAS. It is legally equivalent to a handwritten signature in all EU member states and carries a presumption of validity.
+
+### Requirements
+
+QES must meet all AES requirements plus:
+
+1. **Qualified Certificate** - Issued by a Qualified Trust Service Provider (QTSP) that is accredited by an EU member state
+2. **Qualified Electronic Signature Creation Device (QSCD)** - The signature is created using hardware or software that meets specific security standards
+3. **Identity Verification** - In-person or equivalent remote verification compliant with eIDAS requirements
+
+### Characteristics
+
+| Aspect                     | Description                                                           |
+| -------------------------- | --------------------------------------------------------------------- |
+| **Technical Requirements** | Qualified certificate + qualified signature creation device           |
+| **Identity Verification**  | Strict verification by a Qualified Trust Service Provider             |
+| **Legal Status**           | Equivalent to handwritten signature across all EU member states       |
+| **Implementation**         | Requires integration with a QTSP; typically involves external service |
+
+### Compliance Status
+
+<Callout type="warn">
+  Status: [Planned](https://github.com/documenso/backlog/issues/32) via third party until [Let's
+  Sign](https://github.com/documenso/backlog/issues/21) is realized.
+</Callout>
+
+### When QES Is Required
+
+Certain transactions require or benefit from QES:
+
+- Documents that legally require a handwritten signature under national law
+- Court filings and legal documents
+- Company formation documents
+- Land registry transactions
+- Notarized documents
+- Regulated financial transactions
+- Cross-border transactions requiring guaranteed recognition
+
+---
+
+## Comparison of Signature Levels
+
+| Aspect                    | SES          | AES                      | QES                   |
+| ------------------------- | ------------ | ------------------------ | --------------------- |
+| **Technical Complexity**  | Low          | Medium                   | High                  |
+| **Identity Verification** | None         | Required                 | Strict (QTSP)         |
+| **Legal Effect (EU)**     | Admissible   | Higher evidentiary value | Equal to handwritten  |
+| **Cost**                  | Low          | Medium                   | Higher                |
+| **User Experience**       | Simple       | More steps               | Most steps            |
+| **Signer Requirements**   | Email access | Identity verification    | Certificate from QTSP |
+
+### Legal Recognition
+
+| Jurisdiction       | SES                             | AES                        | QES                                  |
+| ------------------ | ------------------------------- | -------------------------- | ------------------------------------ |
+| **European Union** | Valid, evidentiary value varies | Enhanced evidentiary value | Equivalent to handwritten            |
+| **United States**  | Valid under ESIGN/UETA          | No formal distinction      | No formal distinction                |
+| **United Kingdom** | Valid                           | Enhanced value             | Equivalent to handwritten (UK eIDAS) |
+| **Switzerland**    | Valid                           | Valid                      | Equivalent to handwritten (ZertES)   |
+
+---
+
+## What Documenso Provides
+
+Documenso supports Simple Electronic Signatures (SES) with features that enhance evidentiary value:
+
+### SES Features
+
+- **Intent to Sign** - Signers actively interact with signature fields
+- **Email-Based Delivery** - Documents sent to specific email addresses
+- **Audit Trail** - Complete record of signing events, timestamps, and IP addresses
+- **Document Integrity** - Cryptographic sealing detects any post-signing modifications
+- **Record Retention** - Signed documents stored and accessible to all parties
+
+### Additional Verification Options
+
+- **Access Codes** - Require signers to enter a code before accessing documents
+- **Signing Order** - Control the sequence of signatures
+
+### What Documenso Does Not Provide
+
+| Capability                                | Status                                                    |
+| ----------------------------------------- | --------------------------------------------------------- |
+| **Qualified Electronic Signatures (QES)** | Not supported; requires QTSP integration                  |
+| **Advanced Electronic Signatures (AES)**  | Partial; full AES requires identity verification services |
+| **Identity Verification (KYC)**           | Not built-in                                              |
+| **Qualified Certificates**                | Not issued; would require QTSP status                     |
+
+For transactions requiring AES or QES, you would need to integrate with external identity verification services or Qualified Trust Service Providers.
+
+---
+
+## ZertES (Swiss Federal Law)
+
+<Callout type="warn">Status: [Planned](https://github.com/documenso/backlog/issues/34)</Callout>
+
+ZertES is a Swiss federal law that regulates electronic signature compliance. It defines requirements similar to eIDAS for qualified electronic signatures within Switzerland.
+
+---
+
+## When You Need Higher Signature Levels
+
+Consider using AES or QES when:
+
+<Accordions type="multiple">
+  <Accordion title="Legal Requirements">
+    - National law requires a handwritten signature (QES may substitute)
+    - Regulations specify signature requirements (e.g., certain financial or healthcare documents)
+    - Cross-border enforceability is critical
+  </Accordion>
+  <Accordion title="Risk Factors">
+    - High contract value or significant liability
+    - Higher likelihood of disputes
+    - Need for stronger non-repudiation
+    - Counterparty or regulatory requirements specify higher levels
+  </Accordion>
+  <Accordion title="Industry Standards">
+    - Financial services with regulatory oversight
+    - Healthcare with patient consent requirements
+    - Government or public sector contracts
+    - Real estate transactions in regulated markets
+  </Accordion>
+  <Accordion title="Evaluating Your Needs">
+    Most business transactions do not require AES or QES. Consider:
+
+    1. What does your jurisdiction require for this document type?
+    2. What do your counterparties or customers expect?
+    3. What is the risk if the signature is disputed?
+    4. Does your industry have specific requirements?
+
+    When in doubt, consult with legal counsel to determine the appropriate signature level for your specific use case.
+
+  </Accordion>
+</Accordions>
+
+---
+
+## Disclaimer
+
+This documentation is provided for informational purposes only and does not constitute legal advice.
+
+The appropriate signature level for your documents depends on:
+
+- Your jurisdiction and applicable laws
+- The type of document being signed
+- Industry-specific regulations
+- Contractual requirements from counterparties
+- Risk tolerance and dispute likelihood
+
+Electronic signature requirements vary significantly across jurisdictions and document types. Some transactions have specific legal requirements that may mandate particular signature levels or exclude electronic signatures entirely.
+
+Consult with qualified legal counsel to determine the signature level requirements for your specific use case.
+
+---
+
+## Related
+
+- [E-Sign Compliance](/docs/compliance/esign) - ESIGN Act, UETA, eIDAS, and electronic signature laws
+- [Signing Certificates](/docs/concepts/signing-certificates) - How documents are digitally signed and verified
+- [Standards & Regulations](/docs/compliance/standards) - SOC 2, 21 CFR Part 11, and other frameworks
