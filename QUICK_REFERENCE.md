@@ -277,6 +277,5 @@ NEXT_PRIVATE_SMTP_PASSWORD=<resend-api-key>
 
 ---
 
-**Full documentation:** See `DEPLOYMENT_GUIDE.md`  
+**Full documentation:** See `DEPLOYMENT_GUIDE.md`
 **Last Updated:** January 28, 2025
-

@@ -39,7 +39,7 @@ export const TemplateDocumentSelfSigned = ({
           </Column>
         </Section>
 
-        <Text className="text-primary mb-0 mt-6 text-center text-lg font-semibold">
+        <Text className="mb-0 mt-6 text-center text-lg font-semibold text-primary">
           <Trans>You have signed “{documentName}”</Trans>
         </Text>
 
@@ -49,7 +49,7 @@ export const TemplateDocumentSelfSigned = ({
             <Link
               href={signUpUrl}
               target="_blank"
-              className="text-documenso-700 hover:text-documenso-600 whitespace-nowrap"
+              className="whitespace-nowrap text-documenso-700 hover:text-documenso-600"
             >
               free account
             </Link>{' '}

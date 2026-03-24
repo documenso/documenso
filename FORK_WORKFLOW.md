@@ -162,7 +162,7 @@ if git show-ref --verify --quiet "refs/heads/$BRANCH_NAME"; then
 else
     # Create new branch from tag
     git checkout -b "$BRANCH_NAME" "$LATEST_TAG"
-    
+
     # Push to your fork
     git push -u origin "$BRANCH_NAME"
 fi
@@ -232,4 +232,3 @@ open https://github.com/documenso/documenso/releases/tag/v2.0.0
 - **Local server**: http://localhost:3000
 
 Happy forking! 🍴
-

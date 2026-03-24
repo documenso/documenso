@@ -37,10 +37,10 @@ if git show-ref --verify --quiet "refs/heads/$BRANCH_NAME"; then
 else
     echo "🆕 Creating new branch $BRANCH_NAME from tag $LATEST_TAG"
     git checkout -b "$BRANCH_NAME" "$LATEST_TAG"
-    
+
     echo "📤 Pushing to your fork..."
     git push -u origin "$BRANCH_NAME"
-    
+
     echo "✅ Created and pushed $BRANCH_NAME"
 fi
 
@@ -53,4 +53,3 @@ echo "  4. Start application: npm run d"
 echo ""
 echo "Or run all at once:"
 echo "  pkill -f 'npm run dev' && npm install && npm run prisma:migrate-dev && npm run d"
-

@@ -166,7 +166,7 @@ export const DocumentShareButton = ({
             </span>
             <div
               className={cn(
-                'bg-muted/40 mt-4 aspect-[1200/630] overflow-hidden rounded-lg border',
+                'mt-4 aspect-[1200/630] overflow-hidden rounded-lg border bg-muted/40',
                 {
                   'animate-pulse': !shareLink?.slug,
                 },

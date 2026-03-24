@@ -1,7 +1,7 @@
 # SuiteOp OAuth Integration Guide
 
-**Date:** November 11, 2025  
-**Feature:** Custom OAuth flow for SuiteOp to connect with SuiteOp Sign  
+**Date:** November 11, 2025
+**Feature:** Custom OAuth flow for SuiteOp to connect with SuiteOp Sign
 **Status:** ✅ Complete
 
 ---
@@ -396,4 +396,3 @@ The OAuth implementation is completely isolated and does not affect any existing
 - `apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx` - New route
 - `apps/remix/app/root.tsx` - Bug fixes only (cookie handling, meta tags)
 - `packages/lib/constants/app.ts` - Added OAuth environment variables
-

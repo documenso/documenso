@@ -364,7 +364,7 @@ docker.io/jeanlosi/suiteop-sign:v2.0.0
 **Basic Settings:**
 - **Name:** `suiteop-sign` (or your preferred name)
 - **Region:** Choose closest to your users
-- **Instance Type:** 
+- **Instance Type:**
   - **Development:** Starter (512 MB RAM, $7/month)
   - **Production:** Standard (2 GB RAM, $25/month) or higher
 
@@ -840,13 +840,13 @@ npm run dev
 
 ## Support & Credits
 
-**Original Project:** [Documenso](https://github.com/documenso/documenso)  
-**License:** AGPL-3.0 (inherited from Documenso)  
-**Documentation:** https://docs.documenso.com  
+**Original Project:** [Documenso](https://github.com/documenso/documenso)
+**License:** AGPL-3.0 (inherited from Documenso)
+**Documentation:** https://docs.documenso.com
 **Community:** https://documen.so/discord
 
-**White-Label Customization:** SuiteOp Sign  
-**Maintainer:** JeanSuiteop  
+**White-Label Customization:** SuiteOp Sign
+**Maintainer:** JeanSuiteop
 **Docker Hub:** https://hub.docker.com/r/jeanlosi/suiteop-sign
 
 ---
@@ -862,4 +862,3 @@ npm run dev
 ---
 
 **Last Updated:** January 27, 2026
-

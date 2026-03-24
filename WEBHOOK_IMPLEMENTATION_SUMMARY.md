@@ -1,7 +1,7 @@
 # Global Webhook Implementation - Summary
 
-**Date:** October 28, 2025  
-**Feature:** Global webhook for centralized event tracking  
+**Date:** October 28, 2025
+**Feature:** Global webhook for centralized event tracking
 **Status:** ✅ Complete and deployed
 
 ---
@@ -12,11 +12,11 @@ A **global webhook system** that automatically sends notifications to a centrali
 
 ### Key Features
 
-✅ **Automatic Triggering**: No user configuration required  
-✅ **Event Coverage**: `DOCUMENT_SIGNED` and `DOCUMENT_COMPLETED`  
-✅ **Non-Blocking**: Doesn't slow down document operations  
-✅ **Error Handling**: Failures are logged but don't affect the main workflow  
-✅ **Independent**: Runs alongside user-configured webhooks  
+✅ **Automatic Triggering**: No user configuration required
+✅ **Event Coverage**: `DOCUMENT_SIGNED` and `DOCUMENT_COMPLETED`
+✅ **Non-Blocking**: Doesn't slow down document operations
+✅ **Error Handling**: Failures are logged but don't affect the main workflow
+✅ **Independent**: Runs alongside user-configured webhooks
 ✅ **Configurable**: Can be customized via environment variable
 
 ---
@@ -204,9 +204,9 @@ NEXT_PRIVATE_GLOBAL_WEBHOOK_URL=""
 
 ### Current Implementation
 
-✅ Uses HTTPS for webhook URL  
-✅ Includes custom header `X-SuiteOp-Global-Webhook: true` for identification  
-✅ Error handling prevents system crashes  
+✅ Uses HTTPS for webhook URL
+✅ Includes custom header `X-SuiteOp-Global-Webhook: true` for identification
+✅ Error handling prevents system crashes
 ✅ Non-blocking design prevents performance impact
 
 ### Recommended Endpoint Security
@@ -305,7 +305,7 @@ To add more events, simply update:
 ```typescript
 // In handler.ts
 const shouldTriggerGlobalWebhook =
-  event === 'DOCUMENT_SIGNED' || 
+  event === 'DOCUMENT_SIGNED' ||
   event === 'DOCUMENT_COMPLETED' ||
   event === 'DOCUMENT_SENT'; // Add new event
 ```
@@ -344,27 +344,26 @@ If issues arise, rollback is simple:
 
 ## Questions & Answers
 
-**Q: Will this slow down document signing?**  
+**Q: Will this slow down document signing?**
 A: No. The webhook is fire-and-forget and doesn't block the main operation.
 
-**Q: What happens if the webhook endpoint is down?**  
+**Q: What happens if the webhook endpoint is down?**
 A: The error is logged but doesn't affect document completion. Consider adding retry logic in the future.
 
-**Q: Can users disable this?**  
+**Q: Can users disable this?**
 A: No, this is a platform-wide feature. Only the platform admin can disable it via environment variable.
 
-**Q: Is this GDPR compliant?**  
+**Q: Is this GDPR compliant?**
 A: Yes, as long as your webhook endpoint properly handles and stores personal data according to GDPR requirements.
 
-**Q: Can I add more events?**  
+**Q: Can I add more events?**
 A: Yes, simply modify the condition in `handler.ts` to include additional events.
 
-**Q: Does this replace user webhooks?**  
+**Q: Does this replace user webhooks?**
 A: No, it runs in addition to user-configured webhooks. Both systems operate independently.
 
 ---
 
-**Implementation Completed By:** AI Assistant (Claude Sonnet 4.5)  
-**Reviewed By:** To be reviewed by Jean-Emmanuel Losi  
+**Implementation Completed By:** AI Assistant (Claude Sonnet 4.5)
+**Reviewed By:** To be reviewed by Jean-Emmanuel Losi
 **Next Steps:** Monitor webhook delivery in production for 7 days, then evaluate success metrics
-

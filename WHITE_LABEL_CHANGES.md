@@ -6,7 +6,7 @@ This document outlines all the white-labeling changes made to transform Documens
 
 The white-labeling was implemented by modifying core source files rather than using runtime HTML/CSS overrides. This approach ensures maximum performance and prevents hydration issues while minimizing the number of changes needed.
 
-**Total Files Modified:** 48+  
+**Total Files Modified:** 48+
 **Key Changes:** Colors (green → purple), Logos (SVG), Text ("Documenso" → "SuiteOp Sign"), User Profile, Email templates, Meta tags
 
 ## 1. CSS Variables & Theme Colors
@@ -253,4 +253,3 @@ Replace the file at `packages/assets/images/timur.png` with your own professiona
 - All logo PNGs remain in place for backward compatibility but are not used in the main app
 - Email static logo at `packages/email/static/logo.png` should be replaced with SuiteOp logo for production use
 - User profile image at `packages/assets/images/timur.png` should be replaced with Jean-Emmanuel's photo
-

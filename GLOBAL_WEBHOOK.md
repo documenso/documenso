@@ -77,7 +77,7 @@ function verifyWebhookSignature(body, signature, secret) {
   const hmac = crypto.createHmac('sha256', secret);
   hmac.update(body);
   const expectedSignature = hmac.digest('hex');
-  
+
   return signature === expectedSignature;
 }
 
@@ -177,7 +177,7 @@ In production, ensure:
 
 ## Security Considerations
 
-1. **Webhook Signing** (Recommended): 
+1. **Webhook Signing** (Recommended):
    - Always configure `NEXT_PRIVATE_GLOBAL_WEBHOOK_SECRET` in production
    - Use a strong, randomly generated secret (32+ characters recommended)
    - Verify the `X-SuiteOp-Signature` header on every request
@@ -240,4 +240,3 @@ If you're updating from a previous version:
 - The feature is backward compatible
 - Existing user-configured webhooks continue to work normally
 - The global webhook runs in addition to (not instead of) user webhooks
-

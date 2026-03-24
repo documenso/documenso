@@ -215,9 +215,9 @@ documenso-fork/
 
 This project is based on the incredible work by the [Documenso](https://github.com/documenso/documenso) team.
 
-**Original Project:** https://github.com/documenso/documenso  
-**Created by:** Documenso, Inc.  
-**License:** AGPL-3.0  
+**Original Project:** https://github.com/documenso/documenso
+**Created by:** Documenso, Inc.
+**License:** AGPL-3.0
 **Website:** https://documenso.com
 
 Special thanks to:
@@ -290,4 +290,3 @@ For general Documenso questions:
     <a href="https://github.com/documenso/documenso">⭐ Star Documenso on GitHub</a>
   </p>
 </div>
-
