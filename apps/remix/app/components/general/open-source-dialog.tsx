@@ -29,7 +29,7 @@ export const OpenSourceDialog = ({ open, setOpen }: OpenSourceDialogProps) => {
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="space-y-3 text-sm text-muted-foreground">
+          <div className="text-muted-foreground space-y-3 text-sm">
             <p>
               <Trans>
                 SuiteOp Sign is built on Documenso, an open source document signing platform.

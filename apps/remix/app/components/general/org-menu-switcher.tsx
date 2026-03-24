@@ -133,7 +133,7 @@ export const OrgMenuSwitcher = () => {
             primaryText={dropdownMenuAvatarText.primaryText}
             secondaryText={dropdownMenuAvatarText.secondaryText}
             rightSideComponent={
-              <ChevronsUpDown className="ml-auto h-4 w-4 text-muted-foreground" />
+              <ChevronsUpDown className="text-muted-foreground ml-auto h-4 w-4" />
             }
             textSectionClassName="hidden lg:flex"
           />
@@ -142,7 +142,7 @@ export const OrgMenuSwitcher = () => {
 
       <DropdownMenuContent
         className={cn(
-          'z-[60] ml-6 flex w-full divide-x divide-border p-0 md:ml-0 md:min-w-[40rem]',
+          'divide-border z-[60] ml-6 flex w-full divide-x p-0 md:ml-0 md:min-w-[40rem]',
         )}
         align="end"
         forceMount
@@ -151,7 +151,7 @@ export const OrgMenuSwitcher = () => {
           {/* Organisations column */}
           <div className="flex w-full flex-col md:w-1/3">
             <div className="flex h-12 items-center border-b p-2">
-              <h3 className="flex items-center px-2 text-sm font-medium text-muted-foreground">
+              <h3 className="text-muted-foreground flex items-center px-2 text-sm font-medium">
                 <Building2Icon className="mr-2 h-3.5 w-3.5" />
                 <Trans>Organisations</Trans>
               </h3>
@@ -165,7 +165,7 @@ export const OrgMenuSwitcher = () => {
                 >
                   <DropdownMenuItem
                     className={cn(
-                      'w-full px-4 py-2 text-muted-foreground',
+                      'text-muted-foreground w-full px-4 py-2',
                       org.id === currentOrganisation?.id && !hoveredOrgId && 'bg-accent',
                       org.id === hoveredOrgId && 'bg-accent',
                     )}
@@ -189,7 +189,7 @@ export const OrgMenuSwitcher = () => {
                     <div className="absolute bottom-0 right-0 top-0 flex items-center justify-center">
                       <Link
                         to={`/o/${org.url}/settings`}
-                        className="mr-2 rounded-sm border p-1 text-muted-foreground transition-opacity duration-200 group-hover:opacity-100 md:opacity-0"
+                        className="text-muted-foreground mr-2 rounded-sm border p-1 transition-opacity duration-200 group-hover:opacity-100 md:opacity-0"
                       >
                         <Settings2Icon className="h-3.5 w-3.5" />
                       </Link>
@@ -210,7 +210,7 @@ export const OrgMenuSwitcher = () => {
           {/* Teams column */}
           <div className="hidden w-1/3 flex-col md:flex">
             <div className="flex h-12 items-center border-b p-2">
-              <h3 className="flex items-center px-2 text-sm font-medium text-muted-foreground">
+              <h3 className="text-muted-foreground flex items-center px-2 text-sm font-medium">
                 <UsersIcon className="mr-2 h-3.5 w-3.5" />
                 <Trans>Teams</Trans>
               </h3>
@@ -222,7 +222,7 @@ export const OrgMenuSwitcher = () => {
                     <div className="group relative" key={team.id}>
                       <DropdownMenuItem
                         className={cn(
-                          'w-full px-4 py-2 text-muted-foreground',
+                          'text-muted-foreground w-full px-4 py-2',
                           team.id === currentTeam?.id && 'bg-accent',
                         )}
                         asChild
@@ -242,7 +242,7 @@ export const OrgMenuSwitcher = () => {
                         <div className="absolute bottom-0 right-0 top-0 flex items-center justify-center">
                           <Link
                             to={`/t/${team.url}/settings`}
-                            className="mr-2 rounded-sm border p-1 text-muted-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                            className="text-muted-foreground mr-2 rounded-sm border p-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
                           >
                             <Settings2Icon className="h-3.5 w-3.5" />
                           </Link>
@@ -251,7 +251,7 @@ export const OrgMenuSwitcher = () => {
                     </div>
                   ))
                 ) : (
-                  <div className="my-12 flex items-center justify-center px-2 text-center text-sm text-muted-foreground">
+                  <div className="text-muted-foreground my-12 flex items-center justify-center px-2 text-center text-sm">
                     <Trans>Select an organisation to view teams</Trans>
                   </div>
                 )}
@@ -271,14 +271,14 @@ export const OrgMenuSwitcher = () => {
           {/* Settings column */}
           <div className="hidden w-1/3 flex-col md:flex">
             <div className="flex h-12 items-center border-b p-2">
-              <h3 className="flex items-center px-2 text-sm font-medium text-muted-foreground">
+              <h3 className="text-muted-foreground flex items-center px-2 text-sm font-medium">
                 <SettingsIcon className="mr-2 h-3.5 w-3.5" />
                 <Trans>Settings</Trans>
               </h3>
             </div>
             <div className="flex-1 overflow-y-auto p-1.5">
               {isUserAdmin && (
-                <DropdownMenuItem className="px-4 py-2 text-muted-foreground" asChild>
+                <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
                   <Link to="/admin">
                     <Trans>Admin panel</Trans>
                   </Link>
@@ -290,7 +290,7 @@ export const OrgMenuSwitcher = () => {
                   'MANAGE_ORGANISATION',
                   currentOrganisation.currentOrganisationRole,
                 ) && (
-                  <DropdownMenuItem className="px-4 py-2 text-muted-foreground" asChild>
+                  <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
                     <Link to={`/o/${currentOrganisation.url}/settings`}>
                       <Trans>Organisation settings</Trans>
                     </Link>
@@ -298,34 +298,34 @@ export const OrgMenuSwitcher = () => {
                 )}
 
               {currentTeam && canExecuteTeamAction('MANAGE_TEAM', currentTeam.currentTeamRole) && (
-                <DropdownMenuItem className="px-4 py-2 text-muted-foreground" asChild>
+                <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
                   <Link to={`/t/${currentTeam.url}/settings`}>
                     <Trans>Team settings</Trans>
                   </Link>
                 </DropdownMenuItem>
               )}
 
-              <DropdownMenuItem className="px-4 py-2 text-muted-foreground" asChild>
+              <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
                 <Link to="/inbox">
                   <Trans>Personal Inbox</Trans>
                 </Link>
               </DropdownMenuItem>
 
-              <DropdownMenuItem className="px-4 py-2 text-muted-foreground" asChild>
+              <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
                 <Link to="/settings/profile">
                   <Trans>Account</Trans>
                 </Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem
-                className="px-4 py-2 text-muted-foreground"
+                className="text-muted-foreground px-4 py-2"
                 onClick={() => setLanguageSwitcherOpen(true)}
               >
                 <Trans>Language</Trans>
               </DropdownMenuItem>
 
               {currentOrganisation && (
-                <DropdownMenuItem className="px-4 py-2 text-muted-foreground" asChild>
+                <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
                   <a href="https://suiteop.com/help" target="_blank" rel="noopener noreferrer">
                     <Trans>Support</Trans>
                   </a>
@@ -333,14 +333,14 @@ export const OrgMenuSwitcher = () => {
               )}
 
               <DropdownMenuItem
-                className="px-4 py-2 text-muted-foreground"
+                className="text-muted-foreground px-4 py-2"
                 onClick={() => setOpenSourceDialogOpen(true)}
               >
                 <Trans>Open Source</Trans>
               </DropdownMenuItem>
 
               <DropdownMenuItem
-                className="px-4 py-2 text-muted-foreground hover:!text-muted-foreground"
+                className="text-muted-foreground hover:!text-muted-foreground px-4 py-2"
                 onSelect={async () => authClient.signOut()}
               >
                 <Trans>Sign Out</Trans>

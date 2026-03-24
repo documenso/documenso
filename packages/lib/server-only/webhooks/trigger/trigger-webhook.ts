@@ -33,8 +33,7 @@ export const triggerWebhook = async ({ event, data, userId, teamId }: TriggerWeb
     }
 
     // Trigger global webhook for specific events (DOCUMENT_SIGNED, DOCUMENT_COMPLETED)
-    const shouldTriggerGlobalWebhook =
-      event === 'DOCUMENT_SIGNED' || event === 'DOCUMENT_COMPLETED';
+    const shouldTriggerGlobalWebhook = event === 'DOCUMENT_SIGNED' || event === 'DOCUMENT_COMPLETED';
 
     if (shouldTriggerGlobalWebhook && GLOBAL_WEBHOOK_URL) {
       // Fire and forget - don't block on global webhook

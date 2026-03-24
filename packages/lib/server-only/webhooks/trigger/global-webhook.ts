@@ -1,5 +1,6 @@
-import type { WebhookTriggerEvents } from '@prisma/client';
 import { createHmac } from 'crypto';
+
+import type { WebhookTriggerEvents } from '@prisma/client';
 
 import { GLOBAL_WEBHOOK_SECRET, GLOBAL_WEBHOOK_URL } from '../../../constants/app';
 
@@ -71,3 +72,4 @@ export const triggerGlobalWebhook = async ({
     throw err;
   }
 };
+
