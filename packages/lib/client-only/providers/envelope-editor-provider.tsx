@@ -518,7 +518,7 @@ const mapLocalRecipientsToRecipients = ({
   }, -1);
 
   return localRecipients.map((recipient) => {
-    const foundRecipient = envelope.recipients.find((recipient) => recipient.id === recipient.id);
+    const foundRecipient = envelope.recipients.find((r) => r.id === recipient.id);
 
     let recipientId = recipient.id;
 
