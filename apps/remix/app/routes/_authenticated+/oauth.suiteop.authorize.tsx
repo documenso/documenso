@@ -36,9 +36,13 @@ function validateRedirectUrl(redirectUrl: string | null): string {
   try {
     const url = new URL(redirectUrl);
 
-    // Must be on app.suiteop.com domain or localhost (dev)
+    // Must be on an allowed domain: suiteop.com, Railway previews, or localhost (dev)
     const allowedHosts = ['app.suiteop.com', 'localhost', '127.0.0.1'];
-    if (!allowedHosts.includes(url.hostname)) {
+    const isAllowed =
+      allowedHosts.includes(url.hostname) ||
+      url.hostname.endsWith('.suiteop.com') ||
+      url.hostname.endsWith('.up.railway.app');
+    if (!isAllowed) {
       throw new Error('Redirect URL must be on an allowed domain');
     }
 
