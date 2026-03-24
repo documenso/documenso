@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -7,6 +9,7 @@ import { Link } from 'react-router';
 import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
 import { trpc } from '@documenso/trpc/react';
+import type { TGetAdminTeamResponse } from '@documenso/trpc/server/admin-router/get-admin-team.types';
 import {
   Accordion,
   AccordionContent,
@@ -47,6 +50,81 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
       title: _(msg`Copied to clipboard`),
     });
   };
+
+  const teamMembersColumns = useMemo(() => {
+    return [
+      {
+        header: _(msg`Member`),
+        cell: ({ row }) => (
+          <div className="space-y-1">
+            <Link
+              className="font-medium hover:underline"
+              to={`/admin/users/${row.original.user.id}`}
+            >
+              {row.original.user.name ?? row.original.user.email}
+            </Link>
+            {row.original.user.name && (
+              <div className="font-mono text-xs text-muted-foreground">
+                {row.original.user.email}
+              </div>
+            )}
+          </div>
+        ),
+      },
+      {
+        header: _(msg`User ID`),
+        accessorKey: 'userId',
+      },
+      {
+        header: _(msg`Team role`),
+        accessorKey: 'teamRole',
+        cell: ({ row }) => (
+          <Badge variant="secondary">{_(TEAM_MEMBER_ROLE_MAP[row.original.teamRole])}</Badge>
+        ),
+      },
+      {
+        header: _(msg`Organisation role`),
+        accessorKey: 'organisationRole',
+        cell: ({ row }) => {
+          const isOwner = row.original.userId === team?.organisation.ownerUserId;
+
+          if (isOwner) {
+            return <Badge>{_(msg`Owner`)}</Badge>;
+          }
+
+          return (
+            <Badge variant="secondary">
+              {_(ORGANISATION_MEMBER_ROLE_MAP[row.original.organisationRole])}
+            </Badge>
+          );
+        },
+      },
+      {
+        header: _(msg`Joined`),
+        accessorKey: 'createdAt',
+        cell: ({ row }) => i18n.date(row.original.createdAt),
+      },
+    ] satisfies DataTableColumnDef<TGetAdminTeamResponse['teamMembers'][number]>[];
+  }, [team, _, i18n]);
+
+  const pendingInvitesColumns = useMemo(() => {
+    return [
+      {
+        header: _(msg`Email`),
+        accessorKey: 'email',
+      },
+      {
+        header: _(msg`Role`),
+        accessorKey: 'organisationRole',
+        cell: ({ row }) => _(ORGANISATION_MEMBER_ROLE_MAP[row.original.organisationRole]),
+      },
+      {
+        header: _(msg`Invited`),
+        accessorKey: 'createdAt',
+        cell: ({ row }) => i18n.date(row.original.createdAt),
+      },
+    ] satisfies DataTableColumnDef<TGetAdminTeamResponse['pendingInvites'][number]>[];
+  }, [_, i18n]);
 
   if (!Number.isFinite(teamId) || teamId <= 0) {
     return (
@@ -97,72 +175,6 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
       />
     );
   }
-
-  const teamMembersColumns = [
-    {
-      header: _(msg`Member`),
-      cell: ({ row }) => (
-        <div className="space-y-1">
-          <Link className="font-medium hover:underline" to={`/admin/users/${row.original.user.id}`}>
-            {row.original.user.name ?? row.original.user.email}
-          </Link>
-          {row.original.user.name && (
-            <div className="font-mono text-xs text-muted-foreground">{row.original.user.email}</div>
-          )}
-        </div>
-      ),
-    },
-    {
-      header: _(msg`User ID`),
-      accessorKey: 'userId',
-    },
-    {
-      header: _(msg`Team role`),
-      accessorKey: 'teamRole',
-      cell: ({ row }) => (
-        <Badge variant="secondary">{_(TEAM_MEMBER_ROLE_MAP[row.original.teamRole])}</Badge>
-      ),
-    },
-    {
-      header: _(msg`Organisation role`),
-      accessorKey: 'organisationRole',
-      cell: ({ row }) => {
-        const isOwner = row.original.userId === team.organisation.ownerUserId;
-
-        if (isOwner) {
-          return <Badge>{_(msg`Owner`)}</Badge>;
-        }
-
-        return (
-          <Badge variant="secondary">
-            {_(ORGANISATION_MEMBER_ROLE_MAP[row.original.organisationRole])}
-          </Badge>
-        );
-      },
-    },
-    {
-      header: _(msg`Joined`),
-      accessorKey: 'createdAt',
-      cell: ({ row }) => i18n.date(row.original.createdAt),
-    },
-  ] satisfies DataTableColumnDef<(typeof team.teamMembers)[number]>[];
-
-  const pendingInvitesColumns = [
-    {
-      header: _(msg`Email`),
-      accessorKey: 'email',
-    },
-    {
-      header: _(msg`Role`),
-      accessorKey: 'organisationRole',
-      cell: ({ row }) => _(ORGANISATION_MEMBER_ROLE_MAP[row.original.organisationRole]),
-    },
-    {
-      header: _(msg`Invited`),
-      accessorKey: 'createdAt',
-      cell: ({ row }) => i18n.date(row.original.createdAt),
-    },
-  ] satisfies DataTableColumnDef<(typeof team.pendingInvites)[number]>[];
 
   return (
     <div>
