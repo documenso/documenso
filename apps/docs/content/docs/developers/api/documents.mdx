@@ -269,6 +269,10 @@ Returns the full document object including recipients, fields, and envelope item
 
 Create a new document with optional recipients and fields in a single request.
 
+<Callout type="info">
+  This endpoint automatically scans uploaded PDFs for [placeholder patterns](/docs/users/documents/advanced/pdf-placeholders) like `{"{{signature, r1}}"}` and creates fields at those locations.
+</Callout>
+
 ```
 POST /envelope/create
 Content-Type: multipart/form-data

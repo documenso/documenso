@@ -14,16 +14,21 @@ import {
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useSearchParams } from 'react-router';
+import { z } from 'zod';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
+import { ZDirectTemplateEmbedDataSchema } from '@documenso/lib/types/embed-direct-template-schema';
 import {
   isFieldUnsignedAndRequired,
   isRequiredField,
 } from '@documenso/lib/utils/advanced-fields-helpers';
-import { validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
+import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -31,16 +36,16 @@ import type {
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
-import { ZDirectTemplateEmbedDataSchema } from '~/types/embed-direct-template-schema';
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 import { injectCss } from '~/utils/css-vars';
 
 import type { DirectTemplateLocalField } from '../general/direct-template/direct-template-signing-form';
@@ -54,7 +59,7 @@ export type EmbedDirectTemplateClientPageProps = {
   token: string;
   envelopeId: string;
   updatedAt: Date;
-  envelopeItems: Pick<EnvelopeItem, 'id' | 'envelopeId'>[];
+  envelopeItems: Pick<EnvelopeItem, 'id' | 'envelopeId' | 'documentDataId'>[];
   recipient: Recipient;
   fields: Field[];
   metadata?: DocumentMeta | null;
@@ -91,17 +96,16 @@ export const EmbedDirectTemplateClientPage = ({
   const [isNameLocked, setIsNameLocked] = useState(false);
 
   const [showPendingFieldTooltip, setShowPendingFieldTooltip] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   const [throttledOnCompleteClick, isThrottled] = useThrottleFn(() => void onCompleteClick(), 500);
 
   const [localFields, setLocalFields] = useState<DirectTemplateLocalField[]>(() => fields);
 
   const [pendingFields, _completedFields] = [
-    localFields.filter((field) => isFieldUnsignedAndRequired(field)),
+    sortFieldsByPosition(localFields.filter((field) => isFieldUnsignedAndRequired(field))),
     localFields.filter((field) => field.inserted),
   ];
-
-  const highestPendingPageNumber = Math.max(...pendingFields.map((field) => field.page));
 
   const hasSignatureField = localFields.some((field) => isSignatureFieldType(field.type));
 
@@ -206,6 +210,14 @@ export const EmbedDirectTemplateClientPage = ({
         return;
       }
 
+      const { success: isEmailValid } = z.string().email().safeParse(email);
+
+      if (!isEmailValid) {
+        setEmailError(_(msg`A valid email is required`));
+        setIsExpanded(true);
+        return;
+      }
+
       let directTemplateExternalId = searchParams?.get('externalId') || undefined;
 
       if (directTemplateExternalId) {
@@ -291,11 +303,18 @@ export const EmbedDirectTemplateClientPage = ({
           cssVars: data.cssVars,
         });
       }
+
+      if (data.language && data.language !== APP_I18N_OPTIONS.sourceLang) {
+        void dynamicActivate(data.language).finally(() => {
+          setHasFinishedInit(true);
+        });
+      } else {
+        setHasFinishedInit(true);
+      }
     } catch (err) {
       console.error(err);
+      setHasFinishedInit(true);
     }
-
-    setHasFinishedInit(true);
 
     // !: While the two setters are stable we still want to ensure we're avoiding
     // !: re-renders.
@@ -342,9 +361,15 @@ export const EmbedDirectTemplateClientPage = ({
         {/* Viewer */}
         <div className="flex-1">
           <PDFViewerLazy
-            envelopeItem={envelopeItems[0]}
-            token={recipient.token}
-            version="signed"
+            data={getDocumentDataUrlForPdfViewer({
+              envelopeId: envelopeItems[0]?.envelopeId,
+              envelopeItemId: envelopeItems[0]?.id,
+              documentDataId: envelopeItems[0]?.documentDataId,
+              version: 'current',
+              token: recipient.token,
+              presignToken: undefined,
+            })}
+            scrollParentRef="window"
             onDocumentLoad={() => setHasDocumentLoaded(true)}
           />
         </div>
@@ -428,11 +453,23 @@ export const EmbedDirectTemplateClientPage = ({
                   <Input
                     type="email"
                     id="email"
-                    className="mt-2 bg-background"
+                    className={cn(
+                      'mt-2 bg-background',
+                      emailError && 'border-destructive ring-2 ring-destructive/20',
+                    )}
                     disabled={isEmailLocked}
                     value={email}
-                    onChange={(e) => !isEmailLocked && setEmail(e.target.value.trim())}
+                    onChange={(e) => {
+                      if (!isEmailLocked) {
+                        setEmail(e.target.value.trim());
+                        setEmailError(null);
+                      }
+                    }}
                   />
+
+                  {emailError && (
+                    <p className="mt-2 text-xs font-medium text-destructive">{emailError}</p>
+                  )}
                 </div>
 
                 {hasSignatureField && (
@@ -478,15 +515,15 @@ export const EmbedDirectTemplateClientPage = ({
           </div>
         </div>
 
-        <ElementVisible
-          target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPendingPageNumber}"]`}
-        >
-          {showPendingFieldTooltip && pendingFields.length > 0 && (
+        {showPendingFieldTooltip && pendingFields.length > 0 && (
+          <ElementVisible
+            target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${pendingFields[0].page}"]`}
+          >
             <FieldToolTip key={pendingFields[0].id} field={pendingFields[0]} color="warning">
               <Trans>Click to insert field</Trans>
             </FieldToolTip>
-          )}
-        </ElementVisible>
+          </ElementVisible>
+        )}
 
         {/* Fields */}
         <EmbedDocumentFields

@@ -60,11 +60,11 @@ export const ConfigureDocumentAdvancedSettings = ({
 
   return (
     <div>
-      <h3 className="text-foreground mb-1 text-lg font-medium">
+      <h3 className="mb-1 text-lg font-medium text-foreground">
         <Trans>Advanced Settings</Trans>
       </h3>
 
-      <p className="text-muted-foreground mb-6 text-sm">
+      <p className="mb-6 text-sm text-muted-foreground">
         <Trans>Configure additional options and preferences</Trans>
       </p>
 
@@ -100,7 +100,7 @@ export const ConfigureDocumentAdvancedSettings = ({
                         }))}
                         selectedValues={field.value}
                         onChange={field.onChange}
-                        className="bg-background w-full"
+                        className="w-full bg-background"
                         emptySelectionPlaceholder={t`Select signature types`}
                       />
                     </FormControl>
@@ -204,7 +204,7 @@ export const ConfigureDocumentAdvancedSettings = ({
                         <TooltipTrigger>
                           <InfoIcon className="mx-2 h-4 w-4" />
                         </TooltipTrigger>
-                        <TooltipContent className="text-muted-foreground max-w-xs">
+                        <TooltipContent className="max-w-xs text-muted-foreground">
                           <Trans>
                             Add a URL to redirect the user to once the document is signed
                           </Trans>
@@ -279,7 +279,7 @@ export const ConfigureDocumentAdvancedSettings = ({
                       <FormControl>
                         <Input
                           id="subject"
-                          className="bg-background mt-2"
+                          className="mt-2 bg-background"
                           disabled={isSubmitting || !isEmailDistribution}
                           {...field}
                         />
@@ -302,7 +302,7 @@ export const ConfigureDocumentAdvancedSettings = ({
                       <FormControl>
                         <Textarea
                           id="message"
-                          className="bg-background mt-2 h-32 resize-none"
+                          className="mt-2 h-32 resize-none bg-background"
                           disabled={isSubmitting || !isEmailDistribution}
                           {...field}
                         />

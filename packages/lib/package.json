@@ -10,6 +10,8 @@
     "universal/"
   ],
   "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "clean": "rimraf node_modules"
@@ -55,7 +57,6 @@
     "posthog-js": "^1.297.2",
     "posthog-node": "4.18.0",
     "react": "^18",
-    "react-pdf": "^10.3.0",
     "remeda": "^2.32.0",
     "sharp": "0.34.5",
     "skia-canvas": "^3.0.8",
@@ -66,6 +67,7 @@
   "devDependencies": {
     "@playwright/browser-chromium": "1.56.1",
     "@types/luxon": "^3.7.1",
-    "@types/pg": "^8.15.6"
+    "@types/pg": "^8.15.6",
+    "vitest": "^4.0.18"
   }
 }

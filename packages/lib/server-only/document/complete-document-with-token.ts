@@ -109,7 +109,9 @@ export const completeDocumentWithToken = async ({
   }
 
   if (envelope.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL) {
-    const isRecipientsTurn = await getIsRecipientsTurnToSign({ token: recipient.token });
+    const isRecipientsTurn = await getIsRecipientsTurnToSign({
+      token: recipient.token,
+    });
 
     if (!isRecipientsTurn) {
       throw new Error(
@@ -286,6 +288,18 @@ export const completeDocumentWithToken = async ({
     });
   });
 
+  const envelopeWithRelations = await prisma.envelope.findUniqueOrThrow({
+    where: { id: envelope.id },
+    include: { documentMeta: true, recipients: true },
+  });
+
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_RECIPIENT_COMPLETED,
+    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelopeWithRelations)),
+    userId: envelope.userId,
+    teamId: envelope.teamId,
+  });
+
   await jobs.triggerJob({
     name: 'send.recipient.signed.email',
     payload: {
@@ -367,16 +381,16 @@ export const completeDocumentWithToken = async ({
               : {}),
           },
         });
+      });
 
-        await jobs.triggerJob({
-          name: 'send.signing.requested.email',
-          payload: {
-            userId: envelope.userId,
-            documentId: legacyDocumentId,
-            recipientId: nextRecipient.id,
-            requestMetadata,
-          },
-        });
+      await jobs.triggerJob({
+        name: 'send.signing.requested.email',
+        payload: {
+          userId: envelope.userId,
+          documentId: legacyDocumentId,
+          recipientId: nextRecipient.id,
+          requestMetadata,
+        },
       });
     }
   }

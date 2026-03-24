@@ -357,7 +357,8 @@ export default function OrganisationGroupSettingsPage({
           <AlertDescription className="mr-2">
             {organisation.subscription ? (
               <span>
-                {SUBSCRIPTION_STATUS_MAP[organisation.subscription.status]} subscription found
+                {i18n._(SUBSCRIPTION_STATUS_MAP[organisation.subscription.status])} subscription
+                found
               </span>
             ) : (
               <span>

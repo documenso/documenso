@@ -3,7 +3,7 @@ import { zfd } from 'zod-form-data';
 
 import EnvelopeItemSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
 
-import { zodFormData } from '../../utils/zod-form-data';
+import { zfdFile, zodFormData } from '../../utils/zod-form-data';
 import type { TrpcRouteMeta } from '../trpc';
 
 export const createEnvelopeItemsMeta: TrpcRouteMeta = {
@@ -24,7 +24,7 @@ export const ZCreateEnvelopeItemsPayloadSchema = z.object({
 
 export const ZCreateEnvelopeItemsRequestSchema = zodFormData({
   payload: zfd.json(ZCreateEnvelopeItemsPayloadSchema),
-  files: zfd.repeatableOfType(zfd.file()),
+  files: zfd.repeatableOfType(zfdFile()),
 });
 
 export const ZCreateEnvelopeItemsResponseSchema = z.object({
@@ -33,6 +33,7 @@ export const ZCreateEnvelopeItemsResponseSchema = z.object({
     title: true,
     envelopeId: true,
     order: true,
+    documentDataId: true,
   }).array(),
 });
 

@@ -20,7 +20,7 @@ import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-att
 import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
 import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 
-import { zodFormData } from '../../utils/zod-form-data';
+import { zfdFile, zodFormData } from '../../utils/zod-form-data';
 import type { TrpcRouteMeta } from '../trpc';
 import { ZRecipientWithSigningUrlSchema } from './schema';
 
@@ -117,7 +117,7 @@ export const ZUseEnvelopePayloadSchema = z.object({
 
 export const ZUseEnvelopeRequestSchema = zodFormData({
   payload: zfd.json(ZUseEnvelopePayloadSchema),
-  files: zfd.repeatableOfType(zfd.file()).optional(),
+  files: zfd.repeatableOfType(zfdFile()).optional(),
 });
 
 export const ZUseEnvelopeResponseSchema = z.object({
