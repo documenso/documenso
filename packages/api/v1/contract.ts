@@ -39,6 +39,8 @@ import {
   ZSuiteOpGetCodeRequestSchema,
   ZSuiteOpGetCodeResponseSchema,
   ZSuiteOpGetInfoResponseSchema,
+  ZSuiteOpRevokeRequestSchema,
+  ZSuiteOpRevokeResponseSchema,
   ZUnsuccessfulResponseSchema,
   ZUpdateFieldMutationSchema,
   ZUpdateRecipientMutationSchema,
@@ -344,6 +346,18 @@ export const ApiContractV1 = c.router(
         404: ZUnsuccessfulResponseSchema,
       },
       summary: 'Get API token using claim code (SuiteOp only)',
+    },
+
+    revokeSuiteOp: {
+      method: 'POST',
+      path: '/api/v1/oauth/suiteop/revoke',
+      body: ZSuiteOpRevokeRequestSchema,
+      responses: {
+        200: ZSuiteOpRevokeResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Revoke SuiteOp integration for a team (master key auth)',
     },
 
     getSuiteOpInfo: {

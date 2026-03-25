@@ -1699,6 +1699,21 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     };
   }),
 
+  revokeSuiteOp: masterKeyMiddleware(async (args) => {
+    const { teamId } = args.body;
+
+    const { revokeAuthorization } = await import(
+      '@documenso/lib/server-only/suiteop/revoke-authorization'
+    );
+
+    const result = await revokeAuthorization({ teamId });
+
+    return {
+      status: 200,
+      body: result,
+    };
+  }),
+
   getSuiteOpInfo: authenticatedMiddleware(async (args, user, team) => {
     // eslint-disable-next-line @typescript-eslint/require-await
     return Promise.resolve({

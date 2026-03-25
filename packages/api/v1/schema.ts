@@ -680,3 +680,14 @@ export const ZSuiteOpGetInfoResponseSchema = z.object({
   teamName: z.string(),
   valid: z.boolean(),
 });
+
+export const ZSuiteOpRevokeRequestSchema = z.object({
+  teamId: z.number(),
+});
+
+export const ZSuiteOpRevokeResponseSchema = z.object({
+  deletedTokens: z.number(),
+  deletedWebhooks: z.number(),
+  teamId: z.number(),
+  teamName: z.string(),
+});
