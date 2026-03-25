@@ -27,6 +27,7 @@ export const createCheckoutSession = async ({
     ],
     success_url: `${returnUrl}?success=true`,
     cancel_url: `${returnUrl}?canceled=true`,
+    billing_address_collection: 'required',
     subscription_data: {
       metadata: subscriptionMetadata,
     },
