@@ -9,6 +9,7 @@ import { BulkSendCompleteEmail } from '@documenso/email/templates/bulk-send-comp
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
@@ -22,7 +23,7 @@ import type { TBulkSendTemplateJobDefinition } from './bulk-send-template';
 const ZRecipientRowSchema = z.object({
   name: z.string().optional(),
   email: z.union([
-    z.string().email({ message: 'Value must be a valid email or empty string' }),
+    zEmail('Value must be a valid email or empty string'),
     z.string().max(0, { message: 'Value must be a valid email or empty string' }),
   ]),
 });
