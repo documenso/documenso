@@ -340,38 +340,39 @@ export const EnvelopeEditorFieldsPage = () => {
                         {selectedField.id && (
                           <p>
                             <span className="min-w-12 text-muted-foreground">
-                              <Trans>ID:</Trans>
-                            </span>
-                            &nbsp;
+                              <Trans>Field ID:</Trans>
+                            </span>{' '}
                             {selectedField.id}
                           </p>
                         )}
                         <p>
                           <span className="min-w-12 text-muted-foreground">
+                            <Trans>Recipient ID:</Trans>
+                          </span>{' '}
+                          {selectedField.recipientId}
+                        </p>
+                        <p>
+                          <span className="min-w-12 text-muted-foreground">
                             <Trans>Pos X:</Trans>
-                          </span>
-                          &nbsp;
+                          </span>{' '}
                           {selectedField.positionX.toFixed(2)}
                         </p>
                         <p>
                           <span className="min-w-12 text-muted-foreground">
                             <Trans>Pos Y:</Trans>
-                          </span>
-                          &nbsp;
+                          </span>{' '}
                           {selectedField.positionY.toFixed(2)}
                         </p>
                         <p>
                           <span className="min-w-12 text-muted-foreground">
                             <Trans>Width:</Trans>
-                          </span>
-                          &nbsp;
+                          </span>{' '}
                           {selectedField.width.toFixed(2)}
                         </p>
                         <p>
                           <span className="min-w-12 text-muted-foreground">
                             <Trans>Height:</Trans>
-                          </span>
-                          &nbsp;
+                          </span>{' '}
                           {selectedField.height.toFixed(2)}
                         </p>
                       </div>
