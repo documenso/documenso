@@ -335,6 +335,15 @@ const FieldItemInner = ({
         {isDevMode && (
           <div className="absolute -top-20 left-1/2 z-50 -translate-x-1/2 rounded-md border border-border bg-background/95 px-2 py-1 shadow-sm backdrop-blur-sm">
             <div className="flex flex-col gap-0.5 text-[9px]">
+              {field.nativeId && (
+                <span>
+                  <span className="text-muted-foreground">
+                    <Trans>ID:</Trans>
+                  </span>
+                  &nbsp;
+                  <span className="font-mono text-foreground">{field.nativeId}</span>
+                </span>
+              )}
               <span>
                 <span className="text-muted-foreground">
                   <Trans>Pos X:</Trans>

@@ -337,6 +337,15 @@ export const EnvelopeEditorFieldsPage = () => {
                       </h3>
 
                       <div className="space-y-2 rounded-md border border-border bg-muted/50 p-3 text-sm text-foreground">
+                        {selectedField.id && (
+                          <p>
+                            <span className="min-w-12 text-muted-foreground">
+                              <Trans>ID:</Trans>
+                            </span>
+                            &nbsp;
+                            {selectedField.id}
+                          </p>
+                        )}
                         <p>
                           <span className="min-w-12 text-muted-foreground">
                             <Trans>Pos X:</Trans>
