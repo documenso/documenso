@@ -7,7 +7,7 @@
 import { DocumentSource, FieldType } from '@prisma/client';
 import { z } from 'zod';
 
-import { ZEmail } from '../utils/zod';
+import { zEmail } from '../utils/zod';
 import { ZRecipientAccessAuthTypesSchema, ZRecipientActionAuthTypesSchema } from './document-auth';
 
 export const ZDocumentAuditLogTypeSchema = z.enum([
@@ -280,7 +280,7 @@ export const ZDocumentAuditLogEventDocumentCreatedSchema = z.object({
         z.object({
           type: z.literal(DocumentSource.TEMPLATE_DIRECT_LINK),
           templateId: z.number(),
-          directRecipientEmail: ZEmail,
+          directRecipientEmail: zEmail(),
         }),
       ])
       .optional(),

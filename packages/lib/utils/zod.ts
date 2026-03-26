@@ -14,27 +14,20 @@ const EMAIL_REGEX =
 const DEFAULT_EMAIL_MESSAGE = 'Invalid email address';
 
 /**
- * A Zod schema for validating email addresses using an RFC 5322 compliant regex.
+ * Creates a Zod email schema using an RFC 5322 compliant regex.
  *
- * This supports international characters in the local part and domain
+ * Supports international characters in the local part and domain
  * (e.g. "Søren@gmail.com", "user@dömain.com").
  *
- * Use `zEmail()` if you need to pass a custom error message.
- */
-export const ZEmail = z.string().regex(EMAIL_REGEX, { message: DEFAULT_EMAIL_MESSAGE });
-
-/**
- * Creates a Zod email schema with an optional custom error message.
+ * Returns a standard `ZodString` so all string methods are chainable:
+ * `.min()`, `.max()`, `.trim()`, `.toLowerCase()`, `.optional()`, `.nullish()`, etc.
  *
  * @example
  * ```ts
- * // With default message
  * zEmail()
- *
- * // With custom message string
+ * zEmail().min(1).max(254)
+ * zEmail().trim().toLowerCase()
  * zEmail('Email is invalid')
- *
- * // With message object
  * zEmail({ message: 'Email is invalid' })
  * ```
  */

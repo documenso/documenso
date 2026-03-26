@@ -21,7 +21,7 @@ import {
   ZFieldWidthSchema,
 } from '@documenso/lib/types/field';
 import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
-import { ZEmail } from '@documenso/lib/utils/zod';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { RecipientRole } from '@documenso/prisma/client';
 import { DocumentSigningOrder } from '@documenso/prisma/generated/types';
 
@@ -34,7 +34,7 @@ export const ZCreateEmbeddingDocumentRequestSchema = z.object({
   recipients: z.array(
     z.object({
       id: z.number().optional(),
-      email: ZEmail,
+      email: zEmail(),
       name: z.string(),
       role: z.nativeEnum(RecipientRole),
       signingOrder: z.number().optional(),

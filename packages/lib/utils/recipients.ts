@@ -6,7 +6,7 @@ import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-fiel
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import { AppError, AppErrorCode } from '../errors/app-error';
 import { extractLegacyIds } from '../universal/id';
-import { ZEmail } from './zod';
+import { zEmail } from './zod';
 
 /**
  * Roles that require fields to be assigned before a document can be distributed.
@@ -93,7 +93,7 @@ export const mapRecipientToLegacyRecipient = (
 };
 
 export const isRecipientEmailValidForSending = (recipient: Pick<Recipient, 'email'>) => {
-  return ZEmail.safeParse(recipient.email).success;
+  return zEmail().safeParse(recipient.email).success;
 };
 
 /**

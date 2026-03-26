@@ -9,7 +9,7 @@ import {
   ZDocumentMetaTimezoneSchema,
 } from '@documenso/lib/types/document-meta';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
-import { ZEmail } from '@documenso/lib/utils/zod';
+import { zEmail } from '@documenso/lib/utils/zod';
 
 export const ZUpdateOrganisationSettingsRequestSchema = z.object({
   organisationId: z.string(),
@@ -37,7 +37,7 @@ export const ZUpdateOrganisationSettingsRequestSchema = z.object({
 
     // Email related settings.
     emailId: z.string().nullish(),
-    emailReplyTo: ZEmail.nullish(),
+    emailReplyTo: zEmail().nullish(),
     // emailReplyToName: z.string().optional(),
     emailDocumentSettings: ZDocumentEmailSettingsSchema.optional(),
 

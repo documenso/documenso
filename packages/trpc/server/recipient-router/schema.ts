@@ -9,7 +9,7 @@ import {
   ZRecipientActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZRecipientLiteSchema, ZRecipientSchema } from '@documenso/lib/types/recipient';
-import { ZEmail, zEmail } from '@documenso/lib/utils/zod';
+import { zEmail } from '@documenso/lib/utils/zod';
 
 export const ZGetRecipientRequestSchema = z.object({
   recipientId: z.number(),
@@ -143,7 +143,7 @@ export const ZSetTemplateRecipientsRequestSchema = z.object({
         .toLowerCase()
         .refine(
           (email) => {
-            return isTemplateRecipientEmailPlaceholder(email) || ZEmail.safeParse(email).success;
+            return isTemplateRecipientEmailPlaceholder(email) || zEmail().safeParse(email).success;
           },
           { message: 'Please enter a valid email address' },
         ),
@@ -165,7 +165,7 @@ export const ZCompleteDocumentWithTokenMutationSchema = z.object({
   accessAuthOptions: ZRecipientAccessAuthSchema.optional(),
   nextSigner: z
     .object({
-      email: ZEmail.max(254),
+      email: zEmail().max(254),
       name: z.string().min(1).max(255),
     })
     .optional(),
