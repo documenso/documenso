@@ -25,6 +25,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
 import { AdminGlobalSettingsSection } from '~/components/general/admin-global-settings-section';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
+import { SettingsHeader } from '~/components/general/settings-header';
 
 import type { Route } from './+types/teams.$id';
 
@@ -178,15 +179,13 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
 
   return (
     <div>
-      <div className="flex items-start justify-between">
-        <h2 className="text-4xl font-semibold">{team.name}</h2>
-
+      <SettingsHeader title={_(msg`Manage team`)} subtitle={_(msg`Manage the ${team.name} team`)}>
         <Button variant="outline" asChild>
           <Link to={`/admin/organisations/${team.organisation.id}`}>
             <Trans>Manage organisation</Trans>
           </Link>
         </Button>
-      </div>
+      </SettingsHeader>
 
       <div className="mt-8 rounded-lg border p-4">
         <div>

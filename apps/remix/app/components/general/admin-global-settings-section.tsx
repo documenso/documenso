@@ -1,10 +1,30 @@
+import type { MessageDescriptor } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { OrganisationGlobalSettings, TeamGlobalSettings } from '@prisma/client';
 
 import { DOCUMENT_VISIBILITY } from '@documenso/lib/constants/document-visibility';
+import {
+  type TDocumentEmailSettings,
+  ZDocumentEmailSettingsSchema,
+} from '@documenso/lib/types/document-email';
 
 import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
+
+const EMAIL_SETTINGS_LABELS: Record<keyof TDocumentEmailSettings, MessageDescriptor> = {
+  recipientSigningRequest: msg`Recipient signing request`,
+  recipientRemoved: msg`Recipient removed`,
+  recipientSigned: msg`Recipient signed`,
+  documentPending: msg`Document pending`,
+  documentCompleted: msg`Document completed`,
+  documentDeleted: msg`Document deleted`,
+  ownerDocumentCompleted: msg`Owner document completed`,
+  ownerRecipientExpired: msg`Owner recipient expired`,
+  ownerDocumentCreated: msg`Owner document created`,
+};
+
+const emailSettingsKeys = Object.keys(EMAIL_SETTINGS_LABELS) as (keyof TDocumentEmailSettings)[];
 
 type AdminGlobalSettingsSectionProps = {
   settings: TeamGlobalSettings | OrganisationGlobalSettings | null;
@@ -46,13 +66,9 @@ export const AdminGlobalSettingsSection = ({
     return value ? <Trans>Enabled</Trans> : <Trans>Disabled</Trans>;
   };
 
-  const jsonValue = (value: unknown | null | undefined) => {
-    if (value === null || value === undefined) {
-      return notSetLabel;
-    }
-
-    return JSON.stringify(value);
-  };
+  const parsedEmailSettings = ZDocumentEmailSettingsSchema.safeParse(
+    settings.emailDocumentSettings,
+  );
 
   return (
     <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
@@ -124,9 +140,18 @@ export const AdminGlobalSettingsSection = ({
         <DetailsValue>{textValue(settings.emailReplyTo)}</DetailsValue>
       </DetailsCard>
 
-      {isTeam && (
+      {isTeam && parsedEmailSettings.success && (
         <DetailsCard label={<Trans>Email document settings</Trans>}>
-          <DetailsValue>{jsonValue(settings.emailDocumentSettings)}</DetailsValue>
+          <div className="mt-1 space-y-1 pb-2 pr-3 text-xs">
+            {emailSettingsKeys.map((key) => (
+              <div key={key} className="flex items-center justify-between gap-2">
+                <span className="text-muted-foreground">{_(EMAIL_SETTINGS_LABELS[key])}</span>
+                <span>
+                  {parsedEmailSettings.data[key] ? <Trans>On</Trans> : <Trans>Off</Trans>}
+                </span>
+              </div>
+            ))}
+          </div>
         </DetailsCard>
       )}
 

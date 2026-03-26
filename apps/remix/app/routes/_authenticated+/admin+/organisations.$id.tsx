@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { OrganisationMemberRole } from '@prisma/client';
-import { CopyIcon, ExternalLinkIcon, InfoIcon, Loader } from 'lucide-react';
+import { ExternalLinkIcon, InfoIcon, Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
@@ -96,14 +96,6 @@ export default function OrganisationGroupSettingsPage({
         });
       },
     });
-
-  const onCopyToClipboard = async (text: string) => {
-    await navigator.clipboard.writeText(text);
-
-    toast({
-      title: t`Copied to clipboard`,
-    });
-  };
 
   const teamsColumns = useMemo(() => {
     return [
@@ -280,39 +272,31 @@ export default function OrganisationGroupSettingsPage({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-medium">
-              <Trans>Organisation details</Trans>
+              <Trans>Organisation usage</Trans>
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              <Trans>Key identifiers and relationships for this organisation.</Trans>
+              <Trans>Current usage against organisation limits.</Trans>
             </p>
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
-          <DetailsCard
-            label={<Trans>Organisation ID</Trans>}
-            action={
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-8 w-8 shrink-0 p-0"
-                onClick={() => void onCopyToClipboard(organisation.id)}
-                title={t`Copy organisation ID`}
-              >
-                <CopyIcon className="h-4 w-4" />
-              </Button>
-            }
-          >
-            <DetailsValue isSelectable>{organisation.id}</DetailsValue>
+        <div className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+          <DetailsCard label={<Trans>Members</Trans>}>
+            <DetailsValue>
+              {organisation.members.length} /{' '}
+              {organisation.organisationClaim.memberCount === 0
+                ? t`Unlimited`
+                : organisation.organisationClaim.memberCount}
+            </DetailsValue>
           </DetailsCard>
 
-          <DetailsCard label={<Trans>Type</Trans>}>
-            <DetailsValue>{organisation.type}</DetailsValue>
-          </DetailsCard>
-
-          <DetailsCard label={<Trans>Created</Trans>}>
-            <DetailsValue>{i18n.date(organisation.createdAt)}</DetailsValue>
+          <DetailsCard label={<Trans>Teams</Trans>}>
+            <DetailsValue>
+              {organisation.teams.length} /{' '}
+              {organisation.organisationClaim.teamCount === 0
+                ? t`Unlimited`
+                : organisation.organisationClaim.teamCount}
+            </DetailsValue>
           </DetailsCard>
         </div>
       </div>
