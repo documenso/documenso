@@ -17,7 +17,7 @@ import { IS_BILLING_ENABLED, SUPPORT_EMAIL } from '@documenso/lib/constants/app'
 import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@documenso/lib/constants/organisations';
 import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
 import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
-import { ZEmail } from '@documenso/lib/utils/zod';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc } from '@documenso/trpc/react';
 import { ZCreateOrganisationMemberInvitesRequestSchema } from '@documenso/trpc/server/organisation-router/create-organisation-member-invites.types';
 import { cn } from '@documenso/ui/lib/utils';
@@ -95,7 +95,7 @@ type TabTypes = 'INDIVIDUAL' | 'BULK';
 
 const ZImportOrganisationMemberSchema = z.array(
   z.object({
-    email: ZEmail,
+    email: zEmail(),
     organisationRole: z.nativeEnum(OrganisationMemberRole),
   }),
 );

@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
-import { ZEmail } from '../utils/zod';
+import { zEmail } from '../utils/zod';
 import { ZBaseEmbedDataSchema } from './embed-base-schemas';
 
 export const ZDirectTemplateEmbedDataSchema = ZBaseEmbedDataSchema.extend({
   email: z
-    .union([z.literal(''), ZEmail])
+    .union([z.literal(''), zEmail()])
     .optional()
     .transform((value) => value || undefined),
   lockEmail: z.boolean().optional().default(false),
