@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
-import { ZEmail } from '../../../utils/zod';
+import { zEmail } from '../../../utils/zod';
 import type { JobDefinition } from '../../client/_internal/job';
 
 const SEND_CONFIRMATION_EMAIL_JOB_DEFINITION_ID = 'send.signup.confirmation.email';
 
 const SEND_CONFIRMATION_EMAIL_JOB_DEFINITION_SCHEMA = z.object({
-  email: ZEmail,
+  email: zEmail(),
   force: z.boolean().optional(),
 });
 

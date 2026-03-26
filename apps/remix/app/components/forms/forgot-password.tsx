@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router';
 import { z } from 'zod';
 
 import { authClient } from '@documenso/auth/client';
-import { ZEmail } from '@documenso/lib/utils/zod';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -22,7 +22,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZForgotPasswordFormSchema = z.object({
-  email: ZEmail.min(1),
+  email: zEmail().min(1),
 });
 
 export type TForgotPasswordFormSchema = z.infer<typeof ZForgotPasswordFormSchema>;

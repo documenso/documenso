@@ -6,7 +6,7 @@ import { VALID_DATE_FORMAT_VALUES } from '@documenso/lib/constants/date-formats'
 import { ZEnvelopeExpirationPeriod } from '@documenso/lib/constants/envelope-expiration';
 import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
-import { ZEmail } from '@documenso/lib/utils/zod';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { DocumentMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
 
 import { ZDocumentEmailSettingsSchema } from './document-email';
@@ -128,7 +128,7 @@ export const ZDocumentMetaCreateSchema = z.object({
   uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
   drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
   emailId: z.string().nullish(),
-  emailReplyTo: ZEmail.nullish(),
+  emailReplyTo: zEmail().nullish(),
   emailSettings: ZDocumentEmailSettingsSchema.nullish(),
   envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullish(),
 });
