@@ -1,9 +1,11 @@
 import { z } from 'zod';
 
+import { ZEmail } from '@documenso/lib/utils/zod';
+
 export const ZUpdateRecipientRequestSchema = z.object({
   id: z.number().min(1),
   name: z.string().optional(),
-  email: z.string().email().optional(),
+  email: ZEmail.optional(),
   role: z.enum(['CC', 'SIGNER', 'VIEWER', 'APPROVER', 'ASSISTANT']).optional(),
 });
 
