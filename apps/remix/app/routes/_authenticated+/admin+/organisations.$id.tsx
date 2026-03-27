@@ -2,11 +2,12 @@ import { useMemo } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { OrganisationMemberRole } from '@prisma/client';
 import { ExternalLinkIcon, InfoIcon, Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
+import { match } from 'ts-pattern';
 import type { z } from 'zod';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
@@ -15,9 +16,16 @@ import { AppError } from '@documenso/lib/errors/app-error';
 import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import type { TLicenseClaim } from '@documenso/lib/types/license';
 import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '@documenso/lib/types/subscription';
+import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import type { TGetAdminOrganisationResponse } from '@documenso/trpc/server/admin-router/get-admin-organisation.types';
 import { ZUpdateAdminOrganisationRequestSchema } from '@documenso/trpc/server/admin-router/update-admin-organisation.types';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@documenso/ui/primitives/accordion';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
@@ -37,6 +45,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
+import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
+import { AdminGlobalSettingsSection } from '~/components/general/admin-global-settings-section';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { SettingsHeader } from '~/components/general/settings-header';
 
@@ -56,7 +66,7 @@ export default function OrganisationGroupSettingsPage({
 }: Route.ComponentProps) {
   const { licenseFlags } = loaderData;
 
-  const { t, i18n } = useLingui();
+  const { i18n, t } = useLingui();
   const { toast } = useToast();
 
   const navigate = useNavigate();
@@ -92,34 +102,101 @@ export default function OrganisationGroupSettingsPage({
       {
         header: t`Team`,
         accessorKey: 'name',
+        cell: ({ row }) => (
+          <Link className="font-medium hover:underline" to={`/admin/teams/${row.original.id}`}>
+            {row.original.name}
+          </Link>
+        ),
+      },
+      {
+        header: t`Team ID`,
+        accessorKey: 'id',
+        cell: ({ row }) => (
+          <span className="font-mono text-xs text-muted-foreground">{row.original.id}</span>
+        ),
       },
       {
         header: t`Team url`,
         accessorKey: 'url',
+        cell: ({ row }) => <span className="font-mono text-xs">{row.original.url}</span>,
+      },
+      {
+        header: t`Created`,
+        accessorKey: 'createdAt',
+        cell: ({ row }) => {
+          return (
+            <span className="whitespace-nowrap font-mono text-xs text-muted-foreground">
+              {i18n.date(row.original.createdAt)}
+            </span>
+          );
+        },
       },
     ] satisfies DataTableColumnDef<TGetAdminOrganisationResponse['teams'][number]>[];
-  }, [t]);
+  }, [i18n, t]);
 
   const organisationMembersColumns = useMemo(() => {
     return [
       {
         header: t`Member`,
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
-            <Link to={`/admin/users/${row.original.user.id}`}>{row.original.user.name}</Link>
-            {row.original.user.id === organisation?.ownerUserId && (
-              <Badge>
-                <Trans>Owner</Trans>
-              </Badge>
+          <div className="space-y-1">
+            <Link
+              className="font-medium hover:underline"
+              to={`/admin/users/${row.original.user.id}`}
+            >
+              {row.original.user.name ?? row.original.user.email}
+            </Link>
+            {row.original.user.name && (
+              <div className="font-mono text-xs text-muted-foreground">
+                {row.original.user.email}
+              </div>
             )}
           </div>
         ),
       },
       {
-        header: t`Email`,
+        header: t`User ID`,
+        accessorKey: 'userId',
         cell: ({ row }) => (
-          <Link to={`/admin/users/${row.original.user.id}`}>{row.original.user.email}</Link>
+          <span className="font-mono text-xs text-muted-foreground">{row.original.userId}</span>
         ),
+      },
+      {
+        header: t`Role`,
+        cell: ({ row }) => {
+          if (!organisation) {
+            return null;
+          }
+
+          const isOwner = row.original.userId === organisation.ownerUserId;
+
+          if (isOwner) {
+            return <Badge>{t`Owner`}</Badge>;
+          }
+
+          const highestRole = getHighestOrganisationRoleInGroup(
+            row.original.organisationGroupMembers.map((ogm) => ogm.group),
+          );
+
+          const roleLabel = match(highestRole)
+            .with(OrganisationMemberRole.ADMIN, () => t`Admin`)
+            .with(OrganisationMemberRole.MANAGER, () => t`Manager`)
+            .with(OrganisationMemberRole.MEMBER, () => t`Member`)
+            .exhaustive();
+
+          return <Badge variant="secondary">{roleLabel}</Badge>;
+        },
+      },
+      {
+        header: t`Joined`,
+        accessorKey: 'createdAt',
+        cell: ({ row }) => {
+          return (
+            <span className="whitespace-nowrap font-mono text-xs text-muted-foreground">
+              {i18n.date(row.original.createdAt)}
+            </span>
+          );
+        },
       },
       {
         header: t`Actions`,
@@ -143,7 +220,7 @@ export default function OrganisationGroupSettingsPage({
         },
       },
     ] satisfies DataTableColumnDef<TGetAdminOrganisationResponse['members'][number]>[];
-  }, [organisation, t]);
+  }, [organisation, i18n, t]);
 
   if (isLoadingOrganisation) {
     return (
@@ -190,6 +267,61 @@ export default function OrganisationGroupSettingsPage({
       </SettingsHeader>
 
       <GenericOrganisationAdminForm organisation={organisation} />
+
+      <div className="mt-6 rounded-lg border p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-medium">
+              <Trans>Organisation usage</Trans>
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              <Trans>Current usage against organisation limits.</Trans>
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+          <DetailsCard label={<Trans>Members</Trans>}>
+            <DetailsValue>
+              {organisation.members.length} /{' '}
+              {organisation.organisationClaim.memberCount === 0
+                ? t`Unlimited`
+                : organisation.organisationClaim.memberCount}
+            </DetailsValue>
+          </DetailsCard>
+
+          <DetailsCard label={<Trans>Teams</Trans>}>
+            <DetailsValue>
+              {organisation.teams.length} /{' '}
+              {organisation.organisationClaim.teamCount === 0
+                ? t`Unlimited`
+                : organisation.organisationClaim.teamCount}
+            </DetailsValue>
+          </DetailsCard>
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-lg border p-4">
+        <Accordion type="single" collapsible>
+          <AccordionItem value="global-settings" className="border-b-0">
+            <AccordionTrigger className="py-0">
+              <div className="text-left">
+                <p className="text-sm font-medium">
+                  <Trans>Global Settings</Trans>
+                </p>
+                <p className="mt-1 text-sm font-normal text-muted-foreground">
+                  <Trans>Default settings applied to this organisation.</Trans>
+                </p>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="mt-4">
+                <AdminGlobalSettingsSection settings={organisation.organisationGlobalSettings} />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
 
       <SettingsHeader
         title={t`Manage subscription`}
