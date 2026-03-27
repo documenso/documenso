@@ -55,6 +55,16 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
 
   // Directly log in user if account already exists.
   if (existingAccount) {
+    // Update the stored OAuth tokens so session validation uses fresh values.
+    await prisma.account.update({
+      where: { id: existingAccount.id },
+      data: {
+        access_token: accessToken,
+        expires_at: Math.floor(accessTokenExpiresAt.getTime() / 1000),
+        id_token: idToken,
+      },
+    });
+
     await onAuthorize({ userId: existingAccount.user.id }, c);
 
     return c.redirect(redirectPath, 302);
