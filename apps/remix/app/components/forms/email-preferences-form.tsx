@@ -10,6 +10,7 @@ import {
   DEFAULT_DOCUMENT_EMAIL_SETTINGS,
   ZDocumentEmailSettingsSchema,
 } from '@documenso/lib/types/document-email';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc } from '@documenso/trpc/react';
 import { DocumentEmailCheckboxes } from '@documenso/ui/components/document/document-email-checkboxes';
 import { Button } from '@documenso/ui/primitives/button';
@@ -33,7 +34,7 @@ import {
 
 const ZEmailPreferencesFormSchema = z.object({
   emailId: z.string().nullable(),
-  emailReplyTo: z.string().email().nullable(),
+  emailReplyTo: zEmail().nullable(),
   // emailReplyToName: z.string(),
   emailDocumentSettings: ZDocumentEmailSettingsSchema.nullable(),
 });

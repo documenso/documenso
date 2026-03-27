@@ -17,6 +17,7 @@ import {
   ZFieldPageNumberSchema,
 } from '@documenso/lib/types/field';
 import { ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
+import { zEmail } from '@documenso/lib/utils/zod';
 
 import { zfdFile, zodFormData } from '../../utils/zod-form-data';
 import {
@@ -41,9 +42,7 @@ export const createEnvelopeMeta: TrpcRouteMeta = {
 export const ZCreateEnvelopePayloadSchema = z.object({
   title: ZDocumentTitleSchema,
   type: z.nativeEnum(EnvelopeType),
-  delegatedDocumentOwner: z
-    .string()
-    .email()
+  delegatedDocumentOwner: zEmail()
     .describe('The email of the user who will own the document.')
     .optional(),
   externalId: ZDocumentExternalIdSchema.optional(),

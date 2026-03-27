@@ -29,6 +29,7 @@ import {
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { dynamicActivate } from '@documenso/lib/utils/i18n';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -210,7 +211,7 @@ export const EmbedDirectTemplateClientPage = ({
         return;
       }
 
-      const { success: isEmailValid } = z.string().email().safeParse(email);
+      const { success: isEmailValid } = zEmail().safeParse(email);
 
       if (!isEmailValid) {
         setEmailError(_(msg`A valid email is required`));
