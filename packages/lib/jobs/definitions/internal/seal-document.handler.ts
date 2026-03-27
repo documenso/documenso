@@ -311,6 +311,13 @@ export const run = async ({
       });
     });
 
+    // Delete orphaned DocumentData records that were replaced during sealing.
+    for (const { oldDocumentDataId } of newDocumentData) {
+      await prisma.documentData.delete({
+        where: { id: oldDocumentDataId },
+      });
+    }
+
     return {
       envelopeId: envelope.id,
       envelopeStatus: envelope.status,
