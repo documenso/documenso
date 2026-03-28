@@ -27,8 +27,54 @@ const toAddressUrl = (address: string) =>
   address.includes(':') ? `http://[${address}]` : `http://${address}`;
 
 /**
+ * Parse the NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS environment variable into
+ * a Set of lowercased hostnames/IPs that are allowed to resolve to private
+ * addresses. The Set is built once at module load and never changes.
+ *
+ * Empty or unset = no bypasses (safe default).
+ */
+const parseSsrfBypassHosts = (): Set<string> => {
+  const raw = process.env['NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS'] ?? '';
+ 
+  const hosts = new Set<string>();
+ 
+  for (const entry of raw.split(',')) {
+    const trimmed = entry.trim().toLowerCase();
+ 
+    if (trimmed.length > 0) {
+      hosts.add(trimmed);
+    }
+  }
+ 
+  return hosts;
+};
+ 
+const ssrfBypassHosts = parseSsrfBypassHosts();
+
+/**
+ * Check whether the hostname of the given URL is present in the SSRF bypass
+ * list. Matches against URL.hostname which covers both DNS names and raw IP
+ * addresses uniformly.
+ */
+const isBypassedHost = (url: string): boolean => {
+  if (ssrfBypassHosts.size === 0) {
+    return false;
+  }
+ 
+  try {
+    const hostname = normalizeHostname(new URL(url).hostname);
+ 
+    return ssrfBypassHosts.has(hostname);
+  } catch {
+    return false;
+  }
+};
+
+/**
  * Asserts that a webhook URL does not resolve to a private or loopback
  * address. Throws an AppError with WEBHOOK_INVALID_REQUEST if it does.
+ *
+ * Hosts listed in NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS skip all checks.
  */
 export const assertNotPrivateUrl = async (
   url: string,
@@ -36,6 +82,10 @@ export const assertNotPrivateUrl = async (
     lookup?: TLookupFn;
   },
 ) => {
+  if (isBypassedHost(url)) {
+    return;
+  }
+  
   if (isPrivateUrl(url)) {
     throw new AppError(AppErrorCode.WEBHOOK_INVALID_REQUEST, {
       message: 'Webhook URL resolves to a private or loopback address',
