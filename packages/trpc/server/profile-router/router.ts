@@ -1,6 +1,7 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { SetAvatarImageOptions } from '@documenso/lib/server-only/profile/set-avatar-image';
 import { setAvatarImage } from '@documenso/lib/server-only/profile/set-avatar-image';
+import { verifyPassword } from '@documenso/lib/server-only/2fa/verify-password';
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 import { findUserSecurityAuditLogs } from '@documenso/lib/server-only/user/find-user-security-audit-logs';
 import { submitSupportTicket } from '@documenso/lib/server-only/user/submit-support-ticket';
@@ -8,6 +9,7 @@ import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
 
 import { authenticatedProcedure, router } from '../trpc';
 import {
+  ZDeleteAccountMutationSchema,
   ZFindUserSecurityAuditLogsSchema,
   ZSetProfileImageMutationSchema,
   ZSubmitSupportTicketMutationSchema,
@@ -37,11 +39,26 @@ export const profileRouter = router({
       });
     }),
 
-  deleteAccount: authenticatedProcedure.mutation(async ({ ctx }) => {
-    await deleteUser({
-      id: ctx.user.id,
-    });
-  }),
+  deleteAccount: authenticatedProcedure
+    .input(ZDeleteAccountMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { password } = input;
+
+      const isValid = await verifyPassword({
+        userId: ctx.user.id,
+        password,
+      });
+
+      if (!isValid) {
+        throw new AppError(AppErrorCode.UNAUTHORIZED, {
+          message: 'Incorrect password. Account deletion denied.',
+        });
+      }
+
+      await deleteUser({
+        id: ctx.user.id,
+      });
+    }),
 
   setProfileImage: authenticatedProcedure
     .input(ZSetProfileImageMutationSchema)
