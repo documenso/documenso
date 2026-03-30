@@ -123,6 +123,64 @@ export const completeDocumentWithToken = async ({
     }
   }
 
+  // Check ACCESS AUTH 2FA validation during document completion
+  const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
+    documentAuth: envelope.authOptions,
+    recipientAuth: recipient.authOptions,
+  });
+
+  if (derivedRecipientAccessAuth.includes(DocumentAuth.TWO_FACTOR_AUTH)) {
+    if (!accessAuthOptions) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'Access authentication required',
+      });
+    }
+
+    if (!recipient.email.trim()) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Recipient ${recipient.id} requires an email because they have auth requirements.`,
+      });
+    }
+
+    const isValid = await isRecipientAuthorized({
+      type: 'ACCESS_2FA',
+      documentAuthOptions: envelope.authOptions,
+      recipient: recipient,
+      userId, // Can be undefined for non-account recipients
+      authOptions: accessAuthOptions,
+    });
+
+    if (!isValid) {
+      await prisma.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_FAILED,
+          envelopeId: envelope.id,
+          data: {
+            recipientId: recipient.id,
+            recipientName: recipient.name,
+            recipientEmail: recipient.email,
+          },
+        }),
+      });
+
+      throw new AppError(AppErrorCode.TWO_FACTOR_AUTH_FAILED, {
+        message: 'Invalid 2FA authentication',
+      });
+    }
+
+    await prisma.documentAuditLog.create({
+      data: createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED,
+        envelopeId: envelope.id,
+        data: {
+          recipientId: recipient.id,
+          recipientName: recipient.name,
+          recipientEmail: recipient.email,
+        },
+      }),
+    });
+  }
+
   let fields = await prisma.field.findMany({
     where: {
       envelopeId: envelope.id,
@@ -226,64 +284,6 @@ export const completeDocumentWithToken = async ({
   if (!recipientEmail) {
     throw new AppError(AppErrorCode.INVALID_BODY, {
       message: 'Recipient email is required',
-    });
-  }
-
-  // Check ACCESS AUTH 2FA validation during document completion
-  const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
-    documentAuth: envelope.authOptions,
-    recipientAuth: recipient.authOptions,
-  });
-
-  if (derivedRecipientAccessAuth.includes(DocumentAuth.TWO_FACTOR_AUTH)) {
-    if (!accessAuthOptions) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'Access authentication required',
-      });
-    }
-
-    if (!recipient.email.trim()) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Recipient ${recipient.id} requires an email because they have auth requirements.`,
-      });
-    }
-
-    const isValid = await isRecipientAuthorized({
-      type: 'ACCESS_2FA',
-      documentAuthOptions: envelope.authOptions,
-      recipient: recipient,
-      userId, // Can be undefined for non-account recipients
-      authOptions: accessAuthOptions,
-    });
-
-    if (!isValid) {
-      await prisma.documentAuditLog.create({
-        data: createDocumentAuditLogData({
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_FAILED,
-          envelopeId: envelope.id,
-          data: {
-            recipientId: recipient.id,
-            recipientName: recipient.name,
-            recipientEmail: recipient.email,
-          },
-        }),
-      });
-
-      throw new AppError(AppErrorCode.TWO_FACTOR_AUTH_FAILED, {
-        message: 'Invalid 2FA authentication',
-      });
-    }
-
-    await prisma.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED,
-        envelopeId: envelope.id,
-        data: {
-          recipientId: recipient.id,
-          recipientName: recipient.name,
-          recipientEmail: recipient.email,
-        },
-      }),
     });
   }
 

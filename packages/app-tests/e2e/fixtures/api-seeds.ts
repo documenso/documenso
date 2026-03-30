@@ -22,6 +22,7 @@ import path from 'node:path';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
+import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { seedUser } from '@documenso/prisma/seed/users';
 import type {
   TCreateEnvelopePayload,
@@ -840,14 +841,12 @@ export const apiSeedDirectTemplate = async (
     throw new Error(`Direct template recipient not found: ${directRecipientEmail}`);
   }
 
-  // The template/direct/create endpoint uses numeric templateId (secondaryId number)
-  // but the envelope ID is a string - we need to get the numeric version.
-  // The API uses the secondaryId for legacy template endpoints.
-  // Let's use the envelope ID based direct link creation.
+  const numericTemplateId = mapSecondaryIdToTemplateId(templateResult.envelope.secondaryId);
+
   const directLink = await apiCreateDirectTemplateLink(
     request,
     templateResult.token,
-    directRecipient.id,
+    numericTemplateId,
     directRecipient.id,
   );
 
