@@ -18,6 +18,7 @@ import { prisma } from '@documenso/prisma';
 import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 
 import { validateCheckboxLength } from '../../advanced-fields-validation/validate-checkbox';
+import { DIRECT_TEMPLATE_RECIPIENT_EMAIL } from '../../constants/direct-templates';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
@@ -387,8 +388,12 @@ export const extractFieldAutoInsertValues = (
   const field = parsedField.data;
   const fieldId = unknownField.id;
 
-  // Auto insert email fields if an recipient email exists.
-  if (field.type === FieldType.EMAIL && recipient.email) {
+  // Auto insert email fields if the recipient has a valid email.
+  if (
+    field.type === FieldType.EMAIL &&
+    isRecipientEmailValidForSending(recipient) &&
+    recipient.email !== DIRECT_TEMPLATE_RECIPIENT_EMAIL
+  ) {
     return {
       fieldId,
       customText: recipient.email,
