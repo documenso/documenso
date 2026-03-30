@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { authClient } from '@documenso/auth/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { AppError } from '@documenso/lib/errors/app-error';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -37,7 +38,7 @@ export const ZClaimAccountFormSchema = z
       .string()
       .trim()
       .min(1, { message: msg`Please enter a valid name.`.id }),
-    email: z.string().email().min(1),
+    email: zEmail().min(1),
     password: ZPasswordSchema,
   })
   .refine(

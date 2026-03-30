@@ -14,6 +14,7 @@ import {
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useSearchParams } from 'react-router';
+import { z } from 'zod';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
@@ -28,6 +29,7 @@ import {
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { dynamicActivate } from '@documenso/lib/utils/i18n';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -35,6 +37,7 @@ import type {
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
@@ -94,6 +97,7 @@ export const EmbedDirectTemplateClientPage = ({
   const [isNameLocked, setIsNameLocked] = useState(false);
 
   const [showPendingFieldTooltip, setShowPendingFieldTooltip] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   const [throttledOnCompleteClick, isThrottled] = useThrottleFn(() => void onCompleteClick(), 500);
 
@@ -204,6 +208,14 @@ export const EmbedDirectTemplateClientPage = ({
 
       if (!valid) {
         setShowPendingFieldTooltip(true);
+        return;
+      }
+
+      const { success: isEmailValid } = zEmail().safeParse(email);
+
+      if (!isEmailValid) {
+        setEmailError(_(msg`A valid email is required`));
+        setIsExpanded(true);
         return;
       }
 
@@ -442,11 +454,23 @@ export const EmbedDirectTemplateClientPage = ({
                   <Input
                     type="email"
                     id="email"
-                    className="mt-2 bg-background"
+                    className={cn(
+                      'mt-2 bg-background',
+                      emailError && 'border-destructive ring-2 ring-destructive/20',
+                    )}
                     disabled={isEmailLocked}
                     value={email}
-                    onChange={(e) => !isEmailLocked && setEmail(e.target.value.trim())}
+                    onChange={(e) => {
+                      if (!isEmailLocked) {
+                        setEmail(e.target.value.trim());
+                        setEmailError(null);
+                      }
+                    }}
                   />
+
+                  {emailError && (
+                    <p className="mt-2 text-xs font-medium text-destructive">{emailError}</p>
+                  )}
                 </div>
 
                 {hasSignatureField && (
