@@ -51,6 +51,12 @@ import { MailChannelsTransport } from './transports/mailchannels';
  * - If `NEXT_PRIVATE_SMTP_TRANSPORT` is not specified, the default is `smtp-auth`.
  * - `NEXT_PRIVATE_SMTP_SERVICE` is optional and used specifically for well-known services like Gmail.
  */
+// Use base64 encoding for all text/* MIME parts. This avoids the ~3x size
+// expansion that quoted-printable causes for multi-byte Unicode content
+// (e.g. React Email's preview padding characters), which can lead to HTML
+// truncation when sent through SMTP relays like SendGrid.
+const TEXT_ENCODING_DEFAULTS = { textEncoding: 'base64' as const };
+
 const getTransport = (): Transporter => {
   const transport = env('NEXT_PRIVATE_SMTP_TRANSPORT') ?? 'smtp-auth';
 
@@ -60,6 +66,7 @@ const getTransport = (): Transporter => {
         apiKey: env('NEXT_PRIVATE_MAILCHANNELS_API_KEY'),
         endpoint: env('NEXT_PRIVATE_MAILCHANNELS_ENDPOINT'),
       }),
+      TEXT_ENCODING_DEFAULTS,
     );
   }
 
@@ -68,6 +75,7 @@ const getTransport = (): Transporter => {
       ResendTransport.makeTransport({
         apiKey: env('NEXT_PRIVATE_RESEND_API_KEY') || '',
       }),
+      TEXT_ENCODING_DEFAULTS,
     );
   }
 
@@ -78,30 +86,36 @@ const getTransport = (): Transporter => {
       );
     }
 
-    return createTransport({
-      host: env('NEXT_PRIVATE_SMTP_HOST'),
-      port: Number(env('NEXT_PRIVATE_SMTP_PORT')) || 587,
-      secure: env('NEXT_PRIVATE_SMTP_SECURE') === 'true',
-      auth: {
-        user: env('NEXT_PRIVATE_SMTP_APIKEY_USER') ?? 'apikey',
-        pass: env('NEXT_PRIVATE_SMTP_APIKEY') ?? '',
+    return createTransport(
+      {
+        host: env('NEXT_PRIVATE_SMTP_HOST'),
+        port: Number(env('NEXT_PRIVATE_SMTP_PORT')) || 587,
+        secure: env('NEXT_PRIVATE_SMTP_SECURE') === 'true',
+        auth: {
+          user: env('NEXT_PRIVATE_SMTP_APIKEY_USER') ?? 'apikey',
+          pass: env('NEXT_PRIVATE_SMTP_APIKEY') ?? '',
+        },
       },
-    });
+      TEXT_ENCODING_DEFAULTS,
+    );
   }
 
-  return createTransport({
-    host: env('NEXT_PRIVATE_SMTP_HOST') ?? '127.0.0.1:2500',
-    port: Number(env('NEXT_PRIVATE_SMTP_PORT')) || 587,
-    secure: env('NEXT_PRIVATE_SMTP_SECURE') === 'true',
-    ignoreTLS: env('NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS') === 'true',
-    auth: env('NEXT_PRIVATE_SMTP_USERNAME')
-      ? {
-          user: env('NEXT_PRIVATE_SMTP_USERNAME'),
-          pass: env('NEXT_PRIVATE_SMTP_PASSWORD') ?? '',
-        }
-      : undefined,
-    ...(env('NEXT_PRIVATE_SMTP_SERVICE') ? { service: env('NEXT_PRIVATE_SMTP_SERVICE') } : {}),
-  });
+  return createTransport(
+    {
+      host: env('NEXT_PRIVATE_SMTP_HOST') ?? '127.0.0.1:2500',
+      port: Number(env('NEXT_PRIVATE_SMTP_PORT')) || 587,
+      secure: env('NEXT_PRIVATE_SMTP_SECURE') === 'true',
+      ignoreTLS: env('NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS') === 'true',
+      auth: env('NEXT_PRIVATE_SMTP_USERNAME')
+        ? {
+            user: env('NEXT_PRIVATE_SMTP_USERNAME'),
+            pass: env('NEXT_PRIVATE_SMTP_PASSWORD') ?? '',
+          }
+        : undefined,
+      ...(env('NEXT_PRIVATE_SMTP_SERVICE') ? { service: env('NEXT_PRIVATE_SMTP_SERVICE') } : {}),
+    },
+    TEXT_ENCODING_DEFAULTS,
+  );
 };
 
 export const mailer = getTransport();

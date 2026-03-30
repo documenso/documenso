@@ -9,7 +9,7 @@ export { Hr } from '@react-email/hr';
 export { Html } from '@react-email/html';
 export { Img } from '@react-email/img';
 export { Link } from '@react-email/link';
-export { Preview } from '@react-email/preview';
+export { Preview } from './components/preview';
 export { render } from '@react-email/render';
 export { Row } from '@react-email/row';
 export { Section } from '@react-email/section';
