@@ -216,9 +216,9 @@ export const completeDocumentWithToken = async ({
     });
 
     // Create audit log entries for each auto-inserted date field.
-    for (const field of uninsertedDateFields) {
-      await prisma.documentAuditLog.create({
-        data: createDocumentAuditLogData({
+    await prisma.documentAuditLog.createMany({
+      data: uninsertedDateFields.map((field) =>
+        createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
           envelopeId: envelope.id,
           user: {
@@ -238,8 +238,8 @@ export const completeDocumentWithToken = async ({
             },
           },
         }),
-      });
-    }
+      ),
+    });
 
     // Update the local fields array so the subsequent validation check passes.
     fields = fields.map((field) => {
