@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const ZSaveAsTemplateRequestSchema = z.object({
-  envelopeId: z.string(),
+  envelopeId: z.string().min(1).describe('The ID of the envelope to save as a template.'),
   includeRecipients: z.boolean(),
   includeFields: z.boolean(),
 });
