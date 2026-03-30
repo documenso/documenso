@@ -8,7 +8,7 @@
 - `npm run test:e2e` - Run E2E tests with Playwright
 - `npm run test:dev -w @documenso/app-tests` - Run single E2E test in dev mode
 - `npm run test-ui:dev -w @documenso/app-tests` - Run E2E tests with UI
-- `npm run format` - Format code with Prettier
+- `npm run format` - Format code with Biome
 - `npm run dev` - Start development server for Remix app
 
 **Important:** Do not run `npm run build` to verify changes unless explicitly asked. Builds take a long time (~2 minutes). Use `npx tsc --noEmit` for type checking specific packages if needed.
