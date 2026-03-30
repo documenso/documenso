@@ -232,7 +232,7 @@ export const duplicateEnvelope = async ({
     id: duplicatedEnvelope.id,
     envelope: duplicatedEnvelope,
     legacyId: {
-      type: targetType,
+      type: duplicatedEnvelope.type,
       id: legacyNumberId,
     },
   };

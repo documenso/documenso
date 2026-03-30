@@ -9,6 +9,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -125,9 +126,11 @@ export const EnvelopeSaveAsTemplateDialog = ({
         </div>
 
         <DialogFooter>
-          <Button type="button" variant="secondary" disabled={isPending}>
-            <Trans>Cancel</Trans>
-          </Button>
+          <DialogClose asChild>
+            <Button type="button" variant="secondary" disabled={isPending}>
+              <Trans>Cancel</Trans>
+            </Button>
+          </DialogClose>
 
           <Button type="button" loading={isPending} onClick={onSubmit}>
             <Trans>Save as Template</Trans>
