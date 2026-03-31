@@ -93,7 +93,7 @@ export const duplicateEnvelope = async ({ id, userId, teamId }: DuplicateEnvelop
   const duplicatedTemplateType =
     envelope.templateType === 'ORGANISATION' && envelope.teamId !== teamId
       ? 'PRIVATE'
-      : envelope.templateType ?? undefined;
+      : (envelope.templateType ?? undefined);
 
   const duplicatedEnvelope = await prisma.envelope.create({
     data: {
@@ -150,7 +150,7 @@ export const duplicateEnvelope = async ({ id, userId, teamId }: DuplicateEnvelop
 
   await pMap(
     envelope.recipients,
-    (recipient) =>
+    async (recipient) =>
       prisma.recipient.create({
         data: {
           envelopeId: duplicatedEnvelope.id,

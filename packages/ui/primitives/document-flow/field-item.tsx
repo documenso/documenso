@@ -333,34 +333,44 @@ const FieldItemInner = ({
         </div>
 
         {isDevMode && (
-          <div className="absolute -top-20 left-1/2 z-50 -translate-x-1/2 rounded-md border border-border bg-background/95 px-2 py-1 shadow-sm backdrop-blur-sm">
+          <div className="absolute bottom-full left-1/2 z-50 mb-1 -translate-x-1/2 rounded-md border border-border bg-background/95 px-2 py-1 shadow-sm backdrop-blur-sm">
             <div className="flex flex-col gap-0.5 text-[9px]">
+              {field.nativeId && (
+                <span>
+                  <span className="text-muted-foreground">
+                    <Trans>Field ID:</Trans>
+                  </span>{' '}
+                  <span className="font-mono text-foreground">{field.nativeId}</span>
+                </span>
+              )}
+              <span>
+                <span className="text-muted-foreground">
+                  <Trans>Recipient ID:</Trans>
+                </span>{' '}
+                <span className="font-mono text-foreground">{field.recipientId}</span>
+              </span>
               <span>
                 <span className="text-muted-foreground">
                   <Trans>Pos X:</Trans>
-                </span>
-                &nbsp;
+                </span>{' '}
                 <span className="font-mono text-foreground">{field.pageX.toFixed(2)}</span>
               </span>
               <span>
                 <span className="text-muted-foreground">
                   <Trans>Pos Y:</Trans>
-                </span>
-                &nbsp;
+                </span>{' '}
                 <span className="font-mono text-foreground">{field.pageY.toFixed(2)}</span>
               </span>
               <span>
                 <span className="text-muted-foreground">
                   <Trans>Width:</Trans>
-                </span>
-                &nbsp;
+                </span>{' '}
                 <span className="font-mono text-foreground">{field.pageWidth.toFixed(2)}</span>
               </span>
               <span>
                 <span className="text-muted-foreground">
                   <Trans>Height:</Trans>
-                </span>
-                &nbsp;
+                </span>{' '}
                 <span className="font-mono text-foreground">{field.pageHeight.toFixed(2)}</span>
               </span>
             </div>

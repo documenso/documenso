@@ -7,9 +7,9 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { isEmailDomainAllowedForSignup } from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
-import { env } from '@documenso/lib/utils/env';
 import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
 import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
+import { env } from '@documenso/lib/utils/env';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { prisma } from '@documenso/prisma';
 

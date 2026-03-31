@@ -61,7 +61,7 @@ export const UNSAFE_createEnvelopeItems = async ({
 
       const { cleanedPdf, placeholders } = await extractPdfPlaceholders(normalized);
 
-      const { id: documentDataId } = await putPdfFileServerSide({
+      const { documentData } = await putPdfFileServerSide({
         name: file.name,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(cleanedPdf),
@@ -71,7 +71,7 @@ export const UNSAFE_createEnvelopeItems = async ({
         id: prefixedId('envelope_item'),
         title: file.name,
         clientId,
-        documentDataId,
+        documentDataId: documentData.id,
         placeholders,
         order: orderOverride ?? currentHighestOrderValue + index + 1,
       };

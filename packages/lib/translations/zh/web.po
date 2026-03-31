@@ -8,7 +8,7 @@ msgstr ""
 "Language: zh\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-13 04:15\n"
+"PO-Revision-Date: 2026-03-19 04:58\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -159,6 +159,11 @@ msgstr "{0, plural, other {<2>您有 <3>#</3> 条待处理邀请</2>}}"
 msgid "{0, plural, one {1 Field Remaining} other {# Fields Remaining}}"
 msgstr "{0, plural, other {# 个字段剩余}}"
 
+#. placeholder {0}: fieldsOnExcessPages.length
+#: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
+msgid "{0, plural, one {1 field will be deleted because the new PDF has fewer pages than the current one.} other {# fields will be deleted because the new PDF has fewer pages than the current one.}}"
+msgstr "{0, plural, other {由于新 PDF 的页数少于当前文件，将删除 # 个字段。}}"
+
 #. placeholder {0}: fields.filter((field) => field.envelopeItemId === doc.id).length
 #. placeholder {0}: remainingFields.filter((field) => field.envelopeItemId === doc.id).length
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
@@ -170,6 +175,11 @@ msgstr "{0, plural, other {# 个字段}}"
 #: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
 msgid "{0, plural, one {1 matching field} other {# matching fields}}"
 msgstr "{0, plural, other {# 个匹配字段}}"
+
+#. placeholder {0}: replacementFile.pageCount
+#: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
+msgid "{0, plural, one {1 page} other {# pages}}"
+msgstr "{0, plural, other {# 页}}"
 
 #. placeholder {0}: recipients.length
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.legacy_editor.tsx
@@ -241,11 +251,6 @@ msgstr "{0, plural, other {你即将删除 # 个模板。}}"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 msgid "{0}"
 msgstr "{0}"
-
-#. placeholder {0}: file.name
-#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
-msgid "{0} couldn't be uploaded:"
-msgstr "{0} 无法上传："
 
 #. placeholder {0}: team.name
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
@@ -509,6 +514,11 @@ msgstr "{user} 移除了一个字段"
 msgid "{user} removed a recipient"
 msgstr "{user} 移除了一个收件人"
 
+#. placeholder {0}: data.envelopeItemTitle
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} replaced the PDF for envelope item {0}"
+msgstr "{user} 已替换信封条目 {0} 的 PDF"
+
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{user} requested a 2FA token for the document"
 msgstr "{user} 请求了此文档的双重验证 (2FA) 令牌"
@@ -546,6 +556,10 @@ msgstr "{user} 更新了一个字段"
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{user} updated a recipient"
 msgstr "{user} 更新了一个收件人"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} updated an envelope item"
+msgstr "{user} 更新了一个信封项目"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{user} updated the document"
@@ -718,6 +732,18 @@ msgstr "<0>无</0> - 我们将生成链接，您可以手动将其发送给收�
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "<0>Note</0> - If you use Links in combination with direct templates, you will need to manually send the links to the remaining recipients."
 msgstr "<0>注意</0> - 如果您将链接与直链模板组合使用，则需要手动将链接发送给剩余收件人。"
+
+#: packages/ui/components/template/template-type-select.tsx
+msgid "<0>Organisation</0> templates are shared across all teams in your organisation but can only be edited by the owning team."
+msgstr "<0>组织</0>模板会在你所在组织的所有团队之间共享，但只能由所属团队进行编辑。"
+
+#: packages/ui/components/template/template-type-select.tsx
+msgid "<0>Private</0> templates can only be used by your team."
+msgstr "<0>私人</0>模板只能由你的团队使用。"
+
+#: packages/ui/components/template/template-type-select.tsx
+msgid "<0>Public</0> templates are linked to your public profile."
+msgstr "<0>公开</0>模板会链接到你的公共个人资料。"
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx
@@ -1139,6 +1165,10 @@ msgstr "启用"
 msgid "Active sessions"
 msgstr "活动会话"
 
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+msgid "Active Sessions"
+msgstr "活动会话"
+
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Active Subscriptions"
 msgstr "有效订阅"
@@ -1360,6 +1390,7 @@ msgstr "要显示在邮件底部的更多品牌信息"
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: packages/lib/constants/organisations-translations.ts
 #: packages/lib/constants/teams-translations.ts
 msgid "Admin"
@@ -1866,6 +1897,7 @@ msgstr "任意状态"
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "API Tokens"
 msgstr "API 令牌"
 
@@ -2151,6 +2183,8 @@ msgstr "在开始之前，请点击下方按钮确认您的邮箱地址："
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/billing.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/billing.tsx
 msgid "Billing"
 msgstr "账单"
@@ -2188,6 +2222,8 @@ msgstr "品牌 Logo"
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Branding Preferences"
 msgstr "品牌偏好设置"
@@ -2292,6 +2328,7 @@ msgstr "找不到某个人？"
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
@@ -3240,6 +3277,7 @@ msgid "Dark Mode"
 msgstr "深色模式"
 
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
+#: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Dashboard"
 msgstr "控制台"
 
@@ -3945,6 +3983,8 @@ msgstr "文档待处理邮件"
 
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.document.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.document.tsx
 msgid "Document Preferences"
 msgstr "文档偏好"
@@ -4005,6 +4045,8 @@ msgstr "文档状态"
 msgid "Document title"
 msgstr "文档标题"
 
+#: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 msgid "Document Title"
 msgstr "文档标题"
@@ -4085,8 +4127,10 @@ msgstr "文档"
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.legacy_editor.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.folders._index.tsx
 #: apps/remix/app/routes/_profile+/p.$url.tsx
 msgid "Documents"
 msgstr "文档"
@@ -4235,6 +4279,10 @@ msgctxt "Draw signature"
 msgid "Draw"
 msgstr "绘制"
 
+#: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
+msgid "Drop PDF here or click to select"
+msgstr "将 PDF 拖放到此处，或点击以选择"
+
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Drop your document here"
 msgstr "将文档拖放到此处"
@@ -4322,6 +4370,10 @@ msgstr "例如：100"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Edit"
 msgstr "编辑"
+
+#: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
+msgid "Edit Item"
+msgstr "编辑条目"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Edit Template"
@@ -4441,6 +4493,7 @@ msgstr "邮箱域名设置"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
 msgid "Email Domains"
 msgstr "邮箱域名"
 
@@ -4457,6 +4510,7 @@ msgid "Email Options"
 msgstr "邮件选项"
 
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.email.tsx
 msgid "Email Preferences"
@@ -4773,6 +4827,16 @@ msgctxt "Audit log format"
 msgid "Envelope item deleted"
 msgstr "信封条目已删除"
 
+#: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
+msgid "Envelope item PDF replaced"
+msgstr "信封条目 PDF 已被替换"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
+msgid "Envelope item updated"
+msgstr "信封项目已更新"
+
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
 msgid "Envelope resent"
 msgstr "信封已重新发送"
@@ -5013,6 +5077,10 @@ msgstr "移动订阅失败。请重试。"
 msgid "Failed to re-register email domain"
 msgstr "重新注册电子邮件域名失败"
 
+#: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
+msgid "Failed to read file"
+msgstr "读取文件失败"
+
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Failed to reseal document"
 msgstr "重新封存文档失败"
@@ -5048,6 +5116,10 @@ msgstr "更新文档失败"
 #: apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
 msgid "Failed to update envelope. Please try again."
 msgstr "更新信封失败。请重试。"
+
+#: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
+msgid "Failed to update item"
+msgstr "更新条目失败"
 
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 msgid "Failed to update recipient"
@@ -5138,18 +5210,11 @@ msgstr "字段"
 msgid "Fields updated"
 msgstr "字段已更新"
 
-#: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
-#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
-#: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
-#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
-msgid "File cannot be larger than {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB"
-msgstr "文件大小不能超过 {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB"
-
-#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: packages/ui/lib/handle-dropzone-rejection.tsx
 msgid "File is larger than {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB"
 msgstr "文件大于 {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB"
 
-#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: packages/ui/lib/handle-dropzone-rejection.tsx
 msgid "File is too small"
 msgstr "文件太小"
 
@@ -5222,6 +5287,14 @@ msgstr "请为每个收件人分别提供邮箱（必填）和姓名（可选）
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "For example, if the claim has a new flag \"FLAG_1\" set to true, then this organisation will get that flag added."
 msgstr "例如，如果声明中新加了一个标记“FLAG_1”并设为 true，则该组织会获得该标记。"
+
+#: apps/remix/app/routes/_unauthenticated+/check-email.tsx
+msgid "Forgot password"
+msgstr "忘记密码"
+
+#: apps/remix/app/routes/_unauthenticated+/forgot-password.tsx
+msgid "Forgot Password"
+msgstr "忘记密码"
 
 #: packages/lib/server-only/auth/send-forgot-password.ts
 msgid "Forgot Password?"
@@ -6052,6 +6125,7 @@ msgstr "关联您的 Documenso 账户"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 msgid "Linked Accounts"
 msgstr "已关联账户"
 
@@ -6190,6 +6264,7 @@ msgid "Manage organisations"
 msgstr "管理组织"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.passkeys.tsx
 msgid "Manage passkeys"
 msgstr "管理通行密钥"
 
@@ -6631,6 +6706,11 @@ msgstr "未找到文件夹"
 msgid "No folders found matching \"{searchTerm}\""
 msgstr "未找到与“{searchTerm}”匹配的文件夹"
 
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.folders._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.folders._index.tsx
+msgid "No folders yet."
+msgstr "还没有文件夹。"
+
 #: apps/remix/app/components/embed/embed-document-rejected.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/rejected.tsx
 msgid "No further action is required from you at this time."
@@ -6647,6 +6727,10 @@ msgstr "未选择任何成员"
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "No organisation members available"
 msgstr "没有可用的组织成员"
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
+msgid "No organisation templates are shared with your team yet."
+msgstr "目前还没有与您的团队共享的组织模板。"
 
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "No organisations found"
@@ -6858,11 +6942,11 @@ msgstr "只有管理员可以访问并查看该文档"
 msgid "Only managers and above can access and view the document"
 msgstr "仅经理及以上角色可以访问并查看该文档"
 
-#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: packages/ui/lib/handle-dropzone-rejection.tsx
 msgid "Only one file can be uploaded at a time"
 msgstr "一次只能上传一个文件"
 
-#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: packages/ui/lib/handle-dropzone-rejection.tsx
 msgid "Only PDF files are allowed"
 msgstr "只允许上传 PDF 文件"
 
@@ -6911,13 +6995,17 @@ msgstr "或"
 msgid "Or continue with"
 msgstr "或者使用以下方式继续"
 
+#: apps/remix/app/components/general/template/template-type.tsx
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 #: apps/remix/app/components/tables/admin-user-teams-table.tsx
+#: apps/remix/app/components/tables/templates-table.tsx
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
+#: packages/ui/components/template/template-type-select.tsx
 msgid "Organisation"
 msgstr "组织"
 
@@ -7001,9 +7089,11 @@ msgid "Organisation settings"
 msgstr "组织设置"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 msgid "Organisation Settings"
 msgstr "组织设置"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Organisation SSO Portal"
 msgstr "组织 SSO 门户"
@@ -7011,6 +7101,14 @@ msgstr "组织 SSO 门户"
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Organisation Teams"
 msgstr "组织团队"
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
+msgid "Organisation Template"
+msgstr "组织模板"
+
+#: apps/remix/app/components/tables/templates-table.tsx
+msgid "Organisation templates are shared across all teams within the same organisation. Only the owning team can edit them."
+msgstr "组织模板会在同一组织内的所有团队之间共享。只有拥有该模板的团队可以编辑。"
 
 #: apps/remix/app/components/forms/organisation-update-form.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -7254,6 +7352,7 @@ msgstr "个人账号"
 #: apps/remix/app/components/general/menu-switcher.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
+#: apps/remix/app/routes/_authenticated+/inbox.tsx
 #: apps/remix/app/routes/_authenticated+/inbox.tsx
 msgid "Personal Inbox"
 msgstr "个人收件箱"
@@ -7567,6 +7666,7 @@ msgstr "使用占位数据预览签署后的文档效果"
 
 #: apps/remix/app/components/general/template/template-type.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
+#: packages/ui/components/template/template-type-select.tsx
 msgid "Private"
 msgstr "私有"
 
@@ -7590,6 +7690,8 @@ msgstr "正在处理文档"
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/profile.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/profile.tsx
+#: apps/remix/app/routes/_profile+/_layout.tsx
 msgid "Profile"
 msgstr "个人资料"
 
@@ -7620,12 +7722,14 @@ msgstr "提供方已成功更新"
 
 #: apps/remix/app/components/general/template/template-type.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
+#: packages/ui/components/template/template-type-select.tsx
 msgid "Public"
 msgstr "公开"
 
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Public Profile"
 msgstr "公开资料"
@@ -8016,6 +8120,14 @@ msgstr "移除团队成员"
 msgid "Repeat Password"
 msgstr "重复密码"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
+msgid "Replace failed"
+msgstr "替换失败"
+
+#: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
+msgid "Replace PDF"
+msgstr "替换 PDF"
+
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Reply to email"
 msgstr "回复邮箱"
@@ -8121,6 +8233,8 @@ msgstr "重置邮件已发送"
 
 #: apps/remix/app/components/forms/forgot-password.tsx
 #: apps/remix/app/components/forms/reset-password.tsx
+#: apps/remix/app/routes/_unauthenticated+/reset-password._index.tsx
+#: apps/remix/app/routes/_unauthenticated+/reset-password.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/reset-password.$token.tsx
 #: packages/email/template-components/template-forgot-password.tsx
 msgid "Reset Password"
@@ -8357,9 +8471,11 @@ msgstr "密钥"
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "Security"
 msgstr "安全"
 
+#: apps/remix/app/routes/_authenticated+/settings+/security.activity.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.activity.tsx
 msgid "Security activity"
 msgstr "安全活动"
@@ -8695,7 +8811,10 @@ msgstr "设置模板属性和收件人信息"
 #: apps/remix/app/components/general/folder/folder-card.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.general.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.email.tsx
 msgid "Settings"
 msgstr "设置"
 
@@ -8803,6 +8922,8 @@ msgstr "在此签名"
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
+#: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
+#: apps/remix/app/routes/_unauthenticated+/signin.tsx
 #: packages/email/template-components/template-reset-password.tsx
 msgid "Sign In"
 msgstr "登录"
@@ -8831,6 +8952,10 @@ msgstr "签署文档以完成流程。"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-page.tsx
 msgid "Sign up"
+msgstr "注册"
+
+#: apps/remix/app/routes/_unauthenticated+/signup.tsx
+msgid "Sign Up"
 msgstr "注册"
 
 #: apps/remix/app/components/forms/signup.tsx
@@ -9001,8 +9126,8 @@ msgid "Signing window expired for {0}"
 msgstr "{0} 的签署时间窗口已过期"
 
 #: apps/remix/app/components/forms/signup.tsx
-msgid "Signups are disabled."
-msgstr "注册已被禁用。"
+msgid "Signup is currently disabled or not available for your email domain."
+msgstr "当前已禁用注册，或您的电子邮箱域名不支持注册。"
 
 #. placeholder {0}: DateTime.fromJSDate(publicProfile.badge.since).toFormat('LLL ‘yy')
 #: apps/remix/app/routes/_profile+/p.$url.tsx
@@ -9108,9 +9233,17 @@ msgstr "渲染文档时出现问题，请重试或联系我们的支持团队。
 msgid "Something went wrong while rendering the document, some fields may be missing or corrupted."
 msgstr "渲染文档时出现问题，某些字段可能丢失或已损坏。"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
+msgid "Something went wrong while replacing the PDF"
+msgstr "替换 PDF 时出现问题。"
+
 #: apps/remix/app/components/general/verify-email-banner.tsx
 msgid "Something went wrong while sending the confirmation email."
 msgstr "发送确认邮件时出错。"
+
+#: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
+msgid "Something went wrong while updating the envelope item."
+msgstr "更新信封项目时出现问题。"
 
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 msgid "Something went wrong while updating the team billing subscription, please contact support."
@@ -9354,6 +9487,7 @@ msgstr "支持"
 #: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Support"
 msgstr "支持"
 
@@ -9401,6 +9535,7 @@ msgstr "目标组织"
 #: apps/remix/app/components/tables/organisation-teams-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 msgid "Team"
 msgstr "团队"
 
@@ -9520,6 +9655,7 @@ msgid "Team settings"
 msgstr "团队设置"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 msgid "Team Settings"
 msgstr "团队设置"
 
@@ -9621,6 +9757,11 @@ msgstr "模板设置"
 msgid "Template title"
 msgstr "模板标题"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
+#: packages/ui/primitives/template-flow/add-template-settings.tsx
+msgid "Template type"
+msgstr "模板类型"
+
 #: apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
 msgid "Template Updated"
 msgstr "模板已更新"
@@ -9639,7 +9780,9 @@ msgstr "模板已上传"
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.folders._index.tsx
 msgid "Templates"
 msgstr "模板"
 
@@ -9837,6 +9980,10 @@ msgstr "将触发 Webhook 发送到你的 URL 的事件。"
 #: apps/remix/app/components/general/legacy-field-warning-popover.tsx
 msgid "The fields have been updated to the new field insertion method successfully"
 msgstr "字段已成功更新为新的字段插入方式"
+
+#: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
+msgid "The file is not a valid PDF."
+msgstr "该文件不是有效的 PDF。"
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "The folder you are trying to delete does not exist."
@@ -10834,7 +10981,7 @@ msgstr "撤销"
 msgid "Unknown"
 msgstr "未知"
 
-#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: packages/ui/lib/handle-dropzone-rejection.tsx
 msgid "Unknown error"
 msgstr "未知错误"
 
@@ -10869,6 +11016,7 @@ msgid "Untitled Group"
 msgstr "未命名组"
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-update-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
@@ -10990,6 +11138,10 @@ msgstr "更新模板"
 msgid "Update the role and add fields as required for the direct recipient. The individual who uses the direct link will sign the document as the direct recipient."
 msgstr "根据需要更新直链收件人的角色并添加字段。使用直链的人将以直链收件人的身份签署文档。"
 
+#: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
+msgid "Update the title or replace the PDF file."
+msgstr "请更新标题或替换该 PDF 文件。"
+
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "Update user"
 msgstr "更新用户"
@@ -11076,6 +11228,7 @@ msgstr "上传文档"
 msgid "Upload documents and add recipients"
 msgstr "上传文档并添加收件人"
 
+#: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
@@ -11241,6 +11394,10 @@ msgstr "验证并完成"
 msgid "Verify Domain"
 msgstr "验证域名"
 
+#: apps/remix/app/routes/_unauthenticated+/verify-email._index.tsx
+msgid "Verify Email"
+msgstr "验证邮箱"
+
 #: apps/remix/app/components/general/verify-email-banner.tsx
 msgid "Verify Now"
 msgstr "立即验证"
@@ -11301,6 +11458,10 @@ msgstr "查看使用此邮箱地址发送和接收的所有文档"
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 msgid "View all documents sent to your account"
 msgstr "查看发送到你账号的所有文档"
+
+#: apps/remix/app/components/general/folder/folder-grid.tsx
+msgid "View all folders"
+msgstr "查看所有文件夹"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "View all recent security activity related to your account."
@@ -11387,6 +11548,10 @@ msgstr "查看更多"
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "View next document"
 msgstr "查看下一份文档"
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
+msgid "View organisation template"
+msgstr "查看组织模板"
 
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 msgid "View owner"
@@ -11870,6 +12035,8 @@ msgstr "Webhook URL"
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Webhooks"
 msgstr "Webhooks"
 
@@ -12094,6 +12261,20 @@ msgstr "您即将订阅 {planName} 套餐"
 msgid "You are currently on the <0>Free Plan</0>."
 msgstr "你当前正在使用<0>免费计划</0>。"
 
+#. placeholder {0}: i18n.date(periodEnd)
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
+msgid "You are currently subscribed to <0>{currentProductName}</0> which is set to automatically renew on <1>{0}</1>."
+msgstr "您当前订阅的是 <0>{currentProductName}</0>，该订阅将于 <1>{0}</1> 自动续订。"
+
+#. placeholder {0}: i18n.date(periodEnd)
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
+msgid "You are currently subscribed to <0>{currentProductName}</0> which is set to end on <1>{0}</1>."
+msgstr "您当前订阅的是 <0>{currentProductName}</0>，该订阅将于 <1>{0}</1> 结束。"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
+msgid "You are currently subscribed to <0>{currentProductName}</0>."
+msgstr "您当前订阅的是 <0>{currentProductName}</0>。"
+
 #. placeholder {0}: organisationEmail.email
 #: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
 msgid "You are currently updating <0>{0}</0>"
@@ -12260,9 +12441,23 @@ msgstr "你创建了一个标题为 {0} 的信封条目"
 msgid "You created the document"
 msgstr "你创建了此文档"
 
+#. placeholder {0}: i18n.date(periodEnd)
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
-msgid "You currently have an inactive <0>{currentProductName}</0> subscription"
-msgstr "您当前有一个非激活的 <0>{currentProductName}</0> 订阅"
+msgid "You currently have an active plan which is set to automatically renew on <0>{0}</0>."
+msgstr "您目前有一个活动套餐，将于 <0>{0}</0> 自动续订。"
+
+#. placeholder {0}: i18n.date(periodEnd)
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
+msgid "You currently have an active plan which is set to end on <0>{0}</0>."
+msgstr "您目前有一个活动套餐，将于 <0>{0}</0> 结束。"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
+msgid "You currently have an active plan."
+msgstr "您目前有一个活动套餐。"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
+msgid "You currently have an inactive <0>{currentProductName}</0> subscription."
+msgstr "您当前有一个未激活的 <0>{currentProductName}</0> 订阅。"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "You currently have no access to any teams within this organisation. Please contact your organisation to request access."
@@ -12590,6 +12785,11 @@ msgstr "你移除了一个字段"
 msgid "You removed a recipient"
 msgstr "你移除了一个收件人"
 
+#. placeholder {0}: data.envelopeItemTitle
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You replaced the PDF for envelope item {0}"
+msgstr "您已替换信封项目 {0} 的 PDF"
+
 #: packages/lib/utils/document-audit-logs.ts
 msgid "You requested a 2FA token for the document"
 msgstr "你请求了此文档的双重验证 (2FA) 令牌"
@@ -12627,6 +12827,10 @@ msgstr "你更新了一个字段"
 #: packages/lib/utils/document-audit-logs.ts
 msgid "You updated a recipient"
 msgstr "你更新了一个收件人"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You updated an envelope item"
+msgstr "你更新了一个信封项目"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "You updated the document"
