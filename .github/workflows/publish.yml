@@ -3,6 +3,12 @@ name: Publish Docker
 on:
   push:
     branches: ['release']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Git tag to build and publish (e.g., v1.0.0)'
+        required: true
+        type: string
 
 jobs:
   build_and_publish_platform_containers:
@@ -18,6 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.tag || github.ref }}
           fetch-tags: true
 
       - name: Login to DockerHub
@@ -36,13 +43,20 @@ jobs:
       - name: Build the docker image
         env:
           BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
+          NEXT_PRIVATE_TELEMETRY_KEY: ${{ secrets.NEXT_PRIVATE_TELEMETRY_KEY }}
+          NEXT_PRIVATE_TELEMETRY_HOST: ${{ secrets.NEXT_PRIVATE_TELEMETRY_HOST }}
+          APP_VERSION: ${{ inputs.tag || '' }}
         run: |
-          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          if [ -z "$APP_VERSION" ]; then
+            APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          fi
           GIT_SHA="$(git rev-parse HEAD)"
 
           docker build \
             -f ./docker/Dockerfile \
             --progress=plain \
+            --build-arg NEXT_PRIVATE_TELEMETRY_KEY="${NEXT_PRIVATE_TELEMETRY_KEY:-}" \
+            --build-arg NEXT_PRIVATE_TELEMETRY_HOST="${NEXT_PRIVATE_TELEMETRY_HOST:-}" \
             -t "documenso/documenso-$BUILD_PLATFORM:latest" \
             -t "documenso/documenso-$BUILD_PLATFORM:$GIT_SHA" \
             -t "documenso/documenso-$BUILD_PLATFORM:$APP_VERSION" \
@@ -69,6 +83,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.tag || github.ref }}
           fetch-tags: true
 
       - name: Login to DockerHub
@@ -85,8 +100,12 @@ jobs:
           password: ${{ secrets.GH_TOKEN }}
 
       - name: Create and push DockerHub manifest
+        env:
+          APP_VERSION: ${{ inputs.tag || '' }}
         run: |
-          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          if [ -z "$APP_VERSION" ]; then
+            APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          fi
           GIT_SHA="$(git rev-parse HEAD)"
 
           # Check if the version is stable (no rc or beta in the version)
@@ -122,8 +141,12 @@ jobs:
           docker manifest push documenso/documenso:$APP_VERSION
 
       - name: Create and push Github Container Registry manifest
+        env:
+          APP_VERSION: ${{ inputs.tag || '' }}
         run: |
-          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          if [ -z "$APP_VERSION" ]; then
+            APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          fi
           GIT_SHA="$(git rev-parse HEAD)"
 
           # Check if the version is stable (no rc or beta in the version)

@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { httpBatchLink, httpLink, splitLink } from '@trpc/client';
+import { httpBatchLink, httpLink, isNonJsonSerializable, splitLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
-import SuperJSON from 'superjson';
 
 import { getBaseUrl } from '@documenso/lib/universal/get-base-url';
 
 import type { AppRouter } from '../server/router';
+import { dataTransformer } from '../utils/data-transformer';
 
 export { getQueryKey } from '@trpc/react-query';
 
@@ -44,16 +44,16 @@ export function TrpcProvider({ children, headers }: TrpcProviderProps) {
       trpc.createClient({
         links: [
           splitLink({
-            condition: (op) => op.context.skipBatch === true,
+            condition: (op) => op.context.skipBatch === true || isNonJsonSerializable(op.input),
             true: httpLink({
               url: `${getBaseUrl()}/api/trpc`,
               headers,
-              transformer: SuperJSON,
+              transformer: dataTransformer,
             }),
             false: httpBatchLink({
               url: `${getBaseUrl()}/api/trpc`,
               headers,
-              transformer: SuperJSON,
+              transformer: dataTransformer,
             }),
           }),
         ],

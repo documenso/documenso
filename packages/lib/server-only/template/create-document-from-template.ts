@@ -17,11 +17,14 @@ import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
+import type { TEnvelopeExpirationPeriod } from '../../constants/envelope-expiration';
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { ZDefaultRecipientsSchema } from '../../types/default-recipients';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import type { TDocumentEmailSettings } from '../../types/document-email';
+import type { TDocumentFormValues } from '../../types/document-form-values';
 import type {
   TCheckboxFieldMeta,
   TDropdownFieldMeta,
@@ -42,7 +45,7 @@ import {
 } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
-import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
+import { putNormalizedPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
@@ -55,8 +58,10 @@ import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
+import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
+import { getOrganisationTemplateWhereInput } from './get-organisation-template-by-id';
 
 type FinalRecipient = Pick<
   Recipient,
@@ -91,6 +96,12 @@ export type CreateDocumentFromTemplateOptions = {
     envelopeItemId?: string;
   }[];
 
+  attachments?: Array<{
+    label: string;
+    data: string;
+    type?: 'link';
+  }>;
+
   /**
    * Values that will override the predefined values in the template.
    */
@@ -110,7 +121,10 @@ export type CreateDocumentFromTemplateOptions = {
     typedSignatureEnabled?: boolean;
     uploadSignatureEnabled?: boolean;
     drawSignatureEnabled?: boolean;
+    envelopeExpirationPeriod?: TEnvelopeExpirationPeriod | null;
   };
+
+  formValues?: TDocumentFormValues;
   requestMetadata: ApiRequestMetadata;
 };
 
@@ -203,6 +217,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
         type: 'radio',
         label: field.label,
         values: newValues,
+        direction: radioMeta.direction ?? 'vertical',
       };
 
       return meta;
@@ -295,30 +310,46 @@ export const createDocumentFromTemplate = async ({
   requestMetadata,
   folderId,
   prefillFields,
+  attachments,
+  formValues,
 }: CreateDocumentFromTemplateOptions) => {
-  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+  const templateInclude = {
+    recipients: {
+      include: {
+        fields: true,
+      },
+    },
+    envelopeItems: {
+      include: {
+        documentData: true,
+      },
+    },
+    documentMeta: true,
+  } as const;
+
+  const { envelopeWhereInput, team: callerTeam } = await getEnvelopeWhereInput({
     id,
     type: EnvelopeType.TEMPLATE,
     userId,
     teamId,
   });
 
-  const template = await prisma.envelope.findUnique({
-    where: envelopeWhereInput,
-    include: {
-      recipients: {
-        include: {
-          fields: true,
-        },
-      },
-      envelopeItems: {
-        include: {
-          documentData: true,
-        },
-      },
-      documentMeta: true,
-    },
-  });
+  const [teamTemplate, organisationTemplate] = await Promise.all([
+    prisma.envelope.findFirst({
+      where: envelopeWhereInput,
+      include: templateInclude,
+    }),
+    prisma.envelope.findFirst({
+      where: getOrganisationTemplateWhereInput({
+        id,
+        organisationId: callerTeam.organisationId,
+        teamRole: callerTeam.currentTeamRole,
+      }),
+      include: templateInclude,
+    }),
+  ]);
+
+  const template = teamTemplate ?? organisationTemplate;
 
   if (!template) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
@@ -388,7 +419,29 @@ export const createDocumentFromTemplate = async ({
     };
   });
 
-  const firstEnvelopeItemId = template.envelopeItems[0].id;
+  const defaultRecipients = settings.defaultRecipients
+    ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients)
+    : [];
+
+  const defaultRecipientsFinal: FinalRecipient[] = defaultRecipients.map((recipient) => {
+    const authOptions = ZRecipientAuthOptionsSchema.parse({});
+
+    return {
+      templateRecipientId: -1,
+      fields: [],
+      name: recipient.name || recipient.email,
+      email: recipient.email,
+      role: recipient.role,
+      signingOrder: null,
+      authOptions: createRecipientAuthOptions({
+        accessAuth: authOptions.accessAuth,
+        actionAuth: authOptions.actionAuth,
+      }),
+      token: nanoid(),
+    };
+  });
+
+  const allFinalRecipients = [...finalRecipients, ...defaultRecipientsFinal];
 
   // Key = original envelope item ID
   // Value = duplicated envelope item ID.
@@ -400,10 +453,14 @@ export const createDocumentFromTemplate = async ({
     template.envelopeItems.map(async (item, i) => {
       let documentDataIdToDuplicate = item.documentDataId;
 
-      const foundCustomDocumentData = customDocumentData.find(
-        (customDocumentDataItem) =>
-          customDocumentDataItem.envelopeItemId || firstEnvelopeItemId === item.id,
-      );
+      const foundCustomDocumentData = customDocumentData.find((customDocumentDataItem) => {
+        // Handle empty envelopeItemId for backwards compatibility reasons.
+        if (customDocumentDataItem.documentDataId && !customDocumentDataItem.envelopeItemId) {
+          return true;
+        }
+
+        return customDocumentDataItem.envelopeItemId === item.id;
+      });
 
       if (foundCustomDocumentData) {
         documentDataIdToDuplicate = foundCustomDocumentData.documentDataId;
@@ -421,11 +478,19 @@ export const createDocumentFromTemplate = async ({
         });
       }
 
-      const buffer = await getFileServerSide(documentDataToDuplicate);
+      let buffer = await getFileServerSide(documentDataToDuplicate);
 
       const titleToUse = item.title || finalEnvelopeTitle;
 
-      const duplicatedFile = await putPdfFileServerSide({
+      if (formValues) {
+        // eslint-disable-next-line require-atomic-updates
+        buffer = await insertFormValuesInPdf({
+          pdf: Buffer.from(buffer),
+          formValues,
+        });
+      }
+
+      const duplicatedFile = await putNormalizedPdfFileServerSide({
         name: titleToUse,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(buffer),
@@ -435,7 +500,7 @@ export const createDocumentFromTemplate = async ({
         data: {
           type: duplicatedFile.type,
           data: duplicatedFile.data,
-          initialData: duplicatedFile.initialData,
+          initialData: documentDataToDuplicate.data,
         },
       });
 
@@ -473,10 +538,12 @@ export const createDocumentFromTemplate = async ({
         override?.drawSignatureEnabled ?? template.documentMeta?.drawSignatureEnabled,
       allowDictateNextSigner:
         override?.allowDictateNextSigner ?? template.documentMeta?.allowDictateNextSigner,
+      envelopeExpirationPeriod:
+        override?.envelopeExpirationPeriod ?? template.documentMeta?.envelopeExpirationPeriod,
     }),
   });
 
-  return await prisma.$transaction(async (tx) => {
+  const { envelope, createdEnvelope } = await prisma.$transaction(async (tx) => {
     const envelope = await tx.envelope.create({
       data: {
         id: prefixedId('envelope'),
@@ -489,7 +556,7 @@ export const createDocumentFromTemplate = async ({
         templateId: legacyTemplateId, // The template this envelope was created from.
         userId,
         folderId,
-        teamId: template.teamId,
+        teamId,
         title: finalEnvelopeTitle,
         envelopeItems: {
           createMany: {
@@ -503,9 +570,10 @@ export const createDocumentFromTemplate = async ({
         visibility: template.visibility || settings.documentVisibility,
         useLegacyFieldInsertion: template.useLegacyFieldInsertion ?? false,
         documentMetaId: documentMeta.id,
+        formValues: formValues ?? undefined,
         recipients: {
           createMany: {
-            data: finalRecipients.map((recipient) => {
+            data: allFinalRecipients.map((recipient) => {
               const authOptions = ZRecipientAuthOptionsSchema.parse(recipient?.authOptions);
 
               return {
@@ -586,7 +654,7 @@ export const createDocumentFromTemplate = async ({
       }
     }
 
-    Object.values(finalRecipients).forEach(({ token, fields }) => {
+    Object.values(allFinalRecipients).forEach(({ token, fields }) => {
       const recipient = envelope.recipients.find((recipient) => recipient.token === token);
 
       if (!recipient) {
@@ -667,6 +735,33 @@ export const createDocumentFromTemplate = async ({
       }),
     });
 
+    const templateAttachments = await tx.envelopeAttachment.findMany({
+      where: {
+        envelopeId: template.id,
+      },
+    });
+
+    const attachmentsToCreate = [
+      ...templateAttachments.map((attachment) => ({
+        envelopeId: envelope.id,
+        type: attachment.type,
+        label: attachment.label,
+        data: attachment.data,
+      })),
+      ...(attachments || []).map((attachment) => ({
+        envelopeId: envelope.id,
+        type: attachment.type || 'link',
+        label: attachment.label,
+        data: attachment.data,
+      })),
+    ];
+
+    if (attachmentsToCreate.length > 0) {
+      await tx.envelopeAttachment.createMany({
+        data: attachmentsToCreate,
+      });
+    }
+
     const createdEnvelope = await tx.envelope.findFirst({
       where: {
         id: envelope.id,
@@ -681,13 +776,25 @@ export const createDocumentFromTemplate = async ({
       throw new Error('Document not found');
     }
 
-    await triggerWebhook({
+    return { envelope, createdEnvelope };
+  });
+
+  // Trigger webhook outside the transaction to avoid holding the connection
+  // open during network I/O.
+  await Promise.allSettled([
+    triggerWebhook({
       event: WebhookTriggerEvents.DOCUMENT_CREATED,
       data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
       userId,
       teamId,
-    });
+    }),
+    triggerWebhook({
+      event: WebhookTriggerEvents.TEMPLATE_USED,
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
+      userId,
+      teamId,
+    }),
+  ]);
 
-    return envelope;
-  });
+  return envelope;
 };

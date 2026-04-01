@@ -8,6 +8,7 @@ import { validateRadioField } from '@documenso/lib/advanced-fields-validation/va
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import {
+  FIELD_META_DEFAULT_VALUES,
   type TFieldMetaSchema as FieldMeta,
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
@@ -143,7 +144,7 @@ export const setFieldsForDocument = async ({
 
         const parsedFieldMeta = field.fieldMeta
           ? ZFieldMetaSchema.parse(field.fieldMeta)
-          : undefined;
+          : FIELD_META_DEFAULT_VALUES[field.type];
 
         if (field.type === FieldType.TEXT && field.fieldMeta) {
           const textFieldParsedMeta = ZTextFieldMeta.parse(field.fieldMeta);
@@ -156,9 +157,11 @@ export const setFieldsForDocument = async ({
 
         if (field.type === FieldType.NUMBER && field.fieldMeta) {
           const numberFieldParsedMeta = ZNumberFieldMeta.parse(field.fieldMeta);
+
           const errors = validateNumberField(
-            String(numberFieldParsedMeta.value),
+            String(numberFieldParsedMeta.value || ''),
             numberFieldParsedMeta,
+            false,
           );
 
           if (errors.length > 0) {
@@ -304,7 +307,10 @@ export const setFieldsForDocument = async ({
           });
         }
 
-        return upsertedField;
+        return {
+          ...upsertedField,
+          formId: field.formId,
+        };
       }),
     );
   });
@@ -338,17 +344,25 @@ export const setFieldsForDocument = async ({
   }
 
   // Filter out fields that have been removed or have been updated.
-  const filteredFields = existingFields.filter((field) => {
-    const isRemoved = removedFields.find((removedField) => removedField.id === field.id);
-    const isUpdated = persistedFields.find((persistedField) => persistedField.id === field.id);
+  const mappedFilteredFields = existingFields
+    .filter((field) => {
+      const isRemoved = removedFields.find((removedField) => removedField.id === field.id);
+      const isUpdated = persistedFields.find((persistedField) => persistedField.id === field.id);
 
-    return !isRemoved && !isUpdated;
-  });
+      return !isRemoved && !isUpdated;
+    })
+    .map((field) => ({
+      ...mapFieldToLegacyField(field, envelope),
+      formId: undefined,
+    }));
+
+  const mappedPersistentFields = persistedFields.map((field) => ({
+    ...mapFieldToLegacyField(field, envelope),
+    formId: field?.formId,
+  }));
 
   return {
-    fields: [...filteredFields, ...persistedFields].map((field) =>
-      mapFieldToLegacyField(field, envelope),
-    ),
+    fields: [...mappedFilteredFields, ...mappedPersistentFields],
   };
 };
 
@@ -357,6 +371,7 @@ export const setFieldsForDocument = async ({
  */
 type FieldData = {
   id?: number | null;
+  formId?: string;
   envelopeItemId: string;
   type: FieldType;
   recipientId: number;

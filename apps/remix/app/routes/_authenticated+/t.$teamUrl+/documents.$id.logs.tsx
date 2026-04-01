@@ -75,11 +75,12 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     },
     recipients: envelope.recipients,
     documentRootPath,
+    userId: user.id,
   };
 }
 
 export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) {
-  const { document, recipients, documentRootPath } = loaderData;
+  const { document, recipients, documentRootPath, userId } = loaderData;
 
   const { _, i18n } = useLingui();
 
@@ -133,7 +134,7 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
       <Link
         to={`${documentRootPath}/${document.envelopeId}`}
-        className="flex items-center text-[#7AC455] hover:opacity-80"
+        className="flex items-center text-documenso-700 hover:opacity-80"
       >
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         <Trans>Document</Trans>
@@ -171,15 +172,17 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
       <section className="mt-6">
         <Card className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2" degrees={45} gradient>
           {documentInformation.map((info, i) => (
-            <div className="text-foreground text-sm" key={i}>
+            <div className="text-sm text-foreground" key={i}>
               <h3 className="font-semibold">{_(info.description)}</h3>
-              <p className="text-muted-foreground truncate">{info.value}</p>
+              <p className="truncate text-muted-foreground">{info.value}</p>
             </div>
           ))}
 
-          <div className="text-foreground text-sm">
-            <h3 className="font-semibold">Recipients</h3>
-            <ul className="text-muted-foreground list-inside list-disc">
+          <div className="text-sm text-foreground">
+            <h3 className="font-semibold">
+              <Trans>Recipients</Trans>
+            </h3>
+            <ul className="list-inside list-disc text-muted-foreground">
               {recipients.map((recipient) => (
                 <li key={`recipient-${recipient.id}`}>
                   <span>{formatRecipientText(recipient)}</span>
@@ -191,7 +194,7 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
       </section>
 
       <section className="mt-6">
-        <DocumentLogsTable documentId={document.id} />
+        <DocumentLogsTable documentId={document.id} userId={userId} />
       </section>
     </div>
   );

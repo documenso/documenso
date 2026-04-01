@@ -1,19 +1,23 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { UNSAFE_deleteEnvelopeItem } from '@documenso/lib/server-only/envelope-item/delete-envelope-item';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
-import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
+import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 
+import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';
 import {
   ZDeleteEnvelopeItemRequestSchema,
   ZDeleteEnvelopeItemResponseSchema,
+  deleteEnvelopeItemMeta,
 } from './delete-envelope-item.types';
 
 export const deleteEnvelopeItemRoute = authenticatedProcedure
+  .meta(deleteEnvelopeItemMeta)
   .input(ZDeleteEnvelopeItemRequestSchema)
   .output(ZDeleteEnvelopeItemResponseSchema)
   .mutation(async ({ input, ctx }) => {
-    const { user, teamId } = ctx;
+    const { user, teamId, metadata } = ctx;
     const { envelopeId, envelopeItemId } = input;
 
     ctx.logger.info({
@@ -46,19 +50,20 @@ export const deleteEnvelopeItemRoute = authenticatedProcedure
       });
     }
 
-    if (!canEnvelopeItemsBeModified(envelope, envelope.recipients)) {
+    const { canFileBeChanged } = getEnvelopeItemPermissions(envelope, envelope.recipients);
+
+    if (!canFileBeChanged) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Envelope item is not editable',
       });
     }
 
-    await prisma.envelopeItem.delete({
-      where: {
-        id: envelopeItemId,
-        envelopeId: envelope.id,
-      },
+    await UNSAFE_deleteEnvelopeItem({
+      envelopeId,
+      envelopeItemId,
+      user,
+      apiRequestMetadata: metadata,
     });
 
-    // Todo: Envelopes - Audit logs?
-    // Todo: Envelopes - Delete the document data as well?
+    return ZGenericSuccessResponse;
   });

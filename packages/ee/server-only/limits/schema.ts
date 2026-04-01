@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT } from './constants';
+
 // Not proud of the below but it's a way to deal with Infinity when returning JSON.
 export const ZLimitsSchema = z.object({
   documents: z
@@ -21,6 +23,7 @@ export type TLimitsSchema = z.infer<typeof ZLimitsSchema>;
 export const ZLimitsResponseSchema = z.object({
   quota: ZLimitsSchema,
   remaining: ZLimitsSchema,
+  maximumEnvelopeItemCount: z.number().optional().default(DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT),
 });
 
 export type TLimitsResponseSchema = z.infer<typeof ZLimitsResponseSchema>;

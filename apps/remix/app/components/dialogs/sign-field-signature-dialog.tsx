@@ -17,6 +17,7 @@ import { DocumentSigningDisclosure } from '../general/document-signing/document-
 
 export type SignFieldSignatureDialogProps = {
   initialSignature?: string;
+  fullName?: string;
   typedSignatureEnabled?: boolean;
   uploadSignatureEnabled?: boolean;
   drawSignatureEnabled?: boolean;
@@ -28,6 +29,7 @@ export const SignFieldSignatureDialog = createCallable<
 >(
   ({
     call,
+    fullName,
     typedSignatureEnabled,
     uploadSignatureEnabled,
     drawSignatureEnabled,
@@ -46,6 +48,7 @@ export const SignFieldSignatureDialog = createCallable<
             </DialogHeader>
 
             <SignaturePad
+              fullName={fullName}
               value={localSignature ?? ''}
               onChange={({ value }) => setLocalSignature(value)}
               typedSignatureEnabled={typedSignatureEnabled}

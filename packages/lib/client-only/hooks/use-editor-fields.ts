@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { Recipient } from '@prisma/client';
+import type { Field, Recipient } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { getPdfPagesCount } from '@documenso/lib/constants/pdf-viewer';
+import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
-
-import type { TEnvelope } from '../../types/envelope';
 
 export const ZLocalFieldSchema = z.object({
   // This is the actual ID of the field if created.
@@ -37,7 +37,7 @@ const ZEditorFieldsFormSchema = z.object({
 export type TEditorFieldsFormSchema = z.infer<typeof ZEditorFieldsFormSchema>;
 
 type EditorFieldsProps = {
-  envelope: TEnvelope;
+  envelope: TEditorEnvelope;
   handleFieldsUpdate: (fields: TLocalField[]) => unknown;
 };
 
@@ -50,6 +50,7 @@ type UseEditorFieldsResponse = {
 
   // Field operations
   addField: (field: Omit<TLocalField, 'formId'>) => TLocalField;
+  setFieldId: (formId: string, id: number) => void;
   removeFieldsByFormId: (formIds: string[]) => void;
   updateFieldByFormId: (formId: string, updates: Partial<TLocalField>) => void;
   duplicateField: (field: TLocalField, recipientId?: number) => TLocalField;
@@ -62,6 +63,8 @@ type UseEditorFieldsResponse = {
   // Selected recipient
   selectedRecipient: Recipient | null;
   setSelectedRecipient: (recipientId: number | null) => void;
+
+  resetForm: (fields?: Field[]) => void;
 };
 
 export const useEditorFields = ({
@@ -71,24 +74,30 @@ export const useEditorFields = ({
   const [selectedFieldFormId, setSelectedFieldFormId] = useState<string | null>(null);
   const [selectedRecipientId, setSelectedRecipientId] = useState<number | null>(null);
 
+  const generateDefaultValues = (fields?: Field[]) => {
+    const formFields = (fields || envelope.fields).map(
+      (field): TLocalField => ({
+        id: field.id,
+        formId: nanoid(),
+        envelopeItemId: field.envelopeItemId,
+        page: field.page,
+        type: field.type,
+        positionX: Number(field.positionX),
+        positionY: Number(field.positionY),
+        width: Number(field.width),
+        height: Number(field.height),
+        recipientId: field.recipientId,
+        fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
+      }),
+    );
+
+    return {
+      fields: formFields,
+    };
+  };
+
   const form = useForm<TEditorFieldsFormSchema>({
-    defaultValues: {
-      fields: envelope.fields.map(
-        (field): TLocalField => ({
-          id: field.id,
-          formId: nanoid(),
-          envelopeItemId: field.envelopeItemId,
-          page: field.page,
-          type: field.type,
-          positionX: Number(field.positionX),
-          positionY: Number(field.positionY),
-          width: Number(field.width),
-          height: Number(field.height),
-          recipientId: field.recipientId,
-          fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
-        }),
-      ),
-    },
+    defaultValues: generateDefaultValues(),
     resolver: zodResolver(ZEditorFieldsFormSchema),
   });
 
@@ -123,7 +132,6 @@ export const useEditorFields = ({
     }
 
     if (bypassCheck) {
-      console.log(3);
       setSelectedFieldFormId(formId);
       return;
     }
@@ -136,6 +144,7 @@ export const useEditorFields = ({
       const field: TLocalField = {
         ...fieldData,
         formId: nanoid(12),
+        ...restrictFieldPosValues(fieldData),
       };
 
       append(field);
@@ -160,12 +169,33 @@ export const useEditorFields = ({
     [localFields, remove, triggerFieldsUpdate],
   );
 
+  const setFieldId = (formId: string, id: number) => {
+    const { fields } = form.getValues();
+
+    const index = fields.findIndex((field) => field.formId === formId);
+
+    if (index !== -1) {
+      update(index, {
+        ...fields[index],
+        id,
+      });
+    }
+  };
+
   const updateFieldByFormId = useCallback(
     (formId: string, updates: Partial<TLocalField>) => {
       const index = localFields.findIndex((field) => field.formId === formId);
 
       if (index !== -1) {
-        update(index, { ...localFields[index], ...updates });
+        const updatedField = {
+          ...localFields[index],
+          ...updates,
+        };
+
+        update(index, {
+          ...updatedField,
+          ...restrictFieldPosValues(updatedField),
+        });
         triggerFieldsUpdate();
       }
     },
@@ -192,14 +222,16 @@ export const useEditorFields = ({
 
   const duplicateFieldToAllPages = useCallback(
     (field: TLocalField): TLocalField[] => {
-      const pages = Array.from(document.querySelectorAll('[data-page-number]'));
+      const totalPages = getPdfPagesCount();
       const newFields: TLocalField[] = [];
 
-      pages.forEach((_, index) => {
-        const pageNumber = index + 1;
+      if (totalPages < 1) {
+        return newFields;
+      }
 
+      for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
         if (pageNumber === field.page) {
-          return;
+          continue;
         }
 
         const newField: TLocalField = {
@@ -211,7 +243,7 @@ export const useEditorFields = ({
 
         append(newField);
         newFields.push(newField);
-      });
+      }
 
       triggerFieldsUpdate();
       return newFields;
@@ -255,12 +287,17 @@ export const useEditorFields = ({
     setSelectedRecipientId(foundRecipient?.id ?? null);
   };
 
+  const resetForm = (fields?: Field[]) => {
+    form.reset(generateDefaultValues(fields));
+  };
+
   return {
     // Core state
     localFields,
 
     // Field operations
     addField,
+    setFieldId,
     removeFieldsByFormId,
     updateFieldByFormId,
     duplicateField,
@@ -277,5 +314,18 @@ export const useEditorFields = ({
     // Selected recipient
     selectedRecipient,
     setSelectedRecipient,
+
+    resetForm,
+  };
+};
+
+const restrictFieldPosValues = (
+  field: Pick<TLocalField, 'positionX' | 'positionY' | 'width' | 'height'>,
+) => {
+  return {
+    positionX: Math.max(0, Math.min(100, field.positionX)),
+    positionY: Math.max(0, Math.min(100, field.positionY)),
+    width: Math.max(0, Math.min(100, field.width)),
+    height: Math.max(0, Math.min(100, field.height)),
   };
 };

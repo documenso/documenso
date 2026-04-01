@@ -9,6 +9,12 @@ import { DocumentSignatureType } from '@documenso/lib/utils/teams';
 
 export { DocumentSignatureType };
 
+/**
+ * Maximum count returned per status bucket in document stats. The server clamps
+ * each count to this value; the UI should display "10,000+" when it sees it.
+ */
+export const STATS_COUNT_CAP = 10_000;
+
 export const DOCUMENT_STATUS: {
   [status in DocumentStatus]: { description: MessageDescriptor };
 } = {
@@ -51,21 +57,21 @@ export const DOCUMENT_SIGNATURE_TYPES = {
   [DocumentSignatureType.DRAW]: {
     label: msg({
       message: `Draw`,
-      context: `Draw signatute type`,
+      context: `Draw signature`,
     }),
     value: DocumentSignatureType.DRAW,
   },
   [DocumentSignatureType.TYPE]: {
     label: msg({
       message: `Type`,
-      context: `Type signatute type`,
+      context: `Type signature`,
     }),
     value: DocumentSignatureType.TYPE,
   },
   [DocumentSignatureType.UPLOAD]: {
     label: msg({
       message: `Upload`,
-      context: `Upload signatute type`,
+      context: `Upload signature`,
     }),
     value: DocumentSignatureType.UPLOAD,
   },

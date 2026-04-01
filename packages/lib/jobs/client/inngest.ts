@@ -1,8 +1,8 @@
 import type { Context as HonoContext } from 'hono';
 import type { Context, Handler, InngestFunction } from 'inngest';
 import { Inngest as InngestClient } from 'inngest';
+import type { Logger } from 'inngest';
 import { serve as createHonoPagesRoute } from 'inngest/hono';
-import type { Logger } from 'inngest/middleware/logger';
 
 import { env } from '../../utils/env';
 import type { JobDefinition, JobRunIO, SimpleTriggerJobOptions } from './_internal/job';
@@ -26,6 +26,7 @@ export class InngestJobProvider extends BaseJobProvider {
       const client = new InngestClient({
         id: env('NEXT_PRIVATE_INNGEST_APP_ID') || 'documenso-app',
         eventKey: env('INNGEST_EVENT_KEY') || env('NEXT_PRIVATE_INNGEST_EVENT_KEY'),
+        logger: console,
       });
 
       this._instance = new InngestJobProvider({ client });
@@ -35,55 +36,33 @@ export class InngestJobProvider extends BaseJobProvider {
   }
 
   public defineJob<N extends string, T>(job: JobDefinition<N, T>): void {
-    let jobFunction: InngestFunction.Any;
+    const triggerConfig: { cron: string } | { event: N } = job.trigger.cron
+      ? { cron: job.trigger.cron }
+      : { event: job.trigger.name };
 
-    if (job.trigger.type === 'cron') {
-      jobFunction = this._client.createFunction(
-        {
-          id: job.id,
-          name: job.name,
-        },
-        {
-          cron: job.trigger.schedule,
-        },
-        async (ctx) => {
-          const io = this.convertInngestIoToJobRunIo(ctx);
-          const payload: T | undefined = undefined;
+    const fn = this._client.createFunction(
+      {
+        id: job.id,
+        name: job.name,
+        optimizeParallelism: job.optimizeParallelism ?? false,
+      },
+      triggerConfig,
+      async (ctx) => {
+        const io = this.convertInngestIoToJobRunIo(ctx);
 
-          if (job.trigger.schema) {
-            console.warn(
-              `Job "${job.id}" is cron-triggered but defines a schema. The schema will be ignored. `,
-            );
-          }
+        // We need to cast to any so we can deal with parsing later.
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any
+        let payload = ctx.event.data as any;
 
-          await job.handler({ payload: payload as T, io });
-        },
-      );
-    } else {
-      jobFunction = this._client.createFunction(
-        {
-          id: job.id,
-          name: job.name,
-        },
-        {
-          event: job.trigger.name,
-        },
-        async (ctx) => {
-          const io = this.convertInngestIoToJobRunIo(ctx);
+        if (job.trigger.schema) {
+          payload = job.trigger.schema.parse(payload);
+        }
 
-          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any
-          let payload = ctx.event.data as any;
+        await job.handler({ payload, io });
+      },
+    );
 
-          if (job.trigger.schema) {
-            payload = job.trigger.schema.parse(payload);
-          }
-
-          await job.handler({ payload, io });
-        },
-      );
-    }
-
-    this._functions.push(jobFunction);
+    this._functions.push(fn);
   }
 
   public async triggerJob(options: SimpleTriggerJobOptions): Promise<void> {
@@ -113,9 +92,9 @@ export class InngestJobProvider extends BaseJobProvider {
       wait: step.sleep,
       logger: {
         info: ctx.logger.info,
+        debug: ctx.logger.debug,
         error: ctx.logger.error,
         warn: ctx.logger.warn,
-        debug: ctx.logger.debug,
         log: ctx.logger.info,
       },
       runTask: async (cacheKey, callback) => {

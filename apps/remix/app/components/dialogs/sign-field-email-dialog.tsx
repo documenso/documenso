@@ -5,6 +5,7 @@ import { createCallable } from 'react-call';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { zEmail } from '@documenso/lib/utils/zod';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -24,32 +25,34 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 
 const ZSignFieldEmailFormSchema = z.object({
-  email: z.string().min(1, { message: msg`Email is required`.id }),
+  email: zEmail().min(1, { message: msg`Email is required`.id }),
 });
 
 type TSignFieldEmailFormSchema = z.infer<typeof ZSignFieldEmailFormSchema>;
 
-export type SignFieldEmailDialogProps = Record<string, never>;
+export type SignFieldEmailDialogProps = {
+  placeholderEmail: string | null;
+};
 
 export const SignFieldEmailDialog = createCallable<SignFieldEmailDialogProps, string | null>(
-  ({ call }) => {
+  ({ call, placeholderEmail }) => {
     const form = useForm<TSignFieldEmailFormSchema>({
       resolver: zodResolver(ZSignFieldEmailFormSchema),
       defaultValues: {
-        email: '',
+        email: placeholderEmail || '',
       },
     });
 
     return (
       <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
-        <DialogContent position="center">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              <Trans>Sign Email</Trans>
+              <Trans>Enter Email</Trans>
             </DialogTitle>
 
             <DialogDescription className="mt-4">
-              <Trans>Sign your email into the field</Trans>
+              <Trans>Please enter your email address</Trans>
             </DialogDescription>
           </DialogHeader>
 
@@ -78,7 +81,7 @@ export const SignFieldEmailDialog = createCallable<SignFieldEmailDialogProps, st
                   </Button>
 
                   <Button type="submit">
-                    <Trans>Sign</Trans>
+                    <Trans>Enter</Trans>
                   </Button>
                 </DialogFooter>
               </fieldset>

@@ -21,6 +21,7 @@ import type { ApiRequestMetadata } from '../../universal/extract-request-metadat
 import { isDocumentCompleted } from '../../utils/document';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { type EnvelopeIdOptions, unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
+import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 import { getMemberRoles } from '../team/get-member-roles';
@@ -92,6 +93,13 @@ export const deleteDocument = async ({
       user,
       requestMetadata,
     });
+
+    await triggerWebhook({
+      event: WebhookTriggerEvents.DOCUMENT_CANCELLED,
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
+      userId,
+      teamId,
+    });
   }
 
   // Continue to hide the document from the user if they are a recipient.
@@ -110,13 +118,6 @@ export const deleteDocument = async ({
         // Do nothing.
       });
   }
-
-  await triggerWebhook({
-    event: WebhookTriggerEvents.DOCUMENT_CANCELLED,
-    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
-    userId,
-    teamId,
-  });
 
   return envelope;
 };
@@ -209,7 +210,7 @@ const handleDocumentOwnerDelete = async ({
   // Send cancellation emails to recipients.
   await Promise.all(
     envelope.recipients.map(async (recipient) => {
-      if (recipient.sendStatus !== SendStatus.SENT) {
+      if (recipient.sendStatus !== SendStatus.SENT || !isRecipientEmailValidForSending(recipient)) {
         return;
       }
 

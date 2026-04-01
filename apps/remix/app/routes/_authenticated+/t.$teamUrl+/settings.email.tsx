@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 
 import { trpc } from '@documenso/trpc/react';
@@ -13,7 +14,7 @@ import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Settings');
+  return appMetaTags(msg`Settings`);
 }
 
 export default function TeamEmailSettingsGeneral() {
@@ -63,7 +64,7 @@ export default function TeamEmailSettingsGeneral() {
     <div className="max-w-2xl">
       <SettingsHeader
         title={t`Email Preferences`}
-        subtitle={t`You can manage your email preferences here`}
+        subtitle={t`You can manage your email preferences here.`}
       />
 
       <section>

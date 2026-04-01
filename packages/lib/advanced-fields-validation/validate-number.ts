@@ -11,7 +11,7 @@ export const validateNumberField = (
 
   const { minValue, maxValue, readOnly, required, numberFormat, fontSize } = fieldMeta || {};
 
-  if (numberFormat) {
+  if (numberFormat && value.length > 0) {
     const foundRegex = numberFormatValues.find((item) => item.value === numberFormat)?.regex;
 
     if (!foundRegex) {
@@ -29,7 +29,7 @@ export const validateNumberField = (
     errors.push('Value is required');
   }
 
-  if (!/^[0-9,.]+$/.test(value.trim())) {
+  if ((isSigningPage || value.length > 0) && !/^[0-9,.]+$/.test(value.trim())) {
     errors.push(`Value is not a valid number`);
   }
 

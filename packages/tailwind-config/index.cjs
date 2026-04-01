@@ -11,6 +11,7 @@ module.exports = {
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
         signature: ['var(--font-signature)'],
+        noto: ['var(--font-noto)'],
       },
       zIndex: {
         9999: '9999',
@@ -29,6 +30,7 @@ module.exports = {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
         },
+        'envelope-editor-background': 'hsl(var(--envelope-editor-background))',
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
           foreground: 'hsl(var(--secondary-foreground))',

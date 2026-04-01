@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -34,8 +34,8 @@ export const RecipientSelector = ({
   const { _ } = useLingui();
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
-  const recipientsByRole = useCallback(() => {
-    const recipientsByRole: Record<RecipientRole, Recipient[]> = {
+  const recipientsByRole = useMemo(() => {
+    const recipientsWithRole: Record<RecipientRole, Recipient[]> = {
       CC: [],
       VIEWER: [],
       SIGNER: [],
@@ -44,14 +44,14 @@ export const RecipientSelector = ({
     };
 
     recipients.forEach((recipient) => {
-      recipientsByRole[recipient.role].push(recipient);
+      recipientsWithRole[recipient.role].push(recipient);
     });
 
-    return recipientsByRole;
+    return recipientsWithRole;
   }, [recipients]);
 
-  const recipientsByRoleToDisplay = useCallback(() => {
-    return Object.entries(recipientsByRole())
+  const recipientsByRoleToDisplay = useMemo(() => {
+    return Object.entries(recipientsByRole)
       .filter(
         ([role]) =>
           role !== RecipientRole.CC &&
@@ -71,6 +71,28 @@ export const RecipientSelector = ({
       );
   }, [recipientsByRole]);
 
+  const getRecipientLabel = useCallback(
+    (recipient: Recipient) => {
+      if (recipient.name && recipient.email) {
+        return `${recipient.name} (${recipient.email})`;
+      }
+
+      if (recipient.name) {
+        return recipient.name;
+      }
+
+      if (recipient.email) {
+        return recipient.email;
+      }
+
+      // Since objects are basically pointers we can use `indexOf` rather than `findIndex`
+      const index = recipients.indexOf(recipient);
+
+      return `Recipient ${index + 1}`;
+    },
+    [recipients, selectedRecipient],
+  );
+
   return (
     <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>
       <PopoverTrigger asChild>
@@ -79,24 +101,16 @@ export const RecipientSelector = ({
           variant="outline"
           role="combobox"
           className={cn(
-            'bg-background text-muted-foreground hover:text-foreground justify-between font-normal',
-            getRecipientColorStyles(
-              Math.max(
-                recipients.findIndex((r) => r.id === selectedRecipient?.id),
-                0,
-              ),
-            ).comboxBoxTrigger,
+            'justify-between bg-background font-normal text-muted-foreground hover:text-foreground',
+            getRecipientColorStyles(recipients.findIndex((r) => r.id === selectedRecipient?.id))
+              .comboBoxTrigger,
             className,
           )}
         >
-          {selectedRecipient?.email && (
+          {selectedRecipient && (
             <span className="flex-1 truncate text-left">
-              {selectedRecipient?.name} ({selectedRecipient?.email})
+              {getRecipientLabel(selectedRecipient)}
             </span>
-          )}
-
-          {!selectedRecipient?.email && (
-            <span className="flex-1 truncate text-left">{selectedRecipient?.email}</span>
           )}
 
           <ChevronsUpDown className="ml-2 h-4 w-4" />
@@ -108,21 +122,21 @@ export const RecipientSelector = ({
           <CommandInput />
 
           <CommandEmpty>
-            <span className="text-muted-foreground inline-block px-4">
+            <span className="inline-block px-4 text-muted-foreground">
               <Trans>No recipient matching this description was found.</Trans>
             </span>
           </CommandEmpty>
 
-          {recipientsByRoleToDisplay().map(([role, roleRecipients], roleIndex) => (
+          {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
             <CommandGroup key={roleIndex}>
-              <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
+              <div className="mb-1 ml-2 mt-2 text-xs font-medium text-muted-foreground">
                 {_(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
               </div>
 
               {roleRecipients.length === 0 && (
                 <div
                   key={`${role}-empty`}
-                  className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
+                  className="px-4 pb-4 pt-2.5 text-center text-xs text-muted-foreground/80"
                 >
                   <Trans>No recipients with this role</Trans>
                 </div>
@@ -133,12 +147,8 @@ export const RecipientSelector = ({
                   key={recipient.id}
                   className={cn(
                     'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
-                    getRecipientColorStyles(
-                      Math.max(
-                        recipients.findIndex((r) => r.id === recipient.id),
-                        0,
-                      ),
-                    ).comboxBoxItem,
+                    getRecipientColorStyles(recipients.findIndex((r) => r.id === recipient.id))
+                      .comboBoxItem,
                     {
                       'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
                     },
@@ -150,17 +160,11 @@ export const RecipientSelector = ({
                   disabled={recipient.signingStatus !== SigningStatus.NOT_SIGNED}
                 >
                   <span
-                    className={cn('text-foreground/70 truncate', {
+                    className={cn('truncate text-foreground/70', {
                       'text-foreground/80': recipient.id === selectedRecipient?.id,
                     })}
                   >
-                    {recipient.name && (
-                      <span title={`${recipient.name} (${recipient.email})`}>
-                        {recipient.name} ({recipient.email})
-                      </span>
-                    )}
-
-                    {!recipient.name && <span title={recipient.email}>{recipient.email}</span>}
+                    {getRecipientLabel(recipient)}
                   </span>
 
                   <div className="ml-auto flex items-center justify-center">
@@ -178,7 +182,7 @@ export const RecipientSelector = ({
                           <Info className="ml-2 h-4 w-4" />
                         </TooltipTrigger>
 
-                        <TooltipContent className="text-muted-foreground max-w-xs">
+                        <TooltipContent className="max-w-xs text-muted-foreground">
                           <Trans>
                             This document has already been sent to this recipient. You can no longer
                             edit this recipient.

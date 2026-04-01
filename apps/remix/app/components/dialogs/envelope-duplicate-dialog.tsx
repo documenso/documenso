@@ -43,7 +43,7 @@ export const EnvelopeDuplicateDialog = ({
 
   const { mutateAsync: duplicateEnvelope, isPending: isDuplicating } =
     trpc.envelope.duplicate.useMutation({
-      onSuccess: async ({ duplicatedEnvelopeId }) => {
+      onSuccess: async ({ id }) => {
         toast({
           title: t`Envelope Duplicated`,
           description: t`Your envelope has been successfully duplicated.`,
@@ -55,7 +55,7 @@ export const EnvelopeDuplicateDialog = ({
             ? formatDocumentsPath(team.url)
             : formatTemplatesPath(team.url);
 
-        await navigate(`${path}/${duplicatedEnvelopeId}/edit`);
+        await navigate(`${path}/${id}/edit`);
         setOpen(false);
       },
     });

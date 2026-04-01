@@ -16,6 +16,7 @@ import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
+import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { formatDocumentsPath } from '../../utils/teams';
@@ -81,11 +82,15 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
   const { user: owner } = envelope;
 
   const completedDocumentEmailAttachments = await Promise.all(
-    envelope.envelopeItems.map(async (document) => {
-      const file = await getFileServerSide(document.documentData);
+    envelope.envelopeItems.map(async (envelopeItem) => {
+      const file = await getFileServerSide(envelopeItem.documentData);
+
+      // Use the envelope title for version 1, and the envelope item title for version 2.
+      const fileNameToUse =
+        envelope.internalVersion === 1 ? envelope.title : envelopeItem.title + '.pdf';
 
       return {
-        fileName: document.title.endsWith('.pdf') ? document.title : document.title + '.pdf',
+        filename: fileNameToUse.endsWith('.pdf') ? fileNameToUse : fileNameToUse + '.pdf',
         content: Buffer.from(file),
         contentType: 'application/pdf',
       };
@@ -172,8 +177,12 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
     return;
   }
 
+  const recipientsToNotify = envelope.recipients.filter((recipient) =>
+    isRecipientEmailValidForSending(recipient),
+  );
+
   await Promise.all(
-    envelope.recipients.map(async (recipient) => {
+    recipientsToNotify.map(async (recipient) => {
       const customEmailTemplate = {
         'signer.name': recipient.name,
         'signer.email': recipient.email,

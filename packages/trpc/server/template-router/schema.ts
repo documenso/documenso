@@ -1,12 +1,15 @@
 import { DocumentSigningOrder, DocumentVisibility, TemplateType } from '@prisma/client';
 import { z } from 'zod';
+import { zfd } from 'zod-form-data';
 
+import { ZEnvelopeExpirationPeriod } from '@documenso/lib/constants/envelope-expiration';
 import { ZDocumentSchema } from '@documenso/lib/types/document';
 import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
@@ -19,15 +22,21 @@ import {
   ZDocumentMetaTypedSignatureEnabledSchema,
   ZDocumentMetaUploadSignatureEnabledSchema,
 } from '@documenso/lib/types/document-meta';
+import { ZEnvelopeSchema } from '@documenso/lib/types/envelope';
+import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
 import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
+import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import {
   ZTemplateLiteSchema,
   ZTemplateManySchema,
   ZTemplateSchema,
 } from '@documenso/lib/types/template';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { LegacyTemplateDirectLinkSchema } from '@documenso/prisma/types/template-legacy-schema';
+import { ZDocumentExternalIdSchema } from '@documenso/trpc/server/document-router/schema';
 
+import { zfdFile, zodFormData } from '../../utils/zod-form-data';
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
 
 export const MAX_TEMPLATE_PUBLIC_TITLE_LENGTH = 50;
@@ -65,7 +74,7 @@ export const ZTemplateMetaUpsertSchema = z.object({
   dateFormat: ZDocumentMetaDateFormatSchema.optional(),
   distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
   emailId: z.string().nullish(),
-  emailReplyTo: z.string().email().nullish(),
+  emailReplyTo: zEmail().nullish(),
   emailSettings: ZDocumentEmailSettingsSchema.optional(),
   redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
   language: ZDocumentMetaLanguageSchema.optional(),
@@ -76,28 +85,29 @@ export const ZTemplateMetaUpsertSchema = z.object({
   allowDictateNextSigner: z.boolean().optional(),
 });
 
-export const ZCreateTemplateMutationSchema = z.object({
-  title: z.string().min(1).trim(),
-  templateDocumentDataId: z.string().min(1),
-  folderId: z.string().optional(),
-});
-
 export const ZCreateDocumentFromDirectTemplateRequestSchema = z.object({
   directRecipientName: z.string().max(255).optional(),
-  directRecipientEmail: z.string().email().max(254),
+  directRecipientEmail: zEmail().max(254),
   directTemplateToken: z.string().min(1),
   directTemplateExternalId: z.string().optional(),
   signedFieldValues: z.array(ZSignFieldWithTokenMutationSchema),
   templateUpdatedAt: z.date(),
+  nextSigner: z
+    .object({
+      email: zEmail().max(254),
+      name: z.string().min(1).max(255),
+    })
+    .optional(),
 });
 
 export const ZCreateDocumentFromTemplateRequestSchema = z.object({
   templateId: z.number(),
+  externalId: ZDocumentExternalIdSchema.optional(),
   recipients: z
     .array(
       z.object({
         id: z.number().describe('The ID of the recipient in the template.'),
-        email: z.string().email().max(254),
+        email: ZRecipientEmailSchema,
         name: z.string().max(255).optional(),
       }),
     )
@@ -130,12 +140,45 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
       'The ID of the folder to create the document in. If not provided, the document will be created in the root folder.',
     )
     .optional(),
+
   prefillFields: z
     .array(ZFieldMetaPrefillFieldsSchema)
     .describe(
       'The fields to prefill on the document before sending it out. Useful when you want to create a document from an existing template and pre-fill the fields with specific values.',
     )
     .optional(),
+
+  override: z
+    .object({
+      title: z.string().min(1).max(255).optional(),
+      subject: ZDocumentMetaSubjectSchema.optional(),
+      message: ZDocumentMetaMessageSchema.optional(),
+      timezone: ZDocumentMetaTimezoneSchema.optional(),
+      dateFormat: ZDocumentMetaDateFormatSchema.optional(),
+      redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
+      distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
+      emailSettings: ZDocumentEmailSettingsSchema.optional(),
+      language: ZDocumentMetaLanguageSchema.optional(),
+      typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
+      uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
+      drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
+      allowDictateNextSigner: z.boolean().optional(),
+      envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullish(),
+    })
+    .describe('Override values from the template for the created document.')
+    .optional(),
+
+  attachments: z
+    .array(
+      z.object({
+        label: z.string().min(1, 'Label is required'),
+        data: z.string().url('Must be a valid URL'),
+        type: ZEnvelopeAttachmentTypeSchema.optional().default('link'),
+      }),
+    )
+    .optional(),
+
+  formValues: ZDocumentFormValuesSchema.optional(),
 });
 
 export const ZCreateDocumentFromTemplateResponseSchema = ZDocumentSchema;
@@ -197,6 +240,15 @@ export const ZCreateTemplateV2RequestSchema = z.object({
   publicDescription: ZTemplatePublicDescriptionSchema.optional(),
   type: z.nativeEnum(TemplateType).optional(),
   meta: ZTemplateMetaUpsertSchema.optional(),
+  attachments: z
+    .array(
+      z.object({
+        label: z.string().min(1, 'Label is required'),
+        data: z.string().url('Must be a valid URL'),
+        type: ZEnvelopeAttachmentTypeSchema.optional().default('link'),
+      }),
+    )
+    .optional(),
 });
 
 /**
@@ -208,7 +260,15 @@ export const ZCreateTemplateV2ResponseSchema = z.object({
 });
 
 export const ZCreateTemplateResponseSchema = z.object({
-  legacyTemplateId: z.number(),
+  envelopeId: z.string(),
+  id: z.number(),
+});
+
+export const ZCreateTemplatePayloadSchema = ZCreateTemplateV2RequestSchema;
+
+export const ZCreateTemplateMutationSchema = zodFormData({
+  payload: zfd.json(ZCreateTemplatePayloadSchema),
+  file: zfdFile(),
 });
 
 export const ZUpdateTemplateRequestSchema = z.object({
@@ -237,6 +297,8 @@ export const ZFindTemplatesRequestSchema = ZFindSearchParamsSchema.extend({
   folderId: z.string().describe('The ID of the folder to filter templates by.').optional(),
 });
 
+export const ZFindOrganisationTemplatesRequestSchema = ZFindSearchParamsSchema;
+
 export const ZFindTemplatesResponseSchema = ZFindResultResponse.extend({
   data: ZTemplateManySchema.array(),
 });
@@ -250,6 +312,12 @@ export const ZGetTemplateByIdRequestSchema = z.object({
 
 export const ZGetTemplateByIdResponseSchema = ZTemplateSchema;
 
+export const ZGetOrganisationTemplateByIdRequestSchema = z.object({
+  envelopeId: z.string(),
+});
+
+export const ZGetOrganisationTemplateByIdResponseSchema = ZEnvelopeSchema;
+
 export const ZBulkSendTemplateMutationSchema = z.object({
   templateId: z.number(),
   teamId: z.number(),
@@ -257,6 +325,7 @@ export const ZBulkSendTemplateMutationSchema = z.object({
   sendImmediately: z.boolean(),
 });
 
+export type TCreateTemplatePayloadSchema = z.input<typeof ZCreateTemplatePayloadSchema>;
 export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationSchema>;
 export type TDuplicateTemplateMutationSchema = z.infer<typeof ZDuplicateTemplateMutationSchema>;
 export type TDeleteTemplateMutationSchema = z.infer<typeof ZDeleteTemplateMutationSchema>;

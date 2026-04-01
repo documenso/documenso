@@ -6,7 +6,7 @@ import { env } from '@documenso/lib/utils/env';
 import type {
   TGetPresignedPostUrlResponse,
   TUploadPdfResponse,
-} from '@documenso/remix/server/api/files.types';
+} from '@documenso/remix/server/api/files/files.types';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError } from '../../errors/app-error';

@@ -23,7 +23,7 @@ test('[USER] can sign up with email and password', async ({ page }: { page: Page
 
   await signSignaturePad(page);
 
-  await page.getByRole('button', { name: 'Complete', exact: true }).click();
+  await page.getByRole('button', { name: 'Create account', exact: true }).click();
 
   await page.waitForURL('/unverified-account');
 

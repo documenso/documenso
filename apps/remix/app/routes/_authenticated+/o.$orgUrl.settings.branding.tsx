@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
 import { Link } from 'react-router';
@@ -21,7 +22,7 @@ import { useOptionalCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Branding Preferences');
+  return appMetaTags(msg`Branding Preferences`);
 }
 
 export default function OrganisationSettingsBrandingPage() {
@@ -79,7 +80,7 @@ export default function OrganisationSettingsBrandingPage() {
   if (isLoadingOrganisation || !organisationWithSettings) {
     return (
       <div className="flex items-center justify-center rounded-lg py-32">
-        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
+        <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -87,9 +88,9 @@ export default function OrganisationSettingsBrandingPage() {
   const settingsHeaderText = t`Branding Preferences`;
 
   const settingsHeaderSubtitle = isPersonalLayoutMode
-    ? t`Here you can set your general branding preferences`
+    ? t`Here you can set your general branding preferences.`
     : team
-      ? t`Here you can set branding preferences for your team`
+      ? t`Here you can set branding preferences for your team.`
       : t`Here you can set branding preferences for your organisation. Teams will inherit these settings by default.`;
 
   return (

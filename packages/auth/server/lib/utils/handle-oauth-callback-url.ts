@@ -3,8 +3,14 @@ import { OAuth2Client, decodeIdToken } from 'arctic';
 import type { Context } from 'hono';
 import { deleteCookie } from 'hono/cookie';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { isEmailDomainAllowedForSignup } from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
+import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
+import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
+import { env } from '@documenso/lib/utils/env';
+import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { prisma } from '@documenso/prisma';
 
 import type { OAuthClientOptions } from '../../config';
@@ -24,6 +30,13 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
 
   const { email, name, sub, accessToken, accessTokenExpiresAt, idToken, redirectPath } =
     await validateOauth({ c, clientOptions });
+
+  if (
+    email.toLowerCase() === legacyServiceAccountEmail() ||
+    email.toLowerCase() === deletedServiceAccountEmail()
+  ) {
+    return c.text('FORBIDDEN', 403);
+  }
 
   // Find the account if possible.
   const existingAccount = await prisma.account.findFirst({
@@ -104,6 +117,24 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
     return c.redirect(redirectPath, 302);
   }
 
+  // Check if signups are disabled.
+  if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
+    const errorUrl = new URL('/signin', NEXT_PUBLIC_WEBAPP_URL());
+
+    errorUrl.searchParams.set('error', AuthenticationErrorCode.SignupDisabled);
+
+    return c.redirect(errorUrl.toString(), 302);
+  }
+
+  // Check domain restriction for new SSO users.
+  if (!isEmailDomainAllowedForSignup(email)) {
+    const errorUrl = new URL('/signin', NEXT_PUBLIC_WEBAPP_URL());
+
+    errorUrl.searchParams.set('error', AuthenticationErrorCode.SignupDisabled);
+
+    return c.redirect(errorUrl.toString(), 302);
+  }
+
   // Handle new user.
   const createdUser = await prisma.$transaction(async (tx) => {
     const user = await tx.user.create({
@@ -176,6 +207,12 @@ export const validateOauth = async (options: HandleOAuthCallbackUrlOptions) => {
   if (redirectState !== storedState || !redirectPath) {
     redirectPath = '/';
   }
+
+  if (!isValidReturnTo(redirectPath)) {
+    redirectPath = '/';
+  }
+
+  redirectPath = normalizeReturnTo(redirectPath) || '/';
 
   const tokens = await oAuthClient.validateAuthorizationCode(
     token_endpoint,

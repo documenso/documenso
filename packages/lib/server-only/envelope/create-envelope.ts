@@ -10,16 +10,26 @@ import {
 } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import type { PlaceholderInfo } from '@documenso/lib/server-only/pdf/auto-place-fields';
+import { convertPlaceholdersToFieldInputs } from '@documenso/lib/server-only/pdf/auto-place-fields';
+import { findRecipientByPlaceholder } from '@documenso/lib/server-only/pdf/helpers';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
+import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { TCreateEnvelopeRequest } from '@documenso/trpc/server/envelope-router/create-envelope.types';
 
-import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
+import type {
+  TDocumentAccessAuthTypes,
+  TDocumentActionAuthTypes,
+  TRecipientAccessAuthTypes,
+  TRecipientActionAuthTypes,
+} from '../../types/document-auth';
 import type { TDocumentFormValues } from '../../types/document-form-values';
+import type { TEnvelopeAttachmentType } from '../../types/envelope-attachment';
+import type { TFieldAndMeta } from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
   mapEnvelopeToWebhookDocumentPayload,
@@ -33,6 +43,25 @@ import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
+type CreateEnvelopeRecipientFieldOptions = TFieldAndMeta & {
+  documentDataId: string;
+  page: number;
+  positionX: number;
+  positionY: number;
+  width: number;
+  height: number;
+};
+
+type CreateEnvelopeRecipientOptions = {
+  email: string;
+  name: string;
+  role: RecipientRole;
+  signingOrder?: number;
+  accessAuth?: TRecipientAccessAuthTypes[];
+  actionAuth?: TRecipientActionAuthTypes[];
+  fields?: CreateEnvelopeRecipientFieldOptions[];
+};
+
 export type CreateEnvelopeOptions = {
   userId: number;
   teamId: number;
@@ -42,10 +71,14 @@ export type CreateEnvelopeOptions = {
     type: EnvelopeType;
     title: string;
     externalId?: string;
-    envelopeItems: { title?: string; documentDataId: string; order?: number }[];
+    envelopeItems: {
+      title?: string;
+      documentDataId: string;
+      order?: number;
+      placeholders?: PlaceholderInfo[];
+    }[];
     formValues?: TDocumentFormValues;
 
-    timezone?: string;
     userTimezone?: string;
 
     templateType?: TemplateType;
@@ -55,9 +88,23 @@ export type CreateEnvelopeOptions = {
     visibility?: DocumentVisibility;
     globalAccessAuth?: TDocumentAccessAuthTypes[];
     globalActionAuth?: TDocumentActionAuthTypes[];
-    recipients?: TCreateEnvelopeRequest['recipients'];
+    recipients?: CreateEnvelopeRecipientOptions[];
     folderId?: string;
+    delegatedDocumentOwner?: string;
   };
+  attachments?: Array<{
+    label: string;
+    data: string;
+    type?: TEnvelopeAttachmentType;
+  }>;
+
+  /**
+   * Whether to bypass adding default recipients.
+   *
+   * Defaults to false.
+   */
+  bypassDefaultRecipients?: boolean;
+
   meta?: Partial<Omit<DocumentMeta, 'id'>>;
   requestMetadata: ApiRequestMetadata;
 };
@@ -67,16 +114,17 @@ export const createEnvelope = async ({
   teamId,
   normalizePdf,
   data,
+  attachments,
   meta,
   requestMetadata,
   internalVersion,
+  bypassDefaultRecipients = false,
 }: CreateEnvelopeOptions) => {
   const {
     type,
     title,
     externalId,
     formValues,
-    timezone,
     userTimezone,
     folderId,
     templateType,
@@ -85,6 +133,7 @@ export const createEnvelope = async ({
     publicTitle,
     publicDescription,
     visibility: visibilityOverride,
+    delegatedDocumentOwner,
   } = data;
 
   const team = await prisma.team.findFirst({
@@ -132,9 +181,9 @@ export const createEnvelope = async ({
     });
   }
 
-  let envelopeItems: { title?: string; documentDataId: string; order?: number }[] =
-    data.envelopeItems;
+  let envelopeItems = data.envelopeItems;
 
+  // Todo: Envelopes - Remove
   if (normalizePdf) {
     envelopeItems = await Promise.all(
       data.envelopeItems.map(async (item) => {
@@ -152,11 +201,13 @@ export const createEnvelope = async ({
 
         const buffer = await getFileServerSide(documentData);
 
-        const normalizedPdf = await makeNormalizedPdf(Buffer.from(buffer));
+        const normalizedPdf = await makeNormalizedPdf(Buffer.from(buffer), {
+          flattenForm: type !== EnvelopeType.TEMPLATE,
+        });
 
         const titleToUse = item.title || title;
 
-        const newDocumentData = await putPdfFileServerSide({
+        const { documentData: newDocumentData } = await putPdfFileServerSide({
           name: titleToUse,
           type: 'application/pdf',
           arrayBuffer: async () => Promise.resolve(normalizedPdf),
@@ -212,21 +263,57 @@ export const createEnvelope = async ({
 
   // userTimezone is last because it's always passed in regardless of the organisation/team settings
   // for uploads from the frontend
-  const timezoneToUse = timezone || settings.documentTimezone || userTimezone;
+  const timezoneToUse = meta?.timezone || settings.documentTimezone || userTimezone;
 
-  const documentMeta = await prisma.documentMeta.create({
-    data: extractDerivedDocumentMeta(settings, {
-      ...meta,
-      timezone: timezoneToUse,
+  const getValidatedDelegatedOwner = async () => {
+    if (
+      !settings.delegateDocumentOwnership ||
+      !delegatedDocumentOwner ||
+      requestMetadata.source === 'app'
+    ) {
+      return null;
+    }
+
+    const delegatedOwner = await prisma.user.findFirst({
+      where: {
+        email: delegatedDocumentOwner,
+      },
+    });
+
+    if (!delegatedOwner) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'Delegated document owner must be a member of the team',
+      });
+    }
+
+    const isTeamMember = await prisma.team.findFirst({
+      where: buildTeamWhereQuery({ teamId, userId: delegatedOwner.id }),
+    });
+
+    if (!isTeamMember) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'Delegated document owner must be a member of the team',
+      });
+    }
+
+    return delegatedOwner;
+  };
+
+  const [documentMeta, secondaryId, delegatedOwner] = await Promise.all([
+    prisma.documentMeta.create({
+      data: extractDerivedDocumentMeta(settings, {
+        ...meta,
+        timezone: timezoneToUse,
+      }),
     }),
-  });
-
-  const secondaryId =
     type === EnvelopeType.DOCUMENT
-      ? await incrementDocumentId().then((v) => v.formattedDocumentId)
-      : await incrementTemplateId().then((v) => v.formattedTemplateId);
+      ? incrementDocumentId().then((v) => v.formattedDocumentId)
+      : incrementTemplateId().then((v) => v.formattedTemplateId),
+    getValidatedDelegatedOwner(),
+  ]);
+  const envelopeOwnerId = delegatedOwner?.id ?? userId;
 
-  return await prisma.$transaction(async (tx) => {
+  const createdEnvelope = await prisma.$transaction(async (tx) => {
     const envelope = await tx.envelope.create({
       data: {
         id: prefixedId('envelope'),
@@ -246,7 +333,16 @@ export const createEnvelope = async ({
             })),
           },
         },
-        userId,
+        envelopeAttachments: {
+          createMany: {
+            data: (attachments || []).map((attachment) => ({
+              label: attachment.label,
+              data: attachment.data,
+              type: attachment.type ?? 'link',
+            })),
+          },
+        },
+        userId: envelopeOwnerId,
         teamId,
         authOptions,
         visibility,
@@ -267,8 +363,23 @@ export const createEnvelope = async ({
 
     const firstEnvelopeItem = envelope.envelopeItems[0];
 
+    const defaultRecipients =
+      settings.defaultRecipients && !bypassDefaultRecipients
+        ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients)
+        : [];
+
+    const mappedDefaultRecipients: CreateEnvelopeRecipientOptions[] = defaultRecipients.map(
+      (recipient) => ({
+        email: recipient.email,
+        name: recipient.name,
+        role: recipient.role,
+      }),
+    );
+
+    const allRecipients = [...(data.recipients || []), ...mappedDefaultRecipients];
+
     await Promise.all(
-      (data.recipients || []).map(async (recipient) => {
+      allRecipients.map(async (recipient) => {
         const recipientAuthOptions = createRecipientAuthOptions({
           accessAuth: recipient.accessAuth ?? [],
           actionAuth: recipient.actionAuth ?? [],
@@ -328,6 +439,124 @@ export const createEnvelope = async ({
       }),
     );
 
+    // Create fields from PDF placeholders (extracted at upload time).
+    const itemsWithPlaceholders = envelopeItems.filter(
+      (item) => item.placeholders && item.placeholders.length > 0,
+    );
+
+    if (itemsWithPlaceholders.length > 0) {
+      // Collect all unique recipient placeholder references (e.g. "r1", "r2").
+      const allPlaceholders = itemsWithPlaceholders.flatMap((item) => item.placeholders ?? []);
+      const uniqueRecipientRefs = new Map<number, string>();
+
+      for (const p of allPlaceholders) {
+        const match = p.recipient.match(/^r(\d+)$/i);
+
+        if (match) {
+          const index = Number(match[1]);
+
+          if (!uniqueRecipientRefs.has(index)) {
+            uniqueRecipientRefs.set(index, `Recipient ${index}`);
+          }
+        }
+      }
+
+      // Fetch existing recipients (may have been created above from data.recipients or defaults).
+      let availableRecipients = await tx.recipient.findMany({
+        where: { envelopeId: envelope.id },
+        select: { id: true, email: true },
+      });
+
+      const shouldCreatePlaceholderRecipients =
+        (!data.recipients || data.recipients.length === 0) && uniqueRecipientRefs.size > 0;
+
+      // If recipients were not provided, create placeholder recipients even when defaults exist.
+      if (shouldCreatePlaceholderRecipients) {
+        const existingRecipientEmails = new Set(
+          availableRecipients.map((recipient) => recipient.email.toLowerCase()),
+        );
+
+        const placeholderRecipients = Array.from(
+          uniqueRecipientRefs.entries(),
+          ([recipientIndex, name]) => ({
+            envelopeId: envelope.id,
+            email: `recipient.${recipientIndex}@documenso.com`,
+            name,
+            role: RecipientRole.SIGNER,
+            signingOrder: recipientIndex,
+            token: nanoid(),
+            sendStatus: SendStatus.NOT_SENT,
+            signingStatus: SigningStatus.NOT_SIGNED,
+          }),
+        ).filter((recipient) => !existingRecipientEmails.has(recipient.email.toLowerCase()));
+
+        if (placeholderRecipients.length > 0) {
+          await tx.recipient.createMany({
+            data: placeholderRecipients,
+          });
+
+          // eslint-disable-next-line require-atomic-updates
+          availableRecipients = await tx.recipient.findMany({
+            where: { envelopeId: envelope.id },
+            select: { id: true, email: true },
+          });
+        }
+      }
+
+      for (const item of itemsWithPlaceholders) {
+        const envelopeItem = envelope.envelopeItems.find(
+          (ei) => ei.documentDataId === item.documentDataId,
+        );
+
+        if (!envelopeItem) {
+          continue;
+        }
+
+        const fieldsToCreate = convertPlaceholdersToFieldInputs(
+          item.placeholders ?? [],
+          (recipientPlaceholder, placeholder) =>
+            findRecipientByPlaceholder(
+              recipientPlaceholder,
+              placeholder,
+              data.recipients && data.recipients.length > 0
+                ? data.recipients.map((r) => {
+                    const found = availableRecipients.find((cr) => cr.email === r.email);
+
+                    if (!found) {
+                      throw new AppError(AppErrorCode.NOT_FOUND, {
+                        message: `Recipient not found for email: ${r.email}`,
+                      });
+                    }
+
+                    return found;
+                  })
+                : undefined,
+              availableRecipients,
+            ),
+          envelopeItem.id,
+        );
+
+        if (fieldsToCreate.length > 0) {
+          await tx.field.createMany({
+            data: fieldsToCreate.map((field) => ({
+              envelopeId: envelope.id,
+              envelopeItemId: envelopeItem.id,
+              recipientId: field.recipientId,
+              type: field.type,
+              page: field.page,
+              positionX: field.positionX,
+              positionY: field.positionY,
+              width: field.width,
+              height: field.height,
+              customText: '',
+              inserted: false,
+              fieldMeta: field.fieldMeta || undefined,
+            })),
+          });
+        }
+      }
+    }
+
     const createdEnvelope = await tx.envelope.findFirst({
       where: {
         id: envelope.id,
@@ -337,7 +566,12 @@ export const createEnvelope = async ({
         recipients: true,
         fields: true,
         folder: true,
-        envelopeItems: true,
+        envelopeAttachments: true,
+        envelopeItems: {
+          include: {
+            documentData: true,
+          },
+        },
       },
     });
 
@@ -347,12 +581,15 @@ export const createEnvelope = async ({
       });
     }
 
-    // Only create audit logs and webhook events for documents.
+    // Only create audit logs for documents.
     if (type === EnvelopeType.DOCUMENT) {
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
           envelopeId: envelope.id,
+          user: {
+            id: envelopeOwnerId,
+          },
           metadata: requestMetadata,
           data: {
             title,
@@ -363,14 +600,46 @@ export const createEnvelope = async ({
         }),
       });
 
-      await triggerWebhook({
-        event: WebhookTriggerEvents.DOCUMENT_CREATED,
-        data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
-        userId,
-        teamId,
-      });
+      // Create audit log for delegated owner if validation passed
+      if (delegatedOwner) {
+        await tx.documentAuditLog.create({
+          data: createDocumentAuditLogData({
+            type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELEGATED_OWNER_CREATED,
+            envelopeId: envelope.id,
+            user: {
+              id: userId,
+            },
+            metadata: requestMetadata,
+            data: {
+              delegatedOwnerName: delegatedOwner.name,
+              delegatedOwnerEmail: delegatedOwner.email,
+              teamName: team.name,
+            },
+          }),
+        });
+      }
     }
 
     return createdEnvelope;
   });
+
+  // Trigger webhook outside the transaction to avoid holding the connection
+  // open during network I/O.
+  if (type === EnvelopeType.DOCUMENT) {
+    await triggerWebhook({
+      event: WebhookTriggerEvents.DOCUMENT_CREATED,
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
+      userId,
+      teamId,
+    });
+  } else if (type === EnvelopeType.TEMPLATE) {
+    await triggerWebhook({
+      event: WebhookTriggerEvents.TEMPLATE_CREATED,
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
+      userId,
+      teamId,
+    });
+  }
+
+  return createdEnvelope;
 };

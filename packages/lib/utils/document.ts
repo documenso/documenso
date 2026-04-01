@@ -63,10 +63,9 @@ export const extractDerivedDocumentMeta = (
     emailSettings:
       meta.emailSettings || settings.emailDocumentSettings || DEFAULT_DOCUMENT_EMAIL_SETTINGS,
 
-    // Reminder settings.
-    reminderInterval: ('reminderInterval' in meta ? meta.reminderInterval : undefined) ?? 'NONE',
-    lastReminderSentAt:
-      ('lastReminderSentAt' in meta ? meta.lastReminderSentAt : undefined) ?? null,
+    // Envelope expiration.
+    envelopeExpirationPeriod:
+      meta.envelopeExpirationPeriod ?? settings.envelopeExpirationPeriod ?? null,
   } satisfies Omit<DocumentMeta, 'id'>;
 };
 
@@ -81,6 +80,7 @@ export const mapEnvelopeToDocumentLite = (envelope: Envelope): TDocumentLite => 
   return {
     id: documentId, // Use legacy ID.
     envelopeId: envelope.id,
+    internalVersion: envelope.internalVersion,
     visibility: envelope.visibility,
     status: envelope.status,
     source: envelope.source,
@@ -120,6 +120,7 @@ export const mapEnvelopesToDocumentMany = (
   return {
     id: legacyDocumentId, // Use legacy ID.
     envelopeId: envelope.id,
+    internalVersion: envelope.internalVersion,
     visibility: envelope.visibility,
     status: envelope.status,
     source: envelope.source,

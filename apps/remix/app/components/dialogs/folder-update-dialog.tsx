@@ -61,8 +61,6 @@ export const FolderUpdateDialog = ({ folder, isOpen, onOpenChange }: FolderUpdat
   const { toast } = useToast();
   const { mutateAsync: updateFolder } = trpc.folder.updateFolder.useMutation();
 
-  const isTeamContext = !!team;
-
   const form = useForm<z.infer<typeof ZUpdateFolderFormSchema>>({
     resolver: zodResolver(ZUpdateFolderFormSchema),
     defaultValues: {
@@ -87,11 +85,11 @@ export const FolderUpdateDialog = ({ folder, isOpen, onOpenChange }: FolderUpdat
 
     try {
       await updateFolder({
-        id: folder.id,
-        name: data.name,
-        visibility: isTeamContext
-          ? (data.visibility ?? DocumentVisibility.EVERYONE)
-          : DocumentVisibility.EVERYONE,
+        folderId: folder.id,
+        data: {
+          name: data.name,
+          visibility: data.visibility,
+        },
       });
 
       toast({
@@ -140,38 +138,36 @@ export const FolderUpdateDialog = ({ folder, isOpen, onOpenChange }: FolderUpdat
               )}
             />
 
-            {isTeamContext && (
-              <FormField
-                control={form.control}
-                name="visibility"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      <Trans>Visibility</Trans>
-                    </FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t`Select visibility`} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value={DocumentVisibility.EVERYONE}>
-                          <Trans>Everyone</Trans>
-                        </SelectItem>
-                        <SelectItem value={DocumentVisibility.MANAGER_AND_ABOVE}>
-                          <Trans>Managers and above</Trans>
-                        </SelectItem>
-                        <SelectItem value={DocumentVisibility.ADMIN}>
-                          <Trans>Admins only</Trans>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
+            <FormField
+              control={form.control}
+              name="visibility"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    <Trans>Visibility</Trans>
+                  </FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t`Select visibility`} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={DocumentVisibility.EVERYONE}>
+                        <Trans>Everyone</Trans>
+                      </SelectItem>
+                      <SelectItem value={DocumentVisibility.MANAGER_AND_ABOVE}>
+                        <Trans>Managers and above</Trans>
+                      </SelectItem>
+                      <SelectItem value={DocumentVisibility.ADMIN}>
+                        <Trans>Admins only</Trans>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <DialogFooter>
               <DialogClose asChild>

@@ -1,14 +1,12 @@
 import { msg } from '@lingui/core/macro';
-import {
-  DocumentDistributionMethod,
-  DocumentReminderInterval,
-  DocumentSigningOrder,
-} from '@prisma/client';
+import { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
 import { z } from 'zod';
 
 import { VALID_DATE_FORMAT_VALUES } from '@documenso/lib/constants/date-formats';
+import { ZEnvelopeExpirationPeriod } from '@documenso/lib/constants/envelope-expiration';
 import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { DocumentMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
 
 import { ZDocumentEmailSettingsSchema } from './document-email';
@@ -32,8 +30,6 @@ export const ZDocumentMetaSchema = DocumentMetaSchema.pick({
   drawSignatureEnabled: true,
   language: true,
   emailSettings: true,
-  reminderInterval: true,
-  lastReminderSentAt: true,
 });
 
 export type TDocumentMeta = z.infer<typeof ZDocumentMetaSchema>;
@@ -132,9 +128,9 @@ export const ZDocumentMetaCreateSchema = z.object({
   uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
   drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
   emailId: z.string().nullish(),
-  emailReplyTo: z.string().email().nullish(),
-  emailSettings: ZDocumentEmailSettingsSchema.optional(),
-  reminderInterval: z.nativeEnum(DocumentReminderInterval).optional(),
+  emailReplyTo: zEmail().nullish(),
+  emailSettings: ZDocumentEmailSettingsSchema.nullish(),
+  envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullish(),
 });
 
 export type TDocumentMetaCreate = z.infer<typeof ZDocumentMetaCreateSchema>;

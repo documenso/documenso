@@ -1,7 +1,14 @@
+/**
+ * @deprecated We use Konva to generate the audit logs PDF now.
+ */
 import { DateTime } from 'luxon';
 import type { Browser } from 'playwright';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import {
+  NEXT_PRIVATE_INTERNAL_WEBAPP_URL,
+  NEXT_PUBLIC_WEBAPP_URL,
+  USE_INTERNAL_URL_BROWSERLESS,
+} from '../../constants/app';
 import { type SupportedLanguageCodes, isValidLanguageCode } from '../../constants/i18n';
 import { env } from '../../utils/env';
 import { encryptSecondaryData } from '../crypto/encrypt';
@@ -29,7 +36,9 @@ export const getAuditLogsPdf = async ({ documentId, language }: GetAuditLogsPdfO
     // !: Previously we would have to keep the playwright version in sync with the browserless version to avoid errors.
     browser = await chromium.connectOverCDP(browserlessUrl);
   } else {
-    browser = await chromium.launch();
+    browser = await chromium.launch({
+      executablePath: env('PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH') || undefined,
+    });
   }
 
   if (!browser) {
@@ -48,14 +57,19 @@ export const getAuditLogsPdf = async ({ documentId, language }: GetAuditLogsPdfO
     {
       name: 'language',
       value: lang,
-      url: NEXT_PUBLIC_WEBAPP_URL(),
+      url: USE_INTERNAL_URL_BROWSERLESS()
+        ? NEXT_PUBLIC_WEBAPP_URL()
+        : NEXT_PRIVATE_INTERNAL_WEBAPP_URL(),
     },
   ]);
 
-  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/audit-log?d=${encryptedId}`, {
-    waitUntil: 'networkidle',
-    timeout: 10_000,
-  });
+  await page.goto(
+    `${USE_INTERNAL_URL_BROWSERLESS() ? NEXT_PUBLIC_WEBAPP_URL() : NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/__htmltopdf/audit-log?d=${encryptedId}`,
+    {
+      waitUntil: 'networkidle',
+      timeout: 10_000,
+    },
+  );
 
   // !: This is a workaround to ensure the page is loaded correctly.
   // !: It's not clear why but suddenly browserless cdp connections would

@@ -1,4 +1,5 @@
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import type { DocumentMeta, Signature } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 import { ChevronDown } from 'lucide-react';
@@ -61,8 +62,8 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
         >
           <div className="flex items-center">
             <Checkbox className="h-3 w-3" disabled />
-            <Label className="text-foreground ml-1.5 text-xs font-normal opacity-50">
-              Checkbox option
+            <Label className="ml-1.5 text-xs font-normal text-foreground opacity-50">
+              <Trans>Checkbox option</Trans>
             </Label>
           </div>
         </div>
@@ -89,7 +90,7 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
             {item.value && (
               <Label
                 htmlFor={`checkbox-${index}`}
-                className="text-foreground ml-1.5 text-xs font-normal"
+                className="ml-1.5 text-xs font-normal text-foreground"
               >
                 {item.value}
               </Label>
@@ -121,7 +122,7 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
               {item.value && (
                 <Label
                   htmlFor={`option-${index}`}
-                  className="text-foreground ml-1.5 text-xs font-normal"
+                  className="ml-1.5 text-xs font-normal text-foreground"
                 >
                   {item.value}
                 </Label>
@@ -139,8 +140,10 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
     !field.inserted
   ) {
     return (
-      <div className="text-field-card-foreground flex flex-row items-center py-0.5 text-[clamp(0.07rem,25cqw,0.825rem)] text-sm">
-        <p>Select</p>
+      <div className="flex flex-row items-center py-0.5 text-[clamp(0.07rem,25cqw,0.825rem)] text-sm text-field-card-foreground">
+        <p>
+          <Trans>Select</Trans>
+        </p>
         <ChevronDown className="h-4 w-4" />
       </div>
     );
@@ -193,7 +196,7 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
     <div className="flex h-full w-full items-center overflow-hidden">
       <p
         className={cn(
-          'text-foreground w-full whitespace-pre-wrap text-left text-[clamp(0.07rem,25cqw,0.825rem)] duration-200',
+          'w-full whitespace-pre-wrap text-left text-[clamp(0.07rem,25cqw,0.825rem)] text-foreground duration-200',
           {
             '!text-center': textAlign === 'center' || !textToDisplay,
             '!text-right': textAlign === 'right',

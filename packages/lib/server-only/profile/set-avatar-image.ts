@@ -1,11 +1,10 @@
-import sharp from 'sharp';
-
 import { prisma } from '@documenso/prisma';
 
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/organisations';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
 import { AppError } from '../../errors/app-error';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
+import { optimiseAvatar } from '../../utils/images/avatar';
 import { buildOrganisationWhereQuery } from '../../utils/organisations';
 import { buildTeamWhereQuery } from '../../utils/teams';
 
@@ -100,10 +99,7 @@ export const setAvatarImage = async ({
   let newAvatarImageId: string | null = null;
 
   if (bytes) {
-    const optimisedBytes = await sharp(Buffer.from(bytes, 'base64'))
-      .resize(512, 512)
-      .toFormat('jpeg', { quality: 75 })
-      .toBuffer();
+    const optimisedBytes = await optimiseAvatar(bytes);
 
     const avatarImage = await prisma.avatarImage.create({
       data: {

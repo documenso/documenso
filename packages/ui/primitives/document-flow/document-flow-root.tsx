@@ -24,7 +24,7 @@ export const DocumentFlowFormContainer = ({
     <form
       id={id}
       className={cn(
-        'dark:bg-background border-border bg-widget sticky top-20 flex h-full max-h-[64rem] flex-col overflow-auto rounded-xl border px-4 py-6',
+        'sticky top-20 flex h-full max-h-[64rem] flex-col overflow-auto rounded-xl border border-border bg-widget px-4 py-6 dark:bg-background',
         className,
       )}
       {...props}
@@ -47,11 +47,11 @@ export const DocumentFlowFormContainerHeader = ({
 
   return (
     <>
-      <h3 className="text-foreground text-2xl font-semibold">{_(title)}</h3>
+      <h3 className="text-2xl font-semibold text-foreground">{_(title)}</h3>
 
-      <p className="text-muted-foreground mt-2 text-sm">{_(description)}</p>
+      <p className="mt-2 text-sm text-muted-foreground">{_(description)}</p>
 
-      <hr className="border-border mb-8 mt-4" />
+      <hr className="mb-8 mt-4 border-border" />
     </>
   );
 };
@@ -66,10 +66,7 @@ export const DocumentFlowFormContainerContent = ({
   ...props
 }: DocumentFlowFormContainerContentProps) => {
   return (
-    <div
-      className={cn('custom-scrollbar -mx-2 flex flex-1 flex-col overflow-hidden px-2', className)}
-      {...props}
-    >
+    <div className={cn('custom-scrollbar -mx-2 flex flex-1 flex-col px-2', className)} {...props}>
       <div className="flex flex-1 flex-col">{children}</div>
     </div>
   );
@@ -102,17 +99,17 @@ export const DocumentFlowFormContainerStep = ({
 }: DocumentFlowFormContainerStepProps) => {
   return (
     <div>
-      <p className="text-muted-foreground text-sm">
+      <p className="text-sm text-muted-foreground">
         <Trans>
           Step <span>{`${step} of ${maxStep}`}</span>
         </Trans>
       </p>
 
-      <div className="bg-muted relative mt-4 h-[2px] rounded-md">
+      <div className="relative mt-4 h-[2px] rounded-md bg-muted">
         <motion.div
           layout="size"
           layoutId="document-flow-container-step"
-          className="bg-documenso absolute inset-y-0 left-0"
+          className="absolute inset-y-0 left-0 bg-primary"
           style={{
             width: `${(100 / maxStep) * step}%`,
           }}
@@ -150,7 +147,7 @@ export const DocumentFlowFormContainerActions = ({
     <div className="mt-4 flex gap-x-4">
       <Button
         type="button"
-        className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
+        className="flex-1 bg-black/5 hover:bg-black/10 dark:bg-muted dark:hover:bg-muted/80"
         size="lg"
         variant="secondary"
         disabled={disabled || loading || !canGoBack || !onGoBackClick}
@@ -161,7 +158,7 @@ export const DocumentFlowFormContainerActions = ({
 
       <Button
         type="button"
-        className="bg-documenso flex-1"
+        className="flex-1 bg-primary"
         size="lg"
         disabled={disabled || disableNextStep || loading || !canGoNext}
         loading={loading}

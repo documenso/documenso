@@ -17,6 +17,7 @@ export const AuthenticationErrorCode = {
   // TwoFactorMissingSecret: 'TWO_FACTOR_MISSING_SECRET',
   // TwoFactorMissingCredentials: 'TWO_FACTOR_MISSING_CREDENTIALS',
   InvalidTwoFactorCode: 'INVALID_TWO_FACTOR_CODE',
+  SignupDisabled: 'SIGNUP_DISABLED',
   // IncorrectTwoFactorBackupCode: 'INCORRECT_TWO_FACTOR_BACKUP_CODE',
   // IncorrectIdentityProvider: 'INCORRECT_IDENTITY_PROVIDER',
   // IncorrectPassword: 'INCORRECT_PASSWORD',

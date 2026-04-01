@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
 import {
-  DocumentReminderInterval,
   DocumentStatus,
   DocumentVisibility,
   type Field,
@@ -121,7 +120,6 @@ export const AddSettingsFormPartial = ({
         redirectUrl: document.documentMeta?.redirectUrl ?? '',
         language: document.documentMeta?.language ?? 'en',
         signatureTypes: extractTeamSignatureSettings(document.documentMeta),
-        reminderInterval: document.documentMeta?.reminderInterval ?? DocumentReminderInterval.NONE,
       },
     },
   });
@@ -244,7 +242,7 @@ export const AddSettingsFormPartial = ({
                         <InfoIcon className="mx-2 h-4 w-4" />
                       </TooltipTrigger>
 
-                      <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+                      <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
                         <Trans>
                           Controls the language for the document, including the language to be used
                           for email notifications, and the final certificate that is generated and
@@ -271,7 +269,7 @@ export const AddSettingsFormPartial = ({
                       <SelectContent>
                         {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
                           <SelectItem key={code} value={code}>
-                            {language.full}
+                            {t(language.full)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -314,7 +312,7 @@ export const AddSettingsFormPartial = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex flex-row items-center">
-                      Document visibility
+                      <Trans>Document visibility</Trans>
                       <DocumentVisibilityTooltip />
                     </FormLabel>
 
@@ -363,11 +361,11 @@ export const AddSettingsFormPartial = ({
 
             <Accordion type="multiple" className="mt-6">
               <AccordionItem value="advanced-options" className="border-none">
-                <AccordionTrigger className="text-foreground mb-2 rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
+                <AccordionTrigger className="mb-2 rounded border px-3 py-2 text-left text-foreground hover:bg-neutral-200/30 hover:no-underline">
                   <Trans>Advanced Options</Trans>
                 </AccordionTrigger>
 
-                <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-2 text-sm leading-relaxed">
+                <AccordionContent className="-mx-1 px-1 pt-2 text-sm leading-relaxed text-muted-foreground">
                   <div className="flex flex-col space-y-6">
                     <FormField
                       control={form.control}
@@ -381,7 +379,7 @@ export const AddSettingsFormPartial = ({
                                 <InfoIcon className="mx-2 h-4 w-4" />
                               </TooltipTrigger>
 
-                              <TooltipContent className="text-muted-foreground max-w-xs">
+                              <TooltipContent className="max-w-xs text-muted-foreground">
                                 <Trans>
                                   Add an external ID to the document. This can be used to identify
                                   the document in external systems.
@@ -420,70 +418,9 @@ export const AddSettingsFormPartial = ({
                                 field.onChange(value);
                                 void handleAutoSave();
                               }}
-                              className="bg-background w-full"
+                              className="w-full bg-background"
                               emptySelectionPlaceholder={t`Select signature types`}
                             />
-                          </FormControl>
-
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="meta.reminderInterval"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="flex flex-row items-center">
-                            <Trans>Reminder Interval</Trans>{' '}
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <InfoIcon className="mx-2 h-4 w-4" />
-                              </TooltipTrigger>
-
-                              <TooltipContent className="text-muted-foreground max-w-xs">
-                                <Trans>Set the interval between reminders for this document.</Trans>
-                              </TooltipContent>
-                            </Tooltip>
-                          </FormLabel>
-
-                          <FormControl>
-                            <Select {...field} onValueChange={field.onChange}>
-                              <SelectTrigger className="bg-background">
-                                <SelectValue />
-                              </SelectTrigger>
-
-                              <SelectContent>
-                                <SelectItem value={DocumentReminderInterval.NONE}>
-                                  <Trans>No reminders</Trans>
-                                </SelectItem>
-                                <SelectItem value={DocumentReminderInterval.EVERY_1_HOUR}>
-                                  <Trans>Every hour</Trans>
-                                </SelectItem>
-                                <SelectItem value={DocumentReminderInterval.EVERY_6_HOURS}>
-                                  <Trans>Every 6 hours</Trans>
-                                </SelectItem>
-                                <SelectItem value={DocumentReminderInterval.EVERY_12_HOURS}>
-                                  <Trans>Every 12 hours</Trans>
-                                </SelectItem>
-                                <SelectItem value={DocumentReminderInterval.DAILY}>
-                                  <Trans>Daily</Trans>
-                                </SelectItem>
-                                <SelectItem value={DocumentReminderInterval.EVERY_3_DAYS}>
-                                  <Trans>Every 3 days</Trans>
-                                </SelectItem>
-                                <SelectItem value={DocumentReminderInterval.WEEKLY}>
-                                  <Trans>Weekly</Trans>
-                                </SelectItem>
-                                <SelectItem value={DocumentReminderInterval.EVERY_2_WEEKS}>
-                                  <Trans>Every 2 weeks</Trans>
-                                </SelectItem>
-                                <SelectItem value={DocumentReminderInterval.MONTHLY}>
-                                  <Trans>Monthly</Trans>
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
                           </FormControl>
 
                           <FormMessage />
@@ -569,7 +506,7 @@ export const AddSettingsFormPartial = ({
                                 <InfoIcon className="mx-2 h-4 w-4" />
                               </TooltipTrigger>
 
-                              <TooltipContent className="text-muted-foreground max-w-xs">
+                              <TooltipContent className="max-w-xs text-muted-foreground">
                                 <Trans>
                                   Add a URL to redirect the user to once the document is signed
                                 </Trans>

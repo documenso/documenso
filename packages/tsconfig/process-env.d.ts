@@ -1,6 +1,8 @@
 declare namespace NodeJS {
   export interface ProcessEnv {
+    PORT?: string;
     NEXT_PUBLIC_WEBAPP_URL?: string;
+    NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY?: string;
 
     NEXT_PRIVATE_GOOGLE_CLIENT_ID?: string;
     NEXT_PRIVATE_GOOGLE_CLIENT_SECRET?: string;
@@ -40,6 +42,12 @@ declare namespace NodeJS {
     NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_PATH?: string;
     NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS?: string;
     NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS?: string;
+    NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_FILE_PATH?: string;
+    NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_CONTENTS?: string;
+    NEXT_PRIVATE_SIGNING_GCLOUD_HSM_SECRET_MANAGER_CERT_PATH?: string;
+    NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY?: string;
+    NEXT_PUBLIC_SIGNING_CONTACT_INFO?: string;
+    NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER?: string;
 
     NEXT_PRIVATE_SMTP_TRANSPORT?: 'mailchannels' | 'resend' | 'smtp-auth' | 'smtp-api';
 
@@ -66,10 +74,20 @@ declare namespace NodeJS {
     NEXT_PRIVATE_SMTP_FROM_ADDRESS?: string;
 
     NEXT_PUBLIC_DISABLE_SIGNUP?: string;
+    NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS?: string;
 
     NEXT_PRIVATE_BROWSERLESS_URL?: string;
 
-    NEXT_PRIVATE_JOBS_PROVIDER?: 'inngest' | 'local';
+    NEXT_PRIVATE_JOBS_PROVIDER?: 'inngest' | 'local' | 'bullmq';
+
+    NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS?: string;
+
+    /**
+     * Redis / BullMQ environment variables
+     */
+    NEXT_PRIVATE_REDIS_URL?: string;
+    NEXT_PRIVATE_REDIS_PREFIX?: string;
+    NEXT_PRIVATE_BULLMQ_CONCURRENCY?: string;
 
     /**
      * Inngest environment variables
@@ -83,5 +101,12 @@ declare namespace NodeJS {
     DATABASE_URL?: string;
     POSTGRES_PRISMA_URL?: string;
     POSTGRES_URL_NON_POOLING?: string;
+
+    /**
+     * Google Vertex AI environment variables
+     */
+    GOOGLE_VERTEX_PROJECT_ID?: string;
+    GOOGLE_VERTEX_LOCATION?: string;
+    GOOGLE_VERTEX_API_KEY?: string;
   }
 }

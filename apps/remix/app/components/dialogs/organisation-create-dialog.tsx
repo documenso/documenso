@@ -367,7 +367,7 @@ const BillingPlanForm = ({
           <div className="w-full text-left">
             <div className="flex items-center justify-between">
               <p className="text-medium">
-                <Trans>Free</Trans>
+                <Trans context="Plan price">Free</Trans>
               </p>
 
               <Badge size="small" variant="neutral" className="ml-1.5">

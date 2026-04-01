@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
+import { ZSuccessResponseSchema } from '../schema';
 import type { TrpcRouteMeta } from '../trpc';
-import { ZSuccessResponseSchema } from './schema';
 
 export const redistributeDocumentMeta: TrpcRouteMeta = {
   openapi: {

@@ -89,8 +89,7 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
           404: {
             heading: msg`Organisation group not found`,
             subHeading: msg`404 Organisation group not found`,
-            message: msg`The organisation group you are looking for may have been removed, renamed or may have never
-                    existed.`,
+            message: msg`The organisation group you are looking for may have been removed, renamed or may have never existed.`,
           },
         }}
         primaryButton={

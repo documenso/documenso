@@ -26,26 +26,22 @@ export type TriggerJobOptions<Definitions extends ReadonlyArray<JobDefinition> =
   };
 }[number];
 
-export type CronTrigger<N extends string = string> = {
-  type: 'cron';
-  schedule: string;
-  name: N;
-};
-
-export type EventTrigger<N extends string = string> = {
-  type: 'event';
-  name: N;
-};
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type JobDefinition<Name extends string = string, Schema = any> = {
   id: string;
   name: string;
   version: string;
   enabled?: boolean;
-  trigger:
-    | (EventTrigger<Name> & { schema?: z.ZodType<Schema> })
-    | (CronTrigger<Name> & { schema?: z.ZodType<Schema> });
+  optimizeParallelism?: boolean;
+  trigger: {
+    name: Name;
+    schema?: z.ZodType<Schema>;
+    /**
+     * Optional cron expression (e.g., "* * * * *" for every minute).
+     * When set, the job runs on a schedule instead of being event-triggered.
+     */
+    cron?: string;
+  };
   handler: (options: { payload: Schema; io: JobRunIO }) => Promise<Json | void>;
 };
 

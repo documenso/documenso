@@ -1,6 +1,6 @@
-import sharp from 'sharp';
-
 import { prisma } from '@documenso/prisma';
+
+import { loadAvatar } from '../../utils/images/avatar';
 
 export type GetAvatarImageOptions = {
   id: string;
@@ -17,10 +17,5 @@ export const getAvatarImage = async ({ id }: GetAvatarImageOptions) => {
     return null;
   }
 
-  const bytes = Buffer.from(avatarImage.bytes, 'base64');
-
-  return {
-    contentType: 'image/jpeg',
-    content: await sharp(bytes).toFormat('jpeg').toBuffer(),
-  };
+  return await loadAvatar(avatarImage.bytes);
 };

@@ -9,6 +9,7 @@ export type EmbedAuthenticationRequiredProps = {
   email?: string;
   returnTo: string;
   isGoogleSSOEnabled?: boolean;
+  isMicrosoftSSOEnabled?: boolean;
   isOIDCSSOEnabled?: boolean;
   oidcProviderLabel?: string;
 };
@@ -17,6 +18,7 @@ export const EmbedAuthenticationRequired = ({
   email,
   returnTo,
   // isGoogleSSOEnabled,
+  // isMicrosoftSSOEnabled,
   // isOIDCSSOEnabled,
   // oidcProviderLabel,
 }: EmbedAuthenticationRequiredProps) => {
@@ -37,6 +39,7 @@ export const EmbedAuthenticationRequired = ({
         <SignInForm
           // Embed currently not supported.
           // isGoogleSSOEnabled={isGoogleSSOEnabled}
+          // isMicrosoftSSOEnabled={isMicrosoftSSOEnabled}
           // isOIDCSSOEnabled={isOIDCSSOEnabled}
           // oidcProviderLabel={oidcProviderLabel}
           className="mt-4"

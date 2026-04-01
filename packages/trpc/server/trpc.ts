@@ -1,5 +1,4 @@
 import { TRPCError, initTRPC } from '@trpc/server';
-import SuperJSON from 'superjson';
 import type { AnyZodObject } from 'zod';
 
 import { AppError, genericErrorCodeToTrpcErrorCodeMap } from '@documenso/lib/errors/app-error';
@@ -9,6 +8,7 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { alphaid } from '@documenso/lib/universal/id';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
 
+import { dataTransformer } from '../utils/data-transformer';
 import type { TrpcContext } from './context';
 
 // Can't import type from trpc-to-openapi because it breaks build, not sure why.
@@ -35,9 +35,9 @@ const t = initTRPC
   .meta<TrpcRouteMeta>()
   .context<TrpcContext>()
   .create({
-    transformer: SuperJSON,
+    transformer: dataTransformer,
     errorFormatter(opts) {
-      const { shape, error } = opts;
+      const { shape, error, ctx } = opts;
 
       const originalError = error.cause;
 
@@ -46,6 +46,12 @@ const t = initTRPC
       // Default unknown errors to 400, since if you're throwing an AppError it is expected
       // that you already know what you're doing.
       if (originalError instanceof AppError) {
+        if (originalError.headers && ctx) {
+          for (const [headerKey, headerValue] of Object.entries(originalError.headers)) {
+            ctx.res.headers.append(headerKey, headerValue);
+          }
+        }
+
         data = {
           ...data,
           appError: AppError.toJSON(originalError),
@@ -67,7 +73,7 @@ const t = initTRPC
 /**
  * Middlewares
  */
-export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path }) => {
+export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path, meta }) => {
   const infoToLog: TrpcApiLog = {
     path,
     auth: ctx.metadata.auth,
@@ -78,8 +84,10 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path }) 
 
   const authorizationHeader = ctx.req.headers.get('authorization');
 
+  const isApiV2 = Boolean(meta?.openapi?.path);
+
   // Taken from `authenticatedMiddleware` in `@documenso/api/v1/middleware/authenticated.ts`.
-  if (authorizationHeader) {
+  if (authorizationHeader && isApiV2) {
     // Support for both "Authorization: Bearer api_xxx" and "Authorization: api_xxx"
     const [token] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
 
@@ -158,20 +166,70 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path }) 
   });
 });
 
-export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next, path }) => {
+export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next, path, meta }) => {
   // Recreate the logger with a sub request ID to differentiate between batched requests.
   const trpcSessionLogger = ctx.logger.child({
     nonBatchedRequestId: alphaid(),
   });
 
-  ctx.logger.info({
+  const infoToLog: TrpcApiLog = {
     path,
     auth: ctx.metadata.auth,
     source: ctx.metadata.source,
-    userId: ctx.user?.id,
-    apiTokenId: null,
     trpcMiddleware: 'maybeAuthenticated',
     unverifiedTeamId: ctx.teamId,
+  };
+
+  const authorizationHeader = ctx.req.headers.get('authorization');
+
+  const isApiV2 = Boolean(meta?.openapi?.path);
+
+  // Taken from `authenticatedMiddleware` in `@documenso/api/v1/middleware/authenticated.ts`.
+  if (authorizationHeader && isApiV2) {
+    // Support for both "Authorization: Bearer api_xxx" and "Authorization: api_xxx"
+    const [token] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
+
+    if (!token) {
+      throw new Error('Token was not provided for authenticated middleware');
+    }
+
+    const apiToken = await getApiTokenByToken({ token });
+
+    ctx.logger.info({
+      ...infoToLog,
+      userId: apiToken.user.id,
+      apiTokenId: apiToken.id,
+    } satisfies TrpcApiLog);
+
+    return await next({
+      ctx: {
+        ...ctx,
+        user: apiToken.user,
+        teamId: apiToken.teamId,
+        session: null,
+        metadata: {
+          ...ctx.metadata,
+          auditUser: apiToken.team
+            ? {
+                id: null,
+                email: null,
+                name: apiToken.team.name,
+              }
+            : {
+                id: apiToken.user.id,
+                email: apiToken.user.email,
+                name: apiToken.user.name,
+              },
+          auth: 'api',
+        } satisfies ApiRequestMetadata,
+      },
+    });
+  }
+
+  trpcSessionLogger.info({
+    ...infoToLog,
+    userId: ctx.user?.id,
+    apiTokenId: null,
   } satisfies TrpcApiLog);
 
   return await next({

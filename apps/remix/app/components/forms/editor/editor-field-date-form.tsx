@@ -7,6 +7,7 @@ import type { z } from 'zod';
 import {
   DEFAULT_FIELD_FONT_SIZE,
   type TDateFieldMeta as DateFieldMeta,
+  FIELD_DEFAULT_GENERIC_ALIGN,
   ZDateFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { Form } from '@documenso/ui/primitives/form/form';
@@ -39,7 +40,7 @@ export const EditorFieldDateForm = ({
     mode: 'onChange',
     defaultValues: {
       fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
-      textAlign: value.textAlign || 'left',
+      textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
     },
   });
 

@@ -17,7 +17,7 @@ server.use(
   serveStatic({
     root: 'build/client',
     onFound: (path, c) => {
-      if (path.startsWith('./build/client/assets')) {
+      if (path.startsWith('build/client/assets')) {
         // Hard cache assets with hashed file names.
         c.header('Cache-Control', 'public, immutable, max-age=31536000');
       } else {
@@ -30,4 +30,6 @@ server.use(
 
 const handler = handle(build, server);
 
-serve({ fetch: handler.fetch, port: 3000 });
+const port = parseInt(process.env.PORT || '3000', 10);
+
+serve({ fetch: handler.fetch, port });

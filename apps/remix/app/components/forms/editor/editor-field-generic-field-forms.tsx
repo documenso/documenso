@@ -3,6 +3,10 @@ import { useEffect } from 'react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { type Control, useFormContext } from 'react-hook-form';
 
+import { FIELD_MIN_LINE_HEIGHT } from '@documenso/lib/types/field-meta';
+import { FIELD_MAX_LINE_HEIGHT } from '@documenso/lib/types/field-meta';
+import { FIELD_MIN_LETTER_SPACING } from '@documenso/lib/types/field-meta';
+import { FIELD_MAX_LETTER_SPACING } from '@documenso/lib/types/field-meta';
 import { cn } from '@documenso/ui/lib/utils';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import {
@@ -46,6 +50,7 @@ export const EditorGenericFontSizeField = ({
           </FormLabel>
           <FormControl>
             <Input
+              data-testid="field-form-fontSize"
               type="number"
               min={8}
               max={96}
@@ -84,7 +89,7 @@ export const EditorGenericTextAlignField = ({
           </FormLabel>
           <FormControl>
             <Select {...field} onValueChange={field.onChange}>
-              <SelectTrigger>
+              <SelectTrigger data-testid="field-form-textAlign">
                 <SelectValue placeholder={t`Select text align`} />
               </SelectTrigger>
               <SelectContent>
@@ -99,6 +104,121 @@ export const EditorGenericTextAlignField = ({
                 </SelectItem>
               </SelectContent>
             </Select>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
+
+export const EditorGenericVerticalAlignField = ({
+  formControl,
+  className,
+}: {
+  formControl: FormControlType;
+  className?: string;
+}) => {
+  const { t } = useLingui();
+
+  return (
+    <FormField
+      control={formControl}
+      name="verticalAlign"
+      render={({ field }) => (
+        <FormItem className={className}>
+          <FormLabel>
+            <Trans>Vertical Align</Trans>
+          </FormLabel>
+          <FormControl>
+            <Select {...field} onValueChange={field.onChange}>
+              <SelectTrigger data-testid="field-form-verticalAlign">
+                <SelectValue placeholder={t`Select vertical align`} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="top">
+                  <Trans>Top</Trans>
+                </SelectItem>
+                <SelectItem value="middle">
+                  <Trans>Middle</Trans>
+                </SelectItem>
+                <SelectItem value="bottom">
+                  <Trans>Bottom</Trans>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
+
+export const EditorGenericLineHeightField = ({
+  formControl,
+  className,
+}: {
+  formControl: FormControlType;
+  className?: string;
+}) => {
+  const { t } = useLingui();
+
+  return (
+    <FormField
+      control={formControl}
+      name="lineHeight"
+      render={({ field }) => (
+        <FormItem className={className}>
+          <FormLabel>
+            <Trans>Line Height</Trans>
+          </FormLabel>
+          <FormControl>
+            <Input
+              data-testid="field-form-lineHeight"
+              type="number"
+              min={FIELD_MIN_LINE_HEIGHT}
+              max={FIELD_MAX_LINE_HEIGHT}
+              className="bg-background"
+              placeholder={t`Line height`}
+              {...field}
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
+
+export const EditorGenericLetterSpacingField = ({
+  formControl,
+  className,
+}: {
+  formControl: FormControlType;
+  className?: string;
+}) => {
+  const { t } = useLingui();
+
+  return (
+    <FormField
+      control={formControl}
+      name="letterSpacing"
+      render={({ field }) => (
+        <FormItem className={className}>
+          <FormLabel>
+            <Trans>Letter Spacing</Trans>
+          </FormLabel>
+          <FormControl>
+            <Input
+              data-testid="field-form-letterSpacing"
+              type="number"
+              min={FIELD_MIN_LETTER_SPACING}
+              max={FIELD_MAX_LETTER_SPACING}
+              className="bg-background"
+              placeholder={t`Letter spacing`}
+              {...field}
+            />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -133,12 +253,13 @@ export const EditorGenericRequiredField = ({
           <FormControl>
             <div className="flex items-center">
               <Checkbox
+                data-testid="field-form-required"
                 id="field-required"
                 checked={field.value}
                 onCheckedChange={field.onChange}
               />
 
-              <label className="text-muted-foreground ml-2 text-sm" htmlFor="field-required">
+              <label className="ml-2 text-sm text-muted-foreground" htmlFor="field-required">
                 <Trans>Required Field</Trans>
               </label>
             </div>
@@ -176,12 +297,13 @@ export const EditorGenericReadOnlyField = ({
           <FormControl>
             <div className="flex items-center">
               <Checkbox
+                data-testid="field-form-readOnly"
                 id="field-read-only"
                 checked={field.value}
                 onCheckedChange={field.onChange}
               />
 
-              <label className="text-muted-foreground ml-2 text-sm" htmlFor="field-read-only">
+              <label className="ml-2 text-sm text-muted-foreground" htmlFor="field-read-only">
                 <Trans>Read Only</Trans>
               </label>
             </div>
@@ -212,7 +334,7 @@ export const EditorGenericLabelField = ({
             <Trans>Label</Trans>
           </FormLabel>
           <FormControl>
-            <Input placeholder={t`Field label`} {...field} />
+            <Input data-testid="field-form-label" placeholder={t`Field label`} {...field} />
           </FormControl>
           <FormMessage />
         </FormItem>

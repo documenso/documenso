@@ -171,6 +171,24 @@ test.describe('Template Field Prefill API v2', () => {
       },
     });
 
+    // Add SIGNATURE field (required for distribution)
+    await prisma.field.create({
+      data: {
+        envelopeId: template.id,
+        envelopeItemId: firstEnvelopeItem.id,
+        recipientId: recipient.id,
+        type: FieldType.SIGNATURE,
+        page: 1,
+        positionX: 1,
+        positionY: 1,
+        width: 1,
+        height: 1,
+        customText: '',
+        inserted: false,
+        fieldMeta: { type: 'signature', fontSize: 14 },
+      },
+    });
+
     // 6. Sign in as the user
     await apiSignin({
       page,
@@ -179,7 +197,7 @@ test.describe('Template Field Prefill API v2', () => {
 
     // 7. Navigate to the template
     await page.goto(
-      `${WEBAPP_BASE_URL}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}`,
+      `${WEBAPP_BASE_URL}/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}`,
     );
 
     // 8. Create a document from the template with prefilled fields using v2 API
@@ -441,6 +459,24 @@ test.describe('Template Field Prefill API v2', () => {
       },
     });
 
+    // Add SIGNATURE field (required for distribution)
+    await prisma.field.create({
+      data: {
+        envelopeId: template.id,
+        envelopeItemId: firstEnvelopeItem.id,
+        recipientId: recipient.id,
+        type: FieldType.SIGNATURE,
+        page: 1,
+        positionX: 1,
+        positionY: 1,
+        width: 1,
+        height: 1,
+        customText: '',
+        inserted: false,
+        fieldMeta: { type: 'signature', fontSize: 14 },
+      },
+    });
+
     // 6. Sign in as the user
     await apiSignin({
       page,
@@ -449,7 +485,7 @@ test.describe('Template Field Prefill API v2', () => {
 
     // 7. Navigate to the template
     await page.goto(
-      `${WEBAPP_BASE_URL}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}`,
+      `${WEBAPP_BASE_URL}/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}`,
     );
 
     // 8. Create a document from the template without prefilled fields using v2 API

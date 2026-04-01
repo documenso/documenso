@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import { type TemplateDirectLink, TemplateType } from '@prisma/client';
@@ -31,7 +32,7 @@ type DirectTemplate = FindTemplateRow & {
 };
 
 export function meta() {
-  return appMetaTags('Public Profile');
+  return appMetaTags(msg`Public Profile`);
 }
 
 // Todo: This can be optimized.
@@ -67,6 +68,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
   const { data } = trpc.template.findTemplates.useQuery({
+    type: TemplateType.PRIVATE,
     perPage: 100,
   });
 
@@ -82,8 +84,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
   const enabledPrivateDirectTemplates = useMemo(
     () =>
       (data?.data ?? []).filter(
-        (template): template is DirectTemplate =>
-          template.directLink?.enabled === true && template.type !== TemplateType.PUBLIC,
+        (template): template is DirectTemplate => template.directLink?.enabled === true,
       ),
     [data],
   );
@@ -143,7 +144,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
           <TooltipTrigger asChild>
             <div
               className={cn(
-                'text-muted-foreground/50 flex flex-row items-center justify-center space-x-2 text-xs',
+                'flex flex-row items-center justify-center space-x-2 text-xs text-muted-foreground/50',
                 {
                   '[&>*:first-child]:text-muted-foreground': !isPublicProfileVisible,
                   '[&>*:last-child]:text-muted-foreground': isPublicProfileVisible,
@@ -164,7 +165,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
             </div>
           </TooltipTrigger>
 
-          <TooltipContent className="text-muted-foreground max-w-[40ch] space-y-2 py-2">
+          <TooltipContent className="max-w-[40ch] space-y-2 py-2 text-muted-foreground">
             {isPublicProfileVisible ? (
               <>
                 <p>
@@ -207,7 +208,9 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
             directTemplates={enabledPrivateDirectTemplates}
             trigger={
               <Button variant="outline">
-                <Trans>Link template</Trans>
+                <Trans context="Action button to link template to public profile">
+                  Link template
+                </Trans>
               </Button>
             }
           />

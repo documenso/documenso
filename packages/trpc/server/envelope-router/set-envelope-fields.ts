@@ -24,7 +24,7 @@ export const setEnvelopeFieldsRoute = authenticatedProcedure
       },
     });
 
-    await match(envelopeType)
+    const result = await match(envelopeType)
       .with(EnvelopeType.DOCUMENT, async () =>
         setFieldsForDocument({
           userId: ctx.user.id,
@@ -63,4 +63,11 @@ export const setEnvelopeFieldsRoute = authenticatedProcedure
         }),
       )
       .exhaustive();
+
+    return {
+      data: result.fields.map((field) => ({
+        ...field,
+        formId: field.formId,
+      })),
+    };
   });

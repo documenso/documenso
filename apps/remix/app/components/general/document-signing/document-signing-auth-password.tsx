@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -23,8 +23,6 @@ import { Input } from '@documenso/ui/primitives/input';
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 
 export type DocumentSigningAuthPasswordProps = {
-  actionTarget?: 'FIELD' | 'DOCUMENT';
-  actionVerb?: string;
   open: boolean;
   onOpenChange: (value: boolean) => void;
   onReauthFormSubmit: (values?: TRecipientActionAuth) => Promise<void> | void;
@@ -40,12 +38,12 @@ const ZPasswordAuthFormSchema = z.object({
 type TPasswordAuthFormSchema = z.infer<typeof ZPasswordAuthFormSchema>;
 
 export const DocumentSigningAuthPassword = ({
-  actionTarget = 'FIELD',
-  actionVerb = 'sign',
   onReauthFormSubmit,
   open,
   onOpenChange,
 }: DocumentSigningAuthPasswordProps) => {
+  const { t } = useLingui();
+
   const { recipient, isCurrentlyAuthenticating, setIsCurrentlyAuthenticating } =
     useRequiredDocumentSigningAuthContext();
 
@@ -120,7 +118,7 @@ export const DocumentSigningAuthPassword = ({
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="Enter your password"
+                      placeholder={t`Enter your password`}
                       {...field}
                       autoComplete="current-password"
                     />

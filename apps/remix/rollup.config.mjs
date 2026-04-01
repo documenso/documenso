@@ -1,6 +1,7 @@
 import linguiMacro from '@lingui/babel-plugin-lingui-macro';
 import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
+import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
 import path from 'node:path';
@@ -39,6 +40,7 @@ const config = {
       ],
       extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
     }),
+    json(),
     commonjs(),
     babel({
       babelHelpers: 'bundled',

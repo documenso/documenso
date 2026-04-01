@@ -13,12 +13,12 @@ import {
 } from '@documenso/lib/constants/trpc';
 import { ZDocumentAccessAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import type { TTemplate } from '@documenso/lib/types/template';
+import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { AddTemplateFieldsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-fields';
 import type { TAddTemplateFieldsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-fields.types';
@@ -28,6 +28,7 @@ import { AddTemplateSettingsFormPartial } from '@documenso/ui/primitives/templat
 import type { TAddTemplateSettingsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-settings.types';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 import { useCurrentTeam } from '~/providers/team';
 
 export type TemplateEditFormProps = {
@@ -135,6 +136,7 @@ export const TemplateEditForm = ({
       templateId: template.id,
       data: {
         title: data.title,
+        type: data.templateType,
         externalId: data.externalId || null,
         visibility: data.visibility,
         globalAccessAuth: parsedGlobalAccessAuth.success ? parsedGlobalAccessAuth.data : [],
@@ -312,9 +314,17 @@ export const TemplateEditForm = ({
         gradient
       >
         <CardContent className="p-2">
-          <PDFViewer
-            key={templateDocumentData.id}
-            documentData={templateDocumentData}
+          <PDFViewerLazy
+            key={template.envelopeItems[0]?.id}
+            data={getDocumentDataUrlForPdfViewer({
+              envelopeId: template.envelopeId,
+              envelopeItemId: template.envelopeItems[0]?.id,
+              documentDataId: initialTemplate.templateDocumentDataId,
+              version: 'current',
+              token: undefined,
+              presignToken: undefined,
+            })}
+            scrollParentRef="window"
             onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
           />
         </CardContent>

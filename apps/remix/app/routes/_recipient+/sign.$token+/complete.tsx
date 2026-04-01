@@ -1,11 +1,8 @@
-import { useEffect } from 'react';
-
-import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
-import { CheckCircle2, Clock8, FileSearch } from 'lucide-react';
-import { Link, useRevalidator } from 'react-router';
+import { CheckCircle2, Clock8, DownloadIcon, Loader2 } from 'lucide-react';
+import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
@@ -19,15 +16,14 @@ import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { env } from '@documenso/lib/utils/env';
-import type { Document } from '@documenso/prisma/types/document-legacy-schema';
-import DocumentDialog from '@documenso/ui/components/document/document-dialog';
-import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
+import { trpc } from '@documenso/trpc/react';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
 import { cn } from '@documenso/ui/lib/utils';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 
+import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { ClaimAccount } from '~/components/general/claim-account';
 import { DocumentSigningAuthPageView } from '~/components/general/document-signing/document-signing-auth-page';
 
@@ -86,6 +82,13 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const canSignUp = !isExistingUser && env('NEXT_PUBLIC_DISABLE_SIGNUP') !== 'true';
 
+  const canRedirectToFolder =
+    user && document.userId === user.id && document.folderId && document.team?.url;
+
+  const returnToHomePath = canRedirectToFolder
+    ? `/t/${document.team.url}/documents/f/${document.folderId}`
+    : '/';
+
   return {
     isDocumentAccessValid: true,
     canSignUp,
@@ -94,6 +97,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     signatures,
     document,
     recipient,
+    returnToHomePath,
   };
 }
 
@@ -111,7 +115,26 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
     document,
     recipient,
     recipientEmail,
+    returnToHomePath,
   } = loaderData;
+
+  // Poll signing status every few seconds
+  const { data: signingStatusData } = trpc.envelope.signingStatus.useQuery(
+    {
+      token: recipient?.token || '',
+    },
+    {
+      refetchInterval: 3000,
+      initialData: match(document?.status)
+        .with(DocumentStatus.COMPLETED, () => ({ status: 'COMPLETED' }) as const)
+        .with(DocumentStatus.REJECTED, () => ({ status: 'REJECTED' }) as const)
+        .with(DocumentStatus.PENDING, () => ({ status: 'PENDING' }) as const)
+        .otherwise(() => ({ status: 'PENDING' }) as const),
+    },
+  );
+
+  // Use signing status from query if available, otherwise fall back to document status
+  const signingStatus = signingStatusData?.status ?? 'PENDING';
 
   if (!isDocumentAccessValid) {
     return <DocumentSigningAuthPageView email={recipientEmail} />;
@@ -120,7 +143,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
   return (
     <div
       className={cn(
-        '-mx-4 flex flex-col items-center overflow-hidden px-4 pt-24 md:-mx-8 md:px-8 lg:pt-36 xl:pt-44',
+        '-mx-4 flex flex-col items-center overflow-hidden px-4 pt-16 md:-mx-8 md:px-8 lg:pt-20 xl:pt-28',
         { 'pt-0 lg:pt-0 xl:pt-0': canSignUp },
       )}
     >
@@ -154,12 +177,20 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
             {recipient.role === RecipientRole.APPROVER && <Trans>Document Approved</Trans>}
           </h2>
 
-          {match({ status: document.status, deletedAt: document.deletedAt })
-            .with({ status: DocumentStatus.COMPLETED }, () => (
-              <div className="text-documenso-700 mt-4 flex items-center text-center">
+          {match({ status: signingStatus, deletedAt: document.deletedAt })
+            .with({ status: 'COMPLETED' }, () => (
+              <div className="mt-4 flex items-center text-center text-documenso-700">
                 <CheckCircle2 className="mr-2 h-5 w-5" />
                 <span className="text-sm">
                   <Trans>Everyone has signed</Trans>
+                </span>
+              </div>
+            ))
+            .with({ status: 'PROCESSING' }, () => (
+              <div className="mt-4 flex items-center text-center text-orange-600">
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <span className="text-sm">
+                  <Trans>Processing document</Trans>
                 </span>
               </div>
             ))
@@ -180,23 +211,31 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
               </div>
             ))}
 
-          {match({ status: document.status, deletedAt: document.deletedAt })
-            .with({ status: DocumentStatus.COMPLETED }, () => (
-              <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
+          {match({ status: signingStatus, deletedAt: document.deletedAt })
+            .with({ status: 'COMPLETED' }, () => (
+              <p className="mt-2.5 max-w-[60ch] text-center text-sm font-medium text-muted-foreground/60 md:text-base">
                 <Trans>
-                  Everyone has signed! You will receive an Email copy of the signed document.
+                  Everyone has signed! You will receive an email copy of the signed document.
+                </Trans>
+              </p>
+            ))
+            .with({ status: 'PROCESSING' }, () => (
+              <p className="mt-2.5 max-w-[60ch] text-center text-sm font-medium text-muted-foreground/60 md:text-base">
+                <Trans>
+                  All recipients have signed. The document is being processed and you will receive
+                  an email copy shortly.
                 </Trans>
               </p>
             ))
             .with({ deletedAt: null }, () => (
-              <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
+              <p className="mt-2.5 max-w-[60ch] text-center text-sm font-medium text-muted-foreground/60 md:text-base">
                 <Trans>
-                  You will receive an Email copy of the signed document once everyone has signed.
+                  You will receive an email copy of the signed document once everyone has signed.
                 </Trans>
               </p>
             ))
             .otherwise(() => (
-              <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
+              <p className="mt-2.5 max-w-[60ch] text-center text-sm font-medium text-muted-foreground/60 md:text-base">
                 <Trans>
                   This document has been cancelled by the owner and is no longer available for
                   others to sign.
@@ -204,30 +243,34 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
               </p>
             ))}
 
-          <div className="mt-8 flex w-full max-w-sm items-center justify-center gap-4">
-            <DocumentShareButton documentId={document.id} token={recipient.token} />
+          <div className="mt-8 flex w-full max-w-xs flex-col items-stretch gap-4 md:w-auto md:max-w-none md:flex-row md:items-center">
+            <DocumentShareButton
+              documentId={document.id}
+              token={recipient.token}
+              className="w-full max-w-none md:flex-1"
+            />
 
-            {isDocumentCompleted(document.status) ? (
-              <DocumentDownloadButton
-                className="flex-1"
-                fileName={document.title}
-                documentData={document.documentData}
-                disabled={!isDocumentCompleted(document.status)}
-              />
-            ) : (
-              <DocumentDialog
-                documentData={document.documentData}
+            {isDocumentCompleted(document) && (
+              <EnvelopeDownloadDialog
+                envelopeId={document.envelopeId}
+                envelopeStatus={document.status}
+                envelopeItems={document.envelopeItems}
+                token={recipient?.token}
                 trigger={
-                  <Button
-                    className="text-[11px]"
-                    title={_(msg`Signatures will appear once the document has been completed`)}
-                    variant="outline"
-                  >
-                    <FileSearch className="mr-2 h-5 w-5" strokeWidth={1.7} />
-                    <Trans>View Original Document</Trans>
+                  <Button type="button" variant="outline" className="flex-1 md:flex-initial">
+                    <DownloadIcon className="mr-2 h-5 w-5" />
+                    <Trans>Download</Trans>
                   </Button>
                 }
               />
+            )}
+
+            {user && (
+              <Button asChild>
+                <Link to={returnToHomePath}>
+                  <Trans>Go Back Home</Trans>
+                </Link>
+              </Button>
             )}
           </div>
         </div>
@@ -239,7 +282,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
                 <Trans>Need to sign documents?</Trans>
               </h2>
 
-              <p className="text-muted-foreground/60 mt-4 max-w-[55ch] text-center leading-normal">
+              <p className="mt-4 max-w-[55ch] text-center leading-normal text-muted-foreground/60">
                 <Trans>
                   Create your account and start using state-of-the-art document signing.
                 </Trans>
@@ -248,41 +291,8 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
               <ClaimAccount defaultName={recipientName} defaultEmail={recipient.email} />
             </div>
           )}
-
-          {user && (
-            <Link to="/" className="text-documenso-700 hover:text-documenso-600 mt-2">
-              <Trans>Go Back Home</Trans>
-            </Link>
-          )}
         </div>
       </div>
-
-      <PollUntilDocumentCompleted document={document} />
     </div>
   );
 }
-
-export type PollUntilDocumentCompletedProps = {
-  document: Pick<Document, 'id' | 'status' | 'deletedAt'>;
-};
-
-export const PollUntilDocumentCompleted = ({ document }: PollUntilDocumentCompletedProps) => {
-  const { revalidate } = useRevalidator();
-
-  useEffect(() => {
-    if (isDocumentCompleted(document.status)) {
-      return;
-    }
-
-    const interval = setInterval(() => {
-      if (window.document.hasFocus()) {
-        void revalidate();
-      }
-    }, 5000);
-
-    return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [document.status]);
-
-  return <></>;
-};

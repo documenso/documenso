@@ -15,6 +15,7 @@ import communityCardsImage from '@documenso/assets/images/community-cards.png';
 import { authClient } from '@documenso/auth/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -39,7 +40,7 @@ export const ZSignUpFormSchema = z
       .string()
       .trim()
       .min(1, { message: msg`Please enter a valid name.`.id }),
-    email: z.string().email().min(1),
+    email: zEmail().min(1),
     password: ZPasswordSchema,
     signature: z.string().min(1, { message: msg`We need your signature to sign documents`.id }),
   })
@@ -54,8 +55,8 @@ export const ZSignUpFormSchema = z
     },
   );
 
-export const signupErrorMessages: Record<string, MessageDescriptor> = {
-  SIGNUP_DISABLED: msg`Signups are disabled.`,
+export const SIGNUP_ERROR_MESSAGES: Record<string, MessageDescriptor> = {
+  SIGNUP_DISABLED: msg`Signup is currently disabled or not available for your email domain.`,
   [AppErrorCode.ALREADY_EXISTS]: msg`User with this email already exists. Please use a different email address.`,
   [AppErrorCode.INVALID_REQUEST]: msg`We were unable to create your account. Please review the information you provided and try again.`,
 };
@@ -66,14 +67,18 @@ export type SignUpFormProps = {
   className?: string;
   initialEmail?: string;
   isGoogleSSOEnabled?: boolean;
+  isMicrosoftSSOEnabled?: boolean;
   isOIDCSSOEnabled?: boolean;
+  returnTo?: string;
 };
 
 export const SignUpForm = ({
   className,
   initialEmail,
   isGoogleSSOEnabled,
+  isMicrosoftSSOEnabled,
   isOIDCSSOEnabled,
+  returnTo,
 }: SignUpFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -83,6 +88,8 @@ export const SignUpForm = ({
   const [searchParams] = useSearchParams();
 
   const utmSrc = searchParams.get('utm_source') ?? null;
+
+  const hasSocialAuthEnabled = isGoogleSSOEnabled || isMicrosoftSSOEnabled || isOIDCSSOEnabled;
 
   const form = useForm<TSignUpFormSchema>({
     values: {
@@ -106,7 +113,7 @@ export const SignUpForm = ({
         signature,
       });
 
-      await navigate(`/unverified-account`);
+      await navigate(returnTo ? returnTo : '/unverified-account');
 
       toast({
         title: _(msg`Registration Successful`),
@@ -124,7 +131,8 @@ export const SignUpForm = ({
     } catch (err) {
       const error = AppError.parseError(err);
 
-      const errorMessage = signupErrorMessages[error.code] ?? signupErrorMessages.INVALID_REQUEST;
+      const errorMessage =
+        SIGNUP_ERROR_MESSAGES[error.code] ?? SIGNUP_ERROR_MESSAGES.INVALID_REQUEST;
 
       toast({
         title: _(msg`An error occurred`),
@@ -137,6 +145,20 @@ export const SignUpForm = ({
   const onSignUpWithGoogleClick = async () => {
     try {
       await authClient.google.signIn();
+    } catch (err) {
+      toast({
+        title: _(msg`An unknown error occurred`),
+        description: _(
+          msg`We encountered an unknown error while attempting to sign you Up. Please try again later.`,
+        ),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const onSignUpWithMicrosoftClick = async () => {
+    try {
+      await authClient.microsoft.signIn();
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),
@@ -176,7 +198,7 @@ export const SignUpForm = ({
 
   return (
     <div className={cn('flex justify-center gap-x-12', className)}>
-      <div className="border-border relative hidden flex-1 overflow-hidden rounded-xl border xl:flex">
+      <div className="relative hidden flex-1 overflow-hidden rounded-xl border border-border xl:flex">
         <div className="absolute -inset-8 -z-[2] backdrop-blur">
           <img
             src={communityCardsImage}
@@ -185,17 +207,17 @@ export const SignUpForm = ({
           />
         </div>
 
-        <div className="bg-background/50 absolute -inset-8 -z-[1] backdrop-blur-[2px]" />
+        <div className="absolute -inset-8 -z-[1] bg-background/50 backdrop-blur-[2px]" />
 
         <div className="relative flex h-full w-full flex-col items-center justify-evenly">
-          <div className="bg-background rounded-2xl border px-4 py-1 text-sm font-medium">
+          <div className="rounded-2xl border bg-background px-4 py-1 text-sm font-medium">
             <Trans>User profiles are here!</Trans>
           </div>
 
           <div className="w-full max-w-md">
             <UserProfileTimur
               rows={2}
-              className="bg-background border-border rounded-2xl border shadow-md"
+              className="rounded-2xl border border-border bg-background shadow-md"
             />
           </div>
 
@@ -203,13 +225,13 @@ export const SignUpForm = ({
         </div>
       </div>
 
-      <div className="border-border dark:bg-background relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border bg-neutral-100 p-6">
+      <div className="relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border border-border bg-neutral-100 p-6 dark:bg-background">
         <div className="h-20">
           <h1 className="text-xl font-semibold md:text-2xl">
             <Trans>Create a new account</Trans>
           </h1>
 
-          <p className="text-muted-foreground mt-2 text-xs md:text-sm">
+          <p className="mt-2 text-xs text-muted-foreground md:text-sm">
             <Trans>
               Create your account and start using state-of-the-art document signing. Open and
               beautiful signing is within your grasp.
@@ -227,7 +249,7 @@ export const SignUpForm = ({
             <fieldset
               className={cn(
                 'flex h-[550px] w-full flex-col gap-y-4',
-                (isGoogleSSOEnabled || isOIDCSSOEnabled) && 'h-[650px]',
+                hasSocialAuthEnabled && 'h-[650px]',
               )}
               disabled={isSubmitting}
             >
@@ -302,51 +324,63 @@ export const SignUpForm = ({
                 )}
               />
 
-              {(isGoogleSSOEnabled || isOIDCSSOEnabled) && (
-                <>
-                  <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-                    <div className="bg-border h-px flex-1" />
-                    <span className="text-muted-foreground bg-transparent">
-                      <Trans>Or</Trans>
-                    </span>
-                    <div className="bg-border h-px flex-1" />
-                  </div>
-                </>
+              {hasSocialAuthEnabled && (
+                <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
+                  <div className="h-px flex-1 bg-border" />
+                  <span className="bg-transparent text-muted-foreground">
+                    <Trans>Or</Trans>
+                  </span>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
               )}
 
               {isGoogleSSOEnabled && (
-                <>
-                  <Button
-                    type="button"
-                    size="lg"
-                    variant={'outline'}
-                    className="bg-background text-muted-foreground border"
-                    disabled={isSubmitting}
-                    onClick={onSignUpWithGoogleClick}
-                  >
-                    <FcGoogle className="mr-2 h-5 w-5" />
-                    <Trans>Sign Up with Google</Trans>
-                  </Button>
-                </>
+                <Button
+                  type="button"
+                  size="lg"
+                  variant={'outline'}
+                  className="border bg-background text-muted-foreground"
+                  disabled={isSubmitting}
+                  onClick={onSignUpWithGoogleClick}
+                >
+                  <FcGoogle className="mr-2 h-5 w-5" />
+                  <Trans>Sign Up with Google</Trans>
+                </Button>
+              )}
+
+              {isMicrosoftSSOEnabled && (
+                <Button
+                  type="button"
+                  size="lg"
+                  variant={'outline'}
+                  className="border bg-background text-muted-foreground"
+                  disabled={isSubmitting}
+                  onClick={onSignUpWithMicrosoftClick}
+                >
+                  <img
+                    className="mr-2 h-4 w-4"
+                    alt="Microsoft Logo"
+                    src={'/static/microsoft.svg'}
+                  />
+                  <Trans>Sign Up with Microsoft</Trans>
+                </Button>
               )}
 
               {isOIDCSSOEnabled && (
-                <>
-                  <Button
-                    type="button"
-                    size="lg"
-                    variant={'outline'}
-                    className="bg-background text-muted-foreground border"
-                    disabled={isSubmitting}
-                    onClick={onSignUpWithOIDCClick}
-                  >
-                    <FaIdCardClip className="mr-2 h-5 w-5" />
-                    <Trans>Sign Up with OIDC</Trans>
-                  </Button>
-                </>
+                <Button
+                  type="button"
+                  size="lg"
+                  variant={'outline'}
+                  className="border bg-background text-muted-foreground"
+                  disabled={isSubmitting}
+                  onClick={onSignUpWithOIDCClick}
+                >
+                  <FaIdCardClip className="mr-2 h-5 w-5" />
+                  <Trans>Sign Up with OIDC</Trans>
+                </Button>
               )}
 
-              <p className="text-muted-foreground mt-4 text-sm">
+              <p className="mt-4 text-sm text-muted-foreground">
                 <Trans>
                   Already have an account?{' '}
                   <Link to="/signin" className="text-documenso-700 duration-200 hover:opacity-70">
@@ -362,11 +396,11 @@ export const SignUpForm = ({
               size="lg"
               className="mt-6 w-full"
             >
-              <Trans>Complete</Trans>
+              <Trans>Create account</Trans>
             </Button>
           </form>
         </Form>
-        <p className="text-muted-foreground mt-6 text-xs">
+        <p className="mt-6 text-xs text-muted-foreground">
           <Trans>
             By proceeding, you agree to our{' '}
             <Link

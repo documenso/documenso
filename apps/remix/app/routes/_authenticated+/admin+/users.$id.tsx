@@ -10,6 +10,12 @@ import type { z } from 'zod';
 import { trpc } from '@documenso/trpc/react';
 import type { TGetUserResponse } from '@documenso/trpc/server/admin-router/get-user.types';
 import { ZUpdateUserRequestSchema } from '@documenso/trpc/server/admin-router/update-user.types';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@documenso/ui/primitives/accordion';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Form,
@@ -30,6 +36,7 @@ import { AdminUserEnableDialog } from '~/components/dialogs/admin-user-enable-di
 import { AdminUserResetTwoFactorDialog } from '~/components/dialogs/admin-user-reset-two-factor-dialog';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { AdminOrganisationsTable } from '~/components/tables/admin-organisations-table';
+import { AdminUserTeamsTable } from '~/components/tables/admin-user-teams-table';
 
 import { MultiSelectRoleCombobox } from '../../../components/general/multiselect-role-combobox';
 
@@ -59,8 +66,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
           404: {
             heading: msg`User not found`,
             subHeading: msg`404 User not found`,
-            message: msg`The user you are looking for may have been removed, renamed or may have never
-                    existed.`,
+            message: msg`The user you are looking for may have been removed, renamed or may have never existed.`,
           },
         }}
         primaryButton={
@@ -198,7 +204,7 @@ const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
             <h3 className="text-lg font-semibold leading-none tracking-tight">
               <Trans>User Organisations</Trans>
             </h3>
-            <p className="text-muted-foreground mt-1.5 text-sm">
+            <p className="mt-1.5 text-sm text-muted-foreground">
               <Trans>Organisations that the user is a member of.</Trans>
             </p>
           </div>
@@ -219,6 +225,28 @@ const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
           hidePaginationUntilOverflow
         />
       </div>
+
+      <hr className="my-8" />
+
+      <Accordion type="single" collapsible>
+        <AccordionItem value="team-memberships" className="border-b-0">
+          <AccordionTrigger className="py-0">
+            <div className="text-left">
+              <h3 className="text-lg font-semibold leading-none tracking-tight">
+                <Trans>Team Memberships</Trans>
+              </h3>
+              <p className="mt-1.5 text-sm font-normal text-muted-foreground">
+                <Trans>Teams that this user is a member of and their roles.</Trans>
+              </p>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="mt-4">
+              <AdminUserTeamsTable userId={user.id} />
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
       <div className="mt-16 flex flex-col gap-4">
         {user && user.twoFactorEnabled && <AdminUserResetTwoFactorDialog user={user} />}

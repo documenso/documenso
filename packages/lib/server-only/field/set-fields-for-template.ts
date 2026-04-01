@@ -6,6 +6,7 @@ import { validateNumberField } from '@documenso/lib/advanced-fields-validation/v
 import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import {
+  FIELD_META_DEFAULT_VALUES,
   type TFieldMetaSchema as FieldMeta,
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
@@ -27,6 +28,7 @@ export type SetFieldsForTemplateOptions = {
   id: EnvelopeIdOptions;
   fields: {
     id?: number | null;
+    formId?: string;
     envelopeItemId: string;
     type: FieldType;
     recipientId: number;
@@ -111,11 +113,13 @@ export const setFieldsForTemplate = async ({
     };
   });
 
-  const persistedFields = await prisma.$transaction(
+  const persistedFields = await Promise.all(
     // Disabling as wrapping promises here causes type issues
     // eslint-disable-next-line @typescript-eslint/promise-function-async
-    linkedFields.map((field) => {
-      const parsedFieldMeta = field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined;
+    linkedFields.map(async (field) => {
+      const parsedFieldMeta = field.fieldMeta
+        ? ZFieldMetaSchema.parse(field.fieldMeta)
+        : FIELD_META_DEFAULT_VALUES[field.type];
 
       if (field.type === FieldType.TEXT && field.fieldMeta) {
         const textFieldParsedMeta = ZTextFieldMeta.parse(field.fieldMeta);
@@ -128,7 +132,7 @@ export const setFieldsForTemplate = async ({
       if (field.type === FieldType.NUMBER && field.fieldMeta) {
         const numberFieldParsedMeta = ZNumberFieldMeta.parse(field.fieldMeta);
         const errors = validateNumberField(
-          String(numberFieldParsedMeta.value),
+          String(numberFieldParsedMeta.value || ''),
           numberFieldParsedMeta,
         );
         if (errors.length > 0) {
@@ -176,7 +180,7 @@ export const setFieldsForTemplate = async ({
       }
 
       // Proceed with upsert operation
-      return prisma.field.upsert({
+      const upsertedField = await prisma.field.upsert({
         where: {
           id: field._persisted?.id ?? -1,
           envelopeId: envelope.id,
@@ -219,6 +223,11 @@ export const setFieldsForTemplate = async ({
           },
         },
       });
+
+      return {
+        ...upsertedField,
+        formId: field.formId,
+      };
     }),
   );
 
@@ -240,9 +249,17 @@ export const setFieldsForTemplate = async ({
     return !isRemoved && !isUpdated;
   });
 
+  const mappedFilteredFields = filteredFields.map((field) => ({
+    ...mapFieldToLegacyField(field, envelope),
+    formId: undefined,
+  }));
+
+  const mappedPersistentFields = persistedFields.map((field) => ({
+    ...mapFieldToLegacyField(field, envelope),
+    formId: field?.formId,
+  }));
+
   return {
-    fields: [...filteredFields, ...persistedFields].map((field) =>
-      mapFieldToLegacyField(field, envelope),
-    ),
+    fields: [...mappedFilteredFields, ...mappedPersistentFields],
   };
 };

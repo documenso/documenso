@@ -1,21 +1,18 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
 import { CheckCircle, Download, Edit, EyeIcon, Pencil } from 'lucide-react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
-import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import type { TDocumentMany as TDocumentRow } from '@documenso/lib/types/document';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useCurrentTeam } from '~/providers/team';
+
+import { EnvelopeDownloadDialog } from '../dialogs/envelope-download-dialog';
 
 export type DocumentsTableActionButtonProps = {
   row: TDocumentRow;
@@ -23,8 +20,6 @@ export type DocumentsTableActionButtonProps = {
 
 export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonProps) => {
   const { user } = useSession();
-  const { toast } = useToast();
-  const { _ } = useLingui();
 
   const team = useCurrentTeam();
 
@@ -42,39 +37,6 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
   const documentsPath = formatDocumentsPath(team.url);
   const formatPath = `${documentsPath}/${row.envelopeId}/edit`;
 
-  const onDownloadClick = async () => {
-    try {
-      const document = !recipient
-        ? await trpcClient.document.get.query(
-            {
-              documentId: row.id,
-            },
-            {
-              context: {
-                teamId: team?.id?.toString(),
-              },
-            },
-          )
-        : await trpcClient.document.getDocumentByToken.query({
-            token: recipient.token,
-          });
-
-      const documentData = document?.documentData;
-
-      if (!documentData) {
-        throw Error('No document available');
-      }
-
-      await downloadPDF({ documentData, fileName: row.title });
-    } catch (err) {
-      toast({
-        title: _(msg`Something went wrong`),
-        description: _(msg`An error occurred while downloading your document.`),
-        variant: 'destructive',
-      });
-    }
-  };
-
   // TODO: Consider if want to keep this logic for hiding viewing for CC'ers
   if (recipient?.role === RecipientRole.CC && isComplete === false) {
     return null;
@@ -88,6 +50,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
     isComplete,
     isSigned,
     isCurrentTeamDocument,
+    internalVersion: row.internalVersion,
   })
     .with(
       isOwner ? { isDraft: true, isOwner: true } : { isDraft: true, isCurrentTeamDocument: true },
@@ -132,10 +95,17 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
       </Button>
     ))
     .with({ isComplete: true }, () => (
-      <Button className="w-32" onClick={onDownloadClick}>
-        <Download className="-ml-1 mr-2 inline h-4 w-4" />
-        <Trans>Download</Trans>
-      </Button>
+      <EnvelopeDownloadDialog
+        envelopeId={row.envelopeId}
+        envelopeStatus={row.status}
+        token={recipient?.token}
+        trigger={
+          <Button className="w-32">
+            <Download className="-ml-1 mr-2 inline h-4 w-4" />
+            <Trans>Download</Trans>
+          </Button>
+        }
+      />
     ))
     .otherwise(() => <div></div>);
 };

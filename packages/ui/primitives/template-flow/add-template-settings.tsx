@@ -1,9 +1,8 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { DocumentVisibility, TeamMemberRole, TemplateType } from '@prisma/client';
 import { DocumentDistributionMethod, type Field, type Recipient } from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -37,6 +36,10 @@ import {
   DocumentVisibilitySelect,
   DocumentVisibilityTooltip,
 } from '@documenso/ui/components/document/document-visibility-select';
+import {
+  TemplateTypeSelect,
+  TemplateTypeTooltip,
+} from '@documenso/ui/components/template/template-type-select';
 import {
   Accordion,
   AccordionContent,
@@ -97,7 +100,7 @@ export const AddTemplateSettingsFormPartial = ({
   onSubmit,
   onAutoSave,
 }: AddTemplateSettingsFormProps) => {
-  const { t, i18n } = useLingui();
+  const { t } = useLingui();
 
   const organisation = useCurrentOrganisation();
 
@@ -110,6 +113,7 @@ export const AddTemplateSettingsFormPartial = ({
     defaultValues: {
       title: template.title,
       externalId: template.externalId || undefined,
+      templateType: template.type || TemplateType.PRIVATE,
       visibility: template.visibility || '',
       globalAccessAuth: documentAuthOption?.globalAccessAuth || [],
       globalActionAuth: documentAuthOption?.globalActionAuth || [],
@@ -240,7 +244,7 @@ export const AddTemplateSettingsFormPartial = ({
                         <InfoIcon className="mx-2 h-4 w-4" />
                       </TooltipTrigger>
 
-                      <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+                      <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
                         Controls the language for the document, including the language to be used
                         for email notifications, and the final certificate that is generated and
                         attached to the document.
@@ -263,7 +267,7 @@ export const AddTemplateSettingsFormPartial = ({
                       <SelectContent>
                         {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
                           <SelectItem key={code} value={code}>
-                            {language.full}
+                            {t(language.full)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -306,7 +310,7 @@ export const AddTemplateSettingsFormPartial = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex flex-row items-center">
-                      Document visibility
+                      <Trans>Document visibility</Trans>
                       <DocumentVisibilityTooltip />
                     </FormLabel>
 
@@ -328,6 +332,29 @@ export const AddTemplateSettingsFormPartial = ({
 
             <FormField
               control={form.control}
+              name="templateType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex flex-row items-center">
+                    <Trans>Template type</Trans>
+                    <TemplateTypeTooltip organisationTeamCount={organisation.teams.length} />
+                  </FormLabel>
+
+                  <FormControl>
+                    <TemplateTypeSelect
+                      {...field}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        void handleAutoSave();
+                      }}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="meta.distributionMethod"
               render={({ field }) => (
                 <FormItem>
@@ -338,7 +365,7 @@ export const AddTemplateSettingsFormPartial = ({
                         <InfoIcon className="mx-2 h-4 w-4" />
                       </TooltipTrigger>
 
-                      <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+                      <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
                         <h2>
                           <strong>
                             <Trans>Document Distribution Method</Trans>
@@ -392,7 +419,7 @@ export const AddTemplateSettingsFormPartial = ({
                         {Object.values(DOCUMENT_DISTRIBUTION_METHODS).map(
                           ({ value, description }) => (
                             <SelectItem key={value} value={value}>
-                              {i18n._(description)}
+                              {t(description)}
                             </SelectItem>
                           ),
                         )}
@@ -424,8 +451,8 @@ export const AddTemplateSettingsFormPartial = ({
                         field.onChange(value);
                         void handleAutoSave();
                       }}
-                      className="bg-background w-full"
-                      emptySelectionPlaceholder="Select signature types"
+                      className="w-full bg-background"
+                      emptySelectionPlaceholder={t`Select signature types`}
                     />
                   </FormControl>
 
@@ -464,11 +491,11 @@ export const AddTemplateSettingsFormPartial = ({
             {distributionMethod === DocumentDistributionMethod.EMAIL && (
               <Accordion type="multiple">
                 <AccordionItem value="email-options" className="border-none">
-                  <AccordionTrigger className="text-foreground rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
+                  <AccordionTrigger className="rounded border px-3 py-2 text-left text-foreground hover:bg-neutral-200/30 hover:no-underline">
                     <Trans>Email Options</Trans>
                   </AccordionTrigger>
 
-                  <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-4 text-sm leading-relaxed [&>div]:pb-0">
+                  <AccordionContent className="-mx-1 px-1 pt-4 text-sm leading-relaxed text-muted-foreground [&>div]:pb-0">
                     <div className="flex flex-col space-y-6">
                       {organisation.organisationClaim.flags.emailDomains && (
                         <FormField
@@ -519,8 +546,10 @@ export const AddTemplateSettingsFormPartial = ({
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              <Trans>Reply To Email</Trans>{' '}
-                              <span className="text-muted-foreground">(Optional)</span>
+                              <Trans>
+                                Reply To Email{' '}
+                                <span className="text-muted-foreground">(Optional)</span>
+                              </Trans>
                             </FormLabel>
 
                             <FormControl>
@@ -558,13 +587,14 @@ export const AddTemplateSettingsFormPartial = ({
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="flex flex-row items-center">
-                              <Trans>Message</Trans>{' '}
-                              <span className="text-muted-foreground">(Optional)</span>
+                              <Trans>
+                                Message <span className="text-muted-foreground">(Optional)</span>
+                              </Trans>
                               <Tooltip>
                                 <TooltipTrigger>
                                   <InfoIcon className="mx-2 h-4 w-4" />
                                 </TooltipTrigger>
-                                <TooltipContent className="text-muted-foreground p-4">
+                                <TooltipContent className="p-4 text-muted-foreground">
                                   <DocumentSendEmailMessageHelper />
                                 </TooltipContent>
                               </Tooltip>
@@ -572,7 +602,7 @@ export const AddTemplateSettingsFormPartial = ({
 
                             <FormControl>
                               <Textarea
-                                className="bg-background h-16 resize-none"
+                                className="h-16 resize-none bg-background"
                                 {...field}
                                 maxLength={5000}
                                 onBlur={handleAutoSave}
@@ -601,11 +631,11 @@ export const AddTemplateSettingsFormPartial = ({
 
             <Accordion type="multiple">
               <AccordionItem value="advanced-options" className="border-none">
-                <AccordionTrigger className="text-foreground rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
+                <AccordionTrigger className="rounded border px-3 py-2 text-left text-foreground hover:bg-neutral-200/30 hover:no-underline">
                   <Trans>Advanced Options</Trans>
                 </AccordionTrigger>
 
-                <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-4 text-sm leading-relaxed">
+                <AccordionContent className="-mx-1 px-1 pt-4 text-sm leading-relaxed text-muted-foreground">
                   <div className="flex flex-col space-y-6">
                     <FormField
                       control={form.control}
@@ -619,7 +649,7 @@ export const AddTemplateSettingsFormPartial = ({
                                 <InfoIcon className="mx-2 h-4 w-4" />
                               </TooltipTrigger>
 
-                              <TooltipContent className="text-muted-foreground max-w-xs">
+                              <TooltipContent className="max-w-xs text-muted-foreground">
                                 <Trans>
                                   Add an external ID to the template. This can be used to identify
                                   in external systems.
@@ -689,7 +719,7 @@ export const AddTemplateSettingsFormPartial = ({
 
                           <FormControl>
                             <Combobox
-                              className="bg-background time-zone-field"
+                              className="time-zone-field bg-background"
                               options={TIME_ZONES}
                               {...field}
                               onChange={(value) => {
@@ -716,7 +746,7 @@ export const AddTemplateSettingsFormPartial = ({
                                 <InfoIcon className="mx-2 h-4 w-4" />
                               </TooltipTrigger>
 
-                              <TooltipContent className="text-muted-foreground max-w-xs">
+                              <TooltipContent className="max-w-xs text-muted-foreground">
                                 <Trans>
                                   Add a URL to redirect the user to once the document is signed
                                 </Trans>

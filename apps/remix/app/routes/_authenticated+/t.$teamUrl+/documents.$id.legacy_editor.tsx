@@ -9,6 +9,7 @@ import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { logDocumentAccess } from '@documenso/lib/utils/logger';
 import { canAccessTeamDocument, formatDocumentsPath } from '@documenso/lib/utils/teams';
 
+import { DocumentAttachmentsPopover } from '~/components/general/document/document-attachments-popover';
 import { DocumentEditForm } from '~/components/general/document/document-edit-form';
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { LegacyFieldWarningPopover } from '~/components/general/legacy-field-warning-popover';
@@ -83,7 +84,7 @@ export default function DocumentEditPage() {
 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
-      <Link to={documentRootPath} className="flex items-center text-[#7AC455] hover:opacity-80">
+      <Link to={documentRootPath} className="flex items-center text-documenso-700 hover:opacity-80">
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         <Trans>Documents</Trans>
       </Link>
@@ -105,7 +106,7 @@ export default function DocumentEditPage() {
             />
 
             {recipients.length > 0 && (
-              <div className="text-muted-foreground flex items-center">
+              <div className="flex items-center text-muted-foreground">
                 <Users2 className="mr-2 h-5 w-5" />
 
                 <StackAvatarsWithTooltip
@@ -122,11 +123,13 @@ export default function DocumentEditPage() {
           </div>
         </div>
 
-        {document.useLegacyFieldInsertion && (
-          <div>
+        <div className="flex items-center gap-x-4">
+          <DocumentAttachmentsPopover envelopeId={document.envelopeId} />
+
+          {document.useLegacyFieldInsertion && (
             <LegacyFieldWarningPopover type="document" documentId={document.id} />
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <DocumentEditForm

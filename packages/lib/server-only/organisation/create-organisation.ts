@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { OrganisationType } from '@prisma/client';
 import { OrganisationMemberRole } from '@prisma/client';
 
@@ -63,6 +63,7 @@ export const createOrganisation = async ({
     const organisationSetting = await tx.organisationGlobalSettings.create({
       data: {
         ...generateDefaultOrganisationSettings(),
+        defaultRecipients: Prisma.DbNull,
         id: generateDatabaseId('org_setting'),
       },
     });
@@ -205,6 +206,7 @@ export const createOrganisationClaimUpsertData = (subscriptionClaim: InternalCla
     flags: {
       ...subscriptionClaim.flags,
     },
+    envelopeItemCount: subscriptionClaim.envelopeItemCount,
     teamCount: subscriptionClaim.teamCount,
     memberCount: subscriptionClaim.memberCount,
   };

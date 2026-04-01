@@ -5,6 +5,8 @@ import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaLanguageSchema,
 } from '@documenso/lib/types/document-meta';
+import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { DocumentDistributionMethod } from '@documenso/prisma/generated/types';
 
 // Define the schema for configuration
@@ -17,8 +19,8 @@ export const ZConfigureEmbedFormSchema = z.object({
       z.object({
         nativeId: z.number().optional(),
         formId: z.string(),
-        name: z.string().min(1, { message: 'Name is required' }),
-        email: z.string().email('Invalid email address'),
+        name: z.string(),
+        email: zEmail('Invalid email address'),
         role: z.enum(['SIGNER', 'CC', 'APPROVER', 'VIEWER', 'ASSISTANT']),
         signingOrder: z.number().optional(),
         disabled: z.boolean().optional(),
@@ -47,4 +49,18 @@ export const ZConfigureEmbedFormSchema = z.object({
       data: z.instanceof(Uint8Array), // UInt8Array can't be directly validated by zod
     })
     .optional(),
+});
+
+export const ZConfigureTemplateEmbedFormSchema = ZConfigureEmbedFormSchema.extend({
+  signers: z.array(
+    z.object({
+      nativeId: z.number().optional(),
+      formId: z.string(),
+      name: z.string(),
+      email: ZRecipientEmailSchema,
+      role: z.enum(['SIGNER', 'CC', 'APPROVER', 'VIEWER', 'ASSISTANT']),
+      signingOrder: z.number().optional(),
+      disabled: z.boolean().optional(),
+    }),
+  ),
 });
