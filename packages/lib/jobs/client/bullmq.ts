@@ -331,7 +331,7 @@ export class BullMQJobProvider extends BaseJobProvider {
           return task.result as T;
         }
 
-        if (task.retried >= 3) {
+        if (task.retried >= DEFAULT_MAX_RETRIES) {
           throw new Error('Task exceeded retries');
         }
 
