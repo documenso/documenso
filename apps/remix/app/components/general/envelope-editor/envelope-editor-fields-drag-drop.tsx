@@ -11,6 +11,7 @@ import {
   HashIcon,
   ListIcon,
   MailIcon,
+  StampIcon,
   TextIcon,
   UserIcon,
 } from 'lucide-react';
@@ -84,6 +85,11 @@ export const fieldButtonList = [
     type: FieldType.DROPDOWN,
     icon: ListIcon,
     name: msg`Dropdown`,
+  },
+  {
+    type: FieldType.ESTAMP,
+    icon: StampIcon,
+    name: msg`Stamp`,
   },
 ];
 

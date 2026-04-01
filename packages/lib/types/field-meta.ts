@@ -158,6 +158,13 @@ export const ZSignatureFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('signature'),
 });
 
+export const ZEstampFieldMeta = ZBaseFieldMeta.extend({
+  type: z.literal('estamp'),
+  fromPlaceholder: z.string(),
+});
+
+export type TEstampFieldMeta = z.infer<typeof ZEstampFieldMeta>;
+
 export type TSignatureFieldMeta = z.infer<typeof ZSignatureFieldMeta>;
 
 export const ZFieldMetaNotOptionalSchema = z.discriminatedUnion('type', [
@@ -171,6 +178,7 @@ export const ZFieldMetaNotOptionalSchema = z.discriminatedUnion('type', [
   ZRadioFieldMeta,
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
+  ZEstampFieldMeta,
 ]);
 
 export type TFieldMetaNotOptionalSchema = z.infer<typeof ZFieldMetaNotOptionalSchema>;
@@ -275,6 +283,10 @@ export const ZFieldAndMetaSchema = z.discriminatedUnion('type', [
     type: z.literal(FieldType.DROPDOWN),
     fieldMeta: ZDropdownFieldMeta.optional(),
   }),
+  z.object({
+    type: z.literal(FieldType.ESTAMP),
+    fieldMeta: ZEstampFieldMeta.optional(),
+  }),
 ]);
 
 export type TFieldAndMeta = z.infer<typeof ZFieldAndMetaSchema>;
@@ -353,6 +365,11 @@ export const FIELD_DROPDOWN_META_DEFAULT_VALUES: TDropdownFieldMeta = {
   readOnly: false,
 };
 
+export const FIELD_ESTAMP_META_DEFAULT_VALUES: TEstampFieldMeta = {
+  type: 'estamp',
+  fromPlaceholder: '0',
+};
+
 export const FIELD_SIGNATURE_META_DEFAULT_VALUES: TSignatureFieldMeta = {
   type: 'signature',
   fontSize: DEFAULT_SIGNATURE_TEXT_FONT_SIZE,
@@ -370,6 +387,7 @@ export const FIELD_META_DEFAULT_VALUES: Record<FieldType, TFieldMetaSchema> = {
   [FieldType.RADIO]: FIELD_RADIO_META_DEFAULT_VALUES,
   [FieldType.CHECKBOX]: FIELD_CHECKBOX_META_DEFAULT_VALUES,
   [FieldType.DROPDOWN]: FIELD_DROPDOWN_META_DEFAULT_VALUES,
+  [FieldType.ESTAMP]: FIELD_ESTAMP_META_DEFAULT_VALUES,
 } as const;
 
 export const ZEnvelopeFieldAndMetaSchema = z.discriminatedUnion('type', [

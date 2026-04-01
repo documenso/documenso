@@ -12,6 +12,7 @@ import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones'
 import {
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
+  ZEstampFieldMeta,
   ZNumberFieldMeta,
   ZRadioFieldMeta,
   ZTextFieldMeta,
@@ -114,6 +115,11 @@ export const DirectTemplateSigningForm = ({
         }
 
         if (field.type === FieldType.DATE) {
+          tempField.customText = DateTime.now()
+            .setZone(template.templateMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
+            .toFormat(template.templateMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
+        }
+        if (field.type === FieldType.ESTAMP) {
           tempField.customText = DateTime.now()
             .setZone(template.templateMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
             .toFormat(template.templateMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
@@ -376,6 +382,24 @@ export const DirectTemplateSigningForm = ({
                   : null;
 
                 return (
+                  <DocumentSigningCheckboxField
+                    key={field.id}
+                    field={{
+                      ...field,
+                      fieldMeta: parsedFieldMeta,
+                    }}
+                    onSignField={onSignField}
+                    onUnsignField={onUnsignField}
+                  />
+                );
+              })
+              .with(FieldType.ESTAMP, () => {
+                const parsedFieldMeta = field.fieldMeta
+                  ? ZEstampFieldMeta.parse(field.fieldMeta)
+                  : null;
+
+                return (
+                  // here we need to add estamp component
                   <DocumentSigningCheckboxField
                     key={field.id}
                     field={{

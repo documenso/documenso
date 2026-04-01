@@ -8,6 +8,7 @@ import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import type { TFieldMetaSchema } from '../../types/field-meta';
 import { renderCheckboxFieldElement } from './render-checkbox-field';
 import { renderDropdownFieldElement } from './render-dropdown-field';
+import { renderEstampFieldElement } from './render-estamp-field';
 import { renderGenericTextFieldElement } from './render-generic-text-field';
 import { renderRadioFieldElement } from './render-radio-field';
 import { renderSignatureFieldElement } from './render-signature-field';
@@ -78,22 +79,27 @@ export const renderField = ({
   };
 
   // If the generic text field element array changes, update the `GenericTextFieldTypeMetas` type
-  return match(field.type)
-    .with(
-      FieldType.INITIALS,
-      FieldType.NAME,
-      FieldType.EMAIL,
-      FieldType.DATE,
-      FieldType.TEXT,
-      FieldType.NUMBER,
-      () => renderGenericTextFieldElement(field, options),
-    )
-    .with(FieldType.CHECKBOX, () => renderCheckboxFieldElement(field, options))
-    .with(FieldType.RADIO, () => renderRadioFieldElement(field, options))
-    .with(FieldType.DROPDOWN, () => renderDropdownFieldElement(field, options))
-    .with(FieldType.SIGNATURE, () => renderSignatureFieldElement(field, options))
-    .with(FieldType.FREE_SIGNATURE, () => {
-      throw new Error('Free signature fields are not supported');
-    })
-    .exhaustive();
+  return (
+    match(field.type)
+      .with(
+        FieldType.INITIALS,
+        FieldType.NAME,
+        FieldType.EMAIL,
+        FieldType.DATE,
+        FieldType.TEXT,
+        FieldType.NUMBER,
+
+        () => renderGenericTextFieldElement(field, options),
+      )
+      .with(FieldType.CHECKBOX, () => renderCheckboxFieldElement(field, options))
+      .with(FieldType.RADIO, () => renderRadioFieldElement(field, options))
+      .with(FieldType.DROPDOWN, () => renderDropdownFieldElement(field, options))
+      .with(FieldType.SIGNATURE, () => renderSignatureFieldElement(field, options))
+      // here we need new component for estamp field
+      .with(FieldType.ESTAMP, () => renderEstampFieldElement(field, options))
+      .with(FieldType.FREE_SIGNATURE, () => {
+        throw new Error('Free signature fields are not supported');
+      })
+      .exhaustive()
+  );
 };

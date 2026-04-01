@@ -20,6 +20,7 @@ import {
   type TDateFieldMeta,
   type TDropdownFieldMeta,
   type TEmailFieldMeta,
+  type TEstampFieldMeta,
   type TFieldMetaSchema,
   type TInitialsFieldMeta,
   type TNameFieldMeta,
@@ -43,6 +44,7 @@ import { EditorFieldCheckboxForm } from '~/components/forms/editor/editor-field-
 import { EditorFieldDateForm } from '~/components/forms/editor/editor-field-date-form';
 import { EditorFieldDropdownForm } from '~/components/forms/editor/editor-field-dropdown-form';
 import { EditorFieldEmailForm } from '~/components/forms/editor/editor-field-email-form';
+import { EditorFieldEstampForm } from '~/components/forms/editor/editor-field-estamp-form';
 import { EditorFieldInitialsForm } from '~/components/forms/editor/editor-field-initials-form';
 import { EditorFieldNameForm } from '~/components/forms/editor/editor-field-name-form';
 import { EditorFieldNumberForm } from '~/components/forms/editor/editor-field-number-form';
@@ -69,6 +71,7 @@ const FieldSettingsTypeTranslations: Record<FieldType, MessageDescriptor> = {
   [FieldType.RADIO]: msg`Radio Settings`,
   [FieldType.CHECKBOX]: msg`Checkbox Settings`,
   [FieldType.DROPDOWN]: msg`Dropdown Settings`,
+  [FieldType.ESTAMP]: msg`Stamp Settings`,
 };
 
 export const EnvelopeEditorFieldsPage = () => {
@@ -445,6 +448,12 @@ export const EnvelopeEditorFieldsPage = () => {
                     .with(FieldType.TEXT, () => (
                       <EditorFieldTextForm
                         value={selectedField?.fieldMeta as TTextFieldMeta | undefined}
+                        onValueChange={(value) => updateSelectedFieldMeta(value)}
+                      />
+                    ))
+                    .with(FieldType.ESTAMP, () => (
+                      <EditorFieldEstampForm
+                        value={selectedField?.fieldMeta as TEstampFieldMeta | undefined}
                         onValueChange={(value) => updateSelectedFieldMeta(value)}
                       />
                     ))
