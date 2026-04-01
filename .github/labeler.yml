@@ -2,8 +2,7 @@
   - apps/remix/**
 
 'type: documentation'
-  - apps/documentation/**
-  - *.md
+  - apps/docs/**
 
 'version bump 👀':
   - '**/package.json'
