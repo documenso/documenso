@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { Trans, useLingui } from '@lingui/react/macro';
+import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
@@ -42,8 +43,14 @@ export const EnvelopeSaveAsTemplateDialog = ({
 
   const templatesPath = formatTemplatesPath(team.url);
 
-  const [includeRecipients, setIncludeRecipients] = useState(true);
-  const [includeFields, setIncludeFields] = useState(true);
+  const form = useForm({
+    defaultValues: {
+      includeRecipients: true,
+      includeFields: true,
+    },
+  });
+
+  const includeRecipients = form.watch('includeRecipients');
 
   const { mutateAsync: saveAsTemplate, isPending } = trpc.envelope.saveAsTemplate.useMutation({
     onSuccess: async ({ id }) => {
@@ -59,6 +66,8 @@ export const EnvelopeSaveAsTemplateDialog = ({
   });
 
   const onSubmit = async () => {
+    const { includeRecipients, includeFields } = form.getValues();
+
     try {
       await saveAsTemplate({
         envelopeId,
@@ -75,16 +84,21 @@ export const EnvelopeSaveAsTemplateDialog = ({
     }
   };
 
-  const handleIncludeRecipientsChange = (checked: boolean) => {
-    setIncludeRecipients(checked);
-
-    if (!checked) {
-      setIncludeFields(false);
-    }
-  };
-
   return (
-    <Dialog open={open} onOpenChange={(value) => !isPending && setOpen(value)}>
+    <Dialog
+      open={open}
+      onOpenChange={(value) => {
+        if (isPending) {
+          return;
+        }
+
+        setOpen(value);
+
+        if (!value) {
+          form.reset();
+        }
+      }}
+    >
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
 
       <DialogContent>
@@ -98,31 +112,49 @@ export const EnvelopeSaveAsTemplateDialog = ({
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="envelopeIncludeRecipients"
-              checked={includeRecipients}
-              onCheckedChange={(checked) => handleIncludeRecipientsChange(checked === true)}
-            />
-            <Label htmlFor="envelopeIncludeRecipients">
-              <Trans>Include Recipients</Trans>
-            </Label>
-          </div>
+          <Controller
+            control={form.control}
+            name="includeRecipients"
+            render={({ field }) => (
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="envelopeIncludeRecipients"
+                  checked={field.value}
+                  onCheckedChange={(checked) => {
+                    field.onChange(checked === true);
 
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="envelopeIncludeFields"
-              checked={includeFields}
-              disabled={!includeRecipients}
-              onCheckedChange={(checked) => setIncludeFields(checked === true)}
-            />
-            <Label
-              htmlFor="envelopeIncludeFields"
-              className={!includeRecipients ? 'opacity-50' : ''}
-            >
-              <Trans>Include Fields</Trans>
-            </Label>
-          </div>
+                    if (!checked) {
+                      form.setValue('includeFields', false);
+                    }
+                  }}
+                />
+                <Label htmlFor="envelopeIncludeRecipients">
+                  <Trans>Include Recipients</Trans>
+                </Label>
+              </div>
+            )}
+          />
+
+          <Controller
+            control={form.control}
+            name="includeFields"
+            render={({ field }) => (
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="envelopeIncludeFields"
+                  checked={field.value}
+                  disabled={!includeRecipients}
+                  onCheckedChange={(checked) => field.onChange(checked === true)}
+                />
+                <Label
+                  htmlFor="envelopeIncludeFields"
+                  className={!includeRecipients ? 'opacity-50' : ''}
+                >
+                  <Trans>Include Fields</Trans>
+                </Label>
+              </div>
+            )}
+          />
         </div>
 
         <DialogFooter>
