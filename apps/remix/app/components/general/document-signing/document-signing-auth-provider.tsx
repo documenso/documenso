@@ -141,7 +141,7 @@ export const DocumentSigningAuthProvider = ({
 
     if (
       derivedRecipientActionAuth.includes(DocumentAuth.ACCOUNT) &&
-      user?.email == recipient.email
+      user?.email === recipient.email
     ) {
       return {
         type: DocumentAuth.ACCOUNT,
