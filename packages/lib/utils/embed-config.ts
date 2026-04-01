@@ -88,6 +88,9 @@ export const buildEmbeddedFeatures = (
       allowDuplication:
         features.actions?.allowDuplication ??
         DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowDuplication,
+      allowSaveAsTemplate:
+        features.actions?.allowSaveAsTemplate ??
+        DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowSaveAsTemplate,
       allowDownloadPDF:
         features.actions?.allowDownloadPDF ??
         DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowDownloadPDF,

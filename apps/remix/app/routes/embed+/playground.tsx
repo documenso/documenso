@@ -70,6 +70,7 @@ export default function EmbedPlaygroundPage() {
     allowDistributing: false,
     allowDirectLink: false,
     allowDuplication: false,
+    allowSaveAsTemplate: false,
     allowDownloadPDF: false,
     allowDeletion: false,
   });
