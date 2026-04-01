@@ -6,6 +6,7 @@ import { withTimeout } from '../../utils/timeout';
 import { isPrivateUrl } from './is-private-url';
 
 const ZIpSchema = z.string().ip();
+
 const WEBHOOK_DNS_LOOKUP_TIMEOUT_MS = 250;
 
 type TLookupAddress = {
@@ -33,23 +34,23 @@ const toAddressUrl = (address: string) =>
  *
  * Empty or unset = no bypasses (safe default).
  */
-const parseSsrfBypassHosts = (): Set<string> => {
+const webhookSSRFBypassHosts = (): Set<string> => {
   const raw = process.env['NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS'] ?? '';
- 
+
   const hosts = new Set<string>();
- 
+
   for (const entry of raw.split(',')) {
     const trimmed = entry.trim().toLowerCase();
- 
+
     if (trimmed.length > 0) {
       hosts.add(trimmed);
     }
   }
- 
+
   return hosts;
 };
- 
-const ssrfBypassHosts = parseSsrfBypassHosts();
+
+const WEBHOOK_SSRF_BYPASS_HOSTS = webhookSSRFBypassHosts();
 
 /**
  * Check whether the hostname of the given URL is present in the SSRF bypass
@@ -57,14 +58,14 @@ const ssrfBypassHosts = parseSsrfBypassHosts();
  * addresses uniformly.
  */
 const isBypassedHost = (url: string): boolean => {
-  if (ssrfBypassHosts.size === 0) {
+  if (WEBHOOK_SSRF_BYPASS_HOSTS.size === 0) {
     return false;
   }
- 
+
   try {
     const hostname = normalizeHostname(new URL(url).hostname);
- 
-    return ssrfBypassHosts.has(hostname);
+
+    return WEBHOOK_SSRF_BYPASS_HOSTS.has(hostname);
   } catch {
     return false;
   }
@@ -85,7 +86,7 @@ export const assertNotPrivateUrl = async (
   if (isBypassedHost(url)) {
     return;
   }
-  
+
   if (isPrivateUrl(url)) {
     throw new AppError(AppErrorCode.WEBHOOK_INVALID_REQUEST, {
       message: 'Webhook URL resolves to a private or loopback address',
@@ -100,6 +101,7 @@ export const assertNotPrivateUrl = async (
     }
 
     const resolveHostname = options?.lookup ?? lookup;
+
     const lookupResult = await withTimeout(
       resolveHostname(hostname, {
         all: true,
