@@ -161,8 +161,7 @@ export const DocumentEditForm = ({
   });
 
   const saveSettingsData = async (data: TAddSettingsFormSchema) => {
-    const { timezone, dateFormat, redirectUrl, language, signatureTypes, reminderInterval } =
-      data.meta;
+    const { timezone, dateFormat, redirectUrl, language, signatureTypes } = data.meta;
 
     const parsedGlobalAccessAuth = z
       .array(ZDocumentAccessAuthTypesSchema)
@@ -185,7 +184,6 @@ export const DocumentEditForm = ({
         typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
         uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
         drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
-        reminderInterval,
       },
     });
   };

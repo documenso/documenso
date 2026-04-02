@@ -1,6 +1,5 @@
 import {
   type DocumentDistributionMethod,
-  type DocumentReminderInterval,
   type DocumentSigningOrder,
   EnvelopeType,
 } from '@prisma/client';
@@ -38,7 +37,6 @@ export type CreateDocumentMetaOptions = {
   uploadSignatureEnabled?: boolean;
   drawSignatureEnabled?: boolean;
   language?: SupportedLanguageCodes;
-  reminderInterval?: DocumentReminderInterval;
   requestMetadata: ApiRequestMetadata;
 };
 
@@ -61,7 +59,6 @@ export const updateDocumentMeta = async ({
   uploadSignatureEnabled,
   drawSignatureEnabled,
   language,
-  reminderInterval,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
   const { envelopeWhereInput, team } = await getEnvelopeWhereInput({
@@ -123,7 +120,6 @@ export const updateDocumentMeta = async ({
         uploadSignatureEnabled,
         drawSignatureEnabled,
         language,
-        reminderInterval,
       },
     });
 

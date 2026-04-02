@@ -31,6 +31,12 @@ const TEST_SETTINGS_VALUES = {
   expirationMode: 'Custom duration',
   expirationAmount: 5,
   expirationUnit: 'Weeks',
+  reminderMode: 'Enabled',
+  reminderSendAfterAmount: 3,
+  reminderSendAfterUnit: 'Days',
+  reminderRepeatMode: 'Custom interval',
+  reminderRepeatAmount: 7,
+  reminderRepeatUnit: 'Days',
   accessAuth: 'Require account',
   actionAuth: 'Require password',
   visibility: 'Managers and above',
@@ -42,6 +48,10 @@ const DB_EXPECTED_VALUES = {
   timezone: 'Europe/London',
   distributionMethod: DocumentDistributionMethod.NONE,
   envelopeExpirationPeriod: { unit: 'week', amount: 5 },
+  reminderSettings: {
+    sendAfter: { unit: 'day', amount: 3 },
+    repeatEvery: { unit: 'day', amount: 7 },
+  },
   visibility: DocumentVisibility.MANAGER_AND_ABOVE,
   globalAccessAuth: ['ACCOUNT'],
   globalActionAuth: ['PASSWORD'],
@@ -130,6 +140,66 @@ const runSettingsFlow = async (
   await root.getByRole('option', { name: TEST_SETTINGS_VALUES.expirationUnit }).click();
   await clickSettingsDialogHeader(root);
 
+  // Configure reminder settings.
+  await root.getByRole('button', { name: 'Reminders' }).click();
+
+  await root.locator('[data-testid="reminder-mode-select"]').click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderMode }).click();
+  await clickSettingsDialogHeader(root);
+
+  await root.locator('[data-testid="reminder-send-after-amount"]').clear();
+  await root
+    .locator('[data-testid="reminder-send-after-amount"]')
+    .fill(String(TEST_SETTINGS_VALUES.reminderSendAfterAmount));
+
+  await root.locator('[data-testid="reminder-send-after-unit"]').click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderSendAfterUnit }).click();
+  await clickSettingsDialogHeader(root);
+
+  await root.locator('[data-testid="reminder-repeat-mode-select"]').click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderRepeatMode }).click();
+  await clickSettingsDialogHeader(root);
+
+  await root.locator('[data-testid="reminder-repeat-amount"]').clear();
+  await root
+    .locator('[data-testid="reminder-repeat-amount"]')
+    .fill(String(TEST_SETTINGS_VALUES.reminderRepeatAmount));
+
+  await root.locator('[data-testid="reminder-repeat-unit"]').click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderRepeatUnit }).click();
+  await clickSettingsDialogHeader(root);
+
+  const spinbuttons = root.getByRole('spinbutton');
+  await spinbuttons.first().clear();
+  await spinbuttons.first().fill(String(TEST_SETTINGS_VALUES.reminderSendAfterAmount));
+
+  const sendAfterUnitTrigger = root
+    .locator('button[role="combobox"]')
+    .filter({ hasText: /Days|Weeks|Months/ })
+    .first();
+  await sendAfterUnitTrigger.click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderSendAfterUnit }).click();
+  await clickSettingsDialogHeader(root);
+
+  const repeatModeSelect = root
+    .locator('button[role="combobox"]')
+    .filter({ hasText: /Custom interval|Don't repeat/ })
+    .first();
+  await repeatModeSelect.click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderRepeatMode }).click();
+  await clickSettingsDialogHeader(root);
+
+  await spinbuttons.last().clear();
+  await spinbuttons.last().fill(String(TEST_SETTINGS_VALUES.reminderRepeatAmount));
+
+  const repeatUnitTrigger = root
+    .locator('button[role="combobox"]')
+    .filter({ hasText: /Days|Weeks|Months/ })
+    .last();
+  await repeatUnitTrigger.click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderRepeatUnit }).click();
+  await clickSettingsDialogHeader(root);
+
   await root.getByRole('button', { name: 'Email' }).click();
   await root.locator('#recipientSigned').click();
   await root.locator('#recipientSigningRequest').click();
@@ -199,6 +269,27 @@ const runSettingsFlow = async (
       .filter({ hasText: TEST_SETTINGS_VALUES.expirationUnit })
       .first(),
   ).toBeVisible();
+
+  // Verify reminder settings persisted in UI.
+  await root.getByRole('button', { name: 'Reminders' }).click();
+  await expect(root.locator('[data-testid="reminder-mode-select"]')).toContainText(
+    TEST_SETTINGS_VALUES.reminderMode,
+  );
+  await expect(root.locator('[data-testid="reminder-send-after-amount"]')).toHaveValue(
+    String(TEST_SETTINGS_VALUES.reminderSendAfterAmount),
+  );
+  await expect(root.locator('[data-testid="reminder-send-after-unit"]')).toContainText(
+    TEST_SETTINGS_VALUES.reminderSendAfterUnit,
+  );
+  await expect(root.locator('[data-testid="reminder-repeat-mode-select"]')).toContainText(
+    TEST_SETTINGS_VALUES.reminderRepeatMode,
+  );
+  await expect(root.locator('[data-testid="reminder-repeat-amount"]')).toHaveValue(
+    String(TEST_SETTINGS_VALUES.reminderRepeatAmount),
+  );
+  await expect(root.locator('[data-testid="reminder-repeat-unit"]')).toContainText(
+    TEST_SETTINGS_VALUES.reminderRepeatUnit,
+  );
 
   await root.getByRole('button', { name: 'Email' }).click();
   await expect(root.locator('#recipientSigned')).toHaveAttribute('aria-checked', 'false');
@@ -285,6 +376,7 @@ const assertEnvelopeSettingsPersistedInDatabase = async ({
   expect(envelope.documentMeta.envelopeExpirationPeriod).toEqual(
     DB_EXPECTED_VALUES.envelopeExpirationPeriod,
   );
+  expect(envelope.documentMeta.reminderSettings).toEqual(DB_EXPECTED_VALUES.reminderSettings);
   expect(envelope.documentMeta.redirectUrl).toBe(TEST_SETTINGS_VALUES.redirectUrl);
   expect(envelope.documentMeta.emailReplyTo).toBe(TEST_SETTINGS_VALUES.replyTo);
   expect(envelope.documentMeta.subject).toBe(TEST_SETTINGS_VALUES.subject);

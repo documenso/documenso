@@ -1,5 +1,5 @@
 import { msg } from '@lingui/core/macro';
-import { DocumentReminderInterval, DocumentVisibility } from '@prisma/client';
+import { DocumentVisibility } from '@prisma/client';
 import { z } from 'zod';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
@@ -46,7 +46,6 @@ export const ZAddSettingsFormSchema = z.object({
     signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(1, {
       message: msg`At least one signature type must be enabled`.id,
     }),
-    reminderInterval: z.nativeEnum(DocumentReminderInterval).optional(),
   }),
 });
 

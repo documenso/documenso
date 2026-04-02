@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { ZEnvelopeExpirationPeriod } from '@documenso/lib/constants/envelope-expiration';
+import { ZEnvelopeReminderSettings } from '@documenso/lib/constants/envelope-reminder';
 import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
@@ -28,6 +29,7 @@ export const ZUpdateOrganisationSettingsRequestSchema = z.object({
     defaultRecipients: ZDefaultRecipientsSchema.nullish(),
     delegateDocumentOwnership: z.boolean().nullish(),
     envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.optional(),
+    reminderSettings: ZEnvelopeReminderSettings.optional(),
 
     // Branding related settings.
     brandingEnabled: z.boolean().optional(),
