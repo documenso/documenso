@@ -19,7 +19,6 @@ export const SEND_DOCUMENT_CANCELLED_EMAILS_JOB_DEFINITION = {
   name: 'Send Document Cancelled Emails',
   version: '1.0.0',
   trigger: {
-    type: 'event',
     name: SEND_DOCUMENT_CANCELLED_EMAILS_JOB_DEFINITION_ID,
     schema: SEND_DOCUMENT_CANCELLED_EMAILS_JOB_DEFINITION_SCHEMA,
   },

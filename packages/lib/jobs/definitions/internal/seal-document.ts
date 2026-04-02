@@ -20,7 +20,6 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
   version: '1.0.0',
   optimizeParallelism: true,
   trigger: {
-    type: 'event',
     name: SEAL_DOCUMENT_JOB_DEFINITION_ID,
     schema: SEAL_DOCUMENT_JOB_DEFINITION_SCHEMA,
   },
