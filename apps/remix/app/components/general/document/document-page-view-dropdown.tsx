@@ -6,6 +6,7 @@ import {
   Copy,
   Download,
   Edit,
+  FileOutputIcon,
   Loader,
   MoreHorizontal,
   Pencil,
@@ -38,6 +39,7 @@ import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { EnvelopeRenameDialog } from '~/components/dialogs/envelope-rename-dialog';
+import { EnvelopeSaveAsTemplateDialog } from '~/components/dialogs/envelope-save-as-template-dialog';
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
 import { useCurrentTeam } from '~/providers/team';
 
@@ -75,7 +77,7 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger data-testid="document-page-view-action-btn">
         <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
       </DropdownMenuTrigger>
 
@@ -126,6 +128,18 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
           <Copy className="mr-2 h-4 w-4" />
           <Trans>Duplicate</Trans>
         </DropdownMenuItem>
+
+        <EnvelopeSaveAsTemplateDialog
+          envelopeId={envelope.id}
+          trigger={
+            <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+              <div>
+                <FileOutputIcon className="mr-2 h-4 w-4" />
+                <Trans>Save as Template</Trans>
+              </div>
+            </DropdownMenuItem>
+          }
+        />
 
         <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)} disabled={isDeleted}>
           <Trash2 className="mr-2 h-4 w-4" />
