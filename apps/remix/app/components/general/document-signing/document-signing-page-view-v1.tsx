@@ -60,6 +60,7 @@ export type DocumentSigningPageViewV1Props = {
   isRecipientsTurn: boolean;
   allRecipients?: RecipientWithFields[];
   includeSenderDetails: boolean;
+  allowDocumentRejection?: boolean;
 };
 
 export const DocumentSigningPageViewV1 = ({
@@ -70,6 +71,7 @@ export const DocumentSigningPageViewV1 = ({
   isRecipientsTurn,
   allRecipients = [],
   includeSenderDetails,
+  allowDocumentRejection = true,
 }: DocumentSigningPageViewV1Props) => {
   const { documentData, documentMeta } = document;
 
@@ -265,7 +267,9 @@ export const DocumentSigningPageViewV1 = ({
               envelopeId={document.envelopeId}
               token={recipient.token}
             />
-            <DocumentSigningRejectDialog documentId={document.id} token={recipient.token} />
+            {allowDocumentRejection && (
+              <DocumentSigningRejectDialog documentId={document.id} token={recipient.token} />
+            )}
           </div>
         </div>
 

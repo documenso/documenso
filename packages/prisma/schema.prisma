@@ -531,6 +531,8 @@ model DocumentMeta {
 
   envelopeExpirationPeriod Json? /// [EnvelopeExpirationPeriod] @zod.custom.use(ZEnvelopeExpirationPeriodSchema)
 
+  allowDocumentRejection Boolean?
+
   envelope Envelope?
 }
 
@@ -859,6 +861,8 @@ model OrganisationGlobalSettings {
 
   envelopeExpirationPeriod Json? /// [EnvelopeExpirationPeriod] @zod.custom.use(ZEnvelopeExpirationPeriodSchema)
 
+  allowDocumentRejection Boolean @default(true)
+
   // AI features settings.
   aiFeaturesEnabled Boolean @default(false)
 }
@@ -897,6 +901,8 @@ model TeamGlobalSettings {
   brandingCompanyDetails String?
 
   envelopeExpirationPeriod Json? /// [EnvelopeExpirationPeriod] @zod.custom.use(ZEnvelopeExpirationPeriodSchema)
+
+  allowDocumentRejection Boolean?
 
   // AI features settings.
   aiFeaturesEnabled Boolean?
