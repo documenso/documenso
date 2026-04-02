@@ -2,9 +2,19 @@ import { useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import type { Recipient, TemplateDirectLink } from '@prisma/client';
-import { Copy, Edit, FolderIcon, MoreHorizontal, Share2Icon, Trash2, Upload } from 'lucide-react';
+import {
+  Copy,
+  Edit,
+  FolderIcon,
+  MoreHorizontal,
+  Pencil,
+  Share2Icon,
+  Trash2,
+  Upload,
+} from 'lucide-react';
 import { Link } from 'react-router';
 
+import { trpc as trpcReact } from '@documenso/trpc/react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +23,7 @@ import {
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
 
+import { EnvelopeRenameDialog } from '../dialogs/envelope-rename-dialog';
 import { TemplateBulkSendDialog } from '../dialogs/template-bulk-send-dialog';
 import { TemplateDeleteDialog } from '../dialogs/template-delete-dialog';
 import { TemplateDirectLinkDialog } from '../dialogs/template-direct-link-dialog';
@@ -41,8 +52,11 @@ export const TemplatesTableActionDropdown = ({
   teamId,
   onDelete,
 }: TemplatesTableActionDropdownProps) => {
+  const trpcUtils = trpcReact.useUtils();
+
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  const [isRenameDialogOpen, setRenameDialogOpen] = useState(false);
   const [isMoveToFolderDialogOpen, setMoveToFolderDialogOpen] = useState(false);
 
   const isTeamTemplate = row.teamId === teamId;
@@ -65,6 +79,13 @@ export const TemplatesTableActionDropdown = ({
             <Trans>Edit</Trans>
           </Link>
         </DropdownMenuItem>
+
+        {canMutate && (
+          <DropdownMenuItem onClick={() => setRenameDialogOpen(true)}>
+            <Pencil className="mr-2 h-4 w-4" />
+            <Trans>Rename</Trans>
+          </DropdownMenuItem>
+        )}
 
         <DropdownMenuItem disabled={!canMutate} onClick={() => setDuplicateDialogOpen(true)}>
           <Copy className="mr-2 h-4 w-4" />
@@ -131,6 +152,17 @@ export const TemplatesTableActionDropdown = ({
         isOpen={isMoveToFolderDialogOpen}
         onOpenChange={setMoveToFolderDialogOpen}
         currentFolderId={row.folderId}
+      />
+
+      <EnvelopeRenameDialog
+        id={row.envelopeId}
+        initialTitle={row.title}
+        open={isRenameDialogOpen}
+        onOpenChange={setRenameDialogOpen}
+        envelopeType="template"
+        onSuccess={async () => {
+          await trpcUtils.template.findTemplates.invalidate();
+        }}
       />
     </DropdownMenu>
   );

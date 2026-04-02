@@ -9,6 +9,7 @@ import {
   FileOutputIcon,
   Loader,
   MoreHorizontal,
+  Pencil,
   ScrollTextIcon,
   Share,
   Trash2,
@@ -18,8 +19,12 @@ import { Link, useNavigate } from 'react-router';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import type { TEnvelope } from '@documenso/lib/types/envelope';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import {
+  getEnvelopeItemPermissions,
+  mapSecondaryIdToDocumentId,
+} from '@documenso/lib/utils/envelope';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
+import { trpc as trpcReact } from '@documenso/trpc/react';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import {
   DropdownMenu,
@@ -33,6 +38,7 @@ import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialo
 import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate-dialog';
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
+import { EnvelopeRenameDialog } from '~/components/dialogs/envelope-rename-dialog';
 import { EnvelopeSaveAsTemplateDialog } from '~/components/dialogs/envelope-save-as-template-dialog';
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
 import { useCurrentTeam } from '~/providers/team';
@@ -47,8 +53,11 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
   const navigate = useNavigate();
   const team = useCurrentTeam();
 
+  const trpcUtils = trpcReact.useUtils();
+
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  const [isRenameDialogOpen, setRenameDialogOpen] = useState(false);
 
   const recipient = envelope.recipients.find((recipient) => recipient.email === user.email);
 
@@ -59,6 +68,8 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
   const isComplete = isDocumentCompleted(envelope);
   const isCurrentTeamDocument = team && envelope.teamId === team.id;
   const canManageDocument = Boolean(isOwner || isCurrentTeamDocument);
+
+  const { canTitleBeChanged } = getEnvelopeItemPermissions(envelope, []);
 
   const documentsPath = formatDocumentsPath(team.url);
 
@@ -81,6 +92,13 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
               <Edit className="mr-2 h-4 w-4" />
               <Trans>Edit</Trans>
             </Link>
+          </DropdownMenuItem>
+        )}
+
+        {canManageDocument && canTitleBeChanged && (
+          <DropdownMenuItem onClick={() => setRenameDialogOpen(true)}>
+            <Pencil className="mr-2 h-4 w-4" />
+            <Trans>Rename</Trans>
           </DropdownMenuItem>
         )}
 
@@ -189,6 +207,16 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
           onOpenChange={setDuplicateDialogOpen}
         />
       )}
+
+      <EnvelopeRenameDialog
+        id={envelope.id}
+        initialTitle={envelope.title}
+        open={isRenameDialogOpen}
+        onOpenChange={setRenameDialogOpen}
+        onSuccess={async () => {
+          await trpcUtils.envelope.get.invalidate();
+        }}
+      />
     </DropdownMenu>
   );
 };
