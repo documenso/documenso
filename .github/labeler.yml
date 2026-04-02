@@ -1,7 +1,7 @@
 'apps: web':
   - apps/remix/**
 
-'type: documentation'
+'type: documentation':
   - apps/docs/**
 
 'version bump 👀':
