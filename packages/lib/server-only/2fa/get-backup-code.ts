@@ -25,17 +25,21 @@ export const getBackupCodes = ({ user }: GetBackupCodesOptions) => {
     throw new Error('User has no backup codes');
   }
 
-  const secret = Buffer.from(symmetricDecrypt({ key, data: user.twoFactorBackupCodes })).toString(
-    'utf-8',
-  );
+  try {
+    const secret = Buffer.from(
+      symmetricDecrypt({ key, data: user.twoFactorBackupCodes }),
+    ).toString('utf-8');
 
-  const data = JSON.parse(secret);
+    const data = JSON.parse(secret);
 
-  const result = ZBackupCodeSchema.safeParse(data);
+    const result = ZBackupCodeSchema.safeParse(data);
 
-  if (result.success) {
-    return result.data;
+    if (result.success) {
+      return result.data;
+    }
+
+    return null;
+  } catch {
+    return null;
   }
-
-  return null;
 };
