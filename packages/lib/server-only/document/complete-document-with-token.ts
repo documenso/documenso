@@ -193,6 +193,35 @@ export const completeDocumentWithToken = async ({
     (field) => field.type === FieldType.DATE && !field.inserted,
   );
 
+  let recipientName = recipient.name;
+  let recipientEmail = recipient.email;
+
+  // Only trim the name if it's been derived.
+  if (!recipientName) {
+    recipientName = (
+      recipientOverride?.name ||
+      fields.find((field) => field.type === FieldType.NAME)?.customText ||
+      ''
+    ).trim();
+  }
+
+  // Only trim the email if it's been derived.
+  if (!recipient.email) {
+    recipientEmail = (
+      recipientOverride?.email ||
+      fields.find((field) => field.type === FieldType.EMAIL)?.customText ||
+      ''
+    )
+      .trim()
+      .toLowerCase();
+  }
+
+  if (!recipientEmail) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Recipient email is required',
+    });
+  }
+
   // Auto-insert all un-inserted date fields for V2 envelopes at completion time.
   if (envelope.internalVersion === 2 && uninsertedDateFields.length > 0) {
     const formattedDate = DateTime.now()
@@ -222,14 +251,14 @@ export const completeDocumentWithToken = async ({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
           envelopeId: envelope.id,
           user: {
-            email: recipient.email,
-            name: recipient.name,
+            email: recipientEmail,
+            name: recipientName,
           },
           requestMetadata,
           data: {
-            recipientEmail: recipient.email,
+            recipientEmail: recipientEmail,
             recipientId: recipient.id,
-            recipientName: recipient.name,
+            recipientName: recipientName,
             recipientRole: recipient.role,
             fieldId: field.secondaryId,
             field: {
@@ -256,35 +285,6 @@ export const completeDocumentWithToken = async ({
 
   if (fieldsContainUnsignedRequiredField(fields)) {
     throw new Error(`Recipient ${recipient.id} has unsigned fields`);
-  }
-
-  let recipientName = recipient.name;
-  let recipientEmail = recipient.email;
-
-  // Only trim the name if it's been derived.
-  if (!recipientName) {
-    recipientName = (
-      recipientOverride?.name ||
-      fields.find((field) => field.type === FieldType.NAME)?.customText ||
-      ''
-    ).trim();
-  }
-
-  // Only trim the email if it's been derived.
-  if (!recipient.email) {
-    recipientEmail = (
-      recipientOverride?.email ||
-      fields.find((field) => field.type === FieldType.EMAIL)?.customText ||
-      ''
-    )
-      .trim()
-      .toLowerCase();
-  }
-
-  if (!recipientEmail) {
-    throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: 'Recipient email is required',
-    });
   }
 
   await prisma.$transaction(async (tx) => {

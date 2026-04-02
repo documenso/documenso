@@ -112,7 +112,7 @@ const prefillDateFields = (data: EnvelopeForSigningResponse): EnvelopeForSigning
       customText: formattedDate,
       inserted: true,
       fieldMeta: {
-        ...(typeof field.fieldMeta === 'object' && field.fieldMeta !== null ? field.fieldMeta : {}),
+        ...(typeof field.fieldMeta === 'object' ? field.fieldMeta : {}),
         readOnly: true,
       },
     };
