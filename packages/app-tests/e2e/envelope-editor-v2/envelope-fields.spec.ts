@@ -1,6 +1,7 @@
 import { type Page, expect, test } from '@playwright/test';
 import { FieldType } from '@prisma/client';
 
+import { PDF_VIEWER_CONTENT_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 
@@ -637,6 +638,159 @@ const assertDuplicateDeleteFieldPersistedInDatabase = async ({
   expect(envelope.fields[0].type).toBe(FieldType.SIGNATURE);
 };
 
+// --- Duplicate field on all pages with confirmation dialog ---
+
+type TDuplicateOnAllPagesFlowResult = {
+  externalId: string;
+};
+
+const runDuplicateOnAllPagesFieldFlow = async (
+  surface: TEnvelopeEditorSurface,
+): Promise<TDuplicateOnAllPagesFlowResult> => {
+  const externalId = `e2e-dup-on-all-pages-${nanoid()}`;
+  const root = surface.root;
+
+  if (surface.isEmbedded && !surface.envelopeId) {
+    // Use a multi-page PDF for this test
+    await addEnvelopeItemPdf(root, 'embedded-fields.pdf', { isMultiPage: true });
+  }
+
+  await updateExternalId(surface, externalId);
+  await setupRecipientsForFieldPlacement(surface);
+
+  await clickEnvelopeEditorStep(root, 'addFields');
+  await expect(root.locator('.konva-container canvas').first()).toBeVisible();
+
+  // Get the page count from the PDF viewer.
+  const pageElements = root.locator(PDF_VIEWER_CONTENT_SELECTOR);
+  const pageCountAttr = await pageElements.getAttribute('data-page-count');
+  const pageCount = Number(pageCountAttr);
+
+  expect(Number.isInteger(pageCount)).toBe(true);
+  expect(pageCount).toBeGreaterThan(2);
+
+  // Place a Signature field on page 1.
+  await placeFieldOnPdf(root, 'Signature', { x: 150, y: 150 });
+  let fieldCount = await getKonvaElementCountForPage(root, 1, '.field-group');
+  expect(fieldCount).toBe(1);
+
+  // Select the field to show the action toolbar.
+  await selectFieldOnCanvas(root, { x: 150, y: 150 });
+  await expect(root.locator('button[title="Duplicate on all pages"]')).toBeVisible();
+
+  // Click "Duplicate on all pages" button.
+  await root.locator('button[title="Duplicate on all pages"]').click();
+
+  // A confirmation dialog should appear.
+  const confirmButton = root.getByRole('button', { name: /confirm|duplicate|yes/i }).first();
+  await expect(confirmButton).toBeVisible();
+
+  // Confirm the duplication.
+  await confirmButton.click();
+
+  // Wait briefly for fields to be created on all pages.
+  await root.waitForTimeout(500);
+
+  // Check fields on page 1 (should still have 1).
+  fieldCount = await getKonvaElementCountForPage(root, 1, '.field-group');
+  expect(fieldCount).toBe(1);
+
+  // Check that at least one other page has a field.
+  const page2FieldCount = await getKonvaElementCountForPage(root, 2, '.field-group');
+  expect(page2FieldCount).toBe(1);
+
+  // Navigate away and back to verify persistence.
+  await clickEnvelopeEditorStep(root, 'upload');
+  await clickEnvelopeEditorStep(root, 'addFields');
+
+  // Verify fields are still there after navigation.
+  fieldCount = await getKonvaElementCountForPage(root, 1, '.field-group');
+  expect(fieldCount).toBe(1);
+
+  const page2FieldCountAfterNav = await getKonvaElementCountForPage(root, 2, '.field-group');
+  expect(page2FieldCountAfterNav).toBe(1);
+
+  return { externalId };
+};
+
+const runDuplicateOnAllPagesCancelFlow = async (
+  surface: TEnvelopeEditorSurface,
+): Promise<TDuplicateOnAllPagesFlowResult> => {
+  const externalId = `e2e-dup-on-all-pages-cancel-${nanoid()}`;
+  const root = surface.root;
+
+  if (surface.isEmbedded && !surface.envelopeId) {
+    // Use a multi-page PDF for this test
+    await addEnvelopeItemPdf(root, 'embedded-fields.pdf', { isMultiPage: true });
+  }
+
+  await updateExternalId(surface, externalId);
+  await setupRecipientsForFieldPlacement(surface);
+
+  await clickEnvelopeEditorStep(root, 'addFields');
+  await expect(root.locator('.konva-container canvas').first()).toBeVisible();
+
+  // Place a Signature field on page 1.
+  await placeFieldOnPdf(root, 'Signature', { x: 150, y: 150 });
+  let fieldCount = await getKonvaElementCountForPage(root, 1, '.field-group');
+  expect(fieldCount).toBe(1);
+
+  // Select the field to show the action toolbar.
+  await selectFieldOnCanvas(root, { x: 150, y: 150 });
+  await expect(root.locator('button[title="Duplicate on all pages"]')).toBeVisible();
+
+  // Click "Duplicate on all pages" button.
+  await root.locator('button[title="Duplicate on all pages"]').click();
+
+  // A confirmation dialog should appear.
+  const cancelButton = root.locator('button[title="Cancel"]').first();
+  await expect(cancelButton).toBeVisible();
+
+  // Click cancel.
+  await cancelButton.click();
+
+  // Verify dialog is gone.
+  await expect(root.getByRole('dialog')).not.toBeVisible({ timeout: 1000 });
+
+  // Verify field count remains 1 on page 1 (no duplication occurred).
+  fieldCount = await getKonvaElementCountForPage(root, 1, '.field-group');
+  expect(fieldCount).toBe(1);
+
+  return { externalId };
+};
+
+const assertDuplicateOnAllPagesPersistedInDatabase = async ({
+  surface,
+  externalId,
+}: {
+  surface: TEnvelopeEditorSurface;
+  externalId: string;
+}) => {
+  const envelope = await prisma.envelope.findFirstOrThrow({
+    where: {
+      externalId,
+      userId: surface.userId,
+      teamId: surface.teamId,
+      type: surface.envelopeType,
+    },
+    orderBy: { createdAt: 'desc' },
+    include: { fields: true },
+  });
+
+  // Should have multiple fields (one per page, minus the original page).
+  // Minimum: 1 original field + at least 1 duplicated field
+  expect(envelope.fields.length).toBeGreaterThanOrEqual(2);
+
+  // All fields should be SIGNATURE type.
+  envelope.fields.forEach((field) => {
+    expect(field.type).toBe(FieldType.SIGNATURE);
+  });
+
+  // Fields should be on different pages.
+  const pageNumbers = envelope.fields.map((field) => field.page);
+  expect(pageNumbers.length).toBeGreaterThan(1);
+};
+
 // --- Test describe blocks ---
 
 test.describe('document editor', () => {
@@ -678,6 +832,23 @@ test.describe('document editor', () => {
       surface,
       ...result,
     });
+  });
+
+  test('duplicate on all pages with confirmation dialog', async ({ page }) => {
+    // Use a multi-page PDF for this test
+    const surface = await openDocumentEnvelopeEditor(page, { multipage: true });
+    const result = await runDuplicateOnAllPagesFieldFlow(surface);
+
+    await assertDuplicateOnAllPagesPersistedInDatabase({
+      surface,
+      ...result,
+    });
+  });
+
+  test('cancel duplicate on all pages with confirmation dialog', async ({ page }) => {
+    // Use a multi-page PDF for this test
+    const surface = await openDocumentEnvelopeEditor(page, { multipage: true });
+    await runDuplicateOnAllPagesCancelFlow(surface);
   });
 });
 
@@ -782,6 +953,31 @@ test.describe('embedded create', () => {
       surface,
       ...result,
     });
+  });
+
+  test('duplicate on all pages with confirmation dialog', async ({ page }) => {
+    const surface = await openEmbeddedEnvelopeEditor(page, {
+      envelopeType: 'DOCUMENT',
+      tokenNamePrefix: 'e2e-embed-dup-on-all-pages',
+    });
+    const result = await runDuplicateOnAllPagesFieldFlow(surface);
+
+    await persistEmbeddedEnvelope(surface);
+
+    await assertDuplicateOnAllPagesPersistedInDatabase({
+      surface,
+      ...result,
+    });
+  });
+
+  test('cancel duplicate on all pages confirmation dialog', async ({ page }) => {
+    const surface = await openEmbeddedEnvelopeEditor(page, {
+      envelopeType: 'DOCUMENT',
+      tokenNamePrefix: 'e2e-embed-dup-on-all-pages-cancel',
+    });
+    await runDuplicateOnAllPagesCancelFlow(surface);
+
+    await persistEmbeddedEnvelope(surface);
   });
 });
 
