@@ -142,6 +142,8 @@ export const generateDefaultOrganisationSettings = (): Omit<
 
     envelopeExpirationPeriod: DEFAULT_ENVELOPE_EXPIRATION_PERIOD,
 
+    requireRejectionReason: false,
+
     aiFeaturesEnabled: false,
   };
 };

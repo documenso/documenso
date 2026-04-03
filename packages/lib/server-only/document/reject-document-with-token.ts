@@ -10,6 +10,7 @@ import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToDocumentId, unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
 import { assertRecipientNotExpired } from '../../utils/recipients';
+import { getTeamSettings } from '../../server-only/team/get-team-settings';
 
 export type RejectDocumentWithTokenOptions = {
   token: string;
@@ -50,6 +51,14 @@ export async function rejectDocumentWithToken({
   }
 
   assertRecipientNotExpired(recipient);
+
+  const settings = await getTeamSettings({ teamId: envelope.teamId });
+
+  if (settings.requireRejectionReason && !reason?.trim()) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'A reason for rejection is required',
+    });
+  }
 
   // Update the recipient status to rejected
   const [updatedRecipient] = await prisma.$transaction([

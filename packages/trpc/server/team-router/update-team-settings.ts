@@ -58,6 +58,8 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       defaultRecipients,
       // AI features settings.
       aiFeaturesEnabled,
+      // Rejection settings.
+      requireRejectionReason,
     } = data;
 
     if (Object.values(data).length === 0) {
@@ -174,6 +176,9 @@ export const updateTeamSettingsRoute = authenticatedProcedure
 
             // AI features settings.
             aiFeaturesEnabled,
+
+            // Rejection settings.
+            requireRejectionReason,
           },
         },
       },

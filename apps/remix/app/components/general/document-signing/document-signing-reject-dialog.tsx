@@ -33,6 +33,10 @@ const ZRejectDocumentFormSchema = z.object({
   reason: z.string().max(500, msg`Reason must be less than 500 characters`),
 });
 
+const ZRejectDocumentFormSchemaRequired = z.object({
+  reason: z.string().min(1, msg`Reason is required`).max(500, msg`Reason must be less than 500 characters`),
+});
+
 type TRejectDocumentFormSchema = z.infer<typeof ZRejectDocumentFormSchema>;
 
 export interface DocumentSigningRejectDialogProps {
@@ -40,6 +44,7 @@ export interface DocumentSigningRejectDialogProps {
   token: string;
   onRejected?: (reason: string) => void | Promise<void>;
   trigger?: React.ReactNode;
+  requireReason?: boolean;
 }
 
 export function DocumentSigningRejectDialog({
@@ -47,6 +52,7 @@ export function DocumentSigningRejectDialog({
   token,
   onRejected,
   trigger,
+  requireReason = false,
 }: DocumentSigningRejectDialogProps) {
   const { t } = useLingui();
   const { toast } = useToast();
@@ -58,8 +64,10 @@ export function DocumentSigningRejectDialog({
   const { mutateAsync: rejectDocumentWithToken } =
     trpc.recipient.rejectDocumentWithToken.useMutation();
 
+  const formSchema = requireReason ? ZRejectDocumentFormSchemaRequired : ZRejectDocumentFormSchema;
+
   const form = useForm<TRejectDocumentFormSchema>({
-    resolver: zodResolver(ZRejectDocumentFormSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       reason: '',
     },
