@@ -170,6 +170,7 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
     recipientSignature,
     isRecipientsTurn,
     includeSenderDetails: settings.includeSenderDetails,
+    requireRejectionReason: settings.requireRejectionReason,
   } as const;
 };
 
@@ -341,6 +342,7 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
     isRecipientsTurn,
     allRecipients,
     includeSenderDetails,
+    requireRejectionReason,
     recipientWithFields,
   } = data;
 
@@ -421,6 +423,7 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
               isRecipientsTurn={isRecipientsTurn}
               allRecipients={allRecipients}
               includeSenderDetails={includeSenderDetails}
+              requireRejectionReason={requireRejectionReason}
             />
           </div>
         </>

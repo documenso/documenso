@@ -43,6 +43,9 @@ export const ZUpdateOrganisationSettingsRequestSchema = z.object({
 
     // AI features settings.
     aiFeaturesEnabled: z.boolean().optional(),
+
+    // Rejection settings.
+    requireRejectionReason: z.boolean().optional(),
   }),
 });
 
