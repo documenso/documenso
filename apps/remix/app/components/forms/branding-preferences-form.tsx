@@ -9,6 +9,7 @@ import { z } from 'zod';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { BRANDING_LOGO_SIZE_OPTIONS } from '@documenso/lib/constants/organisations';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -45,6 +46,7 @@ const ZBrandingPreferencesFormSchema = z.object({
     )
     .nullish(),
   brandingUrl: z.string().url().optional().or(z.literal('')),
+  brandingLogoSize: z.enum(['h-6', 'h-8', 'h-12', 'h-16']).optional(),
   brandingCompanyDetails: z.string().max(500).optional(),
 });
 
@@ -52,7 +54,7 @@ export type TBrandingPreferencesFormSchema = z.infer<typeof ZBrandingPreferences
 
 type SettingsSubset = Pick<
   TeamGlobalSettings,
-  'brandingEnabled' | 'brandingLogo' | 'brandingUrl' | 'brandingCompanyDetails'
+  'brandingEnabled' | 'brandingLogo' | 'brandingUrl' | 'brandingCompanyDetails' | 'brandingLogoSize'
 >;
 
 export type BrandingPreferencesFormProps = {
@@ -82,6 +84,12 @@ export function BrandingPreferencesForm({
       brandingUrl: settings.brandingUrl ?? '',
       brandingLogo: undefined,
       brandingCompanyDetails: settings.brandingCompanyDetails ?? '',
+      brandingLogoSize: (settings.brandingLogoSize ?? undefined) as
+        | 'h-6'
+        | 'h-8'
+        | 'h-12'
+        | 'h-16'
+        | undefined,
     },
     resolver: zodResolver(ZBrandingPreferencesFormSchema),
   });
@@ -173,7 +181,7 @@ export function BrandingPreferencesForm({
           />
 
           <div className="relative flex w-full flex-col gap-y-4">
-            {!isBrandingEnabled && <div className="bg-background/60 absolute inset-0 z-[9998]" />}
+            {!isBrandingEnabled && <div className="absolute inset-0 z-[9998] bg-background/60" />}
 
             <FormField
               control={form.control}
@@ -185,7 +193,7 @@ export function BrandingPreferencesForm({
                   </FormLabel>
 
                   <div className="flex flex-col gap-4">
-                    <div className="border-border bg-background relative h-48 w-full overflow-hidden rounded-lg border">
+                    <div className="relative h-48 w-full overflow-hidden rounded-lg border border-border bg-background">
                       {previewUrl ? (
                         <img
                           src={previewUrl}
@@ -193,12 +201,12 @@ export function BrandingPreferencesForm({
                           className="h-full w-full object-contain p-4"
                         />
                       ) : (
-                        <div className="bg-muted/20 dark:bg-muted text-muted-foreground relative flex h-full w-full items-center justify-center text-sm">
+                        <div className="relative flex h-full w-full items-center justify-center bg-muted/20 text-sm text-muted-foreground dark:bg-muted">
                           <Trans>Please upload a logo</Trans>
 
                           {!hasLoadedPreview && (
-                            <div className="bg-muted dark:bg-muted absolute inset-0 z-[999] flex items-center justify-center">
-                              <Loader className="text-muted-foreground h-8 w-8 animate-spin" />
+                            <div className="absolute inset-0 z-[999] flex items-center justify-center bg-muted dark:bg-muted">
+                              <Loader className="h-8 w-8 animate-spin text-muted-foreground" />
                             </div>
                           )}
                         </div>
@@ -243,7 +251,7 @@ export function BrandingPreferencesForm({
                           type="button"
                           variant="link"
                           size="sm"
-                          className="text-destructive text-xs"
+                          className="text-xs text-destructive"
                           onClick={() => {
                             setPreviewUrl('');
                             onChange(null);
@@ -264,6 +272,45 @@ export function BrandingPreferencesForm({
                         </span>
                       )}
                     </FormDescription>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="brandingLogoSize"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            <Trans>Logo Size</Trans>
+                          </FormLabel>
+
+                          <FormControl>
+                            <Select
+                              {...field}
+                              value={field.value ?? ''}
+                              onValueChange={(value) => field.onChange(value)}
+                              disabled={!isBrandingEnabled}
+                            >
+                              <SelectTrigger className="bg-background text-muted-foreground">
+                                <SelectValue />
+                              </SelectTrigger>
+
+                              <SelectContent className="z-[9999]">
+                                {BRANDING_LOGO_SIZE_OPTIONS.map((option) => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+
+                          <FormDescription>
+                            <Trans>Select the size for your branding logo in emails</Trans>
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
                   </div>
                 </FormItem>
               )}
