@@ -308,6 +308,8 @@ export const createEnvelopeFields = async ({
       continue;
     }
 
+    const oldDocumentDataId = envelopeItem.documentDataId;
+
     const { documentData: newDocumentData } = await putPdfFileServerSide({
       name: 'document.pdf',
       type: 'application/pdf',
@@ -317,6 +319,11 @@ export const createEnvelopeFields = async ({
     await prisma.envelopeItem.update({
       where: { id: envelopeItemId },
       data: { documentDataId: newDocumentData.id },
+    });
+
+    // Delete orphaned DocumentData that was replaced.
+    await prisma.documentData.delete({
+      where: { id: oldDocumentDataId },
     });
   }
 
