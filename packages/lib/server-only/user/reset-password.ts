@@ -30,6 +30,7 @@ export const resetPassword = async ({ token, password, requestMetadata }: ResetP
           email: true,
           name: true,
           password: true,
+          emailVerified: true,
         },
       },
     },
@@ -54,12 +55,15 @@ export const resetPassword = async ({ token, password, requestMetadata }: ResetP
   const hashedPassword = await hash(password, SALT_ROUNDS);
 
   await prisma.$transaction(async (tx) => {
+    // Update password and verify email if not already verified
+    // This allows admin-created users to verify email and set password in one step
     await tx.user.update({
       where: {
         id: foundToken.userId,
       },
       data: {
         password: hashedPassword,
+        emailVerified: foundToken.user.emailVerified || new Date(),
       },
     });
 
