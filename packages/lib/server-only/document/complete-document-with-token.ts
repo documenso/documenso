@@ -373,6 +373,7 @@ export const completeDocumentWithToken = async ({
           where: { id: nextRecipient.id },
           data: {
             sendStatus: SendStatus.SENT,
+            sentAt: new Date(),
             ...(nextSigner && envelope.documentMeta?.allowDictateNextSigner
               ? {
                   name: nextSigner.name,

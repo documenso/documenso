@@ -5,7 +5,7 @@ import { type JobDefinition } from '../../client/_internal/job';
 const PROCESS_SIGNING_REMINDER_JOB_DEFINITION_ID = 'internal.process-signing-reminder';
 
 const PROCESS_SIGNING_REMINDER_JOB_DEFINITION_SCHEMA = z.object({
-  envelopeId: z.string(),
+  recipientId: z.number(),
 });
 
 export type TProcessSigningReminderJobDefinition = z.infer<

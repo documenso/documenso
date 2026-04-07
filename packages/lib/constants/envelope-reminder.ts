@@ -49,14 +49,16 @@ export const getEnvelopeReminderDuration = (period: TEnvelopeReminderDurationPer
  * - `{ sendAfter: { disabled: true }, ... }` means never send the first reminder.
  * - `{ repeatEvery: { disabled: true }, ... }` means don't repeat after the first reminder.
  *
+ * `sentAt` is when the signing request was sent to this specific recipient.
+ *
  * Returns the next Date the reminder should be sent, or null if no reminder should be sent.
  */
 export const resolveNextReminderAt = (options: {
   config: TEnvelopeReminderSettings | null;
-  envelopeSentAt: Date;
+  sentAt: Date;
   lastReminderSentAt: Date | null;
 }): Date | null => {
-  const { config, envelopeSentAt, lastReminderSentAt } = options;
+  const { config, sentAt, lastReminderSentAt } = options;
 
   if (!config) {
     return null;
@@ -70,7 +72,7 @@ export const resolveNextReminderAt = (options: {
 
     const delay = getEnvelopeReminderDuration(config.sendAfter);
 
-    return new Date(envelopeSentAt.getTime() + delay.toMillis());
+    return new Date(sentAt.getTime() + delay.toMillis());
   }
 
   // For subsequent reminders, use repeatEvery.

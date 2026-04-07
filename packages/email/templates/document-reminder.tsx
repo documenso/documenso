@@ -1,11 +1,12 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import type { RecipientRole } from '@prisma/client';
+import { RecipientRole } from '@prisma/client';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 
 import { Body, Container, Head, Hr, Html, Img, Preview, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
+import { TemplateCustomMessageBody } from '../template-components/template-custom-message-body';
 import { TemplateDocumentReminder } from '../template-components/template-document-reminder';
 import { TemplateFooter } from '../template-components/template-footer';
 
@@ -19,19 +20,19 @@ export type DocumentReminderEmailTemplateProps = {
 };
 
 export const DocumentReminderEmailTemplate = ({
-  recipientName,
+  recipientName = 'John Doe',
   documentName = 'Open Source Pledge.pdf',
   signDocumentLink = 'https://documenso.com',
   assetBaseUrl = 'http://localhost:3002',
   customBody,
-  role,
+  role = RecipientRole.SIGNER,
 }: DocumentReminderEmailTemplateProps) => {
-  const { i18n } = useLingui();
+  const { _ } = useLingui();
   const branding = useBranding();
 
-  const action = i18n.t(RECIPIENT_ROLES_DESCRIPTION[role].actionVerb).toLowerCase();
+  const action = _(RECIPIENT_ROLES_DESCRIPTION[role].actionVerb).toLowerCase();
 
-  const previewTextString = i18n._(msg`Reminder to ${action} ${documentName}`);
+  const previewText = msg`Reminder to ${action} ${documentName}`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();
@@ -40,7 +41,7 @@ export const DocumentReminderEmailTemplate = ({
   return (
     <Html>
       <Head />
-      <Preview>{previewTextString}</Preview>
+      <Preview>{_(previewText)}</Preview>
 
       <Body className="mx-auto my-auto bg-white font-sans">
         <Section>
@@ -70,7 +71,7 @@ export const DocumentReminderEmailTemplate = ({
             <Container className="mx-auto mt-12 max-w-xl">
               <Section>
                 <Text className="mt-2 text-base text-slate-400">
-                  <pre className="font-sans text-base text-slate-400">{customBody}</pre>
+                  <TemplateCustomMessageBody text={customBody} />
                 </Text>
               </Section>
             </Container>
