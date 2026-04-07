@@ -48,14 +48,16 @@ const encodeEmbeddedOptions = (options: Record<string, unknown>) => {
 export const createEmbeddedEnvelopeCreateHash = ({
   envelopeType,
   externalId,
+  folderId,
   features = DEFAULT_EMBEDDED_EDITOR_CONFIG,
   css,
   cssVars,
   darkModeDisabled,
-}: { envelopeType: TEnvelopeEditorType } & TEmbeddedHashCommonOptions) => {
+}: { envelopeType: TEnvelopeEditorType; folderId?: string } & TEmbeddedHashCommonOptions) => {
   return encodeEmbeddedOptions({
     externalId,
     type: envelopeType,
+    folderId,
     features,
     css,
     cssVars,
@@ -139,6 +141,7 @@ type OpenEmbeddedEnvelopeEditorOptions = {
   mode?: 'create' | 'edit';
   tokenNamePrefix?: string;
   externalId?: string;
+  folderId?: string;
   features?: typeof DEFAULT_EMBEDDED_EDITOR_CONFIG;
   css?: string;
   cssVars?: Record<string, string>;
@@ -152,6 +155,7 @@ export const openEmbeddedEnvelopeEditor = async (
     mode = 'create',
     tokenNamePrefix = 'e2e-embed',
     externalId,
+    folderId,
     features,
     css,
     cssVars,
@@ -205,6 +209,7 @@ export const openEmbeddedEnvelopeEditor = async (
     const hash = createEmbeddedEnvelopeCreateHash({
       envelopeType,
       externalId,
+      folderId,
       features,
       css,
       cssVars,
@@ -241,6 +246,9 @@ export const getEnvelopeItemDragHandles = (root: Page) =>
 
 export const getEnvelopeItemRemoveButtons = (root: Page) =>
   root.locator('[data-testid^="envelope-item-remove-button-"]');
+
+export const getEnvelopeItemReplaceButtons = (root: Page) =>
+  root.locator('[data-testid^="envelope-item-replace-button-"]');
 
 export const getEnvelopeItemDropzoneInput = (root: Page) =>
   root.locator('[data-testid="envelope-item-dropzone"] input[type="file"]');

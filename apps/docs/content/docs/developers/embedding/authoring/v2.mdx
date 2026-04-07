@@ -110,14 +110,16 @@ const EnvelopeEditor = ({ presignToken, envelopeId }) => {
 | `css`              | `string`  | No       | Custom CSS string (Platform Plan)                        |
 | `cssVars`          | `object`  | No       | [CSS variable](/docs/developers/embedding/css-variables) overrides (Platform Plan) |
 | `darkModeDisabled` | `boolean` | No       | Disable dark mode (Platform Plan)                        |
+| `language`         | `string`  | No       | Set the UI language. See [Supported Languages](https://github.com/documenso/documenso/tree/main/packages/lib/constants/locales.ts) |
 | `className`        | `string`  | No       | CSS class for the iframe                                 |
 | `features`         | `object`  | No       | Feature toggles for the authoring experience             |
 
 ### Create Component Only
 
-| Prop   | Type                           | Required | Description                                         |
-| ------ | ------------------------------ | -------- | --------------------------------------------------- |
-| `type` | `"DOCUMENT"` \| `"TEMPLATE"`  | Yes      | Whether to create a document or template envelope   |
+| Prop       | Type                           | Required | Description                                                                                                                                                      |
+| ---------- | ------------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`     | `"DOCUMENT"` \| `"TEMPLATE"`  | Yes      | Whether to create a document or template envelope                                                                                                                |
+| `folderId` | `string`                       | No       | The ID of the folder to create the envelope in. If not provided, the envelope is created in the root folder. The folder must match the envelope type and team.   |
 
 ### Update Component Only
 
@@ -201,6 +203,7 @@ Controls how envelope items (individual files within the envelope) can be manage
 | `allowConfigureOrder`  | `boolean` | `true`  | Allow reordering items               |
 | `allowUpload`          | `boolean` | `true`  | Allow uploading new items            |
 | `allowDelete`          | `boolean` | `true`  | Allow deleting items                 |
+| `allowReplace`         | `boolean` | `true`  | Allow replacing an item's PDF        |
 
 ### Recipients
 

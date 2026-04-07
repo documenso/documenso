@@ -6,6 +6,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { UNSAFE_createEnvelopeItems } from '@documenso/lib/server-only/envelope-item/create-envelope-items';
 import { UNSAFE_deleteEnvelopeItem } from '@documenso/lib/server-only/envelope-item/delete-envelope-item';
+import { UNSAFE_replaceEnvelopeItemPdf } from '@documenso/lib/server-only/envelope-item/replace-envelope-item-pdf';
 import { UNSAFE_updateEnvelopeItems } from '@documenso/lib/server-only/envelope-item/update-envelope-items';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
@@ -15,7 +16,7 @@ import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-
 import { setTemplateRecipients } from '@documenso/lib/server-only/recipient/set-template-recipients';
 import { nanoid } from '@documenso/lib/universal/id';
 import { PRESIGNED_ENVELOPE_ITEM_ID_PREFIX } from '@documenso/lib/utils/embed-config';
-import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
+import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 
 import { procedure } from '../trpc';
@@ -95,8 +96,9 @@ export const updateEmbeddingEnvelopeRoute = procedure
     // Step 1: Update the envelope items.
     const envelopeItemsToUpdate: EnvelopeItemUpdateOptions[] = [];
     const envelopeItemsToCreate: EnvelopeItemCreateOptions[] = [];
+    const envelopeItemsToReplace: EnvelopeItemReplaceOptions[] = [];
 
-    // Sort and group envelope items to update and create.
+    // Sort and group envelope items to update, create, and replace.
     data.envelopeItems.forEach((item) => {
       const isNewEnvelopeItem = item.id.startsWith(PRESIGNED_ENVELOPE_ITEM_ID_PREFIX);
 
@@ -110,6 +112,27 @@ export const updateEmbeddingEnvelopeRoute = procedure
           throw new AppError(AppErrorCode.NOT_FOUND, {
             message: 'Envelope item not found',
           });
+        }
+
+        // Check if this existing item has a replacement file.
+        if (item.replaceFileIndex !== undefined) {
+          const replaceFile = files[item.replaceFileIndex];
+
+          if (!replaceFile) {
+            throw new AppError(AppErrorCode.INVALID_BODY, {
+              message: 'Invalid replace file index',
+            });
+          }
+
+          envelopeItemsToReplace.push({
+            envelopeItemId: envelopeItem.id,
+            oldDocumentDataId: envelopeItem.documentDataId,
+            title: item.title,
+            order: item.order,
+            file: replaceFile,
+          });
+
+          return;
         }
 
         const hasEnvelopeItemChanged =
@@ -152,7 +175,8 @@ export const updateEmbeddingEnvelopeRoute = procedure
     const willEnvelopeItemsBeModified =
       envelopeItemIdsToDelete.length > 0 ||
       envelopeItemsToCreate.length > 0 ||
-      envelopeItemsToUpdate.length > 0;
+      envelopeItemsToUpdate.length > 0 ||
+      envelopeItemsToReplace.length > 0;
 
     const organisationClaim = envelope.team.organisation.organisationClaim;
     const resultingEnvelopeItemCount =
@@ -167,10 +191,36 @@ export const updateEmbeddingEnvelopeRoute = procedure
 
     // Should be safe to use stale envelope.recipients since only signed or sent
     // recipients affect the outcome.
-    if (willEnvelopeItemsBeModified && !canEnvelopeItemsBeModified(envelope, envelope.recipients)) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Envelope item is not editable',
+    if (willEnvelopeItemsBeModified) {
+      const permissions = getEnvelopeItemPermissions(envelope, envelope.recipients);
+
+      const hasFileChange = envelopeItemIdsToDelete.length > 0 || envelopeItemsToCreate.length > 0;
+
+      const hasOrderChange = envelopeItemsToUpdate.some((item) => {
+        const existing = envelope.envelopeItems.find((e) => e.id === item.envelopeItemId);
+
+        return !existing || item.order !== existing.order;
       });
+
+      const hasTitleChange = envelopeItemsToUpdate.some((item) => item.title !== undefined);
+
+      if (hasFileChange && !permissions.canFileBeChanged) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Envelope item files are not editable',
+        });
+      }
+
+      if (hasOrderChange && !permissions.canOrderBeChanged) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Envelope item order is not editable',
+        });
+      }
+
+      if (hasTitleChange && !permissions.canTitleBeChanged) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Envelope item title is not editable',
+        });
+      }
     }
 
     if (envelopeItemIdsToDelete.length > 0) {
@@ -228,8 +278,39 @@ export const updateEmbeddingEnvelopeRoute = procedure
     if (envelopeItemsToUpdate.length > 0) {
       await UNSAFE_updateEnvelopeItems({
         envelopeId: envelope.id,
+        envelopeType: envelope.type,
+        existingEnvelopeItems: envelope.envelopeItems,
         data: envelopeItemsToUpdate,
+        user: {
+          name: apiToken.user.name,
+          email: apiToken.user.email,
+        },
+        apiRequestMetadata: ctx.metadata,
       });
+    }
+
+    // Replace PDFs for existing envelope items without creating placeholder fields
+    // field cleanup is handled in later steps.
+    if (envelopeItemsToReplace.length > 0) {
+      await pMap(
+        envelopeItemsToReplace,
+        async (item) => {
+          await UNSAFE_replaceEnvelopeItemPdf({
+            envelope,
+            recipients: [],
+            envelopeItemId: item.envelopeItemId,
+            oldDocumentDataId: item.oldDocumentDataId,
+            data: {
+              title: item.title,
+              order: item.order,
+              file: item.file,
+            },
+            user: apiToken.user,
+            apiRequestMetadata: ctx.metadata,
+          });
+        },
+        { concurrency: 2 },
+      );
     }
 
     // Step 2: Update the general envelope data and meta.
@@ -422,6 +503,14 @@ type EnvelopeItemUpdateOptions = {
 
 type EnvelopeItemCreateOptions = {
   embeddedEnvelopeItemId: string;
+  title: string;
+  order: number;
+  file: File;
+};
+
+type EnvelopeItemReplaceOptions = {
+  envelopeItemId: string;
+  oldDocumentDataId: string;
   title: string;
   order: number;
   file: File;

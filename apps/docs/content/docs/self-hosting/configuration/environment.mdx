@@ -224,11 +224,31 @@ For detailed certificate setup, see [Signing Certificate](/docs/self-hosting/con
 
 ## Feature Flags
 
-| Variable                              | Description                                     | Default |
-| ------------------------------------- | ----------------------------------------------- | ------- |
-| `NEXT_PUBLIC_DISABLE_SIGNUP`          | Disable public user registration                | `false` |
-| `NEXT_PUBLIC_POSTHOG_KEY`             | PostHog API key for analytics and feature flags |         |
-| `NEXT_PUBLIC_FEATURE_BILLING_ENABLED` | Enable billing features                         | `false` |
+| Variable                              | Description                                                                         | Default |
+| ------------------------------------- | ----------------------------------------------------------------------------------- | ------- |
+| `NEXT_PUBLIC_DISABLE_SIGNUP`          | Disable public user registration entirely                                           | `false` |
+| `NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS` | Comma-separated list of email domains allowed to sign up (e.g., `example.com,acme.org`) |         |
+| `NEXT_PUBLIC_POSTHOG_KEY`             | PostHog API key for analytics and feature flags                                     |         |
+| `NEXT_PUBLIC_FEATURE_BILLING_ENABLED` | Enable billing features                                                             | `false` |
+
+### Signup Restrictions
+
+You can control who is allowed to create accounts on your instance using two environment variables:
+
+- **`NEXT_PUBLIC_DISABLE_SIGNUP`**: Set to `true` to block all new signups. Existing users can still sign in. This applies to both email/password and OAuth signups.
+- **`NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS`**: Restrict signups to specific email domains. When set, only users whose email address matches one of the listed domains can create an account. Leave empty to allow all domains.
+
+Both restrictions apply to email/password registration and OAuth (Google, Microsoft, OIDC). If a user attempts to sign up via OAuth with a disallowed domain, they are redirected to the sign-in page with an error.
+
+When both variables are set, `NEXT_PUBLIC_DISABLE_SIGNUP` takes precedence. Signups are blocked regardless of the domain list.
+
+```bash
+# Allow signups only from specific domains
+NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS="example.com,acme.org"
+
+# Or disable signups entirely
+NEXT_PUBLIC_DISABLE_SIGNUP="true"
+```
 
 ---
 
@@ -248,20 +268,40 @@ AI features must also be enabled in organisation/team settings after configurati
 
 ## Background Jobs
 
-Documenso uses a PostgreSQL-based job queue by default. Jobs (email delivery, document processing, webhook dispatch) are stored in the `BackgroundJob` table and processed via internal HTTP requests. No external queue service like Redis is required.
+Documenso supports multiple background job providers for processing emails, documents, webhooks, and scheduled tasks.
 
-| Variable                     | Description                                                                    | Default |
-| ---------------------------- | ------------------------------------------------------------------------------ | ------- |
-| `NEXT_PRIVATE_JOBS_PROVIDER` | Jobs provider: `local` (PostgreSQL-based queue) or `inngest` (managed service) | `local` |
+### Provider Selection
 
-### Inngest Configuration
+| Variable                     | Description                                                                            | Default |
+| ---------------------------- | -------------------------------------------------------------------------------------- | ------- |
+| `NEXT_PRIVATE_JOBS_PROVIDER` | Jobs provider: `local` (PostgreSQL), `bullmq` (Redis), or `inngest` (managed service) | `local` |
 
-| Variable                         | Description                                  |
-| -------------------------------- | -------------------------------------------- |
-| `NEXT_PRIVATE_INNGEST_EVENT_KEY` | Inngest event key                            |
-| `INNGEST_EVENT_KEY`              | Alternative Inngest event key                |
-| `INNGEST_SIGNING_KEY`            | Inngest signing key for webhook verification |
-| `NEXT_PRIVATE_INNGEST_APP_ID`    | Custom Inngest app ID                        |
+### Local (local)
+
+No additional configuration required. Jobs are stored in PostgreSQL and processed via internal HTTP requests.
+
+| Variable                           | Description                                                  | Default                          |
+| ---------------------------------- | ------------------------------------------------------------ | -------------------------------- |
+| `NEXT_PRIVATE_INTERNAL_WEBAPP_URL` | Internal URL for the app to send job requests to itself      | Same as `NEXT_PUBLIC_WEBAPP_URL` |
+
+### BullMQ (bullmq)
+
+| Variable                           | Required | Description                                                   | Default     |
+| ---------------------------------- | -------- | ------------------------------------------------------------- | ----------- |
+| `NEXT_PRIVATE_REDIS_URL`           | Yes      | Redis connection URL (e.g., `redis://localhost:6379`)         |             |
+| `NEXT_PRIVATE_REDIS_PREFIX`        | No       | Key prefix for Redis queues (useful when sharing an instance) | `documenso` |
+| `NEXT_PRIVATE_BULLMQ_CONCURRENCY` | No       | Number of concurrent jobs to process                          | `10`        |
+
+### Inngest (inngest)
+
+| Variable                         | Required | Description                                  |
+| -------------------------------- | -------- | -------------------------------------------- |
+| `NEXT_PRIVATE_INNGEST_EVENT_KEY` | Yes      | Inngest event key                            |
+| `INNGEST_EVENT_KEY`              | No       | Alternative Inngest event key                |
+| `INNGEST_SIGNING_KEY`            | Yes      | Inngest signing key for webhook verification |
+| `NEXT_PRIVATE_INNGEST_APP_ID`    | No       | Custom Inngest app ID                        |
+
+For setup guides and provider recommendations, see [Background Jobs](/docs/self-hosting/configuration/background-jobs).
 
 ---
 
@@ -328,6 +368,10 @@ NEXT_PRIVATE_SMTP_FROM_ADDRESS="noreply@example.com"
 
 # Signing (certificate must be configured)
 NEXT_PRIVATE_SIGNING_PASSPHRASE="your-certificate-password"
+
+# Signup restrictions (optional)
+# NEXT_PUBLIC_DISABLE_SIGNUP="true"
+# NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS="example.com,acme.org"
 ```
 
 ---

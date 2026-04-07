@@ -19,6 +19,7 @@ export enum AppErrorCode {
   'SCHEMA_FAILED' = 'SCHEMA_FAILED',
   'TOO_MANY_REQUESTS' = 'TOO_MANY_REQUESTS',
   'TWO_FACTOR_AUTH_FAILED' = 'TWO_FACTOR_AUTH_FAILED',
+  'WEBHOOK_INVALID_REQUEST' = 'WEBHOOK_INVALID_REQUEST',
 }
 
 export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; status: number }> =

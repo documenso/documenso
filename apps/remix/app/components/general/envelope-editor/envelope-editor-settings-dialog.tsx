@@ -8,7 +8,9 @@ import {
   DocumentDistributionMethod,
   DocumentVisibility,
   EnvelopeType,
+  RecipientRole,
   SendStatus,
+  TemplateType,
 } from '@prisma/client';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { InfoIcon, MailIcon, SettingsIcon, ShieldIcon } from 'lucide-react';
@@ -49,6 +51,7 @@ import {
   canAccessTeamDocument,
   extractTeamSignatureSettings,
 } from '@documenso/lib/utils/teams';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc } from '@documenso/trpc/react';
 import { DocumentEmailCheckboxes } from '@documenso/ui/components/document/document-email-checkboxes';
 import {
@@ -66,6 +69,10 @@ import {
   DocumentVisibilityTooltip,
 } from '@documenso/ui/components/document/document-visibility-select';
 import { ExpirationPeriodPicker } from '@documenso/ui/components/document/expiration-period-picker';
+import {
+  TemplateTypeSelect,
+  TemplateTypeTooltip,
+} from '@documenso/ui/components/template/template-type-select';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { CardDescription, CardHeader, CardTitle } from '@documenso/ui/primitives/card';
@@ -102,6 +109,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { useCurrentTeam } from '~/providers/team';
 
 export const ZAddSettingsFormSchema = z.object({
+  templateType: z.nativeEnum(TemplateType).optional(),
   externalId: z.string().optional(),
   visibility: z.nativeEnum(DocumentVisibility).optional(),
   globalAccessAuth: z
@@ -131,10 +139,7 @@ export const ZAddSettingsFormSchema = z.object({
       .optional()
       .default('en'),
     emailId: z.string().nullable(),
-    emailReplyTo: z.preprocess(
-      (val) => (val === '' ? undefined : val),
-      z.string().email().optional(),
-    ),
+    emailReplyTo: z.preprocess((val) => (val === '' ? undefined : val), zEmail().optional()),
     emailSettings: ZDocumentEmailSettingsSchema,
     signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(1, {
       message: msg`At least one signature type must be enabled`.id,
@@ -196,6 +201,7 @@ export const EnvelopeEditorSettingsDialog = ({
 
   const createDefaultValues = () => {
     return {
+      templateType: envelope.templateType || TemplateType.PRIVATE,
       externalId: envelope.externalId || '',
       visibility: envelope.visibility || '',
       globalAccessAuth: documentAuthOption?.globalAccessAuth || [],
@@ -227,7 +233,10 @@ export const EnvelopeEditorSettingsDialog = ({
 
   const envelopeHasBeenSent =
     envelope.type === EnvelopeType.DOCUMENT &&
-    envelope.recipients.some((recipient) => recipient.sendStatus === SendStatus.SENT);
+    envelope.recipients.some(
+      (recipient) =>
+        recipient.role !== RecipientRole.CC && recipient.sendStatus === SendStatus.SENT,
+    );
 
   const emailSettings = form.watch('meta.emailSettings');
 
@@ -270,6 +279,7 @@ export const EnvelopeEditorSettingsDialog = ({
     try {
       await updateEnvelopeAsync({
         data: {
+          templateType: envelope.type === EnvelopeType.TEMPLATE ? data.templateType : undefined,
           externalId: data.externalId || null,
           visibility: data.visibility,
           globalAccessAuth: parsedGlobalAccessAuth.success ? parsedGlobalAccessAuth.data : [],
@@ -605,6 +615,31 @@ export const EnvelopeEditorSettingsDialog = ({
                           </FormItem>
                         )}
                       />
+
+                      {envelope.type === EnvelopeType.TEMPLATE && (
+                        <FormField
+                          control={form.control}
+                          name="templateType"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="flex flex-row items-center">
+                                <Trans>Template type</Trans>
+                                <TemplateTypeTooltip
+                                  organisationTeamCount={organisation.teams.length}
+                                />
+                              </FormLabel>
+
+                              <FormControl>
+                                <TemplateTypeSelect
+                                  value={field.value}
+                                  disabled={field.disabled}
+                                  onValueChange={field.onChange}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      )}
 
                       {settings.allowConfigureDistribution && (
                         <FormField

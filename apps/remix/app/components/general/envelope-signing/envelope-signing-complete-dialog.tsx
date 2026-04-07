@@ -221,10 +221,12 @@ export const EnvelopeSignerCompleteDialog = () => {
       return {
         name:
           recipient.name ||
+          fullName ||
           recipient.fields.find((field) => field.type === FieldType.NAME)?.customText ||
           '',
         email:
           recipient.email ||
+          email ||
           recipient.fields.find((field) => field.type === FieldType.EMAIL)?.customText ||
           '',
       };

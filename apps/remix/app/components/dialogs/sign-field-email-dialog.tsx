@@ -5,6 +5,7 @@ import { createCallable } from 'react-call';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { zEmail } from '@documenso/lib/utils/zod';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -24,10 +25,7 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 
 const ZSignFieldEmailFormSchema = z.object({
-  email: z
-    .string()
-    .email()
-    .min(1, { message: msg`Email is required`.id }),
+  email: zEmail().min(1, { message: msg`Email is required`.id }),
 });
 
 type TSignFieldEmailFormSchema = z.infer<typeof ZSignFieldEmailFormSchema>;

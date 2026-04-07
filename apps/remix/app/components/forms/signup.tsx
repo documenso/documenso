@@ -16,6 +16,7 @@ import { authClient } from '@documenso/auth/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { ZNameSchema } from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -37,7 +38,7 @@ import { UserProfileTimur } from '~/components/general/user-profile-timur';
 export const ZSignUpFormSchema = z
   .object({
     name: ZNameSchema,
-    email: z.string().email().min(1),
+    email: zEmail().min(1),
     password: ZPasswordSchema,
     signature: z.string().min(1, { message: msg`We need your signature to sign documents`.id }),
   })
@@ -52,8 +53,8 @@ export const ZSignUpFormSchema = z
     },
   );
 
-export const signupErrorMessages: Record<string, MessageDescriptor> = {
-  SIGNUP_DISABLED: msg`Signups are disabled.`,
+export const SIGNUP_ERROR_MESSAGES: Record<string, MessageDescriptor> = {
+  SIGNUP_DISABLED: msg`Signup is currently disabled or not available for your email domain.`,
   [AppErrorCode.ALREADY_EXISTS]: msg`We were unable to create your account. If you already have an account, try signing in instead.`,
   [AppErrorCode.INVALID_REQUEST]: msg`We were unable to create your account. Please review the information you provided and try again.`,
 };
@@ -128,7 +129,8 @@ export const SignUpForm = ({
     } catch (err) {
       const error = AppError.parseError(err);
 
-      const errorMessage = signupErrorMessages[error.code] ?? signupErrorMessages.INVALID_REQUEST;
+      const errorMessage =
+        SIGNUP_ERROR_MESSAGES[error.code] ?? SIGNUP_ERROR_MESSAGES.INVALID_REQUEST;
 
       toast({
         title: _(msg`An error occurred`),
@@ -321,67 +323,59 @@ export const SignUpForm = ({
               />
 
               {hasSocialAuthEnabled && (
-                <>
-                  <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-                    <div className="h-px flex-1 bg-border" />
-                    <span className="bg-transparent text-muted-foreground">
-                      <Trans>Or</Trans>
-                    </span>
-                    <div className="h-px flex-1 bg-border" />
-                  </div>
-                </>
+                <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
+                  <div className="h-px flex-1 bg-border" />
+                  <span className="bg-transparent text-muted-foreground">
+                    <Trans>Or</Trans>
+                  </span>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
               )}
 
               {isGoogleSSOEnabled && (
-                <>
-                  <Button
-                    type="button"
-                    size="lg"
-                    variant={'outline'}
-                    className="border bg-background text-muted-foreground"
-                    disabled={isSubmitting}
-                    onClick={onSignUpWithGoogleClick}
-                  >
-                    <FcGoogle className="mr-2 h-5 w-5" />
-                    <Trans>Sign Up with Google</Trans>
-                  </Button>
-                </>
+                <Button
+                  type="button"
+                  size="lg"
+                  variant={'outline'}
+                  className="border bg-background text-muted-foreground"
+                  disabled={isSubmitting}
+                  onClick={onSignUpWithGoogleClick}
+                >
+                  <FcGoogle className="mr-2 h-5 w-5" />
+                  <Trans>Sign Up with Google</Trans>
+                </Button>
               )}
 
               {isMicrosoftSSOEnabled && (
-                <>
-                  <Button
-                    type="button"
-                    size="lg"
-                    variant={'outline'}
-                    className="border bg-background text-muted-foreground"
-                    disabled={isSubmitting}
-                    onClick={onSignUpWithMicrosoftClick}
-                  >
-                    <img
-                      className="mr-2 h-4 w-4"
-                      alt="Microsoft Logo"
-                      src={'/static/microsoft.svg'}
-                    />
-                    <Trans>Sign Up with Microsoft</Trans>
-                  </Button>
-                </>
+                <Button
+                  type="button"
+                  size="lg"
+                  variant={'outline'}
+                  className="border bg-background text-muted-foreground"
+                  disabled={isSubmitting}
+                  onClick={onSignUpWithMicrosoftClick}
+                >
+                  <img
+                    className="mr-2 h-4 w-4"
+                    alt="Microsoft Logo"
+                    src={'/static/microsoft.svg'}
+                  />
+                  <Trans>Sign Up with Microsoft</Trans>
+                </Button>
               )}
 
               {isOIDCSSOEnabled && (
-                <>
-                  <Button
-                    type="button"
-                    size="lg"
-                    variant={'outline'}
-                    className="border bg-background text-muted-foreground"
-                    disabled={isSubmitting}
-                    onClick={onSignUpWithOIDCClick}
-                  >
-                    <FaIdCardClip className="mr-2 h-5 w-5" />
-                    <Trans>Sign Up with OIDC</Trans>
-                  </Button>
-                </>
+                <Button
+                  type="button"
+                  size="lg"
+                  variant={'outline'}
+                  className="border bg-background text-muted-foreground"
+                  disabled={isSubmitting}
+                  onClick={onSignUpWithOIDCClick}
+                >
+                  <FaIdCardClip className="mr-2 h-5 w-5" />
+                  <Trans>Sign Up with OIDC</Trans>
+                </Button>
               )}
 
               <p className="mt-4 text-sm text-muted-foreground">

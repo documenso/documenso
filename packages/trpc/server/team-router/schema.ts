@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { URL_PATTERN, ZNameSchema } from '@documenso/lib/constants/auth';
 import { PROTECTED_TEAM_URLS } from '@documenso/lib/constants/teams';
+import { zEmail } from '@documenso/lib/utils/zod';
 
 /**
  * Restrict team URLs schema.
@@ -47,7 +48,7 @@ export const ZTeamNameSchema = z
 export const ZCreateTeamEmailVerificationMutationSchema = z.object({
   teamId: z.number(),
   name: ZNameSchema,
-  email: z.string().trim().email().toLowerCase().min(1, 'Please enter a valid email.'),
+  email: zEmail().trim().toLowerCase().min(1, 'Please enter a valid email.'),
 });
 
 export const ZDeleteTeamEmailMutationSchema = z.object({
