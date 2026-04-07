@@ -114,6 +114,7 @@ export default function AuthoringLayout() {
     createdAt: new Date(),
     avatarImageId: null,
     organisationId: '',
+    teamEmail: null,
     currentTeamRole: TeamMemberRole.MEMBER,
     preferences: {
       aiFeaturesEnabled: preferences.aiFeaturesEnabled,

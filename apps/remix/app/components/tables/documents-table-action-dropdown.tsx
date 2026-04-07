@@ -24,6 +24,7 @@ import { useSession } from '@documenso/lib/client-only/providers/session';
 import type { TDocumentMany as TDocumentRow } from '@documenso/lib/types/document';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
+import { findRecipientByEmail } from '@documenso/lib/utils/recipients';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
@@ -64,7 +65,11 @@ export const DocumentsTableActionDropdown = ({
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
   const [isRenameDialogOpen, setRenameDialogOpen] = useState(false);
 
-  const recipient = row.recipients.find((recipient) => recipient.email === user.email);
+  const recipient = findRecipientByEmail({
+    recipients: row.recipients,
+    userEmail: user.email,
+    teamEmail: team.teamEmail?.email,
+  });
 
   const isOwner = row.user.id === user.id;
   // const isRecipient = !!recipient;
