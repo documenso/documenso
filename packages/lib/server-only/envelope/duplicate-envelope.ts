@@ -1,4 +1,5 @@
 import { DocumentSource, EnvelopeType, WebhookTriggerEvents } from '@prisma/client';
+import pMap from 'p-map';
 import { omit } from 'remeda';
 
 import { prisma } from '@documenso/prisma';
@@ -18,9 +19,25 @@ export interface DuplicateEnvelopeOptions {
   id: EnvelopeIdOptions;
   userId: number;
   teamId: number;
+  overrides?: {
+    duplicateAsTemplate?: boolean;
+    includeRecipients?: boolean;
+    includeFields?: boolean;
+  };
 }
 
-export const duplicateEnvelope = async ({ id, userId, teamId }: DuplicateEnvelopeOptions) => {
+export const duplicateEnvelope = async ({
+  id,
+  userId,
+  teamId,
+  overrides,
+}: DuplicateEnvelopeOptions) => {
+  const {
+    duplicateAsTemplate = false,
+    includeRecipients = true,
+    includeFields = true,
+  } = overrides ?? {};
+
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,
     type: null,
@@ -35,6 +52,9 @@ export const duplicateEnvelope = async ({ id, userId, teamId }: DuplicateEnvelop
       title: true,
       userId: true,
       internalVersion: true,
+      templateType: true,
+      publicTitle: true,
+      publicDescription: true,
       envelopeItems: {
         include: {
           documentData: {
@@ -68,29 +88,42 @@ export const duplicateEnvelope = async ({ id, userId, teamId }: DuplicateEnvelop
     });
   }
 
-  const { legacyNumberId, secondaryId } =
-    envelope.type === EnvelopeType.DOCUMENT
-      ? await incrementDocumentId().then(({ documentId, formattedDocumentId }) => ({
+  if (duplicateAsTemplate && envelope.type !== EnvelopeType.DOCUMENT) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Only documents can be saved as templates',
+    });
+  }
+
+  const targetType = duplicateAsTemplate ? EnvelopeType.TEMPLATE : envelope.type;
+
+  const [{ legacyNumberId, secondaryId }, createdDocumentMeta] = await Promise.all([
+    targetType === EnvelopeType.DOCUMENT
+      ? incrementDocumentId().then(({ documentId, formattedDocumentId }) => ({
           legacyNumberId: documentId,
           secondaryId: formattedDocumentId,
         }))
-      : await incrementTemplateId().then(({ templateId, formattedTemplateId }) => ({
+      : incrementTemplateId().then(({ templateId, formattedTemplateId }) => ({
           legacyNumberId: templateId,
           secondaryId: formattedTemplateId,
-        }));
+        })),
+    prisma.documentMeta.create({
+      data: {
+        ...omit(envelope.documentMeta, ['id']),
+        emailSettings: envelope.documentMeta.emailSettings || undefined,
+      },
+    }),
+  ]);
 
-  const createdDocumentMeta = await prisma.documentMeta.create({
-    data: {
-      ...omit(envelope.documentMeta, ['id']),
-      emailSettings: envelope.documentMeta.emailSettings || undefined,
-    },
-  });
+  const duplicatedTemplateType =
+    envelope.templateType === 'ORGANISATION' && envelope.teamId !== teamId
+      ? 'PRIVATE'
+      : (envelope.templateType ?? undefined);
 
   const duplicatedEnvelope = await prisma.envelope.create({
     data: {
       id: prefixedId('envelope'),
       secondaryId,
-      type: envelope.type,
+      type: targetType,
       internalVersion: envelope.internalVersion,
       userId,
       teamId,
@@ -98,8 +131,11 @@ export const duplicateEnvelope = async ({ id, userId, teamId }: DuplicateEnvelop
       documentMetaId: createdDocumentMeta.id,
       authOptions: envelope.authOptions || undefined,
       visibility: envelope.visibility,
+      templateType: duplicatedTemplateType,
+      publicTitle: envelope.publicTitle ?? undefined,
+      publicDescription: envelope.publicDescription ?? undefined,
       source:
-        envelope.type === EnvelopeType.DOCUMENT ? DocumentSource.DOCUMENT : DocumentSource.TEMPLATE,
+        targetType === EnvelopeType.DOCUMENT ? DocumentSource.DOCUMENT : DocumentSource.TEMPLATE,
     },
     include: {
       recipients: true,
@@ -136,34 +172,41 @@ export const duplicateEnvelope = async ({ id, userId, teamId }: DuplicateEnvelop
     }),
   );
 
-  for (const recipient of envelope.recipients) {
-    await prisma.recipient.create({
-      data: {
-        envelopeId: duplicatedEnvelope.id,
-        email: recipient.email,
-        name: recipient.name,
-        role: recipient.role,
-        signingOrder: recipient.signingOrder,
-        token: nanoid(),
-        fields: {
-          createMany: {
-            data: recipient.fields.map((field) => ({
-              envelopeId: duplicatedEnvelope.id,
-              envelopeItemId: oldEnvelopeItemToNewEnvelopeItemIdMap[field.envelopeItemId],
-              type: field.type,
-              page: field.page,
-              positionX: field.positionX,
-              positionY: field.positionY,
-              width: field.width,
-              height: field.height,
-              customText: '',
-              inserted: false,
-              fieldMeta: field.fieldMeta as PrismaJson.FieldMeta,
-            })),
+  if (includeRecipients) {
+    await pMap(
+      envelope.recipients,
+      async (recipient) =>
+        prisma.recipient.create({
+          data: {
+            envelopeId: duplicatedEnvelope.id,
+            email: recipient.email,
+            name: recipient.name,
+            role: recipient.role,
+            signingOrder: recipient.signingOrder,
+            token: nanoid(),
+            fields: includeFields
+              ? {
+                  createMany: {
+                    data: recipient.fields.map((field) => ({
+                      envelopeId: duplicatedEnvelope.id,
+                      envelopeItemId: oldEnvelopeItemToNewEnvelopeItemIdMap[field.envelopeItemId],
+                      type: field.type,
+                      page: field.page,
+                      positionX: field.positionX,
+                      positionY: field.positionY,
+                      width: field.width,
+                      height: field.height,
+                      customText: '',
+                      inserted: false,
+                      fieldMeta: field.fieldMeta as PrismaJson.FieldMeta,
+                    })),
+                  },
+                }
+              : undefined,
           },
-        },
-      },
-    });
+        }),
+      { concurrency: 5 },
+    );
   }
 
   if (duplicatedEnvelope.type === EnvelopeType.DOCUMENT) {
@@ -189,7 +232,7 @@ export const duplicateEnvelope = async ({ id, userId, teamId }: DuplicateEnvelop
     id: duplicatedEnvelope.id,
     envelope: duplicatedEnvelope,
     legacyId: {
-      type: envelope.type,
+      type: duplicatedEnvelope.type,
       id: legacyNumberId,
     },
   };

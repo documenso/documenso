@@ -96,7 +96,7 @@ export const EditorFieldDropdownForm = ({
     mode: 'onChange',
     defaultValues: {
       defaultValue: value.defaultValue,
-      values: [{ value: t`Option 1` }],
+      values: value.values || [{ value: t`Option 1` }],
       required: value.required || false,
       readOnly: value.readOnly || false,
       fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,

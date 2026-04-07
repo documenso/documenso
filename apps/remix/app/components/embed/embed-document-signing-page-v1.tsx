@@ -8,11 +8,13 @@ import { type Field, RecipientRole, SigningStatus } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
+import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { ZSignDocumentEmbedDataSchema } from '@documenso/lib/types/embed-document-sign-schema';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
@@ -30,7 +32,7 @@ import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signa
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 import { injectCss } from '~/utils/css-vars';
 
 import { DocumentSigningAttachmentsPopover } from '../general/document-signing/document-signing-attachments-popover';
@@ -74,7 +76,7 @@ export const EmbedSignDocumentV1ClientPage = ({
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const { fullName, email, signature, setFullName, setSignature } =
+  const { fullName, email, signature, setFullName, setEmail, setSignature } =
     useRequiredDocumentSigningContext();
 
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
@@ -89,6 +91,7 @@ export const EmbedSignDocumentV1ClientPage = ({
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [isNameLocked, setIsNameLocked] = useState(false);
+  const [isEmailLocked, setIsEmailLocked] = useState(!!email);
   const [showPendingFieldTooltip, setShowPendingFieldTooltip] = useState(false);
   const [_showOtherRecipientsCompletedFields, setShowOtherRecipientsCompletedFields] =
     useState(false);
@@ -205,13 +208,19 @@ export const EmbedSignDocumentV1ClientPage = ({
     try {
       const data = ZSignDocumentEmbedDataSchema.parse(JSON.parse(decodeURIComponent(atob(hash))));
 
-      if (!isCompleted && data.name) {
+      if (!isCompleted && data.name && !fullName) {
         setFullName(data.name);
       }
 
       // Since a recipient can be provided a name we can lock it without requiring
       // a to be provided by the parent application, unlike direct templates.
       setIsNameLocked(!!data.lockName);
+
+      if (!isCompleted && data.email && !email) {
+        setEmail(data.email);
+        setIsEmailLocked(!!data.lockEmail);
+      }
+
       setAllowDocumentRejection(!!data.allowDocumentRejection);
       setShowOtherRecipientsCompletedFields(!!data.showOtherRecipientsCompletedFields);
 
@@ -225,11 +234,18 @@ export const EmbedSignDocumentV1ClientPage = ({
           cssVars: data.cssVars,
         });
       }
+
+      if (data.language && data.language !== APP_I18N_OPTIONS.sourceLang) {
+        void dynamicActivate(data.language).finally(() => {
+          setHasFinishedInit(true);
+        });
+      } else {
+        setHasFinishedInit(true);
+      }
     } catch (err) {
       console.error(err);
+      setHasFinishedInit(true);
     }
-
-    setHasFinishedInit(true);
 
     // !: While the two setters are stable we still want to ensure we're avoiding
     // !: re-renders.
@@ -288,7 +304,7 @@ export const EmbedSignDocumentV1ClientPage = ({
         <div className="embed--DocumentContainer relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
           {/* Viewer */}
           <div className="embed--DocumentViewer flex-1">
-            <PDFViewer
+            <PDFViewerLazy
               data={getDocumentDataUrlForPdfViewer({
                 envelopeId: envelopeItems[0]?.envelopeId,
                 envelopeItemId: envelopeItems[0]?.id,
@@ -449,7 +465,8 @@ export const EmbedSignDocumentV1ClientPage = ({
                           id="email"
                           className="mt-2 bg-background"
                           value={email}
-                          disabled
+                          onChange={(e) => setEmail(e.target.value)}
+                          disabled={isEmailLocked}
                         />
                       </div>
 

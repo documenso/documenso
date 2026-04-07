@@ -6,6 +6,7 @@ import { deleteDocumentRoute } from './delete-document';
 import { deleteSubscriptionClaimRoute } from './delete-subscription-claim';
 import { deleteUserRoute } from './delete-user';
 import { disableUserRoute } from './disable-user';
+import { downloadDocumentAuditLogsRoute } from './download-document-audit-logs';
 import { enableUserRoute } from './enable-user';
 import { findAdminOrganisationsRoute } from './find-admin-organisations';
 import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
@@ -16,6 +17,7 @@ import { findSubscriptionClaimsRoute } from './find-subscription-claims';
 import { findUnsealedDocumentsRoute } from './find-unsealed-documents';
 import { findUserTeamsRoute } from './find-user-teams';
 import { getAdminOrganisationRoute } from './get-admin-organisation';
+import { getAdminTeamRoute } from './get-admin-team';
 import { getEmailDomainRoute } from './get-email-domain';
 import { getUserRoute } from './get-user';
 import { promoteMemberToOwnerRoute } from './promote-member-to-owner';
@@ -71,6 +73,7 @@ export const adminRouter = router({
     reseal: resealDocumentRoute,
     findJobs: findDocumentJobsRoute,
     findAuditLogs: findDocumentAuditLogsRoute,
+    downloadAuditLogs: downloadDocumentAuditLogsRoute,
   },
   recipient: {
     update: updateRecipientRoute,
@@ -79,6 +82,9 @@ export const adminRouter = router({
     find: findEmailDomainsRoute,
     get: getEmailDomainRoute,
     reregister: reregisterEmailDomainRoute,
+  },
+  team: {
+    get: getAdminTeamRoute,
   },
   updateSiteSetting: updateSiteSettingRoute,
 });

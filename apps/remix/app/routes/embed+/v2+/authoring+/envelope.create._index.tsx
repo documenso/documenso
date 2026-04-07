@@ -38,6 +38,8 @@ import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/envelope.create._index';
 
+export const shouldRevalidate = () => false;
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const url = new URL(request.url);
 
@@ -356,7 +358,7 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
       publicDescription: '',
       userId: tokenUserId,
       teamId: tokenTeamId,
-      folderId: null,
+      folderId: embedAuthoringOptions?.folderId ?? null,
       documentMeta: {
         id: '',
         ...defaultDocumentMeta,

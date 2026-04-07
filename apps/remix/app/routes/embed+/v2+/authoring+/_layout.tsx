@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { OrganisationMemberRole, OrganisationType, TeamMemberRole } from '@prisma/client';
@@ -8,17 +8,22 @@ import { match } from 'ts-pattern';
 import { PAID_PLAN_LIMITS } from '@documenso/ee/server-only/limits/constants';
 import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client';
 import { OrganisationProvider } from '@documenso/lib/client-only/providers/organisation';
+import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
 import { ZBaseEmbedDataSchema } from '@documenso/lib/types/embed-base-schemas';
+import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { TrpcProvider } from '@documenso/trpc/react';
 import type { OrganisationSession } from '@documenso/trpc/server/organisation-router/get-organisation-session.types';
+import { Spinner } from '@documenso/ui/primitives/spinner';
 
 import { TeamProvider } from '~/providers/team';
 import { injectCss } from '~/utils/css-vars';
 
 import type { Route } from './+types/_layout';
+
+export const shouldRevalidate = () => false;
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const url = new URL(request.url);
@@ -58,6 +63,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 export default function AuthoringLayout() {
   const { token, teamId, organisationClaim, preferences } = useLoaderData<typeof loader>();
 
+  const [hasFinishedInit, setHasFinishedInit] = useState(false);
+
   const allowEmbedAuthoringWhiteLabel = organisationClaim.flags.embedAuthoringWhiteLabel ?? false;
 
   useLayoutEffect(() => {
@@ -67,10 +74,11 @@ export default function AuthoringLayout() {
       const result = ZBaseEmbedDataSchema.safeParse(JSON.parse(decodeURIComponent(atob(hash))));
 
       if (!result.success) {
+        setHasFinishedInit(true);
         return;
       }
 
-      const { css, cssVars, darkModeDisabled } = result.data;
+      const { css, cssVars, darkModeDisabled, language } = result.data;
 
       if (darkModeDisabled) {
         document.documentElement.classList.add('dark-mode-disabled');
@@ -82,8 +90,17 @@ export default function AuthoringLayout() {
           cssVars,
         });
       }
+
+      if (language && language !== APP_I18N_OPTIONS.sourceLang) {
+        void dynamicActivate(language).finally(() => {
+          setHasFinishedInit(true);
+        });
+      } else {
+        setHasFinishedInit(true);
+      }
     } catch (error) {
       console.error(error);
+      setHasFinishedInit(true);
     }
   }, []);
 
@@ -137,7 +154,13 @@ export default function AuthoringLayout() {
             }}
             teamId={team.id}
           >
-            <Outlet />
+            {hasFinishedInit ? (
+              <Outlet />
+            ) : (
+              <div className="flex min-h-screen items-center justify-center">
+                <Spinner />
+              </div>
+            )}
           </LimitsProvider>
         </TrpcProvider>
       </TeamProvider>

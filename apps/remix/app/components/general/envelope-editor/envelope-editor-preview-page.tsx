@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { faker } from '@faker-js/faker/locale/en';
+import type { Faker } from '@faker-js/faker';
 import { Trans } from '@lingui/react/macro';
 import { FieldType, SigningStatus } from '@prisma/client';
 import { FileTextIcon } from 'lucide-react';
@@ -26,9 +26,8 @@ import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-
 
 import { EnvelopeRendererFileSelector } from './envelope-file-selector';
 
-// Todo: Envelopes - Dynamically import faker
 export const EnvelopeEditorPreviewPage = () => {
-  const { envelope, editorFields } = useCurrentEnvelopeEditor();
+  const { envelope, editorFields, editorConfig } = useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem, fields } = useCurrentEnvelopeRender();
 
@@ -38,7 +37,20 @@ export const EnvelopeEditorPreviewPage = () => {
     'recipient',
   );
 
+  const [fakerInstance, setFakerInstance] = useState<Faker | null>(null);
+
+  useEffect(() => {
+    void import('@faker-js/faker/locale/en').then((mod) => {
+      setFakerInstance(mod.faker);
+    });
+  }, []);
+
   const fieldsWithPlaceholders = useMemo(() => {
+    if (!fakerInstance) {
+      return [];
+    }
+
+    const faker = fakerInstance;
     return fields.map((field) => {
       const fieldMeta = ZFieldAndMetaSchema.parse(field);
 
@@ -189,7 +201,7 @@ export const EnvelopeEditorPreviewPage = () => {
           .exhaustive(),
       };
     });
-  }, [fields, envelope, envelope.recipients, envelope.documentMeta]);
+  }, [fields, envelope, envelope.recipients, envelope.documentMeta, fakerInstance]);
 
   /**
    * Set the selected recipient to the first recipient in the envelope.
@@ -210,26 +222,30 @@ export const EnvelopeEditorPreviewPage = () => {
         ...recipient,
         signingStatus: SigningStatus.SIGNED,
       }))}
+      presignToken={editorConfig?.embedded?.presignToken}
       overrideSettings={{
         mode: 'export',
       }}
     >
       <div className="relative flex h-full">
-        <div className="flex w-full flex-col overflow-y-auto" ref={scrollableContainerRef}>
+        <div
+          className="flex h-full w-full flex-col overflow-y-auto px-2"
+          ref={scrollableContainerRef}
+        >
           {/* Horizontal envelope item selector */}
-          <EnvelopeRendererFileSelector fields={editorFields.localFields} />
+          <EnvelopeRendererFileSelector className="px-0" fields={editorFields.localFields} />
+
+          <Alert variant="warning" className="mx-auto max-w-[800px]">
+            <AlertTitle>
+              <Trans>Preview Mode</Trans>
+            </AlertTitle>
+            <AlertDescription>
+              <Trans>Preview what the signed document will look like with placeholder data</Trans>
+            </AlertDescription>
+          </Alert>
 
           {/* Document View */}
           <div className="mt-4 flex h-full flex-col items-center justify-center">
-            <Alert variant="warning" className="mb-4 max-w-[800px]">
-              <AlertTitle>
-                <Trans>Preview Mode</Trans>
-              </AlertTitle>
-              <AlertDescription>
-                <Trans>Preview what the signed document will look like with placeholder data</Trans>
-              </AlertDescription>
-            </Alert>
-
             {currentEnvelopeItem !== null ? (
               <EnvelopePdfViewer
                 customPageRenderer={EnvelopeGenericPageRenderer}

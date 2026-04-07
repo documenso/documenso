@@ -16,7 +16,7 @@ import { type TFieldMetaSchema, ZFieldMetaSchema } from '@documenso/lib/types/fi
 import { nanoid } from '@documenso/lib/universal/id';
 import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
-import { useRecipientColors } from '@documenso/ui/lib/recipient-colors';
+import { getRecipientColorStyles } from '@documenso/ui/lib/recipient-colors';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { FieldItem } from '@documenso/ui/primitives/document-flow/field-item';
@@ -29,7 +29,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@documenso/ui/primitives/shee
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { FieldAdvancedSettingsDrawer } from '~/components/embed/authoring/field-advanced-settings-drawer';
-import { PDFViewer } from '~/components/general/pdf-viewer/pdf-viewer';
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 
 import type { TConfigureEmbedFormSchema } from './configure-document-view.types';
 import type { TConfigureFieldsFormSchema } from './configure-fields-view.types';
@@ -155,9 +155,7 @@ export const ConfigureFieldsView = ({
   });
 
   const selectedRecipientIndex = recipients.findIndex((r) => r.id === selectedRecipient?.id);
-  const selectedRecipientStyles = useRecipientColors(
-    selectedRecipientIndex === -1 ? 0 : selectedRecipientIndex,
-  );
+  const selectedRecipientStyles = getRecipientColorStyles(selectedRecipientIndex);
 
   const form = useForm<TConfigureFieldsFormSchema>({
     defaultValues: {
@@ -549,7 +547,7 @@ export const ConfigureFieldsView = ({
             <Form {...form}>
               <div>
                 {normalizedDocumentData && (
-                  <PDFViewer data={normalizedDocumentData} scrollParentRef="window" />
+                  <PDFViewerLazy data={normalizedDocumentData} scrollParentRef="window" />
                 )}
 
                 <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>

@@ -3,7 +3,7 @@ import { useLayoutEffect, useMemo, useState } from 'react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
 import { CheckCircle2Icon } from 'lucide-react';
-import { redirect } from 'react-router';
+import { type ShouldRevalidateFunctionArgs, redirect } from 'react-router';
 
 import { EnvelopeEditorProvider } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import type { SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
@@ -17,7 +17,10 @@ import {
   ZEmbedEditEnvelopeAuthoringSchema,
 } from '@documenso/lib/types/envelope-editor';
 import type { TEnvelopeFieldAndMeta } from '@documenso/lib/types/field-meta';
-import { buildEmbeddedEditorOptions } from '@documenso/lib/utils/embed-config';
+import {
+  PRESIGNED_ENVELOPE_ITEM_ID_PREFIX,
+  buildEmbeddedEditorOptions,
+} from '@documenso/lib/utils/embed-config';
 import { prisma } from '@documenso/prisma';
 import { trpc } from '@documenso/trpc/react';
 import type { TUpdateEmbeddingEnvelopePayload } from '@documenso/trpc/server/embedding-router/update-embedding-envelope.types';
@@ -29,6 +32,10 @@ import { EnvelopeEditorRenderProviderWrapper } from '~/components/general/envelo
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/envelope.edit.$id';
+
+export const shouldRevalidate = ({ currentParams, nextParams }: ShouldRevalidateFunctionArgs) => {
+  return currentParams.id !== nextParams.id;
+};
 
 export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const url = new URL(request.url);
@@ -55,20 +62,21 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
     throw new Error('Invalid token');
   }
 
-  const settings = await getTeamSettings({
-    userId: result.userId,
-    teamId: result.teamId,
-  });
-
-  const envelope = await getEditorEnvelopeById({
-    id: {
-      type: 'envelopeId',
-      id,
-    },
-    type: null,
-    userId: result.userId,
-    teamId: result.teamId,
-  }).catch(() => null);
+  const [settings, envelope] = await Promise.all([
+    getTeamSettings({
+      userId: result.userId,
+      teamId: result.teamId,
+    }),
+    getEditorEnvelopeById({
+      id: {
+        type: 'envelopeId',
+        id,
+      },
+      type: null,
+      userId: result.userId,
+      teamId: result.teamId,
+    }).catch(() => null),
+  ]);
 
   if (!envelope) {
     throw redirect(`/embed/v2/authoring/error/not-found`);
@@ -167,7 +175,9 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
     const files: File[] = [];
 
     const envelopeItems = envelope.envelopeItems.map((item) => {
-      // Attach any new envelope item files to the request.
+      const isNewItem = item.id.startsWith(PRESIGNED_ENVELOPE_ITEM_ID_PREFIX);
+
+      // Attach any new or replacement envelope item files to the request.
       if (item.data) {
         files.push(
           new File(
@@ -184,7 +194,10 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
         id: item.id,
         title: item.title,
         order: item.order,
-        index: item.data ? files.length - 1 : undefined,
+        // For new items, use `index` to reference the file.
+        index: isNewItem && item.data ? files.length - 1 : undefined,
+        // For existing items being replaced, use `replaceFileIndex`.
+        replaceFileIndex: !isNewItem && item.data ? files.length - 1 : undefined,
       };
     });
 

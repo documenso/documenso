@@ -1,0 +1,343 @@
+---
+title: V2 Authoring
+description: Embed envelope creation and editing directly in your application.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+V2 authoring components allow your users to create and edit envelopes without leaving your application. Envelopes are the unified model for documents and templates in the V2 API.
+
+<Callout type="warn">
+  Embedded authoring is included with [Enterprise](https://documen.so/enterprise-cta) plans. It is
+  also available as a paid add-on for the [Platform Plan](https://documen.so/platform-cta-pricing).
+  Contact sales for access.
+</Callout>
+
+## Components
+
+The SDK provides two V2 authoring components:
+
+| Component              | Purpose                  |
+| ---------------------- | ------------------------ |
+| `EmbedCreateEnvelope`  | Create new envelopes     |
+| `EmbedUpdateEnvelope`  | Edit existing envelopes  |
+
+---
+
+## Presign Tokens
+
+All authoring components require a **presign token** for authentication. See the [Authoring overview](/docs/developers/embedding/authoring) for details on obtaining presign tokens.
+
+<Callout type="warn">
+  A presigned token is NOT an API token
+</Callout>
+
+---
+
+## Creating Envelopes
+
+Use `EmbedCreateEnvelope` to embed envelope creation. The `type` prop determines whether the envelope is created as a document or template.
+
+```jsx
+import { EmbedCreateEnvelope } from '@documenso/embed-react';
+
+const EnvelopeCreator = ({ presignToken }) => {
+  return (
+    <div style={{ height: '800px', width: '100%' }}>
+      <EmbedCreateEnvelope
+        presignToken={presignToken}
+        type="DOCUMENT"
+        externalId="order-12345"
+        onEnvelopeCreated={(data) => {
+          console.log('Envelope created:', data.envelopeId);
+          console.log('External ID:', data.externalId);
+        }}
+      />
+    </div>
+  );
+};
+```
+
+To create a template instead of a document, set `type` to `"TEMPLATE"`:
+
+```jsx
+<EmbedCreateEnvelope
+  presignToken={presignToken}
+  type="TEMPLATE"
+  externalId="template-12345"
+  onEnvelopeCreated={(data) => {
+    console.log('Template envelope created:', data.envelopeId);
+  }}
+/>
+```
+
+---
+
+## Editing Envelopes
+
+Use `EmbedUpdateEnvelope` to embed envelope editing:
+
+```jsx
+import { EmbedUpdateEnvelope } from '@documenso/embed-react';
+
+const EnvelopeEditor = ({ presignToken, envelopeId }) => {
+  return (
+    <div style={{ height: '800px', width: '100%' }}>
+      <EmbedUpdateEnvelope
+        presignToken={presignToken}
+        envelopeId={envelopeId}
+        externalId="order-12345"
+        onEnvelopeUpdated={(data) => {
+          console.log('Envelope updated:', data.envelopeId);
+        }}
+      />
+    </div>
+  );
+};
+```
+
+---
+
+## Props
+
+### All V2 Authoring Components
+
+| Prop               | Type      | Required | Description                                              |
+| ------------------ | --------- | -------- | -------------------------------------------------------- |
+| `presignToken`     | `string`  | Yes      | Authentication token from your backend                   |
+| `externalId`       | `string`  | No       | Your reference ID to link with the envelope              |
+| `host`             | `string`  | No       | Custom host URL. Defaults to `https://app.documenso.com` |
+| `css`              | `string`  | No       | Custom CSS string (Platform Plan)                        |
+| `cssVars`          | `object`  | No       | [CSS variable](/docs/developers/embedding/css-variables) overrides (Platform Plan) |
+| `darkModeDisabled` | `boolean` | No       | Disable dark mode (Platform Plan)                        |
+| `language`         | `string`  | No       | Set the UI language. See [Supported Languages](https://github.com/documenso/documenso/tree/main/packages/lib/constants/locales.ts) |
+| `className`        | `string`  | No       | CSS class for the iframe                                 |
+| `features`         | `object`  | No       | Feature toggles for the authoring experience             |
+
+### Create Component Only
+
+| Prop       | Type                           | Required | Description                                                                                                                                                      |
+| ---------- | ------------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`     | `"DOCUMENT"` \| `"TEMPLATE"`  | Yes      | Whether to create a document or template envelope                                                                                                                |
+| `folderId` | `string`                       | No       | The ID of the folder to create the envelope in. If not provided, the envelope is created in the root folder. The folder must match the envelope type and team.   |
+
+### Update Component Only
+
+| Prop         | Type     | Required | Description                  |
+| ------------ | -------- | -------- | ---------------------------- |
+| `envelopeId` | `string` | Yes      | The envelope ID to edit      |
+
+---
+
+## Feature Toggles
+
+V2 authoring provides rich, structured feature toggles organized into sections. Pass a partial configuration to customize the authoring experience — any omitted fields will use their defaults.
+
+```jsx
+<EmbedCreateEnvelope
+  presignToken={presignToken}
+  type="DOCUMENT"
+  features={{
+    general: {
+      allowConfigureEnvelopeTitle: false,
+      allowUploadAndRecipientStep: false,
+      allowAddFieldsStep: false,
+      allowPreviewStep: false,
+    },
+    settings: {
+      allowConfigureSignatureTypes: false,
+      allowConfigureLanguage: false,
+      allowConfigureDateFormat: false,
+    },
+    recipients: {
+      allowApproverRole: false,
+      allowViewerRole: false,
+    },
+  }}
+/>
+```
+
+### General
+
+Controls the overall authoring flow and UI:
+
+| Property                        | Type      | Default | Description                                      |
+| ------------------------------- | --------- | ------- | ------------------------------------------------ |
+| `allowConfigureEnvelopeTitle`   | `boolean` | `true`  | Allow editing the envelope title                 |
+| `allowUploadAndRecipientStep`   | `boolean` | `true`  | Show the upload and recipient configuration step |
+| `allowAddFieldsStep`           | `boolean` | `true`  | Show the add fields step                         |
+| `allowPreviewStep`             | `boolean` | `true`  | Show the preview step                            |
+| `minimizeLeftSidebar`          | `boolean` | `true`  | Minimize the left sidebar by default             |
+
+### Settings
+
+Controls envelope configuration options. Set to `null` to hide envelope settings entirely.
+
+| Property                            | Type      | Default | Description                               |
+| ----------------------------------- | --------- | ------- | ----------------------------------------- |
+| `allowConfigureSignatureTypes`      | `boolean` | `true`  | Allow configuring signature types         |
+| `allowConfigureLanguage`            | `boolean` | `true`  | Allow configuring the language            |
+| `allowConfigureDateFormat`          | `boolean` | `true`  | Allow configuring the date format         |
+| `allowConfigureTimezone`            | `boolean` | `true`  | Allow configuring the timezone            |
+| `allowConfigureRedirectUrl`         | `boolean` | `true`  | Allow configuring a redirect URL          |
+| `allowConfigureDistribution`        | `boolean` | `true`  | Allow configuring distribution settings   |
+| `allowConfigureExpirationPeriod`    | `boolean` | `true`  | Allow configuring the expiration period   |
+| `allowConfigureEmailSender`         | `boolean` | `true`  | Allow configuring the email sender        |
+| `allowConfigureEmailReplyTo`        | `boolean` | `true`  | Allow configuring the email reply-to      |
+
+### Actions
+
+Controls available actions during authoring:
+
+| Property           | Type      | Default | Description              |
+| ------------------ | --------- | ------- | ------------------------ |
+| `allowAttachments` | `boolean` | `true`  | Allow adding attachments |
+
+### Envelope Items
+
+Controls how envelope items (individual files within the envelope) can be managed. Set to `null` to prevent any item modifications.
+
+| Property              | Type      | Default | Description                          |
+| --------------------- | --------- | ------- | ------------------------------------ |
+| `allowConfigureTitle`  | `boolean` | `true`  | Allow editing item titles            |
+| `allowConfigureOrder`  | `boolean` | `true`  | Allow reordering items               |
+| `allowUpload`          | `boolean` | `true`  | Allow uploading new items            |
+| `allowDelete`          | `boolean` | `true`  | Allow deleting items                 |
+| `allowReplace`         | `boolean` | `true`  | Allow replacing an item's PDF        |
+
+### Recipients
+
+Controls recipient configuration options. Set to `null` to prevent any recipient modifications.
+
+| Property                          | Type      | Default | Description                              |
+| --------------------------------- | --------- | ------- | ---------------------------------------- |
+| `allowConfigureSigningOrder`      | `boolean` | `true`  | Allow configuring the signing order      |
+| `allowConfigureDictateNextSigner` | `boolean` | `true`  | Allow configuring dictate next signer    |
+| `allowApproverRole`               | `boolean` | `true`  | Allow the approver recipient role        |
+| `allowViewerRole`                 | `boolean` | `true`  | Allow the viewer recipient role          |
+| `allowCCerRole`                   | `boolean` | `true`  | Allow the CC recipient role              |
+| `allowAssistantRole`              | `boolean` | `true`  | Allow the assistant recipient role       |
+
+### Disabling Steps
+
+You can also disable entire steps of the authoring flow. This allows you to skip steps that are not relevant to your use case:
+
+```jsx
+<EmbedCreateEnvelope
+  presignToken={presignToken}
+  type="DOCUMENT"
+  features={{
+    general: {
+      allowUploadAndRecipientStep: false, // Skip the upload and recipient step
+      allowAddFieldsStep: false,          // Skip the add fields step
+      allowPreviewStep: false,            // Skip the preview step
+    },
+    settings: null,       // Hide all envelope settings
+    envelopeItems: null,  // Prevent item modifications
+    recipients: null,     // Prevent recipient modifications
+  }}
+/>
+```
+
+---
+
+## Event Callbacks
+
+### `onEnvelopeCreated`
+
+Fired when an envelope is successfully created:
+
+| Field        | Type             | Description                             |
+| ------------ | ---------------- | --------------------------------------- |
+| `envelopeId` | `string`         | The ID of the created envelope          |
+| `externalId` | `string \| null` | Your external reference ID, if provided |
+
+### `onEnvelopeUpdated`
+
+Fired when an envelope is successfully updated:
+
+| Field        | Type             | Description                             |
+| ------------ | ---------------- | --------------------------------------- |
+| `envelopeId` | `string`         | The ID of the updated envelope          |
+| `externalId` | `string \| null` | Your external reference ID, if provided |
+
+---
+
+## Complete Integration Example
+
+This example shows a full workflow where users create an envelope and then edit it:
+
+```tsx
+import { useState } from 'react';
+
+import { EmbedCreateEnvelope, EmbedUpdateEnvelope } from '@documenso/embed-react';
+
+const EnvelopeManager = ({ presignToken }) => {
+  const [envelopeId, setEnvelopeId] = useState(null);
+  const [mode, setMode] = useState('create');
+
+  if (mode === 'success') {
+    return (
+      <div>
+        <h2>Envelope updated successfully</h2>
+        <button
+          onClick={() => {
+            setEnvelopeId(null);
+            setMode('create');
+          }}
+        >
+          Create Another Envelope
+        </button>
+      </div>
+    );
+  }
+
+  if (mode === 'edit' && envelopeId) {
+    return (
+      <div style={{ height: '800px', width: '100%' }}>
+        <button onClick={() => setMode('create')}>Back to Create</button>
+        <EmbedUpdateEnvelope
+          presignToken={presignToken}
+          envelopeId={envelopeId}
+          onEnvelopeUpdated={(data) => {
+            console.log('Envelope updated:', data.envelopeId);
+            setMode('success');
+          }}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ height: '800px', width: '100%' }}>
+      <EmbedCreateEnvelope
+        presignToken={presignToken}
+        type="DOCUMENT"
+        features={{
+          general: {
+            allowConfigureEnvelopeTitle: false,
+          },
+          settings: {
+            allowConfigureSignatureTypes: false,
+            allowConfigureLanguage: false,
+          },
+        }}
+        onEnvelopeCreated={(data) => {
+          console.log('Envelope created:', data.envelopeId);
+          setEnvelopeId(data.envelopeId);
+          setMode('edit');
+        }}
+      />
+    </div>
+  );
+};
+```
+
+---
+
+## See Also
+
+- [Authoring Overview](/docs/developers/embedding/authoring) - V1 vs V2 comparison and presign tokens
+- [V1 Authoring](/docs/developers/embedding/authoring/v1) - V1 document and template authoring
+- [Embedding Overview](/docs/developers/embedding) - Signing embed concepts and props
+- [CSS Variables](/docs/developers/embedding/css-variables) - Customize appearance

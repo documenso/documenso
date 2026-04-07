@@ -1,11 +1,11 @@
 ---
-title: Authoring
-description: Embed document and template creation directly in your application.
+title: V1 Authoring
+description: Embed V1 document and template creation directly in your application.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 
-In addition to embedding signing, Documenso supports embedded authoring. It allows your users to create and edit documents and templates without leaving your application.
+V1 authoring components allow your users to create and edit documents and templates using the V1 Documents and Templates API without leaving your application.
 
 <Callout type="warn">
   Embedded authoring is included with [Enterprise](https://documen.so/enterprise-cta) plans. It is
@@ -15,7 +15,7 @@ In addition to embedding signing, Documenso supports embedded authoring. It allo
 
 ## Components
 
-The SDK provides four authoring components:
+The SDK provides four V1 authoring components:
 
 | Component               | Purpose                 |
 | ----------------------- | ----------------------- |
@@ -24,24 +24,16 @@ The SDK provides four authoring components:
 | `EmbedUpdateDocumentV1` | Edit existing documents |
 | `EmbedUpdateTemplateV1` | Edit existing templates |
 
-All authoring components require a **presign token** for authentication instead of a regular token.
 
 ---
 
 ## Presign Tokens
 
-Before using any authoring component, obtain a presign token from your backend:
+All authoring components require a **presign token** for authentication. See the [Authoring overview](/docs/developers/embedding/authoring) for details on obtaining presign tokens.
 
-```
-POST /api/v2/embedding/create-presign-token
-```
-
-This endpoint requires your Documenso API key. The token has a default expiration of 1 hour.
-
-See the [API documentation](https://openapi.documenso.com/reference#tag/embedding) for full details.
 
 <Callout type="warn">
-  Presign tokens should be created server-side. Never expose your API key in client-side code.
+  A presigned token is NOT an API token
 </Callout>
 
 ---
@@ -147,8 +139,9 @@ const TemplateEditor = ({ presignToken, templateId }) => {
 | `externalId`       | `string`  | No       | Your reference ID to link with the document or template  |
 | `host`             | `string`  | No       | Custom host URL. Defaults to `https://app.documenso.com` |
 | `css`              | `string`  | No       | Custom CSS string (Platform Plan)                        |
-| `cssVars`          | `object`  | No       | CSS variable overrides (Platform Plan)                   |
+| `cssVars`          | `object`  | No       | [CSS variable](/docs/developers/embedding/css-variables) overrides (Platform Plan) |
 | `darkModeDisabled` | `boolean` | No       | Disable dark mode (Platform Plan)                        |
+| `language`         | `string`  | No       | Set the UI language. See [Supported Languages](https://github.com/documenso/documenso/tree/main/packages/lib/constants/locales.ts) |
 | `className`        | `string`  | No       | CSS class for the iframe                                 |
 | `features`         | `object`  | No       | Feature toggles for the authoring experience             |
 
@@ -301,6 +294,7 @@ Pass extra props to the iframe for testing experimental features:
 ## See Also
 
 - [Embedding Overview](/docs/developers/embedding) - Signing embed concepts and props
+- [V2 Authoring](/docs/developers/embedding/authoring/v2) - V2 envelope authoring
 - [CSS Variables](/docs/developers/embedding/css-variables) - Customize appearance
 - [Documents API](/docs/developers/api/documents) - Create documents via API
 - [Templates API](/docs/developers/api/templates) - Create templates via API
