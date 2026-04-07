@@ -81,6 +81,7 @@ export const normalizeDetectedField = (field: DetectedField): NormalizedField =>
 
   return {
     type: field.type,
+    label: field.label,
     recipientKey: field.recipientKey,
     positionX: xMin / 10,
     positionY: yMin / 10,

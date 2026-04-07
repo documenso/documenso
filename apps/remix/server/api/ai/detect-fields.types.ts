@@ -21,6 +21,7 @@ export type TDetectFieldsRequest = z.infer<typeof ZDetectFieldsRequestSchema>;
 // Schema for fields returned from streaming API (before recipient resolution)
 export const ZNormalizedFieldWithPageSchema = z.object({
   type: ZDetectableFieldType,
+  label: z.string(),
   recipientKey: z.string(),
   positionX: z.number(),
   positionY: z.number(),
@@ -35,6 +36,7 @@ export type TNormalizedFieldWithPage = z.infer<typeof ZNormalizedFieldWithPageSc
 // Schema for fields after recipient resolution
 export const ZNormalizedFieldWithContextSchema = z.object({
   type: ZDetectableFieldType,
+  label: z.string(),
   positionX: z.number(),
   positionY: z.number(),
   width: z.number(),

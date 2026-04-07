@@ -114,6 +114,12 @@ export const EnvelopeEditorFieldsPage = () => {
 
   const onFieldDetectionComplete = (fields: NormalizedFieldWithContext[]) => {
     for (const field of fields) {
+      const fieldMeta = structuredClone(FIELD_META_DEFAULT_VALUES[field.type]);
+
+      if (fieldMeta && field.label) {
+        fieldMeta.label = field.label;
+      }
+
       editorFields.addField({
         height: field.height,
         width: field.width,
@@ -123,7 +129,7 @@ export const EnvelopeEditorFieldsPage = () => {
         envelopeItemId: field.envelopeItemId,
         recipientId: field.recipientId,
         page: field.pageNumber,
-        fieldMeta: structuredClone(FIELD_META_DEFAULT_VALUES[field.type]),
+        fieldMeta,
       });
     }
 

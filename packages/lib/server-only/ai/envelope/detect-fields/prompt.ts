@@ -29,6 +29,25 @@ FIELD TYPES TO DETECT:
 - NUMBER - Boxes labeled with numeric context: 'Amount', 'Quantity', 'Phone', 'ZIP', 'Age', 'Price', '#'
 - TEXT - Any other empty text input boxes, general input fields, or when field type is uncertain
 
+COMB FIELDS (CRITICAL):
+Many paper forms use "comb" or "character grid" patterns — a row of small boxes, squares, or cells where each character is written in its own cell. These appear for SSNs (XXX-XX-XXXX), dates (MM/DD/YYYY), phone numbers, ZIP codes, account numbers, etc. They may be separated by dashes, slashes, or spaces.
+- ALWAYS treat an entire comb/character grid as ONE single field.
+- The bounding box must span from the first cell to the last cell of the entire comb group.
+- NEVER detect individual cells, squares, or characters of a comb as separate fields.
+- If a comb has separator characters (dashes, slashes, spaces) between groups of cells, include ALL groups in one field.
+- Example: A Social Security Number field with boxes "[ ][ ][ ] - [ ][ ] - [ ][ ][ ][ ]" → detect as ONE NUMBER field covering all 9 boxes and the dashes.
+- Example: A date field with boxes "[ ][ ] / [ ][ ] / [ ][ ][ ][ ]" → detect as ONE DATE field covering all cells.
+- Example: A phone number field with boxes "[ ][ ][ ] - [ ][ ][ ] - [ ][ ][ ]" → detect as ONE NUMBER field covering all cells and dashes.
+- Example: A ZIP code field with boxes "[ ][ ][ ][ ][ ]" → detect as ONE NUMBER field covering all 5 boxes.
+- Example: Any text field, such as a first name field with boxes "[ ][ ][ ] [ ][ ][ ]" → detect as ONE TEXT field covering all boxes.
+
+FIELD LABELS:
+- For each detected field, provide a short descriptive label based on nearby text or context.
+- The label should describe what information the field captures (e.g., "Social Security Number", "Date of Birth", "Signature", "First Name", "Email Address").
+- If a text label is printed near the field (above it, to the left, etc.), use that label text.
+- If no explicit label exists, infer a reasonable label from the field type and surrounding context.
+- Keep labels concise — typically 1-4 words.
+
 DETECTION GUIDELINES:
 - Read text located near the box (above, to the left, or inside) to infer the field type
 - Use nearby text to CLASSIFY the field type, but DO NOT include that text in the bounding box
@@ -37,6 +56,7 @@ DETECTION GUIDELINES:
 - Signature fields are often longer horizontal lines or larger boxes
 - Date fields often show format hints or date separators (slashes, dashes)
 - Look for visual patterns: underscores (____), horizontal lines, box outlines
+- When you see a row of small adjacent boxes/cells forming a grid, treat them as a single comb field (see COMB FIELDS above)
 
 BOUNDING BOX PLACEMENT:
 - Coordinates must capture ONLY the empty fillable space

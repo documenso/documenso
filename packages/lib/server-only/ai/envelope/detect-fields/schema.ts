@@ -32,6 +32,11 @@ export const ZDetectedFieldSchema = z.object({
   type: ZDetectableFieldType.describe(
     `The field type based on nearby labels and visual appearance`,
   ),
+  label: z
+    .string()
+    .describe(
+      'A short descriptive label for the field based on nearby text or context (e.g., "Social Security Number", "Date of Birth", "Signature", "First Name"). 1-4 words.',
+    ),
   recipientKey: z
     .string()
     .describe(

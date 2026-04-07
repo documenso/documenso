@@ -9,6 +9,7 @@ export type DetectableFieldType = (typeof DETECTABLE_FIELD_TYPES)[number];
  */
 export type NormalizedField = {
   type: DetectableFieldType;
+  label: string;
   recipientKey: string;
   positionX: number;
   positionY: number;
