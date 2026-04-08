@@ -8,7 +8,10 @@ import {
   SigningStatus,
   WebhookTriggerEvents,
 } from '@prisma/client';
+import { DateTime } from 'luxon';
 
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import {
   DOCUMENT_AUDIT_LOG_TYPE,
   RECIPIENT_DIFF_TYPE,
@@ -120,46 +123,6 @@ export const completeDocumentWithToken = async ({
     }
   }
 
-  const fields = await prisma.field.findMany({
-    where: {
-      envelopeId: envelope.id,
-      recipientId: recipient.id,
-    },
-  });
-
-  if (fieldsContainUnsignedRequiredField(fields)) {
-    throw new Error(`Recipient ${recipient.id} has unsigned fields`);
-  }
-
-  let recipientName = recipient.name;
-  let recipientEmail = recipient.email;
-
-  // Only trim the name if it's been derived.
-  if (!recipientName) {
-    recipientName = (
-      recipientOverride?.name ||
-      fields.find((field) => field.type === FieldType.NAME)?.customText ||
-      ''
-    ).trim();
-  }
-
-  // Only trim the email if it's been derived.
-  if (!recipient.email) {
-    recipientEmail = (
-      recipientOverride?.email ||
-      fields.find((field) => field.type === FieldType.EMAIL)?.customText ||
-      ''
-    )
-      .trim()
-      .toLowerCase();
-  }
-
-  if (!recipientEmail) {
-    throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: 'Recipient email is required',
-    });
-  }
-
   // Check ACCESS AUTH 2FA validation during document completion
   const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
     documentAuth: envelope.authOptions,
@@ -216,6 +179,112 @@ export const completeDocumentWithToken = async ({
         },
       }),
     });
+  }
+
+  let fields = await prisma.field.findMany({
+    where: {
+      envelopeId: envelope.id,
+      recipientId: recipient.id,
+    },
+  });
+
+  // This should be scoped to the current recipient.
+  const uninsertedDateFields = fields.filter(
+    (field) => field.type === FieldType.DATE && !field.inserted,
+  );
+
+  let recipientName = recipient.name;
+  let recipientEmail = recipient.email;
+
+  // Only trim the name if it's been derived.
+  if (!recipientName) {
+    recipientName = (
+      recipientOverride?.name ||
+      fields.find((field) => field.type === FieldType.NAME)?.customText ||
+      ''
+    ).trim();
+  }
+
+  // Only trim the email if it's been derived.
+  if (!recipient.email) {
+    recipientEmail = (
+      recipientOverride?.email ||
+      fields.find((field) => field.type === FieldType.EMAIL)?.customText ||
+      ''
+    )
+      .trim()
+      .toLowerCase();
+  }
+
+  if (!recipientEmail) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Recipient email is required',
+    });
+  }
+
+  // Auto-insert all un-inserted date fields for V2 envelopes at completion time.
+  if (envelope.internalVersion === 2 && uninsertedDateFields.length > 0) {
+    const formattedDate = DateTime.now()
+      .setZone(envelope.documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
+      .toFormat(envelope.documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
+
+    const newDateFieldValues = {
+      customText: formattedDate,
+      inserted: true,
+    };
+
+    await prisma.field.updateMany({
+      where: {
+        id: {
+          in: uninsertedDateFields.map((field) => field.id),
+        },
+      },
+      data: {
+        ...newDateFieldValues,
+      },
+    });
+
+    // Create audit log entries for each auto-inserted date field.
+    await prisma.documentAuditLog.createMany({
+      data: uninsertedDateFields.map((field) =>
+        createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
+          envelopeId: envelope.id,
+          user: {
+            email: recipientEmail,
+            name: recipientName,
+          },
+          requestMetadata,
+          data: {
+            recipientEmail: recipientEmail,
+            recipientId: recipient.id,
+            recipientName: recipientName,
+            recipientRole: recipient.role,
+            fieldId: field.secondaryId,
+            field: {
+              type: FieldType.DATE,
+              data: formattedDate,
+            },
+          },
+        }),
+      ),
+    });
+
+    // Update the local fields array so the subsequent validation check passes.
+    fields = fields.map((field) => {
+      if (field.type === FieldType.DATE && !field.inserted) {
+        return {
+          ...field,
+          ...newDateFieldValues,
+        };
+      }
+
+      return field;
+    });
+  }
+
+  if (fieldsContainUnsignedRequiredField(fields)) {
+    throw new Error(`Recipient ${recipient.id} has unsigned fields`);
   }
 
   await prisma.$transaction(async (tx) => {
