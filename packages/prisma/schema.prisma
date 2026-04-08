@@ -478,7 +478,7 @@ model DocumentAuditLog {
   userAgent String?
   ipAddress String?
 
-  envelope Envelope? @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  envelope Envelope? @relation(fields: [envelopeId], references: [id], onDelete: SetNull)
 
   @@index([envelopeId])
 }
