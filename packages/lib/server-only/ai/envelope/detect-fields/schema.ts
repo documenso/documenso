@@ -35,7 +35,7 @@ export const ZDetectedFieldSchema = z.object({
   label: z
     .string()
     .describe(
-      'A short descriptive label for the field based on nearby text or context (e.g., "Social Security Number", "Date of Birth", "Signature", "First Name"). 1-4 words.',
+      'For CHECKBOX and RADIO fields: combine a short plain-language summary of the question/topic with the option value using " - ". The prefix must describe WHAT the field is about — NOT just a question number (e.g., "Heart Disease History - Yes", "Heart Disease History - No", "Gender - Male", "Smoker - Yes", "Agreement - I Agree"). For all other fields: the form label printed near the field (e.g., "Social Security Number", "Date of Birth", "First Name", "Phone Number"). 3-8 words.',
     ),
   recipientKey: z
     .string()

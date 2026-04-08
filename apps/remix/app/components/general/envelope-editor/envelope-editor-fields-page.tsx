@@ -118,6 +118,15 @@ export const EnvelopeEditorFieldsPage = () => {
 
       if (fieldMeta && field.label) {
         fieldMeta.label = field.label;
+
+        if (
+          (field.type === FieldType.RADIO || field.type === FieldType.CHECKBOX) &&
+          'values' in fieldMeta &&
+          Array.isArray(fieldMeta.values) &&
+          fieldMeta.values.length > 0
+        ) {
+          fieldMeta.values[0].value = field.label;
+        }
       }
 
       editorFields.addField({
