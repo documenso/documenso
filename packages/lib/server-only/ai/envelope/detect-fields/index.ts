@@ -66,6 +66,9 @@ export const detectFieldsFromEnvelope = async ({
   const allFields: NormalizedFieldWithContext[] = [];
 
   for (const item of envelope.envelopeItems) {
+    if (item.title === 'Scope of Appointment.pdf') {
+      continue;
+    }
     const existingFields = await prisma.field.findMany({
       where: {
         envelopeItemId: item.id,
