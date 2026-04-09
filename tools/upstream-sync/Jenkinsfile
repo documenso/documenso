@@ -39,7 +39,6 @@ pipeline {
     environment {
         OPENROUTER_API_KEY  = credentials('openrouter-api-key')
         OPENROUTER_MODEL    = 'google/gemini-3-flash-preview'
-        GITHUB_TOKEN        = credentials('github-app-davinci')
         UPSTREAM_URL        = 'https://github.com/documenso/documenso.git'
         FORK_REPO           = 'Davinci-Technology/documenso'
     }
@@ -248,22 +247,23 @@ for t in touched:
                 }
             }
             steps {
+                // All git/gh operations need the GitHub App token.
+                withCredentials([usernamePassword(
+                    credentialsId: 'github-app-davinci',
+                    usernameVariable: 'GIT_USER',
+                    passwordVariable: 'GIT_PASS'
+                )]) {
                 script {
                     def unresolvable = (env.UNRESOLVABLE ?: '').trim()
                     def mergeClean = (env.MERGE_CLEAN == 'true')
                     def agentRan = (env.BRANDING_FILES_TOUCHED == 'true' || !mergeClean || params.FORCE_CLAUDE)
 
-                    // Push the sync branch using the GitHub App credential.
-                    withCredentials([usernamePassword(
-                        credentialsId: 'github-app-davinci',
-                        usernameVariable: 'GIT_USER',
-                        passwordVariable: 'GIT_PASS'
-                    )]) {
-                        sh """
-                            git remote set-url origin https://\${GIT_USER}:\${GIT_PASS}@github.com/${FORK_REPO}.git
-                            git push origin ${env.SYNC_BRANCH} --force
-                        """
-                    }
+                    // Set GITHUB_TOKEN for gh CLI and push URL for git.
+                    env.GITHUB_TOKEN = env.GIT_PASS
+                    sh """
+                        git remote set-url origin https://\${GIT_USER}:\${GIT_PASS}@github.com/${FORK_REPO}.git
+                        git push origin ${env.SYNC_BRANCH} --force
+                    """
 
                     // Close any existing PR for this sync branch.
                     sh(script: "gh pr close ${env.SYNC_BRANCH} --repo ${FORK_REPO} 2>/dev/null || true", returnStatus: true)
@@ -360,6 +360,7 @@ for t in touched:
                             "FFA500")
                     }
                 }
+                } // withCredentials
             }
         }
     }
