@@ -253,11 +253,17 @@ for t in touched:
                     def mergeClean = (env.MERGE_CLEAN == 'true')
                     def agentRan = (env.BRANDING_FILES_TOUCHED == 'true' || !mergeClean || params.FORCE_CLAUDE)
 
-                    // Push the sync branch.
-                    sh """
-                        git remote set-url origin https://x-access-token:\${GITHUB_TOKEN}@github.com/${FORK_REPO}.git
-                        git push origin ${env.SYNC_BRANCH} --force
-                    """
+                    // Push the sync branch using the GitHub App credential.
+                    withCredentials([usernamePassword(
+                        credentialsId: 'github-app-davinci',
+                        usernameVariable: 'GIT_USER',
+                        passwordVariable: 'GIT_PASS'
+                    )]) {
+                        sh """
+                            git remote set-url origin https://\${GIT_USER}:\${GIT_PASS}@github.com/${FORK_REPO}.git
+                            git push origin ${env.SYNC_BRANCH} --force
+                        """
+                    }
 
                     // Close any existing PR for this sync branch.
                     sh(script: "gh pr close ${env.SYNC_BRANCH} --repo ${FORK_REPO} 2>/dev/null || true", returnStatus: true)
