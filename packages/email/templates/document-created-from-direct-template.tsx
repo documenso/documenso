@@ -46,7 +46,11 @@ export const DocumentCreatedFromDirectTemplateEmailTemplate = ({
           <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-2 backdrop-blur-sm">
             <Section className="p-2">
               {branding.brandingEnabled && branding.brandingLogo ? (
-                <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
+                <Img
+                  src={branding.brandingLogo}
+                  alt="Branding Logo"
+                  className={`mb-4 ${branding.brandingLogoSize}`}
+                />
               ) : (
                 <Img
                   src={getAssetUrl('/static/logo.png')}
@@ -58,7 +62,7 @@ export const DocumentCreatedFromDirectTemplateEmailTemplate = ({
               <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
               <Section>
-                <Text className="text-primary mb-0 text-center text-lg font-semibold">
+                <Text className="mb-0 text-center text-lg font-semibold text-primary">
                   <Trans>
                     {recipientName} {action} a document by using one of your direct links
                   </Trans>
@@ -70,7 +74,7 @@ export const DocumentCreatedFromDirectTemplateEmailTemplate = ({
 
                 <Section className="my-6 text-center">
                   <Button
-                    className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
+                    className="inline-flex items-center justify-center rounded-lg bg-documenso-500 px-6 py-3 text-center text-sm font-medium text-black no-underline"
                     href={documentLink}
                   >
                     <Trans>View document</Trans>

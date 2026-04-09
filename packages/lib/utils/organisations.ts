@@ -9,6 +9,7 @@ import type { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/orga
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../constants/date-formats';
 import { DEFAULT_ENVELOPE_EXPIRATION_PERIOD } from '../constants/envelope-expiration';
+import { DEFAULT_BRANDING_LOGO_SIZE } from '../constants/organisations';
 import {
   LOWEST_ORGANISATION_ROLE,
   ORGANISATION_MEMBER_ROLE_HIERARCHY,
@@ -132,6 +133,7 @@ export const generateDefaultOrganisationSettings = (): Omit<
     brandingLogo: '',
     brandingUrl: '',
     brandingCompanyDetails: '',
+    brandingLogoSize: DEFAULT_BRANDING_LOGO_SIZE,
 
     emailId: null,
     emailReplyTo: null,
