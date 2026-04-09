@@ -296,7 +296,7 @@ test.describe('document editor', () => {
     await page.getByRole('button', { name: 'Duplicate' }).click();
 
     // Assert toast appears.
-    await expectToastTextToBeVisible(page, 'Envelope Duplicated');
+    await expectToastTextToBeVisible(page, 'Document Duplicated');
 
     // The page should have navigated to the new document's edit page.
     await expect(page).toHaveURL(/\/documents\/.*\/edit/);
@@ -422,7 +422,7 @@ test.describe('template editor', () => {
     await page.getByRole('button', { name: 'Duplicate' }).click();
 
     // Assert toast appears.
-    await expectToastTextToBeVisible(page, 'Envelope Duplicated');
+    await expectToastTextToBeVisible(page, 'Template Duplicated');
 
     // The page should have navigated to the new template's edit page.
     await expect(page).toHaveURL(/\/templates\/.*\/edit/);

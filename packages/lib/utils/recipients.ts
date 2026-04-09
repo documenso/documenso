@@ -92,6 +92,16 @@ export const mapRecipientToLegacyRecipient = (
   };
 };
 
+export const findRecipientByEmail = <T extends { email: string }>({
+  recipients,
+  userEmail,
+  teamEmail,
+}: {
+  recipients: T[];
+  userEmail: string;
+  teamEmail?: string | null;
+}) => recipients.find((r) => r.email === userEmail || (teamEmail && r.email === teamEmail));
+
 export const isRecipientEmailValidForSending = (recipient: Pick<Recipient, 'email'>) => {
   return zEmail().safeParse(recipient.email).success;
 };
