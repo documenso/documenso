@@ -146,5 +146,7 @@ export const generateDefaultOrganisationSettings = (): Omit<
     reminderSettings: DEFAULT_ENVELOPE_REMINDER_SETTINGS,
 
     aiFeaturesEnabled: false,
+
+    allowDocumentRejection: true,
   };
 };
