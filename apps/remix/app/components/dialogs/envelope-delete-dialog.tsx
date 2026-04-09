@@ -59,8 +59,16 @@ export const EnvelopeDeleteDialog = ({
       void refreshLimits();
 
       toast({
-        title: isDocument ? t`Document deleted` : t`Template deleted`,
-        description: t`"${title}" has been successfully deleted`,
+        title: canManageDocument
+          ? isDocument
+            ? t`Document deleted`
+            : t`Template deleted`
+          : isDocument
+            ? t`Document hidden`
+            : t`Template hidden`,
+        description: canManageDocument
+          ? t`"${title}" has been successfully deleted`
+          : t`"${title}" has been successfully hidden`,
         duration: 5000,
       });
 
