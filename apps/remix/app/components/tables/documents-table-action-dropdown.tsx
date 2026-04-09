@@ -36,9 +36,9 @@ import {
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
 
-import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialog';
-import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate-dialog';
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
+import { EnvelopeDeleteDialog } from '~/components/dialogs/envelope-delete-dialog';
+import { EnvelopeDuplicateDialog } from '~/components/dialogs/envelope-duplicate-dialog';
 import { EnvelopeSaveAsTemplateDialog } from '~/components/dialogs/envelope-save-as-template-dialog';
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
 import { useCurrentTeam } from '~/providers/team';
@@ -61,8 +61,6 @@ export const DocumentsTableActionDropdown = ({
   const { _ } = useLingui();
   const trpcUtils = trpcReact.useUtils();
 
-  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
   const [isRenameDialogOpen, setRenameDialogOpen] = useState(false);
 
   const recipient = findRecipientByEmail({
@@ -164,10 +162,18 @@ export const DocumentsTableActionDropdown = ({
           }
         />
 
-        <DropdownMenuItem onClick={() => setDuplicateDialogOpen(true)}>
-          <Copy className="mr-2 h-4 w-4" />
-          <Trans>Duplicate</Trans>
-        </DropdownMenuItem>
+        <EnvelopeDuplicateDialog
+          envelopeId={row.envelopeId}
+          envelopeType={EnvelopeType.DOCUMENT}
+          trigger={
+            <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+              <div>
+                <Copy className="mr-2 h-4 w-4" />
+                <Trans>Duplicate</Trans>
+              </div>
+            </DropdownMenuItem>
+          }
+        />
 
         <EnvelopeSaveAsTemplateDialog
           envelopeId={row.envelopeId}
@@ -194,10 +200,21 @@ export const DocumentsTableActionDropdown = ({
           Void
         </DropdownMenuItem> */}
 
-        <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}>
-          <Trash2 className="mr-2 h-4 w-4" />
-          {canManageDocument ? _(msg`Delete`) : _(msg`Hide`)}
-        </DropdownMenuItem>
+        <EnvelopeDeleteDialog
+          id={row.envelopeId}
+          type={EnvelopeType.DOCUMENT}
+          status={row.status}
+          title={row.title}
+          canManageDocument={canManageDocument}
+          trigger={
+            <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+              <div>
+                <Trash2 className="mr-2 h-4 w-4" />
+                {canManageDocument ? _(msg`Delete`) : _(msg`Hide`)}
+              </div>
+            </DropdownMenuItem>
+          }
+        />
 
         <DropdownMenuLabel>
           <Trans>Share</Trans>
@@ -232,22 +249,6 @@ export const DocumentsTableActionDropdown = ({
           )}
         />
       </DropdownMenuContent>
-
-      <DocumentDeleteDialog
-        id={row.id}
-        status={row.status}
-        documentTitle={row.title}
-        open={isDeleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
-        canManageDocument={canManageDocument}
-      />
-
-      <DocumentDuplicateDialog
-        id={row.envelopeId}
-        token={recipient?.token}
-        open={isDuplicateDialogOpen}
-        onOpenChange={setDuplicateDialogOpen}
-      />
 
       <EnvelopeRenameDialog
         id={row.envelopeId}
