@@ -204,6 +204,7 @@ export const DocumentSigningPageViewV2 = () => {
                   <DocumentSigningRejectDialog
                     documentId={mapSecondaryIdToDocumentId(envelope.secondaryId)}
                     token={recipient.token}
+                    requireReason={envelope.settings?.requireRejectionReason ?? false}
                     onRejected={
                       onDocumentRejected &&
                       ((reason) =>

@@ -62,6 +62,7 @@ export default function OrganisationSettingsDocumentPage() {
         delegateDocumentOwnership,
         aiFeaturesEnabled,
         envelopeExpirationPeriod,
+        requireRejectionReason,
       } = data;
 
       if (
@@ -71,7 +72,8 @@ export default function OrganisationSettingsDocumentPage() {
         includeSenderDetails === null ||
         includeSigningCertificate === null ||
         includeAuditLog === null ||
-        aiFeaturesEnabled === null
+        aiFeaturesEnabled === null ||
+        requireRejectionReason === null
       ) {
         throw new Error('Should not be possible.');
       }
@@ -93,6 +95,7 @@ export default function OrganisationSettingsDocumentPage() {
           delegateDocumentOwnership: delegateDocumentOwnership,
           aiFeaturesEnabled,
           envelopeExpirationPeriod: envelopeExpirationPeriod ?? undefined,
+          requireRejectionReason,
         },
       });
 

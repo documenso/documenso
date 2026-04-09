@@ -208,6 +208,8 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
 
     envelopeExpirationPeriod: null,
 
+    requireRejectionReason: null,
+
     aiFeaturesEnabled: null,
   };
 };

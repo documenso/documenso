@@ -143,6 +143,7 @@ export const ZEnvelopeForSigningResponse = z.object({
     includeSenderDetails: z.boolean(),
     brandingEnabled: z.boolean(),
     brandingLogo: z.string(),
+    requireRejectionReason: z.boolean(),
   }),
 });
 
@@ -303,6 +304,7 @@ export const getEnvelopeForRecipientSigning = async ({
       includeSenderDetails: settings.includeSenderDetails,
       brandingEnabled: settings.brandingEnabled,
       brandingLogo: settings.brandingLogo,
+      requireRejectionReason: settings.requireRejectionReason,
     },
   } satisfies EnvelopeForSigningResponse);
 };
