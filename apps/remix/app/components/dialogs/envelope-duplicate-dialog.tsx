@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
 import { useNavigate } from 'react-router';
 
@@ -10,6 +9,7 @@ import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -41,19 +41,20 @@ export const EnvelopeDuplicateDialog = ({
 
   const team = useCurrentTeam();
 
+  const isDocument = envelopeType === EnvelopeType.DOCUMENT;
+
   const { mutateAsync: duplicateEnvelope, isPending: isDuplicating } =
     trpc.envelope.duplicate.useMutation({
       onSuccess: async ({ id }) => {
         toast({
-          title: t`Envelope Duplicated`,
-          description: t`Your envelope has been successfully duplicated.`,
+          title: isDocument ? t`Document Duplicated` : t`Template Duplicated`,
+          description: isDocument
+            ? t`Your document has been successfully duplicated.`
+            : t`Your template has been successfully duplicated.`,
           duration: 5000,
         });
 
-        const path =
-          envelopeType === EnvelopeType.DOCUMENT
-            ? formatDocumentsPath(team.url)
-            : formatTemplatesPath(team.url);
+        const path = isDocument ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
 
         await navigate(`${path}/${id}/edit`);
         setOpen(false);
@@ -66,7 +67,9 @@ export const EnvelopeDuplicateDialog = ({
     } catch {
       toast({
         title: t`Something went wrong`,
-        description: t`This document could not be duplicated at this time. Please try again.`,
+        description: isDocument
+          ? t`This document could not be duplicated at this time. Please try again.`
+          : t`This template could not be duplicated at this time. Please try again.`,
         variant: 'destructive',
         duration: 7500,
       });
@@ -78,30 +81,25 @@ export const EnvelopeDuplicateDialog = ({
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
 
       <DialogContent>
-        {envelopeType === EnvelopeType.DOCUMENT ? (
-          <DialogHeader>
-            <DialogTitle>
-              <Trans>Duplicate Document</Trans>
-            </DialogTitle>
-            <DialogDescription>
+        <DialogHeader>
+          <DialogTitle>
+            {isDocument ? <Trans>Duplicate Document</Trans> : <Trans>Duplicate Template</Trans>}
+          </DialogTitle>
+          <DialogDescription>
+            {isDocument ? (
               <Trans>This document will be duplicated.</Trans>
-            </DialogDescription>
-          </DialogHeader>
-        ) : (
-          <DialogHeader>
-            <DialogTitle>
-              <Trans>Duplicate Template</Trans>
-            </DialogTitle>
-            <DialogDescription>
+            ) : (
               <Trans>This template will be duplicated.</Trans>
-            </DialogDescription>
-          </DialogHeader>
-        )}
+            )}
+          </DialogDescription>
+        </DialogHeader>
 
         <DialogFooter>
-          <Button type="button" variant="secondary" disabled={isDuplicating}>
-            <Trans>Cancel</Trans>
-          </Button>
+          <DialogClose asChild>
+            <Button type="button" variant="secondary" disabled={isDuplicating}>
+              <Trans>Cancel</Trans>
+            </Button>
+          </DialogClose>
 
           <Button type="button" loading={isDuplicating} onClick={onDuplicate}>
             <Trans>Duplicate</Trans>
