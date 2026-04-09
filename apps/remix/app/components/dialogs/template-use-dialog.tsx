@@ -208,7 +208,11 @@ export function TemplateUseDialog({
         variant: 'destructive',
       };
 
-      if (error.code === 'DOCUMENT_SEND_FAILED') {
+      const detail = error.userMessage ?? error.message;
+
+      if (detail && detail !== error.code) {
+        toastPayload.description = detail;
+      } else if (error.code === 'DOCUMENT_SEND_FAILED') {
         toastPayload.description = _(
           msg`The document was created but could not be sent to recipients.`,
         );

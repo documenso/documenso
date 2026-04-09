@@ -602,6 +602,10 @@ export const templateRouter = router({
         }).catch((err) => {
           console.error(err);
 
+          if (err instanceof AppError) {
+            throw err;
+          }
+
           throw new AppError('DOCUMENT_SEND_FAILED');
         });
       }
