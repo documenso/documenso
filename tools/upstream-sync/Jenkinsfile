@@ -39,7 +39,7 @@ pipeline {
     environment {
         OPENROUTER_API_KEY  = credentials('openrouter-api-key')
         OPENROUTER_MODEL    = 'google/gemini-3-flash-preview'
-        GITHUB_TOKEN        = credentials('github-token')
+        GITHUB_TOKEN        = credentials('github-app-davinci')
         UPSTREAM_URL        = 'https://github.com/documenso/documenso.git'
         FORK_REPO           = 'Davinci-Technology/documenso'
     }
