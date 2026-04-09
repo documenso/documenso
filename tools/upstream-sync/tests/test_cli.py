@@ -8,8 +8,11 @@ from branding_resolver.confidence import ConfidenceLevel
 from branding_resolver.resolver import Resolution, MergeResult
 
 
-def _make_merge_result(flagged=0, total=3, resolutions=None):
+def _make_merge_result(flagged=0, total=3, unresolvable=None, resolutions=None):
     """Create a MergeResult for testing."""
+    if unresolvable is None:
+        unresolvable = [f"flagged{i}.ts" for i in range(flagged)] if flagged > 0 else []
+
     if resolutions is None:
         resolutions = [
             Resolution(
@@ -37,6 +40,7 @@ def _make_merge_result(flagged=0, total=3, resolutions=None):
         total_files=total,
         auto_resolved=total - flagged,
         flagged_for_review=flagged,
+        unresolvable_files=unresolvable,
         api_calls_made=1,
         total_input_tokens=500,
         total_output_tokens=200,

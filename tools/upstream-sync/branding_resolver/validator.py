@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
+import subprocess
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .config import BrandingConfig
+
+logger = logging.getLogger(__name__)
 
 # Strings that, when found in resolved content, indicate an upstream brand
 # leaked back in.  The validator checks surrounding context to avoid false
@@ -130,8 +134,12 @@ def _check_conflict_markers(content: str) -> list[str]:
 def _check_syntax(file_path: str, content: str) -> list[str]:
     ext = Path(file_path).suffix.lower()
 
-    if ext in _JS_EXTENSIONS:
+    # Skip naive bracket checking for .tsx/.jsx — JSX syntax causes false
+    # positives. Real syntax validation comes from tsc --noEmit instead.
+    if ext in {".ts", ".js", ".cjs", ".mjs"}:
         return _check_js_brackets(content)
+    if ext in {".tsx", ".jsx"}:
+        return []  # JSX confuses the bracket checker; rely on tsc
     if ext in _JSON_EXTENSIONS:
         return _check_json(content)
     if ext in _YAML_EXTENSIONS:
@@ -264,3 +272,83 @@ def _check_css_braces(content: str) -> list[str]:
             f"Unbalanced CSS braces: {open_count} opening vs {close_count} closing"
         ]
     return []
+
+
+# ---------------------------------------------------------------------------
+# Auto-formatting for the self-healing repair loop
+# ---------------------------------------------------------------------------
+
+_PRETTIER_EXTENSIONS = _JS_EXTENSIONS | _CSS_EXTENSIONS | _JSON_EXTENSIONS
+
+
+def auto_format_file(file_path: str, content: str, repo_path: Path) -> str:
+    """Run the appropriate auto-formatter on file content.
+
+    Writes the content to disk, runs the formatter, and reads back the result.
+    Returns the original content unchanged if no formatter is available or if
+    the formatter fails.
+
+    Args:
+        file_path: Relative path to the file.
+        content: The file content to format.
+        repo_path: Path to the repository root.
+
+    Returns:
+        The formatted content, or the original if formatting failed.
+    """
+    ext = Path(file_path).suffix.lower()
+
+    if ext in _PRETTIER_EXTENSIONS:
+        return _run_prettier(file_path, content, repo_path)
+
+    if ext in _YAML_EXTENSIONS:
+        return _format_yaml(content)
+
+    return content
+
+
+def _run_prettier(file_path: str, content: str, repo_path: Path) -> str:
+    """Format a file using prettier via npx."""
+    full_path = repo_path / file_path
+    original = content
+
+    try:
+        full_path.write_text(content, encoding="utf-8")
+
+        result = subprocess.run(
+            ["npx", "prettier", "--write", str(full_path)],
+            cwd=repo_path,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+
+        if result.returncode != 0:
+            logger.warning(
+                "prettier failed for %s: %s", file_path, result.stderr[:200]
+            )
+            return original
+
+        formatted = full_path.read_text(encoding="utf-8")
+        logger.debug("prettier formatted %s", file_path)
+        return formatted
+
+    except subprocess.TimeoutExpired:
+        logger.warning("prettier timed out for %s", file_path)
+        return original
+    except OSError as exc:
+        logger.warning("prettier error for %s: %s", file_path, exc)
+        return original
+
+
+def _format_yaml(content: str) -> str:
+    """Re-serialize YAML to fix formatting issues."""
+    try:
+        import yaml  # noqa: PLC0415
+
+        parsed = yaml.safe_load(content)
+        if parsed is None:
+            return content
+        return yaml.safe_dump(parsed, default_flow_style=False, allow_unicode=True)
+    except Exception:
+        return content

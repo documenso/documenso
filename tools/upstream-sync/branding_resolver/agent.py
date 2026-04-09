@@ -1,10 +1,14 @@
-"""OpenRouter/OpenAI SDK integration with tool-use for branding conflict resolution."""
+"""Branding conflict resolution agent using tool-use via LLM providers.
+
+The BrandingAgent builds prompts, sends them through an LLMClient (provider-
+agnostic), and parses tool-call responses. Supports both single-turn batch
+resolution and multi-turn agentic exploration.
+"""
 
 from __future__ import annotations
 
 import json
 import logging
-import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -12,19 +16,14 @@ import openai
 from pydantic import BaseModel, Field
 
 from .confidence import ConfidenceLevel
-from .exceptions import APIError
+from .model_client import ChatResponse, LLMClient, ToolCall
 from .tool_executor import execute_tool_call
 
 if TYPE_CHECKING:
     from .config import BrandingConfig
-    from .differ import ConflictHunk, FileConflict
-    from .rate_limiter import RateLimiter
+    from .differ import FileConflict
 
 logger = logging.getLogger(__name__)
-
-# Retry configuration.
-_MAX_RETRIES = 3
-_BACKOFF_SECONDS = (5, 15, 60)
 
 # Maximum exploration turns before the LLM must resolve.
 _MAX_EXPLORATION_TURNS = 5
@@ -149,30 +148,24 @@ RESOLUTION_TOOL_NAMES = {"resolve_conflict", "keep_ours", "accept_theirs", "flag
 
 
 class BrandingAgent:
-    """OpenRouter API client that resolves branding conflicts via tool-use."""
+    """Resolves branding conflicts via tool-use through an LLMClient."""
 
     def __init__(
         self,
         config: BrandingConfig,
-        api_key: str | None = None,
-        model: str = "google/gemini-3-flash-preview",
+        client: LLMClient,
         dry_run: bool = False,
     ) -> None:
         self.config = config
-        self.model = model
+        self._client = client
         self.dry_run = dry_run
         self.total_input_tokens = 0
         self.total_output_tokens = 0
+        self.total_cost_usd: float = 0.0
 
-        # Lazy-import to keep module importable without rate_limiter existing.
-        from .rate_limiter import RateLimiter  # noqa: PLC0415
-
-        self._rate_limiter = RateLimiter()
-
-        self._client = openai.OpenAI(
-            base_url="https://openrouter.ai/api/v1",
-            api_key=api_key or "",
-        )
+    @property
+    def model_name(self) -> str:
+        return self._client.model_name
 
     # ------------------------------------------------------------------
     # System prompt
@@ -180,14 +173,7 @@ class BrandingAgent:
 
     @staticmethod
     def build_system_prompt(config: BrandingConfig) -> str:
-        """Build the system prompt encoding all branding rules.
-
-        Args:
-            config: The branding configuration with substitution pairs.
-
-        Returns:
-            A system prompt string.
-        """
+        """Build the system prompt encoding all branding rules."""
         substitution_lines = "\n".join(
             f"  - \"{pair[0]}\" -> \"{pair[1]}\""
             for pair in config.substitution_pairs
@@ -257,16 +243,9 @@ you must resolve.  When you have enough context, call one of the resolution tool
     # ------------------------------------------------------------------
 
     def resolve_files(self, files: list[FileConflict]) -> list[dict[str, Any]]:
-        """Resolve a batch of file conflicts via the OpenRouter API.
+        """Resolve a batch of file conflicts via the LLM client.
 
-        Args:
-            files: List of FileConflict objects to resolve.
-
-        Returns:
-            A list of dicts with resolution details, one per file.
-
-        Raises:
-            APIError: If the API is unreachable after all retries.
+        Uses resolution-only tools (no exploration). Good for fast first-pass.
         """
         if not files:
             return []
@@ -274,9 +253,19 @@ you must resolve.  When you have enough context, call one of the resolution tool
         user_message = self._build_user_message(files)
         system_prompt = self.build_system_prompt(self.config)
 
-        response = self._call_api(system_prompt, user_message)
+        response = self._client.chat(
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message},
+            ],
+            tools=TOOL_DEFINITIONS,
+            tool_choice="required",
+        )
 
-        # Parse tool_use blocks from the response.
+        self.total_input_tokens += response.input_tokens
+        self.total_output_tokens += response.output_tokens
+        self.total_cost_usd += response.cost_usd
+
         results = self._parse_tool_calls(response)
 
         # Safety: flag any files the LLM missed.
@@ -284,21 +273,19 @@ you must resolve.  When you have enough context, call one of the resolution tool
         for f in files:
             if f.path not in resolved_paths:
                 logger.warning("LLM missed file %s — flagging for review", f.path)
-                results.append(
-                    {
-                        "tool": "flag_for_review",
-                        "file_path": f.path,
-                        "reason": "LLM did not return a resolution for this file.",
-                        "suggested_resolution": "",
-                        "ours_snippet": "",
-                        "theirs_snippet": "",
-                    }
-                )
+                results.append({
+                    "tool": "flag_for_review",
+                    "file_path": f.path,
+                    "reason": "LLM did not return a resolution for this file.",
+                    "suggested_resolution": "",
+                    "ours_snippet": "",
+                    "theirs_snippet": "",
+                })
 
         return results
 
     # ------------------------------------------------------------------
-    # Second-pass resolution with exploration tools
+    # Resolution with exploration tools (multi-turn)
     # ------------------------------------------------------------------
 
     def resolve_files_with_exploration(
@@ -309,16 +296,8 @@ you must resolve.  When you have enough context, call one of the resolution tool
         """Resolve files with agentic codebase exploration.
 
         The LLM can call ``search_codebase`` and ``read_file`` to gather
-        context before calling a resolution tool.  The loop caps at
+        context before calling a resolution tool. Caps at
         ``_MAX_EXPLORATION_TURNS`` to prevent runaway costs.
-
-        Args:
-            files: File conflicts to resolve (usually a single file).
-            repo_path: Path to the git repository root.
-
-        Returns:
-            Resolution dicts, one per file, in the same format as
-            ``resolve_files()``.
         """
         if not files:
             return []
@@ -334,41 +313,52 @@ you must resolve.  When you have enough context, call one of the resolution tool
         resolved_paths: set[str] = set()
 
         for turn in range(_MAX_EXPLORATION_TURNS):
-            response = self._call_api_with_messages(messages, ALL_TOOLS)
+            response = self._client.chat(
+                messages=messages,
+                tools=ALL_TOOLS,
+                tool_choice="required",
+            )
 
-            message = response.choices[0].message
-            if not message.tool_calls:
+            self.total_input_tokens += response.input_tokens
+            self.total_output_tokens += response.output_tokens
+
+            if not response.message.tool_calls:
                 break
 
-            # Process each tool call in this turn.
+            # Build assistant message for conversation history.
+            assistant_tool_calls: list[dict[str, Any]] = []
             tool_responses: list[dict[str, str]] = []
             has_exploration = False
 
-            for tool_call in message.tool_calls:
-                name = tool_call.function.name
-                try:
-                    args = json.loads(tool_call.function.arguments)
-                except json.JSONDecodeError:
-                    args = {}
+            for tc in response.message.tool_calls:
+                # Build OpenAI-format tool_call for message history.
+                assistant_tool_calls.append({
+                    "id": tc.id,
+                    "type": "function",
+                    "function": {
+                        "name": tc.name,
+                        "arguments": json.dumps(tc.arguments),
+                    },
+                })
 
-                if name in EXPLORATION_TOOL_NAMES:
+                if tc.name in EXPLORATION_TOOL_NAMES:
                     has_exploration = True
-                    result_text = execute_tool_call(name, args, repo_path)
+                    result_text = execute_tool_call(tc.name, tc.arguments, repo_path)
                     tool_responses.append({
-                        "tool_call_id": tool_call.id,
+                        "tool_call_id": tc.id,
                         "content": result_text,
                     })
-                    log_key = args.get("pattern", args.get("file_path", ""))
+                    log_key = tc.arguments.get("pattern", tc.arguments.get("file_path", ""))
                     logger.info(
                         "Exploration [turn %d]: %s(%s) → %d chars",
-                        turn + 1, name, log_key, len(result_text),
+                        turn + 1, tc.name, log_key, len(result_text),
                     )
                 else:
                     # Resolution tool — collect and acknowledge.
-                    resolution_results.append({"tool": name, **args})
-                    resolved_paths.add(args.get("file_path", ""))
+                    resolution_results.append({"tool": tc.name, **tc.arguments})
+                    resolved_paths.add(tc.arguments.get("file_path", ""))
                     tool_responses.append({
-                        "tool_call_id": tool_call.id,
+                        "tool_call_id": tc.id,
                         "content": "Resolution recorded.",
                     })
 
@@ -381,7 +371,11 @@ you must resolve.  When you have enough context, call one of the resolution tool
                 break
 
             # Append assistant message + tool results for next turn.
-            messages.append({"role": "assistant", "tool_calls": message.tool_calls})
+            messages.append({
+                "role": "assistant",
+                "tool_calls": assistant_tool_calls,
+                "content": response.message.text or "",
+            })
             for tr in tool_responses:
                 messages.append({
                     "role": "tool",
@@ -447,106 +441,104 @@ you must resolve.  When you have enough context, call one of the resolution tool
 
         return "\n".join(parts)
 
-    def _call_api(self, system_prompt: str, user_message: str) -> Any:
-        """Make a single-turn API call (system + user → response).
-
-        Delegates to ``_call_api_with_messages`` with resolution-only tools.
-        """
-        messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_message},
-        ]
-        return self._call_api_with_messages(messages, TOOL_DEFINITIONS)
-
-    def _call_api_with_messages(
-        self,
-        messages: list[dict[str, Any]],
-        tools: list[Any],
-    ) -> Any:
-        """Make an API call with a full message history and retry logic.
-
-        Retries on rate-limit (429) and server errors (5xx) with exponential
-        backoff.  Raises APIError after exhausting all retries.
-        """
-        last_error: Exception | None = None
-
-        for attempt in range(_MAX_RETRIES):
-            try:
-                self._rate_limiter.wait()
-
-                response = self._client.chat.completions.create(
-                    model=self.model,
-                    max_tokens=16384,
-                    messages=messages,
-                    tools=tools,
-                    tool_choice="required",
-                )
-
-                # Track token usage.
-                if response.usage:
-                    self.total_input_tokens += response.usage.prompt_tokens
-                    self.total_output_tokens += response.usage.completion_tokens
-
-                return response
-
-            except openai.RateLimitError as exc:
-                last_error = exc
-                backoff = _BACKOFF_SECONDS[min(attempt, len(_BACKOFF_SECONDS) - 1)]
-                logger.warning(
-                    "Rate limited (attempt %d/%d), backing off %ds",
-                    attempt + 1,
-                    _MAX_RETRIES,
-                    backoff,
-                )
-                time.sleep(backoff)
-
-            except openai.APIStatusError as exc:
-                if exc.status_code >= 500:
-                    last_error = exc
-                    backoff = _BACKOFF_SECONDS[min(attempt, len(_BACKOFF_SECONDS) - 1)]
-                    logger.warning(
-                        "Server error %d (attempt %d/%d), backing off %ds",
-                        exc.status_code,
-                        attempt + 1,
-                        _MAX_RETRIES,
-                        backoff,
-                    )
-                    time.sleep(backoff)
-                else:
-                    raise
-
-            except openai.APIConnectionError as exc:
-                last_error = exc
-                backoff = _BACKOFF_SECONDS[min(attempt, len(_BACKOFF_SECONDS) - 1)]
-                logger.warning(
-                    "Connection error (attempt %d/%d), backing off %ds",
-                    attempt + 1,
-                    _MAX_RETRIES,
-                    backoff,
-                )
-                time.sleep(backoff)
-
-        raise APIError(
-            f"OpenRouter API unreachable after {_MAX_RETRIES} retries: {last_error}"
-        ) from last_error
-
     @staticmethod
-    def _parse_tool_calls(response: Any) -> list[dict[str, Any]]:
-        """Extract tool calls from the OpenAI-format API response."""
+    def _parse_tool_calls(response: ChatResponse) -> list[dict[str, Any]]:
+        """Extract tool calls from a normalised ChatResponse."""
         results: list[dict[str, Any]] = []
 
-        message = response.choices[0].message
-        if not message.tool_calls:
-            return results
-
-        for tool_call in message.tool_calls:
-            tool_name = tool_call.function.name
-            inputs = json.loads(tool_call.function.arguments)
-
-            result: dict[str, Any] = {"tool": tool_name, **inputs}
+        for tc in response.message.tool_calls:
+            result: dict[str, Any] = {"tool": tc.name, **tc.arguments}
             results.append(result)
 
         return results
+
+
+    # ------------------------------------------------------------------
+    # Hunk-based resolution (fallback for truncated files)
+    # ------------------------------------------------------------------
+
+    def resolve_hunks(self, file_conflict: FileConflict) -> list[str] | None:
+        """Resolve each conflict hunk individually, returning replacement text per hunk.
+
+        This is a cheap fallback for files where full-file resolution gets
+        truncated. Each hunk is resolved in isolation with minimal tokens.
+
+        Returns a list of resolved strings (one per hunk), or None on failure.
+        """
+        if not file_conflict.hunks:
+            return None
+
+        system_prompt = self.build_system_prompt(self.config)
+        resolved_hunks: list[str] = []
+
+        for i, hunk in enumerate(file_conflict.hunks):
+            user_message = (
+                f"Resolve this ONE conflict hunk from `{file_conflict.path}` "
+                f"(hunk {i + 1} of {len(file_conflict.hunks)}).\n\n"
+                f"**Context before:**\n```\n{hunk.context_before}\n```\n\n"
+                f"**Our version (Davinci Sign):**\n```\n{hunk.ours}\n```\n\n"
+                f"**Upstream version (Documenso):**\n```\n{hunk.theirs}\n```\n\n"
+                f"**Context after:**\n```\n{hunk.context_after}\n```\n\n"
+                f"Return ONLY the replacement text for this hunk using the `resolve_hunk` tool. "
+                f"Apply branding substitutions. Do NOT include the context before/after — "
+                f"just the lines that replace the conflict region."
+            )
+
+            hunk_tool: dict[str, Any] = {
+                "type": "function",
+                "function": {
+                    "name": "resolve_hunk",
+                    "description": "Return the resolved replacement text for a single conflict hunk.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "resolved_text": {
+                                "type": "string",
+                                "description": "The replacement text for this hunk (no conflict markers, no surrounding context).",
+                            },
+                            "explanation": {
+                                "type": "string",
+                                "description": "Brief explanation of the resolution.",
+                            },
+                        },
+                        "required": ["resolved_text", "explanation"],
+                    },
+                },
+            }
+
+            try:
+                response = self._client.chat(
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_message},
+                    ],
+                    tools=[hunk_tool],
+                    tool_choice="required",
+                    max_tokens=4096,
+                )
+
+                self.total_input_tokens += response.input_tokens
+                self.total_output_tokens += response.output_tokens
+                self.total_cost_usd += response.cost_usd
+
+                for tc in response.message.tool_calls:
+                    if tc.name == "resolve_hunk":
+                        resolved_hunks.append(tc.arguments.get("resolved_text", ""))
+                        break
+                else:
+                    logger.warning("Hunk %d/%d: no resolve_hunk call returned", i + 1, len(file_conflict.hunks))
+                    return None
+
+            except Exception:
+                logger.exception("Hunk %d/%d resolution failed for %s", i + 1, len(file_conflict.hunks), file_conflict.path)
+                return None
+
+        logger.info(
+            "Hunk-based: resolved %d/%d hunks for %s",
+            len(resolved_hunks), len(file_conflict.hunks), file_conflict.path,
+        )
+
+        return resolved_hunks
 
 
 def _truncate(text: str, max_chars: int) -> str:

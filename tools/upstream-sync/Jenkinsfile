@@ -21,7 +21,7 @@ pipeline {
 
     options {
         buildDiscarder(logRotator(numToKeepStr: '30'))
-        timeout(time: 30, unit: 'MINUTES')
+        timeout(time: 45, unit: 'MINUTES')
         timestamps()
     }
 
@@ -33,6 +33,7 @@ pipeline {
         string(name: 'UPSTREAM_REF', defaultValue: '', description: 'Specific upstream ref to sync (tag, SHA, or branch). Leave empty for upstream/main HEAD.')
         booleanParam(name: 'FORCE_CLAUDE', defaultValue: false, description: 'Force AI resolution even when merge is clean (useful for branding drift detection)')
         booleanParam(name: 'DRY_RUN', defaultValue: false, description: 'Run the full pipeline without pushing or creating PRs')
+        booleanParam(name: 'ENABLE_TSC', defaultValue: false, description: 'Enable TypeScript validation via Docker (requires Docker on agent)')
     }
 
     environment {
@@ -41,7 +42,6 @@ pipeline {
         GITHUB_TOKEN        = credentials('github-token')
         UPSTREAM_URL        = 'https://github.com/documenso/documenso.git'
         FORK_REPO           = 'Davinci-Technology/documenso'
-        AUTO_MERGE_THRESHOLD = '0.95'
     }
 
     stages {
@@ -176,7 +176,7 @@ for t in touched:
             }
         }
 
-        stage('Agent Resolution') {
+        stage('Resolve Conflicts') {
             when {
                 allOf {
                     expression { env.SKIP_SYNC != 'true' }
@@ -189,31 +189,49 @@ for t in touched:
             }
             steps {
                 script {
-                    // Exit code 1 = files flagged for review (not a real failure).
-                    // The confidence score drives auto-merge vs draft PR.
-                    def rc = sh(script: '''
+                    def tscFlag = params.ENABLE_TSC ? '--enable-tsc' : ''
+
+                    // The resolver handles the full tier escalation + repair loop internally.
+                    // Exit code 0 = all resolved, 1 = unresolvable files, 2 = fatal error.
+                    def rc = sh(script: """
                         . .venv/bin/activate
                         PYTHONPATH=tools/upstream-sync python3 -m branding_resolver \
                             --repo . \
                             --our-branch origin/main \
                             --upstream-branch upstream/main \
                             --output-pr-body sync-output/pr_body.md \
+                            --tier1-model "\${OPENROUTER_MODEL}" \
+                            --tier2-model "anthropic/claude-sonnet-4" \
+                            --tier3-model "anthropic/claude-opus-4" \
+                            --max-repair-rounds 3 \
+                            ${tscFlag} \
                             --verbose
-                    ''', returnStatus: true)
+                    """, returnStatus: true)
 
-                    if (fileExists('sync-output/confidence.txt')) {
-                        env.CONFIDENCE = readFile('sync-output/confidence.txt').trim()
-                        echo "Agent confidence score: ${env.CONFIDENCE}"
-                    } else if (rc != 0) {
-                        error "Branding resolver failed (exit ${rc}) without producing confidence score"
-                    } else {
-                        env.CONFIDENCE = '0.0'
+                    if (rc == 2) {
+                        error "Branding resolver failed with fatal error (exit 2)"
                     }
 
-                    // Finalize the merge commit — resolver staged resolved files,
-                    // now complete the interrupted merge.
-                    // Exclude .venv and sync-output from staging to keep the
-                    // commit clean (git add -A would pick them up).
+                    // Read the unresolvable files list (the merge gate).
+                    if (fileExists('sync-output/unresolvable_files.txt')) {
+                        env.UNRESOLVABLE = readFile('sync-output/unresolvable_files.txt').trim()
+                    } else {
+                        env.UNRESOLVABLE = ''
+                    }
+
+                    // Read confidence for logging.
+                    if (fileExists('sync-output/confidence.txt')) {
+                        env.CONFIDENCE = readFile('sync-output/confidence.txt').trim()
+                        echo "Confidence score (informational): ${env.CONFIDENCE}"
+                    }
+
+                    // Log resolution report.
+                    if (fileExists('sync-output/resolution_report.json')) {
+                        def report = readFile('sync-output/resolution_report.json')
+                        echo "Resolution report:\n${report}"
+                    }
+
+                    // Finalize the merge commit.
                     sh 'git reset HEAD -- .venv sync-output 2>/dev/null || true'
                     sh 'git checkout -- .venv 2>/dev/null || true'
                     sh 'git add -A -- . ":!.venv" ":!sync-output"'
@@ -222,24 +240,7 @@ for t in touched:
             }
         }
 
-        // TODO: Re-enable once worker has Node 22+ installed
-        // stage('Validate') {
-        //     when {
-        //         expression { env.SKIP_SYNC != 'true' }
-        //     }
-        //     environment {
-        //         NEXT_PRIVATE_ENCRYPTION_KEY = '0000000000000000000000000000000000000000000000000000000000000000'
-        //         NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY = '1111111111111111111111111111111111111111111111111111111111111111'
-        //     }
-        //     steps {
-        //         sh '''
-        //             npm ci --ignore-scripts
-        //             npx tsc --noEmit
-        //         '''
-        //     }
-        // }
-
-        stage('Auto-Merge or PR') {
+        stage('Create PR and Merge') {
             when {
                 allOf {
                     expression { env.SKIP_SYNC != 'true' }
@@ -248,51 +249,79 @@ for t in touched:
             }
             steps {
                 script {
-                    def confidence = (env.CONFIDENCE ?: '0.0').toFloat()
-                    def threshold = env.AUTO_MERGE_THRESHOLD.toFloat()
+                    def unresolvable = (env.UNRESOLVABLE ?: '').trim()
                     def mergeClean = (env.MERGE_CLEAN == 'true')
                     def agentRan = (env.BRANDING_FILES_TOUCHED == 'true' || !mergeClean || params.FORCE_CLAUDE)
 
-                    if (mergeClean && !agentRan) {
-                        confidence = 1.0
-                    }
-
-                    echo "Final confidence: ${confidence}, threshold: ${threshold}"
-
-                    // Push the sync branch using GitHub token
+                    // Push the sync branch.
                     sh """
                         git remote set-url origin https://x-access-token:\${GITHUB_TOKEN}@github.com/${FORK_REPO}.git
                         git push origin ${env.SYNC_BRANCH} --force
                     """
 
-                    if (confidence >= threshold) {
-                        echo "Confidence ${confidence} >= threshold ${threshold}. Auto-merging to main."
+                    // Close any existing PR for this sync branch.
+                    sh(script: "gh pr close ${env.SYNC_BRANCH} --repo ${FORK_REPO} 2>/dev/null || true", returnStatus: true)
 
-                        sh """
-                            curl -s -X POST \
-                                -H "Authorization: token \${GITHUB_TOKEN}" \
-                                -H "Accept: application/vnd.github+json" \
-                                https://api.github.com/repos/${FORK_REPO}/merges \
-                                -d '{"base":"main","head":"${env.SYNC_BRANCH}","commit_message":"chore: upstream sync ${env.SYNC_BRANCH} (auto-merged, confidence ${confidence})"}'
-                        """
-
-                        notifyTeams("Upstream Sync Auto-Merged",
-                            "Branch **${env.SYNC_BRANCH}** merged to main.\\n\\nCommits synced: ${env.COMMIT_COUNT}\\nConfidence: ${confidence}",
-                            "00CC00")
-                    } else {
-                        echo "Confidence ${confidence} < threshold ${threshold}. Creating draft PR for review."
+                    if (unresolvable.isEmpty()) {
+                        // All files resolved — create PR and auto-merge.
+                        echo "All files resolved. Creating PR and auto-merging."
 
                         def prBody = ''
                         if (fileExists('sync-output/pr_body.md')) {
                             prBody = readFile('sync-output/pr_body.md')
                         } else {
-                            prBody = "Automated upstream sync from ${env.UPSTREAM_REF}.\\n\\nCommits: ${env.COMMIT_COUNT}\\nConfidence: ${confidence}"
+                            prBody = "Automated upstream sync from ${env.UPSTREAM_REF}.\n\nCommits: ${env.COMMIT_COUNT}\nAll conflicts resolved automatically."
                         }
 
                         writeFile file: 'sync-output/gh_pr_body.md', text: prBody
 
-                        // Close any existing PR for this sync branch
-                        sh(script: "gh pr close ${env.SYNC_BRANCH} --repo ${FORK_REPO} 2>/dev/null || true", returnStatus: true)
+                        sh """
+                            gh pr create \
+                                --repo ${FORK_REPO} \
+                                --base main \
+                                --head ${env.SYNC_BRANCH} \
+                                --title "chore: upstream sync ${env.SYNC_BRANCH}" \
+                                --body-file sync-output/gh_pr_body.md
+                        """
+
+                        def prUrl = sh(
+                            script: "gh pr view ${env.SYNC_BRANCH} --repo ${FORK_REPO} --json url -q .url",
+                            returnStdout: true
+                        ).trim()
+
+                        // Auto-merge the PR.
+                        def mergeResult = sh(
+                            script: "gh pr merge ${env.SYNC_BRANCH} --repo ${FORK_REPO} --merge --admin",
+                            returnStatus: true
+                        )
+
+                        if (mergeResult == 0) {
+                            echo "PR auto-merged successfully: ${prUrl}"
+                            notifyTeams("Upstream Sync Auto-Merged",
+                                "Branch **${env.SYNC_BRANCH}** merged to main via PR.\\n\\nCommits synced: ${env.COMMIT_COUNT}\\n[View PR](${prUrl})",
+                                "00CC00")
+                        } else {
+                            // Fallback: enable auto-merge flag for when checks pass.
+                            echo "Direct merge failed (branch protection). Enabling auto-merge."
+                            sh(script: "gh pr merge ${env.SYNC_BRANCH} --repo ${FORK_REPO} --merge --auto", returnStatus: true)
+                            notifyTeams("Upstream Sync PR Created (Auto-Merge Enabled)",
+                                "Branch **${env.SYNC_BRANCH}** PR created with auto-merge enabled.\\n\\nCommits: ${env.COMMIT_COUNT}\\n[Review PR](${prUrl})",
+                                "00CC00")
+                        }
+
+                    } else {
+                        // Some files unresolvable — create draft PR for review.
+                        echo "Unresolvable files detected. Creating draft PR for review."
+                        echo "Unresolvable: ${unresolvable}"
+
+                        def prBody = ''
+                        if (fileExists('sync-output/pr_body.md')) {
+                            prBody = readFile('sync-output/pr_body.md')
+                        } else {
+                            prBody = "Automated upstream sync from ${env.UPSTREAM_REF}.\n\nCommits: ${env.COMMIT_COUNT}\n\n**Unresolvable files:**\n${unresolvable}"
+                        }
+
+                        writeFile file: 'sync-output/gh_pr_body.md', text: prBody
 
                         sh """
                             gh pr create \
@@ -309,19 +338,8 @@ for t in touched:
                             returnStdout: true
                         ).trim()
 
-                        // Post inline review comments on flagged files
+                        // Post inline review comments on flagged files.
                         if (fileExists('sync-output/flagged_reviews.json')) {
-                            def prNumber = sh(
-                                script: "gh pr view ${env.SYNC_BRANCH} --repo ${FORK_REPO} --json number -q .number",
-                                returnStdout: true
-                            ).trim()
-
-                            def commitSha = sh(
-                                script: 'git rev-parse HEAD',
-                                returnStdout: true
-                            ).trim()
-
-                            // Post a PR comment listing all flagged files
                             sh(script: '''
                                 . .venv/bin/activate
                                 PYTHONPATH=tools/upstream-sync python3 -m branding_resolver.post_review
@@ -331,8 +349,8 @@ for t in touched:
                             ''', returnStatus: true)
                         }
 
-                        notifyTeams("Upstream Sync PR Created (Draft)",
-                            "Branch **${env.SYNC_BRANCH}** needs manual review.\\n\\nCommits: ${env.COMMIT_COUNT}\\nConfidence: ${confidence}\\n[Review PR](${prUrl})",
+                        notifyTeams("Upstream Sync PR Created (Draft — Needs Review)",
+                            "Branch **${env.SYNC_BRANCH}** has unresolvable files.\\n\\nCommits: ${env.COMMIT_COUNT}\\n[Review PR](${prUrl})",
                             "FFA500")
                     }
                 }

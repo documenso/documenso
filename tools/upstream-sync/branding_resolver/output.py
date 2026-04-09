@@ -100,12 +100,24 @@ def generate_pr_body(result: MergeResult, upstream_ref: str) -> str:
                     lines.append(f"  - :warning: {err}")
         lines.append("")
 
-    # Token usage.
+    # Unresolvable files.
+    if result.unresolvable_files:
+        lines.append("### :x: Unresolvable Files")
+        lines.append("")
+        for f in result.unresolvable_files:
+            lines.append(f"- `{f}` — requires manual resolution")
+        lines.append("")
+
+    # API usage and cost.
     lines.append("### API Usage")
     lines.append("")
     lines.append(f"- API calls: {result.api_calls_made}")
     lines.append(f"- Input tokens: {result.total_input_tokens:,}")
     lines.append(f"- Output tokens: {result.total_output_tokens:,}")
+    lines.append(f"- Cost: ${result.total_cost_usd:.4f} USD")
+    if result.tier_stats:
+        tier_parts = [f"{k}: {v}" for k, v in result.tier_stats.items()]
+        lines.append(f"- Tiers: {', '.join(tier_parts)}")
     lines.append("")
 
     # Footer.

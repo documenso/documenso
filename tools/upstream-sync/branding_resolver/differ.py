@@ -45,6 +45,7 @@ def get_conflicted_files(repo_path: str) -> list[str]:
         cwd=repo_path,
         capture_output=True,
         text=True,
+        encoding="utf-8",
         check=True,
     )
     return [line.strip() for line in result.stdout.splitlines() if line.strip()]
@@ -129,6 +130,51 @@ def parse_conflict_markers(content: str) -> list[ConflictHunk]:
     return hunks
 
 
+def reconstruct_from_hunks(content_with_markers: str, resolved_hunks: list[str]) -> str:
+    """Replace conflict markers in a file with resolved hunk text.
+
+    Walks through the file, replacing each ``<<<<<<< ... >>>>>>>`` block
+    with the corresponding entry from *resolved_hunks*.
+
+    Args:
+        content_with_markers: The file content containing git conflict markers.
+        resolved_hunks: Resolved replacement text, one per conflict region.
+
+    Returns:
+        The reconstructed file content.
+    """
+    lines = content_with_markers.splitlines(keepends=True)
+    result: list[str] = []
+    hunk_idx = 0
+    i = 0
+
+    while i < len(lines):
+        line = lines[i].rstrip("\n\r")
+
+        if _CONFLICT_START.match(line):
+            # Skip <<<<<<< line, ours section, ======= line, theirs section, >>>>>>> line
+            i += 1
+            while i < len(lines) and not _CONFLICT_SEP.match(lines[i].rstrip("\n\r")):
+                i += 1
+            i += 1  # skip =======
+            while i < len(lines) and not _CONFLICT_END.match(lines[i].rstrip("\n\r")):
+                i += 1
+            i += 1  # skip >>>>>>>
+
+            # Insert the resolved hunk text.
+            if hunk_idx < len(resolved_hunks):
+                text = resolved_hunks[hunk_idx]
+                if text and not text.endswith("\n"):
+                    text += "\n"
+                result.append(text)
+                hunk_idx += 1
+        else:
+            result.append(lines[i])
+            i += 1
+
+    return "".join(result)
+
+
 def get_file_at_ref(repo_path: str, ref: str, file_path: str) -> str | None:
     """Retrieve the content of a file at a specific git ref.
 
@@ -140,6 +186,7 @@ def get_file_at_ref(repo_path: str, ref: str, file_path: str) -> str | None:
             cwd=repo_path,
             capture_output=True,
             text=True,
+            encoding="utf-8",
             check=True,
         )
         return result.stdout
