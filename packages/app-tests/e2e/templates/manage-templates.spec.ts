@@ -117,7 +117,13 @@ test('[TEMPLATES]: duplicate template', async ({ page }) => {
   await expect(page.getByRole('menuitem', { name: 'Duplicate' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Duplicate' }).click();
   await page.getByRole('button', { name: 'Duplicate' }).click();
-  await expect(page.getByText('Template duplicated').first()).toBeVisible();
+  await expect(page.getByText('Template Duplicated').first()).toBeVisible();
+
+  // The dialog should navigate to the new template's edit page.
+  await page.waitForURL(/\/templates\/.*\/edit/);
+
+  // Navigate back to the templates list and verify the count is now 2.
+  await page.goto(`/t/${team.url}/templates`);
   await expect(page.getByTestId('data-table-count')).toContainText('Showing 2 results');
 });
 

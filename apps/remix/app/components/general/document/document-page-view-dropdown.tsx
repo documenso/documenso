@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
 import {
   Copy,
   Download,
@@ -34,10 +34,10 @@ import {
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
 
-import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialog';
-import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate-dialog';
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
+import { EnvelopeDeleteDialog } from '~/components/dialogs/envelope-delete-dialog';
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
+import { EnvelopeDuplicateDialog } from '~/components/dialogs/envelope-duplicate-dialog';
 import { EnvelopeRenameDialog } from '~/components/dialogs/envelope-rename-dialog';
 import { EnvelopeSaveAsTemplateDialog } from '~/components/dialogs/envelope-save-as-template-dialog';
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
@@ -55,8 +55,6 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
 
   const trpcUtils = trpcReact.useUtils();
 
-  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
   const [isRenameDialogOpen, setRenameDialogOpen] = useState(false);
 
   const recipient = envelope.recipients.find((recipient) => recipient.email === user.email);
@@ -124,10 +122,18 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
           </Link>
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={() => setDuplicateDialogOpen(true)}>
-          <Copy className="mr-2 h-4 w-4" />
-          <Trans>Duplicate</Trans>
-        </DropdownMenuItem>
+        <EnvelopeDuplicateDialog
+          envelopeId={envelope.id}
+          envelopeType={EnvelopeType.DOCUMENT}
+          trigger={
+            <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+              <div>
+                <Copy className="mr-2 h-4 w-4" />
+                <Trans>Duplicate</Trans>
+              </div>
+            </DropdownMenuItem>
+          }
+        />
 
         <EnvelopeSaveAsTemplateDialog
           envelopeId={envelope.id}
@@ -141,10 +147,24 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
           }
         />
 
-        <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)} disabled={isDeleted}>
-          <Trash2 className="mr-2 h-4 w-4" />
-          <Trans>Delete</Trans>
-        </DropdownMenuItem>
+        <EnvelopeDeleteDialog
+          id={envelope.id}
+          type={EnvelopeType.DOCUMENT}
+          status={envelope.status}
+          title={envelope.title}
+          canManageDocument={canManageDocument}
+          onDelete={() => {
+            void navigate(documentsPath);
+          }}
+          trigger={
+            <DropdownMenuItem asChild disabled={isDeleted} onSelect={(e) => e.preventDefault()}>
+              <div>
+                <Trash2 className="mr-2 h-4 w-4" />
+                <Trans>Delete</Trans>
+              </div>
+            </DropdownMenuItem>
+          }
+        />
 
         <DropdownMenuLabel>
           <Trans>Share</Trans>
@@ -186,27 +206,6 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
           )}
         />
       </DropdownMenuContent>
-
-      <DocumentDeleteDialog
-        id={mapSecondaryIdToDocumentId(envelope.secondaryId)}
-        status={envelope.status}
-        documentTitle={envelope.title}
-        open={isDeleteDialogOpen}
-        canManageDocument={canManageDocument}
-        onOpenChange={setDeleteDialogOpen}
-        onDelete={() => {
-          void navigate(documentsPath);
-        }}
-      />
-
-      {isDuplicateDialogOpen && (
-        <DocumentDuplicateDialog
-          id={envelope.id}
-          token={recipient?.token}
-          open={isDuplicateDialogOpen}
-          onOpenChange={setDuplicateDialogOpen}
-        />
-      )}
 
       <EnvelopeRenameDialog
         id={envelope.id}
