@@ -51,6 +51,7 @@ import {
   canAccessTeamDocument,
   extractTeamSignatureSettings,
 } from '@documenso/lib/utils/teams';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc } from '@documenso/trpc/react';
 import { DocumentEmailCheckboxes } from '@documenso/ui/components/document/document-email-checkboxes';
 import {
@@ -138,10 +139,7 @@ export const ZAddSettingsFormSchema = z.object({
       .optional()
       .default('en'),
     emailId: z.string().nullable(),
-    emailReplyTo: z.preprocess(
-      (val) => (val === '' ? undefined : val),
-      z.string().email().optional(),
-    ),
+    emailReplyTo: z.preprocess((val) => (val === '' ? undefined : val), zEmail().optional()),
     emailSettings: ZDocumentEmailSettingsSchema,
     signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(1, {
       message: msg`At least one signature type must be enabled`.id,

@@ -22,7 +22,7 @@ import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
-const PDF_PAGE_SELECTOR = 'img[data-page-number]';
+export const PDF_PAGE_SELECTOR = 'img[data-page-number]';
 
 async function addSecondEnvelopeItem(envelopeId: string) {
   const firstItem = await prisma.envelopeItem.findFirstOrThrow({

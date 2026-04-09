@@ -32,6 +32,7 @@ import {
   ZTemplateManySchema,
   ZTemplateSchema,
 } from '@documenso/lib/types/template';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { LegacyTemplateDirectLinkSchema } from '@documenso/prisma/types/template-legacy-schema';
 import { ZDocumentExternalIdSchema } from '@documenso/trpc/server/document-router/schema';
 
@@ -73,7 +74,7 @@ export const ZTemplateMetaUpsertSchema = z.object({
   dateFormat: ZDocumentMetaDateFormatSchema.optional(),
   distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
   emailId: z.string().nullish(),
-  emailReplyTo: z.string().email().nullish(),
+  emailReplyTo: zEmail().nullish(),
   emailSettings: ZDocumentEmailSettingsSchema.optional(),
   redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
   language: ZDocumentMetaLanguageSchema.optional(),
@@ -86,14 +87,14 @@ export const ZTemplateMetaUpsertSchema = z.object({
 
 export const ZCreateDocumentFromDirectTemplateRequestSchema = z.object({
   directRecipientName: z.string().max(255).optional(),
-  directRecipientEmail: z.string().email().max(254),
+  directRecipientEmail: zEmail().max(254),
   directTemplateToken: z.string().min(1),
   directTemplateExternalId: z.string().optional(),
   signedFieldValues: z.array(ZSignFieldWithTokenMutationSchema),
   templateUpdatedAt: z.date(),
   nextSigner: z
     .object({
-      email: z.string().email().max(254),
+      email: zEmail().max(254),
       name: z.string().min(1).max(255),
     })
     .optional(),

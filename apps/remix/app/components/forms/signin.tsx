@@ -17,6 +17,7 @@ import { z } from 'zod';
 import { authClient } from '@documenso/auth/client';
 import { AuthenticationErrorCode } from '@documenso/auth/server/lib/errors/error-codes';
 import { AppError } from '@documenso/lib/errors/app-error';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc } from '@documenso/trpc/react';
 import { ZCurrentPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
@@ -58,7 +59,7 @@ const handleFallbackErrorMessages = (code: string) => {
 const LOGIN_REDIRECT_PATH = '/';
 
 export const ZSignInFormSchema = z.object({
-  email: z.string().email().min(1),
+  email: zEmail().min(1),
   password: ZCurrentPasswordSchema,
   totpCode: z.string().trim().optional(),
   backupCode: z.string().trim().optional(),
