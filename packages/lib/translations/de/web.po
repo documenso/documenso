@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-19 04:58\n"
+"PO-Revision-Date: 2026-04-02 08:21\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -1019,7 +1019,7 @@ msgstr "Eine eindeutige URL, um dein Team zu identifizieren"
 
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 msgid "A valid email is required"
-msgstr ""
+msgstr "Eine gültige E-Mail-Adresse ist erforderlich"
 
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 msgid "A verification email will be sent to the provided email."
@@ -1448,7 +1448,7 @@ msgstr "Nach der Übermittlung wird ein Dokument automatisch generiert und zu Ih
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "AI features"
-msgstr ""
+msgstr "KI-Funktionen"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "AI Features"
@@ -2229,11 +2229,11 @@ msgstr "Marken"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Branding company details"
-msgstr ""
+msgstr "Branding-Unternehmensdetails"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Branding logo"
-msgstr ""
+msgstr "Branding-Logo"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Branding Logo"
@@ -2255,7 +2255,7 @@ msgstr "Markenpräferenzen aktualisiert"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Branding URL"
-msgstr ""
+msgstr "Branding-URL"
 
 #: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
@@ -2908,7 +2908,7 @@ msgstr "Steuert, wie lange Empfänger Zeit haben, die Signatur abzuschließen, b
 
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Controls the default email settings when new documents or templates are created. Updating these settings will not affect existing documents or templates."
-msgstr ""
+msgstr "Legt die standardmäßigen E-Mail-Einstellungen fest, wenn neue Dokumente oder Vorlagen erstellt werden. Das Aktualisieren dieser Einstellungen wirkt sich nicht auf bestehende Dokumente oder Vorlagen aus."
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Controls the default language of an uploaded document. This will be used as the language in email communications with the recipients."
@@ -2989,7 +2989,7 @@ msgstr "Link kopieren"
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Copy organisation ID"
-msgstr ""
+msgstr "Organisations-ID kopieren"
 
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 msgid "Copy sharable link"
@@ -3006,7 +3006,7 @@ msgstr "Signierlinks kopieren"
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Copy team ID"
-msgstr ""
+msgstr "Team-ID kopieren"
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "Copy token"
@@ -3052,7 +3052,7 @@ msgstr "Ein Team erstellen, um mit Ihren Teammitgliedern zusammenzuarbeiten."
 
 #: apps/remix/app/components/dialogs/envelope-save-as-template-dialog.tsx
 msgid "Create a template from this document."
-msgstr ""
+msgstr "Aus diesem Dokument eine Vorlage erstellen."
 
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
@@ -3290,7 +3290,7 @@ msgstr "Aktuelle Empfänger:"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Current usage against organisation limits."
-msgstr ""
+msgstr "Aktuelle Nutzung im Verhältnis zu den Organisationslimits."
 
 #: apps/remix/app/components/general/teams/team-inherit-member-alert.tsx
 msgid "Currently all organisation members can access this team"
@@ -3343,7 +3343,7 @@ msgstr "Erstellungsdatum"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Date format"
-msgstr ""
+msgstr "Datumsformat"
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
@@ -3404,11 +3404,11 @@ msgstr "Standardempfänger"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Default settings applied to this organisation."
-msgstr ""
+msgstr "Standard­einstellungen, die auf diese Organisation angewendet werden."
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Default settings applied to this team. Inherited values come from the organisation."
-msgstr ""
+msgstr "Standard­einstellungen, die auf dieses Team angewendet werden. Vererbte Werte stammen von der Organisation."
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Signature Settings"
@@ -3431,7 +3431,7 @@ msgstr "Standardwert"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Delegate document ownership"
-msgstr ""
+msgstr "Dokumenten­eigentum delegieren"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Delegate Document Ownership"
@@ -3935,7 +3935,7 @@ msgstr "Dokument erstellt aus direkter Vorlage"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Document created from direct template email"
-msgstr ""
+msgstr "Dokument erstellt aus direkter Vorlagen-E-Mail"
 
 #: apps/remix/app/components/general/template/template-page-view-recent-activity.tsx
 msgid "Document created using a <0>direct link</0>"
@@ -4017,7 +4017,7 @@ msgstr "Dokument verwendet Altfeld-Integration"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Document language"
-msgstr ""
+msgstr "Dokumentensprache"
 
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Document Limit Exceeded!"
@@ -4084,7 +4084,7 @@ msgstr "Dokument Abgelehnt"
 
 #: apps/remix/app/components/dialogs/envelope-rename-dialog.tsx
 msgid "Document Renamed"
-msgstr ""
+msgstr "Dokument umbenannt"
 
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 msgid "Document sent"
@@ -4120,7 +4120,7 @@ msgstr "Dokumentenstatus"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Document timezone"
-msgstr ""
+msgstr "Dokumenten­zeitzone"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
 msgid "Document title"
@@ -4363,7 +4363,7 @@ msgstr "Zeichnen"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Draw signature"
-msgstr ""
+msgstr "Unterschrift zeichnen"
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Drop PDF here or click to select"
@@ -4564,7 +4564,7 @@ msgstr "E-Mail erstellt"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Email document settings"
-msgstr ""
+msgstr "E-Mail-Dokumenteinstellungen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Email Domain"
@@ -4629,7 +4629,7 @@ msgstr "Empfänger per E-Mail mit einer Signaturanfrage benachrichtigen"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Email reply-to"
-msgstr ""
+msgstr "E-Mail-Reply-To"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
@@ -4658,7 +4658,7 @@ msgstr "E-Mail-Einstellungen"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Email the owner when a document is created from a direct template"
-msgstr ""
+msgstr "Den Eigentümer per E-Mail benachrichtigen, wenn ein Dokument aus einer direkten Vorlage erstellt wird"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Email the owner when a recipient signs"
@@ -4818,7 +4818,7 @@ msgstr "Geben Sie einen Namen für Ihren neuen Ordner ein. Ordner helfen Ihnen, 
 
 #: apps/remix/app/components/dialogs/envelope-rename-dialog.tsx
 msgid "Enter a new title"
-msgstr ""
+msgstr "Neuen Titel eingeben"
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Enter claim name"
@@ -5280,7 +5280,7 @@ msgstr "Feldformat"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: packages/ui/primitives/document-flow/field-item.tsx
 msgid "Field ID:"
-msgstr ""
+msgstr "Feld-ID:"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
@@ -5481,7 +5481,7 @@ msgstr "Globale Empfängerauthentifizierung"
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Global Settings"
-msgstr ""
+msgstr "Globale Einstellungen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
@@ -5814,23 +5814,23 @@ msgstr "Posteingang Dokumente"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Include audit log"
-msgstr ""
+msgstr "Prüfprotokoll einbeziehen"
 
 #: apps/remix/app/components/dialogs/envelope-save-as-template-dialog.tsx
 msgid "Include Fields"
-msgstr ""
+msgstr "Felder einschließen"
 
 #: apps/remix/app/components/dialogs/envelope-save-as-template-dialog.tsx
 msgid "Include Recipients"
-msgstr ""
+msgstr "Empfänger einschließen"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Include sender details"
-msgstr ""
+msgstr "Absenderdetails einbeziehen"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Include signing certificate"
-msgstr ""
+msgstr "Signaturzertifikat einbeziehen"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Include the Audit Logs in the Document"
@@ -5877,7 +5877,7 @@ msgstr "Organisationsmitglieder erben"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Inherited"
-msgstr ""
+msgstr "Vererbt"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -6006,7 +6006,7 @@ msgstr "Laden Sie sie zuerst in die Organisation ein"
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Invited"
-msgstr ""
+msgstr "Eingeladen"
 
 #: apps/remix/app/components/tables/organisation-member-invites-table.tsx
 msgid "Invited At"
@@ -6089,7 +6089,7 @@ msgstr "Beigetreten {0}"
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Key identifiers and relationships for this team."
-msgstr ""
+msgstr "Zentrale Kennungen und Beziehungen für dieses Team."
 
 #: packages/lib/constants/i18n.ts
 msgid "Korean"
@@ -6433,7 +6433,7 @@ msgstr "Abonnement verwalten"
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Manage team"
-msgstr ""
+msgstr "Team verwalten"
 
 #. placeholder {0}: organisation.name
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -6448,7 +6448,7 @@ msgstr "Verwalten Sie das Abonnement der {0} Organisation"
 #. placeholder {0}: team.name
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Manage the {0} team"
-msgstr ""
+msgstr "Das Team {0} verwalten"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Manage the custom groups of members for your organisation."
@@ -6590,7 +6590,7 @@ msgstr "Mitglieder"
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Members that currently belong to this team."
-msgstr ""
+msgstr "Mitglieder, die derzeit zu diesem Team gehören."
 
 #: apps/remix/app/components/forms/support-ticket-form.tsx
 msgid "Message"
@@ -7024,7 +7024,7 @@ msgstr "Nicht gefunden"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Not set"
-msgstr ""
+msgstr "Nicht festgelegt"
 
 #: apps/remix/app/components/forms/signin.tsx
 msgid "Not supported"
@@ -7070,11 +7070,11 @@ msgstr "Zahleneinstellungen"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Off"
-msgstr ""
+msgstr "Aus"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "On"
-msgstr ""
+msgstr "Ein"
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "On this page, you can create a new webhook."
@@ -7216,7 +7216,7 @@ msgstr "Organisation wurde erfolgreich aktualisiert"
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Organisation ID"
-msgstr ""
+msgstr "Organisations-ID"
 
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-insights._index.tsx
@@ -7302,11 +7302,11 @@ msgstr "Organisations-URL"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Organisation usage"
-msgstr ""
+msgstr "Organisations­nutzung"
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Organisation-level pending invites for this team's parent organisation."
-msgstr ""
+msgstr "Ausstehende Einladungen auf Organisationsebene für die übergeordnete Organisation dieses Teams."
 
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
@@ -7370,15 +7370,15 @@ msgstr "Besitzer"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Owner document completed"
-msgstr ""
+msgstr "Dokument des Eigentümers abgeschlossen"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Owner document created"
-msgstr ""
+msgstr "Dokument des Eigentümers erstellt"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Owner recipient expired"
-msgstr ""
+msgstr "Empfänger des Eigentümers abgelaufen"
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 msgid "Ownership transferred to {organisationMemberName}."
@@ -7533,7 +7533,7 @@ msgstr "Ausstehende Einladungen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Pending Organisation Invites"
-msgstr ""
+msgstr "Ausstehende Organisations­einladungen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Pending since"
@@ -8106,7 +8106,7 @@ msgstr "Dem Empfänger ist es nicht gelungen, ein 2FA-Token für das Dokument zu
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: packages/ui/primitives/document-flow/field-item.tsx
 msgid "Recipient ID:"
-msgstr ""
+msgstr "Empfänger-ID:"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Recipient rejected the document"
@@ -8114,7 +8114,7 @@ msgstr "Der Empfänger hat das Dokument abgelehnt"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Recipient removed"
-msgstr ""
+msgstr "Empfänger entfernt"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Recipient removed email"
@@ -8126,7 +8126,7 @@ msgstr "Der Empfänger hat ein 2FA-Token für das Dokument angefordert"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Recipient signed"
-msgstr ""
+msgstr "Empfänger hat unterschrieben"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Recipient signed email"
@@ -8138,7 +8138,7 @@ msgstr "Der Empfänger hat das Dokument unterschrieben"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Recipient signing request"
-msgstr ""
+msgstr "Signaturanforderung für Empfänger"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Recipient signing request email"
@@ -8347,15 +8347,15 @@ msgstr "Teammitglied entfernen"
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 msgid "Rename"
-msgstr ""
+msgstr "Umbenennen"
 
 #: apps/remix/app/components/dialogs/envelope-rename-dialog.tsx
 msgid "Rename Document"
-msgstr ""
+msgstr "Dokument umbenennen"
 
 #: apps/remix/app/components/dialogs/envelope-rename-dialog.tsx
 msgid "Rename Template"
-msgstr ""
+msgstr "Vorlage umbenennen"
 
 #: apps/remix/app/components/forms/password.tsx
 #: apps/remix/app/components/forms/reset-password.tsx
@@ -8637,7 +8637,7 @@ msgstr "Speichern"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 msgid "Save as Template"
-msgstr ""
+msgstr "Als Vorlage speichern"
 
 #: packages/lib/client-only/providers/envelope-editor-provider.tsx
 #: packages/lib/client-only/providers/envelope-editor-provider.tsx
@@ -9529,7 +9529,7 @@ msgstr "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut oder kontaktiere
 
 #: apps/remix/app/components/dialogs/envelope-rename-dialog.tsx
 msgid "Something went wrong. Please try again."
-msgstr ""
+msgstr "Etwas ist schiefgelaufen. Bitte versuche es erneut."
 
 #: apps/remix/app/components/general/document/document-audit-log-download-button.tsx
 msgid "Sorry, we were unable to download the audit logs. Please try again later."
@@ -9817,7 +9817,7 @@ msgstr "Teamanzahl"
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Team details"
-msgstr ""
+msgstr "Teamdetails"
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._index.tsx
@@ -9844,7 +9844,7 @@ msgstr "Team-E-Mail wurde für {0} widerrufen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Team email name"
-msgstr ""
+msgstr "Team-E-Mail-Name"
 
 #: packages/email/templates/team-email-removed.tsx
 msgid "Team email removed"
@@ -9873,7 +9873,7 @@ msgstr "Teamgruppen"
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Team ID"
-msgstr ""
+msgstr "Team-ID"
 
 #: packages/lib/constants/teams-translations.ts
 msgid "Team Manager"
@@ -9921,7 +9921,7 @@ msgstr "Nur Teamvorlagen sind nirgendwo verlinkt und nur für Ihr Team sichtbar.
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Team role"
-msgstr ""
+msgstr "Teamrolle"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
@@ -10029,7 +10029,7 @@ msgstr "Vorlage verschoben"
 
 #: apps/remix/app/components/dialogs/envelope-rename-dialog.tsx
 msgid "Template Renamed"
-msgstr ""
+msgstr "Vorlage umbenannt"
 
 #: apps/remix/app/components/general/template/template-edit-form.tsx
 msgid "Template saved"
@@ -10617,7 +10617,7 @@ msgstr "Dieses Dokument konnte zu diesem Zeitpunkt nicht erneut gesendet werden.
 
 #: apps/remix/app/components/dialogs/envelope-save-as-template-dialog.tsx
 msgid "This document could not be saved as a template at this time. Please try again."
-msgstr ""
+msgstr "Dieses Dokument konnte derzeit nicht als Vorlage gespeichert werden. Bitte versuchen Sie es erneut."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-recipient-selector.tsx
 #: packages/ui/primitives/recipient-selector.tsx
@@ -10679,7 +10679,7 @@ msgstr "Diese E-Mail-Adresse wird bereits von einem anderen Team verwendet."
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "This email is sent to the document owner when a recipient creates a document via a direct template link."
-msgstr ""
+msgstr "Diese E-Mail wird an den Dokumenteigentümer gesendet, wenn ein Empfänger ein Dokument über einen direkten Vorlagenlink erstellt."
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "This email is sent to the document owner when a recipient has signed the document."
@@ -11161,7 +11161,7 @@ msgstr "Geben Sie Ihre Unterschrift ein"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Typed signature"
-msgstr ""
+msgstr "Getippte Unterschrift"
 
 #: apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx
 msgid "Typed signatures are not allowed. Please draw your signature."
@@ -11540,7 +11540,7 @@ msgstr "Hochladen fehlgeschlagen"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Upload signature"
-msgstr ""
+msgstr "Unterschrift hochladen"
 
 #: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
 msgid "Upload Signature"
@@ -11632,7 +11632,7 @@ msgstr "Benutzer hat kein Passwort."
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "User ID"
-msgstr ""
+msgstr "Benutzer-ID"
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "User not found"
@@ -13321,7 +13321,7 @@ msgstr "Ihr Dokument wurde erfolgreich erneut gesendet."
 
 #: apps/remix/app/components/dialogs/envelope-save-as-template-dialog.tsx
 msgid "Your document has been saved as a template."
-msgstr ""
+msgstr "Ihr Dokument wurde als Vorlage gespeichert."
 
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 msgid "Your document has been sent successfully."
@@ -13333,7 +13333,7 @@ msgstr "Ihr Dokument wurde erfolgreich dupliziert."
 
 #: apps/remix/app/components/dialogs/envelope-rename-dialog.tsx
 msgid "Your document has been successfully renamed."
-msgstr ""
+msgstr "Dein Dokument wurde erfolgreich umbenannt."
 
 #: apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
 msgid "Your document has been updated successfully"
@@ -13504,7 +13504,7 @@ msgstr "Ihre Vorlage wurde erfolgreich gelöscht."
 
 #: apps/remix/app/components/dialogs/envelope-rename-dialog.tsx
 msgid "Your template has been successfully renamed."
-msgstr ""
+msgstr "Deine Vorlage wurde erfolgreich umbenannt."
 
 #: apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
 msgid "Your template has been updated successfully"
@@ -13554,3 +13554,4 @@ msgstr "Ihr Verifizierungscode:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
