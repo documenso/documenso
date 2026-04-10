@@ -1,11 +1,4 @@
-import { EnvelopeType } from '@prisma/client';
-import { z } from 'zod';
-import { zfd } from 'zod-form-data';
-
-import {
-  ZDocumentAccessAuthTypesSchema,
-  ZDocumentActionAuthTypesSchema,
-} from '@documenso/lib/types/document-auth';
+import { ZDocumentAccessAuthTypesSchema, ZDocumentActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
 import { ZDocumentMetaCreateSchema } from '@documenso/lib/types/document-meta';
 import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
@@ -18,13 +11,12 @@ import {
 } from '@documenso/lib/types/field';
 import { ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 import { zEmail } from '@documenso/lib/utils/zod';
+import { EnvelopeType } from '@prisma/client';
+import { z } from 'zod';
+import { zfd } from 'zod-form-data';
 
 import { zfdFile, zodFormData } from '../../utils/zod-form-data';
-import {
-  ZDocumentExternalIdSchema,
-  ZDocumentTitleSchema,
-  ZDocumentVisibilitySchema,
-} from '../document-router/schema';
+import { ZDocumentExternalIdSchema, ZDocumentTitleSchema, ZDocumentVisibilitySchema } from '../document-router/schema';
 import type { TrpcRouteMeta } from '../trpc';
 import { ZCreateEnvelopeRecipientSchema } from './envelope-recipients/create-envelope-recipients.types';
 
@@ -42,9 +34,7 @@ export const createEnvelopeMeta: TrpcRouteMeta = {
 export const ZCreateEnvelopePayloadSchema = z.object({
   title: ZDocumentTitleSchema,
   type: z.nativeEnum(EnvelopeType),
-  delegatedDocumentOwner: zEmail()
-    .describe('The email of the user who will own the document.')
-    .optional(),
+  delegatedDocumentOwner: zEmail().describe('The email of the user who will own the document.').optional(),
   externalId: ZDocumentExternalIdSchema.optional(),
   visibility: ZDocumentVisibilitySchema.optional(),
   globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional(),
@@ -63,9 +53,7 @@ export const ZCreateEnvelopePayloadSchema = z.object({
           z.object({
             identifier: z
               .union([z.string(), z.number()])
-              .describe(
-                'Either the filename or the index of the file that was uploaded to attach the field to.',
-              )
+              .describe('Either the filename or the index of the file that was uploaded to attach the field to.')
               .optional(),
             page: ZFieldPageNumberSchema,
             positionX: ZClampedFieldPositionXSchema,

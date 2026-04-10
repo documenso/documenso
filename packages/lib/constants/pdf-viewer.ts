@@ -5,9 +5,7 @@ export const PDF_VIEWER_PAGE_CLASSNAME = 'react-pdf__Page z-0';
 export const PDF_VIEWER_CONTENT_SELECTOR = '[data-pdf-content]';
 
 export const getPdfPagesCount = () => {
-  const pageCountAttr = document
-    .querySelector(PDF_VIEWER_CONTENT_SELECTOR)
-    ?.getAttribute('data-page-count');
+  const pageCountAttr = document.querySelector(PDF_VIEWER_CONTENT_SELECTOR)?.getAttribute('data-page-count');
 
   const totalPages = Number(pageCountAttr);
 

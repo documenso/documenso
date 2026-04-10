@@ -6,9 +6,9 @@ import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-ap
 
 import { procedure } from '../trpc';
 import {
+  createEmbeddingPresignTokenMeta,
   ZCreateEmbeddingPresignTokenRequestSchema,
   ZCreateEmbeddingPresignTokenResponseSchema,
-  createEmbeddingPresignTokenMeta,
 } from './create-embedding-presign-token.types';
 
 /**

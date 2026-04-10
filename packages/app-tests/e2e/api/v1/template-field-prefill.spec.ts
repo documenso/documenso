@@ -1,5 +1,3 @@
-import { expect, test } from '@playwright/test';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import type { TCheckboxFieldMeta, TRadioFieldMeta } from '@documenso/lib/types/field-meta';
@@ -12,16 +10,14 @@ import { prisma } from '@documenso/prisma';
 import { FieldType, RecipientRole } from '@documenso/prisma/client';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../../fixtures/authentication';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
 test.describe('Template Field Prefill API v1', () => {
-  test('should create a document from template with prefilled fields', async ({
-    page,
-    request,
-  }) => {
+  test('should create a document from template with prefilled fields', async ({ page, request }) => {
     // 1. Create a user
     const { user, team } = await seedUser();
 
@@ -196,9 +192,7 @@ test.describe('Template Field Prefill API v1', () => {
     });
 
     // 7. Navigate to the template
-    await page.goto(
-      `${WEBAPP_BASE_URL}/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}`,
-    );
+    await page.goto(`${WEBAPP_BASE_URL}/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}`);
 
     // 8. Create a document from the template with prefilled fields
     const response = await request.post(
@@ -381,10 +375,7 @@ test.describe('Template Field Prefill API v1', () => {
     await expect(page.getByText('Select B')).toBeVisible();
   });
 
-  test('should create a document from template without prefilled fields', async ({
-    page,
-    request,
-  }) => {
+  test('should create a document from template without prefilled fields', async ({ page, request }) => {
     // 1. Create a user
     const { user, team } = await seedUser();
 
@@ -487,9 +478,7 @@ test.describe('Template Field Prefill API v1', () => {
     });
 
     // 7. Navigate to the template
-    await page.goto(
-      `${WEBAPP_BASE_URL}/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}`,
-    );
+    await page.goto(`${WEBAPP_BASE_URL}/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}`);
 
     // 8. Create a document from the template without prefilled fields
     const response = await request.post(

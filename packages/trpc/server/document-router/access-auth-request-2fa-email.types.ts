@@ -9,9 +9,5 @@ export const ZAccessAuthRequest2FAEmailResponseSchema = z.object({
   expiresAt: z.date(),
 });
 
-export type TAccessAuthRequest2FAEmailRequest = z.infer<
-  typeof ZAccessAuthRequest2FAEmailRequestSchema
->;
-export type TAccessAuthRequest2FAEmailResponse = z.infer<
-  typeof ZAccessAuthRequest2FAEmailResponseSchema
->;
+export type TAccessAuthRequest2FAEmailRequest = z.infer<typeof ZAccessAuthRequest2FAEmailRequestSchema>;
+export type TAccessAuthRequest2FAEmailResponse = z.infer<typeof ZAccessAuthRequest2FAEmailResponseSchema>;

@@ -3,9 +3,9 @@ import { formatSigningLink } from '@documenso/lib/utils/recipients';
 
 import { authenticatedProcedure } from '../trpc';
 import {
+  redistributeEnvelopeMeta,
   ZRedistributeEnvelopeRequestSchema,
   ZRedistributeEnvelopeResponseSchema,
-  redistributeEnvelopeMeta,
 } from './redistribute-envelope.types';
 
 export const redistributeEnvelopeRoute = authenticatedProcedure

@@ -1,12 +1,3 @@
-import { useMemo, useState } from 'react';
-
-import { Trans } from '@lingui/react/macro';
-import type { Field } from '@prisma/client';
-import { FieldType, RecipientRole } from '@prisma/client';
-import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
-import { useNavigate } from 'react-router';
-import { P, match } from 'ts-pattern';
-
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
@@ -31,6 +22,13 @@ import { DocumentReadOnlyFields } from '@documenso/ui/components/document/docume
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
+import { Trans } from '@lingui/react/macro';
+import type { Field } from '@prisma/client';
+import { FieldType, RecipientRole } from '@prisma/client';
+import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router';
+import { match, P } from 'ts-pattern';
 
 import { DocumentSigningAttachmentsPopover } from '~/components/general/document-signing/document-signing-attachments-popover';
 import { DocumentSigningAutoSign } from '~/components/general/document-signing/document-signing-auto-sign';
@@ -94,10 +92,7 @@ export const DocumentSigningPageViewV1 = ({
   // Keep the loading state going if successful since the redirect may take some time.
   const isSubmitting = isPending || isSuccess;
 
-  const fieldsRequiringValidation = useMemo(
-    () => fields.filter(isFieldUnsignedAndRequired),
-    [fields],
-  );
+  const fieldsRequiringValidation = useMemo(() => fields.filter(isFieldUnsignedAndRequired), [fields]);
 
   const fieldsValidated = () => {
     validateFieldsInserted(fieldsRequiringValidation);
@@ -140,8 +135,7 @@ export const DocumentSigningPageViewV1 = ({
   }
 
   const selectedSigner = allRecipients?.find((r) => r.id === selectedSignerId);
-  const targetSigner =
-    recipient.role === RecipientRole.ASSISTANT && selectedSigner ? selectedSigner : null;
+  const targetSigner = recipient.role === RecipientRole.ASSISTANT && selectedSigner ? selectedSigner : null;
 
   const nextRecipient = useMemo(() => {
     if (!documentMeta?.signingOrder || documentMeta.signingOrder !== 'SEQUENTIAL') {
@@ -150,10 +144,18 @@ export const DocumentSigningPageViewV1 = ({
 
     const sortedRecipients = allRecipients.sort((a, b) => {
       // Sort by signingOrder first (nulls last), then by id
-      if (a.signingOrder === null && b.signingOrder === null) return a.id - b.id;
-      if (a.signingOrder === null) return 1;
-      if (b.signingOrder === null) return -1;
-      if (a.signingOrder === b.signingOrder) return a.id - b.id;
+      if (a.signingOrder === null && b.signingOrder === null) {
+        return a.id - b.id;
+      }
+      if (a.signingOrder === null) {
+        return 1;
+      }
+      if (b.signingOrder === null) {
+        return -1;
+      }
+      if (a.signingOrder === b.signingOrder) {
+        return a.id - b.id;
+      }
       return a.signingOrder - b.signingOrder;
     });
 
@@ -169,16 +171,15 @@ export const DocumentSigningPageViewV1 = ({
   return (
     <DocumentSigningRecipientProvider recipient={recipient} targetSigner={targetSigner}>
       <div className="mx-auto w-full max-w-screen-xl sm:px-6">
-        {document.team.teamGlobalSettings.brandingEnabled &&
-          document.team.teamGlobalSettings.brandingLogo && (
-            <img
-              src={`/api/branding/logo/team/${document.teamId}`}
-              alt={`${document.team.name}'s Logo`}
-              className="mb-4 h-12 w-12 md:mb-2"
-            />
-          )}
+        {document.team.teamGlobalSettings.brandingEnabled && document.team.teamGlobalSettings.brandingLogo && (
+          <img
+            src={`/api/branding/logo/team/${document.teamId}`}
+            alt={`${document.team.name}'s Logo`}
+            className="mb-4 h-12 w-12 md:mb-2"
+          />
+        )}
         <h1
-          className="block max-w-[20rem] truncate text-2xl font-semibold sm:mt-4 md:max-w-[30rem] md:text-3xl"
+          className="block max-w-[20rem] truncate font-semibold text-2xl sm:mt-4 md:max-w-[30rem] md:text-3xl"
           title={document.title}
         >
           {document.title}
@@ -261,10 +262,7 @@ export const DocumentSigningPageViewV1 = ({
           </div>
 
           <div className="flex items-center gap-x-4">
-            <DocumentSigningAttachmentsPopover
-              envelopeId={document.envelopeId}
-              token={recipient.token}
-            />
+            <DocumentSigningAttachmentsPopover envelopeId={document.envelopeId} token={recipient.token} />
             <DocumentSigningRejectDialog documentId={document.id} token={recipient.token} />
           </div>
         </div>
@@ -291,12 +289,12 @@ export const DocumentSigningPageViewV1 = ({
 
           <div
             key={isExpanded ? 'expanded' : 'collapsed'}
-            className="group/document-widget fixed bottom-6 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-4 md:sticky md:bottom-[unset] md:top-4 md:z-auto md:w-[350px] md:px-0"
+            className="group/document-widget fixed bottom-6 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-4 md:sticky md:top-4 md:bottom-[unset] md:z-auto md:w-[350px] md:px-0"
             data-expanded={isExpanded || undefined}
           >
             <div className="flex w-full flex-col rounded-xl border border-border bg-widget px-4 py-4 md:py-6">
               <div className="flex items-center justify-between gap-x-2">
-                <h3 className="text-xl font-semibold text-foreground md:text-2xl">
+                <h3 className="font-semibold text-foreground text-xl md:text-2xl">
                   {match(recipient.role)
                     .with(RecipientRole.VIEWER, () => <Trans>View Document</Trans>)
                     .with(RecipientRole.SIGNER, () => <Trans>Sign Document</Trans>)
@@ -320,17 +318,11 @@ export const DocumentSigningPageViewV1 = ({
                           fields={fields}
                           fieldsValidated={fieldsValidated}
                           disabled={!isRecipientsTurn}
-                          onSignatureComplete={async (nextSigner) =>
-                            completeDocument({ nextSigner })
-                          }
+                          onSignatureComplete={async (nextSigner) => completeDocument({ nextSigner })}
                           recipient={recipient}
-                          allowDictateNextSigner={
-                            nextRecipient && documentMeta?.allowDictateNextSigner
-                          }
+                          allowDictateNextSigner={nextRecipient && documentMeta?.allowDictateNextSigner}
                           defaultNextSigner={
-                            nextRecipient
-                              ? { name: nextRecipient.name, email: nextRecipient.email }
-                              : undefined
+                            nextRecipient ? { name: nextRecipient.name, email: nextRecipient.email } : undefined
                           }
                         />
                       </div>
@@ -357,24 +349,16 @@ export const DocumentSigningPageViewV1 = ({
               </div>
 
               <div className="hidden group-data-[expanded]/document-widget:block md:block">
-                <p className="mt-2 text-sm text-muted-foreground">
+                <p className="mt-2 text-muted-foreground text-sm">
                   {match(recipient.role)
-                    .with(RecipientRole.VIEWER, () => (
-                      <Trans>Please mark as viewed to complete.</Trans>
-                    ))
-                    .with(RecipientRole.SIGNER, () => (
-                      <Trans>Please review the document before signing.</Trans>
-                    ))
-                    .with(RecipientRole.APPROVER, () => (
-                      <Trans>Please review the document before approving.</Trans>
-                    ))
-                    .with(RecipientRole.ASSISTANT, () => (
-                      <Trans>Complete the fields for the following signers.</Trans>
-                    ))
+                    .with(RecipientRole.VIEWER, () => <Trans>Please mark as viewed to complete.</Trans>)
+                    .with(RecipientRole.SIGNER, () => <Trans>Please review the document before signing.</Trans>)
+                    .with(RecipientRole.APPROVER, () => <Trans>Please review the document before approving.</Trans>)
+                    .with(RecipientRole.ASSISTANT, () => <Trans>Complete the fields for the following signers.</Trans>)
                     .otherwise(() => null)}
                 </p>
 
-                <hr className="mb-8 mt-4 border-border" />
+                <hr className="mt-4 mb-8 border-border" />
               </div>
 
               <div className="-mx-2 hidden px-2 group-data-[expanded]/document-widget:block md:block">
@@ -407,11 +391,7 @@ export const DocumentSigningPageViewV1 = ({
 
         <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
           {fields
-            .filter(
-              (field) =>
-                recipient.role !== RecipientRole.ASSISTANT ||
-                field.recipientId === selectedSigner?.id,
-            )
+            .filter((field) => recipient.role !== RecipientRole.ASSISTANT || field.recipientId === selectedSigner?.id)
             .map((field) =>
               match(field.type)
                 .with(FieldType.SIGNATURE, () => (
@@ -423,12 +403,8 @@ export const DocumentSigningPageViewV1 = ({
                     drawSignatureEnabled={documentMeta?.drawSignatureEnabled}
                   />
                 ))
-                .with(FieldType.INITIALS, () => (
-                  <DocumentSigningInitialsField key={field.id} field={field} />
-                ))
-                .with(FieldType.NAME, () => (
-                  <DocumentSigningNameField key={field.id} field={field} />
-                ))
+                .with(FieldType.INITIALS, () => <DocumentSigningInitialsField key={field.id} field={field} />)
+                .with(FieldType.NAME, () => <DocumentSigningNameField key={field.id} field={field} />)
                 .with(FieldType.DATE, () => (
                   <DocumentSigningDateField
                     key={field.id}
@@ -437,9 +413,7 @@ export const DocumentSigningPageViewV1 = ({
                     timezone={documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE}
                   />
                 ))
-                .with(FieldType.EMAIL, () => (
-                  <DocumentSigningEmailField key={field.id} field={field} />
-                ))
+                .with(FieldType.EMAIL, () => <DocumentSigningEmailField key={field.id} field={field} />)
                 .with(FieldType.TEXT, () => {
                   const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
                     ...field,

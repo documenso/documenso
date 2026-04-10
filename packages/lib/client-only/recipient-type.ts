@@ -1,11 +1,5 @@
 import type { Recipient } from '@prisma/client';
-import {
-  DocumentDistributionMethod,
-  ReadStatus,
-  RecipientRole,
-  SendStatus,
-  SigningStatus,
-} from '@prisma/client';
+import { DocumentDistributionMethod, ReadStatus, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 
 export enum RecipientStatusType {
   COMPLETED = 'completed',
@@ -27,10 +21,7 @@ export const getRecipientType = (
     return RecipientStatusType.REJECTED;
   }
 
-  if (
-    recipient.readStatus === ReadStatus.OPENED &&
-    recipient.signingStatus === SigningStatus.NOT_SIGNED
-  ) {
+  if (recipient.readStatus === ReadStatus.OPENED && recipient.signingStatus === SigningStatus.NOT_SIGNED) {
     return RecipientStatusType.OPENED;
   }
 

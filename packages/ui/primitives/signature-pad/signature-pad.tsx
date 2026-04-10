@@ -1,12 +1,11 @@
-import type { HTMLAttributes } from 'react';
-import { useState } from 'react';
+import { DocumentSignatureType } from '@documenso/lib/constants/document';
+import { isBase64Image } from '@documenso/lib/constants/signatures';
 
 import { Trans } from '@lingui/react/macro';
 import { KeyboardIcon, UploadCloudIcon } from 'lucide-react';
+import type { HTMLAttributes } from 'react';
+import { useState } from 'react';
 import { match } from 'ts-pattern';
-
-import { DocumentSignatureType } from '@documenso/lib/constants/document';
-import { isBase64Image } from '@documenso/lib/constants/signatures';
 
 import { SignatureIcon } from '../../icons/signature';
 import { cn } from '../../lib/utils';
@@ -172,22 +171,14 @@ export const SignaturePad = ({
         value="draw"
         className="relative flex aspect-signature-pad items-center justify-center rounded-md border border-border bg-neutral-50 text-center dark:bg-background"
       >
-        <SignaturePadDraw
-          className="h-full w-full"
-          onChange={onDrawSignatureChange}
-          value={drawSignature}
-        />
+        <SignaturePadDraw className="h-full w-full" onChange={onDrawSignatureChange} value={drawSignature} />
       </TabsContent>
 
       <TabsContent
         value="text"
         className="relative flex aspect-signature-pad items-center justify-center rounded-md border border-border bg-neutral-50 text-center dark:bg-background"
       >
-        <SignaturePadType
-          value={typedSignature}
-          defaultValue={fullName}
-          onChange={onTypedSignatureChange}
-        />
+        <SignaturePadType value={typedSignature} defaultValue={fullName} onChange={onTypedSignatureChange} />
       </TabsContent>
 
       <TabsContent

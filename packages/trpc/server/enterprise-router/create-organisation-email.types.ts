@@ -1,6 +1,5 @@
-import { z } from 'zod';
-
 import { zEmail } from '@documenso/lib/utils/zod';
+import { z } from 'zod';
 
 export const ZCreateOrganisationEmailRequestSchema = z.object({
   emailDomainId: z.string(),

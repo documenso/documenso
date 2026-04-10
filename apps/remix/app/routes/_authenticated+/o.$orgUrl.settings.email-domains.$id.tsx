@@ -1,11 +1,3 @@
-import { useMemo } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { EditIcon, MoreHorizontalIcon, Trash2Icon } from 'lucide-react';
-import { Link } from 'react-router';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { generateEmailDomainRecords } from '@documenso/lib/utils/email-domains';
@@ -22,6 +14,11 @@ import {
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
 import { SpinnerBox } from '@documenso/ui/primitives/spinner';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { EditIcon, MoreHorizontalIcon, Trash2Icon } from 'lucide-react';
+import { useMemo } from 'react';
+import { Link } from 'react-router';
 
 import { OrganisationEmailCreateDialog } from '~/components/dialogs/organisation-email-create-dialog';
 import { OrganisationEmailDeleteDialog } from '~/components/dialogs/organisation-email-delete-dialog';
@@ -40,15 +37,14 @@ export default function OrganisationEmailDomainSettingsPage({ params }: Route.Co
 
   const emailDomainId = params.id;
 
-  const { data: emailDomain, isLoading: isLoadingEmailDomain } =
-    trpc.enterprise.organisation.emailDomain.get.useQuery(
-      {
-        emailDomainId,
-      },
-      {
-        enabled: !!emailDomainId,
-      },
-    );
+  const { data: emailDomain, isLoading: isLoadingEmailDomain } = trpc.enterprise.organisation.emailDomain.get.useQuery(
+    {
+      emailDomainId,
+    },
+    {
+      enabled: !!emailDomainId,
+    },
+  );
 
   const emailColumns = useMemo(() => {
     return [
@@ -65,7 +61,7 @@ export default function OrganisationEmailDomainSettingsPage({ params }: Route.Co
         cell: ({ row }) => (
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <MoreHorizontalIcon className="text-muted-foreground h-5 w-5" />
+              <MoreHorizontalIcon className="h-5 w-5 text-muted-foreground" />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent className="w-52" align="start" forceMount>
@@ -136,15 +132,12 @@ export default function OrganisationEmailDomainSettingsPage({ params }: Route.Co
 
   return (
     <div>
-      <SettingsHeader
-        title={t`Email Domain Settings`}
-        subtitle={t`Manage your email domain settings.`}
-      >
+      <SettingsHeader title={t`Email Domain Settings`} subtitle={t`Manage your email domain settings.`}>
         <OrganisationEmailCreateDialog emailDomain={emailDomain} />
       </SettingsHeader>
 
       <div className="mt-4">
-        <label className="text-sm font-medium leading-none">
+        <label className="font-medium text-sm leading-none">
           <Trans>Emails</Trans>
         </label>
 
@@ -153,10 +146,7 @@ export default function OrganisationEmailDomainSettingsPage({ params }: Route.Co
         </div>
       </div>
 
-      <Alert
-        className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center"
-        variant="neutral"
-      >
+      <Alert className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
         <div className="mb-4 sm:mb-0">
           <AlertTitle>
             <Trans>DNS Records</Trans>
@@ -177,10 +167,7 @@ export default function OrganisationEmailDomainSettingsPage({ params }: Route.Co
         />
       </Alert>
 
-      <Alert
-        className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center"
-        variant="neutral"
-      >
+      <Alert className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
         <div className="mb-4 sm:mb-0">
           <AlertTitle>
             <Trans>Delete email domain</Trans>

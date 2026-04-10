@@ -1,17 +1,11 @@
-import { DocumentStatus, SigningStatus } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { DocumentStatus, SigningStatus } from '@prisma/client';
 
 import { jobs } from '../../client';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TExpireRecipientsSweepJobDefinition } from './expire-recipients-sweep';
 
-export const run = async ({
-  io,
-}: {
-  payload: TExpireRecipientsSweepJobDefinition;
-  io: JobRunIO;
-}) => {
+export const run = async ({ io }: { payload: TExpireRecipientsSweepJobDefinition; io: JobRunIO }) => {
   const now = new Date();
 
   const expiredRecipients = await prisma.recipient.findMany({

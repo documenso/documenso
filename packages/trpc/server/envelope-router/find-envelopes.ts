@@ -1,11 +1,7 @@
 import { findEnvelopes } from '@documenso/lib/server-only/envelope/find-envelopes';
 
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZFindEnvelopesRequestSchema,
-  ZFindEnvelopesResponseSchema,
-  findEnvelopesMeta,
-} from './find-envelopes.types';
+import { findEnvelopesMeta, ZFindEnvelopesRequestSchema, ZFindEnvelopesResponseSchema } from './find-envelopes.types';
 
 export const findEnvelopesRoute = authenticatedProcedure
   .meta(findEnvelopesMeta)
@@ -14,18 +10,7 @@ export const findEnvelopesRoute = authenticatedProcedure
   .query(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
 
-    const {
-      query,
-      type,
-      templateId,
-      page,
-      perPage,
-      orderByDirection,
-      orderByColumn,
-      source,
-      status,
-      folderId,
-    } = input;
+    const { query, type, templateId, page, perPage, orderByDirection, orderByColumn, source, status, folderId } = input;
 
     ctx.logger.info({
       input: {

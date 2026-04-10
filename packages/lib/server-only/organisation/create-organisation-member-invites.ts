@@ -1,10 +1,3 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import type { Organisation, Prisma } from '@prisma/client';
-import { OrganisationMemberInviteStatus } from '@prisma/client';
-import { nanoid } from 'nanoid';
-
 import { syncMemberCountWithStripeSeatPlan } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import { mailer } from '@documenso/email/mailer';
 import { OrganisationInviteEmailTemplate } from '@documenso/email/templates/organisation-invite';
@@ -14,6 +7,11 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { isOrganisationRoleWithinUserHierarchy } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
 import type { TCreateOrganisationMemberInvitesRequestSchema } from '@documenso/trpc/server/organisation-router/create-organisation-member-invites.types';
+import { msg } from '@lingui/core/macro';
+import type { Organisation, Prisma } from '@prisma/client';
+import { OrganisationMemberInviteStatus } from '@prisma/client';
+import { nanoid } from 'nanoid';
+import { createElement } from 'react';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { generateDatabaseId } from '../../universal/id';
@@ -101,8 +99,7 @@ export const createOrganisationMemberInvites = async ({
   });
 
   const unauthorizedRoleAccess = usersToInvite.some(
-    ({ organisationRole }) =>
-      !isOrganisationRoleWithinUserHierarchy(currentOrganisationMemberRole, organisationRole),
+    ({ organisationRole }) => !isOrganisationRoleWithinUserHierarchy(currentOrganisationMemberRole, organisationRole),
   );
 
   if (unauthorizedRoleAccess) {
@@ -111,29 +108,25 @@ export const createOrganisationMemberInvites = async ({
     });
   }
 
-  const organisationMemberInvites: Prisma.OrganisationMemberInviteCreateManyInput[] =
-    usersToInvite.map(({ email, organisationRole }) => ({
+  const organisationMemberInvites: Prisma.OrganisationMemberInviteCreateManyInput[] = usersToInvite.map(
+    ({ email, organisationRole }) => ({
       id: generateDatabaseId('member_invite'),
       email,
       organisationId,
       organisationRole,
       token: nanoid(32),
-    }));
+    }),
+  );
 
   const numberOfCurrentMembers = organisation.members.length;
   const numberOfCurrentInvites = organisation.invites.length;
   const numberOfNewInvites = organisationMemberInvites.length;
 
-  const totalMemberCountWithInvites =
-    numberOfCurrentMembers + numberOfCurrentInvites + numberOfNewInvites;
+  const totalMemberCountWithInvites = numberOfCurrentMembers + numberOfCurrentInvites + numberOfNewInvites;
 
   // Handle billing for seat based plans.
   if (subscription) {
-    await syncMemberCountWithStripeSeatPlan(
-      subscription,
-      organisationClaim,
-      totalMemberCountWithInvites,
-    );
+    await syncMemberCountWithStripeSeatPlan(subscription, organisationClaim, totalMemberCountWithInvites);
   }
 
   await prisma.organisationMemberInvite.createMany({

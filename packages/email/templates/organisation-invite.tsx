@@ -2,18 +2,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Hr,
-  Html,
-  Img,
-  Preview,
-  Section,
-  Text,
-} from '../components';
+import { Body, Button, Container, Head, Hr, Html, Img, Preview, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
 import { TemplateFooter } from '../template-components/template-footer';
 import TemplateImage from '../template-components/template-image';
@@ -45,27 +34,19 @@ export const OrganisationInviteEmailTemplate = ({
 
       <Body className="mx-auto my-auto font-sans">
         <Section className="bg-white text-slate-500">
-          <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-2 backdrop-blur-sm">
+          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid p-2 backdrop-blur-sm">
             {branding.brandingEnabled && branding.brandingLogo ? (
               <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6 p-2" />
             ) : (
-              <TemplateImage
-                assetBaseUrl={assetBaseUrl}
-                className="mb-4 h-6 p-2"
-                staticAsset="logo.png"
-              />
+              <TemplateImage assetBaseUrl={assetBaseUrl} className="mb-4 h-6 p-2" staticAsset="logo.png" />
             )}
 
             <Section>
-              <TemplateImage
-                className="mx-auto"
-                assetBaseUrl={assetBaseUrl}
-                staticAsset="add-user.png"
-              />
+              <TemplateImage className="mx-auto" assetBaseUrl={assetBaseUrl} staticAsset="add-user.png" />
             </Section>
 
             <Section className="p-2 text-slate-500">
-              <Text className="text-center text-lg font-medium text-black">
+              <Text className="text-center font-medium text-black text-lg">
                 <Trans>Join {organisationName} on Documenso</Trans>
               </Text>
 
@@ -73,7 +54,7 @@ export const OrganisationInviteEmailTemplate = ({
                 <Trans>You have been invited to join the following organisation</Trans>
               </Text>
 
-              <div className="mx-auto my-2 w-fit rounded-lg bg-gray-50 px-4 py-2 text-base font-medium text-slate-600">
+              <div className="mx-auto my-2 w-fit rounded-lg bg-gray-50 px-4 py-2 font-medium text-base text-slate-600">
                 {organisationName}
               </div>
 
@@ -83,15 +64,15 @@ export const OrganisationInviteEmailTemplate = ({
                 </Trans>
               </Text>
 
-              <Section className="mb-6 mt-6 text-center">
+              <Section className="mt-6 mb-6 text-center">
                 <Button
-                  className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
+                  className="inline-flex items-center justify-center rounded-lg bg-documenso-500 px-6 py-3 text-center font-medium text-black text-sm no-underline"
                   href={`${baseUrl}/organisation/invite/${token}`}
                 >
                   <Trans>Accept</Trans>
                 </Button>
                 <Button
-                  className="ml-4 inline-flex items-center justify-center rounded-lg bg-gray-50 px-6 py-3 text-center text-sm font-medium text-slate-600 no-underline"
+                  className="ml-4 inline-flex items-center justify-center rounded-lg bg-gray-50 px-6 py-3 text-center font-medium text-slate-600 text-sm no-underline"
                   href={`${baseUrl}/organisation/decline/${token}`}
                 >
                   <Trans>Decline</Trans>

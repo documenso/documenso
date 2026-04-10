@@ -1,11 +1,10 @@
-import { FieldType, ReadStatus, SigningStatus } from '@prisma/client';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getDocumentByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { signFieldWithToken } from '@documenso/lib/server-only/field/sign-field-with-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
+import { FieldType, ReadStatus, SigningStatus } from '@prisma/client';
 
 import { procedure } from '../trpc';
 import {
@@ -31,9 +30,7 @@ export const applyMultiSignSignatureRoute = procedure
       );
 
       // Check if all documents have been viewed
-      const hasUnviewedDocuments = envelopes.some(
-        (envelope) => envelope.recipient.readStatus !== ReadStatus.OPENED,
-      );
+      const hasUnviewedDocuments = envelopes.some((envelope) => envelope.recipient.readStatus !== ReadStatus.OPENED);
 
       if (hasUnviewedDocuments) {
         throw new AppError(AppErrorCode.INVALID_REQUEST, {
@@ -53,8 +50,7 @@ export const applyMultiSignSignatureRoute = procedure
           derivedRecipientActionAuth.recipientActionAuthRequired
         ) {
           throw new AppError(AppErrorCode.INVALID_REQUEST, {
-            message:
-              'Documents that require additional authentication cannot be multi signed at the moment',
+            message: 'Documents that require additional authentication cannot be multi signed at the moment',
           });
         }
       }

@@ -1,13 +1,8 @@
-import { msg } from '@lingui/core/macro';
-import { redirect } from 'react-router';
-
-import {
-  IS_GOOGLE_SSO_ENABLED,
-  IS_MICROSOFT_SSO_ENABLED,
-  IS_OIDC_SSO_ENABLED,
-} from '@documenso/lib/constants/auth';
+import { IS_GOOGLE_SSO_ENABLED, IS_MICROSOFT_SSO_ENABLED, IS_OIDC_SSO_ENABLED } from '@documenso/lib/constants/auth';
 import { env } from '@documenso/lib/utils/env';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
+import { msg } from '@lingui/core/macro';
+import { redirect } from 'react-router';
 
 import { SignUpForm } from '~/components/forms/signup';
 import { appMetaTags } from '~/utils/meta';

@@ -1,14 +1,3 @@
-import { useMemo } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { ErrorCode, useDropzone } from 'react-dropzone';
-import { useForm } from 'react-hook-form';
-import { match } from 'ts-pattern';
-import { z } from 'zod';
-
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { base64 } from '@documenso/lib/universal/base64';
@@ -18,15 +7,17 @@ import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { useMemo } from 'react';
+import { ErrorCode, useDropzone } from 'react-dropzone';
+import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
+import { z } from 'zod';
 
 export const ZAvatarImageFormSchema = z.object({
   bytes: z.string().nullish(),
@@ -69,11 +60,7 @@ export const AvatarImageForm = ({ className, team, organisation }: AvatarImageFo
     return user.avatarImageId !== null;
   }, [team, organisation, user.avatarImageId]);
 
-  const avatarImageId = team
-    ? team.avatarImageId
-    : organisation
-      ? organisation.avatarImageId
-      : user.avatarImageId;
+  const avatarImageId = team ? team.avatarImageId : organisation ? organisation.avatarImageId : user.avatarImageId;
 
   const form = useForm<TAvatarImageFormSchema>({
     values: {
@@ -127,8 +114,7 @@ export const AvatarImageForm = ({ className, team, organisation }: AvatarImageFo
       const error = AppError.parseError(err);
 
       const errorMessage = match(error.code).otherwise(
-        () =>
-          msg`We encountered an unknown error while attempting to update your password. Please try again later.`,
+        () => msg`We encountered an unknown error while attempting to update your password. Please try again later.`,
       );
 
       toast({
@@ -160,15 +146,13 @@ export const AvatarImageForm = ({ className, team, organisation }: AvatarImageFo
                     <div className="relative">
                       <Avatar className="h-16 w-16 border-2 border-solid">
                         {avatarImageId && <AvatarImage src={formatAvatarUrl(avatarImageId)} />}
-                        <AvatarFallback className="text-sm text-gray-400">
-                          {initials}
-                        </AvatarFallback>
+                        <AvatarFallback className="text-gray-400 text-sm">{initials}</AvatarFallback>
                       </Avatar>
 
                       {hasAvatarImage && (
                         <button
                           type="button"
-                          className="bg-background/70 text-destructive absolute inset-0 flex cursor-pointer items-center justify-center text-xs opacity-0 transition-opacity hover:opacity-100"
+                          className="absolute inset-0 flex cursor-pointer items-center justify-center bg-background/70 text-destructive text-xs opacity-0 transition-opacity hover:opacity-100"
                           disabled={form.formState.isSubmitting}
                           onClick={() => void onFormSubmit({ bytes: null })}
                         >

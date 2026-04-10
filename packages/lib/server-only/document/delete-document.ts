@@ -1,22 +1,17 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import type { DocumentMeta, Envelope, Recipient, User } from '@prisma/client';
-import { DocumentStatus, EnvelopeType, SendStatus, WebhookTriggerEvents } from '@prisma/client';
-
 import { mailer } from '@documenso/email/mailer';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { prisma } from '@documenso/prisma';
+import { msg } from '@lingui/core/macro';
+import type { DocumentMeta, Envelope, Recipient, User } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, SendStatus, WebhookTriggerEvents } from '@prisma/client';
+import { createElement } from 'react';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
-import {
-  ZWebhookDocumentSchema,
-  mapEnvelopeToWebhookDocumentPayload,
-} from '../../types/webhook-payload';
+import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { isDocumentCompleted } from '../../utils/document';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
@@ -34,12 +29,7 @@ export type DeleteDocumentOptions = {
   requestMetadata: ApiRequestMetadata;
 };
 
-export const deleteDocument = async ({
-  id,
-  userId,
-  teamId,
-  requestMetadata,
-}: DeleteDocumentOptions) => {
+export const deleteDocument = async ({ id, userId, teamId, requestMetadata }: DeleteDocumentOptions) => {
   const user = await prisma.user.findUnique({
     where: {
       id: userId,
@@ -131,11 +121,7 @@ type HandleDocumentOwnerDeleteOptions = {
   requestMetadata: ApiRequestMetadata;
 };
 
-const handleDocumentOwnerDelete = async ({
-  envelope,
-  user,
-  requestMetadata,
-}: HandleDocumentOwnerDeleteOptions) => {
+const handleDocumentOwnerDelete = async ({ envelope, user, requestMetadata }: HandleDocumentOwnerDeleteOptions) => {
   if (envelope.deletedAt) {
     return;
   }
@@ -199,9 +185,7 @@ const handleDocumentOwnerDelete = async ({
     });
   });
 
-  const isEnvelopeDeleteEmailEnabled = extractDerivedDocumentEmailSettings(
-    envelope.documentMeta,
-  ).documentDeleted;
+  const isEnvelopeDeleteEmailEnabled = extractDerivedDocumentEmailSettings(envelope.documentMeta).documentDeleted;
 
   if (!isEnvelopeDeleteEmailEnabled) {
     return deletedEnvelope;

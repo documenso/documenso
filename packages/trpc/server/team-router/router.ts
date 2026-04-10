@@ -58,37 +58,33 @@ export const teamRouter = router({
     get: authenticatedProcedure.query(async ({ ctx }) => {
       return await getTeamEmailByEmail({ email: ctx.user.email });
     }),
-    update: authenticatedProcedure
-      .input(ZUpdateTeamEmailMutationSchema)
-      .mutation(async ({ input, ctx }) => {
-        ctx.logger.info({
-          input: {
-            teamId: input.teamId,
-          },
-        });
+    update: authenticatedProcedure.input(ZUpdateTeamEmailMutationSchema).mutation(async ({ input, ctx }) => {
+      ctx.logger.info({
+        input: {
+          teamId: input.teamId,
+        },
+      });
 
-        return await updateTeamEmail({
-          userId: ctx.user.id,
-          ...input,
-        });
-      }),
-    delete: authenticatedProcedure
-      .input(ZDeleteTeamEmailMutationSchema)
-      .mutation(async ({ input, ctx }) => {
-        const { teamId } = input;
+      return await updateTeamEmail({
+        userId: ctx.user.id,
+        ...input,
+      });
+    }),
+    delete: authenticatedProcedure.input(ZDeleteTeamEmailMutationSchema).mutation(async ({ input, ctx }) => {
+      const { teamId } = input;
 
-        ctx.logger.info({
-          input: {
-            teamId,
-          },
-        });
-
-        return await deleteTeamEmail({
-          userId: ctx.user.id,
-          userEmail: ctx.user.email,
+      ctx.logger.info({
+        input: {
           teamId,
-        });
-      }),
+        },
+      });
+
+      return await deleteTeamEmail({
+        userId: ctx.user.id,
+        userEmail: ctx.user.email,
+        teamId,
+      });
+    }),
     verification: {
       send: authenticatedProcedure
         .input(ZCreateTeamEmailVerificationMutationSchema)

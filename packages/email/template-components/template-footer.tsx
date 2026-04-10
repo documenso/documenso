@@ -25,7 +25,7 @@ export const TemplateFooter = ({ isDocument = true }: TemplateFooterProps) => {
       )}
 
       {branding.brandingEnabled && branding.brandingCompanyDetails && (
-        <Text className="my-8 text-sm text-slate-400">
+        <Text className="my-8 text-slate-400 text-sm">
           {branding.brandingCompanyDetails.split('\n').map((line, idx) => {
             return (
               <>
@@ -38,7 +38,7 @@ export const TemplateFooter = ({ isDocument = true }: TemplateFooterProps) => {
       )}
 
       {!branding.brandingEnabled && (
-        <Text className="my-8 text-sm text-slate-400">
+        <Text className="my-8 text-slate-400 text-sm">
           Documenso, Inc.
           <br />
           2261 Market Street, #5211, San Francisco, CA 94114, USA

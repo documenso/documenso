@@ -1,20 +1,16 @@
-import { expect, test } from '@playwright/test';
-import { DocumentDataType, TeamMemberRole } from '@prisma/client';
-import path from 'path';
-
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
 import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
+import { DocumentDataType, TeamMemberRole } from '@prisma/client';
+import path from 'path';
 
 import { apiSignin } from '../fixtures/authentication';
 
 const EXAMPLE_PDF_PATH = path.join(__dirname, '../../../../assets/example.pdf');
-const FIELD_ALIGNMENT_TEST_PDF_PATH = path.join(
-  __dirname,
-  '../../../../assets/field-font-alignment.pdf',
-);
+const FIELD_ALIGNMENT_TEST_PDF_PATH = path.join(__dirname, '../../../../assets/field-font-alignment.pdf');
 
 /**
  * 1. Create a template with all settings filled out
@@ -230,9 +226,7 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
  * This test verifies that we can create a document from a template using a custom document
  * instead of the template's default document.
  */
-test('[TEMPLATE]: should create a document from a template with custom document', async ({
-  page,
-}) => {
+test('[TEMPLATE]: should create a document from a template with custom document', async ({ page }) => {
   const { user, team } = await seedUser();
   const template = await seedBlankTemplate(user, team.id);
 
@@ -267,13 +261,11 @@ test('[TEMPLATE]: should create a document from a template with custom document'
   // Upload document.
   const [fileChooser] = await Promise.all([
     page.waitForEvent('filechooser'),
-    page
-      .locator(`#template-use-dialog-file-input-${template.envelopeItems[0].id}`)
-      .evaluate((e) => {
-        if (e instanceof HTMLInputElement) {
-          e.click();
-        }
-      }),
+    page.locator(`#template-use-dialog-file-input-${template.envelopeItems[0].id}`).evaluate((e) => {
+      if (e instanceof HTMLInputElement) {
+        e.click();
+      }
+    }),
   ]);
 
   await fileChooser.setFiles(FIELD_ALIGNMENT_TEST_PDF_PATH);
@@ -305,9 +297,7 @@ test('[TEMPLATE]: should create a document from a template with custom document'
   const firstDocumentData = document.envelopeItems[0].documentData;
 
   const expectedDocumentDataType =
-    process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === 's3'
-      ? DocumentDataType.S3_PATH
-      : DocumentDataType.BYTES_64;
+    process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === 's3' ? DocumentDataType.S3_PATH : DocumentDataType.BYTES_64;
 
   expect(document.title).toEqual('TEMPLATE_WITH_CUSTOM_DOC');
   expect(firstDocumentData.type).toEqual(expectedDocumentDataType);
@@ -316,9 +306,7 @@ test('[TEMPLATE]: should create a document from a template with custom document'
     // Todo: Doesn't really work due to normalization of the PDF which won't let us directly compare the data.
     // Probably need to do a pixel match
     expect(firstDocumentData.data).not.toEqual(template.envelopeItems[0].documentData.data);
-    expect(firstDocumentData.initialData).not.toEqual(
-      template.envelopeItems[0].documentData.initialData,
-    );
+    expect(firstDocumentData.initialData).not.toEqual(template.envelopeItems[0].documentData.initialData);
   } else {
     // For S3, we expect the data/initialData to be the S3 path (non-empty string)
     expect(firstDocumentData.data).toBeTruthy();
@@ -330,9 +318,7 @@ test('[TEMPLATE]: should create a document from a template with custom document'
  * This test verifies that we can create a team document from a template using a custom document
  * instead of the template's default document.
  */
-test('[TEMPLATE]: should create a team document from a template with custom document', async ({
-  page,
-}) => {
+test('[TEMPLATE]: should create a team document from a template with custom document', async ({ page }) => {
   const { team, owner, organisation } = await seedTeam({
     createTeamMembers: 2,
   });
@@ -370,13 +356,11 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
   // Upload document.
   const [fileChooser] = await Promise.all([
     page.waitForEvent('filechooser'),
-    page
-      .locator(`#template-use-dialog-file-input-${template.envelopeItems[0].id}`)
-      .evaluate((e) => {
-        if (e instanceof HTMLInputElement) {
-          e.click();
-        }
-      }),
+    page.locator(`#template-use-dialog-file-input-${template.envelopeItems[0].id}`).evaluate((e) => {
+      if (e instanceof HTMLInputElement) {
+        e.click();
+      }
+    }),
   ]);
 
   await fileChooser.setFiles(FIELD_ALIGNMENT_TEST_PDF_PATH);
@@ -406,9 +390,7 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
   });
 
   const expectedDocumentDataType =
-    process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === 's3'
-      ? DocumentDataType.S3_PATH
-      : DocumentDataType.BYTES_64;
+    process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === 's3' ? DocumentDataType.S3_PATH : DocumentDataType.BYTES_64;
 
   const firstDocumentData = document.envelopeItems[0].documentData;
 
@@ -420,9 +402,7 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
     // Todo: Doesn't really work due to normalization of the PDF which won't let us directly compare the data.
     // Probably need to do a pixel match
     expect(firstDocumentData.data).not.toEqual(template.envelopeItems[0].documentData.data);
-    expect(firstDocumentData.initialData).not.toEqual(
-      template.envelopeItems[0].documentData.initialData,
-    );
+    expect(firstDocumentData.initialData).not.toEqual(template.envelopeItems[0].documentData.initialData);
   } else {
     // For S3, we expect the data/initialData to be the S3 path (non-empty string)
     expect(firstDocumentData.data).toBeTruthy();
@@ -505,18 +485,12 @@ test('[TEMPLATE]: should create a document from a template using template docume
   });
 
   expect(document.title).toEqual('TEMPLATE_WITH_ORIGINAL_DOC');
-  expect(firstDocumentData.initialData).toEqual(
-    templateWithData.envelopeItems[0].documentData.data,
-  );
-  expect(firstDocumentData.initialData).toEqual(
-    templateWithData.envelopeItems[0].documentData.initialData,
-  );
+  expect(firstDocumentData.initialData).toEqual(templateWithData.envelopeItems[0].documentData.data);
+  expect(firstDocumentData.initialData).toEqual(templateWithData.envelopeItems[0].documentData.initialData);
   expect(firstDocumentData.type).toEqual(templateWithData.envelopeItems[0].documentData.type);
 });
 
-test('[TEMPLATE]: should persist document visibility when creating from template', async ({
-  page,
-}) => {
+test('[TEMPLATE]: should persist document visibility when creating from template', async ({ page }) => {
   const { team, owner, organisation } = await seedTeam({
     createTeamMembers: 2,
   });
@@ -533,9 +507,7 @@ test('[TEMPLATE]: should persist document visibility when creating from template
   await page.getByLabel('Title').fill('TEMPLATE_WITH_VISIBILITY');
   await page.getByTestId('documentVisibilitySelectValue').click();
   await page.getByLabel('Managers and above').click();
-  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText(
-    'Managers and above',
-  );
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText('Managers and above');
 
   await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();

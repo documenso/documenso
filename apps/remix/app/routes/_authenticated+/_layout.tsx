@@ -1,7 +1,3 @@
-import { msg } from '@lingui/core/macro';
-import { Trans } from '@lingui/react/macro';
-import { Link, Outlet, redirect } from 'react-router';
-
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { OrganisationProvider } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -9,6 +5,9 @@ import { getSiteSettings } from '@documenso/lib/server-only/site-settings/get-si
 import { SITE_SETTINGS_BANNER_ID } from '@documenso/lib/server-only/site-settings/schemas/banner';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import { msg } from '@lingui/core/macro';
+import { Trans } from '@lingui/react/macro';
+import { Link, Outlet, redirect } from 'react-router';
 
 import { AppBanner } from '~/components/general/app-banner';
 import { Header } from '~/components/general/app-header';
@@ -29,9 +28,7 @@ export const shouldRevalidate = () => false;
 export async function loader({ request }: Route.LoaderArgs) {
   const [session, banner] = await Promise.all([
     getOptionalSession(request),
-    getSiteSettings().then((settings) =>
-      settings.find((setting) => setting.id === SITE_SETTINGS_BANNER_ID),
-    ),
+    getSiteSettings().then((settings) => settings.find((setting) => setting.id === SITE_SETTINGS_BANNER_ID)),
   ]);
 
   if (!session.isAuthenticated) {

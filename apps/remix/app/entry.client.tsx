@@ -1,14 +1,12 @@
-import { StrictMode, startTransition, useEffect } from 'react';
-
+import { extractPostHogConfig } from '@documenso/lib/constants/feature-flags';
+import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { i18n } from '@lingui/core';
 import { detect, fromHtmlTag } from '@lingui/detect-locale';
 import { I18nProvider } from '@lingui/react';
 import posthog from 'posthog-js';
+import { StrictMode, startTransition, useEffect } from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import { HydratedRouter } from 'react-router/dom';
-
-import { extractPostHogConfig } from '@documenso/lib/constants/feature-flags';
-import { dynamicActivate } from '@documenso/lib/utils/i18n';
 
 import './utils/polyfills/promise-with-resolvers';
 

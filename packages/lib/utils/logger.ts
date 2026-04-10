@@ -1,4 +1,4 @@
-import { type TransportTargetOptions, pino } from 'pino';
+import { pino, type TransportTargetOptions } from 'pino';
 
 import type { BaseApiLog } from '../types/api-logs';
 import { extractRequestMetadata } from '../universal/extract-request-metadata';

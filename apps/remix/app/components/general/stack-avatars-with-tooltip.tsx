@@ -1,13 +1,11 @@
-import { useMemo } from 'react';
-
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { type DocumentStatus, type Recipient } from '@prisma/client';
-
-import { RecipientStatusType, getRecipientType } from '@documenso/lib/client-only/recipient-type';
+import { getRecipientType, RecipientStatusType } from '@documenso/lib/client-only/recipient-type';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import { PopoverHover } from '@documenso/ui/primitives/popover';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import type { DocumentStatus, Recipient } from '@prisma/client';
+import { useMemo } from 'react';
 
 import { AvatarWithRecipient } from './avatar-with-recipient';
 import { StackAvatar } from './stack-avatar';
@@ -32,9 +30,7 @@ export const StackAvatarsWithTooltip = ({
     (recipient) => getRecipientType(recipient) === RecipientStatusType.WAITING,
   );
 
-  const openedRecipients = recipients.filter(
-    (recipient) => getRecipientType(recipient) === RecipientStatusType.OPENED,
-  );
+  const openedRecipients = recipients.filter((recipient) => getRecipientType(recipient) === RecipientStatusType.OPENED);
 
   const completedRecipients = recipients.filter(
     (recipient) => getRecipientType(recipient) === RecipientStatusType.COMPLETED,
@@ -71,7 +67,7 @@ export const StackAvatarsWithTooltip = ({
     >
       {completedRecipients.length > 0 && (
         <div>
-          <h1 className="text-base font-medium">
+          <h1 className="font-medium text-base">
             <Trans>Completed</Trans>
           </h1>
           {completedRecipients.map((recipient: Recipient) => (
@@ -83,8 +79,8 @@ export const StackAvatarsWithTooltip = ({
                 fallbackText={recipientAbbreviation(recipient)}
               />
               <div>
-                <p className="text-sm text-muted-foreground">{recipient.email || recipient.name}</p>
-                <p className="text-xs text-muted-foreground/70">
+                <p className="text-muted-foreground text-sm">{recipient.email || recipient.name}</p>
+                <p className="text-muted-foreground/70 text-xs">
                   {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
                 </p>
               </div>
@@ -95,7 +91,7 @@ export const StackAvatarsWithTooltip = ({
 
       {rejectedRecipients.length > 0 && (
         <div>
-          <h1 className="text-base font-medium">
+          <h1 className="font-medium text-base">
             <Trans>Rejected</Trans>
           </h1>
           {rejectedRecipients.map((recipient: Recipient) => (
@@ -107,8 +103,8 @@ export const StackAvatarsWithTooltip = ({
                 fallbackText={recipientAbbreviation(recipient)}
               />
               <div>
-                <p className="text-sm text-muted-foreground">{recipient.email || recipient.name}</p>
-                <p className="text-xs text-muted-foreground/70">
+                <p className="text-muted-foreground text-sm">{recipient.email || recipient.name}</p>
+                <p className="text-muted-foreground/70 text-xs">
                   {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
                 </p>
               </div>
@@ -119,45 +115,33 @@ export const StackAvatarsWithTooltip = ({
 
       {waitingRecipients.length > 0 && (
         <div>
-          <h1 className="text-base font-medium">
+          <h1 className="font-medium text-base">
             <Trans>Waiting</Trans>
           </h1>
           {waitingRecipients.map((recipient: Recipient) => (
-            <AvatarWithRecipient
-              key={recipient.id}
-              recipient={recipient}
-              documentStatus={documentStatus}
-            />
+            <AvatarWithRecipient key={recipient.id} recipient={recipient} documentStatus={documentStatus} />
           ))}
         </div>
       )}
 
       {openedRecipients.length > 0 && (
         <div>
-          <h1 className="text-base font-medium">
+          <h1 className="font-medium text-base">
             <Trans>Opened</Trans>
           </h1>
           {openedRecipients.map((recipient: Recipient) => (
-            <AvatarWithRecipient
-              key={recipient.id}
-              recipient={recipient}
-              documentStatus={documentStatus}
-            />
+            <AvatarWithRecipient key={recipient.id} recipient={recipient} documentStatus={documentStatus} />
           ))}
         </div>
       )}
 
       {uncompletedRecipients.length > 0 && (
         <div>
-          <h1 className="text-base font-medium">
+          <h1 className="font-medium text-base">
             <Trans>Uncompleted</Trans>
           </h1>
           {uncompletedRecipients.map((recipient: Recipient) => (
-            <AvatarWithRecipient
-              key={recipient.id}
-              recipient={recipient}
-              documentStatus={documentStatus}
-            />
+            <AvatarWithRecipient key={recipient.id} recipient={recipient} documentStatus={documentStatus} />
           ))}
         </div>
       )}

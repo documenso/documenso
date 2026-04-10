@@ -1,11 +1,10 @@
-import { expect, test } from '@playwright/test';
-import type { Team, User } from '@prisma/client';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { prisma } from '@documenso/prisma';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
+import type { Team, User } from '@prisma/client';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
@@ -35,33 +34,23 @@ test.describe('Envelope Attachments API V2', () => {
   });
 
   test.describe('Envelope attachment find endpoint', () => {
-    test('should block unauthorized access to envelope attachment find endpoint', async ({
-      request,
-    }) => {
+    test('should block unauthorized access to envelope attachment find endpoint', async ({ request }) => {
       const doc = await seedBlankDocument(userA, teamA.id);
 
-      const res = await request.get(
-        `${WEBAPP_BASE_URL}/api/v2-beta/envelope/attachment?envelopeId=${doc.id}`,
-        {
-          headers: { Authorization: `Bearer ${tokenB}` },
-        },
-      );
+      const res = await request.get(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/attachment?envelopeId=${doc.id}`, {
+        headers: { Authorization: `Bearer ${tokenB}` },
+      });
 
       expect(res.ok()).toBeFalsy();
       expect(res.status()).toBe(404);
     });
 
-    test('should allow authorized access to envelope attachment find endpoint', async ({
-      request,
-    }) => {
+    test('should allow authorized access to envelope attachment find endpoint', async ({ request }) => {
       const doc = await seedBlankDocument(userA, teamA.id);
 
-      const res = await request.get(
-        `${WEBAPP_BASE_URL}/api/v2-beta/envelope/attachment?envelopeId=${doc.id}`,
-        {
-          headers: { Authorization: `Bearer ${tokenA}` },
-        },
-      );
+      const res = await request.get(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/attachment?envelopeId=${doc.id}`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
 
       expect(res.ok()).toBeTruthy();
       expect(res.status()).toBe(200);
@@ -69,9 +58,7 @@ test.describe('Envelope Attachments API V2', () => {
   });
 
   test.describe('Envelope attachment create endpoint', () => {
-    test('should block unauthorized access to envelope attachment create endpoint', async ({
-      request,
-    }) => {
+    test('should block unauthorized access to envelope attachment create endpoint', async ({ request }) => {
       const doc = await seedBlankDocument(userA, teamA.id);
 
       const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/attachment/create`, {
@@ -89,9 +76,7 @@ test.describe('Envelope Attachments API V2', () => {
       expect(res.status()).toBe(404);
     });
 
-    test('should allow authorized access to envelope attachment create endpoint', async ({
-      request,
-    }) => {
+    test('should allow authorized access to envelope attachment create endpoint', async ({ request }) => {
       const doc = await seedBlankDocument(userA, teamA.id);
 
       const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/attachment/create`, {
@@ -111,9 +96,7 @@ test.describe('Envelope Attachments API V2', () => {
   });
 
   test.describe('Envelope attachment update endpoint', () => {
-    test('should block unauthorized access to envelope attachment update endpoint', async ({
-      request,
-    }) => {
+    test('should block unauthorized access to envelope attachment update endpoint', async ({ request }) => {
       const doc = await seedBlankDocument(userA, teamA.id);
 
       const attachment = await prisma.envelopeAttachment.create({
@@ -140,9 +123,7 @@ test.describe('Envelope Attachments API V2', () => {
       expect(res.status()).toBe(404);
     });
 
-    test('should allow authorized access to envelope attachment update endpoint', async ({
-      request,
-    }) => {
+    test('should allow authorized access to envelope attachment update endpoint', async ({ request }) => {
       const doc = await seedBlankDocument(userA, teamA.id);
 
       const attachment = await prisma.envelopeAttachment.create({
@@ -171,9 +152,7 @@ test.describe('Envelope Attachments API V2', () => {
   });
 
   test.describe('Envelope attachment delete endpoint', () => {
-    test('should block unauthorized access to envelope attachment delete endpoint', async ({
-      request,
-    }) => {
+    test('should block unauthorized access to envelope attachment delete endpoint', async ({ request }) => {
       const doc = await seedBlankDocument(userA, teamA.id);
 
       const attachment = await prisma.envelopeAttachment.create({
@@ -194,9 +173,7 @@ test.describe('Envelope Attachments API V2', () => {
       expect(res.status()).toBe(404);
     });
 
-    test('should allow authorized access to envelope attachment delete endpoint', async ({
-      request,
-    }) => {
+    test('should allow authorized access to envelope attachment delete endpoint', async ({ request }) => {
       const doc = await seedBlankDocument(userA, teamA.id);
 
       const attachment = await prisma.envelopeAttachment.create({

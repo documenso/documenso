@@ -1,8 +1,7 @@
+import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { Trans } from '@lingui/react/macro';
 import { ChevronLeft, Loader } from 'lucide-react';
 import { Link } from 'react-router';
-
-import { Skeleton } from '@documenso/ui/primitives/skeleton';
 
 export default function DocumentEditSkeleton() {
   return (
@@ -12,7 +11,7 @@ export default function DocumentEditSkeleton() {
         <Trans>Documents</Trans>
       </Link>
 
-      <h1 className="mt-4 grow-0 truncate text-2xl font-semibold md:text-3xl">
+      <h1 className="mt-4 grow-0 truncate font-semibold text-2xl md:text-3xl">
         <Trans>Loading Document...</Trans>
       </h1>
 

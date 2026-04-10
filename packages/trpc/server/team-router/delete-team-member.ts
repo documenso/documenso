@@ -1,16 +1,12 @@
-import { OrganisationGroupType } from '@prisma/client';
-
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getMemberRoles } from '@documenso/lib/server-only/team/get-member-roles';
 import { buildTeamWhereQuery, isTeamRoleWithinUserHierarchy } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
+import { OrganisationGroupType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZDeleteTeamMemberRequestSchema,
-  ZDeleteTeamMemberResponseSchema,
-} from './delete-team-member.types';
+import { ZDeleteTeamMemberRequestSchema, ZDeleteTeamMemberResponseSchema } from './delete-team-member.types';
 
 export const deleteTeamMemberRoute = authenticatedProcedure
   // .meta(deleteTeamMemberMeta)

@@ -1,10 +1,10 @@
+import path from 'node:path';
 import linguiMacro from '@lingui/babel-plugin-lingui-macro';
 import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
-import path from 'node:path';
 
 /** @type {import('rollup').RollupOptions} */
 const config = {

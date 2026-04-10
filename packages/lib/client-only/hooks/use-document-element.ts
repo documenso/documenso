@@ -1,6 +1,5 @@
-import { useCallback } from 'react';
-
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
+import { useCallback } from 'react';
 
 export const useDocumentElement = () => {
   /**
@@ -15,9 +14,7 @@ export const useDocumentElement = () => {
 
     const $page =
       target.closest<HTMLElement>(pageSelector) ??
-      document
-        .elementsFromPoint(event.clientX, event.clientY)
-        .find((el) => el.matches(pageSelector));
+      document.elementsFromPoint(event.clientX, event.clientY).find((el) => el.matches(pageSelector));
 
     if (!$page) {
       return null;
@@ -31,19 +28,9 @@ export const useDocumentElement = () => {
    * as a percentage of the page width and height.
    */
   const getFieldPosition = (page: HTMLElement, field: HTMLElement) => {
-    const {
-      top: pageTop,
-      left: pageLeft,
-      height: pageHeight,
-      width: pageWidth,
-    } = getBoundingClientRect(page);
+    const { top: pageTop, left: pageLeft, height: pageHeight, width: pageWidth } = getBoundingClientRect(page);
 
-    const {
-      top: fieldTop,
-      left: fieldLeft,
-      height: fieldHeight,
-      width: fieldWidth,
-    } = getBoundingClientRect(field);
+    const { top: fieldTop, left: fieldLeft, height: fieldHeight, width: fieldWidth } = getBoundingClientRect(field);
 
     return {
       x: ((fieldLeft - pageLeft) / pageWidth) * 100,
@@ -60,31 +47,28 @@ export const useDocumentElement = () => {
    * @param mouseWidth The artifical width of the mouse.
    * @param mouseHeight The artifical height of the mouse.
    */
-  const isWithinPageBounds = useCallback(
-    (event: MouseEvent, pageSelector: string, mouseWidth = 0, mouseHeight = 0) => {
-      const $page = getPage(event, pageSelector);
+  const isWithinPageBounds = useCallback((event: MouseEvent, pageSelector: string, mouseWidth = 0, mouseHeight = 0) => {
+    const $page = getPage(event, pageSelector);
 
-      if (!$page) {
-        return false;
-      }
+    if (!$page) {
+      return false;
+    }
 
-      const { top, left, height, width } = $page.getBoundingClientRect();
+    const { top, left, height, width } = $page.getBoundingClientRect();
 
-      const halfMouseWidth = mouseWidth / 2;
-      const halfMouseHeight = mouseHeight / 2;
+    const halfMouseWidth = mouseWidth / 2;
+    const halfMouseHeight = mouseHeight / 2;
 
-      if (event.clientY > top + height - halfMouseHeight || event.clientY < top + halfMouseHeight) {
-        return false;
-      }
+    if (event.clientY > top + height - halfMouseHeight || event.clientY < top + halfMouseHeight) {
+      return false;
+    }
 
-      if (event.clientX > left + width - halfMouseWidth || event.clientX < left + halfMouseWidth) {
-        return false;
-      }
+    if (event.clientX > left + width - halfMouseWidth || event.clientX < left + halfMouseWidth) {
+      return false;
+    }
 
-      return true;
-    },
-    [],
-  );
+    return true;
+  }, []);
 
   return {
     getPage,

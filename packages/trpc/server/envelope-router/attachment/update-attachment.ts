@@ -3,9 +3,9 @@ import { updateAttachment } from '@documenso/lib/server-only/envelope-attachment
 import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';
 import {
+  updateAttachmentMeta,
   ZUpdateAttachmentRequestSchema,
   ZUpdateAttachmentResponseSchema,
-  updateAttachmentMeta,
 } from './update-attachment.types';
 
 export const updateAttachmentRoute = authenticatedProcedure

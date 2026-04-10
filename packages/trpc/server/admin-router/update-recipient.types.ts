@@ -1,6 +1,5 @@
-import { z } from 'zod';
-
 import { zEmail } from '@documenso/lib/utils/zod';
+import { z } from 'zod';
 
 export const ZUpdateRecipientRequestSchema = z.object({
   id: z.number().min(1),

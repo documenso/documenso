@@ -1,8 +1,3 @@
-import { useState } from 'react';
-
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
@@ -17,6 +12,8 @@ import {
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { useState } from 'react';
 
 export type OrganisationEmailDeleteDialogProps = {
   emailId: string;
@@ -24,11 +21,7 @@ export type OrganisationEmailDeleteDialogProps = {
   trigger?: React.ReactNode;
 };
 
-export const OrganisationEmailDeleteDialog = ({
-  trigger,
-  emailId,
-  email,
-}: OrganisationEmailDeleteDialogProps) => {
+export const OrganisationEmailDeleteDialog = ({ trigger, emailId, email }: OrganisationEmailDeleteDialogProps) => {
   const [open, setOpen] = useState(false);
 
   const { t } = useLingui();
@@ -36,26 +29,25 @@ export const OrganisationEmailDeleteDialog = ({
 
   const organisation = useCurrentOrganisation();
 
-  const { mutateAsync: deleteEmail, isPending: isDeleting } =
-    trpc.enterprise.organisation.email.delete.useMutation({
-      onSuccess: () => {
-        toast({
-          title: t`Success`,
-          description: t`You have successfully removed this email from the organisation.`,
-          duration: 5000,
-        });
+  const { mutateAsync: deleteEmail, isPending: isDeleting } = trpc.enterprise.organisation.email.delete.useMutation({
+    onSuccess: () => {
+      toast({
+        title: t`Success`,
+        description: t`You have successfully removed this email from the organisation.`,
+        duration: 5000,
+      });
 
-        setOpen(false);
-      },
-      onError: () => {
-        toast({
-          title: t`An unknown error occurred`,
-          description: t`We encountered an unknown error while attempting to remove this email. Please try again later.`,
-          variant: 'destructive',
-          duration: 10000,
-        });
-      },
-    });
+      setOpen(false);
+    },
+    onError: () => {
+      toast({
+        title: t`An unknown error occurred`,
+        description: t`We encountered an unknown error while attempting to remove this email. Please try again later.`,
+        variant: 'destructive',
+        duration: 10000,
+      });
+    },
+  });
 
   return (
     <Dialog open={open} onOpenChange={(value) => !isDeleting && setOpen(value)}>

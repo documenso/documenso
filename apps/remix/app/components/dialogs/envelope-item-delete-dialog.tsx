@@ -1,8 +1,3 @@
-import { useState } from 'react';
-
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -16,6 +11,8 @@ import {
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { useState } from 'react';
 
 export type EnvelopeItemDeleteDialogProps = {
   canItemBeDeleted: boolean;
@@ -39,28 +36,27 @@ export const EnvelopeItemDeleteDialog = ({
   const { t } = useLingui();
   const { toast } = useToast();
 
-  const { mutateAsync: deleteEnvelopeItem, isPending: isDeleting } =
-    trpc.envelope.item.delete.useMutation({
-      onSuccess: () => {
-        toast({
-          title: t`Success`,
-          description: t`You have successfully removed this envelope item.`,
-          duration: 5000,
-        });
+  const { mutateAsync: deleteEnvelopeItem, isPending: isDeleting } = trpc.envelope.item.delete.useMutation({
+    onSuccess: () => {
+      toast({
+        title: t`Success`,
+        description: t`You have successfully removed this envelope item.`,
+        duration: 5000,
+      });
 
-        onDelete?.(envelopeItemId);
+      onDelete?.(envelopeItemId);
 
-        setOpen(false);
-      },
-      onError: () => {
-        toast({
-          title: t`An unknown error occurred`,
-          description: t`We encountered an unknown error while attempting to remove this envelope item. Please try again later.`,
-          variant: 'destructive',
-          duration: 10000,
-        });
-      },
-    });
+      setOpen(false);
+    },
+    onError: () => {
+      toast({
+        title: t`An unknown error occurred`,
+        description: t`We encountered an unknown error while attempting to remove this envelope item. Please try again later.`,
+        variant: 'destructive',
+        duration: 10000,
+      });
+    },
+  });
 
   return (
     <Dialog open={open} onOpenChange={(value) => !isDeleting && setOpen(value)}>
@@ -74,16 +70,12 @@ export const EnvelopeItemDeleteDialog = ({
             </DialogTitle>
 
             <DialogDescription className="mt-4">
-              <Trans>
-                You are about to remove the following document and all associated fields
-              </Trans>
+              <Trans>You are about to remove the following document and all associated fields</Trans>
             </DialogDescription>
           </DialogHeader>
 
           <Alert variant="neutral">
-            <AlertDescription className="text-center font-semibold">
-              {envelopeItemTitle}
-            </AlertDescription>
+            <AlertDescription className="text-center font-semibold">{envelopeItemTitle}</AlertDescription>
           </Alert>
 
           <fieldset disabled={isDeleting}>
@@ -116,9 +108,7 @@ export const EnvelopeItemDeleteDialog = ({
             </DialogTitle>
 
             <DialogDescription className="mt-4">
-              <Trans>
-                You cannot delete this item because the document has been sent to recipients.
-              </Trans>
+              <Trans>You cannot delete this item because the document has been sent to recipients.</Trans>
             </DialogDescription>
           </DialogHeader>
 

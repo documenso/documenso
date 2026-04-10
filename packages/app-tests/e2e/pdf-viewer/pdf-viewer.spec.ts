@@ -1,15 +1,9 @@
-import { expect, test } from '@playwright/test';
-import { FieldType } from '@prisma/client';
 import path from 'node:path';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/create-embedding-presign-token';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { prefixedId } from '@documenso/lib/universal/id';
-import {
-  mapSecondaryIdToDocumentId,
-  mapSecondaryIdToTemplateId,
-} from '@documenso/lib/utils/envelope';
+import { mapSecondaryIdToDocumentId, mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
 import { prisma } from '@documenso/prisma';
 import {
@@ -19,6 +13,8 @@ import {
 } from '@documenso/prisma/seed/documents';
 import { seedBlankTemplate, seedDirectTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
+import { FieldType } from '@prisma/client';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -118,14 +114,13 @@ test.describe('PDF Viewer Rendering', () => {
         fields: [FieldType.SIGNATURE],
       });
 
-      const { document: documentV2, recipients: recipientsV2 } =
-        await seedPendingDocumentWithFullFields({
-          owner: user,
-          teamId: team.id,
-          recipients: ['signer-v2@test.documenso.com'],
-          fields: [FieldType.SIGNATURE],
-          updateDocumentOptions: { internalVersion: 2 },
-        });
+      const { document: documentV2, recipients: recipientsV2 } = await seedPendingDocumentWithFullFields({
+        owner: user,
+        teamId: team.id,
+        recipients: ['signer-v2@test.documenso.com'],
+        fields: [FieldType.SIGNATURE],
+        updateDocumentOptions: { internalVersion: 2 },
+      });
       await addSecondEnvelopeItem(documentV2.id);
 
       await page.goto(`/sign/${recipientsV1[0].token}`);
@@ -173,24 +168,14 @@ test.describe('PDF Viewer Rendering', () => {
       const qrTokenV1 = prefixedId('qr');
       const qrTokenV2 = prefixedId('qr');
 
-      const documentV1 = await seedCompletedDocument(
-        user,
-        team.id,
-        ['share-v1@test.documenso.com'],
-        {
-          createDocumentOptions: { qrToken: qrTokenV1 },
-        },
-      );
+      const documentV1 = await seedCompletedDocument(user, team.id, ['share-v1@test.documenso.com'], {
+        createDocumentOptions: { qrToken: qrTokenV1 },
+      });
 
-      const documentV2 = await seedCompletedDocument(
-        user,
-        team.id,
-        ['share-v2@test.documenso.com'],
-        {
-          createDocumentOptions: { qrToken: qrTokenV2 },
-          internalVersion: 2,
-        },
-      );
+      const documentV2 = await seedCompletedDocument(user, team.id, ['share-v2@test.documenso.com'], {
+        createDocumentOptions: { qrToken: qrTokenV2 },
+        internalVersion: 2,
+      });
       await addSecondEnvelopeItem(documentV2.id);
 
       await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/share/${qrTokenV1}`);
@@ -224,14 +209,13 @@ test.describe('PDF Viewer Rendering', () => {
         fields: [FieldType.SIGNATURE],
       });
 
-      const { document: documentV2, recipients: recipientsV2 } =
-        await seedPendingDocumentWithFullFields({
-          owner: user,
-          teamId: team.id,
-          recipients: ['embed-signer-v2@test.documenso.com'],
-          fields: [FieldType.SIGNATURE],
-          updateDocumentOptions: { internalVersion: 2 },
-        });
+      const { document: documentV2, recipients: recipientsV2 } = await seedPendingDocumentWithFullFields({
+        owner: user,
+        teamId: team.id,
+        recipients: ['embed-signer-v2@test.documenso.com'],
+        fields: [FieldType.SIGNATURE],
+        updateDocumentOptions: { internalVersion: 2 },
+      });
       await addSecondEnvelopeItem(documentV2.id);
 
       await page.goto(`/embed/sign/${recipientsV1[0].token}`);
@@ -281,14 +265,13 @@ test.describe('PDF Viewer Rendering', () => {
         fields: [FieldType.SIGNATURE],
       });
 
-      const { document: documentV2, recipients: recipientsV2 } =
-        await seedPendingDocumentWithFullFields({
-          owner: user,
-          teamId: team.id,
-          recipients: ['multisign-v2@test.documenso.com'],
-          fields: [FieldType.SIGNATURE],
-          updateDocumentOptions: { internalVersion: 2 },
-        });
+      const { document: documentV2, recipients: recipientsV2 } = await seedPendingDocumentWithFullFields({
+        owner: user,
+        teamId: team.id,
+        recipients: ['multisign-v2@test.documenso.com'],
+        fields: [FieldType.SIGNATURE],
+        updateDocumentOptions: { internalVersion: 2 },
+      });
       await addSecondEnvelopeItem(documentV2.id);
 
       await page.goto(`/embed/v1/multisign?token=${recipientsV1[0].token}`);
@@ -325,9 +308,7 @@ test.describe('PDF Viewer Rendering', () => {
       const embedParams = { darkModeDisabled: false, features: {} };
       const hash = btoa(encodeURIComponent(JSON.stringify(embedParams)));
 
-      await page.goto(
-        `${NEXT_PUBLIC_WEBAPP_URL()}/embed/v1/authoring/document/create?token=${presignToken}#${hash}`,
-      );
+      await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/embed/v1/authoring/document/create?token=${presignToken}#${hash}`);
 
       await expect(page.getByText('Configure Document')).toBeVisible({ timeout: 15_000 });
 

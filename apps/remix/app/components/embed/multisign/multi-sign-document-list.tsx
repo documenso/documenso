@@ -1,14 +1,13 @@
-import { Trans } from '@lingui/react/macro';
-import { ReadStatus, RecipientRole, SigningStatus } from '@prisma/client';
-import { ArrowRight, EyeIcon, XCircle } from 'lucide-react';
-import { match } from 'ts-pattern';
-
 import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
 import type { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Progress } from '@documenso/ui/primitives/progress';
+import { Trans } from '@lingui/react/macro';
+import { ReadStatus, RecipientRole, SigningStatus } from '@prisma/client';
+import { ArrowRight, EyeIcon, XCircle } from 'lucide-react';
+import { match } from 'ts-pattern';
 
 // Get the return type from getRecipientByToken
 type RecipientWithFields = Awaited<ReturnType<typeof getRecipientByToken>>;
@@ -25,9 +24,7 @@ interface MultiSignDocumentListProps {
 
 export function MultiSignDocumentList({ envelopes, onDocumentSelect }: MultiSignDocumentListProps) {
   // Calculate progress
-  const completedDocuments = envelopes.filter(
-    (envelope) => envelope.recipient.signingStatus === SigningStatus.SIGNED,
-  );
+  const completedDocuments = envelopes.filter((envelope) => envelope.recipient.signingStatus === SigningStatus.SIGNED);
   const totalDocuments = envelopes.length;
   const progressPercentage = (completedDocuments.length / totalDocuments) * 100;
 
@@ -41,9 +38,7 @@ export function MultiSignDocumentList({ envelopes, onDocumentSelect }: MultiSign
   const allDocumentsCompleted = completedDocuments.length === totalDocuments;
 
   const hasAssistantOrCcRecipient = envelopes.some(
-    (envelope) =>
-      envelope.recipient.role === RecipientRole.ASSISTANT ||
-      envelope.recipient.role === RecipientRole.CC,
+    (envelope) => envelope.recipient.role === RecipientRole.ASSISTANT || envelope.recipient.role === RecipientRole.CC,
   );
 
   function handleView(doc: DocumentEnvelope['document']) {
@@ -60,27 +55,25 @@ export function MultiSignDocumentList({ envelopes, onDocumentSelect }: MultiSign
     return (
       <div className="mx-auto mt-16 flex w-full max-w-lg flex-col md:mt-16 md:rounded-2xl md:border md:px-8 md:py-16 md:shadow-lg">
         <div className="flex items-center justify-center">
-          <XCircle className="text-destructive h-16 w-16 md:h-24 md:w-24" strokeWidth={1.2} />
+          <XCircle className="h-16 w-16 text-destructive md:h-24 md:w-24" strokeWidth={1.2} />
         </div>
 
-        <h2 className="mt-12 text-xl font-bold md:text-2xl">
+        <h2 className="mt-12 font-bold text-xl md:text-2xl">
           <Trans>It looks like we ran into an issue!</Trans>
         </h2>
 
-        <p className="text-muted-foreground mt-6">
+        <p className="mt-6 text-muted-foreground">
           <Trans>
-            One of the documents in the current bundle has a signing role that is not compatible
-            with the current signing experience.
+            One of the documents in the current bundle has a signing role that is not compatible with the current
+            signing experience.
           </Trans>
         </p>
 
-        <p className="text-muted-foreground mt-2">
-          <Trans>
-            Assistants and Copy roles are currently not compatible with the multi-sign experience.
-          </Trans>
+        <p className="mt-2 text-muted-foreground">
+          <Trans>Assistants and Copy roles are currently not compatible with the multi-sign experience.</Trans>
         </p>
 
-        <p className="text-muted-foreground mt-2">
+        <p className="mt-2 text-muted-foreground">
           <Trans>Please contact the site owner for further assistance.</Trans>
         </p>
       </div>
@@ -88,22 +81,22 @@ export function MultiSignDocumentList({ envelopes, onDocumentSelect }: MultiSign
   }
 
   return (
-    <div className="bg-background mx-auto w-full max-w-lg md:my-12 md:rounded-2xl md:border md:p-8 md:shadow-lg">
-      <h2 className="text-foreground mb-1 text-lg font-semibold">
+    <div className="mx-auto w-full max-w-lg bg-background md:my-12 md:rounded-2xl md:border md:p-8 md:shadow-lg">
+      <h2 className="mb-1 font-semibold text-foreground text-lg">
         <Trans>Sign Documents</Trans>
       </h2>
 
       <p className="text-muted-foreground text-sm">
         <Trans>
-          You have been requested to sign the following documents. Review each document carefully
-          and complete the signing process.
+          You have been requested to sign the following documents. Review each document carefully and complete the
+          signing process.
         </Trans>
       </p>
 
       {/* Progress Section */}
       <div className="mt-6">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground font-medium">
+          <span className="font-medium text-muted-foreground">
             <Trans>Progress</Trans>
           </span>
           <span className="text-muted-foreground">
@@ -118,13 +111,8 @@ export function MultiSignDocumentList({ envelopes, onDocumentSelect }: MultiSign
 
       <div className="mt-6 flex flex-col gap-4">
         {envelopes.map((envelope) => (
-          <div
-            key={envelope.document.id}
-            className="border-border flex items-center gap-4 rounded-lg border px-4 py-2"
-          >
-            <span className="text-foreground flex-1 truncate text-sm font-medium">
-              {envelope.document.title}
-            </span>
+          <div key={envelope.document.id} className="flex items-center gap-4 rounded-lg border border-border px-4 py-2">
+            <span className="flex-1 truncate font-medium text-foreground text-sm">{envelope.document.title}</span>
 
             {match(envelope.recipient)
               .with({ signingStatus: SigningStatus.SIGNED }, () => (
@@ -144,12 +132,7 @@ export function MultiSignDocumentList({ envelopes, onDocumentSelect }: MultiSign
               ))
               .otherwise(() => null)}
 
-            <Button
-              className="-mr-2"
-              variant="outline"
-              size="sm"
-              onClick={() => handleView(envelope.document)}
-            >
+            <Button className="-mr-2" variant="outline" size="sm" onClick={() => handleView(envelope.document)}>
               <EyeIcon className="mr-1 h-4 w-4" />
               <Trans>View</Trans>
             </Button>

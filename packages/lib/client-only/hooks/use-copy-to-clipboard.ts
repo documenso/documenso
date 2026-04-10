@@ -18,9 +18,7 @@ export function useCopyToClipboard(): [CopiedValue, CopyFn] {
 
     // Try to save to clipboard then save it in the state if worked
     try {
-      isClipboardApiSupported
-        ? await handleClipboardApiCopy(text, blobType)
-        : await handleWriteTextCopy(text);
+      isClipboardApiSupported ? await handleClipboardApiCopy(text, blobType) : await handleWriteTextCopy(text);
 
       setCopiedText(await text);
       return true;

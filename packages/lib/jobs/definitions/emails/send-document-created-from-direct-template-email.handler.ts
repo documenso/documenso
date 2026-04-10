@@ -1,10 +1,8 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
-
 import { mailer } from '@documenso/email/mailer';
 import { DocumentCreatedFromDirectTemplateEmailTemplate } from '@documenso/email/templates/document-created-from-direct-template';
 import { prisma } from '@documenso/prisma';
+import { msg } from '@lingui/core/macro';
+import { createElement } from 'react';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
@@ -13,11 +11,7 @@ import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import { formatDocumentsPath } from '../../../utils/teams';
 import type { TSendDocumentCreatedFromDirectTemplateEmailJobDefinition } from './send-document-created-from-direct-template-email';
 
-export const run = async ({
-  payload,
-}: {
-  payload: TSendDocumentCreatedFromDirectTemplateEmailJobDefinition;
-}) => {
+export const run = async ({ payload }: { payload: TSendDocumentCreatedFromDirectTemplateEmailJobDefinition }) => {
   const { envelopeId, recipientId } = payload;
 
   const envelope = await prisma.envelope.findFirst({

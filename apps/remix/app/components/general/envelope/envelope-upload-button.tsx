@@ -1,13 +1,3 @@
-import { useMemo, useState } from 'react';
-
-import { msg, plural } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
-import { ErrorCode as DropzoneErrorCode, type FileRejection } from 'react-dropzone';
-import { useNavigate } from 'react-router';
-import { match } from 'ts-pattern';
-
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -19,13 +9,15 @@ import type { TCreateEnvelopePayload } from '@documenso/trpc/server/envelope-rou
 import { buildDropzoneRejectionDescription } from '@documenso/ui/lib/handle-dropzone-rejection';
 import { cn } from '@documenso/ui/lib/utils';
 import { DocumentUploadButton } from '@documenso/ui/primitives/document-upload-button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@documenso/ui/primitives/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg, plural } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { EnvelopeType } from '@prisma/client';
+import { useMemo, useState } from 'react';
+import { ErrorCode as DropzoneErrorCode, type FileRejection } from 'react-dropzone';
+import { useNavigate } from 'react-router';
+import { match } from 'ts-pattern';
 
 import { useCurrentTeam } from '~/providers/team';
 
@@ -48,9 +40,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
   const navigate = useNavigate();
   const organisation = useCurrentOrganisation();
 
-  const userTimezone = TIME_ZONES.find(
-    (timezone) => timezone === Intl.DateTimeFormat().resolvedOptions().timeZone,
-  );
+  const userTimezone = TIME_ZONES.find((timezone) => timezone === Intl.DateTimeFormat().resolvedOptions().timeZone);
 
   const { quota, remaining, refreshLimits, maximumEnvelopeItemCount } = useLimits();
 
@@ -103,10 +93,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
 
       void refreshLimits();
 
-      const pathPrefix =
-        type === EnvelopeType.DOCUMENT
-          ? formatDocumentsPath(team.url)
-          : formatTemplatesPath(team.url);
+      const pathPrefix = type === EnvelopeType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
 
       const aiQueryParam = team.preferences.aiFeaturesEnabled ? '?ai=true' : '';
 
@@ -131,10 +118,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
           AppErrorCode.LIMIT_EXCEEDED,
           () => t`You have reached your document limit for this month. Please upgrade your plan.`,
         )
-        .with(
-          'ENVELOPE_ITEM_LIMIT_EXCEEDED',
-          () => t`You have reached the limit of the number of files per envelope.`,
-        )
+        .with('ENVELOPE_ITEM_LIMIT_EXCEEDED', () => t`You have reached the limit of the number of files per envelope.`)
         .otherwise(() => t`An error occurred while uploading your document.`);
 
       toast({
@@ -193,17 +177,15 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
             </div>
           </TooltipTrigger>
 
-          {type === EnvelopeType.DOCUMENT &&
-            remaining.documents > 0 &&
-            Number.isFinite(remaining.documents) && (
-              <TooltipContent>
-                <p className="text-sm">
-                  <Trans>
-                    {remaining.documents} of {quota.documents} documents remaining this month.
-                  </Trans>
-                </p>
-              </TooltipContent>
-            )}
+          {type === EnvelopeType.DOCUMENT && remaining.documents > 0 && Number.isFinite(remaining.documents) && (
+            <TooltipContent>
+              <p className="text-sm">
+                <Trans>
+                  {remaining.documents} of {quota.documents} documents remaining this month.
+                </Trans>
+              </p>
+            </TooltipContent>
+          )}
         </Tooltip>
       </TooltipProvider>
     </div>

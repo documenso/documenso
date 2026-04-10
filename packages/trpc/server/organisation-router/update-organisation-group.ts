@@ -1,15 +1,11 @@
-import { unique } from 'remeda';
-
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getMemberOrganisationRole } from '@documenso/lib/server-only/team/get-member-roles';
 import { generateDatabaseId } from '@documenso/lib/universal/id';
-import {
-  buildOrganisationWhereQuery,
-  isOrganisationRoleWithinUserHierarchy,
-} from '@documenso/lib/utils/organisations';
+import { buildOrganisationWhereQuery, isOrganisationRoleWithinUserHierarchy } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
 import { OrganisationGroupType } from '@documenso/prisma/generated/types';
+import { unique } from 'remeda';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -65,12 +61,7 @@ export const updateOrganisationGroupRoute = authenticatedProcedure
       },
     });
 
-    if (
-      !isOrganisationRoleWithinUserHierarchy(
-        currentUserOrganisationRole,
-        organisationGroup.organisationRole,
-      )
-    ) {
+    if (!isOrganisationRoleWithinUserHierarchy(currentUserOrganisationRole, organisationGroup.organisationRole)) {
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
         message: 'You are not allowed to update this organisation group',
       });
@@ -92,10 +83,7 @@ export const updateOrganisationGroupRoute = authenticatedProcedure
     );
 
     const membersToCreate = groupMemberIds.filter(
-      (id) =>
-        !organisationGroup.organisationGroupMembers.some(
-          (member) => member.organisationMemberId === id,
-        ),
+      (id) => !organisationGroup.organisationGroupMembers.some((member) => member.organisationMemberId === id),
     );
 
     await prisma.$transaction(async (tx) => {

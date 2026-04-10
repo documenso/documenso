@@ -1,15 +1,14 @@
-import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
-import { CheckCircle, Download, Edit, EyeIcon, Pencil } from 'lucide-react';
-import { Link } from 'react-router';
-import { match } from 'ts-pattern';
-
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import type { TDocumentMany as TDocumentRow } from '@documenso/lib/types/document';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { findRecipientByEmail } from '@documenso/lib/utils/recipients';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { Button } from '@documenso/ui/primitives/button';
+import { Trans } from '@lingui/react/macro';
+import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
+import { CheckCircle, Download, Edit, EyeIcon, Pencil } from 'lucide-react';
+import { Link } from 'react-router';
+import { match } from 'ts-pattern';
 
 import { useCurrentTeam } from '~/providers/team';
 
@@ -57,36 +56,33 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
     isCurrentTeamDocument,
     internalVersion: row.internalVersion,
   })
-    .with(
-      isOwner ? { isDraft: true, isOwner: true } : { isDraft: true, isCurrentTeamDocument: true },
-      () => (
-        <Button className="w-32" asChild>
-          <Link to={formatPath}>
-            <Edit className="-ml-1 mr-2 h-4 w-4" />
-            <Trans>Edit</Trans>
-          </Link>
-        </Button>
-      ),
-    )
+    .with(isOwner ? { isDraft: true, isOwner: true } : { isDraft: true, isCurrentTeamDocument: true }, () => (
+      <Button className="w-32" asChild>
+        <Link to={formatPath}>
+          <Edit className="mr-2 -ml-1 h-4 w-4" />
+          <Trans>Edit</Trans>
+        </Link>
+      </Button>
+    ))
     .with({ isRecipient: true, isPending: true, isSigned: false }, () => (
       <Button className="w-32" asChild>
         <Link to={`/sign/${recipient?.token}`}>
           {match(role)
             .with(RecipientRole.SIGNER, () => (
               <>
-                <Pencil className="-ml-1 mr-2 h-4 w-4" />
+                <Pencil className="mr-2 -ml-1 h-4 w-4" />
                 <Trans>Sign</Trans>
               </>
             ))
             .with(RecipientRole.APPROVER, () => (
               <>
-                <CheckCircle className="-ml-1 mr-2 h-4 w-4" />
+                <CheckCircle className="mr-2 -ml-1 h-4 w-4" />
                 <Trans>Approve</Trans>
               </>
             ))
             .otherwise(() => (
               <>
-                <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
+                <EyeIcon className="mr-2 -ml-1 h-4 w-4" />
                 <Trans>View</Trans>
               </>
             ))}
@@ -95,7 +91,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
     ))
     .with({ isPending: true, isSigned: true }, () => (
       <Button className="w-32" disabled={true}>
-        <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
+        <EyeIcon className="mr-2 -ml-1 h-4 w-4" />
         <Trans>View</Trans>
       </Button>
     ))
@@ -106,7 +102,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
         token={recipient?.token}
         trigger={
           <Button className="w-32">
-            <Download className="-ml-1 mr-2 inline h-4 w-4" />
+            <Download className="mr-2 -ml-1 inline h-4 w-4" />
             <Trans>Download</Trans>
           </Button>
         }

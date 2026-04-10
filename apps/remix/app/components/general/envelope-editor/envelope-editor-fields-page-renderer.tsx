@@ -1,12 +1,3 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-
-import { useLingui } from '@lingui/react/macro';
-import type { FieldType } from '@prisma/client';
-import Konva from 'konva';
-import type { KonvaEventObject } from 'konva/lib/Node';
-import type { Transformer } from 'konva/lib/shapes/Transformer';
-import { CopyPlusIcon, SquareStackIcon, TrashIcon, UserCircleIcon } from 'lucide-react';
-
 import type { TLocalField } from '@documenso/lib/client-only/hooks/use-editor-fields';
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
@@ -16,14 +7,21 @@ import {
 } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { FIELD_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
 import {
+  convertPixelToPercentage,
   MIN_FIELD_HEIGHT_PX,
   MIN_FIELD_WIDTH_PX,
-  convertPixelToPercentage,
 } from '@documenso/lib/universal/field-renderer/field-renderer';
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { CommandDialog } from '@documenso/ui/primitives/command';
+import { useLingui } from '@lingui/react/macro';
+import type { FieldType } from '@prisma/client';
+import Konva from 'konva';
+import type { KonvaEventObject } from 'konva/lib/Node';
+import type { Transformer } from 'konva/lib/shapes/Transformer';
+import { CopyPlusIcon, SquareStackIcon, TrashIcon, UserCircleIcon } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { fieldButtonList } from './envelope-editor-fields-drag-drop';
 import { EnvelopeRecipientSelectorCommand } from './envelope-recipient-selector';
@@ -112,8 +110,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     }
 
     const recipient = envelope.recipients.find((r) => r.id === field.recipientId);
-    const isFieldEditable =
-      recipient !== undefined && canRecipientFieldsBeModified(recipient, envelope.fields);
+    const isFieldEditable = recipient !== undefined && canRecipientFieldsBeModified(recipient, envelope.fields);
 
     const { fieldGroup } = renderField({
       scale,
@@ -196,9 +193,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
 
       setIsFieldChanging(e.type === 'dragstart');
 
-      const itemAlreadySelected = (interactiveTransformer.current?.nodes() || []).includes(
-        e.target,
-      );
+      const itemAlreadySelected = (interactiveTransformer.current?.nodes() || []).includes(e.target);
 
       // Do nothing and allow the transformer to handle it.
       // Required so when multiple items are selected, this won't deselect them.
@@ -226,10 +221,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
    * - Selecting multiple fields
    * - Selecting empty area to create fields
    */
-  const createInteractiveTransformer = (
-    currentStage: Konva.Stage,
-    currentPageLayer: Konva.Layer,
-  ) => {
+  const createInteractiveTransformer = (currentStage: Konva.Stage, currentPageLayer: Konva.Layer) => {
     const transformer = new Konva.Transformer({
       rotateEnabled: false,
       keepRatio: false,
@@ -355,13 +347,9 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     });
 
     // Clicks should select/deselect shapes
-    currentStage.on('click tap', function (e) {
+    currentStage.on('click tap', (e) => {
       // if we are selecting with rect, do nothing
-      if (
-        selectionRectangle.visible() &&
-        selectionRectangle.width() > 0 &&
-        selectionRectangle.height() > 0
-      ) {
+      if (selectionRectangle.visible() && selectionRectangle.width() > 0 && selectionRectangle.height() > 0) {
         return;
       }
 
@@ -411,10 +399,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
 
     // If doesn't exist in localFields, destroy it since it's been deleted.
     pageLayer.current.find('Group').forEach((group) => {
-      if (
-        group.name() === 'field-group' &&
-        !localPageFields.some((field) => field.formId === group.id())
-      ) {
+      if (group.name() === 'field-group' && !localPageFields.some((field) => field.formId === group.id())) {
         group.destroy();
       }
     });
@@ -446,8 +431,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
   const setSelectedFields = (nodes: Konva.Node[]) => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const fieldGroups = nodes.filter(
-      (node) =>
-        node.hasName('field-group') && Boolean(node.getStage()) && Boolean(node.getParent()),
+      (node) => node.hasName('field-group') && Boolean(node.getStage()) && Boolean(node.getParent()),
     ) as Konva.Group[];
 
     interactiveTransformer.current?.nodes(fieldGroups);
@@ -467,9 +451,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
   };
 
   const deletedSelectedFields = () => {
-    const fieldFormids = selectedKonvaFieldGroups
-      .map((field) => field.id())
-      .filter((field) => field !== undefined);
+    const fieldFormids = selectedKonvaFieldGroups.map((field) => field.id()).filter((field) => field !== undefined);
 
     editorFields.removeFieldsByFormId(fieldFormids);
 
@@ -566,47 +548,31 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
 
   return (
     <>
-      {selectedKonvaFieldGroups.length > 0 &&
-        interactiveTransformer.current &&
-        !isFieldChanging && (
-          <FieldActionButtons
-            handleDuplicateSelectedFields={duplicatedSelectedFields}
-            handleDuplicateSelectedFieldsOnAllPages={duplicatedSelectedFieldsOnAllPages}
-            handleDeleteSelectedFields={deletedSelectedFields}
-            handleChangeRecipient={changeSelectedFieldsRecipients}
-            selectedFieldFormId={selectedKonvaFieldGroups.map((field) => field.id())}
-            style={{
-              position: 'absolute',
-              top:
-                interactiveTransformer.current.y() +
-                interactiveTransformer.current.getClientRect().height +
-                5 +
-                'px',
-              left:
-                interactiveTransformer.current.x() +
-                interactiveTransformer.current.getClientRect().width / 2 +
-                'px',
-              transform: 'translateX(-50%)',
-              gap: '8px',
-              pointerEvents: 'auto',
-              zIndex: 50,
-            }}
-          />
-        )}
+      {selectedKonvaFieldGroups.length > 0 && interactiveTransformer.current && !isFieldChanging && (
+        <FieldActionButtons
+          handleDuplicateSelectedFields={duplicatedSelectedFields}
+          handleDuplicateSelectedFieldsOnAllPages={duplicatedSelectedFieldsOnAllPages}
+          handleDeleteSelectedFields={deletedSelectedFields}
+          handleChangeRecipient={changeSelectedFieldsRecipients}
+          selectedFieldFormId={selectedKonvaFieldGroups.map((field) => field.id())}
+          style={{
+            position: 'absolute',
+            top: interactiveTransformer.current.y() + interactiveTransformer.current.getClientRect().height + 5 + 'px',
+            left: interactiveTransformer.current.x() + interactiveTransformer.current.getClientRect().width / 2 + 'px',
+            transform: 'translateX(-50%)',
+            gap: '8px',
+            pointerEvents: 'auto',
+            zIndex: 50,
+          }}
+        />
+      )}
 
       {pendingFieldCreation && (
         <div
           style={{
             position: 'absolute',
-            top:
-              pendingFieldCreation.y() * scale +
-              pendingFieldCreation.getClientRect().height +
-              5 +
-              'px',
-            left:
-              pendingFieldCreation.x() * scale +
-              pendingFieldCreation.getClientRect().width / 2 +
-              'px',
+            top: pendingFieldCreation.y() * scale + pendingFieldCreation.getClientRect().height + 5 + 'px',
+            left: pendingFieldCreation.x() * scale + pendingFieldCreation.getClientRect().width / 2 + 'px',
             transform: 'translateX(-50%)',
             zIndex: 50,
           }}
@@ -665,17 +631,13 @@ const FieldActionButtons = ({
       return null;
     }
 
-    const fields = editorFields.localFields.filter((field) =>
-      selectedFieldFormId.includes(field.formId),
-    );
+    const fields = editorFields.localFields.filter((field) => selectedFieldFormId.includes(field.formId));
 
     if (fields.length === 0) {
       return null;
     }
 
-    const recipient = envelope.recipients.find(
-      (recipient) => recipient.id === fields[0].recipientId,
-    );
+    const recipient = envelope.recipients.find((recipient) => recipient.id === fields[0].recipientId);
 
     if (!recipient) {
       return null;
@@ -730,11 +692,7 @@ const FieldActionButtons = ({
         </button>
       </div>
 
-      <CommandDialog
-        position="start"
-        open={showRecipientSelector}
-        onOpenChange={setShowRecipientSelector}
-      >
+      <CommandDialog position="start" open={showRecipientSelector} onOpenChange={setShowRecipientSelector}>
         <EnvelopeRecipientSelectorCommand
           placeholder={t`Select a recipient`}
           selectedRecipient={preselectedRecipient}

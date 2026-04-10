@@ -1,10 +1,3 @@
-import { useEffect, useMemo, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Loader } from 'lucide-react';
-import { useRevalidator } from 'react-router';
-
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
@@ -22,6 +15,11 @@ import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Loader } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { useRevalidator } from 'react-router';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningFieldContainer } from './document-signing-field-container';
@@ -60,9 +58,7 @@ export const DocumentSigningCheckboxField = ({
 
   const [checkedValues, setCheckedValues] = useState(
     values
-      ?.map((item) =>
-        item.checked ? (item.value.length > 0 ? item.value : `empty-value-${item.id}`) : '',
-      )
+      ?.map((item) => (item.checked ? (item.value.length > 0 ? item.value : `empty-value-${item.id}`) : ''))
       .filter(Boolean) || [],
   );
 
@@ -70,12 +66,12 @@ export const DocumentSigningCheckboxField = ({
 
   const checkboxValidationRule = parsedFieldMeta.validationRule;
   const checkboxValidationLength = parsedFieldMeta.validationLength;
-  const validationSign = checkboxValidationSigns.find(
-    (sign) => sign.label === checkboxValidationRule,
-  );
+  const validationSign = checkboxValidationSigns.find((sign) => sign.label === checkboxValidationRule);
 
   const isLengthConditionMet = useMemo(() => {
-    if (!validationSign) return true;
+    if (!validationSign) {
+      return true;
+    }
     return (
       (validationSign.value === '>=' && checkedValues.length >= (checkboxValidationLength || 0)) ||
       (validationSign.value === '=' && checkedValues.length === (checkboxValidationLength || 0)) ||
@@ -86,10 +82,8 @@ export const DocumentSigningCheckboxField = ({
   const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
-  const {
-    mutateAsync: removeSignedFieldWithToken,
-    isPending: isRemoveSignedFieldWithTokenLoading,
-  } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
+  const { mutateAsync: removeSignedFieldWithToken, isPending: isRemoveSignedFieldWithTokenLoading } =
+    trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading;
   const shouldAutoSignField =
@@ -180,27 +174,16 @@ export const DocumentSigningCheckboxField = ({
     setCheckedValues(updatedValues);
   };
 
-  const handleCheckboxOptionClick = async (item: {
-    id: number;
-    checked: boolean;
-    value: string;
-  }) => {
+  const handleCheckboxOptionClick = async (item: { id: number; checked: boolean; value: string }) => {
     let updatedValues: string[] = [];
 
     try {
-      const isChecked = checkedValues.includes(
-        item.value.length > 0 ? item.value : `empty-value-${item.id}`,
-      );
+      const isChecked = checkedValues.includes(item.value.length > 0 ? item.value : `empty-value-${item.id}`);
 
       if (!isChecked) {
-        updatedValues = [
-          ...checkedValues,
-          item.value.length > 0 ? item.value : `empty-value-${item.id}`,
-        ];
+        updatedValues = [...checkedValues, item.value.length > 0 ? item.value : `empty-value-${item.id}`];
       } else {
-        updatedValues = checkedValues.filter(
-          (v) => v !== item.value && v !== `empty-value-${item.id}`,
-        );
+        updatedValues = checkedValues.filter((v) => v !== item.value && v !== `empty-value-${item.id}`);
       }
 
       setCheckedValues(updatedValues);
@@ -252,21 +235,13 @@ export const DocumentSigningCheckboxField = ({
     }
   }, [checkedValues, isLengthConditionMet, field.inserted]);
 
-  const parsedCheckedValues = useMemo(
-    () => fromCheckboxValue(field.customText),
-    [field.customText],
-  );
+  const parsedCheckedValues = useMemo(() => fromCheckboxValue(field.customText), [field.customText]);
 
   return (
-    <DocumentSigningFieldContainer
-      field={field}
-      onSign={onSign}
-      onRemove={onRemove}
-      type="Checkbox"
-    >
+    <DocumentSigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Checkbox">
       {isLoading && (
-        <div className="bg-background absolute inset-0 z-20 flex items-center justify-center rounded-md">
-          <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
+        <div className="absolute inset-0 z-20 flex items-center justify-center rounded-md bg-background">
+          <Loader className="h-5 w-5 animate-spin text-primary md:h-8 md:w-8" />
         </div>
       )}
 
@@ -280,9 +255,7 @@ export const DocumentSigningCheckboxField = ({
           <div
             className={cn(
               'z-50 my-0.5 flex gap-1',
-              parsedFieldMeta.direction === 'horizontal'
-                ? 'flex-row flex-wrap'
-                : 'flex-col gap-y-1',
+              parsedFieldMeta.direction === 'horizontal' ? 'flex-row flex-wrap' : 'flex-col gap-y-1',
             )}
           >
             {values?.map((item: { id: number; value: string; checked: boolean }, index: number) => {
@@ -300,7 +273,7 @@ export const DocumentSigningCheckboxField = ({
                   {!item.value.includes('empty-value-') && item.value && (
                     <Label
                       htmlFor={`checkbox-${field.id}-${item.id}`}
-                      className="text-foreground ml-1.5 text-xs font-normal"
+                      className="ml-1.5 font-normal text-foreground text-xs"
                     >
                       {item.value}
                     </Label>
@@ -334,7 +307,7 @@ export const DocumentSigningCheckboxField = ({
                 {!item.value.includes('empty-value-') && item.value && (
                   <Label
                     htmlFor={`checkbox-${field.id}-${item.id}`}
-                    className="text-foreground ml-1.5 text-xs font-normal"
+                    className="ml-1.5 font-normal text-foreground text-xs"
                   >
                     {item.value}
                   </Label>

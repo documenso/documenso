@@ -1,14 +1,13 @@
-import { sValidator } from '@hono/standard-validator';
-import type { DocumentData, EnvelopeItem } from '@prisma/client';
-import { type Context, Hono } from 'hono';
-import { z } from 'zod';
-
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import type { DocumentDataVersion } from '@documenso/lib/types/document';
 import { sha256 } from '@documenso/lib/universal/crypto';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { prisma } from '@documenso/prisma';
+import { sValidator } from '@hono/standard-validator';
+import type { DocumentData, EnvelopeItem } from '@prisma/client';
+import { type Context, Hono } from 'hono';
+import { z } from 'zod';
 
 import type { HonoEnv } from '../../../router';
 import { checkEnvelopeFileAccess } from '../files.helpers';

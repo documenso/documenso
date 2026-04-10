@@ -2,9 +2,9 @@ import { getEnvelopesByIds } from '@documenso/lib/server-only/envelope/get-envel
 
 import { authenticatedProcedure } from '../trpc';
 import {
+  getEnvelopesByIdsMeta,
   ZGetEnvelopesByIdsRequestSchema,
   ZGetEnvelopesByIdsResponseSchema,
-  getEnvelopesByIdsMeta,
 } from './get-envelopes-by-ids.types';
 
 export const getEnvelopesByIdsRoute = authenticatedProcedure

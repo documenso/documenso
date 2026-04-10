@@ -1,15 +1,3 @@
-import { useMemo, useTransition } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { DocumentStatus as DocumentStatusEnum } from '@prisma/client';
-import { RecipientRole, SigningStatus } from '@prisma/client';
-import { CheckCircleIcon, DownloadIcon, EyeIcon, Loader, PencilIcon } from 'lucide-react';
-import { DateTime } from 'luxon';
-import { Link, useSearchParams } from 'react-router';
-import { match } from 'ts-pattern';
-
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
@@ -22,6 +10,15 @@ import { DataTablePagination } from '@documenso/ui/primitives/data-table-paginat
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { DocumentStatus as DocumentStatusEnum, RecipientRole, SigningStatus } from '@prisma/client';
+import { CheckCircleIcon, DownloadIcon, EyeIcon, Loader, PencilIcon } from 'lucide-react';
+import { DateTime } from 'luxon';
+import { useMemo, useTransition } from 'react';
+import { Link, useSearchParams } from 'react-router';
+import { match } from 'ts-pattern';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { useOptionalCurrentTeam } from '~/providers/team';
@@ -59,15 +56,12 @@ export const InboxTable = () => {
       {
         header: _(msg`Created`),
         accessorKey: 'createdAt',
-        cell: ({ row }) =>
-          i18n.date(row.original.createdAt, { ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }),
+        cell: ({ row }) => i18n.date(row.original.createdAt, { ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }),
       },
       {
         header: _(msg`Title`),
         cell: ({ row }) => (
-          <span className="block max-w-[10rem] truncate font-medium md:max-w-[20rem]">
-            {row.original.title}
-          </span>
+          <span className="block max-w-[10rem] truncate font-medium md:max-w-[20rem]">{row.original.title}</span>
         ),
       },
       {
@@ -79,10 +73,7 @@ export const InboxTable = () => {
         header: _(msg`Recipient`),
         accessorKey: 'recipient',
         cell: ({ row }) => (
-          <StackAvatarsWithTooltip
-            recipients={row.original.recipients}
-            documentStatus={row.original.status}
-          />
+          <StackAvatarsWithTooltip recipients={row.original.recipients} documentStatus={row.original.status} />
         ),
       },
       {
@@ -130,7 +121,7 @@ export const InboxTable = () => {
           enable: isLoadingError || false,
         }}
         emptyState={
-          <div className="text-muted-foreground/60 flex h-60 flex-col items-center justify-center gap-y-4">
+          <div className="flex h-60 flex-col items-center justify-center gap-y-4 text-muted-foreground/60">
             <p>
               <Trans>Documents that require your attention will appear here</Trans>
             </p>
@@ -163,15 +154,13 @@ export const InboxTable = () => {
         }}
       >
         {(table) =>
-          results.totalPages > 1 && (
-            <DataTablePagination additionalInformation="VisibleCount" table={table} />
-          )
+          results.totalPages > 1 && <DataTablePagination additionalInformation="VisibleCount" table={table} />
         }
       </DataTable>
 
       {isPending && (
-        <div className="bg-background/50 absolute inset-0 flex items-center justify-center">
-          <Loader className="text-muted-foreground h-8 w-8 animate-spin" />
+        <div className="absolute inset-0 flex items-center justify-center bg-background/50">
+          <Loader className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       )}
     </div>
@@ -215,19 +204,19 @@ export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => 
           {match(role)
             .with(RecipientRole.SIGNER, () => (
               <>
-                <PencilIcon className="-ml-1 mr-2 h-4 w-4" />
+                <PencilIcon className="mr-2 -ml-1 h-4 w-4" />
                 <Trans>Sign</Trans>
               </>
             ))
             .with(RecipientRole.APPROVER, () => (
               <>
-                <CheckCircleIcon className="-ml-1 mr-2 h-4 w-4" />
+                <CheckCircleIcon className="mr-2 -ml-1 h-4 w-4" />
                 <Trans>Approve</Trans>
               </>
             ))
             .otherwise(() => (
               <>
-                <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
+                <EyeIcon className="mr-2 -ml-1 h-4 w-4" />
                 <Trans>View</Trans>
               </>
             ))}
@@ -236,7 +225,7 @@ export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => 
     ))
     .with({ isPending: true, isSigned: true }, () => (
       <Button className="w-32" disabled={true}>
-        <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
+        <EyeIcon className="mr-2 -ml-1 h-4 w-4" />
         <Trans>View</Trans>
       </Button>
     ))
@@ -247,7 +236,7 @@ export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => 
         token={recipient?.token}
         trigger={
           <Button className="w-32">
-            <DownloadIcon className="-ml-1 mr-2 inline h-4 w-4" />
+            <DownloadIcon className="mr-2 -ml-1 inline h-4 w-4" />
             <Trans>Download</Trans>
           </Button>
         }

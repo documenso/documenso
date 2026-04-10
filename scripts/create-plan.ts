@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync } from 'fs';
-import { mkdirSync, writeFileSync } from 'fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 import { generateId } from './utils/generate-id';

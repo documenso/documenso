@@ -1,8 +1,8 @@
 import { authenticatedProcedure } from '../trpc';
 import {
+  downloadDocumentMeta,
   ZDownloadDocumentRequestSchema,
   ZDownloadDocumentResponseSchema,
-  downloadDocumentMeta,
 } from './download-document.types';
 
 export const downloadDocumentRoute = authenticatedProcedure

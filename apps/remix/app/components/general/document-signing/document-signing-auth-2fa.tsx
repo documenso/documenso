@@ -1,26 +1,17 @@
-import { useEffect, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/react/macro';
-import { RecipientRole } from '@prisma/client';
-import { useForm } from 'react-hook-form';
-import { match } from 'ts-pattern';
-import { z } from 'zod';
-
 import { AppError } from '@documenso/lib/errors/app-error';
 import { DocumentAuth, type TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { DialogFooter } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { PinInput, PinInputGroup, PinInputSlot } from '@documenso/ui/primitives/pin-input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans } from '@lingui/react/macro';
+import { RecipientRole } from '@prisma/client';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
+import { z } from 'zod';
 
 import { EnableAuthenticatorAppDialog } from '~/components/forms/2fa/enable-authenticator-app-dialog';
 
@@ -135,8 +126,8 @@ export const DocumentSigningAuth2FA = ({
             </p>
             <p className="mt-2">
               <Trans>
-                By enabling 2FA, you will be required to enter a code from your authenticator app
-                every time you sign in using email password.
+                By enabling 2FA, you will be required to enter a code from your authenticator app every time you sign in
+                using email password.
               </Trans>
             </p>
           </AlertDescription>
@@ -189,9 +180,7 @@ export const DocumentSigningAuth2FA = ({
                   <Trans>Unauthorized</Trans>
                 </AlertTitle>
                 <AlertDescription>
-                  <Trans>
-                    We were unable to verify your details. Please try again or contact support
-                  </Trans>
+                  <Trans>We were unable to verify your details. Please try again or contact support</Trans>
                 </AlertDescription>
               </Alert>
             )}

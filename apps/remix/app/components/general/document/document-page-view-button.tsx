@@ -1,14 +1,13 @@
-import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
-import { CheckCircle, Download, EyeIcon, Pencil } from 'lucide-react';
-import { Link } from 'react-router';
-import { match } from 'ts-pattern';
-
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import type { TEnvelope } from '@documenso/lib/types/envelope';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { Button } from '@documenso/ui/primitives/button';
+import { Trans } from '@lingui/react/macro';
+import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
+import { CheckCircle, Download, EyeIcon, Pencil } from 'lucide-react';
+import { Link } from 'react-router';
+import { match } from 'ts-pattern';
 
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 
@@ -43,19 +42,19 @@ export const DocumentPageViewButton = ({ envelope }: DocumentPageViewButtonProps
           {match(role)
             .with(RecipientRole.SIGNER, () => (
               <>
-                <Pencil className="-ml-1 mr-2 h-4 w-4" />
+                <Pencil className="mr-2 -ml-1 h-4 w-4" />
                 <Trans>Sign</Trans>
               </>
             ))
             .with(RecipientRole.APPROVER, () => (
               <>
-                <CheckCircle className="-ml-1 mr-2 h-4 w-4" />
+                <CheckCircle className="mr-2 -ml-1 h-4 w-4" />
                 <Trans>Approve</Trans>
               </>
             ))
             .otherwise(() => (
               <>
-                <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
+                <EyeIcon className="mr-2 -ml-1 h-4 w-4" />
                 <Trans>View</Trans>
               </>
             ))}
@@ -77,7 +76,7 @@ export const DocumentPageViewButton = ({ envelope }: DocumentPageViewButtonProps
         token={recipient?.token}
         trigger={
           <Button className="w-full">
-            <Download className="-ml-1 mr-2 inline h-4 w-4" />
+            <Download className="mr-2 -ml-1 inline h-4 w-4" />
             <Trans>Download</Trans>
           </Button>
         }

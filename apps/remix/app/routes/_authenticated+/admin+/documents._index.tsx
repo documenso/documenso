@@ -1,11 +1,3 @@
-import { useMemo, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { Loader } from 'lucide-react';
-import { Link, useSearchParams } from 'react-router';
-
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
@@ -16,6 +8,12 @@ import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Input } from '@documenso/ui/primitives/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { Loader } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
 
@@ -32,17 +30,16 @@ export default function AdminDocumentsPage() {
   const page = searchParams?.get?.('page') ? Number(searchParams.get('page')) : undefined;
   const perPage = searchParams?.get?.('perPage') ? Number(searchParams.get('perPage')) : undefined;
 
-  const { data: findDocumentsData, isPending: isFindDocumentsLoading } =
-    trpc.admin.document.find.useQuery(
-      {
-        query: debouncedTerm,
-        page: page || 1,
-        perPage: perPage || 20,
-      },
-      {
-        placeholderData: (previousData) => previousData,
-      },
-    );
+  const { data: findDocumentsData, isPending: isFindDocumentsLoading } = trpc.admin.document.find.useQuery(
+    {
+      query: debouncedTerm,
+      page: page || 1,
+      perPage: perPage || 20,
+    },
+    {
+      placeholderData: (previousData) => previousData,
+    },
+  );
 
   const results = findDocumentsData ?? {
     data: [],
@@ -89,22 +86,18 @@ export default function AdminDocumentsPage() {
             <Tooltip delayDuration={200}>
               <TooltipTrigger>
                 <Link to={`/admin/users/${row.original.user.id}`}>
-                  <Avatar className="dark:border-border h-12 w-12 border-2 border-solid border-white">
-                    <AvatarFallback className="text-muted-foreground text-xs">
-                      {avatarFallbackText}
-                    </AvatarFallback>
+                  <Avatar className="h-12 w-12 border-2 border-white border-solid dark:border-border">
+                    <AvatarFallback className="text-muted-foreground text-xs">{avatarFallbackText}</AvatarFallback>
                   </Avatar>
                 </Link>
               </TooltipTrigger>
 
               <TooltipContent className="flex max-w-xs items-center gap-2">
-                <Avatar className="dark:border-border h-12 w-12 border-2 border-solid border-white">
-                  <AvatarFallback className="text-muted-foreground text-xs">
-                    {avatarFallbackText}
-                  </AvatarFallback>
+                <Avatar className="h-12 w-12 border-2 border-white border-solid dark:border-border">
+                  <AvatarFallback className="text-muted-foreground text-xs">{avatarFallbackText}</AvatarFallback>
                 </Avatar>
 
-                <div className="text-muted-foreground flex flex-col text-sm">
+                <div className="flex flex-col text-muted-foreground text-sm">
                   <span>{row.original.user.name}</span>
                   <span>{row.original.user.email}</span>
                 </div>
@@ -130,7 +123,7 @@ export default function AdminDocumentsPage() {
 
   return (
     <div>
-      <h2 className="text-4xl font-semibold">
+      <h2 className="font-semibold text-4xl">
         <Trans>Manage documents</Trans>
       </h2>
 
@@ -152,9 +145,7 @@ export default function AdminDocumentsPage() {
               totalPages={results.totalPages ?? 1}
               onPaginationChange={onPaginationChange}
             >
-              {(table) => (
-                <DataTablePagination additionalInformation="VisibleCount" table={table} />
-              )}
+              {(table) => <DataTablePagination additionalInformation="VisibleCount" table={table} />}
             </DataTable>
 
             {isFindDocumentsLoading && (

@@ -3,10 +3,10 @@ import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 
 import { authenticatedProcedure } from '../trpc';
 import {
+  updateDocumentMeta as updateDocumentTrpcMeta,
   ZUpdateDocumentRequestSchema,
   ZUpdateDocumentResponseSchema,
 } from './update-document.types';
-import { updateDocumentMeta as updateDocumentTrpcMeta } from './update-document.types';
 
 /**
  * Public route.

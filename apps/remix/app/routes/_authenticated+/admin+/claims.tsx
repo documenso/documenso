@@ -1,11 +1,9 @@
-import { useEffect, useState } from 'react';
-
-import { useLingui } from '@lingui/react/macro';
-import { useLocation, useSearchParams } from 'react-router';
-
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import { Input } from '@documenso/ui/primitives/input';
+import { useLingui } from '@lingui/react/macro';
+import { useEffect, useState } from 'react';
+import { useLocation, useSearchParams } from 'react-router';
 
 import { ClaimCreateDialog } from '~/components/dialogs/claim-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
@@ -55,11 +53,7 @@ export default function Claims({ loaderData }: Route.ComponentProps) {
 
   return (
     <div>
-      <SettingsHeader
-        title={t`Subscription Claims`}
-        subtitle={t`Manage all subscription claims`}
-        hideDivider
-      >
+      <SettingsHeader title={t`Subscription Claims`} subtitle={t`Manage all subscription claims`} hideDivider>
         <ClaimCreateDialog licenseFlags={licenseFlags} />
       </SettingsHeader>
 

@@ -1,9 +1,8 @@
-import type { Prisma } from '@prisma/client';
-import type { z } from 'zod';
-
 import type { FindResultResponse } from '@documenso/lib/types/search-params';
 import { prisma } from '@documenso/prisma';
 import type SubscriptionClaimSchema from '@documenso/prisma/generated/zod/modelSchema/SubscriptionClaimSchema';
+import type { Prisma } from '@prisma/client';
+import type { z } from 'zod';
 
 import { adminProcedure } from '../trpc';
 import {
@@ -26,11 +25,7 @@ type FindSubscriptionClaimsOptions = {
   perPage?: number;
 };
 
-export const findSubscriptionClaims = async ({
-  query,
-  page = 1,
-  perPage = 50,
-}: FindSubscriptionClaimsOptions) => {
+export const findSubscriptionClaims = async ({ query, page = 1, perPage = 50 }: FindSubscriptionClaimsOptions) => {
   let whereClause: Prisma.SubscriptionClaimWhereInput = {};
 
   if (query) {

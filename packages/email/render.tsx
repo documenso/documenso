@@ -1,8 +1,7 @@
+import config from '@documenso/tailwind-config';
 import type { I18n } from '@lingui/core';
 import { I18nProvider } from '@lingui/react';
 import * as ReactEmail from '@react-email/render';
-
-import config from '@documenso/tailwind-config';
 
 import { Tailwind } from './components';
 import { BrandingProvider, type BrandingSettings } from './providers/branding';

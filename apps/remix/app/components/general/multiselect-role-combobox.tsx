@@ -1,19 +1,11 @@
-import * as React from 'react';
-
+import { cn } from '@documenso/ui/lib/utils';
+import { Button } from '@documenso/ui/primitives/button';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@documenso/ui/primitives/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
 import { Trans } from '@lingui/react/macro';
 import { Role } from '@prisma/client';
 import { Check, ChevronsUpDown } from 'lucide-react';
-
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from '@documenso/ui/primitives/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
+import * as React from 'react';
 
 type ComboboxProps = {
   listValues: string[];
@@ -47,12 +39,7 @@ const MultiSelectRoleCombobox = ({ listValues, onChange }: ComboboxProps) => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-[200px] justify-between"
-        >
+        <Button variant="outline" role="combobox" aria-expanded={open} className="w-[200px] justify-between">
           {selectedValues.length > 0 ? selectedValues.join(', ') : 'Select values...'}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -66,12 +53,7 @@ const MultiSelectRoleCombobox = ({ listValues, onChange }: ComboboxProps) => {
           <CommandGroup>
             {allRoles.map((value: string, i: number) => (
               <CommandItem key={i} onSelect={() => handleSelect(value)}>
-                <Check
-                  className={cn(
-                    'mr-2 h-4 w-4',
-                    selectedValues.includes(value) ? 'opacity-100' : 'opacity-0',
-                  )}
-                />
+                <Check className={cn('mr-2 h-4 w-4', selectedValues.includes(value) ? 'opacity-100' : 'opacity-0')} />
                 {value}
               </CommandItem>
             ))}

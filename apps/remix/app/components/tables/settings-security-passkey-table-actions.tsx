@@ -1,12 +1,3 @@
-import { useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -20,16 +11,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 export type SettingsSecurityPasskeyTableActionsProps = {
   className?: string;
@@ -61,56 +52,47 @@ export const SettingsSecurityPasskeyTableActions = ({
     },
   });
 
-  const { mutateAsync: updatePasskey, isPending: isUpdatingPasskey } =
-    trpc.auth.passkey.update.useMutation({
-      onSuccess: () => {
-        toast({
-          title: _(msg`Success`),
-          description: _(msg`Passkey has been updated`),
-        });
+  const { mutateAsync: updatePasskey, isPending: isUpdatingPasskey } = trpc.auth.passkey.update.useMutation({
+    onSuccess: () => {
+      toast({
+        title: _(msg`Success`),
+        description: _(msg`Passkey has been updated`),
+      });
 
-        setIsUpdateDialogOpen(false);
-      },
-      onError: () => {
-        toast({
-          title: _(msg`Something went wrong`),
-          description: _(
-            msg`We are unable to update this passkey at the moment. Please try again later.`,
-          ),
-          duration: 10000,
-          variant: 'destructive',
-        });
-      },
-    });
+      setIsUpdateDialogOpen(false);
+    },
+    onError: () => {
+      toast({
+        title: _(msg`Something went wrong`),
+        description: _(msg`We are unable to update this passkey at the moment. Please try again later.`),
+        duration: 10000,
+        variant: 'destructive',
+      });
+    },
+  });
 
-  const { mutateAsync: deletePasskey, isPending: isDeletingPasskey } =
-    trpc.auth.passkey.delete.useMutation({
-      onSuccess: () => {
-        toast({
-          title: _(msg`Success`),
-          description: _(msg`Passkey has been removed`),
-        });
+  const { mutateAsync: deletePasskey, isPending: isDeletingPasskey } = trpc.auth.passkey.delete.useMutation({
+    onSuccess: () => {
+      toast({
+        title: _(msg`Success`),
+        description: _(msg`Passkey has been removed`),
+      });
 
-        setIsDeleteDialogOpen(false);
-      },
-      onError: () => {
-        toast({
-          title: _(msg`Something went wrong`),
-          description: _(
-            msg`We are unable to remove this passkey at the moment. Please try again later.`,
-          ),
-          duration: 10000,
-          variant: 'destructive',
-        });
-      },
-    });
+      setIsDeleteDialogOpen(false);
+    },
+    onError: () => {
+      toast({
+        title: _(msg`Something went wrong`),
+        description: _(msg`We are unable to remove this passkey at the moment. Please try again later.`),
+        duration: 10000,
+        variant: 'destructive',
+      });
+    },
+  });
 
   return (
     <div className={cn('flex justify-end space-x-2', className)}>
-      <Dialog
-        open={isUpdateDialogOpen}
-        onOpenChange={(value) => !isUpdatingPasskey && setIsUpdateDialogOpen(value)}
-      >
+      <Dialog open={isUpdateDialogOpen} onOpenChange={(value) => !isUpdatingPasskey && setIsUpdateDialogOpen(value)}>
         <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
           <Button variant="outline">
             <Trans>Edit</Trans>
@@ -173,10 +155,7 @@ export const SettingsSecurityPasskeyTableActions = ({
         </DialogContent>
       </Dialog>
 
-      <Dialog
-        open={isDeleteDialogOpen}
-        onOpenChange={(value) => !isDeletingPasskey && setIsDeleteDialogOpen(value)}
-      >
+      <Dialog open={isDeleteDialogOpen} onOpenChange={(value) => !isDeletingPasskey && setIsDeleteDialogOpen(value)}>
         <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
           <Button variant="destructive">
             <Trans>Delete</Trans>

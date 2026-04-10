@@ -78,9 +78,7 @@ export const deleteOrganisationMembers = async ({
 
   const { organisationClaim } = organisation;
 
-  const membersToDelete = organisation.members.filter((member) =>
-    organisationMemberIds.includes(member.id),
-  );
+  const membersToDelete = organisation.members.filter((member) => organisationMemberIds.includes(member.id));
 
   const subscription = validateIfSubscriptionIsRequired(organisation.subscription);
 

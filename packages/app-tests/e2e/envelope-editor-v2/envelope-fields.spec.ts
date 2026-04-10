@@ -1,11 +1,9 @@
-import { type Page, expect, test } from '@playwright/test';
-import { FieldType } from '@prisma/client';
-
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
+import { expect, type Page, test } from '@playwright/test';
+import { FieldType } from '@prisma/client';
 
 import {
-  type TEnvelopeEditorSurface,
   addEnvelopeItemPdf,
   clickAddMyselfButton,
   clickAddSignerButton,
@@ -19,6 +17,7 @@ import {
   persistEmbeddedEnvelope,
   setRecipientEmail,
   setRecipientName,
+  type TEnvelopeEditorSurface,
 } from '../fixtures/envelope-editor';
 import { expectToastTextToBeVisible } from '../fixtures/generic';
 import { getKonvaElementCountForPage } from '../fixtures/konva';
@@ -78,11 +77,7 @@ type FieldButtonName =
   | 'Checkbox'
   | 'Dropdown';
 
-const placeFieldOnPdf = async (
-  root: Page,
-  fieldName: FieldButtonName,
-  position: { x: number; y: number },
-) => {
+const placeFieldOnPdf = async (root: Page, fieldName: FieldButtonName, position: { x: number; y: number }) => {
   await root.getByRole('button', { name: fieldName, exact: true }).click();
 
   const canvas = root.locator('.konva-container canvas').first();
@@ -103,9 +98,7 @@ const selectFieldOnCanvas = async (root: Page, position: { x: number; y: number 
   await canvas.click({ position, force: true });
 };
 
-const runAddAndPersistSignatureTextFields = async (
-  surface: TEnvelopeEditorSurface,
-): Promise<TFieldFlowResult> => {
+const runAddAndPersistSignatureTextFields = async (surface: TEnvelopeEditorSurface): Promise<TFieldFlowResult> => {
   const externalId = `e2e-fields-${nanoid()}`;
 
   if (surface.isEmbedded && !surface.envelopeId) {
@@ -150,8 +143,7 @@ const getFieldMetaType = (fieldMeta: unknown) => {
   return typeof fieldMeta.type === 'string' ? fieldMeta.type : null;
 };
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null;
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
 
 const assertFieldsPersistedInDatabase = async ({
   surface,
@@ -178,9 +170,7 @@ const assertFieldsPersistedInDatabase = async ({
     },
   });
 
-  const recipient = envelope.recipients.find(
-    (currentRecipient) => currentRecipient.email === recipientEmail,
-  );
+  const recipient = envelope.recipients.find((currentRecipient) => currentRecipient.email === recipientEmail);
 
   expect(recipient).toBeDefined();
 
@@ -214,9 +204,7 @@ const MULTI_RECIPIENT_VALUES = {
   },
 };
 
-const runMultiRecipientFieldFlow = async (
-  surface: TEnvelopeEditorSurface,
-): Promise<TMultiRecipientFlowResult> => {
+const runMultiRecipientFieldFlow = async (surface: TEnvelopeEditorSurface): Promise<TMultiRecipientFlowResult> => {
   const externalId = `e2e-multi-recip-${nanoid()}`;
   const root = surface.root;
 
@@ -322,9 +310,7 @@ type TAllFieldTypesFlowResult = {
   externalId: string;
 };
 
-const runAllFieldTypesFlow = async (
-  surface: TEnvelopeEditorSurface,
-): Promise<TAllFieldTypesFlowResult> => {
+const runAllFieldTypesFlow = async (surface: TEnvelopeEditorSurface): Promise<TAllFieldTypesFlowResult> => {
   const externalId = `e2e-all-fields-${nanoid()}`;
   const root = surface.root;
 
@@ -562,9 +548,7 @@ type TDuplicateDeleteFlowResult = {
   externalId: string;
 };
 
-const runDuplicateDeleteFieldFlow = async (
-  surface: TEnvelopeEditorSurface,
-): Promise<TDuplicateDeleteFlowResult> => {
+const runDuplicateDeleteFieldFlow = async (surface: TEnvelopeEditorSurface): Promise<TDuplicateDeleteFlowResult> => {
   const externalId = `e2e-dup-del-${nanoid()}`;
   const root = surface.root;
 

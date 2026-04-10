@@ -1,15 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { FolderIcon, HomeIcon, Loader2, Search } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
-import { z } from 'zod';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { FolderType } from '@documenso/lib/types/folder-type';
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
@@ -23,16 +11,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import type * as DialogPrimitive from '@radix-ui/react-dialog';
+import { FolderIcon, HomeIcon, Loader2, Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router';
+import { z } from 'zod';
 
 import { useCurrentTeam } from '~/providers/team';
 
@@ -157,7 +148,7 @@ export function TemplateMoveToFolderDialog({
         </DialogHeader>
 
         <div className="relative">
-          <Search className="text-muted-foreground absolute left-2 top-3 h-4 w-4" />
+          <Search className="absolute top-3 left-2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={_(msg`Search folders...`)}
             value={searchTerm}
@@ -211,7 +202,7 @@ export function TemplateMoveToFolderDialog({
                           ))}
 
                           {searchTerm && filteredFolders?.length === 0 && (
-                            <div className="text-muted-foreground px-2 py-2 text-center text-sm">
+                            <div className="px-2 py-2 text-center text-muted-foreground text-sm">
                               <Trans>No folders found</Trans>
                             </div>
                           )}

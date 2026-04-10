@@ -1,20 +1,12 @@
-import { useEffect, useState } from 'react';
-
-import { Trans, useLingui } from '@lingui/react/macro';
-
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { DOCUMENT_TITLE_MAX_LENGTH } from '@documenso/trpc/server/document-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@documenso/ui/primitives/dialog';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@documenso/ui/primitives/dialog';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { useEffect, useState } from 'react';
 
 export type EnvelopeRenameDialogProps = {
   id: string;
@@ -89,9 +81,7 @@ export const EnvelopeRenameDialog = ({
     <Dialog open={open} onOpenChange={(value) => !isPending && onOpenChange(value)}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            {isTemplate ? <Trans>Rename Template</Trans> : <Trans>Rename Document</Trans>}
-          </DialogTitle>
+          <DialogTitle>{isTemplate ? <Trans>Rename Template</Trans> : <Trans>Rename Document</Trans>}</DialogTitle>
         </DialogHeader>
 
         <div className="py-2">

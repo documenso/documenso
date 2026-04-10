@@ -1,8 +1,7 @@
-import type { DocumentStatus } from '@prisma/client';
-import { EnvelopeType } from '@prisma/client';
-
 import type { DateRange } from '@documenso/lib/types/search-params';
 import { kyselyPrisma, sql } from '@documenso/prisma';
+import type { DocumentStatus } from '@prisma/client';
+import { EnvelopeType } from '@prisma/client';
 
 export type OrganisationSummary = {
   totalTeams: number;
@@ -260,10 +259,7 @@ async function getDocumentInsights(
 
   countQuery = countQuery.select(({ fn }) => [fn.countAll().as('count')]);
 
-  const [documents, countResult] = await Promise.all([
-    documentsQuery.execute(),
-    countQuery.execute(),
-  ]);
+  const [documents, countResult] = await Promise.all([documentsQuery.execute(), countQuery.execute()]);
 
   const count = Number((countResult[0] as { count: number })?.count || 0);
 
@@ -302,9 +298,7 @@ async function getOrganisationSummary(
     .where('e.type', '=', sql.lit(EnvelopeType.DOCUMENT))
     .select([
       sql<number>`count(e.id)`.as('totalDocuments'),
-      sql<number>`count(case when e.status in ('DRAFT', 'PENDING') then 1 end)`.as(
-        'activeDocuments',
-      ),
+      sql<number>`count(case when e.status in ('DRAFT', 'PENDING') then 1 end)`.as('activeDocuments'),
       sql<number>`count(case when e.status = 'COMPLETED' then 1 end)`.as('completedDocuments'),
       sql<number>`count(case when e.status = 'COMPLETED' then 1 end)`.as('volumeAllTime'),
       (createdAtFrom

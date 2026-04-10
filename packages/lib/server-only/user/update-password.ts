@@ -1,9 +1,8 @@
-import { compare, hash } from '@node-rs/bcrypt';
-import { UserSecurityAuditLogType } from '@prisma/client';
-
 import { SALT_ROUNDS } from '@documenso/lib/constants/auth';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
+import { compare, hash } from '@node-rs/bcrypt';
+import { UserSecurityAuditLogType } from '@prisma/client';
 
 import { AppError } from '../../errors/app-error';
 
@@ -14,12 +13,7 @@ export type UpdatePasswordOptions = {
   requestMetadata?: RequestMetadata;
 };
 
-export const updatePassword = async ({
-  userId,
-  password,
-  currentPassword,
-  requestMetadata,
-}: UpdatePasswordOptions) => {
+export const updatePassword = async ({ userId, password, currentPassword, requestMetadata }: UpdatePasswordOptions) => {
   // Existence check
   const user = await prisma.user.findFirstOrThrow({
     where: {

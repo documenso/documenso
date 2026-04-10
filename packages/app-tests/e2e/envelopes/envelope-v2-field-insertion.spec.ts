@@ -1,10 +1,9 @@
-import { expect, test } from '@playwright/test';
-import { DocumentStatus, FieldType } from '@prisma/client';
-import { DateTime } from 'luxon';
-
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { prisma } from '@documenso/prisma';
+import { expect, test } from '@playwright/test';
+import { DocumentStatus, FieldType } from '@prisma/client';
+import { DateTime } from 'luxon';
 
 import { apiSeedPendingDocument } from '../fixtures/api-seeds';
 
@@ -58,11 +57,9 @@ test.describe('V2 envelope field insertion during signing', () => {
     }
 
     const x =
-      (Number(sigField.positionX) / 100) * canvasBox.width +
-      ((Number(sigField.width) / 100) * canvasBox.width) / 2;
+      (Number(sigField.positionX) / 100) * canvasBox.width + ((Number(sigField.width) / 100) * canvasBox.width) / 2;
     const y =
-      (Number(sigField.positionY) / 100) * canvasBox.height +
-      ((Number(sigField.height) / 100) * canvasBox.height) / 2;
+      (Number(sigField.positionY) / 100) * canvasBox.height + ((Number(sigField.height) / 100) * canvasBox.height) / 2;
 
     await canvas.click({ position: { x, y } });
     await page.waitForTimeout(500);
@@ -165,17 +162,12 @@ test.describe('V2 envelope field insertion during signing', () => {
     }
 
     // Only NAME and SIGNATURE fields need manual interaction (DATE and EMAIL are auto-filled).
-    const manualFields = fields.filter(
-      (f) => f.type !== FieldType.DATE && f.type !== FieldType.EMAIL,
-    );
+    const manualFields = fields.filter((f) => f.type !== FieldType.DATE && f.type !== FieldType.EMAIL);
 
     for (const field of manualFields) {
-      const x =
-        (Number(field.positionX) / 100) * canvasBox.width +
-        ((Number(field.width) / 100) * canvasBox.width) / 2;
+      const x = (Number(field.positionX) / 100) * canvasBox.width + ((Number(field.width) / 100) * canvasBox.width) / 2;
       const y =
-        (Number(field.positionY) / 100) * canvasBox.height +
-        ((Number(field.height) / 100) * canvasBox.height) / 2;
+        (Number(field.positionY) / 100) * canvasBox.height + ((Number(field.height) / 100) * canvasBox.height) / 2;
 
       await canvas.click({ position: { x, y } });
 

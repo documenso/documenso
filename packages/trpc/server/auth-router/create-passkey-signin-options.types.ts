@@ -7,9 +7,5 @@ export const ZCreatePasskeySigninOptionsResponseSchema = z.object({
   sessionId: z.string(),
 });
 
-export type TCreatePasskeySigninOptionsRequest = z.infer<
-  typeof ZCreatePasskeySigninOptionsRequestSchema
->;
-export type TCreatePasskeySigninOptionsResponse = z.infer<
-  typeof ZCreatePasskeySigninOptionsResponseSchema
->;
+export type TCreatePasskeySigninOptionsRequest = z.infer<typeof ZCreatePasskeySigninOptionsRequestSchema>;
+export type TCreatePasskeySigninOptionsResponse = z.infer<typeof ZCreatePasskeySigninOptionsResponseSchema>;

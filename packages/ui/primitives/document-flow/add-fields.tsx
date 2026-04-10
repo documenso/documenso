@@ -1,33 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { Field, Recipient } from '@prisma/client';
-import { FieldType, Prisma, RecipientRole, SendStatus } from '@prisma/client';
-import {
-  CalendarDays,
-  CheckSquare,
-  ChevronDown,
-  Contact,
-  Disc,
-  Hash,
-  Mail,
-  Type,
-  User,
-} from 'lucide-react';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { useHotkeys } from 'react-hotkeys-hook';
-
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
-import { PDF_VIEWER_PAGE_SELECTOR, getPdfPagesCount } from '@documenso/lib/constants/pdf-viewer';
-import {
-  type TFieldMetaSchema as FieldMeta,
-  ZFieldMetaSchema,
-} from '@documenso/lib/types/field-meta';
+import { getPdfPagesCount, PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { type TFieldMetaSchema as FieldMeta, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
 import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsUninserted } from '@documenso/lib/utils/fields';
@@ -37,6 +12,16 @@ import {
   canRecipientFieldsBeModified,
   getRecipientsWithMissingFields,
 } from '@documenso/lib/utils/recipients';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import type { Field, Recipient } from '@prisma/client';
+import { FieldType, Prisma, RecipientRole, SendStatus } from '@prisma/client';
+import { CalendarDays, CheckSquare, ChevronDown, Contact, Disc, Hash, Mail, Type, User } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 import { FieldToolTip } from '../../components/field/field-tooltip';
 import { getRecipientColorStyles } from '../../lib/recipient-colors';
@@ -110,8 +95,7 @@ export const AddFieldsFormPartial = ({
 
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
-  const canRenderBackButtonAsRemove =
-    currentStep === 1 && typeof documentFlow.onBackStep === 'function' && canGoBack;
+  const canRenderBackButtonAsRemove = currentStep === 1 && typeof documentFlow.onBackStep === 'function' && canGoBack;
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [currentField, setCurrentField] = useState<FieldFormType>();
   const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
@@ -127,8 +111,7 @@ export const AddFieldsFormPartial = ({
         pageY: Number(field.positionY),
         pageWidth: Number(field.width),
         pageHeight: Number(field.height),
-        signerEmail:
-          recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
+        signerEmail: recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
         recipientId: field.recipientId,
         fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
       })),
@@ -173,12 +156,8 @@ export const AddFieldsFormPartial = ({
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
-  const [lastActiveField, setLastActiveField] = useState<TAddFieldsFormSchema['fields'][0] | null>(
-    null,
-  );
-  const [fieldClipboard, setFieldClipboard] = useState<TAddFieldsFormSchema['fields'][0] | null>(
-    null,
-  );
+  const [lastActiveField, setLastActiveField] = useState<TAddFieldsFormSchema['fields'][0] | null>(null);
+  const [fieldClipboard, setFieldClipboard] = useState<TAddFieldsFormSchema['fields'][0] | null>(null);
   const selectedSignerIndex = recipients.findIndex((r) => r.id === selectedSigner?.id);
   const selectedSignerStyles = getRecipientColorStyles(selectedSignerIndex);
 
@@ -213,15 +192,12 @@ export const AddFieldsFormPartial = ({
     [localFields],
   );
 
-  const hasErrors =
-    emptyCheckboxFields.length > 0 || emptyRadioFields.length > 0 || emptySelectFields.length > 0;
+  const hasErrors = emptyCheckboxFields.length > 0 || emptyRadioFields.length > 0 || emptySelectFields.length > 0;
 
   const fieldsWithError = useMemo(() => {
     const fields = localFields.filter((field) => {
       const hasError =
-        ((field.type === FieldType.CHECKBOX ||
-          field.type === FieldType.RADIO ||
-          field.type === FieldType.DROPDOWN) &&
+        ((field.type === FieldType.CHECKBOX || field.type === FieldType.RADIO || field.type === FieldType.DROPDOWN) &&
           field.fieldMeta === undefined) ||
         (field.fieldMeta && 'values' in field.fieldMeta && field?.fieldMeta?.values?.length === 0);
 
@@ -270,12 +246,7 @@ export const AddFieldsFormPartial = ({
   const onMouseMove = useCallback(
     (event: MouseEvent) => {
       setIsFieldWithinBounds(
-        isWithinPageBounds(
-          event,
-          PDF_VIEWER_PAGE_SELECTOR,
-          fieldBounds.current.width,
-          fieldBounds.current.height,
-        ),
+        isWithinPageBounds(event, PDF_VIEWER_PAGE_SELECTOR, fieldBounds.current.width, fieldBounds.current.height),
       );
 
       setCoords({
@@ -296,12 +267,7 @@ export const AddFieldsFormPartial = ({
 
       if (
         !$page ||
-        !isWithinPageBounds(
-          event,
-          PDF_VIEWER_PAGE_SELECTOR,
-          fieldBounds.current.width,
-          fieldBounds.current.height,
-        )
+        !isWithinPageBounds(event, PDF_VIEWER_PAGE_SELECTOR, fieldBounds.current.width, fieldBounds.current.height)
       ) {
         setSelectedField(null);
         return;
@@ -364,12 +330,7 @@ export const AddFieldsFormPartial = ({
         return;
       }
 
-      const {
-        x: pageX,
-        y: pageY,
-        width: pageWidth,
-        height: pageHeight,
-      } = getFieldPosition($page, node);
+      const { x: pageX, y: pageY, width: pageWidth, height: pageHeight } = getFieldPosition($page, node);
 
       update(index, {
         ...field,
@@ -525,13 +486,11 @@ export const AddFieldsFormPartial = ({
 
   useEffect(() => {
     const recipientsByRoleToDisplay = recipients.filter(
-      (recipient) =>
-        recipient.role !== RecipientRole.CC && recipient.role !== RecipientRole.ASSISTANT,
+      (recipient) => recipient.role !== RecipientRole.CC && recipient.role !== RecipientRole.ASSISTANT,
     );
 
     setSelectedSigner(
-      recipientsByRoleToDisplay.find((r) => r.sendStatus !== SendStatus.SENT) ??
-        recipientsByRoleToDisplay[0],
+      recipientsByRoleToDisplay.find((r) => r.sendStatus !== SendStatus.SENT) ?? recipientsByRoleToDisplay[0],
     );
   }, [recipients]);
 
@@ -594,10 +553,7 @@ export const AddFieldsFormPartial = ({
       {showAdvancedSettings && currentField ? (
         <FieldAdvancedSettings
           title={msg`Advanced settings`}
-          description={msg`Configure the ${parseMessageDescriptor(
-            _,
-            FRIENDLY_FIELD_TYPE[currentField.type],
-          )} field`}
+          description={msg`Configure the ${parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[currentField.type])} field`}
           field={currentField}
           fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
@@ -613,17 +569,14 @@ export const AddFieldsFormPartial = ({
         />
       ) : (
         <>
-          <DocumentFlowFormContainerHeader
-            title={documentFlow.title}
-            description={documentFlow.description}
-          />
+          <DocumentFlowFormContainerHeader title={documentFlow.title} description={documentFlow.description} />
 
           <DocumentFlowFormContainerContent>
             <div className="flex flex-col">
               {selectedField && (
                 <div
                   className={cn(
-                    'dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white text-muted-foreground ring-2 transition duration-200 [container-type:size]',
+                    'pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white text-muted-foreground ring-2 transition duration-200 [container-type:size] dark:text-muted-background',
                     selectedSignerStyles?.base,
                     {
                       '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
@@ -657,8 +610,7 @@ export const AddFieldsFormPartial = ({
                       recipientIndex={recipientIndex === -1 ? 0 : recipientIndex}
                       field={field}
                       disabled={
-                        selectedSigner?.email !== field.signerEmail ||
-                        !canRecipientBeModified(selectedSigner, fields)
+                        selectedSigner?.email !== field.signerEmail || !canRecipientBeModified(selectedSigner, fields)
                       }
                       minHeight={MIN_HEIGHT_PX}
                       minWidth={MIN_WIDTH_PX}
@@ -703,7 +655,7 @@ export const AddFieldsFormPartial = ({
                   selectedRecipient={selectedSigner}
                   onSelectedRecipientChange={setSelectedSigner}
                   recipients={recipients}
-                  className="mb-12 mt-2"
+                  className="mt-2 mb-12"
                 />
               )}
 
@@ -725,7 +677,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 font-signature text-lg font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal font-signature text-lg text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <Trans>Signature</Trans>
@@ -749,7 +701,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
                             )}
                           >
                             <Contact className="h-4 w-4" />
@@ -774,7 +726,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
                             )}
                           >
                             <Mail className="h-4 w-4" />
@@ -799,7 +751,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
                             )}
                           >
                             <User className="h-4 w-4" />
@@ -824,7 +776,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
                             )}
                           >
                             <CalendarDays className="h-4 w-4" />
@@ -849,7 +801,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
                             )}
                           >
                             <Type className="h-4 w-4" />
@@ -874,7 +826,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
                             )}
                           >
                             <Hash className="h-4 w-4" />
@@ -899,7 +851,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
                             )}
                           >
                             <Disc className="h-4 w-4" />
@@ -924,7 +876,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
                             )}
                           >
                             <CheckSquare className="h-4 w-4" />
@@ -949,7 +901,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
                             )}
                           >
                             <ChevronDown className="h-4 w-4" />
@@ -967,14 +919,10 @@ export const AddFieldsFormPartial = ({
           {hasErrors && (
             <div className="mt-4">
               <ul>
-                <li className="text-sm text-red-500">
+                <li className="text-red-500 text-sm">
                   <Trans>
                     To proceed further, please set at least one value for the{' '}
-                    {emptyCheckboxFields.length > 0
-                      ? 'Checkbox'
-                      : emptyRadioFields.length > 0
-                        ? 'Radio'
-                        : 'Select'}{' '}
+                    {emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'}{' '}
                     field.
                   </Trans>
                 </li>
@@ -986,8 +934,7 @@ export const AddFieldsFormPartial = ({
             <Alert variant="warning">
               <AlertDescription>
                 <Trans>
-                  This recipient can no longer be modified as they have signed a field, or completed
-                  the document.
+                  This recipient can no longer be modified as they have signed a field, or completed the document.
                 </Trans>
               </AlertDescription>
             </Alert>

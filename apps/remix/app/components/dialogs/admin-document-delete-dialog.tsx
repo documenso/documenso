@@ -1,10 +1,3 @@
-import { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { useNavigate } from 'react-router';
-
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -19,6 +12,11 @@ import {
 } from '@documenso/ui/primitives/dialog';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 export type AdminDocumentDeleteDialogProps = {
   envelopeId: string;
@@ -32,8 +30,7 @@ export const AdminDocumentDeleteDialog = ({ envelopeId }: AdminDocumentDeleteDia
 
   const [reason, setReason] = useState('');
 
-  const { mutateAsync: deleteDocument, isPending: isDeletingDocument } =
-    trpc.admin.document.delete.useMutation();
+  const { mutateAsync: deleteDocument, isPending: isDeletingDocument } = trpc.admin.document.delete.useMutation();
 
   const handleDeleteDocument = async () => {
     try {
@@ -64,18 +61,13 @@ export const AdminDocumentDeleteDialog = ({ envelopeId }: AdminDocumentDeleteDia
   return (
     <div>
       <div>
-        <Alert
-          className="flex flex-col items-center justify-between gap-4 p-6 md:flex-row"
-          variant="neutral"
-        >
+        <Alert className="flex flex-col items-center justify-between gap-4 p-6 md:flex-row" variant="neutral">
           <div>
             <AlertTitle>
               <Trans>Delete Document</Trans>
             </AlertTitle>
             <AlertDescription className="mr-2">
-              <Trans>
-                Delete the document. This action is irreversible so proceed with caution.
-              </Trans>
+              <Trans>Delete the document. This action is irreversible so proceed with caution.</Trans>
             </AlertDescription>
           </div>
 
@@ -105,12 +97,7 @@ export const AdminDocumentDeleteDialog = ({ envelopeId }: AdminDocumentDeleteDia
                     <Trans>To confirm, please enter the reason</Trans>
                   </DialogDescription>
 
-                  <Input
-                    className="mt-2"
-                    type="text"
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                  />
+                  <Input className="mt-2" type="text" value={reason} onChange={(e) => setReason(e.target.value)} />
                 </div>
 
                 <DialogFooter>

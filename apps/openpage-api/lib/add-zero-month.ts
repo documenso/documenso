@@ -10,10 +10,7 @@ export type TransformedData = {
 
 const FORMAT = 'MMM yyyy';
 
-export const addZeroMonth = (
-  transformedData: TransformedData,
-  isCumulative = false,
-): TransformedData => {
+export const addZeroMonth = (transformedData: TransformedData, isCumulative = false): TransformedData => {
   const result: TransformedData = {
     labels: [...transformedData.labels],
     datasets: transformedData.datasets.map((dataset) => ({

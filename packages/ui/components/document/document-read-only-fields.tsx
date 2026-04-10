@@ -1,11 +1,3 @@
-import { useState } from 'react';
-
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { DocumentMeta, Field, Recipient } from '@prisma/client';
-import { SigningStatus } from '@prisma/client';
-import { Clock, EyeOffIcon } from 'lucide-react';
-
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
 import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
@@ -17,6 +9,12 @@ import { Badge } from '@documenso/ui/primitives/badge';
 import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/types';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { PopoverHover } from '@documenso/ui/primitives/popover';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import type { DocumentMeta, Field, Recipient } from '@prisma/client';
+import { SigningStatus } from '@prisma/client';
+import { Clock, EyeOffIcon } from 'lucide-react';
+import { useState } from 'react';
 
 import { getRecipientColorStyles } from '../../lib/recipient-colors';
 import { FieldContent } from '../../primitives/document-flow/field-content';
@@ -66,10 +64,7 @@ export type DocumentReadOnlyFieldsProps = {
   showRecipientColors?: boolean;
 };
 
-export const mapFieldsWithRecipients = (
-  fields: Field[],
-  recipients: Recipient[],
-): DocumentField[] => {
+export const mapFieldsWithRecipients = (fields: Field[], recipients: Recipient[]): DocumentField[] => {
   return fields.map((field) => {
     const recipient = recipients.find((recipient) => recipient.id === field.recipientId) || {
       id: field.recipientId,
@@ -109,18 +104,16 @@ export const DocumentReadOnlyFields = ({
               readonly={true}
               color={
                 showRecipientColors
-                  ? getRecipientColorStyles(
-                      recipientIds.findIndex((id) => id === field.recipientId),
-                    )
+                  ? getRecipientColorStyles(recipientIds.findIndex((id) => id === field.recipientId))
                   : undefined
               }
             >
               {showRecipientTooltip && (
-                <div className="absolute -right-3 -top-3">
+                <div className="absolute -top-3 -right-3">
                   <PopoverHover
                     trigger={
-                      <Avatar className="h-6 w-6 border-2 border-solid border-gray-200/50 transition-colors hover:border-gray-200">
-                        <AvatarFallback className="bg-neutral-50 text-xs text-gray-400">
+                      <Avatar className="h-6 w-6 border-2 border-gray-200/50 border-solid transition-colors hover:border-gray-200">
+                        <AvatarFallback className="bg-neutral-50 text-gray-400 text-xs">
                           {extractInitials(field.recipient.name || field.recipient.email)}
                         </AvatarFallback>
                       </Avatar>
@@ -132,11 +125,7 @@ export const DocumentReadOnlyFields = ({
                     {showFieldStatus && (
                       <Badge
                         className="mx-auto mb-1 py-0.5"
-                        variant={
-                          field.recipient.signingStatus === SigningStatus.SIGNED
-                            ? 'default'
-                            : 'secondary'
-                        }
+                        variant={field.recipient.signingStatus === SigningStatus.SIGNED ? 'default' : 'secondary'}
                       >
                         {field.recipient.signingStatus === SigningStatus.SIGNED ? (
                           <>
@@ -153,17 +142,15 @@ export const DocumentReadOnlyFields = ({
                     )}
 
                     <p className="text-center font-semibold">
-                      <span>
-                        {parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[field.type])} field
-                      </span>
+                      <span>{parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[field.type])} field</span>
                     </p>
 
-                    <p className="mt-1 text-center text-xs text-muted-foreground">
+                    <p className="mt-1 text-center text-muted-foreground text-xs">
                       {getRecipientDisplayText(field.recipient)}
                     </p>
 
                     <button
-                      className="absolute right-0 top-0 my-1 p-2 focus:outline-none focus-visible:ring-0"
+                      className="absolute top-0 right-0 my-1 p-2 focus:outline-none focus-visible:ring-0"
                       onClick={() => handleHideField(field.secondaryId)}
                       title="Hide field"
                     >

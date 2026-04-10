@@ -1,12 +1,6 @@
-import React from 'react';
-
-import type { Recipient } from '@prisma/client';
-
-import {
-  getExtraRecipientsType,
-  getRecipientType,
-} from '@documenso/lib/client-only/recipient-type';
+import { getExtraRecipientsType, getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
+import type { Recipient } from '@prisma/client';
 
 import { StackAvatar } from './stack-avatar';
 

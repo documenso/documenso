@@ -1,6 +1,5 @@
-import { generateOpenApiDocument } from 'trpc-to-openapi';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { generateOpenApiDocument } from 'trpc-to-openapi';
 
 import { appRouter } from './router';
 

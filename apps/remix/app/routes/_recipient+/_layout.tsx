@@ -1,10 +1,9 @@
-import { Trans } from '@lingui/react/macro';
-import { ChevronLeft } from 'lucide-react';
-import { Link, Outlet, isRouteErrorResponse } from 'react-router';
-
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import { Trans } from '@lingui/react/macro';
+import { ChevronLeft } from 'lucide-react';
+import { isRouteErrorResponse, Link, Outlet } from 'react-router';
 
 import { Header as AuthenticatedHeader } from '~/components/general/app-header';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
@@ -23,8 +22,7 @@ export default function RecipientLayout({ matches }: Route.ComponentProps) {
   // Hide the header for signing routes.
   const hideHeader = matches.some(
     (match) =>
-      match?.id === 'routes/_recipient+/sign.$token+/_index' ||
-      match?.id === 'routes/_recipient+/d.$token+/_index',
+      match?.id === 'routes/_recipient+/sign.$token+/_index' || match?.id === 'routes/_recipient+/d.$token+/_index',
   );
 
   return (
@@ -33,7 +31,7 @@ export default function RecipientLayout({ matches }: Route.ComponentProps) {
 
       <main
         className={cn({
-          'mb-8 mt-8 px-4 md:mb-12 md:mt-12 md:px-8': !hideHeader,
+          'mt-8 mb-8 px-4 md:mt-12 md:mb-12 md:px-8': !hideHeader,
         })}
       >
         <Outlet />

@@ -1,8 +1,7 @@
 import { PDF } from '@libpdf/core';
 import { i18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import type { DocumentMeta } from '@prisma/client';
-import type { Envelope, Field, Recipient, Signature } from '@prisma/client';
+import type { DocumentMeta, Envelope, Field, Recipient, Signature } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 import { prop, sortBy } from 'remeda';
 import { match } from 'ts-pattern';
@@ -73,22 +72,17 @@ export const generateCertificatePdf = async (options: GenerateCertificatePdfOpti
         (log) => log.type === 'DOCUMENT_SENT',
       );
 
-      const documentOpened: TDocumentAuditLogBaseSchema | undefined = auditLogs[
-        'DOCUMENT_OPENED'
-      ].find((log) => log.type === 'DOCUMENT_OPENED' && log.data.recipientId === recipientId);
+      const documentOpened: TDocumentAuditLogBaseSchema | undefined = auditLogs['DOCUMENT_OPENED'].find(
+        (log) => log.type === 'DOCUMENT_OPENED' && log.data.recipientId === recipientId,
+      );
 
       const documentRecipientCompleted: TDocumentAuditLogBaseSchema | undefined = auditLogs[
         'DOCUMENT_RECIPIENT_COMPLETED'
-      ].find(
-        (log) =>
-          log.type === 'DOCUMENT_RECIPIENT_COMPLETED' && log.data.recipientId === recipientId,
-      );
+      ].find((log) => log.type === 'DOCUMENT_RECIPIENT_COMPLETED' && log.data.recipientId === recipientId);
 
       const documentRecipientRejected: TDocumentAuditLogBaseSchema | undefined = auditLogs[
         'DOCUMENT_RECIPIENT_REJECTED'
-      ].find(
-        (log) => log.type === 'DOCUMENT_RECIPIENT_REJECTED' && log.data.recipientId === recipientId,
-      );
+      ].find((log) => log.type === 'DOCUMENT_RECIPIENT_REJECTED' && log.data.recipientId === recipientId);
 
       const extractedAuthMethods = extractDocumentAuthMethods({
         documentAuth: envelope.authOptions,

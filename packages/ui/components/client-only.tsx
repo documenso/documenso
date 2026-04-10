@@ -6,5 +6,5 @@ type ClientOnlyProps = {
 };
 
 export const ClientOnly = ({ children, fallback = null }: ClientOnlyProps) => {
-  return useHydrated() ? <>{children()}</> : <>{fallback}</>;
+  return useHydrated() ? children() : fallback;
 };

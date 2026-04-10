@@ -15,7 +15,9 @@ export function useEnvelopeAutosave<T>(saveFn: (data: T) => Promise<void>, delay
       // A debounce or promise means something is pending
       setIsPending(true);
 
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
 
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       timeoutRef.current = setTimeout(async () => {

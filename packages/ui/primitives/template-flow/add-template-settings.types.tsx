@@ -1,23 +1,15 @@
-import { msg } from '@lingui/core/macro';
-import { DocumentDistributionMethod } from '@prisma/client';
-import { DocumentVisibility, TemplateType } from '@prisma/client';
-import { z } from 'zod';
-
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
-import {
-  ZDocumentAccessAuthTypesSchema,
-  ZDocumentActionAuthTypesSchema,
-} from '@documenso/lib/types/document-auth';
+import { ZDocumentAccessAuthTypesSchema, ZDocumentActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
-import {
-  ZDocumentMetaDateFormatSchema,
-  ZDocumentMetaTimezoneSchema,
-} from '@documenso/lib/types/document-meta';
+import { ZDocumentMetaDateFormatSchema, ZDocumentMetaTimezoneSchema } from '@documenso/lib/types/document-meta';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 import { zEmail } from '@documenso/lib/utils/zod';
+import { msg } from '@lingui/core/macro';
+import { DocumentDistributionMethod, DocumentVisibility, TemplateType } from '@prisma/client';
+import { z } from 'zod';
 
 export const ZAddTemplateSettingsFormSchema = z.object({
   title: z.string().trim().min(1, { message: "Title can't be empty" }),
@@ -35,16 +27,12 @@ export const ZAddTemplateSettingsFormSchema = z.object({
     message: z.string(),
     timezone: ZDocumentMetaTimezoneSchema.default(DEFAULT_DOCUMENT_TIME_ZONE),
     dateFormat: ZDocumentMetaDateFormatSchema.default(DEFAULT_DOCUMENT_DATE_FORMAT),
-    distributionMethod: z
-      .nativeEnum(DocumentDistributionMethod)
-      .optional()
-      .default(DocumentDistributionMethod.EMAIL),
+    distributionMethod: z.nativeEnum(DocumentDistributionMethod).optional().default(DocumentDistributionMethod.EMAIL),
     redirectUrl: z
       .string()
       .optional()
       .refine((value) => value === undefined || value === '' || isValidRedirectUrl(value), {
-        message:
-          'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
+        message: 'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
       }),
     language: z
       .union([z.string(), z.enum(SUPPORTED_LANGUAGE_CODES)])

@@ -1,10 +1,3 @@
-import { Hono } from 'hono';
-import { contextStorage } from 'hono/context-storage';
-import { cors } from 'hono/cors';
-import type { RequestIdVariables } from 'hono/request-id';
-import { requestId } from 'hono/request-id';
-import type { Logger } from 'pino';
-
 import { tsRestHonoApp } from '@documenso/api/hono';
 import { auth } from '@documenso/auth/server';
 import { jobsClient } from '@documenso/lib/jobs/client';
@@ -23,6 +16,12 @@ import { migrateLegacyServiceAccount } from '@documenso/lib/server-only/user/ser
 import { env } from '@documenso/lib/utils/env';
 import { logger } from '@documenso/lib/utils/logger';
 import { openApiDocument } from '@documenso/trpc/server/open-api';
+import { Hono } from 'hono';
+import { contextStorage } from 'hono/context-storage';
+import { cors } from 'hono/cors';
+import type { RequestIdVariables } from 'hono/request-id';
+import { requestId } from 'hono/request-id';
+import type { Logger } from 'pino';
 
 import { aiRoute } from './api/ai/route';
 import { downloadRoute } from './api/download/download';

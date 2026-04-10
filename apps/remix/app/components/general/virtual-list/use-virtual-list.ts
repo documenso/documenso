@@ -289,16 +289,7 @@ export const useVirtualList = (options: VirtualListOptions): VirtualListResult =
     }
 
     return items;
-  }, [
-    itemCount,
-    constraintWidth,
-    scrollTop,
-    viewportHeight,
-    overscan,
-    offsets,
-    getItemSize,
-    findStartIndex,
-  ]);
+  }, [itemCount, constraintWidth, scrollTop, viewportHeight, overscan, offsets, getItemSize, findStartIndex]);
 
   /**
    * Imperatively scroll the scroll container so that the item at the given

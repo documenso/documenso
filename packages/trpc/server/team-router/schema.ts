@@ -1,8 +1,7 @@
-import { TeamMemberRole } from '@prisma/client';
-import { z } from 'zod';
-
 import { PROTECTED_TEAM_URLS } from '@documenso/lib/constants/teams';
 import { zEmail } from '@documenso/lib/utils/zod';
+import { TeamMemberRole } from '@prisma/client';
+import { z } from 'zod';
 
 /**
  * Restrict team URLs schema.
@@ -27,10 +26,7 @@ export const ZTeamUrlSchema = z
   .toLowerCase()
   .regex(/^[a-z0-9].*[^_-]$/, 'Team URL cannot start or end with dashes or underscores.')
   .regex(/^(?!.*[-_]{2})/, 'Team URL cannot contain consecutive dashes or underscores.')
-  .regex(
-    /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/,
-    'Team URL can only contain letters, numbers, dashes and underscores.',
-  )
+  .regex(/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/, 'Team URL can only contain letters, numbers, dashes and underscores.')
   .refine((value) => !PROTECTED_TEAM_URLS.includes(value), {
     message: 'This URL is already in use.',
   });
@@ -78,13 +74,9 @@ export const ZResendTeamEmailVerificationMutationSchema = z.object({
   teamId: z.number(),
 });
 
-export type TCreateTeamEmailVerificationMutationSchema = z.infer<
-  typeof ZCreateTeamEmailVerificationMutationSchema
->;
+export type TCreateTeamEmailVerificationMutationSchema = z.infer<typeof ZCreateTeamEmailVerificationMutationSchema>;
 
 export type TDeleteTeamEmailMutationSchema = z.infer<typeof ZDeleteTeamEmailMutationSchema>;
 export type TGetTeamMembersQuerySchema = z.infer<typeof ZGetTeamMembersQuerySchema>;
 export type TUpdateTeamEmailMutationSchema = z.infer<typeof ZUpdateTeamEmailMutationSchema>;
-export type TResendTeamEmailVerificationMutationSchema = z.infer<
-  typeof ZResendTeamEmailVerificationMutationSchema
->;
+export type TResendTeamEmailVerificationMutationSchema = z.infer<typeof ZResendTeamEmailVerificationMutationSchema>;

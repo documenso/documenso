@@ -19,10 +19,7 @@ export const ZEnvelopeExpirationPeriod = z.union([
 export type TEnvelopeExpirationPeriod = z.infer<typeof ZEnvelopeExpirationPeriod>;
 export type TEnvelopeExpirationDurationPeriod = z.infer<typeof ZEnvelopeExpirationDurationPeriod>;
 
-const UNIT_TO_LUXON_KEY: Record<
-  TEnvelopeExpirationDurationPeriod['unit'],
-  keyof DurationLikeObject
-> = {
+const UNIT_TO_LUXON_KEY: Record<TEnvelopeExpirationDurationPeriod['unit'], keyof DurationLikeObject> = {
   day: 'days',
   week: 'weeks',
   month: 'months',
@@ -34,9 +31,7 @@ export const DEFAULT_ENVELOPE_EXPIRATION_PERIOD: TEnvelopeExpirationDurationPeri
   amount: 3,
 };
 
-export const getEnvelopeExpirationDuration = (
-  period: TEnvelopeExpirationDurationPeriod,
-): Duration => {
+export const getEnvelopeExpirationDuration = (period: TEnvelopeExpirationDurationPeriod): Duration => {
   return Duration.fromObject({ [UNIT_TO_LUXON_KEY[period.unit]]: period.amount });
 };
 

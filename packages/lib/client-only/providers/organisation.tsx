@@ -1,7 +1,6 @@
-import { createContext, useContext } from 'react';
-import React from 'react';
-
 import type { OrganisationSession } from '@documenso/trpc/server/organisation-router/get-organisation-session.types';
+import type React from 'react';
+import { createContext, useContext } from 'react';
 
 type OrganisationProviderValue = OrganisationSession;
 
@@ -27,7 +26,5 @@ export const useOptionalCurrentOrganisation = () => {
 };
 
 export const OrganisationProvider = ({ children, organisation }: OrganisationProviderProps) => {
-  return (
-    <OrganisationContext.Provider value={organisation}>{children}</OrganisationContext.Provider>
-  );
+  return <OrganisationContext.Provider value={organisation}>{children}</OrganisationContext.Provider>;
 };

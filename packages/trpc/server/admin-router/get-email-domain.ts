@@ -2,10 +2,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
 import { adminProcedure } from '../trpc';
-import {
-  ZGetEmailDomainRequestSchema,
-  ZGetEmailDomainResponseSchema,
-} from './get-email-domain.types';
+import { ZGetEmailDomainRequestSchema, ZGetEmailDomainResponseSchema } from './get-email-domain.types';
 
 export const getEmailDomainRoute = adminProcedure
   .input(ZGetEmailDomainRequestSchema)

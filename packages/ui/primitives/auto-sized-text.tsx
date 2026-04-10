@@ -47,12 +47,7 @@ function pxToRem(px: number): number {
   return px / getBaseFontSize();
 }
 
-export function AutoSizedText({
-  children,
-  className,
-  maxHeight,
-  useRem = false,
-}: AutoSizedTextProps) {
+export function AutoSizedText({ children, className, maxHeight, useRem = false }: AutoSizedTextProps) {
   const childRef = useRef<HTMLDivElement>(null);
 
   const fontSize = useRef<number>(0);
@@ -68,20 +63,15 @@ export function AutoSizedText({
 
     let newFontSize: number;
 
-    const targetHeight =
-      maxHeight && maxHeight < parentDimensions.height ? maxHeight : parentDimensions.height;
+    const targetHeight = maxHeight && maxHeight < parentDimensions.height ? maxHeight : parentDimensions.height;
 
-    const isElementTooBig =
-      childDimensions.width > parentDimensions.width || childDimensions.height > targetHeight;
+    const isElementTooBig = childDimensions.width > parentDimensions.width || childDimensions.height > targetHeight;
 
     if (isElementTooBig) {
       // Scale down if element is bigger than target
       newFontSize = (fontSizeLowerBound.current + fontSize.current) / 2;
       fontSizeUpperBound.current = fontSize.current;
-    } else if (
-      childDimensions.width < parentDimensions.width ||
-      childDimensions.height < parentDimensions.height
-    ) {
+    } else if (childDimensions.width < parentDimensions.width || childDimensions.height < parentDimensions.height) {
       // Scale up if element is smaller than target
       newFontSize = (fontSizeUpperBound.current + fontSize.current) / 2;
       fontSizeLowerBound.current = fontSize.current;
@@ -120,16 +110,14 @@ export function AutoSizedText({
       while (iterationCount <= ITERATION_LIMIT) {
         const childDimensions = getElementDimensions(childElement);
 
-        const targetHeight =
-          maxHeight && maxHeight < parentDimensions.height ? maxHeight : parentDimensions.height;
+        const targetHeight = maxHeight && maxHeight < parentDimensions.height ? maxHeight : parentDimensions.height;
 
         const widthDifference = parentDimensions.width - childDimensions.width;
         const heightDifference = targetHeight - childDimensions.height;
 
         const childFitsIntoParent = heightDifference >= 0 && widthDifference >= 0;
         const isWithinTolerance =
-          Math.abs(widthDifference) <= MAXIMUM_DIFFERENCE ||
-          Math.abs(heightDifference) <= MAXIMUM_DIFFERENCE;
+          Math.abs(widthDifference) <= MAXIMUM_DIFFERENCE || Math.abs(heightDifference) <= MAXIMUM_DIFFERENCE;
 
         if (childFitsIntoParent && isWithinTolerance) {
           break;

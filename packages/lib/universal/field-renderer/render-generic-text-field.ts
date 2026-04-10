@@ -116,10 +116,7 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
   return fieldText;
 };
 
-export const renderGenericTextFieldElement = (
-  field: FieldToRender,
-  options: RenderFieldElementOptions,
-) => {
+export const renderGenericTextFieldElement = (field: FieldToRender, options: RenderFieldElementOptions) => {
   const { mode = 'edit', pageLayer, color } = options;
 
   const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);

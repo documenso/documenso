@@ -1,9 +1,8 @@
-import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
+import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
 
 import { adminProcedure } from '../trpc';
 import {
@@ -88,9 +87,7 @@ export const updateOrganisationMemberRoleRoute = adminProcedure
         (group) => group.organisationRole === currentOrganisationRole,
       );
 
-      const adminGroup = organisation.groups.find(
-        (group) => group.organisationRole === OrganisationMemberRole.ADMIN,
-      );
+      const adminGroup = organisation.groups.find((group) => group.organisationRole === OrganisationMemberRole.ADMIN);
 
       if (!currentMemberGroup) {
         ctx.logger.error({
@@ -165,13 +162,9 @@ export const updateOrganisationMemberRoleRoute = adminProcedure
       });
     }
 
-    const currentMemberGroup = organisation.groups.find(
-      (group) => group.organisationRole === currentOrganisationRole,
-    );
+    const currentMemberGroup = organisation.groups.find((group) => group.organisationRole === currentOrganisationRole);
 
-    const newMemberGroup = organisation.groups.find(
-      (group) => group.organisationRole === targetRole,
-    );
+    const newMemberGroup = organisation.groups.find((group) => group.organisationRole === targetRole);
 
     if (!currentMemberGroup) {
       ctx.logger.error({

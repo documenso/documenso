@@ -1,11 +1,3 @@
-import { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { useNavigate } from 'react-router';
-import { match } from 'ts-pattern';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import type { TGetUserResponse } from '@documenso/trpc/server/admin-router/get-user.types';
@@ -22,6 +14,12 @@ import {
 } from '@documenso/ui/primitives/dialog';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
+import { match } from 'ts-pattern';
 
 export type AdminUserDeleteDialogProps = {
   className?: string;
@@ -34,8 +32,7 @@ export const AdminUserDeleteDialog = ({ className, user }: AdminUserDeleteDialog
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
 
-  const { mutateAsync: deleteUser, isPending: isDeletingUser } =
-    trpc.admin.user.delete.useMutation();
+  const { mutateAsync: deleteUser, isPending: isDeletingUser } = trpc.admin.user.delete.useMutation();
 
   const onDeleteAccount = async () => {
     try {
@@ -69,16 +66,13 @@ export const AdminUserDeleteDialog = ({ className, user }: AdminUserDeleteDialog
 
   return (
     <div className={className}>
-      <Alert
-        className="flex flex-col items-center justify-between gap-4 p-6 md:flex-row"
-        variant="neutral"
-      >
+      <Alert className="flex flex-col items-center justify-between gap-4 p-6 md:flex-row" variant="neutral">
         <div>
           <AlertTitle>Delete Account</AlertTitle>
           <AlertDescription className="mr-2">
             <Trans>
-              Delete the users account and all its contents. This action is irreversible and will
-              cancel their subscription, so proceed with caution.
+              Delete the users account and all its contents. This action is irreversible and will cancel their
+              subscription, so proceed with caution.
             </Trans>
           </AlertDescription>
         </div>
@@ -111,12 +105,7 @@ export const AdminUserDeleteDialog = ({ className, user }: AdminUserDeleteDialog
                   </Trans>
                 </DialogDescription>
 
-                <Input
-                  className="mt-2"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+                <Input className="mt-2" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
 
               <DialogFooter>

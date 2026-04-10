@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import {
   ZDocumentMetaDateFormatSchema,
@@ -23,6 +21,7 @@ import {
 import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { DocumentSigningOrder, RecipientRole } from '@documenso/prisma/generated/types';
+import { z } from 'zod';
 
 import { ZDocumentExternalIdSchema, ZDocumentTitleSchema } from '../document-router/schema';
 
@@ -76,6 +75,4 @@ export const ZUpdateEmbeddingDocumentResponseSchema = z.object({
   documentId: z.number(),
 });
 
-export type TUpdateEmbeddingDocumentRequestSchema = z.infer<
-  typeof ZUpdateEmbeddingDocumentRequestSchema
->;
+export type TUpdateEmbeddingDocumentRequestSchema = z.infer<typeof ZUpdateEmbeddingDocumentRequestSchema>;

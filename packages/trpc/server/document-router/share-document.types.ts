@@ -1,6 +1,5 @@
-import { z } from 'zod';
-
 import DocumentShareLinkSchema from '@documenso/prisma/generated/zod/modelSchema/DocumentShareLinkSchema';
+import { z } from 'zod';
 
 export const ZShareDocumentRequestSchema = z.object({
   documentId: z.number(),

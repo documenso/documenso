@@ -1,24 +1,16 @@
-import { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { Cloud, FileText, Loader, X } from 'lucide-react';
-import { type FileRejection, useDropzone } from 'react-dropzone';
-import { useFormContext } from 'react-hook-form';
-
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { buildDropzoneRejectionDescription } from '@documenso/ui/lib/handle-dropzone-rejection';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { Cloud, FileText, Loader, X } from 'lucide-react';
+import { useState } from 'react';
+import { type FileRejection, useDropzone } from 'react-dropzone';
+import { useFormContext } from 'react-hook-form';
 
 import { useConfigureDocument } from './configure-document-context';
 import type { TConfigureEmbedFormSchema } from './configure-document-view.types';
@@ -107,11 +99,13 @@ export const ConfigureDocumentUpload = ({ isSubmitting = false }: ConfigureDocum
   };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) {
+      return '0 Bytes';
+    }
 
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return `${parseFloat((bytes / Math.pow(1024, i)).toFixed(2))} ${sizes[i]}`;
+    return `${parseFloat((bytes / 1024 ** i).toFixed(2))} ${sizes[i]}`;
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -145,11 +139,10 @@ export const ConfigureDocumentUpload = ({ isSubmitting = false }: ConfigureDocum
                     <div
                       {...getRootProps()}
                       className={cn(
-                        'relative flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-border bg-background transition',
+                        'relative flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-lg border border-border border-dashed bg-background transition',
                         {
                           'border-primary/50 bg-primary/5': isDragActive,
-                          'hover:bg-muted/30':
-                            !isDragActive && !isSubmitting && !isLoading && !isPersisted,
+                          'hover:bg-muted/30': !isDragActive && !isSubmitting && !isLoading && !isPersisted,
                           'cursor-not-allowed opacity-60': isSubmitting || isLoading || isPersisted,
                         },
                       )}
@@ -170,7 +163,7 @@ export const ConfigureDocumentUpload = ({ isSubmitting = false }: ConfigureDocum
                             'text-muted-foreground': !isDragActive,
                           })}
                         >
-                          <p className="text-sm font-medium">
+                          <p className="font-medium text-sm">
                             {isDragActive ? (
                               <Trans>Drop your document here</Trans>
                             ) : isPersisted ? (
@@ -183,9 +176,7 @@ export const ConfigureDocumentUpload = ({ isSubmitting = false }: ConfigureDocum
                             {isPersisted ? (
                               <Trans>This document cannot be changed</Trans>
                             ) : (
-                              <Trans>
-                                .PDF documents accepted (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)
-                              </Trans>
+                              <Trans>.PDF documents accepted (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)</Trans>
                             )}
                           </p>
                         </div>
@@ -207,10 +198,8 @@ export const ConfigureDocumentUpload = ({ isSubmitting = false }: ConfigureDocum
                     </div>
 
                     <div className="flex-1">
-                      <div className="text-sm font-medium">{documentData.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {formatFileSize(documentData.size)}
-                      </div>
+                      <div className="font-medium text-sm">{documentData.name}</div>
+                      <div className="text-muted-foreground text-xs">{formatFileSize(documentData.size)}</div>
                     </div>
 
                     {!isPersisted && (

@@ -1,11 +1,6 @@
-import { expect, test } from '@playwright/test';
-
-import {
-  seedBlankDocument,
-  seedDraftDocument,
-  seedPendingDocument,
-} from '@documenso/prisma/seed/documents';
+import { seedBlankDocument, seedDraftDocument, seedPendingDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 

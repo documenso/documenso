@@ -1,7 +1,6 @@
+import { kyselyPrisma, sql } from '@documenso/prisma';
 import { DocumentStatus, EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
-
-import { kyselyPrisma, sql } from '@documenso/prisma';
 
 import { mapSecondaryIdToDocumentId } from '../../../utils/envelope';
 import { jobs } from '../../client';
@@ -30,9 +29,7 @@ export const run = async ({ io }: { payload: TSealDocumentSweepJobDefinition; io
     .where('Envelope.type', '=', sql.lit(EnvelopeType.DOCUMENT))
     .where('Envelope.deletedAt', 'is', null)
     // Ensure there is at least one recipient.
-    .where((eb) =>
-      eb.exists(eb.selectFrom('Recipient').whereRef('Recipient.envelopeId', '=', 'Envelope.id')),
-    )
+    .where((eb) => eb.exists(eb.selectFrom('Recipient').whereRef('Recipient.envelopeId', '=', 'Envelope.id')))
     // Document is ready to seal: all recipients are SIGNED/CC, or any recipient REJECTED.
     .where((eb) =>
       eb.or([

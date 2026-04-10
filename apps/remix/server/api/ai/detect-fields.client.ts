@@ -1,9 +1,6 @@
 import { z } from 'zod';
 
-import {
-  type TDetectFieldsRequest,
-  ZNormalizedFieldWithContextSchema,
-} from './detect-fields.types';
+import { type TDetectFieldsRequest, ZNormalizedFieldWithContextSchema } from './detect-fields.types';
 
 export type { TDetectFieldsRequest };
 

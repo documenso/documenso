@@ -1,10 +1,3 @@
-import { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { TeamMemberRole } from '@prisma/client';
-
 import { isTeamRoleWithinUserHierarchy } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
@@ -19,6 +12,11 @@ import {
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import type { TeamMemberRole } from '@prisma/client';
+import { useState } from 'react';
 
 import { useCurrentTeam } from '~/providers/team';
 
@@ -82,8 +80,7 @@ export const TeamGroupDeleteDialog = ({
 
           <DialogDescription className="mt-4">
             <Trans context="Removing group from team">
-              You are about to remove the following group from{' '}
-              <span className="font-semibold">{team.name}</span>.
+              You are about to remove the following group from <span className="font-semibold">{team.name}</span>.
             </Trans>
           </DialogDescription>
         </DialogHeader>
@@ -91,9 +88,7 @@ export const TeamGroupDeleteDialog = ({
         {isTeamRoleWithinUserHierarchy(team.currentTeamRole, teamGroupRole) ? (
           <>
             <Alert variant="neutral">
-              <AlertDescription className="text-center font-semibold">
-                {teamGroupName}
-              </AlertDescription>
+              <AlertDescription className="text-center font-semibold">{teamGroupName}</AlertDescription>
             </Alert>
 
             <fieldset disabled={isDeleting}>

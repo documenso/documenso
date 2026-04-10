@@ -4,9 +4,7 @@ export type GetRecipientOrSenderByShareLinkSlugOptions = {
   slug: string;
 };
 
-export const getRecipientOrSenderByShareLinkSlug = async ({
-  slug,
-}: GetRecipientOrSenderByShareLinkSlugOptions) => {
+export const getRecipientOrSenderByShareLinkSlug = async ({ slug }: GetRecipientOrSenderByShareLinkSlugOptions) => {
   const { envelopeId, email } = await prisma.documentShareLink.findFirstOrThrow({
     where: {
       slug,

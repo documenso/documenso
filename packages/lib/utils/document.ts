@@ -1,11 +1,4 @@
-import type {
-  DocumentMeta,
-  Envelope,
-  OrganisationGlobalSettings,
-  Recipient,
-  Team,
-  User,
-} from '@prisma/client';
+import type { DocumentMeta, Envelope, OrganisationGlobalSettings, Recipient, Team, User } from '@prisma/client';
 import { DocumentDistributionMethod, DocumentSigningOrder, DocumentStatus } from '@prisma/client';
 
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../constants/time-zones';
@@ -60,12 +53,10 @@ export const extractDerivedDocumentMeta = (
     // Email settings.
     emailId: meta.emailId ?? settings.emailId,
     emailReplyTo: meta.emailReplyTo ?? settings.emailReplyTo,
-    emailSettings:
-      meta.emailSettings || settings.emailDocumentSettings || DEFAULT_DOCUMENT_EMAIL_SETTINGS,
+    emailSettings: meta.emailSettings || settings.emailDocumentSettings || DEFAULT_DOCUMENT_EMAIL_SETTINGS,
 
     // Envelope expiration.
-    envelopeExpirationPeriod:
-      meta.envelopeExpirationPeriod ?? settings.envelopeExpirationPeriod ?? null,
+    envelopeExpirationPeriod: meta.envelopeExpirationPeriod ?? settings.envelopeExpirationPeriod ?? null,
   } satisfies Omit<DocumentMeta, 'id'>;
 };
 
@@ -112,9 +103,7 @@ type MapEnvelopeToDocumentManyOptions = Envelope & {
  *
  * Do not use spread operator here to avoid unexpected behavior.
  */
-export const mapEnvelopesToDocumentMany = (
-  envelope: MapEnvelopeToDocumentManyOptions,
-): TDocumentMany => {
+export const mapEnvelopesToDocumentMany = (envelope: MapEnvelopeToDocumentManyOptions): TDocumentMany => {
   const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 
   return {
@@ -147,8 +136,6 @@ export const mapEnvelopesToDocumentMany = (
       id: envelope.teamId,
       url: envelope.team.url,
     },
-    recipients: envelope.recipients.map((recipient) =>
-      mapRecipientToLegacyRecipient(recipient, envelope),
-    ),
+    recipients: envelope.recipients.map((recipient) => mapRecipientToLegacyRecipient(recipient, envelope)),
   };
 };

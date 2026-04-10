@@ -1,6 +1,5 @@
-import type { Prisma } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import type { Prisma } from '@prisma/client';
 
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import type { TFolderType } from '../../types/folder-type';
@@ -17,14 +16,7 @@ export interface FindFoldersOptions {
   perPage?: number;
 }
 
-export const findFolders = async ({
-  userId,
-  teamId,
-  parentId,
-  type,
-  page = 1,
-  perPage = 10,
-}: FindFoldersOptions) => {
+export const findFolders = async ({ userId, teamId, parentId, type, page = 1, perPage = 10 }: FindFoldersOptions) => {
   const team = await getTeamById({ userId, teamId });
 
   const whereClause: Prisma.FolderWhereInput = {

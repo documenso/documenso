@@ -29,23 +29,20 @@ export const TemplateDocumentRecipientSigned = ({
       <Section>
         <Section className="mb-4">
           <Column align="center">
-            <Text className="text-base font-semibold text-[#7AC455]">
-              <Img
-                src={getAssetUrl('/static/completed.png')}
-                className="-mt-0.5 mr-2 inline h-7 w-7 align-middle"
-              />
+            <Text className="font-semibold text-[#7AC455] text-base">
+              <Img src={getAssetUrl('/static/completed.png')} className="-mt-0.5 mr-2 inline h-7 w-7 align-middle" />
               <Trans>Completed</Trans>
             </Text>
           </Column>
         </Section>
 
-        <Text className="text-primary mb-0 text-center text-lg font-semibold">
+        <Text className="mb-0 text-center font-semibold text-lg text-primary">
           <Trans>
             {recipientReference} has signed "{documentName}"
           </Trans>
         </Text>
 
-        <Text className="mx-auto mb-6 mt-1 max-w-[80%] text-center text-base text-slate-400">
+        <Text className="mx-auto mt-1 mb-6 max-w-[80%] text-center text-base text-slate-400">
           <Trans>{recipientReference} has completed signing the document.</Trans>
         </Text>
       </Section>

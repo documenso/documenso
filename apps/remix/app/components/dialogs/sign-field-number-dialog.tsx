@@ -1,10 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { createCallable } from 'react-call';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
 import type { TNumberFieldMeta } from '@documenso/lib/types/field-meta';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -17,14 +10,13 @@ import {
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
 import { numberFormatValues } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { createCallable } from 'react-call';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 export type SignFieldNumberDialogProps = {
   fieldMeta: TNumberFieldMeta;
@@ -115,10 +107,7 @@ export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, 
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit((data) => call.end(data.number))}>
-              <fieldset
-                className="flex h-full flex-col space-y-4"
-                disabled={form.formState.isSubmitting}
-              >
+              <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
                 <FormField
                   control={form.control}
                   name="number"

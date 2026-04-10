@@ -1,12 +1,3 @@
-import { useMemo, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { useQuery } from '@tanstack/react-query';
-import { DateTime } from 'luxon';
-import { UAParser } from 'ua-parser-js';
-
 import { authClient } from '@documenso/auth/client';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { Badge } from '@documenso/ui/primitives/badge';
@@ -16,6 +7,12 @@ import { DataTable } from '@documenso/ui/primitives/data-table';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { useQuery } from '@tanstack/react-query';
+import { DateTime } from 'luxon';
+import { useMemo, useState } from 'react';
+import { UAParser } from 'ua-parser-js';
 
 import { SessionLogoutAllDialog } from '~/components/dialogs/session-logout-all-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
@@ -97,10 +94,7 @@ export default function SettingsSecuritySessions() {
 
   return (
     <div>
-      <SettingsHeader
-        title={t`Active sessions`}
-        subtitle={t`View and manage all active sessions for your account.`}
-      >
+      <SettingsHeader title={t`Active sessions`} subtitle={t`View and manage all active sessions for your account.`}>
         <SessionLogoutAllDialog onSuccess={refetch} disabled={results.length === 1 || isLoading} />
       </SettingsHeader>
 
@@ -147,11 +141,7 @@ type SessionRevokeButtonProps = {
   onSuccess: () => Promise<unknown>;
 };
 
-const SessionRevokeButton = ({
-  sessionId,
-  isCurrentSession,
-  onSuccess,
-}: SessionRevokeButtonProps) => {
+const SessionRevokeButton = ({ sessionId, isCurrentSession, onSuccess }: SessionRevokeButtonProps) => {
   const { toast } = useToast();
   const { t } = useLingui();
 

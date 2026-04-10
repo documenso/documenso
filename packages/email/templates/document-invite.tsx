@@ -1,10 +1,9 @@
+import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { RecipientRole } from '@prisma/client';
 import { OrganisationType } from '@prisma/client';
-
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 
 import { Body, Container, Head, Hr, Html, Img, Link, Preview, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
@@ -64,16 +63,12 @@ export const DocumentInviteEmailTemplate = ({
 
       <Body className="mx-auto my-auto bg-white font-sans">
         <Section>
-          <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
+          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid p-4 backdrop-blur-sm">
             <Section>
               {branding.brandingEnabled && branding.brandingLogo ? (
                 <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
               ) : (
-                <Img
-                  src={getAssetUrl('/static/logo.png')}
-                  alt="Documenso Logo"
-                  className="mb-4 h-6"
-                />
+                <Img src={getAssetUrl('/static/logo.png')} alt="Documenso Logo" className="mb-4 h-6" />
               )}
 
               <TemplateDocumentInvite
@@ -94,7 +89,7 @@ export const DocumentInviteEmailTemplate = ({
           <Container className="mx-auto mt-12 max-w-xl">
             <Section>
               {organisationType === OrganisationType.PERSONAL && (
-                <Text className="my-4 text-base font-semibold">
+                <Text className="my-4 font-semibold text-base">
                   <Trans>
                     {inviterName}{' '}
                     <Link className="font-normal text-slate-400" href="mailto:{inviterEmail}">

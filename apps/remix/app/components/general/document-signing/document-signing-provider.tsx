@@ -1,6 +1,5 @@
-import { createContext, useContext, useState } from 'react';
-
 import { isBase64Image } from '@documenso/lib/constants/signatures';
+import { createContext, useContext, useState } from 'react';
 
 export type DocumentSigningContextValue = {
   fullName: string;

@@ -1,33 +1,18 @@
-import { useEffect, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
-import type { TeamGlobalSettings } from '@prisma/client';
-import { Loader } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Textarea } from '@documenso/ui/primitives/textarea';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import type { TeamGlobalSettings } from '@prisma/client';
+import { Loader } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
 
@@ -39,10 +24,7 @@ const ZBrandingPreferencesFormSchema = z.object({
   brandingLogo: z
     .instanceof(File)
     .refine((file) => file.size <= MAX_FILE_SIZE, 'File size must be less than 5MB')
-    .refine(
-      (file) => ACCEPTED_FILE_TYPES.includes(file.type),
-      'Only .jpg, .png, and .webp files are accepted',
-    )
+    .refine((file) => ACCEPTED_FILE_TYPES.includes(file.type), 'Only .jpg, .png, and .webp files are accepted')
     .nullish(),
   brandingUrl: z.string().url().optional().or(z.literal('')),
   brandingCompanyDetails: z.string().max(500).optional(),
@@ -136,10 +118,7 @@ export function BrandingPreferencesForm({
                       field.onChange(value === 'true' ? true : value === 'false' ? false : null)
                     }
                   >
-                    <SelectTrigger
-                      className="bg-background text-muted-foreground"
-                      data-testid="enable-branding"
-                    >
+                    <SelectTrigger className="bg-background text-muted-foreground" data-testid="enable-branding">
                       <SelectValue />
                     </SelectTrigger>
 
@@ -173,7 +152,7 @@ export function BrandingPreferencesForm({
           />
 
           <div className="relative flex w-full flex-col gap-y-4">
-            {!isBrandingEnabled && <div className="bg-background/60 absolute inset-0 z-[9998]" />}
+            {!isBrandingEnabled && <div className="absolute inset-0 z-[9998] bg-background/60" />}
 
             <FormField
               control={form.control}
@@ -185,20 +164,16 @@ export function BrandingPreferencesForm({
                   </FormLabel>
 
                   <div className="flex flex-col gap-4">
-                    <div className="border-border bg-background relative h-48 w-full overflow-hidden rounded-lg border">
+                    <div className="relative h-48 w-full overflow-hidden rounded-lg border border-border bg-background">
                       {previewUrl ? (
-                        <img
-                          src={previewUrl}
-                          alt="Logo preview"
-                          className="h-full w-full object-contain p-4"
-                        />
+                        <img src={previewUrl} alt="Logo preview" className="h-full w-full object-contain p-4" />
                       ) : (
-                        <div className="bg-muted/20 dark:bg-muted text-muted-foreground relative flex h-full w-full items-center justify-center text-sm">
+                        <div className="relative flex h-full w-full items-center justify-center bg-muted/20 text-muted-foreground text-sm dark:bg-muted">
                           <Trans>Please upload a logo</Trans>
 
                           {!hasLoadedPreview && (
-                            <div className="bg-muted dark:bg-muted absolute inset-0 z-[999] flex items-center justify-center">
-                              <Loader className="text-muted-foreground h-8 w-8 animate-spin" />
+                            <div className="absolute inset-0 z-[999] flex items-center justify-center bg-muted dark:bg-muted">
+                              <Loader className="h-8 w-8 animate-spin text-muted-foreground" />
                             </div>
                           )}
                         </div>
@@ -238,7 +213,7 @@ export function BrandingPreferencesForm({
                         />
                       </FormControl>
 
-                      <div className="absolute right-2 top-0 inline-flex h-full items-center justify-center">
+                      <div className="absolute top-0 right-2 inline-flex h-full items-center justify-center">
                         <Button
                           type="button"
                           variant="link"
@@ -279,12 +254,7 @@ export function BrandingPreferencesForm({
                   </FormLabel>
 
                   <FormControl>
-                    <Input
-                      type="url"
-                      placeholder="https://example.com"
-                      disabled={!isBrandingEnabled}
-                      {...field}
-                    />
+                    <Input type="url" placeholder="https://example.com" disabled={!isBrandingEnabled} {...field} />
                   </FormControl>
 
                   <FormDescription>

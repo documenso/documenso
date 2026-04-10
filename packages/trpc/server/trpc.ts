@@ -1,12 +1,11 @@
-import { TRPCError, initTRPC } from '@trpc/server';
-import type { AnyZodObject } from 'zod';
-
 import { AppError, genericErrorCodeToTrpcErrorCodeMap } from '@documenso/lib/errors/app-error';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
 import type { TrpcApiLog } from '@documenso/lib/types/api-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { alphaid } from '@documenso/lib/universal/id';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
+import { initTRPC, TRPCError } from '@trpc/server';
+import type { AnyZodObject } from 'zod';
 
 import { dataTransformer } from '../utils/data-transformer';
 import type { TrpcContext } from './context';
@@ -56,10 +55,7 @@ const t = initTRPC
           ...data,
           appError: AppError.toJSON(originalError),
           code: originalError.code,
-          httpStatus:
-            originalError.statusCode ??
-            genericErrorCodeToTrpcErrorCodeMap[originalError.code]?.status ??
-            400,
+          httpStatus: originalError.statusCode ?? genericErrorCodeToTrpcErrorCodeMap[originalError.code]?.status ?? 400,
         };
       }
 

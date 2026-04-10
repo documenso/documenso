@@ -1,15 +1,11 @@
-import { EnvelopeType } from '@prisma/client';
-
 import { jobs } from '@documenso/lib/jobs/client';
 import { unsafeGetEntireEnvelope } from '@documenso/lib/server-only/admin/get-entire-document';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { EnvelopeType } from '@prisma/client';
 
 import { adminProcedure } from '../trpc';
-import {
-  ZResealDocumentRequestSchema,
-  ZResealDocumentResponseSchema,
-} from './reseal-document.types';
+import { ZResealDocumentRequestSchema, ZResealDocumentResponseSchema } from './reseal-document.types';
 
 export const resealDocumentRoute = adminProcedure
   .input(ZResealDocumentRequestSchema)
