@@ -1,6 +1,5 @@
-import type { LucideIcon } from 'lucide-react/dist/lucide-react';
-
 import { cn } from '@documenso/ui/lib/utils';
+import type { LucideIcon } from 'lucide-react/dist/lucide-react';
 
 export type CardMetricProps = {
   icon?: LucideIcon;
@@ -18,7 +17,7 @@ export const CardMetric = ({ icon: Icon, title, value, className, children }: Ca
         className,
       )}
     >
-      <div className="flex h-full max-h-full flex-col px-4 pb-6 pt-4 sm:px-4 sm:pb-8 sm:pt-4">
+      <div className="flex h-full max-h-full flex-col px-4 pt-4 pb-6 sm:px-4 sm:pt-4 sm:pb-8">
         <div className="flex items-start">
           {Icon && (
             <div className="mr-2 h-4 w-4">
@@ -26,13 +25,11 @@ export const CardMetric = ({ icon: Icon, title, value, className, children }: Ca
             </div>
           )}
 
-          <h3 className="text-primary-forground mb-2 flex items-end text-sm font-medium leading-tight">
-            {title}
-          </h3>
+          <h3 className="mb-2 flex items-end font-medium text-primary-forground text-sm leading-tight">{title}</h3>
         </div>
 
         {children || (
-          <p className="mt-auto text-4xl font-semibold leading-8 text-foreground">
+          <p className="mt-auto font-semibold text-4xl text-foreground leading-8">
             {typeof value === 'number' ? value.toLocaleString('en-US') : value}
           </p>
         )}

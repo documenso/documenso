@@ -194,12 +194,9 @@ export class Canvas {
     const smoothedPoints = this.smoothSignature(this.points);
 
     let velocity = point.velocityFrom(lastPoint);
-    velocity =
-      this.VELOCITY_FILTER_WEIGHT * velocity +
-      (1 - this.VELOCITY_FILTER_WEIGHT) * this.lastVelocity;
+    velocity = this.VELOCITY_FILTER_WEIGHT * velocity + (1 - this.VELOCITY_FILTER_WEIGHT) * this.lastVelocity;
 
-    const newWidth =
-      velocity > 0 && this.lastVelocity > 0 ? this.strokeWidth(velocity) : this.minStrokeWidth();
+    const newWidth = velocity > 0 && this.lastVelocity > 0 ? this.strokeWidth(velocity) : this.minStrokeWidth();
 
     this.drawSmoothSignature(smoothedPoints, newWidth);
 

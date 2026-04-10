@@ -1,8 +1,3 @@
-import { Trans } from '@lingui/react/macro';
-import type { Team } from '@prisma/client';
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
-import { Link, redirect } from 'react-router';
-
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
@@ -10,6 +5,10 @@ import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-re
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { Button } from '@documenso/ui/primitives/button';
+import { Trans } from '@lingui/react/macro';
+import type { Team } from '@prisma/client';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
+import { Link, redirect } from 'react-router';
 
 import type { Route } from './+types/waiting';
 
@@ -60,8 +59,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     }
   }
 
-  const documentPathForEditing =
-    isOwnerOrTeamMember && team ? formatDocumentsPath(team.url) + '/' + document.id : null;
+  const documentPathForEditing = isOwnerOrTeamMember && team ? formatDocumentsPath(team.url) + '/' + document.id : null;
 
   return {
     documentPathForEditing,
@@ -74,18 +72,18 @@ export default function WaitingForTurnToSignPage({ loaderData }: Route.Component
   return (
     <div className="relative flex flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md text-center">
-        <h2 className="tracking-tigh text-3xl font-bold">
+        <h2 className="font-bold text-3xl tracking-tigh">
           <Trans>Waiting for Your Turn</Trans>
         </h2>
 
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-2 text-muted-foreground text-sm">
           <Trans>
-            It's currently not your turn to sign. You will receive an email with instructions once
-            it's your turn to sign the document.
+            It's currently not your turn to sign. You will receive an email with instructions once it's your turn to
+            sign the document.
           </Trans>
         </p>
 
-        <p className="mt-4 text-sm text-muted-foreground">
+        <p className="mt-4 text-muted-foreground text-sm">
           <Trans>Please check your email for updates.</Trans>
         </p>
 

@@ -1,15 +1,12 @@
-import { useEffect, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { Trans } from '@lingui/react/macro';
-import { PlusIcon } from 'lucide-react';
-import { ChevronLeft } from 'lucide-react';
-import { Link, Outlet, isRouteErrorResponse } from 'react-router';
-
 import LogoIcon from '@documenso/assets/logo_icon.png';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import { msg } from '@lingui/core/macro';
+import { Trans } from '@lingui/react/macro';
+import { ChevronLeft, PlusIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { isRouteErrorResponse, Link, Outlet } from 'react-router';
 
 import { Header as AuthenticatedHeader } from '~/components/general/app-header';
 import { BrandingLogo } from '~/components/general/branding-logo';
@@ -44,7 +41,7 @@ export default function PublicProfileLayout() {
       ) : (
         <header
           className={cn(
-            'supports-backdrop-blur:bg-background/60 sticky top-0 z-[60] flex h-16 w-full items-center border-b border-b-transparent bg-background/95 backdrop-blur duration-200',
+            'sticky top-0 z-[60] flex h-16 w-full items-center border-b border-b-transparent bg-background/95 backdrop-blur duration-200 supports-backdrop-blur:bg-background/60',
             scrollY > 5 && 'border-b-border',
           )}
         >

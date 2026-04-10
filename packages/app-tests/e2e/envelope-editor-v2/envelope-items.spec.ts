@@ -1,15 +1,13 @@
-import { type Page, expect, test } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
-
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import { seedPendingDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, type Page, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 import {
-  type TEnvelopeEditorSurface,
   clickEnvelopeEditorStep,
   getEnvelopeEditorSettingsTrigger,
   getEnvelopeItemDragHandles,
@@ -20,6 +18,7 @@ import {
   openEmbeddedEnvelopeEditor,
   openTemplateEnvelopeEditor,
   persistEmbeddedEnvelope,
+  type TEnvelopeEditorSurface,
 } from '../fixtures/envelope-editor';
 import { expectToastTextToBeVisible } from '../fixtures/generic';
 
@@ -76,10 +75,7 @@ const navigateToAddFieldsAndBack = async (root: Page) => {
   await expect(root.getByRole('heading', { name: 'Recipients' })).toBeVisible();
 };
 
-const getEnvelopeItemsFromDatabase = async (
-  surface: TEnvelopeEditorSurface,
-  externalId: string,
-) => {
+const getEnvelopeItemsFromDatabase = async (surface: TEnvelopeEditorSurface, externalId: string) => {
   const envelope = await prisma.envelope.findFirstOrThrow({
     where: {
       externalId,
@@ -199,9 +195,7 @@ const runEnvelopeItemCrudFlow = async ({
     targetIndex: 1,
   });
 
-  await expect
-    .poll(async () => await getCurrentTitles(root))
-    .toEqual(['Envelope Item B', 'Envelope Item A']);
+  await expect.poll(async () => await getCurrentTitles(root)).toEqual(['Envelope Item B', 'Envelope Item A']);
 
   if (!isEmbedded) {
     await navigateToAddFieldsAndBack(root);
@@ -366,14 +360,10 @@ test.describe('pending envelope title editing', () => {
     expect(updatedEnvelope.envelopeItems[0].title).toBe('Updated Item Title');
 
     // Verify audit logs were created for both title changes.
-    const titleAuditLog = updatedEnvelope.auditLogs.find(
-      (log) => log.type === 'DOCUMENT_TITLE_UPDATED',
-    );
+    const titleAuditLog = updatedEnvelope.auditLogs.find((log) => log.type === 'DOCUMENT_TITLE_UPDATED');
     expect(titleAuditLog).toBeDefined();
 
-    const itemAuditLog = updatedEnvelope.auditLogs.find(
-      (log) => log.type === 'ENVELOPE_ITEM_UPDATED',
-    );
+    const itemAuditLog = updatedEnvelope.auditLogs.find((log) => log.type === 'ENVELOPE_ITEM_UPDATED');
     expect(itemAuditLog).toBeDefined();
 
     // Verify the upload dropzone is still disabled for pending envelopes.

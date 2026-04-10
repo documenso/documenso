@@ -1,7 +1,6 @@
-import { DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
-
 import { jobs } from '@documenso/lib/jobs/client';
 import { prisma } from '@documenso/prisma';
+import { DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
@@ -18,12 +17,7 @@ export type RejectDocumentWithTokenOptions = {
   requestMetadata?: RequestMetadata;
 };
 
-export async function rejectDocumentWithToken({
-  token,
-  id,
-  reason,
-  requestMetadata,
-}: RejectDocumentWithTokenOptions) {
+export async function rejectDocumentWithToken({ token, id, reason, requestMetadata }: RejectDocumentWithTokenOptions) {
   // Find the recipient and document in a single query
   const recipient = await prisma.recipient.findFirst({
     where: {

@@ -1,34 +1,15 @@
-import { useEffect } from 'react';
-
+import { DEFAULT_FIELD_FONT_SIZE, type TDropdownFieldMeta as DropdownFieldMeta } from '@documenso/lib/types/field-meta';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
+import { Input } from '@documenso/ui/primitives/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
+import { Separator } from '@documenso/ui/primitives/separator';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { PlusIcon, Trash } from 'lucide-react';
+import { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
-
-import {
-  DEFAULT_FIELD_FONT_SIZE,
-  type TDropdownFieldMeta as DropdownFieldMeta,
-} from '@documenso/lib/types/field-meta';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
-import { Separator } from '@documenso/ui/primitives/separator';
 
 import {
   EditorGenericFontSizeField,
@@ -209,12 +190,12 @@ export const EditorFieldDropdownForm = ({
           <EditorGenericReadOnlyField formControl={form.control} />
 
           <section className="space-y-2">
-            <div className="-mx-4 mb-4 mt-2">
+            <div className="-mx-4 mt-2 mb-4">
               <Separator />
             </div>
 
             <div className="flex flex-row items-center justify-between gap-2">
-              <p className="text-sm font-medium">
+              <p className="font-medium text-sm">
                 <Trans>Dropdown values</Trans>
               </p>
 

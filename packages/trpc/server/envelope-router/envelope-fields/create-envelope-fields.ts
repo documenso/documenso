@@ -2,9 +2,9 @@ import { createEnvelopeFields } from '@documenso/lib/server-only/field/create-en
 
 import { authenticatedProcedure } from '../../trpc';
 import {
+  createEnvelopeFieldsMeta,
   ZCreateEnvelopeFieldsRequestSchema,
   ZCreateEnvelopeFieldsResponseSchema,
-  createEnvelopeFieldsMeta,
 } from './create-envelope-fields.types';
 
 export const createEnvelopeFieldsRoute = authenticatedProcedure

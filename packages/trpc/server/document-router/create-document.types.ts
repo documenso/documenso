@@ -1,10 +1,4 @@
-import { z } from 'zod';
-import { zfd } from 'zod-form-data';
-
-import {
-  ZDocumentAccessAuthTypesSchema,
-  ZDocumentActionAuthTypesSchema,
-} from '@documenso/lib/types/document-auth';
+import { ZDocumentAccessAuthTypesSchema, ZDocumentActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
 import { ZDocumentMetaCreateSchema } from '@documenso/lib/types/document-meta';
 import { ZDocumentVisibilitySchema } from '@documenso/lib/types/document-visibility';
@@ -17,6 +11,8 @@ import {
   ZFieldWidthSchema,
 } from '@documenso/lib/types/field';
 import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
+import { z } from 'zod';
+import { zfd } from 'zod-form-data';
 
 import { zfdFile, zodFormData } from '../../utils/zod-form-data';
 import { ZCreateRecipientSchema } from '../recipient-router/schema';

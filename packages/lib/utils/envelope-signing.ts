@@ -1,9 +1,3 @@
-import type { Field } from '@prisma/client';
-import { FieldType } from '@prisma/client';
-import { DateTime } from 'luxon';
-import { P, match } from 'ts-pattern';
-import { z } from 'zod';
-
 import { validateCheckboxLength } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
@@ -24,6 +18,11 @@ import { toCheckboxCustomText, toRadioCustomText } from '@documenso/lib/utils/fi
 import { zEmail } from '@documenso/lib/utils/zod';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
 import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
+import type { Field } from '@prisma/client';
+import { FieldType } from '@prisma/client';
+import { DateTime } from 'luxon';
+import { match, P } from 'ts-pattern';
+import { z } from 'zod';
 
 export type ExtractFieldInsertionValuesOptions = {
   fieldValue: TSignEnvelopeFieldValue;
@@ -184,16 +183,10 @@ export const extractFieldInsertionValues = ({
       const { validationRule, validationLength } = parsedCheckboxFieldParsedMeta;
 
       if (validationRule && validationLength) {
-        const checkboxValidationRule = checkboxValidationSigns.find(
-          (sign) => sign.label === validationRule,
-        );
+        const checkboxValidationRule = checkboxValidationSigns.find((sign) => sign.label === validationRule);
 
         if (checkboxValidationRule) {
-          const isValid = validateCheckboxLength(
-            selectedValues.length,
-            checkboxValidationRule.value,
-            validationLength,
-          );
+          const isValid = validateCheckboxLength(selectedValues.length, checkboxValidationRule.value, validationLength);
 
           if (!isValid) {
             throw new AppError(AppErrorCode.INVALID_BODY, {

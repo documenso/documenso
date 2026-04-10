@@ -7,10 +7,7 @@ import { verifyBackupCode } from './verify-backup-code';
 type ValidateTwoFactorAuthenticationOptions = {
   totpCode?: string;
   backupCode?: string;
-  user: Pick<
-    User,
-    'id' | 'email' | 'twoFactorEnabled' | 'twoFactorSecret' | 'twoFactorBackupCodes'
-  >;
+  user: Pick<User, 'id' | 'email' | 'twoFactorEnabled' | 'twoFactorSecret' | 'twoFactorBackupCodes'>;
 };
 
 export const validateTwoFactorAuthentication = async ({

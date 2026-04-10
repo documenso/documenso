@@ -1,9 +1,8 @@
+import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { msg } from '@lingui/core/macro';
 import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 import { z } from 'zod';
-
-import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
-import { zEmail } from '@documenso/lib/utils/zod';
 
 export const ZAddSignersFormSchema = z.object({
   signers: z.array(

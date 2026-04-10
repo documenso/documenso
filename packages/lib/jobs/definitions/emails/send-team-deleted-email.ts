@@ -19,9 +19,7 @@ const SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_SCHEMA = z.object({
   ),
 });
 
-export type TSendTeamDeletedEmailJobDefinition = z.infer<
-  typeof SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_SCHEMA
->;
+export type TSendTeamDeletedEmailJobDefinition = z.infer<typeof SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_SCHEMA>;
 
 export const SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION = {
   id: SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_ID,

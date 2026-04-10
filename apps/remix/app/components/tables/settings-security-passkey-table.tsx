@@ -1,10 +1,3 @@
-import { useMemo } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { DateTime } from 'luxon';
-import { useLocation, useNavigate, useSearchParams } from 'react-router';
-
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { trpc } from '@documenso/trpc/react';
@@ -13,6 +6,11 @@ import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { DateTime } from 'luxon';
+import { useMemo } from 'react';
+import { useLocation, useNavigate, useSearchParams } from 'react-router';
 
 import { SettingsSecurityPasskeyTableActions } from './settings-security-passkey-table-actions';
 
@@ -66,9 +64,7 @@ export const SettingsSecurityPasskeyTable = () => {
         header: _(msg`Last used`),
         accessorKey: 'updatedAt',
         cell: ({ row }) =>
-          row.original.lastUsedAt
-            ? DateTime.fromJSDate(row.original.lastUsedAt).toRelative()
-            : _(msg`Never`),
+          row.original.lastUsedAt ? DateTime.fromJSDate(row.original.lastUsedAt).toRelative() : _(msg`Never`),
       },
       {
         id: 'actions',

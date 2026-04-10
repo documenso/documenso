@@ -1,6 +1,5 @@
-import type { TeamProfile } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import type { TeamProfile } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { buildTeamWhereQuery } from '../../utils/teams';

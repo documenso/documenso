@@ -1,10 +1,3 @@
-import { useEffect, useMemo, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { type TemplateDirectLink, TemplateType } from '@prisma/client';
-
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
@@ -16,6 +9,10 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Switch } from '@documenso/ui/primitives/switch';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { type TemplateDirectLink, TemplateType } from '@prisma/client';
+import { useEffect, useMemo, useState } from 'react';
 
 import { ManagePublicTemplateDialog } from '~/components/dialogs/public-profile-template-manage-dialog';
 import type { TPublicProfileFormSchema } from '~/components/forms/public-profile-form';
@@ -72,20 +69,16 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
     perPage: 100,
   });
 
-  const { mutateAsync: updateTeam, isPending: isUpdatingTeamProfile } =
-    trpc.team.update.useMutation({
-      onSuccess: async () => {
-        await refreshSession();
-      },
-    });
+  const { mutateAsync: updateTeam, isPending: isUpdatingTeamProfile } = trpc.team.update.useMutation({
+    onSuccess: async () => {
+      await refreshSession();
+    },
+  });
 
   const isUpdating = isUpdatingTeamProfile;
 
   const enabledPrivateDirectTemplates = useMemo(
-    () =>
-      (data?.data ?? []).filter(
-        (template): template is DirectTemplate => template.directLink?.enabled === true,
-      ),
+    () => (data?.data ?? []).filter((template): template is DirectTemplate => template.directLink?.enabled === true),
     [data],
   );
 
@@ -143,13 +136,10 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
         <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
           <TooltipTrigger asChild>
             <div
-              className={cn(
-                'flex flex-row items-center justify-center space-x-2 text-xs text-muted-foreground/50',
-                {
-                  '[&>*:first-child]:text-muted-foreground': !isPublicProfileVisible,
-                  '[&>*:last-child]:text-muted-foreground': isPublicProfileVisible,
-                },
-              )}
+              className={cn('flex flex-row items-center justify-center space-x-2 text-muted-foreground/50 text-xs', {
+                '[&>*:first-child]:text-muted-foreground': !isPublicProfileVisible,
+                '[&>*:last-child]:text-muted-foreground': isPublicProfileVisible,
+              })}
             >
               <span>
                 <Trans>Hide</Trans>
@@ -208,9 +198,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
             directTemplates={enabledPrivateDirectTemplates}
             trigger={
               <Button variant="outline">
-                <Trans context="Action button to link template to public profile">
-                  Link template
-                </Trans>
+                <Trans context="Action button to link template to public profile">Link template</Trans>
               </Button>
             }
           />

@@ -1,9 +1,8 @@
-import { SubscriptionStatus } from '@prisma/client';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createOrganisationClaimUpsertData } from '@documenso/lib/server-only/organisation/create-organisation';
 import { INTERNAL_CLAIM_ID, internalClaims } from '@documenso/lib/types/subscription';
 import { prisma } from '@documenso/prisma';
+import { SubscriptionStatus } from '@prisma/client';
 
 import { adminProcedure } from '../trpc';
 import {

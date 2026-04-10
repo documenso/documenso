@@ -1,10 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { Trans } from '@lingui/react/macro';
-import { type DocumentData, DocumentStatus, type EnvelopeItem, EnvelopeType } from '@prisma/client';
-import { DownloadIcon } from 'lucide-react';
-import { DateTime } from 'luxon';
-
 import {
   EnvelopeRenderProvider,
   useCurrentEnvelopeRender,
@@ -22,6 +15,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
+import { Trans } from '@lingui/react/macro';
+import { type DocumentData, DocumentStatus, type EnvelopeItem, EnvelopeType } from '@prisma/client';
+import { DownloadIcon } from 'lucide-react';
+import { DateTime } from 'luxon';
+import { useEffect, useState } from 'react';
 
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
@@ -57,9 +55,7 @@ export const DocumentCertificateQRView = ({
 
   const [isDialogOpen, setIsDialogOpen] = useState(() => !!documentViaUser);
 
-  const formattedDate = completedDate
-    ? DateTime.fromJSDate(completedDate).toLocaleString(DateTime.DATETIME_MED)
-    : '';
+  const formattedDate = completedDate ? DateTime.fromJSDate(completedDate).toLocaleString(DateTime.DATETIME_MED) : '';
 
   useEffect(() => {
     if (documentViaUser) {
@@ -80,8 +76,8 @@ export const DocumentCertificateQRView = ({
 
               <DialogDescription>
                 <Trans>
-                  This document is available in your Documenso account. You can view more details,
-                  recipients, and audit logs there.
+                  This document is available in your Documenso account. You can view more details, recipients, and audit
+                  logs there.
                 </Trans>
               </DialogDescription>
             </DialogHeader>
@@ -123,8 +119,8 @@ export const DocumentCertificateQRView = ({
         <>
           <div className="flex w-full flex-col justify-between gap-4 md:flex-row md:items-end">
             <div className="space-y-1">
-              <h1 className="text-xl font-medium">{title}</h1>
-              <div className="flex flex-col gap-0.5 text-sm text-muted-foreground">
+              <h1 className="font-medium text-xl">{title}</h1>
+              <div className="flex flex-col gap-0.5 text-muted-foreground text-sm">
                 <p>
                   <Trans>{recipientCount} recipients</Trans>
                 </p>
@@ -176,20 +172,15 @@ type DocumentCertificateQrV2Props = {
   token: string;
 };
 
-const DocumentCertificateQrV2 = ({
-  title,
-  recipientCount,
-  formattedDate,
-  token,
-}: DocumentCertificateQrV2Props) => {
+const DocumentCertificateQrV2 = ({ title, recipientCount, formattedDate, token }: DocumentCertificateQrV2Props) => {
   const { envelopeItems } = useCurrentEnvelopeRender();
 
   return (
     <div className="flex min-h-screen flex-col items-start">
       <div className="flex w-full flex-col justify-between gap-4 md:flex-row md:items-end">
         <div className="space-y-1">
-          <h1 className="text-xl font-medium">{title}</h1>
-          <div className="flex flex-col gap-0.5 text-sm text-muted-foreground">
+          <h1 className="font-medium text-xl">{title}</h1>
+          <div className="flex flex-col gap-0.5 text-muted-foreground text-sm">
             <p>
               <Trans>{recipientCount} recipients</Trans>
             </p>

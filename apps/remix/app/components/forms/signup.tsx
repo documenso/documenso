@@ -1,16 +1,3 @@
-import { useEffect } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { useForm } from 'react-hook-form';
-import { FaIdCardClip } from 'react-icons/fa6';
-import { FcGoogle } from 'react-icons/fc';
-import { Link, useNavigate, useSearchParams } from 'react-router';
-import { z } from 'zod';
-
 import communityCardsImage from '@documenso/assets/images/community-cards.png';
 import { authClient } from '@documenso/auth/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
@@ -19,27 +6,28 @@ import { zEmail } from '@documenso/lib/utils/zod';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import type { MessageDescriptor } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { FaIdCardClip } from 'react-icons/fa6';
+import { FcGoogle } from 'react-icons/fc';
+import { Link, useNavigate, useSearchParams } from 'react-router';
+import { z } from 'zod';
 
 import { UserProfileTimur } from '~/components/general/user-profile-timur';
 
 export const ZSignUpFormSchema = z
   .object({
-    name: z
-      .string()
-      .trim()
-      .min(1, { message: msg`Please enter a valid name.`.id }),
+    name: z.string().trim().min(1, { message: msg`Please enter a valid name.`.id }),
     email: zEmail().min(1),
     password: ZPasswordSchema,
     signature: z.string().min(1, { message: msg`We need your signature to sign documents`.id }),
@@ -131,8 +119,7 @@ export const SignUpForm = ({
     } catch (err) {
       const error = AppError.parseError(err);
 
-      const errorMessage =
-        SIGNUP_ERROR_MESSAGES[error.code] ?? SIGNUP_ERROR_MESSAGES.INVALID_REQUEST;
+      const errorMessage = SIGNUP_ERROR_MESSAGES[error.code] ?? SIGNUP_ERROR_MESSAGES.INVALID_REQUEST;
 
       toast({
         title: _(msg`An error occurred`),
@@ -148,9 +135,7 @@ export const SignUpForm = ({
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),
-        description: _(
-          msg`We encountered an unknown error while attempting to sign you Up. Please try again later.`,
-        ),
+        description: _(msg`We encountered an unknown error while attempting to sign you Up. Please try again later.`),
         variant: 'destructive',
       });
     }
@@ -162,9 +147,7 @@ export const SignUpForm = ({
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),
-        description: _(
-          msg`We encountered an unknown error while attempting to sign you Up. Please try again later.`,
-        ),
+        description: _(msg`We encountered an unknown error while attempting to sign you Up. Please try again later.`),
         variant: 'destructive',
       });
     }
@@ -176,9 +159,7 @@ export const SignUpForm = ({
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),
-        description: _(
-          msg`We encountered an unknown error while attempting to sign you Up. Please try again later.`,
-        ),
+        description: _(msg`We encountered an unknown error while attempting to sign you Up. Please try again later.`),
         variant: 'destructive',
       });
     }
@@ -210,15 +191,12 @@ export const SignUpForm = ({
         <div className="absolute -inset-8 -z-[1] bg-background/50 backdrop-blur-[2px]" />
 
         <div className="relative flex h-full w-full flex-col items-center justify-evenly">
-          <div className="rounded-2xl border bg-background px-4 py-1 text-sm font-medium">
+          <div className="rounded-2xl border bg-background px-4 py-1 font-medium text-sm">
             <Trans>User profiles are here!</Trans>
           </div>
 
           <div className="w-full max-w-md">
-            <UserProfileTimur
-              rows={2}
-              className="rounded-2xl border border-border bg-background shadow-md"
-            />
+            <UserProfileTimur rows={2} className="rounded-2xl border border-border bg-background shadow-md" />
           </div>
 
           <div />
@@ -227,14 +205,14 @@ export const SignUpForm = ({
 
       <div className="relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border border-border bg-neutral-100 p-6 dark:bg-background">
         <div className="h-20">
-          <h1 className="text-xl font-semibold md:text-2xl">
+          <h1 className="font-semibold text-xl md:text-2xl">
             <Trans>Create a new account</Trans>
           </h1>
 
-          <p className="mt-2 text-xs text-muted-foreground md:text-sm">
+          <p className="mt-2 text-muted-foreground text-xs md:text-sm">
             <Trans>
-              Create your account and start using state-of-the-art document signing. Open and
-              beautiful signing is within your grasp.
+              Create your account and start using state-of-the-art document signing. Open and beautiful signing is
+              within your grasp.
             </Trans>
           </p>
         </div>
@@ -242,15 +220,9 @@ export const SignUpForm = ({
         <hr className="-mx-6 my-4" />
 
         <Form {...form}>
-          <form
-            className="flex w-full flex-1 flex-col gap-y-4"
-            onSubmit={form.handleSubmit(onFormSubmit)}
-          >
+          <form className="flex w-full flex-1 flex-col gap-y-4" onSubmit={form.handleSubmit(onFormSubmit)}>
             <fieldset
-              className={cn(
-                'flex h-[550px] w-full flex-col gap-y-4',
-                hasSocialAuthEnabled && 'h-[650px]',
-              )}
+              className={cn('flex h-[550px] w-full flex-col gap-y-4', hasSocialAuthEnabled && 'h-[650px]')}
               disabled={isSubmitting}
             >
               <FormField
@@ -312,11 +284,7 @@ export const SignUpForm = ({
                       <Trans>Sign Here</Trans>
                     </FormLabel>
                     <FormControl>
-                      <SignaturePadDialog
-                        disabled={isSubmitting}
-                        value={value}
-                        onChange={(v) => onChange(v ?? '')}
-                      />
+                      <SignaturePadDialog disabled={isSubmitting} value={value} onChange={(v) => onChange(v ?? '')} />
                     </FormControl>
 
                     <FormMessage />
@@ -357,11 +325,7 @@ export const SignUpForm = ({
                   disabled={isSubmitting}
                   onClick={onSignUpWithMicrosoftClick}
                 >
-                  <img
-                    className="mr-2 h-4 w-4"
-                    alt="Microsoft Logo"
-                    src={'/static/microsoft.svg'}
-                  />
+                  <img className="mr-2 h-4 w-4" alt="Microsoft Logo" src={'/static/microsoft.svg'} />
                   <Trans>Sign Up with Microsoft</Trans>
                 </Button>
               )}
@@ -380,7 +344,7 @@ export const SignUpForm = ({
                 </Button>
               )}
 
-              <p className="mt-4 text-sm text-muted-foreground">
+              <p className="mt-4 text-muted-foreground text-sm">
                 <Trans>
                   Already have an account?{' '}
                   <Link to="/signin" className="text-documenso-700 duration-200 hover:opacity-70">
@@ -390,17 +354,12 @@ export const SignUpForm = ({
               </p>
             </fieldset>
 
-            <Button
-              loading={form.formState.isSubmitting}
-              type="submit"
-              size="lg"
-              className="mt-6 w-full"
-            >
+            <Button loading={form.formState.isSubmitting} type="submit" size="lg" className="mt-6 w-full">
               <Trans>Create account</Trans>
             </Button>
           </form>
         </Form>
-        <p className="mt-6 text-xs text-muted-foreground">
+        <p className="mt-6 text-muted-foreground text-xs">
           <Trans>
             By proceeding, you agree to our{' '}
             <Link

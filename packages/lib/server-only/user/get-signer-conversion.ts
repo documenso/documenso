@@ -1,6 +1,5 @@
-import { DateTime } from 'luxon';
-
 import { kyselyPrisma, sql } from '@documenso/prisma';
+import { DateTime } from 'luxon';
 
 export const getSignerConversionMonthly = async () => {
   const qb = kyselyPrisma.$kysely
@@ -29,6 +28,4 @@ export const getSignerConversionMonthly = async () => {
   }));
 };
 
-export type GetSignerConversionMonthlyResult = Awaited<
-  ReturnType<typeof getSignerConversionMonthly>
->;
+export type GetSignerConversionMonthlyResult = Awaited<ReturnType<typeof getSignerConversionMonthly>>;

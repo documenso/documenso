@@ -1,6 +1,5 @@
-import type { EnvelopeType } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import type { EnvelopeType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { mapFieldToLegacyField } from '../../utils/fields';
@@ -14,12 +13,7 @@ export type GetFieldByIdOptions = {
   envelopeType?: EnvelopeType;
 };
 
-export const getFieldById = async ({
-  userId,
-  teamId,
-  fieldId,
-  envelopeType,
-}: GetFieldByIdOptions) => {
+export const getFieldById = async ({ userId, teamId, fieldId, envelopeType }: GetFieldByIdOptions) => {
   const field = await prisma.field.findFirst({
     where: {
       id: fieldId,

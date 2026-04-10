@@ -1,9 +1,8 @@
-import { expect, test } from '@playwright/test';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { prisma } from '@documenso/prisma';
 import { seedDirectTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 import { expectToastTextToBeVisible } from '../fixtures/generic';
@@ -31,9 +30,7 @@ test('[PUBLIC_PROFILE]: create team profile', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Update' }).click();
 
-  await expect(page.getByRole('status').first()).toContainText(
-    'Your public profile has been updated.',
-  );
+  await expect(page.getByRole('status').first()).toContainText('Your public profile has been updated.');
 
   // Link direct template to public profile.
   await page.getByRole('button', { name: 'Link template' }).click();
@@ -41,9 +38,7 @@ test('[PUBLIC_PROFILE]: create team profile', async ({ page }) => {
   await page.getByRole('button', { name: 'Continue' }).click();
 
   await page.getByRole('textbox', { name: 'Title *' }).fill('public-direct-template-title');
-  await page
-    .getByRole('textbox', { name: 'Description *' })
-    .fill('public-direct-template-description');
+  await page.getByRole('textbox', { name: 'Description *' }).fill('public-direct-template-description');
   await page.getByRole('button', { name: 'Update' }).click();
 
   // Wait for toast

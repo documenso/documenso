@@ -1,10 +1,9 @@
-import { sha256 } from '@oslojs/crypto/sha2';
-import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from '@oslojs/encoding';
-import { type Session, type User, UserSecurityAuditLogType } from '@prisma/client';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
+import { sha256 } from '@oslojs/crypto/sha2';
+import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from '@oslojs/encoding';
+import { type Session, type User, UserSecurityAuditLogType } from '@prisma/client';
 
 import { AUTH_SESSION_LIFETIME } from '../../config';
 
@@ -15,14 +14,7 @@ import { AUTH_SESSION_LIFETIME } from '../../config';
  */
 export type SessionUser = Pick<
   User,
-  | 'id'
-  | 'name'
-  | 'email'
-  | 'emailVerified'
-  | 'avatarImageId'
-  | 'twoFactorEnabled'
-  | 'roles'
-  | 'signature'
+  'id' | 'name' | 'email' | 'emailVerified' | 'avatarImageId' | 'twoFactorEnabled' | 'roles' | 'signature'
 >;
 
 export type SessionValidationResult =
@@ -43,11 +35,7 @@ export const generateSessionToken = (): string => {
   return token;
 };
 
-export const createSession = async (
-  token: string,
-  userId: number,
-  metadata: RequestMetadata,
-): Promise<Session> => {
+export const createSession = async (token: string, userId: number, metadata: RequestMetadata): Promise<Session> => {
   const hashedSessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 
   const session: Session = {
@@ -166,9 +154,7 @@ export const invalidateSessions = async ({
         userId,
         ipAddress: metadata.ipAddress,
         userAgent: metadata.userAgent,
-        type: isRevoke
-          ? UserSecurityAuditLogType.SESSION_REVOKED
-          : UserSecurityAuditLogType.SIGN_OUT,
+        type: isRevoke ? UserSecurityAuditLogType.SESSION_REVOKED : UserSecurityAuditLogType.SIGN_OUT,
       })),
     });
   });

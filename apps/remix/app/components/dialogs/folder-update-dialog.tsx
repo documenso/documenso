@@ -1,12 +1,3 @@
-import { useEffect } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { trpc } from '@documenso/trpc/react';
@@ -21,23 +12,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import type * as DialogPrimitive from '@radix-ui/react-dialog';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
 

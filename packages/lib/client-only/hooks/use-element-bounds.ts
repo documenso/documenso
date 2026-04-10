@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
+import { useCallback, useEffect, useState } from 'react';
 
 export const useElementBounds = (elementOrSelector: HTMLElement | string, withScroll = false) => {
   const [bounds, setBounds] = useState({

@@ -1,17 +1,17 @@
-import {
-  type DocumentDataType,
-  DocumentStatus,
-  type EnvelopeType,
-  type TemplateType,
-} from '@prisma/client';
-import { EnvelopeType as EnvelopeTypeEnum, TemplateType as TemplateTypeEnum } from '@prisma/client';
-import contentDisposition from 'content-disposition';
-import { type Context } from 'hono';
-
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { sha256 } from '@documenso/lib/universal/crypto';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { prisma } from '@documenso/prisma';
+import {
+  type DocumentDataType,
+  DocumentStatus,
+  type EnvelopeType,
+  EnvelopeType as EnvelopeTypeEnum,
+  type TemplateType,
+  TemplateType as TemplateTypeEnum,
+} from '@prisma/client';
+import contentDisposition from 'content-disposition';
+import type { Context } from 'hono';
 
 import type { HonoEnv } from '../../router';
 
@@ -114,10 +114,7 @@ export const checkEnvelopeFileAccess = async ({
     return true;
   }
 
-  if (
-    envelopeType === EnvelopeTypeEnum.TEMPLATE &&
-    templateType === TemplateTypeEnum.ORGANISATION
-  ) {
+  if (envelopeType === EnvelopeTypeEnum.TEMPLATE && templateType === TemplateTypeEnum.ORGANISATION) {
     const orgAccess = await prisma.team.findFirst({
       where: {
         id: teamId,

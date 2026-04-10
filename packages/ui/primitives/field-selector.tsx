@@ -1,16 +1,6 @@
 import { Trans } from '@lingui/react/macro';
 import { FieldType } from '@prisma/client';
-import {
-  CalendarDays,
-  CheckSquare,
-  ChevronDown,
-  Contact,
-  Disc,
-  Hash,
-  Mail,
-  Type,
-  User,
-} from 'lucide-react';
+import { CalendarDays, CheckSquare, ChevronDown, Contact, Disc, Hash, Mail, Type, User } from 'lucide-react';
 
 import { cn } from '../lib/utils';
 import { Card, CardContent } from './card';
@@ -96,18 +86,15 @@ export const FieldSelector = ({
             data-selected={selectedField === field.type ? true : undefined}
           >
             <Card
-              className={cn(
-                'flex w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                {
-                  'border-primary': selectedField === field.type,
-                },
-              )}
+              className={cn('flex w-full cursor-pointer items-center justify-center group-disabled:opacity-50', {
+                'border-primary': selectedField === field.type,
+              })}
             >
               <CardContent className="relative flex items-center justify-center gap-x-2 px-6 py-4">
                 {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
                 <span
                   className={cn(
-                    'text-sm text-muted-foreground group-data-[selected]:text-foreground',
+                    'text-muted-foreground text-sm group-data-[selected]:text-foreground',
                     field.type === FieldType.SIGNATURE && 'invisible',
                   )}
                 >

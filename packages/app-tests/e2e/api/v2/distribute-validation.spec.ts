@@ -1,8 +1,5 @@
-import { type APIRequestContext, expect, test } from '@playwright/test';
-import type { Team, User } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { EnvelopeType, FieldType, RecipientRole } from '@documenso/prisma/client';
@@ -13,6 +10,8 @@ import type {
 } from '@documenso/trpc/server/envelope-router/create-envelope.types';
 import type { TCreateEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/envelope-recipients/create-envelope-recipients.types';
 import type { TGetEnvelopeResponse } from '@documenso/trpc/server/envelope-router/get-envelope.types';
+import { type APIRequestContext, expect, test } from '@playwright/test';
+import type { Team, User } from '@prisma/client';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 const baseUrl = `${WEBAPP_BASE_URL}/api/v2-beta`;
@@ -138,9 +137,7 @@ test.describe('Envelope distribute validation', () => {
     expect(errorResponse.message).toContain('Signers must have at least one signature field');
   });
 
-  test('should fail to distribute when signer has non-signature fields only', async ({
-    request,
-  }) => {
+  test('should fail to distribute when signer has non-signature fields only', async ({ request }) => {
     const envelope = await createEnvelope(request, token);
     const envelopeData = await getEnvelope(request, token, envelope.id);
 
@@ -321,9 +318,7 @@ test.describe('Envelope distribute validation', () => {
     expect(distributeRes.status()).toBe(200);
   });
 
-  test('should fail when one of multiple signers is missing signature field', async ({
-    request,
-  }) => {
+  test('should fail when one of multiple signers is missing signature field', async ({ request }) => {
     const envelope = await createEnvelope(request, token);
     const envelopeData = await getEnvelope(request, token, envelope.id);
 

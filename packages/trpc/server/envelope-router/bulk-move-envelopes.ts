@@ -5,10 +5,7 @@ import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZBulkMoveEnvelopesRequestSchema,
-  ZBulkMoveEnvelopesResponseSchema,
-} from './bulk-move-envelopes.types';
+import { ZBulkMoveEnvelopesRequestSchema, ZBulkMoveEnvelopesResponseSchema } from './bulk-move-envelopes.types';
 
 export const bulkMoveEnvelopesRoute = authenticatedProcedure
   // .meta(bulkMoveEnvelopesMeta)

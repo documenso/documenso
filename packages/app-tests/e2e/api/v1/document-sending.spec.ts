@@ -1,15 +1,11 @@
-import { expect, test } from '@playwright/test';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import { FieldType, RecipientRole } from '@documenso/prisma/client';
-import {
-  seedBlankDocument,
-  seedPendingDocumentWithFullFields,
-} from '@documenso/prisma/seed/documents';
+import { seedBlankDocument, seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
 
 test.describe('Document API', () => {
   test('sendDocument: should respect sendCompletionEmails setting', async ({ request }) => {
@@ -193,9 +189,7 @@ test.describe('Document API', () => {
     expect(response.status()).toBe(400);
   });
 
-  test('sendDocument: should fail when signer has only non-signature fields', async ({
-    request,
-  }) => {
+  test('sendDocument: should fail when signer has only non-signature fields', async ({ request }) => {
     const { user, team } = await seedUser();
 
     // Create a blank document and get it with envelope items

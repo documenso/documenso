@@ -1,9 +1,8 @@
-import { Trans } from '@lingui/react/macro';
-import { ExternalLink, PaperclipIcon } from 'lucide-react';
-
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
+import { Trans } from '@lingui/react/macro';
+import { ExternalLink, PaperclipIcon } from 'lucide-react';
 
 export type DocumentSigningAttachmentsPopoverProps = {
   envelopeId: string;
@@ -33,9 +32,7 @@ export const DocumentSigningAttachmentsPopover = ({
             <PaperclipIcon className="h-4 w-4" />
             <span>
               <Trans>Attachments</Trans>{' '}
-              {attachments && attachments.data.length > 0 && (
-                <span className="ml-1">({attachments.data.length})</span>
-              )}
+              {attachments && attachments.data.length > 0 && <span className="ml-1">({attachments.data.length})</span>}
             </span>
           </Button>
         )}
@@ -47,7 +44,7 @@ export const DocumentSigningAttachmentsPopover = ({
             <h4 className="font-medium">
               <Trans>Attachments</Trans>
             </h4>
-            <p className="text-muted-foreground mt-1 text-sm">
+            <p className="mt-1 text-muted-foreground text-sm">
               <Trans>Documents and resources related to this envelope.</Trans>
             </p>
           </div>
@@ -60,14 +57,14 @@ export const DocumentSigningAttachmentsPopover = ({
                 title={attachment.data}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="border-border hover:bg-muted/50 group flex items-center justify-between rounded-md border px-3 py-2.5 transition duration-200"
+                className="group flex items-center justify-between rounded-md border border-border px-3 py-2.5 transition duration-200 hover:bg-muted/50"
               >
                 <div className="flex flex-1 items-center gap-2.5">
-                  <div className="bg-muted rounded p-2">
+                  <div className="rounded bg-muted p-2">
                     <PaperclipIcon className="h-4 w-4" />
                   </div>
 
-                  <span className="text-muted-foreground hover:text-foreground block truncate text-sm underline">
+                  <span className="block truncate text-muted-foreground text-sm underline hover:text-foreground">
                     {attachment.label}
                   </span>
                 </div>

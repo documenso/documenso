@@ -1,15 +1,13 @@
-import { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { FolderIcon, HomeIcon, Loader2, SearchIcon } from 'lucide-react';
-import { Link, useSearchParams } from 'react-router';
-
 import { FolderType } from '@documenso/lib/types/folder-type';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
-import { type TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
+import type { TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
 import { Input } from '@documenso/ui/primitives/input';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { FolderIcon, HomeIcon, Loader2, SearchIcon } from 'lucide-react';
+import { useState } from 'react';
+import { Link, useSearchParams } from 'react-router';
 
 import { FolderCreateDialog } from '~/components/dialogs/folder-create-dialog';
 import { FolderDeleteDialog } from '~/components/dialogs/folder-delete-dialog';
@@ -64,11 +62,8 @@ export default function DocumentsFoldersPage() {
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <div className="flex w-full items-center justify-between">
-        <div className="flex flex-1 items-center text-sm font-medium text-muted-foreground">
-          <Link
-            to={formatDocumentsPath(team.url)}
-            className="flex items-center hover:text-muted-foreground/80"
-          >
+        <div className="flex flex-1 items-center font-medium text-muted-foreground text-sm">
+          <Link to={formatDocumentsPath(team.url)} className="flex items-center hover:text-muted-foreground/80">
             <HomeIcon className="mr-2 h-4 w-4" />
             <Trans>Home</Trans>
           </Link>
@@ -76,10 +71,7 @@ export default function DocumentsFoldersPage() {
           {foldersData?.breadcrumbs.map((folder) => (
             <div key={folder.id} className="flex items-center">
               <span className="px-3">/</span>
-              <Link
-                to={formatBreadcrumbPath(folder.id)}
-                className="flex items-center hover:text-muted-foreground/80"
-              >
+              <Link to={formatBreadcrumbPath(folder.id)} className="flex items-center hover:text-muted-foreground/80">
                 <FolderIcon className="mr-2 h-4 w-4" />
                 <span>{folder.name}</span>
               </Link>
@@ -93,7 +85,7 @@ export default function DocumentsFoldersPage() {
       </div>
 
       <div className="relative w-full max-w-md py-6">
-        <SearchIcon className="absolute left-2 top-9 h-4 w-4 text-muted-foreground" />
+        <SearchIcon className="absolute top-9 left-2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder={t`Search folders...`}
           value={searchTerm}
@@ -102,7 +94,7 @@ export default function DocumentsFoldersPage() {
         />
       </div>
 
-      <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl">
+      <h1 className="mt-4 truncate font-semibold text-2xl md:text-3xl">
         <Trans>All Folders</Trans>
       </h1>
 

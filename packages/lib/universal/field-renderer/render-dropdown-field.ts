@@ -10,8 +10,8 @@ import {
   upsertFieldGroup,
   upsertFieldRect,
 } from './field-generic-items';
-import { calculateFieldPosition } from './field-renderer';
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
+import { calculateFieldPosition } from './field-renderer';
 
 type CalculateDropdownPositionOptions = {
   fieldWidth: number;
@@ -46,10 +46,7 @@ const calculateDropdownPosition = (options: CalculateDropdownPositionOptions) =>
   };
 };
 
-export const renderDropdownFieldElement = (
-  field: FieldToRender,
-  options: RenderFieldElementOptions,
-) => {
+export const renderDropdownFieldElement = (field: FieldToRender, options: RenderFieldElementOptions) => {
   const { pageWidth, pageHeight, pageLayer, mode, translations, color } = options;
 
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
@@ -93,11 +90,10 @@ export const renderDropdownFieldElement = (
     selectedValue = field.customText;
   }
 
-  const { arrowX, arrowY, arrowSize, textX, textY, textWidth, textHeight } =
-    calculateDropdownPosition({
-      fieldWidth,
-      fieldHeight,
-    });
+  const { arrowX, arrowY, arrowSize, textX, textY, textWidth, textHeight } = calculateDropdownPosition({
+    fieldWidth,
+    fieldHeight,
+  });
 
   // Selected value text
   const selectedText = new Konva.Text({

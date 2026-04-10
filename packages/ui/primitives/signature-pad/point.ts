@@ -11,13 +11,7 @@ export type PointLike = {
 };
 
 const isTouchEvent = (
-  event:
-    | ReactMouseEvent
-    | ReactPointerEvent
-    | ReactTouchEvent
-    | MouseEvent
-    | PointerEvent
-    | TouchEvent,
+  event: ReactMouseEvent | ReactPointerEvent | ReactTouchEvent | MouseEvent | PointerEvent | TouchEvent,
 ): event is TouchEvent | ReactTouchEvent => {
   return 'touches' in event;
 };
@@ -34,7 +28,7 @@ export class Point implements PointLike {
   }
 
   public distanceTo(point: PointLike): number {
-    return Math.sqrt(Math.pow(point.x - this.x, 2) + Math.pow(point.y - this.y, 2));
+    return Math.sqrt((point.x - this.x) ** 2 + (point.y - this.y) ** 2);
   }
 
   public equals(point: PointLike): boolean {
@@ -56,13 +50,7 @@ export class Point implements PointLike {
   }
 
   public static fromEvent(
-    event:
-      | ReactMouseEvent
-      | ReactPointerEvent
-      | ReactTouchEvent
-      | MouseEvent
-      | PointerEvent
-      | TouchEvent,
+    event: ReactMouseEvent | ReactPointerEvent | ReactTouchEvent | MouseEvent | PointerEvent | TouchEvent,
     dpi = 1,
     el?: HTMLElement | null,
   ): Point {

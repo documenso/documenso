@@ -1,11 +1,3 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { Loader } from 'lucide-react';
-import { useRevalidator } from 'react-router';
-
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
@@ -19,6 +11,12 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { Loader } from 'lucide-react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useRevalidator } from 'react-router';
 
 import { DocumentSigningDisclosure } from '~/components/general/document-signing/document-signing-disclosure';
 
@@ -67,10 +65,8 @@ export const DocumentSigningSignatureField = ({
   const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
-  const {
-    mutateAsync: removeSignedFieldWithToken,
-    isPending: isRemoveSignedFieldWithTokenLoading,
-  } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
+  const { mutateAsync: removeSignedFieldWithToken, isPending: isRemoveSignedFieldWithTokenLoading } =
+    trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const { signature } = field;
 
@@ -211,10 +207,7 @@ export const DocumentSigningSignatureField = ({
       let size = 2;
       text.style.fontSize = `${size}rem`;
 
-      while (
-        (text.scrollWidth > container.clientWidth || text.scrollHeight > container.clientHeight) &&
-        size > 0.8
-      ) {
+      while ((text.scrollWidth > container.clientWidth || text.scrollHeight > container.clientHeight) && size > 0.8) {
         size -= 0.1;
         text.style.fontSize = `${size}rem`;
       }
@@ -245,7 +238,7 @@ export const DocumentSigningSignatureField = ({
       )}
 
       {state === 'empty' && (
-        <p className="font-signature text-[clamp(0.575rem,25cqw,1.2rem)] text-xl text-muted-foreground duration-200 group-hover:text-primary group-hover:text-recipient-green">
+        <p className="font-signature text-[clamp(0.575rem,25cqw,1.2rem)] text-muted-foreground text-xl duration-200 group-hover:text-primary group-hover:text-recipient-green">
           <Trans>Signature</Trans>
         </p>
       )}
@@ -262,7 +255,7 @@ export const DocumentSigningSignatureField = ({
         <div ref={containerRef} className="flex h-full w-full items-center justify-center p-2">
           <p
             ref={signatureRef}
-            className="w-full overflow-hidden break-all text-center font-signature leading-tight text-muted-foreground duration-200"
+            className="w-full overflow-hidden break-all text-center font-signature text-muted-foreground leading-tight duration-200"
             style={{ fontSize: `${fontSize}rem` }}
           >
             {signature?.typedSignature}
@@ -274,8 +267,7 @@ export const DocumentSigningSignatureField = ({
         <DialogContent>
           <DialogTitle>
             <Trans>
-              Sign as {recipient.name}{' '}
-              <div className="h-5 text-muted-foreground">({recipient.email})</div>
+              Sign as {recipient.name} <div className="h-5 text-muted-foreground">({recipient.email})</div>
             </Trans>
           </DialogTitle>
 
@@ -304,12 +296,7 @@ export const DocumentSigningSignatureField = ({
               >
                 <Trans>Cancel</Trans>
               </Button>
-              <Button
-                type="button"
-                className="flex-1"
-                disabled={!localSignature}
-                onClick={() => onDialogSignClick()}
-              >
+              <Button type="button" className="flex-1" disabled={!localSignature} onClick={() => onDialogSignClick()}>
                 <Trans>Sign</Trans>
               </Button>
             </div>

@@ -102,10 +102,8 @@ export const diffRecipientChanges = (
   const oldActionAuth = oldAuthOptions.actionAuth;
 
   const newAuthOptions = ZRecipientAuthOptionsSchema.parse(newRecipient.authOptions);
-  const newAccessAuth =
-    newAuthOptions?.accessAuth === undefined ? oldAccessAuth : newAuthOptions.accessAuth;
-  const newActionAuth =
-    newAuthOptions?.actionAuth === undefined ? oldActionAuth : newAuthOptions.actionAuth;
+  const newAccessAuth = newAuthOptions?.accessAuth === undefined ? oldAccessAuth : newAuthOptions.accessAuth;
+  const newActionAuth = newAuthOptions?.actionAuth === undefined ? oldActionAuth : newAuthOptions.actionAuth;
 
   if (!isDeepEqual(oldAccessAuth, newAccessAuth)) {
     diffs.push({
@@ -150,10 +148,7 @@ export const diffRecipientChanges = (
   return diffs;
 };
 
-export const diffFieldChanges = (
-  oldField: Field,
-  newField: Field,
-): TDocumentAuditLogFieldDiffSchema[] => {
+export const diffFieldChanges = (oldField: Field, newField: Field): TDocumentAuditLogFieldDiffSchema[] => {
   const diffs: TDocumentAuditLogFieldDiffSchema[] = [];
 
   if (
@@ -289,11 +284,7 @@ export const diffDocumentMetaChanges = (
  *
  * Provide a userId to prefix the action with the user, example 'X did Y'.
  */
-export const formatDocumentAuditLogAction = (
-  i18n: I18n,
-  auditLog: TDocumentAuditLog,
-  userId?: number,
-) => {
+export const formatDocumentAuditLogAction = (i18n: I18n, auditLog: TDocumentAuditLog, userId?: number) => {
   const isCurrentUser = userId === auditLog.userId;
   const user = auditLog.name || auditLog.email || '';
 

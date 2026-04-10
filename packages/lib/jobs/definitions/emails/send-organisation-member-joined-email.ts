@@ -2,8 +2,7 @@ import { z } from 'zod';
 
 import type { JobDefinition } from '../../client/_internal/job';
 
-const SEND_ORGANISATION_MEMBER_JOINED_EMAIL_JOB_DEFINITION_ID =
-  'send.organisation-member-joined.email';
+const SEND_ORGANISATION_MEMBER_JOINED_EMAIL_JOB_DEFINITION_ID = 'send.organisation-member-joined.email';
 
 const SEND_ORGANISATION_MEMBER_JOINED_EMAIL_JOB_DEFINITION_SCHEMA = z.object({
   organisationId: z.string(),

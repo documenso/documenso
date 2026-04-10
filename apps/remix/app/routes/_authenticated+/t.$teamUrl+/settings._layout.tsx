@@ -1,21 +1,12 @@
-import { msg } from '@lingui/core/macro';
-import { Trans, useLingui } from '@lingui/react/macro';
-import {
-  BracesIcon,
-  Globe2Icon,
-  GroupIcon,
-  Settings2Icon,
-  SettingsIcon,
-  Users2Icon,
-  WebhookIcon,
-} from 'lucide-react';
-import { Link, NavLink, Outlet, redirect } from 'react-router';
-
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { BracesIcon, Globe2Icon, GroupIcon, Settings2Icon, SettingsIcon, Users2Icon, WebhookIcon } from 'lucide-react';
+import { Link, NavLink, Outlet, redirect } from 'react-router';
 
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { useCurrentTeam } from '~/providers/team';
@@ -128,7 +119,7 @@ export default function TeamsSettingsLayout() {
 
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-      <h1 className="text-4xl font-semibold">
+      <h1 className="font-semibold text-4xl">
         <Trans>Team Settings</Trans>
       </h1>
 

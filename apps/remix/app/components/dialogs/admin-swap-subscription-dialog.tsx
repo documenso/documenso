@@ -1,8 +1,3 @@
-import { useEffect, useMemo, useState } from 'react';
-
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-
 import { AppError } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
@@ -15,14 +10,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { useEffect, useMemo, useState } from 'react';
 
 export type AdminSwapSubscriptionDialogProps = {
   open: boolean;
@@ -68,8 +59,7 @@ export const AdminSwapSubscriptionDialog = ({
       }
 
       const hasActiveSubscription =
-        org.subscription &&
-        (org.subscription.status === 'ACTIVE' || org.subscription.status === 'PAST_DUE');
+        org.subscription && (org.subscription.status === 'ACTIVE' || org.subscription.status === 'PAST_DUE');
 
       return !hasActiveSubscription;
     });
@@ -133,15 +123,14 @@ export const AdminSwapSubscriptionDialog = ({
 
           <DialogDescription>
             <Trans>
-              Move the subscription from "{sourceOrganisationName}" to another organisation owned by
-              this user.
+              Move the subscription from "{sourceOrganisationName}" to another organisation owned by this user.
             </Trans>
           </DialogDescription>
         </DialogHeader>
 
         <fieldset className="flex flex-col space-y-4" disabled={isSubmitting}>
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">
+            <label className="font-medium text-sm">
               <Trans>Target Organisation</Trans>
             </label>
 
@@ -159,7 +148,7 @@ export const AdminSwapSubscriptionDialog = ({
             </Select>
 
             {eligibleOrgs.length === 0 && orgsData && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 <Trans>No eligible organisations found. The target must be on the free plan.</Trans>
               </p>
             )}
@@ -169,8 +158,8 @@ export const AdminSwapSubscriptionDialog = ({
             <Alert variant="warning">
               <AlertDescription className="mt-0">
                 <Trans>
-                  This will move the subscription from "{sourceOrganisationName}" to "
-                  {selectedOrg.name}". The source organisation will be reset to the free plan.
+                  This will move the subscription from "{sourceOrganisationName}" to "{selectedOrg.name}". The source
+                  organisation will be reset to the free plan.
                 </Trans>
               </AlertDescription>
             </Alert>
@@ -181,12 +170,7 @@ export const AdminSwapSubscriptionDialog = ({
               <Trans>Cancel</Trans>
             </Button>
 
-            <Button
-              type="button"
-              onClick={onSubmit}
-              disabled={!selectedOrgId}
-              loading={isSubmitting}
-            >
+            <Button type="button" onClick={onSubmit} disabled={!selectedOrgId} loading={isSubmitting}>
               <Trans>Move Subscription</Trans>
             </Button>
           </DialogFooter>

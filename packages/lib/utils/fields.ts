@@ -1,8 +1,7 @@
+import { PDF_VIEWER_CONTENT_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import type { I18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { type Envelope, type Field, FieldType } from '@prisma/client';
-
-import { PDF_VIEWER_CONTENT_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 
 import { extractLegacyIds } from '../universal/id';
 
@@ -89,10 +88,7 @@ export const validateFieldsUninserted = (): boolean => {
   return errorElements.length === 0;
 };
 
-export const mapFieldToLegacyField = (
-  field: Field,
-  envelope: Pick<Envelope, 'type' | 'secondaryId'>,
-) => {
+export const mapFieldToLegacyField = (field: Field, envelope: Pick<Envelope, 'type' | 'secondaryId'>) => {
   const legacyId = extractLegacyIds(envelope);
 
   return {

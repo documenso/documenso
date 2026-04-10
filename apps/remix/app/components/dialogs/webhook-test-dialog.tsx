@@ -1,12 +1,3 @@
-import { useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
-import type { Webhook } from '@prisma/client';
-import { WebhookTriggerEvents } from '@prisma/client';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
 import { toFriendlyWebhookEventName } from '@documenso/lib/universal/webhook/to-friendly-webhook-event-name';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
@@ -19,22 +10,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import type { Webhook } from '@prisma/client';
+import { WebhookTriggerEvents } from '@prisma/client';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 export type WebhookTestDialogProps = {
   webhook: Pick<Webhook, 'id' | 'webhookUrl' | 'eventTriggers'>;
@@ -97,18 +82,13 @@ export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps)
           </DialogTitle>
 
           <DialogDescription>
-            <Trans>
-              Send a test webhook with sample data to verify your integration is working correctly.
-            </Trans>
+            <Trans>Send a test webhook with sample data to verify your integration is working correctly.</Trans>
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <fieldset
-              className="flex h-full flex-col space-y-4"
-              disabled={form.formState.isSubmitting}
-            >
+            <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
               <FormField
                 control={form.control}
                 name="event"
@@ -137,10 +117,10 @@ export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps)
               />
 
               <div className="rounded-md border p-4">
-                <h4 className="mb-2 text-sm font-medium">
+                <h4 className="mb-2 font-medium text-sm">
                   <Trans>Webhook URL</Trans>
                 </h4>
-                <p className="text-muted-foreground break-all text-sm">{webhook.webhookUrl}</p>
+                <p className="break-all text-muted-foreground text-sm">{webhook.webhookUrl}</p>
               </div>
 
               <DialogFooter>

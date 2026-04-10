@@ -1,17 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Plural, Trans } from '@lingui/react/macro';
-import { type TemplateDirectLink, TemplateType } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { CheckCircle2Icon, CircleIcon } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { P, match } from 'ts-pattern';
-import { z } from 'zod';
-
-import { type Template } from '@documenso/prisma/types/template-legacy-schema';
+import type { Template } from '@documenso/prisma/types/template-legacy-schema';
 import { trpc } from '@documenso/trpc/react';
 import {
   MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH,
@@ -29,25 +16,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@documenso/ui/primitives/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@documenso/ui/primitives/table';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Plural, Trans } from '@lingui/react/macro';
+import { type TemplateDirectLink, TemplateType } from '@prisma/client';
+import type * as DialogPrimitive from '@radix-ui/react-dialog';
+import { CheckCircle2Icon, CircleIcon } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { match, P } from 'ts-pattern';
+import { z } from 'zod';
 
 import { useCurrentTeam } from '~/providers/team';
 
@@ -145,10 +129,7 @@ export const ManagePublicTemplateDialog = ({
     }
   };
 
-  const onFormSubmit = async ({
-    publicTitle,
-    publicDescription,
-  }: TUpdatePublicTemplateFormSchema) => {
+  const onFormSubmit = async ({ publicTitle, publicDescription }: TUpdatePublicTemplateFormSchema) => {
     if (!selectedTemplateId) {
       return;
     }
@@ -251,9 +232,7 @@ export const ManagePublicTemplateDialog = ({
 
                   <DialogDescription>
                     {team ? (
-                      <Trans>
-                        Select a template you'd like to display on your team's public profile
-                      </Trans>
+                      <Trans>Select a template you'd like to display on your team's public profile</Trans>
                     ) : (
                       <Trans>Select a template you'd like to display on your public profile</Trans>
                     )}
@@ -290,13 +269,9 @@ export const ManagePublicTemplateDialog = ({
                           key={row.id}
                           onClick={() => setSelectedTemplateId(row.id)}
                         >
-                          <TableCell className="text-muted-foreground max-w-[30ch] text-sm">
-                            {row.title}
-                          </TableCell>
+                          <TableCell className="max-w-[30ch] text-muted-foreground text-sm">{row.title}</TableCell>
 
-                          <TableCell className="text-muted-foreground text-sm">
-                            {i18n.date(row.createdAt)}
-                          </TableCell>
+                          <TableCell className="text-muted-foreground text-sm">{i18n.date(row.createdAt)}</TableCell>
 
                           <TableCell>
                             {selectedTemplateId === row.id ? (
@@ -317,11 +292,7 @@ export const ManagePublicTemplateDialog = ({
                     </Button>
                   </DialogClose>
 
-                  <Button
-                    type="button"
-                    disabled={selectedTemplateId === null}
-                    onClick={() => onManageStep()}
-                  >
+                  <Button type="button" disabled={selectedTemplateId === null} onClick={() => onManageStep()}>
                     <Trans>Continue</Trans>
                   </Button>
                 </DialogFooter>
@@ -340,10 +311,7 @@ export const ManagePublicTemplateDialog = ({
                 </DialogHeader>
 
                 <Form {...form}>
-                  <form
-                    className="flex h-full flex-col space-y-4"
-                    onSubmit={form.handleSubmit(onFormSubmit)}
-                  >
+                  <form className="flex h-full flex-col space-y-4" onSubmit={form.handleSubmit(onFormSubmit)}>
                     <FormField
                       control={form.control}
                       name="publicTitle"
@@ -351,10 +319,7 @@ export const ManagePublicTemplateDialog = ({
                         <FormItem>
                           <FormLabel required>Title</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder={_(msg`The public name for your template`)}
-                              {...field}
-                            />
+                            <Input placeholder={_(msg`The public name for your template`)} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -365,17 +330,14 @@ export const ManagePublicTemplateDialog = ({
                       control={form.control}
                       name="publicDescription"
                       render={({ field }) => {
-                        const remaningLength =
-                          MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH - (field.value || '').length;
+                        const remaningLength = MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH - (field.value || '').length;
 
                         return (
                           <FormItem>
                             <FormLabel required>Description</FormLabel>
                             <FormControl>
                               <Textarea
-                                placeholder={_(
-                                  msg`The public description that will be displayed with this template`,
-                                )}
+                                placeholder={_(msg`The public description that will be displayed with this template`)}
                                 {...field}
                               />
                             </FormControl>

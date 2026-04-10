@@ -1,6 +1,5 @@
-import { type Page, expect, test } from '@playwright/test';
-
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, type Page, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 import { expectTextToBeVisible } from '../fixtures/generic';
@@ -59,24 +58,14 @@ test('[USER] revoke sessions', async ({ page }: { page: Page }) => {
   });
 
   // Find table row which does not have text 'Current' and click the button called Revoke within the row.
-  await page
-    .getByRole('row')
-    .filter({ hasNotText: 'Current' })
-    .nth(1)
-    .getByRole('button', { name: 'Revoke' })
-    .click();
+  await page.getByRole('row').filter({ hasNotText: 'Current' }).nth(1).getByRole('button', { name: 'Revoke' }).click();
   await expectTextToBeVisible(page, 'Session revoked');
 
   // Expect (1 sessions + 1 header) rows length
   await expect(page.getByRole('row')).toHaveCount(2);
 
   // Revoke own session.
-  await page
-    .getByRole('row')
-    .filter({ hasText: 'Current' })
-    .first()
-    .getByRole('button', { name: 'Revoke' })
-    .click();
+  await page.getByRole('row').filter({ hasText: 'Current' }).first().getByRole('button', { name: 'Revoke' }).click();
 
   await expect(page).toHaveURL('/signin');
 });

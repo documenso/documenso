@@ -1,10 +1,9 @@
-import { Trans } from '@lingui/react/macro';
-import { Link } from 'react-router';
-
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { acceptOrganisationInvitation } from '@documenso/lib/server-only/organisation/accept-organisation-invitation';
 import { prisma } from '@documenso/prisma';
 import { Button } from '@documenso/ui/primitives/button';
+import { Trans } from '@lingui/react/macro';
+import { Link } from 'react-router';
 
 import type { Route } from './+types/organisation.invite.$token';
 
@@ -80,14 +79,12 @@ export default function AcceptInvitationPage({ loaderData }: Route.ComponentProp
     return (
       <div className="w-screen max-w-lg px-4">
         <div className="w-full">
-          <h1 className="text-4xl font-semibold">
+          <h1 className="font-semibold text-4xl">
             <Trans>Invalid token</Trans>
           </h1>
 
-          <p className="text-muted-foreground mb-4 mt-2 text-sm">
-            <Trans>
-              This token is invalid or has expired. Please contact your team for a new invitation.
-            </Trans>
+          <p className="mt-2 mb-4 text-muted-foreground text-sm">
+            <Trans>This token is invalid or has expired. Please contact your team for a new invitation.</Trans>
           </p>
 
           <Button asChild>
@@ -103,18 +100,17 @@ export default function AcceptInvitationPage({ loaderData }: Route.ComponentProp
   if (data.state === 'LoginRequired') {
     return (
       <div>
-        <h1 className="text-4xl font-semibold">
+        <h1 className="font-semibold text-4xl">
           <Trans>Organisation invitation</Trans>
         </h1>
 
-        <p className="text-muted-foreground mt-2 text-sm">
+        <p className="mt-2 text-muted-foreground text-sm">
           <Trans>
-            You have been invited by <strong>{data.organisationName}</strong> to join their
-            organisation.
+            You have been invited by <strong>{data.organisationName}</strong> to join their organisation.
           </Trans>
         </p>
 
-        <p className="text-muted-foreground mb-4 mt-1 text-sm">
+        <p className="mt-1 mb-4 text-muted-foreground text-sm">
           <Trans>To accept this invitation you must create an account.</Trans>
         </p>
 
@@ -129,14 +125,13 @@ export default function AcceptInvitationPage({ loaderData }: Route.ComponentProp
 
   return (
     <div>
-      <h1 className="text-4xl font-semibold">
+      <h1 className="font-semibold text-4xl">
         <Trans>Invitation accepted!</Trans>
       </h1>
 
-      <p className="text-muted-foreground mb-4 mt-2 text-sm">
+      <p className="mt-2 mb-4 text-muted-foreground text-sm">
         <Trans>
-          You have accepted an invitation from <strong>{data.organisationName}</strong> to join
-          their organisation.
+          You have accepted an invitation from <strong>{data.organisationName}</strong> to join their organisation.
         </Trans>
       </p>
 

@@ -1,7 +1,3 @@
-import { RecipientRole } from '@prisma/client';
-import { data } from 'react-router';
-import { match } from 'ts-pattern';
-
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
@@ -21,6 +17,9 @@ import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { isRecipientExpired } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
+import { RecipientRole } from '@prisma/client';
+import { data } from 'react-router';
+import { match } from 'ts-pattern';
 
 import { EmbedSignDocumentV1ClientPage } from '~/components/embed/embed-document-signing-page-v1';
 import { EmbedSignDocumentV2ClientPage } from '~/components/embed/embed-document-signing-page-v2';
@@ -334,11 +333,7 @@ export default function EmbedSignDocumentPage() {
   return <EmbedSignDocumentPageV2 data={payload} />;
 }
 
-const EmbedSignDocumentPageV1 = ({
-  data,
-}: {
-  data: Awaited<ReturnType<typeof handleV1Loader>>;
-}) => {
+const EmbedSignDocumentPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loader>> }) => {
   const {
     token,
     user,
@@ -360,11 +355,7 @@ const EmbedSignDocumentPageV1 = ({
       uploadSignatureEnabled={document.documentMeta?.uploadSignatureEnabled}
       drawSignatureEnabled={document.documentMeta?.drawSignatureEnabled}
     >
-      <DocumentSigningAuthProvider
-        documentAuthOptions={document.authOptions}
-        recipient={recipient}
-        user={user}
-      >
+      <DocumentSigningAuthProvider documentAuthOptions={document.authOptions} recipient={recipient} user={user}>
         <EmbedSignDocumentV1ClientPage
           token={token}
           documentId={document.id}
@@ -384,11 +375,7 @@ const EmbedSignDocumentPageV1 = ({
   );
 };
 
-const EmbedSignDocumentPageV2 = ({
-  data,
-}: {
-  data: Awaited<ReturnType<typeof handleV2Loader>>;
-}) => {
+const EmbedSignDocumentPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV2Loader>> }) => {
   const { token, user, envelopeForSigning, hidePoweredBy, allowEmbedSigningWhitelabel } = data;
 
   const { envelope, recipient } = envelopeForSigning;
@@ -400,11 +387,7 @@ const EmbedSignDocumentPageV2 = ({
       fullName={user?.email === recipient.email ? user?.name : recipient.name}
       signature={user?.email === recipient.email ? user?.signature : undefined}
     >
-      <DocumentSigningAuthProvider
-        documentAuthOptions={envelope.authOptions}
-        recipient={recipient}
-        user={user}
-      >
+      <DocumentSigningAuthProvider documentAuthOptions={envelope.authOptions} recipient={recipient} user={user}>
         <EnvelopeRenderProvider
           version="current"
           envelope={envelope}

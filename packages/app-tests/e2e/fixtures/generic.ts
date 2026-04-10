@@ -1,5 +1,5 @@
 import type { Locator } from '@playwright/test';
-import { type Page, expect } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 
 export const expectTextToBeVisible = async (page: Page, text: string) => {
   await expect(page.getByText(text).first()).toBeVisible();

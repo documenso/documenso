@@ -1,21 +1,12 @@
-import { expect, test } from '@playwright/test';
-import {
-  DocumentSigningOrder,
-  DocumentStatus,
-  FieldType,
-  RecipientRole,
-  SigningStatus,
-} from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
 import { seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
+import { DocumentSigningOrder, DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
 
 import { signDirectSignaturePad, signSignaturePad } from '../fixtures/signature';
 
-test('[NEXT_RECIPIENT_DICTATION]: should allow updating next recipient when dictation is enabled', async ({
-  page,
-}) => {
+test('[NEXT_RECIPIENT_DICTATION]: should allow updating next recipient when dictation is enabled', async ({ page }) => {
   const { user, team } = await seedUser();
   const { user: firstSigner } = await seedUser();
   const { user: secondSigner } = await seedUser();
@@ -157,9 +148,7 @@ test('[NEXT_RECIPIENT_DICTATION]: should not show dictation UI when disabled', a
   await page.getByRole('button', { name: 'Complete' }).click();
 
   // Verify next recipient UI is not shown
-  await expect(
-    page.getByText('The next recipient to sign this document will be'),
-  ).not.toBeVisible();
+  await expect(page.getByText('The next recipient to sign this document will be')).not.toBeVisible();
   await expect(page.getByRole('button', { name: 'Update Recipient' })).not.toBeVisible();
 
   // Submit and verify completion
@@ -243,9 +232,7 @@ test('[NEXT_RECIPIENT_DICTATION]: should work with parallel signing flow', async
     await page.getByRole('button', { name: 'Complete' }).click();
 
     // Verify next recipient UI is not shown in parallel flow
-    await expect(
-      page.getByText('The next recipient to sign this document will be'),
-    ).not.toBeVisible();
+    await expect(page.getByText('The next recipient to sign this document will be')).not.toBeVisible();
     await expect(page.getByRole('button', { name: 'Update Recipient' })).not.toBeVisible();
 
     // Submit and verify completion
@@ -274,9 +261,7 @@ test('[NEXT_RECIPIENT_DICTATION]: should work with parallel signing flow', async
   }).toPass();
 });
 
-test('[NEXT_RECIPIENT_DICTATION]: should allow assistant to dictate next signer', async ({
-  page,
-}) => {
+test('[NEXT_RECIPIENT_DICTATION]: should allow assistant to dictate next signer', async ({ page }) => {
   const { user, team } = await seedUser();
   const { user: assistant } = await seedUser();
   const { user: signer } = await seedUser();

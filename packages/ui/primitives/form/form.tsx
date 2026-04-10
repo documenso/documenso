@@ -1,9 +1,8 @@
-import * as React from 'react';
-
 import { useLingui } from '@lingui/react';
 import type * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
 import { AnimatePresence, motion } from 'framer-motion';
+import * as React from 'react';
 import type { ControllerProps, FieldPath, FieldValues } from 'react-hook-form';
 import { Controller, FormProvider, useFormContext } from 'react-hook-form';
 
@@ -98,97 +97,73 @@ const FormLabel = React.forwardRef<
 });
 FormLabel.displayName = 'FormLabel';
 
-const FormControl = React.forwardRef<
-  React.ElementRef<typeof Slot>,
-  React.ComponentPropsWithoutRef<typeof Slot>
->(({ ...props }, ref) => {
-  const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
+const FormControl = React.forwardRef<React.ElementRef<typeof Slot>, React.ComponentPropsWithoutRef<typeof Slot>>(
+  ({ ...props }, ref) => {
+    const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
 
-  return (
-    <Slot
-      ref={ref}
-      id={formItemId}
-      aria-describedby={!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`}
-      aria-invalid={!!error}
-      {...props}
-    />
-  );
-});
+    return (
+      <Slot
+        ref={ref}
+        id={formItemId}
+        aria-describedby={!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`}
+        aria-invalid={!!error}
+        {...props}
+      />
+    );
+  },
+);
 FormControl.displayName = 'FormControl';
 
-const FormDescription = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => {
-  const { formDescriptionId } = useFormField();
+const FormDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
+  ({ className, ...props }, ref) => {
+    const { formDescriptionId } = useFormField();
 
-  return (
-    <p
-      ref={ref}
-      id={formDescriptionId}
-      className={cn('text-muted-foreground text-sm', className)}
-      {...props}
-    />
-  );
-});
+    return <p ref={ref} id={formDescriptionId} className={cn('text-muted-foreground text-sm', className)} {...props} />;
+  },
+);
 FormDescription.displayName = 'FormDescription';
 
-const FormMessage = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, children, ...props }, ref) => {
-  const { i18n } = useLingui();
+const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
+  ({ className, children, ...props }, ref) => {
+    const { i18n } = useLingui();
 
-  const { error, formMessageId } = useFormField();
+    const { error, formMessageId } = useFormField();
 
-  let body = error ? String(error?.message) : children;
+    let body = error ? String(error?.message) : children;
 
-  if (!body) {
-    return null;
-  }
+    if (!body) {
+      return null;
+    }
 
-  // Checks to see if there's a translation for the string, since we're passing IDs for Zod errors.
-  if (typeof body === 'string' && i18n.t(body)) {
-    body = i18n.t(body);
-  }
+    // Checks to see if there's a translation for the string, since we're passing IDs for Zod errors.
+    if (typeof body === 'string' && i18n.t(body)) {
+      body = i18n.t(body);
+    }
 
-  return (
-    <AnimatePresence>
-      <motion.div
-        initial={{
-          opacity: 0,
-          y: -10,
-        }}
-        animate={{
-          opacity: 1,
-          y: 0,
-        }}
-        exit={{
-          opacity: 0,
-          y: 10,
-        }}
-      >
-        <p
-          ref={ref}
-          id={formMessageId}
-          className={cn('text-xs text-red-500', className)}
-          {...props}
+    return (
+      <AnimatePresence>
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: -10,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          exit={{
+            opacity: 0,
+            y: 10,
+          }}
         >
-          {body}
-        </p>
-      </motion.div>
-    </AnimatePresence>
-  );
-});
+          <p ref={ref} id={formMessageId} className={cn('text-red-500 text-xs', className)} {...props}>
+            {body}
+          </p>
+        </motion.div>
+      </AnimatePresence>
+    );
+  },
+);
 FormMessage.displayName = 'FormMessage';
 
-export {
-  useFormField,
-  Form,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormDescription,
-  FormMessage,
-  FormField,
-};
+export { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage, useFormField };

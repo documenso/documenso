@@ -5,10 +5,7 @@ import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZResendWebhookCallRequestSchema,
-  ZResendWebhookCallResponseSchema,
-} from './resend-webhook-call.types';
+import { ZResendWebhookCallRequestSchema, ZResendWebhookCallResponseSchema } from './resend-webhook-call.types';
 
 export const resendWebhookCallRoute = authenticatedProcedure
   .input(ZResendWebhookCallRequestSchema)

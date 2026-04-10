@@ -1,12 +1,3 @@
-import { useMemo, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Building2Icon, PlusIcon } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-
 import type { InternalClaimPlans } from '@documenso/ee/server-only/stripe/get-internal-claim-plans';
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
@@ -26,19 +17,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Building2Icon, PlusIcon } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 import { ZCreateOrganisationFormSchema } from '../dialogs/organisation-create-dialog';
 
@@ -75,10 +65,7 @@ export const BillingPlans = ({ plans }: BillingPlansProps) => {
 
   return (
     <div>
-      <Tabs
-        value={interval}
-        onValueChange={(value) => setInterval(value as 'monthlyPrice' | 'yearlyPrice')}
-      >
+      <Tabs value={interval} onValueChange={(value) => setInterval(value as 'monthlyPrice' | 'yearlyPrice')}>
         <TabsList>
           <TabsTrigger className="min-w-[150px]" value="monthlyPrice">
             <Trans>Monthly</Trans>
@@ -101,24 +88,18 @@ export const BillingPlans = ({ plans }: BillingPlansProps) => {
               <CardContent className="flex h-full flex-col p-6">
                 <CardTitle>{price.product.name}</CardTitle>
 
-                <div className="mt-2 text-lg font-medium text-muted-foreground">
+                <div className="mt-2 font-medium text-lg text-muted-foreground">
                   {price.friendlyPrice + ' '}
                   <span className="text-xs">
-                    {interval === 'monthlyPrice' ? (
-                      <Trans>per month</Trans>
-                    ) : (
-                      <Trans>per year</Trans>
-                    )}
+                    {interval === 'monthlyPrice' ? <Trans>per month</Trans> : <Trans>per year</Trans>}
                   </span>
                 </div>
 
-                <div className="mt-1.5 text-sm text-muted-foreground">
-                  {price.product.description}
-                </div>
+                <div className="mt-1.5 text-muted-foreground text-sm">{price.product.description}</div>
 
                 {price.product.features && price.product.features.length > 0 && (
                   <div className="mt-4 text-muted-foreground">
-                    <div className="text-sm font-medium">
+                    <div className="font-medium text-sm">
                       <Trans>Includes:</Trans>
                     </div>
 
@@ -173,9 +154,7 @@ const BillingDialog = ({
   const organisation = useCurrentOrganisation();
 
   const [subscriptionOption, setSubscriptionOption] = useState<'update' | 'create'>(
-    organisation.type === 'PERSONAL' && claim === INTERNAL_CLAIM_ID.INDIVIDUAL
-      ? 'update'
-      : 'create',
+    organisation.type === 'PERSONAL' && claim === INTERNAL_CLAIM_ID.INDIVIDUAL ? 'update' : 'create',
   );
 
   const [step, setStep] = useState(0);
@@ -190,8 +169,7 @@ const BillingDialog = ({
   const { mutateAsync: createSubscription, isPending: isCreatingSubscription } =
     trpc.enterprise.billing.subscription.create.useMutation();
 
-  const { mutateAsync: createOrganisation, isPending: isCreatingOrganisation } =
-    trpc.organisation.create.useMutation();
+  const { mutateAsync: createOrganisation, isPending: isCreatingOrganisation } = trpc.organisation.create.useMutation();
 
   const isPending = isCreatingSubscription || isCreatingOrganisation;
 
@@ -263,7 +241,7 @@ const BillingDialog = ({
                     <Building2Icon className="h-4 w-4" />
                     <Trans>Update current organisation</Trans>
                   </Label>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     <Trans>
                       Upgrade <strong>{organisation.name}</strong> to {planName}
                     </Trans>
@@ -278,10 +256,10 @@ const BillingDialog = ({
                     <PlusIcon className="h-4 w-4" />
                     <Trans>Create separate organisation</Trans>
                   </Label>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     <Trans>
-                      Create a new organisation with {planName} plan. Keep your current organisation
-                      on it's current plan
+                      Create a new organisation with {planName} plan. Keep your current organisation on it's current
+                      plan
                     </Trans>
                   </p>
                 </div>
@@ -347,8 +325,7 @@ export const IndividualPersonalLayoutCheckoutButton = ({
   const { toast } = useToast();
   const { organisations } = useSession();
 
-  const { mutateAsync: createSubscription, isPending } =
-    trpc.enterprise.billing.subscription.create.useMutation();
+  const { mutateAsync: createSubscription, isPending } = trpc.enterprise.billing.subscription.create.useMutation();
 
   const onSubscribeClick = async () => {
     try {

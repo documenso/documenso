@@ -1,10 +1,9 @@
-import { expect, test } from '@playwright/test';
-import { TeamMemberRole } from '@prisma/client';
-
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
+import { TeamMemberRole } from '@prisma/client';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -55,9 +54,7 @@ test('[TEMPLATE_FLOW] add document visibility settings', async ({ page }) => {
   // Set document visibility.
   await page.getByTestId('documentVisibilitySelectValue').click();
   await page.getByLabel('Managers and above').click();
-  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText(
-    'Managers and above',
-  );
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText('Managers and above');
 
   // Save the settings by going to the next step.
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -67,9 +64,7 @@ test('[TEMPLATE_FLOW] add document visibility settings', async ({ page }) => {
   await page.goto(`/t/${team.url}/templates/${template.id}/edit`);
 
   await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
-  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText(
-    'Managers and above',
-  );
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText('Managers and above');
 });
 
 test('[TEMPLATE_FLOW] team member visibility permissions', async ({ page }) => {
@@ -103,9 +98,7 @@ test('[TEMPLATE_FLOW] team member visibility permissions', async ({ page }) => {
   // Manager should be able to set visibility to managers and above
   await page.getByTestId('documentVisibilitySelectValue').click();
   await page.getByLabel('Managers and above').click();
-  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText(
-    'Managers and above',
-  );
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText('Managers and above');
   await expect(page.getByText('Admins only')).toBeDisabled();
 
   // Save and verify
@@ -133,9 +126,7 @@ test('[TEMPLATE_FLOW] team member visibility permissions', async ({ page }) => {
   });
 
   // Navigate to the new template
-  await page.goto(
-    `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(everyoneTemplate.secondaryId)}/edit`,
-  );
+  await page.goto(`/t/${team.url}/templates/${mapSecondaryIdToTemplateId(everyoneTemplate.secondaryId)}/edit`);
 
   // Regular member should be able to see but not modify visibility
   await expect(page.getByTestId('documentVisibilitySelectValue')).toBeDisabled();

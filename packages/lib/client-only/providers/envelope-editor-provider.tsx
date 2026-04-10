@@ -1,9 +1,3 @@
-import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
-
-import { useLingui } from '@lingui/react/macro';
-import { EnvelopeType, Prisma, ReadStatus, SendStatus, SigningStatus } from '@prisma/client';
-import { useSearchParams } from 'react-router';
-
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import {
   DEFAULT_EDITOR_CONFIG,
@@ -17,11 +11,16 @@ import type { TUpdateEnvelopeRequest } from '@documenso/trpc/server/envelope-rou
 import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import { getRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { useLingui } from '@lingui/react/macro';
+import { EnvelopeType, Prisma, ReadStatus, SendStatus, SigningStatus } from '@prisma/client';
+import type React from 'react';
+import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router';
 
 import type { TDocumentEmailSettings } from '../../types/document-email';
 import { formatDocumentsPath, formatTemplatesPath } from '../../utils/teams';
-import { useEditorFields } from '../hooks/use-editor-fields';
 import type { TLocalField } from '../hooks/use-editor-fields';
+import { useEditorFields } from '../hooks/use-editor-fields';
 import { useEditorRecipients } from '../hooks/use-editor-recipients';
 import { useEnvelopeAutosave } from '../hooks/use-envelope-autosave';
 
@@ -176,16 +175,12 @@ export const EnvelopeEditorProvider = ({
       setEnvelope((prev) => ({
         ...prev,
         recipients,
-        fields: prev.fields.filter((field) =>
-          recipients.some((recipient) => recipient.id === field.recipientId),
-        ),
+        fields: prev.fields.filter((field) => recipients.some((recipient) => recipient.id === field.recipientId)),
       }));
 
       // Reset the local fields to ensure deleted recipient fields are removed.
       editorFields.resetForm(
-        envelope.fields.filter((field) =>
-          recipients.some((recipient) => recipient.id === field.recipientId),
-        ),
+        envelope.fields.filter((field) => recipients.some((recipient) => recipient.id === field.recipientId)),
       );
 
       setAutosaveError(false);
@@ -203,9 +198,7 @@ export const EnvelopeEditorProvider = ({
     }
   }, 1000);
 
-  const setRecipientsAsync = async (
-    localRecipients: TSetEnvelopeRecipientsRequest['recipients'],
-  ) => {
+  const setRecipientsAsync = async (localRecipients: TSetEnvelopeRecipientsRequest['recipients']) => {
     setRecipientsDebounced(localRecipients);
     await flushSetRecipients();
   };
@@ -346,8 +339,7 @@ export const EnvelopeEditorProvider = ({
   };
 
   const getRecipientColorKey = useCallback(
-    (recipientId: number) =>
-      getRecipientColor(envelope.recipients.findIndex((r) => r.id === recipientId)),
+    (recipientId: number) => getRecipientColor(envelope.recipients.findIndex((r) => r.id === recipientId)),
     [envelope.recipients],
   );
 
@@ -536,10 +528,7 @@ const mapLocalRecipientsToRecipients = ({
       documentDeletedAt: foundRecipient?.documentDeletedAt || null,
       expired: foundRecipient?.expired || null,
       signedAt: foundRecipient?.signedAt || null,
-      authOptions:
-        recipient.actionAuth.length > 0
-          ? { actionAuth: recipient.actionAuth, accessAuth: [] }
-          : null,
+      authOptions: recipient.actionAuth.length > 0 ? { actionAuth: recipient.actionAuth, accessAuth: [] } : null,
       signingOrder: recipient.signingOrder ?? null,
       rejectionReason: foundRecipient?.rejectionReason || null,
       role: recipient.role,

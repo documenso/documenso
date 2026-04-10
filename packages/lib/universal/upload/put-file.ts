@@ -1,12 +1,8 @@
+import { env } from '@documenso/lib/utils/env';
+import type { TGetPresignedPostUrlResponse, TUploadPdfResponse } from '@documenso/remix/server/api/files/files.types';
 import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
 import { match } from 'ts-pattern';
-
-import { env } from '@documenso/lib/utils/env';
-import type {
-  TGetPresignedPostUrlResponse,
-  TUploadPdfResponse,
-} from '@documenso/remix/server/api/files/files.types';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError } from '../../errors/app-error';
@@ -67,24 +63,19 @@ const putFileInDatabase = async (file: File) => {
 };
 
 const putFileInS3 = async (file: File) => {
-  const getPresignedUrlResponse = await fetch(
-    `${NEXT_PUBLIC_WEBAPP_URL()}/api/files/presigned-post-url`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        fileName: file.name,
-        contentType: file.type,
-      }),
+  const getPresignedUrlResponse = await fetch(`${NEXT_PUBLIC_WEBAPP_URL()}/api/files/presigned-post-url`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
     },
-  );
+    body: JSON.stringify({
+      fileName: file.name,
+      contentType: file.type,
+    }),
+  });
 
   if (!getPresignedUrlResponse.ok) {
-    throw new Error(
-      `Failed to get presigned post url, failed with status code ${getPresignedUrlResponse.status}`,
-    );
+    throw new Error(`Failed to get presigned post url, failed with status code ${getPresignedUrlResponse.status}`);
   }
 
   const { url, key }: TGetPresignedPostUrlResponse = await getPresignedUrlResponse.json();
@@ -100,9 +91,7 @@ const putFileInS3 = async (file: File) => {
   });
 
   if (!reponse.ok) {
-    throw new Error(
-      `Failed to upload file "${file.name}", failed with status code ${reponse.status}`,
-    );
+    throw new Error(`Failed to upload file "${file.name}", failed with status code ${reponse.status}`);
   }
 
   return {

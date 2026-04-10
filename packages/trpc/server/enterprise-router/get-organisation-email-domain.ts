@@ -32,10 +32,7 @@ type GetOrganisationEmailDomainOptions = {
   emailDomainId: string;
 };
 
-export const getOrganisationEmailDomain = async ({
-  userId,
-  emailDomainId,
-}: GetOrganisationEmailDomainOptions) => {
+export const getOrganisationEmailDomain = async ({ userId, emailDomainId }: GetOrganisationEmailDomainOptions) => {
   const emailDomain = await prisma.emailDomain.findFirst({
     where: {
       id: emailDomainId,

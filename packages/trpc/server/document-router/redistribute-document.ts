@@ -3,9 +3,9 @@ import { resendDocument } from '@documenso/lib/server-only/document/resend-docum
 import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';
 import {
+  redistributeDocumentMeta,
   ZRedistributeDocumentRequestSchema,
   ZRedistributeDocumentResponseSchema,
-  redistributeDocumentMeta,
 } from './redistribute-document.types';
 
 export const redistributeDocumentRoute = authenticatedProcedure

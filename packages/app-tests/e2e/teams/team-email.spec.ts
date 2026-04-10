@@ -1,8 +1,7 @@
-import { expect, test } from '@playwright/test';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { seedTeamEmailVerification } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 import { openDropdownMenu } from '../fixtures/generic';
@@ -25,10 +24,7 @@ test('[TEAMS]: send team email request', async ({ page }) => {
   await page.getByRole('button', { name: 'Add' }).click();
 
   await expect(
-    page
-      .getByRole('status')
-      .filter({ hasText: 'We have sent a confirmation email for verification.' })
-      .first(),
+    page.getByRole('status').filter({ hasText: 'We have sent a confirmation email for verification.' }).first(),
   ).toBeVisible();
 });
 
@@ -55,10 +51,7 @@ test('[TEAMS]: delete team email', async ({ page }) => {
     redirectPath: `/t/${team.url}/settings`,
   });
 
-  const settingsBtn = page
-    .locator('section div')
-    .filter({ hasText: 'Team email' })
-    .getByRole('button');
+  const settingsBtn = page.locator('section div').filter({ hasText: 'Team email' }).getByRole('button');
   await openDropdownMenu(page, settingsBtn);
 
   await expect(page.getByRole('menuitem', { name: 'Remove' })).toBeVisible();

@@ -3,10 +3,7 @@ import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constan
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getMemberOrganisationRole } from '@documenso/lib/server-only/team/get-member-roles';
 import { validateIfSubscriptionIsRequired } from '@documenso/lib/utils/billing';
-import {
-  buildOrganisationWhereQuery,
-  isOrganisationRoleWithinUserHierarchy,
-} from '@documenso/lib/utils/organisations';
+import { buildOrganisationWhereQuery, isOrganisationRoleWithinUserHierarchy } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
@@ -78,11 +75,7 @@ export const deleteOrganisationMemberInvitesRoute = authenticatedProcedure
     });
 
     const hasUnauthorizedRoleAccess = invitesToDelete.some(
-      (invite) =>
-        !isOrganisationRoleWithinUserHierarchy(
-          currentOrganisationMemberRole,
-          invite.organisationRole,
-        ),
+      (invite) => !isOrganisationRoleWithinUserHierarchy(currentOrganisationMemberRole, invite.organisationRole),
     );
 
     if (hasUnauthorizedRoleAccess) {
@@ -100,11 +93,7 @@ export const deleteOrganisationMemberInvitesRoute = authenticatedProcedure
     const totalMemberCountWithInvites = numberOfCurrentMembers + numberOfCurrentInvites - 1;
 
     if (subscription) {
-      await syncMemberCountWithStripeSeatPlan(
-        subscription,
-        organisationClaim,
-        totalMemberCountWithInvites,
-      );
+      await syncMemberCountWithStripeSeatPlan(subscription, organisationClaim, totalMemberCountWithInvites);
     }
 
     await prisma.organisationMemberInvite.deleteMany({

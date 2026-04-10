@@ -1,7 +1,6 @@
+import { prisma } from '@documenso/prisma';
 import { DocumentStatus, EnvelopeType } from '@prisma/client';
 import { match } from 'ts-pattern';
-
-import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DocumentAccessAuth, type TDocumentAuthMethods } from '../../types/document-auth';
@@ -84,9 +83,7 @@ export const getEnvelopeForDirectTemplateSigning = async ({
     },
   });
 
-  const recipient = (envelope?.recipients || []).find(
-    (r) => r.id === envelope?.directLink?.directTemplateRecipientId,
-  );
+  const recipient = (envelope?.recipients || []).find((r) => r.id === envelope?.directLink?.directTemplateRecipientId);
 
   if (!envelope || !recipient) {
     throw new AppError(AppErrorCode.NOT_FOUND, {

@@ -1,4 +1,4 @@
-import { type TSiteSettingsBannerSchema } from '@documenso/lib/server-only/site-settings/schemas/banner';
+import type { TSiteSettingsBannerSchema } from '@documenso/lib/server-only/site-settings/schemas/banner';
 
 export type AppBannerProps = {
   banner: TSiteSettingsBannerSchema;
@@ -12,7 +12,7 @@ export const AppBanner = ({ banner }: AppBannerProps) => {
   return (
     <div className="mb-2" style={{ background: banner.data.bgColor }}>
       <div
-        className="mx-auto flex h-auto max-w-screen-xl items-center justify-center px-4 py-3 text-sm font-medium"
+        className="mx-auto flex h-auto max-w-screen-xl items-center justify-center px-4 py-3 font-medium text-sm"
         style={{ color: banner.data.textColor }}
       >
         <div className="flex items-center">

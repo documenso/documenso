@@ -1,9 +1,8 @@
-import { SubscriptionStatus } from '@prisma/client';
-
 import { createOrganisationClaimUpsertData } from '@documenso/lib/server-only/organisation/create-organisation';
 import type { Stripe } from '@documenso/lib/server-only/stripe';
 import { INTERNAL_CLAIM_ID, internalClaims } from '@documenso/lib/types/subscription';
 import { prisma } from '@documenso/prisma';
+import { SubscriptionStatus } from '@prisma/client';
 
 import { extractStripeClaimId } from './on-subscription-updated';
 

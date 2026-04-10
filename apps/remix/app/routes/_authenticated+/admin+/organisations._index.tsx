@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react';
-
-import { useLingui } from '@lingui/react/macro';
-import { useLocation, useSearchParams } from 'react-router';
-
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { Input } from '@documenso/ui/primitives/input';
+import { useLingui } from '@lingui/react/macro';
+import { useEffect, useState } from 'react';
+import { useLocation, useSearchParams } from 'react-router';
 
 import { SettingsHeader } from '~/components/general/settings-header';
 import { AdminOrganisationsTable } from '~/components/tables/admin-organisations-table';
@@ -41,11 +39,7 @@ export default function Organisations() {
 
   return (
     <div>
-      <SettingsHeader
-        hideDivider
-        title={t`Manage organisations`}
-        subtitle={t`Search and manage all organisations`}
-      />
+      <SettingsHeader hideDivider title={t`Manage organisations`} subtitle={t`Search and manage all organisations`} />
 
       <div className="mt-4">
         <Input

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { type JobDefinition } from '../../client/_internal/job';
+import type { JobDefinition } from '../../client/_internal/job';
 
 const SEND_DOCUMENT_CREATED_FROM_DIRECT_TEMPLATE_EMAIL_JOB_DEFINITION_ID =
   'send.document.created.from.direct.template.email';

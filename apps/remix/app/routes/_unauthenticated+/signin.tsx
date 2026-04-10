@@ -1,10 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { Link, redirect, useSearchParams } from 'react-router';
-
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import {
   IS_GOOGLE_SSO_ENABLED,
@@ -15,6 +8,11 @@ import {
 import { env } from '@documenso/lib/utils/env';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { useEffect, useState } from 'react';
+import { Link, redirect, useSearchParams } from 'react-router';
 
 import { SignInForm } from '~/components/forms/signin';
 import { SIGNUP_ERROR_MESSAGES } from '~/components/forms/signup';
@@ -53,13 +51,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export default function SignIn({ loaderData }: Route.ComponentProps) {
-  const {
-    isGoogleSSOEnabled,
-    isMicrosoftSSOEnabled,
-    isOIDCSSOEnabled,
-    oidcProviderLabel,
-    returnTo,
-  } = loaderData;
+  const { isGoogleSSOEnabled, isMicrosoftSSOEnabled, isOIDCSSOEnabled, oidcProviderLabel, returnTo } = loaderData;
 
   const { _ } = useLingui();
 
@@ -86,11 +78,11 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
           </Alert>
         )}
 
-        <h1 className="text-2xl font-semibold">
+        <h1 className="font-semibold text-2xl">
           <Trans>Sign in to your account</Trans>
         </h1>
 
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-2 text-muted-foreground text-sm">
           <Trans>Welcome back, we are lucky to have you.</Trans>
         </p>
         <hr className="-mx-6 my-4" />
@@ -104,7 +96,7 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
         />
 
         {!isEmbeddedRedirect && env('NEXT_PUBLIC_DISABLE_SIGNUP') !== 'true' && (
-          <p className="mt-6 text-center text-sm text-muted-foreground">
+          <p className="mt-6 text-center text-muted-foreground text-sm">
             <Trans>
               Don't have an account?{' '}
               <Link

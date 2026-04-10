@@ -1,13 +1,3 @@
-import { useEffect, useMemo, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { OrganisationGroupType, TeamMemberRole } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { useForm } from 'react-hook-form';
-import { match } from 'ts-pattern';
-import { z } from 'zod';
-
 import { TEAM_MEMBER_ROLE_HIERARCHY } from '@documenso/lib/constants/teams';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
 import { trpc } from '@documenso/trpc/react';
@@ -32,14 +22,16 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { OrganisationGroupType, TeamMemberRole } from '@prisma/client';
+import type * as DialogPrimitive from '@radix-ui/react-dialog';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
+import { z } from 'zod';
 
 import { useCurrentTeam } from '~/providers/team';
 
@@ -184,21 +176,18 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
                               value: group.id,
                             }))}
                             loading={organisationGroupQuery.isLoading || teamGroupQuery.isLoading}
-                            selectedValues={field.value.map(
-                              ({ organisationGroupId }) => organisationGroupId,
-                            )}
+                            selectedValues={field.value.map(({ organisationGroupId }) => organisationGroupId)}
                             onChange={(value) => {
                               field.onChange(
                                 value.map((organisationGroupId) => ({
                                   organisationGroupId,
                                   teamRole:
-                                    field.value.find(
-                                      (value) => value.organisationGroupId === organisationGroupId,
-                                    )?.teamRole || TeamMemberRole.MEMBER,
+                                    field.value.find((value) => value.organisationGroupId === organisationGroupId)
+                                      ?.teamRole || TeamMemberRole.MEMBER,
                                 })),
                               );
                             }}
-                            className="bg-background w-full"
+                            className="w-full bg-background"
                             emptySelectionPlaceholder={t`Select groups`}
                           />
                         </FormControl>
@@ -243,9 +232,8 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
                             readOnly
                             className="bg-background"
                             value={
-                              avaliableOrganisationGroups.find(
-                                ({ id }) => id === group.organisationGroupId,
-                              )?.name || t`Untitled Group`
+                              avaliableOrganisationGroups.find(({ id }) => id === group.organisationGroupId)?.name ||
+                              t`Untitled Group`
                             }
                           />
                         </div>
@@ -267,13 +255,11 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
                                   </SelectTrigger>
 
                                   <SelectContent position="popper">
-                                    {TEAM_MEMBER_ROLE_HIERARCHY[team.currentTeamRole].map(
-                                      (role) => (
-                                        <SelectItem key={role} value={role}>
-                                          {t(TEAM_MEMBER_ROLE_MAP[role]) ?? role}
-                                        </SelectItem>
-                                      ),
-                                    )}
+                                    {TEAM_MEMBER_ROLE_HIERARCHY[team.currentTeamRole].map((role) => (
+                                      <SelectItem key={role} value={role}>
+                                        {t(TEAM_MEMBER_ROLE_MAP[role]) ?? role}
+                                      </SelectItem>
+                                    ))}
                                   </SelectContent>
                                 </Select>
                               </FormControl>

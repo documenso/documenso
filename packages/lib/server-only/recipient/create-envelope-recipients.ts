@@ -1,14 +1,11 @@
-import { EnvelopeType, RecipientRole } from '@prisma/client';
-import { SendStatus, SigningStatus } from '@prisma/client';
-
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
-import { type TRecipientActionAuthTypes } from '@documenso/lib/types/document-auth';
+import type { TRecipientAccessAuthTypes, TRecipientActionAuthTypes } from '@documenso/lib/types/document-auth';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { nanoid } from '@documenso/lib/universal/id';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
@@ -105,8 +102,7 @@ export const createEnvelopeRecipients = async ({
             signingOrder: recipient.signingOrder,
             token: nanoid(),
             sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
-            signingStatus:
-              recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
+            signingStatus: recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
             authOptions,
           },
         });
@@ -136,8 +132,6 @@ export const createEnvelopeRecipients = async ({
   });
 
   return {
-    recipients: createdRecipients.map((recipient) =>
-      mapRecipientToLegacyRecipient(recipient, envelope),
-    ),
+    recipients: createdRecipients.map((recipient) => mapRecipientToLegacyRecipient(recipient, envelope)),
   };
 };

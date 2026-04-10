@@ -1,12 +1,11 @@
-import { sValidator } from '@hono/standard-validator';
-import { Hono } from 'hono';
-
 import { AppError } from '@documenso/lib/errors/app-error';
 import { disableTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/disable-2fa';
 import { enableTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/enable-2fa';
 import { setupTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/setup-2fa';
 import { viewBackupCodes } from '@documenso/lib/server-only/2fa/view-backup-codes';
 import { prisma } from '@documenso/prisma';
+import { sValidator } from '@hono/standard-validator';
+import { Hono } from 'hono';
 
 import { AuthenticationErrorCode } from '../lib/errors/error-codes';
 import { getSession } from '../lib/utils/get-session';
@@ -113,39 +112,35 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
   /**
    * View backup codes.
    */
-  .post(
-    '/view-recovery-codes',
-    sValidator('json', ZViewTwoFactorRecoveryCodesRequestSchema),
-    async (c) => {
-      const { user: sessionUser } = await getSession(c);
+  .post('/view-recovery-codes', sValidator('json', ZViewTwoFactorRecoveryCodesRequestSchema), async (c) => {
+    const { user: sessionUser } = await getSession(c);
 
-      const user = await prisma.user.findFirst({
-        where: {
-          id: sessionUser.id,
-        },
-        select: {
-          id: true,
-          email: true,
-          twoFactorEnabled: true,
-          twoFactorSecret: true,
-          twoFactorBackupCodes: true,
-        },
-      });
+    const user = await prisma.user.findFirst({
+      where: {
+        id: sessionUser.id,
+      },
+      select: {
+        id: true,
+        email: true,
+        twoFactorEnabled: true,
+        twoFactorSecret: true,
+        twoFactorBackupCodes: true,
+      },
+    });
 
-      if (!user) {
-        throw new AppError(AuthenticationErrorCode.InvalidRequest);
-      }
+    if (!user) {
+      throw new AppError(AuthenticationErrorCode.InvalidRequest);
+    }
 
-      const { token } = c.req.valid('json');
+    const { token } = c.req.valid('json');
 
-      const backupCodes = await viewBackupCodes({
-        user,
-        token,
-      });
+    const backupCodes = await viewBackupCodes({
+      user,
+      token,
+    });
 
-      return c.json({
-        success: true,
-        backupCodes,
-      });
-    },
-  );
+    return c.json({
+      success: true,
+      backupCodes,
+    });
+  });

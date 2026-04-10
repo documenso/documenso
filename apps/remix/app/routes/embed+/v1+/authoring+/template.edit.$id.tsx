@@ -1,14 +1,4 @@
-import { useLayoutEffect, useMemo, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { DocumentDistributionMethod, DocumentSigningOrder, SigningStatus } from '@prisma/client';
-import { redirect, useLoaderData } from 'react-router';
-
-import {
-  DEFAULT_DOCUMENT_DATE_FORMAT,
-  isValidDateFormat,
-} from '@documenso/lib/constants/date-formats';
+import { DEFAULT_DOCUMENT_DATE_FORMAT, isValidDateFormat } from '@documenso/lib/constants/date-formats';
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
@@ -23,6 +13,11 @@ import { nanoid } from '@documenso/lib/universal/id';
 import { trpc } from '@documenso/trpc/react';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { DocumentDistributionMethod, DocumentSigningOrder, SigningStatus } from '@prisma/client';
+import { useLayoutEffect, useMemo, useState } from 'react';
+import { redirect, useLoaderData } from 'react-router';
 
 import { ConfigureDocumentProvider } from '~/components/embed/authoring/configure-document-context';
 import { ConfigureDocumentView } from '~/components/embed/authoring/configure-document-view';
@@ -41,9 +36,7 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const token = url.searchParams.get('token') || '';
 
   // We also know that the token is valid, but we need the userId + teamId
-  const result = await verifyEmbeddingPresignToken({ token, scope: `templateId:${id}` }).catch(
-    () => null,
-  );
+  const result = await verifyEmbeddingPresignToken({ token, scope: `templateId:${id}` }).catch(() => null);
 
   if (!result) {
     throw new Error('Invalid token');
@@ -117,15 +110,12 @@ export default function EmbeddingAuthoringTemplateEditPage() {
     meta: {
       subject: template.templateMeta?.subject ?? undefined,
       message: template.templateMeta?.message ?? undefined,
-      distributionMethod:
-        template.templateMeta?.distributionMethod ?? DocumentDistributionMethod.EMAIL,
+      distributionMethod: template.templateMeta?.distributionMethod ?? DocumentDistributionMethod.EMAIL,
       emailSettings: template.templateMeta?.emailSettings ?? ZDocumentEmailSettingsSchema.parse({}),
       timezone: template.templateMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
       signingOrder: template.templateMeta?.signingOrder ?? DocumentSigningOrder.PARALLEL,
       allowDictateNextSigner: template.templateMeta?.allowDictateNextSigner ?? false,
-      language: isValidLanguageCode(template.templateMeta?.language)
-        ? template.templateMeta.language
-        : undefined,
+      language: isValidLanguageCode(template.templateMeta?.language) ? template.templateMeta.language : undefined,
       signatureTypes: signatureTypes,
       dateFormat: isValidDateFormat(template.templateMeta?.dateFormat)
         ? template.templateMeta?.dateFormat
@@ -148,8 +138,7 @@ export default function EmbeddingAuthoringTemplateEditPage() {
       nativeId: field.id,
       formId: nanoid(8),
       type: field.type,
-      signerEmail:
-        template.recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
+      signerEmail: template.recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
       inserted: field.inserted,
       recipientId: field.recipientId,
       pageNumber: field.page,
@@ -166,8 +155,7 @@ export default function EmbeddingAuthoringTemplateEditPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [canGoBack, setCanGoBack] = useState(true);
 
-  const { mutateAsync: updateEmbeddingTemplate } =
-    trpc.embeddingPresign.updateEmbeddingTemplate.useMutation();
+  const { mutateAsync: updateEmbeddingTemplate } = trpc.embeddingPresign.updateEmbeddingTemplate.useMutation();
 
   const handleConfigurePageViewSubmit = (data: TConfigureEmbedFormSchema) => {
     // Store the configuration data and move to the field placement stage
@@ -281,9 +269,7 @@ export default function EmbeddingAuthoringTemplateEditPage() {
     try {
       const hash = window.location.hash.slice(1);
 
-      const result = ZBaseEmbedAuthoringEditSchema.safeParse(
-        JSON.parse(decodeURIComponent(atob(hash))),
-      );
+      const result = ZBaseEmbedAuthoringEditSchema.safeParse(JSON.parse(decodeURIComponent(atob(hash))));
 
       if (!result.success) {
         return;

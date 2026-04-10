@@ -1,7 +1,6 @@
+import { zEmail } from '@documenso/lib/utils/zod';
 import { OrganisationMemberRole } from '@prisma/client';
 import { z } from 'zod';
-
-import { zEmail } from '@documenso/lib/utils/zod';
 
 // export const createOrganisationMemberInvitesMeta: TrpcOpenApiMeta = {
 //   openapi: {

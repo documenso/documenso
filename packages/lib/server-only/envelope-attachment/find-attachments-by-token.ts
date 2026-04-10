@@ -6,10 +6,7 @@ export type FindAttachmentsByTokenOptions = {
   token: string;
 };
 
-export const findAttachmentsByToken = async ({
-  envelopeId,
-  token,
-}: FindAttachmentsByTokenOptions) => {
+export const findAttachmentsByToken = async ({ envelopeId, token }: FindAttachmentsByTokenOptions) => {
   const envelope = await prisma.envelope.findFirst({
     where: {
       id: envelopeId,
@@ -42,10 +39,7 @@ export type FindAttachmentsByTeamOptions = {
   teamId: number;
 };
 
-export const findAttachmentsByTeam = async ({
-  envelopeId,
-  teamId,
-}: FindAttachmentsByTeamOptions) => {
+export const findAttachmentsByTeam = async ({ envelopeId, teamId }: FindAttachmentsByTeamOptions) => {
   const envelope = await prisma.envelope.findFirst({
     where: {
       id: envelopeId,

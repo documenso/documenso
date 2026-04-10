@@ -1,9 +1,3 @@
-import { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
@@ -18,6 +12,10 @@ import {
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { useState } from 'react';
 
 export type OrganisationGroupDeleteDialogProps = {
   organisationGroupId: string;
@@ -37,28 +35,27 @@ export const OrganisationGroupDeleteDialog = ({
 
   const organisation = useCurrentOrganisation();
 
-  const { mutateAsync: deleteGroup, isPending: isDeleting } =
-    trpc.organisation.group.delete.useMutation({
-      onSuccess: () => {
-        toast({
-          title: _(msg`Success`),
-          description: _(msg`You have successfully removed this group from the organisation.`),
-          duration: 5000,
-        });
+  const { mutateAsync: deleteGroup, isPending: isDeleting } = trpc.organisation.group.delete.useMutation({
+    onSuccess: () => {
+      toast({
+        title: _(msg`Success`),
+        description: _(msg`You have successfully removed this group from the organisation.`),
+        duration: 5000,
+      });
 
-        setOpen(false);
-      },
-      onError: () => {
-        toast({
-          title: _(msg`An unknown error occurred`),
-          description: _(
-            msg`We encountered an unknown error while attempting to remove this group. Please try again later.`,
-          ),
-          variant: 'destructive',
-          duration: 10000,
-        });
-      },
-    });
+      setOpen(false);
+    },
+    onError: () => {
+      toast({
+        title: _(msg`An unknown error occurred`),
+        description: _(
+          msg`We encountered an unknown error while attempting to remove this group. Please try again later.`,
+        ),
+        variant: 'destructive',
+        duration: 10000,
+      });
+    },
+  });
 
   return (
     <Dialog open={open} onOpenChange={(value) => !isDeleting && setOpen(value)}>
@@ -85,9 +82,7 @@ export const OrganisationGroupDeleteDialog = ({
         </DialogHeader>
 
         <Alert variant="neutral">
-          <AlertDescription className="text-center font-semibold">
-            {organisationGroupName}
-          </AlertDescription>
+          <AlertDescription className="text-center font-semibold">{organisationGroupName}</AlertDescription>
         </Alert>
 
         <fieldset disabled={isDeleting}>

@@ -1,11 +1,10 @@
-import { expect, test } from '@playwright/test';
-import { WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { alphaid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
+import { WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
 import { expectTextToBeVisible, openDropdownMenu } from '../fixtures/generic';
@@ -340,9 +339,7 @@ test('[WEBHOOKS]: cannot see unrelated webhooks', async ({ page }) => {
   await expect(page.getByText(webhookUrl2)).not.toBeVisible();
 
   // Navigate to team1's webhook logs page
-  await page.goto(
-    `${NEXT_PUBLIC_WEBAPP_URL()}/t/${user1Data.team.url}/settings/webhooks/${webhook1.id}`,
-  );
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${user1Data.team.url}/settings/webhooks/${webhook1.id}`);
 
   // Verify user1 can see their webhook logs
   // The webhook call should be visible in the table
@@ -363,18 +360,14 @@ test('[WEBHOOKS]: cannot see unrelated webhooks', async ({ page }) => {
   await expect(page.getByText(webhookUrl1)).not.toBeVisible();
 
   // Navigate to team2's webhook logs page
-  await page.goto(
-    `${NEXT_PUBLIC_WEBAPP_URL()}/t/${user2Data.team.url}/settings/webhooks/${webhook2.id}`,
-  );
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${user2Data.team.url}/settings/webhooks/${webhook2.id}`);
 
   // Verify user2 cannot see team1's webhook logs
   // The webhook call from team1 should not be visible
   await expect(page.getByText(webhookCall1.id)).not.toBeVisible();
 
   // Attempt to access user1's webhook detail page directly via URL
-  await page.goto(
-    `${NEXT_PUBLIC_WEBAPP_URL()}/t/${user2Data.team.url}/settings/webhooks/${webhook1.id}`,
-  );
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${user2Data.team.url}/settings/webhooks/${webhook1.id}`);
 
   // Verify access is denied - should show error or redirect
   // Based on the component, it shows a 404 error page

@@ -1,10 +1,4 @@
 {
   "title": "Concepts",
-  "pages": [
-    "document-lifecycle",
-    "recipient-roles",
-    "field-types",
-    "signing-workflow",
-    "signing-certificates"
-  ]
+  "pages": ["document-lifecycle", "recipient-roles", "field-types", "signing-workflow", "signing-certificates"]
 }

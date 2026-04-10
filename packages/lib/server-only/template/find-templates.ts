@@ -1,10 +1,9 @@
+import { prisma } from '@documenso/prisma';
 import type { TemplateType } from '@prisma/client';
 import { EnvelopeType, type Prisma } from '@prisma/client';
 
-import { prisma } from '@documenso/prisma';
-
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
-import { type FindResultResponse } from '../../types/search-params';
+import type { FindResultResponse } from '../../types/search-params';
 import { getMemberRoles } from '../team/get-member-roles';
 
 export type FindTemplatesOptions = {

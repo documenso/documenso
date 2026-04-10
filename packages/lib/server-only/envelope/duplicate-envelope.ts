@@ -1,14 +1,10 @@
+import { prisma } from '@documenso/prisma';
 import { DocumentSource, EnvelopeType, WebhookTriggerEvents } from '@prisma/client';
 import pMap from 'p-map';
 import { omit } from 'remeda';
 
-import { prisma } from '@documenso/prisma';
-
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import {
-  ZWebhookDocumentSchema,
-  mapEnvelopeToWebhookDocumentPayload,
-} from '../../types/webhook-payload';
+import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { nanoid, prefixedId } from '../../universal/id';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
@@ -26,17 +22,8 @@ export interface DuplicateEnvelopeOptions {
   };
 }
 
-export const duplicateEnvelope = async ({
-  id,
-  userId,
-  teamId,
-  overrides,
-}: DuplicateEnvelopeOptions) => {
-  const {
-    duplicateAsTemplate = false,
-    includeRecipients = true,
-    includeFields = true,
-  } = overrides ?? {};
+export const duplicateEnvelope = async ({ id, userId, teamId, overrides }: DuplicateEnvelopeOptions) => {
+  const { duplicateAsTemplate = false, includeRecipients = true, includeFields = true } = overrides ?? {};
 
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,
@@ -134,8 +121,7 @@ export const duplicateEnvelope = async ({
       templateType: duplicatedTemplateType,
       publicTitle: envelope.publicTitle ?? undefined,
       publicDescription: envelope.publicDescription ?? undefined,
-      source:
-        targetType === EnvelopeType.DOCUMENT ? DocumentSource.DOCUMENT : DocumentSource.TEMPLATE,
+      source: targetType === EnvelopeType.DOCUMENT ? DocumentSource.DOCUMENT : DocumentSource.TEMPLATE,
     },
     include: {
       recipients: true,

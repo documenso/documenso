@@ -1,6 +1,3 @@
-import { Trans, useLingui } from '@lingui/react/macro';
-import { OrganisationGroupType, OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
@@ -15,6 +12,8 @@ import {
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { OrganisationGroupType, OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
 
 import { useCurrentTeam } from '~/providers/team';
 
@@ -81,8 +80,7 @@ export const TeamMemberInheritEnableDialog = () => {
 
           <DialogDescription className="mt-4">
             <Trans>
-              You are about to give all organisation members access to this team under their
-              organisation role.
+              You are about to give all organisation members access to this team under their organisation role.
             </Trans>
           </DialogDescription>
         </DialogHeader>

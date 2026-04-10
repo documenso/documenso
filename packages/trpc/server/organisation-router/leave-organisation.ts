@@ -7,10 +7,7 @@ import { prisma } from '@documenso/prisma';
 import { OrganisationMemberInviteStatus } from '@documenso/prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZLeaveOrganisationRequestSchema,
-  ZLeaveOrganisationResponseSchema,
-} from './leave-organisation.types';
+import { ZLeaveOrganisationRequestSchema, ZLeaveOrganisationResponseSchema } from './leave-organisation.types';
 
 export const leaveOrganisationRoute = authenticatedProcedure
   .input(ZLeaveOrganisationRequestSchema)

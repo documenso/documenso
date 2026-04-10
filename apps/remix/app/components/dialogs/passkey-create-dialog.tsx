@@ -1,15 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Plural, Trans, useLingui } from '@lingui/react/macro';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { startRegistration } from '@simplewebauthn/browser';
-import { KeyRoundIcon } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { match } from 'ts-pattern';
-import { UAParser } from 'ua-parser-js';
-import { z } from 'zod';
-
 import { MAXIMUM_PASSKEYS } from '@documenso/lib/constants/auth';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
@@ -24,16 +12,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Plural, Trans, useLingui } from '@lingui/react/macro';
+import type * as DialogPrimitive from '@radix-ui/react-dialog';
+import { startRegistration } from '@simplewebauthn/browser';
+import { KeyRoundIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
+import { UAParser } from 'ua-parser-js';
+import { z } from 'zod';
 
 export type PasskeyCreateDialogProps = {
   trigger?: React.ReactNode;
@@ -133,15 +124,11 @@ export const PasskeyCreateDialog = ({ trigger, onSuccess, ...props }: PasskeyCre
   }, [open, form]);
 
   return (
-    <Dialog
-      {...props}
-      open={open}
-      onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
-    >
+    <Dialog {...props} open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
         {trigger ?? (
           <Button variant="secondary" loading={isPending}>
-            <KeyRoundIcon className="-ml-1 mr-1 h-5 w-5" />
+            <KeyRoundIcon className="mr-1 -ml-1 h-5 w-5" />
             <Trans>Add passkey</Trans>
           </Button>
         )}
@@ -154,19 +141,13 @@ export const PasskeyCreateDialog = ({ trigger, onSuccess, ...props }: PasskeyCre
           </DialogTitle>
 
           <DialogDescription className="mt-4">
-            <Trans>
-              Passkeys allow you to sign in and authenticate using biometrics, password managers,
-              etc.
-            </Trans>
+            <Trans>Passkeys allow you to sign in and authenticate using biometrics, password managers, etc.</Trans>
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
-            <fieldset
-              className="flex h-full flex-col space-y-4"
-              disabled={form.formState.isSubmitting}
-            >
+            <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
               <FormField
                 control={form.control}
                 name="passkeyName"
@@ -186,15 +167,15 @@ export const PasskeyCreateDialog = ({ trigger, onSuccess, ...props }: PasskeyCre
               <Alert variant="neutral">
                 <AlertDescription>
                   <Trans>
-                    When you click continue, you will be prompted to add the first available
-                    authenticator on your system.
+                    When you click continue, you will be prompted to add the first available authenticator on your
+                    system.
                   </Trans>
                 </AlertDescription>
 
                 <AlertDescription className="mt-2">
                   <Trans>
-                    If you do not want to use the authenticator prompted, you can close it, which
-                    will then display the next available authenticator.
+                    If you do not want to use the authenticator prompted, you can close it, which will then display the
+                    next available authenticator.
                   </Trans>
                 </AlertDescription>
               </Alert>
@@ -219,9 +200,7 @@ export const PasskeyCreateDialog = ({ trigger, onSuccess, ...props }: PasskeyCre
                     .with('InvalidStateError', () => (
                       <>
                         <AlertTitle className="text-sm">
-                          <Trans>
-                            Passkey creation cancelled due to one of the following reasons:
-                          </Trans>
+                          <Trans>Passkey creation cancelled due to one of the following reasons:</Trans>
                         </AlertTitle>
                         <AlertDescription>
                           <ul className="mt-1 list-inside list-disc">

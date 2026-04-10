@@ -1,9 +1,3 @@
-import { Plural, Trans } from '@lingui/react/macro';
-import { EnvelopeType, RecipientRole } from '@prisma/client';
-import { BanIcon, DownloadCloudIcon } from 'lucide-react';
-import { Link } from 'react-router';
-import { match } from 'ts-pattern';
-
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
@@ -14,6 +8,11 @@ import {
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
 import { Separator } from '@documenso/ui/primitives/separator';
+import { Plural, Trans } from '@lingui/react/macro';
+import { EnvelopeType, RecipientRole } from '@prisma/client';
+import { BanIcon, DownloadCloudIcon } from 'lucide-react';
+import { Link } from 'react-router';
+import { match } from 'ts-pattern';
 
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
@@ -25,13 +24,12 @@ import { useRequiredEnvelopeSigningContext } from '../document-signing/envelope-
 import { EnvelopeSignerCompleteDialog } from './envelope-signing-complete-dialog';
 
 export const EnvelopeSignerHeader = () => {
-  const { envelopeData, envelope, recipientFieldsRemaining, recipient } =
-    useRequiredEnvelopeSigningContext();
+  const { envelopeData, envelope, recipientFieldsRemaining, recipient } = useRequiredEnvelopeSigningContext();
 
   const isEmbedSigning = useEmbedSigningContext() !== null;
 
   return (
-    <nav className="embed--DocumentWidgetHeader max-w-screen flex flex-row justify-between border-b border-border bg-background px-4 py-3 md:px-6">
+    <nav className="embed--DocumentWidgetHeader flex max-w-screen flex-row justify-between border-border border-b bg-background px-4 py-3 md:px-6">
       {/* Left side - Logo and title */}
       <div className="flex min-w-0 flex-1 items-center space-x-2 md:w-auto md:flex-none">
         {!isEmbedSigning && (
@@ -51,19 +49,14 @@ export const EnvelopeSignerHeader = () => {
           </Link>
         )}
 
-        <h1
-          title={envelope.title}
-          className="min-w-0 truncate text-base font-semibold text-foreground md:hidden"
-        >
+        <h1 title={envelope.title} className="min-w-0 truncate font-semibold text-base text-foreground md:hidden">
           {envelope.title}
         </h1>
 
         {!isEmbedSigning && <Separator orientation="vertical" className="hidden h-6 md:block" />}
 
         <div className="hidden items-center space-x-2 md:flex">
-          <h1 className="whitespace-nowrap text-sm font-medium text-foreground">
-            {envelope.title}
-          </h1>
+          <h1 className="whitespace-nowrap font-medium text-foreground text-sm">{envelope.title}</h1>
 
           <Badge>
             {match(recipient.role)
@@ -78,12 +71,8 @@ export const EnvelopeSignerHeader = () => {
 
       {/* Right side - Desktop content */}
       <div className="hidden items-center space-x-2 lg:flex">
-        <p className="mr-2 flex-shrink-0 text-sm text-muted-foreground">
-          <Plural
-            one="1 Field Remaining"
-            other="# Fields Remaining"
-            value={recipientFieldsRemaining.length}
-          />
+        <p className="mr-2 flex-shrink-0 text-muted-foreground text-sm">
+          <Plural one="1 Field Remaining" other="# Fields Remaining" value={recipientFieldsRemaining.length} />
         </p>
 
         <EnvelopeSignerCompleteDialog />

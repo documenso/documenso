@@ -2,16 +2,12 @@ import Konva from 'konva';
 
 import { DEFAULT_SIGNATURE_TEXT_FONT_SIZE } from '../../constants/pdf';
 import { AppError } from '../../errors/app-error';
-import {
-  createFieldHoverInteraction,
-  upsertFieldGroup,
-  upsertFieldRect,
-} from './field-generic-items';
-import { calculateFieldPosition } from './field-renderer';
+import { createFieldHoverInteraction, upsertFieldGroup, upsertFieldRect } from './field-generic-items';
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
+import { calculateFieldPosition } from './field-renderer';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-let SkiaImage: any = undefined;
+let SkiaImage: any;
 
 void (async () => {
   if (typeof window === 'undefined') {
@@ -40,10 +36,7 @@ const getImageDimensions = (img: HTMLImageElement, fieldWidth: number, fieldHeig
   };
 };
 
-const createFieldSignature = (
-  field: FieldToRender,
-  options: RenderFieldElementOptions,
-): Konva.Text | Konva.Image => {
+const createFieldSignature = (field: FieldToRender, options: RenderFieldElementOptions): Konva.Text | Konva.Image => {
   const { pageWidth, pageHeight, mode = 'edit', translations } = options;
 
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
@@ -139,10 +132,7 @@ const createFieldSignature = (
   return fieldText;
 };
 
-export const renderSignatureFieldElement = (
-  field: FieldToRender,
-  options: RenderFieldElementOptions,
-) => {
+export const renderSignatureFieldElement = (field: FieldToRender, options: RenderFieldElementOptions) => {
   const { mode = 'edit', pageLayer, color } = options;
 
   const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);

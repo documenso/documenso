@@ -1,6 +1,3 @@
-import { expect, test } from '@playwright/test';
-import type { Team, User } from '@prisma/client';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { prisma } from '@documenso/prisma';
@@ -15,6 +12,8 @@ import {
 import { seedTeam, seedTeamEmail, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 import type { TFindDocumentsResponse } from '@documenso/trpc/server/document-router/find-documents.types';
+import { expect, test } from '@playwright/test';
+import type { Team, User } from '@prisma/client';
 
 import { apiSignin } from '../../fixtures/authentication';
 
@@ -78,9 +77,7 @@ test.describe('Find Documents API - Personal Context', () => {
     expect(json!.totalPages).toBe(0);
   });
 
-  test('should return only documents owned by the user and not the other user', async ({
-    request,
-  }) => {
+  test('should return only documents owned by the user and not the other user', async ({ request }) => {
     // The v2 API token scopes to a team. A personal team token only returns
     // docs belonging to that team — cross-team received docs are NOT included.
     await seedDraftDocument(userA, teamA.id, [], {
@@ -287,9 +284,7 @@ test.describe('Find Documents API - Personal Context', () => {
     expect(json!.data[0].title).toBe('Quarterly Report 2024');
   });
 
-  test('should search by recipient email and not return docs with different recipients', async ({
-    request,
-  }) => {
+  test('should search by recipient email and not return docs with different recipients', async ({ request }) => {
     const { user: userC } = await seedUser();
 
     await seedPendingDocument(userA, teamA.id, [userB], {
@@ -404,9 +399,7 @@ test.describe('Find Documents API - Personal Context', () => {
     }
   });
 
-  test('should only show root-level documents when no folderId is provided', async ({
-    request,
-  }) => {
+  test('should only show root-level documents when no folderId is provided', async ({ request }) => {
     const folder = await prisma.folder.create({
       data: {
         name: 'Test Folder',
@@ -499,9 +492,7 @@ test.describe('Find Documents API - Personal Context', () => {
     expect(doc.recipients[0].email).toBe(userB.email);
   });
 
-  test('should not return deleted documents but should return non-deleted ones', async ({
-    request,
-  }) => {
+  test('should not return deleted documents but should return non-deleted ones', async ({ request }) => {
     const deletedDoc = await seedDraftDocument(userA, teamA.id, [], {
       createDocumentOptions: { title: 'Deleted Document' },
     });
@@ -562,9 +553,7 @@ test.describe('Find Documents API - Personal Context', () => {
 });
 
 test.describe('Find Documents API - Team Context', () => {
-  test('should return team documents for team members and exclude non-team docs', async ({
-    request,
-  }) => {
+  test('should return team documents for team members and exclude non-team docs', async ({ request }) => {
     const { team, owner } = await seedTeam();
 
     const member = await seedTeamMember({ teamId: team.id, role: TeamMemberRole.ADMIN });
@@ -723,9 +712,7 @@ test.describe('Find Documents API - Team Context', () => {
     expect(json!.count).toBe(2);
   });
 
-  test('should enforce visibility across admin and manager levels with adequate data', async ({
-    request,
-  }) => {
+  test('should enforce visibility across admin and manager levels with adequate data', async ({ request }) => {
     // Note: MEMBER role cannot create API tokens (requires MANAGE_TEAM permission).
     // MEMBER visibility is tested in the UI test file instead.
     const { team, owner } = await seedTeam();
@@ -978,9 +965,7 @@ test.describe('Find Documents API - Team with Team Email', () => {
     expect(titles).not.toContain('External Noise Doc');
   });
 
-  test('team email documents should respect visibility rules with adequate controls', async ({
-    request,
-  }) => {
+  test('team email documents should respect visibility rules with adequate controls', async ({ request }) => {
     const { team } = await seedTeam();
 
     const teamEmail = `team-vis-email-${team.id}@test.documenso.com`;
@@ -1033,9 +1018,7 @@ test.describe('Find Documents API - Team with Team Email', () => {
 });
 
 test.describe('Find Documents API - Deleted Document Handling', () => {
-  test('should not show soft-deleted documents for owner but show non-deleted ones', async ({
-    request,
-  }) => {
+  test('should not show soft-deleted documents for owner but show non-deleted ones', async ({ request }) => {
     const { user, team } = await seedUser();
 
     const deletedDoc = await seedPendingDocument(user, team.id, [], {
@@ -1068,9 +1051,7 @@ test.describe('Find Documents API - Deleted Document Handling', () => {
     expect(titles).not.toContain('Soft Deleted by Owner');
   });
 
-  test('should not show documents where owner soft-deleted their copy in personal context', async ({
-    request,
-  }) => {
+  test('should not show documents where owner soft-deleted their copy in personal context', async ({ request }) => {
     // In personal context, documentDeletedAt on recipient hides the doc for that user.
     // Note: the v2 API scopes to a team, so we test this by having the owner
     // soft-delete a doc from their own personal team.
@@ -1102,9 +1083,7 @@ test.describe('Find Documents API - Deleted Document Handling', () => {
     expect(titles).not.toContain('Owner Soft Deleted');
   });
 
-  test('should not show deleted team documents for any team member but show non-deleted ones', async ({
-    request,
-  }) => {
+  test('should not show deleted team documents for any team member but show non-deleted ones', async ({ request }) => {
     const { team, owner } = await seedTeam();
     const member = await seedTeamMember({ teamId: team.id, role: TeamMemberRole.ADMIN });
 
@@ -1198,9 +1177,7 @@ test.describe('Find Documents API - Edge Cases', () => {
     expect(res.ok()).toBeFalsy();
   });
 
-  test('personal documents should not appear in team context even with adequate team data', async ({
-    request,
-  }) => {
+  test('personal documents should not appear in team context even with adequate team data', async ({ request }) => {
     const { team, owner } = await seedTeam();
 
     const teamMember = await seedTeamMember({
@@ -1276,9 +1253,7 @@ const trpcQuery = async (
 };
 
 test.describe('Find Documents API - Adversarial: x-team-id Header Spoofing', () => {
-  test('should reject request when user spoofs x-team-id to a team they do not belong to', async ({
-    page,
-  }) => {
+  test('should reject request when user spoofs x-team-id to a team they do not belong to', async ({ page }) => {
     // Setup: two separate teams with documents
     const { team: teamA, owner: ownerA } = await seedTeam();
     const { team: teamB, owner: ownerB } = await seedTeam();
@@ -1365,9 +1340,7 @@ test.describe('Find Documents API - Adversarial: x-team-id Header Spoofing', () 
 });
 
 test.describe('Find Documents API - Adversarial: Cross-Team folderId', () => {
-  test('should NOT return documents from another team when folderId belongs to that team', async ({
-    request,
-  }) => {
+  test('should NOT return documents from another team when folderId belongs to that team', async ({ request }) => {
     // Setup: two teams each with a folder and documents
     const { user: userA, team: teamA } = await seedUser();
     const { user: userB, team: teamB } = await seedUser();
@@ -1452,9 +1425,7 @@ test.describe('Find Documents API - Adversarial: Cross-Team folderId', () => {
 });
 
 test.describe('Find Documents API - Adversarial: Cross-Team senderIds', () => {
-  test('should NOT return documents when senderIds contains users from another team', async ({
-    page,
-  }) => {
+  test('should NOT return documents when senderIds contains users from another team', async ({ page }) => {
     const { team: teamA, owner: ownerA } = await seedTeam();
     const { team: teamB, owner: ownerB } = await seedTeam();
 
@@ -1495,9 +1466,7 @@ test.describe('Find Documents API - Adversarial: Cross-Team senderIds', () => {
     expect(docs2[0].title).toBe('TeamA Doc by OwnerA');
   });
 
-  test('senderIds with mix of valid and cross-team userIds should only return matching team docs', async ({
-    page,
-  }) => {
+  test('senderIds with mix of valid and cross-team userIds should only return matching team docs', async ({ page }) => {
     const { team, owner } = await seedTeam();
     const member = await seedTeamMember({ teamId: team.id, role: TeamMemberRole.ADMIN });
     const { user: outsider } = await seedUser();
@@ -1542,9 +1511,7 @@ test.describe('Find Documents API - Adversarial: Cross-Team senderIds', () => {
 });
 
 test.describe('Find Documents API - Adversarial: Cross-Team templateId', () => {
-  test('should NOT return documents from another team when filtering by their templateId', async ({
-    request,
-  }) => {
+  test('should NOT return documents from another team when filtering by their templateId', async ({ request }) => {
     const { user: userA, team: teamA } = await seedUser();
     const { user: userB, team: teamB } = await seedUser();
 

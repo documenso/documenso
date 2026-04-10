@@ -1,10 +1,3 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Plural, Trans } from '@lingui/react/macro';
-import { OrganisationMemberInviteStatus } from '@prisma/client';
-import { AnimatePresence } from 'framer-motion';
-import { BellIcon } from 'lucide-react';
-
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { trpc } from '@documenso/trpc/react';
@@ -21,6 +14,12 @@ import {
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Plural, Trans } from '@lingui/react/macro';
+import { OrganisationMemberInviteStatus } from '@prisma/client';
+import { AnimatePresence } from 'framer-motion';
+import { BellIcon } from 'lucide-react';
 
 export const OrganisationInvitations = ({ className }: { className?: string }) => {
   const { data, isLoading } = trpc.organisation.member.invite.getMany.useQuery({
@@ -53,7 +52,7 @@ export const OrganisationInvitations = ({ className }: { className?: string }) =
 
               <Dialog>
                 <DialogTrigger asChild>
-                  <button className="ml-auto text-sm font-medium text-blue-700 hover:text-blue-600">
+                  <button className="ml-auto font-medium text-blue-700 text-sm hover:text-blue-600">
                     <Trans>View invites</Trans>
                   </button>
                 </DialogTrigger>
@@ -90,9 +89,7 @@ export const OrganisationInvitations = ({ className }: { className?: string }) =
                             className="w-full max-w-none py-4"
                             avatarFallback={invitation.organisation.name.slice(0, 1)}
                             primaryText={
-                              <span className="text-foreground/80 font-semibold">
-                                {invitation.organisation.name}
-                              </span>
+                              <span className="font-semibold text-foreground/80">{invitation.organisation.name}</span>
                             }
                             secondaryText={`/o/${invitation.organisation.url}`}
                             rightSideComponent={

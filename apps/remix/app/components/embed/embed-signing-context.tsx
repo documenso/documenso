@@ -6,12 +6,7 @@ export type EmbedSigningContextValue = {
   isNameLocked: boolean;
   isEmailLocked: boolean;
   hidePoweredBy: boolean;
-  onDocumentCompleted: (data: {
-    token: string;
-    documentId: number;
-    envelopeId: string;
-    recipientId: number;
-  }) => void;
+  onDocumentCompleted: (data: { token: string; documentId: number; envelopeId: string; recipientId: number }) => void;
   onDocumentError: () => void;
   onDocumentRejected: (data: {
     token: string;
@@ -46,12 +41,7 @@ export type EmbedSigningProviderProps = {
   isNameLocked?: boolean;
   isEmailLocked?: boolean;
   hidePoweredBy?: boolean;
-  onDocumentCompleted: (data: {
-    token: string;
-    documentId: number;
-    envelopeId: string;
-    recipientId: number;
-  }) => void;
+  onDocumentCompleted: (data: { token: string; documentId: number; envelopeId: string; recipientId: number }) => void;
   onDocumentError: () => void;
   onDocumentRejected: (data: {
     token: string;

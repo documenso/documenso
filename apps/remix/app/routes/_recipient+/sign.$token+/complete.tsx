@@ -1,10 +1,3 @@
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
-import { CheckCircle2, Clock8, DownloadIcon, Loader2 } from 'lucide-react';
-import { Link } from 'react-router';
-import { match } from 'ts-pattern';
-
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
@@ -22,6 +15,12 @@ import { SigningCard3D } from '@documenso/ui/components/signing-card';
 import { cn } from '@documenso/ui/lib/utils';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
+import { CheckCircle2, Clock8, DownloadIcon, Loader2 } from 'lucide-react';
+import { Link } from 'react-router';
+import { match } from 'ts-pattern';
 
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { ClaimAccount } from '~/components/general/claim-account';
@@ -76,18 +75,13 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     .catch(() => false);
 
   const recipientName =
-    recipient.name ||
-    fields.find((field) => field.type === FieldType.NAME)?.customText ||
-    recipient.email;
+    recipient.name || fields.find((field) => field.type === FieldType.NAME)?.customText || recipient.email;
 
   const canSignUp = !isExistingUser && env('NEXT_PUBLIC_DISABLE_SIGNUP') !== 'true';
 
-  const canRedirectToFolder =
-    user && document.userId === user.id && document.folderId && document.team?.url;
+  const canRedirectToFolder = user && document.userId === user.id && document.folderId && document.team?.url;
 
-  const returnToHomePath = canRedirectToFolder
-    ? `/t/${document.team.url}/documents/f/${document.folderId}`
-    : '/';
+  const returnToHomePath = canRedirectToFolder ? `/t/${document.team.url}/documents/f/${document.folderId}` : '/';
 
   return {
     isDocumentAccessValid: true,
@@ -142,10 +136,9 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
 
   return (
     <div
-      className={cn(
-        '-mx-4 flex flex-col items-center overflow-hidden px-4 pt-16 md:-mx-8 md:px-8 lg:pt-20 xl:pt-28',
-        { 'pt-0 lg:pt-0 xl:pt-0': canSignUp },
-      )}
+      className={cn('-mx-4 flex flex-col items-center overflow-hidden px-4 pt-16 md:-mx-8 md:px-8 lg:pt-20 xl:pt-28', {
+        'pt-0 lg:pt-0 xl:pt-0': canSignUp,
+      })}
     >
       <div
         className={cn('relative mt-6 flex w-full flex-col items-center justify-center', {
@@ -171,7 +164,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
             signingCelebrationImage={signingCelebration}
           />
 
-          <h2 className="mt-6 max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
+          <h2 className="mt-6 max-w-[35ch] text-center font-semibold text-2xl leading-normal md:text-3xl lg:text-4xl">
             {recipient.role === RecipientRole.SIGNER && <Trans>Document Signed</Trans>}
             {recipient.role === RecipientRole.VIEWER && <Trans>Document Viewed</Trans>}
             {recipient.role === RecipientRole.APPROVER && <Trans>Document Approved</Trans>}
@@ -213,32 +206,27 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
 
           {match({ status: signingStatus, deletedAt: document.deletedAt })
             .with({ status: 'COMPLETED' }, () => (
-              <p className="mt-2.5 max-w-[60ch] text-center text-sm font-medium text-muted-foreground/60 md:text-base">
-                <Trans>
-                  Everyone has signed! You will receive an email copy of the signed document.
-                </Trans>
+              <p className="mt-2.5 max-w-[60ch] text-center font-medium text-muted-foreground/60 text-sm md:text-base">
+                <Trans>Everyone has signed! You will receive an email copy of the signed document.</Trans>
               </p>
             ))
             .with({ status: 'PROCESSING' }, () => (
-              <p className="mt-2.5 max-w-[60ch] text-center text-sm font-medium text-muted-foreground/60 md:text-base">
+              <p className="mt-2.5 max-w-[60ch] text-center font-medium text-muted-foreground/60 text-sm md:text-base">
                 <Trans>
-                  All recipients have signed. The document is being processed and you will receive
-                  an email copy shortly.
+                  All recipients have signed. The document is being processed and you will receive an email copy
+                  shortly.
                 </Trans>
               </p>
             ))
             .with({ deletedAt: null }, () => (
-              <p className="mt-2.5 max-w-[60ch] text-center text-sm font-medium text-muted-foreground/60 md:text-base">
-                <Trans>
-                  You will receive an email copy of the signed document once everyone has signed.
-                </Trans>
+              <p className="mt-2.5 max-w-[60ch] text-center font-medium text-muted-foreground/60 text-sm md:text-base">
+                <Trans>You will receive an email copy of the signed document once everyone has signed.</Trans>
               </p>
             ))
             .otherwise(() => (
-              <p className="mt-2.5 max-w-[60ch] text-center text-sm font-medium text-muted-foreground/60 md:text-base">
+              <p className="mt-2.5 max-w-[60ch] text-center font-medium text-muted-foreground/60 text-sm md:text-base">
                 <Trans>
-                  This document has been cancelled by the owner and is no longer available for
-                  others to sign.
+                  This document has been cancelled by the owner and is no longer available for others to sign.
                 </Trans>
               </p>
             ))}
@@ -278,14 +266,12 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
         <div className="flex flex-col items-center">
           {canSignUp && (
             <div className="flex max-w-xl flex-col items-center justify-center p-4 md:p-12">
-              <h2 className="mt-8 text-center text-xl font-semibold md:mt-0">
+              <h2 className="mt-8 text-center font-semibold text-xl md:mt-0">
                 <Trans>Need to sign documents?</Trans>
               </h2>
 
-              <p className="mt-4 max-w-[55ch] text-center leading-normal text-muted-foreground/60">
-                <Trans>
-                  Create your account and start using state-of-the-art document signing.
-                </Trans>
+              <p className="mt-4 max-w-[55ch] text-center text-muted-foreground/60 leading-normal">
+                <Trans>Create your account and start using state-of-the-art document signing.</Trans>
               </p>
 
               <ClaimAccount defaultName={recipientName} defaultEmail={recipient.email} />

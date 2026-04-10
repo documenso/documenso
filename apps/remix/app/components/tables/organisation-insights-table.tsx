@@ -1,11 +1,3 @@
-import { useTransition } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Building2, Loader, TrendingUp, Users } from 'lucide-react';
-import { Link } from 'react-router';
-import { useNavigation } from 'react-router';
-
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import type { OrganisationDetailedInsights } from '@documenso/lib/server-only/admin/get-organisation-detailed-insights';
 import type { DateRange } from '@documenso/lib/types/search-params';
@@ -14,6 +6,11 @@ import { Button } from '@documenso/ui/primitives/button';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Building2, Loader, TrendingUp, Users } from 'lucide-react';
+import { useTransition } from 'react';
+import { Link, useNavigation } from 'react-router';
 
 import { DateRangeFilter } from '~/components/filters/date-range-filter';
 import { DocumentStatus } from '~/components/general/document/document-status';
@@ -63,10 +60,7 @@ export const OrganisationInsightsTable = ({
       header: _(msg`Team Name`),
       accessorKey: 'name',
       cell: ({ row }) => (
-        <Link
-          className="block max-w-full truncate hover:underline"
-          to={`/admin/teams/${row.original.id}`}
-        >
+        <Link className="block max-w-full truncate hover:underline" to={`/admin/teams/${row.original.id}`}>
           {row.getValue('name')}
         </Link>
       ),
@@ -97,10 +91,7 @@ export const OrganisationInsightsTable = ({
       header: () => <span className="whitespace-nowrap">{_(msg`Name`)}</span>,
       accessorKey: 'name',
       cell: ({ row }) => (
-        <Link
-          className="block max-w-full truncate hover:underline"
-          to={`/admin/users/${row.original.id}`}
-        >
+        <Link className="block max-w-full truncate hover:underline" to={`/admin/users/${row.original.id}`}>
           {(row.getValue('name') as string) || (row.getValue('email') as string)}
         </Link>
       ),
@@ -150,9 +141,7 @@ export const OrganisationInsightsTable = ({
     {
       header: () => <span className="whitespace-nowrap">{_(msg`Status`)}</span>,
       accessorKey: 'status',
-      cell: ({ row }) => (
-        <DocumentStatus status={row.getValue('status') as ExtendedDocumentStatus} />
-      ),
+      cell: ({ row }) => <DocumentStatus status={row.getValue('status') as ExtendedDocumentStatus} />,
       size: 120,
     },
     {
@@ -286,9 +275,9 @@ const SummaryCard = ({
   <div className="flex items-start gap-x-2 rounded-lg border bg-card px-4 py-3">
     <Icon className="h-4 w-4 items-start text-muted-foreground" />
     <div className="-mt-0.5 space-y-2">
-      <p className="text-sm font-medium text-muted-foreground">{title}</p>
-      <p className="text-2xl font-bold">{value}</p>
-      {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+      <p className="font-medium text-muted-foreground text-sm">{title}</p>
+      <p className="font-bold text-2xl">{value}</p>
+      {subtitle && <p className="text-muted-foreground text-xs">{subtitle}</p>}
     </div>
   </div>
 );

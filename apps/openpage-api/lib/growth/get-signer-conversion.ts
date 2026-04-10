@@ -1,6 +1,5 @@
-import { DateTime } from 'luxon';
-
 import { kyselyPrisma, sql } from '@documenso/prisma';
+import { DateTime } from 'luxon';
 
 import { addZeroMonth } from '../add-zero-month';
 
@@ -29,9 +28,7 @@ export const getSignerConversionMonthly = async (type: 'count' | 'cumulative' = 
     datasets: [
       {
         label: type === 'count' ? 'Signers That Signed Up' : 'Total Signers That Signed Up',
-        data: result
-          .map((row) => (type === 'count' ? Number(row.count) : Number(row.cume_count)))
-          .reverse(),
+        data: result.map((row) => (type === 'count' ? Number(row.count) : Number(row.cume_count))).reverse(),
       },
     ],
   };
@@ -39,6 +36,4 @@ export const getSignerConversionMonthly = async (type: 'count' | 'cumulative' = 
   return addZeroMonth(transformedData, type === 'cumulative');
 };
 
-export type GetSignerConversionMonthlyResult = Awaited<
-  ReturnType<typeof getSignerConversionMonthly>
->;
+export type GetSignerConversionMonthlyResult = Awaited<ReturnType<typeof getSignerConversionMonthly>>;

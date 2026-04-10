@@ -1,10 +1,6 @@
-import type { Context, Next } from 'hono';
-
 import { extractSessionCookieFromHeaders } from '@documenso/auth/server/lib/session/session-cookies';
-import {
-  type RequestMetadata,
-  extractRequestMetadata,
-} from '@documenso/lib/universal/extract-request-metadata';
+import { extractRequestMetadata, type RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { Context, Next } from 'hono';
 
 export type AppContext = {
   requestMetadata: RequestMetadata;
@@ -64,4 +60,4 @@ const isPageRequest = (request: Request) => {
  * - Urls that start with /api
  * - Urls that start with _
  */
-const blacklistedPathsRegex = new RegExp('^/api/|^/__');
+const blacklistedPathsRegex = /^\/api\/|^\/__/;

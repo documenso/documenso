@@ -1,5 +1,3 @@
-import { EnvelopeType, FieldType } from '@prisma/client';
-
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
@@ -16,6 +14,7 @@ import {
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType, FieldType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
@@ -41,12 +40,7 @@ export type SetFieldsForTemplateOptions = {
   }[];
 };
 
-export const setFieldsForTemplate = async ({
-  userId,
-  teamId,
-  id,
-  fields,
-}: SetFieldsForTemplateOptions) => {
+export const setFieldsForTemplate = async ({ userId, teamId, id, fields }: SetFieldsForTemplateOptions) => {
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,
     type: EnvelopeType.TEMPLATE,
@@ -89,9 +83,7 @@ export const setFieldsForTemplate = async ({
     const recipient = envelope.recipients.find((recipient) => recipient.id === field.recipientId);
 
     // Check whether the field is being attached to an allowed envelope item.
-    const foundEnvelopeItem = envelope.envelopeItems.find(
-      (envelopeItem) => envelopeItem.id === field.envelopeItemId,
-    );
+    const foundEnvelopeItem = envelope.envelopeItems.find((envelopeItem) => envelopeItem.id === field.envelopeItemId);
 
     if (!foundEnvelopeItem) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
@@ -131,10 +123,7 @@ export const setFieldsForTemplate = async ({
 
       if (field.type === FieldType.NUMBER && field.fieldMeta) {
         const numberFieldParsedMeta = ZNumberFieldMeta.parse(field.fieldMeta);
-        const errors = validateNumberField(
-          String(numberFieldParsedMeta.value || ''),
-          numberFieldParsedMeta,
-        );
+        const errors = validateNumberField(String(numberFieldParsedMeta.value || ''), numberFieldParsedMeta);
         if (errors.length > 0) {
           throw new Error(errors.join(', '));
         }
@@ -159,9 +148,7 @@ export const setFieldsForTemplate = async ({
           throw new Error('Radio field is missing required metadata');
         }
         const radioFieldParsedMeta = ZRadioFieldMeta.parse(field.fieldMeta);
-        const checkedRadioFieldValue = radioFieldParsedMeta.values?.find(
-          (option) => option.checked,
-        )?.value;
+        const checkedRadioFieldValue = radioFieldParsedMeta.values?.find((option) => option.checked)?.value;
         const errors = validateRadioField(checkedRadioFieldValue, radioFieldParsedMeta);
         if (errors.length > 0) {
           throw new Error(errors.join('. '));

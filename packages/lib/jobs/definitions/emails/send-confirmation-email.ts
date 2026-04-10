@@ -10,9 +10,7 @@ const SEND_CONFIRMATION_EMAIL_JOB_DEFINITION_SCHEMA = z.object({
   force: z.boolean().optional(),
 });
 
-export type TSendConfirmationEmailJobDefinition = z.infer<
-  typeof SEND_CONFIRMATION_EMAIL_JOB_DEFINITION_SCHEMA
->;
+export type TSendConfirmationEmailJobDefinition = z.infer<typeof SEND_CONFIRMATION_EMAIL_JOB_DEFINITION_SCHEMA>;
 
 export const SEND_CONFIRMATION_EMAIL_JOB_DEFINITION = {
   id: SEND_CONFIRMATION_EMAIL_JOB_DEFINITION_ID,

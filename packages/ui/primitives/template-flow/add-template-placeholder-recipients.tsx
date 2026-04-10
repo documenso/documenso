@@ -1,17 +1,3 @@
-import { useCallback, useId, useMemo, useRef, useState } from 'react';
-
-import type { DropResult, SensorAPI } from '@hello-pangea/dnd';
-import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { TemplateDirectLink } from '@prisma/client';
-import { DocumentSigningOrder, type Field, type Recipient, RecipientRole } from '@prisma/client';
-import { motion } from 'framer-motion';
-import { GripVerticalIcon, HelpCircle, Link2Icon, Plus, Trash } from 'lucide-react';
-import { useFieldArray, useForm } from 'react-hook-form';
-
 import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -27,11 +13,20 @@ import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { toast } from '@documenso/ui/primitives/use-toast';
+import type { DropResult, SensorAPI } from '@hello-pangea/dnd';
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import type { TemplateDirectLink } from '@prisma/client';
+import { DocumentSigningOrder, type Field, type Recipient, RecipientRole } from '@prisma/client';
+import { motion } from 'framer-motion';
+import { GripVerticalIcon, HelpCircle, Link2Icon, Plus, Trash } from 'lucide-react';
+import { useCallback, useId, useMemo, useRef, useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
 
-import {
-  DocumentReadOnlyFields,
-  mapFieldsWithRecipients,
-} from '../../components/document/document-read-only-fields';
+import { DocumentReadOnlyFields, mapFieldsWithRecipients } from '../../components/document/document-read-only-fields';
 import { Checkbox } from '../checkbox';
 import {
   DocumentFlowFormContainerActions,
@@ -113,9 +108,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     }));
 
     if (signingOrder === DocumentSigningOrder.SEQUENTIAL) {
-      mappedRecipients = mappedRecipients.sort(
-        (a, b) => (a.signingOrder ?? 0) - (b.signingOrder ?? 0),
-      );
+      mappedRecipients = mappedRecipients.sort((a, b) => (a.signingOrder ?? 0) - (b.signingOrder ?? 0));
     }
 
     return mappedRecipients;
@@ -130,10 +123,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     },
   });
 
-  const emptySigners = useCallback(
-    () => form.getValues('signers').filter((signer) => signer.email === ''),
-    [form],
-  );
+  const emptySigners = useCallback(() => form.getValues('signers').filter((signer) => signer.email === ''), [form]);
 
   const { scheduleSave } = useAutoSave(onAutoSave);
 
@@ -156,9 +146,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
         const currentSigners = form.getValues('signers');
         const updatedSigners = currentSigners.map((signer) => {
           // Find the matching recipient from the response using nativeId
-          const matchingRecipient = response.recipients.find(
-            (recipient) => recipient.id === signer.nativeId,
-          );
+          const matchingRecipient = response.recipients.find((recipient) => recipient.id === signer.nativeId);
 
           if (matchingRecipient) {
             // Update the signer with the server-returned data, especially the ID
@@ -170,9 +158,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
 
           // For new signers without nativeId, match by email and update with server ID
           if (!signer.nativeId) {
-            const newRecipient = response.recipients.find(
-              (recipient) => recipient.email === signer.email,
-            );
+            const newRecipient = response.recipients.find((recipient) => recipient.email === signer.email);
             if (newRecipient) {
               return {
                 ...signer,
@@ -205,14 +191,10 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     const recipientHasAuthOptions = recipients.find((recipient) => {
       const recipientAuthOptions = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
 
-      return (
-        recipientAuthOptions.accessAuth.length > 0 || recipientAuthOptions.actionAuth.length > 0
-      );
+      return recipientAuthOptions.accessAuth.length > 0 || recipientAuthOptions.actionAuth.length > 0;
     });
 
-    const formHasActionAuth = form
-      .getValues('signers')
-      .find((signer) => signer.actionAuth.length > 0);
+    const formHasActionAuth = form.getValues('signers').find((signer) => signer.actionAuth.length > 0);
 
     return recipientHasAuthOptions !== undefined || formHasActionAuth !== undefined;
   }, [recipients, form]);
@@ -279,18 +261,15 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     void handleAutoSave();
   };
 
-  const isSignerDirectRecipient = (
-    signer: TAddTemplatePlacholderRecipientsFormSchema['signers'][number],
-  ): boolean => {
-    return (
-      templateDirectLink !== null &&
-      signer.nativeId === templateDirectLink?.directTemplateRecipientId
-    );
+  const isSignerDirectRecipient = (signer: TAddTemplatePlacholderRecipientsFormSchema['signers'][number]): boolean => {
+    return templateDirectLink !== null && signer.nativeId === templateDirectLink?.directTemplateRecipientId;
   };
 
   const onDragEnd = useCallback(
     async (result: DropResult) => {
-      if (!result.destination) return;
+      if (!result.destination) {
+        return;
+      }
 
       const items = Array.from(watchedSigners);
       const [reorderedSigner] = items.splice(result.source.index, 1);
@@ -442,10 +421,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
 
   return (
     <>
-      <DocumentFlowFormContainerHeader
-        title={documentFlow.title}
-        description={documentFlow.description}
-      />
+      <DocumentFlowFormContainerHeader title={documentFlow.title} description={documentFlow.description} />
       <DocumentFlowFormContainerContent>
         {isDocumentPdfLoaded && (
           <DocumentReadOnlyFields
@@ -469,17 +445,12 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                       id="signingOrder"
                       checked={field.value === DocumentSigningOrder.SEQUENTIAL}
                       onCheckedChange={(checked) => {
-                        if (
-                          !checked &&
-                          watchedSigners.some((s) => s.role === RecipientRole.ASSISTANT)
-                        ) {
+                        if (!checked && watchedSigners.some((s) => s.role === RecipientRole.ASSISTANT)) {
                           setShowSigningOrderConfirmation(true);
                           return;
                         }
 
-                        field.onChange(
-                          checked ? DocumentSigningOrder.SEQUENTIAL : DocumentSigningOrder.PARALLEL,
-                        );
+                        field.onChange(checked ? DocumentSigningOrder.SEQUENTIAL : DocumentSigningOrder.PARALLEL);
 
                         // If sequential signing is turned off, disable dictate next signer
                         if (!checked) {
@@ -540,8 +511,8 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                       <TooltipContent className="max-w-80 p-4">
                         <p>
                           <Trans>
-                            When enabled, signers can choose who should sign next in the sequence
-                            instead of following the predefined order.
+                            When enabled, signers can choose who should sign next in the sequence instead of following
+                            the predefined order.
                           </Trans>
                         </p>
                       </TooltipContent>
@@ -562,11 +533,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
             >
               <Droppable droppableId="signers">
                 {(provided) => (
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className="flex w-full flex-col gap-y-2"
-                  >
+                  <div {...provided.droppableProps} ref={provided.innerRef} className="flex w-full flex-col gap-y-2">
                     {/* todo */}
                     {signers.map((signer, index) => (
                       <Draggable
@@ -586,8 +553,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             className={cn('py-1', {
-                              'pointer-events-none rounded-md bg-widget-foreground pt-2':
-                                snapshot.isDragging,
+                              'pointer-events-none rounded-md bg-widget-foreground pt-2': snapshot.isDragging,
                             })}
                           >
                             <motion.fieldset
@@ -624,9 +590,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                             handleSigningOrderChange(index, e.target.value);
                                           }}
                                           disabled={
-                                            snapshot.isDragging ||
-                                            isSubmitting ||
-                                            isSignerDirectRecipient(signer)
+                                            snapshot.isDragging || isSubmitting || isSignerDirectRecipient(signer)
                                           }
                                         />
                                       </FormControl>
@@ -657,11 +621,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                         type="email"
                                         placeholder={_(msg`Email`)}
                                         {...field}
-                                        value={
-                                          isTemplateRecipientEmailPlaceholder(field.value)
-                                            ? ''
-                                            : field.value
-                                        }
+                                        value={isTemplateRecipientEmailPlaceholder(field.value) ? '' : field.value}
                                         disabled={
                                           field.disabled ||
                                           isSubmitting ||
@@ -716,30 +676,29 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                 )}
                               />
 
-                              {showAdvancedSettings &&
-                                organisation.organisationClaim.flags.cfr21 && (
-                                  <FormField
-                                    control={form.control}
-                                    name={`signers.${index}.actionAuth`}
-                                    render={({ field }) => (
-                                      <FormItem
-                                        className={cn('col-span-8', {
-                                          'col-span-10': isSigningOrderSequential,
-                                        })}
-                                      >
-                                        <FormControl>
-                                          <RecipientActionAuthSelect
-                                            {...field}
-                                            onValueChange={field.onChange}
-                                            disabled={isSubmitting}
-                                          />
-                                        </FormControl>
+                              {showAdvancedSettings && organisation.organisationClaim.flags.cfr21 && (
+                                <FormField
+                                  control={form.control}
+                                  name={`signers.${index}.actionAuth`}
+                                  render={({ field }) => (
+                                    <FormItem
+                                      className={cn('col-span-8', {
+                                        'col-span-10': isSigningOrderSequential,
+                                      })}
+                                    >
+                                      <FormControl>
+                                        <RecipientActionAuthSelect
+                                          {...field}
+                                          onValueChange={field.onChange}
+                                          disabled={isSubmitting}
+                                        />
+                                      </FormControl>
 
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-                                )}
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                              )}
 
                               <div className="col-span-2 flex gap-x-2">
                                 <FormField
@@ -769,15 +728,14 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                       <Link2Icon className="h-4 w-4" />
                                     </TooltipTrigger>
                                     <TooltipContent className="z-9999 max-w-md p-4 text-foreground">
-                                      <h3 className="text-lg font-semibold text-foreground">
+                                      <h3 className="font-semibold text-foreground text-lg">
                                         <Trans>Direct link receiver</Trans>
                                       </h3>
                                       <p className="mt-1 text-muted-foreground">
                                         <Trans>
-                                          This field cannot be modified or deleted. When you share
-                                          this template's direct link or add it to your public
-                                          profile, anyone who accesses it can input their name and
-                                          email, and fill in the fields assigned to them.
+                                          This field cannot be modified or deleted. When you share this template's
+                                          direct link or add it to your public profile, anyone who accesses it can input
+                                          their name and email, and fill in the fields assigned to them.
                                         </Trans>
                                       </p>
                                     </TooltipContent>
@@ -823,7 +781,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                 disabled={isSubmitting}
                 onClick={() => onAddPlaceholderRecipient()}
               >
-                <Plus className="-ml-1 mr-2 h-5 w-5" />
+                <Plus className="mr-2 -ml-1 h-5 w-5" />
                 <Trans>Add Placeholder Recipient</Trans>
               </Button>
 
@@ -831,13 +789,10 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                 type="button"
                 className="bg-black/5 hover:bg-black/10 dark:bg-muted dark:hover:bg-muted/80"
                 variant="secondary"
-                disabled={
-                  isSubmitting ||
-                  form.getValues('signers').some((signer) => signer.email === user?.email)
-                }
+                disabled={isSubmitting || form.getValues('signers').some((signer) => signer.email === user?.email)}
                 onClick={() => onAddPlaceholderSelfRecipient()}
               >
-                <Plus className="-ml-1 mr-2 h-5 w-5" />
+                <Plus className="mr-2 -ml-1 h-5 w-5" />
                 <Trans>Add Myself</Trans>
               </Button>
             </div>
@@ -851,10 +806,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                   onCheckedChange={(value) => setShowAdvancedSettings(Boolean(value))}
                 />
 
-                <label
-                  className="ml-2 text-sm text-muted-foreground"
-                  htmlFor="showAdvancedRecipientSettings"
-                >
+                <label className="ml-2 text-muted-foreground text-sm" htmlFor="showAdvancedRecipientSettings">
                   <Trans>Show advanced settings</Trans>
                 </label>
               </div>

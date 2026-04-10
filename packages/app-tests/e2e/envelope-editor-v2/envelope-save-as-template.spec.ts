@@ -1,8 +1,5 @@
-import { type Page, expect, test } from '@playwright/test';
-import { EnvelopeType, FieldType, RecipientRole } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { prisma } from '@documenso/prisma';
@@ -13,6 +10,8 @@ import type {
 } from '@documenso/trpc/server/envelope-router/create-envelope.types';
 import type { TCreateEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/envelope-recipients/create-envelope-recipients.types';
 import type { TGetEnvelopeResponse } from '@documenso/trpc/server/envelope-router/get-envelope.types';
+import { expect, type Page, test } from '@playwright/test';
+import { EnvelopeType, FieldType, RecipientRole } from '@prisma/client';
 
 import { apiSignin } from '../fixtures/authentication';
 import {
@@ -31,11 +30,7 @@ const examplePdfBuffer = fs.readFileSync(path.join(__dirname, '../../../../asset
 /**
  * Place a field on the PDF canvas in the envelope editor.
  */
-const placeFieldOnPdf = async (
-  root: Page,
-  fieldName: 'Signature' | 'Text',
-  position: { x: number; y: number },
-) => {
+const placeFieldOnPdf = async (root: Page, fieldName: 'Signature' | 'Text', position: { x: number; y: number }) => {
   await root.getByRole('button', { name: fieldName, exact: true }).click();
 
   const canvas = root.locator('.konva-container canvas').first();
@@ -69,10 +64,7 @@ const createDocumentWithRecipientAndField = async () => {
 
   const formData = new FormData();
   formData.append('payload', JSON.stringify(payload));
-  formData.append(
-    'files',
-    new File([examplePdfBuffer], 'example.pdf', { type: 'application/pdf' }),
-  );
+  formData.append('files', new File([examplePdfBuffer], 'example.pdf', { type: 'application/pdf' }));
 
   const createRes = await fetch(`${V2_API_BASE_URL}/envelope/create`, {
     method: 'POST',

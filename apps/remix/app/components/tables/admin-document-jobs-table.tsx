@@ -1,9 +1,3 @@
-import { useMemo } from 'react';
-
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { useSearchParams } from 'react-router';
-
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { trpc } from '@documenso/trpc/react';
@@ -13,6 +7,9 @@ import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { useMemo } from 'react';
+import { useSearchParams } from 'react-router';
 
 export const AdminDocumentJobsTable = ({ envelopeId }: { envelopeId: string }) => {
   const { t, i18n } = useLingui();
@@ -22,12 +19,11 @@ export const AdminDocumentJobsTable = ({ envelopeId }: { envelopeId: string }) =
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
-  const { data, isLoading, isLoadingError, refetch, isFetching } =
-    trpc.admin.document.findJobs.useQuery({
-      envelopeId: envelopeId,
-      page: parsedSearchParams.page,
-      perPage: parsedSearchParams.perPage,
-    });
+  const { data, isLoading, isLoadingError, refetch, isFetching } = trpc.admin.document.findJobs.useQuery({
+    envelopeId: envelopeId,
+    page: parsedSearchParams.page,
+    perPage: parsedSearchParams.perPage,
+  });
 
   const onPaginationChange = (page: number, perPage: number) => {
     updateSearchParams({
@@ -65,8 +61,7 @@ export const AdminDocumentJobsTable = ({ envelopeId }: { envelopeId: string }) =
       {
         header: t`Last Retried`,
         accessorKey: 'lastRetriedAt',
-        cell: ({ row }) =>
-          row.original.lastRetriedAt ? i18n.date(row.original.lastRetriedAt) : 'N/A',
+        cell: ({ row }) => (row.original.lastRetriedAt ? i18n.date(row.original.lastRetriedAt) : 'N/A'),
       },
       {
         header: t`Completed`,
@@ -79,7 +74,7 @@ export const AdminDocumentJobsTable = ({ envelopeId }: { envelopeId: string }) =
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">
+        <h2 className="font-semibold text-lg">
           <Trans>Background Jobs</Trans>
         </h2>
 
@@ -126,9 +121,7 @@ export const AdminDocumentJobsTable = ({ envelopeId }: { envelopeId: string }) =
         }}
       >
         {(table) =>
-          results.totalPages > 1 && (
-            <DataTablePagination additionalInformation="VisibleCount" table={table} />
-          )
+          results.totalPages > 1 && <DataTablePagination additionalInformation="VisibleCount" table={table} />
         }
       </DataTable>
     </div>

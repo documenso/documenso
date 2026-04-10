@@ -1,15 +1,3 @@
-import { useMemo } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { OrganisationMemberRole } from '@prisma/client';
-import { ExternalLinkIcon, InfoIcon, Loader } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router';
-import { match } from 'ts-pattern';
-import type { z } from 'zod';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { SUBSCRIPTION_STATUS_MAP } from '@documenso/lib/constants/billing';
 import { AppError } from '@documenso/lib/errors/app-error';
@@ -20,12 +8,7 @@ import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisa
 import { trpc } from '@documenso/trpc/react';
 import type { TGetAdminOrganisationResponse } from '@documenso/trpc/server/admin-router/get-admin-organisation.types';
 import { ZUpdateAdminOrganisationRequestSchema } from '@documenso/trpc/server/admin-router/update-admin-organisation.types';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@documenso/ui/primitives/accordion';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@documenso/ui/primitives/accordion';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
@@ -43,6 +26,16 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { OrganisationMemberRole } from '@prisma/client';
+import { ExternalLinkIcon, InfoIcon, Loader } from 'lucide-react';
+import { useMemo } from 'react';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router';
+import { match } from 'ts-pattern';
+import type { z } from 'zod';
 
 import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
 import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
@@ -60,10 +53,7 @@ export async function loader() {
   };
 }
 
-export default function OrganisationGroupSettingsPage({
-  params,
-  loaderData,
-}: Route.ComponentProps) {
+export default function OrganisationGroupSettingsPage({ params, loaderData }: Route.ComponentProps) {
   const { licenseFlags } = loaderData;
 
   const { i18n, t } = useLingui();
@@ -73,10 +63,9 @@ export default function OrganisationGroupSettingsPage({
 
   const organisationId = params.id;
 
-  const { data: organisation, isLoading: isLoadingOrganisation } =
-    trpc.admin.organisation.get.useQuery({
-      organisationId,
-    });
+  const { data: organisation, isLoading: isLoadingOrganisation } = trpc.admin.organisation.get.useQuery({
+    organisationId,
+  });
 
   const { mutateAsync: createStripeCustomer, isPending: isCreatingStripeCustomer } =
     trpc.admin.stripe.createCustomer.useMutation({
@@ -111,9 +100,7 @@ export default function OrganisationGroupSettingsPage({
       {
         header: t`Team ID`,
         accessorKey: 'id',
-        cell: ({ row }) => (
-          <span className="font-mono text-xs text-muted-foreground">{row.original.id}</span>
-        ),
+        cell: ({ row }) => <span className="font-mono text-muted-foreground text-xs">{row.original.id}</span>,
       },
       {
         header: t`Team url`,
@@ -125,7 +112,7 @@ export default function OrganisationGroupSettingsPage({
         accessorKey: 'createdAt',
         cell: ({ row }) => {
           return (
-            <span className="whitespace-nowrap font-mono text-xs text-muted-foreground">
+            <span className="whitespace-nowrap font-mono text-muted-foreground text-xs">
               {i18n.date(row.original.createdAt)}
             </span>
           );
@@ -140,16 +127,11 @@ export default function OrganisationGroupSettingsPage({
         header: t`Member`,
         cell: ({ row }) => (
           <div className="space-y-1">
-            <Link
-              className="font-medium hover:underline"
-              to={`/admin/users/${row.original.user.id}`}
-            >
+            <Link className="font-medium hover:underline" to={`/admin/users/${row.original.user.id}`}>
               {row.original.user.name ?? row.original.user.email}
             </Link>
             {row.original.user.name && (
-              <div className="font-mono text-xs text-muted-foreground">
-                {row.original.user.email}
-              </div>
+              <div className="font-mono text-muted-foreground text-xs">{row.original.user.email}</div>
             )}
           </div>
         ),
@@ -157,9 +139,7 @@ export default function OrganisationGroupSettingsPage({
       {
         header: t`User ID`,
         accessorKey: 'userId',
-        cell: ({ row }) => (
-          <span className="font-mono text-xs text-muted-foreground">{row.original.userId}</span>
-        ),
+        cell: ({ row }) => <span className="font-mono text-muted-foreground text-xs">{row.original.userId}</span>,
       },
       {
         header: t`Role`,
@@ -192,7 +172,7 @@ export default function OrganisationGroupSettingsPage({
         accessorKey: 'createdAt',
         cell: ({ row }) => {
           return (
-            <span className="whitespace-nowrap font-mono text-xs text-muted-foreground">
+            <span className="whitespace-nowrap font-mono text-muted-foreground text-xs">
               {i18n.date(row.original.createdAt)}
             </span>
           );
@@ -255,10 +235,7 @@ export default function OrganisationGroupSettingsPage({
 
   return (
     <div>
-      <SettingsHeader
-        title={t`Manage organisation`}
-        subtitle={t`Manage the ${organisation.name} organisation`}
-      >
+      <SettingsHeader title={t`Manage organisation`} subtitle={t`Manage the ${organisation.name} organisation`}>
         <Button variant="outline" asChild>
           <Link to={`/admin/organisation-insights/${organisationId}`}>
             <Trans>View insights</Trans>
@@ -271,10 +248,10 @@ export default function OrganisationGroupSettingsPage({
       <div className="mt-6 rounded-lg border p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-medium">
+            <p className="font-medium text-sm">
               <Trans>Organisation usage</Trans>
             </p>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-1 text-muted-foreground text-sm">
               <Trans>Current usage against organisation limits.</Trans>
             </p>
           </div>
@@ -293,9 +270,7 @@ export default function OrganisationGroupSettingsPage({
           <DetailsCard label={<Trans>Teams</Trans>}>
             <DetailsValue>
               {organisation.teams.length} /{' '}
-              {organisation.organisationClaim.teamCount === 0
-                ? t`Unlimited`
-                : organisation.organisationClaim.teamCount}
+              {organisation.organisationClaim.teamCount === 0 ? t`Unlimited` : organisation.organisationClaim.teamCount}
             </DetailsValue>
           </DetailsCard>
         </div>
@@ -306,10 +281,10 @@ export default function OrganisationGroupSettingsPage({
           <AccordionItem value="global-settings" className="border-b-0">
             <AccordionTrigger className="py-0">
               <div className="text-left">
-                <p className="text-sm font-medium">
+                <p className="font-medium text-sm">
                   <Trans>Global Settings</Trans>
                 </p>
-                <p className="mt-1 text-sm font-normal text-muted-foreground">
+                <p className="mt-1 font-normal text-muted-foreground text-sm">
                   <Trans>Default settings applied to this organisation.</Trans>
                 </p>
               </div>
@@ -329,10 +304,7 @@ export default function OrganisationGroupSettingsPage({
         className="mt-16"
       />
 
-      <Alert
-        className="my-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center"
-        variant="neutral"
-      >
+      <Alert className="my-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
         <div className="mb-4 sm:mb-0">
           <AlertTitle>
             <Trans>Subscription</Trans>
@@ -340,10 +312,7 @@ export default function OrganisationGroupSettingsPage({
 
           <AlertDescription className="mr-2">
             {organisation.subscription ? (
-              <span>
-                {i18n._(SUBSCRIPTION_STATUS_MAP[organisation.subscription.status])} subscription
-                found
-              </span>
+              <span>{i18n._(SUBSCRIPTION_STATUS_MAP[organisation.subscription.status])} subscription found</span>
             ) : (
               <span>
                 <Trans>No subscription found</Trans>
@@ -397,7 +366,7 @@ export default function OrganisationGroupSettingsPage({
 
       <div className="mt-16 space-y-10">
         <div>
-          <label className="text-sm font-medium leading-none">
+          <label className="font-medium text-sm leading-none">
             <Trans>Organisation Members</Trans>
           </label>
 
@@ -407,7 +376,7 @@ export default function OrganisationGroupSettingsPage({
         </div>
 
         <div>
-          <label className="text-sm font-medium leading-none">
+          <label className="font-medium text-sm leading-none">
             <Trans>Organisation Teams</Trans>
           </label>
 
@@ -420,15 +389,12 @@ export default function OrganisationGroupSettingsPage({
   );
 }
 
-const ZUpdateGenericOrganisationDataFormSchema =
-  ZUpdateAdminOrganisationRequestSchema.shape.data.pick({
-    name: true,
-    url: true,
-  });
+const ZUpdateGenericOrganisationDataFormSchema = ZUpdateAdminOrganisationRequestSchema.shape.data.pick({
+  name: true,
+  url: true,
+});
 
-type TUpdateGenericOrganisationDataFormSchema = z.infer<
-  typeof ZUpdateGenericOrganisationDataFormSchema
->;
+type TUpdateGenericOrganisationDataFormSchema = z.infer<typeof ZUpdateGenericOrganisationDataFormSchema>;
 
 type OrganisationAdminFormOptions = {
   organisation: TGetAdminOrganisationResponse;
@@ -504,7 +470,7 @@ const GenericOrganisationAdminForm = ({ organisation }: OrganisationAdminFormOpt
                 <Input {...field} />
               </FormControl>
               {!form.formState.errors.url && (
-                <span className="text-xs font-normal text-foreground/50">
+                <span className="font-normal text-foreground/50 text-xs">
                   {field.value ? (
                     `${NEXT_PUBLIC_WEBAPP_URL()}/o/${field.value}`
                   ) : (
@@ -609,22 +575,21 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
 
                     <p>
                       <Trans>
-                        This is the claim that this organisation was initially created with. Any
-                        feature flag changes to this claim will be backported into this
-                        organisation.
+                        This is the claim that this organisation was initially created with. Any feature flag changes to
+                        this claim will be backported into this organisation.
                       </Trans>
                     </p>
 
                     <p>
                       <Trans>
-                        For example, if the claim has a new flag "FLAG_1" set to true, then this
-                        organisation will get that flag added.
+                        For example, if the claim has a new flag "FLAG_1" set to true, then this organisation will get
+                        that flag added.
                       </Trans>
                     </p>
                     <p>
                       <Trans>
-                        This will ONLY backport feature flags which are set to true, anything
-                        disabled in the initial claim will not be backported
+                        This will ONLY backport feature flags which are set to true, anything disabled in the initial
+                        claim will not be backported
                       </Trans>
                     </p>
                   </TooltipContent>
@@ -653,7 +618,7 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
                 <Link
                   target="_blank"
                   to={`https://dashboard.stripe.com/customers/${field.value}`}
-                  className="text-xs font-normal text-foreground/50"
+                  className="font-normal text-foreground/50 text-xs"
                 >
                   {`https://dashboard.stripe.com/customers/${field.value}`}
                 </Link>
@@ -743,8 +708,7 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
 
           <div className="mt-2 space-y-2 rounded-md border p-4">
             {Object.values(SUBSCRIPTION_CLAIM_FEATURE_FLAGS).map(({ key, label, isEnterprise }) => {
-              const isRestrictedFeature =
-                isEnterprise && !licenseFlags?.[key as keyof TLicenseClaim]; // eslint-disable-line @typescript-eslint/consistent-type-assertions
+              const isRestrictedFeature = isEnterprise && !licenseFlags?.[key as keyof TLicenseClaim]; // eslint-disable-line @typescript-eslint/consistent-type-assertions
 
               return (
                 <FormField
@@ -763,7 +727,7 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
                           />
 
                           <label
-                            className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
+                            className="ml-2 flex flex-row items-center text-muted-foreground text-sm"
                             htmlFor={`flag-${key}`}
                           >
                             {label}

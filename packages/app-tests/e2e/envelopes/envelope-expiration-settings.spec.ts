@@ -1,16 +1,13 @@
-import { expect, test } from '@playwright/test';
-
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
 import { prisma } from '@documenso/prisma';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 
 test.describe.configure({ mode: 'parallel' });
 
-test('[ENVELOPE_EXPIRATION]: set custom expiration period at organisation level', async ({
-  page,
-}) => {
+test('[ENVELOPE_EXPIRATION]: set custom expiration period at organisation level', async ({ page }) => {
   const { user, organisation } = await seedUser({
     isPersonalOrganisation: false,
   });
@@ -33,9 +30,7 @@ test('[ENVELOPE_EXPIRATION]: set custom expiration period at organisation level'
   // In the duration mode, there's a mode select and a unit select.
   // The unit select is inside the duration row, after the number input.
   // Let's find the select trigger that contains the unit text.
-  const unitTrigger = page
-    .locator('button[role="combobox"]')
-    .filter({ hasText: /Months|Days|Weeks|Years/ });
+  const unitTrigger = page.locator('button[role="combobox"]').filter({ hasText: /Months|Days|Weeks|Years/ });
 
   await unitTrigger.click();
   await page.getByRole('option', { name: 'Weeks' }).click();
@@ -65,9 +60,7 @@ test('[ENVELOPE_EXPIRATION]: disable expiration at organisation level', async ({
   await expect(page.getByRole('button', { name: 'Update' }).first()).toBeVisible();
 
   // Find the mode select (shows "Custom duration") and change to "Never expires".
-  const modeTrigger = page
-    .locator('button[role="combobox"]')
-    .filter({ hasText: 'Custom duration' });
+  const modeTrigger = page.locator('button[role="combobox"]').filter({ hasText: 'Custom duration' });
   await modeTrigger.click();
   await page.getByRole('option', { name: 'Never expires' }).click();
 

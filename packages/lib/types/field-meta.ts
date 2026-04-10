@@ -37,9 +37,7 @@ const ZFieldMetaLetterSpacing = z.coerce
   .min(FIELD_MIN_LETTER_SPACING)
   .max(FIELD_MAX_LETTER_SPACING)
   .describe('The spacing between each character');
-const ZFieldMetaVerticalAlign = z
-  .enum(['top', 'middle', 'bottom'])
-  .describe('The vertical alignment of the text');
+const ZFieldMetaVerticalAlign = z.enum(['top', 'middle', 'bottom']).describe('The vertical alignment of the text');
 
 export const ZBaseFieldMeta = z.object({
   label: z.string().optional(),
@@ -86,10 +84,7 @@ export type TDateFieldMeta = z.infer<typeof ZDateFieldMeta>;
 export const ZTextFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('text'),
   text: z.string().optional(),
-  characterLimit: z.coerce
-    .number({ invalid_type_error: 'Value must be a number' })
-    .min(0)
-    .optional(),
+  characterLimit: z.coerce.number({ invalid_type_error: 'Value must be a number' }).min(0).optional(),
   textAlign: ZFieldTextAlignSchema.optional(),
   lineHeight: ZFieldMetaLineHeight.nullish(),
   letterSpacing: ZFieldMetaLetterSpacing.nullish(),

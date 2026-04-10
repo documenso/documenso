@@ -1,8 +1,5 @@
-import { type APIRequestContext, expect, test } from '@playwright/test';
-import type { Team, User } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { prisma } from '@documenso/prisma';
@@ -16,6 +13,8 @@ import type { TDistributeEnvelopeRequest } from '@documenso/trpc/server/envelope
 import type { TCreateEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/envelope-recipients/create-envelope-recipients.types';
 import type { TGetEnvelopeResponse } from '@documenso/trpc/server/envelope-router/get-envelope.types';
 import type { TUpdateEnvelopeItemsRequest } from '@documenso/trpc/server/envelope-router/update-envelope-items.types';
+import { type APIRequestContext, expect, test } from '@playwright/test';
+import type { Team, User } from '@prisma/client';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 const baseUrl = `${WEBAPP_BASE_URL}/api/v2-beta`;
@@ -64,11 +63,7 @@ const getEnvelope = async (request: APIRequestContext, authToken: string, envelo
  * Transition an envelope from DRAFT to PENDING by adding a recipient with a
  * signature field and distributing.
  */
-const distributeEnvelope = async (
-  request: APIRequestContext,
-  authToken: string,
-  envelopeId: string,
-) => {
+const distributeEnvelope = async (request: APIRequestContext, authToken: string, envelopeId: string) => {
   const recipientEmail = `signer-${Date.now()}@test.documenso.com`;
 
   // Create a SIGNER recipient.
@@ -228,9 +223,7 @@ test.describe('Update envelope items', () => {
     expect(dbItem.title).toBe('Updated Pending Title');
   });
 
-  test('should allow title-only update when order matches existing on a PENDING envelope', async ({
-    request,
-  }) => {
+  test('should allow title-only update when order matches existing on a PENDING envelope', async ({ request }) => {
     const envelope = await createEnvelope(request, token);
     await distributeEnvelope(request, token, envelope.id);
 
@@ -318,9 +311,7 @@ test.describe('Update envelope items', () => {
     expect(res.status()).toBe(400);
   });
 
-  test('should reject combined title and order change on a PENDING envelope', async ({
-    request,
-  }) => {
+  test('should reject combined title and order change on a PENDING envelope', async ({ request }) => {
     const envelope = await createEnvelope(request, token);
     await distributeEnvelope(request, token, envelope.id);
 
@@ -499,9 +490,7 @@ test.describe('Update envelope items', () => {
     expect(res.ok()).toBeFalsy();
   });
 
-  test('should reject update for an envelope item that does not belong to the envelope', async ({
-    request,
-  }) => {
+  test('should reject update for an envelope item that does not belong to the envelope', async ({ request }) => {
     const envelopeA = await createEnvelope(request, token);
     const envelopeB = await createEnvelope(request, token);
 

@@ -1,3 +1,11 @@
+import { authClient } from '@documenso/auth/client';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
+import { cn } from '@documenso/ui/lib/utils';
+import { Button } from '@documenso/ui/primitives/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
+import { PasswordInput } from '@documenso/ui/primitives/password-input';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -6,22 +14,6 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
-
-import { authClient } from '@documenso/auth/client';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { PasswordInput } from '@documenso/ui/primitives/password-input';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZResetPasswordFormSchema = z
   .object({
@@ -78,13 +70,9 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
       const errorMessage = match(error.code)
         .with(AppErrorCode.EXPIRED_CODE, () => msg`Token has expired. Please try again.`)
         .with('INVALID_TOKEN', () => msg`Invalid token provided. Please try again.`)
-        .with(
-          'SAME_PASSWORD',
-          () => msg`Your new password cannot be the same as your old password.`,
-        )
+        .with('SAME_PASSWORD', () => msg`Your new password cannot be the same as your old password.`)
         .otherwise(
-          () =>
-            msg`We encountered an unknown error while attempting to reset your password. Please try again later.`,
+          () => msg`We encountered an unknown error while attempting to reset your password. Please try again later.`,
         );
 
       toast({
@@ -97,10 +85,7 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
 
   return (
     <Form {...form}>
-      <form
-        className={cn('flex w-full flex-col gap-y-4', className)}
-        onSubmit={form.handleSubmit(onFormSubmit)}
-      >
+      <form className={cn('flex w-full flex-col gap-y-4', className)} onSubmit={form.handleSubmit(onFormSubmit)}>
         <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
           <FormField
             control={form.control}

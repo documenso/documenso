@@ -1,9 +1,8 @@
-import { EnvelopeType } from '@prisma/client';
-
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
@@ -16,12 +15,7 @@ export interface DeleteDocumentFieldOptions {
   requestMetadata: ApiRequestMetadata;
 }
 
-export const deleteDocumentField = async ({
-  userId,
-  teamId,
-  fieldId,
-  requestMetadata,
-}: DeleteDocumentFieldOptions) => {
+export const deleteDocumentField = async ({ userId, teamId, fieldId, requestMetadata }: DeleteDocumentFieldOptions) => {
   // Unauthenticated check, we do the real check later.
   const field = await prisma.field.findFirst({
     where: {

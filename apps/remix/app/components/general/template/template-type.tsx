@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from 'react';
+import { cn } from '@documenso/ui/lib/utils';
 
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
@@ -6,8 +6,7 @@ import { useLingui } from '@lingui/react';
 import type { TemplateType as TemplateTypePrisma } from '@prisma/client';
 import { Building2, Globe2, Lock } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react/dist/lucide-react';
-
-import { cn } from '@documenso/ui/lib/utils';
+import type { HTMLAttributes } from 'react';
 
 type TemplateTypeIcon = {
   label: MessageDescriptor;

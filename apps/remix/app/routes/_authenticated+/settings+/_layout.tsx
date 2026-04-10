@@ -13,7 +13,7 @@ export function meta() {
 export default function SettingsLayout() {
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-      <h1 className="text-4xl font-semibold">
+      <h1 className="font-semibold text-4xl">
         <Trans>Settings</Trans>
       </h1>
 

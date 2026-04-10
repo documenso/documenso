@@ -6,5 +6,4 @@ export const ExtendedDocumentStatus = {
   ALL: 'ALL',
 } as const;
 
-export type ExtendedDocumentStatus =
-  (typeof ExtendedDocumentStatus)[keyof typeof ExtendedDocumentStatus];
+export type ExtendedDocumentStatus = (typeof ExtendedDocumentStatus)[keyof typeof ExtendedDocumentStatus];

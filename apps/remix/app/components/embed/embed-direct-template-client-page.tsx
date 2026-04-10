@@ -1,30 +1,10 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import {
-  type DocumentMeta,
-  type EnvelopeItem,
-  type Field,
-  FieldType,
-  type Recipient,
-  type Signature,
-} from '@prisma/client';
-import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
-import { DateTime } from 'luxon';
-import { useSearchParams } from 'react-router';
-
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { ZDirectTemplateEmbedDataSchema } from '@documenso/lib/types/embed-direct-template-schema';
-import {
-  isFieldUnsignedAndRequired,
-  isRequiredField,
-} from '@documenso/lib/utils/advanced-fields-helpers';
+import { isFieldUnsignedAndRequired, isRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { dynamicActivate } from '@documenso/lib/utils/i18n';
@@ -43,6 +23,21 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import {
+  type DocumentMeta,
+  type EnvelopeItem,
+  type Field,
+  FieldType,
+  type Recipient,
+  type Signature,
+} from '@prisma/client';
+import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
+import { DateTime } from 'luxon';
+import { useEffect, useLayoutEffect, useState } from 'react';
+import { useSearchParams } from 'react-router';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
 import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
@@ -83,8 +78,7 @@ export const EmbedDirectTemplateClientPage = ({
 
   const [searchParams] = useSearchParams();
 
-  const { fullName, email, signature, setFullName, setEmail, setSignature } =
-    useRequiredDocumentSigningContext();
+  const { fullName, email, signature, setFullName, setEmail, setSignature } = useRequiredDocumentSigningContext();
 
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
   const [hasDocumentLoaded, setHasDocumentLoaded] = useState(false);
@@ -134,10 +128,8 @@ export const EmbedDirectTemplateClientPage = ({
             created: new Date(),
             recipientId: 1,
             fieldId: 1,
-            signatureImageAsBase64:
-              payload.value && payload.value.startsWith('data:') ? payload.value : null,
-            typedSignature:
-              payload.value && !payload.value.startsWith('data:') ? payload.value : null,
+            signatureImageAsBase64: payload.value && payload.value.startsWith('data:') ? payload.value : null,
+            typedSignature: payload.value && !payload.value.startsWith('data:') ? payload.value : null,
           } satisfies Signature;
         }
 
@@ -269,9 +261,7 @@ export const EmbedDirectTemplateClientPage = ({
 
       toast({
         title: _(msg`Something went wrong`),
-        description: _(
-          msg`We were unable to submit this document at this time. Please try again later.`,
-        ),
+        description: _(msg`We were unable to submit this document at this time. Please try again later.`),
         variant: 'destructive',
       });
     }
@@ -377,31 +367,23 @@ export const EmbedDirectTemplateClientPage = ({
         {/* Widget */}
         <div
           key={isExpanded ? 'expanded' : 'collapsed'}
-          className="group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:bottom-[unset] md:top-4 md:z-auto md:w-[350px] md:px-0"
+          className="group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:top-4 md:bottom-[unset] md:z-auto md:w-[350px] md:px-0"
           data-expanded={isExpanded || undefined}
         >
           <div className="flex h-fit w-full flex-col rounded-xl border border-border bg-widget px-4 py-4 md:min-h-[min(calc(100dvh-2rem),48rem)] md:py-6">
             {/* Header */}
             <div>
               <div className="flex items-center justify-between gap-x-2">
-                <h3 className="text-xl font-semibold text-foreground md:text-2xl">
+                <h3 className="font-semibold text-foreground text-xl md:text-2xl">
                   <Trans>Sign document</Trans>
                 </h3>
 
                 {isExpanded ? (
-                  <Button
-                    variant="outline"
-                    className="h-8 w-8 p-0 md:hidden"
-                    onClick={() => setIsExpanded(false)}
-                  >
+                  <Button variant="outline" className="h-8 w-8 p-0 md:hidden" onClick={() => setIsExpanded(false)}>
                     <LucideChevronDown className="h-5 w-5 text-muted-foreground" />
                   </Button>
                 ) : pendingFields.length > 0 ? (
-                  <Button
-                    variant="outline"
-                    className="h-8 w-8 p-0 md:hidden"
-                    onClick={() => setIsExpanded(true)}
-                  >
+                  <Button variant="outline" className="h-8 w-8 p-0 md:hidden" onClick={() => setIsExpanded(true)}>
                     <LucideChevronUp className="h-5 w-5 text-muted-foreground" />
                   </Button>
                 ) : (
@@ -420,11 +402,11 @@ export const EmbedDirectTemplateClientPage = ({
             </div>
 
             <div className="hidden group-data-[expanded]/document-widget:block md:block">
-              <p className="mt-2 text-sm text-muted-foreground">
+              <p className="mt-2 text-muted-foreground text-sm">
                 <Trans>Sign the document to complete the process.</Trans>
               </p>
 
-              <hr className="mb-8 mt-4 border-border" />
+              <hr className="mt-4 mb-8 border-border" />
             </div>
 
             {/* Form */}
@@ -453,10 +435,7 @@ export const EmbedDirectTemplateClientPage = ({
                   <Input
                     type="email"
                     id="email"
-                    className={cn(
-                      'mt-2 bg-background',
-                      emailError && 'border-destructive ring-2 ring-destructive/20',
-                    )}
+                    className={cn('mt-2 bg-background', emailError && 'border-destructive ring-2 ring-destructive/20')}
                     disabled={isEmailLocked}
                     value={email}
                     onChange={(e) => {
@@ -467,9 +446,7 @@ export const EmbedDirectTemplateClientPage = ({
                     }}
                   />
 
-                  {emailError && (
-                    <p className="mt-2 text-xs font-medium text-destructive">{emailError}</p>
-                  )}
+                  {emailError && <p className="mt-2 font-medium text-destructive text-xs">{emailError}</p>}
                 </div>
 
                 {hasSignatureField && (
@@ -516,9 +493,7 @@ export const EmbedDirectTemplateClientPage = ({
         </div>
 
         {showPendingFieldTooltip && pendingFields.length > 0 && (
-          <ElementVisible
-            target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${pendingFields[0].page}"]`}
-          >
+          <ElementVisible target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${pendingFields[0].page}"]`}>
             <FieldToolTip key={pendingFields[0].id} field={pendingFields[0]} color="warning">
               <Trans>Click to insert field</Trans>
             </FieldToolTip>
@@ -535,7 +510,7 @@ export const EmbedDirectTemplateClientPage = ({
       </div>
 
       {!hidePoweredBy && (
-        <div className="fixed bottom-0 left-0 z-40 rounded-tr bg-primary px-2 py-1 text-xs font-medium text-primary-foreground opacity-60 hover:opacity-100">
+        <div className="fixed bottom-0 left-0 z-40 rounded-tr bg-primary px-2 py-1 font-medium text-primary-foreground text-xs opacity-60 hover:opacity-100">
           <span>
             <Trans>Powered by</Trans>
           </span>

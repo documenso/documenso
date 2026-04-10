@@ -20,9 +20,7 @@ import {
   SigningStatus,
 } from '../client';
 
-const examplePdf = fs
-  .readFileSync(path.join(__dirname, '../../../assets/example.pdf'))
-  .toString('base64');
+const examplePdf = fs.readFileSync(path.join(__dirname, '../../../assets/example.pdf')).toString('base64');
 
 type SeedTemplateOptions = {
   title?: string;
@@ -37,11 +35,7 @@ type CreateTemplateOptions = {
   createTemplateOptions?: Partial<Prisma.EnvelopeUncheckedCreateInput>;
 };
 
-export const seedBlankTemplate = async (
-  owner: User,
-  teamId: number,
-  options: CreateTemplateOptions = {},
-) => {
+export const seedBlankTemplate = async (owner: User, teamId: number, options: CreateTemplateOptions = {}) => {
   const { key, createTemplateOptions = {} } = options;
 
   const documentData = await prisma.documentData.create({

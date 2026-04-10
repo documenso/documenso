@@ -1,10 +1,9 @@
 // sort-imports-ignore
 import '../konva/skia-backend';
 
+import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import Konva from 'konva';
 import type { Canvas } from 'skia-canvas';
-
-import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 
 import { renderField } from '../../universal/field-renderer/render-field';
 import { ensureFontLibrary } from './helpers';
@@ -15,11 +14,7 @@ type InsertFieldInPDFV2Options = {
   fields: FieldWithSignature[];
 };
 
-export const insertFieldInPDFV2 = async ({
-  pageWidth,
-  pageHeight,
-  fields,
-}: InsertFieldInPDFV2Options) => {
+export const insertFieldInPDFV2 = async ({ pageWidth, pageHeight, fields }: InsertFieldInPDFV2Options) => {
   ensureFontLibrary();
 
   let stage: Konva.Stage | null = new Konva.Stage({ width: pageWidth, height: pageHeight });

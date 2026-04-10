@@ -1,7 +1,6 @@
+import { prisma } from '@documenso/prisma';
 import { hash } from '@node-rs/bcrypt';
 import type { User } from '@prisma/client';
-
-import { prisma } from '@documenso/prisma';
 
 import { SALT_ROUNDS } from '../../constants/auth';
 import { AppError, AppErrorCode } from '../../errors/app-error';

@@ -1,5 +1,4 @@
-import type { Envelope } from '@prisma/client';
-import { type Recipient } from '@prisma/client';
+import type { Envelope, Recipient } from '@prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import type { TTemplateLite } from '../types/template';

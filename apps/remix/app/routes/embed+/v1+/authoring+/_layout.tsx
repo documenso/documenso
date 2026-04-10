@@ -1,8 +1,3 @@
-import { useLayoutEffect, useState } from 'react';
-
-import { Trans } from '@lingui/react/macro';
-import { Outlet, useLoaderData } from 'react-router';
-
 import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
@@ -10,6 +5,9 @@ import { ZBaseEmbedAuthoringSchema } from '@documenso/lib/types/embed-authoring-
 import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { Spinner } from '@documenso/ui/primitives/spinner';
+import { Trans } from '@lingui/react/macro';
+import { useLayoutEffect, useState } from 'react';
+import { Outlet, useLoaderData } from 'react-router';
 
 import { injectCss } from '~/utils/css-vars';
 
@@ -55,9 +53,7 @@ export default function AuthoringLayout() {
     try {
       const hash = window.location.hash.slice(1);
 
-      const result = ZBaseEmbedAuthoringSchema.safeParse(
-        JSON.parse(decodeURIComponent(atob(hash))),
-      );
+      const result = ZBaseEmbedAuthoringSchema.safeParse(JSON.parse(decodeURIComponent(atob(hash))));
 
       if (!result.success) {
         setHasFinishedInit(true);

@@ -1,12 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
-
-import { Trans, useLingui } from '@lingui/react/macro';
-import { SigningStatus } from '@prisma/client';
-import type { Field, Recipient } from '@prisma/client';
-import { ClockIcon, EyeOffIcon, LockIcon } from 'lucide-react';
-
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { Trans, useLingui } from '@lingui/react/macro';
+import type { Field, Recipient } from '@prisma/client';
+import { SigningStatus } from '@prisma/client';
+import { ClockIcon, EyeOffIcon, LockIcon } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { isTemplateRecipientEmailPlaceholder } from '../../../lib/constants/template';
 import { extractInitials } from '../../../lib/utils/recipient-formatter';
@@ -20,15 +18,7 @@ import { PopoverHover } from '../../primitives/popover';
 interface EnvelopeRecipientFieldTooltipProps {
   field: Pick<
     Field,
-    | 'id'
-    | 'inserted'
-    | 'positionX'
-    | 'positionY'
-    | 'width'
-    | 'height'
-    | 'page'
-    | 'type'
-    | 'fieldMeta'
+    'id' | 'inserted' | 'positionX' | 'positionY' | 'width' | 'height' | 'page' | 'type' | 'fieldMeta'
   > & {
     recipient: Pick<Recipient, 'name' | 'email' | 'signingStatus'>;
   };
@@ -70,9 +60,7 @@ export function EnvelopeRecipientFieldTooltip({
   });
 
   const calculateCoords = useCallback(() => {
-    const $page = document.querySelector<HTMLElement>(
-      `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`,
-    );
+    const $page = document.querySelector<HTMLElement>(`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`);
 
     if (!$page) {
       return;
@@ -111,9 +99,7 @@ export function EnvelopeRecipientFieldTooltip({
   }, [calculateCoords]);
 
   useEffect(() => {
-    const $page = document.querySelector<HTMLElement>(
-      `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`,
-    );
+    const $page = document.querySelector<HTMLElement>(`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`);
 
     if (!$page) {
       return;
@@ -145,8 +131,8 @@ export function EnvelopeRecipientFieldTooltip({
     >
       <PopoverHover
         trigger={
-          <Avatar className="absolute -left-3 -top-3 z-50 h-6 w-6 border-2 border-solid border-gray-200/50 transition-colors hover:border-gray-200">
-            <AvatarFallback className="bg-neutral-50 text-xs text-gray-400">
+          <Avatar className="absolute -top-3 -left-3 z-50 h-6 w-6 border-2 border-gray-200/50 border-solid transition-colors hover:border-gray-200">
+            <AvatarFallback className="bg-neutral-50 text-gray-400 text-xs">
               {extractInitials(field.recipient.name || field.recipient.email)}
             </AvatarFallback>
           </Avatar>
@@ -191,12 +177,10 @@ export function EnvelopeRecipientFieldTooltip({
           </span>
         </p>
 
-        <p className="mt-1 text-center text-xs text-muted-foreground">
-          {getRecipientDisplayText(field.recipient)}
-        </p>
+        <p className="mt-1 text-center text-muted-foreground text-xs">{getRecipientDisplayText(field.recipient)}</p>
 
         <button
-          className="absolute right-0 top-0 my-1 p-2 focus:outline-none focus-visible:ring-0"
+          className="absolute top-0 right-0 my-1 p-2 focus:outline-none focus-visible:ring-0"
           onClick={() => setHideField(true)}
           title="Hide field"
         >

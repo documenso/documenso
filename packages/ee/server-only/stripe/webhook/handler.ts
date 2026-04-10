@@ -1,9 +1,8 @@
-import { match } from 'ts-pattern';
-
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import type { Stripe } from '@documenso/lib/server-only/stripe';
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { env } from '@documenso/lib/utils/env';
+import { match } from 'ts-pattern';
 
 import { onSubscriptionCreated } from './on-subscription-created';
 import { onSubscriptionDeleted } from './on-subscription-deleted';
@@ -35,9 +34,7 @@ export const stripeWebhookHandler = async (req: Request): Promise<Response> => {
     }
 
     const signature =
-      typeof req.headers.get('stripe-signature') === 'string'
-        ? req.headers.get('stripe-signature')
-        : '';
+      typeof req.headers.get('stripe-signature') === 'string' ? req.headers.get('stripe-signature') : '';
 
     if (!signature) {
       return Response.json(
@@ -76,25 +73,22 @@ export const stripeWebhookHandler = async (req: Request): Promise<Response> => {
 
         await onSubscriptionCreated({ subscription });
 
-        return Response.json(
-          { success: true, message: 'Webhook received' } satisfies StripeWebhookResponse,
-          { status: 200 },
-        );
+        return Response.json({ success: true, message: 'Webhook received' } satisfies StripeWebhookResponse, {
+          status: 200,
+        });
       })
       .with('customer.subscription.updated', async () => {
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         const subscription = event.data.object as Stripe.Subscription;
 
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        const previousAttributes = event.data
-          .previous_attributes as Partial<Stripe.Subscription> | null;
+        const previousAttributes = event.data.previous_attributes as Partial<Stripe.Subscription> | null;
 
         await onSubscriptionUpdated({ subscription, previousAttributes });
 
-        return Response.json(
-          { success: true, message: 'Webhook received' } satisfies StripeWebhookResponse,
-          { status: 200 },
-        );
+        return Response.json({ success: true, message: 'Webhook received' } satisfies StripeWebhookResponse, {
+          status: 200,
+        });
       })
       .with('customer.subscription.deleted', async () => {
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions

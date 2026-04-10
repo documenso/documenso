@@ -1,9 +1,8 @@
+import { formatDocumentsPath, getHighestTeamRoleInGroup } from '@documenso/lib/utils/teams';
+import { prisma } from '@documenso/prisma';
 import type { Prisma } from '@prisma/client';
 import { DocumentStatus, DocumentVisibility, EnvelopeType, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
-
-import { formatDocumentsPath, getHighestTeamRoleInGroup } from '@documenso/lib/utils/teams';
-import { prisma } from '@documenso/prisma';
 
 import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { getUserTeamGroups } from '../team/get-user-team-groups';
@@ -14,11 +13,7 @@ export type SearchDocumentsWithKeywordOptions = {
   limit?: number;
 };
 
-export const searchDocumentsWithKeyword = async ({
-  query,
-  userId,
-  limit = 20,
-}: SearchDocumentsWithKeywordOptions) => {
+export const searchDocumentsWithKeyword = async ({ query, userId, limit = 20 }: SearchDocumentsWithKeywordOptions) => {
   if (!query.trim()) {
     return [];
   }
@@ -135,10 +130,7 @@ export const searchDocumentsWithKeyword = async ({
 
       let path: string;
 
-      if (
-        envelope.userId === user.id ||
-        (envelope.teamId && teamGroupsByTeamId.has(envelope.teamId))
-      ) {
+      if (envelope.userId === user.id || (envelope.teamId && teamGroupsByTeamId.has(envelope.teamId))) {
         path = `${formatDocumentsPath(envelope.team.url)}/${legacyDocumentId}`;
       } else {
         const signingToken = envelope.recipients.find((r) => r.email === user.email)?.token;

@@ -1,7 +1,5 @@
-import { expect, test } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { prisma } from '@documenso/prisma';
@@ -13,6 +11,7 @@ import type {
   TCreateEnvelopeResponse,
 } from '@documenso/trpc/server/envelope-router/create-envelope.types';
 import type { TDistributeEnvelopeRequest } from '@documenso/trpc/server/envelope-router/distribute-envelope.types';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 import { openDropdownMenu } from '../fixtures/generic';
@@ -24,9 +23,7 @@ const examplePdf = fs.readFileSync(path.join(__dirname, '../../../../assets/exam
 
 test.describe.configure({ mode: 'parallel' });
 
-test('[ENVELOPE_EXPIRATION]: sending document sets expiresAt on recipients', async ({
-  request,
-}) => {
+test('[ENVELOPE_EXPIRATION]: sending document sets expiresAt on recipients', async ({ request }) => {
   const { user, team } = await seedUser();
 
   const { token } = await createApiToken({
@@ -98,9 +95,7 @@ test('[ENVELOPE_EXPIRATION]: sending document sets expiresAt on recipients', asy
   expect(diffDays).toBeLessThan(100);
 });
 
-test('[ENVELOPE_EXPIRATION]: sending document with custom org expiration period', async ({
-  request,
-}) => {
+test('[ENVELOPE_EXPIRATION]: sending document with custom org expiration period', async ({ request }) => {
   const { user, organisation, team } = await seedUser();
 
   // Set org expiration to 7 days.

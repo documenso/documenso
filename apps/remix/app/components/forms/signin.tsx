@@ -1,19 +1,3 @@
-import { useEffect, useMemo, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
-import { KeyRoundIcon } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { FaIdCardClip } from 'react-icons/fa6';
-import { FcGoogle } from 'react-icons/fc';
-import { Link, useNavigate } from 'react-router';
-import { match } from 'ts-pattern';
-import { z } from 'zod';
-
 import { authClient } from '@documenso/auth/client';
 import { AuthenticationErrorCode } from '@documenso/auth/server/lib/errors/error-codes';
 import { AppError } from '@documenso/lib/errors/app-error';
@@ -22,25 +6,26 @@ import { trpc } from '@documenso/trpc/react';
 import { ZCurrentPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@documenso/ui/primitives/dialog';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { PinInput, PinInputGroup, PinInputSlot } from '@documenso/ui/primitives/pin-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import type { MessageDescriptor } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
+import { KeyRoundIcon } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FaIdCardClip } from 'react-icons/fa6';
+import { FcGoogle } from 'react-icons/fc';
+import { Link, useNavigate } from 'react-router';
+import { match } from 'ts-pattern';
+import { z } from 'zod';
 
 const CommonErrorMessages: Record<string, MessageDescriptor> = {
   [AuthenticationErrorCode.AccountDisabled]: msg`This account has been disabled. Please contact support.`,
@@ -91,13 +76,10 @@ export const SignInForm = ({
 
   const navigate = useNavigate();
 
-  const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] =
-    useState(false);
+  const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] = useState(false);
   const [isEmbeddedRedirect, setIsEmbeddedRedirect] = useState(false);
 
-  const [twoFactorAuthenticationMethod, setTwoFactorAuthenticationMethod] = useState<
-    'totp' | 'backup'
-  >('totp');
+  const [twoFactorAuthenticationMethod, setTwoFactorAuthenticationMethod] = useState<'totp' | 'backup'>('totp');
 
   const hasSocialAuthEnabled = isGoogleSSOEnabled || isMicrosoftSSOEnabled || isOIDCSSOEnabled;
 
@@ -119,8 +101,7 @@ export const SignInForm = ({
     return url.toString();
   }, [returnTo]);
 
-  const { mutateAsync: createPasskeySigninOptions } =
-    trpc.auth.passkey.createSigninOptions.useMutation();
+  const { mutateAsync: createPasskeySigninOptions } = trpc.auth.passkey.createSigninOptions.useMutation();
 
   const form = useForm<TSignInFormSchema>({
     values: {
@@ -195,10 +176,7 @@ export const SignInForm = ({
           () =>
             msg`This passkey is not configured for this application. Please login and add one in the user settings.`,
         )
-        .with(
-          AuthenticationErrorCode.SessionExpired,
-          () => msg`This session has expired. Please try again.`,
-        )
+        .with(AuthenticationErrorCode.SessionExpired, () => msg`This session has expired. Please try again.`)
         .otherwise(() => handleFallbackErrorMessages(error.code));
 
       toast({
@@ -234,19 +212,14 @@ export const SignInForm = ({
 
         toast({
           title: _(msg`Unable to sign in`),
-          description: _(
-            msg`This account has not been verified. Please verify your account before signing in.`,
-          ),
+          description: _(msg`This account has not been verified. Please verify your account before signing in.`),
         });
 
         return;
       }
 
       const errorMessage = match(error.code)
-        .with(
-          AuthenticationErrorCode.InvalidCredentials,
-          () => msg`The email or password provided is incorrect.`,
-        )
+        .with(AuthenticationErrorCode.InvalidCredentials, () => msg`The email or password provided is incorrect.`)
         .with(
           AuthenticationErrorCode.InvalidTwoFactorCode,
           () => msg`The two-factor authentication code provided is incorrect.`,
@@ -269,9 +242,7 @@ export const SignInForm = ({
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),
-        description: _(
-          msg`We encountered an unknown error while attempting to sign you In. Please try again later.`,
-        ),
+        description: _(msg`We encountered an unknown error while attempting to sign you In. Please try again later.`),
         variant: 'destructive',
       });
     }
@@ -285,9 +256,7 @@ export const SignInForm = ({
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),
-        description: _(
-          msg`We encountered an unknown error while attempting to sign you In. Please try again later.`,
-        ),
+        description: _(msg`We encountered an unknown error while attempting to sign you In. Please try again later.`),
         variant: 'destructive',
       });
     }
@@ -301,9 +270,7 @@ export const SignInForm = ({
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),
-        description: _(
-          msg`We encountered an unknown error while attempting to sign you In. Please try again later.`,
-        ),
+        description: _(msg`We encountered an unknown error while attempting to sign you In. Please try again later.`),
         variant: 'destructive',
       });
     }
@@ -325,14 +292,8 @@ export const SignInForm = ({
 
   return (
     <Form {...form}>
-      <form
-        className={cn('flex w-full flex-col gap-y-4', className)}
-        onSubmit={form.handleSubmit(onFormSubmit)}
-      >
-        <fieldset
-          className="flex w-full flex-col gap-y-4"
-          disabled={isSubmitting || isPasskeyLoading}
-        >
+      <form className={cn('flex w-full flex-col gap-y-4', className)} onSubmit={form.handleSubmit(onFormSubmit)}>
+        <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting || isPasskeyLoading}>
           <FormField
             control={form.control}
             name="email"
@@ -367,10 +328,7 @@ export const SignInForm = ({
                 <FormMessage />
 
                 <p className="mt-2 text-right">
-                  <Link
-                    to="/forgot-password"
-                    className="text-sm text-muted-foreground duration-200 hover:opacity-70"
-                  >
+                  <Link to="/forgot-password" className="text-muted-foreground text-sm duration-200 hover:opacity-70">
                     <Trans>Forgot your password?</Trans>
                   </Link>
                 </p>
@@ -378,12 +336,7 @@ export const SignInForm = ({
             )}
           />
 
-          <Button
-            type="submit"
-            size="lg"
-            loading={isSubmitting}
-            className="dark:bg-documenso dark:hover:opacity-90"
-          >
+          <Button type="submit" size="lg" loading={isSubmitting} className="dark:bg-documenso dark:hover:opacity-90">
             {isSubmitting ? <Trans>Signing in...</Trans> : <Trans>Sign In</Trans>}
           </Button>
 
@@ -422,11 +375,7 @@ export const SignInForm = ({
                   disabled={isSubmitting}
                   onClick={onSignInWithMicrosoftClick}
                 >
-                  <img
-                    className="mr-2 h-4 w-4"
-                    alt="Microsoft Logo"
-                    src={'/static/microsoft.svg'}
-                  />
+                  <img className="mr-2 h-4 w-4" alt="Microsoft Logo" src={'/static/microsoft.svg'} />
                   Microsoft
                 </Button>
               )}
@@ -456,16 +405,13 @@ export const SignInForm = ({
             className="border bg-background text-muted-foreground"
             onClick={onSignInWithPasskey}
           >
-            {!isPasskeyLoading && <KeyRoundIcon className="-ml-1 mr-1 h-5 w-5" />}
+            {!isPasskeyLoading && <KeyRoundIcon className="mr-1 -ml-1 h-5 w-5" />}
             <Trans>Passkey</Trans>
           </Button>
         </fieldset>
       </form>
 
-      <Dialog
-        open={isTwoFactorAuthenticationDialogOpen}
-        onOpenChange={onCloseTwoFactorAuthenticationDialog}
-      >
+      <Dialog open={isTwoFactorAuthenticationDialogOpen} onOpenChange={onCloseTwoFactorAuthenticationDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
@@ -518,11 +464,7 @@ export const SignInForm = ({
               )}
 
               <DialogFooter className="mt-4">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={onToggleTwoFactorAuthenticationMethodClick}
-                >
+                <Button type="button" variant="secondary" onClick={onToggleTwoFactorAuthenticationMethodClick}>
                   {twoFactorAuthenticationMethod === 'totp' ? (
                     <Trans>Use Backup Code</Trans>
                   ) : (

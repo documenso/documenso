@@ -29,9 +29,7 @@ const ZBox2DSchema = z.array(z.number().min(0).max(1000)).length(4);
  * Schema for a detected field.
  */
 export const ZDetectedFieldSchema = z.object({
-  type: ZDetectableFieldType.describe(
-    `The field type based on nearby labels and visual appearance`,
-  ),
+  type: ZDetectableFieldType.describe(`The field type based on nearby labels and visual appearance`),
   recipientKey: z
     .string()
     .describe(

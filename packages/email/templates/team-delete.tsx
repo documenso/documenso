@@ -1,7 +1,6 @@
+import { formatTeamUrl } from '@documenso/lib/utils/teams';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-
-import { formatTeamUrl } from '@documenso/lib/utils/teams';
 
 import { Body, Container, Head, Hr, Html, Img, Preview, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
@@ -35,31 +34,23 @@ export const TeamDeleteEmailTemplate = ({
 
       <Body className="mx-auto my-auto font-sans">
         <Section className="bg-white text-slate-500">
-          <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-2 backdrop-blur-sm">
+          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid p-2 backdrop-blur-sm">
             {branding.brandingEnabled && branding.brandingLogo ? (
               <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6 p-2" />
             ) : (
-              <TemplateImage
-                assetBaseUrl={assetBaseUrl}
-                className="mb-4 h-6 p-2"
-                staticAsset="logo.png"
-              />
+              <TemplateImage assetBaseUrl={assetBaseUrl} className="mb-4 h-6 p-2" staticAsset="logo.png" />
             )}
 
             <Section>
-              <TemplateImage
-                className="mx-auto"
-                assetBaseUrl={assetBaseUrl}
-                staticAsset="delete-team.png"
-              />
+              <TemplateImage className="mx-auto" assetBaseUrl={assetBaseUrl} staticAsset="delete-team.png" />
             </Section>
 
             <Section className="p-2 text-slate-500">
-              <Text className="text-center text-lg font-medium text-black">{_(title)}</Text>
+              <Text className="text-center font-medium text-black text-lg">{_(title)}</Text>
 
               <Text className="my-1 text-center text-base">{_(description)}</Text>
 
-              <div className="mx-auto my-2 w-fit rounded-lg bg-gray-50 px-4 py-2 text-base font-medium text-slate-600">
+              <div className="mx-auto my-2 w-fit rounded-lg bg-gray-50 px-4 py-2 font-medium text-base text-slate-600">
                 {formatTeamUrl(teamUrl, baseUrl)}
               </div>
             </Section>

@@ -1,11 +1,10 @@
-import { EnvelopeType, type Recipient } from '@prisma/client';
-import { nanoid } from 'nanoid';
-
 import {
   DIRECT_TEMPLATE_RECIPIENT_EMAIL,
   DIRECT_TEMPLATE_RECIPIENT_NAME,
 } from '@documenso/lib/constants/direct-templates';
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType, type Recipient } from '@prisma/client';
+import { nanoid } from 'nanoid';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { type EnvelopeIdOptions, mapSecondaryIdToTemplateId } from '../../utils/envelope';
@@ -47,18 +46,13 @@ export const createTemplateDirectLink = async ({
     throw new AppError(AppErrorCode.ALREADY_EXISTS, { message: 'Direct template already exists' });
   }
 
-  if (
-    directRecipientId &&
-    !envelope.recipients.find((recipient) => recipient.id === directRecipientId)
-  ) {
+  if (directRecipientId && !envelope.recipients.find((recipient) => recipient.id === directRecipientId)) {
     throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Recipient not found' });
   }
 
   if (
     !directRecipientId &&
-    envelope.recipients.find(
-      (recipient) => recipient.email.toLowerCase() === DIRECT_TEMPLATE_RECIPIENT_EMAIL,
-    )
+    envelope.recipients.find((recipient) => recipient.email.toLowerCase() === DIRECT_TEMPLATE_RECIPIENT_EMAIL)
   ) {
     throw new AppError(AppErrorCode.INVALID_BODY, {
       message: 'Cannot generate placeholder direct recipient',

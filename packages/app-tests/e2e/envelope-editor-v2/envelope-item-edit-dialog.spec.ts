@@ -1,12 +1,10 @@
-import { type Page, expect, test } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
-
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
+import { expect, type Page, test } from '@playwright/test';
 
 import {
-  type TEnvelopeEditorSurface,
   addEnvelopeItemPdf,
   clickAddMyselfButton,
   clickEnvelopeEditorStep,
@@ -17,6 +15,7 @@ import {
   persistEmbeddedEnvelope,
   setRecipientEmail,
   setRecipientName,
+  type TEnvelopeEditorSurface,
 } from '../fixtures/envelope-editor';
 import { expectToastTextToBeVisible } from '../fixtures/generic';
 
@@ -29,9 +28,7 @@ test.use({
 
 const examplePdfBuffer = fs.readFileSync(path.join(__dirname, '../../../../assets/example.pdf'));
 
-const multiPagePdfBuffer = fs.readFileSync(
-  path.join(__dirname, '../../../../assets/field-font-alignment.pdf'),
-);
+const multiPagePdfBuffer = fs.readFileSync(path.join(__dirname, '../../../../assets/field-font-alignment.pdf'));
 
 // --- Shared helpers ---
 
@@ -55,27 +52,20 @@ const getEditButton = (root: Page, index: number) =>
 
 const getEditDialog = (root: Page) => root.getByRole('dialog');
 
-const getEditDialogTitleInput = (root: Page) =>
-  root.locator('[data-testid="envelope-item-edit-title-input"]');
+const getEditDialogTitleInput = (root: Page) => root.locator('[data-testid="envelope-item-edit-title-input"]');
 
-const getEditDialogDropzone = (root: Page) =>
-  root.locator('[data-testid="envelope-item-edit-dropzone"]');
+const getEditDialogDropzone = (root: Page) => root.locator('[data-testid="envelope-item-edit-dropzone"]');
 
-const getEditDialogSelectedFile = (root: Page) =>
-  root.locator('[data-testid="envelope-item-edit-selected-file"]');
+const getEditDialogSelectedFile = (root: Page) => root.locator('[data-testid="envelope-item-edit-selected-file"]');
 
-const getEditDialogClearFileButton = (root: Page) =>
-  root.locator('[data-testid="envelope-item-edit-clear-file"]');
+const getEditDialogClearFileButton = (root: Page) => root.locator('[data-testid="envelope-item-edit-clear-file"]');
 
-const getEditDialogUpdateButton = (root: Page) =>
-  root.locator('[data-testid="envelope-item-edit-update-button"]');
+const getEditDialogUpdateButton = (root: Page) => root.locator('[data-testid="envelope-item-edit-update-button"]');
 
 const assertPdfPageCount = async (root: Page, expectedCount: number) => {
-  await expect(root.locator('[data-pdf-content]').first()).toHaveAttribute(
-    'data-page-count',
-    String(expectedCount),
-    { timeout: 15000 },
-  );
+  await expect(root.locator('[data-pdf-content]').first()).toHaveAttribute('data-page-count', String(expectedCount), {
+    timeout: 15000,
+  });
 };
 
 const navigateToFieldsPage = async (surface: TEnvelopeEditorSurface) => {

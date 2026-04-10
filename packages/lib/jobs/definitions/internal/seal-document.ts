@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { ZRequestMetadataSchema } from '../../../universal/extract-request-metadata';
-import { type JobDefinition } from '../../client/_internal/job';
+import type { JobDefinition } from '../../client/_internal/job';
 
 const SEAL_DOCUMENT_JOB_DEFINITION_ID = 'internal.seal-document';
 
@@ -28,7 +28,4 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
 
     await handler.run({ payload, io });
   },
-} as const satisfies JobDefinition<
-  typeof SEAL_DOCUMENT_JOB_DEFINITION_ID,
-  TSealDocumentJobDefinition
->;
+} as const satisfies JobDefinition<typeof SEAL_DOCUMENT_JOB_DEFINITION_ID, TSealDocumentJobDefinition>;

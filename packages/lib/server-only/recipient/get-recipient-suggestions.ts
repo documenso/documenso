@@ -1,7 +1,6 @@
-import { EnvelopeType, Prisma } from '@prisma/client';
-
 import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType, Prisma } from '@prisma/client';
 
 export type GetRecipientSuggestionsOptions = {
   userId: number;
@@ -9,11 +8,7 @@ export type GetRecipientSuggestionsOptions = {
   query: string;
 };
 
-export const getRecipientSuggestions = async ({
-  userId,
-  teamId,
-  query,
-}: GetRecipientSuggestionsOptions) => {
+export const getRecipientSuggestions = async ({ userId, teamId, query }: GetRecipientSuggestionsOptions) => {
   const trimmedQuery = query.trim();
 
   const nameEmailFilter = trimmedQuery
@@ -89,9 +84,7 @@ export const getRecipientSuggestions = async ({
       take: 5,
     });
 
-    const uniqueTeamMember = teamMembers.find(
-      (member) => !recipients.some((r) => r.email === member.user.email),
-    );
+    const uniqueTeamMember = teamMembers.find((member) => !recipients.some((r) => r.email === member.user.email));
 
     if (uniqueTeamMember) {
       const teamMemberSuggestion = {

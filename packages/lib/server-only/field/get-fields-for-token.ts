@@ -1,6 +1,5 @@
-import { EnvelopeType, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
 
 export type GetFieldsForTokenOptions = {
   token: string;
