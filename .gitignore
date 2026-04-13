@@ -54,6 +54,10 @@ yarn-error.log*
 # logs
 logs.json
 
+# local signing analysis artifacts
+artifacts/poa/
+artifacts/acroform-field-sidecar/
+
 # claude
 .claude
 CLAUDE.md

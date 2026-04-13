@@ -1,0 +1,65 @@
+{
+  "profile": "sample-acroform",
+  "envelopeType": "TEMPLATE",
+  "signerRecipientKey": "signer",
+  "primaryEnvelopeItemKey": "primary-pdf",
+  "fieldOverrides": {
+    "sampleDateYear": {
+      "semanticKey": "sampleDateYear",
+      "semanticLabel": "Sample date year",
+      "classification": "overlay-candidate",
+      "confidence": "high",
+      "generationRole": "ignored",
+      "evidence": [
+        "sample policy treats sampleDateYear as a signer-date candidate, not a default overlay field"
+      ]
+    },
+    "sampleDateMonth": {
+      "semanticKey": "sampleDateMonth",
+      "semanticLabel": "Sample date month",
+      "classification": "overlay-candidate",
+      "confidence": "high",
+      "generationRole": "ignored",
+      "evidence": [
+        "sample policy treats sampleDateMonth as a signer-date candidate, not a default overlay field"
+      ]
+    },
+    "sampleDateDay": {
+      "semanticKey": "sampleDateDay",
+      "semanticLabel": "Sample date day",
+      "classification": "overlay-candidate",
+      "confidence": "high",
+      "generationRole": "ignored",
+      "evidence": [
+        "sample policy treats sampleDateDay as a signer-date candidate, not a default overlay field"
+      ]
+    },
+    "signatureAnchor": {
+      "semanticKey": "signatureAnchor",
+      "semanticLabel": "Signature anchor",
+      "classification": "signer-overlay-signature",
+      "confidence": "high",
+      "generationRole": "overlay-generated",
+      "evidence": [
+        "sample policy treats signatureAnchor as the Documenso signer signature anchor"
+      ]
+    }
+  },
+  "manualOverlays": [],
+  "generatedOverlays": [
+    {
+      "bindingKey": "signer-signature",
+      "rawName": "signatureAnchor",
+      "semanticKey": "signatureAnchor",
+      "semanticLabel": "Signature anchor",
+      "classification": "signer-overlay-signature",
+      "recipientKey": "signer",
+      "envelopeItemKey": "primary-pdf",
+      "type": "SIGNATURE",
+      "fieldMeta": {
+        "type": "signature",
+        "fontSize": 18
+      }
+    }
+  ]
+}
