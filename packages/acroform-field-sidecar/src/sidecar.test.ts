@@ -16,30 +16,40 @@ import {
 } from './schemas.ts';
 import { loadPolicy, resolveSemantics } from './resolve-semantics.ts';
 
-const buildSyntheticAcroformPdf = () => {
+type TSyntheticPdfOptions = {
+  inheritPageMediaBox?: boolean;
+  widgetWithoutPageRef?: 'customerName' | 'toggle_1' | 'sampleDateYear' | 'signatureAnchor';
+};
+
+const buildSyntheticAcroformPdf = (options: TSyntheticPdfOptions = {}) => {
+  const pageMediaBox = options.inheritPageMediaBox ? '' : ' /MediaBox [0 0 600 800]';
+  const customerNamePageRef = options.widgetWithoutPageRef === 'customerName' ? '' : ' /P 5 0 R';
+  const togglePageRef = options.widgetWithoutPageRef === 'toggle_1' ? '' : ' /P 5 0 R';
+  const sampleDateYearPageRef = options.widgetWithoutPageRef === 'sampleDateYear' ? '' : ' /P 5 0 R';
+  const signatureAnchorPageRef = options.widgetWithoutPageRef === 'signatureAnchor' ? '' : ' /P 5 0 R';
   const objects = [
     ['1 0', '<< /Type /Catalog /Pages 2 0 R /AcroForm 3 0 R >>'],
-    ['2 0', '<< /Type /Pages /Kids [5 0 R] /Count 1 >>'],
+    ['2 0', '<< /Type /Pages /Kids [5 0 R] /Count 1 /MediaBox [0 0 600 800] >>'],
     ['3 0', '<< /Fields [4 0 R 6 0 R 7 0 R 8 0 R] >>'],
     [
       '4 0',
-      '<< /Type /Annot /Subtype /Widget /FT /Tx /T (customerName) /TU (Customer name) /P 5 0 R /Rect [60 700 240 720] >>',
+      `<< /Type /Annot /Subtype /Widget /FT /Tx /T (customerName) /TU (Customer name)${customerNamePageRef} /Rect [60 700 240 720] >>`,
     ],
     [
       '5 0',
-      '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 600 800] /Resources << >> /Annots [4 0 R 6 0 R 7 0 R 8 0 R] >>',
+      `<< /Type /Page /Parent 2 0 R${pageMediaBox} /Resources << >> /Annots [4 0 R 6 0 R 7 0 R 8 0 R] >>`,
     ],
     [
       '6 0',
-      '<< /Type /Annot /Subtype /Widget /FT /Btn /T (toggle_1) /TU (Marketing consent) /P 5 0 R /Rect [60 650 72 662] >>',
+      `<< /Type /Annot /Subtype /Widget /FT /Btn /T (toggle_1) /TU (Marketing consent)${togglePageRef} /Rect [60 650 72 662] >>`,
     ],
     [
       '7 0',
-      '<< /Type /Annot /Subtype /Widget /FT /Tx /T (sampleDateYear) /TU (Sample date year) /P 5 0 R /Rect [60 100 100 120] >>',
+      `<< /Type /Annot /Subtype /Widget /FT /Tx /T (sampleDateYear) /TU (Sample date year)${sampleDateYearPageRef} /Rect [60 100 100 120] >>`,
     ],
     [
       '8 0',
-      '<< /Type /Annot /Subtype /Widget /FT /Tx /T (signatureAnchor) /TU (Signature anchor) /P 5 0 R /Rect [390 100 540 120] >>',
+      `<< /Type /Annot /Subtype /Widget /FT /Tx /T (signatureAnchor) /TU (Signature anchor)${signatureAnchorPageRef} /Rect [390 100 540 120] >>`,
     ],
   ];
   const offsets = [0];
@@ -62,11 +72,11 @@ const buildSyntheticAcroformPdf = () => {
   return body;
 };
 
-const writeSyntheticAcroformPdf = async () => {
+const writeSyntheticAcroformPdf = async (options: TSyntheticPdfOptions = {}) => {
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'acroform-field-sidecar-'));
   const inputPath = path.join(directory, 'sample-acroform-form.pdf');
 
-  await fs.writeFile(inputPath, buildSyntheticAcroformPdf(), 'latin1');
+  await fs.writeFile(inputPath, buildSyntheticAcroformPdf(options), 'latin1');
 
   return {
     directory,
@@ -95,6 +105,31 @@ describe('acroform-field-sidecar', () => {
     expect(customerNameField?.rectDocumenso.positionY).toBeCloseTo(10, 4);
     expect(customerNameField?.rectDocumenso.width).toBeCloseTo(30, 4);
     expect(customerNameField?.rectDocumenso.height).toBeCloseTo(2.5, 4);
+  });
+
+  it('inherits the page MediaBox from parent Pages nodes', async () => {
+    const { inputPath } = await writeSyntheticAcroformPdf({ inheritPageMediaBox: true });
+    const inventory = await extractAcroformInventory(inputPath);
+
+    expect(inventory.pages).toEqual([
+      {
+        pageNumber: 1,
+        width: 600,
+        height: 800,
+      },
+    ]);
+    expect(inventory.fields[0]?.page).toBe(1);
+  });
+
+  it('derives widget page ownership from the page Annots array when /P is missing', async () => {
+    const { inputPath } = await writeSyntheticAcroformPdf({ widgetWithoutPageRef: 'signatureAnchor' });
+    const inventory = await extractAcroformInventory(inputPath);
+    const signatureField = inventory.fields.find((field) => field.rawName === 'signatureAnchor');
+
+    expect(signatureField).toBeDefined();
+    expect(signatureField?.page).toBe(1);
+    expect(signatureField?.rectDocumenso.positionX).toBeCloseTo(65, 4);
+    expect(signatureField?.rectDocumenso.positionY).toBeCloseTo(85, 4);
   });
 
   it('resolves named fields from /T and generic toggles from /TU', async () => {

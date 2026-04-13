@@ -46,6 +46,12 @@ type TPdfJsInventoryResult = {
   fields: TPdfJsField[];
 } | null;
 
+type TPageTreeNode = {
+  ref: string;
+  mediaBox: number[];
+  annots: string[];
+};
+
 const INDIRECT_OBJECT_REGEX = /(\d+)\s+(\d+)\s+obj\b([\s\S]*?)endobj/g;
 
 const round = (value: number) => Math.round(value * 10000) / 10000;
@@ -389,44 +395,51 @@ const buildPageList = (objects: Map<string, TObjectRecord>) => {
     throw new Error('Could not locate page tree root');
   }
 
-  const orderedPageRefs: string[] = [];
+  const orderedPages: TPageTreeNode[] = [];
 
-  const walkPageTree = (ref: string) => {
+  const walkPageTree = (ref: string, inheritedMediaBox: number[] | null) => {
     const object = objects.get(ref);
 
     if (!object) {
       throw new Error(`Missing page tree object: ${ref}`);
     }
 
+    const localMediaBox = extractNumberArrayForKey(object.rawBody, 'MediaBox');
+    const resolvedMediaBox = localMediaBox.length === 4 ? localMediaBox : inheritedMediaBox;
+
     if (/\/Type\s*\/Page\b/.test(object.rawBody)) {
-      orderedPageRefs.push(ref);
+      if (!resolvedMediaBox || resolvedMediaBox.length !== 4) {
+        throw new Error(`Page ${ref} is missing a valid MediaBox`);
+      }
+
+      orderedPages.push({
+        ref,
+        mediaBox: resolvedMediaBox,
+        annots: extractRefsFromArrayForKey(object.rawBody, 'Annots'),
+      });
+
       return;
     }
 
     const children = extractRefsFromArrayForKey(object.rawBody, 'Kids');
 
     for (const child of children) {
-      walkPageTree(child);
+      walkPageTree(child, resolvedMediaBox);
     }
   };
 
-  walkPageTree(rootPagesRef);
+  walkPageTree(rootPagesRef, null);
 
-  const pages = orderedPageRefs.map((ref, pageIndex) => {
+  const pages = orderedPages.map((page, pageIndex) => {
+    const ref = page.ref;
     const pageObject = objects.get(ref);
 
     if (!pageObject) {
       throw new Error(`Missing page object: ${ref}`);
     }
 
-    const mediaBox = extractNumberArrayForKey(pageObject.rawBody, 'MediaBox');
-
-    if (mediaBox.length !== 4) {
-      throw new Error(`Page ${ref} is missing a valid MediaBox`);
-    }
-
-    const width = round(Math.abs(mediaBox[2] - mediaBox[0]));
-    const height = round(Math.abs(mediaBox[3] - mediaBox[1]));
+    const width = round(Math.abs(page.mediaBox[2] - page.mediaBox[0]));
+    const height = round(Math.abs(page.mediaBox[3] - page.mediaBox[1]));
 
     return {
       ref,
@@ -438,10 +451,21 @@ const buildPageList = (objects: Map<string, TObjectRecord>) => {
     };
   });
 
+  const widgetPageRefByWidgetRef = new Map<string, string>();
+
+  for (const page of orderedPages) {
+    for (const annotRef of page.annots) {
+      if (!widgetPageRefByWidgetRef.has(annotRef)) {
+        widgetPageRefByWidgetRef.set(annotRef, page.ref);
+      }
+    }
+  }
+
   return {
     pages,
     pageNumberByRef: new Map(pages.map((page) => [page.ref, page.info.pageNumber])),
     pageInfoByRef: new Map(pages.map((page) => [page.ref, page.info])),
+    widgetPageRefByWidgetRef,
   };
 };
 
@@ -449,6 +473,7 @@ const extractAcroformFields = (
   objects: Map<string, TObjectRecord>,
   pageNumberByRef: Map<string, number>,
   pageInfoByRef: Map<string, TPageInfo>,
+  widgetPageRefByWidgetRef: Map<string, string>,
 ) => {
   const catalog = [...objects.values()].find((object) => /\/Type\s*\/Catalog/.test(object.rawBody));
 
@@ -481,7 +506,8 @@ const extractAcroformFields = (
     const localName = extractPdfStringForKey(object.rawBody, 'T');
     const localTooltip = extractPdfStringForKey(object.rawBody, 'TU');
     const fieldType = extractNameForKey(object.rawBody, 'FT') ?? context.rawType;
-    const pageRef = extractRefForKey(object.rawBody, 'P') ?? context.pageRef;
+    const explicitPageRef = extractRefForKey(object.rawBody, 'P');
+    const inheritedPageRef = explicitPageRef ?? context.pageRef;
     const rectNumbers = extractNumberArrayForKey(object.rawBody, 'Rect');
     const kids = extractRefsFromArrayForKey(object.rawBody, 'Kids');
     const hasWidgetRect = rectNumbers.length === 4;
@@ -490,10 +516,12 @@ const extractAcroformFields = (
       nameParts: localName ? [...context.nameParts, localName] : context.nameParts,
       rawType: fieldType,
       rawTooltip: localTooltip ?? context.rawTooltip,
-      pageRef,
+      pageRef: inheritedPageRef,
     };
 
     if (isWidget && rectNumbers.length === 4) {
+      const pageRef = explicitPageRef ?? context.pageRef ?? widgetPageRefByWidgetRef.get(ref) ?? null;
+
       if (!pageRef) {
         throw new Error(`Widget ${ref} is missing a page reference`);
       }
@@ -691,11 +719,12 @@ export const extractAcroformInventory = async (pdfPath: string): Promise<TAcrofo
   const sha256 = crypto.createHash('sha256').update(pdfBytes).digest('hex');
   const pdfJsInventory = await tryExtractWithPdfJs(pdfBytes);
   const objects = parseIndirectObjects(pdfBytes);
-  const { pages, pageNumberByRef, pageInfoByRef } = buildPageList(objects);
+  const { pages, pageNumberByRef, pageInfoByRef, widgetPageRefByWidgetRef } = buildPageList(objects);
   const fallbackFields = extractAcroformFields(
     objects,
     pageNumberByRef,
     pageInfoByRef,
+    widgetPageRefByWidgetRef,
   );
   const merged = mergePdfJsWithFallback(
     pdfJsInventory,
