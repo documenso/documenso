@@ -124,6 +124,7 @@ pipeline {
                         rm -rf sync-output 2>/dev/null || true
                         git checkout -- . 2>/dev/null || true
                         git clean -fd 2>/dev/null || true
+                        mkdir -p sync-output
                     '''
 
                     // Clean up any leftover sync branch from a previous run.
