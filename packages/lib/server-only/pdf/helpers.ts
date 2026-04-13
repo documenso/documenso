@@ -1,8 +1,44 @@
 import { FieldType } from '@prisma/client';
 import type { Recipient } from '@prisma/client';
+import path from 'node:path';
+import { FontLibrary } from 'skia-canvas';
 import { match } from 'ts-pattern';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+
+/**
+ * Ensure all required fonts are registered in the skia-canvas FontLibrary.
+ *
+ * Fonts are registered once per process and retained — calling this multiple
+ * times is a no-op after the first invocation.
+ */
+export const ensureFontLibrary = () => {
+  const fontPath = path.join(process.cwd(), 'public/fonts');
+
+  if (!FontLibrary.has('Caveat')) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    FontLibrary.use({
+      ['Caveat']: [path.join(fontPath, 'caveat.ttf')],
+    });
+  }
+
+  if (!FontLibrary.has('Inter')) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    FontLibrary.use({
+      ['Inter']: [path.join(fontPath, 'inter-variablefont_opsz,wght.ttf')],
+    });
+  }
+
+  if (!FontLibrary.has('Noto Sans')) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    FontLibrary.use({
+      ['Noto Sans']: [path.join(fontPath, 'noto-sans.ttf')],
+      ['Noto Sans Japanese']: [path.join(fontPath, 'noto-sans-japanese.ttf')],
+      ['Noto Sans Chinese']: [path.join(fontPath, 'noto-sans-chinese.ttf')],
+      ['Noto Sans Korean']: [path.join(fontPath, 'noto-sans-korean.ttf')],
+    });
+  }
+};
 
 type RecipientPlaceholderInfo = {
   email: string;

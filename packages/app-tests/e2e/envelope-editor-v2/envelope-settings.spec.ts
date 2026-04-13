@@ -54,6 +54,7 @@ const DB_EXPECTED_VALUES = {
     documentDeleted: false,
     ownerDocumentCompleted: false,
     ownerRecipientExpired: false,
+    ownerDocumentCreated: false,
   },
 };
 
@@ -138,6 +139,7 @@ const runSettingsFlow = async (
   await root.locator('#documentDeleted').click();
   await root.locator('#ownerDocumentCompleted').click();
   await root.locator('#ownerRecipientExpired').click();
+  await root.locator('#ownerDocumentCreated').click();
   await root.locator('input[name="meta.emailReplyTo"]').fill(TEST_SETTINGS_VALUES.replyTo);
   await root.locator('input[name="meta.subject"]').fill(TEST_SETTINGS_VALUES.subject);
   await root.locator('textarea[name="meta.message"]').fill(TEST_SETTINGS_VALUES.message);
@@ -207,6 +209,7 @@ const runSettingsFlow = async (
   await expect(root.locator('#documentDeleted')).toHaveAttribute('aria-checked', 'false');
   await expect(root.locator('#ownerDocumentCompleted')).toHaveAttribute('aria-checked', 'false');
   await expect(root.locator('#ownerRecipientExpired')).toHaveAttribute('aria-checked', 'false');
+  await expect(root.locator('#ownerDocumentCreated')).toHaveAttribute('aria-checked', 'false');
   await expect(root.locator('input[name="meta.emailReplyTo"]')).toHaveValue(
     TEST_SETTINGS_VALUES.replyTo,
   );

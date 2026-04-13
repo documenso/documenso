@@ -20,6 +20,8 @@ const badgeVariants = cva(
           'bg-green-50 text-green-700 ring-green-600/20 dark:bg-green-500/10 dark:text-green-400 dark:ring-green-500/20',
         secondary:
           'bg-blue-50 text-blue-700 ring-blue-700/10 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/30',
+        orange:
+          'bg-orange-50 text-orange-700 ring-orange-700/10 dark:bg-orange-400/10 dark:text-orange-400 dark:ring-orange-400/30',
       },
       size: {
         small: 'px-1.5 py-0.5 text-xs',

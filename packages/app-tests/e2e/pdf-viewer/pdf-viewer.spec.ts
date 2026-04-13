@@ -22,7 +22,7 @@ import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
-const PDF_PAGE_SELECTOR = 'img[data-page-number]';
+export const PDF_PAGE_SELECTOR = 'img[data-page-number]';
 
 async function addSecondEnvelopeItem(envelopeId: string) {
   const firstItem = await prisma.envelopeItem.findFirstOrThrow({
@@ -201,6 +201,15 @@ test.describe('PDF Viewer Rendering', () => {
 
       await page.getByRole('button', { name: /Page 2/ }).click();
       await expect(page.locator(PDF_PAGE_SELECTOR).first()).toBeVisible({ timeout: 30_000 });
+    });
+
+    test('should not return 500 for invalid QR share token', async ({ page }) => {
+      const response = await page.request.get('/share/qr_invalid_token_for_regression_check', {
+        maxRedirects: 0,
+      });
+
+      expect(response.status()).toBe(302);
+      expect(response.headers().location).toBe('/');
     });
   });
 

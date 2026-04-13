@@ -40,12 +40,20 @@ type TCreateFolderFormSchema = z.infer<typeof ZCreateFolderFormSchema>;
 export type FolderCreateDialogProps = {
   type: FolderType;
   trigger?: React.ReactNode;
+  parentFolderId?: string | null;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
-export const FolderCreateDialog = ({ type, trigger, ...props }: FolderCreateDialogProps) => {
+export const FolderCreateDialog = ({
+  type,
+  trigger,
+  parentFolderId,
+  ...props
+}: FolderCreateDialogProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
   const { folderId } = useParams();
+
+  const parentId = parentFolderId ?? folderId;
 
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
 
@@ -62,7 +70,7 @@ export const FolderCreateDialog = ({ type, trigger, ...props }: FolderCreateDial
     try {
       await createFolder({
         name: data.name,
-        parentId: folderId,
+        parentId,
         type,
       });
 

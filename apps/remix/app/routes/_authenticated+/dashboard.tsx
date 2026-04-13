@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { Plural, Trans, useLingui } from '@lingui/react/macro';
 import { Building2Icon, InboxIcon, SettingsIcon, UsersIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
@@ -25,7 +26,7 @@ export function loader() {
 }
 
 export function meta() {
-  return appMetaTags('Dashboard');
+  return appMetaTags(msg`Dashboard`);
 }
 
 export default function DashboardPage() {
@@ -54,7 +55,7 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-bold">
             <Trans>Dashboard</Trans>
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-muted-foreground">
             <Trans>Welcome back! Here's an overview of your account.</Trans>
           </p>
 
@@ -69,7 +70,7 @@ export default function DashboardPage() {
               <p className="font-semibold">
                 <Trans>No organisations found</Trans>
               </p>
-              <p className="text-muted-foreground text-sm">
+              <p className="text-sm text-muted-foreground">
                 <Trans>Create an organisation to get started.</Trans>
               </p>
             </div>
@@ -87,7 +88,7 @@ export default function DashboardPage() {
           <div className="mb-8">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Building2Icon className="text-muted-foreground h-5 w-5" />
+                <Building2Icon className="h-5 w-5 text-muted-foreground" />
                 <h2 className="text-xl font-semibold">
                   <Trans>Organisations</Trans>
                 </h2>
@@ -104,7 +105,7 @@ export default function DashboardPage() {
               {organisations.map((org) => (
                 <div key={org.id} className="group relative">
                   <Link to={`/o/${org.url}`}>
-                    <Card className="hover:bg-muted/50 h-full border pr-6 transition-all">
+                    <Card className="h-full border pr-6 transition-all hover:bg-muted/50">
                       <CardContent className="p-4">
                         <div className="flex items-center gap-3">
                           <Avatar className="h-10 w-10 border border-solid">
@@ -118,7 +119,7 @@ export default function DashboardPage() {
 
                           <div className="flex-1">
                             <h3 className="font-medium">{org.name}</h3>
-                            <div className="text-muted-foreground mt-1 flex items-center gap-3 text-xs">
+                            <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
                               <div className="flex items-center gap-1">
                                 <UsersIcon className="h-3 w-3" />
                                 <span>
@@ -148,7 +149,7 @@ export default function DashboardPage() {
                     'MANAGE_ORGANISATION',
                     org.currentOrganisationRole,
                   ) && (
-                    <div className="text-muted-foreground absolute right-4 top-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                    <div className="absolute right-4 top-4 text-muted-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                       <Link to={`/o/${org.url}/settings`}>
                         <SettingsIcon className="h-4 w-4" />
                       </Link>
@@ -165,7 +166,7 @@ export default function DashboardPage() {
           <div className="mb-8">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <UsersIcon className="text-muted-foreground h-5 w-5" />
+                <UsersIcon className="h-5 w-5 text-muted-foreground" />
                 <h2 className="text-xl font-semibold">
                   <Trans>Teams</Trans>
                 </h2>
@@ -183,7 +184,7 @@ export default function DashboardPage() {
                 {teams.map((team) => (
                   <div key={team.id} className="group relative">
                     <Link to={`/t/${team.url}`}>
-                      <Card className="hover:bg-muted/50 w-[350px] shrink-0 border transition-all">
+                      <Card className="w-[350px] shrink-0 border transition-all hover:bg-muted/50">
                         <CardContent className="p-4">
                           <div className="flex items-center gap-3">
                             <Avatar className="h-10 w-10 border border-solid">
@@ -197,7 +198,7 @@ export default function DashboardPage() {
 
                             <div className="flex-1">
                               <h3 className="font-medium">{team.name}</h3>
-                              <div className="text-muted-foreground mt-1 flex items-center gap-3 text-xs">
+                              <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
                                 <div className="flex items-center gap-1">
                                   <UsersIcon className="h-3 w-3" />
                                   {team.organisation.ownerUserId === user.id
@@ -211,7 +212,7 @@ export default function DashboardPage() {
                               </div>
                             </div>
                           </div>
-                          <div className="text-muted-foreground mt-3 text-xs">
+                          <div className="mt-3 text-xs text-muted-foreground">
                             <Trans>
                               Joined{' '}
                               {DateTime.fromJSDate(team.createdAt).toRelative({ style: 'short' })}
@@ -222,7 +223,7 @@ export default function DashboardPage() {
                     </Link>
 
                     {canExecuteTeamAction('MANAGE_TEAM', team.currentTeamRole) && (
-                      <div className="text-muted-foreground absolute right-4 top-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                      <div className="absolute right-4 top-4 text-muted-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                         <Link to={`/t/${team.url}/settings`}>
                           <SettingsIcon className="h-4 w-4" />
                         </Link>
@@ -240,7 +241,7 @@ export default function DashboardPage() {
         <div>
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <InboxIcon className="text-muted-foreground h-5 w-5" />
+              <InboxIcon className="h-5 w-5 text-muted-foreground" />
               <h2 className="text-xl font-semibold">
                 <Trans>Personal Inbox</Trans>
               </h2>

@@ -244,28 +244,57 @@ export const mapSecondaryIdToTemplateId = (secondaryId: string) => {
   return parseInt(parsed.data.split('_')[1]);
 };
 
-export const canEnvelopeItemsBeModified = (
+export type EnvelopeItemPermissions = {
+  canTitleBeChanged: boolean;
+  canFileBeChanged: boolean;
+  canOrderBeChanged: boolean;
+};
+
+export const getEnvelopeItemPermissions = (
   envelope: Pick<Envelope, 'completedAt' | 'deletedAt' | 'type' | 'status'>,
   recipients: Recipient[],
-) => {
-  if (envelope.completedAt || envelope.deletedAt || envelope.status !== DocumentStatus.DRAFT) {
-    return false;
-  }
-
-  if (envelope.type === EnvelopeType.TEMPLATE) {
-    return true;
-  }
-
+): EnvelopeItemPermissions => {
+  // Always reject completed/rejected/deleted envelopes.
   if (
-    recipients.some(
-      (recipient) =>
-        recipient.role !== RecipientRole.CC &&
-        (recipient.signingStatus === SigningStatus.SIGNED ||
-          recipient.sendStatus === SendStatus.SENT),
-    )
+    envelope.completedAt ||
+    envelope.deletedAt ||
+    envelope.status === DocumentStatus.REJECTED ||
+    envelope.status === DocumentStatus.COMPLETED
   ) {
-    return false;
+    return {
+      canTitleBeChanged: false,
+      canFileBeChanged: false,
+      canOrderBeChanged: false,
+    };
   }
 
-  return true;
+  // Templates can always be modified.
+  if (envelope.type === EnvelopeType.TEMPLATE) {
+    return {
+      canTitleBeChanged: true,
+      canFileBeChanged: true,
+      canOrderBeChanged: true,
+    };
+  }
+
+  const hasActiveRecipients = recipients.some(
+    (recipient) =>
+      recipient.role !== RecipientRole.CC &&
+      (recipient.signingStatus === SigningStatus.SIGNED ||
+        recipient.signingStatus === SigningStatus.REJECTED ||
+        recipient.sendStatus === SendStatus.SENT),
+  );
+
+  return match(envelope.status)
+    .with(DocumentStatus.DRAFT, () => ({
+      canTitleBeChanged: true,
+      canFileBeChanged: true,
+      canOrderBeChanged: true,
+    }))
+    .with(DocumentStatus.PENDING, () => ({
+      canTitleBeChanged: true,
+      canFileBeChanged: false,
+      canOrderBeChanged: !hasActiveRecipients, // Only allow order changes if no active recipients.
+    }))
+    .exhaustive();
 };

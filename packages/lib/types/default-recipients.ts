@@ -1,8 +1,10 @@
 import { RecipientRole } from '@prisma/client';
 import { z } from 'zod';
 
+import { zEmail } from '../utils/zod';
+
 export const ZDefaultRecipientSchema = z.object({
-  email: z.string().email(),
+  email: zEmail(),
   name: z.string(),
   role: z.nativeEnum(RecipientRole),
 });

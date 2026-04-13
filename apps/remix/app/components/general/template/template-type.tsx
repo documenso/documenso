@@ -4,7 +4,7 @@ import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import type { TemplateType as TemplateTypePrisma } from '@prisma/client';
-import { Globe2, Lock } from 'lucide-react';
+import { Building2, Globe2, Lock } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react/dist/lucide-react';
 
 import { cn } from '@documenso/ui/lib/utils';
@@ -27,6 +27,11 @@ const TEMPLATE_TYPES: Record<TemplateTypes, TemplateTypeIcon> = {
     label: msg`Public`,
     icon: Globe2,
     color: 'text-green-500 dark:text-green-300',
+  },
+  ORGANISATION: {
+    label: msg`Organisation`,
+    icon: Building2,
+    color: 'text-orange-500 dark:text-orange-300',
   },
 };
 

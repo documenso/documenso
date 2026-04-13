@@ -1,3 +1,4 @@
+import { TemplateType } from '@prisma/client';
 import { z } from 'zod';
 
 import {
@@ -33,6 +34,7 @@ export const ZUpdateEnvelopeRequestSchema = z.object({
       globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional(),
       globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional(),
       folderId: z.string().nullish(),
+      templateType: z.nativeEnum(TemplateType).optional(),
     })
     .optional(),
   meta: ZDocumentMetaUpdateSchema.optional(),

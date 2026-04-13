@@ -136,6 +136,7 @@ export const TemplateEditForm = ({
       templateId: template.id,
       data: {
         title: data.title,
+        type: data.templateType,
         externalId: data.externalId || null,
         visibility: data.visibility,
         globalAccessAuth: parsedGlobalAccessAuth.success ? parsedGlobalAccessAuth.data : [],

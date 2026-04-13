@@ -5,12 +5,7 @@ import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
 import { Loader } from 'lucide-react';
-import {
-  ErrorCode as DropzoneErrorCode,
-  ErrorCode,
-  type FileRejection,
-  useDropzone,
-} from 'react-dropzone';
+import { ErrorCode as DropzoneErrorCode, type FileRejection, useDropzone } from 'react-dropzone';
 import { Link, useNavigate, useParams } from 'react-router';
 import { match } from 'ts-pattern';
 
@@ -25,6 +20,7 @@ import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import type { TCreateEnvelopePayload } from '@documenso/trpc/server/envelope-router/create-envelope.types';
+import { buildDropzoneRejectionDescription } from '@documenso/ui/lib/handle-dropzone-rejection';
 import { cn } from '@documenso/ui/lib/utils';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -41,7 +37,7 @@ export const EnvelopeDropZoneWrapper = ({
   type,
   className,
 }: EnvelopeDropZoneWrapperProps) => {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const { toast } = useToast();
   const { user } = useSession();
   const { folderId } = useParams();
@@ -167,42 +163,9 @@ export const EnvelopeDropZoneWrapper = ({
       return;
     }
 
-    // Since users can only upload only one file (no multi-upload), we only handle the first file rejection
-    const { file, errors } = fileRejections[0];
-
-    if (!errors.length) {
-      return;
-    }
-
-    const errorNodes = errors.map((error, index) => (
-      <span key={index} className="block">
-        {match(error.code)
-          .with(ErrorCode.FileTooLarge, () => (
-            <Trans>File is larger than {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB</Trans>
-          ))
-          .with(ErrorCode.FileInvalidType, () => <Trans>Only PDF files are allowed</Trans>)
-          .with(ErrorCode.FileTooSmall, () => <Trans>File is too small</Trans>)
-          .with(ErrorCode.TooManyFiles, () => (
-            <Trans>Only one file can be uploaded at a time</Trans>
-          ))
-          .otherwise(() => (
-            <Trans>Unknown error</Trans>
-          ))}
-      </span>
-    ));
-
-    const description = (
-      <>
-        <span className="font-medium">
-          <Trans>{file.name} couldn't be uploaded:</Trans>
-        </span>
-        {errorNodes}
-      </>
-    );
-
     toast({
       title: t`Upload failed`,
-      description,
+      description: i18n._(buildDropzoneRejectionDescription(fileRejections)),
       duration: 5000,
       variant: 'destructive',
     });

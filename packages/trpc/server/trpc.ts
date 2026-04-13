@@ -73,7 +73,7 @@ const t = initTRPC
 /**
  * Middlewares
  */
-export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path }) => {
+export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path, meta }) => {
   const infoToLog: TrpcApiLog = {
     path,
     auth: ctx.metadata.auth,
@@ -84,8 +84,10 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path }) 
 
   const authorizationHeader = ctx.req.headers.get('authorization');
 
+  const isApiV2 = Boolean(meta?.openapi?.path);
+
   // Taken from `authenticatedMiddleware` in `@documenso/api/v1/middleware/authenticated.ts`.
-  if (authorizationHeader) {
+  if (authorizationHeader && isApiV2) {
     // Support for both "Authorization: Bearer api_xxx" and "Authorization: api_xxx"
     const [token] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
 
@@ -164,7 +166,7 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path }) 
   });
 });
 
-export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next, path }) => {
+export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next, path, meta }) => {
   // Recreate the logger with a sub request ID to differentiate between batched requests.
   const trpcSessionLogger = ctx.logger.child({
     nonBatchedRequestId: alphaid(),
@@ -180,8 +182,10 @@ export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next, pat
 
   const authorizationHeader = ctx.req.headers.get('authorization');
 
+  const isApiV2 = Boolean(meta?.openapi?.path);
+
   // Taken from `authenticatedMiddleware` in `@documenso/api/v1/middleware/authenticated.ts`.
-  if (authorizationHeader) {
+  if (authorizationHeader && isApiV2) {
     // Support for both "Authorization: Bearer api_xxx" and "Authorization: api_xxx"
     const [token] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
 

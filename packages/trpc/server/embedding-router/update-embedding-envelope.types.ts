@@ -17,7 +17,7 @@ import { ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 import { EnvelopeAttachmentSchema } from '@documenso/prisma/generated/zod/modelSchema/EnvelopeAttachmentSchema';
 import { ZSetEnvelopeRecipientSchema } from '@documenso/trpc/server/envelope-router/set-envelope-recipients.types';
 
-import { zodFormData } from '../../utils/zod-form-data';
+import { zfdFile, zodFormData } from '../../utils/zod-form-data';
 import {
   ZDocumentExternalIdSchema,
   ZDocumentTitleSchema,
@@ -60,6 +60,16 @@ export const ZUpdateEmbeddingEnvelopePayloadSchema = z.object({
          * The file index for items that are not yet uploaded.
          */
         index: z.number().int().min(0).optional(),
+
+        /**
+         * The file index for existing items that need their PDF replaced.
+         * Only applicable to items with real IDs (not PRESIGNED_ prefix).
+         */
+        replaceFileIndex: z.number().int().min(0).optional(),
+      })
+      .refine((item) => !(item.index !== undefined && item.replaceFileIndex !== undefined), {
+        message: 'Cannot provide both index and replaceFileIndex on the same envelope item',
+        path: ['replaceFileIndex'],
       })
       .array(),
 
@@ -102,7 +112,7 @@ export const ZUpdateEmbeddingEnvelopePayloadSchema = z.object({
 
 export const ZUpdateEmbeddingEnvelopeRequestSchema = zodFormData({
   payload: zfd.json(ZUpdateEmbeddingEnvelopePayloadSchema),
-  files: zfd.repeatableOfType(zfd.file()),
+  files: zfd.repeatableOfType(zfdFile()),
 });
 
 export const ZUpdateEmbeddingEnvelopeResponseSchema = z.void();

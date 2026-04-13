@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { BookIcon, HelpCircleIcon, Link2Icon } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router';
@@ -13,7 +14,7 @@ import { SupportTicketForm } from '~/components/forms/support-ticket-form';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Support');
+  return appMetaTags(msg`Support`);
 }
 
 export default function SupportPage() {
@@ -52,7 +53,7 @@ export default function SupportPage() {
             <h2 className="flex items-center gap-2 text-lg font-bold">
               <BookIcon className="h-5 w-5 text-muted-foreground" />
               <Link
-                to="https://docs.documenso.com"
+                to="https://docs.davincisolutions.ai"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline"

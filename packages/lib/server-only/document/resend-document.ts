@@ -7,6 +7,7 @@ import {
   OrganisationType,
   RecipientRole,
   SigningStatus,
+  WebhookTriggerEvents,
 } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
@@ -25,12 +26,17 @@ import { prisma } from '@documenso/prisma';
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
+import {
+  ZWebhookDocumentSchema,
+  mapEnvelopeToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import { isDocumentCompleted } from '../../utils/document';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type ResendDocumentOptions = {
   id: EnvelopeIdOptions;
@@ -213,45 +219,49 @@ export const resendDocument = async ({
         }),
       ]);
 
-      await prisma.$transaction(
-        async (tx) => {
-          await mailer.sendMail({
-            to: {
-              address: email,
-              name,
-            },
-            from: senderEmail,
-            replyTo: replyToEmail,
-            subject: envelope.documentMeta.subject
-              ? renderCustomEmailTemplate(
-                  i18n._(msg`Reminder: ${envelope.documentMeta.subject}`),
-                  customEmailTemplate,
-                )
-              : emailSubject,
-            html,
-            text,
-          });
-
-          await tx.documentAuditLog.create({
-            data: createDocumentAuditLogData({
-              type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
-              envelopeId: envelope.id,
-              metadata: requestMetadata,
-              data: {
-                emailType: recipientEmailType,
-                recipientEmail: recipient.email,
-                recipientName: recipient.name,
-                recipientRole: recipient.role,
-                recipientId: recipient.id,
-                isResending: true,
-              },
-            }),
-          });
+      // Send email outside any transaction to avoid holding a connection
+      // open during network I/O.
+      await mailer.sendMail({
+        to: {
+          address: email,
+          name,
         },
-        { timeout: 30_000 },
-      );
+        from: senderEmail,
+        replyTo: replyToEmail,
+        subject: envelope.documentMeta.subject
+          ? renderCustomEmailTemplate(
+              i18n._(msg`Reminder: ${envelope.documentMeta.subject}`),
+              customEmailTemplate,
+            )
+          : emailSubject,
+        html,
+        text,
+      });
+
+      await prisma.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
+          envelopeId: envelope.id,
+          metadata: requestMetadata,
+          data: {
+            emailType: recipientEmailType,
+            recipientEmail: recipient.email,
+            recipientName: recipient.name,
+            recipientRole: recipient.role,
+            recipientId: recipient.id,
+            isResending: true,
+          },
+        }),
+      });
     }),
   );
+
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_REMINDER_SENT,
+    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
+    userId: envelope.userId,
+    teamId: envelope.teamId,
+  });
 
   return envelope;
 };

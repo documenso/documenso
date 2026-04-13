@@ -1,6 +1,8 @@
 import { OrganisationMemberRole } from '@prisma/client';
 import { z } from 'zod';
 
+import { zEmail } from '@documenso/lib/utils/zod';
+
 // export const createOrganisationMemberInvitesMeta: TrpcOpenApiMeta = {
 //   openapi: {
 //     method: 'POST',
@@ -16,7 +18,7 @@ export const ZCreateOrganisationMemberInvitesRequestSchema = z.object({
   invitations: z
     .array(
       z.object({
-        email: z.string().trim().email().toLowerCase(),
+        email: zEmail().trim().toLowerCase(),
         organisationRole: z.nativeEnum(OrganisationMemberRole),
       }),
     )

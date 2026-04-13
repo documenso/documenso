@@ -1,12 +1,9 @@
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import { z } from 'zod';
 
 import { SUPPORTED_LANGUAGE_CODES, type SupportedLanguageCodes } from './locales';
 
 export * from './locales';
-
-export const ZSupportedLanguageCodeSchema = z.enum(SUPPORTED_LANGUAGE_CODES).catch('en');
 
 export type I18nLocaleData = {
   /**

@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import type { TTemplate } from '@documenso/lib/types/template';
+import { zEmail } from '@documenso/lib/utils/zod';
 import {
   DocumentReadOnlyFields,
   mapFieldsWithRecipients,
@@ -33,7 +34,7 @@ import { useStep } from '@documenso/ui/primitives/stepper';
 import { useRequiredDocumentSigningAuthContext } from '~/components/general/document-signing/document-signing-auth-provider';
 
 const ZDirectTemplateConfigureFormSchema = z.object({
-  email: z.string().email('Email is invalid'),
+  email: zEmail('Email is invalid'),
 });
 
 export type TDirectTemplateConfigureFormSchema = z.infer<typeof ZDirectTemplateConfigureFormSchema>;

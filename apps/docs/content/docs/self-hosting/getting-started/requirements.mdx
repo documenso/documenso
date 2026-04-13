@@ -85,9 +85,13 @@ See [Storage Configuration](/docs/self-hosting/configuration/storage) for setup 
 
 ### Background Jobs
 
-Documenso processes background jobs (email delivery, document processing) using a PostgreSQL-based queue. No additional services like Redis are required: the job queue is built into the application and uses your existing database.
+Documenso processes background jobs (email delivery, document processing) using a PostgreSQL-based queue by default. No additional services are required: the job queue is built into the application and uses your existing database.
 
-For high-throughput deployments, Documenso optionally supports [Inngest](https://www.inngest.com/) as an alternative job provider. Set `NEXT_PRIVATE_JOBS_PROVIDER=inngest` and configure `INNGEST_EVENT_KEY` and `INNGEST_SIGNING_KEY`. Most self-hosted instances do not need this.
+For production deployments that need higher throughput or more reliable job processing, Documenso supports [BullMQ](https://docs.bullmq.io/) as an alternative provider. BullMQ requires a **Redis** instance (v6.2+). Set `NEXT_PRIVATE_JOBS_PROVIDER=bullmq` and configure `NEXT_PRIVATE_REDIS_URL`.
+
+For managed/cloud deployments, [Inngest](https://www.inngest.com/) is also supported as a job provider. Set `NEXT_PRIVATE_JOBS_PROVIDER=inngest` and configure `INNGEST_EVENT_KEY` and `INNGEST_SIGNING_KEY`.
+
+See [Background Jobs Configuration](/docs/self-hosting/configuration/background-jobs) for full details.
 
 ---
 

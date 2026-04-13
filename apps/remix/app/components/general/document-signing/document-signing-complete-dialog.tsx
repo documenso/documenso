@@ -14,6 +14,7 @@ import {
   ZDocumentAccessAuthSchema,
 } from '@documenso/lib/types/document-auth';
 import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -68,7 +69,7 @@ export type DocumentSigningCompleteDialogProps = {
 
 const ZNextSignerFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  email: z.string().email('Invalid email address'),
+  email: zEmail('Invalid email address'),
   accessAuthOptions: ZDocumentAccessAuthSchema.optional(),
 });
 
@@ -76,7 +77,7 @@ type TNextSignerFormSchema = z.infer<typeof ZNextSignerFormSchema>;
 
 const ZDirectRecipientFormSchema = z.object({
   name: z.string(),
-  email: z.string().email('Invalid email address'),
+  email: zEmail('Invalid email address'),
 });
 
 type TDirectRecipientFormSchema = z.infer<typeof ZDirectRecipientFormSchema>;
@@ -117,7 +118,7 @@ export const DocumentSigningCompleteDialog = ({
 
   const recipientForm = useForm<TDirectRecipientFormSchema>({
     resolver: zodResolver(ZDirectRecipientFormSchema),
-    defaultValues: {
+    values: {
       name: recipientPayload?.name ?? '',
       email: recipientPayload?.email ?? '',
     },
@@ -157,6 +158,10 @@ export const DocumentSigningCompleteDialog = ({
         }
 
         recipientOverridePayload = recipientForm.getValues();
+      } else if (recipientPayload && recipientPayload.email && !recipient.email) {
+        // Form is hidden because we have an email (e.g. from embed context),
+        // but the DB recipient doesn't have one yet — send the override.
+        recipientOverridePayload = recipientPayload;
       }
 
       // Check if 2FA is required

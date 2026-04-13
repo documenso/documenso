@@ -5,15 +5,15 @@
     "apps/*",
     "packages/*"
   ],
-  "version": "2.8.0",
+  "version": "2.8.1",
   "scripts": {
     "postinstall": "patch-package",
     "build": "turbo run build",
     "dev": "npm run translate:compile && turbo run dev --filter=@documenso/remix",
     "dev:remix": "npm run translate:compile && turbo run dev --filter=@documenso/remix",
-    "dev:docs": "turbo run dev --filter=@documenso/documentation",
+    "dev:docs": "turbo run dev --filter=@documenso/docs",
     "dev:openpage-api": "turbo run dev --filter=@documenso/openpage-api",
-    "start": "turbo run start --filter=@documenso/remix --filter=@documenso/documentation --filter=@documenso/openpage-api",
+    "start": "turbo run start --filter=@documenso/remix --filter=@documenso/docs --filter=@documenso/openpage-api",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "format": "prettier --write \"**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,mdx}\"",
@@ -49,6 +49,7 @@
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
+    "@datadog/pprof": "^5.13.5",
     "@lingui/cli": "^5.6.0",
     "@prisma/client": "^6.19.0",
     "@trpc/client": "11.8.1",
@@ -86,7 +87,7 @@
   "dependencies": {
     "@ai-sdk/google-vertex": "3.0.81",
     "@documenso/prisma": "*",
-    "@libpdf/core": "^0.2.12",
+    "@libpdf/core": "^0.3.3",
     "@lingui/conf": "^5.6.0",
     "@lingui/core": "^5.6.0",
     "@prisma/extension-read-replicas": "^0.4.1",

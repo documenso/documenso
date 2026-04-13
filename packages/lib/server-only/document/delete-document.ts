@@ -93,6 +93,13 @@ export const deleteDocument = async ({
       user,
       requestMetadata,
     });
+
+    await triggerWebhook({
+      event: WebhookTriggerEvents.DOCUMENT_CANCELLED,
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
+      userId,
+      teamId,
+    });
   }
 
   // Continue to hide the document from the user if they are a recipient.
@@ -111,13 +118,6 @@ export const deleteDocument = async ({
         // Do nothing.
       });
   }
-
-  await triggerWebhook({
-    event: WebhookTriggerEvents.DOCUMENT_CANCELLED,
-    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
-    userId,
-    teamId,
-  });
 
   return envelope;
 };

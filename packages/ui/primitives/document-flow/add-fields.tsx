@@ -39,7 +39,7 @@ import {
 } from '@documenso/lib/utils/recipients';
 
 import { FieldToolTip } from '../../components/field/field-tooltip';
-import { useRecipientColors } from '../../lib/recipient-colors';
+import { getRecipientColorStyles } from '../../lib/recipient-colors';
 import { cn } from '../../lib/utils';
 import { Alert, AlertDescription } from '../alert';
 import { Card, CardContent } from '../card';
@@ -180,9 +180,7 @@ export const AddFieldsFormPartial = ({
     null,
   );
   const selectedSignerIndex = recipients.findIndex((r) => r.id === selectedSigner?.id);
-  const selectedSignerStyles = useRecipientColors(
-    selectedSignerIndex === -1 ? 0 : selectedSignerIndex,
-  );
+  const selectedSignerStyles = getRecipientColorStyles(selectedSignerIndex);
 
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
