@@ -26,7 +26,7 @@ export const run = async ({
       },
     },
     select: { id: true },
-    take: 500,
+    take: 1000,
   });
 
   if (recipients.length === 0) {

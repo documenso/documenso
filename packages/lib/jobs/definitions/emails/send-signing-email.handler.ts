@@ -222,31 +222,27 @@ export const run = async ({
   });
 
   // Compute the first reminder time based on the envelope's effective settings.
-  await io.runTask('compute-next-reminder', async () => {
-    await updateRecipientNextReminder({
-      recipientId: recipient.id,
-      envelopeId: envelope.id,
-      sentAt,
-      lastReminderSentAt: null,
-    });
+  await updateRecipientNextReminder({
+    recipientId: recipient.id,
+    envelopeId: envelope.id,
+    sentAt,
+    lastReminderSentAt: null,
   });
 
-  await io.runTask('store-audit-log', async () => {
-    await prisma.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
-        envelopeId: envelope.id,
-        user,
-        requestMetadata,
-        data: {
-          emailType: recipientEmailType,
-          recipientId: recipient.id,
-          recipientName: recipient.name,
-          recipientEmail: recipient.email,
-          recipientRole: recipient.role,
-          isResending: false,
-        },
-      }),
-    });
+  await prisma.documentAuditLog.create({
+    data: createDocumentAuditLogData({
+      type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
+      envelopeId: envelope.id,
+      user,
+      requestMetadata,
+      data: {
+        emailType: recipientEmailType,
+        recipientId: recipient.id,
+        recipientName: recipient.name,
+        recipientEmail: recipient.email,
+        recipientRole: recipient.role,
+        isResending: false,
+      },
+    }),
   });
 };
