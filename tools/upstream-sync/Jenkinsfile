@@ -119,12 +119,10 @@ pipeline {
             }
             steps {
                 script {
-                    // Clean workspace: remove stale files from previous builds.
+                    // Clean git working tree from previous builds (preserve sync-output/).
                     sh '''
-                        rm -rf sync-output 2>/dev/null || true
                         git checkout -- . 2>/dev/null || true
-                        git clean -fd 2>/dev/null || true
-                        mkdir -p sync-output
+                        git clean -fd --exclude=sync-output 2>/dev/null || true
                     '''
 
                     // Clean up any leftover sync branch from a previous run.
