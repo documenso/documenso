@@ -119,10 +119,10 @@ pipeline {
             }
             steps {
                 script {
-                    // Clean git working tree from previous builds (preserve sync-output/).
+                    // Clean git working tree from previous builds (preserve sync-output/ and .venv/).
                     sh '''
                         git checkout -- . 2>/dev/null || true
-                        git clean -fd --exclude=sync-output 2>/dev/null || true
+                        git clean -fd --exclude=sync-output --exclude=.venv 2>/dev/null || true
                     '''
 
                     // Clean up any leftover sync branch from a previous run.
