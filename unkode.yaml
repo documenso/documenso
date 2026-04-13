@@ -1,0 +1,223 @@
+_meta:
+  last_sync_commit: 6d7bd212bf890678b8fe040bb4292748addf4daf
+  last_sync: 2026-04-13T10:42:53Z
+  version: 1
+
+architecture:
+  - name: Web Application
+    path: apps/remix
+    tech: [TypeScript, React Router, Hono]
+    role: Main user-facing web app and HTTP server that mounts every API surface and serves the React UI.
+    depends_on:
+      - REST API V1
+      - tRPC API
+      - Core Library
+      - UI Components
+      - Authentication
+      - Email Templates
+      - Database
+      - Enterprise Features
+    components:
+      - name: Hono Server
+        path: apps/remix/server
+        description: Hono entry point that wires routing, middleware, and mounts api/trpc/jobs handlers.
+      - name: React Router UI
+        path: apps/remix/app/routes
+        description: File-based React Router routes for authenticated, public, and recipient-signing pages.
+      - name: Client Providers
+        path: apps/remix/app/providers
+        description: Top-level React providers for auth, theming, i18n, and tRPC client wiring.
+
+  - name: Documentation Site
+    path: apps/docs
+    tech: [TypeScript, Next.js, Nextra]
+    role: Standalone documentation portal for product and developer guides.
+
+  - name: Public Analytics API
+    path: apps/openpage-api
+    tech: [TypeScript, Node]
+    role: Publicly exposed API that serves aggregate analytics for the openpage marketing surface.
+    depends_on: [Database]
+
+  - name: REST API V1
+    path: packages/api
+    tech: [TypeScript, ts-rest, Hono]
+    role: Deprecated but maintained REST API for documents, templates, recipients, and fields under /api/v1.
+    depends_on: [Core Library, Database, Authentication]
+    components:
+      - name: V1 Contracts
+        path: packages/api/v1
+        description: ts-rest contract definitions, handlers, and Zod schemas for the legacy REST surface.
+
+  - name: tRPC API
+    path: packages/trpc
+    tech: [TypeScript, tRPC, OpenAPI]
+    role: Internal tRPC API and public V2 OpenAPI surface covering documents, templates, envelopes, folders, and admin.
+    depends_on: [Core Library, Database, Authentication, Enterprise Features]
+    components:
+      - name: Server Routers
+        path: packages/trpc/server
+        description: Domain routers (document, template, envelope, recipient, field, etc.) exposed via tRPC and OpenAPI.
+      - name: React Client
+        path: packages/trpc/react
+        description: React Query bindings used by the frontend to consume internal tRPC procedures.
+      - name: Standalone Client
+        path: packages/trpc/client
+        description: Plain tRPC client for non-React consumers and server-to-server calls.
+
+  - name: Core Library
+    path: packages/lib
+    tech: [TypeScript]
+    role: Shared business logic, background jobs, schemas, and provider strategies used by every server surface.
+    depends_on:
+      - Database
+      - Email Templates
+      - PDF Signing
+      - Object Storage
+      - Job Queue
+      - Stripe
+      - PostHog
+    components:
+      - name: Server Logic
+        path: packages/lib/server-only
+        description: Server-only domain functions for documents, recipients, billing, webhooks, and admin actions.
+      - name: Client Utilities
+        path: packages/lib/client-only
+        description: Browser-safe helpers, hooks, and constants consumed by the React UI.
+      - name: Universal Helpers
+        path: packages/lib/universal
+        description: Isomorphic utilities including upload abstractions, validation, and crypto-safe helpers.
+      - name: Background Jobs
+        path: packages/lib/jobs
+        description: Job definitions and pluggable provider clients for Local, BullMQ, and Inngest queues.
+      - name: Schemas and Types
+        path: packages/lib/schemas
+        description: Shared Zod schemas and TypeScript types reused across API and UI layers.
+
+  - name: Database
+    path: packages/prisma
+    tech: [TypeScript, Prisma, Kysely]
+    role: Prisma schema, generated client, migrations, and Kysely query builder for PostgreSQL access.
+    depends_on: [PostgreSQL]
+
+  - name: UI Components
+    path: packages/ui
+    tech: [TypeScript, React, Tailwind, Radix]
+    role: Shared component library built on Shadcn and Radix primitives styled with Tailwind.
+
+  - name: Email Templates
+    path: packages/email
+    tech: [TypeScript, React Email, Nodemailer]
+    role: React Email templates and the swappable mailer that dispatches via SMTP, Resend, or MailChannels.
+    depends_on: [Resend, MailChannels, SMTP Provider]
+
+  - name: Authentication
+    path: packages/auth
+    tech: [TypeScript, Arctic, WebAuthn]
+    role: Session, OAuth (Arctic), and passkey/WebAuthn authentication flows shared across server entry points.
+    depends_on: [Database, Google OAuth]
+
+  - name: PDF Signing
+    path: packages/signing
+    tech: [TypeScript]
+    role: Cryptographic PDF signing with swappable Local P12 and Google Cloud HSM transports.
+    depends_on: [Google Cloud KMS]
+    components:
+      - name: Signing Transports
+        path: packages/signing/transports
+        description: Provider implementations for local P12 certificates and Google Cloud HSM-backed signing.
+      - name: Signing Helpers
+        path: packages/signing/helpers
+        description: PDF preparation utilities, timestamp authority calls, and signature placement helpers.
+
+  - name: Enterprise Features
+    path: packages/ee
+    tech: [TypeScript]
+    role: Server-only Enterprise Edition features layered on top of the core platform under a separate license.
+    depends_on: [Core Library, Database]
+
+  - name: Static Assets
+    path: packages/assets
+    tech: [TypeScript]
+    role: Shared static images, fonts, and brand assets bundled into apps and emails.
+
+  - name: E2E Tests
+    path: packages/app-tests
+    tech: [TypeScript, Playwright]
+    role: Playwright end-to-end test suite that exercises the running web application.
+    depends_on: [Web Application]
+
+  - name: PostgreSQL
+    type: external
+    role: Primary relational datastore for users, documents, recipients, audit logs, and queued local jobs.
+
+  - name: Object Storage
+    type: external
+    role: S3-compatible bucket (e.g. AWS S3, MinIO) for uploaded and signed PDF binaries.
+
+  - name: Job Queue
+    type: external
+    role: External job runner backing the Inngest or BullMQ/Redis providers when not using the local DB queue.
+
+  - name: Google Cloud KMS
+    type: external
+    role: Managed HSM that holds signing keys and produces PDF signatures for the gcloud-hsm transport.
+
+  - name: Google OAuth
+    type: external
+    role: Google identity provider used for OAuth sign-in via Arctic.
+
+  - name: Stripe
+    type: external
+    role: Billing, subscriptions, and webhook events for paid plans and team seats.
+
+  - name: Resend
+    type: external
+    role: Transactional email delivery via the Resend HTTP API.
+
+  - name: MailChannels
+    type: external
+    role: Transactional email delivery via the MailChannels HTTP API with optional DKIM signing.
+
+  - name: SMTP Provider
+    type: external
+    role: Generic SMTP relay (auth or API key) for transactional email when Resend/MailChannels are not used.
+
+  - name: PostHog
+    type: external
+    role: Product analytics and feature-flag service for both server and client telemetry.
+
+deployment:
+  - name: Documenso Container
+    tech: [docker-compose, node]
+    role: Single Node container running the Remix/Hono app image that serves UI, APIs, and job handlers.
+    hosts:
+      - Web Application
+      - REST API V1
+      - tRPC API
+      - Core Library
+      - Authentication
+      - PDF Signing
+      - Email Templates
+      - Enterprise Features
+    depends_on: [PostgreSQL Container]
+
+  - name: PostgreSQL Container
+    tech: [docker-compose, postgres-15]
+    role: Postgres 15 container with a persistent volume that backs the Documenso database.
+    hosts: [Database]
+
+  - name: Redis Container
+    tech: [docker-compose, redis-8]
+    role: Development Redis instance available to back the BullMQ jobs provider and caching needs.
+    hosts: [Job Queue]
+
+  - name: MinIO Container
+    tech: [docker-compose, minio]
+    role: Development S3-compatible object store used when NEXT_PUBLIC_UPLOAD_TRANSPORT is set to s3.
+    hosts: [Object Storage]
+
+  - name: Inbucket Container
+    tech: [docker-compose, inbucket]
+    role: Development SMTP/IMAP catcher that captures outbound mail for local testing.
+    hosts: [SMTP Provider]
