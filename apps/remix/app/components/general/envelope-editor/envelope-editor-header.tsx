@@ -1,7 +1,10 @@
+import { useMemo } from 'react';
+
 import { Trans, useLingui } from '@lingui/react/macro';
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, TemplateType } from '@prisma/client';
 import {
   AlertTriangleIcon,
+  Building2Icon,
   Globe2Icon,
   LockIcon,
   RefreshCwIcon,
@@ -12,7 +15,10 @@ import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
-import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
+import {
+  getEnvelopeItemPermissions,
+  mapSecondaryIdToTemplateId,
+} from '@documenso/lib/utils/envelope';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
@@ -49,6 +55,11 @@ export default function EnvelopeEditorHeader() {
     actions: { allowAttachments, allowDistributing },
   } = editorConfig;
 
+  const envelopeItemPermissions = useMemo(
+    () => getEnvelopeItemPermissions(envelope, envelope.recipients),
+    [envelope, envelope.recipients],
+  );
+
   const handleCreateEmbeddedEnvelope = async () => {
     const latestEnvelope = await flushAutosave();
 
@@ -80,7 +91,8 @@ export default function EnvelopeEditorHeader() {
 
           <div className="flex items-center space-x-2">
             <EnvelopeItemTitleInput
-              disabled={envelope.status !== DocumentStatus.DRAFT || !allowConfigureEnvelopeTitle}
+              dataTestId="envelope-title-input"
+              disabled={!envelopeItemPermissions.canTitleBeChanged || !allowConfigureEnvelopeTitle}
               value={envelope.title}
               onChange={(title) => {
                 updateEnvelope({
@@ -94,12 +106,19 @@ export default function EnvelopeEditorHeader() {
 
             {envelope.type === EnvelopeType.TEMPLATE && (
               <>
-                {envelope.templateType === 'PRIVATE' ? (
+                {envelope.templateType === TemplateType.PRIVATE && (
                   <Badge variant="secondary">
                     <LockIcon className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-300" />
                     <Trans>Private Template</Trans>
                   </Badge>
-                ) : (
+                )}
+                {envelope.templateType === TemplateType.ORGANISATION && (
+                  <Badge variant="orange">
+                    <Building2Icon className="mr-2 size-4" />
+                    <Trans>Organisation Template</Trans>
+                  </Badge>
+                )}
+                {envelope.templateType === TemplateType.PUBLIC && (
                   <Badge variant="default">
                     <Globe2Icon className="mr-2 h-4 w-4 text-green-500 dark:text-green-300" />
                     <Trans>Public Template</Trans>

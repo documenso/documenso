@@ -1,5 +1,5 @@
 import { msg } from '@lingui/core/macro';
-import { Trans, useLingui } from '@lingui/react/macro';
+import { Trans } from '@lingui/react/macro';
 import { DocumentSigningOrder, SigningStatus } from '@prisma/client';
 import { ChevronLeft, LucideEdit } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
@@ -37,19 +37,25 @@ import { useCurrentTeam } from '~/providers/team';
 import type { Route } from './+types/templates.$id._index';
 
 export default function TemplatePage({ params }: Route.ComponentProps) {
-  const { t } = useLingui();
   const { user } = useSession();
   const navigate = useNavigate();
 
   const team = useCurrentTeam();
 
-  const {
-    data: envelope,
-    isLoading: isLoadingEnvelope,
-    isError: isErrorEnvelope,
-  } = trpc.envelope.get.useQuery({
-    envelopeId: params.id,
-  });
+  // Try fetching as a team template first; only fall back to the org endpoint if the team
+  // query has definitively failed (i.e. this template belongs to a sibling team).
+  // We disable retries on the team query so the org fallback kicks in immediately.
+  const teamTemplateQuery = trpc.envelope.get.useQuery({ envelopeId: params.id }, { retry: false });
+  const orgTemplateQuery = trpc.template.getOrganisationTemplateById.useQuery(
+    { envelopeId: params.id },
+    { enabled: teamTemplateQuery.isError, retry: false },
+  );
+
+  const envelope = teamTemplateQuery.data ?? orgTemplateQuery.data;
+  const isLoadingEnvelope =
+    teamTemplateQuery.isLoading ||
+    (teamTemplateQuery.isError && !orgTemplateQuery.isError && !orgTemplateQuery.data);
+  const isErrorEnvelope = teamTemplateQuery.isError && orgTemplateQuery.isError;
 
   if (isLoadingEnvelope) {
     return (
@@ -84,6 +90,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
 
   const documentRootPath = formatDocumentsPath(team.url);
   const templateRootPath = formatTemplatesPath(team.url);
+  const isOwnTeamTemplate = envelope.teamId === team?.id;
 
   // Remap to fit the DocumentReadOnlyFields component.
   const readOnlyFields = envelope.fields.map((field) => {
@@ -146,23 +153,27 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
         </div>
 
         <div className="mt-2 flex flex-row space-x-4 sm:mt-0 sm:self-end">
-          <TemplateDirectLinkDialog
-            templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
-            directLink={envelope.directLink}
-            recipients={envelope.recipients}
-          />
+          {isOwnTeamTemplate && (
+            <>
+              <TemplateDirectLinkDialog
+                templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
+                directLink={envelope.directLink}
+                recipients={envelope.recipients}
+              />
 
-          <TemplateBulkSendDialog
-            templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
-            recipients={envelope.recipients}
-          />
+              <TemplateBulkSendDialog
+                templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
+                recipients={envelope.recipients}
+              />
 
-          <Button className="w-full" asChild>
-            <Link to={`${templateRootPath}/${envelope.id}/edit`}>
-              <LucideEdit className="mr-1.5 h-3.5 w-3.5" />
-              <Trans>Edit Template</Trans>
-            </Link>
-          </Button>
+              <Button className="w-full" asChild>
+                <Link to={`${templateRootPath}/${envelope.id}/edit`}>
+                  <LucideEdit className="mr-1.5 h-3.5 w-3.5" />
+                  <Trans>Edit Template</Trans>
+                </Link>
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -236,22 +247,28 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
                   <Trans>Template</Trans>
                 </h3>
 
-                <div>
-                  <TemplatesTableActionDropdown
-                    row={{
-                      ...envelope,
-                      id: mapSecondaryIdToTemplateId(envelope.secondaryId),
-                      envelopeId: envelope.id,
-                    }}
-                    teamId={team?.id}
-                    templateRootPath={templateRootPath}
-                    onDelete={async () => navigate(templateRootPath)}
-                  />
-                </div>
+                {isOwnTeamTemplate && (
+                  <div>
+                    <TemplatesTableActionDropdown
+                      row={{
+                        ...envelope,
+                        id: mapSecondaryIdToTemplateId(envelope.secondaryId),
+                        envelopeId: envelope.id,
+                      }}
+                      teamId={team?.id}
+                      templateRootPath={templateRootPath}
+                      onDelete={async () => navigate(templateRootPath)}
+                    />
+                  </div>
+                )}
               </div>
 
               <p className="mt-2 px-4 text-sm text-muted-foreground">
-                <Trans>Manage and view template</Trans>
+                {isOwnTeamTemplate ? (
+                  <Trans>Manage and view template</Trans>
+                ) : (
+                  <Trans>View organisation template</Trans>
+                )}
               </p>
 
               <div className="mt-4 border-t px-4 pt-4">
@@ -278,6 +295,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
               recipients={envelope.recipients}
               envelopeId={envelope.id}
               templateRootPath={templateRootPath}
+              readOnly={!isOwnTeamTemplate}
             />
 
             {/* Recent activity section. */}

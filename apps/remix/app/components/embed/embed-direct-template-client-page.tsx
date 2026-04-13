@@ -17,6 +17,7 @@ import { useSearchParams } from 'react-router';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { ZDirectTemplateEmbedDataSchema } from '@documenso/lib/types/embed-direct-template-schema';
@@ -26,6 +27,8 @@ import {
 } from '@documenso/lib/utils/advanced-fields-helpers';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { dynamicActivate } from '@documenso/lib/utils/i18n';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -33,6 +36,7 @@ import type {
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
@@ -92,6 +96,7 @@ export const EmbedDirectTemplateClientPage = ({
   const [isNameLocked, setIsNameLocked] = useState(false);
 
   const [showPendingFieldTooltip, setShowPendingFieldTooltip] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   const [throttledOnCompleteClick, isThrottled] = useThrottleFn(() => void onCompleteClick(), 500);
 
@@ -205,6 +210,14 @@ export const EmbedDirectTemplateClientPage = ({
         return;
       }
 
+      const { success: isEmailValid } = zEmail().safeParse(email);
+
+      if (!isEmailValid) {
+        setEmailError(_(msg`A valid email is required`));
+        setIsExpanded(true);
+        return;
+      }
+
       let directTemplateExternalId = searchParams?.get('externalId') || undefined;
 
       if (directTemplateExternalId) {
@@ -290,11 +303,18 @@ export const EmbedDirectTemplateClientPage = ({
           cssVars: data.cssVars,
         });
       }
+
+      if (data.language && data.language !== APP_I18N_OPTIONS.sourceLang) {
+        void dynamicActivate(data.language).finally(() => {
+          setHasFinishedInit(true);
+        });
+      } else {
+        setHasFinishedInit(true);
+      }
     } catch (err) {
       console.error(err);
+      setHasFinishedInit(true);
     }
-
-    setHasFinishedInit(true);
 
     // !: While the two setters are stable we still want to ensure we're avoiding
     // !: re-renders.
@@ -433,11 +453,23 @@ export const EmbedDirectTemplateClientPage = ({
                   <Input
                     type="email"
                     id="email"
-                    className="mt-2 bg-background"
+                    className={cn(
+                      'mt-2 bg-background',
+                      emailError && 'border-destructive ring-2 ring-destructive/20',
+                    )}
                     disabled={isEmailLocked}
                     value={email}
-                    onChange={(e) => !isEmailLocked && setEmail(e.target.value.trim())}
+                    onChange={(e) => {
+                      if (!isEmailLocked) {
+                        setEmail(e.target.value.trim());
+                        setEmailError(null);
+                      }
+                    }}
                   />
+
+                  {emailError && (
+                    <p className="mt-2 text-xs font-medium text-destructive">{emailError}</p>
+                  )}
                 </div>
 
                 {hasSignatureField && (

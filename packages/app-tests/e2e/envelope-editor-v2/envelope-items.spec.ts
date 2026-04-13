@@ -4,7 +4,10 @@ import path from 'node:path';
 
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
+import { seedPendingDocument } from '@documenso/prisma/seed/documents';
+import { seedUser } from '@documenso/prisma/seed/users';
 
+import { apiSignin } from '../fixtures/authentication';
 import {
   type TEnvelopeEditorSurface,
   clickEnvelopeEditorStep,
@@ -312,5 +315,74 @@ test.describe('embedded edit', () => {
     expect(items).toHaveLength(1);
     expect(items[0].title).toBe('Envelope Item A');
     expect(items[0].order).toBe(2); // Expect order 2 because deleting items does not drop the order of sequential items.
+  });
+});
+
+test.describe('pending envelope title editing', () => {
+  test('edit envelope and item titles on a pending envelope', async ({ page }) => {
+    const recipientEmail = `recipient-${nanoid()}@test.documenso.com`;
+    const { user, team } = await seedUser();
+    const pendingDocument = await seedPendingDocument(user, team.id, [recipientEmail], {
+      internalVersion: 2,
+    });
+
+    await apiSignin({
+      page,
+      email: user.email,
+      redirectPath: `/t/${team.url}/documents/${pendingDocument.id}/edit`,
+    });
+
+    // Verify the envelope editor loaded with the upload step visible.
+    await expect(page.getByRole('heading', { name: 'Documents' })).toBeVisible();
+
+    // Edit the envelope title in the header.
+    const envelopeTitleInput = page.locator('[data-testid="envelope-title-input"]');
+    await expect(envelopeTitleInput).toBeEnabled();
+    await envelopeTitleInput.fill('Updated Pending Title');
+
+    // Edit the envelope item title.
+    const itemTitleInput = getEnvelopeItemTitleInputs(page).first();
+    await expect(itemTitleInput).toBeEnabled();
+    await itemTitleInput.fill('Updated Item Title');
+
+    // Wait for debounced auto-save to persist by navigating away and back.
+    await clickEnvelopeEditorStep(page, 'addFields');
+    await expect(page.getByText('Selected Recipient')).toBeVisible();
+    await clickEnvelopeEditorStep(page, 'upload');
+    await expect(page.getByRole('heading', { name: 'Documents' })).toBeVisible();
+
+    // Verify the titles persisted in the database.
+    const updatedEnvelope = await prisma.envelope.findFirstOrThrow({
+      where: { id: pendingDocument.id },
+      include: {
+        envelopeItems: true,
+        auditLogs: {
+          orderBy: { createdAt: 'desc' },
+        },
+      },
+    });
+
+    expect(updatedEnvelope.title).toBe('Updated Pending Title');
+    expect(updatedEnvelope.envelopeItems[0].title).toBe('Updated Item Title');
+
+    // Verify audit logs were created for both title changes.
+    const titleAuditLog = updatedEnvelope.auditLogs.find(
+      (log) => log.type === 'DOCUMENT_TITLE_UPDATED',
+    );
+    expect(titleAuditLog).toBeDefined();
+
+    const itemAuditLog = updatedEnvelope.auditLogs.find(
+      (log) => log.type === 'ENVELOPE_ITEM_UPDATED',
+    );
+    expect(itemAuditLog).toBeDefined();
+
+    // Verify the upload dropzone is still disabled for pending envelopes.
+    const dropzoneMessage = page.getByText('Cannot upload items after the document has been sent');
+    await expect(dropzoneMessage).toBeVisible();
+
+    // Drag handles are still rendered but dragging is disabled via isDragDisabled
+    // when canItemsBeModified is false. Verify at least that the handle is present
+    // but we cannot programmatically assert isDragDisabled from the DOM.
+    await expect(getEnvelopeItemDragHandles(page)).toHaveCount(1);
   });
 });

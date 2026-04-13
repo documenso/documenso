@@ -55,6 +55,7 @@ export const getTemplatesByIdsRoute = authenticatedProcedure
           select: {
             id: true,
             url: true,
+            name: true,
           },
         },
         documentMeta: {
@@ -97,6 +98,7 @@ export const getTemplatesByIdsRoute = authenticatedProcedure
           ? {
               id: envelope.team.id,
               url: envelope.team.url,
+              name: envelope.team.name,
             }
           : null,
         fields: envelope.fields.map((field) => mapFieldToLegacyField(field, envelope)),

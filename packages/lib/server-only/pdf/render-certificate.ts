@@ -9,7 +9,6 @@ import { DateTime } from 'luxon';
 import fs from 'node:fs';
 import path from 'node:path';
 import type { Canvas } from 'skia-canvas';
-import { FontLibrary } from 'skia-canvas';
 import { Image as SkiaImage } from 'skia-canvas';
 import { UAParser } from 'ua-parser-js';
 import { renderSVG } from 'uqr';
@@ -22,6 +21,7 @@ import {
 } from '../../constants/recipient-roles';
 import type { TDocumentAuditLogBaseSchema } from '../../types/document-audit-logs';
 import { svgToPng } from '../../utils/images/svg-to-png';
+import { ensureFontLibrary } from './helpers';
 
 type ColumnWidths = [number, number, number];
 
@@ -724,13 +724,7 @@ export async function renderCertificate({
   pageWidth,
   pageHeight,
 }: GenerateCertificateOptions) {
-  const fontPath = path.join(process.cwd(), 'public/fonts');
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  FontLibrary.use({
-    ['Caveat']: [path.join(fontPath, 'caveat.ttf')],
-    ['Inter']: [path.join(fontPath, 'inter-variablefont_opsz,wght.ttf')],
-  });
+  ensureFontLibrary();
 
   const minimumMargin = 10;
 

@@ -5,6 +5,7 @@
     "pdf-placeholders",
     "ai-detection",
     "default-recipients",
-    "document-visibility"
+    "document-visibility",
+    "recipient-expiration"
   ]
 }

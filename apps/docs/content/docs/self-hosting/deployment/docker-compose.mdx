@@ -154,8 +154,9 @@ PORT=3000
 # Signing certificate (see Signing Certificate section)
 NEXT_PRIVATE_SIGNING_PASSPHRASE=your-certificate-password
 
-# Disable public signups
+# Signup restrictions (optional)
 NEXT_PUBLIC_DISABLE_SIGNUP=false
+# NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS=example.com,acme.org
 ```
 
 <Callout type="info">Generate secure secrets using: `openssl rand -base64 32`</Callout>
@@ -251,7 +252,8 @@ Navigate to the signup page and create your account. Verify your email address â
 <Callout type="info">
   All accounts created through signup are regular user accounts. Admin access must be granted
   directly in the database. Once your accounts are set up, consider disabling public signups by
-  setting `NEXT_PUBLIC_DISABLE_SIGNUP=true`.
+  setting `NEXT_PUBLIC_DISABLE_SIGNUP=true`, or restrict signups to specific email domains with
+  `NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS`.
 </Callout>
 
 ## Managing Services

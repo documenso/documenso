@@ -1389,7 +1389,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
               throw new Error('Invalid page number');
             }
 
-            const recipient = await prisma.recipient.findFirst({
+            const recipient = await tx.recipient.findFirst({
               where: {
                 id: Number(recipientId),
                 envelopeId: envelope.id,

@@ -15,7 +15,7 @@ import type { TSetEnvelopeFieldsResponse } from '@documenso/trpc/server/envelope
 import type { TSetEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/set-envelope-recipients.types';
 import type { TUpdateEnvelopeRequest } from '@documenso/trpc/server/envelope-router/update-envelope.types';
 import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
-import { AVAILABLE_RECIPIENT_COLORS } from '@documenso/ui/lib/recipient-colors';
+import { getRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import type { TDocumentEmailSettings } from '../../types/document-email';
@@ -346,15 +346,8 @@ export const EnvelopeEditorProvider = ({
   };
 
   const getRecipientColorKey = useCallback(
-    (recipientId: number) => {
-      const recipientIndex = envelope.recipients.findIndex(
-        (recipient) => recipient.id === recipientId,
-      );
-
-      return AVAILABLE_RECIPIENT_COLORS[
-        Math.max(recipientIndex, 0) % AVAILABLE_RECIPIENT_COLORS.length
-      ];
-    },
+    (recipientId: number) =>
+      getRecipientColor(envelope.recipients.findIndex((r) => r.id === recipientId)),
     [envelope.recipients],
   );
 
@@ -364,6 +357,7 @@ export const EnvelopeEditorProvider = ({
     },
     {
       enabled: !isEmbedded,
+      gcTime: 0,
       ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     },
   );
@@ -524,7 +518,7 @@ const mapLocalRecipientsToRecipients = ({
   }, -1);
 
   return localRecipients.map((recipient) => {
-    const foundRecipient = envelope.recipients.find((recipient) => recipient.id === recipient.id);
+    const foundRecipient = envelope.recipients.find((r) => r.id === recipient.id);
 
     let recipientId = recipient.id;
 

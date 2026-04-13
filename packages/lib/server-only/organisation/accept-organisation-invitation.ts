@@ -111,32 +111,27 @@ export const addUserToOrganisation = async ({
     });
   }
 
-  await prisma.$transaction(
-    async (tx) => {
-      await tx.organisationMember.create({
-        data: {
-          id: generateDatabaseId('member'),
-          userId,
-          organisationId,
-          organisationGroupMembers: {
-            create: {
-              id: generateDatabaseId('group_member'),
-              groupId: organisationGroupToUse.id,
-            },
-          },
+  await prisma.organisationMember.create({
+    data: {
+      id: generateDatabaseId('member'),
+      userId,
+      organisationId,
+      organisationGroupMembers: {
+        create: {
+          id: generateDatabaseId('group_member'),
+          groupId: organisationGroupToUse.id,
         },
-      });
-
-      if (!bypassEmail) {
-        await jobs.triggerJob({
-          name: 'send.organisation-member-joined.email',
-          payload: {
-            organisationId,
-            memberUserId: userId,
-          },
-        });
-      }
+      },
     },
-    { timeout: 30_000 },
-  );
+  });
+
+  if (!bypassEmail) {
+    await jobs.triggerJob({
+      name: 'send.organisation-member-joined.email',
+      payload: {
+        organisationId,
+        memberUserId: userId,
+      },
+    });
+  }
 };

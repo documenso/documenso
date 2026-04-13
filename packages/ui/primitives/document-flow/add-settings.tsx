@@ -242,7 +242,7 @@ export const AddSettingsFormPartial = ({
                         <InfoIcon className="mx-2 h-4 w-4" />
                       </TooltipTrigger>
 
-                      <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+                      <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
                         <Trans>
                           Controls the language for the document, including the language to be used
                           for email notifications, and the final certificate that is generated and
@@ -361,11 +361,11 @@ export const AddSettingsFormPartial = ({
 
             <Accordion type="multiple" className="mt-6">
               <AccordionItem value="advanced-options" className="border-none">
-                <AccordionTrigger className="text-foreground mb-2 rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
+                <AccordionTrigger className="mb-2 rounded border px-3 py-2 text-left text-foreground hover:bg-neutral-200/30 hover:no-underline">
                   <Trans>Advanced Options</Trans>
                 </AccordionTrigger>
 
-                <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-2 text-sm leading-relaxed">
+                <AccordionContent className="-mx-1 px-1 pt-2 text-sm leading-relaxed text-muted-foreground">
                   <div className="flex flex-col space-y-6">
                     <FormField
                       control={form.control}
@@ -379,7 +379,7 @@ export const AddSettingsFormPartial = ({
                                 <InfoIcon className="mx-2 h-4 w-4" />
                               </TooltipTrigger>
 
-                              <TooltipContent className="text-muted-foreground max-w-xs">
+                              <TooltipContent className="max-w-xs text-muted-foreground">
                                 <Trans>
                                   Add an external ID to the document. This can be used to identify
                                   the document in external systems.
@@ -418,7 +418,7 @@ export const AddSettingsFormPartial = ({
                                 field.onChange(value);
                                 void handleAutoSave();
                               }}
-                              className="bg-background w-full"
+                              className="w-full bg-background"
                               emptySelectionPlaceholder={t`Select signature types`}
                             />
                           </FormControl>
@@ -506,7 +506,7 @@ export const AddSettingsFormPartial = ({
                                 <InfoIcon className="mx-2 h-4 w-4" />
                               </TooltipTrigger>
 
-                              <TooltipContent className="text-muted-foreground max-w-xs">
+                              <TooltipContent className="max-w-xs text-muted-foreground">
                                 <Trans>
                                   Add a URL to redirect the user to once the document is signed
                                 </Trans>

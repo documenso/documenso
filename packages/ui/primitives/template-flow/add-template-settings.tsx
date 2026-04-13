@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
+import { DocumentVisibility, TeamMemberRole, TemplateType } from '@prisma/client';
 import { DocumentDistributionMethod, type Field, type Recipient } from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -36,6 +36,10 @@ import {
   DocumentVisibilitySelect,
   DocumentVisibilityTooltip,
 } from '@documenso/ui/components/document/document-visibility-select';
+import {
+  TemplateTypeSelect,
+  TemplateTypeTooltip,
+} from '@documenso/ui/components/template/template-type-select';
 import {
   Accordion,
   AccordionContent,
@@ -109,6 +113,7 @@ export const AddTemplateSettingsFormPartial = ({
     defaultValues: {
       title: template.title,
       externalId: template.externalId || undefined,
+      templateType: template.type || TemplateType.PRIVATE,
       visibility: template.visibility || '',
       globalAccessAuth: documentAuthOption?.globalAccessAuth || [],
       globalActionAuth: documentAuthOption?.globalActionAuth || [],
@@ -324,6 +329,29 @@ export const AddTemplateSettingsFormPartial = ({
                 )}
               />
             )}
+
+            <FormField
+              control={form.control}
+              name="templateType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex flex-row items-center">
+                    <Trans>Template type</Trans>
+                    <TemplateTypeTooltip organisationTeamCount={organisation.teams.length} />
+                  </FormLabel>
+
+                  <FormControl>
+                    <TemplateTypeSelect
+                      {...field}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        void handleAutoSave();
+                      }}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}

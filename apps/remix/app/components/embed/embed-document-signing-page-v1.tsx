@@ -8,11 +8,13 @@ import { type Field, RecipientRole, SigningStatus } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
+import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { ZSignDocumentEmbedDataSchema } from '@documenso/lib/types/embed-document-sign-schema';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
@@ -232,11 +234,18 @@ export const EmbedSignDocumentV1ClientPage = ({
           cssVars: data.cssVars,
         });
       }
+
+      if (data.language && data.language !== APP_I18N_OPTIONS.sourceLang) {
+        void dynamicActivate(data.language).finally(() => {
+          setHasFinishedInit(true);
+        });
+      } else {
+        setHasFinishedInit(true);
+      }
     } catch (err) {
       console.error(err);
+      setHasFinishedInit(true);
     }
-
-    setHasFinishedInit(true);
 
     // !: While the two setters are stable we still want to ensure we're avoiding
     // !: re-renders.

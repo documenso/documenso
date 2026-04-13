@@ -1,8 +1,17 @@
 import { WebhookTriggerEvents } from '@prisma/client';
 import { z } from 'zod';
 
+import { isPrivateUrl } from '@documenso/lib/server-only/webhooks/is-private-url';
+
+export const ZWebhookUrlSchema = z
+  .string()
+  .url()
+  .refine((url) => !isPrivateUrl(url), {
+    message: 'Webhook URL cannot point to a private or loopback address',
+  });
+
 export const ZCreateWebhookRequestSchema = z.object({
-  webhookUrl: z.string().url(),
+  webhookUrl: ZWebhookUrlSchema,
   eventTriggers: z
     .array(z.nativeEnum(WebhookTriggerEvents))
     .min(1, { message: 'At least one event trigger is required' }),

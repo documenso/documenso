@@ -6,6 +6,7 @@ import { HTTPException } from 'hono/http-exception';
 import { DateTime } from 'luxon';
 import { z } from 'zod';
 
+import { isEmailDomainAllowedForSignup } from '@documenso/lib/constants/auth';
 import { EMAIL_VERIFICATION_STATE } from '@documenso/lib/constants/email';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { jobsClient } from '@documenso/lib/jobs/client';
@@ -122,7 +123,11 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     const is2faEnabled = isTwoFactorAuthenticationEnabled({ user });
 
     if (is2faEnabled) {
-      const isValid = await validateTwoFactorAuthentication({ backupCode, totpCode, user });
+      const isValid = await validateTwoFactorAuthentication({
+        backupCode,
+        totpCode,
+        user,
+      });
 
       if (!isValid) {
         await prisma.userSecurityAuditLog.create({
@@ -178,8 +183,8 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     const requestMetadata = c.get('requestMetadata');
 
     if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
-      throw new AppError('SIGNUP_DISABLED', {
-        message: 'Signups are disabled.',
+      throw new AppError(AuthenticationErrorCode.SignupDisabled, {
+        statusCode: 400,
       });
     }
 
@@ -194,6 +199,12 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     if (signupLimited) {
       throw new HTTPException(429, {
         res: signupLimited,
+      });
+    }
+
+    if (!isEmailDomainAllowedForSignup(email)) {
+      throw new AppError(AuthenticationErrorCode.SignupDisabled, {
+        statusCode: 400,
       });
     }
 

@@ -29,24 +29,22 @@ export const updateSubscriptionClaimRoute = adminProcedure
 
     const newlyEnabledFlags = getNewTruthyFlags(existingClaim.flags, data.flags);
 
-    await prisma.$transaction(async (tx) => {
-      await tx.subscriptionClaim.update({
-        where: {
-          id,
-        },
-        data,
-      });
-
-      if (Object.keys(newlyEnabledFlags).length > 0) {
-        await jobsClient.triggerJob({
-          name: 'internal.backport-subscription-claims',
-          payload: {
-            subscriptionClaimId: id,
-            flags: newlyEnabledFlags,
-          },
-        });
-      }
+    await prisma.subscriptionClaim.update({
+      where: {
+        id,
+      },
+      data,
     });
+
+    if (Object.keys(newlyEnabledFlags).length > 0) {
+      await jobsClient.triggerJob({
+        name: 'internal.backport-subscription-claims',
+        payload: {
+          subscriptionClaimId: id,
+          flags: newlyEnabledFlags,
+        },
+      });
+    }
   });
 
 function getNewTruthyFlags(

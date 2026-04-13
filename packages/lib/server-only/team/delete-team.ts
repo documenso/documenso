@@ -78,38 +78,35 @@ export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
     (member) => member.id,
   );
 
-  await prisma.$transaction(
-    async (tx) => {
-      await tx.team.delete({
-        where: {
-          id: teamId,
-        },
-      });
+  await prisma.$transaction(async (tx) => {
+    await tx.team.delete({
+      where: {
+        id: teamId,
+      },
+    });
 
-      // Purge all internal organisation groups that have no teams.
-      await tx.organisationGroup.deleteMany({
-        where: {
-          type: OrganisationGroupType.INTERNAL_TEAM,
-          teamGroups: {
-            none: {},
-          },
+    // Purge all internal organisation groups that have no teams.
+    await tx.organisationGroup.deleteMany({
+      where: {
+        type: OrganisationGroupType.INTERNAL_TEAM,
+        teamGroups: {
+          none: {},
         },
-      });
+      },
+    });
+  });
 
-      await jobs.triggerJob({
-        name: 'send.team-deleted.email',
-        payload: {
-          team: {
-            name: team.name,
-            url: team.url,
-          },
-          members: membersToNotify,
-          organisationId: team.organisationId,
-        },
-      });
+  await jobs.triggerJob({
+    name: 'send.team-deleted.email',
+    payload: {
+      team: {
+        name: team.name,
+        url: team.url,
+      },
+      members: membersToNotify,
+      organisationId: team.organisationId,
     },
-    { timeout: 30_000 },
-  );
+  });
 };
 
 type SendTeamDeleteEmailOptions = {

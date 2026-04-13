@@ -1,5 +1,22 @@
 import type { ZodRawShape } from 'zod';
 import z from 'zod';
+import { zfd } from 'zod-form-data';
+
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
+import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
+
+/**
+ * A `zfd.file()` schema with a max file size constraint based on
+ * `APP_DOCUMENT_UPLOAD_SIZE_LIMIT`. Use this instead of bare `zfd.file()`
+ * to ensure server-side file size validation.
+ */
+export const zfdFile = () => {
+  const maxBytes = megabytesToBytes(APP_DOCUMENT_UPLOAD_SIZE_LIMIT);
+
+  return zfd.file().refine((file) => file.size <= maxBytes, {
+    message: `File cannot be larger than ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB`,
+  });
+};
 
 /**
  * This helper takes the place of the `z.object` at the root of your schema.

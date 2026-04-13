@@ -52,13 +52,23 @@ export const EnvelopeDeleteDialog = ({
   const [inputValue, setInputValue] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(status === DocumentStatus.DRAFT);
 
+  const isDocument = type === EnvelopeType.DOCUMENT;
+
   const { mutateAsync: deleteEnvelope, isPending } = trpcReact.envelope.delete.useMutation({
     onSuccess: async () => {
       void refreshLimits();
 
       toast({
-        title: t`Document deleted`,
-        description: t`"${title}" has been successfully deleted`,
+        title: canManageDocument
+          ? isDocument
+            ? t`Document deleted`
+            : t`Template deleted`
+          : isDocument
+            ? t`Document hidden`
+            : t`Template hidden`,
+        description: canManageDocument
+          ? t`"${title}" has been successfully deleted`
+          : t`"${title}" has been successfully hidden`,
         duration: 5000,
       });
 
@@ -69,7 +79,9 @@ export const EnvelopeDeleteDialog = ({
     onError: () => {
       toast({
         title: t`Something went wrong`,
-        description: t`This document could not be deleted at this time. Please try again.`,
+        description: isDocument
+          ? t`This document could not be deleted at this time. Please try again.`
+          : t`This template could not be deleted at this time. Please try again.`,
         variant: 'destructive',
         duration: 7500,
       });

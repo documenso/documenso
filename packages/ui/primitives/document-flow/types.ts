@@ -4,6 +4,7 @@ import { FieldType } from '@prisma/client';
 import { z } from 'zod';
 
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { zEmail } from '@documenso/lib/utils/zod';
 
 export const ZDocumentFlowFormSchema = z.object({
   title: z.string().min(1),
@@ -12,7 +13,7 @@ export const ZDocumentFlowFormSchema = z.object({
     z.object({
       formId: z.string().min(1),
       nativeId: z.number().optional(),
-      email: z.string().min(1).email(),
+      email: zEmail().min(1),
       name: z.string(),
     }),
   ),

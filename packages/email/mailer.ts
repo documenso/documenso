@@ -64,9 +64,13 @@ const getTransport = (): Transporter => {
   }
 
   if (transport === 'resend') {
+    if (!env('NEXT_PRIVATE_RESEND_API_KEY')) {
+      throw new Error('Resend transport requires NEXT_PRIVATE_RESEND_API_KEY');
+    }
+
     return createTransport(
       ResendTransport.makeTransport({
-        apiKey: env('NEXT_PRIVATE_RESEND_API_KEY') || '',
+        apiKey: env('NEXT_PRIVATE_RESEND_API_KEY'),
       }),
     );
   }

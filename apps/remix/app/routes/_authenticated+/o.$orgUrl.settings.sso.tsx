@@ -69,7 +69,7 @@ const ZProviderFormSchema = ZUpdateOrganisationAuthenticationPortalRequestSchema
 type TProviderFormSchema = z.infer<typeof ZProviderFormSchema>;
 
 export function meta() {
-  return appMetaTags('Organisation SSO Portal');
+  return appMetaTags(msg`Organisation SSO Portal`);
 }
 
 export default function OrganisationSettingSSOLoginPage() {
@@ -205,7 +205,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
               </div>
             </div>
 
-            <p className="text-muted-foreground text-xs">
+            <p className="text-xs text-muted-foreground">
               <Trans>This is the URL which users will use to sign in to your organisation.</Trans>
             </p>
           </div>
@@ -229,7 +229,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
               </div>
             </div>
 
-            <p className="text-muted-foreground text-xs">
+            <p className="text-xs text-muted-foreground">
               <Trans>Add this URL to your provider's allowed redirect URIs</Trans>
             </p>
           </div>
@@ -241,7 +241,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
 
             <Input className="pr-12" disabled value={`openid profile email`} />
 
-            <p className="text-muted-foreground text-xs">
+            <p className="text-xs text-muted-foreground">
               <Trans>This is the required scopes you must set in your provider's settings</Trans>
             </p>
           </div>
@@ -262,7 +262,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
                 </FormControl>
 
                 {!form.formState.errors.wellKnownUrl && (
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-xs text-muted-foreground">
                     <Trans>The OpenID discovery endpoint URL for your provider</Trans>
                   </p>
                 )}
@@ -356,7 +356,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
                 </FormControl>
 
                 {!form.formState.errors.allowedDomains && (
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-xs text-muted-foreground">
                     <Trans>
                       Space-separated list of domains. Leave empty to allow all domains.
                     </Trans>
@@ -399,7 +399,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
                   <FormLabel>
                     <Trans>Enable SSO portal</Trans>
                   </FormLabel>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-sm text-muted-foreground">
                     <Trans>Whether to enable the SSO portal for your organisation</Trans>
                   </p>
                 </div>
