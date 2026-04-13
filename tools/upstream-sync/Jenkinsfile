@@ -196,23 +196,10 @@ for t in touched:
                 script {
                     def tscFlag = params.ENABLE_TSC ? '--enable-tsc' : ''
 
-                    // Sanity check: ensure API key is available and valid format.
+                    // Sanity check: ensure API key is set.
                     sh '''
                         if [ -z "${OPENROUTER_API_KEY}" ]; then
                             echo "ERROR: OPENROUTER_API_KEY is not set!"
-                            exit 2
-                        fi
-                        KEY_LEN=${#OPENROUTER_API_KEY}
-                        KEY_PREFIX=$(echo "${OPENROUTER_API_KEY}" | cut -c1-8)
-                        KEY_SUFFIX=$(echo "${OPENROUTER_API_KEY}" | rev | cut -c1-4 | rev)
-                        echo "OPENROUTER_API_KEY: ${KEY_LEN} chars, prefix=${KEY_PREFIX}..., suffix=...${KEY_SUFFIX}"
-                        # Quick validation call
-                        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
-                            -H "Authorization: Bearer ${OPENROUTER_API_KEY}" \
-                            https://openrouter.ai/api/v1/models)
-                        echo "OpenRouter API test: HTTP ${HTTP_CODE}"
-                        if [ "${HTTP_CODE}" != "200" ]; then
-                            echo "ERROR: OpenRouter API key validation failed (HTTP ${HTTP_CODE})"
                             exit 2
                         fi
                     '''
