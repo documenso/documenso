@@ -4,7 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { EnvelopeItem, FieldType } from '@prisma/client';
-import { ReadStatus, type Recipient, SendStatus, SigningStatus } from '@prisma/client';
+import { ReadStatus, SendStatus, SigningStatus } from '@prisma/client';
 import { ChevronsUpDown } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -13,6 +13,7 @@ import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-c
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR, getPdfPagesCount } from '@documenso/lib/constants/pdf-viewer';
 import { type TFieldMetaSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { nanoid } from '@documenso/lib/universal/id';
 import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
@@ -105,7 +106,7 @@ export const ConfigureFieldsView = ({
   }, [configData.documentData, envelopeItem, presignToken]);
 
   const recipients = useMemo(() => {
-    return configData.signers.map<Recipient>((signer, index) => ({
+    return configData.signers.map<TRecipientLite>((signer, index) => ({
       id: signer.nativeId || index,
       name: signer.name || '',
       email: signer.email || '',
@@ -128,7 +129,7 @@ export const ConfigureFieldsView = ({
     }));
   }, [configData.signers]);
 
-  const [selectedRecipient, setSelectedRecipient] = useState<Recipient | null>(
+  const [selectedRecipient, setSelectedRecipient] = useState<TRecipientLite | null>(
     () => recipients.find((r) => r.signingStatus === SigningStatus.NOT_SIGNED) || null,
   );
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);

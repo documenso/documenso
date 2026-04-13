@@ -7,7 +7,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { TemplateDirectLink } from '@prisma/client';
-import { DocumentSigningOrder, type Field, type Recipient, RecipientRole } from '@prisma/client';
+import { DocumentSigningOrder, type Field, RecipientRole } from '@prisma/client';
 import { motion } from 'framer-motion';
 import { GripVerticalIcon, HelpCircle, Link2Icon, Plus, Trash } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
@@ -17,6 +17,7 @@ import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/org
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { nanoid } from '@documenso/lib/universal/id';
 import { generateRecipientPlaceholder } from '@documenso/lib/utils/templates';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
@@ -49,12 +50,12 @@ import type { TAddTemplatePlacholderRecipientsFormSchema } from './add-template-
 import { ZAddTemplatePlacholderRecipientsFormSchema } from './add-template-placeholder-recipients.types';
 
 type AutoSaveResponse = {
-  recipients: Recipient[];
+  recipients: TRecipientLite[];
 };
 
 export type AddTemplatePlaceholderRecipientsFormProps = {
   documentFlow: DocumentFlowStep;
-  recipients: Recipient[];
+  recipients: TRecipientLite[];
   fields: Field[];
   signingOrder?: DocumentSigningOrder | null;
   allowDictateNextSigner?: boolean;

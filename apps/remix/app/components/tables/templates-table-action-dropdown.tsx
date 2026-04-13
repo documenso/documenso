@@ -1,10 +1,11 @@
 import { useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import type { Recipient, TemplateDirectLink } from '@prisma/client';
+import type { TemplateDirectLink } from '@prisma/client';
 import { Copy, Edit, FolderIcon, MoreHorizontal, Share2Icon, Trash2, Upload } from 'lucide-react';
 import { Link } from 'react-router';
 
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,7 +29,7 @@ export type TemplatesTableActionDropdownProps = {
     folderId?: string | null;
     envelopeId: string;
     directLink?: Pick<TemplateDirectLink, 'token' | 'enabled'> | null;
-    recipients: Recipient[];
+    recipients: TRecipientLite[];
   };
   templateRootPath: string;
   teamId: number;
