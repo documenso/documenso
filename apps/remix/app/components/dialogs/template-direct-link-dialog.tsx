@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { type Recipient, RecipientRole, type TemplateDirectLink } from '@prisma/client';
+import { RecipientRole, type TemplateDirectLink } from '@prisma/client';
 import {
   CircleDotIcon,
   CircleIcon,
@@ -21,6 +21,7 @@ import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/org
 import { DIRECT_TEMPLATE_RECIPIENT_EMAIL } from '@documenso/lib/constants/direct-templates';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { DIRECT_TEMPLATE_DOCUMENTATION } from '@documenso/lib/constants/template';
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
@@ -52,7 +53,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 type TemplateDirectLinkDialogProps = {
   templateId: number;
   directLink?: Pick<TemplateDirectLink, 'token' | 'enabled'> | null;
-  recipients: Recipient[];
+  recipients: TRecipientLite[];
   trigger?: React.ReactNode;
   onCreateSuccess?: () => Promise<void> | void;
   onDeleteSuccess?: () => Promise<void> | void;

@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
 import { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
 import { FileTextIcon, InfoIcon, Plus, UploadCloudIcon, X } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
@@ -21,7 +20,7 @@ import {
   SKIP_QUERY_BATCH_META,
 } from '@documenso/lib/constants/trpc';
 import { AppError } from '@documenso/lib/errors/app-error';
-import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
+import { type TRecipientLite, ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -79,7 +78,7 @@ export type TemplateUseDialogProps = {
   envelopeId: string;
   templateId: number;
   templateSigningOrder?: DocumentSigningOrder | null;
-  recipients: Recipient[];
+  recipients: TRecipientLite[];
   documentDistributionMethod?: DocumentDistributionMethod;
   documentRootPath: string;
   trigger?: React.ReactNode;

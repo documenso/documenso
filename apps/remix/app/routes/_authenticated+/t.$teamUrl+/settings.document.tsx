@@ -55,6 +55,7 @@ export default function TeamsSettingsPage() {
         delegateDocumentOwnership,
         aiFeaturesEnabled,
         envelopeExpirationPeriod,
+        reminderSettings,
       } = data;
 
       await updateTeamSettings({
@@ -70,6 +71,7 @@ export default function TeamsSettingsPage() {
           defaultRecipients,
           aiFeaturesEnabled,
           envelopeExpirationPeriod,
+          reminderSettings,
           ...(signatureTypes.length === 0
             ? {
                 typedSignatureEnabled: null,
