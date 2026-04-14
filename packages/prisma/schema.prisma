@@ -507,7 +507,7 @@ enum DocumentDistributionMethod {
   NONE
 }
 
-/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZEnvelopeExpirationPeriod as ZEnvelopeExpirationPeriodSchema } from '@documenso/lib/constants/envelope-expiration';"])
+/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZEnvelopeExpirationPeriod as ZEnvelopeExpirationPeriodSchema } from '@documenso/lib/constants/envelope-expiration';", "import { ZEnvelopeReminderSettings as ZEnvelopeReminderSettingsSchema } from '@documenso/lib/constants/envelope-reminder';"])
 model DocumentMeta {
   id                     String               @id @default(cuid())
   subject                String?
@@ -530,6 +530,8 @@ model DocumentMeta {
   emailId       String?
 
   envelopeExpirationPeriod Json? /// [EnvelopeExpirationPeriod] @zod.custom.use(ZEnvelopeExpirationPeriodSchema)
+
+  reminderSettings Json? /// [EnvelopeReminderSettings] @zod.custom.use(ZEnvelopeReminderSettingsSchema)
 
   envelope Envelope?
 }
@@ -587,7 +589,10 @@ model Recipient {
   expired              DateTime? // deprecated Not in use. To be removed in a future migration.
   expiresAt            DateTime?
   expirationNotifiedAt DateTime?
+  sentAt               DateTime?
   signedAt             DateTime?
+  lastReminderSentAt   DateTime?
+  nextReminderAt       DateTime?
   authOptions          Json? /// [RecipientAuthOptions] @zod.custom.use(ZRecipientAuthOptionsSchema)
   signingOrder         Int? /// @zod.number.describe("The order in which the recipient should sign the document. Only works if the document is set to sequential signing.")
   rejectionReason      String?
@@ -607,6 +612,7 @@ model Recipient {
   @@index([email, documentDeletedAt, envelopeId], map: "Recipient_email_documentDeletedAt_envelopeId_idx")
   @@index([email, envelopeId], map: "Recipient_email_envelopeId_idx")
   @@index([email, signingStatus, envelopeId, role], map: "Recipient_email_signingStatus_envelopeId_role_idx")
+  @@index([nextReminderAt])
   @@index([email(ops: raw("gin_trgm_ops"))], map: "Recipient_email_trgm_idx", type: Gin)
   @@index([name(ops: raw("gin_trgm_ops"))], map: "Recipient_name_trgm_idx", type: Gin)
 }
@@ -825,7 +831,7 @@ enum OrganisationMemberInviteStatus {
   DECLINED
 }
 
-/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';", "import { ZEnvelopeExpirationPeriod as ZEnvelopeExpirationPeriodSchema } from '@documenso/lib/constants/envelope-expiration';"])
+/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';", "import { ZEnvelopeExpirationPeriod as ZEnvelopeExpirationPeriodSchema } from '@documenso/lib/constants/envelope-expiration';", "import { ZEnvelopeReminderSettings as ZEnvelopeReminderSettingsSchema } from '@documenso/lib/constants/envelope-reminder';"])
 model OrganisationGlobalSettings {
   id           String        @id
   organisation Organisation?
@@ -859,11 +865,13 @@ model OrganisationGlobalSettings {
 
   envelopeExpirationPeriod Json? /// [EnvelopeExpirationPeriod] @zod.custom.use(ZEnvelopeExpirationPeriodSchema)
 
+  reminderSettings Json? /// [EnvelopeReminderSettings] @zod.custom.use(ZEnvelopeReminderSettingsSchema)
+
   // AI features settings.
   aiFeaturesEnabled Boolean @default(false)
 }
 
-/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';", "import { ZEnvelopeExpirationPeriod as ZEnvelopeExpirationPeriodSchema } from '@documenso/lib/constants/envelope-expiration';"])
+/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';", "import { ZEnvelopeExpirationPeriod as ZEnvelopeExpirationPeriodSchema } from '@documenso/lib/constants/envelope-expiration';", "import { ZEnvelopeReminderSettings as ZEnvelopeReminderSettingsSchema } from '@documenso/lib/constants/envelope-reminder';"])
 model TeamGlobalSettings {
   id   String @id
   team Team?
@@ -897,6 +905,8 @@ model TeamGlobalSettings {
   brandingCompanyDetails String?
 
   envelopeExpirationPeriod Json? /// [EnvelopeExpirationPeriod] @zod.custom.use(ZEnvelopeExpirationPeriodSchema)
+
+  reminderSettings Json? /// [EnvelopeReminderSettings] @zod.custom.use(ZEnvelopeReminderSettingsSchema)
 
   // AI features settings.
   aiFeaturesEnabled Boolean?

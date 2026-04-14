@@ -62,6 +62,7 @@ export const DocumentsTableActionDropdown = ({
   const trpcUtils = trpcReact.useUtils();
 
   const [isRenameDialogOpen, setRenameDialogOpen] = useState(false);
+  const [isSaveAsTemplateDialogOpen, setSaveAsTemplateDialogOpen] = useState(false);
 
   const recipient = findRecipientByEmail({
     recipients: row.recipients,
@@ -175,17 +176,10 @@ export const DocumentsTableActionDropdown = ({
           }
         />
 
-        <EnvelopeSaveAsTemplateDialog
-          envelopeId={row.envelopeId}
-          trigger={
-            <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-              <div>
-                <FileOutputIcon className="mr-2 h-4 w-4" />
-                <Trans>Save as Template</Trans>
-              </div>
-            </DropdownMenuItem>
-          }
-        />
+        <DropdownMenuItem onClick={() => setSaveAsTemplateDialogOpen(true)}>
+          <FileOutputIcon className="mr-2 h-4 w-4" />
+          <Trans>Save as Template</Trans>
+        </DropdownMenuItem>
 
         {onMoveDocument && canManageDocument && (
           <DropdownMenuItem onClick={onMoveDocument} onSelect={(e) => e.preventDefault()}>
@@ -249,6 +243,12 @@ export const DocumentsTableActionDropdown = ({
           )}
         />
       </DropdownMenuContent>
+
+      <EnvelopeSaveAsTemplateDialog
+        envelopeId={row.envelopeId}
+        open={isSaveAsTemplateDialogOpen}
+        onOpenChange={setSaveAsTemplateDialogOpen}
+      />
 
       <EnvelopeRenameDialog
         id={row.envelopeId}

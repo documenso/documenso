@@ -34,12 +34,13 @@ export default function TeamsSettingsPage() {
     try {
       const { brandingEnabled, brandingLogo, brandingUrl, brandingCompanyDetails } = data;
 
-      let uploadedBrandingLogo = teamWithSettings?.teamSettings?.brandingLogo;
+      let uploadedBrandingLogo: string | undefined = undefined;
 
       if (brandingLogo) {
         uploadedBrandingLogo = JSON.stringify(await putFile(brandingLogo));
       }
 
+      // Empty the branding logo if the user unsets it.
       if (brandingLogo === null) {
         uploadedBrandingLogo = '';
       }
@@ -48,7 +49,7 @@ export default function TeamsSettingsPage() {
         teamId: team.id,
         data: {
           brandingEnabled,
-          brandingLogo: uploadedBrandingLogo || null,
+          brandingLogo: uploadedBrandingLogo,
           brandingUrl: brandingUrl || null,
           brandingCompanyDetails: brandingCompanyDetails || null,
         },

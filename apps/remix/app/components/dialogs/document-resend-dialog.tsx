@@ -4,13 +4,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { type Recipient, SigningStatus, type Team, type User } from '@prisma/client';
+import { SigningStatus, type Team, type User } from '@prisma/client';
 import { History } from 'lucide-react';
 import { useForm, useWatch } from 'react-hook-form';
 import * as z from 'zod';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import type { Document } from '@documenso/prisma/types/document-legacy-schema';
 import { trpc as trpcReact } from '@documenso/trpc/react';
@@ -45,10 +46,10 @@ const FORM_ID = 'resend-email';
 export type DocumentResendDialogProps = {
   document: Pick<Document, 'id' | 'userId' | 'teamId' | 'status'> & {
     user: Pick<User, 'id' | 'name' | 'email'>;
-    recipients: Recipient[];
+    recipients: TRecipientLite[];
     team: Pick<Team, 'id' | 'url'> | null;
   };
-  recipients: Recipient[];
+  recipients: TRecipientLite[];
 };
 
 export const ZResendDocumentFormSchema = z.object({
@@ -183,7 +184,7 @@ export const DocumentResendDialog = ({ document, recipients }: DocumentResendDia
             <DialogClose asChild>
               <Button
                 type="button"
-                className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
+                className="flex-1 bg-black/5 hover:bg-black/10 dark:bg-muted dark:hover:bg-muted/80"
                 variant="secondary"
                 disabled={isSubmitting}
               >
