@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Field, Recipient } from '@prisma/client';
+import type { Field } from '@prisma/client';
 import { FieldType, Prisma, RecipientRole, SendStatus } from '@prisma/client';
 import {
   CalendarDays,
@@ -28,6 +28,7 @@ import {
   type TFieldMetaSchema as FieldMeta,
   ZFieldMetaSchema,
 } from '@documenso/lib/types/field-meta';
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { nanoid } from '@documenso/lib/universal/id';
 import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsUninserted } from '@documenso/lib/utils/fields';
@@ -83,7 +84,7 @@ export type FieldFormType = {
 export type AddFieldsFormProps = {
   documentFlow: DocumentFlowStep;
   hideRecipients?: boolean;
-  recipients: Recipient[];
+  recipients: TRecipientLite[];
   fields: Field[];
   onSubmit: (_data: TAddFieldsFormSchema) => void;
   onAutoSave: (_data: TAddFieldsFormSchema) => Promise<void>;
@@ -172,7 +173,7 @@ export const AddFieldsFormPartial = ({
   });
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
-  const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
+  const [selectedSigner, setSelectedSigner] = useState<TRecipientLite | null>(null);
   const [lastActiveField, setLastActiveField] = useState<TAddFieldsFormSchema['fields'][0] | null>(
     null,
   );
@@ -536,7 +537,7 @@ export const AddFieldsFormPartial = ({
   }, [recipients]);
 
   const recipientsByRole = useMemo(() => {
-    const recipientsByRole: Record<RecipientRole, Recipient[]> = {
+    const recipientsByRole: Record<RecipientRole, TRecipientLite[]> = {
       CC: [],
       VIEWER: [],
       SIGNER: [],

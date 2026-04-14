@@ -1,17 +1,17 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
 import { PenIcon, PlusIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 
 export type TemplatePageViewRecipientsProps = {
-  recipients: Recipient[];
+  recipients: TRecipientLite[];
   envelopeId: string;
   templateRootPath: string;
   readOnly?: boolean;

@@ -66,6 +66,9 @@ export const extractDerivedDocumentMeta = (
     // Envelope expiration.
     envelopeExpirationPeriod:
       meta.envelopeExpirationPeriod ?? settings.envelopeExpirationPeriod ?? null,
+
+    // Reminder settings.
+    reminderSettings: meta.reminderSettings ?? settings.reminderSettings ?? null,
   } satisfies Omit<DocumentMeta, 'id'>;
 };
 

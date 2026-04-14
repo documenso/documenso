@@ -6,7 +6,6 @@ import {
   DocumentStatus,
   DocumentVisibility,
   type Field,
-  type Recipient,
   SendStatus,
   TeamMemberRole,
 } from '@prisma/client';
@@ -21,6 +20,7 @@ import { DOCUMENT_SIGNATURE_TYPES } from '@documenso/lib/constants/document';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import type { TDocument } from '@documenso/lib/types/document';
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
 import {
@@ -74,7 +74,7 @@ import type { DocumentFlowStep } from './types';
 
 export type AddSettingsFormProps = {
   documentFlow: DocumentFlowStep;
-  recipients: Recipient[];
+  recipients: TRecipientLite[];
   fields: Field[];
   isDocumentPdfLoaded: boolean;
   document: TDocument;

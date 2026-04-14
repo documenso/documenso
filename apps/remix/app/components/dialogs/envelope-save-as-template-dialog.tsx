@@ -26,15 +26,22 @@ import { useCurrentTeam } from '~/providers/team';
 type EnvelopeSaveAsTemplateDialogProps = {
   envelopeId: string;
   trigger?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 export const EnvelopeSaveAsTemplateDialog = ({
   envelopeId,
   trigger,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
 }: EnvelopeSaveAsTemplateDialogProps) => {
   const navigate = useNavigate();
 
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  const open = controlledOpen ?? internalOpen;
+  const setOpen = controlledOnOpenChange ?? setInternalOpen;
 
   const { toast } = useToast();
   const { t } = useLingui();

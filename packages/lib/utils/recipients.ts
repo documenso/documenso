@@ -1,10 +1,11 @@
 import type { Envelope } from '@prisma/client';
-import { type Field, type Recipient, RecipientRole, SigningStatus } from '@prisma/client';
+import { type Field, RecipientRole, SigningStatus } from '@prisma/client';
 
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import { AppError, AppErrorCode } from '../errors/app-error';
+import type { TRecipientLite } from '../types/recipient';
 import { extractLegacyIds } from '../universal/id';
 import { zEmail } from './zod';
 
@@ -20,7 +21,7 @@ export const RECIPIENT_ROLES_THAT_REQUIRE_FIELDS = [RecipientRole.SIGNER] as con
  *
  * Currently only SIGNERs are validated - they must have at least one signature field.
  */
-export const getRecipientsWithMissingFields = <T extends Pick<Recipient, 'id' | 'role'>>(
+export const getRecipientsWithMissingFields = <T extends Pick<TRecipientLite, 'id' | 'role'>>(
   recipients: T[],
   fields: Pick<Field, 'type' | 'recipientId'>[],
 ): T[] => {
@@ -42,7 +43,10 @@ export const formatSigningLink = (token: string) => `${NEXT_PUBLIC_WEBAPP_URL()}
 /**
  * Whether a recipient can be modified by the document owner.
  */
-export const canRecipientBeModified = (recipient: Recipient, fields: Field[]) => {
+export const canRecipientBeModified = (
+  recipient: TRecipientLite,
+  fields: Pick<Field, 'recipientId' | 'inserted'>[],
+) => {
   if (!recipient) {
     return false;
   }
@@ -72,7 +76,10 @@ export const canRecipientBeModified = (recipient: Recipient, fields: Field[]) =>
  * - They are not a Viewer or CCer
  * - They can be modified (canRecipientBeModified)
  */
-export const canRecipientFieldsBeModified = (recipient: Recipient, fields: Field[]) => {
+export const canRecipientFieldsBeModified = (
+  recipient: TRecipientLite,
+  fields: Pick<Field, 'recipientId' | 'inserted'>[],
+) => {
   if (!canRecipientBeModified(recipient, fields)) {
     return false;
   }
@@ -81,7 +88,7 @@ export const canRecipientFieldsBeModified = (recipient: Recipient, fields: Field
 };
 
 export const mapRecipientToLegacyRecipient = (
-  recipient: Recipient,
+  recipient: TRecipientLite,
   envelope: Pick<Envelope, 'type' | 'secondaryId'>,
 ) => {
   const legacyId = extractLegacyIds(envelope);
@@ -91,6 +98,7 @@ export const mapRecipientToLegacyRecipient = (
     ...legacyId,
   };
 };
+
 
 export const findRecipientByEmail = <T extends { email: string }>({
   recipients,
@@ -102,7 +110,7 @@ export const findRecipientByEmail = <T extends { email: string }>({
   teamEmail?: string | null;
 }) => recipients.find((r) => r.email === userEmail || (teamEmail && r.email === teamEmail));
 
-export const isRecipientEmailValidForSending = (recipient: Pick<Recipient, 'email'>) => {
+export const isRecipientEmailValidForSending = (recipient: Pick<TRecipientLite, 'email'>) => {
   return zEmail().safeParse(recipient.email).success;
 };
 
