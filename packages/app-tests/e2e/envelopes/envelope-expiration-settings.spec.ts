@@ -25,7 +25,7 @@ test('[ENVELOPE_EXPIRATION]: set custom expiration period at organisation level'
   await expect(page.getByRole('button', { name: 'Update' }).first()).toBeVisible();
 
   // Change the amount to 2.
-  const amountInput = page.getByRole('spinbutton');
+  const amountInput = page.getByTestId('envelope-expiration-amount');
   await amountInput.clear();
   await amountInput.fill('2');
 
@@ -33,9 +33,7 @@ test('[ENVELOPE_EXPIRATION]: set custom expiration period at organisation level'
   // In the duration mode, there's a mode select and a unit select.
   // The unit select is inside the duration row, after the number input.
   // Let's find the select trigger that contains the unit text.
-  const unitTrigger = page
-    .locator('button[role="combobox"]')
-    .filter({ hasText: /Months|Days|Weeks|Years/ });
+  const unitTrigger = page.getByTestId('envelope-expiration-unit');
 
   await unitTrigger.click();
   await page.getByRole('option', { name: 'Weeks' }).click();
@@ -65,9 +63,7 @@ test('[ENVELOPE_EXPIRATION]: disable expiration at organisation level', async ({
   await expect(page.getByRole('button', { name: 'Update' }).first()).toBeVisible();
 
   // Find the mode select (shows "Custom duration") and change to "Never expires".
-  const modeTrigger = page
-    .locator('button[role="combobox"]')
-    .filter({ hasText: 'Custom duration' });
+  const modeTrigger = page.getByTestId('envelope-expiration-mode');
   await modeTrigger.click();
   await page.getByRole('option', { name: 'Never expires' }).click();
 
@@ -118,11 +114,8 @@ test('[ENVELOPE_EXPIRATION]: team overrides organisation expiration', async ({ p
 
   await expect(page.getByRole('button', { name: 'Update' }).first()).toBeVisible();
 
-  // Scope to the "Default Envelope Expiration" form field section.
-  const expirationSection = page.getByText('Default Envelope Expiration').locator('..');
-
   // The expiration picker mode select should show "Inherit from organisation" by default.
-  const modeTrigger = expirationSection.locator('button[role="combobox"]').first();
+  const modeTrigger = page.getByTestId('envelope-expiration-mode');
   await expect(modeTrigger).toBeVisible();
 
   // Switch to custom duration.
@@ -130,13 +123,11 @@ test('[ENVELOPE_EXPIRATION]: team overrides organisation expiration', async ({ p
   await page.getByRole('option', { name: 'Custom duration' }).click();
 
   // Set to 5 days.
-  const amountInput = expirationSection.getByRole('spinbutton');
+  const amountInput = page.getByTestId('envelope-expiration-amount');
   await amountInput.clear();
   await amountInput.fill('5');
 
-  const unitTrigger = expirationSection
-    .locator('button[role="combobox"]')
-    .filter({ hasText: /Months|Days|Weeks|Years/ });
+  const unitTrigger = page.getByTestId('envelope-expiration-unit');
   await unitTrigger.click();
   await page.getByRole('option', { name: 'Days' }).click();
 

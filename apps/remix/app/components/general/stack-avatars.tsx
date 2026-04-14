@@ -1,22 +1,21 @@
 import React from 'react';
 
-import type { Recipient } from '@prisma/client';
-
 import {
   getExtraRecipientsType,
   getRecipientType,
 } from '@documenso/lib/client-only/recipient-type';
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 
 import { StackAvatar } from './stack-avatar';
 
-export function StackAvatars({ recipients }: { recipients: Recipient[] }) {
-  const renderStackAvatars = (recipients: Recipient[]) => {
+export function StackAvatars({ recipients }: { recipients: TRecipientLite[] }) {
+  const renderStackAvatars = (recipients: TRecipientLite[]) => {
     const zIndex = 50;
     const itemsToRender = recipients.slice(0, 5);
     const remainingItems = recipients.length - itemsToRender.length;
 
-    return itemsToRender.map((recipient: Recipient, index: number) => {
+    return itemsToRender.map((recipient, index: number) => {
       const first = index === 0;
 
       if (index === 4 && remainingItems > 0) {

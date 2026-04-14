@@ -90,7 +90,7 @@ export const ExpirationPeriodPicker = ({
   return (
     <div className="flex flex-col gap-2">
       <Select value={mode} onValueChange={onModeChange} disabled={disabled}>
-        <SelectTrigger className="bg-background">
+        <SelectTrigger className="bg-background" data-testid="envelope-expiration-mode">
           <SelectValue />
         </SelectTrigger>
 
@@ -113,13 +113,14 @@ export const ExpirationPeriodPicker = ({
             type="number"
             min={1}
             className="w-20 bg-background"
+            data-testid="envelope-expiration-amount"
             value={amount}
             onChange={(e) => onAmountChange(Number(e.target.value))}
             disabled={disabled}
           />
 
           <Select value={unit} onValueChange={onUnitChange} disabled={disabled}>
-            <SelectTrigger className="flex-1 bg-background">
+            <SelectTrigger className="flex-1 bg-background" data-testid="envelope-expiration-unit">
               <SelectValue />
             </SelectTrigger>
 

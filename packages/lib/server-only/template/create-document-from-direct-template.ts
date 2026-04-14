@@ -705,6 +705,7 @@ export const createDocumentFromDirectTemplate = async ({
           where: { id: nextRecipient.id },
           data: {
             sendStatus: SendStatus.SENT,
+            sentAt: new Date(),
             ...(nextSigner && documentMeta?.allowDictateNextSigner
               ? {
                   name: nextSigner.name,

@@ -56,6 +56,7 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
   const trpcUtils = trpcReact.useUtils();
 
   const [isRenameDialogOpen, setRenameDialogOpen] = useState(false);
+  const [isSaveAsTemplateDialogOpen, setSaveAsTemplateDialogOpen] = useState(false);
 
   const recipient = envelope.recipients.find((recipient) => recipient.email === user.email);
 
@@ -135,17 +136,10 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
           }
         />
 
-        <EnvelopeSaveAsTemplateDialog
-          envelopeId={envelope.id}
-          trigger={
-            <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-              <div>
-                <FileOutputIcon className="mr-2 h-4 w-4" />
-                <Trans>Save as Template</Trans>
-              </div>
-            </DropdownMenuItem>
-          }
-        />
+        <DropdownMenuItem onClick={() => setSaveAsTemplateDialogOpen(true)}>
+          <FileOutputIcon className="mr-2 h-4 w-4" />
+          <Trans>Save as Template</Trans>
+        </DropdownMenuItem>
 
         <EnvelopeDeleteDialog
           id={envelope.id}
@@ -206,6 +200,12 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
           )}
         />
       </DropdownMenuContent>
+
+      <EnvelopeSaveAsTemplateDialog
+        envelopeId={envelope.id}
+        open={isSaveAsTemplateDialogOpen}
+        onOpenChange={setSaveAsTemplateDialogOpen}
+      />
 
       <EnvelopeRenameDialog
         id={envelope.id}
