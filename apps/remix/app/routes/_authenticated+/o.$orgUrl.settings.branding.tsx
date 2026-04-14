@@ -54,13 +54,13 @@ export default function OrganisationSettingsBrandingPage() {
         brandingCompanyDetails,
       } = data;
 
-      let uploadedBrandingLogo: string | undefined =
-        organisationWithSettings?.organisationGlobalSettings?.brandingLogo ?? undefined;
+      let uploadedBrandingLogo: string | undefined = undefined;
 
       if (brandingLogo) {
         uploadedBrandingLogo = JSON.stringify(await putFile(brandingLogo));
       }
 
+      // Empty the branding logo if the user unsets it.
       if (brandingLogo === null) {
         uploadedBrandingLogo = '';
       }

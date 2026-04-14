@@ -106,7 +106,7 @@ export function BrandingPreferencesForm({
             ? `${NEXT_PUBLIC_WEBAPP_URL()}/api/branding/logo/team/${team?.id}`
             : `${NEXT_PUBLIC_WEBAPP_URL()}/api/branding/logo/organisation/${organisation?.id}`;
 
-        setPreviewUrl(logoUrl);
+        setPreviewUrl(logoUrl + '?v=' + Date.now());
         setHasLoadedPreview(true);
       }
     }
