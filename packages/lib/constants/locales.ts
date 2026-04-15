@@ -11,6 +11,7 @@ export const SUPPORTED_LANGUAGE_CODES = [
   'pt-BR',
   'ja',
   'ko',
+  'ru',
   'zh',
 ] as const;
 

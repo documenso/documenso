@@ -7816,6 +7816,10 @@ msgstr "Polish"
 msgid "Portuguese (Brazil)"
 msgstr "Portuguese (Brazil)"
 
+#: packages/lib/constants/i18n.ts
+msgid "Russian"
+msgstr "Russian"
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: packages/ui/primitives/document-flow/field-item.tsx
 msgid "Pos X:"
