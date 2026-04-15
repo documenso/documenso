@@ -440,7 +440,7 @@ export const EnvelopeEditorSettingsDialog = ({
                               <FormLabel className="inline-flex items-center">
                                 <Trans>Language</Trans>
                                 <Tooltip>
-                                  <TooltipTrigger>
+                                  <TooltipTrigger type="button">
                                     <InfoIcon className="mx-2 h-4 w-4" />
                                   </TooltipTrigger>
 
@@ -581,7 +581,7 @@ export const EnvelopeEditorSettingsDialog = ({
                             <FormLabel className="flex flex-row items-center">
                               <Trans>External ID</Trans>{' '}
                               <Tooltip>
-                                <TooltipTrigger>
+                                <TooltipTrigger type="button">
                                   <InfoIcon className="mx-2 h-4 w-4" />
                                 </TooltipTrigger>
 
@@ -611,7 +611,7 @@ export const EnvelopeEditorSettingsDialog = ({
                             <FormLabel className="flex flex-row items-center">
                               <Trans>Redirect URL</Trans>{' '}
                               <Tooltip>
-                                <TooltipTrigger>
+                                <TooltipTrigger type="button">
                                   <InfoIcon className="mx-2 h-4 w-4" />
                                 </TooltipTrigger>
 
@@ -666,7 +666,7 @@ export const EnvelopeEditorSettingsDialog = ({
                               <FormLabel className="flex flex-row items-center">
                                 <Trans>Document Distribution Method</Trans>
                                 <Tooltip>
-                                  <TooltipTrigger>
+                                  <TooltipTrigger type="button">
                                     <InfoIcon className="mx-2 h-4 w-4" />
                                   </TooltipTrigger>
 
@@ -739,7 +739,7 @@ export const EnvelopeEditorSettingsDialog = ({
                               <FormLabel className="flex flex-row items-center">
                                 <Trans>Expiration</Trans>
                                 <Tooltip>
-                                  <TooltipTrigger>
+                                  <TooltipTrigger type="button">
                                     <InfoIcon className="mx-2 h-4 w-4" />
                                   </TooltipTrigger>
 
@@ -778,7 +778,7 @@ export const EnvelopeEditorSettingsDialog = ({
                             <FormLabel className="flex flex-row items-center">
                               <Trans>Signing Reminders</Trans>
                               <Tooltip>
-                                <TooltipTrigger>
+                                <TooltipTrigger type="button">
                                   <InfoIcon className="mx-2 h-4 w-4" />
                                 </TooltipTrigger>
 
@@ -906,7 +906,7 @@ export const EnvelopeEditorSettingsDialog = ({
                                   Message <span className="text-muted-foreground">(Optional)</span>
                                 </Trans>
                                 <Tooltip>
-                                  <TooltipTrigger>
+                                  <TooltipTrigger type="button">
                                     <InfoIcon className="mx-2 h-4 w-4" />
                                   </TooltipTrigger>
                                   <TooltipContent className="p-4 text-muted-foreground">
