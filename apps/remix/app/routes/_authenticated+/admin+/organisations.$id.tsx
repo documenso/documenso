@@ -136,6 +136,10 @@ export default function OrganisationGroupSettingsPage({
   }, [i18n, t]);
 
   const organisationMembersColumns = useMemo(() => {
+    if (!organisation) {
+      return [];
+    }
+
     return [
       {
         header: t`Member`,
@@ -165,10 +169,6 @@ export default function OrganisationGroupSettingsPage({
       {
         header: t`Role`,
         cell: ({ row }) => {
-          if (!organisation) {
-            return null;
-          }
-
           const isOwner = row.original.userId === organisation.ownerUserId;
 
           if (isOwner) {
@@ -202,7 +202,7 @@ export default function OrganisationGroupSettingsPage({
       {
         header: t`Actions`,
         cell: ({ row }) => {
-          const isOwner = row.original.userId === organisation?.ownerUserId;
+          const isOwner = row.original.userId === organisation.ownerUserId;
 
           const memberName = row.original.user.name ?? row.original.user.email;
 
@@ -219,7 +219,7 @@ export default function OrganisationGroupSettingsPage({
                 isOwner={isOwner}
               />
 
-              {!isOwner && organisation && (
+              {!isOwner && (
                 <AdminOrganisationMemberDeleteDialog
                   organisationId={organisationId}
                   organisationName={organisation.name}

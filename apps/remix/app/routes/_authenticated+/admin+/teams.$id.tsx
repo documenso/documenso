@@ -54,6 +54,10 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
   };
 
   const teamMembersColumns = useMemo(() => {
+    if (!team) {
+      return [];
+    }
+
     return [
       {
         header: _(msg`Member`),
@@ -88,7 +92,7 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
         header: _(msg`Organisation role`),
         accessorKey: 'organisationRole',
         cell: ({ row }) => {
-          const isOwner = row.original.userId === team?.organisation.ownerUserId;
+          const isOwner = row.original.userId === team.organisation.ownerUserId;
 
           if (isOwner) {
             return <Badge>{_(msg`Owner`)}</Badge>;
@@ -109,9 +113,9 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
       {
         header: _(msg`Actions`),
         cell: ({ row }) => {
-          const isOwner = row.original.userId === team?.organisation.ownerUserId;
+          const isOwner = row.original.userId === team.organisation.ownerUserId;
 
-          if (isOwner || !team) {
+          if (isOwner) {
             return null;
           }
 
