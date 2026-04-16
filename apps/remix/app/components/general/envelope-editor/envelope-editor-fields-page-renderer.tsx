@@ -23,6 +23,16 @@ import {
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@documenso/ui/primitives/alert-dialog';
 import { CommandDialog } from '@documenso/ui/primitives/command';
 
 import { fieldButtonList } from './envelope-editor-fields-drag-drop';
@@ -650,6 +660,7 @@ const FieldActionButtons = ({
   const { t } = useLingui();
 
   const [showRecipientSelector, setShowRecipientSelector] = useState(false);
+  const [showDuplicateAllPagesDialog, setShowDuplicateAllPagesDialog] = useState(false);
 
   const { editorFields, envelope } = useCurrentEnvelopeEditor();
 
@@ -714,8 +725,8 @@ const FieldActionButtons = ({
         <button
           title={t`Duplicate on all pages`}
           className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
-          onClick={handleDuplicateSelectedFieldsOnAllPages}
-          onTouchEnd={handleDuplicateSelectedFieldsOnAllPages}
+          onClick={() => setShowDuplicateAllPagesDialog(true)}
+          onTouchEnd={() => setShowDuplicateAllPagesDialog(true)}
         >
           <SquareStackIcon className="h-3 w-3" />
         </button>
@@ -747,6 +758,28 @@ const FieldActionButtons = ({
           fields={envelope.fields}
         />
       </CommandDialog>
+
+      <AlertDialog open={showDuplicateAllPagesDialog} onOpenChange={setShowDuplicateAllPagesDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t`Duplicate on all pages?`}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t`This will duplicate the selected field(s) to the same position on all other pages. This action cannot be undone.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t`Cancel`}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                handleDuplicateSelectedFieldsOnAllPages();
+                setShowDuplicateAllPagesDialog(false);
+              }}
+            >
+              {t`Duplicate`}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

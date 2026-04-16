@@ -17,6 +17,16 @@ import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '@documenso/lib/types/field-
 
 import { getRecipientColorStyles } from '../../lib/recipient-colors';
 import { cn } from '../../lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../alert-dialog';
 import { FieldContent } from './field-content';
 import type { TDocumentFlowFormSchema } from './types';
 
@@ -94,6 +104,7 @@ const FieldItemInner = ({
     pageWidth: defaultWidth || 0,
   });
   const [settingsActive, setSettingsActive] = useState(false);
+  const [duplicateAllPagesAlertOpen, setDuplicateAllPagesAlertOpen] = useState(false);
   const $el = useRef<HTMLDivElement>(null);
 
   const $pageBounds = useElementBounds(
@@ -404,8 +415,8 @@ const FieldItemInner = ({
             <button
               title={_(msg`Duplicate on all pages`)}
               className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
-              onClick={onDuplicateAllPages}
-              onTouchEnd={onDuplicateAllPages}
+              onClick={() => setDuplicateAllPagesAlertOpen(true)}
+              onTouchEnd={() => setDuplicateAllPagesAlertOpen(true)}
             >
               <SquareStack className="h-3 w-3" />
             </button>
@@ -421,6 +432,35 @@ const FieldItemInner = ({
           </div>
         </div>
       )}
+
+      <AlertDialog open={duplicateAllPagesAlertOpen} onOpenChange={setDuplicateAllPagesAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              <Trans>Duplicate on all pages?</Trans>
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              <Trans>
+                This will duplicate the selected field(s) to the same position on all other pages.
+                This action cannot be undone.
+              </Trans>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              <Trans>Cancel</Trans>
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                onDuplicateAllPages?.();
+                setDuplicateAllPagesAlertOpen(false);
+              }}
+            >
+              <Trans>Duplicate</Trans>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Rnd>,
     document.body,
   );
