@@ -16,6 +16,7 @@ import { isTwoFactorAuthenticationEnabled } from '@documenso/lib/server-only/2fa
 import { setupTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/setup-2fa';
 import { validateTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/validate-2fa';
 import { viewBackupCodes } from '@documenso/lib/server-only/2fa/view-backup-codes';
+import { verifyCaptchaToken } from '@documenso/lib/server-only/captcha/verify-captcha';
 import { rateLimitResponse } from '@documenso/lib/server-only/rate-limit/rate-limit-middleware';
 import {
   forgotPasswordRateLimit,
@@ -60,7 +61,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   .post('/authorize', sValidator('json', ZSignInSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
-    const { email, password, totpCode, backupCode, csrfToken } = c.req.valid('json');
+    const { email, password, totpCode, backupCode, csrfToken, captchaToken } = c.req.valid('json');
 
     const loginLimitResult = await loginRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
@@ -83,6 +84,11 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
         message: 'Invalid CSRF token',
       });
     }
+
+    await verifyCaptchaToken({
+      token: captchaToken,
+      ipAddress: requestMetadata.ipAddress,
+    });
 
     if (
       email.toLowerCase() === legacyServiceAccountEmail() ||
@@ -188,7 +194,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       });
     }
 
-    const { name, email, password, signature } = c.req.valid('json');
+    const { name, email, password, signature, captchaToken } = c.req.valid('json');
 
     const signupLimitResult = await signupRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
@@ -201,6 +207,11 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
         res: signupLimited,
       });
     }
+
+    await verifyCaptchaToken({
+      token: captchaToken,
+      ipAddress: requestMetadata.ipAddress,
+    });
 
     if (!isEmailDomainAllowedForSignup(email)) {
       throw new AppError(AuthenticationErrorCode.SignupDisabled, {
