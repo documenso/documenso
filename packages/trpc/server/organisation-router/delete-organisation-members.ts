@@ -2,7 +2,6 @@ import { syncMemberCountWithStripeSeatPlan } from '@documenso/ee/server-only/str
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobs } from '@documenso/lib/jobs/client';
-import { validateIfSubscriptionIsRequired } from '@documenso/lib/utils/billing';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
 import { OrganisationMemberInviteStatus } from '@documenso/prisma/client';
@@ -82,13 +81,17 @@ export const deleteOrganisationMembers = async ({
     organisationMemberIds.includes(member.id),
   );
 
-  const subscription = validateIfSubscriptionIsRequired(organisation.subscription);
-
   const inviteCount = organisation.invites.length;
   const newMemberCount = organisation.members.length + inviteCount - membersToDelete.length;
 
-  if (subscription) {
-    await syncMemberCountWithStripeSeatPlan(subscription, organisationClaim, newMemberCount);
+  // Removing members is a reducing operation, so we don't gate it on the
+  // subscription being present. Sync Stripe only when one exists.
+  if (organisation.subscription) {
+    await syncMemberCountWithStripeSeatPlan(
+      organisation.subscription,
+      organisationClaim,
+      newMemberCount,
+    );
   }
 
   await prisma.$transaction(async (tx) => {
