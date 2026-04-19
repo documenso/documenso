@@ -7,6 +7,9 @@ on:
 
 jobs:
   deploy:
+    # Upstream-only workflow: pushes tags to a release branch. Forks skip
+    # this — they use .github/workflows/deploy-aws.yml instead.
+    if: github.repository == 'documenso/documenso'
     runs-on: ubuntu-latest
 
     steps:

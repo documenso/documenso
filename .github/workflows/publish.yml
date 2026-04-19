@@ -12,6 +12,9 @@ on:
 
 jobs:
   build_and_publish_platform_containers:
+    # Upstream-only: publishes to documenso's Docker Hub namespace on `release`
+    # branch. Uses Warp runners. Forks rely on .github/workflows/deploy-aws.yml.
+    if: github.repository == 'documenso/documenso'
     name: Build and publish platform containers
     runs-on: ${{ matrix.os }}
     strategy:

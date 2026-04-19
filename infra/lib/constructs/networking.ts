@@ -12,9 +12,9 @@ export interface NetworkingProps {
 }
 
 /**
- * Imports the existing default VPC and public subnets, then creates security
- * groups, an ALB with TLS termination, and a Route 53 alias record for
- * sign.gnarlysoft.com.
+ * Imports an existing VPC + public subnets (via lookup in internal mode, via
+ * CFN tokens in generic mode), then creates security groups, an ALB with TLS
+ * termination, and a Route 53 alias record for the configured domain.
  */
 export class Networking extends Construct {
   public readonly vpc: ec2.IVpc;
@@ -31,8 +31,19 @@ export class Networking extends Construct {
     const { config } = props;
 
     // -- Import existing VPC and subnets ----------------------------------
-
-    this.vpc = ec2.Vpc.fromLookup(this, "Vpc", { vpcId: config.vpcId });
+    //
+    // Internal mode resolves the VPC at synth time via lookup. Generic mode
+    // receives vpcId/subnetIds as CFN tokens, which can't be resolved at
+    // synth, so we use fromVpcAttributes + Fn.getAzs().
+    if (config.mode === "internal") {
+      this.vpc = ec2.Vpc.fromLookup(this, "Vpc", { vpcId: config.vpcId });
+    } else {
+      this.vpc = ec2.Vpc.fromVpcAttributes(this, "Vpc", {
+        vpcId: config.vpcId,
+        availabilityZones: cdk.Fn.getAzs(),
+        publicSubnetIds: config.subnetIds,
+      });
+    }
 
     this.subnets = config.subnetIds.map((subnetId, i) =>
       ec2.Subnet.fromSubnetId(this, `Subnet${i + 1}`, subnetId),

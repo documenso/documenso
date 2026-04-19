@@ -11,6 +11,10 @@ concurrency:
 
 jobs:
   e2e_tests:
+    # Requires a Warp runner that upstream configured. Forks can opt in by
+    # setting repo variable ENABLE_E2E_TESTS=true and providing their own
+    # runner.
+    if: vars.ENABLE_E2E_TESTS == 'true' || github.repository == 'documenso/documenso'
     name: 'E2E Tests'
     timeout-minutes: 60
     runs-on: warp-ubuntu-2204-x64-8x

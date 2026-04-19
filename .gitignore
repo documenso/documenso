@@ -54,8 +54,11 @@ yarn-error.log*
 # logs
 logs.json
 
-# claude
-.claude
+# claude — ignore user-level claude artifacts but track the deploy-to-aws skill
+.claude/*
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/deploy-to-aws/
 CLAUDE.md
 
 # agents

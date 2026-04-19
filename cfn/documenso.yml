@@ -1,0 +1,1088 @@
+Description: Documenso document-signing platform — ECS Fargate + RDS Postgres + S3.
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Environment
+        Parameters:
+          - EnvName
+      - Label:
+          default: Networking & DNS
+        Parameters:
+          - VpcId
+          - SubnetIds
+          - Domain
+          - HostedZoneId
+      - Label:
+          default: Application
+        Parameters:
+          - ContainerImage
+          - AppName
+          - AllowedSignupDomains
+          - SmtpFromAddress
+      - Label:
+          default: SSO (Microsoft)
+        Parameters:
+          - MicrosoftTenantId
+      - Label:
+          default: Sizing
+        Parameters:
+          - DbInstanceClass
+          - DbStorageGb
+          - FargateCpu
+          - FargateMemory
+          - DesiredCount
+Parameters:
+  EnvName:
+    Type: String
+    Default: prod
+    AllowedPattern: ^[a-z][a-z0-9]{0,15}$
+    Description: Environment name used in resource naming.
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC to deploy Documenso into. Must have at least two public subnets in different AZs.
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Public subnet IDs in the selected VPC (at least 2 AZs).
+  Domain:
+    Type: String
+    AllowedPattern: ^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$
+    Description: Fully-qualified hostname (e.g. 'sign.example.com'). Must be a subdomain of an existing Route 53 hosted zone.
+  HostedZoneId:
+    Type: AWS::Route53::HostedZone::Id
+    Description: Route 53 hosted zone that will own the DNS record for Domain.
+  ContainerImage:
+    Type: String
+    Description: Full container image URI (e.g. ghcr.io/<owner>/documenso:latest or <account>.dkr.ecr.<region>.amazonaws.com/documenso:latest).
+  AppName:
+    Type: String
+    Default: Documenso
+    Description: Display name shown as the email 'From' name and used in UI branding.
+  AllowedSignupDomains:
+    Type: String
+    Default: ""
+    Description: Comma-separated email domains allowed to sign up (e.g. 'example.com,acme.com'). Leave blank to allow any domain.
+  MicrosoftTenantId:
+    Type: String
+    Default: common
+    Description: Microsoft/Entra tenant ID (or 'common' for multi-tenant). Used only if Microsoft SSO is configured.
+  SmtpFromAddress:
+    Type: String
+    Description: Email 'From' address. Must be verified at your SMTP provider (e.g. AWS SES).
+  DbInstanceClass:
+    Type: String
+    Default: t4g.small
+    Description: RDS instance class (e.g. t4g.micro, t4g.small, m7g.large).
+  DbStorageGb:
+    Type: Number
+    Default: 20
+    Description: RDS storage in GB. Auto-scales up to 2x this value.
+    MinValue: 20
+  FargateCpu:
+    Type: Number
+    Default: 512
+    AllowedValues:
+      - "256"
+      - "512"
+      - "1024"
+      - "2048"
+      - "4096"
+    Description: Fargate task CPU in milli-vCPU (1024 = 1 vCPU).
+  FargateMemory:
+    Type: Number
+    Default: 1024
+    Description: Fargate task memory in MiB. Must be compatible with chosen CPU.
+  DesiredCount:
+    Type: Number
+    Default: 1
+    Description: Number of ECS tasks to run.
+    MinValue: 1
+Resources:
+  NetworkingAlbSgEC40B0D9:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Documenso ALB - HTTP/HTTPS from internet
+      GroupName:
+        Fn::Join:
+          - ""
+          - - documenso-alb-
+            - Ref: EnvName
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: "-1"
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          Description: HTTP from anywhere
+          FromPort: 80
+          IpProtocol: tcp
+          ToPort: 80
+        - CidrIp: 0.0.0.0/0
+          Description: HTTPS from anywhere
+          FromPort: 443
+          IpProtocol: tcp
+          ToPort: 443
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: project
+          Value: documenso
+      VpcId:
+        Ref: VpcId
+    Metadata:
+      aws:cdk:path: Documenso/Networking/AlbSg/Resource
+  NetworkingAppSg7FDCB0B9:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Documenso ECS service - traffic from ALB only
+      GroupName:
+        Fn::Join:
+          - ""
+          - - documenso-app-
+            - Ref: EnvName
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: "-1"
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: project
+          Value: documenso
+      VpcId:
+        Ref: VpcId
+    Metadata:
+      aws:cdk:path: Documenso/Networking/AppSg/Resource
+  NetworkingAppSgfromDocumensoNetworkingAlbSgD738D0763000B024A0E9:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Documenso app from ALB
+      FromPort: 3000
+      GroupId:
+        Fn::GetAtt:
+          - NetworkingAppSg7FDCB0B9
+          - GroupId
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Fn::GetAtt:
+          - NetworkingAlbSgEC40B0D9
+          - GroupId
+      ToPort: 3000
+    Metadata:
+      aws:cdk:path: Documenso/Networking/AppSg/from DocumensoNetworkingAlbSgD738D076:3000
+  NetworkingDbSg37EB0EE1:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Documenso RDS - access from ECS service
+      GroupName:
+        Fn::Join:
+          - ""
+          - - documenso-db-
+            - Ref: EnvName
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: "-1"
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: project
+          Value: documenso
+      VpcId:
+        Ref: VpcId
+    Metadata:
+      aws:cdk:path: Documenso/Networking/DbSg/Resource
+  NetworkingDbSgfromDocumensoNetworkingAppSgF4598CC95432B3437E37:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: PostgreSQL from ECS service
+      FromPort: 5432
+      GroupId:
+        Fn::GetAtt:
+          - NetworkingDbSg37EB0EE1
+          - GroupId
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Fn::GetAtt:
+          - NetworkingAppSg7FDCB0B9
+          - GroupId
+      ToPort: 5432
+    Metadata:
+      aws:cdk:path: Documenso/Networking/DbSg/from DocumensoNetworkingAppSgF4598CC9:5432
+  NetworkingAlb1EC41264:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      LoadBalancerAttributes:
+        - Key: deletion_protection.enabled
+          Value: "false"
+      Name:
+        Fn::Join:
+          - ""
+          - - documenso-
+            - Ref: EnvName
+      Scheme: internet-facing
+      SecurityGroups:
+        - Fn::GetAtt:
+            - NetworkingAlbSgEC40B0D9
+            - GroupId
+      Subnets:
+        Ref: SubnetIds
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: project
+          Value: documenso
+      Type: application
+    Metadata:
+      aws:cdk:path: Documenso/Networking/Alb/Resource
+  NetworkingAlbHttpListenerDDEBD142:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - RedirectConfig:
+            Port: "443"
+            Protocol: HTTPS
+            StatusCode: HTTP_301
+          Type: redirect
+      LoadBalancerArn:
+        Ref: NetworkingAlb1EC41264
+      Port: 80
+      Protocol: HTTP
+    Metadata:
+      aws:cdk:path: Documenso/Networking/Alb/HttpListener/Resource
+  NetworkingAlbHttpsListener491E99FD:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Certificates:
+        - CertificateArn:
+            Ref: NetworkingCert367F9A6E
+      DefaultActions:
+        - TargetGroupArn:
+            Ref: NetworkingAppTgEA72E7D9
+          Type: forward
+      LoadBalancerArn:
+        Ref: NetworkingAlb1EC41264
+      Port: 443
+      Protocol: HTTPS
+    Metadata:
+      aws:cdk:path: Documenso/Networking/Alb/HttpsListener/Resource
+  NetworkingAppTgEA72E7D9:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: /api/health
+      HealthyThresholdCount: 2
+      Name:
+        Fn::Join:
+          - ""
+          - - documenso-app-
+            - Ref: EnvName
+      Port: 3000
+      Protocol: HTTP
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: project
+          Value: documenso
+      TargetGroupAttributes:
+        - Key: stickiness.enabled
+          Value: "false"
+      TargetType: ip
+      UnhealthyThresholdCount: 3
+      VpcId:
+        Ref: VpcId
+    Metadata:
+      aws:cdk:path: Documenso/Networking/AppTg/Resource
+  NetworkingCert367F9A6E:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName:
+        Ref: Domain
+      DomainValidationOptions:
+        - DomainName:
+            Ref: Domain
+          HostedZoneId:
+            Ref: HostedZoneId
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: Name
+          Value: Documenso/Networking/Cert
+        - Key: project
+          Value: documenso
+      ValidationMethod: DNS
+    Metadata:
+      aws:cdk:path: Documenso/Networking/Cert/Resource
+  NetworkingAliasRecord0A0BFAAC:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      AliasTarget:
+        DNSName:
+          Fn::Join:
+            - ""
+            - - dualstack.
+              - Fn::GetAtt:
+                  - NetworkingAlb1EC41264
+                  - DNSName
+        HostedZoneId:
+          Fn::GetAtt:
+            - NetworkingAlb1EC41264
+            - CanonicalHostedZoneID
+      HostedZoneId:
+        Ref: HostedZoneId
+      Name:
+        Fn::Join:
+          - ""
+          - - Ref: Domain
+            - "."
+      Type: A
+    Metadata:
+      aws:cdk:path: Documenso/Networking/AliasRecord/Resource
+  DatabaseDbSubnetGroupD28E49B1:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Documenso RDS subnet group
+      DBSubnetGroupName:
+        Fn::Join:
+          - ""
+          - - documenso-db-
+            - Ref: EnvName
+      SubnetIds:
+        Ref: SubnetIds
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: project
+          Value: documenso
+    Metadata:
+      aws:cdk:path: Documenso/Database/DbSubnetGroup/Default
+  DatabaseParamGroupAA5F4DA7:
+    Type: AWS::RDS::DBParameterGroup
+    Properties:
+      Description: Documenso PostgreSQL 16 params
+      Family: postgres16
+      Parameters:
+        rds.force_ssl: "0"
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: project
+          Value: documenso
+    Metadata:
+      aws:cdk:path: Documenso/Database/ParamGroup/Resource
+  DocumensoDatabaseInstanceSecretFBD0DF013fdaad7efa858a3daf9490cf0a702aeb:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description:
+        Fn::Join:
+          - ""
+          - - "Generated by the CDK for stack: "
+            - Ref: AWS::StackName
+      GenerateSecretString:
+        ExcludeCharacters: " %+~`#$&*()|[]{}:;<>?!'/@\"\\"
+        GenerateStringKey: password
+        PasswordLength: 30
+        SecretStringTemplate: '{"username":"documenso"}'
+      Name:
+        Fn::Join:
+          - ""
+          - - documenso/
+            - Ref: EnvName
+            - /db-credentials
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: project
+          Value: documenso
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: Documenso/Database/Instance/Secret/Resource
+  DatabaseInstanceSecretAttachmentFCA06D38:
+    Type: AWS::SecretsManager::SecretTargetAttachment
+    Properties:
+      SecretId:
+        Ref: DocumensoDatabaseInstanceSecretFBD0DF013fdaad7efa858a3daf9490cf0a702aeb
+      TargetId:
+        Ref: DatabaseInstanceAA8A5FDE
+      TargetType: AWS::RDS::DBInstance
+    Metadata:
+      aws:cdk:path: Documenso/Database/Instance/Secret/Attachment/Resource
+  DatabaseInstanceAA8A5FDE:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage:
+        Ref: DbStorageGb
+      BackupRetentionPeriod: 3
+      CopyTagsToSnapshot: true
+      DBInstanceClass:
+        Fn::Join:
+          - ""
+          - - db.
+            - Ref: DbInstanceClass
+      DBInstanceIdentifier:
+        Fn::Join:
+          - ""
+          - - documenso-db-
+            - Ref: EnvName
+      DBName: documenso
+      DBParameterGroupName:
+        Ref: DatabaseParamGroupAA5F4DA7
+      DBSubnetGroupName:
+        Ref: DatabaseDbSubnetGroupD28E49B1
+      DeletionProtection: false
+      Engine: postgres
+      EngineVersion: "16"
+      MasterUserPassword:
+        Fn::Join:
+          - ""
+          - - "{{resolve:secretsmanager:"
+            - Ref: DocumensoDatabaseInstanceSecretFBD0DF013fdaad7efa858a3daf9490cf0a702aeb
+            - :SecretString:password::}}
+      MasterUsername: documenso
+      MaxAllocatedStorage: -3.7763091794175126e+289
+      MultiAZ: false
+      PreferredBackupWindow: 03:00-04:00
+      PreferredMaintenanceWindow: sun:04:00-sun:05:00
+      PubliclyAccessible: true
+      StorageType: gp3
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: project
+          Value: documenso
+      VPCSecurityGroups:
+        - Fn::GetAtt:
+            - NetworkingDbSg37EB0EE1
+            - GroupId
+    UpdateReplacePolicy: Snapshot
+    DeletionPolicy: Snapshot
+    Metadata:
+      aws:cdk:path: Documenso/Database/Instance/Resource
+  SecretsAppConfig1DE8CB45:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Documenso app secrets (NEXTAUTH_SECRET, encryption keys, SSO, SMTP, signing cert). Auto-generated placeholder values — update after deploy.
+      GenerateSecretString:
+        ExcludePunctuation: true
+        GenerateStringKey: NEXTAUTH_SECRET
+        PasswordLength: 64
+        SecretStringTemplate: '{"NEXT_PRIVATE_MICROSOFT_CLIENT_ID":"","NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET":"","NEXT_PRIVATE_SMTP_HOST":"","NEXT_PRIVATE_SMTP_PORT":"587","NEXT_PRIVATE_SMTP_USERNAME":"","NEXT_PRIVATE_SMTP_PASSWORD":"","NEXT_PRIVATE_SIGNING_PASSPHRASE":"","NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS":"","NEXT_PRIVATE_ENCRYPTION_KEY":"","NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY":""}'
+      Name:
+        Fn::Join:
+          - ""
+          - - documenso/
+            - Ref: EnvName
+            - /app-config
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: project
+          Value: documenso
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: Documenso/Secrets/AppConfig/Resource
+  SecretsDatabaseUrlE7453004:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Documenso DATABASE_URL secret — populated by the skill after RDS endpoint is known.
+      Name:
+        Fn::Join:
+          - ""
+          - - documenso/
+            - Ref: EnvName
+            - /database-url
+      SecretString: '{"NEXT_PRIVATE_DATABASE_URL":"postgresql://placeholder","NEXT_PRIVATE_DIRECT_DATABASE_URL":"postgresql://placeholder"}'
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: project
+          Value: documenso
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: Documenso/Secrets/DatabaseUrl/Resource
+  ComputeUploadsBucket577D16FD:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      BucketName:
+        Fn::Join:
+          - "-"
+          - - documenso-uploads
+            - Ref: AWS::AccountId
+            - Ref: AWS::Region
+            - Ref: AWS::StackName
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - "*"
+            AllowedMethods:
+              - GET
+              - PUT
+              - POST
+              - DELETE
+            AllowedOrigins:
+              - Fn::Join:
+                  - ""
+                  - - https://
+                    - Ref: Domain
+            ExposedHeaders:
+              - ETag
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: project
+          Value: documenso
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: Documenso/Compute/UploadsBucket/Resource
+  ComputeCluster4F8E5F81:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName:
+        Fn::Join:
+          - ""
+          - - documenso-
+            - Ref: EnvName
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: project
+          Value: documenso
+    Metadata:
+      aws:cdk:path: Documenso/Compute/Cluster/Resource
+  ComputeCluster64C33C01:
+    Type: AWS::ECS::ClusterCapacityProviderAssociations
+    Properties:
+      CapacityProviders:
+        - FARGATE
+        - FARGATE_SPOT
+      Cluster:
+        Ref: ComputeCluster4F8E5F81
+      DefaultCapacityProviderStrategy: []
+    Metadata:
+      aws:cdk:path: Documenso/Compute/Cluster/Cluster
+  ComputeLogGroup1A40385B:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:
+        Fn::Join:
+          - ""
+          - - /documenso/
+            - Ref: EnvName
+      RetentionInDays: 14
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: project
+          Value: documenso
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: Documenso/Compute/LogGroup/Resource
+  ComputeTaskDefTaskRole10B1918B:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: "2012-10-17"
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: project
+          Value: documenso
+    Metadata:
+      aws:cdk:path: Documenso/Compute/TaskDef/TaskRole/Resource
+  ComputeTaskDefTaskRoleDefaultPolicy70556C7B:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:GetObject*
+              - s3:GetBucket*
+              - s3:List*
+              - s3:DeleteObject*
+              - s3:PutObject
+              - s3:PutObjectLegalHold
+              - s3:PutObjectRetention
+              - s3:PutObjectTagging
+              - s3:PutObjectVersionTagging
+              - s3:Abort*
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - ComputeUploadsBucket577D16FD
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - ComputeUploadsBucket577D16FD
+                        - Arn
+                    - /*
+        Version: "2012-10-17"
+      PolicyName: ComputeTaskDefTaskRoleDefaultPolicy70556C7B
+      Roles:
+        - Ref: ComputeTaskDefTaskRole10B1918B
+    Metadata:
+      aws:cdk:path: Documenso/Compute/TaskDef/TaskRole/DefaultPolicy/Resource
+  ComputeTaskDefBA99999B:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        - Environment:
+            - Name: NODE_ENV
+              Value: production
+            - Name: PORT
+              Value: "3000"
+            - Name: NEXT_PUBLIC_WEBAPP_URL
+              Value:
+                Fn::Join:
+                  - ""
+                  - - https://
+                    - Ref: Domain
+            - Name: NEXT_PRIVATE_INTERNAL_WEBAPP_URL
+              Value: http://localhost:3000
+            - Name: NEXT_PUBLIC_UPLOAD_TRANSPORT
+              Value: s3
+            - Name: NEXT_PRIVATE_UPLOAD_BUCKET
+              Value:
+                Ref: ComputeUploadsBucket577D16FD
+            - Name: NEXT_PRIVATE_UPLOAD_REGION
+              Value:
+                Ref: AWS::Region
+            - Name: NEXT_PRIVATE_SMTP_TRANSPORT
+              Value: smtp-auth
+            - Name: NEXT_PRIVATE_SMTP_FROM_NAME
+              Value:
+                Ref: AppName
+            - Name: NEXT_PRIVATE_SMTP_FROM_ADDRESS
+              Value:
+                Ref: SmtpFromAddress
+            - Name: NEXT_PRIVATE_SIGNING_TRANSPORT
+              Value: local
+            - Name: NEXT_PRIVATE_MICROSOFT_TENANT_ID
+              Value:
+                Ref: MicrosoftTenantId
+            - Name: NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS
+              Value:
+                Ref: AllowedSignupDomains
+            - Name: NEXT_PRIVATE_JOBS_PROVIDER
+              Value: local
+            - Name: DOCUMENSO_DISABLE_TELEMETRY
+              Value: "true"
+          Essential: true
+          Image:
+            Ref: ContainerImage
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group:
+                Ref: ComputeLogGroup1A40385B
+              awslogs-stream-prefix: documenso
+              awslogs-region:
+                Ref: AWS::Region
+          Name: documenso
+          PortMappings:
+            - ContainerPort: 3000
+              Protocol: tcp
+          Secrets:
+            - Name: NEXTAUTH_SECRET
+              ValueFrom:
+                Fn::Join:
+                  - ""
+                  - - Ref: SecretsAppConfig1DE8CB45
+                    - ":NEXTAUTH_SECRET::"
+            - Name: NEXT_PRIVATE_ENCRYPTION_KEY
+              ValueFrom:
+                Fn::Join:
+                  - ""
+                  - - Ref: SecretsAppConfig1DE8CB45
+                    - ":NEXT_PRIVATE_ENCRYPTION_KEY::"
+            - Name: NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY
+              ValueFrom:
+                Fn::Join:
+                  - ""
+                  - - Ref: SecretsAppConfig1DE8CB45
+                    - ":NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY::"
+            - Name: NEXT_PRIVATE_MICROSOFT_CLIENT_ID
+              ValueFrom:
+                Fn::Join:
+                  - ""
+                  - - Ref: SecretsAppConfig1DE8CB45
+                    - ":NEXT_PRIVATE_MICROSOFT_CLIENT_ID::"
+            - Name: NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET
+              ValueFrom:
+                Fn::Join:
+                  - ""
+                  - - Ref: SecretsAppConfig1DE8CB45
+                    - ":NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET::"
+            - Name: NEXT_PRIVATE_SMTP_HOST
+              ValueFrom:
+                Fn::Join:
+                  - ""
+                  - - Ref: SecretsAppConfig1DE8CB45
+                    - ":NEXT_PRIVATE_SMTP_HOST::"
+            - Name: NEXT_PRIVATE_SMTP_PORT
+              ValueFrom:
+                Fn::Join:
+                  - ""
+                  - - Ref: SecretsAppConfig1DE8CB45
+                    - ":NEXT_PRIVATE_SMTP_PORT::"
+            - Name: NEXT_PRIVATE_SMTP_USERNAME
+              ValueFrom:
+                Fn::Join:
+                  - ""
+                  - - Ref: SecretsAppConfig1DE8CB45
+                    - ":NEXT_PRIVATE_SMTP_USERNAME::"
+            - Name: NEXT_PRIVATE_SMTP_PASSWORD
+              ValueFrom:
+                Fn::Join:
+                  - ""
+                  - - Ref: SecretsAppConfig1DE8CB45
+                    - ":NEXT_PRIVATE_SMTP_PASSWORD::"
+            - Name: NEXT_PRIVATE_SIGNING_PASSPHRASE
+              ValueFrom:
+                Fn::Join:
+                  - ""
+                  - - Ref: SecretsAppConfig1DE8CB45
+                    - ":NEXT_PRIVATE_SIGNING_PASSPHRASE::"
+            - Name: NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS
+              ValueFrom:
+                Fn::Join:
+                  - ""
+                  - - Ref: SecretsAppConfig1DE8CB45
+                    - ":NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS::"
+            - Name: NEXT_PRIVATE_DATABASE_URL
+              ValueFrom:
+                Fn::Join:
+                  - ""
+                  - - Ref: SecretsDatabaseUrlE7453004
+                    - ":NEXT_PRIVATE_DATABASE_URL::"
+            - Name: NEXT_PRIVATE_DIRECT_DATABASE_URL
+              ValueFrom:
+                Fn::Join:
+                  - ""
+                  - - Ref: SecretsDatabaseUrlE7453004
+                    - ":NEXT_PRIVATE_DIRECT_DATABASE_URL::"
+      Cpu:
+        Ref: FargateCpu
+      ExecutionRoleArn:
+        Fn::GetAtt:
+          - ComputeTaskDefExecutionRole781DCE1C
+          - Arn
+      Family:
+        Fn::Join:
+          - ""
+          - - documenso-
+            - Ref: EnvName
+      Memory:
+        Ref: FargateMemory
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: project
+          Value: documenso
+      TaskRoleArn:
+        Fn::GetAtt:
+          - ComputeTaskDefTaskRole10B1918B
+          - Arn
+    Metadata:
+      aws:cdk:path: Documenso/Compute/TaskDef/Resource
+  ComputeTaskDefExecutionRole781DCE1C:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: "2012-10-17"
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: project
+          Value: documenso
+    Metadata:
+      aws:cdk:path: Documenso/Compute/TaskDef/ExecutionRole/Resource
+  ComputeTaskDefExecutionRoleDefaultPolicy3C303926:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - ComputeLogGroup1A40385B
+                - Arn
+          - Action:
+              - secretsmanager:GetSecretValue
+              - secretsmanager:DescribeSecret
+            Effect: Allow
+            Resource:
+              Ref: SecretsAppConfig1DE8CB45
+          - Action:
+              - secretsmanager:GetSecretValue
+              - secretsmanager:DescribeSecret
+            Effect: Allow
+            Resource:
+              Ref: SecretsDatabaseUrlE7453004
+          - Action: secretsmanager:GetSecretValue
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:aws:secretsmanager:"
+                  - Ref: AWS::Region
+                  - ":"
+                  - Ref: AWS::AccountId
+                  - :secret:documenso/*
+        Version: "2012-10-17"
+      PolicyName: ComputeTaskDefExecutionRoleDefaultPolicy3C303926
+      Roles:
+        - Ref: ComputeTaskDefExecutionRole781DCE1C
+    Metadata:
+      aws:cdk:path: Documenso/Compute/TaskDef/ExecutionRole/DefaultPolicy/Resource
+  ComputeServiceC2A22793:
+    Type: AWS::ECS::Service
+    Properties:
+      CapacityProviderStrategy:
+        - CapacityProvider: FARGATE
+          Weight: 1
+      Cluster:
+        Ref: ComputeCluster4F8E5F81
+      DeploymentConfiguration:
+        Alarms:
+          AlarmNames: []
+          Enable: false
+          Rollback: false
+        DeploymentCircuitBreaker:
+          Enable: true
+          Rollback: true
+        MaximumPercent: 200
+        MinimumHealthyPercent: 50
+      DeploymentController:
+        Type: ECS
+      DesiredCount:
+        Ref: DesiredCount
+      EnableECSManagedTags: false
+      HealthCheckGracePeriodSeconds: 60
+      LoadBalancers:
+        - ContainerName: documenso
+          ContainerPort: 3000
+          TargetGroupArn:
+            Ref: NetworkingAppTgEA72E7D9
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - Fn::GetAtt:
+                - NetworkingAppSg7FDCB0B9
+                - GroupId
+          Subnets:
+            Ref: SubnetIds
+      ServiceName:
+        Fn::Join:
+          - ""
+          - - documenso-
+            - Ref: EnvName
+      Tags:
+        - Key: environment
+          Value:
+            Ref: EnvName
+        - Key: project
+          Value: documenso
+      TaskDefinition:
+        Ref: ComputeTaskDefBA99999B
+    DependsOn:
+      - ComputeTaskDefTaskRoleDefaultPolicy70556C7B
+      - ComputeTaskDefTaskRole10B1918B
+      - NetworkingAlbHttpsListener491E99FD
+    Metadata:
+      aws:cdk:path: Documenso/Compute/Service/Service
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Analytics: v2:deflate64:H4sIAAAAAAAA/31T227bMAz9lr0rXpEuH5ALNhQo0CDp+8DIjMfElgyRylAE/vdSUuO6LdAnHR0e3qV5Nf+1qO5+wH+e2fo8a+lQXfcC9mzWR7eFAB0KBrND9jFYNCr8e0U7VxXaGEhe/gQf+6T+nnhwTUDmwWALLGRbD/UBWnCWXHPReMu+b8mCkHePaltlm6bWQB/uUx2xoHvT3PDE/gyhQRnrmVwHo6GEjkmIHThoMFTX9TuX9JPrYNRLcHGvde7Q+lAnQUF7FDXXrCOJBzfJt1lNiXGYE/snbgMCB2B8cCyp2ZHQSQaU4nMzDoYzy+/l55EnYTlKv0vRdf7r0IkZBV8shdaQ2uAq2nNJVpCuzGpz6zaylFl/hWvoweqqt8FfqMawZPaW8hLY/NZsOsNn4PMGj+Qo0WUhHxnvBEh3OOHefPcYLmSxdJDhYFrfaFmPvhkHesODIeiq68632SOfW6+v4iW/6oyGIeGnKH3UDp2vsTrxz8t8UaX/cGKiWYhOqMNqV85XrTpoqywDAAA=
+    Metadata:
+      aws:cdk:path: Documenso/CDKMetadata/Default
+    Condition: CDKMetadataAvailable
+Outputs:
+  NetworkingAlbDnsFCD6AD50:
+    Description: ALB DNS name
+    Value:
+      Fn::GetAtt:
+        - NetworkingAlb1EC41264
+        - DNSName
+  DatabaseDbEndpointC40AEC92:
+    Description: RDS endpoint
+    Value:
+      Fn::GetAtt:
+        - DatabaseInstanceAA8A5FDE
+        - Endpoint.Address
+  DatabaseDbSecretArnCBC92421:
+    Description: DB credentials secret ARN
+    Value:
+      Ref: DatabaseInstanceSecretAttachmentFCA06D38
+  SecretsAppConfigSecretArn09C63060:
+    Description: App config secret ARN
+    Value:
+      Ref: SecretsAppConfig1DE8CB45
+  SecretsDatabaseUrlSecretArn0EC3A9C0:
+    Description: Database URL secret ARN
+    Value:
+      Ref: SecretsDatabaseUrlE7453004
+  ComputeClusterNameEC99A2A2:
+    Description: ECS cluster name
+    Value:
+      Ref: ComputeCluster4F8E5F81
+  ComputeServiceName454090EE:
+    Description: ECS service name
+    Value:
+      Fn::GetAtt:
+        - ComputeServiceC2A22793
+        - Name
+  ComputeUploadsBucketNameB9345B1A:
+    Description: S3 uploads bucket
+    Value:
+      Ref: ComputeUploadsBucket577D16FD
+Conditions:
+  CDKMetadataAvailable:
+    Fn::Or:
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - af-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-3
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-4
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-northwest-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-south-2
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - il-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - sa-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-1
+      - Fn::Equals:
+          - Ref: AWS::Region
+          - us-west-2
+

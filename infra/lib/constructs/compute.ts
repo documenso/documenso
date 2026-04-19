@@ -20,13 +20,15 @@ export interface ComputeProps {
   readonly dbSecret: secretsmanager.ISecret;
   readonly appConfigSecret: secretsmanager.ISecret;
   readonly databaseUrlSecret: secretsmanager.ISecret;
-  readonly repo: ecr.IRepository;
+  /** Used only in internal mode (when pulling from our ECR repo). */
+  readonly repo?: ecr.IRepository;
   readonly targetGroup: elbv2.ApplicationTargetGroup;
 }
 
 /**
- * ECS Fargate cluster with the Documenso service, an S3 bucket for
- * document uploads, and the necessary IAM permissions.
+ * ECS Fargate cluster with the Documenso service, an S3 bucket for document
+ * uploads (imported by name in internal mode, created in generic mode), and
+ * the IAM permissions needed to pull container images and read secrets.
  */
 export class Compute extends Construct {
   public readonly cluster: ecs.Cluster;
@@ -35,15 +37,36 @@ export class Compute extends Construct {
     super(scope, id);
 
     const { config } = props;
+    const isInternal = config.mode === "internal";
 
     // -- S3 Bucket for document uploads -----------------------------------
 
-    const bucketName = `gnarlysoft-documenso-uploads-${config.envName}`;
-    const uploadsBucket = s3.Bucket.fromBucketName(
-      this,
-      "UploadsBucket",
-      bucketName,
-    );
+    const uploadsBucket: s3.IBucket = isInternal
+      ? s3.Bucket.fromBucketName(this, "UploadsBucket", config.uploadsBucketName)
+      : new s3.Bucket(this, "UploadsBucket", {
+          bucketName: cdk.Fn.join("-", [
+            "documenso-uploads",
+            cdk.Aws.ACCOUNT_ID,
+            cdk.Aws.REGION,
+            cdk.Aws.STACK_NAME,
+          ]),
+          encryption: s3.BucketEncryption.S3_MANAGED,
+          blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+          cors: [
+            {
+              allowedMethods: [
+                s3.HttpMethods.GET,
+                s3.HttpMethods.PUT,
+                s3.HttpMethods.POST,
+                s3.HttpMethods.DELETE,
+              ],
+              allowedOrigins: [`https://${config.domain}`],
+              allowedHeaders: ["*"],
+              exposedHeaders: ["ETag"],
+            },
+          ],
+          removalPolicy: cdk.RemovalPolicy.RETAIN,
+        });
 
     // -- ECS Cluster ------------------------------------------------------
 
@@ -69,8 +92,12 @@ export class Compute extends Construct {
       family: `documenso-${config.envName}`,
     });
 
+    const containerImage = isInternal
+      ? ecs.ContainerImage.fromEcrRepository(props.repo!, "latest")
+      : ecs.ContainerImage.fromRegistry(config.containerImage);
+
     const container = taskDef.addContainer("DocumensoContainer", {
-      image: ecs.ContainerImage.fromEcrRepository(props.repo, "latest"),
+      image: containerImage,
       containerName: "documenso",
       logging: ecs.LogDrivers.awsLogs({
         logGroup,
@@ -83,13 +110,13 @@ export class Compute extends Construct {
         NEXT_PRIVATE_INTERNAL_WEBAPP_URL: "http://localhost:3000",
         NEXT_PUBLIC_UPLOAD_TRANSPORT: "s3",
         NEXT_PRIVATE_UPLOAD_BUCKET: uploadsBucket.bucketName,
-        NEXT_PRIVATE_UPLOAD_REGION: config.region,
+        NEXT_PRIVATE_UPLOAD_REGION: isInternal ? config.region : cdk.Aws.REGION,
         NEXT_PRIVATE_SMTP_TRANSPORT: "smtp-auth",
-        NEXT_PRIVATE_SMTP_FROM_NAME: "Gnarlysoft Sign",
-        NEXT_PRIVATE_SMTP_FROM_ADDRESS: `noreply@gnarlysoft.com`,
+        NEXT_PRIVATE_SMTP_FROM_NAME: config.appName,
+        NEXT_PRIVATE_SMTP_FROM_ADDRESS: config.smtpFromAddress,
         NEXT_PRIVATE_SIGNING_TRANSPORT: "local",
-        NEXT_PRIVATE_MICROSOFT_TENANT_ID: "f64ae4c4-b8e2-453a-97bb-8e73450aed49",
-        NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS: "gnarlysoft.com",
+        NEXT_PRIVATE_MICROSOFT_TENANT_ID: config.microsoftTenantId,
+        NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS: config.allowedSignupDomains,
         NEXT_PRIVATE_JOBS_PROVIDER: "local",
         DOCUMENSO_DISABLE_TELEMETRY: "true",
       },

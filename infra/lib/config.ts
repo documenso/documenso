@@ -1,82 +1,141 @@
 /**
- * Environment-specific configuration for the Documenso stack.
+ * Environment configuration for the Documenso stack.
  *
- * Usage:
- *   const config = getConfig('dev');
- *   new DocumensoStack(app, `Documenso-${config.envName}`, { config });
+ * Two deployment modes:
+ *
+ * 1. `internal` — CI/CD deploys where every value flows in from environment
+ *    variables (set via GitHub repo variables/secrets). Used by
+ *    `infra/bin/documenso.ts` and `cdk deploy`.
+ * 2. `generic` — Customer-facing CloudFormation template where every value
+ *    flows in from `CfnParameter` tokens at deploy time. Used by
+ *    `infra/bin/cfn-synth.ts` to emit `cfn/documenso.yml`.
+ *
+ * Both modes yield the same `EnvironmentConfig` shape so constructs in
+ * `lib/constructs/` don't need to care which mode they're running in.
+ *
+ * No Gnarlysoft-specific values live in this file. Internal-mode values come
+ * from process.env; generic-mode values come from CfnParameters.
  */
 
+export type DeploymentMode = "internal" | "generic";
+
 export interface EnvironmentConfig {
-  /** Environment name used in resource naming. */
+  readonly mode: DeploymentMode;
+
+  /** Environment name used in resource naming (e.g. "dev", "prod"). */
   readonly envName: string;
 
-  /** AWS account ID. */
+  /** AWS account ID (required in internal; empty in generic — resolved at deploy). */
   readonly account: string;
 
-  /** AWS region. */
+  /** AWS region (required in internal; empty in generic — resolved at deploy). */
   readonly region: string;
 
-  /** Existing VPC ID to deploy into. */
+  /** Existing VPC ID to deploy into. CFN token in generic mode. */
   readonly vpcId: string;
 
-  /** Public subnet IDs within the VPC. */
+  /** Public subnet IDs (minimum 2 AZs). CFN tokens in generic mode. */
   readonly subnetIds: string[];
 
-  /** Domain name for the Documenso instance. */
+  /** Fully-qualified hostname (e.g. "sign.example.com"). */
   readonly domain: string;
 
-  /** Route 53 hosted zone ID for the domain. */
+  /** Route 53 hosted zone ID that owns the apex of `domain`. */
   readonly hostedZoneId: string;
+
+  /**
+   * Container image URI. Empty in internal mode (uses the Registry construct
+   * with ECR repo name `containerImageRepo`); in generic mode this is the
+   * full image URI (ECR or any registry).
+   */
+  readonly containerImage: string;
+
+  /** ECR repo name for internal mode (empty in generic). */
+  readonly containerImageRepo: string;
 
   // -- Database ---------------------------------------------------------
 
-  /** RDS instance class. */
   readonly dbInstanceClass: string;
-
-  /** Storage in GB. */
   readonly dbStorageGb: number;
 
   // -- Compute ----------------------------------------------------------
 
-  /** Fargate CPU (in milli-vCPU: 256 = 0.25 vCPU). */
   readonly fargateCpu: number;
-
-  /** Fargate memory (in MiB). */
   readonly fargateMemory: number;
-
-  /** Desired task count. */
   readonly desiredCount: number;
+
+  // -- App --------------------------------------------------------------
+
+  /** Display name used in email ("From" name) and UI branding. */
+  readonly appName: string;
+
+  /** SMTP "From" address. Must be verified at your SMTP provider. */
+  readonly smtpFromAddress: string;
+
+  /** Comma-separated list of email domains allowed to sign up (empty = any). */
+  readonly allowedSignupDomains: string;
+
+  /** Microsoft/Entra tenant ID (empty = "common"). */
+  readonly microsoftTenantId: string;
+
+  // -- Secrets ----------------------------------------------------------
+
+  /**
+   * Full ARN of the pre-existing `app-config` Secrets Manager secret (internal
+   * mode). In generic mode this is empty — the stack creates a fresh secret.
+   */
+  readonly appConfigSecretArn: string;
+
+  /**
+   * Full ARN of the pre-existing `database-url` secret (internal mode).
+   * Empty in generic mode.
+   */
+  readonly databaseUrlSecretArn: string;
+
+  /**
+   * Name of the existing S3 uploads bucket (internal mode). Empty in generic
+   * mode — the stack creates a fresh bucket.
+   */
+  readonly uploadsBucketName: string;
 }
 
-const SHARED = {
-  account: "809015461931",
-  region: "us-east-1",
-  vpcId: "vpc-889621f2",
-  subnetIds: ["subnet-065945a74d9f344b8", "subnet-439ff96d"],
-  domain: "sign.gnarlysoft.com",
-  hostedZoneId: "Z01372345YL6LKC37MDH",
-};
+// ---------------------------------------------------------------------------
+// Internal mode config loader
+// ---------------------------------------------------------------------------
 
-const configs: Record<string, EnvironmentConfig> = {
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(
+      `Missing required environment variable: ${name}. ` +
+        `Set it via GitHub repo variables/secrets (see .github/workflows/deploy-aws.yml) ` +
+        `or export it locally before running cdk.`,
+    );
+  }
+  return value;
+}
+
+function optionalEnv(name: string, fallback: string = ""): string {
+  return process.env[name] ?? fallback;
+}
+
+const SIZING: Record<
+  string,
+  Pick<
+    EnvironmentConfig,
+    "dbInstanceClass" | "dbStorageGb" | "fargateCpu" | "fargateMemory" | "desiredCount"
+  >
+> = {
   dev: {
-    ...SHARED,
-    envName: "dev",
-
     dbInstanceClass: "t4g.micro",
     dbStorageGb: 20,
-
     fargateCpu: 512,
     fargateMemory: 1024,
     desiredCount: 1,
   },
-
   prod: {
-    ...SHARED,
-    envName: "prod",
-
     dbInstanceClass: "t4g.small",
     dbStorageGb: 50,
-
     fargateCpu: 1024,
     fargateMemory: 2048,
     desiredCount: 2,
@@ -84,18 +143,38 @@ const configs: Record<string, EnvironmentConfig> = {
 };
 
 /**
- * Return the configuration for the given environment name.
- *
- * @param env - environment key (e.g. "dev", "prod").
- * @returns the matching environment config.
- * @throws if the environment name is not recognised.
+ * Build the internal-mode configuration from environment variables. Throws
+ * if any required variable is missing.
  */
-export function getConfig(env: string): EnvironmentConfig {
-  const config = configs[env];
-  if (!config) {
+export function getInternalConfig(envName: string): EnvironmentConfig {
+  const sizing = SIZING[envName];
+  if (!sizing) {
     throw new Error(
-      `Unknown environment: ${env}. Valid: ${Object.keys(configs).join(", ")}`,
+      `Unknown environment: ${envName}. Valid: ${Object.keys(SIZING).join(", ")}`,
     );
   }
-  return config;
+
+  return {
+    mode: "internal",
+    envName,
+    account: requireEnv("AWS_ACCOUNT_ID"),
+    region: requireEnv("AWS_REGION"),
+    vpcId: requireEnv("AWS_VPC_ID"),
+    subnetIds: requireEnv("AWS_SUBNET_IDS").split(",").map((s) => s.trim()),
+    domain: requireEnv("DOMAIN"),
+    hostedZoneId: requireEnv("HOSTED_ZONE_ID"),
+    containerImage: "",
+    containerImageRepo: requireEnv("ECR_REPOSITORY"),
+    appName: requireEnv("APP_NAME"),
+    smtpFromAddress: requireEnv("SMTP_FROM_ADDRESS"),
+    allowedSignupDomains: optionalEnv("ALLOWED_SIGNUP_DOMAINS"),
+    microsoftTenantId: optionalEnv("MICROSOFT_TENANT_ID"),
+    appConfigSecretArn: requireEnv("APP_CONFIG_SECRET_ARN"),
+    databaseUrlSecretArn: requireEnv("DATABASE_URL_SECRET_ARN"),
+    uploadsBucketName: optionalEnv(
+      "UPLOADS_BUCKET_NAME",
+      `documenso-uploads-${envName}`,
+    ),
+    ...sizing,
+  };
 }

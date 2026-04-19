@@ -1,0 +1,10 @@
+{
+  "app": "npx ts-node bin/cfn-synth.ts",
+  "output": "cdk.out.generic",
+  "requireApproval": "never",
+  "context": {
+    "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
+    "@aws-cdk/core:checkSecretUsage": true,
+    "@aws-cdk/core:target-partitions": ["aws"]
+  }
+}

@@ -9,21 +9,34 @@ concurrency:
   group: deploy-documenso-aws
   cancel-in-progress: false
 
-env:
-  AWS_REGION: us-east-1
-  AWS_ACCOUNT_ID: "809015461931"
-  ECR_REPOSITORY: documenso
-  ECS_CLUSTER: documenso-dev
-  ECS_SERVICE: documenso-dev
-
 permissions:
   id-token: write
   contents: read
 
 jobs:
+  guard:
+    name: Check deploy config
+    runs-on: ubuntu-latest
+    outputs:
+      should_deploy: ${{ steps.check.outputs.should_deploy }}
+    steps:
+      - id: check
+        env:
+          AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+          AWS_DEPLOY_ROLE_ARN: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+        run: |
+          if [[ -n "$AWS_ACCOUNT_ID" && -n "$AWS_DEPLOY_ROLE_ARN" ]]; then
+            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_deploy=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::AWS deploy vars/secrets not configured; skipping deploy. See .claude/skills/deploy-to-aws for first-time setup."
+          fi
+
   build-and-push:
     name: Build & Push Image
     runs-on: ubuntu-latest
+    needs: guard
+    if: needs.guard.outputs.should_deploy == 'true'
     outputs:
       image_tag: ${{ steps.meta.outputs.tag }}
     steps:
@@ -32,8 +45,8 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::809015461931:role/GitHubActionsRole
-          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Login to ECR
         id: ecr-login
@@ -41,7 +54,7 @@ jobs:
 
       - name: Set image tag
         id: meta
-        run: echo "tag=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
+        run: echo "tag=${GITHUB_SHA::8}" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -54,34 +67,35 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ steps.meta.outputs.tag }}
-            ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
+            ${{ steps.ecr-login.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:${{ steps.meta.outputs.tag }}
+            ${{ steps.ecr-login.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   deploy:
     name: Deploy to ECS
     runs-on: ubuntu-latest
-    needs: build-and-push
+    needs: [guard, build-and-push]
+    if: needs.guard.outputs.should_deploy == 'true'
     steps:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::809015461931:role/GitHubActionsRole
-          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Update ECS service
         run: |
           aws ecs update-service \
-            --cluster ${{ env.ECS_CLUSTER }} \
-            --service ${{ env.ECS_SERVICE }} \
+            --cluster "${{ vars.ECS_CLUSTER }}" \
+            --service "${{ vars.ECS_SERVICE }}" \
             --force-new-deployment \
-            --region ${{ env.AWS_REGION }} \
+            --region "${{ vars.AWS_REGION }}" \
             --no-cli-pager
 
       - name: Wait for service stability
         run: |
           aws ecs wait services-stable \
-            --cluster ${{ env.ECS_CLUSTER }} \
-            --services ${{ env.ECS_SERVICE }} \
-            --region ${{ env.AWS_REGION }}
+            --cluster "${{ vars.ECS_CLUSTER }}" \
+            --services "${{ vars.ECS_SERVICE }}" \
+            --region "${{ vars.AWS_REGION }}"

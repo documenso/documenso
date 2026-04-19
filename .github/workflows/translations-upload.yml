@@ -13,6 +13,7 @@ concurrency:
 jobs:
   extract_translations:
     name: Extract and upload translations
+    if: github.repository == 'documenso/documenso'
     runs-on: ubuntu-latest
     environment: Translations
     permissions:
