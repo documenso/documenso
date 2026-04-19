@@ -12,8 +12,6 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
     "clean": "rimraf node_modules"
   },
   "dependencies": {
