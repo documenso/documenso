@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { plural } from '@lingui/core/macro';
 import { Plural, useLingui } from '@lingui/react/macro';
@@ -37,7 +37,7 @@ export type EnvelopesBulkDownloadDialogProps = {
   envelopes: EnvelopeBulkDownloadItem[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
+  onSuccess?: (successfulEnvelopeIds: string[]) => void;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 type DownloadVersion = 'signed' | 'original';
@@ -55,6 +55,8 @@ export const EnvelopesBulkDownloadDialog = ({
   const [versionMap, setVersionMap] = useState<Record<string, DownloadVersion>>({});
   const [progress, setProgress] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
+
+  const abortRef = useRef(false);
 
   const trpcUtils = trpc.useUtils();
 
@@ -89,15 +91,18 @@ export const EnvelopesBulkDownloadDialog = ({
       return;
     }
 
+    abortRef.current = false;
     setIsDownloading(true);
     setProgress(0);
 
-    let successfulDownloads = 0;
+    const successfulEnvelopeIds: string[] = [];
     let failedDownloads = 0;
 
     try {
-      for (let index = 0; index < envelopes.length; index++) {
-        const envelope = envelopes[index];
+      for (const envelope of envelopes) {
+        if (abortRef.current) {
+          break;
+        }
 
         try {
           const downloadVersion: DownloadVersion =
@@ -121,29 +126,28 @@ export const EnvelopesBulkDownloadDialog = ({
             });
           }
 
-          successfulDownloads++;
+          successfulEnvelopeIds.push(envelope.id);
         } catch (error) {
           console.error(error);
           failedDownloads++;
         }
 
-        setProgress(index + 1);
+        setProgress((p) => p + 1);
       }
 
-      if (successfulDownloads === 0) {
+      if (successfulEnvelopeIds.length === 0) {
         toast({
           title: t`Error`,
           description: t`An error occurred while downloading the documents.`,
           variant: 'destructive',
         });
-
         return;
       }
 
       if (failedDownloads > 0) {
         toast({
           title: t`Documents partially downloaded`,
-          description: t`${plural(successfulDownloads, {
+          description: t`${plural(successfulEnvelopeIds.length, {
             one: '# document downloaded.',
             other: '# documents downloaded.',
           })} ${plural(failedDownloads, {
@@ -152,26 +156,20 @@ export const EnvelopesBulkDownloadDialog = ({
           })}`,
           variant: 'destructive',
         });
-      } else {
-        toast({
-          title: t`Documents downloaded`,
-          description: plural(successfulDownloads, {
-            one: '# document has been downloaded.',
-            other: '# documents have been downloaded.',
-          }),
-        });
+        onSuccess?.(successfulEnvelopeIds);
+        return;
       }
 
-      onSuccess?.();
-      onOpenChange(false);
-    } catch (error) {
-      console.error(error);
-
       toast({
-        title: t`Error`,
-        description: t`An error occurred while downloading the documents.`,
-        variant: 'destructive',
+        title: t`Documents downloaded`,
+        description: plural(successfulEnvelopeIds.length, {
+          one: '# document has been downloaded.',
+          other: '# documents have been downloaded.',
+        }),
       });
+
+      onSuccess?.(successfulEnvelopeIds);
+      onOpenChange(false);
     } finally {
       setIsDownloading(false);
     }
@@ -264,10 +262,15 @@ export const EnvelopesBulkDownloadDialog = ({
             <Button
               type="button"
               variant="secondary"
-              onClick={() => onOpenChange(false)}
-              disabled={isDownloading}
+              onClick={() => {
+                if (isDownloading) {
+                  abortRef.current = true;
+                } else {
+                  onOpenChange(false);
+                }
+              }}
             >
-              <Trans>Cancel</Trans>
+              {isDownloading ? <Trans>Stop</Trans> : <Trans>Cancel</Trans>}
             </Button>
 
             <Button

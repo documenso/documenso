@@ -1,3 +1,4 @@
+import type { Download } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import { seedDraftDocument } from '@documenso/prisma/seed/documents';
@@ -133,17 +134,14 @@ test('[BULK_ACTIONS]: can bulk download multiple documents', async ({ page }) =>
   await expect(dialog.getByText('Bulk Test Doc 2')).toBeVisible();
   await expect(dialog.getByText('Draft').first()).toBeVisible();
 
-  const firstDownloadPromise = page.waitForEvent('download');
-  const secondDownloadPromise = page.waitForEvent('download');
+  const downloads: Download[] = [];
+  page.on('download', (d) => downloads.push(d));
 
   await dialog.getByRole('button', { name: 'Download' }).click();
 
-  const [firstDownload, secondDownload] = await Promise.all([
-    firstDownloadPromise,
-    secondDownloadPromise,
-  ]);
+  await expect.poll(() => downloads.length, { timeout: 10_000 }).toBe(2);
 
-  expect([firstDownload.suggestedFilename(), secondDownload.suggestedFilename()]).toEqual(
+  expect(downloads.map((d) => d.suggestedFilename())).toEqual(
     expect.arrayContaining(['Bulk Test Doc 1.pdf', 'Bulk Test Doc 2.pdf']),
   );
 

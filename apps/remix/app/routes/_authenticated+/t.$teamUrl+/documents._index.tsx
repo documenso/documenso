@@ -267,7 +267,15 @@ export default function DocumentsPage() {
           envelopes={selectedEnvelopesForDownload}
           open={isBulkDownloadDialogOpen}
           onOpenChange={setIsBulkDownloadDialogOpen}
-          onSuccess={() => setRowSelection({})}
+          onSuccess={(successfulEnvelopeIds) => {
+            setRowSelection((prev) => {
+              const next = { ...prev };
+              for (const id of successfulEnvelopeIds) {
+                delete next[id];
+              }
+              return next;
+            });
+          }}
         />
 
         <EnvelopesBulkMoveDialog
