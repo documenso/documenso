@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { plural } from '@lingui/core/macro';
-import { Plural, useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
+import { Plural, Trans, useLingui } from '@lingui/react/macro';
 import { DocumentStatus } from '@prisma/client';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { match } from 'ts-pattern';
@@ -40,8 +39,6 @@ export type EnvelopesBulkDownloadDialogProps = {
   onSuccess?: (successfulEnvelopeIds: string[]) => void;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
-type DownloadVersion = 'signed' | 'original';
-
 export const EnvelopesBulkDownloadDialog = ({
   envelopes,
   open,
@@ -52,7 +49,7 @@ export const EnvelopesBulkDownloadDialog = ({
   const { t } = useLingui();
   const { toast } = useToast();
 
-  const [versionMap, setVersionMap] = useState<Record<string, DownloadVersion>>({});
+  const [versionMap, setVersionMap] = useState<Record<string, 'signed' | 'original'>>({});
   const [progress, setProgress] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -74,7 +71,6 @@ export const EnvelopesBulkDownloadDialog = ({
       ),
     );
     setProgress(0);
-    // Only reset selections/progress when the dialog transitions to open.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -105,10 +101,7 @@ export const EnvelopesBulkDownloadDialog = ({
         }
 
         try {
-          const downloadVersion: DownloadVersion =
-            versionMap[envelope.id] === 'signed' && envelope.status === DocumentStatus.COMPLETED
-              ? 'signed'
-              : 'original';
+          const downloadVersion = versionMap[envelope.id] ?? 'original';
 
           const { data: envelopeItems } = await trpcUtils.envelope.item.getManyByToken.fetch({
             envelopeId: envelope.id,
@@ -225,11 +218,12 @@ export const EnvelopesBulkDownloadDialog = ({
                   {isCompleted && (
                     <Select
                       value={versionMap[envelope.id] ?? 'signed'}
-                      onValueChange={(value) => {
-                        if (value === 'signed' || value === 'original') {
-                          setVersionMap((prev) => ({ ...prev, [envelope.id]: value }));
-                        }
-                      }}
+                      onValueChange={(value) =>
+                        setVersionMap((prev) => ({
+                          ...prev,
+                          [envelope.id]: value as 'signed' | 'original',
+                        }))
+                      }
                     >
                       <SelectTrigger className="w-[120px] flex-shrink-0">
                         <SelectValue />

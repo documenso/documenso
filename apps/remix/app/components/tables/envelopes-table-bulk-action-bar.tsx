@@ -102,13 +102,9 @@ export const EnvelopesTableBulkActionBar = ({
         size="sm"
         onClick={onClearSelection}
         aria-label={t`Clear selection`}
-        className="relative h-8 w-8 p-0"
+        className="h-8 w-8 p-0"
       >
         <XIcon className="size-4 shrink-0" />
-        <span
-          aria-hidden="true"
-          className="pointer-fine:hidden -translate-1/2 absolute left-1/2 top-1/2 size-[max(100%,3rem)]"
-        />
       </Button>
     </div>
   );
