@@ -111,6 +111,46 @@ test('[BULK_ACTIONS]: can move multiple documents to a folder', async ({ page })
   await expect(page.getByRole('link', { name: 'Bulk Test Doc 2' })).toBeVisible();
 });
 
+test('[BULK_ACTIONS]: can bulk download multiple documents', async ({ page }) => {
+  const { sender } = await seedBulkActionsTestRequirements();
+
+  await apiSignin({
+    page,
+    email: sender.user.email,
+    redirectPath: `/t/${sender.team.url}/documents`,
+  });
+
+  await page.locator('tr', { hasText: 'Bulk Test Doc 1' }).getByRole('checkbox').click();
+  await page.locator('tr', { hasText: 'Bulk Test Doc 2' }).getByRole('checkbox').click();
+
+  await page.getByRole('button', { name: 'Download', exact: true }).click();
+
+  const dialog = page.getByRole('dialog');
+
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByText('Download Documents')).toBeVisible();
+  await expect(dialog.getByText('Bulk Test Doc 1')).toBeVisible();
+  await expect(dialog.getByText('Bulk Test Doc 2')).toBeVisible();
+  await expect(dialog.getByText('Draft').first()).toBeVisible();
+
+  const firstDownloadPromise = page.waitForEvent('download');
+  const secondDownloadPromise = page.waitForEvent('download');
+
+  await dialog.getByRole('button', { name: 'Download' }).click();
+
+  const [firstDownload, secondDownload] = await Promise.all([
+    firstDownloadPromise,
+    secondDownloadPromise,
+  ]);
+
+  expect([firstDownload.suggestedFilename(), secondDownload.suggestedFilename()]).toEqual(
+    expect.arrayContaining(['Bulk Test Doc 1.pdf', 'Bulk Test Doc 2.pdf']),
+  );
+
+  await expectToastTextToBeVisible(page, 'Documents downloaded');
+  await expect(page.getByText(/\d+ selected/)).not.toBeVisible();
+});
+
 test('[BULK_ACTIONS]: can delete multiple draft documents', async ({ page }) => {
   const { sender } = await seedBulkActionsTestRequirements();
 

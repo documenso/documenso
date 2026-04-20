@@ -25,6 +25,7 @@ import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
 import { DocumentMoveToFolderDialog } from '~/components/dialogs/document-move-to-folder-dialog';
 import { EnvelopesBulkDeleteDialog } from '~/components/dialogs/envelopes-bulk-delete-dialog';
+import { EnvelopesBulkDownloadDialog } from '~/components/dialogs/envelopes-bulk-download-dialog';
 import { EnvelopesBulkMoveDialog } from '~/components/dialogs/envelopes-bulk-move-dialog';
 import { DocumentSearch } from '~/components/general/document/document-search';
 import { DocumentStatus } from '~/components/general/document/document-status';
@@ -68,6 +69,7 @@ export default function DocumentsPage() {
   );
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
+  const [isBulkDownloadDialogOpen, setIsBulkDownloadDialogOpen] = useState(false);
 
   const selectedEnvelopeIds = useMemo(() => {
     return Object.keys(rowSelection).filter((id) => rowSelection[id]);
@@ -96,6 +98,18 @@ export default function DocumentsPage() {
       ...SKIP_QUERY_BATCH_META,
     },
   );
+
+  const selectedEnvelopesForDownload = useMemo(() => {
+    const selectedSet = new Set(selectedEnvelopeIds);
+
+    return (data?.data ?? [])
+      .filter((document) => selectedSet.has(document.envelopeId))
+      .map((document) => ({
+        id: document.envelopeId,
+        title: document.title,
+        status: document.status,
+      }));
+  }, [selectedEnvelopeIds, data?.data]);
 
   const getTabHref = (value: keyof typeof ExtendedDocumentStatus) => {
     const params = new URLSearchParams(searchParams);
@@ -243,9 +257,17 @@ export default function DocumentsPage() {
 
         <EnvelopesTableBulkActionBar
           selectedCount={selectedEnvelopeIds.length}
+          onDownloadClick={() => setIsBulkDownloadDialogOpen(true)}
           onMoveClick={() => setIsBulkMoveDialogOpen(true)}
           onDeleteClick={() => setIsBulkDeleteDialogOpen(true)}
           onClearSelection={() => setRowSelection({})}
+        />
+
+        <EnvelopesBulkDownloadDialog
+          envelopes={selectedEnvelopesForDownload}
+          open={isBulkDownloadDialogOpen}
+          onOpenChange={setIsBulkDownloadDialogOpen}
+          onSuccess={() => setRowSelection({})}
         />
 
         <EnvelopesBulkMoveDialog
