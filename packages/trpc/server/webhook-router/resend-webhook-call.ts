@@ -39,12 +39,21 @@ export const resendWebhookCallRoute = authenticatedProcedure
       throw new AppError(AppErrorCode.NOT_FOUND);
     }
 
+    const requestBody = webhookCall.requestBody;
+    const data =
+      requestBody &&
+      typeof requestBody === 'object' &&
+      !Array.isArray(requestBody) &&
+      'payload' in requestBody
+        ? requestBody.payload
+        : requestBody;
+
     await jobs.triggerJob({
       name: 'internal.execute-webhook',
       payload: {
         event: webhookCall.event,
         webhookId,
-        data: webhookCall.requestBody,
+        data,
       },
     });
   });
