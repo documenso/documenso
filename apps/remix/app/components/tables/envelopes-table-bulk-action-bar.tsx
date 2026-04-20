@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import { DownloadIcon, FolderInputIcon, Trash2Icon, XIcon } from 'lucide-react';
@@ -21,37 +23,92 @@ export const EnvelopesTableBulkActionBar = ({
 }: EnvelopesTableBulkActionBarProps) => {
   const { t } = useLingui();
 
+  useEffect(() => {
+    if (selectedCount === 0) {
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClearSelection();
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [selectedCount, onClearSelection]);
+
   if (selectedCount === 0) {
     return null;
   }
 
   return (
-    <div className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-x-4 rounded-lg border border-border bg-background px-4 py-3 shadow-lg">
-      <span className="text-sm font-medium">
-        <Trans>{selectedCount} selected</Trans>
-      </span>
+    <div
+      role="toolbar"
+      aria-label={t`Bulk actions`}
+      className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-x-1 rounded-xl bg-popover/95 p-1.5 text-popover-foreground shadow-lg ring-1 ring-black/10 backdrop-blur-md supports-[backdrop-filter]:bg-popover/80 dark:ring-white/10"
+    >
+      <div className="flex items-center gap-x-2 px-2">
+        <span className="flex h-5 min-w-5 items-center justify-center rounded-md bg-primary px-1 text-xs font-semibold tabular-nums text-primary-foreground">
+          {selectedCount}
+        </span>
+        <span className="max-[420px]:hidden text-sm font-medium text-foreground">
+          <Trans>selected</Trans>
+        </span>
+      </div>
 
-      <div className="h-6 w-px bg-border" />
+      <div className="mx-1 h-5 w-px bg-border" />
 
-      <Button type="button" variant="outline" size="sm" onClick={onMoveClick}>
-        <FolderInputIcon className="mr-2 h-4 w-4" />
-        <Trans>Move to Folder</Trans>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={onMoveClick}
+        className="h-8 gap-x-1.5 py-1.5 pl-2 pr-2.5"
+      >
+        <FolderInputIcon className="size-4 shrink-0" />
+        <Trans>Move</Trans>
       </Button>
 
       {onDownloadClick && (
-        <Button type="button" variant="outline" size="sm" onClick={onDownloadClick}>
-          <DownloadIcon className="mr-2 h-4 w-4" />
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={onDownloadClick}
+          className="h-8 gap-x-1.5 py-1.5 pl-2 pr-2.5"
+        >
+          <DownloadIcon className="size-4 shrink-0" />
           <Trans>Download</Trans>
         </Button>
       )}
 
-      <Button type="button" variant="destructive" size="sm" onClick={onDeleteClick}>
-        <Trash2Icon className="mr-2 h-4 w-4" />
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={onDeleteClick}
+        className="h-8 gap-x-1.5 py-1.5 pl-2 pr-2.5 text-destructive hover:bg-destructive/10 hover:text-destructive"
+      >
+        <Trash2Icon className="size-4 shrink-0" />
         <Trans>Delete</Trans>
       </Button>
 
-      <Button variant="ghost" size="sm" onClick={onClearSelection} aria-label={t`Clear selection`}>
-        <XIcon className="h-4 w-4" />
+      <div className="mx-1 h-5 w-px bg-border" />
+
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={onClearSelection}
+        aria-label={t`Clear selection`}
+        className="relative h-8 w-8 p-0"
+      >
+        <XIcon className="size-4 shrink-0" />
+        <span
+          aria-hidden="true"
+          className="pointer-fine:hidden -translate-1/2 absolute left-1/2 top-1/2 size-[max(100%,3rem)]"
+        />
       </Button>
     </div>
   );
