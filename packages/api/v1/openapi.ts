@@ -11,7 +11,8 @@ export const OpenAPIV1 = Object.assign(
       info: {
         title: 'Documenso API',
         version: '1.0.0',
-        description: 'The Documenso API for retrieving, creating, updating and deleting documents.',
+        description:
+          'API V1 is deprecated, but will continue to be supported. For more details, see https://docs.documenso.com/developers/public-api. \n\nThe Documenso API for retrieving, creating, updating and deleting documents.',
       },
       servers: [
         {

@@ -1,0 +1,68 @@
+---
+title: Timestamp Server
+description: Configure timestamp servers and signature appearance for document signing.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Timestamp servers add a trusted timestamp to signatures, proving when the document was signed. This enables Long-Term Validation (LTV) and archival timestamps.
+
+## Environment Variable
+
+| Variable                                   | Description                                      |
+| ------------------------------------------ | ------------------------------------------------ |
+| `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY` | Comma-separated list of timestamp authority URLs |
+
+## Configuration
+
+```bash
+NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY=http://timestamp.digicert.com,http://timestamp.globalsign.com/tsa/r6advanced1
+```
+
+## Free Timestamp Servers
+
+| Provider   | URL                                               |
+| ---------- | ------------------------------------------------- |
+| DigiCert   | `http://timestamp.digicert.com`                   |
+| GlobalSign | `http://timestamp.globalsign.com/tsa/r6advanced1` |
+| FreeTSA    | `https://freetsa.org/tsr`                         |
+| Sectigo    | `http://timestamp.sectigo.com`                    |
+
+<Callout type="info">
+  Timestamp servers add latency to the signing process. Each server in the list is tried in order
+  until one succeeds.
+</Callout>
+
+## Benefits of Timestamping
+
+- Proves when the document was signed
+- Signature remains valid after certificate expiration
+- Required for some compliance standards
+- Enables long-term archival
+
+## Signature Appearance
+
+### Contact Information
+
+Set contact information embedded in PDF signatures:
+
+```bash
+NEXT_PUBLIC_SIGNING_CONTACT_INFO=support@example.com
+```
+
+If not set, defaults to your `NEXT_PUBLIC_WEBAPP_URL`.
+
+### Legacy Signature Format
+
+For compatibility with older PDF readers, use the legacy signature subfilter:
+
+```bash
+NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER=true
+```
+
+| Subfilter             | Description                   | Default |
+| --------------------- | ----------------------------- | ------- |
+| `ETSI.CAdES.detached` | Modern CAdES-based signatures | Yes     |
+| `adbe.pkcs7.detached` | Legacy PKCS#7 signatures      | No      |
+
+Use the legacy format only if recipients report compatibility issues with older software.

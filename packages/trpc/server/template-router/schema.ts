@@ -2,6 +2,7 @@ import { DocumentSigningOrder, DocumentVisibility, TemplateType } from '@prisma/
 import { z } from 'zod';
 import { zfd } from 'zod-form-data';
 
+import { ZEnvelopeExpirationPeriod } from '@documenso/lib/constants/envelope-expiration';
 import { ZDocumentSchema } from '@documenso/lib/types/document';
 import {
   ZDocumentAccessAuthTypesSchema,
@@ -21,6 +22,7 @@ import {
   ZDocumentMetaTypedSignatureEnabledSchema,
   ZDocumentMetaUploadSignatureEnabledSchema,
 } from '@documenso/lib/types/document-meta';
+import { ZEnvelopeSchema } from '@documenso/lib/types/envelope';
 import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
 import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
 import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
@@ -30,10 +32,11 @@ import {
   ZTemplateManySchema,
   ZTemplateSchema,
 } from '@documenso/lib/types/template';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { LegacyTemplateDirectLinkSchema } from '@documenso/prisma/types/template-legacy-schema';
 import { ZDocumentExternalIdSchema } from '@documenso/trpc/server/document-router/schema';
 
-import { zodFormData } from '../../utils/zod-form-data';
+import { zfdFile, zodFormData } from '../../utils/zod-form-data';
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
 
 export const MAX_TEMPLATE_PUBLIC_TITLE_LENGTH = 50;
@@ -71,7 +74,7 @@ export const ZTemplateMetaUpsertSchema = z.object({
   dateFormat: ZDocumentMetaDateFormatSchema.optional(),
   distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
   emailId: z.string().nullish(),
-  emailReplyTo: z.string().email().nullish(),
+  emailReplyTo: zEmail().nullish(),
   emailSettings: ZDocumentEmailSettingsSchema.optional(),
   redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
   language: ZDocumentMetaLanguageSchema.optional(),
@@ -84,14 +87,14 @@ export const ZTemplateMetaUpsertSchema = z.object({
 
 export const ZCreateDocumentFromDirectTemplateRequestSchema = z.object({
   directRecipientName: z.string().max(255).optional(),
-  directRecipientEmail: z.string().email().max(254),
+  directRecipientEmail: zEmail().max(254),
   directTemplateToken: z.string().min(1),
   directTemplateExternalId: z.string().optional(),
   signedFieldValues: z.array(ZSignFieldWithTokenMutationSchema),
   templateUpdatedAt: z.date(),
   nextSigner: z
     .object({
-      email: z.string().email().max(254),
+      email: zEmail().max(254),
       name: z.string().min(1).max(255),
     })
     .optional(),
@@ -160,6 +163,7 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
       uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
       drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
       allowDictateNextSigner: z.boolean().optional(),
+      envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullish(),
     })
     .describe('Override values from the template for the created document.')
     .optional(),
@@ -264,7 +268,7 @@ export const ZCreateTemplatePayloadSchema = ZCreateTemplateV2RequestSchema;
 
 export const ZCreateTemplateMutationSchema = zodFormData({
   payload: zfd.json(ZCreateTemplatePayloadSchema),
-  file: zfd.file(),
+  file: zfdFile(),
 });
 
 export const ZUpdateTemplateRequestSchema = z.object({
@@ -293,6 +297,8 @@ export const ZFindTemplatesRequestSchema = ZFindSearchParamsSchema.extend({
   folderId: z.string().describe('The ID of the folder to filter templates by.').optional(),
 });
 
+export const ZFindOrganisationTemplatesRequestSchema = ZFindSearchParamsSchema;
+
 export const ZFindTemplatesResponseSchema = ZFindResultResponse.extend({
   data: ZTemplateManySchema.array(),
 });
@@ -305,6 +311,12 @@ export const ZGetTemplateByIdRequestSchema = z.object({
 });
 
 export const ZGetTemplateByIdResponseSchema = ZTemplateSchema;
+
+export const ZGetOrganisationTemplateByIdRequestSchema = z.object({
+  envelopeId: z.string(),
+});
+
+export const ZGetOrganisationTemplateByIdResponseSchema = ZEnvelopeSchema;
 
 export const ZBulkSendTemplateMutationSchema = z.object({
   templateId: z.number(),

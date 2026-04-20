@@ -1,17 +1,18 @@
-import { lazy, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
-import { FileTextIcon, SparklesIcon } from 'lucide-react';
-import { Link, useRevalidator, useSearchParams } from 'react-router';
+import { FileTextIcon, PencilIcon, SparklesIcon } from 'lucide-react';
+import { useRevalidator, useSearchParams } from 'react-router';
 import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
 
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
 import type { NormalizedFieldWithContext } from '@documenso/lib/server-only/ai/envelope/detect-fields/types';
 import {
   FIELD_META_DEFAULT_VALUES,
@@ -27,15 +28,17 @@ import {
   type TSignatureFieldMeta,
   type TTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
+import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
-import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
+import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
 
 import { AiFeaturesEnableDialog } from '~/components/dialogs/ai-features-enable-dialog';
 import { AiFieldDetectionDialog } from '~/components/dialogs/ai-field-detection-dialog';
+import { EnvelopeItemEditDialog } from '~/components/dialogs/envelope-item-edit-dialog';
 import { EditorFieldCheckboxForm } from '~/components/forms/editor/editor-field-checkbox-form';
 import { EditorFieldDateForm } from '~/components/forms/editor/editor-field-date-form';
 import { EditorFieldDropdownForm } from '~/components/forms/editor/editor-field-dropdown-form';
@@ -46,15 +49,13 @@ import { EditorFieldNumberForm } from '~/components/forms/editor/editor-field-nu
 import { EditorFieldRadioForm } from '~/components/forms/editor/editor-field-radio-form';
 import { EditorFieldSignatureForm } from '~/components/forms/editor/editor-field-signature-form';
 import { EditorFieldTextForm } from '~/components/forms/editor/editor-field-text-form';
+import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
 import { useCurrentTeam } from '~/providers/team';
 
 import { EnvelopeEditorFieldDragDrop } from './envelope-editor-fields-drag-drop';
+import { EnvelopeEditorFieldsPageRenderer } from './envelope-editor-fields-page-renderer';
 import { EnvelopeRendererFileSelector } from './envelope-file-selector';
 import { EnvelopeRecipientSelector } from './envelope-recipient-selector';
-
-const EnvelopeEditorFieldsPageRenderer = lazy(
-  async () => import('~/components/general/envelope-editor/envelope-editor-fields-page-renderer'),
-);
 
 const FieldSettingsTypeTranslations: Record<FieldType, MessageDescriptor> = {
   [FieldType.SIGNATURE]: msg`Signature Settings`,
@@ -75,7 +76,9 @@ export const EnvelopeEditorFieldsPage = () => {
 
   const team = useCurrentTeam();
 
-  const { envelope, editorFields, relativePath } = useCurrentEnvelopeEditor();
+  const scrollableContainerRef = useRef<HTMLDivElement>(null);
+
+  const { envelope, editorFields, navigateToStep, editorConfig } = useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem } = useCurrentEnvelopeRender();
 
@@ -84,6 +87,11 @@ export const EnvelopeEditorFieldsPage = () => {
   const [isAiFieldDialogOpen, setIsAiFieldDialogOpen] = useState(false);
   const [isAiEnableDialogOpen, setIsAiEnableDialogOpen] = useState(false);
   const { revalidate } = useRevalidator();
+
+  const envelopeItemPermissions = useMemo(
+    () => getEnvelopeItemPermissions(envelope, envelope.recipients),
+    [envelope, envelope.recipients],
+  );
 
   const selectedField = useMemo(
     () => structuredClone(editorFields.selectedField),
@@ -97,14 +105,10 @@ export const EnvelopeEditorFieldsPage = () => {
 
     const isMetaSame = isDeepEqual(selectedField.fieldMeta, fieldMeta);
 
-    // Todo: Envelopes - Clean up console logs.
     if (!isMetaSame) {
-      console.log('TRIGGER UPDATE');
       editorFields.updateFieldByFormId(selectedField.formId, {
         fieldMeta,
       });
-    } else {
-      console.log('DATA IS SAME, NO UPDATE');
     }
   };
 
@@ -156,12 +160,47 @@ export const EnvelopeEditorFieldsPage = () => {
 
   return (
     <div className="relative flex h-full">
-      <div className="flex w-full flex-col overflow-y-auto">
+      <div
+        className="flex h-full w-full flex-col overflow-y-auto px-2"
+        ref={scrollableContainerRef}
+      >
         {/* Horizontal envelope item selector */}
-        <EnvelopeRendererFileSelector fields={editorFields.localFields} />
+        <EnvelopeRendererFileSelector
+          className="px-0"
+          fields={editorFields.localFields}
+          renderItemAction={
+            editorConfig.envelopeItems !== null &&
+            editorConfig.envelopeItems.allowReplace &&
+            envelopeItemPermissions.canFileBeChanged
+              ? (item) => (
+                  <div className="relative flex h-5 w-5 flex-shrink-0 items-center justify-center">
+                    <div
+                      className={cn(
+                        'h-2 w-2 rounded-full transition-opacity duration-150 group-hover:opacity-0',
+                        { 'bg-green-500': currentEnvelopeItem?.id === item.id },
+                      )}
+                    />
+                    <EnvelopeItemEditDialog
+                      envelopeItem={item}
+                      allowConfigureTitle={editorConfig.envelopeItems?.allowConfigureTitle ?? false}
+                      trigger={
+                        <span
+                          className="absolute inset-0 flex cursor-pointer items-center justify-center opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+                          onClick={(e) => e.stopPropagation()}
+                          data-testid={`envelope-item-edit-button-${item.id}`}
+                        >
+                          <PencilIcon className="h-3.5 w-3.5" />
+                        </span>
+                      }
+                    />
+                  </div>
+                )
+              : undefined
+          }
+        />
 
         {/* Document View */}
-        <div className="mt-4 flex flex-col items-center justify-center">
+        <div className="mt-4 flex h-full flex-col items-center justify-center">
           {envelope.recipients.length === 0 && (
             <Alert
               variant="neutral"
@@ -176,18 +215,17 @@ export const EnvelopeEditorFieldsPage = () => {
                 </AlertDescription>
               </div>
 
-              <Button asChild variant="outline">
-                <Link to={`${relativePath.editorPath}`}>
-                  <Trans>Add Recipients</Trans>
-                </Link>
+              <Button variant="outline" onClick={() => void navigateToStep('upload')}>
+                <Trans>Add Recipients</Trans>
               </Button>
             </Alert>
           )}
 
           {currentEnvelopeItem !== null ? (
-            <PDFViewerKonvaLazy
-              renderer="editor"
+            <EnvelopePdfViewer
               customPageRenderer={EnvelopeEditorFieldsPageRenderer}
+              scrollParentRef={scrollableContainerRef}
+              errorMessage={PDF_VIEWER_ERROR_MESSAGES.editor}
             />
           ) : (
             <div className="flex flex-col items-center justify-center py-32">
@@ -249,36 +287,40 @@ export const EnvelopeEditorFieldsPage = () => {
               selectedEnvelopeItemId={currentEnvelopeItem?.id ?? null}
             />
 
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="mt-4 w-full"
-              onClick={onDetectClick}
-              disabled={envelope.status !== DocumentStatus.DRAFT}
-              title={
-                envelope.status !== DocumentStatus.DRAFT
-                  ? _(msg`You can only detect fields in draft envelopes`)
-                  : undefined
-              }
-            >
-              <SparklesIcon className="-ml-1 mr-2 h-4 w-4" />
-              <Trans>Detect with AI</Trans>
-            </Button>
+            {editorConfig.fields?.allowAIDetection && (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-4 w-full"
+                  onClick={onDetectClick}
+                  disabled={envelope.status !== DocumentStatus.DRAFT}
+                  title={
+                    envelope.status !== DocumentStatus.DRAFT
+                      ? _(msg`You can only detect fields in draft envelopes`)
+                      : undefined
+                  }
+                >
+                  <SparklesIcon className="-ml-1 mr-2 h-4 w-4" />
+                  <Trans>Detect with AI</Trans>
+                </Button>
 
-            <AiFieldDetectionDialog
-              open={isAiFieldDialogOpen}
-              onOpenChange={setIsAiFieldDialogOpen}
-              onComplete={onFieldDetectionComplete}
-              envelopeId={envelope.id}
-              teamId={envelope.teamId}
-            />
+                <AiFieldDetectionDialog
+                  open={isAiFieldDialogOpen}
+                  onOpenChange={setIsAiFieldDialogOpen}
+                  onComplete={onFieldDetectionComplete}
+                  envelopeId={envelope.id}
+                  teamId={envelope.teamId}
+                />
 
-            <AiFeaturesEnableDialog
-              open={isAiEnableDialogOpen}
-              onOpenChange={setIsAiEnableDialogOpen}
-              onEnabled={onAiFeaturesEnabled}
-            />
+                <AiFeaturesEnableDialog
+                  open={isAiEnableDialogOpen}
+                  onOpenChange={setIsAiEnableDialogOpen}
+                  onEnabled={onAiFeaturesEnabled}
+                />
+              </>
+            )}
           </section>
 
           {/* Field details section. */}
@@ -295,20 +337,42 @@ export const EnvelopeEditorFieldsPage = () => {
                       </h3>
 
                       <div className="space-y-2 rounded-md border border-border bg-muted/50 p-3 text-sm text-foreground">
+                        {selectedField.id && (
+                          <p>
+                            <span className="min-w-12 text-muted-foreground">
+                              <Trans>Field ID:</Trans>
+                            </span>{' '}
+                            {selectedField.id}
+                          </p>
+                        )}
                         <p>
-                          <span className="min-w-12 text-muted-foreground">Pos X:&nbsp;</span>
+                          <span className="min-w-12 text-muted-foreground">
+                            <Trans>Recipient ID:</Trans>
+                          </span>{' '}
+                          {selectedField.recipientId}
+                        </p>
+                        <p>
+                          <span className="min-w-12 text-muted-foreground">
+                            <Trans>Pos X:</Trans>
+                          </span>{' '}
                           {selectedField.positionX.toFixed(2)}
                         </p>
                         <p>
-                          <span className="min-w-12 text-muted-foreground">Pos Y:&nbsp;</span>
+                          <span className="min-w-12 text-muted-foreground">
+                            <Trans>Pos Y:</Trans>
+                          </span>{' '}
                           {selectedField.positionY.toFixed(2)}
                         </p>
                         <p>
-                          <span className="min-w-12 text-muted-foreground">Width:&nbsp;</span>
+                          <span className="min-w-12 text-muted-foreground">
+                            <Trans>Width:</Trans>
+                          </span>{' '}
                           {selectedField.width.toFixed(2)}
                         </p>
                         <p>
-                          <span className="min-w-12 text-muted-foreground">Height:&nbsp;</span>
+                          <span className="min-w-12 text-muted-foreground">
+                            <Trans>Height:</Trans>
+                          </span>{' '}
                           {selectedField.height.toFixed(2)}
                         </p>
                       </div>

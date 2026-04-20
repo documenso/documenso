@@ -1,6 +1,5 @@
 import type { DocumentMeta, DocumentVisibility, Prisma, TemplateType } from '@prisma/client';
-import { EnvelopeType, FolderType } from '@prisma/client';
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, FolderType, WebhookTriggerEvents } from '@prisma/client';
 import { isDeepEqual } from 'remeda';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -12,9 +11,15 @@ import { prisma } from '@documenso/prisma';
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
+import {
+  ZWebhookDocumentSchema,
+  mapEnvelopeToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import { createDocumentAuthOptions, extractDocumentAuthMethods } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { buildTeamWhereQuery, canAccessTeamDocument } from '../../utils/teams';
+import { recomputeNextReminderForEnvelope } from '../recipient/update-recipient-next-reminder';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { getEnvelopeWhereInput } from './get-envelope-by-id';
 
 export type UpdateEnvelopeOptions = {
@@ -203,9 +208,13 @@ export const updateEnvelope = async ({
 
   const auditLogs: CreateDocumentAuditLogDataResponse[] = [];
 
-  if (!isTitleSame && envelope.status !== DocumentStatus.DRAFT) {
+  if (
+    !isTitleSame &&
+    envelope.status !== DocumentStatus.DRAFT &&
+    envelope.status !== DocumentStatus.PENDING
+  ) {
     throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: 'You cannot update the title if the envelope has been sent',
+      message: 'Envelope title can only be updated while in draft or pending status',
     });
   }
 
@@ -309,8 +318,8 @@ export const updateEnvelope = async ({
   //   return envelope;
   // }
 
-  return await prisma.$transaction(async (tx) => {
-    const updatedEnvelope = await tx.envelope.update({
+  const updatedEnvelope = await prisma.$transaction(async (tx) => {
+    const result = await tx.envelope.update({
       where: {
         id: envelope.id,
       },
@@ -331,6 +340,10 @@ export const updateEnvelope = async ({
           },
         },
       },
+      include: {
+        documentMeta: true,
+        recipients: true,
+      },
     });
 
     if (envelope.type === EnvelopeType.DOCUMENT) {
@@ -339,6 +352,29 @@ export const updateEnvelope = async ({
       });
     }
 
-    return updatedEnvelope;
+    return result;
   });
+
+  // Recompute reminders for active recipients when reminder settings change.
+  if (meta && 'reminderSettings' in meta) {
+    await recomputeNextReminderForEnvelope(envelope.id);
+  }
+
+  if (envelope.type === EnvelopeType.TEMPLATE) {
+    await triggerWebhook({
+      event: WebhookTriggerEvents.TEMPLATE_UPDATED,
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(updatedEnvelope)),
+      userId,
+      teamId,
+    });
+  }
+
+  // deconstruct to remove the recipients and documentMeta from the returned object since they aren't needed and can be large.
+  const {
+    recipients: _recipients,
+    documentMeta: _documentMeta,
+    ...finalEnvelope
+  } = updatedEnvelope;
+
+  return finalEnvelope;
 };

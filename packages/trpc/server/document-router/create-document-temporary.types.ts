@@ -27,6 +27,7 @@ import {
 
 /**
  * Temporariy endpoint for V2 Beta until we allow passthrough documents on create.
+ * @deprecated
  */
 export const createDocumentTemporaryMeta: TrpcRouteMeta = {
   openapi: {
@@ -36,6 +37,7 @@ export const createDocumentTemporaryMeta: TrpcRouteMeta = {
     description:
       'You will need to upload the PDF to the provided URL returned. Note: Once V2 API is released, this will be removed since we will allow direct uploads, instead of using an upload URL.',
     tags: ['Document'],
+    deprecated: true,
   },
 };
 

@@ -62,6 +62,13 @@ export const extractDerivedDocumentMeta = (
     emailReplyTo: meta.emailReplyTo ?? settings.emailReplyTo,
     emailSettings:
       meta.emailSettings || settings.emailDocumentSettings || DEFAULT_DOCUMENT_EMAIL_SETTINGS,
+
+    // Envelope expiration.
+    envelopeExpirationPeriod:
+      meta.envelopeExpirationPeriod ?? settings.envelopeExpirationPeriod ?? null,
+
+    // Reminder settings.
+    reminderSettings: meta.reminderSettings ?? settings.reminderSettings ?? null,
   } satisfies Omit<DocumentMeta, 'id'>;
 };
 

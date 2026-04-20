@@ -1,3 +1,4 @@
+import { defaultOptions as devServerDefaults } from '@hono/vite-dev-server';
 import { lingui } from '@lingui/vite-plugin';
 import { reactRouter } from '@react-router/dev/vite';
 import autoprefixer from 'autoprefixer';
@@ -46,6 +47,18 @@ export default defineConfig({
     tsconfigPaths(),
     serverAdapter({
       entry: 'server/router.ts',
+      exclude: [
+        // Spread the defaults but replace the /.css$/ rule so that Bull
+        // Board's static CSS at /api/jobs/board/static/** passes through to Hono.
+        ...devServerDefaults.exclude.map((pattern) =>
+          pattern instanceof RegExp && pattern.source === '.*\\.css$'
+            ? /^(?!\/api\/jobs\/board\/).*\.css$/
+            : pattern,
+        ),
+        '/assets/**',
+        '/src/app/**',
+        /\?(?:inline|url|no-inline|raw|import(?:&(?:inline|url|no-inline|raw)?)?)$/,
+      ],
     }),
   ],
   ssr: {
@@ -58,6 +71,9 @@ export default defineConfig({
       'playwright',
       'playwright-core',
       '@playwright/browser-chromium',
+      'pdfjs-dist',
+      '@google-cloud/kms',
+      '@google-cloud/secret-manager',
     ],
   },
   optimizeDeps: {
@@ -67,11 +83,12 @@ export default defineConfig({
       'node_modules',
       '@napi-rs/canvas',
       '@node-rs/bcrypt',
-      '@documenso/pdf-sign',
       'sharp',
       'playwright',
       'playwright-core',
       '@playwright/browser-chromium',
+      'lightningcss',
+      'fsevents',
     ],
   },
   resolve: {
@@ -98,8 +115,9 @@ export default defineConfig({
       external: [
         '@napi-rs/canvas',
         '@node-rs/bcrypt',
-        '@documenso/pdf-sign',
         '@aws-sdk/cloudfront-signer',
+        '@google-cloud/kms',
+        '@google-cloud/secret-manager',
         'nodemailer',
         /playwright/,
         '@playwright/browser-chromium',

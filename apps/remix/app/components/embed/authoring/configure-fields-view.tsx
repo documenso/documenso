@@ -4,19 +4,20 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { EnvelopeItem, FieldType } from '@prisma/client';
-import { ReadStatus, type Recipient, SendStatus, SigningStatus } from '@prisma/client';
-import { base64 } from '@scure/base';
+import { ReadStatus, SendStatus, SigningStatus } from '@prisma/client';
 import { ChevronsUpDown } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { PDF_VIEWER_PAGE_SELECTOR, getPdfPagesCount } from '@documenso/lib/constants/pdf-viewer';
 import { type TFieldMetaSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { nanoid } from '@documenso/lib/universal/id';
 import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
-import { useRecipientColors } from '@documenso/ui/lib/recipient-colors';
+import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
+import { getRecipientColorStyles } from '@documenso/ui/lib/recipient-colors';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { FieldItem } from '@documenso/ui/primitives/document-flow/field-item';
@@ -24,14 +25,15 @@ import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/type
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { FieldSelector } from '@documenso/ui/primitives/field-selector';
 import { Form } from '@documenso/ui/primitives/form/form';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { RecipientSelector } from '@documenso/ui/primitives/recipient-selector';
 import { Sheet, SheetContent, SheetTrigger } from '@documenso/ui/primitives/sheet';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { FieldAdvancedSettingsDrawer } from '~/components/embed/authoring/field-advanced-settings-drawer';
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
+
 import type { TConfigureEmbedFormSchema } from './configure-document-view.types';
 import type { TConfigureFieldsFormSchema } from './configure-fields-view.types';
-import { FieldAdvancedSettingsDrawer } from './field-advanced-settings-drawer';
 
 const MIN_HEIGHT_PX = 12;
 const MIN_WIDTH_PX = 36;
@@ -42,7 +44,7 @@ const DEFAULT_WIDTH_PX = MIN_WIDTH_PX * 2.5;
 export type ConfigureFieldsViewProps = {
   configData: TConfigureEmbedFormSchema;
   presignToken?: string | undefined;
-  envelopeItem?: Pick<EnvelopeItem, 'id' | 'envelopeId'>;
+  envelopeItem?: Pick<EnvelopeItem, 'id' | 'envelopeId' | 'documentDataId'>;
   defaultValues?: Partial<TConfigureFieldsFormSchema>;
   onBack?: (data: TConfigureFieldsFormSchema) => void;
   onSubmit: (data: TConfigureFieldsFormSchema) => void;
@@ -86,26 +88,25 @@ export const ConfigureFieldsView = ({
 
   const normalizedDocumentData = useMemo(() => {
     if (envelopeItem) {
-      return undefined;
+      return getDocumentDataUrlForPdfViewer({
+        envelopeId: envelopeItem.envelopeId,
+        envelopeItemId: envelopeItem.id,
+        documentDataId: envelopeItem.documentDataId,
+        version: 'current',
+        token: undefined,
+        presignToken,
+      });
     }
 
     if (!configData.documentData) {
       return undefined;
     }
 
-    return base64.encode(configData.documentData.data);
-  }, [configData.documentData]);
-
-  const normalizedEnvelopeItem = useMemo(() => {
-    if (envelopeItem) {
-      return envelopeItem;
-    }
-
-    return { id: '', envelopeId: '' };
-  }, [envelopeItem]);
+    return configData.documentData.data;
+  }, [configData.documentData, envelopeItem, presignToken]);
 
   const recipients = useMemo(() => {
-    return configData.signers.map<Recipient>((signer, index) => ({
+    return configData.signers.map<TRecipientLite>((signer, index) => ({
       id: signer.nativeId || index,
       name: signer.name || '',
       email: signer.email || '',
@@ -115,7 +116,9 @@ export const ConfigureFieldsView = ({
       templateId: null,
       token: '',
       documentDeletedAt: null,
-      expired: null,
+      expired: null, // !: deprecated Not in use. To be removed in a future migration.
+      expiresAt: null,
+      expirationNotifiedAt: null,
       signedAt: null,
       authOptions: null,
       rejectionReason: null,
@@ -126,7 +129,7 @@ export const ConfigureFieldsView = ({
     }));
   }, [configData.signers]);
 
-  const [selectedRecipient, setSelectedRecipient] = useState<Recipient | null>(
+  const [selectedRecipient, setSelectedRecipient] = useState<TRecipientLite | null>(
     () => recipients.find((r) => r.signingStatus === SigningStatus.NOT_SIGNED) || null,
   );
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
@@ -153,9 +156,7 @@ export const ConfigureFieldsView = ({
   });
 
   const selectedRecipientIndex = recipients.findIndex((r) => r.id === selectedRecipient?.id);
-  const selectedRecipientStyles = useRecipientColors(
-    selectedRecipientIndex === -1 ? 0 : selectedRecipientIndex,
-  );
+  const selectedRecipientStyles = getRecipientColorStyles(selectedRecipientIndex);
 
   const form = useForm<TConfigureFieldsFormSchema>({
     defaultValues: {
@@ -176,8 +177,6 @@ export const ConfigureFieldsView = ({
     control: control,
     name: 'fields',
   });
-
-  const highestPageNumber = Math.max(...localFields.map((field) => field.pageNumber));
 
   const onFieldCopy = useCallback(
     (event?: KeyboardEvent | null, options?: { duplicate?: boolean; duplicateAll?: boolean }) => {
@@ -203,13 +202,15 @@ export const ConfigureFieldsView = ({
         }
 
         if (duplicateAll) {
-          const pages = Array.from(document.querySelectorAll(PDF_VIEWER_PAGE_SELECTOR));
+          const totalPages = getPdfPagesCount();
 
-          pages.forEach((_, index) => {
-            const pageNumber = index + 1;
+          if (totalPages < 1) {
+            return;
+          }
 
+          for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
             if (pageNumber === lastActiveField.pageNumber) {
-              return;
+              continue;
             }
 
             const newField: TConfigureFieldsFormSchema['fields'][0] = {
@@ -222,7 +223,7 @@ export const ConfigureFieldsView = ({
             };
 
             append(newField);
-          });
+          }
 
           return;
         }
@@ -546,17 +547,11 @@ export const ConfigureFieldsView = ({
 
             <Form {...form}>
               <div>
-                <PDFViewerLazy
-                  presignToken={presignToken}
-                  overrideData={normalizedDocumentData}
-                  envelopeItem={normalizedEnvelopeItem}
-                  token={undefined}
-                  version="signed"
-                />
+                {normalizedDocumentData && (
+                  <PDFViewerLazy data={normalizedDocumentData} scrollParentRef="window" />
+                )}
 
-                <ElementVisible
-                  target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}
-                >
+                <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
                   {localFields.map((field, index) => {
                     const recipientIndex = recipients.findIndex((r) => r.id === field.recipientId);
 

@@ -3,8 +3,11 @@ import { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client
 import { z } from 'zod';
 
 import { VALID_DATE_FORMAT_VALUES } from '@documenso/lib/constants/date-formats';
+import { ZEnvelopeExpirationPeriod } from '@documenso/lib/constants/envelope-expiration';
+import { ZEnvelopeReminderSettings } from '@documenso/lib/constants/envelope-reminder';
 import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { DocumentMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
 
 import { ZDocumentEmailSettingsSchema } from './document-email';
@@ -126,8 +129,10 @@ export const ZDocumentMetaCreateSchema = z.object({
   uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
   drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
   emailId: z.string().nullish(),
-  emailReplyTo: z.string().email().nullish(),
+  emailReplyTo: zEmail().nullish(),
   emailSettings: ZDocumentEmailSettingsSchema.nullish(),
+  envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullish(),
+  reminderSettings: ZEnvelopeReminderSettings.nullish(),
 });
 
 export type TDocumentMetaCreate = z.infer<typeof ZDocumentMetaCreateSchema>;

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   DragDropContext,
@@ -7,32 +7,26 @@ import {
   Droppable,
   type SensorAPI,
 } from '@hello-pangea/dnd';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { plural } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentSigningOrder, EnvelopeType, RecipientRole, SendStatus } from '@prisma/client';
 import { motion } from 'framer-motion';
 import { GripVerticalIcon, HelpCircleIcon, PlusIcon, SparklesIcon, TrashIcon } from 'lucide-react';
-import { useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { useFieldArray, useWatch } from 'react-hook-form';
 import { useRevalidator, useSearchParams } from 'react-router';
-import { isDeepEqual, prop, sortBy } from 'remeda';
-import { z } from 'zod';
+import { isDeepEqual } from 'remeda';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
+import { ZEditorRecipientsFormSchema } from '@documenso/lib/client-only/hooks/use-editor-recipients';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { useSession } from '@documenso/lib/client-only/providers/session';
+import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import type { TDetectedRecipientSchema } from '@documenso/lib/server-only/ai/envelope/detect-recipients/schema';
-import {
-  ZRecipientActionAuthTypesSchema,
-  ZRecipientAuthOptionsSchema,
-} from '@documenso/lib/types/document-auth';
-import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
+import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import { canRecipientBeModified as utilCanRecipientBeModified } from '@documenso/lib/utils/recipients';
 import { trpc } from '@documenso/trpc/react';
-import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
 import {
   RecipientAutoCompleteInput,
@@ -67,26 +61,15 @@ import { AiFeaturesEnableDialog } from '~/components/dialogs/ai-features-enable-
 import { AiRecipientDetectionDialog } from '~/components/dialogs/ai-recipient-detection-dialog';
 import { useCurrentTeam } from '~/providers/team';
 
-const ZEnvelopeRecipientsForm = z.object({
-  signers: z.array(
-    z.object({
-      formId: z.string().min(1),
-      id: z.number().optional(),
-      email: ZRecipientEmailSchema,
-      name: z.string(),
-      role: z.nativeEnum(RecipientRole),
-      signingOrder: z.number().optional(),
-      actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
-    }),
-  ),
-  signingOrder: z.nativeEnum(DocumentSigningOrder),
-  allowDictateNextSigner: z.boolean().default(false),
-});
-
-type TEnvelopeRecipientsForm = z.infer<typeof ZEnvelopeRecipientsForm>;
-
 export const EnvelopeEditorRecipientForm = () => {
-  const { envelope, setRecipientsDebounced, updateEnvelope } = useCurrentEnvelopeEditor();
+  const {
+    envelope,
+    setRecipientsDebounced,
+    updateEnvelope,
+    editorRecipients,
+    isEmbedded,
+    editorConfig,
+  } = useCurrentEnvelopeEditor();
 
   const organisation = useCurrentOrganisation();
   const team = useCurrentTeam();
@@ -94,7 +77,9 @@ export const EnvelopeEditorRecipientForm = () => {
   const { t } = useLingui();
   const { toast } = useToast();
   const { remaining } = useLimits();
-  const { user } = useSession();
+  const { sessionData } = useOptionalSession();
+
+  const user = sessionData?.user;
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [recipientSearchQuery, setRecipientSearchQuery] = useState('');
@@ -145,7 +130,6 @@ export const EnvelopeEditorRecipientForm = () => {
 
   const debouncedRecipientSearchQuery = useDebouncedValue(recipientSearchQuery, 500);
 
-  const initialId = useId();
   const $sensorApi = useRef<SensorAPI | null>(null);
   const isFirstRender = useRef(true);
   const { recipients, fields } = envelope;
@@ -155,48 +139,14 @@ export const EnvelopeEditorRecipientForm = () => {
       query: debouncedRecipientSearchQuery,
     },
     {
-      enabled: debouncedRecipientSearchQuery.length > 1,
+      enabled: debouncedRecipientSearchQuery.length > 1 && !isEmbedded,
+      retry: false,
     },
   );
 
   const recipientSuggestions = recipientSuggestionsData?.results || [];
 
-  const defaultRecipients = [
-    {
-      formId: initialId,
-      name: '',
-      email: '',
-      role: RecipientRole.SIGNER,
-      signingOrder: 1,
-      actionAuth: [],
-    },
-  ];
-
-  const form = useForm<TEnvelopeRecipientsForm>({
-    resolver: zodResolver(ZEnvelopeRecipientsForm),
-    mode: 'onChange', // Used for autosave purposes, maybe can try onBlur instead?
-    defaultValues: {
-      signers:
-        recipients.length > 0
-          ? sortBy(
-              recipients.map((recipient, index) => ({
-                id: recipient.id,
-                formId: String(recipient.id),
-                name: recipient.name,
-                email: recipient.email,
-                role: recipient.role,
-                signingOrder: recipient.signingOrder ?? index + 1,
-                actionAuth:
-                  ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? undefined,
-              })),
-              [prop('signingOrder'), 'asc'],
-              [prop('id'), 'asc'],
-            )
-          : defaultRecipients,
-      signingOrder: envelope.documentMeta.signingOrder,
-      allowDictateNextSigner: envelope.documentMeta.allowDictateNextSigner,
-    },
-  });
+  const { form } = editorRecipients;
 
   const recipientHasAuthSettings = useMemo(() => {
     const recipientHasAuthOptions = recipients.find((recipient) => {
@@ -588,7 +538,7 @@ export const EnvelopeEditorRecipientForm = () => {
       return;
     }
 
-    const validatedFormValues = ZEnvelopeRecipientsForm.safeParse(formValues);
+    const validatedFormValues = ZEditorRecipientsFormSchema.safeParse(formValues);
 
     if (!validatedFormValues.success) {
       return;
@@ -652,42 +602,50 @@ export const EnvelopeEditorRecipientForm = () => {
     <Card backdropBlur={false} className="border">
       <CardHeader className="flex flex-row justify-between">
         <div>
-          <CardTitle>Recipients</CardTitle>
-          <CardDescription className="mt-1.5">Add recipients to your document</CardDescription>
+          <CardTitle>
+            <Trans>Recipients</Trans>
+          </CardTitle>
+          <CardDescription className="mt-1.5">
+            <Trans>Add recipients to your document</Trans>
+          </CardDescription>
         </div>
 
         <div className="flex flex-row items-center space-x-2">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                type="button"
-                size="sm"
-                disabled={isSubmitting}
-                onClick={onDetectRecipientsClick}
-              >
-                <SparklesIcon className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
+          {editorConfig.recipients?.allowAIDetection && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  type="button"
+                  size="sm"
+                  disabled={isSubmitting}
+                  onClick={onDetectRecipientsClick}
+                >
+                  <SparklesIcon className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
 
-            <TooltipContent>
-              {team.preferences.aiFeaturesEnabled ? (
-                <Trans>Detect recipients with AI</Trans>
-              ) : (
-                <Trans>Enable AI detection</Trans>
-              )}
-            </TooltipContent>
-          </Tooltip>
+              <TooltipContent>
+                {team.preferences.aiFeaturesEnabled ? (
+                  <Trans>Detect recipients with AI</Trans>
+                ) : (
+                  <Trans>Enable AI detection</Trans>
+                )}
+              </TooltipContent>
+            </Tooltip>
+          )}
 
-          <Button
-            variant="outline"
-            className="flex flex-row items-center"
-            size="sm"
-            disabled={isSubmitting || isUserAlreadyARecipient}
-            onClick={() => onAddSelfSigner()}
-          >
-            <Trans>Add Myself</Trans>
-          </Button>
+          {!isEmbedded && (
+            <Button
+              variant="outline"
+              className="flex flex-row items-center"
+              size="sm"
+              disabled={isSubmitting || isUserAlreadyARecipient}
+              onClick={() => onAddSelfSigner()}
+            >
+              <Trans>Add Myself</Trans>
+            </Button>
+          )}
 
           <Button
             variant="outline"
@@ -704,26 +662,32 @@ export const EnvelopeEditorRecipientForm = () => {
       </CardHeader>
 
       <CardContent>
-        <AnimateGenericFadeInOut motionKey={showAdvancedSettings ? 'Show' : 'Hide'}>
-          <Form {...form}>
-            <div className="-mt-2 mb-2 space-y-4 rounded-md bg-accent/50 p-4">
-              {organisation.organisationClaim.flags.cfr21 && (
-                <div className="flex flex-row items-center">
-                  <Checkbox
-                    id="showAdvancedRecipientSettings"
-                    checked={showAdvancedSettings}
-                    onCheckedChange={(value) => setShowAdvancedSettings(Boolean(value))}
-                  />
+        <Form {...form}>
+          <div
+            className={cn('-mt-2 mb-2 space-y-4 rounded-md bg-accent/50 p-4', {
+              hidden:
+                !editorConfig.recipients?.allowConfigureSigningOrder &&
+                !organisation.organisationClaim.flags.cfr21,
+            })}
+          >
+            {organisation.organisationClaim.flags.cfr21 && (
+              <div className="flex flex-row items-center">
+                <Checkbox
+                  id="showAdvancedRecipientSettings"
+                  checked={showAdvancedSettings}
+                  onCheckedChange={(value) => setShowAdvancedSettings(Boolean(value))}
+                />
 
-                  <label
-                    className="ml-2 text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    htmlFor="showAdvancedRecipientSettings"
-                  >
-                    <Trans>Show advanced settings</Trans>
-                  </label>
-                </div>
-              )}
+                <label
+                  className="ml-2 text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  htmlFor="showAdvancedRecipientSettings"
+                >
+                  <Trans>Show advanced settings</Trans>
+                </label>
+              </div>
+            )}
 
+            {editorConfig.recipients?.allowConfigureSigningOrder && (
               <FormField
                 control={form.control}
                 name="signingOrder"
@@ -782,73 +746,78 @@ export const EnvelopeEditorRecipientForm = () => {
                   </FormItem>
                 )}
               />
+            )}
 
-              {isSigningOrderSequential && (
-                <FormField
-                  control={form.control}
-                  name="allowDictateNextSigner"
-                  render={({ field: { value, ...field } }) => (
-                    <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-                      <FormControl>
-                        <Checkbox
-                          {...field}
-                          id="allowDictateNextSigner"
-                          checked={value}
-                          onCheckedChange={(checked) => {
-                            field.onChange(checked);
-                          }}
-                          disabled={
-                            isSubmitting || hasDocumentBeenSent || !isSigningOrderSequential
-                          }
-                        />
-                      </FormControl>
+            {isSigningOrderSequential && (
+              <FormField
+                control={form.control}
+                name="allowDictateNextSigner"
+                render={({ field: { value, ...field } }) => (
+                  <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        {...field}
+                        id="allowDictateNextSigner"
+                        checked={value}
+                        onCheckedChange={(checked) => {
+                          field.onChange(checked);
+                        }}
+                        disabled={isSubmitting || hasDocumentBeenSent || !isSigningOrderSequential}
+                      />
+                    </FormControl>
 
-                      <div className="flex items-center text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                        <FormLabel
-                          htmlFor="allowDictateNextSigner"
-                          className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          <Trans>Allow signers to dictate next signer</Trans>
-                        </FormLabel>
+                    <div className="flex items-center text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      <FormLabel
+                        htmlFor="allowDictateNextSigner"
+                        className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        <Trans>Allow signers to dictate next signer</Trans>
+                      </FormLabel>
 
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="ml-1 cursor-help text-muted-foreground">
-                              <HelpCircleIcon className="h-3.5 w-3.5" />
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-80 p-4">
-                            <p>
-                              <Trans>
-                                When enabled, signers can choose who should sign next in the
-                                sequence instead of following the predefined order.
-                              </Trans>
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                    </FormItem>
-                  )}
-                />
-              )}
-            </div>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="ml-1 cursor-help text-muted-foreground">
+                            <HelpCircleIcon className="h-3.5 w-3.5" />
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-80 p-4">
+                          <p>
+                            <Trans>
+                              When enabled, signers can choose who should sign next in the sequence
+                              instead of following the predefined order.
+                            </Trans>
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </FormItem>
+                )}
+              />
+            )}
+          </div>
 
-            <DragDropContext
-              onDragEnd={onDragEnd}
-              sensors={[
-                (api: SensorAPI) => {
-                  $sensorApi.current = api;
-                },
-              ]}
-            >
-              <Droppable droppableId="signers">
-                {(provided) => (
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className="flex w-full flex-col gap-y-2"
-                  >
-                    {signers.map((signer, index) => (
+          <DragDropContext
+            onDragEnd={onDragEnd}
+            sensors={[
+              (api: SensorAPI) => {
+                $sensorApi.current = api;
+              },
+            ]}
+          >
+            <Droppable droppableId="signers">
+              {(provided) => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className="flex w-full flex-col gap-y-2"
+                >
+                  {signers.map((signer, index) => {
+                    const isDirectRecipient =
+                      envelope.type === EnvelopeType.TEMPLATE &&
+                      envelope.directLink !== null &&
+                      signer.id === envelope.directLink.directTemplateRecipientId;
+
+                    return (
                       <Draggable
                         key={`${signer.nativeId}-${signer.signingOrder}`}
                         draggableId={signer['nativeId']}
@@ -953,7 +922,8 @@ export const EnvelopeEditorRecipientForm = () => {
                                           disabled={
                                             snapshot.isDragging ||
                                             isSubmitting ||
-                                            !canRecipientBeModified(signer.id)
+                                            !canRecipientBeModified(signer.id) ||
+                                            isDirectRecipient
                                           }
                                           options={recipientSuggestions}
                                           onSelect={(suggestion) =>
@@ -999,7 +969,8 @@ export const EnvelopeEditorRecipientForm = () => {
                                           disabled={
                                             snapshot.isDragging ||
                                             isSubmitting ||
-                                            !canRecipientBeModified(signer.id)
+                                            !canRecipientBeModified(signer.id) ||
+                                            isDirectRecipient
                                           }
                                           options={recipientSuggestions}
                                           onSelect={(suggestion) =>
@@ -1033,6 +1004,14 @@ export const EnvelopeEditorRecipientForm = () => {
                                       <FormControl>
                                         <RecipientRoleSelect
                                           {...field}
+                                          hideAssistantRole={
+                                            !editorConfig.recipients?.allowAssistantRole
+                                          }
+                                          hideCCerRole={!editorConfig.recipients?.allowCCerRole}
+                                          hideViewerRole={!editorConfig.recipients?.allowViewerRole}
+                                          hideApproverRole={
+                                            !editorConfig.recipients?.allowApproverRole
+                                          }
                                           isAssistantEnabled={isSigningOrderSequential}
                                           onValueChange={(value) => {
                                             // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -1062,7 +1041,8 @@ export const EnvelopeEditorRecipientForm = () => {
                                     snapshot.isDragging ||
                                     isSubmitting ||
                                     !canRecipientBeModified(signer.id) ||
-                                    signers.length === 1
+                                    signers.length === 1 ||
+                                    isDirectRecipient
                                   }
                                   onClick={() => onRemoveSigner(index)}
                                 >
@@ -1105,21 +1085,21 @@ export const EnvelopeEditorRecipientForm = () => {
                           </div>
                         )}
                       </Draggable>
-                    ))}
+                    );
+                  })}
 
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
 
-            <FormErrorMessage
-              className="mt-2"
-              // Dirty hack to handle errors when .root is populated for an array type
-              error={'signers__root' in errors && errors['signers__root']}
-            />
-          </Form>
-        </AnimateGenericFadeInOut>
+          <FormErrorMessage
+            className="mt-2"
+            // Dirty hack to handle errors when .root is populated for an array type
+            error={'signers__root' in errors && errors['signers__root']}
+          />
+        </Form>
 
         <SigningOrderConfirmation
           open={showSigningOrderConfirmation}
@@ -1127,13 +1107,15 @@ export const EnvelopeEditorRecipientForm = () => {
           onConfirm={handleSigningOrderDisable}
         />
 
-        <AiRecipientDetectionDialog
-          open={isAiDialogOpen}
-          onOpenChange={onAiDialogOpenChange}
-          onComplete={onAiDetectionComplete}
-          envelopeId={envelope.id}
-          teamId={envelope.teamId}
-        />
+        {editorConfig.recipients?.allowAIDetection && (
+          <AiRecipientDetectionDialog
+            open={isAiDialogOpen}
+            onOpenChange={onAiDialogOpenChange}
+            onComplete={onAiDetectionComplete}
+            envelopeId={envelope.id}
+            teamId={envelope.teamId}
+          />
+        )}
 
         <AiFeaturesEnableDialog
           open={isAiEnableDialogOpen}

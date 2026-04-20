@@ -6,6 +6,7 @@ import { useNavigate, useRevalidator, useSearchParams } from 'react-router';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import { PDF_VIEWER_CONTENT_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientAccessAuth } from '@documenso/lib/types/document-auth';
@@ -71,6 +72,14 @@ export const EnvelopeSignerCompleteDialog = () => {
 
         if (fieldTooltip) {
           fieldTooltip.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          // Tooltip not in DOM (page virtualized away) — signal the PDF viewer
+          // to scroll to the correct page via the data attribute.
+          const pdfContent = document.querySelector(PDF_VIEWER_CONTENT_SELECTOR);
+
+          if (pdfContent) {
+            pdfContent.setAttribute('data-scroll-to-page', String(nextField.page));
+          }
         }
       },
       isEnvelopeItemSwitch ? 150 : 50,
@@ -212,10 +221,12 @@ export const EnvelopeSignerCompleteDialog = () => {
       return {
         name:
           recipient.name ||
+          fullName ||
           recipient.fields.find((field) => field.type === FieldType.NAME)?.customText ||
           '',
         email:
           recipient.email ||
+          email ||
           recipient.fields.find((field) => field.type === FieldType.EMAIL)?.customText ||
           '',
       };

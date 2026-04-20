@@ -3,13 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import {
-  DocumentDistributionMethod,
-  DocumentStatus,
-  EnvelopeType,
-  FieldType,
-  RecipientRole,
-} from '@prisma/client';
+import { DocumentDistributionMethod, DocumentStatus, EnvelopeType } from '@prisma/client';
 import { AnimatePresence, motion } from 'framer-motion';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -19,7 +13,10 @@ import * as z from 'zod';
 
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { getRecipientsWithMissingFields } from '@documenso/lib/utils/recipients';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc, trpc as trpcReact } from '@documenso/trpc/react';
 import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/document/document-send-email-message-helper';
 import { cn } from '@documenso/ui/lib/utils';
@@ -66,10 +63,7 @@ export type EnvelopeDistributeDialogProps = {
 export const ZEnvelopeDistributeFormSchema = z.object({
   meta: z.object({
     emailId: z.string().nullable(),
-    emailReplyTo: z.preprocess(
-      (val) => (val === '' ? undefined : val),
-      z.string().email().optional(),
-    ),
+    emailReplyTo: z.preprocess((val) => (val === '' ? undefined : val), zEmail().optional()),
     subject: z.string(),
     message: z.string(),
     distributionMethod: z
@@ -121,10 +115,15 @@ export const EnvelopeDistributeDialog = ({
   } = form;
 
   const { data: emailData, isLoading: isLoadingEmails } =
-    trpc.enterprise.organisation.email.find.useQuery({
-      organisationId: organisation.id,
-      perPage: 100,
-    });
+    trpc.enterprise.organisation.email.find.useQuery(
+      {
+        organisationId: organisation.id,
+        perPage: 100,
+      },
+      {
+        ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+      },
+    );
 
   const emails = emailData?.data || [];
 
@@ -140,14 +139,7 @@ export const EnvelopeDistributeDialog = ({
   );
 
   const recipientsMissingSignatureFields = useMemo(
-    () =>
-      recipientsWithIndex.filter(
-        (recipient) =>
-          recipient.role === RecipientRole.SIGNER &&
-          !envelope.fields.some(
-            (field) => field.type === FieldType.SIGNATURE && field.recipientId === recipient.id,
-          ),
-      ),
+    () => getRecipientsWithMissingFields(recipientsWithIndex, envelope.fields),
     [recipientsWithIndex, envelope.fields],
   );
 
@@ -270,10 +262,10 @@ export const EnvelopeDistributeDialog = ({
                 >
                   <TabsList className="w-full">
                     <TabsTrigger className="w-full" value={DocumentDistributionMethod.EMAIL}>
-                      Email
+                      <Trans>Email</Trans>
                     </TabsTrigger>
                     <TabsTrigger className="w-full" value={DocumentDistributionMethod.NONE}>
-                      None
+                      <Trans>None</Trans>
                     </TabsTrigger>
                   </TabsList>
                 </Tabs>

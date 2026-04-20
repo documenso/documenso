@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { Trans, useLingui } from '@lingui/react/macro';
 
+import type { TLicenseClaim } from '@documenso/lib/types/license';
 import { trpc } from '@documenso/trpc/react';
 import type { TFindSubscriptionClaimsResponse } from '@documenso/trpc/server/admin-router/find-subscription-claims.types';
 import { Button } from '@documenso/ui/primitives/button';
@@ -21,9 +22,10 @@ import { SubscriptionClaimForm } from '../forms/subscription-claim-form';
 export type ClaimUpdateDialogProps = {
   claim: TFindSubscriptionClaimsResponse['data'][number];
   trigger: React.ReactNode;
+  licenseFlags?: TLicenseClaim;
 };
 
-export const ClaimUpdateDialog = ({ claim, trigger }: ClaimUpdateDialogProps) => {
+export const ClaimUpdateDialog = ({ claim, trigger, licenseFlags }: ClaimUpdateDialogProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
 
@@ -51,7 +53,7 @@ export const ClaimUpdateDialog = ({ claim, trigger }: ClaimUpdateDialogProps) =>
         {trigger}
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="scrollbar-hidden max-h-[90vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
             <Trans>Update Subscription Claim</Trans>
@@ -69,6 +71,7 @@ export const ClaimUpdateDialog = ({ claim, trigger }: ClaimUpdateDialogProps) =>
               data,
             })
           }
+          licenseFlags={licenseFlags}
           formSubmitTrigger={
             <DialogFooter>
               <Button

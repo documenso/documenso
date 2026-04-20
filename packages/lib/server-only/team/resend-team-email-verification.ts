@@ -35,30 +35,27 @@ export const resendTeamEmailVerification = async ({
     });
   }
 
-  await prisma.$transaction(
-    async (tx) => {
-      const { emailVerification } = team;
+  const { emailVerification } = team;
 
-      if (!emailVerification) {
-        throw new AppError('VerificationNotFound', {
-          message: 'No team email verification exists for this team.',
-        });
-      }
+  if (!emailVerification) {
+    throw new AppError('VerificationNotFound', {
+      message: 'No team email verification exists for this team.',
+    });
+  }
 
-      const { token, expiresAt } = createTokenVerification({ hours: 1 });
+  const { token, expiresAt } = createTokenVerification({ hours: 1 });
 
-      await tx.teamEmailVerification.update({
-        where: {
-          teamId,
-        },
-        data: {
-          token,
-          expiresAt,
-        },
-      });
-
-      await sendTeamEmailVerificationEmail(emailVerification.email, token, team);
+  await prisma.teamEmailVerification.update({
+    where: {
+      teamId,
     },
-    { timeout: 30_000 },
-  );
+    data: {
+      token,
+      expiresAt,
+    },
+  });
+
+  // Send email outside any transaction to avoid holding a connection
+  // open during network I/O.
+  await sendTeamEmailVerificationEmail(emailVerification.email, token, team);
 };

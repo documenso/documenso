@@ -186,10 +186,12 @@ export function EnvelopeRecipientFieldTooltip({
         )}
 
         <p className="text-center font-semibold">
-          <span>{t(FRIENDLY_FIELD_TYPE[field.type])} field</span>
+          <span>
+            <Trans>{t(FRIENDLY_FIELD_TYPE[field.type])} field</Trans>
+          </span>
         </p>
 
-        <p className="text-muted-foreground mt-1 text-center text-xs">
+        <p className="mt-1 text-center text-xs text-muted-foreground">
           {getRecipientDisplayText(field.recipient)}
         </p>
 

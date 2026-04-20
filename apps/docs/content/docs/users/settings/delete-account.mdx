@@ -1,0 +1,44 @@
+---
+title: Delete Account
+description: Permanently delete your Documenso account and all associated data.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+<Callout type="error">
+  Account deletion is permanent and irreversible. All documents, signatures, templates, and account
+  data will be permanently removed. Any active subscription will be cancelled.
+</Callout>
+
+## Before Deleting
+
+- Download any documents you need to keep
+- Cancel any active subscriptions
+- Disable two-factor authentication (required before deletion)
+
+## Delete Your Account
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Go to **Settings** > **Profile** and scroll to the **Delete Account** section.
+  </Step>
+  <Step>
+    Click **Delete Account**.
+  </Step>
+  <Step>
+    Type your email address to confirm and click **Confirm Deletion**.
+  </Step>
+</Steps>
+
+<Callout type="info">
+  If you have two-factor authentication enabled, you must disable it before deleting your account.
+</Callout>
+
+---
+
+## See Also
+
+- [Profile Settings](/docs/users/settings/profile) - Manage your profile and signature
+- [Security Settings](/docs/users/settings/security) - Manage 2FA and passkeys

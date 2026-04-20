@@ -37,7 +37,7 @@ const t = initTRPC
   .create({
     transformer: dataTransformer,
     errorFormatter(opts) {
-      const { shape, error } = opts;
+      const { shape, error, ctx } = opts;
 
       const originalError = error.cause;
 
@@ -46,6 +46,12 @@ const t = initTRPC
       // Default unknown errors to 400, since if you're throwing an AppError it is expected
       // that you already know what you're doing.
       if (originalError instanceof AppError) {
+        if (originalError.headers && ctx) {
+          for (const [headerKey, headerValue] of Object.entries(originalError.headers)) {
+            ctx.res.headers.append(headerKey, headerValue);
+          }
+        }
+
         data = {
           ...data,
           appError: AppError.toJSON(originalError),
@@ -67,7 +73,7 @@ const t = initTRPC
 /**
  * Middlewares
  */
-export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path }) => {
+export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path, meta }) => {
   const infoToLog: TrpcApiLog = {
     path,
     auth: ctx.metadata.auth,
@@ -78,8 +84,10 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path }) 
 
   const authorizationHeader = ctx.req.headers.get('authorization');
 
+  const isApiV2 = Boolean(meta?.openapi?.path);
+
   // Taken from `authenticatedMiddleware` in `@documenso/api/v1/middleware/authenticated.ts`.
-  if (authorizationHeader) {
+  if (authorizationHeader && isApiV2) {
     // Support for both "Authorization: Bearer api_xxx" and "Authorization: api_xxx"
     const [token] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
 
@@ -158,7 +166,7 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path }) 
   });
 });
 
-export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next, path }) => {
+export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next, path, meta }) => {
   // Recreate the logger with a sub request ID to differentiate between batched requests.
   const trpcSessionLogger = ctx.logger.child({
     nonBatchedRequestId: alphaid(),
@@ -174,8 +182,10 @@ export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next, pat
 
   const authorizationHeader = ctx.req.headers.get('authorization');
 
+  const isApiV2 = Boolean(meta?.openapi?.path);
+
   // Taken from `authenticatedMiddleware` in `@documenso/api/v1/middleware/authenticated.ts`.
-  if (authorizationHeader) {
+  if (authorizationHeader && isApiV2) {
     // Support for both "Authorization: Bearer api_xxx" and "Authorization: api_xxx"
     const [token] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
 

@@ -3,12 +3,15 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, FieldType, SigningStatus } from '@prisma/client';
+import { DocumentStatus, SigningStatus } from '@prisma/client';
 import { Loader, LucideChevronDown, LucideChevronUp, X } from 'lucide-react';
 import { P, match } from 'ts-pattern';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
+import { sortFieldsByPosition } from '@documenso/lib/utils/fields';
+import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { trpc } from '@documenso/trpc/react';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
@@ -21,9 +24,10 @@ import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 
 import { useRequiredDocumentSigningContext } from '../../general/document-signing/document-signing-provider';
 import { DocumentSigningRejectDialog } from '../../general/document-signing/document-signing-reject-dialog';
@@ -83,16 +87,16 @@ export const MultiSignDocumentSigningView = ({
   const { mutateAsync: completeDocumentWithToken } =
     trpc.recipient.completeDocumentWithToken.useMutation();
 
-  const hasSignatureField = document?.fields.some((field) => field.type === FieldType.SIGNATURE);
+  const hasSignatureField = document?.fields.some((field) => isSignatureFieldType(field.type));
 
   const [pendingFields, completedFields] = [
-    document?.fields.filter((field) => field.recipient.signingStatus !== SigningStatus.SIGNED) ??
-      [],
+    sortFieldsByPosition(
+      document?.fields.filter((field) => field.recipient.signingStatus !== SigningStatus.SIGNED) ??
+        [],
+    ),
     document?.fields.filter((field) => field.recipient.signingStatus === SigningStatus.SIGNED) ??
       [],
   ];
-
-  const highestPendingPageNumber = Math.max(...pendingFields.map((field) => field.page));
 
   const uninsertedFields = document?.fields.filter((field) => !field.inserted) ?? [];
 
@@ -177,8 +181,8 @@ export const MultiSignDocumentSigningView = ({
   };
 
   return (
-    <div className="min-h-screen overflow-hidden bg-background">
-      <div id="document-field-portal-root" className="relative h-full w-full overflow-y-auto p-8">
+    <div className="min-h-screen bg-background">
+      <div className="relative h-full w-full p-8">
         {match({ isLoading, document })
           .with({ isLoading: true }, () => (
             <div className="flex min-h-[400px] w-full items-center justify-center">
@@ -226,9 +230,15 @@ export const MultiSignDocumentSigningView = ({
                   })}
                 >
                   <PDFViewerLazy
-                    envelopeItem={document.envelopeItems[0]}
-                    token={token}
-                    version="signed"
+                    data={getDocumentDataUrlForPdfViewer({
+                      envelopeId: document.envelopeId,
+                      envelopeItemId: document.envelopeItems[0]?.id,
+                      documentDataId: document.documentData.id,
+                      version: 'current',
+                      token,
+                      presignToken: undefined,
+                    })}
+                    scrollParentRef="window"
                     onDocumentLoad={() => {
                       setHasDocumentLoaded(true);
                       onDocumentReady?.();
@@ -359,13 +369,11 @@ export const MultiSignDocumentSigningView = ({
                     </div>
                   </div>
                 )}
-              </div>
 
-              {hasDocumentLoaded && (
-                <ElementVisible
-                  target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPendingPageNumber}"]`}
-                >
-                  {showPendingFieldTooltip && pendingFields.length > 0 && (
+                {hasDocumentLoaded && showPendingFieldTooltip && pendingFields.length > 0 && (
+                  <ElementVisible
+                    target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${pendingFields[0].page}"]`}
+                  >
                     <FieldToolTip
                       key={pendingFields[0].id}
                       field={pendingFields[0]}
@@ -373,27 +381,27 @@ export const MultiSignDocumentSigningView = ({
                     >
                       <Trans>Click to insert field</Trans>
                     </FieldToolTip>
-                  )}
-                </ElementVisible>
-              )}
+                  </ElementVisible>
+                )}
 
-              {/* Fields */}
-              {hasDocumentLoaded && (
-                <EmbedDocumentFields
-                  fields={pendingFields}
-                  metadata={document.documentMeta}
-                  onSignField={onSignField}
-                  onUnsignField={onUnsignField}
-                />
-              )}
+                {/* Fields */}
+                {hasDocumentLoaded && (
+                  <EmbedDocumentFields
+                    fields={pendingFields}
+                    metadata={document.documentMeta}
+                    onSignField={onSignField}
+                    onUnsignField={onUnsignField}
+                  />
+                )}
 
-              {/* Completed fields */}
-              {document.status !== DocumentStatus.COMPLETED && (
-                <DocumentReadOnlyFields
-                  documentMeta={document.documentMeta ?? undefined}
-                  fields={completedFields}
-                />
-              )}
+                {/* Completed fields */}
+                {document.status !== DocumentStatus.COMPLETED && (
+                  <DocumentReadOnlyFields
+                    documentMeta={document.documentMeta ?? undefined}
+                    fields={completedFields}
+                  />
+                )}
+              </div>
             </>
           ))
           .otherwise(() => null)}

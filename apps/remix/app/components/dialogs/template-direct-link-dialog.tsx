@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { type Recipient, RecipientRole, type TemplateDirectLink } from '@prisma/client';
+import { RecipientRole, type TemplateDirectLink } from '@prisma/client';
 import {
   CircleDotIcon,
   CircleIcon,
@@ -21,6 +21,7 @@ import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/org
 import { DIRECT_TEMPLATE_RECIPIENT_EMAIL } from '@documenso/lib/constants/direct-templates';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { DIRECT_TEMPLATE_DOCUMENTATION } from '@documenso/lib/constants/template';
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
@@ -52,8 +53,10 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 type TemplateDirectLinkDialogProps = {
   templateId: number;
   directLink?: Pick<TemplateDirectLink, 'token' | 'enabled'> | null;
-  recipients: Recipient[];
+  recipients: TRecipientLite[];
   trigger?: React.ReactNode;
+  onCreateSuccess?: () => Promise<void> | void;
+  onDeleteSuccess?: () => Promise<void> | void;
 };
 
 type TemplateDirectLinkStep = 'ONBOARD' | 'SELECT_RECIPIENT' | 'MANAGE' | 'CONFIRM_DELETE';
@@ -63,6 +66,8 @@ export const TemplateDirectLinkDialog = ({
   directLink,
   recipients,
   trigger,
+  onCreateSuccess,
+  onDeleteSuccess,
 }: TemplateDirectLinkDialogProps) => {
   const { toast } = useToast();
   const { quota, remaining } = useLimits();
@@ -97,6 +102,7 @@ export const TemplateDirectLinkDialog = ({
   } = trpcReact.template.createTemplateDirectLink.useMutation({
     onSuccess: async (data) => {
       await revalidate();
+      await onCreateSuccess?.();
 
       setToken(data.token);
       setIsEnabled(data.enabled);
@@ -142,6 +148,7 @@ export const TemplateDirectLinkDialog = ({
     trpcReact.template.deleteTemplateDirectLink.useMutation({
       onSuccess: async () => {
         await revalidate();
+        await onDeleteSuccess?.();
 
         setOpen(false);
         setToken(null);
@@ -234,7 +241,7 @@ export const TemplateDirectLinkDialog = ({
                         </div>
 
                         <h3 className="font-semibold">{_(step.title)}</h3>
-                        <p className="text-muted-foreground mt-1 text-sm">{_(step.description)}</p>
+                        <p className="mt-1 text-sm text-muted-foreground">{_(step.description)}</p>
                       </li>
                     ))}
                   </ul>
@@ -320,13 +327,13 @@ export const TemplateDirectLinkDialog = ({
                             onClick={async () => onRecipientTableRowClick(row.id)}
                           >
                             <TableCell>
-                              <div className="text-muted-foreground text-sm">
+                              <div className="text-sm text-muted-foreground">
                                 <p>{row.name}</p>
-                                <p className="text-muted-foreground/70 text-xs">{row.email}</p>
+                                <p className="text-xs text-muted-foreground/70">{row.email}</p>
                               </div>
                             </TableCell>
 
-                            <TableCell className="text-muted-foreground text-sm">
+                            <TableCell className="text-sm text-muted-foreground">
                               {_(RECIPIENT_ROLES_DESCRIPTION[row.role].roleName)}
                             </TableCell>
 
@@ -350,7 +357,7 @@ export const TemplateDirectLinkDialog = ({
                     <DialogFooter className="mx-auto">
                       <div className="flex flex-col items-center justify-center">
                         {validDirectTemplateRecipients.length !== 0 && (
-                          <p className="text-muted-foreground text-sm">
+                          <p className="text-sm text-muted-foreground">
                             <Trans>Or</Trans>
                           </p>
                         )}
@@ -392,7 +399,7 @@ export const TemplateDirectLinkDialog = ({
                           <TooltipTrigger tabIndex={-1} className="ml-2">
                             <InfoIcon className="h-4 w-4" />
                           </TooltipTrigger>
-                          <TooltipContent className="text-foreground z-9999 max-w-md p-4">
+                          <TooltipContent className="z-9999 max-w-md p-4 text-foreground">
                             <Trans>
                               Disabling direct link signing will prevent anyone from accessing the
                               link.

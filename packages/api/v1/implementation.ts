@@ -67,6 +67,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       perPage,
       userId: user.id,
       teamId: team.id,
+      folderId: args.query.folderId,
     });
 
     return {
@@ -77,6 +78,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           externalId: document.externalId,
           userId: document.userId,
           teamId: document.teamId,
+          folderId: document.folderId,
           title: document.title,
           status: document.status,
           createdAt: document.createdAt,
@@ -164,6 +166,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           externalId: envelope.externalId,
           userId: envelope.userId,
           teamId: envelope.teamId,
+          folderId: envelope.folderId,
           title: envelope.title,
           status: envelope.status,
           createdAt: envelope.createdAt,
@@ -796,6 +799,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           title: body.title,
         },
         attachments: body.attachments,
+        formValues: body.formValues,
         requestMetadata: metadata,
       });
 
@@ -1043,12 +1047,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         },
       };
     } catch (err) {
-      return {
-        status: 500,
-        body: {
-          message: 'An error has occured while sending the document for signing',
-        },
-      };
+      return AppError.toRestAPIError(err);
     }
   }),
 
@@ -1392,7 +1391,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
               throw new Error('Invalid page number');
             }
 
-            const recipient = await prisma.recipient.findFirst({
+            const recipient = await tx.recipient.findFirst({
               where: {
                 id: Number(recipientId),
                 envelopeId: envelope.id,

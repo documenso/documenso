@@ -17,6 +17,7 @@ import { IS_BILLING_ENABLED, SUPPORT_EMAIL } from '@documenso/lib/constants/app'
 import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@documenso/lib/constants/organisations';
 import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
 import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc } from '@documenso/trpc/react';
 import { ZCreateOrganisationMemberInvitesRequestSchema } from '@documenso/trpc/server/organisation-router/create-organisation-member-invites.types';
 import { cn } from '@documenso/ui/lib/utils';
@@ -94,7 +95,7 @@ type TabTypes = 'INDIVIDUAL' | 'BULK';
 
 const ZImportOrganisationMemberSchema = z.array(
   z.object({
-    email: z.string().email(),
+    email: zEmail(),
     organisationRole: z.nativeEnum(OrganisationMemberRole),
   }),
 );
@@ -329,12 +330,12 @@ export const OrganisationMemberInviteDialog = ({
             onValueChange={(value) => setInvitationType(value as TabTypes)}
           >
             <TabsList className="w-full">
-              <TabsTrigger value="INDIVIDUAL" className="hover:text-foreground w-full">
+              <TabsTrigger value="INDIVIDUAL" className="w-full hover:text-foreground">
                 <MailIcon size={20} className="mr-2" />
                 <Trans>Invite Members</Trans>
               </TabsTrigger>
 
-              <TabsTrigger value="BULK" className="hover:text-foreground w-full">
+              <TabsTrigger value="BULK" className="w-full hover:text-foreground">
                 <UsersIcon size={20} className="mr-2" /> <Trans>Bulk Import</Trans>
               </TabsTrigger>
             </TabsList>
@@ -382,7 +383,7 @@ export const OrganisationMemberInviteDialog = ({
                                 )}
                                 <FormControl>
                                   <Select {...field} onValueChange={field.onChange}>
-                                    <SelectTrigger className="text-muted-foreground max-w-[200px]">
+                                    <SelectTrigger className="max-w-[200px] text-muted-foreground">
                                       <SelectValue />
                                     </SelectTrigger>
 
@@ -447,7 +448,7 @@ export const OrganisationMemberInviteDialog = ({
               <div className="mt-4 space-y-4">
                 <Card gradient className="h-32">
                   <CardContent
-                    className="text-muted-foreground/80 hover:text-muted-foreground/90 flex h-full cursor-pointer flex-col items-center justify-center rounded-lg p-0 transition-colors"
+                    className="flex h-full cursor-pointer flex-col items-center justify-center rounded-lg p-0 text-muted-foreground/80 transition-colors hover:text-muted-foreground/90"
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <Upload className="h-5 w-5" />

@@ -1,7 +1,7 @@
 import { createCanvas } from '@napi-rs/canvas';
 import type { TestInfo } from '@playwright/test';
 import { expect, test } from '@playwright/test';
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, FieldType } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
@@ -161,7 +161,16 @@ test('field placement visual regression', async ({ page, request }, testInfo) =>
   const uninsertedFields = await prisma.field.findMany({
     where: {
       envelopeId: envelope.id,
-      inserted: false,
+      OR: [
+        {
+          inserted: false,
+        },
+        {
+          // Include email fields because they are automatically inserted during envelope distribution.
+          // We need to extract it to override their values for accurate comparison in tests.
+          type: FieldType.EMAIL,
+        },
+      ],
     },
     include: {
       envelopeItem: {
@@ -298,8 +307,15 @@ test('field placement visual regression', async ({ page, request }, testInfo) =>
  *
  * DON'T COMMIT THIS WITHOUT THE "SKIP" COMMAND.
  */
-test.skip('download envelope images', async ({ page }) => {
+test.skip('download envelope images', async ({ page, request }) => {
   const { user, team } = await seedUser();
+
+  const { token: apiToken } = await createApiToken({
+    userId: user.id,
+    teamId: team.id,
+    tokenName: 'test',
+    expiresIn: null,
+  });
 
   const envelope = await seedAlignmentTestDocument({
     userId: user.id,
@@ -307,8 +323,17 @@ test.skip('download envelope images', async ({ page }) => {
     recipientName: user.name || '',
     recipientEmail: user.email,
     insertFields: true,
-    status: DocumentStatus.PENDING,
+    status: DocumentStatus.DRAFT,
   });
+
+  const distributeEnvelopeRequest = await request.post(`${baseUrl}/envelope/distribute`, {
+    headers: { Authorization: `Bearer ${apiToken}` },
+    data: {
+      envelopeId: envelope.id,
+    } satisfies TDistributeEnvelopeRequest,
+  });
+
+  expect(distributeEnvelopeRequest.ok()).toBeTruthy();
 
   const token = envelope.recipients[0].token;
 

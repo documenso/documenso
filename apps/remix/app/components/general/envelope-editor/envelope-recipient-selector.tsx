@@ -4,12 +4,13 @@ import type { I18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import type { Field, Recipient } from '@prisma/client';
+import type { Field } from '@prisma/client';
 import { RecipientRole, SendStatus } from '@prisma/client';
 import { Check, ChevronsUpDown, Info } from 'lucide-react';
 import { sortBy } from 'remeda';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import type { TEnvelopeRecipientLite } from '@documenso/lib/types/recipient';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { getRecipientColorStyles } from '@documenso/ui/lib/recipient-colors';
 import { cn } from '@documenso/ui/lib/utils';
@@ -26,9 +27,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 
 export interface EnvelopeRecipientSelectorProps {
   className?: string;
-  selectedRecipient: Recipient | null;
-  onSelectedRecipientChange: (recipient: Recipient) => void;
-  recipients: Recipient[];
+  selectedRecipient: TEnvelopeRecipientLite | null;
+  onSelectedRecipientChange: (recipient: TEnvelopeRecipientLite) => void;
+  recipients: TEnvelopeRecipientLite[];
   fields: Field[];
   align?: 'center' | 'end' | 'start';
 }
@@ -46,7 +47,7 @@ export const EnvelopeRecipientSelector = ({
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
   const getRecipientLabel = useCallback(
-    (recipient: Recipient) => extractRecipientLabel(recipient, recipients, i18n),
+    (recipient: TEnvelopeRecipientLite) => extractRecipientLabel(recipient, recipients, i18n),
     [recipients],
   );
 
@@ -59,12 +60,8 @@ export const EnvelopeRecipientSelector = ({
           role="combobox"
           className={cn(
             'justify-between bg-background font-normal text-muted-foreground hover:text-foreground',
-            getRecipientColorStyles(
-              Math.max(
-                recipients.findIndex((r) => r.id === selectedRecipient?.id),
-                0,
-              ),
-            ).comboxBoxTrigger,
+            getRecipientColorStyles(recipients.findIndex((r) => r.id === selectedRecipient?.id))
+              .comboBoxTrigger,
             className,
           )}
         >
@@ -95,9 +92,9 @@ export const EnvelopeRecipientSelector = ({
 
 interface EnvelopeRecipientSelectorCommandProps {
   className?: string;
-  selectedRecipient: Recipient | null;
-  onSelectedRecipientChange: (recipient: Recipient) => void;
-  recipients: Recipient[];
+  selectedRecipient: TEnvelopeRecipientLite | null;
+  onSelectedRecipientChange: (recipient: TEnvelopeRecipientLite) => void;
+  recipients: TEnvelopeRecipientLite[];
   fields: Field[];
   placeholder?: string;
 }
@@ -113,7 +110,7 @@ export const EnvelopeRecipientSelectorCommand = ({
   const { t, i18n } = useLingui();
 
   const recipientsByRole = useCallback(() => {
-    const recipientsByRole: Record<RecipientRole, Recipient[]> = {
+    const recipientsByRole: Record<RecipientRole, TEnvelopeRecipientLite[]> = {
       CC: [],
       VIEWER: [],
       SIGNER: [],
@@ -145,7 +142,7 @@ export const EnvelopeRecipientSelectorCommand = ({
               [(r) => r.signingOrder || Number.MAX_SAFE_INTEGER, 'asc'],
               [(r) => r.id, 'asc'],
             ),
-          ] as [RecipientRole, Recipient[]],
+          ] as [RecipientRole, TEnvelopeRecipientLite[]],
       );
   }, [recipientsByRole]);
 
@@ -160,7 +157,7 @@ export const EnvelopeRecipientSelectorCommand = ({
   );
 
   const getRecipientLabel = useCallback(
-    (recipient: Recipient) => extractRecipientLabel(recipient, recipients, i18n),
+    (recipient: TEnvelopeRecipientLite) => extractRecipientLabel(recipient, recipients, i18n),
     [recipients],
   );
 
@@ -197,12 +194,8 @@ export const EnvelopeRecipientSelectorCommand = ({
               key={recipient.id}
               className={cn(
                 'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
-                getRecipientColorStyles(
-                  Math.max(
-                    recipients.findIndex((r) => r.id === recipient.id),
-                    0,
-                  ),
-                ).comboxBoxItem,
+                getRecipientColorStyles(recipients.findIndex((r) => r.id === recipient.id))
+                  .comboBoxItem,
                 {
                   'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
                   'cursor-not-allowed': isRecipientDisabled(recipient.id),
@@ -255,7 +248,11 @@ export const EnvelopeRecipientSelectorCommand = ({
   );
 };
 
-const extractRecipientLabel = (recipient: Recipient, recipients: Recipient[], i18n: I18n) => {
+const extractRecipientLabel = (
+  recipient: TEnvelopeRecipientLite,
+  recipients: TEnvelopeRecipientLite[],
+  i18n: I18n,
+) => {
   if (recipient.name && recipient.email) {
     return `${recipient.name} (${recipient.email})`;
   }

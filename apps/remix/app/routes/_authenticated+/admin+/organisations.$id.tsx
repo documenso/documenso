@@ -2,20 +2,30 @@ import { useMemo } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { OrganisationMemberRole } from '@prisma/client';
 import { ExternalLinkIcon, InfoIcon, Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
+import { match } from 'ts-pattern';
 import type { z } from 'zod';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { SUBSCRIPTION_STATUS_MAP } from '@documenso/lib/constants/billing';
 import { AppError } from '@documenso/lib/errors/app-error';
+import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
+import type { TLicenseClaim } from '@documenso/lib/types/license';
 import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '@documenso/lib/types/subscription';
+import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import type { TGetAdminOrganisationResponse } from '@documenso/trpc/server/admin-router/get-admin-organisation.types';
 import { ZUpdateAdminOrganisationRequestSchema } from '@documenso/trpc/server/admin-router/update-admin-organisation.types';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@documenso/ui/primitives/accordion';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
@@ -35,13 +45,28 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
+import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
+import { AdminGlobalSettingsSection } from '~/components/general/admin-global-settings-section';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { SettingsHeader } from '~/components/general/settings-header';
 
 import type { Route } from './+types/organisations.$id';
 
-export default function OrganisationGroupSettingsPage({ params }: Route.ComponentProps) {
-  const { t } = useLingui();
+export async function loader() {
+  const licenseData = await LicenseClient.getInstance()?.getCachedLicense();
+
+  return {
+    licenseFlags: licenseData?.license?.flags,
+  };
+}
+
+export default function OrganisationGroupSettingsPage({
+  params,
+  loaderData,
+}: Route.ComponentProps) {
+  const { licenseFlags } = loaderData;
+
+  const { i18n, t } = useLingui();
   const { toast } = useToast();
 
   const navigate = useNavigate();
@@ -77,30 +102,101 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
       {
         header: t`Team`,
         accessorKey: 'name',
+        cell: ({ row }) => (
+          <Link className="font-medium hover:underline" to={`/admin/teams/${row.original.id}`}>
+            {row.original.name}
+          </Link>
+        ),
+      },
+      {
+        header: t`Team ID`,
+        accessorKey: 'id',
+        cell: ({ row }) => (
+          <span className="font-mono text-xs text-muted-foreground">{row.original.id}</span>
+        ),
       },
       {
         header: t`Team url`,
         accessorKey: 'url',
+        cell: ({ row }) => <span className="font-mono text-xs">{row.original.url}</span>,
+      },
+      {
+        header: t`Created`,
+        accessorKey: 'createdAt',
+        cell: ({ row }) => {
+          return (
+            <span className="whitespace-nowrap font-mono text-xs text-muted-foreground">
+              {i18n.date(row.original.createdAt)}
+            </span>
+          );
+        },
       },
     ] satisfies DataTableColumnDef<TGetAdminOrganisationResponse['teams'][number]>[];
-  }, []);
+  }, [i18n, t]);
 
   const organisationMembersColumns = useMemo(() => {
     return [
       {
         header: t`Member`,
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
-            <Link to={`/admin/users/${row.original.user.id}`}>{row.original.user.name}</Link>
-            {row.original.user.id === organisation?.ownerUserId && <Badge>Owner</Badge>}
+          <div className="space-y-1">
+            <Link
+              className="font-medium hover:underline"
+              to={`/admin/users/${row.original.user.id}`}
+            >
+              {row.original.user.name ?? row.original.user.email}
+            </Link>
+            {row.original.user.name && (
+              <div className="font-mono text-xs text-muted-foreground">
+                {row.original.user.email}
+              </div>
+            )}
           </div>
         ),
       },
       {
-        header: t`Email`,
+        header: t`User ID`,
+        accessorKey: 'userId',
         cell: ({ row }) => (
-          <Link to={`/admin/users/${row.original.user.id}`}>{row.original.user.email}</Link>
+          <span className="font-mono text-xs text-muted-foreground">{row.original.userId}</span>
         ),
+      },
+      {
+        header: t`Role`,
+        cell: ({ row }) => {
+          if (!organisation) {
+            return null;
+          }
+
+          const isOwner = row.original.userId === organisation.ownerUserId;
+
+          if (isOwner) {
+            return <Badge>{t`Owner`}</Badge>;
+          }
+
+          const highestRole = getHighestOrganisationRoleInGroup(
+            row.original.organisationGroupMembers.map((ogm) => ogm.group),
+          );
+
+          const roleLabel = match(highestRole)
+            .with(OrganisationMemberRole.ADMIN, () => t`Admin`)
+            .with(OrganisationMemberRole.MANAGER, () => t`Manager`)
+            .with(OrganisationMemberRole.MEMBER, () => t`Member`)
+            .exhaustive();
+
+          return <Badge variant="secondary">{roleLabel}</Badge>;
+        },
+      },
+      {
+        header: t`Joined`,
+        accessorKey: 'createdAt',
+        cell: ({ row }) => {
+          return (
+            <span className="whitespace-nowrap font-mono text-xs text-muted-foreground">
+              {i18n.date(row.original.createdAt)}
+            </span>
+          );
+        },
       },
       {
         header: t`Actions`,
@@ -124,12 +220,12 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
         },
       },
     ] satisfies DataTableColumnDef<TGetAdminOrganisationResponse['members'][number]>[];
-  }, [organisation]);
+  }, [organisation, i18n, t]);
 
   if (isLoadingOrganisation) {
     return (
       <div className="flex items-center justify-center rounded-lg py-32">
-        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
+        <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -172,6 +268,61 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
 
       <GenericOrganisationAdminForm organisation={organisation} />
 
+      <div className="mt-6 rounded-lg border p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-medium">
+              <Trans>Organisation usage</Trans>
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              <Trans>Current usage against organisation limits.</Trans>
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+          <DetailsCard label={<Trans>Members</Trans>}>
+            <DetailsValue>
+              {organisation.members.length} /{' '}
+              {organisation.organisationClaim.memberCount === 0
+                ? t`Unlimited`
+                : organisation.organisationClaim.memberCount}
+            </DetailsValue>
+          </DetailsCard>
+
+          <DetailsCard label={<Trans>Teams</Trans>}>
+            <DetailsValue>
+              {organisation.teams.length} /{' '}
+              {organisation.organisationClaim.teamCount === 0
+                ? t`Unlimited`
+                : organisation.organisationClaim.teamCount}
+            </DetailsValue>
+          </DetailsCard>
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-lg border p-4">
+        <Accordion type="single" collapsible>
+          <AccordionItem value="global-settings" className="border-b-0">
+            <AccordionTrigger className="py-0">
+              <div className="text-left">
+                <p className="text-sm font-medium">
+                  <Trans>Global Settings</Trans>
+                </p>
+                <p className="mt-1 text-sm font-normal text-muted-foreground">
+                  <Trans>Default settings applied to this organisation.</Trans>
+                </p>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="mt-4">
+                <AdminGlobalSettingsSection settings={organisation.organisationGlobalSettings} />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
+
       <SettingsHeader
         title={t`Manage subscription`}
         subtitle={t`Manage the ${organisation.name} organisation subscription`}
@@ -190,10 +341,13 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
           <AlertDescription className="mr-2">
             {organisation.subscription ? (
               <span>
-                {SUBSCRIPTION_STATUS_MAP[organisation.subscription.status]} subscription found
+                {i18n._(SUBSCRIPTION_STATUS_MAP[organisation.subscription.status])} subscription
+                found
               </span>
             ) : (
-              <span>No subscription found</span>
+              <span>
+                <Trans>No subscription found</Trans>
+              </span>
             )}
           </AlertDescription>
         </div>
@@ -239,7 +393,7 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
         )}
       </Alert>
 
-      <OrganisationAdminForm organisation={organisation} />
+      <OrganisationAdminForm organisation={organisation} licenseFlags={licenseFlags} />
 
       <div className="mt-16 space-y-10">
         <div>
@@ -278,6 +432,7 @@ type TUpdateGenericOrganisationDataFormSchema = z.infer<
 
 type OrganisationAdminFormOptions = {
   organisation: TGetAdminOrganisationResponse;
+  licenseFlags?: TLicenseClaim;
 };
 
 const GenericOrganisationAdminForm = ({ organisation }: OrganisationAdminFormOptions) => {
@@ -349,7 +504,7 @@ const GenericOrganisationAdminForm = ({ organisation }: OrganisationAdminFormOpt
                 <Input {...field} />
               </FormControl>
               {!form.formState.errors.url && (
-                <span className="text-foreground/50 text-xs font-normal">
+                <span className="text-xs font-normal text-foreground/50">
                   {field.value ? (
                     `${NEXT_PUBLIC_WEBAPP_URL()}/o/${field.value}`
                   ) : (
@@ -381,11 +536,16 @@ const ZUpdateOrganisationBillingFormSchema = ZUpdateAdminOrganisationRequestSche
 
 type TUpdateOrganisationBillingFormSchema = z.infer<typeof ZUpdateOrganisationBillingFormSchema>;
 
-const OrganisationAdminForm = ({ organisation }: OrganisationAdminFormOptions) => {
+const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdminFormOptions) => {
   const { toast } = useToast();
   const { t } = useLingui();
 
   const { mutateAsync: updateOrganisation } = trpc.admin.organisation.update.useMutation();
+
+  const hasRestrictedEnterpriseFeatures = Object.values(SUBSCRIPTION_CLAIM_FEATURE_FLAGS).some(
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    (flag) => flag.isEnterprise && !licenseFlags?.[flag.key as keyof TLicenseClaim],
+  );
 
   const form = useForm<TUpdateOrganisationBillingFormSchema>({
     resolver: zodResolver(ZUpdateOrganisationBillingFormSchema),
@@ -440,7 +600,7 @@ const OrganisationAdminForm = ({ organisation }: OrganisationAdminFormOptions) =
                     <InfoIcon className="mx-2 h-4 w-4" />
                   </TooltipTrigger>
 
-                  <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+                  <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
                     <h2>
                       <strong>
                         <Trans>Inherited subscription claim</Trans>
@@ -493,7 +653,7 @@ const OrganisationAdminForm = ({ organisation }: OrganisationAdminFormOptions) =
                 <Link
                   target="_blank"
                   to={`https://dashboard.stripe.com/customers/${field.value}`}
-                  className="text-foreground/50 text-xs font-normal"
+                  className="text-xs font-normal text-foreground/50"
                 >
                   {`https://dashboard.stripe.com/customers/${field.value}`}
                 </Link>
@@ -582,34 +742,57 @@ const OrganisationAdminForm = ({ organisation }: OrganisationAdminFormOptions) =
           </FormLabel>
 
           <div className="mt-2 space-y-2 rounded-md border p-4">
-            {Object.values(SUBSCRIPTION_CLAIM_FEATURE_FLAGS).map(({ key, label }) => (
-              <FormField
-                key={key}
-                control={form.control}
-                name={`claims.flags.${key}`}
-                render={({ field }) => (
-                  <FormItem className="flex items-center space-x-2">
-                    <FormControl>
-                      <div className="flex items-center">
-                        <Checkbox
-                          id={`flag-${key}`}
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+            {Object.values(SUBSCRIPTION_CLAIM_FEATURE_FLAGS).map(({ key, label, isEnterprise }) => {
+              const isRestrictedFeature =
+                isEnterprise && !licenseFlags?.[key as keyof TLicenseClaim]; // eslint-disable-line @typescript-eslint/consistent-type-assertions
 
-                        <label
-                          className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
-                          htmlFor={`flag-${key}`}
-                        >
-                          {label}
-                        </label>
-                      </div>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            ))}
+              return (
+                <FormField
+                  key={key}
+                  control={form.control}
+                  name={`claims.flags.${key}`}
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-x-2">
+                      <FormControl>
+                        <div className="flex items-center">
+                          <Checkbox
+                            id={`flag-${key}`}
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={isRestrictedFeature && !field.value} // Allow disabling of restricted features.
+                          />
+
+                          <label
+                            className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
+                            htmlFor={`flag-${key}`}
+                          >
+                            {label}
+                            {isRestrictedFeature && ' ¹'}
+                          </label>
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              );
+            })}
           </div>
+
+          {hasRestrictedEnterpriseFeatures && (
+            <Alert variant="neutral" className="mt-4">
+              <AlertDescription>
+                <span>¹&nbsp;</span>
+                <Trans>Your current license does not include these features.</Trans>{' '}
+                <Link
+                  to="https://docs.documenso.com/users/licenses/enterprise-edition"
+                  target="_blank"
+                  className="text-foreground underline hover:opacity-80"
+                >
+                  <Trans>Learn more</Trans>
+                </Link>
+              </AlertDescription>
+            </Alert>
+          )}
         </div>
 
         <div className="flex justify-end">

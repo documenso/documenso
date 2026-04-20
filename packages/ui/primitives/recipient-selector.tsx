@@ -2,12 +2,12 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
 import { RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 import { Check, ChevronsUpDown, Info } from 'lucide-react';
 import { sortBy } from 'remeda';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 
 import { getRecipientColorStyles } from '../lib/recipient-colors';
 import { cn } from '../lib/utils';
@@ -18,9 +18,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './tooltip';
 
 export interface RecipientSelectorProps {
   className?: string;
-  selectedRecipient: Recipient | null;
-  onSelectedRecipientChange: (recipient: Recipient) => void;
-  recipients: Recipient[];
+  selectedRecipient: TRecipientLite | null;
+  onSelectedRecipientChange: (recipient: TRecipientLite) => void;
+  recipients: TRecipientLite[];
   align?: 'center' | 'end' | 'start';
 }
 
@@ -35,7 +35,7 @@ export const RecipientSelector = ({
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
   const recipientsByRole = useMemo(() => {
-    const recipientsWithRole: Record<RecipientRole, Recipient[]> = {
+    const recipientsWithRole: Record<RecipientRole, TRecipientLite[]> = {
       CC: [],
       VIEWER: [],
       SIGNER: [],
@@ -67,12 +67,12 @@ export const RecipientSelector = ({
               [(r) => r.signingOrder || Number.MAX_SAFE_INTEGER, 'asc'],
               [(r) => r.id, 'asc'],
             ),
-          ] as [RecipientRole, Recipient[]],
+          ] as [RecipientRole, TRecipientLite[]],
       );
   }, [recipientsByRole]);
 
   const getRecipientLabel = useCallback(
-    (recipient: Recipient) => {
+    (recipient: TRecipientLite) => {
       if (recipient.name && recipient.email) {
         return `${recipient.name} (${recipient.email})`;
       }
@@ -101,13 +101,9 @@ export const RecipientSelector = ({
           variant="outline"
           role="combobox"
           className={cn(
-            'bg-background text-muted-foreground hover:text-foreground justify-between font-normal',
-            getRecipientColorStyles(
-              Math.max(
-                recipients.findIndex((r) => r.id === selectedRecipient?.id),
-                0,
-              ),
-            ).comboxBoxTrigger,
+            'justify-between bg-background font-normal text-muted-foreground hover:text-foreground',
+            getRecipientColorStyles(recipients.findIndex((r) => r.id === selectedRecipient?.id))
+              .comboBoxTrigger,
             className,
           )}
         >
@@ -126,21 +122,21 @@ export const RecipientSelector = ({
           <CommandInput />
 
           <CommandEmpty>
-            <span className="text-muted-foreground inline-block px-4">
+            <span className="inline-block px-4 text-muted-foreground">
               <Trans>No recipient matching this description was found.</Trans>
             </span>
           </CommandEmpty>
 
           {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
             <CommandGroup key={roleIndex}>
-              <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
+              <div className="mb-1 ml-2 mt-2 text-xs font-medium text-muted-foreground">
                 {_(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
               </div>
 
               {roleRecipients.length === 0 && (
                 <div
                   key={`${role}-empty`}
-                  className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
+                  className="px-4 pb-4 pt-2.5 text-center text-xs text-muted-foreground/80"
                 >
                   <Trans>No recipients with this role</Trans>
                 </div>
@@ -151,12 +147,8 @@ export const RecipientSelector = ({
                   key={recipient.id}
                   className={cn(
                     'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
-                    getRecipientColorStyles(
-                      Math.max(
-                        recipients.findIndex((r) => r.id === recipient.id),
-                        0,
-                      ),
-                    ).comboxBoxItem,
+                    getRecipientColorStyles(recipients.findIndex((r) => r.id === recipient.id))
+                      .comboBoxItem,
                     {
                       'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
                     },
@@ -168,7 +160,7 @@ export const RecipientSelector = ({
                   disabled={recipient.signingStatus !== SigningStatus.NOT_SIGNED}
                 >
                   <span
-                    className={cn('text-foreground/70 truncate', {
+                    className={cn('truncate text-foreground/70', {
                       'text-foreground/80': recipient.id === selectedRecipient?.id,
                     })}
                   >
@@ -190,7 +182,7 @@ export const RecipientSelector = ({
                           <Info className="ml-2 h-4 w-4" />
                         </TooltipTrigger>
 
-                        <TooltipContent className="text-muted-foreground max-w-xs">
+                        <TooltipContent className="max-w-xs text-muted-foreground">
                           <Trans>
                             This document has already been sent to this recipient. You can no longer
                             edit this recipient.

@@ -1,4 +1,4 @@
-import type { DocumentData, Envelope, EnvelopeItem, Field } from '@prisma/client';
+import type { DocumentData, Envelope, EnvelopeItem, Field, Recipient } from '@prisma/client';
 import {
   DocumentSigningOrder,
   DocumentStatus,
@@ -10,6 +10,7 @@ import {
   WebhookTriggerEvents,
 } from '@prisma/client';
 
+import { resolveExpiresAt } from '@documenso/lib/constants/envelope-expiration';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
@@ -17,6 +18,7 @@ import { prisma } from '@documenso/prisma';
 import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 
 import { validateCheckboxLength } from '../../advanced-fields-validation/validate-checkbox';
+import { DIRECT_TEMPLATE_RECIPIENT_EMAIL } from '../../constants/direct-templates';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
@@ -38,7 +40,10 @@ import { isDocumentCompleted } from '../../utils/document';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { toCheckboxCustomText, toRadioCustomText } from '../../utils/fields';
-import { isRecipientEmailValidForSending } from '../../utils/recipients';
+import {
+  getRecipientsWithMissingFields,
+  isRecipientEmailValidForSending,
+} from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -150,30 +155,21 @@ export const sendDocument = async ({
     }
   });
 
-  // Commented out server side checks for minimum 1 signature per signer now since we need to
-  // decide if we want to enforce this for API & templates.
-  // const fields = await getFieldsForDocument({
-  //   documentId: documentId,
-  //   userId: userId,
-  // });
+  // Validate that recipients who require fields (e.g., signers need signature fields) have them.
+  const recipientsWithMissingFields = getRecipientsWithMissingFields(
+    envelope.recipients,
+    envelope.fields,
+  );
 
-  // const fieldsWithSignerEmail = fields.map((field) => ({
-  //   ...field,
-  //   signerEmail:
-  //     envelope.Recipient.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
-  // }));
+  if (recipientsWithMissingFields.length > 0) {
+    const missingRecipientDescriptions = recipientsWithMissingFields
+      .map((r) => (r.name ? `${r.name} (${r.email}, id: ${r.id})` : `${r.email} (id: ${r.id})`))
+      .join(', ');
 
-  // const everySignerHasSignature = document?.Recipient.every(
-  //   (recipient) =>
-  //     recipient.role !== RecipientRole.SIGNER ||
-  //     fieldsWithSignerEmail.some(
-  //       (field) => field.type === 'SIGNATURE' && field.signerEmail === recipient.email,
-  //     ),
-  // );
-
-  // if (!everySignerHasSignature) {
-  //   throw new Error('Some signers have not been assigned a signature field.');
-  // }
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `The following recipients are missing required fields: ${missingRecipientDescriptions}. Signers must have at least one signature field.`,
+    });
+  }
 
   const allRecipientsHaveNoActionToTake = envelope.recipients.every(
     (recipient) =>
@@ -214,7 +210,7 @@ export const sendDocument = async ({
         });
       }
 
-      const fieldToAutoInsert = extractFieldAutoInsertValues(unknownField);
+      const fieldToAutoInsert = extractFieldAutoInsertValues(unknownField, recipient);
 
       // Only auto-insert fields if the recipient has not been sent the document yet.
       if (fieldToAutoInsert && recipient.sendStatus !== SendStatus.SENT) {
@@ -264,6 +260,28 @@ export const sendDocument = async ({
           },
           // Don't put metadata or user here since it's a system event.
         }),
+      });
+    }
+
+    const expiresAt = resolveExpiresAt(envelope.documentMeta?.envelopeExpirationPeriod ?? null);
+
+    // Set expiresAt on each recipient that hasn't already signed/rejected.
+    // Exclude CC recipients since they don't sign and shouldn't be subject to expiry.
+    if (expiresAt) {
+      await tx.recipient.updateMany({
+        where: {
+          envelopeId: envelope.id,
+          signingStatus: {
+            notIn: [SigningStatus.SIGNED, SigningStatus.REJECTED],
+          },
+          role: {
+            not: RecipientRole.CC,
+          },
+        },
+        data: {
+          expiresAt,
+          expirationNotifiedAt: null,
+        },
       });
     }
 
@@ -361,6 +379,7 @@ const injectFormValuesIntoDocument = async (
  */
 export const extractFieldAutoInsertValues = (
   unknownField: Field,
+  recipient: Pick<Recipient, 'email'>,
 ): { fieldId: number; customText: string } | null => {
   const parsedField = ZFieldAndMetaSchema.safeParse(unknownField);
 
@@ -372,6 +391,18 @@ export const extractFieldAutoInsertValues = (
 
   const field = parsedField.data;
   const fieldId = unknownField.id;
+
+  // Auto insert email fields if the recipient has a valid email.
+  if (
+    field.type === FieldType.EMAIL &&
+    isRecipientEmailValidForSending(recipient) &&
+    recipient.email !== DIRECT_TEMPLATE_RECIPIENT_EMAIL
+  ) {
+    return {
+      fieldId,
+      customText: recipient.email,
+    };
+  }
 
   // Auto insert text fields with prefilled values.
   if (field.type === FieldType.TEXT) {

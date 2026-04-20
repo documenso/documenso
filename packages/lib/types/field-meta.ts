@@ -1,4 +1,3 @@
-import { msg } from '@lingui/core/macro';
 import { FieldType } from '@prisma/client';
 import { z } from 'zod';
 
@@ -88,7 +87,7 @@ export const ZTextFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('text'),
   text: z.string().optional(),
   characterLimit: z.coerce
-    .number({ invalid_type_error: msg`Value must be a number`.id })
+    .number({ invalid_type_error: 'Value must be a number' })
     .min(0)
     .optional(),
   textAlign: ZFieldTextAlignSchema.optional(),
@@ -420,4 +419,4 @@ export const ZEnvelopeFieldAndMetaSchema = z.discriminatedUnion('type', [
   }),
 ]);
 
-type TEnvelopeFieldAndMeta = z.infer<typeof ZEnvelopeFieldAndMetaSchema>;
+export type TEnvelopeFieldAndMeta = z.infer<typeof ZEnvelopeFieldAndMetaSchema>;

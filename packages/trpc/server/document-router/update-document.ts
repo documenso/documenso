@@ -5,14 +5,14 @@ import { authenticatedProcedure } from '../trpc';
 import {
   ZUpdateDocumentRequestSchema,
   ZUpdateDocumentResponseSchema,
+  updateDocumentMeta,
 } from './update-document.types';
-import { updateDocumentMeta as updateDocumentTrpcMeta } from './update-document.types';
 
 /**
  * Public route.
  */
 export const updateDocumentRoute = authenticatedProcedure
-  .meta(updateDocumentTrpcMeta)
+  .meta(updateDocumentMeta)
   .input(ZUpdateDocumentRequestSchema)
   .output(ZUpdateDocumentResponseSchema)
   .mutation(async ({ input, ctx }) => {

@@ -1,4 +1,4 @@
-import { PDFDocument } from '@cantoo/pdf-lib';
+import { PDF } from '@libpdf/core';
 import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
 import { match } from 'ts-pattern';
@@ -16,16 +16,22 @@ type File = {
   arrayBuffer: () => Promise<ArrayBuffer>;
 };
 
+type PutPdfFileOptions = {
+  initialData?: string;
+  originalData?: string;
+  originalMimeType?: string;
+};
+
 /**
  * Uploads a document file to the appropriate storage location and creates
  * a document data record.
  */
-export const putPdfFileServerSide = async (file: File) => {
+export const putPdfFileServerSide = async (file: File, options: PutPdfFileOptions = {}) => {
   const isEncryptedDocumentsAllowed = false; // Was feature flag.
 
   const arrayBuffer = await file.arrayBuffer();
 
-  const pdf = await PDFDocument.load(arrayBuffer).catch((e) => {
+  const pdf = await PDF.load(new Uint8Array(arrayBuffer)).catch((e) => {
     console.error(`PDF upload parse error: ${e.message}`);
 
     throw new AppError('INVALID_DOCUMENT_FILE');
@@ -41,7 +47,18 @@ export const putPdfFileServerSide = async (file: File) => {
 
   const { type, data } = await putFileServerSide(file);
 
-  return await createDocumentData({ type, data });
+  const createdData = await createDocumentData({
+    type,
+    data,
+    initialData: options.initialData,
+    originalData: options.originalData,
+    originalMimeType: options.originalMimeType,
+  });
+
+  return {
+    documentData: createdData,
+    filePageCount: pdf.getPageCount(),
+  };
 };
 
 type PutNormalizedPdfOptions = {

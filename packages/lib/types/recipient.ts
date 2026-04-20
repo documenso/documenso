@@ -1,10 +1,10 @@
-import { msg } from '@lingui/core/macro';
 import { z } from 'zod';
 
 import { RecipientSchema } from '@documenso/prisma/generated/zod/modelSchema/RecipientSchema';
 import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import { UserSchema } from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
 
+import { zEmail } from '../utils/zod';
 import { ZFieldSchema } from './field';
 
 /**
@@ -23,7 +23,9 @@ export const ZRecipientSchema = RecipientSchema.pick({
   name: true,
   token: true,
   documentDeletedAt: true,
-  expired: true,
+  expired: true, // deprecated Not in use. To be removed in a future migration.
+  expiresAt: true,
+  expirationNotifiedAt: true,
   signedAt: true,
   authOptions: true,
   signingOrder: true,
@@ -50,7 +52,9 @@ export const ZRecipientLiteSchema = RecipientSchema.pick({
   name: true,
   token: true,
   documentDeletedAt: true,
-  expired: true,
+  expired: true, // !: deprecated Not in use. To be removed in a future migration.
+  expiresAt: true,
+  expirationNotifiedAt: true,
   signedAt: true,
   authOptions: true,
   signingOrder: true,
@@ -75,7 +79,9 @@ export const ZRecipientManySchema = RecipientSchema.pick({
   name: true,
   token: true,
   documentDeletedAt: true,
-  expired: true,
+  expired: true, // !: deprecated Not in use. To be removed in a future migration.
+  expiresAt: true,
+  expirationNotifiedAt: true,
   signedAt: true,
   authOptions: true,
   signingOrder: true,
@@ -112,12 +118,14 @@ export const ZEnvelopeRecipientManySchema = ZRecipientManySchema.omit({
   templateId: true,
 });
 
+export type TRecipientSchema = z.infer<typeof ZRecipientSchema>;
+export type TRecipientLite = z.infer<typeof ZRecipientLiteSchema>;
+export type TRecipientMany = z.infer<typeof ZRecipientManySchema>;
+export type TEnvelopeRecipientSchema = z.infer<typeof ZEnvelopeRecipientSchema>;
+export type TEnvelopeRecipientLite = z.infer<typeof ZEnvelopeRecipientLiteSchema>;
+export type TEnvelopeRecipientMany = z.infer<typeof ZEnvelopeRecipientManySchema>;
+
 export const ZRecipientEmailSchema = z.union([
   z.literal(''),
-  z
-    .string()
-    .trim()
-    .toLowerCase()
-    .email({ message: msg`Invalid email`.id })
-    .max(254),
+  zEmail('Invalid email').trim().toLowerCase().max(254),
 ]);
