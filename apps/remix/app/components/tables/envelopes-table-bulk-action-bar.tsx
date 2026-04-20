@@ -43,11 +43,7 @@ export const EnvelopesTableBulkActionBar = ({
   }
 
   return (
-    <div
-      role="toolbar"
-      aria-label={t`Bulk actions`}
-      className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-x-1 rounded-xl bg-popover/95 p-1.5 text-popover-foreground shadow-lg ring-1 ring-black/10 backdrop-blur-md supports-[backdrop-filter]:bg-popover/80 dark:ring-white/10"
-    >
+    <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-x-1 rounded-xl bg-popover/95 p-1.5 text-popover-foreground shadow-lg ring-1 ring-black/10 backdrop-blur-md supports-[backdrop-filter]:bg-popover/80 dark:ring-white/10">
       <div className="flex items-center gap-x-2 px-2">
         <span className="flex h-5 min-w-5 items-center justify-center rounded-md bg-primary px-1 text-xs font-semibold tabular-nums text-primary-foreground">
           {selectedCount}
