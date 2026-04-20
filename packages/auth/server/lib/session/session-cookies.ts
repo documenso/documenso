@@ -35,7 +35,6 @@ export const sessionCookieOptions = {
   sameSite: useSecureCookies ? 'none' : 'lax',
   secure: useSecureCookies,
   domain: getCookieDomain(),
-  expires: new Date(Date.now() + AUTH_SESSION_LIFETIME),
 } as const;
 
 export const extractSessionCookieFromHeaders = (headers: Headers): string | null => {
@@ -66,7 +65,7 @@ export const setSessionCookie = async (c: Context, sessionToken: string) => {
     sessionCookieName,
     sessionToken,
     getAuthSecret(),
-    sessionCookieOptions,
+    { ...sessionCookieOptions, expires: new Date(Date.now() + AUTH_SESSION_LIFETIME) },
   ).catch((err) => {
     appLog('SetSessionCookie', `Error setting signed cookie: ${err}`);
 
