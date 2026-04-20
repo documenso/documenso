@@ -26,6 +26,7 @@ import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { CommandDialog } from '@documenso/ui/primitives/command';
 
 import { fieldButtonList } from './envelope-editor-fields-drag-drop';
+import { arrangeDuplicatedFields } from './envelope-editor-fields-validator';
 import { EnvelopeRecipientSelectorCommand } from './envelope-recipient-selector';
 
 export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
@@ -443,6 +444,55 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     pageLayer.current.batchDraw();
   }, [localPageFields, selectedKonvaFieldGroups]);
 
+  const getScrollableParent = (node: HTMLElement | null): HTMLElement | null => {
+    if (!node) return null;
+    const overflowY = window.getComputedStyle(node).overflowY;
+    const isScrollable = overflowY === 'auto' || overflowY === 'scroll';
+    if (isScrollable && node.scrollHeight > node.clientHeight) {
+      return node;
+    }
+    return getScrollableParent(node.parentElement);
+  };
+
+  useEffect(() => {
+    const handleSelectField = (e: Event) => {
+      const { formId } = (e as CustomEvent).detail;
+      const field = localPageFields.find((f) => f.formId === formId);
+      if (!field || !pageLayer.current || !stage.current) {
+        return;
+      }
+      const fieldGroup = pageLayer.current.findOne<Konva.Group>(`#${formId}`);
+      if (!fieldGroup) {
+        return;
+      }
+      setSelectedFields([fieldGroup]);
+      pageLayer.current.batchDraw();
+
+      if (konvaContainer.current) {
+        const fieldRect = fieldGroup.getClientRect();
+        konvaContainer.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+        const scrollableParent = getScrollableParent(konvaContainer.current);
+        if (scrollableParent) {
+          const containerRect = konvaContainer.current.getBoundingClientRect();
+          const fieldAbsoluteTop = containerRect.top + fieldRect.y + fieldRect.height / 2;
+          const scrollTarget =
+            scrollableParent.scrollTop +
+            fieldAbsoluteTop -
+            scrollableParent.getBoundingClientRect().top -
+            scrollableParent.clientHeight / 2;
+          scrollableParent.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+        }
+      }
+    };
+    window.addEventListener('envelope:select-field', handleSelectField);
+    return () => {
+      window.removeEventListener('envelope:select-field', handleSelectField);
+    };
+  }, [localPageFields, konvaContainer, pageLayer, stage]);
+
   const setSelectedFields = (nodes: Konva.Node[]) => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const fieldGroups = nodes.filter(
@@ -493,6 +543,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       .map((field) => editorFields.getFieldByFormId(field.id()))
       .filter((field) => field !== undefined);
 
+    arrangeDuplicatedFields(fields, editorFields.localFields);
     for (const field of fields) {
       editorFields.duplicateField(field);
     }
