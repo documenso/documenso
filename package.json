@@ -5,7 +5,7 @@
     "apps/*",
     "packages/*"
   ],
-  "version": "2.8.0",
+  "version": "2.9.0",
   "scripts": {
     "postinstall": "patch-package",
     "build": "turbo run build",
@@ -98,6 +98,7 @@
     "posthog-node": "4.18.0",
     "react": "^18",
     "typescript": "5.6.2",
+    "@marsidev/react-turnstile": "^1.5.0",
     "zod": "^3.25.76"
   },
   "overrides": {

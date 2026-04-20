@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export const SUPPORTED_LANGUAGE_CODES = [
   'de',
   'en',
@@ -19,3 +21,5 @@ export const APP_I18N_OPTIONS = {
   sourceLang: 'en',
   defaultLocale: 'en-US',
 } as const;
+
+export const ZSupportedLanguageCodeSchema = z.enum(SUPPORTED_LANGUAGE_CODES).catch('en');

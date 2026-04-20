@@ -43,6 +43,7 @@ export const ZEnvelopeEditorSettingsSchema = z.object({
       allowConfigureRedirectUrl: z.boolean(),
       allowConfigureDistribution: z.boolean(),
       allowConfigureExpirationPeriod: z.boolean(),
+      allowConfigureReminders: z.boolean(),
       allowConfigureEmailSender: z.boolean(),
       allowConfigureEmailReplyTo: z.boolean(),
     })
@@ -56,6 +57,7 @@ export const ZEnvelopeEditorSettingsSchema = z.object({
     allowDistributing: z.boolean(),
     allowDirectLink: z.boolean(),
     allowDuplication: z.boolean(),
+    allowSaveAsTemplate: z.boolean(),
     allowDownloadPDF: z.boolean(),
     allowDeletion: z.boolean(),
   }),
@@ -71,6 +73,7 @@ export const ZEnvelopeEditorSettingsSchema = z.object({
       allowConfigureOrder: z.boolean(),
       allowUpload: z.boolean(),
       allowDelete: z.boolean(),
+      allowReplace: z.boolean(),
     })
     .nullable(),
 
@@ -120,6 +123,7 @@ export const DEFAULT_EDITOR_CONFIG: EnvelopeEditorConfig = {
     allowConfigureRedirectUrl: true,
     allowConfigureDistribution: true,
     allowConfigureExpirationPeriod: true,
+    allowConfigureReminders: true,
     allowConfigureEmailSender: true,
     allowConfigureEmailReplyTo: true,
   },
@@ -128,6 +132,7 @@ export const DEFAULT_EDITOR_CONFIG: EnvelopeEditorConfig = {
     allowDistributing: true,
     allowDirectLink: true,
     allowDuplication: true,
+    allowSaveAsTemplate: true,
     allowDownloadPDF: true,
     allowDeletion: true,
   },
@@ -136,6 +141,7 @@ export const DEFAULT_EDITOR_CONFIG: EnvelopeEditorConfig = {
     allowConfigureOrder: true,
     allowUpload: true,
     allowDelete: true,
+    allowReplace: true,
   },
   recipients: {
     allowAIDetection: true,
@@ -176,6 +182,7 @@ export const DEFAULT_EMBEDDED_EDITOR_CONFIG = {
     allowConfigureRedirectUrl: true,
     allowConfigureDistribution: true,
     allowConfigureExpirationPeriod: true,
+    allowConfigureReminders: true,
     allowConfigureEmailSender: true,
     allowConfigureEmailReplyTo: true,
   },
@@ -184,6 +191,7 @@ export const DEFAULT_EMBEDDED_EDITOR_CONFIG = {
     allowDistributing: false, // These are not supported for embeds, and are directly excluded in the embedded repo.
     allowDirectLink: false, // These are not supported for embeds, and are directly excluded in the embedded repo.
     allowDuplication: false, // These are not supported for embeds, and are directly excluded in the embedded repo.
+    allowSaveAsTemplate: false, // These are not supported for embeds, and are directly excluded in the embedded repo.
     allowDownloadPDF: false, // These are not supported for embeds, and are directly excluded in the embedded repo.
     allowDeletion: false, // These are not supported for embeds, and are directly excluded in the embedded repo.
   },
@@ -192,6 +200,7 @@ export const DEFAULT_EMBEDDED_EDITOR_CONFIG = {
     allowConfigureOrder: true,
     allowUpload: true,
     allowDelete: true,
+    allowReplace: true,
   },
   recipients: {
     allowAIDetection: false, // These are not supported for embeds, and are directly excluded in the embedded repo.
@@ -265,6 +274,7 @@ export const ZEditorEnvelopeSchema = EnvelopeSchema.pick({
     emailId: true,
     emailReplyTo: true,
     envelopeExpirationPeriod: true,
+    reminderSettings: true,
   }),
   recipients: ZEnvelopeRecipientLiteSchema.array(),
   fields: ZEnvelopeFieldSchema.array(),

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { Field, Recipient } from '@prisma/client';
+import type { Field } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -61,7 +61,7 @@ type UseEditorFieldsResponse = {
   getFieldsByRecipient: (recipientId: number) => TLocalField[];
 
   // Selected recipient
-  selectedRecipient: Recipient | null;
+  selectedRecipient: TEditorEnvelope['recipients'][number] | null;
   setSelectedRecipient: (recipientId: number | null) => void;
 
   resetForm: (fields?: Field[]) => void;

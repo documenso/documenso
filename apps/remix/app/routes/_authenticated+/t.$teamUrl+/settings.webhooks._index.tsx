@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { Plural, useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import type { Webhook } from '@prisma/client';
@@ -28,7 +29,7 @@ import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Webhooks');
+  return appMetaTags(msg`Webhooks`);
 }
 
 export default function WebhookPage() {

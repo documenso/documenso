@@ -7,6 +7,7 @@
 import { DocumentSource, FieldType } from '@prisma/client';
 import { z } from 'zod';
 
+import { zEmail } from '../utils/zod';
 import { ZRecipientAccessAuthTypesSchema, ZRecipientActionAuthTypesSchema } from './document-auth';
 
 export const ZDocumentAuditLogTypeSchema = z.enum([
@@ -23,6 +24,8 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
 
   'ENVELOPE_ITEM_CREATED',
   'ENVELOPE_ITEM_DELETED',
+  'ENVELOPE_ITEM_UPDATED',
+  'ENVELOPE_ITEM_PDF_REPLACED',
 
   // Document events.
   'DOCUMENT_COMPLETED', // When the document is sealed and fully completed.
@@ -60,6 +63,7 @@ export const ZDocumentAuditLogEmailTypeSchema = z.enum([
   'ASSISTING_REQUEST',
   'CC',
   'DOCUMENT_COMPLETED',
+  'REMINDER',
 ]);
 
 export const ZDocumentMetaDiffTypeSchema = z.enum([
@@ -210,6 +214,34 @@ export const ZDocumentAuditLogEventEnvelopeItemDeletedSchema = z.object({
 });
 
 /**
+ * Event: Envelope item updated.
+ */
+export const ZDocumentAuditLogEventEnvelopeItemUpdatedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_UPDATED),
+  data: z.object({
+    envelopeItemId: z.string(),
+    changes: z.array(
+      z.object({
+        field: z.string(),
+        from: z.string(),
+        to: z.string(),
+      }),
+    ),
+  }),
+});
+
+/**
+ * Event: Envelope item PDF replaced.
+ */
+export const ZDocumentAuditLogEventEnvelopeItemPdfReplacedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_PDF_REPLACED),
+  data: z.object({
+    envelopeItemId: z.string(),
+    envelopeItemTitle: z.string(),
+  }),
+});
+
+/**
  * Event: Email sent.
  */
 export const ZDocumentAuditLogEventEmailSentSchema = z.object({
@@ -249,7 +281,7 @@ export const ZDocumentAuditLogEventDocumentCreatedSchema = z.object({
         z.object({
           type: z.literal(DocumentSource.TEMPLATE_DIRECT_LINK),
           templateId: z.number(),
-          directRecipientEmail: z.string().email(),
+          directRecipientEmail: zEmail(),
         }),
       ])
       .optional(),
@@ -722,6 +754,8 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
   z.union([
     ZDocumentAuditLogEventEnvelopeItemCreatedSchema,
     ZDocumentAuditLogEventEnvelopeItemDeletedSchema,
+    ZDocumentAuditLogEventEnvelopeItemUpdatedSchema,
+    ZDocumentAuditLogEventEnvelopeItemPdfReplacedSchema,
     ZDocumentAuditLogEventEmailSentSchema,
     ZDocumentAuditLogEventDocumentCompletedSchema,
     ZDocumentAuditLogEventDocumentCreatedSchema,

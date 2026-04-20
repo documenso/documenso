@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { Link } from 'react-router';
 
@@ -6,7 +7,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Forgot password');
+  return appMetaTags(msg`Forgot password`);
 }
 
 export default function ForgotPasswordPage() {
@@ -17,7 +18,7 @@ export default function ForgotPasswordPage() {
           <Trans>Email sent!</Trans>
         </h1>
 
-        <p className="text-muted-foreground mb-4 mt-2 text-sm">
+        <p className="mb-4 mt-2 text-sm text-muted-foreground">
           <Trans>
             A password reset email has been sent, if you have an account you should see it in your
             inbox shortly.

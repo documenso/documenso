@@ -16,6 +16,10 @@ import {
   ZEnvelopeExpirationPeriod,
 } from '@documenso/lib/constants/envelope-expiration';
 import {
+  type TEnvelopeReminderSettings,
+  ZEnvelopeReminderSettings,
+} from '@documenso/lib/constants/envelope-reminder';
+import {
   SUPPORTED_LANGUAGES,
   SUPPORTED_LANGUAGE_CODES,
   isValidLanguageCode,
@@ -32,6 +36,7 @@ import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter'
 import { extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
 import { DocumentSignatureSettingsTooltip } from '@documenso/ui/components/document/document-signature-settings-tooltip';
 import { ExpirationPeriodPicker } from '@documenso/ui/components/document/expiration-period-picker';
+import { ReminderSettingsPicker } from '@documenso/ui/components/document/reminder-settings-picker';
 import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
 import { Alert } from '@documenso/ui/primitives/alert';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
@@ -76,6 +81,7 @@ export type TDocumentPreferencesFormSchema = {
   delegateDocumentOwnership: boolean | null;
   aiFeaturesEnabled: boolean | null;
   envelopeExpirationPeriod: TEnvelopeExpirationPeriod | null;
+  reminderSettings: TEnvelopeReminderSettings | null;
 };
 
 type SettingsSubset = Pick<
@@ -94,6 +100,7 @@ type SettingsSubset = Pick<
   | 'delegateDocumentOwnership'
   | 'aiFeaturesEnabled'
   | 'envelopeExpirationPeriod'
+  | 'reminderSettings'
 >;
 
 export type DocumentPreferencesFormProps = {
@@ -134,6 +141,7 @@ export const DocumentPreferencesForm = ({
     delegateDocumentOwnership: z.boolean().nullable(),
     aiFeaturesEnabled: z.boolean().nullable(),
     envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullable(),
+    reminderSettings: ZEnvelopeReminderSettings.nullable(),
   });
 
   const form = useForm<TDocumentPreferencesFormSchema>({
@@ -155,6 +163,7 @@ export const DocumentPreferencesForm = ({
       delegateDocumentOwnership: settings.delegateDocumentOwnership,
       aiFeaturesEnabled: settings.aiFeaturesEnabled,
       envelopeExpirationPeriod: settings.envelopeExpirationPeriod ?? null,
+      reminderSettings: settings.reminderSettings ?? null,
     },
     resolver: zodResolver(ZDocumentPreferencesFormSchema),
   });
@@ -699,6 +708,35 @@ export const DocumentPreferencesForm = ({
                   <Trans>
                     Controls how long recipients have to complete signing before the document
                     expires. After expiration, recipients can no longer sign the document.
+                  </Trans>
+                </FormDescription>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="reminderSettings"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>
+                  <Trans>Default Signing Reminders</Trans>
+                </FormLabel>
+
+                <FormControl>
+                  <ReminderSettingsPicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    inheritLabel={canInherit ? t`Inherit from organisation` : undefined}
+                  />
+                </FormControl>
+
+                <FormDescription>
+                  <Trans>
+                    Controls when and how often reminder emails are sent to recipients who have not
+                    yet completed signing.
                   </Trans>
                 </FormDescription>
 

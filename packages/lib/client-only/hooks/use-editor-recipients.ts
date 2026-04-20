@@ -1,7 +1,7 @@
 import { useId } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DocumentSigningOrder, type Recipient, RecipientRole } from '@prisma/client';
+import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 import type { UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { prop, sortBy } from 'remeda';
@@ -39,7 +39,7 @@ type EditorRecipientsProps = {
 };
 
 type ResetFormOptions = {
-  recipients?: Recipient[];
+  recipients?: TEditorEnvelope['recipients'];
   documentMeta?: TEditorEnvelope['documentMeta'];
 };
 

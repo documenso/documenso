@@ -24,6 +24,7 @@ import { jobs } from '../../jobs/client';
 import { DOCUMENT_AUDIT_LOG_TYPE, RECIPIENT_DIFF_TYPE } from '../../types/document-audit-logs';
 import type { TRecipientActionAuthTypes } from '../../types/document-auth';
 import { DocumentAccessAuth, ZRecipientAuthOptionsSchema } from '../../types/document-auth';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { ZFieldMetaSchema } from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
@@ -307,18 +308,10 @@ export const createDocumentFromDirectTemplate = async ({
 
       const titleToUse = item.title || directTemplateEnvelope.title;
 
-      const duplicatedFile = await putPdfFileServerSide({
+      const { documentData: newDocumentData } = await putPdfFileServerSide({
         name: titleToUse,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(buffer),
-      });
-
-      const newDocumentData = await prisma.documentData.create({
-        data: {
-          type: duplicatedFile.type,
-          data: duplicatedFile.data,
-          initialData: duplicatedFile.initialData,
-        },
       });
 
       const newEnvelopeItemId = prefixedId('envelope_item');
@@ -712,6 +705,7 @@ export const createDocumentFromDirectTemplate = async ({
           where: { id: nextRecipient.id },
           data: {
             sendStatus: SendStatus.SENT,
+            sentAt: new Date(),
             ...(nextSigner && documentMeta?.allowDictateNextSigner
               ? {
                   name: nextSigner.name,
@@ -751,14 +745,17 @@ export const createDocumentFromDirectTemplate = async ({
     };
   });
 
-  // Send email to template owner via background job.
-  await jobs.triggerJob({
-    name: 'send.document.created.from.direct.template.email',
-    payload: {
-      envelopeId: createdEnvelope.id,
-      recipientId,
-    },
-  });
+  const emailSettings = extractDerivedDocumentEmailSettings(documentMeta);
+
+  if (emailSettings.ownerDocumentCreated) {
+    await jobs.triggerJob({
+      name: 'send.document.created.from.direct.template.email',
+      payload: {
+        envelopeId: createdEnvelope.id,
+        recipientId,
+      },
+    });
+  }
 
   try {
     // This handles sending emails and sealing the document if required.

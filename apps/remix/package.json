@@ -53,6 +53,7 @@
     "lucide-react": "^0.554.0",
     "luxon": "^3.7.2",
     "nanoid": "^5.1.6",
+    "nuqs": "^2.8.9",
     "papaparse": "^5.5.3",
     "posthog-js": "^1.297.2",
     "posthog-node": "4.18.0",
@@ -105,5 +106,5 @@
     "vite-plugin-babel-macros": "^1.0.6",
     "vite-tsconfig-paths": "^5.1.4"
   },
-  "version": "2.8.0"
+  "version": "2.9.0"
 }

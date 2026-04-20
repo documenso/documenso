@@ -131,16 +131,16 @@ export const DocumentSigningFieldContainer = ({
 
   return (
     <FieldRootContainer
-        color={getRecipientColorStyles(field.fieldMeta?.readOnly ? 'readOnly' : 0)}
-        field={field}
-      >
-        {!field.inserted && !loading && !readOnlyField && (
-          <button
-            type="submit"
-            className="absolute inset-0 z-10 h-full w-full rounded-[2px]"
-            onClick={async () => handleInsertField()}
-          />
-        )}
+      color={getRecipientColorStyles(field.fieldMeta?.readOnly ? 'readOnly' : 0)}
+      field={field}
+    >
+      {!field.inserted && !loading && !readOnlyField && (
+        <button
+          type="submit"
+          className="absolute inset-0 z-10 h-full w-full rounded-[2px]"
+          onClick={async () => handleInsertField()}
+        />
+      )}
 
       {type === 'Checkbox' && field.inserted && !loading && !readOnlyField && (
         <button

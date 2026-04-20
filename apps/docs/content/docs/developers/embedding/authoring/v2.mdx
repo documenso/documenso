@@ -110,6 +110,7 @@ const EnvelopeEditor = ({ presignToken, envelopeId }) => {
 | `css`              | `string`  | No       | Custom CSS string (Platform Plan)                        |
 | `cssVars`          | `object`  | No       | [CSS variable](/docs/developers/embedding/css-variables) overrides (Platform Plan) |
 | `darkModeDisabled` | `boolean` | No       | Disable dark mode (Platform Plan)                        |
+| `language`         | `string`  | No       | Set the UI language. See [Supported Languages](https://github.com/documenso/documenso/tree/main/packages/lib/constants/locales.ts) |
 | `className`        | `string`  | No       | CSS class for the iframe                                 |
 | `features`         | `object`  | No       | Feature toggles for the authoring experience             |
 
@@ -202,6 +203,7 @@ Controls how envelope items (individual files within the envelope) can be manage
 | `allowConfigureOrder`  | `boolean` | `true`  | Allow reordering items               |
 | `allowUpload`          | `boolean` | `true`  | Allow uploading new items            |
 | `allowDelete`          | `boolean` | `true`  | Allow deleting items                 |
+| `allowReplace`         | `boolean` | `true`  | Allow replacing an item's PDF        |
 
 ### Recipients
 

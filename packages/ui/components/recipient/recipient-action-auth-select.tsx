@@ -83,7 +83,7 @@ export const RecipientActionAuthSelect = ({
           <InfoIcon className="h-4 w-4" />
         </TooltipTrigger>
 
-        <TooltipContent className="text-foreground max-w-md p-4">
+        <TooltipContent className="max-w-md p-4 text-foreground">
           <h2>
             <strong>
               <Trans>Recipient action authentication</Trans>

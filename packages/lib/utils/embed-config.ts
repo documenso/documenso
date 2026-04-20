@@ -67,6 +67,9 @@ export const buildEmbeddedFeatures = (
             allowConfigureExpirationPeriod:
               features.settings?.allowConfigureExpirationPeriod ??
               DEFAULT_EMBEDDED_EDITOR_CONFIG.settings.allowConfigureExpirationPeriod,
+            allowConfigureReminders:
+              features.settings?.allowConfigureReminders ??
+              DEFAULT_EMBEDDED_EDITOR_CONFIG.settings.allowConfigureReminders,
             allowConfigureEmailSender:
               features.settings?.allowConfigureEmailSender ??
               DEFAULT_EMBEDDED_EDITOR_CONFIG.settings.allowConfigureEmailSender,
@@ -88,6 +91,9 @@ export const buildEmbeddedFeatures = (
       allowDuplication:
         features.actions?.allowDuplication ??
         DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowDuplication,
+      allowSaveAsTemplate:
+        features.actions?.allowSaveAsTemplate ??
+        DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowSaveAsTemplate,
       allowDownloadPDF:
         features.actions?.allowDownloadPDF ??
         DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowDownloadPDF,
@@ -110,6 +116,9 @@ export const buildEmbeddedFeatures = (
             allowDelete:
               features.envelopeItems?.allowDelete ??
               DEFAULT_EMBEDDED_EDITOR_CONFIG.envelopeItems.allowDelete,
+            allowReplace:
+              features.envelopeItems?.allowReplace ??
+              DEFAULT_EMBEDDED_EDITOR_CONFIG.envelopeItems.allowReplace,
           }
         : null,
 

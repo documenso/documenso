@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import {
   AlertTriangleIcon,
@@ -19,8 +20,13 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { AdminLicenseStatusBanner } from '~/components/general/admin-license-status-banner';
+import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types/_layout';
+
+export function meta() {
+  return appMetaTags(msg`Admin`);
+}
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { user } = await getSession(request);
