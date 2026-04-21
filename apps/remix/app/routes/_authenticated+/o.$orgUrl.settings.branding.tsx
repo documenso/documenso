@@ -48,10 +48,15 @@ export default function OrganisationSettingsBrandingPage() {
     try {
       const { brandingEnabled, brandingLogo, brandingUrl, brandingCompanyDetails } = data;
 
-      let uploadedBrandingLogo: string | undefined = '';
+      let uploadedBrandingLogo: string | undefined = undefined;
 
       if (brandingLogo) {
         uploadedBrandingLogo = JSON.stringify(await putFile(brandingLogo));
+      }
+
+      // Empty the branding logo if the user unsets it.
+      if (brandingLogo === null) {
+        uploadedBrandingLogo = '';
       }
 
       await updateOrganisationSettings({

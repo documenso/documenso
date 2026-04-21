@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Field, Recipient } from '@prisma/client';
+import type { Field } from '@prisma/client';
 import { FieldType, RecipientRole, SendStatus } from '@prisma/client';
 import {
   CalendarDays,
@@ -31,6 +31,7 @@ import {
   type TFieldMetaSchema as FieldMeta,
   ZFieldMetaSchema,
 } from '@documenso/lib/types/field-meta';
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { nanoid } from '@documenso/lib/universal/id';
 import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
 import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
@@ -75,7 +76,7 @@ const DEFAULT_WIDTH_PX = MIN_WIDTH_PX * 2.5;
 
 export type AddTemplateFieldsFormProps = {
   documentFlow: DocumentFlowStep;
-  recipients: Recipient[];
+  recipients: TRecipientLite[];
   fields: Field[];
   onSubmit: (_data: TAddTemplateFieldsFormSchema) => void;
   onAutoSave: (_data: TAddTemplateFieldsFormSchema) => Promise<void>;
@@ -154,7 +155,7 @@ export const AddTemplateFieldsFormPartial = ({
   });
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
-  const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
+  const [selectedSigner, setSelectedSigner] = useState<TRecipientLite | null>(null);
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
   const selectedSignerIndex = recipients.findIndex((r) => r.id === selectedSigner?.id);
@@ -491,7 +492,7 @@ export const AddTemplateFieldsFormPartial = ({
   }, [recipients]);
 
   const recipientsByRole = useMemo(() => {
-    const recipientsByRole: Record<RecipientRole, Recipient[]> = {
+    const recipientsByRole: Record<RecipientRole, TRecipientLite[]> = {
       CC: [],
       VIEWER: [],
       SIGNER: [],
@@ -520,7 +521,7 @@ export const AddTemplateFieldsFormPartial = ({
 
   const recipientsByRoleToDisplay = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    return (Object.entries(recipientsByRole) as [RecipientRole, Recipient[]][]).filter(
+    return (Object.entries(recipientsByRole) as [RecipientRole, TRecipientLite[]][]).filter(
       ([role]) =>
         role !== RecipientRole.CC &&
         role !== RecipientRole.VIEWER &&

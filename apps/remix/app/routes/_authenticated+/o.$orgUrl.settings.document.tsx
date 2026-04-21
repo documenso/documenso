@@ -62,6 +62,7 @@ export default function OrganisationSettingsDocumentPage() {
         delegateDocumentOwnership,
         aiFeaturesEnabled,
         envelopeExpirationPeriod,
+        reminderSettings,
       } = data;
 
       if (
@@ -93,6 +94,7 @@ export default function OrganisationSettingsDocumentPage() {
           delegateDocumentOwnership: delegateDocumentOwnership,
           aiFeaturesEnabled,
           envelopeExpirationPeriod: envelopeExpirationPeriod ?? undefined,
+          reminderSettings: reminderSettings ?? undefined,
         },
       });
 

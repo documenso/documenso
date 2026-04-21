@@ -103,6 +103,12 @@ declare namespace NodeJS {
     POSTGRES_URL_NON_POOLING?: string;
 
     /**
+     * Cloudflare Turnstile environment variables
+     */
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY?: string;
+    NEXT_PRIVATE_TURNSTILE_SECRET_KEY?: string;
+
+    /**
      * Google Vertex AI environment variables
      */
     GOOGLE_VERTEX_PROJECT_ID?: string;

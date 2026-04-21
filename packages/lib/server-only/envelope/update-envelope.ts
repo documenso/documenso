@@ -18,6 +18,7 @@ import {
 import { createDocumentAuthOptions, extractDocumentAuthMethods } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { buildTeamWhereQuery, canAccessTeamDocument } from '../../utils/teams';
+import { recomputeNextReminderForEnvelope } from '../recipient/update-recipient-next-reminder';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { getEnvelopeWhereInput } from './get-envelope-by-id';
 
@@ -353,6 +354,11 @@ export const updateEnvelope = async ({
 
     return result;
   });
+
+  // Recompute reminders for active recipients when reminder settings change.
+  if (meta && 'reminderSettings' in meta) {
+    await recomputeNextReminderForEnvelope(envelope.id);
+  }
 
   if (envelope.type === EnvelopeType.TEMPLATE) {
     await triggerWebhook({

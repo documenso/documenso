@@ -22,6 +22,7 @@ import {
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
 } from '../../../constants/recipient-roles';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { updateRecipientNextReminder } from '../../../server-only/recipient/update-recipient-next-reminder';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
@@ -206,6 +207,8 @@ export const run = async ({
     });
   }
 
+  const sentAt = new Date();
+
   await io.runTask('update-recipient', async () => {
     await prisma.recipient.update({
       where: {
@@ -213,26 +216,33 @@ export const run = async ({
       },
       data: {
         sendStatus: SendStatus.SENT,
+        sentAt,
       },
     });
   });
 
-  await io.runTask('store-audit-log', async () => {
-    await prisma.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
-        envelopeId: envelope.id,
-        user,
-        requestMetadata,
-        data: {
-          emailType: recipientEmailType,
-          recipientId: recipient.id,
-          recipientName: recipient.name,
-          recipientEmail: recipient.email,
-          recipientRole: recipient.role,
-          isResending: false,
-        },
-      }),
-    });
+  // Compute the first reminder time based on the envelope's effective settings.
+  await updateRecipientNextReminder({
+    recipientId: recipient.id,
+    envelopeId: envelope.id,
+    sentAt,
+    lastReminderSentAt: null,
+  });
+
+  await prisma.documentAuditLog.create({
+    data: createDocumentAuditLogData({
+      type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
+      envelopeId: envelope.id,
+      user,
+      requestMetadata,
+      data: {
+        emailType: recipientEmailType,
+        recipientId: recipient.id,
+        recipientName: recipient.name,
+        recipientEmail: recipient.email,
+        recipientRole: recipient.role,
+        isResending: false,
+      },
+    }),
   });
 };

@@ -2,12 +2,12 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
 import { RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 import { Check, ChevronsUpDown, Info } from 'lucide-react';
 import { sortBy } from 'remeda';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 
 import { getRecipientColorStyles } from '../lib/recipient-colors';
 import { cn } from '../lib/utils';
@@ -18,9 +18,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './tooltip';
 
 export interface RecipientSelectorProps {
   className?: string;
-  selectedRecipient: Recipient | null;
-  onSelectedRecipientChange: (recipient: Recipient) => void;
-  recipients: Recipient[];
+  selectedRecipient: TRecipientLite | null;
+  onSelectedRecipientChange: (recipient: TRecipientLite) => void;
+  recipients: TRecipientLite[];
   align?: 'center' | 'end' | 'start';
 }
 
@@ -35,7 +35,7 @@ export const RecipientSelector = ({
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
   const recipientsByRole = useMemo(() => {
-    const recipientsWithRole: Record<RecipientRole, Recipient[]> = {
+    const recipientsWithRole: Record<RecipientRole, TRecipientLite[]> = {
       CC: [],
       VIEWER: [],
       SIGNER: [],
@@ -67,12 +67,12 @@ export const RecipientSelector = ({
               [(r) => r.signingOrder || Number.MAX_SAFE_INTEGER, 'asc'],
               [(r) => r.id, 'asc'],
             ),
-          ] as [RecipientRole, Recipient[]],
+          ] as [RecipientRole, TRecipientLite[]],
       );
   }, [recipientsByRole]);
 
   const getRecipientLabel = useCallback(
-    (recipient: Recipient) => {
+    (recipient: TRecipientLite) => {
       if (recipient.name && recipient.email) {
         return `${recipient.name} (${recipient.email})`;
       }
