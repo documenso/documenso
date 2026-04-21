@@ -71,3 +71,4 @@ scripts/bench-*
 
 # tmp
 tmp/
+.superpowers/
