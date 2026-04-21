@@ -88,7 +88,7 @@ export const EnvelopeDistributeDialog = ({
 }: EnvelopeDistributeDialogProps) => {
   const organisation = useCurrentOrganisation();
 
-  const { envelope, syncEnvelope, isAutosaving, autosaveError, editorFields } =
+  const { envelope, syncEnvelope, isAutosaving, autosaveError, editorFields, navigateToStep } =
     useCurrentEnvelopeEditor();
   const { setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
 
@@ -245,6 +245,13 @@ export const EnvelopeDistributeDialog = ({
       void handleSync();
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    // Navigate to the addFields step to support field-navigation
+    if (isOpen && mutualEnclosingFields.length > 0) {
+      navigateToStep('addFields');
+    }
+  }, [isOpen, mutualEnclosingFields]);
 
   if (envelope.status !== DocumentStatus.DRAFT || envelope.type !== EnvelopeType.DOCUMENT) {
     return null;
