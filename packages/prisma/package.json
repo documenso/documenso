@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
-    "kysely": "0.28.8",
+    "kysely": "0.28.16",
     "nanoid": "^5.1.6",
     "prisma": "^6.19.0",
     "prisma-extension-kysely": "^3.0.0",
