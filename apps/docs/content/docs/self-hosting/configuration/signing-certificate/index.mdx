@@ -25,6 +25,11 @@ Self-hosted Documenso instances require a signing certificate. You can generate 
     href="/docs/self-hosting/configuration/signing-certificate/google-cloud-hsm"
   />
   <Card
+    title="AWS KMS"
+    description="Hardware-backed key protection with AWS Key Management Service."
+    href="/docs/self-hosting/configuration/signing-certificate/aws-kms"
+  />
+  <Card
     title="Timestamp Server"
     description="Add trusted timestamps and customise signature appearance."
     href="/docs/self-hosting/configuration/signing-certificate/timestamp-server"
@@ -38,7 +43,7 @@ Self-hosted Documenso instances require a signing certificate. You can generate 
 
 ## Certificate Options
 
-<Tabs items={['Self-Signed', 'CA-Issued', 'Google Cloud HSM']}>
+<Tabs items={['Self-Signed', 'CA-Issued', 'Google Cloud HSM', 'AWS KMS']}>
 <Tab value="Self-Signed">
 
 A self-signed certificate is sufficient for most use cases where your industry has no special signing regulations.
@@ -78,6 +83,18 @@ For organisations requiring hardware-based key protection, Documenso supports Go
 - Audit logging of all cryptographic operations
 
 See [Google Cloud HSM](/docs/self-hosting/configuration/signing-certificate/google-cloud-hsm) for setup instructions.
+
+</Tab>
+<Tab value="AWS KMS">
+
+For organisations running on AWS, Documenso supports AWS KMS. This provides:
+
+- FIPS 140-2-validated key storage
+- Keys never leave KMS — only the digest is sent for signing
+- Native AWS IAM integration (no separate GCP project required)
+- CloudTrail audit logging of all cryptographic operations
+
+See [AWS KMS](/docs/self-hosting/configuration/signing-certificate/aws-kms) for setup instructions.
 
 </Tab>
 </Tabs>
