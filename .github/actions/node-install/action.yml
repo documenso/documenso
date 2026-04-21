@@ -12,6 +12,10 @@ runs:
       with:
         node-version: ${{ inputs.node_version }}
 
+    - name: Enable corepack
+      shell: bash
+      run: corepack enable npm
+
     - name: Cache npm
       uses: actions/cache@v3
       with:
