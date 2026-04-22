@@ -29,6 +29,11 @@ export const leaveOrganisationRoute = authenticatedProcedure
       include: {
         organisationClaim: true,
         subscription: true,
+        teams: {
+          select: {
+            id: true,
+          },
+        },
         invites: {
           where: {
             status: OrganisationMemberInviteStatus.PENDING,
@@ -64,13 +69,35 @@ export const leaveOrganisationRoute = authenticatedProcedure
       );
     }
 
-    await prisma.organisationMember.delete({
-      where: {
-        userId_organisationId: {
-          userId,
-          organisationId,
+    const teamIds = organisation.teams.map((team) => team.id);
+
+    await prisma.$transaction(async (tx) => {
+      // Leaving the org cascades the user out of every team via
+      // OrganisationGroupMember, but their authored Envelope rows still
+      // reference them. Reassign those to the org owner so they remain
+      // reachable after the member loses access (mirrors delete-user.ts).
+      if (teamIds.length > 0) {
+        await tx.envelope.updateMany({
+          where: {
+            userId,
+            teamId: {
+              in: teamIds,
+            },
+          },
+          data: {
+            userId: organisation.ownerUserId,
+          },
+        });
+      }
+
+      await tx.organisationMember.delete({
+        where: {
+          userId_organisationId: {
+            userId,
+            organisationId,
+          },
         },
-      },
+      });
     });
 
     await jobs.triggerJob({
