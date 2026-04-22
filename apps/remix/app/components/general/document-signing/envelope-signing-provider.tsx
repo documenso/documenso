@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   EnvelopeType,
@@ -206,6 +206,28 @@ export const EnvelopeSigningProvider = ({
   const visibleRecipientFields = useMemo(() => {
     return recipientFields.filter((f) => recipientFieldVisibility.get(f.id) !== false);
   }, [recipientFields, recipientFieldVisibility]);
+
+  const prevVisibilityRef = useRef<Map<number, boolean>>(new Map());
+  const [revealedFieldLabel, setRevealedFieldLabel] = useState<string | null>(null);
+
+  useEffect(() => {
+    const prev = prevVisibilityRef.current;
+    const newlyVisible = Array.from(recipientFieldVisibility.entries()).filter(
+      ([id, visible]) => visible && prev.get(id) === false,
+    );
+
+    if (newlyVisible.length > 0) {
+      const [firstId] = newlyVisible[0];
+      const field = recipientFields.find((f) => f.id === firstId);
+      const meta = field?.fieldMeta as { label?: string } | null;
+      setRevealedFieldLabel(meta?.label ?? 'New required field');
+      const timer = setTimeout(() => setRevealedFieldLabel(null), 2000);
+      prevVisibilityRef.current = new Map(recipientFieldVisibility);
+      return () => clearTimeout(timer);
+    }
+
+    prevVisibilityRef.current = new Map(recipientFieldVisibility);
+  }, [recipientFieldVisibility, recipientFields]);
 
   /**
    * The fields that are still required to be signed by the actual recipient.
@@ -432,6 +454,23 @@ export const EnvelopeSigningProvider = ({
       }}
     >
       {children}
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        style={{
+          position: 'absolute',
+          width: 1,
+          height: 1,
+          padding: 0,
+          margin: -1,
+          overflow: 'hidden',
+          clip: 'rect(0,0,0,0)',
+          border: 0,
+        }}
+      >
+        {revealedFieldLabel ? `Field revealed: ${revealedFieldLabel}` : ''}
+      </div>
     </EnvelopeSigningContext.Provider>
   );
 };
