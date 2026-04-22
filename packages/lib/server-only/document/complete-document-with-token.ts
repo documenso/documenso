@@ -14,7 +14,8 @@ import {
   RECIPIENT_DIFF_TYPE,
 } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
+import { evaluateAllVisibility } from '@documenso/lib/universal/field-visibility';
+import { fieldsContainUnsignedRequiredVisibleField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 
@@ -127,8 +128,47 @@ export const completeDocumentWithToken = async ({
     },
   });
 
-  if (fieldsContainUnsignedRequiredField(fields)) {
+  if (fieldsContainUnsignedRequiredVisibleField(fields)) {
     throw new Error(`Recipient ${recipient.id} has unsigned fields`);
+  }
+
+  // Sweep: clear hidden fields and emit audit entries before marking completion.
+  const visibilityMap = evaluateAllVisibility(
+    fields.map((f) => ({
+      id: f.id,
+      type: f.type,
+      customText: f.customText,
+      inserted: f.inserted,
+      fieldMeta: f.fieldMeta,
+    })),
+  );
+
+  const hiddenFields = fields.filter((f) => visibilityMap.get(f.id) === false);
+
+  if (hiddenFields.length > 0) {
+    await prisma.$transaction(async (tx) => {
+      await tx.field.updateMany({
+        where: { id: { in: hiddenFields.map((f) => f.id) } },
+        data: { customText: '', inserted: false },
+      });
+
+      await tx.documentAuditLog.createMany({
+        data: hiddenFields.map((f) => {
+          const meta = f.fieldMeta as { stableId?: string; label?: string } | null;
+          return createDocumentAuditLogData({
+            type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_SKIPPED_CONDITIONAL,
+            envelopeId: envelope.id,
+            requestMetadata,
+            data: {
+              fieldId: f.secondaryId,
+              stableId: meta?.stableId ?? '',
+              fieldLabel: meta?.label ?? '',
+              unmetRuleSummary: '', // Populated in Task 20's summarizer helper
+            },
+          });
+        }),
+      });
+    });
   }
 
   let recipientName = recipient.name;

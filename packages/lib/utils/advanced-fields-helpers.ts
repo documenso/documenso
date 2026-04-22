@@ -1,6 +1,7 @@
 import { type Field, FieldType } from '@prisma/client';
 
 import { ZFieldMetaSchema } from '../types/field-meta';
+import { evaluateAllVisibility } from '../universal/field-visibility';
 
 // Currently it seems that the majority of fields have advanced fields for font reasons.
 // This array should only contain fields that have an optional setting in the fieldMeta.
@@ -49,3 +50,22 @@ export const isFieldUnsignedAndRequired = (field: Field) =>
  */
 export const fieldsContainUnsignedRequiredField = (fields: Field[]) =>
   fields.some(isFieldUnsignedAndRequired);
+
+/**
+ * Whether the fields contain any required field that is both VISIBLE and not
+ * yet inserted. Use this for completion gating instead of
+ * fieldsContainUnsignedRequiredField when visibility rules are in play.
+ */
+export const fieldsContainUnsignedRequiredVisibleField = (fields: Field[]) => {
+  const visibility = evaluateAllVisibility(
+    fields.map((f) => ({
+      id: f.id,
+      type: f.type,
+      customText: f.customText,
+      inserted: f.inserted,
+      fieldMeta: f.fieldMeta,
+    })),
+  );
+
+  return fields.some((f) => isFieldUnsignedAndRequired(f) && visibility.get(f.id) !== false);
+};

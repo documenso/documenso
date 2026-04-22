@@ -606,6 +606,46 @@ export const formatDocumentAuditLogAction = (
         user: message,
       };
     })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_VALUE_CLEARED_CONDITIONAL }, () => ({
+      anonymous: msg({
+        message: `A hidden field's value was cleared`,
+        context: `Audit log format`,
+      }),
+      you: msg`A hidden field's value was cleared`,
+      user: msg`A hidden field's value was cleared`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_SKIPPED_CONDITIONAL }, () => ({
+      anonymous: msg({
+        message: `A conditionally hidden field was skipped`,
+        context: `Audit log format`,
+      }),
+      you: msg`A conditionally hidden field was skipped`,
+      user: msg`A conditionally hidden field was skipped`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_VISIBILITY_RULE_ADDED }, () => ({
+      anonymous: msg({
+        message: `A field visibility rule was added`,
+        context: `Audit log format`,
+      }),
+      you: msg`You added a field visibility rule`,
+      user: msg`${user} added a field visibility rule`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_VISIBILITY_RULE_REMOVED }, () => ({
+      anonymous: msg({
+        message: `A field visibility rule was removed`,
+        context: `Audit log format`,
+      }),
+      you: msg`You removed a field visibility rule`,
+      user: msg`${user} removed a field visibility rule`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_VISIBILITY_RULE_MODIFIED }, () => ({
+      anonymous: msg({
+        message: `A field visibility rule was modified`,
+        context: `Audit log format`,
+      }),
+      you: msg`You modified a field visibility rule`,
+      user: msg`${user} modified a field visibility rule`,
+    }))
     .exhaustive();
 
   let selectedDescription = description.anonymous;
