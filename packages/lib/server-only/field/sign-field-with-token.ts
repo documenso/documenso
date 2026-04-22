@@ -14,6 +14,7 @@ import { prisma } from '@documenso/prisma';
 import { AUTO_SIGNABLE_FIELD_TYPES } from '../../constants/autosign';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { TRecipientActionAuth } from '../../types/document-auth';
 import {
@@ -24,6 +25,7 @@ import {
   ZTextFieldMeta,
 } from '../../types/field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
+import { evaluateAllVisibility } from '../../universal/field-visibility';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { assertRecipientNotExpired } from '../../utils/recipients';
 import { validateFieldAuth } from '../document/validate-field-auth';
@@ -181,6 +183,30 @@ export const signFieldWithToken = async ({
     userId,
     authOptions,
   });
+
+  const recipientFields = await prisma.field.findMany({
+    where: {
+      envelopeId: field.envelopeId,
+      recipientId: field.recipientId,
+    },
+  });
+
+  const visibilityMap = evaluateAllVisibility(
+    recipientFields.map((f) => ({
+      id: f.id,
+      type: f.type,
+      customText: f.customText,
+      inserted: f.inserted,
+      fieldMeta: f.fieldMeta,
+    })),
+  );
+
+  if (visibilityMap.get(field.id) === false) {
+    throw new AppError(AppErrorCode.FIELD_NOT_VISIBLE, {
+      message: 'This field is not currently active and cannot be signed.',
+      userMessage: 'This field is not currently active.',
+    });
+  }
 
   const documentMeta = await prisma.documentMeta.findFirst({
     where: {
