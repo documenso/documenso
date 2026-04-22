@@ -21,6 +21,7 @@ import {
   type TTextFieldMeta as TextFieldMeta,
   ZFieldMetaSchema,
 } from '@documenso/lib/types/field-meta';
+import type { TVisibilityBlock } from '@documenso/lib/types/field-meta';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import type { FieldFormType } from './add-fields';
@@ -208,13 +209,15 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
     }, [fieldState, localStorageKey, handleAutoSave]);
 
     const handleFieldChange = (
-      key: FieldMetaKeys,
+      key: FieldMetaKeys | 'visibility',
       value:
         | string
         | { checked: boolean; value: string }[]
         | { value: string }[]
         | boolean
-        | number,
+        | number
+        | TVisibilityBlock
+        | undefined,
     ) => {
       setFieldState((prevState: FieldMeta) => {
         if (
@@ -310,6 +313,20 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
                 fieldState={fieldState}
                 handleFieldChange={handleFieldChange}
                 handleErrors={setErrors}
+                currentFieldId={field.nativeId ?? null}
+                sameRecipientFields={fields
+                  .filter(
+                    (f) =>
+                      f.recipientId === field.recipientId &&
+                      (f.nativeId == null || f.nativeId !== field.nativeId),
+                  )
+                  .map((f) => ({
+                    id: f.nativeId ?? 0,
+                    type: f.type,
+                    recipientId: f.recipientId,
+                    fieldMeta: f.fieldMeta,
+                    page: f.pageNumber,
+                  }))}
               />
             ))
             .with(FieldType.NUMBER, () => (
@@ -317,6 +334,20 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
                 fieldState={fieldState}
                 handleFieldChange={handleFieldChange}
                 handleErrors={setErrors}
+                currentFieldId={field.nativeId ?? null}
+                sameRecipientFields={fields
+                  .filter(
+                    (f) =>
+                      f.recipientId === field.recipientId &&
+                      (f.nativeId == null || f.nativeId !== field.nativeId),
+                  )
+                  .map((f) => ({
+                    id: f.nativeId ?? 0,
+                    type: f.type,
+                    recipientId: f.recipientId,
+                    fieldMeta: f.fieldMeta,
+                    page: f.pageNumber,
+                  }))}
               />
             ))
             .with(FieldType.RADIO, () => (
@@ -324,6 +355,20 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
                 fieldState={fieldState}
                 handleFieldChange={handleFieldChange}
                 handleErrors={setErrors}
+                currentFieldId={field.nativeId ?? null}
+                sameRecipientFields={fields
+                  .filter(
+                    (f) =>
+                      f.recipientId === field.recipientId &&
+                      (f.nativeId == null || f.nativeId !== field.nativeId),
+                  )
+                  .map((f) => ({
+                    id: f.nativeId ?? 0,
+                    type: f.type,
+                    recipientId: f.recipientId,
+                    fieldMeta: f.fieldMeta,
+                    page: f.pageNumber,
+                  }))}
               />
             ))
             .with(FieldType.CHECKBOX, () => (
@@ -331,6 +376,20 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
                 fieldState={fieldState}
                 handleFieldChange={handleFieldChange}
                 handleErrors={setErrors}
+                currentFieldId={field.nativeId ?? null}
+                sameRecipientFields={fields
+                  .filter(
+                    (f) =>
+                      f.recipientId === field.recipientId &&
+                      (f.nativeId == null || f.nativeId !== field.nativeId),
+                  )
+                  .map((f) => ({
+                    id: f.nativeId ?? 0,
+                    type: f.type,
+                    recipientId: f.recipientId,
+                    fieldMeta: f.fieldMeta,
+                    page: f.pageNumber,
+                  }))}
               />
             ))
             .with(FieldType.DROPDOWN, () => (
@@ -338,6 +397,20 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
                 fieldState={fieldState}
                 handleFieldChange={handleFieldChange}
                 handleErrors={setErrors}
+                currentFieldId={field.nativeId ?? null}
+                sameRecipientFields={fields
+                  .filter(
+                    (f) =>
+                      f.recipientId === field.recipientId &&
+                      (f.nativeId == null || f.nativeId !== field.nativeId),
+                  )
+                  .map((f) => ({
+                    id: f.nativeId ?? 0,
+                    type: f.type,
+                    recipientId: f.recipientId,
+                    fieldMeta: f.fieldMeta,
+                    page: f.pageNumber,
+                  }))}
               />
             ))
             .otherwise(() => null)}

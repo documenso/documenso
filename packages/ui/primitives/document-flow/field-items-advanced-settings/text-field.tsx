@@ -1,6 +1,8 @@
 import { Trans, useLingui } from '@lingui/react/macro';
+import { FieldType } from '@prisma/client';
 
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
+import type { TVisibilityBlock } from '@documenso/lib/types/field-meta';
 import { type TTextFieldMeta as TextFieldMeta } from '@documenso/lib/types/field-meta';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
@@ -14,16 +16,37 @@ import {
 import { Switch } from '@documenso/ui/primitives/switch';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 
+import { VisibilitySection } from './visibility-section';
+
+type FieldMetaWithValues = {
+  stableId?: string;
+  label?: string;
+  values?: Array<{ value: string }>;
+};
+
 type TextFieldAdvancedSettingsProps = {
   fieldState: TextFieldMeta;
-  handleFieldChange: (key: keyof TextFieldMeta, value: string | boolean) => void;
+  handleFieldChange: (
+    key: keyof TextFieldMeta,
+    value: string | boolean | TVisibilityBlock | undefined,
+  ) => void;
   handleErrors: (errors: string[]) => void;
+  sameRecipientFields?: Array<{
+    id: number;
+    type: FieldType;
+    recipientId: number;
+    fieldMeta: unknown;
+    page?: number;
+  }>;
+  currentFieldId?: number | null;
 };
 
 export const TextFieldAdvancedSettings = ({
   fieldState,
   handleFieldChange,
   handleErrors,
+  sameRecipientFields,
+  currentFieldId,
 }: TextFieldAdvancedSettingsProps) => {
   const { t } = useLingui();
 
@@ -55,7 +78,7 @@ export const TextFieldAdvancedSettings = ({
         </Label>
         <Input
           id="label"
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={t`Field label`}
           value={fieldState.label}
           onChange={(e) => handleFieldChange('label', e.target.value)}
@@ -67,7 +90,7 @@ export const TextFieldAdvancedSettings = ({
         </Label>
         <Input
           id="placeholder"
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={t`Field placeholder`}
           value={fieldState.placeholder}
           onChange={(e) => handleFieldChange('placeholder', e.target.value)}
@@ -80,7 +103,7 @@ export const TextFieldAdvancedSettings = ({
         </Label>
         <Textarea
           id="text"
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={t`Add text to the field`}
           value={fieldState.text}
           onChange={(e) => handleInput('text', e.target.value)}
@@ -95,7 +118,7 @@ export const TextFieldAdvancedSettings = ({
           id="characterLimit"
           type="number"
           min={0}
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={t`Field character limit`}
           value={fieldState.characterLimit}
           onChange={(e) => handleInput('characterLimit', e.target.value)}
@@ -109,7 +132,7 @@ export const TextFieldAdvancedSettings = ({
         <Input
           id="fontSize"
           type="number"
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={t`Field font size`}
           value={fieldState.fontSize}
           onChange={(e) => handleInput('fontSize', e.target.value)}
@@ -133,7 +156,7 @@ export const TextFieldAdvancedSettings = ({
             handleInput('textAlign', value);
           }}
         >
-          <SelectTrigger className="bg-background mt-2">
+          <SelectTrigger className="mt-2 bg-background">
             <SelectValue placeholder={t`Select text align`} />
           </SelectTrigger>
 
@@ -167,6 +190,24 @@ export const TextFieldAdvancedSettings = ({
           </Label>
         </div>
       </div>
+
+      <VisibilitySection
+        currentFieldId={currentFieldId ?? null}
+        currentFieldType={FieldType.TEXT}
+        triggerCandidates={(sameRecipientFields ?? []).map((f) => {
+          const meta = f.fieldMeta as FieldMetaWithValues | null;
+          return {
+            id: f.id,
+            type: f.type,
+            stableId: meta?.stableId,
+            label: meta?.label,
+            page: f.page,
+            values: meta?.values,
+          };
+        })}
+        value={fieldState.visibility}
+        onChange={(next) => handleFieldChange('visibility', next)}
+      />
     </div>
   );
 };
