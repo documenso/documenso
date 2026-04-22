@@ -1,4 +1,5 @@
 import { EnvelopeType, type FieldType } from '@prisma/client';
+import { isDeepEqual } from 'remeda';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
@@ -206,6 +207,43 @@ export const updateEnvelopeFields = async ({
                   fieldType: updatedField.type,
                   changes,
                 },
+              }),
+            });
+          }
+
+          // Handle visibility rule add/remove/modify audit logs.
+          const prevMeta = originalField.fieldMeta as { visibility?: unknown } | null;
+          const nextMeta = updatedField.fieldMeta as { visibility?: unknown } | null;
+          const prevVis = prevMeta?.visibility ?? null;
+          const nextVis = nextMeta?.visibility ?? null;
+
+          if (!isDeepEqual(prevVis, nextVis)) {
+            const visType =
+              prevVis === null
+                ? DOCUMENT_AUDIT_LOG_TYPE.FIELD_VISIBILITY_RULE_ADDED
+                : nextVis === null
+                  ? DOCUMENT_AUDIT_LOG_TYPE.FIELD_VISIBILITY_RULE_REMOVED
+                  : DOCUMENT_AUDIT_LOG_TYPE.FIELD_VISIBILITY_RULE_MODIFIED;
+
+            await tx.documentAuditLog.create({
+              data: createDocumentAuditLogData({
+                type: visType,
+                envelopeId: envelope.id,
+                metadata: requestMetadata,
+                data:
+                  visType === DOCUMENT_AUDIT_LOG_TYPE.FIELD_VISIBILITY_RULE_MODIFIED
+                    ? {
+                        fieldId: updatedField.secondaryId,
+                        before: prevVis as Record<string, unknown>,
+                        after: nextVis as Record<string, unknown>,
+                      }
+                    : {
+                        fieldId: updatedField.secondaryId,
+                        ruleSnapshot: (visType ===
+                        DOCUMENT_AUDIT_LOG_TYPE.FIELD_VISIBILITY_RULE_ADDED
+                          ? nextVis
+                          : prevVis) as Record<string, unknown>,
+                      },
               }),
             });
           }
