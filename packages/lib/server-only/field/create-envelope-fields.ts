@@ -13,7 +13,9 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
+import { assignFieldStableIds } from '../envelope/assign-field-stable-ids';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { validateFieldVisibility } from '../envelope/validate-field-visibility';
 import { type BoundingBox, whiteoutRegions } from '../pdf/auto-place-fields';
 
 type CoordinatePosition = {
@@ -242,6 +244,45 @@ export const createEnvelopeFields = async ({
       height: field.height,
     };
   });
+
+  // Auto-assign stableIds on incoming fields that need one (i.e. those that own
+  // a visibility block). Preserves any stableId that was already set.
+  const assignedIncoming = assignFieldStableIds(
+    validatedFields.map((vf, idx) => ({
+      id: -(idx + 1),
+      fieldMeta: vf.fieldMeta as Record<string, unknown> | null,
+    })),
+  );
+  validatedFields.forEach((vf, idx) => {
+    vf.fieldMeta = assignedIncoming[idx].fieldMeta as typeof vf.fieldMeta;
+  });
+
+  // Merge existing envelope fields with the incoming fields so that cross-field
+  // visibility rules (e.g. a new field referencing an existing trigger) can be
+  // validated in one pass. Incoming fields receive negative sentinel IDs to
+  // avoid collisions with real database IDs.
+  const mergedForValidation = [
+    ...envelope.fields.map((f) => ({
+      id: f.id,
+      type: f.type,
+      recipientId: f.recipientId,
+      fieldMeta: f.fieldMeta as Record<string, unknown> | null,
+    })),
+    ...validatedFields.map((vf, idx) => ({
+      id: -(idx + 1),
+      type: vf.type,
+      recipientId: vf.recipientId,
+      fieldMeta: vf.fieldMeta as Record<string, unknown> | null,
+    })),
+  ];
+
+  const validation = validateFieldVisibility({ fields: mergedForValidation });
+  if (!validation.ok) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: validation.errors[0].message,
+      userMessage: validation.errors[0].message,
+    });
+  }
 
   const createdFields = await prisma.$transaction(async (tx) => {
     const newlyCreatedFields = await tx.field.createManyAndReturn({
