@@ -250,12 +250,11 @@ export const createEnvelopeFields = async ({
   const assignedIncoming = assignFieldStableIds(
     validatedFields.map((vf, idx) => ({
       id: -(idx + 1),
+      type: vf.type,
+      recipientId: vf.recipientId,
       fieldMeta: vf.fieldMeta as Record<string, unknown> | null,
     })),
   );
-  validatedFields.forEach((vf, idx) => {
-    vf.fieldMeta = assignedIncoming[idx].fieldMeta as typeof vf.fieldMeta;
-  });
 
   // Merge existing envelope fields with the incoming fields so that cross-field
   // visibility rules (e.g. a new field referencing an existing trigger) can be
@@ -266,27 +265,23 @@ export const createEnvelopeFields = async ({
       id: f.id,
       type: f.type,
       recipientId: f.recipientId,
-      fieldMeta: f.fieldMeta as Record<string, unknown> | null,
+      fieldMeta: f.fieldMeta as unknown,
     })),
-    ...validatedFields.map((vf, idx) => ({
-      id: -(idx + 1),
-      type: vf.type,
-      recipientId: vf.recipientId,
-      fieldMeta: vf.fieldMeta as Record<string, unknown> | null,
-    })),
+    ...assignedIncoming,
   ];
 
   const validation = validateFieldVisibility({ fields: mergedForValidation });
   if (!validation.ok) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: validation.errors[0].message,
-      userMessage: validation.errors[0].message,
+    const firstError = validation.errors[0];
+    throw new AppError(AppErrorCode[firstError.code as keyof typeof AppErrorCode], {
+      message: firstError.message,
+      userMessage: firstError.message,
     });
   }
 
   const createdFields = await prisma.$transaction(async (tx) => {
     const newlyCreatedFields = await tx.field.createManyAndReturn({
-      data: validatedFields.map((field) => ({
+      data: validatedFields.map((field, idx) => ({
         type: field.type,
         page: field.page,
         positionX: field.positionX,
@@ -295,7 +290,7 @@ export const createEnvelopeFields = async ({
         height: field.height,
         customText: '',
         inserted: false,
-        fieldMeta: field.fieldMeta,
+        fieldMeta: assignedIncoming[idx].fieldMeta as typeof field.fieldMeta,
         envelopeId: envelope.id,
         envelopeItemId: field.envelopeItemId,
         recipientId: field.recipientId,
