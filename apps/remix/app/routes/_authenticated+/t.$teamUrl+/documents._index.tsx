@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
+import type { DocumentStatus as PrismaDocumentStatus } from '@prisma/client';
 import { EnvelopeType } from '@prisma/client';
 import { FolderType, OrganisationType } from '@prisma/client';
 import { useParams, useSearchParams } from 'react-router';
@@ -67,6 +68,9 @@ export default function DocumentsPage() {
     'documents-bulk-selection',
     {},
   );
+  const [envelopeMetaCache, setEnvelopeMetaCache] = useSessionStorage<
+    Record<string, { title: string; status: PrismaDocumentStatus }>
+  >('documents-bulk-selection-meta', {});
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
   const [isBulkDownloadDialogOpen, setIsBulkDownloadDialogOpen] = useState(false);
@@ -99,17 +103,40 @@ export default function DocumentsPage() {
     },
   );
 
-  const selectedEnvelopesForDownload = useMemo(() => {
-    const selectedSet = new Set(selectedEnvelopeIds);
+  useEffect(() => {
+    setEnvelopeMetaCache((prev) => {
+      const next: Record<string, { title: string; status: PrismaDocumentStatus }> = {};
 
-    return (data?.data ?? [])
-      .filter((document) => selectedSet.has(document.envelopeId))
-      .map((document) => ({
-        id: document.envelopeId,
-        title: document.title,
-        status: document.status,
-      }));
-  }, [selectedEnvelopeIds, data?.data]);
+      for (const id of Object.keys(prev)) {
+        if (rowSelection[id]) {
+          next[id] = prev[id];
+        }
+      }
+
+      for (const document of data?.data ?? []) {
+        if (rowSelection[document.envelopeId]) {
+          next[document.envelopeId] = {
+            title: document.title,
+            status: document.status,
+          };
+        }
+      }
+
+      return next;
+    });
+  }, [data?.data, rowSelection, setEnvelopeMetaCache]);
+
+  const selectedEnvelopesForDownload = useMemo(() => {
+    return selectedEnvelopeIds
+      .map((id) => {
+        const meta = envelopeMetaCache[id];
+        return meta ? { id, title: meta.title, status: meta.status } : null;
+      })
+      .filter(
+        (item): item is { id: string; title: string; status: PrismaDocumentStatus } =>
+          item !== null,
+      );
+  }, [selectedEnvelopeIds, envelopeMetaCache]);
 
   const getTabHref = (value: keyof typeof ExtendedDocumentStatus) => {
     const params = new URLSearchParams(searchParams);
