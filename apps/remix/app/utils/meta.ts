@@ -2,13 +2,15 @@ import { type MessageDescriptor, i18n } from '@lingui/core';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 
-export const appMetaTags = (title?: MessageDescriptor) => {
+export const appMetaTags = (title?: MessageDescriptor | string) => {
   const description =
     'Join Documenso, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.';
 
+  const resolvedTitle = typeof title === 'string' ? title : title ? i18n._(title) : undefined;
+
   return [
     {
-      title: title ? `${i18n._(title)} - Documenso` : 'Documenso',
+      title: resolvedTitle ? `${resolvedTitle} - Documenso` : 'Documenso',
     },
     {
       name: 'description',
