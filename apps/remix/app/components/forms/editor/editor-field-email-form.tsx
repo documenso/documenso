@@ -8,6 +8,7 @@ import {
   DEFAULT_FIELD_FONT_SIZE,
   type TEmailFieldMeta as EmailFieldMeta,
   FIELD_DEFAULT_GENERIC_ALIGN,
+  FIELD_EMAIL_META_DEFAULT_VALUES,
   ZEmailFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { Form } from '@documenso/ui/primitives/form/form';
@@ -20,6 +21,7 @@ import {
 const ZEmailFieldFormSchema = ZEmailFieldMeta.pick({
   fontSize: true,
   textAlign: true,
+  overflow: true,
 });
 
 type TEmailFieldFormSchema = z.infer<typeof ZEmailFieldFormSchema>;
@@ -41,6 +43,7 @@ export const EditorFieldEmailForm = ({
     defaultValues: {
       fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
       textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
+      overflow: value.overflow || FIELD_EMAIL_META_DEFAULT_VALUES.overflow,
     },
   });
 
