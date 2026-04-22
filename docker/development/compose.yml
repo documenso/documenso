@@ -48,6 +48,20 @@ services:
     entrypoint: sh
     command: -c 'mkdir -p /data/documenso && minio server /data --console-address ":9001" --address ":9002"'
 
+  clamav:
+    image: clamav/clamav:latest
+    container_name: clamav
+    ports:
+      - 3310:3310
+    healthcheck:
+      test: ['CMD-SHELL', 'clamdscan --version || exit 1 ']
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - clamav_data:/var/lib/clamav
+
 volumes:
   minio:
   redis:

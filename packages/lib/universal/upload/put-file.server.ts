@@ -3,9 +3,10 @@ import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
 import { match } from 'ts-pattern';
 
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { scanFileForMalware } from '@documenso/lib/server-only/document/scanner';
 import { env } from '@documenso/lib/utils/env';
 
-import { AppError } from '../../errors/app-error';
 import { createDocumentData } from '../../server-only/document-data/create-document-data';
 import { normalizePdf } from '../../server-only/pdf/normalize-pdf';
 import { uploadS3File } from './server-actions';
@@ -24,6 +25,15 @@ export const putPdfFileServerSide = async (file: File, initialData?: string) => 
   const isEncryptedDocumentsAllowed = false; // Was feature flag.
 
   const arrayBuffer = await file.arrayBuffer();
+  // converting to Nodejs buffer for scanning
+  const bufferforScaning = Buffer.from(arrayBuffer);
+  const isInfected = await scanFileForMalware(bufferforScaning);
+
+  if (isInfected) {
+    throw new AppError(AppErrorCode.SECURITY_CHECK_FAILED, {
+      userMessage: 'Malware Detected',
+    });
+  }
 
   const pdf = await PDF.load(new Uint8Array(arrayBuffer)).catch((e) => {
     console.error(`PDF upload parse error: ${e.message}`);
@@ -57,6 +67,10 @@ export const putNormalizedPdfFileServerSide = async (
   options: { flattenForm?: boolean } = {},
 ) => {
   const buffer = Buffer.from(await file.arrayBuffer());
+  const isInfected = await scanFileForMalware(buffer);
+  if (isInfected) {
+    throw new AppError('SECURITY_CHECK_FAILED');
+  }
 
   const normalized = await normalizePdf(buffer, options);
 

@@ -22,6 +22,14 @@ services:
       - 2500:2500
       - 1100:1100
 
+  clamav:
+    image: clamav/clamav:latest_fp
+    healthcheck:
+      test: ['CMD', 'clamdscan', '--version']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   documenso:
     build:
       context: ../../
@@ -31,6 +39,8 @@ services:
         condition: service_healthy
       inbucket:
         condition: service_started
+      clamav:
+        condition: service_healthy
     env_file:
       - ../../.env.example
     environment:
@@ -48,6 +58,9 @@ services:
       - NEXT_PRIVATE_SMTP_FROM_NAME="No Reply @ Documenso"
       - NEXT_PRIVATE_SMTP_FROM_ADDRESS=noreply@documenso.com
       - NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
+      - NEXT_PRIVATE_ENABLE_MALWARE_SCAN=true
+      - NEXT_PRIVATE_CLAMAV_HOST=clamav
+      - NEXT_PRIVATE_CLAMAV_PORT=3310
     ports:
       - 3000:3000
     volumes:

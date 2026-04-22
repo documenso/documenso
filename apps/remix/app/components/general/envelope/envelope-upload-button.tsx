@@ -135,7 +135,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
           'ENVELOPE_ITEM_LIMIT_EXCEEDED',
           () => t`You have reached the limit of the number of files per envelope.`,
         )
-        .otherwise(() => t`An error occurred while uploading your document.`);
+        .otherwise(() => error.userMessage || t`An error occurred while uploading your document.`);
 
       toast({
         title: t`Error`,
