@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ['next', 'turbo', 'eslint:recommended', 'plugin:@typescript-eslint/recommended'],
+  extends: ['turbo', 'eslint:recommended', 'plugin:@typescript-eslint/recommended'],
 
   plugins: ['unused-imports'],
 
@@ -22,8 +22,7 @@ module.exports = {
   },
 
   rules: {
-    '@next/next/no-html-link-for-pages': 'off',
-    'react/no-unescaped-entities': 'off',
+    // 'react/no-unescaped-entities': 'off',
 
     '@typescript-eslint/no-unused-vars': 'off',
     'unused-imports/no-unused-imports': 'warn',

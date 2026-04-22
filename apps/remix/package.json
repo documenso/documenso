@@ -45,7 +45,7 @@
     "colord": "^2.9.3",
     "content-disposition": "^1.0.1",
     "framer-motion": "^12.23.24",
-    "hono": "^4.12.5",
+    "hono": "^4.12.14",
     "hono-react-router-adapter": "^0.6.5",
     "input-otp": "^1.4.2",
     "isbot": "^5.1.32",
