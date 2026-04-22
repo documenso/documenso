@@ -13,7 +13,13 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { type EnvelopeIdOptions } from '../../utils/envelope';
 import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
+import { assignFieldStableIds } from '../envelope/assign-field-stable-ids';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { mergeFieldsForValidation } from '../envelope/merge-fields-for-validation';
+import {
+  type ValidatableField,
+  validateFieldVisibility,
+} from '../envelope/validate-field-visibility';
 
 export interface UpdateEnvelopeFieldsOptions {
   userId: number;
@@ -127,6 +133,42 @@ export const updateEnvelopeFields = async ({
       recipientEmail: recipient.email,
     };
   });
+
+  // Build the post-update field set for visibility validation. Each incoming
+  // field replaces the matching existing row; fields not being updated are
+  // carried through unchanged via mergeFieldsForValidation.
+  const incomingForStableIds = fieldsToUpdate.map(({ originalField, updateData }) => ({
+    id: updateData.id,
+    type: updateData.type ?? originalField.type,
+    recipientId: originalField.recipientId,
+    fieldMeta: (updateData.fieldMeta ?? originalField.fieldMeta) as Record<string, unknown> | null,
+  }));
+
+  const assignedIncoming = assignFieldStableIds(incomingForStableIds);
+
+  const mergedForValidation = mergeFieldsForValidation(
+    envelope.fields.map((f) => ({
+      id: f.id,
+      type: f.type,
+      recipientId: f.recipientId,
+      fieldMeta: f.fieldMeta as unknown,
+    })),
+    assignedIncoming.map((ai) => ({
+      id: ai.id,
+      type: ai.type,
+      recipientId: ai.recipientId,
+      fieldMeta: ai.fieldMeta as unknown,
+    })),
+  );
+
+  const validation = validateFieldVisibility({ fields: mergedForValidation as ValidatableField[] });
+  if (!validation.ok) {
+    const firstError = validation.errors[0];
+    throw new AppError(AppErrorCode[firstError.code as keyof typeof AppErrorCode], {
+      message: firstError.message,
+      userMessage: firstError.message,
+    });
+  }
 
   const updatedFields = await prisma.$transaction(async (tx) => {
     return await Promise.all(

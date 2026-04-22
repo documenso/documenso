@@ -15,7 +15,11 @@ import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
 import { assignFieldStableIds } from '../envelope/assign-field-stable-ids';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
-import { validateFieldVisibility } from '../envelope/validate-field-visibility';
+import { mergeFieldsForValidation } from '../envelope/merge-fields-for-validation';
+import {
+  type ValidatableField,
+  validateFieldVisibility,
+} from '../envelope/validate-field-visibility';
 import { type BoundingBox, whiteoutRegions } from '../pdf/auto-place-fields';
 
 type CoordinatePosition = {
@@ -260,17 +264,22 @@ export const createEnvelopeFields = async ({
   // visibility rules (e.g. a new field referencing an existing trigger) can be
   // validated in one pass. Incoming fields receive negative sentinel IDs to
   // avoid collisions with real database IDs.
-  const mergedForValidation = [
-    ...envelope.fields.map((f) => ({
+  const mergedForValidation = mergeFieldsForValidation(
+    envelope.fields.map((f) => ({
       id: f.id,
       type: f.type,
       recipientId: f.recipientId,
       fieldMeta: f.fieldMeta as unknown,
     })),
-    ...assignedIncoming,
-  ];
+    assignedIncoming.map((ai) => ({
+      id: null,
+      type: ai.type,
+      recipientId: ai.recipientId,
+      fieldMeta: ai.fieldMeta as unknown,
+    })),
+  );
 
-  const validation = validateFieldVisibility({ fields: mergedForValidation });
+  const validation = validateFieldVisibility({ fields: mergedForValidation as ValidatableField[] });
   if (!validation.ok) {
     const firstError = validation.errors[0];
     throw new AppError(AppErrorCode[firstError.code as keyof typeof AppErrorCode], {

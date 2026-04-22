@@ -20,7 +20,13 @@ import { prisma } from '@documenso/prisma';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapFieldToLegacyField } from '../../utils/fields';
+import { assignFieldStableIds } from '../envelope/assign-field-stable-ids';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { mergeFieldsForValidation } from '../envelope/merge-fields-for-validation';
+import {
+  type ValidatableField,
+  validateFieldVisibility,
+} from '../envelope/validate-field-visibility';
 
 export type SetFieldsForTemplateOptions = {
   userId: number;
@@ -112,6 +118,43 @@ export const setFieldsForTemplate = async ({
       _recipient: recipient,
     };
   });
+
+  // Validate cross-field visibility rules against the post-operation field set.
+  // linkedFields represents what will be persisted; removedFields will be gone.
+  const incomingForStableIds = linkedFields.map((field, idx) => ({
+    id: field._persisted?.id != null ? field._persisted.id : -(idx + 1),
+    type: field.type,
+    recipientId: field.recipientId,
+    fieldMeta: (field.fieldMeta ?? null) as Record<string, unknown> | null,
+  }));
+
+  const assignedIncoming = assignFieldStableIds(incomingForStableIds);
+
+  const mergedForValidation = mergeFieldsForValidation(
+    existingFields.map((f) => ({
+      id: f.id,
+      type: f.type,
+      recipientId: f.recipientId ?? -1,
+      fieldMeta: f.fieldMeta as unknown,
+    })),
+    assignedIncoming.map((ai) => ({
+      id: ai.id,
+      type: ai.type,
+      recipientId: ai.recipientId,
+      fieldMeta: ai.fieldMeta as unknown,
+    })),
+  );
+
+  const visibilityValidation = validateFieldVisibility({
+    fields: mergedForValidation as ValidatableField[],
+  });
+  if (!visibilityValidation.ok) {
+    const firstError = visibilityValidation.errors[0];
+    throw new AppError(AppErrorCode[firstError.code as keyof typeof AppErrorCode], {
+      message: firstError.message,
+      userMessage: firstError.message,
+    });
+  }
 
   const persistedFields = await Promise.all(
     // Disabling as wrapping promises here causes type issues
