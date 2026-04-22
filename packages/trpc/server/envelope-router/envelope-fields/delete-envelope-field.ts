@@ -21,7 +21,7 @@ export const deleteEnvelopeFieldRoute = authenticatedProcedure
   .output(ZDeleteEnvelopeFieldResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { user, teamId, metadata } = ctx;
-    const { fieldId } = input;
+    const { fieldId, force } = input;
 
     ctx.logger.info({
       input: {
@@ -89,7 +89,69 @@ export const deleteEnvelopeFieldRoute = authenticatedProcedure
       });
     }
 
+    // Check for dangling visibility references.
+    const deletingMeta = fieldToDelete.fieldMeta as { stableId?: string } | null;
+    const deletingStableId = deletingMeta?.stableId;
+
+    let danglingRefs: Array<{ id: number; fieldMeta: unknown }> = [];
+
+    if (deletingStableId) {
+      const allOtherFields = await prisma.field.findMany({
+        where: {
+          envelopeId: envelope.id,
+          id: { not: fieldToDelete.id },
+        },
+        select: { id: true, fieldMeta: true },
+      });
+
+      danglingRefs = allOtherFields.filter((f) => {
+        const meta = f.fieldMeta as {
+          visibility?: { rules: Array<{ triggerFieldStableId: string }> };
+        } | null;
+        return (
+          meta?.visibility?.rules.some((r) => r.triggerFieldStableId === deletingStableId) ?? false
+        );
+      });
+
+      if (danglingRefs.length > 0 && !force) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message:
+            'Field is used as a visibility trigger by other fields. Pass force=true to strip those rules.',
+        });
+      }
+    }
+
     await prisma.$transaction(async (tx) => {
+      // Strip dangling visibility rules from referencing fields before deletion.
+      if (danglingRefs.length > 0 && force) {
+        for (const ref of danglingRefs) {
+          const meta = ref.fieldMeta as {
+            visibility: {
+              rules: Array<{ triggerFieldStableId: string }>;
+              match: 'all' | 'any';
+            };
+          } & Record<string, unknown>;
+
+          const remaining = meta.visibility.rules.filter(
+            (r) => r.triggerFieldStableId !== deletingStableId,
+          );
+
+          const newMeta = { ...meta };
+
+          if (remaining.length === 0) {
+            delete (newMeta as Record<string, unknown>).visibility;
+          } else {
+            newMeta.visibility = { ...meta.visibility, rules: remaining };
+          }
+
+          await tx.field.update({
+            where: { id: ref.id },
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            data: { fieldMeta: newMeta as unknown as any },
+          });
+        }
+      }
+
       const deletedField = await tx.field.delete({
         where: {
           id: fieldToDelete.id,

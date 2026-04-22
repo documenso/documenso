@@ -15,6 +15,13 @@ export const deleteEnvelopeFieldMeta: TrpcRouteMeta = {
 
 export const ZDeleteEnvelopeFieldRequestSchema = z.object({
   fieldId: z.number(),
+  force: z
+    .boolean()
+    .optional()
+    .default(false)
+    .describe(
+      "When true, proceed even if the field is referenced by other fields' visibility rules. Dangling rules will be stripped.",
+    ),
 });
 
 export const ZDeleteEnvelopeFieldResponseSchema = ZSuccessResponseSchema;
