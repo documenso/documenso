@@ -14,6 +14,7 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
+import { useRequiredEnvelopeSigningContext } from './envelope-signing-provider';
 
 export type DocumentSigningFieldContainerProps = {
   field: FieldWithSignature;
@@ -66,6 +67,8 @@ export const DocumentSigningFieldContainer = ({
 }: DocumentSigningFieldContainerProps) => {
   const { executeActionAuthProcedure, isAuthRedirectRequired } =
     useRequiredDocumentSigningAuthContext();
+
+  const { recipientFieldVisibility } = useRequiredEnvelopeSigningContext();
 
   const parsedFieldMeta = field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined;
   const readOnlyField = parsedFieldMeta?.readOnly || false;
@@ -133,6 +136,7 @@ export const DocumentSigningFieldContainer = ({
     <FieldRootContainer
       color={getRecipientColorStyles(field.fieldMeta?.readOnly ? 'readOnly' : 0)}
       field={field}
+      hidden={recipientFieldVisibility.get(field.id) === false}
     >
       {!field.inserted && !loading && !readOnlyField && (
         <button
