@@ -3,7 +3,10 @@ import { match } from 'ts-pattern';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import type { TDocumentMany as TDocumentRow } from '@documenso/lib/types/document';
+import { findRecipientByEmail } from '@documenso/lib/utils/recipients';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
+
+import { useCurrentTeam } from '~/providers/team';
 
 export type DataTableTitleProps = {
   row: TDocumentRow;
@@ -12,8 +15,13 @@ export type DataTableTitleProps = {
 
 export const DataTableTitle = ({ row, teamUrl }: DataTableTitleProps) => {
   const { user } = useSession();
+  const team = useCurrentTeam();
 
-  const recipient = row.recipients.find((recipient) => recipient.email === user.email);
+  const recipient = findRecipientByEmail({
+    recipients: row.recipients,
+    userEmail: user.email,
+    teamEmail: team.teamEmail?.email,
+  });
 
   const isOwner = row.user.id === user.id;
   const isRecipient = !!recipient;

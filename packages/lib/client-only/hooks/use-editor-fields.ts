@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { Field, Recipient } from '@prisma/client';
+import type { Field } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { getPdfPagesCount } from '@documenso/lib/constants/pdf-viewer';
+import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
-
-import type { TEnvelope } from '../../types/envelope';
 
 export const ZLocalFieldSchema = z.object({
   // This is the actual ID of the field if created.
@@ -37,7 +37,7 @@ const ZEditorFieldsFormSchema = z.object({
 export type TEditorFieldsFormSchema = z.infer<typeof ZEditorFieldsFormSchema>;
 
 type EditorFieldsProps = {
-  envelope: TEnvelope;
+  envelope: TEditorEnvelope;
   handleFieldsUpdate: (fields: TLocalField[]) => unknown;
 };
 
@@ -61,7 +61,7 @@ type UseEditorFieldsResponse = {
   getFieldsByRecipient: (recipientId: number) => TLocalField[];
 
   // Selected recipient
-  selectedRecipient: Recipient | null;
+  selectedRecipient: TEditorEnvelope['recipients'][number] | null;
   setSelectedRecipient: (recipientId: number | null) => void;
 
   resetForm: (fields?: Field[]) => void;
@@ -222,14 +222,16 @@ export const useEditorFields = ({
 
   const duplicateFieldToAllPages = useCallback(
     (field: TLocalField): TLocalField[] => {
-      const pages = Array.from(document.querySelectorAll('[data-page-number]'));
+      const totalPages = getPdfPagesCount();
       const newFields: TLocalField[] = [];
 
-      pages.forEach((_, index) => {
-        const pageNumber = index + 1;
+      if (totalPages < 1) {
+        return newFields;
+      }
 
+      for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
         if (pageNumber === field.page) {
-          return;
+          continue;
         }
 
         const newField: TLocalField = {
@@ -241,7 +243,7 @@ export const useEditorFields = ({
 
         append(newField);
         newFields.push(newField);
-      });
+      }
 
       triggerFieldsUpdate();
       return newFields;

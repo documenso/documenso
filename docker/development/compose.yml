@@ -26,6 +26,14 @@ services:
       - 2500:2500
       - 1100:1100
 
+  redis:
+    image: redis:8-alpine
+    container_name: redis
+    ports:
+      - 63790:6379
+    volumes:
+      - redis:/data
+
   minio:
     image: minio/minio
     container_name: minio
@@ -42,4 +50,5 @@ services:
 
 volumes:
   minio:
+  redis:
   documenso_database:

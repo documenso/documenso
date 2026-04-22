@@ -209,6 +209,8 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
 
     envelopeExpirationPeriod: null,
 
+    reminderSettings: null,
+
     aiFeaturesEnabled: null,
   };
 };

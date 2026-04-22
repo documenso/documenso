@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Field, Recipient } from '@prisma/client';
+import type { Field } from '@prisma/client';
 import { DocumentDistributionMethod, DocumentStatus, RecipientRole } from '@prisma/client';
 import { AnimatePresence, motion } from 'framer-motion';
 import { InfoIcon } from 'lucide-react';
@@ -15,6 +15,7 @@ import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/org
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import type { TDocument } from '@documenso/lib/types/document';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { formatSigningLink } from '@documenso/lib/utils/recipients';
 import { trpc } from '@documenso/trpc/react';
 import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/document/document-send-email-message-helper';
@@ -59,7 +60,7 @@ import type { DocumentFlowStep } from './types';
 
 export type AddSubjectFormProps = {
   documentFlow: DocumentFlowStep;
-  recipients: Recipient[];
+  recipients: TRecipientLite[];
   fields: Field[];
   document: TDocument;
   onSubmit: (_data: TAddSubjectFormSchema) => void;

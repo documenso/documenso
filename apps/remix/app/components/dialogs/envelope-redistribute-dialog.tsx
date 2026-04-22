@@ -4,12 +4,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, EnvelopeType, type Recipient, SigningStatus } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import type { TEnvelope } from '@documenso/lib/types/envelope';
+import type { TEnvelopeRecipientLite } from '@documenso/lib/types/recipient';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -38,7 +39,7 @@ import { StackAvatar } from '../general/stack-avatar';
 
 export type EnvelopeRedistributeDialogProps = {
   envelope: Pick<TEnvelope, 'id' | 'userId' | 'teamId' | 'status' | 'type' | 'documentMeta'> & {
-    recipients: Recipient[];
+    recipients: TEnvelopeRecipientLite[];
   };
   trigger?: React.ReactNode;
 };

@@ -13,12 +13,14 @@ export enum AppErrorCode {
   'LIMIT_EXCEEDED' = 'LIMIT_EXCEEDED',
   'NOT_FOUND' = 'NOT_FOUND',
   'NOT_SETUP' = 'NOT_SETUP',
+  'INVALID_CAPTCHA' = 'INVALID_CAPTCHA',
   'UNAUTHORIZED' = 'UNAUTHORIZED',
   'UNKNOWN_ERROR' = 'UNKNOWN_ERROR',
   'RETRY_EXCEPTION' = 'RETRY_EXCEPTION',
   'SCHEMA_FAILED' = 'SCHEMA_FAILED',
   'TOO_MANY_REQUESTS' = 'TOO_MANY_REQUESTS',
   'TWO_FACTOR_AUTH_FAILED' = 'TWO_FACTOR_AUTH_FAILED',
+  'WEBHOOK_INVALID_REQUEST' = 'WEBHOOK_INVALID_REQUEST',
 }
 
 export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; status: number }> =
@@ -28,6 +30,7 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
     [AppErrorCode.EXPIRED_CODE]: { code: 'BAD_REQUEST', status: 400 },
     [AppErrorCode.INVALID_BODY]: { code: 'BAD_REQUEST', status: 400 },
     [AppErrorCode.INVALID_REQUEST]: { code: 'BAD_REQUEST', status: 400 },
+    [AppErrorCode.INVALID_CAPTCHA]: { code: 'BAD_REQUEST', status: 400 },
     [AppErrorCode.NOT_FOUND]: { code: 'NOT_FOUND', status: 404 },
     [AppErrorCode.NOT_SETUP]: { code: 'BAD_REQUEST', status: 400 },
     [AppErrorCode.UNAUTHORIZED]: { code: 'UNAUTHORIZED', status: 401 },

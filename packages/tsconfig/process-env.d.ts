@@ -74,12 +74,20 @@ declare namespace NodeJS {
     NEXT_PRIVATE_SMTP_FROM_ADDRESS?: string;
 
     NEXT_PUBLIC_DISABLE_SIGNUP?: string;
+    NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS?: string;
 
     NEXT_PRIVATE_BROWSERLESS_URL?: string;
 
-    NEXT_PRIVATE_JOBS_PROVIDER?: 'inngest' | 'local';
+    NEXT_PRIVATE_JOBS_PROVIDER?: 'inngest' | 'local' | 'bullmq';
 
     NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS?: string;
+
+    /**
+     * Redis / BullMQ environment variables
+     */
+    NEXT_PRIVATE_REDIS_URL?: string;
+    NEXT_PRIVATE_REDIS_PREFIX?: string;
+    NEXT_PRIVATE_BULLMQ_CONCURRENCY?: string;
 
     /**
      * Inngest environment variables
@@ -93,6 +101,12 @@ declare namespace NodeJS {
     DATABASE_URL?: string;
     POSTGRES_PRISMA_URL?: string;
     POSTGRES_URL_NON_POOLING?: string;
+
+    /**
+     * Cloudflare Turnstile environment variables
+     */
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY?: string;
+    NEXT_PRIVATE_TURNSTILE_SECRET_KEY?: string;
 
     /**
      * Google Vertex AI environment variables

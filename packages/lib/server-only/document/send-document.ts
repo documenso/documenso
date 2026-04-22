@@ -1,4 +1,4 @@
-import type { DocumentData, Envelope, EnvelopeItem, Field } from '@prisma/client';
+import type { DocumentData, Envelope, EnvelopeItem, Field, Recipient } from '@prisma/client';
 import {
   DocumentSigningOrder,
   DocumentStatus,
@@ -18,6 +18,7 @@ import { prisma } from '@documenso/prisma';
 import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 
 import { validateCheckboxLength } from '../../advanced-fields-validation/validate-checkbox';
+import { DIRECT_TEMPLATE_RECIPIENT_EMAIL } from '../../constants/direct-templates';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
@@ -159,10 +160,12 @@ export const sendDocument = async ({
   );
 
   if (recipientsWithMissingFields.length > 0) {
-    const missingRecipientIds = recipientsWithMissingFields.map((r) => r.id).join(', ');
+    const missingRecipientDescriptions = recipientsWithMissingFields
+      .map((r) => (r.name ? `${r.name} (${r.email}, id: ${r.id})` : `${r.email} (id: ${r.id})`))
+      .join(', ');
 
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: `The following recipients are missing required fields: ${missingRecipientIds}. Signers must have at least one signature field.`,
+      message: `The following recipients are missing required fields: ${missingRecipientDescriptions}. Signers must have at least one signature field.`,
     });
   }
 
@@ -205,7 +208,7 @@ export const sendDocument = async ({
         });
       }
 
-      const fieldToAutoInsert = extractFieldAutoInsertValues(unknownField);
+      const fieldToAutoInsert = extractFieldAutoInsertValues(unknownField, recipient);
 
       // Only auto-insert fields if the recipient has not been sent the document yet.
       if (fieldToAutoInsert && recipient.sendStatus !== SendStatus.SENT) {
@@ -372,6 +375,7 @@ const injectFormValuesIntoDocument = async (
  */
 export const extractFieldAutoInsertValues = (
   unknownField: Field,
+  recipient: Pick<Recipient, 'email'>,
 ): { fieldId: number; customText: string } | null => {
   const parsedField = ZFieldAndMetaSchema.safeParse(unknownField);
 
@@ -383,6 +387,18 @@ export const extractFieldAutoInsertValues = (
 
   const field = parsedField.data;
   const fieldId = unknownField.id;
+
+  // Auto insert email fields if the recipient has a valid email.
+  if (
+    field.type === FieldType.EMAIL &&
+    isRecipientEmailValidForSending(recipient) &&
+    recipient.email !== DIRECT_TEMPLATE_RECIPIENT_EMAIL
+  ) {
+    return {
+      fieldId,
+      customText: recipient.email,
+    };
+  }
 
   // Auto insert text fields with prefilled values.
   if (field.type === FieldType.TEXT) {

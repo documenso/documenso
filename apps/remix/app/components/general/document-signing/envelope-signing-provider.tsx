@@ -8,9 +8,12 @@ import {
   RecipientRole,
   SigningStatus,
 } from '@prisma/client';
+import { DateTime } from 'luxon';
 import { prop, sortBy } from 'remeda';
 
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import type { EnvelopeForSigningResponse } from '@documenso/lib/server-only/envelope/get-envelope-for-recipient-signing';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
@@ -83,6 +86,54 @@ export interface EnvelopeSigningProviderProps {
   children: React.ReactNode;
 }
 
+/**
+ * Inject prefilled date fields for the current recipient.
+ *
+ * The dates are filled in correctly when the recipient "completes" the document.
+ */
+const prefillDateFields = (data: EnvelopeForSigningResponse): EnvelopeForSigningResponse => {
+  const { timezone, dateFormat } = data.envelope.documentMeta;
+
+  const formattedDate = DateTime.now()
+    .setZone(timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
+    .toFormat(dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
+
+  const prefillField = <
+    T extends { type: FieldType; inserted: boolean; customText: string; fieldMeta: unknown },
+  >(
+    field: T,
+  ): T => {
+    if (field.type !== FieldType.DATE || field.inserted) {
+      return field;
+    }
+
+    return {
+      ...field,
+      customText: formattedDate,
+      inserted: true,
+      fieldMeta: {
+        ...(typeof field.fieldMeta === 'object' ? field.fieldMeta : {}),
+        readOnly: true,
+      },
+    };
+  };
+
+  return {
+    ...data,
+    envelope: {
+      ...data.envelope,
+      recipients: data.envelope.recipients.map((recipient) => ({
+        ...recipient,
+        fields: recipient.fields.map(prefillField),
+      })),
+    },
+    recipient: {
+      ...data.recipient,
+      fields: data.recipient.fields.map(prefillField),
+    },
+  };
+};
+
 export const EnvelopeSigningProvider = ({
   fullName: initialFullName,
   email: initialEmail,
@@ -90,7 +141,7 @@ export const EnvelopeSigningProvider = ({
   envelopeData: initialEnvelopeData,
   children,
 }: EnvelopeSigningProviderProps) => {
-  const [envelopeData, setEnvelopeData] = useState(initialEnvelopeData);
+  const [envelopeData, setEnvelopeData] = useState(() => prefillDateFields(initialEnvelopeData));
 
   const { envelope, recipient } = envelopeData;
 

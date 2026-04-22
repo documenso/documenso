@@ -1,5 +1,7 @@
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import {
+  AlertTriangleIcon,
   BarChart3,
   Building2Icon,
   FileStack,
@@ -18,8 +20,13 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { AdminLicenseStatusBanner } from '~/components/general/admin-license-status-banner';
+import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types/_layout';
+
+export function meta() {
+  return appMetaTags(msg`Admin`);
+}
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { user } = await getSession(request);
@@ -120,6 +127,20 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
             <Link to="/admin/documents">
               <FileStack className="mr-2 h-5 w-5" />
               <Trans>Documents</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/unsealed-documents') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/unsealed-documents">
+              <AlertTriangleIcon className="mr-2 h-5 w-5" />
+              <Trans>Unsealed Documents</Trans>
             </Link>
           </Button>
 

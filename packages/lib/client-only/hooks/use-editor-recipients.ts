@@ -1,7 +1,7 @@
 import { useId } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DocumentSigningOrder, type Recipient, RecipientRole } from '@prisma/client';
+import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 import type { UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { prop, sortBy } from 'remeda';
@@ -11,9 +11,8 @@ import {
   ZRecipientActionAuthTypesSchema,
   ZRecipientAuthOptionsSchema,
 } from '@documenso/lib/types/document-auth';
+import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
 import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
-
-import type { TEnvelope } from '../../types/envelope';
 
 const LocalRecipientSchema = z.object({
   formId: z.string().min(1),
@@ -36,12 +35,12 @@ export const ZEditorRecipientsFormSchema = z.object({
 export type TEditorRecipientsFormSchema = z.infer<typeof ZEditorRecipientsFormSchema>;
 
 type EditorRecipientsProps = {
-  envelope: TEnvelope;
+  envelope: TEditorEnvelope;
 };
 
 type ResetFormOptions = {
-  recipients?: Recipient[];
-  documentMeta?: TEnvelope['documentMeta'];
+  recipients?: TEditorEnvelope['recipients'];
+  documentMeta?: TEditorEnvelope['documentMeta'];
 };
 
 type UseEditorRecipientsResponse = {

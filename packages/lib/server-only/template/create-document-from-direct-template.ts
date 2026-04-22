@@ -1,6 +1,3 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
 import type { Field, Signature } from '@prisma/client';
 import {
   DocumentSigningOrder,
@@ -18,18 +15,16 @@ import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
-import { mailer } from '@documenso/email/mailer';
-import { DocumentCreatedFromDirectTemplateEmailTemplate } from '@documenso/email/templates/document-created-from-direct-template';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
 
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { jobs } from '../../jobs/client';
 import { DOCUMENT_AUDIT_LOG_TYPE, RECIPIENT_DIFF_TYPE } from '../../types/document-audit-logs';
 import type { TRecipientActionAuthTypes } from '../../types/document-auth';
 import { DocumentAccessAuth, ZRecipientAuthOptionsSchema } from '../../types/document-auth';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { ZFieldMetaSchema } from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
@@ -48,12 +43,10 @@ import {
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { formatDocumentsPath } from '../../utils/teams';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
-import { getEmailContext } from '../email/get-email-context';
 import { incrementDocumentId } from '../envelope/increment-id';
+import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentFromDirectTemplateOptions = {
@@ -156,15 +149,12 @@ export const createDocumentFromDirectTemplate = async ({
     });
   }
 
-  const { branding, settings, senderEmail, emailLanguage } = await getEmailContext({
-    emailType: 'INTERNAL',
-    source: {
-      type: 'team',
-      teamId: directTemplateEnvelope.teamId,
-    },
+  const settings = await getTeamSettings({
+    userId: directTemplateEnvelope.userId,
+    teamId: directTemplateEnvelope.teamId,
   });
 
-  const { recipients, directLink, user: templateOwner } = directTemplateEnvelope;
+  const { recipients, directLink } = directTemplateEnvelope;
 
   const directTemplateRecipient = recipients.find(
     (recipient) => recipient.id === directLink.directTemplateRecipientId,
@@ -318,18 +308,10 @@ export const createDocumentFromDirectTemplate = async ({
 
       const titleToUse = item.title || directTemplateEnvelope.title;
 
-      const duplicatedFile = await putPdfFileServerSide({
+      const { documentData: newDocumentData } = await putPdfFileServerSide({
         name: titleToUse,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(buffer),
-      });
-
-      const newDocumentData = await prisma.documentData.create({
-        data: {
-          type: duplicatedFile.type,
-          data: duplicatedFile.data,
-          initialData: duplicatedFile.initialData,
-        },
       });
 
       const newEnvelopeItemId = prefixedId('envelope_item');
@@ -723,6 +705,7 @@ export const createDocumentFromDirectTemplate = async ({
           where: { id: nextRecipient.id },
           data: {
             sendStatus: SendStatus.SENT,
+            sentAt: new Date(),
             ...(nextSigner && documentMeta?.allowDictateNextSigner
               ? {
                   name: nextSigner.name,
@@ -755,43 +738,24 @@ export const createDocumentFromDirectTemplate = async ({
       });
     }
 
-    // Send email to template owner.
-    const emailTemplate = createElement(DocumentCreatedFromDirectTemplateEmailTemplate, {
-      recipientName: directRecipientEmail,
-      recipientRole: directTemplateRecipient.role,
-      documentLink: `${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(createdEnvelope.team?.url)}/${
-        createdEnvelope.id
-      }`,
-      documentName: createdEnvelope.title,
-      assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000',
-    });
-
-    const [html, text] = await Promise.all([
-      renderEmailWithI18N(emailTemplate, { lang: emailLanguage, branding }),
-      renderEmailWithI18N(emailTemplate, { lang: emailLanguage, branding, plainText: true }),
-    ]);
-
-    const i18n = await getI18nInstance(emailLanguage);
-
-    await mailer.sendMail({
-      to: [
-        {
-          name: templateOwner.name || '',
-          address: templateOwner.email,
-        },
-      ],
-      from: senderEmail,
-      subject: i18n._(msg`Document created from direct template`),
-      html,
-      text,
-    });
-
     return {
       createdEnvelope,
       token: createdDirectRecipient.token,
       recipientId: createdDirectRecipient.id,
     };
   });
+
+  const emailSettings = extractDerivedDocumentEmailSettings(documentMeta);
+
+  if (emailSettings.ownerDocumentCreated) {
+    await jobs.triggerJob({
+      name: 'send.document.created.from.direct.template.email',
+      payload: {
+        envelopeId: createdEnvelope.id,
+        recipientId,
+      },
+    });
+  }
 
   try {
     // This handles sending emails and sealing the document if required.

@@ -293,6 +293,45 @@ export const DocumentEmailCheckboxes = ({
 
       <div className="flex flex-row items-center">
         <Checkbox
+          id={DocumentEmailEvents.OwnerDocumentCreated}
+          className="h-5 w-5"
+          checked={value.ownerDocumentCreated}
+          onCheckedChange={(checked) =>
+            onChange({ ...value, [DocumentEmailEvents.OwnerDocumentCreated]: Boolean(checked) })
+          }
+        />
+
+        <label
+          className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
+          htmlFor={DocumentEmailEvents.OwnerDocumentCreated}
+        >
+          <Trans>Email the owner when a document is created from a direct template</Trans>
+
+          <Tooltip>
+            <TooltipTrigger>
+              <InfoIcon className="mx-2 h-4 w-4" />
+            </TooltipTrigger>
+
+            <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+              <h2>
+                <strong>
+                  <Trans>Document created from direct template email</Trans>
+                </strong>
+              </h2>
+
+              <p>
+                <Trans>
+                  This email is sent to the document owner when a recipient creates a document via a
+                  direct template link.
+                </Trans>
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </label>
+      </div>
+
+      <div className="flex flex-row items-center">
+        <Checkbox
           id={DocumentEmailEvents.OwnerRecipientExpired}
           className="h-5 w-5"
           checked={value.ownerRecipientExpired}

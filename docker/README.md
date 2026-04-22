@@ -254,3 +254,4 @@ Here's a markdown table documenting all the provided environment variables:
 | `NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT`                       | The maximum document upload limit displayed to the user (in MB).                                    |
 | `NEXT_PUBLIC_POSTHOG_KEY`                                      | The optional PostHog key for analytics and feature flags.                                           |
 | `NEXT_PUBLIC_DISABLE_SIGNUP`                                   | Whether to disable user signups through the /signup page.                                           |
+| `NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS`                          | Comma-separated list of email domains allowed to sign up (e.g., `example.com,acme.org`).            |

@@ -97,6 +97,14 @@ export type CreateEnvelopeOptions = {
     data: string;
     type?: TEnvelopeAttachmentType;
   }>;
+
+  /**
+   * Whether to bypass adding default recipients.
+   *
+   * Defaults to false.
+   */
+  bypassDefaultRecipients?: boolean;
+
   meta?: Partial<Omit<DocumentMeta, 'id'>>;
   requestMetadata: ApiRequestMetadata;
 };
@@ -110,6 +118,7 @@ export const createEnvelope = async ({
   meta,
   requestMetadata,
   internalVersion,
+  bypassDefaultRecipients = false,
 }: CreateEnvelopeOptions) => {
   const {
     type,
@@ -198,7 +207,7 @@ export const createEnvelope = async ({
 
         const titleToUse = item.title || title;
 
-        const newDocumentData = await putPdfFileServerSide({
+        const { documentData: newDocumentData } = await putPdfFileServerSide({
           name: titleToUse,
           type: 'application/pdf',
           arrayBuffer: async () => Promise.resolve(normalizedPdf),
@@ -256,18 +265,6 @@ export const createEnvelope = async ({
   // for uploads from the frontend
   const timezoneToUse = meta?.timezone || settings.documentTimezone || userTimezone;
 
-  const documentMeta = await prisma.documentMeta.create({
-    data: extractDerivedDocumentMeta(settings, {
-      ...meta,
-      timezone: timezoneToUse,
-    }),
-  });
-
-  const secondaryId =
-    type === EnvelopeType.DOCUMENT
-      ? await incrementDocumentId().then((v) => v.formattedDocumentId)
-      : await incrementTemplateId().then((v) => v.formattedTemplateId);
-
   const getValidatedDelegatedOwner = async () => {
     if (
       !settings.delegateDocumentOwnership ||
@@ -302,7 +299,18 @@ export const createEnvelope = async ({
     return delegatedOwner;
   };
 
-  const delegatedOwner = await getValidatedDelegatedOwner();
+  const [documentMeta, secondaryId, delegatedOwner] = await Promise.all([
+    prisma.documentMeta.create({
+      data: extractDerivedDocumentMeta(settings, {
+        ...meta,
+        timezone: timezoneToUse,
+      }),
+    }),
+    type === EnvelopeType.DOCUMENT
+      ? incrementDocumentId().then((v) => v.formattedDocumentId)
+      : incrementTemplateId().then((v) => v.formattedTemplateId),
+    getValidatedDelegatedOwner(),
+  ]);
   const envelopeOwnerId = delegatedOwner?.id ?? userId;
 
   const createdEnvelope = await prisma.$transaction(async (tx) => {
@@ -355,9 +363,10 @@ export const createEnvelope = async ({
 
     const firstEnvelopeItem = envelope.envelopeItems[0];
 
-    const defaultRecipients = settings.defaultRecipients
-      ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients)
-      : [];
+    const defaultRecipients =
+      settings.defaultRecipients && !bypassDefaultRecipients
+        ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients)
+        : [];
 
     const mappedDefaultRecipients: CreateEnvelopeRecipientOptions[] = defaultRecipients.map(
       (recipient) => ({
@@ -572,7 +581,7 @@ export const createEnvelope = async ({
       });
     }
 
-    // Only create audit logs and webhook events for documents.
+    // Only create audit logs for documents.
     if (type === EnvelopeType.DOCUMENT) {
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({
@@ -609,17 +618,28 @@ export const createEnvelope = async ({
           }),
         });
       }
-
-      await triggerWebhook({
-        event: WebhookTriggerEvents.DOCUMENT_CREATED,
-        data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
-        userId,
-        teamId,
-      });
     }
 
     return createdEnvelope;
   });
+
+  // Trigger webhook outside the transaction to avoid holding the connection
+  // open during network I/O.
+  if (type === EnvelopeType.DOCUMENT) {
+    await triggerWebhook({
+      event: WebhookTriggerEvents.DOCUMENT_CREATED,
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
+      userId,
+      teamId,
+    });
+  } else if (type === EnvelopeType.TEMPLATE) {
+    await triggerWebhook({
+      event: WebhookTriggerEvents.TEMPLATE_CREATED,
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
+      userId,
+      teamId,
+    });
+  }
 
   return createdEnvelope;
 };

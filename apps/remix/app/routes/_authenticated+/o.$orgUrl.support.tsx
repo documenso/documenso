@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { BookIcon, HelpCircleIcon, Link2Icon } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router';
@@ -13,7 +14,7 @@ import { SupportTicketForm } from '~/components/forms/support-ticket-form';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Support');
+  return appMetaTags(msg`Support`);
 }
 
 export default function SupportPage() {
@@ -39,18 +40,18 @@ export default function SupportPage() {
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <div className="mb-8">
         <h1 className="flex flex-row items-center gap-2 text-3xl font-bold">
-          <HelpCircleIcon className="text-muted-foreground h-8 w-8" />
+          <HelpCircleIcon className="h-8 w-8 text-muted-foreground" />
           <Trans>Support</Trans>
         </h1>
 
-        <p className="text-muted-foreground mt-2">
+        <p className="mt-2 text-muted-foreground">
           <Trans>Your current plan includes the following support channels:</Trans>
         </p>
 
         <div className="mt-6 flex flex-col gap-4">
           <div className="rounded-lg border p-4">
             <h2 className="flex items-center gap-2 text-lg font-bold">
-              <BookIcon className="text-muted-foreground h-5 w-5" />
+              <BookIcon className="h-5 w-5 text-muted-foreground" />
               <Link
                 to="https://docs.documenso.com"
                 target="_blank"
@@ -60,13 +61,13 @@ export default function SupportPage() {
                 <Trans>Documentation</Trans>
               </Link>
             </h2>
-            <p className="text-muted-foreground mt-1">
+            <p className="mt-1 text-muted-foreground">
               <Trans>Read our documentation to get started with Documenso.</Trans>
             </p>
           </div>
           <div className="rounded-lg border p-4">
             <h2 className="flex items-center gap-2 text-lg font-bold">
-              <Link2Icon className="text-muted-foreground h-5 w-5" />
+              <Link2Icon className="h-5 w-5 text-muted-foreground" />
               <Link
                 to="https://documen.so/discord"
                 target="_blank"
@@ -76,7 +77,7 @@ export default function SupportPage() {
                 <Trans>Discord</Trans>
               </Link>
             </h2>
-            <p className="text-muted-foreground mt-1">
+            <p className="mt-1 text-muted-foreground">
               <Trans>
                 Join our community on{' '}
                 <Link
@@ -95,10 +96,10 @@ export default function SupportPage() {
             <>
               <div className="rounded-lg border p-4">
                 <h2 className="flex items-center gap-2 text-lg font-bold">
-                  <Link2Icon className="text-muted-foreground h-5 w-5" />
+                  <Link2Icon className="h-5 w-5 text-muted-foreground" />
                   <Trans>Contact us</Trans>
                 </h2>
-                <p className="text-muted-foreground mt-1">
+                <p className="mt-1 text-muted-foreground">
                   <Trans>We'll get back to you as soon as possible via email.</Trans>
                 </p>
                 <div className="mt-4">

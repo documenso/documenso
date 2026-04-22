@@ -63,6 +63,7 @@ CLAUDE.md
 
 # scripts
 scripts/output*
+scripts/bench-*
 
 # license
 .documenso-license.json
@@ -70,3 +71,6 @@ scripts/output*
 
 # tmp
 tmp/
+
+# opencode
+.opencode/package-lock.json

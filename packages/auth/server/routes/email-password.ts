@@ -6,6 +6,7 @@ import { HTTPException } from 'hono/http-exception';
 import { DateTime } from 'luxon';
 import { z } from 'zod';
 
+import { isEmailDomainAllowedForSignup } from '@documenso/lib/constants/auth';
 import { EMAIL_VERIFICATION_STATE } from '@documenso/lib/constants/email';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { jobsClient } from '@documenso/lib/jobs/client';
@@ -15,6 +16,7 @@ import { isTwoFactorAuthenticationEnabled } from '@documenso/lib/server-only/2fa
 import { setupTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/setup-2fa';
 import { validateTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/validate-2fa';
 import { viewBackupCodes } from '@documenso/lib/server-only/2fa/view-backup-codes';
+import { verifyCaptchaToken } from '@documenso/lib/server-only/captcha/verify-captcha';
 import { rateLimitResponse } from '@documenso/lib/server-only/rate-limit/rate-limit-middleware';
 import {
   forgotPasswordRateLimit,
@@ -59,7 +61,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   .post('/authorize', sValidator('json', ZSignInSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
-    const { email, password, totpCode, backupCode, csrfToken } = c.req.valid('json');
+    const { email, password, totpCode, backupCode, csrfToken, captchaToken } = c.req.valid('json');
 
     const loginLimitResult = await loginRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
@@ -82,6 +84,11 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
         message: 'Invalid CSRF token',
       });
     }
+
+    await verifyCaptchaToken({
+      token: captchaToken,
+      ipAddress: requestMetadata.ipAddress,
+    });
 
     if (
       email.toLowerCase() === legacyServiceAccountEmail() ||
@@ -122,7 +129,11 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     const is2faEnabled = isTwoFactorAuthenticationEnabled({ user });
 
     if (is2faEnabled) {
-      const isValid = await validateTwoFactorAuthentication({ backupCode, totpCode, user });
+      const isValid = await validateTwoFactorAuthentication({
+        backupCode,
+        totpCode,
+        user,
+      });
 
       if (!isValid) {
         await prisma.userSecurityAuditLog.create({
@@ -178,12 +189,12 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     const requestMetadata = c.get('requestMetadata');
 
     if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
-      throw new AppError('SIGNUP_DISABLED', {
-        message: 'Signups are disabled.',
+      throw new AppError(AuthenticationErrorCode.SignupDisabled, {
+        statusCode: 400,
       });
     }
 
-    const { name, email, password, signature } = c.req.valid('json');
+    const { name, email, password, signature, captchaToken } = c.req.valid('json');
 
     const signupLimitResult = await signupRateLimit.check({
       ip: requestMetadata.ipAddress ?? 'unknown',
@@ -194,6 +205,17 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     if (signupLimited) {
       throw new HTTPException(429, {
         res: signupLimited,
+      });
+    }
+
+    await verifyCaptchaToken({
+      token: captchaToken,
+      ipAddress: requestMetadata.ipAddress,
+    });
+
+    if (!isEmailDomainAllowedForSignup(email)) {
+      throw new AppError(AuthenticationErrorCode.SignupDisabled, {
+        statusCode: 400,
       });
     }
 

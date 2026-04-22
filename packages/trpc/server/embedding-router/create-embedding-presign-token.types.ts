@@ -24,7 +24,9 @@ export const ZCreateEmbeddingPresignTokenRequestSchema = z.object({
   scope: z
     .string()
     .optional()
-    .describe('Resource restriction. Example: documentId:1, templateId:2'),
+    .describe(
+      'Resource restriction. V1 embeds only support documentId:1, templateId:2. V2 embeds only support envelopeId:envelope_123',
+    ),
 });
 
 export const ZCreateEmbeddingPresignTokenResponseSchema = z.object({
