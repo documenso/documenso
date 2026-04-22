@@ -1,5 +1,6 @@
 import { FieldType } from '@prisma/client';
 
+import type { TVisibilityBlock } from '../../types/field-meta';
 import { topologicalSort } from '../../universal/field-visibility/topological-sort';
 
 export type FieldVisibilityErrorCode =
@@ -18,7 +19,7 @@ export type FieldVisibilityError = {
   cyclePath?: string[];
 };
 
-type ValidatableField = {
+export type ValidatableField = {
   id: number;
   type: FieldType;
   recipientId: number;
@@ -32,14 +33,8 @@ const ELIGIBLE_TRIGGER_TYPES = new Set<FieldType>([
   FieldType.TEXT,
 ]);
 
-const extractVisibility = (field: ValidatableField) => {
-  const meta = field.fieldMeta as {
-    stableId?: string;
-    visibility?: {
-      match: 'all' | 'any';
-      rules: Array<{ operator: string; triggerFieldStableId: string; value?: string }>;
-    };
-  } | null;
+const extractVisibility = (field: ValidatableField): TVisibilityBlock | null => {
+  const meta = field.fieldMeta as { visibility?: TVisibilityBlock } | null;
   return meta?.visibility ?? null;
 };
 
@@ -49,13 +44,19 @@ const extractStableId = (field: ValidatableField): string | null => {
 };
 
 const triggerOptionValues = (field: ValidatableField): string[] | null => {
-  const meta = field.fieldMeta as {
-    values?: Array<{ value: string } | { value: string; id: number; checked: boolean }>;
-  } | null;
+  const meta = field.fieldMeta as { values?: Array<{ value: string }> } | null;
   if (!meta?.values) return null;
   return meta.values.map((v) => v.value);
 };
 
+/**
+ * Validates visibility rules across a complete envelope field set.
+ *
+ * **Precondition:** callers must have already Zod-parsed each field's
+ * `fieldMeta` with `ZFieldMetaSchema` (or equivalent). This validator performs
+ * cross-field structural checks only — it trusts that per-field meta shapes
+ * are already well-formed.
+ */
 export const validateFieldVisibility = (input: {
   fields: ValidatableField[];
 }): { ok: true } | { ok: false; errors: FieldVisibilityError[] } => {
@@ -75,7 +76,7 @@ export const validateFieldVisibility = (input: {
     block.rules.forEach((rule, ruleIndex) => {
       const trigger = byStableId.get(rule.triggerFieldStableId);
 
-      if (rule.triggerFieldStableId === depStableId) {
+      if (depStableId !== null && rule.triggerFieldStableId === depStableId) {
         errors.push({
           fieldId: dep.id,
           ruleIndex,
