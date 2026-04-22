@@ -21,6 +21,7 @@ export const getDocumentCertificateAuditLogs = async ({
           DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED,
           DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
           DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT,
+          DOCUMENT_AUDIT_LOG_TYPE.FIELD_SKIPPED_CONDITIONAL,
         ],
       },
     },
@@ -48,6 +49,9 @@ export const getDocumentCertificateAuditLogs = async ({
       (log) =>
         log.type === DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT &&
         log.data.emailType !== DOCUMENT_EMAIL_TYPE.DOCUMENT_COMPLETED,
+    ),
+    [DOCUMENT_AUDIT_LOG_TYPE.FIELD_SKIPPED_CONDITIONAL]: auditLogs.filter(
+      (log) => log.type === DOCUMENT_AUDIT_LOG_TYPE.FIELD_SKIPPED_CONDITIONAL,
     ),
   } as const;
 

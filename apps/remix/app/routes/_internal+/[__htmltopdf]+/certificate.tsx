@@ -221,6 +221,18 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
       );
   };
 
+  const getSkippedConditionalFields = (recipientId: number) => {
+    const recipientFieldSecondaryIds = new Set(
+      document.recipients.find((r) => r.id === recipientId)?.fields.map((f) => f.secondaryId) ?? [],
+    );
+
+    return auditLogs[DOCUMENT_AUDIT_LOG_TYPE.FIELD_SKIPPED_CONDITIONAL].filter(
+      (log) =>
+        log.type === DOCUMENT_AUDIT_LOG_TYPE.FIELD_SKIPPED_CONDITIONAL &&
+        recipientFieldSecondaryIds.has(log.data.fieldId),
+    );
+  };
+
   return (
     <div className="print-provider pointer-events-none mx-auto max-w-screen-md">
       <div className="flex items-center">
@@ -377,6 +389,37 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
                                 )}
                           </span>
                         </p>
+
+                        {(() => {
+                          const skipped = getSkippedConditionalFields(recipient.id);
+                          if (skipped.length === 0) return null;
+                          return (
+                            <div className="mt-2">
+                              <p className="text-sm font-medium text-muted-foreground print:text-xs">
+                                {_(msg`Fields Not Shown (Conditional)`)}:
+                              </p>
+                              <ul className="mt-1 space-y-0.5">
+                                {skipped.map((log) => (
+                                  <li
+                                    key={log.data.fieldId}
+                                    className="text-sm text-muted-foreground print:text-xs"
+                                  >
+                                    <span className="font-medium">
+                                      {log.data.fieldLabel || log.data.fieldId}
+                                    </span>
+                                    {log.data.unmetRuleSummary ? (
+                                      <>
+                                        {' '}
+                                        &mdash; {_(msg`not shown because`)}{' '}
+                                        {log.data.unmetRuleSummary}
+                                      </>
+                                    ) : null}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </TableCell>
                   </TableRow>
