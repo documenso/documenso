@@ -272,7 +272,7 @@ export const createEnvelopeFields = async ({
       fieldMeta: f.fieldMeta as unknown,
     })),
     assignedIncoming.map((ai) => ({
-      id: null,
+      id: ai.id,
       type: ai.type,
       recipientId: ai.recipientId,
       fieldMeta: ai.fieldMeta as unknown,
