@@ -190,16 +190,29 @@ describe('evaluateAllVisibility — operator semantics', () => {
     expect(m.get(3)).toBe(true);
   });
 
-  it('chained: when A fails, B hides, and C evaluates against hidden B (still sees its committed value)', () => {
+  it('chained: when A fails, B hides, and C evaluates against hidden B (still sees B\'s committed value)', () => {
     const a = mkField({
       id: 1, type: FieldType.RADIO, customText: 'No', inserted: true,
       fieldMeta: { type: 'radio', stableId: 'A' },
     });
+    // B has customText filled from a prior state when A was 'Yes'; A is now 'No' so B is hidden.
     const b = mkField({
       id: 2, type: FieldType.TEXT, customText: 'Jane', inserted: true,
-      fieldMeta: vis({ match: 'all', rules: [{ operator: 'equals', triggerFieldStableId: 'A', value: 'Yes' }] }, 'B'),
+      fieldMeta: vis(
+        { match: 'all', rules: [{ operator: 'equals', triggerFieldStableId: 'A', value: 'Yes' }] },
+        'B',
+      ),
     });
-    const m = evaluateAllVisibility([a, b]);
-    expect(m.get(2)).toBe(false);
+    // C depends on B being non-empty. B's customText is still 'Jane' even though B is hidden,
+    // so C's condition is met and C is visible. This documents the "committed values are
+    // the source of truth" semantic — cleanup of stale values happens at completion, not during
+    // live evaluation.
+    const c = mkField({
+      id: 3, type: FieldType.TEXT,
+      fieldMeta: vis({ match: 'all', rules: [{ operator: 'isNotEmpty', triggerFieldStableId: 'B' }] }, 'C'),
+    });
+    const m = evaluateAllVisibility([a, b, c]);
+    expect(m.get(2)).toBe(false); // B hidden because A failed
+    expect(m.get(3)).toBe(true); // C visible because B's stale customText is still non-empty
   });
 });

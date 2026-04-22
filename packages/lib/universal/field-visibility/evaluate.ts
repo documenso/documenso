@@ -3,7 +3,7 @@ import { FieldType } from '@prisma/client';
 import type { TVisibilityBlock, TVisibilityRule } from '../../types/field-meta';
 import { topologicalSort } from './topological-sort';
 
-type EvaluatableField = {
+export type EvaluatableField = {
   id: number;
   type: FieldType;
   customText: string;
@@ -23,6 +23,8 @@ const getVisibility = (field: EvaluatableField): TVisibilityBlock | null => {
 
 const normalize = (s: string): string => s.trim().toLowerCase();
 
+// Returns [] on malformed JSON — safe for contains/isEmpty (fail-closed)
+// but note that notContains will treat corrupt state as "does not contain X" → true.
 const parseCheckboxCustomText = (customText: string): string[] => {
   if (!customText) return [];
   try {
@@ -51,7 +53,7 @@ const triggerValueFor = (
     return { isEmpty: list.length === 0, scalar: '', list };
   }
 
-  const scalar = (trigger.customText ?? '').toString();
+  const scalar = trigger.customText;
   return { isEmpty: scalar.trim() === '', scalar, list: [] };
 };
 
@@ -136,14 +138,15 @@ export const evaluateAllVisibility = (fields: EvaluatableField[]): Map<number, b
   };
 
   const sorted = topologicalSort(ids, dependenciesOf);
-  const order =
-    sorted.kind === 'ok' ? sorted.order.map((s) => byId.get(s)!).filter(Boolean) : fields;
 
-  for (const field of order) {
-    if (sorted.kind === 'cycle') {
-      result.set(field.id, false); // fail-closed on corrupt data
-      continue;
-    }
+  if (sorted.kind === 'cycle') {
+    for (const f of fields) result.set(f.id, false);
+    return result;
+  }
+
+  for (const idStr of sorted.order) {
+    const field = byId.get(idStr);
+    if (!field) continue;
     const { visible } = evaluateVisibility(field, fields);
     result.set(field.id, visible);
   }
