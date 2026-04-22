@@ -41,6 +41,34 @@ const ZFieldMetaVerticalAlign = z
   .enum(['top', 'middle', 'bottom'])
   .describe('The vertical alignment of the text');
 
+export const ZVisibilityRule = z.discriminatedUnion('operator', [
+  z.object({
+    operator: z.enum(['equals', 'notEquals', 'contains', 'notContains']),
+    triggerFieldStableId: z.string().min(1),
+    value: z.string(),
+  }),
+  z
+    .object({
+      operator: z.enum(['isEmpty', 'isNotEmpty']),
+      triggerFieldStableId: z.string().min(1),
+    })
+    .strict(),
+]);
+
+export type TVisibilityRule = z.infer<typeof ZVisibilityRule>;
+
+export const ZVisibilityBlock = z.object({
+  match: z.enum(['all', 'any']),
+  rules: z.array(ZVisibilityRule).min(1).max(10),
+});
+
+export type TVisibilityBlock = z.infer<typeof ZVisibilityBlock>;
+
+const ZConditionalMetaExtensions = {
+  stableId: z.string().optional(),
+  visibility: ZVisibilityBlock.optional(),
+};
+
 export const ZBaseFieldMeta = z.object({
   label: z.string().optional(),
   placeholder: z.string().optional(),
@@ -58,28 +86,28 @@ export type TFieldTextAlignSchema = z.infer<typeof ZFieldTextAlignSchema>;
 export const ZInitialsFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('initials'),
   textAlign: ZFieldTextAlignSchema.optional(),
-});
+}).strict();
 
 export type TInitialsFieldMeta = z.infer<typeof ZInitialsFieldMeta>;
 
 export const ZNameFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('name'),
   textAlign: ZFieldTextAlignSchema.optional(),
-});
+}).strict();
 
 export type TNameFieldMeta = z.infer<typeof ZNameFieldMeta>;
 
 export const ZEmailFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('email'),
   textAlign: ZFieldTextAlignSchema.optional(),
-});
+}).strict();
 
 export type TEmailFieldMeta = z.infer<typeof ZEmailFieldMeta>;
 
 export const ZDateFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('date'),
   textAlign: ZFieldTextAlignSchema.optional(),
-});
+}).strict();
 
 export type TDateFieldMeta = z.infer<typeof ZDateFieldMeta>;
 
@@ -94,6 +122,7 @@ export const ZTextFieldMeta = ZBaseFieldMeta.extend({
   lineHeight: ZFieldMetaLineHeight.nullish(),
   letterSpacing: ZFieldMetaLetterSpacing.nullish(),
   verticalAlign: ZFieldMetaVerticalAlign.nullish(),
+  ...ZConditionalMetaExtensions,
 });
 
 export type TTextFieldMeta = z.infer<typeof ZTextFieldMeta>;
@@ -108,6 +137,7 @@ export const ZNumberFieldMeta = ZBaseFieldMeta.extend({
   lineHeight: ZFieldMetaLineHeight.nullish(),
   letterSpacing: ZFieldMetaLetterSpacing.nullish(),
   verticalAlign: ZFieldMetaVerticalAlign.nullish(),
+  ...ZConditionalMetaExtensions,
 });
 
 export type TNumberFieldMeta = z.infer<typeof ZNumberFieldMeta>;
@@ -124,6 +154,7 @@ export const ZRadioFieldMeta = ZBaseFieldMeta.extend({
     )
     .optional(),
   direction: z.enum(['vertical', 'horizontal']).optional().default('vertical'),
+  ...ZConditionalMetaExtensions,
 });
 
 export type TRadioFieldMeta = z.infer<typeof ZRadioFieldMeta>;
@@ -142,6 +173,7 @@ export const ZCheckboxFieldMeta = ZBaseFieldMeta.extend({
   validationRule: z.string().optional(),
   validationLength: z.number().optional(),
   direction: z.enum(['vertical', 'horizontal']).optional().default('vertical'),
+  ...ZConditionalMetaExtensions,
 });
 
 export type TCheckboxFieldMeta = z.infer<typeof ZCheckboxFieldMeta>;
@@ -150,13 +182,14 @@ export const ZDropdownFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('dropdown'),
   values: z.array(z.object({ value: z.string() })).optional(),
   defaultValue: z.string().optional(),
+  ...ZConditionalMetaExtensions,
 });
 
 export type TDropdownFieldMeta = z.infer<typeof ZDropdownFieldMeta>;
 
 export const ZSignatureFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('signature'),
-});
+}).strict();
 
 export type TSignatureFieldMeta = z.infer<typeof ZSignatureFieldMeta>;
 
