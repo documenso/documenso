@@ -72,3 +72,4 @@ scripts/bench-*
 # tmp
 tmp/
 .superpowers/
+.worktrees/
