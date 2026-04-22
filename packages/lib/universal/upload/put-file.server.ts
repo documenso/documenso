@@ -25,9 +25,8 @@ export const putPdfFileServerSide = async (file: File, initialData?: string) => 
   const isEncryptedDocumentsAllowed = false; // Was feature flag.
 
   const arrayBuffer = await file.arrayBuffer();
-  // converting to Nodejs buffer for scanning
-  const bufferforScaning = Buffer.from(arrayBuffer);
-  const isInfected = await scanFileForMalware(bufferforScaning);
+  const scanBuffer = Buffer.from(arrayBuffer);
+  const isInfected = await scanFileForMalware(scanBuffer);
 
   if (isInfected) {
     throw new AppError(AppErrorCode.SECURITY_CHECK_FAILED, {
@@ -69,7 +68,9 @@ export const putNormalizedPdfFileServerSide = async (
   const buffer = Buffer.from(await file.arrayBuffer());
   const isInfected = await scanFileForMalware(buffer);
   if (isInfected) {
-    throw new AppError('SECURITY_CHECK_FAILED');
+    throw new AppError(AppErrorCode.SECURITY_CHECK_FAILED, {
+      userMessage: 'Malware Detected',
+    });
   }
 
   const normalized = await normalizePdf(buffer, options);

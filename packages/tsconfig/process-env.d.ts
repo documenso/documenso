@@ -115,9 +115,9 @@ declare namespace NodeJS {
     GOOGLE_VERTEX_LOCATION?: string;
     GOOGLE_VERTEX_API_KEY?: string;
 
-    /**
-     * MALWARE SCAN enviornment variables
-     */
+
+    // MALWARE SCAN enviornment variables
+
     NEXT_PRIVATE_CLAMAV_PORT?: string;
     NEXT_PRIVATE_CLAMAV_HOST?: string;
     NEXT_PRIVATE_ENABLE_MALWARE_SCAN?: string;
