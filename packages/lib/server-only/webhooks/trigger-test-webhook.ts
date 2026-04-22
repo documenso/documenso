@@ -32,7 +32,7 @@ export const triggerTestWebhook = async ({
   try {
     await triggerWebhook({
       event,
-      data: samplePayload,
+      data: samplePayload.payload,
       userId,
       teamId,
     });
