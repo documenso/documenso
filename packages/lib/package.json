@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@ai-sdk/google-vertex": "3.0.81",
+    "@paralleldrive/cuid2": "^2.2.2",
     "@aws-sdk/client-s3": "^3.998.0",
     "@aws-sdk/client-sesv2": "^3.998.0",
     "@aws-sdk/cloudfront-signer": "^3.998.0",
