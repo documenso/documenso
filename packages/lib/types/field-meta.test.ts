@@ -4,6 +4,9 @@ import {
   ZCheckboxFieldMeta,
   ZDateFieldMeta,
   ZDropdownFieldMeta,
+  ZEmailFieldMeta,
+  ZInitialsFieldMeta,
+  ZNameFieldMeta,
   ZNumberFieldMeta,
   ZRadioFieldMeta,
   ZSignatureFieldMeta,
@@ -40,22 +43,14 @@ describe('field-meta visibility extension', () => {
     ).not.toThrow();
   });
 
-  it('rejects visibility on signature fields', () => {
-    expect(() =>
-      ZSignatureFieldMeta.parse({
-        type: 'signature',
-        visibility: validBlock,
-      }),
-    ).toThrow();
-  });
-
-  it('rejects visibility on date fields', () => {
-    expect(() =>
-      ZDateFieldMeta.parse({
-        type: 'date',
-        visibility: validBlock,
-      }),
-    ).toThrow();
+  it.each([
+    ['signature', ZSignatureFieldMeta],
+    ['date', ZDateFieldMeta],
+    ['initials', ZInitialsFieldMeta],
+    ['name', ZNameFieldMeta],
+    ['email', ZEmailFieldMeta],
+  ])('rejects visibility on %s fields', (type, schema) => {
+    expect(() => schema.parse({ type, visibility: validBlock })).toThrow();
   });
 
   it('requires value when operator is equals', () => {
@@ -67,16 +62,17 @@ describe('field-meta visibility extension', () => {
     ).toThrow();
   });
 
-  it('rejects value when operator is isEmpty', () => {
-    expect(() =>
-      ZVisibilityBlock.parse({
-        match: 'all',
-        rules: [
-          { operator: 'isEmpty', triggerFieldStableId: 'abc', value: 'x' },
-        ],
-      }),
-    ).toThrow();
-  });
+  it.each([['isEmpty'], ['isNotEmpty']])(
+    'rejects value when operator is %s',
+    (operator) => {
+      expect(() =>
+        ZVisibilityBlock.parse({
+          match: 'all',
+          rules: [{ operator, triggerFieldStableId: 'abc', value: 'x' }],
+        }),
+      ).toThrow();
+    },
+  );
 
   it('requires at least one rule', () => {
     expect(() => ZVisibilityBlock.parse({ match: 'all', rules: [] })).toThrow();
@@ -89,5 +85,23 @@ describe('field-meta visibility extension', () => {
       value: 'v',
     }));
     expect(() => ZVisibilityBlock.parse({ match: 'all', rules })).toThrow();
+  });
+
+  it('accepts match any', () => {
+    expect(() =>
+      ZVisibilityBlock.parse({
+        match: 'any',
+        rules: [{ operator: 'equals', triggerFieldStableId: 'abc', value: 'x' }],
+      }),
+    ).not.toThrow();
+  });
+
+  it('rejects empty triggerFieldStableId', () => {
+    expect(() =>
+      ZVisibilityBlock.parse({
+        match: 'all',
+        rules: [{ operator: 'equals', triggerFieldStableId: '', value: 'x' }],
+      }),
+    ).toThrow();
   });
 });
