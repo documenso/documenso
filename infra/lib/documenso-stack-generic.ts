@@ -90,6 +90,41 @@ export class GenericDocumensoStack extends cdk.Stack {
       description: "Email 'From' address. Must be verified at your SMTP provider (e.g. AWS SES).",
     });
 
+    // -- Signing ---------------------------------------------------------
+
+    const signingTransport = new cdk.CfnParameter(this, 'SigningTransport', {
+      type: 'String',
+      default: 'aws-kms',
+      allowedValues: ['aws-kms', 'azure-kv'],
+      description:
+        "Signing backend. 'aws-kms' = self-signed (Adobe shows 'identity not trusted'); " +
+        "'azure-kv' = AATL-trusted (requires Azure Key Vault Premium + SSL.com OV Document " +
+        'Signing cert, ~$300-500/yr + one-time $500 attestation fee).',
+    });
+
+    const azureKvUrl = new cdk.CfnParameter(this, 'AzureKvUrl', {
+      type: 'String',
+      default: '',
+      description:
+        "Azure Key Vault URL (e.g. 'https://my-vault.vault.azure.net'). Required when " +
+        'SigningTransport=azure-kv; leave blank for aws-kms.',
+    });
+
+    const azureKvKeyName = new cdk.CfnParameter(this, 'AzureKvKeyName', {
+      type: 'String',
+      default: '',
+      description:
+        'Name of the signing key inside the Azure Key Vault. Required when ' +
+        'SigningTransport=azure-kv; leave blank for aws-kms.',
+    });
+
+    const azureKvKeyVersion = new cdk.CfnParameter(this, 'AzureKvKeyVersion', {
+      type: 'String',
+      default: '',
+      description:
+        'Optional Azure Key Vault key version. Leave blank to always use the latest version.',
+    });
+
     // -- Sizing -----------------------------------------------------------
 
     const dbInstanceClass = new cdk.CfnParameter(this, 'DbInstanceClass', {
@@ -146,6 +181,10 @@ export class GenericDocumensoStack extends cdk.Stack {
       appConfigSecretArn: '',
       databaseUrlSecretArn: '',
       uploadsBucketName: '',
+      signingTransport: signingTransport.valueAsString as 'aws-kms' | 'azure-kv',
+      azureKvUrl: azureKvUrl.valueAsString,
+      azureKvKeyName: azureKvKeyName.valueAsString,
+      azureKvKeyVersion: azureKvKeyVersion.valueAsString,
     };
 
     cdk.Tags.of(this).add('project', 'documenso');
@@ -199,6 +238,10 @@ export class GenericDocumensoStack extends cdk.Stack {
           {
             Label: { default: 'SSO (Microsoft)' },
             Parameters: ['MicrosoftTenantId'],
+          },
+          {
+            Label: { default: 'Signing' },
+            Parameters: ['SigningTransport', 'AzureKvUrl', 'AzureKvKeyName', 'AzureKvKeyVersion'],
           },
           {
             Label: { default: 'Sizing' },

@@ -2,213 +2,279 @@
 
 > ## ⚠️ READ THIS FIRST
 >
-> **A self-signed cert is NOT suitable for real contracts.** PDFs signed with a self-signed cert show in Adobe Reader as *"Signature valid. Signer's identity is UNKNOWN."* Counterparties, courts, and auditors treat "identity unknown" as **not legally binding**.
+> **Self-signed signatures are NOT legally binding.** PDFs signed with a self-signed cert show in Adobe Reader as *"Signature valid. Signer's identity is UNKNOWN."* Counterparties, courts, and auditors treat "identity unknown" as not legally binding.
 >
-> **Before sending real contracts, you MUST upgrade to an AATL cert.** The upgrade is a single Secrets Manager update — no code, no infra, no redeploy of the stack. This document walks you through it.
+> **For real contracts, you need an AATL cert.** See the [AATL attestation matrix](#aatl-attestation-matrix) below to pick a path — the short version is **Azure Key Vault Premium is the cheapest working option (~$850 year 1, ~$350/yr after).**
 
 ---
 
 ## How signing works here
 
-Documenso signs PDFs using an X.509 certificate whose private key lives in AWS KMS (or a local `.p12` file — see the "transport" you picked during deploy).
+Documenso signs PDFs using an X.509 certificate whose private key lives in an HSM — AWS KMS, Azure Key Vault, Google Cloud HSM, or a local `.p12` file (depending on the "transport" picked at deploy).
 
-- **The private key stays in KMS.** No local file, no export. Operations are `kms:Sign` calls.
-- **The certificate** declares "whose public key this is" (the subject) and "who vouches for that claim" (the issuer / CA).
-- **Self-signed** means you are both the subject AND the issuer — no external party vouches for you. Adobe has no basis to trust the identity.
-- **AATL-trusted** means a CA from [Adobe's Approved Trust List](https://helpx.adobe.com/acrobat/kb/approved-trust-list2.html) verified your identity (phone calls, IDs, business docs) and issued the cert. Adobe trusts their root, so your signature chains up to "trusted".
+- **The private key stays in the HSM.** No local file, no export. Signing is an API call that hands a digest to the HSM.
+- **The certificate** declares "whose public key this is" (subject) and "who vouches for that claim" (issuer).
+- **Self-signed** means you are both the subject AND the issuer. No external party vouches. Adobe has no basis to trust.
+- **AATL-trusted** means a CA from [Adobe's Approved Trust List](https://helpx.adobe.com/acrobat/kb/approved-trust-list2.html) verified your identity and issued the cert. Adobe trusts their root → your signature chains up to "trusted".
 
-Critically: **you can keep using the same KMS key forever.** Upgrading from self-signed → AATL-trusted is just swapping the cert PEM. The signature bytes are still produced by the same KMS key.
+Critically: **you can keep using the same HSM key forever.** Upgrading from self-signed → AATL is just swapping the cert PEM.
 
 ---
 
-## When the self-signed default is OK
+## AATL attestation matrix
+
+[CABForum Baseline Requirements](https://cabforum.org/baseline-requirements-documents/) (June 2023+) require AATL CAs to attest that the signing key lives in a FIPS 140-2 Level 2+ HSM and was never exported. The HSM backend determines which CA flow is available.
+
+| Backend | Attestation | Cost (first year) | Cost (yearly) | Viability for MSP |
+|---|---|---|---|---|
+| ❌ **AWS KMS** (standard) | Not supported by any AATL CA — attestation-form audit ($2,000+) required by each CA | Prohibitive | Prohibitive | **No.** Self-signed only. |
+| ⚠️ **AWS CloudHSM** | Supported via KGC ceremony | ~$1,600/mo + cert | ~$19,200/yr/deploy | **No.** Too expensive. |
+| ✅ **Azure Key Vault Premium** | Built-in via portal CSR. SSL.com + DigiCert + GlobalSign accept. | ~$850 (fee + cert) | ~$350 (cert renewal) | **Yes — recommended.** |
+| ✅ **Azure Key Vault Managed HSM** | Same as Premium, but FIPS Level 3 | ~$2,300/mo + fee + cert | Prohibitive | **No.** Premium is cheaper and satisfies AATL. |
+| ✅ **Google Cloud HSM** | Built-in attestation | ~$1/mo + cert | Similar to Azure | Viable if already on GCP. |
+
+**Our choice: Azure Key Vault Premium + SSL.com OV Document Signing.** Confirmed via [SSL.com's supported Cloud HSMs guide](https://www.ssl.com/guide/supported-cloud-hsms-document-signing-ev-code-signing/):
+
+- ✅ KV Premium supported
+- ✅ Attestation = portal-generated CSR (no separate form)
+- ✅ One-time $500 USD attestation fee
+- ✅ Base cert tiered by signing volume: Free / +$180 / +$300 / ... per year
+- ✅ Key requirement: RSA-HSM, non-exportable, **≥3072 bits**
+
+---
+
+## When self-signed is OK
 
 Use cases where "valid but untrusted identity" is acceptable:
 
-- Internal HR forms, consent flows, or approvals within a single org
+- Internal HR forms, consent flows, approvals within one org
 - Demos and UAT environments
-- Pilots where counterparties are the same org as the signer
-- Workflows where the PDF is one artifact among many (and the trusted record lives elsewhere — e.g. in a CLM with its own notarization)
+- Pilots where counterparties are the same org
+- Workflows where the PDF is one artifact among many (e.g. CLM with its own notarization)
 
-**Not** OK (upgrade before using):
+**NOT OK:**
 
 - External contracts (clients, vendors, employees outside the org)
 - Anything a counterparty's legal team will review
-- Anything subject to compliance regimes (SOC 2, HIPAA, FINRA, etc.)
+- Anything subject to compliance regimes (SOC 2, HIPAA, FINRA)
 - Anything that might end up in discovery during a dispute
 
 ---
 
-## AATL CA options
+## Azure Key Vault Premium procurement runbook
 
-| CA            | Typical cost          | Notes                                                                    |
-| ------------- | --------------------- | ------------------------------------------------------------------------ |
-| **SSL.com**   | ~$200 IV / ~$300 OV   | Fastest onboarding. Good HSM attestation flow for AWS KMS. Recommended starter. |
-| **GlobalSign**| ~$250 IV / ~$400 OV   | Widely recognized. HSM attestation supported. Slightly slower issuance.   |
-| **DigiCert**  | ~$280 IV / ~$400 OV   | Premium; enterprise workflows. Rigorous identity verification.            |
-| **Entrust**   | ~$350–600 OV          | Enterprise-focused. Longest lead time.                                    |
-| **IdenTrust** | ~$80–150 IV           | Cheapest AATL. Issuance can take 1–2 weeks. Limited to certain regions.   |
+Budget: 1-2 business days setup + 3-10 business days for OV validation. Total ~$850 first year, ~$350/yr renewal.
 
-### IV vs OV
+### Prerequisites
 
-- **Individual Validation (IV)** — subject is a named person. ("CN=Jacob Kapostins, O=Gnarlysoft")
-- **Organization Validation (OV)** — subject is the org. ("O=Gnarlysoft, CN=Gnarlysoft Document Signing")
-- **IV + OV** — both present in the cert.
+- Azure subscription (any tier; subscription ID and tenant ID needed)
+- Legal entity in good standing (Articles of Incorporation / Certificate of Good Standing)
+- D-U-N-S number — free from [D&B iUpdate](https://iupdate.dnb.com/), takes 1-2 days if you don't have one
+- Verifiable business phone number (must appear in public directory — Google Business, D-U-N-S, legal filing)
+- Corporate officer's name + government-issued photo ID scan
 
-For server-side signing where the Documenso server signs on behalf of the company (rather than a specific human attesting), **OV is the right choice.** Signatures appear as "Signed by [YourOrg]" which is what recipients expect.
+### Step 1: Provision Azure Key Vault Premium
 
----
-
-## Procurement runbook (self-host path)
-
-Budget: ~2–5 business days, ~$200–500 first year.
-
-### What to gather before contacting the CA
-
-1. **Legal entity name** — exactly as registered (Articles of Incorporation / Certificate of Good Standing).
-2. **Business registration details** — state/country of incorporation, registration number.
-3. **D-U-N-S number** — most AATL CAs use D&B as a third-party business verifier. Free from [D&B iUpdate](https://iupdate.dnb.com/) if you don't have one; takes a day or two.
-4. **Signing officer** — a corporate officer who will be the verification contact (often CEO or CTO). Government-issued photo ID will be needed.
-5. **Verifiable phone number** — must appear in a public directory (Google Business listing, D-U-N-S, legal filing). CAs call this number to confirm identity.
-6. **Contact email** on the org's verified domain (e.g. `ceo@yourcompany.com`, not a Gmail).
-
-### Step 1: Pick the CA and order the cert
-
-SSL.com example (similar flows at other CAs):
-
-1. Go to the CA's "Document Signing Certificate" product page.
-2. Choose **Organization Validation (OV)**.
-3. Under "Where will the private key live?", choose **"Bring my own HSM"** / **"HSM attestation"** (NOT "YubiKey" or "Cloud signing" — we want to use AWS KMS).
-4. Pay.
-
-### Step 2: Generate a CSR from the AWS KMS key
-
-Your Documenso deploy already created the KMS key. Get its ARN:
+The skill's `scripts/setup-azure-kv.py` does this via ARM API. Manual equivalent:
 
 ```bash
-# If you still have .deploy.env from the deploy:
-source .deploy.env
-KEY_ARN=$(aws kms describe-key --profile "$AWS_PROFILE" --region "$AWS_REGION" \
-  --key-id "alias/documenso-signing-$ENV_NAME" --query 'KeyMetadata.Arn' --output text)
+# Create resource group
+az group create -n documenso-signing-prod -l eastus
+
+# Create Key Vault Premium (NOT Standard — must be Premium for HSM-backed keys)
+az keyvault create -n <your-vault-name> -g documenso-signing-prod \
+  --sku premium \
+  --enable-rbac-authorization true \
+  --enable-purge-protection true
+
+# Create the signing key: RSA-HSM, 3072-bit, non-exportable, sign-only
+az keyvault key create --vault-name <your-vault-name> \
+  --name documenso-signing-prod \
+  --kty RSA-HSM \
+  --size 3072 \
+  --ops sign verify \
+  --not-before "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 ```
 
-Then generate a CSR that the KMS key signs:
+### Step 2: Create a service principal for ECS → Azure auth
 
 ```bash
-# Use the helper script stashed during deploy (if the skill provisioned it):
-#   ~/.documenso-deploy-tmp/make_csr.py
-# It calls aws kms sign with the correct algorithm, assembles a PKCS#10 CSR
-# with the subject fields you provide (CN, O, OU, L, ST, C, emailAddress),
-# and writes csr.pem. Submit csr.pem to the CA.
+# Create SP with Key Vault Crypto User role scoped to just the one key
+az ad sp create-for-rbac --name documenso-signing-ecs \
+  --role "Key Vault Crypto User" \
+  --scopes "/subscriptions/<sub-id>/resourceGroups/documenso-signing-prod/providers/Microsoft.KeyVault/vaults/<vault-name>/keys/documenso-signing-prod"
+# Outputs appId (= clientId), password (= clientSecret), tenant (= tenantId)
 ```
 
-*(If the skill didn't create a helper during deploy, see the companion file `scripts/make-kms-csr.py` in the skill directory, or ask Claude to generate one — it's ~60 lines of Python using `asn1crypto` + `boto3`.)*
+Save these three values — they're needed in Step 6.
 
-### Step 3: Submit CSR + identity docs
+### Step 3: Generate the CSR + attestation via the Azure portal
 
-The CA's portal will ask for:
-- The CSR you just generated (`csr.pem`)
-- Upload the articles of incorporation or certificate of good standing
-- Contact info for the signing officer (name, title, email, phone)
-- A scan of the officer's government-issued photo ID (passport or driver's license)
-- The D-U-N-S number if requested
+The portal is the ONLY way to generate an attested CSR as of April 2026 (Azure doesn't expose this via CLI yet).
 
-### Step 4: Respond to the CA's verification calls
+1. Azure portal → your vault → **Certificates** → **Generate/Import** → **Generate**.
+2. Certificate name: `documenso-signing-prod` (can match the key name).
+3. Subject: `CN=<Your Company>, O=<Your Company>, OU=Documenso, emailAddress=<officer>@<yourdomain>, C=<US|CA|...>`
+4. **Advanced Policy Configuration** →
+   - Content Type: **PEM**
+   - Key Type: **RSA-HSM** (critical)
+   - Key Size: **3072**
+   - Exportable Private Key: **No** (critical)
+   - Lifetime validity: 1 year
+   - Issuer: **Self-signed** for now — SSL.com re-signs later via CSR merge
+5. Create. The portal shows "In progress (issuer is unknown)".
+6. Click the pending cert → **Certificate Operation** → **Download CSR**. Save as `csr.pem`.
 
-- CA calls the verified phone number to confirm the officer is real and authorized.
-- CA may ask you to host a DNS TXT record or file on the domain to prove control.
-- Respond promptly — most of the 2–5 business-day timeline is waiting for you, not them.
+### Step 4: Order the cert at SSL.com
 
-### Step 5: CA issues the cert
+1. Visit [SSL.com Document Signing Certificates](https://www.ssl.com/certificates/document-signing/).
+2. Pick **Organization Validation (OV)**. Pick 1-year or 3-year.
+3. During checkout, note under HSM options: **"Azure Key Vault"** — select it. Pay the one-time $500 attestation fee + base cert cost.
+4. Upload `csr.pem` when prompted.
+5. Upload identity docs: Articles of Incorporation, corporate officer's government ID.
+6. Enter signing officer contact info (name, title, business email, business phone).
 
-You'll receive an email with:
-- Your certificate (`.crt` or `.pem`) signed by the CA's intermediate
-- The intermediate and root CA certs to build the chain
+### Step 5: Respond to SSL.com's validation steps
 
-Save them as `signing-cert.pem` and `signing-chain.pem`.
+- SSL.com will call the listed business number (once, 5-min automated) to confirm officer is real.
+- May request DUNS lookup confirmation.
+- May request a DNS TXT record to prove domain control.
 
-### Step 6: Swap the cert in Secrets Manager
+Budget 3-10 business days. Most of the wait is SSL.com's side; respond to their emails within a few hours to keep the clock moving.
 
-**This is the only ops step. No CFN changes, no code changes, no downtime beyond an ECS task rollover.**
+### Step 6: Merge the issued cert back into Azure KV
+
+When SSL.com issues the cert, they'll email:
+- The issued cert (`.crt` or `.pem`)
+- The intermediate + root chain
+
+```bash
+# Combine cert + chain into a single PEM (issued first, then intermediates)
+cat signing-cert.pem signing-chain.pem > merged-cert.pem
+
+# Merge back into the pending KV certificate. This completes the cert lifecycle
+# inside Key Vault — the cert is now bound to the HSM-protected private key.
+az keyvault certificate pending merge --vault-name <vault-name> \
+  --name documenso-signing-prod \
+  --file merged-cert.pem
+```
+
+### Step 7: Wire the cert into Documenso's Secrets Manager
 
 ```bash
 source .deploy.env
 
-# Base64-encode the cert (use the cert your CA issued, not the self-signed one)
-NEW_CERT_B64=$(base64 -w0 /path/to/signing-cert.pem)
+# Base64-encode cert + chain
+CERT_B64=$(base64 -w0 signing-cert.pem)
+CHAIN_B64=$(base64 -w0 signing-chain.pem)
 
-# Optional: if you have a chain file with intermediates
-NEW_CHAIN_B64=$(base64 -w0 /path/to/signing-chain.pem)
-
-# Read current app-config, update only the signing-cert fields, put it back
 APP_CONFIG_ARN=$(aws cloudformation describe-stacks --profile "$AWS_PROFILE" --region "$AWS_REGION" \
   --stack-name "$STACK_NAME" \
   --query "Stacks[0].Outputs[?OutputKey=='SecretsAppConfigSecretArn'].OutputValue" --output text)
 
 aws secretsmanager get-secret-value --profile "$AWS_PROFILE" --region "$AWS_REGION" \
   --secret-id "$APP_CONFIG_ARN" --query SecretString --output text | \
-  jq --arg cert "$NEW_CERT_B64" --arg chain "${NEW_CHAIN_B64:-}" '
-    .NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_CONTENTS = $cert
-    | (if $chain != "" then .NEXT_PRIVATE_SIGNING_AWS_KMS_CERT_CHAIN_CONTENTS = $chain else . end)
-  ' | \
+  jq \
+    --arg tenant "$AZURE_KV_TENANT_ID" \
+    --arg cid "$AZURE_KV_CLIENT_ID" \
+    --arg csec "$AZURE_KV_CLIENT_SECRET" \
+    --arg cert "$CERT_B64" \
+    --arg chain "$CHAIN_B64" '
+      .NEXT_PRIVATE_SIGNING_AZURE_KV_TENANT_ID = $tenant
+      | .NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_ID = $cid
+      | .NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_SECRET = $csec
+      | .NEXT_PRIVATE_SIGNING_AZURE_KV_PUBLIC_CRT_FILE_CONTENTS = $cert
+      | .NEXT_PRIVATE_SIGNING_AZURE_KV_CERT_CHAIN_CONTENTS = $chain
+    ' | \
   aws secretsmanager put-secret-value --profile "$AWS_PROFILE" --region "$AWS_REGION" \
     --secret-id "$APP_CONFIG_ARN" \
     --secret-string file:///dev/stdin
+```
 
-# Roll new tasks so the container picks up the updated secret
-aws ecs update-service --profile "$AWS_PROFILE" --region "$AWS_REGION" \
-  --cluster "documenso-$ENV_NAME" --service "documenso-$ENV_NAME" \
-  --force-new-deployment --no-cli-pager
+### Step 8: Switch the stack to azure-kv transport
+
+```bash
+# Update the stack with SigningTransport=azure-kv + Azure KV coordinates
+aws cloudformation update-stack --profile "$AWS_PROFILE" --region "$AWS_REGION" \
+  --stack-name "$STACK_NAME" \
+  --use-previous-template \
+  --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+  --parameters \
+    ParameterKey=SigningTransport,ParameterValue=azure-kv \
+    ParameterKey=AzureKvUrl,ParameterValue=https://<vault-name>.vault.azure.net \
+    ParameterKey=AzureKvKeyName,ParameterValue=documenso-signing-prod \
+    ParameterKey=AzureKvKeyVersion,ParameterValue= \
+    ParameterKey=EnvName,UsePreviousValue=true \
+    ParameterKey=VpcId,UsePreviousValue=true \
+    # ... repeat UsePreviousValue for all other params ...
 
 aws ecs wait services-stable --profile "$AWS_PROFILE" --region "$AWS_REGION" \
   --cluster "documenso-$ENV_NAME" --services "documenso-$ENV_NAME"
 ```
 
-**(For local-transport deployments)** swap `_AWS_KMS_PUBLIC_CRT_FILE_CONTENTS` for `_LOCAL_FILE_CONTENTS` and include `NEXT_PRIVATE_SIGNING_PASSPHRASE` in the jq update. Same flow otherwise.
+### Step 9: Verify in Adobe Reader
 
-### Step 7: Verify in Adobe Reader
+Sign a test doc. Open the signed PDF in Adobe Reader:
 
-Sign a test document. Open the signed PDF in Adobe Reader:
+- ✅ **Before**: "Signature valid. Signer's identity is UNKNOWN."
+- ✅ **After**: Green checkmark. "Signed by [YourOrg]. The signer's identity is valid."
 
-- ✅ **Before AATL**: "Signature valid. Signer's identity is UNKNOWN."
-- ✅ **After AATL**: Green checkmark. "Signed by [YourOrg]. The signer's identity is valid."
-
-If it still shows untrusted after the swap, first check that the ECS task redeployed and is actually using the new cert (see "Inspecting the currently deployed cert" below). Adobe may also cache validation results — right-click the signature, "Validate Signature" to re-check.
+Right-click the signature → **Validate Signature** if Adobe has cached the untrusted result.
 
 ---
 
 ## MSP Pattern
 
-You cannot use one cert for multiple clients' Documenso instances. The cert's subject IS the signer identity — one cert per legal entity that's actually signing contracts.
+**Each client needs their own cert, their own Azure KV, their own legal identity.** You cannot use one cert across clients — the cert's subject IS the legal signer, and the $500 attestation fee is per-identity.
 
-**For each client deployment:**
+For each client deployment:
 
-1. Deploy Documenso into the client's AWS account (using this skill).
-2. The skill creates a KMS signing key in their account.
-3. **Each client procures their own AATL cert** (they pay the CA, they own the cert, they're the legal signer).
-4. You (the MSP) can facilitate: generate the CSR from their KMS key, walk them through the CA's portal, be the technical point of contact. But the CA must verify the client's identity, not yours.
-5. Drop the cert PEM in their Secrets Manager, force new deployment, verify.
+1. Deploy Documenso into the client's AWS account (this skill).
+2. Walk the client through Steps 1-3 above in **their** Azure subscription.
+3. Client procures their own SSL.com OV Document Signing cert (they pay the $500 attestation + cert fee, they own it).
+4. You can facilitate: generate the CSR, run the merge, wire the secret — but SSL.com verifies the client's identity, not yours.
 
-Billing-wise: most MSPs pass-through the cert cost to the client as a line item, or bundle it into the onboarding fee. Don't absorb it — cert ownership is legal, not technical.
+Cost per client deployment (first year): ~$850 total. ~$350/yr renewal.
 
-**What about a sub-CA approach** (Gnarlysoft issues certs under its own AATL-approved root)? Technically possible — you'd become an AATL-approved **subordinate CA** — but requires WebTrust / ETSI annual audits ($50–100k+), full CA operational infrastructure, and compliance overhead. Not practical for MSPs; realistic path is only for dedicated PKI companies.
+**Sub-CA approach?** Becoming a subordinate AATL-approved CA requires WebTrust / ETSI annual audits ($50-100k+), full CA infrastructure, and compliance overhead. Not practical unless you're a dedicated PKI company.
 
 ---
 
-## Replacing the cert post-deploy (same-cert-type rotation)
+## Cert rotation
 
-Use this when:
-- The current cert is about to expire (most AATL certs are 1 year validity)
-- You're moving from self-signed to AATL
-- You're moving between AATL CAs
+### Rotating the service principal secret (yearly)
 
-The steps are identical to Step 6 above. If the subject DN changes (e.g. legal entity rename), existing signed documents keep the OLD cert (correctly — they were signed at a point in time). Only NEW signatures use the new cert.
+Azure SP secrets expire. Rotate annually:
+
+```bash
+# Create new secret, update ECS, retire old secret
+NEW_SECRET=$(az ad sp credential reset --id <client-id> --years 1 --query password -o tsv)
+
+# Update app-config with new secret
+aws secretsmanager get-secret-value --profile "$AWS_PROFILE" --region "$AWS_REGION" \
+  --secret-id "$APP_CONFIG_ARN" --query SecretString --output text | \
+  jq --arg s "$NEW_SECRET" '.NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_SECRET = $s' | \
+  aws secretsmanager put-secret-value --profile "$AWS_PROFILE" --region "$AWS_REGION" \
+    --secret-id "$APP_CONFIG_ARN" --secret-string file:///dev/stdin
+
+aws ecs update-service --profile "$AWS_PROFILE" --region "$AWS_REGION" \
+  --cluster "documenso-$ENV_NAME" --service "documenso-$ENV_NAME" \
+  --force-new-deployment --no-cli-pager
+```
+
+Set a calendar reminder 11 months after the previous rotation.
+
+### Rotating the cert (yearly at expiry)
+
+Same as Steps 3-7 above. **Key stays the same** — only the cert rotates. So no new attestation fee, just the base cert renewal cost (~$180-300/yr depending on signing volume tier).
+
+### Rotating the key (rarely — compromise or policy)
+
+If the HSM-protected key itself needs rotation (e.g. suspected compromise), create a new key version, generate a new CSR, submit to SSL.com as a rekey, and update `NEXT_PRIVATE_SIGNING_AZURE_KV_KEY_VERSION` to pin the new version. Past signatures remain valid (they were signed by the old key; the old cert chain is unchanged).
 
 ---
 
 ## Inspecting the currently deployed cert
-
-**AWS KMS transport:**
 
 ```bash
 source .deploy.env
@@ -216,33 +282,26 @@ APP_CONFIG_ARN=$(aws cloudformation describe-stacks --profile "$AWS_PROFILE" --r
   --stack-name "$STACK_NAME" \
   --query "Stacks[0].Outputs[?OutputKey=='SecretsAppConfigSecretArn'].OutputValue" --output text)
 
+# Transport-agnostic: extract whichever cert contents are populated
 aws secretsmanager get-secret-value --profile "$AWS_PROFILE" --region "$AWS_REGION" \
   --secret-id "$APP_CONFIG_ARN" --query SecretString --output text | \
-  jq -r .NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_CONTENTS | \
+  jq -r '.NEXT_PRIVATE_SIGNING_AZURE_KV_PUBLIC_CRT_FILE_CONTENTS // .NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_CONTENTS' | \
   base64 -d | \
   openssl x509 -noout -subject -issuer -dates -fingerprint -sha256
 ```
 
-**Local transport (.p12):**
-
-```bash
-aws secretsmanager get-secret-value --profile "$AWS_PROFILE" --region "$AWS_REGION" \
-  --secret-id "$APP_CONFIG_ARN" --query SecretString --output text | \
-  jq -r '. | "\(.NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS) \(.NEXT_PRIVATE_SIGNING_PASSPHRASE)"' | \
-  while read -r CERT_B64 PP; do
-    echo "$CERT_B64" | base64 -d | openssl pkcs12 -info -nokeys -nomacver \
-      -passin "pass:$PP" 2>/dev/null | grep -E "subject|issuer|Not"
-  done
-```
-
-Check issuer — if it matches the CA you procured from (e.g. `CN=SSL.com Document Signing Intermediate CA ECC R2`), the AATL upgrade landed. If it matches your own subject, the self-signed cert is still active.
+- **Issuer matches SSL.com / another AATL CA** → AATL-trusted.
+- **Issuer matches your own subject** → self-signed, untrusted by Adobe.
 
 ---
 
 ## Common mistakes to avoid
 
-1. **Sending real contracts on the self-signed cert** "just for now." The "just for now" contracts become part of your production record. Counterparties may not notice initially but legal review later will flag them.
-2. **Procuring a cert for the wrong AWS KMS key.** If you regenerate the key (accident or rotation), the CSR needs to come from the NEW key. An AATL cert issued against an old key is useless — no refunds from the CA.
-3. **Losing the passphrase** (for `.p12` / local transport). There's no recovery. Generate a new cert.
-4. **Expired cert.** AATL certs are typically 1-year. Set a calendar reminder 60 days before expiry. Renewal is the same flow as Step 6 above.
-5. **MSPs issuing one cert for all clients.** See the MSP Pattern section above — you can't and shouldn't. The legal signer on every contract would be you, not the client.
+1. **Sending real contracts on the self-signed cert** "just for now." The "just for now" contracts become part of your production record.
+2. **Picking Azure KV Standard instead of Premium.** Standard SKU has no HSM-backed keys. SSL.com requires Premium. No refunds from Microsoft.
+3. **Generating the key with Exportable=true.** Makes the attestation worthless. SSL.com will reject the CSR.
+4. **Using a key smaller than 3072 bits.** SSL.com's minimum is 3072. 2048 will be rejected.
+5. **Forgetting to merge the CA-issued cert back into Azure KV** (Step 6). The cert is technically usable from Secrets Manager alone (Documenso reads it from there), but having it also in Azure KV keeps the lifecycle aligned with the key.
+6. **Losing the Azure SP client-secret.** Recoverable — `az ad sp credential reset --id <client-id>` generates a new one. Update the AWS secret.
+7. **Expired cert.** Set a calendar reminder 60 days before expiry. Renewal is cheap (~$180-300) and fast — no new attestation fee.
+8. **Assuming AATL = legally binding everywhere.** AATL is an Adobe-specific trust list. Some jurisdictions (EU eIDAS qualified signatures, for example) have additional requirements. Check with counsel for anything cross-border.

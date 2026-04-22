@@ -101,6 +101,47 @@ export class Compute extends Construct {
       ? ecs.ContainerImage.fromEcrRepository(props.repo!, 'latest')
       : ecs.ContainerImage.fromRegistry(config.containerImage);
 
+    // -- Signing secrets: Azure entries are only wired into the task def when
+    // the active transport needs them. In internal mode we branch on the string
+    // `config.signingTransport`; in generic mode the azure-kv placeholder keys
+    // always exist in the freshly-created secret, so including them is safe.
+    const includeAzureKvSecrets = !isInternal || config.signingTransport === 'azure-kv';
+    const includeAwsKmsSecrets = !isInternal || config.signingTransport === 'aws-kms';
+
+    const azureKvSecrets: Record<string, ecs.Secret> = includeAzureKvSecrets
+      ? {
+          NEXT_PRIVATE_SIGNING_AZURE_KV_TENANT_ID: ecs.Secret.fromSecretsManager(
+            props.appConfigSecret,
+            'NEXT_PRIVATE_SIGNING_AZURE_KV_TENANT_ID',
+          ),
+          NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_ID: ecs.Secret.fromSecretsManager(
+            props.appConfigSecret,
+            'NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_ID',
+          ),
+          NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_SECRET: ecs.Secret.fromSecretsManager(
+            props.appConfigSecret,
+            'NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_SECRET',
+          ),
+          NEXT_PRIVATE_SIGNING_AZURE_KV_PUBLIC_CRT_FILE_CONTENTS: ecs.Secret.fromSecretsManager(
+            props.appConfigSecret,
+            'NEXT_PRIVATE_SIGNING_AZURE_KV_PUBLIC_CRT_FILE_CONTENTS',
+          ),
+          NEXT_PRIVATE_SIGNING_AZURE_KV_CERT_CHAIN_CONTENTS: ecs.Secret.fromSecretsManager(
+            props.appConfigSecret,
+            'NEXT_PRIVATE_SIGNING_AZURE_KV_CERT_CHAIN_CONTENTS',
+          ),
+        }
+      : {};
+
+    const awsKmsSecrets: Record<string, ecs.Secret> = includeAwsKmsSecrets
+      ? {
+          NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_CONTENTS: ecs.Secret.fromSecretsManager(
+            props.appConfigSecret,
+            'NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_CONTENTS',
+          ),
+        }
+      : {};
+
     const container = taskDef.addContainer('DocumensoContainer', {
       image: containerImage,
       containerName: 'documenso',
@@ -119,9 +160,15 @@ export class Compute extends Construct {
         NEXT_PRIVATE_SMTP_TRANSPORT: 'smtp-auth',
         NEXT_PRIVATE_SMTP_FROM_NAME: config.appName,
         NEXT_PRIVATE_SMTP_FROM_ADDRESS: config.smtpFromAddress,
-        NEXT_PRIVATE_SIGNING_TRANSPORT: 'aws-kms',
+        // Signing — both transports' env vars are always present so the task
+        // def is stable across transport switches. The app picks based on
+        // NEXT_PRIVATE_SIGNING_TRANSPORT and ignores the other set.
+        NEXT_PRIVATE_SIGNING_TRANSPORT: config.signingTransport,
         NEXT_PRIVATE_SIGNING_AWS_KMS_KEY_ID: props.signingKey.keyArn,
         NEXT_PRIVATE_SIGNING_AWS_KMS_REGION: isInternal ? config.region : cdk.Aws.REGION,
+        NEXT_PRIVATE_SIGNING_AZURE_KV_URL: config.azureKvUrl,
+        NEXT_PRIVATE_SIGNING_AZURE_KV_KEY_NAME: config.azureKvKeyName,
+        NEXT_PRIVATE_SIGNING_AZURE_KV_KEY_VERSION: config.azureKvKeyVersion,
         NEXT_PRIVATE_MICROSOFT_TENANT_ID: config.microsoftTenantId,
         NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS: config.allowedSignupDomains,
         NEXT_PRIVATE_JOBS_PROVIDER: 'local',
@@ -161,10 +208,8 @@ export class Compute extends Construct {
           props.appConfigSecret,
           'NEXT_PRIVATE_SMTP_PASSWORD',
         ),
-        NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_CONTENTS: ecs.Secret.fromSecretsManager(
-          props.appConfigSecret,
-          'NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_CONTENTS',
-        ),
+        ...awsKmsSecrets,
+        ...azureKvSecrets,
         NEXT_PRIVATE_DATABASE_URL: ecs.Secret.fromSecretsManager(
           props.databaseUrlSecret,
           'NEXT_PRIVATE_DATABASE_URL',

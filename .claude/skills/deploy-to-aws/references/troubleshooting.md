@@ -143,3 +143,78 @@ If stuck, capture:
 - The specific error message
 
 Open an issue on the repo or paste to the skill for diagnosis.
+
+---
+
+## Azure Key Vault (azure-kv transport)
+
+**`Azure.Identity.ClientSecretCredential failed`** in ECS task logs
+
+The Azure SP creds in `documenso/<env>/app-config` are wrong or missing. Validate:
+
+```bash
+APP_CONFIG_ARN=$(aws cloudformation describe-stacks --profile "$AWS_PROFILE" --region "$AWS_REGION" \
+  --stack-name "$STACK_NAME" \
+  --query "Stacks[0].Outputs[?OutputKey=='SecretsAppConfigSecretArn'].OutputValue" --output text)
+
+aws secretsmanager get-secret-value --profile "$AWS_PROFILE" --region "$AWS_REGION" \
+  --secret-id "$APP_CONFIG_ARN" --query SecretString --output text | \
+  jq 'keys[] | select(contains("AZURE_KV"))'
+```
+
+Expect `NEXT_PRIVATE_SIGNING_AZURE_KV_TENANT_ID/CLIENT_ID/CLIENT_SECRET` populated. If any are empty or missing, rerun step 6e of SKILL.md. If populated but still failing, the SP secret may have been rotated or expired — use `az ad sp credential reset --id <client-id>` to generate a new one.
+
+**`KeyVaultErrorException: Forbidden` — status code 403 from Azure**
+
+The SP doesn't have the `Key Vault Crypto User` role on the key. Verify:
+
+```bash
+az role assignment list \
+  --assignee <client-id> \
+  --scope "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.KeyVault/vaults/<vault>/keys/<key>"
+```
+
+If empty, re-run `setup-azure-kv.py` or assign manually:
+
+```bash
+az role assignment create \
+  --role "Key Vault Crypto User" \
+  --assignee <client-id> \
+  --scope "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.KeyVault/vaults/<vault>/keys/<key>"
+```
+
+RBAC assignments take up to 5 minutes to propagate. If you just assigned the role, wait and retry.
+
+**Signing throws `No certificate found for Azure Key Vault signing`**
+
+SSL.com's issued cert hasn't been loaded yet. The secret field `NEXT_PRIVATE_SIGNING_AZURE_KV_PUBLIC_CRT_FILE_CONTENTS` is empty. Follow Step 7 in SKILL.md to install the cert from SSL.com's email.
+
+**`CSR was rejected` by SSL.com**
+
+Likely causes (in order of frequency):
+- Key size <3072 bits. SSL.com's minimum. Recreate the key with `key_size: 3072` or 4096.
+- `Exportable Private Key: Yes`. Must be No. Recreate the key.
+- Key type is `RSA` instead of `RSA-HSM`. Standard RSA keys don't carry the HSM attestation SSL.com needs. Use RSA-HSM (requires Premium SKU).
+- Subject DN missing required fields. SSL.com requires at minimum CN, O, C. Add OU + emailAddress for cleaner UX.
+
+**Azure portal "Generate CSR" button missing**
+
+The key was created outside the Certificates API. Azure KV's CSR flow only works on certificates, not raw keys. Work around: create a new cert in the portal with the same subject, let it generate its own key (RSA-HSM 3072, non-exportable), then download the CSR. The old raw key you created via `setup-azure-kv.py` is now unused — delete or leave it.
+
+**ECS task restart-looping after switching `SigningTransport` from aws-kms to azure-kv**
+
+The secret JSON is missing Azure KV fields. ECS can't resolve `ecs.Secret.fromSecretsManager(..., 'NEXT_PRIVATE_SIGNING_AZURE_KV_TENANT_ID')` against a secret that doesn't have that key. Update the secret before (or concurrently with) the stack update:
+
+```bash
+aws secretsmanager get-secret-value --profile "$AWS_PROFILE" --region "$AWS_REGION" \
+  --secret-id "$APP_CONFIG_ARN" --query SecretString --output text | \
+  jq '. + {
+    NEXT_PRIVATE_SIGNING_AZURE_KV_TENANT_ID: (.NEXT_PRIVATE_SIGNING_AZURE_KV_TENANT_ID // ""),
+    NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_ID: (.NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_ID // ""),
+    NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_SECRET: (.NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_SECRET // ""),
+    NEXT_PRIVATE_SIGNING_AZURE_KV_PUBLIC_CRT_FILE_CONTENTS: (.NEXT_PRIVATE_SIGNING_AZURE_KV_PUBLIC_CRT_FILE_CONTENTS // ""),
+    NEXT_PRIVATE_SIGNING_AZURE_KV_CERT_CHAIN_CONTENTS: (.NEXT_PRIVATE_SIGNING_AZURE_KV_CERT_CHAIN_CONTENTS // "")
+  }' | \
+  aws secretsmanager put-secret-value --profile "$AWS_PROFILE" --region "$AWS_REGION" \
+    --secret-id "$APP_CONFIG_ARN" --secret-string file:///dev/stdin
+```

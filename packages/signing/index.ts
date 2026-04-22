@@ -11,6 +11,7 @@ import { env } from '@documenso/lib/utils/env';
 
 import { getTimestampAuthority } from './helpers/tsa';
 import { createAwsKmsSigner } from './transports/aws-kms';
+import { createAzureKvSigner } from './transports/azure-kv';
 import { createGoogleCloudSigner } from './transports/google-cloud';
 import { createLocalSigner } from './transports/local';
 
@@ -32,6 +33,7 @@ const getSigner = async () => {
     .with('local', async () => await createLocalSigner())
     .with('gcloud-hsm', async () => await createGoogleCloudSigner())
     .with('aws-kms', async () => await createAwsKmsSigner())
+    .with('azure-kv', async () => await createAzureKvSigner())
     .otherwise(() => {
       throw new Error(`Unsupported signing transport: ${transport}`);
     });

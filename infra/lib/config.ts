@@ -17,7 +17,19 @@
  * from process.env; generic-mode values come from CfnParameters.
  */
 
-export type DeploymentMode = "internal" | "generic";
+export type DeploymentMode = 'internal' | 'generic';
+
+/**
+ * Signing backend selection.
+ *
+ * - `aws-kms`: self-signed cert over an AWS KMS key. Signatures verify but Adobe
+ *   shows "identity not trusted". Fine for internal signing; no legal binding.
+ * - `azure-kv`: Azure Key Vault Premium key with an SSL.com AATL-issued cert.
+ *   Signatures verify as fully trusted in Adobe (AATL-rooted). Requires an
+ *   Azure subscription, one-time $500 SSL.com attestation fee, and a CA-issued
+ *   OV Document Signing cert (~$300-500/yr).
+ */
+export type SigningTransport = 'aws-kms' | 'azure-kv';
 
 export interface EnvironmentConfig {
   readonly mode: DeploymentMode;
@@ -97,6 +109,23 @@ export interface EnvironmentConfig {
    * mode — the stack creates a fresh bucket.
    */
   readonly uploadsBucketName: string;
+
+  // -- Signing ----------------------------------------------------------
+
+  /** Which signing backend the task definition should wire up. */
+  readonly signingTransport: SigningTransport;
+
+  /**
+   * Azure Key Vault URL (e.g. `https://my-vault.vault.azure.net`). Required
+   * when `signingTransport === "azure-kv"`; ignored otherwise.
+   */
+  readonly azureKvUrl: string;
+
+  /** Key name inside the Azure Key Vault. Required for `azure-kv`. */
+  readonly azureKvKeyName: string;
+
+  /** Optional Azure KV key version. Blank = use latest. */
+  readonly azureKvKeyVersion: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -115,7 +144,7 @@ function requireEnv(name: string): string {
   return value;
 }
 
-function optionalEnv(name: string, fallback: string = ""): string {
+function optionalEnv(name: string, fallback: string = ''): string {
   return process.env[name] ?? fallback;
 }
 
@@ -123,18 +152,18 @@ const SIZING: Record<
   string,
   Pick<
     EnvironmentConfig,
-    "dbInstanceClass" | "dbStorageGb" | "fargateCpu" | "fargateMemory" | "desiredCount"
+    'dbInstanceClass' | 'dbStorageGb' | 'fargateCpu' | 'fargateMemory' | 'desiredCount'
   >
 > = {
   dev: {
-    dbInstanceClass: "t4g.micro",
+    dbInstanceClass: 't4g.micro',
     dbStorageGb: 20,
     fargateCpu: 512,
     fargateMemory: 1024,
     desiredCount: 1,
   },
   prod: {
-    dbInstanceClass: "t4g.small",
+    dbInstanceClass: 't4g.small',
     dbStorageGb: 50,
     fargateCpu: 1024,
     fargateMemory: 2048,
@@ -149,32 +178,33 @@ const SIZING: Record<
 export function getInternalConfig(envName: string): EnvironmentConfig {
   const sizing = SIZING[envName];
   if (!sizing) {
-    throw new Error(
-      `Unknown environment: ${envName}. Valid: ${Object.keys(SIZING).join(", ")}`,
-    );
+    throw new Error(`Unknown environment: ${envName}. Valid: ${Object.keys(SIZING).join(', ')}`);
   }
 
   return {
-    mode: "internal",
+    mode: 'internal',
     envName,
-    account: requireEnv("AWS_ACCOUNT_ID"),
-    region: requireEnv("AWS_REGION"),
-    vpcId: requireEnv("AWS_VPC_ID"),
-    subnetIds: requireEnv("AWS_SUBNET_IDS").split(",").map((s) => s.trim()),
-    domain: requireEnv("DOMAIN"),
-    hostedZoneId: requireEnv("HOSTED_ZONE_ID"),
-    containerImage: "",
-    containerImageRepo: requireEnv("ECR_REPOSITORY"),
-    appName: requireEnv("APP_NAME"),
-    smtpFromAddress: requireEnv("SMTP_FROM_ADDRESS"),
-    allowedSignupDomains: optionalEnv("ALLOWED_SIGNUP_DOMAINS"),
-    microsoftTenantId: optionalEnv("MICROSOFT_TENANT_ID"),
-    appConfigSecretArn: requireEnv("APP_CONFIG_SECRET_ARN"),
-    databaseUrlSecretArn: requireEnv("DATABASE_URL_SECRET_ARN"),
-    uploadsBucketName: optionalEnv(
-      "UPLOADS_BUCKET_NAME",
-      `documenso-uploads-${envName}`,
-    ),
+    account: requireEnv('AWS_ACCOUNT_ID'),
+    region: requireEnv('AWS_REGION'),
+    vpcId: requireEnv('AWS_VPC_ID'),
+    subnetIds: requireEnv('AWS_SUBNET_IDS')
+      .split(',')
+      .map((s) => s.trim()),
+    domain: requireEnv('DOMAIN'),
+    hostedZoneId: requireEnv('HOSTED_ZONE_ID'),
+    containerImage: '',
+    containerImageRepo: requireEnv('ECR_REPOSITORY'),
+    appName: requireEnv('APP_NAME'),
+    smtpFromAddress: requireEnv('SMTP_FROM_ADDRESS'),
+    allowedSignupDomains: optionalEnv('ALLOWED_SIGNUP_DOMAINS'),
+    microsoftTenantId: optionalEnv('MICROSOFT_TENANT_ID'),
+    appConfigSecretArn: requireEnv('APP_CONFIG_SECRET_ARN'),
+    databaseUrlSecretArn: requireEnv('DATABASE_URL_SECRET_ARN'),
+    uploadsBucketName: optionalEnv('UPLOADS_BUCKET_NAME', `documenso-uploads-${envName}`),
+    signingTransport: optionalEnv('SIGNING_TRANSPORT', 'aws-kms') as SigningTransport,
+    azureKvUrl: optionalEnv('AZURE_KV_URL'),
+    azureKvKeyName: optionalEnv('AZURE_KV_KEY_NAME'),
+    azureKvKeyVersion: optionalEnv('AZURE_KV_KEY_VERSION'),
     ...sizing,
   };
 }

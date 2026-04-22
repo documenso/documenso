@@ -150,37 +150,48 @@ Documenso sends signing invitations, notifications, and account verification ema
 
 Write all five SMTP values to `.deploy.env`. `SMTP_FROM_ADDRESS` must be a verified sender at the chosen provider.
 
-#### 2f. Signing certificate (two-track)
+#### 2f. Signing transport selection
 
-Documenso signs PDFs via a KMS-backed X.509 certificate. The CDK creates the KMS key; the skill generates a cert against that key and uploads the PEM after stack deploy (Step 6). At this interview stage, only collect the subject info for the cert:
+Documenso supports two signing backends. Ask the deployer this question verbatim:
 
-Ask (or infer from earlier answers — app name, org, admin email):
+> **Will this deployment send legally-binding contracts to external parties?**
 
-```
-CERT_CN  = "$APP_NAME"                    # e.g. "TechnologyMatch Signature"
-CERT_O   = "<user's legal org name>"      # e.g. "TechnologyMatch"
-CERT_OU  = "Documenso"
-CERT_EMAIL = "<admin email>"
-```
+If **yes** → use `azure-kv` (AATL-trusted signatures via Azure Key Vault Premium + SSL.com OV cert). Requires an Azure subscription, ~$850 first-year cost, 3-10 day cert issuance wait. This is the right default for MSP client deployments.
 
-Write these to `.deploy.env`:
+If **no** (pilot / UAT / internal-only) → use `aws-kms` (self-signed cert, Adobe shows "identity not trusted"). Fastest path to a running stack; upgrade to Azure KV later by switching `SigningTransport` + swapping the cert in Secrets Manager.
+
+Why not "AWS KMS + buy an AATL cert later"? We tried. No AATL CA accepts AWS KMS — CABForum 2023 requires device-level HSM attestation, and AWS KMS doesn't expose one. Only path from AWS KMS to AATL is a per-deploy $2,000+ BYOA audit. See `references/signing-cert.md` for the full attestation matrix.
+
+Write transport + subject fields to `.deploy.env`:
 
 ```bash
 cat >> .deploy.env <<EOF
-SIGNING_CERT_CN="$CERT_CN"
-SIGNING_CERT_O="$CERT_O"
-SIGNING_CERT_OU="$CERT_OU"
-SIGNING_CERT_EMAIL="$CERT_EMAIL"
+SIGNING_TRANSPORT=azure-kv                # or aws-kms
+SIGNING_CERT_CN="$APP_NAME"               # e.g. "Gnarlysoft Sign"
+SIGNING_CERT_O="<user's legal org name>"  # e.g. "Gnarlysoft Inc."
+SIGNING_CERT_OU="Documenso"
+SIGNING_CERT_EMAIL="<admin email>"
+SIGNING_CERT_COUNTRY="US"                 # 2-letter ISO country code
 EOF
 ```
 
-**Do NOT generate the cert here.** The cert is generated in Step 6 after the CFN stack creates the KMS key — we need the key's public half to sign the cert against. The KMS key ARN comes from the `SigningKmsSigningKeyArn` stack output.
+**Azure-kv path (AATL-trusted):** also prompt for these values, written to `.deploy.env` after Azure provisioning in Step 5a:
 
-Print a **loud** banner so the deployer cannot miss it:
+```env
+AZURE_SUBSCRIPTION_ID=                    # filled in 5a
+AZURE_KV_URL=                             # filled in 5a (e.g. https://<vault>.vault.azure.net)
+AZURE_KV_KEY_NAME=documenso-signing-$ENV_NAME
+AZURE_KV_KEY_VERSION=                     # blank = latest
+AZURE_KV_TENANT_ID=                       # filled in 5a
+AZURE_KV_CLIENT_ID=                       # filled in 5a
+AZURE_KV_CLIENT_SECRET=                   # filled in 5a
+```
+
+**aws-kms path:** print this loud banner so nobody misses the limitation:
 
 ```
 ══════════════════════════════════════════════════════════════════════════
-⚠️  SELF-SIGNED CERTIFICATE — DO NOT USE FOR REAL CONTRACTS YET  ⚠️
+⚠️  SELF-SIGNED CERTIFICATE — DO NOT USE FOR REAL CONTRACTS  ⚠️
 ══════════════════════════════════════════════════════════════════════════
 PDFs signed with this cert verify as "signature VALID, identity NOT TRUSTED"
 in Adobe Reader. Counterparties, courts, and auditors will NOT accept these
@@ -189,15 +200,13 @@ signatures as legally binding.
 Fine for:   internal pilot, UI/UX walkthrough, dev/staging environments.
 NOT for:    real signed contracts, external counterparties, production use.
 
-BEFORE sending any real contracts, upgrade to an AATL CA cert:
-  → see references/signing-cert.md for the procurement runbook
-  → typical cost: $200-500/year
-  → typical timeline: 2-5 business days after payment
-  → the swap is a 30-second Secrets Manager update; no code/infra change
+To upgrade to AATL-trusted later:
+  → re-run this skill with SIGNING_TRANSPORT=azure-kv
+  → OR follow references/signing-cert.md "Azure Key Vault Premium" runbook
 ══════════════════════════════════════════════════════════════════════════
 ```
 
-If the deployer already has an AATL-issued cert (PEM) against an existing KMS key they'll supply later, note that in `.deploy.env` as `SIGNING_CERT_SOURCE=external` and skip the self-sign in Step 6 — they'll paste the PEM directly into the secret. For everyone else the self-signed flow is the default.
+**Do NOT generate the cert here.** For aws-kms, the cert is generated in Step 6 against the KMS key the CFN stack creates. For azure-kv, the cert is issued by SSL.com in Step 7 after the CSR generated in Step 5a.
 
 #### 2g. Validation pass
 
@@ -281,6 +290,63 @@ Build takes 10–20 minutes. Stream output.
 
 Ask for a full image URI (e.g. `ghcr.io/<owner>/documenso:<tag>`) and write `CONTAINER_IMAGE=` to `.deploy.env`.
 
+### Step 4a — Azure KV provisioning (azure-kv only; skip for aws-kms)
+
+If `SIGNING_TRANSPORT=azure-kv`, stand up Azure Key Vault Premium + the HSM-backed signing key + a service principal for ECS to authenticate with, BEFORE deploying the CFN stack. The stack's CfnParameters need the vault URL + key name.
+
+Use the `/gnarlysoft-microsoft:azure` skill to drive the ARM API (it handles the multi-tenant auth dance automatically). The helper script `.claude/skills/deploy-to-aws/scripts/setup-azure-kv.py` does this end-to-end:
+
+```bash
+source .deploy.env
+
+# One-time venv bootstrap if not done
+VENV="$HOME/.documenso-deploy-venv"
+if [ ! -d "$VENV" ]; then
+  uv venv "$VENV" --quiet || python3 -m venv "$VENV"
+  "$VENV/bin/pip" install --quiet requests
+fi
+
+"$VENV/bin/python" .claude/skills/deploy-to-aws/scripts/setup-azure-kv.py \
+  --profile "<azure-skill-profile>" \
+  --subscription "$AZURE_SUBSCRIPTION_ID" \
+  --resource-group "documenso-signing-$ENV_NAME" \
+  --location "eastus" \
+  --vault-name "<globally-unique-vault-name>" \
+  --key-name "documenso-signing-$ENV_NAME" \
+  --env-out .deploy.env
+```
+
+The helper provisions (idempotent):
+- Resource group `documenso-signing-$ENV_NAME` in the chosen region
+- Key Vault Premium with RBAC + purge protection enabled
+- RSA-HSM 3072-bit non-exportable key (sign + verify only)
+- Service principal `documenso-signing-ecs-$ENV_NAME` with `Key Vault Crypto User` scoped to the one key
+- Appends `AZURE_KV_URL`, `AZURE_KV_TENANT_ID`, `AZURE_KV_CLIENT_ID`, `AZURE_KV_CLIENT_SECRET` to `.deploy.env`
+
+After provisioning, **prompt the deployer to visit the Azure portal once** to generate the attested CSR (Azure's CLI doesn't expose this yet — portal is the only way as of April 2026):
+
+```
+══════════════════════════════════════════════════════════════════════════
+ ACTION REQUIRED — GENERATE ATTESTED CSR IN AZURE PORTAL
+══════════════════════════════════════════════════════════════════════════
+1. Open https://portal.azure.com → Key Vaults → <your vault> → Certificates
+2. Click "Generate/Import" → "Generate"
+3. Certificate Name: documenso-signing-$ENV_NAME
+4. Subject: CN=$SIGNING_CERT_CN, O=$SIGNING_CERT_O, OU=$SIGNING_CERT_OU,
+            emailAddress=$SIGNING_CERT_EMAIL, C=$SIGNING_CERT_COUNTRY
+5. Advanced Policy Configuration:
+   - Content Type: PEM
+   - Key Type: RSA-HSM
+   - Key Size: 3072
+   - Exportable Private Key: No
+   - Issuer: Self (CSR merge happens later)
+6. Create. Then click the pending cert → "Certificate Operation" → Download CSR
+7. Save as .deploy-artifacts/csr.pem
+══════════════════════════════════════════════════════════════════════════
+```
+
+Pause until the CSR file exists locally, then continue with Step 5. The CSR is what we'll submit to SSL.com in Step 7.
+
 ### Step 5 — Deploy the stack
 
 ```bash
@@ -297,6 +363,10 @@ PARAMS=(
   "AllowedSignupDomains=$ALLOWED_SIGNUP_DOMAINS"
   "MicrosoftTenantId=$MICROSOFT_TENANT_ID"
   "SmtpFromAddress=$SMTP_FROM_ADDRESS"
+  "SigningTransport=${SIGNING_TRANSPORT:-aws-kms}"
+  "AzureKvUrl=${AZURE_KV_URL:-}"
+  "AzureKvKeyName=${AZURE_KV_KEY_NAME:-}"
+  "AzureKvKeyVersion=${AZURE_KV_KEY_VERSION:-}"
   "DbInstanceClass=$DB_INSTANCE_CLASS"
   "DbStorageGb=$DB_STORAGE_GB"
   "FargateCpu=$FARGATE_CPU"
@@ -368,19 +438,17 @@ ENCRYPTION_SECONDARY_KEY=$(openssl rand -hex 32)
 NEXTAUTH_SECRET=$(openssl rand -base64 32 | tr -d '/+=' | head -c 32)
 ```
 
-#### 6d. Generate the signing cert against the KMS key
+#### 6d. Obtain the signing cert (branches by transport)
 
-The CFN stack created a KMS signing key (`SigningKeyArn`). Now we generate a self-signed X.509 cert whose subject-public-key *is* that KMS key's public half, signed *by* that KMS key. (This requires Python with `asn1crypto`, `cryptography`, `boto3` — the skill ships a helper that does exactly this.)
+**aws-kms path (self-signed):** generate a self-signed X.509 cert whose subject-public-key IS the KMS key's public half, signed BY the KMS key.
 
 ```bash
-# One-time: set up a venv with the crypto deps if not already done
 VENV="$HOME/.documenso-deploy-venv"
 if [ ! -d "$VENV" ]; then
   uv venv "$VENV" --quiet || python3 -m venv "$VENV"
   "$VENV/bin/pip" install --quiet asn1crypto cryptography boto3
 fi
 
-# Run the helper (lives in the skill dir)
 SKILL_DIR=".claude/skills/deploy-to-aws"
 CERT_PEM=$(mktemp --suffix=.crt)
 
@@ -395,17 +463,42 @@ CERT_PEM=$(mktemp --suffix=.crt)
   --out "$CERT_PEM"
 
 SIGNING_CERT_B64=$(base64 -w0 "$CERT_PEM")
-```
-
-Inspect the cert briefly so the deployer sees what just got generated:
-
-```bash
 openssl x509 -in "$CERT_PEM" -noout -subject -issuer -dates
 ```
 
-#### 6e. Update app-config secret
+**azure-kv path (SSL.com-issued AATL cert):** at this stage the cert doesn't exist yet — SSL.com issues it 3-10 business days after Step 7. Populate the secret with empty cert placeholders now; the skill returns to populate real values in Step 7.
 
 ```bash
+SIGNING_CERT_B64=""      # filled in Step 7 after SSL.com issues the cert
+SIGNING_CHAIN_B64=""     # filled in Step 7
+```
+
+The ECS task will start up and health-check green without the cert — PDF signing attempts will throw a clear error until the cert is loaded, but the rest of the app (SSO, doc upload, field placement, invitations) works immediately. Users can prep documents and recipients while waiting for the CA.
+
+#### 6e. Update app-config secret
+
+The secret shape depends on which transport is active. Build the JSON with transport-specific fields only populated for the active transport:
+
+```bash
+if [ "${SIGNING_TRANSPORT:-aws-kms}" = "azure-kv" ]; then
+  SIGNING_JSON=$(jq -n \
+    --arg tenant "$AZURE_KV_TENANT_ID" \
+    --arg cid "$AZURE_KV_CLIENT_ID" \
+    --arg csec "$AZURE_KV_CLIENT_SECRET" \
+    --arg cert "${SIGNING_CERT_B64:-}" \
+    --arg chain "${SIGNING_CHAIN_B64:-}" '
+      {
+        NEXT_PRIVATE_SIGNING_AZURE_KV_TENANT_ID: $tenant,
+        NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_ID: $cid,
+        NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_SECRET: $csec,
+        NEXT_PRIVATE_SIGNING_AZURE_KV_PUBLIC_CRT_FILE_CONTENTS: $cert,
+        NEXT_PRIVATE_SIGNING_AZURE_KV_CERT_CHAIN_CONTENTS: $chain
+      }')
+else
+  SIGNING_JSON=$(jq -n --arg cert "$SIGNING_CERT_B64" \
+    '{ NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_CONTENTS: $cert }')
+fi
+
 aws secretsmanager put-secret-value \
   --profile "$AWS_PROFILE" --region "$AWS_REGION" \
   --secret-id "$APP_CONFIG_ARN" \
@@ -415,25 +508,21 @@ aws secretsmanager put-secret-value \
     --arg mcid "$MICROSOFT_CLIENT_ID" --arg msec "$MICROSOFT_CLIENT_SECRET" \
     --arg sh "$SMTP_HOST" --arg sp "$SMTP_PORT" \
     --arg su "$SMTP_USERNAME" --arg spw "$SMTP_PASSWORD" \
-    --arg cert "$SIGNING_CERT_B64" \
-    '{
-      NEXTAUTH_SECRET: $nextauth,
-      NEXT_PRIVATE_ENCRYPTION_KEY: $ek,
-      NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: $esk,
-      NEXT_PRIVATE_MICROSOFT_CLIENT_ID: $mcid,
-      NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET: $msec,
-      NEXT_PRIVATE_SMTP_HOST: $sh,
-      NEXT_PRIVATE_SMTP_PORT: $sp,
-      NEXT_PRIVATE_SMTP_USERNAME: $su,
-      NEXT_PRIVATE_SMTP_PASSWORD: $spw,
-      NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_CONTENTS: $cert
-    }')"
+    --argjson signing "$SIGNING_JSON" '
+      {
+        NEXTAUTH_SECRET: $nextauth,
+        NEXT_PRIVATE_ENCRYPTION_KEY: $ek,
+        NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: $esk,
+        NEXT_PRIVATE_MICROSOFT_CLIENT_ID: $mcid,
+        NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET: $msec,
+        NEXT_PRIVATE_SMTP_HOST: $sh,
+        NEXT_PRIVATE_SMTP_PORT: $sp,
+        NEXT_PRIVATE_SMTP_USERNAME: $su,
+        NEXT_PRIVATE_SMTP_PASSWORD: $spw
+      } + $signing')"
 ```
 
-Note what changed vs older local-transport deploys:
-- No `NEXT_PRIVATE_SIGNING_PASSPHRASE` (KMS holds the key — no passphrase)
-- No `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` (no `.p12` — we use KMS directly)
-- `NEXT_PRIVATE_SIGNING_AWS_KMS_KEY_ID` and `_REGION` are set as plain env vars by CFN (not secrets) — no action needed here
+Note: `NEXT_PRIVATE_SIGNING_AWS_KMS_KEY_ID/REGION` and `NEXT_PRIVATE_SIGNING_AZURE_KV_URL/KEY_NAME/KEY_VERSION` are plain env vars set by CFN, not secrets — no action needed here.
 
 #### 6f. Update database-url secret
 
@@ -458,7 +547,7 @@ aws ecs wait services-stable --profile "$AWS_PROFILE" --region "$AWS_REGION" \
 
 Prisma migrations run automatically on first boot via `docker/start.sh`.
 
-### Step 7 — Verify
+### Step 7 — Verify + (azure-kv only) SSL.com cert procurement
 
 ```bash
 curl -fsS "https://$DOMAIN/api/health"
@@ -467,48 +556,136 @@ curl -fsS "https://$DOMAIN/api/health"
 Should return 200. If not, check ECS task logs in CloudWatch (`/documenso/$ENV_NAME`).
 
 Visit `https://$DOMAIN` in a browser:
-- Microsoft sign-in button appears (upstream signin UI)
+- Microsoft sign-in button appears
 - Sign in with a user whose email matches `ALLOWED_SIGNUP_DOMAINS` (or any domain if blank)
-- Upload a PDF, add a signer, complete the flow end-to-end
+- Upload a PDF, add a signer, place fields
 
-Print the cert info for confirmation:
+**aws-kms path:** complete the signing flow end-to-end. Sign a test doc. Open in Adobe Reader — shows "signature valid, identity not trusted". Done.
+
+**azure-kv path:** signing attempts return a clear error until the SSL.com cert is installed. Submit the CSR now:
+
+1. Go to [SSL.com Document Signing](https://www.ssl.com/certificates/document-signing/).
+2. Choose **Organization Validation (OV)**. Pick 1-year or 3-year.
+3. Under HSM options select **Azure Key Vault**. This triggers the $500 attestation fee.
+4. Upload `.deploy-artifacts/csr.pem` (generated in Step 4a).
+5. Upload identity documents (Articles of Incorporation, officer's government ID).
+6. Wait 3-10 business days. SSL.com will:
+   - Call the listed business number (automated, ~5 min) to confirm the officer
+   - May request a DUNS lookup or DNS TXT record
+   - Issue the cert + chain via email
+
+When the cert arrives:
 
 ```bash
-echo "$SIGNING_CERT_B64" | base64 -d | openssl pkcs12 -info -nokeys -nomacver \
-  -passin "pass:$SIGNING_PASSPHRASE" 2>/dev/null | grep -E "subject|issuer|Not"
+# Save files locally
+# signing-cert.pem = the issued cert
+# signing-chain.pem = SSL.com intermediate + root
+
+# Merge back into Azure KV (completes the cert lifecycle there)
+az keyvault certificate pending merge --vault-name "$AZURE_KV_VAULT_NAME" \
+  --name "$AZURE_KV_KEY_NAME" \
+  --file <(cat signing-cert.pem signing-chain.pem)
+
+# Encode for Secrets Manager
+SIGNING_CERT_B64=$(base64 -w0 signing-cert.pem)
+SIGNING_CHAIN_B64=$(base64 -w0 signing-chain.pem)
+
+# Update app-config with real cert values
+aws secretsmanager get-secret-value --profile "$AWS_PROFILE" --region "$AWS_REGION" \
+  --secret-id "$APP_CONFIG_ARN" --query SecretString --output text | \
+  jq \
+    --arg cert "$SIGNING_CERT_B64" \
+    --arg chain "$SIGNING_CHAIN_B64" '
+      .NEXT_PRIVATE_SIGNING_AZURE_KV_PUBLIC_CRT_FILE_CONTENTS = $cert
+      | .NEXT_PRIVATE_SIGNING_AZURE_KV_CERT_CHAIN_CONTENTS = $chain
+    ' | \
+  aws secretsmanager put-secret-value --profile "$AWS_PROFILE" --region "$AWS_REGION" \
+    --secret-id "$APP_CONFIG_ARN" --secret-string file:///dev/stdin
+
+# Roll new ECS tasks to pick up the cert
+aws ecs update-service --profile "$AWS_PROFILE" --region "$AWS_REGION" \
+  --cluster "documenso-$ENV_NAME" --service "documenso-$ENV_NAME" \
+  --force-new-deployment --no-cli-pager
+aws ecs wait services-stable --profile "$AWS_PROFILE" --region "$AWS_REGION" \
+  --cluster "documenso-$ENV_NAME" --services "documenso-$ENV_NAME"
+```
+
+Sign a test PDF. Adobe Reader should now show a green check with "Signed by $SIGNING_CERT_O".
+
+Inspect the installed cert any time with:
+
+```bash
+aws secretsmanager get-secret-value --profile "$AWS_PROFILE" --region "$AWS_REGION" \
+  --secret-id "$APP_CONFIG_ARN" --query SecretString --output text | \
+  jq -r '.NEXT_PRIVATE_SIGNING_AZURE_KV_PUBLIC_CRT_FILE_CONTENTS // .NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_CONTENTS' | \
+  base64 -d | openssl x509 -noout -subject -issuer -dates -fingerprint -sha256
 ```
 
 ### Final deploy summary — print this verbatim
 
-Always end the deploy session with this summary so the deployer knows the **one
-remaining step before real contracts can be sent**:
+Print the summary that matches the active transport.
+
+**aws-kms path:**
 
 ```
 ══════════════════════════════════════════════════════════════════════════
-✅  DEPLOY COMPLETE  →  <https://DOMAIN>
+✅  DEPLOY COMPLETE (aws-kms, self-signed)  →  <https://DOMAIN>
 ══════════════════════════════════════════════════════════════════════════
 What works right now:
   • SSO login
   • PDF upload, field placement, signing UI, email invitations
-  • Cryptographically valid signatures (signer cannot forge them)
+  • Cryptographically valid signatures (no forgery possible)
 
-What does NOT work yet (if you chose self-signed):
+What does NOT work:
   • Signatures are NOT AATL-trusted. Adobe Reader shows:
       "Signature valid. Signer's identity is UNKNOWN / not trusted."
-  • Most counterparties, courts, and auditors will NOT accept these
-    as legally binding. DO NOT SEND REAL CONTRACTS until you upgrade.
+  • Courts, counterparties, and auditors will NOT accept these as
+    legally binding. DO NOT send real contracts.
 
-Before real contracts:
-  1. Buy an AATL cert from one of: SSL.com, GlobalSign, Entrust,
-     DigiCert, IdenTrust. Typical cost $200-500/yr.
-     (MSPs deploying for clients: each client needs their OWN cert —
-      see references/signing-cert.md#msp-pattern.)
-  2. Follow the procurement runbook in references/signing-cert.md.
-  3. When the CA issues the cert PEM, one Secrets Manager update + ECS
-     redeploy is all that's needed. No code or infra changes.
+Upgrading to AATL-trusted when you need it:
+  • Re-run this skill with SIGNING_TRANSPORT=azure-kv, OR
+  • Follow references/signing-cert.md "Azure Key Vault Premium" runbook
+  • Typical cost: ~$850 year 1, ~$350/yr after
+  • Typical time: 3-10 business days for OV validation
+══════════════════════════════════════════════════════════════════════════
+```
 
-For operational runbooks and cert-rotation procedures:
-  → .claude/skills/deploy-to-aws/references/signing-cert.md
+**azure-kv path (cert installed):**
+
+```
+══════════════════════════════════════════════════════════════════════════
+✅  DEPLOY COMPLETE (azure-kv, AATL-trusted)  →  <https://DOMAIN>
+══════════════════════════════════════════════════════════════════════════
+What works right now:
+  • Full AATL-trusted document signing
+  • Adobe Reader shows green check: "Signed by <YourOrg>"
+  • Legally binding where AATL trust is recognized
+
+Operational notes:
+  • Cert expires: <expiry date>  →  renew 60 days before
+  • Azure SP secret expires: <expiry date>  →  rotate yearly
+  • Renewals are cheap (~$180-300/yr) — no new attestation fee
+
+For rotation runbooks: references/signing-cert.md
+══════════════════════════════════════════════════════════════════════════
+```
+
+**azure-kv path (awaiting SSL.com cert):**
+
+```
+══════════════════════════════════════════════════════════════════════════
+⏳  DEPLOY COMPLETE, AWAITING CERT  →  <https://DOMAIN>
+══════════════════════════════════════════════════════════════════════════
+Stack is deployed. SSL.com will issue the AATL cert in 3-10 business days.
+
+Signing will throw an error until the cert lands. The rest of the app
+(SSO, doc upload, field placement, invites) works now — users can prep
+documents while waiting.
+
+When the cert arrives:
+  • Save signing-cert.pem + signing-chain.pem locally
+  • Re-run this skill (or follow Step 7 in SKILL.md)
+  • No code/infra changes needed — just a Secrets Manager update
 ══════════════════════════════════════════════════════════════════════════
 ```
 
@@ -522,7 +699,9 @@ Load these only when needed:
 - **`references/sizing.md`** — Tier → CFN parameter mapping with cost estimates. Read during step 2d.
 - **`references/sso-interview.md`** — Microsoft/Google/OIDC registration walkthrough. Read during step 2c.
 - **`references/ses.md`** — AWS SES setup. Read during step 2e.
-- **`references/signing-cert.md`** — AATL CA list, self-signed cert posture, how to rotate the cert. Read during step 2f or when user asks about signing trust.
+- **`references/signing-cert.md`** — AATL attestation matrix, SSL.com OV Document Signing runbook, Azure KV Premium provisioning, cert rotation. Read during step 2f or when user asks about signing trust.
+- **`scripts/setup-azure-kv.py`** — Helper that provisions Azure KV Premium + RSA-HSM key + service principal via ARM API. Used in step 4a for azure-kv transport.
+- **`scripts/make-kms-cert.py`** — Helper that generates a self-signed cert against an AWS KMS key. Used in step 6d for aws-kms transport.
 - **`references/update-from-upstream.md`** — Workflow B. Read when user asks to sync/update.
 - **`references/troubleshooting.md`** — Stack failures, task failures, DNS/HTTPS issues. Read on failure.
 

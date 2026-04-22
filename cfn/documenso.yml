@@ -25,6 +25,13 @@ Metadata:
         Parameters:
           - MicrosoftTenantId
       - Label:
+          default: Signing
+        Parameters:
+          - SigningTransport
+          - AzureKvUrl
+          - AzureKvKeyName
+          - AzureKvKeyVersion
+      - Label:
           default: Sizing
         Parameters:
           - DbInstanceClass
@@ -61,9 +68,7 @@ Parameters:
   AllowedSignupDomains:
     Type: String
     Default: ''
-    Description:
-      Comma-separated email domains allowed to sign up (e.g. 'example.com,acme.com'). Leave blank to allow any
-      domain.
+    Description: Comma-separated email domains allowed to sign up (e.g. 'example.com,acme.com'). Leave blank to allow any domain.
   MicrosoftTenantId:
     Type: String
     Default: common
@@ -71,6 +76,25 @@ Parameters:
   SmtpFromAddress:
     Type: String
     Description: Email 'From' address. Must be verified at your SMTP provider (e.g. AWS SES).
+  SigningTransport:
+    Type: String
+    Default: aws-kms
+    AllowedValues:
+      - aws-kms
+      - azure-kv
+    Description: Signing backend. 'aws-kms' = self-signed (Adobe shows 'identity not trusted'); 'azure-kv' = AATL-trusted (requires Azure Key Vault Premium + SSL.com OV Document Signing cert, ~$300-500/yr + one-time $500 attestation fee).
+  AzureKvUrl:
+    Type: String
+    Default: ''
+    Description: Azure Key Vault URL (e.g. 'https://my-vault.vault.azure.net'). Required when SigningTransport=azure-kv; leave blank for aws-kms.
+  AzureKvKeyName:
+    Type: String
+    Default: ''
+    Description: Name of the signing key inside the Azure Key Vault. Required when SigningTransport=azure-kv; leave blank for aws-kms.
+  AzureKvKeyVersion:
+    Type: String
+    Default: ''
+    Description: Optional Azure Key Vault key version. Leave blank to always use the latest version.
   DbInstanceClass:
     Type: String
     Default: t4g.small
@@ -473,14 +497,12 @@ Resources:
   SecretsAppConfig1DE8CB45:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Description:
-        "Documenso app secrets (NEXTAUTH_SECRET, encryption keys, SSO, SMTP, signing cert). Auto-generated placeholder\
-        \ values \u2014 update after deploy."
+      Description: "Documenso app secrets (NEXTAUTH_SECRET, encryption keys, SSO, SMTP, signing cert). Auto-generated placeholder values \u2014 update after deploy."
       GenerateSecretString:
         ExcludePunctuation: true
         GenerateStringKey: NEXTAUTH_SECRET
         PasswordLength: 64
-        SecretStringTemplate: '{"NEXT_PRIVATE_MICROSOFT_CLIENT_ID":"","NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET":"","NEXT_PRIVATE_SMTP_HOST":"","NEXT_PRIVATE_SMTP_PORT":"587","NEXT_PRIVATE_SMTP_USERNAME":"","NEXT_PRIVATE_SMTP_PASSWORD":"","NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_CONTENTS":"","NEXT_PRIVATE_ENCRYPTION_KEY":"","NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY":""}'
+        SecretStringTemplate: '{"NEXT_PRIVATE_MICROSOFT_CLIENT_ID":"","NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET":"","NEXT_PRIVATE_SMTP_HOST":"","NEXT_PRIVATE_SMTP_PORT":"587","NEXT_PRIVATE_SMTP_USERNAME":"","NEXT_PRIVATE_SMTP_PASSWORD":"","NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_CONTENTS":"","NEXT_PRIVATE_SIGNING_AZURE_KV_TENANT_ID":"","NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_ID":"","NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_SECRET":"","NEXT_PRIVATE_SIGNING_AZURE_KV_PUBLIC_CRT_FILE_CONTENTS":"","NEXT_PRIVATE_SIGNING_AZURE_KV_CERT_CHAIN_CONTENTS":"","NEXT_PRIVATE_ENCRYPTION_KEY":"","NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY":""}'
       Name:
         Fn::Join:
           - ''
@@ -752,7 +774,8 @@ Resources:
               Value:
                 Ref: SmtpFromAddress
             - Name: NEXT_PRIVATE_SIGNING_TRANSPORT
-              Value: aws-kms
+              Value:
+                Ref: SigningTransport
             - Name: NEXT_PRIVATE_SIGNING_AWS_KMS_KEY_ID
               Value:
                 Fn::GetAtt:
@@ -761,6 +784,15 @@ Resources:
             - Name: NEXT_PRIVATE_SIGNING_AWS_KMS_REGION
               Value:
                 Ref: AWS::Region
+            - Name: NEXT_PRIVATE_SIGNING_AZURE_KV_URL
+              Value:
+                Ref: AzureKvUrl
+            - Name: NEXT_PRIVATE_SIGNING_AZURE_KV_KEY_NAME
+              Value:
+                Ref: AzureKvKeyName
+            - Name: NEXT_PRIVATE_SIGNING_AZURE_KV_KEY_VERSION
+              Value:
+                Ref: AzureKvKeyVersion
             - Name: NEXT_PRIVATE_MICROSOFT_TENANT_ID
               Value:
                 Ref: MicrosoftTenantId
@@ -847,6 +879,36 @@ Resources:
                   - ''
                   - - Ref: SecretsAppConfig1DE8CB45
                     - ':NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_CONTENTS::'
+            - Name: NEXT_PRIVATE_SIGNING_AZURE_KV_TENANT_ID
+              ValueFrom:
+                Fn::Join:
+                  - ''
+                  - - Ref: SecretsAppConfig1DE8CB45
+                    - ':NEXT_PRIVATE_SIGNING_AZURE_KV_TENANT_ID::'
+            - Name: NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_ID
+              ValueFrom:
+                Fn::Join:
+                  - ''
+                  - - Ref: SecretsAppConfig1DE8CB45
+                    - ':NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_ID::'
+            - Name: NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_SECRET
+              ValueFrom:
+                Fn::Join:
+                  - ''
+                  - - Ref: SecretsAppConfig1DE8CB45
+                    - ':NEXT_PRIVATE_SIGNING_AZURE_KV_CLIENT_SECRET::'
+            - Name: NEXT_PRIVATE_SIGNING_AZURE_KV_PUBLIC_CRT_FILE_CONTENTS
+              ValueFrom:
+                Fn::Join:
+                  - ''
+                  - - Ref: SecretsAppConfig1DE8CB45
+                    - ':NEXT_PRIVATE_SIGNING_AZURE_KV_PUBLIC_CRT_FILE_CONTENTS::'
+            - Name: NEXT_PRIVATE_SIGNING_AZURE_KV_CERT_CHAIN_CONTENTS
+              ValueFrom:
+                Fn::Join:
+                  - ''
+                  - - Ref: SecretsAppConfig1DE8CB45
+                    - ':NEXT_PRIVATE_SIGNING_AZURE_KV_CERT_CHAIN_CONTENTS::'
             - Name: NEXT_PRIVATE_DATABASE_URL
               ValueFrom:
                 Fn::Join:
