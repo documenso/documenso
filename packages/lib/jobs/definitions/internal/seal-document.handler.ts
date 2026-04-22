@@ -40,7 +40,7 @@ import {
 import { prefixedId } from '../../../universal/id';
 import { getFileServerSide } from '../../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../../universal/upload/put-file.server';
-import { fieldsContainUnsignedRequiredField } from '../../../utils/advanced-fields-helpers';
+import { fieldsContainUnsignedRequiredVisibleField } from '../../../utils/advanced-fields-helpers';
 import { isDocumentCompleted } from '../../../utils/document';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import { mapDocumentIdToSecondaryId } from '../../../utils/envelope';
@@ -145,7 +145,7 @@ export const run = async ({
     const rejectionReason = rejectedRecipient?.rejectionReason ?? '';
 
     // Skip the field check if the document is rejected
-    if (!isRejected && fieldsContainUnsignedRequiredField(fields)) {
+    if (!isRejected && fieldsContainUnsignedRequiredVisibleField(fields)) {
       throw new Error(`Document ${envelope.id} has unsigned required fields`);
     }
 

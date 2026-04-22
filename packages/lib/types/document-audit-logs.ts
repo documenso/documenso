@@ -56,7 +56,6 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_ACCESS_AUTH_2FA_FAILED', // When ACCESS AUTH 2FA validation fails.
 
   // Conditional field visibility events.
-  'FIELD_VALUE_CLEARED_CONDITIONAL', // When a hidden field's value is cleared at completion time.
   'FIELD_SKIPPED_CONDITIONAL', // When a required field is skipped because it was conditionally hidden.
   'FIELD_VISIBILITY_RULE_ADDED', // When a visibility rule is added to a field.
   'FIELD_VISIBILITY_RULE_REMOVED', // When a visibility rule is removed from a field.
@@ -746,21 +745,6 @@ export const ZDocumentAuditLogEventRecipientExpiredSchema = z.object({
 });
 
 /**
- * Event: Field value cleared because it was conditionally hidden.
- */
-export const ZDocumentAuditLogEventFieldValueClearedConditionalSchema = z.object({
-  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.FIELD_VALUE_CLEARED_CONDITIONAL),
-  data: z.object({
-    fieldId: z.string(),
-    stableId: z.string(),
-    previousValue: z.string(),
-    triggerStableId: z.string(),
-    triggerOldValue: z.string().optional(),
-    triggerNewValue: z.string().optional(),
-  }),
-});
-
-/**
  * Event: Field skipped because it was conditionally hidden at completion time.
  */
 export const ZDocumentAuditLogEventFieldSkippedConditionalSchema = z.object({
@@ -855,7 +839,6 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventRecipientUpdatedSchema,
     ZDocumentAuditLogEventRecipientRemovedSchema,
     ZDocumentAuditLogEventRecipientExpiredSchema,
-    ZDocumentAuditLogEventFieldValueClearedConditionalSchema,
     ZDocumentAuditLogEventFieldSkippedConditionalSchema,
     ZDocumentAuditLogEventFieldVisibilityRuleAddedSchema,
     ZDocumentAuditLogEventFieldVisibilityRuleRemovedSchema,

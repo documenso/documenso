@@ -606,14 +606,6 @@ export const formatDocumentAuditLogAction = (
         user: message,
       };
     })
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_VALUE_CLEARED_CONDITIONAL }, () => ({
-      anonymous: msg({
-        message: `A hidden field's value was cleared`,
-        context: `Audit log format`,
-      }),
-      you: msg`A hidden field's value was cleared`,
-      user: msg`A hidden field's value was cleared`,
-    }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_SKIPPED_CONDITIONAL }, () => ({
       anonymous: msg({
         message: `A conditionally hidden field was skipped`,
