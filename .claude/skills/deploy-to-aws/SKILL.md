@@ -181,13 +181,25 @@ echo "SIGNING_CERT_SOURCE=self-signed" >> .deploy.env
 # Don't echo the passphrase or base64 cert back to the user.
 ```
 
-Print a banner:
+Print a **loud** banner so the deployer cannot miss it:
 
 ```
-Self-signed signing cert generated.
-PDFs will verify as "signature valid, identity not trusted" in Adobe Reader.
-For legally binding signatures in B2B/B2C flows, upgrade to an AATL CA cert later
-(see references/signing-cert.md for CA list and replacement steps).
+══════════════════════════════════════════════════════════════════════════
+⚠️  SELF-SIGNED CERTIFICATE — DO NOT USE FOR REAL CONTRACTS YET  ⚠️
+══════════════════════════════════════════════════════════════════════════
+PDFs signed with this cert verify as "signature VALID, identity NOT TRUSTED"
+in Adobe Reader. Counterparties, courts, and auditors will NOT accept these
+signatures as legally binding.
+
+Fine for:   internal pilot, UI/UX walkthrough, dev/staging environments.
+NOT for:    real signed contracts, external counterparties, production use.
+
+BEFORE sending any real contracts, upgrade to an AATL CA cert:
+  → see references/signing-cert.md for the procurement runbook
+  → typical cost: $200-500/year
+  → typical timeline: 2-5 business days after payment
+  → the swap is a 30-second Secrets Manager update; no code/infra change
+══════════════════════════════════════════════════════════════════════════
 ```
 
 **If Y:** read the `.p12` at the provided path, validate with `openssl pkcs12 -info -in "$SIGNING_CERT_PATH" -passin "pass:$SIGNING_PASSPHRASE" -nokeys -nomacver 2>&1 | head -5` (won't print the key). Prompt for passphrase with `read -s`. Base64-encode: `SIGNING_CERT_B64=$(base64 -w0 "$SIGNING_CERT_PATH")`.
@@ -428,6 +440,40 @@ Print the cert info for confirmation:
 ```bash
 echo "$SIGNING_CERT_B64" | base64 -d | openssl pkcs12 -info -nokeys -nomacver \
   -passin "pass:$SIGNING_PASSPHRASE" 2>/dev/null | grep -E "subject|issuer|Not"
+```
+
+### Final deploy summary — print this verbatim
+
+Always end the deploy session with this summary so the deployer knows the **one
+remaining step before real contracts can be sent**:
+
+```
+══════════════════════════════════════════════════════════════════════════
+✅  DEPLOY COMPLETE  →  <https://DOMAIN>
+══════════════════════════════════════════════════════════════════════════
+What works right now:
+  • SSO login
+  • PDF upload, field placement, signing UI, email invitations
+  • Cryptographically valid signatures (signer cannot forge them)
+
+What does NOT work yet (if you chose self-signed):
+  • Signatures are NOT AATL-trusted. Adobe Reader shows:
+      "Signature valid. Signer's identity is UNKNOWN / not trusted."
+  • Most counterparties, courts, and auditors will NOT accept these
+    as legally binding. DO NOT SEND REAL CONTRACTS until you upgrade.
+
+Before real contracts:
+  1. Buy an AATL cert from one of: SSL.com, GlobalSign, Entrust,
+     DigiCert, IdenTrust. Typical cost $200-500/yr.
+     (MSPs deploying for clients: each client needs their OWN cert —
+      see references/signing-cert.md#msp-pattern.)
+  2. Follow the procurement runbook in references/signing-cert.md.
+  3. When the CA issues the cert PEM, one Secrets Manager update + ECS
+     redeploy is all that's needed. No code or infra changes.
+
+For operational runbooks and cert-rotation procedures:
+  → .claude/skills/deploy-to-aws/references/signing-cert.md
+══════════════════════════════════════════════════════════════════════════
 ```
 
 Ask the user to delete `.deploy.env` or keep it for future updates. The signing cert passphrase + base64 cert are recoverable from Secrets Manager.

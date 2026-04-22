@@ -2,6 +2,14 @@
 
 `documenso.yml` is a self-contained AWS CloudFormation template that deploys Documenso (this fork) onto ECS Fargate with RDS PostgreSQL and S3 for document uploads.
 
+## ⚠️ Before sending real contracts: get an AATL cert
+
+A Documenso deploy is functional on day one, but PDFs signed with a self-signed or local cert will verify in Adobe Reader as *"Signature valid, signer's identity is UNKNOWN."* Counterparties, courts, and auditors treat this as **not legally binding**.
+
+**For real contracts you need a certificate from an Adobe Approved Trust List (AATL) CA** — SSL.com, GlobalSign, Entrust, DigiCert, or IdenTrust. Typical cost: $200–500/yr. Typical timeline: 2–5 business days. The upgrade is a single Secrets Manager update — no code, infra, or stack redeploy.
+
+Full procurement runbook (including the MSP pattern for deploying on behalf of clients): **[`.claude/skills/deploy-to-aws/references/signing-cert.md`](../.claude/skills/deploy-to-aws/references/signing-cert.md)**.
+
 ## Launch Stack
 
 Click the button below (replace `<owner>` with your GitHub org/user if you've forked this repo):
