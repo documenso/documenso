@@ -400,7 +400,8 @@ export const SignInForm = ({
               onSuccess={setCaptchaToken}
               onExpire={() => setCaptchaToken(null)}
               options={{
-                size: 'invisible',
+                size: 'flexible',
+                appearance: 'interaction-only',
               }}
             />
           )}
