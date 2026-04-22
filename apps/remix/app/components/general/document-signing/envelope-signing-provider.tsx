@@ -14,6 +14,7 @@ import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import type { EnvelopeForSigningResponse } from '@documenso/lib/server-only/envelope/get-envelope-for-recipient-signing';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import { evaluateAllVisibility } from '@documenso/lib/universal/field-visibility';
 import {
   isFieldUnsignedAndRequired,
   isRequiredField,
@@ -41,6 +42,8 @@ export type EnvelopeSigningContextValue = {
   recipient: EnvelopeForSigningResponse['recipient'];
   recipientFieldsRemaining: Field[];
   recipientFields: Field[];
+  recipientFieldVisibility: Map<number, boolean>;
+  visibleRecipientFields: Field[];
   requiredRecipientFields: Field[];
   selectedAssistantRecipientFields: Field[];
   nextRecipient: EnvelopeForSigningResponse['envelope']['recipients'][number] | null;
@@ -168,11 +171,49 @@ export const EnvelopeSigningProvider = ({
   );
 
   /**
+   * All the required fields for the actual recipient.
+   */
+  const requiredRecipientFields = useMemo(() => {
+    return envelopeData.recipient.fields.filter((field) => isRequiredField(field));
+  }, [envelopeData.recipient.fields]);
+
+  /**
+   * All the fields for the actual recipient.
+   */
+  const recipientFields = useMemo(() => {
+    return envelopeData.recipient.fields;
+  }, [envelopeData.recipient.fields]);
+
+  /**
+   * Visibility map for each recipient field (field id -> visible).
+   * A missing entry means the field is visible by default.
+   */
+  const recipientFieldVisibility = useMemo(() => {
+    return evaluateAllVisibility(
+      recipientFields.map((f) => ({
+        id: f.id,
+        type: f.type,
+        customText: f.customText,
+        inserted: f.inserted,
+        fieldMeta: f.fieldMeta,
+      })),
+    );
+  }, [recipientFields]);
+
+  /**
+   * Recipient fields that are currently visible (not hidden by conditional logic).
+   */
+  const visibleRecipientFields = useMemo(() => {
+    return recipientFields.filter((f) => recipientFieldVisibility.get(f.id) !== false);
+  }, [recipientFields, recipientFieldVisibility]);
+
+  /**
    * The fields that are still required to be signed by the actual recipient.
    */
   const recipientFieldsRemaining = useMemo(() => {
     const requiredFields = envelopeData.recipient.fields
       .filter((field) => isFieldUnsignedAndRequired(field))
+      .filter((field) => recipientFieldVisibility.get(field.id) !== false)
       .map((field) => {
         const envelopeItem = envelope.envelopeItems.find(
           (item) => item.id === field.envelopeItemId,
@@ -194,21 +235,7 @@ export const EnvelopeSigningProvider = ({
       [prop('page'), 'asc'],
       [prop('positionY'), 'asc'],
     );
-  }, [envelopeData.recipient.fields]);
-
-  /**
-   * All the required fields for the actual recipient.
-   */
-  const requiredRecipientFields = useMemo(() => {
-    return envelopeData.recipient.fields.filter((field) => isRequiredField(field));
-  }, [envelopeData.recipient.fields]);
-
-  /**
-   * All the fields for the actual recipient.
-   */
-  const recipientFields = useMemo(() => {
-    return envelopeData.recipient.fields;
-  }, [envelopeData.recipient.fields]);
+  }, [envelopeData.recipient.fields, recipientFieldVisibility]);
 
   /**
    * Assistant recipients are those that have a signing order after the assistant.
@@ -389,6 +416,8 @@ export const EnvelopeSigningProvider = ({
         recipient,
         recipientFieldsRemaining,
         recipientFields,
+        recipientFieldVisibility,
+        visibleRecipientFields,
         requiredRecipientFields,
         nextRecipient,
 
