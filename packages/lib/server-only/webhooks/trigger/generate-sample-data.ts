@@ -73,6 +73,7 @@ export const generateSampleWebhookPayload = (
         sendStatus: SendStatus.NOT_SENT,
       },
     ],
+    fields: [],
     Recipient: [
       {
         id: 52,

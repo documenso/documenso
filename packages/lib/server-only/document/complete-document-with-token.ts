@@ -330,7 +330,7 @@ export const completeDocumentWithToken = async ({
 
   const envelopeWithRelations = await prisma.envelope.findUniqueOrThrow({
     where: { id: envelope.id },
-    include: { documentMeta: true, recipients: true },
+    include: { documentMeta: true, recipients: true, fields: true },
   });
 
   await triggerWebhook({
@@ -464,6 +464,7 @@ export const completeDocumentWithToken = async ({
     include: {
       documentMeta: true,
       recipients: true,
+      fields: true,
     },
   });
 

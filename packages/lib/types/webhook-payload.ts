@@ -1,4 +1,10 @@
-import type { DocumentMeta, Envelope, Recipient, WebhookTriggerEvents } from '@prisma/client';
+import type {
+  DocumentMeta,
+  Envelope,
+  Field,
+  Recipient,
+  WebhookTriggerEvents,
+} from '@prisma/client';
 import {
   DocumentDistributionMethod,
   DocumentSigningOrder,
@@ -6,6 +12,7 @@ import {
   DocumentStatus,
   DocumentVisibility,
   EnvelopeType,
+  FieldType,
   ReadStatus,
   RecipientRole,
   SendStatus,
@@ -13,6 +20,7 @@ import {
 } from '@prisma/client';
 import { z } from 'zod';
 
+import { evaluateAllVisibility } from '../universal/field-visibility';
 import { mapSecondaryIdToDocumentId, mapSecondaryIdToTemplateId } from '../utils/envelope';
 
 /**
@@ -36,6 +44,24 @@ export const ZWebhookRecipientSchema = z.object({
   readStatus: z.nativeEnum(ReadStatus),
   signingStatus: z.nativeEnum(SigningStatus),
   sendStatus: z.nativeEnum(SendStatus),
+});
+
+/**
+ * Schema for field data in webhook payloads.
+ * Only visible (non-hidden) fields are included.
+ */
+export const ZWebhookFieldSchema = z.object({
+  id: z.number(),
+  recipientId: z.number(),
+  type: z.nativeEnum(FieldType),
+  page: z.number(),
+  positionX: z.any(),
+  positionY: z.any(),
+  width: z.any(),
+  height: z.any(),
+  customText: z.string(),
+  inserted: z.boolean(),
+  fieldMeta: z.any().nullable(),
 });
 
 /**
@@ -79,6 +105,12 @@ export const ZWebhookDocumentSchema = z.object({
   source: z.nativeEnum(DocumentSource),
   documentMeta: ZWebhookDocumentMetaSchema.nullable(),
   recipients: z.array(ZWebhookRecipientSchema),
+  /**
+   * Visible fields across all recipients. Hidden conditional fields are excluded.
+   * Only populated for completion events (document.signed, document.recipient_completed).
+   * Empty array for other lifecycle events.
+   */
+  fields: z.array(ZWebhookFieldSchema),
 
   /**
    * Legacy field for backwards compatibility.
@@ -100,14 +132,49 @@ export const mapEnvelopeToWebhookDocumentPayload = (
   envelope: Envelope & {
     recipients: Recipient[];
     documentMeta: DocumentMeta | null;
+    fields?: Field[];
   },
 ): TWebhookDocument => {
-  const { recipients: rawRecipients, documentMeta } = envelope;
+  const { recipients: rawRecipients, documentMeta, fields: rawFields = [] } = envelope;
 
   const legacyId =
     envelope.type === EnvelopeType.DOCUMENT
       ? mapSecondaryIdToDocumentId(envelope.secondaryId)
       : mapSecondaryIdToTemplateId(envelope.secondaryId);
+
+  // Build the set of visible fields by evaluating visibility per recipient.
+  // Visibility is recipient-scoped: a dependent field can only reference trigger
+  // fields belonging to the same recipient.
+  const visibleFieldIds = new Set<number>();
+
+  if (rawFields.length > 0) {
+    // Group fields by recipientId.
+    const fieldsByRecipient = new Map<number, Field[]>();
+    for (const field of rawFields) {
+      const group = fieldsByRecipient.get(field.recipientId) ?? [];
+      group.push(field);
+      fieldsByRecipient.set(field.recipientId, group);
+    }
+
+    // For each recipient's field set, evaluate visibility and collect visible ids.
+    for (const recipientFields of fieldsByRecipient.values()) {
+      const evaluatableFields = recipientFields.map((f) => ({
+        id: f.id,
+        type: f.type,
+        customText: f.customText,
+        inserted: f.inserted,
+        fieldMeta: f.fieldMeta,
+      }));
+      const visibilityMap = evaluateAllVisibility(evaluatableFields);
+      for (const [fieldId, visible] of visibilityMap.entries()) {
+        if (visible !== false) {
+          visibleFieldIds.add(fieldId);
+        }
+      }
+    }
+  }
+
+  const visibleFields = rawFields.filter((f) => visibleFieldIds.has(f.id));
 
   const mappedRecipients = rawRecipients.map((recipient) => ({
     id: recipient.id,
@@ -153,6 +220,19 @@ export const mapEnvelopeToWebhookDocumentPayload = (
           dateFormat: 'yyyy-MM-dd hh:mm a',
         }
       : null,
+    fields: visibleFields.map((f) => ({
+      id: f.id,
+      recipientId: f.recipientId,
+      type: f.type,
+      page: f.page,
+      positionX: f.positionX,
+      positionY: f.positionY,
+      width: f.width,
+      height: f.height,
+      customText: f.customText,
+      inserted: f.inserted,
+      fieldMeta: f.fieldMeta,
+    })),
     Recipient: mappedRecipients,
     recipients: mappedRecipients,
   };
