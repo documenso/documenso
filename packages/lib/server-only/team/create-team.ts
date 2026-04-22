@@ -171,7 +171,7 @@ export const createTeam = async ({
         // Create the internal team groups.
         await Promise.all(
           TEAM_INTERNAL_GROUPS.map(async (teamGroup) =>
-            tx.organisationGroup.create({
+            await tx.organisationGroup.create({
               data: {
                 id: generateDatabaseId('org_group'),
                 type: teamGroup.type,

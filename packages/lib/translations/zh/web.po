@@ -45,10 +45,6 @@ msgstr "“{documentName}”已被签署"
 msgid "“{documentName}” was signed by all signers"
 msgstr "“{documentName}”已由所有签署人签署"
 
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
-msgid "\"{documentTitle}\" has been successfully deleted"
-msgstr "\"{documentTitle}\" 已成功删除"
-
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "\"{placeholderEmail}\" on behalf of \"Team Name\" has invited you to sign \"example document\"."
 msgstr "“{placeholderEmail}”代表“Team Name”邀请您签署“example document”。"
@@ -56,6 +52,10 @@ msgstr "“{placeholderEmail}”代表“Team Name”邀请您签署“example d
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "\"{title}\" has been successfully deleted"
 msgstr "“{title}”已成功删除"
+
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
+msgid "\"{title}\" has been successfully hidden"
+msgstr ""
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "\"Team Name\" has invited you to sign \"example document\"."
@@ -1488,7 +1488,6 @@ msgstr "所有邮箱域名已成功同步"
 msgid "All Folders"
 msgstr "所有文件夹"
 
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "All inserted signatures will be voided"
 msgstr "所有已插入的签名将被作废"
@@ -1501,7 +1500,6 @@ msgstr "所有项目必须为同一类型。"
 msgid "All recipients have signed. The document is being processed and you will receive an email copy shortly."
 msgstr "所有收件人都已签署。文档正在处理中，您很快会收到一份通过电子邮件发送的副本。"
 
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "All recipients will be notified"
@@ -1689,10 +1687,6 @@ msgstr "禁用直接链接签署时发生错误。"
 #: apps/remix/app/components/dialogs/admin-user-disable-dialog.tsx
 msgid "An error occurred while disabling the user."
 msgstr "禁用用户时发生错误。"
-
-#: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
-msgid "An error occurred while duplicating template."
-msgstr "复制模板时发生错误。"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "An error occurred while enabling direct link signing."
@@ -1996,7 +1990,6 @@ msgstr "您确定要删除此组织吗？"
 msgid "Are you sure you wish to delete this team?"
 msgstr "确定要删除此团队吗？"
 
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-email-delete-dialog.tsx
@@ -2302,7 +2295,6 @@ msgstr "接受此请求，即表示您授予 {0} 以下权限："
 msgid "By accepting this request, you will be granting <0>{teamName}</0> access to:"
 msgstr "接受此请求后，您将授予 <0>{teamName}</0> 以下访问权限："
 
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "By deleting this document, the following will occur:"
 msgstr "删除此文档将会产生以下后果："
@@ -2344,8 +2336,6 @@ msgstr "找不到某个人？"
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
-#: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
@@ -2401,9 +2391,7 @@ msgstr "找不到某个人？"
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
-#: apps/remix/app/components/dialogs/template-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
-#: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
@@ -2485,6 +2473,14 @@ msgstr "抄送人"
 msgid "Center"
 msgstr "居中"
 
+#: apps/remix/app/components/general/verify/verify-result-card.tsx
+msgid "Certificate"
+msgstr ""
+
+#: apps/remix/app/routes/verify.tsx
+msgid "Change file"
+msgstr ""
+
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Change language"
 msgstr "更改语言"
@@ -2541,6 +2537,10 @@ msgstr "结账"
 #: packages/lib/constants/i18n.ts
 msgid "Chinese"
 msgstr "中文"
+
+#: apps/remix/app/routes/verify.tsx
+msgid "Choose a PDF to verify"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Choose an existing recipient from below to continue"
@@ -3437,13 +3437,11 @@ msgstr "委派文档所有权"
 msgid "Delegate Document Ownership"
 msgstr "委派文档所有权"
 
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "delete"
 msgstr "delete"
 
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
@@ -3457,7 +3455,6 @@ msgstr "delete"
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-group-delete-dialog.tsx
-#: apps/remix/app/components/dialogs/template-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
@@ -3813,14 +3810,6 @@ msgstr "已生成 DKIM 记录。请添加 DNS 记录以验证您的域名。"
 msgid "DNS Records"
 msgstr "DNS 记录"
 
-#: apps/remix/app/components/dialogs/template-delete-dialog.tsx
-msgid "Do you want to delete this template?"
-msgstr "要删除此模板吗？"
-
-#: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
-msgid "Do you want to duplicate this template?"
-msgstr "要复制此模板吗？"
-
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Documenso License"
 msgstr "Documenso 许可证"
@@ -3946,7 +3935,6 @@ msgid "Document Creation"
 msgstr "文档创建"
 
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
@@ -3977,7 +3965,7 @@ msgstr "文档分发方式"
 msgid "Document draft"
 msgstr "文档草稿"
 
-#: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 msgid "Document Duplicated"
 msgstr "文档已复制"
 
@@ -3993,6 +3981,10 @@ msgstr "文档外部 ID 已更新"
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 msgid "Document found in your account"
 msgstr "在您的账户中找到了该文档"
+
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
+msgid "Document hidden"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
@@ -4109,7 +4101,6 @@ msgctxt "Audit log format"
 msgid "Document signing auth updated"
 msgstr "文档签署认证已更新"
 
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Document signing process will be cancelled"
 msgstr "文档签署流程将被取消"
@@ -4162,6 +4153,10 @@ msgstr "由于有未支付账单，已禁用文档上传"
 msgid "Document uploaded"
 msgstr "文档已上传"
 
+#: apps/remix/app/routes/verify.tsx
+msgid "Document verification form"
+msgstr ""
+
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
 msgid "Document viewed"
@@ -4188,7 +4183,6 @@ msgstr "文档可见性已更新"
 msgid "Document Volume"
 msgstr "文档量"
 
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Document will be permanently deleted"
 msgstr "文档将被永久删除"
@@ -4395,10 +4389,7 @@ msgstr "下拉列表设置"
 msgid "Dropdown values"
 msgstr "下拉列表值"
 
-#: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
-#: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
-#: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
@@ -4906,10 +4897,6 @@ msgstr "企业版"
 msgid "Envelope distributed"
 msgstr "信封已分发"
 
-#: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
-msgid "Envelope Duplicated"
-msgstr "信封已复制"
-
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Envelope ID"
@@ -4963,7 +4950,6 @@ msgstr "信封已更新"
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
-#: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
@@ -5677,7 +5663,6 @@ msgstr "您好 {userName}，您需要输入验证码才能完成文档“{docume
 msgid "Hi, {userName} <0>({userEmail})</0>"
 msgstr "您好，{userName} <0>（{userEmail}）</0>"
 
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
@@ -6829,6 +6814,10 @@ msgstr "否"
 msgid "No active drafts"
 msgstr "没有活动草稿"
 
+#: apps/remix/app/routes/verify.tsx
+msgid "No document content is stored or retained. Processing occurs entirely in memory."
+msgstr ""
+
 #: apps/remix/app/components/general/pdf-viewer/envelope-pdf-viewer.tsx
 #: apps/remix/app/components/general/pdf-viewer/pdf-viewer.tsx
 msgid "No document found"
@@ -7088,7 +7077,6 @@ msgstr "在此页面，您可以创建和管理 API 令牌。更多信息请参�
 msgid "On this page, you can create new Webhooks and manage the existing ones."
 msgstr "在此页面，你可以创建新的 Webhook 并管理现有的 Webhook。"
 
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Once confirmed, the following will occur:"
@@ -7174,6 +7162,10 @@ msgstr "或"
 #: apps/remix/app/components/forms/signin.tsx
 msgid "Or continue with"
 msgstr "或者使用以下方式继续"
+
+#: apps/remix/app/routes/verify.tsx
+msgid "or drag and drop — up to 10MB"
+msgstr ""
 
 #: apps/remix/app/components/general/template/template-type.tsx
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
@@ -7654,7 +7646,6 @@ msgstr "请确认您的邮箱"
 msgid "Please confirm your email address"
 msgstr "请确认您的邮箱地址"
 
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Please contact support if you would like to revert this action."
 msgstr "如需撤销此操作，请联系支持。"
@@ -7713,13 +7704,11 @@ msgstr "请注意，任何通过您的门户登录的人都会被添加为您组
 msgid "Please note that proceeding will remove direct linking recipient and turn it into a placeholder."
 msgstr "请注意，继续操作将移除直接链接收件人，并将其转为占位符。"
 
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Please note that this action is <0>irreversible</0>."
 msgstr "请注意，此操作<0>不可恢复</0>。"
 
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Please note that this action is <0>irreversible</0>. Once confirmed, this document will be permanently deleted."
 msgstr "请注意，此操作<0>不可恢复</0>。一旦确认，该文档将被永久删除。"
@@ -7727,10 +7716,6 @@ msgstr "请注意，此操作<0>不可恢复</0>。一旦确认，该文档将�
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Please note that this action is <0>irreversible</0>. Once confirmed, this template will be permanently deleted."
 msgstr "请注意，此操作<0>不可撤销</0>。确认后，此模板将被永久删除。"
-
-#: apps/remix/app/components/dialogs/template-delete-dialog.tsx
-msgid "Please note that this action is irreversible. Once confirmed, your template will be permanently deleted."
-msgstr "请注意，此操作不可恢复。一旦确认，你的模板将被永久删除。"
 
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
 msgid "Please note that this action is irreversible. Once confirmed, your token will be permanently deleted."
@@ -7792,9 +7777,7 @@ msgstr "请重试，并确保你输入了正确的邮箱地址。"
 msgid "Please try again or contact our support."
 msgstr "请重试或联系我们的支持团队。"
 
-#. placeholder {0}: `'${_(deleteMessage)}'`
 #. placeholder {0}: `'${t(deleteMessage)}'`
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Please type {0} to confirm"
 msgstr "请输入 {0} 以确认"
@@ -8184,7 +8167,6 @@ msgstr "将自动添加到新文档中的收件人。"
 msgid "Recipients will be able to sign the document once sent"
 msgstr "发送后，收件人将能够签署此文档"
 
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Recipients will still retain their copy of the document"
 msgstr "收件人仍然会保留他们自己的文档副本"
@@ -8573,6 +8555,10 @@ msgstr "返回模板列表"
 msgid "Review request"
 msgstr "审查请求"
 
+#: apps/remix/app/components/general/verify/verify-result-card.tsx
+msgid "Revocation status could not be confirmed via OCSP or CRL. The certificate may have been revoked."
+msgstr ""
+
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Revoke"
@@ -8755,6 +8741,10 @@ msgstr "请选择此文件夹的目标位置。"
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "Select a folder to move this document to."
 msgstr "选择一个文件夹以将此文档移动到其中。"
+
+#: apps/remix/app/routes/verify.tsx
+msgid "Select a PDF file to verify"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Select a plan"
@@ -9270,6 +9260,7 @@ msgid "Signatures Collected"
 msgstr "收集到的签名数量"
 
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+#: apps/remix/app/components/general/verify/verify-result-card.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: packages/lib/server-only/pdf/render-certificate.ts
 #: packages/ui/components/document/document-read-only-fields.tsx
@@ -9287,6 +9278,10 @@ msgctxt "Signed document (adjective)"
 msgid "Signed"
 msgstr "已签署"
 
+#: apps/remix/app/routes/verify.tsx
+msgid "Signed with Documenso — <0>the open-source DocuSign alternative. Send your own documents free →</0>"
+msgstr ""
+
 #: apps/remix/app/components/general/envelope-signing/envelope-signer-header.tsx
 msgid "Signer"
 msgstr "签署人"
@@ -9300,6 +9295,10 @@ msgstr "签署人"
 #: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Signer Events"
 msgstr "签署人事件"
+
+#: apps/remix/app/components/general/verify/verify-result-card.tsx
+msgid "Signers"
+msgstr ""
 
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role plural name"
@@ -9405,8 +9404,6 @@ msgstr "跳过"
 msgid "Some signers have not been assigned a signature field. Please assign at least 1 signature field to each signer before proceeding."
 msgstr "部分签署人尚未被分配签名字段。请在继续前为每位签署人至少分配 1 个签名字段。"
 
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
-#: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
@@ -9419,7 +9416,6 @@ msgstr "部分签署人尚未被分配签名字段。请在继续前为每位签
 #: apps/remix/app/components/dialogs/team-email-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-inherit-member-disable-dialog.tsx
 #: apps/remix/app/components/dialogs/team-inherit-member-enable-dialog.tsx
-#: apps/remix/app/components/dialogs/template-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
@@ -9991,7 +9987,7 @@ msgstr "模板（旧版）"
 msgid "Template Created"
 msgstr "模板已创建"
 
-#: apps/remix/app/components/dialogs/template-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Template deleted"
 msgstr "模板已删除"
 
@@ -9999,9 +9995,9 @@ msgstr "模板已删除"
 msgid "Template document uploaded"
 msgstr "模板文档已上传"
 
-#: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
-msgid "Template duplicated"
-msgstr "模板已复制"
+#: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
+msgid "Template Duplicated"
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Template Editor"
@@ -10014,6 +10010,10 @@ msgstr "模板已从公开资料中移除。"
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "Template has been updated."
 msgstr "模板已更新。"
+
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
+msgid "Template hidden"
+msgstr ""
 
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 msgid "Template ID (Legacy)"
@@ -10165,6 +10165,10 @@ msgstr "收件人签署签名字段所需的认证方式。"
 msgid "The authentication methods required for recipients to view the document."
 msgstr "收件人查看文档所需的认证方式。"
 
+#: apps/remix/app/components/general/verify/verify-result-card.tsx
+msgid "The certificate issuer could not be verified against a trusted bundle. Treat this signature with caution."
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "The content to show in the banner, HTML is allowed"
 msgstr "横幅中要显示的内容，允许使用 HTML"
@@ -10224,7 +10228,6 @@ msgstr "此文档的所有权已代表 {1} 委派给 {0}"
 msgid "The document was created but could not be sent to recipients."
 msgstr "文档已创建，但无法发送给收件人。"
 
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "The document will be hidden from your account"
 msgstr "该文档将在你的账号中被隐藏"
@@ -10597,7 +10600,6 @@ msgstr "此文档无法恢复。若您希望对未来文档的删除原因提出
 msgid "This document cannot be changed"
 msgstr "此文档无法更改"
 
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "This document could not be deleted at this time. Please try again."
 msgstr "当前无法删除此文档。请重试。"
@@ -10606,7 +10608,6 @@ msgstr "当前无法删除此文档。请重试。"
 msgid "This document could not be downloaded at this time. Please try again."
 msgstr "当前无法下载此文档。请重试。"
 
-#: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 msgid "This document could not be duplicated at this time. Please try again."
 msgstr "当前无法复制此文档。请重试。"
@@ -10772,9 +10773,13 @@ msgstr "该签署人已签署文档。"
 msgid "This team, and any associated data excluding billing invoices will be permanently deleted."
 msgstr "此团队及其所有关联数据（账单发票除外）将被永久删除。"
 
-#: apps/remix/app/components/dialogs/template-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "This template could not be deleted at this time. Please try again."
 msgstr "当前无法删除此模板。请重试。"
+
+#: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
+msgid "This template could not be duplicated at this time. Please try again."
+msgstr ""
 
 #: apps/remix/app/components/general/legacy-field-warning-popover.tsx
 msgid "This template is using legacy field insertion, we recommend using the new field insertion method for more accurate results."
@@ -10797,6 +10802,10 @@ msgstr "此令牌无效或已过期。请联系你的团队获取新的邀请。
 #: apps/remix/app/components/forms/team-update-form.tsx
 msgid "This URL is already in use."
 msgstr "该 URL 已被使用。"
+
+#: apps/remix/app/components/general/verify/verify-result-card.tsx
+msgid "This verification confirms the cryptographic integrity of the digital signature. It does not constitute legal advice."
+msgstr ""
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "This will be sent to all recipients if a pending document has been deleted."
@@ -10878,6 +10887,10 @@ msgstr "标题不能为空"
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 msgid "To accept this invitation you must create an account."
 msgstr "要接受此邀请，你必须创建一个账号。"
+
+#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
+msgid "To add members to this team, they must first be invited to the organisation. Only organisation admins and managers can invite new members — please contact one of them to invite members on your behalf."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "To add members to this team, you must first add them to the organisation."
@@ -11061,6 +11074,11 @@ msgstr "未找到令牌"
 msgid "Too many requests"
 msgstr "请求过多"
 
+#. placeholder {0}: actionData.retryAfterSeconds
+#: apps/remix/app/routes/verify.tsx
+msgid "Too many requests. Please wait {0} seconds before trying again."
+msgstr ""
+
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Top"
 msgstr "顶部对齐"
@@ -11100,6 +11118,10 @@ msgstr "触发条件"
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "Try again"
 msgstr "重试"
+
+#: apps/remix/app/components/general/verify/verify-result-card.tsx
+msgid "TSA validated"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
 msgid "Turn on AI detection to automatically find recipients and fields in your documents. AI providers do not retain your data for training."
@@ -11501,6 +11523,10 @@ msgstr "上传 CSV 文件，以从该模板创建多个文档。每一行代表�
 msgid "Upload a custom document to use instead of the template's default document"
 msgstr "上传自定义文档以替换模板的默认文档"
 
+#: apps/remix/app/routes/verify.tsx
+msgid "Upload a signed PDF to verify its digital signature."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Upload and Process"
 msgstr "上传并处理"
@@ -11702,6 +11728,19 @@ msgstr "验证邮件发送成功。"
 msgid "Verify & Complete"
 msgstr "验证并完成"
 
+#: apps/remix/app/routes/verify.tsx
+msgid "Verify a document"
+msgstr ""
+
+#: apps/remix/app/routes/verify.tsx
+#: apps/remix/app/routes/verify.tsx
+msgid "Verify document"
+msgstr ""
+
+#: apps/remix/app/routes/verify.tsx
+msgid "Verify Document"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-email-domain-records-dialog.tsx
 msgid "Verify Domain"
 msgstr "验证域名"
@@ -11730,6 +11769,14 @@ msgstr "验证邮箱后即可上传文档。"
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Verify your team email address"
 msgstr "验证您的团队邮箱地址"
+
+#: apps/remix/app/routes/verify.tsx
+msgid "Verifying document, please wait"
+msgstr ""
+
+#: apps/remix/app/routes/verify.tsx
+msgid "Verifying…"
+msgstr ""
 
 #: apps/remix/app/components/forms/editor/editor-field-checkbox-form.tsx
 #: apps/remix/app/components/forms/editor/editor-field-radio-form.tsx
@@ -12479,10 +12526,6 @@ msgstr "您即将完成以下文档的签署"
 msgid "You are about to complete viewing the following document"
 msgstr "您即将完成以下文档的查看"
 
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
-msgid "You are about to delete <0>\"{documentTitle}\"</0>"
-msgstr "你即将删除 <0>\"{documentTitle}\"</0>"
-
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "You are about to delete <0>\"{title}\"</0>"
 msgstr "您将要删除<0>\"{title}\"</0>"
@@ -12499,10 +12542,6 @@ msgstr "你即将从 <0>{teamName}</0> 中删除以下团队邮箱。"
 #: apps/remix/app/components/dialogs/team-inherit-member-enable-dialog.tsx
 msgid "You are about to give all organisation members access to this team under their organisation role."
 msgstr "您即将根据组织角色，向所有组织成员授予对此团队的访问权限。"
-
-#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
-msgid "You are about to hide <0>\"{documentTitle}\"</0>"
-msgstr "你即将隐藏 <0>\"{documentTitle}\"</0>"
 
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "You are about to hide <0>\"{title}\"</0>"
@@ -13327,7 +13366,7 @@ msgstr "您的文档已保存为模板。"
 msgid "Your document has been sent successfully."
 msgstr "你的文档已成功发送。"
 
-#: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 msgid "Your document has been successfully duplicated."
 msgstr "你的文档已成功复制。"
 
@@ -13393,10 +13432,6 @@ msgstr "您的信封已成功分发。"
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
 msgid "Your envelope has been resent successfully."
 msgstr "您的信封已成功重新发送。"
-
-#: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
-msgid "Your envelope has been successfully duplicated."
-msgstr "您的信封已成功复制。"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "Your existing tokens"
@@ -13494,13 +13529,9 @@ msgstr "你的团队已成功更新。"
 msgid "Your template has been created successfully"
 msgstr "您的模板已成功创建"
 
-#: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
-msgid "Your template has been duplicated successfully."
-msgstr "你的模板已成功复制。"
-
-#: apps/remix/app/components/dialogs/template-delete-dialog.tsx
-msgid "Your template has been successfully deleted."
-msgstr "你的模板已成功删除。"
+#: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
+msgid "Your template has been successfully duplicated."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/envelope-rename-dialog.tsx
 msgid "Your template has been successfully renamed."
@@ -13514,10 +13545,6 @@ msgstr "您的模板已成功更新"
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
 msgid "Your template has been uploaded successfully."
 msgstr "您的模板已成功上传。"
-
-#: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
-msgid "Your template will be duplicated."
-msgstr "你的模板将被复制。"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Your templates"
@@ -13554,4 +13581,3 @@ msgstr "您的验证码："
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
-

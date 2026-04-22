@@ -15,7 +15,7 @@ export const getAllWebhooksByEventTrigger = async ({
   userId,
   teamId,
 }: GetAllWebhooksByEventTriggerOptions) => {
-  return prisma.webhook.findMany({
+  return await prisma.webhook.findMany({
     where: {
       enabled: true,
       eventTriggers: {

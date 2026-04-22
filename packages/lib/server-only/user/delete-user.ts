@@ -63,7 +63,7 @@ export const deleteUser = async ({ id }: DeleteUserOptions) => {
   // For teams where user is a member (not owner) - transfer envelopes to team owner.
   await Promise.all(
     memberTeams.map(async ({ teamId, orgOwnerId }) => {
-      return prisma.envelope.updateMany({
+      return await prisma.envelope.updateMany({
         where: {
           userId: user.id,
           teamId,

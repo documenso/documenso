@@ -176,7 +176,7 @@ export const duplicateEnvelope = async ({
     await pMap(
       envelope.recipients,
       async (recipient) =>
-        prisma.recipient.create({
+        await prisma.recipient.create({
           data: {
             envelopeId: duplicatedEnvelope.id,
             email: recipient.email,

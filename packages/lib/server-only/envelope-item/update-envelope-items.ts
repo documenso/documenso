@@ -31,7 +31,7 @@ export const UNSAFE_updateEnvelopeItems = async ({
 }: UnsafeUpdateEnvelopeItemsOptions) => {
   const updatedEnvelopeItems = await Promise.all(
     data.map(async ({ envelopeItemId, order, title }) =>
-      prisma.envelopeItem.update({
+      await prisma.envelopeItem.update({
         where: {
           envelopeId,
           id: envelopeItemId,

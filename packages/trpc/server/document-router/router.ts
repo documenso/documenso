@@ -25,6 +25,7 @@ import { redistributeDocumentRoute } from './redistribute-document';
 import { searchDocumentRoute } from './search-document';
 import { shareDocumentRoute } from './share-document';
 import { updateDocumentRoute } from './update-document';
+import { verifyDocumentRoute } from './verify-document';
 
 export const documentRouter = router({
   get: getDocumentRoute,
@@ -39,6 +40,7 @@ export const documentRouter = router({
   redistribute: redistributeDocumentRoute,
   search: searchDocumentRoute,
   share: shareDocumentRoute,
+  verify: verifyDocumentRoute,
 
   download: downloadDocumentRoute,
 
