@@ -4,7 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { FieldType } from '@prisma/client';
-import { CopyPlus, Settings2, SquareStack, Trash } from 'lucide-react';
+import { CopyPlus, EyeIcon, Settings2, SquareStack, Trash } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
 import { useSearchParams } from 'react-router';
@@ -315,6 +315,19 @@ const FieldItemInner = ({
         data-recipient-id={field.recipientId}
       >
         <FieldContent field={field} />
+
+        {(() => {
+          const meta = field.fieldMeta as { visibility?: unknown } | null;
+          if (!meta?.visibility) return null;
+          return (
+            <div
+              className="absolute -right-1 -top-1 rounded-full bg-primary/90 p-0.5 text-primary-foreground shadow"
+              title="This field has conditional visibility"
+            >
+              <EyeIcon className="h-3 w-3" />
+            </div>
+          );
+        })()}
 
         {/* On hover, display recipient initials on side of field.  */}
         <div className="absolute -right-5 top-0 z-20 hidden h-full w-5 items-center justify-center group-hover:flex">
