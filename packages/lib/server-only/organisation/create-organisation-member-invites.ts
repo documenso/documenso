@@ -5,7 +5,10 @@ import type { Organisation, Prisma } from '@prisma/client';
 import { OrganisationMemberInviteStatus } from '@prisma/client';
 import { nanoid } from 'nanoid';
 
-import { syncMemberCountWithStripeSeatPlan } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
+import {
+  assertMemberCountWithinCap,
+  syncMemberCountWithStripeSeatPlan,
+} from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import { mailer } from '@documenso/email/mailer';
 import { OrganisationInviteEmailTemplate } from '@documenso/email/templates/organisation-invite';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
@@ -127,8 +130,10 @@ export const createOrganisationMemberInvites = async ({
   const totalMemberCountWithInvites =
     numberOfCurrentMembers + numberOfCurrentInvites + numberOfNewInvites;
 
-  // Handle billing for seat based plans.
+  // Enforce the seat cap and sync billing for seat based plans.
   if (subscription) {
+    await assertMemberCountWithinCap(subscription, organisationClaim, totalMemberCountWithInvites);
+
     await syncMemberCountWithStripeSeatPlan(
       subscription,
       organisationClaim,
