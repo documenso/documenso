@@ -1,7 +1,8 @@
-import * as cdk from "aws-cdk-lib";
-import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
-import { Construct } from "constructs";
-import type { EnvironmentConfig } from "../config";
+import * as cdk from 'aws-cdk-lib';
+import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
+import { Construct } from 'constructs';
+
+import type { EnvironmentConfig } from '../config';
 
 export interface SecretsProps {
   readonly config: EnvironmentConfig;
@@ -26,64 +27,63 @@ export class Secrets extends Construct {
 
     const { config } = props;
 
-    if (config.mode === "internal") {
+    if (config.mode === 'internal') {
       this.appConfig = secretsmanager.Secret.fromSecretCompleteArn(
         this,
-        "AppConfig",
+        'AppConfig',
         config.appConfigSecretArn,
       );
 
       this.databaseUrl = secretsmanager.Secret.fromSecretCompleteArn(
         this,
-        "DatabaseUrl",
+        'DatabaseUrl',
         config.databaseUrlSecretArn,
       );
     } else {
-      this.appConfig = new secretsmanager.Secret(this, "AppConfig", {
+      this.appConfig = new secretsmanager.Secret(this, 'AppConfig', {
         secretName: `documenso/${config.envName}/app-config`,
         description:
-          "Documenso app secrets (NEXTAUTH_SECRET, encryption keys, SSO, SMTP, signing cert). " +
-          "Auto-generated placeholder values — update after deploy.",
+          'Documenso app secrets (NEXTAUTH_SECRET, encryption keys, SSO, SMTP, signing cert). ' +
+          'Auto-generated placeholder values — update after deploy.',
         generateSecretString: {
           secretStringTemplate: JSON.stringify({
-            NEXT_PRIVATE_MICROSOFT_CLIENT_ID: "",
-            NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET: "",
-            NEXT_PRIVATE_SMTP_HOST: "",
-            NEXT_PRIVATE_SMTP_PORT: "587",
-            NEXT_PRIVATE_SMTP_USERNAME: "",
-            NEXT_PRIVATE_SMTP_PASSWORD: "",
-            NEXT_PRIVATE_SIGNING_PASSPHRASE: "",
-            NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS: "",
-            NEXT_PRIVATE_ENCRYPTION_KEY: "",
-            NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: "",
+            NEXT_PRIVATE_MICROSOFT_CLIENT_ID: '',
+            NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET: '',
+            NEXT_PRIVATE_SMTP_HOST: '',
+            NEXT_PRIVATE_SMTP_PORT: '587',
+            NEXT_PRIVATE_SMTP_USERNAME: '',
+            NEXT_PRIVATE_SMTP_PASSWORD: '',
+            NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_CONTENTS: '',
+            NEXT_PRIVATE_ENCRYPTION_KEY: '',
+            NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: '',
           }),
-          generateStringKey: "NEXTAUTH_SECRET",
+          generateStringKey: 'NEXTAUTH_SECRET',
           excludePunctuation: true,
           passwordLength: 64,
         },
       });
 
-      this.databaseUrl = new secretsmanager.Secret(this, "DatabaseUrl", {
+      this.databaseUrl = new secretsmanager.Secret(this, 'DatabaseUrl', {
         secretName: `documenso/${config.envName}/database-url`,
         description:
-          "Documenso DATABASE_URL secret — populated by the skill after RDS endpoint is known.",
+          'Documenso DATABASE_URL secret — populated by the skill after RDS endpoint is known.',
         secretStringValue: cdk.SecretValue.unsafePlainText(
           JSON.stringify({
-            NEXT_PRIVATE_DATABASE_URL: "postgresql://placeholder",
-            NEXT_PRIVATE_DIRECT_DATABASE_URL: "postgresql://placeholder",
+            NEXT_PRIVATE_DATABASE_URL: 'postgresql://placeholder',
+            NEXT_PRIVATE_DIRECT_DATABASE_URL: 'postgresql://placeholder',
           }),
         ),
       });
     }
 
-    new cdk.CfnOutput(this, "AppConfigSecretArn", {
+    new cdk.CfnOutput(this, 'AppConfigSecretArn', {
       value: this.appConfig.secretArn,
-      description: "App config secret ARN",
+      description: 'App config secret ARN',
     });
 
-    new cdk.CfnOutput(this, "DatabaseUrlSecretArn", {
+    new cdk.CfnOutput(this, 'DatabaseUrlSecretArn', {
       value: this.databaseUrl.secretArn,
-      description: "Database URL secret ARN",
+      description: 'Database URL secret ARN',
     });
   }
 }

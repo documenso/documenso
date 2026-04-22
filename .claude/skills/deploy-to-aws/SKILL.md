@@ -152,34 +152,29 @@ Write all five SMTP values to `.deploy.env`. `SMTP_FROM_ADDRESS` must be a verif
 
 #### 2f. Signing certificate (two-track)
 
-Documenso signs PDFs with a PKCS#12 certificate. Ask:
+Documenso signs PDFs via a KMS-backed X.509 certificate. The CDK creates the KMS key; the skill generates a cert against that key and uploads the PEM after stack deploy (Step 6). At this interview stage, only collect the subject info for the cert:
 
-> Do you have a CA-signed `.p12` cert from an Adobe AATL CA (GlobalSign, Entrust, DigiCert, IdenTrust, SSL.com)? (y/N)
+Ask (or infer from earlier answers — app name, org, admin email):
 
-**If N (default):** generate a self-signed cert on the user's machine. Install `openssl` first if missing (confirm before installing). Prompt for the user's org info, then:
+```
+CERT_CN  = "$APP_NAME"                    # e.g. "TechnologyMatch Signature"
+CERT_O   = "<user's legal org name>"      # e.g. "TechnologyMatch"
+CERT_OU  = "Documenso"
+CERT_EMAIL = "<admin email>"
+```
+
+Write these to `.deploy.env`:
 
 ```bash
-source .deploy.env
-TMPDIR=$(mktemp -d)
-CERT_CN="${APP_NAME:-Documenso}"
-CERT_O="<user's org>"
-CERT_EMAIL="<admin email>"
-# generate random passphrase
-SIGNING_PASSPHRASE=$(openssl rand -base64 24 | tr -d '/+=' | head -c 24)
-
-openssl req -x509 -nodes -newkey rsa:2048 \
-  -keyout "$TMPDIR/key.pem" -out "$TMPDIR/cert.pem" -days 1825 \
-  -subj "/CN=$CERT_CN/O=$CERT_O/OU=Documenso/emailAddress=$CERT_EMAIL"
-
-openssl pkcs12 -export \
-  -out "$TMPDIR/cert.p12" \
-  -inkey "$TMPDIR/key.pem" -in "$TMPDIR/cert.pem" \
-  -passout "pass:$SIGNING_PASSPHRASE"
-
-SIGNING_CERT_B64=$(base64 -w0 "$TMPDIR/cert.p12")
-echo "SIGNING_CERT_SOURCE=self-signed" >> .deploy.env
-# Don't echo the passphrase or base64 cert back to the user.
+cat >> .deploy.env <<EOF
+SIGNING_CERT_CN="$CERT_CN"
+SIGNING_CERT_O="$CERT_O"
+SIGNING_CERT_OU="$CERT_OU"
+SIGNING_CERT_EMAIL="$CERT_EMAIL"
+EOF
 ```
+
+**Do NOT generate the cert here.** The cert is generated in Step 6 after the CFN stack creates the KMS key — we need the key's public half to sign the cert against. The KMS key ARN comes from the `SigningKmsSigningKeyArn` stack output.
 
 Print a **loud** banner so the deployer cannot miss it:
 
@@ -202,9 +197,7 @@ BEFORE sending any real contracts, upgrade to an AATL CA cert:
 ══════════════════════════════════════════════════════════════════════════
 ```
 
-**If Y:** read the `.p12` at the provided path, validate with `openssl pkcs12 -info -in "$SIGNING_CERT_PATH" -passin "pass:$SIGNING_PASSPHRASE" -nokeys -nomacver 2>&1 | head -5` (won't print the key). Prompt for passphrase with `read -s`. Base64-encode: `SIGNING_CERT_B64=$(base64 -w0 "$SIGNING_CERT_PATH")`.
-
-Keep `SIGNING_PASSPHRASE` and `SIGNING_CERT_B64` in memory for step 6 — do not write them to `.deploy.env` unless the user insists (they're recoverable from Secrets Manager once deployed).
+If the deployer already has an AATL-issued cert (PEM) against an existing KMS key they'll supply later, note that in `.deploy.env` as `SIGNING_CERT_SOURCE=external` and skip the self-sign in Step 6 — they'll paste the PEM directly into the secret. For everyone else the self-signed flow is the default.
 
 #### 2g. Validation pass
 
@@ -341,13 +334,16 @@ The stack creates `documenso/<env>/app-config` and `documenso/<env>/database-url
 source .deploy.env
 aws cloudformation describe-stacks --profile "$AWS_PROFILE" --region "$AWS_REGION" \
   --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs' --output table
-# Capture: DbEndpoint, AppConfigSecretArn, DatabaseUrlSecretArn
+
+# Capture what we need for the rest of Step 6
 DB_ENDPOINT=$(aws cloudformation describe-stacks --profile "$AWS_PROFILE" --region "$AWS_REGION" \
   --stack-name "$STACK_NAME" --query "Stacks[0].Outputs[?OutputKey=='DatabaseDbEndpoint'].OutputValue" --output text)
 APP_CONFIG_ARN=$(aws cloudformation describe-stacks --profile "$AWS_PROFILE" --region "$AWS_REGION" \
   --stack-name "$STACK_NAME" --query "Stacks[0].Outputs[?OutputKey=='SecretsAppConfigSecretArn'].OutputValue" --output text)
 DB_URL_ARN=$(aws cloudformation describe-stacks --profile "$AWS_PROFILE" --region "$AWS_REGION" \
   --stack-name "$STACK_NAME" --query "Stacks[0].Outputs[?OutputKey=='SecretsDatabaseUrlSecretArn'].OutputValue" --output text)
+SIGNING_KEY_ARN=$(aws cloudformation describe-stacks --profile "$AWS_PROFILE" --region "$AWS_REGION" \
+  --stack-name "$STACK_NAME" --query "Stacks[0].Outputs[?OutputKey=='SigningKmsSigningKeyArn'].OutputValue" --output text)
 ```
 
 #### 6b. Pull RDS credentials
@@ -369,21 +365,57 @@ DB_PASS=$(echo "$DB_JSON" | jq -r .password)
 ```bash
 ENCRYPTION_KEY=$(openssl rand -hex 32)
 ENCRYPTION_SECONDARY_KEY=$(openssl rand -hex 32)
+NEXTAUTH_SECRET=$(openssl rand -base64 32 | tr -d '/+=' | head -c 32)
 ```
 
-#### 6d. Update app-config secret
+#### 6d. Generate the signing cert against the KMS key
+
+The CFN stack created a KMS signing key (`SigningKeyArn`). Now we generate a self-signed X.509 cert whose subject-public-key *is* that KMS key's public half, signed *by* that KMS key. (This requires Python with `asn1crypto`, `cryptography`, `boto3` — the skill ships a helper that does exactly this.)
+
+```bash
+# One-time: set up a venv with the crypto deps if not already done
+VENV="$HOME/.documenso-deploy-venv"
+if [ ! -d "$VENV" ]; then
+  uv venv "$VENV" --quiet || python3 -m venv "$VENV"
+  "$VENV/bin/pip" install --quiet asn1crypto cryptography boto3
+fi
+
+# Run the helper (lives in the skill dir)
+SKILL_DIR=".claude/skills/deploy-to-aws"
+CERT_PEM=$(mktemp --suffix=.crt)
+
+"$VENV/bin/python" "$SKILL_DIR/scripts/make-kms-cert.py" \
+  --profile "$AWS_PROFILE" \
+  --region "$AWS_REGION" \
+  --key-id "$SIGNING_KEY_ARN" \
+  --common-name "$SIGNING_CERT_CN" \
+  --organization "$SIGNING_CERT_O" \
+  --organizational-unit "$SIGNING_CERT_OU" \
+  --email "$SIGNING_CERT_EMAIL" \
+  --out "$CERT_PEM"
+
+SIGNING_CERT_B64=$(base64 -w0 "$CERT_PEM")
+```
+
+Inspect the cert briefly so the deployer sees what just got generated:
+
+```bash
+openssl x509 -in "$CERT_PEM" -noout -subject -issuer -dates
+```
+
+#### 6e. Update app-config secret
 
 ```bash
 aws secretsmanager put-secret-value \
   --profile "$AWS_PROFILE" --region "$AWS_REGION" \
   --secret-id "$APP_CONFIG_ARN" \
   --secret-string "$(jq -n \
-    --arg nextauth "$(openssl rand -base64 32 | tr -d '/+=' | head -c 32)" \
+    --arg nextauth "$NEXTAUTH_SECRET" \
     --arg ek "$ENCRYPTION_KEY" --arg esk "$ENCRYPTION_SECONDARY_KEY" \
     --arg mcid "$MICROSOFT_CLIENT_ID" --arg msec "$MICROSOFT_CLIENT_SECRET" \
     --arg sh "$SMTP_HOST" --arg sp "$SMTP_PORT" \
     --arg su "$SMTP_USERNAME" --arg spw "$SMTP_PASSWORD" \
-    --arg pp "$SIGNING_PASSPHRASE" --arg cert "$SIGNING_CERT_B64" \
+    --arg cert "$SIGNING_CERT_B64" \
     '{
       NEXTAUTH_SECRET: $nextauth,
       NEXT_PRIVATE_ENCRYPTION_KEY: $ek,
@@ -394,12 +426,16 @@ aws secretsmanager put-secret-value \
       NEXT_PRIVATE_SMTP_PORT: $sp,
       NEXT_PRIVATE_SMTP_USERNAME: $su,
       NEXT_PRIVATE_SMTP_PASSWORD: $spw,
-      NEXT_PRIVATE_SIGNING_PASSPHRASE: $pp,
-      NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS: $cert
+      NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_CONTENTS: $cert
     }')"
 ```
 
-#### 6e. Update database-url secret
+Note what changed vs older local-transport deploys:
+- No `NEXT_PRIVATE_SIGNING_PASSPHRASE` (KMS holds the key — no passphrase)
+- No `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` (no `.p12` — we use KMS directly)
+- `NEXT_PRIVATE_SIGNING_AWS_KMS_KEY_ID` and `_REGION` are set as plain env vars by CFN (not secrets) — no action needed here
+
+#### 6f. Update database-url secret
 
 ```bash
 DB_URL="postgresql://$DB_USER:$DB_PASS@$DB_ENDPOINT:5432/documenso"
@@ -409,7 +445,7 @@ aws secretsmanager put-secret-value \
   --secret-string "{\"NEXT_PRIVATE_DATABASE_URL\":\"$DB_URL\",\"NEXT_PRIVATE_DIRECT_DATABASE_URL\":\"$DB_URL\"}"
 ```
 
-#### 6f. Force new deployment
+#### 6g. Force new deployment
 
 ```bash
 aws ecs update-service --profile "$AWS_PROFILE" --region "$AWS_REGION" \
