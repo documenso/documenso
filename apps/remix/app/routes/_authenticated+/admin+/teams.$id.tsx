@@ -22,6 +22,7 @@ import { DataTable, type DataTableColumnDef } from '@documenso/ui/primitives/dat
 import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { AdminTeamMemberDeleteDialog } from '~/components/dialogs/admin-team-member-delete-dialog';
 import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
 import { AdminGlobalSettingsSection } from '~/components/general/admin-global-settings-section';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
@@ -53,6 +54,10 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
   };
 
   const teamMembersColumns = useMemo(() => {
+    if (!team) {
+      return [];
+    }
+
     return [
       {
         header: _(msg`Member`),
@@ -87,7 +92,7 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
         header: _(msg`Organisation role`),
         accessorKey: 'organisationRole',
         cell: ({ row }) => {
-          const isOwner = row.original.userId === team?.organisation.ownerUserId;
+          const isOwner = row.original.userId === team.organisation.ownerUserId;
 
           if (isOwner) {
             return <Badge>{_(msg`Owner`)}</Badge>;
@@ -104,6 +109,30 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
         header: _(msg`Joined`),
         accessorKey: 'createdAt',
         cell: ({ row }) => i18n.date(row.original.createdAt),
+      },
+      {
+        header: _(msg`Actions`),
+        cell: ({ row }) => {
+          const isOwner = row.original.userId === team.organisation.ownerUserId;
+
+          if (isOwner) {
+            return null;
+          }
+
+          const memberName = row.original.user.name ?? row.original.user.email;
+
+          return (
+            <div className="flex justify-end">
+              <AdminTeamMemberDeleteDialog
+                teamId={team.id}
+                teamName={team.name}
+                memberId={row.original.id}
+                memberName={memberName}
+                memberEmail={row.original.user.email}
+              />
+            </div>
+          );
+        },
       },
     ] satisfies DataTableColumnDef<TGetAdminTeamResponse['teamMembers'][number]>[];
   }, [team, _, i18n]);
