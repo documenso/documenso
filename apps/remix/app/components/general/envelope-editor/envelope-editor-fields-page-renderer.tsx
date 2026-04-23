@@ -176,8 +176,12 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       return;
     }
 
-    const pageWidth = scaledViewport.width;
-    const pageHeight = scaledViewport.height;
+    // Position/size are stored as percentages of the PDF page. The Konva
+    // stage itself has a scale transform applied (see usePageRenderer), so
+    // we must place the group using the UNSCALED viewport — otherwise the
+    // placement gets double-scaled and drifts away from the click point.
+    const pageWidth = unscaledViewport.width;
+    const pageHeight = unscaledViewport.height;
 
     const x = (redaction.positionX / 100) * pageWidth;
     const y = (redaction.positionY / 100) * pageHeight;
@@ -555,9 +559,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     localPageRedactions.forEach((redaction) => {
       const existing = pageLayer.current
         ?.find('Group')
-        .find(
-          (group) => group.name() === 'redaction-group' && group.id() === redaction.formId,
-        );
+        .find((group) => group.name() === 'redaction-group' && group.id() === redaction.formId);
       if (!existing) {
         renderRedactionOnLayer(redaction);
       }
