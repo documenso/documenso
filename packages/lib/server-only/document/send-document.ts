@@ -46,6 +46,7 @@ import {
 } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
+import { applyRedactionsToDocument } from '../redaction/apply-redactions-to-document';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type SendDocumentOptions = {
@@ -77,10 +78,12 @@ export const sendDocument = async ({
         orderBy: [{ signingOrder: { sort: 'asc', nulls: 'last' } }, { id: 'asc' }],
       },
       fields: true,
+      redactions: true,
       documentMeta: true,
       envelopeItems: {
         select: {
           id: true,
+          title: true,
           documentData: {
             select: {
               type: true,
@@ -125,6 +128,35 @@ export const sendDocument = async ({
 
   if (envelope.envelopeItems.length === 0) {
     throw new Error('Missing envelope items');
+  }
+
+  if (envelope.redactions.length > 0) {
+    const redactionsByEnvelopeItemId = new Map<string, typeof envelope.redactions>();
+    for (const redaction of envelope.redactions) {
+      const list = redactionsByEnvelopeItemId.get(redaction.envelopeItemId) ?? [];
+      list.push(redaction);
+      redactionsByEnvelopeItemId.set(redaction.envelopeItemId, list);
+    }
+
+    await Promise.all(
+      envelope.envelopeItems.map(async (envelopeItem) => {
+        const redactions = redactionsByEnvelopeItemId.get(envelopeItem.id);
+        if (!redactions || redactions.length === 0) {
+          return;
+        }
+        await applyRedactionsToDocument({
+          envelopeItem,
+          redactions,
+        });
+      }),
+    );
+
+    // Consume the redaction rows — they represent pending-to-apply work and
+    // are meaningless once baked into the PDF. Leaving them would also cause
+    // a duplicate apply on any subsequent sendDocument call.
+    await prisma.redaction.deleteMany({
+      where: { envelopeId: envelope.id },
+    });
   }
 
   if (envelope.formValues) {
