@@ -11724,6 +11724,11 @@ msgstr "確認メールを送信しました"
 msgid "Verification email sent successfully."
 msgstr "確認メールが正常に送信されました。"
 
+#: apps/remix/app/components/general/app-nav-desktop.tsx
+#: apps/remix/app/components/general/app-nav-mobile.tsx
+msgid "Verify"
+msgstr ""
+
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Verify & Complete"
 msgstr "確認して完了"

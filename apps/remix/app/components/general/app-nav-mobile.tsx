@@ -75,7 +75,6 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
       },
       {
         href: '/inbox',
-        href: '/inbox',
         text: t`Inbox`,
       },
       {

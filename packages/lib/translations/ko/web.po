@@ -11724,6 +11724,11 @@ msgstr "인증 이메일 전송됨"
 msgid "Verification email sent successfully."
 msgstr "인증 이메일이 성공적으로 전송되었습니다."
 
+#: apps/remix/app/components/general/app-nav-desktop.tsx
+#: apps/remix/app/components/general/app-nav-mobile.tsx
+msgid "Verify"
+msgstr ""
+
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Verify & Complete"
 msgstr "인증하고 완료"

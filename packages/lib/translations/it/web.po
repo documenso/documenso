@@ -11724,6 +11724,11 @@ msgstr "Email di Verifica Inviata"
 msgid "Verification email sent successfully."
 msgstr "Email di verifica inviata con successo."
 
+#: apps/remix/app/components/general/app-nav-desktop.tsx
+#: apps/remix/app/components/general/app-nav-mobile.tsx
+msgid "Verify"
+msgstr ""
+
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Verify & Complete"
 msgstr "Verifica e completa"
