@@ -54,6 +54,7 @@ import { useCurrentTeam } from '~/providers/team';
 
 import { EnvelopeEditorFieldDragDrop } from './envelope-editor-fields-drag-drop';
 import { EnvelopeEditorFieldsPageRenderer } from './envelope-editor-fields-page-renderer';
+import { EnvelopeEditorRedactionDragDrop } from './envelope-editor-redaction-drag-drop';
 import { EnvelopeRendererFileSelector } from './envelope-file-selector';
 import { EnvelopeRecipientSelector } from './envelope-recipient-selector';
 
@@ -284,6 +285,14 @@ export const EnvelopeEditorFieldsPage = () => {
 
             <EnvelopeEditorFieldDragDrop
               selectedRecipientId={editorFields.selectedRecipient?.id ?? null}
+              selectedEnvelopeItemId={currentEnvelopeItem?.id ?? null}
+            />
+
+            <h3 className="mb-2 mt-6 text-sm font-semibold text-foreground">
+              <Trans>Redact</Trans>
+            </h3>
+
+            <EnvelopeEditorRedactionDragDrop
               selectedEnvelopeItemId={currentEnvelopeItem?.id ?? null}
             />
 
