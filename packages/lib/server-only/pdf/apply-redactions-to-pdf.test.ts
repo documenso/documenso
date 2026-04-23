@@ -1,4 +1,4 @@
-import { PDFDocument, rgb } from '@cantoo/pdf-lib';
+import { PDFDocument, degrees, rgb } from '@cantoo/pdf-lib';
 import { describe, expect, it } from 'vitest';
 
 import { applyRedactionsToPdf } from './apply-redactions-to-pdf';
@@ -83,5 +83,41 @@ describe('applyRedactionsToPdf', () => {
 
     const parsed = await PDFDocument.load(output);
     expect(parsed.getPageCount()).toBe(1);
+  });
+
+  it('on a rotated page: removes text, replaces page with image at rotated dimensions and Rotate 0', async () => {
+    const doc = await PDFDocument.create();
+    const page = doc.addPage([612, 792]);
+    page.drawText('ROTATED SECRET', { x: 72, y: 720, size: 18, color: rgb(0, 0, 0) });
+    page.setRotation(degrees(90));
+    const input = new Uint8Array(await doc.save());
+
+    const output = await applyRedactionsToPdf({
+      pdfBytes: input,
+      redactions: [{ page: 1, positionX: 0, positionY: 0, width: 100, height: 100 }],
+    });
+
+    // pdfjs takes ownership of the input buffer, so load pdf-lib first.
+    const parsed = await PDFDocument.load(output);
+    expect(parsed.getPageCount()).toBe(1);
+    const outPage = parsed.getPage(0);
+    expect(outPage.getRotation().angle).toBe(0);
+    // Rotated viewport: width and height are swapped.
+    expect(Math.round(outPage.getWidth())).toBe(792);
+    expect(Math.round(outPage.getHeight())).toBe(612);
+
+    const text = await extractPageText(output);
+    expect(text).not.toContain('ROTATED SECRET');
+  });
+
+  it('throws when a redaction references a page outside the document', async () => {
+    const input = await makeTextPdf('hello');
+
+    await expect(
+      applyRedactionsToPdf({
+        pdfBytes: input,
+        redactions: [{ page: 99, positionX: 0, positionY: 0, width: 50, height: 50 }],
+      }),
+    ).rejects.toThrow(/page 99/);
   });
 });
