@@ -42,6 +42,15 @@ type UseEditorRedactionsResponse = {
   removeRedactionsByFormId: (formIds: string[]) => void;
   updateRedactionByFormId: (formId: string, updates: Partial<TLocalRedaction>) => void;
 
+  /**
+   * Attaches a server-generated id to the local row for `formId` WITHOUT
+   * firing `handleRedactionsUpdate`. This is the path the provider uses after
+   * a successful create so the id arrives in local state without re-entering
+   * the sync handler (which would try to re-diff mid-flight and can race
+   * against pending state commits).
+   */
+  setRedactionIdByFormId: (formId: string, id: number) => void;
+
   resetForm: (redactions?: TEnvelopeRedaction[]) => void;
 };
 
@@ -133,6 +142,27 @@ export const useEditorRedactions = ({
     [localRedactions, update, triggerRedactionsUpdate],
   );
 
+  const setRedactionIdByFormId = useCallback(
+    (formId: string, id: number) => {
+      const index = localRedactions.findIndex((redaction) => redaction.formId === formId);
+
+      if (index === -1) {
+        return;
+      }
+
+      // `setValue` on a specific path does NOT trigger the field-array's
+      // change signal the way `update` does. This is deliberate: attaching a
+      // server id is bookkeeping, not a user edit, and should not re-enter
+      // `handleRedactionsUpdate`.
+      form.setValue(`redactions.${index}.id`, id, {
+        shouldDirty: false,
+        shouldTouch: false,
+        shouldValidate: false,
+      });
+    },
+    [localRedactions, form],
+  );
+
   const resetForm = (redactions?: TEnvelopeRedaction[]) => {
     form.reset(generateDefaultValues(redactions));
   };
@@ -143,8 +173,16 @@ export const useEditorRedactions = ({
       addRedaction,
       removeRedactionsByFormId,
       updateRedactionByFormId,
+      setRedactionIdByFormId,
       resetForm,
     }),
-    [localRedactions, addRedaction, removeRedactionsByFormId, updateRedactionByFormId, resetForm],
+    [
+      localRedactions,
+      addRedaction,
+      removeRedactionsByFormId,
+      updateRedactionByFormId,
+      setRedactionIdByFormId,
+      resetForm,
+    ],
   );
 };

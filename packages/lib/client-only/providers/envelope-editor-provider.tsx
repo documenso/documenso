@@ -157,9 +157,16 @@ export const EnvelopeEditorProvider = ({
   const deleteRedactionMutation = trpc.redaction.deleteDocumentRedaction.useMutation();
 
   // Ref used to break the circular dependency between `handleRedactionsUpdate`
-  // (which needs to call `updateRedactionByFormId` to attach server ids) and
+  // (which needs to call `setRedactionIdByFormId` to attach server ids) and
   // `useEditorRedactions` (which needs `handleRedactionsUpdate` at creation time).
   const editorRedactionsRef = useRef<ReturnType<typeof useEditorRedactions> | null>(null);
+
+  // FormIds for redactions whose CREATE mutation is currently in flight. We
+  // filter these out of `toCreate` on subsequent handler calls so a drag or
+  // resize during placement doesn't fire a second create for the same formId
+  // (the real user sees one visual redaction; two server rows for it would
+  // force a stale delete on the next action).
+  const pendingCreateFormIdsRef = useRef<Set<string>>(new Set());
 
   const handleRedactionsUpdate = useCallback(
     async (next: TLocalRedaction[]) => {
@@ -171,7 +178,9 @@ export const EnvelopeEditorProvider = ({
       const documentId = mapSecondaryIdToDocumentId(envelopeRef.current.secondaryId);
       const persisted = envelopeRef.current.redactions ?? [];
 
-      const toCreate = next.filter((r) => r.id === undefined);
+      const toCreate = next.filter(
+        (r) => r.id === undefined && !pendingCreateFormIdsRef.current.has(r.formId),
+      );
 
       const nextIds = new Set(next.filter((r) => r.id !== undefined).map((r) => r.id as number));
       const toDelete = persisted.filter((p) => !nextIds.has(p.id)).map((p) => p.id);
@@ -198,24 +207,30 @@ export const EnvelopeEditorProvider = ({
 
       try {
         if (toCreate.length > 0) {
-          const created = await createRedactionsMutation.mutateAsync({
-            documentId,
-            redactions: toCreate.map((r) => ({
-              envelopeItemId: r.envelopeItemId,
-              page: r.page,
-              positionX: r.positionX,
-              positionY: r.positionY,
-              width: r.width,
-              height: r.height,
-            })),
-          });
+          toCreate.forEach((r) => pendingCreateFormIdsRef.current.add(r.formId));
 
-          // Attach the server ids to the local records in order.
+          let created;
+          try {
+            created = await createRedactionsMutation.mutateAsync({
+              documentId,
+              redactions: toCreate.map((r) => ({
+                envelopeItemId: r.envelopeItemId,
+                page: r.page,
+                positionX: r.positionX,
+                positionY: r.positionY,
+                width: r.width,
+                height: r.height,
+              })),
+            });
+          } finally {
+            toCreate.forEach((r) => pendingCreateFormIdsRef.current.delete(r.formId));
+          }
+
+          // Attach the server ids to the local records WITHOUT re-entering
+          // `handleRedactionsUpdate` — bookkeeping only, not a user edit.
           created.redactions.forEach((serverRedaction, i) => {
             const local = toCreate[i];
-            editorRedactionsRef.current?.updateRedactionByFormId(local.formId, {
-              id: serverRedaction.id,
-            });
+            editorRedactionsRef.current?.setRedactionIdByFormId(local.formId, serverRedaction.id);
           });
 
           // Mirror the server rows into envelopeRef so subsequent diffs are correct.
