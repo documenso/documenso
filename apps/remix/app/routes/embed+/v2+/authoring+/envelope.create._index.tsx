@@ -365,6 +365,7 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
       },
       recipients,
       fields: [],
+      redactions: [],
       envelopeItems: [],
       directLink: null,
       team: {
