@@ -19,10 +19,13 @@ import { getRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import type { TDocumentEmailSettings } from '../../types/document-email';
+import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { formatDocumentsPath, formatTemplatesPath } from '../../utils/teams';
 import { useEditorFields } from '../hooks/use-editor-fields';
 import type { TLocalField } from '../hooks/use-editor-fields';
 import { useEditorRecipients } from '../hooks/use-editor-recipients';
+import { useEditorRedactions } from '../hooks/use-editor-redactions';
+import type { TLocalRedaction } from '../hooks/use-editor-redactions';
 import { useEnvelopeAutosave } from '../hooks/use-envelope-autosave';
 
 export type EnvelopeEditorStep = 'upload' | 'addFields' | 'preview';
@@ -47,6 +50,7 @@ type EnvelopeEditorProviderValue = {
   getRecipientColorKey: (recipientId: number) => TRecipientColor;
 
   editorFields: ReturnType<typeof useEditorFields>;
+  editorRedactions: ReturnType<typeof useEditorRedactions>;
   editorRecipients: ReturnType<typeof useEditorRecipients>;
 
   isAutosaving: boolean;
@@ -147,6 +151,106 @@ export const EnvelopeEditorProvider = ({
   const setRecipientsMutation = trpc.envelope.recipient.set.useMutation();
   const setFieldsMutation = trpc.envelope.field.set.useMutation();
   const updateEnvelopeMutation = trpc.envelope.update.useMutation();
+
+  const createRedactionsMutation = trpc.redaction.createDocumentRedactions.useMutation();
+  const deleteRedactionMutation = trpc.redaction.deleteDocumentRedaction.useMutation();
+
+  // Ref used to break the circular dependency between `handleRedactionsUpdate`
+  // (which needs to call `updateRedactionByFormId` to attach server ids) and
+  // `useEditorRedactions` (which needs `handleRedactionsUpdate` at creation time).
+  const editorRedactionsRef = useRef<ReturnType<typeof useEditorRedactions> | null>(null);
+
+  const handleRedactionsUpdate = useCallback(
+    async (next: TLocalRedaction[]) => {
+      if (isEmbedded) {
+        // Embedded mode doesn't persist redactions to our backend; noop.
+        return;
+      }
+
+      const documentId = mapSecondaryIdToDocumentId(envelopeRef.current.secondaryId);
+      const persisted = envelopeRef.current.redactions ?? [];
+
+      const toCreate = next.filter((r) => r.id === undefined);
+
+      const nextIds = new Set(
+        next.filter((r) => r.id !== undefined).map((r) => r.id as number),
+      );
+      const toDelete = persisted.filter((p) => !nextIds.has(p.id)).map((p) => p.id);
+
+      try {
+        if (toCreate.length > 0) {
+          const created = await createRedactionsMutation.mutateAsync({
+            documentId,
+            redactions: toCreate.map((r) => ({
+              envelopeItemId: r.envelopeItemId,
+              page: r.page,
+              positionX: r.positionX,
+              positionY: r.positionY,
+              width: r.width,
+              height: r.height,
+            })),
+          });
+
+          // Attach the server ids to the local records in order.
+          created.redactions.forEach((serverRedaction, i) => {
+            const local = toCreate[i];
+            editorRedactionsRef.current?.updateRedactionByFormId(local.formId, {
+              id: serverRedaction.id,
+            });
+          });
+
+          // Mirror the server rows into envelopeRef so subsequent diffs are correct.
+          setEnvelope((prev) => ({
+            ...prev,
+            redactions: [
+              ...(prev.redactions ?? []),
+              ...created.redactions.map((r) => ({
+                id: r.id,
+                secondaryId: r.secondaryId,
+                envelopeId: envelopeRef.current.id,
+                envelopeItemId: r.envelopeItemId,
+                page: r.page,
+                positionX: new Prisma.Decimal(r.positionX),
+                positionY: new Prisma.Decimal(r.positionY),
+                width: new Prisma.Decimal(r.width),
+                height: new Prisma.Decimal(r.height),
+              })),
+            ],
+          }));
+        }
+
+        if (toDelete.length > 0) {
+          await Promise.all(
+            toDelete.map((id) =>
+              deleteRedactionMutation.mutateAsync({ documentId, redactionId: id }),
+            ),
+          );
+
+          setEnvelope((prev) => ({
+            ...prev,
+            redactions: (prev.redactions ?? []).filter((r) => !toDelete.includes(r.id)),
+          }));
+        }
+      } catch (err) {
+        console.error(err);
+        setAutosaveError(true);
+        toast({
+          title: t`Save failed`,
+          description: t`We encountered an error while saving your redactions. Your changes cannot be saved at this time.`,
+          variant: 'destructive',
+          duration: 7500,
+        });
+      }
+    },
+    [isEmbedded, createRedactionsMutation, deleteRedactionMutation, toast, t],
+  );
+
+  const editorRedactions = useEditorRedactions({
+    initialRedactions: envelope.redactions,
+    handleRedactionsUpdate,
+  });
+
+  editorRedactionsRef.current = editorRedactions;
 
   /**
    * Handles debouncing the recipients updates to the server.
@@ -386,6 +490,7 @@ export const EnvelopeEditorProvider = ({
       });
 
       editorFields.resetForm(fetchedEnvelopeData.data.fields);
+      editorRedactions.resetForm(fetchedEnvelopeData.data.redactions);
     }
   };
 
@@ -449,6 +554,7 @@ export const EnvelopeEditorProvider = ({
     });
 
     editorFields.resetForm(envelopeRef.current.fields);
+    editorRedactions.resetForm(envelopeRef.current.redactions);
   };
 
   const flushAutosave = async (): Promise<TEditorEnvelope> => {
@@ -482,6 +588,7 @@ export const EnvelopeEditorProvider = ({
         setRecipientsDebounced,
         setRecipientsAsync,
         editorFields,
+        editorRedactions,
         editorRecipients,
         autosaveError,
         flushAutosave,
