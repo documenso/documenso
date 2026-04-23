@@ -16,6 +16,10 @@ export const FIELD_MAX_LETTER_SPACING = 100;
 
 export const DEFAULT_FIELD_FONT_SIZE = 12;
 
+export const DEFAULT_SIGNATURE_OVERFLOW_MODE = 'auto';
+export const DEFAULT_DATE_OVERFLOW_MODE = 'auto';
+export const DEFAULT_EMAIL_OVERFLOW_MODE = 'auto';
+
 /**
  * The overflow mode for a field.
  *
@@ -97,6 +101,7 @@ export type TNameFieldMeta = z.infer<typeof ZNameFieldMeta>;
 export const ZEmailFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('email'),
   textAlign: ZFieldTextAlignSchema.optional(),
+  overflow: ZFieldOverflowMode.optional().default(DEFAULT_EMAIL_OVERFLOW_MODE),
 });
 
 export type TEmailFieldMeta = z.infer<typeof ZEmailFieldMeta>;
@@ -104,6 +109,7 @@ export type TEmailFieldMeta = z.infer<typeof ZEmailFieldMeta>;
 export const ZDateFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('date'),
   textAlign: ZFieldTextAlignSchema.optional(),
+  overflow: ZFieldOverflowMode.optional().default(DEFAULT_DATE_OVERFLOW_MODE),
 });
 
 export type TDateFieldMeta = z.infer<typeof ZDateFieldMeta>;
@@ -181,6 +187,7 @@ export type TDropdownFieldMeta = z.infer<typeof ZDropdownFieldMeta>;
 
 export const ZSignatureFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('signature'),
+  overflow: ZFieldOverflowMode.optional().default(DEFAULT_SIGNATURE_OVERFLOW_MODE),
 });
 
 export type TSignatureFieldMeta = z.infer<typeof ZSignatureFieldMeta>;
@@ -308,7 +315,7 @@ export const FIELD_DATE_META_DEFAULT_VALUES: TDateFieldMeta = {
   type: 'date',
   fontSize: DEFAULT_FIELD_FONT_SIZE,
   textAlign: 'left',
-  overflow: 'auto',
+  overflow: DEFAULT_DATE_OVERFLOW_MODE,
 };
 
 export const FIELD_TEXT_META_DEFAULT_VALUES: TTextFieldMeta = {
@@ -348,7 +355,7 @@ export const FIELD_EMAIL_META_DEFAULT_VALUES: TEmailFieldMeta = {
   type: 'email',
   fontSize: DEFAULT_FIELD_FONT_SIZE,
   textAlign: 'left',
-  overflow: 'auto',
+  overflow: DEFAULT_EMAIL_OVERFLOW_MODE,
 };
 
 export const FIELD_RADIO_META_DEFAULT_VALUES: TRadioFieldMeta = {
@@ -383,7 +390,7 @@ export const FIELD_DROPDOWN_META_DEFAULT_VALUES: TDropdownFieldMeta = {
 export const FIELD_SIGNATURE_META_DEFAULT_VALUES: TSignatureFieldMeta = {
   type: 'signature',
   fontSize: DEFAULT_SIGNATURE_TEXT_FONT_SIZE,
-  overflow: 'auto',
+  overflow: DEFAULT_SIGNATURE_OVERFLOW_MODE,
 };
 
 export const FIELD_META_DEFAULT_VALUES: Record<FieldType, TFieldMetaSchema> = {
