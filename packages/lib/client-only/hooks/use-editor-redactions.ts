@@ -127,11 +127,17 @@ export const useEditorRedactions = ({
 
   const updateRedactionByFormId = useCallback(
     (formId: string, updates: Partial<TLocalRedaction>) => {
-      const index = localRedactions.findIndex((redaction) => redaction.formId === formId);
+      // Read the base record from the live form state, not from the
+      // closed-over `localRedactions` array. Two updates fired before React
+      // commits the re-render between them (e.g. resize immediately followed
+      // by a drag) would otherwise see a stale base and silently revert the
+      // first update's fields.
+      const currentRedactions = form.getValues().redactions;
+      const index = currentRedactions.findIndex((redaction) => redaction.formId === formId);
 
       if (index !== -1) {
         const updatedRedaction = {
-          ...localRedactions[index],
+          ...currentRedactions[index],
           ...updates,
         };
 
@@ -139,7 +145,7 @@ export const useEditorRedactions = ({
         triggerRedactionsUpdate();
       }
     },
-    [localRedactions, update, triggerRedactionsUpdate],
+    [form, update, triggerRedactionsUpdate],
   );
 
   const setRedactionIdByFormId = useCallback(
