@@ -1,4 +1,4 @@
-import { PDFDocument, PDFName } from '@cantoo/pdf-lib';
+import { type PDFDict, PDFDocument, PDFName } from '@cantoo/pdf-lib';
 
 /**
  * Strips information that could leak original document content from a
@@ -18,7 +18,11 @@ export const stripPdfMetadata = async (pdfBytes: Uint8Array): Promise<Uint8Array
   // Producer / ModDate on load, so our cleared values actually survive.
   const doc = await PDFDocument.load(pdfBytes, { updateMetadata: false });
 
-  const infoDict = doc.getInfoDict();
+  // `getInfoDict` is `private` in the pdf-lib types but is the only way to
+  // actually remove Info-dict keys (as opposed to clearing them to empty
+  // strings, which leaves the keys present). No public alternative exists.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const infoDict = (doc as any).getInfoDict() as PDFDict;
   for (const key of ['Title', 'Author', 'Subject', 'Keywords', 'Creator', 'Producer']) {
     infoDict.delete(PDFName.of(key));
   }

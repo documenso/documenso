@@ -22,7 +22,8 @@ describe('stripPdfMetadata', () => {
     const output = await stripPdfMetadata(input);
 
     const parsed = await PDFDocument.load(output, { updateMetadata: false });
-    const infoDict = parsed.getInfoDict();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const infoDict = (parsed as any).getInfoDict();
     for (const key of ['Title', 'Author', 'Subject', 'Keywords', 'Creator', 'Producer']) {
       expect(infoDict.has(PDFName.of(key))).toBe(false);
     }
