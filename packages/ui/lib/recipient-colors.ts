@@ -1,7 +1,7 @@
 import { colord } from 'colord';
 import { once } from 'remeda';
 
-export type TRecipientColor = 'readOnly' | (typeof AVAILABLE_RECIPIENT_COLORS)[number];
+export type TRecipientColor = 'readOnly' | 'required' | (typeof AVAILABLE_RECIPIENT_COLORS)[number];
 
 export type RecipientColorStyles = {
   base: string;
@@ -31,6 +31,19 @@ const RECIPIENT_COLOR_STYLES: Record<TRecipientColor, () => RecipientColorStyles
     fieldItemInitials: '',
     comboBoxTrigger:
       'ring-2 ring-recipient-green shadow-[0_0_0_5px_hsl(var(--recipient-green)/10%),0_0_0_2px_hsl(var(--recipient-green)/60%),0_0_0_0.5px_hsl(var(--recipient-green))]',
+    comboBoxItem: '',
+  }),
+  required: (): RecipientColorStyles => ({
+    base: 'ring-red-400 hover:bg-red-400/30',
+    baseRing: 'rgba(248, 113, 113, 1)',
+    baseRingHover: 'rgba(248, 113, 113, 0.3)',
+    baseTextHover: 'rgba(248, 113, 113, 1)',
+    fieldButton: 'border-red-400 hover:border-red-400',
+    fieldButtonText: '',
+    fieldItem: 'group/field-item rounded-[2px]',
+    fieldItemInitials: '',
+    comboBoxTrigger:
+      'ring-2 ring-red-400 shadow-[0_0_0_5px_rgba(248,113,113,0.1),0_0_0_2px_rgba(248,113,113,0.6),0_0_0_0.5px_rgba(248,113,113,1)]',
     comboBoxItem: '',
   }),
   green: once(() => generateStyles('green')),

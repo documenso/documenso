@@ -138,10 +138,15 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
 
     const fieldToRender = ZFullFieldSchema.parse(unparsedField);
 
+    const isNextPendingField =
+      showPendingFieldTooltip && recipientFieldsRemaining[0]?.id === fieldToRender.id;
+
     const color = fieldToRender.fieldMeta?.readOnly
       ? 'readOnly'
-      : showPendingFieldTooltip && isFieldUnsignedAndRequired(fieldToRender)
-        ? 'orange'
+      : isFieldUnsignedAndRequired(fieldToRender)
+        ? isNextPendingField
+          ? 'orange'
+          : 'required'
         : 'green';
 
     const { fieldGroup } = renderField({
