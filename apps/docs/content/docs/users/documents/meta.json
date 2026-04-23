@@ -1,4 +1,4 @@
 {
   "title": "Documents",
-  "pages": ["upload", "add-recipients", "add-fields", "send", "direct-links", "advanced"]
+  "pages": ["upload", "add-recipients", "add-fields", "redact", "send", "direct-links", "advanced"]
 }
