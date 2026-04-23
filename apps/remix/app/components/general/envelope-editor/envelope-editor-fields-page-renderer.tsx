@@ -8,6 +8,7 @@ import type { Transformer } from 'konva/lib/shapes/Transformer';
 import { CopyPlusIcon, SquareStackIcon, TrashIcon, UserCircleIcon } from 'lucide-react';
 
 import type { TLocalField } from '@documenso/lib/client-only/hooks/use-editor-fields';
+import type { TLocalRedaction } from '@documenso/lib/client-only/hooks/use-editor-redactions';
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import {
@@ -30,7 +31,8 @@ import { EnvelopeRecipientSelectorCommand } from './envelope-recipient-selector'
 
 export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
   const { t, i18n } = useLingui();
-  const { envelope, editorFields, getRecipientColorKey } = useCurrentEnvelopeEditor();
+  const { envelope, editorFields, editorRedactions, getRecipientColorKey } =
+    useCurrentEnvelopeEditor();
   const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
 
   const interactiveTransformer = useRef<Transformer | null>(null);
@@ -53,6 +55,14 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
         (field) => field.page === pageNumber && field.envelopeItemId === currentEnvelopeItem?.id,
       ),
     [editorFields.localFields, pageNumber, currentEnvelopeItem?.id],
+  );
+
+  const localPageRedactions = useMemo(
+    () =>
+      editorRedactions.localRedactions.filter(
+        (r) => r.page === pageNumber && r.envelopeItemId === currentEnvelopeItem?.id,
+      ),
+    [editorRedactions.localRedactions, pageNumber, currentEnvelopeItem?.id],
   );
 
   const handleResizeOrMove = (event: KonvaEventObject<Event>) => {
@@ -161,6 +171,81 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     }
   };
 
+  const renderRedactionOnLayer = (redaction: TLocalRedaction) => {
+    if (!pageLayer.current) {
+      return;
+    }
+
+    const pageWidth = scaledViewport.width;
+    const pageHeight = scaledViewport.height;
+
+    const x = (redaction.positionX / 100) * pageWidth;
+    const y = (redaction.positionY / 100) * pageHeight;
+    const width = (redaction.width / 100) * pageWidth;
+    const height = (redaction.height / 100) * pageHeight;
+
+    const group = new Konva.Group({
+      id: redaction.formId,
+      name: 'redaction-group',
+      x,
+      y,
+      listening: true,
+    });
+
+    const rect = new Konva.Rect({
+      x: 0,
+      y: 0,
+      width,
+      height,
+      fill: '#000000',
+      opacity: 1,
+      stroke: 'transparent',
+      strokeWidth: 2,
+    });
+
+    const label = new Konva.Text({
+      x: 0,
+      y: 0,
+      width,
+      height,
+      text: 'REDACTED',
+      fontSize: Math.max(8, Math.min(12, height * 0.5)),
+      fontFamily: 'sans-serif',
+      fontStyle: 'bold',
+      fill: '#ffffff',
+      align: 'center',
+      verticalAlign: 'middle',
+      listening: false,
+    });
+
+    group.add(rect);
+    group.add(label);
+
+    group.on('mouseenter', () => {
+      rect.stroke('#ef4444');
+      pageLayer.current?.batchDraw();
+      const container = pageLayer.current?.getStage()?.container();
+      if (container) {
+        container.style.cursor = 'pointer';
+      }
+    });
+
+    group.on('mouseleave', () => {
+      rect.stroke('transparent');
+      pageLayer.current?.batchDraw();
+      const container = pageLayer.current?.getStage()?.container();
+      if (container) {
+        container.style.cursor = 'default';
+      }
+    });
+
+    group.on('click', () => {
+      editorRedactions.removeRedactionsByFormId([redaction.formId]);
+    });
+
+    pageLayer.current.add(group);
+  };
+
   /**
    * Initialize the Konva page canvas and all fields and interactions.
    */
@@ -174,6 +259,11 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     // Render the fields.
     for (const field of localPageFields) {
       renderFieldOnLayer(field);
+    }
+
+    // Render the redactions.
+    for (const redaction of localPageRedactions) {
+      renderRedactionOnLayer(redaction);
     }
 
     // Handle stage click to deselect.
@@ -442,6 +532,39 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
 
     pageLayer.current.batchDraw();
   }, [localPageFields, selectedKonvaFieldGroups]);
+
+  /**
+   * Render redactions when they are added or removed from localRedactions.
+   */
+  useEffect(() => {
+    if (!pageLayer.current || !stage.current) {
+      return;
+    }
+
+    // Destroy redaction groups that no longer exist in localPageRedactions.
+    pageLayer.current.find('Group').forEach((group) => {
+      if (
+        group.name() === 'redaction-group' &&
+        !localPageRedactions.some((r) => r.formId === group.id())
+      ) {
+        group.destroy();
+      }
+    });
+
+    // Render new redactions.
+    localPageRedactions.forEach((redaction) => {
+      const existing = pageLayer.current
+        ?.find('Group')
+        .find(
+          (group) => group.name() === 'redaction-group' && group.id() === redaction.formId,
+        );
+      if (!existing) {
+        renderRedactionOnLayer(redaction);
+      }
+    });
+
+    pageLayer.current.batchDraw();
+  }, [localPageRedactions]);
 
   const setSelectedFields = (nodes: Konva.Node[]) => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
