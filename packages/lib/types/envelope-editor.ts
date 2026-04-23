@@ -8,6 +8,7 @@ import { DocumentMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/
 import { EnvelopeAttachmentSchema } from '@documenso/prisma/generated/zod/modelSchema/EnvelopeAttachmentSchema';
 import { EnvelopeItemSchema } from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
 import { EnvelopeSchema } from '@documenso/prisma/generated/zod/modelSchema/EnvelopeSchema';
+import { RedactionSchema } from '@documenso/prisma/generated/zod/modelSchema/RedactionSchema';
 import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
 
@@ -231,6 +232,20 @@ export const ZEmbedEditEnvelopeAuthoringSchema = ZBaseEmbedDataSchema.extend({
 export type TEmbedCreateEnvelopeAuthoring = z.infer<typeof ZEmbedCreateEnvelopeAuthoringSchema>;
 export type TEmbedEditEnvelopeAuthoring = z.infer<typeof ZEmbedEditEnvelopeAuthoringSchema>;
 
+export const ZEnvelopeRedactionSchema = RedactionSchema.pick({
+  id: true,
+  secondaryId: true,
+  envelopeId: true,
+  envelopeItemId: true,
+  page: true,
+  positionX: true,
+  positionY: true,
+  width: true,
+  height: true,
+});
+
+export type TEnvelopeRedaction = z.infer<typeof ZEnvelopeRedactionSchema>;
+
 /**
  * A subset of the full envelope response schema used for the envelope editor.
  *
@@ -278,6 +293,7 @@ export const ZEditorEnvelopeSchema = EnvelopeSchema.pick({
   }),
   recipients: ZEnvelopeRecipientLiteSchema.array(),
   fields: ZEnvelopeFieldSchema.array(),
+  redactions: ZEnvelopeRedactionSchema.array(),
   envelopeItems: EnvelopeItemSchema.pick({
     envelopeId: true,
     id: true,
