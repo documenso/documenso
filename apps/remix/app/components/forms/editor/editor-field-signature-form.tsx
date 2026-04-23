@@ -23,7 +23,7 @@ const ZSignatureFieldFormSchema = ZSignatureFieldMeta.pick({
 type TSignatureFieldFormSchema = z.infer<typeof ZSignatureFieldFormSchema>;
 
 type EditorFieldSignatureFormProps = {
-  value: TSignatureFieldMeta | undefined;
+  value: z.input<typeof ZSignatureFieldMeta> | undefined;
   onValueChange: (value: TSignatureFieldMeta) => void;
 };
 

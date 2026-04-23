@@ -27,7 +27,7 @@ const ZEmailFieldFormSchema = ZEmailFieldMeta.pick({
 type TEmailFieldFormSchema = z.infer<typeof ZEmailFieldFormSchema>;
 
 type EditorFieldEmailFormProps = {
-  value: EmailFieldMeta | undefined;
+  value: z.input<typeof ZEmailFieldMeta> | undefined;
   onValueChange: (value: EmailFieldMeta) => void;
 };
 

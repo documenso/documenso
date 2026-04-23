@@ -10,6 +10,8 @@ import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import {
   type TBaseFieldMeta as BaseFieldMeta,
   type TCheckboxFieldMeta as CheckboxFieldMeta,
+  DEFAULT_DATE_OVERFLOW_MODE,
+  DEFAULT_EMAIL_OVERFLOW_MODE,
   type TDateFieldMeta as DateFieldMeta,
   type TDropdownFieldMeta as DropdownFieldMeta,
   type TEmailFieldMeta as EmailFieldMeta,
@@ -83,12 +85,14 @@ const getDefaultState = (fieldType: FieldType): FieldMeta => {
         type: 'email',
         fontSize: 14,
         textAlign: 'left',
+        overflow: DEFAULT_EMAIL_OVERFLOW_MODE,
       };
     case FieldType.DATE:
       return {
         type: 'date',
         fontSize: 14,
         textAlign: 'left',
+        overflow: DEFAULT_DATE_OVERFLOW_MODE,
       };
     case FieldType.TEXT:
       return {
@@ -186,7 +190,6 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
           ...parsedFieldMeta,
         });
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fieldMeta]);
 
     const { scheduleSave } = useAutoSave(onAutoSave || (async () => {}));

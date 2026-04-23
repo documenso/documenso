@@ -27,7 +27,7 @@ const ZDateFieldFormSchema = ZDateFieldMeta.pick({
 type TDateFieldFormSchema = z.infer<typeof ZDateFieldFormSchema>;
 
 type EditorFieldDateFormProps = {
-  value: DateFieldMeta | undefined;
+  value: z.input<typeof ZDateFieldMeta> | undefined;
   onValueChange: (value: DateFieldMeta) => void;
 };
 
