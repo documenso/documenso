@@ -22,12 +22,10 @@ describe('stripPdfMetadata', () => {
     const output = await stripPdfMetadata(input);
 
     const parsed = await PDFDocument.load(output, { updateMetadata: false });
-    expect(parsed.getTitle() ?? '').toBe('');
-    expect(parsed.getAuthor() ?? '').toBe('');
-    expect(parsed.getSubject() ?? '').toBe('');
-    expect(parsed.getKeywords() ?? '').toBe('');
-    expect(parsed.getCreator() ?? '').toBe('');
-    expect(parsed.getProducer() ?? '').toBe('');
+    const infoDict = parsed.getInfoDict();
+    for (const key of ['Title', 'Author', 'Subject', 'Keywords', 'Creator', 'Producer']) {
+      expect(infoDict.has(PDFName.of(key))).toBe(false);
+    }
   });
 
   it('removes Names, AcroForm, OpenAction, and AA catalog entries', async () => {

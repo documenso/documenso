@@ -18,12 +18,10 @@ export const stripPdfMetadata = async (pdfBytes: Uint8Array): Promise<Uint8Array
   // Producer / ModDate on load, so our cleared values actually survive.
   const doc = await PDFDocument.load(pdfBytes, { updateMetadata: false });
 
-  doc.setTitle('');
-  doc.setAuthor('');
-  doc.setSubject('');
-  doc.setKeywords([]);
-  doc.setCreator('');
-  doc.setProducer('');
+  const infoDict = doc.getInfoDict();
+  for (const key of ['Title', 'Author', 'Subject', 'Keywords', 'Creator', 'Producer']) {
+    infoDict.delete(PDFName.of(key));
+  }
 
   const { catalog } = doc;
   catalog.delete(PDFName.of('Names'));
