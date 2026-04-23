@@ -153,6 +153,7 @@ export const EnvelopeEditorProvider = ({
   const updateEnvelopeMutation = trpc.envelope.update.useMutation();
 
   const createRedactionsMutation = trpc.redaction.createDocumentRedactions.useMutation();
+  const updateRedactionsMutation = trpc.redaction.updateDocumentRedactions.useMutation();
   const deleteRedactionMutation = trpc.redaction.deleteDocumentRedaction.useMutation();
 
   // Ref used to break the circular dependency between `handleRedactionsUpdate`
@@ -172,10 +173,28 @@ export const EnvelopeEditorProvider = ({
 
       const toCreate = next.filter((r) => r.id === undefined);
 
-      const nextIds = new Set(
-        next.filter((r) => r.id !== undefined).map((r) => r.id as number),
-      );
+      const nextIds = new Set(next.filter((r) => r.id !== undefined).map((r) => r.id as number));
       const toDelete = persisted.filter((p) => !nextIds.has(p.id)).map((p) => p.id);
+
+      // Diff for geometry changes on rows that already exist on the server.
+      // Redaction update calls fire from drag-end / transform-end (see
+      // use-editor-redactions.ts), so one mutation per user action is fine —
+      // no debouncing required here.
+      const EPSILON = 0.0001;
+      const hasChanged = (a: (typeof persisted)[number], b: TLocalRedaction) =>
+        a.page !== b.page ||
+        Math.abs(Number(a.positionX) - b.positionX) > EPSILON ||
+        Math.abs(Number(a.positionY) - b.positionY) > EPSILON ||
+        Math.abs(Number(a.width) - b.width) > EPSILON ||
+        Math.abs(Number(a.height) - b.height) > EPSILON;
+
+      const toUpdate = next
+        .filter((r): r is TLocalRedaction & { id: number } => r.id !== undefined)
+        .map((r) => {
+          const match = persisted.find((p) => p.id === r.id);
+          return match && hasChanged(match, r) ? r : null;
+        })
+        .filter((r): r is TLocalRedaction & { id: number } => r !== null);
 
       try {
         if (toCreate.length > 0) {
@@ -219,9 +238,44 @@ export const EnvelopeEditorProvider = ({
           }));
         }
 
+        if (toUpdate.length > 0) {
+          await updateRedactionsMutation.mutateAsync({
+            documentId,
+            redactions: toUpdate.map((r) => ({
+              id: r.id,
+              page: r.page,
+              positionX: r.positionX,
+              positionY: r.positionY,
+              width: r.width,
+              height: r.height,
+            })),
+          });
+
+          // Mirror updates into envelopeRef so subsequent diffs are correct.
+          setEnvelope((prev) => ({
+            ...prev,
+            redactions: (prev.redactions ?? []).map((p) => {
+              const updated = toUpdate.find((u) => u.id === p.id);
+
+              if (!updated) {
+                return p;
+              }
+
+              return {
+                ...p,
+                page: updated.page,
+                positionX: new Prisma.Decimal(updated.positionX),
+                positionY: new Prisma.Decimal(updated.positionY),
+                width: new Prisma.Decimal(updated.width),
+                height: new Prisma.Decimal(updated.height),
+              };
+            }),
+          }));
+        }
+
         if (toDelete.length > 0) {
           await Promise.all(
-            toDelete.map((id) =>
+            toDelete.map(async (id) =>
               deleteRedactionMutation.mutateAsync({ documentId, redactionId: id }),
             ),
           );
@@ -242,7 +296,14 @@ export const EnvelopeEditorProvider = ({
         });
       }
     },
-    [isEmbedded, createRedactionsMutation, deleteRedactionMutation, toast, t],
+    [
+      isEmbedded,
+      createRedactionsMutation,
+      updateRedactionsMutation,
+      deleteRedactionMutation,
+      toast,
+      t,
+    ],
   );
 
   const editorRedactions = useEditorRedactions({
