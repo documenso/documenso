@@ -407,6 +407,7 @@ model Envelope {
   envelopeItems EnvelopeItem[]
   recipients    Recipient[]
   fields        Field[]
+  redactions    Redaction[]
   shareLinks    DocumentShareLink[]
   auditLogs     DocumentAuditLog[]
 
@@ -458,7 +459,8 @@ model EnvelopeItem {
   envelopeId String
   envelope   Envelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
 
-  field Field[]
+  field      Field[]
+  redactions Redaction[]
 
   @@unique([documentDataId])
   @@index([envelopeId])
@@ -655,6 +657,26 @@ model Field {
   @@index([envelopeId])
   @@index([envelopeItemId])
   @@index([recipientId])
+}
+
+model Redaction {
+  id             Int          @id @default(autoincrement())
+  secondaryId    String       @unique @default(cuid())
+  envelopeId     String
+  envelopeItemId String
+  page           Int          /// @zod.number.describe("1-indexed page number of the redaction.")
+  positionX      Decimal      @default(0)
+  positionY      Decimal      @default(0)
+  width          Decimal      @default(-1)
+  height         Decimal      @default(-1)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  envelope     Envelope     @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  envelopeItem EnvelopeItem @relation(fields: [envelopeItemId], references: [id], onDelete: Cascade)
+
+  @@index([envelopeId])
+  @@index([envelopeItemId])
 }
 
 model Signature {
