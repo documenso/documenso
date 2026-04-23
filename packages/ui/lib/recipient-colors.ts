@@ -33,19 +33,7 @@ const RECIPIENT_COLOR_STYLES: Record<TRecipientColor, () => RecipientColorStyles
       'ring-2 ring-recipient-green shadow-[0_0_0_5px_hsl(var(--recipient-green)/10%),0_0_0_2px_hsl(var(--recipient-green)/60%),0_0_0_0.5px_hsl(var(--recipient-green))]',
     comboBoxItem: '',
   }),
-  required: (): RecipientColorStyles => ({
-    base: 'ring-red-400 hover:bg-red-400/30',
-    baseRing: 'rgba(248, 113, 113, 1)',
-    baseRingHover: 'rgba(248, 113, 113, 0.3)',
-    baseTextHover: 'rgba(248, 113, 113, 1)',
-    fieldButton: 'border-red-400 hover:border-red-400',
-    fieldButtonText: '',
-    fieldItem: 'group/field-item rounded-[2px]',
-    fieldItemInitials: '',
-    comboBoxTrigger:
-      'ring-2 ring-red-400 shadow-[0_0_0_5px_rgba(248,113,113,0.1),0_0_0_2px_rgba(248,113,113,0.6),0_0_0_0.5px_rgba(248,113,113,1)]',
-    comboBoxItem: '',
-  }),
+  required: once(() => generateStyles('red')),
   green: once(() => generateStyles('green')),
   blue: once(() => generateStyles('blue')),
   purple: once(() => generateStyles('purple')),
@@ -54,7 +42,7 @@ const RECIPIENT_COLOR_STYLES: Record<TRecipientColor, () => RecipientColorStyles
   pink: once(() => generateStyles('pink')),
 };
 
-const generateStyles = (recipientColor: TRecipientColor): RecipientColorStyles => {
+const generateStyles = (recipientColor: TCssVarRecipientColor): RecipientColorStyles => {
   const { bg, border, ring, text } = CSS_PROPERTY;
   const { active, hover, groupHover, groupHoverFieldItem } = CSS_VARIANT;
 
@@ -92,9 +80,13 @@ const CSS_VARIANT = {
 
 const AVAILABLE_RECIPIENT_COLORS = ['green', 'blue', 'purple', 'orange', 'yellow', 'pink'] as const;
 
+const CSS_VAR_RECIPIENT_COLORS = [...AVAILABLE_RECIPIENT_COLORS, 'red'] as const;
+
+type TCssVarRecipientColor = (typeof CSS_VAR_RECIPIENT_COLORS)[number];
+
 export const RECIPIENT_DYNAMIC_CLASS = {
   pattern: new RegExp(
-    `(${Object.values(CSS_PROPERTY).join('|')})-recipient-(${AVAILABLE_RECIPIENT_COLORS.join('|')})(\\/(15|30))?$`,
+    `(${Object.values(CSS_PROPERTY).join('|')})-recipient-(${CSS_VAR_RECIPIENT_COLORS.join('|')})(\\/(15|30))?$`,
   ),
   variants: Object.values(CSS_VARIANT),
 };
