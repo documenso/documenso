@@ -36,7 +36,11 @@ export const deleteEnvelopeRedaction = async ({
     });
   }
 
-  await prisma.redaction.delete({
+  // Idempotent: client-side diffing can race with concurrent creates and ask
+  // us to delete a row that was never committed or that is already gone. Use
+  // deleteMany so the operation succeeds either way — there's nothing to do
+  // when the row doesn't exist.
+  await prisma.redaction.deleteMany({
     where: { id: redactionId, envelopeId: envelope.id },
   });
 };
