@@ -18,7 +18,7 @@ const LocalRecipientSchema = z.object({
   formId: z.string().min(1),
   id: z.number().optional(),
   email: ZRecipientEmailSchema,
-  name: z.string(),
+  name: z.string().max(255),
   role: z.nativeEnum(RecipientRole),
   signingOrder: z.number().optional(),
   actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
