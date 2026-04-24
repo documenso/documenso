@@ -1,5 +1,5 @@
 // https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
-import type { PDFDocument } from '@cantoo/pdf-lib';
+import type { PDFDocument, PDFFont } from '@cantoo/pdf-lib';
 import { RotationTypes, degrees, radiansToDegrees, rgb } from '@cantoo/pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import { FieldType } from '@prisma/client';
@@ -25,22 +25,16 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '../../types/field-meta';
-import { fetchSignatureFont, getSignatureFontKey } from './font-selection';
+import { embedSignatureFont, getSignatureFontKey } from './font-selection';
 import { getPageSize } from './get-page-size';
 
 export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
+  const isSignatureField = isSignatureFieldType(field.type);
+
   // Determine the best font for typed signature text (Caveat for Latin, Noto Sans variants for other scripts).
   const typedSignatureText = field.signature?.typedSignature ?? '';
   const signatureFontKey = getSignatureFontKey(typedSignatureText);
   const needsUnicodeFallback = signatureFontKey !== 'caveat';
-
-  const [fontCaveat, fontNoto, signatureFontData] = await Promise.all([
-    fetchSignatureFont('caveat'),
-    fetchSignatureFont('noto-sans'),
-    needsUnicodeFallback ? fetchSignatureFont(signatureFontKey) : Promise.resolve(null),
-  ]);
-
-  const isSignatureField = isSignatureFieldType(field.type);
   const isDebugMode =
     // eslint-disable-next-line turbo/no-undeclared-env-vars
     process.env.DEBUG_PDF_INSERT === '1' || process.env.DEBUG_PDF_INSERT === 'true';
@@ -120,14 +114,18 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
     });
   }
 
-  // For signature fields with non-Latin text, use the appropriate Unicode font instead of Caveat.
-  const signatureFontBuffer =
-    isSignatureField && needsUnicodeFallback && signatureFontData ? signatureFontData : fontCaveat;
+  // Embed the appropriate font for this field. embedSignatureFont caches
+  // embedded PDFFont instances per document, so across multiple fields in
+  // the same PDF the same font bytes are parsed and written once.
+  let font: PDFFont;
 
-  const font = await pdf.embedFont(
-    isSignatureField ? signatureFontBuffer : fontNoto,
-    isSignatureField && !needsUnicodeFallback ? { features: { calt: false } } : undefined,
-  );
+  if (!isSignatureField) {
+    font = await embedSignatureFont(pdf, 'noto-sans');
+  } else if (needsUnicodeFallback) {
+    font = await embedSignatureFont(pdf, signatureFontKey);
+  } else {
+    font = await embedSignatureFont(pdf, 'caveat', { features: { calt: false } });
+  }
 
   await match(field)
     .with(

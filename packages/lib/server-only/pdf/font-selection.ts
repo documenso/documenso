@@ -1,3 +1,5 @@
+import type { EmbedFontOptions, PDFDocument, PDFFont } from '@cantoo/pdf-lib';
+
 import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
 
 /**
@@ -96,6 +98,57 @@ export const fetchSignatureFont = async (fontKey: SignatureFontKey): Promise<Arr
   });
 
   fontCache.set(fontKey, promise);
+
+  return promise;
+};
+
+// Per-document cache of embedded PDFFont instances. Without this, each call to
+// insert-field-in-pdf (once per field) would re-parse and re-embed the same
+// TTF bytes into the PDF, duplicating font streams - significant bloat with
+// the multi-MB Noto CJK variants. The WeakMap lets GC reclaim the cache when
+// the PDFDocument is discarded.
+const embedCache = new WeakMap<PDFDocument, Map<string, Promise<PDFFont>>>();
+
+// Cache key must distinguish the same font embedded with different pdf-lib
+// options, since embed options affect the emitted glyph program. In practice
+// only `features.calt` varies (Caveat disables contextual alternates).
+const getEmbedCacheKey = (fontKey: SignatureFontKey, options?: EmbedFontOptions): string =>
+  options?.features?.calt === false ? `${fontKey}:calt-off` : fontKey;
+
+/**
+ * Embed a signature font into the given PDFDocument, reusing a previously
+ * embedded PDFFont if the same (document, fontKey, options) combination has
+ * already been embedded. The caller must have already registered fontkit
+ * on the document via `pdf.registerFontkit(fontkit)`.
+ */
+export const embedSignatureFont = async (
+  pdf: PDFDocument,
+  fontKey: SignatureFontKey,
+  options?: EmbedFontOptions,
+): Promise<PDFFont> => {
+  const cacheKey = getEmbedCacheKey(fontKey, options);
+
+  let perDocCache = embedCache.get(pdf);
+
+  if (!perDocCache) {
+    perDocCache = new Map();
+    embedCache.set(pdf, perDocCache);
+  }
+
+  const cached = perDocCache.get(cacheKey);
+
+  if (cached) {
+    return cached;
+  }
+
+  const promise = fetchSignatureFont(fontKey).then(async (bytes) => pdf.embedFont(bytes, options));
+
+  // Evict on failure so a subsequent call can retry.
+  promise.catch(() => {
+    perDocCache?.delete(cacheKey);
+  });
+
+  perDocCache.set(cacheKey, promise);
 
   return promise;
 };
