@@ -130,6 +130,8 @@ git clone https://github.com/<your-username>/documenso
 ```sh
 npm run d
 ```
+> **Note**: It's better to extract and compile using ```npm run translate``` when dealing with sentences, translation (after modifying). As we are using [lingui](https://lingui.dev/introduction#workflow)
+
 
 #### Access Points for Your Application
 
@@ -176,6 +178,9 @@ git clone https://github.com/<your-username>/documenso
 7. Run `npm run dev` in the root directory to start
 
 8. Register a new user at http://localhost:3000/signup
+
+> **Note**: It's better to extract and compile using ```npm run translate``` when dealing with sentences, translation (after modifying). As we are using [lingui] (https://lingui.dev/introduction#workflow) : ``` (msg,t, <Trans>)````
+
 
 ---
 
