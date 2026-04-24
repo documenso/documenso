@@ -8,7 +8,7 @@ export const ZFindUserSecurityAuditLogsSchema = z.object({
 export type TFindUserSecurityAuditLogsSchema = z.infer<typeof ZFindUserSecurityAuditLogsSchema>;
 
 export const ZUpdateProfileMutationSchema = z.object({
-  name: z.string().min(1),
+  name: z.string().min(1).max(255),
   signature: z.string(),
 });
 
