@@ -42,7 +42,8 @@ export const ZSignUpFormSchema = z
     name: z
       .string()
       .trim()
-      .min(1, { message: msg`Please enter a valid name.`.id }),
+      .min(1, { message: msg`Please enter a valid name.`.id })
+      .max(255),
     email: zEmail().min(1),
     password: ZPasswordSchema,
     signature: z.string().min(1, { message: msg`We need your signature to sign documents`.id }),
@@ -106,7 +107,7 @@ export const SignUpForm = ({
       password: '',
       signature: '',
     },
-    mode: 'onBlur',
+    mode: 'onChange',
     resolver: zodResolver(ZSignUpFormSchema),
   });
 

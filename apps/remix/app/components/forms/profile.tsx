@@ -26,7 +26,8 @@ export const ZProfileFormSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, { message: msg`Please enter a valid name.`.id }),
+    .min(1, { message: msg`Please enter a valid name.`.id })
+    .max(255, { message: msg`Character length should be less than 255`.id }),
   signature: z.string().min(1, { message: msg`Signature Pad cannot be empty.`.id }),
 });
 
@@ -51,6 +52,7 @@ export const ProfileForm = ({ className }: ProfileFormProps) => {
       name: user.name ?? '',
       signature: user.signature || '',
     },
+    mode: 'onChange',
     resolver: zodResolver(ZProfileFormSchema),
   });
 

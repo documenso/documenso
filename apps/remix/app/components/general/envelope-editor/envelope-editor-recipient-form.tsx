@@ -981,7 +981,6 @@ export const EnvelopeEditorRecipientForm = () => {
                                             setRecipientSearchQuery(query);
                                           }}
                                           loading={isLoading}
-                                          maxLength={255}
                                         />
                                       </FormControl>
 

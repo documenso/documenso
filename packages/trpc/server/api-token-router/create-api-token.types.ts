@@ -2,7 +2,10 @@ import { z } from 'zod';
 
 export const ZCreateApiTokenRequestSchema = z.object({
   teamId: z.number(),
-  tokenName: z.string().min(3, { message: 'The token name should be 3 characters or longer' }),
+  tokenName: z
+    .string()
+    .min(3, { message: 'The token name should be 3 characters or longer' })
+    .max(255, { message: 'The token name should be 255 characters or less' }),
   expirationDate: z.string().nullable(),
 });
 
