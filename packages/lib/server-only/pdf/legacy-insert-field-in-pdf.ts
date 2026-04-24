@@ -15,7 +15,6 @@ import { fromCheckboxValue } from '@documenso/lib/universal/field-checkbox';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 
-import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
 import {
   ZCheckboxFieldMeta,
   ZDateFieldMeta,
@@ -36,12 +35,8 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
   const needsUnicodeFallback = signatureFontKey !== 'caveat';
 
   const [fontCaveat, fontNoto, signatureFontData] = await Promise.all([
-    fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/caveat.ttf`).then(async (res) =>
-      res.arrayBuffer(),
-    ),
-    fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(async (res) =>
-      res.arrayBuffer(),
-    ),
+    fetchSignatureFont('caveat'),
+    fetchSignatureFont('noto-sans'),
     needsUnicodeFallback ? fetchSignatureFont(signatureFontKey) : Promise.resolve(null),
   ]);
 
@@ -133,10 +128,6 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
     isSignatureField ? signatureFontBuffer : fontNoto,
     isSignatureField && !needsUnicodeFallback ? { features: { calt: false } } : undefined,
   );
-
-  if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
-    await pdf.embedFont(signatureFontBuffer);
-  }
 
   await match(field)
     .with(

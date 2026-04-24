@@ -60,12 +60,42 @@ const FONT_FILE_MAP: Record<SignatureFontKey, string> = {
   'noto-sans-korean': 'noto-sans-korean.ttf',
 };
 
-/**
- * Fetch the font data (ArrayBuffer) for the given font key from the internal webapp URL.
- */
-export const fetchSignatureFont = async (fontKey: SignatureFontKey): Promise<ArrayBuffer> => {
+// Process-level cache so repeated signature insertions (one call per field) don't
+// re-download multi-MB fonts. Storing the in-flight Promise also dedupes concurrent
+// fetches; on failure the entry is evicted so the next call can retry.
+const fontCache = new Map<SignatureFontKey, Promise<ArrayBuffer>>();
+
+const fetchFontBytes = async (fontKey: SignatureFontKey): Promise<ArrayBuffer> => {
   const fileName = FONT_FILE_MAP[fontKey];
-  const res = await fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/${fileName}`);
+  const fontUrl = `${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/${fileName}`;
+  const res = await fetch(fontUrl);
+
+  if (!res.ok) {
+    throw new Error(
+      `Failed to fetch signature font "${fontKey}" (status: ${res.status}, url: ${fontUrl})`,
+    );
+  }
 
   return res.arrayBuffer();
+};
+
+/**
+ * Fetch the font data (ArrayBuffer) for the given font key from the internal webapp URL.
+ * Results are cached per process; failures are not cached.
+ */
+export const fetchSignatureFont = async (fontKey: SignatureFontKey): Promise<ArrayBuffer> => {
+  const cached = fontCache.get(fontKey);
+
+  if (cached) {
+    return cached;
+  }
+
+  const promise = fetchFontBytes(fontKey).catch((err) => {
+    fontCache.delete(fontKey);
+    throw err;
+  });
+
+  fontCache.set(fontKey, promise);
+
+  return promise;
 };
