@@ -33,16 +33,23 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '../../types/field-meta';
+import { fetchSignatureFont, getSignatureFontKey } from './font-selection';
 import { getPageSize } from './get-page-size';
 
 export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSignature) => {
-  const [fontCaveat, fontNoto] = await Promise.all([
+  // Determine the best font for typed signature text (Caveat for Latin, Noto Sans variants for other scripts).
+  const typedSignatureText = field.signature?.typedSignature ?? '';
+  const signatureFontKey = getSignatureFontKey(typedSignatureText);
+  const needsUnicodeFallback = signatureFontKey !== 'caveat';
+
+  const [fontCaveat, fontNoto, signatureFontData] = await Promise.all([
     fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/caveat.ttf`).then(async (res) =>
       res.arrayBuffer(),
     ),
     fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(async (res) =>
       res.arrayBuffer(),
     ),
+    needsUnicodeFallback ? fetchSignatureFont(signatureFontKey) : Promise.resolve(null),
   ]);
 
   const isSignatureField = isSignatureFieldType(field.type);
@@ -132,13 +139,17 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
     });
   }
 
+  // For signature fields with non-Latin text, use the appropriate Unicode font instead of Caveat.
+  const signatureFontBuffer =
+    isSignatureField && needsUnicodeFallback && signatureFontData ? signatureFontData : fontCaveat;
+
   const font = await pdf.embedFont(
-    isSignatureField ? fontCaveat : fontNoto,
-    isSignatureField ? { features: { calt: false } } : undefined,
+    isSignatureField ? signatureFontBuffer : fontNoto,
+    isSignatureField && !needsUnicodeFallback ? { features: { calt: false } } : undefined,
   );
 
   if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
-    await pdf.embedFont(fontCaveat);
+    await pdf.embedFont(signatureFontBuffer);
   }
 
   await match(field)
