@@ -128,17 +128,27 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
     });
   }
 
-  // Embed the appropriate font for this field. embedSignatureFont caches
-  // embedded PDFFont instances per document, so across multiple fields in
-  // the same PDF the same font bytes are parsed and written once.
-  let font: PDFFont;
+  // Image signatures render the embedded base64 image - they don't draw
+  // text and don't need a font. Skipping the embed in this case keeps
+  // unused font streams out of PDFs whose signatures are all drawn/uploaded.
+  // For every other field type (typed signatures, text/name/email/date,
+  // checkbox/radio labels), embedSignatureFont caches embedded PDFFont
+  // instances per document so the same font is parsed and written once.
+  const isImageSignature = isSignatureField && Boolean(field.signature?.signatureImageAsBase64);
 
-  if (!isSignatureField) {
-    font = await embedSignatureFont(pdf, 'noto-sans');
-  } else if (needsUnicodeFallback) {
-    font = await embedSignatureFont(pdf, signatureFontKey);
-  } else {
-    font = await embedSignatureFont(pdf, 'caveat', { features: { calt: false } });
+  // The match below only reads `font` in branches that don't run for image
+  // signatures, so the definite assignment is sound at runtime.
+  // eslint-disable-next-line @typescript-eslint/init-declarations
+  let font!: PDFFont;
+
+  if (!isImageSignature) {
+    if (!isSignatureField) {
+      font = await embedSignatureFont(pdf, 'noto-sans');
+    } else if (needsUnicodeFallback) {
+      font = await embedSignatureFont(pdf, signatureFontKey);
+    } else {
+      font = await embedSignatureFont(pdf, 'caveat', { features: { calt: false } });
+    }
   }
 
   await match(field)

@@ -7,8 +7,10 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
  * Detect the script category of a text string to select the appropriate font
  * for PDF rendering with pdf-lib (which only supports a single font per drawText call).
  *
- * Returns the font key to use: 'caveat' for Latin-only text, or the appropriate
- * Noto Sans variant for non-Latin scripts.
+ * Returns 'caveat' for scripts the Caveat handwriting font can render
+ * (Latin and Cyrillic), or the appropriate Noto Sans variant for scripts
+ * Caveat does not cover (Greek, Hebrew, Arabic, Indic, Thai, CJK, Japanese
+ * kana, Korean Hangul, etc.).
  */
 export type SignatureFontKey =
   | 'caveat'
@@ -39,7 +41,13 @@ const NON_CAVEAT_SCRIPT_REGEX =
 
 /**
  * Determine which font to use for the given typed signature text.
- * Priority: Korean > Japanese > Chinese > Noto Sans (Greek/Cyrillic/etc.) > Caveat.
+ * Detection order:
+ *   Korean (Hangul) > Japanese (kana) > Chinese (Han) >
+ *   non-Caveat fallback (Greek/Hebrew/Arabic/Indic/etc.) > Caveat.
+ * Caveat is the default and also covers Cyrillic, so Cyrillic-only text
+ * (e.g. "Иванов") falls through to 'caveat' to preserve the handwriting
+ * style. Mixed-script inputs that include any non-Caveat script (e.g.
+ * Cyrillic + Greek) fall back to Noto Sans because Greek alone forces it.
  *
  * Known limitation: pure-kanji Japanese names (e.g. "田中") match `CJK_REGEX`
  * because they contain no kana, and so resolve to the Chinese variant. Han
