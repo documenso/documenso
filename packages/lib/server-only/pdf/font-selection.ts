@@ -1,6 +1,7 @@
 import type { EmbedFontOptions, PDFDocument, PDFFont } from '@cantoo/pdf-lib';
 
 import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 
 /**
  * Detect the script category of a text string to select the appropriate font
@@ -73,9 +74,9 @@ const fetchFontBytes = async (fontKey: SignatureFontKey): Promise<ArrayBuffer> =
   const res = await fetch(fontUrl);
 
   if (!res.ok) {
-    throw new Error(
-      `Failed to fetch signature font "${fontKey}" (status: ${res.status}, url: ${fontUrl})`,
-    );
+    throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+      message: `Failed to fetch signature font "${fontKey}" (status: ${res.status}, url: ${fontUrl})`,
+    });
   }
 
   return res.arrayBuffer();
