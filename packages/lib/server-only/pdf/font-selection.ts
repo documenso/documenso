@@ -24,7 +24,9 @@ const KOREAN_REGEX = /\p{Script=Hangul}/u;
 // handled by the chinese fallback below, so this deliberately only checks for kana.
 const JAPANESE_REGEX = /[\p{Script=Hiragana}\p{Script=Katakana}]/u;
 
-// CJK ideographs - primarily Chinese, also used in Japanese kanji and Korean hanja.
+// Han ideographs (shared across Chinese, Japanese kanji, Korean hanja). We map
+// these to the Chinese Noto variant by default - see the SIGNATURE_FONT_FAMILY
+// constant for the matching CSS fallback order in Konva paths.
 const CJK_REGEX = /\p{Script=Han}/u;
 
 // Other common non-Latin scripts Caveat cannot render but Noto Sans can.
@@ -34,6 +36,15 @@ const NON_LATIN_SCRIPT_REGEX =
 /**
  * Determine which font to use for the given typed signature text.
  * Priority: Korean > Japanese > Chinese > Noto Sans (Greek/Cyrillic/etc.) > Caveat.
+ *
+ * Known limitation: pure-kanji Japanese names (e.g. "田中") match `CJK_REGEX`
+ * because they contain no kana, and so resolve to the Chinese variant. Han
+ * ideographs have visible CN/JP shape differences for some characters, so
+ * Japanese signers using kanji-only names will see Chinese glyph forms. Without
+ * additional context (recipient locale, browser language, etc.) Han alone is
+ * ambiguous, and consistently mapping it to Chinese matches the Konva fallback
+ * chain in `SIGNATURE_FONT_FAMILY`. A locale-aware override could improve this
+ * if it ever becomes a noticeable problem.
  */
 export const getSignatureFontKey = (text: string): SignatureFontKey => {
   if (KOREAN_REGEX.test(text)) {
