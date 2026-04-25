@@ -27,6 +27,7 @@ import { openApiDocument } from '@documenso/trpc/server/open-api';
 import { aiRoute } from './api/ai/route';
 import { downloadRoute } from './api/download/download';
 import { filesRoute } from './api/files/files';
+import { signRoute } from './api/sign/sign';
 import { type AppContext, appContext } from './context';
 import { appMiddleware } from './middleware';
 import { openApiTrpcServerHandler } from './trpc/hono-trpc-open-api';
@@ -106,6 +107,7 @@ app.use('/api/trpc/*', reactRouterTrpcServer);
 // Unstable API server routes. Order matters for these two.
 app.get(`/api/v2/openapi.json`, (c) => c.json(openApiDocument));
 // Shadows the download routes that tRPC defines since tRPC-to-openapi doesn't support their return types.
+app.route(`/api/v2`, signRoute);
 app.route(`/api/v2`, downloadRoute);
 app.use(`/api/v2/*`, async (c) =>
   openApiTrpcServerHandler(c, {
@@ -116,6 +118,7 @@ app.use(`/api/v2/*`, async (c) =>
 // Unstable API server routes. Order matters for these two.
 app.get(`/api/v2-beta/openapi.json`, (c) => c.json(openApiDocument));
 // Shadows the download routes that tRPC defines since tRPC-to-openapi doesn't support their return types.
+app.route(`/api/v2-beta`, signRoute);
 app.route(`/api/v2-beta`, downloadRoute);
 app.use(`/api/v2-beta/*`, async (c) =>
   openApiTrpcServerHandler(c, {
