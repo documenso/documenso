@@ -29,9 +29,13 @@ const JAPANESE_REGEX = /[\p{Script=Hiragana}\p{Script=Katakana}]/u;
 // constant for the matching CSS fallback order in Konva paths.
 const CJK_REGEX = /\p{Script=Han}/u;
 
-// Other common non-Latin scripts Caveat cannot render but Noto Sans can.
-const NON_LATIN_SCRIPT_REGEX =
-  /[\p{Script=Greek}\p{Script=Cyrillic}\p{Script=Armenian}\p{Script=Hebrew}\p{Script=Arabic}\p{Script=Syriac}\p{Script=Thaana}\p{Script=Devanagari}\p{Script=Bengali}\p{Script=Gurmukhi}\p{Script=Gujarati}\p{Script=Oriya}\p{Script=Tamil}\p{Script=Telugu}\p{Script=Kannada}\p{Script=Malayalam}\p{Script=Sinhala}\p{Script=Thai}\p{Script=Lao}\p{Script=Tibetan}\p{Script=Myanmar}\p{Script=Georgian}]/u;
+// Scripts that Caveat does NOT support and need Noto Sans as a fallback.
+// Caveat itself covers Latin (basic + extended) and Cyrillic, so Cyrillic is
+// deliberately excluded here - keeping it routed to Caveat preserves the
+// handwriting style for Russian/Bulgarian/Serbian/etc. names. CJK, Japanese
+// kana, and Korean Hangul are matched by the more specific regexes above.
+const NON_CAVEAT_SCRIPT_REGEX =
+  /[\p{Script=Greek}\p{Script=Armenian}\p{Script=Hebrew}\p{Script=Arabic}\p{Script=Syriac}\p{Script=Thaana}\p{Script=Devanagari}\p{Script=Bengali}\p{Script=Gurmukhi}\p{Script=Gujarati}\p{Script=Oriya}\p{Script=Tamil}\p{Script=Telugu}\p{Script=Kannada}\p{Script=Malayalam}\p{Script=Sinhala}\p{Script=Thai}\p{Script=Lao}\p{Script=Tibetan}\p{Script=Myanmar}\p{Script=Georgian}]/u;
 
 /**
  * Determine which font to use for the given typed signature text.
@@ -59,7 +63,7 @@ export const getSignatureFontKey = (text: string): SignatureFontKey => {
     return 'noto-sans-chinese';
   }
 
-  if (NON_LATIN_SCRIPT_REGEX.test(text)) {
+  if (NON_CAVEAT_SCRIPT_REGEX.test(text)) {
     return 'noto-sans';
   }
 

@@ -16,9 +16,15 @@ describe('getSignatureFontKey', () => {
     expect(getSignatureFontKey('Ωmega')).toBe('noto-sans');
   });
 
-  it('should return noto-sans for Cyrillic characters', () => {
-    expect(getSignatureFontKey('Кириллица')).toBe('noto-sans');
-    expect(getSignatureFontKey('Иванов')).toBe('noto-sans');
+  it('should return caveat for Cyrillic characters (Caveat covers Cyrillic)', () => {
+    expect(getSignatureFontKey('Кириллица')).toBe('caveat');
+    expect(getSignatureFontKey('Иванов')).toBe('caveat');
+  });
+
+  it('should return noto-sans when Cyrillic is mixed with another non-Caveat script', () => {
+    // Greek wins because Caveat cannot render it, so the whole signature
+    // must fall back to a font that covers both.
+    expect(getSignatureFontKey('Иван Ωmega')).toBe('noto-sans');
   });
 
   it('should return noto-sans for Arabic characters', () => {
