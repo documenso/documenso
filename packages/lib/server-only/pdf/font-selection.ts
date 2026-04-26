@@ -167,8 +167,9 @@ export const embedSignatureFont = async (
 
   const promise = fetchSignatureFont(fontKey).then(async (bytes) => pdf.embedFont(bytes, options));
 
-  // Evict on failure so a subsequent call can retry.
-  promise.catch(() => {
+  // Evict on failure so a subsequent call can retry. The catch is purely a
+  // side effect - rejection still propagates to awaiters of `promise`.
+  void promise.catch(() => {
     perDocCache?.delete(cacheKey);
   });
 

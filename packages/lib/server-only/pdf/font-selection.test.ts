@@ -120,9 +120,15 @@ describe('fetchSignatureFont', () => {
 
     vi.stubGlobal('fetch', mockFetch);
 
+    // Both modules must come from the freshly-reset module graph - the static
+    // AppError class identity differs from the dynamic one after resetModules.
     const { fetchSignatureFont } = await import('./font-selection');
+    const { AppError } = await import('../../errors/app-error');
 
-    await expect(fetchSignatureFont('noto-sans-chinese')).rejects.toThrow(
+    const promise = fetchSignatureFont('noto-sans-chinese');
+
+    await expect(promise).rejects.toBeInstanceOf(AppError);
+    await expect(promise).rejects.toThrow(
       /Failed to fetch signature font "noto-sans-chinese" \(status: 404, url: http:\/\/internal\.test\/fonts\/noto-sans-chinese\.ttf\)/,
     );
   });
