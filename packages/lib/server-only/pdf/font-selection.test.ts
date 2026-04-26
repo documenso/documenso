@@ -66,10 +66,13 @@ describe('getSignatureFontKey', () => {
 describe('fetchSignatureFont', () => {
   beforeEach(() => {
     vi.resetModules();
-    process.env.NEXT_PRIVATE_INTERNAL_WEBAPP_URL = 'http://internal.test';
+    // vi.stubEnv is reversed by vi.unstubAllEnvs in afterEach so we don't leak
+    // env state into unrelated tests in the same Vitest worker.
+    vi.stubEnv('NEXT_PRIVATE_INTERNAL_WEBAPP_URL', 'http://internal.test');
   });
 
   afterEach(() => {
+    vi.unstubAllEnvs();
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
@@ -159,7 +162,7 @@ describe('embedSignatureFont', () => {
 
   beforeEach(() => {
     vi.resetModules();
-    process.env.NEXT_PRIVATE_INTERNAL_WEBAPP_URL = 'http://internal.test';
+    vi.stubEnv('NEXT_PRIVATE_INTERNAL_WEBAPP_URL', 'http://internal.test');
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue(new Response(new Uint8Array([1, 2, 3]), { status: 200 })),
@@ -167,6 +170,7 @@ describe('embedSignatureFont', () => {
   });
 
   afterEach(() => {
+    vi.unstubAllEnvs();
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
