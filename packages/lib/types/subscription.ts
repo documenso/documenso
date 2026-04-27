@@ -34,6 +34,8 @@ export const ZClaimFlagsSchema = z.object({
   authenticationPortal: z.boolean().optional(),
 
   allowLegacyEnvelopes: z.boolean().optional(),
+
+  signingReminders: z.boolean().optional(),
 });
 
 export type TClaimFlags = z.infer<typeof ZClaimFlagsSchema>;
@@ -101,6 +103,10 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
     key: 'allowLegacyEnvelopes',
     label: 'Allow Legacy Envelopes',
   },
+  signingReminders: {
+    key: 'signingReminders',
+    label: 'Signing reminders',
+  },
 };
 
 export enum INTERNAL_CLAIM_ID {
@@ -137,6 +143,7 @@ export const internalClaims: InternalClaims = {
     locked: true,
     flags: {
       unlimitedDocuments: true,
+      signingReminders: true,
     },
   },
   [INTERNAL_CLAIM_ID.TEAM]: {
@@ -150,6 +157,7 @@ export const internalClaims: InternalClaims = {
       unlimitedDocuments: true,
       allowCustomBranding: true,
       embedSigning: true,
+      signingReminders: true,
     },
   },
   [INTERNAL_CLAIM_ID.PLATFORM]: {
@@ -168,6 +176,7 @@ export const internalClaims: InternalClaims = {
       embedAuthoringWhiteLabel: true,
       embedSigning: false,
       embedSigningWhiteLabel: true,
+      signingReminders: true,
     },
   },
   [INTERNAL_CLAIM_ID.ENTERPRISE]: {
@@ -188,6 +197,7 @@ export const internalClaims: InternalClaims = {
       embedSigningWhiteLabel: true,
       cfr21: true,
       authenticationPortal: true,
+      signingReminders: true,
     },
   },
   [INTERNAL_CLAIM_ID.EARLY_ADOPTER]: {
@@ -203,6 +213,7 @@ export const internalClaims: InternalClaims = {
       hidePoweredBy: true,
       embedSigning: true,
       embedSigningWhiteLabel: true,
+      signingReminders: true,
     },
   },
 } as const;
