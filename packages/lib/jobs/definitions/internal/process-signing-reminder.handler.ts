@@ -44,13 +44,16 @@ export const run = async ({
   const now = new Date();
 
   // Atomically claim this reminder by setting lastReminderSentAt and clearing
-  // nextReminderAt so no other sweep picks it up.
+  // nextReminderAt so no other sweep picks it up. The expiration filter
+  // guards against races where the expiration sweep hasn't yet flagged
+  // a recipient whose deadline has already passed.
   const updatedCount = await prisma.recipient.updateMany({
     where: {
       id: recipientId,
       signingStatus: SigningStatus.NOT_SIGNED,
       sendStatus: SendStatus.SENT,
       role: { not: RecipientRole.CC },
+      OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
       envelope: {
         status: DocumentStatus.PENDING,
         deletedAt: null,
