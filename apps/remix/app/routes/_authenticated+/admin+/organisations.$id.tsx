@@ -146,6 +146,7 @@ export default function OrganisationGroupSettingsPage({
         cell: ({ row }) => (
           <div className="space-y-1">
             <Link
+              prefetch="intent"
               className="font-medium hover:underline"
               to={`/admin/users/${row.original.user.id}`}
             >
@@ -256,7 +257,7 @@ export default function OrganisationGroupSettingsPage({
         }}
         primaryButton={
           <Button asChild>
-            <Link to={`/admin/organisations`}>
+            <Link prefetch="intent" to={`/admin/organisations`}>
               <Trans>Go back</Trans>
             </Link>
           </Button>
@@ -273,7 +274,7 @@ export default function OrganisationGroupSettingsPage({
         subtitle={t`Manage the ${organisation.name} organisation`}
       >
         <Button variant="outline" asChild>
-          <Link to={`/admin/organisation-insights/${organisationId}`}>
+          <Link prefetch="intent" to={`/admin/organisation-insights/${organisationId}`}>
             <Trans>View insights</Trans>
           </Link>
         </Button>

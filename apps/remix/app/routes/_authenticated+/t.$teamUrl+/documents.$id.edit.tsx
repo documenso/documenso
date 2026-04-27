@@ -90,7 +90,7 @@ export default function EnvelopeEditorPage({ params }: Route.ComponentProps) {
         }}
         primaryButton={
           <Button asChild>
-            <Link to={`/t/${team.url}/documents`}>
+            <Link prefetch="intent" to={`/t/${team.url}/documents`}>
               <Trans>Go home</Trans>
             </Link>
           </Button>

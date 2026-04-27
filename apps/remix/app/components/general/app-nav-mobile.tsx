@@ -83,7 +83,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
   return (
     <Sheet open={isMenuOpen} onOpenChange={onMenuOpenChange}>
       <SheetContent className="flex w-full max-w-[350px] flex-col">
-        <Link to="/" onClick={handleMenuItemClick}>
+        <Link prefetch="intent" to="/" onClick={handleMenuItemClick}>
           <img
             src={LogoImage}
             alt="Documenso Logo"
@@ -96,6 +96,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
         <div className="mt-8 flex w-full flex-col items-start gap-y-4">
           {menuNavigationLinks.map(({ href, text }) => (
             <Link
+              prefetch="intent"
               key={href}
               className="flex items-center gap-2 text-2xl font-semibold text-foreground hover:text-foreground/80"
               to={href}

@@ -219,7 +219,7 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
         }}
         primaryButton={
           <Button asChild>
-            <Link to={`/t/${team.url}/settings/webhooks`}>
+            <Link prefetch="intent" to={`/t/${team.url}/settings/webhooks`}>
               <Trans>Go back</Trans>
             </Link>
           </Button>

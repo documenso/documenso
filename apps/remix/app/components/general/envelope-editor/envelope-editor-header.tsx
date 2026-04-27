@@ -83,7 +83,7 @@ export default function EnvelopeEditorHeader() {
               className="h-6 w-auto"
             />
           ) : (
-            <Link to="/">
+            <Link prefetch="intent" to="/">
               <BrandingLogo className="h-6 w-auto" />
             </Link>
           )}

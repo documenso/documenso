@@ -79,7 +79,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
         }}
         primaryButton={
           <Button asChild>
-            <Link to={`/t/${team.url}/templates`}>
+            <Link prefetch="intent" to={`/t/${team.url}/templates`}>
               <Trans>Go back</Trans>
             </Link>
           </Button>
@@ -121,7 +121,11 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
-      <Link to={templateRootPath} className="flex items-center text-documenso-700 hover:opacity-80">
+      <Link
+        prefetch="intent"
+        to={templateRootPath}
+        className="flex items-center text-documenso-700 hover:opacity-80"
+      >
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         <Trans>Templates</Trans>
       </Link>
@@ -167,7 +171,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
               />
 
               <Button className="w-full" asChild>
-                <Link to={`${templateRootPath}/${envelope.id}/edit`}>
+                <Link prefetch="intent" to={`${templateRootPath}/${envelope.id}/edit`}>
                   <LucideEdit className="mr-1.5 h-3.5 w-3.5" />
                   <Trans>Edit Template</Trans>
                 </Link>

@@ -136,7 +136,7 @@ export const DocumentsTableActionDropdown = ({
           )}
 
         <DropdownMenuItem disabled={!canManageDocument || isComplete} asChild>
-          <Link to={formatPath}>
+          <Link prefetch="intent" to={formatPath}>
             <Edit className="mr-2 h-4 w-4" />
             <Trans>Edit</Trans>
           </Link>

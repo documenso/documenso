@@ -51,7 +51,7 @@ export default function WebhookPage() {
       {
         header: t`Webhook`,
         cell: ({ row }) => (
-          <Link to={`/t/${team.url}/settings/webhooks/${row.original.id}`}>
+          <Link prefetch="intent" to={`/t/${team.url}/settings/webhooks/${row.original.id}`}>
             <p className="text-xs text-muted-foreground">{row.original.id}</p>
             <p
               className="max-w-sm truncate text-xs font-semibold text-foreground"
@@ -169,7 +169,7 @@ const WebhookTableActionDropdown = ({ webhook }: { webhook: Webhook }) => {
         </DropdownMenuLabel>
 
         <DropdownMenuItem asChild>
-          <Link to={`/t/${team.url}/settings/webhooks/${webhook.id}`}>
+          <Link prefetch="intent" to={`/t/${team.url}/settings/webhooks/${webhook.id}`}>
             <ScrollTextIcon className="mr-2 h-4 w-4" />
             <Trans>Logs</Trans>
           </Link>

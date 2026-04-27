@@ -99,7 +99,6 @@ export const mapRecipientToLegacyRecipient = (
   };
 };
 
-
 export const findRecipientByEmail = <T extends { email: string }>({
   recipients,
   userEmail,

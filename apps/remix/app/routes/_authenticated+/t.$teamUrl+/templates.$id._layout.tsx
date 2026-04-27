@@ -108,7 +108,7 @@ export function ErrorBoundary({ error, params }: Route.ErrorBoundaryProps) {
       secondaryButton={null}
       primaryButton={
         <Button asChild className="w-32">
-          <Link to={`/t/${params.teamUrl}/templates`}>
+          <Link prefetch="intent" to={`/t/${params.teamUrl}/templates`}>
             <ChevronLeftIcon className="mr-2 h-4 w-4" />
             <Trans>Go Back</Trans>
           </Link>

@@ -76,7 +76,7 @@ export default function DashboardPage() {
             </div>
 
             <Button asChild className="mt-4" variant="outline">
-              <Link to="/settings/organisations?action=add-organisation">
+              <Link prefetch="intent" to="/settings/organisations?action=add-organisation">
                 <Trans>Create organisation</Trans>
               </Link>
             </Button>
@@ -104,7 +104,7 @@ export default function DashboardPage() {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {organisations.map((org) => (
                 <div key={org.id} className="group relative">
-                  <Link to={`/o/${org.url}`}>
+                  <Link prefetch="intent" to={`/o/${org.url}`}>
                     <Card className="h-full border pr-6 transition-all hover:bg-muted/50">
                       <CardContent className="p-4">
                         <div className="flex items-center gap-3">
@@ -150,7 +150,7 @@ export default function DashboardPage() {
                     org.currentOrganisationRole,
                   ) && (
                     <div className="absolute right-4 top-4 text-muted-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                      <Link to={`/o/${org.url}/settings`}>
+                      <Link prefetch="intent" to={`/o/${org.url}/settings`}>
                         <SettingsIcon className="h-4 w-4" />
                       </Link>
                     </div>
@@ -183,7 +183,7 @@ export default function DashboardPage() {
               <div className="flex gap-4">
                 {teams.map((team) => (
                   <div key={team.id} className="group relative">
-                    <Link to={`/t/${team.url}`}>
+                    <Link prefetch="intent" to={`/t/${team.url}`}>
                       <Card className="w-[350px] shrink-0 border transition-all hover:bg-muted/50">
                         <CardContent className="p-4">
                           <div className="flex items-center gap-3">
@@ -224,7 +224,7 @@ export default function DashboardPage() {
 
                     {canExecuteTeamAction('MANAGE_TEAM', team.currentTeamRole) && (
                       <div className="absolute right-4 top-4 text-muted-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                        <Link to={`/t/${team.url}/settings`}>
+                        <Link prefetch="intent" to={`/t/${team.url}/settings`}>
                           <SettingsIcon className="h-4 w-4" />
                         </Link>
                       </div>

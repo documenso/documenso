@@ -81,7 +81,7 @@ export const AdminDashboardUsersTable = ({
         cell: ({ row }) => {
           return (
             <Button className="w-24" asChild>
-              <Link to={`/admin/users/${row.original.id}`}>
+              <Link prefetch="intent" to={`/admin/users/${row.original.id}`}>
                 <Edit className="-ml-1 mr-2 h-4 w-4" />
                 <Trans>Edit</Trans>
               </Link>

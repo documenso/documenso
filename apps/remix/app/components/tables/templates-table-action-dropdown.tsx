@@ -1,12 +1,7 @@
 import { useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import {
-  DocumentStatus,
-  EnvelopeType,
-  type Recipient,
-  type TemplateDirectLink,
-} from '@prisma/client';
+import { DocumentStatus, EnvelopeType, type TemplateDirectLink } from '@prisma/client';
 import {
   Copy,
   Edit,
@@ -78,7 +73,7 @@ export const TemplatesTableActionDropdown = ({
         <DropdownMenuLabel>Action</DropdownMenuLabel>
 
         <DropdownMenuItem disabled={!canMutate} asChild>
-          <Link to={formatPath}>
+          <Link prefetch="intent" to={formatPath}>
             <Edit className="mr-2 h-4 w-4" />
             <Trans>Edit</Trans>
           </Link>
