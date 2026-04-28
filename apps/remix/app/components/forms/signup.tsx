@@ -1,10 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
+import type { TurnstileInstance } from '@marsidev/react-turnstile';
+import { Turnstile } from '@marsidev/react-turnstile';
 import { useForm } from 'react-hook-form';
 import { FaIdCardClip } from 'react-icons/fa6';
 import { FcGoogle } from 'react-icons/fc';
@@ -16,6 +18,7 @@ import { authClient } from '@documenso/auth/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { ZNameSchema } from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { env } from '@documenso/lib/utils/env';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
@@ -87,6 +90,11 @@ export const SignUpForm = ({
 
   const utmSrc = searchParams.get('utm_source') ?? null;
 
+  const turnstileSiteKey = env('NEXT_PUBLIC_TURNSTILE_SITE_KEY');
+  const turnstileRef = useRef<TurnstileInstance>(null);
+
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+
   const hasSocialAuthEnabled = isGoogleSSOEnabled || isMicrosoftSSOEnabled || isOIDCSSOEnabled;
 
   const form = useForm<TSignUpFormSchema>({
@@ -109,6 +117,7 @@ export const SignUpForm = ({
         email,
         password,
         signature,
+        captchaToken: captchaToken ?? undefined,
       });
 
       await navigate(returnTo ? returnTo : '/unverified-account');
@@ -137,6 +146,9 @@ export const SignUpForm = ({
         description: _(errorMessage),
         variant: 'destructive',
       });
+
+      turnstileRef.current?.reset();
+      setCaptchaToken(null);
     }
   };
 
@@ -244,13 +256,7 @@ export const SignUpForm = ({
             className="flex w-full flex-1 flex-col gap-y-4"
             onSubmit={form.handleSubmit(onFormSubmit)}
           >
-            <fieldset
-              className={cn(
-                'flex h-[550px] w-full flex-col gap-y-4',
-                hasSocialAuthEnabled && 'h-[650px]',
-              )}
-              disabled={isSubmitting}
-            >
+            <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
               <FormField
                 control={form.control}
                 name="name"
@@ -321,6 +327,19 @@ export const SignUpForm = ({
                   </FormItem>
                 )}
               />
+
+              {turnstileSiteKey && (
+                <Turnstile
+                  ref={turnstileRef}
+                  siteKey={turnstileSiteKey}
+                  onSuccess={setCaptchaToken}
+                  onExpire={() => setCaptchaToken(null)}
+                  options={{
+                    size: 'flexible',
+                    appearance: 'interaction-only',
+                  }}
+                />
+              )}
 
               {hasSocialAuthEnabled && (
                 <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">

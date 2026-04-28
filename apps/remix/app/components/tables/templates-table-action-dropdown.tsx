@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router';
 
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import {
   DropdownMenu,
@@ -44,7 +45,7 @@ export type TemplatesTableActionDropdownProps = {
     folderId?: string | null;
     envelopeId: string;
     directLink?: Pick<TemplateDirectLink, 'token' | 'enabled'> | null;
-    recipients: Recipient[];
+    recipients: TRecipientLite[];
   };
   templateRootPath: string;
   teamId: number;

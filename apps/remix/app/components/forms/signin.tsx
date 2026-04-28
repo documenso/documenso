@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
+import type { TurnstileInstance } from '@marsidev/react-turnstile';
+import { Turnstile } from '@marsidev/react-turnstile';
 import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
 import { KeyRoundIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -16,7 +18,8 @@ import { z } from 'zod';
 
 import { authClient } from '@documenso/auth/client';
 import { AuthenticationErrorCode } from '@documenso/auth/server/lib/errors/error-codes';
-import { AppError } from '@documenso/lib/errors/app-error';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { env } from '@documenso/lib/utils/env';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc } from '@documenso/trpc/react';
 import { ZCurrentPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
@@ -100,6 +103,10 @@ export const SignInForm = ({
   >('totp');
 
   const hasSocialAuthEnabled = isGoogleSSOEnabled || isMicrosoftSSOEnabled || isOIDCSSOEnabled;
+
+  const turnstileSiteKey = env('NEXT_PUBLIC_TURNSTILE_SITE_KEY');
+  const turnstileRef = useRef<TurnstileInstance>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
 
@@ -217,6 +224,7 @@ export const SignInForm = ({
         password,
         totpCode,
         backupCode,
+        captchaToken: captchaToken ?? undefined,
         redirectPath,
       });
     } catch (err) {
@@ -251,6 +259,10 @@ export const SignInForm = ({
           AuthenticationErrorCode.InvalidTwoFactorCode,
           () => msg`The two-factor authentication code provided is incorrect.`,
         )
+        .with(
+          AppErrorCode.INVALID_CAPTCHA,
+          () => msg`We were unable to verify that you're human. Please try again.`,
+        )
         .otherwise(() => handleFallbackErrorMessages(error.code));
 
       toast({
@@ -258,6 +270,9 @@ export const SignInForm = ({
         description: _(errorMessage),
         variant: 'destructive',
       });
+
+      turnstileRef.current?.reset();
+      setCaptchaToken(null);
     }
   };
 
@@ -377,6 +392,19 @@ export const SignInForm = ({
               </FormItem>
             )}
           />
+
+          {turnstileSiteKey && (
+            <Turnstile
+              ref={turnstileRef}
+              siteKey={turnstileSiteKey}
+              onSuccess={setCaptchaToken}
+              onExpire={() => setCaptchaToken(null)}
+              options={{
+                size: 'flexible',
+                appearance: 'interaction-only',
+              }}
+            />
+          )}
 
           <Button
             type="submit"

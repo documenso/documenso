@@ -14,6 +14,7 @@ export const ZSignInSchema = z.object({
   totpCode: z.string().trim().optional(),
   backupCode: z.string().trim().optional(),
   csrfToken: z.string().trim(),
+  captchaToken: z.string().trim().optional(),
 });
 
 export type TSignInSchema = z.infer<typeof ZSignInSchema>;
@@ -40,6 +41,7 @@ export const ZSignUpSchema = z.object({
   email: zEmail(),
   password: ZPasswordSchema,
   signature: z.string().nullish(),
+  captchaToken: z.string().trim().optional(),
 });
 
 export type TSignUpSchema = z.infer<typeof ZSignUpSchema>;

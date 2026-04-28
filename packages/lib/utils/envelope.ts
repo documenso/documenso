@@ -252,7 +252,7 @@ export type EnvelopeItemPermissions = {
 
 export const getEnvelopeItemPermissions = (
   envelope: Pick<Envelope, 'completedAt' | 'deletedAt' | 'type' | 'status'>,
-  recipients: Recipient[],
+  recipients: Pick<Recipient, 'role' | 'signingStatus' | 'sendStatus'>[],
 ): EnvelopeItemPermissions => {
   // Always reject completed/rejected/deleted envelopes.
   if (

@@ -118,6 +118,13 @@ export const ZEnvelopeRecipientManySchema = ZRecipientManySchema.omit({
   templateId: true,
 });
 
+export type TRecipientSchema = z.infer<typeof ZRecipientSchema>;
+export type TRecipientLite = z.infer<typeof ZRecipientLiteSchema>;
+export type TRecipientMany = z.infer<typeof ZRecipientManySchema>;
+export type TEnvelopeRecipientSchema = z.infer<typeof ZEnvelopeRecipientSchema>;
+export type TEnvelopeRecipientLite = z.infer<typeof ZEnvelopeRecipientLiteSchema>;
+export type TEnvelopeRecipientMany = z.infer<typeof ZEnvelopeRecipientManySchema>;
+
 export const ZRecipientEmailSchema = z.union([
   z.literal(''),
   zEmail('Invalid email').trim().toLowerCase().max(254),

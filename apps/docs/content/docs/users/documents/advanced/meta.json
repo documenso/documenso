@@ -6,6 +6,7 @@
     "ai-detection",
     "default-recipients",
     "document-visibility",
-    "recipient-expiration"
+    "recipient-expiration",
+    "signing-reminders"
   ]
 }

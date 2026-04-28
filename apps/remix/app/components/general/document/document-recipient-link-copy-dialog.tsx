@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
 import { RecipientRole } from '@prisma/client';
 import { useSearchParams } from 'react-router';
 
@@ -11,6 +10,7 @@ import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { formatSigningLink } from '@documenso/lib/utils/recipients';
 import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
@@ -29,7 +29,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DocumentRecipientLinkCopyDialogProps = {
   trigger?: React.ReactNode;
-  recipients: Recipient[];
+  recipients: TRecipientLite[];
 };
 
 export const DocumentRecipientLinkCopyDialog = ({
@@ -88,7 +88,7 @@ export const DocumentRecipientLinkCopyDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <ul className="text-muted-foreground divide-y rounded-lg border">
+        <ul className="divide-y rounded-lg border text-muted-foreground">
           {recipients.length === 0 && (
             <li className="flex flex-col items-center justify-center py-6 text-sm">
               <Trans>No recipients</Trans>
@@ -99,9 +99,9 @@ export const DocumentRecipientLinkCopyDialog = ({
             <li key={recipient.id} className="flex items-center justify-between px-4 py-3 text-sm">
               <AvatarWithText
                 avatarFallback={recipient.email.slice(0, 1).toUpperCase()}
-                primaryText={<p className="text-muted-foreground text-sm">{recipient.email}</p>}
+                primaryText={<p className="text-sm text-muted-foreground">{recipient.email}</p>}
                 secondaryText={
-                  <p className="text-muted-foreground/70 text-xs">
+                  <p className="text-xs text-muted-foreground/70">
                     {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
                   </p>
                 }
