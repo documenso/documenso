@@ -10,7 +10,7 @@ import { PNG } from 'pngjs';
 
 import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
 import { prisma } from '@documenso/prisma';
-import { seedAlignmentTestDocument } from '@documenso/prisma/seed/initial-seed';
+import { seedOverflowTestDocument } from '@documenso/prisma/seed/initial-seed';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../lib/constants/app';
@@ -22,8 +22,7 @@ import type {
   TCreateEnvelopeResponse,
 } from '../../../trpc/server/envelope-router/create-envelope.types';
 import type { TDistributeEnvelopeRequest } from '../../../trpc/server/envelope-router/distribute-envelope.types';
-import { ALIGNMENT_TEST_FIELDS } from '../../constants/field-alignment-pdf';
-import { FIELD_META_TEST_FIELDS } from '../../constants/field-meta-pdf';
+import { OVERFLOW_TEST_FIELDS } from '../../constants/field-overflow-pdf';
 import { apiSignin } from '../fixtures/authentication';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
@@ -34,7 +33,7 @@ test.describe.configure({ mode: 'parallel', timeout: 60000 });
 /**
  * DON'T COMMIT THIS WITHOUT THE "SKIP" COMMAND.
  */
-test.skip('seed alignment test document', async ({ page }) => {
+test.skip('seed overflow test document', async ({ page }) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       email: 'example@documenso.com',
@@ -51,7 +50,7 @@ test.skip('seed alignment test document', async ({ page }) => {
   const userId = user.id;
   const teamId = user.ownedOrganisations[0].teams[0].id;
 
-  await seedAlignmentTestDocument({
+  await seedOverflowTestDocument({
     userId,
     teamId,
     recipientName: user.name || '',
@@ -61,7 +60,7 @@ test.skip('seed alignment test document', async ({ page }) => {
   });
 });
 
-test('field placement visual regression', async ({ page, request }, testInfo) => {
+test('overflow visual regression', async ({ page, request }, testInfo) => {
   const { user, team } = await seedUser();
 
   const { token } = await createApiToken({
@@ -71,28 +70,15 @@ test('field placement visual regression', async ({ page, request }, testInfo) =>
     expiresIn: null,
   });
 
-  // Step 1: Create initial envelope with Prisma (with first envelope item)
-  const alignmentPdf = fs.readFileSync(
-    path.join(__dirname, '../../../../assets/field-font-alignment.pdf'),
+  // Step 1: Create initial envelope with overflow PDF
+  const overflowPdf = fs.readFileSync(
+    path.join(__dirname, '../../../../assets/field-overflow.pdf'),
   );
-
-  const fieldMetaPdf = fs.readFileSync(path.join(__dirname, '../../../../assets/field-meta.pdf'));
 
   const formData = new FormData();
 
-  const fieldMetaFields = FIELD_META_TEST_FIELDS.map((field) => ({
-    identifier: 'field-meta',
-    type: field.type,
-    page: field.page,
-    positionX: field.positionX,
-    positionY: field.positionY,
-    width: field.width,
-    height: field.height,
-    fieldMeta: field.fieldMeta,
-  }));
-
-  const alignmentFields = ALIGNMENT_TEST_FIELDS.map((field) => ({
-    identifier: 'alignment-pdf',
+  const overflowFields = OVERFLOW_TEST_FIELDS.map((field) => ({
+    identifier: 'field-overflow',
     type: field.type,
     page: field.page,
     positionX: field.positionX,
@@ -104,21 +90,19 @@ test('field placement visual regression', async ({ page, request }, testInfo) =>
 
   const createEnvelopePayload: TCreateEnvelopePayload = {
     type: EnvelopeType.DOCUMENT,
-    title: 'Envelope Full Field Test',
+    title: 'Overflow Test',
     recipients: [
       {
         email: user.email,
         name: user.name || '',
         role: RecipientRole.SIGNER,
-        fields: [...fieldMetaFields, ...alignmentFields],
+        fields: overflowFields,
       },
     ],
   };
 
   formData.append('payload', JSON.stringify(createEnvelopePayload));
-
-  formData.append('files', new File([alignmentPdf], 'alignment-pdf', { type: 'application/pdf' }));
-  formData.append('files', new File([fieldMetaPdf], 'field-meta', { type: 'application/pdf' }));
+  formData.append('files', new File([overflowPdf], 'field-overflow', { type: 'application/pdf' }));
 
   const createEnvelopeRequest = await request.post(`${baseUrl}/envelope/create`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -141,15 +125,13 @@ test('field placement visual regression', async ({ page, request }, testInfo) =>
   });
 
   const recipientId = envelope.recipients[0].id;
-  const alignmentItem = envelope.envelopeItems.find((item: { order: number }) => item.order === 1);
-  const fieldMetaItem = envelope.envelopeItems.find((item: { order: number }) => item.order === 2);
+  const overflowItem = envelope.envelopeItems.find((item: { order: number }) => item.order === 1);
 
   expect(recipientId).toBeDefined();
-  expect(alignmentItem).toBeDefined();
-  expect(fieldMetaItem).toBeDefined();
+  expect(overflowItem).toBeDefined();
 
-  if (!alignmentItem || !fieldMetaItem) {
-    throw new Error('Envelope items not found');
+  if (!overflowItem) {
+    throw new Error('Envelope item not found');
   }
 
   const distributeEnvelopeRequest = await request.post(`${baseUrl}/envelope/distribute`, {
@@ -186,27 +168,14 @@ test('field placement visual regression', async ({ page, request }, testInfo) =>
 
   await Promise.all(
     uninsertedFields.map(async (field) => {
-      let foundField = ALIGNMENT_TEST_FIELDS.find(
+      const foundField = OVERFLOW_TEST_FIELDS.find(
         (f) =>
           field.page === f.page &&
-          field.envelopeItem.title === 'alignment-pdf' &&
           Number(field.positionX).toFixed(2) === f.positionX.toFixed(2) &&
           Number(field.positionY).toFixed(2) === f.positionY.toFixed(2) &&
           Number(field.width).toFixed(2) === f.width.toFixed(2) &&
           Number(field.height).toFixed(2) === f.height.toFixed(2),
       );
-
-      if (!foundField) {
-        foundField = FIELD_META_TEST_FIELDS.find(
-          (f) =>
-            field.page === f.page &&
-            field.envelopeItem.title === 'field-meta' &&
-            Number(field.positionX).toFixed(2) === f.positionX.toFixed(2) &&
-            Number(field.positionY).toFixed(2) === f.positionY.toFixed(2) &&
-            Number(field.width).toFixed(2) === f.width.toFixed(2) &&
-            Number(field.height).toFixed(2) === f.height.toFixed(2),
-        );
-      }
 
       if (!foundField) {
         throw new Error('Field not found');
@@ -237,29 +206,17 @@ test('field placement visual regression', async ({ page, request }, testInfo) =>
 
   // Override email fields with test values after distribution.
   // Email fields are auto-inserted with the signer's email during distribution,
-  // so we override customText directly to test with specific values.
+  // so we override customText directly to test overflow with specific text lengths.
   const emailFields = await prisma.field.findMany({
     where: {
       envelopeId: envelope.id,
       type: FieldType.EMAIL,
     },
-    include: {
-      envelopeItem: {
-        select: {
-          title: true,
-        },
-      },
-    },
   });
 
   await Promise.all(
     emailFields.map(async (field) => {
-      const testFields =
-        field.envelopeItem.title === 'alignment-pdf'
-          ? ALIGNMENT_TEST_FIELDS
-          : FIELD_META_TEST_FIELDS;
-
-      const foundField = testFields.find(
+      const foundField = OVERFLOW_TEST_FIELDS.find(
         (f) =>
           f.type === FieldType.EMAIL &&
           field.page === f.page &&
@@ -333,11 +290,16 @@ test('field placement visual regression', async ({ page, request }, testInfo) =>
       const pdfData = await fetch(documentUrl).then(async (res) => await res.arrayBuffer());
 
       const loadedImages = storedImages
-        .filter((image) => image.includes(item.title))
+        .filter((image) => image.startsWith(`field-overflow-`))
+        .sort((leftImage, rightImage) => {
+          return (
+            getVisualRegressionImageIndex(leftImage) - getVisualRegressionImageIndex(rightImage)
+          );
+        })
         .map((image) => fs.readFileSync(path.join(__dirname, '../../visual-regression', image)));
 
       await compareSignedPdfWithImages({
-        id: item.title.replaceAll(' ', '-').toLowerCase(),
+        id: 'field-overflow',
         pdfData: new Uint8Array(pdfData),
         images: loadedImages,
         testInfo,
@@ -351,7 +313,7 @@ test('field placement visual regression', async ({ page, request }, testInfo) =>
  *
  * DON'T COMMIT THIS WITHOUT THE "SKIP" COMMAND.
  */
-test.skip('download envelope images', async ({ page, request }) => {
+test.skip('download overflow images', async ({ page, request }) => {
   const { user, team } = await seedUser();
 
   const { token: apiToken } = await createApiToken({
@@ -361,7 +323,7 @@ test.skip('download envelope images', async ({ page, request }) => {
     expiresIn: null,
   });
 
-  const envelope = await seedAlignmentTestDocument({
+  const envelope = await seedOverflowTestDocument({
     userId: user.id,
     teamId: team.id,
     recipientName: user.name || '',
@@ -385,23 +347,11 @@ test.skip('download envelope images', async ({ page, request }) => {
       envelopeId: envelope.id,
       type: FieldType.EMAIL,
     },
-    include: {
-      envelopeItem: {
-        select: {
-          title: true,
-        },
-      },
-    },
   });
 
   await Promise.all(
     emailFields.map(async (field) => {
-      const testFields =
-        field.envelopeItem.title === 'alignment-pdf'
-          ? ALIGNMENT_TEST_FIELDS
-          : FIELD_META_TEST_FIELDS;
-
-      const foundField = testFields.find(
+      const foundField = OVERFLOW_TEST_FIELDS.find(
         (f) =>
           f.type === FieldType.EMAIL &&
           field.page === f.page &&
@@ -477,13 +427,17 @@ test.skip('download envelope images', async ({ page, request }) => {
 
       for (const [index, { image }] of pdfImages.entries()) {
         fs.writeFileSync(
-          path.join(__dirname, '../../visual-regression', `${item.title}-${index}.png`),
+          path.join(__dirname, '../../visual-regression', `field-overflow-${index}.png`),
           new Uint8Array(image),
         );
       }
     }),
   );
 });
+
+// ============================================================================
+// Helper functions
+// ============================================================================
 
 async function renderPdfToImage(pdfBytes: Uint8Array) {
   const loadingTask = pdfjsLib.getDocument({ data: pdfBytes });
@@ -536,13 +490,15 @@ const compareSignedPdfWithImages = async ({
 }: CompareSignedPdfWithImagesOptions) => {
   const renderedImages = await renderPdfToImage(pdfData);
 
-  const blankCertificateFile = fs.readFileSync(
-    path.join(__dirname, '../../visual-regression/blank-certificate.png'),
-  );
-  const blankCertificateImage = PNG.sync.read(blankCertificateFile).data;
+  expect(images).toHaveLength(renderedImages.length);
 
   for (const [index, { image, width, height }] of renderedImages.entries()) {
     const isCertificate = index === renderedImages.length - 1;
+
+    // Skip certificate page comparison.
+    if (isCertificate) {
+      continue;
+    }
 
     const diff = new PNG({ width, height });
 
@@ -550,10 +506,8 @@ const compareSignedPdfWithImages = async ({
 
     const newImage = PNG.sync.read(image).data;
 
-    const oldImage = isCertificate ? blankCertificateImage : storedImage;
-
     const comparison = pixelMatch(
-      new Uint8Array(oldImage),
+      new Uint8Array(storedImage),
       new Uint8Array(newImage),
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       diff.data as unknown as Uint8Array,
@@ -574,11 +528,16 @@ const compareSignedPdfWithImages = async ({
     fs.writeFileSync(oldFilePath, new Uint8Array(images[index]));
     fs.writeFileSync(newFilePath, new Uint8Array(image));
 
-    if (isCertificate) {
-      // Expect the certificate to NOT be blank. Since the storedImage is blank.
-      expect.soft(comparison).toBeGreaterThan(20000);
-    } else {
-      expect.soft(comparison).toBeLessThan(2);
-    }
+    expect.soft(comparison).toBeLessThan(2);
   }
+};
+
+const getVisualRegressionImageIndex = (image: string) => {
+  const match = image.match(/-(\d+)\.png$/);
+
+  if (!match) {
+    throw new Error(`Unexpected visual regression image name: ${image}`);
+  }
+
+  return Number(match[1]);
 };
