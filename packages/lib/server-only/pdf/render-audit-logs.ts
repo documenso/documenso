@@ -57,7 +57,7 @@ const textXs = 8;
 const fontMedium = '500';
 
 const pageTopMargin = 60;
-const pageBottomMargin = 15;
+const pageBottomMargin = 27;
 const contentMaxWidth = 768;
 const rowPadding = 10;
 const titleFontSize = 18;
@@ -595,7 +595,7 @@ export async function renderAuditLogs({
 
   const groupedRows = groupRowsIntoPages({
     auditLogs,
-    maxHeight: pageHeight,
+    maxHeight: pageHeight - pageBottomMargin,
     contentWidth,
     i18n,
     overviewCard,
@@ -621,6 +621,16 @@ export async function renderAuditLogs({
   for (const [index, pageGroup] of pageGroups.entries()) {
     stage.destroyChildren();
     const page = new Konva.Layer();
+
+    const footerText = new Konva.Text({
+      x: margin,
+      y: pageHeight - textXs - 10,
+      text: `${i18n._(msg`Envelope ID`)}: ${envelope.id}`,
+      fontFamily: 'Inter',
+      fontSize: textXs,
+      fill: textMutedForegroundLight,
+    });
+    page.add(footerText);
 
     page.add(pageGroup);
 
@@ -656,6 +666,16 @@ export async function renderAuditLogs({
       x: pageWidth - brandingRect.width - margin,
       y: pageTopMargin,
     } satisfies Partial<Konva.GroupConfig>);
+
+    const overflowFooterText = new Konva.Text({
+      x: margin,
+      y: pageHeight - textXs - 10,
+      text: `${i18n._(msg`Envelope ID`)}: ${envelope.id}`,
+      fontFamily: 'Inter',
+      fontSize: textXs,
+      fill: textMutedForegroundLight,
+    });
+    page.add(overflowFooterText);
 
     page.add(brandingGroup);
     stage.add(page);
