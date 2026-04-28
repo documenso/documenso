@@ -16,7 +16,7 @@ export const AppBanner = ({ banner }: AppBannerProps) => {
         style={{ color: banner.data.textColor }}
       >
         <div className="flex items-center">
-          <span dangerouslySetInnerHTML={{ __html: banner.data.content }} />
+          <span>{banner.data.content}</span>
         </div>
       </div>
     </div>
