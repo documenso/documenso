@@ -22,6 +22,7 @@ export const ZUpdateOrganisationSettingsRequestSchema = z.object({
     documentDateFormat: ZDocumentMetaDateFormatSchema.optional(),
     includeSenderDetails: z.boolean().optional(),
     includeSigningCertificate: z.boolean().optional(),
+    allowPublicCompletedDocumentAccess: z.boolean().optional(),
     includeAuditLog: z.boolean().optional(),
     typedSignatureEnabled: z.boolean().optional(),
     uploadSignatureEnabled: z.boolean().optional(),

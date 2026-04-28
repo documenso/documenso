@@ -31,4 +31,8 @@ export const symmetricDecrypt = ({ key, data }: SymmetricDecryptOptions) => {
   return chacha.decrypt(dataAsBytes);
 };
 
+export const tokenFingerprint = (token: string): string => {
+  return bytesToHex(sha256(token)).slice(0, 16);
+};
+
 export { sha256 };

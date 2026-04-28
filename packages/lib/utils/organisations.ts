@@ -123,6 +123,7 @@ export const generateDefaultOrganisationSettings = (): Omit<
 
     includeSenderDetails: true,
     includeSigningCertificate: true,
+    allowPublicCompletedDocumentAccess: true,
     includeAuditLog: false,
 
     typedSignatureEnabled: true,

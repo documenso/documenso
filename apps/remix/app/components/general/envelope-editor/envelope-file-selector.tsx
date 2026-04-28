@@ -67,6 +67,10 @@ export const EnvelopeRendererFileSelector = ({
 }: EnvelopeRendererFileSelectorProps) => {
   const { envelopeItems, currentEnvelopeItem, setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
 
+  if (envelopeItems.length <= 1) {
+    return null;
+  }
+
   return (
     <div
       className={cn(

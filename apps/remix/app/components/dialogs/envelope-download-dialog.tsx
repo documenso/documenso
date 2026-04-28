@@ -67,6 +67,7 @@ export const EnvelopeDownloadDialog = ({
     );
 
   const envelopeItems = envelopeItemsPayload?.data || [];
+  const isQrToken = Boolean(token?.startsWith('qr_'));
 
   const onDownload = async (
     envelopeItem: EnvelopeItemToDownload,
@@ -128,58 +129,53 @@ export const EnvelopeDownloadDialog = ({
 
         <div className="flex w-full flex-col gap-4 overflow-hidden">
           {isLoadingEnvelopeItems ? (
-            <>
-              {Array.from({ length: 1 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="border-border bg-card flex items-center gap-2 rounded-lg border p-4"
-                >
-                  <Skeleton className="h-10 w-10 flex-shrink-0 rounded-lg" />
+            <div className="flex items-center gap-2 rounded-lg border border-border bg-card p-4">
+              <Skeleton className="h-10 w-10 flex-shrink-0 rounded-lg" />
 
-                  <div className="flex w-full flex-col gap-2">
-                    <Skeleton className="h-4 w-28 rounded-lg" />
-                    <Skeleton className="h-4 w-20 rounded-lg" />
-                  </div>
+              <div className="flex w-full flex-col gap-2">
+                <Skeleton className="h-4 w-28 rounded-lg" />
+                <Skeleton className="h-4 w-20 rounded-lg" />
+              </div>
 
-                  <Skeleton className="h-10 w-20 flex-shrink-0 rounded-lg" />
-                </div>
-              ))}
-            </>
+              <Skeleton className="h-10 w-20 flex-shrink-0 rounded-lg" />
+            </div>
           ) : (
             envelopeItems.map((item) => (
               <div
                 key={item.id}
-                className="border-border bg-card hover:bg-accent/50 flex items-center gap-4 rounded-lg border p-4 transition-colors"
+                className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-accent/50"
               >
                 <div className="flex-shrink-0">
-                  <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
-                    <FileTextIcon className="text-primary h-5 w-5" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                    <FileTextIcon className="h-5 w-5 text-primary" />
                   </div>
                 </div>
 
                 <div className="min-w-0 flex-1">
                   {/* Todo: Envelopes - Fix overflow */}
-                  <h4 className="text-foreground truncate text-sm font-medium" title={item.title}>
+                  <h4 className="truncate text-sm font-medium text-foreground" title={item.title}>
                     {item.title}
                   </h4>
-                  <p className="text-muted-foreground mt-0.5 text-xs">
+                  <p className="mt-0.5 text-xs text-muted-foreground">
                     <Trans>PDF Document</Trans>
                   </p>
                 </div>
 
                 <div className="flex flex-shrink-0 items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-xs"
-                    onClick={async () => onDownload(item, 'original')}
-                    loading={isDownloadingState[generateDownloadKey(item.id, 'original')]}
-                  >
-                    {!isDownloadingState[generateDownloadKey(item.id, 'original')] && (
-                      <DownloadIcon className="mr-2 h-4 w-4" />
-                    )}
-                    <Trans context="Original document (adjective)">Original</Trans>
-                  </Button>
+                  {!isQrToken && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
+                      onClick={async () => onDownload(item, 'original')}
+                      loading={isDownloadingState[generateDownloadKey(item.id, 'original')]}
+                    >
+                      {!isDownloadingState[generateDownloadKey(item.id, 'original')] && (
+                        <DownloadIcon className="mr-2 h-4 w-4" />
+                      )}
+                      <Trans context="Original document (adjective)">Original</Trans>
+                    </Button>
+                  )}
 
                   {envelopeStatus === DocumentStatus.COMPLETED && (
                     <Button
