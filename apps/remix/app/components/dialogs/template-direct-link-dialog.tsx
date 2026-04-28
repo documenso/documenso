@@ -55,6 +55,7 @@ type TemplateDirectLinkDialogProps = {
   directLink?: Pick<TemplateDirectLink, 'token' | 'enabled'> | null;
   recipients: TRecipientLite[];
   trigger?: React.ReactNode;
+  triggerSizeVariant?: 'default' | 'sm' | 'lg';
   onCreateSuccess?: () => Promise<void> | void;
   onDeleteSuccess?: () => Promise<void> | void;
 };
@@ -66,6 +67,7 @@ export const TemplateDirectLinkDialog = ({
   directLink,
   recipients,
   trigger,
+  triggerSizeVariant = 'sm',
   onCreateSuccess,
   onDeleteSuccess,
 }: TemplateDirectLinkDialogProps) => {
@@ -208,7 +210,7 @@ export const TemplateDirectLinkDialog = ({
     <Dialog open={open} onOpenChange={(value) => !isLoading && setOpen(value)}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button variant="outline" className="px-3">
+          <Button variant="outline" className="shrink-0 px-3" size={triggerSizeVariant}>
             <LinkIcon className="mr-1.5 h-3.5 w-3.5" />
 
             {directLink ? <Trans>Manage Direct Link</Trans> : <Trans>Create Direct Link</Trans>}
