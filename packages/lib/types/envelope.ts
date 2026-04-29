@@ -13,6 +13,7 @@ import { ZEnvelopeRecipientLiteSchema } from './recipient';
  * The full envelope response schema.
  *
  * Mainly used for returning a single envelope from the API.
+ * {WEB_URL}/api/v2/envelopes/:id
  */
 export const ZEnvelopeSchema = EnvelopeSchema.pick({
   internalVersion: true,
@@ -24,6 +25,7 @@ export const ZEnvelopeSchema = EnvelopeSchema.pick({
   id: true,
   secondaryId: true,
   externalId: true,
+  qrToken: true,
   createdAt: true,
   updatedAt: true,
   completedAt: true,
@@ -116,6 +118,7 @@ export type TEnvelopeLite = z.infer<typeof ZEnvelopeLiteSchema>;
 
 /**
  * A version of the envelope response schema when returning multiple envelopes at once from a single API endpoint.
+ * {WebURL}/api/v2/envelopes
  */
 export const ZEnvelopeManySchema = EnvelopeSchema.pick({
   internalVersion: true,
@@ -127,6 +130,7 @@ export const ZEnvelopeManySchema = EnvelopeSchema.pick({
   id: true,
   secondaryId: true,
   externalId: true,
+  qrToken: true,
   createdAt: true,
   updatedAt: true,
   completedAt: true,

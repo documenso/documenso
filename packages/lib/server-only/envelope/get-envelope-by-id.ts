@@ -88,6 +88,7 @@ export const getEnvelopeById = async ({ id, userId, teamId, type }: GetEnvelopeB
 
   return {
     ...envelope,
+    qrToken: envelope.status === 'COMPLETED' ? envelope.qrToken : null,
     user: {
       id: envelope.user.id,
       name: envelope.user.name || '',
