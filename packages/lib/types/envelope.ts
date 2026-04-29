@@ -160,6 +160,11 @@ export const ZEnvelopeManySchema = EnvelopeSchema.pick({
     id: true,
     url: true,
   }).nullable(),
+  shareURL: z
+    .string()
+    .url()
+    .describe('Share URL (read-only). Null unless the envelope status is COMPLETED.')
+    .nullable(),
 });
 
 export type TEnvelopeMany = z.infer<typeof ZEnvelopeManySchema>;
