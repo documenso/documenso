@@ -286,6 +286,7 @@ export const findEnvelopes = async ({
   const mappedData = maskedData.map((envelope) => ({
     ...envelope,
     recipients: envelope.Recipient,
+    qrToken: envelope.status === 'COMPLETED' ? envelope.qrToken : null,
     user: {
       id: envelope.user.id,
       name: envelope.user.name || '',

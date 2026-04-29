@@ -83,6 +83,11 @@ export const ZEnvelopeSchema = EnvelopeSchema.pick({
     name: z.string(),
     email: z.string(),
   }),
+  shareURL: z
+    .string()
+    .url()
+    .describe('Share URL (read-only). Null unless the envelope status is COMPLETED.')
+    .nullable(),
 });
 
 export type TEnvelope = z.infer<typeof ZEnvelopeSchema>;
