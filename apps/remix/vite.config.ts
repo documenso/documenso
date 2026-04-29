@@ -47,6 +47,10 @@ export default defineConfig({
     tsconfigPaths(),
     serverAdapter({
       entry: 'server/router.ts',
+      getLoadContext: async () => {
+        const { getLoadContext } = await import('./server/load-context');
+        return getLoadContext();
+      },
       exclude: [
         // Spread the defaults but replace the /.css$/ rule so that Bull
         // Board's static CSS at /api/jobs/board/static/** passes through to Hono.

@@ -10,6 +10,7 @@ import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
 import handle from 'hono-react-router-adapter/node';
 
+import { getLoadContext } from './hono/server/load-context.js';
 import server from './hono/server/router.js';
 import * as build from './index.js';
 
@@ -28,7 +29,7 @@ server.use(
   }),
 );
 
-const handler = handle(build, server);
+const handler = handle(build, server, { getLoadContext });
 
 const port = parseInt(process.env.PORT || '3000', 10);
 
