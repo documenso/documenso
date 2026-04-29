@@ -26,6 +26,7 @@ export const ZDocumentSchema = LegacyDocumentSchema.pick({
   authOptions: true,
   formValues: true,
   title: true,
+  qrToken: true,
   createdAt: true,
   updatedAt: true,
   completedAt: true,
