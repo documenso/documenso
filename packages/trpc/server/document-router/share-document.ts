@@ -8,15 +8,34 @@ export const shareDocumentRoute = procedure
   .input(ZShareDocumentRequestSchema)
   .output(ZShareDocumentResponseSchema)
   .mutation(async ({ input, ctx }) => {
-    const { documentId, token } = input;
+    const { documentId, envelopeId, token } = input;
 
     ctx.logger.info({
       input: {
         documentId,
+        envelopeId,
       },
     });
 
-    if (token) {
+    if (envelopeId != null) {
+      if (token != null) {
+        return await createOrGetShareLink({ envelopeId, token });
+      }
+
+      if (!ctx.user?.id) {
+        throw new Error(
+          'You must either provide a token or be logged in to create a sharing link.',
+        );
+      }
+
+      return await createOrGetShareLink({ envelopeId, userId: ctx.user.id });
+    }
+
+    if (documentId == null) {
+      throw new Error('documentId is required when envelopeId is not provided');
+    }
+
+    if (token != null) {
       return await createOrGetShareLink({ documentId, token });
     }
 

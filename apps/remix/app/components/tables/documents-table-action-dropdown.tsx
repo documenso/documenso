@@ -231,7 +231,7 @@ export const DocumentsTableActionDropdown = ({
         <DocumentResendDialog document={row} recipients={nonSignedRecipients} />
 
         <DocumentShareButton
-          documentId={row.id}
+          envelopeId={row.envelopeId}
           token={isOwner ? undefined : recipient?.token}
           trigger={({ loading, disabled }) => (
             <DropdownMenuItem disabled={disabled || isDraft} onSelect={(e) => e.preventDefault()}>
