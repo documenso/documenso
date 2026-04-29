@@ -69,9 +69,7 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
     {
       ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
       enabled:
-        Boolean(envelope) &&
-        envelope.internalVersion === 2 &&
-        envelope.status === DocumentStatus.PENDING,
+        envelope && envelope.internalVersion === 2 && envelope.status === DocumentStatus.PENDING,
     },
   );
 
