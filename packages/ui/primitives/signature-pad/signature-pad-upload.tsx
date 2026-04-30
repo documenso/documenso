@@ -88,6 +88,34 @@ const getSignatureImageBounds = (image: HTMLImageElement): DOMRect | null => {
   return new DOMRect(minX, minY, maxX - minX + 1, maxY - minY + 1);
 };
 
+const getCroppedSignatureDataUrl = (image: HTMLImageElement): string => {
+  const sourceBounds =
+    getSignatureImageBounds(image) ?? new DOMRect(0, 0, image.width, image.height);
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) {
+    throw new Error('Canvas context is not available.');
+  }
+
+  canvas.width = sourceBounds.width;
+  canvas.height = sourceBounds.height;
+
+  ctx.drawImage(
+    image,
+    sourceBounds.x,
+    sourceBounds.y,
+    sourceBounds.width,
+    sourceBounds.height,
+    0,
+    0,
+    sourceBounds.width,
+    sourceBounds.height,
+  );
+
+  return canvas.toDataURL();
+};
+
 const loadImageOntoCanvas = (
   image: HTMLImageElement,
   canvas: HTMLCanvasElement,
@@ -96,10 +124,7 @@ const loadImageOntoCanvas = (
   const sourceBounds =
     getSignatureImageBounds(image) ?? new DOMRect(0, 0, image.width, image.height);
 
-  const scale = Math.min(
-    canvas.width / sourceBounds.width,
-    canvas.height / sourceBounds.height,
-  );
+  const scale = Math.min(canvas.width / sourceBounds.width, canvas.height / sourceBounds.height);
 
   const targetWidth = sourceBounds.width * scale;
   const targetHeight = sourceBounds.height * scale;
@@ -157,7 +182,7 @@ export const SignaturePadUpload = ({
       if (!ctx) return;
 
       $imageData.current = loadImageOntoCanvas(img, $el.current, ctx);
-      onChange?.($el.current.toDataURL());
+      onChange?.(getCroppedSignatureDataUrl(img));
     } catch (error) {
       console.error(error);
     }
