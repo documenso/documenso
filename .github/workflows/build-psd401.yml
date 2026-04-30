@@ -1,0 +1,44 @@
+name: Build PSD401 Fork
+
+on:
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: psd401/documenso
+
+jobs:
+  build:
+    name: Build and push Docker image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        run: |
+          GIT_SHA="$(git rev-parse --short HEAD)"
+
+          docker build \
+            -f ./docker/Dockerfile \
+            --progress=plain \
+            -t "$REGISTRY/$IMAGE_NAME:latest" \
+            -t "$REGISTRY/$IMAGE_NAME:$GIT_SHA" \
+            .
+
+          docker push "$REGISTRY/$IMAGE_NAME:latest"
+          docker push "$REGISTRY/$IMAGE_NAME:$GIT_SHA"
+
+          echo "### Image pushed" >> $GITHUB_STEP_SUMMARY
+          echo "- \`$REGISTRY/$IMAGE_NAME:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`$REGISTRY/$IMAGE_NAME:$GIT_SHA\`" >> $GITHUB_STEP_SUMMARY
