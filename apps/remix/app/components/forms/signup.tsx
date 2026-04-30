@@ -16,6 +16,7 @@ import { z } from 'zod';
 import communityCardsImage from '@documenso/assets/images/community-cards.png';
 import { authClient } from '@documenso/auth/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
+import { ZNameSchema } from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { env } from '@documenso/lib/utils/env';
 import { zEmail } from '@documenso/lib/utils/zod';
@@ -39,10 +40,7 @@ import { UserProfileTimur } from '~/components/general/user-profile-timur';
 
 export const ZSignUpFormSchema = z
   .object({
-    name: z
-      .string()
-      .trim()
-      .min(1, { message: msg`Please enter a valid name.`.id }),
+    name: ZNameSchema,
     email: zEmail().min(1),
     password: ZPasswordSchema,
     signature: z.string().min(1, { message: msg`We need your signature to sign documents`.id }),
@@ -60,7 +58,7 @@ export const ZSignUpFormSchema = z
 
 export const SIGNUP_ERROR_MESSAGES: Record<string, MessageDescriptor> = {
   SIGNUP_DISABLED: msg`Signup is currently disabled or not available for your email domain.`,
-  [AppErrorCode.ALREADY_EXISTS]: msg`User with this email already exists. Please use a different email address.`,
+  [AppErrorCode.ALREADY_EXISTS]: msg`We were unable to create your account. If you already have an account, try signing in instead.`,
   [AppErrorCode.INVALID_REQUEST]: msg`We were unable to create your account. Please review the information you provided and try again.`,
 };
 

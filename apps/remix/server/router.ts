@@ -29,13 +29,20 @@ import { downloadRoute } from './api/download/download';
 import { filesRoute } from './api/files/files';
 import { type AppContext, appContext } from './context';
 import { appMiddleware } from './middleware';
+import { securityHeadersMiddleware } from './security-headers';
 import { openApiTrpcServerHandler } from './trpc/hono-trpc-open-api';
 import { reactRouterTrpcServer } from './trpc/hono-trpc-remix';
+
+// Re-export so the rollup build (entry: server/router.ts) bundles
+// load-context.ts. server/main.js imports getLoadContext from the rolled-up
+// output to wire it into the React Router adapter.
+export { getLoadContext } from './load-context';
 
 export interface HonoEnv {
   Variables: RequestIdVariables & {
     context: AppContext;
     logger: Logger;
+    cspNonce: string;
   };
 }
 
@@ -55,6 +62,15 @@ const fileRateLimitMiddleware = createRateLimitMiddleware(fileUploadRateLimit);
  */
 app.use(contextStorage());
 app.use(appContext);
+
+/**
+ * Emit response security headers (CSP with per-request nonce, plus
+ * Referrer-Policy and X-Content-Type-Options on embed routes). Must run
+ * after `contextStorage()` so the nonce is readable via `getContext()` from
+ * `getLoadContext`, and before the React Router handler so the response
+ * carries the header.
+ */
+app.use(securityHeadersMiddleware);
 
 /**
  * RR7 app middleware.
