@@ -254,7 +254,7 @@ export const DocumentSigningSignatureField = ({
         <img
           src={signature.signatureImageAsBase64}
           alt={`Signature for ${recipient.name}`}
-          className="h-full w-full object-contain"
+          className="h-full w-full"
         />
       )}
 

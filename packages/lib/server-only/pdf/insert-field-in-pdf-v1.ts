@@ -150,16 +150,10 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
         if (field.signature?.signatureImageAsBase64) {
           const image = await pdf.embedPng(field.signature?.signatureImageAsBase64 ?? '');
 
-          let imageWidth = image.width;
-          let imageHeight = image.height;
-
-          const scalingFactor = Math.min(fieldWidth / imageWidth, fieldHeight / imageHeight);
-
-          imageWidth = imageWidth * scalingFactor;
-          imageHeight = imageHeight * scalingFactor;
-
-          let imageX = fieldX + (fieldWidth - imageWidth) / 2;
-          let imageY = fieldY + (fieldHeight - imageHeight) / 2;
+          let imageX = fieldX;
+          let imageY = fieldY;
+          const imageWidth = fieldWidth;
+          const imageHeight = fieldHeight;
 
           // Invert the Y axis since PDFs use a bottom-left coordinate system
           imageY = pageHeight - imageY - imageHeight;
