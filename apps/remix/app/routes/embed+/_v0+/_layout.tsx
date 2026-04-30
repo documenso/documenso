@@ -17,19 +17,14 @@ import { EmbedRecipientExpired } from '~/components/embed/embed-recipient-expire
 
 import type { Route } from './+types/_layout';
 
-// Todo: (RR7) Test
-export function headers({ loaderHeaders }: Route.HeadersArgs) {
-  const origin = loaderHeaders.get('Origin') ?? '*';
-
-  // Allow third parties to iframe the document.
-  return {
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Origin': origin,
-    'Content-Security-Policy': `frame-ancestors ${origin}`,
-    'Referrer-Policy': 'strict-origin-when-cross-origin',
-    'X-Content-Type-Options': 'nosniff',
-  };
-}
+// Note: CSP (`frame-ancestors *`), `Referrer-Policy`, and
+// `X-Content-Type-Options` are now emitted globally by
+// `securityHeadersMiddleware` for any path under `/embed`. See
+// `apps/remix/server/security-headers.ts`.
+//
+// The previous `Access-Control-Allow-*` headers here only ever applied to
+// HTML page renders, where CORS preflight does not apply, so they were a
+// no-op and have been dropped along with the rest of `headers()`.
 
 export function loader() {
   // SSR env variables.

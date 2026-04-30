@@ -2,7 +2,7 @@ import crypto from 'crypto';
 
 import { prisma } from '@documenso/prisma';
 
-import { ONE_DAY } from '../../constants/time';
+import { ONE_HOUR } from '../../constants/time';
 import { sendForgotPassword } from '../auth/send-forgot-password';
 
 export const forgotPassword = async ({ email }: { email: string }) => {
@@ -41,7 +41,7 @@ export const forgotPassword = async ({ email }: { email: string }) => {
   await prisma.passwordResetToken.create({
     data: {
       token,
-      expiry: new Date(Date.now() + ONE_DAY),
+      expiry: new Date(Date.now() + ONE_HOUR),
       userId: user.id,
     },
   });
