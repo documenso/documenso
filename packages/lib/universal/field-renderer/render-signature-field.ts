@@ -21,11 +21,22 @@ void (async () => {
 })();
 
 const getImageDimensions = (img: HTMLImageElement, fieldWidth: number, fieldHeight: number) => {
+  let imageWidth = img.width;
+  let imageHeight = img.height;
+
+  const scalingFactor = Math.min(fieldWidth / imageWidth, fieldHeight / imageHeight);
+
+  imageWidth = imageWidth * scalingFactor;
+  imageHeight = imageHeight * scalingFactor;
+
+  const imageX = (fieldWidth - imageWidth) / 2;
+  const imageY = (fieldHeight - imageHeight) / 2;
+
   return {
-    width: fieldWidth,
-    height: fieldHeight,
-    x: 0,
-    y: 0,
+    width: imageWidth,
+    height: imageHeight,
+    x: imageX,
+    y: imageY,
   };
 };
 

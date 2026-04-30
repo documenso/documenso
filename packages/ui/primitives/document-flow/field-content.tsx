@@ -158,7 +158,7 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
       <img
         src={field.signature.signatureImageAsBase64}
         alt="Signature"
-        className="h-full w-full"
+        className="h-full w-full object-contain"
       />
     );
   }
