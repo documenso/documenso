@@ -11,6 +11,18 @@ import { getRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import type { TEnvelope } from '../../types/envelope';
 import type { FieldRenderMode } from '../../universal/field-renderer/render-field';
 
+/**
+ * The signature data for an inserted signature field.
+ *
+ * Loaded separately from the envelope to avoid bloating the envelope.get response
+ * with potentially large base64 image payloads.
+ */
+export type EnvelopeRenderFieldSignature = {
+  fieldId: number;
+  signatureImageAsBase64: string | null;
+  typedSignature: string | null;
+};
+
 export type PageRenderData = {
   scale: number;
   pageIndex: number;
@@ -50,6 +62,7 @@ type EnvelopeRenderProviderValue = {
   currentEnvelopeItem: EnvelopeRenderItem | null;
   setCurrentEnvelopeItem: (envelopeItemId: string) => void;
   fields: Field[];
+  signatures: EnvelopeRenderFieldSignature[];
   recipients: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>[];
   getRecipientColorKey: (recipientId: number) => TRecipientColor;
 
@@ -88,6 +101,15 @@ interface EnvelopeRenderProviderProps {
    * Only pass if the CustomRenderer you are passing in wants fields.
    */
   fields?: Field[];
+
+  /**
+   * Optional inserted signature data for signature fields.
+   *
+   * Fetched separately from the envelope to keep the envelope response lean.
+   * If a signature field has no entry here, the renderer will fall back to
+   * showing the field type placeholder.
+   */
+  signatures?: EnvelopeRenderFieldSignature[];
 
   /**
    * Optional recipient used to determine the color of the fields and hover
@@ -137,6 +159,7 @@ export const EnvelopeRenderProvider = ({
   envelope,
   envelopeItems: envelopeItemsFromProps,
   fields,
+  signatures,
   token,
   presignToken,
   recipients = [],
@@ -212,6 +235,7 @@ export const EnvelopeRenderProvider = ({
         currentEnvelopeItem: currentItem,
         setCurrentEnvelopeItem,
         fields: fields ?? [],
+        signatures: signatures ?? [],
         recipients,
         getRecipientColorKey,
         renderError,
