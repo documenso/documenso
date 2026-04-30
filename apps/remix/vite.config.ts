@@ -16,6 +16,33 @@ const require = createRequire(import.meta.url);
 const pdfjsDistPath = path.dirname(require.resolve('pdfjs-dist/package.json'));
 const cMapsDir = normalizePath(path.join(pdfjsDistPath, 'cmaps'));
 
+const honoDevServer = serverAdapter({
+  entry: 'server/router.ts',
+  exclude: [
+    // Spread the defaults but replace the /.css$/ rule so that Bull
+    // Board's static CSS at /api/jobs/board/static/** passes through to Hono.
+    ...devServerDefaults.exclude.map((pattern) =>
+      pattern instanceof RegExp && pattern.source === '.*\\.css$'
+        ? /^(?!\/api\/jobs\/board\/).*\.css$/
+        : pattern,
+    ),
+    '/assets/**',
+    '/src/app/**',
+    /\?(?:inline|url|no-inline|raw|import(?:&(?:inline|url|no-inline|raw)?)?)$/,
+  ],
+});
+
+// Restrict @hono/vite-dev-server's full-reload to backend files. Otherwise it
+// fires on any SSR-loaded module change, which kills HMR for the entire app.
+const honoServerDir = path.resolve(__dirname, 'server') + path.sep;
+const upstreamHandleHotUpdate = honoDevServer.handleHotUpdate;
+honoDevServer.handleHotUpdate = async function (ctx) {
+  if (!ctx.file.startsWith(honoServerDir)) return;
+  return typeof upstreamHandleHotUpdate === 'function'
+    ? upstreamHandleHotUpdate.call(this, ctx)
+    : upstreamHandleHotUpdate?.handler.call(this, ctx);
+};
+
 /**
  * Note: We load the env variables externally so we can have runtime enviroment variables
  * for docker.
@@ -45,21 +72,7 @@ export default defineConfig({
     macrosPlugin(),
     lingui(),
     tsconfigPaths(),
-    serverAdapter({
-      entry: 'server/router.ts',
-      exclude: [
-        // Spread the defaults but replace the /.css$/ rule so that Bull
-        // Board's static CSS at /api/jobs/board/static/** passes through to Hono.
-        ...devServerDefaults.exclude.map((pattern) =>
-          pattern instanceof RegExp && pattern.source === '.*\\.css$'
-            ? /^(?!\/api\/jobs\/board\/).*\.css$/
-            : pattern,
-        ),
-        '/assets/**',
-        '/src/app/**',
-        /\?(?:inline|url|no-inline|raw|import(?:&(?:inline|url|no-inline|raw)?)?)$/,
-      ],
-    }),
+    honoDevServer,
   ],
   ssr: {
     noExternal: ['react-dropzone', 'plausible-tracker'],
