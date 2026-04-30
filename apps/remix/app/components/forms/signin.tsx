@@ -106,6 +106,7 @@ export const SignInForm = ({
 
   const turnstileSiteKey = env('NEXT_PUBLIC_TURNSTILE_SITE_KEY');
   const turnstileRef = useRef<TurnstileInstance>(null);
+  const twoFactorTurnstileRef = useRef<TurnstileInstance>(null);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
@@ -234,6 +235,11 @@ export const SignInForm = ({
 
       if (error.code === 'TWO_FACTOR_MISSING_CREDENTIALS') {
         setIsTwoFactorAuthenticationDialogOpen(true);
+
+        // Turnstile tokens are single-use. Clear the consumed one so the
+        // dialog's fresh widget mounts cleanly and the dialog can't be
+        // submitted with the stale token before a new one is issued.
+        setCaptchaToken(null);
         return;
       }
 
@@ -393,7 +399,7 @@ export const SignInForm = ({
             )}
           />
 
-          {turnstileSiteKey && (
+          {turnstileSiteKey && !isTwoFactorAuthenticationDialogOpen && (
             <Turnstile
               ref={turnstileRef}
               siteKey={turnstileSiteKey}
@@ -545,6 +551,21 @@ export const SignInForm = ({
                 />
               )}
 
+              {turnstileSiteKey && (
+                <div className="mt-4">
+                  <Turnstile
+                    ref={twoFactorTurnstileRef}
+                    siteKey={turnstileSiteKey}
+                    onSuccess={setCaptchaToken}
+                    onExpire={() => setCaptchaToken(null)}
+                    options={{
+                      size: 'flexible',
+                      appearance: 'interaction-only',
+                    }}
+                  />
+                </div>
+              )}
+
               <DialogFooter className="mt-4">
                 <Button
                   type="button"
@@ -558,7 +579,11 @@ export const SignInForm = ({
                   )}
                 </Button>
 
-                <Button type="submit" loading={isSubmitting}>
+                <Button
+                  type="submit"
+                  loading={isSubmitting}
+                  disabled={Boolean(turnstileSiteKey) && !captchaToken}
+                >
                   {isSubmitting ? <Trans>Signing in...</Trans> : <Trans>Sign In</Trans>}
                 </Button>
               </DialogFooter>
