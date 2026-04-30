@@ -86,6 +86,9 @@ export function FieldRootContainer({
 }: FieldRootContainerProps) {
   const [isValidating, setIsValidating] = useState(false);
   const isPageInDom = useIsPageInDom(field.page);
+  const isInsertedSignatureField =
+    field.inserted &&
+    (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE);
 
   const ref = React.useRef<HTMLDivElement>(null);
 
@@ -137,8 +140,12 @@ export function FieldRootContainer({
         data-inserted={field.inserted ? 'true' : 'false'}
         data-readonly={readonly ? 'true' : 'false'}
         className={cn(
-          'field--FieldRootContainer field-card-container dark-mode-disabled group relative z-20 flex h-full w-full items-center rounded-[2px] bg-white/90 ring-2 ring-gray-200 transition-all',
-          color?.base,
+          'field--FieldRootContainer field-card-container dark-mode-disabled group relative z-20 flex h-full w-full items-center rounded-[2px] transition-all',
+          {
+            'bg-white/90 ring-2 ring-gray-200': !isInsertedSignatureField,
+            'bg-transparent ring-0': isInsertedSignatureField,
+          },
+          !isInsertedSignatureField && color?.base,
           {
             'px-2': field.type !== FieldType.SIGNATURE && field.type !== FieldType.FREE_SIGNATURE,
             'justify-center': !field.inserted,
