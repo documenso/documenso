@@ -41,6 +41,18 @@ const getImageDimensions = (img: HTMLImageElement, fieldWidth: number, fieldHeig
 };
 
 /**
+ * The pixel ratio used when caching the signature image as an offscreen bitmap.
+ *
+ * Konva's default redraw composites the source image with low-quality scaling
+ * which makes signatures look blurry, especially when the source PNG is much
+ * larger than the field. Caching at a high pixel ratio rasterises the shape
+ * once into a sharp bitmap that is then reused on every redraw.
+ *
+ * Multiplied by `devicePixelRatio` to keep the cache crisp on retina displays.
+ */
+const SIGNATURE_IMAGE_CACHE_PIXEL_RATIO = 2;
+
+/**
  * Build a Konva.Image for a base64 signature, sized to fit within the given
  * field dimensions. Works in both browser and Node.js (via skia-canvas).
  */
@@ -64,6 +76,13 @@ const createSignatureImage = (
       image.setAttrs({
         image: img,
         ...getImageDimensions(img, fieldWidth, fieldHeight),
+      });
+
+      // Cache the image as a high-resolution bitmap so it stays sharp on
+      // redraws and zoom changes instead of being re-scaled from the source PNG
+      // every time.
+      image.cache({
+        pixelRatio: SIGNATURE_IMAGE_CACHE_PIXEL_RATIO * (window.devicePixelRatio || 1),
       });
     };
 
