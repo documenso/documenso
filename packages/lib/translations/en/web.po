@@ -1805,6 +1805,18 @@ msgstr "An error occurred while uploading your document."
 msgid "An error occurred. Please try again later."
 msgstr "An error occurred. Please try again later."
 
+#: packages/email/templates/organisation-invite-declined.tsx
+msgid "An invitation to join your organisation {organisationName} was declined"
+msgstr "An invitation to join your organisation {organisationName} was declined"
+
+#: packages/lib/jobs/definitions/emails/send-organisation-member-invite-declined-email.handler.ts
+msgid "An organisation invitation was declined"
+msgstr "An organisation invitation was declined"
+
+#: packages/email/templates/organisation-invite-declined.tsx
+msgid "An organisation invitation was declined on Documenso"
+msgstr "An organisation invitation was declined on Documenso"
+
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "An organisation wants to create an account for you. Please review the details below."
 msgstr "An organisation wants to create an account for you. Please review the details below."
@@ -4310,6 +4322,7 @@ msgstr "Don't transfer (Delete all documents)"
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/organisation-billing-invoices-table.tsx
+#: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 #: packages/email/template-components/template-document-completed.tsx
 msgid "Download"
@@ -4917,6 +4930,10 @@ msgstr "Envelope distributed"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-certificate.ts
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Envelope ID"
 msgstr "Envelope ID"
 
@@ -7673,6 +7690,10 @@ msgstr "Please confirm your email"
 msgid "Please confirm your email address"
 msgstr "Please confirm your email address"
 
+#: apps/remix/app/components/embed/embed-paywall.tsx
+msgid "Please contact <0>support</0> if you have any questions."
+msgstr "Please contact <0>support</0> if you have any questions."
+
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Please contact support if you would like to revert this action."
 msgstr "Please contact support if you would like to revert this action."
@@ -7689,8 +7710,6 @@ msgstr "Please enter a meaningful name for your token. This will help you identi
 msgid "Please enter a number"
 msgstr "Please enter a number"
 
-#: apps/remix/app/components/forms/profile.tsx
-#: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Please enter a valid name."
 msgstr "Please enter a valid name."
@@ -10772,6 +10791,10 @@ msgstr "This envelope could not be distributed at this time. Please try again."
 msgid "This envelope could not be resent at this time. Please try again."
 msgstr "This envelope could not be resent at this time. Please try again."
 
+#: apps/remix/app/components/embed/embed-paywall.tsx
+msgid "This feature is not available on your current plan"
+msgstr "This feature is not available on your current plan"
+
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
@@ -11732,10 +11755,6 @@ msgstr "User profiles are here!"
 msgid "User settings"
 msgstr "User settings"
 
-#: apps/remix/app/components/forms/signup.tsx
-msgid "User with this email already exists. Please use a different email address."
-msgstr "User with this email already exists. Please use a different email address."
-
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 msgid "Users"
@@ -12280,6 +12299,10 @@ msgstr "We were unable to copy the token to your clipboard. Please try again."
 #: apps/remix/app/components/forms/2fa/recovery-code-list.tsx
 msgid "We were unable to copy your recovery code to your clipboard. Please try again."
 msgstr "We were unable to copy your recovery code to your clipboard. Please try again."
+
+#: apps/remix/app/components/forms/signup.tsx
+msgid "We were unable to create your account. If you already have an account, try signing in instead."
+msgstr "We were unable to create your account. If you already have an account, try signing in instead."
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "We were unable to create your account. Please review the information you provided and try again."
