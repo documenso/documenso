@@ -16,6 +16,7 @@ concurrency:
 
 jobs:
   pull_translations:
+    if: false
     name: Force pull translations
     runs-on: ubuntu-latest
     environment: Translations

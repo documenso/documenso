@@ -12,6 +12,7 @@ concurrency:
 
 jobs:
   extract_translations:
+    if: false
     name: Extract and upload translations
     runs-on: ubuntu-latest
     environment: Translations
