@@ -62,6 +62,7 @@ export const duplicateEnvelope = async ({
               data: true,
               initialData: true,
               type: true,
+              originalMimeType: true,
             },
           },
         },

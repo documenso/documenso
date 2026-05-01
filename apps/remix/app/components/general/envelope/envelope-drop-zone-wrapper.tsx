@@ -15,6 +15,7 @@ import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/org
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
+import { ALLOWED_UPLOAD_MIME_TYPES } from '@documenso/lib/constants/upload';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
@@ -128,6 +129,18 @@ export const EnvelopeDropZoneWrapper = ({
           'ENVELOPE_ITEM_LIMIT_EXCEEDED',
           () => t`You have reached the limit of the number of files per envelope.`,
         )
+        .with(
+          'CONVERSION_SERVICE_UNAVAILABLE',
+          () => t`File conversion is not available. Please upload a PDF file.`,
+        )
+        .with(
+          'CONVERSION_FAILED',
+          () => t`Failed to convert file. Please try uploading a PDF instead.`,
+        )
+        .with(
+          'UNSUPPORTED_FILE_TYPE',
+          () => t`This file type is not supported. Please upload a PDF, Word document, or image.`,
+        )
         .otherwise(() => t`An error occurred during upload.`);
 
       toast({
@@ -171,9 +184,7 @@ export const EnvelopeDropZoneWrapper = ({
     });
   };
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: {
-      'application/pdf': ['.pdf'],
-    },
+    accept: ALLOWED_UPLOAD_MIME_TYPES,
     multiple: true,
     maxSize: megabytesToBytes(APP_DOCUMENT_UPLOAD_SIZE_LIMIT),
     maxFiles: maximumEnvelopeItemCount,
@@ -200,7 +211,7 @@ export const EnvelopeDropZoneWrapper = ({
             </h2>
 
             <p className="text-md mt-4 text-muted-foreground">
-              <Trans>Drag and drop your PDF file here</Trans>
+              <Trans>Drag and drop your document here</Trans>
             </p>
 
             {isUploadDisabled && IS_BILLING_ENABLED() && (

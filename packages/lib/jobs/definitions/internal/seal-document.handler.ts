@@ -497,7 +497,7 @@ const decorateAndSignPdf = async ({
       type: 'application/pdf',
       arrayBuffer: async () => Promise.resolve(pdfBytes),
     },
-    envelopeItem.documentData.initialData,
+    { initialData: envelopeItem.documentData.initialData },
   );
 
   return {

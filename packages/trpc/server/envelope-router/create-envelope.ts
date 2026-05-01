@@ -3,10 +3,14 @@ import { EnvelopeType } from '@prisma/client';
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
+import { convertToPdfIfNeeded } from '@documenso/lib/server-only/file-conversion/convert-to-pdf';
 import { extractPdfPlaceholders } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
+import {
+  putFileServerSide,
+  putPdfFileServerSide,
+} from '@documenso/lib/universal/upload/put-file.server';
 
 import { insertFormValuesInPdf } from '../../../lib/server-only/pdf/insert-form-values-in-pdf';
 import { authenticatedProcedure } from '../trpc';
@@ -97,17 +101,12 @@ export const createEnvelopeRouteCaller = async ({
     });
   }
 
-  if (files.some((file) => !file.type.startsWith('application/pdf'))) {
-    throw new AppError('INVALID_DOCUMENT_FILE', {
-      message: 'You cannot upload non-PDF files',
-      statusCode: 400,
-    });
-  }
-
-  // For each file: normalize, extract & clean placeholders, then upload.
+  // For each file: convert to PDF if needed, normalize, extract & clean placeholders, then upload.
   const envelopeItems = await Promise.all(
     files.map(async (file) => {
-      let pdf = Buffer.from(await file.arrayBuffer());
+      const { pdfBuffer, originalBuffer, originalMimeType } = await convertToPdfIfNeeded(file);
+
+      let pdf = pdfBuffer;
 
       if (formValues) {
         // eslint-disable-next-line require-atomic-updates
@@ -124,11 +123,27 @@ export const createEnvelopeRouteCaller = async ({
       // Todo: Embeds - Might need to add this for client-side embeds in the future.
       const { cleanedPdf, placeholders } = await extractPdfPlaceholders(normalized);
 
-      const { documentData } = await putPdfFileServerSide({
-        name: file.name,
-        type: 'application/pdf',
-        arrayBuffer: async () => Promise.resolve(cleanedPdf),
-      });
+      let originalData: string | undefined;
+      if (originalBuffer) {
+        const stored = await putFileServerSide({
+          name: `original-${file.name}`,
+          type: originalMimeType,
+          arrayBuffer: async () => Promise.resolve(originalBuffer),
+        });
+        originalData = stored.data;
+      }
+
+      const { documentData } = await putPdfFileServerSide(
+        {
+          name: file.name,
+          type: 'application/pdf',
+          arrayBuffer: async () => Promise.resolve(cleanedPdf),
+        },
+        {
+          originalData,
+          originalMimeType: originalBuffer ? originalMimeType : undefined,
+        },
+      );
 
       return {
         title: file.name,

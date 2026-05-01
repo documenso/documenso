@@ -8,6 +8,7 @@ import { EnvelopeType as EnvelopeTypeEnum, TemplateType as TemplateTypeEnum } fr
 import contentDisposition from 'content-disposition';
 import { type Context } from 'hono';
 
+import { getFileExtensionForMimeType } from '@documenso/lib/constants/upload';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { sha256 } from '@documenso/lib/universal/crypto';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
@@ -22,6 +23,8 @@ type HandleEnvelopeItemFileRequestOptions = {
     type: DocumentDataType;
     data: string;
     initialData: string;
+    originalData?: string | null;
+    originalMimeType?: string | null;
   };
   version: 'signed' | 'original';
   isDownload: boolean;
@@ -39,7 +42,21 @@ export const handleEnvelopeItemFileRequest = async ({
   isDownload,
   context: c,
 }: HandleEnvelopeItemFileRequestOptions) => {
-  const documentDataToUse = version === 'signed' ? documentData.data : documentData.initialData;
+  const shouldServeOriginalSourceFile =
+    version === 'original' &&
+    documentData.originalData &&
+    documentData.originalMimeType &&
+    documentData.originalMimeType !== 'application/pdf';
+
+  const documentDataToUse = shouldServeOriginalSourceFile
+    ? documentData.originalData!
+    : version === 'signed'
+      ? documentData.data
+      : documentData.initialData;
+
+  const contentType = shouldServeOriginalSourceFile
+    ? documentData.originalMimeType!
+    : 'application/pdf';
 
   const etag = Buffer.from(sha256(documentDataToUse)).toString('hex');
 
@@ -60,7 +77,7 @@ export const handleEnvelopeItemFileRequest = async ({
     return c.json({ error: 'File not found' }, 404);
   }
 
-  c.header('Content-Type', 'application/pdf');
+  c.header('Content-Type', contentType);
   c.header('ETag', etag);
 
   if (!isDownload) {
@@ -72,10 +89,17 @@ export const handleEnvelopeItemFileRequest = async ({
   }
 
   if (isDownload) {
-    // Generate filename following the pattern from envelope-download-dialog.tsx
-    const baseTitle = title.replace(/\.pdf$/, '');
-    const suffix = version === 'signed' ? '_signed.pdf' : '.pdf';
-    const filename = `${baseTitle}${suffix}`;
+    const baseTitle = title.replace(/\.[^/.]+$/, '');
+
+    let filename: string;
+    if (version === 'signed') {
+      filename = `${baseTitle}_signed.pdf`;
+    } else if (shouldServeOriginalSourceFile) {
+      const extension = getFileExtensionForMimeType(documentData.originalMimeType!);
+      filename = `${baseTitle}${extension}`;
+    } else {
+      filename = `${baseTitle}.pdf`;
+    }
 
     c.header('Content-Disposition', contentDisposition(filename));
 

@@ -13,9 +13,30 @@ type DownloadPDFProps = {
   /**
    * Specifies which version of the document to download.
    * 'signed': Downloads the signed version (default).
-   * 'original': Downloads the original version.
+   * 'original': Downloads the original version (may be DOCX, PNG, JPEG if converted).
    */
   version?: DocumentVersion;
+};
+
+const getFilenameFromContentDisposition = (header: string | null): string | null => {
+  if (!header) return null;
+
+  const filenameStarMatch = header.match(/filename\*=(?:UTF-8''|utf-8'')([^;]+)/i);
+  if (filenameStarMatch) {
+    return decodeURIComponent(filenameStarMatch[1]);
+  }
+
+  const filenameMatch = header.match(/filename="([^"]+)"/);
+  if (filenameMatch) {
+    return filenameMatch[1];
+  }
+
+  const filenameNoQuotesMatch = header.match(/filename=([^;\s]+)/);
+  if (filenameNoQuotesMatch) {
+    return filenameNoQuotesMatch[1];
+  }
+
+  return null;
 };
 
 export const downloadPDF = async ({
@@ -31,13 +52,23 @@ export const downloadPDF = async ({
     version,
   });
 
-  const blob = await fetch(downloadUrl).then(async (res) => await res.blob());
+  const response = await fetch(downloadUrl);
+  const blob = await response.blob();
 
-  const baseTitle = (fileName ?? 'document').replace(/\.pdf$/, '');
-  const suffix = version === 'signed' ? '_signed.pdf' : '.pdf';
+  const contentDisposition = response.headers.get('Content-Disposition');
+  const serverFilename = getFilenameFromContentDisposition(contentDisposition);
+
+  let filename: string;
+  if (serverFilename) {
+    filename = serverFilename;
+  } else {
+    const baseTitle = (fileName ?? 'document').replace(/\.[^/.]+$/, '');
+    const suffix = version === 'signed' ? '_signed.pdf' : '.pdf';
+    filename = `${baseTitle}${suffix}`;
+  }
 
   downloadFile({
-    filename: `${baseTitle}${suffix}`,
+    filename,
     data: blob,
   });
 };

@@ -12,18 +12,24 @@ export type CreateDocumentDataOptions = {
    * If not provided, the current data will be used.
    */
   initialData?: string;
+  originalData?: string;
+  originalMimeType?: string;
 };
 
 export const createDocumentData = async ({
   type,
   data,
   initialData,
+  originalData,
+  originalMimeType,
 }: CreateDocumentDataOptions) => {
   return await prisma.documentData.create({
     data: {
       type,
       data,
       initialData: initialData || data,
+      originalData,
+      originalMimeType,
     },
   });
 };

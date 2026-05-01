@@ -16,11 +16,17 @@ type File = {
   arrayBuffer: () => Promise<ArrayBuffer>;
 };
 
+type PutPdfFileOptions = {
+  initialData?: string;
+  originalData?: string;
+  originalMimeType?: string;
+};
+
 /**
  * Uploads a document file to the appropriate storage location and creates
  * a document data record.
  */
-export const putPdfFileServerSide = async (file: File, initialData?: string) => {
+export const putPdfFileServerSide = async (file: File, options: PutPdfFileOptions = {}) => {
   const isEncryptedDocumentsAllowed = false; // Was feature flag.
 
   const arrayBuffer = await file.arrayBuffer();
@@ -41,7 +47,13 @@ export const putPdfFileServerSide = async (file: File, initialData?: string) => 
 
   const { type, data } = await putFileServerSide(file);
 
-  const createdData = await createDocumentData({ type, data, initialData });
+  const createdData = await createDocumentData({
+    type,
+    data,
+    initialData: options.initialData,
+    originalData: options.originalData,
+    originalMimeType: options.originalMimeType,
+  });
 
   return {
     documentData: createdData,
@@ -49,16 +61,25 @@ export const putPdfFileServerSide = async (file: File, initialData?: string) => 
   };
 };
 
+type PutNormalizedPdfOptions = {
+  file: File;
+  originalData?: string;
+  originalMimeType?: string;
+  flattenForm?: boolean;
+};
+
 /**
  * Uploads a pdf file and normalizes it.
  */
-export const putNormalizedPdfFileServerSide = async (
-  file: File,
-  options: { flattenForm?: boolean } = {},
-) => {
+export const putNormalizedPdfFileServerSide = async ({
+  file,
+  originalData,
+  originalMimeType,
+  flattenForm = true,
+}: PutNormalizedPdfOptions) => {
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  const normalized = await normalizePdf(buffer, options);
+  const normalized = await normalizePdf(buffer, { flattenForm });
 
   const fileName = file.name.endsWith('.pdf') ? file.name : `${file.name}.pdf`;
 
@@ -71,6 +92,8 @@ export const putNormalizedPdfFileServerSide = async (
   return await createDocumentData({
     type: documentData.type,
     data: documentData.data,
+    originalData,
+    originalMimeType,
   });
 };
 

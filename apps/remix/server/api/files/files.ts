@@ -47,7 +47,7 @@ export const filesRoute = new Hono<HonoEnv>()
         return c.json({ error: 'File too large' }, 400);
       }
 
-      const result = await putNormalizedPdfFileServerSide(file);
+      const result = await putNormalizedPdfFileServerSide({ file });
 
       return c.json(result);
     } catch (error) {
