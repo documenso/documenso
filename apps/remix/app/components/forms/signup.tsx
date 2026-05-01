@@ -104,7 +104,7 @@ export const SignUpForm = ({
       password: '',
       signature: '',
     },
-    mode: 'onBlur',
+    mode: 'onChange',
     resolver: zodResolver(ZSignUpFormSchema),
   });
 
