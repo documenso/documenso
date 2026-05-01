@@ -3,7 +3,6 @@ name: documenso-test
 services:
   database:
     image: postgres:15
-    restart: unless-stopped
     environment:
       - POSTGRES_USER=documenso
       - POSTGRES_PASSWORD=password
@@ -18,7 +17,6 @@ services:
 
   inbucket:
     image: inbucket/inbucket
-    restart: unless-stopped
     ports:
       - 9000:9000
       - 2500:2500
@@ -28,7 +26,6 @@ services:
     build:
       context: ../../
       dockerfile: docker/Dockerfile
-    restart: unless-stopped
     depends_on:
       database:
         condition: service_healthy
