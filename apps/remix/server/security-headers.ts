@@ -19,23 +19,32 @@ const NON_PAGE_PATH_REGEX = /^(\/api\/|\/ingest\/|\/__manifest|\/assets\/|\/appl
 const EMBED_PATH_REGEX = /^\/embed(\/|\.data|$)/;
 
 /**
- * Auth pages reachable from inside an embed iframe during the
+ * Non-`/embed` page routes that customers iframe directly, plus the auth
+ * pages reachable from inside an embed iframe during the
  * reauth-as-different-account flow.
  *
+ * Signing routes (`/sign/:token`, `/d/:token`):
+ * Some customer integrations embed these URLs directly (without going
+ * through `EmbedSignDocument`). Without `frame-ancestors *` here, those
+ * integrations break with a "refused to connect" iframe error.
+ *
+ * Auth routes (`/signin`, `/forgot-password`, `/check-email`,
+ * `/unverified-account`):
  * `apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx`
  * does `window.location.href = '/signin?...'` inside the iframe when the
  * user needs to sign out and sign back in as a different account, and
  * `<SignInForm>` links/navigates to `/forgot-password`, `/check-email`, and
- * `/unverified-account` from there.
- *
- * Without `frame-ancestors *` on these routes, the customer's iframe gets
- * blocked the moment the user clicks "Login" in the reauth dialog.
+ * `/unverified-account` from there. Without `frame-ancestors *` on these
+ * routes, the customer's iframe gets blocked the moment the user clicks
+ * "Login" in the reauth dialog.
  *
  * These routes still get the strict nonced `script-src`/`style-src-elem`
- * policy — only `frame-ancestors` is relaxed.
+ * policy — only `frame-ancestors` is relaxed. The `(\/|\.data|$)` tail
+ * keeps `/sign` from matching `/signin`/`/signup` and `/d` from matching
+ * `/dashboard`.
  */
-const AUTH_FRAMEABLE_PATH_REGEX =
-  /^\/(signin|forgot-password|check-email|unverified-account)(\/|\.data|$)/;
+const FRAMEABLE_PATH_REGEX =
+  /^\/(signin|forgot-password|check-email|unverified-account|sign|d)(\/|\.data|$)/;
 
 /**
  * Hono context variable name where the per-request CSP nonce is stashed.
@@ -59,7 +68,7 @@ const generateNonce = () => {
   return btoa(binary);
 };
 
-type CspPathKind = 'embed' | 'auth' | 'default';
+type CspPathKind = 'embed' | 'frameable' | 'default';
 
 const buildCspHeader = ({ nonce, kind }: { nonce: string; kind: CspPathKind }) => {
   // `'self'` is included alongside `'strict-dynamic'` as a fallback for
@@ -87,18 +96,18 @@ const buildCspHeader = ({ nonce, kind }: { nonce: string; kind: CspPathKind }) =
   // Embeds inject customer-supplied CSS via runtime-created `<style>`
   // elements (see apps/remix/app/utils/css-vars.ts). Nonce-stamping those
   // would be brittle for white-label customers, so we accept
-  // `'unsafe-inline'` on the embed scope only. Auth pages do NOT load
-  // customer CSS and keep the strict nonced policy.
+  // `'unsafe-inline'` on the embed scope only. Frameable (auth/signing)
+  // pages do NOT load customer CSS and keep the strict nonced policy.
   if (kind === 'embed') {
     directives.push(`style-src-elem 'self' 'unsafe-inline'`);
   } else {
     directives.push(`style-src-elem 'self' 'nonce-${nonce}'`);
   }
 
-  // Embed and auth routes are both reachable from inside a customer's
-  // iframe and therefore need `frame-ancestors *`. Every other page gets
-  // clickjacking protection.
-  if (kind === 'embed' || kind === 'auth') {
+  // Embed, signing, and auth routes are all reachable from inside a
+  // customer's iframe and therefore need `frame-ancestors *`. Every other
+  // page gets clickjacking protection.
+  if (kind === 'embed' || kind === 'frameable') {
     directives.push(`frame-ancestors *`);
   } else {
     directives.push(`frame-ancestors 'self'`);
@@ -112,8 +121,8 @@ const classifyPath = (path: string): CspPathKind => {
     return 'embed';
   }
 
-  if (AUTH_FRAMEABLE_PATH_REGEX.test(path)) {
-    return 'auth';
+  if (FRAMEABLE_PATH_REGEX.test(path)) {
+    return 'frameable';
   }
 
   return 'default';
@@ -130,13 +139,16 @@ const classifyPath = (path: string): CspPathKind => {
  * Router for `<ServerRouter nonce>` and `<Scripts nonce>` etc.
  *
  * Path-aware classification:
- * - `embed`  — wildcard `frame-ancestors`, `'unsafe-inline'` style-src-elem
- *              (white-label CSS injection), strict nonced script-src.
- * - `auth`   — wildcard `frame-ancestors` only; needed because the embed
- *              reauth flow redirects the iframe to `/signin` etc. Strict
- *              nonced script-src and style-src-elem otherwise.
- * - default  — strict nonced script-src and style-src-elem,
- *              `frame-ancestors 'self'` for clickjacking protection.
+ * - `embed`     — wildcard `frame-ancestors`, `'unsafe-inline'`
+ *                 style-src-elem (white-label CSS injection), strict
+ *                 nonced script-src.
+ * - `frameable` — wildcard `frame-ancestors` only; needed because the
+ *                 embed reauth flow redirects the iframe to `/signin` etc,
+ *                 and because some customers iframe `/sign/:token` and
+ *                 `/d/:token` directly without using `EmbedSignDocument`.
+ *                 Strict nonced script-src and style-src-elem otherwise.
+ * - default     — strict nonced script-src and style-src-elem,
+ *                 `frame-ancestors 'self'` for clickjacking protection.
  */
 export const securityHeadersMiddleware = createMiddleware<HonoEnv>(async (c, next) => {
   const nonce = generateNonce();
