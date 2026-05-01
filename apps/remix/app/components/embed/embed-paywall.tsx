@@ -12,11 +12,7 @@ export const EmbedPaywall = () => {
         </p>
         <p className="mt-2 text-sm">
           <Trans>
-            Please see the{' '}
-            <Link to="https://documen.so/pricing" target="_blank">
-              pricing page
-            </Link>{' '}
-            for more information or contact{' '}
+            Please contact{' '}
             <Link to={`mailto:${SUPPORT_EMAIL}`} target="_blank">
               support
             </Link>{' '}
