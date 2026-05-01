@@ -1836,6 +1836,18 @@ msgstr "Si è verificato un errore durante l'aggiornamento del tuo profilo."
 msgid "An error occurred while uploading your document."
 msgstr "Si è verificato un errore durante il caricamento del tuo documento."
 
+#: packages/email/templates/organisation-invite-declined.tsx
+msgid "An invitation to join your organisation {organisationName} was declined"
+msgstr ""
+
+#: packages/lib/jobs/definitions/emails/send-organisation-member-invite-declined-email.handler.ts
+msgid "An organisation invitation was declined"
+msgstr ""
+
+#: packages/email/templates/organisation-invite-declined.tsx
+msgid "An organisation invitation was declined on Documenso"
+msgstr ""
+
 #: apps/remix/app/components/forms/support-ticket-form.tsx
 msgid "An error occurred. Please try again later."
 msgstr "Si è verificato un errore. Per favore riprova più tardi."

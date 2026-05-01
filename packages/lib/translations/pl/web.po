@@ -1840,6 +1840,18 @@ msgstr "Wystąpił błąd podczas przesyłania dokumentu."
 msgid "An error occurred. Please try again later."
 msgstr "Wystąpił błąd. Spróbuj ponownie później."
 
+#: packages/email/templates/organisation-invite-declined.tsx
+msgid "An invitation to join your organisation {organisationName} was declined"
+msgstr ""
+
+#: packages/lib/jobs/definitions/emails/send-organisation-member-invite-declined-email.handler.ts
+msgid "An organisation invitation was declined"
+msgstr ""
+
+#: packages/email/templates/organisation-invite-declined.tsx
+msgid "An organisation invitation was declined on Documenso"
+msgstr ""
+
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "An organisation wants to create an account for you. Please review the details below."
 msgstr "Organizacja chce utworzyć konto dla Ciebie. Sprawdź szczegóły poniżej."

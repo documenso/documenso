@@ -1836,6 +1836,18 @@ msgstr "Er is een fout opgetreden bij het bijwerken van je profiel."
 msgid "An error occurred while uploading your document."
 msgstr "Er is een fout opgetreden bij het uploaden van je document."
 
+#: packages/email/templates/organisation-invite-declined.tsx
+msgid "An invitation to join your organisation {organisationName} was declined"
+msgstr ""
+
+#: packages/lib/jobs/definitions/emails/send-organisation-member-invite-declined-email.handler.ts
+msgid "An organisation invitation was declined"
+msgstr ""
+
+#: packages/email/templates/organisation-invite-declined.tsx
+msgid "An organisation invitation was declined on Documenso"
+msgstr ""
+
 #: apps/remix/app/components/forms/support-ticket-form.tsx
 msgid "An error occurred. Please try again later."
 msgstr "Er is een fout opgetreden. Probeer het later opnieuw."
