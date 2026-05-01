@@ -1,0 +1,13 @@
+{
+  "extends": "@documenso/tsconfig/base.json",
+  "include": ["src/**/*.ts", "src/**/*.json"],
+  "exclude": ["dist", "build", "node_modules"],
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "lib": ["esnext"]
+  }
+}

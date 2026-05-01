@@ -1,0 +1,22 @@
+{
+  "name": "@documenso/acroform-field-sidecar",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "inspect": "node --experimental-strip-types ./src/cli.ts inspect",
+    "generate": "node --experimental-strip-types ./src/cli.ts generate",
+    "bind-payload": "node --experimental-strip-types ./src/cli.ts bind-payload",
+    "render-preview": "node --experimental-strip-types ./src/cli.ts render-preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@libpdf/core": "^0.3.3",
+    "pdfjs-dist": "5.4.296"
+  },
+  "devDependencies": {
+    "@documenso/tsconfig": "*",
+    "vitest": "^4.0.18"
+  }
+}
