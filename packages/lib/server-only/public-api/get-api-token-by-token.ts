@@ -66,6 +66,16 @@ export const getApiTokenByToken = async ({ token }: { token: string }) => {
       statusCode: 401,
     });
   }
+  prisma.apiToken
+    .update({
+      where: {
+        id: apiToken.id,
+      },
+      data: {
+        lastUsedAt: new Date(),
+      },
+    })
+    .catch(() => {});
 
   return {
     ...apiToken,

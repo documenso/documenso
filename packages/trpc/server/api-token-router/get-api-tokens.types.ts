@@ -9,7 +9,10 @@ export const ZGetApiTokensResponseSchema = z.array(
     id: true,
     name: true,
     createdAt: true,
+    lastUsedAt: true,
     expires: true,
+  }).extend({
+    lastUsedAt: z.coerce.date().nullable(),
   }),
 );
 
