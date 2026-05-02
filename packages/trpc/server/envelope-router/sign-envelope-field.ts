@@ -8,6 +8,7 @@ import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
+import { assertRecipientNotExpired } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 
 import { procedure } from '../trpc';
@@ -112,6 +113,8 @@ export const signEnvelopeFieldRoute = procedure
         message: `Document ${envelope.id} must be pending for signing`,
       });
     }
+
+    assertRecipientNotExpired(recipient);
 
     if (
       documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL &&

@@ -1,13 +1,15 @@
 import { Trans } from '@lingui/react/macro';
 import type { Team } from '@prisma/client';
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
 import { Link, redirect } from 'react-router';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
+import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/get-is-recipient-turn';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
+import { isRecipientExpired } from '@documenso/lib/utils/recipients';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -31,8 +33,25 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw new Response('Not Found', { status: 404 });
   }
 
-  if (document.status === DocumentStatus.COMPLETED) {
-    throw redirect(`/sign/${token}/complete`);
+  if (recipient.signingStatus === SigningStatus.REJECTED || document.status === DocumentStatus.REJECTED) {
+    throw redirect(`/sign/${token}/rejected`);
+  }
+
+  if (
+    document.status === DocumentStatus.COMPLETED ||
+    recipient.signingStatus === SigningStatus.SIGNED
+  ) {
+    throw redirect(document.documentMeta?.redirectUrl || `/sign/${token}/complete`);
+  }
+
+  if (isRecipientExpired(recipient)) {
+    throw redirect(`/sign/${token}/expired`);
+  }
+
+  const isRecipientsTurn = await getIsRecipientsTurnToSign({ token });
+
+  if (isRecipientsTurn) {
+    throw redirect(`/sign/${token}`);
   }
 
   let isOwnerOrTeamMember = false;
