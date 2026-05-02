@@ -1,6 +1,13 @@
 import { expect, test } from '@playwright/test';
-import { DocumentSigningOrder, DocumentStatus, FieldType, SigningStatus } from '@prisma/client';
+import {
+  DocumentSigningOrder,
+  DocumentStatus,
+  FieldType,
+  SendStatus,
+  SigningStatus,
+} from '@prisma/client';
 
+import { getDocumentByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { prisma } from '@documenso/prisma';
 import { seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -69,7 +76,9 @@ test.describe('Sequential Signing Order', () => {
     await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
   });
 
-  test('[SIGNING_ORDER]: second recipient cannot sign field before their turn', async ({ page }) => {
+  test('[SIGNING_ORDER]: second recipient is redirected to waiting page and cannot access signing page', async ({
+    page,
+  }) => {
     const { user, team } = await seedUser();
 
     const { document, recipients } = await seedPendingDocumentWithFullFields({
@@ -87,20 +96,21 @@ test.describe('Sequential Signing Order', () => {
       data: { signingOrder: DocumentSigningOrder.SEQUENTIAL },
     });
 
-    const signer1 = recipients[0];
     const signer2 = recipients[1];
 
-    const signatureField = signer2.fields.find((f) => f.type === FieldType.SIGNATURE);
+    await page.goto(`/sign/${signer2.token}`);
+    await page.waitForURL(`/sign/${signer2.token}/waiting`);
 
-    expect(signatureField).toBeDefined();
+    await expect(page.getByText('Waiting for Your Turn')).toBeVisible();
+    await expect(
+      page.getByText("It's currently not your turn to sign. You will receive an email"),
+    ).toBeVisible();
 
-    if (signatureField) {
-      const fieldBefore = await prisma.field.findUniqueOrThrow({
-        where: { id: signatureField.id },
-      });
+    const signer2Before = await prisma.recipient.findUniqueOrThrow({
+      where: { id: signer2.id },
+    });
 
-      expect(fieldBefore.inserted).toBe(false);
-    }
+    expect(signer2Before.signingStatus).toBe(SigningStatus.NOT_SIGNED);
   });
 
   test('[SIGNING_ORDER]: waiting page redirects to sign page when it becomes recipients turn', async ({
@@ -349,7 +359,7 @@ test.describe('V2 Envelope Expiration', () => {
 });
 
 test.describe('Sequential Signing Next Recipient Notification', () => {
-  test('[NEXT_SIGNER]: after first signer completes, second signer can access signing page', async ({
+  test('[NEXT_SIGNER]: after first signer actually completes signing, second signer can access signing page and sendStatus is updated', async ({
     page,
   }) => {
     const { user, team } = await seedUser();
@@ -372,43 +382,76 @@ test.describe('Sequential Signing Next Recipient Notification', () => {
     const signer1 = recipients[0];
     const signer2 = recipients[1];
 
-    await page.goto(`/sign/${signer2.token}`);
-    await page.waitForURL(`/sign/${signer2.token}/waiting`);
-
-    await prisma.recipient.update({
-      where: { id: signer1.id },
-      data: { signingStatus: SigningStatus.SIGNED, signedAt: new Date() },
-    });
-
-    await page.goto(`/sign/${signer2.token}`);
-
-    await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
-  });
-
-  test('[NEXT_SIGNER]: sendStatus is updated for next recipient after signing', async () => {
-    const { user, team } = await seedUser();
-
-    const { document, recipients } = await seedPendingDocumentWithFullFields({
-      owner: user,
-      recipients: [
-        'send-status1@test.documenso.com',
-        'send-status2@test.documenso.com',
-      ],
-      teamId: team.id,
-      fields: [FieldType.SIGNATURE],
-    });
-
-    await prisma.documentMeta.update({
-      where: { id: document.documentMetaId },
-      data: { signingOrder: DocumentSigningOrder.SEQUENTIAL },
-    });
-
-    const signer2 = recipients[1];
-
-    const recipientBefore = await prisma.recipient.findUniqueOrThrow({
+    const signer2Before = await prisma.recipient.findUniqueOrThrow({
       where: { id: signer2.id },
     });
 
-    expect(recipientBefore.sendStatus).not.toBe('SENT');
+    expect(signer2Before.sendStatus).not.toBe(SendStatus.SENT);
+    expect(signer2Before.signingStatus).toBe(SigningStatus.NOT_SIGNED);
+
+    await page.goto(`/sign/${signer2.token}`);
+    await page.waitForURL(`/sign/${signer2.token}/waiting`);
+
+    await expect(page.getByText('Waiting for Your Turn')).toBeVisible();
+
+    await page.goto(`/sign/${signer1.token}`);
+    await page.waitForURL(`/sign/${signer1.token}`);
+
+    await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
+
+    await signSignaturePad(page);
+
+    const signatureField = signer1.fields.find((f) => f.type === FieldType.SIGNATURE);
+
+    expect(signatureField).toBeDefined();
+
+    if (signatureField) {
+      await page.locator(`#field-${signatureField.id}`).getByRole('button').click();
+
+      await expect(page.locator(`#field-${signatureField.id}`)).toHaveAttribute(
+        'data-inserted',
+        'true',
+      );
+    }
+
+    await page.getByRole('button', { name: 'Complete' }).click();
+
+    await page.waitForTimeout(1000);
+
+    await page.getByRole('button', { name: 'Sign' }).click({ force: true });
+    await page.waitForURL(`/sign/${signer1.token}/complete`);
+
+    await expect(async () => {
+      const { status } = await getDocumentByToken({
+        token: signer1.token,
+      });
+
+      const signer1After = await prisma.recipient.findUniqueOrThrow({
+        where: { id: signer1.id },
+      });
+
+      expect(signer1After.signingStatus).toBe(SigningStatus.SIGNED);
+      expect(status).toBe(DocumentStatus.PENDING);
+    }).toPass({ timeout: 15_000 });
+
+    await expect(async () => {
+      const signer2After = await prisma.recipient.findUniqueOrThrow({
+        where: { id: signer2.id },
+      });
+
+      expect(signer2After.sendStatus).toBe(SendStatus.SENT);
+    }).toPass({ timeout: 15_000 });
+
+    await page.goto(`/sign/${signer2.token}`);
+    await page.waitForURL(`/sign/${signer2.token}`);
+
+    await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
+
+    const signer2Final = await prisma.recipient.findUniqueOrThrow({
+      where: { id: signer2.id },
+    });
+
+    expect(signer2Final.sendStatus).toBe(SendStatus.SENT);
+    expect(signer2Final.signingStatus).toBe(SigningStatus.NOT_SIGNED);
   });
 });
