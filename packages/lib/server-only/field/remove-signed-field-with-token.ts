@@ -1,6 +1,7 @@
-import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
+import { DocumentSigningOrder, DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/get-is-recipient-turn';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { assertRecipientNotExpired } from '@documenso/lib/utils/recipients';
@@ -43,7 +44,11 @@ export const removeSignedFieldWithToken = async ({
       },
     },
     include: {
-      envelope: true,
+      envelope: {
+        include: {
+          documentMeta: true,
+        },
+      },
       recipient: true,
     },
   });
@@ -59,6 +64,19 @@ export const removeSignedFieldWithToken = async ({
   }
 
   assertRecipientNotExpired(recipient);
+
+  if (
+    envelope.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL &&
+    recipient.role !== RecipientRole.ASSISTANT
+  ) {
+    const isRecipientsTurn = await getIsRecipientsTurnToSign({
+      token: recipient.token,
+    });
+
+    if (!isRecipientsTurn) {
+      throw new Error(`Recipient ${recipient.id} attempted to modify field before it was their turn`);
+    }
+  }
 
   if (
     recipient?.signingStatus === SigningStatus.SIGNED ||

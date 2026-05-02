@@ -1,4 +1,4 @@
-import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
+import { DocumentSigningOrder, DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
@@ -26,6 +26,7 @@ import {
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { assertRecipientNotExpired } from '../../utils/recipients';
+import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { validateFieldAuth } from '../document/validate-field-auth';
 
 export type SignFieldWithTokenOptions = {
@@ -85,6 +86,7 @@ export const signFieldWithToken = async ({
     include: {
       envelope: {
         include: {
+          documentMeta: true,
           recipients: true,
         },
       },
@@ -111,6 +113,19 @@ export const signFieldWithToken = async ({
   }
 
   assertRecipientNotExpired(recipient);
+
+  if (
+    envelope.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL &&
+    recipient.role !== RecipientRole.ASSISTANT
+  ) {
+    const isRecipientsTurn = await getIsRecipientsTurnToSign({
+      token: recipient.token,
+    });
+
+    if (!isRecipientsTurn) {
+      throw new Error(`Recipient ${recipient.id} attempted to sign before it was their turn`);
+    }
+  }
 
   if (
     recipient.signingStatus === SigningStatus.SIGNED ||

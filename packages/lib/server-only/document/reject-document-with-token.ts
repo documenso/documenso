@@ -1,6 +1,7 @@
-import { DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
+import { DocumentSigningOrder, DocumentStatus, EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
 
 import { jobs } from '@documenso/lib/jobs/client';
+import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/get-is-recipient-turn';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -24,14 +25,17 @@ export async function rejectDocumentWithToken({
   reason,
   requestMetadata,
 }: RejectDocumentWithTokenOptions) {
-  // Find the recipient and document in a single query
   const recipient = await prisma.recipient.findFirst({
     where: {
       token,
       envelope: unsafeBuildEnvelopeIdQuery(id, EnvelopeType.DOCUMENT),
     },
     include: {
-      envelope: true,
+      envelope: {
+        include: {
+          documentMeta: true,
+        },
+      },
     },
   });
 
@@ -51,7 +55,21 @@ export async function rejectDocumentWithToken({
 
   assertRecipientNotExpired(recipient);
 
-  // Update the recipient status to rejected
+  if (
+    envelope.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL &&
+    recipient.role !== RecipientRole.ASSISTANT
+  ) {
+    const isRecipientsTurn = await getIsRecipientsTurnToSign({
+      token: recipient.token,
+    });
+
+    if (!isRecipientsTurn) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Recipient ${recipient.id} attempted to reject before it was their turn`,
+      });
+    }
+  }
+
   const [updatedRecipient] = await prisma.$transaction([
     prisma.recipient.update({
       where: {

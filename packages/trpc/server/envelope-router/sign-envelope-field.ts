@@ -1,9 +1,10 @@
-import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
+import { DocumentSigningOrder, DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { validateFieldAuth } from '@documenso/lib/server-only/document/validate-field-auth';
+import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/get-is-recipient-turn';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
@@ -110,6 +111,21 @@ export const signEnvelopeFieldRoute = procedure
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: `Document ${envelope.id} must be pending for signing`,
       });
+    }
+
+    if (
+      documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL &&
+      recipient.role !== RecipientRole.ASSISTANT
+    ) {
+      const isRecipientsTurn = await getIsRecipientsTurnToSign({
+        token: recipient.token,
+      });
+
+      if (!isRecipientsTurn) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: `Recipient ${recipient.id} attempted to sign before it was their turn`,
+        });
+      }
     }
 
     if (
