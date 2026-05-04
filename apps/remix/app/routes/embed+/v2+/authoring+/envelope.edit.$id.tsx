@@ -314,6 +314,7 @@ const EnvelopeEditPage = ({ embedAuthoringOptions }: EnvelopeEditPageProps) => {
       mode: 'edit' as const,
       onUpdate: async (envelope: TEditorEnvelope) => updateEmbeddedEnvelope(envelope),
       brandingLogo,
+      user: embedAuthoringOptions.user,
     }),
     [token],
   );

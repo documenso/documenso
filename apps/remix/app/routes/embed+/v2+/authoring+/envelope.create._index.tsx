@@ -298,6 +298,7 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
       mode: 'create' as const,
       onCreate: async (envelope: Omit<TEditorEnvelope, 'id'>) => createEmbeddedEnvelope(envelope),
       customBrandingLogo: Boolean(teamSettings.brandingEnabled && teamSettings.brandingLogo),
+      user: embedAuthoringOptions.user,
     }),
     [token],
   );
