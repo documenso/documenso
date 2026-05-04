@@ -120,7 +120,7 @@ export function MultiSelectCombobox<T = OptionValue>({
             <AnimatePresence>
               {loading ? (
                 <div className="flex items-center justify-center">
-                  <Loader className="h-5 w-5 animate-spin text-gray-500 dark:text-gray-100" />
+                  <Loader className="h-5 w-5 animate-spin text-muted-foreground" />
                 </div>
               ) : (
                 <AnimateGenericFadeInOut className="flex w-full justify-between">
@@ -143,10 +143,10 @@ export function MultiSelectCombobox<T = OptionValue>({
         {showClearButton && !loading && (
           <div className="absolute bottom-0 right-8 top-0 flex items-center justify-center">
             <button
-              className="flex h-4 w-4 items-center justify-center rounded-full bg-gray-300 dark:bg-neutral-700"
+              className="flex h-4 w-4 items-center justify-center rounded-full bg-muted-foreground/20"
               onClick={() => onChange([])}
             >
-              <XIcon className="text-muted-foreground h-3.5 w-3.5" />
+              <XIcon className="h-3.5 w-3.5 text-muted-foreground" />
             </button>
           </div>
         )}

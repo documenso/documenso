@@ -346,7 +346,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
             <div className="mt-4">
               <ul>
                 {errors.map((error, index) => (
-                  <li className="text-sm text-red-500" key={index}>
+                  <li className="text-sm text-destructive" key={index}>
                     {error}
                   </li>
                 ))}

@@ -120,8 +120,8 @@ export const DocumentReadOnlyFields = ({
                 <div className="absolute -right-3 -top-3">
                   <PopoverHover
                     trigger={
-                      <Avatar className="h-6 w-6 border-2 border-solid border-gray-200/50 transition-colors hover:border-gray-200">
-                        <AvatarFallback className="bg-neutral-50 text-xs text-gray-400">
+                      <Avatar className="h-6 w-6 border-2 border-solid border-border/50 transition-colors hover:border-border">
+                        <AvatarFallback className="bg-muted text-[10px] text-muted-foreground">
                           {extractInitials(field.recipient.name || field.recipient.email)}
                         </AvatarFallback>
                       </Avatar>

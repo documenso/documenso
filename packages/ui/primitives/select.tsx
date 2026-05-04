@@ -32,7 +32,7 @@ const SelectTrigger = React.forwardRef<
     <AnimatePresence>
       {loading ? (
         <div className="flex w-full items-center justify-center">
-          <Loader className="h-5 w-5 animate-spin text-gray-500 dark:text-gray-100" />
+          <Loader className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
       ) : (
         <AnimateGenericFadeInOut className="flex w-full justify-between">
