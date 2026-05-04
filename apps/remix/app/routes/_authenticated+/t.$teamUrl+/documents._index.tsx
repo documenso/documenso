@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
+import type { DocumentStatus as PrismaDocumentStatus } from '@prisma/client';
 import { EnvelopeType } from '@prisma/client';
 import { FolderType, OrganisationType } from '@prisma/client';
 import { useParams, useSearchParams } from 'react-router';
@@ -25,6 +26,7 @@ import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
 import { DocumentMoveToFolderDialog } from '~/components/dialogs/document-move-to-folder-dialog';
 import { EnvelopesBulkDeleteDialog } from '~/components/dialogs/envelopes-bulk-delete-dialog';
+import { EnvelopesBulkDownloadDialog } from '~/components/dialogs/envelopes-bulk-download-dialog';
 import { EnvelopesBulkMoveDialog } from '~/components/dialogs/envelopes-bulk-move-dialog';
 import { DocumentSearch } from '~/components/general/document/document-search';
 import { DocumentStatus } from '~/components/general/document/document-status';
@@ -66,8 +68,12 @@ export default function DocumentsPage() {
     'documents-bulk-selection',
     {},
   );
+  const [envelopeMetaCache, setEnvelopeMetaCache] = useSessionStorage<
+    Record<string, { title: string; status: PrismaDocumentStatus }>
+  >('documents-bulk-selection-meta', {});
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
+  const [isBulkDownloadDialogOpen, setIsBulkDownloadDialogOpen] = useState(false);
 
   const selectedEnvelopeIds = useMemo(() => {
     return Object.keys(rowSelection).filter((id) => rowSelection[id]);
@@ -96,6 +102,41 @@ export default function DocumentsPage() {
       ...SKIP_QUERY_BATCH_META,
     },
   );
+
+  useEffect(() => {
+    setEnvelopeMetaCache((prev) => {
+      const next: Record<string, { title: string; status: PrismaDocumentStatus }> = {};
+
+      for (const id of Object.keys(prev)) {
+        if (rowSelection[id]) {
+          next[id] = prev[id];
+        }
+      }
+
+      for (const document of data?.data ?? []) {
+        if (rowSelection[document.envelopeId]) {
+          next[document.envelopeId] = {
+            title: document.title,
+            status: document.status,
+          };
+        }
+      }
+
+      return next;
+    });
+  }, [data?.data, rowSelection, setEnvelopeMetaCache]);
+
+  const selectedEnvelopesForDownload = useMemo(() => {
+    return selectedEnvelopeIds
+      .map((id) => {
+        const meta = envelopeMetaCache[id];
+        return meta ? { id, title: meta.title, status: meta.status } : null;
+      })
+      .filter(
+        (item): item is { id: string; title: string; status: PrismaDocumentStatus } =>
+          item !== null,
+      );
+  }, [selectedEnvelopeIds, envelopeMetaCache]);
 
   const getTabHref = (value: keyof typeof ExtendedDocumentStatus) => {
     const params = new URLSearchParams(searchParams);
@@ -243,9 +284,25 @@ export default function DocumentsPage() {
 
         <EnvelopesTableBulkActionBar
           selectedCount={selectedEnvelopeIds.length}
+          onDownloadClick={() => setIsBulkDownloadDialogOpen(true)}
           onMoveClick={() => setIsBulkMoveDialogOpen(true)}
           onDeleteClick={() => setIsBulkDeleteDialogOpen(true)}
           onClearSelection={() => setRowSelection({})}
+        />
+
+        <EnvelopesBulkDownloadDialog
+          envelopes={selectedEnvelopesForDownload}
+          open={isBulkDownloadDialogOpen}
+          onOpenChange={setIsBulkDownloadDialogOpen}
+          onSuccess={(successfulEnvelopeIds) => {
+            setRowSelection((prev) => {
+              const next = { ...prev };
+              for (const id of successfulEnvelopeIds) {
+                delete next[id];
+              }
+              return next;
+            });
+          }}
         />
 
         <EnvelopesBulkMoveDialog
