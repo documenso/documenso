@@ -1,6 +1,6 @@
 import Konva from 'konva';
 
-import { DEFAULT_SIGNATURE_TEXT_FONT_SIZE } from '../../constants/pdf';
+import { DEFAULT_SIGNATURE_TEXT_FONT_SIZE, SIGNATURE_FONT_FAMILY } from '../../constants/pdf';
 import { AppError } from '../../errors/app-error';
 import {
   createFieldHoverInteraction,
@@ -168,7 +168,7 @@ const createFieldSignature = (
     wrap: 'char',
     text: textToRender,
     fontSize,
-    fontFamily: 'Caveat, sans-serif',
+    fontFamily: SIGNATURE_FONT_FAMILY,
     align: 'center',
     width: fieldWidth,
     height: fieldHeight,

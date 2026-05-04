@@ -15,6 +15,7 @@ import { renderSVG } from 'uqr';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { APP_I18N_OPTIONS } from '../../constants/i18n';
+import { SIGNATURE_FONT_FAMILY } from '../../constants/pdf';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_SIGNING_REASONS,
@@ -306,7 +307,7 @@ const renderColumnTwo = (options: RenderColumnOptions) => {
         x: 2,
         text: recipient.signatureField?.signature?.typedSignature,
         padding: 4,
-        fontFamily: 'Caveat',
+        fontFamily: SIGNATURE_FONT_FAMILY,
         fontSize: 16,
         align: 'center',
         verticalAlign: 'middle',
