@@ -8,6 +8,7 @@ import { Copy, Sparkles } from 'lucide-react';
 import { FaXTwitter } from 'react-icons/fa6';
 
 import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
+import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { generateTwitterIntent } from '@documenso/lib/universal/generate-twitter-intent';
@@ -27,18 +28,20 @@ import { useToast } from '../../primitives/use-toast';
 
 export type DocumentShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
   token?: string;
-  documentId: number;
+  envelopeId: string;
   trigger?: (_props: { loading: boolean; disabled: boolean }) => React.ReactNode;
 };
 
 export const DocumentShareButton = ({
   token,
-  documentId,
+  envelopeId,
   className,
   trigger,
 }: DocumentShareButtonProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { sessionData } = useOptionalSession();
+  const isLoggedIn = Boolean(sessionData?.user);
 
   const { copyShareLink, createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink({
     onSuccess: () =>
@@ -57,6 +60,13 @@ export const DocumentShareButton = ({
 
   const [isOpen, setIsOpen] = useState(false);
 
+  const { data: qrData, isFetching: isFetchingQrCode } = trpc.envelope.getQrCode.useQuery(
+    { envelopeId },
+    {
+      enabled: isLoggedIn && Boolean(envelopeId) && isOpen,
+    },
+  );
+
   const {
     mutateAsync: createOrGetShareLink,
     data: shareLink,
@@ -65,13 +75,17 @@ export const DocumentShareButton = ({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   });
 
-  const isLoading = isCreatingOrGettingShareLink || isCopyingShareLink;
+  const displaySlug = qrData?.shareToken ?? null ?? shareLink?.slug;
+  const previewUrl =
+    qrData?.qrCodeUrl ?? (displaySlug ? `${NEXT_PUBLIC_WEBAPP_URL()}/share/${displaySlug}` : null);
+
+  const isLoading = isCreatingOrGettingShareLink || isCopyingShareLink || isFetchingQrCode;
 
   const onOpenChange = (nextOpen: boolean) => {
     if (nextOpen) {
       void createOrGetShareLink({
         token,
-        documentId,
+        envelopeId,
       });
     }
 
@@ -79,12 +93,12 @@ export const DocumentShareButton = ({
   };
 
   const onCopyClick = async () => {
-    if (shareLink) {
-      await copyShareLink(`${NEXT_PUBLIC_WEBAPP_URL()}/share/${shareLink.slug}`);
+    if (displaySlug) {
+      await copyShareLink(`${NEXT_PUBLIC_WEBAPP_URL()}/share/${displaySlug}`);
     } else {
       await createAndCopyShareLink({
         token,
-        documentId,
+        envelopeId,
       });
     }
 
@@ -92,16 +106,18 @@ export const DocumentShareButton = ({
   };
 
   const onTweetClick = async () => {
-    let { slug = '' } = shareLink || {};
+    let slug = displaySlug ?? '';
 
     if (!slug) {
       const result = await createOrGetShareLink({
         token,
-        documentId,
+        envelopeId,
       });
 
       slug = result.slug;
     }
+
+    const url = `${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}`;
 
     // Ensuring we've prewarmed the opengraph image for the Twitter
     await fetch(`${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}/opengraph`, {
@@ -112,7 +128,7 @@ export const DocumentShareButton = ({
     window.open(
       generateTwitterIntent(
         `I just ${token ? 'signed' : 'sent'} a document in style with @documenso. Check it out!`,
-        `${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}`,
+        url,
       ),
       '_blank',
     );
@@ -124,12 +140,12 @@ export const DocumentShareButton = ({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
         {trigger?.({
-          disabled: !documentId,
+          disabled: !envelopeId,
           loading: isLoading,
         }) || (
           <Button
             variant="outline"
-            disabled={!token || !documentId}
+            disabled={!envelopeId}
             className={cn('h-11 w-full max-w-lg flex-1', className)}
             loading={isLoading}
           >
@@ -162,22 +178,22 @@ export const DocumentShareButton = ({
             <span className="mt-2 block" />
             <span
               className={cn('break-all font-medium text-blue-400', {
-                'animate-pulse': !shareLink?.slug,
+                'animate-pulse': !displaySlug,
               })}
             >
-              {NEXT_PUBLIC_WEBAPP_URL()}/share/{shareLink?.slug || '...'}
+              {previewUrl ?? '...'}
             </span>
             <div
               className={cn(
                 'mt-4 aspect-[1200/630] overflow-hidden rounded-lg border bg-muted/40',
                 {
-                  'animate-pulse': !shareLink?.slug,
+                  'animate-pulse': !displaySlug,
                 },
               )}
             >
-              {shareLink?.slug && (
+              {displaySlug && (
                 <img
-                  src={`${NEXT_PUBLIC_WEBAPP_URL()}/share/${shareLink.slug}/opengraph`}
+                  src={`${NEXT_PUBLIC_WEBAPP_URL()}/share/${displaySlug}/opengraph`}
                   alt="sharing link"
                   className="h-full w-full object-cover"
                 />

@@ -188,7 +188,7 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
         />
 
         <DocumentShareButton
-          documentId={mapSecondaryIdToDocumentId(envelope.secondaryId)}
+          envelopeId={envelope.id}
           token={isOwner ? undefined : recipient?.token}
           trigger={({ loading, disabled }) => (
             <DropdownMenuItem disabled={disabled || isDraft} onSelect={(e) => e.preventDefault()}>

@@ -18,7 +18,13 @@ export const ZGetDocumentRequestSchema = z.object({
   documentId: z.number(),
 });
 
-export const ZGetDocumentResponseSchema = ZDocumentSchema;
+export const ZGetDocumentResponseSchema = ZDocumentSchema.extend({
+  shareURL: z
+    .string()
+    .describe('Share URL (read-only). Null unless the envelope status is COMPLETED.')
+    .url()
+    .nullable(),
+});
 
 export type TGetDocumentRequest = z.infer<typeof ZGetDocumentRequestSchema>;
 export type TGetDocumentResponse = z.infer<typeof ZGetDocumentResponseSchema>;

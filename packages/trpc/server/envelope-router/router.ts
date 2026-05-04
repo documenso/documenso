@@ -27,6 +27,7 @@ import { getEditorEnvelopeRoute } from './get-editor-envelope';
 import { getEnvelopeRoute } from './get-envelope';
 import { getEnvelopeItemsRoute } from './get-envelope-items';
 import { getEnvelopeItemsByTokenRoute } from './get-envelope-items-by-token';
+import { getEnvelopeQrCodeRoute } from './get-envelope-qrcode';
 import { getEnvelopesByIdsRoute } from './get-envelopes-by-ids';
 import { redistributeEnvelopeRoute } from './redistribute-envelope';
 import { replaceEnvelopeItemPdfRoute } from './replace-envelope-item-pdf';
@@ -98,4 +99,5 @@ export const envelopeRouter = router({
   distribute: distributeEnvelopeRoute,
   redistribute: redistributeEnvelopeRoute,
   signingStatus: signingStatusEnvelopeRoute,
+  getQrCode: getEnvelopeQrCodeRoute,
 });

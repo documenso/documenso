@@ -1,5 +1,6 @@
-import { EnvelopeType } from '@prisma/client';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getMultipleEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelopes-by-ids';
 import { mapEnvelopesToDocumentMany } from '@documenso/lib/utils/document';
 import { prisma } from '@documenso/prisma';
@@ -60,6 +61,16 @@ export const getDocumentsByIdsRoute = authenticatedProcedure
     });
 
     return {
-      data: envelopes.map((envelope) => mapEnvelopesToDocumentMany(envelope)),
+      data: envelopes.map((envelope) => {
+        const document = mapEnvelopesToDocumentMany(envelope);
+
+        return {
+          ...document,
+          shareURL:
+            envelope.status === DocumentStatus.COMPLETED && envelope.qrToken
+              ? `${NEXT_PUBLIC_WEBAPP_URL()}/share/${envelope.qrToken}`
+              : null,
+        };
+      }),
     };
   });

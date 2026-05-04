@@ -128,6 +128,7 @@ export const mapEnvelopesToDocumentMany = (
     status: envelope.status,
     source: envelope.source,
     externalId: envelope.externalId,
+    qrToken: envelope.status === 'COMPLETED' ? envelope.qrToken : null,
     userId: envelope.userId,
     authOptions: envelope.authOptions,
     formValues: envelope.formValues,

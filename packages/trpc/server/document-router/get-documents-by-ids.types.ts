@@ -19,7 +19,15 @@ export const ZGetDocumentsByIdsRequestSchema = z.object({
 });
 
 export const ZGetDocumentsByIdsResponseSchema = z.object({
-  data: z.array(ZDocumentManySchema),
+  data: z.array(
+    ZDocumentManySchema.extend({
+      shareURL: z
+        .string()
+        .describe('Share URL (read-only). Null unless the envelope status is COMPLETED.')
+        .url()
+        .nullable(),
+    }),
+  ),
 });
 
 export type TGetDocumentsByIdsRequest = z.infer<typeof ZGetDocumentsByIdsRequestSchema>;
