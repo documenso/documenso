@@ -121,44 +121,23 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
-      <Link to={templateRootPath} className="flex items-center text-documenso-700 hover:opacity-80">
-        <ChevronLeft className="mr-2 inline-block h-5 w-5" />
-        <Trans>Templates</Trans>
-      </Link>
+      <div className="flex flex-row justify-between">
+        <Link
+          to={templateRootPath}
+          className="flex items-center text-documenso-700 hover:opacity-80"
+        >
+          <ChevronLeft className="mr-2 inline-block h-5 w-5" />
+          <Trans>Templates</Trans>
+        </Link>
 
-      <div className="flex flex-row justify-between truncate">
-        <div>
-          <h1
-            className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
-            title={envelope.title}
-          >
-            {envelope.title}
-          </h1>
-
-          <div className="mt-2.5 flex items-center">
-            <TemplateType
-              inheritColor
-              className="text-muted-foreground"
-              type={envelope.templateType}
-            />
-
-            {envelope.directLink?.token && (
-              <TemplateDirectLinkBadge
-                className="ml-4"
-                token={envelope.directLink.token}
-                enabled={envelope.directLink.enabled}
-              />
-            )}
-          </div>
-        </div>
-
-        <div className="mt-2 flex flex-row space-x-4 sm:mt-0 sm:self-end">
+        <div className="flex shrink-0 flex-row space-x-4">
           {isOwnTeamTemplate && (
             <>
               <TemplateDirectLinkDialog
                 templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
                 directLink={envelope.directLink}
                 recipients={envelope.recipients}
+                triggerSizeVariant="sm"
               />
 
               <TemplateBulkSendDialog
@@ -166,13 +145,35 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
                 recipients={envelope.recipients}
               />
 
-              <Button className="w-full" asChild>
+              <Button asChild size="sm">
                 <Link to={`${templateRootPath}/${envelope.id}/edit`}>
                   <LucideEdit className="mr-1.5 h-3.5 w-3.5" />
                   <Trans>Edit Template</Trans>
                 </Link>
               </Button>
             </>
+          )}
+        </div>
+      </div>
+
+      <div className="min-w-0">
+        <h1 className="mt-4 block text-2xl font-semibold md:text-3xl" title={envelope.title}>
+          {envelope.title}
+        </h1>
+
+        <div className="mt-2.5 flex items-center">
+          <TemplateType
+            inheritColor
+            className="text-muted-foreground"
+            type={envelope.templateType}
+          />
+
+          {envelope.directLink?.token && (
+            <TemplateDirectLinkBadge
+              className="ml-4"
+              token={envelope.directLink.token}
+              enabled={envelope.directLink.enabled}
+            />
           )}
         </div>
       </div>
@@ -247,20 +248,18 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
                   <Trans>Template</Trans>
                 </h3>
 
-                {isOwnTeamTemplate && (
-                  <div>
-                    <TemplatesTableActionDropdown
-                      row={{
-                        ...envelope,
-                        id: mapSecondaryIdToTemplateId(envelope.secondaryId),
-                        envelopeId: envelope.id,
-                      }}
-                      teamId={team?.id}
-                      templateRootPath={templateRootPath}
-                      onDelete={async () => navigate(templateRootPath)}
-                    />
-                  </div>
-                )}
+                <div>
+                  <TemplatesTableActionDropdown
+                    row={{
+                      ...envelope,
+                      id: mapSecondaryIdToTemplateId(envelope.secondaryId),
+                      envelopeId: envelope.id,
+                    }}
+                    teamId={team?.id}
+                    templateRootPath={templateRootPath}
+                    onDelete={async () => navigate(templateRootPath)}
+                  />
+                </div>
               </div>
 
               <p className="mt-2 px-4 text-sm text-muted-foreground">

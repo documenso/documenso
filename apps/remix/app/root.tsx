@@ -27,6 +27,7 @@ import { GenericErrorLayout } from './components/general/generic-error-layout';
 import { langCookie } from './storage/lang-cookie.server';
 import { themeSessionResolver } from './storage/theme-session.server';
 import { appMetaTags } from './utils/meta';
+import { nonce } from './utils/nonce';
 
 export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: stylesheet }];
 
@@ -41,7 +42,7 @@ export function meta() {
  */
 export const shouldRevalidate = () => false;
 
-export async function loader({ request }: Route.LoaderArgs) {
+export async function loader({ context, request }: Route.LoaderArgs) {
   const session = await getOptionalSession(request);
 
   const { getTheme } = await themeSessionResolver(request);
@@ -67,6 +68,10 @@ export async function loader({ request }: Route.LoaderArgs) {
       lang,
       theme: getTheme(),
       disableAnimations,
+      // Surface the per-request CSP nonce produced by `securityHeadersMiddleware` so all
+      // SSR-rendered <script>/<style> elements in this layout (and child
+      // routes that need it) can carry the matching nonce attribute.
+      nonce: context.nonce,
       session: session.isAuthenticated
         ? {
             user: session.user,
@@ -95,8 +100,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export function LayoutContent({ children }: { children: React.ReactNode }) {
-  const { publicEnv, session, lang, disableAnimations, ...data } =
-    useLoaderData<typeof loader>() || {};
+  const {
+    publicEnv,
+    session,
+    lang,
+    disableAnimations,
+    nonce: cspNonce,
+    ...data
+  } = useLoaderData<typeof loader>() || {};
 
   const [theme] = useTheme();
 
@@ -111,12 +122,13 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="google" content="notranslate" />
         <Meta />
-        <Links />
+        <Links nonce={nonce(cspNonce)} />
         <meta name="google" content="notranslate" />
-        <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} />
+        <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} nonce={nonce(cspNonce)} />
 
         {disableAnimations && (
           <style
+            nonce={nonce(cspNonce)}
             dangerouslySetInnerHTML={{
               __html: `*, *::before, *::after { animation: none !important; transition: none !important; }`,
             }}
@@ -124,7 +136,7 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
         )}
 
         {/* Fix: https://stackoverflow.com/questions/21147149/flash-of-unstyled-content-fouc-in-firefox-only-is-ff-slow-renderer */}
-        <script>0</script>
+        <script nonce={nonce(cspNonce)}>0</script>
       </head>
       <body>
         {/* Global license banner currently disabled. Need to wait until after a few releases. */}
@@ -152,13 +164,14 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
         </NuqsAdapter>
 
         <script
+          nonce={nonce(cspNonce)}
           dangerouslySetInnerHTML={{
             __html: `window.__ENV__ = ${JSON.stringify(publicEnv)}`,
           }}
         />
 
-        <ScrollRestoration />
-        <Scripts />
+        <ScrollRestoration nonce={nonce(cspNonce)} />
+        <Scripts nonce={nonce(cspNonce)} />
       </body>
     </html>
   );

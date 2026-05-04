@@ -20,6 +20,11 @@ export const run = async ({
       signingStatus: SigningStatus.NOT_SIGNED,
       sendStatus: SendStatus.SENT,
       role: { not: RecipientRole.CC },
+      // Skip recipients whose signing deadline has passed. `expiresAt`
+      // is the source of truth — the expiration sweep asynchronously
+      // sets `expirationNotifiedAt`, so filtering on `expiresAt` also
+      // covers the window before the expiration sweep runs.
+      OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
       envelope: {
         status: DocumentStatus.PENDING,
         deletedAt: null,
