@@ -150,7 +150,11 @@ export const DocumentUploadButtonLegacy = ({
           'ENVELOPE_ITEM_LIMIT_EXCEEDED',
           () => msg`You have reached the limit of the number of files per envelope.`,
         )
-        .otherwise(() => msg`An error occurred while uploading your document.`);
+        .otherwise(() =>
+          error.userMessage
+            ? msg`${error.userMessage}`
+            : msg`An error occurred while uploading your document.`,
+        );
 
       toast({
         title: _(msg`Error`),

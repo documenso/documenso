@@ -21,6 +21,7 @@ export enum AppErrorCode {
   'TOO_MANY_REQUESTS' = 'TOO_MANY_REQUESTS',
   'TWO_FACTOR_AUTH_FAILED' = 'TWO_FACTOR_AUTH_FAILED',
   'WEBHOOK_INVALID_REQUEST' = 'WEBHOOK_INVALID_REQUEST',
+  'SECURITY_CHECK_FAILED' = 'SECURITY_CHECK_FAILED',
 }
 
 export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; status: number }> =
@@ -39,6 +40,7 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
     [AppErrorCode.SCHEMA_FAILED]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
     [AppErrorCode.TOO_MANY_REQUESTS]: { code: 'TOO_MANY_REQUESTS', status: 429 },
     [AppErrorCode.TWO_FACTOR_AUTH_FAILED]: { code: 'UNAUTHORIZED', status: 401 },
+    [AppErrorCode.SECURITY_CHECK_FAILED]: { code: 'BAD_REQUEST', status: 400 },
   };
 
 export const ZAppErrorJsonSchema = z.object({
@@ -222,7 +224,12 @@ export class AppError extends Error {
     const error = AppError.parseError(err);
 
     const status = match(error.code)
-      .with(AppErrorCode.INVALID_BODY, AppErrorCode.INVALID_REQUEST, () => 400 as const)
+      .with(
+        AppErrorCode.INVALID_BODY,
+        AppErrorCode.INVALID_REQUEST,
+        AppErrorCode.SECURITY_CHECK_FAILED,
+        () => 400 as const,
+      )
       .with(AppErrorCode.UNAUTHORIZED, () => 401 as const)
       .with(AppErrorCode.NOT_FOUND, () => 404 as const)
       .otherwise(() => 500 as const);
@@ -230,7 +237,7 @@ export class AppError extends Error {
     return {
       status,
       body: {
-        message: status !== 500 ? error.message : 'Something went wrong',
+        message: status !== 500 ? error.userMessage || error.message : 'Something went wrong',
       },
     };
   }
