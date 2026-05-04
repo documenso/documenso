@@ -2,6 +2,7 @@ import { Trans } from '@lingui/react/macro';
 import { OrganisationMemberInviteStatus } from '@prisma/client';
 import { Link } from 'react-router';
 
+import { jobs } from '@documenso/lib/jobs/client';
 import { prisma } from '@documenso/prisma';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -44,6 +45,13 @@ export async function loader({ params }: Route.LoaderArgs) {
         status: OrganisationMemberInviteStatus.DECLINED,
       },
     });
+    await jobs.triggerJob({
+      name: 'send.organisation-member-declined.email',
+      payload: {
+        organisationId: organisationMemberInvite.organisationId,
+        memberEmail: organisationMemberInvite.email,
+      },
+    });
   }
 
   return {
@@ -63,7 +71,7 @@ export default function DeclineInvitationPage({ loaderData }: Route.ComponentPro
             <Trans>Invalid token</Trans>
           </h1>
 
-          <p className="text-muted-foreground mb-4 mt-2 text-sm">
+          <p className="mb-4 mt-2 text-sm text-muted-foreground">
             <Trans>This token is invalid or has expired. No action is needed.</Trans>
           </p>
 
@@ -83,7 +91,7 @@ export default function DeclineInvitationPage({ loaderData }: Route.ComponentPro
         <Trans>Invitation declined</Trans>
       </h1>
 
-      <p className="text-muted-foreground mb-4 mt-2 text-sm">
+      <p className="mb-4 mt-2 text-sm text-muted-foreground">
         <Trans>
           You have declined the invitation from <strong>{data.organisationName}</strong> to join
           their organisation.
