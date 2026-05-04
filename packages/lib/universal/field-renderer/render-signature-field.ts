@@ -24,7 +24,7 @@ const getImageDimensions = (img: HTMLImageElement, fieldWidth: number, fieldHeig
   let imageWidth = img.width;
   let imageHeight = img.height;
 
-  const scalingFactor = Math.min(fieldWidth / imageWidth, fieldHeight / imageHeight, 1);
+  const scalingFactor = Math.min(fieldWidth / imageWidth, fieldHeight / imageHeight);
 
   imageWidth = imageWidth * scalingFactor;
   imageHeight = imageHeight * scalingFactor;

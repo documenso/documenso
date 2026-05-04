@@ -40,15 +40,96 @@ const loadImage = async (file: File | undefined): Promise<HTMLImageElement> => {
   });
 };
 
+const getSignatureImageBounds = (image: HTMLImageElement): DOMRect | null => {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+  if (!ctx) {
+    return null;
+  }
+
+  canvas.width = image.naturalWidth || image.width;
+  canvas.height = image.naturalHeight || image.height;
+
+  ctx.drawImage(image, 0, 0);
+
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+
+  let minX = canvas.width;
+  let minY = canvas.height;
+  let maxX = 0;
+  let maxY = 0;
+
+  for (let y = 0; y < canvas.height; y++) {
+    for (let x = 0; x < canvas.width; x++) {
+      const index = (y * canvas.width + x) * 4;
+      const red = data[index];
+      const green = data[index + 1];
+      const blue = data[index + 2];
+      const alpha = data[index + 3];
+
+      const isTransparent = alpha <= 10;
+      const isNearWhite = red > 245 && green > 245 && blue > 245;
+
+      if (!isTransparent && !isNearWhite) {
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+      }
+    }
+  }
+
+  if (minX > maxX || minY > maxY) {
+    return null;
+  }
+
+  return new DOMRect(minX, minY, maxX - minX + 1, maxY - minY + 1);
+};
+
+const getCroppedSignatureDataUrl = (image: HTMLImageElement): string => {
+  const sourceBounds =
+    getSignatureImageBounds(image) ?? new DOMRect(0, 0, image.width, image.height);
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) {
+    throw new Error('Canvas context is not available.');
+  }
+
+  canvas.width = sourceBounds.width;
+  canvas.height = sourceBounds.height;
+
+  ctx.drawImage(
+    image,
+    sourceBounds.x,
+    sourceBounds.y,
+    sourceBounds.width,
+    sourceBounds.height,
+    0,
+    0,
+    sourceBounds.width,
+    sourceBounds.height,
+  );
+
+  return canvas.toDataURL();
+};
+
 const loadImageOntoCanvas = (
   image: HTMLImageElement,
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
 ): ImageData => {
-  const scale = Math.min((canvas.width * 0.8) / image.width, (canvas.height * 0.8) / image.height);
+  const sourceBounds =
+    getSignatureImageBounds(image) ?? new DOMRect(0, 0, image.width, image.height);
 
-  const x = (canvas.width - image.width * scale) / 2;
-  const y = (canvas.height - image.height * scale) / 2;
+  const scale = Math.min(canvas.width / sourceBounds.width, canvas.height / sourceBounds.height);
+
+  const targetWidth = sourceBounds.width * scale;
+  const targetHeight = sourceBounds.height * scale;
+  const x = (canvas.width - targetWidth) / 2;
+  const y = (canvas.height - targetHeight) / 2;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -56,7 +137,17 @@ const loadImageOntoCanvas = (
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
 
-  ctx.drawImage(image, x, y, image.width * scale, image.height * scale);
+  ctx.drawImage(
+    image,
+    sourceBounds.x,
+    sourceBounds.y,
+    sourceBounds.width,
+    sourceBounds.height,
+    x,
+    y,
+    targetWidth,
+    targetHeight,
+  );
 
   ctx.restore();
 
@@ -91,7 +182,7 @@ export const SignaturePadUpload = ({
       if (!ctx) return;
 
       $imageData.current = loadImageOntoCanvas(img, $el.current, ctx);
-      onChange?.($el.current.toDataURL());
+      onChange?.(getCroppedSignatureDataUrl(img));
     } catch (error) {
       console.error(error);
     }
@@ -107,14 +198,14 @@ export const SignaturePadUpload = ({
     if ($el.current && value) {
       const ctx = $el.current.getContext('2d');
 
-      const { width, height } = $el.current;
-
       const img = new Image();
 
       img.onload = () => {
-        ctx?.drawImage(img, 0, 0, Math.min(width, img.width), Math.min(height, img.height));
+        if (!$el.current || !ctx) {
+          return;
+        }
 
-        const defaultImageData = ctx?.getImageData(0, 0, width, height) || null;
+        const defaultImageData = loadImageOntoCanvas(img, $el.current, ctx);
 
         $imageData.current = defaultImageData;
       };
