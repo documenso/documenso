@@ -1,0 +1,151 @@
+---
+title: Redact
+description: Permanently remove sensitive content from a PDF before sending it for signing.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Overview
+
+Redaction lets you mark regions of a PDF to be permanently removed before the document is distributed to recipients. Unlike drawing a black rectangle on top of content — which leaves the underlying text in the file and recoverable by any PDF parser — Documenso performs **true redaction**: the entire affected page is rasterized and the redaction regions are painted solid black into the pixels. The original text, annotations, and form data on that page are no longer in the PDF in any form.
+
+Redactions are applied exactly once, at the moment you send the document. Before that, they're editable and reversible. After that, they're permanent.
+
+<Callout type="warn">
+  Redaction is a one-way operation. Once you send a document with redactions, the original content is
+  destroyed and cannot be recovered — not by you, not by support, not by re-downloading. Review
+  carefully before sending.
+</Callout>
+
+## Add a Redaction
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Open the document in the editor
+
+Upload your PDF and proceed to the **Add Fields** step as you would for any document.
+
+</Step>
+
+<Step>
+### Click the Redact button
+
+Scroll the sidebar below the field palette to find the **Redact** section. Click the **Redact** button — the cursor becomes a small black preview rectangle that follows your mouse over the document.
+
+</Step>
+
+<Step>
+### Click to place
+
+Click anywhere on the document to drop a redaction at that position. The redaction appears as a solid black rectangle labelled "REDACTED".
+
+</Step>
+
+<Step>
+### Adjust size and position
+
+Click the redaction to select it. Drag the rectangle to reposition, or drag the corner handles to resize so it fully covers the content you want removed.
+
+</Step>
+</Steps>
+
+<Callout type="info">
+  You can place as many redactions as you need, across any pages of any document in the envelope.
+  Redactions are saved automatically as you place, move, and resize them.
+</Callout>
+
+## Move, Resize, and Delete
+
+<Tabs items={['Move', 'Resize', 'Delete']}>
+<Tab value="Move">
+
+Click a placed redaction to select it, then drag it to a new position. Redactions cannot be dragged outside the page bounds.
+
+</Tab>
+<Tab value="Resize">
+
+Click to select the redaction, then drag any of the corner handles. Make the rectangle large enough to fully cover the content you want removed — pixels just outside the edge are still visible in the final PDF.
+
+</Tab>
+<Tab value="Delete">
+
+Click the redaction to select it, then click the trash button that appears below it. Deletion is immediate and only applies while the document is still a draft.
+
+</Tab>
+</Tabs>
+
+## What Gets Removed
+
+When you send the document, Documenso applies redactions by rasterizing every affected page and baking the black rectangles into the image. As a side effect of this approach:
+
+- **Text operators on redacted pages are removed.** Text cannot be selected, copied, or extracted by any tool (`pdftotext`, search-in-viewer, screen readers, AI extraction).
+- **The entire page becomes an image.** Unredacted regions of a redacted page are also converted to pixels — they lose vector fidelity and are no longer searchable.
+- **Pages without redactions are untouched.** Their text stays selectable and the file stays small.
+- **Form fields, annotations, and layers on redacted pages are flattened before redaction**, so form values that could have contained the redacted text are erased along with everything else.
+- **Document metadata is stripped.** Title, Author, Subject, Keywords, Creator, Producer, embedded file attachments, and any JavaScript triggers are removed from the output regardless of which pages were redacted.
+- **The stored original is overwritten.** Both `data` and `initialData` on the document are replaced with the redacted version, so even an administrative reseal operation cannot resurrect the unredacted original.
+
+<Callout type="info">
+  Because the entire redacted page is rasterized, file size grows for affected pages. For most
+  documents this is negligible, but heavy documents with many redacted pages may see a noticeable
+  increase.
+</Callout>
+
+## When Redactions Are Applied
+
+Redactions are applied during the DRAFT → PENDING transition — that is, the moment you click **Send**. The sequence is:
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### You click Send
+
+The document's status is still `DRAFT`. Recipients have not yet been notified.
+
+</Step>
+
+<Step>
+### Redactions are baked in
+
+For every page that has one or more redactions, Documenso renders the page, paints the redaction regions as solid black, and replaces the page in the PDF. Document metadata is stripped.
+
+</Step>
+
+<Step>
+### Document data is overwritten
+
+The redacted PDF replaces both the current and the original stored copies. The in-progress redaction markers are deleted because they've been fulfilled.
+
+</Step>
+
+<Step>
+### Recipients are notified
+
+Only now are signing invitations sent. The recipients receive the redacted PDF — they never have access to the unredacted version.
+
+</Step>
+</Steps>
+
+## Best Practices
+
+- **Redact generously.** Leave a small margin around sensitive content. If text clips the edge of a redaction box by even a pixel, it may remain legible in the rasterized output.
+- **Verify before sending.** Placed redactions are editable up until you click Send. Use the editor preview to confirm each redaction covers what you expect.
+- **Verify after sending.** Download the distributed PDF from your envelope list and check that the redactions landed correctly — try selecting text on redacted pages (you shouldn't be able to) and search for redacted terms in the file.
+- **Keep your working copy.** If you need the unredacted original for your own records, save a copy before uploading — Documenso deliberately destroys the original as part of the guarantee that recipients never see it.
+
+## Limitations
+
+- **Documents only.** Redactions are not available on templates in this release.
+- **No reversal.** Once sent, redactions are permanent. There is no un-redact path.
+- **Entire page rasterized.** Redactions cause the whole page to become an image, not just the marked rectangles.
+- **One appearance.** Redaction rectangles are always solid black with a "REDACTED" label. Color, reason codes, and per-recipient redactions are not configurable in this release.
+
+---
+
+## See Also
+
+- [Add Fields](/docs/users/documents/add-fields) — place signature and data-entry fields for recipients
+- [Send Documents](/docs/users/documents/send) — send the document and trigger redaction

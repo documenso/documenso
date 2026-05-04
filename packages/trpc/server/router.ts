@@ -10,6 +10,7 @@ import { folderRouter } from './folder-router/router';
 import { organisationRouter } from './organisation-router/router';
 import { profileRouter } from './profile-router/router';
 import { recipientRouter } from './recipient-router/router';
+import { redactionRouter } from './redaction-router/router';
 import { teamRouter } from './team-router/router';
 import { templateRouter } from './template-router/router';
 import { router } from './trpc';
@@ -22,6 +23,7 @@ export const appRouter = router({
   profile: profileRouter,
   document: documentRouter,
   field: fieldRouter,
+  redaction: redactionRouter,
   folder: folderRouter,
   recipient: recipientRouter,
   admin: adminRouter,

@@ -19,10 +19,13 @@ import { getRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import type { TDocumentEmailSettings } from '../../types/document-email';
+import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { formatDocumentsPath, formatTemplatesPath } from '../../utils/teams';
 import { useEditorFields } from '../hooks/use-editor-fields';
 import type { TLocalField } from '../hooks/use-editor-fields';
 import { useEditorRecipients } from '../hooks/use-editor-recipients';
+import { useEditorRedactions } from '../hooks/use-editor-redactions';
+import type { TLocalRedaction } from '../hooks/use-editor-redactions';
 import { useEnvelopeAutosave } from '../hooks/use-envelope-autosave';
 
 export type EnvelopeEditorStep = 'upload' | 'addFields' | 'preview';
@@ -47,6 +50,7 @@ type EnvelopeEditorProviderValue = {
   getRecipientColorKey: (recipientId: number) => TRecipientColor;
 
   editorFields: ReturnType<typeof useEditorFields>;
+  editorRedactions: ReturnType<typeof useEditorRedactions>;
   editorRecipients: ReturnType<typeof useEditorRecipients>;
 
   isAutosaving: boolean;
@@ -147,6 +151,182 @@ export const EnvelopeEditorProvider = ({
   const setRecipientsMutation = trpc.envelope.recipient.set.useMutation();
   const setFieldsMutation = trpc.envelope.field.set.useMutation();
   const updateEnvelopeMutation = trpc.envelope.update.useMutation();
+
+  const createRedactionsMutation = trpc.redaction.createDocumentRedactions.useMutation();
+  const updateRedactionsMutation = trpc.redaction.updateDocumentRedactions.useMutation();
+  const deleteRedactionMutation = trpc.redaction.deleteDocumentRedaction.useMutation();
+
+  // Ref used to break the circular dependency between `handleRedactionsUpdate`
+  // (which needs to call `setRedactionIdByFormId` to attach server ids) and
+  // `useEditorRedactions` (which needs `handleRedactionsUpdate` at creation time).
+  const editorRedactionsRef = useRef<ReturnType<typeof useEditorRedactions> | null>(null);
+
+  // FormIds for redactions whose CREATE mutation is currently in flight. We
+  // filter these out of `toCreate` on subsequent handler calls so a drag or
+  // resize during placement doesn't fire a second create for the same formId
+  // (the real user sees one visual redaction; two server rows for it would
+  // force a stale delete on the next action).
+  const pendingCreateFormIdsRef = useRef<Set<string>>(new Set());
+
+  const handleRedactionsUpdate = useCallback(
+    async (next: TLocalRedaction[]) => {
+      if (isEmbedded) {
+        // Embedded mode doesn't persist redactions to our backend; noop.
+        return;
+      }
+
+      const documentId = mapSecondaryIdToDocumentId(envelopeRef.current.secondaryId);
+      const persisted = envelopeRef.current.redactions ?? [];
+
+      const toCreate = next.filter(
+        (r) => r.id === undefined && !pendingCreateFormIdsRef.current.has(r.formId),
+      );
+
+      const nextIds = new Set(next.filter((r) => r.id !== undefined).map((r) => r.id as number));
+      const toDelete = persisted.filter((p) => !nextIds.has(p.id)).map((p) => p.id);
+
+      // Diff for geometry changes on rows that already exist on the server.
+      // Redaction update calls fire from drag-end / transform-end (see
+      // use-editor-redactions.ts), so one mutation per user action is fine —
+      // no debouncing required here.
+      const EPSILON = 0.0001;
+      const hasChanged = (a: (typeof persisted)[number], b: TLocalRedaction) =>
+        a.page !== b.page ||
+        Math.abs(Number(a.positionX) - b.positionX) > EPSILON ||
+        Math.abs(Number(a.positionY) - b.positionY) > EPSILON ||
+        Math.abs(Number(a.width) - b.width) > EPSILON ||
+        Math.abs(Number(a.height) - b.height) > EPSILON;
+
+      const toUpdate = next
+        .filter((r): r is TLocalRedaction & { id: number } => r.id !== undefined)
+        .map((r) => {
+          const match = persisted.find((p) => p.id === r.id);
+          return match && hasChanged(match, r) ? r : null;
+        })
+        .filter((r): r is TLocalRedaction & { id: number } => r !== null);
+
+      try {
+        if (toCreate.length > 0) {
+          toCreate.forEach((r) => pendingCreateFormIdsRef.current.add(r.formId));
+
+          let created;
+          try {
+            created = await createRedactionsMutation.mutateAsync({
+              documentId,
+              redactions: toCreate.map((r) => ({
+                envelopeItemId: r.envelopeItemId,
+                page: r.page,
+                positionX: r.positionX,
+                positionY: r.positionY,
+                width: r.width,
+                height: r.height,
+              })),
+            });
+          } finally {
+            toCreate.forEach((r) => pendingCreateFormIdsRef.current.delete(r.formId));
+          }
+
+          // Attach the server ids to the local records WITHOUT re-entering
+          // `handleRedactionsUpdate` — bookkeeping only, not a user edit.
+          created.redactions.forEach((serverRedaction, i) => {
+            const local = toCreate[i];
+            editorRedactionsRef.current?.setRedactionIdByFormId(local.formId, serverRedaction.id);
+          });
+
+          // Mirror the server rows into envelopeRef so subsequent diffs are correct.
+          setEnvelope((prev) => ({
+            ...prev,
+            redactions: [
+              ...(prev.redactions ?? []),
+              ...created.redactions.map((r) => ({
+                id: r.id,
+                secondaryId: r.secondaryId,
+                envelopeId: envelopeRef.current.id,
+                envelopeItemId: r.envelopeItemId,
+                page: r.page,
+                positionX: new Prisma.Decimal(r.positionX),
+                positionY: new Prisma.Decimal(r.positionY),
+                width: new Prisma.Decimal(r.width),
+                height: new Prisma.Decimal(r.height),
+              })),
+            ],
+          }));
+        }
+
+        if (toUpdate.length > 0) {
+          await updateRedactionsMutation.mutateAsync({
+            documentId,
+            redactions: toUpdate.map((r) => ({
+              id: r.id,
+              page: r.page,
+              positionX: r.positionX,
+              positionY: r.positionY,
+              width: r.width,
+              height: r.height,
+            })),
+          });
+
+          // Mirror updates into envelopeRef so subsequent diffs are correct.
+          setEnvelope((prev) => ({
+            ...prev,
+            redactions: (prev.redactions ?? []).map((p) => {
+              const updated = toUpdate.find((u) => u.id === p.id);
+
+              if (!updated) {
+                return p;
+              }
+
+              return {
+                ...p,
+                page: updated.page,
+                positionX: new Prisma.Decimal(updated.positionX),
+                positionY: new Prisma.Decimal(updated.positionY),
+                width: new Prisma.Decimal(updated.width),
+                height: new Prisma.Decimal(updated.height),
+              };
+            }),
+          }));
+        }
+
+        if (toDelete.length > 0) {
+          await Promise.all(
+            toDelete.map(async (id) =>
+              deleteRedactionMutation.mutateAsync({ documentId, redactionId: id }),
+            ),
+          );
+
+          setEnvelope((prev) => ({
+            ...prev,
+            redactions: (prev.redactions ?? []).filter((r) => !toDelete.includes(r.id)),
+          }));
+        }
+      } catch (err) {
+        console.error(err);
+        setAutosaveError(true);
+        toast({
+          title: t`Save failed`,
+          description: t`We encountered an error while saving your redactions. Your changes cannot be saved at this time.`,
+          variant: 'destructive',
+          duration: 7500,
+        });
+      }
+    },
+    [
+      isEmbedded,
+      createRedactionsMutation,
+      updateRedactionsMutation,
+      deleteRedactionMutation,
+      toast,
+      t,
+    ],
+  );
+
+  const editorRedactions = useEditorRedactions({
+    initialRedactions: envelope.redactions,
+    handleRedactionsUpdate,
+  });
+
+  editorRedactionsRef.current = editorRedactions;
 
   /**
    * Handles debouncing the recipients updates to the server.
@@ -386,6 +566,7 @@ export const EnvelopeEditorProvider = ({
       });
 
       editorFields.resetForm(fetchedEnvelopeData.data.fields);
+      editorRedactions.resetForm(fetchedEnvelopeData.data.redactions);
     }
   };
 
@@ -449,6 +630,7 @@ export const EnvelopeEditorProvider = ({
     });
 
     editorFields.resetForm(envelopeRef.current.fields);
+    editorRedactions.resetForm(envelopeRef.current.redactions);
   };
 
   const flushAutosave = async (): Promise<TEditorEnvelope> => {
@@ -482,6 +664,7 @@ export const EnvelopeEditorProvider = ({
         setRecipientsDebounced,
         setRecipientsAsync,
         editorFields,
+        editorRedactions,
         editorRecipients,
         autosaveError,
         flushAutosave,
