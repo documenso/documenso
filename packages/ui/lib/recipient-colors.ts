@@ -1,7 +1,7 @@
 import { colord } from 'colord';
 import { once } from 'remeda';
 
-export type TRecipientColor = 'readOnly' | (typeof AVAILABLE_RECIPIENT_COLORS)[number];
+export type TRecipientColor = 'readOnly' | 'required' | (typeof AVAILABLE_RECIPIENT_COLORS)[number];
 
 export type RecipientColorStyles = {
   base: string;
@@ -33,6 +33,7 @@ const RECIPIENT_COLOR_STYLES: Record<TRecipientColor, () => RecipientColorStyles
       'ring-2 ring-recipient-green shadow-[0_0_0_5px_hsl(var(--recipient-green)/10%),0_0_0_2px_hsl(var(--recipient-green)/60%),0_0_0_0.5px_hsl(var(--recipient-green))]',
     comboBoxItem: '',
   }),
+  required: once(() => generateStyles('red')),
   green: once(() => generateStyles('green')),
   blue: once(() => generateStyles('blue')),
   purple: once(() => generateStyles('purple')),
@@ -41,7 +42,7 @@ const RECIPIENT_COLOR_STYLES: Record<TRecipientColor, () => RecipientColorStyles
   pink: once(() => generateStyles('pink')),
 };
 
-const generateStyles = (recipientColor: TRecipientColor): RecipientColorStyles => {
+const generateStyles = (recipientColor: TCssVarRecipientColor): RecipientColorStyles => {
   const { bg, border, ring, text } = CSS_PROPERTY;
   const { active, hover, groupHover, groupHoverFieldItem } = CSS_VARIANT;
 
@@ -79,9 +80,13 @@ const CSS_VARIANT = {
 
 const AVAILABLE_RECIPIENT_COLORS = ['green', 'blue', 'purple', 'orange', 'yellow', 'pink'] as const;
 
+const CSS_VAR_RECIPIENT_COLORS = [...AVAILABLE_RECIPIENT_COLORS, 'red'] as const;
+
+type TCssVarRecipientColor = (typeof CSS_VAR_RECIPIENT_COLORS)[number];
+
 export const RECIPIENT_DYNAMIC_CLASS = {
   pattern: new RegExp(
-    `(${Object.values(CSS_PROPERTY).join('|')})-recipient-(${AVAILABLE_RECIPIENT_COLORS.join('|')})(\\/(15|30))?$`,
+    `(${Object.values(CSS_PROPERTY).join('|')})-recipient-(${CSS_VAR_RECIPIENT_COLORS.join('|')})(\\/(15|30))?$`,
   ),
   variants: Object.values(CSS_VARIANT),
 };
