@@ -42,12 +42,12 @@ export class InngestJobProvider extends BaseJobProvider {
 
     const fn = this._client.createFunction(
       {
-        id: job.id,
+      id: job.id,
         name: job.name,
         optimizeParallelism: job.optimizeParallelism ?? false,
-      },
-      triggerConfig,
-      async (ctx) => {
+      triggers: [triggerConfig],
+    },
+    async (ctx) => {
         const io = this.convertInngestIoToJobRunIo(ctx);
 
         // We need to cast to any so we can deal with parsing later.
