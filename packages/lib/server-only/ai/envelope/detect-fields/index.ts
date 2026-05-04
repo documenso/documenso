@@ -10,7 +10,7 @@ import { getFileServerSide } from '../../../../universal/upload/get-file.server'
 import { resizeImageToGeminiImage } from '../../../../utils/images/resize-image-to-gemini-image';
 import { getEnvelopeById } from '../../../envelope/get-envelope-by-id';
 import { createEnvelopeRecipients } from '../../../recipient/create-envelope-recipients';
-import { vertex } from '../../google';
+import { getAIModel, getAIProviderOptions } from '../../provider';
 import { pdfToImages } from '../../pdf-to-images';
 import {
   buildRecipientContextMessage,
@@ -286,18 +286,12 @@ const detectFieldsFromPage = async ({
   });
 
   const result = await generateObject({
-    model: vertex('gemini-3-flash-preview'),
+    model: getAIModel(),
     system: SYSTEM_PROMPT,
     schema: ZSubmitDetectedFieldsInputSchema,
     messages,
     temperature: 0.5,
-    providerOptions: {
-      google: {
-        thinkingConfig: {
-          thinkingLevel: 'low',
-        },
-      },
-    },
+    providerOptions: getAIProviderOptions(),
   });
 
   if (!result.object) {
