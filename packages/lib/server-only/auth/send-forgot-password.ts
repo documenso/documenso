@@ -16,27 +16,39 @@ export interface SendForgotPasswordOptions {
 }
 
 export const sendForgotPassword = async ({ userId }: SendForgotPasswordOptions) => {
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-    include: {
-      passwordResetTokens: {
-        orderBy: {
-          createdAt: 'desc',
-        },
-        take: 1,
-      },
-    },
-  });
+  let user;
 
-  if (!user) {
-    throw new Error('User not found');
+  try {
+    user = await prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      include: {
+        passwordResetTokens: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+          take: 1,
+        },
+      },
+    });
+  } catch (error) {
+    throw error;
   }
 
-  const token = user.passwordResetTokens[0].token;
+  if (!user) {
+    return;
+  }
+
+  const token = user.passwordResetTokens?.[0]?.token;
+
+  if (!token) {
+    return;
+  }
+
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
-  const resetPasswordLink = `${NEXT_PUBLIC_WEBAPP_URL()}/reset-password/${token}`;
+
+  const resetPasswordLink = `${assetBaseUrl}/reset-password/${token}`;
 
   const template = createElement(ForgotPasswordTemplate, {
     assetBaseUrl,
