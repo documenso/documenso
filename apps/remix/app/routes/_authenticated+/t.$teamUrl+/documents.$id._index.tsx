@@ -62,6 +62,17 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
     },
   );
 
+  const { data: fieldSignatures } = trpc.envelope.field.getSignatures.useQuery(
+    {
+      envelopeId: params.id,
+    },
+    {
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+      enabled:
+        envelope && envelope.internalVersion === 2 && envelope.status === DocumentStatus.PENDING,
+    },
+  );
+
   if (isLoadingEnvelope) {
     return (
       <div className="flex w-screen flex-col items-center justify-center gap-2 py-64 text-foreground">
@@ -159,6 +170,7 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
               envelopeItems={envelope.envelopeItems}
               token={undefined}
               fields={envelope.fields}
+              signatures={fieldSignatures}
               recipients={envelope.recipients}
               overrideSettings={{
                 showRecipientSigningStatus: true,
