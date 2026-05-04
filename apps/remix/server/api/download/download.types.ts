@@ -2,17 +2,24 @@ import { z } from 'zod';
 
 export const ZDownloadEnvelopeItemRequestParamsSchema = z.object({
   envelopeItemId: z.string().describe('The ID of the envelope item to download.'),
+});
+
+export const ZDownloadEnvelopeItemRequestQuerySchema = z.object({
   version: z
-    .enum(['original', 'signed'])
+    .enum(['original', 'signed', 'pending'])
     .optional()
     .default('signed')
     .describe(
-      'The version of the envelope item to download. "signed" returns the completed document with signatures, "original" returns the original uploaded document.',
+      'The version of the envelope item to download. "signed" returns the completed document with signatures, "original" returns the original uploaded document, "pending" returns a watermarked draft with inserted fields while the envelope is pending.',
     ),
 });
 
 export type TDownloadEnvelopeItemRequestParams = z.infer<
   typeof ZDownloadEnvelopeItemRequestParamsSchema
+>;
+
+export type TDownloadEnvelopeItemRequestQuery = z.infer<
+  typeof ZDownloadEnvelopeItemRequestQuerySchema
 >;
 
 export const ZDownloadDocumentRequestParamsSchema = z.object({

@@ -18,9 +18,9 @@ export const downloadEnvelopeItemMeta: TrpcRouteMeta = {
 export const ZDownloadEnvelopeItemRequestSchema = z.object({
   envelopeItemId: z.string().describe('The ID of the envelope item to download.'),
   version: z
-    .enum(['original', 'signed'])
+    .enum(['original', 'signed', 'pending'])
     .describe(
-      'The version of the envelope item to download. "signed" returns the completed document with signatures, "original" returns the original uploaded document.',
+      'The version of the envelope item to download. "signed" returns the completed document with signatures, "original" returns the original uploaded document, "pending" returns a watermarked draft with inserted fields while the envelope is pending.',
     )
     .default('signed'),
 });

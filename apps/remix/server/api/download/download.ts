@@ -9,10 +9,14 @@ import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
 import type { HonoEnv } from '../../router';
-import { handleEnvelopeItemFileRequest } from '../files/files.helpers';
+import {
+  handleEnvelopeItemFileRequest,
+  handlePartialEnvelopeItemFileRequest,
+} from '../files/files.helpers';
 import {
   ZDownloadDocumentRequestParamsSchema,
   ZDownloadEnvelopeItemRequestParamsSchema,
+  ZDownloadEnvelopeItemRequestQuerySchema,
 } from './download.types';
 
 export const downloadRoute = new Hono<HonoEnv>()
@@ -23,11 +27,13 @@ export const downloadRoute = new Hono<HonoEnv>()
   .get(
     '/envelope/item/:envelopeItemId/download',
     sValidator('param', ZDownloadEnvelopeItemRequestParamsSchema),
+    sValidator('query', ZDownloadEnvelopeItemRequestQuerySchema),
     async (c) => {
       const logger = c.get('logger');
 
       try {
-        const { envelopeItemId, version } = c.req.valid('param');
+        const { envelopeItemId } = c.req.valid('param');
+        const { version } = c.req.valid('query');
         const authorizationHeader = c.req.header('authorization');
 
         // Support for both "Authorization: Bearer api_xxx" and "Authorization: api_xxx"
@@ -65,7 +71,16 @@ export const downloadRoute = new Hono<HonoEnv>()
             },
           },
           include: {
-            envelope: true,
+            envelope: {
+              include: {
+                recipients: {
+                  select: {
+                    role: true,
+                    signingStatus: true,
+                  },
+                },
+              },
+            },
             documentData: true,
           },
         });
@@ -78,11 +93,21 @@ export const downloadRoute = new Hono<HonoEnv>()
           return c.json({ error: 'Document data not found' }, 404);
         }
 
+        if (version === 'pending') {
+          return await handlePartialEnvelopeItemFileRequest({
+            title: envelopeItem.title,
+            envelopeItemId: envelopeItem.id,
+            envelope: envelopeItem.envelope,
+            documentData: envelopeItem.documentData,
+            context: c,
+          });
+        }
+
         return await handleEnvelopeItemFileRequest({
           title: envelopeItem.title,
           status: envelopeItem.envelope.status,
           documentData: envelopeItem.documentData,
-          version: version || 'signed',
+          version,
           isDownload: true,
           context: c,
         });
@@ -94,7 +119,16 @@ export const downloadRoute = new Hono<HonoEnv>()
             return c.json({ error: error.message }, 401);
           }
 
-          return c.json({ error: error.message }, 400);
+          const { status } = AppError.toRestAPIError(error);
+
+          return c.json(
+            {
+              code: error.code,
+              message: error.message,
+              status,
+            },
+            status,
+          );
         }
 
         return c.json({ error: 'Internal server error' }, 500);
