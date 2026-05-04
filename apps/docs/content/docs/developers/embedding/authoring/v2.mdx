@@ -102,17 +102,18 @@ const EnvelopeEditor = ({ presignToken, envelopeId }) => {
 
 ### All V2 Authoring Components
 
-| Prop               | Type      | Required | Description                                              |
-| ------------------ | --------- | -------- | -------------------------------------------------------- |
-| `presignToken`     | `string`  | Yes      | Authentication token from your backend                   |
-| `externalId`       | `string`  | No       | Your reference ID to link with the envelope              |
-| `host`             | `string`  | No       | Custom host URL. Defaults to `https://app.documenso.com` |
-| `css`              | `string`  | No       | Custom CSS string (Platform Plan)                        |
-| `cssVars`          | `object`  | No       | [CSS variable](/docs/developers/embedding/css-variables) overrides (Platform Plan) |
-| `darkModeDisabled` | `boolean` | No       | Disable dark mode (Platform Plan)                        |
-| `language`         | `string`  | No       | Set the UI language. See [Supported Languages](https://github.com/documenso/documenso/tree/main/packages/lib/constants/locales.ts) |
-| `className`        | `string`  | No       | CSS class for the iframe                                 |
-| `features`         | `object`  | No       | Feature toggles for the authoring experience             |
+| Prop             | Type      | Required | Description                                              |
+| ---------------- | --------- | -------- | -------------------------------------------------------- |
+| `presignToken`   | `string`  | Yes      | Authentication token from your backend                   |
+| `externalId`     | `string`  | No       | Your reference ID to link with the envelope              |
+| `host`           | `string`  | No       | Custom host URL. Defaults to `https://app.documenso.com` |
+| `css`            | `string`  | No       | Custom CSS string (Platform Plan)                        |
+| `cssVars`        | `object`  | No       | [CSS variable](/docs/developers/embedding/css-variables) overrides (Platform Plan) |
+| `darkModeDisabled` | `boolean` | No     | Disable dark mode (Platform Plan)                        |
+| `language`       | `string`  | No       | Set the UI language. See [Supported Languages](https://github.com/documenso/documenso/tree/main/packages/lib/constants/locales.ts) |
+| `className`      | `string`  | No       | CSS class for the iframe                                 |
+| `user`           | `object`  | No       | Current user info. When provided, enables the "Add Myself" button in the recipients list. Object with optional `email` and `name` fields |
+| `features`       | `object`  | No       | Feature toggles for the authoring experience             |
 
 ### Create Component Only
 
