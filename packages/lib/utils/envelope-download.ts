@@ -4,12 +4,16 @@ import type { DocumentDataVersion } from '@documenso/lib/types/document';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 
+/**
+ * `pending` is only supported when there is no recipient token (team/owner-side downloads
+ * via the session-authed file route). The recipient-token route does not accept `pending`.
+ */
 export type EnvelopeItemPdfUrlOptions =
   | {
       type: 'download';
       envelopeItem: Pick<EnvelopeItem, 'id' | 'envelopeId'>;
       token: string | undefined;
-      version: 'original' | 'signed';
+      version: 'original' | 'signed' | 'pending';
       presignToken?: undefined;
     }
   | {

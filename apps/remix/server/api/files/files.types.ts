@@ -56,7 +56,7 @@ export type TGetEnvelopeItemFileTokenRequestParams = z.infer<
 export const ZGetEnvelopeItemFileDownloadRequestParamsSchema = z.object({
   envelopeId: z.string().min(1),
   envelopeItemId: z.string().min(1),
-  version: z.enum(['signed', 'original']).default('signed'),
+  version: z.enum(['signed', 'original', 'pending']).default('signed'),
 });
 
 export type TGetEnvelopeItemFileDownloadRequestParams = z.infer<

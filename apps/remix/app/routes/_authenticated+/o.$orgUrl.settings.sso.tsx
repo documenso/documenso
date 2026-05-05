@@ -51,6 +51,7 @@ const ZProviderFormSchema = ZUpdateOrganisationAuthenticationPortalRequestSchema
     clientId: true,
     autoProvisionUsers: true,
     defaultOrganisationRole: true,
+    allowPersonalOrganisations: true,
   })
   .extend({
     clientSecret: z.string().nullable(),
@@ -120,6 +121,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
       autoProvisionUsers: authenticationPortal.autoProvisionUsers,
       defaultOrganisationRole: authenticationPortal.defaultOrganisationRole,
       allowedDomains: authenticationPortal.allowedDomains.join(' '),
+      allowPersonalOrganisations: authenticationPortal.allowPersonalOrganisations,
     },
   });
 
@@ -161,6 +163,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
           autoProvisionUsers: values.autoProvisionUsers,
           defaultOrganisationRole: values.defaultOrganisationRole,
           allowedDomains: values.allowedDomains.split(' ').filter(Boolean),
+          allowPersonalOrganisations: values.allowPersonalOrganisations,
         },
       });
 
@@ -389,6 +392,30 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
               </FormItem>
             )}
           /> */}
+
+          <FormField
+            control={form.control}
+            name="allowPersonalOrganisations"
+            render={({ field }) => (
+              <FormItem className="flex items-center justify-between rounded-lg border px-4 py-3">
+                <div className="space-y-0.5">
+                  <FormLabel>
+                    <Trans>Allow Personal Organisations</Trans>
+                  </FormLabel>
+                  <p className="text-sm text-muted-foreground">
+                    <Trans>
+                      When enabled, users signing in via SSO for the first time will also receive
+                      their own personal organisation.
+                    </Trans>
+                  </p>
+                </div>
+                <FormControl>
+                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}
