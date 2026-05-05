@@ -150,66 +150,101 @@ export const filesRoute = new Hono<HonoEnv>()
     '/envelope/:envelopeId/envelopeItem/:envelopeItemId/download/:version?',
     sValidator('param', ZGetEnvelopeItemFileDownloadRequestParamsSchema),
     async (c) => {
-      const { envelopeId, envelopeItemId, version } = c.req.valid('param');
+      const logger = c.get('logger');
 
-      const session = await getOptionalSession(c);
+      try {
+        const { envelopeId, envelopeItemId, version } = c.req.valid('param');
 
-      if (!session.user) {
-        return c.json({ error: 'Unauthorized' }, 401);
-      }
+        const session = await getOptionalSession(c);
 
-      const envelope = await prisma.envelope.findFirst({
-        where: {
-          id: envelopeId,
-        },
-        include: {
-          envelopeItems: {
-            where: {
-              id: envelopeItemId,
+        if (!session.user) {
+          return c.json({ error: 'Unauthorized' }, 401);
+        }
+
+        const envelope = await prisma.envelope.findFirst({
+          where: {
+            id: envelopeId,
+          },
+          include: {
+            envelopeItems: {
+              where: {
+                id: envelopeItemId,
+              },
+              include: {
+                documentData: true,
+              },
             },
-            include: {
-              documentData: true,
+            recipients: {
+              select: {
+                role: true,
+                signingStatus: true,
+              },
             },
           },
-        },
-      });
+        });
 
-      if (!envelope) {
-        return c.json({ error: 'Envelope not found' }, 404);
+        if (!envelope) {
+          return c.json({ error: 'Envelope not found' }, 404);
+        }
+
+        const [envelopeItem] = envelope.envelopeItems;
+
+        if (!envelopeItem) {
+          return c.json({ error: 'Envelope item not found' }, 404);
+        }
+
+        const hasDownloadAccess = await checkEnvelopeFileAccess({
+          userId: session.user.id,
+          teamId: envelope.teamId,
+          envelopeType: envelope.type,
+          templateType: envelope.templateType,
+        });
+
+        if (!hasDownloadAccess) {
+          return c.json(
+            {
+              error: 'User does not have access to the team that this envelope is associated with',
+            },
+            403,
+          );
+        }
+
+        if (!envelopeItem.documentData) {
+          return c.json({ error: 'Document data not found' }, 404);
+        }
+
+        const baseOptions = {
+          title: envelopeItem.title,
+          documentData: envelopeItem.documentData,
+          isDownload: true,
+          context: c,
+        } as const;
+
+        if (version === 'pending') {
+          return await handleEnvelopeItemFileRequest({
+            ...baseOptions,
+            version,
+            envelopeItemId: envelopeItem.id,
+            envelope,
+          });
+        }
+
+        return await handleEnvelopeItemFileRequest({
+          ...baseOptions,
+          version,
+          status: envelope.status,
+        });
+      } catch (error) {
+        logger.error(error);
+
+        if (error instanceof AppError) {
+          const { status, body } = AppError.toRestAPIError(error);
+
+          return c.json({ error: body.message, code: error.code }, status);
+        }
+
+        return c.json({ error: 'Internal server error' }, 500);
       }
-
-      const [envelopeItem] = envelope.envelopeItems;
-
-      if (!envelopeItem) {
-        return c.json({ error: 'Envelope item not found' }, 404);
-      }
-
-      const hasDownloadAccess = await checkEnvelopeFileAccess({
-        userId: session.user.id,
-        teamId: envelope.teamId,
-        envelopeType: envelope.type,
-        templateType: envelope.templateType,
-      });
-
-      if (!hasDownloadAccess) {
-        return c.json(
-          { error: 'User does not have access to the team that this envelope is associated with' },
-          403,
-        );
-      }
-
-      if (!envelopeItem.documentData) {
-        return c.json({ error: 'Document data not found' }, 404);
-      }
-
-      return await handleEnvelopeItemFileRequest({
-        title: envelopeItem.title,
-        status: envelope.status,
-        documentData: envelopeItem.documentData,
-        version,
-        isDownload: true,
-        context: c,
-      });
     },
   )
   .get(

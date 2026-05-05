@@ -13,6 +13,7 @@ import { handleEnvelopeItemFileRequest } from '../files/files.helpers';
 import {
   ZDownloadDocumentRequestParamsSchema,
   ZDownloadEnvelopeItemRequestParamsSchema,
+  ZDownloadEnvelopeItemRequestQuerySchema,
 } from './download.types';
 
 export const downloadRoute = new Hono<HonoEnv>()
@@ -23,11 +24,13 @@ export const downloadRoute = new Hono<HonoEnv>()
   .get(
     '/envelope/item/:envelopeItemId/download',
     sValidator('param', ZDownloadEnvelopeItemRequestParamsSchema),
+    sValidator('query', ZDownloadEnvelopeItemRequestQuerySchema),
     async (c) => {
       const logger = c.get('logger');
 
       try {
-        const { envelopeItemId, version } = c.req.valid('param');
+        const { envelopeItemId } = c.req.valid('param');
+        const { version } = c.req.valid('query');
         const authorizationHeader = c.req.header('authorization');
 
         // Support for both "Authorization: Bearer api_xxx" and "Authorization: api_xxx"
@@ -65,7 +68,16 @@ export const downloadRoute = new Hono<HonoEnv>()
             },
           },
           include: {
-            envelope: true,
+            envelope: {
+              include: {
+                recipients: {
+                  select: {
+                    role: true,
+                    signingStatus: true,
+                  },
+                },
+              },
+            },
             documentData: true,
           },
         });
@@ -78,23 +90,36 @@ export const downloadRoute = new Hono<HonoEnv>()
           return c.json({ error: 'Document data not found' }, 404);
         }
 
-        return await handleEnvelopeItemFileRequest({
+        const baseOptions = {
           title: envelopeItem.title,
-          status: envelopeItem.envelope.status,
           documentData: envelopeItem.documentData,
-          version: version || 'signed',
           isDownload: true,
           context: c,
+        } as const;
+
+        if (version === 'pending') {
+          return await handleEnvelopeItemFileRequest({
+            ...baseOptions,
+            version,
+            envelopeItemId: envelopeItem.id,
+            envelope: envelopeItem.envelope,
+          });
+        }
+
+        return await handleEnvelopeItemFileRequest({
+          ...baseOptions,
+          version,
+          status: envelopeItem.envelope.status,
         });
       } catch (error) {
         logger.error(error);
 
         if (error instanceof AppError) {
-          if (error.code === AppErrorCode.UNAUTHORIZED) {
-            return c.json({ error: error.message }, 401);
-          }
+          const { status, body } = AppError.toRestAPIError(error);
 
-          return c.json({ error: error.message }, 400);
+          // Preserve the existing `{ error }` shape for backwards compatibility;
+          // `code` is added as a new field for callers that want to branch on it.
+          return c.json({ error: body.message, code: error.code }, status);
         }
 
         return c.json({ error: 'Internal server error' }, 500);
