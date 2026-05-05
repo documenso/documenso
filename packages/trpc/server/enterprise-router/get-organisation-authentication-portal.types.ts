@@ -14,6 +14,7 @@ export const ZGetOrganisationAuthenticationPortalResponseSchema =
     wellKnownUrl: true,
     autoProvisionUsers: true,
     allowedDomains: true,
+    allowPersonalOrganisations: true,
   }).extend({
     /**
      * Whether we have the client secret in the database.
