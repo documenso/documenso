@@ -533,6 +533,8 @@ model DocumentMeta {
 
   reminderSettings Json? /// [EnvelopeReminderSettings] @zod.custom.use(ZEnvelopeReminderSettingsSchema)
 
+  allowDocumentRejection Boolean?
+
   envelope Envelope?
 }
 
@@ -867,6 +869,8 @@ model OrganisationGlobalSettings {
 
   reminderSettings Json? /// [EnvelopeReminderSettings] @zod.custom.use(ZEnvelopeReminderSettingsSchema)
 
+  allowDocumentRejection Boolean @default(true)
+
   // AI features settings.
   aiFeaturesEnabled Boolean @default(false)
 }
@@ -907,6 +911,8 @@ model TeamGlobalSettings {
   envelopeExpirationPeriod Json? /// [EnvelopeExpirationPeriod] @zod.custom.use(ZEnvelopeExpirationPeriodSchema)
 
   reminderSettings Json? /// [EnvelopeReminderSettings] @zod.custom.use(ZEnvelopeReminderSettingsSchema)
+
+  allowDocumentRejection Boolean?
 
   // AI features settings.
   aiFeaturesEnabled Boolean?

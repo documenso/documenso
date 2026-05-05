@@ -211,6 +211,8 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
     reminderSettings: null,
 
     aiFeaturesEnabled: null,
+
+    allowDocumentRejection: null,
   };
 };
 
