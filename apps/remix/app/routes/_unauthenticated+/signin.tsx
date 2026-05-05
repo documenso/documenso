@@ -11,8 +11,8 @@ import {
   IS_MICROSOFT_SSO_ENABLED,
   IS_OIDC_SSO_ENABLED,
   OIDC_PROVIDER_LABEL,
+  isSignupEnabledForProvider,
 } from '@documenso/lib/constants/auth';
-import { env } from '@documenso/lib/utils/env';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 
@@ -34,6 +34,11 @@ export async function loader({ request }: Route.LoaderArgs) {
   const isMicrosoftSSOEnabled = IS_MICROSOFT_SSO_ENABLED;
   const isOIDCSSOEnabled = IS_OIDC_SSO_ENABLED;
   const oidcProviderLabel = OIDC_PROVIDER_LABEL;
+  const isSignupEnabled =
+    isSignupEnabledForProvider('email') ||
+    (IS_GOOGLE_SSO_ENABLED && isSignupEnabledForProvider('google')) ||
+    (IS_MICROSOFT_SSO_ENABLED && isSignupEnabledForProvider('microsoft')) ||
+    (IS_OIDC_SSO_ENABLED && isSignupEnabledForProvider('oidc'));
 
   let returnTo = new URL(request.url).searchParams.get('returnTo') ?? undefined;
 
@@ -47,6 +52,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     isGoogleSSOEnabled,
     isMicrosoftSSOEnabled,
     isOIDCSSOEnabled,
+    isSignupEnabled,
     oidcProviderLabel,
     returnTo,
   };
@@ -57,6 +63,7 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
     isGoogleSSOEnabled,
     isMicrosoftSSOEnabled,
     isOIDCSSOEnabled,
+    isSignupEnabled,
     oidcProviderLabel,
     returnTo,
   } = loaderData;
@@ -103,7 +110,7 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
           returnTo={returnTo}
         />
 
-        {!isEmbeddedRedirect && env('NEXT_PUBLIC_DISABLE_SIGNUP') !== 'true' && (
+        {!isEmbeddedRedirect && isSignupEnabled && (
           <p className="mt-6 text-center text-sm text-muted-foreground">
             <Trans>
               Don't have an account?{' '}
