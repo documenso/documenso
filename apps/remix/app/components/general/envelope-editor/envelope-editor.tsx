@@ -495,6 +495,7 @@ export const EnvelopeEditor = () => {
               <EnvelopeDownloadDialog
                 envelopeId={envelope.id}
                 envelopeStatus={envelope.status}
+                isLegacy={envelope.internalVersion === 1}
                 envelopeItems={envelope.envelopeItems}
                 trigger={
                   <Button

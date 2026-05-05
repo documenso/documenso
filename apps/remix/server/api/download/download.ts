@@ -9,10 +9,7 @@ import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
 import type { HonoEnv } from '../../router';
-import {
-  handleEnvelopeItemFileRequest,
-  handlePartialEnvelopeItemFileRequest,
-} from '../files/files.helpers';
+import { handleEnvelopeItemFileRequest } from '../files/files.helpers';
 import {
   ZDownloadDocumentRequestParamsSchema,
   ZDownloadEnvelopeItemRequestParamsSchema,
@@ -93,42 +90,36 @@ export const downloadRoute = new Hono<HonoEnv>()
           return c.json({ error: 'Document data not found' }, 404);
         }
 
+        const baseOptions = {
+          title: envelopeItem.title,
+          documentData: envelopeItem.documentData,
+          isDownload: true,
+          context: c,
+        } as const;
+
         if (version === 'pending') {
-          return await handlePartialEnvelopeItemFileRequest({
-            title: envelopeItem.title,
+          return await handleEnvelopeItemFileRequest({
+            ...baseOptions,
+            version,
             envelopeItemId: envelopeItem.id,
             envelope: envelopeItem.envelope,
-            documentData: envelopeItem.documentData,
-            context: c,
           });
         }
 
         return await handleEnvelopeItemFileRequest({
-          title: envelopeItem.title,
-          status: envelopeItem.envelope.status,
-          documentData: envelopeItem.documentData,
+          ...baseOptions,
           version,
-          isDownload: true,
-          context: c,
+          status: envelopeItem.envelope.status,
         });
       } catch (error) {
         logger.error(error);
 
         if (error instanceof AppError) {
-          if (error.code === AppErrorCode.UNAUTHORIZED) {
-            return c.json({ error: error.message }, 401);
-          }
+          const { status, body } = AppError.toRestAPIError(error);
 
-          const { status } = AppError.toRestAPIError(error);
-
-          return c.json(
-            {
-              code: error.code,
-              message: error.message,
-              status,
-            },
-            status,
-          );
+          // Preserve the existing `{ error }` shape for backwards compatibility;
+          // `code` is added as a new field for callers that want to branch on it.
+          return c.json({ error: body.message, code: error.code }, status);
         }
 
         return c.json({ error: 'Internal server error' }, 500);

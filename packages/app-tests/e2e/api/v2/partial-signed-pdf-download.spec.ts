@@ -2,7 +2,6 @@ import { PDF } from '@libpdf/core';
 import type { APIRequestContext } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 import { DocumentStatus, FieldType, SigningStatus } from '@prisma/client';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
@@ -27,28 +26,6 @@ const trpcMutation = async (
   });
 
   expect(res.ok(), `${procedure} failed: ${await res.text()}`).toBeTruthy();
-};
-
-const extractPdfText = async (pdfBytes: Uint8Array) => {
-  const loadingTask = pdfjsLib.getDocument({ data: pdfBytes });
-  const pdf = await loadingTask.promise;
-  const pageTexts: string[] = [];
-
-  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-    const page = await pdf.getPage(pageNumber);
-    const textContent = await page.getTextContent();
-
-    pageTexts.push(
-      textContent.items
-        .map((item) => ('str' in item ? item.str : ''))
-        .filter(Boolean)
-        .join(' '),
-    );
-  }
-
-  await pdf.destroy();
-
-  return pageTexts.join('\n');
 };
 
 const getPdfBytes = async (response: Awaited<ReturnType<APIRequestContext['get']>>) => {
@@ -86,7 +63,7 @@ const signAndCompleteRecipient = async ({
 };
 
 test.describe('API V2 partial signed PDF downloads', () => {
-  test('returns a watermarked pending PDF, supports ETag, and rejects after completion', async ({
+  test('returns a PDF with inserted fields, supports ETag, and rejects after completion', async ({
     request,
   }) => {
     const { envelope, token, distributeResult } = await apiSeedPendingDocument(request, {
@@ -147,22 +124,22 @@ test.describe('API V2 partial signed PDF downloads', () => {
     }).toPass();
 
     const downloadUrl = `${API_BASE_URL}/envelope/item/${envelopeItem.id}/download?version=pending`;
-    const draftResponse = await request.get(downloadUrl, {
+    const pendingResponse = await request.get(downloadUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
-    expect(draftResponse.status()).toBe(200);
-    expect(draftResponse.headers()['content-type']).toContain('application/pdf');
-    expect(draftResponse.headers()['cache-control']).toBe('no-store, private');
-    expect(draftResponse.headers()['content-disposition']).toContain('-draft.pdf');
+    expect(pendingResponse.status()).toBe(200);
+    expect(pendingResponse.headers()['content-type']).toContain('application/pdf');
+    expect(pendingResponse.headers()['cache-control']).toBe('no-store, private');
+    expect(pendingResponse.headers()['content-disposition']).toContain('_pending.pdf');
 
-    const etag = draftResponse.headers().etag;
+    const etag = pendingResponse.headers().etag;
     expect(etag).toBeTruthy();
 
-    const draftPdfBytes = await getPdfBytes(draftResponse);
-    const draftPdf = await PDF.load(draftPdfBytes);
+    const pendingPdfBytes = await getPdfBytes(pendingResponse);
+    const pendingPdf = await PDF.load(pendingPdfBytes);
 
     const originalEnvelopeItem = await prisma.envelopeItem.findUniqueOrThrow({
       where: {
@@ -178,14 +155,8 @@ test.describe('API V2 partial signed PDF downloads', () => {
     });
     const originalPdf = await PDF.load(new Uint8Array(originalPdfBytes));
 
-    expect(draftPdf.getPageCount()).toBe(originalPdf.getPageCount());
-
-    const draftText = await extractPdfText(draftPdfBytes);
-
-    expect(draftText).toContain('DRAFT');
-    expect(draftText).toContain('Awaiting 1 more signature');
-    expect(draftText).toContain(envelope.id);
-    expect(draftText).toMatch(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/);
+    // Pending PDF should have the same page count as the original (no cert/audit pages).
+    expect(pendingPdf.getPageCount()).toBe(originalPdf.getPageCount());
 
     const cachedResponse = await request.get(downloadUrl, {
       headers: {
@@ -195,18 +166,6 @@ test.describe('API V2 partial signed PDF downloads', () => {
     });
 
     expect(cachedResponse.status()).toBe(304);
-
-    const signedTokenResponse = await request.get(
-      `${API_BASE_URL}/sign/${recipientOne.token}/envelope-item/${envelopeItem.id}/download?version=pending`,
-    );
-
-    expect(signedTokenResponse.status()).toBe(200);
-
-    const unsignedTokenResponse = await request.get(
-      `${API_BASE_URL}/sign/${recipientTwo.token}/envelope-item/${envelopeItem.id}/download?version=pending`,
-    );
-
-    expect(unsignedTokenResponse.status()).toBe(403);
 
     await signAndCompleteRecipient({
       request,
@@ -225,15 +184,15 @@ test.describe('API V2 partial signed PDF downloads', () => {
       expect(dbEnvelope.status).toBe(DocumentStatus.COMPLETED);
     }).toPass({ timeout: 15_000 });
 
-    const completedDraftResponse = await request.get(downloadUrl, {
+    const completedResponse = await request.get(downloadUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    const completedDraftError = await completedDraftResponse.json();
+    const completedError = await completedResponse.json();
 
-    expect(completedDraftResponse.status()).toBe(400);
-    expect(completedDraftError.code).toBe('ENVELOPE_COMPLETED');
+    expect(completedResponse.status()).toBe(400);
+    expect(completedError.code).toBe('ENVELOPE_COMPLETED');
 
     const signedResponse = await request.get(
       `${API_BASE_URL}/envelope/item/${envelopeItem.id}/download?version=signed`,
@@ -246,35 +205,6 @@ test.describe('API V2 partial signed PDF downloads', () => {
 
     expect(signedResponse.status()).toBe(200);
     await getPdfBytes(signedResponse);
-  });
-
-  test('allows a rejected recipient token while the envelope is still pending', async ({
-    request,
-  }) => {
-    const { envelope, distributeResult } = await apiSeedPendingDocument(request, {
-      recipients: [{ email: 'partial-rejecter@test.documenso.com', name: 'Partial Rejecter' }],
-    });
-
-    const recipient = distributeResult.recipients[0];
-    const envelopeItem = envelope.envelopeItems[0];
-
-    await prisma.recipient.update({
-      where: {
-        id: recipient.id,
-      },
-      data: {
-        signingStatus: SigningStatus.REJECTED,
-        signedAt: new Date(),
-        rejectionReason: 'Rejected for pending PDF test',
-      },
-    });
-
-    const response = await request.get(
-      `${API_BASE_URL}/sign/${recipient.token}/envelope-item/${envelopeItem.id}/download?version=pending`,
-    );
-
-    expect(response.status()).toBe(200);
-    await getPdfBytes(response);
   });
 
   test('rejects draft and legacy pending envelopes', async ({ request }) => {
@@ -315,7 +245,7 @@ test.describe('API V2 partial signed PDF downloads', () => {
     );
     const legacyError = await legacyResponse.json();
 
-    expect(legacyResponse.status()).toBe(501);
-    expect(legacyError.code).toBe('NOT_IMPLEMENTED');
+    expect(legacyResponse.status()).toBe(400);
+    expect(legacyError.code).toBe('ENVELOPE_LEGACY');
   });
 });

@@ -3,132 +3,92 @@ date: 2026-04-22
 title: Partial Signed Pdf Download
 ---
 
-## Context
+## Summary
 
-External API / embed-iframe consumers need to return a usable signed PDF to a recipient immediately after that recipient completes their signature, even when other recipients are still pending. Today, `GET /api/v2/envelope/item/{id}/download?version=signed` silently returns the original unsigned PDF while the envelope is `PENDING` — the real signed PDF only materialises after the last recipient signs and the `seal-document` job runs. Impact: no way for an internal signer (who signed first) to verify their signature was captured until the whole envelope completes.
+Let team members fetch a PDF with all currently-inserted fields burned in while the envelope is still in `PENDING` status. Today the only available bytes for a pending envelope are the original (no fields) - the sealed PDF only materialises after the last recipient signs and the `seal-document` job runs.
 
-Goal: add a third download variant `version=pending` that, during envelope status `PENDING`, returns the original PDF with all currently-inserted fields burned in, marked as a non-final draft.
+Exposed in two places:
+
+- v2 API: `GET /api/v2/envelope/item/{envelopeItemId}/download?version=pending` (API-token auth)
+- UI: a `Partial` button in the existing `EnvelopeDownloadDialog`, alongside `Original`. Replaces the `Signed` slot when the envelope is `PENDING`. Backed by the existing session-authed file route `GET /api/files/envelope/{envelopeId}/envelopeItem/{id}/download/pending`.
 
 ## Scope
 
-- API-only. No internal UI / "View" button wiring.
 - v2 API only (no v1).
-- `internalVersion === 2` envelopes only.
+- `internalVersion === 2` envelopes only. Legacy v1 returns 400 `ENVELOPE_LEGACY`.
+- Team-side / owner only. No recipient-token download path - recipients have the in-app overlay viewer for verification, and a downloadable half-signed PDF is a leak vector for partially-executed contracts. Enforced both at the server (the recipient-token file route does not accept `pending`) and at the UI (the dialog hides the Partial button when a recipient token is set).
+- No PKI signature, no certificate page, no audit log appendix - the response is explicitly not a final executed document.
+- No watermark or banner text. The filename suffix (`_pending.pdf`), the `Cache-Control: no-store, private` header, and the absence of a PKI signature are sufficient to signal draft status.
 
-## Decisions
+## Behaviour
 
-| # | Decision |
+API response matrix (both `/api/v2/envelope/item/{id}/download?version=pending` and the UI-facing `/api/files/envelope/{envelopeId}/envelopeItem/{id}/download/pending`):
+
+| Envelope status | Response |
 |---|---|
-| 1 | Extend existing endpoint: add `'pending'` to `version` enum on `GET /envelope/item/{envelopeItemId}/download` |
-| 2 | Add sibling recipient-token route: `GET /api/v2/sign/{token}/envelope-item/{envelopeItemId}/download?version=pending` |
-| 3 | Allowed envelope status for `version=pending`: `PENDING` only — else 400 (distinct AppError codes per status, single HTTP 400) |
-| 4 | Legacy `internalVersion === 1` envelopes: 501 Not Implemented |
-| 5 | Recipient-token path: allowed only after that recipient's `signingStatus === SIGNED` or `signingStatus === REJECTED`; otherwise 403 |
-| 6 | Same content for all authorized callers (API token vs recipient token). No per-caller field filtering |
-| 7 | Burn fields where `inserted === true` across all recipients. Exact parity with `seal-document` (same `FieldWithSignature` prisma include) |
-| 8 | **No PKI signing** (`signPdf` skipped) |
-| 9 | **No certificate / no audit log** appendix pages |
-| 10 | **No audit log entry** on download (matches no-cert decision); structured log/metric only |
-| 11 | Watermark: diagonal watermark across entire page 1 + footer line on every page. Banner text: `"DRAFT — Not a final executed document. Awaiting {N} more signature(s). Envelope {envelopeId} · {ISO-UTC timestamp}"`. English only, correct pluralization (drop "(s)" when N=1 / use "signature" vs "signatures"). `N` = recipients whose `signingStatus !== SIGNED` excluding `role === ASSISTANT` and `role === CC` |
-| 12 | Zero-inserted-fields case: still return original + banner/watermark (never 404). Banner renders on every item in envelope regardless of whether that item has inserted fields |
-| 13 | Assistant-inserted fields ARE burned in; Assistant role is not counted in `N` |
-| 14 | Content-addressed ETag: `sha256(envelope.status + recipient count + sorted((field.id, field.customText, field.Signature?.id, field.updatedAt) for inserted===true fields on this envelopeItemId))`. Return `304 Not Modified` on `If-None-Match` match. On miss, generate fresh PDF, set `ETag`, `Cache-Control: no-store, private` |
-| 15 | Generation: on-demand each request when ETag misses, no persistent cache |
-| 16 | Do not persist a new `DocumentData` / do not mutate `EnvelopeItem.documentDataId` |
-| 17 | Error body shape for 400/501/403: AppError JSON `{code, message, status}` consistent with other v2 API errors. SHA-256 of response bytes returned as `ETag` header also usable by callers for integrity check |
-| 18 | Filename on download: `{title}-draft.pdf` |
+| `PENDING` (v2) | 200, PDF with currently-inserted fields burned in |
+| `PENDING` (v1) | 400 `ENVELOPE_LEGACY` |
+| `DRAFT` | 400 `ENVELOPE_DRAFT` |
+| `COMPLETED` | 400 `ENVELOPE_COMPLETED` |
+| `REJECTED` | 400 `ENVELOPE_REJECTED` |
 
-## Files to Modify
+All v1-vs-v2 / status-mismatch errors are 4xx so callers can cleanly separate them from real server failures (5xx). Specifically v1 PENDING returns 400 not 501: 5xx is reserved for actual server problems, while "this envelope can't satisfy this request shape" is a client-addressable condition.
 
-### 1. `apps/remix/server/api/download/download.types.ts`
-Extend Hono validator: add `'pending'` to the `version` enum on `ZDownloadEnvelopeItemRequestParamsSchema`. (Document-level schema unchanged.)
+Filename: `{title}_pending.pdf`.
 
-### 2. `packages/trpc/server/envelope-router/download-envelope-item.types.ts`
-Extend OpenAPI-facing `ZDownloadEnvelopeItemRequestSchema.version` enum with `'pending'` so the public schema/docs match. Update `.describe(...)`.
+ETag is content-addressed over `sha256(envelope.status + sorted((field.id, field.customText, field.signature?.id, field.signature?.created) for inserted===true fields))`. Returns 304 on `If-None-Match` match.
 
-### 3. `apps/remix/server/api/files/files.helpers.ts`
-Keep `handleEnvelopeItemFileRequest` shape unchanged. Add a sibling function `handlePartialEnvelopeItemFileRequest` invoked when `version === 'pending'`:
-- Guard: `envelope.status !== PENDING` → `AppError` (distinct code per status: `ENVELOPE_DRAFT`, `ENVELOPE_COMPLETED`, `ENVELOPE_REJECTED`, `ENVELOPE_VOIDED`), HTTP 400.
-- Guard: `envelope.internalVersion !== 2` → `AppError(NOT_IMPLEMENTED)` 501.
-- Compute content-addressed ETag (see Decision 14). If `If-None-Match` matches → 304.
-- Load original PDF bytes via `getFileServerSide({ type, data: documentData.initialData })`.
-- Load fields with `FieldWithSignature` include (mirror the query in `seal-document.handler.ts`), filter `inserted === true`.
-- Compute `N` (see Decision 11).
-- Call new helper `generatePartialSignedPdf` (below).
-- Set headers: `Content-Type: application/pdf`, `Cache-Control: no-store, private`, `ETag: <computed>`.
-- On download: `Content-Disposition` filename `{baseTitle}-draft.pdf`.
-- Return bytes.
+No persistent caching. Generated on-demand per request when ETag misses.
 
-### 4. API route: `apps/remix/server/api/download/download.ts` (or wherever the existing `/envelope/item/{id}/download` handler lives)
-Branch on `version`. For `'pending'` call the new handler above.
+Error response shape (envelope item v2 download route and the team-side file route): preserves the existing `{ error: <message> }` field for backwards compatibility and adds `code: <APP_ERROR_CODE>` as a new field for callers that want to branch on it. The document download route (`/document/{documentId}/download`) is untouched.
 
-### 5. NEW sibling route for recipient-token path: `apps/remix/server/api/sign/*`
-Pattern: `GET /api/v2/sign/{token}/envelope-item/{envelopeItemId}/download?version=pending`.
-- Resolve recipient by token (reuse existing token lookup used by signing routes).
-- Authorize envelopeItemId belongs to that envelope.
-- Enforce Decision 5 (`signingStatus` must be `SIGNED` or `REJECTED`).
-- Delegate to the same `handlePartialEnvelopeItemFileRequest`.
-- Only `version=pending` is supported on this route (reject other versions with 400). This route does not expose `version=signed` / `version=original` — callers holding API tokens continue using the primary route.
+## UI
 
-### 6. NEW: `packages/lib/server-only/pdf/generate-partial-signed-pdf.ts`
-Small orchestrator — trimmed parallel of `decorateAndSignPdf` from `seal-document.handler.ts`:
-- `PDFDocument.load(bytes)` → `flattenAll()` → `updatePdfVersion(1.7)`.
-- Draw diagonal watermark across page 1 using pdf-lib (`drawText` rotated ~45°, low opacity grey/red).
-- Draw small footer line on every page with the banner text (font size ~8pt, bottom margin).
-- Banner text: `DRAFT — Not a final executed document. Awaiting {N} more signature(s). Envelope {envelopeId} · {ISO-UTC}`. Pluralize correctly (`1 signature` vs `N signatures`; drop "more" naturally).
-- For each page, collect its `FieldWithSignature` and call `insertFieldInPDFV2` (already exported from `packages/lib/server-only/pdf/insert-field-in-pdf-v2.ts`).
-- `flattenAll()` again, `save()` to bytes.
-- **Do not** call `signPdf`, `generateCertificatePdf`, `generateAuditLogPdf`, `putPdfFileServerSide`, or any DB write.
+`apps/remix/app/components/dialogs/envelope-download-dialog.tsx`:
 
-Justification for new file: orchestration is non-trivial (page iteration, field grouping, watermark + footer rendering, pluralization) and the equivalent logic in `decorateAndSignPdf` is private. Extracting a partial-only function avoids entangling the seal-document job.
+- The dialog shows `Original` plus one of:
+  - `Signed` when status is `COMPLETED` (existing behaviour)
+  - `Partial` when status is `PENDING`, there is no recipient token, and the envelope is not legacy (`!isLegacy`)
+  - nothing otherwise
+- New optional prop `isLegacy?: boolean`. Only consulted to gate the `Partial` button, so callers whose status can never be `PENDING` (DRAFT/COMPLETED/REJECTED hardcoded, or `isComplete: true` matchers) and callers that always set a recipient token can omit it. Three call sites pass it (`isLegacy={envelope.internalVersion === 1}`): `documents-table-action-dropdown.tsx`, `envelope-editor.tsx`, `document-page-view-dropdown.tsx`. The other eight callers were left alone.
 
-## Reused Utilities (no changes)
+Trade-off: a future team-side dialog usage where status could be PENDING but the dev forgets `isLegacy` will silently not render the Partial button. The status gate prevents an actively broken click; missing button is discoverable in testing. Required-prop alternative was rejected because eight of eleven call sites would carry a meaningless value.
 
-- `packages/lib/server-only/pdf/insert-field-in-pdf-v2.ts` — burns field array into PDF page.
-- `packages/lib/universal/upload/get-file.server.ts` → `getFileServerSide` — loads PDF bytes from `DocumentData`.
-- `packages/lib/utils/pdf.ts` → `flattenAll`, `updatePdfVersion`.
-- `AppError` with codes `ENVELOPE_DRAFT`, `ENVELOPE_COMPLETED`, `ENVELOPE_REJECTED`, `ENVELOPE_VOIDED`, `NOT_IMPLEMENTED`, `UNAUTHORIZED` / `FORBIDDEN`.
-- Existing recipient-token resolver used by `/sign/[token]` signing routes.
+## Files
+
+Server:
+
+- `apps/remix/server/api/download/download.types.ts` - added `'pending'` to the `version` enum; split the validator into `param` (envelopeItemId) + `query` (version). The original wiring as a path-param validator was a pre-existing bug: requests like `?version=original` were silently returning the signed PDF since `version` actually arrives as a query string. Fixed as a side effect.
+- `packages/trpc/server/envelope-router/download-envelope-item.types.ts` - mirrored the enum change in the OpenAPI schema.
+- `apps/remix/server/api/download/download.ts` - the envelope item v2 route now fetches envelope recipients alongside the envelope, branches on `version` when calling the helper, and emits AppError responses as `{ error, code }` consistently across all status codes.
+- `apps/remix/server/api/files/files.types.ts` - added `'pending'` to the team-side download schema only. The recipient-token download schema is untouched, so `/api/files/token/.../download/pending` is rejected by the schema validator.
+- `apps/remix/server/api/files/files.ts` - the team-side download handler fetches envelope recipients and dispatches the `pending` branch through the same `handleEnvelopeItemFileRequest` helper. Wrapped in a try/catch that returns `{ error, code }` for AppErrors.
+- `apps/remix/server/api/files/files.helpers.ts` - `handleEnvelopeItemFileRequest` is now a single entry point taking a discriminated-union options type. The static-file flow (`signed`/`original`) and the on-demand pending flow are private helpers in the same module.
+- `packages/lib/server-only/pdf/generate-partial-signed-pdf.ts` (new) - small orchestrator that loads the original PDF, groups inserted fields by page, calls the existing `insertFieldInPDFV2` overlay helper for each page, flattens, and saves.
+- `packages/lib/errors/app-error.ts` - added `ENVELOPE_DRAFT`, `ENVELOPE_COMPLETED`, `ENVELOPE_REJECTED`, `ENVELOPE_LEGACY` codes, all mapped to 400. The legacy-envelope case deliberately returns 4xx rather than 501 to keep "this resource can't satisfy this operation" distinct from real 5xx server failures in caller logs/metrics.
+
+Client:
+
+- `packages/lib/utils/envelope-download.ts` - `EnvelopeItemPdfUrlOptions` download variant now allows `'pending'` as a version. The recipient-token URL builder will produce a URL the server rejects, but the dialog gates on no-token at the call site.
+- `packages/lib/client-only/download-pdf.ts` - `DocumentVersion` extended; filename suffix logic moved into a small switch (`_signed.pdf`, `_pending.pdf`, `.pdf`).
+- `apps/remix/app/components/dialogs/envelope-download-dialog.tsx` - secondary download derivation with the new `Partial` branch, optional `isLegacy` prop.
+- `apps/remix/app/components/tables/documents-table-action-dropdown.tsx`, `apps/remix/app/components/general/envelope-editor/envelope-editor.tsx`, `apps/remix/app/components/general/document/document-page-view-dropdown.tsx` - pass `isLegacy={envelope.internalVersion === 1}` (or `row.internalVersion === 1`) to the dialog.
 
 ## Verification
 
-1. **E2E test** (new, `packages/app-tests/e2e/`):
-   - Seed envelope with 2 SIGNER recipients, internalVersion=2.
-   - Recipient 1 signs via `apiSignin` + completion helper.
-   - With API token: `GET /api/v2/envelope/item/{id}/download?version=pending` → 200, `application/pdf`, response starts with `%PDF-`.
-   - Parse with pdf-lib: page count equals original (no cert pages appended).
-   - Text extraction page 1 contains `DRAFT`, `Awaiting 1 more signature`, envelope id, and an ISO timestamp.
-   - Second call with `If-None-Match: <etag>` → 304.
-   - Recipient 2 completes signing → envelope flips to COMPLETED.
-   - Re-call `version=pending` → 400 with `AppError` JSON body, code `ENVELOPE_COMPLETED`.
-   - Caller retries `version=signed` → 200 with fully sealed PDF.
+1. E2E (`packages/app-tests/e2e/api/v2/partial-signed-pdf-download.spec.ts`):
+   - Pending envelope, recipient 1 signs, API token download with `?version=pending` returns 200 + PDF; subsequent call with `If-None-Match: <etag>` returns 304; after recipient 2 completes the envelope flips to `COMPLETED` and the same call returns 400 `ENVELOPE_COMPLETED`; `?version=signed` then succeeds.
+   - Draft envelope returns 400 `ENVELOPE_DRAFT`.
+   - `internalVersion === 1` pending envelope returns 400 `ENVELOPE_LEGACY`.
 
-2. **Recipient-token E2E**:
-   - Recipient 1 (signed): `GET /api/v2/sign/{recipient1Token}/envelope-item/{id}/download?version=pending` → 200.
-   - Recipient 2 (not yet signed): same call with recipient 2's token → 403.
-   - Recipient who rejected: 200.
+2. `npx tsc --noEmit -p apps/remix/tsconfig.json` and `npm run lint`.
 
-3. **Negative cases**:
-   - DRAFT envelope → 400 `ENVELOPE_DRAFT`.
-   - internalVersion=1 PENDING envelope → 501 `NOT_IMPLEMENTED`.
-   - No / wrong API token → existing 401/403 path untouched.
-   - Assistant-only inserted fields, no signer signed: 200, banner shows `Awaiting 2 more signatures`, fields rendered.
-
-4. **Manual smoke**:
-   - Open returned PDF in Acrobat → no PKI signature panel; diagonal watermark on page 1; footer on every page.
-   - Confirm pluralization at N=1.
-
-5. **Type + lint**: `npx tsc --noEmit -p apps/remix/tsconfig.json` and `npm run lint`.
+3. Manual: open the Documents table or envelope editor on a PENDING envelope (v2), open the download dialog, confirm `Partial` appears alongside `Original` and produces a `_pending.pdf` with current fields burned in. Same dialog on a COMPLETED envelope shows `Signed`. Same dialog on a v1 PENDING envelope shows neither (status gate would show Partial, but the `isLegacy` flag filters it out).
 
 ## Out of Scope / Follow-ups
 
-- Per-recipient certificate endpoint — not building now.
-- v1 API parity — not building.
-- Internal "View" UI wiring during PENDING — not building (overlay-based viewer already shows signatures in-app).
-- Persistent caching layer / job-queue generation — revisit if p95 latency on large PDFs or CPU pressure becomes an issue.
-- i18n of banner text — English only for now; envelope.language / `?locale=` support deferred.
-- Concurrency guardrails (semaphore, per-envelope lock) — defer; rely on existing API rate limiter.
-
-## Unresolved Questions
-
-- None blocking.
+- Recipient-token download path (API and UI) - decided against. Revisit if there is concrete demand and a story for limiting the leak vector.
+- v1 API parity / v1 partial rendering - not building. Implementing partial for v1 would require porting `legacy_insertFieldInPDF` / `insertFieldInPDFV1` into a partial-only flow, which is code with no long-term home as v1 is being phased out.
+- Document download route (`/document/{documentId}/download`) - untouched. Same error shape and validator wiring as before. Consider normalising to the same `{ error, code }` shape in a follow-up if any caller wants to branch on `code` from that route.
+- Persistent caching layer / job-queue generation - revisit if p95 latency on large PDFs becomes an issue.
+- Specific toast for `ENVELOPE_LEGACY` in the dialog - currently the catch-all "Something went wrong" handles it. Worth a polish if v1 PENDING envelopes are common in your data and we see complaints. (Note: with the `isLegacy` gate at the UI, the error is unreachable from the dialog itself; the API can still surface it for direct callers.)

@@ -2,8 +2,8 @@ import {
   type DocumentDataType,
   DocumentStatus,
   type EnvelopeType,
-  RecipientRole,
-  SigningStatus,
+  type RecipientRole,
+  type SigningStatus,
   type TemplateType,
 } from '@prisma/client';
 import { EnvelopeType as EnvelopeTypeEnum, TemplateType as TemplateTypeEnum } from '@prisma/client';
@@ -20,49 +20,75 @@ import { prisma } from '@documenso/prisma';
 
 import type { HonoEnv } from '../../router';
 
-type HandleEnvelopeItemFileRequestOptions = {
-  title: string;
-  status: DocumentStatus;
-  documentData: {
-    type: DocumentDataType;
-    data: string;
-    initialData: string;
-  };
-  version: 'signed' | 'original';
-  isDownload: boolean;
-  context: Context<HonoEnv>;
+type DocumentDataInput = {
+  type: DocumentDataType;
+  data: string;
+  initialData: string;
 };
 
-type HandlePartialEnvelopeItemFileRequestOptions = {
-  title: string;
-  envelopeItemId: string;
-  envelope: {
-    id: string;
-    status: DocumentStatus;
-    internalVersion: number;
-    recipients: Array<{
-      role: RecipientRole;
-      signingStatus: SigningStatus;
-    }>;
-  };
-  documentData: {
-    type: DocumentDataType;
-    initialData: string;
-  };
-  context: Context<HonoEnv>;
+type EnvelopeForPendingDownload = {
+  id: string;
+  status: DocumentStatus;
+  internalVersion: number;
+  recipients: Array<{
+    role: RecipientRole;
+    signingStatus: SigningStatus;
+  }>;
 };
 
 /**
- * Helper function to handle envelope item file requests (both view and download)
+ * Options shape varies by `version`:
+ * - `signed` / `original`: serves stored bytes; only needs envelope `status` for cache headers.
+ * - `pending`: generates a fresh PDF with currently-inserted fields burned in; needs the
+ *   full envelope (id, status, internalVersion, recipients) plus envelopeItemId to query fields.
  */
-export const handleEnvelopeItemFileRequest = async ({
+type HandleEnvelopeItemFileRequestOptions = {
+  title: string;
+  documentData: DocumentDataInput;
+  isDownload: boolean;
+  context: Context<HonoEnv>;
+} & (
+  | {
+      version: 'signed' | 'original';
+      status: DocumentStatus;
+    }
+  | {
+      version: 'pending';
+      envelopeItemId: string;
+      envelope: EnvelopeForPendingDownload;
+    }
+);
+
+/**
+ * Single entry point for envelope item file requests (view and download).
+ *
+ * Dispatches on `version`:
+ * - `signed` / `original`: returns the stored PDF bytes as-is.
+ * - `pending`: generates an on-demand PDF with all currently-inserted fields burned in.
+ */
+export const handleEnvelopeItemFileRequest = async (
+  options: HandleEnvelopeItemFileRequestOptions,
+) => {
+  if (options.version === 'pending') {
+    return handlePendingFileRequest(options);
+  }
+
+  return handleStaticFileRequest(options);
+};
+
+type StaticFileRequestOptions = Extract<
+  HandleEnvelopeItemFileRequestOptions,
+  { version: 'signed' | 'original' }
+>;
+
+const handleStaticFileRequest = async ({
   title,
   status,
   documentData,
   version,
   isDownload,
   context: c,
-}: HandleEnvelopeItemFileRequestOptions) => {
+}: StaticFileRequestOptions) => {
   const documentDataToUse = version === 'signed' ? documentData.data : documentData.initialData;
 
   const etag = Buffer.from(sha256(documentDataToUse)).toString('hex');
@@ -112,13 +138,18 @@ export const handleEnvelopeItemFileRequest = async ({
   return c.body(file);
 };
 
-export const handlePartialEnvelopeItemFileRequest = async ({
+type PendingFileRequestOptions = Extract<
+  HandleEnvelopeItemFileRequestOptions,
+  { version: 'pending' }
+>;
+
+const handlePendingFileRequest = async ({
   title,
   envelopeItemId,
   envelope,
   documentData,
   context: c,
-}: HandlePartialEnvelopeItemFileRequestOptions) => {
+}: PendingFileRequestOptions) => {
   if (envelope.status !== DocumentStatus.PENDING) {
     const errorCode = match(envelope.status)
       .with(DocumentStatus.DRAFT, () => AppErrorCode.ENVELOPE_DRAFT)
@@ -127,15 +158,15 @@ export const handlePartialEnvelopeItemFileRequest = async ({
       .otherwise(() => AppErrorCode.INVALID_REQUEST);
 
     throw new AppError(errorCode, {
-      message: `Envelope ${envelope.id} must be pending to download a draft signed PDF`,
+      message: `Envelope ${envelope.id} must be pending to download a partially signed PDF`,
       statusCode: 400,
     });
   }
 
   if (envelope.internalVersion !== 2) {
-    throw new AppError(AppErrorCode.NOT_IMPLEMENTED, {
-      message: `Envelope ${envelope.id} does not support draft signed PDF downloads`,
-      statusCode: 501,
+    throw new AppError(AppErrorCode.ENVELOPE_LEGACY, {
+      message: `Envelope ${envelope.id} is a legacy envelope and does not support partially signed PDF downloads`,
+      statusCode: 400,
     });
   }
 
@@ -152,18 +183,10 @@ export const handlePartialEnvelopeItemFileRequest = async ({
     },
   });
 
-  const pendingRecipientCount = envelope.recipients.filter(
-    (recipient) =>
-      recipient.signingStatus !== SigningStatus.SIGNED &&
-      recipient.role !== RecipientRole.ASSISTANT &&
-      recipient.role !== RecipientRole.CC,
-  ).length;
-
   const etag = Buffer.from(
     sha256(
       JSON.stringify({
         envelopeStatus: envelope.status,
-        pendingRecipientCount,
         fields: fields.map((field) => ({
           id: field.id,
           customText: field.customText,
@@ -197,17 +220,13 @@ export const handlePartialEnvelopeItemFileRequest = async ({
   const pdf = await generatePartialSignedPdf({
     pdfData: file,
     fields,
-    envelopeId: envelope.id,
-    pendingRecipientCount,
-    generatedAt: new Date(),
   });
 
   c.get('logger').info({
-    source: 'partialSignedPdfDownload',
+    source: 'pendingPdfDownload',
     envelopeId: envelope.id,
     envelopeItemId,
     insertedFieldCount: fields.length,
-    pendingRecipientCount,
     etag,
   });
 
@@ -216,7 +235,7 @@ export const handlePartialEnvelopeItemFileRequest = async ({
   c.header('ETag', etag);
 
   const baseTitle = title.replace(/\.pdf$/i, '');
-  const filename = `${baseTitle}-draft.pdf`;
+  const filename = `${baseTitle}_pending.pdf`;
 
   c.header('Content-Disposition', contentDisposition(filename));
 

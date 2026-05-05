@@ -1,32 +1,27 @@
-import { PDF, rgb } from '@libpdf/core';
+import { PDF } from '@libpdf/core';
 import { groupBy } from 'remeda';
 
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 
-import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
 import { insertFieldInPDFV2 } from './insert-field-in-pdf-v2';
 
 type GeneratePartialSignedPdfOptions = {
   pdfData: Uint8Array;
   fields: FieldWithSignature[];
-  envelopeId: string;
-  pendingRecipientCount: number;
-  generatedAt: Date;
 };
 
-let fontBytesPromise: Promise<ArrayBuffer> | null = null;
-
+/**
+ * Generates a PDF with all currently-inserted fields burned in. Used to serve
+ * partially signed envelopes during the `PENDING` window before the seal job
+ * has had a chance to produce the final sealed PDF.
+ *
+ * No PKI signature, no certificate page, no audit log appendix - this is a
+ * preview of the in-progress envelope, not a final executed document.
+ */
 export const generatePartialSignedPdf = async ({
   pdfData,
   fields,
-  envelopeId,
-  pendingRecipientCount,
-  generatedAt,
 }: GeneratePartialSignedPdfOptions) => {
-  const signatureText =
-    pendingRecipientCount === 1 ? '1 more signature' : `${pendingRecipientCount} more signatures`;
-  const bannerText = `DRAFT — Not a final executed document. Awaiting ${signatureText}. Envelope ${envelopeId} · ${generatedAt.toISOString()}`;
-
   const pdfDoc = await PDF.load(pdfData);
 
   pdfDoc.flattenAll();
@@ -76,44 +71,6 @@ export const generatePartialSignedPdf = async ({
       rotate: {
         angle: page.rotation,
       },
-    });
-  }
-
-  fontBytesPromise ??= fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(
-    async (res) => res.arrayBuffer(),
-  );
-
-  const fontBytes = await fontBytesPromise;
-  const font = pdfDoc.embedFont(new Uint8Array(fontBytes));
-
-  const pages = pdfDoc.getPages();
-  const firstPage = pages[0];
-
-  if (firstPage) {
-    firstPage.drawText(bannerText, {
-      x: firstPage.width * 0.05,
-      y: firstPage.height * 0.45,
-      size: 28,
-      font,
-      color: rgb(185 / 255, 28 / 255, 28 / 255),
-      opacity: 0.16,
-      maxWidth: firstPage.width * 1.35,
-      rotate: {
-        angle: 45,
-        origin: 'center',
-      },
-    });
-  }
-
-  for (const page of pages) {
-    page.drawText(bannerText, {
-      x: 24,
-      y: 14,
-      size: 8,
-      font,
-      color: rgb(75 / 255, 85 / 255, 99 / 255),
-      opacity: 0.85,
-      maxWidth: Math.max(page.width - 48, 1),
     });
   }
 

@@ -26,6 +26,7 @@ export enum AppErrorCode {
   'ENVELOPE_DRAFT' = 'ENVELOPE_DRAFT',
   'ENVELOPE_COMPLETED' = 'ENVELOPE_COMPLETED',
   'ENVELOPE_REJECTED' = 'ENVELOPE_REJECTED',
+  'ENVELOPE_LEGACY' = 'ENVELOPE_LEGACY',
 }
 
 export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; status: number }> =
@@ -49,6 +50,7 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
     [AppErrorCode.ENVELOPE_DRAFT]: { code: 'BAD_REQUEST', status: 400 },
     [AppErrorCode.ENVELOPE_COMPLETED]: { code: 'BAD_REQUEST', status: 400 },
     [AppErrorCode.ENVELOPE_REJECTED]: { code: 'BAD_REQUEST', status: 400 },
+    [AppErrorCode.ENVELOPE_LEGACY]: { code: 'BAD_REQUEST', status: 400 },
   };
 
 export const ZAppErrorJsonSchema = z.object({
@@ -238,6 +240,7 @@ export class AppError extends Error {
         AppErrorCode.ENVELOPE_DRAFT,
         AppErrorCode.ENVELOPE_COMPLETED,
         AppErrorCode.ENVELOPE_REJECTED,
+        AppErrorCode.ENVELOPE_LEGACY,
         () => 400 as const,
       )
       .with(AppErrorCode.UNAUTHORIZED, () => 401 as const)
