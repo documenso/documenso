@@ -152,7 +152,8 @@ export const DocumentsTableActionDropdown = ({
         <EnvelopeDownloadDialog
           envelopeId={row.envelopeId}
           envelopeStatus={row.status}
-          token={recipient?.token}
+          isLegacy={row.internalVersion === 1}
+          token={canManageDocument ? undefined : recipient?.token}
           trigger={
             <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
               <div>
