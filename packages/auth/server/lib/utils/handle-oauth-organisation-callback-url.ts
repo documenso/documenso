@@ -76,7 +76,10 @@ export const handleOAuthOrganisationCallbackUrl = async (
       },
     });
 
-    await onCreateUserHook(userToLink, { skipPersonalOrganisation: true }).catch((err) => {
+    await onCreateUserHook(userToLink, {
+      skipPersonalOrganisation:
+        !organisation.organisationAuthenticationPortal.allowPersonalOrganisations,
+    }).catch((err) => {
       // Todo: (RR7) Add logging.
       console.error(err);
     });
