@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { useLingui } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import type { FieldType } from '@prisma/client';
 import Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
@@ -23,7 +23,16 @@ import {
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
+import { Button } from '@documenso/ui/primitives/button';
 import { CommandDialog } from '@documenso/ui/primitives/command';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@documenso/ui/primitives/dialog';
 
 import { fieldButtonList } from './envelope-editor-fields-drag-drop';
 import { EnvelopeRecipientSelectorCommand } from './envelope-recipient-selector';
@@ -650,6 +659,7 @@ const FieldActionButtons = ({
   const { t } = useLingui();
 
   const [showRecipientSelector, setShowRecipientSelector] = useState(false);
+  const [showDuplicateAllConfirmation, setShowDuplicateAllConfirmation] = useState(false);
 
   const { editorFields, envelope } = useCurrentEnvelopeEditor();
 
@@ -714,8 +724,8 @@ const FieldActionButtons = ({
         <button
           title={t`Duplicate on all pages`}
           className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
-          onClick={handleDuplicateSelectedFieldsOnAllPages}
-          onTouchEnd={handleDuplicateSelectedFieldsOnAllPages}
+          onClick={() => setShowDuplicateAllConfirmation(true)}
+          onTouchEnd={() => setShowDuplicateAllConfirmation(true)}
         >
           <SquareStackIcon className="h-3 w-3" />
         </button>
@@ -747,6 +757,40 @@ const FieldActionButtons = ({
           fields={envelope.fields}
         />
       </CommandDialog>
+
+      <Dialog open={showDuplicateAllConfirmation} onOpenChange={setShowDuplicateAllConfirmation}>
+        <DialogContent position="center">
+          <DialogHeader>
+            <DialogTitle>
+              <Trans>Duplicate fields on all pages</Trans>
+            </DialogTitle>
+            <DialogDescription>
+              <Trans>
+                This will create copies of the selected fields on every page of the document. Are
+                you sure?
+              </Trans>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowDuplicateAllConfirmation(false)}
+              title="Cancel"
+            >
+              <Trans>Cancel</Trans>
+            </Button>
+            <Button
+              onClick={() => {
+                handleDuplicateSelectedFieldsOnAllPages();
+                setShowDuplicateAllConfirmation(false);
+              }}
+              title="Duplicate"
+            >
+              <Trans>Duplicate</Trans>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

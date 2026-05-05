@@ -39,6 +39,10 @@ const examplePdf = fs
   .readFileSync(path.join(__dirname, '../../../assets/example.pdf'))
   .toString('base64');
 
+const multiPageExamplePdf = fs
+  .readFileSync(path.join(__dirname, '../../../assets/example-multipage.pdf'))
+  .toString('base64');
+
 type DocumentToSeed = {
   sender: User;
   teamId: number;
@@ -79,13 +83,13 @@ export const seedBlankDocument = async (
   teamId: number,
   options: CreateDocumentOptions = {},
 ) => {
-  const { key, createDocumentOptions = {}, internalVersion = 1 } = options;
+  const { key, createDocumentOptions = {}, internalVersion = 1, multipage = false } = options;
 
   const documentData = await prisma.documentData.create({
     data: {
       type: DocumentDataType.BYTES_64,
-      data: examplePdf,
-      initialData: examplePdf,
+      data: multipage ? multiPageExamplePdf : examplePdf,
+      initialData: multipage ? multiPageExamplePdf : examplePdf,
     },
   });
 
@@ -299,13 +303,13 @@ export const seedDraftDocument = async (
   recipients: (User | string)[],
   options: CreateDocumentOptions = {},
 ) => {
-  const { key, createDocumentOptions = {}, internalVersion = 1 } = options;
+  const { key, createDocumentOptions = {}, internalVersion = 1, multipage = false } = options;
 
   const documentData = await prisma.documentData.create({
     data: {
       type: DocumentDataType.BYTES_64,
-      data: examplePdf,
-      initialData: examplePdf,
+      data: multipage ? multiPageExamplePdf : examplePdf,
+      initialData: multipage ? multiPageExamplePdf : examplePdf,
     },
   });
 
@@ -385,6 +389,7 @@ type CreateDocumentOptions = {
   key?: string | number;
   createDocumentOptions?: Partial<Prisma.EnvelopeUncheckedCreateInput>;
   internalVersion?: number;
+  multipage?: boolean;
 };
 
 export const seedPendingDocument = async (
@@ -393,13 +398,13 @@ export const seedPendingDocument = async (
   recipients: (User | string)[],
   options: CreateDocumentOptions = {},
 ) => {
-  const { key, createDocumentOptions = {}, internalVersion = 1 } = options;
+  const { key, createDocumentOptions = {}, internalVersion = 1, multipage = false } = options;
 
   const documentData = await prisma.documentData.create({
     data: {
       type: DocumentDataType.BYTES_64,
-      data: examplePdf,
-      initialData: examplePdf,
+      data: multipage ? multiPageExamplePdf : examplePdf,
+      initialData: multipage ? multiPageExamplePdf : examplePdf,
     },
   });
 
@@ -646,13 +651,13 @@ export const seedCompletedDocument = async (
   recipients: (User | string)[],
   options: CreateDocumentOptions = {},
 ) => {
-  const { key, createDocumentOptions = {}, internalVersion = 1 } = options;
+  const { key, createDocumentOptions = {}, internalVersion = 1, multipage = false } = options;
 
   const documentData = await prisma.documentData.create({
     data: {
       type: DocumentDataType.BYTES_64,
-      data: examplePdf,
-      initialData: examplePdf,
+      data: multipage ? multiPageExamplePdf : examplePdf,
+      initialData: multipage ? multiPageExamplePdf : examplePdf,
     },
   });
 

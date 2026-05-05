@@ -13,6 +13,9 @@ import { seedUser } from '@documenso/prisma/seed/users';
 import { apiSignin } from './authentication';
 
 const examplePdfBuffer = fs.readFileSync(path.join(__dirname, '../../../../assets/example.pdf'));
+const exampleMultiPagePdfBuffer = fs.readFileSync(
+  path.join(__dirname, '../../../../assets/example-multipage.pdf'),
+);
 
 export type TEnvelopeEditorSurface = {
   root: Page;
@@ -81,11 +84,20 @@ export const createEmbeddedEnvelopeEditHash = ({
   });
 };
 
-export const openDocumentEnvelopeEditor = async (page: Page): Promise<TEnvelopeEditorSurface> => {
+type OpenDocumentEnvelopeEditorOptions = {
+  multipage?: boolean;
+};
+
+export const openDocumentEnvelopeEditor = async (
+  page: Page,
+  options: OpenDocumentEnvelopeEditorOptions = {},
+): Promise<TEnvelopeEditorSurface> => {
+  const { multipage = false } = options;
   const { user, team } = await seedUser();
 
   const document = await seedBlankDocument(user, team.id, {
     internalVersion: 2,
+    multipage,
   });
 
   await apiSignin({
@@ -253,11 +265,20 @@ export const getEnvelopeItemReplaceButtons = (root: Page) =>
 export const getEnvelopeItemDropzoneInput = (root: Page) =>
   root.locator('[data-testid="envelope-item-dropzone"] input[type="file"]');
 
-export const addEnvelopeItemPdf = async (root: Page, fileName = 'embedded-envelope-item.pdf') => {
+type AddEnvelopeItemPdfOptions = {
+  isMultiPage?: boolean;
+};
+
+export const addEnvelopeItemPdf = async (
+  root: Page,
+  fileName: string = 'embedded-envelope-item.pdf',
+  options: AddEnvelopeItemPdfOptions = {},
+) => {
+  const { isMultiPage = false } = options;
   await getEnvelopeItemDropzoneInput(root).setInputFiles({
     name: fileName,
     mimeType: 'application/pdf',
-    buffer: examplePdfBuffer,
+    buffer: isMultiPage ? exampleMultiPagePdfBuffer : examplePdfBuffer,
   });
 };
 
