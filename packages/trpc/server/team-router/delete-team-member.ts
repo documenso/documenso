@@ -34,6 +34,11 @@ export const deleteTeamMemberRoute = authenticatedProcedure
         roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
       }),
       include: {
+        organisation: {
+          select: {
+            ownerUserId: true,
+          },
+        },
         teamGroups: {
           where: {
             organisationGroup: {
@@ -106,12 +111,39 @@ export const deleteTeamMemberRoute = authenticatedProcedure
       });
     }
 
-    await prisma.organisationGroupMember.delete({
-      where: {
-        organisationMemberId_groupId: {
-          organisationMemberId: memberId,
-          groupId: teamGroupToRemoveMemberFrom.organisationGroupId,
+    const removedMember =
+      teamGroupToRemoveMemberFrom.organisationGroup.organisationGroupMembers.find(
+        (ogm) => ogm.organisationMember.id === memberId,
+      );
+
+    if (!removedMember) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Member not found in this team',
+      });
+    }
+
+    await prisma.$transaction(async (tx) => {
+      // Removing a user from a single team drops their INTERNAL_TEAM
+      // OrganisationGroupMember link, but Envelope rows they authored in this
+      // team still point at their userId. Reassign to the org owner so those
+      // envelopes remain reachable after the member loses team access.
+      await tx.envelope.updateMany({
+        where: {
+          userId: removedMember.organisationMember.userId,
+          teamId,
         },
-      },
+        data: {
+          userId: team.organisation.ownerUserId,
+        },
+      });
+
+      await tx.organisationGroupMember.delete({
+        where: {
+          organisationMemberId_groupId: {
+            organisationMemberId: memberId,
+            groupId: teamGroupToRemoveMemberFrom.organisationGroupId,
+          },
+        },
+      });
     });
   });

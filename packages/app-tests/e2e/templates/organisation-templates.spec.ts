@@ -551,3 +551,144 @@ test.describe('Organisation Templates - Adversarial', () => {
     expect(titles).not.toContain(orgTemplate.title);
   });
 });
+
+// ─── API: envelope.item.getManyByToken (org template fallback) ───────────────
+
+test.describe('Organisation Templates - envelope.item.getManyByToken API', () => {
+  test('should allow a sibling team member to fetch envelope items for an org template', async ({
+    page,
+  }) => {
+    const { memberB, teamB, orgTemplate } = await seedOrgTemplateScenario();
+
+    await apiSignin({ page, email: memberB.email });
+
+    const { res, json } = await trpcQuery(
+      page,
+      'envelope.item.getManyByToken',
+      { envelopeId: orgTemplate.id, access: { type: 'user' } },
+      teamB.id,
+    );
+
+    expect(res.ok()).toBeTruthy();
+
+    const items = json.result.data.json.data;
+    expect(Array.isArray(items)).toBe(true);
+    expect(items.length).toBeGreaterThan(0);
+    expect(items[0].envelopeId).toBe(orgTemplate.id);
+  });
+
+  test('should allow the owning team member to fetch envelope items (own-team path)', async ({
+    page,
+  }) => {
+    const { ownerA, teamA, orgTemplate } = await seedOrgTemplateScenario();
+
+    await apiSignin({ page, email: ownerA.email });
+
+    const { res, json } = await trpcQuery(
+      page,
+      'envelope.item.getManyByToken',
+      { envelopeId: orgTemplate.id, access: { type: 'user' } },
+      teamA.id,
+    );
+
+    expect(res.ok()).toBeTruthy();
+
+    const items = json.result.data.json.data;
+    expect(items.length).toBeGreaterThan(0);
+    expect(items[0].envelopeId).toBe(orgTemplate.id);
+  });
+
+  test('should reject a user outside the organisation', async ({ page }) => {
+    const { orgTemplate } = await seedOrgTemplateScenario();
+    const { user: outsider, team: outsiderTeam } = await seedUser();
+
+    await apiSignin({ page, email: outsider.email });
+
+    const { res } = await trpcQuery(
+      page,
+      'envelope.item.getManyByToken',
+      { envelopeId: orgTemplate.id, access: { type: 'user' } },
+      outsiderTeam.id,
+    );
+
+    expect(res.ok()).toBeFalsy();
+  });
+
+  test('should reject fetching items for a PRIVATE template from a sibling team', async ({
+    page,
+  }) => {
+    const { ownerA, teamA, memberB, teamB } = await seedOrgTemplateScenario();
+
+    const privateTemplate = await seedBlankTemplate(ownerA, teamA.id, {
+      createTemplateOptions: {
+        title: `Private Items ${nanoid()}`,
+        templateType: TemplateType.PRIVATE,
+      },
+    });
+
+    await apiSignin({ page, email: memberB.email });
+
+    const { res } = await trpcQuery(
+      page,
+      'envelope.item.getManyByToken',
+      { envelopeId: privateTemplate.id, access: { type: 'user' } },
+      teamB.id,
+    );
+
+    expect(res.ok()).toBeFalsy();
+  });
+
+  test('should respect document visibility for the viewer team role', async ({ page }) => {
+    const { ownerA, teamA, memberB, teamB } = await seedOrgTemplateScenario();
+
+    const adminOnlyTemplate = await seedBlankTemplate(ownerA, teamA.id, {
+      createTemplateOptions: {
+        title: `Items Admin Only ${nanoid()}`,
+        templateType: TemplateType.ORGANISATION,
+        visibility: 'ADMIN',
+      },
+    });
+
+    // memberB is a MEMBER on teamB — must not be able to read items for an ADMIN-only template.
+    await apiSignin({ page, email: memberB.email });
+
+    const { res: memberRes } = await trpcQuery(
+      page,
+      'envelope.item.getManyByToken',
+      { envelopeId: adminOnlyTemplate.id, access: { type: 'user' } },
+      teamB.id,
+    );
+
+    expect(memberRes.ok()).toBeFalsy();
+
+    await apiSignout({ page });
+
+    // ownerA is ADMIN on teamA — should succeed via the own-team path.
+    await apiSignin({ page, email: ownerA.email });
+
+    const { res: adminRes, json: adminJson } = await trpcQuery(
+      page,
+      'envelope.item.getManyByToken',
+      { envelopeId: adminOnlyTemplate.id, access: { type: 'user' } },
+      teamA.id,
+    );
+
+    expect(adminRes.ok()).toBeTruthy();
+    expect(adminJson.result.data.json.data.length).toBeGreaterThan(0);
+  });
+
+  test('should reject unauthenticated callers using the user access type', async ({ page }) => {
+    const { orgTemplate, teamB } = await seedOrgTemplateScenario();
+
+    // No apiSignin — unauthenticated.
+
+    const { res } = await trpcQuery(
+      page,
+      'envelope.item.getManyByToken',
+      { envelopeId: orgTemplate.id, access: { type: 'user' } },
+      teamB.id,
+    );
+
+    expect(res.ok()).toBeFalsy();
+  });
+});

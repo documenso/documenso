@@ -2,7 +2,6 @@ import { syncMemberCountWithStripeSeatPlan } from '@documenso/ee/server-only/str
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobs } from '@documenso/lib/jobs/client';
-import { validateIfSubscriptionIsRequired } from '@documenso/lib/utils/billing';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
 import { OrganisationMemberInviteStatus } from '@documenso/prisma/client';
@@ -55,6 +54,11 @@ export const deleteOrganisationMembers = async ({
     include: {
       subscription: true,
       organisationClaim: true,
+      teams: {
+        select: {
+          id: true,
+        },
+      },
       members: {
         select: {
           id: true,
@@ -82,16 +86,43 @@ export const deleteOrganisationMembers = async ({
     organisationMemberIds.includes(member.id),
   );
 
-  const subscription = validateIfSubscriptionIsRequired(organisation.subscription);
-
   const inviteCount = organisation.invites.length;
   const newMemberCount = organisation.members.length + inviteCount - membersToDelete.length;
 
-  if (subscription) {
-    await syncMemberCountWithStripeSeatPlan(subscription, organisationClaim, newMemberCount);
+  // Removing members is a reducing operation, so we don't gate it on the
+  // subscription being present. Sync Stripe only when one exists.
+  if (organisation.subscription) {
+    await syncMemberCountWithStripeSeatPlan(
+      organisation.subscription,
+      organisationClaim,
+      newMemberCount,
+    );
   }
 
+  const removedUserIds = membersToDelete.map((member) => member.userId);
+  const teamIds = organisation.teams.map((team) => team.id);
+
   await prisma.$transaction(async (tx) => {
+    // Removing an OrganisationMember cascades the user out of every team in
+    // the org via OrganisationGroupMember, but their authored Envelope rows
+    // still reference them. Reassign those to the org owner so they remain
+    // reachable after the member loses access (mirrors delete-user.ts).
+    if (removedUserIds.length > 0 && teamIds.length > 0) {
+      await tx.envelope.updateMany({
+        where: {
+          userId: {
+            in: removedUserIds,
+          },
+          teamId: {
+            in: teamIds,
+          },
+        },
+        data: {
+          userId: organisation.ownerUserId,
+        },
+      });
+    }
+
     await tx.organisationMember.deleteMany({
       where: {
         id: {

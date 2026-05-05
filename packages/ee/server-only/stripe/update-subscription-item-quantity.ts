@@ -50,55 +50,88 @@ export const updateSubscriptionItemQuantity = async ({
 };
 
 /**
- * Checks whether the member count should be synced with a given Stripe subscription.
+ * Asserts that a proposed member count does not exceed the organisation's cap.
  *
- * If the subscription is not "seat" based, it will be ignored.
+ * Only enforced for non-seats-based plans, since seats-based plans meter usage
+ * via Stripe rather than enforcing a hard cap. A `memberCount` of `0` on the
+ * organisation claim represents unlimited seats.
  *
- * @param subscription - The subscription to sync the member count with.
- * @param organisationClaim - The organisation claim
- * @param quantity - The amount to sync the Stripe item with
- * @returns
+ * Should only be called from grow paths (invite/add). Reducing operations
+ * must never be gated by this check.
+ *
+ * @param subscription - The organisation's Stripe subscription.
+ * @param organisationClaim - The organisation claim.
+ * @param quantity - The proposed total member + pending invite count.
  */
-export const syncMemberCountWithStripeSeatPlan = async (
+export const assertMemberCountWithinCap = async (
   subscription: Subscription,
   organisationClaim: OrganisationClaim,
   quantity: number,
 ) => {
   const maximumMemberCount = organisationClaim.memberCount;
 
-  // Infinite seats means no sync needed.
+  // 0 = unlimited.
   if (maximumMemberCount === 0) {
     return;
   }
 
-  const syncMemberCountWithStripe = await isPriceSeatsBased(subscription.priceId);
+  // Seats-based plans don't have a hard cap; Stripe meters the usage.
+  const isSeatsBased = await isPriceSeatsBased(subscription.priceId);
 
-  // Throw error if quantity exceeds maximum member count and the subscription is not seats based.
-  if (quantity > maximumMemberCount && !syncMemberCountWithStripe) {
+  if (isSeatsBased) {
+    return;
+  }
+
+  if (quantity > maximumMemberCount) {
     throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
       message: 'Maximum member count reached',
     });
   }
+};
 
-  // Bill the user with the new quantity.
-  if (syncMemberCountWithStripe) {
-    appLog('BILLING', 'Updating seat based plan');
-
-    await updateSubscriptionItemQuantity({
-      priceId: subscription.priceId,
-      subscriptionId: subscription.planId,
-      quantity,
-    });
-
-    // This should be automatically updated after the Stripe webhook is fired
-    // but we just manually adjust it here as well to avoid any race conditions.
-    await prisma.organisationClaim.update({
-      where: {
-        id: organisationClaim.id,
-      },
-      data: {
-        memberCount: quantity,
-      },
-    });
+/**
+ * Syncs the organisation's member count with the Stripe subscription quantity.
+ *
+ * No-ops for plans that are not seats-based, and for organisations with
+ * unlimited seats (`organisationClaim.memberCount === 0`). Safe to call from
+ * both grow and shrink paths.
+ *
+ * @param subscription - The subscription to sync the member count with.
+ * @param organisationClaim - The organisation claim.
+ * @param quantity - The new total member + pending invite count to sync.
+ */
+export const syncMemberCountWithStripeSeatPlan = async (
+  subscription: Subscription,
+  organisationClaim: OrganisationClaim,
+  quantity: number,
+) => {
+  // Infinite seats means no sync needed.
+  if (organisationClaim.memberCount === 0) {
+    return;
   }
+
+  const isSeatsBased = await isPriceSeatsBased(subscription.priceId);
+
+  if (!isSeatsBased) {
+    return;
+  }
+
+  appLog('BILLING', 'Updating seat based plan');
+
+  await updateSubscriptionItemQuantity({
+    priceId: subscription.priceId,
+    subscriptionId: subscription.planId,
+    quantity,
+  });
+
+  // This should be automatically updated after the Stripe webhook is fired
+  // but we just manually adjust it here as well to avoid any race conditions.
+  await prisma.organisationClaim.update({
+    where: {
+      id: organisationClaim.id,
+    },
+    data: {
+      memberCount: quantity,
+    },
+  });
 };

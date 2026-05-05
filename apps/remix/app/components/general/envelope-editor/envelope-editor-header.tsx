@@ -74,8 +74,8 @@ export default function EnvelopeEditorHeader() {
 
   return (
     <nav className="w-full border-b border-border bg-background px-4 py-3 md:px-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex min-w-0 flex-1 items-center space-x-4">
           {editorConfig.embedded?.customBrandingLogo ? (
             <img
               src={`/api/branding/logo/team/${envelope.teamId}`}
@@ -87,9 +87,9 @@ export default function EnvelopeEditorHeader() {
               <BrandingLogo className="h-6 w-auto" />
             </Link>
           )}
-          <Separator orientation="vertical" className="h-6" />
+          <Separator orientation="vertical" className="h-6 shrink-0" />
 
-          <div className="flex items-center space-x-2">
+          <div className="flex min-w-0 items-center space-x-2">
             <EnvelopeItemTitleInput
               dataTestId="envelope-title-input"
               disabled={!envelopeItemPermissions.canTitleBeChanged || !allowConfigureEnvelopeTitle}
@@ -107,19 +107,19 @@ export default function EnvelopeEditorHeader() {
             {envelope.type === EnvelopeType.TEMPLATE && (
               <>
                 {envelope.templateType === TemplateType.PRIVATE && (
-                  <Badge variant="secondary">
+                  <Badge variant="secondary" className="shrink-0">
                     <LockIcon className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-300" />
                     <Trans>Private Template</Trans>
                   </Badge>
                 )}
                 {envelope.templateType === TemplateType.ORGANISATION && (
-                  <Badge variant="orange">
+                  <Badge variant="orange" className="shrink-0">
                     <Building2Icon className="mr-2 size-4" />
                     <Trans>Organisation Template</Trans>
                   </Badge>
                 )}
                 {envelope.templateType === TemplateType.PUBLIC && (
-                  <Badge variant="default">
+                  <Badge variant="default" className="shrink-0">
                     <Globe2Icon className="mr-2 h-4 w-4 text-green-500 dark:text-green-300" />
                     <Trans>Public Template</Trans>
                   </Badge>
@@ -127,7 +127,7 @@ export default function EnvelopeEditorHeader() {
 
                 {envelope.directLink?.token && (
                   <TemplateDirectLinkBadge
-                    className="py-1"
+                    className="shrink-0 py-1"
                     token={envelope.directLink.token}
                     enabled={envelope.directLink.enabled}
                   />
@@ -138,22 +138,22 @@ export default function EnvelopeEditorHeader() {
             {envelope.type === EnvelopeType.DOCUMENT &&
               match(envelope.status)
                 .with(DocumentStatus.DRAFT, () => (
-                  <Badge variant="warning">
+                  <Badge variant="warning" className="shrink-0">
                     <Trans>Draft</Trans>
                   </Badge>
                 ))
                 .with(DocumentStatus.PENDING, () => (
-                  <Badge variant="secondary">
+                  <Badge variant="secondary" className="shrink-0">
                     <Trans>Pending</Trans>
                   </Badge>
                 ))
                 .with(DocumentStatus.COMPLETED, () => (
-                  <Badge variant="default">
+                  <Badge variant="default" className="shrink-0">
                     <Trans>Completed</Trans>
                   </Badge>
                 ))
                 .with(DocumentStatus.REJECTED, () => (
-                  <Badge variant="destructive">
+                  <Badge variant="destructive" className="shrink-0">
                     <Trans>Rejected</Trans>
                   </Badge>
                 ))
@@ -161,7 +161,7 @@ export default function EnvelopeEditorHeader() {
 
             {autosaveError && (
               <>
-                <Badge variant="destructive">
+                <Badge variant="destructive" className="shrink-0">
                   <AlertTriangleIcon className="mr-2 h-4 w-4" />
                   <Trans>Sync failed, changes not saved</Trans>
                 </Badge>
@@ -171,7 +171,7 @@ export default function EnvelopeEditorHeader() {
                     window.location.reload();
                   }}
                 >
-                  <Badge variant="destructive">
+                  <Badge variant="destructive" className="shrink-0">
                     <RefreshCwIcon className="mr-2 h-4 w-4" />
                     <Trans>Reload</Trans>
                   </Badge>
@@ -181,7 +181,7 @@ export default function EnvelopeEditorHeader() {
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex shrink-0 items-center space-x-2">
           {allowAttachments &&
             (isEmbedded ? (
               <EmbeddedEditorAttachmentPopover buttonSize="sm" />
