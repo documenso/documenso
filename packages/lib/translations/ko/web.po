@@ -438,6 +438,10 @@ msgstr "{remaningLength, plural, other {#자 남음}}"
 msgid "{selectedCount} selected"
 msgstr "{selectedCount}개 선택함"
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "{sender} has sent you a document to sign"
+msgstr ""
+
 #: packages/email/template-components/template-document-rejected.tsx
 msgid "{signerName} has rejected the document \"{documentName}\"."
 msgstr "{signerName}님이 \"{documentName}\" 문서를 거부했습니다."
@@ -1541,6 +1545,10 @@ msgstr "모든 조직 구성원이 이 팀에 접근할 수 있도록 허용"
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Allow document recipients to reply directly to this email address"
 msgstr "문서 수신자가 이 이메일 주소로 직접 회신할 수 있도록 허용합니다."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
+msgid "Allow Personal Organisations"
+msgstr ""
 
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
@@ -3845,6 +3853,7 @@ msgstr "Documenso는 <0>모든 문서</0>와 완료된 문서, 서명, 계정에
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
 msgid "Document"
 msgstr "문서"
 
@@ -4315,6 +4324,7 @@ msgstr "전송하지 않음(모든 문서 삭제)"
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/organisation-billing-invoices-table.tsx
+#: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 #: packages/email/template-components/template-document-completed.tsx
 msgid "Download"
@@ -4922,6 +4932,10 @@ msgstr "봉투가 배포되었습니다"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-certificate.ts
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Envelope ID"
 msgstr "봉투 ID"
 
@@ -5392,6 +5406,10 @@ msgstr "폴더가 성공적으로 업데이트되었습니다."
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Font Size"
 msgstr "글꼴 크기"
+
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "For {recipientName}"
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>{SUPPORT_EMAIL}</0>"
@@ -7423,6 +7441,11 @@ msgctxt "Subscription status"
 msgid "Paid"
 msgstr "유료"
 
+#: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
+msgctxt "Partially signed document (adjective)"
+msgid "Partial"
+msgstr ""
+
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
@@ -7678,6 +7701,10 @@ msgstr "이메일을 확인해 주세요."
 msgid "Please confirm your email address"
 msgstr "이메일 주소를 확인해 주세요."
 
+#: apps/remix/app/components/embed/embed-paywall.tsx
+msgid "Please contact <0>support</0> if you have any questions."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Please contact support if you would like to revert this action."
 msgstr "이 작업을 되돌리려면 지원팀에 문의해 주세요."
@@ -7694,8 +7721,6 @@ msgstr "토큰을 나중에 식별할 수 있도록 의미 있는 이름을 입�
 msgid "Please enter a number"
 msgstr "숫자를 입력하세요"
 
-#: apps/remix/app/components/forms/profile.tsx
-#: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Please enter a valid name."
 msgstr "올바른 이름을 입력해 주세요."
@@ -9311,6 +9336,10 @@ msgstr "서명이 너무 작습니다."
 msgid "Signature Pad cannot be empty."
 msgstr "서명 패드는 비워 둘 수 없습니다."
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "Signature requested"
+msgstr ""
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Signature Settings"
 msgstr "서명 설정"
@@ -10377,6 +10406,10 @@ msgstr "다음 팀이 삭제되었습니다. 더 이상 이 팀과 그 문서에
 msgid "The next recipient to sign this document will be <0>{0}</0> (<1>{1}</1>)."
 msgstr "이 문서의 다음 서명자는 <0>{0}</0> (<1>{1}</1>)입니다."
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "The open-source signing platform"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "The OpenID discovery endpoint URL for your provider"
 msgstr "제공자의 OpenID 검색 엔드포인트 URL입니다"
@@ -10776,6 +10809,10 @@ msgstr "현재 이 봉투를 배포할 수 없습니다. 다시 시도해 주세
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
 msgid "This envelope could not be resent at this time. Please try again."
 msgstr "현재 이 봉투를 다시 보낼 수 없습니다. 다시 시도해 주세요."
+
+#: apps/remix/app/components/embed/embed-paywall.tsx
+msgid "This feature is not available on your current plan"
+msgstr ""
 
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
@@ -11737,10 +11774,6 @@ msgstr "사용자 프로필이 추가되었습니다!"
 msgid "User settings"
 msgstr "사용자 설정"
 
-#: apps/remix/app/components/forms/signup.tsx
-msgid "User with this email already exists. Please use a different email address."
-msgstr "이 이메일을 사용하는 사용자가 이미 있습니다. 다른 이메일 주소를 사용해 주세요."
-
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 msgid "Users"
@@ -12287,6 +12320,10 @@ msgid "We were unable to copy your recovery code to your clipboard. Please try a
 msgstr "복구 코드를 클립보드에 복사하지 못했습니다. 다시 시도해 주세요."
 
 #: apps/remix/app/components/forms/signup.tsx
+msgid "We were unable to create your account. If you already have an account, try signing in instead."
+msgstr ""
+
+#: apps/remix/app/components/forms/signup.tsx
 msgid "We were unable to create your account. Please review the information you provided and try again."
 msgstr "계정을 생성하지 못했습니다. 입력하신 정보를 확인한 뒤 다시 시도해 주세요."
 
@@ -12480,6 +12517,10 @@ msgstr "팀으로 할 수 있는 일:"
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "When enabled, signers can choose who should sign next in the sequence instead of following the predefined order."
 msgstr "활성화하면, 미리 정의된 순서 대신 서명자가 다음 서명자를 직접 선택할 수 있습니다."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
+msgid "When enabled, users signing in via SSO for the first time will also receive their own personal organisation."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "When you click continue, you will be prompted to add the first available authenticator on your system."
@@ -13636,4 +13677,3 @@ msgstr "인증 코드:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
-

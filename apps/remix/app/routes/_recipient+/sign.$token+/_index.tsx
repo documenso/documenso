@@ -9,6 +9,7 @@ import signingCelebration from '@documenso/assets/images/signing-celebration.png
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
@@ -307,6 +308,27 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
     payload: payloadV1,
   } as const);
 }
+
+export const meta = ({ params }: Route.MetaArgs) => {
+  const { token } = params;
+  const baseUrl = NEXT_PUBLIC_WEBAPP_URL();
+  const ogImageUrl = `${baseUrl}/sign/${token}/opengraph`;
+  const title = 'You have a document to sign';
+  const description = 'Review and sign this document securely on Documenso.';
+
+  return [
+    { title: `${title} - Documenso` },
+    { name: 'description', content: description },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: ogImageUrl },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: ogImageUrl },
+  ];
+};
 
 export default function SigningPage() {
   const data = useSuperLoaderData<typeof loader>();

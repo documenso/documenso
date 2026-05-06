@@ -438,6 +438,10 @@ msgstr "{remaningLength, plural, one {# teken resterend} other {# tekens restere
 msgid "{selectedCount} selected"
 msgstr "{selectedCount} geselecteerd"
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "{sender} has sent you a document to sign"
+msgstr ""
+
 #: packages/email/template-components/template-document-rejected.tsx
 msgid "{signerName} has rejected the document \"{documentName}\"."
 msgstr "{signerName} heeft het document \"{documentName}\" geweigerd."
@@ -1541,6 +1545,10 @@ msgstr "Alle organisatieleden toestaan toegang te hebben tot dit team"
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Allow document recipients to reply directly to this email address"
 msgstr "Sta documentontvangers toe direct op dit e-mailadres te antwoorden."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
+msgid "Allow Personal Organisations"
+msgstr ""
 
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
@@ -3845,6 +3853,7 @@ msgstr "Documenso verwijdert <0>al je documenten</0>, samen met al je voltooide 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
 msgid "Document"
 msgstr "Document"
 
@@ -4315,6 +4324,7 @@ msgstr "Niet overdragen (alle documenten verwijderen)"
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/organisation-billing-invoices-table.tsx
+#: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 #: packages/email/template-components/template-document-completed.tsx
 msgid "Download"
@@ -4922,6 +4932,10 @@ msgstr "Envelope gedistribueerd"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-certificate.ts
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Envelope ID"
 msgstr "Envelope-ID"
 
@@ -5392,6 +5406,10 @@ msgstr "Map succesvol bijgewerkt"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Font Size"
 msgstr "Lettergrootte"
+
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "For {recipientName}"
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>{SUPPORT_EMAIL}</0>"
@@ -7423,6 +7441,11 @@ msgctxt "Subscription status"
 msgid "Paid"
 msgstr "Betaald"
 
+#: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
+msgctxt "Partially signed document (adjective)"
+msgid "Partial"
+msgstr ""
+
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
@@ -7678,6 +7701,10 @@ msgstr "Bevestig je e-mailadres"
 msgid "Please confirm your email address"
 msgstr "Bevestig je e-mailadres"
 
+#: apps/remix/app/components/embed/embed-paywall.tsx
+msgid "Please contact <0>support</0> if you have any questions."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Please contact support if you would like to revert this action."
 msgstr "Neem contact op met support als je deze actie ongedaan wilt maken."
@@ -7694,8 +7721,6 @@ msgstr "Voer een betekenisvolle naam in voor je token. Hiermee kun je het later 
 msgid "Please enter a number"
 msgstr "Voer een nummer in"
 
-#: apps/remix/app/components/forms/profile.tsx
-#: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Please enter a valid name."
 msgstr "Voer een geldige naam in."
@@ -9311,6 +9336,10 @@ msgstr "Handtekening is te klein"
 msgid "Signature Pad cannot be empty."
 msgstr "Handtekeningveld mag niet leeg zijn."
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "Signature requested"
+msgstr ""
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Signature Settings"
 msgstr "Handtekening-instellingen"
@@ -10377,6 +10406,10 @@ msgstr "Het volgende team is verwijderd. Je hebt geen toegang meer tot dit team 
 msgid "The next recipient to sign this document will be <0>{0}</0> (<1>{1}</1>)."
 msgstr "De volgende ontvanger die dit document moet ondertekenen is <0>{0}</0> (<1>{1}</1>)."
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "The open-source signing platform"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "The OpenID discovery endpoint URL for your provider"
 msgstr "De OpenID-discovery-endpoint-URL voor uw provider"
@@ -10776,6 +10809,10 @@ msgstr "Deze envelop kon op dit moment niet worden verzonden. Probeer het opnieu
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
 msgid "This envelope could not be resent at this time. Please try again."
 msgstr "Deze envelop kon op dit moment niet opnieuw worden verzonden. Probeer het opnieuw."
+
+#: apps/remix/app/components/embed/embed-paywall.tsx
+msgid "This feature is not available on your current plan"
+msgstr ""
 
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
@@ -11737,10 +11774,6 @@ msgstr "Gebruikersprofielen zijn er!"
 msgid "User settings"
 msgstr "Gebruikersinstellingen"
 
-#: apps/remix/app/components/forms/signup.tsx
-msgid "User with this email already exists. Please use a different email address."
-msgstr "Er bestaat al een gebruiker met dit e-mailadres. Gebruik een ander e-mailadres."
-
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 msgid "Users"
@@ -12287,6 +12320,10 @@ msgid "We were unable to copy your recovery code to your clipboard. Please try a
 msgstr "We konden je herstelcode niet naar je klembord kopiëren. Probeer het opnieuw."
 
 #: apps/remix/app/components/forms/signup.tsx
+msgid "We were unable to create your account. If you already have an account, try signing in instead."
+msgstr ""
+
+#: apps/remix/app/components/forms/signup.tsx
 msgid "We were unable to create your account. Please review the information you provided and try again."
 msgstr "We konden je account niet aanmaken. Controleer de door jou ingevoerde gegevens en probeer het opnieuw."
 
@@ -12480,6 +12517,10 @@ msgstr "Wat je met teams kunt doen:"
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "When enabled, signers can choose who should sign next in the sequence instead of following the predefined order."
 msgstr "Wanneer dit is ingeschakeld, kunnen ondertekenaars zelf kiezen wie de volgende in de volgorde moet ondertekenen in plaats van de vooraf gedefinieerde volgorde te volgen."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
+msgid "When enabled, users signing in via SSO for the first time will also receive their own personal organisation."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "When you click continue, you will be prompted to add the first available authenticator on your system."
@@ -13636,4 +13677,3 @@ msgstr "Uw verificatiecode:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
-
