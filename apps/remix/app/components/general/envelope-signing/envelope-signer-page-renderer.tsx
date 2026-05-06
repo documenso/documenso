@@ -167,7 +167,9 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
       const currentTarget = e.currentTarget as Konva.Group;
       const target = e.target as Konva.Shape;
 
-      const { width: fieldWidth, height: fieldHeight } = fieldGroup.getClientRect();
+      const fieldRect = fieldGroup.findOne('.field-rect');
+      const fieldWidth = fieldRect ? fieldRect.width() : fieldGroup.width();
+      const fieldHeight = fieldRect ? fieldRect.height() : fieldGroup.height();
 
       const foundField = localPageFields.find((f) => f.id === unparsedField.id);
       const foundLoadingGroup = currentTarget.findOne('.loading-spinner-group');
@@ -195,8 +197,8 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
       }
 
       const loadingSpinnerGroup = createSpinner({
-        fieldWidth: fieldWidth / scale,
-        fieldHeight: fieldHeight / scale,
+        fieldWidth,
+        fieldHeight,
       });
 
       const parsedFoundField = ZFullFieldSchema.parse(foundField);
