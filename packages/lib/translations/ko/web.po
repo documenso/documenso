@@ -496,6 +496,10 @@ msgstr "{remaningLength, plural, other {#자 남음}}"
 msgid "{selectedCount} selected"
 msgstr "{selectedCount}개 선택함"
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "{sender} has sent you a document to sign"
+msgstr ""
+
 #: packages/email/template-components/template-document-rejected.tsx
 msgid "{signerName} has rejected the document \"{documentName}\"."
 msgstr "{signerName}님이 \"{documentName}\" 문서를 거부했습니다."
@@ -4292,6 +4296,7 @@ msgstr "Documenso는 <0>모든 문서</0>와 완료된 문서, 서명, 계정에
 
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
 msgid "Document"
 msgstr "문서"
 
@@ -6029,6 +6034,10 @@ msgstr "폴더가 성공적으로 업데이트되었습니다."
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Font Size"
 msgstr "글꼴 크기"
+
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "For {recipientName}"
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>{SUPPORT_EMAIL}</0>"
@@ -10389,6 +10398,10 @@ msgstr "서명이 너무 작습니다."
 #: apps/remix/app/components/forms/profile.tsx
 msgid "Signature Pad cannot be empty."
 msgstr "서명 패드는 비워 둘 수 없습니다."
+
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "Signature requested"
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Signature Settings"

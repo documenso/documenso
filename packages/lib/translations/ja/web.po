@@ -496,6 +496,10 @@ msgstr "{remaningLength, plural, other {# 文字残り}}"
 msgid "{selectedCount} selected"
 msgstr "{selectedCount} 件選択済み"
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "{sender} has sent you a document to sign"
+msgstr ""
+
 #: packages/email/template-components/template-document-rejected.tsx
 msgid "{signerName} has rejected the document \"{documentName}\"."
 msgstr "{signerName} がドキュメント「{documentName}」を却下しました。"
@@ -4292,6 +4296,7 @@ msgstr "Documenso は<0>すべての文書</0>と、完了済み文書・署名�
 
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
 msgid "Document"
 msgstr "文書"
 
@@ -6029,6 +6034,10 @@ msgstr "フォルダは正常に更新されました"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Font Size"
 msgstr "フォントサイズ"
+
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "For {recipientName}"
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>{SUPPORT_EMAIL}</0>"
@@ -10389,6 +10398,10 @@ msgstr "署名が小さすぎます"
 #: apps/remix/app/components/forms/profile.tsx
 msgid "Signature Pad cannot be empty."
 msgstr "署名パッドを空のままにはできません。"
+
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "Signature requested"
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Signature Settings"

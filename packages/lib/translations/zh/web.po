@@ -496,6 +496,10 @@ msgstr "{remaningLength, plural, other {# 个字符剩余}}"
 msgid "{selectedCount} selected"
 msgstr "已选择 {selectedCount} 个"
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "{sender} has sent you a document to sign"
+msgstr ""
+
 #: packages/email/template-components/template-document-rejected.tsx
 msgid "{signerName} has rejected the document \"{documentName}\"."
 msgstr "{signerName} 已拒签文档“{documentName}”。"
@@ -4292,6 +4296,7 @@ msgstr "Documenso 将删除<0>你所有的文档</0>，包括所有已完成的�
 
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
 msgid "Document"
 msgstr "文档"
 
@@ -6029,6 +6034,10 @@ msgstr "文件夹更新成功"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Font Size"
 msgstr "字体大小"
+
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "For {recipientName}"
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>{SUPPORT_EMAIL}</0>"
@@ -10389,6 +10398,10 @@ msgstr "签名太小"
 #: apps/remix/app/components/forms/profile.tsx
 msgid "Signature Pad cannot be empty."
 msgstr "签名板不能为空。"
+
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "Signature requested"
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Signature Settings"
