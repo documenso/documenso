@@ -146,8 +146,37 @@ export const createTeamMembers = async ({
     });
   }
 
+  // Silently drop members who are already in any of the team's internal-team
+  // groups. This makes the create idempotent for the common race where a
+  // member was added to the team between the picker fetch and the submit.
+  const existingTeamMemberships = await prisma.organisationGroupMember.findMany({
+    where: {
+      organisationMemberId: {
+        in: membersToCreate.map((member) => member.organisationMemberId),
+      },
+      group: {
+        teamGroups: {
+          some: { teamId },
+        },
+      },
+    },
+    select: { organisationMemberId: true },
+  });
+
+  const alreadyInTeam = new Set(
+    existingTeamMemberships.map(({ organisationMemberId }) => organisationMemberId),
+  );
+
+  const filteredMembersToCreate = membersToCreate.filter(
+    (member) => !alreadyInTeam.has(member.organisationMemberId),
+  );
+
+  if (filteredMembersToCreate.length === 0) {
+    return;
+  }
+
   await prisma.organisationGroupMember.createMany({
-    data: membersToCreate.map((member) => ({
+    data: filteredMembersToCreate.map((member) => ({
       id: generateDatabaseId('group_member'),
       organisationMemberId: member.organisationMemberId,
       groupId: match(member.teamRole)
