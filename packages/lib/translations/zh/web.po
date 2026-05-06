@@ -10288,6 +10288,7 @@ msgstr "以<0>{0} <1>（{1}）</1></0>的身份签署"
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
 msgid "Sign document"
 msgstr "签署文档"
 
