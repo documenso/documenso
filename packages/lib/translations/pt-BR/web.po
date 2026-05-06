@@ -9223,6 +9223,7 @@ msgstr "Assinar como<0>{0} <1>({1})</1></0>"
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
 msgid "Sign document"
 msgstr "Assinar documento"
 
@@ -10399,10 +10400,6 @@ msgstr "A seguinte equipe foi excluída. Você não poderá mais acessar esta eq
 #. placeholder {1}: form.watch('email')
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
 msgid "The next recipient to sign this document will be <0>{0}</0> (<1>{1}</1>)."
-msgstr ""
-
-#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
-msgid "The open-source signing platform"
 msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx

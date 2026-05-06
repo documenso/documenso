@@ -65,7 +65,7 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
     headline: i18n._(msg`${sender} has sent you a document to sign`),
     documentLabel: i18n._(msg`Document`),
     forRecipient: recipientName ? i18n._(msg`For ${recipientName}`) : null,
-    tagline: i18n._(msg`The open-source signing platform`),
+    cta: i18n._(msg`Sign document`),
   };
 
   const svg = await satori(
@@ -189,7 +189,22 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
         }}
       >
         <img src={`${baseUrl}/static/logo.png`} alt="Documenso" width={204} height={30} />
-        <span style={{ color: '#94a3b8', fontSize: '20px' }}>{labels.tagline}</span>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '14px 28px',
+            borderRadius: '999px',
+            backgroundColor: '#a2e771',
+            color: '#0f172a',
+            fontSize: '22px',
+            fontWeight: 600,
+          }}
+        >
+          {labels.cta}
+          <span style={{ fontSize: '24px' }}>→</span>
+        </div>
       </div>
     </div>,
     {

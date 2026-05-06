@@ -9223,6 +9223,7 @@ msgstr "Sign as<0>{0} <1>({1})</1></0>"
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
 msgid "Sign document"
 msgstr "Sign document"
 
@@ -10400,10 +10401,6 @@ msgstr "The following team has been deleted. You will no longer be able to acces
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
 msgid "The next recipient to sign this document will be <0>{0}</0> (<1>{1}</1>)."
 msgstr "The next recipient to sign this document will be <0>{0}</0> (<1>{1}</1>)."
-
-#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
-msgid "The open-source signing platform"
-msgstr "The open-source signing platform"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "The OpenID discovery endpoint URL for your provider"

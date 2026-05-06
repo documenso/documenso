@@ -9228,6 +9228,7 @@ msgstr "以<0>{0} <1>（{1}）</1></0>的身份签署"
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
 msgid "Sign document"
 msgstr "签署文档"
 
@@ -10405,10 +10406,6 @@ msgstr "以下团队已被删除。您将无法再访问该团队及其文档"
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
 msgid "The next recipient to sign this document will be <0>{0}</0> (<1>{1}</1>)."
 msgstr "下一个需要签署此文档的收件人是<0>{0}</0>（<1>{1}</1>）。"
-
-#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
-msgid "The open-source signing platform"
-msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "The OpenID discovery endpoint URL for your provider"

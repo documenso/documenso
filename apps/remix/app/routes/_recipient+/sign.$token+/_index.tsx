@@ -313,8 +313,9 @@ export const meta = ({ params }: Route.MetaArgs) => {
   const { token } = params;
   const baseUrl = NEXT_PUBLIC_WEBAPP_URL();
   const ogImageUrl = `${baseUrl}/sign/${token}/opengraph`;
-  const title = 'You have a document to sign';
-  const description = 'Review and sign this document securely on Documenso.';
+  const title = 'A document is ready for your secure signature on Documenso';
+  const description =
+    'Review and sign this document securely from your browser. Documenso is the open-source signing platform — no account required to sign.';
 
   return [
     { title: `${title} - Documenso` },
