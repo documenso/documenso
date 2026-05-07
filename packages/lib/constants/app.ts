@@ -25,8 +25,27 @@ export const SUPPORT_EMAIL = env('NEXT_PUBLIC_SUPPORT_EMAIL') ?? 'support@docume
 export const USE_INTERNAL_URL_BROWSERLESS = () =>
   env('NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS') === 'true';
 
-export const IS_AI_FEATURES_CONFIGURED = () =>
-  !!env('GOOGLE_VERTEX_PROJECT_ID') && !!env('GOOGLE_VERTEX_API_KEY');
+export const IS_AI_FEATURES_CONFIGURED = () => {
+  const provider = env('NEXT_PRIVATE_AI_PROVIDER') ?? 'google-vertex';
+
+  if (provider === 'google-vertex') {
+    return !!env('GOOGLE_VERTEX_PROJECT_ID') && !!env('GOOGLE_VERTEX_API_KEY');
+  }
+
+  if (provider === 'anthropic') {
+    return !!env('NEXT_PRIVATE_ANTHROPIC_API_KEY');
+  }
+
+  if (provider === 'openai-compatible') {
+    return (
+      !!env('NEXT_PRIVATE_AI_BASE_URL') &&
+      !!env('NEXT_PRIVATE_AI_API_KEY') &&
+      !!env('NEXT_PRIVATE_AI_MODEL')
+    );
+  }
+
+  return false;
+};
 
 /**
  * Temporary flag to toggle between Playwright-based and Konva-based PDF generation
