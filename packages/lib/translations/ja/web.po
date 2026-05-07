@@ -1542,6 +1542,10 @@ msgstr "すべての組織メンバーがこのチームにアクセスできる
 msgid "Allow document recipients to reply directly to this email address"
 msgstr "ドキュメントの受信者が、このメールアドレスに直接返信できるようにします。"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
+msgid "Allow Personal Organisations"
+msgstr ""
+
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
@@ -4315,6 +4319,7 @@ msgstr "転送しない（すべてのドキュメントを削除）"
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/organisation-billing-invoices-table.tsx
+#: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 #: packages/email/template-components/template-document-completed.tsx
 msgid "Download"
@@ -4922,6 +4927,10 @@ msgstr "封筒を送信しました"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-certificate.ts
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Envelope ID"
 msgstr "封筒ID"
 
@@ -7423,6 +7432,11 @@ msgctxt "Subscription status"
 msgid "Paid"
 msgstr "有料"
 
+#: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
+msgctxt "Partially signed document (adjective)"
+msgid "Partial"
+msgstr ""
+
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
@@ -7678,6 +7692,10 @@ msgstr "メールアドレスを確認してください"
 msgid "Please confirm your email address"
 msgstr "メールアドレスを確認してください"
 
+#: apps/remix/app/components/embed/embed-paywall.tsx
+msgid "Please contact <0>support</0> if you have any questions."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Please contact support if you would like to revert this action."
 msgstr "この操作を元に戻したい場合は、サポートまでお問い合わせください。"
@@ -7694,8 +7712,6 @@ msgstr "トークンの用途が分かる名前を入力してください。後
 msgid "Please enter a number"
 msgstr "数値を入力してください"
 
-#: apps/remix/app/components/forms/profile.tsx
-#: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Please enter a valid name."
 msgstr "有効な名前を入力してください。"
@@ -10777,6 +10793,10 @@ msgstr "この封筒は現在送信できません。もう一度お試しくだ
 msgid "This envelope could not be resent at this time. Please try again."
 msgstr "この封筒は現在再送信できません。もう一度お試しください。"
 
+#: apps/remix/app/components/embed/embed-paywall.tsx
+msgid "This feature is not available on your current plan"
+msgstr ""
+
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "このフィールドは変更も削除もできません。このテンプレートのダイレクトリンクを共有するか、公開プロフィールに追加すると、アクセスした人は自分の名前とメールアドレスを入力し、割り当てられたフィールドに入力できます。"
@@ -11737,10 +11757,6 @@ msgstr "ユーザープロフィール機能が登場しました！"
 msgid "User settings"
 msgstr "ユーザー設定"
 
-#: apps/remix/app/components/forms/signup.tsx
-msgid "User with this email already exists. Please use a different email address."
-msgstr "このメールアドレスのユーザーはすでに存在します。別のメールアドレスを使用してください。"
-
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 msgid "Users"
@@ -12287,6 +12303,10 @@ msgid "We were unable to copy your recovery code to your clipboard. Please try a
 msgstr "リカバリーコードをクリップボードにコピーできませんでした。もう一度お試しください。"
 
 #: apps/remix/app/components/forms/signup.tsx
+msgid "We were unable to create your account. If you already have an account, try signing in instead."
+msgstr ""
+
+#: apps/remix/app/components/forms/signup.tsx
 msgid "We were unable to create your account. Please review the information you provided and try again."
 msgstr "アカウントを作成できませんでした。入力内容を確認のうえ、もう一度お試しください。"
 
@@ -12480,6 +12500,10 @@ msgstr "チームでできること:"
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "When enabled, signers can choose who should sign next in the sequence instead of following the predefined order."
 msgstr "有効にすると、定義済みの順序ではなく、署名者が次に署名する人を順次選択できるようになります。"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
+msgid "When enabled, users signing in via SSO for the first time will also receive their own personal organisation."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "When you click continue, you will be prompted to add the first available authenticator on your system."
@@ -13636,4 +13660,3 @@ msgstr "認証コード:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
-
