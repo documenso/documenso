@@ -34,7 +34,6 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
 import {
   Select,
   SelectContent,
@@ -43,6 +42,11 @@ import {
   SelectValue,
 } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+import {
+  type OrganisationMemberOption,
+  OrganisationMembersMultiSelectCombobox,
+} from '~/components/general/organisation-members-multiselect-combobox';
 
 export type OrganisationGroupCreateDialogProps = {
   trigger?: React.ReactNode;
@@ -64,6 +68,7 @@ export const OrganisationGroupCreateDialog = ({
   const { toast } = useToast();
 
   const [open, setOpen] = useState(false);
+  const [selectedMembers, setSelectedMembers] = useState<OrganisationMemberOption[]>([]);
   const organisation = useCurrentOrganisation();
 
   const form = useForm({
@@ -76,13 +81,6 @@ export const OrganisationGroupCreateDialog = ({
   });
 
   const { mutateAsync: createOrganisationGroup } = trpc.organisation.group.create.useMutation();
-
-  const { data: membersFindResult, isLoading: isLoadingMembers } =
-    trpc.organisation.member.find.useQuery({
-      organisationId: organisation.id,
-    });
-
-  const members = membersFindResult?.data ?? [];
 
   const onFormSubmit = async ({
     name,
@@ -119,6 +117,7 @@ export const OrganisationGroupCreateDialog = ({
 
   useEffect(() => {
     form.reset();
+    setSelectedMembers([]);
   }, [open, form]);
 
   return (
@@ -178,7 +177,7 @@ export const OrganisationGroupCreateDialog = ({
                     </FormLabel>
                     <FormControl>
                       <Select {...field} onValueChange={field.onChange}>
-                        <SelectTrigger className="text-muted-foreground w-full">
+                        <SelectTrigger className="w-full text-muted-foreground">
                           <SelectValue />
                         </SelectTrigger>
 
@@ -209,16 +208,15 @@ export const OrganisationGroupCreateDialog = ({
                     </FormLabel>
 
                     <FormControl>
-                      <MultiSelectCombobox
-                        options={members.map((member) => ({
-                          label: member.name,
-                          value: member.id,
-                        }))}
-                        loading={isLoadingMembers}
-                        selectedValues={field.value}
-                        onChange={field.onChange}
-                        className="bg-background w-full"
-                        emptySelectionPlaceholder={t`Select members`}
+                      <OrganisationMembersMultiSelectCombobox
+                        organisationId={organisation.id}
+                        selectedMembers={selectedMembers}
+                        onChange={(members) => {
+                          setSelectedMembers(members);
+                          field.onChange(members.map((member) => member.id));
+                        }}
+                        className="w-full bg-background"
+                        dataTestId="group-members-picker"
                       />
                     </FormControl>
 

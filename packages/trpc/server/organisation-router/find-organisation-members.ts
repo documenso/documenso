@@ -28,6 +28,7 @@ export const findOrganisationMembersRoute = authenticatedProcedure
       query: input.query,
       page: input.page,
       perPage: input.perPage,
+      excludeTeamId: input.excludeTeamId,
     });
 
     return {
@@ -55,6 +56,7 @@ type FindOrganisationMembersOptions = {
   query?: string;
   page?: number;
   perPage?: number;
+  excludeTeamId?: number;
 };
 
 export const findOrganisationMembers = async ({
@@ -63,6 +65,7 @@ export const findOrganisationMembers = async ({
   query,
   page = 1,
   perPage = 10,
+  excludeTeamId,
 }: FindOrganisationMembersOptions) => {
   const organisation = await prisma.organisation.findFirst({
     where: buildOrganisationWhereQuery({ organisationId, userId }),
@@ -92,6 +95,21 @@ export const findOrganisationMembers = async ({
           },
         },
       ],
+    };
+  }
+
+  // Exclude organisation members who are already part of the given team —
+  // i.e. they belong to an organisation group that has a team-group entry
+  // pointing at the team.
+  if (excludeTeamId !== undefined) {
+    whereClause.organisationGroupMembers = {
+      none: {
+        group: {
+          teamGroups: {
+            some: { teamId: excludeTeamId },
+          },
+        },
+      },
     };
   }
 
