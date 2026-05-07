@@ -1100,9 +1100,10 @@ model OrganisationAuthenticationPortal {
   clientSecret String @default("")
   wellKnownUrl String @default("")
 
-  defaultOrganisationRole OrganisationMemberRole @default(MEMBER)
-  autoProvisionUsers      Boolean                @default(true)
-  allowedDomains          String[]               @default([])
+  defaultOrganisationRole    OrganisationMemberRole @default(MEMBER)
+  autoProvisionUsers         Boolean                @default(true)
+  allowedDomains             String[]               @default([])
+  allowPersonalOrganisations Boolean                @default(false)
 }
 
 model Counter {

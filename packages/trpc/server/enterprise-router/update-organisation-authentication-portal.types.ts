@@ -14,6 +14,7 @@ export const ZUpdateOrganisationAuthenticationPortalRequestSchema = z.object({
     wellKnownUrl: z.union([z.string().url(), z.literal('')]),
     autoProvisionUsers: z.boolean(),
     allowedDomains: z.array(z.string().regex(domainRegex)),
+    allowPersonalOrganisations: z.boolean(),
   }),
 });
 

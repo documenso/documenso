@@ -220,11 +220,23 @@ export const ZEmbedCreateEnvelopeAuthoringSchema = ZBaseEmbedDataSchema.extend({
   externalId: z.string().optional(),
   type: z.nativeEnum(EnvelopeType),
   folderId: z.string().optional(),
+  user: z
+    .object({
+      email: z.string().email().optional(),
+      name: z.string().optional(),
+    })
+    .optional(),
   features: z.object({}).passthrough().optional().default(DEFAULT_EMBEDDED_EDITOR_CONFIG),
 });
 
 export const ZEmbedEditEnvelopeAuthoringSchema = ZBaseEmbedDataSchema.extend({
   externalId: z.string().optional(),
+  user: z
+    .object({
+      email: z.string().email().optional(),
+      name: z.string().optional(),
+    })
+    .optional(),
   features: z.object({}).passthrough().optional().default(DEFAULT_EMBEDDED_EDITOR_CONFIG),
 });
 
@@ -323,5 +335,9 @@ export type EnvelopeEditorConfig = TEnvelopeEditorSettings & {
     onCreate?: (envelope: Omit<TEditorEnvelope, 'id'>) => void;
     onUpdate?: (envelope: TEditorEnvelope) => void;
     customBrandingLogo?: boolean;
+    user?: {
+      email?: string;
+      name?: string;
+    };
   };
 };

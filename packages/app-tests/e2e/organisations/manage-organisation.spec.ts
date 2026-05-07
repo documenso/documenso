@@ -312,10 +312,12 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Group Name *' }).fill('CUSTOM_GROUP');
   await page.getByRole('combobox').filter({ hasText: 'Organisation Member' }).click();
   await page.getByRole('option', { name: 'Organisation Admin' }).click();
-  await page.getByRole('combobox').filter({ hasText: 'Select members' }).click();
+  await page.getByTestId('group-members-picker').click();
   await page.getByRole('option', { name: 'Member1' }).click();
   await page.getByRole('option', { name: 'Member2' }).click();
   await page.getByRole('option', { name: 'Member3' }).click();
+  // Close the multiselect dropdown so it doesn't overlap the submit button.
+  await page.getByRole('heading', { name: 'Create group' }).click();
   await page.getByTestId('dialog-create-organisation-button').click();
   await expect(page.getByText('Group has been created.').first()).toBeVisible();
 
@@ -338,8 +340,12 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Group Name *' }).fill('CUSTOM_GROUP_A');
   await page.getByRole('combobox').filter({ hasText: 'Organisation Admin' }).click();
   await page.getByRole('option', { name: 'Organisation Member' }).click();
-  await page.getByRole('combobox').filter({ hasText: 'Member1, Member2, Member3' }).click();
-  await page.getByRole('option', { name: 'Member3' }).click();
+  // Remove Member3 by clicking the X on its chip in the multiselect.
+  await page
+    .getByTestId('group-members-picker')
+    .locator('div', { hasText: /^Member3/ })
+    .getByRole('button', { name: 'Remove' })
+    .click();
   await page.getByRole('button', { name: 'Update' }).click();
   await expect(page.getByText('Group has been updated successfully').first()).toBeVisible();
 
@@ -348,10 +354,12 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
   // Create a custom member group with the 3 admins to check that they still get the ADMIN roles.
   await page.getByRole('button', { name: 'Create group' }).click();
   await page.getByRole('textbox', { name: 'Group Name *' }).fill('CUSTOM_GROUP_ADMINS');
-  await page.getByRole('combobox').filter({ hasText: 'Select members' }).click();
+  await page.getByTestId('group-members-picker').click();
   await page.getByRole('option', { name: 'Admin1' }).click();
   await page.getByRole('option', { name: 'Admin2' }).click();
   await page.getByRole('option', { name: 'Admin3' }).click();
+  // Close the multiselect dropdown so it doesn't overlap the submit button.
+  await page.getByRole('heading', { name: 'Create group' }).click();
   await page.getByTestId('dialog-create-organisation-button').click();
   await expect(page.getByText('Group has been created.').first()).toBeVisible();
 
@@ -374,17 +382,21 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Group Name *' }).fill('CUSTOM_GROUP_B');
   await page.getByRole('combobox').filter({ hasText: 'Organisation Member' }).click();
   await page.getByRole('option', { name: 'Organisation Admin' }).click();
-  await page.getByRole('combobox').filter({ hasText: 'Select members' }).click();
+  await page.getByTestId('group-members-picker').click();
   await page.getByRole('option', { name: 'Member4' }).click();
   await page.getByRole('option', { name: 'Member5' }).click();
+  // Close the multiselect dropdown so it doesn't overlap the submit button.
+  await page.getByRole('heading', { name: 'Create group' }).click();
   await page.getByTestId('dialog-create-organisation-button').click();
   await expect(page.getByText('Group has been created.').first()).toBeVisible();
 
   // Assign CUSTOM_GROUP_A to TeamA
   await page.goto(`/t/${teamA}/settings/groups`);
   await page.getByRole('button', { name: 'Add groups' }).click();
-  await page.getByRole('combobox').click();
+  await page.getByTestId('team-groups-picker').click();
   await page.getByRole('option', { name: 'CUSTOM_GROUP_A', exact: true }).click();
+  // Close the multiselect dropdown so it doesn't overlap the Next button.
+  await page.getByRole('heading', { name: 'Add groups' }).click();
   await page.getByRole('button', { name: 'Next' }).click();
   await page.getByRole('combobox').click();
   await page.getByRole('option', { name: 'Manager' }).click();
@@ -394,8 +406,10 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
   // Assign CUSTOM_GROUP_B to TeamA
   await page.goto(`/t/${teamA}/settings/groups`);
   await page.getByRole('button', { name: 'Add groups' }).click();
-  await page.getByRole('combobox').click();
+  await page.getByTestId('team-groups-picker').click();
   await page.getByRole('option', { name: 'CUSTOM_GROUP_B', exact: true }).click();
+  // Close the multiselect dropdown so it doesn't overlap the Next button.
+  await page.getByRole('heading', { name: 'Add groups' }).click();
   await page.getByRole('button', { name: 'Next' }).click();
   await page.getByRole('combobox').click();
   await page.getByRole('option', { name: 'Manager' }).click();
