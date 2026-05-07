@@ -146,15 +146,55 @@ export const createTeamMembers = async ({
     });
   }
 
+  const teamRoleGroupId = (role: TeamMemberRole) =>
+    match(role)
+      .with(TeamMemberRole.MEMBER, () => teamMemberGroup.organisationGroupId)
+      .with(TeamMemberRole.MANAGER, () => teamManagerGroup.organisationGroupId)
+      .with(TeamMemberRole.ADMIN, () => teamAdminGroup.organisationGroupId)
+      .exhaustive();
+
+  // Silently drop additions that would duplicate an existing membership in
+  // the same internal-team role group (the only case that would hit the
+  // (organisationMemberId, groupId) unique constraint). Members who are
+  // implicitly part of the team via an INTERNAL_ORGANISATION group are NOT
+  // dropped, so this still allows assigning an explicit team role on top
+  // of the inherited org-level membership.
+  const existingTeamGroupMemberships = await prisma.organisationGroupMember.findMany({
+    where: {
+      organisationMemberId: {
+        in: membersToCreate.map((member) => member.organisationMemberId),
+      },
+      groupId: {
+        in: [
+          teamMemberGroup.organisationGroupId,
+          teamManagerGroup.organisationGroupId,
+          teamAdminGroup.organisationGroupId,
+        ],
+      },
+    },
+    select: { organisationMemberId: true, groupId: true },
+  });
+
+  const existingPairs = new Set(
+    existingTeamGroupMemberships.map(
+      ({ organisationMemberId, groupId }) => `${organisationMemberId}:${groupId}`,
+    ),
+  );
+
+  const filteredMembersToCreate = membersToCreate.filter(
+    (member) =>
+      !existingPairs.has(`${member.organisationMemberId}:${teamRoleGroupId(member.teamRole)}`),
+  );
+
+  if (filteredMembersToCreate.length === 0) {
+    return;
+  }
+
   await prisma.organisationGroupMember.createMany({
-    data: membersToCreate.map((member) => ({
+    data: filteredMembersToCreate.map((member) => ({
       id: generateDatabaseId('group_member'),
       organisationMemberId: member.organisationMemberId,
-      groupId: match(member.teamRole)
-        .with(TeamMemberRole.MEMBER, () => teamMemberGroup.organisationGroupId)
-        .with(TeamMemberRole.MANAGER, () => teamManagerGroup.organisationGroupId)
-        .with(TeamMemberRole.ADMIN, () => teamAdminGroup.organisationGroupId)
-        .exhaustive(),
+      groupId: teamRoleGroupId(member.teamRole),
     })),
   });
 };

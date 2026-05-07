@@ -65,6 +65,8 @@ export const createTeamGroupsRoute = authenticatedProcedure
       },
     });
 
+    // Hard validation — these failures indicate programming or authorisation
+    // errors and should reject the whole request.
     const isValid = groups.every((group) => {
       const organisationGroup = team.organisation.groups.find(
         ({ id }) => id === group.organisationGroupId,
@@ -84,11 +86,6 @@ export const createTeamGroupsRoute = authenticatedProcedure
         return false;
       }
 
-      // Check that the group is not already added to the team.
-      if (organisationGroup.teamGroups.some((teamGroup) => teamGroup.teamId === teamId)) {
-        return false;
-      }
-
       // Check that the user has permission to add the group to the team.
       if (!isTeamRoleWithinUserHierarchy(currentUserTeamRole, group.teamRole)) {
         return false;
@@ -103,8 +100,23 @@ export const createTeamGroupsRoute = authenticatedProcedure
       });
     }
 
+    // Silently drop groups already attached to the team. Makes the create
+    // idempotent for the common race where a group was added between the
+    // picker fetch and the submit.
+    const filteredGroups = groups.filter((group) => {
+      const organisationGroup = team.organisation.groups.find(
+        ({ id }) => id === group.organisationGroupId,
+      );
+
+      return !organisationGroup?.teamGroups.some((teamGroup) => teamGroup.teamId === teamId);
+    });
+
+    if (filteredGroups.length === 0) {
+      return;
+    }
+
     await prisma.teamGroup.createMany({
-      data: groups.map((group) => ({
+      data: filteredGroups.map((group) => ({
         id: generateDatabaseId('team_group'),
         teamId,
         organisationGroupId: group.organisationGroupId,
