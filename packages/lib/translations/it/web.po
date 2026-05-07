@@ -8,7 +8,7 @@ msgstr ""
 "Language: it\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-04-22 14:34\n"
+"PO-Revision-Date: 2026-05-07 05:08\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -1544,7 +1544,7 @@ msgstr "Consenti ai destinatari del documento di rispondere direttamente a quest
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Allow Personal Organisations"
-msgstr ""
+msgstr "Consenti organizzazioni personali"
 
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
@@ -6338,6 +6338,8 @@ msgstr "Caricamento suggerimenti..."
 #: apps/remix/app/components/embed/embed-client-loading.tsx
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Loading..."
 msgstr "Caricamento in corso..."
@@ -6914,9 +6916,17 @@ msgstr "Nessuna cartella ancora."
 msgid "No further action is required from you at this time."
 msgstr "Non sono richieste ulteriori azioni da parte tua in questo momento."
 
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+msgid "No groups found"
+msgstr "Nessun gruppo trovato"
+
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "No License Configured"
 msgstr "Nessuna licenza configurata"
+
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
+msgid "No members found"
+msgstr "Nessun membro trovato"
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "No members selected"
@@ -7435,7 +7445,7 @@ msgstr "A pagamento"
 #: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
 msgctxt "Partially signed document (adjective)"
 msgid "Partial"
-msgstr ""
+msgstr "Parzialmente firmato"
 
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
@@ -7694,7 +7704,7 @@ msgstr "Per favore conferma il tuo indirizzo email"
 
 #: apps/remix/app/components/embed/embed-paywall.tsx
 msgid "Please contact <0>support</0> if you have any questions."
-msgstr ""
+msgstr "Contatta il <0>supporto</0> se hai domande."
 
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Please contact support if you would like to revert this action."
@@ -8777,9 +8787,17 @@ msgstr "Cerca documenti..."
 msgid "Search folders..."
 msgstr "Cerca cartelle..."
 
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+msgid "Search groups by name"
+msgstr "Cerca gruppi per nome"
+
 #: packages/ui/components/common/language-switcher-dialog.tsx
 msgid "Search languages..."
 msgstr "Cerca lingue..."
+
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
+msgid "Search members by name or email"
+msgstr "Cerca membri per nome o email"
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "Secret"
@@ -8900,7 +8918,8 @@ msgstr "Seleziona ruolo predefinito"
 msgid "Select direction"
 msgstr "Seleziona la direzione"
 
-#: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
 msgid "Select groups"
 msgstr "Seleziona gruppi"
 
@@ -8912,9 +8931,8 @@ msgstr "Seleziona i gruppi di membri da aggiungere al team."
 msgid "Select groups to add to this team"
 msgstr "Seleziona i gruppi da aggiungere a questo team"
 
-#: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
-#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
 msgid "Select members"
 msgstr "Seleziona membri"
 
@@ -10795,7 +10813,7 @@ msgstr "Questa busta non può essere reinviata in questo momento. Per favore rip
 
 #: apps/remix/app/components/embed/embed-paywall.tsx
 msgid "This feature is not available on your current plan"
-msgstr ""
+msgstr "Questa funzionalità non è disponibile nel tuo piano attuale"
 
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
@@ -12304,7 +12322,7 @@ msgstr "Non siamo riusciti a copiare il tuo codice di recupero negli appunti. Si
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "We were unable to create your account. If you already have an account, try signing in instead."
-msgstr ""
+msgstr "Non siamo riusciti a creare il tuo account. Se hai già un account, prova ad accedere invece."
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "We were unable to create your account. Please review the information you provided and try again."
@@ -12503,7 +12521,7 @@ msgstr "Quando abilitato, i firmatari possono scegliere chi deve firmare success
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "When enabled, users signing in via SSO for the first time will also receive their own personal organisation."
-msgstr ""
+msgstr "Quando è abilitata, gli utenti che eseguono l’accesso tramite SSO per la prima volta riceveranno anche una propria organizzazione personale."
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "When you click continue, you will be prompted to add the first available authenticator on your system."
@@ -13660,3 +13678,4 @@ msgstr "Il tuo codice di verifica:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "tuo-dominio.com altro-dominio.com"
+
