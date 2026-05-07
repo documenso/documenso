@@ -1,3 +1,4 @@
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { mapEnvelopesToDocumentMany } from '@documenso/lib/utils/document';
 
@@ -43,6 +44,16 @@ export const findDocumentsRoute = authenticatedProcedure
 
     return {
       ...documents,
-      data: documents.data.map((envelope) => mapEnvelopesToDocumentMany(envelope)),
+      data: documents.data.map((envelope) => {
+        const document = mapEnvelopesToDocumentMany(envelope);
+
+        return {
+          ...document,
+          shareURL:
+            envelope.status === 'COMPLETED' && envelope.qrToken
+              ? `${NEXT_PUBLIC_WEBAPP_URL()}/share/${envelope.qrToken}`
+              : null,
+        };
+      }),
     };
   });

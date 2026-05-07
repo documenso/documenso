@@ -15,23 +15,35 @@ export type CreateSharingIdOptions =
   | {
       documentId: number;
       userId: number;
+    }
+  | {
+      envelopeId: string;
+      token: string;
+    }
+  | {
+      envelopeId: string;
+      userId: number;
     };
 
-export const createOrGetShareLink = async ({ documentId, ...options }: CreateSharingIdOptions) => {
-  const envelope = await prisma.envelope.findUnique({
-    where: unsafeBuildEnvelopeIdQuery(
-      {
-        type: 'documentId',
-        id: documentId,
-      },
-      EnvelopeType.DOCUMENT,
-    ),
-    select: {
-      id: true,
-    },
-  });
+export const createOrGetShareLink = async (options: CreateSharingIdOptions) => {
+  const envelope =
+    'envelopeId' in options
+      ? await prisma.envelope.findUnique({
+          where: { id: options.envelopeId },
+          select: { id: true, type: true },
+        })
+      : await prisma.envelope.findUnique({
+          where: unsafeBuildEnvelopeIdQuery(
+            {
+              type: 'documentId',
+              id: options.documentId,
+            },
+            EnvelopeType.DOCUMENT,
+          ),
+          select: { id: true, type: true },
+        });
 
-  if (!envelope) {
+  if (!envelope || envelope.type !== EnvelopeType.DOCUMENT) {
     throw new AppError(AppErrorCode.NOT_FOUND);
   }
 

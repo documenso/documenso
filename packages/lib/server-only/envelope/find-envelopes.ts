@@ -4,6 +4,7 @@ import type { Expression, ExpressionBuilder, SelectQueryBuilder, SqlBool } from 
 import { kyselyPrisma, prisma, sql } from '@documenso/prisma';
 import type { DB } from '@documenso/prisma/generated/types';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import type { FindResultResponse } from '../../types/search-params';
 import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
@@ -286,6 +287,11 @@ export const findEnvelopes = async ({
   const mappedData = maskedData.map((envelope) => ({
     ...envelope,
     recipients: envelope.Recipient,
+    qrToken: envelope.status === 'COMPLETED' ? envelope.qrToken : null,
+    shareURL:
+      envelope.status === 'COMPLETED' && envelope.qrToken
+        ? `${NEXT_PUBLIC_WEBAPP_URL()}/share/${envelope.qrToken}`
+        : null,
     user: {
       id: envelope.user.id,
       name: envelope.user.name || '',

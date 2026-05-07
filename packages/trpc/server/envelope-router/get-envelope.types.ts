@@ -18,7 +18,13 @@ export const ZGetEnvelopeRequestSchema = z.object({
   envelopeId: z.string(),
 });
 
-export const ZGetEnvelopeResponseSchema = ZEnvelopeSchema;
+export const ZGetEnvelopeResponseSchema = ZEnvelopeSchema.extend({
+  shareURL: z
+    .string()
+    .url()
+    .describe('Share URL (read-only). Null unless the envelope status is COMPLETED.')
+    .nullable(),
+});
 
 export type TGetEnvelopeRequest = z.infer<typeof ZGetEnvelopeRequestSchema>;
 export type TGetEnvelopeResponse = z.infer<typeof ZGetEnvelopeResponseSchema>;

@@ -2,6 +2,7 @@ import type { EnvelopeType, Prisma } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
@@ -88,6 +89,11 @@ export const getEnvelopeById = async ({ id, userId, teamId, type }: GetEnvelopeB
 
   return {
     ...envelope,
+    qrToken: envelope.status === 'COMPLETED' ? envelope.qrToken : null,
+    shareURL:
+      envelope.status === 'COMPLETED' && envelope.qrToken
+        ? `${NEXT_PUBLIC_WEBAPP_URL()}/share/${envelope.qrToken}`
+        : null,
     user: {
       id: envelope.user.id,
       name: envelope.user.name || '',

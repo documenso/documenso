@@ -35,7 +35,13 @@ export const ZFindDocumentsRequestSchema = ZFindSearchParamsSchema.extend({
 });
 
 export const ZFindDocumentsResponseSchema = ZFindResultResponse.extend({
-  data: ZDocumentManySchema.array(),
+  data: ZDocumentManySchema.extend({
+    shareURL: z
+      .string()
+      .describe('Share URL (read-only). Null unless the envelope status is COMPLETED.')
+      .url()
+      .nullable(),
+  }).array(),
 });
 
 export type TFindDocumentsRequest = z.infer<typeof ZFindDocumentsRequestSchema>;
