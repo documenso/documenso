@@ -19,6 +19,12 @@ export const ZFindOrganisationGroupsRequestSchema = ZFindSearchParamsSchema.exte
   organisationGroupId: z.string().optional(),
   organisationRoles: z.nativeEnum(OrganisationMemberRole).array().optional(),
   types: z.nativeEnum(OrganisationGroupType).array().optional(),
+  /**
+   * Exclude organisation groups that are already attached to the given team.
+   * Useful for "add groups to team" pickers so that groups already on the
+   * team don't appear in the dropdown.
+   */
+  excludeTeamId: z.number().optional(),
 });
 
 export const ZFindOrganisationGroupsResponseSchema = ZFindResultResponse.extend({

@@ -208,8 +208,14 @@ export const EnvelopeEditorRecipientForm = () => {
       envelope.fields.filter((field) => field.recipientId === signer.id).length === 0,
   );
 
+  const currentEditorEmail = isEmbedded ? editorConfig.embedded?.user?.email : user?.email;
+
+  const currentEditorName = isEmbedded ? editorConfig.embedded?.user?.name : user?.name;
+
+  const hasCurrentEditorInfo = Boolean(currentEditorEmail || currentEditorName);
+
   const isUserAlreadyARecipient = watchedSigners.some(
-    (signer) => signer.email.toLowerCase() === user?.email?.toLowerCase(),
+    (signer) => signer.email.toLowerCase() === currentEditorEmail?.toLowerCase(),
   );
 
   const hasDocumentBeenSent = recipients.some(
@@ -344,11 +350,11 @@ export const EnvelopeEditorRecipientForm = () => {
 
   const onAddSelfSigner = () => {
     if (emptySignerIndex !== -1) {
-      setValue(`signers.${emptySignerIndex}.name`, user?.name ?? '', {
+      setValue(`signers.${emptySignerIndex}.name`, currentEditorName ?? '', {
         shouldValidate: true,
         shouldDirty: true,
       });
-      setValue(`signers.${emptySignerIndex}.email`, user?.email ?? '', {
+      setValue(`signers.${emptySignerIndex}.email`, currentEditorEmail ?? '', {
         shouldValidate: true,
         shouldDirty: true,
       });
@@ -358,8 +364,8 @@ export const EnvelopeEditorRecipientForm = () => {
       appendSigner(
         {
           formId: nanoid(12),
-          name: user?.name ?? '',
-          email: user?.email ?? '',
+          name: currentEditorName ?? '',
+          email: currentEditorEmail ?? '',
           role: RecipientRole.SIGNER,
           actionAuth: [],
           signingOrder:
@@ -635,7 +641,7 @@ export const EnvelopeEditorRecipientForm = () => {
             </Tooltip>
           )}
 
-          {!isEmbedded && (
+          {(!isEmbedded || hasCurrentEditorInfo) && (
             <Button
               variant="outline"
               className="flex flex-row items-center"

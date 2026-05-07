@@ -40,6 +40,71 @@ const getImageDimensions = (img: HTMLImageElement, fieldWidth: number, fieldHeig
   };
 };
 
+/**
+ * The pixel ratio used when caching the signature image as an offscreen bitmap.
+ *
+ * Konva's default redraw composites the source image with low-quality scaling
+ * which makes signatures look blurry, especially when the source PNG is much
+ * larger than the field. Caching at a high pixel ratio rasterises the shape
+ * once into a sharp bitmap that is then reused on every redraw.
+ *
+ * Multiplied by `devicePixelRatio` to keep the cache crisp on retina displays.
+ */
+const SIGNATURE_IMAGE_CACHE_PIXEL_RATIO = 2;
+
+/**
+ * Build a Konva.Image for a base64 signature, sized to fit within the given
+ * field dimensions. Works in both browser and Node.js (via skia-canvas).
+ */
+const createSignatureImage = (
+  signatureImageAsBase64: string,
+  fieldWidth: number,
+  fieldHeight: number,
+): Konva.Image => {
+  if (typeof window !== 'undefined') {
+    const img = new Image();
+
+    const image = new Konva.Image({
+      image: img,
+      x: 0,
+      y: 0,
+      width: fieldWidth,
+      height: fieldHeight,
+    });
+
+    img.onload = () => {
+      image.setAttrs({
+        image: img,
+        ...getImageDimensions(img, fieldWidth, fieldHeight),
+      });
+
+      // Cache the image as a high-resolution bitmap so it stays sharp on
+      // redraws and zoom changes instead of being re-scaled from the source PNG
+      // every time.
+      image.cache({
+        pixelRatio: SIGNATURE_IMAGE_CACHE_PIXEL_RATIO * (window.devicePixelRatio || 1),
+      });
+    };
+
+    img.src = signatureImageAsBase64;
+
+    return image;
+  }
+
+  // Node.js with skia-canvas
+  if (!SkiaImage) {
+    throw new Error('Skia image not found');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const img = new SkiaImage(signatureImageAsBase64) as unknown as HTMLImageElement;
+
+  return new Konva.Image({
+    image: img,
+    ...getImageDimensions(img, fieldWidth, fieldHeight),
+  });
+};
+
 const createFieldSignature = (
   field: FieldToRender,
   options: RenderFieldElementOptions,
@@ -67,6 +132,16 @@ const createFieldSignature = (
   // Handle edit mode.
   if (mode === 'edit') {
     textToRender = fieldTypeName;
+
+    // If the field has already been signed and we have the signature data
+    // available, render it. Otherwise leave the field type label as a placeholder.
+    if (field.inserted && signature?.typedSignature) {
+      textToRender = signature.typedSignature;
+    }
+
+    if (field.inserted && signature?.signatureImageAsBase64) {
+      return createSignatureImage(signature.signatureImageAsBase64, fieldWidth, fieldHeight);
+    }
   }
 
   // Handle sign mode.
@@ -82,44 +157,7 @@ const createFieldSignature = (
     }
 
     if (signature?.signatureImageAsBase64) {
-      if (typeof window !== 'undefined') {
-        // Create a new HTML Image element
-        const img = new Image();
-
-        const image = new Konva.Image({
-          image: img,
-          x: 0,
-          y: 0,
-          width: fieldWidth,
-          height: fieldHeight,
-        });
-
-        img.onload = () => {
-          image.setAttrs({
-            image: img,
-            ...getImageDimensions(img, fieldWidth, fieldHeight),
-          });
-        };
-
-        img.src = signature.signatureImageAsBase64;
-
-        return image;
-      } else {
-        // Node.js with skia-canvas
-        if (!SkiaImage) {
-          throw new Error('Skia image not found');
-        }
-
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        const img = new SkiaImage(signature?.signatureImageAsBase64) as unknown as HTMLImageElement;
-
-        const image = new Konva.Image({
-          image: img,
-          ...getImageDimensions(img, fieldWidth, fieldHeight),
-        });
-
-        return image;
-      }
+      return createSignatureImage(signature.signatureImageAsBase64, fieldWidth, fieldHeight);
     }
   }
 

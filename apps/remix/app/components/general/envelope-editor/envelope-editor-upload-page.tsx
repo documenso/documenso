@@ -525,7 +525,7 @@ export const EnvelopeEditorUploadPage = () => {
                               snapshot.isDragging ? 'shadow-md' : ''
                             }`}
                           >
-                            <div className="flex items-center space-x-3">
+                            <div className="flex min-w-0 items-center space-x-3">
                               {uploadConfig?.allowConfigureOrder && (
                                 <div
                                   {...provided.dragHandleProps}
@@ -536,7 +536,7 @@ export const EnvelopeEditorUploadPage = () => {
                                 </div>
                               )}
 
-                              <div>
+                              <div className="min-w-0">
                                 {localFile.envelopeItemId !== null ? (
                                   <EnvelopeItemTitleInput
                                     disabled={
@@ -564,7 +564,7 @@ export const EnvelopeEditorUploadPage = () => {
                                 </div>
                               </div>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex shrink-0 items-center space-x-2">
                               {localFile.isUploading && (
                                 <div className="flex h-6 w-10 items-center justify-center">
                                   <Loader2Icon className="h-4 w-4 animate-spin text-muted-foreground" />
