@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
@@ -36,7 +36,6 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
 import {
   Select,
   SelectContent,
@@ -48,6 +47,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { OrganisationMemberInviteDialog } from '~/components/dialogs/organisation-member-invite-dialog';
+import {
+  type OrganisationMemberOption,
+  OrganisationMembersMultiSelectCombobox,
+} from '~/components/general/organisation-members-multiselect-combobox';
 import { useCurrentTeam } from '~/providers/team';
 
 export type TeamMemberCreateDialogProps = {
@@ -69,6 +72,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<'SELECT' | 'MEMBERS'>('SELECT');
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [selectedMembers, setSelectedMembers] = useState<OrganisationMemberOption[]>([]);
   const prevInviteDialogOpenRef = useRef(false);
 
   const { t } = useLingui();
@@ -92,25 +96,16 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
 
   const { mutateAsync: createTeamMembers } = trpc.team.member.createMany.useMutation();
 
-  const organisationMemberQuery = trpc.organisation.member.find.useQuery({
+  // Lightweight count-only query for org members not already on this team.
+  // Powers the "no available members" empty state.
+  const availableMemberCountQuery = trpc.organisation.member.find.useQuery({
     organisationId: team.organisationId,
+    perPage: 1,
+    excludeTeamId: team.id,
   });
-
-  const teamMemberQuery = trpc.team.member.find.useQuery({
-    teamId: team.id,
-  });
-
-  const avaliableOrganisationMembers = useMemo(() => {
-    const organisationMembers = organisationMemberQuery.data?.data ?? [];
-    const teamMembers = teamMemberQuery.data?.data ?? [];
-
-    return organisationMembers.filter(
-      (member) => !teamMembers.some((teamMember) => teamMember.id === member.id),
-    );
-  }, [organisationMemberQuery, teamMemberQuery]);
 
   const hasNoAvailableMembers =
-    !organisationMemberQuery.isLoading && avaliableOrganisationMembers.length === 0;
+    !availableMemberCountQuery.isLoading && (availableMemberCountQuery.data?.count ?? 0) === 0;
 
   const onFormSubmit = async ({ members }: TAddTeamMembersFormSchema) => {
     if (members.length === 0) {
@@ -159,6 +154,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
       form.reset();
       setStep('SELECT');
       setInviteDialogOpen(false);
+      setSelectedMembers([]);
     }
   }, [open, form]);
 
@@ -296,29 +292,24 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                               )}
                             </div>
                           ) : (
-                            <MultiSelectCombobox
-                              options={avaliableOrganisationMembers.map((member) => ({
-                                label: member.name,
-                                value: member.id,
-                              }))}
-                              loading={organisationMemberQuery.isLoading}
-                              selectedValues={field.value.map(
-                                (member) => member.organisationMemberId,
-                              )}
-                              onChange={(value) => {
+                            <OrganisationMembersMultiSelectCombobox
+                              organisationId={team.organisationId}
+                              selectedMembers={selectedMembers}
+                              excludeTeamId={team.id}
+                              onChange={(members) => {
+                                setSelectedMembers(members);
                                 field.onChange(
-                                  value.map((organisationMemberId) => ({
-                                    organisationMemberId,
+                                  members.map((member) => ({
+                                    organisationMemberId: member.id,
                                     teamRole:
                                       field.value.find(
-                                        (member) =>
-                                          member.organisationMemberId === organisationMemberId,
+                                        (entry) => entry.organisationMemberId === member.id,
                                       )?.teamRole || TeamMemberRole.MEMBER,
                                   })),
                                 );
                               }}
                               className="w-full bg-background"
-                              emptySelectionPlaceholder={t`Select members`}
+                              dataTestId="team-members-picker"
                             />
                           )}
                         </FormControl>
@@ -394,9 +385,8 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                             readOnly
                             className="bg-background"
                             value={
-                              organisationMemberQuery.data?.data.find(
-                                ({ id }) => id === member.organisationMemberId,
-                              )?.name || ''
+                              selectedMembers.find(({ id }) => id === member.organisationMemberId)
+                                ?.name || ''
                             }
                           />
                         </div>

@@ -17,6 +17,12 @@ import { OrganisationMemberSchema } from '@documenso/prisma/generated/zod/modelS
 
 export const ZFindOrganisationMembersRequestSchema = ZFindSearchParamsSchema.extend({
   organisationId: z.string(),
+  /**
+   * Exclude organisation members who are already members of the given team.
+   * Useful for "add members to team" pickers so that members already on the
+   * team don't appear in the dropdown.
+   */
+  excludeTeamId: z.number().optional(),
 });
 
 export const ZFindOrganisationMembersResponseSchema = ZFindResultResponse.extend({
