@@ -28,6 +28,7 @@ type OrganisationMembersMultiSelectComboboxProps = {
   /** Number of members to fetch per search call. Defaults to the schema cap (100). */
   perPage?: number;
   className?: string;
+  dataTestId?: string;
 };
 
 const toOption = (member: OrganisationMemberOption): Option => ({
@@ -58,6 +59,7 @@ export const OrganisationMembersMultiSelectCombobox = ({
   excludeTeamId,
   perPage = 100,
   className,
+  dataTestId,
 }: OrganisationMembersMultiSelectComboboxProps) => {
   const { _ } = useLingui();
 
@@ -84,7 +86,9 @@ export const OrganisationMembersMultiSelectCombobox = ({
   return (
     <MultiSelect
       className={className}
+      data-testid={dataTestId}
       commandProps={{ label: _(msg`Select members`) }}
+      inputProps={{ 'aria-label': _(msg`Select members`) }}
       placeholder={_(msg`Search members by name or email`)}
       value={selectedMembers.map(toOption)}
       onChange={(options) => onChange(options.map(fromOption))}

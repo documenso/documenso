@@ -309,6 +309,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                                 );
                               }}
                               className="w-full bg-background"
+                              dataTestId="team-members-picker"
                             />
                           )}
                         </FormControl>

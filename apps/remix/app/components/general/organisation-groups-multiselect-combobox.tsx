@@ -33,6 +33,7 @@ type OrganisationGroupsMultiSelectComboboxProps = {
   /** Number of groups to fetch per search call. Defaults to the schema cap (100). */
   perPage?: number;
   className?: string;
+  dataTestId?: string;
 };
 
 const toOption = (group: OrganisationGroupOption): Option => ({
@@ -61,6 +62,7 @@ export const OrganisationGroupsMultiSelectCombobox = ({
   types = [OrganisationGroupType.CUSTOM],
   perPage = 100,
   className,
+  dataTestId,
 }: OrganisationGroupsMultiSelectComboboxProps) => {
   const { _ } = useLingui();
 
@@ -87,7 +89,9 @@ export const OrganisationGroupsMultiSelectCombobox = ({
   return (
     <MultiSelect
       className={className}
+      data-testid={dataTestId}
       commandProps={{ label: _(msg`Select groups`) }}
+      inputProps={{ 'aria-label': _(msg`Select groups`) }}
       placeholder={_(msg`Search groups by name`)}
       value={selectedGroups.map(toOption)}
       onChange={(options) => onChange(options.map(fromOption))}

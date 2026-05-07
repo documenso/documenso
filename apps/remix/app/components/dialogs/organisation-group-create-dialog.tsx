@@ -216,6 +216,7 @@ export const OrganisationGroupCreateDialog = ({
                           field.onChange(members.map((member) => member.id));
                         }}
                         className="w-full bg-background"
+                        dataTestId="group-members-picker"
                       />
                     </FormControl>
 

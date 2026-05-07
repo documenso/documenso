@@ -180,6 +180,7 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
                               );
                             }}
                             className="w-full bg-background"
+                            dataTestId="team-groups-picker"
                           />
                         </FormControl>
 

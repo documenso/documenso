@@ -273,6 +273,7 @@ const OrganisationGroupForm = ({ group }: OrganisationGroupFormOptions) => {
                     field.onChange(members.map((member) => member.id));
                   }}
                   className="w-full"
+                  dataTestId="group-members-picker"
                 />
               </FormControl>
               <FormDescription>
