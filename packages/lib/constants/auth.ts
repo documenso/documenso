@@ -124,21 +124,20 @@ export const isEmailDomainAllowedForSignup = (email: string): boolean => {
 
 /**
  * Check if signup is enabled for the given provider.
- * The master switch (`DISABLE_SIGNUP`, with `NEXT_PUBLIC_DISABLE_SIGNUP` kept as a
- * legacy alias) takes precedence over the per-provider flags.
+ * The master switch takes precedence over the per-provider flags.
  */
 export const isSignupEnabledForProvider = (
   provider: 'email' | 'google' | 'microsoft' | 'oidc',
 ): boolean => {
-  if (env('DISABLE_SIGNUP') === 'true' || env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
+  if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
     return false;
   }
 
   const flagMap = {
-    email: 'DISABLE_EMAIL_PASSWORD_SIGNUP',
-    google: 'DISABLE_GOOGLE_SIGNUP',
-    microsoft: 'DISABLE_MICROSOFT_SIGNUP',
-    oidc: 'DISABLE_OIDC_SIGNUP',
+    email: 'NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNUP',
+    google: 'NEXT_PUBLIC_DISABLE_GOOGLE_SIGNUP',
+    microsoft: 'NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP',
+    oidc: 'NEXT_PUBLIC_DISABLE_OIDC_SIGNUP',
   } as const;
 
   return env(flagMap[provider]) !== 'true';

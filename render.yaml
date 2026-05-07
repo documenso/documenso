@@ -155,15 +155,13 @@ services:
       # Features Optional
       - key: NEXT_PUBLIC_DISABLE_SIGNUP
         sync: false
-      - key: DISABLE_SIGNUP
+      - key: NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNUP
         sync: false
-      - key: DISABLE_EMAIL_PASSWORD_SIGNUP
+      - key: NEXT_PUBLIC_DISABLE_GOOGLE_SIGNUP
         sync: false
-      - key: DISABLE_GOOGLE_SIGNUP
+      - key: NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP
         sync: false
-      - key: DISABLE_MICROSOFT_SIGNUP
-        sync: false
-      - key: DISABLE_OIDC_SIGNUP
+      - key: NEXT_PUBLIC_DISABLE_OIDC_SIGNUP
         sync: false
       - key: NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS
         sync: false
