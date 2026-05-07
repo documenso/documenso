@@ -8,7 +8,7 @@ msgstr ""
 "Language: ja\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-04-22 14:34\n"
+"PO-Revision-Date: 2026-05-07 05:08\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -1544,7 +1544,7 @@ msgstr "ドキュメントの受信者が、このメールアドレスに直接
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Allow Personal Organisations"
-msgstr ""
+msgstr "個人用組織を許可する"
 
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
@@ -6338,6 +6338,8 @@ msgstr "候補を読み込み中..."
 #: apps/remix/app/components/embed/embed-client-loading.tsx
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Loading..."
 msgstr "読み込み中..."
@@ -6914,9 +6916,17 @@ msgstr "まだフォルダーがありません。"
 msgid "No further action is required from you at this time."
 msgstr "現在、お客様が行う必要のある操作はありません。"
 
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+msgid "No groups found"
+msgstr "グループが見つかりません"
+
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "No License Configured"
 msgstr "ライセンスが設定されていません"
+
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
+msgid "No members found"
+msgstr "メンバーが見つかりません"
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "No members selected"
@@ -7435,7 +7445,7 @@ msgstr "有料"
 #: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
 msgctxt "Partially signed document (adjective)"
 msgid "Partial"
-msgstr ""
+msgstr "一部署名済み"
 
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
@@ -7694,7 +7704,7 @@ msgstr "メールアドレスを確認してください"
 
 #: apps/remix/app/components/embed/embed-paywall.tsx
 msgid "Please contact <0>support</0> if you have any questions."
-msgstr ""
+msgstr "ご不明な点がありましたら、<0>サポート</0>までお問い合わせください。"
 
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Please contact support if you would like to revert this action."
@@ -8777,9 +8787,17 @@ msgstr "文書を検索..."
 msgid "Search folders..."
 msgstr "フォルダを検索…"
 
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+msgid "Search groups by name"
+msgstr "グループ名で検索"
+
 #: packages/ui/components/common/language-switcher-dialog.tsx
 msgid "Search languages..."
 msgstr "言語を検索…"
+
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
+msgid "Search members by name or email"
+msgstr "名前またはメールアドレスでメンバーを検索"
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "Secret"
@@ -8900,7 +8918,8 @@ msgstr "デフォルトロールを選択"
 msgid "Select direction"
 msgstr "方向を選択"
 
-#: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
 msgid "Select groups"
 msgstr "グループを選択"
 
@@ -8912,9 +8931,8 @@ msgstr "チームに追加するメンバーグループを選択します。"
 msgid "Select groups to add to this team"
 msgstr "このチームに追加するグループを選択"
 
-#: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
-#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
 msgid "Select members"
 msgstr "メンバーを選択"
 
@@ -10795,7 +10813,7 @@ msgstr "この封筒は現在再送信できません。もう一度お試しく
 
 #: apps/remix/app/components/embed/embed-paywall.tsx
 msgid "This feature is not available on your current plan"
-msgstr ""
+msgstr "この機能は現在ご利用中のプランではご利用いただけません"
 
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
@@ -12304,7 +12322,7 @@ msgstr "リカバリーコードをクリップボードにコピーできませ
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "We were unable to create your account. If you already have an account, try signing in instead."
-msgstr ""
+msgstr "アカウントを作成できませんでした。すでにアカウントをお持ちの場合は、代わりにサインインしてください。"
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "We were unable to create your account. Please review the information you provided and try again."
@@ -12503,7 +12521,7 @@ msgstr "有効にすると、定義済みの順序ではなく、署名者が次
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "When enabled, users signing in via SSO for the first time will also receive their own personal organisation."
-msgstr ""
+msgstr "有効にすると、SSO で初めてサインインするユーザーには、個人用の組織も自動的に作成されます。"
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "When you click continue, you will be prompted to add the first available authenticator on your system."
@@ -13660,3 +13678,4 @@ msgstr "認証コード:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
