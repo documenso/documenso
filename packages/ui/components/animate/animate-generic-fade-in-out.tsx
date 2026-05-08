@@ -6,11 +6,7 @@ type AnimateGenericFadeInOutProps = {
   motionKey?: string;
 };
 
-export const AnimateGenericFadeInOut = ({
-  children,
-  className,
-  motionKey,
-}: AnimateGenericFadeInOutProps) => {
+export const AnimateGenericFadeInOut = ({ children, className, motionKey }: AnimateGenericFadeInOutProps) => {
   return (
     <motion.section
       key={motionKey}

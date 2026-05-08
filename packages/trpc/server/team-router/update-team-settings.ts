@@ -1,18 +1,13 @@
-import { Prisma } from '@prisma/client';
-import { OrganisationType } from '@prisma/client';
-
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
 import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
+import { OrganisationType, Prisma } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZUpdateTeamSettingsRequestSchema,
-  ZUpdateTeamSettingsResponseSchema,
-} from './update-team-settings.types';
+import { ZUpdateTeamSettingsRequestSchema, ZUpdateTeamSettingsResponseSchema } from './update-team-settings.types';
 
 export const updateTeamSettingsRoute = authenticatedProcedure
   .input(ZUpdateTeamSettingsRequestSchema)
@@ -68,11 +63,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
     }
 
     // Signatures will only be inherited if all are NULL.
-    if (
-      typedSignatureEnabled === false &&
-      uploadSignatureEnabled === false &&
-      drawSignatureEnabled === false
-    ) {
+    if (typedSignatureEnabled === false && uploadSignatureEnabled === false && drawSignatureEnabled === false) {
       throw new AppError(AppErrorCode.INVALID_BODY, {
         message: 'At least one signature type must be enabled',
       });
@@ -125,8 +116,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
     });
 
     const isPersonalOrganisation = organisation?.type === OrganisationType.PERSONAL;
-    const currentIncludeSenderDetails =
-      organisation?.organisationGlobalSettings.includeSenderDetails;
+    const currentIncludeSenderDetails = organisation?.organisationGlobalSettings.includeSenderDetails;
 
     const isChangingIncludeSenderDetails =
       includeSenderDetails !== undefined && includeSenderDetails !== currentIncludeSenderDetails;
@@ -156,8 +146,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             uploadSignatureEnabled,
             drawSignatureEnabled,
             delegateDocumentOwnership,
-            envelopeExpirationPeriod:
-              envelopeExpirationPeriod === null ? Prisma.DbNull : envelopeExpirationPeriod,
+            envelopeExpirationPeriod: envelopeExpirationPeriod === null ? Prisma.DbNull : envelopeExpirationPeriod,
             reminderSettings: reminderSettings === null ? Prisma.DbNull : reminderSettings,
 
             // Branding related settings.
@@ -170,8 +159,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             emailId,
             emailReplyTo,
             // emailReplyToName,
-            emailDocumentSettings:
-              emailDocumentSettings === null ? Prisma.DbNull : emailDocumentSettings,
+            emailDocumentSettings: emailDocumentSettings === null ? Prisma.DbNull : emailDocumentSettings,
             defaultRecipients: defaultRecipients === null ? Prisma.DbNull : defaultRecipients,
 
             // AI features settings.

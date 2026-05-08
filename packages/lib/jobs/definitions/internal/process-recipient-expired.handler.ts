@@ -1,25 +1,15 @@
-import { SigningStatus, WebhookTriggerEvents } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { SigningStatus, WebhookTriggerEvents } from '@prisma/client';
 
 import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-webhook';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
-import {
-  ZWebhookDocumentSchema,
-  mapEnvelopeToWebhookDocumentPayload,
-} from '../../../types/webhook-payload';
+import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../../types/webhook-payload';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import { jobs } from '../../client';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TProcessRecipientExpiredJobDefinition } from './process-recipient-expired';
 
-export const run = async ({
-  payload,
-  io,
-}: {
-  payload: TProcessRecipientExpiredJobDefinition;
-  io: JobRunIO;
-}) => {
+export const run = async ({ payload, io }: { payload: TProcessRecipientExpiredJobDefinition; io: JobRunIO }) => {
   const { recipientId } = payload;
 
   // Atomic idempotency guard — only one concurrent worker wins.
@@ -57,9 +47,7 @@ export const run = async ({
 
   const { envelope } = recipient;
 
-  io.logger.info(
-    `Recipient ${recipientId} (${recipient.email}) expired on envelope ${recipient.envelopeId}`,
-  );
+  io.logger.info(`Recipient ${recipientId} (${recipient.email}) expired on envelope ${recipient.envelopeId}`);
 
   // Create audit log entry — wrapped so a retry skips this if it already succeeded.
   await io.runTask('create-audit-log', async () => {

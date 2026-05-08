@@ -1,13 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { FolderIcon, HomeIcon, Search } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import type { TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
@@ -20,15 +10,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import type * as DialogPrimitive from '@radix-ui/react-dialog';
+import { FolderIcon, HomeIcon, Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 export type FolderMoveDialogProps = {
   foldersData: TFolderWithSubfolders[] | undefined;
@@ -43,12 +34,7 @@ const ZMoveFolderFormSchema = z.object({
 
 type TMoveFolderFormSchema = z.infer<typeof ZMoveFolderFormSchema>;
 
-export const FolderMoveDialog = ({
-  foldersData,
-  folder,
-  isOpen,
-  onOpenChange,
-}: FolderMoveDialogProps) => {
+export const FolderMoveDialog = ({ foldersData, folder, isOpen, onOpenChange }: FolderMoveDialogProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
@@ -129,7 +115,7 @@ export const FolderMoveDialog = ({
         </DialogHeader>
 
         <div className="relative">
-          <Search className="text-muted-foreground absolute left-2 top-3 h-4 w-4" />
+          <Search className="absolute top-3 left-2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={t`Search folders...`}
             value={searchTerm}

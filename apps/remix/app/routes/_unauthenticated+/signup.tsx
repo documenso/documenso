@@ -1,6 +1,3 @@
-import { msg } from '@lingui/core/macro';
-import { redirect } from 'react-router';
-
 import {
   IS_GOOGLE_SSO_ENABLED,
   IS_MICROSOFT_SSO_ENABLED,
@@ -8,6 +5,8 @@ import {
   isSignupEnabledForProvider,
 } from '@documenso/lib/constants/auth';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
+import { msg } from '@lingui/core/macro';
+import { redirect } from 'react-router';
 
 import { SignUpForm } from '~/components/forms/signup';
 import { appMetaTags } from '~/utils/meta';
@@ -21,15 +20,11 @@ export function meta() {
 export function loader({ request }: Route.LoaderArgs) {
   const isEmailPasswordSignupEnabled = isSignupEnabledForProvider('email');
   const isGoogleSignupEnabled = IS_GOOGLE_SSO_ENABLED && isSignupEnabledForProvider('google');
-  const isMicrosoftSignupEnabled =
-    IS_MICROSOFT_SSO_ENABLED && isSignupEnabledForProvider('microsoft');
+  const isMicrosoftSignupEnabled = IS_MICROSOFT_SSO_ENABLED && isSignupEnabledForProvider('microsoft');
   const isOidcSignupEnabled = IS_OIDC_SSO_ENABLED && isSignupEnabledForProvider('oidc');
 
   const isAnySignupEnabled =
-    isEmailPasswordSignupEnabled ||
-    isGoogleSignupEnabled ||
-    isMicrosoftSignupEnabled ||
-    isOidcSignupEnabled;
+    isEmailPasswordSignupEnabled || isGoogleSignupEnabled || isMicrosoftSignupEnabled || isOidcSignupEnabled;
 
   if (!isAnySignupEnabled) {
     throw redirect('/signin');

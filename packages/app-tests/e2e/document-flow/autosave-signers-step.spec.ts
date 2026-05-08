@@ -1,12 +1,11 @@
-import type { Page } from '@playwright/test';
-import { expect, test } from '@playwright/test';
-import { EnvelopeType } from '@prisma/client';
-
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
+import type { Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { EnvelopeType } from '@prisma/client';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -167,15 +166,9 @@ test.describe('AutoSave Signers Step', () => {
       expect(retrievedDocumentData.documentMeta?.allowDictateNextSigner).toBe(true);
       expect(retrievedRecipients.length).toBe(3);
 
-      const firstRecipient = retrievedRecipients.find(
-        (r) => r.email === 'recipient1@documenso.com',
-      );
-      const secondRecipient = retrievedRecipients.find(
-        (r) => r.email === 'recipient2@documenso.com',
-      );
-      const thirdRecipient = retrievedRecipients.find(
-        (r) => r.email === 'recipient3@documenso.com',
-      );
+      const firstRecipient = retrievedRecipients.find((r) => r.email === 'recipient1@documenso.com');
+      const secondRecipient = retrievedRecipients.find((r) => r.email === 'recipient2@documenso.com');
+      const thirdRecipient = retrievedRecipients.find((r) => r.email === 'recipient3@documenso.com');
 
       expect(firstRecipient?.signingOrder).toBe(2);
       expect(secondRecipient?.signingOrder).toBe(3);

@@ -1,10 +1,3 @@
-import { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { useNavigate } from 'react-router';
-
 import { AppError } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
@@ -20,6 +13,11 @@ import {
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 export type AdminOrganisationMemberDeleteDialogProps = {
   organisationId: string;
@@ -42,33 +40,32 @@ export const AdminOrganisationMemberDeleteDialog = ({
 
   const [open, setOpen] = useState(false);
 
-  const { mutateAsync: deleteOrganisationMember, isPending } =
-    trpc.admin.organisationMember.delete.useMutation({
-      onSuccess: async () => {
-        toast({
-          title: _(msg`Success`),
-          description: _(msg`Member has been removed from the organisation.`),
-          duration: 5000,
-        });
+  const { mutateAsync: deleteOrganisationMember, isPending } = trpc.admin.organisationMember.delete.useMutation({
+    onSuccess: async () => {
+      toast({
+        title: _(msg`Success`),
+        description: _(msg`Member has been removed from the organisation.`),
+        duration: 5000,
+      });
 
-        setOpen(false);
+      setOpen(false);
 
-        // Refresh the page to show updated data
-        await navigate(0);
-      },
-      onError: (err) => {
-        const error = AppError.parseError(err);
+      // Refresh the page to show updated data
+      await navigate(0);
+    },
+    onError: (err) => {
+      const error = AppError.parseError(err);
 
-        console.error(error);
+      console.error(error);
 
-        toast({
-          title: _(msg`An error occurred`),
-          description: _(msg`We couldn't remove this member. Please try again later.`),
-          variant: 'destructive',
-          duration: 10000,
-        });
-      },
-    });
+      toast({
+        title: _(msg`An error occurred`),
+        description: _(msg`We couldn't remove this member. Please try again later.`),
+        variant: 'destructive',
+        duration: 10000,
+      });
+    },
+  });
 
   return (
     <Dialog open={open} onOpenChange={(value) => !isPending && setOpen(value)}>

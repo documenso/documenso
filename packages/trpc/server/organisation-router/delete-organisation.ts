@@ -8,10 +8,7 @@ import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations'
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZDeleteOrganisationRequestSchema,
-  ZDeleteOrganisationResponseSchema,
-} from './delete-organisation.types';
+import { ZDeleteOrganisationRequestSchema, ZDeleteOrganisationResponseSchema } from './delete-organisation.types';
 
 export const deleteOrganisationRoute = authenticatedProcedure
   //   .meta(deleteOrganisationMeta)

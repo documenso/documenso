@@ -1,7 +1,6 @@
+import { type TFieldAndMeta, ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 import { PDF, rgb } from '@libpdf/core';
 import type { FieldType, Recipient } from '@prisma/client';
-
-import { type TFieldAndMeta, ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 
 import { parseFieldMetaFromPlaceholder, parseFieldTypeFromPlaceholder } from './helpers';
 
@@ -21,10 +20,7 @@ export type BoundingBox = {
  *
  * Mutates the PDF in place. Coordinates use bottom-left origin (standard PDF coordinates).
  */
-export const whiteoutRegions = (
-  pdfDoc: PDF,
-  regions: Array<{ pageIndex: number; bbox: BoundingBox }>,
-): void => {
+export const whiteoutRegions = (pdfDoc: PDF, regions: Array<{ pageIndex: number; bbox: BoundingBox }>): void => {
   const pages = pdfDoc.getPages();
 
   for (const { pageIndex, bbox } of regions) {
@@ -151,10 +147,7 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
  *
  * Accepts optional pre-extracted placeholders to avoid re-parsing the PDF.
  */
-export const removePlaceholdersFromPDF = async (
-  pdf: Buffer,
-  placeholders?: PlaceholderInfo[],
-): Promise<Buffer> => {
+export const removePlaceholdersFromPDF = async (pdf: Buffer, placeholders?: PlaceholderInfo[]): Promise<Buffer> => {
   const resolved = placeholders ?? (await extractPlaceholdersFromPDF(pdf));
 
   const pdfDoc = await PDF.load(new Uint8Array(pdf));
@@ -218,8 +211,7 @@ export const convertPlaceholdersToFieldInputs = (
     const widthPercent = (p.width / p.pageWidth) * 100;
     const heightPercent = (p.height / p.pageHeight) * 100;
 
-    const finalHeightPercent =
-      heightPercent > MIN_HEIGHT_THRESHOLD ? heightPercent : DEFAULT_FIELD_HEIGHT_PERCENT;
+    const finalHeightPercent = heightPercent > MIN_HEIGHT_THRESHOLD ? heightPercent : DEFAULT_FIELD_HEIGHT_PERCENT;
 
     const recipient = recipientResolver(p.recipient, p.placeholder);
 

@@ -1,8 +1,3 @@
-import { UserSecurityAuditLogType } from '@prisma/client';
-import { OAuth2Client, decodeIdToken } from 'arctic';
-import type { Context } from 'hono';
-import { deleteCookie } from 'hono/cookie';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import {
   isEmailDomainAllowedForSignup,
@@ -14,6 +9,10 @@ import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/serv
 import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { prisma } from '@documenso/prisma';
+import { UserSecurityAuditLogType } from '@prisma/client';
+import { decodeIdToken, OAuth2Client } from 'arctic';
+import type { Context } from 'hono';
+import { deleteCookie } from 'hono/cookie';
 
 import type { OAuthClientOptions } from '../../config';
 import { AuthenticationErrorCode } from '../errors/error-codes';
@@ -30,13 +29,12 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
 
   const requestMeta = c.get('requestMetadata');
 
-  const { email, name, sub, accessToken, accessTokenExpiresAt, idToken, redirectPath } =
-    await validateOauth({ c, clientOptions });
+  const { email, name, sub, accessToken, accessTokenExpiresAt, idToken, redirectPath } = await validateOauth({
+    c,
+    clientOptions,
+  });
 
-  if (
-    email.toLowerCase() === legacyServiceAccountEmail() ||
-    email.toLowerCase() === deletedServiceAccountEmail()
-  ) {
+  if (email.toLowerCase() === legacyServiceAccountEmail() || email.toLowerCase() === deletedServiceAccountEmail()) {
     return c.text('FORBIDDEN', 403);
   }
 
@@ -184,11 +182,7 @@ export const validateOauth = async (options: HandleOAuthCallbackUrlOptions) => {
     requiredScopes: clientOptions.scope,
   });
 
-  const oAuthClient = new OAuth2Client(
-    clientOptions.clientId,
-    clientOptions.clientSecret,
-    clientOptions.redirectUrl,
-  );
+  const oAuthClient = new OAuth2Client(clientOptions.clientId, clientOptions.clientSecret, clientOptions.redirectUrl);
 
   const code = c.req.query('code');
   const state = c.req.query('state');
@@ -216,11 +210,7 @@ export const validateOauth = async (options: HandleOAuthCallbackUrlOptions) => {
 
   redirectPath = normalizeReturnTo(redirectPath) || '/';
 
-  const tokens = await oAuthClient.validateAuthorizationCode(
-    token_endpoint,
-    code,
-    storedCodeVerifier,
-  );
+  const tokens = await oAuthClient.validateAuthorizationCode(token_endpoint, code, storedCodeVerifier);
 
   const accessToken = tokens.accessToken();
   const accessTokenExpiresAt = tokens.accessTokenExpiresAt();

@@ -1,13 +1,11 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import React from 'react';
-
-import type { Session } from '@prisma/client';
-import { useLocation } from 'react-router';
-
 import { authClient } from '@documenso/auth/client';
 import type { SessionUser } from '@documenso/auth/server/lib/session/session';
 import { trpc } from '@documenso/trpc/client';
 import type { TGetOrganisationSessionResponse } from '@documenso/trpc/server/organisation-router/get-organisation-session.types';
+import type { Session } from '@prisma/client';
+import type React from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { useLocation } from 'react-router';
 
 import { SKIP_QUERY_BATCH_META } from '../../constants/trpc';
 
@@ -74,8 +72,7 @@ export const SessionProvider = ({ children, initialSession }: SessionProviderPro
       .catch((e) => {
         const errorMessage = typeof e.message === 'string' ? e.message.toLowerCase() : '';
 
-        const isNetworkError =
-          errorMessage.includes('networkerror') || errorMessage.includes('failed to fetch');
+        const isNetworkError = errorMessage.includes('networkerror') || errorMessage.includes('failed to fetch');
 
         // If the error is a transient network/abort error (e.g. page refresh while
         // fetch was in-flight), return null to signal we should skip the state update.

@@ -1,13 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import type { TEnvelope } from '@documenso/lib/types/envelope';
 import type { TEnvelopeRecipientLite } from '@documenso/lib/types/recipient';
@@ -26,14 +16,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@documenso/ui/primitives/form/form';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
 
 import { StackAvatar } from '../general/stack-avatar';
 
@@ -52,10 +43,7 @@ export const ZEnvelopeRedistributeFormSchema = z.object({
 
 export type TEnvelopeRedistributeFormSchema = z.infer<typeof ZEnvelopeRedistributeFormSchema>;
 
-export const EnvelopeRedistributeDialog = ({
-  envelope,
-  trigger,
-}: EnvelopeRedistributeDialogProps) => {
+export const EnvelopeRedistributeDialog = ({ envelope, trigger }: EnvelopeRedistributeDialogProps) => {
   const recipients = envelope.recipients;
 
   const { toast } = useToast();

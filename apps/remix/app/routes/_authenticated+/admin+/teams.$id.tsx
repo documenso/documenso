@@ -1,26 +1,19 @@
-import { useMemo } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { CopyIcon } from 'lucide-react';
-import { Link } from 'react-router';
-
 import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
 import { trpc } from '@documenso/trpc/react';
 import type { TGetAdminTeamResponse } from '@documenso/trpc/server/admin-router/get-admin-team.types';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@documenso/ui/primitives/accordion';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@documenso/ui/primitives/accordion';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { DataTable, type DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { CopyIcon } from 'lucide-react';
+import { useMemo } from 'react';
+import { Link } from 'react-router';
 
 import { AdminTeamMemberDeleteDialog } from '~/components/dialogs/admin-team-member-delete-dialog';
 import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
@@ -63,16 +56,11 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
         header: _(msg`Member`),
         cell: ({ row }) => (
           <div className="space-y-1">
-            <Link
-              className="font-medium hover:underline"
-              to={`/admin/users/${row.original.user.id}`}
-            >
+            <Link className="font-medium hover:underline" to={`/admin/users/${row.original.user.id}`}>
               {row.original.user.name ?? row.original.user.email}
             </Link>
             {row.original.user.name && (
-              <div className="font-mono text-xs text-muted-foreground">
-                {row.original.user.email}
-              </div>
+              <div className="font-mono text-muted-foreground text-xs">{row.original.user.email}</div>
             )}
           </div>
         ),
@@ -84,9 +72,7 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
       {
         header: _(msg`Team role`),
         accessorKey: 'teamRole',
-        cell: ({ row }) => (
-          <Badge variant="secondary">{_(TEAM_MEMBER_ROLE_MAP[row.original.teamRole])}</Badge>
-        ),
+        cell: ({ row }) => <Badge variant="secondary">{_(TEAM_MEMBER_ROLE_MAP[row.original.teamRole])}</Badge>,
       },
       {
         header: _(msg`Organisation role`),
@@ -98,11 +84,7 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
             return <Badge>{_(msg`Owner`)}</Badge>;
           }
 
-          return (
-            <Badge variant="secondary">
-              {_(ORGANISATION_MEMBER_ROLE_MAP[row.original.organisationRole])}
-            </Badge>
-          );
+          return <Badge variant="secondary">{_(ORGANISATION_MEMBER_ROLE_MAP[row.original.organisationRole])}</Badge>;
         },
       },
       {
@@ -218,10 +200,10 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
 
       <div className="mt-8 rounded-lg border p-4">
         <div>
-          <p className="text-sm font-medium">
+          <p className="font-medium text-sm">
             <Trans>Team details</Trans>
           </p>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-muted-foreground text-sm">
             <Trans>Key identifiers and relationships for this team.</Trans>
           </p>
         </div>
@@ -295,14 +277,11 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
             <AccordionItem value="global-settings" className="border-b-0">
               <AccordionTrigger className="py-0">
                 <div className="text-left">
-                  <p className="text-sm font-medium">
+                  <p className="font-medium text-sm">
                     <Trans>Global Settings</Trans>
                   </p>
-                  <p className="mt-1 text-sm font-normal text-muted-foreground">
-                    <Trans>
-                      Default settings applied to this team. Inherited values come from the
-                      organisation.
-                    </Trans>
+                  <p className="mt-1 font-normal text-muted-foreground text-sm">
+                    <Trans>Default settings applied to this team. Inherited values come from the organisation.</Trans>
                   </p>
                 </div>
               </AccordionTrigger>
@@ -317,10 +296,10 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
       )}
 
       <div className="mt-8">
-        <p className="text-sm font-medium">
+        <p className="font-medium text-sm">
           <Trans>Team Members</Trans>
         </p>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-muted-foreground text-sm">
           <Trans>Members that currently belong to this team.</Trans>
         </p>
 
@@ -330,10 +309,10 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
       </div>
 
       <div className="mt-8">
-        <p className="text-sm font-medium">
+        <p className="font-medium text-sm">
           <Trans>Pending Organisation Invites</Trans>
         </p>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-muted-foreground text-sm">
           <Trans>Organisation-level pending invites for this team's parent organisation.</Trans>
         </p>
 

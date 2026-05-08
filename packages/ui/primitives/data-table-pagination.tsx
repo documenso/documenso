@@ -23,22 +23,14 @@ export function DataTablePagination<TData>({
 }: DataTablePaginationProps<TData>) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-4 px-2">
-      <div className="flex-1 text-sm text-muted-foreground">
+      <div className="flex-1 text-muted-foreground text-sm">
         {match(additionalInformation)
           .with('SelectedCount', () => (
             <span>
               <Plural
                 value={table.getFilteredRowModel().rows.length}
-                one={
-                  <Trans>
-                    {table.getFilteredSelectedRowModel().rows.length} of # row selected.
-                  </Trans>
-                }
-                other={
-                  <Trans>
-                    {table.getFilteredSelectedRowModel().rows.length} of # rows selected.
-                  </Trans>
-                }
+                one={<Trans>{table.getFilteredSelectedRowModel().rows.length} of # row selected.</Trans>}
+                other={<Trans>{table.getFilteredSelectedRowModel().rows.length} of # rows selected.</Trans>}
               />
             </span>
           ))
@@ -47,11 +39,7 @@ export function DataTablePagination<TData>({
 
             return (
               <span data-testid="data-table-count">
-                <Plural
-                  value={visibleRows}
-                  one={`Showing # result.`}
-                  other={`Showing # results.`}
-                />
+                <Plural value={visibleRows} one={`Showing # result.`} other={`Showing # results.`} />
               </span>
             );
           })
@@ -60,7 +48,7 @@ export function DataTablePagination<TData>({
       </div>
 
       <div className="flex items-center gap-x-2">
-        <p className="whitespace-nowrap text-sm font-medium">
+        <p className="whitespace-nowrap font-medium text-sm">
           <Trans>Rows per page</Trans>
         </p>
         <Select
@@ -82,7 +70,7 @@ export function DataTablePagination<TData>({
         </Select>
       </div>
       <div className="flex flex-wrap items-center gap-x-6 gap-y-4 lg:gap-x-8">
-        <div className="flex items-center text-sm font-medium md:justify-center">
+        <div className="flex items-center font-medium text-sm md:justify-center">
           <Trans>
             Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount() || 1}
           </Trans>
