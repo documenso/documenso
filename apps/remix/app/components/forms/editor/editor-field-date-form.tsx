@@ -1,31 +1,28 @@
-import { useEffect } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, useWatch } from 'react-hook-form';
-import type { z } from 'zod';
-
 import {
-  DEFAULT_FIELD_FONT_SIZE,
   type TDateFieldMeta as DateFieldMeta,
+  DEFAULT_FIELD_FONT_SIZE,
+  FIELD_DATE_META_DEFAULT_VALUES,
   FIELD_DEFAULT_GENERIC_ALIGN,
   ZDateFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { Form } from '@documenso/ui/primitives/form/form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import type { z } from 'zod';
 
-import {
-  EditorGenericFontSizeField,
-  EditorGenericTextAlignField,
-} from './editor-field-generic-field-forms';
+import { EditorGenericFontSizeField, EditorGenericTextAlignField } from './editor-field-generic-field-forms';
 
 const ZDateFieldFormSchema = ZDateFieldMeta.pick({
   fontSize: true,
   textAlign: true,
+  overflow: true,
 });
 
 type TDateFieldFormSchema = z.infer<typeof ZDateFieldFormSchema>;
 
 type EditorFieldDateFormProps = {
-  value: DateFieldMeta | undefined;
+  value: z.input<typeof ZDateFieldMeta> | undefined;
   onValueChange: (value: DateFieldMeta) => void;
 };
 
@@ -41,6 +38,7 @@ export const EditorFieldDateForm = ({
     defaultValues: {
       fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
       textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
+      overflow: value.overflow || FIELD_DATE_META_DEFAULT_VALUES.overflow,
     },
   });
 

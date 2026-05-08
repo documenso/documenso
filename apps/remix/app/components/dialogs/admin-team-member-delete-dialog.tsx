@@ -1,10 +1,3 @@
-import { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { useNavigate } from 'react-router';
-
 import { AppError } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
@@ -20,6 +13,11 @@ import {
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 export type AdminTeamMemberDeleteDialogProps = {
   teamId: number;
@@ -93,8 +91,8 @@ export const AdminTeamMemberDeleteDialog = ({
         <div>
           <DialogDescription>
             <Trans>
-              You are about to remove the following user from the team{' '}
-              <span className="font-semibold">{teamName}</span>:
+              You are about to remove the following user from the team <span className="font-semibold">{teamName}</span>
+              :
             </Trans>
           </DialogDescription>
 

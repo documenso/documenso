@@ -1,18 +1,3 @@
-import { useEffect } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
-import {
-  DocumentStatus,
-  DocumentVisibility,
-  type Field,
-  SendStatus,
-  TeamMemberRole,
-} from '@prisma/client';
-import { InfoIcon } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { match } from 'ts-pattern';
-
 import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
@@ -39,21 +24,16 @@ import {
   DocumentVisibilitySelect,
   DocumentVisibilityTooltip,
 } from '@documenso/ui/components/document/document-visibility-select';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@documenso/ui/primitives/accordion';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@documenso/ui/primitives/accordion';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { DocumentStatus, DocumentVisibility, type Field, SendStatus, TeamMemberRole } from '@prisma/client';
+import { InfoIcon } from 'lucide-react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
 
 import { DocumentSignatureSettingsTooltip } from '../../components/document/document-signature-settings-tooltip';
 import { Combobox } from '../combobox';
@@ -112,11 +92,10 @@ export const AddSettingsFormPartial = ({
 
       meta: {
         timezone:
-          TIME_ZONES.find((timezone) => timezone === document.documentMeta?.timezone) ??
-          DEFAULT_DOCUMENT_TIME_ZONE,
+          TIME_ZONES.find((timezone) => timezone === document.documentMeta?.timezone) ?? DEFAULT_DOCUMENT_TIME_ZONE,
         dateFormat:
-          DATE_FORMATS.find((format) => format.value === document.documentMeta?.dateFormat)
-            ?.value ?? DEFAULT_DOCUMENT_DATE_FORMAT,
+          DATE_FORMATS.find((format) => format.value === document.documentMeta?.dateFormat)?.value ??
+          DEFAULT_DOCUMENT_DATE_FORMAT,
         redirectUrl: document.documentMeta?.redirectUrl ?? '',
         language: document.documentMeta?.language ?? 'en',
         signatureTypes: extractTeamSignatureSettings(document.documentMeta),
@@ -126,9 +105,7 @@ export const AddSettingsFormPartial = ({
 
   const { stepIndex, currentStep, totalSteps, previousStep } = useStep();
 
-  const documentHasBeenSent = recipients.some(
-    (recipient) => recipient.sendStatus === SendStatus.SENT,
-  );
+  const documentHasBeenSent = recipients.some((recipient) => recipient.sendStatus === SendStatus.SENT);
 
   const canUpdateVisibility = match(currentTeamMemberRole)
     .with(TeamMemberRole.ADMIN, () => true)
@@ -149,11 +126,7 @@ export const AddSettingsFormPartial = ({
   // We almost always want to set the timezone to the user's local timezone to avoid confusion
   // when the document is signed.
   useEffect(() => {
-    if (
-      !form.formState.touchedFields.meta?.timezone &&
-      !documentHasBeenSent &&
-      !document.documentMeta?.timezone
-    ) {
+    if (!form.formState.touchedFields.meta?.timezone && !documentHasBeenSent && !document.documentMeta?.timezone) {
       form.setValue('meta.timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
     }
   }, [
@@ -188,10 +161,7 @@ export const AddSettingsFormPartial = ({
 
   return (
     <>
-      <DocumentFlowFormContainerHeader
-        title={documentFlow.title}
-        description={documentFlow.description}
-      />
+      <DocumentFlowFormContainerHeader title={documentFlow.title} description={documentFlow.description} />
 
       <DocumentFlowFormContainerContent>
         {isDocumentPdfLoaded && (
@@ -203,10 +173,7 @@ export const AddSettingsFormPartial = ({
         )}
 
         <Form {...form}>
-          <fieldset
-            className="flex h-full flex-col space-y-6"
-            disabled={form.formState.isSubmitting}
-          >
+          <fieldset className="flex h-full flex-col space-y-6" disabled={form.formState.isSubmitting}>
             <FormField
               control={form.control}
               name="title"
@@ -244,9 +211,8 @@ export const AddSettingsFormPartial = ({
 
                       <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
                         <Trans>
-                          Controls the language for the document, including the language to be used
-                          for email notifications, and the final certificate that is generated and
-                          attached to the document.
+                          Controls the language for the document, including the language to be used for email
+                          notifications, and the final certificate that is generated and attached to the document.
                         </Trans>
                       </TooltipContent>
                     </Tooltip>
@@ -365,7 +331,7 @@ export const AddSettingsFormPartial = ({
                   <Trans>Advanced Options</Trans>
                 </AccordionTrigger>
 
-                <AccordionContent className="-mx-1 px-1 pt-2 text-sm leading-relaxed text-muted-foreground">
+                <AccordionContent className="-mx-1 px-1 pt-2 text-muted-foreground text-sm leading-relaxed">
                   <div className="flex flex-col space-y-6">
                     <FormField
                       control={form.control}
@@ -381,8 +347,8 @@ export const AddSettingsFormPartial = ({
 
                               <TooltipContent className="max-w-xs text-muted-foreground">
                                 <Trans>
-                                  Add an external ID to the document. This can be used to identify
-                                  the document in external systems.
+                                  Add an external ID to the document. This can be used to identify the document in
+                                  external systems.
                                 </Trans>
                               </TooltipContent>
                             </Tooltip>
@@ -507,9 +473,7 @@ export const AddSettingsFormPartial = ({
                               </TooltipTrigger>
 
                               <TooltipContent className="max-w-xs text-muted-foreground">
-                                <Trans>
-                                  Add a URL to redirect the user to once the document is signed
-                                </Trans>
+                                <Trans>Add a URL to redirect the user to once the document is signed</Trans>
                               </TooltipContent>
                             </Tooltip>
                           </FormLabel>

@@ -1,12 +1,11 @@
-import { Trans } from '@lingui/react/macro';
-import { Outlet, isRouteErrorResponse, useRouteError } from 'react-router';
-
 import {
   IS_GOOGLE_SSO_ENABLED,
   IS_MICROSOFT_SSO_ENABLED,
   IS_OIDC_SSO_ENABLED,
   OIDC_PROVIDER_LABEL,
 } from '@documenso/lib/constants/auth';
+import { Trans } from '@lingui/react/macro';
+import { isRouteErrorResponse, Outlet, useRouteError } from 'react-router';
 
 import { EmbedAuthenticationRequired } from '~/components/embed/embed-authentication-required';
 import { EmbedDocumentCompleted } from '~/components/embed/embed-document-completed';
@@ -46,8 +45,7 @@ export default function Layout() {
 }
 
 export function ErrorBoundary({ loaderData }: Route.ErrorBoundaryProps) {
-  const { isGoogleSSOEnabled, isMicrosoftSSOEnabled, isOIDCSSOEnabled, oidcProviderLabel } =
-    loaderData || {};
+  const { isGoogleSSOEnabled, isMicrosoftSSOEnabled, isOIDCSSOEnabled, oidcProviderLabel } = loaderData || {};
 
   const error = useRouteError();
 

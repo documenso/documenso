@@ -1,12 +1,3 @@
-import { useEffect } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import type { TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
@@ -20,16 +11,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import type * as DialogPrimitive from '@radix-ui/react-dialog';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 export type FolderDeleteDialogProps = {
   folder: TFolderWithSubfolders;
@@ -110,14 +100,12 @@ export const FolderDeleteDialog = ({ folder, isOpen, onOpenChange }: FolderDelet
           </DialogDescription>
         </DialogHeader>
 
-        {(folder._count.documents > 0 ||
-          folder._count.templates > 0 ||
-          folder._count.subfolders > 0) && (
+        {(folder._count.documents > 0 || folder._count.templates > 0 || folder._count.subfolders > 0) && (
           <Alert variant="destructive">
             <AlertDescription>
               <Trans>
-                This folder contains multiple items. Deleting it will remove all subfolders and move
-                all nested documents and templates to the root folder.
+                This folder contains multiple items. Deleting it will remove all subfolders and move all nested
+                documents and templates to the root folder.
               </Trans>
             </AlertDescription>
           </Alert>
@@ -134,9 +122,7 @@ export const FolderDeleteDialog = ({ folder, isOpen, onOpenChange }: FolderDelet
                     <FormLabel>
                       <Trans>
                         Confirm by typing:{' '}
-                        <span className="font-sm text-destructive font-semibold">
-                          {deleteMessage}
-                        </span>
+                        <span className="font-semibold font-sm text-destructive">{deleteMessage}</span>
                       </Trans>
                     </FormLabel>
                     <FormControl>

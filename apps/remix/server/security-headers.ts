@@ -43,8 +43,7 @@ const EMBED_PATH_REGEX = /^\/embed(\/|\.data|$)/;
  * keeps `/sign` from matching `/signin`/`/signup` and `/d` from matching
  * `/dashboard`.
  */
-const FRAMEABLE_PATH_REGEX =
-  /^\/(signin|forgot-password|check-email|unverified-account|sign|d)(\/|\.data|$)/;
+const FRAMEABLE_PATH_REGEX = /^\/(signin|forgot-password|check-email|unverified-account|sign|d)(\/|\.data|$)/;
 
 /**
  * Hono context variable name where the per-request CSP nonce is stashed.

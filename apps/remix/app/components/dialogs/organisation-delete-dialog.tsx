@@ -1,13 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
-import { z } from 'zod';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { AppError } from '@documenso/lib/errors/app-error';
@@ -22,16 +12,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router';
+import { z } from 'zod';
 
 export type OrganisationDeleteDialogProps = {
   trigger?: React.ReactNode;
@@ -117,19 +108,16 @@ export const OrganisationDeleteDialog = ({ trigger }: OrganisationDeleteDialogPr
 
           <DialogDescription>
             <Trans>
-              You are about to delete <span className="font-semibold">{organisation.name}</span>.
-              All data related to this organisation such as teams, documents, and all other
-              resources will be deleted. This action is irreversible.
+              You are about to delete <span className="font-semibold">{organisation.name}</span>. All data related to
+              this organisation such as teams, documents, and all other resources will be deleted. This action is
+              irreversible.
             </Trans>
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
-            <fieldset
-              className="flex h-full flex-col space-y-4"
-              disabled={form.formState.isSubmitting}
-            >
+            <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
               <FormField
                 control={form.control}
                 name="organisationName"

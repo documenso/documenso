@@ -1,10 +1,10 @@
+import { createRequire } from 'node:module';
+import path from 'node:path';
 import { defaultOptions as devServerDefaults } from '@hono/vite-dev-server';
 import { lingui } from '@lingui/vite-plugin';
 import { reactRouter } from '@react-router/dev/vite';
 import autoprefixer from 'autoprefixer';
 import serverAdapter from 'hono-react-router-adapter/vite';
-import { createRequire } from 'node:module';
-import path from 'node:path';
 import tailwindcss from 'tailwindcss';
 import { defineConfig, normalizePath } from 'vite';
 import macrosPlugin from 'vite-plugin-babel-macros';
@@ -26,9 +26,7 @@ const honoDevServer = serverAdapter({
     // Spread the defaults but replace the /.css$/ rule so that Bull
     // Board's static CSS at /api/jobs/board/static/** passes through to Hono.
     ...devServerDefaults.exclude.map((pattern) =>
-      pattern instanceof RegExp && pattern.source === '.*\\.css$'
-        ? /^(?!\/api\/jobs\/board\/).*\.css$/
-        : pattern,
+      pattern instanceof RegExp && pattern.source === '.*\\.css$' ? /^(?!\/api\/jobs\/board\/).*\.css$/ : pattern,
     ),
     '/assets/**',
     '/src/app/**',
@@ -41,7 +39,9 @@ const honoDevServer = serverAdapter({
 const honoServerDir = path.resolve(__dirname, 'server') + path.sep;
 const upstreamHandleHotUpdate = honoDevServer.handleHotUpdate;
 honoDevServer.handleHotUpdate = async function (ctx) {
-  if (!ctx.file.startsWith(honoServerDir)) return;
+  if (!ctx.file.startsWith(honoServerDir)) {
+    return;
+  }
   return typeof upstreamHandleHotUpdate === 'function'
     ? upstreamHandleHotUpdate.call(this, ctx)
     : upstreamHandleHotUpdate?.handler.call(this, ctx);
@@ -111,14 +111,8 @@ export default defineConfig({
   resolve: {
     alias: {
       https: 'node:https',
-      '.prisma/client/default': path.resolve(
-        __dirname,
-        '../../node_modules/.prisma/client/default.js',
-      ),
-      '.prisma/client/index-browser': path.resolve(
-        __dirname,
-        '../../node_modules/.prisma/client/index-browser.js',
-      ),
+      '.prisma/client/default': path.resolve(__dirname, '../../node_modules/.prisma/client/default.js'),
+      '.prisma/client/index-browser': path.resolve(__dirname, '../../node_modules/.prisma/client/index-browser.js'),
       canvas: path.resolve(__dirname, './app/types/empty-module.ts'),
     },
   },

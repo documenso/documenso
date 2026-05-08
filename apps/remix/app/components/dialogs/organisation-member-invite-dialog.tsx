@@ -1,16 +1,3 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { OrganisationMemberRole } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { Download, Mail, MailIcon, PlusCircle, Trash, Upload, UsersIcon } from 'lucide-react';
-import Papa, { type ParseResult } from 'papaparse';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { z } from 'zod';
-
 import { downloadFile } from '@documenso/lib/client-only/download-file';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { IS_BILLING_ENABLED, SUPPORT_EMAIL } from '@documenso/lib/constants/app';
@@ -33,25 +20,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { OrganisationMemberRole } from '@prisma/client';
+import type * as DialogPrimitive from '@radix-ui/react-dialog';
+import { Download, Mail, MailIcon, PlusCircle, Trash, Upload, UsersIcon } from 'lucide-react';
+import Papa, { type ParseResult } from 'papaparse';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 export type OrganisationMemberInviteDialogProps = {
   trigger?: React.ReactNode;
@@ -100,10 +85,7 @@ const ZImportOrganisationMemberSchema = z.array(
   }),
 );
 
-export const OrganisationMemberInviteDialog = ({
-  trigger,
-  ...props
-}: OrganisationMemberInviteDialogProps) => {
+export const OrganisationMemberInviteDialog = ({ trigger, ...props }: OrganisationMemberInviteDialogProps) => {
   const [open, setOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [invitationType, setInvitationType] = useState<TabTypes>('INDIVIDUAL');
@@ -134,8 +116,7 @@ export const OrganisationMemberInviteDialog = ({
     name: 'invitations',
   });
 
-  const { mutateAsync: createOrganisationMemberInvites } =
-    trpc.organisation.member.invite.createMany.useMutation();
+  const { mutateAsync: createOrganisationMemberInvites } = trpc.organisation.member.invite.createMany.useMutation();
 
   const { data: fullOrganisation } = trpc.organisation.get.useQuery({
     organisationReference: organisation.id,
@@ -242,9 +223,7 @@ export const OrganisationMemberInviteDialog = ({
 
           toast({
             title: _(msg`Something went wrong`),
-            description: _(
-              msg`Please check the CSV file and make sure it is according to our format`,
-            ),
+            description: _(msg`Please check the CSV file and make sure it is according to our format`),
             variant: 'destructive',
           });
         }
@@ -259,8 +238,7 @@ export const OrganisationMemberInviteDialog = ({
       { email: 'member@documenso.com', role: 'Member' },
     ];
 
-    const csvContent =
-      'Email address,Role\n' + data.map((row) => `${row.email},${row.role}`).join('\n');
+    const csvContent = 'Email address,Role\n' + data.map((row) => `${row.email},${row.role}`).join('\n');
 
     const blob = new Blob([csvContent], {
       type: 'text/csv',
@@ -273,11 +251,7 @@ export const OrganisationMemberInviteDialog = ({
   };
 
   return (
-    <Dialog
-      {...props}
-      open={open}
-      onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
-    >
+    <Dialog {...props} open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
         {trigger ?? (
           <Button variant="secondary">
@@ -301,15 +275,11 @@ export const OrganisationMemberInviteDialog = ({
 
         {dialogState === 'alert' && (
           <>
-            <Alert
-              className="flex flex-col justify-between p-6 sm:flex-row sm:items-center"
-              variant="neutral"
-            >
+            <Alert className="flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
               <AlertDescription>
                 <Trans>
-                  Your plan does not support inviting members. Please upgrade or your plan or
-                  contact sales at <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> if you
-                  would like to discuss your options.
+                  Your plan does not support inviting members. Please upgrade or your plan or contact sales at{' '}
+                  <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> if you would like to discuss your options.
                 </Trans>
               </AlertDescription>
             </Alert>
@@ -343,16 +313,10 @@ export const OrganisationMemberInviteDialog = ({
             <TabsContent value="INDIVIDUAL">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onFormSubmit)}>
-                  <fieldset
-                    className="flex h-full flex-col space-y-4"
-                    disabled={form.formState.isSubmitting}
-                  >
+                  <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
                     <div className="custom-scrollbar -m-1 max-h-[60vh] space-y-4 overflow-y-auto p-1">
                       {organisationMemberInvites.map((organisationMemberInvite, index) => (
-                        <div
-                          className="flex w-full flex-row space-x-4"
-                          key={organisationMemberInvite.id}
-                        >
+                        <div className="flex w-full flex-row space-x-4" key={organisationMemberInvite.id}>
                           <FormField
                             control={form.control}
                             name={`invitations.${index}.email`}
@@ -388,13 +352,13 @@ export const OrganisationMemberInviteDialog = ({
                                     </SelectTrigger>
 
                                     <SelectContent position="popper">
-                                      {ORGANISATION_MEMBER_ROLE_HIERARCHY[
-                                        organisation.currentOrganisationRole
-                                      ].map((role) => (
-                                        <SelectItem key={role} value={role}>
-                                          {_(ORGANISATION_MEMBER_ROLE_MAP[role]) ?? role}
-                                        </SelectItem>
-                                      ))}
+                                      {ORGANISATION_MEMBER_ROLE_HIERARCHY[organisation.currentOrganisationRole].map(
+                                        (role) => (
+                                          <SelectItem key={role} value={role}>
+                                            {_(ORGANISATION_MEMBER_ROLE_MAP[role]) ?? role}
+                                          </SelectItem>
+                                        ),
+                                      )}
                                     </SelectContent>
                                   </Select>
                                 </FormControl>
@@ -457,13 +421,7 @@ export const OrganisationMemberInviteDialog = ({
                       <Trans>Click here to upload</Trans>
                     </p>
 
-                    <input
-                      onChange={onFileInputChange}
-                      type="file"
-                      ref={fileInputRef}
-                      accept=".csv"
-                      hidden
-                    />
+                    <input onChange={onFileInputChange} type="file" ref={fileInputRef} accept=".csv" hidden />
                   </CardContent>
                 </Card>
 

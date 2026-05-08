@@ -1,12 +1,11 @@
-import { sValidator } from '@hono/standard-validator';
-import { Hono } from 'hono';
-import { streamText } from 'hono/streaming';
-
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { IS_AI_FEATURES_CONFIGURED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { detectRecipientsFromEnvelope } from '@documenso/lib/server-only/ai/envelope/detect-recipients';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
+import { sValidator } from '@hono/standard-validator';
+import { Hono } from 'hono';
+import { streamText } from 'hono/streaming';
 
 import type { HonoEnv } from '../../router';
 import { ZDetectRecipientsRequestSchema } from './detect-recipients.types';

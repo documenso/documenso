@@ -1,6 +1,5 @@
-import { z } from 'zod';
-
 import UserSchema from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
+import { z } from 'zod';
 
 export const ZGetUserRequestSchema = z.object({
   id: z.number().min(1),

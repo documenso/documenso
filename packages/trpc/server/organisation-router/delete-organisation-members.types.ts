@@ -12,11 +12,9 @@ import { z } from 'zod';
 
 export const ZDeleteOrganisationMembersRequestSchema = z.object({
   organisationId: z.string(),
-  organisationMemberIds: z
-    .array(z.string())
-    .refine((items) => new Set(items).size === items.length, {
-      message: 'Organisation member ids must be unique, no duplicate values allowed',
-    }),
+  organisationMemberIds: z.array(z.string()).refine((items) => new Set(items).size === items.length, {
+    message: 'Organisation member ids must be unique, no duplicate values allowed',
+  }),
 });
 
 export const ZDeleteOrganisationMembersResponseSchema = z.void();

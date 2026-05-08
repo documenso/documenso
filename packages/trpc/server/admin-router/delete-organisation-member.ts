@@ -1,9 +1,8 @@
-import { OrganisationMemberInviteStatus } from '@prisma/client';
-
 import { syncMemberCountWithStripeSeatPlan } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobs } from '@documenso/lib/jobs/client';
 import { prisma } from '@documenso/prisma';
+import { OrganisationMemberInviteStatus } from '@prisma/client';
 
 import { adminProcedure } from '../trpc';
 import {
@@ -59,9 +58,7 @@ export const deleteAdminOrganisationMemberRoute = adminProcedure
       });
     }
 
-    const memberToDelete = organisation.members.find(
-      (member) => member.id === organisationMemberId,
-    );
+    const memberToDelete = organisation.members.find((member) => member.id === organisationMemberId);
 
     if (!memberToDelete) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
