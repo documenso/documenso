@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-05-07 05:08\n"
+"PO-Revision-Date: 2026-05-08 03:04\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -6926,7 +6926,7 @@ msgstr "Brak skonfigurowanej licencji"
 
 #: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
 msgid "No members found"
-msgstr "Nie znaleziono członków"
+msgstr "Nie znaleziono użytkowników"
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "No members selected"
@@ -8789,7 +8789,7 @@ msgstr "Szukaj folderów..."
 
 #: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
 msgid "Search groups by name"
-msgstr "Wyszukaj grupy po nazwie"
+msgstr "Szukaj nazwy grupy"
 
 #: packages/ui/components/common/language-switcher-dialog.tsx
 msgid "Search languages..."
@@ -8797,7 +8797,7 @@ msgstr "Szukaj języków..."
 
 #: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
 msgid "Search members by name or email"
-msgstr "Wyszukaj członków po imieniu, nazwisku lub e-mailu"
+msgstr "Szukaj nazwy lub adresu e-mail użytkownika"
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "Secret"
