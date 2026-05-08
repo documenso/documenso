@@ -86,6 +86,7 @@ export const ALIGNMENT_TEST_FIELDS: FieldTestData[] = [
       fontSize: 10,
       textAlign: 'left',
       type: 'email',
+      overflow: 'auto',
     },
     page: 1,
     ...calculatePositionPageOne(0, 0),
@@ -96,6 +97,7 @@ export const ALIGNMENT_TEST_FIELDS: FieldTestData[] = [
     fieldMeta: {
       textAlign: 'center',
       type: 'email',
+      overflow: 'auto',
     },
     page: 1,
     ...calculatePositionPageOne(0, 1),
@@ -107,6 +109,7 @@ export const ALIGNMENT_TEST_FIELDS: FieldTestData[] = [
       fontSize: 20,
       textAlign: 'right',
       type: 'email',
+      overflow: 'auto',
     },
     page: 1,
     ...calculatePositionPageOne(0, 2),
@@ -156,6 +159,7 @@ export const ALIGNMENT_TEST_FIELDS: FieldTestData[] = [
       fontSize: 10,
       textAlign: 'left',
       type: 'date',
+      overflow: 'auto',
     },
     page: 1,
     ...calculatePositionPageOne(2, 0),
@@ -166,6 +170,7 @@ export const ALIGNMENT_TEST_FIELDS: FieldTestData[] = [
     fieldMeta: {
       textAlign: 'center',
       type: 'date',
+      overflow: 'auto',
     },
     page: 1,
     ...calculatePositionPageOne(2, 1),
@@ -177,6 +182,7 @@ export const ALIGNMENT_TEST_FIELDS: FieldTestData[] = [
       fontSize: 20,
       textAlign: 'right',
       type: 'date',
+      overflow: 'auto',
     },
     page: 1,
     ...calculatePositionPageOne(2, 2),
@@ -424,6 +430,7 @@ export const ALIGNMENT_TEST_FIELDS: FieldTestData[] = [
     fieldMeta: {
       fontSize: 10,
       type: 'signature',
+      overflow: 'auto',
     },
     page: 1,
     ...calculatePositionPageOne(9, 0),
@@ -434,6 +441,7 @@ export const ALIGNMENT_TEST_FIELDS: FieldTestData[] = [
     type: FieldType.SIGNATURE,
     fieldMeta: {
       type: 'signature',
+      overflow: 'auto',
     },
     page: 1,
     ...calculatePositionPageOne(9, 1),
@@ -445,6 +453,7 @@ export const ALIGNMENT_TEST_FIELDS: FieldTestData[] = [
     fieldMeta: {
       fontSize: 20,
       type: 'signature',
+      overflow: 'auto',
     },
     page: 1,
     ...calculatePositionPageOne(9, 2),
