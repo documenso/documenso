@@ -1,5 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-
+import type { EnvelopeEditorStep } from '@documenso/lib/client-only/providers/envelope-editor-provider';
+import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
+import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
+import { cn } from '@documenso/ui/lib/utils';
+import { Button } from '@documenso/ui/primitives/button';
+import { Separator } from '@documenso/ui/primitives/separator';
+import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
@@ -19,17 +24,9 @@ import {
   Trash2Icon,
   UploadIcon,
 } from 'lucide-react';
-import { useNavigate, useSearchParams } from 'react-router';
-import { Link } from 'react-router';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
-
-import type { EnvelopeEditorStep } from '@documenso/lib/client-only/providers/envelope-editor-provider';
-import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
-import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import { Separator } from '@documenso/ui/primitives/separator';
-import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 
 import { EnvelopeDeleteDialog } from '~/components/dialogs/envelope-delete-dialog';
 import { EnvelopeDistributeDialog } from '~/components/dialogs/envelope-distribute-dialog';
@@ -93,12 +90,7 @@ export const EnvelopeEditor = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const {
-    general: {
-      minimizeLeftSidebar,
-      allowUploadAndRecipientStep,
-      allowAddFieldsStep,
-      allowPreviewStep,
-    },
+    general: { minimizeLeftSidebar, allowUploadAndRecipientStep, allowAddFieldsStep, allowPreviewStep },
     actions: {
       allowDistributing,
       allowDirectLink,
@@ -148,9 +140,7 @@ export const EnvelopeEditor = () => {
     return 'upload';
   }, [searchParams]);
 
-  const [pageToRender, setPageToRender] = useState<EnvelopeEditorStep | 'loading'>(
-    searchParamsStep,
-  );
+  const [pageToRender, setPageToRender] = useState<EnvelopeEditorStep | 'loading'>(searchParamsStep);
 
   const latestStepChangeTime = useRef(0);
 
@@ -182,8 +172,7 @@ export const EnvelopeEditor = () => {
     }
   }, [searchParams]);
 
-  const currentStepData =
-    envelopeEditorSteps.find((step) => step.id === searchParamsStep) || envelopeEditorSteps[0];
+  const currentStepData = envelopeEditorSteps.find((step) => step.id === searchParamsStep) || envelopeEditorSteps[0];
 
   return (
     <div className="h-screen w-screen bg-envelope-editor-background">
@@ -193,12 +182,9 @@ export const EnvelopeEditor = () => {
       <div className="flex h-[calc(100vh-4rem)] w-screen">
         {/* Left Section - Step Navigation */}
         <div
-          className={cn(
-            'flex w-80 flex-shrink-0 flex-col overflow-y-auto border-r border-border bg-background py-4',
-            {
-              'w-14': minimizeLeftSidebar,
-            },
-          )}
+          className={cn('flex w-80 flex-shrink-0 flex-col overflow-y-auto border-border border-r bg-background py-4', {
+            'w-14': minimizeLeftSidebar,
+          })}
         >
           {/* Left section step selector. */}
           {minimizeLeftSidebar ? (
@@ -229,15 +215,12 @@ export const EnvelopeEditor = () => {
                     initial={false}
                     animate={{
                       strokeDashoffset:
-                        2 *
-                        Math.PI *
-                        16 *
-                        (1 - (currentStepData.order ?? 0) / envelopeEditorSteps.length),
+                        2 * Math.PI * 16 * (1 - (currentStepData.order ?? 0) / envelopeEditorSteps.length),
                     }}
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                   />
                 </svg>
-                <span className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-foreground">
+                <span className="absolute inset-0 flex items-center justify-center font-semibold text-[10px] text-foreground">
                   <Trans context="The step counter">
                     {currentStepData.order}/{envelopeEditorSteps.length}
                   </Trans>
@@ -246,10 +229,10 @@ export const EnvelopeEditor = () => {
             </div>
           ) : (
             <div className="px-4">
-              <h3 className="flex items-end justify-between text-sm font-semibold text-foreground">
+              <h3 className="flex items-end justify-between font-semibold text-foreground text-sm">
                 {isDocument ? <Trans>Document Editor</Trans> : <Trans>Template Editor</Trans>}
 
-                <span className="ml-2 rounded border bg-muted/50 px-2 py-0.5 text-xs text-muted-foreground">
+                <span className="ml-2 rounded border bg-muted/50 px-2 py-0.5 text-muted-foreground text-xs">
                   <Trans context="The step counter">
                     Step {currentStepData.order}/{envelopeEditorSteps.length}
                   </Trans>
@@ -304,15 +287,13 @@ export const EnvelopeEditor = () => {
                           : 'border-gray-100 bg-gray-100 dark:border-gray-400/20 dark:bg-gray-400/10'
                       }`}
                     >
-                      <Icon
-                        className={`h-4 w-4 ${isActive ? 'text-green-600' : 'text-gray-600'}`}
-                      />
+                      <Icon className={`h-4 w-4 ${isActive ? 'text-green-600' : 'text-gray-600'}`} />
                     </div>
 
                     {!minimizeLeftSidebar && (
                       <div>
                         <div
-                          className={`text-sm font-medium ${
+                          className={`font-medium text-sm ${
                             isActive
                               ? 'text-green-900 dark:text-green-400'
                               : 'text-foreground dark:text-muted-foreground'
@@ -320,7 +301,7 @@ export const EnvelopeEditor = () => {
                         >
                           {t(step.title)}
                         </div>
-                        <div className="text-xs text-muted-foreground">{t(step.description)}</div>
+                        <div className="text-muted-foreground text-xs">{t(step.description)}</div>
                       </div>
                     )}
                   </div>
@@ -342,7 +323,7 @@ export const EnvelopeEditor = () => {
             })}
           >
             {!minimizeLeftSidebar && (
-              <h4 className="text-sm font-semibold text-foreground">
+              <h4 className="font-semibold text-foreground text-sm">
                 <Trans>Quick Actions</Trans>
               </h4>
             )}
@@ -350,21 +331,12 @@ export const EnvelopeEditor = () => {
             {editorConfig.settings && (
               <EnvelopeEditorSettingsDialog
                 trigger={
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start"
-                    title={t(msg`Settings`)}
-                  >
+                  <Button variant="ghost" size="sm" className="w-full justify-start" title={t(msg`Settings`)}>
                     <SettingsIcon className="h-4 w-4" />
 
                     {!minimizeLeftSidebar && (
                       <span className="ml-2">
-                        {isDocument ? (
-                          <Trans>Document Settings</Trans>
-                        ) : (
-                          <Trans>Template Settings</Trans>
-                        )}
+                        {isDocument ? <Trans>Document Settings</Trans> : <Trans>Template Settings</Trans>}
                       </span>
                     )}
                   </Button>
@@ -377,12 +349,7 @@ export const EnvelopeEditor = () => {
                 <EnvelopeDistributeDialog
                   documentRootPath={relativePath.documentRootPath}
                   trigger={
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start"
-                      title={t(msg`Send Envelope`)}
-                    >
+                    <Button variant="ghost" size="sm" className="w-full justify-start" title={t(msg`Send Envelope`)}>
                       <SendIcon className="h-4 w-4" />
 
                       {!minimizeLeftSidebar && (
@@ -397,12 +364,7 @@ export const EnvelopeEditor = () => {
                 <EnvelopeRedistributeDialog
                   envelope={envelope}
                   trigger={
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start"
-                      title={t(msg`Resend Envelope`)}
-                    >
+                    <Button variant="ghost" size="sm" className="w-full justify-start" title={t(msg`Resend Envelope`)}>
                       <SendIcon className="h-4 w-4" />
 
                       {!minimizeLeftSidebar && (
@@ -424,12 +386,7 @@ export const EnvelopeEditor = () => {
                 onCreateSuccess={async () => await syncEnvelope()}
                 onDeleteSuccess={async () => await syncEnvelope()}
                 trigger={
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start"
-                    title={t(msg`Direct Link`)}
-                  >
+                  <Button variant="ghost" size="sm" className="w-full justify-start" title={t(msg`Direct Link`)}>
                     <LinkIcon className="h-4 w-4" />
 
                     {!minimizeLeftSidebar && (
@@ -447,21 +404,12 @@ export const EnvelopeEditor = () => {
                 envelopeId={envelope.id}
                 envelopeType={envelope.type}
                 trigger={
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start"
-                    title={t(msg`Duplicate Envelope`)}
-                  >
+                  <Button variant="ghost" size="sm" className="w-full justify-start" title={t(msg`Duplicate Envelope`)}>
                     <CopyPlusIcon className="h-4 w-4" />
 
                     {!minimizeLeftSidebar && (
                       <span className="ml-2">
-                        {isDocument ? (
-                          <Trans>Duplicate Document</Trans>
-                        ) : (
-                          <Trans>Duplicate Template</Trans>
-                        )}
+                        {isDocument ? <Trans>Duplicate Document</Trans> : <Trans>Duplicate Template</Trans>}
                       </span>
                     )}
                   </Button>
@@ -473,12 +421,7 @@ export const EnvelopeEditor = () => {
               <EnvelopeSaveAsTemplateDialog
                 envelopeId={envelope.id}
                 trigger={
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start"
-                    title={t(msg`Save as Template`)}
-                  >
+                  <Button variant="ghost" size="sm" className="w-full justify-start" title={t(msg`Save as Template`)}>
                     <FileOutputIcon className="h-4 w-4" />
 
                     {!minimizeLeftSidebar && (
@@ -495,14 +438,10 @@ export const EnvelopeEditor = () => {
               <EnvelopeDownloadDialog
                 envelopeId={envelope.id}
                 envelopeStatus={envelope.status}
+                isLegacy={envelope.internalVersion === 1}
                 envelopeItems={envelope.envelopeItems}
                 trigger={
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start"
-                    title={t(msg`Download PDF`)}
-                  >
+                  <Button variant="ghost" size="sm" className="w-full justify-start" title={t(msg`Download PDF`)}>
                     <DownloadCloudIcon className="h-4 w-4" />
 
                     {!minimizeLeftSidebar && (
@@ -535,11 +474,7 @@ export const EnvelopeEditor = () => {
 
                     {!minimizeLeftSidebar && (
                       <span className="ml-2">
-                        {isDocument ? (
-                          <Trans>Delete Document</Trans>
-                        ) : (
-                          <Trans>Delete Template</Trans>
-                        )}
+                        {isDocument ? <Trans>Delete Document</Trans> : <Trans>Delete Template</Trans>}
                       </span>
                     )}
                   </Button>
@@ -574,11 +509,7 @@ export const EnvelopeEditor = () => {
 
                   {!minimizeLeftSidebar && (
                     <span className="ml-2">
-                      {isDocument ? (
-                        <Trans>Return to documents</Trans>
-                      ) : (
-                        <Trans>Return to templates</Trans>
-                      )}
+                      {isDocument ? <Trans>Return to documents</Trans> : <Trans>Return to templates</Trans>}
                     </span>
                   )}
                 </Link>
@@ -596,15 +527,9 @@ export const EnvelopeEditor = () => {
             allowPreviewStep,
           })
             .with({ pageToRender: 'loading' }, () => <SpinnerBox className="py-32" />)
-            .with({ pageToRender: 'upload', allowUploadAndRecipientStep: true }, () => (
-              <EnvelopeEditorUploadPage />
-            ))
-            .with({ pageToRender: 'addFields', allowAddFieldsStep: true }, () => (
-              <EnvelopeEditorFieldsPage />
-            ))
-            .with({ pageToRender: 'preview', allowPreviewStep: true }, () => (
-              <EnvelopeEditorPreviewPage />
-            ))
+            .with({ pageToRender: 'upload', allowUploadAndRecipientStep: true }, () => <EnvelopeEditorUploadPage />)
+            .with({ pageToRender: 'addFields', allowAddFieldsStep: true }, () => <EnvelopeEditorFieldsPage />)
+            .with({ pageToRender: 'preview', allowPreviewStep: true }, () => <EnvelopeEditorPreviewPage />)
             .otherwise(() => null)}
         </div>
       </div>

@@ -1,11 +1,9 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { EnvelopeType } from '@prisma/client';
-
 import { mailer } from '@documenso/email/mailer';
 import { DocumentPendingEmailTemplate } from '@documenso/email/templates/document-pending';
 import { prisma } from '@documenso/prisma';
+import { msg } from '@lingui/core/macro';
+import { EnvelopeType } from '@prisma/client';
+import { createElement } from 'react';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
@@ -58,9 +56,7 @@ export const sendPendingEmail = async ({ id, recipientId }: SendPendingEmailOpti
     meta: envelope.documentMeta,
   });
 
-  const isDocumentPendingEmailEnabled = extractDerivedDocumentEmailSettings(
-    envelope.documentMeta,
-  ).documentPending;
+  const isDocumentPendingEmailEnabled = extractDerivedDocumentEmailSettings(envelope.documentMeta).documentPending;
 
   if (!isDocumentPendingEmailEnabled) {
     return;

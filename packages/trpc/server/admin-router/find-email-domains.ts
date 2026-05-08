@@ -1,13 +1,9 @@
-import { Prisma } from '@prisma/client';
-
 import type { FindResultResponse } from '@documenso/lib/types/search-params';
 import { prisma } from '@documenso/prisma';
+import { Prisma } from '@prisma/client';
 
 import { adminProcedure } from '../trpc';
-import {
-  ZFindEmailDomainsRequestSchema,
-  ZFindEmailDomainsResponseSchema,
-} from './find-email-domains.types';
+import { ZFindEmailDomainsRequestSchema, ZFindEmailDomainsResponseSchema } from './find-email-domains.types';
 
 export const findEmailDomainsRoute = adminProcedure
   .input(ZFindEmailDomainsRequestSchema)
@@ -25,12 +21,7 @@ type FindEmailDomainsOptions = {
   status?: 'PENDING' | 'ACTIVE';
 };
 
-const findEmailDomains = async ({
-  query,
-  page = 1,
-  perPage = 20,
-  status,
-}: FindEmailDomainsOptions) => {
+const findEmailDomains = async ({ query, page = 1, perPage = 20, status }: FindEmailDomainsOptions) => {
   const whereClause: Prisma.EmailDomainWhereInput = {};
 
   if (query) {

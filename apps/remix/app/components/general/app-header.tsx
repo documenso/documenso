@@ -1,15 +1,13 @@
-import { type HTMLAttributes, useEffect, useState } from 'react';
-
-import { ReadStatus } from '@prisma/client';
-import { InboxIcon, MenuIcon, SearchIcon } from 'lucide-react';
-import { Link, useParams } from 'react-router';
-
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { getRootHref } from '@documenso/lib/utils/params';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import { ReadStatus } from '@prisma/client';
+import { InboxIcon, MenuIcon, SearchIcon } from 'lucide-react';
+import { type HTMLAttributes, useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
 
@@ -52,7 +50,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
   return (
     <header
       className={cn(
-        'supports-backdrop-blur:bg-background/60 sticky top-0 z-[60] flex h-16 w-full items-center border-b border-b-transparent bg-background/95 backdrop-blur duration-200',
+        'sticky top-0 z-[60] flex h-16 w-full items-center border-b border-b-transparent bg-background/95 backdrop-blur duration-200 supports-backdrop-blur:bg-background/60',
         scrollY > 5 && 'border-b-border',
         className,
       )}
@@ -74,16 +72,14 @@ export const Header = ({ className, ...props }: HeaderProps) => {
             <InboxIcon className="h-5 w-5 flex-shrink-0 text-muted-foreground transition-colors hover:text-foreground" />
 
             {unreadCountData && unreadCountData.count > 0 && (
-              <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
+              <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary font-semibold text-[10px] text-primary-foreground">
                 {unreadCountData.count > 99 ? '99+' : unreadCountData.count}
               </span>
             )}
           </Link>
         </Button>
 
-        <div className="md:ml-4">
-          {isPersonalLayout(organisations) ? <MenuSwitcher /> : <OrgMenuSwitcher />}
-        </div>
+        <div className="md:ml-4">{isPersonalLayout(organisations) ? <MenuSwitcher /> : <OrgMenuSwitcher />}</div>
 
         <div className="flex flex-row items-center space-x-4 md:hidden">
           <button onClick={() => setIsCommandMenuOpen(true)}>
@@ -96,10 +92,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
 
           <AppCommandMenu open={isCommandMenuOpen} onOpenChange={setIsCommandMenuOpen} />
 
-          <AppNavMobile
-            isMenuOpen={isHamburgerMenuOpen}
-            onMenuOpenChange={setIsHamburgerMenuOpen}
-          />
+          <AppNavMobile isMenuOpen={isHamburgerMenuOpen} onMenuOpenChange={setIsHamburgerMenuOpen} />
         </div>
       </div>
     </header>

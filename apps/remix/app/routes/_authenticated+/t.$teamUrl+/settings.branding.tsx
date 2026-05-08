@@ -1,10 +1,9 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Loader } from 'lucide-react';
-
 import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react/macro';
+import { Loader } from 'lucide-react';
 
 import {
   BrandingPreferencesForm,
@@ -34,7 +33,7 @@ export default function TeamsSettingsPage() {
     try {
       const { brandingEnabled, brandingLogo, brandingUrl, brandingCompanyDetails } = data;
 
-      let uploadedBrandingLogo: string | undefined = undefined;
+      let uploadedBrandingLogo: string | undefined;
 
       if (brandingLogo) {
         uploadedBrandingLogo = JSON.stringify(await putFile(brandingLogo));

@@ -1,18 +1,15 @@
-import type { HTMLAttributes } from 'react';
-import { useEffect, useMemo, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { motion } from 'framer-motion';
-import { AnimatePresence } from 'framer-motion';
-import { Search } from 'lucide-react';
-import { Link, useLocation } from 'react-router';
-
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Search } from 'lucide-react';
+import type { HTMLAttributes } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useLocation } from 'react-router';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
 
@@ -20,11 +17,7 @@ export type AppNavDesktopProps = HTMLAttributes<HTMLDivElement> & {
   setIsCommandMenuOpen: (value: boolean) => void;
 };
 
-export const AppNavDesktop = ({
-  className,
-  setIsCommandMenuOpen,
-  ...props
-}: AppNavDesktopProps) => {
+export const AppNavDesktop = ({ className, setIsCommandMenuOpen, ...props }: AppNavDesktopProps) => {
   const { _ } = useLingui();
   const { organisations } = useSession();
 
@@ -65,13 +58,7 @@ export const AppNavDesktop = ({
   }, [currentTeam, organisations]);
 
   return (
-    <div
-      className={cn(
-        'ml-8 hidden flex-1 items-center gap-x-12 md:flex md:justify-between',
-        className,
-      )}
-      {...props}
-    >
+    <div className={cn('ml-8 hidden flex-1 items-center gap-x-12 md:flex md:justify-between', className)} {...props}>
       <div>
         <AnimatePresence>
           {menuNavigationLinks.length > 0 && (
@@ -87,7 +74,7 @@ export const AppNavDesktop = ({
                   key={href}
                   to={href}
                   className={cn(
-                    'rounded-md font-medium leading-5 text-muted-foreground ring-offset-background hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:text-muted-foreground/60',
+                    'rounded-md font-medium text-muted-foreground leading-5 ring-offset-background hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:text-muted-foreground/60',
                     {
                       'text-foreground dark:text-muted-foreground': pathname?.startsWith(href),
                     },
@@ -112,7 +99,7 @@ export const AppNavDesktop = ({
         </div>
 
         <div>
-          <div className="flex items-center rounded-md bg-muted px-1.5 py-0.5 text-xs tracking-wider text-muted-foreground">
+          <div className="flex items-center rounded-md bg-muted px-1.5 py-0.5 text-muted-foreground text-xs tracking-wider">
             {modifierKey}+K
           </div>
         </div>

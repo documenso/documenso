@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { type JobDefinition } from '../../client/_internal/job';
+import type { JobDefinition } from '../../client/_internal/job';
 
 const SEND_SIGNING_REJECTION_EMAILS_JOB_DEFINITION_ID = 'send.signing.rejected.emails';
 

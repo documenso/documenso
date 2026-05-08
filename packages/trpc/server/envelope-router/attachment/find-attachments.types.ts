@@ -1,6 +1,5 @@
-import { z } from 'zod';
-
 import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
+import { z } from 'zod';
 
 import type { TrpcRouteMeta } from '../../trpc';
 

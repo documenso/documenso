@@ -1,22 +1,17 @@
+import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { Trans } from '@lingui/react/macro';
 import { ChevronLeft, Loader } from 'lucide-react';
 import { Link } from 'react-router';
 
-import { Skeleton } from '@documenso/ui/primitives/skeleton';
-
 export default function DocumentEditSkeleton() {
   return (
     <div className="mx-auto -mt-4 flex w-full max-w-screen-xl flex-col px-4 md:px-8">
-      <Link
-        prefetch="intent"
-        to="/"
-        className="flex grow-0 items-center text-documenso-700 hover:opacity-80"
-      >
+      <Link prefetch="intent" to="/" className="flex grow-0 items-center text-documenso-700 hover:opacity-80">
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         <Trans>Documents</Trans>
       </Link>
 
-      <h1 className="mt-4 grow-0 truncate text-2xl font-semibold md:text-3xl">
+      <h1 className="mt-4 grow-0 truncate font-semibold text-2xl md:text-3xl">
         <Trans>Loading Document...</Trans>
       </h1>
 

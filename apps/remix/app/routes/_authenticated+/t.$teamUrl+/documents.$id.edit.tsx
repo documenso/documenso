@@ -1,16 +1,14 @@
-import { useEffect } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
-import { Link, useNavigate } from 'react-router';
-
 import { EnvelopeEditorProvider } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Spinner } from '@documenso/ui/primitives/spinner';
+import { msg } from '@lingui/core/macro';
+import { Trans } from '@lingui/react/macro';
+import { EnvelopeType } from '@prisma/client';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router';
 
 import { EnvelopeEditor } from '~/components/general/envelope-editor/envelope-editor';
 import { EnvelopeEditorRenderProviderWrapper } from '~/components/general/envelope-editor/envelope-editor-renderer-provider-wrapper';
@@ -48,9 +46,7 @@ export default function EnvelopeEditorPage({ params }: Route.ComponentProps) {
     }
 
     const pathPrefix =
-      envelope.type === EnvelopeType.DOCUMENT
-        ? formatDocumentsPath(team.url)
-        : formatTemplatesPath(team.url);
+      envelope.type === EnvelopeType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
 
     if (envelope.teamId !== team.id) {
       void navigate(pathPrefix, { replace: true });

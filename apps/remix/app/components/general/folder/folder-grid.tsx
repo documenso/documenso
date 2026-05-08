@@ -1,15 +1,13 @@
-import { useState } from 'react';
-
-import { Trans } from '@lingui/react/macro';
-import { FolderType } from '@prisma/client';
-import { FolderIcon, HomeIcon } from 'lucide-react';
-import { Link } from 'react-router';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
-import { type TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
+import type { TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
+import { Trans } from '@lingui/react/macro';
+import { FolderType } from '@prisma/client';
+import { FolderIcon, HomeIcon } from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router';
 
 import { FolderCreateDialog } from '~/components/dialogs/folder-create-dialog';
 import { FolderDeleteDialog } from '~/components/dialogs/folder-delete-dialog';
@@ -43,15 +41,13 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
   });
 
   const formatBreadCrumbPath = (folderId: string) => {
-    const rootPath =
-      type === FolderType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
+    const rootPath = type === FolderType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
 
     return `${rootPath}/f/${folderId}`;
   };
 
   const formatViewAllFoldersPath = () => {
-    const rootPath =
-      type === FolderType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
+    const rootPath = type === FolderType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
 
     if (parentId) {
       return `${rootPath}/folders?parentId=${parentId}`;
@@ -61,9 +57,7 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
   };
 
   const formatRootPath = () => {
-    return type === FolderType.DOCUMENT
-      ? formatDocumentsPath(team.url)
-      : formatTemplatesPath(team.url);
+    return type === FolderType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
   };
 
   const pinnedFolders = foldersData?.folders.filter((folder) => folder.pinned) || [];
@@ -73,7 +67,7 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
     <div>
       <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div
-          className="flex flex-1 items-center text-sm font-medium text-muted-foreground hover:text-muted-foreground/80"
+          className="flex flex-1 items-center font-medium text-muted-foreground text-sm hover:text-muted-foreground/80"
           data-testid="folder-grid-breadcrumbs"
         >
           <Link prefetch="intent" to={formatRootPath()} className="flex items-center">
@@ -91,11 +85,7 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
             foldersData?.breadcrumbs.map((folder) => (
               <div key={folder.id} className="flex items-center">
                 <span className="px-3">/</span>
-                <Link
-                  prefetch="intent"
-                  to={formatBreadCrumbPath(folder.id)}
-                  className="flex items-center"
-                >
+                <Link prefetch="intent" to={formatBreadCrumbPath(folder.id)} className="flex items-center">
                   <FolderIcon className="mr-2 h-4 w-4" />
                   <span>{folder.name}</span>
                 </Link>
@@ -108,9 +98,7 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
           <EnvelopeUploadButton type={type} folderId={parentId || undefined} />
 
           {/* If you delete this, delete the component as well. */}
-          {organisation.organisationClaim.flags.allowLegacyEnvelopes && (
-            <DocumentUploadButtonLegacy type={type} />
-          )}
+          {organisation.organisationClaim.flags.allowLegacyEnvelopes && <DocumentUploadButtonLegacy type={type} />}
 
           <FolderCreateDialog type={type} />
         </div>
@@ -201,7 +189,7 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
               <div className="mt-2 flex items-center justify-center">
                 <Link
                   prefetch="intent"
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
+                  className="font-medium text-muted-foreground text-sm hover:text-foreground"
                   to={formatViewAllFoldersPath()}
                 >
                   <Trans>View all folders</Trans>
