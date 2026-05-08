@@ -32,7 +32,7 @@ export const RecipientExpiredTemplate = ({
 
       <Body className="mx-auto my-auto bg-white font-sans">
         <Section>
-          <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
+          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid p-4 backdrop-blur-sm">
             <Section>
               {branding.brandingEnabled && branding.brandingLogo ? (
                 <Img
@@ -41,11 +41,7 @@ export const RecipientExpiredTemplate = ({
                   className={`mb-4 ${branding.brandingLogoSize}`}
                 />
               ) : (
-                <Img
-                  src={getAssetUrl('/static/logo.png')}
-                  alt="Documenso Logo"
-                  className="mb-4 h-6"
-                />
+                <Img src={getAssetUrl('/static/logo.png')} alt="Documenso Logo" className="mb-4 h-6" />
               )}
 
               <TemplateRecipientExpired

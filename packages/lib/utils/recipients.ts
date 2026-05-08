@@ -1,7 +1,6 @@
+import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { Envelope } from '@prisma/client';
 import { type Field, RecipientRole, SigningStatus } from '@prisma/client';
-
-import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import { AppError, AppErrorCode } from '../errors/app-error';
@@ -98,7 +97,6 @@ export const mapRecipientToLegacyRecipient = (
     ...legacyId,
   };
 };
-
 
 export const findRecipientByEmail = <T extends { email: string }>({
   recipients,

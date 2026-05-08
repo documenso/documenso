@@ -1,18 +1,17 @@
+import { createRequire } from 'node:module';
+import path from 'node:path';
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { HonoAdapter } from '@bull-board/hono';
+import { prisma } from '@documenso/prisma';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { sha256 } from '@noble/hashes/sha2';
 import { BackgroundJobStatus, Prisma } from '@prisma/client';
-import { Queue, Worker } from 'bullmq';
 import type { Job } from 'bullmq';
-import { Hono } from 'hono';
+import { Queue, Worker } from 'bullmq';
 import type { Context as HonoContext } from 'hono';
+import { Hono } from 'hono';
 import IORedis from 'ioredis';
-import { createRequire } from 'node:module';
-import path from 'node:path';
-
-import { prisma } from '@documenso/prisma';
 
 import { env } from '../../utils/env';
 import type { JobDefinition, JobRunIO, SimpleTriggerJobOptions } from './_internal/job';
@@ -42,9 +41,7 @@ export class BullMQJobProvider extends BaseJobProvider {
     const redisUrl = env('NEXT_PRIVATE_REDIS_URL');
 
     if (!redisUrl) {
-      throw new Error(
-        '[JOBS]: NEXT_PRIVATE_REDIS_URL is required when using the BullMQ jobs provider',
-      );
+      throw new Error('[JOBS]: NEXT_PRIVATE_REDIS_URL is required when using the BullMQ jobs provider');
     }
 
     const prefix = env('NEXT_PRIVATE_REDIS_PREFIX') || 'documenso';
@@ -135,9 +132,7 @@ export class BullMQJobProvider extends BaseJobProvider {
   }
 
   public async triggerJob(options: SimpleTriggerJobOptions) {
-    const eligibleJobs = Object.values(this._jobDefinitions).filter(
-      (job) => job.trigger.name === options.name,
-    );
+    const eligibleJobs = Object.values(this._jobDefinitions).filter((job) => job.trigger.name === options.name);
 
     await Promise.all(
       eligibleJobs.map(async (job) => {

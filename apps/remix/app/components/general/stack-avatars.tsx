@@ -1,9 +1,4 @@
-import React from 'react';
-
-import {
-  getExtraRecipientsType,
-  getRecipientType,
-} from '@documenso/lib/client-only/recipient-type';
+import { getExtraRecipientsType, getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 

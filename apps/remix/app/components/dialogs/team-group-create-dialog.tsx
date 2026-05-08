@@ -1,13 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { TeamMemberRole } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { useForm } from 'react-hook-form';
-import { match } from 'ts-pattern';
-import { z } from 'zod';
-
 import { TEAM_MEMBER_ROLE_HIERARCHY } from '@documenso/lib/constants/teams';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
 import { trpc } from '@documenso/trpc/react';
@@ -31,14 +21,16 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { TeamMemberRole } from '@prisma/client';
+import type * as DialogPrimitive from '@radix-ui/react-dialog';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
+import { z } from 'zod';
 
 import {
   type OrganisationGroupOption,
@@ -173,9 +165,8 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
                                 groups.map((group) => ({
                                   organisationGroupId: group.id,
                                   teamRole:
-                                    field.value.find(
-                                      (value) => value.organisationGroupId === group.id,
-                                    )?.teamRole || TeamMemberRole.MEMBER,
+                                    field.value.find((value) => value.organisationGroupId === group.id)?.teamRole ||
+                                    TeamMemberRole.MEMBER,
                                 })),
                               );
                             }}
@@ -224,8 +215,8 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
                             readOnly
                             className="bg-background"
                             value={
-                              selectedGroups.find(({ id }) => id === group.organisationGroupId)
-                                ?.name || t`Untitled Group`
+                              selectedGroups.find(({ id }) => id === group.organisationGroupId)?.name ||
+                              t`Untitled Group`
                             }
                           />
                         </div>
@@ -247,13 +238,11 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
                                   </SelectTrigger>
 
                                   <SelectContent position="popper">
-                                    {TEAM_MEMBER_ROLE_HIERARCHY[team.currentTeamRole].map(
-                                      (role) => (
-                                        <SelectItem key={role} value={role}>
-                                          {t(TEAM_MEMBER_ROLE_MAP[role]) ?? role}
-                                        </SelectItem>
-                                      ),
-                                    )}
+                                    {TEAM_MEMBER_ROLE_HIERARCHY[team.currentTeamRole].map((role) => (
+                                      <SelectItem key={role} value={role}>
+                                        {t(TEAM_MEMBER_ROLE_MAP[role]) ?? role}
+                                      </SelectItem>
+                                    ))}
                                   </SelectContent>
                                 </Select>
                               </FormControl>

@@ -1,9 +1,3 @@
-import { msg } from '@lingui/core/macro';
-import { Trans } from '@lingui/react/macro';
-import { DocumentSigningOrder, SigningStatus } from '@prisma/client';
-import { ChevronLeft, LucideEdit } from 'lucide-react';
-import { Link, useNavigate } from 'react-router';
-
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
@@ -16,6 +10,11 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { Spinner } from '@documenso/ui/primitives/spinner';
+import { msg } from '@lingui/core/macro';
+import { Trans } from '@lingui/react/macro';
+import { DocumentSigningOrder, SigningStatus } from '@prisma/client';
+import { ChevronLeft, LucideEdit } from 'lucide-react';
+import { Link, useNavigate } from 'react-router';
 
 import { TemplateBulkSendDialog } from '~/components/dialogs/template-bulk-send-dialog';
 import { TemplateDirectLinkDialog } from '~/components/dialogs/template-direct-link-dialog';
@@ -53,8 +52,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
 
   const envelope = teamTemplateQuery.data ?? orgTemplateQuery.data;
   const isLoadingEnvelope =
-    teamTemplateQuery.isLoading ||
-    (teamTemplateQuery.isError && !orgTemplateQuery.isError && !orgTemplateQuery.data);
+    teamTemplateQuery.isLoading || (teamTemplateQuery.isError && !orgTemplateQuery.isError && !orgTemplateQuery.data);
   const isErrorEnvelope = teamTemplateQuery.isError && orgTemplateQuery.isError;
 
   if (isLoadingEnvelope) {
@@ -94,9 +92,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
 
   // Remap to fit the DocumentReadOnlyFields component.
   const readOnlyFields = envelope.fields.map((field) => {
-    const recipient = envelope.recipients.find(
-      (recipient) => recipient.id === field.recipientId,
-    ) || {
+    const recipient = envelope.recipients.find((recipient) => recipient.id === field.recipientId) || {
       name: '',
       email: '',
       signingStatus: SigningStatus.NOT_SIGNED,
@@ -122,10 +118,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
       <div className="flex flex-row justify-between">
-        <Link
-          to={templateRootPath}
-          className="flex items-center text-documenso-700 hover:opacity-80"
-        >
+        <Link to={templateRootPath} className="flex items-center text-documenso-700 hover:opacity-80">
           <ChevronLeft className="mr-2 inline-block h-5 w-5" />
           <Trans>Templates</Trans>
         </Link>
@@ -157,16 +150,12 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
       </div>
 
       <div className="min-w-0">
-        <h1 className="mt-4 block text-2xl font-semibold md:text-3xl" title={envelope.title}>
+        <h1 className="mt-4 block font-semibold text-2xl md:text-3xl" title={envelope.title}>
           {envelope.title}
         </h1>
 
         <div className="mt-2.5 flex items-center">
-          <TemplateType
-            inheritColor
-            className="text-muted-foreground"
-            type={envelope.templateType}
-          />
+          <TemplateType inheritColor className="text-muted-foreground" type={envelope.templateType} />
 
           {envelope.directLink?.token && (
             <TemplateDirectLinkBadge
@@ -192,9 +181,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
                 showRecipientTooltip: true,
               }}
             >
-              {isMultiEnvelopeItem && (
-                <EnvelopeRendererFileSelector fields={envelope.fields} className="mb-4 p-0" />
-              )}
+              {isMultiEnvelopeItem && <EnvelopeRendererFileSelector fields={envelope.fields} className="mb-4 p-0" />}
 
               <Card className="rounded-xl before:rounded-xl" gradient>
                 <CardContent className="p-2">
@@ -208,10 +195,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
             </EnvelopeRenderProvider>
           </div>
         ) : (
-          <Card
-            className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7"
-            gradient
-          >
+          <Card className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7" gradient>
             <CardContent className="p-2">
               <DocumentReadOnlyFields
                 fields={readOnlyFields}
@@ -238,13 +222,11 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
           </Card>
         )}
 
-        <div
-          className={cn('col-span-12 lg:col-span-6 xl:col-span-5', isMultiEnvelopeItem && 'mt-20')}
-        >
+        <div className={cn('col-span-12 lg:col-span-6 xl:col-span-5', isMultiEnvelopeItem && 'mt-20')}>
           <div className="space-y-6">
-            <section className="flex flex-col rounded-xl border border-border bg-widget pb-4 pt-6">
+            <section className="flex flex-col rounded-xl border border-border bg-widget pt-6 pb-4">
               <div className="flex flex-row items-center justify-between px-4">
-                <h3 className="text-2xl font-semibold text-foreground">
+                <h3 className="font-semibold text-2xl text-foreground">
                   <Trans>Template</Trans>
                 </h3>
 
@@ -262,7 +244,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
                 </div>
               </div>
 
-              <p className="mt-2 px-4 text-sm text-muted-foreground">
+              <p className="mt-2 px-4 text-muted-foreground text-sm">
                 {isOwnTeamTemplate ? (
                   <Trans>Manage and view template</Trans>
                 ) : (
@@ -307,13 +289,11 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
       </div>
 
       <div className="mt-16" id="documents">
-        <h1 className="mb-4 text-2xl font-bold">
+        <h1 className="mb-4 font-bold text-2xl">
           <Trans>Documents created from template</Trans>
         </h1>
 
-        <TemplatePageViewDocumentsTable
-          templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
-        />
+        <TemplatePageViewDocumentsTable templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)} />
       </div>
     </div>
   );

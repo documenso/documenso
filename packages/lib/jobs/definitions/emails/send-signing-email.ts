@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { ZRequestMetadataSchema } from '../../../universal/extract-request-metadata';
-import { type JobDefinition } from '../../client/_internal/job';
+import type { JobDefinition } from '../../client/_internal/job';
 
 const SEND_SIGNING_EMAIL_JOB_DEFINITION_ID = 'send.signing.requested.email';
 
@@ -12,9 +12,7 @@ const SEND_SIGNING_EMAIL_JOB_DEFINITION_SCHEMA = z.object({
   requestMetadata: ZRequestMetadataSchema.optional(),
 });
 
-export type TSendSigningEmailJobDefinition = z.infer<
-  typeof SEND_SIGNING_EMAIL_JOB_DEFINITION_SCHEMA
->;
+export type TSendSigningEmailJobDefinition = z.infer<typeof SEND_SIGNING_EMAIL_JOB_DEFINITION_SCHEMA>;
 
 export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
   id: SEND_SIGNING_EMAIL_JOB_DEFINITION_ID,
@@ -29,7 +27,4 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
 
     await handler.run({ payload, io });
   },
-} as const satisfies JobDefinition<
-  typeof SEND_SIGNING_EMAIL_JOB_DEFINITION_ID,
-  TSendSigningEmailJobDefinition
->;
+} as const satisfies JobDefinition<typeof SEND_SIGNING_EMAIL_JOB_DEFINITION_ID, TSendSigningEmailJobDefinition>;

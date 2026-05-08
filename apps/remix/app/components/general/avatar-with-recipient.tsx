@@ -1,7 +1,3 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { DocumentStatus } from '@prisma/client';
-
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
@@ -10,6 +6,9 @@ import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import { cn } from '@documenso/ui/lib/utils';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { DocumentStatus } from '@prisma/client';
 
 import { StackAvatar } from './stack-avatar';
 
@@ -56,15 +55,11 @@ export function AvatarWithRecipient({ recipient, documentStatus }: AvatarWithRec
       />
 
       <div
-        className="text-sm text-muted-foreground"
-        title={
-          signingToken ? _(msg`Click to copy signing link for sending to recipient`) : undefined
-        }
+        className="text-muted-foreground text-sm"
+        title={signingToken ? _(msg`Click to copy signing link for sending to recipient`) : undefined}
       >
         <p>{recipient.email || recipient.name}</p>
-        <p className="text-xs text-muted-foreground/70">
-          {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
-        </p>
+        <p className="text-muted-foreground/70 text-xs">{_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}</p>
       </div>
     </div>
   );

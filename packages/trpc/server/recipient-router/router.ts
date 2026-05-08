@@ -1,5 +1,3 @@
-import { EnvelopeType } from '@prisma/client';
-
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
 import { createEnvelopeRecipients } from '@documenso/lib/server-only/recipient/create-envelope-recipients';
@@ -8,6 +6,7 @@ import { getRecipientById } from '@documenso/lib/server-only/recipient/get-recip
 import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
 import { setTemplateRecipients } from '@documenso/lib/server-only/recipient/set-template-recipients';
 import { updateEnvelopeRecipients } from '@documenso/lib/server-only/recipient/update-envelope-recipients';
+import { EnvelopeType } from '@prisma/client';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, procedure, router } from '../trpc';
@@ -586,25 +585,23 @@ export const recipientRouter = router({
   /**
    * @private
    */
-  rejectDocumentWithToken: procedure
-    .input(ZRejectDocumentWithTokenMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { token, documentId, reason } = input;
+  rejectDocumentWithToken: procedure.input(ZRejectDocumentWithTokenMutationSchema).mutation(async ({ input, ctx }) => {
+    const { token, documentId, reason } = input;
 
-      ctx.logger.info({
-        input: {
-          documentId,
-        },
-      });
+    ctx.logger.info({
+      input: {
+        documentId,
+      },
+    });
 
-      return await rejectDocumentWithToken({
-        token,
-        id: {
-          type: 'documentId',
-          id: documentId,
-        },
-        reason,
-        requestMetadata: ctx.metadata.requestMetadata,
-      });
-    }),
+    return await rejectDocumentWithToken({
+      token,
+      id: {
+        type: 'documentId',
+        id: documentId,
+      },
+      reason,
+      requestMetadata: ctx.metadata.requestMetadata,
+    });
+  }),
 });

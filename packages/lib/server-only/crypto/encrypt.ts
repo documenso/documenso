@@ -1,7 +1,6 @@
-import { z } from 'zod';
-
 import { DOCUMENSO_ENCRYPTION_SECONDARY_KEY } from '@documenso/lib/constants/crypto';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
+import { z } from 'zod';
 
 export const ZEncryptedDataSchema = z.object({
   data: z.string(),

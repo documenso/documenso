@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { type JobDefinition } from '../../client/_internal/job';
+import type { JobDefinition } from '../../client/_internal/job';
 
 const PROCESS_SIGNING_REMINDER_JOB_DEFINITION_ID = 'internal.process-signing-reminder';
 
@@ -8,9 +8,7 @@ const PROCESS_SIGNING_REMINDER_JOB_DEFINITION_SCHEMA = z.object({
   recipientId: z.number(),
 });
 
-export type TProcessSigningReminderJobDefinition = z.infer<
-  typeof PROCESS_SIGNING_REMINDER_JOB_DEFINITION_SCHEMA
->;
+export type TProcessSigningReminderJobDefinition = z.infer<typeof PROCESS_SIGNING_REMINDER_JOB_DEFINITION_SCHEMA>;
 
 export const PROCESS_SIGNING_REMINDER_JOB_DEFINITION = {
   id: PROCESS_SIGNING_REMINDER_JOB_DEFINITION_ID,

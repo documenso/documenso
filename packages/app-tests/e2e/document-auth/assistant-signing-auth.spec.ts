@@ -1,8 +1,7 @@
-import { type APIRequestContext, expect, test } from '@playwright/test';
-import { FieldType, SigningStatus } from '@prisma/client';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { prisma } from '@documenso/prisma';
+import { type APIRequestContext, expect, test } from '@playwright/test';
+import { FieldType, SigningStatus } from '@prisma/client';
 
 import { apiSeedPendingDocument } from '../fixtures/api-seeds';
 
@@ -89,11 +88,7 @@ const seedTwoPendingEnvelopes = async (request: APIRequestContext): Promise<Seed
   };
 };
 
-const trpcMutation = async (
-  request: APIRequestContext,
-  procedure: string,
-  input: Record<string, unknown>,
-) => {
+const trpcMutation = async (request: APIRequestContext, procedure: string, input: Record<string, unknown>) => {
   return await request.post(`${WEBAPP_BASE_URL}/api/trpc/${procedure}`, {
     headers: { 'content-type': 'application/json' },
     data: JSON.stringify({ json: input }),
@@ -120,9 +115,7 @@ test.describe('[ASSISTANT_SIGNING_AUTH]: cross-envelope field access', () => {
     expect(fieldAfter.customText).toBe('');
   });
 
-  test('field.signFieldWithToken (V1) rejects fieldId from another envelope', async ({
-    request,
-  }) => {
+  test('field.signFieldWithToken (V1) rejects fieldId from another envelope', async ({ request }) => {
     const { assistantToken, otherEnvelopeFieldId } = await seedTwoPendingEnvelopes(request);
 
     const res = await trpcMutation(request, 'field.signFieldWithToken', {
@@ -142,9 +135,7 @@ test.describe('[ASSISTANT_SIGNING_AUTH]: cross-envelope field access', () => {
     expect(fieldAfter.customText).toBe('');
   });
 
-  test('field.removeSignedFieldWithToken (V1) rejects fieldId from another envelope', async ({
-    request,
-  }) => {
+  test('field.removeSignedFieldWithToken (V1) rejects fieldId from another envelope', async ({ request }) => {
     const { assistantToken, otherEnvelopeFieldId } = await seedTwoPendingEnvelopes(request);
 
     // Pre-insert the field so a successful (incorrect) uninsert is detectable.

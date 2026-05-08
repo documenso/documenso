@@ -1,13 +1,3 @@
-import { useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { flushSync } from 'react-dom';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
 import { authClient } from '@documenso/auth/client';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { Button } from '@documenso/ui/primitives/button';
@@ -20,17 +10,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { PinInput, PinInputGroup, PinInputSlot } from '@documenso/ui/primitives/pin-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { useState } from 'react';
+import { flushSync } from 'react-dom';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 export const ZDisable2FAForm = z.object({
   totpCode: z.string().trim().optional(),
@@ -120,8 +111,8 @@ export const DisableAuthenticatorAppDialog = () => {
 
           <DialogDescription>
             <Trans>
-              Please provide a token from the authenticator, or a backup code. If you do not have a
-              backup code available, please contact support.
+              Please provide a token from the authenticator, or a backup code. If you do not have a backup code
+              available, please contact support.
             </Trans>
           </DialogDescription>
         </DialogHeader>
@@ -171,11 +162,7 @@ export const DisableAuthenticatorAppDialog = () => {
               )}
 
               <DialogFooter>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={onToggleTwoFactorDisableMethodClick}
-                >
+                <Button type="button" variant="secondary" onClick={onToggleTwoFactorDisableMethodClick}>
                   {twoFactorDisableMethod === 'totp' ? (
                     <Trans>Use Backup Code</Trans>
                   ) : (

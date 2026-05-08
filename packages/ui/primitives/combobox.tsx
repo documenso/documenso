@@ -1,9 +1,8 @@
-import * as React from 'react';
-
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Check, ChevronDown } from 'lucide-react';
+import * as React from 'react';
 
 import { cn } from '../lib/utils';
 import { Button } from './button';
@@ -69,9 +68,7 @@ const Combobox = ({
           <CommandGroup className="max-h-[250px] overflow-y-auto">
             {options.map((option, index) => (
               <CommandItem key={index} onSelect={() => onOptionSelected(option)}>
-                <Check
-                  className={cn('mr-2 h-4 w-4', option === value ? 'opacity-100' : 'opacity-0')}
-                />
+                <Check className={cn('mr-2 h-4 w-4', option === value ? 'opacity-100' : 'opacity-0')} />
 
                 {option}
               </CommandItem>

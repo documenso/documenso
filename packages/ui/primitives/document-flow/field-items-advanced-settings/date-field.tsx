@@ -1,19 +1,9 @@
-import { Trans, useLingui } from '@lingui/react/macro';
-
 import { validateFields as validateDateFields } from '@documenso/lib/advanced-fields-validation/validate-fields';
-import {
-  DEFAULT_DATE_OVERFLOW_MODE,
-  type TDateFieldMeta as DateFieldMeta,
-} from '@documenso/lib/types/field-meta';
+import { type TDateFieldMeta as DateFieldMeta, DEFAULT_DATE_OVERFLOW_MODE } from '@documenso/lib/types/field-meta';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
+import { Trans, useLingui } from '@lingui/react/macro';
 
 type DateFieldAdvancedSettingsProps = {
   fieldState: DateFieldMeta;
@@ -82,10 +72,7 @@ export const DateFieldAdvancedSettings = ({
           <Trans>Text Align</Trans>
         </Label>
 
-        <Select
-          value={fieldState.textAlign}
-          onValueChange={(value) => handleInput('textAlign', value)}
-        >
+        <Select value={fieldState.textAlign} onValueChange={(value) => handleInput('textAlign', value)}>
           <SelectTrigger className="mt-2 bg-background">
             <SelectValue placeholder={t`Select text align`} />
           </SelectTrigger>

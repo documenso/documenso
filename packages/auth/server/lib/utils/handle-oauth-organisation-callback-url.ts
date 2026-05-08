@@ -1,10 +1,9 @@
-import type { Context } from 'hono';
-
 import { sendOrganisationAccountLinkConfirmationEmail } from '@documenso/ee/server-only/lib/send-organisation-account-link-confirmation-email';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
 import { formatOrganisationLoginUrl } from '@documenso/lib/utils/organisation-authentication-portal';
 import { prisma } from '@documenso/prisma';
+import type { Context } from 'hono';
 
 import { AuthenticationErrorCode } from '../errors/error-codes';
 import { onAuthorize } from './authorizer';
@@ -16,9 +15,7 @@ type HandleOAuthOrganisationCallbackUrlOptions = {
   orgUrl: string;
 };
 
-export const handleOAuthOrganisationCallbackUrl = async (
-  options: HandleOAuthOrganisationCallbackUrlOptions,
-) => {
+export const handleOAuthOrganisationCallbackUrl = async (options: HandleOAuthOrganisationCallbackUrlOptions) => {
   const { c, orgUrl } = options;
 
   const { organisation, clientOptions } = await getOrganisationAuthenticationPortalOptions({
@@ -77,8 +74,7 @@ export const handleOAuthOrganisationCallbackUrl = async (
     });
 
     await onCreateUserHook(userToLink, {
-      skipPersonalOrganisation:
-        !organisation.organisationAuthenticationPortal.allowPersonalOrganisations,
+      skipPersonalOrganisation: !organisation.organisationAuthenticationPortal.allowPersonalOrganisations,
     }).catch((err) => {
       // Todo: (RR7) Add logging.
       console.error(err);

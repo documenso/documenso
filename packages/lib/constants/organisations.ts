@@ -9,8 +9,8 @@ export const BRANDING_LOGO_SIZE_OPTIONS = [
 
 export const DEFAULT_BRANDING_LOGO_SIZE = BRANDING_LOGO_SIZE_OPTIONS[0].value;
 
-export const ORGANISATION_URL_ROOT_REGEX = new RegExp('^/t/[^/]+/?$');
-export const ORGANISATION_URL_REGEX = new RegExp('^/t/[^/]+');
+export const ORGANISATION_URL_ROOT_REGEX = /^\/t\/[^/]+\/?$/;
+export const ORGANISATION_URL_REGEX = /^\/t\/[^/]+/;
 
 export const ORGANISATION_INTERNAL_GROUPS: {
   organisationRole: OrganisationMemberRole;

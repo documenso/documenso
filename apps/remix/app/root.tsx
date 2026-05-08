@@ -1,16 +1,3 @@
-import { NuqsAdapter } from 'nuqs/adapters/react-router/v7';
-import {
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  data,
-  isRouteErrorResponse,
-  useLoaderData,
-} from 'react-router';
-import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
-
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
 import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
@@ -20,6 +7,18 @@ import { TrpcProvider } from '@documenso/trpc/react';
 import { getOrganisationSession } from '@documenso/trpc/server/organisation-router/get-organisation-session';
 import { Toaster } from '@documenso/ui/primitives/toaster';
 import { TooltipProvider } from '@documenso/ui/primitives/tooltip';
+import { NuqsAdapter } from 'nuqs/adapters/react-router/v7';
+import {
+  data,
+  isRouteErrorResponse,
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useLoaderData,
+} from 'react-router';
+import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
 
 import type { Route } from './+types/root';
 import stylesheet from './app.css?url';
