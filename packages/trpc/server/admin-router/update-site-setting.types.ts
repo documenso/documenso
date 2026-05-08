@@ -1,6 +1,5 @@
-import { z } from 'zod';
-
 import { ZSiteSettingSchema } from '@documenso/lib/server-only/site-settings/schema';
+import { z } from 'zod';
 
 export const ZUpdateSiteSettingRequestSchema = ZSiteSettingSchema;
 

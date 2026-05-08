@@ -2,9 +2,9 @@ import { createAttachment } from '@documenso/lib/server-only/envelope-attachment
 
 import { authenticatedProcedure } from '../../trpc';
 import {
+  createAttachmentMeta,
   ZCreateAttachmentRequestSchema,
   ZCreateAttachmentResponseSchema,
-  createAttachmentMeta,
 } from './create-attachment.types';
 
 export const createAttachmentRoute = authenticatedProcedure

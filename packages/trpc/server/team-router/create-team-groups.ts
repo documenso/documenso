@@ -1,23 +1,13 @@
-import {
-  ALLOWED_TEAM_GROUP_TYPES,
-  TEAM_MEMBER_ROLE_PERMISSIONS_MAP,
-} from '@documenso/lib/constants/teams';
+import { ALLOWED_TEAM_GROUP_TYPES, TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getMemberRoles } from '@documenso/lib/server-only/team/get-member-roles';
 import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { buildTeamWhereQuery, isTeamRoleWithinUserHierarchy } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
-import {
-  OrganisationGroupType,
-  OrganisationMemberRole,
-  TeamMemberRole,
-} from '@documenso/prisma/generated/types';
+import { OrganisationGroupType, OrganisationMemberRole, TeamMemberRole } from '@documenso/prisma/generated/types';
 
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZCreateTeamGroupsRequestSchema,
-  ZCreateTeamGroupsResponseSchema,
-} from './create-team-groups.types';
+import { ZCreateTeamGroupsRequestSchema, ZCreateTeamGroupsResponseSchema } from './create-team-groups.types';
 
 export const createTeamGroupsRoute = authenticatedProcedure
   // .meta(createTeamGroupsMeta)
@@ -68,9 +58,7 @@ export const createTeamGroupsRoute = authenticatedProcedure
     // Hard validation — these failures indicate programming or authorisation
     // errors and should reject the whole request.
     const isValid = groups.every((group) => {
-      const organisationGroup = team.organisation.groups.find(
-        ({ id }) => id === group.organisationGroupId,
-      );
+      const organisationGroup = team.organisation.groups.find(({ id }) => id === group.organisationGroupId);
 
       // Only allow specific organisation groups to be used as a reference for team groups.
       if (!organisationGroup?.type || !ALLOWED_TEAM_GROUP_TYPES.includes(organisationGroup.type)) {
@@ -104,9 +92,7 @@ export const createTeamGroupsRoute = authenticatedProcedure
     // idempotent for the common race where a group was added between the
     // picker fetch and the submit.
     const filteredGroups = groups.filter((group) => {
-      const organisationGroup = team.organisation.groups.find(
-        ({ id }) => id === group.organisationGroupId,
-      );
+      const organisationGroup = team.organisation.groups.find(({ id }) => id === group.organisationGroupId);
 
       return !organisationGroup?.teamGroups.some((teamGroup) => teamGroup.teamId === teamId);
     });

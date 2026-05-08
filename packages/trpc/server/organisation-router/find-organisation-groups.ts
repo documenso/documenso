@@ -1,10 +1,9 @@
-import type { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
-import { Prisma } from '@prisma/client';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { FindResultResponse } from '@documenso/lib/types/search-params';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
+import type { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -17,16 +16,8 @@ export const findOrganisationGroupsRoute = authenticatedProcedure
   .input(ZFindOrganisationGroupsRequestSchema)
   .output(ZFindOrganisationGroupsResponseSchema)
   .query(async ({ input, ctx }) => {
-    const {
-      organisationId,
-      types,
-      query,
-      page,
-      perPage,
-      organisationGroupId,
-      organisationRoles,
-      excludeTeamId,
-    } = input;
+    const { organisationId, types, query, page, perPage, organisationGroupId, organisationRoles, excludeTeamId } =
+      input;
     const { user } = ctx;
 
     ctx.logger.info({

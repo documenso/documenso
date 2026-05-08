@@ -1,17 +1,3 @@
-import { useMemo, useState } from 'react';
-
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import {
-  ArrowRightLeftIcon,
-  CreditCardIcon,
-  ExternalLinkIcon,
-  MoreHorizontalIcon,
-  SettingsIcon,
-  UserIcon,
-} from 'lucide-react';
-import { Link, useSearchParams } from 'react-router';
-
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { SUBSCRIPTION_STATUS_MAP } from '@documenso/lib/constants/billing';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
@@ -29,6 +15,17 @@ import {
 } from '@documenso/ui/primitives/dropdown-menu';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
+import { Trans, useLingui } from '@lingui/react/macro';
+import {
+  ArrowRightLeftIcon,
+  CreditCardIcon,
+  ExternalLinkIcon,
+  MoreHorizontalIcon,
+  SettingsIcon,
+  UserIcon,
+} from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router';
 
 import { AdminSwapSubscriptionDialog } from '~/components/dialogs/admin-swap-subscription-dialog';
 
@@ -85,9 +82,7 @@ export const AdminOrganisationsTable = ({
       {
         header: t`Organisation`,
         accessorKey: 'name',
-        cell: ({ row }) => (
-          <Link to={`/admin/organisations/${row.original.id}`}>{row.original.name}</Link>
-        ),
+        cell: ({ row }) => <Link to={`/admin/organisations/${row.original.id}`}>{row.original.name}</Link>,
       },
       {
         header: t`Created At`,
@@ -97,17 +92,13 @@ export const AdminOrganisationsTable = ({
       {
         header: t`Owner`,
         accessorKey: 'owner',
-        cell: ({ row }) => (
-          <Link to={`/admin/users/${row.original.owner.id}`}>{row.original.owner.name}</Link>
-        ),
+        cell: ({ row }) => <Link to={`/admin/users/${row.original.owner.id}`}>{row.original.owner.name}</Link>,
       },
       {
         id: 'role',
         header: t`Role`,
         cell: ({ row }) => (
-          <Badge variant="neutral">
-            {row.original.owner.id === memberUserId ? t`Owner` : t`Member`}
-          </Badge>
+          <Badge variant="neutral">{row.original.owner.id === memberUserId ? t`Owner` : t`Member`}</Badge>
         ),
       },
       {
@@ -118,7 +109,7 @@ export const AdminOrganisationsTable = ({
           const isPaid = subscription && subscription.status === 'ACTIVE';
           return (
             <div
-              className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+              className={`inline-flex items-center rounded-full px-2 py-1 font-medium text-xs ${
                 isPaid ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
               }`}
             >
@@ -183,8 +174,7 @@ export const AdminOrganisationsTable = ({
               </DropdownMenuItem>
 
               {row.original.subscription &&
-                (row.original.subscription.status === 'ACTIVE' ||
-                  row.original.subscription.status === 'PAST_DUE') && (
+                (row.original.subscription.status === 'ACTIVE' || row.original.subscription.status === 'PAST_DUE') && (
                   <DropdownMenuItem
                     onClick={() =>
                       setSwapSource({

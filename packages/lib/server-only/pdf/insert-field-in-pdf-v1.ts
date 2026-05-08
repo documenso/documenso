@@ -1,17 +1,6 @@
 // https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
 import type { PDFDocument, PDFFont, PDFTextField } from '@cantoo/pdf-lib';
-import {
-  RotationTypes,
-  TextAlignment,
-  degrees,
-  radiansToDegrees,
-  rgb,
-  setFontAndSize,
-} from '@cantoo/pdf-lib';
-import fontkit from '@pdf-lib/fontkit';
-import { FieldType } from '@prisma/client';
-import { P, match } from 'ts-pattern';
-
+import { degrees, RotationTypes, radiansToDegrees, rgb, setFontAndSize, TextAlignment } from '@cantoo/pdf-lib';
 import {
   DEFAULT_HANDWRITING_FONT_SIZE,
   DEFAULT_STANDARD_FONT_SIZE,
@@ -21,6 +10,9 @@ import {
 import { fromCheckboxValue } from '@documenso/lib/universal/field-checkbox';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+import fontkit from '@pdf-lib/fontkit';
+import { FieldType } from '@prisma/client';
+import { match, P } from 'ts-pattern';
 
 import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
 import {
@@ -37,12 +29,8 @@ import { getPageSize } from './get-page-size';
 
 export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSignature) => {
   const [fontCaveat, fontNoto] = await Promise.all([
-    fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/caveat.ttf`).then(async (res) =>
-      res.arrayBuffer(),
-    ),
-    fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(async (res) =>
-      res.arrayBuffer(),
-    ),
+    fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/caveat.ttf`).then(async (res) => res.arrayBuffer()),
+    fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(async (res) => res.arrayBuffer()),
   ]);
 
   const isSignatureField = isSignatureFieldType(field.type);
@@ -109,13 +97,7 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
     let debugY = pageHeight - fieldY - fieldHeight; // Invert Y for PDF coordinates
 
     if (pageRotationInDegrees !== 0) {
-      const adjustedPosition = adjustPositionForRotation(
-        pageWidth,
-        pageHeight,
-        debugX,
-        debugY,
-        pageRotationInDegrees,
-      );
+      const adjustedPosition = adjustPositionForRotation(pageWidth, pageHeight, debugX, debugY, pageRotationInDegrees);
 
       debugX = adjustedPosition.xPos;
       debugY = adjustedPosition.yPos;
@@ -187,9 +169,7 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
         } else {
           const signatureText = field.signature?.typedSignature ?? '';
 
-          const longestLineInTextForWidth = signatureText
-            .split('\n')
-            .sort((a, b) => b.length - a.length)[0];
+          const longestLineInTextForWidth = signatureText.split('\n').sort((a, b) => b.length - a.length)[0];
 
           let fontSize = maxFontSize;
           let textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
@@ -401,9 +381,7 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
        * - True = text will overflow downwards.
        * - False = text will overflow sideways.
        */
-      const isMultiline =
-        field.type === FieldType.TEXT &&
-        (textWidth > fieldWidth || field.customText.includes('\n'));
+      const isMultiline = field.type === FieldType.TEXT && (textWidth > fieldWidth || field.customText.includes('\n'));
 
       // Add padding similar to web display (roughly 0.5rem equivalent in PDF units)
       const padding = 8;

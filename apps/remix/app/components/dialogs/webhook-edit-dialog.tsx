@@ -204,19 +204,19 @@ export const WebhookEditDialog = ({ trigger, webhook, ...props }: WebhookEditDia
                   </FormItem>
                 )}
               />
-
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="secondary">
-                    <Trans>Close</Trans>
-                  </Button>
-                </DialogClose>
-
-                <Button type="submit" loading={form.formState.isSubmitting}>
-                  <Trans>Update</Trans>
-                </Button>
-              </DialogFooter>
             </fieldset>
+
+            <DialogFooter className="mt-4 flex flex-row justify-end space-x-4">
+              <DialogClose asChild>
+                <Button variant="secondary" type="button">
+                  <Trans>Cancel</Trans>
+                </Button>
+              </DialogClose>
+
+              <Button type="submit" loading={form.formState.isSubmitting}>
+                <Trans>Save Changes</Trans>
+              </Button>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>

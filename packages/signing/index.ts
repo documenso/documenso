@@ -1,13 +1,11 @@
-import type { Signer } from '@libpdf/core';
-import type { PDF } from '@libpdf/core';
-import { match } from 'ts-pattern';
-
 import {
   NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER,
   NEXT_PUBLIC_SIGNING_CONTACT_INFO,
   NEXT_PUBLIC_WEBAPP_URL,
 } from '@documenso/lib/constants/app';
 import { env } from '@documenso/lib/utils/env';
+import type { PDF, Signer } from '@libpdf/core';
+import { match } from 'ts-pattern';
 
 import { getTimestampAuthority } from './helpers/tsa';
 import { createGoogleCloudSigner } from './transports/google-cloud';
@@ -47,9 +45,7 @@ export const signPdf = async ({ pdf }: SignOptions) => {
     reason: 'Signed by Documenso',
     location: NEXT_PUBLIC_WEBAPP_URL(),
     contactInfo: NEXT_PUBLIC_SIGNING_CONTACT_INFO(),
-    subFilter: NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER()
-      ? 'adbe.pkcs7.detached'
-      : 'ETSI.CAdES.detached',
+    subFilter: NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER() ? 'adbe.pkcs7.detached' : 'ETSI.CAdES.detached',
     timestampAuthority: tsa ?? undefined,
     longTermValidation: !!tsa,
     archivalTimestamp: !!tsa,

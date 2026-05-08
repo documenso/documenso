@@ -1,18 +1,13 @@
-import { useId } from 'react';
-
+import { ZRecipientActionAuthTypesSchema, ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
+import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
+import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
+import { useId } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { prop, sortBy } from 'remeda';
 import { z } from 'zod';
-
-import {
-  ZRecipientActionAuthTypesSchema,
-  ZRecipientAuthOptionsSchema,
-} from '@documenso/lib/types/document-auth';
-import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
-import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 
 const LocalRecipientSchema = z.object({
   formId: z.string().min(1),
@@ -48,9 +43,7 @@ type UseEditorRecipientsResponse = {
   resetForm: (options?: ResetFormOptions) => void;
 };
 
-export const useEditorRecipients = ({
-  envelope,
-}: EditorRecipientsProps): UseEditorRecipientsResponse => {
+export const useEditorRecipients = ({ envelope }: EditorRecipientsProps): UseEditorRecipientsResponse => {
   const initialId = useId();
 
   const generateDefaultValues = (options?: ResetFormOptions) => {
@@ -83,8 +76,7 @@ export const useEditorRecipients = ({
     return {
       signers,
       signingOrder: documentMeta?.signingOrder ?? envelope.documentMeta.signingOrder,
-      allowDictateNextSigner:
-        documentMeta?.allowDictateNextSigner ?? envelope.documentMeta.allowDictateNextSigner,
+      allowDictateNextSigner: documentMeta?.allowDictateNextSigner ?? envelope.documentMeta.allowDictateNextSigner,
     };
   };
 

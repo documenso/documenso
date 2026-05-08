@@ -52,7 +52,7 @@ export const sendOrganisationAccountLinkConfirmationEmail = async ({
 
   const [previousVerificationToken] = user.verificationTokens;
 
-  // If we've sent a token in the last 5 minutes, don't send another one
+  // If we\'ve sent a token in the last 5 minutes, don't send another one
   if (
     previousVerificationToken?.createdAt &&
     DateTime.fromJSDate(previousVerificationToken.createdAt).diffNow('minutes').minutes > -5

@@ -25,7 +25,7 @@ export const TemplateFooter = ({ isDocument = true }: TemplateFooterProps) => {
       )}
 
       {branding.brandingEnabled && branding.brandingCompanyDetails && (
-        <Text className="my-8 text-sm text-slate-400">
+        <Text className="my-8 text-slate-400 text-sm">
           {branding.brandingCompanyDetails.split('\n').map((line, idx) => {
             return (
               <>
@@ -38,7 +38,7 @@ export const TemplateFooter = ({ isDocument = true }: TemplateFooterProps) => {
       )}
 
       {!branding.brandingEnabled && (
-        <Text className="my-8 text-sm text-slate-400">Davinci AI Solutions</Text>
+        <Text className="my-8 text-slate-400 text-sm">Davinci AI Solutions</Text>
       )}
     </Section>
   );

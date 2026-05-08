@@ -1,12 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
-
+import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
+import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import type { Field } from '@prisma/client';
 import { TooltipArrow } from '@radix-ui/react-tooltip';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
-
-import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { useCallback, useEffect, useState } from 'react';
 
 import { cn } from '../../lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../primitives/tooltip';
@@ -26,21 +24,13 @@ const tooltipVariants = cva('font-semibold', {
 interface EnvelopeFieldToolTipProps extends VariantProps<typeof tooltipVariants> {
   children: React.ReactNode;
   className?: string;
-  field: Pick<
-    Field,
-    'id' | 'inserted' | 'fieldMeta' | 'positionX' | 'positionY' | 'width' | 'height' | 'page'
-  >;
+  field: Pick<Field, 'id' | 'inserted' | 'fieldMeta' | 'positionX' | 'positionY' | 'width' | 'height' | 'page'>;
 }
 
 /**
  * Renders a tooltip for a given field.
  */
-export function EnvelopeFieldToolTip({
-  children,
-  color,
-  className = '',
-  field,
-}: EnvelopeFieldToolTipProps) {
+export function EnvelopeFieldToolTip({ children, color, className = '', field }: EnvelopeFieldToolTipProps) {
   const [coords, setCoords] = useState({
     x: 0,
     y: 0,
@@ -49,9 +39,7 @@ export function EnvelopeFieldToolTip({
   });
 
   const calculateCoords = useCallback(() => {
-    const $page = document.querySelector<HTMLElement>(
-      `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`,
-    );
+    const $page = document.querySelector<HTMLElement>(`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`);
 
     if (!$page) {
       return;
@@ -90,9 +78,7 @@ export function EnvelopeFieldToolTip({
   }, [calculateCoords]);
 
   useEffect(() => {
-    const $page = document.querySelector<HTMLElement>(
-      `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`,
-    );
+    const $page = document.querySelector<HTMLElement>(`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`);
 
     if (!$page) {
       return;
@@ -124,10 +110,7 @@ export function EnvelopeFieldToolTip({
         <Tooltip delayDuration={0} open={!field.inserted || !field.fieldMeta}>
           <TooltipTrigger className="absolute inset-0 w-full"></TooltipTrigger>
 
-          <TooltipContent
-            className={tooltipVariants({ color, className: cn(className, 'z-40') })}
-            sideOffset={2}
-          >
+          <TooltipContent className={tooltipVariants({ color, className: cn(className, 'z-40') })} sideOffset={2}>
             {children}
             <TooltipArrow />
           </TooltipContent>

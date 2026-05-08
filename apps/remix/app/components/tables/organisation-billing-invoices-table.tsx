@@ -1,18 +1,16 @@
-import { useMemo } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { File } from 'lucide-react';
-import { DateTime } from 'luxon';
-import { Link } from 'react-router';
-
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { File } from 'lucide-react';
+import { DateTime } from 'luxon';
+import { useMemo } from 'react';
+import { Link } from 'react-router';
 
 export type OrganisationBillingInvoicesTableProps = {
   organisationId: string;
@@ -59,7 +57,7 @@ export const OrganisationBillingInvoicesTable = ({
           <div className="flex max-w-xs items-center gap-2">
             <File className="h-6 w-6" />
 
-            <div className="text-foreground/80 text-sm font-semibold">
+            <div className="font-semibold text-foreground/80 text-sm">
               {DateTime.fromSeconds(row.original.created).toFormat('MMMM yyyy')}
             </div>
           </div>
@@ -87,21 +85,13 @@ export const OrganisationBillingInvoicesTable = ({
         id: 'actions',
         cell: ({ row }) => (
           <div className="flex justify-end space-x-2">
-            <Button
-              variant="outline"
-              asChild
-              disabled={typeof row.original.hosted_invoice_url !== 'string'}
-            >
+            <Button variant="outline" asChild disabled={typeof row.original.hosted_invoice_url !== 'string'}>
               <Link to={row.original.hosted_invoice_url ?? ''} target="_blank">
                 <Trans>View</Trans>
               </Link>
             </Button>
 
-            <Button
-              variant="outline"
-              asChild
-              disabled={typeof row.original.invoice_pdf !== 'string'}
-            >
+            <Button variant="outline" asChild disabled={typeof row.original.invoice_pdf !== 'string'}>
               <Link to={row.original.invoice_pdf ?? ''} target="_blank">
                 <Trans>Download</Trans>
               </Link>

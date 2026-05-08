@@ -15,19 +15,15 @@ export type SigningOrderConfirmationProps = {
   onConfirm: () => void;
 };
 
-export function SigningOrderConfirmation({
-  open,
-  onOpenChange,
-  onConfirm,
-}: SigningOrderConfirmationProps) {
+export function SigningOrderConfirmation({ open, onOpenChange, onConfirm }: SigningOrderConfirmationProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Warning</AlertDialogTitle>
           <AlertDialogDescription>
-            You have an assistant role on the signers list, removing the signing order will change
-            the assistant role to signer.
+            You have an assistant role on the signers list, removing the signing order will change the assistant role to
+            signer.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

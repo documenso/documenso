@@ -1,11 +1,9 @@
-import { useRef } from 'react';
-
+import { unsafe_useEffectOnce } from '@documenso/lib/client-only/hooks/use-effect-once';
+import { SIGNATURE_CANVAS_DPI } from '@documenso/lib/constants/signatures';
 import { Trans } from '@lingui/react/macro';
 import { motion } from 'framer-motion';
 import { UploadCloudIcon } from 'lucide-react';
-
-import { unsafe_useEffectOnce } from '@documenso/lib/client-only/hooks/use-effect-once';
-import { SIGNATURE_CANVAS_DPI } from '@documenso/lib/constants/signatures';
+import { useRef } from 'react';
 
 import { cn } from '../../lib/utils';
 
@@ -71,12 +69,7 @@ export type SignaturePadUploadProps = {
   onChange: (_signatureDataUrl: string) => void;
 };
 
-export const SignaturePadUpload = ({
-  className,
-  value,
-  onChange,
-  ...props
-}: SignaturePadUploadProps) => {
+export const SignaturePadUpload = ({ className, value, onChange, ...props }: SignaturePadUploadProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
   const $imageData = useRef<ImageData | null>(null);
   const $fileInput = useRef<HTMLInputElement>(null);
@@ -85,10 +78,14 @@ export const SignaturePadUpload = ({
     try {
       const img = await loadImage(event.target.files?.[0]);
 
-      if (!$el.current) return;
+      if (!$el.current) {
+        return;
+      }
 
       const ctx = $el.current.getContext('2d');
-      if (!ctx) return;
+      if (!ctx) {
+        return;
+      }
 
       $imageData.current = loadImageOntoCanvas(img, $el.current, ctx);
       onChange?.($el.current.toDataURL());
@@ -133,13 +130,7 @@ export const SignaturePadUpload = ({
         {...props}
       />
 
-      <input
-        ref={$fileInput}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={handleImageUpload}
-      />
+      <input ref={$fileInput} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
 
       <motion.button
         className="absolute inset-0 flex h-full w-full items-center justify-center"
@@ -150,10 +141,10 @@ export const SignaturePadUpload = ({
       >
         {!value && (
           <motion.div>
-            <div className="text-muted-foreground flex flex-col items-center justify-center">
+            <div className="flex flex-col items-center justify-center text-muted-foreground">
               <div className="flex flex-col items-center">
                 <UploadCloudIcon className="h-8 w-8" />
-                <span className="text-lg font-semibold">
+                <span className="font-semibold text-lg">
                   <Trans>Upload Signature</Trans>
                 </span>
               </div>

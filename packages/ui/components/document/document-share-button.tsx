@@ -1,17 +1,16 @@
-import type { HTMLAttributes } from 'react';
-import React, { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { Copy, Sparkles } from 'lucide-react';
-import { FaXTwitter } from 'react-icons/fa6';
-
 import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { generateTwitterIntent } from '@documenso/lib/universal/generate-twitter-intent';
 import { trpc } from '@documenso/trpc/react';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { Copy, Sparkles } from 'lucide-react';
+import type React from 'react';
+import type { HTMLAttributes } from 'react';
+import { useState } from 'react';
+import { FaXTwitter } from 'react-icons/fa6';
 
 import { cn } from '../../lib/utils';
 import { Button } from '../../primitives/button';
@@ -31,12 +30,7 @@ export type DocumentShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
   trigger?: (_props: { loading: boolean; disabled: boolean }) => React.ReactNode;
 };
 
-export const DocumentShareButton = ({
-  token,
-  documentId,
-  className,
-  trigger,
-}: DocumentShareButtonProps) => {
+export const DocumentShareButton = ({ token, documentId, className, trigger }: DocumentShareButtonProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
@@ -147,9 +141,8 @@ export const DocumentShareButton = ({
 
           <DialogDescription className="mt-4">
             <Trans>
-              Rest assured, your document is strictly confidential and will never be shared. Only
-              your signing experience will be highlighted. Share your personalized signing card to
-              showcase your signature!
+              Rest assured, your document is strictly confidential and will never be shared. Only your signing
+              experience will be highlighted. Share your personalized signing card to showcase your signature!
             </Trans>
           </DialogDescription>
         </DialogHeader>
@@ -157,8 +150,7 @@ export const DocumentShareButton = ({
         <div className="flex w-full flex-col">
           <div className="rounded-md border p-4">
             I just {token ? 'signed' : 'sent'} a document in style with{' '}
-            <span className="font-medium text-blue-400">@documenso</span>
-            . Check it out!
+            <span className="font-medium text-blue-400">@documenso</span>. Check it out!
             <span className="mt-2 block" />
             <span
               className={cn('break-all font-medium text-blue-400', {
@@ -168,12 +160,9 @@ export const DocumentShareButton = ({
               {NEXT_PUBLIC_WEBAPP_URL()}/share/{shareLink?.slug || '...'}
             </span>
             <div
-              className={cn(
-                'mt-4 aspect-[1200/630] overflow-hidden rounded-lg border bg-muted/40',
-                {
-                  'animate-pulse': !shareLink?.slug,
-                },
-              )}
+              className={cn('mt-4 aspect-[1200/630] overflow-hidden rounded-lg border bg-muted/40', {
+                'animate-pulse': !shareLink?.slug,
+              })}
             >
               {shareLink?.slug && (
                 <img

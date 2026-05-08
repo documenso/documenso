@@ -1,8 +1,7 @@
+import { env } from '@documenso/lib/utils/env';
 import type { SentMessageInfo, Transport } from 'nodemailer';
 import type { Address } from 'nodemailer/lib/mailer';
 import type MailMessage from 'nodemailer/lib/mailer/mail-message';
-
-import { env } from '@documenso/lib/utils/env';
 
 const VERSION = '1.0.0';
 

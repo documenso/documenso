@@ -1,3 +1,16 @@
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { APP_I18N_OPTIONS, ZSupportedLanguageCodeSchema } from '@documenso/lib/constants/i18n';
+import { RECIPIENT_ROLE_SIGNING_REASONS, RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { unsafeGetEntireEnvelope } from '@documenso/lib/server-only/admin/get-entire-document';
+import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
+import { getDocumentCertificateAuditLogs } from '@documenso/lib/server-only/document/get-document-certificate-audit-logs';
+import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { getTranslations } from '@documenso/lib/utils/i18n';
+import { Card, CardContent } from '@documenso/ui/primitives/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@documenso/ui/primitives/table';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -8,30 +21,6 @@ import { prop, sortBy } from 'remeda';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 import { renderSVG } from 'uqr';
-
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { APP_I18N_OPTIONS, ZSupportedLanguageCodeSchema } from '@documenso/lib/constants/i18n';
-import {
-  RECIPIENT_ROLES_DESCRIPTION,
-  RECIPIENT_ROLE_SIGNING_REASONS,
-} from '@documenso/lib/constants/recipient-roles';
-import { unsafeGetEntireEnvelope } from '@documenso/lib/server-only/admin/get-entire-document';
-import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
-import { getDocumentCertificateAuditLogs } from '@documenso/lib/server-only/document/get-document-certificate-audit-logs';
-import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
-import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
-import { getTranslations } from '@documenso/lib/utils/i18n';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@documenso/ui/primitives/table';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
 
@@ -183,32 +172,25 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
   const getRecipientAuditLogs = (recipientId: number) => {
     return {
       [DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT]: auditLogs[DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT].filter(
-        (log) =>
-          log.type === DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT && log.data.recipientId === recipientId,
+        (log) => log.type === DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT && log.data.recipientId === recipientId,
       ),
-      [DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT]: auditLogs[
-        DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT
-      ].filter((log) => log.type === DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT),
-      [DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED]: auditLogs[
-        DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED
-      ].filter(
-        (log) =>
-          log.type === DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED &&
-          log.data.recipientId === recipientId,
+      [DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT]: auditLogs[DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT].filter(
+        (log) => log.type === DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT,
+      ),
+      [DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED]: auditLogs[DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED].filter(
+        (log) => log.type === DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED && log.data.recipientId === recipientId,
       ),
       [DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED]: auditLogs[
         DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED
       ].filter(
         (log) =>
-          log.type === DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED &&
-          log.data.recipientId === recipientId,
+          log.type === DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED && log.data.recipientId === recipientId,
       ),
       [DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED]: auditLogs[
         DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED
       ].filter(
         (log) =>
-          log.type === DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED &&
-          log.data.recipientId === recipientId,
+          log.type === DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED && log.data.recipientId === recipientId,
       ),
     };
   };
@@ -216,15 +198,13 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
   const getRecipientSignatureField = (recipientId: number) => {
     return document.recipients
       .find((recipient) => recipient.id === recipientId)
-      ?.fields.find(
-        (field) => field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE,
-      );
+      ?.fields.find((field) => field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE);
   };
 
   return (
     <div className="print-provider pointer-events-none mx-auto max-w-screen-md">
       <div className="flex items-center">
-        <h1 className="my-8 text-2xl font-bold">{_(msg`Signing Certificate`)}</h1>
+        <h1 className="my-8 font-bold text-2xl">{_(msg`Signing Certificate`)}</h1>
       </div>
 
       <Card>
@@ -249,11 +229,11 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
                     <TableCell truncate={false} className="w-[min-content] max-w-[220px] align-top">
                       <div className="hyphens-auto break-words font-medium">{recipient.name}</div>
                       <div className="break-all">{recipient.email}</div>
-                      <p className="mt-2 text-sm text-muted-foreground print:text-xs">
+                      <p className="mt-2 text-muted-foreground text-sm print:text-xs">
                         {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
                       </p>
 
-                      <p className="mt-2 text-sm text-muted-foreground print:text-xs">
+                      <p className="mt-2 text-muted-foreground text-sm print:text-xs">
                         <span className="font-medium">{_(msg`Authentication Level`)}:</span>{' '}
                         <span className="block">{getAuthenticationLevel(recipient.id)}</span>
                       </p>
@@ -283,11 +263,9 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
                             )}
                           </div>
 
-                          <p className="mt-2 text-sm text-muted-foreground print:text-xs">
+                          <p className="mt-2 text-muted-foreground text-sm print:text-xs">
                             <span className="font-medium">{_(msg`Signature ID`)}:</span>{' '}
-                            <span className="block font-mono uppercase">
-                              {signature.secondaryId}
-                            </span>
+                            <span className="block font-mono uppercase">{signature.secondaryId}</span>
                           </p>
                         </>
                       ) : (
@@ -296,14 +274,14 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
                         </p>
                       )}
 
-                      <p className="mt-2 text-sm text-muted-foreground print:text-xs">
+                      <p className="mt-2 text-muted-foreground text-sm print:text-xs">
                         <span className="font-medium">{_(msg`IP Address`)}:</span>{' '}
                         <span className="inline-block">
                           {logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.ipAddress ?? _(msg`Unknown`)}
                         </span>
                       </p>
 
-                      <p className="mt-1 text-sm text-muted-foreground print:text-xs">
+                      <p className="mt-1 text-muted-foreground text-sm print:text-xs">
                         <span className="font-medium">{_(msg`Device`)}:</span>{' '}
                         <span className="inline-block">
                           {getDevice(logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.userAgent)}
@@ -313,7 +291,7 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
 
                     <TableCell truncate={false} className="w-[min-content] align-top">
                       <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground print:text-xs">
+                        <p className="text-muted-foreground text-sm print:text-xs">
                           <span className="font-medium">{_(msg`Sent`)}:</span>{' '}
                           <span className="inline-block">
                             {logs.EMAIL_SENT[0]
@@ -328,7 +306,7 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
                           </span>
                         </p>
 
-                        <p className="text-sm text-muted-foreground print:text-xs">
+                        <p className="text-muted-foreground text-sm print:text-xs">
                           <span className="font-medium">{_(msg`Viewed`)}:</span>{' '}
                           <span className="inline-block">
                             {logs.DOCUMENT_OPENED[0]
@@ -340,7 +318,7 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
                         </p>
 
                         {logs.DOCUMENT_RECIPIENT_REJECTED[0] ? (
-                          <p className="text-sm text-muted-foreground print:text-xs">
+                          <p className="text-muted-foreground text-sm print:text-xs">
                             <span className="font-medium">{_(msg`Rejected`)}:</span>{' '}
                             <span className="inline-block">
                               {logs.DOCUMENT_RECIPIENT_REJECTED[0]
@@ -351,13 +329,11 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
                             </span>
                           </p>
                         ) : (
-                          <p className="text-sm text-muted-foreground print:text-xs">
+                          <p className="text-muted-foreground text-sm print:text-xs">
                             <span className="font-medium">{_(msg`Signed`)}:</span>{' '}
                             <span className="inline-block">
                               {logs.DOCUMENT_RECIPIENT_COMPLETED[0]
-                                ? DateTime.fromJSDate(
-                                    logs.DOCUMENT_RECIPIENT_COMPLETED[0].createdAt,
-                                  )
+                                ? DateTime.fromJSDate(logs.DOCUMENT_RECIPIENT_COMPLETED[0].createdAt)
                                     .setLocale(APP_I18N_OPTIONS.defaultLocale)
                                     .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
                                 : _(msg`Unknown`)}
@@ -365,7 +341,7 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
                           </p>
                         )}
 
-                        <p className="text-sm text-muted-foreground print:text-xs">
+                        <p className="text-muted-foreground text-sm print:text-xs">
                           <span className="font-medium">{_(msg`Reason`)}:</span>{' '}
                           <span className="inline-block">
                             {recipient.signingStatus === SigningStatus.REJECTED
@@ -401,7 +377,7 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
           </div>
 
           <div className="flex items-end justify-end gap-x-4">
-            <p className="flex-shrink-0 text-sm font-medium print:text-xs">
+            <p className="flex-shrink-0 font-medium text-sm print:text-xs">
               {_(msg`Signing certificate provided by`)}:
             </p>
             <BrandingLogo className="max-h-6 print:max-h-4" />

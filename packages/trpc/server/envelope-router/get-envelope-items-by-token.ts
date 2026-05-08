@@ -1,9 +1,8 @@
-import { EnvelopeType } from '@prisma/client';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { getOrganisationTemplateWhereInput } from '@documenso/lib/server-only/template/get-organisation-template-by-id';
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType } from '@prisma/client';
 
 import { maybeAuthenticatedProcedure } from '../trpc';
 import {
@@ -56,13 +55,7 @@ export const getEnvelopeItemsByTokenRoute = maybeAuthenticatedProcedure
     };
   });
 
-const handleGetEnvelopeItemsByToken = async ({
-  envelopeId,
-  token,
-}: {
-  envelopeId: string;
-  token: string;
-}) => {
+const handleGetEnvelopeItemsByToken = async ({ envelopeId, token }: { envelopeId: string; token: string }) => {
   const envelope = await prisma.envelope.findFirst({
     where: {
       id: envelopeId,

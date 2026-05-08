@@ -1,9 +1,8 @@
+import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { CheckCircle2, FileText } from 'lucide-react';
 import { match } from 'ts-pattern';
-
-import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
 export type DocumentsTableEmptyStateProps = { status: ExtendedDocumentStatus };
 
@@ -44,7 +43,7 @@ export const DocumentsTableEmptyState = ({ status }: DocumentsTableEmptyStatePro
       <Icon className="h-12 w-12" strokeWidth={1.5} />
 
       <div className="text-center">
-        <h3 className="text-lg font-semibold">{_(title)}</h3>
+        <h3 className="font-semibold text-lg">{_(title)}</h3>
 
         <p className="mt-2 max-w-[60ch]">{_(message)}</p>
       </div>
