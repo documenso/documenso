@@ -24,6 +24,8 @@ import { requestId } from 'hono/request-id';
 import type { Logger } from 'pino';
 
 import { aiRoute } from './api/ai/route';
+import { tokenLoginRoute } from './api/auth/token-login';
+import { bootstrapRoute } from './api/bootstrap/route';
 import { downloadRoute } from './api/download/download';
 import { filesRoute } from './api/files/files';
 import { type AppContext, appContext } from './context';
@@ -98,6 +100,12 @@ app.use(`/api/v2/*`, cors());
 app.use('/api/v2/*', apiV2RateLimitMiddleware);
 app.use(`/api/v2-beta/*`, cors());
 app.use('/api/v2-beta/*', apiV2RateLimitMiddleware);
+
+// Bootstrap route (protected by shared secret, before auth server).
+app.route('/api', bootstrapRoute);
+
+// Token-login SSO route (must be before the auth server which has Origin-check middleware).
+app.route('/auth', tokenLoginRoute);
 
 // Auth server.
 app.route('/api/auth', auth);
