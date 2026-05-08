@@ -1,30 +1,19 @@
-import { useEffect, useState } from 'react';
-
+import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
+import type { TDropdownFieldMeta as DropdownFieldMeta } from '@documenso/lib/types/field-meta';
+import { Button } from '@documenso/ui/primitives/button';
+import { Input } from '@documenso/ui/primitives/input';
+import { Label } from '@documenso/ui/primitives/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
+import { Switch } from '@documenso/ui/primitives/switch';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
-
-import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
-import { type TDropdownFieldMeta as DropdownFieldMeta } from '@documenso/lib/types/field-meta';
-import { Button } from '@documenso/ui/primitives/button';
-import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
-import { Switch } from '@documenso/ui/primitives/switch';
+import { useEffect, useState } from 'react';
 
 type DropdownFieldAdvancedSettingsProps = {
   fieldState: DropdownFieldMeta;
-  handleFieldChange: (
-    key: keyof DropdownFieldMeta,
-    value: string | { value: string }[] | boolean,
-  ) => void;
+  handleFieldChange: (key: keyof DropdownFieldMeta, value: string | { value: string }[] | boolean) => void;
   handleErrors: (errors: string[]) => void;
 };
 
@@ -47,7 +36,9 @@ export const DropdownFieldAdvancedSettings = ({
   };
 
   const removeValue = (index: number) => {
-    if (values.length === 1) return;
+    if (values.length === 1) {
+      return;
+    }
 
     const newValues = [...values];
     newValues.splice(index, 1);
@@ -98,7 +89,7 @@ export const DropdownFieldAdvancedSettings = ({
   }, [fieldState.defaultValue]);
 
   return (
-    <div className="text-dark flex flex-col gap-4">
+    <div className="flex flex-col gap-4 text-dark">
       <div>
         <Label>
           <Trans>Select default option</Trans>
@@ -168,11 +159,7 @@ export const DropdownFieldAdvancedSettings = ({
         <div>
           {values.map((value, index) => (
             <div key={index} className="mt-2 flex items-center gap-4">
-              <Input
-                className="w-1/2"
-                value={value.value}
-                onChange={(e) => handleValueChange(index, e.target.value)}
-              />
+              <Input className="w-1/2" value={value.value} onChange={(e) => handleValueChange(index, e.target.value)} />
               <button
                 type="button"
                 className="col-span-1 mt-auto inline-flex h-10 w-10 items-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
@@ -183,7 +170,7 @@ export const DropdownFieldAdvancedSettings = ({
             </div>
           ))}
           <Button
-            className="ml-9 mt-4 border border-foreground/10 bg-foreground/10 hover:bg-foreground/5"
+            className="mt-4 ml-9 border border-foreground/10 bg-foreground/10 hover:bg-foreground/5"
             variant="outline"
             onClick={addValue}
           >

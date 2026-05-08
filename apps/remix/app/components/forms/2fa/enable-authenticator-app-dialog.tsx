@@ -208,11 +208,11 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
                     </DialogDescription>
                   </DialogHeader>
 
-                  <fieldset disabled={isEnabling2FA} className="mt-4 flex flex-col gap-y-4">
+                  <div className="flex flex-col items-center space-y-4 py-4">
                     <div
-                      className="flex h-36 justify-center"
+                      className="rounded-lg border-4 border-white bg-white"
                       dangerouslySetInnerHTML={{
-                        __html: renderSVG(setup2FAData?.uri ?? ''),
+                        __html: renderSVG(setup2FAData.uri),
                       }}
                     />
 
@@ -269,7 +269,7 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
                         <Trans>Enable 2FA</Trans>
                       </Button>
                     </DialogFooter>
-                  </fieldset>
+                  </div>
                 </form>
               </Form>
             )}

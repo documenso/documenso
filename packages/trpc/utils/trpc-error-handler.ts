@@ -1,7 +1,6 @@
-import type { ErrorHandlerOptions } from '@trpc/server/unstable-core-do-not-import';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { logger } from '@documenso/lib/utils/logger';
+import type { ErrorHandlerOptions } from '@trpc/server/unstable-core-do-not-import';
 
 import type { TrpcContext } from '../server/context';
 
@@ -16,8 +15,7 @@ export const handleTrpcRouterError = (
 
   // Only log AppErrors that are explicitly set to 500 or the error code
   // is in the errorCodesToAlertOn list.
-  const isLoggableAppError =
-    isAppError && (appError.statusCode === 500 || errorCodesToAlertOn.includes(appError.code));
+  const isLoggableAppError = isAppError && (appError.statusCode === 500 || errorCodesToAlertOn.includes(appError.code));
 
   // Only log TRPC errors that are in the `errorCodesToAlertOn` list and is
   // not an AppError.

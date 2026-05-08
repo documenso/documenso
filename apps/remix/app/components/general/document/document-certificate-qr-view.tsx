@@ -123,8 +123,8 @@ export const DocumentCertificateQRView = ({
         <>
           <div className="flex w-full flex-col justify-between gap-4 md:flex-row md:items-end">
             <div className="space-y-1">
-              <h1 className="text-xl font-medium">{title}</h1>
-              <div className="flex flex-col gap-0.5 text-sm text-muted-foreground">
+              <h1 className="font-medium text-xl">{title}</h1>
+              <div className="flex flex-col gap-0.5 text-muted-foreground text-sm">
                 <p>
                   <Trans>{recipientCount} recipients</Trans>
                 </p>
@@ -188,8 +188,8 @@ const DocumentCertificateQrV2 = ({
     <div className="flex min-h-screen flex-col items-start">
       <div className="flex w-full flex-col justify-between gap-4 md:flex-row md:items-end">
         <div className="space-y-1">
-          <h1 className="text-xl font-medium">{title}</h1>
-          <div className="flex flex-col gap-0.5 text-sm text-muted-foreground">
+          <h1 className="font-medium text-xl">{title}</h1>
+          <div className="flex flex-col gap-0.5 text-muted-foreground text-sm">
             <p>
               <Trans>{recipientCount} recipients</Trans>
             </p>
@@ -214,14 +214,26 @@ const DocumentCertificateQrV2 = ({
         />
       </div>
 
-      <div className="mt-12 w-full">
-        <EnvelopeRendererFileSelector className="mb-4 p-0" fields={[]} secondaryOverride={''} />
+      <div className="mt-8 flex w-full flex-1 flex-col overflow-hidden">
+        <div className="flex-1 overflow-hidden transition-all">
+          <EnvelopePdfViewer
+            token={token}
+            key={envelopeItems[0]?.id}
+            scrollParentRef="window"
+            className="h-full border-none p-0 pb-[13dvh]"
+            errorMessage={PDF_VIEWER_ERROR_MESSAGES}
+          />
+        </div>
 
-        <EnvelopePdfViewer
-          scrollParentRef="window"
-          customPageRenderer={EnvelopeGenericPageRenderer}
-          errorMessage={PDF_VIEWER_ERROR_MESSAGES.preview}
-        />
+        <div className="fixed bottom-0 left-0 right-0 z-10 w-full overflow-x-auto bg-background/80 py-4 shadow-xl backdrop-blur-sm transition-all duration-300">
+          <div className="mx-auto flex h-full max-w-fit items-center justify-start gap-4 px-4 sm:px-6">
+            <EnvelopeRendererFileSelector />
+
+            <div className="flex flex-nowrap items-center gap-4">
+              <EnvelopeGenericPageRenderer />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

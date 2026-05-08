@@ -1,6 +1,5 @@
-import { EnvelopeType } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { mapSecondaryIdToDocumentId, mapSecondaryIdToTemplateId } from '../../utils/envelope';
@@ -17,12 +16,7 @@ export type GetRecipientByIdOptions = {
  * Get a recipient by ID. This will also return the recipient signing token so
  * be careful when using this.
  */
-export const getRecipientById = async ({
-  recipientId,
-  userId,
-  teamId,
-  type,
-}: GetRecipientByIdOptions) => {
+export const getRecipientById = async ({ recipientId, userId, teamId, type }: GetRecipientByIdOptions) => {
   const recipient = await prisma.recipient.findFirst({
     where: {
       id: recipientId,
@@ -48,14 +42,8 @@ export const getRecipientById = async ({
   }
 
   const legacyId = {
-    documentId:
-      type === EnvelopeType.DOCUMENT
-        ? mapSecondaryIdToDocumentId(recipient.envelope.secondaryId)
-        : null,
-    templateId:
-      type === EnvelopeType.TEMPLATE
-        ? mapSecondaryIdToTemplateId(recipient.envelope.secondaryId)
-        : null,
+    documentId: type === EnvelopeType.DOCUMENT ? mapSecondaryIdToDocumentId(recipient.envelope.secondaryId) : null,
+    templateId: type === EnvelopeType.TEMPLATE ? mapSecondaryIdToTemplateId(recipient.envelope.secondaryId) : null,
   };
 
   // Backwards compatibility mapping.

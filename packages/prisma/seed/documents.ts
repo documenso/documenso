@@ -1,9 +1,5 @@
-import type { Team, User } from '@prisma/client';
-import { nanoid } from 'nanoid';
 import fs from 'node:fs';
 import path from 'node:path';
-import { match } from 'ts-pattern';
-
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import { incrementDocumentId } from '@documenso/lib/server-only/envelope/increment-id';
 import {
@@ -19,6 +15,9 @@ import {
   FIELD_TEXT_META_DEFAULT_VALUES,
 } from '@documenso/lib/types/field-meta';
 import { prefixedId } from '@documenso/lib/universal/id';
+import type { Team, User } from '@prisma/client';
+import { nanoid } from 'nanoid';
+import { match } from 'ts-pattern';
 
 import { prisma } from '..';
 import {
@@ -35,9 +34,7 @@ import {
 import { seedTeam } from './teams';
 import { seedUser } from './users';
 
-const examplePdf = fs
-  .readFileSync(path.join(__dirname, '../../../assets/example.pdf'))
-  .toString('base64');
+const examplePdf = fs.readFileSync(path.join(__dirname, '../../../assets/example.pdf')).toString('base64');
 
 type DocumentToSeed = {
   sender: User;
@@ -74,11 +71,7 @@ export const seedDocuments = async (documents: DocumentToSeed[]) => {
   );
 };
 
-export const seedBlankDocument = async (
-  owner: User,
-  teamId: number,
-  options: CreateDocumentOptions = {},
-) => {
+export const seedBlankDocument = async (owner: User, teamId: number, options: CreateDocumentOptions = {}) => {
   const { key, createDocumentOptions = {}, internalVersion = 1 } = options;
 
   const documentData = await prisma.documentData.create({

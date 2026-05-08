@@ -12,9 +12,5 @@ export const ZGetEnvelopeFieldSignaturesResponseSchema = z
   })
   .array();
 
-export type TGetEnvelopeFieldSignaturesRequest = z.infer<
-  typeof ZGetEnvelopeFieldSignaturesRequestSchema
->;
-export type TGetEnvelopeFieldSignaturesResponse = z.infer<
-  typeof ZGetEnvelopeFieldSignaturesResponseSchema
->;
+export type TGetEnvelopeFieldSignaturesRequest = z.infer<typeof ZGetEnvelopeFieldSignaturesRequestSchema>;
+export type TGetEnvelopeFieldSignaturesResponse = z.infer<typeof ZGetEnvelopeFieldSignaturesResponseSchema>;

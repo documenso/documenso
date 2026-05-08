@@ -192,7 +192,9 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
                     </FormControl>
 
                     <FormDescription>
-                      <Trans>The events that will trigger a webhook to be sent to your URL.</Trans>
+                      <Trans>
+                        The events that will trigger a webhook to be sent to your URL.
+                      </Trans>
                     </FormDescription>
 
                     <FormMessage />
@@ -226,17 +228,13 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
                   </FormItem>
                 )}
               />
-
-              <DialogFooter>
-                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                  <Trans>Cancel</Trans>
-                </Button>
-
-                <Button type="submit" loading={form.formState.isSubmitting}>
-                  <Trans>Create</Trans>
-                </Button>
-              </DialogFooter>
             </fieldset>
+
+            <DialogFooter className="mt-4">
+              <Button type="submit" loading={form.formState.isSubmitting}>
+                <Trans>Create Webhook</Trans>
+              </Button>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>

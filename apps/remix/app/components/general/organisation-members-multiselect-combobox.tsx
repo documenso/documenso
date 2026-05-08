@@ -1,9 +1,8 @@
+import { trpc } from '@documenso/trpc/react';
+import { MultiSelect, type Option } from '@documenso/ui/primitives/multiselect';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-
-import { trpc } from '@documenso/trpc/react';
-import { MultiSelect, type Option } from '@documenso/ui/primitives/multiselect';
 
 export type OrganisationMemberOption = {
   /** Organisation member ID. */
@@ -98,12 +97,12 @@ export const OrganisationMembersMultiSelectCombobox = ({
       hidePlaceholderWhenSelected
       delay={300}
       loadingIndicator={
-        <p className="py-4 text-center text-sm text-muted-foreground">
+        <p className="py-4 text-center text-muted-foreground text-sm">
           <Trans>Loading...</Trans>
         </p>
       }
       emptyIndicator={
-        <p className="py-4 text-center text-sm text-muted-foreground">
+        <p className="py-4 text-center text-muted-foreground text-sm">
           <Trans>No members found</Trans>
         </p>
       }

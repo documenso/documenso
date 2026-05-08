@@ -1,10 +1,3 @@
-import { useMemo } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { Link } from 'react-router';
-
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
@@ -17,6 +10,11 @@ import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { useMemo } from 'react';
+import { Link } from 'react-router';
 
 import { OrganisationLeaveDialog } from '../dialogs/organisation-leave-dialog';
 
@@ -55,7 +53,7 @@ export const UserOrganisationsTable = () => {
               avatarClass="h-12 w-12"
               avatarFallback={row.original.name.slice(0, 1).toUpperCase()}
               primaryText={
-                <span className="text-foreground/80 font-semibold">
+                <span className="font-semibold text-foreground/80">
                   {isPersonalLayoutMode
                     ? _(
                         msg({
@@ -92,10 +90,7 @@ export const UserOrganisationsTable = () => {
         id: 'actions',
         cell: ({ row }) => (
           <div className="flex justify-end space-x-2">
-            {canExecuteOrganisationAction(
-              'MANAGE_ORGANISATION',
-              row.original.currentOrganisationRole,
-            ) && (
+            {canExecuteOrganisationAction('MANAGE_ORGANISATION', row.original.currentOrganisationRole) && (
               <Button variant="outline" asChild>
                 <Link to={`/o/${row.original.url}/settings`}>
                   <Trans>Manage</Trans>

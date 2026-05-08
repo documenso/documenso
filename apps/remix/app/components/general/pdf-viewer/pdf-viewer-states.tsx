@@ -1,6 +1,5 @@
-import { Trans } from '@lingui/react/macro';
-
 import { Spinner } from '@documenso/ui/primitives/spinner';
+import { Trans } from '@lingui/react/macro';
 
 export const PdfViewerLoadingState = () => {
   return (

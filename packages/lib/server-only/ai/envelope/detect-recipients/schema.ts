@@ -16,9 +16,7 @@ export const ZDetectedRecipientSchema = z.object({
 export type TDetectedRecipientSchema = z.infer<typeof ZDetectedRecipientSchema>;
 
 export const ZDetectedRecipientsSchema = z.object({
-  recipients: z
-    .array(ZDetectedRecipientSchema)
-    .describe('The list of detected recipients from the document'),
+  recipients: z.array(ZDetectedRecipientSchema).describe('The list of detected recipients from the document'),
 });
 
 export type TDetectedRecipientsSchema = z.infer<typeof ZDetectedRecipientsSchema>;

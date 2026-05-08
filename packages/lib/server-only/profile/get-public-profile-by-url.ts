@@ -1,7 +1,6 @@
+import { prisma } from '@documenso/prisma';
 import type { Envelope, TemplateDirectLink } from '@prisma/client';
 import { EnvelopeType, type TeamProfile, TemplateType } from '@prisma/client';
-
-import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 

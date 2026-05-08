@@ -65,8 +65,6 @@ Davinci Sign is an electronic document signing platform rebranded from the open-
 | Package                      | Description               |
 | ---------------------------- | ------------------------- |
 | `@documenso/app-tests`       | E2E tests (Playwright)    |
-| `@documenso/eslint-config`   | Shared ESLint config      |
-| `@documenso/prettier-config` | Shared Prettier config    |
 | `@documenso/tailwind-config` | Shared Tailwind config    |
 | `@documenso/tsconfig`        | Shared TypeScript configs |
 

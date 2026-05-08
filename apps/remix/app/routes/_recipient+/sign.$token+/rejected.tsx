@@ -1,8 +1,3 @@
-import { Trans } from '@lingui/react/macro';
-import { FieldType } from '@prisma/client';
-import { XCircle } from 'lucide-react';
-import { Link } from 'react-router';
-
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
@@ -11,6 +6,10 @@ import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-f
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
+import { Trans } from '@lingui/react/macro';
+import { FieldType } from '@prisma/client';
+import { XCircle } from 'lucide-react';
+import { Link } from 'react-router';
 
 import { DocumentSigningAuthPageView } from '~/components/general/document-signing/document-signing-auth-page';
 import { truncateTitle } from '~/utils/truncate-title';
@@ -54,9 +53,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   });
 
   const recipientReference =
-    recipient.name ||
-    fields.find((field) => field.type === FieldType.NAME)?.customText ||
-    recipient.email;
+    recipient.name || fields.find((field) => field.type === FieldType.NAME)?.customText || recipient.email;
 
   if (isDocumentAccessValid) {
     return {
@@ -93,23 +90,23 @@ export default function RejectedSigningPage({ loaderData }: Route.ComponentProps
         <div className="flex items-center gap-x-4">
           <XCircle className="h-10 w-10 text-destructive" />
 
-          <h2 className="max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
+          <h2 className="max-w-[35ch] text-center font-semibold text-2xl leading-normal md:text-3xl lg:text-4xl">
             <Trans>Document Rejected</Trans>
           </h2>
         </div>
 
-        <div className="mt-4 flex items-center text-center text-sm text-destructive">
+        <div className="mt-4 flex items-center text-center text-destructive text-sm">
           <Trans>You have rejected this document</Trans>
         </div>
 
-        <p className="mt-6 max-w-[60ch] text-center text-sm text-muted-foreground">
+        <p className="mt-6 max-w-[60ch] text-center text-muted-foreground text-sm">
           <Trans>
-            The document owner has been notified of your decision. They may contact you with further
-            instructions if necessary.
+            The document owner has been notified of your decision. They may contact you with further instructions if
+            necessary.
           </Trans>
         </p>
 
-        <p className="mt-2 max-w-[60ch] text-center text-sm text-muted-foreground">
+        <p className="mt-2 max-w-[60ch] text-center text-muted-foreground text-sm">
           <Trans>No further action is required from you at this time.</Trans>
         </p>
 

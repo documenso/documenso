@@ -104,7 +104,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
                   </p>
                   <p className="mt-0.5 text-sm text-muted-foreground">
                     <Trans>
-                      Since {DateTime.fromJSDate(publicProfile.badge.since).toFormat('LLL ‘yy')}
+                      Since {DateTime.fromJSDate(publicProfile.badge.since).toFormat('LLL 'yy')}
                     </Trans>
                   </p>
                 </div>
@@ -167,27 +167,23 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
             <TableBody>
               {templates.map((template) => (
                 <TableRow key={template.id}>
-                  <TableCell className="flex flex-col justify-between overflow-hidden text-sm text-muted-foreground sm:flex-row">
-                    <div className="flex flex-1 flex-col gap-4 overflow-hidden md:flex-row md:items-start md:justify-between">
-                      <div>
-                        <p className="break-all text-sm font-semibold leading-none text-foreground">
-                          {template.publicTitle}
-                        </p>
-                        <p className="mt-1 line-clamp-3 max-w-[70ch] whitespace-normal break-all text-xs text-muted-foreground">
-                          {template.publicDescription}
-                        </p>
-                      </div>
+                  <TableCell className="flex flex-col justify-between overflow-hidden text-muted-foreground text-sm sm:flex-row">
+                    <div className="flex flex-1 items-start justify-start gap-2">
+                      <FileIcon className="h-8 w-8 flex-shrink-0 text-muted-foreground/40" strokeWidth={1.5} />
 
-                      <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" asChild>
-                          <Link
-                            to={formatDirectTemplatePath({
-                              profileUrl: publicProfile.url || '',
-                              templateUrl: template.directLink || '',
-                            })}
-                          >
-                            <FileIcon className="mr-2 h-4 w-4" />
-                            <Trans>Sign document</Trans>
+                      <div className="flex flex-1 flex-col gap-4 overflow-hidden md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <p className="break-all font-semibold text-foreground text-sm leading-none">
+                            {template.publicTitle}
+                          </p>
+                          <p className="mt-1 line-clamp-3 max-w-[70ch] whitespace-normal break-all text-muted-foreground text-xs">
+                            {template.publicDescription}
+                          </p>
+                        </div>
+
+                        <Button asChild className="w-fit">
+                          <Link to={formatDirectTemplatePath(template.directLink.token)}>
+                            <Trans>Sign</Trans>
                           </Link>
                         </Button>
                       </div>

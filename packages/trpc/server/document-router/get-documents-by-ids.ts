@@ -1,14 +1,13 @@
-import { EnvelopeType } from '@prisma/client';
-
 import { getMultipleEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelopes-by-ids';
 import { mapEnvelopesToDocumentMany } from '@documenso/lib/utils/document';
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
 import {
+  getDocumentsByIdsMeta,
   ZGetDocumentsByIdsRequestSchema,
   ZGetDocumentsByIdsResponseSchema,
-  getDocumentsByIdsMeta,
 } from './get-documents-by-ids.types';
 
 export const getDocumentsByIdsRoute = authenticatedProcedure

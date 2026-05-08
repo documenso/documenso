@@ -1,7 +1,6 @@
+import { prisma } from '@documenso/prisma';
 import type { JWTPayload } from 'jose';
 import { decodeJwt, jwtVerify } from 'jose';
-
-import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
@@ -10,10 +9,7 @@ export type VerifyEmbeddingPresignTokenOptions = {
   scope?: string;
 };
 
-export const verifyEmbeddingPresignToken = async ({
-  token,
-  scope,
-}: VerifyEmbeddingPresignTokenOptions) => {
+export const verifyEmbeddingPresignToken = async ({ token, scope }: VerifyEmbeddingPresignTokenOptions) => {
   // First decode the JWT to get the claims without verification
   let decodedToken: JWTPayload;
 

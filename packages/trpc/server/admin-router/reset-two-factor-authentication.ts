@@ -2,10 +2,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
 import { adminProcedure } from '../trpc';
-import {
-  ZResetTwoFactorRequestSchema,
-  ZResetTwoFactorResponseSchema,
-} from './reset-two-factor-authentication.types';
+import { ZResetTwoFactorRequestSchema, ZResetTwoFactorResponseSchema } from './reset-two-factor-authentication.types';
 
 export const resetTwoFactorRoute = adminProcedure
   .input(ZResetTwoFactorRequestSchema)

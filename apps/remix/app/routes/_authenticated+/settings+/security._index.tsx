@@ -1,13 +1,12 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { Link } from 'react-router';
-
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { prisma } from '@documenso/prisma';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { Link } from 'react-router';
 
 import { DisableAuthenticatorAppDialog } from '~/components/forms/2fa/disable-authenticator-app-dialog';
 import { EnableAuthenticatorAppDialog } from '~/components/forms/2fa/enable-authenticator-app-dialog';
@@ -75,10 +74,7 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
         </>
       )}
 
-      <Alert
-        className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center"
-        variant="neutral"
-      >
+      <Alert className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
         <div className="mb-4 sm:mb-0">
           <AlertTitle>
             <Trans>Two factor authentication</Trans>
@@ -87,30 +83,20 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
           <AlertDescription className="mr-4">
             {hasEmailPasswordAccount ? (
               <Trans>
-                Add an authenticator to serve as a secondary authentication method when signing in,
-                or when signing documents.
-              </Trans>
-            ) : (
-              <Trans>
-                Add an authenticator to serve as a secondary authentication method for signing
+                Add an authenticator to serve as a secondary authentication method when signing in, or when signing
                 documents.
               </Trans>
+            ) : (
+              <Trans>Add an authenticator to serve as a secondary authentication method for signing documents.</Trans>
             )}
           </AlertDescription>
         </div>
 
-        {user.twoFactorEnabled ? (
-          <DisableAuthenticatorAppDialog />
-        ) : (
-          <EnableAuthenticatorAppDialog />
-        )}
+        {user.twoFactorEnabled ? <DisableAuthenticatorAppDialog /> : <EnableAuthenticatorAppDialog />}
       </Alert>
 
       {user.twoFactorEnabled && (
-        <Alert
-          className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center"
-          variant="neutral"
-        >
+        <Alert className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
           <div className="mb-4 sm:mb-0">
             <AlertTitle>
               <Trans>Recovery codes</Trans>
@@ -118,8 +104,8 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
 
             <AlertDescription className="mr-4">
               <Trans>
-                Two factor authentication recovery codes are used to access your account in the
-                event that you lose access to your authenticator app.
+                Two factor authentication recovery codes are used to access your account in the event that you lose
+                access to your authenticator app.
               </Trans>
             </AlertDescription>
           </div>
@@ -128,19 +114,14 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
         </Alert>
       )}
 
-      <Alert
-        className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center"
-        variant="neutral"
-      >
+      <Alert className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
         <div className="mb-4 sm:mb-0">
           <AlertTitle>
             <Trans>Passkeys</Trans>
           </AlertTitle>
 
           <AlertDescription className="mr-4">
-            <Trans>
-              Allows authenticating using biometrics, password managers, hardware keys, etc.
-            </Trans>
+            <Trans>Allows authenticating using biometrics, password managers, hardware keys, etc.</Trans>
           </AlertDescription>
         </div>
 
@@ -151,11 +132,8 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
         </Button>
       </Alert>
 
-      <Alert
-        className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center"
-        variant="neutral"
-      >
-        <div className="mb-4 mr-4 sm:mb-0">
+      <Alert className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
+        <div className="mr-4 mb-4 sm:mb-0">
           <AlertTitle>
             <Trans>Recent activity</Trans>
           </AlertTitle>
@@ -172,11 +150,8 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
         </Button>
       </Alert>
 
-      <Alert
-        className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center"
-        variant="neutral"
-      >
-        <div className="mb-4 mr-4 sm:mb-0">
+      <Alert className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
+        <div className="mr-4 mb-4 sm:mb-0">
           <AlertTitle>
             <Trans>Active sessions</Trans>
           </AlertTitle>
@@ -193,11 +168,8 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
         </Button>
       </Alert>
 
-      <Alert
-        className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center"
-        variant="neutral"
-      >
-        <div className="mb-4 mr-4 sm:mb-0">
+      <Alert className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
+        <div className="mr-4 mb-4 sm:mb-0">
           <AlertTitle>
             <Trans>Linked Accounts</Trans>
           </AlertTitle>

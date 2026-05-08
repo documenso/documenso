@@ -1,9 +1,3 @@
-import { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { trpc } from '@documenso/trpc/react';
 import { Alert } from '@documenso/ui/primitives/alert';
@@ -19,6 +13,10 @@ import {
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { useState } from 'react';
 
 export type OrganisationMemberDeleteDialogProps = {
   organisationMemberId: string;
@@ -81,8 +79,8 @@ export const OrganisationMemberDeleteDialog = ({
 
           <DialogDescription className="mt-4">
             <Trans>
-              You are about to remove the following user from{' '}
-              <span className="font-semibold">{organisation.name}</span>.
+              You are about to remove the following user from <span className="font-semibold">{organisation.name}</span>
+              .
             </Trans>
           </DialogDescription>
         </DialogHeader>

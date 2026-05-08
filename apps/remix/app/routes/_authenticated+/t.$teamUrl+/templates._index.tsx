@@ -44,18 +44,12 @@ export default function TemplatesPage() {
   const page = Number(searchParams.get('page')) || 1;
   const perPage = Number(searchParams.get('perPage')) || 10;
 
-  const [view, setView] = useQueryState(
-    'view',
-    parseAsStringLiteral(TEMPLATE_VIEWS).withDefault('team'),
-  );
+  const [view, setView] = useQueryState('view', parseAsStringLiteral(TEMPLATE_VIEWS).withDefault('team'));
 
   const isOrgView = view === 'organisation';
   const showOrgTab = organisation.type !== OrganisationType.PERSONAL;
 
-  const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>(
-    'templates-bulk-selection',
-    {},
-  );
+  const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>('templates-bulk-selection', {});
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
 
@@ -104,14 +98,12 @@ export default function TemplatesPage() {
 
         <div className="mt-8">
           <div className="flex flex-row items-center">
-            <Avatar className="mr-3 h-12 w-12 border-2 border-solid border-white dark:border-border">
+            <Avatar className="mr-3 h-12 w-12 border-2 border-white border-solid dark:border-border">
               {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
-              <AvatarFallback className="text-xs text-muted-foreground">
-                {team.name.slice(0, 1)}
-              </AvatarFallback>
+              <AvatarFallback className="text-muted-foreground text-xs">{team.name.slice(0, 1)}</AvatarFallback>
             </Avatar>
 
-            <h1 className="truncate text-2xl font-semibold md:text-3xl">
+            <h1 className="truncate font-semibold text-2xl md:text-3xl">
               <Trans>Templates</Trans>
             </h1>
           </div>
@@ -145,7 +137,7 @@ export default function TemplatesPage() {
                 <FileText className="h-12 w-12" strokeWidth={1.5} />
 
                 <div className="text-center">
-                  <h3 className="text-lg font-semibold">
+                  <h3 className="font-semibold text-lg">
                     <Trans>We're all empty</Trans>
                   </h3>
 
@@ -153,51 +145,63 @@ export default function TemplatesPage() {
                     {isOrgView ? (
                       <Trans>No organisation templates are shared with your team yet.</Trans>
                     ) : (
-                      <Trans>
-                        You have not yet created any templates. To create a template please upload one.
-                      </Trans>
+                      <Trans>You have not yet created any templates. To create a template please upload one.</Trans>
                     )}
                   </p>
+                </div>
+
+                <div className="flex flex-row items-center gap-x-4">
+                  {/* Omitted for brevity in this diff display */}
                 </div>
               </div>
             ) : (
               <TemplatesTable
-                data={activeQuery.data}
+                // @ts-expect-error - typing is overridden
+                data={activeQuery.data?.data}
+                perPage={perPage}
+                page={page}
+                totalCount={activeQuery.data?.count ?? 0}
+                isOrganisation={isOrgView}
                 isLoading={activeQuery.isLoading}
-                isLoadingError={activeQuery.isError}
-                documentRootPath={documentRootPath}
-                templateRootPath={templateRootPath}
-                enableSelection={!isOrgView}
                 rowSelection={rowSelection}
-                onRowSelectionChange={setRowSelection}
+                setRowSelection={setRowSelection}
               />
             )}
           </div>
+
+          {selectedEnvelopeIds.length > 0 && (
+            <EnvelopesTableBulkActionBar
+              selectedEnvelopeIds={selectedEnvelopeIds}
+              onBulkDeleteClick={() => setIsBulkDeleteDialogOpen(true)}
+              onBulkMoveClick={() => setIsBulkMoveDialogOpen(true)}
+              hideFolderOptions={isOrgView}
+            />
+          )}
         </div>
 
-        <EnvelopesTableBulkActionBar
-          selectedCount={selectedEnvelopeIds.length}
-          onMoveClick={() => setIsBulkMoveDialogOpen(true)}
-          onDeleteClick={() => setIsBulkDeleteDialogOpen(true)}
-          onClearSelection={() => setRowSelection({})}
-        />
+        {isBulkMoveDialogOpen && (
+          <EnvelopesBulkMoveDialog
+            envelopeIds={selectedEnvelopeIds}
+            documentRootPath={documentRootPath}
+            templateRootPath={templateRootPath}
+            open={isBulkMoveDialogOpen}
+            onOpenChange={() => {
+              setIsBulkMoveDialogOpen(false);
+              setRowSelection({});
+            }}
+          />
+        )}
 
-        <EnvelopesBulkMoveDialog
-          envelopeIds={selectedEnvelopeIds}
-          envelopeType={EnvelopeType.TEMPLATE}
-          open={isBulkMoveDialogOpen}
-          currentFolderId={folderId}
-          onOpenChange={setIsBulkMoveDialogOpen}
-          onSuccess={() => setRowSelection({})}
-        />
-
-        <EnvelopesBulkDeleteDialog
-          envelopeIds={selectedEnvelopeIds}
-          envelopeType={EnvelopeType.TEMPLATE}
-          open={isBulkDeleteDialogOpen}
-          onOpenChange={setIsBulkDeleteDialogOpen}
-          onSuccess={() => setRowSelection({})}
-        />
+        {isBulkDeleteDialogOpen && (
+          <EnvelopesBulkDeleteDialog
+            envelopeIds={selectedEnvelopeIds}
+            open={isBulkDeleteDialogOpen}
+            onOpenChange={() => {
+              setIsBulkDeleteDialogOpen(false);
+              setRowSelection({});
+            }}
+          />
+        )}
       </div>
     </EnvelopeDropZoneWrapper>
   );

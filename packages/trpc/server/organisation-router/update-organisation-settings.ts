@@ -1,9 +1,8 @@
-import { OrganisationType, Prisma } from '@prisma/client';
-
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
+import { OrganisationType, Prisma } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -104,8 +103,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       drawSignatureEnabled ?? organisation.organisationGlobalSettings.drawSignatureEnabled;
 
     const derivedDelegateDocumentOwnership =
-      delegateDocumentOwnership ??
-      organisation.organisationGlobalSettings.delegateDocumentOwnership;
+      delegateDocumentOwnership ?? organisation.organisationGlobalSettings.delegateDocumentOwnership;
 
     if (
       derivedTypedSignatureEnabled === false &&
@@ -118,8 +116,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
     }
 
     const isPersonalOrganisation = organisation.type === OrganisationType.PERSONAL;
-    const currentIncludeSenderDetails =
-      organisation.organisationGlobalSettings.includeSenderDetails;
+    const currentIncludeSenderDetails = organisation.organisationGlobalSettings.includeSenderDetails;
 
     const isChangingIncludeSenderDetails =
       includeSenderDetails !== undefined && includeSenderDetails !== currentIncludeSenderDetails;
@@ -150,8 +147,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
             drawSignatureEnabled,
             defaultRecipients: defaultRecipients === null ? Prisma.DbNull : defaultRecipients,
             delegateDocumentOwnership: derivedDelegateDocumentOwnership,
-            envelopeExpirationPeriod:
-              envelopeExpirationPeriod === null ? Prisma.DbNull : envelopeExpirationPeriod,
+            envelopeExpirationPeriod: envelopeExpirationPeriod === null ? Prisma.DbNull : envelopeExpirationPeriod,
             reminderSettings: reminderSettings === null ? Prisma.DbNull : reminderSettings,
 
             // Branding related settings.

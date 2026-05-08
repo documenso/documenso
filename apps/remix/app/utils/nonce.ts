@@ -18,5 +18,4 @@
  * client has no functional impact. Subsequent dynamically-injected
  * scripts inherit trust via `'strict-dynamic'`.
  */
-export const nonce = (value: string | undefined): string | undefined =>
-  typeof window === 'undefined' ? value : '';
+export const nonce = (value: string | undefined): string | undefined => (typeof window === 'undefined' ? value : '');

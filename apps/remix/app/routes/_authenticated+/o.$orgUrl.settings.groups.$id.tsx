@@ -1,15 +1,3 @@
-import { useMemo, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
-import { Loader } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { Link } from 'react-router';
-import { z } from 'zod';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@documenso/lib/constants/organisations';
 import { EXTENDED_ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
@@ -29,14 +17,17 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
+import { Loader } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Link } from 'react-router';
+import { z } from 'zod';
 
 import { OrganisationGroupDeleteDialog } from '~/components/dialogs/organisation-group-delete-dialog';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
@@ -104,10 +95,7 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
 
   return (
     <div>
-      <SettingsHeader
-        title={t`Organisation Group Settings`}
-        subtitle={t`Manage your organisation group settings.`}
-      >
+      <SettingsHeader title={t`Organisation Group Settings`} subtitle={t`Manage your organisation group settings.`}>
         <OrganisationGroupDeleteDialog
           organisationGroupId={groupId}
           organisationGroupName={group.name || ''}
@@ -236,21 +224,17 @@ const OrganisationGroupForm = ({ group }: OrganisationGroupFormOptions) => {
                   </SelectTrigger>
 
                   <SelectContent position="popper">
-                    {ORGANISATION_MEMBER_ROLE_HIERARCHY[organisation.currentOrganisationRole].map(
-                      (role) => (
-                        <SelectItem key={role} value={role}>
-                          {t(EXTENDED_ORGANISATION_MEMBER_ROLE_MAP[role])}
-                        </SelectItem>
-                      ),
-                    )}
+                    {ORGANISATION_MEMBER_ROLE_HIERARCHY[organisation.currentOrganisationRole].map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {t(EXTENDED_ORGANISATION_MEMBER_ROLE_MAP[role])}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </FormControl>
               <FormMessage />
               <FormDescription>
-                <Trans>
-                  The organisation role that will be applied to all members in this group.
-                </Trans>
+                <Trans>The organisation role that will be applied to all members in this group.</Trans>
               </FormDescription>
             </FormItem>
           )}
