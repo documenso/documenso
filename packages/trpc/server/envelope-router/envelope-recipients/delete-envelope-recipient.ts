@@ -3,9 +3,9 @@ import { deleteEnvelopeRecipient } from '@documenso/lib/server-only/recipient/de
 import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';
 import {
+  deleteEnvelopeRecipientMeta,
   ZDeleteEnvelopeRecipientRequestSchema,
   ZDeleteEnvelopeRecipientResponseSchema,
-  deleteEnvelopeRecipientMeta,
 } from './delete-envelope-recipient.types';
 
 export const deleteEnvelopeRecipientRoute = authenticatedProcedure

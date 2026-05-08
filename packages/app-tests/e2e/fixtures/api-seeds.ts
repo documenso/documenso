@@ -16,10 +16,9 @@
  *     });
  *   });
  */
-import { type APIRequestContext, expect } from '@playwright/test';
+
 import fs from 'node:fs';
 import path from 'node:path';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
@@ -34,6 +33,7 @@ import type {
 } from '@documenso/trpc/server/envelope-router/distribute-envelope.types';
 import type { TCreateEnvelopeRecipientsResponse } from '@documenso/trpc/server/envelope-router/envelope-recipients/create-envelope-recipients.types';
 import type { TGetEnvelopeResponse } from '@documenso/trpc/server/envelope-router/get-envelope.types';
+import { type APIRequestContext, expect } from '@playwright/test';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -543,12 +543,7 @@ export const apiSeedDraftDocument = async (
 
   // If we need per-recipient fields, add recipients and fields separately
   if (options.recipients && options.fieldsPerRecipient) {
-    const recipientsRes = await apiCreateRecipients(
-      request,
-      ctx.token,
-      envelopeId,
-      options.recipients,
-    );
+    const recipientsRes = await apiCreateRecipients(request, ctx.token, envelopeId, options.recipients);
 
     // Get envelope to resolve envelope item IDs
     const envelopeData = await apiGetEnvelope(request, ctx.token, envelopeId);
@@ -694,12 +689,7 @@ export const apiSeedPendingDocument = async (
   }
 
   // Distribute
-  const distributeResult = await apiDistributeEnvelope(
-    request,
-    ctx.token,
-    envelopeId,
-    options.distributeMeta,
-  );
+  const distributeResult = await apiDistributeEnvelope(request, ctx.token, envelopeId, options.distributeMeta);
 
   const envelope = await apiGetEnvelope(request, ctx.token, envelopeId);
 
@@ -758,12 +748,7 @@ export const apiSeedTemplate = async (
   const { id: envelopeId } = await apiCreateEnvelope(request, ctx.token, createOptions);
 
   if (options.recipients && options.fieldsPerRecipient) {
-    const recipientsRes = await apiCreateRecipients(
-      request,
-      ctx.token,
-      envelopeId,
-      options.recipients,
-    );
+    const recipientsRes = await apiCreateRecipients(request, ctx.token, envelopeId, options.recipients);
 
     const envelopeData = await apiGetEnvelope(request, ctx.token, envelopeId);
     const firstItemId = envelopeData.envelopeItems[0]?.id;
@@ -833,9 +818,7 @@ export const apiSeedDirectTemplate = async (
   // Find the recipient ID for the direct link
   const directRecipientEmail = options.directRecipient?.email ?? recipients[0].email;
 
-  const directRecipient = templateResult.envelope.recipients.find(
-    (r) => r.email === directRecipientEmail,
-  );
+  const directRecipient = templateResult.envelope.recipients.find((r) => r.email === directRecipientEmail);
 
   if (!directRecipient) {
     throw new Error(`Direct template recipient not found: ${directRecipientEmail}`);
@@ -887,9 +870,7 @@ export const apiSeedMultipleDraftDocuments = async (
   const ctx = context ?? (await apiCreateTestContext('e2e-multi-doc'));
 
   const results = await Promise.all(
-    documents.map(async (docOptions) =>
-      apiSeedDraftDocument(request, { ...docOptions, context: ctx }),
-    ),
+    documents.map(async (docOptions) => apiSeedDraftDocument(request, { ...docOptions, context: ctx })),
   );
 
   return {

@@ -1,10 +1,3 @@
-import { useEffect } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { useForm, useWatch } from 'react-hook-form';
-import type { z } from 'zod';
-
 import {
   DEFAULT_FIELD_FONT_SIZE,
   FIELD_DEFAULT_GENERIC_ALIGN,
@@ -14,16 +7,14 @@ import {
   type TTextFieldMeta as TextFieldMeta,
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { Textarea } from '@documenso/ui/primitives/textarea';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { useEffect } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import type { z } from 'zod';
 
 import {
   EditorGenericFontSizeField,
@@ -150,11 +141,7 @@ export const EditorFieldTextForm = ({
                   <Trans>Placeholder</Trans>
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    data-testid="field-form-placeholder"
-                    placeholder={t`Field placeholder`}
-                    {...field}
-                  />
+                  <Input data-testid="field-form-placeholder" placeholder={t`Field placeholder`} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

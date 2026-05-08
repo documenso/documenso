@@ -1,8 +1,3 @@
-import { msg } from '@lingui/core/macro';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { Loader } from 'lucide-react';
-import { Link } from 'react-router';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
@@ -12,6 +7,10 @@ import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { Loader } from 'lucide-react';
+import { Link } from 'react-router';
 
 import {
   BrandingPreferencesForm,
@@ -36,19 +35,17 @@ export default function OrganisationSettingsBrandingPage() {
 
   const isPersonalLayoutMode = isPersonalLayout(organisations);
 
-  const { data: organisationWithSettings, isLoading: isLoadingOrganisation } =
-    trpc.organisation.get.useQuery({
-      organisationReference: organisation.url,
-    });
+  const { data: organisationWithSettings, isLoading: isLoadingOrganisation } = trpc.organisation.get.useQuery({
+    organisationReference: organisation.url,
+  });
 
-  const { mutateAsync: updateOrganisationSettings } =
-    trpc.organisation.settings.update.useMutation();
+  const { mutateAsync: updateOrganisationSettings } = trpc.organisation.settings.update.useMutation();
 
   const onBrandingPreferencesFormSubmit = async (data: TBrandingPreferencesFormSchema) => {
     try {
       const { brandingEnabled, brandingLogo, brandingUrl, brandingCompanyDetails } = data;
 
-      let uploadedBrandingLogo: string | undefined = undefined;
+      let uploadedBrandingLogo: string | undefined;
 
       if (brandingLogo) {
         uploadedBrandingLogo = JSON.stringify(await putFile(brandingLogo));
@@ -102,8 +99,7 @@ export default function OrganisationSettingsBrandingPage() {
     <div className="max-w-2xl">
       <SettingsHeader title={settingsHeaderText} subtitle={settingsHeaderSubtitle} />
 
-      {organisationWithSettings.organisationClaim.flags.allowCustomBranding ||
-      !IS_BILLING_ENABLED() ? (
+      {organisationWithSettings.organisationClaim.flags.allowCustomBranding || !IS_BILLING_ENABLED() ? (
         <section>
           <BrandingPreferencesForm
             context="Organisation"
@@ -112,10 +108,7 @@ export default function OrganisationSettingsBrandingPage() {
           />
         </section>
       ) : (
-        <Alert
-          className="mt-8 flex flex-col justify-between p-6 sm:flex-row sm:items-center"
-          variant="neutral"
-        >
+        <Alert className="mt-8 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
           <div className="mb-4 sm:mb-0">
             <AlertTitle>
               <Trans>Branding Preferences</Trans>
@@ -128,13 +121,7 @@ export default function OrganisationSettingsBrandingPage() {
 
           {canExecuteOrganisationAction('MANAGE_BILLING', organisation.currentOrganisationRole) && (
             <Button asChild variant="outline">
-              <Link
-                to={
-                  isPersonalLayoutMode
-                    ? '/settings/billing'
-                    : `/o/${organisation.url}/settings/billing`
-                }
-              >
+              <Link to={isPersonalLayoutMode ? '/settings/billing' : `/o/${organisation.url}/settings/billing`}>
                 <Trans>Update Billing</Trans>
               </Link>
             </Button>

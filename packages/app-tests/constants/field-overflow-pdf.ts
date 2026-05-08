@@ -160,8 +160,7 @@ export const OVERFLOW_TEST_FIELDS: OverflowFieldTestData[] = [
     seedFieldMeta: { type: 'date', overflow: 'auto' },
     page: 1,
     ...calculateSingleLinePosition(2),
-    customText:
-      'Wednesday, April 16, 2026 at 14:30:45.123 Coordinated Universal Time signed in Melbourne, Australia',
+    customText: 'Wednesday, April 16, 2026 at 14:30:45.123 Coordinated Universal Time signed in Melbourne, Australia',
   },
   // Multi-line 3×3: Row 0 = TA_LEFT (short / medium / long)
   {

@@ -1,7 +1,6 @@
-import { z } from 'zod';
-
 import { ZDocumentManySchema } from '@documenso/lib/types/document';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { z } from 'zod';
 
 export const ZFindDocumentsRequestSchema = ZFindSearchParamsSchema.extend({
   perPage: z.number().optional().default(20),

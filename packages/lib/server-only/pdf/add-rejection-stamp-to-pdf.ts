@@ -9,8 +9,8 @@ import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
 export async function addRejectionStampToPdf(pdf: PDF, reason: string): Promise<PDF> {
   const pages = pdf.getPages();
 
-  const fontBytes = await fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(
-    async (res) => res.arrayBuffer(),
+  const fontBytes = await fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(async (res) =>
+    res.arrayBuffer(),
   );
 
   const font = pdf.embedFont(new Uint8Array(fontBytes));

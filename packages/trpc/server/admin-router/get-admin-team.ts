@@ -1,9 +1,8 @@
-import { OrganisationMemberInviteStatus } from '@prisma/client';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisations';
 import { getHighestTeamRoleInGroup } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
+import { OrganisationMemberInviteStatus } from '@prisma/client';
 
 import { adminProcedure } from '../trpc';
 import { ZGetAdminTeamRequestSchema, ZGetAdminTeamResponseSchema } from './get-admin-team.types';

@@ -1,7 +1,6 @@
+import { RootProvider } from 'fumadocs-ui/provider/next';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-
-import { RootProvider } from 'fumadocs-ui/provider/next';
 import PlausibleProvider from 'next-plausible';
 
 import './global.css';
@@ -16,8 +15,7 @@ export const metadata: Metadata = {
     template: '%s | Documenso Docs',
     default: 'Documenso Docs',
   },
-  description:
-    'The official documentation for Documenso, the open-source document signing platform.',
+  description: 'The official documentation for Documenso, the open-source document signing platform.',
   openGraph: {
     siteName: 'Documenso Docs',
     type: 'website',

@@ -3,9 +3,9 @@ import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embeddin
 
 import { procedure } from '../trpc';
 import {
+  verifyEmbeddingPresignTokenMeta,
   ZVerifyEmbeddingPresignTokenRequestSchema,
   ZVerifyEmbeddingPresignTokenResponseSchema,
-  verifyEmbeddingPresignTokenMeta,
 } from './verify-embedding-presign-token.types';
 
 /**

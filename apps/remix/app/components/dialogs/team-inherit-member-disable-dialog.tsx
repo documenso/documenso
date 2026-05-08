@@ -1,6 +1,3 @@
-import { Trans, useLingui } from '@lingui/react/macro';
-import type { TeamGroup } from '@prisma/client';
-
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -14,6 +11,8 @@ import {
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { Trans, useLingui } from '@lingui/react/macro';
+import type { TeamGroup } from '@prisma/client';
 
 import { useCurrentTeam } from '~/providers/team';
 
@@ -60,8 +59,8 @@ export const TeamMemberInheritDisableDialog = ({ group }: TeamMemberInheritDisab
 
           <DialogDescription className="mt-4">
             <Trans>
-              You are about to remove default access to this team for all organisation members. Any
-              members not explicitly added to this team will no longer have access.
+              You are about to remove default access to this team for all organisation members. Any members not
+              explicitly added to this team will no longer have access.
             </Trans>
           </DialogDescription>
         </DialogHeader>

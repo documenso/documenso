@@ -1,10 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Loader } from 'lucide-react';
-import { useRevalidator } from 'react-router';
-
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
@@ -16,14 +9,13 @@ import type {
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Loader } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useRevalidator } from 'react-router';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningFieldContainer } from './document-signing-field-container';
@@ -56,14 +48,11 @@ export const DocumentSigningDropdownField = ({
   const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
-  const {
-    mutateAsync: removeSignedFieldWithToken,
-    isPending: isRemoveSignedFieldWithTokenLoading,
-  } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
+  const { mutateAsync: removeSignedFieldWithToken, isPending: isRemoveSignedFieldWithTokenLoading } =
+    trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading;
-  const shouldAutoSignField =
-    (!field.inserted && localChoice) || (!field.inserted && isReadOnly && defaultValue);
+  const shouldAutoSignField = (!field.inserted && localChoice) || (!field.inserted && isReadOnly && defaultValue);
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
@@ -171,23 +160,18 @@ export const DocumentSigningDropdownField = ({
         type="Dropdown"
       >
         {isLoading && (
-          <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
-            <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
+          <div className="absolute inset-0 flex items-center justify-center rounded-md bg-background">
+            <Loader className="h-5 w-5 animate-spin text-primary md:h-8 md:w-8" />
           </div>
         )}
 
         {!field.inserted && (
-          <p className="group-hover:text-primary text-foreground flex flex-col items-center justify-center duration-200">
+          <p className="flex flex-col items-center justify-center text-foreground duration-200 group-hover:text-primary">
             <Select value={localChoice} onValueChange={handleSelectItem}>
               <SelectTrigger
-                className={cn(
-                  'text-foreground z-10 h-full w-full border-none ring-0 focus:border-none focus:ring-0',
-                )}
+                className={cn('z-10 h-full w-full border-none text-foreground ring-0 focus:border-none focus:ring-0')}
               >
-                <SelectValue
-                  className="text-[clamp(0.425rem,25cqw,0.825rem)]"
-                  placeholder={`${_(msg`Select`)}`}
-                />
+                <SelectValue className="text-[clamp(0.425rem,25cqw,0.825rem)]" placeholder={`${_(msg`Select`)}`} />
               </SelectTrigger>
               <SelectContent className="w-full ring-0 focus:ring-0" position="popper">
                 {parsedFieldMeta?.values?.map((item, index) => (
@@ -201,9 +185,7 @@ export const DocumentSigningDropdownField = ({
         )}
 
         {field.inserted && (
-          <p className="text-foreground text-[clamp(0.425rem,25cqw,0.825rem)] duration-200">
-            {field.customText}
-          </p>
+          <p className="text-[clamp(0.425rem,25cqw,0.825rem)] text-foreground duration-200">{field.customText}</p>
         )}
       </DocumentSigningFieldContainer>
     </div>

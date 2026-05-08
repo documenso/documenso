@@ -8,16 +8,13 @@ export type TemplateForgotPasswordProps = {
   assetBaseUrl: string;
 };
 
-export const TemplateForgotPassword = ({
-  resetPasswordLink,
-  assetBaseUrl,
-}: TemplateForgotPasswordProps) => {
+export const TemplateForgotPassword = ({ resetPasswordLink, assetBaseUrl }: TemplateForgotPasswordProps) => {
   return (
     <>
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
       <Section className="flex-row items-center justify-center">
-        <Text className="text-primary mx-auto mb-0 max-w-[80%] text-center text-lg font-semibold">
+        <Text className="mx-auto mb-0 max-w-[80%] text-center font-semibold text-lg text-primary">
           <Trans>Forgot your password?</Trans>
         </Text>
 
@@ -25,9 +22,9 @@ export const TemplateForgotPassword = ({
           <Trans>That's okay, it happens! Click the button below to reset your password.</Trans>
         </Text>
 
-        <Section className="mb-6 mt-8 text-center">
+        <Section className="mt-8 mb-6 text-center">
           <Button
-            className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
+            className="inline-flex items-center justify-center rounded-lg bg-documenso-500 px-6 py-3 text-center font-medium text-black text-sm no-underline"
             href={resetPasswordLink}
           >
             <Trans>Reset Password</Trans>

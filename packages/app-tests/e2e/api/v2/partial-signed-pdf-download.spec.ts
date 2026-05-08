@@ -1,23 +1,18 @@
-import { PDF } from '@libpdf/core';
-import type { APIRequestContext } from '@playwright/test';
-import { expect, test } from '@playwright/test';
-import { DocumentStatus, FieldType, SigningStatus } from '@prisma/client';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
+import { PDF } from '@libpdf/core';
+import type { APIRequestContext } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { DocumentStatus, FieldType, SigningStatus } from '@prisma/client';
 
 import { apiSeedDraftDocument, apiSeedPendingDocument } from '../../fixtures/api-seeds';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 const API_BASE_URL = `${WEBAPP_BASE_URL}/api/v2-beta`;
 
-const trpcMutation = async (
-  request: APIRequestContext,
-  procedure: string,
-  input: Record<string, unknown>,
-) => {
+const trpcMutation = async (request: APIRequestContext, procedure: string, input: Record<string, unknown>) => {
   const res = await request.post(`${WEBAPP_BASE_URL}/api/trpc/${procedure}`, {
     headers: {
       'content-type': 'application/json',
@@ -63,9 +58,7 @@ const signAndCompleteRecipient = async ({
 };
 
 test.describe('API V2 partial signed PDF downloads', () => {
-  test('returns a PDF with inserted fields, supports ETag, and rejects after completion', async ({
-    request,
-  }) => {
+  test('returns a PDF with inserted fields, supports ETag, and rejects after completion', async ({ request }) => {
     const { envelope, token, distributeResult } = await apiSeedPendingDocument(request, {
       recipients: [
         { email: 'partial-signer-1@test.documenso.com', name: 'Partial Signer 1' },
@@ -118,9 +111,9 @@ test.describe('API V2 partial signed PDF downloads', () => {
       });
 
       expect(dbEnvelope.status).toBe(DocumentStatus.PENDING);
-      expect(
-        dbEnvelope.recipients.find((recipient) => recipient.id === recipientOne.id)?.signingStatus,
-      ).toBe(SigningStatus.SIGNED);
+      expect(dbEnvelope.recipients.find((recipient) => recipient.id === recipientOne.id)?.signingStatus).toBe(
+        SigningStatus.SIGNED,
+      );
     }).toPass();
 
     const downloadUrl = `${API_BASE_URL}/envelope/item/${envelopeItem.id}/download?version=pending`;

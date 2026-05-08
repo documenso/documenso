@@ -1,8 +1,7 @@
+import { prisma } from '@documenso/prisma';
 import type { OrganisationMember } from '@prisma/client';
 import { Prisma } from '@prisma/client';
-import { P, match } from 'ts-pattern';
-
-import { prisma } from '@documenso/prisma';
+import { match, P } from 'ts-pattern';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { FindResultResponse } from '../../types/search-params';
@@ -144,14 +143,10 @@ export const findTeamMembers = async ({
     avatarImageId: member.user.avatarImageId,
     // Filter teamGroups to only include the current team
     teamRole: getHighestTeamRoleInGroup(
-      member.organisationGroupMembers.flatMap(({ group }) =>
-        group.teamGroups.filter((tg) => tg.teamId === teamId),
-      ),
+      member.organisationGroupMembers.flatMap(({ group }) => group.teamGroups.filter((tg) => tg.teamId === teamId)),
     ),
     teamRoleGroupType: member.organisationGroupMembers[0].group.type,
-    organisationRole: getHighestOrganisationRoleInGroup(
-      member.organisationGroupMembers.flatMap(({ group }) => group),
-    ),
+    organisationRole: getHighestOrganisationRoleInGroup(member.organisationGroupMembers.flatMap(({ group }) => group)),
   }));
 
   return {

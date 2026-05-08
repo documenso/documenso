@@ -5,16 +5,12 @@ import { AppError } from '../../errors/app-error';
 import type { TSignatureFieldMeta } from '../../types/field-meta';
 import { resolveFieldOverflowMode } from '../../types/field-meta';
 import { calculateOverflowLayout } from './calculate-overflow-layout';
-import {
-  createFieldHoverInteraction,
-  upsertFieldGroup,
-  upsertFieldRect,
-} from './field-generic-items';
-import { calculateFieldPosition } from './field-renderer';
+import { createFieldHoverInteraction, upsertFieldGroup, upsertFieldRect } from './field-generic-items';
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
+import { calculateFieldPosition } from './field-renderer';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-let SkiaImage: any = undefined;
+let SkiaImage: any;
 
 void (async () => {
   if (typeof window === 'undefined') {
@@ -71,11 +67,7 @@ const SIGNATURE_IMAGE_CACHE_PIXEL_RATIO = 2;
  * Build a Konva.Image for a base64 signature, sized to fit within the given
  * field dimensions. Works in both browser and Node.js (via skia-canvas).
  */
-const createSignatureImage = (
-  signatureImageAsBase64: string,
-  fieldWidth: number,
-  fieldHeight: number,
-): Konva.Image => {
+const createSignatureImage = (signatureImageAsBase64: string, fieldWidth: number, fieldHeight: number): Konva.Image => {
   if (typeof window !== 'undefined') {
     const img = new Image();
 
@@ -120,17 +112,10 @@ const createSignatureImage = (
   });
 };
 
-const createFieldSignature = (
-  field: FieldToRender,
-  options: RenderFieldElementOptions,
-): FieldSignature => {
+const createFieldSignature = (field: FieldToRender, options: RenderFieldElementOptions): FieldSignature => {
   const { pageWidth, pageHeight, mode = 'edit', translations } = options;
 
-  const { fieldX, fieldY, fieldWidth, fieldHeight } = calculateFieldPosition(
-    field,
-    pageWidth,
-    pageHeight,
-  );
+  const { fieldX, fieldY, fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
   const fontSize = field.fieldMeta?.fontSize || DEFAULT_SIGNATURE_TEXT_FONT_SIZE;
 
   const fieldText = new Konva.Text({
@@ -230,10 +215,7 @@ const createFieldSignature = (
   return { node: fieldText, isImageSignature: false, isLabel };
 };
 
-export const renderSignatureFieldElement = (
-  field: FieldToRender,
-  options: RenderFieldElementOptions,
-) => {
+export const renderSignatureFieldElement = (field: FieldToRender, options: RenderFieldElementOptions) => {
   const { mode = 'edit', pageLayer, pageWidth, pageHeight, color } = options;
 
   const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);

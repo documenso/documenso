@@ -1,7 +1,3 @@
-import { useState } from 'react';
-
-import { Trans, useLingui } from '@lingui/react/macro';
-
 import type { TLicenseClaim } from '@documenso/lib/types/license';
 import { trpc } from '@documenso/trpc/react';
 import type { TFindSubscriptionClaimsResponse } from '@documenso/trpc/server/admin-router/find-subscription-claims.types';
@@ -16,6 +12,8 @@ import {
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { useState } from 'react';
 
 import { SubscriptionClaimForm } from '../forms/subscription-claim-form';
 
@@ -74,12 +72,7 @@ export const ClaimUpdateDialog = ({ claim, trigger, licenseFlags }: ClaimUpdateD
           licenseFlags={licenseFlags}
           formSubmitTrigger={
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-                disabled={isPending}
-              >
+              <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isPending}>
                 <Trans>Cancel</Trans>
               </Button>
 

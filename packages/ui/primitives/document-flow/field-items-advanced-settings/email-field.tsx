@@ -1,19 +1,9 @@
-import { Trans, useLingui } from '@lingui/react/macro';
-
 import { validateFields as validateEmailFields } from '@documenso/lib/advanced-fields-validation/validate-fields';
-import {
-  DEFAULT_EMAIL_OVERFLOW_MODE,
-  type TEmailFieldMeta as EmailFieldMeta,
-} from '@documenso/lib/types/field-meta';
+import { DEFAULT_EMAIL_OVERFLOW_MODE, type TEmailFieldMeta as EmailFieldMeta } from '@documenso/lib/types/field-meta';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
+import { Trans, useLingui } from '@lingui/react/macro';
 
 type EmailFieldAdvancedSettingsProps = {
   fieldState: EmailFieldMeta;
@@ -64,10 +54,7 @@ export const EmailFieldAdvancedSettings = ({
           <Trans>Text Align</Trans>
         </Label>
 
-        <Select
-          value={fieldState.textAlign}
-          onValueChange={(value) => handleInput('textAlign', value)}
-        >
+        <Select value={fieldState.textAlign} onValueChange={(value) => handleInput('textAlign', value)}>
           <SelectTrigger className="mt-2 bg-background">
             <SelectValue placeholder={t`Select text align`} />
           </SelectTrigger>

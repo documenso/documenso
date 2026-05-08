@@ -1,19 +1,3 @@
-import { useMemo, useTransition } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import {
-  AlertTriangle,
-  Building2Icon,
-  Globe2Icon,
-  InfoIcon,
-  Link2Icon,
-  Loader,
-  LockIcon,
-} from 'lucide-react';
-import { Link } from 'react-router';
-
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
@@ -27,6 +11,12 @@ import { DataTablePagination } from '@documenso/ui/primitives/data-table-paginat
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { AlertTriangle, Building2Icon, Globe2Icon, InfoIcon, Link2Icon, Loader, LockIcon } from 'lucide-react';
+import { useMemo, useTransition } from 'react';
+import { Link } from 'react-router';
 
 import { TemplateType } from '~/components/general/template/template-type';
 import { useCurrentTeam } from '~/providers/team';
@@ -128,7 +118,7 @@ export const TemplatesTable = ({
                 <InfoIcon className="mx-2 h-4 w-4" />
               </TooltipTrigger>
 
-              <TooltipContent className="max-w-md space-y-2 !p-0 text-foreground">
+              <TooltipContent className="!p-0 max-w-md space-y-2 text-foreground">
                 <ul className="space-y-0.5 divide-y text-muted-foreground [&>li]:p-4">
                   <li>
                     <h2 className="mb-2 flex flex-row items-center font-semibold">
@@ -138,8 +128,8 @@ export const TemplatesTable = ({
 
                     <p>
                       <Trans>
-                        Public templates are connected to your public profile. Any modifications to
-                        public templates will also appear in your public profile.
+                        Public templates are connected to your public profile. Any modifications to public templates
+                        will also appear in your public profile.
                       </Trans>
                     </p>
                   </li>
@@ -151,9 +141,8 @@ export const TemplatesTable = ({
 
                     <p>
                       <Trans>
-                        Direct link templates contain one dynamic recipient placeholder. Anyone with
-                        access to this link can sign the document, and it will then appear on your
-                        documents page.
+                        Direct link templates contain one dynamic recipient placeholder. Anyone with access to this link
+                        can sign the document, and it will then appear on your documents page.
                       </Trans>
                     </p>
                   </li>
@@ -165,10 +154,7 @@ export const TemplatesTable = ({
 
                     <p>
                       {team?.id ? (
-                        <Trans>
-                          Team only templates are not linked anywhere and are visible only to your
-                          team.
-                        </Trans>
+                        <Trans>Team only templates are not linked anywhere and are visible only to your team.</Trans>
                       ) : (
                         <Trans>Private templates can only be modified and viewed by you.</Trans>
                       )}
@@ -182,8 +168,8 @@ export const TemplatesTable = ({
 
                     <p>
                       <Trans>
-                        Organisation templates are shared across all teams within the same
-                        organisation. Only the owning team can edit them.
+                        Organisation templates are shared across all teams within the same organisation. Only the owning
+                        team can edit them.
                       </Trans>
                     </p>
                   </li>
@@ -201,9 +187,7 @@ export const TemplatesTable = ({
               <TemplateType type={row.original.type} />
 
               {isFromOtherTeam && row.original.team?.name && (
-                <span className="ml-2 text-xs text-muted-foreground">
-                  ({row.original.team.name})
-                </span>
+                <span className="ml-2 text-muted-foreground text-xs">({row.original.team.name})</span>
               )}
 
               {row.original.directLink?.token && (
@@ -232,11 +216,7 @@ export const TemplatesTable = ({
                 documentRootPath={documentRootPath}
               />
 
-              <TemplatesTableActionDropdown
-                row={row.original}
-                teamId={team?.id}
-                templateRootPath={templateRootPath}
-              />
+              <TemplatesTableActionDropdown row={row.original} teamId={team?.id} templateRootPath={templateRootPath} />
             </div>
           );
         },
@@ -273,10 +253,7 @@ export const TemplatesTable = ({
           <AlertDescription className="mt-2">
             <Trans>
               You have reached your document limit.{' '}
-              <Link
-                className="underline underline-offset-4"
-                to={`/o/${organisation.url}/settings/billing`}
-              >
+              <Link className="underline underline-offset-4" to={`/o/${organisation.url}/settings/billing`}>
                 Upgrade your account to continue!
               </Link>
             </Trans>

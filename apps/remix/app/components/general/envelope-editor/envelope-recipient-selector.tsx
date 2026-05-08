@@ -1,29 +1,20 @@
-import { useCallback, useState } from 'react';
-
-import type { I18n } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import type { Field } from '@prisma/client';
-import { RecipientRole, SendStatus } from '@prisma/client';
-import { Check, ChevronsUpDown, Info } from 'lucide-react';
-import { sortBy } from 'remeda';
-
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import type { TEnvelopeRecipientLite } from '@documenso/lib/types/recipient';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { getRecipientColorStyles } from '@documenso/ui/lib/recipient-colors';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from '@documenso/ui/primitives/command';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@documenso/ui/primitives/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+import type { I18n } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import type { Field } from '@prisma/client';
+import { RecipientRole, SendStatus } from '@prisma/client';
+import { Check, ChevronsUpDown, Info } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { sortBy } from 'remeda';
 
 export interface EnvelopeRecipientSelectorProps {
   className?: string;
@@ -60,15 +51,12 @@ export const EnvelopeRecipientSelector = ({
           role="combobox"
           className={cn(
             'justify-between bg-background font-normal text-muted-foreground hover:text-foreground',
-            getRecipientColorStyles(recipients.findIndex((r) => r.id === selectedRecipient?.id))
-              .comboBoxTrigger,
+            getRecipientColorStyles(recipients.findIndex((r) => r.id === selectedRecipient?.id)).comboBoxTrigger,
             className,
           )}
         >
           {selectedRecipient && (
-            <span className="flex-1 truncate text-left">
-              {getRecipientLabel(selectedRecipient)}
-            </span>
+            <span className="flex-1 truncate text-left">{getRecipientLabel(selectedRecipient)}</span>
           )}
 
           <ChevronsUpDown className="ml-2 h-4 w-4" />
@@ -128,20 +116,13 @@ export const EnvelopeRecipientSelectorCommand = ({
   const recipientsByRoleToDisplay = useCallback(() => {
     return Object.entries(recipientsByRole())
       .filter(
-        ([role]) =>
-          role !== RecipientRole.CC &&
-          role !== RecipientRole.VIEWER &&
-          role !== RecipientRole.ASSISTANT,
+        ([role]) => role !== RecipientRole.CC && role !== RecipientRole.VIEWER && role !== RecipientRole.ASSISTANT,
       )
       .map(
         ([role, roleRecipients]) =>
           [
             role,
-            sortBy(
-              roleRecipients,
-              [(r) => r.signingOrder || Number.MAX_SAFE_INTEGER, 'asc'],
-              [(r) => r.id, 'asc'],
-            ),
+            sortBy(roleRecipients, [(r) => r.signingOrder || Number.MAX_SAFE_INTEGER, 'asc'], [(r) => r.id, 'asc']),
           ] as [RecipientRole, TEnvelopeRecipientLite[]],
       );
   }, [recipientsByRole]);
@@ -162,10 +143,7 @@ export const EnvelopeRecipientSelectorCommand = ({
   );
 
   return (
-    <Command
-      value={selectedRecipient ? selectedRecipient.id.toString() : undefined}
-      className={className}
-    >
+    <Command value={selectedRecipient ? selectedRecipient.id.toString() : undefined} className={className}>
       <CommandInput placeholder={placeholder} />
 
       <CommandEmpty>
@@ -176,15 +154,12 @@ export const EnvelopeRecipientSelectorCommand = ({
 
       {recipientsByRoleToDisplay().map(([role, roleRecipients], roleIndex) => (
         <CommandGroup key={roleIndex}>
-          <div className="mb-1 ml-2 mt-2 text-xs font-medium text-muted-foreground">
+          <div className="mt-2 mb-1 ml-2 font-medium text-muted-foreground text-xs">
             {t(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
           </div>
 
           {roleRecipients.length === 0 && (
-            <div
-              key={`${role}-empty`}
-              className="px-4 pb-4 pt-2.5 text-center text-xs text-muted-foreground/80"
-            >
+            <div key={`${role}-empty`} className="px-4 pt-2.5 pb-4 text-center text-muted-foreground/80 text-xs">
               <Trans>No recipients with this role</Trans>
             </div>
           )}
@@ -194,8 +169,7 @@ export const EnvelopeRecipientSelectorCommand = ({
               key={recipient.id}
               className={cn(
                 'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
-                getRecipientColorStyles(recipients.findIndex((r) => r.id === recipient.id))
-                  .comboBoxItem,
+                getRecipientColorStyles(recipients.findIndex((r) => r.id === recipient.id)).comboBoxItem,
                 {
                   'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
                   'cursor-not-allowed': isRecipientDisabled(recipient.id),
@@ -233,8 +207,7 @@ export const EnvelopeRecipientSelectorCommand = ({
 
                     <TooltipContent className="max-w-xs text-muted-foreground">
                       <Trans>
-                        This document has already been sent to this recipient. You can no longer
-                        edit this recipient.
+                        This document has already been sent to this recipient. You can no longer edit this recipient.
                       </Trans>
                     </TooltipContent>
                   </Tooltip>
@@ -248,11 +221,7 @@ export const EnvelopeRecipientSelectorCommand = ({
   );
 };
 
-const extractRecipientLabel = (
-  recipient: TEnvelopeRecipientLite,
-  recipients: TEnvelopeRecipientLite[],
-  i18n: I18n,
-) => {
+const extractRecipientLabel = (recipient: TEnvelopeRecipientLite, recipients: TEnvelopeRecipientLite[], i18n: I18n) => {
   if (recipient.name && recipient.email) {
     return `${recipient.name} (${recipient.email})`;
   }
