@@ -1,10 +1,12 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { isEmailDomainAllowedForSignup } from '@documenso/lib/constants/auth';
+import {
+  isEmailDomainAllowedForSignup,
+  isSignupEnabledForProvider,
+} from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
 import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
 import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
-import { env } from '@documenso/lib/utils/env';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { prisma } from '@documenso/prisma';
 import { UserSecurityAuditLogType } from '@prisma/client';
@@ -115,8 +117,8 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
     return c.redirect(redirectPath, 302);
   }
 
-  // Check if signups are disabled.
-  if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
+  // Check if signups are disabled for this provider.
+  if (!isSignupEnabledForProvider(clientOptions.id as 'google' | 'microsoft' | 'oidc')) {
     const errorUrl = new URL('/signin', NEXT_PUBLIC_WEBAPP_URL());
 
     errorUrl.searchParams.set('error', AuthenticationErrorCode.SignupDisabled);
