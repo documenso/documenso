@@ -58,18 +58,20 @@ export type TSignUpFormSchema = z.infer<typeof ZSignUpFormSchema>;
 export type SignUpFormProps = {
   className?: string;
   initialEmail?: string;
-  isGoogleSSOEnabled?: boolean;
-  isMicrosoftSSOEnabled?: boolean;
-  isOIDCSSOEnabled?: boolean;
+  isEmailPasswordSignupEnabled?: boolean;
+  isGoogleSignupEnabled?: boolean;
+  isMicrosoftSignupEnabled?: boolean;
+  isOidcSignupEnabled?: boolean;
   returnTo?: string;
 };
 
 export const SignUpForm = ({
   className,
   initialEmail,
-  isGoogleSSOEnabled,
-  isMicrosoftSSOEnabled,
-  isOIDCSSOEnabled,
+  isEmailPasswordSignupEnabled = true,
+  isGoogleSignupEnabled,
+  isMicrosoftSignupEnabled,
+  isOidcSignupEnabled,
   returnTo,
 }: SignUpFormProps) => {
   const { _ } = useLingui();
@@ -86,7 +88,7 @@ export const SignUpForm = ({
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
-  const hasSocialAuthEnabled = isGoogleSSOEnabled || isMicrosoftSSOEnabled || isOIDCSSOEnabled;
+  const hasSocialAuthEnabled = isGoogleSignupEnabled || isMicrosoftSignupEnabled || isOidcSignupEnabled;
 
   const form = useForm<TSignUpFormSchema>({
     values: {
@@ -145,7 +147,7 @@ export const SignUpForm = ({
   const onSignUpWithGoogleClick = async () => {
     try {
       await authClient.google.signIn();
-    } catch (err) {
+    } catch {
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(msg`We encountered an unknown error while attempting to sign you Up. Please try again later.`),
@@ -157,7 +159,7 @@ export const SignUpForm = ({
   const onSignUpWithMicrosoftClick = async () => {
     try {
       await authClient.microsoft.signIn();
-    } catch (err) {
+    } catch {
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(msg`We encountered an unknown error while attempting to sign you Up. Please try again later.`),
@@ -169,7 +171,7 @@ export const SignUpForm = ({
   const onSignUpWithOIDCClick = async () => {
     try {
       await authClient.oidc.signIn();
-    } catch (err) {
+    } catch {
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(msg`We encountered an unknown error while attempting to sign you Up. Please try again later.`),
@@ -235,72 +237,80 @@ export const SignUpForm = ({
         <Form {...form}>
           <form className="flex w-full flex-1 flex-col gap-y-4" onSubmit={form.handleSubmit(onFormSubmit)}>
             <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      <Trans>Full Name</Trans>
-                    </FormLabel>
-                    <FormControl>
-                      <Input type="text" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {isEmailPasswordSignupEnabled && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          <Trans>Full Name</Trans>
+                        </FormLabel>
+                        <FormControl>
+                          <Input type="text" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      <Trans>Email Address</Trans>
-                    </FormLabel>
-                    <FormControl>
-                      <Input type="email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          <Trans>Email Address</Trans>
+                        </FormLabel>
+                        <FormControl>
+                          <Input type="email" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      <Trans>Password</Trans>
-                    </FormLabel>
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          <Trans>Password</Trans>
+                        </FormLabel>
 
-                    <FormControl>
-                      <PasswordInput {...field} />
-                    </FormControl>
+                        <FormControl>
+                          <PasswordInput {...field} />
+                        </FormControl>
 
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <FormField
-                control={form.control}
-                name="signature"
-                render={({ field: { onChange, value } }) => (
-                  <FormItem>
-                    <FormLabel>
-                      <Trans>Sign Here</Trans>
-                    </FormLabel>
-                    <FormControl>
-                      <SignaturePadDialog disabled={isSubmitting} value={value} onChange={(v) => onChange(v ?? '')} />
-                    </FormControl>
+                  <FormField
+                    control={form.control}
+                    name="signature"
+                    render={({ field: { onChange, value } }) => (
+                      <FormItem>
+                        <FormLabel>
+                          <Trans>Sign Here</Trans>
+                        </FormLabel>
+                        <FormControl>
+                          <SignaturePadDialog
+                            disabled={isSubmitting}
+                            value={value}
+                            onChange={(v) => onChange(v ?? '')}
+                          />
+                        </FormControl>
 
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
 
               {turnstileSiteKey && (
                 <Turnstile
@@ -325,7 +335,7 @@ export const SignUpForm = ({
                 </div>
               )}
 
-              {isGoogleSSOEnabled && (
+              {isGoogleSignupEnabled && (
                 <Button
                   type="button"
                   size="lg"
@@ -339,7 +349,7 @@ export const SignUpForm = ({
                 </Button>
               )}
 
-              {isMicrosoftSSOEnabled && (
+              {isMicrosoftSignupEnabled && (
                 <Button
                   type="button"
                   size="lg"
@@ -353,7 +363,7 @@ export const SignUpForm = ({
                 </Button>
               )}
 
-              {isOIDCSSOEnabled && (
+              {isOidcSignupEnabled && (
                 <Button
                   type="button"
                   size="lg"
@@ -377,9 +387,11 @@ export const SignUpForm = ({
               </p>
             </fieldset>
 
-            <Button loading={form.formState.isSubmitting} type="submit" size="lg" className="mt-6 w-full">
-              <Trans>Create account</Trans>
-            </Button>
+            {isEmailPasswordSignupEnabled && (
+              <Button loading={form.formState.isSubmitting} type="submit" size="lg" className="mt-6 w-full">
+                <Trans>Create account</Trans>
+              </Button>
+            )}
           </form>
         </Form>
         <p className="mt-6 text-muted-foreground text-xs">
