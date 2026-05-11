@@ -40,6 +40,8 @@ export const getTeamSettings = async ({ userId, teamId }: GetTeamSettingsOptions
     teamSettings.brandingLogoSize = organisationSettings.brandingLogoSize;
     teamSettings.brandingUrl = organisationSettings.brandingUrl;
     teamSettings.brandingCompanyDetails = organisationSettings.brandingCompanyDetails;
+    teamSettings.brandingColors = organisationSettings.brandingColors;
+    teamSettings.brandingCss = organisationSettings.brandingCss;
   }
 
   return extractDerivedTeamSettings(organisationSettings, teamSettings);
