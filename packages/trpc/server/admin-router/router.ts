@@ -3,7 +3,9 @@ import { createAdminOrganisationRoute } from './create-admin-organisation';
 import { createStripeCustomerRoute } from './create-stripe-customer';
 import { createSubscriptionClaimRoute } from './create-subscription-claim';
 import { deleteDocumentRoute } from './delete-document';
+import { deleteAdminOrganisationMemberRoute } from './delete-organisation-member';
 import { deleteSubscriptionClaimRoute } from './delete-subscription-claim';
+import { deleteAdminTeamMemberRoute } from './delete-team-member';
 import { deleteUserRoute } from './delete-user';
 import { disableUserRoute } from './disable-user';
 import { downloadDocumentAuditLogsRoute } from './download-document-audit-logs';
@@ -17,6 +19,7 @@ import { findSubscriptionClaimsRoute } from './find-subscription-claims';
 import { findUnsealedDocumentsRoute } from './find-unsealed-documents';
 import { findUserTeamsRoute } from './find-user-teams';
 import { getAdminOrganisationRoute } from './get-admin-organisation';
+import { getAdminTeamRoute } from './get-admin-team';
 import { getEmailDomainRoute } from './get-email-domain';
 import { getUserRoute } from './get-user';
 import { promoteMemberToOwnerRoute } from './promote-member-to-owner';
@@ -43,6 +46,7 @@ export const adminRouter = router({
   organisationMember: {
     promoteToOwner: promoteMemberToOwnerRoute,
     updateRole: updateOrganisationMemberRoleRoute,
+    delete: deleteAdminOrganisationMemberRoute,
   },
   claims: {
     find: findSubscriptionClaimsRoute,
@@ -81,6 +85,12 @@ export const adminRouter = router({
     find: findEmailDomainsRoute,
     get: getEmailDomainRoute,
     reregister: reregisterEmailDomainRoute,
+  },
+  team: {
+    get: getAdminTeamRoute,
+  },
+  teamMember: {
+    delete: deleteAdminTeamMemberRoute,
   },
   updateSiteSetting: updateSiteSettingRoute,
 });

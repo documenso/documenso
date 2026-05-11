@@ -268,20 +268,40 @@ AI features must also be enabled in organisation/team settings after configurati
 
 ## Background Jobs
 
-Documenso uses a PostgreSQL-based job queue by default. Jobs (email delivery, document processing, webhook dispatch) are stored in the `BackgroundJob` table and processed via internal HTTP requests. No external queue service like Redis is required.
+Documenso supports multiple background job providers for processing emails, documents, webhooks, and scheduled tasks.
 
-| Variable                     | Description                                                                    | Default |
-| ---------------------------- | ------------------------------------------------------------------------------ | ------- |
-| `NEXT_PRIVATE_JOBS_PROVIDER` | Jobs provider: `local` (PostgreSQL-based queue) or `inngest` (managed service) | `local` |
+### Provider Selection
 
-### Inngest Configuration
+| Variable                     | Description                                                                            | Default |
+| ---------------------------- | -------------------------------------------------------------------------------------- | ------- |
+| `NEXT_PRIVATE_JOBS_PROVIDER` | Jobs provider: `local` (PostgreSQL), `bullmq` (Redis), or `inngest` (managed service) | `local` |
 
-| Variable                         | Description                                  |
-| -------------------------------- | -------------------------------------------- |
-| `NEXT_PRIVATE_INNGEST_EVENT_KEY` | Inngest event key                            |
-| `INNGEST_EVENT_KEY`              | Alternative Inngest event key                |
-| `INNGEST_SIGNING_KEY`            | Inngest signing key for webhook verification |
-| `NEXT_PRIVATE_INNGEST_APP_ID`    | Custom Inngest app ID                        |
+### Local (local)
+
+No additional configuration required. Jobs are stored in PostgreSQL and processed via internal HTTP requests.
+
+| Variable                           | Description                                                  | Default                          |
+| ---------------------------------- | ------------------------------------------------------------ | -------------------------------- |
+| `NEXT_PRIVATE_INTERNAL_WEBAPP_URL` | Internal URL for the app to send job requests to itself      | Same as `NEXT_PUBLIC_WEBAPP_URL` |
+
+### BullMQ (bullmq)
+
+| Variable                           | Required | Description                                                   | Default     |
+| ---------------------------------- | -------- | ------------------------------------------------------------- | ----------- |
+| `NEXT_PRIVATE_REDIS_URL`           | Yes      | Redis connection URL (e.g., `redis://localhost:6379`)         |             |
+| `NEXT_PRIVATE_REDIS_PREFIX`        | No       | Key prefix for Redis queues (useful when sharing an instance) | `documenso` |
+| `NEXT_PRIVATE_BULLMQ_CONCURRENCY` | No       | Number of concurrent jobs to process                          | `10`        |
+
+### Inngest (inngest)
+
+| Variable                         | Required | Description                                  |
+| -------------------------------- | -------- | -------------------------------------------- |
+| `NEXT_PRIVATE_INNGEST_EVENT_KEY` | Yes      | Inngest event key                            |
+| `INNGEST_EVENT_KEY`              | No       | Alternative Inngest event key                |
+| `INNGEST_SIGNING_KEY`            | Yes      | Inngest signing key for webhook verification |
+| `NEXT_PRIVATE_INNGEST_APP_ID`    | No       | Custom Inngest app ID                        |
+
+For setup guides and provider recommendations, see [Background Jobs](/docs/self-hosting/configuration/background-jobs).
 
 ---
 

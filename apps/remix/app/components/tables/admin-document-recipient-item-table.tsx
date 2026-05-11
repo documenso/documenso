@@ -14,6 +14,7 @@ import { useForm } from 'react-hook-form';
 import { useRevalidator } from 'react-router';
 import { z } from 'zod';
 
+import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
@@ -46,7 +47,7 @@ const RECIPIENT_ROLE_LABELS: Record<RecipientRole, string> = {
 
 const ZAdminUpdateRecipientFormSchema = z.object({
   name: z.string().min(1),
-  email: z.string().email(),
+  email: zEmail(),
   role: z.nativeEnum(RecipientRole),
 });
 

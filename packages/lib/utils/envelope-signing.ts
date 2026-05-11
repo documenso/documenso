@@ -21,6 +21,7 @@ import {
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { toCheckboxCustomText, toRadioCustomText } from '@documenso/lib/utils/fields';
+import { zEmail } from '@documenso/lib/utils/zod';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
 import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 
@@ -37,7 +38,7 @@ export const extractFieldInsertionValues = ({
 }: ExtractFieldInsertionValuesOptions): { customText: string; inserted: boolean } => {
   return match(fieldValue)
     .with({ type: FieldType.EMAIL }, (fieldValue) => {
-      const parsedEmailValue = z.string().email().nullable().safeParse(fieldValue.value);
+      const parsedEmailValue = zEmail().nullable().safeParse(fieldValue.value);
 
       if (!parsedEmailValue.success) {
         throw new AppError(AppErrorCode.INVALID_BODY, {

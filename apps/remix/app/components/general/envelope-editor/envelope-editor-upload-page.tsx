@@ -4,10 +4,8 @@ import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
 import { msg, plural } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { DocumentStatus } from '@prisma/client';
-import { FileWarningIcon, GripVerticalIcon, Loader2 } from 'lucide-react';
-import { X } from 'lucide-react';
-import { ErrorCode as DropzoneErrorCode, type FileRejection } from 'react-dropzone';
+import { FileWarningIcon, GripVerticalIcon, Loader2Icon, PencilIcon, XIcon } from 'lucide-react';
+import { ErrorCode as DropzoneErrorCode, type FileRejection, useDropzone } from 'react-dropzone';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useEnvelopeAutosave } from '@documenso/lib/client-only/hooks/use-envelope-autosave';
@@ -16,10 +14,13 @@ import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/org
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
 import { nanoid } from '@documenso/lib/universal/id';
+import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 import { PRESIGNED_ENVELOPE_ITEM_ID_PREFIX } from '@documenso/lib/utils/embed-config';
-import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
+import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { trpc } from '@documenso/trpc/react';
 import type { TCreateEnvelopeItemsPayload } from '@documenso/trpc/server/envelope-router/create-envelope-items.types';
+import type { TReplaceEnvelopeItemPdfPayload } from '@documenso/trpc/server/envelope-router/replace-envelope-item-pdf.types';
+import { buildDropzoneRejectionDescription } from '@documenso/ui/lib/handle-dropzone-rejection';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Card,
@@ -41,13 +42,14 @@ type LocalFile = {
   title: string;
   envelopeItemId: string | null;
   isUploading: boolean;
+  isReplacing: boolean;
   isError: boolean;
 };
 
 export const EnvelopeEditorUploadPage = () => {
   const organisation = useCurrentOrganisation();
 
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const { maximumEnvelopeItemCount, remaining } = useLimits();
   const { toast } = useToast();
 
@@ -72,9 +74,35 @@ export const EnvelopeEditorUploadPage = () => {
         title: item.title,
         envelopeItemId: item.id,
         isUploading: false,
+        isReplacing: false,
         isError: false,
       })),
   );
+
+  const replacingItemIdRef = useRef<string | null>(null);
+
+  const { open: openReplaceFilePicker, getInputProps: getReplaceInputProps } = useDropzone({
+    accept: { 'application/pdf': ['.pdf'] },
+    maxFiles: 1,
+    maxSize: megabytesToBytes(APP_DOCUMENT_UPLOAD_SIZE_LIMIT),
+    multiple: false,
+    noClick: true,
+    noKeyboard: true,
+    noDrag: true,
+    onDrop: (acceptedFiles) => {
+      const file = acceptedFiles[0];
+      const replacingItemId = replacingItemIdRef.current;
+
+      if (file && replacingItemId) {
+        void onReplacePdf(replacingItemId, file);
+        replacingItemIdRef.current = null;
+      }
+    },
+    onDropRejected: (fileRejections) => void onFileDropRejected(fileRejections),
+    onFileDialogCancel: () => {
+      replacingItemIdRef.current = null;
+    },
+  });
 
   const { mutateAsync: createEnvelopeItems, isPending: isCreatingEnvelopeItems } =
     trpc.envelope.item.createMany.useMutation({
@@ -108,10 +136,28 @@ export const EnvelopeEditorUploadPage = () => {
     },
   });
 
-  const canItemsBeModified = useMemo(
-    () => canEnvelopeItemsBeModified(envelope, envelope.recipients),
+  const envelopeItemPermissions = useMemo(
+    () => getEnvelopeItemPermissions(envelope, envelope.recipients),
     [envelope, envelope.recipients],
   );
+
+  const { mutateAsync: replaceEnvelopeItemPdf } = trpc.envelope.item.replacePdf.useMutation({
+    onSuccess: ({ data, fields }) => {
+      // Update the envelope item with the new documentDataId.
+      setLocalEnvelope({
+        envelopeItems: envelope.envelopeItems.map((item) =>
+          item.id === data.id ? { ...item, documentDataId: data.documentDataId } : item,
+        ),
+      });
+
+      // When fields were created or deleted during the replacement,
+      // the server returns the full updated field list.
+      if (fields) {
+        setLocalEnvelope({ fields });
+        editorFields.resetForm(fields);
+      }
+    },
+  });
 
   const onFileDrop = async (files: File[]) => {
     const newUploadingFiles: (LocalFile & {
@@ -125,6 +171,7 @@ export const EnvelopeEditorUploadPage = () => {
           title: file.name,
           file,
           isUploading: isEmbedded ? false : true,
+          isReplacing: false,
           // Clone the buffer so it can be read multiple times (File.arrayBuffer() consumes the stream once)
           data: isEmbedded ? new Uint8Array((await file.arrayBuffer()).slice(0)) : null,
           isError: false,
@@ -197,10 +244,75 @@ export const EnvelopeEditorUploadPage = () => {
           envelopeItemId: item.id,
           title: item.title,
           isUploading: false,
+          isReplacing: false,
           isError: false,
         })),
       );
     });
+  };
+
+  const onReplacePdf = async (envelopeItemId: string, file: File) => {
+    setLocalFiles((prev) =>
+      prev.map((f) => (f.envelopeItemId === envelopeItemId ? { ...f, isReplacing: true } : f)),
+    );
+
+    try {
+      if (isEmbedded) {
+        // For embedded mode, store the file data locally on the envelope item.
+        // The actual replacement will happen when the embed flow submits.
+        const arrayBuffer = await file.arrayBuffer();
+        const data = new Uint8Array(arrayBuffer.slice(0));
+
+        // Count pages in the new PDF to remove out-of-bounds fields.
+        const { PDF } = await import('@libpdf/core');
+        const pdfDoc = await PDF.load(data);
+        const newPageCount = pdfDoc.getPageCount();
+
+        // Remove fields that are on pages beyond the new PDF's page count.
+        const remainingFields = envelope.fields.filter(
+          (field) => field.envelopeItemId !== envelopeItemId || field.page <= newPageCount,
+        );
+
+        setLocalEnvelope({
+          envelopeItems: envelope.envelopeItems.map((item) =>
+            item.id === envelopeItemId ? { ...item, data } : item,
+          ),
+          fields: remainingFields,
+        });
+
+        editorFields.resetForm(remainingFields);
+
+        return;
+      }
+
+      // Normal mode: upload immediately via tRPC.
+      const payload = {
+        envelopeId: envelope.id,
+        envelopeItemId,
+      } satisfies TReplaceEnvelopeItemPdfPayload;
+
+      const formData = new FormData();
+      formData.append('payload', JSON.stringify(payload));
+      formData.append('file', file);
+
+      const replacePromise = replaceEnvelopeItemPdf(formData);
+      registerPendingMutation(replacePromise);
+
+      await replacePromise;
+    } catch (error) {
+      console.error(error);
+
+      toast({
+        title: t`Replace failed`,
+        description: t`Something went wrong while replacing the PDF`,
+        duration: 5000,
+        variant: 'destructive',
+      });
+    } finally {
+      setLocalFiles((prev) =>
+        prev.map((f) => (f.envelopeItemId === envelopeItemId ? { ...f, isReplacing: false } : f)),
+      );
+    }
   };
 
   /**
@@ -305,7 +417,7 @@ export const EnvelopeEditorUploadPage = () => {
   };
 
   const dropzoneDisabledMessage = useMemo(() => {
-    if (!canItemsBeModified) {
+    if (!envelopeItemPermissions.canFileBeChanged) {
       return msg`Cannot upload items after the document has been sent`;
     }
 
@@ -346,7 +458,7 @@ export const EnvelopeEditorUploadPage = () => {
 
     toast({
       title: t`Upload failed`,
-      description: t`File cannot be larger than ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB`,
+      description: i18n._(buildDropzoneRejectionDescription(fileRejections)),
       duration: 5000,
       variant: 'destructive',
     });
@@ -354,6 +466,7 @@ export const EnvelopeEditorUploadPage = () => {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-8">
+      <input {...getReplaceInputProps()} />
       <Card backdropBlur={false} className="border">
         <CardHeader className="pb-3">
           <CardTitle>
@@ -395,7 +508,8 @@ export const EnvelopeEditorUploadPage = () => {
                         key={localFile.id}
                         isDragDisabled={
                           isCreatingEnvelopeItems ||
-                          !canItemsBeModified ||
+                          !envelopeItemPermissions.canOrderBeChanged ||
+                          localFile.isReplacing ||
                           !uploadConfig?.allowConfigureOrder
                         }
                         draggableId={localFile.id}
@@ -411,7 +525,7 @@ export const EnvelopeEditorUploadPage = () => {
                               snapshot.isDragging ? 'shadow-md' : ''
                             }`}
                           >
-                            <div className="flex items-center space-x-3">
+                            <div className="flex min-w-0 items-center space-x-3">
                               {uploadConfig?.allowConfigureOrder && (
                                 <div
                                   {...provided.dragHandleProps}
@@ -422,12 +536,13 @@ export const EnvelopeEditorUploadPage = () => {
                                 </div>
                               )}
 
-                              <div>
+                              <div className="min-w-0">
                                 {localFile.envelopeItemId !== null ? (
                                   <EnvelopeItemTitleInput
                                     disabled={
-                                      envelope.status !== DocumentStatus.DRAFT ||
-                                      !uploadConfig?.allowConfigureTitle
+                                      !envelopeItemPermissions.canTitleBeChanged ||
+                                      !uploadConfig?.allowConfigureTitle ||
+                                      localFile.isReplacing
                                     }
                                     value={localFile.title}
                                     dataTestId={`envelope-item-title-input-${localFile.id}`}
@@ -445,15 +560,14 @@ export const EnvelopeEditorUploadPage = () => {
                                     <Trans>Uploading</Trans>
                                   ) : localFile.isError ? (
                                     <Trans>Something went wrong while uploading this file</Trans>
-                                  ) : // <div className="text-xs text-gray-500">2.4 MB • 3 pages</div>
-                                  null}
+                                  ) : null}
                                 </div>
                               </div>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex shrink-0 items-center space-x-2">
                               {localFile.isUploading && (
                                 <div className="flex h-6 w-10 items-center justify-center">
-                                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                                  <Loader2Icon className="h-4 w-4 animate-spin text-muted-foreground" />
                                 </div>
                               )}
 
@@ -463,8 +577,28 @@ export const EnvelopeEditorUploadPage = () => {
                                 </div>
                               )}
 
-                              {!localFile.isUploading &&
-                                localFile.envelopeItemId &&
+                              {localFile.envelopeItemId &&
+                                envelopeItemPermissions.canFileBeChanged &&
+                                uploadConfig?.allowReplace && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    data-testid={`envelope-item-replace-button-${localFile.id}`}
+                                    disabled={localFile.isReplacing || localFile.isUploading}
+                                    onClick={() => {
+                                      replacingItemIdRef.current = localFile.envelopeItemId;
+                                      openReplaceFilePicker();
+                                    }}
+                                  >
+                                    {localFile.isReplacing ? (
+                                      <Loader2Icon className="h-4 w-4 animate-spin text-muted-foreground" />
+                                    ) : (
+                                      <PencilIcon className="h-4 w-4" />
+                                    )}
+                                  </Button>
+                                )}
+
+                              {localFile.envelopeItemId &&
                                 uploadConfig?.allowDelete &&
                                 (isEmbedded ? (
                                   <Button
@@ -472,12 +606,13 @@ export const EnvelopeEditorUploadPage = () => {
                                     size="sm"
                                     data-testid={`envelope-item-remove-button-${localFile.id}`}
                                     onClick={() => onFileDelete(localFile.envelopeItemId!)}
+                                    disabled={localFile.isReplacing || localFile.isUploading}
                                   >
-                                    <X className="h-4 w-4" />
+                                    <XIcon className="h-4 w-4" />
                                   </Button>
                                 ) : (
                                   <EnvelopeItemDeleteDialog
-                                    canItemBeDeleted={canItemsBeModified}
+                                    canItemBeDeleted={envelopeItemPermissions.canFileBeChanged}
                                     envelopeId={envelope.id}
                                     envelopeItemId={localFile.envelopeItemId}
                                     envelopeItemTitle={localFile.title}
@@ -487,8 +622,9 @@ export const EnvelopeEditorUploadPage = () => {
                                         variant="ghost"
                                         size="sm"
                                         data-testid={`envelope-item-remove-button-${localFile.id}`}
+                                        disabled={localFile.isReplacing || localFile.isUploading}
                                       >
-                                        <X className="h-4 w-4" />
+                                        <XIcon className="h-4 w-4" />
                                       </Button>
                                     }
                                   />

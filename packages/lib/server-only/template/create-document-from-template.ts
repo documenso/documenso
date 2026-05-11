@@ -61,6 +61,7 @@ import { incrementDocumentId } from '../envelope/increment-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
+import { getOrganisationTemplateWhereInput } from './get-organisation-template-by-id';
 
 type FinalRecipient = Pick<
   Recipient,
@@ -312,29 +313,43 @@ export const createDocumentFromTemplate = async ({
   attachments,
   formValues,
 }: CreateDocumentFromTemplateOptions) => {
-  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+  const templateInclude = {
+    recipients: {
+      include: {
+        fields: true,
+      },
+    },
+    envelopeItems: {
+      include: {
+        documentData: true,
+      },
+    },
+    documentMeta: true,
+  } as const;
+
+  const { envelopeWhereInput, team: callerTeam } = await getEnvelopeWhereInput({
     id,
     type: EnvelopeType.TEMPLATE,
     userId,
     teamId,
   });
 
-  const template = await prisma.envelope.findUnique({
-    where: envelopeWhereInput,
-    include: {
-      recipients: {
-        include: {
-          fields: true,
-        },
-      },
-      envelopeItems: {
-        include: {
-          documentData: true,
-        },
-      },
-      documentMeta: true,
-    },
-  });
+  const [teamTemplate, organisationTemplate] = await Promise.all([
+    prisma.envelope.findFirst({
+      where: envelopeWhereInput,
+      include: templateInclude,
+    }),
+    prisma.envelope.findFirst({
+      where: getOrganisationTemplateWhereInput({
+        id,
+        organisationId: callerTeam.organisationId,
+        teamRole: callerTeam.currentTeamRole,
+      }),
+      include: templateInclude,
+    }),
+  ]);
+
+  const template = teamTemplate ?? organisationTemplate;
 
   if (!template) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
@@ -541,7 +556,7 @@ export const createDocumentFromTemplate = async ({
         templateId: legacyTemplateId, // The template this envelope was created from.
         userId,
         folderId,
-        teamId: template.teamId,
+        teamId,
         title: finalEnvelopeTitle,
         envelopeItems: {
           createMany: {

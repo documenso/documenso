@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { Link } from 'react-router';
 
@@ -14,7 +15,7 @@ import { OrganisationEmailDomainsDataTable } from '~/components/tables/organisat
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Email Domains');
+  return appMetaTags(msg`Email Domains`);
 }
 
 export default function OrganisationSettingsEmailDomains() {

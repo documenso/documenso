@@ -69,6 +69,8 @@ export const viewedDocument = async ({
         // This handles cases where distribution is done manually
         sendStatus: SendStatus.SENT,
         readStatus: ReadStatus.OPENED,
+        // Only set sentAt if not already set (email may have been sent before they opened).
+        ...(!recipient.sentAt ? { sentAt: new Date() } : {}),
       },
     });
 
@@ -91,6 +93,9 @@ export const viewedDocument = async ({
       }),
     });
   });
+
+  // Don't schedule reminders for manually distributed documents —
+  // there's no email pathway to send them through.
 
   const envelope = await prisma.envelope.findUniqueOrThrow({
     where: {

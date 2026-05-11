@@ -209,6 +209,7 @@ test.describe('API V2 Envelopes', () => {
             documentDeleted: false,
             ownerRecipientExpired: true,
             ownerDocumentCompleted: true,
+            ownerDocumentCreated: true,
           },
         },
         attachments: [

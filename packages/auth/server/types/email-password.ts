@@ -1,16 +1,20 @@
 import { z } from 'zod';
 
+import { ZNameSchema } from '@documenso/lib/constants/auth';
+import { zEmail } from '@documenso/lib/utils/zod';
+
 export const ZCurrentPasswordSchema = z
   .string()
   .min(6, { message: 'Must be at least 6 characters in length' })
   .max(72);
 
 export const ZSignInSchema = z.object({
-  email: z.string().email().min(1),
+  email: zEmail().min(1),
   password: ZCurrentPasswordSchema,
   totpCode: z.string().trim().optional(),
   backupCode: z.string().trim().optional(),
   csrfToken: z.string().trim(),
+  captchaToken: z.string().trim().optional(),
 });
 
 export type TSignInSchema = z.infer<typeof ZSignInSchema>;
@@ -33,16 +37,17 @@ export const ZPasswordSchema = z
   });
 
 export const ZSignUpSchema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
+  name: ZNameSchema,
+  email: zEmail(),
   password: ZPasswordSchema,
   signature: z.string().nullish(),
+  captchaToken: z.string().trim().optional(),
 });
 
 export type TSignUpSchema = z.infer<typeof ZSignUpSchema>;
 
 export const ZForgotPasswordSchema = z.object({
-  email: z.string().email().min(1),
+  email: zEmail().min(1),
 });
 
 export type TForgotPasswordSchema = z.infer<typeof ZForgotPasswordSchema>;
@@ -61,7 +66,7 @@ export const ZVerifyEmailSchema = z.object({
 export type TVerifyEmailSchema = z.infer<typeof ZVerifyEmailSchema>;
 
 export const ZResendVerifyEmailSchema = z.object({
-  email: z.string().email().min(1),
+  email: zEmail().min(1),
 });
 
 export type TResendVerifyEmailSchema = z.infer<typeof ZResendVerifyEmailSchema>;

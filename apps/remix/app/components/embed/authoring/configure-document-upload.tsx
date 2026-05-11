@@ -4,10 +4,11 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Cloud, FileText, Loader, X } from 'lucide-react';
-import { useDropzone } from 'react-dropzone';
+import { type FileRejection, useDropzone } from 'react-dropzone';
 import { useFormContext } from 'react-hook-form';
 
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
+import { buildDropzoneRejectionDescription } from '@documenso/ui/lib/handle-dropzone-rejection';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -82,10 +83,10 @@ export const ConfigureDocumentUpload = ({ isSubmitting = false }: ConfigureDocum
     }
   };
 
-  const onDropRejected = () => {
+  const onDropRejected = (fileRejections: FileRejection[]) => {
     toast({
       title: _(msg`Your document failed to upload.`),
-      description: _(msg`File cannot be larger than ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB`),
+      description: _(buildDropzoneRejectionDescription(fileRejections)),
       duration: 5000,
       variant: 'destructive',
     });
@@ -144,7 +145,7 @@ export const ConfigureDocumentUpload = ({ isSubmitting = false }: ConfigureDocum
                     <div
                       {...getRootProps()}
                       className={cn(
-                        'border-border bg-background relative flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed transition',
+                        'relative flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-border bg-background transition',
                         {
                           'border-primary/50 bg-primary/5': isDragActive,
                           'hover:bg-muted/30':
@@ -193,21 +194,21 @@ export const ConfigureDocumentUpload = ({ isSubmitting = false }: ConfigureDocum
                   </FormControl>
 
                   {isLoading && (
-                    <div className="bg-background/50 absolute inset-0 flex items-center justify-center rounded-lg">
-                      <Loader className="text-muted-foreground h-10 w-10 animate-spin" />
+                    <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-background/50">
+                      <Loader className="h-10 w-10 animate-spin text-muted-foreground" />
                     </div>
                   )}
                 </div>
               ) : (
                 <div className="mt-2 rounded-lg border p-4">
                   <div className="flex items-center gap-x-4">
-                    <div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-md">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary/10 text-primary">
                       <FileText className="h-6 w-6" />
                     </div>
 
                     <div className="flex-1">
                       <div className="text-sm font-medium">{documentData.name}</div>
-                      <div className="text-muted-foreground text-xs">
+                      <div className="text-xs text-muted-foreground">
                         {formatFileSize(documentData.size)}
                       </div>
                     </div>

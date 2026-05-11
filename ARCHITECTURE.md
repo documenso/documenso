@@ -65,8 +65,6 @@ Documenso is an open-source document signing platform built as a **monorepo** us
 | Package                      | Description               |
 | ---------------------------- | ------------------------- |
 | `@documenso/app-tests`       | E2E tests (Playwright)    |
-| `@documenso/eslint-config`   | Shared ESLint config      |
-| `@documenso/prettier-config` | Shared Prettier config    |
 | `@documenso/tailwind-config` | Shared Tailwind config    |
 | `@documenso/tsconfig`        | Shared TypeScript configs |
 
@@ -235,6 +233,7 @@ Processes async jobs.
 | Provider | Description           | Env Value         |
 | -------- | --------------------- | ----------------- |
 | Local    | Database-backed queue | `local` (default) |
+| BullMQ   | Redis-backed queue    | `bullmq`          |
 | Inngest  | Managed cloud service | `inngest`         |
 
 **Config**: `NEXT_PRIVATE_JOBS_PROVIDER`

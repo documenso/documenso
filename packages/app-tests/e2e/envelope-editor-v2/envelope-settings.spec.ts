@@ -31,6 +31,12 @@ const TEST_SETTINGS_VALUES = {
   expirationMode: 'Custom duration',
   expirationAmount: 5,
   expirationUnit: 'Weeks',
+  reminderMode: 'Enabled',
+  reminderSendAfterAmount: 3,
+  reminderSendAfterUnit: 'Days',
+  reminderRepeatMode: 'Custom interval',
+  reminderRepeatAmount: 7,
+  reminderRepeatUnit: 'Days',
   accessAuth: 'Require account',
   actionAuth: 'Require password',
   visibility: 'Managers and above',
@@ -42,6 +48,10 @@ const DB_EXPECTED_VALUES = {
   timezone: 'Europe/London',
   distributionMethod: DocumentDistributionMethod.NONE,
   envelopeExpirationPeriod: { unit: 'week', amount: 5 },
+  reminderSettings: {
+    sendAfter: { unit: 'day', amount: 3 },
+    repeatEvery: { unit: 'day', amount: 7 },
+  },
   visibility: DocumentVisibility.MANAGER_AND_ABOVE,
   globalAccessAuth: ['ACCOUNT'],
   globalActionAuth: ['PASSWORD'],
@@ -54,6 +64,7 @@ const DB_EXPECTED_VALUES = {
     documentDeleted: false,
     ownerDocumentCompleted: false,
     ownerRecipientExpired: false,
+    ownerDocumentCreated: false,
   },
 };
 
@@ -129,6 +140,66 @@ const runSettingsFlow = async (
   await root.getByRole('option', { name: TEST_SETTINGS_VALUES.expirationUnit }).click();
   await clickSettingsDialogHeader(root);
 
+  // Configure reminder settings.
+  await root.getByRole('button', { name: 'Reminders' }).click();
+
+  await root.locator('[data-testid="reminder-mode-select"]').click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderMode }).click();
+  await clickSettingsDialogHeader(root);
+
+  await root.locator('[data-testid="reminder-send-after-amount"]').clear();
+  await root
+    .locator('[data-testid="reminder-send-after-amount"]')
+    .fill(String(TEST_SETTINGS_VALUES.reminderSendAfterAmount));
+
+  await root.locator('[data-testid="reminder-send-after-unit"]').click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderSendAfterUnit }).click();
+  await clickSettingsDialogHeader(root);
+
+  await root.locator('[data-testid="reminder-repeat-mode-select"]').click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderRepeatMode }).click();
+  await clickSettingsDialogHeader(root);
+
+  await root.locator('[data-testid="reminder-repeat-amount"]').clear();
+  await root
+    .locator('[data-testid="reminder-repeat-amount"]')
+    .fill(String(TEST_SETTINGS_VALUES.reminderRepeatAmount));
+
+  await root.locator('[data-testid="reminder-repeat-unit"]').click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderRepeatUnit }).click();
+  await clickSettingsDialogHeader(root);
+
+  const spinbuttons = root.getByRole('spinbutton');
+  await spinbuttons.first().clear();
+  await spinbuttons.first().fill(String(TEST_SETTINGS_VALUES.reminderSendAfterAmount));
+
+  const sendAfterUnitTrigger = root
+    .locator('button[role="combobox"]')
+    .filter({ hasText: /Days|Weeks|Months/ })
+    .first();
+  await sendAfterUnitTrigger.click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderSendAfterUnit }).click();
+  await clickSettingsDialogHeader(root);
+
+  const repeatModeSelect = root
+    .locator('button[role="combobox"]')
+    .filter({ hasText: /Custom interval|Don't repeat/ })
+    .first();
+  await repeatModeSelect.click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderRepeatMode }).click();
+  await clickSettingsDialogHeader(root);
+
+  await spinbuttons.last().clear();
+  await spinbuttons.last().fill(String(TEST_SETTINGS_VALUES.reminderRepeatAmount));
+
+  const repeatUnitTrigger = root
+    .locator('button[role="combobox"]')
+    .filter({ hasText: /Days|Weeks|Months/ })
+    .last();
+  await repeatUnitTrigger.click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderRepeatUnit }).click();
+  await clickSettingsDialogHeader(root);
+
   await root.getByRole('button', { name: 'Email' }).click();
   await root.locator('#recipientSigned').click();
   await root.locator('#recipientSigningRequest').click();
@@ -138,6 +209,7 @@ const runSettingsFlow = async (
   await root.locator('#documentDeleted').click();
   await root.locator('#ownerDocumentCompleted').click();
   await root.locator('#ownerRecipientExpired').click();
+  await root.locator('#ownerDocumentCreated').click();
   await root.locator('input[name="meta.emailReplyTo"]').fill(TEST_SETTINGS_VALUES.replyTo);
   await root.locator('input[name="meta.subject"]').fill(TEST_SETTINGS_VALUES.subject);
   await root.locator('textarea[name="meta.message"]').fill(TEST_SETTINGS_VALUES.message);
@@ -198,6 +270,27 @@ const runSettingsFlow = async (
       .first(),
   ).toBeVisible();
 
+  // Verify reminder settings persisted in UI.
+  await root.getByRole('button', { name: 'Reminders' }).click();
+  await expect(root.locator('[data-testid="reminder-mode-select"]')).toContainText(
+    TEST_SETTINGS_VALUES.reminderMode,
+  );
+  await expect(root.locator('[data-testid="reminder-send-after-amount"]')).toHaveValue(
+    String(TEST_SETTINGS_VALUES.reminderSendAfterAmount),
+  );
+  await expect(root.locator('[data-testid="reminder-send-after-unit"]')).toContainText(
+    TEST_SETTINGS_VALUES.reminderSendAfterUnit,
+  );
+  await expect(root.locator('[data-testid="reminder-repeat-mode-select"]')).toContainText(
+    TEST_SETTINGS_VALUES.reminderRepeatMode,
+  );
+  await expect(root.locator('[data-testid="reminder-repeat-amount"]')).toHaveValue(
+    String(TEST_SETTINGS_VALUES.reminderRepeatAmount),
+  );
+  await expect(root.locator('[data-testid="reminder-repeat-unit"]')).toContainText(
+    TEST_SETTINGS_VALUES.reminderRepeatUnit,
+  );
+
   await root.getByRole('button', { name: 'Email' }).click();
   await expect(root.locator('#recipientSigned')).toHaveAttribute('aria-checked', 'false');
   await expect(root.locator('#recipientSigningRequest')).toHaveAttribute('aria-checked', 'false');
@@ -207,6 +300,7 @@ const runSettingsFlow = async (
   await expect(root.locator('#documentDeleted')).toHaveAttribute('aria-checked', 'false');
   await expect(root.locator('#ownerDocumentCompleted')).toHaveAttribute('aria-checked', 'false');
   await expect(root.locator('#ownerRecipientExpired')).toHaveAttribute('aria-checked', 'false');
+  await expect(root.locator('#ownerDocumentCreated')).toHaveAttribute('aria-checked', 'false');
   await expect(root.locator('input[name="meta.emailReplyTo"]')).toHaveValue(
     TEST_SETTINGS_VALUES.replyTo,
   );
@@ -282,6 +376,7 @@ const assertEnvelopeSettingsPersistedInDatabase = async ({
   expect(envelope.documentMeta.envelopeExpirationPeriod).toEqual(
     DB_EXPECTED_VALUES.envelopeExpirationPeriod,
   );
+  expect(envelope.documentMeta.reminderSettings).toEqual(DB_EXPECTED_VALUES.reminderSettings);
   expect(envelope.documentMeta.redirectUrl).toBe(TEST_SETTINGS_VALUES.redirectUrl);
   expect(envelope.documentMeta.emailReplyTo).toBe(TEST_SETTINGS_VALUES.replyTo);
   expect(envelope.documentMeta.subject).toBe(TEST_SETTINGS_VALUES.subject);

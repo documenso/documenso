@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
+import type { TurnstileInstance } from '@marsidev/react-turnstile';
+import { Turnstile } from '@marsidev/react-turnstile';
 import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
 import { KeyRoundIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -16,7 +18,9 @@ import { z } from 'zod';
 
 import { authClient } from '@documenso/auth/client';
 import { AuthenticationErrorCode } from '@documenso/auth/server/lib/errors/error-codes';
-import { AppError } from '@documenso/lib/errors/app-error';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { env } from '@documenso/lib/utils/env';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc } from '@documenso/trpc/react';
 import { ZCurrentPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
@@ -58,7 +62,7 @@ const handleFallbackErrorMessages = (code: string) => {
 const LOGIN_REDIRECT_PATH = '/';
 
 export const ZSignInFormSchema = z.object({
-  email: z.string().email().min(1),
+  email: zEmail().min(1),
   password: ZCurrentPasswordSchema,
   totpCode: z.string().trim().optional(),
   backupCode: z.string().trim().optional(),
@@ -99,6 +103,11 @@ export const SignInForm = ({
   >('totp');
 
   const hasSocialAuthEnabled = isGoogleSSOEnabled || isMicrosoftSSOEnabled || isOIDCSSOEnabled;
+
+  const turnstileSiteKey = env('NEXT_PUBLIC_TURNSTILE_SITE_KEY');
+  const turnstileRef = useRef<TurnstileInstance>(null);
+  const twoFactorTurnstileRef = useRef<TurnstileInstance>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
 
@@ -216,6 +225,7 @@ export const SignInForm = ({
         password,
         totpCode,
         backupCode,
+        captchaToken: captchaToken ?? undefined,
         redirectPath,
       });
     } catch (err) {
@@ -225,6 +235,11 @@ export const SignInForm = ({
 
       if (error.code === 'TWO_FACTOR_MISSING_CREDENTIALS') {
         setIsTwoFactorAuthenticationDialogOpen(true);
+
+        // Turnstile tokens are single-use. Clear the consumed one so the
+        // dialog's fresh widget mounts cleanly and the dialog can't be
+        // submitted with the stale token before a new one is issued.
+        setCaptchaToken(null);
         return;
       }
 
@@ -250,6 +265,10 @@ export const SignInForm = ({
           AuthenticationErrorCode.InvalidTwoFactorCode,
           () => msg`The two-factor authentication code provided is incorrect.`,
         )
+        .with(
+          AppErrorCode.INVALID_CAPTCHA,
+          () => msg`We were unable to verify that you're human. Please try again.`,
+        )
         .otherwise(() => handleFallbackErrorMessages(error.code));
 
       toast({
@@ -257,6 +276,9 @@ export const SignInForm = ({
         description: _(errorMessage),
         variant: 'destructive',
       });
+
+      turnstileRef.current?.reset();
+      setCaptchaToken(null);
     }
   };
 
@@ -376,6 +398,19 @@ export const SignInForm = ({
               </FormItem>
             )}
           />
+
+          {turnstileSiteKey && !isTwoFactorAuthenticationDialogOpen && (
+            <Turnstile
+              ref={turnstileRef}
+              siteKey={turnstileSiteKey}
+              onSuccess={setCaptchaToken}
+              onExpire={() => setCaptchaToken(null)}
+              options={{
+                size: 'flexible',
+                appearance: 'interaction-only',
+              }}
+            />
+          )}
 
           <Button
             type="submit"
@@ -516,6 +551,21 @@ export const SignInForm = ({
                 />
               )}
 
+              {turnstileSiteKey && (
+                <div className="mt-4">
+                  <Turnstile
+                    ref={twoFactorTurnstileRef}
+                    siteKey={turnstileSiteKey}
+                    onSuccess={setCaptchaToken}
+                    onExpire={() => setCaptchaToken(null)}
+                    options={{
+                      size: 'flexible',
+                      appearance: 'interaction-only',
+                    }}
+                  />
+                </div>
+              )}
+
               <DialogFooter className="mt-4">
                 <Button
                   type="button"
@@ -529,7 +579,11 @@ export const SignInForm = ({
                   )}
                 </Button>
 
-                <Button type="submit" loading={isSubmitting}>
+                <Button
+                  type="submit"
+                  loading={isSubmitting}
+                  disabled={Boolean(turnstileSiteKey) && !captchaToken}
+                >
                   {isSubmitting ? <Trans>Signing in...</Trans> : <Trans>Sign In</Trans>}
                 </Button>
               </DialogFooter>

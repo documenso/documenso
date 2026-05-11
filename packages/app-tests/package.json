@@ -5,9 +5,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:dev": "NODE_OPTIONS=--experimental-require-module playwright test",
-    "test-ui:dev": "NODE_OPTIONS=--experimental-require-module playwright test --ui",
-    "test:e2e": "NODE_OPTIONS=--experimental-require-module NODE_ENV=test NEXT_PRIVATE_LOGGER_FILE_PATH=./logs.json start-server-and-test \"npm run start -w @documenso/remix\" http://localhost:3000 \"playwright test $E2E_TEST_PATH\""
+    "test:dev": "NODE_OPTIONS='--import tsx' playwright test",
+    "test-ui:dev": "NODE_OPTIONS='--import tsx' playwright test --ui",
+    "test:e2e": "NODE_OPTIONS='--import tsx' NODE_ENV=test NEXT_PRIVATE_LOGGER_FILE_PATH=./logs.json start-server-and-test \"npm run start -w @documenso/remix\" http://localhost:3000 \"playwright test $E2E_TEST_PATH\""
   },
   "keywords": [],
   "author": "",
@@ -18,6 +18,7 @@
     "@playwright/test": "1.56.1",
     "@types/node": "^20",
     "@types/pngjs": "^6.0.5",
+    "tsx": "^4.20.6",
     "pixelmatch": "^7.1.0",
     "pngjs": "^7.0.0"
   },

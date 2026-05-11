@@ -11,6 +11,7 @@ import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-upda
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { isOrganisationRoleWithinUserHierarchy } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
@@ -108,7 +109,7 @@ export const OrganisationMemberInvitesTable = () => {
               avatarClass="h-12 w-12"
               avatarFallback={row.original.email.slice(0, 1).toUpperCase()}
               primaryText={
-                <span className="text-foreground/80 font-semibold">{row.original.email}</span>
+                <span className="font-semibold text-foreground/80">{row.original.email}</span>
               }
             />
           );
@@ -129,7 +130,7 @@ export const OrganisationMemberInvitesTable = () => {
         cell: ({ row }) => (
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <MoreHorizontal className="text-muted-foreground h-5 w-5" />
+              <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent className="w-52" align="start" forceMount>
@@ -149,17 +150,22 @@ export const OrganisationMemberInvitesTable = () => {
                 <Trans>Resend</Trans>
               </DropdownMenuItem>
 
-              <DropdownMenuItem
-                onClick={async () =>
-                  deleteOrganisationMemberInvitations({
-                    organisationId: organisation.id,
-                    invitationIds: [row.original.id],
-                  })
-                }
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                <Trans>Remove</Trans>
-              </DropdownMenuItem>
+              {isOrganisationRoleWithinUserHierarchy(
+                organisation.currentOrganisationRole,
+                row.original.organisationRole,
+              ) && (
+                <DropdownMenuItem
+                  onClick={async () =>
+                    deleteOrganisationMemberInvitations({
+                      organisationId: organisation.id,
+                      invitationIds: [row.original.id],
+                    })
+                  }
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  <Trans>Remove</Trans>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         ),

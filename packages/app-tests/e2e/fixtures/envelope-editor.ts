@@ -247,6 +247,9 @@ export const getEnvelopeItemDragHandles = (root: Page) =>
 export const getEnvelopeItemRemoveButtons = (root: Page) =>
   root.locator('[data-testid^="envelope-item-remove-button-"]');
 
+export const getEnvelopeItemReplaceButtons = (root: Page) =>
+  root.locator('[data-testid^="envelope-item-replace-button-"]');
+
 export const getEnvelopeItemDropzoneInput = (root: Page) =>
   root.locator('[data-testid="envelope-item-dropzone"] input[type="file"]');
 

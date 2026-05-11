@@ -14,6 +14,7 @@ import {
   ZDocumentAccessAuthSchema,
 } from '@documenso/lib/types/document-auth';
 import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -68,7 +69,7 @@ export type DocumentSigningCompleteDialogProps = {
 
 const ZNextSignerFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  email: z.string().email('Invalid email address'),
+  email: zEmail('Invalid email address'),
   accessAuthOptions: ZDocumentAccessAuthSchema.optional(),
 });
 
@@ -76,7 +77,7 @@ type TNextSignerFormSchema = z.infer<typeof ZNextSignerFormSchema>;
 
 const ZDirectRecipientFormSchema = z.object({
   name: z.string(),
-  email: z.string().email('Invalid email address'),
+  email: zEmail('Invalid email address'),
 });
 
 type TDirectRecipientFormSchema = z.infer<typeof ZDirectRecipientFormSchema>;

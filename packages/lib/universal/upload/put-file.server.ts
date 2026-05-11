@@ -41,7 +41,12 @@ export const putPdfFileServerSide = async (file: File, initialData?: string) => 
 
   const { type, data } = await putFileServerSide(file);
 
-  return await createDocumentData({ type, data, initialData });
+  const createdData = await createDocumentData({ type, data, initialData });
+
+  return {
+    documentData: createdData,
+    filePageCount: pdf.getPageCount(),
+  };
 };
 
 /**

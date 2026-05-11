@@ -18,7 +18,7 @@ import {
 } from '@documenso/lib/types/field';
 import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 
-import { zodFormData } from '../../utils/zod-form-data';
+import { zfdFile, zodFormData } from '../../utils/zod-form-data';
 import { ZCreateRecipientSchema } from '../recipient-router/schema';
 import type { TrpcRouteMeta } from '../trpc';
 import { ZDocumentExternalIdSchema, ZDocumentTitleSchema } from './schema';
@@ -79,7 +79,7 @@ export const ZCreateDocumentPayloadSchema = z.object({
 
 export const ZCreateDocumentRequestSchema = zodFormData({
   payload: zfd.json(ZCreateDocumentPayloadSchema),
-  file: zfd.file(),
+  file: zfdFile(),
 });
 
 export const ZCreateDocumentResponseSchema = z.object({

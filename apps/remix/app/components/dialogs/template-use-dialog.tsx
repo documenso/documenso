@@ -4,11 +4,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
 import { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
 import { FileTextIcon, InfoIcon, Plus, UploadCloudIcon, X } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
+import { match } from 'ts-pattern';
 import * as z from 'zod';
 
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
@@ -20,8 +20,8 @@ import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   SKIP_QUERY_BATCH_META,
 } from '@documenso/lib/constants/trpc';
-import { AppError } from '@documenso/lib/errors/app-error';
-import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { type TRecipientLite, ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -48,7 +48,6 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
-import type { Toast } from '@documenso/ui/primitives/use-toast';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 const ZAddRecipientsForNewDocumentSchema = z.object({
@@ -79,7 +78,7 @@ export type TemplateUseDialogProps = {
   envelopeId: string;
   templateId: number;
   templateSigningOrder?: DocumentSigningOrder | null;
-  recipients: Recipient[];
+  recipients: TRecipientLite[];
   documentDistributionMethod?: DocumentDistributionMethod;
   documentRootPath: string;
   trigger?: React.ReactNode;
@@ -202,19 +201,32 @@ export function TemplateUseDialog({
     } catch (err) {
       const error = AppError.parseError(err);
 
-      const toastPayload: Toast = {
+      const errorMessage = match(error.code)
+        .with(
+          'DOCUMENT_SEND_FAILED',
+          () => msg`The document was created but could not be sent to recipients.`,
+        )
+        .with(
+          AppErrorCode.INVALID_BODY,
+          AppErrorCode.INVALID_REQUEST,
+          () =>
+            msg`The document could not be created because of missing or invalid information. Please review the template's recipients and fields.`,
+        )
+        .with(
+          AppErrorCode.NOT_FOUND,
+          () => msg`The template or one of its recipients could not be found.`,
+        )
+        .with(
+          AppErrorCode.LIMIT_EXCEEDED,
+          () => msg`You have reached your document limit for this plan.`,
+        )
+        .otherwise(() => msg`An error occurred while creating document from template.`);
+
+      toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while creating document from template.`),
+        description: _(errorMessage),
         variant: 'destructive',
-      };
-
-      if (error.code === 'DOCUMENT_SEND_FAILED') {
-        toastPayload.description = _(
-          msg`The document was created but could not be sent to recipients.`,
-        );
-      }
-
-      toast(toastPayload);
+      });
     }
   };
 

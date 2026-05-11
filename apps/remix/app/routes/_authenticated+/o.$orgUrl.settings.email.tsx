@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
@@ -13,7 +14,7 @@ import { SettingsHeader } from '~/components/general/settings-header';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Email Preferences');
+  return appMetaTags(msg`Email Preferences`);
 }
 
 export default function OrganisationSettingsGeneral() {
