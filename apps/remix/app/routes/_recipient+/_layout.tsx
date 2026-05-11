@@ -1,18 +1,18 @@
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import { i18n } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { ChevronLeft } from 'lucide-react';
 import { isRouteErrorResponse, Link, Outlet } from 'react-router';
-
 import { Header as AuthenticatedHeader } from '~/components/general/app-header';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
-
 import type { Route } from './+types/_layout';
 
 export function meta() {
   return [
-    { title: 'Sign Document - Documenso' },
+    { title: i18n._(msg`Sign Document - Documenso`) },
     { name: 'robots', content: 'noindex, nofollow, noarchive, nosnippet, noimageindex' },
   ];
 }
