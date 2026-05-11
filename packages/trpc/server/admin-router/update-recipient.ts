@@ -1,16 +1,13 @@
 import { updateRecipient } from '@documenso/lib/server-only/admin/update-recipient';
 
 import { adminProcedure } from '../trpc';
-import {
-  ZUpdateRecipientRequestSchema,
-  ZUpdateRecipientResponseSchema,
-} from './update-recipient.types';
+import { ZUpdateRecipientRequestSchema, ZUpdateRecipientResponseSchema } from './update-recipient.types';
 
 export const updateRecipientRoute = adminProcedure
   .input(ZUpdateRecipientRequestSchema)
   .output(ZUpdateRecipientResponseSchema)
   .mutation(async ({ input, ctx }) => {
-    const { id, name, email } = input;
+    const { id, name, email, role } = input;
 
     ctx.logger.info({
       input: {
@@ -18,5 +15,5 @@ export const updateRecipientRoute = adminProcedure
       },
     });
 
-    await updateRecipient({ id, name, email });
+    await updateRecipient({ id, name, email, role });
   });

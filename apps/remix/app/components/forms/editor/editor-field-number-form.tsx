@@ -1,10 +1,3 @@
-import { useEffect } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { useForm, useWatch } from 'react-hook-form';
-import type { z } from 'zod';
-
 import {
   DEFAULT_FIELD_FONT_SIZE,
   FIELD_DEFAULT_GENERIC_ALIGN,
@@ -15,23 +8,15 @@ import {
   ZNumberFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { numberFormatValues } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Separator } from '@documenso/ui/primitives/separator';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { useEffect } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import type { z } from 'zod';
 
 import {
   EditorGenericFontSizeField,
@@ -167,7 +152,12 @@ export const EditorFieldNumberForm = ({
                   <Trans>Placeholder</Trans>
                 </FormLabel>
                 <FormControl>
-                  <Input className="bg-background" placeholder={t`Placeholder`} {...field} />
+                  <Input
+                    data-testid="field-form-placeholder"
+                    className="bg-background"
+                    placeholder={t`Placeholder`}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -183,7 +173,7 @@ export const EditorFieldNumberForm = ({
                   <Trans>Value</Trans>
                 </FormLabel>
                 <FormControl>
-                  <Input className="bg-background" placeholder={t`Value`} {...field} />
+                  <Input data-testid="field-form-value" className="bg-background" placeholder={t`Value`} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -203,7 +193,10 @@ export const EditorFieldNumberForm = ({
                     value={field.value === null ? '-1' : field.value}
                     onValueChange={(value) => field.onChange(value === '-1' ? null : value)}
                   >
-                    <SelectTrigger className="text-muted-foreground bg-background w-full">
+                    <SelectTrigger
+                      data-testid="field-form-numberFormat"
+                      className="w-full bg-background text-muted-foreground"
+                    >
                       <SelectValue placeholder={t`Field format`} />
                     </SelectTrigger>
                     <SelectContent position="popper">
@@ -238,11 +231,11 @@ export const EditorFieldNumberForm = ({
 
           {/* Validation section */}
           <section className="space-y-2">
-            <div className="-mx-4 mb-4 mt-2">
+            <div className="-mx-4 mt-2 mb-4">
               <Separator />
             </div>
 
-            <p className="text-sm font-medium">
+            <p className="font-medium text-sm">
               <Trans>Validation</Trans>
             </p>
 
@@ -257,13 +250,12 @@ export const EditorFieldNumberForm = ({
                     </FormLabel>
                     <FormControl>
                       <Input
+                        data-testid="field-form-minValue"
                         className="bg-background"
-                        placeholder="E.g. 0"
+                        placeholder={t`E.g. 0`}
                         {...field}
                         value={field.value ?? ''}
-                        onChange={(e) =>
-                          field.onChange(e.target.value === '' ? null : e.target.value)
-                        }
+                        onChange={(e) => field.onChange(e.target.value === '' ? null : e.target.value)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -281,13 +273,12 @@ export const EditorFieldNumberForm = ({
                     </FormLabel>
                     <FormControl>
                       <Input
+                        data-testid="field-form-maxValue"
                         className="bg-background"
-                        placeholder="E.g. 100"
+                        placeholder={t`E.g. 100`}
                         {...field}
                         value={field.value ?? ''}
-                        onChange={(e) =>
-                          field.onChange(e.target.value === '' ? null : e.target.value)
-                        }
+                        onChange={(e) => field.onChange(e.target.value === '' ? null : e.target.value)}
                       />
                     </FormControl>
                     <FormMessage />

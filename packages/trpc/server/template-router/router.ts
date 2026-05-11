@@ -1,24 +1,23 @@
-import type { Envelope } from '@prisma/client';
-import { DocumentDataType, EnvelopeType } from '@prisma/client';
-
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobs } from '@documenso/lib/jobs/client';
-import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
+import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import { duplicateEnvelope } from '@documenso/lib/server-only/envelope/duplicate-envelope';
 import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
 import {
-  ZCreateDocumentFromDirectTemplateResponseSchema,
   createDocumentFromDirectTemplate,
+  ZCreateDocumentFromDirectTemplateResponseSchema,
 } from '@documenso/lib/server-only/template/create-document-from-direct-template';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createTemplateDirectLink } from '@documenso/lib/server-only/template/create-template-direct-link';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { deleteTemplateDirectLink } from '@documenso/lib/server-only/template/delete-template-direct-link';
+import { findOrganisationTemplates } from '@documenso/lib/server-only/template/find-organisation-templates';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
+import { getOrganisationTemplateById } from '@documenso/lib/server-only/template/get-organisation-template-by-id';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
@@ -27,6 +26,8 @@ import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { mapFieldToLegacyField } from '@documenso/lib/utils/fields';
 import { mapRecipientToLegacyRecipient } from '@documenso/lib/utils/recipients';
 import { mapEnvelopeToTemplateLite } from '@documenso/lib/utils/templates';
+import type { Envelope } from '@prisma/client';
+import { DocumentDataType, EnvelopeType } from '@prisma/client';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
@@ -46,8 +47,11 @@ import {
   ZDeleteTemplateMutationSchema,
   ZDuplicateTemplateMutationSchema,
   ZDuplicateTemplateResponseSchema,
+  ZFindOrganisationTemplatesRequestSchema,
   ZFindTemplatesRequestSchema,
   ZFindTemplatesResponseSchema,
+  ZGetOrganisationTemplateByIdRequestSchema,
+  ZGetOrganisationTemplateByIdResponseSchema,
   ZGetTemplateByIdRequestSchema,
   ZGetTemplateByIdResponseSchema,
   ZToggleTemplateDirectLinkRequestSchema,
@@ -55,6 +59,7 @@ import {
   ZUpdateTemplateRequestSchema,
   ZUpdateTemplateResponseSchema,
 } from './schema';
+import { searchTemplateRoute } from './search-template';
 
 export const templateRouter = router({
   /**
@@ -111,14 +116,79 @@ export const templateRouter = router({
             useLegacyFieldInsertion: envelope.useLegacyFieldInsertion,
             team: envelope.team,
             fields: envelope.fields.map((field) => mapFieldToLegacyField(field, envelope)),
-            recipients: envelope.recipients.map((recipient) =>
-              mapRecipientToLegacyRecipient(recipient, envelope),
-            ),
+            recipients: envelope.recipients.map((recipient) => mapRecipientToLegacyRecipient(recipient, envelope)),
             templateMeta: envelope.documentMeta,
             directLink: envelope.directLink,
           };
         }),
       };
+    }),
+
+  /**
+   * @private
+   */
+  findOrganisationTemplates: authenticatedProcedure
+    .input(ZFindOrganisationTemplatesRequestSchema)
+    .output(ZFindTemplatesResponseSchema)
+    .query(async ({ input, ctx }) => {
+      const { teamId } = ctx;
+
+      const result = await findOrganisationTemplates({
+        userId: ctx.user.id,
+        teamId,
+        ...input,
+      });
+
+      // Remapping for backwards compatibility.
+      return {
+        ...result,
+        data: result.data.map((envelope) => {
+          const legacyTemplateId = mapSecondaryIdToTemplateId(envelope.secondaryId);
+
+          return {
+            id: legacyTemplateId,
+            envelopeId: envelope.id,
+            type: envelope.templateType,
+            visibility: envelope.visibility,
+            externalId: envelope.externalId,
+            title: envelope.title,
+            userId: envelope.userId,
+            teamId: envelope.teamId,
+            authOptions: envelope.authOptions,
+            createdAt: envelope.createdAt,
+            updatedAt: envelope.updatedAt,
+            publicTitle: envelope.publicTitle,
+            publicDescription: envelope.publicDescription,
+            folderId: envelope.folderId,
+            useLegacyFieldInsertion: envelope.useLegacyFieldInsertion,
+            team: envelope.team,
+            fields: envelope.fields.map((field) => mapFieldToLegacyField(field, envelope)),
+            recipients: envelope.recipients.map((recipient) => mapRecipientToLegacyRecipient(recipient, envelope)),
+            templateMeta: envelope.documentMeta,
+            directLink: envelope.directLink,
+          };
+        }),
+      };
+    }),
+
+  /**
+   * @private
+   */
+  getOrganisationTemplateById: authenticatedProcedure
+    .input(ZGetOrganisationTemplateByIdRequestSchema)
+    .output(ZGetOrganisationTemplateByIdResponseSchema)
+    .query(async ({ input, ctx }) => {
+      const { teamId } = ctx;
+      const { envelopeId } = input;
+
+      return await getOrganisationTemplateById({
+        id: {
+          type: 'envelopeId',
+          id: envelopeId,
+        },
+        userId: ctx.user.id,
+        teamId,
+      });
     }),
 
   /**
@@ -159,6 +229,8 @@ export const templateRouter = router({
    * @public
    */
   getMany: getTemplatesByIdsRoute,
+
+  search: searchTemplateRoute,
 
   /**
    * Wait until RR7 so we can passthrough documents.
@@ -525,6 +597,10 @@ export const templateRouter = router({
         }).catch((err) => {
           console.error(err);
 
+          if (err instanceof AppError) {
+            throw err;
+          }
+
           throw new AppError('DOCUMENT_SEND_FAILED');
         });
       }
@@ -713,53 +789,51 @@ export const templateRouter = router({
   /**
    * @private
    */
-  uploadBulkSend: authenticatedProcedure
-    .input(ZBulkSendTemplateMutationSchema)
-    .mutation(async ({ ctx, input }) => {
-      const { templateId, teamId, csv, sendImmediately } = input;
-      const { user } = ctx;
+  uploadBulkSend: authenticatedProcedure.input(ZBulkSendTemplateMutationSchema).mutation(async ({ ctx, input }) => {
+    const { templateId, teamId, csv, sendImmediately } = input;
+    const { user } = ctx;
 
-      ctx.logger.info({
-        input: {
-          templateId,
-          teamId,
-        },
-      });
-
-      if (csv.length > 4 * 1024 * 1024) {
-        throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
-          message: 'File size exceeds 4MB limit',
-          statusCode: 400,
-        });
-      }
-
-      const template = await getTemplateById({
-        id: {
-          type: 'templateId',
-          id: templateId,
-        },
+    ctx.logger.info({
+      input: {
+        templateId,
         teamId,
+      },
+    });
+
+    if (csv.length > 4 * 1024 * 1024) {
+      throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
+        message: 'File size exceeds 4MB limit',
+        statusCode: 400,
+      });
+    }
+
+    const template = await getTemplateById({
+      id: {
+        type: 'templateId',
+        id: templateId,
+      },
+      teamId,
+      userId: user.id,
+    });
+
+    if (!template) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Template not found',
+      });
+    }
+
+    await jobs.triggerJob({
+      name: 'internal.bulk-send-template',
+      payload: {
         userId: user.id,
-      });
+        teamId,
+        templateId,
+        csvContent: csv,
+        sendImmediately,
+        requestMetadata: ctx.metadata.requestMetadata,
+      },
+    });
 
-      if (!template) {
-        throw new AppError(AppErrorCode.NOT_FOUND, {
-          message: 'Template not found',
-        });
-      }
-
-      await jobs.triggerJob({
-        name: 'internal.bulk-send-template',
-        payload: {
-          userId: user.id,
-          teamId,
-          templateId,
-          csvContent: csv,
-          sendImmediately,
-          requestMetadata: ctx.metadata.requestMetadata,
-        },
-      });
-
-      return { success: true };
-    }),
+    return { success: true };
+  }),
 });

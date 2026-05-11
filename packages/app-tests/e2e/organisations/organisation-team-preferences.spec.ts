@@ -1,10 +1,9 @@
-import { expect, test } from '@playwright/test';
-
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
 import { prisma } from '@documenso/prisma';
 import { DocumentVisibility } from '@documenso/prisma/client';
 import { seedTeamDocumentWithMeta } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -205,9 +204,9 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Reply to email' }).fill('organisation@documenso.com');
 
   // Update email document settings by enabling/disabling some checkboxes
-  await page.getByRole('checkbox', { name: 'Send recipient signed email' }).uncheck();
-  await page.getByRole('checkbox', { name: 'Send document pending email' }).uncheck();
-  await page.getByRole('checkbox', { name: 'Send document deleted email' }).uncheck();
+  await page.getByRole('checkbox', { name: 'Email the owner when a recipient signs' }).uncheck();
+  await page.getByRole('checkbox', { name: 'Email the signer if the document is still pending' }).uncheck();
+  await page.getByRole('checkbox', { name: 'Email recipients when a pending document is deleted' }).uncheck();
 
   await page.getByRole('button', { name: 'Update' }).first().click();
   await expect(page.getByText('Your email preferences have been updated').first()).toBeVisible();
@@ -225,7 +224,9 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentPending: false, // unchecked
     documentCompleted: true,
     documentDeleted: false, // unchecked
+    ownerRecipientExpired: true,
     ownerDocumentCompleted: true,
+    ownerDocumentCreated: true,
   });
 
   // Edit the team email settings
@@ -240,13 +241,9 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   await page.getByRole('option', { name: 'Override organisation settings' }).click();
 
   // Update some email settings
-  await page.getByRole('checkbox', { name: 'Send recipient signing request email' }).uncheck();
-  await page
-    .getByRole('checkbox', { name: 'Send document completed email', exact: true })
-    .uncheck();
-  await page
-    .getByRole('checkbox', { name: 'Send document completed email to the owner' })
-    .uncheck();
+  await page.getByRole('checkbox', { name: 'Email recipients with a signing request' }).uncheck();
+  await page.getByRole('checkbox', { name: 'Email recipients when the document is completed', exact: true }).uncheck();
+  await page.getByRole('checkbox', { name: 'Email the owner when the document is completed' }).uncheck();
 
   await page.getByRole('button', { name: 'Update' }).first().click();
   await expect(page.getByText('Your email preferences have been updated').first()).toBeVisible();
@@ -264,7 +261,9 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentPending: true,
     documentCompleted: false,
     documentDeleted: true,
+    ownerRecipientExpired: true,
     ownerDocumentCompleted: false,
+    ownerDocumentCreated: true,
   });
 
   // Verify that a document can be created successfully with the team email settings
@@ -284,7 +283,9 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentPending: true,
     documentCompleted: false,
     documentDeleted: true,
+    ownerRecipientExpired: true,
     ownerDocumentCompleted: false,
+    ownerDocumentCreated: true,
   });
 
   // Test inheritance by setting team back to inherit from organisation
@@ -309,7 +310,9 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentPending: false,
     documentCompleted: true,
     documentDeleted: false,
+    ownerRecipientExpired: true,
     ownerDocumentCompleted: true,
+    ownerDocumentCreated: true,
   });
 
   // Verify that a document can be created successfully with the email settings
@@ -329,6 +332,8 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     documentPending: false,
     documentCompleted: true,
     documentDeleted: false,
+    ownerRecipientExpired: true,
     ownerDocumentCompleted: true,
+    ownerDocumentCreated: true,
   });
 });

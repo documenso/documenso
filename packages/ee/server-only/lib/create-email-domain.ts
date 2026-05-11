@@ -1,8 +1,4 @@
 import { CreateEmailIdentityCommand, SESv2Client } from '@aws-sdk/client-sesv2';
-import { EmailDomainStatus } from '@prisma/client';
-import { generateKeyPair } from 'crypto';
-import { promisify } from 'util';
-
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
@@ -10,6 +6,9 @@ import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { generateEmailDomainRecords } from '@documenso/lib/utils/email-domains';
 import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
+import { EmailDomainStatus } from '@prisma/client';
+import { generateKeyPair } from 'crypto';
+import { promisify } from 'util';
 
 export const getSesClient = () => {
   const accessKeyId = env('NEXT_PRIVATE_SES_ACCESS_KEY_ID');
@@ -111,40 +110,40 @@ export const createEmailDomain = async ({ domain, organisationId }: CreateEmailD
     data: privateKeyFlattened,
   });
 
-  const emailDomain = await prisma.$transaction(async (tx) => {
-    await verifyDomainWithDKIM(domain, selector, privateKeyFlattened).catch((err) => {
-      if (err.name === 'AlreadyExistsException') {
-        throw new AppError(AppErrorCode.ALREADY_EXISTS, {
-          message: 'Domain already exists in SES',
-        });
-      }
+  // Verify domain with SES outside a transaction to avoid holding a
+  // connection open during the external API call.
+  await verifyDomainWithDKIM(domain, selector, privateKeyFlattened).catch((err) => {
+    if (err.name === 'AlreadyExistsException') {
+      throw new AppError(AppErrorCode.ALREADY_EXISTS, {
+        message: 'Domain already exists in SES',
+      });
+    }
 
-      throw err;
-    });
+    throw err;
+  });
 
-    // Create email domain record.
-    return await tx.emailDomain.create({
-      data: {
-        id: generateDatabaseId('email_domain'),
-        domain,
-        status: EmailDomainStatus.PENDING,
-        organisationId,
-        selector: recordName,
-        publicKey: publicKeyFlattened,
-        privateKey: encryptedPrivateKey,
-      },
-      select: {
-        id: true,
-        status: true,
-        organisationId: true,
-        domain: true,
-        selector: true,
-        publicKey: true,
-        createdAt: true,
-        updatedAt: true,
-        emails: true,
-      },
-    });
+  const emailDomain = await prisma.emailDomain.create({
+    data: {
+      id: generateDatabaseId('email_domain'),
+      domain,
+      status: EmailDomainStatus.PENDING,
+      organisationId,
+      selector: recordName,
+      publicKey: publicKeyFlattened,
+      privateKey: encryptedPrivateKey,
+    },
+    select: {
+      id: true,
+      status: true,
+      organisationId: true,
+      domain: true,
+      selector: true,
+      publicKey: true,
+      createdAt: true,
+      updatedAt: true,
+      lastVerifiedAt: true,
+      emails: true,
+    },
   });
 
   return {

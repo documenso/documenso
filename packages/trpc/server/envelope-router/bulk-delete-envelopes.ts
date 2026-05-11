@@ -1,16 +1,12 @@
-import { EnvelopeType } from '@prisma/client';
-import pMap from 'p-map';
-
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { getMultipleEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelopes-by-ids';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType } from '@prisma/client';
+import pMap from 'p-map';
 
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZBulkDeleteEnvelopesRequestSchema,
-  ZBulkDeleteEnvelopesResponseSchema,
-} from './bulk-delete-envelopes.types';
+import { ZBulkDeleteEnvelopesRequestSchema, ZBulkDeleteEnvelopesResponseSchema } from './bulk-delete-envelopes.types';
 
 export const bulkDeleteEnvelopesRoute = authenticatedProcedure
   // .meta(bulkDeleteEnvelopesMeta) // Keeping this as a private API for a little while until we're sure it's stable and the request/response schemas are finalized.

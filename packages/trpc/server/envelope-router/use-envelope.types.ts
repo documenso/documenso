@@ -1,6 +1,4 @@
-import { z } from 'zod';
-import { zfd } from 'zod-form-data';
-
+import { ZEnvelopeExpirationPeriod } from '@documenso/lib/constants/envelope-expiration';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
 import {
@@ -18,8 +16,10 @@ import {
 import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
 import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
 import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
+import { z } from 'zod';
+import { zfd } from 'zod-form-data';
 
-import { zodFormData } from '../../utils/zod-form-data';
+import { zfdFile, zodFormData } from '../../utils/zod-form-data';
 import type { TrpcRouteMeta } from '../trpc';
 import { ZRecipientWithSigningUrlSchema } from './schema';
 
@@ -66,9 +66,7 @@ export const ZUseEnvelopePayloadSchema = z.object({
           .describe('The envelope item ID from the template to replace with the uploaded file.'),
       }),
     )
-    .describe(
-      'Map uploaded files to specific envelope items in the template. If not provided, files will be ignored.',
-    )
+    .describe('Map uploaded files to specific envelope items in the template. If not provided, files will be ignored.')
     .optional(),
   folderId: z
     .string()
@@ -97,6 +95,7 @@ export const ZUseEnvelopePayloadSchema = z.object({
       uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
       drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
       allowDictateNextSigner: z.boolean().optional(),
+      envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullish(),
     })
     .describe('Override values from the template for the created document.')
     .optional(),
@@ -115,7 +114,7 @@ export const ZUseEnvelopePayloadSchema = z.object({
 
 export const ZUseEnvelopeRequestSchema = zodFormData({
   payload: zfd.json(ZUseEnvelopePayloadSchema),
-  files: zfd.repeatableOfType(zfd.file()).optional(),
+  files: zfd.repeatableOfType(zfdFile()).optional(),
 });
 
 export const ZUseEnvelopeResponseSchema = z.object({

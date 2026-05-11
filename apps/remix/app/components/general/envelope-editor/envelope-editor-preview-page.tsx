@@ -1,43 +1,52 @@
-import { lazy, useEffect, useMemo, useState } from 'react';
-
-import { faker } from '@faker-js/faker/locale/en';
-import { Trans } from '@lingui/react/macro';
-import { FieldType, SigningStatus } from '@prisma/client';
-import { FileTextIcon } from 'lucide-react';
-import { match } from 'ts-pattern';
-
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import {
   EnvelopeRenderProvider,
   useCurrentEnvelopeRender,
 } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
 import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
 import { toCheckboxCustomText } from '@documenso/lib/utils/fields';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
-import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { RecipientSelector } from '@documenso/ui/primitives/recipient-selector';
 import { Separator } from '@documenso/ui/primitives/separator';
+import type { Faker } from '@faker-js/faker';
+import { Trans } from '@lingui/react/macro';
+import { FieldType, SigningStatus } from '@prisma/client';
+import { FileTextIcon } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { match } from 'ts-pattern';
+
+import { EnvelopeGenericPageRenderer } from '~/components/general/envelope-editor/envelope-generic-page-renderer';
+import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
 
 import { EnvelopeRendererFileSelector } from './envelope-file-selector';
 
-const EnvelopeGenericPageRenderer = lazy(
-  async () => import('~/components/general/envelope-editor/envelope-generic-page-renderer'),
-);
-
-// Todo: Envelopes - Dynamically import faker
 export const EnvelopeEditorPreviewPage = () => {
-  const { envelope, editorFields } = useCurrentEnvelopeEditor();
+  const { envelope, editorFields, editorConfig } = useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem, fields } = useCurrentEnvelopeRender();
 
-  const [selectedPreviewMode, setSelectedPreviewMode] = useState<'recipient' | 'signed'>(
-    'recipient',
-  );
+  const scrollableContainerRef = useRef<HTMLDivElement>(null);
+
+  const [selectedPreviewMode, setSelectedPreviewMode] = useState<'recipient' | 'signed'>('recipient');
+
+  const [fakerInstance, setFakerInstance] = useState<Faker | null>(null);
+
+  useEffect(() => {
+    void import('@faker-js/faker/locale/en').then((mod) => {
+      setFakerInstance(mod.faker);
+    });
+  }, []);
 
   const fieldsWithPlaceholders = useMemo(() => {
+    if (!fakerInstance) {
+      return [];
+    }
+
+    const faker = fakerInstance;
     return fields.map((field) => {
       const fieldMeta = ZFieldAndMetaSchema.parse(field);
 
@@ -188,7 +197,7 @@ export const EnvelopeEditorPreviewPage = () => {
           .exhaustive(),
       };
     });
-  }, [fields, envelope, envelope.recipients, envelope.documentMeta]);
+  }, [fields, envelope, envelope.recipients, envelope.documentMeta, fakerInstance]);
 
   /**
    * Set the selected recipient to the first recipient in the envelope.
@@ -200,45 +209,49 @@ export const EnvelopeEditorPreviewPage = () => {
   // Override the parent renderer provider so we can inject custom fields.
   return (
     <EnvelopeRenderProvider
+      version="current"
       envelope={envelope}
+      envelopeItems={envelope.envelopeItems}
       token={undefined}
       fields={fieldsWithPlaceholders}
       recipients={envelope.recipients.map((recipient) => ({
         ...recipient,
         signingStatus: SigningStatus.SIGNED,
       }))}
+      presignToken={editorConfig?.embedded?.presignToken}
       overrideSettings={{
         mode: 'export',
       }}
     >
       <div className="relative flex h-full">
-        <div className="flex w-full flex-col overflow-y-auto">
+        <div className="flex h-full w-full flex-col overflow-y-auto px-2" ref={scrollableContainerRef}>
           {/* Horizontal envelope item selector */}
-          <EnvelopeRendererFileSelector fields={editorFields.localFields} />
+          <EnvelopeRendererFileSelector className="px-0" fields={editorFields.localFields} />
+
+          <Alert variant="warning" className="mx-auto max-w-[800px]">
+            <AlertTitle>
+              <Trans>Preview Mode</Trans>
+            </AlertTitle>
+            <AlertDescription>
+              <Trans>Preview what the signed document will look like with placeholder data</Trans>
+            </AlertDescription>
+          </Alert>
 
           {/* Document View */}
-          <div className="mt-4 flex flex-col items-center justify-center">
-            <Alert variant="warning" className="mb-4 max-w-[800px]">
-              <AlertTitle>
-                <Trans>Preview Mode</Trans>
-              </AlertTitle>
-              <AlertDescription>
-                <Trans>Preview what the signed document will look like with placeholder data</Trans>
-              </AlertDescription>
-            </Alert>
-
+          <div className="mt-4 flex h-full flex-col items-center justify-center">
             {currentEnvelopeItem !== null ? (
-              <PDFViewerKonvaLazy
-                renderer="editor"
+              <EnvelopePdfViewer
                 customPageRenderer={EnvelopeGenericPageRenderer}
+                scrollParentRef={scrollableContainerRef}
+                errorMessage={PDF_VIEWER_ERROR_MESSAGES.preview}
               />
             ) : (
               <div className="flex flex-col items-center justify-center py-32">
                 <FileTextIcon className="h-10 w-10 text-muted-foreground" />
-                <p className="mt-1 text-sm text-foreground">
+                <p className="mt-1 text-foreground text-sm">
                   <Trans>No documents found</Trans>
                 </p>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-1 text-muted-foreground text-sm">
                   <Trans>Please upload a document to continue</Trans>
                 </p>
               </div>
@@ -248,7 +261,7 @@ export const EnvelopeEditorPreviewPage = () => {
 
         {/* Right Section - Form Fields Panel */}
         {currentEnvelopeItem && false && (
-          <div className="sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-l border-gray-200 bg-white py-4">
+          <div className="sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-gray-200 border-l bg-white py-4">
             {/* Add fields section. */}
             <section className="px-4">
               {/* <h3 className="mb-2 text-sm font-semibold text-gray-900">
@@ -260,9 +273,7 @@ export const EnvelopeEditorPreviewPage = () => {
                   <Trans>Preview Mode</Trans>
                 </AlertTitle>
                 <AlertDescription>
-                  <Trans>
-                    Preview what the signed document will look like with placeholder data
-                  </Trans>
+                  <Trans>Preview what the signed document will look like with placeholder data</Trans>
                 </AlertDescription>
               </Alert>
 
@@ -315,15 +326,13 @@ export const EnvelopeEditorPreviewPage = () => {
 
                     {/* Recipient selector section. */}
                     <section className="px-4">
-                      <h3 className="mb-2 text-sm font-semibold text-gray-900">
+                      <h3 className="mb-2 font-semibold text-gray-900 text-sm">
                         <Trans>Selected Recipient</Trans>
                       </h3>
 
                       <RecipientSelector
                         selectedRecipient={editorFields.selectedRecipient}
-                        onSelectedRecipientChange={(recipient) =>
-                          editorFields.setSelectedRecipient(recipient.id)
-                        }
+                        onSelectedRecipientChange={(recipient) => editorFields.setSelectedRecipient(recipient.id)}
                         recipients={envelope.recipients}
                         className="w-full"
                         align="end"

@@ -1,7 +1,6 @@
+import { prisma } from '@documenso/prisma';
 import { hash } from '@node-rs/bcrypt';
 import type { User } from '@prisma/client';
-
-import { prisma } from '@documenso/prisma';
 
 import { SALT_ROUNDS } from '../../constants/auth';
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -60,13 +59,27 @@ export const createUser = async ({ name, email, password, signature }: CreateUse
   return user;
 };
 
+export type OnCreateUserHookOptions = {
+  /**
+   * When true, do not create a "Personal Organisation" for the new user.
+   * Used by the Organisation SSO signup path, where the user is intended
+   * to operate inside the SSO organisation rather than a personal space.
+   *
+   * Defaults to false — preserves the historical behaviour of creating a
+   * personal organisation for every new user.
+   */
+  skipPersonalOrganisation?: boolean;
+};
+
 /**
  * Should be run after a user is created, example during email password signup or google sign in.
  *
  * @returns User
  */
-export const onCreateUserHook = async (user: User) => {
-  await createPersonalOrganisation({ userId: user.id });
+export const onCreateUserHook = async (user: User, options: OnCreateUserHookOptions = {}) => {
+  if (!options.skipPersonalOrganisation) {
+    await createPersonalOrganisation({ userId: user.id });
+  }
 
   return user;
 };

@@ -1,7 +1,7 @@
+import type { TDocumentAuditLog } from '@documenso/lib/types/document-audit-logs';
+import { prisma } from '@documenso/prisma';
 import { PDF } from '@libpdf/core';
 import { i18n } from '@lingui/core';
-
-import { prisma } from '@documenso/prisma';
 
 import { ZSupportedLanguageCodeSchema } from '../../constants/i18n';
 import { parseDocumentAuditLogData } from '../../utils/document-audit-logs';
@@ -12,15 +12,24 @@ import { renderAuditLogs } from './render-audit-logs';
 
 type GenerateAuditLogPdfOptions = GenerateCertificatePdfOptions & {
   envelopeItems: string[];
+  additionalAuditLogs?: TDocumentAuditLog[];
 };
 
 export const generateAuditLogPdf = async (options: GenerateAuditLogPdfOptions) => {
-  const { envelope, envelopeOwner, envelopeItems, recipients, language, pageWidth, pageHeight } =
-    options;
+  const {
+    envelope,
+    envelopeOwner,
+    envelopeItems,
+    recipients,
+    language,
+    pageWidth,
+    pageHeight,
+    additionalAuditLogs = [],
+  } = options;
 
   const documentLanguage = ZSupportedLanguageCodeSchema.parse(language);
 
-  const [organisationClaim, auditLogs, messages] = await Promise.all([
+  const [organisationClaim, partialAuditLogs, messages] = await Promise.all([
     getOrganisationClaimByTeamId({ teamId: envelope.teamId }),
     getAuditLogs(envelope.id),
     getTranslations(documentLanguage),
@@ -30,6 +39,8 @@ export const generateAuditLogPdf = async (options: GenerateAuditLogPdfOptions) =
     locale: documentLanguage,
     messages,
   });
+
+  const auditLogs: TDocumentAuditLog[] = [...additionalAuditLogs, ...partialAuditLogs];
 
   const auditLogPages = await renderAuditLogs({
     envelope,

@@ -1,41 +1,6 @@
+import { CSS_LENGTH_REGEX, type TCssVarsSchema } from '@documenso/lib/types/css-vars';
 import { colord } from 'colord';
 import { toKebabCase } from 'remeda';
-import { z } from 'zod';
-
-export const ZCssVarsSchema = z
-  .object({
-    background: z.string().optional().describe('Base background color'),
-    foreground: z.string().optional().describe('Base text color'),
-    muted: z.string().optional().describe('Muted/subtle background color'),
-    mutedForeground: z.string().optional().describe('Muted/subtle text color'),
-    popover: z.string().optional().describe('Popover/dropdown background color'),
-    popoverForeground: z.string().optional().describe('Popover/dropdown text color'),
-    card: z.string().optional().describe('Card background color'),
-    cardBorder: z.string().optional().describe('Card border color'),
-    cardBorderTint: z.string().optional().describe('Card border tint/highlight color'),
-    cardForeground: z.string().optional().describe('Card text color'),
-    fieldCard: z.string().optional().describe('Field card background color'),
-    fieldCardBorder: z.string().optional().describe('Field card border color'),
-    fieldCardForeground: z.string().optional().describe('Field card text color'),
-    widget: z.string().optional().describe('Widget background color'),
-    widgetForeground: z.string().optional().describe('Widget text color'),
-    border: z.string().optional().describe('Default border color'),
-    input: z.string().optional().describe('Input field border color'),
-    primary: z.string().optional().describe('Primary action/button color'),
-    primaryForeground: z.string().optional().describe('Primary action/button text color'),
-    secondary: z.string().optional().describe('Secondary action/button color'),
-    secondaryForeground: z.string().optional().describe('Secondary action/button text color'),
-    accent: z.string().optional().describe('Accent/highlight color'),
-    accentForeground: z.string().optional().describe('Accent/highlight text color'),
-    destructive: z.string().optional().describe('Destructive/danger action color'),
-    destructiveForeground: z.string().optional().describe('Destructive/danger text color'),
-    ring: z.string().optional().describe('Focus ring color'),
-    radius: z.string().optional().describe('Border radius size in REM units'),
-    warning: z.string().optional().describe('Warning/alert color'),
-  })
-  .describe('Custom CSS variables for theming');
-
-export type TCssVarsSchema = z.infer<typeof ZCssVarsSchema>;
 
 export const toNativeCssVars = (vars: TCssVarsSchema) => {
   const cssVars: Record<string, string> = {};
@@ -47,15 +12,42 @@ export const toNativeCssVars = (vars: TCssVarsSchema) => {
       const color = colord(value);
       const { h, s, l } = color.toHsl();
 
-      cssVars[`--${toKebabCase(key)}`] = `${h} ${s} ${l}`;
+      // Tailwind's theme.css consumes these via `hsl(var(--token))`. CSS
+      // Color 4 space-separated `hsl()` requires `%` on saturation and
+      // lightness — without it, the function is invalid and the property
+      // falls back to its initial value (which is why bare numeric output
+      // here used to silently break customer colours).
+      cssVars[`--${toKebabCase(key)}`] = `${h} ${s}% ${l}%`;
     }
   }
 
-  if (radius) {
-    cssVars[`--radius`] = `${radius}`;
+  // Defence in depth: radius is interpolated raw into the rendered <style>
+  // block, so anything outside the length pattern is a CSS-injection vector.
+  // The Zod schema rejects bad values at the API boundary; this re-check
+  // protects against schema drift and any path that bypasses validation.
+  if (radius && CSS_LENGTH_REGEX.test(radius)) {
+    cssVars[`--radius`] = radius;
   }
 
   return cssVars;
+};
+
+/**
+ * Pure-string sibling of `toNativeCssVars` — returns the same set of CSS custom
+ * property declarations as a single string suitable for SSR inlining inside a
+ * rule block. Does not touch the DOM.
+ *
+ * Example: { background: '#111', radius: '0.5rem' }
+ *  -> "--background: 0 0% 6.7%; --radius: 0.5rem;"
+ *
+ * Saturation and lightness include the `%` suffix that
+ * `hsl(var(--token))` requires under CSS Color 4 space-separated syntax.
+ */
+export const toNativeCssVarsString = (vars: TCssVarsSchema): string => {
+  const map = toNativeCssVars(vars);
+  return Object.entries(map)
+    .map(([k, v]) => `${k}: ${v};`)
+    .join(' ');
 };
 
 export const injectCss = (options: { css?: string; cssVars?: TCssVarsSchema }) => {
@@ -63,7 +55,7 @@ export const injectCss = (options: { css?: string; cssVars?: TCssVarsSchema }) =
 
   if (css) {
     const style = document.createElement('style');
-    style.innerHTML = css;
+    style.textContent = css;
 
     document.head.appendChild(style);
   }

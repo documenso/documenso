@@ -1,28 +1,7 @@
-import { useMemo } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { Plural, useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import type { Webhook } from '@prisma/client';
-import {
-  CheckCircle2Icon,
-  EditIcon,
-  Loader,
-  MoreHorizontalIcon,
-  ScrollTextIcon,
-  Trash2Icon,
-  XCircleIcon,
-} from 'lucide-react';
-import { DateTime } from 'luxon';
-import { Link } from 'react-router';
-
 import { toFriendlyWebhookEventName } from '@documenso/lib/universal/webhook/to-friendly-webhook-event-name';
 import { trpc } from '@documenso/trpc/react';
-import { cn } from '@documenso/ui/lib/utils';
 import { Badge } from '@documenso/ui/primitives/badge';
-import { Button } from '@documenso/ui/primitives/button';
 import { DataTable, type DataTableColumnDef } from '@documenso/ui/primitives/data-table';
-import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,6 +11,12 @@ import {
 } from '@documenso/ui/primitives/dropdown-menu';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
+import { msg } from '@lingui/core/macro';
+import { Plural, Trans, useLingui } from '@lingui/react/macro';
+import type { Webhook } from '@prisma/client';
+import { EditIcon, Loader, MoreHorizontalIcon, ScrollTextIcon, Trash2Icon } from 'lucide-react';
+import { useMemo } from 'react';
+import { Link } from 'react-router';
 
 import { WebhookCreateDialog } from '~/components/dialogs/webhook-create-dialog';
 import { WebhookDeleteDialog } from '~/components/dialogs/webhook-delete-dialog';
@@ -41,7 +26,7 @@ import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Webhooks');
+  return appMetaTags(msg`Webhooks`);
 }
 
 export default function WebhookPage() {
@@ -65,10 +50,7 @@ export default function WebhookPage() {
         cell: ({ row }) => (
           <Link to={`/t/${team.url}/settings/webhooks/${row.original.id}`}>
             <p className="text-muted-foreground text-xs">{row.original.id}</p>
-            <p
-              className="text-foreground max-w-sm truncate text-xs font-semibold"
-              title={row.original.webhookUrl}
-            >
+            <p className="max-w-sm truncate font-semibold text-foreground text-xs" title={row.original.webhookUrl}>
               {row.original.webhookUrl}
             </p>
           </Link>
@@ -87,9 +69,7 @@ export default function WebhookPage() {
         cell: ({ row }) => (
           <p
             className="text-foreground"
-            title={row.original.eventTriggers
-              .map((event) => toFriendlyWebhookEventName(event))
-              .join(', ')}
+            title={row.original.eventTriggers.map((event) => toFriendlyWebhookEventName(event)).join(', ')}
           >
             <Plural value={row.original.eventTriggers.length} one="# Event" other="# Events" />
           </p>
@@ -130,11 +110,9 @@ export default function WebhookPage() {
           enable: isError,
         }}
         emptyState={
-          <div className="text-muted-foreground/60 flex h-60 flex-col items-center justify-center gap-y-4">
+          <div className="flex h-60 flex-col items-center justify-center gap-y-4 text-muted-foreground/60">
             <p>
-              <Trans>
-                You have no webhooks yet. Your webhooks will be shown here once you create them.
-              </Trans>
+              <Trans>You have no webhooks yet. Your webhooks will be shown here once you create them.</Trans>
             </p>
           </div>
         }
@@ -172,7 +150,7 @@ const WebhookTableActionDropdown = ({ webhook }: { webhook: Webhook }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger data-testid="webhook-table-action-btn">
-        <MoreHorizontalIcon className="text-muted-foreground h-5 w-5" />
+        <MoreHorizontalIcon className="h-5 w-5 text-muted-foreground" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" forceMount>

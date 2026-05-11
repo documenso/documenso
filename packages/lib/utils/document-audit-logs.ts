@@ -102,10 +102,8 @@ export const diffRecipientChanges = (
   const oldActionAuth = oldAuthOptions.actionAuth;
 
   const newAuthOptions = ZRecipientAuthOptionsSchema.parse(newRecipient.authOptions);
-  const newAccessAuth =
-    newAuthOptions?.accessAuth === undefined ? oldAccessAuth : newAuthOptions.accessAuth;
-  const newActionAuth =
-    newAuthOptions?.actionAuth === undefined ? oldActionAuth : newAuthOptions.actionAuth;
+  const newAccessAuth = newAuthOptions?.accessAuth === undefined ? oldAccessAuth : newAuthOptions.accessAuth;
+  const newActionAuth = newAuthOptions?.actionAuth === undefined ? oldActionAuth : newAuthOptions.actionAuth;
 
   if (!isDeepEqual(oldAccessAuth, newAccessAuth)) {
     diffs.push({
@@ -150,10 +148,7 @@ export const diffRecipientChanges = (
   return diffs;
 };
 
-export const diffFieldChanges = (
-  oldField: Field,
-  newField: Field,
-): TDocumentAuditLogFieldDiffSchema[] => {
+export const diffFieldChanges = (oldField: Field, newField: Field): TDocumentAuditLogFieldDiffSchema[] => {
   const diffs: TDocumentAuditLogFieldDiffSchema[] = [];
 
   if (
@@ -289,11 +284,7 @@ export const diffDocumentMetaChanges = (
  *
  * Provide a userId to prefix the action with the user, example 'X did Y'.
  */
-export const formatDocumentAuditLogAction = (
-  i18n: I18n,
-  auditLog: TDocumentAuditLog,
-  userId?: number,
-) => {
+export const formatDocumentAuditLogAction = (i18n: I18n, auditLog: TDocumentAuditLog, userId?: number) => {
   const isCurrentUser = userId === auditLog.userId;
   const user = auditLog.name || auditLog.email || '';
 
@@ -570,6 +561,30 @@ export const formatDocumentAuditLogAction = (
       }),
       you: msg`You deleted an envelope item with title ${data.envelopeItemTitle}`,
       user: msg`${user} deleted an envelope item with title ${data.envelopeItemTitle}`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_UPDATED }, () => ({
+      anonymous: msg({
+        message: `Envelope item updated`,
+        context: `Audit log format`,
+      }),
+      you: msg`You updated an envelope item`,
+      user: msg`${user} updated an envelope item`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_PDF_REPLACED }, ({ data }) => ({
+      anonymous: msg({
+        message: `Envelope item PDF replaced`,
+        context: `Audit log format`,
+      }),
+      you: msg`You replaced the PDF for envelope item ${data.envelopeItemTitle}`,
+      user: msg`${user} replaced the PDF for envelope item ${data.envelopeItemTitle}`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_EXPIRED }, ({ data }) => ({
+      anonymous: msg({
+        message: `Recipient signing window expired`,
+        context: `Audit log format`,
+      }),
+      you: msg`Signing window expired for ${data.recipientName || data.recipientEmail}`,
+      user: msg`Signing window expired for ${data.recipientName || data.recipientEmail}`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELEGATED_OWNER_CREATED }, ({ data }) => {
       const message = msg({

@@ -7,6 +7,7 @@
 import { DocumentSource, FieldType } from '@prisma/client';
 import { z } from 'zod';
 
+import { zEmail } from '../utils/zod';
 import { ZRecipientAccessAuthTypesSchema, ZRecipientActionAuthTypesSchema } from './document-auth';
 
 export const ZDocumentAuditLogTypeSchema = z.enum([
@@ -23,6 +24,8 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
 
   'ENVELOPE_ITEM_CREATED',
   'ENVELOPE_ITEM_DELETED',
+  'ENVELOPE_ITEM_UPDATED',
+  'ENVELOPE_ITEM_PDF_REPLACED',
 
   // Document events.
   'DOCUMENT_COMPLETED', // When the document is sealed and fully completed.
@@ -40,6 +43,7 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_VIEWED', // When the document is viewed by a recipient.
   'DOCUMENT_RECIPIENT_REJECTED', // When a recipient rejects the document.
   'DOCUMENT_RECIPIENT_COMPLETED', // When a recipient completes all their required tasks for the document.
+  'DOCUMENT_RECIPIENT_EXPIRED', // When a recipient's signing window expires.
   'DOCUMENT_SENT', // When the document transitions from DRAFT to PENDING.
   'DOCUMENT_TITLE_UPDATED', // When the document title is updated.
   'DOCUMENT_EXTERNAL_ID_UPDATED', // When the document external ID is updated.
@@ -59,6 +63,7 @@ export const ZDocumentAuditLogEmailTypeSchema = z.enum([
   'ASSISTING_REQUEST',
   'CC',
   'DOCUMENT_COMPLETED',
+  'REMINDER',
 ]);
 
 export const ZDocumentMetaDiffTypeSchema = z.enum([
@@ -74,13 +79,7 @@ export const ZDocumentMetaDiffTypeSchema = z.enum([
 ]);
 
 export const ZFieldDiffTypeSchema = z.enum(['DIMENSION', 'POSITION']);
-export const ZRecipientDiffTypeSchema = z.enum([
-  'NAME',
-  'ROLE',
-  'EMAIL',
-  'ACCESS_AUTH',
-  'ACTION_AUTH',
-]);
+export const ZRecipientDiffTypeSchema = z.enum(['NAME', 'ROLE', 'EMAIL', 'ACCESS_AUTH', 'ACTION_AUTH']);
 
 export const DOCUMENT_AUDIT_LOG_TYPE = ZDocumentAuditLogTypeSchema.Enum;
 export const DOCUMENT_EMAIL_TYPE = ZDocumentAuditLogEmailTypeSchema.Enum;
@@ -134,10 +133,7 @@ export const ZDocumentAuditLogDocumentMetaSchema = z.union([
   }),
 ]);
 
-export const ZDocumentAuditLogFieldDiffSchema = z.union([
-  ZFieldDiffDimensionSchema,
-  ZFieldDiffPositionSchema,
-]);
+export const ZDocumentAuditLogFieldDiffSchema = z.union([ZFieldDiffDimensionSchema, ZFieldDiffPositionSchema]);
 
 export const ZGenericFromToSchema = z.object({
   from: z.union([z.string(), z.array(z.string())]).nullable(),
@@ -209,6 +205,34 @@ export const ZDocumentAuditLogEventEnvelopeItemDeletedSchema = z.object({
 });
 
 /**
+ * Event: Envelope item updated.
+ */
+export const ZDocumentAuditLogEventEnvelopeItemUpdatedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_UPDATED),
+  data: z.object({
+    envelopeItemId: z.string(),
+    changes: z.array(
+      z.object({
+        field: z.string(),
+        from: z.string(),
+        to: z.string(),
+      }),
+    ),
+  }),
+});
+
+/**
+ * Event: Envelope item PDF replaced.
+ */
+export const ZDocumentAuditLogEventEnvelopeItemPdfReplacedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_PDF_REPLACED),
+  data: z.object({
+    envelopeItemId: z.string(),
+    envelopeItemTitle: z.string(),
+  }),
+});
+
+/**
  * Event: Email sent.
  */
 export const ZDocumentAuditLogEventEmailSentSchema = z.object({
@@ -248,7 +272,7 @@ export const ZDocumentAuditLogEventDocumentCreatedSchema = z.object({
         z.object({
           type: z.literal(DocumentSource.TEMPLATE_DIRECT_LINK),
           templateId: z.number(),
-          directRecipientEmail: z.string().email(),
+          directRecipientEmail: zEmail(),
         }),
       ])
       .optional(),
@@ -323,11 +347,7 @@ export const ZDocumentAuditLogEventDocumentFieldInsertedSchema = z.object({
         });
 
         // Replace legacy 'NONE' field security type with undefined.
-        if (
-          typeof input === 'object' &&
-          input !== null &&
-          JSON.stringify(input) === legacyNoneSecurityType
-        ) {
+        if (typeof input === 'object' && input !== null && JSON.stringify(input) === legacyNoneSecurityType) {
           return undefined;
         }
 
@@ -427,11 +447,7 @@ export const ZDocumentAuditLogEventDocumentFieldPrefilledSchema = z.object({
         });
 
         // Replace legacy 'NONE' field security type with undefined.
-        if (
-          typeof input === 'object' &&
-          input !== null &&
-          JSON.stringify(input) === legacyNoneSecurityType
-        ) {
+        if (typeof input === 'object' && input !== null && JSON.stringify(input) === legacyNoneSecurityType) {
           return undefined;
         }
 
@@ -694,6 +710,18 @@ export const ZDocumentAuditLogEventDocumentDelegatedOwnerCreatedSchema = z.objec
   }),
 });
 
+/**
+ * Event: Recipient's signing window expired.
+ */
+export const ZDocumentAuditLogEventRecipientExpiredSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_EXPIRED),
+  data: z.object({
+    recipientEmail: z.string(),
+    recipientName: z.string(),
+    recipientId: z.number(),
+  }),
+});
+
 export const ZDocumentAuditLogBaseSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
@@ -709,6 +737,8 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
   z.union([
     ZDocumentAuditLogEventEnvelopeItemCreatedSchema,
     ZDocumentAuditLogEventEnvelopeItemDeletedSchema,
+    ZDocumentAuditLogEventEnvelopeItemUpdatedSchema,
+    ZDocumentAuditLogEventEnvelopeItemPdfReplacedSchema,
     ZDocumentAuditLogEventEmailSentSchema,
     ZDocumentAuditLogEventDocumentCompletedSchema,
     ZDocumentAuditLogEventDocumentCreatedSchema,
@@ -739,6 +769,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventRecipientAddedSchema,
     ZDocumentAuditLogEventRecipientUpdatedSchema,
     ZDocumentAuditLogEventRecipientRemovedSchema,
+    ZDocumentAuditLogEventRecipientExpiredSchema,
   ]),
 );
 
@@ -747,17 +778,10 @@ export type TDocumentAuditLogType = z.infer<typeof ZDocumentAuditLogTypeSchema>;
 
 export type TDocumentAuditLogFieldDiffSchema = z.infer<typeof ZDocumentAuditLogFieldDiffSchema>;
 
-export type TDocumentAuditLogDocumentMetaDiffSchema = z.infer<
-  typeof ZDocumentAuditLogDocumentMetaSchema
->;
+export type TDocumentAuditLogDocumentMetaDiffSchema = z.infer<typeof ZDocumentAuditLogDocumentMetaSchema>;
 
-export type TDocumentAuditLogRecipientDiffSchema = z.infer<
-  typeof ZDocumentAuditLogRecipientDiffSchema
->;
+export type TDocumentAuditLogRecipientDiffSchema = z.infer<typeof ZDocumentAuditLogRecipientDiffSchema>;
 
-export type DocumentAuditLogByType<T = TDocumentAuditLog['type']> = Extract<
-  TDocumentAuditLog,
-  { type: T }
->;
+export type DocumentAuditLogByType<T = TDocumentAuditLog['type']> = Extract<TDocumentAuditLog, { type: T }>;
 
 export type TDocumentAuditLogBaseSchema = z.infer<typeof ZDocumentAuditLogBaseSchema>;

@@ -1,3 +1,13 @@
+import { getDocumentStats } from '@documenso/lib/server-only/admin/get-documents-stats';
+import { getRecipientsStats } from '@documenso/lib/server-only/admin/get-recipients-stats';
+import {
+  getMonthlyActiveUsers,
+  getOrganisationsWithSubscriptionsCount,
+  getUsersCount,
+  getUserWithSignedDocumentMonthlyGrowth,
+} from '@documenso/lib/server-only/admin/get-users-stats';
+import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
+import { getSignerConversionMonthly } from '@documenso/lib/server-only/user/get-signer-conversion';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -14,17 +24,6 @@ import {
   UserSquare2,
   Users,
 } from 'lucide-react';
-
-import { getDocumentStats } from '@documenso/lib/server-only/admin/get-documents-stats';
-import { getRecipientsStats } from '@documenso/lib/server-only/admin/get-recipients-stats';
-import {
-  getMonthlyActiveUsers,
-  getOrganisationsWithSubscriptionsCount,
-  getUserWithSignedDocumentMonthlyGrowth,
-  getUsersCount,
-} from '@documenso/lib/server-only/admin/get-users-stats';
-import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
-import { getSignerConversionMonthly } from '@documenso/lib/server-only/user/get-signer-conversion';
 
 import { AdminLicenseCard } from '~/components/general/admin-license-card';
 import { MonthlyActiveUsersChart } from '~/components/general/admin-monthly-active-user-charts';
@@ -84,79 +83,51 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
 
   return (
     <div>
-      <h2 className="text-4xl font-semibold">
+      <h2 className="font-semibold text-4xl">
         <Trans>Instance Stats</Trans>
       </h2>
 
       <div className="mt-8 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <CardMetric icon={Users} title={_(msg`Total Users`)} value={usersCount} />
         <CardMetric icon={File} title={_(msg`Total Documents`)} value={docStats.ALL} />
-        <CardMetric
-          icon={UserPlus}
-          title={_(msg`Active Subscriptions`)}
-          value={organisationsWithSubscriptionsCount}
-        />
+        <CardMetric icon={UserPlus} title={_(msg`Active Subscriptions`)} value={organisationsWithSubscriptionsCount} />
 
         <CardMetric icon={FileCog} title={_(msg`App Version`)} value={`v${version}`} />
       </div>
 
-      <div className="mb-8 mt-4">
+      <div className="mt-4 mb-8">
         <AdminLicenseCard licenseData={licenseData} />
       </div>
 
       <div className="mt-16 gap-8">
         <div>
-          <h3 className="text-3xl font-semibold">
+          <h3 className="font-semibold text-3xl">
             <Trans>Document metrics</Trans>
           </h3>
 
-          <div className="mb-8 mt-4 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="mt-4 mb-8 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
             <CardMetric icon={FileEdit} title={_(msg`Drafted Documents`)} value={docStats.DRAFT} />
-            <CardMetric
-              icon={FileClock}
-              title={_(msg`Pending Documents`)}
-              value={docStats.PENDING}
-            />
-            <CardMetric
-              icon={FileCheck}
-              title={_(msg`Completed Documents`)}
-              value={docStats.COMPLETED}
-            />
+            <CardMetric icon={FileClock} title={_(msg`Pending Documents`)} value={docStats.PENDING} />
+            <CardMetric icon={FileCheck} title={_(msg`Completed Documents`)} value={docStats.COMPLETED} />
           </div>
         </div>
 
         <div>
-          <h3 className="text-3xl font-semibold">
+          <h3 className="font-semibold text-3xl">
             <Trans>Recipients metrics</Trans>
           </h3>
 
-          <div className="mb-8 mt-4 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
-            <CardMetric
-              icon={UserSquare2}
-              title={_(msg`Total Recipients`)}
-              value={recipientStats.TOTAL_RECIPIENTS}
-            />
-            <CardMetric
-              icon={Mail}
-              title={_(msg`Documents Received`)}
-              value={recipientStats.SENT}
-            />
-            <CardMetric
-              icon={MailOpen}
-              title={_(msg`Documents Viewed`)}
-              value={recipientStats.OPENED}
-            />
-            <CardMetric
-              icon={PenTool}
-              title={_(msg`Signatures Collected`)}
-              value={recipientStats.SIGNED}
-            />
+          <div className="mt-4 mb-8 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
+            <CardMetric icon={UserSquare2} title={_(msg`Total Recipients`)} value={recipientStats.TOTAL_RECIPIENTS} />
+            <CardMetric icon={Mail} title={_(msg`Documents Received`)} value={recipientStats.SENT} />
+            <CardMetric icon={MailOpen} title={_(msg`Documents Viewed`)} value={recipientStats.OPENED} />
+            <CardMetric icon={PenTool} title={_(msg`Signatures Collected`)} value={recipientStats.SIGNED} />
           </div>
         </div>
       </div>
 
       <div className="mt-16">
-        <h3 className="text-3xl font-semibold">
+        <h3 className="font-semibold text-3xl">
           <Trans>Charts</Trans>
         </h3>
         <div className="mt-5 grid grid-cols-2 gap-8">
@@ -171,14 +142,9 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
             data={monthlyUsersWithDocuments}
             completed
             title={_(msg`MAU (had document completed)`)}
-            tooltip={_(
-              msg`Monthly Active Users: Users that had at least one of their documents completed`,
-            )}
+            tooltip={_(msg`Monthly Active Users: Users that had at least one of their documents completed`)}
           />
-          <AdminStatsSignerConversionChart
-            title="Signers that Signed Up"
-            data={signerConversionMonthly}
-          />
+          <AdminStatsSignerConversionChart title="Signers that Signed Up" data={signerConversionMonthly} />
           <AdminStatsSignerConversionChart
             title={_(msg`Total Signers that Signed Up`)}
             data={signerConversionMonthly}

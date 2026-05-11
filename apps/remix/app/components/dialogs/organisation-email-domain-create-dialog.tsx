@@ -1,12 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { useForm } from 'react-hook-form';
-import type { z } from 'zod';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
@@ -32,6 +23,12 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import type * as DialogPrimitive from '@radix-ui/react-dialog';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import type { z } from 'zod';
 
 import { OrganisationEmailDomainRecordContent } from './organisation-email-domain-records-dialog';
 
@@ -43,9 +40,7 @@ const ZCreateOrganisationEmailDomainFormSchema = ZCreateOrganisationEmailDomainR
   domain: true,
 });
 
-type TCreateOrganisationEmailDomainFormSchema = z.infer<
-  typeof ZCreateOrganisationEmailDomainFormSchema
->;
+type TCreateOrganisationEmailDomainFormSchema = z.infer<typeof ZCreateOrganisationEmailDomainFormSchema>;
 
 type DomainRecord = {
   name: string;
@@ -53,10 +48,7 @@ type DomainRecord = {
   type: string;
 };
 
-export const OrganisationEmailDomainCreateDialog = ({
-  trigger,
-  ...props
-}: OrganisationEmailCreateDialogProps) => {
+export const OrganisationEmailDomainCreateDialog = ({ trigger, ...props }: OrganisationEmailCreateDialogProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
   const organisation = useCurrentOrganisation();
@@ -72,8 +64,7 @@ export const OrganisationEmailDomainCreateDialog = ({
     },
   });
 
-  const { mutateAsync: createOrganisationEmail } =
-    trpc.enterprise.organisation.emailDomain.create.useMutation();
+  const { mutateAsync: createOrganisationEmail } = trpc.enterprise.organisation.emailDomain.create.useMutation();
 
   // Reset state when dialog closes
   useEffect(() => {
@@ -119,11 +110,7 @@ export const OrganisationEmailDomainCreateDialog = ({
   };
 
   return (
-    <Dialog
-      {...props}
-      open={open}
-      onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
-    >
+    <Dialog {...props} open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
         {trigger ?? (
           <Button className="flex-shrink-0" variant="secondary">
@@ -140,18 +127,15 @@ export const OrganisationEmailDomainCreateDialog = ({
             </DialogTitle>
             <DialogDescription>
               <Trans>
-                Add a custom domain to send emails on behalf of your organisation. We'll generate
-                DKIM records that you need to add to your DNS provider.
+                Add a custom domain to send emails on behalf of your organisation. We'll generate DKIM records that you
+                need to add to your DNS provider.
               </Trans>
             </DialogDescription>
           </DialogHeader>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onFormSubmit)}>
-              <fieldset
-                className="flex h-full flex-col space-y-4"
-                disabled={form.formState.isSubmitting}
-              >
+              <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
                 <FormField
                   control={form.control}
                   name="domain"
@@ -165,10 +149,7 @@ export const OrganisationEmailDomainCreateDialog = ({
                       </FormControl>
                       <FormMessage />
                       <FormDescription>
-                        <Trans>
-                          Enter the domain you want to use for sending emails (without http:// or
-                          www)
-                        </Trans>
+                        <Trans>Enter the domain you want to use for sending emails (without http:// or www)</Trans>
                       </FormDescription>
                     </FormItem>
                   )}

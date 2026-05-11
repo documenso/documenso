@@ -1,12 +1,11 @@
-import { expect, test } from '@playwright/test';
 import path from 'node:path';
-
 import { prisma } from '@documenso/prisma';
 import { DocumentVisibility, FolderType, TeamMemberRole } from '@documenso/prisma/client';
 import { seedBlankDocument, seedTeamDocuments } from '@documenso/prisma/seed/documents';
 import { seedBlankFolder } from '@documenso/prisma/seed/folders';
 import { seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 import { expectTextToBeVisible, openDropdownMenu } from '../fixtures/generic';
@@ -88,9 +87,7 @@ test('[TEAMS]: can create a document inside a document folder', async ({ page })
     page.getByRole('button', { name: 'Document (Legacy)' }).click(),
   ]);
 
-  await fileChooser.setFiles(
-    path.join(__dirname, '../../../assets/documenso-supporter-pledge.pdf'),
-  );
+  await fileChooser.setFiles(path.join(__dirname, '../../../assets/documenso-supporter-pledge.pdf'));
 
   await page.waitForTimeout(3000);
 
@@ -405,9 +402,7 @@ test('[TEAMS]: can create a template inside a template folder', async ({ page })
     page.getByRole('button', { name: 'Template (Legacy)' }).click(),
   ]);
 
-  await fileChooser.setFiles(
-    path.join(__dirname, '../../../assets/documenso-supporter-pledge.pdf'),
-  );
+  await fileChooser.setFiles(path.join(__dirname, '../../../assets/documenso-supporter-pledge.pdf'));
 
   await page.waitForTimeout(3000);
 
@@ -677,9 +672,7 @@ test('[TEAMS]: can navigate between template folders', async ({ page }) => {
   await expect(page.getByText('Team Contract Template 1')).toBeVisible();
 });
 
-test('[TEAMS]: folder visibility is properly applied based on team member roles', async ({
-  page,
-}) => {
+test('[TEAMS]: folder visibility is properly applied based on team member roles', async ({ page }) => {
   const { team, teamOwner } = await seedTeamDocuments();
 
   const teamMember1 = await seedTeamMember({
@@ -893,9 +886,7 @@ test('[TEAMS]: documents inherit folder visibility', async ({ page }) => {
     page.getByRole('button', { name: 'Document (Legacy)' }).click(),
   ]);
 
-  await fileChooser.setFiles(
-    path.join(__dirname, '../../../assets/documenso-supporter-pledge.pdf'),
-  );
+  await fileChooser.setFiles(path.join(__dirname, '../../../assets/documenso-supporter-pledge.pdf'));
 
   await page.waitForTimeout(3000);
 
@@ -2119,9 +2110,7 @@ test('[TEAMS]: team member cannot see admin folder in folder list', async ({ pag
   await expect(page.getByText('Admin Only Folder')).not.toBeVisible();
 });
 
-test('[TEAMS]: team member can access admin folder via URL and see everyone documents', async ({
-  page,
-}) => {
+test('[TEAMS]: team member can access admin folder via URL and see everyone documents', async ({ page }) => {
   const { team, teamOwner } = await seedTeamDocuments();
 
   const teamMember = await seedTeamMember({
@@ -2203,9 +2192,7 @@ test('[TEAMS]: team member cannot see manager folder in folder list', async ({ p
   await expect(page.getByText('Manager Folder')).not.toBeVisible();
 });
 
-test('[TEAMS]: team member can access manager folder via URL and see everyone documents', async ({
-  page,
-}) => {
+test('[TEAMS]: team member can access manager folder via URL and see everyone documents', async ({ page }) => {
   const { team, teamOwner } = await seedTeamDocuments();
 
   const teamMember = await seedTeamMember({
@@ -2305,9 +2292,7 @@ test('[TEAMS]: team member can see everyone folders', async ({ page }) => {
   await expect(page.getByText('Everyone Folder')).toBeVisible();
 });
 
-test('[TEAMS]: team member can only see everyone documents in everyone folder', async ({
-  page,
-}) => {
+test('[TEAMS]: team member can only see everyone documents in everyone folder', async ({ page }) => {
   const { team, teamOwner } = await seedTeamDocuments();
 
   const teamMember = await seedTeamMember({
@@ -2362,9 +2347,7 @@ test('[TEAMS]: team member can only see everyone documents in everyone folder', 
   await expect(page.getByText('Admin Document')).not.toBeVisible();
 });
 
-test('[TEAMS]: team manager can see manager and everyone folders in folder list', async ({
-  page,
-}) => {
+test('[TEAMS]: team manager can see manager and everyone folders in folder list', async ({ page }) => {
   const { team, teamOwner } = await seedTeamDocuments();
 
   const teamManager = await seedTeamMember({
@@ -2408,9 +2391,7 @@ test('[TEAMS]: team manager can see manager and everyone folders in folder list'
   await expect(page.getByText('Everyone Folder')).toBeVisible();
 });
 
-test('[TEAMS]: team manager can see manager and everyone documents in manager folder', async ({
-  page,
-}) => {
+test('[TEAMS]: team manager can see manager and everyone documents in manager folder', async ({ page }) => {
   const { team, teamOwner } = await seedTeamDocuments();
 
   const teamManager = await seedTeamMember({
@@ -2460,18 +2441,14 @@ test('[TEAMS]: team manager can see manager and everyone documents in manager fo
     redirectPath: `/t/${team.url}/documents/f/${managerFolder.id}`,
   });
 
-  await expect(
-    page.getByTestId('folder-grid-breadcrumbs').getByRole('link', { name: 'Manager Folder' }),
-  ).toBeVisible();
+  await expect(page.getByTestId('folder-grid-breadcrumbs').getByRole('link', { name: 'Manager Folder' })).toBeVisible();
 
   await expect(page.getByText('Manager Folder - Everyone Document')).toBeVisible();
   await expect(page.getByText('Manager Folder - Manager Document')).toBeVisible();
   await expect(page.getByText('Manager Folder - Admin Document')).not.toBeVisible();
 });
 
-test('[TEAMS]: team manager can see manager and everyone documents in everyone folder', async ({
-  page,
-}) => {
+test('[TEAMS]: team manager can see manager and everyone documents in everyone folder', async ({ page }) => {
   const { team, teamOwner } = await seedTeamDocuments();
 
   const teamManager = await seedTeamMember({
@@ -2723,9 +2700,7 @@ test('[TEAMS]: team owner can see all documents in manager folder', async ({ pag
     redirectPath: `/t/${team.url}/documents/f/${managerFolder.id}`,
   });
 
-  await expect(
-    page.getByTestId('folder-grid-breadcrumbs').getByRole('link', { name: 'Manager Folder' }),
-  ).toBeVisible();
+  await expect(page.getByTestId('folder-grid-breadcrumbs').getByRole('link', { name: 'Manager Folder' })).toBeVisible();
   await expect(page.getByText('Manager Folder - Everyone Document')).toBeVisible();
   await expect(page.getByText('Manager Folder - Manager Document')).toBeVisible();
   await expect(page.getByText('Manager Folder - Admin Document')).toBeVisible();
@@ -2936,9 +2911,7 @@ test('[TEAMS]: team admin can see all documents in manager folder', async ({ pag
     redirectPath: `/t/${team.url}/documents/f/${managerFolder.id}`,
   });
 
-  await expect(
-    page.getByTestId('folder-grid-breadcrumbs').getByRole('link', { name: 'Manager Folder' }),
-  ).toBeVisible();
+  await expect(page.getByTestId('folder-grid-breadcrumbs').getByRole('link', { name: 'Manager Folder' })).toBeVisible();
   await expect(page.getByText('Manager Folder - Everyone Document')).toBeVisible();
   await expect(page.getByText('Manager Folder - Manager Document')).toBeVisible();
   await expect(page.getByText('Manager Folder - Admin Document')).toBeVisible();

@@ -1,6 +1,5 @@
-import { UserSecurityAuditLogType } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { UserSecurityAuditLogType } from '@prisma/client';
 
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 
@@ -11,12 +10,7 @@ export interface UpdateAuthenticatorsOptions {
   requestMetadata?: RequestMetadata;
 }
 
-export const updatePasskey = async ({
-  userId,
-  passkeyId,
-  name,
-  requestMetadata,
-}: UpdateAuthenticatorsOptions) => {
+export const updatePasskey = async ({ userId, passkeyId, name, requestMetadata }: UpdateAuthenticatorsOptions) => {
   const passkey = await prisma.passkey.findFirstOrThrow({
     where: {
       id: passkeyId,

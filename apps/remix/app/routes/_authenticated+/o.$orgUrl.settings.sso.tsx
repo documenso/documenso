@@ -1,10 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { OrganisationMemberRole } from '@prisma/client';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@documenso/lib/constants/organisations';
 import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
@@ -19,27 +12,20 @@ import { ZUpdateOrganisationAuthenticationPortalRequestSchema } from '@documenso
 import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { Switch } from '@documenso/ui/primitives/switch';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { OrganisationMemberRole } from '@prisma/client';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { SettingsHeader } from '~/components/general/settings-header';
 import { appMetaTags } from '~/utils/meta';
@@ -51,6 +37,7 @@ const ZProviderFormSchema = ZUpdateOrganisationAuthenticationPortalRequestSchema
     clientId: true,
     autoProvisionUsers: true,
     defaultOrganisationRole: true,
+    allowPersonalOrganisations: true,
   })
   .extend({
     clientSecret: z.string().nullable(),
@@ -69,7 +56,7 @@ const ZProviderFormSchema = ZUpdateOrganisationAuthenticationPortalRequestSchema
 type TProviderFormSchema = z.infer<typeof ZProviderFormSchema>;
 
 export function meta() {
-  return appMetaTags('Organisation SSO Portal');
+  return appMetaTags(msg`Organisation SSO Portal`);
 }
 
 export default function OrganisationSettingSSOLoginPage() {
@@ -120,6 +107,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
       autoProvisionUsers: authenticationPortal.autoProvisionUsers,
       defaultOrganisationRole: authenticationPortal.defaultOrganisationRole,
       allowedDomains: authenticationPortal.allowedDomains.join(' '),
+      allowPersonalOrganisations: authenticationPortal.allowPersonalOrganisations,
     },
   });
 
@@ -161,6 +149,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
           autoProvisionUsers: values.autoProvisionUsers,
           defaultOrganisationRole: values.defaultOrganisationRole,
           allowedDomains: values.allowedDomains.split(' ').filter(Boolean),
+          allowPersonalOrganisations: values.allowPersonalOrganisations,
         },
       });
 
@@ -192,12 +181,8 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
             </Label>
 
             <div className="relative">
-              <Input
-                className="pr-12"
-                disabled
-                value={formatOrganisationLoginUrl(organisation.url)}
-              />
-              <div className="absolute bottom-0 right-2 top-0 flex items-center justify-center">
+              <Input className="pr-12" disabled value={formatOrganisationLoginUrl(organisation.url)} />
+              <div className="absolute top-0 right-2 bottom-0 flex items-center justify-center">
                 <CopyTextButton
                   value={formatOrganisationLoginUrl(organisation.url)}
                   onCopySuccess={() => toast({ title: t`Copied to clipboard` })}
@@ -216,12 +201,8 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
             </Label>
 
             <div className="relative">
-              <Input
-                className="pr-12"
-                disabled
-                value={formatOrganisationCallbackUrl(organisation.url)}
-              />
-              <div className="absolute bottom-0 right-2 top-0 flex items-center justify-center">
+              <Input className="pr-12" disabled value={formatOrganisationCallbackUrl(organisation.url)} />
+              <div className="absolute top-0 right-2 bottom-0 flex items-center justify-center">
                 <CopyTextButton
                   value={formatOrganisationCallbackUrl(organisation.url)}
                   onCopySuccess={() => toast({ title: t`Copied to clipboard` })}
@@ -255,10 +236,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
                   <Trans>Issuer URL</Trans>
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder={'https://your-provider.com/.well-known/openid-configuration'}
-                    {...field}
-                  />
+                  <Input placeholder={'https://your-provider.com/.well-known/openid-configuration'} {...field} />
                 </FormControl>
 
                 {!form.formState.errors.wellKnownUrl && (
@@ -324,13 +302,11 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
                       <SelectValue placeholder={t`Select default role`} />
                     </SelectTrigger>
                     <SelectContent>
-                      {ORGANISATION_MEMBER_ROLE_HIERARCHY[OrganisationMemberRole.MANAGER].map(
-                        (role) => (
-                          <SelectItem key={role} value={role}>
-                            {t(ORGANISATION_MEMBER_ROLE_MAP[role])}
-                          </SelectItem>
-                        ),
-                      )}
+                      {ORGANISATION_MEMBER_ROLE_HIERARCHY[OrganisationMemberRole.MANAGER].map((role) => (
+                        <SelectItem key={role} value={role}>
+                          {t(ORGANISATION_MEMBER_ROLE_MAP[role])}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -348,18 +324,12 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
                   <Trans>Allowed Email Domains</Trans>
                 </FormLabel>
                 <FormControl>
-                  <Textarea
-                    {...field}
-                    placeholder={t`your-domain.com another-domain.com`}
-                    className="min-h-[80px]"
-                  />
+                  <Textarea {...field} placeholder={t`your-domain.com another-domain.com`} className="min-h-[80px]" />
                 </FormControl>
 
                 {!form.formState.errors.allowedDomains && (
                   <p className="text-muted-foreground text-xs">
-                    <Trans>
-                      Space-separated list of domains. Leave empty to allow all domains.
-                    </Trans>
+                    <Trans>Space-separated list of domains. Leave empty to allow all domains.</Trans>
                   </p>
                 )}
 
@@ -392,6 +362,30 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
 
           <FormField
             control={form.control}
+            name="allowPersonalOrganisations"
+            render={({ field }) => (
+              <FormItem className="flex items-center justify-between rounded-lg border px-4 py-3">
+                <div className="space-y-0.5">
+                  <FormLabel>
+                    <Trans>Allow Personal Organisations</Trans>
+                  </FormLabel>
+                  <p className="text-muted-foreground text-sm">
+                    <Trans>
+                      When enabled, users signing in via SSO for the first time will also receive their own personal
+                      organisation.
+                    </Trans>
+                  </p>
+                </div>
+                <FormControl>
+                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="enabled"
             render={({ field }) => (
               <FormItem className="flex items-center justify-between rounded-lg border px-4 py-3">
@@ -414,8 +408,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
           <Alert variant="warning">
             <AlertDescription>
               <Trans>
-                Please note that anyone who signs in through your portal will be added to your
-                organisation as a member.
+                Please note that anyone who signs in through your portal will be added to your organisation as a member.
               </Trans>
             </AlertDescription>
           </Alert>

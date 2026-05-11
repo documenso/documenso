@@ -1,13 +1,8 @@
+import { stripe } from '@documenso/lib/server-only/stripe';
+import { INTERNAL_CLAIM_ID, type InternalClaim, internalClaims } from '@documenso/lib/types/subscription';
+import { toHumanPrice } from '@documenso/lib/universal/stripe/to-human-price';
 import { clone } from 'remeda';
 import type Stripe from 'stripe';
-
-import { stripe } from '@documenso/lib/server-only/stripe';
-import {
-  INTERNAL_CLAIM_ID,
-  type InternalClaim,
-  internalClaims,
-} from '@documenso/lib/types/subscription';
-import { toHumanPrice } from '@documenso/lib/universal/stripe/to-human-price';
 
 export type InternalClaimPlans = {
   [key in INTERNAL_CLAIM_ID]: InternalClaim & {

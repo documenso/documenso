@@ -1,18 +1,15 @@
+import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { msg } from '@lingui/core/macro';
 import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 import { z } from 'zod';
-
-import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 
 export const ZAddSignersFormSchema = z.object({
   signers: z.array(
     z.object({
       formId: z.string().min(1),
       nativeId: z.number().optional(),
-      email: z
-        .string()
-        .email({ message: msg`Invalid email`.id })
-        .min(1),
+      email: zEmail(msg`Invalid email`.id).min(1),
       name: z.string(),
       role: z.nativeEnum(RecipientRole),
       signingOrder: z.number().optional(),

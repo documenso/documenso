@@ -1,0 +1,1222 @@
+---
+title: Troubleshooting
+description: Diagnose and resolve common issues with your self-hosted Documenso instance, organized by component.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## General Debugging
+
+### Checking Application Logs
+
+Application logs are your primary source of debugging information.
+
+<Tabs items={['Docker', 'Docker Compose', 'Kubernetes']}>
+<Tab value="Docker">
+
+```bash
+docker logs documenso
+```
+
+</Tab>
+<Tab value="Docker Compose">
+
+```bash
+docker compose logs -f documenso
+```
+
+</Tab>
+<Tab value="Kubernetes">
+
+```bash
+kubectl logs -l app.kubernetes.io/name=documenso -n documenso -f
+```
+
+</Tab>
+</Tabs>
+
+### Filtering Logs
+
+Filter logs to find specific errors:
+
+```bash
+# Docker - find errors
+docker logs documenso 2>&1 | grep -i error
+
+# Docker - find warnings
+docker logs documenso 2>&1 | grep -i warn
+
+# Show last 100 lines
+docker logs --tail 100 documenso
+```
+
+### Health Checks
+
+Documenso exposes a health endpoint to verify the application is running:
+
+```bash
+curl http://localhost:3000/api/health
+```
+
+A healthy response returns HTTP 200. If the health check fails:
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Check application logs for startup errors
+  </Step>
+  <Step>
+    Verify database connectivity
+  </Step>
+  <Step>
+    Confirm environment variables are set correctly
+  </Step>
+</Steps>
+
+### Container Status
+
+Check if containers are running and healthy:
+
+<Tabs items={['Docker', 'Docker Compose', 'Kubernetes']}>
+<Tab value="Docker">
+
+```bash
+docker ps -a | grep documenso
+```
+
+</Tab>
+<Tab value="Docker Compose">
+
+```bash
+docker compose ps
+```
+
+</Tab>
+<Tab value="Kubernetes">
+
+```bash
+kubectl get pods -n documenso -o wide
+```
+
+</Tab>
+</Tabs>
+
+### Environment Variable Verification
+
+Verify environment variables are set correctly inside the container:
+
+<Tabs items={['Docker', 'Docker Compose']}>
+<Tab value="Docker">
+
+```bash
+docker exec documenso printenv | grep NEXT
+```
+
+</Tab>
+<Tab value="Docker Compose">
+
+```bash
+docker compose exec documenso printenv | grep NEXT
+```
+
+</Tab>
+</Tabs>
+
+<Callout type="warn">
+  Be cautious when printing environment variables as they may contain sensitive information like
+  passwords and API keys.
+</Callout>
+
+---
+
+## Application Issues
+
+### Container Fails to Start
+
+**Symptoms:** Container exits immediately or enters a crash loop.
+
+**Check the exit code:**
+
+```bash
+docker inspect documenso --format='{{.State.ExitCode}}'
+```
+
+| Exit Code | Meaning                    |
+| --------- | -------------------------- |
+| 0         | Normal exit                |
+| 1         | Application error          |
+| 137       | Out of memory (OOM killed) |
+| 139       | Segmentation fault         |
+| 143       | Terminated by SIGTERM      |
+
+**Common causes and solutions:**
+
+| Cause                         | Solution                                              |
+| ----------------------------- | ----------------------------------------------------- |
+| Missing required env variable | Check logs for "required environment variable" errors |
+| Database connection failure   | Verify database URL and connectivity                  |
+| Port already in use           | Change the port mapping or stop conflicting services  |
+| Insufficient memory           | Increase container memory limits                      |
+| Invalid certificate           | Check certificate path and passphrase                 |
+
+### Application Crashes After Startup
+
+**Symptoms:** Application starts but crashes during operation.
+
+**Check for memory issues:**
+
+```bash
+# Docker
+docker stats documenso
+
+# Kubernetes
+kubectl top pod -n documenso
+```
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Increase memory limits in Docker or Kubernetes configuration
+  </Step>
+  <Step>
+    Check for memory leaks in custom integrations
+  </Step>
+  <Step>
+    Review application logs around the time of crash
+  </Step>
+</Steps>
+
+### Startup Timeout in Kubernetes
+
+**Symptoms:** Pod marked as unhealthy, enters CrashLoopBackOff.
+
+**Cause:** Startup probe fails before the application is ready.
+
+**Solution:** Increase startup probe timeout in your deployment:
+
+```yaml
+startupProbe:
+  httpGet:
+    path: /api/health
+    port: 3000
+  failureThreshold: 60
+  periodSeconds: 5
+```
+
+This allows up to 5 minutes (60 x 5 seconds) for startup.
+
+### Port Conflicts
+
+**Symptoms:** "Port already in use" error.
+
+**Find what's using the port:**
+
+```bash
+# Linux/macOS
+lsof -i :3000
+
+# Or using netstat
+netstat -tlnp | grep 3000
+```
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Stop the conflicting service
+  </Step>
+  <Step>
+    Change Documenso's port mapping: `-p 3001:3000`
+  </Step>
+</Steps>
+
+---
+
+## Database Issues
+
+### Connection Refused
+
+```
+Error: connect ECONNREFUSED 127.0.0.1:5432
+```
+
+**Causes:**
+
+- PostgreSQL not running
+- Incorrect host in connection string
+- Firewall blocking connection
+- Database container not started yet
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Verify PostgreSQL is running:
+
+```bash
+# Direct PostgreSQL
+pg_isready -h localhost -p 5432
+
+# Docker Compose
+docker compose ps database
+```
+
+  </Step>
+  <Step>
+    Check connection string host matches database location
+  </Step>
+  <Step>
+    For Docker Compose, ensure the database service is defined and started
+  </Step>
+  <Step>
+    Verify network connectivity between containers
+  </Step>
+</Steps>
+
+### Authentication Failed
+
+```
+Error: password authentication failed for user "documenso"
+```
+
+**Causes:**
+
+- Incorrect password
+- Password contains unescaped special characters
+- User does not exist
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    URL-encode special characters in password (`@` becomes `%40`, `#` becomes `%23`)
+  </Step>
+  <Step>
+    Verify credentials match database configuration
+  </Step>
+  <Step>
+    Reset the password:
+
+```sql
+ALTER USER documenso WITH PASSWORD 'newpassword';
+```
+
+  </Step>
+</Steps>
+
+### Database Does Not Exist
+
+```
+Error: database "documenso" does not exist
+```
+
+**Solution:** Create the database:
+
+```sql
+CREATE DATABASE documenso;
+GRANT ALL PRIVILEGES ON DATABASE documenso TO documenso;
+```
+
+### Too Many Connections
+
+```
+Error: too many connections for role "documenso"
+```
+
+**Causes:**
+
+- Connection pool exhausted
+- Multiple instances without connection pooling
+- Connections not being released
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Reduce connection pool size in connection string:
+
+```
+postgresql://user:password@host:5432/documenso?connection_limit=5
+```
+
+  </Step>
+  <Step>
+    Increase PostgreSQL `max_connections`
+  </Step>
+  <Step>
+    Implement connection pooling with PgBouncer
+  </Step>
+</Steps>
+
+### Migration Failures
+
+**Symptoms:** Application fails to start with migration errors.
+
+**Check migration status:**
+
+```sql
+SELECT * FROM _prisma_migrations WHERE finished_at IS NULL;
+```
+
+**Common causes:**
+
+| Cause                     | Solution                                      |
+| ------------------------- | --------------------------------------------- |
+| Database locked           | Wait for other processes to complete          |
+| Insufficient disk         | Free up disk space on database server         |
+| Permission denied         | Grant schema modification permissions to user |
+| Connection through pooler | Use direct database connection for migrations |
+
+**Retry failed migration:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Fix the underlying issue
+  </Step>
+  <Step>
+    Mark migration as rolled back:
+
+```sql
+UPDATE _prisma_migrations SET rolled_back_at = NOW() WHERE migration_name = 'failed_migration';
+```
+
+  </Step>
+  <Step>
+    Restart the application
+  </Step>
+</Steps>
+
+### SSL Required
+
+```
+Error: SSL/TLS required
+```
+
+**Solution:** Add SSL mode to connection string:
+
+```
+postgresql://user:password@host:5432/documenso?sslmode=require
+```
+
+---
+
+## Email Issues
+
+### Emails Not Sending
+
+**Symptoms:** No emails received, no errors in logs.
+
+**Diagnostic steps:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Check email configuration:
+
+```bash
+docker exec documenso printenv | grep SMTP
+```
+
+  </Step>
+  <Step>
+    Verify all required variables are set:
+
+| Variable                         | Required |
+| -------------------------------- | -------- |
+| `NEXT_PRIVATE_SMTP_TRANSPORT`    | Yes      |
+| `NEXT_PRIVATE_SMTP_FROM_ADDRESS` | Yes      |
+| `NEXT_PRIVATE_SMTP_FROM_NAME`    | Yes      |
+
+  </Step>
+  <Step>
+    Test SMTP connectivity:
+
+```bash
+# Test connection to SMTP server
+telnet smtp.example.com 587
+```
+
+  </Step>
+</Steps>
+
+### SMTP Connection Timeout
+
+```
+Error: Connection timeout
+```
+
+**Causes:**
+
+- Incorrect SMTP hostname or port
+- Firewall blocking outbound SMTP
+- SMTP server unreachable
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Verify hostname and port match provider documentation
+  </Step>
+  <Step>
+    Check outbound firewall rules for ports 25, 465, 587
+  </Step>
+  <Step>
+    Test connectivity from the container:
+
+```bash
+docker exec documenso nc -zv smtp.example.com 587
+```
+
+  </Step>
+</Steps>
+
+### SMTP Authentication Failed
+
+```
+Error: Invalid login or authentication failed
+```
+
+**Causes:**
+
+- Incorrect username or password
+- Account requires app-specific password
+- Account security restrictions
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Double-check credentials
+  </Step>
+  <Step>
+    For Gmail/Microsoft with 2FA, generate an app password
+  </Step>
+  <Step>
+    Check provider for security alerts or blocked sign-ins
+  </Step>
+</Steps>
+
+### Emails Going to Spam
+
+**Causes:**
+
+- Missing SPF record
+- Missing DKIM signature
+- No DMARC policy
+- Poor sender reputation
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Configure SPF record for your domain
+  </Step>
+  <Step>
+    Set up DKIM signing with your email provider
+  </Step>
+  <Step>
+    Add a DMARC policy
+  </Step>
+  <Step>
+    Use a reputable email provider
+  </Step>
+  <Step>
+    Test deliverability at [mail-tester.com](https://www.mail-tester.com)
+  </Step>
+</Steps>
+
+### From Address Not Authorized
+
+```
+Error: Sender address rejected
+```
+
+**Cause:** The `NEXT_PRIVATE_SMTP_FROM_ADDRESS` is not authorized to send from your email provider.
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Verify the domain in your email provider's settings
+  </Step>
+  <Step>
+    Use an email address from a verified domain
+  </Step>
+  <Step>
+    Check provider-specific sender authorization requirements
+  </Step>
+</Steps>
+
+---
+
+## Signing Issues
+
+### No Certificate Found
+
+```
+Error: No certificate found for local signing
+```
+
+**Causes:**
+
+- Certificate path not configured
+- Certificate file not mounted
+- Environment variable not set
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Verify certificate configuration:
+
+```bash
+docker exec documenso printenv | grep SIGNING
+```
+
+  </Step>
+  <Step>
+    Check file exists at configured path:
+
+```bash
+docker exec documenso ls -la /opt/documenso/cert.p12
+```
+
+  </Step>
+  <Step>
+    Ensure either `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH` or `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` is set
+  </Step>
+</Steps>
+
+### Certificate Permission Denied
+
+```
+Error: EACCES: permission denied, open '/opt/documenso/cert.p12'
+```
+
+**Cause:** Application cannot read the certificate file.
+
+**Solution:** Fix file permissions:
+
+```bash
+# On host before mounting
+sudo chown 1001 certificate.p12
+chmod 400 certificate.p12
+```
+
+### Invalid Certificate Password
+
+```
+Error: mac verify failure
+```
+
+**Cause:** Incorrect passphrase for the certificate.
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Verify `NEXT_PRIVATE_SIGNING_PASSPHRASE` matches the certificate password
+  </Step>
+  <Step>
+    Check for trailing whitespace or encoding issues
+  </Step>
+  <Step>
+    Test the password:
+
+```bash
+openssl pkcs12 -in certificate.p12 -noout
+```
+
+  </Step>
+</Steps>
+
+### Failed to Get Private Key
+
+```
+Error: Failed to get private key bags
+```
+
+**Cause:** Certificate has no password or incompatible encryption.
+
+**Solution:** Re-create the certificate with a password and compatible encryption:
+
+```bash
+openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt \
+    -keypbe PBE-SHA1-3DES \
+    -certpbe PBE-SHA1-3DES \
+    -macalg sha1
+```
+
+<Callout type="warn">
+  You must set a non-empty password when creating the certificate. Certificates without passwords
+  will fail.
+</Callout>
+
+### Certificate Expired
+
+```
+Error: Certificate has expired
+```
+
+**Solution:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Check expiration date:
+
+```bash
+openssl pkcs12 -in certificate.p12 -nokeys | openssl x509 -noout -dates
+```
+
+  </Step>
+  <Step>
+    Generate a new certificate or obtain a renewed one from your CA
+  </Step>
+  <Step>
+    Update the certificate file and restart Documenso
+  </Step>
+</Steps>
+
+### Base64 Decode Error
+
+```
+Error: Invalid base64 in NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS
+```
+
+**Cause:** Incorrect base64 encoding or line breaks in the value.
+
+**Solution:** Encode without line breaks:
+
+```bash
+# macOS
+base64 -i certificate.p12 | tr -d '\n'
+
+# Linux
+base64 -w 0 certificate.p12
+```
+
+---
+
+## Storage Issues
+
+### S3 Access Denied
+
+```
+Error: Access Denied
+```
+
+**Causes:**
+
+- Incorrect IAM credentials
+- Bucket policy doesn't allow operations
+- CORS not configured
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Verify IAM user has required permissions:
+
+```json
+{
+  "Effect": "Allow",
+  "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"],
+  "Resource": "arn:aws:s3:::your-bucket/*"
+}
+```
+
+  </Step>
+  <Step>
+    Configure CORS for presigned URL uploads
+  </Step>
+  <Step>
+    Verify credentials are correct and not expired
+  </Step>
+</Steps>
+
+### S3 Bucket Not Found
+
+```
+Error: The specified bucket does not exist
+```
+
+**Causes:**
+
+- Bucket name typo
+- Bucket in different region
+- Bucket doesn't exist
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Verify bucket exists:
+
+```bash
+aws s3 ls s3://your-bucket
+```
+
+  </Step>
+  <Step>
+    Check `NEXT_PRIVATE_UPLOAD_REGION` matches bucket region
+  </Step>
+  <Step>
+    Create the bucket if it doesn't exist
+  </Step>
+</Steps>
+
+### Signature Mismatch
+
+```
+Error: SignatureDoesNotMatch
+```
+
+**Causes:**
+
+- Incorrect secret access key
+- Clock skew between server and S3
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Verify credentials are correct
+  </Step>
+  <Step>
+    Synchronize server time using NTP:
+
+```bash
+# Check time
+date
+
+# Sync time (Linux)
+sudo ntpdate pool.ntp.org
+```
+
+  </Step>
+</Steps>
+
+### Path-Style Access Required
+
+```
+Error: The bucket you are attempting to access must be addressed using the specified endpoint
+```
+
+**Cause:** S3-compatible service requires path-style URLs.
+
+**Solution:** Enable path-style access:
+
+```bash
+NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true
+```
+
+### File Upload Timeout
+
+**Symptoms:** Large file uploads fail or timeout.
+
+**Causes:**
+
+- Upload size exceeds limit
+- Network timeout
+- Reverse proxy timeout
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Check configured upload limit: `NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT`
+  </Step>
+  <Step>
+    Increase reverse proxy timeout (nginx `client_body_timeout`)
+  </Step>
+  <Step>
+    For very large files, verify S3 multipart upload is working
+  </Step>
+</Steps>
+
+---
+
+## Performance Issues
+
+### Slow Response Times
+
+**Diagnostic steps:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Check container resource usage:
+
+```bash
+docker stats documenso
+```
+
+  </Step>
+  <Step>
+    Monitor database performance:
+
+```sql
+SELECT query, calls, mean_time
+FROM pg_stat_statements
+ORDER BY mean_time DESC
+LIMIT 10;
+```
+
+  </Step>
+  <Step>
+    Check for memory pressure or CPU throttling
+  </Step>
+</Steps>
+
+**Common causes and solutions:**
+
+| Cause               | Solution                                      |
+| ------------------- | --------------------------------------------- |
+| Insufficient memory | Increase container memory limits              |
+| Database slow       | Add indexes, increase database resources      |
+| Network latency     | Move database closer to application           |
+| Large documents     | Enable S3 storage instead of database storage |
+
+### High Memory Usage
+
+**Symptoms:** Container OOM killed, slow response times.
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Increase memory limits:
+
+```yaml
+# Docker Compose
+services:
+  documenso:
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+```
+
+  </Step>
+  <Step>
+    If using database storage, switch to S3 for large files
+  </Step>
+  <Step>
+    Review and optimize any custom integrations
+  </Step>
+</Steps>
+
+### Database Performance Degradation
+
+**Symptoms:** Slow queries, timeouts.
+
+**Diagnostic queries:**
+
+```sql
+-- Check table sizes
+SELECT relname, pg_size_pretty(pg_total_relation_size(relid))
+FROM pg_catalog.pg_statio_user_tables
+ORDER BY pg_total_relation_size(relid) DESC;
+
+-- Find long-running queries
+SELECT pid, now() - pg_stat_activity.query_start AS duration, query
+FROM pg_stat_activity
+WHERE state != 'idle'
+ORDER BY duration DESC;
+```
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Run VACUUM ANALYZE to update statistics:
+
+```sql
+VACUUM ANALYZE;
+```
+
+  </Step>
+  <Step>
+    Check for missing indexes on frequently queried columns
+  </Step>
+  <Step>
+    Consider upgrading database resources
+  </Step>
+  <Step>
+    Archive old documents and audit logs
+  </Step>
+</Steps>
+
+### Slow Document Signing
+
+**Symptoms:** Document completion takes a long time.
+
+**Causes:**
+
+- Timestamp server latency
+- Large PDF files
+- Certificate issues
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Use a faster timestamp server or one geographically closer
+  </Step>
+  <Step>
+    Optimize PDF file sizes before upload
+  </Step>
+  <Step>
+    Verify certificate is valid and not causing retries
+  </Step>
+</Steps>
+
+---
+
+## Network Issues
+
+### Cannot Reach Application
+
+**Diagnostic steps:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Verify container is running and port is exposed:
+
+```bash
+docker ps | grep documenso
+```
+
+  </Step>
+  <Step>
+    Check port binding:
+
+```bash
+netstat -tlnp | grep 3000
+```
+
+  </Step>
+  <Step>
+    Test local connectivity:
+
+```bash
+curl http://localhost:3000/api/health
+```
+
+  </Step>
+</Steps>
+
+### Reverse Proxy Issues
+
+**Symptoms:** 502 Bad Gateway, connection refused through proxy.
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Verify upstream is reachable from the proxy
+  </Step>
+  <Step>
+    Check proxy configuration points to correct port
+  </Step>
+  <Step>
+    Ensure headers are forwarded correctly:
+
+```nginx
+proxy_set_header Host $host;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto $scheme;
+```
+
+  </Step>
+</Steps>
+
+### WebSocket Connection Failures
+
+**Symptoms:** Real-time updates not working.
+
+**Solution:** Configure reverse proxy for WebSocket support:
+
+```nginx
+location / {
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+}
+```
+
+### DNS Resolution Failures
+
+```
+Error: getaddrinfo ENOTFOUND hostname
+```
+
+**Causes:**
+
+- Incorrect hostname
+- DNS not configured in container
+- Network isolation
+
+**Solutions:**
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Verify hostname is correct
+  </Step>
+  <Step>
+    Check DNS configuration:
+
+```bash
+docker exec documenso cat /etc/resolv.conf
+```
+
+  </Step>
+  <Step>
+    For Docker Compose, use service names for inter-container communication
+  </Step>
+</Steps>
+
+---
+
+## Getting Help
+
+### Before Asking for Help
+
+Gather this information before seeking support:
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    **Documenso version:**
+
+```bash
+docker inspect documenso --format='{{.Config.Image}}'
+```
+
+  </Step>
+  <Step>
+    **Deployment method:** Docker, Docker Compose, Kubernetes, or other
+  </Step>
+  <Step>
+    **Relevant logs:** Filter to show errors around the issue
+  </Step>
+  <Step>
+    **Steps to reproduce:** What actions trigger the problem
+  </Step>
+  <Step>
+    **Environment:** Cloud provider, OS, database type
+  </Step>
+</Steps>
+
+### Community Support
+
+- **[GitHub Discussions](https://github.com/documenso/documenso/discussions)**
+- **[Discord](https://documen.so/discord)**: Join the Documenso community Discord
+- **[GitHub Issues](https://github.com/documenso/documenso/issues)**: For confirmed bugs, open an issue
+
+### Reporting Bugs
+
+When reporting bugs, include:
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Clear description of the expected vs actual behavior
+  </Step>
+  <Step>
+    Steps to reproduce
+  </Step>
+  <Step>
+    Documenso version
+  </Step>
+  <Step>
+    Relevant logs (redact sensitive information)
+  </Step>
+  <Step>
+    Environment details
+  </Step>
+</Steps>
+
+### Security Issues
+
+For security vulnerabilities, do not open a public issue. Contact security@documenso.com directly.
+
+---
+
+## Troubleshooting Checklist
+
+Use this checklist when diagnosing issues:
+
+<Accordions type="multiple">
+  <Accordion title="Check application logs for errors">
+    Run `docker logs documenso` or `docker compose logs documenso` (or `kubectl logs` for
+    Kubernetes) and look for error messages.
+  </Accordion>
+  <Accordion title="Verify all required environment variables are set">
+    Compare your `.env` or configuration against [Environment
+    Variables](/docs/self-hosting/configuration/environment).
+  </Accordion>
+  <Accordion title="Confirm database connectivity">
+    Test the connection string with `psql` or the database CLI. Ensure the database is running and
+    reachable.
+  </Accordion>
+  <Accordion title="Test health endpoint responds">
+    Run `curl http://localhost:3000/api/health` and verify it returns a successful response.
+  </Accordion>
+  <Accordion title="Check container resource usage (CPU, memory)">
+    Use `docker stats` or your container runtime's monitoring to ensure adequate resources.
+  </Accordion>
+  <Accordion title="Verify certificate is valid and accessible">
+    Check `curl http://localhost:3000/api/certificate-status` and ensure file permissions are
+    correct.
+  </Accordion>
+  <Accordion title="Confirm email configuration">
+    Verify SMTP settings in [Email Configuration](/docs/self-hosting/configuration/email) and check
+    logs for delivery errors.
+  </Accordion>
+  <Accordion title="Check network connectivity to external services">
+    Ensure outbound connections to SMTP, S3, and other external services are allowed.
+  </Accordion>
+  <Accordion title="Review recent changes (upgrades, config changes)">
+    Check release notes and compare your configuration before and after the change.
+  </Accordion>
+</Accordions>
+
+---
+
+## See Also
+
+- [Backups](/docs/self-hosting/maintenance/backups) - Backup and restore procedures
+- [Upgrades](/docs/self-hosting/maintenance/upgrades) - Upgrade procedures
+- [Database Configuration](/docs/self-hosting/configuration/database) - Database setup reference
+- [Email Configuration](/docs/self-hosting/configuration/email) - Email troubleshooting
+- [Signing Certificate](/docs/self-hosting/configuration/signing-certificate) - Certificate troubleshooting
+- [Storage Configuration](/docs/self-hosting/configuration/storage) - Storage troubleshooting

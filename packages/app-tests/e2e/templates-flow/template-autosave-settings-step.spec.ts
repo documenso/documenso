@@ -1,10 +1,9 @@
-import type { Page } from '@playwright/test';
-import { expect, test } from '@playwright/test';
-
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
+import type { Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -50,9 +49,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
         teamId: team.id,
       });
 
-      await expect(page.getByRole('textbox', { name: 'Title *' })).toHaveValue(
-        retrievedTemplate.title,
-      );
+      await expect(page.getByRole('textbox', { name: 'Title *' })).toHaveValue(retrievedTemplate.title);
     }).toPass();
   });
 
@@ -136,7 +133,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await page.getByRole('button', { name: 'Advanced Options' }).click();
 
-    await page.getByRole('combobox').nth(4).click();
+    await page.getByRole('combobox').nth(5).click();
     await page.getByRole('option', { name: 'Draw' }).click();
     await page.getByRole('option', { name: 'Type' }).click();
 
@@ -163,7 +160,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await page.getByRole('button', { name: 'Advanced Options' }).click();
 
-    await page.getByRole('combobox').nth(5).click();
+    await page.getByRole('combobox').nth(6).click();
     await page.getByRole('option', { name: 'ISO 8601', exact: true }).click();
 
     await triggerAutosave(page);
@@ -187,7 +184,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await page.getByRole('button', { name: 'Advanced Options' }).click();
 
-    await page.getByRole('combobox').nth(6).click();
+    await page.getByRole('combobox').nth(7).click();
     await page.getByRole('option', { name: 'Europe/London' }).click();
 
     await triggerAutosave(page);
@@ -247,7 +244,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
     const newExternalId = 'MULTI-TEST-123';
     await page.getByRole('textbox', { name: 'External ID' }).fill(newExternalId);
 
-    await page.getByRole('combobox').nth(6).click();
+    await page.getByRole('combobox').nth(7).click();
     await page.getByRole('option', { name: 'Europe/Berlin' }).click();
 
     await triggerAutosave(page);

@@ -1,0 +1,132 @@
+---
+title: AI Recipient & Field Detection
+description: Use Documenso's AI helpers to detect recipients and fields in draft documents.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Overview
+
+Documenso can suggest recipients and place fields automatically using Google Vertex AI (Gemini). The feature is optional and only available when your organisation or team has **AI Features** enabled. Documents are processed securely and providers do not retain your data for training.
+
+## Requirements
+
+- AI Features must be enabled in **Document Preferences** for your organisation or team.
+- The envelope must be in **Draft** status.
+- Helpful rate limits are in place (up to 3 detection requests per minute per IP) to prevent abuse. If you see a "too many requests" message, wait a minute or two and try again.
+
+### Enable AI features
+
+<Tabs items={['Organisation Settings', 'Team Settings']}>
+<Tab value="Organisation Settings">
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+Go to **Settings** > **Document Preferences** > **AI Features**.
+</Step>
+<Step>
+Set to **Enabled**.
+</Step>
+</Steps>
+
+_This applies to teams that inherit organisation defaults._
+
+</Tab>
+<Tab value="Team Settings">
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+Go to **Team Settings** > **Document Preferences** > **AI Features**.
+</Step>
+<Step>
+Choose **Enabled**, **Disabled**, or **Inherit**.
+</Step>
+</Steps>
+
+</Tab>
+</Tabs>
+
+## Detect Recipients
+
+Use this to identify who needs to sign or approve.
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Open a draft document or template and go to the **Recipients** panel.
+  </Step>
+  <Step>
+    Select the **sparkle** button to start detection. If AI is enabled, uploads from the dashboard may open the detector automatically.
+
+    ![Detect recipients with AI button in the Recipients panel](/document-signing/ai-recipient-detect-button.webp)
+
+  </Step>
+  <Step>
+    Wait for progress to finish, then review the suggested recipients.
+  </Step>
+  <Step>
+    Remove any incorrect entries, then click **Add recipients** to apply. Existing recipients and duplicates are preserved.
+  </Step>
+</Steps>
+
+<Callout type="info">
+  Detection is unavailable once an envelope is completed. You can re-run detection if you update the
+  document; each run counts toward the rate limit.
+</Callout>
+
+## Detect Fields
+
+Use this to auto-place fields on the pages of a draft.
+
+{/* prettier-ignore */}
+<Steps>
+  <Step>
+    Open the envelope editor and switch to the **Fields** tab.
+  </Step>
+  <Step>
+    Select **Detect with AI**. Optionally provide context (e.g., "Alice is the tenant, Bob is the landlord") to improve recipient assignment.
+
+    ![AI field detection button](/document-signing/ai-field-detection-button.webp)
+
+    ![AI field detection dialog with context input](/document-signing/ai-field-detection-dialog.webp)
+
+  </Step>
+  <Step>
+    Watch the progress indicators (per page and total fields found).
+  </Step>
+  <Step>
+    Review the summary and choose **Add fields** to place them in the editor.
+  </Step>
+</Steps>
+
+<Callout type="info">
+  Works only for draft envelopes and teams with AI features enabled. Existing fields are masked
+  during detection to avoid duplicates. Fields are assigned to recipients based on nearby labels and
+  your context message; you can edit them after adding.
+</Callout>
+
+## Best Practices
+
+<Accordions type="multiple">
+  <Accordion title="Keep labels near the intended fields">
+    Place labels close to the intended fields (e.g. "Tenant signature", "Buyer email") to improve
+    detection accuracy.
+  </Accordion>
+  <Accordion title="Provide short context when roles are ambiguous">
+    Add brief context when recipient roles are unclear to help the AI assign fields correctly.
+  </Accordion>
+  <Accordion title="Always review suggestions before sending">
+    AI assists but does not replace final checks. Review all suggestions before sending documents.
+  </Accordion>
+</Accordions>
+
+## See Also
+
+- [Add Recipients](/docs/users/documents/add-recipients) - Manually add recipients to documents
+- [Add Fields](/docs/users/documents/add-fields) - Manually place fields on documents
+- [AI Features (Self-Hosting)](/docs/self-hosting/configuration/advanced/ai-features) - Configure AI detection for self-hosted instances

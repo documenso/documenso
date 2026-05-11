@@ -1,18 +1,16 @@
-import { sValidator } from '@hono/standard-validator';
-import type { Prisma } from '@prisma/client';
-import { Hono } from 'hono';
-
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
-import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 import { prisma } from '@documenso/prisma';
+import { sValidator } from '@hono/standard-validator';
+import type { Prisma } from '@prisma/client';
+import { Hono } from 'hono';
 
 import type { HonoEnv } from '../../router';
-import { handleEnvelopeItemFileRequest } from './files.helpers';
+import { checkEnvelopeFileAccess, handleEnvelopeItemFileRequest } from './files.helpers';
 import {
   type TGetPresignedPostUrlResponse,
   ZGetEnvelopeItemFileDownloadRequestParamsSchema,
@@ -23,6 +21,8 @@ import {
   ZGetPresignedPostUrlRequestSchema,
   ZUploadPdfRequestSchema,
 } from './files.types';
+import getEnvelopeItemPdfRoute from './routes/get-envelope-item-pdf';
+import getEnvelopeItemPdfByTokenRoute from './routes/get-envelope-item-pdf-by-token';
 
 export const filesRoute = new Hono<HonoEnv>()
   /**
@@ -117,20 +117,15 @@ export const filesRoute = new Hono<HonoEnv>()
         return c.json({ error: 'Envelope item not found' }, 404);
       }
 
-      const team = await getTeamById({
-        userId: userId,
+      const hasAccess = await checkEnvelopeFileAccess({
+        userId,
         teamId: envelope.teamId,
-      }).catch((error) => {
-        console.error(error);
-
-        return null;
+        envelopeType: envelope.type,
+        templateType: envelope.templateType,
       });
 
-      if (!team) {
-        return c.json(
-          { error: 'User does not have access to the team that this envelope is associated with' },
-          403,
-        );
+      if (!hasAccess) {
+        return c.json({ error: 'User does not have access to the team that this envelope is associated with' }, 403);
       }
 
       if (!envelopeItem.documentData) {
@@ -151,68 +146,101 @@ export const filesRoute = new Hono<HonoEnv>()
     '/envelope/:envelopeId/envelopeItem/:envelopeItemId/download/:version?',
     sValidator('param', ZGetEnvelopeItemFileDownloadRequestParamsSchema),
     async (c) => {
-      const { envelopeId, envelopeItemId, version } = c.req.valid('param');
+      const logger = c.get('logger');
 
-      const session = await getOptionalSession(c);
+      try {
+        const { envelopeId, envelopeItemId, version } = c.req.valid('param');
 
-      if (!session.user) {
-        return c.json({ error: 'Unauthorized' }, 401);
-      }
+        const session = await getOptionalSession(c);
 
-      const envelope = await prisma.envelope.findFirst({
-        where: {
-          id: envelopeId,
-        },
-        include: {
-          envelopeItems: {
-            where: {
-              id: envelopeItemId,
+        if (!session.user) {
+          return c.json({ error: 'Unauthorized' }, 401);
+        }
+
+        const envelope = await prisma.envelope.findFirst({
+          where: {
+            id: envelopeId,
+          },
+          include: {
+            envelopeItems: {
+              where: {
+                id: envelopeItemId,
+              },
+              include: {
+                documentData: true,
+              },
             },
-            include: {
-              documentData: true,
+            recipients: {
+              select: {
+                role: true,
+                signingStatus: true,
+              },
             },
           },
-        },
-      });
+        });
 
-      if (!envelope) {
-        return c.json({ error: 'Envelope not found' }, 404);
+        if (!envelope) {
+          return c.json({ error: 'Envelope not found' }, 404);
+        }
+
+        const [envelopeItem] = envelope.envelopeItems;
+
+        if (!envelopeItem) {
+          return c.json({ error: 'Envelope item not found' }, 404);
+        }
+
+        const hasDownloadAccess = await checkEnvelopeFileAccess({
+          userId: session.user.id,
+          teamId: envelope.teamId,
+          envelopeType: envelope.type,
+          templateType: envelope.templateType,
+        });
+
+        if (!hasDownloadAccess) {
+          return c.json(
+            {
+              error: 'User does not have access to the team that this envelope is associated with',
+            },
+            403,
+          );
+        }
+
+        if (!envelopeItem.documentData) {
+          return c.json({ error: 'Document data not found' }, 404);
+        }
+
+        const baseOptions = {
+          title: envelopeItem.title,
+          documentData: envelopeItem.documentData,
+          isDownload: true,
+          context: c,
+        } as const;
+
+        if (version === 'pending') {
+          return await handleEnvelopeItemFileRequest({
+            ...baseOptions,
+            version,
+            envelopeItemId: envelopeItem.id,
+            envelope,
+          });
+        }
+
+        return await handleEnvelopeItemFileRequest({
+          ...baseOptions,
+          version,
+          status: envelope.status,
+        });
+      } catch (error) {
+        logger.error(error);
+
+        if (error instanceof AppError) {
+          const { status, body } = AppError.toRestAPIError(error);
+
+          return c.json({ error: body.message, code: error.code }, status);
+        }
+
+        return c.json({ error: 'Internal server error' }, 500);
       }
-
-      const [envelopeItem] = envelope.envelopeItems;
-
-      if (!envelopeItem) {
-        return c.json({ error: 'Envelope item not found' }, 404);
-      }
-
-      const team = await getTeamById({
-        userId: session.user.id,
-        teamId: envelope.teamId,
-      }).catch((error) => {
-        console.error(error);
-
-        return null;
-      });
-
-      if (!team) {
-        return c.json(
-          { error: 'User does not have access to the team that this envelope is associated with' },
-          403,
-        );
-      }
-
-      if (!envelopeItem.documentData) {
-        return c.json({ error: 'Document data not found' }, 404);
-      }
-
-      return await handleEnvelopeItemFileRequest({
-        title: envelopeItem.title,
-        status: envelope.status,
-        documentData: envelopeItem.documentData,
-        version,
-        isDownload: true,
-        context: c,
-      });
     },
   )
   .get(
@@ -319,3 +347,8 @@ export const filesRoute = new Hono<HonoEnv>()
       });
     },
   );
+
+// PDF routes for both tokens and auth based
+// Is different to the other file endpoints since it uses documentDataId for hard caching.
+filesRoute.route('/', getEnvelopeItemPdfRoute);
+filesRoute.route('/', getEnvelopeItemPdfByTokenRoute);
