@@ -1,10 +1,13 @@
+import { BRANDING_CSS_MAX_LENGTH } from '@documenso/lib/constants/branding';
 import { ZEnvelopeExpirationPeriod } from '@documenso/lib/constants/envelope-expiration';
 import { ZEnvelopeReminderSettings } from '@documenso/lib/constants/envelope-reminder';
 import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
+import { ZCssVarsSchema } from '@documenso/lib/types/css-vars';
 import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { ZDocumentMetaDateFormatSchema, ZDocumentMetaTimezoneSchema } from '@documenso/lib/types/document-meta';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
+import { ZSanitizeBrandingCssWarningSchema } from '@documenso/lib/utils/sanitize-branding-css';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { z } from 'zod';
 
@@ -35,6 +38,8 @@ export const ZUpdateTeamSettingsRequestSchema = z.object({
     brandingLogo: z.string().nullish(),
     brandingUrl: z.string().nullish(),
     brandingCompanyDetails: z.string().nullish(),
+    brandingColors: ZCssVarsSchema.nullish(),
+    brandingCss: z.string().max(BRANDING_CSS_MAX_LENGTH).nullish(),
 
     // Email related settings.
     emailId: z.string().nullish(),
@@ -49,4 +54,6 @@ export const ZUpdateTeamSettingsRequestSchema = z.object({
   }),
 });
 
-export const ZUpdateTeamSettingsResponseSchema = z.void();
+export const ZUpdateTeamSettingsResponseSchema = z.object({
+  cssWarnings: z.array(ZSanitizeBrandingCssWarningSchema).optional(),
+});

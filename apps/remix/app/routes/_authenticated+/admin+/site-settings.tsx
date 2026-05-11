@@ -27,7 +27,7 @@ import { useRevalidator } from 'react-router';
 import type { z } from 'zod';
 
 import { SettingsHeader } from '~/components/general/settings-header';
-
+import { useCspNonce } from '~/utils/nonce';
 import type { Route } from './+types/site-settings';
 
 const ZBannerFormSchema = ZSiteSettingsBannerSchema;
@@ -44,6 +44,8 @@ export async function loader() {
 
 export default function AdminBannerPage({ loaderData }: Route.ComponentProps) {
   const { banner } = loaderData;
+
+  const nonce = useCspNonce();
 
   const { toast } = useToast();
   const { _ } = useLingui();
@@ -142,7 +144,7 @@ export default function AdminBannerPage({ loaderData }: Route.ComponentProps) {
 
                         <FormControl>
                           <div>
-                            <ColorPicker {...field} />
+                            <ColorPicker {...field} nonce={nonce} />
                           </div>
                         </FormControl>
 
@@ -162,7 +164,7 @@ export default function AdminBannerPage({ loaderData }: Route.ComponentProps) {
 
                         <FormControl>
                           <div>
-                            <ColorPicker {...field} />
+                            <ColorPicker {...field} nonce={nonce} />
                           </div>
                         </FormControl>
 

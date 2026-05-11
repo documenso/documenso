@@ -1,6 +1,8 @@
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { normalizeBrandingColors } from '@documenso/lib/utils/normalize-branding-colors';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
+import { type SanitizeBrandingCssWarning, sanitizeBrandingCss } from '@documenso/lib/utils/sanitize-branding-css';
 import { prisma } from '@documenso/prisma';
 import { OrganisationType, Prisma } from '@prisma/client';
 
@@ -45,6 +47,8 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       brandingLogo,
       brandingUrl,
       brandingCompanyDetails,
+      brandingColors,
+      brandingCss,
 
       // Email related settings.
       emailId,
@@ -127,6 +131,24 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       });
     }
 
+    // Sanitize custom branding CSS at write time so we can store the safe
+    // result and skip per-render sanitisation. Warnings are returned to the
+    // UI so the user can see what was dropped.
+    let cssWarnings: SanitizeBrandingCssWarning[] | undefined;
+    let sanitizedBrandingCss: string | undefined;
+
+    if (brandingCss !== undefined) {
+      const result = sanitizeBrandingCss(brandingCss);
+      sanitizedBrandingCss = result.css;
+      cssWarnings = result.warnings;
+    }
+
+    // Strip empty-string colour values; collapse to `null` when the payload
+    // contains no overrides. Keeps the stored row clean and avoids storing
+    // `{}` as a real "override of nothing" (matters more for teams, but the
+    // org row stays tidy this way too).
+    const normalizedBrandingColors = normalizeBrandingColors(brandingColors);
+
     await prisma.organisation.update({
       where: {
         id: organisationId,
@@ -155,6 +177,8 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
             brandingLogo,
             brandingUrl,
             brandingCompanyDetails,
+            brandingColors: normalizedBrandingColors === null ? Prisma.DbNull : normalizedBrandingColors,
+            brandingCss: sanitizedBrandingCss,
 
             // Email related settings.
             emailId,
@@ -168,4 +192,8 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
         },
       },
     });
+
+    return {
+      cssWarnings: cssWarnings && cssWarnings.length > 0 ? cssWarnings : undefined,
+    };
   });

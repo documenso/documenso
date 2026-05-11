@@ -3,13 +3,15 @@ import { useSession } from '@documenso/lib/client-only/providers/session';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { canExecuteOrganisationAction, isPersonalLayout } from '@documenso/lib/utils/organisations';
+import type { SanitizeBrandingCssWarning } from '@documenso/lib/utils/sanitize-branding-css';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-import { msg } from '@lingui/core/macro';
+import { msg, plural } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 
 import {
@@ -35,7 +37,13 @@ export default function OrganisationSettingsBrandingPage() {
 
   const isPersonalLayoutMode = isPersonalLayout(organisations);
 
-  const { data: organisationWithSettings, isLoading: isLoadingOrganisation } = trpc.organisation.get.useQuery({
+  const [cssWarnings, setCssWarnings] = useState<SanitizeBrandingCssWarning[]>([]);
+
+  const {
+    data: organisationWithSettings,
+    isLoading: isLoadingOrganisation,
+    refetch: refetchOrganisation,
+  } = trpc.organisation.get.useQuery({
     organisationReference: organisation.url,
   });
 
@@ -43,7 +51,7 @@ export default function OrganisationSettingsBrandingPage() {
 
   const onBrandingPreferencesFormSubmit = async (data: TBrandingPreferencesFormSchema) => {
     try {
-      const { brandingEnabled, brandingLogo, brandingUrl, brandingCompanyDetails } = data;
+      const { brandingEnabled, brandingLogo, brandingUrl, brandingCompanyDetails, brandingColors, brandingCss } = data;
 
       let uploadedBrandingLogo: string | undefined;
 
@@ -56,20 +64,40 @@ export default function OrganisationSettingsBrandingPage() {
         uploadedBrandingLogo = '';
       }
 
-      await updateOrganisationSettings({
+      const result = await updateOrganisationSettings({
         organisationId: organisation.id,
         data: {
           brandingEnabled: brandingEnabled ?? undefined,
           brandingLogo: uploadedBrandingLogo,
           brandingUrl,
           brandingCompanyDetails,
+          brandingColors,
+          brandingCss,
         },
       });
 
-      toast({
-        title: t`Branding preferences updated`,
-        description: t`Your branding preferences have been updated`,
-      });
+      // Refetch so the form re-syncs with the sanitised CSS that was
+      // actually persisted (sanitiser may have dropped rules).
+      await refetchOrganisation();
+
+      const warnings = result?.cssWarnings ?? [];
+      setCssWarnings(warnings);
+
+      if (warnings.length > 0) {
+        toast({
+          title: t`Branding preferences updated with warnings`,
+          description: plural(warnings.length, {
+            one: '# CSS rule was dropped during sanitisation.',
+            other: '# CSS rules were dropped during sanitisation.',
+          }),
+          duration: 8000,
+        });
+      } else {
+        toast({
+          title: t`Branding preferences updated`,
+          description: t`Your branding preferences have been updated`,
+        });
+      }
     } catch (err) {
       toast({
         title: t`Something went wrong`,
@@ -103,9 +131,36 @@ export default function OrganisationSettingsBrandingPage() {
         <section>
           <BrandingPreferencesForm
             context="Organisation"
+            hasAdvancedBranding={
+              organisationWithSettings.organisationClaim.flags.embedSigningWhiteLabel === true || !IS_BILLING_ENABLED()
+            }
             settings={organisationWithSettings.organisationGlobalSettings}
             onFormSubmit={onBrandingPreferencesFormSubmit}
           />
+
+          {cssWarnings.length > 0 && (
+            <Alert variant="warning" className="mt-6">
+              <AlertTitle>
+                <Trans>CSS rules were dropped during sanitisation</Trans>
+              </AlertTitle>
+
+              <AlertDescription>
+                <ul className="list-disc pl-5">
+                  {cssWarnings.map((warning, index) => (
+                    <li key={index}>
+                      {warning.detail}
+                      {warning.line !== undefined && (
+                        <span className="text-muted-foreground">
+                          {' '}
+                          <Trans>(line {warning.line})</Trans>
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
+          )}
         </section>
       ) : (
         <Alert className="mt-8 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">

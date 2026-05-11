@@ -124,9 +124,7 @@ export const isEmailDomainAllowedForSignup = (email: string): boolean => {
  * Check if signup is enabled for the given provider.
  * The master switch takes precedence over the per-provider flags.
  */
-export const isSignupEnabledForProvider = (
-  provider: 'email' | 'google' | 'microsoft' | 'oidc',
-): boolean => {
+export const isSignupEnabledForProvider = (provider: 'email' | 'google' | 'microsoft' | 'oidc'): boolean => {
   if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
     return false;
   }
