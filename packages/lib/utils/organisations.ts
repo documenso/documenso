@@ -124,6 +124,8 @@ export const generateDefaultOrganisationSettings = (): Omit<OrganisationGlobalSe
     brandingLogo: '',
     brandingUrl: '',
     brandingCompanyDetails: '',
+    brandingColors: null,
+    brandingCss: '',
 
     emailId: null,
     emailReplyTo: null,

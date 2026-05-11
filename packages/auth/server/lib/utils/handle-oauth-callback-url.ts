@@ -1,8 +1,5 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import {
-  isEmailDomainAllowedForSignup,
-  isSignupEnabledForProvider,
-} from '@documenso/lib/constants/auth';
+import { isEmailDomainAllowedForSignup, isSignupEnabledForProvider } from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
 import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';

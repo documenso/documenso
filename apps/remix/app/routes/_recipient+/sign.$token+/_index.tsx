@@ -3,6 +3,7 @@ import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { loadRecipientBrandingByTeamId } from '@documenso/lib/server-only/branding/load-recipient-branding';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getEnvelopeForRecipientSigning } from '@documenso/lib/server-only/envelope/get-envelope-for-recipient-signing';
@@ -35,6 +36,8 @@ import { DocumentSigningPageViewV1 } from '~/components/general/document-signing
 import { DocumentSigningPageViewV2 } from '~/components/general/document-signing/document-signing-page-view-v2';
 import { DocumentSigningProvider } from '~/components/general/document-signing/document-signing-provider';
 import { EnvelopeSigningProvider } from '~/components/general/document-signing/envelope-signing-provider';
+import { RecipientBranding } from '~/components/general/recipient-branding';
+import { useCspNonce } from '~/utils/nonce';
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/_index';
@@ -272,6 +275,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
       envelope: {
         select: {
           internalVersion: true,
+          teamId: true,
         },
       },
     },
@@ -281,12 +285,17 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
     throw new Response('Not Found', { status: 404 });
   }
 
+  const branding = await loadRecipientBrandingByTeamId({
+    teamId: foundRecipient.envelope.teamId,
+  });
+
   if (foundRecipient.envelope.internalVersion === 2) {
     const payloadV2 = await handleV2Loader(loaderArgs);
 
     return superLoaderJson({
       version: 2,
       payload: payloadV2,
+      branding,
     } as const);
   }
 
@@ -295,17 +304,20 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
   return superLoaderJson({
     version: 1,
     payload: payloadV1,
+    branding,
   } as const);
 }
 
 export default function SigningPage() {
   const data = useSuperLoaderData<typeof loader>();
+  const cspNonce = useCspNonce();
 
-  if (data.version === 2) {
-    return <SigningPageV2 data={data.payload} />;
-  }
-
-  return <SigningPageV1 data={data.payload} />;
+  return (
+    <>
+      <RecipientBranding branding={data.branding} cspNonce={cspNonce} />
+      {data.version === 2 ? <SigningPageV2 data={data.payload} /> : <SigningPageV1 data={data.payload} />}
+    </>
+  );
 }
 
 const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loader>> }) => {
