@@ -32,10 +32,14 @@ const TEST_RAW_CSS = '.e2e-css-test-marker { color: red; }';
  * Expected HSL values after conversion by `toNativeCssVars`:
  * - colord('#ff0000').toHsl() → { h: 0, s: 100, l: 50 }
  * - colord('#00ff00').toHsl() → { h: 120, s: 100, l: 50 }
+ *
+ * The `%` on saturation and lightness is required: theme.css consumes these
+ * via `hsl(var(--token))`, and CSS Color 4 space-separated `hsl()` rejects
+ * bare numbers there. See `apps/remix/app/utils/css-vars.ts`.
  */
 const EXPECTED_CSS_VARS = {
-  '--background': '0 100 50',
-  '--primary': '120 100 50',
+  '--background': '0 100% 50%',
+  '--primary': '120 100% 50%',
   '--radius': '1rem',
 };
 
@@ -64,7 +68,7 @@ const enableEmbedAuthoringWhiteLabel = async (userId: number) => {
 const DEFAULT_BODY_BG_COLOR = 'rgb(255, 255, 255)';
 
 /**
- * When `--background` is set to `0 100 50` (hsl(0, 100%, 50%)) the body background
+ * When `--background` is set to `0 100% 50%` (hsl(0, 100%, 50%)) the body background
  * resolves to pure red via the Tailwind `bg-background` → `hsl(var(--background))` chain.
  */
 const INJECTED_BODY_BG_COLOR = 'rgb(255, 0, 0)';
