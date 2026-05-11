@@ -14,10 +14,10 @@ export const DateRangeFilter = ({ currentRange }: DateRangeFilterProps) => {
   const [isPending, startTransition] = useTransition();
   const updateSearchParams = useUpdateSearchParams();
 
-  const handleRangeChange = (value: string) => {
+  const handleRangeChange = (value: DateRange) => {
     startTransition(() => {
       updateSearchParams({
-        dateRange: value as DateRange,
+        dateRange: value,
         page: 1,
       });
     });
