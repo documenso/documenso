@@ -10,6 +10,7 @@ import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { loadRecipientBrandingByTeamId } from '@documenso/lib/server-only/branding/load-recipient-branding';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getEnvelopeForRecipientSigning } from '@documenso/lib/server-only/envelope/get-envelope-for-recipient-signing';
@@ -36,6 +37,8 @@ import { DocumentSigningPageViewV1 } from '~/components/general/document-signing
 import { DocumentSigningPageViewV2 } from '~/components/general/document-signing/document-signing-page-view-v2';
 import { DocumentSigningProvider } from '~/components/general/document-signing/document-signing-provider';
 import { EnvelopeSigningProvider } from '~/components/general/document-signing/envelope-signing-provider';
+import { RecipientBranding } from '~/components/general/recipient-branding';
+import { useCspNonce } from '~/utils/nonce';
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/_index';
@@ -144,27 +147,31 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
     throw redirect(`/sign/${token}/expired`);
   }
 
-  const recipientSignatures = await getRecipientSignatures({
-    recipientId: recipient.id,
-  });
+  const [includeSenderDetails, recipientSignatures] = await Promise.all([
+    getTeamSettings({ teamId: document.teamId }).then(
+      (teamSettings) => teamSettings?.includeSenderDetails ?? false,
+    ),
+    getRecipientSignatures({
+      documentId: document.id,
+    }),
+  ]);
 
-  const teamSettings = await getTeamSettings({
-    teamId: document.team?.id,
-  });
+  const recipientSignature = recipientSignatures?.find(
+    (signature) => signature.recipientId === recipient.id,
+  );
 
-  const signatures = recipientSignatures.map((signature) => signature.Signature);
-
-  return superLoaderJson({
-    recipients: allRecipients,
+  return {
+    isDocumentAccessValid: true,
     document,
     fields,
+    recipient,
     completedFields,
-    signatures,
-    isDocumentAccessValid: true,
-    documentMeta,
-    teamSettings,
-    isRecipientExpired: isRecipientExpired(recipient),
-  });
+    recipientSignature,
+    isRecipientsTurn,
+    allRecipients,
+    includeSenderDetails,
+    recipientWithFields,
+  } as const;
 };
 
 const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
@@ -226,41 +233,161 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
       .then((user) => !!user)
       .catch(() => false);
 
-    return superLoaderJson({
+    return {
       isDocumentAccessValid: false,
       recipientEmail: recipient.email,
       recipientHasAccount,
       envelope,
       requiredAccess,
-    } as const);
+    } as const;
   }
 
-  return superLoaderJson({
+  return {
     isDocumentAccessValid: true,
     envelope,
     requiredAccess,
     isRecipientExpired: isRecipientExpired(recipient),
-  });
+  } as const;
 };
 
 export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const url = new URL(request.url);
 
-  const v2 = url.searchParams.has('v2');
+  const loaderArgs = { params, request };
 
-  if (!v2) {
-    return handleV1Loader({ params, request });
+  // Try to find the recipient with envelope information first
+  const foundRecipient = await prisma.recipient.findUnique({
+    where: {
+      token: params.token,
+    },
+    select: {
+      envelope: {
+        select: {
+          internalVersion: true,
+          teamId: true,
+        },
+      },
+    },
+  });
+
+  if (!foundRecipient) {
+    throw new Response('Not Found', { status: 404 });
   }
 
-  return handleV2Loader({ params, request });
+  const branding = await loadRecipientBrandingByTeamId({
+    teamId: foundRecipient.envelope.teamId,
+  });
+
+  if (foundRecipient.envelope.internalVersion === 2) {
+    const payloadV2 = await handleV2Loader(loaderArgs);
+
+    return superLoaderJson({
+      version: 2,
+      payload: payloadV2,
+      branding,
+    } as const);
+  }
+
+  const payloadV1 = await handleV1Loader(loaderArgs);
+
+  return superLoaderJson({
+    version: 1,
+    payload: payloadV1,
+    branding,
+  } as const);
 };
 
 export default function SignDocumentPage() {
   const data = useSuperLoaderData<typeof loader>();
+  const cspNonce = useCspNonce();
 
-  const { user } = useOptionalSession();
+  return (
+    <>
+      <RecipientBranding branding={data.branding} cspNonce={cspNonce} />
+      {data.version === 2 ? <SigningPageV2 data={data.payload} /> : <SigningPageV1 data={data.payload} />}
+    </>
+  );
+}
 
-  if (!data.isDocumentAccessValid && 'envelope' in data) {
+const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loader>> }) => {
+  const { sessionData } = useOptionalSession();
+
+  const user = sessionData?.user;
+
+  if (!data.isDocumentAccessValid) {
+    return <DocumentSigningAuthPageView email={data.recipientEmail} emailHasAccount={!!data.recipientHasAccount} />;
+  }
+
+  const {
+    document,
+    fields,
+    recipient,
+    completedFields,
+    recipientSignature,
+    isRecipientsTurn,
+    allRecipients,
+    includeSenderDetails,
+    recipientWithFields,
+  } = data;
+
+  if (document.deletedAt || document.status === DocumentStatus.REJECTED) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="mx-auto max-w-[40rem] text-center">
+          <img className="mx-auto size-72" src={signingCelebration} alt="Document rejected" />
+
+          <h1 className="mb-4 text-4xl font-bold">
+            <Trans>This document has been rejected</Trans>
+          </h1>
+
+          <p className="mb-4 text-lg text-muted-foreground">
+            <Trans>This document has either been rejected or has expired.</Trans>
+          </p>
+
+          <p className="text-muted-foreground">
+            <Trans>If you believe this is an error, please contact the document sender.</Trans>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative flex min-h-screen">
+      <AuthenticatedHeader user={user} />
+      <div className="absolute inset-0 -z-10 h-full w-full bg-white">
+        <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+      </div>
+      <div className="fixed left-6 top-1/2 -translate-y-1/2 hidden lg:block">
+        <SigningCard3D className="h-48 w-32" />
+      </div>
+
+      <div className="ml-auto w-full lg:max-w-[60rem]">
+        <EnvelopeRenderProvider>
+          <DocumentSigningProvider
+            user={user}
+            document={document}
+            fields={fields}
+            recipients={allRecipients}
+            recipient={recipient}
+            completedFields={completedFields}
+            signature={recipientSignature}
+            includeSenderDetails={includeSenderDetails}
+          >
+            <DocumentSigningPageViewV1 />
+          </DocumentSigningProvider>
+        </EnvelopeRenderProvider>
+      </div>
+    </div>
+  );
+};
+
+const SigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV2Loader>> }) => {
+  const { sessionData } = useOptionalSession();
+
+  const user = sessionData?.user;
+
+  if (!data.isDocumentAccessValid) {
     return (
       <DocumentSigningAuthProvider
         envelope={data.envelope}
@@ -273,230 +400,25 @@ export default function SignDocumentPage() {
     );
   }
 
-  if (!data.isDocumentAccessValid && 'document' in data) {
-    return (
-      <DocumentSigningAuthProvider
-        documentMeta={data.documentMeta}
-        recipientEmail={data.recipientEmail}
-        recipientHasAccount={data.recipientHasAccount}
-      >
-        <DocumentSigningAuthPageView />
-      </DocumentSigningAuthProvider>
-    );
-  }
+  const { envelope, requiredAccess } = data;
 
-  if ('envelope' in data) {
-    return (
-      <div className="relative flex min-h-screen">
-        <AuthenticatedHeader user={user} />
-        <div className="absolute inset-0 -z-10 h-full w-full bg-white">
-          <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
-        </div>
-        <div className="fixed left-6 top-1/2 -translate-y-1/2 hidden lg:block">
-          <SigningCard3D />
-        </div>
-        <EnvelopeRenderProvider envelope={data.envelope}>
-          <EnvelopeSigningProvider envelope={data.envelope}>
+  return (
+    <div className="relative flex min-h-screen">
+      <AuthenticatedHeader user={user} />
+      <div className="absolute inset-0 -z-10 h-full w-full bg-white">
+        <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+      </div>
+      <div className="fixed left-6 top-1/2 -translate-y-1/2 hidden lg:block">
+        <SigningCard3D className="h-48 w-32" />
+      </div>
+
+      <div className="ml-auto w-full lg:max-w-[60rem]">
+        <EnvelopeRenderProvider>
+          <EnvelopeSigningProvider user={user} envelope={envelope} requiredAccess={requiredAccess}>
             <DocumentSigningPageViewV2 />
           </EnvelopeSigningProvider>
         </EnvelopeRenderProvider>
       </div>
-    );
-  }
-
-  if (data.recipients.length === 1 && data.recipients[0]?.role === RecipientRole.SIGNER) {
-    return (
-      <div className="mx-auto max-w-screen-xl px-4 md:px-8">
-        <div className="relative">
-          <DocumentSigningProvider
-            document={data.document}
-            recipient={data.recipients[0]}
-            fields={data.fields}
-            completedFields={data.completedFields}
-            signatures={data.signatures}
-            documentMeta={data.documentMeta}
-            teamSettings={data.teamSettings}
-          >
-            <DocumentSigningPageViewV1 />
-          </DocumentSigningProvider>
-        </div>
-
-        <div className="mx-auto mt-36 max-w-xl pb-16 text-center">
-          <h2 className="text-4xl font-semibold">
-            <Trans>You're almost done!</Trans>
-          </h2>
-
-          <p className="text-muted-foreground mt-4">
-            <Trans>
-              Once you have filled out all the required fields and signed the document we will
-              handle the rest.
-            </Trans>
-          </p>
-
-          <div className="bg-muted/40 mt-12 rounded-2xl p-8">
-            <Clock8 className="text-muted-foreground mx-auto h-12 w-12" />
-
-            <h3 className="mt-4 text-lg font-medium">
-              <Trans>What happens next?</Trans>
-            </h3>
-
-            <p className="text-muted-foreground mt-2 text-sm">
-              <Trans>
-                Once you have signed the document, all parties will receive a copy of the completed
-                document by email.
-              </Trans>
-            </p>
-          </div>
-
-          <hr className="border-border mt-12" />
-
-          <div className="mt-12">
-            <img
-              src={signingCelebration}
-              alt="Signing celebration"
-              className="dark:contrast-[0.8] dark:invert mx-auto h-44 w-44"
-            />
-
-            <div className="mx-auto mt-6 max-w-md">
-              <h3 className="text-lg font-medium">
-                <Trans>Signing complete!</Trans>
-              </h3>
-
-              <p className="text-muted-foreground mt-2 text-sm">
-                <Trans>
-                  Everyone has now signed the document. You will receive a copy via email shortly.
-                </Trans>
-              </p>
-            </div>
-          </div>
-
-          <div className="border-border mt-12 rounded-2xl border p-8">
-            <h3 className="text-lg font-medium">
-              <Trans>Need to make changes?</Trans>
-            </h3>
-
-            <p className="text-muted-foreground mt-2 text-sm">
-              <Trans>
-                Contact the document sender if you need to make any changes to the document.
-              </Trans>
-            </p>
-          </div>
-
-          <hr className="border-border mt-12" />
-
-          <div className="mt-12">
-            <p className="mt-36 text-muted-foreground/60 text-sm">
-              <Trans>
-                Want to send slick signing links like this one?{' '}
-                <Link
-                  to="https://davincisolutions.ai"
-                  className="text-documenso-700 hover:text-documenso-600"
-                >
-                  Check out Davinci Sign
-                </Link>
-                .
-              </Trans>
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="mx-auto max-w-screen-xl px-4 md:px-8">
-      <div className="relative">
-        <DocumentSigningProvider
-          document={data.document}
-          recipient={data.recipients[0]}
-          fields={data.fields}
-          completedFields={data.completedFields}
-          signatures={data.signatures}
-          documentMeta={data.documentMeta}
-          teamSettings={data.teamSettings}
-        >
-          <DocumentSigningPageViewV1 />
-        </DocumentSigningProvider>
-      </div>
-
-      <div className="mx-auto mt-36 max-w-xl pb-16 text-center">
-        <h2 className="text-4xl font-semibold">
-          <Trans>You're almost done!</Trans>
-        </h2>
-
-        <p className="text-muted-foreground mt-4">
-          <Trans>
-            Once you have filled out all the required fields and signed the document we will handle
-            the rest.
-          </Trans>
-        </p>
-
-        <div className="bg-muted/40 mt-12 rounded-2xl p-8">
-          <Clock8 className="text-muted-foreground mx-auto h-12 w-12" />
-
-          <h3 className="mt-4 text-lg font-medium">
-            <Trans>What happens next?</Trans>
-          </h3>
-
-          <p className="text-muted-foreground mt-2 text-sm">
-            <Trans>
-              Once you have signed the document, all parties will receive a copy of the completed
-              document by email.
-            </Trans>
-          </p>
-        </div>
-
-        <hr className="border-border mt-12" />
-
-        <div className="mt-12">
-          <img
-            src={signingCelebration}
-            alt="Signing celebration"
-            className="dark:contrast-[0.8] dark:invert mx-auto h-44 w-44"
-          />
-
-          <div className="mx-auto mt-6 max-w-md">
-            <h3 className="text-lg font-medium">
-              <Trans>Signing complete!</Trans>
-            </h3>
-
-            <p className="text-muted-foreground mt-2 text-sm">
-              <Trans>
-                Everyone has now signed the document. You will receive a copy via email shortly.
-              </Trans>
-            </p>
-          </div>
-        </div>
-
-        <div className="border-border mt-12 rounded-2xl border p-8">
-          <h3 className="text-lg font-medium">
-            <Trans>Need to make changes?</Trans>
-          </h3>
-
-          <p className="text-muted-foreground mt-2 text-sm">
-            <Trans>
-              Contact the document sender if you need to make any changes to the document.
-            </Trans>
-          </p>
-        </div>
-
-        <hr className="border-border mt-12" />
-
-        <div className="mt-12">
-          <p className="mt-36 text-muted-foreground/60 text-sm">
-            <Trans>
-              Want to send slick signing links like this one?{' '}
-              <Link
-                to="https://davincisolutions.ai"
-                className="text-documenso-700 hover:text-documenso-600"
-              >
-                Check out Davinci Sign
-              </Link>
-              .
-            </Trans>
-          </p>
-        </div>
-      </div>
     </div>
   );
-}
+};
