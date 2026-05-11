@@ -1,8 +1,7 @@
-import { DocumentDistributionMethod } from '@prisma/client';
-import { z } from 'zod';
-
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { zEmail } from '@documenso/lib/utils/zod';
+import { DocumentDistributionMethod } from '@prisma/client';
+import { z } from 'zod';
 
 export const ZAddSubjectFormSchema = z.object({
   meta: z.object({
@@ -11,10 +10,7 @@ export const ZAddSubjectFormSchema = z.object({
     // emailReplyName: z.string().optional(),
     subject: z.string(),
     message: z.string(),
-    distributionMethod: z
-      .nativeEnum(DocumentDistributionMethod)
-      .optional()
-      .default(DocumentDistributionMethod.EMAIL),
+    distributionMethod: z.nativeEnum(DocumentDistributionMethod).optional().default(DocumentDistributionMethod.EMAIL),
     emailSettings: ZDocumentEmailSettingsSchema,
   }),
 });

@@ -1,13 +1,11 @@
-import { useCallback, useMemo, useState } from 'react';
-
+import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 import { Check, ChevronsUpDown, Info } from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
 import { sortBy } from 'remeda';
-
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
-import type { TRecipientLite } from '@documenso/lib/types/recipient';
 
 import { getRecipientColorStyles } from '../lib/recipient-colors';
 import { cn } from '../lib/utils';
@@ -53,20 +51,13 @@ export const RecipientSelector = ({
   const recipientsByRoleToDisplay = useMemo(() => {
     return Object.entries(recipientsByRole)
       .filter(
-        ([role]) =>
-          role !== RecipientRole.CC &&
-          role !== RecipientRole.VIEWER &&
-          role !== RecipientRole.ASSISTANT,
+        ([role]) => role !== RecipientRole.CC && role !== RecipientRole.VIEWER && role !== RecipientRole.ASSISTANT,
       )
       .map(
         ([role, roleRecipients]) =>
           [
             role,
-            sortBy(
-              roleRecipients,
-              [(r) => r.signingOrder || Number.MAX_SAFE_INTEGER, 'asc'],
-              [(r) => r.id, 'asc'],
-            ),
+            sortBy(roleRecipients, [(r) => r.signingOrder || Number.MAX_SAFE_INTEGER, 'asc'], [(r) => r.id, 'asc']),
           ] as [RecipientRole, TRecipientLite[]],
       );
   }, [recipientsByRole]);
@@ -102,15 +93,12 @@ export const RecipientSelector = ({
           role="combobox"
           className={cn(
             'justify-between bg-background font-normal text-muted-foreground hover:text-foreground',
-            getRecipientColorStyles(recipients.findIndex((r) => r.id === selectedRecipient?.id))
-              .comboBoxTrigger,
+            getRecipientColorStyles(recipients.findIndex((r) => r.id === selectedRecipient?.id)).comboBoxTrigger,
             className,
           )}
         >
           {selectedRecipient && (
-            <span className="flex-1 truncate text-left">
-              {getRecipientLabel(selectedRecipient)}
-            </span>
+            <span className="flex-1 truncate text-left">{getRecipientLabel(selectedRecipient)}</span>
           )}
 
           <ChevronsUpDown className="ml-2 h-4 w-4" />
@@ -129,15 +117,12 @@ export const RecipientSelector = ({
 
           {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
             <CommandGroup key={roleIndex}>
-              <div className="mb-1 ml-2 mt-2 text-xs font-medium text-muted-foreground">
+              <div className="mt-2 mb-1 ml-2 font-medium text-muted-foreground text-xs">
                 {_(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
               </div>
 
               {roleRecipients.length === 0 && (
-                <div
-                  key={`${role}-empty`}
-                  className="px-4 pb-4 pt-2.5 text-center text-xs text-muted-foreground/80"
-                >
+                <div key={`${role}-empty`} className="px-4 pt-2.5 pb-4 text-center text-muted-foreground/80 text-xs">
                   <Trans>No recipients with this role</Trans>
                 </div>
               )}
@@ -147,8 +132,7 @@ export const RecipientSelector = ({
                   key={recipient.id}
                   className={cn(
                     'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
-                    getRecipientColorStyles(recipients.findIndex((r) => r.id === recipient.id))
-                      .comboBoxItem,
+                    getRecipientColorStyles(recipients.findIndex((r) => r.id === recipient.id)).comboBoxItem,
                     {
                       'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
                     },
@@ -184,8 +168,8 @@ export const RecipientSelector = ({
 
                         <TooltipContent className="max-w-xs text-muted-foreground">
                           <Trans>
-                            This document has already been sent to this recipient. You can no longer
-                            edit this recipient.
+                            This document has already been sent to this recipient. You can no longer edit this
+                            recipient.
                           </Trans>
                         </TooltipContent>
                       </Tooltip>

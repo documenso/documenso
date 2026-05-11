@@ -14,7 +14,7 @@ type PromiseWithResolvers<T> = {
 const GlobalPromise = globalThis.Promise as any;
 
 if (typeof GlobalPromise.withResolvers !== 'function') {
-  GlobalPromise.withResolvers = function <T>(): PromiseWithResolvers<T> {
+  GlobalPromise.withResolvers = <T>(): PromiseWithResolvers<T> => {
     let resolve!: (value: T | PromiseLike<T>) => void;
     let reject!: (reason?: unknown) => void;
 

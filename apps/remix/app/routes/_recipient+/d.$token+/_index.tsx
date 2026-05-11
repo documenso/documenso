@@ -1,17 +1,17 @@
-import { Plural } from '@lingui/react/macro';
-import { UsersIcon } from 'lucide-react';
-import { redirect } from 'react-router';
-import { match } from 'ts-pattern';
-
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { loadRecipientBrandingByTeamId } from '@documenso/lib/server-only/branding/load-recipient-branding';
 import { getEnvelopeForDirectTemplateSigning } from '@documenso/lib/server-only/envelope/get-envelope-for-direct-template-signing';
 import { getTemplateByDirectLinkToken } from '@documenso/lib/server-only/template/get-template-by-direct-link-token';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
+import { Plural } from '@lingui/react/macro';
+import { UsersIcon } from 'lucide-react';
+import { redirect } from 'react-router';
+import { match } from 'ts-pattern';
 
 import { Header as AuthenticatedHeader } from '~/components/general/app-header';
 import { DirectTemplatePageView } from '~/components/general/direct-template/direct-template-page';
@@ -21,6 +21,8 @@ import { DocumentSigningAuthProvider } from '~/components/general/document-signi
 import { DocumentSigningPageViewV2 } from '~/components/general/document-signing/document-signing-page-view-v2';
 import { DocumentSigningProvider } from '~/components/general/document-signing/document-signing-provider';
 import { EnvelopeSigningProvider } from '~/components/general/document-signing/envelope-signing-provider';
+import { RecipientBranding } from '~/components/general/recipient-branding';
+import { useCspNonce } from '~/utils/nonce';
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/_index';
@@ -126,6 +128,7 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
     },
     select: {
       internalVersion: true,
+      teamId: true,
     },
   });
 
@@ -133,12 +136,17 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
     throw new Response('Not Found', { status: 404 });
   }
 
+  const branding = await loadRecipientBrandingByTeamId({
+    teamId: directEnvelope.teamId,
+  });
+
   if (directEnvelope.internalVersion === 2) {
     const payloadV2 = await handleV2Loader(loaderArgs);
 
     return superLoaderJson({
       version: 2,
       payload: payloadV2,
+      branding,
     } as const);
   }
 
@@ -147,17 +155,20 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
   return superLoaderJson({
     version: 1,
     payload: payloadV1,
+    branding,
   } as const);
 }
 
 export default function DirectTemplatePage() {
   const data = useSuperLoaderData<typeof loader>();
+  const cspNonce = useCspNonce();
 
-  if (data.version === 2) {
-    return <DirectSigningPageV2 data={data.payload} />;
-  }
-
-  return <DirectSigningPageV1 data={data.payload} />;
+  return (
+    <>
+      <RecipientBranding branding={data.branding} cspNonce={cspNonce} />
+      {data.version === 2 ? <DirectSigningPageV2 data={data.payload} /> : <DirectSigningPageV1 data={data.payload} />}
+    </>
+  );
 }
 
 const DirectSigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loader>> }) => {
@@ -187,31 +198,29 @@ const DirectSigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV
         isDirectTemplate={true}
         user={user}
       >
-        <>
-          {sessionData?.user && <AuthenticatedHeader />}
+        {sessionData?.user && <AuthenticatedHeader />}
 
-          <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
-            <h1
-              className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
-              title={template.title}
-            >
-              {template.title}
-            </h1>
+        <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
+          <h1
+            className="mt-4 block max-w-[20rem] truncate font-semibold text-2xl md:max-w-[30rem] md:text-3xl"
+            title={template.title}
+          >
+            {template.title}
+          </h1>
 
-            <div className="mb-8 mt-2.5 flex items-center gap-x-2 text-muted-foreground">
-              <UsersIcon className="h-4 w-4" />
-              <p className="text-muted-foreground/80">
-                <Plural value={template.recipients.length} one="# recipient" other="# recipients" />
-              </p>
-            </div>
-
-            <DirectTemplatePageView
-              directTemplateRecipient={directTemplateRecipient}
-              directTemplateToken={template.directLink.token}
-              template={template}
-            />
+          <div className="mt-2.5 mb-8 flex items-center gap-x-2 text-muted-foreground">
+            <UsersIcon className="h-4 w-4" />
+            <p className="text-muted-foreground/80">
+              <Plural value={template.recipients.length} one="# recipient" other="# recipients" />
+            </p>
           </div>
-        </>
+
+          <DirectTemplatePageView
+            directTemplateRecipient={directTemplateRecipient}
+            directTemplateToken={template.directLink.token}
+            template={template}
+          />
+        </div>
       </DocumentSigningAuthProvider>
     </DocumentSigningProvider>
   );
@@ -241,11 +250,7 @@ const DirectSigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV
       fullName={user?.name}
       signature={user?.signature}
     >
-      <DocumentSigningAuthProvider
-        documentAuthOptions={envelope.authOptions}
-        recipient={recipient}
-        user={user}
-      >
+      <DocumentSigningAuthProvider documentAuthOptions={envelope.authOptions} recipient={recipient} user={user}>
         <EnvelopeRenderProvider
           version="current"
           envelope={envelope}

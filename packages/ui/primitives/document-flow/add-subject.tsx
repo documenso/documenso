@@ -1,15 +1,3 @@
-import { useEffect } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { Field } from '@prisma/client';
-import { DocumentDistributionMethod, DocumentStatus, RecipientRole } from '@prisma/client';
-import { AnimatePresence, motion } from 'framer-motion';
-import { InfoIcon } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-
 import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
@@ -19,29 +7,23 @@ import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { formatSigningLink } from '@documenso/lib/utils/recipients';
 import { trpc } from '@documenso/trpc/react';
 import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/document/document-send-email-message-helper';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import type { Field } from '@prisma/client';
+import { DocumentDistributionMethod, DocumentStatus, RecipientRole } from '@prisma/client';
+import { AnimatePresence, motion } from 'framer-motion';
+import { InfoIcon } from 'lucide-react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 
 import { CopyTextButton } from '../../components/common/copy-text-button';
 import { DocumentEmailCheckboxes } from '../../components/document/document-email-checkboxes';
-import {
-  DocumentReadOnlyFields,
-  mapFieldsWithRecipients,
-} from '../../components/document/document-read-only-fields';
+import { DocumentReadOnlyFields, mapFieldsWithRecipients } from '../../components/document/document-read-only-fields';
 import { AvatarWithText } from '../avatar';
 import { Input } from '../input';
 import { useStep } from '../stepper';
@@ -70,8 +52,8 @@ export type AddSubjectFormProps = {
 
 export const AddSubjectFormPartial = ({
   documentFlow,
-  recipients: recipients,
-  fields: fields,
+  recipients,
+  fields,
   document,
   onSubmit,
   onAutoSave,
@@ -89,8 +71,7 @@ export const AddSubjectFormPartial = ({
         // emailReplyName: document.documentMeta?.emailReplyName || undefined,
         subject: document.documentMeta?.subject ?? '',
         message: document.documentMeta?.message ?? '',
-        distributionMethod:
-          document.documentMeta?.distributionMethod || DocumentDistributionMethod.EMAIL,
+        distributionMethod: document.documentMeta?.distributionMethod || DocumentDistributionMethod.EMAIL,
         emailSettings: ZDocumentEmailSettingsSchema.parse(document?.documentMeta?.emailSettings),
       },
     },
@@ -106,11 +87,10 @@ export const AddSubjectFormPartial = ({
     formState: { isSubmitting },
   } = form;
 
-  const { data: emailData, isLoading: isLoadingEmails } =
-    trpc.enterprise.organisation.email.find.useQuery({
-      organisationId: organisation.id,
-      perPage: 100,
-    });
+  const { data: emailData, isLoading: isLoadingEmails } = trpc.enterprise.organisation.email.find.useQuery({
+    organisationId: organisation.id,
+    perPage: 100,
+  });
 
   const emails = emailData?.data || [];
 
@@ -168,10 +148,7 @@ export const AddSubjectFormPartial = ({
 
   return (
     <>
-      <DocumentFlowFormContainerHeader
-        title={documentFlow.title}
-        description={documentFlow.description}
-      />
+      <DocumentFlowFormContainerHeader title={documentFlow.title} description={documentFlow.description} />
       <DocumentFlowFormContainerContent>
         <div className="flex flex-col">
           {isDocumentPdfLoaded && (
@@ -226,9 +203,7 @@ export const AddSubjectFormPartial = ({
                               <Select
                                 {...field}
                                 value={field.value === null ? '-1' : field.value}
-                                onValueChange={(value) =>
-                                  field.onChange(value === '-1' ? null : value)
-                                }
+                                onValueChange={(value) => field.onChange(value === '-1' ? null : value)}
                               >
                                 <SelectTrigger loading={isLoadingEmails} className="bg-background">
                                   <SelectValue />
@@ -259,8 +234,7 @@ export const AddSubjectFormPartial = ({
                         <FormItem>
                           <FormLabel>
                             <Trans>
-                              Reply To Email{' '}
-                              <span className="text-muted-foreground">(Optional)</span>
+                              Reply To Email <span className="text-muted-foreground">(Optional)</span>
                             </Trans>
                           </FormLabel>
 
@@ -331,11 +305,7 @@ export const AddSubjectFormPartial = ({
                           </FormLabel>
 
                           <FormControl>
-                            <Textarea
-                              className="mt-2 h-16 resize-none bg-background"
-                              {...field}
-                              maxLength={5000}
-                            />
+                            <Textarea className="mt-2 h-16 resize-none bg-background" {...field} maxLength={5000} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -361,15 +331,15 @@ export const AddSubjectFormPartial = ({
                 className="rounded-lg border"
               >
                 {document.status === DocumentStatus.DRAFT ? (
-                  <div className="py-16 text-center text-sm text-muted-foreground">
+                  <div className="py-16 text-center text-muted-foreground text-sm">
                     <p>
                       <Trans>We won't send anything to notify recipients.</Trans>
                     </p>
 
                     <p className="mt-2">
                       <Trans>
-                        We will generate signing links for you, which you can send to the recipients
-                        through your method of choice.
+                        We will generate signing links for you, which you can send to the recipients through your method
+                        of choice.
                       </Trans>
                     </p>
                   </div>
@@ -382,17 +352,12 @@ export const AddSubjectFormPartial = ({
                     )}
 
                     {recipients.map((recipient) => (
-                      <li
-                        key={recipient.id}
-                        className="flex items-center justify-between px-4 py-3 text-sm"
-                      >
+                      <li key={recipient.id} className="flex items-center justify-between px-4 py-3 text-sm">
                         <AvatarWithText
                           avatarFallback={recipient.email.slice(0, 1).toUpperCase()}
-                          primaryText={
-                            <p className="text-sm text-muted-foreground">{recipient.email}</p>
-                          }
+                          primaryText={<p className="text-muted-foreground text-sm">{recipient.email}</p>}
                           secondaryText={
-                            <p className="text-xs text-muted-foreground/70">
+                            <p className="text-muted-foreground/70 text-xs">
                               {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
                             </p>
                           }
@@ -404,9 +369,7 @@ export const AddSubjectFormPartial = ({
                             onCopySuccess={() => {
                               toast({
                                 title: _(msg`Copied to clipboard`),
-                                description: _(
-                                  msg`The signing link has been copied to your clipboard.`,
-                                ),
+                                description: _(msg`The signing link has been copied to your clipboard.`),
                               });
                             }}
                             badgeContentUncopied={

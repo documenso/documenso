@@ -1,9 +1,8 @@
-import { FieldType } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
-
 import type { TFieldAndMeta } from '@documenso/lib/types/field-meta';
 import { toCheckboxCustomText } from '@documenso/lib/utils/fields';
+import { FieldType } from '@prisma/client';
 
 export type FieldTestData = TFieldAndMeta & {
   page: number;
@@ -25,11 +24,7 @@ const fullColumnWidth = 57.37499999999998;
 const rowHeight = 6.7;
 const rowPadding = 0;
 
-const calculatePositionPageOne = (
-  row: number,
-  column: number,
-  width: 'full' | 'column' = 'column',
-) => {
+const calculatePositionPageOne = (row: number, column: number, width: 'full' | 'column' = 'column') => {
   const alignmentGridStartX = 31;
   const alignmentGridStartY = 19;
 
@@ -41,11 +36,7 @@ const calculatePositionPageOne = (
   };
 };
 
-const calculatePositionPageTwo = (
-  row: number,
-  column: number,
-  width: 'full' | 'column' = 'column',
-) => {
+const calculatePositionPageTwo = (row: number, column: number, width: 'full' | 'column' = 'column') => {
   const alignmentGridStartX = 31;
   const alignmentGridStartY = 16.35;
 

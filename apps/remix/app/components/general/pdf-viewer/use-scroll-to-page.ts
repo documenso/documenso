@@ -9,10 +9,7 @@ import { type RefObject, useEffect } from 'react';
  * This is the communication bridge between field validation logic (which knows
  * which page to scroll to) and the virtual list (which knows how to scroll).
  */
-export const useScrollToPage = (
-  contentRef: RefObject<HTMLElement | null>,
-  scrollToItem: (index: number) => void,
-) => {
+export const useScrollToPage = (contentRef: RefObject<HTMLElement | null>, scrollToItem: (index: number) => void) => {
   useEffect(() => {
     const el = contentRef.current;
 

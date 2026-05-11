@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
-
 import { useTheme } from 'next-themes';
+import { useEffect, useId, useRef, useState } from 'react';
 
 export const Mermaid = ({ chart }: { chart: string }) => {
   const [mounted, setMounted] = useState(false);

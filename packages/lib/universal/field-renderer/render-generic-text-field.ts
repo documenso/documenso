@@ -25,11 +25,7 @@ const DEFAULT_TEXT_X_PADDING = 6;
 const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOptions) => {
   const { pageWidth, pageHeight, mode = 'edit', pageLayer, translations } = options;
 
-  const { fieldX, fieldY, fieldWidth, fieldHeight } = calculateFieldPosition(
-    field,
-    pageWidth,
-    pageHeight,
-  );
+  const { fieldX, fieldY, fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
   const fieldMeta = field.fieldMeta as GenericTextFieldTypeMetas | undefined;
 
@@ -157,10 +153,7 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
   };
 };
 
-export const renderGenericTextFieldElement = (
-  field: FieldToRender,
-  options: RenderFieldElementOptions,
-) => {
+export const renderGenericTextFieldElement = (field: FieldToRender, options: RenderFieldElementOptions) => {
   const { mode = 'edit', pageLayer, color } = options;
   const { pageWidth, pageHeight } = options;
   const fieldMeta = field.fieldMeta as GenericTextFieldTypeMetas | undefined;

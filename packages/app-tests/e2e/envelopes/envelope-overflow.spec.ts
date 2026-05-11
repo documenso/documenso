@@ -1,17 +1,16 @@
-import { createCanvas } from '@napi-rs/canvas';
-import type { TestInfo } from '@playwright/test';
-import { expect, test } from '@playwright/test';
-import { DocumentStatus, EnvelopeType, FieldType } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
-import pixelMatch from 'pixelmatch';
-import { PNG } from 'pngjs';
-
 import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
 import { prisma } from '@documenso/prisma';
 import { seedOverflowTestDocument } from '@documenso/prisma/seed/initial-seed';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { createCanvas } from '@napi-rs/canvas';
+import type { TestInfo } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { DocumentStatus, EnvelopeType, FieldType } from '@prisma/client';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
+import pixelMatch from 'pixelmatch';
+import { PNG } from 'pngjs';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../lib/constants/app';
 import { isBase64Image } from '../../../lib/constants/signatures';
@@ -71,9 +70,7 @@ test('overflow visual regression', async ({ page, request }, testInfo) => {
   });
 
   // Step 1: Create initial envelope with overflow PDF
-  const overflowPdf = fs.readFileSync(
-    path.join(__dirname, '../../../../assets/field-overflow.pdf'),
-  );
+  const overflowPdf = fs.readFileSync(path.join(__dirname, '../../../../assets/field-overflow.pdf'));
 
   const formData = new FormData();
 
@@ -192,9 +189,7 @@ test('overflow visual regression', async ({ page, request }, testInfo) => {
             ? {
                 create: {
                   recipientId: envelope.recipients[0].id,
-                  signatureImageAsBase64: isBase64Image(foundField.signature)
-                    ? foundField.signature
-                    : null,
+                  signatureImageAsBase64: isBase64Image(foundField.signature) ? foundField.signature : null,
                   typedSignature: isBase64Image(foundField.signature) ? null : foundField.signature,
                 },
               }
@@ -292,9 +287,7 @@ test('overflow visual regression', async ({ page, request }, testInfo) => {
       const loadedImages = storedImages
         .filter((image) => image.startsWith(`field-overflow-`))
         .sort((leftImage, rightImage) => {
-          return (
-            getVisualRegressionImageIndex(leftImage) - getVisualRegressionImageIndex(rightImage)
-          );
+          return getVisualRegressionImageIndex(leftImage) - getVisualRegressionImageIndex(rightImage);
         })
         .map((image) => fs.readFileSync(path.join(__dirname, '../../visual-regression', image)));
 
@@ -482,12 +475,7 @@ type CompareSignedPdfWithImagesOptions = {
   testInfo: TestInfo;
 };
 
-const compareSignedPdfWithImages = async ({
-  id,
-  pdfData,
-  images,
-  testInfo,
-}: CompareSignedPdfWithImagesOptions) => {
+const compareSignedPdfWithImages = async ({ id, pdfData, images, testInfo }: CompareSignedPdfWithImagesOptions) => {
   const renderedImages = await renderPdfToImage(pdfData);
 
   expect(images).toHaveLength(renderedImages.length);

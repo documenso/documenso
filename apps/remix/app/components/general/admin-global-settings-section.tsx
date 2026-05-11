@@ -1,14 +1,10 @@
+import { DOCUMENT_VISIBILITY } from '@documenso/lib/constants/document-visibility';
+import { type TDocumentEmailSettings, ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { OrganisationGlobalSettings, TeamGlobalSettings } from '@prisma/client';
-
-import { DOCUMENT_VISIBILITY } from '@documenso/lib/constants/document-visibility';
-import {
-  type TDocumentEmailSettings,
-  ZDocumentEmailSettingsSchema,
-} from '@documenso/lib/types/document-email';
 
 import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
 
@@ -31,10 +27,7 @@ type AdminGlobalSettingsSectionProps = {
   isTeam?: boolean;
 };
 
-export const AdminGlobalSettingsSection = ({
-  settings,
-  isTeam = false,
-}: AdminGlobalSettingsSectionProps) => {
+export const AdminGlobalSettingsSection = ({ settings, isTeam = false }: AdminGlobalSettingsSectionProps) => {
   const { _ } = useLingui();
   const notSetLabel = isTeam ? <Trans>Inherited</Trans> : <Trans>Not set</Trans>;
 
@@ -66,9 +59,7 @@ export const AdminGlobalSettingsSection = ({
     return value ? <Trans>Enabled</Trans> : <Trans>Disabled</Trans>;
   };
 
-  const parsedEmailSettings = ZDocumentEmailSettingsSchema.safeParse(
-    settings.emailDocumentSettings,
-  );
+  const parsedEmailSettings = ZDocumentEmailSettingsSchema.safeParse(settings.emailDocumentSettings);
 
   return (
     <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
@@ -142,13 +133,11 @@ export const AdminGlobalSettingsSection = ({
 
       {isTeam && parsedEmailSettings.success && (
         <DetailsCard label={<Trans>Email document settings</Trans>}>
-          <div className="mt-1 space-y-1 pb-2 pr-3 text-xs">
+          <div className="mt-1 space-y-1 pr-3 pb-2 text-xs">
             {emailSettingsKeys.map((key) => (
               <div key={key} className="flex items-center justify-between gap-2">
                 <span className="text-muted-foreground">{_(EMAIL_SETTINGS_LABELS[key])}</span>
-                <span>
-                  {parsedEmailSettings.data[key] ? <Trans>On</Trans> : <Trans>Off</Trans>}
-                </span>
+                <span>{parsedEmailSettings.data[key] ? <Trans>On</Trans> : <Trans>Off</Trans>}</span>
               </div>
             ))}
           </div>

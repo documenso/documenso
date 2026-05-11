@@ -86,8 +86,7 @@ const calculateLayout = (params: {
   exceedsHeightWhenWrapped: boolean;
   hasRoomForMoreThanOneLine: boolean;
 } => {
-  const { textToRender, fontSize, fontFamily, lineHeight, letterSpacing, baseWidth, baseHeight } =
-    params;
+  const { textToRender, fontSize, fontFamily, lineHeight, letterSpacing, baseWidth, baseHeight } = params;
 
   // Measure the text without width constraint to get natural width and single-line height.
   const unwrappedNode = new Konva.Text({
@@ -194,8 +193,7 @@ const calculateHorizontalOverflow = (params: OverflowLayoutParams): OverflowLayo
  * - middle aligned: extends symmetrically up and down toward the closer page edge
  */
 const calculateVerticalOverflow = (params: OverflowLayoutParams): OverflowLayoutResult => {
-  const { verticalAlign, textAlign, baseX, baseY, baseWidth, baseHeight, groupY, pageHeight } =
-    params;
+  const { verticalAlign, textAlign, baseX, baseY, baseWidth, baseHeight, groupY, pageHeight } = params;
 
   if (verticalAlign === 'bottom') {
     // Extend upward to page top edge.

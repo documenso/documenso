@@ -25,9 +25,7 @@ export const getBackupCodes = ({ user }: GetBackupCodesOptions) => {
     throw new Error('User has no backup codes');
   }
 
-  const secret = Buffer.from(symmetricDecrypt({ key, data: user.twoFactorBackupCodes })).toString(
-    'utf-8',
-  );
+  const secret = Buffer.from(symmetricDecrypt({ key, data: user.twoFactorBackupCodes })).toString('utf-8');
 
   const data = JSON.parse(secret);
 

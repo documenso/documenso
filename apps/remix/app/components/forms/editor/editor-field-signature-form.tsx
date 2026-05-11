@@ -1,10 +1,3 @@
-import { useEffect } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/react/macro';
-import { useForm, useWatch } from 'react-hook-form';
-import type { z } from 'zod';
-
 import { DEFAULT_SIGNATURE_TEXT_FONT_SIZE } from '@documenso/lib/constants/pdf';
 import {
   FIELD_SIGNATURE_META_DEFAULT_VALUES,
@@ -12,6 +5,11 @@ import {
   ZSignatureFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { Form } from '@documenso/ui/primitives/form/form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans } from '@lingui/react/macro';
+import { useEffect } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import type { z } from 'zod';
 
 import { EditorGenericFontSizeField } from './editor-field-generic-field-forms';
 
@@ -66,7 +64,7 @@ export const EditorFieldSignatureForm = ({
         <fieldset className="flex flex-col gap-2">
           <div>
             <EditorGenericFontSizeField formControl={form.control} />
-            <p className="mt-0.5 text-xs text-muted-foreground">
+            <p className="mt-0.5 text-muted-foreground text-xs">
               <Trans>The typed signature font size</Trans>
             </p>
           </div>

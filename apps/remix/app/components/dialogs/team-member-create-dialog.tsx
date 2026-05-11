@@ -1,15 +1,3 @@
-import { useEffect, useRef, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { TeamMemberRole } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { InfoIcon, UserPlusIcon } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { Link } from 'react-router';
-import { match } from 'ts-pattern';
-import { z } from 'zod';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { TEAM_MEMBER_ROLE_HIERARCHY } from '@documenso/lib/constants/teams';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
@@ -36,15 +24,19 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { TeamMemberRole } from '@prisma/client';
+import type * as DialogPrimitive from '@radix-ui/react-dialog';
+import { InfoIcon, UserPlusIcon } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Link } from 'react-router';
+import { match } from 'ts-pattern';
+import { z } from 'zod';
 
 import { OrganisationMemberInviteDialog } from '~/components/dialogs/organisation-member-invite-dialog';
 import {
@@ -195,8 +187,8 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                   </TooltipTrigger>
                   <TooltipContent className="z-[99999] max-w-xs text-muted-foreground">
                     <Trans>
-                      To be able to add members to a team, you must first add them to the
-                      organisation. For more information, please see the{' '}
+                      To be able to add members to a team, you must first add them to the organisation. For more
+                      information, please see the{' '}
                       <Link
                         to="https://docs.documenso.com/users/organisations/members"
                         target="_blank"
@@ -256,25 +248,23 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
 
                         <FormControl>
                           {hasNoAvailableMembers ? (
-                            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-muted-foreground/25 bg-muted/30 px-6 py-12 text-center">
+                            <div className="flex flex-col items-center justify-center rounded-lg border border-muted-foreground/25 border-dashed bg-muted/30 px-6 py-12 text-center">
                               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                                 <UserPlusIcon className="h-6 w-6 text-muted-foreground" />
                               </div>
-                              <h3 className="mb-2 text-sm font-semibold">
+                              <h3 className="mb-2 font-semibold text-sm">
                                 <Trans>No organisation members available</Trans>
                               </h3>
-                              <p className="mb-6 max-w-sm text-sm text-muted-foreground">
+                              <p className="mb-6 max-w-sm text-muted-foreground text-sm">
                                 {canInviteOrganisationMembers ? (
                                   <Trans>
-                                    To add members to this team, you must first add them to the
-                                    organisation.
+                                    To add members to this team, you must first add them to the organisation.
                                   </Trans>
                                 ) : (
                                   <Trans>
-                                    To add members to this team, they must first be invited to the
-                                    organisation. Only organisation admins and managers can invite
-                                    new members — please contact one of them to invite members on
-                                    your behalf.
+                                    To add members to this team, they must first be invited to the organisation. Only
+                                    organisation admins and managers can invite new members — please contact one of them
+                                    to invite members on your behalf.
                                   </Trans>
                                 )}
                               </p>
@@ -302,9 +292,8 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                                   members.map((member) => ({
                                     organisationMemberId: member.id,
                                     teamRole:
-                                      field.value.find(
-                                        (entry) => entry.organisationMemberId === member.id,
-                                      )?.teamRole || TeamMemberRole.MEMBER,
+                                      field.value.find((entry) => entry.organisationMemberId === member.id)?.teamRole ||
+                                      TeamMemberRole.MEMBER,
                                   })),
                                 );
                               }}
@@ -321,10 +310,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                             </FormDescription>
 
                             {canInviteOrganisationMembers && (
-                              <Alert
-                                variant="neutral"
-                                className="mt-2 flex items-center gap-2 space-y-0"
-                              >
+                              <Alert variant="neutral" className="mt-2 flex items-center gap-2 space-y-0">
                                 <div>
                                   <UserPlusIcon className="h-5 w-5 text-muted-foreground" />
                                 </div>
@@ -337,7 +323,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                                       <Button
                                         type="button"
                                         variant="link"
-                                        className="h-auto p-0 text-sm font-medium text-documenso-700 hover:text-documenso-600"
+                                        className="h-auto p-0 font-medium text-documenso-700 text-sm hover:text-documenso-600"
                                       >
                                         <Trans>Invite them to the organisation first</Trans>
                                       </Button>
@@ -384,10 +370,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                           <Input
                             readOnly
                             className="bg-background"
-                            value={
-                              selectedMembers.find(({ id }) => id === member.organisationMemberId)
-                                ?.name || ''
-                            }
+                            value={selectedMembers.find(({ id }) => id === member.organisationMemberId)?.name || ''}
                           />
                         </div>
 
@@ -408,13 +391,11 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                                   </SelectTrigger>
 
                                   <SelectContent position="popper">
-                                    {TEAM_MEMBER_ROLE_HIERARCHY[team.currentTeamRole].map(
-                                      (role) => (
-                                        <SelectItem key={role} value={role}>
-                                          {t(TEAM_MEMBER_ROLE_MAP[role]) ?? role}
-                                        </SelectItem>
-                                      ),
-                                    )}
+                                    {TEAM_MEMBER_ROLE_HIERARCHY[team.currentTeamRole].map((role) => (
+                                      <SelectItem key={role} value={role}>
+                                        {t(TEAM_MEMBER_ROLE_MAP[role]) ?? role}
+                                      </SelectItem>
+                                    ))}
                                   </SelectContent>
                                 </Select>
                               </FormControl>

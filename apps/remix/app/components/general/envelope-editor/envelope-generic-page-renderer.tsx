@@ -1,9 +1,3 @@
-import { useEffect, useMemo } from 'react';
-
-import { useLingui } from '@lingui/react/macro';
-import { DocumentStatus, type Recipient, SigningStatus } from '@prisma/client';
-import type Konva from 'konva';
-
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
 import {
   type PageRenderData,
@@ -13,6 +7,10 @@ import type { TEnvelope } from '@documenso/lib/types/envelope';
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
 import { EnvelopeRecipientFieldTooltip } from '@documenso/ui/components/document/envelope-recipient-field-tooltip';
+import { useLingui } from '@lingui/react/macro';
+import { DocumentStatus, type Recipient, SigningStatus } from '@prisma/client';
+import type Konva from 'konva';
+import { useEffect, useMemo } from 'react';
 
 type GenericLocalField = TEnvelope['fields'][number] & {
   recipient: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>;
@@ -36,12 +34,9 @@ export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRender
     return new Map(signatures.map((signature) => [signature.fieldId, signature]));
   }, [signatures]);
 
-  const { stage, pageLayer, konvaContainer, unscaledViewport } = usePageRenderer(
-    ({ stage, pageLayer }) => {
-      createPageCanvas(stage, pageLayer);
-    },
-    pageData,
-  );
+  const { stage, pageLayer, konvaContainer, unscaledViewport } = usePageRenderer(({ stage, pageLayer }) => {
+    createPageCanvas(stage, pageLayer);
+  }, pageData);
 
   const { scale, pageNumber } = pageData;
 
@@ -51,9 +46,7 @@ export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRender
     }
 
     return fields
-      .filter(
-        (field) => field.page === pageNumber && field.envelopeItemId === currentEnvelopeItem?.id,
-      )
+      .filter((field) => field.page === pageNumber && field.envelopeItemId === currentEnvelopeItem?.id)
       .map((field) => {
         const recipient = recipients.find((recipient) => recipient.id === field.recipientId);
 
@@ -72,8 +65,7 @@ export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRender
       })
       .filter(
         ({ inserted, fieldMeta, recipient }) =>
-          (recipient.signingStatus === SigningStatus.SIGNED ? inserted : true) ||
-          fieldMeta?.readOnly,
+          (recipient.signingStatus === SigningStatus.SIGNED ? inserted : true) || fieldMeta?.readOnly,
       );
   }, [fields, pageNumber, currentEnvelopeItem?.id, recipients, envelopeStatus]);
 
@@ -148,10 +140,7 @@ export const EnvelopeGenericPageRenderer = ({ pageData }: { pageData: PageRender
 
     // If doesn't exist in localFields, destroy it since it's been deleted.
     pageLayer.current.find('Group').forEach((group) => {
-      if (
-        group.name() === 'field-group' &&
-        !localPageFields.some((field) => field.id.toString() === group.id())
-      ) {
+      if (group.name() === 'field-group' && !localPageFields.some((field) => field.id.toString() === group.id())) {
         group.destroy();
       }
     });

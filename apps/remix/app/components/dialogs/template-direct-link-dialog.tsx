@@ -1,20 +1,3 @@
-import { useEffect, useMemo, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { RecipientRole, type TemplateDirectLink } from '@prisma/client';
-import {
-  CircleDotIcon,
-  CircleIcon,
-  ClipboardCopyIcon,
-  InfoIcon,
-  LinkIcon,
-  LoaderIcon,
-} from 'lucide-react';
-import { Link, useRevalidator } from 'react-router';
-import { P, match } from 'ts-pattern';
-
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
@@ -39,16 +22,17 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { Switch } from '@documenso/ui/primitives/switch';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@documenso/ui/primitives/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@documenso/ui/primitives/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { RecipientRole, type TemplateDirectLink } from '@prisma/client';
+import { CircleDotIcon, CircleIcon, ClipboardCopyIcon, InfoIcon, LinkIcon, LoaderIcon } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useRevalidator } from 'react-router';
+import { match, P } from 'ts-pattern';
 
 type TemplateDirectLinkDialogProps = {
   templateId: number;
@@ -82,17 +66,14 @@ export const TemplateDirectLinkDialog = ({
   const [isEnabled, setIsEnabled] = useState(directLink?.enabled ?? false);
   const [token, setToken] = useState(directLink?.token ?? null);
   const [selectedRecipientId, setSelectedRecipientId] = useState<number | null>(null);
-  const [currentStep, setCurrentStep] = useState<TemplateDirectLinkStep>(
-    token ? 'MANAGE' : 'ONBOARD',
-  );
+  const [currentStep, setCurrentStep] = useState<TemplateDirectLinkStep>(token ? 'MANAGE' : 'ONBOARD');
 
   const organisation = useCurrentOrganisation();
 
   const validDirectTemplateRecipients = useMemo(
     () =>
       recipients.filter(
-        (recipient) =>
-          recipient.role !== RecipientRole.CC && recipient.role !== RecipientRole.ASSISTANT,
+        (recipient) => recipient.role !== RecipientRole.CC && recipient.role !== RecipientRole.ASSISTANT,
       ),
     [recipients],
   );
@@ -166,9 +147,7 @@ export const TemplateDirectLinkDialog = ({
       onError: () => {
         toast({
           title: _(msg`Something went wrong`),
-          description: _(
-            msg`We encountered an error while removing the direct template link. Please try again later.`,
-          ),
+          description: _(msg`We encountered an error while removing the direct template link. Please try again later.`),
           variant: 'destructive',
         });
       },
@@ -195,8 +174,7 @@ export const TemplateDirectLinkDialog = ({
     });
   };
 
-  const isLoading =
-    isCreatingTemplateDirectLink || isTogglingTemplateAccess || isDeletingTemplateDirectLink;
+  const isLoading = isCreatingTemplateDirectLink || isTogglingTemplateAccess || isDeletingTemplateDirectLink;
 
   useEffect(() => {
     resetCreateTemplateDirectLink();
@@ -237,13 +215,13 @@ export const TemplateDirectLinkDialog = ({
                     {DIRECT_TEMPLATE_DOCUMENTATION.map((step, index) => (
                       <li className="relative" key={index}>
                         <div className="absolute -left-12">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full border-[3px] border-neutral-200 text-sm font-bold">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full border-[3px] border-neutral-200 font-bold text-sm">
                             {index + 1}
                           </div>
                         </div>
 
                         <h3 className="font-semibold">{_(step.title)}</h3>
-                        <p className="mt-1 text-sm text-muted-foreground">{_(step.description)}</p>
+                        <p className="mt-1 text-muted-foreground text-sm">{_(step.description)}</p>
                       </li>
                     ))}
                   </ul>
@@ -252,14 +230,12 @@ export const TemplateDirectLinkDialog = ({
                     <Alert variant="warning">
                       <AlertTitle>
                         <Trans>
-                          Direct template link usage exceeded ({quota.directTemplates}/
-                          {quota.directTemplates})
+                          Direct template link usage exceeded ({quota.directTemplates}/{quota.directTemplates})
                         </Trans>
                       </AlertTitle>
                       <AlertDescription>
                         <Trans>
-                          You have reached the maximum limit of {quota.directTemplates} direct
-                          templates.{' '}
+                          You have reached the maximum limit of {quota.directTemplates} direct templates.{' '}
                           <Link
                             className="mt-1 block underline underline-offset-4"
                             to={`/o/${organisation.url}/settings/billing`}
@@ -329,13 +305,13 @@ export const TemplateDirectLinkDialog = ({
                             onClick={async () => onRecipientTableRowClick(row.id)}
                           >
                             <TableCell>
-                              <div className="text-sm text-muted-foreground">
+                              <div className="text-muted-foreground text-sm">
                                 <p>{row.name}</p>
-                                <p className="text-xs text-muted-foreground/70">{row.email}</p>
+                                <p className="text-muted-foreground/70 text-xs">{row.email}</p>
                               </div>
                             </TableCell>
 
-                            <TableCell className="text-sm text-muted-foreground">
+                            <TableCell className="text-muted-foreground text-sm">
                               {_(RECIPIENT_ROLES_DESCRIPTION[row.role].roleName)}
                             </TableCell>
 
@@ -353,13 +329,11 @@ export const TemplateDirectLinkDialog = ({
                   </div>
 
                   {/* Prevent creating placeholder direct template recipient if the email already exists. */}
-                  {!recipients.some(
-                    (recipient) => recipient.email === DIRECT_TEMPLATE_RECIPIENT_EMAIL,
-                  ) && (
+                  {!recipients.some((recipient) => recipient.email === DIRECT_TEMPLATE_RECIPIENT_EMAIL) && (
                     <DialogFooter className="mx-auto">
                       <div className="flex flex-col items-center justify-center">
                         {validDirectTemplateRecipients.length !== 0 && (
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-muted-foreground text-sm">
                             <Trans>Or</Trans>
                           </p>
                         )}
@@ -402,19 +376,12 @@ export const TemplateDirectLinkDialog = ({
                             <InfoIcon className="h-4 w-4" />
                           </TooltipTrigger>
                           <TooltipContent className="z-9999 max-w-md p-4 text-foreground">
-                            <Trans>
-                              Disabling direct link signing will prevent anyone from accessing the
-                              link.
-                            </Trans>
+                            <Trans>Disabling direct link signing will prevent anyone from accessing the link.</Trans>
                           </TooltipContent>
                         </Tooltip>
                       </Label>
 
-                      <Switch
-                        className="mt-2"
-                        checked={isEnabled}
-                        onCheckedChange={(value) => setIsEnabled(value)}
-                      />
+                      <Switch className="mt-2" checked={isEnabled} onCheckedChange={(value) => setIsEnabled(value)} />
                     </div>
 
                     <div className="mt-2">
@@ -431,7 +398,7 @@ export const TemplateDirectLinkDialog = ({
                           className="pr-12"
                         />
 
-                        <div className="absolute bottom-0 right-1 top-0 flex items-center justify-center">
+                        <div className="absolute top-0 right-1 bottom-0 flex items-center justify-center">
                           <Button
                             variant="none"
                             type="button"
@@ -482,18 +449,13 @@ export const TemplateDirectLinkDialog = ({
 
                     <DialogDescription>
                       <Trans>
-                        Please note that proceeding will remove direct linking recipient and turn it
-                        into a placeholder.
+                        Please note that proceeding will remove direct linking recipient and turn it into a placeholder.
                       </Trans>
                     </DialogDescription>
                   </DialogHeader>
 
                   <DialogFooter>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      onClick={() => setCurrentStep('MANAGE')}
-                    >
+                    <Button type="button" variant="secondary" onClick={() => setCurrentStep('MANAGE')}>
                       <Trans>Cancel</Trans>
                     </Button>
 

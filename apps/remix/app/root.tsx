@@ -1,16 +1,3 @@
-import { NuqsAdapter } from 'nuqs/adapters/react-router/v7';
-import {
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  data,
-  isRouteErrorResponse,
-  useLoaderData,
-} from 'react-router';
-import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
-
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
 import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
@@ -20,6 +7,19 @@ import { TrpcProvider } from '@documenso/trpc/react';
 import { getOrganisationSession } from '@documenso/trpc/server/organisation-router/get-organisation-session';
 import { Toaster } from '@documenso/ui/primitives/toaster';
 import { TooltipProvider } from '@documenso/ui/primitives/tooltip';
+import { NuqsAdapter } from 'nuqs/adapters/react-router/v7';
+import {
+  data,
+  isRouteErrorResponse,
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useLoaderData,
+  useMatches,
+} from 'react-router';
+import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
 
 import type { Route } from './+types/root';
 import stylesheet from './app.css?url';
@@ -111,6 +111,13 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
 
   const [theme] = useTheme();
 
+  // Recipient routes (signing pages) put `documenso-branded` on <body> so the
+  // <style> block from `RecipientBranding` applies to BOTH the main tree and
+  // any portaled content (Radix dialogs/popovers/dropdowns mount outside the
+  // route tree, attached directly to document.body).
+  const matches = useMatches();
+  const isRecipientRoute = matches.some((m) => m.id?.startsWith('routes/_recipient+'));
+
   return (
     <html translate="no" lang={lang} data-theme={theme} className={theme ?? ''}>
       <head>
@@ -138,7 +145,7 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
         {/* Fix: https://stackoverflow.com/questions/21147149/flash-of-unstyled-content-fouc-in-firefox-only-is-ff-slow-renderer */}
         <script nonce={nonce(cspNonce)}>0</script>
       </head>
-      <body>
+      <body className={isRecipientRoute ? 'documenso-branded' : undefined}>
         {/* Global license banner currently disabled. Need to wait until after a few releases. */}
         {/* {licenseStatus === '?' && (
           <div className="bg-destructive text-destructive-foreground">

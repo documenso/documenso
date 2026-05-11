@@ -11,10 +11,7 @@ export const ZEnvelopeReminderDisabledPeriod = z.object({
   disabled: z.literal(true),
 });
 
-export const ZEnvelopeReminderPeriod = z.union([
-  ZEnvelopeReminderDurationPeriod,
-  ZEnvelopeReminderDisabledPeriod,
-]);
+export const ZEnvelopeReminderPeriod = z.union([ZEnvelopeReminderDurationPeriod, ZEnvelopeReminderDisabledPeriod]);
 
 export type TEnvelopeReminderPeriod = z.infer<typeof ZEnvelopeReminderPeriod>;
 export type TEnvelopeReminderDurationPeriod = z.infer<typeof ZEnvelopeReminderDurationPeriod>;
@@ -39,12 +36,11 @@ export const DEFAULT_ENVELOPE_REMINDER_SETTINGS: TEnvelopeReminderSettings = {
  */
 export const MAX_REMINDER_WINDOW_DAYS = 30;
 
-const UNIT_TO_LUXON_KEY: Record<TEnvelopeReminderDurationPeriod['unit'], keyof DurationLikeObject> =
-  {
-    day: 'days',
-    week: 'weeks',
-    month: 'months',
-  };
+const UNIT_TO_LUXON_KEY: Record<TEnvelopeReminderDurationPeriod['unit'], keyof DurationLikeObject> = {
+  day: 'days',
+  week: 'weeks',
+  month: 'months',
+};
 
 export const getEnvelopeReminderDuration = (period: TEnvelopeReminderDurationPeriod): Duration => {
   return Duration.fromObject({ [UNIT_TO_LUXON_KEY[period.unit]]: period.amount });
@@ -75,9 +71,7 @@ export const resolveNextReminderAt = (options: {
     return null;
   }
 
-  const maxReminderAt = new Date(
-    sentAt.getTime() + Duration.fromObject({ days: MAX_REMINDER_WINDOW_DAYS }).toMillis(),
-  );
+  const maxReminderAt = new Date(sentAt.getTime() + Duration.fromObject({ days: MAX_REMINDER_WINDOW_DAYS }).toMillis());
 
   let candidate: Date;
 
