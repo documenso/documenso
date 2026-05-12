@@ -102,14 +102,12 @@ export const run = async ({ payload, io }: { payload: TAdminDeleteOrganisationJo
   if (organisation.subscription) {
     const stripeSubscriptionId = organisation.subscription.planId;
 
-    await io.runTask('enqueue-cancel-organisation-subscription', async () => {
-      await jobs.triggerJob({
-        name: 'internal.cancel-organisation-subscription',
-        payload: {
-          stripeSubscriptionId,
-          organisationId: organisation.id,
-        },
-      });
+    await jobs.triggerJob({
+      name: 'internal.cancel-organisation-subscription',
+      payload: {
+        stripeSubscriptionId,
+        organisationId: organisation.id,
+      },
     });
   }
 };
