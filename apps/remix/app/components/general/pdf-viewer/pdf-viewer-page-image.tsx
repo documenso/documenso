@@ -1,8 +1,7 @@
-import { Trans } from '@lingui/react/macro';
-
 import type { ImageLoadingState } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { cn } from '@documenso/ui/lib/utils';
 import { Spinner } from '@documenso/ui/primitives/spinner';
+import { Trans } from '@lingui/react/macro';
 
 type PdfViewerPageImageProps = {
   imageLoadingState: ImageLoadingState;
@@ -29,12 +28,7 @@ export const PdfViewerPageImage = ({ imageLoadingState, imageProps }: PdfViewerP
 
       {/* The PDF image. */}
       {imageProps.src && (
-        <img
-          {...imageProps}
-          className={cn(imageProps.className, 'select-none')}
-          draggable={false}
-          alt=""
-        />
+        <img {...imageProps} className={cn(imageProps.className, 'select-none')} draggable={false} alt="" />
       )}
     </>
   );

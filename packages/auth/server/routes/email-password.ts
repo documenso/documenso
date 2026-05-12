@@ -1,12 +1,4 @@
-import { sValidator } from '@hono/standard-validator';
-import { compare } from '@node-rs/bcrypt';
-import { UserSecurityAuditLogType } from '@prisma/client';
-import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
-import { DateTime } from 'luxon';
-import { z } from 'zod';
-
-import { isEmailDomainAllowedForSignup } from '@documenso/lib/constants/auth';
+import { isEmailDomainAllowedForSignup, isSignupEnabledForProvider } from '@documenso/lib/constants/auth';
 import { EMAIL_VERIFICATION_STATE } from '@documenso/lib/constants/email';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { jobsClient } from '@documenso/lib/jobs/client';
@@ -35,8 +27,14 @@ import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/serv
 import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { verifyEmail } from '@documenso/lib/server-only/user/verify-email';
-import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
+import { sValidator } from '@hono/standard-validator';
+import { compare } from '@node-rs/bcrypt';
+import { UserSecurityAuditLogType } from '@prisma/client';
+import { Hono } from 'hono';
+import { HTTPException } from 'hono/http-exception';
+import { DateTime } from 'luxon';
+import { z } from 'zod';
 
 import { AuthenticationErrorCode } from '../lib/errors/error-codes';
 import { invalidateSessions } from '../lib/session/session';
@@ -90,10 +88,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       ipAddress: requestMetadata.ipAddress,
     });
 
-    if (
-      email.toLowerCase() === legacyServiceAccountEmail() ||
-      email.toLowerCase() === deletedServiceAccountEmail()
-    ) {
+    if (email.toLowerCase() === legacyServiceAccountEmail() || email.toLowerCase() === deletedServiceAccountEmail()) {
       return c.text('FORBIDDEN', 403);
     }
 
@@ -188,7 +183,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   .post('/signup', sValidator('json', ZSignUpSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
-    if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
+    if (!isSignupEnabledForProvider('email')) {
       throw new AppError(AuthenticationErrorCode.SignupDisabled, {
         statusCode: 400,
       });
@@ -357,10 +352,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       });
     }
 
-    if (
-      email.toLowerCase() === legacyServiceAccountEmail() ||
-      email.toLowerCase() === deletedServiceAccountEmail()
-    ) {
+    if (email.toLowerCase() === legacyServiceAccountEmail() || email.toLowerCase() === deletedServiceAccountEmail()) {
       return c.text('FORBIDDEN', 403);
     }
 

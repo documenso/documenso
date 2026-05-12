@@ -224,27 +224,40 @@ For detailed certificate setup, see [Signing Certificate](/docs/self-hosting/con
 
 ## Feature Flags
 
-| Variable                              | Description                                                                         | Default |
-| ------------------------------------- | ----------------------------------------------------------------------------------- | ------- |
-| `NEXT_PUBLIC_DISABLE_SIGNUP`          | Disable public user registration entirely                                           | `false` |
-| `NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS` | Comma-separated list of email domains allowed to sign up (e.g., `example.com,acme.org`) |         |
+| Variable                                     | Description                                                                         | Default |
+| -------------------------------------------- | ----------------------------------------------------------------------------------- | ------- |
+| `NEXT_PUBLIC_DISABLE_SIGNUP`                 | Master switch. Disable all signup methods application-wide                          | `false` |
+| `NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNUP`  | Disable email/password signup only. SSO signup is unaffected                        | `false` |
+| `NEXT_PUBLIC_DISABLE_GOOGLE_SIGNUP`          | Block new accounts via Google. Existing Google-linked users can still sign in       | `false` |
+| `NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP`       | Block new accounts via Microsoft. Existing linked users can still sign in           | `false` |
+| `NEXT_PUBLIC_DISABLE_OIDC_SIGNUP`            | Block new accounts via OIDC, including the organisation portal                      | `false` |
+| `NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS`        | Comma-separated list of email domains allowed to sign up (e.g., `example.com,acme.org`) |         |
 | `NEXT_PUBLIC_POSTHOG_KEY`             | PostHog API key for analytics and feature flags                                     |         |
 | `NEXT_PUBLIC_FEATURE_BILLING_ENABLED` | Enable billing features                                                             | `false` |
 
 ### Signup Restrictions
 
-You can control who is allowed to create accounts on your instance using two environment variables:
+You can control who is allowed to create accounts on your instance with the following environment variables:
 
-- **`NEXT_PUBLIC_DISABLE_SIGNUP`**: Set to `true` to block all new signups. Existing users can still sign in. This applies to both email/password and OAuth signups.
+- **`NEXT_PUBLIC_DISABLE_SIGNUP`** (master switch): Set to `true` to block all new signups across every method (email/password, Google, Microsoft, OIDC). When set, this also blocks new-account creation through the organisation OIDC authentication portal.
+- **`NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNUP`**: Set to `true` to disable email/password signup only. SSO signup is still allowed.
+- **`NEXT_PUBLIC_DISABLE_GOOGLE_SIGNUP`**, **`NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP`**, **`NEXT_PUBLIC_DISABLE_OIDC_SIGNUP`**: Set to `true` to block brand-new account creation through the matching SSO provider. Existing users with the provider already linked can still sign in, and existing users can still link the provider to their account. `NEXT_PUBLIC_DISABLE_OIDC_SIGNUP` also blocks new-account creation through the organisation authentication portal.
 - **`NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS`**: Restrict signups to specific email domains. When set, only users whose email address matches one of the listed domains can create an account. Leave empty to allow all domains.
 
-Both restrictions apply to email/password registration and OAuth (Google, Microsoft, OIDC). If a user attempts to sign up via OAuth with a disallowed domain, they are redirected to the sign-in page with an error.
+Sign-in for existing users is never affected — only the creation of brand-new accounts.
 
-When both variables are set, `NEXT_PUBLIC_DISABLE_SIGNUP` takes precedence. Signups are blocked regardless of the domain list.
+Both the master switch and the domain allowlist apply to email/password registration and OAuth (Google, Microsoft, OIDC). If a user attempts to sign up via OAuth with a disallowed domain, they are redirected to the sign-in page with an error.
+
+When both the master switch and the domain allowlist are set, the master switch takes precedence. Signups are blocked regardless of the domain list.
 
 ```bash
 # Allow signups only from specific domains
 NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS="example.com,acme.org"
+
+# Allow OIDC signup only; block email/password, Google, Microsoft
+NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNUP="true"
+NEXT_PUBLIC_DISABLE_GOOGLE_SIGNUP="true"
+NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP="true"
 
 # Or disable signups entirely
 NEXT_PUBLIC_DISABLE_SIGNUP="true"
@@ -371,6 +384,10 @@ NEXT_PRIVATE_SIGNING_PASSPHRASE="your-certificate-password"
 
 # Signup restrictions (optional)
 # NEXT_PUBLIC_DISABLE_SIGNUP="true"
+# NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNUP="true"
+# NEXT_PUBLIC_DISABLE_GOOGLE_SIGNUP="true"
+# NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP="true"
+# NEXT_PUBLIC_DISABLE_OIDC_SIGNUP="true"
 # NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS="example.com,acme.org"
 ```
 

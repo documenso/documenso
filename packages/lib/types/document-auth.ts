@@ -5,13 +5,7 @@ import { ZAuthenticationResponseJSONSchema } from './webauthn';
 /**
  * All the available types of document authentication options for both access and action.
  */
-export const ZDocumentAuthTypesSchema = z.enum([
-  'ACCOUNT',
-  'PASSKEY',
-  'TWO_FACTOR_AUTH',
-  'PASSWORD',
-  'EXPLICIT_NONE',
-]);
+export const ZDocumentAuthTypesSchema = z.enum(['ACCOUNT', 'PASSKEY', 'TWO_FACTOR_AUTH', 'PASSWORD', 'EXPLICIT_NONE']);
 
 export const DocumentAuth = ZDocumentAuthTypesSchema.Enum;
 
@@ -76,12 +70,7 @@ export const ZDocumentActionAuthSchema = z.discriminatedUnion('type', [
   ZDocumentAuthPasswordSchema,
 ]);
 export const ZDocumentActionAuthTypesSchema = z
-  .enum([
-    DocumentAuth.ACCOUNT,
-    DocumentAuth.PASSKEY,
-    DocumentAuth.TWO_FACTOR_AUTH,
-    DocumentAuth.PASSWORD,
-  ])
+  .enum([DocumentAuth.ACCOUNT, DocumentAuth.PASSKEY, DocumentAuth.TWO_FACTOR_AUTH, DocumentAuth.PASSWORD])
   .describe(
     'The type of authentication required for the recipient to sign the document. This field is restricted to Enterprise plan users only.',
   );
@@ -138,10 +127,8 @@ export const ZDocumentAuthOptionsSchema = z.preprocess(
       };
     }
 
-    const globalAccessAuth =
-      'globalAccessAuth' in unknownValue ? processAuthValue(unknownValue.globalAccessAuth) : [];
-    const globalActionAuth =
-      'globalActionAuth' in unknownValue ? processAuthValue(unknownValue.globalActionAuth) : [];
+    const globalAccessAuth = 'globalAccessAuth' in unknownValue ? processAuthValue(unknownValue.globalAccessAuth) : [];
+    const globalActionAuth = 'globalActionAuth' in unknownValue ? processAuthValue(unknownValue.globalActionAuth) : [];
 
     return {
       globalAccessAuth,
@@ -166,10 +153,8 @@ export const ZRecipientAuthOptionsSchema = z.preprocess(
       };
     }
 
-    const accessAuth =
-      'accessAuth' in unknownValue ? processAuthValue(unknownValue.accessAuth) : [];
-    const actionAuth =
-      'actionAuth' in unknownValue ? processAuthValue(unknownValue.actionAuth) : [];
+    const accessAuth = 'accessAuth' in unknownValue ? processAuthValue(unknownValue.accessAuth) : [];
+    const actionAuth = 'actionAuth' in unknownValue ? processAuthValue(unknownValue.actionAuth) : [];
 
     return {
       accessAuth,

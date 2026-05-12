@@ -1,12 +1,10 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import React from 'react';
-
-import { type Field, type Recipient } from '@prisma/client';
-
 import type { DocumentDataVersion } from '@documenso/lib/types/document';
 import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
 import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import { getRecipientColor } from '@documenso/ui/lib/recipient-colors';
+import type { Field, Recipient } from '@prisma/client';
+import type React from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import type { TEnvelope } from '../../types/envelope';
 import type { FieldRenderMode } from '../../universal/field-renderer/render-field';
@@ -215,10 +213,7 @@ export const EnvelopeRenderProvider = ({
     }
   }, [currentItem, envelopeItems]);
 
-  const recipientIds = useMemo(
-    () => recipients.map((recipient) => recipient.id).sort(),
-    [recipients],
-  );
+  const recipientIds = useMemo(() => recipients.map((recipient) => recipient.id).sort(), [recipients]);
 
   const getRecipientColorKey = useCallback(
     (recipientId: number) => getRecipientColor(recipientIds.findIndex((id) => id === recipientId)),

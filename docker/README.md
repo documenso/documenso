@@ -253,5 +253,9 @@ Here's a markdown table documenting all the provided environment variables:
 | `NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY`                   | The private key for DKIM signing with MailChannels for the `mailchannels` transport.                |
 | `NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT`                       | The maximum document upload limit displayed to the user (in MB).                                    |
 | `NEXT_PUBLIC_POSTHOG_KEY`                                      | The optional PostHog key for analytics and feature flags.                                           |
-| `NEXT_PUBLIC_DISABLE_SIGNUP`                                   | Whether to disable user signups through the /signup page.                                           |
+| `NEXT_PUBLIC_DISABLE_SIGNUP`                                   | Master switch. Set to `true` to disable all signup methods (incl. organisation OIDC portal).        |
+| `NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNUP`                    | Set to `true` to disable email/password signup only. SSO signup is unaffected.                      |
+| `NEXT_PUBLIC_DISABLE_GOOGLE_SIGNUP`                            | Set to `true` to block new accounts via Google. Existing Google-linked users can still sign in.     |
+| `NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP`                         | Set to `true` to block new accounts via Microsoft. Existing linked users can still sign in.         |
+| `NEXT_PUBLIC_DISABLE_OIDC_SIGNUP`                              | Set to `true` to block new accounts via OIDC (incl. organisation portal). Existing users unaffected.|
 | `NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS`                          | Comma-separated list of email domains allowed to sign up (e.g., `example.com,acme.org`).            |

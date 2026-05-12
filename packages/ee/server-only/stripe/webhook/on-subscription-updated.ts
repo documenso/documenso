@@ -1,10 +1,9 @@
-import { OrganisationType, SubscriptionStatus } from '@prisma/client';
-import { match } from 'ts-pattern';
-
 import { createOrganisationClaimUpsertData } from '@documenso/lib/server-only/organisation/create-organisation';
 import { type Stripe, stripe } from '@documenso/lib/server-only/stripe';
 import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
 import { prisma } from '@documenso/prisma';
+import { OrganisationType, SubscriptionStatus } from '@prisma/client';
+import { match } from 'ts-pattern';
 
 export type OnSubscriptionUpdatedOptions = {
   subscription: Stripe.Subscription;
@@ -16,12 +15,8 @@ type StripeWebhookResponse = {
   message: string;
 };
 
-export const onSubscriptionUpdated = async ({
-  subscription,
-  previousAttributes,
-}: OnSubscriptionUpdatedOptions) => {
-  const customerId =
-    typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
+export const onSubscriptionUpdated = async ({ subscription, previousAttributes }: OnSubscriptionUpdatedOptions) => {
+  const customerId = typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
 
   // Todo: logging
   if (subscription.items.data.length !== 1) {
@@ -67,9 +62,7 @@ export const onSubscriptionUpdated = async ({
   const previousItem = previousAttributes?.items?.data[0];
   const updatedItem = subscription.items.data[0];
 
-  const previousSubscriptionClaimId = previousItem
-    ? await extractStripeClaimId(previousItem.price)
-    : null;
+  const previousSubscriptionClaimId = previousItem ? await extractStripeClaimId(previousItem.price) : null;
   const updatedSubscriptionClaim = await extractStripeClaim(updatedItem.price);
 
   if (!updatedSubscriptionClaim) {

@@ -1,6 +1,5 @@
-import { TeamMemberRole } from '@prisma/client';
-
 import { createTeamMembers } from '@documenso/trpc/server/team-router/create-team-members';
+import { TeamMemberRole } from '@prisma/client';
 
 import { prisma } from '..';
 import { seedTeam } from './teams';
@@ -32,9 +31,7 @@ const seedLargeTeam = async () => {
 
   const membersToAttachToTeam = nonOwnerOrgMembers.slice(0, TEAM_MEMBER_COUNT);
 
-  console.log(
-    `[SEEDING]: Attaching ${membersToAttachToTeam.length} org members to the team's role group...`,
-  );
+  console.log(`[SEEDING]: Attaching ${membersToAttachToTeam.length} org members to the team's role group...`);
 
   await createTeamMembers({
     userId: owner.id,

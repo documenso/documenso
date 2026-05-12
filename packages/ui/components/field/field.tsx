@@ -1,16 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
-
-import { type Field, FieldType } from '@prisma/client';
-import { createPortal } from 'react-dom';
-
 import { useElementBounds } from '@documenso/lib/client-only/hooks/use-element-bounds';
 import { useFieldPageCoords } from '@documenso/lib/client-only/hooks/use-field-page-coords';
 import { useIsPageInDom } from '@documenso/lib/client-only/hooks/use-is-page-in-dom';
-import {
-  PDF_VIEWER_CONTENT_SELECTOR,
-  PDF_VIEWER_PAGE_SELECTOR,
-} from '@documenso/lib/constants/pdf-viewer';
+import { PDF_VIEWER_CONTENT_SELECTOR, PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
+import { type Field, FieldType } from '@prisma/client';
+import React, { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import type { RecipientColorStyles } from '../../lib/recipient-colors';
 import { cn } from '../../lib/utils';
@@ -21,17 +16,11 @@ export type FieldContainerPortalProps = {
   children: React.ReactNode;
 };
 
-export function FieldContainerPortal({
-  field,
-  children,
-  className = '',
-}: FieldContainerPortalProps) {
+export function FieldContainerPortal({ field, children, className = '' }: FieldContainerPortalProps) {
   const alternativePortalRoot = document.getElementById('document-field-portal-root');
 
   const coords = useFieldPageCoords(field);
-  const $pageBounds = useElementBounds(
-    `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`,
-  );
+  const $pageBounds = useElementBounds(`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`);
 
   const maxWidth = $pageBounds?.width ? $pageBounds.width - coords.x : undefined;
 
@@ -77,13 +66,7 @@ export type FieldRootContainerProps = {
   readonly?: boolean;
 };
 
-export function FieldRootContainer({
-  field,
-  children,
-  color,
-  className,
-  readonly,
-}: FieldRootContainerProps) {
+export function FieldRootContainer({ field, children, color, className, readonly }: FieldRootContainerProps) {
   const [isValidating, setIsValidating] = useState(false);
   const isPageInDom = useIsPageInDom(field.page);
 
@@ -101,10 +84,7 @@ export function FieldRootContainer({
     // pick up the validation state immediately.
     const pdfContent = document.querySelector(PDF_VIEWER_CONTENT_SELECTOR);
 
-    if (
-      pdfContent?.getAttribute('data-validate-fields') === 'true' &&
-      isFieldUnsignedAndRequired(field)
-    ) {
+    if (pdfContent?.getAttribute('data-validate-fields') === 'true' && isFieldUnsignedAndRequired(field)) {
       ref.current.setAttribute('data-validate', 'true');
       setIsValidating(true);
     }

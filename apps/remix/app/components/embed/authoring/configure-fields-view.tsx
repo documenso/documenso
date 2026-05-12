@@ -1,17 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { EnvelopeItem, FieldType } from '@prisma/client';
-import { ReadStatus, SendStatus, SigningStatus } from '@prisma/client';
-import { ChevronsUpDown } from 'lucide-react';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { useHotkeys } from 'react-hotkeys-hook';
-
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
-import { PDF_VIEWER_PAGE_SELECTOR, getPdfPagesCount } from '@documenso/lib/constants/pdf-viewer';
+import { getPdfPagesCount, PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { type TFieldMetaSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { nanoid } from '@documenso/lib/universal/id';
@@ -28,6 +17,15 @@ import { Form } from '@documenso/ui/primitives/form/form';
 import { RecipientSelector } from '@documenso/ui/primitives/recipient-selector';
 import { Sheet, SheetContent, SheetTrigger } from '@documenso/ui/primitives/sheet';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import type { EnvelopeItem, FieldType } from '@prisma/client';
+import { ReadStatus, SendStatus, SigningStatus } from '@prisma/client';
+import { ChevronsUpDown } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 import { FieldAdvancedSettingsDrawer } from '~/components/embed/authoring/field-advanced-settings-drawer';
 import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
@@ -139,16 +137,10 @@ export const ConfigureFieldsView = ({
     y: 0,
   });
   const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
-  const [lastActiveField, setLastActiveField] = useState<
-    TConfigureFieldsFormSchema['fields'][0] | null
-  >(null);
-  const [fieldClipboard, setFieldClipboard] = useState<
-    TConfigureFieldsFormSchema['fields'][0] | null
-  >(null);
+  const [lastActiveField, setLastActiveField] = useState<TConfigureFieldsFormSchema['fields'][0] | null>(null);
+  const [fieldClipboard, setFieldClipboard] = useState<TConfigureFieldsFormSchema['fields'][0] | null>(null);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
-  const [currentField, setCurrentField] = useState<TConfigureFieldsFormSchema['fields'][0] | null>(
-    null,
-  );
+  const [currentField, setCurrentField] = useState<TConfigureFieldsFormSchema['fields'][0] | null>(null);
 
   const fieldBounds = useRef({
     height: DEFAULT_HEIGHT_PX,
@@ -266,15 +258,12 @@ export const ConfigureFieldsView = ({
 
   const onMouseMove = useCallback(
     (event: MouseEvent) => {
-      if (!selectedField) return;
+      if (!selectedField) {
+        return;
+      }
 
       setIsFieldWithinBounds(
-        isWithinPageBounds(
-          event,
-          PDF_VIEWER_PAGE_SELECTOR,
-          fieldBounds.current.width,
-          fieldBounds.current.height,
-        ),
+        isWithinPageBounds(event, PDF_VIEWER_PAGE_SELECTOR, fieldBounds.current.width, fieldBounds.current.height),
       );
 
       setCoords({
@@ -295,12 +284,7 @@ export const ConfigureFieldsView = ({
 
       if (
         !$page ||
-        !isWithinPageBounds(
-          event,
-          PDF_VIEWER_PAGE_SELECTOR,
-          fieldBounds.current.width,
-          fieldBounds.current.height,
-        )
+        !isWithinPageBounds(event, PDF_VIEWER_PAGE_SELECTOR, fieldBounds.current.width, fieldBounds.current.height)
       ) {
         return;
       }
@@ -359,12 +343,7 @@ export const ConfigureFieldsView = ({
         return;
       }
 
-      const {
-        x: pageX,
-        y: pageY,
-        width: pageWidth,
-        height: pageHeight,
-      } = getFieldPosition($page, node);
+      const { x: pageX, y: pageY, width: pageWidth, height: pageHeight } = getFieldPosition($page, node);
 
       update(index, {
         ...field,
@@ -466,11 +445,11 @@ export const ConfigureFieldsView = ({
         {!isMobile && (
           <div className="order-2 col-span-12 md:order-1 md:col-span-4">
             <div className="sticky top-4 max-h-[calc(100vh-2rem)] rounded-lg border border-border bg-widget p-4 pb-6">
-              <h2 className="mb-1 text-lg font-medium">
+              <h2 className="mb-1 font-medium text-lg">
                 <Trans>Configure Fields</Trans>
               </h2>
 
-              <p className="mb-6 text-sm text-muted-foreground">
+              <p className="mb-6 text-muted-foreground text-sm">
                 <Trans>Configure the fields you want to place on the document.</Trans>
               </p>
 
@@ -524,7 +503,7 @@ export const ConfigureFieldsView = ({
             {selectedField && (
               <div
                 className={cn(
-                  'dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white text-muted-foreground transition duration-200 [container-type:size]',
+                  'pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white text-muted-foreground transition duration-200 [container-type:size] dark:text-muted-background',
                   selectedRecipientStyles.base,
                   {
                     '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
@@ -539,17 +518,13 @@ export const ConfigureFieldsView = ({
                   width: fieldBounds.current.width,
                 }}
               >
-                <span className="text-[clamp(0.425rem,25cqw,0.825rem)]">
-                  {_(FRIENDLY_FIELD_TYPE[selectedField])}
-                </span>
+                <span className="text-[clamp(0.425rem,25cqw,0.825rem)]">{_(FRIENDLY_FIELD_TYPE[selectedField])}</span>
               </div>
             )}
 
             <Form {...form}>
               <div>
-                {normalizedDocumentData && (
-                  <PDFViewerLazy data={normalizedDocumentData} scrollParentRef="window" />
-                )}
+                {normalizedDocumentData && <PDFViewerLazy data={normalizedDocumentData} scrollParentRef="window" />}
 
                 <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
                   {localFields.map((field, index) => {
@@ -593,8 +568,8 @@ export const ConfigureFieldsView = ({
       {isMobile && (
         <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
           <SheetTrigger asChild>
-            <div className="fixed bottom-6 left-6 right-6 z-50 flex items-center justify-between gap-2 rounded-lg border border-border bg-widget p-4">
-              <span className="text-lg font-medium">
+            <div className="fixed right-6 bottom-6 left-6 z-50 flex items-center justify-between gap-2 rounded-lg border border-border bg-widget p-4">
+              <span className="font-medium text-lg">
                 <Trans>Configure Fields</Trans>
               </span>
 
@@ -612,11 +587,11 @@ export const ConfigureFieldsView = ({
             size="xl"
             className="h-fit max-h-[80vh] overflow-y-auto rounded-t-xl bg-widget p-4"
           >
-            <h2 className="mb-1 text-lg font-medium">
+            <h2 className="mb-1 font-medium text-lg">
               <Trans>Configure Fields</Trans>
             </h2>
 
-            <p className="mb-6 text-sm text-muted-foreground">
+            <p className="mb-6 text-muted-foreground text-sm">
               <Trans>Configure the fields you want to place on the document.</Trans>
             </p>
 

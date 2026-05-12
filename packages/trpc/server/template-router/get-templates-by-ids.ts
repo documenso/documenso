@@ -1,16 +1,15 @@
-import { EnvelopeType } from '@prisma/client';
-
 import { getMultipleEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelopes-by-ids';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { mapFieldToLegacyField } from '@documenso/lib/utils/fields';
 import { mapRecipientToLegacyRecipient } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
 import {
+  getTemplatesByIdsMeta,
   ZGetTemplatesByIdsRequestSchema,
   ZGetTemplatesByIdsResponseSchema,
-  getTemplatesByIdsMeta,
 } from './get-templates-by-ids.types';
 
 export const getTemplatesByIdsRoute = authenticatedProcedure
@@ -102,9 +101,7 @@ export const getTemplatesByIdsRoute = authenticatedProcedure
             }
           : null,
         fields: envelope.fields.map((field) => mapFieldToLegacyField(field, envelope)),
-        recipients: envelope.recipients.map((recipient) =>
-          mapRecipientToLegacyRecipient(recipient, envelope),
-        ),
+        recipients: envelope.recipients.map((recipient) => mapRecipientToLegacyRecipient(recipient, envelope)),
         templateMeta: envelope.documentMeta
           ? {
               signingOrder: envelope.documentMeta.signingOrder,

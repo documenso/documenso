@@ -1,9 +1,10 @@
-import { OrganisationType, Prisma } from '@prisma/client';
-
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { normalizeBrandingColors } from '@documenso/lib/utils/normalize-branding-colors';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
+import { type SanitizeBrandingCssWarning, sanitizeBrandingCss } from '@documenso/lib/utils/sanitize-branding-css';
 import { prisma } from '@documenso/prisma';
+import { OrganisationType, Prisma } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -46,6 +47,8 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       brandingLogo,
       brandingUrl,
       brandingCompanyDetails,
+      brandingColors,
+      brandingCss,
 
       // Email related settings.
       emailId,
@@ -104,8 +107,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       drawSignatureEnabled ?? organisation.organisationGlobalSettings.drawSignatureEnabled;
 
     const derivedDelegateDocumentOwnership =
-      delegateDocumentOwnership ??
-      organisation.organisationGlobalSettings.delegateDocumentOwnership;
+      delegateDocumentOwnership ?? organisation.organisationGlobalSettings.delegateDocumentOwnership;
 
     if (
       derivedTypedSignatureEnabled === false &&
@@ -118,8 +120,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
     }
 
     const isPersonalOrganisation = organisation.type === OrganisationType.PERSONAL;
-    const currentIncludeSenderDetails =
-      organisation.organisationGlobalSettings.includeSenderDetails;
+    const currentIncludeSenderDetails = organisation.organisationGlobalSettings.includeSenderDetails;
 
     const isChangingIncludeSenderDetails =
       includeSenderDetails !== undefined && includeSenderDetails !== currentIncludeSenderDetails;
@@ -129,6 +130,24 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
         message: 'Personal organisations cannot update the sender details',
       });
     }
+
+    // Sanitize custom branding CSS at write time so we can store the safe
+    // result and skip per-render sanitisation. Warnings are returned to the
+    // UI so the user can see what was dropped.
+    let cssWarnings: SanitizeBrandingCssWarning[] | undefined;
+    let sanitizedBrandingCss: string | undefined;
+
+    if (brandingCss !== undefined) {
+      const result = sanitizeBrandingCss(brandingCss);
+      sanitizedBrandingCss = result.css;
+      cssWarnings = result.warnings;
+    }
+
+    // Strip empty-string colour values; collapse to `null` when the payload
+    // contains no overrides. Keeps the stored row clean and avoids storing
+    // `{}` as a real "override of nothing" (matters more for teams, but the
+    // org row stays tidy this way too).
+    const normalizedBrandingColors = normalizeBrandingColors(brandingColors);
 
     await prisma.organisation.update({
       where: {
@@ -150,8 +169,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
             drawSignatureEnabled,
             defaultRecipients: defaultRecipients === null ? Prisma.DbNull : defaultRecipients,
             delegateDocumentOwnership: derivedDelegateDocumentOwnership,
-            envelopeExpirationPeriod:
-              envelopeExpirationPeriod === null ? Prisma.DbNull : envelopeExpirationPeriod,
+            envelopeExpirationPeriod: envelopeExpirationPeriod === null ? Prisma.DbNull : envelopeExpirationPeriod,
             reminderSettings: reminderSettings === null ? Prisma.DbNull : reminderSettings,
 
             // Branding related settings.
@@ -159,6 +177,8 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
             brandingLogo,
             brandingUrl,
             brandingCompanyDetails,
+            brandingColors: normalizedBrandingColors === null ? Prisma.DbNull : normalizedBrandingColors,
+            brandingCss: sanitizedBrandingCss,
 
             // Email related settings.
             emailId,
@@ -172,4 +192,8 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
         },
       },
     });
+
+    return {
+      cssWarnings: cssWarnings && cssWarnings.length > 0 ? cssWarnings : undefined,
+    };
   });

@@ -3,9 +3,9 @@ import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 
 import { authenticatedProcedure } from '../trpc';
 import {
+  updateDocumentMeta,
   ZUpdateDocumentRequestSchema,
   ZUpdateDocumentResponseSchema,
-  updateDocumentMeta,
 } from './update-document.types';
 
 /**
