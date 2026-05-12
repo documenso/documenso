@@ -1,7 +1,6 @@
-import { P12Signer } from '@libpdf/core';
 import * as fs from 'node:fs';
-
 import { env } from '@documenso/lib/utils/env';
+import { P12Signer } from '@libpdf/core';
 
 const loadP12 = (): Uint8Array => {
   const localFileContents = env('NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS');

@@ -2,11 +2,11 @@
  * Legacy Document schema to confirm backwards API compatibility since
  * we migrated Documents to Envelopes.
  */
-import { DocumentSource } from '@prisma/client';
-import { z } from 'zod';
 
 import { ZDocumentAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
+import { DocumentSource } from '@prisma/client';
+import { z } from 'zod';
 
 import DocumentStatusSchema from '../generated/zod/inputTypeSchemas/DocumentStatusSchema';
 import DocumentVisibilitySchema from '../generated/zod/inputTypeSchemas/DocumentVisibilitySchema';
@@ -20,14 +20,8 @@ export const LegacyDocumentSchema = z.object({
   status: DocumentStatusSchema,
   source: z.nativeEnum(DocumentSource),
   id: z.number(),
-  qrToken: z
-    .string()
-    .describe('The token for viewing the document using the QR code on the certificate.')
-    .nullable(),
-  externalId: z
-    .string()
-    .describe('A custom external ID you can use to identify the document.')
-    .nullable(),
+  qrToken: z.string().describe('The token for viewing the document using the QR code on the certificate.').nullable(),
+  externalId: z.string().describe('A custom external ID you can use to identify the document.').nullable(),
   userId: z.number().describe('The ID of the user that created this document.'),
   teamId: z.number(),
   /**

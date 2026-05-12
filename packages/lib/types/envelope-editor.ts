@@ -1,6 +1,3 @@
-import { EnvelopeType } from '@prisma/client';
-import { z } from 'zod';
-
 import { ZBaseEmbedDataSchema } from '@documenso/lib/types/embed-base-schemas';
 import { ZEnvelopeFieldSchema } from '@documenso/lib/types/field';
 import { ZEnvelopeRecipientLiteSchema } from '@documenso/lib/types/recipient';
@@ -10,6 +7,8 @@ import { EnvelopeItemSchema } from '@documenso/prisma/generated/zod/modelSchema/
 import { EnvelopeSchema } from '@documenso/prisma/generated/zod/modelSchema/EnvelopeSchema';
 import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
+import { EnvelopeType } from '@prisma/client';
+import { z } from 'zod';
 
 /**
  * DO NOT MAKE ANY BREAKING BACKWARD CHANGES HERE UNLESS YOU'RE SURE
@@ -220,11 +219,23 @@ export const ZEmbedCreateEnvelopeAuthoringSchema = ZBaseEmbedDataSchema.extend({
   externalId: z.string().optional(),
   type: z.nativeEnum(EnvelopeType),
   folderId: z.string().optional(),
+  user: z
+    .object({
+      email: z.string().email().optional(),
+      name: z.string().optional(),
+    })
+    .optional(),
   features: z.object({}).passthrough().optional().default(DEFAULT_EMBEDDED_EDITOR_CONFIG),
 });
 
 export const ZEmbedEditEnvelopeAuthoringSchema = ZBaseEmbedDataSchema.extend({
   externalId: z.string().optional(),
+  user: z
+    .object({
+      email: z.string().email().optional(),
+      name: z.string().optional(),
+    })
+    .optional(),
   features: z.object({}).passthrough().optional().default(DEFAULT_EMBEDDED_EDITOR_CONFIG),
 });
 
@@ -323,5 +334,9 @@ export type EnvelopeEditorConfig = TEnvelopeEditorSettings & {
     onCreate?: (envelope: Omit<TEditorEnvelope, 'id'>) => void;
     onUpdate?: (envelope: TEditorEnvelope) => void;
     customBrandingLogo?: boolean;
+    user?: {
+      email?: string;
+      name?: string;
+    };
   };
 };

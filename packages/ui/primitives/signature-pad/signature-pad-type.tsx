@@ -1,6 +1,5 @@
-import { useEffect, useRef } from 'react';
-
 import { useLingui } from '@lingui/react/macro';
+import { useEffect, useRef } from 'react';
 
 import { cn } from '../../lib/utils';
 
@@ -11,12 +10,7 @@ export type SignaturePadTypeProps = {
   onChange: (_value: string) => void;
 };
 
-export const SignaturePadType = ({
-  className,
-  value,
-  defaultValue,
-  onChange,
-}: SignaturePadTypeProps) => {
+export const SignaturePadType = ({ className, value, defaultValue, onChange }: SignaturePadTypeProps) => {
   const { t } = useLingui();
 
   const $isDirty = useRef(false);

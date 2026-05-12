@@ -1,6 +1,14 @@
-import { posthog } from 'posthog-js';
-
 import { extractPostHogConfig } from '@documenso/lib/constants/feature-flags';
+
+let posthogPromise: Promise<typeof import('posthog-js')> | null = null;
+
+const getPosthog = async () => {
+  if (!posthogPromise) {
+    posthogPromise = import('posthog-js');
+  }
+
+  return posthogPromise;
+};
 
 export function useAnalytics() {
   // const featureFlags = useFeatureFlags();
@@ -17,7 +25,9 @@ export function useAnalytics() {
       return;
     }
 
-    posthog.capture(event, properties);
+    void getPosthog().then(({ default: posthog }) => {
+      posthog.capture(event, properties);
+    });
   };
 
   /**
@@ -31,7 +41,9 @@ export function useAnalytics() {
       return;
     }
 
-    posthog.captureException(error, properties);
+    void getPosthog().then(({ default: posthog }) => {
+      posthog.captureException(error, properties);
+    });
   };
 
   /**

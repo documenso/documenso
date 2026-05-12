@@ -1,17 +1,11 @@
-import { DocumentStatus, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { DocumentStatus, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 
 import { jobs } from '../../client';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendSigningRemindersSweepJobDefinition } from './send-signing-reminders-sweep';
 
-export const run = async ({
-  io,
-}: {
-  payload: TSendSigningRemindersSweepJobDefinition;
-  io: JobRunIO;
-}) => {
+export const run = async ({ io }: { payload: TSendSigningRemindersSweepJobDefinition; io: JobRunIO }) => {
   const now = new Date();
 
   const recipients = await prisma.recipient.findMany({

@@ -1,10 +1,9 @@
-import * as React from 'react';
-
 import { Trans } from '@lingui/react/macro';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { X } from 'lucide-react';
+import * as React from 'react';
 
 import { cn } from '../lib/utils';
 
@@ -24,9 +23,7 @@ const portalVariants = cva('fixed inset-0 z-[61] flex', {
   defaultVariants: { position: 'right' },
 });
 
-interface SheetPortalProps
-  extends SheetPrimitive.DialogPortalProps,
-    VariantProps<typeof portalVariants> {}
+interface SheetPortalProps extends SheetPrimitive.DialogPortalProps, VariantProps<typeof portalVariants> {}
 
 const SheetPortal = ({ position, children, ...props }: SheetPortalProps) => (
   <SheetPrimitive.Portal {...props}>
@@ -42,7 +39,7 @@ const SheetOverlay = React.forwardRef<
 >(({ className, children: _children, ...props }, ref) => (
   <SheetPrimitive.Overlay
     className={cn(
-      'fixed inset-0 z-[61] bg-background/80 backdrop-blur-sm transition-all duration-100 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in',
+      'data-[state=closed]:fade-out data-[state=open]:fade-in fixed inset-0 z-[61] bg-background/80 backdrop-blur-sm transition-all duration-100 data-[state=closed]:animate-out',
       className,
     )}
     {...props}
@@ -52,93 +49,90 @@ const SheetOverlay = React.forwardRef<
 
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
 
-const sheetVariants = cva(
-  'fixed z-[61] scale-100 gap-4 bg-background p-6 opacity-100 shadow-lg border',
-  {
-    variants: {
-      position: {
-        top: 'animate-in slide-in-from-top w-full duration-300',
-        bottom: 'animate-in slide-in-from-bottom w-full duration-300',
-        left: 'animate-in slide-in-from-left h-full duration-300',
-        right: 'animate-in slide-in-from-right h-full duration-300',
-      },
-      size: {
-        content: '',
-        default: '',
-        sm: '',
-        lg: '',
-        xl: '',
-        full: '',
-      },
+const sheetVariants = cva('fixed z-[61] scale-100 gap-4 bg-background p-6 opacity-100 shadow-lg border', {
+  variants: {
+    position: {
+      top: 'animate-in slide-in-from-top w-full duration-300',
+      bottom: 'animate-in slide-in-from-bottom w-full duration-300',
+      left: 'animate-in slide-in-from-left h-full duration-300',
+      right: 'animate-in slide-in-from-right h-full duration-300',
     },
-    compoundVariants: [
-      {
-        position: ['top', 'bottom'],
-        size: 'content',
-        class: 'max-h-screen',
-      },
-      {
-        position: ['top', 'bottom'],
-        size: 'default',
-        class: 'h-1/3',
-      },
-      {
-        position: ['top', 'bottom'],
-        size: 'sm',
-        class: 'h-1/4',
-      },
-      {
-        position: ['top', 'bottom'],
-        size: 'lg',
-        class: 'h-1/2',
-      },
-      {
-        position: ['top', 'bottom'],
-        size: 'xl',
-        class: 'h-5/6',
-      },
-      {
-        position: ['top', 'bottom'],
-        size: 'full',
-        class: 'h-screen',
-      },
-      {
-        position: ['right', 'left'],
-        size: 'content',
-        class: 'max-w-screen',
-      },
-      {
-        position: ['right', 'left'],
-        size: 'default',
-        class: 'w-1/3',
-      },
-      {
-        position: ['right', 'left'],
-        size: 'sm',
-        class: 'w-1/4',
-      },
-      {
-        position: ['right', 'left'],
-        size: 'lg',
-        class: 'w-1/2',
-      },
-      {
-        position: ['right', 'left'],
-        size: 'xl',
-        class: 'w-5/6',
-      },
-      {
-        position: ['right', 'left'],
-        size: 'full',
-        class: 'w-screen',
-      },
-    ],
-    defaultVariants: {
-      position: 'right',
-      size: 'default',
+    size: {
+      content: '',
+      default: '',
+      sm: '',
+      lg: '',
+      xl: '',
+      full: '',
     },
   },
-);
+  compoundVariants: [
+    {
+      position: ['top', 'bottom'],
+      size: 'content',
+      class: 'max-h-screen',
+    },
+    {
+      position: ['top', 'bottom'],
+      size: 'default',
+      class: 'h-1/3',
+    },
+    {
+      position: ['top', 'bottom'],
+      size: 'sm',
+      class: 'h-1/4',
+    },
+    {
+      position: ['top', 'bottom'],
+      size: 'lg',
+      class: 'h-1/2',
+    },
+    {
+      position: ['top', 'bottom'],
+      size: 'xl',
+      class: 'h-5/6',
+    },
+    {
+      position: ['top', 'bottom'],
+      size: 'full',
+      class: 'h-screen',
+    },
+    {
+      position: ['right', 'left'],
+      size: 'content',
+      class: 'max-w-screen',
+    },
+    {
+      position: ['right', 'left'],
+      size: 'default',
+      class: 'w-1/3',
+    },
+    {
+      position: ['right', 'left'],
+      size: 'sm',
+      class: 'w-1/4',
+    },
+    {
+      position: ['right', 'left'],
+      size: 'lg',
+      class: 'w-1/2',
+    },
+    {
+      position: ['right', 'left'],
+      size: 'xl',
+      class: 'w-5/6',
+    },
+    {
+      position: ['right', 'left'],
+      size: 'full',
+      class: 'w-screen',
+    },
+  ],
+  defaultVariants: {
+    position: 'right',
+    size: 'default',
+  },
+});
 
 export interface DialogContentProps
   extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
@@ -147,27 +141,22 @@ export interface DialogContentProps
   sheetClass?: string;
 }
 
-const SheetContent = React.forwardRef<
-  React.ElementRef<typeof SheetPrimitive.Content>,
-  DialogContentProps
->(({ position, size, className, sheetClass, showOverlay = true, children, ...props }, ref) => (
-  <SheetPortal position={position}>
-    {showOverlay && <SheetOverlay className={sheetClass} />}
-    <SheetPrimitive.Content
-      ref={ref}
-      className={cn(sheetVariants({ position, size }), className)}
-      {...props}
-    >
-      {children}
-      <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
-        <X className="h-4 w-4" />
-        <span className="sr-only">
-          <Trans>Close</Trans>
-        </span>
-      </SheetPrimitive.Close>
-    </SheetPrimitive.Content>
-  </SheetPortal>
-));
+const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Content>, DialogContentProps>(
+  ({ position, size, className, sheetClass, showOverlay = true, children, ...props }, ref) => (
+    <SheetPortal position={position}>
+      {showOverlay && <SheetOverlay className={sheetClass} />}
+      <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ position, size }), className)} {...props}>
+        {children}
+        <SheetPrimitive.Close className="absolute top-4 right-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+          <X className="h-4 w-4" />
+          <span className="sr-only">
+            <Trans>Close</Trans>
+          </span>
+        </SheetPrimitive.Close>
+      </SheetPrimitive.Content>
+    </SheetPortal>
+  ),
+);
 
 SheetContent.displayName = SheetPrimitive.Content.displayName;
 
@@ -178,10 +167,7 @@ const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
 SheetHeader.displayName = 'SheetHeader';
 
 const SheetFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}
-    {...props}
-  />
+  <div className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)} {...props} />
 );
 
 SheetFooter.displayName = 'SheetFooter';
@@ -190,11 +176,7 @@ const SheetTitle = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Title>
 >(({ className, ...props }, ref) => (
-  <SheetPrimitive.Title
-    ref={ref}
-    className={cn('text-lg font-semibold text-foreground', className)}
-    {...props}
-  />
+  <SheetPrimitive.Title ref={ref} className={cn('font-semibold text-foreground text-lg', className)} {...props} />
 ));
 
 SheetTitle.displayName = SheetPrimitive.Title.displayName;
@@ -203,21 +185,9 @@ const SheetDescription = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Description>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Description>
 >(({ className, ...props }, ref) => (
-  <SheetPrimitive.Description
-    ref={ref}
-    className={cn('text-sm text-muted-foreground', className)}
-    {...props}
-  />
+  <SheetPrimitive.Description ref={ref} className={cn('text-muted-foreground text-sm', className)} {...props} />
 ));
 
 SheetDescription.displayName = SheetPrimitive.Description.displayName;
 
-export {
-  Sheet,
-  SheetTrigger,
-  SheetContent,
-  SheetHeader,
-  SheetFooter,
-  SheetTitle,
-  SheetDescription,
-};
+export { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger };

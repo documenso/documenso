@@ -30,9 +30,7 @@ export const verifyTwoFactorAuthenticationToken = async ({
     throw new Error('user missing 2fa secret');
   }
 
-  const secret = Buffer.from(symmetricDecrypt({ key, data: user.twoFactorSecret })).toString(
-    'utf-8',
-  );
+  const secret = Buffer.from(symmetricDecrypt({ key, data: user.twoFactorSecret })).toString('utf-8');
 
   const decodedSecret = base32.decode(secret);
 

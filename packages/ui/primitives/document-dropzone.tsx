@@ -1,3 +1,6 @@
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -7,10 +10,6 @@ import { AlertTriangle, Plus } from 'lucide-react';
 import type { FileRejection } from 'react-dropzone';
 import { useDropzone } from 'react-dropzone';
 import { Link } from 'react-router';
-
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 
 import {
   DocumentDropzoneCardCenterVariants,
@@ -71,19 +70,12 @@ export const DocumentDropzone = ({
   });
 
   const heading = {
-    document: disabled
-      ? disabledHeading || msg`You have reached your document limit.`
-      : msg`Add a document`,
+    document: disabled ? disabledHeading || msg`You have reached your document limit.` : msg`Add a document`,
     template: msg`Upload Template Document`,
   };
 
   return (
-    <motion.div
-      variants={DocumentDropzoneContainerVariants}
-      initial="initial"
-      animate="animate"
-      whileHover="hover"
-    >
+    <motion.div variants={DocumentDropzoneContainerVariants} initial="initial" animate="animate" whileHover="hover">
       <Card
         role="button"
         className={cn(
@@ -101,7 +93,7 @@ export const DocumentDropzone = ({
             // Disabled State
             <div className="flex">
               <motion.div
-                className="group-hover:bg-destructive/2 a z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] flex-col gap-y-1 rounded-lg border border-muted-foreground/20 bg-background/80 px-2 py-4 backdrop-blur-sm group-hover:border-destructive/10"
+                className="a z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] flex-col gap-y-1 rounded-lg border border-muted-foreground/20 bg-background/80 px-2 py-4 backdrop-blur-sm group-hover:border-destructive/10 group-hover:bg-destructive/2"
                 variants={DocumentDropzoneDisabledCardLeftVariants}
               >
                 <div className="h-2 w-full rounded-[2px] bg-muted-foreground/10 group-hover:bg-destructive/10" />
@@ -118,7 +110,7 @@ export const DocumentDropzone = ({
                 />
               </motion.div>
               <motion.div
-                className="group-hover:bg-destructive/2 z-10 flex aspect-[3/4] w-24 origin-top-left rotate-[22deg] flex-col gap-y-1 rounded-lg border border-muted-foreground/20 bg-background/80 px-2 py-4 backdrop-blur-sm group-hover:border-destructive/10"
+                className="z-10 flex aspect-[3/4] w-24 origin-top-left rotate-[22deg] flex-col gap-y-1 rounded-lg border border-muted-foreground/20 bg-background/80 px-2 py-4 backdrop-blur-sm group-hover:border-destructive/10 group-hover:bg-destructive/2"
                 variants={DocumentDropzoneDisabledCardRightVariants}
               >
                 <div className="h-2 w-full rounded-[2px] bg-muted-foreground/10 group-hover:bg-destructive/10" />
@@ -141,10 +133,7 @@ export const DocumentDropzone = ({
                 className="z-20 flex aspect-[3/4] w-24 flex-col items-center justify-center gap-y-1 rounded-lg border border-muted-foreground/20 bg-background/80 px-2 py-4 backdrop-blur-sm group-hover:border-documenso/80"
                 variants={DocumentDropzoneCardCenterVariants}
               >
-                <Plus
-                  strokeWidth="2px"
-                  className="h-12 w-12 text-muted-foreground/20 group-hover:text-documenso"
-                />
+                <Plus strokeWidth="2px" className="h-12 w-12 text-muted-foreground/20 group-hover:text-documenso" />
               </motion.div>
               <motion.div
                 className="z-10 flex aspect-[3/4] w-24 origin-top-left rotate-[22deg] flex-col gap-y-1 rounded-lg border border-muted-foreground/20 bg-background/80 px-2 py-4 backdrop-blur-sm group-hover:border-documenso/80"
@@ -161,7 +150,7 @@ export const DocumentDropzone = ({
 
           <p className="mt-6 font-medium text-foreground">{_(heading[type])}</p>
 
-          <p className="mt-1 text-center text-sm text-muted-foreground/80">
+          <p className="mt-1 text-center text-muted-foreground/80 text-sm">
             {_(disabled ? disabledMessage : msg`Drag & drop your PDF here.`)}
           </p>
 

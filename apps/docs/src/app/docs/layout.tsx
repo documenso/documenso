@@ -1,16 +1,14 @@
 'use client';
 
-import { useMemo } from 'react';
-
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-
-import { cn } from '@/lib/cn';
-import { baseOptions } from '@/lib/layout.shared';
-import { getFilteredPageTree, source } from '@/lib/source';
 import type * as PageTree from 'fumadocs-core/page-tree';
 import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import { CodeIcon, ServerIcon, UserIcon } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useMemo } from 'react';
+import { cn } from '@/lib/cn';
+import { baseOptions } from '@/lib/layout.shared';
+import { getFilteredPageTree, source } from '@/lib/source';
 
 const ROOT_SECTIONS = [
   {
@@ -44,7 +42,9 @@ function getFirstPageUrl(children: PageTree.Node[]): string | undefined {
     }
     if (child.type === 'folder' && child.children.length > 0) {
       const url = getFirstPageUrl(child.children);
-      if (url) return url;
+      if (url) {
+        return url;
+      }
     }
   }
   return undefined;
@@ -69,13 +69,8 @@ function SectionSwitcher({ activeSection }: { activeSection: string | null }) {
           >
             <Icon className={cn('mt-0.5 size-4 shrink-0', isActive ? 'text-fd-primary' : '')} />
             <div className="flex flex-col gap-0.5">
-              <span className="text-sm font-medium">{section.label}</span>
-              <span
-                className={cn(
-                  'text-xs',
-                  isActive ? 'text-fd-muted-foreground' : 'text-fd-muted-foreground/70',
-                )}
-              >
+              <span className="font-medium text-sm">{section.label}</span>
+              <span className={cn('text-xs', isActive ? 'text-fd-muted-foreground' : 'text-fd-muted-foreground/70')}>
                 {section.subtitle}
               </span>
             </div>
