@@ -1,14 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
-
-import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
-import { CheckCircle2, Clock8, DownloadIcon, EyeIcon, Loader2 } from 'lucide-react';
-import { Link, useRevalidator } from 'react-router';
-import { match } from 'ts-pattern';
-
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
+import { isSignupEnabledForProvider } from '@documenso/lib/constants/auth';
+import { loadRecipientBrandingByTeamId } from '@documenso/lib/server-only/branding/load-recipient-branding';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { isRecipientAuthorized } from '@documenso/lib/server-only/document/is-recipient-authorized';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
@@ -16,17 +10,24 @@ import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-re
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { env } from '@documenso/lib/utils/env';
 import { trpc } from '@documenso/trpc/react';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
 import { cn } from '@documenso/ui/lib/utils';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
+import { Trans } from '@lingui/react/macro';
+import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
+import { CheckCircle2, Clock8, DownloadIcon, EyeIcon, Loader2 } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { Link, useRevalidator } from 'react-router';
+import { match } from 'ts-pattern';
 
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { ClaimAccount } from '~/components/general/claim-account';
 import { DocumentSigningAuthPageView } from '~/components/general/document-signing/document-signing-auth-page';
+import { RecipientBranding } from '~/components/general/recipient-branding';
+import { useCspNonce } from '~/utils/nonce';
 
 import type { Route } from './+types/complete';
 
@@ -50,6 +51,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw new Response('Not Found', { status: 404 });
   }
 
+  const branding = await loadRecipientBrandingByTeamId({ teamId: document.teamId });
+
   const [fields, recipient] = await Promise.all([
     getFieldsForToken({ token }),
     getRecipientByToken({ token }).catch(() => null),
@@ -70,6 +73,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     return {
       isDocumentAccessValid: false,
       recipientEmail: recipient.email,
+      branding,
     } as const;
   }
 
@@ -79,18 +83,13 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     .catch(() => false);
 
   const recipientName =
-    recipient.name ||
-    fields.find((field) => field.type === FieldType.NAME)?.customText ||
-    recipient.email;
+    recipient.name || fields.find((field) => field.type === FieldType.NAME)?.customText || recipient.email;
 
-  const canSignUp = !isExistingUser && env('NEXT_PUBLIC_DISABLE_SIGNUP') !== 'true';
+  const canSignUp = !isExistingUser && isSignupEnabledForProvider('email');
 
-  const canRedirectToFolder =
-    user && document.userId === user.id && document.folderId && document.team?.url;
+  const canRedirectToFolder = user && document.userId === user.id && document.folderId && document.team?.url;
 
-  const returnToHomePath = canRedirectToFolder
-    ? `/t/${document.team.url}/documents/f/${document.folderId}`
-    : '/';
+  const returnToHomePath = canRedirectToFolder ? `/t/${document.team.url}/documents/f/${document.folderId}` : '/';
 
   return {
     isDocumentAccessValid: true,
@@ -101,6 +100,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     document,
     recipient,
     returnToHomePath,
+    branding,
   };
 }
 
@@ -109,12 +109,11 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
 
   const { sessionData } = useOptionalSession();
   const user = sessionData?.user;
+  const cspNonce = useCspNonce();
 
-  const { isDocumentAccessValid, recipientEmail } = loaderData;
+  const { isDocumentAccessValid, recipientEmail, branding } = loaderData;
   const signingStatusToken = isDocumentAccessValid ? loaderData.recipient.token : '';
-  const initialSigningStatus = isDocumentAccessValid
-    ? loaderData.document.status
-    : DocumentStatus.PENDING;
+  const initialSigningStatus = isDocumentAccessValid ? loaderData.document.status : DocumentStatus.PENDING;
 
   const { data: signingStatusData } = trpc.envelope.signingStatus.useQuery(
     {
@@ -167,9 +166,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
 
   const isFullyCompleted = isDocumentAccessValid && signingStatus === 'COMPLETED';
   const hasQrToken = isDocumentAccessValid && Boolean(loaderData.document.qrToken);
-  const supportCode = isDocumentAccessValid
-    ? `QR-${loaderData.document.id}-${loaderData.recipient.id}`
-    : '';
+  const supportCode = isDocumentAccessValid ? `QR-${loaderData.document.id}-${loaderData.recipient.id}` : '';
 
   useEffect(() => {
     if (
@@ -186,201 +183,199 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
   }, [hasQrToken, isFullyCompleted, isRetryingQrLink, onRetryQrLink, qrRetryCount, revalidator]);
 
   if (!isDocumentAccessValid) {
-    return <DocumentSigningAuthPageView email={recipientEmail} />;
+    return (
+      <>
+        <RecipientBranding branding={branding} cspNonce={cspNonce} />
+        <DocumentSigningAuthPageView email={recipientEmail} />
+      </>
+    );
   }
 
-  const { canSignUp, recipientName, signatures, document, recipient, returnToHomePath } =
-    loaderData;
+  const { canSignUp, recipientName, signatures, document, recipient, returnToHomePath } = loaderData;
 
   return (
-    <div
-      className={cn(
-        '-mx-4 flex flex-col items-center overflow-hidden px-4 pt-16 md:-mx-8 md:px-8 lg:pt-20 xl:pt-28',
-        { 'pt-0 lg:pt-0 xl:pt-0': canSignUp },
-      )}
-    >
+    <>
+      <RecipientBranding branding={branding} cspNonce={cspNonce} />
       <div
-        className={cn('relative mt-6 flex w-full flex-col items-center justify-center', {
-          'mt-0 flex-col divide-y overflow-hidden pt-6 md:pt-16 lg:flex-row lg:divide-x lg:divide-y-0 lg:pt-20 xl:pt-24':
-            canSignUp,
-        })}
+        className={cn(
+          '-mx-4 flex flex-col items-center overflow-hidden px-4 pt-16 md:-mx-8 md:px-8 lg:pt-20 xl:pt-28',
+          { 'pt-0 lg:pt-0 xl:pt-0': canSignUp },
+        )}
       >
         <div
-          className={cn('flex flex-col items-center', {
-            'mb-8 p-4 md:mb-0 md:p-12': canSignUp,
+          className={cn('relative mt-6 flex w-full flex-col items-center justify-center', {
+            'mt-0 flex-col divide-y overflow-hidden pt-6 md:pt-16 lg:flex-row lg:divide-x lg:divide-y-0 lg:pt-20 xl:pt-24':
+              canSignUp,
           })}
         >
-          <Badge variant="neutral" size="default" className="mb-6 rounded-xl border bg-transparent">
-            <span className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]">
-              {document.title}
-            </span>
-          </Badge>
+          <div
+            className={cn('flex flex-col items-center', {
+              'mb-8 p-4 md:mb-0 md:p-12': canSignUp,
+            })}
+          >
+            <Badge variant="neutral" size="default" className="mb-6 rounded-xl border bg-transparent">
+              <span className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]">
+                {document.title}
+              </span>
+            </Badge>
 
-          {/* Card with recipient */}
-          <SigningCard3D
-            name={recipientName}
-            signature={signatures.at(0)}
-            signingCelebrationImage={signingCelebration}
-          />
-
-          <h2 className="mt-6 max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
-            {recipient.role === RecipientRole.SIGNER && <Trans>Document Signed</Trans>}
-            {recipient.role === RecipientRole.VIEWER && <Trans>Document Viewed</Trans>}
-            {recipient.role === RecipientRole.APPROVER && <Trans>Document Approved</Trans>}
-          </h2>
-
-          {match({ status: signingStatus, deletedAt: document.deletedAt })
-            .with({ status: 'COMPLETED' }, () => (
-              <div className="mt-4 flex items-center text-center text-documenso-700">
-                <CheckCircle2 className="mr-2 h-5 w-5" />
-                <span className="text-sm">
-                  <Trans>Everyone has signed</Trans>
-                </span>
-              </div>
-            ))
-            .with({ status: 'PROCESSING' }, () => (
-              <div className="mt-4 flex items-center text-center text-orange-600">
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                <span className="text-sm">
-                  <Trans>Processing document</Trans>
-                </span>
-              </div>
-            ))
-            .with({ deletedAt: null }, () => (
-              <div className="mt-4 flex items-center text-center text-blue-600">
-                <Clock8 className="mr-2 h-5 w-5" />
-                <span className="text-sm">
-                  <Trans>Waiting for others to sign</Trans>
-                </span>
-              </div>
-            ))
-            .otherwise(() => (
-              <div className="flex items-center text-center text-red-600">
-                <Clock8 className="mr-2 h-5 w-5" />
-                <span className="text-sm">
-                  <Trans>Document no longer available to sign</Trans>
-                </span>
-              </div>
-            ))}
-
-          {match({ status: signingStatus, deletedAt: document.deletedAt })
-            .with({ status: 'COMPLETED' }, () => (
-              <p className="mt-2.5 max-w-[60ch] text-center text-sm font-medium text-muted-foreground/60 md:text-base">
-                <Trans>
-                  Everyone has signed! You will receive an email copy of the signed document.
-                </Trans>
-              </p>
-            ))
-            .with({ status: 'PROCESSING' }, () => (
-              <p className="mt-2.5 max-w-[60ch] text-center text-sm font-medium text-muted-foreground/60 md:text-base">
-                <Trans>
-                  All recipients have signed. The document is being processed and you will receive
-                  an email copy shortly.
-                </Trans>
-              </p>
-            ))
-            .with({ deletedAt: null }, () => (
-              <p className="mt-2.5 max-w-[60ch] text-center text-sm font-medium text-muted-foreground/60 md:text-base">
-                <Trans>
-                  You will receive an email copy of the signed document once everyone has signed.
-                </Trans>
-              </p>
-            ))
-            .otherwise(() => (
-              <p className="mt-2.5 max-w-[60ch] text-center text-sm font-medium text-muted-foreground/60 md:text-base">
-                <Trans>
-                  This document has been cancelled by the owner and is no longer available for
-                  others to sign.
-                </Trans>
-              </p>
-            ))}
-
-          <div className="mt-8 flex w-full max-w-xs flex-col items-stretch gap-4 md:w-auto md:max-w-none md:flex-row md:items-center">
-            {isFullyCompleted && hasQrToken && (
-              <Button asChild variant="secondary" className="w-full">
-                <Link to={`/share/${document.qrToken}`} target="_blank" rel="noopener noreferrer">
-                  <EyeIcon className="mr-2 h-5 w-5" />
-                  <Trans>View completed PDF</Trans>
-                </Link>
-              </Button>
-            )}
-
-            {isFullyCompleted && !hasQrToken && (
-              <div className="w-full rounded-md border border-orange-200 bg-orange-50 p-3 text-left text-sm text-orange-900 md:max-w-sm">
-                <p>
-                  <Trans>
-                    We are preparing your online PDF view. If it does not appear, retry below.
-                  </Trans>
-                </p>
-
-                <div className="mt-2 flex items-center justify-between gap-2">
-                  <span className="text-xs font-medium uppercase tracking-wide text-orange-700">
-                    <Trans>Support code</Trans>: {supportCode}
-                  </span>
-
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    loading={isRetryingQrLink || revalidator.state === 'loading'}
-                    disabled={qrRetryCount >= MAX_QR_RETRY_COUNT}
-                    onClick={() => void onRetryQrLink()}
-                  >
-                    <Trans>Retry</Trans>
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            <DocumentShareButton
-              documentId={document.id}
-              token={recipient.token}
-              className="w-full max-w-none md:flex-1"
+            {/* Card with recipient */}
+            <SigningCard3D
+              name={recipientName}
+              signature={signatures.at(0)}
+              signingCelebrationImage={signingCelebration}
             />
 
-            {isDocumentCompleted(document) && (
-              <EnvelopeDownloadDialog
-                envelopeId={document.envelopeId}
-                envelopeStatus={document.status}
-                envelopeItems={document.envelopeItems}
-                token={recipient?.token}
-                trigger={
-                  <Button type="button" variant="outline" className="flex-1 md:flex-initial">
-                    <DownloadIcon className="mr-2 h-5 w-5" />
-                    <Trans>Download</Trans>
-                  </Button>
-                }
-              />
-            )}
+            <h2 className="mt-6 max-w-[35ch] text-center font-semibold text-2xl leading-normal md:text-3xl lg:text-4xl">
+              {recipient.role === RecipientRole.SIGNER && <Trans>Document Signed</Trans>}
+              {recipient.role === RecipientRole.VIEWER && <Trans>Document Viewed</Trans>}
+              {recipient.role === RecipientRole.APPROVER && <Trans>Document Approved</Trans>}
+            </h2>
 
-            {user && (
-              <Button asChild>
-                <Link to={returnToHomePath}>
-                  <Trans>Go Back Home</Trans>
-                </Link>
-              </Button>
+            {match({ status: signingStatus, deletedAt: document.deletedAt })
+              .with({ status: 'COMPLETED' }, () => (
+                <div className="mt-4 flex items-center text-center text-documenso-700">
+                  <CheckCircle2 className="mr-2 h-5 w-5" />
+                  <span className="text-sm">
+                    <Trans>Everyone has signed</Trans>
+                  </span>
+                </div>
+              ))
+              .with({ status: 'PROCESSING' }, () => (
+                <div className="mt-4 flex items-center text-center text-orange-600">
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  <span className="text-sm">
+                    <Trans>Processing document</Trans>
+                  </span>
+                </div>
+              ))
+              .with({ deletedAt: null }, () => (
+                <div className="mt-4 flex items-center text-center text-blue-600">
+                  <Clock8 className="mr-2 h-5 w-5" />
+                  <span className="text-sm">
+                    <Trans>Waiting for others to sign</Trans>
+                  </span>
+                </div>
+              ))
+              .otherwise(() => (
+                <div className="flex items-center text-center text-red-600">
+                  <Clock8 className="mr-2 h-5 w-5" />
+                  <span className="text-sm">
+                    <Trans>Document no longer available to sign</Trans>
+                  </span>
+                </div>
+              ))}
+
+            {match({ status: signingStatus, deletedAt: document.deletedAt })
+              .with({ status: 'COMPLETED' }, () => (
+                <p className="mt-2.5 max-w-[60ch] text-center font-medium text-muted-foreground/60 text-sm md:text-base">
+                  <Trans>Everyone has signed! You will receive an email copy of the signed document.</Trans>
+                </p>
+              ))
+              .with({ status: 'PROCESSING' }, () => (
+                <p className="mt-2.5 max-w-[60ch] text-center font-medium text-muted-foreground/60 text-sm md:text-base">
+                  <Trans>
+                    All recipients have signed. The document is being processed and you will receive an email copy
+                    shortly.
+                  </Trans>
+                </p>
+              ))
+              .with({ deletedAt: null }, () => (
+                <p className="mt-2.5 max-w-[60ch] text-center font-medium text-muted-foreground/60 text-sm md:text-base">
+                  <Trans>You will receive an email copy of the signed document once everyone has signed.</Trans>
+                </p>
+              ))
+              .otherwise(() => (
+                <p className="mt-2.5 max-w-[60ch] text-center font-medium text-muted-foreground/60 text-sm md:text-base">
+                  <Trans>
+                    This document has been cancelled by the owner and is no longer available for others to sign.
+                  </Trans>
+                </p>
+              ))}
+
+            <div className="mt-8 flex w-full max-w-xs flex-col items-stretch gap-4 md:w-auto md:max-w-none md:flex-row md:items-center">
+              {isFullyCompleted && hasQrToken && (
+                <Button asChild variant="secondary" className="w-full">
+                  <Link to={`/share/${document.qrToken}`} target="_blank" rel="noopener noreferrer">
+                    <EyeIcon className="mr-2 h-5 w-5" />
+                    <Trans>View completed PDF</Trans>
+                  </Link>
+                </Button>
+              )}
+
+              {isFullyCompleted && !hasQrToken && (
+                <div className="w-full rounded-md border border-orange-200 bg-orange-50 p-3 text-left text-orange-900 text-sm md:max-w-sm">
+                  <p>
+                    <Trans>We are preparing your online PDF view. If it does not appear, retry below.</Trans>
+                  </p>
+
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <span className="font-medium text-orange-700 text-xs uppercase tracking-wide">
+                      <Trans>Support code</Trans>: {supportCode}
+                    </span>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      loading={isRetryingQrLink || revalidator.state === 'loading'}
+                      disabled={qrRetryCount >= MAX_QR_RETRY_COUNT}
+                      onClick={() => void onRetryQrLink()}
+                    >
+                      <Trans>Retry</Trans>
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              <DocumentShareButton
+                documentId={document.id}
+                token={recipient.token}
+                className="w-full max-w-none md:flex-1"
+              />
+
+              {isDocumentCompleted(document) && (
+                <EnvelopeDownloadDialog
+                  envelopeId={document.envelopeId}
+                  envelopeStatus={document.status}
+                  envelopeItems={document.envelopeItems}
+                  token={recipient?.token}
+                  trigger={
+                    <Button type="button" variant="outline" className="flex-1 md:flex-initial">
+                      <DownloadIcon className="mr-2 h-5 w-5" />
+                      <Trans>Download</Trans>
+                    </Button>
+                  }
+                />
+              )}
+
+              {user && (
+                <Button asChild>
+                  <Link to={returnToHomePath}>
+                    <Trans>Go Back Home</Trans>
+                  </Link>
+                </Button>
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center">
+            {canSignUp && (
+              <div className="flex max-w-xl flex-col items-center justify-center p-4 md:p-12">
+                <h2 className="mt-8 text-center font-semibold text-xl md:mt-0">
+                  <Trans>Need to sign documents?</Trans>
+                </h2>
+
+                <p className="mt-4 max-w-[55ch] text-center text-muted-foreground/60 leading-normal">
+                  <Trans>Create your account and start using state-of-the-art document signing.</Trans>
+                </p>
+
+                <ClaimAccount defaultName={recipientName} defaultEmail={recipient.email} />
+              </div>
             )}
           </div>
         </div>
-
-        <div className="flex flex-col items-center">
-          {canSignUp && (
-            <div className="flex max-w-xl flex-col items-center justify-center p-4 md:p-12">
-              <h2 className="mt-8 text-center text-xl font-semibold md:mt-0">
-                <Trans>Need to sign documents?</Trans>
-              </h2>
-
-              <p className="mt-4 max-w-[55ch] text-center leading-normal text-muted-foreground/60">
-                <Trans>
-                  Create your account and start using state-of-the-art document signing.
-                </Trans>
-              </p>
-
-              <ClaimAccount defaultName={recipientName} defaultEmail={recipient.email} />
-            </div>
-          )}
-        </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -1,13 +1,3 @@
-import { useMemo, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
-import type { FileRejection } from 'react-dropzone';
-import { useNavigate, useParams } from 'react-router';
-import { match } from 'ts-pattern';
-
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
@@ -21,13 +11,16 @@ import type { TCreateTemplatePayloadSchema } from '@documenso/trpc/server/templa
 import { buildDropzoneRejectionDescription } from '@documenso/ui/lib/handle-dropzone-rejection';
 import { cn } from '@documenso/ui/lib/utils';
 import { DocumentUploadButton as DocumentUploadButtonPrimitive } from '@documenso/ui/primitives/document-upload-button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@documenso/ui/primitives/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { EnvelopeType } from '@prisma/client';
+import { useMemo, useState } from 'react';
+import type { FileRejection } from 'react-dropzone';
+import { useNavigate, useParams } from 'react-router';
+import { match } from 'ts-pattern';
 
 import { useCurrentTeam } from '~/providers/team';
 
@@ -36,10 +29,7 @@ export type DocumentUploadButtonLegacyProps = {
   type: EnvelopeType;
 };
 
-export const DocumentUploadButtonLegacy = ({
-  className,
-  type,
-}: DocumentUploadButtonLegacyProps) => {
+export const DocumentUploadButtonLegacy = ({ className, type }: DocumentUploadButtonLegacyProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
   const { user } = useSession();

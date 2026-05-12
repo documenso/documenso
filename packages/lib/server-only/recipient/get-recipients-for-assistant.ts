@@ -1,6 +1,5 @@
-import { FieldType } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { FieldType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 

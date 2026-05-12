@@ -1,8 +1,7 @@
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { isPublicDocumentAccessEnabled } from '@documenso/lib/universal/document-access';
 import { prisma } from '@documenso/prisma';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
 
 import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
 

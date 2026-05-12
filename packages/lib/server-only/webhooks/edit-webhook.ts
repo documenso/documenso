@@ -1,6 +1,5 @@
-import type { Prisma } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import type { Prisma } from '@prisma/client';
 
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
 import { buildTeamWhereQuery } from '../../utils/teams';

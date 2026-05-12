@@ -1,13 +1,11 @@
-import React, { forwardRef } from 'react';
-
+import { ROLE_ICONS } from '@documenso/ui/primitives/recipient-role-icons';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@documenso/ui/primitives/select';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { Trans } from '@lingui/react/macro';
 import { RecipientRole } from '@prisma/client';
 import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
-
-import { ROLE_ICONS } from '@documenso/ui/primitives/recipient-role-icons';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@documenso/ui/primitives/select';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+import { forwardRef } from 'react';
 
 import { cn } from '../../lib/utils';
 
@@ -21,17 +19,7 @@ export type RecipientRoleSelectProps = SelectProps & {
 };
 
 export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSelectProps>(
-  (
-    {
-      hideAssistantRole,
-      hideCCerRole,
-      hideViewerRole,
-      hideApproverRole,
-      isAssistantEnabled = true,
-      ...props
-    },
-    ref,
-  ) => (
+  ({ hideAssistantRole, hideCCerRole, hideViewerRole, hideApproverRole, isAssistantEnabled = true, ...props }, ref) => (
     <Select {...props}>
       <SelectTrigger ref={ref} className="w-[50px] bg-background p-2" title={props.value}>
         {/* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */}
@@ -51,9 +39,7 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
               </TooltipTrigger>
               <TooltipContent className="z-9999 max-w-md p-4 text-foreground">
                 <p>
-                  <Trans>
-                    The recipient is required to sign the document for it to be completed.
-                  </Trans>
+                  <Trans>The recipient is required to sign the document for it to be completed.</Trans>
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -73,9 +59,7 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
                 </TooltipTrigger>
                 <TooltipContent className="z-9999 max-w-md p-4 text-foreground">
                   <p>
-                    <Trans>
-                      The recipient is required to approve the document for it to be completed.
-                    </Trans>
+                    <Trans>The recipient is required to approve the document for it to be completed.</Trans>
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -96,9 +80,7 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
                 </TooltipTrigger>
                 <TooltipContent className="z-9999 max-w-md p-4 text-foreground">
                   <p>
-                    <Trans>
-                      The recipient is required to view the document for it to be completed.
-                    </Trans>
+                    <Trans>The recipient is required to view the document for it to be completed.</Trans>
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -120,8 +102,8 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
                 <TooltipContent className="z-9999 max-w-md p-4 text-foreground">
                   <p>
                     <Trans>
-                      The recipient is not required to take any action and receives a copy of the
-                      document after it is completed.
+                      The recipient is not required to take any action and receives a copy of the document after it is
+                      completed.
                     </Trans>
                   </p>
                 </TooltipContent>
@@ -134,10 +116,7 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
           <SelectItem
             value={RecipientRole.ASSISTANT}
             disabled={!isAssistantEnabled}
-            className={cn(
-              !isAssistantEnabled &&
-                'cursor-not-allowed opacity-50 data-[disabled]:pointer-events-auto',
-            )}
+            className={cn(!isAssistantEnabled && 'cursor-not-allowed opacity-50 data-[disabled]:pointer-events-auto')}
           >
             <div className="flex items-center">
               <div className="flex w-[150px] items-center">
@@ -152,14 +131,10 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
                   <p>
                     {isAssistantEnabled ? (
                       <Trans>
-                        The recipient can prepare the document for later signers by pre-filling
-                        suggest values.
+                        The recipient can prepare the document for later signers by pre-filling suggest values.
                       </Trans>
                     ) : (
-                      <Trans>
-                        Assistant role is only available when the document is in sequential signing
-                        mode.
-                      </Trans>
+                      <Trans>Assistant role is only available when the document is in sequential signing mode.</Trans>
                     )}
                   </p>
                 </TooltipContent>

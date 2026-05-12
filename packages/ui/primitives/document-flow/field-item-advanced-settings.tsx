@@ -1,16 +1,10 @@
-import { forwardRef, useEffect, useState } from 'react';
-
-import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { FieldType } from '@prisma/client';
-import { match } from 'ts-pattern';
-
 import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import {
   type TBaseFieldMeta as BaseFieldMeta,
   type TCheckboxFieldMeta as CheckboxFieldMeta,
   type TDateFieldMeta as DateFieldMeta,
+  DEFAULT_DATE_OVERFLOW_MODE,
+  DEFAULT_EMAIL_OVERFLOW_MODE,
   type TDropdownFieldMeta as DropdownFieldMeta,
   type TEmailFieldMeta as EmailFieldMeta,
   type TFieldMetaSchema as FieldMeta,
@@ -22,6 +16,12 @@ import {
   ZFieldMetaSchema,
 } from '@documenso/lib/types/field-meta';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import type { MessageDescriptor } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { FieldType } from '@prisma/client';
+import { forwardRef, useEffect, useState } from 'react';
+import { match } from 'ts-pattern';
 
 import type { FieldFormType } from './add-fields';
 import {
@@ -83,12 +83,14 @@ const getDefaultState = (fieldType: FieldType): FieldMeta => {
         type: 'email',
         fontSize: 14,
         textAlign: 'left',
+        overflow: DEFAULT_EMAIL_OVERFLOW_MODE,
       };
     case FieldType.DATE:
       return {
         type: 'date',
         fontSize: 14,
         textAlign: 'left',
+        overflow: DEFAULT_DATE_OVERFLOW_MODE,
       };
     case FieldType.TEXT:
       return {
@@ -148,19 +150,7 @@ const getDefaultState = (fieldType: FieldType): FieldMeta => {
 };
 
 export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSettingsProps>(
-  (
-    {
-      title,
-      description,
-      field,
-      fields,
-      onAdvancedSettings,
-      isDocumentPdfLoaded = true,
-      onSave,
-      onAutoSave,
-    },
-    ref,
-  ) => {
+  ({ title, description, field, fields, onAdvancedSettings, isDocumentPdfLoaded = true, onSave, onAutoSave }, ref) => {
     const { _ } = useLingui();
     const { toast } = useToast();
 
@@ -186,7 +176,6 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
           ...parsedFieldMeta,
         });
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fieldMeta]);
 
     const { scheduleSave } = useAutoSave(onAutoSave || (async () => {}));
@@ -209,17 +198,10 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
     const handleFieldChange = (
       key: FieldMetaKeys,
-      value:
-        | string
-        | { checked: boolean; value: string }[]
-        | { value: string }[]
-        | boolean
-        | number,
+      value: string | { checked: boolean; value: string }[] | { value: string }[] | boolean | number,
     ) => {
       setFieldState((prevState: FieldMeta) => {
-        if (
-          ['characterLimit', 'minValue', 'maxValue', 'validationLength', 'fontSize'].includes(key)
-        ) {
+        if (['characterLimit', 'minValue', 'maxValue', 'validationLength', 'fontSize'].includes(key)) {
           const parsedValue = Number(value);
 
           return {
@@ -268,9 +250,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
                   key={index}
                   field={localField}
                   disabled={true}
-                  fieldClassName={
-                    localField.formId === field.formId ? 'ring-red-400' : 'ring-neutral-200'
-                  }
+                  fieldClassName={localField.formId === field.formId ? 'ring-red-400' : 'ring-neutral-200'}
                 />
               </span>
             ))}
@@ -346,7 +326,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
             <div className="mt-4">
               <ul>
                 {errors.map((error, index) => (
-                  <li className="text-sm text-red-500" key={index}>
+                  <li className="text-red-500 text-sm" key={index}>
                     {error}
                   </li>
                 ))}
@@ -355,10 +335,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
           )}
         </DocumentFlowFormContainerContent>
 
-        <DocumentFlowFormContainerFooter
-          className="mt-auto"
-          data-testid="field-advanced-settings-footer"
-        >
+        <DocumentFlowFormContainerFooter className="mt-auto" data-testid="field-advanced-settings-footer">
           <DocumentFlowFormContainerActions
             goNextLabel={msg`Save`}
             goBackLabel={msg`Cancel`}

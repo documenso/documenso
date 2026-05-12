@@ -1,3 +1,5 @@
+import { nanoid, prefixedId } from '@documenso/lib/universal/id';
+import { prisma } from '@documenso/prisma';
 import type { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
 import {
   DocumentSource,
@@ -12,9 +14,6 @@ import {
 } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
-
-import { nanoid, prefixedId } from '@documenso/lib/universal/id';
-import { prisma } from '@documenso/prisma';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import type { TEnvelopeExpirationPeriod } from '../../constants/envelope-expiration';
@@ -33,16 +32,8 @@ import type {
   TRadioFieldMeta,
   TTextFieldMeta,
 } from '../../types/field-meta';
-import {
-  ZCheckboxFieldMeta,
-  ZDropdownFieldMeta,
-  ZFieldMetaSchema,
-  ZRadioFieldMeta,
-} from '../../types/field-meta';
-import {
-  ZWebhookDocumentSchema,
-  mapEnvelopeToWebhookDocumentPayload,
-} from '../../types/webhook-payload';
+import { ZCheckboxFieldMeta, ZDropdownFieldMeta, ZFieldMetaSchema, ZRadioFieldMeta } from '../../types/field-meta';
+import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putNormalizedPdfFileServerSide } from '../../universal/upload/put-file.server';
@@ -63,10 +54,7 @@ import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { getOrganisationTemplateWhereInput } from './get-organisation-template-by-id';
 
-type FinalRecipient = Pick<
-  Recipient,
-  'name' | 'email' | 'role' | 'authOptions' | 'signingOrder' | 'token'
-> & {
+type FinalRecipient = Pick<Recipient, 'name' | 'email' | 'role' | 'authOptions' | 'signingOrder' | 'token'> & {
   templateRecipientId: number;
   fields: Field[];
 };
@@ -389,9 +377,7 @@ export const createDocumentFromTemplate = async ({
 
   // Check that all the passed in recipient IDs can be associated with a template recipient.
   recipients.forEach((recipient) => {
-    const foundRecipient = template.recipients.find(
-      (templateRecipient) => templateRecipient.id === recipient.id,
-    );
+    const foundRecipient = template.recipients.find((templateRecipient) => templateRecipient.id === recipient.id);
 
     if (!foundRecipient) {
       throw new AppError(AppErrorCode.INVALID_BODY, {
@@ -530,16 +516,11 @@ export const createDocumentFromTemplate = async ({
       emailSettings: override?.emailSettings || template.documentMeta?.emailSettings,
       signingOrder: override?.signingOrder || template.documentMeta?.signingOrder,
       language: override?.language || template.documentMeta?.language || settings.documentLanguage,
-      typedSignatureEnabled:
-        override?.typedSignatureEnabled ?? template.documentMeta?.typedSignatureEnabled,
-      uploadSignatureEnabled:
-        override?.uploadSignatureEnabled ?? template.documentMeta?.uploadSignatureEnabled,
-      drawSignatureEnabled:
-        override?.drawSignatureEnabled ?? template.documentMeta?.drawSignatureEnabled,
-      allowDictateNextSigner:
-        override?.allowDictateNextSigner ?? template.documentMeta?.allowDictateNextSigner,
-      envelopeExpirationPeriod:
-        override?.envelopeExpirationPeriod ?? template.documentMeta?.envelopeExpirationPeriod,
+      typedSignatureEnabled: override?.typedSignatureEnabled ?? template.documentMeta?.typedSignatureEnabled,
+      uploadSignatureEnabled: override?.uploadSignatureEnabled ?? template.documentMeta?.uploadSignatureEnabled,
+      drawSignatureEnabled: override?.drawSignatureEnabled ?? template.documentMeta?.drawSignatureEnabled,
+      allowDictateNextSigner: override?.allowDictateNextSigner ?? template.documentMeta?.allowDictateNextSigner,
+      envelopeExpirationPeriod: override?.envelopeExpirationPeriod ?? template.documentMeta?.envelopeExpirationPeriod,
     }),
   });
 
@@ -584,12 +565,8 @@ export const createDocumentFromTemplate = async ({
                   accessAuth: authOptions.accessAuth,
                   actionAuth: authOptions.actionAuth,
                 }),
-                sendStatus:
-                  recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
-                signingStatus:
-                  recipient.role === RecipientRole.CC
-                    ? SigningStatus.SIGNED
-                    : SigningStatus.NOT_SIGNED,
+                sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
+                signingStatus: recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
                 signingOrder: recipient.signingOrder,
                 token: recipient.token,
               };
@@ -614,9 +591,7 @@ export const createDocumentFromTemplate = async ({
     let fieldsToCreate: Omit<Field, 'id' | 'secondaryId'>[] = [];
 
     // Get all template field IDs first so we can validate later
-    const allTemplateFieldIds = finalRecipients.flatMap((recipient) =>
-      recipient.fields.map((field) => field.id),
-    );
+    const allTemplateFieldIds = finalRecipients.flatMap((recipient) => recipient.fields.map((field) => field.id));
 
     if (prefillFields?.length) {
       // Validate that all prefill field IDs exist in the template

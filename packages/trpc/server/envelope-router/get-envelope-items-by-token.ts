@@ -1,9 +1,9 @@
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
+import { getOrganisationTemplateWhereInput } from '@documenso/lib/server-only/template/get-organisation-template-by-id';
 import { isPublicDocumentAccessEnabled } from '@documenso/lib/universal/document-access';
 import { prisma } from '@documenso/prisma';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
 
 import { maybeAuthenticatedProcedure } from '../trpc';
 import {
@@ -56,22 +56,14 @@ export const getEnvelopeItemsByTokenRoute = maybeAuthenticatedProcedure
     };
   });
 
-const handleGetEnvelopeItemsByToken = async ({
-  envelopeId,
-  token,
-}: {
-  envelopeId: string;
-  token: string;
-}) => {
+const handleGetEnvelopeItemsByToken = async ({ envelopeId, token }: { envelopeId: string; token: string }) => {
   const isQrToken = token.startsWith('qr_');
 
   const envelope = await prisma.envelope.findFirst({
     where: {
       id: envelopeId,
       type: EnvelopeType.DOCUMENT,
-      ...(isQrToken
-        ? { qrToken: token, status: DocumentStatus.COMPLETED }
-        : { recipients: { some: { token } } }),
+      ...(isQrToken ? { qrToken: token, status: DocumentStatus.COMPLETED } : { recipients: { some: { token } } }),
     },
     include: {
       envelopeItems: {
@@ -122,7 +114,7 @@ const handleGetEnvelopeItemsByUser = async ({
   userId: number;
   teamId: number;
 }) => {
-  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+  const { envelopeWhereInput, team: callerTeam } = await getEnvelopeWhereInput({
     id: {
       type: 'envelopeId',
       id: envelopeId,
@@ -132,7 +124,8 @@ const handleGetEnvelopeItemsByUser = async ({
     teamId,
   });
 
-  const envelope = await prisma.envelope.findUnique({
+  // Try the standard team-scoped access path first (owner / current team / team email).
+  let envelope = await prisma.envelope.findUnique({
     where: envelopeWhereInput,
     include: {
       envelopeItems: {
@@ -142,6 +135,28 @@ const handleGetEnvelopeItemsByUser = async ({
       },
     },
   });
+
+  // Fallback: if the envelope is an ORGANISATION template owned by a sibling team
+  // in the caller's organisation, allow read access to the items metadata.
+  // Mirrors the access logic used by `createDocumentFromTemplate` and the
+  // file-download endpoint's `checkEnvelopeFileAccess` so this route stays in
+  // sync with where actual file access is granted.
+  if (!envelope) {
+    envelope = await prisma.envelope.findFirst({
+      where: getOrganisationTemplateWhereInput({
+        id: { type: 'envelopeId', id: envelopeId },
+        organisationId: callerTeam.organisationId,
+        teamRole: callerTeam.currentTeamRole,
+      }),
+      include: {
+        envelopeItems: {
+          include: {
+            documentData: true,
+          },
+        },
+      },
+    });
+  }
 
   if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {

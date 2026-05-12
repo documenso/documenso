@@ -1,13 +1,3 @@
-import { useEffect, useMemo, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { OrganisationGroupType, TeamMemberRole } from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { useForm } from 'react-hook-form';
-import { match } from 'ts-pattern';
-import { z } from 'zod';
-
 import { TEAM_MEMBER_ROLE_HIERARCHY } from '@documenso/lib/constants/teams';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
 import { trpc } from '@documenso/trpc/react';
@@ -31,16 +21,21 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { TeamMemberRole } from '@prisma/client';
+import type * as DialogPrimitive from '@radix-ui/react-dialog';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
+import { z } from 'zod';
 
+import {
+  type OrganisationGroupOption,
+  OrganisationGroupsMultiSelectCombobox,
+} from '~/components/general/organisation-groups-multiselect-combobox';
 import { useCurrentTeam } from '~/providers/team';
 
 export type TeamGroupCreateDialogProps = Omit<DialogPrimitive.DialogProps, 'children'>;
@@ -59,6 +54,7 @@ type TAddTeamMembersFormSchema = z.infer<typeof ZAddTeamMembersFormSchema>;
 export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) => {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<'SELECT' | 'ROLES'>('SELECT');
+  const [selectedGroups, setSelectedGroups] = useState<OrganisationGroupOption[]>([]);
 
   const { t } = useLingui();
   const { toast } = useToast();
@@ -73,26 +69,6 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
   });
 
   const { mutateAsync: createTeamGroups } = trpc.team.group.createMany.useMutation();
-
-  const organisationGroupQuery = trpc.organisation.group.find.useQuery({
-    organisationId: team.organisationId,
-    perPage: 100, // Won't really work if they somehow have more than 100 groups.
-    types: [OrganisationGroupType.CUSTOM],
-  });
-
-  const teamGroupQuery = trpc.team.group.find.useQuery({
-    teamId: team.id,
-    perPage: 100, // Won't really work if they somehow have more than 100 groups.
-  });
-
-  const avaliableOrganisationGroups = useMemo(() => {
-    const organisationGroups = organisationGroupQuery.data?.data ?? [];
-    const teamGroups = teamGroupQuery.data?.data ?? [];
-
-    return organisationGroups.filter(
-      (group) => !teamGroups.some((teamGroup) => teamGroup.organisationGroupId === group.id),
-    );
-  }, [organisationGroupQuery, teamGroupQuery]);
 
   const onFormSubmit = async ({ groups }: TAddTeamMembersFormSchema) => {
     try {
@@ -121,6 +97,7 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
     if (!open) {
       form.reset();
       setStep('SELECT');
+      setSelectedGroups([]);
     }
   }, [open, form]);
 
@@ -178,28 +155,23 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
                         </FormLabel>
 
                         <FormControl>
-                          <MultiSelectCombobox
-                            options={avaliableOrganisationGroups.map((group) => ({
-                              label: group.name ?? group.organisationRole,
-                              value: group.id,
-                            }))}
-                            loading={organisationGroupQuery.isLoading || teamGroupQuery.isLoading}
-                            selectedValues={field.value.map(
-                              ({ organisationGroupId }) => organisationGroupId,
-                            )}
-                            onChange={(value) => {
+                          <OrganisationGroupsMultiSelectCombobox
+                            organisationId={team.organisationId}
+                            selectedGroups={selectedGroups}
+                            excludeTeamId={team.id}
+                            onChange={(groups) => {
+                              setSelectedGroups(groups);
                               field.onChange(
-                                value.map((organisationGroupId) => ({
-                                  organisationGroupId,
+                                groups.map((group) => ({
+                                  organisationGroupId: group.id,
                                   teamRole:
-                                    field.value.find(
-                                      (value) => value.organisationGroupId === organisationGroupId,
-                                    )?.teamRole || TeamMemberRole.MEMBER,
+                                    field.value.find((value) => value.organisationGroupId === group.id)?.teamRole ||
+                                    TeamMemberRole.MEMBER,
                                 })),
                               );
                             }}
-                            className="bg-background w-full"
-                            emptySelectionPlaceholder={t`Select groups`}
+                            className="w-full bg-background"
+                            dataTestId="team-groups-picker"
                           />
                         </FormControl>
 
@@ -243,9 +215,8 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
                             readOnly
                             className="bg-background"
                             value={
-                              avaliableOrganisationGroups.find(
-                                ({ id }) => id === group.organisationGroupId,
-                              )?.name || t`Untitled Group`
+                              selectedGroups.find(({ id }) => id === group.organisationGroupId)?.name ||
+                              t`Untitled Group`
                             }
                           />
                         </div>
@@ -267,13 +238,11 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
                                   </SelectTrigger>
 
                                   <SelectContent position="popper">
-                                    {TEAM_MEMBER_ROLE_HIERARCHY[team.currentTeamRole].map(
-                                      (role) => (
-                                        <SelectItem key={role} value={role}>
-                                          {t(TEAM_MEMBER_ROLE_MAP[role]) ?? role}
-                                        </SelectItem>
-                                      ),
-                                    )}
+                                    {TEAM_MEMBER_ROLE_HIERARCHY[team.currentTeamRole].map((role) => (
+                                      <SelectItem key={role} value={role}>
+                                        {t(TEAM_MEMBER_ROLE_MAP[role]) ?? role}
+                                      </SelectItem>
+                                    ))}
                                   </SelectContent>
                                 </Select>
                               </FormControl>

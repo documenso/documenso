@@ -1,9 +1,3 @@
-import { Trans } from '@lingui/react/macro';
-import { AlertCircle } from 'lucide-react';
-import { nanoid } from 'nanoid';
-import { Link, isRouteErrorResponse, redirect, useLoaderData } from 'react-router';
-import { match } from 'ts-pattern';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getDocumentByAccessToken } from '@documenso/lib/server-only/document/get-document-by-access-token';
@@ -12,6 +6,11 @@ import { tokenFingerprint } from '@documenso/lib/universal/crypto';
 import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { logger } from '@documenso/lib/utils/logger';
 import { Button } from '@documenso/ui/primitives/button';
+import { Trans } from '@lingui/react/macro';
+import { AlertCircle } from 'lucide-react';
+import { nanoid } from 'nanoid';
+import { isRouteErrorResponse, Link, redirect, useLoaderData } from 'react-router';
+import { match } from 'ts-pattern';
 
 import { DocumentCertificateQRView } from '~/components/general/document/document-certificate-qr-view';
 import { appMetaTags } from '~/utils/meta';
@@ -123,9 +122,7 @@ export const loader = async ({ request, params: { slug } }: Route.LoaderArgs) =>
     });
 
     if (rateLimitResult.isLimited) {
-      const retryAfter = String(
-        Math.max(1, Math.ceil((rateLimitResult.reset.getTime() - Date.now()) / 1000)),
-      );
+      const retryAfter = String(Math.max(1, Math.ceil((rateLimitResult.reset.getTime() - Date.now()) / 1000)));
 
       logger.warn({
         msg: 'QR share access throttled',
@@ -245,12 +242,8 @@ const qrShareErrorMessage = (code: string | undefined) =>
   match(code)
     .with('QR_VIEW_NOT_FOUND', () => <Trans>The shared document could not be found.</Trans>)
     .with('QR_VIEW_NOT_COMPLETED', () => <Trans>This document is not fully completed yet.</Trans>)
-    .with('QR_VIEW_DISABLED', () => (
-      <Trans>Public completed-document access is currently disabled.</Trans>
-    ))
-    .with('QR_VIEW_UNAUTHORIZED', () => (
-      <Trans>You are not authorized to view this document.</Trans>
-    ))
+    .with('QR_VIEW_DISABLED', () => <Trans>Public completed-document access is currently disabled.</Trans>)
+    .with('QR_VIEW_UNAUTHORIZED', () => <Trans>You are not authorized to view this document.</Trans>)
     .with('QR_VIEW_RATE_LIMITED', () => <Trans>Too many requests. Please try again shortly.</Trans>)
     .otherwise(() => <Trans>Something went wrong while opening this shared view.</Trans>);
 
@@ -263,13 +256,13 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         <AlertCircle className="size-10 self-start text-destructive" />
 
         <div className="flex flex-col gap-2">
-          <h2 className="text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
+          <h2 className="font-semibold text-2xl leading-normal md:text-3xl lg:text-4xl">
             <Trans>Unable to Open Document</Trans>
           </h2>
-          <p className="text-sm text-muted-foreground">{qrShareErrorMessage(payload?.code)}</p>
+          <p className="text-muted-foreground text-sm">{qrShareErrorMessage(payload?.code)}</p>
 
           {payload?.correlationId && (
-            <p className="mt-4 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <p className="mt-4 font-medium text-muted-foreground text-xs uppercase tracking-wide">
               <Trans>Support code: {payload.correlationId}</Trans>
             </p>
           )}

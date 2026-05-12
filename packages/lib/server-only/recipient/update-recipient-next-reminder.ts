@@ -1,16 +1,7 @@
-import {
-  DocumentDistributionMethod,
-  RecipientRole,
-  SendStatus,
-  SigningStatus,
-} from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { DocumentDistributionMethod, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 
-import {
-  ZEnvelopeReminderSettings,
-  resolveNextReminderAt,
-} from '../../constants/envelope-reminder';
+import { resolveNextReminderAt, ZEnvelopeReminderSettings } from '../../constants/envelope-reminder';
 
 /**
  * Compute and store `nextReminderAt` for a single recipient.
@@ -72,13 +63,14 @@ export const recomputeNextReminderForEnvelope = async (envelopeId: string) => {
   });
 
   // No reminders for manually distributed documents.
-  const isEmailDistribution =
-    envelope?.documentMeta?.distributionMethod !== DocumentDistributionMethod.NONE;
+  const isEmailDistribution = envelope?.documentMeta?.distributionMethod !== DocumentDistributionMethod.NONE;
 
   const settings =
     isEmailDistribution && envelope?.documentMeta?.reminderSettings
       ? ZEnvelopeReminderSettings.parse(envelope.documentMeta.reminderSettings)
       : null;
+
+  const now = new Date();
 
   const recipients = await prisma.recipient.findMany({
     where: {
@@ -87,6 +79,8 @@ export const recomputeNextReminderForEnvelope = async (envelopeId: string) => {
       sendStatus: SendStatus.SENT,
       sentAt: { not: null },
       role: { not: RecipientRole.CC },
+      // Don't reschedule reminders for recipients whose deadline has passed.
+      OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
     },
     select: { id: true, sentAt: true, lastReminderSentAt: true },
   });

@@ -1,13 +1,9 @@
-import { OrganisationGroupType } from '@prisma/client';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
+import { OrganisationGroupType } from '@prisma/client';
 
 import { adminProcedure } from '../trpc';
-import {
-  ZDeleteAdminTeamMemberRequestSchema,
-  ZDeleteAdminTeamMemberResponseSchema,
-} from './delete-team-member.types';
+import { ZDeleteAdminTeamMemberRequestSchema, ZDeleteAdminTeamMemberResponseSchema } from './delete-team-member.types';
 
 export const deleteAdminTeamMemberRoute = adminProcedure
   .input(ZDeleteAdminTeamMemberRequestSchema)
@@ -59,8 +55,7 @@ export const deleteAdminTeamMemberRoute = adminProcedure
 
     if (!teamGroupToRemoveMemberFrom) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
-        message:
-          'Member is not directly assigned to this team. Inherited members cannot be removed here.',
+        message: 'Member is not directly assigned to this team. Inherited members cannot be removed here.',
       });
     }
 

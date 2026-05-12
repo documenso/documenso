@@ -1,15 +1,3 @@
-import { useMemo } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
-import { Loader } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { Link } from 'react-router';
-import { z } from 'zod';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@documenso/lib/constants/organisations';
 import { EXTENDED_ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
@@ -17,7 +5,6 @@ import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translation
 import { AppError } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import type { TFindOrganisationGroupsResponse } from '@documenso/trpc/server/organisation-router/find-organisation-groups.types';
-import type { TFindOrganisationMembersResponse } from '@documenso/trpc/server/organisation-router/find-organisation-members.types';
 import { Button } from '@documenso/ui/primitives/button';
 import { DataTable, type DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import {
@@ -30,18 +17,24 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
+import { Loader } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Link } from 'react-router';
+import { z } from 'zod';
 
 import { OrganisationGroupDeleteDialog } from '~/components/dialogs/organisation-group-delete-dialog';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
+import {
+  type OrganisationMemberOption,
+  OrganisationMembersMultiSelectCombobox,
+} from '~/components/general/organisation-members-multiselect-combobox';
 import { SettingsHeader } from '~/components/general/settings-header';
 
 import type { Route } from './+types/o.$orgUrl.settings.groups.$id';
@@ -52,10 +45,6 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
   const organisation = useCurrentOrganisation();
 
   const groupId = params.id;
-
-  const { data: members, isLoading: isLoadingMembers } = trpc.organisation.member.find.useQuery({
-    organisationId: organisation.id,
-  });
 
   const { data: groupData, isLoading: isLoadingGroup } = trpc.organisation.group.find.useQuery(
     {
@@ -72,10 +61,10 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
 
   const group = groupData?.data.find((g) => g.id === groupId);
 
-  if (isLoadingGroup || isLoadingMembers) {
+  if (isLoadingGroup) {
     return (
       <div className="flex items-center justify-center rounded-lg py-32">
-        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
+        <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -106,10 +95,7 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
 
   return (
     <div>
-      <SettingsHeader
-        title={t`Organisation Group Settings`}
-        subtitle={t`Manage your organisation group settings.`}
-      >
+      <SettingsHeader title={t`Organisation Group Settings`} subtitle={t`Manage your organisation group settings.`}>
         <OrganisationGroupDeleteDialog
           organisationGroupId={groupId}
           organisationGroupName={group.name || ''}
@@ -121,7 +107,7 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
         />
       </SettingsHeader>
 
-      <OrganisationGroupForm group={group} organisationMembers={members?.data || []} />
+      <OrganisationGroupForm group={group} />
     </div>
   );
 }
@@ -136,16 +122,25 @@ type TUpdateOrganisationGroupFormSchema = z.infer<typeof ZUpdateOrganisationGrou
 
 type OrganisationGroupFormOptions = {
   group: TFindOrganisationGroupsResponse['data'][number];
-  organisationMembers: TFindOrganisationMembersResponse['data'];
 };
 
-const OrganisationGroupForm = ({ group, organisationMembers }: OrganisationGroupFormOptions) => {
+const OrganisationGroupForm = ({ group }: OrganisationGroupFormOptions) => {
   const { toast } = useToast();
   const { t } = useLingui();
 
   const organisation = useCurrentOrganisation();
 
   const { mutateAsync: updateOrganisationGroup } = trpc.organisation.group.update.useMutation();
+
+  // Track full member details (name/email) keyed by id so chip labels render
+  // correctly even after the form has been mounted for a while.
+  const [selectedMembers, setSelectedMembers] = useState<OrganisationMemberOption[]>(() =>
+    group.members.map((member) => ({
+      id: member.id,
+      name: member.name,
+      email: member.email,
+    })),
+  );
 
   const form = useForm<TUpdateOrganisationGroupFormSchema>({
     resolver: zodResolver(ZUpdateOrganisationGroupFormSchema),
@@ -229,21 +224,17 @@ const OrganisationGroupForm = ({ group, organisationMembers }: OrganisationGroup
                   </SelectTrigger>
 
                   <SelectContent position="popper">
-                    {ORGANISATION_MEMBER_ROLE_HIERARCHY[organisation.currentOrganisationRole].map(
-                      (role) => (
-                        <SelectItem key={role} value={role}>
-                          {t(EXTENDED_ORGANISATION_MEMBER_ROLE_MAP[role])}
-                        </SelectItem>
-                      ),
-                    )}
+                    {ORGANISATION_MEMBER_ROLE_HIERARCHY[organisation.currentOrganisationRole].map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {t(EXTENDED_ORGANISATION_MEMBER_ROLE_MAP[role])}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </FormControl>
               <FormMessage />
               <FormDescription>
-                <Trans>
-                  The organisation role that will be applied to all members in this group.
-                </Trans>
+                <Trans>The organisation role that will be applied to all members in this group.</Trans>
               </FormDescription>
             </FormItem>
           )}
@@ -258,15 +249,15 @@ const OrganisationGroupForm = ({ group, organisationMembers }: OrganisationGroup
                 <Trans>Members</Trans>
               </FormLabel>
               <FormControl>
-                <MultiSelectCombobox
-                  options={organisationMembers.map((member) => ({
-                    label: member.name || member.email,
-                    value: member.id,
-                  }))}
-                  selectedValues={field.value}
-                  onChange={field.onChange}
+                <OrganisationMembersMultiSelectCombobox
+                  organisationId={organisation.id}
+                  selectedMembers={selectedMembers}
+                  onChange={(members) => {
+                    setSelectedMembers(members);
+                    field.onChange(members.map((member) => member.id));
+                  }}
                   className="w-full"
-                  emptySelectionPlaceholder={t`Select members`}
+                  dataTestId="group-members-picker"
                 />
               </FormControl>
               <FormDescription>

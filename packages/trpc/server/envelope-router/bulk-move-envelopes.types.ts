@@ -18,16 +18,12 @@ export const ZBulkMoveEnvelopesRequestSchema = z.object({
     .array(z.string())
     .min(1)
     .max(100)
-    .describe(
-      'The IDs of the envelopes to move. The maximum number of envelopes you can move at once is 100.',
-    ),
+    .describe('The IDs of the envelopes to move. The maximum number of envelopes you can move at once is 100.'),
   envelopeType: z.nativeEnum(EnvelopeType).describe('The type of the envelopes being moved.'),
   folderId: z
     .string()
     .nullable()
-    .describe(
-      'The ID of the folder to move the envelopes to. If null envelopes will be moved to the root folder.',
-    ),
+    .describe('The ID of the folder to move the envelopes to. If null envelopes will be moved to the root folder.'),
 });
 
 export const ZBulkMoveEnvelopesResponseSchema = z.object({
