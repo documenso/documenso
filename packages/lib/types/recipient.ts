@@ -1,8 +1,7 @@
-import { z } from 'zod';
-
 import { RecipientSchema } from '@documenso/prisma/generated/zod/modelSchema/RecipientSchema';
 import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import { UserSchema } from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
+import { z } from 'zod';
 
 import { zEmail } from '../utils/zod';
 import { ZFieldSchema } from './field';
@@ -125,7 +124,4 @@ export type TEnvelopeRecipientSchema = z.infer<typeof ZEnvelopeRecipientSchema>;
 export type TEnvelopeRecipientLite = z.infer<typeof ZEnvelopeRecipientLiteSchema>;
 export type TEnvelopeRecipientMany = z.infer<typeof ZEnvelopeRecipientManySchema>;
 
-export const ZRecipientEmailSchema = z.union([
-  z.literal(''),
-  zEmail('Invalid email').trim().toLowerCase().max(254),
-]);
+export const ZRecipientEmailSchema = z.union([z.literal(''), zEmail('Invalid email').trim().toLowerCase().max(254)]);

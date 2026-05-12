@@ -1,9 +1,8 @@
-import { z } from 'zod';
-
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import OrganisationMemberRoleSchema from '@documenso/prisma/generated/zod/inputTypeSchemas/OrganisationMemberRoleSchema';
 import OrganisationGroupSchema from '@documenso/prisma/generated/zod/modelSchema/OrganisationGroupSchema';
 import { OrganisationMemberSchema } from '@documenso/prisma/generated/zod/modelSchema/OrganisationMemberSchema';
+import { z } from 'zod';
 
 // export const getOrganisationMembersMeta: TrpcOpenApiMeta = {
 //   openapi: {
@@ -17,6 +16,12 @@ import { OrganisationMemberSchema } from '@documenso/prisma/generated/zod/modelS
 
 export const ZFindOrganisationMembersRequestSchema = ZFindSearchParamsSchema.extend({
   organisationId: z.string(),
+  /**
+   * Exclude organisation members who are already members of the given team.
+   * Useful for "add members to team" pickers so that members already on the
+   * team don't appear in the dropdown.
+   */
+  excludeTeamId: z.number().optional(),
 });
 
 export const ZFindOrganisationMembersResponseSchema = ZFindResultResponse.extend({
@@ -41,6 +46,4 @@ export const ZFindOrganisationMembersResponseSchema = ZFindResultResponse.extend
     .array(),
 });
 
-export type TFindOrganisationMembersResponse = z.infer<
-  typeof ZFindOrganisationMembersResponseSchema
->;
+export type TFindOrganisationMembersResponse = z.infer<typeof ZFindOrganisationMembersResponseSchema>;

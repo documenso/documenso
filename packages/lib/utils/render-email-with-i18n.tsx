@@ -2,11 +2,7 @@ import type { RenderOptions } from '@documenso/email/render';
 import { renderWithI18N } from '@documenso/email/render';
 
 import { getI18nInstance } from '../client-only/providers/i18n-server';
-import {
-  APP_I18N_OPTIONS,
-  type SupportedLanguageCodes,
-  isValidLanguageCode,
-} from '../constants/i18n';
+import { APP_I18N_OPTIONS, isValidLanguageCode, type SupportedLanguageCodes } from '../constants/i18n';
 
 export const renderEmailWithI18N = async (
   component: React.ReactElement,

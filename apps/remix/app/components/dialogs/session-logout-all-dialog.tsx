@@ -1,7 +1,3 @@
-import { useState } from 'react';
-
-import { Trans, useLingui } from '@lingui/react/macro';
-
 import { authClient } from '@documenso/auth/client';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -15,6 +11,8 @@ import {
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { useState } from 'react';
 
 type SessionLogoutAllDialogProps = {
   onSuccess?: () => Promise<unknown>;
@@ -71,8 +69,8 @@ export const SessionLogoutAllDialog = ({ onSuccess, disabled }: SessionLogoutAll
           </DialogTitle>
           <DialogDescription>
             <Trans>
-              This will sign you out of all other devices. You will need to sign in again on those
-              devices to continue using your account.
+              This will sign you out of all other devices. You will need to sign in again on those devices to continue
+              using your account.
             </Trans>
           </DialogDescription>
         </DialogHeader>

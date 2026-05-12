@@ -47,10 +47,7 @@ export const updateSubscriptionClaimRoute = adminProcedure
     }
   });
 
-function getNewTruthyFlags(
-  a: Partial<TClaimFlags>,
-  b: Partial<TClaimFlags>,
-): Record<keyof TClaimFlags, true> {
+function getNewTruthyFlags(a: Partial<TClaimFlags>, b: Partial<TClaimFlags>): Record<keyof TClaimFlags, true> {
   const flags: { [key in keyof TClaimFlags]?: true } = {};
 
   for (const key in b) {

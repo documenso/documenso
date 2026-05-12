@@ -1,11 +1,7 @@
 import type { Page } from '@playwright/test';
 import type Konva from 'konva';
 
-export const getKonvaElementCountForPage = async (
-  page: Page,
-  pageNumber: number,
-  elementSelector: string,
-) => {
+export const getKonvaElementCountForPage = async (page: Page, pageNumber: number, elementSelector: string) => {
   await page.locator('.konva-container canvas').first().waitFor({ state: 'visible' });
 
   return await page.evaluate(

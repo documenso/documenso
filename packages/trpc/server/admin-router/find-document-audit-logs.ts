@@ -1,10 +1,9 @@
-import { EnvelopeType } from '@prisma/client';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { FindResultResponse } from '@documenso/lib/types/search-params';
 import { parseDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { unsafeBuildEnvelopeIdQuery } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType } from '@prisma/client';
 
 import { adminProcedure } from '../trpc';
 import {
@@ -16,13 +15,7 @@ export const findDocumentAuditLogsRoute = adminProcedure
   .input(ZFindDocumentAuditLogsRequestSchema)
   .output(ZFindDocumentAuditLogsResponseSchema)
   .query(async ({ input }) => {
-    const {
-      envelopeId,
-      page = 1,
-      perPage = 50,
-      orderByColumn = 'createdAt',
-      orderByDirection = 'desc',
-    } = input;
+    const { envelopeId, page = 1, perPage = 50, orderByColumn = 'createdAt', orderByDirection = 'desc' } = input;
 
     const envelope = await prisma.envelope.findFirst({
       where: unsafeBuildEnvelopeIdQuery(

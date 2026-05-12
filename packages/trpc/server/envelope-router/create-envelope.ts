@@ -1,5 +1,3 @@
-import { EnvelopeType } from '@prisma/client';
-
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
@@ -7,18 +5,16 @@ import { convertToPdfIfNeeded } from '@documenso/lib/server-only/file-conversion
 import { extractPdfPlaceholders } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import {
-  putFileServerSide,
-  putPdfFileServerSide,
-} from '@documenso/lib/universal/upload/put-file.server';
+import { putFileServerSide, putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
+import { EnvelopeType } from '@prisma/client';
 
 import { insertFormValuesInPdf } from '../../../lib/server-only/pdf/insert-form-values-in-pdf';
 import { authenticatedProcedure } from '../trpc';
 import type { TCreateEnvelopeRequest } from './create-envelope.types';
 import {
+  createEnvelopeMeta,
   ZCreateEnvelopeRequestSchema,
   ZCreateEnvelopeResponseSchema,
-  createEnvelopeMeta,
 } from './create-envelope.types';
 
 export const createEnvelopeRoute = authenticatedProcedure
@@ -161,12 +157,10 @@ export const createEnvelopeRouteCaller = async ({
     accessAuth: recipient.accessAuth,
     actionAuth: recipient.actionAuth,
     fields: recipient.fields?.map((field) => {
-      let documentDataId: string | undefined = undefined;
+      let documentDataId: string | undefined;
 
       if (typeof field.identifier === 'string') {
-        documentDataId = envelopeItems.find(
-          (item) => item.title === field.identifier,
-        )?.documentDataId;
+        documentDataId = envelopeItems.find((item) => item.title === field.identifier)?.documentDataId;
       }
 
       if (typeof field.identifier === 'number') {

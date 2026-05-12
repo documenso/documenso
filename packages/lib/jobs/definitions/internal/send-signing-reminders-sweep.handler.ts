@@ -1,17 +1,11 @@
-import { DocumentStatus, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { DocumentStatus, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 
 import { jobs } from '../../client';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendSigningRemindersSweepJobDefinition } from './send-signing-reminders-sweep';
 
-export const run = async ({
-  io,
-}: {
-  payload: TSendSigningRemindersSweepJobDefinition;
-  io: JobRunIO;
-}) => {
+export const run = async ({ io }: { payload: TSendSigningRemindersSweepJobDefinition; io: JobRunIO }) => {
   const now = new Date();
 
   const recipients = await prisma.recipient.findMany({
@@ -20,6 +14,11 @@ export const run = async ({
       signingStatus: SigningStatus.NOT_SIGNED,
       sendStatus: SendStatus.SENT,
       role: { not: RecipientRole.CC },
+      // Skip recipients whose signing deadline has passed. `expiresAt`
+      // is the source of truth — the expiration sweep asynchronously
+      // sets `expirationNotifiedAt`, so filtering on `expiresAt` also
+      // covers the window before the expiration sweep runs.
+      OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
       envelope: {
         status: DocumentStatus.PENDING,
         deletedAt: null,

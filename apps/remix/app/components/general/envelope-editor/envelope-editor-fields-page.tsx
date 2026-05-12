@@ -1,15 +1,3 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-
-import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
-import { FileTextIcon, PencilIcon, SparklesIcon } from 'lucide-react';
-import { useRevalidator, useSearchParams } from 'react-router';
-import { isDeepEqual } from 'remeda';
-import { match } from 'ts-pattern';
-
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
@@ -35,6 +23,16 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
+import type { MessageDescriptor } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
+import { FileTextIcon, PencilIcon, SparklesIcon } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRevalidator, useSearchParams } from 'react-router';
+import { isDeepEqual } from 'remeda';
+import { match } from 'ts-pattern';
 
 import { AiFeaturesEnableDialog } from '~/components/dialogs/ai-features-enable-dialog';
 import { AiFieldDetectionDialog } from '~/components/dialogs/ai-field-detection-dialog';
@@ -93,10 +91,7 @@ export const EnvelopeEditorFieldsPage = () => {
     [envelope, envelope.recipients],
   );
 
-  const selectedField = useMemo(
-    () => structuredClone(editorFields.selectedField),
-    [editorFields.selectedField],
-  );
+  const selectedField = useMemo(() => structuredClone(editorFields.selectedField), [editorFields.selectedField]);
 
   const updateSelectedFieldMeta = (fieldMeta: TFieldMetaSchema) => {
     if (!selectedField) {
@@ -135,8 +130,7 @@ export const EnvelopeEditorFieldsPage = () => {
    */
   useEffect(() => {
     const firstSelectableRecipient = envelope.recipients.find(
-      (recipient) =>
-        recipient.role === RecipientRole.SIGNER || recipient.role === RecipientRole.APPROVER,
+      (recipient) => recipient.role === RecipientRole.SIGNER || recipient.role === RecipientRole.APPROVER,
     );
 
     editorFields.setSelectedRecipient(firstSelectableRecipient?.id ?? null);
@@ -160,10 +154,7 @@ export const EnvelopeEditorFieldsPage = () => {
 
   return (
     <div className="relative flex h-full">
-      <div
-        className="flex h-full w-full flex-col overflow-y-auto px-2"
-        ref={scrollableContainerRef}
-      >
+      <div className="flex h-full w-full flex-col overflow-y-auto px-2" ref={scrollableContainerRef}>
         {/* Horizontal envelope item selector */}
         <EnvelopeRendererFileSelector
           className="px-0"
@@ -175,10 +166,9 @@ export const EnvelopeEditorFieldsPage = () => {
               ? (item) => (
                   <div className="relative flex h-5 w-5 flex-shrink-0 items-center justify-center">
                     <div
-                      className={cn(
-                        'h-2 w-2 rounded-full transition-opacity duration-150 group-hover:opacity-0',
-                        { 'bg-green-500': currentEnvelopeItem?.id === item.id },
-                      )}
+                      className={cn('h-2 w-2 rounded-full transition-opacity duration-150 group-hover:opacity-0', {
+                        'bg-green-500': currentEnvelopeItem?.id === item.id,
+                      })}
                     />
                     <EnvelopeItemEditDialog
                       envelopeItem={item}
@@ -230,10 +220,10 @@ export const EnvelopeEditorFieldsPage = () => {
           ) : (
             <div className="flex flex-col items-center justify-center py-32">
               <FileTextIcon className="h-10 w-10 text-muted-foreground" />
-              <p className="mt-1 text-sm text-foreground">
+              <p className="mt-1 text-foreground text-sm">
                 <Trans>No documents found</Trans>
               </p>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="mt-1 text-muted-foreground text-sm">
                 <Trans>Please upload a document to continue</Trans>
               </p>
             </div>
@@ -243,18 +233,16 @@ export const EnvelopeEditorFieldsPage = () => {
 
       {/* Right Section - Form Fields Panel */}
       {currentEnvelopeItem && envelope.recipients.length > 0 && (
-        <div className="sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-l border-border bg-background py-4">
+        <div className="sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-border border-l bg-background py-4">
           {/* Recipient selector section. */}
           <section className="px-4">
-            <h3 className="mb-2 text-sm font-semibold text-foreground">
+            <h3 className="mb-2 font-semibold text-foreground text-sm">
               <Trans>Selected Recipient</Trans>
             </h3>
 
             <EnvelopeRecipientSelector
               selectedRecipient={editorFields.selectedRecipient}
-              onSelectedRecipientChange={(recipient) =>
-                editorFields.setSelectedRecipient(recipient.id)
-              }
+              onSelectedRecipientChange={(recipient) => editorFields.setSelectedRecipient(recipient.id)}
               recipients={envelope.recipients}
               fields={envelope.fields}
               className="w-full"
@@ -266,8 +254,7 @@ export const EnvelopeEditorFieldsPage = () => {
                 <Alert className="mt-4" variant="warning">
                   <AlertDescription>
                     <Trans>
-                      This recipient can no longer be modified as they have signed a field, or
-                      completed the document.
+                      This recipient can no longer be modified as they have signed a field, or completed the document.
                     </Trans>
                   </AlertDescription>
                 </Alert>
@@ -278,7 +265,7 @@ export const EnvelopeEditorFieldsPage = () => {
 
           {/* Add fields section. */}
           <section className="px-4">
-            <h3 className="mb-2 text-sm font-semibold text-foreground">
+            <h3 className="mb-2 font-semibold text-foreground text-sm">
               <Trans>Add Fields</Trans>
             </h3>
 
@@ -302,7 +289,7 @@ export const EnvelopeEditorFieldsPage = () => {
                       : undefined
                   }
                 >
-                  <SparklesIcon className="-ml-1 mr-2 h-4 w-4" />
+                  <SparklesIcon className="mr-2 -ml-1 h-4 w-4" />
                   <Trans>Detect with AI</Trans>
                 </Button>
 
@@ -332,11 +319,11 @@ export const EnvelopeEditorFieldsPage = () => {
                 {searchParams.get('devmode') && (
                   <>
                     <div className="px-4">
-                      <h3 className="mb-3 text-sm font-semibold text-foreground">
+                      <h3 className="mb-3 font-semibold text-foreground text-sm">
                         <Trans>Developer Mode</Trans>
                       </h3>
 
-                      <div className="space-y-2 rounded-md border border-border bg-muted/50 p-3 text-sm text-foreground">
+                      <div className="space-y-2 rounded-md border border-border bg-muted/50 p-3 text-foreground text-sm">
                         {selectedField.id && (
                           <p>
                             <span className="min-w-12 text-muted-foreground">
@@ -382,10 +369,8 @@ export const EnvelopeEditorFieldsPage = () => {
                   </>
                 )}
 
-                <div className="px-4 [&_label]:text-xs [&_label]:text-foreground/70">
-                  <h3 className="text-sm font-semibold">
-                    {_(FieldSettingsTypeTranslations[selectedField.type])}
-                  </h3>
+                <div className="px-4 [&_label]:text-foreground/70 [&_label]:text-xs">
+                  <h3 className="font-semibold text-sm">{_(FieldSettingsTypeTranslations[selectedField.type])}</h3>
 
                   {match(selectedField.type)
                     .with(FieldType.SIGNATURE, () => (

@@ -1,9 +1,3 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { EnvelopeType } from '@prisma/client';
-import { DateTime } from 'luxon';
-import { redirect } from 'react-router';
-
 import { DOCUMENT_STATUS } from '@documenso/lib/constants/document';
 import { APP_I18N_OPTIONS, ZSupportedLanguageCodeSchema } from '@documenso/lib/constants/i18n';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
@@ -14,6 +8,11 @@ import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organis
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { getTranslations } from '@documenso/lib/utils/i18n';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { EnvelopeType } from '@prisma/client';
+import { DateTime } from 'luxon';
+import { redirect } from 'react-router';
 
 import appStylesheet from '~/app.css?url';
 import { BrandingLogo } from '~/components/general/branding-logo';
@@ -108,7 +107,7 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
   return (
     <div className="print-provider pointer-events-none mx-auto max-w-screen-md">
       <div className="mb-6 border-b pb-4">
-        <h1 className="text-xl font-semibold">{_(msg`Audit Log`)}</h1>
+        <h1 className="font-semibold text-xl">{_(msg`Audit Log`)}</h1>
       </div>
 
       <Card>
@@ -129,9 +128,7 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
             <span className="font-medium">{_(msg`Status`)}</span>
 
             <span className="mt-1 block">
-              {_(
-                document.deletedAt ? msg`Deleted` : DOCUMENT_STATUS[document.status].description,
-              ).toUpperCase()}
+              {_(document.deletedAt ? msg`Deleted` : DOCUMENT_STATUS[document.status].description).toUpperCase()}
             </span>
           </p>
 
@@ -166,9 +163,7 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
           <p>
             <span className="font-medium">{_(msg`Time Zone`)}</span>
 
-            <span className="mt-1 block break-words">
-              {document.documentMeta?.timezone ?? 'N/A'}
-            </span>
+            <span className="mt-1 block break-words">{document.documentMeta?.timezone ?? 'N/A'}</span>
           </p>
 
           <div>

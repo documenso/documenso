@@ -155,7 +155,13 @@ PORT=3000
 NEXT_PRIVATE_SIGNING_PASSPHRASE=your-certificate-password
 
 # Signup restrictions (optional)
+# Master switch â€” disables every signup method
 NEXT_PUBLIC_DISABLE_SIGNUP=false
+# Per-method switches (optional). Each disables brand-new account creation through that method.
+# NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNUP=true
+# NEXT_PUBLIC_DISABLE_GOOGLE_SIGNUP=true
+# NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP=true
+# NEXT_PUBLIC_DISABLE_OIDC_SIGNUP=true
 # NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS=example.com,acme.org
 ```
 
@@ -252,7 +258,10 @@ Navigate to the signup page and create your account. Verify your email address â
 <Callout type="info">
   All accounts created through signup are regular user accounts. Admin access must be granted
   directly in the database. Once your accounts are set up, consider disabling public signups by
-  setting `NEXT_PUBLIC_DISABLE_SIGNUP=true`, or restrict signups to specific email domains with
+  setting `NEXT_PUBLIC_DISABLE_SIGNUP=true`. For finer control, use the per-method switches
+  `NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNUP`, `NEXT_PUBLIC_DISABLE_GOOGLE_SIGNUP`,
+  `NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP`, `NEXT_PUBLIC_DISABLE_OIDC_SIGNUP`, or restrict
+  signups to specific email domains with
   `NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS`.
 </Callout>
 
