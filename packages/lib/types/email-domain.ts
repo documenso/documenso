@@ -1,6 +1,5 @@
-import type { z } from 'zod';
-
 import { EmailDomainSchema } from '@documenso/prisma/generated/zod/modelSchema/EmailDomainSchema';
+import type { z } from 'zod';
 
 import { ZOrganisationEmailLiteSchema } from './organisation-email';
 
@@ -18,6 +17,7 @@ export const ZEmailDomainSchema = EmailDomainSchema.pick({
   publicKey: true,
   createdAt: true,
   updatedAt: true,
+  lastVerifiedAt: true,
 }).extend({
   emails: ZOrganisationEmailLiteSchema.array(),
 });
@@ -35,6 +35,7 @@ export const ZEmailDomainManySchema = EmailDomainSchema.pick({
   selector: true,
   createdAt: true,
   updatedAt: true,
+  lastVerifiedAt: true,
 });
 
 export type TEmailDomainMany = z.infer<typeof ZEmailDomainManySchema>;

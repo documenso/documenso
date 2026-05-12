@@ -4,9 +4,9 @@ import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../../trpc';
 import {
+  getEnvelopeRecipientMeta,
   ZGetEnvelopeRecipientRequestSchema,
   ZGetEnvelopeRecipientResponseSchema,
-  getEnvelopeRecipientMeta,
 } from './get-envelope-recipient.types';
 
 export const getEnvelopeRecipientRoute = authenticatedProcedure

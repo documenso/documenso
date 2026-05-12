@@ -1,7 +1,3 @@
-import { useLingui } from '@lingui/react/macro';
-import { Loader } from 'lucide-react';
-import { useLoaderData } from 'react-router';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { IS_AI_FEATURES_CONFIGURED } from '@documenso/lib/constants/app';
@@ -9,6 +5,10 @@ import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react/macro';
+import { Loader } from 'lucide-react';
+import { useLoaderData } from 'react-router';
 
 import {
   DocumentPreferencesForm,
@@ -18,7 +18,7 @@ import { SettingsHeader } from '~/components/general/settings-header';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Document Preferences');
+  return appMetaTags(msg`Document Preferences`);
 }
 
 export const loader = () => {
@@ -38,13 +38,11 @@ export default function OrganisationSettingsDocumentPage() {
 
   const isPersonalLayoutMode = isPersonalLayout(organisations);
 
-  const { data: organisationWithSettings, isLoading: isLoadingOrganisation } =
-    trpc.organisation.get.useQuery({
-      organisationReference: organisation.url,
-    });
+  const { data: organisationWithSettings, isLoading: isLoadingOrganisation } = trpc.organisation.get.useQuery({
+    organisationReference: organisation.url,
+  });
 
-  const { mutateAsync: updateOrganisationSettings } =
-    trpc.organisation.settings.update.useMutation();
+  const { mutateAsync: updateOrganisationSettings } = trpc.organisation.settings.update.useMutation();
 
   const onDocumentPreferencesFormSubmit = async (data: TDocumentPreferencesFormSchema) => {
     try {
@@ -60,6 +58,8 @@ export default function OrganisationSettingsDocumentPage() {
         defaultRecipients,
         delegateDocumentOwnership,
         aiFeaturesEnabled,
+        envelopeExpirationPeriod,
+        reminderSettings,
       } = data;
 
       if (
@@ -90,6 +90,8 @@ export default function OrganisationSettingsDocumentPage() {
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
           delegateDocumentOwnership: delegateDocumentOwnership,
           aiFeaturesEnabled,
+          envelopeExpirationPeriod: envelopeExpirationPeriod ?? undefined,
+          reminderSettings: reminderSettings ?? undefined,
         },
       });
 

@@ -1,14 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
-
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
-import { FolderType, OrganisationType } from '@prisma/client';
-import { useParams, useSearchParams } from 'react-router';
-import { z } from 'zod';
-
 import { useSessionStorage } from '@documenso/lib/client-only/hooks/use-session-storage';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { SKIP_QUERY_BATCH_META } from '@documenso/lib/constants/trpc';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { parseToIntegerArray } from '@documenso/lib/utils/params';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
@@ -18,6 +10,13 @@ import { ZFindDocumentsInternalRequestSchema } from '@documenso/trpc/server/docu
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import type { RowSelectionState } from '@documenso/ui/primitives/data-table';
 import type { DataTableFacetedFilterOption } from '@documenso/ui/primitives/data-table-faceted-filter';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { EnvelopeType, FolderType, OrganisationType } from '@prisma/client';
+import { useEffect, useMemo, useState } from 'react';
+import { useParams, useSearchParams } from 'react-router';
+import { z } from 'zod';
 
 import { DocumentMoveToFolderDialog } from '~/components/dialogs/document-move-to-folder-dialog';
 import { EnvelopesBulkDeleteDialog } from '~/components/dialogs/envelopes-bulk-delete-dialog';
@@ -33,7 +32,7 @@ import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Documents');
+  return appMetaTags(msg`Documents`);
 }
 
 const ZSearchParamsSchema = ZFindDocumentsInternalRequestSchema.pick({
@@ -58,10 +57,7 @@ export default function DocumentsPage() {
   const [isMovingDocument, setIsMovingDocument] = useState(false);
   const [documentToMove, setDocumentToMove] = useState<number | null>(null);
 
-  const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>(
-    'documents-bulk-selection',
-    {},
-  );
+  const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>('documents-bulk-selection', {});
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
 
@@ -83,10 +79,15 @@ export default function DocumentsPage() {
     [searchParams],
   );
 
-  const { data, isLoading, isLoadingError } = trpc.document.findDocumentsInternal.useQuery({
-    ...findDocumentSearchParams,
-    folderId,
-  });
+  const { data, isLoading, isLoadingError } = trpc.document.findDocumentsInternal.useQuery(
+    {
+      ...findDocumentSearchParams,
+      folderId,
+    },
+    {
+      ...SKIP_QUERY_BATCH_META,
+    },
+  );
 
   const statusOptions = useMemo<DataTableFacetedFilterOption[]>(() => {
     return [
@@ -117,8 +118,7 @@ export default function DocumentsPage() {
 
   const selectedStatuses = findDocumentSearchParams.status ?? [];
 
-  const selectedStatus =
-    selectedStatuses.length === 1 ? selectedStatuses[0] : ExtendedDocumentStatus.ALL;
+  const selectedStatus = selectedStatuses.length === 1 ? selectedStatuses[0] : ExtendedDocumentStatus.ALL;
 
   useEffect(() => {
     if (data?.stats) {
@@ -133,25 +133,19 @@ export default function DocumentsPage() {
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-x-4 gap-y-8">
           <div className="flex flex-row items-center">
-            <Avatar className="mr-3 h-12 w-12 border-2 border-solid border-white dark:border-border">
+            <Avatar className="mr-3 h-12 w-12 border-2 border-white border-solid dark:border-border">
               {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
-              <AvatarFallback className="text-xs text-muted-foreground">
-                {team.name.slice(0, 1)}
-              </AvatarFallback>
+              <AvatarFallback className="text-muted-foreground text-xs">{team.name.slice(0, 1)}</AvatarFallback>
             </Avatar>
 
-            <h2 className="text-4xl font-semibold">
+            <h2 className="font-semibold text-4xl">
               <Trans>Documents</Trans>
             </h2>
           </div>
         </div>
 
         <div className="mt-8">
-          <DocumentsTableToolbar
-            teamId={team?.id}
-            statusOptions={statusOptions}
-            statusCounts={stats}
-          />
+          <DocumentsTableToolbar teamId={team?.id} statusOptions={statusOptions} statusCounts={stats} />
         </div>
 
         <div className="mt-8">

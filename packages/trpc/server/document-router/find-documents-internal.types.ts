@@ -1,10 +1,9 @@
-import { DocumentSource } from '@prisma/client';
-import { z } from 'zod';
-
 import { ZDocumentManySchema } from '@documenso/lib/types/document';
 import { ZFindResultResponse } from '@documenso/lib/types/search-params';
 import { parseCommaSeparatedValues } from '@documenso/lib/utils/params';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+import { DocumentSource } from '@prisma/client';
+import { z } from 'zod';
 
 import { ZFindDocumentsRequestSchema } from './find-documents.types';
 
@@ -12,10 +11,7 @@ export const ZFindDocumentsInternalRequestSchema = ZFindDocumentsRequestSchema.e
   period: z.enum(['all', '7d', '14d', '30d']).optional(),
   senderIds: z.array(z.number()).optional(),
   source: z.preprocess(parseCommaSeparatedValues, z.array(z.nativeEnum(DocumentSource)).optional()),
-  status: z.preprocess(
-    parseCommaSeparatedValues,
-    z.array(z.nativeEnum(ExtendedDocumentStatus)).optional(),
-  ),
+  status: z.preprocess(parseCommaSeparatedValues, z.array(z.nativeEnum(ExtendedDocumentStatus)).optional()),
   folderId: z.string().optional(),
 });
 

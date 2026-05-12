@@ -1,9 +1,8 @@
-import { Trans, useLingui } from '@lingui/react/macro';
-
 import { validateFields as validateInitialsFields } from '@documenso/lib/advanced-fields-validation/validate-fields';
-import { type TInitialsFieldMeta as InitialsFieldMeta } from '@documenso/lib/types/field-meta';
+import type { TInitialsFieldMeta as InitialsFieldMeta } from '@documenso/lib/types/field-meta';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
+import { Trans, useLingui } from '@lingui/react/macro';
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../select';
 
@@ -41,7 +40,7 @@ export const InitialsFieldAdvancedSettings = ({
         <Input
           id="fontSize"
           type="number"
-          className="bg-background mt-2"
+          className="mt-2 bg-background"
           placeholder={t`Field font size`}
           value={fieldState.fontSize}
           onChange={(e) => handleInput('fontSize', e.target.value)}
@@ -55,11 +54,8 @@ export const InitialsFieldAdvancedSettings = ({
           <Trans>Text Align</Trans>
         </Label>
 
-        <Select
-          value={fieldState.textAlign}
-          onValueChange={(value) => handleInput('textAlign', value)}
-        >
-          <SelectTrigger className="bg-background mt-2">
+        <Select value={fieldState.textAlign} onValueChange={(value) => handleInput('textAlign', value)}>
+          <SelectTrigger className="mt-2 bg-background">
             <SelectValue placeholder={t`Select text align`} />
           </SelectTrigger>
 

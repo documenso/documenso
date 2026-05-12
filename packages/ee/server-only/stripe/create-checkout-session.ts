@@ -1,7 +1,6 @@
-import type Stripe from 'stripe';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { stripe } from '@documenso/lib/server-only/stripe';
+import type Stripe from 'stripe';
 
 export type CreateCheckoutSessionOptions = {
   customerId: string;
@@ -27,6 +26,7 @@ export const createCheckoutSession = async ({
     ],
     success_url: `${returnUrl}?success=true`,
     cancel_url: `${returnUrl}?canceled=true`,
+    billing_address_collection: 'required',
     subscription_data: {
       metadata: subscriptionMetadata,
     },

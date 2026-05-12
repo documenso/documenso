@@ -1,7 +1,6 @@
-import { EnvelopeType } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+import { EnvelopeType } from '@prisma/client';
 
 export const getDocumentStats = async () => {
   const counts = await prisma.envelope.groupBy({

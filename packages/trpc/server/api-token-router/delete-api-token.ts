@@ -1,10 +1,7 @@
 import { deleteTokenById } from '@documenso/lib/server-only/public-api/delete-api-token-by-id';
 
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZDeleteApiTokenRequestSchema,
-  ZDeleteApiTokenResponseSchema,
-} from './delete-api-token.types';
+import { ZDeleteApiTokenRequestSchema, ZDeleteApiTokenResponseSchema } from './delete-api-token.types';
 
 export const deleteApiTokenRoute = authenticatedProcedure
   .input(ZDeleteApiTokenRequestSchema)

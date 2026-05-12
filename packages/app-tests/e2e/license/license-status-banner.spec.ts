@@ -1,9 +1,8 @@
-import { expect, test } from '@playwright/test';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-
 import type { TCachedLicense } from '@documenso/lib/types/license';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -116,277 +115,250 @@ const createMockUnauthorizedWithoutLicense = (): TCachedLicense => {
 test.describe.configure({ mode: 'serial' });
 
 // SKIPPING TEST UNTIL WE ADD A WAY TO OVERRIDE THE LICENSE FILE.
-test.describe.skip('License Status Banner', () => {
-  test.beforeAll(async () => {
-    // Backup any existing license file before running tests
-    await backupLicenseFile();
-  });
-
-  test.afterAll(async () => {
-    // Restore the backup license file after all tests complete
-    await restoreLicenseFile();
-  });
-
-  test.beforeEach(async () => {
-    // Clean up license file before each test to ensure clean state
-    await writeLicenseFile(null);
-  });
-
-  test.afterEach(async () => {
-    // Clean up license file after each test
-    await writeLicenseFile(null);
-  });
-
-  test('[ADMIN]: no banner when license file is missing', async ({ page }) => {
-    // Ensure no license file exists BEFORE any page loads
-    await writeLicenseFile(null);
-
-    const { user: adminUser } = await seedUser({
-      isAdmin: true,
+test.describe
+  .skip('License Status Banner', () => {
+    test.beforeAll(async () => {
+      // Backup any existing license file before running tests
+      await backupLicenseFile();
     });
 
-    // Navigate to admin page - license is read during page load
-    await apiSignin({
+    test.afterAll(async () => {
+      // Restore the backup license file after all tests complete
+      await restoreLicenseFile();
+    });
+
+    test.beforeEach(async () => {
+      // Clean up license file before each test to ensure clean state
+      await writeLicenseFile(null);
+    });
+
+    test.afterEach(async () => {
+      // Clean up license file after each test
+      await writeLicenseFile(null);
+    });
+
+    test('[ADMIN]: no banner when license file is missing', async ({ page }) => {
+      // Ensure no license file exists BEFORE any page loads
+      await writeLicenseFile(null);
+
+      const { user: adminUser } = await seedUser({
+        isAdmin: true,
+      });
+
+      // Navigate to admin page - license is read during page load
+      await apiSignin({
+        page,
+        email: adminUser.email,
+        redirectPath: '/admin',
+      });
+
+      // Verify we're on the admin page
+      await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
+
+      // Global banner should not be visible (no license file)
+      await expect(page.getByText('This is an expired license instance of Documenso')).not.toBeVisible();
+
+      // Admin banner messages should not be visible (no license file means no banner)
+      await expect(page.getByText('License payment overdue')).not.toBeVisible();
+      await expect(page.getByText('License expired')).not.toBeVisible();
+      await expect(page.getByText('Invalid License Type')).not.toBeVisible();
+      await expect(page.getByText('Missing License')).not.toBeVisible();
+    });
+
+    test('[ADMIN]: no banner when license is ACTIVE', async ({ page }) => {
+      // Create an ACTIVE license BEFORE any page loads
+      await writeLicenseFile(createMockLicense('ACTIVE', false));
+
+      const { user: adminUser } = await seedUser({
+        isAdmin: true,
+      });
+
+      // Navigate to admin page - license is read during page load
+      await apiSignin({
+        page,
+        email: adminUser.email,
+        redirectPath: '/admin',
+      });
+
+      // Verify we're on the admin page
+      await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
+
+      // Global banner should not be visible (license is ACTIVE)
+      await expect(page.getByText('This is an expired license instance of Documenso')).not.toBeVisible();
+
+      // Admin banner messages should not be visible (license is ACTIVE)
+      await expect(page.getByText('License payment overdue')).not.toBeVisible();
+      await expect(page.getByText('License expired')).not.toBeVisible();
+      await expect(page.getByText('Invalid License Type')).not.toBeVisible();
+    });
+
+    test('[ADMIN]: admin banner shows PAST_DUE warning', async ({ page }) => {
+      // Create a PAST_DUE license BEFORE any page loads
+      await writeLicenseFile(createMockLicense('PAST_DUE', false));
+
+      const { user: adminUser } = await seedUser({
+        isAdmin: true,
+      });
+
+      // Navigate to admin page - license is read during page load
+      await apiSignin({
+        page,
+        email: adminUser.email,
+        redirectPath: '/admin',
+      });
+
+      // Verify we're on the admin page
+      await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
+
+      // Global banner should NOT be visible (only shows for EXPIRED + unauthorized)
+      await expect(page.getByText('This is an expired license instance of Documenso')).not.toBeVisible();
+
+      // Admin banner should show PAST_DUE message
+      await expect(page.getByText('License payment overdue')).toBeVisible();
+      await expect(page.getByText('Please update your payment to avoid service disruptions.')).toBeVisible();
+
+      // Should have the "See Documentation" link
+      await expect(page.getByRole('link', { name: 'See Documentation' })).toBeVisible();
+    });
+
+    test('[ADMIN]: admin banner shows EXPIRED error', async ({ page }) => {
+      // Create an EXPIRED license WITHOUT unauthorized usage BEFORE any page loads
+      await writeLicenseFile(createMockLicense('EXPIRED', false));
+
+      const { user: adminUser } = await seedUser({
+        isAdmin: true,
+      });
+
+      // Navigate to admin page - license is read during page load
+      await apiSignin({
+        page,
+        email: adminUser.email,
+        redirectPath: '/admin',
+      });
+
+      // Verify we're on the admin page
+      await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
+
+      // Global banner should NOT be visible (requires BOTH expired AND unauthorized)
+      await expect(page.getByText('This is an expired license instance of Documenso')).not.toBeVisible();
+
+      // Admin banner should show EXPIRED message
+      await expect(page.getByText('License expired')).toBeVisible();
+      await expect(page.getByText('Please renew your license to continue using enterprise features.')).toBeVisible();
+
+      // Should have the "See Documentation" link
+      await expect(page.getByRole('link', { name: 'See Documentation' })).toBeVisible();
+    });
+
+    test.skip('[ADMIN]: global banner shows when EXPIRED with unauthorized usage', async ({ page }) => {
+      // Create an EXPIRED license WITH unauthorized usage BEFORE any page loads
+      await writeLicenseFile(createMockLicense('EXPIRED', true));
+
+      const { user: adminUser } = await seedUser({
+        isAdmin: true,
+      });
+
+      // Navigate to admin page - license is read during page load
+      await apiSignin({
+        page,
+        email: adminUser.email,
+        redirectPath: '/admin',
+      });
+
+      // Verify we're on the admin page
+      await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
+
+      // Global banner SHOULD be visible (EXPIRED + unauthorized)
+      await expect(page.getByText('This is an expired license instance of Documenso')).toBeVisible();
+
+      // Admin banner should show UNAUTHORIZED message (takes precedence over EXPIRED)
+      await expect(page.getByText('Invalid License Type')).toBeVisible();
+      await expect(
+        page.getByText('Your Documenso instance is using features that are not part of your license.'),
+      ).toBeVisible();
+    });
+
+    test('[ADMIN]: admin banner shows UNAUTHORIZED when flags are misused with license', async ({ page }) => {
+      // Create an ACTIVE license but WITH unauthorized flag usage BEFORE any page loads
+      await writeLicenseFile(createMockLicense('ACTIVE', true));
+
+      const { user: adminUser } = await seedUser({
+        isAdmin: true,
+      });
+
+      // Navigate to admin page - license is read during page load
+      await apiSignin({
+        page,
+        email: adminUser.email,
+        redirectPath: '/admin',
+      });
+
+      // Verify we're on the admin page
+      await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
+
+      // Global banner should NOT be visible (requires EXPIRED status)
+      await expect(page.getByText('This is an expired license instance of Documenso')).not.toBeVisible();
+
+      // Admin banner should show UNAUTHORIZED message
+      await expect(page.getByText('Invalid License Type')).toBeVisible();
+      await expect(
+        page.getByText('Your Documenso instance is using features that are not part of your license.'),
+      ).toBeVisible();
+
+      // Should have the "See Documentation" link
+      await expect(page.getByRole('link', { name: 'See Documentation' })).toBeVisible();
+    });
+
+    test('[ADMIN]: admin banner shows Invalid License Type when unauthorized without license data', async ({
       page,
-      email: adminUser.email,
-      redirectPath: '/admin',
+    }) => {
+      // Create a license file with unauthorized flag but no license data BEFORE any page loads
+      // Note: Even without license data, the banner shows "Invalid License Type" because the
+      // license file exists (just with license: null). The "Missing License" message would only
+      // show if the entire license prop was null, which doesn't happen with a valid file.
+      await writeLicenseFile(createMockUnauthorizedWithoutLicense());
+
+      const { user: adminUser } = await seedUser({
+        isAdmin: true,
+      });
+
+      // Navigate to admin page - license is read during page load
+      await apiSignin({
+        page,
+        email: adminUser.email,
+        redirectPath: '/admin',
+      });
+
+      // Verify we're on the admin page
+      await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
+
+      // Global banner should NOT be visible (no EXPIRED status, only unauthorized flag)
+      await expect(page.getByText('This is an expired license instance of Documenso')).not.toBeVisible();
+
+      // Admin banner should show Invalid License Type message (unauthorized flag is set)
+      await expect(page.getByText('Invalid License Type')).toBeVisible();
+      await expect(
+        page.getByText('Your Documenso instance is using features that are not part of your license.'),
+      ).toBeVisible();
+
+      // Should have the "See Documentation" link
+      await expect(page.getByRole('link', { name: 'See Documentation' })).toBeVisible();
     });
 
-    // Verify we're on the admin page
-    await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
+    test.skip('[ADMIN]: global banner visible on non-admin pages when EXPIRED with unauthorized', async ({ page }) => {
+      // Create an EXPIRED license WITH unauthorized usage BEFORE any page loads
+      await writeLicenseFile(createMockLicense('EXPIRED', true));
 
-    // Global banner should not be visible (no license file)
-    await expect(
-      page.getByText('This is an expired license instance of Documenso'),
-    ).not.toBeVisible();
+      const { user } = await seedUser();
 
-    // Admin banner messages should not be visible (no license file means no banner)
-    await expect(page.getByText('License payment overdue')).not.toBeVisible();
-    await expect(page.getByText('License expired')).not.toBeVisible();
-    await expect(page.getByText('Invalid License Type')).not.toBeVisible();
-    await expect(page.getByText('Missing License')).not.toBeVisible();
+      // Navigate to documents page - license is read during page load
+      await apiSignin({
+        page,
+        email: user.email,
+        redirectPath: '/documents',
+      });
+
+      // Global banner SHOULD be visible on any authenticated page (EXPIRED + unauthorized)
+      await expect(page.getByText('This is an expired license instance of Documenso')).toBeVisible();
+    });
   });
-
-  test('[ADMIN]: no banner when license is ACTIVE', async ({ page }) => {
-    // Create an ACTIVE license BEFORE any page loads
-    await writeLicenseFile(createMockLicense('ACTIVE', false));
-
-    const { user: adminUser } = await seedUser({
-      isAdmin: true,
-    });
-
-    // Navigate to admin page - license is read during page load
-    await apiSignin({
-      page,
-      email: adminUser.email,
-      redirectPath: '/admin',
-    });
-
-    // Verify we're on the admin page
-    await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
-
-    // Global banner should not be visible (license is ACTIVE)
-    await expect(
-      page.getByText('This is an expired license instance of Documenso'),
-    ).not.toBeVisible();
-
-    // Admin banner messages should not be visible (license is ACTIVE)
-    await expect(page.getByText('License payment overdue')).not.toBeVisible();
-    await expect(page.getByText('License expired')).not.toBeVisible();
-    await expect(page.getByText('Invalid License Type')).not.toBeVisible();
-  });
-
-  test('[ADMIN]: admin banner shows PAST_DUE warning', async ({ page }) => {
-    // Create a PAST_DUE license BEFORE any page loads
-    await writeLicenseFile(createMockLicense('PAST_DUE', false));
-
-    const { user: adminUser } = await seedUser({
-      isAdmin: true,
-    });
-
-    // Navigate to admin page - license is read during page load
-    await apiSignin({
-      page,
-      email: adminUser.email,
-      redirectPath: '/admin',
-    });
-
-    // Verify we're on the admin page
-    await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
-
-    // Global banner should NOT be visible (only shows for EXPIRED + unauthorized)
-    await expect(
-      page.getByText('This is an expired license instance of Documenso'),
-    ).not.toBeVisible();
-
-    // Admin banner should show PAST_DUE message
-    await expect(page.getByText('License payment overdue')).toBeVisible();
-    await expect(
-      page.getByText('Please update your payment to avoid service disruptions.'),
-    ).toBeVisible();
-
-    // Should have the "See Documentation" link
-    await expect(page.getByRole('link', { name: 'See Documentation' })).toBeVisible();
-  });
-
-  test('[ADMIN]: admin banner shows EXPIRED error', async ({ page }) => {
-    // Create an EXPIRED license WITHOUT unauthorized usage BEFORE any page loads
-    await writeLicenseFile(createMockLicense('EXPIRED', false));
-
-    const { user: adminUser } = await seedUser({
-      isAdmin: true,
-    });
-
-    // Navigate to admin page - license is read during page load
-    await apiSignin({
-      page,
-      email: adminUser.email,
-      redirectPath: '/admin',
-    });
-
-    // Verify we're on the admin page
-    await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
-
-    // Global banner should NOT be visible (requires BOTH expired AND unauthorized)
-    await expect(
-      page.getByText('This is an expired license instance of Documenso'),
-    ).not.toBeVisible();
-
-    // Admin banner should show EXPIRED message
-    await expect(page.getByText('License expired')).toBeVisible();
-    await expect(
-      page.getByText('Please renew your license to continue using enterprise features.'),
-    ).toBeVisible();
-
-    // Should have the "See Documentation" link
-    await expect(page.getByRole('link', { name: 'See Documentation' })).toBeVisible();
-  });
-
-  test.skip('[ADMIN]: global banner shows when EXPIRED with unauthorized usage', async ({
-    page,
-  }) => {
-    // Create an EXPIRED license WITH unauthorized usage BEFORE any page loads
-    await writeLicenseFile(createMockLicense('EXPIRED', true));
-
-    const { user: adminUser } = await seedUser({
-      isAdmin: true,
-    });
-
-    // Navigate to admin page - license is read during page load
-    await apiSignin({
-      page,
-      email: adminUser.email,
-      redirectPath: '/admin',
-    });
-
-    // Verify we're on the admin page
-    await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
-
-    // Global banner SHOULD be visible (EXPIRED + unauthorized)
-    await expect(page.getByText('This is an expired license instance of Documenso')).toBeVisible();
-
-    // Admin banner should show UNAUTHORIZED message (takes precedence over EXPIRED)
-    await expect(page.getByText('Invalid License Type')).toBeVisible();
-    await expect(
-      page.getByText(
-        'Your Documenso instance is using features that are not part of your license.',
-      ),
-    ).toBeVisible();
-  });
-
-  test('[ADMIN]: admin banner shows UNAUTHORIZED when flags are misused with license', async ({
-    page,
-  }) => {
-    // Create an ACTIVE license but WITH unauthorized flag usage BEFORE any page loads
-    await writeLicenseFile(createMockLicense('ACTIVE', true));
-
-    const { user: adminUser } = await seedUser({
-      isAdmin: true,
-    });
-
-    // Navigate to admin page - license is read during page load
-    await apiSignin({
-      page,
-      email: adminUser.email,
-      redirectPath: '/admin',
-    });
-
-    // Verify we're on the admin page
-    await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
-
-    // Global banner should NOT be visible (requires EXPIRED status)
-    await expect(
-      page.getByText('This is an expired license instance of Documenso'),
-    ).not.toBeVisible();
-
-    // Admin banner should show UNAUTHORIZED message
-    await expect(page.getByText('Invalid License Type')).toBeVisible();
-    await expect(
-      page.getByText(
-        'Your Documenso instance is using features that are not part of your license.',
-      ),
-    ).toBeVisible();
-
-    // Should have the "See Documentation" link
-    await expect(page.getByRole('link', { name: 'See Documentation' })).toBeVisible();
-  });
-
-  test('[ADMIN]: admin banner shows Invalid License Type when unauthorized without license data', async ({
-    page,
-  }) => {
-    // Create a license file with unauthorized flag but no license data BEFORE any page loads
-    // Note: Even without license data, the banner shows "Invalid License Type" because the
-    // license file exists (just with license: null). The "Missing License" message would only
-    // show if the entire license prop was null, which doesn't happen with a valid file.
-    await writeLicenseFile(createMockUnauthorizedWithoutLicense());
-
-    const { user: adminUser } = await seedUser({
-      isAdmin: true,
-    });
-
-    // Navigate to admin page - license is read during page load
-    await apiSignin({
-      page,
-      email: adminUser.email,
-      redirectPath: '/admin',
-    });
-
-    // Verify we're on the admin page
-    await expect(page.getByRole('heading', { name: 'Admin Panel' })).toBeVisible();
-
-    // Global banner should NOT be visible (no EXPIRED status, only unauthorized flag)
-    await expect(
-      page.getByText('This is an expired license instance of Documenso'),
-    ).not.toBeVisible();
-
-    // Admin banner should show Invalid License Type message (unauthorized flag is set)
-    await expect(page.getByText('Invalid License Type')).toBeVisible();
-    await expect(
-      page.getByText(
-        'Your Documenso instance is using features that are not part of your license.',
-      ),
-    ).toBeVisible();
-
-    // Should have the "See Documentation" link
-    await expect(page.getByRole('link', { name: 'See Documentation' })).toBeVisible();
-  });
-
-  test.skip('[ADMIN]: global banner visible on non-admin pages when EXPIRED with unauthorized', async ({
-    page,
-  }) => {
-    // Create an EXPIRED license WITH unauthorized usage BEFORE any page loads
-    await writeLicenseFile(createMockLicense('EXPIRED', true));
-
-    const { user } = await seedUser();
-
-    // Navigate to documents page - license is read during page load
-    await apiSignin({
-      page,
-      email: user.email,
-      redirectPath: '/documents',
-    });
-
-    // Global banner SHOULD be visible on any authenticated page (EXPIRED + unauthorized)
-    await expect(page.getByText('This is an expired license instance of Documenso')).toBeVisible();
-  });
-});

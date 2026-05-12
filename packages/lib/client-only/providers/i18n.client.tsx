@@ -1,7 +1,6 @@
-import { useState } from 'react';
-
 import { type Messages, setupI18n } from '@lingui/core';
 import { I18nProvider } from '@lingui/react';
+import { useState } from 'react';
 
 import type { I18nLocaleData } from '../../constants/i18n';
 

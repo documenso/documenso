@@ -1,20 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { DocumentDistributionMethod, DocumentStatus, EnvelopeType } from '@prisma/client';
-import { AnimatePresence, motion } from 'framer-motion';
-import { InfoIcon } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
-import { match } from 'ts-pattern';
-import * as z from 'zod';
-
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { getRecipientsWithMissingFields } from '@documenso/lib/utils/recipients';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc, trpc as trpcReact } from '@documenso/trpc/react';
 import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/document/document-send-email-message-helper';
 import { cn } from '@documenso/ui/lib/utils';
@@ -30,27 +19,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { DocumentDistributionMethod, DocumentStatus, EnvelopeType } from '@prisma/client';
+import { AnimatePresence, motion } from 'framer-motion';
+import { InfoIcon } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router';
+import { match } from 'ts-pattern';
+import * as z from 'zod';
 
 export type EnvelopeDistributeDialogProps = {
   onDistribute?: () => Promise<void>;
@@ -61,16 +47,10 @@ export type EnvelopeDistributeDialogProps = {
 export const ZEnvelopeDistributeFormSchema = z.object({
   meta: z.object({
     emailId: z.string().nullable(),
-    emailReplyTo: z.preprocess(
-      (val) => (val === '' ? undefined : val),
-      z.string().email().optional(),
-    ),
+    emailReplyTo: z.preprocess((val) => (val === '' ? undefined : val), zEmail().optional()),
     subject: z.string(),
     message: z.string(),
-    distributionMethod: z
-      .nativeEnum(DocumentDistributionMethod)
-      .optional()
-      .default(DocumentDistributionMethod.EMAIL),
+    distributionMethod: z.nativeEnum(DocumentDistributionMethod).optional().default(DocumentDistributionMethod.EMAIL),
   }),
 });
 
@@ -101,8 +81,7 @@ export const EnvelopeDistributeDialog = ({
         emailReplyTo: envelope.documentMeta?.emailReplyTo || undefined,
         subject: envelope.documentMeta?.subject ?? '',
         message: envelope.documentMeta?.message ?? '',
-        distributionMethod:
-          envelope.documentMeta?.distributionMethod || DocumentDistributionMethod.EMAIL,
+        distributionMethod: envelope.documentMeta?.distributionMethod || DocumentDistributionMethod.EMAIL,
       },
     },
     resolver: zodResolver(ZEnvelopeDistributeFormSchema),
@@ -115,11 +94,15 @@ export const EnvelopeDistributeDialog = ({
     formState: { isSubmitting },
   } = form;
 
-  const { data: emailData, isLoading: isLoadingEmails } =
-    trpc.enterprise.organisation.email.find.useQuery({
+  const { data: emailData, isLoading: isLoadingEmails } = trpc.enterprise.organisation.email.find.useQuery(
+    {
       organisationId: organisation.id,
       perPage: 100,
-    });
+    },
+    {
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    },
+  );
 
   const emails = emailData?.data || [];
 
@@ -149,9 +132,7 @@ export const EnvelopeDistributeDialog = ({
         recipientAuth: recipient.authOptions,
       });
 
-      return (
-        (auth.recipientAccessAuthRequired || auth.recipientActionAuthRequired) && !recipient.email
-      );
+      return (auth.recipientAccessAuthRequired || auth.recipientActionAuthRequired) && !recipient.email;
     });
   }, [recipientsWithIndex, envelope.authOptions]);
 
@@ -306,14 +287,9 @@ export const EnvelopeDistributeDialog = ({
                                       <Select
                                         {...field}
                                         value={field.value === null ? '-1' : field.value}
-                                        onValueChange={(value) =>
-                                          field.onChange(value === '-1' ? null : value)
-                                        }
+                                        onValueChange={(value) => field.onChange(value === '-1' ? null : value)}
                                       >
-                                        <SelectTrigger
-                                          loading={isLoadingEmails}
-                                          className="bg-background"
-                                        >
+                                        <SelectTrigger loading={isLoadingEmails} className="bg-background">
                                           <SelectValue />
                                         </SelectTrigger>
 
@@ -342,8 +318,7 @@ export const EnvelopeDistributeDialog = ({
                                 <FormItem>
                                   <FormLabel>
                                     <Trans>
-                                      Reply To Email{' '}
-                                      <span className="text-muted-foreground">(Optional)</span>
+                                      Reply To Email <span className="text-muted-foreground">(Optional)</span>
                                     </Trans>
                                   </FormLabel>
 
@@ -363,8 +338,7 @@ export const EnvelopeDistributeDialog = ({
                                 <FormItem>
                                   <FormLabel>
                                     <Trans>
-                                      Subject{' '}
-                                      <span className="text-muted-foreground">(Optional)</span>
+                                      Subject <span className="text-muted-foreground">(Optional)</span>
                                     </Trans>
                                   </FormLabel>
 
@@ -383,8 +357,7 @@ export const EnvelopeDistributeDialog = ({
                                 <FormItem>
                                   <FormLabel className="flex flex-row items-center">
                                     <Trans>
-                                      Message{' '}
-                                      <span className="text-muted-foreground">(Optional)</span>
+                                      Message <span className="text-muted-foreground">(Optional)</span>
                                     </Trans>
                                     <Tooltip>
                                       <TooltipTrigger type="button">
@@ -418,15 +391,15 @@ export const EnvelopeDistributeDialog = ({
                         exit={{ opacity: 0, transition: { duration: 0.15 } }}
                         className="min-h-60 rounded-lg border"
                       >
-                        <div className="py-24 text-center text-sm text-muted-foreground">
+                        <div className="py-24 text-center text-muted-foreground text-sm">
                           <p>
                             <Trans>We won't send anything to notify recipients.</Trans>
                           </p>
 
                           <p className="mt-2">
                             <Trans>
-                              We will generate signing links for you, which you can send to the
-                              recipients through your method of choice.
+                              We will generate signing links for you, which you can send to the recipients through your
+                              method of choice.
                             </Trans>
                           </p>
                         </div>
@@ -466,7 +439,7 @@ export const EnvelopeDistributeDialog = ({
                   <AlertDescription>
                     <Trans>The following signers are missing signature fields:</Trans>
 
-                    <ul className="ml-2 mt-1 list-inside list-disc">
+                    <ul className="mt-1 ml-2 list-inside list-disc">
                       {recipientsMissingSignatureFields.map((recipient) => (
                         <li key={recipient.id}>
                           {recipient.email || recipient.name || t`Recipient ${recipient.index + 1}`}
@@ -479,7 +452,7 @@ export const EnvelopeDistributeDialog = ({
                   <AlertDescription>
                     <Trans>The following recipients require an email address:</Trans>
 
-                    <ul className="ml-2 mt-1 list-inside list-disc">
+                    <ul className="mt-1 ml-2 list-inside list-disc">
                       {recipientsMissingRequiredEmail.map((recipient) => (
                         <li key={recipient.id}>
                           {recipient.email || recipient.name || t`Recipient ${recipient.index + 1}`}

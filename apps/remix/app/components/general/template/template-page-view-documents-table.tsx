@@ -1,14 +1,3 @@
-import { useMemo } from 'react';
-
-import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { DocumentSource } from '@prisma/client';
-import { InfoIcon } from 'lucide-react';
-import { DateTime } from 'luxon';
-import { useSearchParams } from 'react-router';
-
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { trpc } from '@documenso/trpc/react';
 import { ZFindDocumentsInternalRequestSchema } from '@documenso/trpc/server/document-router/find-documents-internal.types';
@@ -18,6 +7,15 @@ import { DataTablePagination } from '@documenso/ui/primitives/data-table-paginat
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+import type { MessageDescriptor } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import type { DocumentSource } from '@prisma/client';
+import { InfoIcon } from 'lucide-react';
+import { DateTime } from 'luxon';
+import { useMemo } from 'react';
+import { useSearchParams } from 'react-router';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { StackAvatarsWithTooltip } from '~/components/general/stack-avatars-with-tooltip';
@@ -46,9 +44,7 @@ type TemplatePageViewDocumentsTableProps = {
   templateId: number;
 };
 
-export const TemplatePageViewDocumentsTable = ({
-  templateId,
-}: TemplatePageViewDocumentsTableProps) => {
+export const TemplatePageViewDocumentsTable = ({ templateId }: TemplatePageViewDocumentsTableProps) => {
   const { _, i18n } = useLingui();
 
   const [searchParams] = useSearchParams();
@@ -97,8 +93,7 @@ export const TemplatePageViewDocumentsTable = ({
       {
         header: _(msg`Created`),
         accessorKey: 'createdAt',
-        cell: ({ row }) =>
-          i18n.date(row.original.createdAt, { ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }),
+        cell: ({ row }) => i18n.date(row.original.createdAt, { ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }),
       },
       {
         header: _(msg`Title`),
@@ -109,10 +104,7 @@ export const TemplatePageViewDocumentsTable = ({
         header: _(msg`Recipient`),
         accessorKey: 'recipient',
         cell: ({ row }) => (
-          <StackAvatarsWithTooltip
-            recipients={row.original.recipients}
-            documentStatus={row.original.status}
-          />
+          <StackAvatarsWithTooltip recipients={row.original.recipients} documentStatus={row.original.status} />
         ),
       },
       {
@@ -130,7 +122,7 @@ export const TemplatePageViewDocumentsTable = ({
                 <InfoIcon className="mx-2 h-4 w-4" />
               </TooltipTrigger>
 
-              <TooltipContent className="max-w-md space-y-2 !p-0 text-foreground">
+              <TooltipContent className="!p-0 max-w-md space-y-2 text-foreground">
                 <ul className="space-y-0.5 divide-y text-muted-foreground [&>li]:p-4">
                   <li>
                     <h2 className="mb-2 flex flex-row items-center font-semibold">
@@ -138,9 +130,7 @@ export const TemplatePageViewDocumentsTable = ({
                     </h2>
 
                     <p>
-                      <Trans>
-                        This document was created by you or a team member using the template above.
-                      </Trans>
+                      <Trans>This document was created by you or a team member using the template above.</Trans>
                     </p>
                   </li>
 
@@ -160,9 +150,7 @@ export const TemplatePageViewDocumentsTable = ({
         ),
         accessorKey: 'type',
         cell: ({ row }) => (
-          <div className="flex flex-row items-center">
-            {_(DOCUMENT_SOURCE_LABELS[row.original.source])}
-          </div>
+          <div className="flex flex-row items-center">{_(DOCUMENT_SOURCE_LABELS[row.original.source])}</div>
         ),
       },
       {

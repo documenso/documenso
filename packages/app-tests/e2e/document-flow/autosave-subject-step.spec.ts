@@ -1,10 +1,10 @@
-import type { Page } from '@playwright/test';
-import { expect, test } from '@playwright/test';
-import { EnvelopeType } from '@prisma/client';
-
+import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
+import type { Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { EnvelopeType } from '@prisma/client';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -28,7 +28,7 @@ export const setupDocumentAndNavigateToSubjectStep = async (page: Page) => {
   await page.getByRole('button', { name: 'Continue' }).click();
 
   await page.getByRole('button', { name: 'Signature' }).click();
-  await page.locator('canvas').click({
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
     position: {
       x: 100,
       y: 100,
@@ -129,14 +129,10 @@ test.describe('AutoSave Subject Step', () => {
       await expect(page.getByText('Email the owner when a recipient signs')).toBeChecked({
         checked: emailSettings?.recipientSigned,
       });
-      await expect(
-        page.getByText("Email recipients when they're removed from a pending document"),
-      ).toBeChecked({
+      await expect(page.getByText("Email recipients when they're removed from a pending document")).toBeChecked({
         checked: emailSettings?.recipientRemoved,
       });
-      await expect(
-        page.getByText('Email recipients when the document is completed', { exact: true }),
-      ).toBeChecked({
+      await expect(page.getByText('Email recipients when the document is completed', { exact: true })).toBeChecked({
         checked: emailSettings?.documentCompleted,
       });
       await expect(page.getByText('Email recipients when a pending document is deleted')).toBeChecked({
@@ -197,14 +193,10 @@ test.describe('AutoSave Subject Step', () => {
       await expect(page.getByText('Email the owner when a recipient signs')).toBeChecked({
         checked: retrievedDocumentData.documentMeta?.emailSettings?.recipientSigned,
       });
-      await expect(
-        page.getByText("Email recipients when they're removed from a pending document"),
-      ).toBeChecked({
+      await expect(page.getByText("Email recipients when they're removed from a pending document")).toBeChecked({
         checked: retrievedDocumentData.documentMeta?.emailSettings?.recipientRemoved,
       });
-      await expect(
-        page.getByText('Email recipients when the document is completed', { exact: true }),
-      ).toBeChecked({
+      await expect(page.getByText('Email recipients when the document is completed', { exact: true })).toBeChecked({
         checked: retrievedDocumentData.documentMeta?.emailSettings?.documentCompleted,
       });
       await expect(page.getByText('Email recipients when a pending document is deleted')).toBeChecked({

@@ -1,10 +1,9 @@
+import { prisma } from '@documenso/prisma';
 import type { TemplateType } from '@prisma/client';
 import { EnvelopeType, type Prisma } from '@prisma/client';
 
-import { prisma } from '@documenso/prisma';
-
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
-import { type FindResultResponse } from '../../types/search-params';
+import type { FindResultResponse } from '../../types/search-params';
 import { getMemberRoles } from '../team/get-member-roles';
 
 export type FindTemplatesOptions = {
@@ -26,10 +25,6 @@ export const findTemplates = async ({
   perPage = 10,
   folderId,
 }: FindTemplatesOptions) => {
-  const whereFilter: Prisma.EnvelopeWhereInput[] = [];
-
-  const templateTypeFilter = type ? { in: Array.isArray(type) ? type : [type] } : undefined;
-
   const { teamRole } = await getMemberRoles({
     teamId,
     reference: {
@@ -38,82 +33,77 @@ export const findTemplates = async ({
     },
   });
 
-  whereFilter.push(
-    { teamId },
-    {
-      OR: [
-        {
-          visibility: {
-            in: TEAM_DOCUMENT_VISIBILITY_MAP[teamRole],
+  const templateTypeFilter = type ? { in: Array.isArray(type) ? type : [type] } : undefined;
+
+  const where: Prisma.EnvelopeWhereInput = {
+    type: EnvelopeType.TEMPLATE,
+    templateType: templateTypeFilter,
+    AND: [
+      { teamId },
+      {
+        OR: [
+          {
+            visibility: {
+              in: TEAM_DOCUMENT_VISIBILITY_MAP[teamRole],
+            },
           },
-        },
-        { userId, teamId },
-      ],
+          { userId, teamId },
+        ],
+      },
+      folderId ? { folderId } : { folderId: null },
+      ...(query
+        ? [
+            {
+              OR: [
+                {
+                  title: {
+                    contains: query,
+                    mode: 'insensitive' as const,
+                  },
+                },
+                {
+                  externalId: {
+                    contains: query,
+                    mode: 'insensitive' as const,
+                  },
+                },
+              ],
+            },
+          ]
+        : []),
+    ],
+  };
+
+  const templateInclude = {
+    team: {
+      select: {
+        id: true,
+        url: true,
+        name: true,
+      },
     },
-  );
-
-  if (folderId) {
-    whereFilter.push({ folderId });
-  } else {
-    whereFilter.push({ folderId: null });
-  }
-
-  if (query) {
-    whereFilter.push({
-      OR: [
-        {
-          title: {
-            contains: query,
-            mode: 'insensitive',
-          },
-        },
-        {
-          externalId: {
-            contains: query,
-            mode: 'insensitive',
-          },
-        },
-      ],
-    });
-  }
+    fields: true,
+    recipients: true,
+    documentMeta: true,
+    directLink: {
+      select: {
+        token: true,
+        enabled: true,
+      },
+    },
+  } as const;
 
   const [data, count] = await Promise.all([
     prisma.envelope.findMany({
-      where: {
-        type: EnvelopeType.TEMPLATE,
-        templateType: templateTypeFilter,
-        AND: whereFilter,
-      },
-      include: {
-        team: {
-          select: {
-            id: true,
-            url: true,
-          },
-        },
-        fields: true,
-        recipients: true,
-        documentMeta: true,
-        directLink: {
-          select: {
-            token: true,
-            enabled: true,
-          },
-        },
-      },
+      where,
+      include: templateInclude,
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
       orderBy: {
         createdAt: 'desc',
       },
     }),
-    prisma.envelope.count({
-      where: {
-        type: EnvelopeType.TEMPLATE,
-        templateType: templateTypeFilter,
-        AND: whereFilter,
-      },
-    }),
+    prisma.envelope.count({ where }),
   ]);
 
   return {

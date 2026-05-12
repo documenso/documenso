@@ -7,7 +7,7 @@ import { SettingsSecurityPasskeyTable } from '~/components/tables/settings-secur
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Manage passkeys');
+  return appMetaTags(msg`Manage passkeys`);
 }
 
 export default function SettingsPasskeys() {
@@ -15,11 +15,7 @@ export default function SettingsPasskeys() {
 
   return (
     <div>
-      <SettingsHeader
-        title={_(msg`Passkeys`)}
-        subtitle={_(msg`Manage your passkeys.`)}
-        hideDivider={true}
-      >
+      <SettingsHeader title={_(msg`Passkeys`)} subtitle={_(msg`Manage your passkeys.`)} hideDivider={true}>
         <PasskeyCreateDialog />
       </SettingsHeader>
 

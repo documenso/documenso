@@ -1,10 +1,4 @@
-import { useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
+import { zEmail } from '@documenso/lib/utils/zod';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -14,15 +8,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { DocumentSigningDisclosure } from '../general/document-signing/document-signing-disclosure';
 
@@ -43,7 +35,7 @@ type ConfirmationDialogProps = {
 
 const ZNextSignerFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  email: z.string().email('Invalid email address'),
+  email: zEmail('Invalid email address'),
 });
 
 type TNextSignerFormSchema = z.infer<typeof ZNextSignerFormSchema>;
@@ -103,9 +95,8 @@ export function AssistantConfirmationDialog({
                 </DialogTitle>
                 <DialogDescription>
                   <Trans>
-                    Are you sure you want to complete the document? This action cannot be undone.
-                    Please ensure that you have completed prefilling all relevant fields before
-                    proceeding.
+                    Are you sure you want to complete the document? This action cannot be undone. Please ensure that you
+                    have completed prefilling all relevant fields before proceeding.
                   </Trans>
                 </DialogDescription>
               </DialogHeader>
@@ -146,11 +137,7 @@ export function AssistantConfirmationDialog({
                                 <Trans>Name</Trans>
                               </FormLabel>
                               <FormControl>
-                                <Input
-                                  {...field}
-                                  className="mt-2"
-                                  placeholder={t`Enter the next signer's name`}
-                                />
+                                <Input {...field} className="mt-2" placeholder={t`Enter the next signer's name`} />
                               </FormControl>
 
                               <FormMessage />

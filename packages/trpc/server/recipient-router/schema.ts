@@ -1,6 +1,3 @@
-import { RecipientRole } from '@prisma/client';
-import { z } from 'zod';
-
 import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
 import {
   ZRecipientAccessAuthSchema,
@@ -9,6 +6,9 @@ import {
   ZRecipientActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZRecipientLiteSchema, ZRecipientSchema } from '@documenso/lib/types/recipient';
+import { zEmail } from '@documenso/lib/utils/zod';
+import { RecipientRole } from '@prisma/client';
+import { z } from 'zod';
 
 export const ZGetRecipientRequestSchema = z.object({
   recipientId: z.number(),
@@ -24,7 +24,7 @@ export const ZGetRecipientResponseSchema = ZRecipientSchema;
  * pass along required details.
  */
 export const ZCreateRecipientSchema = z.object({
-  email: z.string().toLowerCase().email().min(1).max(254),
+  email: zEmail().toLowerCase().min(1).max(254),
   name: z.string().max(255),
   role: z.nativeEnum(RecipientRole),
   signingOrder: z.number().optional(),
@@ -34,7 +34,7 @@ export const ZCreateRecipientSchema = z.object({
 
 export const ZUpdateRecipientSchema = z.object({
   id: z.number().describe('The ID of the recipient to update.'),
-  email: z.string().toLowerCase().email().min(1).max(254).optional(),
+  email: zEmail().toLowerCase().min(1).max(254).optional(),
   name: z.string().max(255).optional(),
   role: z.nativeEnum(RecipientRole).optional(),
   signingOrder: z.number().optional(),
@@ -83,7 +83,7 @@ export const ZSetDocumentRecipientsRequestSchema = z.object({
   recipients: z.array(
     z.object({
       id: z.number().optional(),
-      email: z.string().toLowerCase().email().min(1).max(254),
+      email: zEmail().toLowerCase().min(1).max(254),
       name: z.string().max(255),
       role: z.nativeEnum(RecipientRole),
       signingOrder: z.number().optional(),
@@ -142,10 +142,7 @@ export const ZSetTemplateRecipientsRequestSchema = z.object({
         .toLowerCase()
         .refine(
           (email) => {
-            return (
-              isTemplateRecipientEmailPlaceholder(email) ||
-              z.string().email().safeParse(email).success
-            );
+            return isTemplateRecipientEmailPlaceholder(email) || zEmail().safeParse(email).success;
           },
           { message: 'Please enter a valid email address' },
         ),
@@ -167,21 +164,19 @@ export const ZCompleteDocumentWithTokenMutationSchema = z.object({
   accessAuthOptions: ZRecipientAccessAuthSchema.optional(),
   nextSigner: z
     .object({
-      email: z.string().email().max(254),
+      email: zEmail().max(254),
       name: z.string().min(1).max(255),
     })
     .optional(),
   recipientOverride: z
     .object({
-      email: z.string().trim().toLowerCase().email().max(254).optional(),
+      email: zEmail().trim().toLowerCase().max(254).optional(),
       name: z.string().max(255).optional(),
     })
     .optional(),
 });
 
-export type TCompleteDocumentWithTokenMutationSchema = z.infer<
-  typeof ZCompleteDocumentWithTokenMutationSchema
->;
+export type TCompleteDocumentWithTokenMutationSchema = z.infer<typeof ZCompleteDocumentWithTokenMutationSchema>;
 
 export const ZRejectDocumentWithTokenMutationSchema = z.object({
   token: z.string(),
@@ -190,6 +185,4 @@ export const ZRejectDocumentWithTokenMutationSchema = z.object({
   authOptions: ZRecipientActionAuthSchema.optional(),
 });
 
-export type TRejectDocumentWithTokenMutationSchema = z.infer<
-  typeof ZRejectDocumentWithTokenMutationSchema
->;
+export type TRejectDocumentWithTokenMutationSchema = z.infer<typeof ZRejectDocumentWithTokenMutationSchema>;

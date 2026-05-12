@@ -1,13 +1,13 @@
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
+import { trpc } from '@documenso/trpc/react';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { SubscriptionStatus } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import type Stripe from 'stripe';
-import { match } from 'ts-pattern';
-
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
-import { trpc } from '@documenso/trpc/react';
+import { match, P } from 'ts-pattern';
 
 import { BillingPlans } from '~/components/general/billing-plans';
 import { OrganisationBillingPortalButton } from '~/components/general/organisations/organisation-billing-portal-button';
@@ -15,7 +15,7 @@ import { OrganisationBillingInvoicesTable } from '~/components/tables/organisati
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Billing');
+  return appMetaTags(msg`Billing`);
 }
 
 export default function TeamsSettingBillingPage() {
@@ -31,17 +31,14 @@ export default function TeamsSettingBillingPage() {
   if (isLoadingSubscription || !subscriptionQuery) {
     return (
       <div className="flex items-center justify-center rounded-lg py-32">
-        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
+        <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   const { subscription, plans } = subscriptionQuery;
 
-  const canManageBilling = canExecuteOrganisationAction(
-    'MANAGE_BILLING',
-    organisation.currentOrganisationRole,
-  );
+  const canManageBilling = canExecuteOrganisationAction('MANAGE_BILLING', organisation.currentOrganisationRole);
 
   const { organisationSubscription, stripeSubscription } = subscription || {};
 
@@ -53,11 +50,11 @@ export default function TeamsSettingBillingPage() {
     <div>
       <div className="flex flex-row items-end justify-between">
         <div>
-          <h3 className="text-2xl font-semibold">
+          <h3 className="font-semibold text-2xl">
             <Trans>Billing</Trans>
           </h3>
 
-          <div className="text-muted-foreground mt-2 text-sm">
+          <div className="mt-2 text-muted-foreground text-sm">
             {!organisationSubscription && (
               <p>
                 <Trans>
@@ -70,44 +67,51 @@ export default function TeamsSettingBillingPage() {
               match(organisationSubscription.status)
                 .with('ACTIVE', () => (
                   <p>
-                    {currentProductName ? (
-                      <span>
-                        You are currently subscribed to{' '}
-                        <span className="font-semibold">{currentProductName}</span>
-                      </span>
-                    ) : (
-                      <span>You currently have an active plan</span>
-                    )}
-
-                    {organisationSubscription.periodEnd && (
-                      <span>
-                        {' '}
-                        which is set to{' '}
-                        {organisationSubscription.cancelAtPeriodEnd ? (
-                          <span>
-                            end on{' '}
-                            <span className="font-semibold">
-                              {i18n.date(organisationSubscription.periodEnd)}.
-                            </span>
-                          </span>
+                    {match(organisationSubscription)
+                      .with({ cancelAtPeriodEnd: true, periodEnd: P.nonNullable }, ({ periodEnd }) =>
+                        currentProductName ? (
+                          <Trans>
+                            You are currently subscribed to <span className="font-semibold">{currentProductName}</span>{' '}
+                            which is set to end on <span className="font-semibold">{i18n.date(periodEnd)}</span>.
+                          </Trans>
                         ) : (
-                          <span>
-                            automatically renew on{' '}
-                            <span className="font-semibold">
-                              {i18n.date(organisationSubscription.periodEnd)}.
-                            </span>
-                          </span>
-                        )}
-                      </span>
-                    )}
+                          <Trans>
+                            You currently have an active plan which is set to end on{' '}
+                            <span className="font-semibold">{i18n.date(periodEnd)}</span>.
+                          </Trans>
+                        ),
+                      )
+                      .with({ cancelAtPeriodEnd: false, periodEnd: P.nonNullable }, ({ periodEnd }) =>
+                        currentProductName ? (
+                          <Trans>
+                            You are currently subscribed to <span className="font-semibold">{currentProductName}</span>{' '}
+                            which is set to automatically renew on{' '}
+                            <span className="font-semibold">{i18n.date(periodEnd)}</span>.
+                          </Trans>
+                        ) : (
+                          <Trans>
+                            You currently have an active plan which is set to automatically renew on{' '}
+                            <span className="font-semibold">{i18n.date(periodEnd)}</span>.
+                          </Trans>
+                        ),
+                      )
+                      .otherwise(() =>
+                        currentProductName ? (
+                          <Trans>
+                            You are currently subscribed to <span className="font-semibold">{currentProductName}</span>.
+                          </Trans>
+                        ) : (
+                          <Trans>You currently have an active plan.</Trans>
+                        ),
+                      )}
                   </p>
                 ))
                 .with('INACTIVE', () => (
                   <p>
                     {currentProductName ? (
                       <Trans>
-                        You currently have an inactive{' '}
-                        <span className="font-semibold">{currentProductName}</span> subscription
+                        You currently have an inactive <span className="font-semibold">{currentProductName}</span>{' '}
+                        subscription.
                       </Trans>
                     ) : (
                       <Trans>Your current plan is inactive.</Trans>
@@ -118,8 +122,7 @@ export default function TeamsSettingBillingPage() {
                   <p>
                     {currentProductName ? (
                       <Trans>
-                        Your current {currentProductName} plan is past due. Please update your
-                        payment information.
+                        Your current {currentProductName} plan is past due. Please update your payment information.
                       </Trans>
                     ) : (
                       <Trans>Your current plan is past due.</Trans>
@@ -135,15 +138,11 @@ export default function TeamsSettingBillingPage() {
 
       <hr className="my-4" />
 
-      {(!subscription ||
-        subscription.organisationSubscription.status === SubscriptionStatus.INACTIVE) &&
+      {(!subscription || subscription.organisationSubscription.status === SubscriptionStatus.INACTIVE) &&
         canManageBilling && <BillingPlans plans={plans} />}
 
       <section className="mt-6">
-        <OrganisationBillingInvoicesTable
-          organisationId={organisation.id}
-          subscriptionExists={Boolean(subscription)}
-        />
+        <OrganisationBillingInvoicesTable organisationId={organisation.id} subscriptionExists={Boolean(subscription)} />
       </section>
     </div>
   );

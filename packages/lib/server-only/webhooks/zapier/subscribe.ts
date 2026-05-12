@@ -1,5 +1,7 @@
+import { AppError } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
+import { assertNotPrivateUrl } from '../assert-webhook-url';
 import { validateApiToken } from './validateApiToken';
 
 export const subscribeHandler = async (req: Request) => {
@@ -11,6 +13,8 @@ export const subscribeHandler = async (req: Request) => {
     }
 
     const { webhookUrl, eventTrigger } = await req.json();
+
+    await assertNotPrivateUrl(webhookUrl);
 
     const result = await validateApiToken({ authorization });
 
@@ -27,6 +31,10 @@ export const subscribeHandler = async (req: Request) => {
 
     return Response.json(createdWebhook);
   } catch (err) {
+    if (err instanceof AppError) {
+      return Response.json({ message: err.message }, { status: 400 });
+    }
+
     console.error(err);
 
     return Response.json(

@@ -3,18 +3,12 @@ import path from 'node:path';
 
 import { ALIGNMENT_TEST_FIELDS } from '@documenso/app-tests/constants/field-alignment-pdf';
 import { FIELD_META_TEST_FIELDS } from '@documenso/app-tests/constants/field-meta-pdf';
+import { OVERFLOW_TEST_FIELDS } from '@documenso/app-tests/constants/field-overflow-pdf';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
-import {
-  incrementDocumentId,
-  incrementTemplateId,
-} from '@documenso/lib/server-only/envelope/increment-id';
+import { incrementDocumentId, incrementTemplateId } from '@documenso/lib/server-only/envelope/increment-id';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
-
+import { DIRECT_TEMPLATE_RECIPIENT_EMAIL, DIRECT_TEMPLATE_RECIPIENT_NAME } from '../../lib/constants/direct-templates';
 import { prisma } from '..';
-import {
-  DIRECT_TEMPLATE_RECIPIENT_EMAIL,
-  DIRECT_TEMPLATE_RECIPIENT_NAME,
-} from '../../lib/constants/direct-templates';
 import {
   DocumentDataType,
   DocumentSource,
@@ -39,9 +33,7 @@ const createDocumentData = async ({ documentData }: { documentData: string }) =>
 };
 
 export const seedDatabase = async () => {
-  const examplePdf = fs
-    .readFileSync(path.join(__dirname, '../../../assets/example.pdf'))
-    .toString('base64');
+  const examplePdf = fs.readFileSync(path.join(__dirname, '../../../assets/example.pdf')).toString('base64');
 
   const exampleUserExists = await prisma.user.findFirst({
     where: {
@@ -183,6 +175,22 @@ export const seedDatabase = async () => {
       userId: adminUser.user.id,
       teamId: adminUser.team.id,
     }),
+    seedOverflowTestDocument({
+      userId: exampleUser.user.id,
+      teamId: exampleUser.team.id,
+      recipientName: exampleUser.user.name || '',
+      recipientEmail: exampleUser.user.email,
+      insertFields: false,
+      status: DocumentStatus.DRAFT,
+    }),
+    seedOverflowTestDocument({
+      userId: adminUser.user.id,
+      teamId: adminUser.team.id,
+      recipientName: adminUser.user.name || '',
+      recipientEmail: adminUser.user.email,
+      insertFields: false,
+      status: DocumentStatus.DRAFT,
+    }),
     seedAlignmentTestDocument({
       userId: exampleUser.user.id,
       teamId: exampleUser.team.id,
@@ -285,9 +293,7 @@ export const seedAlignmentTestDocument = async ({
     .readFileSync(path.join(__dirname, '../../../assets/field-font-alignment.pdf'))
     .toString('base64');
 
-  const fieldMetaPdf = fs
-    .readFileSync(path.join(__dirname, '../../../assets/field-meta.pdf'))
-    .toString('base64');
+  const fieldMetaPdf = fs.readFileSync(path.join(__dirname, '../../../assets/field-meta.pdf')).toString('base64');
 
   const alignmentDocumentData = await createDocumentData({ documentData: alignmentPdf });
   const fieldMetaDocumentData = await createDocumentData({ documentData: fieldMetaPdf });
@@ -351,9 +357,7 @@ export const seedAlignmentTestDocument = async ({
   const { id, recipients, envelopeItems } = createdEnvelope;
 
   if (isDirectTemplate) {
-    const directTemplateRecpient = recipients.find(
-      (recipient) => recipient.email === DIRECT_TEMPLATE_RECIPIENT_EMAIL,
-    );
+    const directTemplateRecpient = recipients.find((recipient) => recipient.email === DIRECT_TEMPLATE_RECIPIENT_EMAIL);
 
     if (!directTemplateRecpient) {
       throw new Error('Need to create a direct template recipient');
@@ -387,9 +391,7 @@ export const seedAlignmentTestDocument = async ({
           envelopeId: id,
           customText: insertFields ? field.customText : '',
           inserted:
-            insertFields &&
-            ((!field?.fieldMeta?.readOnly && Boolean(field.customText)) ||
-              field.type === 'SIGNATURE'),
+            insertFields && ((!field?.fieldMeta?.readOnly && Boolean(field.customText)) || field.type === 'SIGNATURE'),
           signature:
             field.signature && insertFields
               ? {
@@ -415,9 +417,124 @@ export const seedAlignmentTestDocument = async ({
           envelopeId: id,
           customText: insertFields ? field.customText : '',
           inserted:
-            insertFields &&
-            ((!field?.fieldMeta?.readOnly && Boolean(field.customText)) ||
-              field.type === 'SIGNATURE'),
+            insertFields && ((!field?.fieldMeta?.readOnly && Boolean(field.customText)) || field.type === 'SIGNATURE'),
+          signature:
+            field.signature && insertFields
+              ? {
+                  create: {
+                    recipientId,
+                    signatureImageAsBase64: isBase64Image(field.signature) ? field.signature : null,
+                    typedSignature: isBase64Image(field.signature) ? null : field.signature,
+                  },
+                }
+              : undefined,
+        },
+      });
+    }),
+  );
+
+  return await prisma.envelope.findFirstOrThrow({
+    where: {
+      id: createdEnvelope.id,
+    },
+    include: {
+      recipients: true,
+      envelopeItems: true,
+    },
+  });
+};
+
+export const seedOverflowTestDocument = async ({
+  userId,
+  teamId,
+  recipientName,
+  recipientEmail,
+  insertFields,
+  status,
+}: {
+  userId: number;
+  teamId: number;
+  recipientName: string;
+  recipientEmail: string;
+  insertFields: boolean;
+  status: DocumentStatus;
+}) => {
+  const overflowPdf = fs.readFileSync(path.join(__dirname, '../../../assets/field-overflow.pdf')).toString('base64');
+
+  const overflowDocumentData = await createDocumentData({ documentData: overflowPdf });
+
+  const secondaryId = await incrementDocumentId().then((v) => v.formattedDocumentId);
+
+  const documentMeta = await prisma.documentMeta.create({
+    data: {},
+  });
+
+  const createdEnvelope = await prisma.envelope.create({
+    data: {
+      id: prefixedId('envelope'),
+      secondaryId,
+      internalVersion: 2,
+      type: EnvelopeType.DOCUMENT,
+      documentMetaId: documentMeta.id,
+      source: DocumentSource.DOCUMENT,
+      title: 'Overflow Test',
+      status,
+      envelopeItems: {
+        createMany: {
+          data: [
+            {
+              id: prefixedId('envelope_item'),
+              title: 'field-overflow',
+              documentDataId: overflowDocumentData.id,
+              order: 1,
+            },
+          ],
+        },
+      },
+      userId,
+      teamId,
+      recipients: {
+        create: {
+          name: recipientName,
+          email: recipientEmail,
+          token: nanoid(),
+          sendStatus: status === 'DRAFT' ? SendStatus.NOT_SENT : SendStatus.SENT,
+          signingStatus: status === 'COMPLETED' ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
+          readStatus: status !== 'DRAFT' ? ReadStatus.OPENED : ReadStatus.NOT_OPENED,
+        },
+      },
+    },
+    include: {
+      recipients: true,
+      envelopeItems: true,
+    },
+  });
+
+  const { id, recipients, envelopeItems } = createdEnvelope;
+
+  const recipientId = recipients[0].id;
+  const envelopeItemId = envelopeItems.find((item) => item.order === 1)?.id;
+
+  if (!envelopeItemId) {
+    throw new Error('Envelope item not found');
+  }
+
+  await Promise.all(
+    OVERFLOW_TEST_FIELDS.map(async (field) => {
+      // Use seedFieldMeta (full meta with all defaults) instead of fieldMeta
+      // (minimal meta for API testing) since the seed bypasses API validation.
+      const { fieldMeta: _fieldMeta, seedFieldMeta, ...fieldData } = field;
+
+      await prisma.field.create({
+        data: {
+          ...fieldData,
+          fieldMeta: seedFieldMeta,
+          recipientId,
+          envelopeItemId,
+          envelopeId: id,
+          customText: insertFields ? field.customText : '',
+          inserted:
+            insertFields && ((!seedFieldMeta?.readOnly && Boolean(field.customText)) || field.type === 'SIGNATURE'),
           signature:
             field.signature && insertFields
               ? {

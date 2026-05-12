@@ -1,3 +1,4 @@
+import { zEmail } from '@documenso/lib/utils/zod';
 import { z } from 'zod';
 
 export const ZGetRecipientSuggestionsRequestSchema = z.object({
@@ -8,15 +9,11 @@ export const ZGetRecipientSuggestionsResponseSchema = z.object({
   results: z.array(
     z.object({
       name: z.string().nullable(),
-      email: z.string().email(),
+      email: z.union([zEmail(), z.literal('')]),
     }),
   ),
 });
 
-export type TGetRecipientSuggestionsRequestSchema = z.infer<
-  typeof ZGetRecipientSuggestionsRequestSchema
->;
+export type TGetRecipientSuggestionsRequestSchema = z.infer<typeof ZGetRecipientSuggestionsRequestSchema>;
 
-export type TGetRecipientSuggestionsResponseSchema = z.infer<
-  typeof ZGetRecipientSuggestionsResponseSchema
->;
+export type TGetRecipientSuggestionsResponseSchema = z.infer<typeof ZGetRecipientSuggestionsResponseSchema>;
