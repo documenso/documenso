@@ -114,6 +114,7 @@ export const completeDocumentWithToken = async ({
     }
   }
 
+  // Check ACCESS AUTH 2FA validation during document completion
   const { derivedRecipientAccessAuth, derivedRecipientActionAuth } = extractDocumentAuthMethods({
     documentAuth: envelope.authOptions,
     recipientAuth: recipient.authOptions,
