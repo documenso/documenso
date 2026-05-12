@@ -1,5 +1,3 @@
-import { OrganisationType } from '@prisma/client';
-
 import { createCheckoutSession } from '@documenso/ee/server-only/stripe/create-checkout-session';
 import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
 import { IS_BILLING_ENABLED, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
@@ -8,12 +6,10 @@ import { createOrganisation } from '@documenso/lib/server-only/organisation/crea
 import { INTERNAL_CLAIM_ID, internalClaims } from '@documenso/lib/types/subscription';
 import { generateStripeOrganisationCreateMetadata } from '@documenso/lib/utils/billing';
 import { prisma } from '@documenso/prisma';
+import { OrganisationType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZCreateOrganisationRequestSchema,
-  ZCreateOrganisationResponseSchema,
-} from './create-organisation.types';
+import { ZCreateOrganisationRequestSchema, ZCreateOrganisationResponseSchema } from './create-organisation.types';
 
 export const createOrganisationRoute = authenticatedProcedure
   // .meta(createOrganisationMeta)
@@ -68,9 +64,7 @@ export const createOrganisationRoute = authenticatedProcedure
     }
 
     // Free organisations should be Personal by default.
-    const organisationType = IS_BILLING_ENABLED()
-      ? OrganisationType.PERSONAL
-      : OrganisationType.ORGANISATION;
+    const organisationType = IS_BILLING_ENABLED() ? OrganisationType.PERSONAL : OrganisationType.ORGANISATION;
 
     await createOrganisation({
       userId: user.id,

@@ -1,9 +1,8 @@
-import { z } from 'zod';
-
 import { ZFolderTypeSchema } from '@documenso/lib/types/folder-type';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { DocumentVisibility } from '@documenso/prisma/generated/types';
 import FolderSchema from '@documenso/prisma/generated/zod/modelSchema/FolderSchema';
+import { z } from 'zod';
 
 export const ZFolderSchema = FolderSchema.pick({
   id: true,
@@ -40,9 +39,7 @@ export type TFolderWithSubfolders = z.infer<typeof ZFolderWithSubfoldersSchema>;
 
 const ZFolderParentIdSchema = z
   .string()
-  .describe(
-    'The folder ID to place this folder within. Leave empty to place folder at the root level.',
-  );
+  .describe('The folder ID to place this folder within. Leave empty to place folder at the root level.');
 
 export const ZCreateFolderRequestSchema = z.object({
   name: z.string(),
@@ -57,10 +54,7 @@ export const ZUpdateFolderRequestSchema = z.object({
   data: z.object({
     name: z.string().optional().describe('The name of the folder'),
     parentId: ZFolderParentIdSchema.optional().nullable(),
-    visibility: z
-      .nativeEnum(DocumentVisibility)
-      .optional()
-      .describe('The visibility of the folder'),
+    visibility: z.nativeEnum(DocumentVisibility).optional().describe('The visibility of the folder'),
     pinned: z.boolean().optional().describe('Whether the folder should be pinned'),
   }),
 });

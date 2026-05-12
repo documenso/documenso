@@ -1,11 +1,3 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-
-import type { Faker } from '@faker-js/faker';
-import { Trans } from '@lingui/react/macro';
-import { FieldType, SigningStatus } from '@prisma/client';
-import { FileTextIcon } from 'lucide-react';
-import { match } from 'ts-pattern';
-
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import {
   EnvelopeRenderProvider,
@@ -20,6 +12,12 @@ import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animat
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { RecipientSelector } from '@documenso/ui/primitives/recipient-selector';
 import { Separator } from '@documenso/ui/primitives/separator';
+import type { Faker } from '@faker-js/faker';
+import { Trans } from '@lingui/react/macro';
+import { FieldType, SigningStatus } from '@prisma/client';
+import { FileTextIcon } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { match } from 'ts-pattern';
 
 import { EnvelopeGenericPageRenderer } from '~/components/general/envelope-editor/envelope-generic-page-renderer';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
@@ -33,9 +31,7 @@ export const EnvelopeEditorPreviewPage = () => {
 
   const scrollableContainerRef = useRef<HTMLDivElement>(null);
 
-  const [selectedPreviewMode, setSelectedPreviewMode] = useState<'recipient' | 'signed'>(
-    'recipient',
-  );
+  const [selectedPreviewMode, setSelectedPreviewMode] = useState<'recipient' | 'signed'>('recipient');
 
   const [fakerInstance, setFakerInstance] = useState<Faker | null>(null);
 
@@ -228,10 +224,7 @@ export const EnvelopeEditorPreviewPage = () => {
       }}
     >
       <div className="relative flex h-full">
-        <div
-          className="flex h-full w-full flex-col overflow-y-auto px-2"
-          ref={scrollableContainerRef}
-        >
+        <div className="flex h-full w-full flex-col overflow-y-auto px-2" ref={scrollableContainerRef}>
           {/* Horizontal envelope item selector */}
           <EnvelopeRendererFileSelector className="px-0" fields={editorFields.localFields} />
 
@@ -255,10 +248,10 @@ export const EnvelopeEditorPreviewPage = () => {
             ) : (
               <div className="flex flex-col items-center justify-center py-32">
                 <FileTextIcon className="h-10 w-10 text-muted-foreground" />
-                <p className="mt-1 text-sm text-foreground">
+                <p className="mt-1 text-foreground text-sm">
                   <Trans>No documents found</Trans>
                 </p>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-1 text-muted-foreground text-sm">
                   <Trans>Please upload a document to continue</Trans>
                 </p>
               </div>
@@ -268,7 +261,7 @@ export const EnvelopeEditorPreviewPage = () => {
 
         {/* Right Section - Form Fields Panel */}
         {currentEnvelopeItem && false && (
-          <div className="sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-l border-gray-200 bg-white py-4">
+          <div className="sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-gray-200 border-l bg-white py-4">
             {/* Add fields section. */}
             <section className="px-4">
               {/* <h3 className="mb-2 text-sm font-semibold text-gray-900">
@@ -280,9 +273,7 @@ export const EnvelopeEditorPreviewPage = () => {
                   <Trans>Preview Mode</Trans>
                 </AlertTitle>
                 <AlertDescription>
-                  <Trans>
-                    Preview what the signed document will look like with placeholder data
-                  </Trans>
+                  <Trans>Preview what the signed document will look like with placeholder data</Trans>
                 </AlertDescription>
               </Alert>
 
@@ -335,15 +326,13 @@ export const EnvelopeEditorPreviewPage = () => {
 
                     {/* Recipient selector section. */}
                     <section className="px-4">
-                      <h3 className="mb-2 text-sm font-semibold text-gray-900">
+                      <h3 className="mb-2 font-semibold text-gray-900 text-sm">
                         <Trans>Selected Recipient</Trans>
                       </h3>
 
                       <RecipientSelector
                         selectedRecipient={editorFields.selectedRecipient}
-                        onSelectedRecipientChange={(recipient) =>
-                          editorFields.setSelectedRecipient(recipient.id)
-                        }
+                        onSelectedRecipientChange={(recipient) => editorFields.setSelectedRecipient(recipient.id)}
                         recipients={envelope.recipients}
                         className="w-full"
                         align="end"

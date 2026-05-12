@@ -1,11 +1,7 @@
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import {
-  buildTeamWhereQuery,
-  extractDerivedTeamSettings,
-  getHighestTeamRoleInGroup,
-} from '../../utils/teams';
+import { buildTeamWhereQuery, extractDerivedTeamSettings, getHighestTeamRoleInGroup } from '../../utils/teams';
 
 export type GetTeamByIdOptions = {
   userId: number;
@@ -39,13 +35,7 @@ export const getTeamByUrl = async ({ userId, teamUrl }: GetTeamByUrlOptions) => 
 /**
  * Get a team by its ID or URL.
  */
-export const getTeam = async ({
-  teamReference,
-  userId,
-}: {
-  teamReference: number | string;
-  userId: number;
-}) => {
+export const getTeam = async ({ teamReference, userId }: { teamReference: number | string; userId: number }) => {
   const team = await prisma.team.findFirst({
     where: {
       ...buildTeamWhereQuery({ teamId: undefined, userId }),

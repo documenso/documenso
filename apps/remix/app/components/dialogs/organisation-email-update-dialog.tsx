@@ -1,11 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { useForm } from 'react-hook-form';
-import type { z } from 'zod';
-
 import { trpc } from '@documenso/trpc/react';
 import type { TGetOrganisationEmailDomainResponse } from '@documenso/trpc/server/enterprise-router/get-organisation-email-domain.types';
 import { ZUpdateOrganisationEmailRequestSchema } from '@documenso/trpc/server/enterprise-router/update-organisation-email.types';
@@ -30,6 +22,12 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import type * as DialogPrimitive from '@radix-ui/react-dialog';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import type { z } from 'zod';
 
 export type OrganisationEmailUpdateDialogProps = {
   trigger: React.ReactNode;
@@ -61,8 +59,7 @@ export const OrganisationEmailUpdateDialog = ({
     },
   });
 
-  const { mutateAsync: updateOrganisationEmail, isPending } =
-    trpc.enterprise.organisation.email.update.useMutation();
+  const { mutateAsync: updateOrganisationEmail, isPending } = trpc.enterprise.organisation.email.update.useMutation();
 
   const onFormSubmit = async ({ emailName }: ZUpdateOrganisationEmailSchema) => {
     try {
@@ -98,11 +95,7 @@ export const OrganisationEmailUpdateDialog = ({
   }, [open, form]);
 
   return (
-    <Dialog
-      {...props}
-      open={open}
-      onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
-    >
+    <Dialog {...props} open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
         {trigger}
       </DialogTrigger>
@@ -115,8 +108,7 @@ export const OrganisationEmailUpdateDialog = ({
 
           <DialogDescription>
             <Trans>
-              You are currently updating{' '}
-              <span className="font-bold">{organisationEmail.email}</span>
+              You are currently updating <span className="font-bold">{organisationEmail.email}</span>
             </Trans>
           </DialogDescription>
         </DialogHeader>

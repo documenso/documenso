@@ -1,9 +1,3 @@
-import { useMemo } from 'react';
-
-import { useLingui } from '@lingui/react';
-import { useLingui as useLinguiMacro } from '@lingui/react/macro';
-import { Link, useSearchParams } from 'react-router';
-
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
@@ -16,6 +10,10 @@ import { DataTablePagination } from '@documenso/ui/primitives/data-table-paginat
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@documenso/ui/primitives/hover-card';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
+import { useLingui } from '@lingui/react';
+import { useLingui as useLinguiMacro } from '@lingui/react/macro';
+import { useMemo } from 'react';
+import { Link, useSearchParams } from 'react-router';
 
 type AdminUserTeamsTableProps = {
   userId: number;
@@ -61,10 +59,7 @@ export const AdminUserTeamsTable = ({ userId }: AdminUserTeamsTableProps) => {
             <HoverCardTrigger className="cursor-default underline decoration-dotted underline-offset-4">
               {row.original.name}
             </HoverCardTrigger>
-            <HoverCardContent
-              className="w-auto font-mono text-xs text-muted-foreground"
-              align="start"
-            >
+            <HoverCardContent className="w-auto font-mono text-muted-foreground text-xs" align="start">
               <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
                 <dt>id</dt>
                 <dd>{row.original.id}</dd>
@@ -79,10 +74,7 @@ export const AdminUserTeamsTable = ({ userId }: AdminUserTeamsTableProps) => {
         header: t`Organisation`,
         accessorKey: 'organisation',
         cell: ({ row }) => (
-          <Link
-            to={`/admin/organisations/${row.original.organisation.id}`}
-            className="hover:underline"
-          >
+          <Link to={`/admin/organisations/${row.original.organisation.id}`} className="hover:underline">
             {row.original.organisation.name}
           </Link>
         ),
@@ -91,9 +83,7 @@ export const AdminUserTeamsTable = ({ userId }: AdminUserTeamsTableProps) => {
         header: t`Role`,
         accessorKey: 'teamRole',
         cell: ({ row }) => (
-          <Badge variant="neutral">
-            {i18n._(TEAM_MEMBER_ROLE_MAP[row.original.teamRole as TeamMemberRole])}
-          </Badge>
+          <Badge variant="neutral">{i18n._(TEAM_MEMBER_ROLE_MAP[row.original.teamRole as TeamMemberRole])}</Badge>
         ),
       },
       {
@@ -137,9 +127,7 @@ export const AdminUserTeamsTable = ({ userId }: AdminUserTeamsTableProps) => {
       }}
     >
       {(table) =>
-        table.getPageCount() > 1 ? (
-          <DataTablePagination additionalInformation="VisibleCount" table={table} />
-        ) : null
+        table.getPageCount() > 1 ? <DataTablePagination additionalInformation="VisibleCount" table={table} /> : null
       }
     </DataTable>
   );

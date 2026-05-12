@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { type JobDefinition } from '../../client/_internal/job';
+import type { JobDefinition } from '../../client/_internal/job';
 
 const BACKPORT_SUBSCRIPTION_CLAIM_JOB_DEFINITION_ID = 'internal.backport-subscription-claims';
 
@@ -19,14 +19,13 @@ const BACKPORT_SUBSCRIPTION_CLAIM_JOB_DEFINITION_SCHEMA = z.object({
     embedSigningWhiteLabel: z.literal(true).optional(),
     cfr21: z.literal(true).optional(),
     hipaa: z.literal(true).optional(),
+    signingReminders: z.literal(true).optional(),
     // Todo: Envelopes - Do we need to check?
     // authenticationPortal & emailDomains missing here.
   }),
 });
 
-export type TBackportSubscriptionClaimJobDefinition = z.infer<
-  typeof BACKPORT_SUBSCRIPTION_CLAIM_JOB_DEFINITION_SCHEMA
->;
+export type TBackportSubscriptionClaimJobDefinition = z.infer<typeof BACKPORT_SUBSCRIPTION_CLAIM_JOB_DEFINITION_SCHEMA>;
 
 export const BACKPORT_SUBSCRIPTION_CLAIM_JOB_DEFINITION = {
   id: BACKPORT_SUBSCRIPTION_CLAIM_JOB_DEFINITION_ID,

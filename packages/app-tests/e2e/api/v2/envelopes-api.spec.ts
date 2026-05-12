@@ -1,9 +1,5 @@
-import { type APIRequestContext, expect, test } from '@playwright/test';
-import type { Team, User } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
-import { pick } from 'remeda';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
@@ -19,17 +15,20 @@ import {
   RecipientRole,
 } from '@documenso/prisma/client';
 import { seedUser } from '@documenso/prisma/seed/users';
-import type { TCreateEnvelopeItemsPayload } from '@documenso/trpc/server/envelope-router/create-envelope-items.types';
 import type {
   TCreateEnvelopePayload,
   TCreateEnvelopeResponse,
 } from '@documenso/trpc/server/envelope-router/create-envelope.types';
+import type { TCreateEnvelopeItemsPayload } from '@documenso/trpc/server/envelope-router/create-envelope-items.types';
 import type { TDistributeEnvelopeRequest } from '@documenso/trpc/server/envelope-router/distribute-envelope.types';
 import type { TCreateEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/envelope-recipients/create-envelope-recipients.types';
 import type { TUpdateEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/envelope-recipients/update-envelope-recipients.types';
 import type { TFindEnvelopesResponse } from '@documenso/trpc/server/envelope-router/find-envelopes.types';
 import type { TGetEnvelopeResponse } from '@documenso/trpc/server/envelope-router/get-envelope.types';
 import type { TUpdateEnvelopeRequest } from '@documenso/trpc/server/envelope-router/update-envelope.types';
+import { type APIRequestContext, expect, test } from '@playwright/test';
+import type { Team, User } from '@prisma/client';
+import { pick } from 'remeda';
 
 import { ALIGNMENT_TEST_FIELDS } from '../../../constants/field-alignment-pdf';
 import { FIELD_META_TEST_FIELDS } from '../../../constants/field-meta-pdf';
@@ -94,9 +93,7 @@ test.describe('API V2 Envelopes', () => {
       const files = [
         {
           name: 'field-font-alignment.pdf',
-          data: fs.readFileSync(
-            path.join(__dirname, '../../../../../assets/field-font-alignment.pdf'),
-          ),
+          data: fs.readFileSync(path.join(__dirname, '../../../../../assets/field-font-alignment.pdf')),
         },
       ];
 
@@ -232,9 +229,7 @@ test.describe('API V2 Envelopes', () => {
         },
         {
           name: 'field-font-alignment.pdf',
-          data: fs.readFileSync(
-            path.join(__dirname, '../../../../../assets/field-font-alignment.pdf'),
-          ),
+          data: fs.readFileSync(path.join(__dirname, '../../../../../assets/field-font-alignment.pdf')),
         },
       ];
 
@@ -294,15 +289,11 @@ test.describe('API V2 Envelopes', () => {
       expect(envelope.documentMeta.dateFormat).toBe(payload.meta.dateFormat);
       expect(envelope.documentMeta.distributionMethod).toBe(payload.meta.distributionMethod);
       expect(envelope.documentMeta.signingOrder).toBe(payload.meta.signingOrder);
-      expect(envelope.documentMeta.allowDictateNextSigner).toBe(
-        payload.meta.allowDictateNextSigner,
-      );
+      expect(envelope.documentMeta.allowDictateNextSigner).toBe(payload.meta.allowDictateNextSigner);
       expect(envelope.documentMeta.redirectUrl).toBe(payload.meta.redirectUrl);
       expect(envelope.documentMeta.language).toBe(payload.meta.language);
       expect(envelope.documentMeta.typedSignatureEnabled).toBe(payload.meta.typedSignatureEnabled);
-      expect(envelope.documentMeta.uploadSignatureEnabled).toBe(
-        payload.meta.uploadSignatureEnabled,
-      );
+      expect(envelope.documentMeta.uploadSignatureEnabled).toBe(payload.meta.uploadSignatureEnabled);
       expect(envelope.documentMeta.drawSignatureEnabled).toBe(payload.meta.drawSignatureEnabled);
       expect(envelope.documentMeta.emailReplyTo).toBe(payload.meta.emailReplyTo);
       expect(envelope.documentMeta.emailSettings).toEqual(payload.meta.emailSettings);
@@ -324,9 +315,7 @@ test.describe('API V2 Envelopes', () => {
         role: recipient.role,
         signingOrder: recipient.signingOrder,
         accessAuth: recipient.authOptions?.accessAuth,
-      }).toEqual(
-        pick(payload.recipients[0], ['email', 'name', 'role', 'signingOrder', 'accessAuth']),
-      );
+      }).toEqual(pick(payload.recipients[0], ['email', 'name', 'role', 'signingOrder', 'accessAuth']));
 
       expect({
         type: field.type,
@@ -335,16 +324,7 @@ test.describe('API V2 Envelopes', () => {
         positionY: field.positionY.toNumber(),
         width: field.width.toNumber(),
         height: field.height.toNumber(),
-      }).toEqual(
-        pick(payload.recipients[0].fields[0], [
-          'type',
-          'page',
-          'positionX',
-          'positionY',
-          'width',
-          'height',
-        ]),
-      );
+      }).toEqual(pick(payload.recipients[0].fields[0], ['type', 'page', 'positionX', 'positionY', 'width', 'height']));
 
       // Expect string based ID to work.
       expect(field.envelopeItemId).toBe(
@@ -363,13 +343,9 @@ test.describe('API V2 Envelopes', () => {
    */
   test('Envelope full test', async ({ request }) => {
     // Step 1: Create initial envelope with Prisma (with first envelope item)
-    const alignmentPdf = fs.readFileSync(
-      path.join(__dirname, '../../../../../assets/field-font-alignment.pdf'),
-    );
+    const alignmentPdf = fs.readFileSync(path.join(__dirname, '../../../../../assets/field-font-alignment.pdf'));
 
-    const fieldMetaPdf = fs.readFileSync(
-      path.join(__dirname, '../../../../../assets/field-meta.pdf'),
-    );
+    const fieldMetaPdf = fs.readFileSync(path.join(__dirname, '../../../../../assets/field-meta.pdf'));
 
     const formData = new FormData();
 
@@ -382,10 +358,7 @@ test.describe('API V2 Envelopes', () => {
     );
 
     // Only add one file for now.
-    formData.append(
-      'files',
-      new File([alignmentPdf], 'field-font-alignment.pdf', { type: 'application/pdf' }),
-    );
+    formData.append('files', new File([alignmentPdf], 'field-font-alignment.pdf', { type: 'application/pdf' }));
 
     const createEnvelopeRequest = await request.post(`${baseUrl}/envelope/create`, {
       headers: { Authorization: `Bearer ${tokenA}` },
@@ -418,10 +391,7 @@ test.describe('API V2 Envelopes', () => {
 
     const createEnvelopeItemFormData = new FormData();
     createEnvelopeItemFormData.append('payload', JSON.stringify(createEnvelopeItemsPayload));
-    createEnvelopeItemFormData.append(
-      'files',
-      new File([fieldMetaPdf], 'field-meta.pdf', { type: 'application/pdf' }),
-    );
+    createEnvelopeItemFormData.append('files', new File([fieldMetaPdf], 'field-meta.pdf', { type: 'application/pdf' }));
 
     const createItemsRes = await request.post(`${baseUrl}/envelope/item/create-many`, {
       headers: { Authorization: `Bearer ${tokenA}` },
@@ -481,12 +451,8 @@ test.describe('API V2 Envelopes', () => {
     const envelopeResponse = (await getRes.json()) as TGetEnvelopeResponse;
 
     const recipientId = envelopeResponse.recipients[0].id;
-    const alignmentItem = envelopeResponse.envelopeItems.find(
-      (item: { order: number }) => item.order === 1,
-    );
-    const fieldMetaItem = envelopeResponse.envelopeItems.find(
-      (item: { order: number }) => item.order === 2,
-    );
+    const alignmentItem = envelopeResponse.envelopeItems.find((item: { order: number }) => item.order === 1);
+    const fieldMetaItem = envelopeResponse.envelopeItems.find((item: { order: number }) => item.order === 2);
 
     expect(recipientId).toBeDefined();
     expect(alignmentItem).toBeDefined();
@@ -555,9 +521,7 @@ test.describe('API V2 Envelopes', () => {
     // Verify structure
     expect(finalEnvelope.envelopeItems.length).toBe(2);
     expect(finalEnvelope.recipients.length).toBe(1);
-    expect(finalEnvelope.fields.length).toBe(
-      ALIGNMENT_TEST_FIELDS.length + FIELD_META_TEST_FIELDS.length,
-    );
+    expect(finalEnvelope.fields.length).toBe(ALIGNMENT_TEST_FIELDS.length + FIELD_META_TEST_FIELDS.length);
     expect(finalEnvelope.title).toBe('Envelope Full Field Test');
     expect(finalEnvelope.type).toBe(EnvelopeType.DOCUMENT);
 
@@ -568,17 +532,11 @@ test.describe('API V2 Envelopes', () => {
   });
 
   test.describe('Envelope find endpoint', () => {
-    const createEnvelope = async (
-      request: APIRequestContext,
-      token: string,
-      payload: TCreateEnvelopePayload,
-    ) => {
+    const createEnvelope = async (request: APIRequestContext, token: string, payload: TCreateEnvelopePayload) => {
       const formData = new FormData();
       formData.append('payload', JSON.stringify(payload));
 
-      const pdfData = fs.readFileSync(
-        path.join(__dirname, '../../../../../assets/field-font-alignment.pdf'),
-      );
+      const pdfData = fs.readFileSync(path.join(__dirname, '../../../../../assets/field-font-alignment.pdf'));
       formData.append('files', new File([pdfData], 'test.pdf', { type: 'application/pdf' }));
 
       const res = await request.post(`${baseUrl}/envelope/create`, {
@@ -1199,9 +1157,7 @@ test.describe('API V2 Envelopes', () => {
       expect(distributeResponse.recipients[1].signingUrl).toBeTruthy();
     });
 
-    test('Distribute envelope with empty email recipient and auth requirements fails', async ({
-      request,
-    }) => {
+    test('Distribute envelope with empty email recipient and auth requirements fails', async ({ request }) => {
       const payload = {
         type: EnvelopeType.DOCUMENT,
         title: 'Document with Auth Requirements',

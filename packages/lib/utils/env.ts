@@ -8,9 +8,7 @@ declare global {
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type EnvKey = keyof NodeJS.ProcessEnv | (string & {});
-type EnvValue<K extends EnvKey> = K extends keyof NodeJS.ProcessEnv
-  ? NodeJS.ProcessEnv[K]
-  : string | undefined;
+type EnvValue<K extends EnvKey> = K extends keyof NodeJS.ProcessEnv ? NodeJS.ProcessEnv[K] : string | undefined;
 
 export const env = <K extends EnvKey>(variable: K): EnvValue<K> => {
   if (typeof window !== 'undefined' && typeof window.__ENV__ === 'object') {

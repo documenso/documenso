@@ -1,11 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
-import { P, match } from 'ts-pattern';
-
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
@@ -22,6 +14,11 @@ import {
 } from '@documenso/ui/primitives/dialog';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
+import { useEffect, useState } from 'react';
+import { match, P } from 'ts-pattern';
 
 type EnvelopeDeleteDialogProps = {
   id: string;
@@ -130,13 +127,13 @@ export const EnvelopeDeleteDialog = ({
                 <AlertDescription>
                   {type === EnvelopeType.DOCUMENT ? (
                     <Trans>
-                      Please note that this action is <strong>irreversible</strong>. Once confirmed,
-                      this document will be permanently deleted.
+                      Please note that this action is <strong>irreversible</strong>. Once confirmed, this document will
+                      be permanently deleted.
                     </Trans>
                   ) : (
                     <Trans>
-                      Please note that this action is <strong>irreversible</strong>. Once confirmed,
-                      this template will be permanently deleted.
+                      Please note that this action is <strong>irreversible</strong>. Once confirmed, this template will
+                      be permanently deleted.
                     </Trans>
                   )}
                 </AlertDescription>

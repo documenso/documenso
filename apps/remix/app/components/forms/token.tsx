@@ -1,15 +1,3 @@
-import { useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { ApiToken } from '@prisma/client';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useForm } from 'react-hook-form';
-import { match } from 'ts-pattern';
-import type { z } from 'zod';
-
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
@@ -27,15 +15,19 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import type { ApiToken } from '@prisma/client';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
+import type { z } from 'zod';
 
 import { useCurrentTeam } from '~/providers/team';
 
@@ -129,10 +121,7 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
       const error = AppError.parseError(err);
 
       const errorMessage = match(error.code)
-        .with(
-          AppErrorCode.UNAUTHORIZED,
-          () => msg`You do not have permission to create a token for this team.`,
-        )
+        .with(AppErrorCode.UNAUTHORIZED, () => msg`You do not have permission to create a token for this team.`)
         .otherwise(() => msg`Something went wrong. Please try again later.`);
 
       toast({
@@ -148,10 +137,7 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
     <div className={cn(className)}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <fieldset
-            className="mt-6 flex w-full flex-col gap-4"
-            disabled={form.formState.isSubmitting}
-          >
+          <fieldset className="mt-6 flex w-full flex-col gap-4" disabled={form.formState.isSubmitting}>
             <FormField
               control={form.control}
               name="tokenName"
@@ -168,10 +154,7 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
                   </div>
 
                   <FormDescription className="text-xs italic">
-                    <Trans>
-                      Please enter a meaningful name for your token. This will help you identify it
-                      later.
-                    </Trans>
+                    <Trans>Please enter a meaningful name for your token. This will help you identify it later.</Trans>
                   </FormDescription>
 
                   <FormMessage />
@@ -225,11 +208,7 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
               </div>
             </div>
 
-            <Button
-              type="submit"
-              className="hidden md:inline-flex"
-              loading={form.formState.isSubmitting}
-            >
+            <Button type="submit" className="hidden md:inline-flex" loading={form.formState.isSubmitting}>
               <Trans>Create token</Trans>
             </Button>
 
@@ -243,35 +222,32 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
       </Form>
 
       <AnimatePresence>
-        {newlyCreatedToken &&
-          tokens &&
-          tokens.find((token) => token.id === newlyCreatedToken.id) && (
-            <motion.div
-              className="mt-8"
-              initial={{ opacity: 0, y: -40 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 40 }}
-            >
-              <Card gradient>
-                <CardContent className="p-4">
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    <Trans>
-                      Your token was created successfully! Make sure to copy it because you won't be
-                      able to see it again!
-                    </Trans>
-                  </p>
+        {newlyCreatedToken && tokens && tokens.find((token) => token.id === newlyCreatedToken.id) && (
+          <motion.div
+            className="mt-8"
+            initial={{ opacity: 0, y: -40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+          >
+            <Card gradient>
+              <CardContent className="p-4">
+                <p className="mt-2 text-muted-foreground text-sm">
+                  <Trans>
+                    Your token was created successfully! Make sure to copy it because you won't be able to see it again!
+                  </Trans>
+                </p>
 
-                  <p className="my-4 rounded-md bg-muted-foreground/10 px-2.5 py-1 font-mono text-sm">
-                    {newlyCreatedToken.token}
-                  </p>
+                <p className="my-4 rounded-md bg-muted-foreground/10 px-2.5 py-1 font-mono text-sm">
+                  {newlyCreatedToken.token}
+                </p>
 
-                  <Button variant="outline" onClick={() => void copyToken(newlyCreatedToken.token)}>
-                    <Trans>Copy token</Trans>
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
+                <Button variant="outline" onClick={() => void copyToken(newlyCreatedToken.token)}>
+                  <Trans>Copy token</Trans>
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   );

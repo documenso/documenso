@@ -1,18 +1,17 @@
-import { EnvelopeType } from '@prisma/client';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType } from '@prisma/client';
 
 import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';
 import {
+  deleteEnvelopeFieldMeta,
   ZDeleteEnvelopeFieldRequestSchema,
   ZDeleteEnvelopeFieldResponseSchema,
-  deleteEnvelopeFieldMeta,
 } from './delete-envelope-field.types';
 
 export const deleteEnvelopeFieldRoute = authenticatedProcedure

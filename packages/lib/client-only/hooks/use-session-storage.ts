@@ -1,5 +1,5 @@
-import * as React from 'react';
 import type { Dispatch, SetStateAction } from 'react';
+import * as React from 'react';
 
 function dispatchStorageEvent(key: string, newValue: string | null) {
   window.dispatchEvent(new StorageEvent('storage', { key, newValue }));
@@ -25,20 +25,13 @@ const useSessionStorageSubscribe = (callback: (event: StorageEvent) => void) => 
   return () => window.removeEventListener('storage', callback);
 };
 
-export function useSessionStorage<T>(
-  key: string,
-  initialValue: T,
-): [T, Dispatch<SetStateAction<T>>] {
+export function useSessionStorage<T>(key: string, initialValue: T): [T, Dispatch<SetStateAction<T>>] {
   const serializedInitialValue = JSON.stringify(initialValue);
 
   const getSnapshot = () => getSessionStorageItem(key);
   const getServerSnapshot = () => serializedInitialValue;
 
-  const store = React.useSyncExternalStore(
-    useSessionStorageSubscribe,
-    getSnapshot,
-    getServerSnapshot,
-  );
+  const store = React.useSyncExternalStore(useSessionStorageSubscribe, getSnapshot, getServerSnapshot);
 
   const setState: Dispatch<SetStateAction<T>> = React.useCallback(
     (v) => {

@@ -32,8 +32,7 @@ const DEFAULT_EMAIL_MESSAGE = 'Invalid email address';
  * ```
  */
 export const zEmail = (options?: string | { message?: string }) => {
-  const message =
-    typeof options === 'string' ? options : (options?.message ?? DEFAULT_EMAIL_MESSAGE);
+  const message = typeof options === 'string' ? options : (options?.message ?? DEFAULT_EMAIL_MESSAGE);
 
   return z.string().regex(EMAIL_REGEX, { message });
 };

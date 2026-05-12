@@ -1,16 +1,13 @@
-import { expect, test } from '@playwright/test';
-
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
 import { prisma } from '@documenso/prisma';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 
 test.describe.configure({ mode: 'parallel' });
 
-test('[ENVELOPE_EXPIRATION]: set custom expiration period at organisation level', async ({
-  page,
-}) => {
+test('[ENVELOPE_EXPIRATION]: set custom expiration period at organisation level', async ({ page }) => {
   const { user, organisation } = await seedUser({
     isPersonalOrganisation: false,
   });

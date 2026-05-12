@@ -1,18 +1,15 @@
-import { Prisma } from '@prisma/client';
-import { OrganisationType } from '@prisma/client';
-
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { normalizeBrandingColors } from '@documenso/lib/utils/normalize-branding-colors';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
+import { type SanitizeBrandingCssWarning, sanitizeBrandingCss } from '@documenso/lib/utils/sanitize-branding-css';
 import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
+import { OrganisationType, Prisma } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZUpdateTeamSettingsRequestSchema,
-  ZUpdateTeamSettingsResponseSchema,
-} from './update-team-settings.types';
+import { ZUpdateTeamSettingsRequestSchema, ZUpdateTeamSettingsResponseSchema } from './update-team-settings.types';
 
 export const updateTeamSettingsRoute = authenticatedProcedure
   .input(ZUpdateTeamSettingsRequestSchema)
@@ -48,6 +45,8 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       brandingLogo,
       brandingUrl,
       brandingCompanyDetails,
+      brandingColors,
+      brandingCss,
 
       // Email related settings.
       emailId,
@@ -68,11 +67,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
     }
 
     // Signatures will only be inherited if all are NULL.
-    if (
-      typedSignatureEnabled === false &&
-      uploadSignatureEnabled === false &&
-      drawSignatureEnabled === false
-    ) {
+    if (typedSignatureEnabled === false && uploadSignatureEnabled === false && drawSignatureEnabled === false) {
       throw new AppError(AppErrorCode.INVALID_BODY, {
         message: 'At least one signature type must be enabled',
       });
@@ -125,8 +120,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
     });
 
     const isPersonalOrganisation = organisation?.type === OrganisationType.PERSONAL;
-    const currentIncludeSenderDetails =
-      organisation?.organisationGlobalSettings.includeSenderDetails;
+    const currentIncludeSenderDetails = organisation?.organisationGlobalSettings.includeSenderDetails;
 
     const isChangingIncludeSenderDetails =
       includeSenderDetails !== undefined && includeSenderDetails !== currentIncludeSenderDetails;
@@ -136,6 +130,27 @@ export const updateTeamSettingsRoute = authenticatedProcedure
         message: 'Personal teams cannot update the sender details',
       });
     }
+
+    // Sanitize custom branding CSS at write time. `null` means inherit-from-org
+    // for teams, so only run the sanitiser when an explicit string is provided.
+    // An empty string after sanitisation is collapsed to `null` so the team
+    // row inherits rather than persisting an empty override.
+    let cssWarnings: SanitizeBrandingCssWarning[] | undefined;
+    let sanitizedBrandingCss: string | null | undefined;
+
+    if (brandingCss === null) {
+      sanitizedBrandingCss = null;
+    } else if (typeof brandingCss === 'string') {
+      const result = sanitizeBrandingCss(brandingCss);
+      sanitizedBrandingCss = result.css.trim() === '' ? null : result.css;
+      cssWarnings = result.warnings;
+    }
+
+    // Strip empty-string colour values; collapse to `null` when the payload
+    // contains no overrides. For teams this matters because brandingEnabled
+    // = null inherits from the org — leaving `{}` here would persist a real
+    // override of nothing once a team toggles brandingEnabled = true.
+    const normalizedBrandingColors = normalizeBrandingColors(brandingColors);
 
     await prisma.team.update({
       where: {
@@ -156,8 +171,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             uploadSignatureEnabled,
             drawSignatureEnabled,
             delegateDocumentOwnership,
-            envelopeExpirationPeriod:
-              envelopeExpirationPeriod === null ? Prisma.DbNull : envelopeExpirationPeriod,
+            envelopeExpirationPeriod: envelopeExpirationPeriod === null ? Prisma.DbNull : envelopeExpirationPeriod,
             reminderSettings: reminderSettings === null ? Prisma.DbNull : reminderSettings,
 
             // Branding related settings.
@@ -165,13 +179,14 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             brandingLogo,
             brandingUrl,
             brandingCompanyDetails,
+            brandingColors: normalizedBrandingColors === null ? Prisma.DbNull : normalizedBrandingColors,
+            brandingCss: sanitizedBrandingCss,
 
             // Email related settings.
             emailId,
             emailReplyTo,
             // emailReplyToName,
-            emailDocumentSettings:
-              emailDocumentSettings === null ? Prisma.DbNull : emailDocumentSettings,
+            emailDocumentSettings: emailDocumentSettings === null ? Prisma.DbNull : emailDocumentSettings,
             defaultRecipients: defaultRecipients === null ? Prisma.DbNull : defaultRecipients,
 
             // AI features settings.
@@ -180,4 +195,8 @@ export const updateTeamSettingsRoute = authenticatedProcedure
         },
       },
     });
+
+    return {
+      cssWarnings: cssWarnings && cssWarnings.length > 0 ? cssWarnings : undefined,
+    };
   });

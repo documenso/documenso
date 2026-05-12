@@ -1,9 +1,8 @@
-import { UserSecurityAuditLogType } from '@prisma/client';
-import { verifyRegistrationResponse } from '@simplewebauthn/server';
-import type { RegistrationResponseJSON } from '@simplewebauthn/server';
-import { isoBase64URL } from '@simplewebauthn/server/helpers';
-
 import { prisma } from '@documenso/prisma';
+import { UserSecurityAuditLogType } from '@prisma/client';
+import type { RegistrationResponseJSON } from '@simplewebauthn/server';
+import { verifyRegistrationResponse } from '@simplewebauthn/server';
+import { isoBase64URL } from '@simplewebauthn/server/helpers';
 
 import { MAXIMUM_PASSKEYS } from '../../constants/auth';
 import { AppError, AppErrorCode } from '../../errors/app-error';

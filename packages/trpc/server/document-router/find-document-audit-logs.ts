@@ -12,15 +12,7 @@ export const findDocumentAuditLogsRoute = authenticatedProcedure
   .query(async ({ input, ctx }) => {
     const { teamId } = ctx;
 
-    const {
-      page,
-      perPage,
-      documentId,
-      cursor,
-      filterForRecentActivity,
-      orderByColumn,
-      orderByDirection,
-    } = input;
+    const { page, perPage, documentId, cursor, filterForRecentActivity, orderByColumn, orderByDirection } = input;
 
     ctx.logger.info({
       input: {

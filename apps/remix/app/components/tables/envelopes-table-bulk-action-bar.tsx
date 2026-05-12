@@ -1,10 +1,7 @@
-import { useEffect } from 'react';
-
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { DownloadIcon, FolderInputIcon, Trash2Icon, XIcon } from 'lucide-react';
-
 import { Button } from '@documenso/ui/primitives/button';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { DownloadIcon, FolderInputIcon, Trash2Icon, XIcon } from 'lucide-react';
+import { useEffect } from 'react';
 
 export type EnvelopesTableBulkActionBarProps = {
   selectedCount: number;
@@ -45,10 +42,10 @@ export const EnvelopesTableBulkActionBar = ({
   return (
     <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-x-1 rounded-xl bg-popover p-1.5 text-popover-foreground shadow-lg ring-1 ring-black/10 dark:ring-white/10">
       <div className="flex items-center gap-x-2 px-2">
-        <span className="flex h-5 min-w-5 items-center justify-center rounded-md bg-primary px-1 text-xs font-semibold tabular-nums text-primary-foreground">
+        <span className="flex h-5 min-w-5 items-center justify-center rounded-md bg-primary px-1 font-semibold text-primary-foreground text-xs tabular-nums">
           {selectedCount}
         </span>
-        <span className="max-[420px]:hidden text-sm font-medium text-foreground">
+        <span className="font-medium text-foreground text-sm max-[420px]:hidden">
           <Trans>selected</Trans>
         </span>
       </div>
@@ -60,7 +57,7 @@ export const EnvelopesTableBulkActionBar = ({
         variant="ghost"
         size="sm"
         onClick={onMoveClick}
-        className="h-8 gap-x-1.5 py-1.5 pl-2 pr-2.5"
+        className="h-8 gap-x-1.5 py-1.5 pr-2.5 pl-2"
       >
         <FolderInputIcon className="size-4 shrink-0" />
         <Trans>Move</Trans>
@@ -72,7 +69,7 @@ export const EnvelopesTableBulkActionBar = ({
           variant="ghost"
           size="sm"
           onClick={onDownloadClick}
-          className="h-8 gap-x-1.5 py-1.5 pl-2 pr-2.5"
+          className="h-8 gap-x-1.5 py-1.5 pr-2.5 pl-2"
         >
           <DownloadIcon className="size-4 shrink-0" />
           <Trans>Download</Trans>
@@ -84,7 +81,7 @@ export const EnvelopesTableBulkActionBar = ({
         variant="ghost"
         size="sm"
         onClick={onDeleteClick}
-        className="h-8 gap-x-1.5 py-1.5 pl-2 pr-2.5 text-destructive hover:bg-destructive/10 hover:text-destructive"
+        className="h-8 gap-x-1.5 py-1.5 pr-2.5 pl-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
       >
         <Trash2Icon className="size-4 shrink-0" />
         <Trans>Delete</Trans>

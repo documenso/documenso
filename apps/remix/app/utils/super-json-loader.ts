@@ -10,12 +10,9 @@
 import { useActionData, useLoaderData } from 'react-router';
 import * as _superjson from 'superjson';
 
-export type SuperJsonFunction = <Data extends unknown>(
-  data: Data,
-  init?: number | ResponseInit,
-) => SuperTypedResponse<Data>;
+export type SuperJsonFunction = <Data>(data: Data, init?: number | ResponseInit) => SuperTypedResponse<Data>;
 
-export declare type SuperTypedResponse<T extends unknown = unknown> = Response & {
+export declare type SuperTypedResponse<T = unknown> = Response & {
   superjson(): Promise<T>;
 };
 
@@ -23,9 +20,7 @@ type AppData = any;
 type DataFunction = (...args: any[]) => unknown; // matches any function
 type DataOrFunction = AppData | DataFunction;
 
-export type UseDataFunctionReturn<T extends DataOrFunction> = T extends (
-  ...args: any[]
-) => infer Output
+export type UseDataFunctionReturn<T extends DataOrFunction> = T extends (...args: any[]) => infer Output
   ? Awaited<Output> extends SuperTypedResponse<infer U>
     ? U
     : Awaited<ReturnType<T>>

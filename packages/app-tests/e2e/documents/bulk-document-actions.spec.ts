@@ -1,9 +1,7 @@
-import type { Download } from '@playwright/test';
-import { expect, test } from '@playwright/test';
-
 import { seedDraftDocument } from '@documenso/prisma/seed/documents';
 import { seedBlankFolder } from '@documenso/prisma/seed/folders';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { type Download, expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 import { expectToastTextToBeVisible } from '../fixtures/generic';
