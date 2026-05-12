@@ -1,10 +1,7 @@
 import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
 
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZSearchDocumentRequestSchema,
-  ZSearchDocumentResponseSchema,
-} from './search-document.types';
+import { ZSearchDocumentRequestSchema, ZSearchDocumentResponseSchema } from './search-document.types';
 
 export const searchDocumentRoute = authenticatedProcedure
   .input(ZSearchDocumentRequestSchema)

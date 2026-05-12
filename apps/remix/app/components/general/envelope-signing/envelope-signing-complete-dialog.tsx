@@ -1,17 +1,16 @@
-import { useMemo } from 'react';
-
-import { useLingui } from '@lingui/react/macro';
-import { FieldType } from '@prisma/client';
-import { useNavigate, useRevalidator, useSearchParams } from 'react-router';
-
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import { PDF_VIEWER_CONTENT_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientAccessAuth } from '@documenso/lib/types/document-auth';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { useLingui } from '@lingui/react/macro';
+import { FieldType } from '@prisma/client';
+import { useMemo } from 'react';
+import { useNavigate, useRevalidator, useSearchParams } from 'react-router';
 
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 
@@ -43,8 +42,7 @@ export const EnvelopeSignerCompleteDialog = () => {
 
   const { onDocumentCompleted, onDocumentError } = useEmbedSigningContext() || {};
 
-  const { mutateAsync: completeDocument, isPending } =
-    trpc.recipient.completeDocumentWithToken.useMutation();
+  const { mutateAsync: completeDocument, isPending } = trpc.recipient.completeDocumentWithToken.useMutation();
 
   const { mutateAsync: createDocumentFromDirectTemplate } =
     trpc.template.createDocumentFromDirectTemplate.useMutation();
@@ -71,6 +69,14 @@ export const EnvelopeSignerCompleteDialog = () => {
 
         if (fieldTooltip) {
           fieldTooltip.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          // Tooltip not in DOM (page virtualized away) — signal the PDF viewer
+          // to scroll to the correct page via the data attribute.
+          const pdfContent = document.querySelector(PDF_VIEWER_CONTENT_SELECTOR);
+
+          if (pdfContent) {
+            pdfContent.setAttribute('data-scroll-to-page', String(nextField.page));
+          }
         }
       },
       isEnvelopeItemSwitch ? 150 : 50,
@@ -212,10 +218,12 @@ export const EnvelopeSignerCompleteDialog = () => {
       return {
         name:
           recipient.name ||
+          fullName ||
           recipient.fields.find((field) => field.type === FieldType.NAME)?.customText ||
           '',
         email:
           recipient.email ||
+          email ||
           recipient.fields.find((field) => field.type === FieldType.EMAIL)?.customText ||
           '',
       };
@@ -231,20 +239,14 @@ export const EnvelopeSignerCompleteDialog = () => {
     <DocumentSigningCompleteDialog
       isSubmitting={isPending}
       recipientPayload={recipientPayload}
-      onSignatureComplete={
-        isDirectTemplate ? handleDirectTemplateCompleteClick : handleOnCompleteClick
-      }
+      onSignatureComplete={isDirectTemplate ? handleDirectTemplateCompleteClick : handleOnCompleteClick}
       documentTitle={envelope.title}
       fields={recipientFieldsRemaining}
       fieldsValidated={handleOnNextFieldClick}
       recipient={recipient}
-      allowDictateNextSigner={Boolean(
-        nextRecipient && envelope.documentMeta.allowDictateNextSigner,
-      )}
+      allowDictateNextSigner={Boolean(nextRecipient && envelope.documentMeta.allowDictateNextSigner)}
       disableNameInput={!isDirectTemplate && recipient.name !== ''}
-      defaultNextSigner={
-        nextRecipient ? { name: nextRecipient.name, email: nextRecipient.email } : undefined
-      }
+      defaultNextSigner={nextRecipient ? { name: nextRecipient.name, email: nextRecipient.email } : undefined}
       buttonSize="sm"
       position="center"
     />

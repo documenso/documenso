@@ -1,38 +1,25 @@
-import { useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Plural, Trans } from '@lingui/react/macro';
-import type { TeamProfile } from '@prisma/client';
-import { motion } from 'framer-motion';
-import { AnimatePresence } from 'framer-motion';
-import { CheckSquareIcon, CopyIcon } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import type { z } from 'zod';
-
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { formatUserProfilePath } from '@documenso/lib/utils/public-profiles';
-import {
-  MAX_PROFILE_BIO_LENGTH,
-  ZUpdateTeamRequestSchema,
-} from '@documenso/trpc/server/team-router/update-team.types';
+import { MAX_PROFILE_BIO_LENGTH, ZUpdateTeamRequestSchema } from '@documenso/trpc/server/team-router/update-team.types';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Plural, Trans } from '@lingui/react/macro';
+import type { TeamProfile } from '@prisma/client';
+import { AnimatePresence, motion } from 'framer-motion';
+import { CheckSquareIcon, CopyIcon } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import type { z } from 'zod';
 
 import { useCurrentTeam } from '~/providers/team';
 
@@ -48,11 +35,7 @@ export type PublicProfileFormProps = {
   onProfileUpdate: (data: TPublicProfileFormSchema) => Promise<unknown>;
   profile: TeamProfile;
 };
-export const PublicProfileForm = ({
-  className,
-  profile,
-  onProfileUpdate,
-}: PublicProfileFormProps) => {
+export const PublicProfileForm = ({ className, profile, onProfileUpdate }: PublicProfileFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
@@ -137,10 +120,7 @@ export const PublicProfileForm = ({
 
   return (
     <Form {...form}>
-      <form
-        className={cn('flex w-full flex-col gap-y-4', className)}
-        onSubmit={form.handleSubmit(onFormSubmit)}
-      >
+      <form className={cn('flex w-full flex-col gap-y-4', className)} onSubmit={form.handleSubmit(onFormSubmit)}>
         <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
           <FormField
             control={form.control}
@@ -156,22 +136,19 @@ export const PublicProfileForm = ({
 
                 {!isPersonalLayoutMode && (
                   <p className="text-muted-foreground text-xs">
-                    <Trans>
-                      You can update the profile URL by updating the team URL in the general
-                      settings page.
-                    </Trans>
+                    <Trans>You can update the profile URL by updating the team URL in the general settings page.</Trans>
                   </p>
                 )}
 
                 <div className="h-8">
                   {!form.formState.errors.url && (
-                    <div className="text-muted-foreground h-8 text-sm">
+                    <div className="h-8 text-muted-foreground text-sm">
                       {field.value ? (
                         <div>
                           <Button
                             type="button"
                             variant="none"
-                            className="h-7 rounded bg-neutral-50 pl-2 pr-0.5 font-normal dark:border dark:border-neutral-500 dark:bg-neutral-600"
+                            className="h-7 rounded bg-neutral-50 pr-0.5 pl-2 font-normal dark:border dark:border-neutral-500 dark:bg-neutral-600"
                             onClick={async () => onCopy()}
                           >
                             <p>
@@ -222,10 +199,7 @@ export const PublicProfileForm = ({
                 <FormItem>
                   <FormLabel>Bio</FormLabel>
                   <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder={_(msg`Write a description to display on your public profile`)}
-                    />
+                    <Textarea {...field} placeholder={_(msg`Write a description to display on your public profile`)} />
                   </FormControl>
 
                   {!form.formState.errors.profileBio && (

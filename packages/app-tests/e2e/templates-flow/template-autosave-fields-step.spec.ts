@@ -1,10 +1,10 @@
-import type { Page } from '@playwright/test';
-import { expect, test } from '@playwright/test';
-
+import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
+import type { Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -47,7 +47,7 @@ test.describe('AutoSave Fields Step', () => {
     await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 100,
@@ -55,7 +55,7 @@ test.describe('AutoSave Fields Step', () => {
     });
 
     await page.getByRole('button', { name: 'Text' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 200,
@@ -64,10 +64,7 @@ test.describe('AutoSave Fields Step', () => {
 
     await page.getByTestId('field-advanced-settings-footer').waitFor({ state: 'visible' });
 
-    await page
-      .getByTestId('field-advanced-settings-footer')
-      .getByRole('button', { name: 'Cancel' })
-      .click();
+    await page.getByTestId('field-advanced-settings-footer').getByRole('button', { name: 'Cancel' }).click();
 
     await triggerAutosave(page);
 
@@ -75,7 +72,7 @@ test.describe('AutoSave Fields Step', () => {
     await page.getByRole('option', { name: 'Recipient 2 (recipient2@documenso.com)' }).click();
 
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 500,
@@ -98,9 +95,7 @@ test.describe('AutoSave Fields Step', () => {
 
       expect(fields.length).toBe(3);
 
-      expect(fields.map((field) => field.type).toSorted()).toEqual(
-        ['SIGNATURE', 'TEXT', 'SIGNATURE'].toSorted(),
-      );
+      expect(fields.map((field) => field.type).toSorted()).toEqual(['SIGNATURE', 'TEXT', 'SIGNATURE'].toSorted());
     }).toPass();
   });
 
@@ -110,7 +105,7 @@ test.describe('AutoSave Fields Step', () => {
     await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 100,
@@ -118,7 +113,7 @@ test.describe('AutoSave Fields Step', () => {
     });
 
     await page.getByRole('button', { name: 'Text' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 200,
@@ -127,10 +122,7 @@ test.describe('AutoSave Fields Step', () => {
 
     await page.getByTestId('field-advanced-settings-footer').waitFor({ state: 'visible' });
 
-    await page
-      .getByTestId('field-advanced-settings-footer')
-      .getByRole('button', { name: 'Cancel' })
-      .click();
+    await page.getByTestId('field-advanced-settings-footer').getByRole('button', { name: 'Cancel' }).click();
 
     await triggerAutosave(page);
 
@@ -138,7 +130,7 @@ test.describe('AutoSave Fields Step', () => {
     await page.getByRole('option', { name: 'Recipient 2 (recipient2@documenso.com)' }).click();
 
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 500,
@@ -179,7 +171,7 @@ test.describe('AutoSave Fields Step', () => {
     await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 100,
@@ -187,7 +179,7 @@ test.describe('AutoSave Fields Step', () => {
     });
 
     await page.getByRole('button', { name: 'Text' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 200,
@@ -196,10 +188,7 @@ test.describe('AutoSave Fields Step', () => {
 
     await page.getByTestId('field-advanced-settings-footer').waitFor({ state: 'visible' });
 
-    await page
-      .getByTestId('field-advanced-settings-footer')
-      .getByRole('button', { name: 'Cancel' })
-      .click();
+    await page.getByTestId('field-advanced-settings-footer').getByRole('button', { name: 'Cancel' }).click();
 
     await triggerAutosave(page);
 
@@ -207,7 +196,7 @@ test.describe('AutoSave Fields Step', () => {
     await page.getByRole('option', { name: 'Recipient 2 (recipient2@documenso.com)' }).click();
 
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 500,
@@ -250,7 +239,7 @@ test.describe('AutoSave Fields Step', () => {
     await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Signature' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 100,
@@ -258,7 +247,7 @@ test.describe('AutoSave Fields Step', () => {
     });
 
     await page.getByRole('button', { name: 'Text' }).click();
-    await page.locator('canvas').click({
+    await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
       position: {
         x: 100,
         y: 200,
@@ -271,10 +260,7 @@ test.describe('AutoSave Fields Step', () => {
 
     await page.getByTestId('field-advanced-settings-footer').waitFor({ state: 'visible' });
 
-    await page
-      .getByTestId('field-advanced-settings-footer')
-      .getByRole('button', { name: 'Save' })
-      .click();
+    await page.getByTestId('field-advanced-settings-footer').getByRole('button', { name: 'Save' }).click();
 
     await page.waitForTimeout(2500);
     await triggerAutosave(page);
@@ -292,9 +278,7 @@ test.describe('AutoSave Fields Step', () => {
       const fields = retrievedTemplate.fields;
 
       expect(fields.length).toBe(2);
-      expect(fields.map((field) => field.type).toSorted()).toEqual(
-        ['SIGNATURE', 'TEXT'].toSorted(),
-      );
+      expect(fields.map((field) => field.type).toSorted()).toEqual(['SIGNATURE', 'TEXT'].toSorted());
 
       const textField = fields.find((field) => field.type === 'TEXT');
       expect(textField).toBeDefined();
@@ -305,11 +289,7 @@ test.describe('AutoSave Fields Step', () => {
 
       expect(textField.fieldMeta).toBeDefined();
 
-      if (
-        textField.fieldMeta &&
-        typeof textField.fieldMeta === 'object' &&
-        'type' in textField.fieldMeta
-      ) {
+      if (textField.fieldMeta && typeof textField.fieldMeta === 'object' && 'type' in textField.fieldMeta) {
         expect(textField.fieldMeta.type).toBe('text');
         expect(textField.fieldMeta.label).toBe('Test Field');
         expect(textField.fieldMeta.placeholder).toBe('Test Placeholder');

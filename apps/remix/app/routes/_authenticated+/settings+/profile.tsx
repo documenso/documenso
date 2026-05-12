@@ -1,11 +1,10 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { AnimatePresence } from 'framer-motion';
-
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { AnimatePresence } from 'framer-motion';
 
 import { AccountDeleteDialog } from '~/components/dialogs/account-delete-dialog';
 import { AvatarImageForm } from '~/components/forms/avatar-image';
@@ -15,7 +14,7 @@ import { TeamEmailUsage } from '~/components/general/teams/team-email-usage';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Profile');
+  return appMetaTags(msg`Profile`);
 }
 
 export default function SettingsProfile() {
@@ -28,10 +27,7 @@ export default function SettingsProfile() {
 
   return (
     <div>
-      <SettingsHeader
-        title={_(msg`Profile`)}
-        subtitle={_(msg`Here you can edit your personal details.`)}
-      />
+      <SettingsHeader title={_(msg`Profile`)} subtitle={_(msg`Here you can edit your personal details.`)} />
 
       <AvatarImageForm className="mb-8 max-w-xl" />
       <ProfileForm className="mb-8 max-w-xl" />

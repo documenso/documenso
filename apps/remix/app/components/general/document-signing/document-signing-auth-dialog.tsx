@@ -1,23 +1,15 @@
-import { useState } from 'react';
-
-import { Trans } from '@lingui/react/macro';
-import type { FieldType } from '@prisma/client';
-import { ChevronLeftIcon } from 'lucide-react';
-import { P, match } from 'ts-pattern';
-
 import {
   DocumentAuth,
   type TRecipientActionAuth,
   type TRecipientActionAuthTypes,
 } from '@documenso/lib/types/document-auth';
 import { Button } from '@documenso/ui/primitives/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@documenso/ui/primitives/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@documenso/ui/primitives/dialog';
+import { Trans } from '@lingui/react/macro';
+import type { FieldType } from '@prisma/client';
+import { ChevronLeftIcon } from 'lucide-react';
+import { useState } from 'react';
+import { match, P } from 'ts-pattern';
 
 import { DocumentSigningAuth2FA } from './document-signing-auth-2fa';
 import { DocumentSigningAuthAccount } from './document-signing-auth-account';
@@ -48,13 +40,10 @@ export const DocumentSigningAuthDialog = ({
   onOpenChange,
   onReauthFormSubmit,
 }: DocumentSigningAuthDialogProps) => {
-  const { recipient, user, isCurrentlyAuthenticating, isDirectTemplate } =
-    useRequiredDocumentSigningAuthContext();
+  const { recipient, user, isCurrentlyAuthenticating, isDirectTemplate } = useRequiredDocumentSigningAuthContext();
 
   // Filter out EXPLICIT_NONE from available auth types for the chooser
-  const validAuthTypes = availableAuthTypes.filter(
-    (authType) => authType !== DocumentAuth.EXPLICIT_NONE,
-  );
+  const validAuthTypes = availableAuthTypes.filter((authType) => authType !== DocumentAuth.EXPLICIT_NONE);
 
   const [selectedAuthType, setSelectedAuthType] = useState<TRecipientActionAuthTypes | null>(() => {
     // Auto-select if there's only one valid option
@@ -93,20 +82,13 @@ export const DocumentSigningAuthDialog = ({
           <DialogTitle>
             {selectedAuthType && validAuthTypes.length > 1 && (
               <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleBackToChooser}
-                  className="h-6 w-6 p-0"
-                >
+                <Button type="button" variant="ghost" size="sm" onClick={handleBackToChooser} className="h-6 w-6 p-0">
                   <ChevronLeftIcon className="h-4 w-4" />
                 </Button>
                 <span>{title || <Trans>Sign field</Trans>}</span>
               </div>
             )}
-            {(!selectedAuthType || validAuthTypes.length === 1) &&
-              (title || <Trans>Sign field</Trans>)}
+            {(!selectedAuthType || validAuthTypes.length === 1) && (title || <Trans>Sign field</Trans>)}
           </DialogTitle>
 
           <DialogDescription>
@@ -117,7 +99,7 @@ export const DocumentSigningAuthDialog = ({
         {/* Show chooser if no auth type is selected and there are multiple options */}
         {!selectedAuthType && validAuthTypes.length > 1 && (
           <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               <Trans>Choose your preferred authentication method:</Trans>
             </p>
             <div className="grid gap-2">
@@ -135,22 +117,16 @@ export const DocumentSigningAuthDialog = ({
                         .with(DocumentAuth.ACCOUNT, () => <Trans>Account</Trans>)
                         .with(DocumentAuth.PASSKEY, () => <Trans>Passkey</Trans>)
                         .with(DocumentAuth.TWO_FACTOR_AUTH, () => <Trans>2FA</Trans>)
-                        .with(DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH, () => (
-                          <Trans>Verification code</Trans>
-                        ))
+                        .with(DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH, () => <Trans>Verification code</Trans>)
                         .with(DocumentAuth.PASSWORD, () => <Trans>Password</Trans>)
                         .exhaustive()}
                     </div>
 
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-muted-foreground text-sm">
                       {match(authType)
                         .with(DocumentAuth.ACCOUNT, () => <Trans>Sign in to your account</Trans>)
-                        .with(DocumentAuth.PASSKEY, () => (
-                          <Trans>Use your passkey for authentication</Trans>
-                        ))
-                        .with(DocumentAuth.TWO_FACTOR_AUTH, () => (
-                          <Trans>Enter your 2FA code</Trans>
-                        ))
+                        .with(DocumentAuth.PASSKEY, () => <Trans>Use your passkey for authentication</Trans>)
+                        .with(DocumentAuth.TWO_FACTOR_AUTH, () => <Trans>Enter your 2FA code</Trans>)
                         .with(DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH, () => (
                           <Trans>Enter the verification code provided to you</Trans>
                         ))
@@ -170,9 +146,7 @@ export const DocumentSigningAuthDialog = ({
             .with(
               { documentAuthType: DocumentAuth.ACCOUNT },
               {
-                user: P.when(
-                  (user) => !user || (user.email !== recipient.email && !isDirectTemplate),
-                ),
+                user: P.when((user) => !user || (user.email !== recipient.email && !isDirectTemplate)),
               }, // Assume all current auth methods requires them to be logged in.
               () => <DocumentSigningAuthAccount onOpenChange={onOpenChange} />,
             )
@@ -184,11 +158,7 @@ export const DocumentSigningAuthDialog = ({
               />
             ))
             .with({ documentAuthType: DocumentAuth.TWO_FACTOR_AUTH }, () => (
-              <DocumentSigningAuth2FA
-                open={open}
-                onOpenChange={onOpenChange}
-                onReauthFormSubmit={onReauthFormSubmit}
-              />
+              <DocumentSigningAuth2FA open={open} onOpenChange={onOpenChange} onReauthFormSubmit={onReauthFormSubmit} />
             ))
             .with({ documentAuthType: DocumentAuth.PASSWORD }, () => (
               <DocumentSigningAuthPassword

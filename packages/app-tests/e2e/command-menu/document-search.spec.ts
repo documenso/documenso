@@ -1,7 +1,6 @@
-import { expect, test } from '@playwright/test';
-
 import { seedPendingDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -44,7 +43,7 @@ test('[COMMAND_MENU]: should be able to search by recipient', async ({ page }) =
 
   await apiSignin({
     page,
-    email: recipient.email,
+    email: user.email,
   });
 
   await page.keyboard.press('Meta+K');

@@ -1,9 +1,3 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import crypto from 'crypto';
-import { DateTime } from 'luxon';
-
 import { mailer } from '@documenso/email/mailer';
 import { OrganisationAccountLinkConfirmationTemplate } from '@documenso/email/templates/organisation-account-link-confirmation';
 import { getI18nInstance } from '@documenso/lib/client-only/providers/i18n-server';
@@ -15,6 +9,10 @@ import { getEmailContext } from '@documenso/lib/server-only/email/get-email-cont
 import type { TOrganisationAccountLinkMetadata } from '@documenso/lib/types/organisation';
 import { renderEmailWithI18N } from '@documenso/lib/utils/render-email-with-i18n';
 import { prisma } from '@documenso/prisma';
+import { msg } from '@lingui/core/macro';
+import crypto from 'crypto';
+import { DateTime } from 'luxon';
+import { createElement } from 'react';
 
 export type SendOrganisationAccountLinkConfirmationEmailProps = TOrganisationAccountLinkMetadata & {
   organisationName: string;
@@ -109,10 +107,7 @@ export const sendOrganisationAccountLinkConfirmationEmail = async ({
       name: user.name || '',
     },
     from: DOCUMENSO_INTERNAL_EMAIL,
-    subject:
-      type === 'create'
-        ? i18n._(msg`Account creation request`)
-        : i18n._(msg`Account linking request`),
+    subject: type === 'create' ? i18n._(msg`Account creation request`) : i18n._(msg`Account linking request`),
     html,
     text,
   });

@@ -1,9 +1,8 @@
+import { env } from '@documenso/lib/utils/env';
 import { PDF } from '@libpdf/core';
 import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
 import { match } from 'ts-pattern';
-
-import { env } from '@documenso/lib/utils/env';
 
 import { AppError } from '../../errors/app-error';
 import { createDocumentData } from '../../server-only/document-data/create-document-data';
@@ -20,7 +19,7 @@ type File = {
  * Uploads a document file to the appropriate storage location and creates
  * a document data record.
  */
-export const putPdfFileServerSide = async (file: File) => {
+export const putPdfFileServerSide = async (file: File, initialData?: string) => {
   const isEncryptedDocumentsAllowed = false; // Was feature flag.
 
   const arrayBuffer = await file.arrayBuffer();
@@ -41,16 +40,18 @@ export const putPdfFileServerSide = async (file: File) => {
 
   const { type, data } = await putFileServerSide(file);
 
-  return await createDocumentData({ type, data });
+  const createdData = await createDocumentData({ type, data, initialData });
+
+  return {
+    documentData: createdData,
+    filePageCount: pdf.getPageCount(),
+  };
 };
 
 /**
  * Uploads a pdf file and normalizes it.
  */
-export const putNormalizedPdfFileServerSide = async (
-  file: File,
-  options: { flattenForm?: boolean } = {},
-) => {
+export const putNormalizedPdfFileServerSide = async (file: File, options: { flattenForm?: boolean } = {}) => {
   const buffer = Buffer.from(await file.arrayBuffer());
 
   const normalized = await normalizePdf(buffer, options);

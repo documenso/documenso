@@ -13,10 +13,7 @@ import {
 
 import type { WebhookPayload } from '../../../types/webhook-payload';
 
-export const generateSampleWebhookPayload = (
-  event: WebhookTriggerEvents,
-  webhookUrl: string,
-): WebhookPayload => {
+export const generateSampleWebhookPayload = (event: WebhookTriggerEvents, webhookUrl: string): WebhookPayload => {
   const now = new Date();
   const basePayload = {
     id: 10,
@@ -61,7 +58,8 @@ export const generateSampleWebhookPayload = (
         name: 'John Doe',
         token: 'SIGNING_TOKEN',
         documentDeletedAt: null,
-        expired: null,
+        expiresAt: null,
+        expirationNotifiedAt: null,
         signedAt: null,
         authOptions: null,
         signingOrder: 1,
@@ -81,7 +79,8 @@ export const generateSampleWebhookPayload = (
         name: 'John Doe',
         token: 'SIGNING_TOKEN',
         documentDeletedAt: null,
-        expired: null,
+        expiresAt: null,
+        expirationNotifiedAt: null,
         signedAt: null,
         authOptions: null,
         signingOrder: 1,
@@ -120,7 +119,8 @@ export const generateSampleWebhookPayload = (
             role: RecipientRole.VIEWER,
             sendStatus: SendStatus.SENT,
             documentDeletedAt: null,
-            expired: null,
+            expiresAt: null,
+            expirationNotifiedAt: null,
             signedAt: null,
             authOptions: null,
             signingOrder: 1,
@@ -139,7 +139,8 @@ export const generateSampleWebhookPayload = (
             role: RecipientRole.SIGNER,
             sendStatus: SendStatus.SENT,
             documentDeletedAt: null,
-            expired: null,
+            expiresAt: null,
+            expirationNotifiedAt: null,
             signedAt: null,
             authOptions: null,
             rejectionReason: null,
@@ -168,7 +169,8 @@ export const generateSampleWebhookPayload = (
             readStatus: ReadStatus.OPENED,
             sendStatus: SendStatus.SENT,
             documentDeletedAt: null,
-            expired: null,
+            expiresAt: null,
+            expirationNotifiedAt: null,
             signedAt: null,
             authOptions: null,
             signingOrder: 1,
@@ -185,7 +187,8 @@ export const generateSampleWebhookPayload = (
             readStatus: ReadStatus.OPENED,
             sendStatus: SendStatus.SENT,
             documentDeletedAt: null,
-            expired: null,
+            expiresAt: null,
+            expirationNotifiedAt: null,
             signedAt: null,
             authOptions: null,
             signingOrder: 1,
@@ -222,7 +225,8 @@ export const generateSampleWebhookPayload = (
             signingStatus: SigningStatus.SIGNED,
             sendStatus: SendStatus.SENT,
             documentDeletedAt: null,
-            expired: null,
+            expiresAt: null,
+            expirationNotifiedAt: null,
             signingOrder: 1,
             rejectionReason: null,
           },
@@ -243,7 +247,8 @@ export const generateSampleWebhookPayload = (
             signingStatus: SigningStatus.SIGNED,
             sendStatus: SendStatus.SENT,
             documentDeletedAt: null,
-            expired: null,
+            expiresAt: null,
+            expirationNotifiedAt: null,
             signingOrder: 1,
             rejectionReason: null,
           },
@@ -270,7 +275,8 @@ export const generateSampleWebhookPayload = (
             name: 'Signer 2',
             token: 'SIGNING_TOKEN',
             documentDeletedAt: null,
-            expired: null,
+            expiresAt: null,
+            expirationNotifiedAt: null,
             signedAt: now,
             authOptions: {
               accessAuth: null,
@@ -291,7 +297,8 @@ export const generateSampleWebhookPayload = (
             name: 'Signer 1',
             token: 'SIGNING_TOKEN',
             documentDeletedAt: null,
-            expired: null,
+            expiresAt: null,
+            expirationNotifiedAt: null,
             signedAt: now,
             authOptions: {
               accessAuth: null,
@@ -314,7 +321,8 @@ export const generateSampleWebhookPayload = (
             name: 'Signer 2',
             token: 'SIGNING_TOKEN',
             documentDeletedAt: null,
-            expired: null,
+            expiresAt: null,
+            expirationNotifiedAt: null,
             signedAt: now,
             authOptions: {
               accessAuth: null,
@@ -335,7 +343,8 @@ export const generateSampleWebhookPayload = (
             name: 'Signer 1',
             token: 'SIGNING_TOKEN',
             documentDeletedAt: null,
-            expired: null,
+            expiresAt: null,
+            expirationNotifiedAt: null,
             signedAt: now,
             authOptions: {
               accessAuth: null,
@@ -374,7 +383,8 @@ export const generateSampleWebhookPayload = (
             signingStatus: SigningStatus.REJECTED,
             sendStatus: SendStatus.SENT,
             documentDeletedAt: null,
-            expired: null,
+            expiresAt: null,
+            expirationNotifiedAt: null,
             signingOrder: 1,
           },
         ],
@@ -391,7 +401,8 @@ export const generateSampleWebhookPayload = (
             signingStatus: SigningStatus.REJECTED,
             sendStatus: SendStatus.SENT,
             documentDeletedAt: null,
-            expired: null,
+            expiresAt: null,
+            expirationNotifiedAt: null,
             signingOrder: 1,
           },
         ],
@@ -425,6 +436,8 @@ export const generateSampleWebhookPayload = (
             recipientRemoved: true,
             documentCompleted: true,
             ownerDocumentCompleted: true,
+            ownerRecipientExpired: true,
+            ownerDocumentCreated: true,
             recipientSigningRequest: true,
           },
         },
@@ -437,7 +450,8 @@ export const generateSampleWebhookPayload = (
             name: 'Signer 1',
             token: 'SIGNING_TOKEN',
             documentDeletedAt: null,
-            expired: null,
+            expiresAt: null,
+            expirationNotifiedAt: null,
             signedAt: null,
             authOptions: {
               accessAuth: null,
@@ -460,7 +474,8 @@ export const generateSampleWebhookPayload = (
             name: 'Signer',
             token: 'SIGNING_TOKEN',
             documentDeletedAt: null,
-            expired: null,
+            expiresAt: null,
+            expirationNotifiedAt: null,
             signedAt: null,
             authOptions: {
               accessAuth: null,
@@ -474,6 +489,168 @@ export const generateSampleWebhookPayload = (
             sendStatus: SendStatus.SENT,
           },
         ],
+      },
+      createdAt: now.toISOString(),
+      webhookEndpoint: webhookUrl,
+    };
+  }
+
+  if (event === WebhookTriggerEvents.RECIPIENT_EXPIRED) {
+    const expiresAt = new Date(now.getTime() - 60 * 1000); // Expired 1 minute ago
+
+    return {
+      event,
+      payload: {
+        ...basePayload,
+        status: DocumentStatus.PENDING,
+        recipients: [
+          {
+            ...basePayload.recipients[0],
+            email: 'signer1@documenso.com',
+            name: 'Signer 1',
+            sendStatus: SendStatus.SENT,
+            documentDeletedAt: null,
+            expiresAt,
+            expirationNotifiedAt: now,
+            signedAt: null,
+            authOptions: null,
+            signingOrder: 1,
+            rejectionReason: null,
+            readStatus: ReadStatus.OPENED,
+            signingStatus: SigningStatus.NOT_SIGNED,
+          },
+        ],
+        Recipient: [
+          {
+            ...basePayload.Recipient[0],
+            email: 'signer1@documenso.com',
+            name: 'Signer 1',
+            sendStatus: SendStatus.SENT,
+            documentDeletedAt: null,
+            expiresAt,
+            expirationNotifiedAt: now,
+            signedAt: null,
+            authOptions: null,
+            signingOrder: 1,
+            rejectionReason: null,
+            readStatus: ReadStatus.OPENED,
+            signingStatus: SigningStatus.NOT_SIGNED,
+          },
+        ],
+      },
+      createdAt: now.toISOString(),
+      webhookEndpoint: webhookUrl,
+    };
+  }
+
+  if (event === WebhookTriggerEvents.DOCUMENT_RECIPIENT_COMPLETED) {
+    return {
+      event,
+      payload: {
+        ...basePayload,
+        status: DocumentStatus.PENDING,
+        recipients: [
+          {
+            ...basePayload.recipients[0],
+            readStatus: ReadStatus.OPENED,
+            signingStatus: SigningStatus.SIGNED,
+            signedAt: now,
+          },
+        ],
+        Recipient: [
+          {
+            ...basePayload.recipients[0],
+            readStatus: ReadStatus.OPENED,
+            signingStatus: SigningStatus.SIGNED,
+            signedAt: now,
+          },
+        ],
+      },
+      createdAt: now.toISOString(),
+      webhookEndpoint: webhookUrl,
+    };
+  }
+
+  if (event === WebhookTriggerEvents.DOCUMENT_REMINDER_SENT) {
+    return {
+      event,
+      payload: {
+        ...basePayload,
+        status: DocumentStatus.PENDING,
+        recipients: [
+          {
+            ...basePayload.recipients[0],
+            sendStatus: SendStatus.SENT,
+            signingStatus: SigningStatus.NOT_SIGNED,
+          },
+        ],
+        Recipient: [
+          {
+            ...basePayload.recipients[0],
+            sendStatus: SendStatus.SENT,
+            signingStatus: SigningStatus.NOT_SIGNED,
+          },
+        ],
+      },
+      createdAt: now.toISOString(),
+      webhookEndpoint: webhookUrl,
+    };
+  }
+
+  if (event === WebhookTriggerEvents.TEMPLATE_CREATED) {
+    return {
+      event,
+      payload: {
+        ...basePayload,
+        title: 'My Template',
+        status: DocumentStatus.DRAFT,
+        templateId: 10,
+        source: DocumentSource.TEMPLATE,
+      },
+      createdAt: now.toISOString(),
+      webhookEndpoint: webhookUrl,
+    };
+  }
+
+  if (event === WebhookTriggerEvents.TEMPLATE_UPDATED) {
+    return {
+      event,
+      payload: {
+        ...basePayload,
+        title: 'My Updated Template',
+        status: DocumentStatus.DRAFT,
+        templateId: 10,
+        source: DocumentSource.TEMPLATE,
+      },
+      createdAt: now.toISOString(),
+      webhookEndpoint: webhookUrl,
+    };
+  }
+
+  if (event === WebhookTriggerEvents.TEMPLATE_DELETED) {
+    return {
+      event,
+      payload: {
+        ...basePayload,
+        title: 'Deleted Template',
+        status: DocumentStatus.DRAFT,
+        templateId: 10,
+        source: DocumentSource.TEMPLATE,
+      },
+      createdAt: now.toISOString(),
+      webhookEndpoint: webhookUrl,
+    };
+  }
+
+  if (event === WebhookTriggerEvents.TEMPLATE_USED) {
+    return {
+      event,
+      payload: {
+        ...basePayload,
+        title: 'Document from Template',
+        status: DocumentStatus.DRAFT,
+        templateId: 10,
+        source: DocumentSource.TEMPLATE,
       },
       createdAt: now.toISOString(),
       webhookEndpoint: webhookUrl,

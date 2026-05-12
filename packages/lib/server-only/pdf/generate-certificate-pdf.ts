@@ -1,8 +1,7 @@
 import { PDF } from '@libpdf/core';
 import { i18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import type { DocumentMeta } from '@prisma/client';
-import type { Envelope, Field, Recipient, Signature } from '@prisma/client';
+import type { DocumentMeta, Envelope, Field, Recipient, Signature } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 import { prop, sortBy } from 'remeda';
 import { match } from 'ts-pattern';
@@ -16,7 +15,14 @@ import { getOrganisationClaimByTeamId } from '../organisation/get-organisation-c
 import { renderCertificate } from './render-certificate';
 
 export type GenerateCertificatePdfOptions = {
-  envelope: Envelope & {
+  /**
+   * Note: completedAt is not included since it's not real at this point in time.
+   *
+   * If we actually need it here in the future, we will need to preserve the
+   * completedAt value and pass it to the final `envelope.update` function when
+   * the document is initially sealed.
+   */
+  envelope: Omit<Envelope, 'completedAt'> & {
     documentMeta: DocumentMeta;
   };
   envelopeOwner: {
@@ -66,22 +72,17 @@ export const generateCertificatePdf = async (options: GenerateCertificatePdfOpti
         (log) => log.type === 'DOCUMENT_SENT',
       );
 
-      const documentOpened: TDocumentAuditLogBaseSchema | undefined = auditLogs[
-        'DOCUMENT_OPENED'
-      ].find((log) => log.type === 'DOCUMENT_OPENED' && log.data.recipientId === recipientId);
+      const documentOpened: TDocumentAuditLogBaseSchema | undefined = auditLogs['DOCUMENT_OPENED'].find(
+        (log) => log.type === 'DOCUMENT_OPENED' && log.data.recipientId === recipientId,
+      );
 
       const documentRecipientCompleted: TDocumentAuditLogBaseSchema | undefined = auditLogs[
         'DOCUMENT_RECIPIENT_COMPLETED'
-      ].find(
-        (log) =>
-          log.type === 'DOCUMENT_RECIPIENT_COMPLETED' && log.data.recipientId === recipientId,
-      );
+      ].find((log) => log.type === 'DOCUMENT_RECIPIENT_COMPLETED' && log.data.recipientId === recipientId);
 
       const documentRecipientRejected: TDocumentAuditLogBaseSchema | undefined = auditLogs[
         'DOCUMENT_RECIPIENT_REJECTED'
-      ].find(
-        (log) => log.type === 'DOCUMENT_RECIPIENT_REJECTED' && log.data.recipientId === recipientId,
-      );
+      ].find((log) => log.type === 'DOCUMENT_RECIPIENT_REJECTED' && log.data.recipientId === recipientId);
 
       const extractedAuthMethods = extractDocumentAuthMethods({
         documentAuth: envelope.authOptions,
@@ -136,6 +137,7 @@ export const generateCertificatePdf = async (options: GenerateCertificatePdfOpti
       };
     }),
     envelopeOwner,
+    envelopeId: envelope.id,
     qrToken: envelope.qrToken,
     hidePoweredBy: organisationClaim.flags.hidePoweredBy ?? false,
     pageWidth,

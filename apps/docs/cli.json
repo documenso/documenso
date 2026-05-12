@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/@fumadocs/cli/dist/schema/src.json",
+  "aliases": {
+    "uiDir": "./components/ui",
+    "componentsDir": "./components",
+    "blockDir": "./components",
+    "cssDir": "./styles",
+    "libDir": "./lib"
+  },
+  "baseDir": "src",
+  "uiLibrary": "radix-ui",
+  "commands": {}
+}

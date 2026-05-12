@@ -1,0 +1,85 @@
+---
+title: Signing Certificate
+description: Configure the X.509 signing certificate used for digital signatures in self-hosted Documenso.
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+When a document is completed in Documenso, it is digitally signed using an X.509 certificate. This cryptographic signature provides:
+
+- Proof of document authenticity
+- Verification that the document has not been modified since signing
+- Identity information about the signing entity
+
+Self-hosted Documenso instances require a signing certificate. You can generate a self-signed certificate or purchase one from a Certificate Authority (CA).
+
+<Cards>
+  <Card
+    title="Local Certificate"
+    description="Configure a local .p12 certificate file or base64-encoded contents."
+    href="/docs/self-hosting/configuration/signing-certificate/local"
+  />
+  <Card
+    title="Google Cloud HSM"
+    description="Hardware-based key protection with Google Cloud KMS."
+    href="/docs/self-hosting/configuration/signing-certificate/google-cloud-hsm"
+  />
+  <Card
+    title="Timestamp Server"
+    description="Add trusted timestamps and customise signature appearance."
+    href="/docs/self-hosting/configuration/signing-certificate/timestamp-server"
+  />
+  <Card
+    title="Troubleshooting"
+    description="Common certificate errors and solutions."
+    href="/docs/self-hosting/configuration/signing-certificate/troubleshooting"
+  />
+</Cards>
+
+## Certificate Options
+
+<Tabs items={['Self-Signed', 'CA-Issued', 'Google Cloud HSM']}>
+<Tab value="Self-Signed">
+
+A self-signed certificate is sufficient for most use cases where your industry has no special signing regulations.
+
+**Advantages:**
+
+- Free to create
+- Full control over certificate details
+- Works for internal and business documents
+
+**Limitations:**
+
+- PDF readers like Adobe Acrobat will not show a green checkmark
+- Not recognized by Adobe's trust list
+- Recipients see a warning that the signature cannot be verified
+
+The certificate still includes your organisation details and guarantees document integrity.
+
+</Tab>
+<Tab value="CA-Issued">
+
+Purchase a certificate from a Certificate Authority if you need:
+
+- Green checkmark in Adobe PDF readers
+- Industry-specific compliance requirements
+- Third-party signature validation
+
+For Adobe recognition, choose a vendor from the [Adobe Approved Trust List](https://helpx.adobe.com/acrobat/kb/approved-trust-list1.html).
+
+</Tab>
+<Tab value="Google Cloud HSM">
+
+For organisations requiring hardware-based key protection, Documenso supports Google Cloud HSM. This provides:
+
+- FIPS 140-2 Level 3 certified key storage
+- Keys never leave the HSM
+- Audit logging of all cryptographic operations
+
+See [Google Cloud HSM](/docs/self-hosting/configuration/signing-certificate/google-cloud-hsm) for setup instructions.
+
+</Tab>
+</Tabs>
+
+

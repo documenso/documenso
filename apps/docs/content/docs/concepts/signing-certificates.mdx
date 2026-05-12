@@ -1,0 +1,123 @@
+---
+title: Signing Certificates
+description: Documenso digitally signs completed documents using X.509 certificates, providing cryptographic proof of authenticity and integrity.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## How Documenso Signs Documents
+
+Documenso applies a digital signature to the PDF when all recipients complete their actions.
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Create hash
+
+Creates a cryptographic hash of the document content.
+
+</Step>
+
+<Step>
+### Sign the hash
+
+Signs the hash using the certificate's private key.
+
+</Step>
+
+<Step>
+### Embed signature
+
+Embeds the signature and certificate information into the PDF.
+
+</Step>
+</Steps>
+
+The signature is applied at the platform level, not by individual signers. Each signer's actions (signature image, text, checkboxes) are recorded and sealed together in the final signed document.
+
+## What the Signature Proves
+
+The digital signature provides two guarantees:
+
+| Guarantee        | Description                                                                |
+| ---------------- | -------------------------------------------------------------------------- |
+| **Integrity**    | The document has not been altered since signing                            |
+| **Authenticity** | The document was signed by the certificate holder (the Documenso instance) |
+
+If anyone modifies the PDF after signing, the signature becomes invalid. PDF readers will display a warning that the document has been changed.
+
+## Timestamps
+
+Documenso can include a trusted timestamp from a Time Stamping Authority (TSA) in the signature. This proves when the document was signed, independent of the signer's system clock. Timestamps are important for:
+
+- Legal evidence of when signing occurred
+- Long-term validation (LTV) of signatures
+- Compliance with archival requirements
+
+## Viewing the Signature in PDF Readers
+
+You can verify a signed document's signature in any PDF reader that supports digital signatures.
+
+<Tabs items={['Adobe Acrobat', 'Other PDF readers']}>
+  <Tab value="Adobe Acrobat">
+
+1. Open the signed PDF
+2. Click the signature panel on the left, or click on a signature field
+3. View certificate details, signing time, and validation status
+
+</Tab>
+  <Tab value="Other PDF readers">
+
+Preview, Foxit, and other PDF readers also display signature information, though the interface varies. Look for a signatures or security panel in the application menu.
+
+</Tab>
+</Tabs>
+
+The signature panel shows who signed (certificate subject), when it was signed, whether the document has been modified, and certificate trust status.
+
+## Certificate Trust and Validation
+
+PDF readers validate signatures against their list of trusted Certificate Authorities (CAs). You may see different validation results depending on the certificate type:
+
+| Certificate Type | Validation Result                                                      |
+| ---------------- | ---------------------------------------------------------------------- |
+| **CA-issued**    | Green checkmark in Adobe if the CA is on the Adobe Approved Trust List |
+| **Self-signed**  | Warning that the certificate is not from a trusted source              |
+
+<Callout type="info">
+  A self-signed certificate still provides integrity verification. The document cannot be modified without invalidating the signature. The warning only indicates that a third-party CA has not verified the certificate issuer's identity.
+
+For most use cases, self-signed certificates are sufficient. The signature still proves the document came from your Documenso instance and has not been tampered with.
+
+</Callout>
+
+## Using Custom Certificates
+
+If you self-host Documenso, you can use your own signing certificate.
+
+<Tabs items={['Self-signed', 'CA-issued']}>
+  <Tab value="Self-signed">
+
+Free and suitable for most use cases. The signature still proves document integrity and authenticity.
+
+You may see a warning in PDF readers that the certificate is not from a trusted source, but the document cannot be modified without invalidating the signature.
+
+</Tab>
+  <Tab value="CA-issued">
+
+Provides trusted validation in PDF readers (e.g. green checkmark in Adobe) when the CA is on the Adobe Approved Trust List.
+
+Required for some compliance scenarios where third-party verification of the certificate issuer is needed.
+
+</Tab>
+</Tabs>
+
+See [Signing Certificate Configuration](/docs/self-hosting/configuration/signing-certificate) for setup instructions.
+
+## Related
+
+- [Signature Levels](/docs/compliance/signature-levels) - Simple, Advanced, and Qualified electronic signatures
+- [Standards and Regulations](/docs/compliance/standards) - ESIGN, eIDAS, and other compliance frameworks
+- [Signing Certificate Configuration](/docs/self-hosting/configuration/signing-certificate) - Self-hosting certificate setup

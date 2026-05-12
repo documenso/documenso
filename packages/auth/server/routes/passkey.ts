@@ -1,14 +1,18 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { rateLimitResponse } from '@documenso/lib/server-only/rate-limit/rate-limit-middleware';
+import { passkeyRateLimit } from '@documenso/lib/server-only/rate-limit/rate-limits';
+import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
+import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
+import type { TAuthenticationResponseJSONSchema } from '@documenso/lib/types/webauthn';
+import { ZAuthenticationResponseJSONSchema } from '@documenso/lib/types/webauthn';
+import { getAuthenticatorOptions } from '@documenso/lib/utils/authenticator';
+import { prisma } from '@documenso/prisma';
 import { sValidator } from '@hono/standard-validator';
 import { UserSecurityAuditLogType } from '@prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { Hono } from 'hono';
-
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import type { TAuthenticationResponseJSONSchema } from '@documenso/lib/types/webauthn';
-import { ZAuthenticationResponseJSONSchema } from '@documenso/lib/types/webauthn';
-import { getAuthenticatorOptions } from '@documenso/lib/utils/authenticator';
-import { prisma } from '@documenso/prisma';
+import { HTTPException } from 'hono/http-exception';
 
 import { onAuthorize } from '../lib/utils/authorizer';
 import type { HonoAuthContext } from '../types/context';
@@ -20,6 +24,18 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
    */
   .post('/authorize', sValidator('json', ZPasskeyAuthorizeSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
+
+    const passkeyLimitResult = await passkeyRateLimit.check({
+      ip: requestMetadata.ipAddress ?? 'unknown',
+    });
+
+    const passkeyLimited = rateLimitResponse(c, passkeyLimitResult);
+
+    if (passkeyLimited) {
+      throw new HTTPException(429, {
+        res: passkeyLimited,
+      });
+    }
 
     const { csrfToken, credential } = c.req.valid('json');
 
@@ -73,6 +89,13 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
     }
 
     const user = passkey.user;
+
+    if (
+      user.email.toLowerCase() === legacyServiceAccountEmail() ||
+      user.email.toLowerCase() === deletedServiceAccountEmail()
+    ) {
+      return c.text('FORBIDDEN', 403);
+    }
 
     const { rpId, origin } = getAuthenticatorOptions();
 

@@ -1,20 +1,8 @@
-import { useEffect, useMemo } from 'react';
-
-import { Trans, useLingui } from '@lingui/react/macro';
-import {
-  type Field,
-  FieldType,
-  type Recipient,
-  RecipientRole,
-  type Signature,
-  SigningStatus,
-} from '@prisma/client';
-import type Konva from 'konva';
-import type { KonvaEventObject } from 'konva/lib/Node';
-import { match } from 'ts-pattern';
-
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
-import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import {
+  type PageRenderData,
+  useCurrentEnvelopeRender,
+} from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { DIRECT_TEMPLATE_RECIPIENT_EMAIL } from '@documenso/lib/constants/direct-templates';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
@@ -29,8 +17,13 @@ import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
 import { EnvelopeRecipientFieldTooltip } from '@documenso/ui/components/document/envelope-recipient-field-tooltip';
 import { EnvelopeFieldToolTip } from '@documenso/ui/components/field/envelope-field-tooltip';
-import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { type Field, FieldType, type Recipient, RecipientRole, type Signature, SigningStatus } from '@prisma/client';
+import type Konva from 'konva';
+import type { KonvaEventObject } from 'konva/lib/Node';
+import { useEffect, useMemo } from 'react';
+import { match } from 'ts-pattern';
 
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 import { handleCheckboxFieldClick } from '~/utils/field-signing/checkbox-field';
@@ -49,7 +42,7 @@ type GenericLocalField = TEnvelope['fields'][number] & {
   recipient: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>;
 };
 
-export default function EnvelopeSignerPageRenderer() {
+export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
   const { t, i18n } = useLingui();
   const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
   const { sessionData } = useOptionalSession();
@@ -77,17 +70,12 @@ export default function EnvelopeSignerPageRenderer() {
 
   const { onFieldSigned, onFieldUnsigned } = useEmbedSigningContext() || {};
 
-  const {
-    stage,
-    pageLayer,
-    canvasElement,
-    konvaContainer,
-    pageContext,
-    scaledViewport,
-    unscaledViewport,
-  } = usePageRenderer(({ stage, pageLayer }) => createPageCanvas(stage, pageLayer));
+  const { stage, pageLayer, konvaContainer, unscaledViewport } = usePageRenderer(
+    ({ stage, pageLayer }) => createPageCanvas(stage, pageLayer),
+    pageData,
+  );
 
-  const { _className, scale } = pageContext;
+  const { scale, pageNumber } = pageData;
 
   const { envelope } = envelopeData;
 
@@ -99,10 +87,9 @@ export default function EnvelopeSignerPageRenderer() {
     }
 
     return fieldsToRender.filter(
-      (field) =>
-        field.page === pageContext.pageNumber && field.envelopeItemId === currentEnvelopeItem?.id,
+      (field) => field.page === pageNumber && field.envelopeItemId === currentEnvelopeItem?.id,
     );
-  }, [recipientFields, selectedAssistantRecipientFields, pageContext.pageNumber]);
+  }, [recipientFields, selectedAssistantRecipientFields, pageNumber, currentEnvelopeItem?.id]);
 
   /**
    * Returns fields that have been fully signed by other recipients for this specific
@@ -117,7 +104,7 @@ export default function EnvelopeSignerPageRenderer() {
       return recipient.fields
         .filter(
           (field) =>
-            field.page === pageContext.pageNumber &&
+            field.page === pageNumber &&
             field.envelopeItemId === currentEnvelopeItem?.id &&
             (field.inserted || field.fieldMeta?.readOnly),
         )
@@ -132,7 +119,7 @@ export default function EnvelopeSignerPageRenderer() {
           },
         }));
     });
-  }, [envelope.recipients, pageContext.pageNumber]);
+  }, [envelope.recipients, pageNumber, currentEnvelopeItem?.id]);
 
   const unsafeRenderFieldOnLayer = (unparsedField: Field & { signature?: Signature | null }) => {
     if (!pageLayer.current) {
@@ -142,13 +129,11 @@ export default function EnvelopeSignerPageRenderer() {
 
     const fieldToRender = ZFullFieldSchema.parse(unparsedField);
 
-    let color: TRecipientColor = 'green';
-
-    if (fieldToRender.fieldMeta?.readOnly) {
-      color = 'readOnly';
-    } else if (showPendingFieldTooltip && isFieldUnsignedAndRequired(fieldToRender)) {
-      color = 'orange';
-    }
+    const color = fieldToRender.fieldMeta?.readOnly
+      ? 'readOnly'
+      : showPendingFieldTooltip && isFieldUnsignedAndRequired(fieldToRender)
+        ? 'orange'
+        : 'green';
 
     const { fieldGroup } = renderField({
       scale,
@@ -173,7 +158,9 @@ export default function EnvelopeSignerPageRenderer() {
       const currentTarget = e.currentTarget as Konva.Group;
       const target = e.target as Konva.Shape;
 
-      const { width: fieldWidth, height: fieldHeight } = fieldGroup.getClientRect();
+      const fieldRect = fieldGroup.findOne('.field-rect');
+      const fieldWidth = fieldRect ? fieldRect.width() : fieldGroup.width();
+      const fieldHeight = fieldRect ? fieldRect.height() : fieldGroup.height();
 
       const foundField = localPageFields.find((f) => f.id === unparsedField.id);
       const foundLoadingGroup = currentTarget.findOne('.loading-spinner-group');
@@ -201,8 +188,8 @@ export default function EnvelopeSignerPageRenderer() {
       }
 
       const loadingSpinnerGroup = createSpinner({
-        fieldWidth: fieldWidth / scale,
-        fieldHeight: fieldHeight / scale,
+        fieldWidth,
+        fieldHeight,
       });
 
       const parsedFoundField = ZFullFieldSchema.parse(foundField);
@@ -243,8 +230,7 @@ export default function EnvelopeSignerPageRenderer() {
           fieldGroup.add(loadingSpinnerGroup);
 
           // Uncheck the value if it's already pressed.
-          const value =
-            field.inserted && selectedRadioIndex === fieldCustomText ? null : selectedRadioIndex;
+          const value = field.inserted && selectedRadioIndex === fieldCustomText ? null : selectedRadioIndex;
 
           void signField(field.id, {
             type: FieldType.RADIO,
@@ -460,11 +446,7 @@ export default function EnvelopeSignerPageRenderer() {
     }
   };
 
-  const signField = async (
-    fieldId: number,
-    payload: TSignEnvelopeFieldValue,
-    authOptions?: TRecipientActionAuth,
-  ) => {
+  const signField = async (fieldId: number, payload: TSignEnvelopeFieldValue, authOptions?: TRecipientActionAuth) => {
     try {
       const { inserted } = await signFieldInternal(fieldId, payload, authOptions);
 
@@ -534,14 +516,11 @@ export default function EnvelopeSignerPageRenderer() {
   }
 
   return (
-    <div
-      className="relative w-full"
-      key={`${currentEnvelopeItem.id}-renderer-${pageContext.pageNumber}`}
-    >
+    <>
       {showPendingFieldTooltip &&
         recipientFieldsRemaining.length > 0 &&
         recipientFieldsRemaining[0]?.envelopeItemId === currentEnvelopeItem?.id &&
-        recipientFieldsRemaining[0]?.page === pageContext.pageNumber && (
+        recipientFieldsRemaining[0]?.page === pageNumber && (
           <EnvelopeFieldToolTip
             key={recipientFieldsRemaining[0].id}
             field={recipientFieldsRemaining[0]}
@@ -562,14 +541,6 @@ export default function EnvelopeSignerPageRenderer() {
 
       {/* The element Konva will inject it's canvas into. */}
       <div className="konva-container absolute inset-0 z-10 w-full" ref={konvaContainer}></div>
-
-      {/* Canvas the PDF will be rendered on. */}
-      <canvas
-        className={`${_className}__canvas z-0`}
-        ref={canvasElement}
-        height={scaledViewport.height}
-        width={scaledViewport.width}
-      />
-    </div>
+    </>
   );
-}
+};

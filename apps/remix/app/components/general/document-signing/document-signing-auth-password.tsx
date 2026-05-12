@@ -1,30 +1,19 @@
-import { useEffect, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
 import { AppError } from '@documenso/lib/errors/app-error';
 import { DocumentAuth, type TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { DialogFooter } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 
 export type DocumentSigningAuthPasswordProps = {
-  actionTarget?: 'FIELD' | 'DOCUMENT';
-  actionVerb?: string;
   open: boolean;
   onOpenChange: (value: boolean) => void;
   onReauthFormSubmit: (values?: TRecipientActionAuth) => Promise<void> | void;
@@ -40,8 +29,6 @@ const ZPasswordAuthFormSchema = z.object({
 type TPasswordAuthFormSchema = z.infer<typeof ZPasswordAuthFormSchema>;
 
 export const DocumentSigningAuthPassword = ({
-  actionTarget = 'FIELD',
-  actionVerb = 'sign',
   onReauthFormSubmit,
   open,
   onOpenChange,
@@ -103,9 +90,7 @@ export const DocumentSigningAuthPassword = ({
                   <Trans>Unauthorized</Trans>
                 </AlertTitle>
                 <AlertDescription>
-                  <Trans>
-                    We were unable to verify your details. Please try again or contact support
-                  </Trans>
+                  <Trans>We were unable to verify your details. Please try again or contact support</Trans>
                 </AlertDescription>
               </Alert>
             )}

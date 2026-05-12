@@ -1,0 +1,108 @@
+---
+title: Send Your First Document
+description: Upload a document, add recipients, and send for signing.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+## Prerequisites
+
+- A [Documenso account](/docs/users/getting-started/create-account).
+- A PDF document to send for signing.
+
+## Limitations
+
+- Maximum file size: 50MB (configurable for self-hosted)
+- Supported format: PDF only
+- Maximum 5 documents can be uploaded at once on standard plans
+
+## Send a Document
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Upload your document
+
+- Go to your [Documents dashboard](https://app.documenso.com/documents)
+- Click **Upload Document** in the top right
+- Select your PDF file or drag and drop it into the upload area
+
+![Documents dashboard showing the upload document button](/document-signing/documenso-documents-dashboard.webp)
+
+After uploading, you'll be taken to the document editor.
+
+![Document editor overview with the uploaded document](/document-signing/editor-overview.webp)
+
+</Step>
+
+<Step>
+### Add recipients
+
+In the editor, add the people who must take an action or receive a copy of the document.
+
+- Click **+ Add Signer**
+- Enter the recipient's email address and name
+- Select their role:
+  - **Signer** - Must sign the document
+  - **Approver** - Must approve (signature optional)
+  - **Viewer** - Must confirm they viewed it
+  - **CC** - Receives a copy after completion (no action required)
+
+Add additional recipients by clicking **+ Add Signer** again.
+
+![Adding recipients with email, name, and role options](/document-signing/editor-upload-recipients.webp)
+
+<Callout type="info">
+  Enable **Signing Order** if recipients need to sign in a specific sequence.
+</Callout>
+
+</Step>
+
+<Step>
+### Add signature fields
+
+Navigate to the **Add Fields** section. For each recipient:
+
+- Select the recipient in the right sidebar
+- Drag a **Signature** field onto the document where they should sign
+- Optionally add other fields like **Name**, **Date**, or **Initials**
+
+Fields are color-coded by recipient. Resize fields by dragging their corners.
+
+![Fields panel showing available field types like Signature, Name, Date, and more](/document-signing/documenso-document-fields.webp)
+
+<Callout type="info">At minimum, each signer needs one Signature field assigned to them.</Callout>
+
+</Step>
+
+<Step>
+### Send the document
+
+- Click **Send Document** in the left sidebar (or navigate to the Preview section)
+- Review that everything looks correct
+- Click **Send**
+
+Your document is now sent.
+
+</Step>
+</Steps>
+
+## What Happens Next
+
+1. **Recipients receive an email** with a link to sign the document
+2. **Recipients sign** by clicking the link and completing their assigned fields
+3. **You get notified** when each recipient completes their action
+4. **Everyone receives a copy** of the fully signed document once all signatures are collected
+
+![Email notification that recipients receive with a link to sign](/document-signing/documenso-sign-email.webp)
+
+You can track progress from your Documents dashboard. Click on any document to see which recipients have signed and which are pending.
+
+---
+
+## See Also
+
+- [Create Templates](/docs/users/templates/create) - Save time on documents you send repeatedly
+- [Direct Links](/docs/users/documents/direct-links) - Let recipients sign without email invitations
+- [Upload and Configure](/docs/users/documents/upload) - Customize document settings for more control

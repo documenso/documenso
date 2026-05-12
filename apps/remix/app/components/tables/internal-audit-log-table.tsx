@@ -1,18 +1,14 @@
+import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
+import { DOCUMENT_AUDIT_LOG_TYPE, type TDocumentAuditLog } from '@documenso/lib/types/document-audit-logs';
+import { formatDocumentAuditLogAction } from '@documenso/lib/utils/document-audit-logs';
+import { cn } from '@documenso/ui/lib/utils';
+import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import type { DateTimeFormatOptions } from 'luxon';
 import { DateTime } from 'luxon';
-import { P, match } from 'ts-pattern';
+import { match, P } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
-
-import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
-import {
-  DOCUMENT_AUDIT_LOG_TYPE,
-  type TDocumentAuditLog,
-} from '@documenso/lib/types/document-audit-logs';
-import { formatDocumentAuditLogAction } from '@documenso/lib/utils/document-audit-logs';
-import { cn } from '@documenso/ui/lib/utils';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
 
 export type AuditLogDataTableProps = {
   logs: TDocumentAuditLog[];
@@ -33,10 +29,7 @@ const getAuditLogIndicatorColor = (type: string) =>
     .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED, () => 'bg-red-500')
     .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT, () => 'bg-orange-500')
     .with(
-      P.union(
-        DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
-        DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED,
-      ),
+      P.union(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED, DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED),
       () => 'bg-blue-500',
     )
     .otherwise(() => 'bg-muted');
@@ -90,22 +83,20 @@ export const InternalAuditLogTable = ({ logs }: AuditLogDataTableProps) => {
               {/* Header Section with indicator, event type, and timestamp */}
               <div className="mb-3 flex items-start justify-between">
                 <div className="flex items-baseline gap-3">
-                  <div
-                    className={cn(`h-2 w-2 rounded-full`, getAuditLogIndicatorColor(log.type))}
-                  />
+                  <div className={cn(`h-2 w-2 rounded-full`, getAuditLogIndicatorColor(log.type))} />
 
                   <div>
-                    <div className="text-sm font-medium uppercase tracking-wide text-muted-foreground print:text-[8pt]">
+                    <div className="font-medium text-muted-foreground text-sm uppercase tracking-wide print:text-[8pt]">
                       {log.type.replace(/_/g, ' ')}
                     </div>
 
-                    <div className="text-sm font-medium text-foreground print:text-[8pt]">
+                    <div className="font-medium text-foreground text-sm print:text-[8pt]">
                       {formattedAction.description}
                     </div>
                   </div>
                 </div>
 
-                <div className="text-sm text-muted-foreground print:text-[8pt]">
+                <div className="text-muted-foreground text-sm print:text-[8pt]">
                   {DateTime.fromJSDate(log.createdAt)
                     .setLocale(APP_I18N_OPTIONS.defaultLocale)
                     .toLocaleString(dateFormat)}
@@ -117,15 +108,13 @@ export const InternalAuditLogTable = ({ logs }: AuditLogDataTableProps) => {
               {/* Details Section - Two column layout */}
               <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-xs print:text-[6pt]">
                 <div>
-                  <div className="font-medium uppercase tracking-wide text-muted-foreground/70">
-                    {_(msg`User`)}
-                  </div>
+                  <div className="font-medium text-muted-foreground/70 uppercase tracking-wide">{_(msg`User`)}</div>
 
                   <div className="mt-1 font-mono text-foreground">{log.email || 'N/A'}</div>
                 </div>
 
                 <div className="text-right">
-                  <div className="font-medium uppercase tracking-wide text-muted-foreground/70">
+                  <div className="font-medium text-muted-foreground/70 uppercase tracking-wide">
                     {_(msg`IP Address`)}
                   </div>
 
@@ -133,13 +122,11 @@ export const InternalAuditLogTable = ({ logs }: AuditLogDataTableProps) => {
                 </div>
 
                 <div className="col-span-2">
-                  <div className="font-medium uppercase tracking-wide text-muted-foreground/70">
+                  <div className="font-medium text-muted-foreground/70 uppercase tracking-wide">
                     {_(msg`User Agent`)}
                   </div>
 
-                  <div className="mt-1 text-foreground">
-                    {_(formatUserAgent(log.userAgent, userAgentInfo))}
-                  </div>
+                  <div className="mt-1 text-foreground">{_(formatUserAgent(log.userAgent, userAgentInfo))}</div>
                 </div>
               </div>
             </CardContent>

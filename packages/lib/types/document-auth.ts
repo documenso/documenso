@@ -148,10 +148,8 @@ export const ZDocumentAuthOptionsSchema = z.preprocess(
       };
     }
 
-    const globalAccessAuth =
-      'globalAccessAuth' in unknownValue ? processAuthValue(unknownValue.globalAccessAuth) : [];
-    const globalActionAuth =
-      'globalActionAuth' in unknownValue ? processAuthValue(unknownValue.globalActionAuth) : [];
+    const globalAccessAuth = 'globalAccessAuth' in unknownValue ? processAuthValue(unknownValue.globalAccessAuth) : [];
+    const globalActionAuth = 'globalActionAuth' in unknownValue ? processAuthValue(unknownValue.globalActionAuth) : [];
 
     return {
       globalAccessAuth,
@@ -176,10 +174,8 @@ export const ZRecipientAuthOptionsSchema = z.preprocess(
       };
     }
 
-    const accessAuth =
-      'accessAuth' in unknownValue ? processAuthValue(unknownValue.accessAuth) : [];
-    const actionAuth =
-      'actionAuth' in unknownValue ? processAuthValue(unknownValue.actionAuth) : [];
+    const accessAuth = 'accessAuth' in unknownValue ? processAuthValue(unknownValue.accessAuth) : [];
+    const actionAuth = 'actionAuth' in unknownValue ? processAuthValue(unknownValue.actionAuth) : [];
 
     return {
       accessAuth,

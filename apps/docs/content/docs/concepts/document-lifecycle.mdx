@@ -1,0 +1,97 @@
+---
+title: Document Lifecycle
+description: Track document progress through draft, pending, completed, and rejected states.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+## Document States
+
+A document can be in one of four states:
+
+| State         | Description                                                       |
+| ------------- | ----------------------------------------------------------------- |
+| **Draft**     | Document is being prepared and has not been sent                  |
+| **Pending**   | Document has been sent and is awaiting recipient actions          |
+| **Completed** | All recipients have completed their required actions              |
+| **Rejected**  | A recipient has rejected the document (when rejection is enabled) |
+
+## How a Document Moves Through States
+
+```mermaid
+flowchart LR
+    Draft -- Send --> Pending
+    Pending -- All recipients complete --> Completed
+    Pending -- Recipient rejects --> Rejected
+```
+
+## Draft
+
+When you upload a document or create one from a template, it starts in the **Draft** state. In this state, you can:
+
+- Add and remove recipients
+- Assign roles to recipients (signer, approver, viewer, CC)
+- Add, move, and configure fields
+- Set signing order
+- Configure document settings (expiration, reminders, rejection)
+- Delete the document
+
+A draft document is only visible to you (the owner) and team members with appropriate permissions. Recipients cannot see or access the document until you send it.
+
+**Transition:** A draft becomes **Pending** when you send it to recipients.
+
+## Pending
+
+Once sent, a document enters the **Pending** state. Recipients receive email notifications with links to view and complete their assigned actions.
+
+While pending, you can:
+
+- View recipient progress
+- Resend notifications to recipients
+- Void the document (cancels all pending actions)
+
+<Callout type="info">
+  You cannot modify the document content, recipients, or fields while it is pending.
+</Callout>
+
+**Transitions:**
+
+- Becomes **Completed** when all recipients finish their required actions
+- Becomes **Rejected** if any recipient rejects the document (requires rejection to be enabled)
+
+## Completed
+
+A document reaches the **Completed** state when all recipients have fulfilled their roles:
+
+- Signers have signed
+- Approvers have approved
+- Viewers have viewed (if view confirmation is required)
+
+At completion:
+
+- All parties receive a copy of the signed document
+- The document is sealed with a digital certificate
+- An audit log is attached showing all actions taken
+
+<Callout type="info">
+  Completed documents cannot be modified. You can download the signed PDF or view the audit trail.
+</Callout>
+
+## Rejected
+
+If you enable document rejection in settings, recipients can reject instead of signing. When any recipient rejects:
+
+- The document immediately moves to **Rejected** state
+- Other pending recipients can no longer act on the document
+- The document owner is notified
+
+<Callout type="info">
+  Rejected documents cannot be modified or reactivated. To proceed, you need to create a new
+  document.
+</Callout>
+
+## Related Concepts
+
+- [Recipient Roles](/docs/concepts/recipient-roles) - The different roles recipients can have
+- [Field Types](/docs/concepts/field-types) - Fields you can add to documents
+- [Signing Workflow](/docs/concepts/signing-workflow) - How the signing process works for recipients

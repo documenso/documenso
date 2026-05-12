@@ -1,11 +1,3 @@
-import { useEffect, useMemo, useState, useTransition } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { ChevronDownIcon, ChevronUpIcon, ChevronsUpDown, Loader } from 'lucide-react';
-import { Link } from 'react-router';
-
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import type { DateRange } from '@documenso/lib/types/search-params';
@@ -13,6 +5,12 @@ import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Input } from '@documenso/ui/primitives/input';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { ChevronDownIcon, ChevronsUpDown, ChevronUpIcon, Loader } from 'lucide-react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
+import { Link } from 'react-router';
 
 export type OrganisationOverview = {
   id: string;
@@ -56,10 +54,7 @@ export const AdminOrganisationOverviewTable = ({
     return [
       {
         header: () => (
-          <div
-            className="flex cursor-pointer items-center"
-            onClick={() => handleColumnSort('name')}
-          >
+          <div className="flex cursor-pointer items-center" onClick={() => handleColumnSort('name')}>
             {_(msg`Name`)}
             {sortBy === 'name' ? (
               sortOrder === 'asc' ? (
@@ -89,10 +84,7 @@ export const AdminOrganisationOverviewTable = ({
       },
       {
         header: () => (
-          <div
-            className="flex cursor-pointer items-center"
-            onClick={() => handleColumnSort('signingVolume')}
-          >
+          <div className="flex cursor-pointer items-center" onClick={() => handleColumnSort('signingVolume')}>
             <span className="whitespace-nowrap">
               <Trans>Document Volume</Trans>
             </span>
@@ -130,10 +122,7 @@ export const AdminOrganisationOverviewTable = ({
       {
         header: () => {
           return (
-            <div
-              className="flex cursor-pointer items-center"
-              onClick={() => handleColumnSort('createdAt')}
-            >
+            <div className="flex cursor-pointer items-center" onClick={() => handleColumnSort('createdAt')}>
               <span className="whitespace-nowrap">
                 <Trans>Created</Trans>
               </span>

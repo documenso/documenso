@@ -3,9 +3,9 @@ import { deleteAttachment } from '@documenso/lib/server-only/envelope-attachment
 import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';
 import {
+  deleteAttachmentMeta,
   ZDeleteAttachmentRequestSchema,
   ZDeleteAttachmentResponseSchema,
-  deleteAttachmentMeta,
 } from './delete-attachment.types';
 
 export const deleteAttachmentRoute = authenticatedProcedure

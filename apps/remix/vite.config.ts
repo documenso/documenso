@@ -1,9 +1,10 @@
+import { createRequire } from 'node:module';
+import path from 'node:path';
+import { defaultOptions as devServerDefaults } from '@hono/vite-dev-server';
 import { lingui } from '@lingui/vite-plugin';
 import { reactRouter } from '@react-router/dev/vite';
 import autoprefixer from 'autoprefixer';
 import serverAdapter from 'hono-react-router-adapter/vite';
-import { createRequire } from 'node:module';
-import path from 'node:path';
 import tailwindcss from 'tailwindcss';
 import { defineConfig, normalizePath } from 'vite';
 import macrosPlugin from 'vite-plugin-babel-macros';
@@ -46,6 +47,20 @@ export default defineConfig({
     tsconfigPaths(),
     serverAdapter({
       entry: 'server/router.ts',
+      getLoadContext: async () => {
+        const { getLoadContext } = await import('./server/load-context');
+        return getLoadContext();
+      },
+      exclude: [
+        // Spread the defaults but replace the /.css$/ rule so that Bull
+        // Board's static CSS at /api/jobs/board/static/** passes through to Hono.
+        ...devServerDefaults.exclude.map((pattern) =>
+          pattern instanceof RegExp && pattern.source === '.*\\.css$' ? /^(?!\/api\/jobs\/board\/).*\.css$/ : pattern,
+        ),
+        '/assets/**',
+        '/src/app/**',
+        /\?(?:inline|url|no-inline|raw|import(?:&(?:inline|url|no-inline|raw)?)?)$/,
+      ],
     }),
   ],
   ssr: {
@@ -58,6 +73,9 @@ export default defineConfig({
       'playwright',
       'playwright-core',
       '@playwright/browser-chromium',
+      'pdfjs-dist',
+      '@google-cloud/kms',
+      '@google-cloud/secret-manager',
     ],
   },
   optimizeDeps: {
@@ -71,19 +89,15 @@ export default defineConfig({
       'playwright',
       'playwright-core',
       '@playwright/browser-chromium',
+      'lightningcss',
+      'fsevents',
     ],
   },
   resolve: {
     alias: {
       https: 'node:https',
-      '.prisma/client/default': path.resolve(
-        __dirname,
-        '../../node_modules/.prisma/client/default.js',
-      ),
-      '.prisma/client/index-browser': path.resolve(
-        __dirname,
-        '../../node_modules/.prisma/client/index-browser.js',
-      ),
+      '.prisma/client/default': path.resolve(__dirname, '../../node_modules/.prisma/client/default.js'),
+      '.prisma/client/index-browser': path.resolve(__dirname, '../../node_modules/.prisma/client/index-browser.js'),
       canvas: path.resolve(__dirname, './app/types/empty-module.ts'),
     },
   },
@@ -98,6 +112,8 @@ export default defineConfig({
         '@napi-rs/canvas',
         '@node-rs/bcrypt',
         '@aws-sdk/cloudfront-signer',
+        '@google-cloud/kms',
+        '@google-cloud/secret-manager',
         'nodemailer',
         /playwright/,
         '@playwright/browser-chromium',
