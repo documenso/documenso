@@ -8,7 +8,7 @@ msgstr ""
 "Language: nl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-05-07 05:08\n"
+"PO-Revision-Date: 2026-05-11 09:07\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -65,7 +65,7 @@ msgstr "\"Team Name\" heeft je uitgenodigd om \"example document\" te onderteken
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "(line {0})"
-msgstr ""
+msgstr "(regel {0})"
 
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx
@@ -100,7 +100,7 @@ msgstr "{0, plural, one {# teken resterend} other {# tekens resterend}}"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "{0, plural, one {# CSS rule was dropped during sanitisation.} other {# CSS rules were dropped during sanitisation.}}"
-msgstr ""
+msgstr "{0, plural, one {# CSS-regel is verwijderd tijdens het opschonen.} other {# CSS-regels zijn verwijderd tijdens het opschonen.}}"
 
 #. placeholder {0}: folder._count.documents
 #: apps/remix/app/components/general/folder/folder-card.tsx
@@ -631,12 +631,14 @@ msgid "{visibleRows, plural, one {Showing # result.} other {Showing # results.}}
 msgstr "{visibleRows, plural, one {# resultaat wordt getoond.} other {# resultaten worden getoond.}}"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
-msgid ""
-"/* Write CSS targeting your signing pages. Selectors are scoped automatically. */\n"
+msgid "/* Write CSS targeting your signing pages. Selectors are scoped automatically. */\n"
 ".my-button {\n"
 "  background: red;\n"
 "}"
-msgstr ""
+msgstr "/* Schrijf CSS voor je ondertekenpagina&#39;s. Selectors worden automatisch gescopeerd. */\n"
+".my-button {\n"
+"  background: red;\n"
+"}"
 
 #. placeholder {0}: document.title
 #. placeholder {0}: envelope.title
@@ -1448,7 +1450,7 @@ msgstr "Alleen beheerders"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Advanced — Custom CSS"
-msgstr ""
+msgstr "Geavanceerd — Aangepaste CSS"
 
 #: packages/ui/primitives/document-flow/add-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
@@ -2196,7 +2198,7 @@ msgstr "Terug naar startpagina"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Background"
-msgstr ""
+msgstr "Achtergrond"
 
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "Background Color"
@@ -2221,11 +2223,11 @@ msgstr "Banner bijgewerkt"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Base background colour."
-msgstr ""
+msgstr "Standaard achtergrondkleur."
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Base text colour."
-msgstr ""
+msgstr "Standaard tekstkleur."
 
 #: packages/email/template-components/template-confirmation-email.tsx
 msgid "Before you get started, please confirm your email address by clicking the button below:"
@@ -2251,15 +2253,15 @@ msgstr "Blauw"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Border"
-msgstr ""
+msgstr "Rand"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Border Radius"
-msgstr ""
+msgstr "Afgeronde hoeken"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Border radius size in REM units (e.g. 0.5rem)."
-msgstr ""
+msgstr "Grootte van afgeronde hoeken in REM-eenheden (bijv. 0.5rem)."
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Bottom"
@@ -2267,7 +2269,7 @@ msgstr "Onder"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Brand Colours"
-msgstr ""
+msgstr "Merkkleuren"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Brand Details"
@@ -2312,7 +2314,7 @@ msgstr "Brandingvoorkeuren bijgewerkt"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Branding preferences updated with warnings"
-msgstr ""
+msgstr "Brandingvoorkeuren bijgewerkt met waarschuwingen"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Branding URL"
@@ -3345,7 +3347,7 @@ msgstr "Sjabloon wordt gemaakt"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "CSS rules were dropped during sanitisation"
-msgstr ""
+msgstr "CSS-regels zijn verwijderd tijdens het opschonen"
 
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "CSV Structure"
@@ -3390,7 +3392,7 @@ msgstr "Aangepast {0} MB-bestand"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Custom CSS is sanitised on save. Layout-breaking properties, remote URLs, and pseudo-elements are stripped automatically. Any rules dropped during sanitisation will be shown after you save."
-msgstr ""
+msgstr "Aangepaste CSS wordt opgeschoond bij het opslaan. Layout-verstorende eigenschappen, externe URL's en pseudo-elementen worden automatisch verwijderd. Alle regels die tijdens het opschonen zijn verwijderd, worden weergegeven nadat je hebt opgeslagen."
 
 #: packages/ui/components/document/expiration-period-picker.tsx
 msgid "Custom duration"
@@ -3406,7 +3408,7 @@ msgstr "Aangepaste organisatiegroepen"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Customise the colours used on your signing pages."
-msgstr ""
+msgstr "Pas de kleuren aan die op je ondertekenpagina's worden gebruikt."
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Dark Mode"
@@ -3459,7 +3461,7 @@ msgstr "Weigeren"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Default border colour."
-msgstr ""
+msgstr "Standaardrandkleur."
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Date Format"
@@ -5431,7 +5433,7 @@ msgstr "Filteren op status"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Focus ring colour."
-msgstr ""
+msgstr "Focusringkleur."
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
@@ -5493,7 +5495,7 @@ msgstr "Als de claim bijvoorbeeld een nieuwe flag \"FLAG_1\" op true heeft staan
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Foreground"
-msgstr ""
+msgstr "Voorgrond"
 
 #: apps/remix/app/routes/_unauthenticated+/check-email.tsx
 msgid "Forgot password"
@@ -7998,15 +8000,15 @@ msgstr "Bekijk een voorbeeld van hoe het ondertekende document eruitziet met pla
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Primary"
-msgstr ""
+msgstr "Primair"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Primary action colour."
-msgstr ""
+msgstr "Primaire actiekleur."
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Primary Foreground"
-msgstr ""
+msgstr "Primaire voorgrond"
 
 #: apps/remix/app/components/general/template/template-type.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
@@ -8762,7 +8764,7 @@ msgstr "Rechts"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Ring"
-msgstr ""
+msgstr "Ring"
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
@@ -9346,7 +9348,7 @@ msgstr "Document ondertekenen"
 
 #: apps/remix/app/routes/_recipient+/_layout.tsx
 msgid "Sign Document - Documenso"
-msgstr ""
+msgstr "Document ondertekenen - Documenso"
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "Sign Documents"
@@ -10319,7 +10321,7 @@ msgstr "Tekstkleur"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Text colour on primary buttons."
-msgstr ""
+msgstr "Tekstkleur op primaire knoppen."
 
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "Text is required"
@@ -13782,3 +13784,4 @@ msgstr "Uw verificatiecode:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
