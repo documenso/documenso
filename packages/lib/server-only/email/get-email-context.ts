@@ -61,7 +61,7 @@ type RecipientGetEmailContextOptions = BaseGetEmailContextOptions & {
 
 type GetEmailContextOptions = InternalGetEmailContextOptions | RecipientGetEmailContextOptions;
 
-type EmailContextResponse = {
+export type EmailContextResponse = {
   allowedEmails: OrganisationEmail[];
   branding: BrandingSettings;
   settings: Omit<OrganisationGlobalSettings, 'id'>;
