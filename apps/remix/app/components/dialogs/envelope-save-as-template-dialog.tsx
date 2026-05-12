@@ -1,9 +1,3 @@
-import { useState } from 'react';
-
-import { Trans, useLingui } from '@lingui/react/macro';
-import { Controller, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
-
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
@@ -20,21 +14,32 @@ import {
 } from '@documenso/ui/primitives/dialog';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router';
 
 import { useCurrentTeam } from '~/providers/team';
 
 type EnvelopeSaveAsTemplateDialogProps = {
   envelopeId: string;
   trigger?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 export const EnvelopeSaveAsTemplateDialog = ({
   envelopeId,
   trigger,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
 }: EnvelopeSaveAsTemplateDialogProps) => {
   const navigate = useNavigate();
 
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  const open = controlledOpen ?? internalOpen;
+  const setOpen = controlledOnOpenChange ?? setInternalOpen;
 
   const { toast } = useToast();
   const { t } = useLingui();
@@ -146,10 +151,7 @@ export const EnvelopeSaveAsTemplateDialog = ({
                   disabled={!includeRecipients}
                   onCheckedChange={(checked) => field.onChange(checked === true)}
                 />
-                <Label
-                  htmlFor="envelopeIncludeFields"
-                  className={!includeRecipients ? 'opacity-50' : ''}
-                >
+                <Label htmlFor="envelopeIncludeFields" className={!includeRecipients ? 'opacity-50' : ''}>
                   <Trans>Include Fields</Trans>
                 </Label>
               </div>

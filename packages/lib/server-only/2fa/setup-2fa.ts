@@ -1,9 +1,8 @@
-import { type User } from '@prisma/client';
+import { prisma } from '@documenso/prisma';
+import type { User } from '@prisma/client';
 import { base32 } from '@scure/base';
 import crypto from 'crypto';
 import { createTOTPKeyURI } from 'oslo/otp';
-
-import { prisma } from '@documenso/prisma';
 
 import { DOCUMENSO_ENCRYPTION_KEY } from '../../constants/crypto';
 import { symmetricEncrypt } from '../../universal/crypto';
@@ -14,9 +13,7 @@ type SetupTwoFactorAuthenticationOptions = {
 
 const ISSUER = 'Documenso';
 
-export const setupTwoFactorAuthentication = async ({
-  user,
-}: SetupTwoFactorAuthenticationOptions) => {
+export const setupTwoFactorAuthentication = async ({ user }: SetupTwoFactorAuthenticationOptions) => {
   const key = DOCUMENSO_ENCRYPTION_KEY;
 
   if (!key) {

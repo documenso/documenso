@@ -1,5 +1,18 @@
-import { useState } from 'react';
-
+import { useSession } from '@documenso/lib/client-only/providers/session';
+import type { TDocumentMany as TDocumentRow } from '@documenso/lib/types/document';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
+import { findRecipientByEmail } from '@documenso/lib/utils/recipients';
+import { formatDocumentsPath } from '@documenso/lib/utils/teams';
+import { trpc as trpcReact } from '@documenso/trpc/react';
+import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@documenso/ui/primitives/dropdown-menu';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -18,23 +31,8 @@ import {
   Share,
   Trash2,
 } from 'lucide-react';
+import { useState } from 'react';
 import { Link } from 'react-router';
-
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import type { TDocumentMany as TDocumentRow } from '@documenso/lib/types/document';
-import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
-import { findRecipientByEmail } from '@documenso/lib/utils/recipients';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { trpc as trpcReact } from '@documenso/trpc/react';
-import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@documenso/ui/primitives/dropdown-menu';
 
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
 import { EnvelopeDeleteDialog } from '~/components/dialogs/envelope-delete-dialog';
@@ -51,10 +49,7 @@ export type DocumentsTableActionDropdownProps = {
   onMoveDocument?: () => void;
 };
 
-export const DocumentsTableActionDropdown = ({
-  row,
-  onMoveDocument,
-}: DocumentsTableActionDropdownProps) => {
+export const DocumentsTableActionDropdown = ({ row, onMoveDocument }: DocumentsTableActionDropdownProps) => {
   const { user } = useSession();
   const team = useCurrentTeam();
 
@@ -62,6 +57,7 @@ export const DocumentsTableActionDropdown = ({
   const trpcUtils = trpcReact.useUtils();
 
   const [isRenameDialogOpen, setRenameDialogOpen] = useState(false);
+  const [isSaveAsTemplateDialogOpen, setSaveAsTemplateDialogOpen] = useState(false);
 
   const recipient = findRecipientByEmail({
     recipients: row.recipients,
@@ -151,7 +147,8 @@ export const DocumentsTableActionDropdown = ({
         <EnvelopeDownloadDialog
           envelopeId={row.envelopeId}
           envelopeStatus={row.status}
-          token={recipient?.token}
+          isLegacy={row.internalVersion === 1}
+          token={canManageDocument ? undefined : recipient?.token}
           trigger={
             <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
               <div>
@@ -175,17 +172,10 @@ export const DocumentsTableActionDropdown = ({
           }
         />
 
-        <EnvelopeSaveAsTemplateDialog
-          envelopeId={row.envelopeId}
-          trigger={
-            <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-              <div>
-                <FileOutputIcon className="mr-2 h-4 w-4" />
-                <Trans>Save as Template</Trans>
-              </div>
-            </DropdownMenuItem>
-          }
-        />
+        <DropdownMenuItem onClick={() => setSaveAsTemplateDialogOpen(true)}>
+          <FileOutputIcon className="mr-2 h-4 w-4" />
+          <Trans>Save as Template</Trans>
+        </DropdownMenuItem>
 
         {onMoveDocument && canManageDocument && (
           <DropdownMenuItem onClick={onMoveDocument} onSelect={(e) => e.preventDefault()}>
@@ -249,6 +239,12 @@ export const DocumentsTableActionDropdown = ({
           )}
         />
       </DropdownMenuContent>
+
+      <EnvelopeSaveAsTemplateDialog
+        envelopeId={row.envelopeId}
+        open={isSaveAsTemplateDialogOpen}
+        onOpenChange={setSaveAsTemplateDialogOpen}
+      />
 
       <EnvelopeRenameDialog
         id={row.envelopeId}

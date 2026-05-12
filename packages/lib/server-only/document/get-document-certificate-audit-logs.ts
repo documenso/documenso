@@ -7,9 +7,7 @@ export type GetDocumentCertificateAuditLogsOptions = {
   envelopeId: string;
 };
 
-export const getDocumentCertificateAuditLogs = async ({
-  envelopeId,
-}: GetDocumentCertificateAuditLogsOptions) => {
+export const getDocumentCertificateAuditLogs = async ({ envelopeId }: GetDocumentCertificateAuditLogsOptions) => {
   const rawAuditLogs = await prisma.documentAuditLog.findMany({
     where: {
       envelopeId,

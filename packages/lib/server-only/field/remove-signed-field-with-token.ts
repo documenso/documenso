@@ -1,10 +1,9 @@
-import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
-
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { assertRecipientNotExpired } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
+import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
 
 export type RemovedSignedFieldWithTokenOptions = {
   token: string;
@@ -38,6 +37,7 @@ export const removeSignedFieldWithToken = async ({
               signingStatus: {
                 not: SigningStatus.SIGNED,
               },
+              envelopeId: recipient.envelopeId,
             }),
       },
     },
@@ -59,10 +59,7 @@ export const removeSignedFieldWithToken = async ({
 
   assertRecipientNotExpired(recipient);
 
-  if (
-    recipient?.signingStatus === SigningStatus.SIGNED ||
-    field.recipient.signingStatus === SigningStatus.SIGNED
-  ) {
+  if (recipient?.signingStatus === SigningStatus.SIGNED || field.recipient.signingStatus === SigningStatus.SIGNED) {
     throw new Error(`Recipient ${recipient.id} has already signed`);
   }
 

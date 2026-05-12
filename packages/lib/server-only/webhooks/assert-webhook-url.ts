@@ -24,8 +24,7 @@ type TLookupFn = (
 
 const normalizeHostname = (hostname: string) => hostname.toLowerCase().replace(/\.+$/, '');
 
-const toAddressUrl = (address: string) =>
-  address.includes(':') ? `http://[${address}]` : `http://${address}`;
+const toAddressUrl = (address: string) => (address.includes(':') ? `http://[${address}]` : `http://${address}`);
 
 /**
  * Parse the NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS environment variable into

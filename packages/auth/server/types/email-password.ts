@@ -1,11 +1,8 @@
+import { ZNameSchema } from '@documenso/lib/constants/auth';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { z } from 'zod';
 
-import { zEmail } from '@documenso/lib/utils/zod';
-
-export const ZCurrentPasswordSchema = z
-  .string()
-  .min(6, { message: 'Must be at least 6 characters in length' })
-  .max(72);
+export const ZCurrentPasswordSchema = z.string().min(6, { message: 'Must be at least 6 characters in length' }).max(72);
 
 export const ZSignInSchema = z.object({
   email: zEmail().min(1),
@@ -13,6 +10,7 @@ export const ZSignInSchema = z.object({
   totpCode: z.string().trim().optional(),
   backupCode: z.string().trim().optional(),
   csrfToken: z.string().trim(),
+  captchaToken: z.string().trim().optional(),
 });
 
 export type TSignInSchema = z.infer<typeof ZSignInSchema>;
@@ -35,10 +33,11 @@ export const ZPasswordSchema = z
   });
 
 export const ZSignUpSchema = z.object({
-  name: z.string().min(1),
+  name: ZNameSchema,
   email: zEmail(),
   password: ZPasswordSchema,
   signature: z.string().nullish(),
+  captchaToken: z.string().trim().optional(),
 });
 
 export type TSignUpSchema = z.infer<typeof ZSignUpSchema>;

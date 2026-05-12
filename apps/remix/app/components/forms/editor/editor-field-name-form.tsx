@@ -1,9 +1,3 @@
-import { useEffect } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, useWatch } from 'react-hook-form';
-import type { z } from 'zod';
-
 import {
   DEFAULT_FIELD_FONT_SIZE,
   FIELD_DEFAULT_GENERIC_ALIGN,
@@ -11,11 +5,12 @@ import {
   ZNameFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { Form } from '@documenso/ui/primitives/form/form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import type { z } from 'zod';
 
-import {
-  EditorGenericFontSizeField,
-  EditorGenericTextAlignField,
-} from './editor-field-generic-field-forms';
+import { EditorGenericFontSizeField, EditorGenericTextAlignField } from './editor-field-generic-field-forms';
 
 const ZNameFieldFormSchema = ZNameFieldMeta.pick({
   fontSize: true,

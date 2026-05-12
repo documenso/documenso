@@ -1,16 +1,3 @@
-import { useLayoutEffect, useMemo, useState } from 'react';
-
-import { Trans } from '@lingui/react/macro';
-import { useLingui } from '@lingui/react/macro';
-import {
-  DocumentStatus,
-  EnvelopeType,
-  ReadStatus,
-  SendStatus,
-  SigningStatus,
-} from '@prisma/client';
-import { CheckCircle2Icon } from 'lucide-react';
-
 import { EnvelopeEditorProvider } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import type { SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
@@ -24,13 +11,16 @@ import {
 } from '@documenso/lib/types/envelope-editor';
 import type { TEnvelopeFieldAndMeta } from '@documenso/lib/types/field-meta';
 import { extractDerivedDocumentMeta } from '@documenso/lib/utils/document';
-import { buildEmbeddedFeatures } from '@documenso/lib/utils/embed-config';
-import { buildEmbeddedEditorOptions } from '@documenso/lib/utils/embed-config';
+import { buildEmbeddedEditorOptions, buildEmbeddedFeatures } from '@documenso/lib/utils/embed-config';
 import { prisma } from '@documenso/prisma';
 import { trpc } from '@documenso/trpc/react';
 import type { TCreateEnvelopePayload } from '@documenso/trpc/server/envelope-router/create-envelope.types';
 import { Spinner } from '@documenso/ui/primitives/spinner';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { DocumentStatus, EnvelopeType, ReadStatus, SendStatus, SigningStatus } from '@prisma/client';
+import { CheckCircle2Icon } from 'lucide-react';
+import { useLayoutEffect, useMemo, useState } from 'react';
 
 import { EnvelopeEditor } from '~/components/general/envelope-editor/envelope-editor';
 import { EnvelopeEditorRenderProviderWrapper } from '~/components/general/envelope-editor/envelope-editor-renderer-provider-wrapper';
@@ -97,17 +87,14 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
 export default function EmbeddingAuthoringEnvelopeCreatePage() {
   const [hasInitialized, setHasInitialized] = useState(false);
-  const [embedAuthoringOptions, setEmbedAuthoringOptions] =
-    useState<TEmbedCreateEnvelopeAuthoring | null>(null);
+  const [embedAuthoringOptions, setEmbedAuthoringOptions] = useState<TEmbedCreateEnvelopeAuthoring | null>(null);
 
   useLayoutEffect(() => {
     try {
       const hash = window.location.hash.slice(1);
 
       if (hash) {
-        const result = ZEmbedCreateEnvelopeAuthoringSchema.safeParse(
-          JSON.parse(decodeURIComponent(atob(hash))),
-        );
+        const result = ZEmbedCreateEnvelopeAuthoringSchema.safeParse(JSON.parse(decodeURIComponent(atob(hash))));
 
         if (result.success) {
           setEmbedAuthoringOptions({
@@ -147,8 +134,7 @@ type EnvelopeCreatePageProps = {
 };
 
 const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) => {
-  const { token, tokenUserId, tokenTeamId, teamSettings, organisationEmails } =
-    useSuperLoaderData<typeof loader>();
+  const { token, tokenUserId, tokenTeamId, teamSettings, organisationEmails } = useSuperLoaderData<typeof loader>();
 
   const { t } = useLingui();
   const { toast } = useToast();
@@ -156,8 +142,7 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
   const [isCreatingEnvelope, setIsCreatingEnvelope] = useState(false);
   const [createdEnvelope, setCreatedEnvelope] = useState<{ id: string } | null>(null);
 
-  const { mutateAsync: createEmbeddingEnvelope } =
-    trpc.embeddingPresign.createEmbeddingEnvelope.useMutation();
+  const { mutateAsync: createEmbeddingEnvelope } = trpc.embeddingPresign.createEmbeddingEnvelope.useMutation();
 
   const buildCreateEnvelopeRequest = (
     envelope: Omit<TEditorEnvelope, 'id'>,
@@ -298,6 +283,7 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
       mode: 'create' as const,
       onCreate: async (envelope: Omit<TEditorEnvelope, 'id'>) => createEmbeddedEnvelope(envelope),
       customBrandingLogo: Boolean(teamSettings.brandingEnabled && teamSettings.brandingLogo),
+      user: embedAuthoringOptions.user,
     }),
     [token],
   );
@@ -383,12 +369,12 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
   }, []);
 
   return (
-    <div className="min-w-screen relative min-h-screen">
+    <div className="relative min-h-screen min-w-screen">
       {isCreatingEnvelope && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background">
           <Spinner />
 
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-2 text-muted-foreground text-sm">
             {initialEnvelope.type === EnvelopeType.DOCUMENT ? (
               <Trans>Creating Document</Trans>
             ) : (
@@ -403,7 +389,7 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
           <div className="mx-auto w-full max-w-md text-center">
             <CheckCircle2Icon className="mx-auto h-16 w-16 text-primary" />
 
-            <h1 className="mt-6 text-2xl font-bold">
+            <h1 className="mt-6 font-bold text-2xl">
               {initialEnvelope.type === EnvelopeType.TEMPLATE ? (
                 <Trans>Template Created</Trans>
               ) : (

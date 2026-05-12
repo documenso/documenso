@@ -1,24 +1,4 @@
-import { useState } from 'react';
-
-import { Trans } from '@lingui/react/macro';
-import {
-  DocumentStatus,
-  EnvelopeType,
-  type Recipient,
-  type TemplateDirectLink,
-} from '@prisma/client';
-import {
-  Copy,
-  Edit,
-  FolderIcon,
-  MoreHorizontal,
-  Pencil,
-  Share2Icon,
-  Trash2,
-  Upload,
-} from 'lucide-react';
-import { Link } from 'react-router';
-
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import {
   DropdownMenu,
@@ -27,8 +7,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
+import { Trans } from '@lingui/react/macro';
+import { DocumentStatus, EnvelopeType, type TemplateDirectLink } from '@prisma/client';
+import { Copy, Download, Edit, FolderIcon, MoreHorizontal, Pencil, Share2Icon, Trash2, Upload } from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router';
 
 import { EnvelopeDeleteDialog } from '../dialogs/envelope-delete-dialog';
+import { EnvelopeDownloadDialog } from '../dialogs/envelope-download-dialog';
 import { EnvelopeDuplicateDialog } from '../dialogs/envelope-duplicate-dialog';
 import { EnvelopeRenameDialog } from '../dialogs/envelope-rename-dialog';
 import { TemplateBulkSendDialog } from '../dialogs/template-bulk-send-dialog';
@@ -44,7 +30,7 @@ export type TemplatesTableActionDropdownProps = {
     folderId?: string | null;
     envelopeId: string;
     directLink?: Pick<TemplateDirectLink, 'token' | 'enabled'> | null;
-    recipients: Recipient[];
+    recipients: TRecipientLite[];
   };
   templateRootPath: string;
   teamId: number;
@@ -76,87 +62,94 @@ export const TemplatesTableActionDropdown = ({
       <DropdownMenuContent className="w-52" align="start" forceMount>
         <DropdownMenuLabel>Action</DropdownMenuLabel>
 
-        <DropdownMenuItem disabled={!canMutate} asChild>
-          <Link to={formatPath}>
-            <Edit className="mr-2 h-4 w-4" />
-            <Trans>Edit</Trans>
-          </Link>
-        </DropdownMenuItem>
-
-        {canMutate && (
-          <DropdownMenuItem onClick={() => setRenameDialogOpen(true)}>
-            <Pencil className="mr-2 h-4 w-4" />
-            <Trans>Rename</Trans>
-          </DropdownMenuItem>
-        )}
-
-        {canMutate && (
-          <EnvelopeDuplicateDialog
-            envelopeId={row.envelopeId}
-            envelopeType={EnvelopeType.TEMPLATE}
-            trigger={
-              <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-                <div>
-                  <Copy className="mr-2 h-4 w-4" />
-                  <Trans>Duplicate</Trans>
-                </div>
-              </DropdownMenuItem>
-            }
-          />
-        )}
-
-        {canMutate && (
-          <TemplateDirectLinkDialog
-            templateId={row.id}
-            recipients={row.recipients}
-            directLink={row.directLink}
-            trigger={
-              <div
-                data-testid="template-direct-link"
-                className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground"
-              >
-                <Share2Icon className="mr-2 h-4 w-4" />
-                <Trans>Direct link</Trans>
+        <EnvelopeDownloadDialog
+          envelopeId={row.envelopeId}
+          envelopeStatus={DocumentStatus.DRAFT}
+          trigger={
+            <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+              <div>
+                <Download className="mr-2 h-4 w-4" />
+                <Trans>Download</Trans>
               </div>
-            }
-          />
-        )}
-
-        <DropdownMenuItem disabled={!canMutate} onClick={() => setMoveToFolderDialogOpen(true)}>
-          <FolderIcon className="mr-2 h-4 w-4" />
-          <Trans>Move to Folder</Trans>
-        </DropdownMenuItem>
+            </DropdownMenuItem>
+          }
+        />
 
         {canMutate && (
-          <TemplateBulkSendDialog
-            templateId={row.id}
-            recipients={row.recipients}
-            trigger={
-              <div className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground">
-                <Upload className="mr-2 h-4 w-4" />
-                <Trans>Bulk Send via CSV</Trans>
-              </div>
-            }
-          />
-        )}
+          <>
+            <DropdownMenuItem asChild>
+              <Link to={formatPath}>
+                <Edit className="mr-2 h-4 w-4" />
+                <Trans>Edit</Trans>
+              </Link>
+            </DropdownMenuItem>
 
-        {canMutate && (
-          <EnvelopeDeleteDialog
-            id={row.envelopeId}
-            type={EnvelopeType.TEMPLATE}
-            status={DocumentStatus.DRAFT}
-            title={row.title}
-            canManageDocument={canMutate}
-            onDelete={onDelete}
-            trigger={
-              <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-                <div>
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  <Trans>Delete</Trans>
+            <DropdownMenuItem onClick={() => setRenameDialogOpen(true)}>
+              <Pencil className="mr-2 h-4 w-4" />
+              <Trans>Rename</Trans>
+            </DropdownMenuItem>
+
+            <EnvelopeDuplicateDialog
+              envelopeId={row.envelopeId}
+              envelopeType={EnvelopeType.TEMPLATE}
+              trigger={
+                <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+                  <div>
+                    <Copy className="mr-2 h-4 w-4" />
+                    <Trans>Duplicate</Trans>
+                  </div>
+                </DropdownMenuItem>
+              }
+            />
+
+            <TemplateDirectLinkDialog
+              templateId={row.id}
+              recipients={row.recipients}
+              directLink={row.directLink}
+              trigger={
+                <div
+                  data-testid="template-direct-link"
+                  className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground"
+                >
+                  <Share2Icon className="mr-2 h-4 w-4" />
+                  <Trans>Direct link</Trans>
                 </div>
-              </DropdownMenuItem>
-            }
-          />
+              }
+            />
+
+            <DropdownMenuItem onClick={() => setMoveToFolderDialogOpen(true)}>
+              <FolderIcon className="mr-2 h-4 w-4" />
+              <Trans>Move to Folder</Trans>
+            </DropdownMenuItem>
+
+            <TemplateBulkSendDialog
+              templateId={row.id}
+              recipients={row.recipients}
+              trigger={
+                <div className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground">
+                  <Upload className="mr-2 h-4 w-4" />
+                  <Trans>Bulk Send via CSV</Trans>
+                </div>
+              }
+            />
+
+            <EnvelopeDeleteDialog
+              id={row.envelopeId}
+              type={EnvelopeType.TEMPLATE}
+              status={DocumentStatus.DRAFT}
+              title={row.title}
+              canManageDocument={canMutate}
+              onDelete={onDelete}
+              trigger={
+                <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+                  <div>
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    <Trans>Delete</Trans>
+                  </div>
+                </DropdownMenuItem>
+              }
+            />
+          </>
         )}
       </DropdownMenuContent>
 

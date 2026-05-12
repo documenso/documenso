@@ -71,3 +71,6 @@ scripts/bench-*
 
 # tmp
 tmp/
+
+# opencode
+.opencode/package-lock.json

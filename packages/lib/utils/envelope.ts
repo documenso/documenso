@@ -1,11 +1,5 @@
 import type { Envelope, Recipient } from '@prisma/client';
-import {
-  DocumentStatus,
-  EnvelopeType,
-  RecipientRole,
-  SendStatus,
-  SigningStatus,
-} from '@prisma/client';
+import { DocumentStatus, EnvelopeType, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
@@ -53,10 +47,7 @@ export type EnvelopeIdsOptions =
  *
  * This is UNSAFE because does not validate access, it just builds the query for ID and TYPE.
  */
-export const unsafeBuildEnvelopeIdQuery = (
-  options: EnvelopeIdOptions,
-  expectedEnvelopeType: EnvelopeType | null,
-) => {
+export const unsafeBuildEnvelopeIdQuery = (options: EnvelopeIdOptions, expectedEnvelopeType: EnvelopeType | null) => {
   return match(options)
     .with({ type: 'envelopeId' }, (value) => {
       const parsed = ZEnvelopeIdSchema.safeParse(value.id);
@@ -112,10 +103,7 @@ export const unsafeBuildEnvelopeIdQuery = (
  *
  * @throws AppError if any ID is invalid or if the array exceeds the maximum limit
  */
-export const unsafeBuildEnvelopeIdsQuery = (
-  options: EnvelopeIdsOptions,
-  expectedEnvelopeType: EnvelopeType | null,
-) => {
+export const unsafeBuildEnvelopeIdsQuery = (options: EnvelopeIdsOptions, expectedEnvelopeType: EnvelopeType | null) => {
   if (!options.ids || options.ids.length === 0) {
     throw new AppError(AppErrorCode.INVALID_BODY, {
       message: 'At least one ID is required',
@@ -252,7 +240,7 @@ export type EnvelopeItemPermissions = {
 
 export const getEnvelopeItemPermissions = (
   envelope: Pick<Envelope, 'completedAt' | 'deletedAt' | 'type' | 'status'>,
-  recipients: Recipient[],
+  recipients: Pick<Recipient, 'role' | 'signingStatus' | 'sendStatus'>[],
 ): EnvelopeItemPermissions => {
   // Always reject completed/rejected/deleted envelopes.
   if (

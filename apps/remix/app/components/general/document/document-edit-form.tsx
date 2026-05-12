@@ -1,17 +1,6 @@
-import { useEffect, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { DocumentDistributionMethod, DocumentStatus } from '@prisma/client';
-import { useNavigate, useSearchParams } from 'react-router';
-import { z } from 'zod';
-
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
-import {
-  DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-  SKIP_QUERY_BATCH_META,
-} from '@documenso/lib/constants/trpc';
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION, SKIP_QUERY_BATCH_META } from '@documenso/lib/constants/trpc';
 import type { TDocument } from '@documenso/lib/types/document';
 import { ZDocumentAccessAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
@@ -30,6 +19,12 @@ import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flo
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { DocumentDistributionMethod, DocumentStatus } from '@prisma/client';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router';
+import { z } from 'zod';
 
 import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 import { useCurrentTeam } from '~/providers/team';
@@ -43,11 +38,7 @@ export type DocumentEditFormProps = {
 type EditDocumentStep = 'settings' | 'signers' | 'fields' | 'subject';
 const EditDocumentSteps: EditDocumentStep[] = ['settings', 'signers', 'fields', 'subject'];
 
-export const DocumentEditForm = ({
-  className,
-  initialDocument,
-  documentRootPath,
-}: DocumentEditFormProps) => {
+export const DocumentEditForm = ({ className, initialDocument, documentRootPath }: DocumentEditFormProps) => {
   const { toast } = useToast();
   const { _ } = useLingui();
 
@@ -163,9 +154,7 @@ export const DocumentEditForm = ({
   const saveSettingsData = async (data: TAddSettingsFormSchema) => {
     const { timezone, dateFormat, redirectUrl, language, signatureTypes } = data.meta;
 
-    const parsedGlobalAccessAuth = z
-      .array(ZDocumentAccessAuthTypesSchema)
-      .safeParse(data.globalAccessAuth);
+    const parsedGlobalAccessAuth = z.array(ZDocumentAccessAuthTypesSchema).safeParse(data.globalAccessAuth);
 
     return updateDocument({
       documentId: document.id,
@@ -343,8 +332,7 @@ export const DocumentEditForm = ({
   };
 
   const saveSubjectData = async (data: TAddSubjectFormSchema) => {
-    const { subject, message, distributionMethod, emailId, emailReplyTo, emailSettings } =
-      data.meta;
+    const { subject, message, distributionMethod, emailId, emailReplyTo, emailSettings } = data.meta;
 
     return updateDocument({
       documentId: document.id,
@@ -360,8 +348,7 @@ export const DocumentEditForm = ({
   };
 
   const sendDocumentWithSubject = async (data: TAddSubjectFormSchema) => {
-    const { subject, message, distributionMethod, emailId, emailReplyTo, emailSettings } =
-      data.meta;
+    const { subject, message, distributionMethod, emailId, emailReplyTo, emailSettings } = data.meta;
 
     return sendDocument({
       documentId: document.id,
@@ -436,10 +423,7 @@ export const DocumentEditForm = ({
 
   return (
     <div className={cn('grid w-full grid-cols-12 gap-8', className)}>
-      <Card
-        className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7"
-        gradient
-      >
+      <Card className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7" gradient>
         <CardContent className="p-2">
           <PDFViewerLazy
             key={document.envelopeItems[0]?.id}
@@ -458,10 +442,7 @@ export const DocumentEditForm = ({
       </Card>
 
       <div className="col-span-12 lg:col-span-6 xl:col-span-5">
-        <DocumentFlowFormContainer
-          className="lg:h-[calc(100vh-6rem)]"
-          onSubmit={(e) => e.preventDefault()}
-        >
+        <DocumentFlowFormContainer className="lg:h-[calc(100vh-6rem)]" onSubmit={(e) => e.preventDefault()}>
           <Stepper
             currentStep={currentDocumentFlow.stepIndex}
             setCurrentStep={(step) => setStep(EditDocumentSteps[step - 1])}

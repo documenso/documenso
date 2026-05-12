@@ -1,8 +1,3 @@
-import { useLayoutEffect, useState } from 'react';
-
-import { useLingui } from '@lingui/react';
-import { useNavigate } from 'react-router';
-
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import {
   type TBaseEmbedAuthoringSchema,
@@ -12,6 +7,9 @@ import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { trpc } from '@documenso/trpc/react';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { useLingui } from '@lingui/react';
+import { useLayoutEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 
 import { ConfigureDocumentProvider } from '~/components/embed/authoring/configure-document-context';
 import { ConfigureDocumentView } from '~/components/embed/authoring/configure-document-view';
@@ -31,8 +29,7 @@ export default function EmbeddingAuthoringDocumentCreatePage() {
   const [externalId, setExternalId] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
 
-  const { mutateAsync: createEmbeddingDocument } =
-    trpc.embeddingPresign.createEmbeddingDocument.useMutation();
+  const { mutateAsync: createEmbeddingDocument } = trpc.embeddingPresign.createEmbeddingDocument.useMutation();
 
   const handleConfigurePageViewSubmit = (data: TConfigureEmbedFormSchema) => {
     // Store the configuration data and move to the field placement stage
@@ -77,12 +74,9 @@ export default function EmbeddingAuthoringDocumentCreatePage() {
         externalId: documentExternalId,
         meta: {
           ...configuration.meta,
-          drawSignatureEnabled:
-            signatureTypes.length === 0 || signatureTypes.includes(DocumentSignatureType.DRAW),
-          typedSignatureEnabled:
-            signatureTypes.length === 0 || signatureTypes.includes(DocumentSignatureType.TYPE),
-          uploadSignatureEnabled:
-            signatureTypes.length === 0 || signatureTypes.includes(DocumentSignatureType.UPLOAD),
+          drawSignatureEnabled: signatureTypes.length === 0 || signatureTypes.includes(DocumentSignatureType.DRAW),
+          typedSignatureEnabled: signatureTypes.length === 0 || signatureTypes.includes(DocumentSignatureType.TYPE),
+          uploadSignatureEnabled: signatureTypes.length === 0 || signatureTypes.includes(DocumentSignatureType.UPLOAD),
         },
         recipients: configuration.signers.map((signer) => ({
           name: signer.name,
@@ -140,9 +134,7 @@ export default function EmbeddingAuthoringDocumentCreatePage() {
     try {
       const hash = window.location.hash.slice(1);
 
-      const result = ZBaseEmbedAuthoringSchema.safeParse(
-        JSON.parse(decodeURIComponent(atob(hash))),
-      );
+      const result = ZBaseEmbedAuthoringSchema.safeParse(JSON.parse(decodeURIComponent(atob(hash))));
 
       if (!result.success) {
         return;
@@ -163,10 +155,7 @@ export default function EmbeddingAuthoringDocumentCreatePage() {
     <div className="relative mx-auto flex min-h-[100dvh] max-w-screen-lg p-6">
       <ConfigureDocumentProvider isTemplate={false} features={features ?? {}}>
         <Stepper currentStep={currentStep} setCurrentStep={setCurrentStep}>
-          <ConfigureDocumentView
-            defaultValues={configuration ?? undefined}
-            onSubmit={handleConfigurePageViewSubmit}
-          />
+          <ConfigureDocumentView defaultValues={configuration ?? undefined} onSubmit={handleConfigurePageViewSubmit} />
 
           <ConfigureFieldsView
             configData={configuration!}

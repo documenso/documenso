@@ -1,43 +1,14 @@
-import { useEffect, useState } from 'react';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import {
-  DocumentDistributionMethod,
-  DocumentVisibility,
-  EnvelopeType,
-  RecipientRole,
-  SendStatus,
-  TemplateType,
-} from '@prisma/client';
-import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { InfoIcon, MailIcon, SettingsIcon, ShieldIcon } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { match } from 'ts-pattern';
-import { z } from 'zod';
-
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
-import {
-  DOCUMENT_DISTRIBUTION_METHODS,
-  DOCUMENT_SIGNATURE_TYPES,
-} from '@documenso/lib/constants/document';
+import { DOCUMENT_DISTRIBUTION_METHODS, DOCUMENT_SIGNATURE_TYPES } from '@documenso/lib/constants/document';
 import { ZEnvelopeExpirationPeriod } from '@documenso/lib/constants/envelope-expiration';
-import {
-  SUPPORTED_LANGUAGES,
-  SUPPORTED_LANGUAGE_CODES,
-  isValidLanguageCode,
-} from '@documenso/lib/constants/i18n';
+import { ZEnvelopeReminderSettings } from '@documenso/lib/constants/envelope-reminder';
+import { isValidLanguageCode, SUPPORTED_LANGUAGE_CODES, SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError } from '@documenso/lib/errors/app-error';
-import {
-  ZDocumentAccessAuthTypesSchema,
-  ZDocumentActionAuthTypesSchema,
-} from '@documenso/lib/types/document-auth';
+import { ZDocumentAccessAuthTypesSchema, ZDocumentActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import {
   type TDocumentMetaDateFormat,
@@ -46,11 +17,7 @@ import {
 } from '@documenso/lib/types/document-meta';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
-import {
-  DocumentSignatureType,
-  canAccessTeamDocument,
-  extractTeamSignatureSettings,
-} from '@documenso/lib/utils/teams';
+import { canAccessTeamDocument, DocumentSignatureType, extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc } from '@documenso/trpc/react';
 import { DocumentEmailCheckboxes } from '@documenso/ui/components/document/document-email-checkboxes';
@@ -69,10 +36,8 @@ import {
   DocumentVisibilityTooltip,
 } from '@documenso/ui/components/document/document-visibility-select';
 import { ExpirationPeriodPicker } from '@documenso/ui/components/document/expiration-period-picker';
-import {
-  TemplateTypeSelect,
-  TemplateTypeTooltip,
-} from '@documenso/ui/components/template/template-type-select';
+import { ReminderSettingsPicker } from '@documenso/ui/components/document/reminder-settings-picker';
+import { TemplateTypeSelect, TemplateTypeTooltip } from '@documenso/ui/components/template/template-type-select';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { CardDescription, CardHeader, CardTitle } from '@documenso/ui/primitives/card';
@@ -85,26 +50,30 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import {
+  DocumentDistributionMethod,
+  DocumentVisibility,
+  EnvelopeType,
+  RecipientRole,
+  SendStatus,
+  TemplateType,
+} from '@prisma/client';
+import type * as DialogPrimitive from '@radix-ui/react-dialog';
+import { BellRingIcon, InfoIcon, MailIcon, SettingsIcon, ShieldIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
+import { z } from 'zod';
 
 import { useCurrentTeam } from '~/providers/team';
 
@@ -123,16 +92,12 @@ export const ZAddSettingsFormSchema = z.object({
     message: z.string(),
     timezone: ZDocumentMetaTimezoneSchema.default(DEFAULT_DOCUMENT_TIME_ZONE),
     dateFormat: ZDocumentMetaDateFormatSchema.default(DEFAULT_DOCUMENT_DATE_FORMAT),
-    distributionMethod: z
-      .nativeEnum(DocumentDistributionMethod)
-      .optional()
-      .default(DocumentDistributionMethod.EMAIL),
+    distributionMethod: z.nativeEnum(DocumentDistributionMethod).optional().default(DocumentDistributionMethod.EMAIL),
     redirectUrl: z
       .string()
       .optional()
       .refine((value) => value === undefined || value === '' || isValidRedirectUrl(value), {
-        message:
-          'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
+        message: 'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
       }),
     language: z
       .union([z.string(), z.enum(SUPPORTED_LANGUAGE_CODES)])
@@ -145,10 +110,11 @@ export const ZAddSettingsFormSchema = z.object({
       message: msg`At least one signature type must be enabled`.id,
     }),
     envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullish(),
+    reminderSettings: ZEnvelopeReminderSettings.nullish(),
   }),
 });
 
-type EnvelopeEditorSettingsTabType = 'general' | 'email' | 'security';
+type EnvelopeEditorSettingsTabType = 'general' | 'reminders' | 'email' | 'security';
 
 const tabs = [
   {
@@ -156,6 +122,12 @@ const tabs = [
     title: msg`General`,
     icon: SettingsIcon,
     description: msg`Configure document settings and options before sending.`,
+  },
+  {
+    id: 'reminders',
+    title: msg`Reminders`,
+    icon: BellRingIcon,
+    description: msg`Configure signing reminder settings for the document.`,
   },
   {
     id: 'email',
@@ -177,15 +149,11 @@ type EnvelopeEditorSettingsDialogProps = {
   trigger?: React.ReactNode;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
-export const EnvelopeEditorSettingsDialog = ({
-  trigger,
-  ...props
-}: EnvelopeEditorSettingsDialogProps) => {
+export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEditorSettingsDialogProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
 
-  const { envelope, updateEnvelopeAsync, editorConfig, isEmbedded, organisationEmails } =
-    useCurrentEnvelopeEditor();
+  const { envelope, updateEnvelopeAsync, editorConfig, isEmbedded, organisationEmails } = useCurrentEnvelopeEditor();
 
   const { settings } = editorConfig;
 
@@ -211,10 +179,8 @@ export const EnvelopeEditorSettingsDialog = ({
         message: envelope.documentMeta.message ?? '',
         timezone: envelope.documentMeta.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        dateFormat: (envelope.documentMeta.dateFormat ??
-          DEFAULT_DOCUMENT_DATE_FORMAT) as TDocumentMetaDateFormat,
-        distributionMethod:
-          envelope.documentMeta.distributionMethod || DocumentDistributionMethod.EMAIL,
+        dateFormat: (envelope.documentMeta.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT) as TDocumentMetaDateFormat,
+        distributionMethod: envelope.documentMeta.distributionMethod || DocumentDistributionMethod.EMAIL,
         redirectUrl: envelope.documentMeta.redirectUrl ?? '',
         language: envelope.documentMeta.language ?? 'en',
         emailId: envelope.documentMeta.emailId ?? null,
@@ -222,6 +188,7 @@ export const EnvelopeEditorSettingsDialog = ({
         emailSettings: ZDocumentEmailSettingsSchema.parse(envelope.documentMeta.emailSettings),
         signatureTypes: extractTeamSignatureSettings(envelope.documentMeta),
         envelopeExpirationPeriod: envelope.documentMeta?.envelopeExpirationPeriod ?? null,
+        reminderSettings: envelope.documentMeta?.reminderSettings ?? null,
       },
     };
   };
@@ -234,23 +201,21 @@ export const EnvelopeEditorSettingsDialog = ({
   const envelopeHasBeenSent =
     envelope.type === EnvelopeType.DOCUMENT &&
     envelope.recipients.some(
-      (recipient) =>
-        recipient.role !== RecipientRole.CC && recipient.sendStatus === SendStatus.SENT,
+      (recipient) => recipient.role !== RecipientRole.CC && recipient.sendStatus === SendStatus.SENT,
     );
 
   const emailSettings = form.watch('meta.emailSettings');
 
-  const { data: emailData, isLoading: isLoadingEmails } =
-    trpc.enterprise.organisation.email.find.useQuery(
-      {
-        organisationId: organisation.id,
-        perPage: 100,
-      },
-      {
-        ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-        enabled: Boolean(organisationEmails !== undefined && organisation.id),
-      },
-    );
+  const { data: emailData, isLoading: isLoadingEmails } = trpc.enterprise.organisation.email.find.useQuery(
+    {
+      organisationId: organisation.id,
+      perPage: 100,
+    },
+    {
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+      enabled: Boolean(organisationEmails !== undefined && organisation.id),
+    },
+  );
 
   const emails = emailData?.data || organisationEmails || [];
 
@@ -270,11 +235,10 @@ export const EnvelopeEditorSettingsDialog = ({
       subject,
       emailReplyTo,
       envelopeExpirationPeriod,
+      reminderSettings,
     } = data.meta;
 
-    const parsedGlobalAccessAuth = z
-      .array(ZDocumentAccessAuthTypesSchema)
-      .safeParse(data.globalAccessAuth);
+    const parsedGlobalAccessAuth = z.array(ZDocumentAccessAuthTypesSchema).safeParse(data.globalAccessAuth);
 
     try {
       await updateEnvelopeAsync({
@@ -300,6 +264,7 @@ export const EnvelopeEditorSettingsDialog = ({
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
           envelopeExpirationPeriod,
+          reminderSettings,
         },
       });
 
@@ -326,11 +291,7 @@ export const EnvelopeEditorSettingsDialog = ({
   };
 
   useEffect(() => {
-    if (
-      !form.formState.touchedFields.meta?.timezone &&
-      !envelopeHasBeenSent &&
-      !envelope.documentMeta.timezone
-    ) {
+    if (!form.formState.touchedFields.meta?.timezone && !envelopeHasBeenSent && !envelope.documentMeta.timezone) {
       form.setValue('meta.timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
     }
   }, [
@@ -353,11 +314,7 @@ export const EnvelopeEditorSettingsDialog = ({
   }
 
   return (
-    <Dialog
-      {...props}
-      open={open}
-      onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
-    >
+    <Dialog {...props} open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
         {trigger ?? (
           <Button className="flex-shrink-0" variant="secondary">
@@ -366,7 +323,7 @@ export const EnvelopeEditorSettingsDialog = ({
         )}
       </DialogTrigger>
 
-      <DialogContent className="flex w-full !max-w-5xl flex-row gap-0 p-0">
+      <DialogContent className="!max-w-5xl flex w-full flex-row gap-0 p-0">
         {/* Sidebar. */}
         <div className="flex w-80 flex-col border-r bg-accent/20">
           <DialogHeader className="p-6 pb-4" data-testid="envelope-editor-settings-dialog-header">
@@ -378,6 +335,10 @@ export const EnvelopeEditorSettingsDialog = ({
           <nav className="col-span-12 mb-8 flex flex-wrap items-center justify-start gap-x-2 gap-y-4 px-4 md:col-span-3 md:w-full md:flex-col md:items-start md:gap-y-2">
             {tabs.map((tab) => {
               if (tab.id === 'email' && !settings.allowConfigureDistribution) {
+                return null;
+              }
+
+              if (tab.id === 'reminders' && !settings.allowConfigureReminders) {
                 return null;
               }
 
@@ -430,20 +391,16 @@ export const EnvelopeEditorSettingsDialog = ({
 
                                   <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
                                     <Trans>
-                                      Controls the language for the document, including the language
-                                      to be used for email notifications, and the final certificate
-                                      that is generated and attached to the document.
+                                      Controls the language for the document, including the language to be used for
+                                      email notifications, and the final certificate that is generated and attached to
+                                      the document.
                                     </Trans>
                                   </TooltipContent>
                                 </Tooltip>
                               </FormLabel>
 
                               <FormControl>
-                                <Select
-                                  value={field.value}
-                                  disabled={field.disabled}
-                                  onValueChange={field.onChange}
-                                >
+                                <Select value={field.value} disabled={field.disabled} onValueChange={field.onChange}>
                                   <SelectTrigger className="bg-background">
                                     <SelectValue />
                                   </SelectTrigger>
@@ -476,12 +433,10 @@ export const EnvelopeEditorSettingsDialog = ({
 
                               <FormControl>
                                 <MultiSelectCombobox
-                                  options={Object.values(DOCUMENT_SIGNATURE_TYPES).map(
-                                    (option) => ({
-                                      label: t(option.label),
-                                      value: option.value,
-                                    }),
-                                  )}
+                                  options={Object.values(DOCUMENT_SIGNATURE_TYPES).map((option) => ({
+                                    label: t(option.label),
+                                    value: option.value,
+                                  }))}
                                   selectedValues={field.value}
                                   onChange={field.onChange}
                                   className="w-full bg-background"
@@ -571,8 +526,8 @@ export const EnvelopeEditorSettingsDialog = ({
 
                                 <TooltipContent className="max-w-xs text-muted-foreground">
                                   <Trans>
-                                    Add an external ID to the document. This can be used to identify
-                                    the document in external systems.
+                                    Add an external ID to the document. This can be used to identify the document in
+                                    external systems.
                                   </Trans>
                                 </TooltipContent>
                               </Tooltip>
@@ -600,9 +555,7 @@ export const EnvelopeEditorSettingsDialog = ({
                                 </TooltipTrigger>
 
                                 <TooltipContent className="max-w-xs text-muted-foreground">
-                                  <Trans>
-                                    Add a URL to redirect the user to once the document is signed
-                                  </Trans>
+                                  <Trans>Add a URL to redirect the user to once the document is signed</Trans>
                                 </TooltipContent>
                               </Tooltip>
                             </FormLabel>
@@ -624,9 +577,7 @@ export const EnvelopeEditorSettingsDialog = ({
                             <FormItem>
                               <FormLabel className="flex flex-row items-center">
                                 <Trans>Template type</Trans>
-                                <TemplateTypeTooltip
-                                  organisationTeamCount={organisation.teams.length}
-                                />
+                                <TemplateTypeTooltip organisationTeamCount={organisation.teams.length} />
                               </FormLabel>
 
                               <FormControl>
@@ -663,30 +614,29 @@ export const EnvelopeEditorSettingsDialog = ({
 
                                     <p>
                                       <Trans>
-                                        This is how the document will reach the recipients once the
-                                        document is ready for signing.
+                                        This is how the document will reach the recipients once the document is ready
+                                        for signing.
                                       </Trans>
                                     </p>
 
                                     <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
                                       <li>
                                         <Trans>
-                                          <strong>Email</strong> - The recipient will be emailed the
-                                          document to sign, approve, etc.
+                                          <strong>Email</strong> - The recipient will be emailed the document to sign,
+                                          approve, etc.
                                         </Trans>
                                       </li>
                                       <li>
                                         <Trans>
-                                          <strong>None</strong> - We will generate links which you
-                                          can send to the recipients manually.
+                                          <strong>None</strong> - We will generate links which you can send to the
+                                          recipients manually.
                                         </Trans>
                                       </li>
                                     </ul>
 
                                     <Trans>
-                                      <strong>Note</strong> - If you use Links in combination with
-                                      direct templates, you will need to manually send the links to
-                                      the remaining recipients.
+                                      <strong>Note</strong> - If you use Links in combination with direct templates, you
+                                      will need to manually send the links to the remaining recipients.
                                     </Trans>
                                   </TooltipContent>
                                 </Tooltip>
@@ -699,13 +649,11 @@ export const EnvelopeEditorSettingsDialog = ({
                                   </SelectTrigger>
 
                                   <SelectContent position="popper">
-                                    {Object.values(DOCUMENT_DISTRIBUTION_METHODS).map(
-                                      ({ value, description }) => (
-                                        <SelectItem key={value} value={value}>
-                                          {t(description)}
-                                        </SelectItem>
-                                      ),
-                                    )}
+                                    {Object.values(DOCUMENT_DISTRIBUTION_METHODS).map(({ value, description }) => (
+                                      <SelectItem key={value} value={value}>
+                                        {t(description)}
+                                      </SelectItem>
+                                    ))}
                                   </SelectContent>
                                 </Select>
                               </FormControl>
@@ -729,8 +677,8 @@ export const EnvelopeEditorSettingsDialog = ({
 
                                   <TooltipContent className="max-w-xs text-muted-foreground">
                                     <Trans>
-                                      How long recipients have to complete this document after it is
-                                      sent. Uses the team default when set to inherit.
+                                      How long recipients have to complete this document after it is sent. Uses the team
+                                      default when set to inherit.
                                     </Trans>
                                   </TooltipContent>
                                 </Tooltip>
@@ -751,85 +699,86 @@ export const EnvelopeEditorSettingsDialog = ({
                       )}
                     </>
                   ))
-                  .with(
-                    { activeTab: 'email', settings: { allowConfigureDistribution: true } },
-                    () => (
-                      <>
-                        {settings.allowConfigureEmailSender &&
-                          organisation.organisationClaim.flags.emailDomains && (
-                            <FormField
-                              control={form.control}
-                              name="meta.emailId"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>
-                                    <Trans>Email Sender</Trans>
-                                  </FormLabel>
+                  .with({ activeTab: 'reminders', settings: { allowConfigureReminders: true } }, () => (
+                    <FormField
+                      control={form.control}
+                      name="meta.reminderSettings"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex flex-row items-center">
+                            <Trans>Signing Reminders</Trans>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <InfoIcon className="mx-2 h-4 w-4" />
+                              </TooltipTrigger>
 
-                                  <FormControl>
-                                    <Select
-                                      {...field}
-                                      value={field.value === null ? '-1' : field.value}
-                                      onValueChange={(value) =>
-                                        field.onChange(value === '-1' ? null : value)
-                                      }
-                                    >
-                                      <SelectTrigger
-                                        loading={isLoadingEmails}
-                                        className="bg-background"
-                                      >
-                                        <SelectValue />
-                                      </SelectTrigger>
+                              <TooltipContent className="max-w-xs text-muted-foreground">
+                                <Trans>
+                                  Configure when and how often reminder emails are sent to recipients who have not yet
+                                  completed signing. Uses the team default when set to inherit.
+                                </Trans>
+                              </TooltipContent>
+                            </Tooltip>
+                          </FormLabel>
 
-                                      <SelectContent>
-                                        {emails.map((email) => (
-                                          <SelectItem key={email.id} value={email.id}>
-                                            {email.email}
-                                          </SelectItem>
-                                        ))}
+                          <FormControl>
+                            <ReminderSettingsPicker value={field.value} onChange={field.onChange} />
+                          </FormControl>
 
-                                        <SelectItem value={'-1'}>Documenso</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </FormControl>
-
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          )}
-
-                        {settings.allowConfigureEmailReplyTo && (
-                          <FormField
-                            control={form.control}
-                            name="meta.emailReplyTo"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>
-                                  <Trans>
-                                    Reply To Email{' '}
-                                    <span className="text-muted-foreground">(Optional)</span>
-                                  </Trans>
-                                </FormLabel>
-
-                                <FormControl>
-                                  <Input {...field} />
-                                </FormControl>
-
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        )}
-
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ))
+                  .with({ activeTab: 'email', settings: { allowConfigureDistribution: true } }, () => (
+                    <>
+                      {settings.allowConfigureEmailSender && organisation.organisationClaim.flags.emailDomains && (
                         <FormField
                           control={form.control}
-                          name="meta.subject"
+                          name="meta.emailId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                <Trans>Email Sender</Trans>
+                              </FormLabel>
+
+                              <FormControl>
+                                <Select
+                                  {...field}
+                                  value={field.value === null ? '-1' : field.value}
+                                  onValueChange={(value) => field.onChange(value === '-1' ? null : value)}
+                                >
+                                  <SelectTrigger loading={isLoadingEmails} className="bg-background">
+                                    <SelectValue />
+                                  </SelectTrigger>
+
+                                  <SelectContent>
+                                    {emails.map((email) => (
+                                      <SelectItem key={email.id} value={email.id}>
+                                        {email.email}
+                                      </SelectItem>
+                                    ))}
+
+                                    <SelectItem value={'-1'}>Documenso</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
+
+                      {settings.allowConfigureEmailReplyTo && (
+                        <FormField
+                          control={form.control}
+                          name="meta.emailReplyTo"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>
                                 <Trans>
-                                  Subject <span className="text-muted-foreground">(Optional)</span>
+                                  Reply To Email <span className="text-muted-foreground">(Optional)</span>
                                 </Trans>
                               </FormLabel>
 
@@ -841,42 +790,62 @@ export const EnvelopeEditorSettingsDialog = ({
                             </FormItem>
                           )}
                         />
+                      )}
 
-                        <FormField
-                          control={form.control}
-                          name="meta.message"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="flex flex-row items-center">
-                                <Trans>
-                                  Message <span className="text-muted-foreground">(Optional)</span>
-                                </Trans>
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <InfoIcon className="mx-2 h-4 w-4" />
-                                  </TooltipTrigger>
-                                  <TooltipContent className="p-4 text-muted-foreground">
-                                    <DocumentSendEmailMessageHelper />
-                                  </TooltipContent>
-                                </Tooltip>
-                              </FormLabel>
+                      <FormField
+                        control={form.control}
+                        name="meta.subject"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              <Trans>
+                                Subject <span className="text-muted-foreground">(Optional)</span>
+                              </Trans>
+                            </FormLabel>
 
-                              <FormControl>
-                                <Textarea className="h-16 resize-none bg-background" {...field} />
-                              </FormControl>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
 
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                        <DocumentEmailCheckboxes
-                          value={emailSettings}
-                          onChange={(value) => form.setValue('meta.emailSettings', value)}
-                        />
-                      </>
-                    ),
-                  )
+                      <FormField
+                        control={form.control}
+                        name="meta.message"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex flex-row items-center">
+                              <Trans>
+                                Message <span className="text-muted-foreground">(Optional)</span>
+                              </Trans>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <InfoIcon className="mx-2 h-4 w-4" />
+                                </TooltipTrigger>
+                                <TooltipContent className="p-4 text-muted-foreground">
+                                  <DocumentSendEmailMessageHelper />
+                                </TooltipContent>
+                              </Tooltip>
+                            </FormLabel>
+
+                            <FormControl>
+                              <Textarea className="h-16 resize-none bg-background" {...field} />
+                            </FormControl>
+
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <DocumentEmailCheckboxes
+                        value={emailSettings}
+                        onChange={(value) => form.setValue('meta.emailSettings', value)}
+                      />
+                    </>
+                  ))
                   .with({ activeTab: 'security' }, () => (
                     <>
                       {organisation.organisationClaim.flags.cfr21 && (

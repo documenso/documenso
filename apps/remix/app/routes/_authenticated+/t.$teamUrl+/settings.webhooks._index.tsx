@@ -1,12 +1,3 @@
-import { useMemo } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { Plural, useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import type { Webhook } from '@prisma/client';
-import { EditIcon, Loader, MoreHorizontalIcon, ScrollTextIcon, Trash2Icon } from 'lucide-react';
-import { Link } from 'react-router';
-
 import { toFriendlyWebhookEventName } from '@documenso/lib/universal/webhook/to-friendly-webhook-event-name';
 import { trpc } from '@documenso/trpc/react';
 import { Badge } from '@documenso/ui/primitives/badge';
@@ -20,6 +11,12 @@ import {
 } from '@documenso/ui/primitives/dropdown-menu';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
+import { msg } from '@lingui/core/macro';
+import { Plural, Trans, useLingui } from '@lingui/react/macro';
+import type { Webhook } from '@prisma/client';
+import { EditIcon, Loader, MoreHorizontalIcon, ScrollTextIcon, Trash2Icon } from 'lucide-react';
+import { useMemo } from 'react';
+import { Link } from 'react-router';
 
 import { WebhookCreateDialog } from '~/components/dialogs/webhook-create-dialog';
 import { WebhookDeleteDialog } from '~/components/dialogs/webhook-delete-dialog';
@@ -52,11 +49,8 @@ export default function WebhookPage() {
         header: t`Webhook`,
         cell: ({ row }) => (
           <Link to={`/t/${team.url}/settings/webhooks/${row.original.id}`}>
-            <p className="text-xs text-muted-foreground">{row.original.id}</p>
-            <p
-              className="max-w-sm truncate text-xs font-semibold text-foreground"
-              title={row.original.webhookUrl}
-            >
+            <p className="text-muted-foreground text-xs">{row.original.id}</p>
+            <p className="max-w-sm truncate font-semibold text-foreground text-xs" title={row.original.webhookUrl}>
               {row.original.webhookUrl}
             </p>
           </Link>
@@ -75,9 +69,7 @@ export default function WebhookPage() {
         cell: ({ row }) => (
           <p
             className="text-foreground"
-            title={row.original.eventTriggers
-              .map((event) => toFriendlyWebhookEventName(event))
-              .join(', ')}
+            title={row.original.eventTriggers.map((event) => toFriendlyWebhookEventName(event)).join(', ')}
           >
             <Plural value={row.original.eventTriggers.length} one="# Event" other="# Events" />
           </p>
@@ -120,9 +112,7 @@ export default function WebhookPage() {
         emptyState={
           <div className="flex h-60 flex-col items-center justify-center gap-y-4 text-muted-foreground/60">
             <p>
-              <Trans>
-                You have no webhooks yet. Your webhooks will be shown here once you create them.
-              </Trans>
+              <Trans>You have no webhooks yet. Your webhooks will be shown here once you create them.</Trans>
             </p>
           </div>
         }

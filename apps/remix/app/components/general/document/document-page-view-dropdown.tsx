@@ -1,5 +1,17 @@
-import { useState } from 'react';
-
+import { useSession } from '@documenso/lib/client-only/providers/session';
+import type { TEnvelope } from '@documenso/lib/types/envelope';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import { getEnvelopeItemPermissions, mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { formatDocumentsPath } from '@documenso/lib/utils/teams';
+import { trpc as trpcReact } from '@documenso/trpc/react';
+import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@documenso/ui/primitives/dropdown-menu';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, EnvelopeType } from '@prisma/client';
 import {
@@ -14,25 +26,8 @@ import {
   Share,
   Trash2,
 } from 'lucide-react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import type { TEnvelope } from '@documenso/lib/types/envelope';
-import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import {
-  getEnvelopeItemPermissions,
-  mapSecondaryIdToDocumentId,
-} from '@documenso/lib/utils/envelope';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { trpc as trpcReact } from '@documenso/trpc/react';
-import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@documenso/ui/primitives/dropdown-menu';
 
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
 import { EnvelopeDeleteDialog } from '~/components/dialogs/envelope-delete-dialog';
@@ -56,6 +51,7 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
   const trpcUtils = trpcReact.useUtils();
 
   const [isRenameDialogOpen, setRenameDialogOpen] = useState(false);
+  const [isSaveAsTemplateDialogOpen, setSaveAsTemplateDialogOpen] = useState(false);
 
   const recipient = envelope.recipients.find((recipient) => recipient.email === user.email);
 
@@ -103,7 +99,8 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
         <EnvelopeDownloadDialog
           envelopeId={envelope.id}
           envelopeStatus={envelope.status}
-          token={recipient?.token}
+          isLegacy={envelope.internalVersion === 1}
+          token={canManageDocument ? undefined : recipient?.token}
           envelopeItems={envelope.envelopeItems}
           trigger={
             <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
@@ -135,17 +132,10 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
           }
         />
 
-        <EnvelopeSaveAsTemplateDialog
-          envelopeId={envelope.id}
-          trigger={
-            <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-              <div>
-                <FileOutputIcon className="mr-2 h-4 w-4" />
-                <Trans>Save as Template</Trans>
-              </div>
-            </DropdownMenuItem>
-          }
-        />
+        <DropdownMenuItem onClick={() => setSaveAsTemplateDialogOpen(true)}>
+          <FileOutputIcon className="mr-2 h-4 w-4" />
+          <Trans>Save as Template</Trans>
+        </DropdownMenuItem>
 
         <EnvelopeDeleteDialog
           id={envelope.id}
@@ -174,10 +164,7 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
           <DocumentRecipientLinkCopyDialog
             recipients={envelope.recipients}
             trigger={
-              <DropdownMenuItem
-                disabled={!isPending || isDeleted}
-                onSelect={(e) => e.preventDefault()}
-              >
+              <DropdownMenuItem disabled={!isPending || isDeleted} onSelect={(e) => e.preventDefault()}>
                 <Copy className="mr-2 h-4 w-4" />
                 <Trans>Signing Links</Trans>
               </DropdownMenuItem>
@@ -206,6 +193,12 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
           )}
         />
       </DropdownMenuContent>
+
+      <EnvelopeSaveAsTemplateDialog
+        envelopeId={envelope.id}
+        open={isSaveAsTemplateDialogOpen}
+        onOpenChange={setSaveAsTemplateDialogOpen}
+      />
 
       <EnvelopeRenameDialog
         id={envelope.id}
