@@ -43,7 +43,7 @@ msgstr "« {documentName} » a été signé"
 
 #: packages/email/template-components/template-document-completed.tsx
 msgid "“{documentName}” was signed by all signers"
-msgstr "“{documentName}” a été signé par tous les signataires"
+msgstr "« {documentName} » a été signé par tous les signataires"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "\"{placeholderEmail}\" on behalf of \"Team Name\" has invited you to sign \"example document\"."
@@ -405,11 +405,11 @@ msgstr "{maximumEnvelopeItemCount, plural, one {Vous ne pouvez pas téléverser 
 
 #: apps/remix/app/components/general/direct-template/direct-template-page.tsx
 msgid "{recipientActionVerb} document"
-msgstr "{recipientActionVerb} document"
+msgstr "{recipientActionVerb} le document"
 
 #: apps/remix/app/components/general/direct-template/direct-template-page.tsx
 msgid "{recipientActionVerb} the document to complete the process."
-msgstr "{recipientActionVerb} the document to complete the process."
+msgstr "{recipientActionVerb} le document pour terminer le processus."
 
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
@@ -925,7 +925,7 @@ msgstr "Un appareil capable d'accéder, d'ouvrir et de lire des documents"
 
 #: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts
 msgid "A document was created by your direct template that requires you to {recipientActionVerb} it."
-msgstr "Un document a été créé par votre modèle direct qui vous oblige à {recipientActionVerb}."
+msgstr "Un document a été créé par votre modèle direct et vous devez le {recipientActionVerb}."
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "A draft document will be created"
@@ -2954,7 +2954,7 @@ msgstr "Continuer en approuvant le document."
 #: packages/email/template-components/template-document-invite.tsx
 #: packages/email/template-components/template-document-reminder.tsx
 msgid "Continue by assisting with the document."
-msgstr "Continuez en aidant avec le document."
+msgstr "Continuer en collaborant sur le document."
 
 #: packages/email/template-components/template-document-completed.tsx
 msgid "Continue by downloading the document."
@@ -12048,15 +12048,15 @@ msgstr "Voir le document"
 
 #: packages/email/template-components/template-document-invite.tsx
 msgid "View Document to approve"
-msgstr "Voir Document à approuver"
+msgstr "Voir le document à approuver"
 
 #: packages/email/template-components/template-document-invite.tsx
 msgid "View Document to assist"
-msgstr "Voir Document pour assister"
+msgstr "Voir le document pour collaborer"
 
 #: packages/email/template-components/template-document-invite.tsx
 msgid "View Document to sign"
-msgstr "Voir Document pour signature"
+msgstr "Voir le document à signer"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._index.tsx
 msgid "View documents associated with this email"
@@ -13080,7 +13080,7 @@ msgstr "Vous avez refusé l'invitation de <0>{0}</0> à rejoindre leur organisat
 #: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts
 #: packages/lib/server-only/document/resend-document.ts
 msgid "You have initiated the document {0} that requires you to {recipientActionVerb} it."
-msgstr "Vous avez initié le document {0} qui nécessite que vous {recipientActionVerb} celui-ci."
+msgstr "Vous avez initié le document {0} et devez le {recipientActionVerb}."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 msgid "You have no webhooks yet. Your webhooks will be shown here once you create them."
@@ -13140,7 +13140,7 @@ msgstr "Vous avez rejeté ce document"
 
 #: packages/email/template-components/template-document-self-signed.tsx
 msgid "You have signed “{documentName}”"
-msgstr "Vous avez signé “{documentName}”"
+msgstr "Vous avez signé « {documentName} »"
 
 #: apps/remix/app/components/dialogs/organisation-leave-dialog.tsx
 msgid "You have successfully left this organisation."
