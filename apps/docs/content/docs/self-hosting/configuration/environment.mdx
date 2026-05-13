@@ -244,7 +244,7 @@ You can control who is allowed to create accounts on your instance with the foll
 - **`NEXT_PUBLIC_DISABLE_GOOGLE_SIGNUP`**, **`NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP`**, **`NEXT_PUBLIC_DISABLE_OIDC_SIGNUP`**: Set to `true` to block brand-new account creation through the matching SSO provider. Existing users with the provider already linked can still sign in, and existing users can still link the provider to their account. `NEXT_PUBLIC_DISABLE_OIDC_SIGNUP` also blocks new-account creation through the organisation authentication portal.
 - **`NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS`**: Restrict signups to specific email domains. When set, only users whose email address matches one of the listed domains can create an account. Leave empty to allow all domains.
 
-Sign-in for existing users is never affected — only the creation of brand-new accounts.
+Sign-in for existing users is never affected, only the creation of brand-new accounts.
 
 Both the master switch and the domain allowlist apply to email/password registration and OAuth (Google, Microsoft, OIDC). If a user attempts to sign up via OAuth with a disallowed domain, they are redirected to the sign-in page with an error.
 
@@ -276,6 +276,23 @@ Documenso can use Google Vertex AI for recipient and field detection.
 | `GOOGLE_VERTEX_LOCATION`   | Vertex AI region                               | `global` |
 
 AI features must also be enabled in organisation/team settings after configuration.
+
+---
+
+## Document Conversion
+
+Documenso can accept `.docx` uploads by sending them to a [Gotenberg](https://gotenberg.dev) service that converts them to PDF. When `NEXT_PRIVATE_DOCUMENT_CONVERSION_URL` is unset, DOCX uploads are rejected and only PDFs are accepted.
+
+| Variable                                      | Description                                                                                       | Default |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------- |
+| `NEXT_PRIVATE_DOCUMENT_CONVERSION_URL`        | Base URL of the Gotenberg service (e.g., `http://gotenberg:3000`). Unset disables the feature.    |         |
+| `NEXT_PRIVATE_DOCUMENT_CONVERSION_USERNAME`   | HTTP Basic auth username. Required when Gotenberg runs with `--api-enable-basic-auth`.            |         |
+| `NEXT_PRIVATE_DOCUMENT_CONVERSION_PASSWORD`   | HTTP Basic auth password. Set together with the username.                                         |         |
+| `NEXT_PRIVATE_DOCUMENT_CONVERSION_TIMEOUT_MS` | Per-request timeout in milliseconds. Increase for very large documents.                           | `30000` |
+
+The public flag `NEXT_PUBLIC_DOCUMENT_CONVERSION_ENABLED` is derived automatically from `NEXT_PRIVATE_DOCUMENT_CONVERSION_URL` on server start. Do not set it manually.
+
+For setup, image-build instructions, and security recommendations, see [Document Conversion](/docs/self-hosting/configuration/advanced/document-conversion).
 
 ---
 
