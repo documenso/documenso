@@ -1,24 +1,24 @@
 ---
-title: Authoring
+title: Editor
 description: Embed document, template, and envelope creation directly in your application.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 
-In addition to embedding signing, Documenso supports embedded authoring. It allows your users to create and edit documents, templates, and envelopes without leaving your application.
+In addition to embedding signing, Documenso supports embedded editor. It allows your users to create and edit documents, templates, and envelopes without leaving your application.
 
 <Callout type="warn">
-  Embedded authoring is included with [Enterprise](https://documen.so/enterprise-cta) plans. It is
+  Embedded editor is included with [Enterprise](https://documen.so/enterprise-cta) plans. It is
   also available as a paid add-on for the [Platform Plan](https://documen.so/platform-cta-pricing).
   Contact sales for access.
 </Callout>
 
 ## Versions
 
-Embedded authoring is available in two versions:
+Embedded editor is available in two versions:
 
-- **[V1 Authoring](/docs/developers/embedding/authoring/v1)** — Works with V1 Documents and Templates.
-- **[V2 Authoring](/docs/developers/embedding/authoring/v2)** — Works with Envelopes, which are the unified model for documents and templates.
+- **[V1 Editor](/docs/developers/embedding/editor/v1)** — Works with V1 Documents and Templates.
+- **[V2 Editor](/docs/developers/embedding/editor/v2)** — Works with Envelopes, which are the unified model for documents and templates.
 
 ### Comparison
 
@@ -32,7 +32,7 @@ Embedded authoring is available in two versions:
 
 ## Presign Tokens
 
-Before using any authoring component, obtain a presign token from your backend:
+Before using any editor component, obtain a presign token from your backend:
 
 ```
 POST /api/v2/embedding/create-presign-token
@@ -50,7 +50,7 @@ See the [API documentation](https://openapi.documenso.com/reference#tag/embeddin
 
 ## Next Steps
 
-- [V1 Authoring](/docs/developers/embedding/authoring/v1) — Create and edit documents and templates using V1 components
-- [V2 Authoring](/docs/developers/embedding/authoring/v2) — Create and edit envelopes using V2 components
+- [V1 Editor](/docs/developers/embedding/editor/v1) — Create and edit documents and templates using V1 components
+- [V2 Editor](/docs/developers/embedding/editor/v2) — Create and edit envelopes using V2 components
 - [CSS Variables](/docs/developers/embedding/css-variables) — Customize the appearance of embedded components
 - [SDKs](/docs/developers/embedding/sdks) — Framework-specific SDK documentation
