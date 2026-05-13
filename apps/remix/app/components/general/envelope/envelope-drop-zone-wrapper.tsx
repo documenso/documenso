@@ -3,6 +3,7 @@ import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { getAllowedUploadMimeTypes } from '@documenso/lib/constants/document-conversion';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
@@ -115,6 +116,15 @@ export const EnvelopeDropZoneWrapper = ({ children, type, className }: EnvelopeD
           () => t`You have reached your document limit for this month. Please upgrade your plan.`,
         )
         .with('ENVELOPE_ITEM_LIMIT_EXCEEDED', () => t`You have reached the limit of the number of files per envelope.`)
+        .with('UNSUPPORTED_FILE_TYPE', () => t`This file type isn't supported. Please upload a PDF or Word document.`)
+        .with(
+          'CONVERSION_SERVICE_UNAVAILABLE',
+          () => t`Document conversion is temporarily unavailable. Please try again shortly or upload a PDF.`,
+        )
+        .with(
+          'CONVERSION_FAILED',
+          () => t`We couldn't convert this file. Please check it's a valid Word document or upload a PDF instead.`,
+        )
         .otherwise(() => t`An error occurred during upload.`);
 
       toast({
@@ -158,9 +168,7 @@ export const EnvelopeDropZoneWrapper = ({ children, type, className }: EnvelopeD
     });
   };
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: {
-      'application/pdf': ['.pdf'],
-    },
+    accept: getAllowedUploadMimeTypes(),
     multiple: true,
     maxSize: megabytesToBytes(APP_DOCUMENT_UPLOAD_SIZE_LIMIT),
     maxFiles: maximumEnvelopeItemCount,
@@ -183,7 +191,7 @@ export const EnvelopeDropZoneWrapper = ({ children, type, className }: EnvelopeD
             </h2>
 
             <p className="mt-4 text-md text-muted-foreground">
-              <Trans>Drag and drop your PDF file here</Trans>
+              <Trans>Drag and drop your document here</Trans>
             </p>
 
             {isUploadDisabled && IS_BILLING_ENABLED() && (
