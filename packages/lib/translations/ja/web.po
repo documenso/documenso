@@ -8,7 +8,7 @@ msgstr ""
 "Language: ja\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-05-11 09:07\n"
+"PO-Revision-Date: 2026-05-13 05:18\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -3999,6 +3999,12 @@ msgstr "ドキュメント完了メール"
 msgid "Document Completed!"
 msgstr "文書が完了しました！"
 
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "Document conversion is temporarily unavailable. Please try again shortly or upload a PDF."
+msgstr "ドキュメントの変換は現在一時的に利用できません。しばらくしてからもう一度お試しいただくか、PDF をアップロードしてください。"
+
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Document created"
 msgstr "文書を作成しました"
@@ -4440,16 +4446,16 @@ msgid "Drafted Documents"
 msgstr "下書き文書"
 
 #: packages/ui/primitives/document-dropzone.tsx
-msgid "Drag & drop your PDF here."
-msgstr "PDF をここにドラッグ＆ドロップしてください。"
+msgid "Drag & drop your document here."
+msgstr "ここにドキュメントをドラッグ＆ドロップしてください。"
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Drag and drop or click to upload"
 msgstr "ドラッグ＆ドロップするか、クリックしてアップロード"
 
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
-msgid "Drag and drop your PDF file here"
-msgstr "PDF ファイルをここにドラッグ＆ドロップしてください"
+msgid "Drag and drop your document here"
+msgstr "ここにドキュメントをドラッグ＆ドロップしてください。"
 
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
@@ -10926,6 +10932,12 @@ msgstr "この機能は現在ご利用中のプランではご利用いただけ
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "このフィールドは変更も削除もできません。このテンプレートのダイレクトリンクを共有するか、公開プロフィールに追加すると、アクセスした人は自分の名前とメールアドレスを入力し、割り当てられたフィールドに入力できます。"
 
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "This file type isn't supported. Please upload a PDF or Word document."
+msgstr "このファイル形式はサポートされていません。PDF か Word ドキュメントをアップロードしてください。"
+
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "This folder contains multiple items. Deleting it will remove all subfolders and move all nested documents and templates to the root folder."
 msgstr "このフォルダには複数のアイテムが含まれています。削除すると、すべてのサブフォルダが削除され、入れ子になったドキュメントとテンプレートはルートフォルダに移動されます。"
@@ -12196,6 +12208,12 @@ msgstr "現在、このパスキーは削除できません。後でもう一度
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 msgid "We are unable to update this passkey at the moment. Please try again later."
 msgstr "現在、このパスキーは更新できません。後でもう一度お試しください。"
+
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "We couldn't convert this file. Please check it's a valid Word document or upload a PDF instead."
+msgstr "このファイルを変換できませんでした。有効な Word ドキュメントであることを確認するか、代わりに PDF をアップロードしてください。"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "We couldn't create a Stripe customer. Please try again."

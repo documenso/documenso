@@ -8,7 +8,7 @@ msgstr ""
 "Language: nl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-05-11 09:07\n"
+"PO-Revision-Date: 2026-05-13 05:18\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -3999,6 +3999,12 @@ msgstr "E-mail bij voltooid document"
 msgid "Document Completed!"
 msgstr "Document voltooid!"
 
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "Document conversion is temporarily unavailable. Please try again shortly or upload a PDF."
+msgstr "Documentconversie is tijdelijk niet beschikbaar. Probeer het over korte tijd opnieuw of upload een PDF-bestand."
+
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Document created"
 msgstr "Document aangemaakt"
@@ -4440,16 +4446,16 @@ msgid "Drafted Documents"
 msgstr "Conceptdocumenten"
 
 #: packages/ui/primitives/document-dropzone.tsx
-msgid "Drag & drop your PDF here."
-msgstr "Sleep je PDF hierheen."
+msgid "Drag & drop your document here."
+msgstr "Sleep je document hierheen."
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Drag and drop or click to upload"
 msgstr "Slepen en neerzetten of klik om te uploaden"
 
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
-msgid "Drag and drop your PDF file here"
-msgstr "Sleep je PDF-bestand hierheen"
+msgid "Drag and drop your document here"
+msgstr "Sleep je document hierheen"
 
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
@@ -10926,6 +10932,12 @@ msgstr "Deze functie is niet beschikbaar in je huidige abonnement."
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "Dit veld kan niet worden gewijzigd of verwijderd. Wanneer je de directe link van deze sjabloon deelt of aan je openbare profiel toevoegt, kan iedereen die toegang heeft zijn naam en e-mailadres invoeren en de aan hem toegewezen velden invullen."
 
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "This file type isn't supported. Please upload a PDF or Word document."
+msgstr "Dit bestandstype wordt niet ondersteund. Upload een PDF- of Word-document."
+
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "This folder contains multiple items. Deleting it will remove all subfolders and move all nested documents and templates to the root folder."
 msgstr "Deze map bevat meerdere items. Verwijderen zorgt ervoor dat alle submappen worden verwijderd en alle geneste documenten en sjablonen naar de hoofdmap worden verplaatst."
@@ -12196,6 +12208,12 @@ msgstr "We kunnen deze passkey momenteel niet verwijderen. Probeer het later opn
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 msgid "We are unable to update this passkey at the moment. Please try again later."
 msgstr "We kunnen deze passkey momenteel niet bijwerken. Probeer het later opnieuw."
+
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "We couldn't convert this file. Please check it's a valid Word document or upload a PDF instead."
+msgstr "We konden dit bestand niet converteren. Controleer of het een geldig Word-document is of upload in plaats daarvan een PDF-bestand."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "We couldn't create a Stripe customer. Please try again."

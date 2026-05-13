@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-05-12 00:33\n"
+"PO-Revision-Date: 2026-05-13 05:18\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -3999,6 +3999,12 @@ msgstr "Wiadomość potwierdzająca zakończenie"
 msgid "Document Completed!"
 msgstr "Dokument został zakończony!"
 
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "Document conversion is temporarily unavailable. Please try again shortly or upload a PDF."
+msgstr "Konwersja dokumentów jest tymczasowo niedostępna. Spróbuj ponownie za chwilę lub prześlij plik PDF."
+
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Document created"
 msgstr "Dokument został utworzony"
@@ -4440,16 +4446,16 @@ msgid "Drafted Documents"
 msgstr "Szkice dokumentów"
 
 #: packages/ui/primitives/document-dropzone.tsx
-msgid "Drag & drop your PDF here."
-msgstr "Przeciągnij i upuść plik PDF."
+msgid "Drag & drop your document here."
+msgstr "Przeciągnij i upuść tutaj swój dokument."
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Drag and drop or click to upload"
 msgstr "Przeciągnij i upuść lub kliknij, aby przesłać"
 
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
-msgid "Drag and drop your PDF file here"
-msgstr "Przeciągnij i upuść plik PDF"
+msgid "Drag and drop your document here"
+msgstr "Przeciągnij i upuść tutaj swój dokument"
 
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
@@ -10926,6 +10932,12 @@ msgstr "Funkcja nie jest dostępna w Twoim planie"
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "Pole nie może być modyfikowane ani usuwane. Gdy udostępnisz bezpośredni link do szablonu lub dodasz go do profilu publicznego, każdy, kto uzyska do niego dostęp, będzie mógł wpisać swoją nazwę oraz adres e-mail i wypełnić przypisane pola."
 
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "This file type isn't supported. Please upload a PDF or Word document."
+msgstr "Ten typ pliku nie jest obsługiwany. Prześlij plik PDF lub dokument programu Word."
+
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "This folder contains multiple items. Deleting it will remove all subfolders and move all nested documents and templates to the root folder."
 msgstr "Folder zawiera wiele elementów. Usunięcie go spowoduje przeniesienie wszystkich dokumentów i szablonów znajdujących się w tym folderze do folderu głównego."
@@ -12196,6 +12208,12 @@ msgstr "Nie mogliśmy usunąć klucza dostępu. Spróbuj ponownie później."
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 msgid "We are unable to update this passkey at the moment. Please try again later."
 msgstr "Nie mogliśmy zaktualizować klucza dostępu. Spróbuj ponownie później."
+
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "We couldn't convert this file. Please check it's a valid Word document or upload a PDF instead."
+msgstr "Nie udało się przekonwertować tego pliku. Sprawdź, czy jest to prawidłowy dokument programu Word, lub zamiast tego prześlij plik PDF."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "We couldn't create a Stripe customer. Please try again."
