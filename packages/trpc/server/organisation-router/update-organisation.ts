@@ -36,6 +36,21 @@ export const updateOrganisationRoute = authenticatedProcedure
       });
     }
 
+    const organisationWithSameUrl = await prisma.organisation.findFirst({
+      where: {
+        url: data.url,
+        NOT: {
+          id: organisationId,
+        },
+      },
+    });
+
+    if (organisationWithSameUrl) {
+      throw new AppError(AppErrorCode.ALREADY_EXISTS, {
+        message: 'Organisation URL already exists',
+      });
+    }
+
     const updatedOrganisation = await prisma.organisation.update({
       where: {
         id: organisationId,
