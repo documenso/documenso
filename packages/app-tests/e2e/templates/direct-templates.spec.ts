@@ -18,6 +18,20 @@ const formatTemplatesPath = (teamUrl: string) => `/t/${teamUrl}/templates`;
 
 const nanoid = customAlphabet('1234567890abcdef', 10);
 
+const expectSigningRequestJobForRecipient = async (recipientId: number) => {
+  const job = await prisma.backgroundJob.findFirst({
+    where: {
+      jobId: 'send.signing.requested.email',
+      payload: {
+        path: ['recipientId'],
+        equals: recipientId,
+      },
+    },
+  });
+
+  expect(job).not.toBeNull();
+};
+
 test('[DIRECT_TEMPLATES]: create direct link for template', async ({ page }) => {
   const { team, owner, organisation } = await seedTeam({
     createTeamMembers: 1,
@@ -309,8 +323,15 @@ test('[DIRECT_TEMPLATES]: V1 use direct template link with 2 recipients with nex
 
   const updatedSecondRecipient = createdEnvelopeRecipients.find((recipient) => recipient.signingOrder === 2);
 
-  expect(updatedSecondRecipient?.name).toBe(newName);
-  expect(updatedSecondRecipient?.email).toBe(newSecondSignerEmail);
+  expect(updatedSecondRecipient).toBeDefined();
+
+  if (!updatedSecondRecipient) {
+    throw new Error('Expected second recipient to exist');
+  }
+
+  expect(updatedSecondRecipient.name).toBe(newName);
+  expect(updatedSecondRecipient.email).toBe(newSecondSignerEmail);
+  await expectSigningRequestJobForRecipient(updatedSecondRecipient.id);
 });
 
 test('[DIRECT_TEMPLATES]: V2 use direct template link with 2 recipients with next signer dictation', async ({
@@ -394,6 +415,13 @@ test('[DIRECT_TEMPLATES]: V2 use direct template link with 2 recipients with nex
 
   const updatedSecondRecipient = createdEnvelopeRecipients.find((recipient) => recipient.signingOrder === 2);
 
-  expect(updatedSecondRecipient?.name).toBe(newName);
-  expect(updatedSecondRecipient?.email).toBe(newSecondSignerEmail);
+  expect(updatedSecondRecipient).toBeDefined();
+
+  if (!updatedSecondRecipient) {
+    throw new Error('Expected second recipient to exist');
+  }
+
+  expect(updatedSecondRecipient.name).toBe(newName);
+  expect(updatedSecondRecipient.email).toBe(newSecondSignerEmail);
+  await expectSigningRequestJobForRecipient(updatedSecondRecipient.id);
 });

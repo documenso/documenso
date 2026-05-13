@@ -307,7 +307,7 @@ export const createDocumentFromDirectTemplate = async ({
 
   const incrementedDocumentId = await incrementDocumentId();
 
-  const { createdEnvelope, recipientId, token } = await prisma.$transaction(async (tx) => {
+  const { createdEnvelope, recipientId, token, nextRecipientId } = await prisma.$transaction(async (tx) => {
     // Create the envelope and non direct template recipients.
     const createdEnvelope = await tx.envelope.create({
       data: {
@@ -610,6 +610,8 @@ export const createDocumentFromDirectTemplate = async ({
       }),
     ];
 
+    let nextRecipientId: number | undefined;
+
     if (nextSigner) {
       const pendingRecipients = await tx.recipient.findMany({
         select: {
@@ -636,6 +638,8 @@ export const createDocumentFromDirectTemplate = async ({
       const nextRecipient = pendingRecipients[0];
 
       if (nextRecipient) {
+        nextRecipientId = nextRecipient.id;
+
         auditLogsToCreate.push(
           createDocumentAuditLogData({
             type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
@@ -707,6 +711,7 @@ export const createDocumentFromDirectTemplate = async ({
       createdEnvelope,
       token: createdDirectRecipient.token,
       recipientId: createdDirectRecipient.id,
+      nextRecipientId,
     };
   });
 
@@ -718,6 +723,18 @@ export const createDocumentFromDirectTemplate = async ({
       payload: {
         envelopeId: createdEnvelope.id,
         recipientId,
+      },
+    });
+  }
+
+  if (nextRecipientId) {
+    await jobs.triggerJob({
+      name: 'send.signing.requested.email',
+      payload: {
+        userId: createdEnvelope.userId,
+        documentId: incrementedDocumentId.documentId,
+        recipientId: nextRecipientId,
+        requestMetadata: requestMetadata?.requestMetadata,
       },
     });
   }
