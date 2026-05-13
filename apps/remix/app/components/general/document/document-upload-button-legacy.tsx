@@ -140,6 +140,15 @@ export const DocumentUploadButtonLegacy = ({ className, type }: DocumentUploadBu
           'ENVELOPE_ITEM_LIMIT_EXCEEDED',
           () => msg`You have reached the limit of the number of files per envelope.`,
         )
+        .with('UNSUPPORTED_FILE_TYPE', () => msg`This file type isn't supported. Please upload a PDF or Word document.`)
+        .with(
+          'CONVERSION_SERVICE_UNAVAILABLE',
+          () => msg`Document conversion is temporarily unavailable. Please try again shortly or upload a PDF.`,
+        )
+        .with(
+          'CONVERSION_FAILED',
+          () => msg`We couldn't convert this file. Please check it's a valid Word document or upload a PDF instead.`,
+        )
         .otherwise(() => msg`An error occurred while uploading your document.`);
 
       toast({
