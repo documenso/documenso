@@ -180,6 +180,22 @@ Use **Local** (the default). No additional setup required. Works out of the box 
 
 ---
 
+## Scheduled Jobs
+
+Documenso runs internal scheduled jobs for maintenance tasks like sending signing reminders, expiring recipients, sealing completed documents, and cleaning up rate limits. These schedules use cron expressions and can be tuned for self-hosted deployments.
+
+| Variable                                         | Description                     | Default        |
+| ------------------------------------------------ | ------------------------------- | -------------- |
+| `NEXT_PRIVATE_JOBS_SIGNING_REMINDERS_SWEEP_CRON` | Sends configured signing reminders | `*/15 * * * *` |
+| `NEXT_PRIVATE_JOBS_SEAL_DOCUMENT_SWEEP_CRON`     | Seals completed documents       | `*/15 * * * *` |
+| `NEXT_PRIVATE_JOBS_EXPIRE_RECIPIENTS_SWEEP_CRON` | Processes expired recipients    | `*/15 * * * *` |
+| `NEXT_PRIVATE_JOBS_CLEANUP_RATE_LIMITS_CRON`     | Cleans expired rate limit rows  | `*/15 * * * *` |
+| `NEXT_PRIVATE_JOBS_SYNC_EMAIL_DOMAINS_CRON`      | Syncs email domain status       | `0 * * * *`    |
+
+Invalid cron expressions will prevent the application from starting.
+
+---
+
 ## See Also
 
 - [Environment Variables](/docs/self-hosting/configuration/environment) - Complete configuration reference
