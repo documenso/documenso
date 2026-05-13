@@ -1,21 +1,21 @@
 ---
-title: V1 Authoring
+title: V1 Editor
 description: Embed V1 document and template creation directly in your application.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 
-V1 authoring components allow your users to create and edit documents and templates using the V1 Documents and Templates API without leaving your application.
+V1 editor components allow your users to create and edit documents and templates using the V1 Documents and Templates API without leaving your application.
 
 <Callout type="warn">
-  Embedded authoring is included with [Enterprise](https://documen.so/enterprise-cta) plans. It is
+  Embedded editor is included with [Enterprise](https://documen.so/enterprise-cta) plans. It is
   also available as a paid add-on for the [Platform Plan](https://documen.so/platform-cta-pricing).
   Contact sales for access.
 </Callout>
 
 ## Components
 
-The SDK provides four V1 authoring components:
+The SDK provides four V1 editor components:
 
 | Component               | Purpose                 |
 | ----------------------- | ----------------------- |
@@ -29,7 +29,7 @@ The SDK provides four V1 authoring components:
 
 ## Presign Tokens
 
-All authoring components require a **presign token** for authentication. See the [Authoring overview](/docs/developers/embedding/authoring) for details on obtaining presign tokens.
+All editor components require a **presign token** for authentication. See the [Editor overview](/docs/developers/embedding/editor) for details on obtaining presign tokens.
 
 
 <Callout type="warn">
@@ -131,7 +131,7 @@ const TemplateEditor = ({ presignToken, templateId }) => {
 
 ## Props
 
-### All Authoring Components
+### All Editor Components
 
 | Prop               | Type      | Required | Description                                              |
 | ------------------ | --------- | -------- | -------------------------------------------------------- |
@@ -143,7 +143,7 @@ const TemplateEditor = ({ presignToken, templateId }) => {
 | `darkModeDisabled` | `boolean` | No       | Disable dark mode (Platform Plan)                        |
 | `language`         | `string`  | No       | Set the UI language. See [Supported Languages](https://github.com/documenso/documenso/tree/main/packages/lib/constants/locales.ts) |
 | `className`        | `string`  | No       | CSS class for the iframe                                 |
-| `features`         | `object`  | No       | Feature toggles for the authoring experience             |
+| `features`         | `object`  | No       | Feature toggles for the editor experience                |
 
 ### Update Components Only
 
@@ -157,7 +157,7 @@ const TemplateEditor = ({ presignToken, templateId }) => {
 
 ## Feature Toggles
 
-Customize what options are available in the authoring experience:
+Customize what options are available in the editor experience:
 
 ```jsx
 <EmbedCreateDocumentV1
@@ -294,7 +294,7 @@ Pass extra props to the iframe for testing experimental features:
 ## See Also
 
 - [Embedding Overview](/docs/developers/embedding) - Signing embed concepts and props
-- [V2 Authoring](/docs/developers/embedding/authoring/v2) - V2 envelope authoring
+- [V2 Editor](/docs/developers/embedding/editor/v2) - V2 envelope editor
 - [CSS Variables](/docs/developers/embedding/css-variables) - Customize appearance
 - [Documents API](/docs/developers/api/documents) - Create documents via API
 - [Templates API](/docs/developers/api/templates) - Create templates via API
