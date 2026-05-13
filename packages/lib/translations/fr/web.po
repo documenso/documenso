@@ -8,7 +8,7 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-05-11 09:07\n"
+"PO-Revision-Date: 2026-05-13 06:46\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -43,7 +43,7 @@ msgstr "« {documentName} » a été signé"
 
 #: packages/email/template-components/template-document-completed.tsx
 msgid "“{documentName}” was signed by all signers"
-msgstr "« {documentName} » a été signé par tous les signataires"
+msgstr "“{documentName}” a été signé par tous les signataires"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "\"{placeholderEmail}\" on behalf of \"Team Name\" has invited you to sign \"example document\"."
@@ -3405,7 +3405,7 @@ msgstr "Personnalisez les couleurs utilisées sur vos pages de signature."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Danger Zone"
-msgstr ""
+msgstr "Zone de danger"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Dark Mode"
@@ -3592,7 +3592,7 @@ msgstr "supprimer {emailDomain}"
 
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 msgid "delete {organisationName}"
-msgstr ""
+msgstr "supprimer {organisationName}"
 
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 msgid "delete {teamName}"
@@ -3712,7 +3712,7 @@ msgstr "Suppression du compte..."
 
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 msgid "Deletion scheduled"
-msgstr ""
+msgstr "Suppression planifiée"
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Destination"
@@ -4012,7 +4012,7 @@ msgstr "Document Complété !"
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
 msgid "Document conversion is temporarily unavailable. Please try again shortly or upload a PDF."
-msgstr ""
+msgstr "La conversion de documents est temporairement indisponible. Veuillez réessayer dans quelques instants ou téléverser un PDF."
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Document created"
@@ -4456,7 +4456,7 @@ msgstr "Documents brouillon"
 
 #: packages/ui/primitives/document-dropzone.tsx
 msgid "Drag & drop your document here."
-msgstr ""
+msgstr "Faites glisser et déposez votre document ici."
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Drag and drop or click to upload"
@@ -4464,7 +4464,7 @@ msgstr "Glissez-déposez ou cliquez pour importer"
 
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 msgid "Drag and drop your document here"
-msgstr ""
+msgstr "Faites glisser et déposez votre document ici"
 
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
@@ -4766,7 +4766,7 @@ msgstr "Paramètres de l'email"
 
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 msgid "Email the organisation owner to notify them of the deletion."
-msgstr ""
+msgstr "Envoyez un e-mail au propriétaire de l’organisation pour l’informer de la suppression."
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Email the owner when a document is created from a direct template"
@@ -6153,7 +6153,7 @@ msgstr "Adresse IP"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Irreversible actions for this organisation"
-msgstr ""
+msgstr "Actions irréversibles pour cette organisation"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Issuer URL"
@@ -7340,7 +7340,7 @@ msgstr "Organisation"
 
 #: packages/lib/server-only/organisation/delete-organisation-email.ts
 msgid "Organisation \"{organisationName}\" has been deleted"
-msgstr ""
+msgstr "L’organisation \"{organisationName}\" a été supprimée"
 
 #: packages/lib/constants/organisations-translations.ts
 msgid "Organisation Admin"
@@ -7709,7 +7709,7 @@ msgstr "par an"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Permanently delete this organisation. Documents will be orphaned (not deleted) so they remain accessible via the deleted-account service account."
-msgstr ""
+msgstr "Supprimez définitivement cette organisation. Les documents seront orphelins (non supprimés) afin de rester accessibles via le compte de service de compte supprimé."
 
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 msgctxt "Personal organisation (adjective)"
@@ -10408,7 +10408,7 @@ msgstr "L'e-mail par défaut à utiliser lors de l'envoi de courriels aux destin
 
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 msgid "The deletion will run in the background, and can take up to a few minutes to complete. Do not re-run this deletion."
-msgstr ""
+msgstr "La suppression s’exécutera en arrière-plan et peut prendre quelques minutes pour se terminer. Ne relancez pas cette suppression."
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/general/template/template-direct-link-badge.tsx
@@ -10537,11 +10537,11 @@ msgstr "Les erreurs suivantes se sont produites :"
 
 #: packages/email/templates/organisation-delete.tsx
 msgid "The following organisation has been deleted by an administrator. You and your members will no longer be able to access this organisation, its teams, or its associated data."
-msgstr ""
+msgstr "L’organisation suivante a été supprimée par un administrateur. Vous et vos membres ne pourrez plus accéder à cette organisation, à ses équipes ni aux données qui y sont associées."
 
 #: packages/email/templates/organisation-delete.tsx
 msgid "The following organisation has been deleted. You and your members will no longer be able to access this organisation, its teams, or its associated data."
-msgstr ""
+msgstr "L’organisation suivante a été supprimée. Vous et vos membres ne pourrez plus accéder à cette organisation, à ses équipes ni aux données qui y sont associées."
 
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 msgid "The following recipients require an email address:"
@@ -10583,7 +10583,7 @@ msgstr "Le rôle d'organisation qui sera appliqué à tous les membres de ce gro
 
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 msgid "The organisation will be deleted in the background. Documents will be orphaned, not deleted."
-msgstr ""
+msgstr "L’organisation sera supprimée en arrière-plan. Les documents seront rendus orphelins, et non supprimés."
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -10977,7 +10977,7 @@ msgstr "Ce champ ne peut pas être modifié ou supprimé. Lorsque vous partagez 
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
 msgid "This file type isn't supported. Please upload a PDF or Word document."
-msgstr ""
+msgstr "Ce type de fichier n’est pas pris en charge. Veuillez téléverser un document PDF ou Word."
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "This folder contains multiple items. Deleting it will remove all subfolders and move all nested documents and templates to the root folder."
@@ -12254,7 +12254,7 @@ msgstr "Nous ne pouvons pas mettre à jour cette clé de passkey pour le moment.
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
 msgid "We couldn't convert this file. Please check it's a valid Word document or upload a PDF instead."
-msgstr ""
+msgstr "Nous n’avons pas pu convertir ce fichier. Veuillez vérifier qu’il s’agit d’un document Word valide ou téléverser un fichier PDF à la place."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "We couldn't create a Stripe customer. Please try again."
@@ -12284,7 +12284,7 @@ msgstr "Nous n'avons pas pu mettre à jour le fournisseur. Veuillez réessayer."
 
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 msgid "We encountered an error while attempting to delete this organisation. Please try again later."
-msgstr ""
+msgstr "Nous avons rencontré une erreur lors de la tentative de suppression de cette organisation. Veuillez réessayer plus tard."
 
 #: packages/lib/client-only/providers/envelope-editor-provider.tsx
 #: packages/lib/client-only/providers/envelope-editor-provider.tsx
@@ -12791,7 +12791,7 @@ msgstr "Vous êtes sur le point de supprimer <0>{0}</0>. Toutes les données rel
 
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 msgid "You are about to delete <0>{organisationName}</0>. This action is not reversible. All teams will be removed and all documents will be orphaned to the deleted-account service account."
-msgstr ""
+msgstr "Vous êtes sur le point de supprimer <0>{organisationName}</0>. Cette action est irréversible. Toutes les équipes seront supprimées et tous les documents seront rattachés de manière orpheline au compte de service du compte supprimé."
 
 #: apps/remix/app/components/dialogs/team-email-delete-dialog.tsx
 msgid "You are about to delete the following team email from <0>{teamName}</0>."
@@ -13724,7 +13724,7 @@ msgstr "Votre organisation a été créée."
 #: packages/email/templates/organisation-delete.tsx
 #: packages/email/templates/organisation-delete.tsx
 msgid "Your organisation has been deleted"
-msgstr ""
+msgstr "Votre organisation a été supprimée"
 
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 msgid "Your organisation has been successfully deleted."
@@ -13857,3 +13857,4 @@ msgstr "Votre code de vérification :"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
