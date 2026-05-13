@@ -37,6 +37,7 @@ import { Link, useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 import type { z } from 'zod';
 
+import { AdminOrganisationDeleteDialog } from '~/components/dialogs/admin-organisation-delete-dialog';
 import { AdminOrganisationMemberDeleteDialog } from '~/components/dialogs/admin-organisation-member-delete-dialog';
 import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
 import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
@@ -64,9 +65,14 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
 
   const organisationId = params.id;
 
-  const { data: organisation, isLoading: isLoadingOrganisation } = trpc.admin.organisation.get.useQuery({
-    organisationId,
-  });
+  const { data: organisation, isLoading: isLoadingOrganisation } = trpc.admin.organisation.get.useQuery(
+    {
+      organisationId,
+    },
+    {
+      retry: false,
+    },
+  );
 
   const { mutateAsync: createStripeCustomer, isPending: isCreatingStripeCustomer } =
     trpc.admin.stripe.createCustomer.useMutation({
@@ -398,6 +404,31 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
           </div>
         </div>
       </div>
+
+      <SettingsHeader
+        title={t`Danger Zone`}
+        subtitle={t`Irreversible actions for this organisation`}
+        className="mt-16"
+      />
+
+      <Alert className="my-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="destructive">
+        <div className="mb-4 sm:mb-0">
+          <AlertTitle>
+            <Trans>Delete organisation</Trans>
+          </AlertTitle>
+
+          <AlertDescription className="mr-2">
+            <Trans>
+              Permanently delete this organisation. Documents will be orphaned (not deleted) so they remain accessible
+              via the deleted-account service account.
+            </Trans>
+          </AlertDescription>
+        </div>
+
+        <div>
+          <AdminOrganisationDeleteDialog organisationId={organisation.id} organisationName={organisation.name} />
+        </div>
+      </Alert>
     </div>
   );
 }
