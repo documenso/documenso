@@ -630,16 +630,6 @@ msgstr "{validationLength, plural, one {Selecteer precies # optie} other {Select
 msgid "{visibleRows, plural, one {Showing # result.} other {Showing # results.}}"
 msgstr "{visibleRows, plural, one {# resultaat wordt getoond.} other {# resultaten worden getoond.}}"
 
-#: apps/remix/app/components/forms/branding-preferences-form.tsx
-msgid "/* Write CSS targeting your signing pages. Selectors are scoped automatically. */\n"
-".my-button {\n"
-"  background: red;\n"
-"}"
-msgstr "/* Schrijf CSS voor je ondertekenpagina&#39;s. Selectors worden automatisch gescopeerd. */\n"
-".my-button {\n"
-"  background: red;\n"
-"}"
-
 #. placeholder {0}: document.title
 #. placeholder {0}: envelope.title
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
@@ -3999,6 +3989,12 @@ msgstr "E-mail bij voltooid document"
 msgid "Document Completed!"
 msgstr "Document voltooid!"
 
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "Document conversion is temporarily unavailable. Please try again shortly or upload a PDF."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Document created"
 msgstr "Document aangemaakt"
@@ -4440,16 +4436,16 @@ msgid "Drafted Documents"
 msgstr "Conceptdocumenten"
 
 #: packages/ui/primitives/document-dropzone.tsx
-msgid "Drag & drop your PDF here."
-msgstr "Sleep je PDF hierheen."
+msgid "Drag & drop your document here."
+msgstr ""
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Drag and drop or click to upload"
 msgstr "Slepen en neerzetten of klik om te uploaden"
 
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
-msgid "Drag and drop your PDF file here"
-msgstr "Sleep je PDF-bestand hierheen"
+msgid "Drag and drop your document here"
+msgstr ""
 
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
@@ -10926,6 +10922,12 @@ msgstr "Deze functie is niet beschikbaar in je huidige abonnement."
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "Dit veld kan niet worden gewijzigd of verwijderd. Wanneer je de directe link van deze sjabloon deelt of aan je openbare profiel toevoegt, kan iedereen die toegang heeft zijn naam en e-mailadres invoeren en de aan hem toegewezen velden invullen."
 
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "This file type isn't supported. Please upload a PDF or Word document."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "This folder contains multiple items. Deleting it will remove all subfolders and move all nested documents and templates to the root folder."
 msgstr "Deze map bevat meerdere items. Verwijderen zorgt ervoor dat alle submappen worden verwijderd en alle geneste documenten en sjablonen naar de hoofdmap worden verplaatst."
@@ -12196,6 +12198,12 @@ msgstr "We kunnen deze passkey momenteel niet verwijderen. Probeer het later opn
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 msgid "We are unable to update this passkey at the moment. Please try again later."
 msgstr "We kunnen deze passkey momenteel niet bijwerken. Probeer het later opnieuw."
+
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "We couldn't convert this file. Please check it's a valid Word document or upload a PDF instead."
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "We couldn't create a Stripe customer. Please try again."
@@ -13784,4 +13792,3 @@ msgstr "Uw verificatiecode:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
-
