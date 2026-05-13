@@ -16,7 +16,7 @@ export const SEAL_DOCUMENT_SWEEP_JOB_DEFINITION = {
   trigger: {
     name: SEAL_DOCUMENT_SWEEP_JOB_DEFINITION_ID,
     schema: SEAL_DOCUMENT_SWEEP_JOB_DEFINITION_SCHEMA,
-    cron: getJobCronExpression('NEXT_PRIVATE_JOBS_SEAL_DOCUMENT_SWEEP_CRON', '*/15 * * * *'),
+    cron: getJobCronExpression('NEXT_PRIVATE_JOBS_SEAL_DOCUMENT_SWEEP_CRON', '*/15 * * * *'), // Every 15 minutes.
   },
   handler: async ({ payload, io }) => {
     const handler = await import('./seal-document-sweep.handler');

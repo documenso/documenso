@@ -18,7 +18,7 @@ export const SEND_SIGNING_REMINDERS_SWEEP_JOB_DEFINITION = {
   trigger: {
     name: SEND_SIGNING_REMINDERS_SWEEP_JOB_DEFINITION_ID,
     schema: SEND_SIGNING_REMINDERS_SWEEP_JOB_DEFINITION_SCHEMA,
-    cron: getJobCronExpression('NEXT_PRIVATE_JOBS_SIGNING_REMINDERS_SWEEP_CRON', '*/15 * * * *'),
+    cron: getJobCronExpression('NEXT_PRIVATE_JOBS_SIGNING_REMINDERS_SWEEP_CRON', '*/15 * * * *'), // Every 15 minutes.
   },
   handler: async ({ payload, io }) => {
     const handler = await import('./send-signing-reminders-sweep.handler');
