@@ -200,19 +200,27 @@ For full instructions, requirements, and configuration details, see the [Self Ho
 
 For troubleshooting self-hosted deployments, see the [Troubleshooting guide](https://docs.documenso.com/docs/self-hosting/maintenance/troubleshooting) and [Tips & Common Pitfalls](https://docs.documenso.com/docs/self-hosting/getting-started/tips).
 
-### Developer Quickstart: Emails
+### I'm not receiving any emails when using the developer quickstart.
 
-When using the developer quickstart, an [Inbucket](https://inbucket.org/) server is spun up in a Docker container that stores all outgoing emails locally. The Web UI is at http://localhost:9000 and the SMTP port is on localhost:2500.
+When using the developer quickstart, an [Inbucket](https://inbucket.org/) server will be spun up in a docker container that will store all outgoing emails locally for you to view.
 
-### Environment Variables in Scripts
+The Web UI can be found at http://localhost:9000, while the SMTP port will be on localhost:2500.
 
-Wrap your package script with the `with:env` script:
+### I can't see environment variables in my package scripts.
+
+Wrap your package script with the `with:env` script like such:
 
 ```
 npm run with:env -- npm run myscript
 ```
 
-This loads environment variables from your `.env` and `.env.local` files.
+The same can be done when using `npx` for one of the bin scripts:
+
+```
+npm run with:env -- npx myscript
+```
+
+This will load environment variables from your `.env` and `.env.local` files.
 
 ## Repo Activity
 
