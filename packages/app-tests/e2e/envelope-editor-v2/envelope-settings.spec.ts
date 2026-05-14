@@ -115,6 +115,11 @@ const runSettingsFlow = async ({ root }: TEnvelopeEditorSurface, { externalId, i
 
   await root.locator('input[name="externalId"]').fill(externalId);
   await root.locator('input[name="meta.redirectUrl"]').fill(TEST_SETTINGS_VALUES.redirectUrl);
+  await root.getByRole('button', { name: 'Notifications' }).click();
+  await root.locator('input[name="meta.subject"]').fill(TEST_SETTINGS_VALUES.subject);
+  await root.locator('textarea[name="meta.message"]').fill(TEST_SETTINGS_VALUES.message);
+
+  await root.getByRole('button', { name: 'General' }).click();
 
   await root.locator('[data-testid="documentDistributionMethodSelectValue"]').click();
   await root.getByRole('option', { name: TEST_SETTINGS_VALUES.distributionMethod }).click();
@@ -190,7 +195,17 @@ const runSettingsFlow = async ({ root }: TEnvelopeEditorSurface, { externalId, i
   await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderRepeatUnit }).click();
   await clickSettingsDialogHeader(root);
 
-  await root.getByRole('button', { name: 'Email' }).click();
+  await root.getByRole('button', { name: 'Notifications' }).click();
+  await expect(root.locator('input[name="meta.subject"]')).toBeDisabled();
+  await expect(root.locator('textarea[name="meta.message"]')).toBeDisabled();
+  const emailSenderSelect = getComboboxByLabel(root, 'Email Sender');
+  const hasEmailSenderSelect = (await emailSenderSelect.count()) > 0;
+
+  if (hasEmailSenderSelect) {
+    await expect(emailSenderSelect).toBeDisabled();
+  }
+
+  await expect(root.locator('#recipientSigned')).toBeEnabled();
   await root.locator('#recipientSigned').click();
   await root.locator('#recipientSigningRequest').click();
   await root.locator('#recipientRemoved').click();
@@ -201,8 +216,6 @@ const runSettingsFlow = async ({ root }: TEnvelopeEditorSurface, { externalId, i
   await root.locator('#ownerRecipientExpired').click();
   await root.locator('#ownerDocumentCreated').click();
   await root.locator('input[name="meta.emailReplyTo"]').fill(TEST_SETTINGS_VALUES.replyTo);
-  await root.locator('input[name="meta.subject"]').fill(TEST_SETTINGS_VALUES.subject);
-  await root.locator('textarea[name="meta.message"]').fill(TEST_SETTINGS_VALUES.message);
 
   await root.getByRole('button', { name: 'Security' }).click();
   await selectMultiSelectOption(root, 'documentAccessSelectValue', TEST_SETTINGS_VALUES.accessAuth);
@@ -264,7 +277,7 @@ const runSettingsFlow = async ({ root }: TEnvelopeEditorSurface, { externalId, i
     TEST_SETTINGS_VALUES.reminderRepeatUnit,
   );
 
-  await root.getByRole('button', { name: 'Email' }).click();
+  await root.getByRole('button', { name: 'Notifications' }).click();
   await expect(root.locator('#recipientSigned')).toHaveAttribute('aria-checked', 'false');
   await expect(root.locator('#recipientSigningRequest')).toHaveAttribute('aria-checked', 'false');
   await expect(root.locator('#recipientRemoved')).toHaveAttribute('aria-checked', 'false');

@@ -131,9 +131,9 @@ const tabs = [
   },
   {
     id: 'email',
-    title: msg`Email`,
+    title: msg`Notifications`,
     icon: MailIcon,
-    description: msg`Configure email settings for the document.`,
+    description: msg`Configure notification settings for the document.`,
   },
   {
     id: 'security',
@@ -205,6 +205,8 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
     );
 
   const emailSettings = form.watch('meta.emailSettings');
+  const distributionMethod = form.watch('meta.distributionMethod');
+  const isEmailDistribution = distributionMethod === DocumentDistributionMethod.EMAIL;
 
   const { data: emailData, isLoading: isLoadingEmails } = trpc.enterprise.organisation.email.find.useQuery(
     {
@@ -747,6 +749,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                                   {...field}
                                   value={field.value === null ? '-1' : field.value}
                                   onValueChange={(value) => field.onChange(value === '-1' ? null : value)}
+                                  disabled={!isEmailDistribution}
                                 >
                                   <SelectTrigger loading={isLoadingEmails} className="bg-background">
                                     <SelectValue />
@@ -804,7 +807,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                             </FormLabel>
 
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} disabled={!isEmailDistribution} />
                             </FormControl>
 
                             <FormMessage />
@@ -832,7 +835,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                             </FormLabel>
 
                             <FormControl>
-                              <Textarea className="h-16 resize-none bg-background" {...field} />
+                              <Textarea className="h-16 resize-none bg-background" {...field} disabled={!isEmailDistribution} />
                             </FormControl>
 
                             <FormMessage />
