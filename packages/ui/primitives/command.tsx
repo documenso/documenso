@@ -9,16 +9,23 @@ import { Dialog, DialogContent } from './dialog';
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive>
->(({ className, ...props }, ref) => (
-  <CommandPrimitive
-    ref={ref}
-    className={cn(
-      'flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground',
-      className,
-    )}
-    {...props}
-  />
-));
+>(({ className, value, ...props }, ref) => {
+  const sanitizedValue = React.useMemo(() => {
+    return typeof value === 'string' ? value.replace(/"/g, '') : value;
+  }, [value]);
+
+  return (
+    <CommandPrimitive
+      ref={ref}
+      value={sanitizedValue}
+      className={cn(
+        'flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground',
+        className,
+      )}
+      {...props}
+    />
+  );
+});
 
 Command.displayName = CommandPrimitive.displayName;
 
@@ -141,16 +148,23 @@ CommandSeparator.displayName = CommandPrimitive.Separator.displayName;
 const CommandItem = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
->(({ className, ...props }, ref) => (
-  <CommandPrimitive.Item
-    ref={ref}
-    className={cn(
-      'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-      className,
-    )}
-    {...props}
-  />
-));
+>(({ className, value, ...props }, ref) => {
+  const sanitizedValue = React.useMemo(() => {
+    return typeof value === 'string' ? value.replace(/"/g, '') : value;
+  }, [value]);
+
+  return (
+    <CommandPrimitive.Item
+      ref={ref}
+      value={sanitizedValue}
+      className={cn(
+        'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:opacity-50',
+        className,
+      )}
+      {...props}
+    />
+  );
+});
 
 CommandItem.displayName = CommandPrimitive.Item.displayName;
 
