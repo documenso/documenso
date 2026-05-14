@@ -3,6 +3,7 @@ import {
   ORGANISATION_USER_ACCOUNT_TYPE,
 } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { jobs } from '@documenso/lib/jobs/client';
 import { orphanEnvelopes } from '@documenso/lib/server-only/envelope/orphan-envelopes';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
@@ -42,6 +43,11 @@ export const deleteOrganisationRoute = authenticatedProcedure
             id: true,
           },
         },
+        subscription: {
+          select: {
+            planId: true,
+          },
+        },
       },
     });
 
@@ -68,4 +74,18 @@ export const deleteOrganisationRoute = authenticatedProcedure
         },
       });
     });
+
+    // If the organisation has a Stripe subscription, schedule it to be
+    // cancelled at the end of the current billing period. The job runs
+    // asynchronously so a Stripe outage doesn't block deletion, and is
+    // retried by the job runner if Stripe is temporarily unavailable.
+    if (organisation.subscription) {
+      await jobs.triggerJob({
+        name: 'internal.cancel-organisation-subscription',
+        payload: {
+          stripeSubscriptionId: organisation.subscription.planId,
+          organisationId: organisation.id,
+        },
+      });
+    }
   });

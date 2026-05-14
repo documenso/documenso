@@ -1,7 +1,7 @@
 name: 'Validate PR Name'
 
 on:
-  pull_request_target:
+  pull_request:
     types:
       - opened
       - reopened
