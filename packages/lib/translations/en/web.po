@@ -56,6 +56,12 @@ msgstr "\"{title}\" has been successfully hidden"
 msgid "\"Team Name\" has invited you to sign \"example document\"."
 msgstr "\"Team Name\" has invited you to sign \"example document\"."
 
+#. placeholder {0}: warning.line
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+msgid "(line {0})"
+msgstr "(line {0})"
+
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx
 #: apps/remix/app/components/general/envelope-signing/envelope-signer-form.tsx
@@ -84,6 +90,12 @@ msgstr "{0, plural, one {# character over the limit} other {# characters over th
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "{0, plural, one {# character remaining} other {# characters remaining}}"
 msgstr "{0, plural, one {# character remaining} other {# characters remaining}}"
+
+#. placeholder {0}: warnings.length
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+msgid "{0, plural, one {# CSS rule was dropped during sanitisation.} other {# CSS rules were dropped during sanitisation.}}"
+msgstr "{0, plural, one {# CSS rule was dropped during sanitisation.} other {# CSS rules were dropped during sanitisation.}}"
 
 #. placeholder {0}: folder._count.documents
 #: apps/remix/app/components/general/folder/folder-card.tsx
@@ -612,6 +624,18 @@ msgstr "{validationLength, plural, one {Select exactly # option} other {Select e
 #: packages/ui/primitives/data-table-pagination.tsx
 msgid "{visibleRows, plural, one {Showing # result.} other {Showing # results.}}"
 msgstr "{visibleRows, plural, one {Showing # result.} other {Showing # results.}}"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid ""
+"/* Write CSS targeting your signing pages. Selectors are scoped automatically. */\n"
+".my-button {\n"
+"  background: red;\n"
+"}"
+msgstr ""
+"/* Write CSS targeting your signing pages. Selectors are scoped automatically. */\n"
+".my-button {\n"
+"  background: red;\n"
+"}"
 
 #. placeholder {0}: document.title
 #. placeholder {0}: envelope.title
@@ -1421,6 +1445,10 @@ msgstr "Admin Panel"
 msgid "Admins only"
 msgstr "Admins only"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Advanced — Custom CSS"
+msgstr "Advanced — Custom CSS"
+
 #: packages/ui/primitives/document-flow/add-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "Advanced Options"
@@ -1536,6 +1564,10 @@ msgstr "Allow all organisation members to access this team"
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Allow document recipients to reply directly to this email address"
 msgstr "Allow document recipients to reply directly to this email address"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
+msgid "Allow Personal Organisations"
+msgstr "Allow Personal Organisations"
 
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
@@ -2161,6 +2193,10 @@ msgstr "Back"
 msgid "Back home"
 msgstr "Back home"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Background"
+msgstr "Background"
+
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "Background Color"
 msgstr "Background Color"
@@ -2181,6 +2217,14 @@ msgstr "Backup codes"
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "Banner Updated"
 msgstr "Banner Updated"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Base background colour."
+msgstr "Base background colour."
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Base text colour."
+msgstr "Base text colour."
 
 #: packages/email/template-components/template-confirmation-email.tsx
 msgid "Before you get started, please confirm your email address by clicking the button below:"
@@ -2204,9 +2248,25 @@ msgstr "Black"
 msgid "Blue"
 msgstr "Blue"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Border"
+msgstr "Border"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Border Radius"
+msgstr "Border Radius"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Border radius size in REM units (e.g. 0.5rem)."
+msgstr "Border radius size in REM units (e.g. 0.5rem)."
+
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Bottom"
 msgstr "Bottom"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Brand Colours"
+msgstr "Brand Colours"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Brand Details"
@@ -2240,7 +2300,6 @@ msgstr "Branding Logo"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Branding Preferences"
 msgstr "Branding Preferences"
 
@@ -2248,6 +2307,11 @@ msgstr "Branding Preferences"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Branding preferences updated"
 msgstr "Branding preferences updated"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+msgid "Branding preferences updated with warnings"
+msgstr "Branding preferences updated with warnings"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Branding URL"
@@ -2784,7 +2848,7 @@ msgstr "Configure template"
 msgid "Configure Template"
 msgstr "Configure Template"
 
-#. placeholder {0}: parseMessageDescriptor( _, FRIENDLY_FIELD_TYPE[currentField.type], )
+#. placeholder {0}: parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[currentField.type])
 #: apps/remix/app/components/embed/authoring/field-advanced-settings-drawer.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
@@ -3277,6 +3341,11 @@ msgstr "Creating Document"
 msgid "Creating Template"
 msgstr "Creating Template"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+msgid "CSS rules were dropped during sanitisation"
+msgstr "CSS rules were dropped during sanitisation"
+
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "CSV Structure"
 msgstr "CSV Structure"
@@ -3318,6 +3387,10 @@ msgstr "Currently email domains can only be configured for Platform and above pl
 msgid "Custom {0} MB file"
 msgstr "Custom {0} MB file"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Custom CSS is sanitised on save. Layout-breaking properties, remote URLs, and pseudo-elements are stripped automatically. Any rules dropped during sanitisation will be shown after you save."
+msgstr "Custom CSS is sanitised on save. Layout-breaking properties, remote URLs, and pseudo-elements are stripped automatically. Any rules dropped during sanitisation will be shown after you save."
+
 #: packages/ui/components/document/expiration-period-picker.tsx
 msgid "Custom duration"
 msgstr "Custom duration"
@@ -3329,6 +3402,10 @@ msgstr "Custom interval"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Custom Organisation Groups"
 msgstr "Custom Organisation Groups"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Customise the colours used on your signing pages."
+msgstr "Customise the colours used on your signing pages."
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Dark Mode"
@@ -3378,6 +3455,10 @@ msgstr "David is the Employee, Lucas is the Manager"
 #: packages/email/templates/organisation-invite.tsx
 msgid "Decline"
 msgstr "Decline"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Default border colour."
+msgstr "Default border colour."
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Date Format"
@@ -4310,6 +4391,7 @@ msgstr "Don't transfer (Delete all documents)"
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/organisation-billing-invoices-table.tsx
+#: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 #: packages/email/template-components/template-document-completed.tsx
 msgid "Download"
@@ -4917,6 +4999,10 @@ msgstr "Envelope distributed"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-certificate.ts
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Envelope ID"
 msgstr "Envelope ID"
 
@@ -5111,7 +5197,7 @@ msgstr "Expires"
 msgid "Expires {0}"
 msgstr "Expires {0}"
 
-#. placeholder {0}: DateTime.fromMillis(Math.max(millisecondsRemaining, 0)).toFormat( 'mm:ss', )
+#. placeholder {0}: DateTime.fromMillis(Math.max(millisecondsRemaining, 0)).toFormat('mm:ss')
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Expires in {0}"
 msgstr "Expires in {0}"
@@ -5342,6 +5428,10 @@ msgstr "Fill in the details to create a new subscription claim."
 msgid "Filter by status"
 msgstr "Filter by status"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Focus ring colour."
+msgstr "Focus ring colour."
+
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
@@ -5399,6 +5489,10 @@ msgstr "For each recipient, provide their email (required) and name (optional) i
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "For example, if the claim has a new flag \"FLAG_1\" set to true, then this organisation will get that flag added."
 msgstr "For example, if the claim has a new flag \"FLAG_1\" set to true, then this organisation will get that flag added."
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Foreground"
+msgstr "Foreground"
 
 #: apps/remix/app/routes/_unauthenticated+/check-email.tsx
 msgid "Forgot password"
@@ -6324,6 +6418,8 @@ msgstr "Loading suggestions..."
 #: apps/remix/app/components/embed/embed-client-loading.tsx
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Loading..."
 msgstr "Loading..."
@@ -6900,9 +6996,17 @@ msgstr "No folders yet."
 msgid "No further action is required from you at this time."
 msgstr "No further action is required from you at this time."
 
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+msgid "No groups found"
+msgstr "No groups found"
+
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "No License Configured"
 msgstr "No License Configured"
+
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
+msgid "No members found"
+msgstr "No members found"
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "No members selected"
@@ -7418,6 +7522,11 @@ msgctxt "Subscription status"
 msgid "Paid"
 msgstr "Paid"
 
+#: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
+msgctxt "Partially signed document (adjective)"
+msgid "Partial"
+msgstr "Partial"
+
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
@@ -7673,6 +7782,10 @@ msgstr "Please confirm your email"
 msgid "Please confirm your email address"
 msgstr "Please confirm your email address"
 
+#: apps/remix/app/components/embed/embed-paywall.tsx
+msgid "Please contact <0>support</0> if you have any questions."
+msgstr "Please contact <0>support</0> if you have any questions."
+
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Please contact support if you would like to revert this action."
 msgstr "Please contact support if you would like to revert this action."
@@ -7689,8 +7802,6 @@ msgstr "Please enter a meaningful name for your token. This will help you identi
 msgid "Please enter a number"
 msgstr "Please enter a number"
 
-#: apps/remix/app/components/forms/profile.tsx
-#: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Please enter a valid name."
 msgstr "Please enter a valid name."
@@ -7883,6 +7994,18 @@ msgstr "Preview the document before sending"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 msgid "Preview what the signed document will look like with placeholder data"
 msgstr "Preview what the signed document will look like with placeholder data"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Primary"
+msgstr "Primary"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Primary action colour."
+msgstr "Primary action colour."
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Primary Foreground"
+msgstr "Primary Foreground"
 
 #: apps/remix/app/components/general/template/template-type.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
@@ -8636,6 +8759,10 @@ msgstr "Revoke all sessions"
 msgid "Right"
 msgstr "Right"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Ring"
+msgstr "Ring"
+
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
@@ -8756,9 +8883,17 @@ msgstr "Search documents..."
 msgid "Search folders..."
 msgstr "Search folders..."
 
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+msgid "Search groups by name"
+msgstr "Search groups by name"
+
 #: packages/ui/components/common/language-switcher-dialog.tsx
 msgid "Search languages..."
 msgstr "Search languages..."
+
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
+msgid "Search members by name or email"
+msgstr "Search members by name or email"
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "Secret"
@@ -8879,7 +9014,8 @@ msgstr "Select default role"
 msgid "Select direction"
 msgstr "Select direction"
 
-#: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
 msgid "Select groups"
 msgstr "Select groups"
 
@@ -8891,9 +9027,8 @@ msgstr "Select groups of members to add to the team."
 msgid "Select groups to add to this team"
 msgstr "Select groups to add to this team"
 
-#: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
-#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
 msgid "Select members"
 msgstr "Select members"
 
@@ -9207,6 +9342,10 @@ msgstr "Sign document"
 #: packages/email/template-components/template-document-reminder.tsx
 msgid "Sign Document"
 msgstr "Sign Document"
+
+#: apps/remix/app/routes/_recipient+/_layout.tsx
+msgid "Sign Document - Documenso"
+msgstr "Sign Document - Documenso"
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "Sign Documents"
@@ -10177,6 +10316,10 @@ msgstr "Text Align"
 msgid "Text Color"
 msgstr "Text Color"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Text colour on primary buttons."
+msgstr "Text colour on primary buttons."
+
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "Text is required"
 msgstr "Text is required"
@@ -10772,6 +10915,10 @@ msgstr "This envelope could not be distributed at this time. Please try again."
 msgid "This envelope could not be resent at this time. Please try again."
 msgstr "This envelope could not be resent at this time. Please try again."
 
+#: apps/remix/app/components/embed/embed-paywall.tsx
+msgid "This feature is not available on your current plan"
+msgstr "This feature is not available on your current plan"
+
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
@@ -11034,7 +11181,6 @@ msgstr "To mark this document as viewed, you need to be logged in as <0>{0}</0>"
 msgid "To mark this document as viewed, you need to be logged in."
 msgstr "To mark this document as viewed, you need to be logged in."
 
-#. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
 #. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
@@ -11732,10 +11878,6 @@ msgstr "User profiles are here!"
 msgid "User settings"
 msgstr "User settings"
 
-#: apps/remix/app/components/forms/signup.tsx
-msgid "User with this email already exists. Please use a different email address."
-msgstr "User with this email already exists. Please use a different email address."
-
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 msgid "Users"
@@ -12282,6 +12424,10 @@ msgid "We were unable to copy your recovery code to your clipboard. Please try a
 msgstr "We were unable to copy your recovery code to your clipboard. Please try again."
 
 #: apps/remix/app/components/forms/signup.tsx
+msgid "We were unable to create your account. If you already have an account, try signing in instead."
+msgstr "We were unable to create your account. If you already have an account, try signing in instead."
+
+#: apps/remix/app/components/forms/signup.tsx
 msgid "We were unable to create your account. Please review the information you provided and try again."
 msgstr "We were unable to create your account. Please review the information you provided and try again."
 
@@ -12475,6 +12621,10 @@ msgstr "What you can do with teams:"
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "When enabled, signers can choose who should sign next in the sequence instead of following the predefined order."
 msgstr "When enabled, signers can choose who should sign next in the sequence instead of following the predefined order."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
+msgid "When enabled, users signing in via SSO for the first time will also receive their own personal organisation."
+msgstr "When enabled, users signing in via SSO for the first time will also receive their own personal organisation."
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "When you click continue, you will be prompted to add the first available authenticator on your system."

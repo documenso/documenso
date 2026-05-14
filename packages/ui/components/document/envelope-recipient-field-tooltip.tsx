@@ -131,8 +131,8 @@ export function EnvelopeRecipientFieldTooltip({
     >
       <PopoverHover
         trigger={
-          <Avatar className="absolute -top-3 -left-3 z-50 h-6 w-6 border-2 border-border/50 border-solid transition-colors hover:border-border">
-            <AvatarFallback className="bg-muted text-[10px] text-muted-foreground">
+          <Avatar className="absolute -top-3 -left-3 z-50 h-6 w-6 border-2 border-gray-200/50 border-solid transition-colors hover:border-gray-200">
+            <AvatarFallback className="bg-neutral-50 text-gray-400 text-xs">
               {extractInitials(field.recipient.name || field.recipient.email)}
             </AvatarFallback>
           </Avatar>

@@ -12,7 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../
 const tooltipVariants = cva('font-semibold', {
   variants: {
     color: {
-      default: 'border-2 fill-background',
+      default: 'border-2 fill-white',
       warning: 'border-0 bg-orange-300 fill-orange-300 text-orange-900',
     },
   },

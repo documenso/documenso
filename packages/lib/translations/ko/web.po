@@ -8,7 +8,7 @@ msgstr ""
 "Language: ko\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-04-22 14:34\n"
+"PO-Revision-Date: 2026-05-11 09:07\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -61,6 +61,12 @@ msgstr "\"{title}\"이(가) 성공적으로 숨겨졌습니다"
 msgid "\"Team Name\" has invited you to sign \"example document\"."
 msgstr "\"Team Name\"이(가) \"example document\"에 서명하도록 귀하를 초대했습니다."
 
+#. placeholder {0}: warning.line
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+msgid "(line {0})"
+msgstr "(줄 {0})"
+
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx
 #: apps/remix/app/components/general/envelope-signing/envelope-signer-form.tsx
@@ -89,6 +95,12 @@ msgstr "{0, plural, other {제한을 #자 초과했습니다}}"
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "{0, plural, one {# character remaining} other {# characters remaining}}"
 msgstr "{0, plural, other {#자 남음}}"
+
+#. placeholder {0}: warnings.length
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+msgid "{0, plural, one {# CSS rule was dropped during sanitisation.} other {# CSS rules were dropped during sanitisation.}}"
+msgstr "{0, plural, other {#개의 CSS 규칙이 정리 과정에서 제거되었습니다.}}"
 
 #. placeholder {0}: folder._count.documents
 #: apps/remix/app/components/general/folder/folder-card.tsx
@@ -617,6 +629,16 @@ msgstr "{validationLength, plural, other {정확히 #개의 옵션을 선택하�
 #: packages/ui/primitives/data-table-pagination.tsx
 msgid "{visibleRows, plural, one {Showing # result.} other {Showing # results.}}"
 msgstr "{visibleRows, plural, other {총 #개 결과 중 표시 중입니다.}}"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "/* Write CSS targeting your signing pages. Selectors are scoped automatically. */\n"
+".my-button {\n"
+"  background: red;\n"
+"}"
+msgstr "/* 서명 페이지를 대상으로 하는 CSS를 작성하세요. 선택자는 자동으로 범위가 지정됩니다. */\n"
+".my-button {\n"
+"  background: red;\n"
+"}"
 
 #. placeholder {0}: document.title
 #. placeholder {0}: envelope.title
@@ -1426,6 +1448,10 @@ msgstr "관리자 패널"
 msgid "Admins only"
 msgstr "관리자 전용"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Advanced — Custom CSS"
+msgstr "고급 — 사용자 지정 CSS"
+
 #: packages/ui/primitives/document-flow/add-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "Advanced Options"
@@ -1541,6 +1567,10 @@ msgstr "모든 조직 구성원이 이 팀에 접근할 수 있도록 허용"
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Allow document recipients to reply directly to this email address"
 msgstr "문서 수신자가 이 이메일 주소로 직접 회신할 수 있도록 허용합니다."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
+msgid "Allow Personal Organisations"
+msgstr "개인 조직 허용"
 
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
@@ -2166,6 +2196,10 @@ msgstr "뒤로"
 msgid "Back home"
 msgstr "홈으로 돌아가기"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Background"
+msgstr "배경"
+
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "Background Color"
 msgstr "배경 색상"
@@ -2186,6 +2220,14 @@ msgstr "백업 코드"
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "Banner Updated"
 msgstr "배너가 업데이트되었습니다"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Base background colour."
+msgstr "기본 배경 색상입니다."
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Base text colour."
+msgstr "기본 텍스트 색상입니다."
 
 #: packages/email/template-components/template-confirmation-email.tsx
 msgid "Before you get started, please confirm your email address by clicking the button below:"
@@ -2209,9 +2251,25 @@ msgstr "검정"
 msgid "Blue"
 msgstr "파랑"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Border"
+msgstr "테두리"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Border Radius"
+msgstr "테두리 반경"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Border radius size in REM units (e.g. 0.5rem)."
+msgstr "REM 단위의 테두리 반경 크기입니다(예: 0.5rem)."
+
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Bottom"
 msgstr "아래"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Brand Colours"
+msgstr "브랜드 색상"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Brand Details"
@@ -2245,7 +2303,6 @@ msgstr "브랜딩 로고"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Branding Preferences"
 msgstr "브랜딩 환경설정"
 
@@ -2253,6 +2310,11 @@ msgstr "브랜딩 환경설정"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Branding preferences updated"
 msgstr "브랜딩 환경설정이 업데이트되었습니다"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+msgid "Branding preferences updated with warnings"
+msgstr "경고와 함께 브랜딩 환경설정이 업데이트되었습니다"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Branding URL"
@@ -2789,7 +2851,7 @@ msgstr "템플릿 구성"
 msgid "Configure Template"
 msgstr "템플릿 구성"
 
-#. placeholder {0}: parseMessageDescriptor( _, FRIENDLY_FIELD_TYPE[currentField.type], )
+#. placeholder {0}: parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[currentField.type])
 #: apps/remix/app/components/embed/authoring/field-advanced-settings-drawer.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
@@ -3282,6 +3344,11 @@ msgstr "문서 생성 중"
 msgid "Creating Template"
 msgstr "템플릿 생성 중"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+msgid "CSS rules were dropped during sanitisation"
+msgstr "정리 과정에서 일부 CSS 규칙이 제거되었습니다"
+
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "CSV Structure"
 msgstr "CSV 구조"
@@ -3323,6 +3390,10 @@ msgstr "현재 이메일 도메인은 Platform 요금제 이상에서만 구성�
 msgid "Custom {0} MB file"
 msgstr "사용자 정의 {0} MB 파일"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Custom CSS is sanitised on save. Layout-breaking properties, remote URLs, and pseudo-elements are stripped automatically. Any rules dropped during sanitisation will be shown after you save."
+msgstr "사용자 지정 CSS는 저장 시 보안 정제가 수행됩니다. 레이아웃을 깨뜨리는 속성, 원격 URL 및 의사 요소는 자동으로 제거됩니다. 정제 과정에서 제거된 규칙은 저장 후에 표시됩니다."
+
 #: packages/ui/components/document/expiration-period-picker.tsx
 msgid "Custom duration"
 msgstr "사용자 지정 기간"
@@ -3334,6 +3405,10 @@ msgstr "사용자 지정 간격"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Custom Organisation Groups"
 msgstr "사용자 지정 조직 그룹"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Customise the colours used on your signing pages."
+msgstr "서명 페이지에서 사용되는 색상을 사용자 지정하세요."
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Dark Mode"
@@ -3383,6 +3458,10 @@ msgstr "David는 직원이고, Lucas는 관리자입니다."
 #: packages/email/templates/organisation-invite.tsx
 msgid "Decline"
 msgstr "거부"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Default border colour."
+msgstr "기본 테두리 색상입니다."
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Date Format"
@@ -4315,6 +4394,7 @@ msgstr "전송하지 않음(모든 문서 삭제)"
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/organisation-billing-invoices-table.tsx
+#: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 #: packages/email/template-components/template-document-completed.tsx
 msgid "Download"
@@ -4922,6 +5002,10 @@ msgstr "봉투가 배포되었습니다"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-certificate.ts
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Envelope ID"
 msgstr "봉투 ID"
 
@@ -5116,7 +5200,7 @@ msgstr "만료일"
 msgid "Expires {0}"
 msgstr "만료일 {0}"
 
-#. placeholder {0}: DateTime.fromMillis(Math.max(millisecondsRemaining, 0)).toFormat( 'mm:ss', )
+#. placeholder {0}: DateTime.fromMillis(Math.max(millisecondsRemaining, 0)).toFormat('mm:ss')
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Expires in {0}"
 msgstr "{0} 후 만료"
@@ -5347,6 +5431,10 @@ msgstr "새 구독 클레임을 생성하려면 세부 정보를 입력하세요
 msgid "Filter by status"
 msgstr "상태로 필터링"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Focus ring colour."
+msgstr "포커스 링 색상입니다."
+
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
@@ -5404,6 +5492,10 @@ msgstr "각 수신자에 대해 별도 열에 이메일(필수)과 이름(선택
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "For example, if the claim has a new flag \"FLAG_1\" set to true, then this organisation will get that flag added."
 msgstr "예를 들어, 클레임에 새 플래그 \"FLAG_1\"이 true로 설정되면, 이 조직에도 해당 플래그가 추가됩니다."
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Foreground"
+msgstr "전경"
 
 #: apps/remix/app/routes/_unauthenticated+/check-email.tsx
 msgid "Forgot password"
@@ -6329,6 +6421,8 @@ msgstr "제안 불러오는 중..."
 #: apps/remix/app/components/embed/embed-client-loading.tsx
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Loading..."
 msgstr "로딩 중..."
@@ -6905,9 +6999,17 @@ msgstr "아직 폴더가 없습니다."
 msgid "No further action is required from you at this time."
 msgstr "현재 추가로 수행해야 할 작업은 없습니다."
 
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+msgid "No groups found"
+msgstr "그룹을 찾을 수 없습니다."
+
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "No License Configured"
 msgstr "라이선스가 구성되지 않았습니다"
+
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
+msgid "No members found"
+msgstr "구성원을 찾을 수 없습니다."
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "No members selected"
@@ -7423,6 +7525,11 @@ msgctxt "Subscription status"
 msgid "Paid"
 msgstr "유료"
 
+#: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
+msgctxt "Partially signed document (adjective)"
+msgid "Partial"
+msgstr "부분 완료"
+
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
@@ -7678,6 +7785,10 @@ msgstr "이메일을 확인해 주세요."
 msgid "Please confirm your email address"
 msgstr "이메일 주소를 확인해 주세요."
 
+#: apps/remix/app/components/embed/embed-paywall.tsx
+msgid "Please contact <0>support</0> if you have any questions."
+msgstr "궁금한 점이 있으시면 <0>지원팀</0>에 문의해 주세요."
+
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Please contact support if you would like to revert this action."
 msgstr "이 작업을 되돌리려면 지원팀에 문의해 주세요."
@@ -7694,8 +7805,6 @@ msgstr "토큰을 나중에 식별할 수 있도록 의미 있는 이름을 입�
 msgid "Please enter a number"
 msgstr "숫자를 입력하세요"
 
-#: apps/remix/app/components/forms/profile.tsx
-#: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Please enter a valid name."
 msgstr "올바른 이름을 입력해 주세요."
@@ -7888,6 +7997,18 @@ msgstr "보내기 전에 문서를 미리 확인하세요"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 msgid "Preview what the signed document will look like with placeholder data"
 msgstr "자리표시자 데이터를 사용해 서명된 문서가 어떻게 보일지 미리 확인하세요"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Primary"
+msgstr "기본"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Primary action colour."
+msgstr "기본 동작 색상입니다."
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Primary Foreground"
+msgstr "기본 전경"
 
 #: apps/remix/app/components/general/template/template-type.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
@@ -8641,6 +8762,10 @@ msgstr "모든 세션 해지"
 msgid "Right"
 msgstr "오른쪽"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Ring"
+msgstr "링"
+
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
@@ -8761,9 +8886,17 @@ msgstr "문서 검색..."
 msgid "Search folders..."
 msgstr "폴더 검색..."
 
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+msgid "Search groups by name"
+msgstr "그룹 이름으로 검색"
+
 #: packages/ui/components/common/language-switcher-dialog.tsx
 msgid "Search languages..."
 msgstr "언어 검색..."
+
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
+msgid "Search members by name or email"
+msgstr "이름 또는 이메일로 구성원 검색"
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "Secret"
@@ -8884,7 +9017,8 @@ msgstr "기본 역할 선택"
 msgid "Select direction"
 msgstr "방향 선택"
 
-#: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
 msgid "Select groups"
 msgstr "그룹 선택"
 
@@ -8896,9 +9030,8 @@ msgstr "이 팀에 추가할 구성원 그룹을 선택하세요."
 msgid "Select groups to add to this team"
 msgstr "이 팀에 추가할 그룹을 선택하세요."
 
-#: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
-#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
 msgid "Select members"
 msgstr "구성원 선택"
 
@@ -9212,6 +9345,10 @@ msgstr "문서 서명"
 #: packages/email/template-components/template-document-reminder.tsx
 msgid "Sign Document"
 msgstr "문서 서명"
+
+#: apps/remix/app/routes/_recipient+/_layout.tsx
+msgid "Sign Document - Documenso"
+msgstr "문서 서명 - Documenso"
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "Sign Documents"
@@ -10182,6 +10319,10 @@ msgstr "텍스트 정렬"
 msgid "Text Color"
 msgstr "텍스트 색상"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Text colour on primary buttons."
+msgstr "기본 버튼의 텍스트 색상입니다."
+
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "Text is required"
 msgstr "텍스트는 필수 항목입니다"
@@ -10777,6 +10918,10 @@ msgstr "현재 이 봉투를 배포할 수 없습니다. 다시 시도해 주세
 msgid "This envelope could not be resent at this time. Please try again."
 msgstr "현재 이 봉투를 다시 보낼 수 없습니다. 다시 시도해 주세요."
 
+#: apps/remix/app/components/embed/embed-paywall.tsx
+msgid "This feature is not available on your current plan"
+msgstr "현재 요금제에서는 이 기능을 이용할 수 없습니다."
+
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "이 필드는 수정하거나 삭제할 수 없습니다. 이 템플릿의 다이렉트 링크를 공유하거나 공개 프로필에 추가하면, 누구든지 링크에 접근해 이름과 이메일을 입력하고 본인에게 할당된 필드를 작성할 수 있습니다."
@@ -11039,7 +11184,6 @@ msgstr "이 문서를 열람된 상태로 표시하려면 <0>{0}</0> 계정으�
 msgid "To mark this document as viewed, you need to be logged in."
 msgstr "이 문서를 열람 완료로 표시하려면 로그인해야 합니다."
 
-#. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
 #. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
@@ -11737,10 +11881,6 @@ msgstr "사용자 프로필이 추가되었습니다!"
 msgid "User settings"
 msgstr "사용자 설정"
 
-#: apps/remix/app/components/forms/signup.tsx
-msgid "User with this email already exists. Please use a different email address."
-msgstr "이 이메일을 사용하는 사용자가 이미 있습니다. 다른 이메일 주소를 사용해 주세요."
-
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 msgid "Users"
@@ -12287,6 +12427,10 @@ msgid "We were unable to copy your recovery code to your clipboard. Please try a
 msgstr "복구 코드를 클립보드에 복사하지 못했습니다. 다시 시도해 주세요."
 
 #: apps/remix/app/components/forms/signup.tsx
+msgid "We were unable to create your account. If you already have an account, try signing in instead."
+msgstr "계정을 생성할 수 없습니다. 이미 계정을 보유하고 있다면 대신 로그인해 주세요."
+
+#: apps/remix/app/components/forms/signup.tsx
 msgid "We were unable to create your account. Please review the information you provided and try again."
 msgstr "계정을 생성하지 못했습니다. 입력하신 정보를 확인한 뒤 다시 시도해 주세요."
 
@@ -12480,6 +12624,10 @@ msgstr "팀으로 할 수 있는 일:"
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "When enabled, signers can choose who should sign next in the sequence instead of following the predefined order."
 msgstr "활성화하면, 미리 정의된 순서 대신 서명자가 다음 서명자를 직접 선택할 수 있습니다."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
+msgid "When enabled, users signing in via SSO for the first time will also receive their own personal organisation."
+msgstr "활성화하면, 처음으로 SSO를 통해 로그인하는 사용자는 자신의 개인 조직도 함께 생성됩니다."
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "When you click continue, you will be prompted to add the first available authenticator on your system."
