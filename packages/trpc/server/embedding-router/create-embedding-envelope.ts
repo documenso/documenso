@@ -37,5 +37,6 @@ export const createEmbeddingEnvelopeRoute = procedure
         bypassDefaultRecipients: true,
       },
       apiRequestMetadata: ctx.metadata,
+      logger: ctx.logger,
     });
   });

@@ -512,7 +512,7 @@ export function BrandingPreferencesForm({
                         <FormItem className="flex-1">
                           <FormControl>
                             <Textarea
-                              placeholder={t`/* Write CSS targeting your signing pages. Selectors are scoped automatically. */
+                              placeholder={`/* Write CSS targeting your signing pages. Selectors are scoped automatically. */
 .my-button {
   background: red;
 }`}
