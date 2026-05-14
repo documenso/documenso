@@ -7,13 +7,28 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 ## What You Need
 
-Documenso requires the following external services:
+Documenso requires the following items and external services:
 
 | Service       | Purpose                      | Minimum Version |
 | ------------- | ---------------------------- | --------------- |
+| Signing certificate | Digital signature for documents | N/A             |
 | PostgreSQL    | Primary database             | 14+             |
 | SMTP server   | Sending emails to recipients | Any             |
 | Reverse proxy | SSL termination, routing     | Any             |
+
+
+### Signing Certificate
+
+<Callout type="error">
+  Documenso does not ship with a signing certificate. Without one, the application starts normally
+  but all document signing will fail. You must generate or provide a `.p12` certificate before going
+  to production.
+</Callout>
+
+Every completed document is digitally signed using an X.509 certificate. You can generate a self-signed certificate for free or use one from a Certificate Authority (CA).
+
+- [Generate a local certificate](/docs/self-hosting/configuration/signing-certificate/local) — step-by-step instructions to create a `.p12` certificate
+- [All certificate options](/docs/self-hosting/configuration/signing-certificate) — self-signed, CA-issued, and Google Cloud HSM
 
 ### PostgreSQL Database
 

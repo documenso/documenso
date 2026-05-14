@@ -154,6 +154,34 @@ See [Background Jobs Configuration](/docs/self-hosting/configuration/background-
 
 ---
 
+## IPv6-Only Deployments
+
+If you are deploying to an environment that uses only IPv6, set the `HOST` environment variable to `::` so the application binds to all IPv6 addresses:
+
+**Docker:**
+
+```bash
+docker run -it -e HOST=:: documenso/documenso:latest npm run start
+```
+
+**Kubernetes or Docker Compose:**
+
+```yaml
+containers:
+  - name: documenso
+    image: documenso/documenso:latest
+    command:
+      - npm
+    args:
+      - run
+      - start
+    env:
+      - name: HOST
+        value: '::'
+```
+
+---
+
 ## Docker File Permissions
 
 The Documenso container runs as a non-root user (UID 1001). If you mount files into the container (certificates, configuration), ensure they're readable:
