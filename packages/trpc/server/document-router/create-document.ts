@@ -1,5 +1,6 @@
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { convertToPdf } from '@documenso/lib/server-only/document-conversion';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-form-values-in-pdf';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
@@ -35,7 +36,7 @@ export const createDocumentRoute = authenticatedProcedure
       attachments,
     } = payload;
 
-    let pdf = Buffer.from(await file.arrayBuffer());
+    let pdf = await convertToPdf(file, ctx.logger);
 
     if (formValues) {
       // eslint-disable-next-line require-atomic-updates

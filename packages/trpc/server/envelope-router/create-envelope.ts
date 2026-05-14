@@ -1,11 +1,13 @@
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { convertToPdf } from '@documenso/lib/server-only/document-conversion';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import { extractPdfPlaceholders } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { EnvelopeType } from '@prisma/client';
+import type { Logger } from 'pino';
 
 import { insertFormValuesInPdf } from '../../../lib/server-only/pdf/insert-form-values-in-pdf';
 import { authenticatedProcedure } from '../trpc';
@@ -32,6 +34,7 @@ export const createEnvelopeRoute = authenticatedProcedure
       teamId: ctx.teamId,
       input,
       apiRequestMetadata: ctx.metadata,
+      logger: ctx.logger,
     });
   });
 
@@ -48,6 +51,12 @@ type CreateEnvelopeRouteOptions = {
   input: TCreateEnvelopeRequest;
   apiRequestMetadata: ApiRequestMetadata;
 
+  /**
+   * Optional pino logger threaded from the calling tRPC context. Passed to
+   * downstream helpers (e.g. `convertToPdf`) for structured logging.
+   */
+  logger?: Logger;
+
   options?: {
     bypassDefaultRecipients?: boolean;
   };
@@ -58,6 +67,7 @@ export const createEnvelopeRouteCaller = async ({
   teamId,
   input,
   apiRequestMetadata,
+  logger,
   options = {},
 }: CreateEnvelopeRouteOptions) => {
   const { payload, files } = input;
@@ -96,17 +106,10 @@ export const createEnvelopeRouteCaller = async ({
     });
   }
 
-  if (files.some((file) => !file.type.startsWith('application/pdf'))) {
-    throw new AppError('INVALID_DOCUMENT_FILE', {
-      message: 'You cannot upload non-PDF files',
-      statusCode: 400,
-    });
-  }
-
-  // For each file: normalize, extract & clean placeholders, then upload.
+  // For each file: convert to PDF if needed, normalize, extract & clean placeholders, then upload.
   const envelopeItems = await Promise.all(
     files.map(async (file) => {
-      let pdf = Buffer.from(await file.arrayBuffer());
+      let pdf = await convertToPdf(file, logger);
 
       if (formValues) {
         // eslint-disable-next-line require-atomic-updates

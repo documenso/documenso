@@ -1,0 +1,36 @@
+FROM gotenberg/gotenberg:8-libreoffice
+
+# Install Microsoft Core Fonts (Arial, Times New Roman, Courier New, Verdana,
+# Georgia, Comic Sans MS, Trebuchet MS, Impact, Andale Mono, Webdings) so that
+# LibreOffice can render typical Word documents faithfully. The default image
+# only ships metric-compatible substitutes (Carlito for Calibri, Liberation for
+# Arial/Times/Courier) which preserve layout widths but look noticeably wrong.
+#
+# `ttf-mscorefonts-installer` lives in the non-free repo and requires accepting
+# the Microsoft EULA, which we do non-interactively via debconf-set-selections.
+USER root
+
+RUN echo "deb http://deb.debian.org/debian trixie contrib non-free" \
+      > /etc/apt/sources.list.d/contrib.list \
+    && echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" \
+      | debconf-set-selections \
+    && apt-get update -qq \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends \
+        ca-certificates \
+        wget \
+        unzip \
+        culmus \
+        ttf-mscorefonts-installer \
+        fonts-symbola \
+        fonts-noto-extra \
+        fonts-hosny-amiri \
+        fonts-thai-tlwg \
+        fonts-sil-padauk \
+        fonts-sarai \
+        fonts-samyak-taml \
+        libfribidi0 \
+        libharfbuzz0b \
+    && fc-cache -f \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+USER gotenberg

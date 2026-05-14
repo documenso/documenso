@@ -3,6 +3,8 @@ title: Self-Hosting
 description: Deploy and manage your own Documenso instance for complete control over your data, compliance, and customization.
 ---
 
+import { Callout } from 'fumadocs-ui/components/callout';
+
 ## Getting Started
 
 <Cards>
@@ -17,6 +19,13 @@ description: Deploy and manage your own Documenso instance for complete control 
     href="/docs/self-hosting/getting-started/quick-start"
   />
 </Cards>
+
+<Callout type="error">
+  **You must generate a signing certificate.** Documenso does not ship with one. Without a
+  certificate, the application starts normally but document signing will fail.
+
+  Please see all the [requirements](/docs/self-hosting/getting-started/requirements) before proceeding.
+</Callout>
 
 ---
 
@@ -122,7 +131,7 @@ See the [Quick Start guide](/docs/self-hosting/getting-started/quick-start) for 
 
 ## Enterprise Edition
 
-Self-hosted Documenso includes full core functionality under the AGPL-3.0 license. If you need enterprise features such as SSO, embed authoring white label, or 21 CFR Part 11 compliance, you can activate them with a license key.
+Self-hosted Documenso includes full core functionality under the AGPL-3.0 license. If you need enterprise features such as SSO, embed editor white label, or 21 CFR Part 11 compliance, you can activate them with a license key.
 
 See [Enterprise Edition](/docs/policies/enterprise-edition) for details and [Licenses](/docs/policies/licenses) for a comparison.
 
