@@ -11,6 +11,8 @@
     ·
     <a href="https://documenso.com">Website</a>
     ·
+    <a href="https://docs.documenso.com">Documentation</a>
+    ·
     <a href="https://github.com/documenso/documenso/issues">Issues</a>
     ·
     <a href="https://documen.so/live">Upcoming Releases</a>
@@ -146,45 +148,7 @@ npm run d
 
 ### Manual Setup
 
-Follow these steps to setup Documenso on your local machine:
-
-1. [Fork this repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks) to your GitHub account.
-
-After forking the repository, clone it to your local device by using the following command:
-
-```sh
-git clone https://github.com/<your-username>/documenso
-```
-
-2. Run `npm i` in the root directory
-
-3. Create your `.env` from the `.env.example`. You can use `cp .env.example .env` to get started with our handpicked defaults.
-
-4. Set the following environment variables:
-
-   - NEXTAUTH_SECRET
-   - NEXT_PUBLIC_WEBAPP_URL
-   - NEXT_PRIVATE_DATABASE_URL
-   - NEXT_PRIVATE_DIRECT_DATABASE_URL
-   - NEXT_PRIVATE_SMTP_FROM_NAME
-   - NEXT_PRIVATE_SMTP_FROM_ADDRESS
-
-5. Create the database schema by running `npm run prisma:migrate-dev`
-
-6. Run `npm run translate:compile` in the root directory to compile lingui
-
-7. Run `npm run dev` in the root directory to start
-
-8. Register a new user at http://localhost:3000/signup
-
----
-
-- Optional: Seed the database using `npm run prisma:seed -w @documenso/prisma` to create a test user and document.
-- Optional: Create your own signing certificate.
-  - To generate your own using these steps and a Linux Terminal or Windows Subsystem for Linux (WSL), see **[Create your own signing certificate](./SIGNING.md)**.
-- Optional: Configure job provider for document reminders.
-  - The default local job provider does not support scheduled jobs required for document reminders.
-  - To enable reminders, set `NEXT_PRIVATE_JOBS_PROVIDER=inngest` and provide `NEXT_PRIVATE_INNGEST_EVENT_KEY` in your `.env` file.
+Follow the [manual setup guide](https://docs.documenso.com/docs/developers/local-development/manual) to configure Documenso on your local machine.
 
 ### Run in Gitpod
 
@@ -204,138 +168,43 @@ If you're a visual learner and prefer to watch a video walkthrough of setting up
 
 ## Docker
 
-We provide a Docker container for Documenso, which is published on both DockerHub and GitHub Container Registry.
+We provide official Docker images on [DockerHub](https://hub.docker.com/r/documenso/documenso) and [GitHub Container Registry](https://ghcr.io/documenso/documenso).
 
-- DockerHub: [https://hub.docker.com/r/documenso/documenso](https://hub.docker.com/r/documenso/documenso)
-- GitHub Container Registry: [https://ghcr.io/documenso/documenso](https://ghcr.io/documenso/documenso)
-
-You can pull the Docker image from either of these registries and run it with your preferred container hosting provider.
-
-Please note that you will need to provide environment variables for connecting to the database, mailserver, and so forth.
-
-For detailed instructions on how to configure and run the Docker container, please refer to the [Docker README](./docker/README.md) in the `docker` directory.
+For setup instructions, see the [Docker Deployment](https://docs.documenso.com/docs/self-hosting/deployment/docker) and [Docker Compose](https://docs.documenso.com/docs/self-hosting/deployment/docker-compose) guides.
 
 ## Self Hosting
 
-We support a variety of deployment methods, and are actively working on adding more. Stay tuned for updates!
+We support a variety of deployment methods including Docker, Docker Compose, Railway, Kubernetes, and manual deployment.
 
-### Fetch, configure, and build
+For full instructions, requirements, and configuration details, see the [Self Hosting documentation](https://docs.documenso.com/docs/self-hosting).
 
-First, clone the code from Github:
+### One-Click Deploys
 
-```
-git clone https://github.com/documenso/documenso.git
-```
-
-Then, inside the `documenso` folder, copy the example env file:
-
-```
-cp .env.example .env
-```
-
-The following environment variables must be set:
-
-- `NEXTAUTH_SECRET`
-- `NEXT_PUBLIC_WEBAPP_URL`
-- `NEXT_PRIVATE_DATABASE_URL`
-- `NEXT_PRIVATE_DIRECT_DATABASE_URL`
-- `NEXT_PRIVATE_SMTP_FROM_NAME`
-- `NEXT_PRIVATE_SMTP_FROM_ADDRESS`
-
-> If you are using a reverse proxy in front of Documenso, don't forget to provide the public URL for the `NEXT_PUBLIC_WEBAPP_URL` variable!
-
-Now you can install the dependencies and build it:
-
-```
-npm i
-npm run build
-npm run prisma:migrate-deploy
-```
-
-Finally, you can start it with:
-
-```
-cd apps/remix
-npm run start
-```
-
-This will start the server on `localhost:3000`. For now, any reverse proxy can then do the frontend and SSL termination.
-
-> If you want to run with another port than 3000, you can start the application with `PORT=<PORT> npm run start` from the `apps/remix` folder.
-
-### Run as a service
-
-You can use a systemd service file to run the app. Here is a simple example of the service running on port 3500 (using 3000 by default):
-
-```bash
-[Unit]
-Description=documenso
-After=network.target
-
-[Service]
-Environment=PATH=/path/to/your/node/binaries
-Type=simple
-User=www-data
-WorkingDirectory=/var/www/documenso/apps/remix
-ExecStart=/usr/bin/env PORT=3500 /usr/bin/npm run start
-TimeoutSec=15
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-```
-
-### Railway
+#### Railway
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/bG6D4p)
 
-### Render
+#### Render
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
 
-### Koyeb
+#### Koyeb
 
 [![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=documenso-app&builder=dockerfile&dockerfile=/docker/Dockerfile)
 
-## Elestio
+#### Elestio
 
 [![Deploy on Elestio](https://elest.io/images/logos/deploy-to-elestio-btn.png)](https://elest.io/open-source/documenso)
 
 ## Troubleshooting
+
+For troubleshooting self-hosted deployments, see the [Troubleshooting guide](https://docs.documenso.com/docs/self-hosting/maintenance/troubleshooting) and [Tips & Common Pitfalls](https://docs.documenso.com/docs/self-hosting/getting-started/tips).
 
 ### I'm not receiving any emails when using the developer quickstart.
 
 When using the developer quickstart, an [Inbucket](https://inbucket.org/) server will be spun up in a docker container that will store all outgoing emails locally for you to view.
 
 The Web UI can be found at http://localhost:9000, while the SMTP port will be on localhost:2500.
-
-### Support IPv6
-
-If you are deploying to a cluster that uses only IPv6, You can use a custom command to pass a parameter to the Remix start command
-
-For local docker run
-
-```bash
-docker run -it -e HOST=:: documenso/documenso:latest npm run start
-```
-
-For k8s or docker-compose
-
-```yaml
-containers:
-  - name: documenso
-    image: documenso/documenso:latest
-    imagePullPolicy: IfNotPresent
-    command:
-      - npm
-    env:
-      - name: HOST
-      value: "::"
-    args:
-       - run
-       - start
-
-```
 
 ### I can't see environment variables in my package scripts.
 
