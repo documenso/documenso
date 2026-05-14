@@ -1,6 +1,7 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { getAllowedUploadMimeTypes } from '@documenso/lib/constants/document-conversion';
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import type { MessageDescriptor } from '@lingui/core';
@@ -51,9 +52,7 @@ export const DocumentUploadButton = ({
   const isPersonalLayoutMode = isPersonalLayout(organisations);
 
   const { getRootProps, getInputProps } = useDropzone({
-    accept: {
-      'application/pdf': ['.pdf'],
-    },
+    accept: getAllowedUploadMimeTypes(),
     multiple: internalVersion === '2',
     disabled,
     maxFiles,
