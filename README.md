@@ -261,7 +261,7 @@ npm run start
 
 This will start the server on `localhost:3000`. For now, any reverse proxy can then do the frontend and SSL termination.
 
-> If you want to run with another port than 3000, you can start the application with `next -p <ANY PORT>` from the `apps/remix` folder.
+> If you want to run with another port than 3000, you can start the application with `PORT=<PORT> npm run start` from the `apps/remix` folder.
 
 ### Run as a service
 
@@ -277,7 +277,7 @@ Environment=PATH=/path/to/your/node/binaries
 Type=simple
 User=www-data
 WorkingDirectory=/var/www/documenso/apps/remix
-ExecStart=/usr/bin/next start -p 3500
+ExecStart=/usr/bin/env PORT=3500 /usr/bin/npm run start
 TimeoutSec=15
 Restart=always
 
@@ -316,7 +316,7 @@ If you are deploying to a cluster that uses only IPv6, You can use a custom comm
 For local docker run
 
 ```bash
-docker run -it documenso:latest npm run start -- -H ::
+docker run -it -e HOST=:: documenso/documenso:latest npm run start
 ```
 
 For k8s or docker-compose
@@ -324,16 +324,17 @@ For k8s or docker-compose
 ```yaml
 containers:
   - name: documenso
-    image: documenso:latest
+    image: documenso/documenso:latest
     imagePullPolicy: IfNotPresent
     command:
       - npm
+    env:
+      - name: HOST
+      value: "::"
     args:
-      - run
-      - start
-      - --
-      - -H
-      - '::'
+       - run
+       - start
+
 ```
 
 ### I can't see environment variables in my package scripts.
