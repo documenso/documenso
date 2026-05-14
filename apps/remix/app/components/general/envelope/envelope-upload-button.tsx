@@ -119,6 +119,15 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
           () => t`You have reached your document limit for this month. Please upgrade your plan.`,
         )
         .with('ENVELOPE_ITEM_LIMIT_EXCEEDED', () => t`You have reached the limit of the number of files per envelope.`)
+        .with('UNSUPPORTED_FILE_TYPE', () => t`This file type isn't supported. Please upload a PDF or Word document.`)
+        .with(
+          'CONVERSION_SERVICE_UNAVAILABLE',
+          () => t`Document conversion is temporarily unavailable. Please try again shortly or upload a PDF.`,
+        )
+        .with(
+          'CONVERSION_FAILED',
+          () => t`We couldn't convert this file. Please check it's a valid Word document or upload a PDF instead.`,
+        )
         .otherwise(() => t`An error occurred while uploading your document.`);
 
       toast({
