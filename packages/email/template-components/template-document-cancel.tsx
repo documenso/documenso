@@ -22,7 +22,7 @@ export const TemplateDocumentCancel = ({
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
       <Section>
-        <Text className="text-primary mx-auto mb-0 max-w-[80%] text-center text-lg font-semibold">
+        <Text className="mx-auto mb-0 max-w-[80%] text-center font-semibold text-lg text-primary">
           <Trans>
             {inviterName} has cancelled the document
             <br />"{documentName}"

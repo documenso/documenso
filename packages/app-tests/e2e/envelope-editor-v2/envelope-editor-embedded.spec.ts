@@ -1,20 +1,19 @@
-import type { Page } from '@playwright/test';
-import { expect, test } from '@playwright/test';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import { seedUser } from '@documenso/prisma/seed/users';
+import type { Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import {
-  type TEnvelopeEditorSurface,
   addEnvelopeItemPdf,
   createEmbeddedEnvelopeCreateHash,
   getEnvelopeEditorSettingsTrigger,
   openEmbeddedEnvelopeEditor,
   persistEmbeddedEnvelope,
   setRecipientEmail,
+  type TEnvelopeEditorSurface,
 } from '../fixtures/envelope-editor';
 import { expectToastTextToBeVisible } from '../fixtures/generic';
 
@@ -33,10 +32,14 @@ const TEST_RAW_CSS = '.e2e-css-test-marker { color: red; }';
  * Expected HSL values after conversion by `toNativeCssVars`:
  * - colord('#ff0000').toHsl() → { h: 0, s: 100, l: 50 }
  * - colord('#00ff00').toHsl() → { h: 120, s: 100, l: 50 }
+ *
+ * The `%` on saturation and lightness is required: theme.css consumes these
+ * via `hsl(var(--token))`, and CSS Color 4 space-separated `hsl()` rejects
+ * bare numbers there. See `apps/remix/app/utils/css-vars.ts`.
  */
 const EXPECTED_CSS_VARS = {
-  '--background': '0 100 50',
-  '--primary': '120 100 50',
+  '--background': '0 100% 50%',
+  '--primary': '120 100% 50%',
   '--radius': '1rem',
 };
 
@@ -65,7 +68,7 @@ const enableEmbedAuthoringWhiteLabel = async (userId: number) => {
 const DEFAULT_BODY_BG_COLOR = 'rgb(255, 255, 255)';
 
 /**
- * When `--background` is set to `0 100 50` (hsl(0, 100%, 50%)) the body background
+ * When `--background` is set to `0 100% 50%` (hsl(0, 100%, 50%)) the body background
  * resolves to pure red via the Tailwind `bg-background` → `hsl(var(--background))` chain.
  */
 const INJECTED_BODY_BG_COLOR = 'rgb(255, 0, 0)';
@@ -185,9 +188,7 @@ const openEmbeddedCreateWithUser = async (
     folderId: options.folderId,
   });
 
-  await page.goto(
-    `/embed/v2/authoring/envelope/create?token=${encodeURIComponent(presignToken)}#${hash}`,
-  );
+  await page.goto(`/embed/v2/authoring/envelope/create?token=${encodeURIComponent(presignToken)}#${hash}`);
 
   await expect(page.getByRole('heading', { name: 'Documents' })).toBeVisible();
 
@@ -228,8 +229,7 @@ const setupMinimalEnvelope = async (surface: TEnvelopeEditorSurface, externalId:
  * Click "Create Document" and expect a failure toast instead of the success heading.
  */
 const expectCreateToFail = async (surface: TEnvelopeEditorSurface) => {
-  const actionButtonName =
-    surface.envelopeType === 'DOCUMENT' ? 'Create Document' : 'Create Template';
+  const actionButtonName = surface.envelopeType === 'DOCUMENT' ? 'Create Document' : 'Create Template';
 
   await surface.root.getByRole('button', { name: actionButtonName }).click();
   await expectToastTextToBeVisible(surface.root, 'Failed to create document');

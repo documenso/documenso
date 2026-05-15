@@ -4,9 +4,9 @@ import { findAttachmentsByToken } from '@documenso/lib/server-only/envelope-atta
 
 import { maybeAuthenticatedProcedure } from '../../trpc';
 import {
+  findAttachmentsMeta,
   ZFindAttachmentsRequestSchema,
   ZFindAttachmentsResponseSchema,
-  findAttachmentsMeta,
 } from './find-attachments.types';
 
 export const findAttachmentsRoute = maybeAuthenticatedProcedure

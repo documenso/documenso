@@ -1,17 +1,13 @@
+import { prisma } from '@documenso/prisma';
 import type { User } from '@prisma/client';
 import { UserSecurityAuditLogType } from '@prisma/client';
-
-import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { validateTwoFactorAuthentication } from './validate-2fa';
 
 type DisableTwoFactorAuthenticationOptions = {
-  user: Pick<
-    User,
-    'id' | 'email' | 'twoFactorEnabled' | 'twoFactorSecret' | 'twoFactorBackupCodes'
-  >;
+  user: Pick<User, 'id' | 'email' | 'twoFactorEnabled' | 'twoFactorSecret' | 'twoFactorBackupCodes'>;
   totpCode?: string;
   backupCode?: string;
   requestMetadata?: RequestMetadata;

@@ -1,7 +1,5 @@
 import { z } from 'zod';
-
-import { ZTeamUrlSchema } from './schema';
-import { ZTeamNameSchema } from './schema';
+import { ZTeamNameSchema, ZTeamUrlSchema } from './schema';
 
 // export const createTeamMeta: TrpcOpenApiMeta = {
 //   openapi: {

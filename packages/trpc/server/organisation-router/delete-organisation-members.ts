@@ -82,9 +82,7 @@ export const deleteOrganisationMembers = async ({
 
   const { organisationClaim } = organisation;
 
-  const membersToDelete = organisation.members.filter((member) =>
-    organisationMemberIds.includes(member.id),
-  );
+  const membersToDelete = organisation.members.filter((member) => organisationMemberIds.includes(member.id));
 
   const inviteCount = organisation.invites.length;
   const newMemberCount = organisation.members.length + inviteCount - membersToDelete.length;
@@ -92,11 +90,7 @@ export const deleteOrganisationMembers = async ({
   // Removing members is a reducing operation, so we don't gate it on the
   // subscription being present. Sync Stripe only when one exists.
   if (organisation.subscription) {
-    await syncMemberCountWithStripeSeatPlan(
-      organisation.subscription,
-      organisationClaim,
-      newMemberCount,
-    );
+    await syncMemberCountWithStripeSeatPlan(organisation.subscription, organisationClaim, newMemberCount);
   }
 
   const removedUserIds = membersToDelete.map((member) => member.userId);

@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 import { OrganisationMemberRoleSchema } from '@documenso/prisma/generated/zod/inputTypeSchemas/OrganisationMemberRoleSchema';
 import { TeamMemberRoleSchema } from '@documenso/prisma/generated/zod/inputTypeSchemas/TeamMemberRoleSchema';
 import OrganisationMemberInviteSchema from '@documenso/prisma/generated/zod/modelSchema/OrganisationMemberInviteSchema';
@@ -9,6 +7,7 @@ import TeamEmailSchema from '@documenso/prisma/generated/zod/modelSchema/TeamEma
 import TeamGlobalSettingsSchema from '@documenso/prisma/generated/zod/modelSchema/TeamGlobalSettingsSchema';
 import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import UserSchema from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
+import { z } from 'zod';
 
 export const ZGetAdminTeamRequestSchema = z.object({
   teamId: z.number().min(1),

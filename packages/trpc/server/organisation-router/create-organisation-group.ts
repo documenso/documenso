@@ -1,14 +1,10 @@
-import { OrganisationGroupType } from '@prisma/client';
-
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getMemberOrganisationRole } from '@documenso/lib/server-only/team/get-member-roles';
 import { generateDatabaseId } from '@documenso/lib/universal/id';
-import {
-  buildOrganisationWhereQuery,
-  isOrganisationRoleWithinUserHierarchy,
-} from '@documenso/lib/utils/organisations';
+import { buildOrganisationWhereQuery, isOrganisationRoleWithinUserHierarchy } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
+import { OrganisationGroupType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
 import {

@@ -1,10 +1,3 @@
-import { msg } from '@lingui/core/macro';
-import { Plural, Trans, useLingui } from '@lingui/react/macro';
-import { DocumentStatus } from '@prisma/client';
-import { ChevronLeft, Users2 } from 'lucide-react';
-import { Link } from 'react-router';
-import { match } from 'ts-pattern';
-
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
@@ -22,6 +15,12 @@ import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { Spinner } from '@documenso/ui/primitives/spinner';
+import { msg } from '@lingui/core/macro';
+import { Plural, Trans, useLingui } from '@lingui/react/macro';
+import { DocumentStatus } from '@prisma/client';
+import { ChevronLeft, Users2 } from 'lucide-react';
+import { Link } from 'react-router';
+import { match } from 'ts-pattern';
 
 import { DocumentPageViewButton } from '~/components/general/document/document-page-view-button';
 import { DocumentPageViewDropdown } from '~/components/general/document/document-page-view-dropdown';
@@ -68,8 +67,7 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
     },
     {
       ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-      enabled:
-        envelope && envelope.internalVersion === 2 && envelope.status === DocumentStatus.PENDING,
+      enabled: envelope && envelope.internalVersion === 2 && envelope.status === DocumentStatus.PENDING,
     },
   );
 
@@ -121,16 +119,12 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
 
       <div className="flex flex-row justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="mt-4 block text-2xl font-semibold md:text-3xl" title={envelope.title}>
+          <h1 className="mt-4 block font-semibold text-2xl md:text-3xl" title={envelope.title}>
             {envelope.title}
           </h1>
 
           <div className="mt-2.5 flex items-center gap-x-6">
-            <DocumentStatusComponent
-              inheritColor
-              status={envelope.status}
-              className="text-muted-foreground"
-            />
+            <DocumentStatusComponent inheritColor status={envelope.status} className="text-muted-foreground" />
 
             {envelope.recipients.length > 0 && (
               <div className="flex items-center text-muted-foreground">
@@ -142,11 +136,7 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
                   position="bottom"
                 >
                   <span>
-                    <Plural
-                      value={envelope.recipients.length}
-                      one="# Recipient"
-                      other="# Recipients"
-                    />
+                    <Plural value={envelope.recipients.length} one="# Recipient" other="# Recipients" />
                   </span>
                 </StackAvatarsWithTooltip>
               </div>
@@ -177,9 +167,7 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
                 showRecipientTooltip: true,
               }}
             >
-              {isMultiEnvelopeItem && (
-                <EnvelopeRendererFileSelector fields={envelope.fields} className="mb-4 p-0" />
-              )}
+              {isMultiEnvelopeItem && <EnvelopeRendererFileSelector fields={envelope.fields} className="mb-4 p-0" />}
 
               <Card className="rounded-xl before:rounded-xl" gradient>
                 <CardContent className="p-2">
@@ -193,10 +181,7 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
             </EnvelopeRenderProvider>
           </div>
         ) : (
-          <Card
-            className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7"
-            gradient
-          >
+          <Card className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7" gradient>
             <CardContent className="p-2">
               {envelope.status !== DocumentStatus.COMPLETED && (
                 <DocumentReadOnlyFields
@@ -224,27 +209,21 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
           </Card>
         )}
 
-        <div
-          className={cn('col-span-12 lg:col-span-6 xl:col-span-5', isMultiEnvelopeItem && 'mt-20')}
-        >
+        <div className={cn('col-span-12 lg:col-span-6 xl:col-span-5', isMultiEnvelopeItem && 'mt-20')}>
           <div className="space-y-6">
-            <section className="flex flex-col rounded-xl border border-border bg-widget pb-4 pt-6">
+            <section className="flex flex-col rounded-xl border border-border bg-widget pt-6 pb-4">
               <div className="flex flex-row items-center justify-between px-4">
-                <h3 className="text-2xl font-semibold text-foreground">
+                <h3 className="font-semibold text-2xl text-foreground">
                   {t(FRIENDLY_STATUS_MAP[envelope.status].labelExtended)}
                 </h3>
 
                 <DocumentPageViewDropdown envelope={envelope} />
               </div>
 
-              <p className="mt-2 px-4 text-sm text-muted-foreground">
+              <p className="mt-2 px-4 text-muted-foreground text-sm">
                 {match(envelope.status)
-                  .with(DocumentStatus.COMPLETED, () => (
-                    <Trans>This document has been signed by all recipients</Trans>
-                  ))
-                  .with(DocumentStatus.REJECTED, () => (
-                    <Trans>This document has been rejected by a recipient</Trans>
-                  ))
+                  .with(DocumentStatus.COMPLETED, () => <Trans>This document has been signed by all recipients</Trans>)
+                  .with(DocumentStatus.REJECTED, () => <Trans>This document has been rejected by a recipient</Trans>)
                   .with(DocumentStatus.DRAFT, () => (
                     <Trans>This document is currently a draft and has not been sent</Trans>
                   ))

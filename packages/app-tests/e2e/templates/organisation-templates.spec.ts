@@ -1,8 +1,3 @@
-import type { Page } from '@playwright/test';
-import { expect, test } from '@playwright/test';
-import { TemplateType } from '@prisma/client';
-import { customAlphabet } from 'nanoid';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createTeam } from '@documenso/lib/server-only/team/create-team';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
@@ -10,6 +5,10 @@ import { prisma } from '@documenso/prisma';
 import { seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
+import type { Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { TemplateType } from '@prisma/client';
+import { customAlphabet } from 'nanoid';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
 
@@ -65,12 +64,7 @@ const seedOrgTemplateScenario = async () => {
 /**
  * Helper to make tRPC queries via the authenticated page context.
  */
-const trpcQuery = async (
-  page: Page,
-  procedure: string,
-  input: Record<string, unknown>,
-  teamId?: number,
-) => {
+const trpcQuery = async (page: Page, procedure: string, input: Record<string, unknown>, teamId?: number) => {
   const inputParam = encodeURIComponent(JSON.stringify({ json: input }));
   const url = `${WEBAPP_BASE_URL}/api/trpc/${procedure}?input=${inputParam}`;
 
@@ -85,12 +79,7 @@ const trpcQuery = async (
   return { res, json: res.ok() ? await res.json() : null };
 };
 
-const trpcMutation = async (
-  page: Page,
-  procedure: string,
-  input: Record<string, unknown>,
-  teamId?: number,
-) => {
+const trpcMutation = async (page: Page, procedure: string, input: Record<string, unknown>, teamId?: number) => {
   const url = `${WEBAPP_BASE_URL}/api/trpc/${procedure}`;
 
   const headers: Record<string, string> = {
@@ -142,9 +131,7 @@ test.describe('Organisation Templates - UI Tabs', () => {
 // ─── UI: Listing Organisation Templates ──────────────────────────────────────
 
 test.describe('Organisation Templates - Listing', () => {
-  test('should list org templates from other teams under the Organisation tab', async ({
-    page,
-  }) => {
+  test('should list org templates from other teams under the Organisation tab', async ({ page }) => {
     const { memberB, teamB, orgTemplate } = await seedOrgTemplateScenario();
 
     await apiSignin({
@@ -163,9 +150,7 @@ test.describe('Organisation Templates - Listing', () => {
     await expect(page.getByText(orgTemplate.title)).toBeVisible();
   });
 
-  test('should not show private templates from other teams under Organisation tab', async ({
-    page,
-  }) => {
+  test('should not show private templates from other teams under Organisation tab', async ({ page }) => {
     const { ownerA, teamA, memberB, teamB } = await seedOrgTemplateScenario();
 
     // Create a private template on teamA — should NOT appear in org tab.
@@ -245,12 +230,7 @@ test.describe('Organisation Templates - findOrganisationTemplates API', () => {
 
     await apiSignin({ page, email: memberB.email });
 
-    const { json } = await trpcQuery(
-      page,
-      'template.findOrganisationTemplates',
-      { page: 1, perPage: 50 },
-      teamB.id,
-    );
+    const { json } = await trpcQuery(page, 'template.findOrganisationTemplates', { page: 1, perPage: 50 }, teamB.id);
 
     const titles = json.result.data.json.data.map((t: { title: string }) => t.title);
     expect(titles).not.toContain(privateTemplate.title);
@@ -297,12 +277,7 @@ test.describe('Organisation Templates - findOrganisationTemplates API', () => {
     // memberB has role MEMBER on teamB — should only see EVERYONE visibility.
     await apiSignin({ page, email: memberB.email });
 
-    const { json } = await trpcQuery(
-      page,
-      'template.findOrganisationTemplates',
-      { page: 1, perPage: 50 },
-      teamB.id,
-    );
+    const { json } = await trpcQuery(page, 'template.findOrganisationTemplates', { page: 1, perPage: 50 }, teamB.id);
 
     const titles = json.result.data.json.data.map((t: { title: string }) => t.title);
     expect(titles).toContain(everyoneTemplate.title);
@@ -389,9 +364,7 @@ test.describe('Organisation Templates - getOrganisationTemplateById API', () => 
 // ─── API: createDocumentFromTemplate with org template ───────────────────────
 
 test.describe('Organisation Templates - Use from different team', () => {
-  test('should allow creating a document from an org template owned by a sibling team', async ({
-    page,
-  }) => {
+  test('should allow creating a document from an org template owned by a sibling team', async ({ page }) => {
     const { memberB, teamB, orgTemplate } = await seedOrgTemplateScenario();
 
     // Add a recipient to the org template so we can use it.
@@ -443,19 +416,12 @@ test.describe('Organisation Templates - Adversarial', () => {
     await apiSignin({ page, email: outsider.email });
 
     // Try to fetch via the standard envelope.get endpoint.
-    const { res } = await trpcQuery(
-      page,
-      'envelope.get',
-      { envelopeId: orgTemplate.id },
-      outsiderTeam.id,
-    );
+    const { res } = await trpcQuery(page, 'envelope.get', { envelopeId: orgTemplate.id }, outsiderTeam.id);
 
     expect(res.ok()).toBeFalsy();
   });
 
-  test('should not allow a sibling team member to fetch a private template via org endpoint', async ({
-    page,
-  }) => {
+  test('should not allow a sibling team member to fetch a private template via org endpoint', async ({ page }) => {
     const { ownerA, teamA, memberB, teamB } = await seedOrgTemplateScenario();
 
     const privateTemplate = await seedBlankTemplate(ownerA, teamA.id, {
@@ -477,18 +443,11 @@ test.describe('Organisation Templates - Adversarial', () => {
     expect(orgRes.ok()).toBeFalsy();
 
     // Attempt 2: Try via standard envelope endpoint.
-    const { res: envelopeRes } = await trpcQuery(
-      page,
-      'envelope.get',
-      { envelopeId: privateTemplate.id },
-      teamB.id,
-    );
+    const { res: envelopeRes } = await trpcQuery(page, 'envelope.get', { envelopeId: privateTemplate.id }, teamB.id);
     expect(envelopeRes.ok()).toBeFalsy();
   });
 
-  test('should not list org templates from a completely unrelated organisation', async ({
-    page,
-  }) => {
+  test('should not list org templates from a completely unrelated organisation', async ({ page }) => {
     // Create scenario A.
     const { orgTemplate: orgTemplateA } = await seedOrgTemplateScenario();
 
@@ -532,20 +491,13 @@ test.describe('Organisation Templates - Adversarial', () => {
     expect(getRes.status()).toBe(401);
   });
 
-  test('should not return org template data via findTemplates (team endpoint)', async ({
-    page,
-  }) => {
+  test('should not return org template data via findTemplates (team endpoint)', async ({ page }) => {
     const { memberB, teamB, orgTemplate } = await seedOrgTemplateScenario();
 
     await apiSignin({ page, email: memberB.email });
 
     // The standard findTemplates endpoint should NOT include org templates from other teams.
-    const { json } = await trpcQuery(
-      page,
-      'template.findTemplates',
-      { page: 1, perPage: 50 },
-      teamB.id,
-    );
+    const { json } = await trpcQuery(page, 'template.findTemplates', { page: 1, perPage: 50 }, teamB.id);
 
     const titles = json.result.data.json.data.map((t: { title: string }) => t.title);
     expect(titles).not.toContain(orgTemplate.title);
@@ -555,9 +507,7 @@ test.describe('Organisation Templates - Adversarial', () => {
 // ─── API: envelope.item.getManyByToken (org template fallback) ───────────────
 
 test.describe('Organisation Templates - envelope.item.getManyByToken API', () => {
-  test('should allow a sibling team member to fetch envelope items for an org template', async ({
-    page,
-  }) => {
+  test('should allow a sibling team member to fetch envelope items for an org template', async ({ page }) => {
     const { memberB, teamB, orgTemplate } = await seedOrgTemplateScenario();
 
     await apiSignin({ page, email: memberB.email });
@@ -577,9 +527,7 @@ test.describe('Organisation Templates - envelope.item.getManyByToken API', () =>
     expect(items[0].envelopeId).toBe(orgTemplate.id);
   });
 
-  test('should allow the owning team member to fetch envelope items (own-team path)', async ({
-    page,
-  }) => {
+  test('should allow the owning team member to fetch envelope items (own-team path)', async ({ page }) => {
     const { ownerA, teamA, orgTemplate } = await seedOrgTemplateScenario();
 
     await apiSignin({ page, email: ownerA.email });
@@ -614,9 +562,7 @@ test.describe('Organisation Templates - envelope.item.getManyByToken API', () =>
     expect(res.ok()).toBeFalsy();
   });
 
-  test('should reject fetching items for a PRIVATE template from a sibling team', async ({
-    page,
-  }) => {
+  test('should reject fetching items for a PRIVATE template from a sibling team', async ({ page }) => {
     const { ownerA, teamA, memberB, teamB } = await seedOrgTemplateScenario();
 
     const privateTemplate = await seedBlankTemplate(ownerA, teamA.id, {

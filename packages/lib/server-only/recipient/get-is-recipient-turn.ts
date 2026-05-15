@@ -1,6 +1,5 @@
-import { DocumentSigningOrder, EnvelopeType, SigningStatus } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { DocumentSigningOrder, EnvelopeType, SigningStatus } from '@prisma/client';
 
 export type GetIsRecipientTurnOptions = {
   token: string;
