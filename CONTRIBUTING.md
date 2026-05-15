@@ -9,6 +9,10 @@ If you plan to contribute to Documenso, please take a moment to feel awesome ✨
 - Consider the results from the discussion on the issue
 - Accept the [Contributor License Agreement](https://documen.so/cla) to ensure we can accept your contributions.
 
+## English only PRs and Issues
+
+Please write all issues, pull requests, and related comments in English so maintainers and the wider contributor community can follow the discussion.
+
 ## Taking issues
 
 Before taking an issue, ensure that:
