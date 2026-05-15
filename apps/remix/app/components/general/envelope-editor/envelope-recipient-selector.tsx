@@ -4,7 +4,14 @@ import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { getRecipientColorStyles } from '@documenso/ui/lib/recipient-colors';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@documenso/ui/primitives/command';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@documenso/ui/primitives/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import type { I18n } from '@lingui/core';
@@ -143,80 +150,89 @@ export const EnvelopeRecipientSelectorCommand = ({
   );
 
   return (
-    <Command value={selectedRecipient ? selectedRecipient.id.toString() : undefined} className={className}>
+    <Command className={className}>
       <CommandInput placeholder={placeholder} />
 
-      <CommandEmpty>
-        <span className="inline-block px-4 text-muted-foreground">
-          <Trans>No recipient matching this description was found.</Trans>
-        </span>
-      </CommandEmpty>
+      <CommandList>
+        <CommandEmpty>
+          <span className="inline-block px-4 text-muted-foreground">
+            <Trans>No recipient matching this description was found.</Trans>
+          </span>
+        </CommandEmpty>
 
-      {recipientsByRoleToDisplay().map(([role, roleRecipients], roleIndex) => (
-        <CommandGroup key={roleIndex}>
-          <div className="mt-2 mb-1 ml-2 font-medium text-muted-foreground text-xs">
-            {t(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
-          </div>
-
-          {roleRecipients.length === 0 && (
-            <div key={`${role}-empty`} className="px-4 pt-2.5 pb-4 text-center text-muted-foreground/80 text-xs">
-              <Trans>No recipients with this role</Trans>
+        {recipientsByRoleToDisplay().map(([role, roleRecipients], roleIndex) => (
+          <CommandGroup key={roleIndex}>
+            <div className="mt-2 mb-1 ml-2 font-medium text-muted-foreground text-xs">
+              {t(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
             </div>
-          )}
 
-          {roleRecipients.map((recipient) => (
-            <CommandItem
-              key={recipient.id}
-              className={cn(
-                'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
-                getRecipientColorStyles(recipients.findIndex((r) => r.id === recipient.id)).comboBoxItem,
-                {
-                  'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
-                  'cursor-not-allowed': isRecipientDisabled(recipient.id),
-                },
-              )}
-              onSelect={() => {
-                if (!isRecipientDisabled(recipient.id)) {
-                  onSelectedRecipientChange(recipient);
-                }
-              }}
-            >
-              <span
-                className={cn('truncate text-foreground/70', {
-                  'text-foreground/80': recipient.id === selectedRecipient?.id,
-                  'opacity-50': isRecipientDisabled(recipient.id),
-                })}
-              >
-                {getRecipientLabel(recipient)}
-              </span>
-
-              <div className="ml-auto flex items-center justify-center">
-                {!isRecipientDisabled(recipient.id) ? (
-                  <Check
-                    aria-hidden={recipient.id !== selectedRecipient?.id}
-                    className={cn('h-4 w-4 flex-shrink-0', {
-                      'opacity-0': recipient.id !== selectedRecipient?.id,
-                      'opacity-100': recipient.id === selectedRecipient?.id,
-                    })}
-                  />
-                ) : (
-                  <Tooltip>
-                    <TooltipTrigger disabled={false}>
-                      <Info className="z-50 ml-2 h-4 w-4" />
-                    </TooltipTrigger>
-
-                    <TooltipContent className="max-w-xs text-muted-foreground">
-                      <Trans>
-                        This document has already been sent to this recipient. You can no longer edit this recipient.
-                      </Trans>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
+            {roleRecipients.length === 0 && (
+              <div key={`${role}-empty`} className="px-4 pt-2.5 pb-4 text-center text-muted-foreground/80 text-xs">
+                <Trans>No recipients with this role</Trans>
               </div>
-            </CommandItem>
-          ))}
-        </CommandGroup>
-      ))}
+            )}
+
+            {roleRecipients.map((recipient) => (
+              <CommandItem
+                key={recipient.id}
+                value={`id-${recipient.id.toString()}`}
+                keywords={[`${recipient.name} ${recipient.email}`]}
+                className={cn(
+                  'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
+                  getRecipientColorStyles(recipients.findIndex((r) => r.id === recipient.id)).comboBoxItem,
+                  {
+                    'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
+                    'cursor-not-allowed': isRecipientDisabled(recipient.id),
+                  },
+                )}
+                onClick={() => {
+                  if (!isRecipientDisabled(recipient.id)) {
+                    onSelectedRecipientChange(recipient);
+                  }
+                }}
+                onSelect={() => {
+                  if (!isRecipientDisabled(recipient.id)) {
+                    onSelectedRecipientChange(recipient);
+                  }
+                }}
+              >
+                <span
+                  className={cn('truncate text-foreground/70', {
+                    'text-foreground/80': recipient.id === selectedRecipient?.id,
+                    'opacity-50': isRecipientDisabled(recipient.id),
+                  })}
+                >
+                  {getRecipientLabel(recipient)}
+                </span>
+
+                <div className="ml-auto flex items-center justify-center">
+                  {!isRecipientDisabled(recipient.id) ? (
+                    <Check
+                      aria-hidden={recipient.id !== selectedRecipient?.id}
+                      className={cn('h-4 w-4 flex-shrink-0', {
+                        'opacity-0': recipient.id !== selectedRecipient?.id,
+                        'opacity-100': recipient.id === selectedRecipient?.id,
+                      })}
+                    />
+                  ) : (
+                    <Tooltip>
+                      <TooltipTrigger disabled={false}>
+                        <Info className="z-50 ml-2 h-4 w-4" />
+                      </TooltipTrigger>
+
+                      <TooltipContent className="max-w-xs text-muted-foreground">
+                        <Trans>
+                          This document has already been sent to this recipient. You can no longer edit this recipient.
+                        </Trans>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </div>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        ))}
+      </CommandList>
     </Command>
   );
 };

@@ -12,7 +12,14 @@ import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@documenso/ui/primitives/command';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@documenso/ui/primitives/command';
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
@@ -612,66 +619,75 @@ export const AddTemplateFieldsFormPartial = ({
                 </PopoverTrigger>
 
                 <PopoverContent className="p-0" align="start">
-                  <Command value={selectedSigner?.email}>
+                  <Command>
                     <CommandInput />
 
-                    <CommandEmpty>
-                      <span className="inline-block px-4 text-muted-foreground">
-                        <Trans>No recipient matching this description was found.</Trans>
-                      </span>
-                    </CommandEmpty>
+                    <CommandList>
+                      <CommandEmpty>
+                        <span className="inline-block px-4 text-muted-foreground">
+                          <Trans>No recipient matching this description was found.</Trans>
+                        </span>
+                      </CommandEmpty>
 
-                    {/* Note: This is duplicated in `add-fields.tsx` */}
-                    {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
-                      <CommandGroup key={roleIndex}>
-                        <div className="mt-2 mb-1 ml-2 font-medium text-muted-foreground text-xs">
-                          {_(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
-                        </div>
-
-                        {roleRecipients.length === 0 && (
-                          <div
-                            key={`${role}-empty`}
-                            className="px-4 pt-2.5 pb-4 text-center text-muted-foreground/80 text-xs"
-                          >
-                            <Trans>No recipients with this role</Trans>
+                      {/* Note: This is duplicated in `add-fields.tsx` */}
+                      {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
+                        <CommandGroup key={roleIndex}>
+                          <div className="mt-2 mb-1 ml-2 font-medium text-muted-foreground text-xs">
+                            {_(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
                           </div>
-                        )}
 
-                        {roleRecipients.map((recipient) => (
-                          <CommandItem
-                            key={recipient.id}
-                            className={cn(
-                              'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
-                              getRecipientColorStyles(recipients.findIndex((r) => r.id === recipient.id))?.comboBoxItem,
-                            )}
-                            onSelect={() => {
-                              setSelectedSigner(recipient);
-                              setShowRecipientsSelector(false);
-                            }}
-                          >
-                            <span
-                              className={cn('truncate text-foreground/70', {
-                                'text-foreground/80': recipient === selectedSigner,
-                              })}
+                          {roleRecipients.length === 0 && (
+                            <div
+                              key={`${role}-empty`}
+                              className="px-4 pt-2.5 pb-4 text-center text-muted-foreground/80 text-xs"
                             >
-                              {recipient.name && !isTemplateRecipientEmailPlaceholder(recipient.email) && (
-                                <span title={`${recipient.name} (${recipient.email})`}>
-                                  {recipient.name} ({recipient.email})
-                                </span>
-                              )}
+                              <Trans>No recipients with this role</Trans>
+                            </div>
+                          )}
 
-                              {recipient.name && isTemplateRecipientEmailPlaceholder(recipient.email) && (
-                                <span title={recipient.name}>{recipient.name}</span>
+                          {roleRecipients.map((recipient) => (
+                            <CommandItem
+                              key={recipient.id}
+                              value={`id-${recipient.id.toString()}`}
+                              keywords={[`${recipient.name} ${recipient.email}`]}
+                              className={cn(
+                                'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
+                                getRecipientColorStyles(recipients.findIndex((r) => r.id === recipient.id))
+                                  ?.comboBoxItem,
                               )}
+                              onClick={() => {
+                                setSelectedSigner(recipient);
+                                setShowRecipientsSelector(false);
+                              }}
+                              onSelect={() => {
+                                setSelectedSigner(recipient);
+                                setShowRecipientsSelector(false);
+                              }}
+                            >
+                              <span
+                                className={cn('truncate text-foreground/70', {
+                                  'text-foreground/80': recipient === selectedSigner,
+                                })}
+                              >
+                                {recipient.name && !isTemplateRecipientEmailPlaceholder(recipient.email) && (
+                                  <span title={`${recipient.name} (${recipient.email})`}>
+                                    {recipient.name} ({recipient.email})
+                                  </span>
+                                )}
 
-                              {!recipient.name && !isTemplateRecipientEmailPlaceholder(recipient.email) && (
-                                <span title={recipient.email}>{recipient.email}</span>
-                              )}
-                            </span>
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    ))}
+                                {recipient.name && isTemplateRecipientEmailPlaceholder(recipient.email) && (
+                                  <span title={recipient.name}>{recipient.name}</span>
+                                )}
+
+                                {!recipient.name && !isTemplateRecipientEmailPlaceholder(recipient.email) && (
+                                  <span title={recipient.email}>{recipient.email}</span>
+                                )}
+                              </span>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      ))}
+                    </CommandList>
                   </Command>
                 </PopoverContent>
               </Popover>
