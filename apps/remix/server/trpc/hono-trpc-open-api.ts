@@ -1,4 +1,4 @@
-import { API_V2_BETA_URL, API_V2_URL } from '@documenso/lib/constants/app';
+import { API_V2_BETA_URL, API_V2_URL, getBasePath } from '@documenso/lib/constants/app';
 import { AppError, genericErrorCodeToTrpcErrorCodeMap } from '@documenso/lib/errors/app-error';
 import { createTrpcContext } from '@documenso/trpc/server/context';
 import { appRouter } from '@documenso/trpc/server/router';
@@ -11,8 +11,11 @@ type OpenApiTrpcServerHandlerOptions = {
 };
 
 export const openApiTrpcServerHandler = async (c: Context, { isBeta }: OpenApiTrpcServerHandlerOptions) => {
+  const basePath = getBasePath();
+  const endpoint = `${basePath}${isBeta ? API_V2_BETA_URL : API_V2_URL}` as `/${string}`;
+
   return createOpenApiFetchHandler<typeof appRouter>({
-    endpoint: isBeta ? API_V2_BETA_URL : API_V2_URL,
+    endpoint,
     router: appRouter,
     createContext: async () => createTrpcContext({ c, requestSource: 'apiV2' }),
     req: c.req.raw,

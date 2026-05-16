@@ -1,5 +1,6 @@
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { getBasePath } from '@documenso/lib/constants/app';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import {
   DOCUMENTS_PAGE_SHORTCUT,
@@ -362,7 +363,7 @@ const LanguageCommands = () => {
 
       formData.append('lang', lang);
 
-      const response = await fetch('/api/locale', {
+      const response = await fetch(`${getBasePath()}/api/locale`, {
         method: 'post',
         body: formData,
       });

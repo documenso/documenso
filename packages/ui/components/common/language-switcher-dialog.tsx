@@ -1,3 +1,4 @@
+import { getBasePath } from '@documenso/lib/constants/app';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { cn } from '@documenso/ui/lib/utils';
@@ -23,7 +24,7 @@ export const LanguageSwitcherDialog = ({ open, setOpen }: LanguageSwitcherDialog
 
     formData.append('lang', lang);
 
-    await fetch('/api/locale', {
+    await fetch(`${getBasePath()}/api/locale`, {
       method: 'post',
       body: formData,
     });

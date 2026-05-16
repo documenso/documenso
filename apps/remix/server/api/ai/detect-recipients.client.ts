@@ -1,3 +1,4 @@
+import { getBasePath } from '@documenso/lib/constants/app';
 import { ZDetectedRecipientSchema } from '@documenso/lib/server-only/ai/envelope/detect-recipients/schema';
 import { z } from 'zod';
 
@@ -70,7 +71,7 @@ export const detectRecipients = async ({
   onError,
   signal,
 }: DetectRecipientsOptions): Promise<void> => {
-  const response = await fetch('/api/ai/detect-recipients', {
+  const response = await fetch(`${getBasePath()}/api/ai/detect-recipients`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
