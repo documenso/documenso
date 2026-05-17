@@ -186,9 +186,9 @@ Documenso requires a certificate to digitally sign documents.
 
 ### Transport Selection
 
-| Variable                         | Description                              | Default |
-| -------------------------------- | ---------------------------------------- | ------- |
-| `NEXT_PRIVATE_SIGNING_TRANSPORT` | Signing backend: `local` or `gcloud-hsm` | `local` |
+| Variable                         | Description                                         | Default |
+| -------------------------------- | --------------------------------------------------- | ------- |
+| `NEXT_PRIVATE_SIGNING_TRANSPORT` | Signing backend: `local`, `gcloud-hsm`, or `aws-kms` | `local` |
 
 ### Local Signing
 
@@ -209,6 +209,20 @@ Documenso requires a certificate to digitally sign documents.
 | `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_FILE_PATH`         | Path to the certificate chain file                   |
 | `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_CONTENTS`          | Base64-encoded certificate chain                     |
 | `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_SECRET_MANAGER_CERT_PATH`     | Google Secret Manager path for certificate retrieval |
+
+### AWS KMS
+
+| Variable                                                | Description                                                         |
+| ------------------------------------------------------- | ------------------------------------------------------------------- |
+| `NEXT_PRIVATE_SIGNING_AWS_KMS_KEY_ID`                   | AWS KMS key ID or full ARN                                          |
+| `NEXT_PRIVATE_SIGNING_AWS_KMS_REGION`                   | AWS region of the KMS key                                           |
+| `NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_PATH`     | Path to the public certificate file                                 |
+| `NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_CONTENTS` | Base64-encoded public certificate                                   |
+| `NEXT_PRIVATE_SIGNING_AWS_KMS_CERT_CHAIN_FILE_PATH`     | Path to the certificate chain file                                  |
+| `NEXT_PRIVATE_SIGNING_AWS_KMS_CERT_CHAIN_CONTENTS`      | Base64-encoded certificate chain                                    |
+| `NEXT_PRIVATE_SIGNING_AWS_KMS_SECRETS_MANAGER_CERT_ARN` | AWS Secrets Manager secret ARN containing a PEM-encoded certificate |
+
+AWS credentials are resolved by the AWS SDK's default credential chain (env vars, IAM task role, EC2/Lambda instance profile, shared credentials file).
 
 ### Signature Options
 

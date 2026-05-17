@@ -1,0 +1,131 @@
+---
+title: AWS KMS
+description: Configure AWS KMS for hardware-backed signing key protection.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+AWS KMS provides hardware-backed key protection on FIPS 140-2-validated HSMs. The private key never leaves KMS — only the digest is sent for signing.
+
+## Prerequisites
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+### Create an asymmetric KMS key
+
+Create a customer-managed KMS key with `Key usage = Sign and verify` and a key spec of `RSA_2048`, `RSA_3072`, `RSA_4096`, `ECC_NIST_P256`, `ECC_NIST_P384`, or `ECC_NIST_P521` (see [Creating a KMS Key](#creating-a-kms-key) below).
+
+</Step>
+<Step>
+### Grant IAM permissions
+
+Grant the principal that runs Documenso (ECS task role, Lambda execution role, EC2 instance profile, or IAM user) the `kms:Sign` and `kms:GetPublicKey` permissions on the key.
+
+If you plan to load the certificate from AWS Secrets Manager, also grant `secretsmanager:GetSecretValue` and `secretsmanager:DescribeSecret` on the secret.
+
+</Step>
+<Step>
+### Obtain a signing certificate
+
+Export the public key from KMS (via `aws kms get-public-key`), generate a CSR from it, and have an AATL-approved CA (GlobalSign, Entrust, DigiCert, IdenTrust, SSL.com) issue an X.509 certificate via their HSM attestation process. Alternatively, self-sign the certificate — note that self-signed signatures verify as "valid, identity not trusted" in Adobe Reader.
+
+</Step>
+</Steps>
+
+## Environment Variables
+
+| Variable                                                     | Description                                                           |
+| ------------------------------------------------------------ | --------------------------------------------------------------------- |
+| `NEXT_PRIVATE_SIGNING_TRANSPORT`                             | Set to `aws-kms`                                                      |
+| `NEXT_PRIVATE_SIGNING_AWS_KMS_KEY_ID`                        | KMS key ID or full ARN                                                |
+| `NEXT_PRIVATE_SIGNING_AWS_KMS_REGION`                        | AWS region of the key (e.g. `us-east-1`)                              |
+| `NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_PATH`          | Path to the public certificate file                                   |
+| `NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_CONTENTS`      | Base64-encoded public certificate                                     |
+| `NEXT_PRIVATE_SIGNING_AWS_KMS_CERT_CHAIN_FILE_PATH`          | Path to the certificate chain file                                    |
+| `NEXT_PRIVATE_SIGNING_AWS_KMS_CERT_CHAIN_CONTENTS`           | Base64-encoded certificate chain                                      |
+| `NEXT_PRIVATE_SIGNING_AWS_KMS_SECRETS_MANAGER_CERT_ARN`      | AWS Secrets Manager secret ARN containing a PEM-encoded certificate   |
+
+AWS credentials are resolved by the AWS SDK's default credential chain (env vars `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`, IAM task role, EC2 instance profile, shared credentials file). No Documenso-specific credential variables are read.
+
+<Callout type="info">
+On ECS Fargate or Lambda, attach the required permissions to the task role / execution role — do not set long-lived access keys.
+</Callout>
+
+## Configuration Example
+
+```bash
+NEXT_PRIVATE_SIGNING_TRANSPORT=aws-kms
+NEXT_PRIVATE_SIGNING_AWS_KMS_KEY_ID=arn:aws:kms:us-east-1:123456789012:key/abcd1234-5678-90ab-cdef-1234567890ab
+NEXT_PRIVATE_SIGNING_AWS_KMS_REGION=us-east-1
+NEXT_PRIVATE_SIGNING_AWS_KMS_PUBLIC_CRT_FILE_PATH=/opt/documenso/public.crt
+```
+
+Or using Secrets Manager:
+
+```bash
+NEXT_PRIVATE_SIGNING_TRANSPORT=aws-kms
+NEXT_PRIVATE_SIGNING_AWS_KMS_KEY_ID=arn:aws:kms:us-east-1:123456789012:key/abcd1234-...
+NEXT_PRIVATE_SIGNING_AWS_KMS_REGION=us-east-1
+NEXT_PRIVATE_SIGNING_AWS_KMS_SECRETS_MANAGER_CERT_ARN=arn:aws:secretsmanager:us-east-1:123456789012:secret:documenso/signing-cert-AbCdEf
+```
+
+## Creating a KMS Key
+
+Using the AWS CLI:
+
+```bash
+aws kms create-key \
+  --key-spec RSA_2048 \
+  --key-usage SIGN_VERIFY \
+  --description "Documenso PDF signing key" \
+  --region us-east-1
+
+# (Capture the returned KeyId/Arn.)
+
+aws kms create-alias \
+  --alias-name alias/documenso-signing \
+  --target-key-id <key-id-from-above> \
+  --region us-east-1
+```
+
+Export the public key (for CSR generation):
+
+```bash
+aws kms get-public-key \
+  --key-id alias/documenso-signing \
+  --region us-east-1 \
+  --query PublicKey --output text | base64 -d > public-key.der
+openssl rsa -pubin -inform DER -in public-key.der -out public-key.pem
+```
+
+Generate a CSR. Because the private key stays in KMS, the CSR must be signed by KMS. See the AWS sample [sign-a-csr-with-a-kms-key](https://docs.aws.amazon.com/kms/latest/developerguide/services-acm.html) workflow or use an open-source helper that signs the CSR via `kms:Sign`. Submit the CSR to your AATL CA following their HSM attestation process.
+
+## Minimum IAM Policy
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["kms:Sign", "kms:GetPublicKey"],
+      "Resource": "arn:aws:kms:us-east-1:123456789012:key/abcd1234-..."
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"],
+      "Resource": "arn:aws:secretsmanager:us-east-1:123456789012:secret:documenso/signing-cert-*"
+    }
+  ]
+}
+```
+
+The Secrets Manager statement is only required when using `NEXT_PRIVATE_SIGNING_AWS_KMS_SECRETS_MANAGER_CERT_ARN`.
+
+## Signing Algorithm Selection
+
+AWS KMS keys can support multiple signing algorithms (e.g. an `RSA_2048` key supports `RSASSA_PKCS1_V1_5_SHA_256/384/512` and `RSASSA_PSS_SHA_256/384/512`). Documenso calls `kms:GetPublicKey` on startup and uses the first algorithm advertised by the key.
+
+For maximum Adobe compatibility, use PKCS#1 v1.5 (not PSS). If your key supports both, create the key with `RSASSA_PKCS1_V1_5_SHA_256` as the default signing algorithm, or configure a dedicated key for signing.

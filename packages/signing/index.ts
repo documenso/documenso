@@ -8,6 +8,7 @@ import type { PDF, Signer } from '@libpdf/core';
 import { match } from 'ts-pattern';
 
 import { getTimestampAuthority } from './helpers/tsa';
+import { createAwsKmsSigner } from './transports/aws-kms';
 import { createGoogleCloudSigner } from './transports/google-cloud';
 import { createLocalSigner } from './transports/local';
 
@@ -28,6 +29,7 @@ const getSigner = async () => {
   signer = await match(transport)
     .with('local', async () => await createLocalSigner())
     .with('gcloud-hsm', async () => await createGoogleCloudSigner())
+    .with('aws-kms', async () => await createAwsKmsSigner())
     .otherwise(() => {
       throw new Error(`Unsupported signing transport: ${transport}`);
     });
