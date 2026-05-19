@@ -20,7 +20,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { TurnstileInstance } from '@marsidev/react-turnstile';
 import { Turnstile } from '@marsidev/react-turnstile';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaIdCardClip } from 'react-icons/fa6';
 import { FcGoogle } from 'react-icons/fc';
@@ -86,8 +86,6 @@ export const SignUpForm = ({
   const turnstileSiteKey = env('NEXT_PUBLIC_TURNSTILE_SITE_KEY');
   const turnstileRef = useRef<TurnstileInstance>(null);
 
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-
   const hasSocialAuthEnabled = isGoogleSignupEnabled || isMicrosoftSignupEnabled || isOidcSignupEnabled;
 
   const form = useForm<TSignUpFormSchema>({
@@ -105,12 +103,28 @@ export const SignUpForm = ({
 
   const onFormSubmit = async ({ name, email, password, signature }: TSignUpFormSchema) => {
     try {
+      let token: string | undefined;
+
+      if (turnstileSiteKey) {
+        token = await turnstileRef.current?.getResponsePromise(3000).catch((_err) => undefined);
+
+        if (!token) {
+          toast({
+            title: _(msg`Human verification required`),
+            description: _(msg`Please complete the CAPTCHA challenge before signing in.`),
+            variant: 'destructive',
+          });
+
+          return;
+        }
+      }
+
       await authClient.emailPassword.signUp({
         name,
         email,
         password,
         signature,
-        captchaToken: captchaToken ?? undefined,
+        captchaToken: token ?? undefined,
       });
 
       await navigate(returnTo ? returnTo : '/unverified-account');
@@ -140,7 +154,6 @@ export const SignUpForm = ({
       });
 
       turnstileRef.current?.reset();
-      setCaptchaToken(null);
     }
   };
 
@@ -316,8 +329,6 @@ export const SignUpForm = ({
                 <Turnstile
                   ref={turnstileRef}
                   siteKey={turnstileSiteKey}
-                  onSuccess={setCaptchaToken}
-                  onExpire={() => setCaptchaToken(null)}
                   options={{
                     size: 'flexible',
                     appearance: 'interaction-only',
