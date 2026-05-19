@@ -7,15 +7,8 @@ import { ZCreateUserRequestSchema, ZCreateUserResponseSchema } from './create-us
 export const createUserRoute = adminProcedure
   .input(ZCreateUserRequestSchema)
   .output(ZCreateUserResponseSchema)
-  .mutation(async ({ input, ctx }) => {
+  .mutation(async ({ input }) => {
     const { email, name } = input;
-
-    ctx.logger.info({
-      input: {
-        email,
-        name,
-      },
-    });
 
     const user = await createAdminUser({
       name,
