@@ -2,6 +2,7 @@ import { router } from '../trpc';
 import { createAdminOrganisationRoute } from './create-admin-organisation';
 import { createStripeCustomerRoute } from './create-stripe-customer';
 import { createSubscriptionClaimRoute } from './create-subscription-claim';
+import { createUserRoute } from './create-user';
 import { deleteDocumentRoute } from './delete-document';
 import { deleteOrganisationRoute } from './delete-organisation';
 import { deleteAdminOrganisationMemberRoute } from './delete-organisation-member';
@@ -64,6 +65,7 @@ export const adminRouter = router({
   },
   user: {
     get: getUserRoute,
+    create: createUserRoute,
     update: updateUserRoute,
     delete: deleteUserRoute,
     enable: enableUserRoute,
