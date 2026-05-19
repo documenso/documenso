@@ -10,7 +10,8 @@ export interface CreateAdminUserOptions {
  * Create a user for admin-initiated flows.
  *
  * Unlike normal signup, this function:
- * - Generates a secure random password (user must reset via email verification)
+ * - Leaves the password unset (`null`); the user must set it later via a password reset/onboarding link
+ * - Marks the email as verified immediately because this route is only called by admins
  * - Does NOT create a personal organisation (user will be added to real org)
  * - Returns the user immediately without side effects
  */
