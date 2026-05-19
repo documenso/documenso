@@ -1,4 +1,5 @@
 import { JobClient } from './client/client';
+import { SEND_ADMIN_USER_CREATED_EMAIL_JOB_DEFINITION } from './definitions/emails/send-admin-user-created-email';
 import { SEND_CONFIRMATION_EMAIL_JOB_DEFINITION } from './definitions/emails/send-confirmation-email';
 import { SEND_DOCUMENT_CANCELLED_EMAILS_JOB_DEFINITION } from './definitions/emails/send-document-cancelled-emails';
 import { SEND_DOCUMENT_CREATED_FROM_DIRECT_TEMPLATE_EMAIL_JOB_DEFINITION } from './definitions/emails/send-document-created-from-direct-template-email';
@@ -29,6 +30,7 @@ import { SYNC_EMAIL_DOMAINS_JOB_DEFINITION } from './definitions/internal/sync-e
  * triggering jobs.
  */
 export const jobsClient = new JobClient([
+  SEND_ADMIN_USER_CREATED_EMAIL_JOB_DEFINITION,
   SEND_SIGNING_EMAIL_JOB_DEFINITION,
   SEND_CONFIRMATION_EMAIL_JOB_DEFINITION,
   SEND_ORGANISATION_MEMBER_JOINED_EMAIL_JOB_DEFINITION,
