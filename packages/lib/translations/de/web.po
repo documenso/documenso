@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-05-13 06:46\n"
+"PO-Revision-Date: 2026-05-19 05:21\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -5835,6 +5835,12 @@ msgstr "Horizontal"
 msgid "How long recipients have to complete this document after it is sent. Uses the team default when set to inherit."
 msgstr "Wie lange Empfänger Zeit haben, dieses Dokument nach dem Senden zu vervollständigen. Verwendet die Team-Standardeinstellung, wenn \"Vererben\" ausgewählt ist."
 
+#: apps/remix/app/components/forms/signin.tsx
+#: apps/remix/app/components/forms/signup.tsx
+#: apps/remix/app/components/general/claim-account.tsx
+msgid "Human verification required"
+msgstr "Menschliche Überprüfung erforderlich"
+
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "I agree to link my account with this organization"
 msgstr "Ich bin einverstanden, mein Konto mit dieser Organisation zu verknüpfen."
@@ -7796,6 +7802,12 @@ msgstr "Bitte überprüfe deine E-Mail auf Updates."
 #: apps/remix/app/routes/_unauthenticated+/reset-password.$token.tsx
 msgid "Please choose your new password"
 msgstr "Bitte wählen Sie Ihr neues Passwort"
+
+#: apps/remix/app/components/forms/signin.tsx
+#: apps/remix/app/components/forms/signup.tsx
+#: apps/remix/app/components/general/claim-account.tsx
+msgid "Please complete the CAPTCHA challenge before signing in."
+msgstr "Bitte schließen Sie die CAPTCHA‑Prüfung ab, bevor Sie sich anmelden."
 
 #: apps/remix/app/components/general/document-signing/document-signing-mobile-widget.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-mobile-widget.tsx
