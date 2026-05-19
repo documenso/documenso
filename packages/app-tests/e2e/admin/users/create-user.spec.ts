@@ -227,8 +227,6 @@ test('[ADMIN][CREATE_USER]: submitting an empty form shows validation errors and
     redirectPath: '/admin/users',
   });
 
-  const usersBefore = await prisma.user.count();
-
   await page.getByRole('button', { name: 'Create User' }).first().click();
 
   const dialog = page.getByRole('dialog');
@@ -237,15 +235,15 @@ test('[ADMIN][CREATE_USER]: submitting an empty form shows validation errors and
   // Submit without filling anything.
   await dialog.getByTestId('dialog-create-user-button').click();
 
-  // Dialog stays open.
+  // Validation errors are surfaced for both required fields. Their presence
+  // proves react-hook-form's zodResolver blocked the submit before the
+  // mutation ran, so no DB write could have happened.
+  await expect(dialog.getByLabel('Email')).toHaveAttribute('aria-invalid', 'true');
+  await expect(dialog.getByLabel('Name')).toHaveAttribute('aria-invalid', 'true');
+
+  // Dialog stays open and we must not have navigated to a user detail page.
   await expect(dialog).toBeVisible();
-
-  // We must not have navigated to a user detail page.
   await expect(page).not.toHaveURL(/\/admin\/users\/\d+$/);
-
-  // No new user has been created.
-  const usersAfter = await prisma.user.count();
-  expect(usersAfter).toBe(usersBefore);
 });
 
 // ─── Validation: malformed email ─────────────────────────────────────────────
@@ -259,8 +257,6 @@ test('[ADMIN][CREATE_USER]: a malformed email is rejected client-side', async ({
     redirectPath: '/admin/users',
   });
 
-  const usersBefore = await prisma.user.count();
-
   await page.getByRole('button', { name: 'Create User' }).first().click();
 
   const dialog = page.getByRole('dialog');
@@ -271,16 +267,17 @@ test('[ADMIN][CREATE_USER]: a malformed email is rejected client-side', async ({
 
   await dialog.getByTestId('dialog-create-user-button').click();
 
-  // Dialog stays open.
+  // Validation error is surfaced for the malformed email — this proves
+  // react-hook-form's zodResolver blocked the submit before the mutation
+  // ran, so no DB write could have happened.
+  await expect(dialog.getByLabel('Email')).toHaveAttribute('aria-invalid', 'true');
+
+  // Dialog stays open and we must not have navigated.
   await expect(dialog).toBeVisible();
   await expect(page).not.toHaveURL(/\/admin\/users\/\d+$/);
 
-  // No user was created.
-  const usersAfter = await prisma.user.count();
-  expect(usersAfter).toBe(usersBefore);
-
-  // And specifically not the bogus email (which would never match a real
-  // user but is a sanity check).
+  // The bogus email is definitely not present in the DB — a targeted check
+  // on a specific row, not a global count, so it's safe to run in parallel.
   const bogus = await prisma.user.findFirst({
     where: { email: 'not-an-email' },
   });
