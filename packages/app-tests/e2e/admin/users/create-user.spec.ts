@@ -262,15 +262,21 @@ test('[ADMIN][CREATE_USER]: a malformed email is rejected client-side', async ({
   const dialog = page.getByRole('dialog');
   await expect(dialog).toBeVisible();
 
-  await dialog.getByLabel('Email').fill('not-an-email');
+  const emailInput = dialog.getByLabel('Email');
+
+  await emailInput.fill('not-an-email');
   await dialog.getByLabel('Name').fill('Some Name');
 
-  await dialog.getByTestId('dialog-create-user-button').click();
+  // The Email input is rendered with type="email" and the form does not set
+  // noValidate, so the browser's native HTML5 constraint validation rejects
+  // the malformed value and blocks the submit event from ever firing. (As a
+  // result react-hook-form's zodResolver never runs and `aria-invalid` is
+  // not flipped to true — the browser is the layer doing the rejection.) We
+  // assert directly on the input's ValidityState to prove the value is
+  // recognised as invalid client-side.
+  await expect(emailInput).toHaveJSProperty('validity.valid', false);
 
-  // Validation error is surfaced for the malformed email — this proves
-  // react-hook-form's zodResolver blocked the submit before the mutation
-  // ran, so no DB write could have happened.
-  await expect(dialog.getByLabel('Email')).toHaveAttribute('aria-invalid', 'true');
+  await dialog.getByTestId('dialog-create-user-button').click();
 
   // Dialog stays open and we must not have navigated.
   await expect(dialog).toBeVisible();
