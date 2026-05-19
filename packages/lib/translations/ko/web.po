@@ -8,7 +8,7 @@ msgstr ""
 "Language: ko\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-05-13 06:46\n"
+"PO-Revision-Date: 2026-05-19 05:21\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -5835,6 +5835,12 @@ msgstr "가로"
 msgid "How long recipients have to complete this document after it is sent. Uses the team default when set to inherit."
 msgstr "이 문서가 전송된 후 수신자가 이를 완료할 수 있는 기간입니다. 상속으로 설정된 경우 팀 기본값을 사용합니다."
 
+#: apps/remix/app/components/forms/signin.tsx
+#: apps/remix/app/components/forms/signup.tsx
+#: apps/remix/app/components/general/claim-account.tsx
+msgid "Human verification required"
+msgstr "사람 인증이 필요합니다"
+
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "I agree to link my account with this organization"
 msgstr "이 조직과 계정을 연결하는 데 동의합니다"
@@ -7796,6 +7802,12 @@ msgstr "업데이트 내용을 이메일로 확인해 주세요."
 #: apps/remix/app/routes/_unauthenticated+/reset-password.$token.tsx
 msgid "Please choose your new password"
 msgstr "새 비밀번호를 선택해 주세요"
+
+#: apps/remix/app/components/forms/signin.tsx
+#: apps/remix/app/components/forms/signup.tsx
+#: apps/remix/app/components/general/claim-account.tsx
+msgid "Please complete the CAPTCHA challenge before signing in."
+msgstr "로그인하기 전에 CAPTCHA 인증을 완료해 주세요."
 
 #: apps/remix/app/components/general/document-signing/document-signing-mobile-widget.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-mobile-widget.tsx
