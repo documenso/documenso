@@ -275,6 +275,25 @@ export class AuthClient {
     },
   };
 
+  public oauth = {
+    verify2fa: async (data: { totpCode?: string; backupCode?: string; redirectPath?: string }) => {
+      const response = await this.client['oauth']['verify-2fa'].$post({
+        json: {
+          totpCode: data.totpCode,
+          backupCode: data.backupCode,
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+
+        throw AppError.parseError(error);
+      }
+
+      handleSignInRedirect(data.redirectPath);
+    },
+  };
+
   public google = {
     signIn: async ({ redirectPath }: { redirectPath?: string } = {}) => {
       const response = await this.client['oauth'].authorize.google.$post({

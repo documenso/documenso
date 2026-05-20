@@ -26,7 +26,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaIdCardClip } from 'react-icons/fa6';
 import { FcGoogle } from 'react-icons/fc';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
@@ -78,9 +78,17 @@ export const SignInForm = ({
   const { toast } = useToast();
 
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isOauth2fa = searchParams.get('oauth2fa') === 'true';
 
   const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] = useState(false);
   const [isEmbeddedRedirect, setIsEmbeddedRedirect] = useState(false);
+
+  useEffect(() => {
+    if (isOauth2fa) {
+      setIsTwoFactorAuthenticationDialogOpen(true);
+    }
+  }, [isOauth2fa]);
 
   const [twoFactorAuthenticationMethod, setTwoFactorAuthenticationMethod] = useState<'totp' | 'backup'>('totp');
 
@@ -215,14 +223,22 @@ export const SignInForm = ({
         }
       }
 
-      await authClient.emailPassword.signIn({
-        email,
-        password,
-        totpCode,
-        backupCode,
-        captchaToken: token ?? undefined,
-        redirectPath,
-      });
+      if (isOauth2fa) {
+        await authClient.oauth.verify2fa({
+          totpCode,
+          backupCode,
+          redirectPath,
+        });
+      } else {
+        await authClient.emailPassword.signIn({
+          email,
+          password,
+          totpCode,
+          backupCode,
+          captchaToken: token ?? undefined,
+          redirectPath,
+        });
+      }
     } catch (err) {
       console.log(err);
 

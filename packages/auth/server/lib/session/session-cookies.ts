@@ -10,8 +10,9 @@ import { generateSessionToken } from './session';
 
 export const sessionCookieName = formatSecureCookieName('sessionId');
 export const csrfCookieName = formatSecureCookieName('csrfToken');
+export const oauth2faCookieName = formatSecureCookieName('oauth2faUserId');
 
-const getAuthSecret = () => {
+export const getAuthSecret = () => {
   const authSecret = env('NEXTAUTH_SECRET');
 
   if (!authSecret) {
