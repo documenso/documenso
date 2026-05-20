@@ -22,6 +22,10 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { FieldItem } from '@documenso/ui/primitives/document-flow/field-item';
 import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/types';
+import {
+  BulkDeleteFieldsDialog,
+  useFieldDeletion,
+} from '@documenso/ui/primitives/document-flow/use-field-deletion';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { FieldSelector } from '@documenso/ui/primitives/field-selector';
 import { Form } from '@documenso/ui/primitives/form/form';
@@ -176,6 +180,21 @@ export const ConfigureFieldsView = ({
   } = useFieldArray({
     control: control,
     name: 'fields',
+  });
+
+  const {
+    isFieldSelected,
+    onFieldActivate,
+    removeField,
+    bulkDeleteCount,
+    isBulkDeleteOpen,
+    onBulkDeleteOpenChange,
+    confirmBulkDelete,
+  } = useFieldDeletion({
+    getFields: () => form.getValues('fields'),
+    append: (field) => append(field),
+    remove: (index) => remove(index),
+    onActiveFieldIdChange: setActiveFieldId,
   });
 
   const onFieldCopy = useCallback(
@@ -565,7 +584,7 @@ export const ConfigureFieldsView = ({
                         defaultWidth={DEFAULT_WIDTH_PX}
                         onResize={(node) => onFieldResize(node, index)}
                         onMove={(node) => onFieldMove(node, index)}
-                        onRemove={() => remove(index)}
+                        onRemove={() => removeField(field.formId)}
                         onDuplicate={() => onFieldCopy(null, { duplicate: true })}
                         onDuplicateAllPages={() => onFieldCopy(null, { duplicateAll: true })}
                         onFocus={() => setLastActiveField(field)}
@@ -576,7 +595,8 @@ export const ConfigureFieldsView = ({
                         }}
                         recipientIndex={recipientIndex}
                         active={activeFieldId === field.formId}
-                        onFieldActivate={() => setActiveFieldId(field.formId)}
+                        selected={isFieldSelected(field.formId)}
+                        onFieldActivate={(options) => onFieldActivate(field.formId, options)}
                         onFieldDeactivate={() => setActiveFieldId(null)}
                         disabled={selectedRecipient?.id !== field.recipientId}
                       />
@@ -676,6 +696,13 @@ export const ConfigureFieldsView = ({
         currentField={currentField}
         fields={localFields}
         onFieldUpdate={handleUpdateFieldMeta}
+      />
+
+      <BulkDeleteFieldsDialog
+        open={isBulkDeleteOpen}
+        onOpenChange={onBulkDeleteOpenChange}
+        onConfirm={confirmBulkDelete}
+        count={bulkDeleteCount}
       />
     </>
   );

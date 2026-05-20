@@ -55,6 +55,10 @@ import {
 import { FieldItem } from '@documenso/ui/primitives/document-flow/field-item';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/types';
+import {
+  BulkDeleteFieldsDialog,
+  useFieldDeletion,
+} from '@documenso/ui/primitives/document-flow/use-field-deletion';
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -152,6 +156,22 @@ export const AddTemplateFieldsFormPartial = ({
   } = useFieldArray({
     control: form.control,
     name: 'fields',
+  });
+
+  const {
+    isFieldSelected,
+    onFieldActivate,
+    removeField,
+    bulkDeleteCount,
+    isBulkDeleteOpen,
+    onBulkDeleteOpenChange,
+    confirmBulkDelete,
+  } = useFieldDeletion({
+    getFields: () => form.getValues('fields'),
+    append: (field) => append(field),
+    remove: (index) => remove(index),
+    onAfterChange: () => void handleAutoSave(),
+    onActiveFieldIdChange: setActiveFieldId,
   });
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
@@ -636,10 +656,7 @@ export const AddTemplateFieldsFormPartial = ({
                     }}
                     onResize={(options) => onFieldResize(options, index)}
                     onMove={(options) => onFieldMove(options, index)}
-                    onRemove={() => {
-                      remove(index);
-                      void handleAutoSave();
-                    }}
+                    onRemove={() => removeField(field.formId)}
                     onDuplicate={() => {
                       onFieldCopy(null, { duplicate: true });
                     }}
@@ -651,7 +668,8 @@ export const AddTemplateFieldsFormPartial = ({
                       handleAdvancedSettings();
                     }}
                     active={activeFieldId === field.formId}
-                    onFieldActivate={() => setActiveFieldId(field.formId)}
+                    selected={isFieldSelected(field.formId)}
+                    onFieldActivate={(options) => onFieldActivate(field.formId, options)}
                     onFieldDeactivate={() => setActiveFieldId(null)}
                   />
                 );
@@ -1062,6 +1080,13 @@ export const AddTemplateFieldsFormPartial = ({
           </DocumentFlowFormContainerContent>
         </>
       }
+
+      <BulkDeleteFieldsDialog
+        open={isBulkDeleteOpen}
+        onOpenChange={onBulkDeleteOpenChange}
+        onConfirm={confirmBulkDelete}
+        count={bulkDeleteCount}
+      />
     </>
   );
 };

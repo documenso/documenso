@@ -17,6 +17,13 @@ import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '@documenso/lib/types/field-
 
 import { getRecipientColorStyles } from '../../lib/recipient-colors';
 import { cn } from '../../lib/utils';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+} from '../context-menu';
 import { FieldContent } from './field-content';
 import type { TDocumentFlowFormSchema } from './types';
 
@@ -44,7 +51,8 @@ export type FieldItemProps = {
   recipientIndex?: number;
   hasErrors?: boolean;
   active?: boolean;
-  onFieldActivate?: () => void;
+  selected?: boolean;
+  onFieldActivate?: (_options?: { multi?: boolean; keepIfSelected?: boolean }) => void;
   onFieldDeactivate?: () => void;
 };
 
@@ -81,6 +89,7 @@ const FieldItemInner = ({
   recipientIndex = 0,
   hasErrors,
   active,
+  selected,
   onFieldActivate,
   onFieldDeactivate,
 }: FieldItemProps) => {
@@ -290,93 +299,128 @@ const FieldItemInner = ({
           </div>
         )}
 
-      <div
-        className={cn(
-          'group/field-item relative flex h-full w-full items-center justify-center rounded-[2px] bg-white/90 px-2 ring-2 transition-colors',
-          !hasErrors && signerStyles.base,
-          !hasErrors && signerStyles.fieldItem,
-          fieldClassName,
-          {
-            'rounded-[2px] border bg-red-400/20 shadow-[0_0_0_5px_theme(colors.red.500/10%),0_0_0_2px_theme(colors.red.500/40%),0_0_0_0.5px_theme(colors.red.500)] ring-red-400':
-              hasErrors,
-          },
-          !fixedSize && '[container-type:size]',
-        )}
-        data-error={hasErrors ? 'true' : undefined}
-        onClick={(e) => {
-          e.stopPropagation();
-          setSettingsActive((prev) => !prev);
-          onFieldActivate?.();
-          onFocus?.();
-        }}
-        ref={$el}
-        data-field-id={field.nativeId}
-        data-field-type={field.type}
-        data-recipient-id={field.recipientId}
-      >
-        <FieldContent field={field} />
-
-        {/* On hover, display recipient initials on side of field.  */}
-        <div className="absolute -right-5 top-0 z-20 hidden h-full w-5 items-center justify-center group-hover:flex">
+      <ContextMenu>
+        <ContextMenuTrigger asChild disabled={disabled}>
           <div
             className={cn(
-              'flex h-5 w-5 flex-col items-center justify-center rounded-r-md text-[0.5rem] font-bold text-white opacity-0 transition duration-200 group-hover/field-item:opacity-100',
-              signerStyles.fieldItemInitials,
+              'group/field-item relative flex h-full w-full items-center justify-center rounded-[2px] bg-white/90 px-2 ring-2 transition-colors',
+              !hasErrors && signerStyles.base,
+              !hasErrors && signerStyles.fieldItem,
+              !hasErrors && selected && 'ring-primary ring-offset-2',
+              fieldClassName,
               {
-                '!opacity-50': disabled || passive,
+                'rounded-[2px] border bg-red-400/20 shadow-[0_0_0_5px_theme(colors.red.500/10%),0_0_0_2px_theme(colors.red.500/40%),0_0_0_0.5px_theme(colors.red.500)] ring-red-400':
+                  hasErrors,
               },
+              !fixedSize && '[container-type:size]',
             )}
+            data-error={hasErrors ? 'true' : undefined}
+            onClick={(e) => {
+              e.stopPropagation();
+              setSettingsActive((prev) => !prev);
+              onFieldActivate?.({ multi: e.ctrlKey || e.metaKey || e.shiftKey });
+              onFocus?.();
+            }}
+            onContextMenu={() => {
+              onFieldActivate?.({ keepIfSelected: true });
+              onFocus?.();
+            }}
+            ref={$el}
+            data-field-id={field.nativeId}
+            data-field-type={field.type}
+            data-recipient-id={field.recipientId}
           >
-            {(field.signerEmail?.charAt(0)?.toUpperCase() ?? '') +
-              (field.signerEmail?.charAt(1)?.toUpperCase() ?? '')}
-          </div>
-        </div>
+            <FieldContent field={field} />
 
-        {isDevMode && (
-          <div className="absolute bottom-full left-1/2 z-50 mb-1 -translate-x-1/2 rounded-md border border-border bg-background/95 px-2 py-1 shadow-sm backdrop-blur-sm">
-            <div className="flex flex-col gap-0.5 text-[9px]">
-              {field.nativeId && (
-                <span>
-                  <span className="text-muted-foreground">
-                    <Trans>Field ID:</Trans>
-                  </span>{' '}
-                  <span className="font-mono text-foreground">{field.nativeId}</span>
-                </span>
-              )}
-              <span>
-                <span className="text-muted-foreground">
-                  <Trans>Recipient ID:</Trans>
-                </span>{' '}
-                <span className="font-mono text-foreground">{field.recipientId}</span>
-              </span>
-              <span>
-                <span className="text-muted-foreground">
-                  <Trans>Pos X:</Trans>
-                </span>{' '}
-                <span className="font-mono text-foreground">{field.pageX.toFixed(2)}</span>
-              </span>
-              <span>
-                <span className="text-muted-foreground">
-                  <Trans>Pos Y:</Trans>
-                </span>{' '}
-                <span className="font-mono text-foreground">{field.pageY.toFixed(2)}</span>
-              </span>
-              <span>
-                <span className="text-muted-foreground">
-                  <Trans>Width:</Trans>
-                </span>{' '}
-                <span className="font-mono text-foreground">{field.pageWidth.toFixed(2)}</span>
-              </span>
-              <span>
-                <span className="text-muted-foreground">
-                  <Trans>Height:</Trans>
-                </span>{' '}
-                <span className="font-mono text-foreground">{field.pageHeight.toFixed(2)}</span>
-              </span>
+            {/* On hover, display recipient initials on side of field.  */}
+            <div className="absolute -right-5 top-0 z-20 hidden h-full w-5 items-center justify-center group-hover:flex">
+              <div
+                className={cn(
+                  'flex h-5 w-5 flex-col items-center justify-center rounded-r-md text-[0.5rem] font-bold text-white opacity-0 transition duration-200 group-hover/field-item:opacity-100',
+                  signerStyles.fieldItemInitials,
+                  {
+                    '!opacity-50': disabled || passive,
+                  },
+                )}
+              >
+                {(field.signerEmail?.charAt(0)?.toUpperCase() ?? '') +
+                  (field.signerEmail?.charAt(1)?.toUpperCase() ?? '')}
+              </div>
             </div>
+
+            {isDevMode && (
+              <div className="absolute bottom-full left-1/2 z-50 mb-1 -translate-x-1/2 rounded-md border border-border bg-background/95 px-2 py-1 shadow-sm backdrop-blur-sm">
+                <div className="flex flex-col gap-0.5 text-[9px]">
+                  {field.nativeId && (
+                    <span>
+                      <span className="text-muted-foreground">
+                        <Trans>Field ID:</Trans>
+                      </span>{' '}
+                      <span className="font-mono text-foreground">{field.nativeId}</span>
+                    </span>
+                  )}
+                  <span>
+                    <span className="text-muted-foreground">
+                      <Trans>Recipient ID:</Trans>
+                    </span>{' '}
+                    <span className="font-mono text-foreground">{field.recipientId}</span>
+                  </span>
+                  <span>
+                    <span className="text-muted-foreground">
+                      <Trans>Pos X:</Trans>
+                    </span>{' '}
+                    <span className="font-mono text-foreground">{field.pageX.toFixed(2)}</span>
+                  </span>
+                  <span>
+                    <span className="text-muted-foreground">
+                      <Trans>Pos Y:</Trans>
+                    </span>{' '}
+                    <span className="font-mono text-foreground">{field.pageY.toFixed(2)}</span>
+                  </span>
+                  <span>
+                    <span className="text-muted-foreground">
+                      <Trans>Width:</Trans>
+                    </span>{' '}
+                    <span className="font-mono text-foreground">{field.pageWidth.toFixed(2)}</span>
+                  </span>
+                  <span>
+                    <span className="text-muted-foreground">
+                      <Trans>Height:</Trans>
+                    </span>{' '}
+                    <span className="font-mono text-foreground">{field.pageHeight.toFixed(2)}</span>
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </ContextMenuTrigger>
+
+        <ContextMenuContent className="w-52">
+          {advancedField && onAdvancedSettings && (
+            <ContextMenuItem onClick={onAdvancedSettings}>
+              <Settings2 className="mr-2 h-4 w-4" />
+              <Trans>Advanced settings</Trans>
+            </ContextMenuItem>
+          )}
+
+          <ContextMenuItem onClick={onDuplicate}>
+            <CopyPlus className="mr-2 h-4 w-4" />
+            <Trans>Duplicate</Trans>
+          </ContextMenuItem>
+
+          <ContextMenuItem onClick={onDuplicateAllPages}>
+            <SquareStack className="mr-2 h-4 w-4" />
+            <Trans>Duplicate on all pages</Trans>
+          </ContextMenuItem>
+
+          <ContextMenuSeparator />
+
+          <ContextMenuItem className="text-destructive focus:text-destructive" onClick={onRemove}>
+            <Trash className="mr-2 h-4 w-4" />
+            <Trans>Delete</Trans>
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
 
       {!disabled && settingsActive && (
         <div className="absolute z-[60] mt-1 flex w-full items-center justify-center">
@@ -420,6 +464,25 @@ const FieldItemInner = ({
             </button>
           </div>
         </div>
+      )}
+
+      {!disabled && selected && onRemove && (
+        <button
+          type="button"
+          title={_(msg`Delete field`)}
+          aria-label={_(msg`Delete field`)}
+          className="absolute -right-2.5 -top-2.5 z-[70] flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-red-500 text-white shadow-md transition-colors hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+          onTouchEnd={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+        >
+          <Trash className="h-3.5 w-3.5" />
+        </button>
       )}
     </Rnd>,
     document.body,

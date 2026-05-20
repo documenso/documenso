@@ -60,6 +60,7 @@ import { FieldItem } from './field-item';
 import { FieldAdvancedSettings } from './field-item-advanced-settings';
 import { MissingSignatureFieldDialog } from './missing-signature-field-dialog';
 import { type DocumentFlowStep, FRIENDLY_FIELD_TYPE } from './types';
+import { BulkDeleteFieldsDialog, useFieldDeletion } from './use-field-deletion';
 
 const MIN_HEIGHT_PX = 12;
 const MIN_WIDTH_PX = 36;
@@ -590,6 +591,22 @@ export const AddFieldsFormPartial = ({
     scheduleSave(formData);
   };
 
+  const {
+    isFieldSelected,
+    onFieldActivate,
+    removeField,
+    bulkDeleteCount,
+    isBulkDeleteOpen,
+    onBulkDeleteOpenChange,
+    confirmBulkDelete,
+  } = useFieldDeletion({
+    getFields: () => form.getValues('fields'),
+    append: (field) => append(field),
+    remove: (index) => remove(index),
+    onAfterChange: () => void handleAutoSave(),
+    onActiveFieldIdChange: setActiveFieldId,
+  });
+
   return (
     <>
       {showAdvancedSettings && currentField && (
@@ -688,10 +705,7 @@ export const AddFieldsFormPartial = ({
                       onMouseLeave={() => setLastActiveField(null)}
                       onResize={(options) => onFieldResize(options, index)}
                       onMove={(options) => onFieldMove(options, index)}
-                      onRemove={() => {
-                        remove(index);
-                        void handleAutoSave();
-                      }}
+                      onRemove={() => removeField(field.formId)}
                       onDuplicate={() => {
                         onFieldCopy(null, { duplicate: true });
                         void handleAutoSave();
@@ -706,7 +720,8 @@ export const AddFieldsFormPartial = ({
                       }}
                       hasErrors={!!hasFieldError}
                       active={activeFieldId === field.formId}
-                      onFieldActivate={() => setActiveFieldId(field.formId)}
+                      selected={isFieldSelected(field.formId)}
+                      onFieldActivate={(options) => onFieldActivate(field.formId, options)}
                       onFieldDeactivate={() => setActiveFieldId(null)}
                     />
                   );
@@ -1027,6 +1042,13 @@ export const AddFieldsFormPartial = ({
           <MissingSignatureFieldDialog
             isOpen={isMissingSignatureDialogVisible}
             onOpenChange={(value) => setIsMissingSignatureDialogVisible(value)}
+          />
+
+          <BulkDeleteFieldsDialog
+            open={isBulkDeleteOpen}
+            onOpenChange={onBulkDeleteOpenChange}
+            onConfirm={confirmBulkDelete}
+            count={bulkDeleteCount}
           />
         </>
       }
