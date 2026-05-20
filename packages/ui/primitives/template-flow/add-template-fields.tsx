@@ -555,8 +555,9 @@ export const AddTemplateFieldsFormPartial = ({
 
   return (
     <>
-      {showAdvancedSettings && currentField ? (
+      {showAdvancedSettings && currentField && (
         <FieldAdvancedSettings
+          floating
           title={msg`Advanced settings`}
           description={msg`Configure the ${parseMessageDescriptor(
             _,
@@ -570,8 +571,15 @@ export const AddTemplateFieldsFormPartial = ({
             handleSavedFieldSettings(fieldState);
             await handleAutoSave();
           }}
+          onFieldMetaChange={(fieldState) => handleSavedFieldSettings(fieldState)}
         />
-      ) : (
+      )}
+
+      {
+        /* The field-placement form stays mounted while a field's advanced
+           settings are open, so the document and its fields remain visible
+           (the editor now renders as a floating panel instead of replacing
+           this form). */
         <>
           <DocumentFlowFormContainerHeader
             title={documentFlow.title}
@@ -611,6 +619,11 @@ export const AddTemplateFieldsFormPartial = ({
                     recipientIndex={recipientIndex === -1 ? 0 : recipientIndex}
                     field={field}
                     disabled={selectedSigner?.id !== field.recipientId}
+                    fieldClassName={
+                      showAdvancedSettings && currentField?.formId === field.formId
+                        ? 'ring-primary ring-offset-2'
+                        : undefined
+                    }
                     minHeight={MIN_HEIGHT_PX}
                     minWidth={MIN_WIDTH_PX}
                     defaultHeight={DEFAULT_HEIGHT_PX}
@@ -1048,7 +1061,7 @@ export const AddTemplateFieldsFormPartial = ({
             </div>
           </DocumentFlowFormContainerContent>
         </>
-      )}
+      }
     </>
   );
 };

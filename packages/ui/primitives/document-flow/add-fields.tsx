@@ -592,8 +592,9 @@ export const AddFieldsFormPartial = ({
 
   return (
     <>
-      {showAdvancedSettings && currentField ? (
+      {showAdvancedSettings && currentField && (
         <FieldAdvancedSettings
+          floating
           title={msg`Advanced settings`}
           description={msg`Configure the ${parseMessageDescriptor(
             _,
@@ -611,8 +612,15 @@ export const AddFieldsFormPartial = ({
             handleSavedFieldSettings(fieldState);
             await handleAutoSave();
           }}
+          onFieldMetaChange={(fieldState) => handleSavedFieldSettings(fieldState)}
         />
-      ) : (
+      )}
+
+      {
+        /* The field-placement form stays mounted while a field's advanced
+           settings are open, so the document and its fields remain visible
+           (the editor now renders as a floating panel instead of replacing
+           this form). */
         <>
           <DocumentFlowFormContainerHeader
             title={documentFlow.title}
@@ -660,6 +668,11 @@ export const AddFieldsFormPartial = ({
                       disabled={
                         selectedSigner?.email !== field.signerEmail ||
                         !canRecipientBeModified(selectedSigner, fields)
+                      }
+                      fieldClassName={
+                        showAdvancedSettings && currentField?.formId === field.formId
+                          ? 'ring-primary ring-offset-2'
+                          : undefined
                       }
                       minHeight={MIN_HEIGHT_PX}
                       minWidth={MIN_WIDTH_PX}
@@ -1016,7 +1029,7 @@ export const AddFieldsFormPartial = ({
             onOpenChange={(value) => setIsMissingSignatureDialogVisible(value)}
           />
         </>
-      )}
+      }
       {validateUninsertedFields && fieldsWithError[0] && (
         <FieldToolTip key={fieldsWithError[0].id} field={fieldsWithError[0]} color="warning">
           <Trans>Empty field</Trans>
