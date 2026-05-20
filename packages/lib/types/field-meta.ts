@@ -25,7 +25,8 @@ export type GenericTextFieldTypeMetas =
   | TEmailFieldMeta
   | TDateFieldMeta
   | TTextFieldMeta
-  | TNumberFieldMeta;
+  | TNumberFieldMeta
+  | TCalculatedFieldMeta;
 
 const ZFieldMetaLineHeight = z.coerce
   .number()
@@ -112,6 +113,31 @@ export const ZNumberFieldMeta = ZBaseFieldMeta.extend({
 
 export type TNumberFieldMeta = z.infer<typeof ZNumberFieldMeta>;
 
+export const FIELD_MIN_CALCULATED_PRECISION = 0;
+export const FIELD_MAX_CALCULATED_PRECISION = 10;
+export const FIELD_DEFAULT_CALCULATED_PRECISION = 2;
+
+export const ZCalculatedFieldMeta = ZBaseFieldMeta.extend({
+  type: z.literal('calculated'),
+  /**
+   * The formula expression. References other fields by their label using
+   * `{Label}` syntax. Supports + - * / ( ) and SUM/ROUND/MIN/MAX.
+   */
+  formula: z.string().optional(),
+  /** Number of decimal places to display the computed result with. */
+  precision: z.coerce
+    .number()
+    .min(FIELD_MIN_CALCULATED_PRECISION)
+    .max(FIELD_MAX_CALCULATED_PRECISION)
+    .nullish(),
+  textAlign: ZFieldTextAlignSchema.optional(),
+  lineHeight: ZFieldMetaLineHeight.nullish(),
+  letterSpacing: ZFieldMetaLetterSpacing.nullish(),
+  verticalAlign: ZFieldMetaVerticalAlign.nullish(),
+});
+
+export type TCalculatedFieldMeta = z.infer<typeof ZCalculatedFieldMeta>;
+
 export const ZRadioFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('radio'),
   values: z
@@ -171,6 +197,7 @@ export const ZFieldMetaNotOptionalSchema = z.discriminatedUnion('type', [
   ZRadioFieldMeta,
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
+  ZCalculatedFieldMeta,
 ]);
 
 export type TFieldMetaNotOptionalSchema = z.infer<typeof ZFieldMetaNotOptionalSchema>;
@@ -275,6 +302,10 @@ export const ZFieldAndMetaSchema = z.discriminatedUnion('type', [
     type: z.literal(FieldType.DROPDOWN),
     fieldMeta: ZDropdownFieldMeta.optional(),
   }),
+  z.object({
+    type: z.literal(FieldType.CALCULATED),
+    fieldMeta: ZCalculatedFieldMeta.optional(),
+  }),
 ]);
 
 export type TFieldAndMeta = z.infer<typeof ZFieldAndMetaSchema>;
@@ -304,6 +335,18 @@ export const FIELD_NUMBER_META_DEFAULT_VALUES: TNumberFieldMeta = {
   placeholder: '',
   required: false,
   readOnly: false,
+};
+
+export const FIELD_CALCULATED_META_DEFAULT_VALUES: TCalculatedFieldMeta = {
+  type: 'calculated',
+  fontSize: DEFAULT_FIELD_FONT_SIZE,
+  textAlign: 'left',
+  label: '',
+  formula: '',
+  precision: FIELD_DEFAULT_CALCULATED_PRECISION,
+  required: false,
+  // Calculated fields are always read only — signers see the computed result.
+  readOnly: true,
 };
 
 export const FIELD_INITIALS_META_DEFAULT_VALUES: TInitialsFieldMeta = {
@@ -370,6 +413,7 @@ export const FIELD_META_DEFAULT_VALUES: Record<FieldType, TFieldMetaSchema> = {
   [FieldType.RADIO]: FIELD_RADIO_META_DEFAULT_VALUES,
   [FieldType.CHECKBOX]: FIELD_CHECKBOX_META_DEFAULT_VALUES,
   [FieldType.DROPDOWN]: FIELD_DROPDOWN_META_DEFAULT_VALUES,
+  [FieldType.CALCULATED]: FIELD_CALCULATED_META_DEFAULT_VALUES,
 } as const;
 
 export const ZEnvelopeFieldAndMetaSchema = z.discriminatedUnion('type', [
@@ -416,6 +460,10 @@ export const ZEnvelopeFieldAndMetaSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal(FieldType.DROPDOWN),
     fieldMeta: ZDropdownFieldMeta.optional().default(FIELD_DROPDOWN_META_DEFAULT_VALUES),
+  }),
+  z.object({
+    type: z.literal(FieldType.CALCULATED),
+    fieldMeta: ZCalculatedFieldMeta.optional().default(FIELD_CALCULATED_META_DEFAULT_VALUES),
   }),
 ]);
 

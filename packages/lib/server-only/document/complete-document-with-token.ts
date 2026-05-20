@@ -18,6 +18,7 @@ import {
 } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
+import { computeCalculatedFieldValue } from '@documenso/lib/utils/calculated-field';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 
@@ -285,6 +286,72 @@ export const completeDocumentWithToken = async ({
 
   if (fieldsContainUnsignedRequiredField(fields)) {
     throw new Error(`Recipient ${recipient.id} has unsigned fields`);
+  }
+
+  // Authoritatively compute this recipient's calculated fields at completion.
+  // The signer never fills these in (they are read-only), so the server is the
+  // source of truth for the value that gets sealed into the PDF.
+  const calculatedFields = fields.filter((field) => field.type === FieldType.CALCULATED);
+
+  if (calculatedFields.length > 0) {
+    // References can point at fields owned by any recipient, so resolve against
+    // every field in the envelope using their latest persisted values.
+    const allEnvelopeFields = await prisma.field.findMany({
+      where: { envelopeId: envelope.id },
+    });
+
+    const computedUpdates = calculatedFields
+      .map((field) => ({
+        field,
+        display: computeCalculatedFieldValue(field, allEnvelopeFields).display,
+      }))
+      .filter(({ display }) => display !== '');
+
+    if (computedUpdates.length > 0) {
+      await prisma.$transaction(async (tx) => {
+        for (const { field, display } of computedUpdates) {
+          await tx.field.update({
+            where: { id: field.id },
+            data: {
+              customText: display,
+              inserted: true,
+            },
+          });
+        }
+
+        await tx.documentAuditLog.createMany({
+          data: computedUpdates.map(({ field, display }) =>
+            createDocumentAuditLogData({
+              type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
+              envelopeId: envelope.id,
+              user: {
+                email: recipientEmail,
+                name: recipientName,
+              },
+              requestMetadata,
+              data: {
+                recipientEmail,
+                recipientId: recipient.id,
+                recipientName,
+                recipientRole: recipient.role,
+                fieldId: field.secondaryId,
+                field: {
+                  type: FieldType.CALCULATED,
+                  data: display,
+                },
+              },
+            }),
+          ),
+        });
+      });
+
+      // Keep the local fields array in sync for any downstream consumers.
+      fields = fields.map((field) => {
+        const update = computedUpdates.find(({ field: updated }) => updated.id === field.id);
+
+        return update ? { ...field, customText: update.display, inserted: true } : field;
+      });
+    }
   }
 
   await prisma.$transaction(async (tx) => {

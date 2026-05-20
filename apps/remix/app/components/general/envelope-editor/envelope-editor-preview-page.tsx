@@ -13,6 +13,7 @@ import {
 } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
 import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
+import { computeCalculatedFieldValue } from '@documenso/lib/utils/calculated-field';
 import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
 import { toCheckboxCustomText } from '@documenso/lib/utils/fields';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
@@ -196,6 +197,14 @@ export const EnvelopeEditorPreviewPage = () => {
           .with({ type: FieldType.FREE_SIGNATURE }, () => {
             return {
               customText: '',
+            };
+          })
+          .with({ type: FieldType.CALCULATED }, () => {
+            // Preview the computed result using the other fields' sample values.
+            const { display } = computeCalculatedFieldValue(field, fields);
+
+            return {
+              customText: display,
             };
           })
           .exhaustive(),

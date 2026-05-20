@@ -16,6 +16,7 @@ import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i
 import type { NormalizedFieldWithContext } from '@documenso/lib/server-only/ai/envelope/detect-fields/types';
 import {
   FIELD_META_DEFAULT_VALUES,
+  type TCalculatedFieldMeta,
   type TCheckboxFieldMeta,
   type TDateFieldMeta,
   type TDropdownFieldMeta,
@@ -39,6 +40,7 @@ import { Separator } from '@documenso/ui/primitives/separator';
 import { AiFeaturesEnableDialog } from '~/components/dialogs/ai-features-enable-dialog';
 import { AiFieldDetectionDialog } from '~/components/dialogs/ai-field-detection-dialog';
 import { EnvelopeItemEditDialog } from '~/components/dialogs/envelope-item-edit-dialog';
+import { EditorFieldCalculatedForm } from '~/components/forms/editor/editor-field-calculated-form';
 import { EditorFieldCheckboxForm } from '~/components/forms/editor/editor-field-checkbox-form';
 import { EditorFieldDateForm } from '~/components/forms/editor/editor-field-date-form';
 import { EditorFieldDropdownForm } from '~/components/forms/editor/editor-field-dropdown-form';
@@ -69,6 +71,7 @@ const FieldSettingsTypeTranslations: Record<FieldType, MessageDescriptor> = {
   [FieldType.RADIO]: msg`Radio Settings`,
   [FieldType.CHECKBOX]: msg`Checkbox Settings`,
   [FieldType.DROPDOWN]: msg`Dropdown Settings`,
+  [FieldType.CALCULATED]: msg`Calculated Settings`,
 };
 
 export const EnvelopeEditorFieldsPage = () => {
@@ -111,6 +114,35 @@ export const EnvelopeEditorFieldsPage = () => {
       });
     }
   };
+
+  /**
+   * Fields that a calculated field can reference (numeric + other calculated
+   * fields that have a label) and all calculated fields for circular-reference
+   * detection. Excludes the field currently being edited.
+   */
+  const calculatedReferenceData = useMemo(() => {
+    const otherFields = editorFields.localFields.filter(
+      (field) => field.formId !== selectedField?.formId,
+    );
+
+    const readLabel = (field: (typeof otherFields)[number]) =>
+      (field.fieldMeta as { label?: string } | null | undefined)?.label ?? '';
+
+    const availableFields = otherFields
+      .filter((field) => field.type === FieldType.NUMBER || field.type === FieldType.CALCULATED)
+      .map((field) => ({ label: readLabel(field), type: field.type }))
+      .filter((field) => field.label.length > 0);
+
+    const calculatedFields = otherFields
+      .filter((field) => field.type === FieldType.CALCULATED)
+      .map((field) => ({
+        label: readLabel(field),
+        formula: (field.fieldMeta as { formula?: string } | null | undefined)?.formula ?? '',
+      }))
+      .filter((field) => field.label.length > 0);
+
+    return { availableFields, calculatedFields };
+  }, [editorFields.localFields, selectedField?.formId]);
 
   const onFieldDetectionComplete = (fields: NormalizedFieldWithContext[]) => {
     for (const field of fields) {
@@ -446,6 +478,14 @@ export const EnvelopeEditorFieldsPage = () => {
                       <EditorFieldTextForm
                         value={selectedField?.fieldMeta as TTextFieldMeta | undefined}
                         onValueChange={(value) => updateSelectedFieldMeta(value)}
+                      />
+                    ))
+                    .with(FieldType.CALCULATED, () => (
+                      <EditorFieldCalculatedForm
+                        value={selectedField?.fieldMeta as TCalculatedFieldMeta | undefined}
+                        onValueChange={(value) => updateSelectedFieldMeta(value)}
+                        availableFields={calculatedReferenceData.availableFields}
+                        calculatedFields={calculatedReferenceData.calculatedFields}
                       />
                     ))
                     .otherwise(() => null)}

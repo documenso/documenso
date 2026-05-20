@@ -280,6 +280,7 @@ export const signEnvelopeFieldRoute = procedure
                 FieldType.RADIO,
                 FieldType.CHECKBOX,
                 FieldType.DROPDOWN,
+                FieldType.CALCULATED,
                 (type) => ({
                   type,
                   data: updatedField.customText,

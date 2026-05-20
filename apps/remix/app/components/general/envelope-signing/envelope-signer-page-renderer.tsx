@@ -27,6 +27,7 @@ import { ZFullFieldSchema } from '@documenso/lib/types/field';
 import { createSpinner } from '@documenso/lib/universal/field-renderer/field-generic-items';
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
+import { computeCalculatedFieldValue } from '@documenso/lib/utils/calculated-field';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
@@ -136,7 +137,24 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
       return;
     }
 
-    const fieldToRender = ZFullFieldSchema.parse(unparsedField);
+    // Calculated fields are computed live from the current value of every field
+    // in the envelope so the result updates as referenced fields are filled in.
+    let fieldForRender = unparsedField;
+
+    if (unparsedField.type === FieldType.CALCULATED) {
+      const allFields = envelope.recipients.flatMap(
+        (envelopeRecipient) => envelopeRecipient.fields,
+      );
+      const { display } = computeCalculatedFieldValue(unparsedField, allFields);
+
+      fieldForRender = {
+        ...unparsedField,
+        customText: display,
+        inserted: display !== '',
+      };
+    }
+
+    const fieldToRender = ZFullFieldSchema.parse(fieldForRender);
 
     const color = fieldToRender.fieldMeta?.readOnly
       ? 'readOnly'
@@ -361,6 +379,15 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
           }).finally(() => {
             loadingSpinnerGroup.destroy();
           });
+        })
+        /**
+         * CALCULATED FIELD.
+         *
+         * Read-only and computed automatically — there is nothing for the signer
+         * to insert, so clicks are a no-op (also guarded by the readOnly check above).
+         */
+        .with({ type: FieldType.CALCULATED }, () => {
+          // No-op.
         })
         /**
          * SIGNATURE FIELD.

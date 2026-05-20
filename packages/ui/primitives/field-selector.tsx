@@ -1,6 +1,7 @@
 import { Trans } from '@lingui/react/macro';
 import { FieldType } from '@prisma/client';
 import {
+  Calculator,
   CalendarDays,
   CheckSquare,
   ChevronDown,
@@ -78,6 +79,11 @@ export const FieldSelector = ({
       type: FieldType.DROPDOWN,
       label: 'Dropdown',
       icon: ChevronDown,
+    },
+    {
+      type: FieldType.CALCULATED,
+      label: 'Calculated',
+      icon: Calculator,
     },
   ];
 

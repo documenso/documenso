@@ -10,12 +10,19 @@ export const ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING: FieldType[] = [
   FieldType.DROPDOWN,
   FieldType.RADIO,
   FieldType.CHECKBOX,
+  FieldType.CALCULATED,
 ];
 
 /**
  * Whether a field is required to be inserted.
  */
 export const isRequiredField = (field: Field) => {
+  // Calculated fields are computed automatically — a signer never fills them in,
+  // so they must never be treated as a required field that blocks completion.
+  if (field.type === FieldType.CALCULATED) {
+    return false;
+  }
+
   // All fields without the optional metadata are assumed to be required.
   if (!ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING.includes(field.type)) {
     return true;

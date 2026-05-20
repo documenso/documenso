@@ -4,6 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { FieldType } from '@prisma/client';
 import {
+  CalculatorIcon,
   CalendarIcon,
   CheckSquareIcon,
   ContactIcon,
@@ -84,6 +85,11 @@ export const fieldButtonList = [
     type: FieldType.DROPDOWN,
     icon: ListIcon,
     name: msg`Dropdown`,
+  },
+  {
+    type: FieldType.CALCULATED,
+    icon: CalculatorIcon,
+    name: msg`Calculated`,
   },
 ];
 

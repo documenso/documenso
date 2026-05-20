@@ -86,6 +86,7 @@ export const renderField = ({
       FieldType.DATE,
       FieldType.TEXT,
       FieldType.NUMBER,
+      FieldType.CALCULATED,
       () => renderGenericTextFieldElement(field, options),
     )
     .with(FieldType.CHECKBOX, () => renderCheckboxFieldElement(field, options))
