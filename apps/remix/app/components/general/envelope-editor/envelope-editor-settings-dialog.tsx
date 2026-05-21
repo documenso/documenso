@@ -921,14 +921,12 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                               </FormControl>
 
                               <FormLabel className="ml-2 text-muted-foreground text-sm" htmlFor="include-audit-log">
-                                <Trans>Include audit logs in downloaded PDF</Trans>
+                                <Trans>Include audit logs in signed PDF</Trans>
                               </FormLabel>
                             </div>
 
                             <FormDescription>
-                              <Trans>
-                                Audit logs remain available to download separately from the document logs page.
-                              </Trans>
+                              <Trans>Audit logs can still be downloaded separately from the document logs page.</Trans>
                             </FormDescription>
                           </FormItem>
                         )}
