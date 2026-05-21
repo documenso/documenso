@@ -237,7 +237,7 @@ type FormFieldWithDict = {
   getWidgets(): WidgetAnnotation[];
 };
 
-type ResolvedTextDocumentenoType =
+type ResolvedTextDocumensoType =
   | typeof FieldType.TEXT
   | typeof FieldType.DATE
   | typeof FieldType.NUMBER
@@ -249,7 +249,7 @@ const resolveTextSubtype = (
   field: FormFieldWithDict,
   resolver: RefResolver,
 ): {
-  documentenoType: ResolvedTextDocumentenoType;
+  documensoType: ResolvedTextDocumensoType;
 } => {
   const candidateNames = [field.partialName, field.alternateName];
 
@@ -264,11 +264,11 @@ const resolveTextSubtype = (
   // AcroForm format actions take precedence over name tokens — Adobe set them
   // explicitly, so they're a stronger signal than a heuristic regex hit.
   if (formatHint === 'date') {
-    return { documentenoType: FieldType.DATE };
+    return { documensoType: FieldType.DATE };
   }
 
   if (formatHint === 'number') {
-    return { documentenoType: FieldType.NUMBER };
+    return { documensoType: FieldType.NUMBER };
   }
 
   let maxLen = Number.POSITIVE_INFINITY;
@@ -284,26 +284,26 @@ const resolveTextSubtype = (
   }
 
   if (candidateNames.some(isDateFieldByName)) {
-    return { documentenoType: FieldType.DATE };
+    return { documensoType: FieldType.DATE };
   }
 
   if (maxLen <= 10 && candidateNames.some(isNumberFieldByName)) {
-    return { documentenoType: FieldType.NUMBER };
+    return { documensoType: FieldType.NUMBER };
   }
 
   if (candidateNames.some(isEmailFieldByName)) {
-    return { documentenoType: FieldType.EMAIL };
+    return { documensoType: FieldType.EMAIL };
   }
 
   if (candidateNames.some(isNameFieldByName)) {
-    return { documentenoType: FieldType.NAME };
+    return { documensoType: FieldType.NAME };
   }
 
   if (candidateNames.some(isInitialsFieldByName)) {
-    return { documentenoType: FieldType.INITIALS };
+    return { documensoType: FieldType.INITIALS };
   }
 
-  return { documentenoType: FieldType.TEXT };
+  return { documensoType: FieldType.TEXT };
 };
 
 const pickLabel = (field: FormFieldWithDict): string | undefined => {
@@ -440,14 +440,14 @@ const buildSignatureFieldAndMeta = (field: FormFieldWithDict): TFieldAndMeta => 
 
 const buildTextFieldAndMeta = (
   field: FormFieldWithDict,
-  documentenoType: ResolvedTextDocumentenoType,
+  documensoType: ResolvedTextDocumensoType,
   defaultText: string | undefined,
 ): TFieldAndMeta => {
   const label = pickLabel(field);
   const required = field.isRequired() || undefined;
   const readOnly = field.isReadOnly() || undefined;
 
-  if (documentenoType === FieldType.NUMBER) {
+  if (documensoType === FieldType.NUMBER) {
     const fieldMeta: TNumberFieldMeta = {
       ...FIELD_NUMBER_META_DEFAULT_VALUES,
       label: label ?? FIELD_NUMBER_META_DEFAULT_VALUES.label,
@@ -457,10 +457,10 @@ const buildTextFieldAndMeta = (
       value: defaultText && defaultText.length > 0 ? defaultText : undefined,
     };
 
-    return ZEnvelopeFieldAndMetaSchema.parse({ type: documentenoType, fieldMeta });
+    return ZEnvelopeFieldAndMetaSchema.parse({ type: documensoType, fieldMeta });
   }
 
-  if (documentenoType === FieldType.TEXT) {
+  if (documensoType === FieldType.TEXT) {
     const fieldMeta: TTextFieldMeta = {
       ...FIELD_TEXT_META_DEFAULT_VALUES,
       label: label ?? FIELD_TEXT_META_DEFAULT_VALUES.label,
@@ -470,12 +470,12 @@ const buildTextFieldAndMeta = (
       text: defaultText && defaultText.length > 0 ? defaultText : FIELD_TEXT_META_DEFAULT_VALUES.text,
     };
 
-    return ZEnvelopeFieldAndMetaSchema.parse({ type: documentenoType, fieldMeta });
+    return ZEnvelopeFieldAndMetaSchema.parse({ type: documensoType, fieldMeta });
   }
 
-  if (documentenoType === FieldType.DATE) {
+  if (documensoType === FieldType.DATE) {
     return ZEnvelopeFieldAndMetaSchema.parse({
-      type: documentenoType,
+      type: documensoType,
       fieldMeta: {
         ...FIELD_DATE_META_DEFAULT_VALUES,
         label,
@@ -486,9 +486,9 @@ const buildTextFieldAndMeta = (
     });
   }
 
-  if (documentenoType === FieldType.EMAIL) {
+  if (documensoType === FieldType.EMAIL) {
     return ZEnvelopeFieldAndMetaSchema.parse({
-      type: documentenoType,
+      type: documensoType,
       fieldMeta: {
         ...FIELD_EMAIL_META_DEFAULT_VALUES,
         label,
@@ -499,9 +499,9 @@ const buildTextFieldAndMeta = (
     });
   }
 
-  if (documentenoType === FieldType.NAME) {
+  if (documensoType === FieldType.NAME) {
     return ZEnvelopeFieldAndMetaSchema.parse({
-      type: documentenoType,
+      type: documensoType,
       fieldMeta: {
         ...FIELD_NAME_META_DEFAULT_VALUES,
         label,
@@ -513,7 +513,7 @@ const buildTextFieldAndMeta = (
   }
 
   return ZEnvelopeFieldAndMetaSchema.parse({
-    type: documentenoType,
+    type: documensoType,
     fieldMeta: {
       ...FIELD_INITIALS_META_DEFAULT_VALUES,
       label,
@@ -760,9 +760,9 @@ export const extractAcroFormFieldsFromPDF = async (
             getDefaultValue(): string;
           };
           const textField = field as unknown as TextFieldDuck;
-          const { documentenoType } = resolveTextSubtype(formField, resolver);
+          const { documensoType } = resolveTextSubtype(formField, resolver);
           const defaultText = usePdfDefaults ? textField.getValue?.() || textField.getDefaultValue?.() || '' : '';
-          fieldAndMeta = buildTextFieldAndMeta(formField, documentenoType, defaultText);
+          fieldAndMeta = buildTextFieldAndMeta(formField, documensoType, defaultText);
         } else if (acroFormType === 'checkbox') {
           type CheckboxFieldDuck = FormFieldWithDict & {
             isChecked(): boolean;
