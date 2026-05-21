@@ -116,8 +116,18 @@ const runSettingsFlow = async ({ root }: TEnvelopeEditorSurface, { externalId, i
   await root.locator('input[name="externalId"]').fill(externalId);
   await root.locator('input[name="meta.redirectUrl"]').fill(TEST_SETTINGS_VALUES.redirectUrl);
   await root.getByRole('button', { name: 'Notifications' }).click();
+  // Fill email-content fields and toggle recipient-facing notification checkboxes
+  // while distributionMethod is still EMAIL. After it flips to NONE below, these
+  // controls are disabled because no email is sent to recipients.
   await root.locator('input[name="meta.subject"]').fill(TEST_SETTINGS_VALUES.subject);
   await root.locator('textarea[name="meta.message"]').fill(TEST_SETTINGS_VALUES.message);
+  await root.locator('input[name="meta.emailReplyTo"]').fill(TEST_SETTINGS_VALUES.replyTo);
+  await root.locator('#recipientSigned').click();
+  await root.locator('#recipientSigningRequest').click();
+  await root.locator('#recipientRemoved').click();
+  await root.locator('#documentPending').click();
+  await root.locator('#documentCompleted').click();
+  await root.locator('#documentDeleted').click();
 
   await root.getByRole('button', { name: 'General' }).click();
 
@@ -196,8 +206,21 @@ const runSettingsFlow = async ({ root }: TEnvelopeEditorSurface, { externalId, i
   await clickSettingsDialogHeader(root);
 
   await root.getByRole('button', { name: 'Notifications' }).click();
+
+  // Distribution is NONE: email-content fields and recipient-facing checkboxes
+  // must be disabled; owner-facing checkboxes stay editable so we toggle them here.
   await expect(root.locator('input[name="meta.subject"]')).toBeDisabled();
   await expect(root.locator('textarea[name="meta.message"]')).toBeDisabled();
+  await expect(root.locator('input[name="meta.emailReplyTo"]')).toBeDisabled();
+  await expect(root.locator('#recipientSigned')).toBeDisabled();
+  await expect(root.locator('#recipientSigningRequest')).toBeDisabled();
+  await expect(root.locator('#recipientRemoved')).toBeDisabled();
+  await expect(root.locator('#documentPending')).toBeDisabled();
+  await expect(root.locator('#documentCompleted')).toBeDisabled();
+  await expect(root.locator('#documentDeleted')).toBeDisabled();
+
+  // Email Sender select only renders when the org has the emailDomains feature
+  // flag plus allowConfigureEmailSender, so the assertion is conditional.
   const emailSenderSelect = getComboboxByLabel(root, 'Email Sender');
   const hasEmailSenderSelect = (await emailSenderSelect.count()) > 0;
 
@@ -205,17 +228,10 @@ const runSettingsFlow = async ({ root }: TEnvelopeEditorSurface, { externalId, i
     await expect(emailSenderSelect).toBeDisabled();
   }
 
-  await expect(root.locator('#recipientSigned')).toBeEnabled();
-  await root.locator('#recipientSigned').click();
-  await root.locator('#recipientSigningRequest').click();
-  await root.locator('#recipientRemoved').click();
-  await root.locator('#documentPending').click();
-  await root.locator('#documentCompleted').click();
-  await root.locator('#documentDeleted').click();
+  await expect(root.locator('#ownerDocumentCompleted')).toBeEnabled();
   await root.locator('#ownerDocumentCompleted').click();
   await root.locator('#ownerRecipientExpired').click();
   await root.locator('#ownerDocumentCreated').click();
-  await root.locator('input[name="meta.emailReplyTo"]').fill(TEST_SETTINGS_VALUES.replyTo);
 
   await root.getByRole('button', { name: 'Security' }).click();
   await selectMultiSelectOption(root, 'documentAccessSelectValue', TEST_SETTINGS_VALUES.accessAuth);

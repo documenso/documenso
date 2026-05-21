@@ -13,9 +13,17 @@ type DocumentEmailCheckboxesProps = {
   value: Value;
   onChange: (value: Value) => void;
   className?: string;
+  disabledEvents?: readonly DocumentEmailEvents[];
 };
 
-export const DocumentEmailCheckboxes = ({ value, onChange, className }: DocumentEmailCheckboxesProps) => {
+export const DocumentEmailCheckboxes = ({
+  value,
+  onChange,
+  className,
+  disabledEvents,
+}: DocumentEmailCheckboxesProps) => {
+  const isDisabled = (event: DocumentEmailEvents) => disabledEvents?.includes(event) ?? false;
+
   return (
     <div className={cn('space-y-3', className)}>
       <div className="flex flex-row items-center">
@@ -23,6 +31,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className }: Document
           id={DocumentEmailEvents.RecipientSigned}
           className="h-5 w-5"
           checked={value.recipientSigned}
+          disabled={isDisabled(DocumentEmailEvents.RecipientSigned)}
           onCheckedChange={(checked) => onChange({ ...value, [DocumentEmailEvents.RecipientSigned]: Boolean(checked) })}
         />
 
@@ -57,6 +66,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className }: Document
           id={DocumentEmailEvents.RecipientSigningRequest}
           className="h-5 w-5"
           checked={value.recipientSigningRequest}
+          disabled={isDisabled(DocumentEmailEvents.RecipientSigningRequest)}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.RecipientSigningRequest]: Boolean(checked) })
           }
@@ -93,6 +103,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className }: Document
           id={DocumentEmailEvents.RecipientRemoved}
           className="h-5 w-5"
           checked={value.recipientRemoved}
+          disabled={isDisabled(DocumentEmailEvents.RecipientRemoved)}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.RecipientRemoved]: Boolean(checked) })
           }
@@ -129,6 +140,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className }: Document
           id={DocumentEmailEvents.DocumentPending}
           className="h-5 w-5"
           checked={value.documentPending}
+          disabled={isDisabled(DocumentEmailEvents.DocumentPending)}
           onCheckedChange={(checked) => onChange({ ...value, [DocumentEmailEvents.DocumentPending]: Boolean(checked) })}
         />
 
@@ -166,6 +178,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className }: Document
           id={DocumentEmailEvents.DocumentCompleted}
           className="h-5 w-5"
           checked={value.documentCompleted}
+          disabled={isDisabled(DocumentEmailEvents.DocumentCompleted)}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.DocumentCompleted]: Boolean(checked) })
           }
@@ -202,6 +215,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className }: Document
           id={DocumentEmailEvents.DocumentDeleted}
           className="h-5 w-5"
           checked={value.documentDeleted}
+          disabled={isDisabled(DocumentEmailEvents.DocumentDeleted)}
           onCheckedChange={(checked) => onChange({ ...value, [DocumentEmailEvents.DocumentDeleted]: Boolean(checked) })}
         />
 
@@ -236,6 +250,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className }: Document
           id={DocumentEmailEvents.OwnerDocumentCompleted}
           className="h-5 w-5"
           checked={value.ownerDocumentCompleted}
+          disabled={isDisabled(DocumentEmailEvents.OwnerDocumentCompleted)}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.OwnerDocumentCompleted]: Boolean(checked) })
           }
@@ -272,6 +287,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className }: Document
           id={DocumentEmailEvents.OwnerDocumentCreated}
           className="h-5 w-5"
           checked={value.ownerDocumentCreated}
+          disabled={isDisabled(DocumentEmailEvents.OwnerDocumentCreated)}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.OwnerDocumentCreated]: Boolean(checked) })
           }
@@ -311,6 +327,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className }: Document
           id={DocumentEmailEvents.OwnerRecipientExpired}
           className="h-5 w-5"
           checked={value.ownerRecipientExpired}
+          disabled={isDisabled(DocumentEmailEvents.OwnerRecipientExpired)}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.OwnerRecipientExpired]: Boolean(checked) })
           }

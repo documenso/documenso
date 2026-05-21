@@ -9,7 +9,7 @@ import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { ZDocumentAccessAuthTypesSchema, ZDocumentActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
-import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import { DocumentEmailEvents, ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import {
   type TDocumentMetaDateFormat,
   ZDocumentMetaDateFormatSchema,
@@ -114,7 +114,7 @@ export const ZAddSettingsFormSchema = z.object({
   }),
 });
 
-type EnvelopeEditorSettingsTabType = 'general' | 'reminders' | 'email' | 'security';
+type EnvelopeEditorSettingsTabType = 'general' | 'reminders' | 'notifications' | 'security';
 
 const tabs = [
   {
@@ -130,7 +130,7 @@ const tabs = [
     description: msg`Configure signing reminder settings for the document.`,
   },
   {
-    id: 'email',
+    id: 'notifications',
     title: msg`Notifications`,
     icon: MailIcon,
     description: msg`Configure notification settings for the document.`,
@@ -141,6 +141,18 @@ const tabs = [
     icon: ShieldIcon,
     description: msg`Configure security settings for the document.`,
   },
+] as const;
+
+// Recipient-facing notification events. These are suppressed at send time
+// when distributionMethod is not EMAIL (see extractDerivedDocumentEmailSettings),
+// so the UI mirrors that by disabling the matching checkboxes.
+const RECIPIENT_EMAIL_EVENTS = [
+  DocumentEmailEvents.RecipientSigningRequest,
+  DocumentEmailEvents.RecipientRemoved,
+  DocumentEmailEvents.RecipientSigned,
+  DocumentEmailEvents.DocumentPending,
+  DocumentEmailEvents.DocumentCompleted,
+  DocumentEmailEvents.DocumentDeleted,
 ] as const;
 
 type TAddSettingsFormSchema = z.infer<typeof ZAddSettingsFormSchema>;
@@ -336,7 +348,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
 
           <nav className="col-span-12 mb-8 flex flex-wrap items-center justify-start gap-x-2 gap-y-4 px-4 md:col-span-3 md:w-full md:flex-col md:items-start md:gap-y-2">
             {tabs.map((tab) => {
-              if (tab.id === 'email' && !settings.allowConfigureDistribution) {
+              if (tab.id === 'notifications' && !settings.allowConfigureDistribution) {
                 return null;
               }
 
@@ -732,7 +744,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                       )}
                     />
                   ))
-                  .with({ activeTab: 'email', settings: { allowConfigureDistribution: true } }, () => (
+                  .with({ activeTab: 'notifications', settings: { allowConfigureDistribution: true } }, () => (
                     <>
                       {settings.allowConfigureEmailSender && organisation.organisationClaim.flags.emailDomains && (
                         <FormField
@@ -786,7 +798,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                               </FormLabel>
 
                               <FormControl>
-                                <Input {...field} />
+                                <Input {...field} disabled={!isEmailDistribution} />
                               </FormControl>
 
                               <FormMessage />
@@ -835,7 +847,11 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                             </FormLabel>
 
                             <FormControl>
-                              <Textarea className="h-16 resize-none bg-background" {...field} disabled={!isEmailDistribution} />
+                              <Textarea
+                                className="h-16 resize-none bg-background"
+                                {...field}
+                                disabled={!isEmailDistribution}
+                              />
                             </FormControl>
 
                             <FormMessage />
@@ -846,6 +862,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                       <DocumentEmailCheckboxes
                         value={emailSettings}
                         onChange={(value) => form.setValue('meta.emailSettings', value)}
+                        disabledEvents={isEmailDistribution ? undefined : RECIPIENT_EMAIL_EVENTS}
                       />
                     </>
                   ))
