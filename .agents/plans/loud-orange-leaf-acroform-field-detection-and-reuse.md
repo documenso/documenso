@@ -43,7 +43,7 @@ In scope: server-side extraction at upload time for v2 envelopes (both new envel
 | AcroForm type | Documenso field | Rule |
 | --- | --- | --- |
 | `signature` (unsigned) | `SIGNATURE` | Import. |
-| `signature` (signed — `acroField().has('V')` is true) | — | **Skip.** Log `logger.warn({ event: 'acroform-import.signed-signature', envelopeItemTitle, fieldName })`. Also downgrade `flattenForm` to `false` for that envelope item (do not re-flatten a signed PDF). |
+| `signature` (signed — `SignatureField.isSigned()` returns true) | — | **Skip.** Log `logger.warn({ event: 'acroform-import.signed-pdf-no-flatten', envelopeItemTitle })`. Also downgrade `flattenForm` to `false` for that envelope item (do not re-flatten a signed PDF). |
 | `text` | resolved by heuristic below | Heuristic order: AcroForm format action → name token → default to TEXT. |
 | `checkbox` | `CHECKBOX` | One Documenso field per widget. |
 | `radio` | `RADIO` | One Documenso field per widget. Store group's `getOptions()` in each `fieldMeta.values`. Semantics intentionally differ from PDF (each is independent); documented under Risks. |
@@ -52,14 +52,20 @@ In scope: server-side extraction at upload time for v2 envelopes (both new envel
 
 ### Text-field heuristic (resolved in order — first match wins)
 
-1. **DATE** if `acroField()` carries an additional-actions date format (`/AA` → `/F` → `S = JavaScript` referencing `AFDate_FormatEx`) **or** name/alternateName matches `/date|dob|birth_date|signed_date/i`.
-2. **NUMBER** if `acroField()` carries an `AFNumber_Format` action **or** (`/MaxLen <= 10` AND name matches `/amount|qty|count|number|num\b/i`).
-3. **EMAIL** if name/alternateName matches `/\bemail\b|e[-_]?mail/i`.
-4. **NAME** if name/alternateName matches `/\bname\b|full_?name|first_?name|last_?name|fname\b|lname\b/i`.
-5. **INITIALS** if name/alternateName matches `/initial(s)?\b|\binit\b/i`.
-6. Else **TEXT**.
+AcroForm format actions take precedence over every name token. If `/AA → /F → /JS` references a known formatter, that result is final. Only when no format action is detected do the name regexes apply.
 
-All regexes are case-insensitive and run against `partialName` then `alternateName`. False positives are reviewable in the editor; false negatives fall through to TEXT (always safe).
+1. **DATE** if `acroField()` carries an additional-actions date format (`/AA` → `/F` → `JS` containing `AFDate_FormatEx` or `AFDate_Format`).
+2. **NUMBER** if `acroField()` carries an `AFNumber_Format` action.
+3. **DATE** if name/alternateName matches `/date|dob|birth/i`.
+4. **NUMBER** if name/alternateName matches `/amount|qty|count|number/i` AND `/MaxLen <= 10`.
+5. **EMAIL** if name/alternateName matches `/email|e[-_]?mail/i`.
+6. **NAME** if name/alternateName matches `/name/i`.
+7. **INITIALS** if name/alternateName matches `/initial/i`.
+8. Else **TEXT**.
+
+All regexes are case-insensitive and run against `partialName` then `alternateName`.
+
+Patterns are intentionally lenient to handle CamelCase Adobe Acrobat names (e.g. `CustomerName`, `BirthDate`) that strict word-boundary patterns miss. Expected false positives — `username` → NAME, `birth_name` → DATE, `initialize` → INITIALS — are tolerable because the editor is the final arbiter; false negatives fall through to TEXT (always safe).
 
 ### Metadata mapping
 
@@ -121,7 +127,7 @@ Reuse the placeholder convention (top-left percentages, see `auto-place-fields.t
    5. Apply inverse rotation transform so the field lands at the rendered top-left percentage:
       - `rot === 0`: `x = left`, `y = pageH - top`, `w = right - left`, `h = top - bottom`. Page dims `(pageW, pageH)`.
       - `rot === 90`: `x = bottom`, `y = left`, `w = top - bottom`, `h = right - left`. Page dims swap: `(pageH, pageW)`.
-      - `rot === 180`: `x = pageW - right`, `y = top`, `w = right - left`, `h = top - bottom`. Page dims `(pageW, pageH)`.
+      - `rot === 180`: `x = pageW - right`, `y = bottom`, `w = right - left`, `h = top - bottom`. Page dims `(pageW, pageH)`.
       - `rot === 270`: `x = pageH - top`, `y = pageW - right`, `w = top - bottom`, `h = right - left`. Page dims swap.
    6. Out-of-bounds policy: if the entire rect is outside the rotated page bounds, skip + emit `AcroFormUnsupportedFieldInfo` with `reason: 'off-page'`. Otherwise clamp to `[0, renderedW] × [0, renderedH]`.
    7. Convert to percentages against the rendered page dimensions from step 5.
@@ -360,7 +366,7 @@ Skips and unsupported:
 - listbox / button / unknown / non-terminal → `unsupported`, never thrown.
 - Encrypted PDF → `skipReason: 'encrypted'`, `fields: []`, no throw.
 - XFA hybrid PDF (best-effort detect) → `skipReason: 'xfa-hybrid'` when detectable; otherwise extraction proceeds normally.
-- Signed signature widget (`/V` present) → `unsupported` with `reason: 'signed-signature'` AND `hasSignedSignature: true`.
+- Signed signature widget (`SignatureField.isSigned()` returns true) → `unsupported` with `reason: 'signed-signature'` AND `hasSignedSignature: true`.
 - Buffer corruption → top-level try/catch, returns empty + `skipReason: 'error'`, no throw.
 
 ### E2E (`packages/app-tests/e2e/scenarios/acroform-import.spec.ts`)

@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { PDF } from '@libpdf/core';
+import { AnnotationFlags, PDF, PdfDict, PdfName, PdfNumber, PdfString } from '@libpdf/core';
 import { FieldType } from '@prisma/client';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { convertAcroFormFieldsToFieldInputs, extractAcroFormFieldsFromPDF } from './acroform-fields';
 
@@ -51,6 +51,47 @@ const buildPdfBuffer = async (rotation: 0 | 90 | 180 | 270 = 0) => {
   const qty = form.createTextField('item_qty', { maxLength: 4 });
   page2.drawField(qty, { x: 400, y: 540, width: 60, height: 24 });
 
+  // Format-action precedence: name matches /name/i (would resolve to NAME) but
+  // AcroForm carries an `AFNumber_Format` action — the action MUST win.
+  const customerNameNumberField = form.createTextField('customer_name_amount');
+  page2.drawField(customerNameNumberField, { x: 80, y: 480, width: 120, height: 24 });
+  customerNameNumberField.acroField().set(
+    'AA',
+    PdfDict.of({
+      F: PdfDict.of({
+        S: PdfName.of('JavaScript'),
+        JS: PdfString.fromString('AFNumber_Format(2, 0, 0, 0, "$", true)'),
+      }),
+    }),
+  );
+
+  // Required CHECKBOX: /Ff bit 2 (REQUIRED) set via raw dict.
+  const requiredTerms = form.createCheckbox('required_terms', { onValue: 'Accepted' });
+  page2.drawField(requiredTerms, { x: 220, y: 480, width: 18, height: 18 });
+  requiredTerms.acroField().set('Ff', PdfNumber.of(2));
+
+  // /TU (alternateName) label fallback: partialName is `shipping_addr` but
+  // /TU carries a human label that MUST be preferred over partialName.
+  const shippingAddress = form.createTextField('shipping_addr');
+  page2.drawField(shippingAddress, { x: 280, y: 480, width: 220, height: 24 });
+  shippingAddress.acroField().set('TU', PdfString.fromString('Shipping address'));
+
+  // Hidden widget: should land in `unsupported` with reason 'hidden' rather
+  // than producing a field. WidgetAnnotation has no public setFlag, so we
+  // write the annotation /F entry directly (bit 2 = Hidden).
+  const hiddenField = form.createTextField('hidden_field');
+  page2.drawField(hiddenField, { x: 80, y: 440, width: 100, height: 20 });
+  const hiddenWidgets = hiddenField.getWidgets() as Array<{ dict: PdfDict }>;
+  if (hiddenWidgets[0]) {
+    hiddenWidgets[0].dict.set('F', PdfNumber.of(AnnotationFlags.Hidden));
+  }
+
+  // Off-page widget: positioned beyond the right edge of a 612pt-wide page so
+  // the extractor reports `off-page`. Drawn AFTER all others so the file is
+  // intentionally malformed.
+  const offPageField = form.createTextField('off_page_field');
+  page2.drawField(offPageField, { x: 700, y: 440, width: 60, height: 20 });
+
   return Buffer.from(await pdf.save());
 };
 
@@ -91,7 +132,8 @@ describe('extractAcroFormFieldsFromPDF', () => {
 
       expect(result.skipReason).toBeUndefined();
       expect(result.hasSignedSignature).toBe(false);
-      expect(result.unsupported).toEqual([]);
+      // Two intentionally-bad widgets in the fixture: hidden and off-page.
+      expect(result.unsupported.map((u) => u.reason).sort()).toEqual(['hidden', 'off-page']);
 
       const byName = new Map(result.fields.map((f) => [f.fieldName, f.fieldAndMeta.type]));
 
@@ -103,6 +145,9 @@ describe('extractAcroFormFieldsFromPDF', () => {
       expect(byName.get('initials')).toBe(FieldType.INITIALS);
       expect(byName.get('contact_email')).toBe(FieldType.EMAIL);
       expect(byName.get('item_qty')).toBe(FieldType.NUMBER);
+      // Hidden and off-page widgets must not appear as fields.
+      expect(byName.has('hidden_field')).toBe(false);
+      expect(byName.has('off_page_field')).toBe(false);
     });
 
     it('emits one Documenso RADIO field per widget (one field per option)', async () => {
@@ -129,6 +174,35 @@ describe('extractAcroFormFieldsFromPDF', () => {
 
       expect(nameField).toBeDefined();
       expect(nameField?.fieldAndMeta.fieldMeta?.label).toBe('CustomerName');
+    });
+
+    it('prefers AcroForm /TU (alternateName) over partialName for the label', async () => {
+      const result = await extractAcroFormFieldsFromPDF(baseBuffer);
+      const shippingField = result.fields.find((f) => f.fieldName === 'shipping_addr');
+
+      expect(shippingField).toBeDefined();
+      expect(shippingField?.fieldAndMeta.fieldMeta?.label).toBe('Shipping address');
+    });
+
+    it('lets AcroForm format actions override the name heuristic (P1.1)', async () => {
+      const result = await extractAcroFormFieldsFromPDF(baseBuffer);
+      const numberField = result.fields.find((f) => f.fieldName === 'customer_name_amount');
+
+      // Without the format action, /name/i would steer this to NAME. The
+      // `AFNumber_Format` action MUST win.
+      expect(numberField?.fieldAndMeta.type).toBe(FieldType.NUMBER);
+    });
+
+    it('maps required CHECKBOX (/Ff bit 2) to validationRule "at-least" + length 1', async () => {
+      const result = await extractAcroFormFieldsFromPDF(baseBuffer);
+      const required = result.fields.find((f) => f.fieldName === 'required_terms');
+
+      expect(required?.fieldAndMeta.type).toBe(FieldType.CHECKBOX);
+      if (required?.fieldAndMeta.type === FieldType.CHECKBOX) {
+        expect(required.fieldAndMeta.fieldMeta?.required).toBe(true);
+        expect(required.fieldAndMeta.fieldMeta?.validationRule).toBe('at-least');
+        expect(required.fieldAndMeta.fieldMeta?.validationLength).toBe(1);
+      }
     });
   });
 
@@ -317,5 +391,189 @@ describe('extractAcroFormFieldsFromPDF — committed fixture', () => {
       expect(result.unsupported).toEqual([]);
       expect(result.fields.length).toBeGreaterThanOrEqual(8);
     }
+  });
+});
+
+/**
+ * Stub-based scenarios exercise paths that {@link buildPdfBuffer} cannot easily
+ * produce (signed signatures, encrypted docs, XFA hybrids, listboxes, widgets
+ * with mismatched page refs). Each stub mirrors the methods the extractor
+ * actually calls — keeping the contract narrow so a future refactor of the
+ * extractor surfaces here as a loud test failure rather than a silent miss.
+ */
+describe('extractAcroFormFieldsFromPDF — mocked scenarios', () => {
+  const emptyAcroFormDict = { has: () => false };
+  const emptyCatalogDict = {
+    getDict: () => emptyAcroFormDict,
+  };
+  const emptyContext = {
+    catalog: { getDict: () => emptyCatalogDict },
+    resolve: () => null,
+  };
+
+  const buildFieldStub = (overrides: Record<string, unknown>) => ({
+    name: 'stub_field',
+    partialName: 'stub_field',
+    alternateName: null,
+    isReadOnly: () => false,
+    isRequired: () => false,
+    acroField: () => ({
+      get: () => undefined,
+      getDict: () => undefined,
+      getNumber: () => undefined,
+      has: () => false,
+      set: () => undefined,
+    }),
+    getWidgets: () => [],
+    ...overrides,
+  });
+
+  it('returns skipReason "encrypted" when PDF.isEncrypted is true (P2.6)', async () => {
+    vi.spyOn(PDF, 'load').mockResolvedValueOnce({ isEncrypted: true } as unknown as PDF);
+
+    const result = await extractAcroFormFieldsFromPDF(Buffer.from('stub'));
+
+    expect(result.skipReason).toBe('encrypted');
+    expect(result.fields).toEqual([]);
+    expect(result.hasSignedSignature).toBe(false);
+  });
+
+  it('returns skipReason "xfa-hybrid" when /AcroForm has /XFA (P2.1)', async () => {
+    const xfaCatalogDict = {
+      getDict: (key: string) => (key === 'AcroForm' ? { has: (k: string) => k === 'XFA' } : undefined),
+    };
+
+    vi.spyOn(PDF, 'load').mockResolvedValueOnce({
+      isEncrypted: false,
+      context: { catalog: { getDict: () => xfaCatalogDict }, resolve: () => null },
+      getForm: () => ({ getFields: () => [] }),
+      getPages: () => [],
+    } as unknown as PDF);
+
+    const result = await extractAcroFormFieldsFromPDF(Buffer.from('stub'));
+
+    expect(result.skipReason).toBe('xfa-hybrid');
+    expect(result.fields).toEqual([]);
+  });
+
+  it('skips signed signature widgets and reports hasSignedSignature: true (P1.2)', async () => {
+    const signedField = buildFieldStub({
+      type: 'signature',
+      name: 'ExistingSignature',
+      partialName: 'ExistingSignature',
+      isSigned: () => true,
+    });
+
+    vi.spyOn(PDF, 'load').mockResolvedValueOnce({
+      isEncrypted: false,
+      context: emptyContext,
+      getForm: () => ({ getFields: () => [signedField] }),
+      getPages: () => [],
+    } as unknown as PDF);
+
+    const result = await extractAcroFormFieldsFromPDF(Buffer.from('stub'));
+
+    expect(result.hasSignedSignature).toBe(true);
+    expect(result.fields).toEqual([]);
+    expect(result.unsupported.find((u) => u.reason === 'signed-signature')).toMatchObject({
+      fieldName: 'ExistingSignature',
+      acroFormType: 'signature',
+    });
+  });
+
+  it('imports unsigned signature widgets normally (P1.2 negative control)', async () => {
+    const pageRef = { objectNumber: 1, generation: 0 } as unknown as PdfDict;
+    const widget = {
+      rect: [100, 600, 300, 640] as [number, number, number, number],
+      pageRef,
+      isHidden: () => false,
+      getOnValue: () => null,
+    };
+    const unsignedField = buildFieldStub({
+      type: 'signature',
+      name: 'NewSignature',
+      partialName: 'NewSignature',
+      isSigned: () => false,
+      getWidgets: () => [widget],
+    });
+    const page = {
+      ref: pageRef,
+      width: 612,
+      height: 792,
+      rotation: 0,
+      getMediaBox: () => ({ x: 0, y: 0, width: 612, height: 792 }),
+    };
+
+    vi.spyOn(PDF, 'load').mockResolvedValueOnce({
+      isEncrypted: false,
+      context: emptyContext,
+      getForm: () => ({ getFields: () => [unsignedField] }),
+      getPages: () => [page],
+    } as unknown as PDF);
+
+    const result = await extractAcroFormFieldsFromPDF(Buffer.from('stub'));
+
+    expect(result.hasSignedSignature).toBe(false);
+    expect(result.fields).toHaveLength(1);
+    expect(result.fields[0]?.fieldAndMeta.type).toBe(FieldType.SIGNATURE);
+  });
+
+  it('reports listbox fields as unsupported-type (P2.6)', async () => {
+    const listboxField = buildFieldStub({
+      type: 'listbox',
+      name: 'colors',
+      partialName: 'colors',
+    });
+
+    vi.spyOn(PDF, 'load').mockResolvedValueOnce({
+      isEncrypted: false,
+      context: emptyContext,
+      getForm: () => ({ getFields: () => [listboxField] }),
+      getPages: () => [],
+    } as unknown as PDF);
+
+    const result = await extractAcroFormFieldsFromPDF(Buffer.from('stub'));
+
+    expect(result.fields).toEqual([]);
+    expect(result.unsupported).toHaveLength(1);
+    expect(result.unsupported[0]?.reason).toBe('unsupported-type');
+    expect(result.unsupported[0]?.acroFormType).toBe('listbox');
+  });
+
+  it('reports widgets with unknown pageRef as no-page-match (P2.6)', async () => {
+    const realPageRef = { objectNumber: 1, generation: 0 } as unknown as PdfDict;
+    const orphanPageRef = { objectNumber: 99, generation: 0 } as unknown as PdfDict;
+    const orphanField = buildFieldStub({
+      type: 'text',
+      name: 'orphan_text',
+      partialName: 'orphan_text',
+      getWidgets: () => [
+        {
+          rect: [100, 600, 200, 620] as [number, number, number, number],
+          pageRef: orphanPageRef,
+          isHidden: () => false,
+          getOnValue: () => null,
+        },
+      ],
+    });
+    const page = {
+      ref: realPageRef,
+      width: 612,
+      height: 792,
+      rotation: 0,
+      getMediaBox: () => ({ x: 0, y: 0, width: 612, height: 792 }),
+    };
+
+    vi.spyOn(PDF, 'load').mockResolvedValueOnce({
+      isEncrypted: false,
+      context: emptyContext,
+      getForm: () => ({ getFields: () => [orphanField] }),
+      getPages: () => [page],
+    } as unknown as PDF);
+
+    const result = await extractAcroFormFieldsFromPDF(Buffer.from('stub'));
+
+    expect(result.fields).toEqual([]);
+    expect(result.unsupported.map((u) => u.reason)).toContain('no-page-match');
   });
 });

@@ -10,6 +10,7 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
+import { logger } from '@documenso/lib/utils/logger';
 import { prisma } from '@documenso/prisma';
 import type { DocumentMeta, DocumentVisibility, TemplateType } from '@prisma/client';
 import {
@@ -609,63 +610,67 @@ export const createEnvelope = async ({
       }
 
       if (!firstSignableRecipient) {
-        throw new AppError(AppErrorCode.NOT_FOUND, {
-          message: 'Could not resolve a signable recipient for AcroForm import.',
-        });
-      }
-
-      const acroFormRecipient = firstSignableRecipient;
-
-      for (const item of itemsWithAcroFormFields) {
-        const envelopeItem = envelope.envelopeItems.find((ei) => ei.documentDataId === item.documentDataId);
-
-        if (!envelopeItem) {
-          continue;
-        }
-
-        const fieldsToCreate = convertAcroFormFieldsToFieldInputs(
-          item.acroFormFields ?? [],
-          () => acroFormRecipient,
-          envelopeItem.id,
-        );
-
-        if (fieldsToCreate.length === 0) {
-          continue;
-        }
-
-        const createdFields = await tx.field.createManyAndReturn({
-          data: fieldsToCreate.map((field) => ({
+        logger.warn(
+          {
+            event: 'acroform-import.no-signable-recipient',
             envelopeId: envelope.id,
-            envelopeItemId: envelopeItem.id,
-            recipientId: field.recipientId,
-            type: field.type,
-            page: field.page,
-            positionX: field.positionX,
-            positionY: field.positionY,
-            width: field.width,
-            height: field.height,
-            customText: '',
-            inserted: false,
-            fieldMeta: field.fieldMeta || undefined,
-          })),
-        });
+          },
+          'AcroForm import skipped — no signable recipient available',
+        );
+      } else {
+        const acroFormRecipient = firstSignableRecipient;
 
-        if (type === EnvelopeType.DOCUMENT) {
-          await tx.documentAuditLog.createMany({
-            data: createdFields.map((createdField) =>
-              createDocumentAuditLogData({
-                type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED,
-                envelopeId: envelope.id,
-                metadata: requestMetadata,
-                data: {
-                  fieldId: createdField.secondaryId,
-                  fieldRecipientEmail: acroFormRecipient.email,
-                  fieldRecipientId: createdField.recipientId,
-                  fieldType: createdField.type,
-                },
-              }),
-            ),
+        for (const item of itemsWithAcroFormFields) {
+          const envelopeItem = envelope.envelopeItems.find((ei) => ei.documentDataId === item.documentDataId);
+
+          if (!envelopeItem) {
+            continue;
+          }
+
+          const fieldsToCreate = convertAcroFormFieldsToFieldInputs(
+            item.acroFormFields ?? [],
+            () => acroFormRecipient,
+            envelopeItem.id,
+          );
+
+          if (fieldsToCreate.length === 0) {
+            continue;
+          }
+
+          const createdFields = await tx.field.createManyAndReturn({
+            data: fieldsToCreate.map((field) => ({
+              envelopeId: envelope.id,
+              envelopeItemId: envelopeItem.id,
+              recipientId: field.recipientId,
+              type: field.type,
+              page: field.page,
+              positionX: field.positionX,
+              positionY: field.positionY,
+              width: field.width,
+              height: field.height,
+              customText: '',
+              inserted: false,
+              fieldMeta: field.fieldMeta || undefined,
+            })),
           });
+
+          if (type === EnvelopeType.DOCUMENT) {
+            await tx.documentAuditLog.createMany({
+              data: createdFields.map((createdField) =>
+                createDocumentAuditLogData({
+                  type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED,
+                  envelopeId: envelope.id,
+                  metadata: requestMetadata,
+                  data: {
+                    fieldId: createdField.secondaryId,
+                    fieldRecipientEmail: acroFormRecipient.email,
+                    fieldRecipientId: createdField.recipientId,
+                    fieldType: createdField.type,
+                  },
+                }),
+              ),
+            });
+          }
         }
       }
     }

@@ -1,4 +1,12 @@
-import { PDF, type PDFForm, type PDFPage, type PdfDict, type PdfRef } from '@libpdf/core';
+import {
+  PDF,
+  type PDFPage,
+  type PdfDict,
+  type PdfObject,
+  type PdfRef,
+  type PdfStream,
+  type PdfString,
+} from '@libpdf/core';
 import { FieldType, type Recipient } from '@prisma/client';
 import {
   FIELD_CHECKBOX_META_DEFAULT_VALUES,
@@ -36,6 +44,19 @@ type WidgetAnnotation = {
   isHidden(): boolean;
   getOnValue(): string | null;
 };
+
+/**
+ * Function shape that follows a {@link PdfRef} to the referenced object.
+ *
+ * `@libpdf/core` does not re-export the `RefResolver` type alias, so we redeclare
+ * it locally. Built via {@link makeResolver} from a loaded {@link PDF}.
+ */
+type RefResolver = (ref: PdfRef) => PdfObject | null;
+
+const makeResolver =
+  (pdfDoc: PDF): RefResolver =>
+  (ref: PdfRef) =>
+    pdfDoc.context.resolve(ref);
 
 const DEFAULT_FIELD_HEIGHT_PERCENT = 2;
 const MIN_HEIGHT_THRESHOLD = 0.01;
@@ -113,26 +134,23 @@ const EMPTY_RESULT = (skipReason?: AcroFormSkipReason): AcroFormExtractionResult
   skipReason,
 });
 
-const hasXfa = (form: PDFForm): boolean => {
-  // PDFForm doesn't expose the AcroForm dict directly. Inspect a known field's
-  // parent chain to walk up to the AcroForm dict via /Parent traversal.
-  const fields = form.getFields();
-  if (fields.length === 0) {
+/**
+ * Detect XFA-hybrid PDFs by inspecting the catalog's `/AcroForm` dict for an
+ * `/XFA` key.
+ *
+ * Uses public accessors (`pdf.context.catalog.getDict()`) and a {@link RefResolver}
+ * so an indirect `/AcroForm` entry is followed. Returns `false` on any error
+ * (e.g. malformed catalog) so the caller can fall through to normal extraction.
+ */
+const hasXfa = (pdfDoc: PDF, resolver: RefResolver): boolean => {
+  try {
+    const catalogDict = pdfDoc.context.catalog.getDict();
+    const acroFormDict = catalogDict.getDict('AcroForm', resolver);
+
+    return Boolean(acroFormDict?.has('XFA'));
+  } catch {
     return false;
   }
-
-  // Walk up to the AcroForm dict by reading the field dict's /Parent chain.
-  // The root field's parent is null but its containing dict is /AcroForm
-  // (which holds /XFA). We approximate by checking the first field's raw dict
-  // for an inherited /XFA reference via getInheritable would require internal
-  // access; instead, inspect the dict for any /XFA marker keys on the field's
-  // chain. In practice XFA dicts surface on the AcroForm root, not fields.
-  // Best-effort: look at PDFForm internals via a duck-typed dict lookup.
-  type AcroFormInternal = { _acroForm?: { dict?: PdfDict } };
-  const internal = form as unknown as AcroFormInternal;
-  const dict = internal._acroForm?.dict;
-
-  return Boolean(dict?.has('XFA'));
 };
 
 const isDateFieldByName = (name: string | null | undefined): boolean => {
@@ -158,36 +176,42 @@ const isInitialsFieldByName = (name: string | null | undefined): boolean => {
 /**
  * Detect AcroForm format actions on a text field dictionary.
  *
- * Adobe attaches a JavaScript format action via /AA -> /F -> /JS. The script
+ * Adobe attaches a JavaScript format action via `/AA` → `/F` → `/JS`. The script
  * body references `AFDate_FormatEx` or `AFNumber_Format` depending on the
- * intended format. We do a string contains check on the raw script to avoid
- * pulling in a JS parser.
+ * intended format. The action dict and its `/F` entry are frequently stored
+ * as indirect refs in real-world PDFs, so a {@link RefResolver} MUST be
+ * threaded through the lookups. We do a string-contains check on the script
+ * to avoid pulling in a JS parser.
  */
-const getTextFieldFormatHint = (fieldDict: PdfDict): 'date' | 'number' | null => {
+const getTextFieldFormatHint = (fieldDict: PdfDict, resolver: RefResolver): 'date' | 'number' | null => {
   try {
-    const aa = fieldDict.get('AA');
+    const aaDict = fieldDict.getDict('AA', resolver);
 
-    if (!aa || typeof aa !== 'object' || aa.type !== 'dict') {
+    if (!aaDict) {
       return null;
     }
 
-    const aaDict = aa as PdfDict;
-    const formatEntry = aaDict.get('F');
+    const formatDict = aaDict.getDict('F', resolver);
 
-    if (!formatEntry || typeof formatEntry !== 'object' || formatEntry.type !== 'dict') {
+    if (!formatDict) {
       return null;
     }
 
-    const formatDict = formatEntry as PdfDict;
-    const js = formatDict.get('JS');
+    const js = formatDict.get('JS', resolver);
 
-    if (!js) {
+    if (!js || typeof js !== 'object') {
       return null;
     }
 
-    // The JS entry may be a string or a stream. Coerce via toString() —
-    // both PdfString and PdfStream expose a textual representation.
-    const script = typeof js === 'string' ? js : String(js);
+    let script: string;
+
+    if (js.type === 'string') {
+      script = (js as PdfString).asString();
+    } else if (js.type === 'stream') {
+      script = new TextDecoder().decode((js as PdfStream).getDecodedData());
+    } else {
+      return null;
+    }
 
     if (script.includes('AFDate_FormatEx') || script.includes('AFDate_Format')) {
       return 'date';
@@ -223,6 +247,7 @@ type ResolvedTextDocumentenoType =
 
 const resolveTextSubtype = (
   field: FormFieldWithDict,
+  resolver: RefResolver,
 ): {
   documentenoType: ResolvedTextDocumentenoType;
 } => {
@@ -231,28 +256,38 @@ const resolveTextSubtype = (
   let formatHint: 'date' | 'number' | null = null;
 
   try {
-    formatHint = getTextFieldFormatHint(field.acroField());
+    formatHint = getTextFieldFormatHint(field.acroField(), resolver);
   } catch {
     formatHint = null;
   }
 
-  if (formatHint === 'date' || candidateNames.some(isDateFieldByName)) {
+  // AcroForm format actions take precedence over name tokens — Adobe set them
+  // explicitly, so they're a stronger signal than a heuristic regex hit.
+  if (formatHint === 'date') {
     return { documentenoType: FieldType.DATE };
+  }
+
+  if (formatHint === 'number') {
+    return { documentenoType: FieldType.NUMBER };
   }
 
   let maxLen = Number.POSITIVE_INFINITY;
 
   try {
-    const lenEntry = field.acroField().get('MaxLen');
+    const lenEntry = field.acroField().getNumber('MaxLen', resolver);
 
-    if (lenEntry && typeof lenEntry === 'object' && 'value' in lenEntry && typeof lenEntry.value === 'number') {
+    if (lenEntry) {
       maxLen = lenEntry.value;
     }
   } catch {
     // Ignore — MaxLen is optional.
   }
 
-  if (formatHint === 'number' || (maxLen <= 10 && candidateNames.some(isNumberFieldByName))) {
+  if (candidateNames.some(isDateFieldByName)) {
+    return { documentenoType: FieldType.DATE };
+  }
+
+  if (maxLen <= 10 && candidateNames.some(isNumberFieldByName)) {
     return { documentenoType: FieldType.NUMBER };
   }
 
@@ -620,14 +655,16 @@ export const extractAcroFormFieldsFromPDF = async (
       return EMPTY_RESULT('encrypted');
     }
 
+    const resolver = makeResolver(pdfDoc);
+
+    if (hasXfa(pdfDoc, resolver)) {
+      return EMPTY_RESULT('xfa-hybrid');
+    }
+
     const form = pdfDoc.getForm();
 
     if (!form) {
       return EMPTY_RESULT('no-form');
-    }
-
-    if (hasXfa(form)) {
-      return EMPTY_RESULT('xfa-hybrid');
     }
 
     const pages = pdfDoc.getPages();
@@ -723,7 +760,7 @@ export const extractAcroFormFieldsFromPDF = async (
             getDefaultValue(): string;
           };
           const textField = field as unknown as TextFieldDuck;
-          const { documentenoType } = resolveTextSubtype(formField);
+          const { documentenoType } = resolveTextSubtype(formField, resolver);
           const defaultText = usePdfDefaults ? textField.getValue?.() || textField.getDefaultValue?.() || '' : '';
           fieldAndMeta = buildTextFieldAndMeta(formField, documentenoType, defaultText);
         } else if (acroFormType === 'checkbox') {
