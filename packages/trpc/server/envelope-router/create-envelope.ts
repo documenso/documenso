@@ -4,6 +4,7 @@ import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import { extractPdfPlaceholders } from '@documenso/lib/server-only/pdf/auto-place-fields';
+import { detectAcroFormFields } from '@documenso/lib/server-only/pdf/detect-acroform-fields';
 import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
@@ -109,6 +110,10 @@ export const createEnvelopeRouteCaller = async ({
     files.map(async (file) => {
       let pdf = Buffer.from(await file.arrayBuffer());
 
+      // Detect interactive form (AcroForm) fields before the form is flattened
+      // by normalizePdf, since flattening permanently removes them.
+      const detectedFields = await detectAcroFormFields(pdf);
+
       if (formValues) {
         // eslint-disable-next-line require-atomic-updates
         pdf = await insertFormValuesInPdf({
@@ -134,6 +139,7 @@ export const createEnvelopeRouteCaller = async ({
         title: file.name,
         documentDataId: documentData.id,
         placeholders,
+        detectedFields,
       };
     }),
   );

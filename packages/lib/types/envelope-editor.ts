@@ -1,6 +1,7 @@
 import { EnvelopeType } from '@prisma/client';
 import { z } from 'zod';
 
+import { ZDetectedFieldsSchema } from '@documenso/lib/types/detected-field';
 import { ZBaseEmbedDataSchema } from '@documenso/lib/types/embed-base-schemas';
 import { ZEnvelopeFieldSchema } from '@documenso/lib/types/field';
 import { ZEnvelopeRecipientLiteSchema } from '@documenso/lib/types/recipient';
@@ -288,6 +289,8 @@ export const ZEditorEnvelopeSchema = EnvelopeSchema.pick({
     .extend({
       // Only used for embedded.
       data: z.instanceof(Uint8Array).optional(),
+      // Form fields auto-detected in the uploaded PDF, pending review/import.
+      detectedFields: ZDetectedFieldsSchema,
     })
     .array(),
   directLink: TemplateDirectLinkSchema.pick({

@@ -21,6 +21,7 @@ import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 
+import type { TDetectedField } from '../../types/detected-field';
 import type {
   TDocumentAccessAuthTypes,
   TDocumentActionAuthTypes,
@@ -76,6 +77,7 @@ export type CreateEnvelopeOptions = {
       documentDataId: string;
       order?: number;
       placeholders?: PlaceholderInfo[];
+      detectedFields?: TDetectedField[];
     }[];
     formValues?: TDocumentFormValues;
 
@@ -330,6 +332,10 @@ export const createEnvelope = async ({
               title: item.title || title,
               order: item.order !== undefined ? item.order : i + 1,
               documentDataId: item.documentDataId,
+              detectedFields:
+                item.detectedFields && item.detectedFields.length > 0
+                  ? item.detectedFields
+                  : undefined,
             })),
           },
         },

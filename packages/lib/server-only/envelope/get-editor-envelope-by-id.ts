@@ -4,6 +4,7 @@ import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-e
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { ZDetectedFieldsSchema } from '../../types/detected-field';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 
 export type GetEditorEnvelopeByIdOptions = {
@@ -100,6 +101,13 @@ export const getEditorEnvelopeById = async ({
 
   return {
     ...envelope,
+    envelopeItems: envelope.envelopeItems.map((item) => ({
+      ...item,
+      // detectedFields is stored as JSON; parse it into the typed schema so
+      // consumers (e.g. the embed editor loader) get the same shape the tRPC
+      // output schema produces.
+      detectedFields: ZDetectedFieldsSchema.parse(item.detectedFields),
+    })),
     attachments: envelope.envelopeAttachments,
     user: {
       id: envelope.user.id,

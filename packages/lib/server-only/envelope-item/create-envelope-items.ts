@@ -4,6 +4,7 @@ import {
   convertPlaceholdersToFieldInputs,
   extractPdfPlaceholders,
 } from '@documenso/lib/server-only/pdf/auto-place-fields';
+import { detectAcroFormFields } from '@documenso/lib/server-only/pdf/detect-acroform-fields';
 import { findRecipientByPlaceholder } from '@documenso/lib/server-only/pdf/helpers';
 import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-form-values-in-pdf';
 import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
@@ -51,6 +52,10 @@ export const UNSAFE_createEnvelopeItems = async ({
     files.map(async ({ file, orderOverride, clientId }, index) => {
       let buffer = Buffer.from(await file.arrayBuffer());
 
+      // Detect interactive form (AcroForm) fields before the form is flattened
+      // by normalizePdf, since flattening permanently removes them.
+      const detectedFields = await detectAcroFormFields(buffer);
+
       if (envelope.formValues) {
         buffer = await insertFormValuesInPdf({ pdf: buffer, formValues: envelope.formValues });
       }
@@ -73,6 +78,7 @@ export const UNSAFE_createEnvelopeItems = async ({
         clientId,
         documentDataId: documentData.id,
         placeholders,
+        detectedFields,
         order: orderOverride ?? currentHighestOrderValue + index + 1,
       };
     }),
@@ -86,6 +92,8 @@ export const UNSAFE_createEnvelopeItems = async ({
         title: item.title,
         documentDataId: item.documentDataId,
         order: item.order,
+        detectedFields:
+          item.detectedFields && item.detectedFields.length > 0 ? item.detectedFields : undefined,
       })),
       include: {
         documentData: true,

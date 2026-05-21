@@ -38,6 +38,7 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
           order: true,
           documentDataId: true,
           envelopeId: true,
+          detectedFields: true,
           documentData: {
             select: {
               id: true,

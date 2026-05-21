@@ -5,7 +5,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
-import { FileTextIcon, PencilIcon, SparklesIcon } from 'lucide-react';
+import { FileTextIcon, FormInputIcon, PencilIcon, SparklesIcon } from 'lucide-react';
 import { useRevalidator, useSearchParams } from 'react-router';
 import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
@@ -31,12 +31,18 @@ import {
 } from '@documenso/lib/types/field-meta';
 import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
+import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import {
+  AcroFormImportDialog,
+  type TDetectedFieldWithItem,
+} from '~/components/dialogs/acroform-import-dialog';
 import { AiFeaturesEnableDialog } from '~/components/dialogs/ai-features-enable-dialog';
 import { AiFieldDetectionDialog } from '~/components/dialogs/ai-field-detection-dialog';
 import { EnvelopeItemEditDialog } from '~/components/dialogs/envelope-item-edit-dialog';
@@ -81,15 +87,36 @@ export const EnvelopeEditorFieldsPage = () => {
 
   const scrollableContainerRef = useRef<HTMLDivElement>(null);
 
-  const { envelope, editorFields, navigateToStep, editorConfig } = useCurrentEnvelopeEditor();
+  const { envelope, editorFields, navigateToStep, editorConfig, setLocalEnvelope } =
+    useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem } = useCurrentEnvelopeRender();
 
   const { _ } = useLingui();
+  const { toast } = useToast();
 
   const [isAiFieldDialogOpen, setIsAiFieldDialogOpen] = useState(false);
   const [isAiEnableDialogOpen, setIsAiEnableDialogOpen] = useState(false);
+  const [isAcroFormDialogOpen, setIsAcroFormDialogOpen] = useState(false);
   const { revalidate } = useRevalidator();
+
+  const { mutateAsync: dismissDetectedFields } =
+    trpc.envelope.item.dismissDetectedFields.useMutation();
+
+  /**
+   * Form fields auto-detected from the uploaded PDFs, flattened across all
+   * envelope items and tagged with their item ID for placement.
+   */
+  const detectedFields = useMemo<TDetectedFieldWithItem[]>(
+    () =>
+      envelope.envelopeItems.flatMap((item) =>
+        (item.detectedFields ?? []).map((field) => ({
+          ...field,
+          envelopeItemId: item.id,
+        })),
+      ),
+    [envelope.envelopeItems],
+  );
 
   const envelopeItemPermissions = useMemo(
     () => getEnvelopeItemPermissions(envelope, envelope.recipients),
@@ -160,6 +187,51 @@ export const EnvelopeEditorFieldsPage = () => {
     }
 
     setIsAiFieldDialogOpen(false);
+  };
+
+  const onAcroFormImport = (fields: TDetectedFieldWithItem[]) => {
+    const recipientId = editorFields.selectedRecipient?.id;
+
+    if (!recipientId) {
+      toast({
+        title: _(msg`Select a recipient`),
+        description: _(msg`Choose a recipient before importing detected fields.`),
+        variant: 'destructive',
+      });
+
+      return;
+    }
+
+    for (const field of fields) {
+      editorFields.addField({
+        type: field.type,
+        envelopeItemId: field.envelopeItemId,
+        recipientId,
+        page: field.page,
+        positionX: field.positionX,
+        positionY: field.positionY,
+        width: field.width,
+        height: field.height,
+        fieldMeta: field.fieldMeta ?? structuredClone(FIELD_META_DEFAULT_VALUES[field.type]),
+      });
+    }
+
+    setIsAcroFormDialogOpen(false);
+
+    // Clear detected fields locally so the prompt disappears immediately.
+    setLocalEnvelope({
+      envelopeItems: envelope.envelopeItems.map((item) => ({ ...item, detectedFields: null })),
+    });
+
+    // Persist the dismissal so the prompt does not reappear on reload.
+    void dismissDetectedFields({ envelopeId: envelope.id }).catch(() => {
+      // Non-fatal: detected fields will simply reappear on the next load.
+    });
+
+    toast({
+      title: _(msg`Form fields imported`),
+      description: _(msg`The selected fields were added to your document.`),
+    });
   };
 
   /**
@@ -318,6 +390,35 @@ export const EnvelopeEditorFieldsPage = () => {
               selectedRecipientId={editorFields.selectedRecipient?.id ?? null}
               selectedEnvelopeItemId={currentEnvelopeItem?.id ?? null}
             />
+
+            {detectedFields.length > 0 && (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-4 w-full"
+                  onClick={() => setIsAcroFormDialogOpen(true)}
+                  disabled={envelope.status !== DocumentStatus.DRAFT}
+                  data-testid="import-form-fields-button"
+                  title={
+                    envelope.status !== DocumentStatus.DRAFT
+                      ? _(msg`You can only import fields in draft envelopes`)
+                      : undefined
+                  }
+                >
+                  <FormInputIcon className="-ml-1 mr-2 h-4 w-4" />
+                  <Trans>Import form fields ({detectedFields.length})</Trans>
+                </Button>
+
+                <AcroFormImportDialog
+                  open={isAcroFormDialogOpen}
+                  onOpenChange={setIsAcroFormDialogOpen}
+                  detectedFields={detectedFields}
+                  onImport={onAcroFormImport}
+                />
+              </>
+            )}
 
             {editorConfig.fields?.allowAIDetection && (
               <>

@@ -458,6 +458,10 @@ model EnvelopeItem {
   envelopeId String
   envelope   Envelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
 
+  /// Form fields auto-detected in the uploaded PDF's interactive form (AcroForm),
+  /// pending review/import in the editor. Cleared once imported or dismissed.
+  detectedFields Json?
+
   field Field[]
 
   @@unique([documentDataId])
