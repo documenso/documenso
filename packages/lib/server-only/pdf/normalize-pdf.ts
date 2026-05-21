@@ -1,6 +1,7 @@
 import { PDF } from '@libpdf/core';
 
 import { AppError } from '../../errors/app-error';
+import { mergePageContentStreams } from './merge-page-content-streams';
 
 export const normalizePdf = async (pdf: Buffer, options: { flattenForm?: boolean } = {}) => {
   const shouldFlattenForm = options.flattenForm ?? true;
@@ -18,6 +19,11 @@ export const normalizePdf = async (pdf: Buffer, options: { flattenForm?: boolean
       message: 'The document is encrypted',
     });
   }
+
+  // Merge split content streams before flattening. `@libpdf/core`'s flatten
+  // routines corrupt pages whose `/Contents` is an array of streams, blanking
+  // the page behind the form fields (#28).
+  mergePageContentStreams(pdfDoc);
 
   pdfDoc.flattenLayers();
 

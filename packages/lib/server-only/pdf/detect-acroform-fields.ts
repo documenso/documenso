@@ -91,6 +91,42 @@ export const widgetRectToPercentages = (
   };
 };
 
+type PageInfo = { index: number; width: number; height: number };
+
+/**
+ * Resolve the page a widget belongs to.
+ *
+ * The `/P` (page) entry on a widget annotation is *optional* in the PDF spec,
+ * and many real-world forms (especially Acrobat-generated government forms)
+ * omit it. When it is missing we fall back to the page whose `/Annots` array
+ * references the widget - the same fallback `@libpdf/core` uses internally when
+ * flattening. Without this, every widget lacking `/P` is silently dropped and
+ * only a handful (or none) of a form's fields get detected.
+ */
+const resolveWidgetPage = (
+  widget: WidgetAnnotation,
+  pageInfoByPageRef: Map<string, PageInfo>,
+  pageInfoByAnnotRef: Map<string, PageInfo>,
+): PageInfo | undefined => {
+  const pageRef = widget.pageRef?.toString();
+
+  if (pageRef) {
+    const info = pageInfoByPageRef.get(pageRef);
+
+    if (info) {
+      return info;
+    }
+  }
+
+  const annotRef = widget.ref?.toString();
+
+  if (annotRef) {
+    return pageInfoByAnnotRef.get(annotRef);
+  }
+
+  return undefined;
+};
+
 /**
  * Build the Documenso field meta for a detected field, preserving as much of
  * the original PDF field's configuration as the Documenso model allows.
@@ -208,14 +244,33 @@ export const detectAcroFormFields = async (pdf: Buffer): Promise<TDetectedField[
 
     // Map every page reference to its index and dimensions so widgets can be
     // resolved to a page without a second lookup.
-    const pageInfoByRef = new Map<string, { index: number; width: number; height: number }>();
+    const pageInfoByPageRef = new Map<string, PageInfo>();
+    // Fallback lookup for widgets that omit the optional `/P` entry: map each
+    // annotation reference to the page whose `/Annots` array contains it.
+    const pageInfoByAnnotRef = new Map<string, PageInfo>();
 
     for (const page of pdfDoc.getPages()) {
-      pageInfoByRef.set(page.ref.toString(), {
+      const pageInfo: PageInfo = {
         index: page.index,
         width: page.width,
         height: page.height,
-      });
+      };
+
+      if (page.ref) {
+        pageInfoByPageRef.set(page.ref.toString(), pageInfo);
+      }
+
+      const annots = page.dict.getArray('Annots');
+
+      if (annots) {
+        for (let i = 0; i < annots.length; i++) {
+          const annotRef = annots.at(i);
+
+          if (annotRef) {
+            pageInfoByAnnotRef.set(annotRef.toString(), pageInfo);
+          }
+        }
+      }
     }
 
     const detectedFields: TDetectedField[] = [];
@@ -232,8 +287,7 @@ export const detectAcroFormFields = async (pdf: Buffer): Promise<TDetectedField[
           continue;
         }
 
-        const pageRef = widget.pageRef?.toString();
-        const pageInfo = pageRef ? pageInfoByRef.get(pageRef) : undefined;
+        const pageInfo = resolveWidgetPage(widget, pageInfoByPageRef, pageInfoByAnnotRef);
 
         // Skip widgets we cannot associate with a page - they cannot be placed.
         if (!pageInfo) {

@@ -16,6 +16,7 @@ import { addRejectionStampToPdf } from '@documenso/lib/server-only/pdf/add-rejec
 import { generateAuditLogPdf } from '@documenso/lib/server-only/pdf/generate-audit-log-pdf';
 import { generateCertificatePdf } from '@documenso/lib/server-only/pdf/generate-certificate-pdf';
 import { getLastPageDimensions } from '@documenso/lib/server-only/pdf/get-page-size';
+import { mergePageContentStreams } from '@documenso/lib/server-only/pdf/merge-page-content-streams';
 import { prisma } from '@documenso/prisma';
 import { signPdf } from '@documenso/signing';
 
@@ -379,6 +380,12 @@ const decorateAndSignPdf = async ({
 }: DecorateAndSignPdfOptions) => {
   let pdfDoc = await PDF.load(pdfData);
 
+  // Merge split content streams before flattening so `flattenAll()` does not
+  // blank pages whose `/Contents` is an array of streams (#28). Required here
+  // because documents uploaded via the presigned-URL path are stored without
+  // normalization and reach sealing un-merged.
+  mergePageContentStreams(pdfDoc);
+
   // Normalize and flatten layers that could cause issues with the signature
   pdfDoc.flattenAll();
   // Upgrade to PDF 1.7 for better compatibility with signing
@@ -480,6 +487,7 @@ const decorateAndSignPdf = async ({
 
   // Re-flatten the form to handle our checkbox and radio fields that
   // create native arcoFields
+  mergePageContentStreams(pdfDoc);
   pdfDoc.flattenAll();
 
   pdfDoc = await PDF.load(await pdfDoc.save({ useXRefStream: true }));
