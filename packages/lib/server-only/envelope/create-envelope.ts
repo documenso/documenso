@@ -1,4 +1,6 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import type { AcroFormFieldImportInfo } from '@documenso/lib/server-only/pdf/acroform-fields';
+import { convertAcroFormFieldsToFieldInputs } from '@documenso/lib/server-only/pdf/acroform-fields';
 import type { PlaceholderInfo } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { convertPlaceholdersToFieldInputs } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { findRecipientByPlaceholder } from '@documenso/lib/server-only/pdf/helpers';
@@ -72,6 +74,7 @@ export type CreateEnvelopeOptions = {
       documentDataId: string;
       order?: number;
       placeholders?: PlaceholderInfo[];
+      acroFormFields?: AcroFormFieldImportInfo[];
     }[];
     formValues?: TDocumentFormValues;
 
@@ -532,6 +535,136 @@ export const createEnvelope = async ({
               inserted: false,
               fieldMeta: field.fieldMeta || undefined,
             })),
+          });
+        }
+      }
+    }
+
+    // Create fields from imported AcroForm widgets (extracted at upload time).
+    // Runs after the placeholder branch so placeholder-created recipients are
+    // visible in `availableRecipientsForAcroForm`.
+    const itemsWithAcroFormFields = envelopeItems.filter(
+      (item) => item.acroFormFields && item.acroFormFields.length > 0,
+    );
+
+    if (itemsWithAcroFormFields.length > 0) {
+      let availableRecipientsForAcroForm = await tx.recipient.findMany({
+        where: { envelopeId: envelope.id },
+        select: { id: true, email: true, role: true, signingOrder: true },
+      });
+
+      const pickFirstSignableRecipient = () => {
+        const signable = availableRecipientsForAcroForm.filter(
+          (r) => r.role === RecipientRole.SIGNER || r.role === RecipientRole.APPROVER,
+        );
+
+        if (signable.length === 0) {
+          return null;
+        }
+
+        return [...signable].sort((a, b) => {
+          const aOrder = a.signingOrder ?? Number.MAX_SAFE_INTEGER;
+          const bOrder = b.signingOrder ?? Number.MAX_SAFE_INTEGER;
+
+          if (aOrder !== bOrder) {
+            return aOrder - bOrder;
+          }
+
+          return a.id - b.id;
+        })[0];
+      };
+
+      let firstSignableRecipient = pickFirstSignableRecipient();
+
+      if (!firstSignableRecipient) {
+        // No signable recipient yet — create a placeholder Recipient 1 SIGNER
+        // mirroring the placeholder branch's behavior.
+        const placeholderEmail = 'recipient.1@documenso.com';
+        const existingPlaceholder = availableRecipientsForAcroForm.find(
+          (r) => r.email.toLowerCase() === placeholderEmail,
+        );
+
+        if (!existingPlaceholder) {
+          await tx.recipient.create({
+            data: {
+              envelopeId: envelope.id,
+              email: placeholderEmail,
+              name: 'Recipient 1',
+              role: RecipientRole.SIGNER,
+              signingOrder: 1,
+              token: nanoid(),
+              sendStatus: SendStatus.NOT_SENT,
+              signingStatus: SigningStatus.NOT_SIGNED,
+            },
+          });
+        }
+
+        // eslint-disable-next-line require-atomic-updates
+        availableRecipientsForAcroForm = await tx.recipient.findMany({
+          where: { envelopeId: envelope.id },
+          select: { id: true, email: true, role: true, signingOrder: true },
+        });
+
+        firstSignableRecipient = pickFirstSignableRecipient();
+      }
+
+      if (!firstSignableRecipient) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'Could not resolve a signable recipient for AcroForm import.',
+        });
+      }
+
+      const acroFormRecipient = firstSignableRecipient;
+
+      for (const item of itemsWithAcroFormFields) {
+        const envelopeItem = envelope.envelopeItems.find((ei) => ei.documentDataId === item.documentDataId);
+
+        if (!envelopeItem) {
+          continue;
+        }
+
+        const fieldsToCreate = convertAcroFormFieldsToFieldInputs(
+          item.acroFormFields ?? [],
+          () => acroFormRecipient,
+          envelopeItem.id,
+        );
+
+        if (fieldsToCreate.length === 0) {
+          continue;
+        }
+
+        const createdFields = await tx.field.createManyAndReturn({
+          data: fieldsToCreate.map((field) => ({
+            envelopeId: envelope.id,
+            envelopeItemId: envelopeItem.id,
+            recipientId: field.recipientId,
+            type: field.type,
+            page: field.page,
+            positionX: field.positionX,
+            positionY: field.positionY,
+            width: field.width,
+            height: field.height,
+            customText: '',
+            inserted: false,
+            fieldMeta: field.fieldMeta || undefined,
+          })),
+        });
+
+        if (type === EnvelopeType.DOCUMENT) {
+          await tx.documentAuditLog.createMany({
+            data: createdFields.map((createdField) =>
+              createDocumentAuditLogData({
+                type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED,
+                envelopeId: envelope.id,
+                metadata: requestMetadata,
+                data: {
+                  fieldId: createdField.secondaryId,
+                  fieldRecipientEmail: acroFormRecipient.email,
+                  fieldRecipientId: createdField.recipientId,
+                  fieldType: createdField.type,
+                },
+              }),
+            ),
           });
         }
       }
