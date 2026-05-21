@@ -44,6 +44,7 @@ export const extractDerivedDocumentMeta = (
     signingOrder: meta.signingOrder || DocumentSigningOrder.PARALLEL,
     allowDictateNextSigner: meta.allowDictateNextSigner ?? false,
     distributionMethod: meta.distributionMethod || DocumentDistributionMethod.EMAIL, // Todo: Make this a setting.
+    includeAuditLog: meta.includeAuditLog ?? settings.includeAuditLog,
 
     // Signature settings.
     typedSignatureEnabled: meta.typedSignatureEnabled ?? settings.typedSignatureEnabled,

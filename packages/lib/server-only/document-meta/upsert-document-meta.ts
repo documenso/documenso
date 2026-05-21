@@ -2,7 +2,13 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData, diffDocumentMetaChanges } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { type DocumentDistributionMethod, type DocumentSigningOrder, EnvelopeType } from '@prisma/client';
+import {
+  type DocumentDistributionMethod,
+  type DocumentSigningOrder,
+  EnvelopeType,
+  RecipientRole,
+  SendStatus,
+} from '@prisma/client';
 
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -25,6 +31,7 @@ export type CreateDocumentMetaOptions = {
   signingOrder?: DocumentSigningOrder;
   allowDictateNextSigner?: boolean;
   distributionMethod?: DocumentDistributionMethod;
+  includeAuditLog?: boolean;
   typedSignatureEnabled?: boolean;
   uploadSignatureEnabled?: boolean;
   drawSignatureEnabled?: boolean;
@@ -47,6 +54,7 @@ export const updateDocumentMeta = async ({
   emailReplyTo,
   emailSettings,
   distributionMethod,
+  includeAuditLog,
   typedSignatureEnabled,
   uploadSignatureEnabled,
   drawSignatureEnabled,
@@ -91,6 +99,28 @@ export const updateDocumentMeta = async ({
     }
   }
 
+  if (
+    envelope.type === EnvelopeType.DOCUMENT &&
+    includeAuditLog !== undefined &&
+    includeAuditLog !== envelope.documentMeta.includeAuditLog
+  ) {
+    const sentRecipientCount = await prisma.recipient.count({
+      where: {
+        envelopeId: envelope.id,
+        role: {
+          not: RecipientRole.CC,
+        },
+        sendStatus: SendStatus.SENT,
+      },
+    });
+
+    if (sentRecipientCount > 0) {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: 'Audit log embedding can only be changed before the document is sent',
+      });
+    }
+  }
+
   return await prisma.$transaction(async (tx) => {
     const upsertedDocumentMeta = await tx.documentMeta.update({
       where: {
@@ -108,6 +138,7 @@ export const updateDocumentMeta = async ({
         emailReplyTo,
         emailSettings,
         distributionMethod,
+        includeAuditLog,
         typedSignatureEnabled,
         uploadSignatureEnabled,
         drawSignatureEnabled,

@@ -524,6 +524,7 @@ model DocumentMeta {
 
   language           String                     @default("en")
   distributionMethod DocumentDistributionMethod @default(EMAIL)
+  includeAuditLog    Boolean                    @default(false)
 
   emailSettings Json? /// [DocumentEmailSettings] @zod.custom.use(ZDocumentEmailSettingsSchema)
   emailReplyTo  String?

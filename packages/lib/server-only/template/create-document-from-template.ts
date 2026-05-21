@@ -105,6 +105,7 @@ export type CreateDocumentFromTemplateOptions = {
     language?: SupportedLanguageCodes;
     distributionMethod?: DocumentDistributionMethod;
     allowDictateNextSigner?: boolean;
+    includeAuditLog?: boolean;
     emailSettings?: TDocumentEmailSettings;
     typedSignatureEnabled?: boolean;
     uploadSignatureEnabled?: boolean;
@@ -513,6 +514,7 @@ export const createDocumentFromTemplate = async ({
       dateFormat: override?.dateFormat || template.documentMeta?.dateFormat,
       redirectUrl: override?.redirectUrl || template.documentMeta?.redirectUrl,
       distributionMethod: override?.distributionMethod || template.documentMeta?.distributionMethod,
+      includeAuditLog: override?.includeAuditLog ?? template.documentMeta?.includeAuditLog,
       emailSettings: override?.emailSettings || template.documentMeta?.emailSettings,
       signingOrder: override?.signingOrder || template.documentMeta?.signingOrder,
       language: override?.language || template.documentMeta?.language || settings.documentLanguage,
@@ -666,7 +668,7 @@ export const createDocumentFromTemplate = async ({
 
                 const date = new Date(selector.value);
 
-                if (isNaN(date.getTime())) {
+                if (Number.isNaN(date.getTime())) {
                   throw new AppError(AppErrorCode.INVALID_BODY, {
                     message: `Invalid date value for field ${field.id}: ${selector.value}`,
                   });
