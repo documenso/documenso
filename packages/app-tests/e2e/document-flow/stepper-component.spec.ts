@@ -337,9 +337,15 @@ test('[DOCUMENT_FLOW]: should not be able to create a document without signature
   await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
   await page.getByRole('button', { name: 'Continue' }).click();
 
-  await expect(
-    page.getByRole('dialog').getByText('No signature field found').first(),
-  ).toBeVisible();
+  const missingSignatureDialog = page.getByRole('dialog');
+
+  await expect(missingSignatureDialog.getByText('No signature field found').first()).toBeVisible();
+
+  // The signer missing a field should be listed by name.
+  await expect(missingSignatureDialog.getByText('User 1')).toBeVisible();
+
+  // The dialog should point users to the Viewer/CC roles as an alternative to adding a field.
+  await expect(missingSignatureDialog.getByText('Change their role to')).toBeVisible();
 });
 
 test('[DOCUMENT_FLOW]: should be able to approve a document', async ({ page }) => {

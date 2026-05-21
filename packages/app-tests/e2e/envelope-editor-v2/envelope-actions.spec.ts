@@ -228,6 +228,9 @@ test.describe('document editor', () => {
       page.getByText('The following signers are missing signature fields'),
     ).toBeVisible();
 
+    // The warning should point users to the Viewer/CC roles as an alternative to adding a field.
+    await expect(page.getByText('change their role', { exact: false }).first()).toBeVisible();
+
     // The "Send" button should not be visible since we're in validation mode.
     await expect(page.getByRole('button', { name: 'Send', exact: true })).not.toBeVisible();
 

@@ -109,6 +109,7 @@ export const AddFieldsFormPartial = ({
   const { _ } = useLingui();
 
   const [isMissingSignatureDialogVisible, setIsMissingSignatureDialogVisible] = useState(false);
+  const [recipientsMissingFields, setRecipientsMissingFields] = useState<TRecipientLite[]>([]);
 
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
@@ -560,9 +561,10 @@ export const AddFieldsFormPartial = ({
   const handleGoNextClick = () => {
     // localFields already have recipientId set correctly (see field creation at line 338)
     // Using the existing recipientId is important for handling duplicate email recipients
-    const recipientsMissingFields = getRecipientsWithMissingFields(recipients, localFields);
+    const missingFieldRecipients = getRecipientsWithMissingFields(recipients, localFields);
 
-    if (recipientsMissingFields.length > 0) {
+    if (missingFieldRecipients.length > 0) {
+      setRecipientsMissingFields(missingFieldRecipients);
       setIsMissingSignatureDialogVisible(true);
       return;
     }
@@ -1042,6 +1044,7 @@ export const AddFieldsFormPartial = ({
           <MissingSignatureFieldDialog
             isOpen={isMissingSignatureDialogVisible}
             onOpenChange={(value) => setIsMissingSignatureDialogVisible(value)}
+            recipientsMissingFields={recipientsMissingFields}
           />
 
           <BulkDeleteFieldsDialog

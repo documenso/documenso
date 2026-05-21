@@ -477,6 +477,13 @@ export const EnvelopeDistributeDialog = ({
                         </li>
                       ))}
                     </ul>
+
+                    <p className="mt-3">
+                      <Trans>
+                        If a recipient only needs to receive or view the document, change their role
+                        to Viewer or CC — those recipients don't need a signature field.
+                      </Trans>
+                    </p>
                   </AlertDescription>
                 ))
                 .with('MISSING_REQUIRED_EMAIL', () => (
