@@ -3,7 +3,12 @@ import type { FieldType, Recipient } from '@prisma/client';
 
 import { type TFieldAndMeta, ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 
-import { parseFieldMetaFromPlaceholder, parseFieldTypeFromPlaceholder } from './helpers';
+import {
+  parseFieldMetaFromPlaceholder,
+  parseFieldTypeFromPlaceholder,
+  parsePlaceholderData,
+  parseRawFieldMetaFromPlaceholder,
+} from './helpers';
 
 const PLACEHOLDER_REGEX = /\{\{([^}]+)\}\}/g;
 const DEFAULT_FIELD_HEIGHT_PERCENT = 2;
@@ -89,7 +94,7 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
         continue;
       }
 
-      const placeholderData = innerMatch[1].split(',').map((property) => property.trim());
+      const placeholderData = parsePlaceholderData(innerMatch[1]);
       const [fieldTypeString, recipientOrMeta, ...fieldMetaData] = placeholderData;
 
       let fieldType: FieldType;
@@ -113,7 +118,7 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
 
       const recipient = recipientOrMeta;
 
-      const rawFieldMeta = Object.fromEntries(fieldMetaData.map((property) => property.split('=')));
+      const rawFieldMeta = parseRawFieldMetaFromPlaceholder(fieldMetaData);
 
       const parsedFieldMeta = parseFieldMetaFromPlaceholder(rawFieldMeta, fieldType);
 

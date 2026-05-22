@@ -113,11 +113,10 @@ You can customize fields by adding options after the recipient identifier:
 
 Checkbox, radio, and dropdown placeholders can define their selectable choices via the `options` property.
 Separate choices with pipe (`|`) characters.
+Checkbox, radio, and dropdown placeholders do not support `label` or `placeholder` metadata.
 
 | Option             | Applies To                | Values                   | Description                              |
 | ------------------ | ------------------------- | ------------------------ | ---------------------------------------- |
-| `label`            | Dropdown                  | Text                     | Label shown for the field                |
-| `placeholder`      | Dropdown                  | Text                     | Text shown before a value is selected    |
 | `options`          | Checkbox, Radio, Dropdown | `Option 1|Option 2`      | Selectable choices                       |
 | `checked`          | Checkbox                  | `Option 1|Option 2`      | Pre-checked choices                      |
 | `selected`         | Radio, Dropdown           | One option value         | Pre-selected/default choice              |
@@ -130,9 +129,10 @@ Separate choices with pipe (`|`) characters.
 | `readOnly`         | Checkbox, Radio, Dropdown | `true`, `false`          | Whether the pre-selected value is locked |
 | `fontSize`         | Checkbox, Radio, Dropdown | Number (e.g., `12`)      | Field text size                          |
 
-For checkbox validation, `validationLength` defines the option count. `atLeast` means at
-least that many options, `exactly` means exactly that many options, and `atMost` means at
-most that many options.
+For checkbox validation, `validationLength` defines the option count:
+- `atLeast` means at least that many options must be selected
+- `exactly` means exactly that many options must be selected
+- `atMost` means at most that many options must be selected
 
 If an option needs a literal delimiter, escape it with a backslash:
 
@@ -149,8 +149,8 @@ If an option needs a literal delimiter, escape it with a backslash:
 {{text, r2, readOnly=true, text=Contract #12345}}
 {{checkbox, r1, options=Email|SMS|Phone, checked=Email|Phone, validationRule=atLeast, validationLength=1}}
 {{radio, r1, options=Card|Bank transfer|Check, selected=Check}}
-{{dropdown, r1, label=Country, placeholder=Select country, options=United States|Canada|United Kingdom}}
-{{dropdown, r2, label=Department, placeholder=Choose department, options=Sales|Legal|Finance, defaultValue=Legal}}
+{{dropdown, r1, options=United States|Canada|United Kingdom}}
+{{dropdown, r2, options=Sales|Legal|Finance, defaultValue=Legal}}
 ```
 
 <Callout type="info">

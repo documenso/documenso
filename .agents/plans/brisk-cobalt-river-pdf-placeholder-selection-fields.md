@@ -18,7 +18,7 @@ Do not introduce a new delimiter style. Existing applications may already genera
 - Keep the current placeholder grammar unchanged.
 - Support checkbox placeholders with option lists, checked values, validation, direction, required, read-only, and font size.
 - Support radio placeholders with option lists, default/preselected values, direction, required, read-only, and font size.
-- Support dropdown placeholders with option lists, placeholder text, default value, label, required, read-only, and font size.
+- Support dropdown placeholders with option lists, default value, required, read-only, and font size.
 - Use `options` as the only public list key in PDF placeholders.
 - Convert `options` into internal `fieldMeta.values` during parsing.
 - Make generated fields usable immediately in the editor, signing UI, preview renderer, and final PDF export.
@@ -38,8 +38,8 @@ Use the existing comma-separated placeholder format:
 {{checkbox, r1, options=Email|SMS|Phone, checked=Email|Phone, validationRule=atLeast, validationLength=1}}
 {{radio, r1, options=Card|Bank transfer|Check, defaultValue=Check}}
 {{radio, r1, options=Basic|Pro|Enterprise, selected=Pro, direction=horizontal}}
-{{dropdown, r1, label=Country, placeholder=Select country, options=United States|Canada|United Kingdom}}
-{{dropdown, r2, label=Department, placeholder=Choose department, options=Sales|Legal|Finance, defaultValue=Legal}}
+{{dropdown, r1, options=United States|Canada|United Kingdom}}
+{{dropdown, r2, options=Sales|Legal|Finance, defaultValue=Legal}}
 ```
 
 Use `|` inside `options` because `,` is already the top-level placeholder delimiter.
@@ -101,6 +101,8 @@ Accepted keys:
 
 Map checkbox validation aliases internally: `atLeast` -> `Select at least`, `exactly` -> `Select exactly`, `atMost` -> `Select at most`.
 
+Checkbox placeholders do not support `label` or `placeholder` metadata.
+
 ### Radio
 
 Example:
@@ -141,7 +143,7 @@ Radio placeholders do not support `label` or `placeholder` metadata.
 Example:
 
 ```text
-{{dropdown, r1, label=Department, placeholder=Choose department, options=Sales|Legal|Finance, defaultValue=Legal}}
+{{dropdown, r1, options=Sales|Legal|Finance, defaultValue=Legal}}
 ```
 
 Normalize to:
@@ -151,8 +153,6 @@ Normalize to:
   type: FieldType.DROPDOWN,
   fieldMeta: {
     type: 'dropdown',
-    label: 'Department',
-    placeholder: 'Choose department',
     values: [{ value: 'Sales' }, { value: 'Legal' }, { value: 'Finance' }],
     defaultValue: 'Legal',
   },
@@ -161,8 +161,6 @@ Normalize to:
 
 Accepted keys:
 
-- `label`
-- `placeholder`
 - `options`
 - `selected`, `default`, or `defaultValue`
 - `required=true|false`
@@ -170,6 +168,8 @@ Accepted keys:
 - `fontSize=12`
 
 `defaultValue` should only be set if it matches one parsed option.
+
+Dropdown placeholders do not support `label` or `placeholder` metadata.
 
 ## Code Touchpoints
 
@@ -182,14 +182,7 @@ Accepted keys:
 - `packages/lib/types/field-meta.ts`
   - Keep current internal schemas: checkbox/radio/dropdown still store options as `fieldMeta.values`.
 - `packages/ui/primitives/document-flow/field-content.tsx`
-  - Display dropdown `fieldMeta.placeholder || Select` before insertion.
   - Display a radio fallback when a placeholder-created radio has no options.
-- `packages/lib/universal/field-renderer/render-dropdown-field.ts`
-  - Use dropdown placeholder text in edit/sign modes when no selected/default value exists.
-- `apps/remix/app/components/general/document-signing/document-signing-dropdown-field.tsx`
-  - Use parsed dropdown placeholder text in `SelectValue`.
-- `apps/remix/app/components/dialogs/sign-field-dropdown-dialog.tsx`
-  - Use the same placeholder text for the command input.
 - Docs:
   - `apps/docs/content/docs/users/documents/advanced/pdf-placeholders.mdx`
   - `apps/docs/content/docs/developers/api/fields.mdx`
@@ -201,14 +194,13 @@ Unit tests:
 - `options=Yes|No|Maybe` becomes stable radio values.
 - `selected=No` marks only the matching radio option checked.
 - Checkbox `options`, `checked`, `validationRule`, and `validationLength` normalize correctly.
-- Dropdown `placeholder`, `options`, and `defaultValue` normalize correctly.
+- Dropdown `options` and `defaultValue` normalize correctly.
 - Escaped delimiters parse correctly, for example `options=Sales\|Ops|Legal\, Compliance|A\=B`.
 
 E2E/API tests:
 
 - Add a PDF fixture with checkbox, radio, and dropdown placeholders using the current syntax.
 - Verify created fields have schema-compatible metadata and expected options/defaults.
-- Verify dropdown placeholder text appears before signing.
 
 Suggested verification:
 
