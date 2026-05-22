@@ -109,6 +109,37 @@ You can customize fields by adding options after the recipient identifier:
 | `maxValue`     | Number        | Maximum allowed value |
 | `numberFormat` | Format string | Number display format |
 
+### Selection Field Options
+
+Checkbox, radio, and dropdown placeholders can define their selectable choices via the `options` property.
+Separate choices with pipe (`|`) characters.
+
+| Option             | Applies To                | Values                   | Description                              |
+| ------------------ | ------------------------- | ------------------------ | ---------------------------------------- |
+| `label`            | Dropdown                  | Text                     | Label shown for the field                |
+| `placeholder`      | Dropdown                  | Text                     | Text shown before a value is selected    |
+| `options`          | Checkbox, Radio, Dropdown | `Option 1|Option 2`      | Selectable choices                       |
+| `checked`          | Checkbox                  | `Option 1|Option 2`      | Pre-checked choices                      |
+| `selected`         | Radio, Dropdown           | One option value         | Pre-selected/default choice              |
+| `default`          | Radio, Dropdown           | One option value         | Alias for `selected`                     |
+| `defaultValue`     | Radio, Dropdown           | One option value         | Alias for `selected`                     |
+| `direction`        | Checkbox, Radio           | `vertical`, `horizontal` | Option layout                            |
+| `validationRule`   | Checkbox                  | `atLeast`, `exactly`, `atMost` | Checkbox selection validation rule       |
+| `validationLength` | Checkbox                  | Number (e.g., `1`)       | Checkbox validation option count         |
+| `required`         | Checkbox, Radio, Dropdown | `true`, `false`          | Whether the field must be completed      |
+| `readOnly`         | Checkbox, Radio, Dropdown | `true`, `false`          | Whether the pre-selected value is locked |
+| `fontSize`         | Checkbox, Radio, Dropdown | Number (e.g., `12`)      | Field text size                          |
+
+For checkbox validation, `validationLength` defines the option count. `atLeast` means at
+least that many options, `exactly` means exactly that many options, and `atMost` means at
+most that many options.
+
+If an option needs a literal delimiter, escape it with a backslash:
+
+```
+{{dropdown, r1, options=Sales\|Ops|Legal\, Compliance|A\=B}}
+```
+
 ### Examples with Options
 
 ```
@@ -116,6 +147,10 @@ You can customize fields by adding options after the recipient identifier:
 {{number, r1, minValue=0, maxValue=100, value=50}}
 {{name, r1, fontSize=14}}
 {{text, r2, readOnly=true, text=Contract #12345}}
+{{checkbox, r1, options=Email|SMS|Phone, checked=Email|Phone, validationRule=atLeast, validationLength=1}}
+{{radio, r1, options=Card|Bank transfer|Check, selected=Check}}
+{{dropdown, r1, label=Country, placeholder=Select country, options=United States|Canada|United Kingdom}}
+{{dropdown, r2, label=Department, placeholder=Choose department, options=Sales|Legal|Finance, defaultValue=Legal}}
 ```
 
 <Callout type="info">

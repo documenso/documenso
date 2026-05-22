@@ -16,7 +16,8 @@ Do not introduce a new delimiter style. Existing applications may already genera
 ## Goals
 
 - Keep the current placeholder grammar unchanged.
-- Support radio placeholders with option lists, default/preselected values, direction, label, required, read-only, and font size.
+- Support checkbox placeholders with option lists, checked values, validation, direction, required, read-only, and font size.
+- Support radio placeholders with option lists, default/preselected values, direction, required, read-only, and font size.
 - Support dropdown placeholders with option lists, placeholder text, default value, label, required, read-only, and font size.
 - Use `options` as the only public list key in PDF placeholders.
 - Convert `options` into internal `fieldMeta.values` during parsing.
@@ -34,8 +35,9 @@ Do not introduce a new delimiter style. Existing applications may already genera
 Use the existing comma-separated placeholder format:
 
 ```text
-{{radio, r1, label=Payment method, options=Card|Bank transfer|Check, defaultValue=Check}}
-{{radio, r1, label=Plan, options=Basic|Pro|Enterprise, selected=Pro, direction=horizontal}}
+{{checkbox, r1, options=Email|SMS|Phone, checked=Email|Phone, validationRule=atLeast, validationLength=1}}
+{{radio, r1, options=Card|Bank transfer|Check, defaultValue=Check}}
+{{radio, r1, options=Basic|Pro|Enterprise, selected=Pro, direction=horizontal}}
 {{dropdown, r1, label=Country, placeholder=Select country, options=United States|Canada|United Kingdom}}
 {{dropdown, r2, label=Department, placeholder=Choose department, options=Sales|Legal|Finance, defaultValue=Legal}}
 ```
@@ -54,17 +56,57 @@ Parsing rules:
 
 ## Field Type Mapping
 
+- `checkbox` maps to `FieldType.CHECKBOX`.
 - `radio` maps to `FieldType.RADIO`.
 - `dropdown` maps to `FieldType.DROPDOWN`.
 
 ## Metadata Mapping
+
+### Checkbox
+
+Example:
+
+```text
+{{checkbox, r1, options=Email|SMS|Phone, checked=Email|Phone, validationRule=atLeast, validationLength=1}}
+```
+
+Normalize to:
+
+```ts
+{
+  type: FieldType.CHECKBOX,
+  fieldMeta: {
+    type: 'checkbox',
+    validationRule: 'Select at least',
+    validationLength: 1,
+    values: [
+      { id: 1, value: 'Email', checked: true },
+      { id: 2, value: 'SMS', checked: false },
+      { id: 3, value: 'Phone', checked: true },
+    ],
+  },
+}
+```
+
+Accepted keys:
+
+- `options`
+- `checked`
+- `direction=vertical|horizontal`
+- `validationRule=atLeast|exactly|atMost`
+- `validationLength=1`
+- `required=true|false`
+- `readOnly=true|false`
+- `fontSize=12`
+
+Map checkbox validation aliases internally: `atLeast` -> `Select at least`, `exactly` -> `Select exactly`, `atMost` -> `Select at most`.
 
 ### Radio
 
 Example:
 
 ```text
-{{radio, r1, label=Payment method, options=Card|Bank transfer|Check, selected=Bank transfer}}
+{{radio, r1, options=Card|Bank transfer|Check, selected=Bank transfer}}
 ```
 
 Normalize to:
@@ -74,7 +116,6 @@ Normalize to:
   type: FieldType.RADIO,
   fieldMeta: {
     type: 'radio',
-    label: 'Payment method',
     values: [
       { id: 1, value: 'Card', checked: false },
       { id: 2, value: 'Bank transfer', checked: true },
@@ -86,8 +127,6 @@ Normalize to:
 
 Accepted keys:
 
-- `label`
-- `placeholder` as an empty-state fallback only
 - `options`
 - `selected`, `default`, or `defaultValue`
 - `direction=vertical|horizontal`
@@ -95,7 +134,7 @@ Accepted keys:
 - `readOnly=true|false`
 - `fontSize=12`
 
-Radio fields do not have a conventional placeholder once options exist. Use `label` as the visible prompt; treat `placeholder` only as a fallback when no options are configured.
+Radio placeholders do not support `label` or `placeholder` metadata.
 
 ### Dropdown
 
@@ -135,13 +174,13 @@ Accepted keys:
 ## Code Touchpoints
 
 - `packages/lib/server-only/pdf/helpers.ts`
-  - Extend `parseFieldMetaFromPlaceholder` so `options` normalizes into radio/dropdown `fieldMeta.values`.
+  - Extend `parseFieldMetaFromPlaceholder` so `options` normalizes into checkbox/radio/dropdown `fieldMeta.values`.
   - Add delimiter-aware helpers for commas, equals signs, and pipes.
 - `packages/lib/server-only/pdf/auto-place-fields.ts`
   - Replace plain comma splitting with delimiter-aware splitting.
   - Preserve the existing positional structure: field type, recipient, metadata.
 - `packages/lib/types/field-meta.ts`
-  - Keep current internal schemas: radio/dropdown still store options as `fieldMeta.values`.
+  - Keep current internal schemas: checkbox/radio/dropdown still store options as `fieldMeta.values`.
 - `packages/ui/primitives/document-flow/field-content.tsx`
   - Display dropdown `fieldMeta.placeholder || Select` before insertion.
   - Display a radio fallback when a placeholder-created radio has no options.
@@ -161,12 +200,13 @@ Unit tests:
 
 - `options=Yes|No|Maybe` becomes stable radio values.
 - `selected=No` marks only the matching radio option checked.
+- Checkbox `options`, `checked`, `validationRule`, and `validationLength` normalize correctly.
 - Dropdown `placeholder`, `options`, and `defaultValue` normalize correctly.
 - Escaped delimiters parse correctly, for example `options=Sales\|Ops|Legal\, Compliance|A\=B`.
 
 E2E/API tests:
 
-- Add a PDF fixture with radio and dropdown placeholders using the current syntax.
+- Add a PDF fixture with checkbox, radio, and dropdown placeholders using the current syntax.
 - Verify created fields have schema-compatible metadata and expected options/defaults.
 - Verify dropdown placeholder text appears before signing.
 
