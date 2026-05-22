@@ -28,6 +28,7 @@ import { getEnvelopeRoute } from './get-envelope';
 import { getEnvelopeItemsRoute } from './get-envelope-items';
 import { getEnvelopeItemsByTokenRoute } from './get-envelope-items-by-token';
 import { getEnvelopesByIdsRoute } from './get-envelopes-by-ids';
+import { importAcroFormFieldsRoute } from './import-acroform-fields';
 import { redistributeEnvelopeRoute } from './redistribute-envelope';
 import { replaceEnvelopeItemPdfRoute } from './replace-envelope-item-pdf';
 import { saveAsTemplateRoute } from './save-as-template';
@@ -75,6 +76,7 @@ export const envelopeRouter = router({
     delete: deleteEnvelopeFieldRoute,
     set: setEnvelopeFieldsRoute,
     sign: signEnvelopeFieldRoute,
+    importFromPdf: importAcroFormFieldsRoute,
   },
   find: findEnvelopesRoute,
   auditLog: {

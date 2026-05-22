@@ -93,7 +93,7 @@ test.describe('Form Flattening', () => {
   const formFieldsPdf = fs.readFileSync(path.join(__dirname, '../../../../assets/form-fields-test.pdf'));
 
   test.describe('Envelope Creation (DOCUMENT type)', () => {
-    test('should flatten form fields when creating a DOCUMENT envelope with formValues', async ({ request }) => {
+    test('should preserve form fields when creating a DOCUMENT envelope with formValues', async ({ request }) => {
       const { user, team } = await seedUser();
       const { token } = await createApiToken({
         userId: user.id,
@@ -136,16 +136,19 @@ test.describe('Form Flattening', () => {
       expect(envelope.formValues).toEqual(TEST_FORM_VALUES);
       expect(envelope.type).toBe(EnvelopeType.DOCUMENT);
 
-      // Get the PDF and verify form fields are flattened
+      // DOCUMENT uploads no longer auto-flatten — the editor's "Import from
+      // PDF form" button is the new flatten trigger. Inserted values remain
+      // visible in the (still-interactive) widgets.
       const documentData = envelope.envelopeItems[0].documentData;
       const pdfBuffer = await getFileServerSide(documentData);
 
-      const hasFormFields = await pdfHasFormFields(pdfBuffer);
-
-      expect(hasFormFields).toBe(false);
+      expect(await pdfHasFormFields(pdfBuffer)).toBe(true);
+      expect(await getPdfTextFieldValue(pdfBuffer, FORM_FIELDS.TEXT_FIELD)).toBe(
+        TEST_FORM_VALUES[FORM_FIELDS.TEXT_FIELD],
+      );
     });
 
-    test('should flatten form fields when creating a DOCUMENT envelope without formValues', async ({ request }) => {
+    test('should preserve form fields when creating a DOCUMENT envelope without formValues', async ({ request }) => {
       const { user, team } = await seedUser();
       const { token } = await createApiToken({
         userId: user.id,
@@ -157,7 +160,8 @@ test.describe('Form Flattening', () => {
       const payload: TCreateEnvelopePayload = {
         type: EnvelopeType.DOCUMENT,
         title: 'Document without Form Values',
-        // No formValues - but form should still be flattened for DOCUMENT type
+        // No formValues - form fields stay interactive until the user clicks
+        // "Import from PDF form" in the editor.
       };
 
       const formData = new FormData();
@@ -184,13 +188,11 @@ test.describe('Form Flattening', () => {
         },
       });
 
-      // Get the PDF and verify form fields are flattened
+      // DOCUMENT uploads no longer auto-flatten.
       const documentData = envelope.envelopeItems[0].documentData;
       const pdfBuffer = await getFileServerSide(documentData);
 
-      const hasFormFields = await pdfHasFormFields(pdfBuffer);
-
-      expect(hasFormFields).toBe(false);
+      expect(await pdfHasFormFields(pdfBuffer)).toBe(true);
     });
   });
 
@@ -747,11 +749,11 @@ test.describe('Form Flattening', () => {
         },
       });
 
-      // Form should still be flattened for DOCUMENT type
+      // DOCUMENT uploads no longer auto-flatten; widgets remain interactive.
       const documentData = envelope.envelopeItems[0].documentData;
       const pdfBuffer = await getFileServerSide(documentData);
 
-      expect(await pdfHasFormFields(pdfBuffer)).toBe(false);
+      expect(await pdfHasFormFields(pdfBuffer)).toBe(true);
     });
 
     test('should handle partial formValues (only some fields)', async ({ request }) => {
@@ -798,11 +800,13 @@ test.describe('Form Flattening', () => {
         [FORM_FIELDS.TEXT_FIELD]: 'Only this field',
       });
 
-      // Form should still be flattened
+      // DOCUMENT uploads no longer auto-flatten; widgets remain interactive
+      // and the inserted value is visible inside the still-editable field.
       const documentData = envelope.envelopeItems[0].documentData;
       const pdfBuffer = await getFileServerSide(documentData);
 
-      expect(await pdfHasFormFields(pdfBuffer)).toBe(false);
+      expect(await pdfHasFormFields(pdfBuffer)).toBe(true);
+      expect(await getPdfTextFieldValue(pdfBuffer, FORM_FIELDS.TEXT_FIELD)).toBe('Only this field');
     });
   });
 });

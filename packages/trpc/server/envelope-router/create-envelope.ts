@@ -2,12 +2,10 @@ import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { convertToPdf } from '@documenso/lib/server-only/document-conversion';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
-import { extractAcroFormFieldsFromPDF } from '@documenso/lib/server-only/pdf/acroform-fields';
 import { extractPdfPlaceholders } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
-import { EnvelopeType } from '@prisma/client';
 import type { Logger } from 'pino';
 
 import { insertFormValuesInPdf } from '../../../lib/server-only/pdf/insert-form-values-in-pdf';
@@ -107,10 +105,7 @@ export const createEnvelopeRouteCaller = async ({
     });
   }
 
-  // For each file: convert to PDF if needed, extract AcroForm widgets,
-  // normalize (which flattens the form unless we detected a signed signature
-  // and unless this is a template upload), extract & clean placeholders,
-  // then upload.
+  // For each file: convert to PDF if needed, normalize, extract & clean placeholders, then upload.
   const envelopeItems = await Promise.all(
     files.map(async (file) => {
       let pdf = await convertToPdf(file, logger);
@@ -123,55 +118,10 @@ export const createEnvelopeRouteCaller = async ({
         });
       }
 
-      // Run AcroForm extraction BEFORE normalizePdf — flattening destroys
-      // widget geometry, which we need to reuse as Documenso fields.
-      const acroFormExtraction = await extractAcroFormFieldsFromPDF(pdf, {
-        formValuesProvided: Boolean(formValues),
-      });
-
-      if (acroFormExtraction.skipReason) {
-        logger?.info(
-          {
-            event: 'acroform-import.skip',
-            envelopeItemTitle: file.name,
-            reason: acroFormExtraction.skipReason,
-          },
-          'AcroForm extraction skipped',
-        );
-      }
-
-      if (acroFormExtraction.unsupported.length > 0) {
-        const byReason: Record<string, number> = {};
-
-        for (const entry of acroFormExtraction.unsupported) {
-          byReason[entry.reason] = (byReason[entry.reason] ?? 0) + 1;
-        }
-
-        logger?.info(
-          {
-            event: 'acroform-import.unsupported',
-            envelopeItemTitle: file.name,
-            count: acroFormExtraction.unsupported.length,
-            byReason,
-          },
-          'AcroForm import skipped unsupported widgets',
-        );
-      }
-
-      if (acroFormExtraction.hasSignedSignature) {
-        logger?.warn(
-          {
-            event: 'acroform-import.signed-pdf-no-flatten',
-            envelopeItemTitle: file.name,
-          },
-          'Signed AcroForm signature detected — skipping flatten to preserve signature',
-        );
-      }
-
-      const shouldFlatten = type !== EnvelopeType.TEMPLATE && !acroFormExtraction.hasSignedSignature;
-
+      // Preserve interactive AcroForm widgets so they can be imported as
+      // Documenso fields on demand via the editor's "Import from PDF" button.
       const normalized = await normalizePdf(pdf, {
-        flattenForm: shouldFlatten,
+        flattenForm: false,
       });
 
       // Todo: Embeds - Might need to add this for client-side embeds in the future.
@@ -187,7 +137,6 @@ export const createEnvelopeRouteCaller = async ({
         title: file.name,
         documentDataId: documentData.id,
         placeholders,
-        acroFormFields: acroFormExtraction.fields,
       };
     }),
   );

@@ -18,17 +18,19 @@ import {
 } from '@documenso/lib/types/field-meta';
 import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
+import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
-import { FileTextIcon, PencilIcon, SparklesIcon } from 'lucide-react';
+import { FileTextIcon, FormInputIcon, PencilIcon, SparklesIcon } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRevalidator, useSearchParams } from 'react-router';
 import { isDeepEqual } from 'remeda';
@@ -85,6 +87,10 @@ export const EnvelopeEditorFieldsPage = () => {
   const [isAiFieldDialogOpen, setIsAiFieldDialogOpen] = useState(false);
   const [isAiEnableDialogOpen, setIsAiEnableDialogOpen] = useState(false);
   const { revalidate } = useRevalidator();
+  const { toast } = useToast();
+
+  const { mutateAsync: importFieldsFromPdf, isPending: isImportingFieldsFromPdf } =
+    trpc.envelope.field.importFromPdf.useMutation();
 
   const envelopeItemPermissions = useMemo(
     () => getEnvelopeItemPermissions(envelope, envelope.recipients),
@@ -150,6 +156,39 @@ export const EnvelopeEditorFieldsPage = () => {
       setIsAiEnableDialogOpen(false);
       setIsAiFieldDialogOpen(true);
     });
+  };
+
+  const onImportFromPdfClick = async () => {
+    try {
+      const result = await importFieldsFromPdf({ envelopeId: envelope.id });
+
+      if (result.fieldsCreated === 0) {
+        toast({
+          title: _(msg`No form fields found`),
+          description: _(msg`This PDF does not contain any importable form fields.`),
+          duration: 5000,
+        });
+
+        return;
+      }
+
+      await revalidate();
+
+      toast({
+        title: _(msg`Fields imported`),
+        description: _(
+          msg`Imported ${result.fieldsCreated} field${result.fieldsCreated === 1 ? '' : 's'} from the PDF form. Review and reassign in the editor.`,
+        ),
+        duration: 5000,
+      });
+    } catch {
+      toast({
+        title: _(msg`Could not import fields`),
+        description: _(msg`Something went wrong while importing fields from the PDF.`),
+        variant: 'destructive',
+        duration: 5000,
+      });
+    }
   };
 
   return (
@@ -273,6 +312,23 @@ export const EnvelopeEditorFieldsPage = () => {
               selectedRecipientId={editorFields.selectedRecipient?.id ?? null}
               selectedEnvelopeItemId={currentEnvelopeItem?.id ?? null}
             />
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="mt-4 w-full"
+              onClick={() => void onImportFromPdfClick()}
+              disabled={envelope.status !== DocumentStatus.DRAFT || isImportingFieldsFromPdf}
+              title={
+                envelope.status !== DocumentStatus.DRAFT
+                  ? _(msg`You can only import fields in draft envelopes`)
+                  : undefined
+              }
+            >
+              <FormInputIcon className="mr-2 -ml-1 h-4 w-4" />
+              {isImportingFieldsFromPdf ? <Trans>Importing...</Trans> : <Trans>Import from PDF form</Trans>}
+            </Button>
 
             {editorConfig.fields?.allowAIDetection && (
               <>
