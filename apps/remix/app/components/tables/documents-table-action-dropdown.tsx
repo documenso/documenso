@@ -56,6 +56,7 @@ export const DocumentsTableActionDropdown = ({ row, onMoveDocument }: DocumentsT
   const { _ } = useLingui();
   const trpcUtils = trpcReact.useUtils();
 
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isRenameDialogOpen, setRenameDialogOpen] = useState(false);
   const [isSaveAsTemplateDialogOpen, setSaveAsTemplateDialogOpen] = useState(false);
 
@@ -190,21 +191,10 @@ export const DocumentsTableActionDropdown = ({ row, onMoveDocument }: DocumentsT
           Void
         </DropdownMenuItem> */}
 
-        <EnvelopeDeleteDialog
-          id={row.envelopeId}
-          type={EnvelopeType.DOCUMENT}
-          status={row.status}
-          title={row.title}
-          canManageDocument={canManageDocument}
-          trigger={
-            <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-              <div>
-                <Trash2 className="mr-2 h-4 w-4" />
-                {canManageDocument ? _(msg`Delete`) : _(msg`Hide`)}
-              </div>
-            </DropdownMenuItem>
-          }
-        />
+        <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}>
+          <Trash2 className="mr-2 h-4 w-4" />
+          {canManageDocument ? _(msg`Delete`) : _(msg`Hide`)}
+        </DropdownMenuItem>
 
         <DropdownMenuLabel>
           <Trans>Share</Trans>
@@ -239,6 +229,16 @@ export const DocumentsTableActionDropdown = ({ row, onMoveDocument }: DocumentsT
           )}
         />
       </DropdownMenuContent>
+
+      <EnvelopeDeleteDialog
+        id={row.envelopeId}
+        type={EnvelopeType.DOCUMENT}
+        status={row.status}
+        title={row.title}
+        canManageDocument={canManageDocument}
+        open={isDeleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+      />
 
       <EnvelopeSaveAsTemplateDialog
         envelopeId={row.envelopeId}
