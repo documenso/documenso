@@ -24,6 +24,8 @@ type EnvelopeDeleteDialogProps = {
   id: string;
   type: EnvelopeType;
   trigger?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   onDelete?: () => Promise<void> | void;
   status: DocumentStatus;
   title: string;
@@ -34,6 +36,8 @@ export const EnvelopeDeleteDialog = ({
   id,
   type,
   trigger,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
   onDelete,
   status,
   title,
@@ -45,11 +49,20 @@ export const EnvelopeDeleteDialog = ({
 
   const deleteMessage = msg`delete`;
 
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(status === DocumentStatus.DRAFT);
 
   const isDocument = type === EnvelopeType.DOCUMENT;
+
+  // Support both controlled (open/onOpenChange props) and uncontrolled (trigger prop) usage.
+  const open = controlledOpen ?? internalOpen;
+
+  const onOpenChange = (value: boolean) => {
+    if (isPending) return;
+    setInternalOpen(value);
+    controlledOnOpenChange?.(value);
+  };
 
   const { mutateAsync: deleteEnvelope, isPending } = trpcReact.envelope.delete.useMutation({
     onSuccess: async () => {
@@ -71,7 +84,7 @@ export const EnvelopeDeleteDialog = ({
 
       await onDelete?.();
 
-      setOpen(false);
+      onOpenChange(false);
     },
     onError: () => {
       toast({
@@ -98,8 +111,8 @@ export const EnvelopeDeleteDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !isPending && setOpen(value)}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
 
       <DialogContent>
         <DialogHeader>
