@@ -1,6 +1,7 @@
 import { authClient } from '@documenso/auth/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { AppError } from '@documenso/lib/errors/app-error';
+import { env } from '@documenso/lib/utils/env';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
@@ -12,6 +13,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
+import type { TurnstileInstance } from '@marsidev/react-turnstile';
+import { Turnstile } from '@marsidev/react-turnstile';
+import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
@@ -50,6 +54,9 @@ export const ClaimAccount = ({ defaultName, defaultEmail }: ClaimAccountProps) =
   const analytics = useAnalytics();
   const navigate = useNavigate();
 
+  const turnstileSiteKey = env('NEXT_PUBLIC_TURNSTILE_SITE_KEY');
+  const turnstileRef = useRef<TurnstileInstance>(null);
+
   const form = useForm<TClaimAccountFormSchema>({
     values: {
       name: defaultName ?? '',
@@ -61,7 +68,28 @@ export const ClaimAccount = ({ defaultName, defaultEmail }: ClaimAccountProps) =
 
   const onFormSubmit = async ({ name, email, password }: TClaimAccountFormSchema) => {
     try {
-      await authClient.emailPassword.signUp({ name, email, password });
+      let token: string | undefined;
+
+      if (turnstileSiteKey) {
+        token = await turnstileRef.current?.getResponsePromise(3000).catch((_err) => undefined);
+
+        if (!token) {
+          toast({
+            title: _(msg`Human verification required`),
+            description: _(msg`Please complete the CAPTCHA challenge before signing in.`),
+            variant: 'destructive',
+          });
+
+          return;
+        }
+      }
+
+      await authClient.emailPassword.signUp({
+        name,
+        email,
+        password,
+        captchaToken: token ?? undefined,
+      });
 
       await navigate(`/unverified-account`);
 
@@ -87,6 +115,8 @@ export const ClaimAccount = ({ defaultName, defaultEmail }: ClaimAccountProps) =
         description: _(errorMessage),
         variant: 'destructive',
       });
+
+      turnstileRef.current?.reset();
     }
   };
 
@@ -140,6 +170,19 @@ export const ClaimAccount = ({ defaultName, defaultEmail }: ClaimAccountProps) =
                 </FormItem>
               )}
             />
+
+            {turnstileSiteKey && (
+              <div className="mt-4">
+                <Turnstile
+                  ref={turnstileRef}
+                  siteKey={turnstileSiteKey}
+                  options={{
+                    size: 'flexible',
+                    appearance: 'interaction-only',
+                  }}
+                />
+              </div>
+            )}
 
             <Button type="submit" className="mt-6 w-full" loading={form.formState.isSubmitting}>
               <Trans>Claim account</Trans>

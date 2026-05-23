@@ -89,7 +89,6 @@ export const SignInForm = ({
   const turnstileSiteKey = env('NEXT_PUBLIC_TURNSTILE_SITE_KEY');
   const turnstileRef = useRef<TurnstileInstance>(null);
   const twoFactorTurnstileRef = useRef<TurnstileInstance>(null);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
 
@@ -197,13 +196,31 @@ export const SignInForm = ({
   };
 
   const onFormSubmit = async ({ email, password, totpCode, backupCode }: TSignInFormSchema) => {
+    const $turnstile = isTwoFactorAuthenticationDialogOpen ? twoFactorTurnstileRef.current : turnstileRef.current;
+
     try {
+      let token: string | undefined;
+
+      if (turnstileSiteKey) {
+        token = await $turnstile?.getResponsePromise(3000).catch((_err) => undefined);
+
+        if (!token) {
+          toast({
+            title: _(msg`Human verification required`),
+            description: _(msg`Please complete the CAPTCHA challenge before signing in.`),
+            variant: 'destructive',
+          });
+
+          return;
+        }
+      }
+
       await authClient.emailPassword.signIn({
         email,
         password,
         totpCode,
         backupCode,
-        captchaToken: captchaToken ?? undefined,
+        captchaToken: token ?? undefined,
         redirectPath,
       });
     } catch (err) {
@@ -214,10 +231,6 @@ export const SignInForm = ({
       if (error.code === 'TWO_FACTOR_MISSING_CREDENTIALS') {
         setIsTwoFactorAuthenticationDialogOpen(true);
 
-        // Turnstile tokens are single-use. Clear the consumed one so the
-        // dialog's fresh widget mounts cleanly and the dialog can't be
-        // submitted with the stale token before a new one is issued.
-        setCaptchaToken(null);
         return;
       }
 
@@ -247,8 +260,7 @@ export const SignInForm = ({
         variant: 'destructive',
       });
 
-      turnstileRef.current?.reset();
-      setCaptchaToken(null);
+      $turnstile?.reset();
     }
   };
 
@@ -358,8 +370,6 @@ export const SignInForm = ({
             <Turnstile
               ref={turnstileRef}
               siteKey={turnstileSiteKey}
-              onSuccess={setCaptchaToken}
-              onExpire={() => setCaptchaToken(null)}
               options={{
                 size: 'flexible',
                 appearance: 'interaction-only',
@@ -499,8 +509,6 @@ export const SignInForm = ({
                   <Turnstile
                     ref={twoFactorTurnstileRef}
                     siteKey={turnstileSiteKey}
-                    onSuccess={setCaptchaToken}
-                    onExpire={() => setCaptchaToken(null)}
                     options={{
                       size: 'flexible',
                       appearance: 'interaction-only',
@@ -518,7 +526,7 @@ export const SignInForm = ({
                   )}
                 </Button>
 
-                <Button type="submit" loading={isSubmitting} disabled={Boolean(turnstileSiteKey) && !captchaToken}>
+                <Button type="submit" loading={isSubmitting}>
                   {isSubmitting ? <Trans>Signing in...</Trans> : <Trans>Sign In</Trans>}
                 </Button>
               </DialogFooter>
