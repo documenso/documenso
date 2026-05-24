@@ -172,6 +172,10 @@ NEXT_PUBLIC_DISABLE_SIGNUP=false
 # NEXT_PUBLIC_DISABLE_GOOGLE_SIGNIN=true
 # NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN=true
 # NEXT_PUBLIC_DISABLE_OIDC_SIGNIN=true
+
+# Auto-redirect /signin to OIDC (optional). Combine with the signin restrictions
+# above for an OIDC-only signin experience.
+# NEXT_PUBLIC_AUTO_REDIRECT_TO_OIDC=true
 ```
 
 <Callout type="info">Generate secure secrets using: `openssl rand -base64 32`</Callout>

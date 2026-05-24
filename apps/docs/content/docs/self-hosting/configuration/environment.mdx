@@ -237,6 +237,7 @@ For detailed certificate setup, see [Signing Certificate](/docs/self-hosting/con
 | `NEXT_PUBLIC_DISABLE_GOOGLE_SIGNIN`          | Hide the Google signin button                                                       | `false` |
 | `NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN`       | Hide the Microsoft signin button                                                    | `false` |
 | `NEXT_PUBLIC_DISABLE_OIDC_SIGNIN`            | Hide the OIDC signin button                                                         | `false` |
+| `NEXT_PUBLIC_AUTO_REDIRECT_TO_OIDC`          | Auto-redirect `/signin` to the OIDC provider; renders a spinner instead of the form | `false` |
 | `NEXT_PUBLIC_POSTHOG_KEY`             | PostHog API key for analytics and feature flags                                     |         |
 | `NEXT_PUBLIC_FEATURE_BILLING_ENABLED` | Enable billing features                                                             | `false` |
 
@@ -286,6 +287,22 @@ NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN="true"
 
 # Or disable signin entirely
 NEXT_PUBLIC_DISABLE_SIGNIN="true"
+```
+
+### OIDC Auto-redirect
+
+When OIDC is the only signin method on your instance, you can skip the signin form entirely and send users straight to the OIDC provider.
+
+- **`NEXT_PUBLIC_AUTO_REDIRECT_TO_OIDC`**: Set to `true` to auto-redirect `/signin` to the configured OIDC provider on page load. The page renders a spinner while the redirect happens, instead of showing the signin form. Has no effect when OIDC is not configured.
+
+This flag is a UI optimisation. It does not change server-side behaviour and does not disable any other signin methods on its own — combine it with the per-provider signin flags to fully restrict the signin page to OIDC.
+
+```bash
+# OIDC-only signin: hide all other methods and skip the signin form UI
+NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNIN="true"
+NEXT_PUBLIC_DISABLE_GOOGLE_SIGNIN="true"
+NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN="true"
+NEXT_PUBLIC_AUTO_REDIRECT_TO_OIDC="true"
 ```
 
 ---
@@ -438,6 +455,9 @@ NEXT_PRIVATE_SIGNING_PASSPHRASE="your-certificate-password"
 # NEXT_PUBLIC_DISABLE_GOOGLE_SIGNIN="true"
 # NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN="true"
 # NEXT_PUBLIC_DISABLE_OIDC_SIGNIN="true"
+
+# Auto-redirect /signin to OIDC (optional)
+# NEXT_PUBLIC_AUTO_REDIRECT_TO_OIDC="true"
 ```
 
 ---
