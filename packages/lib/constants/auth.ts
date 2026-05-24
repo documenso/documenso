@@ -139,3 +139,22 @@ export const isSignupEnabledForProvider = (provider: 'email' | 'google' | 'micro
 
   return env(flagMap[provider]) !== 'true';
 };
+
+/**
+ * Check if signin is enabled for the given provider.
+ * The master switch takes precedence over the per-provider flags.
+ */
+export const isSigninEnabledForProvider = (provider: 'email' | 'google' | 'microsoft' | 'oidc'): boolean => {
+  if (env('NEXT_PUBLIC_DISABLE_SIGNIN') === 'true') {
+    return false;
+  }
+
+  const flagMap = {
+    email: 'NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNIN',
+    google: 'NEXT_PUBLIC_DISABLE_GOOGLE_SIGNIN',
+    microsoft: 'NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN',
+    oidc: 'NEXT_PUBLIC_DISABLE_OIDC_SIGNIN',
+  } as const;
+
+  return env(flagMap[provider]) !== 'true';
+};

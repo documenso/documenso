@@ -3,6 +3,7 @@ import {
   IS_GOOGLE_SSO_ENABLED,
   IS_MICROSOFT_SSO_ENABLED,
   IS_OIDC_SSO_ENABLED,
+  isSigninEnabledForProvider,
   isSignupEnabledForProvider,
   OIDC_PROVIDER_LABEL,
 } from '@documenso/lib/constants/auth';
@@ -28,9 +29,10 @@ export async function loader({ request }: Route.LoaderArgs) {
   const { isAuthenticated } = await getOptionalSession(request);
 
   // SSR env variables.
-  const isGoogleSSOEnabled = IS_GOOGLE_SSO_ENABLED;
-  const isMicrosoftSSOEnabled = IS_MICROSOFT_SSO_ENABLED;
-  const isOIDCSSOEnabled = IS_OIDC_SSO_ENABLED;
+  const isEmailPasswordSigninEnabled = isSigninEnabledForProvider('email');
+  const isGoogleSSOEnabled = IS_GOOGLE_SSO_ENABLED && isSigninEnabledForProvider('google');
+  const isMicrosoftSSOEnabled = IS_MICROSOFT_SSO_ENABLED && isSigninEnabledForProvider('microsoft');
+  const isOIDCSSOEnabled = IS_OIDC_SSO_ENABLED && isSigninEnabledForProvider('oidc');
   const oidcProviderLabel = OIDC_PROVIDER_LABEL;
   const isSignupEnabled =
     isSignupEnabledForProvider('email') ||
@@ -47,6 +49,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   }
 
   return {
+    isEmailPasswordSigninEnabled,
     isGoogleSSOEnabled,
     isMicrosoftSSOEnabled,
     isOIDCSSOEnabled,
@@ -57,8 +60,15 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export default function SignIn({ loaderData }: Route.ComponentProps) {
-  const { isGoogleSSOEnabled, isMicrosoftSSOEnabled, isOIDCSSOEnabled, isSignupEnabled, oidcProviderLabel, returnTo } =
-    loaderData;
+  const {
+    isEmailPasswordSigninEnabled,
+    isGoogleSSOEnabled,
+    isMicrosoftSSOEnabled,
+    isOIDCSSOEnabled,
+    isSignupEnabled,
+    oidcProviderLabel,
+    returnTo,
+  } = loaderData;
 
   const { _ } = useLingui();
 
@@ -95,6 +105,7 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
         <hr className="-mx-6 my-4" />
 
         <SignInForm
+          isEmailPasswordSigninEnabled={isEmailPasswordSigninEnabled}
           isGoogleSSOEnabled={isGoogleSSOEnabled}
           isMicrosoftSSOEnabled={isMicrosoftSSOEnabled}
           isOIDCSSOEnabled={isOIDCSSOEnabled}
