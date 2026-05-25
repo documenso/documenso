@@ -79,8 +79,29 @@ def validate_resolved_file(
 # ---------------------------------------------------------------------------
 
 def _check_branding_reversion(content: str, config: BrandingConfig) -> list[str]:
-    """Detect upstream brand strings that should have been replaced."""
+    """Detect upstream brand strings that should have been replaced.
+
+    Preservation is determined per-line: if the line containing the match
+    also contains any preservation substring (e.g. ``@documenso/``,
+    ``github.com/documenso``), the match is treated as legitimate.  This
+    is wider than the old 30-char window, which false-positived on credit
+    lines like ``[Documenso](https://github.com/documenso/documenso)`` where
+    the URL sat just outside the window.
+    """
     errors: list[str] = []
+    lines = content.splitlines()
+
+    # Build a line-start offset table so we can compute line numbers quickly.
+    line_starts: list[int] = [0]
+    for line in lines[:-1]:
+        line_starts.append(line_starts[-1] + len(line) + 1)
+
+    def line_at(offset: int) -> int:
+        # Binary-search would be tidier but linear is fine for typical file sizes.
+        for i in range(len(line_starts) - 1, -1, -1):
+            if line_starts[i] <= offset:
+                return i
+        return 0
 
     for brand_string in _UPSTREAM_BRAND_STRINGS:
         start = 0
@@ -89,17 +110,13 @@ def _check_branding_reversion(content: str, config: BrandingConfig) -> list[str]
             if idx == -1:
                 break
 
-            # Check surrounding context (30 chars each side) for preservations.
-            ctx_start = max(0, idx - 30)
-            ctx_end = min(len(content), idx + len(brand_string) + 30)
-            context = content[ctx_start:ctx_end]
+            line_no = line_at(idx)
+            line_text = lines[line_no] if line_no < len(lines) else ""
 
-            if not _is_preserved_context(context):
-                # Find approximate line number for the error message.
-                line_no = content[:idx].count("\n") + 1
+            if not _line_is_preserved(line_text):
                 errors.append(
-                    f"Upstream brand string '{brand_string}' found at line {line_no} "
-                    f"(not in a preserved context)"
+                    f"Upstream brand string '{brand_string}' found at line "
+                    f"{line_no + 1} (not in a preserved context)"
                 )
 
             start = idx + len(brand_string)
@@ -107,9 +124,9 @@ def _check_branding_reversion(content: str, config: BrandingConfig) -> list[str]
     return errors
 
 
-def _is_preserved_context(context: str) -> bool:
-    """Return True if the context indicates a legitimate preservation."""
-    return any(pres in context for pres in _BRANDING_PRESERVATIONS)
+def _line_is_preserved(line: str) -> bool:
+    """Return True if the line contains any preservation substring."""
+    return any(pres in line for pres in _BRANDING_PRESERVATIONS)
 
 
 # ---------------------------------------------------------------------------

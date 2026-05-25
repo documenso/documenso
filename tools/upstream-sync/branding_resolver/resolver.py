@@ -23,6 +23,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from .agent import BrandingAgent
 from .classifier import FileCategory, classify_file
 from .confidence import ConfidenceLevel, compute_confidence
+from .deterministic import apply_substitutions
 from .differ import FileConflict, build_file_conflict, chunk_file_diffs, reconstruct_from_hunks
 from .model_client import LLMClient, ModelTier, create_client
 from .repair_loop import RepairResult, repair_file
@@ -429,6 +430,11 @@ class BrandingResolver:
             explanation = result["explanation"]
             llm_confidence = result.get("confidence", "medium")
 
+            # Deterministic branding pass: replace any literal upstream brand
+            # strings the LLM left behind (skipping preserved contexts).  This
+            # short-circuits most repair-loop rounds for branding-only misses.
+            content = apply_substitutions(content)
+
             # Run the self-healing repair loop.
             repair = repair_file(
                 file_path=file_path,
@@ -643,6 +649,9 @@ class BrandingResolver:
 
         # Reconstruct the file.
         reconstructed = reconstruct_from_hunks(raw_content, resolved_hunks)
+
+        # Deterministic branding pass on the reconstructed file as well.
+        reconstructed = apply_substitutions(reconstructed)
 
         # Validate the reconstructed file.
         errors = validate_resolved_file(fc.path, reconstructed, self.config)

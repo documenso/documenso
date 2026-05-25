@@ -172,8 +172,16 @@ class TestWorkflowE2E:
 
     @patch("branding_resolver.resolver.build_file_conflict")
     @patch("subprocess.run")
-    def test_mixed_file_with_validation_errors(self, mock_run, mock_build_conflict):
-        """LLM output containing upstream brand strings degrades confidence."""
+    def test_mixed_file_brand_leak_is_auto_cleaned(self, mock_run, mock_build_conflict):
+        """LLM output containing upstream brand strings is fixed by the
+        deterministic substitution pass before validation, so the resolution
+        succeeds with HIGH confidence and no validation errors.
+
+        (Previously this test asserted the leak degraded confidence; that
+        contract changed when deterministic.apply_substitutions was added
+        to resolver._process_and_repair — branding-only misses now never
+        reach the validator as errors.)
+        """
         from branding_resolver.differ import FileConflict, ConflictHunk
 
         files = ["packages/lib/constants/app.ts"]
@@ -191,7 +199,7 @@ class TestWorkflowE2E:
             )],
         )
 
-        # LLM returns content with upstream brand leak
+        # LLM returns content with upstream brand leaks the regex pass will fix.
         leaked_content = (
             'const name = "Documenso";\n'
             'const url = "https://documenso.com";\n'
@@ -213,11 +221,14 @@ class TestWorkflowE2E:
         result = resolver.resolve_merge()
 
         res = result.resolutions[0]
-        # With repair rounds disabled, the file fails validation and ends up
-        # either as unresolvable (flag_for_review) or with LOW confidence.
-        assert res.confidence != ConfidenceLevel.HIGH  # Should be degraded
-        # The file should be flagged in some way (unresolvable or low confidence).
-        assert res.confidence == ConfidenceLevel.LOW or len(res.validation_errors) > 0
+        assert res.action == "resolve_conflict"
+        assert res.confidence == ConfidenceLevel.HIGH
+        assert res.validation_errors == []
+        # Deterministic substitution rewrote both leaked strings.
+        assert "Documenso" not in (res.content or "")
+        assert "documenso.com" not in (res.content or "")
+        assert 'const name = "Davinci Sign";' in (res.content or "")
+        assert "https://davincisolutions.ai" in (res.content or "")
 
     # ------------------------------------------------------------------
     # All files flagged for review
