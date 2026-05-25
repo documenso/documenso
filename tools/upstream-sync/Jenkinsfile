@@ -143,6 +143,15 @@ pipeline {
                         sh 'git diff --name-only --diff-filter=U > sync-output/conflicted_files.txt'
                     }
 
+                    // Davinci Sign runs Jenkins, not GitHub Actions. Discard any upstream changes
+                    // (or conflicts) under .github/workflows/ so the push doesn't trip GitHub's
+                    // "App needs workflows permission" rule. Keeps our workflow files frozen.
+                    sh '''
+                        if [ -d .github/workflows ]; then
+                            git checkout HEAD -- .github/workflows/ 2>/dev/null || true
+                        fi
+                    '''
+
                     sh '''
                         . .venv/bin/activate
                         python3 -c "
@@ -246,6 +255,15 @@ for t in touched:
                     // Finalize the merge commit.
                     sh 'git reset HEAD -- .venv sync-output 2>/dev/null || true'
                     sh 'git checkout -- .venv 2>/dev/null || true'
+
+                    // Belt-and-suspenders: re-discard any workflow-file changes the resolver
+                    // may have produced. See note at the merge stage.
+                    sh '''
+                        if [ -d .github/workflows ]; then
+                            git checkout HEAD -- .github/workflows/ 2>/dev/null || true
+                        fi
+                    '''
+
                     sh 'git add -A -- . ":!.venv" ":!sync-output"'
 
                     // Safety: verify no conflict markers remain before committing.
