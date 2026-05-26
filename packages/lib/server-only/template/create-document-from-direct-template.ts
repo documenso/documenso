@@ -25,6 +25,7 @@ import type { TRecipientActionAuthTypes } from '../../types/document-auth';
 import { DocumentAccessAuth, ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { ZFieldMetaSchema } from '../../types/field-meta';
+import { ZSignatureLevelSchema } from '../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
@@ -42,6 +43,7 @@ import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
 import { incrementDocumentId } from '../envelope/increment-id';
+import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -181,7 +183,17 @@ export const createDocumentFromDirectTemplate = async ({
   const nonDirectTemplateRecipients = directTemplateEnvelope.recipients.filter(
     (recipient) => recipient.id !== directTemplateRecipient.id,
   );
-  const derivedDocumentMeta = extractDerivedDocumentMeta(settings, directTemplateEnvelope.documentMeta);
+
+  // Carry the template's level forward, coercing if the instance mode has
+  // changed since the template was created. ZSignatureLevelSchema parses the
+  // free-form TEXT column defensively. Resolved before meta extraction so
+  // signingOrder picks up the TSP-appropriate default + assertion.
+  const signatureLevel = resolveSignatureLevel({
+    requested: ZSignatureLevelSchema.parse(directTemplateEnvelope.signatureLevel),
+    strict: false,
+  });
+
+  const derivedDocumentMeta = extractDerivedDocumentMeta(settings, directTemplateEnvelope.documentMeta, signatureLevel);
 
   // Associate, validate and map to a query every direct template recipient field with the provided fields.
   // Only process fields that are either required or have been signed by the user
@@ -315,6 +327,7 @@ export const createDocumentFromDirectTemplate = async ({
         secondaryId: incrementedDocumentId.formattedDocumentId,
         type: EnvelopeType.DOCUMENT,
         internalVersion: directTemplateEnvelope.internalVersion,
+        signatureLevel,
         qrToken: prefixedId('qr'),
         source: DocumentSource.TEMPLATE_DIRECT_LINK,
         templateId: directTemplateEnvelopeLegacyId,

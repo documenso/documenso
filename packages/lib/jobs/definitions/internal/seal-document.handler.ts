@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { PDFDocument } from '@cantoo/pdf-lib';
+import { finalizeTspEnvelopeCompletion } from '@documenso/ee/server-only/signing/csc/finalize-tsp-completion';
 import { addRejectionStampToPdf } from '@documenso/lib/server-only/pdf/add-rejection-stamp-to-pdf';
 import { generateAuditLogPdf } from '@documenso/lib/server-only/pdf/generate-audit-log-pdf';
 import { generateCertificatePdf } from '@documenso/lib/server-only/pdf/generate-certificate-pdf';
@@ -22,6 +23,7 @@ import { legacy_insertFieldInPDF } from '../../../server-only/pdf/legacy-insert-
 import { getTeamSettings } from '../../../server-only/team/get-team-settings';
 import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-webhook';
 import { DOCUMENT_AUDIT_LOG_TYPE, type TDocumentAuditLog } from '../../../types/document-audit-logs';
+import { isTspEnvelope } from '../../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../../types/webhook-payload';
 import { prefixedId } from '../../../universal/id';
 import { getFileServerSide } from '../../../universal/upload/get-file.server';
@@ -163,6 +165,33 @@ export const run = async ({ payload, io }: { payload: TSealDocumentJobDefinition
     });
 
     const finalEnvelopeStatus = isRejected ? DocumentStatus.REJECTED : DocumentStatus.COMPLETED;
+
+    if (isTspEnvelope(envelope)) {
+      if (isResealing) {
+        throw new AppError(AppErrorCode.NOT_SETUP, {
+          message: 'Re-sealing TSP envelopes is not supported — recipient signatures cannot be regenerated externally.',
+        });
+      }
+
+      if (isRejected) {
+        throw new AppError(AppErrorCode.NOT_SETUP, {
+          message:
+            'TSP envelope rejection is not supported in V1 — rejection stamps would invalidate PAdES signatures.',
+        });
+      }
+
+      await finalizeTspEnvelopeCompletion({
+        envelope,
+        envelopeCompletedAuditLog,
+        requestMetadata,
+      });
+
+      return {
+        envelopeId: envelope.id,
+        envelopeStatus: envelope.status,
+        isRejected,
+      };
+    }
 
     // Pre-fetch all PDF data so we can read dimensions and pass it
     // to decorateAndSignPdf without fetching again.

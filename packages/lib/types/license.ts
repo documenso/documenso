@@ -11,6 +11,8 @@ export const ZLicenseClaimSchema = z.object({
   hipaa: z.boolean().optional(),
   authenticationPortal: z.boolean().optional(),
   billing: z.boolean().optional(),
+  instanceCscSigning: z.boolean().optional(),
+  cscQesSigning: z.boolean().optional(),
 });
 
 /**
@@ -42,6 +44,13 @@ export const ZLicenseResponseSchema = z.object({
 export type TLicenseClaim = z.infer<typeof ZLicenseClaimSchema>;
 export type TLicenseRequest = z.infer<typeof ZLicenseRequestSchema>;
 export type TLicenseResponse = z.infer<typeof ZLicenseResponseSchema>;
+
+/**
+ * String-literal union of every flag the licence server can grant. Adding a
+ * field to `ZLicenseClaimSchema` automatically extends this type so that
+ * `assertLicensedFor(flag)` and similar helpers stay in sync.
+ */
+export type LicenseFlag = keyof TLicenseClaim;
 
 /**
  * Schema for the cached license data stored in the file.

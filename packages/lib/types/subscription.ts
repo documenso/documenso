@@ -35,6 +35,8 @@ export const ZClaimFlagsSchema = z.object({
   allowLegacyEnvelopes: z.boolean().optional(),
 
   signingReminders: z.boolean().optional(),
+
+  cscQesSigning: z.boolean().optional(),
 });
 
 export type TClaimFlags = z.infer<typeof ZClaimFlagsSchema>;
@@ -105,6 +107,11 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   signingReminders: {
     key: 'signingReminders',
     label: 'Signing reminders',
+  },
+  cscQesSigning: {
+    key: 'cscQesSigning',
+    label: 'QES signing',
+    isEnterprise: true,
   },
 };
 
