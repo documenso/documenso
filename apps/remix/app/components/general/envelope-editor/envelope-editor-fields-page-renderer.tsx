@@ -453,16 +453,16 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     interactiveTransformer.current?.nodes(fieldGroups);
     setSelectedKonvaFieldGroups(fieldGroups);
 
-    if (fieldGroups.length === 0 || fieldGroups.length > 1) {
-      editorFields.setSelectedField(null);
-    }
+    const formIds = fieldGroups.map((group) => group.id());
 
-    // Handle single field selection.
+    // Push the full selection up to the editor-fields hook so the right
+    // sidebar can render the bulk-edit panel when more than one field is
+    // selected. setSelectedFormIds also updates the single-selectedField when
+    // exactly one is selected.
+    editorFields.setSelectedFormIds(formIds);
+
     if (fieldGroups.length === 1) {
-      const fieldGroup = fieldGroups[0];
-
-      editorFields.setSelectedField(fieldGroup.id());
-      fieldGroup.moveToTop();
+      fieldGroups[0].moveToTop();
     }
   };
 

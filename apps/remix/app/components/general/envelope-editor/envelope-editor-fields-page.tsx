@@ -46,6 +46,11 @@ import {
 import { AiFeaturesEnableDialog } from '~/components/dialogs/ai-features-enable-dialog';
 import { AiFieldDetectionDialog } from '~/components/dialogs/ai-field-detection-dialog';
 import { EnvelopeItemEditDialog } from '~/components/dialogs/envelope-item-edit-dialog';
+import {
+  type BulkUpdates,
+  EditorFieldBulkEditForm,
+  buildBulkFieldUpdate,
+} from '~/components/forms/editor/editor-field-bulk-edit-form';
 import { EditorFieldCalculatedForm } from '~/components/forms/editor/editor-field-calculated-form';
 import { EditorFieldCheckboxForm } from '~/components/forms/editor/editor-field-checkbox-form';
 import { EditorFieldDateForm } from '~/components/forms/editor/editor-field-date-form';
@@ -127,6 +132,21 @@ export const EnvelopeEditorFieldsPage = () => {
     () => structuredClone(editorFields.selectedField),
     [editorFields.selectedField],
   );
+
+  const bulkSelectedFields = useMemo(
+    () =>
+      editorFields.selectedFormIds
+        .map((formId) => editorFields.getFieldByFormId(formId))
+        .filter((field): field is NonNullable<typeof field> => Boolean(field)),
+    [editorFields.selectedFormIds, editorFields.localFields],
+  );
+
+  const isBulkEditing = bulkSelectedFields.length > 1;
+
+  const applyBulkUpdate = (update: BulkUpdates) => {
+    const formIds = bulkSelectedFields.map((field) => field.formId);
+    editorFields.updateFieldsByFormIds(formIds, (field) => buildBulkFieldUpdate(field, update));
+  };
 
   const updateSelectedFieldMeta = (fieldMeta: TFieldMetaSchema) => {
     if (!selectedField) {
@@ -456,9 +476,27 @@ export const EnvelopeEditorFieldsPage = () => {
             )}
           </section>
 
+          {/* Bulk edit section — shown when more than one field is selected. */}
+          {isBulkEditing && (
+            <section>
+              <Separator className="my-4" />
+
+              <div className="px-4">
+                <h3 className="mb-1 text-sm font-semibold text-foreground">
+                  <Trans>Bulk Edit</Trans>
+                </h3>
+                <p className="mb-3 text-xs text-muted-foreground">
+                  <Trans>{bulkSelectedFields.length} fields selected</Trans>
+                </p>
+
+                <EditorFieldBulkEditForm fields={bulkSelectedFields} onApply={applyBulkUpdate} />
+              </div>
+            </section>
+          )}
+
           {/* Field details section. */}
           <AnimateGenericFadeInOut key={editorFields.selectedField?.formId}>
-            {selectedField && (
+            {!isBulkEditing && selectedField && (
               <section>
                 <Separator className="my-4" />
 

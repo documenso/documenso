@@ -44,15 +44,25 @@ type EditorFieldsProps = {
 type UseEditorFieldsResponse = {
   localFields: TLocalField[];
 
-  // Selected field
+  // Selected field (single)
   selectedField: TLocalField | undefined;
   setSelectedField: (formId: string | null) => void;
+
+  // Selected fields (multi). Always includes the single selectedField formId
+  // when one is set, and may contain more entries when the user has bulk-selected
+  // multiple fields in the page renderer (shift-click, ctrl/cmd-click, drag-select).
+  selectedFormIds: string[];
+  setSelectedFormIds: (formIds: string[]) => void;
 
   // Field operations
   addField: (field: Omit<TLocalField, 'formId'>) => TLocalField;
   setFieldId: (formId: string, id: number) => void;
   removeFieldsByFormId: (formIds: string[]) => void;
   updateFieldByFormId: (formId: string, updates: Partial<TLocalField>) => void;
+  updateFieldsByFormIds: (
+    formIds: string[],
+    updates: (field: TLocalField) => Partial<TLocalField> | null,
+  ) => void;
   duplicateField: (field: TLocalField, recipientId?: number) => TLocalField;
   duplicateFieldToAllPages: (field: TLocalField, recipientId?: number) => TLocalField[];
 
@@ -72,6 +82,7 @@ export const useEditorFields = ({
   handleFieldsUpdate,
 }: EditorFieldsProps): UseEditorFieldsResponse => {
   const [selectedFieldFormId, setSelectedFieldFormId] = useState<string | null>(null);
+  const [selectedFormIds, setSelectedFormIdsState] = useState<string[]>([]);
   const [selectedRecipientId, setSelectedRecipientId] = useState<number | null>(null);
 
   const generateDefaultValues = (fields?: Field[]) => {
@@ -119,6 +130,7 @@ export const useEditorFields = ({
   const setSelectedField = (formId: string | null, bypassCheck = false) => {
     if (!formId) {
       setSelectedFieldFormId(null);
+      setSelectedFormIdsState((prev) => (prev.length === 0 ? prev : []));
       return;
     }
 
@@ -133,11 +145,41 @@ export const useEditorFields = ({
 
     if (bypassCheck) {
       setSelectedFieldFormId(formId);
+      setSelectedFormIdsState([formId]);
       return;
     }
 
-    setSelectedFieldFormId(foundField?.formId ?? null);
+    const resolvedFormId = foundField?.formId ?? null;
+    setSelectedFieldFormId(resolvedFormId);
+    setSelectedFormIdsState(resolvedFormId ? [resolvedFormId] : []);
   };
+
+  const setSelectedFormIds = useCallback(
+    (formIds: string[]) => {
+      // De-dupe and only retain ids that exist in localFields.
+      const validIds = Array.from(new Set(formIds)).filter((formId) =>
+        localFields.some((field) => field.formId === formId),
+      );
+
+      setSelectedFormIdsState(validIds);
+
+      if (validIds.length === 1) {
+        setSelectedFieldFormId(validIds[0]);
+
+        const foundField = localFields.find((field) => field.formId === validIds[0]);
+        const recipient = envelope.recipients.find(
+          (recipient) => recipient.id === foundField?.recipientId,
+        );
+
+        if (recipient) {
+          setSelectedRecipient(recipient.id);
+        }
+      } else {
+        setSelectedFieldFormId(null);
+      }
+    },
+    [localFields, envelope.recipients],
+  );
 
   const addField = useCallback(
     (fieldData: Omit<TLocalField, 'formId'>): TLocalField => {
@@ -196,6 +238,43 @@ export const useEditorFields = ({
           ...updatedField,
           ...restrictFieldPosValues(updatedField),
         });
+        triggerFieldsUpdate();
+      }
+    },
+    [localFields, update, triggerFieldsUpdate],
+  );
+
+  const updateFieldsByFormIds = useCallback(
+    (formIds: string[], deriveUpdates: (field: TLocalField) => Partial<TLocalField> | null) => {
+      let didUpdate = false;
+
+      for (const formId of formIds) {
+        const index = localFields.findIndex((field) => field.formId === formId);
+
+        if (index === -1) {
+          continue;
+        }
+
+        const updates = deriveUpdates(localFields[index]);
+
+        if (!updates) {
+          continue;
+        }
+
+        const updatedField = {
+          ...localFields[index],
+          ...updates,
+        };
+
+        update(index, {
+          ...updatedField,
+          ...restrictFieldPosValues(updatedField),
+        });
+
+        didUpdate = true;
+      }
+
+      if (didUpdate) {
         triggerFieldsUpdate();
       }
     },
@@ -281,6 +360,19 @@ export const useEditorFields = ({
     setSelectedFieldFormId(foundField?.formId ?? null);
   }, [selectedFieldFormId, localFields]);
 
+  /**
+   * Keep the bulk-selected form IDs in sync — drop any that no longer exist.
+   */
+  useEffect(() => {
+    setSelectedFormIdsState((prev) => {
+      const filtered = prev.filter((formId) =>
+        localFields.some((field) => field.formId === formId),
+      );
+
+      return filtered.length === prev.length ? prev : filtered;
+    });
+  }, [localFields]);
+
   const setSelectedRecipient = (recipientId: number | null) => {
     const foundRecipient = envelope.recipients.find((recipient) => recipient.id === recipientId);
 
@@ -300,6 +392,7 @@ export const useEditorFields = ({
     setFieldId,
     removeFieldsByFormId,
     updateFieldByFormId,
+    updateFieldsByFormIds,
     duplicateField,
     duplicateFieldToAllPages,
 
@@ -310,6 +403,10 @@ export const useEditorFields = ({
     // Selected field
     selectedField,
     setSelectedField,
+
+    // Selected fields (multi)
+    selectedFormIds,
+    setSelectedFormIds,
 
     // Selected recipient
     selectedRecipient,
