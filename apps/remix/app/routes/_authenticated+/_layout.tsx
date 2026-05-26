@@ -11,6 +11,7 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { AppBanner } from '~/components/general/app-banner';
+import { AppFooter } from '~/components/general/app-footer';
 import { Header } from '~/components/general/app-header';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { OrganisationBillingBanner } from '~/components/general/organisations/organisation-billing-banner';
@@ -125,6 +126,8 @@ export default function Layout({ loaderData, params, matches }: Route.ComponentP
         >
           <Outlet />
         </main>
+
+        {!hideHeader && <AppFooter />}
       </TeamProvider>
     </OrganisationProvider>
   );
