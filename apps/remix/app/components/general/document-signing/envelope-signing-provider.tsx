@@ -294,7 +294,7 @@ export const EnvelopeSigningProvider = ({
       return null;
     }
 
-    const sortedRecipients = envelope.recipients.sort((a, b) => {
+    const sortedRecipients = [...envelope.recipients].sort((a, b) => {
       // Sort by signingOrder first (nulls last), then by id
       if (a.signingOrder === null && b.signingOrder === null) {
         return a.id - b.id;
