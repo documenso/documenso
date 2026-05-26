@@ -8,7 +8,7 @@ msgstr ""
 "Language: zh\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-05-19 05:21\n"
+"PO-Revision-Date: 2026-05-22 05:21\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -1607,7 +1607,7 @@ msgstr "管理员已删除您的文档“{documentName}”。"
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "An administrator has created a Documenso account for you."
-msgstr ""
+msgstr "管理员已为你创建了一个 Documenso 账户。"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "An electronic signature provided by you on our platform, achieved through clicking through to a document and entering your name, or any other electronic signing method we provide, is legally binding. It carries the same weight and enforceability as a manual signature written with ink on paper."
@@ -3120,7 +3120,7 @@ msgstr "创建一个新的组织并使用 {planName} 套餐。保留当前组织
 
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
 msgid "Create a new user. A welcome email will be sent with a link to set their password."
-msgstr ""
+msgstr "创建新用户。系统将发送一封欢迎电子邮件，其中包含用于设置其密码的链接。"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Create a support ticket"
@@ -3282,7 +3282,7 @@ msgstr "创建令牌"
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
 msgid "Create User"
-msgstr ""
+msgstr "创建用户"
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "Create webhook"
@@ -5924,7 +5924,7 @@ msgstr "如果您在使用预发布环境，请确保已将嵌入组件的 host 
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "If you didn't expect this account or have any questions, please <0>contact support</0>."
-msgstr ""
+msgstr "如果你并未预期会收到此账户，或者有任何疑问，请<0>联系支持团队</0>。"
 
 #: packages/email/template-components/template-access-auth-2fa.tsx
 msgid "If you didn't request this verification code, you can safely ignore this email."
@@ -9300,7 +9300,7 @@ msgstr "设置密码"
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "Set Password"
-msgstr ""
+msgstr "设置密码"
 
 #: apps/remix/app/components/embed/authoring/configure-document-view.tsx
 msgid "Set up your document properties and recipient information"
@@ -9312,7 +9312,7 @@ msgstr "设置模板属性和收件人信息"
 
 #: packages/email/templates/admin-user-created.tsx
 msgid "Set your password for Documenso"
-msgstr ""
+msgstr "为 Documenso 设置您的密码"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
@@ -11273,7 +11273,7 @@ msgstr "要访问你的账号，请点击收件箱中的确认链接以验证邮
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "To get started, please set your password by clicking the button below:"
-msgstr ""
+msgstr "要开始使用，请点击下方按钮设置您的密码："
 
 #. placeholder {0}: recipient.email
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
@@ -11951,7 +11951,7 @@ msgstr "用户代理"
 
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
 msgid "User created and welcome email sent"
-msgstr ""
+msgstr "用户已创建并已发送欢迎电子邮件"
 
 #: apps/remix/app/components/forms/password.tsx
 msgid "User has no password."
@@ -12349,7 +12349,7 @@ msgstr "创建邮箱时遇到错误。请稍后重试。"
 
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
 msgid "We encountered an error while creating the user. Please try again later."
-msgstr ""
+msgstr "创建用户时遇到错误。请稍后再试。"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "We encountered an error while removing the direct template link. Please try again later."
@@ -12722,7 +12722,7 @@ msgstr "欢迎加入 {organisationName}"
 
 #: packages/lib/jobs/definitions/emails/send-admin-user-created-email.handler.ts
 msgid "Welcome to Documenso"
-msgstr ""
+msgstr "欢迎使用 Documenso"
 
 #: packages/email/template-components/template-admin-user-created.tsx
 #: packages/email/template-components/template-confirmation-email.tsx
@@ -13017,7 +13017,7 @@ msgstr "您也可以将此链接复制并粘贴到浏览器中：{confirmationLi
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "You can also copy and paste this link into your browser: {resetPasswordLink} (link expires in 24 hours)"
-msgstr ""
+msgstr "您也可以将此链接复制并粘贴到浏览器中打开：{resetPasswordLink}（链接将在 24 小时后失效）"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "You can choose to enable or disable the profile for public view."
@@ -13921,3 +13921,4 @@ msgstr "您的验证码："
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+

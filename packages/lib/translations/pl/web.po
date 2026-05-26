@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-05-19 05:21\n"
+"PO-Revision-Date: 2026-05-22 05:22\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -1607,7 +1607,7 @@ msgstr "Administrator usunął dokument „{documentName}”."
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "An administrator has created a Documenso account for you."
-msgstr ""
+msgstr "Administrator utworzył dla Ciebie konto Documenso."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "An electronic signature provided by you on our platform, achieved through clicking through to a document and entering your name, or any other electronic signing method we provide, is legally binding. It carries the same weight and enforceability as a manual signature written with ink on paper."
@@ -3120,7 +3120,7 @@ msgstr "Utwórz nową organizację z planem {planName}. Zachowaj obecną organiz
 
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
 msgid "Create a new user. A welcome email will be sent with a link to set their password."
-msgstr ""
+msgstr "Utwórz nowego użytkownika. Zostanie wysłany e‑mail powitalny z łączem do ustawienia hasła."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Create a support ticket"
@@ -3282,7 +3282,7 @@ msgstr "Utwórz token"
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
 msgid "Create User"
-msgstr ""
+msgstr "Utwórz użytkownika"
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "Create webhook"
@@ -5924,7 +5924,7 @@ msgstr "Jeśli korzystasz ze środowiska „staging”, ustaw właściwość hos
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "If you didn't expect this account or have any questions, please <0>contact support</0>."
-msgstr ""
+msgstr "Jeśli nie spodziewałeś(-aś) się tego konta lub masz jakiekolwiek pytania, <0>skontaktuj się z pomocą techniczną</0>."
 
 #: packages/email/template-components/template-access-auth-2fa.tsx
 msgid "If you didn't request this verification code, you can safely ignore this email."
@@ -9300,7 +9300,7 @@ msgstr "Ustaw hasło"
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "Set Password"
-msgstr ""
+msgstr "Ustaw hasło"
 
 #: apps/remix/app/components/embed/authoring/configure-document-view.tsx
 msgid "Set up your document properties and recipient information"
@@ -9312,7 +9312,7 @@ msgstr "Skonfiguruj właściwości szablonu i informacje o odbiorcach"
 
 #: packages/email/templates/admin-user-created.tsx
 msgid "Set your password for Documenso"
-msgstr ""
+msgstr "Ustaw swoje hasło do Documenso"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
@@ -11129,9 +11129,7 @@ msgstr "Zostanie wysłana do właściciela po zakończeniu dokumentu."
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "This will be sent to the document owner when a recipient's signing window has expired."
-msgstr ""
-"Zostanie wysłana do właściciela dokumentu, gdy minie czas na podpisanie przez odbiorcę\n"
-""
+msgstr "Zostanie wysłana do właściciela dokumentu, gdy minie czas na podpisanie przez odbiorcę\n"
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "This will check and sync the status of all email domains for this organisation"
@@ -11275,7 +11273,7 @@ msgstr "Aby uzyskać dostęp do konta, potwierdź adres e-mail, klikając na lin
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "To get started, please set your password by clicking the button below:"
-msgstr ""
+msgstr "Aby rozpocząć, ustaw swoje hasło, klikając przycisk poniżej:"
 
 #. placeholder {0}: recipient.email
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
@@ -11953,7 +11951,7 @@ msgstr "User agent"
 
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
 msgid "User created and welcome email sent"
-msgstr ""
+msgstr "Użytkownik został utworzony i wysłano wiadomość powitalną"
 
 #: apps/remix/app/components/forms/password.tsx
 msgid "User has no password."
@@ -12351,7 +12349,7 @@ msgstr "Wystąpił błąd podczas tworzenia wiadomości. Spróbuj ponownie póź
 
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
 msgid "We encountered an error while creating the user. Please try again later."
-msgstr ""
+msgstr "Wystąpił błąd podczas tworzenia użytkownika. Spróbuj ponownie później."
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "We encountered an error while removing the direct template link. Please try again later."
@@ -12724,7 +12722,7 @@ msgstr "Witaj w organizacji {organisationName}"
 
 #: packages/lib/jobs/definitions/emails/send-admin-user-created-email.handler.ts
 msgid "Welcome to Documenso"
-msgstr ""
+msgstr "Witaj w Documenso"
 
 #: packages/email/template-components/template-admin-user-created.tsx
 #: packages/email/template-components/template-confirmation-email.tsx
@@ -13019,7 +13017,7 @@ msgstr "Możesz także skopiować i wkleić link do przeglądarki: {confirmation
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "You can also copy and paste this link into your browser: {resetPasswordLink} (link expires in 24 hours)"
-msgstr ""
+msgstr "Możesz także skopiować i wkleić ten link do przeglądarki: {resetPasswordLink} (link wygaśnie za 24 godziny)"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "You can choose to enable or disable the profile for public view."
@@ -13923,3 +13921,4 @@ msgstr "Twój kod weryfikacyjny:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+

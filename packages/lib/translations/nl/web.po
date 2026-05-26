@@ -8,7 +8,7 @@ msgstr ""
 "Language: nl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-05-19 05:21\n"
+"PO-Revision-Date: 2026-05-22 05:21\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -1607,7 +1607,7 @@ msgstr "Een beheerder heeft je document \"{documentName}\" verwijderd."
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "An administrator has created a Documenso account for you."
-msgstr ""
+msgstr "Een beheerder heeft een Documenso-account voor je aangemaakt."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "An electronic signature provided by you on our platform, achieved through clicking through to a document and entering your name, or any other electronic signing method we provide, is legally binding. It carries the same weight and enforceability as a manual signature written with ink on paper."
@@ -3120,7 +3120,7 @@ msgstr "Maak een nieuwe organisatie aan met het {planName}-abonnement. Laat je h
 
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
 msgid "Create a new user. A welcome email will be sent with a link to set their password."
-msgstr ""
+msgstr "Maak een nieuwe gebruiker aan. Er wordt een welkomstmail verzonden met een link om hun wachtwoord in te stellen."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Create a support ticket"
@@ -3282,7 +3282,7 @@ msgstr "Token aanmaken"
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
 msgid "Create User"
-msgstr ""
+msgstr "Gebruiker aanmaken"
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "Create webhook"
@@ -5924,7 +5924,7 @@ msgstr "Als je staging gebruikt, zorg er dan voor dat je de host-prop op de embe
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "If you didn't expect this account or have any questions, please <0>contact support</0>."
-msgstr ""
+msgstr "Als je dit account niet had verwacht of vragen hebt, <0>neem dan contact op met support</0>."
 
 #: packages/email/template-components/template-access-auth-2fa.tsx
 msgid "If you didn't request this verification code, you can safely ignore this email."
@@ -9300,7 +9300,7 @@ msgstr "Stel een wachtwoord in"
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "Set Password"
-msgstr ""
+msgstr "Stel wachtwoord in"
 
 #: apps/remix/app/components/embed/authoring/configure-document-view.tsx
 msgid "Set up your document properties and recipient information"
@@ -9312,7 +9312,7 @@ msgstr "Stel je sjablooneigenschappen en ontvangerinformatie in"
 
 #: packages/email/templates/admin-user-created.tsx
 msgid "Set your password for Documenso"
-msgstr ""
+msgstr "Stel uw wachtwoord voor Documenso in"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
@@ -11273,7 +11273,7 @@ msgstr "Om toegang te krijgen tot je account, moet je je e‑mailadres bevestige
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "To get started, please set your password by clicking the button below:"
-msgstr ""
+msgstr "Om te beginnen, stel uw wachtwoord in door op de onderstaande knop te klikken:"
 
 #. placeholder {0}: recipient.email
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
@@ -11951,7 +11951,7 @@ msgstr "User Agent"
 
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
 msgid "User created and welcome email sent"
-msgstr ""
+msgstr "Gebruiker aangemaakt en welkomst-e-mail verzonden"
 
 #: apps/remix/app/components/forms/password.tsx
 msgid "User has no password."
@@ -12349,7 +12349,7 @@ msgstr "Er is een fout opgetreden bij het aanmaken van de e-mail. Probeer het la
 
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
 msgid "We encountered an error while creating the user. Please try again later."
-msgstr ""
+msgstr "Er is een fout opgetreden bij het aanmaken van de gebruiker. Probeer het later opnieuw."
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "We encountered an error while removing the direct template link. Please try again later."
@@ -12722,7 +12722,7 @@ msgstr "Welkom bij {organisationName}"
 
 #: packages/lib/jobs/definitions/emails/send-admin-user-created-email.handler.ts
 msgid "Welcome to Documenso"
-msgstr ""
+msgstr "Welkom bij Documenso"
 
 #: packages/email/template-components/template-admin-user-created.tsx
 #: packages/email/template-components/template-confirmation-email.tsx
@@ -13017,7 +13017,7 @@ msgstr "Je kunt deze link ook kopiëren en in je browser plakken: {confirmationL
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "You can also copy and paste this link into your browser: {resetPasswordLink} (link expires in 24 hours)"
-msgstr ""
+msgstr "U kunt deze link ook kopiëren en in uw browser plakken: {resetPasswordLink} (link verloopt over 24 uur)"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "You can choose to enable or disable the profile for public view."
@@ -13921,3 +13921,4 @@ msgstr "Uw verificatiecode:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
