@@ -21,6 +21,8 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 type EnvelopeItemToDownload = Pick<EnvelopeItem, 'id' | 'envelopeId' | 'title' | 'order'>;
 
+type DownloadVersion = 'original' | 'signed' | 'partial';
+
 type EnvelopeDownloadDialogProps = {
   envelopeId: string;
   envelopeStatus: DocumentStatus;
@@ -32,6 +34,13 @@ type EnvelopeDownloadDialogProps = {
    * If not provided, it will be assumed that the current user can access the document.
    */
   token?: string;
+
+  /**
+   * Whether the current user is permitted to download the partial (in-progress) version.
+   * Only the document owner or a managing team member should pass true.
+   */
+  canDownloadPartial?: boolean;
+
   trigger: React.ReactNode;
 };
 
@@ -40,6 +49,7 @@ export const EnvelopeDownloadDialog = ({
   envelopeStatus,
   envelopeItems: initialEnvelopeItems,
   token,
+  canDownloadPartial = false,
   trigger,
 }: EnvelopeDownloadDialogProps) => {
   const { toast } = useToast();
@@ -51,8 +61,10 @@ export const EnvelopeDownloadDialog = ({
     [envelopeItemIdAndVersion: string]: boolean;
   }>({});
 
-  const generateDownloadKey = (envelopeItemId: string, version: 'original' | 'signed') =>
+  const generateDownloadKey = (envelopeItemId: string, version: DownloadVersion) =>
     `${envelopeItemId}-${version}`;
+
+  const showPartialOption = canDownloadPartial && envelopeStatus === DocumentStatus.PENDING;
 
   const { data: envelopeItemsPayload, isLoading: isLoadingEnvelopeItems } =
     trpc.envelope.item.getManyByToken.useQuery(
@@ -68,10 +80,7 @@ export const EnvelopeDownloadDialog = ({
 
   const envelopeItems = envelopeItemsPayload?.data || [];
 
-  const onDownload = async (
-    envelopeItem: EnvelopeItemToDownload,
-    version: 'original' | 'signed',
-  ) => {
+  const onDownload = async (envelopeItem: EnvelopeItemToDownload, version: DownloadVersion) => {
     const { id: envelopeItemId } = envelopeItem;
 
     if (isDownloadingState[generateDownloadKey(envelopeItemId, version)]) {
@@ -167,7 +176,7 @@ export const EnvelopeDownloadDialog = ({
                   </p>
                 </div>
 
-                <div className="flex flex-shrink-0 items-center gap-2">
+                <div className="flex flex-shrink-0 flex-wrap items-center justify-end gap-2">
                   <Button
                     variant="outline"
                     size="sm"
@@ -180,6 +189,22 @@ export const EnvelopeDownloadDialog = ({
                     )}
                     <Trans context="Original document (adjective)">Original</Trans>
                   </Button>
+
+                  {showPartialOption && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="text-xs"
+                      onClick={async () => onDownload(item, 'partial')}
+                      loading={isDownloadingState[generateDownloadKey(item.id, 'partial')]}
+                      title={t`Includes signatures collected so far. Watermarked as a draft.`}
+                    >
+                      {!isDownloadingState[generateDownloadKey(item.id, 'partial')] && (
+                        <DownloadIcon className="mr-2 h-4 w-4" />
+                      )}
+                      <Trans context="Partially signed draft document">Partial (Draft)</Trans>
+                    </Button>
+                  )}
 
                   {envelopeStatus === DocumentStatus.COMPLETED && (
                     <Button

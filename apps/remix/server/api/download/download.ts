@@ -81,6 +81,8 @@ export const downloadRoute = new Hono<HonoEnv>()
         return await handleEnvelopeItemFileRequest({
           title: envelopeItem.title,
           status: envelopeItem.envelope.status,
+          envelopeId: envelopeItem.envelope.id,
+          envelopeItemId: envelopeItem.id,
           documentData: envelopeItem.documentData,
           version: version || 'signed',
           isDownload: true,
@@ -170,6 +172,8 @@ export const downloadRoute = new Hono<HonoEnv>()
         return await handleEnvelopeItemFileRequest({
           title: envelopeItem.title,
           status: envelope.status,
+          envelopeId: envelope.id,
+          envelopeItemId: envelopeItem.id,
           documentData: envelopeItem.documentData,
           version: version || 'signed',
           isDownload: true,

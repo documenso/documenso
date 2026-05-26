@@ -496,6 +496,7 @@ export const EnvelopeEditor = () => {
                 envelopeId={envelope.id}
                 envelopeStatus={envelope.status}
                 envelopeItems={envelope.envelopeItems}
+                canDownloadPartial={true}
                 trigger={
                   <Button
                     variant="ghost"

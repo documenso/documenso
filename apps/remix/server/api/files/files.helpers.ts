@@ -8,6 +8,7 @@ import { EnvelopeType as EnvelopeTypeEnum, TemplateType as TemplateTypeEnum } fr
 import contentDisposition from 'content-disposition';
 import { type Context } from 'hono';
 
+import { generatePartialDocumentPdf } from '@documenso/lib/server-only/pdf/generate-partial-document-pdf';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { sha256 } from '@documenso/lib/universal/crypto';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
@@ -18,12 +19,14 @@ import type { HonoEnv } from '../../router';
 type HandleEnvelopeItemFileRequestOptions = {
   title: string;
   status: DocumentStatus;
+  envelopeId: string;
+  envelopeItemId: string;
   documentData: {
     type: DocumentDataType;
     data: string;
     initialData: string;
   };
-  version: 'signed' | 'original';
+  version: 'signed' | 'original' | 'partial';
   isDownload: boolean;
   context: Context<HonoEnv>;
 };
@@ -34,11 +37,50 @@ type HandleEnvelopeItemFileRequestOptions = {
 export const handleEnvelopeItemFileRequest = async ({
   title,
   status,
+  envelopeId,
+  envelopeItemId,
   documentData,
   version,
   isDownload,
   context: c,
 }: HandleEnvelopeItemFileRequestOptions) => {
+  if (version === 'partial') {
+    if (!isDownload) {
+      return c.json({ error: 'Partial version is only available for downloads' }, 400);
+    }
+
+    if (status !== DocumentStatus.PENDING) {
+      return c.json(
+        { error: 'Partial download is only available for documents that are pending signatures' },
+        400,
+      );
+    }
+
+    const partialPdf = await generatePartialDocumentPdf({
+      envelopeId,
+      envelopeItemId,
+    }).catch((error) => {
+      console.error(error);
+
+      return null;
+    });
+
+    if (!partialPdf) {
+      return c.json({ error: 'Failed to generate partial document' }, 500);
+    }
+
+    const baseTitle = title.replace(/\.pdf$/, '');
+    const filename = `${baseTitle}_partial.pdf`;
+
+    c.header('Content-Type', 'application/pdf');
+    c.header('Content-Disposition', contentDisposition(filename));
+    c.header('Cache-Control', 'no-cache, no-store, must-revalidate');
+    c.header('Pragma', 'no-cache');
+    c.header('Expires', '0');
+
+    return c.body(partialPdf);
+  }
+
   const documentDataToUse = version === 'signed' ? documentData.data : documentData.initialData;
 
   const etag = Buffer.from(sha256(documentDataToUse)).toString('hex');

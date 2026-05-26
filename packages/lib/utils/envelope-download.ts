@@ -9,7 +9,7 @@ export type EnvelopeItemPdfUrlOptions =
       type: 'download';
       envelopeItem: Pick<EnvelopeItem, 'id' | 'envelopeId'>;
       token: string | undefined;
-      version: 'original' | 'signed';
+      version: 'original' | 'signed' | 'partial';
       presignToken?: undefined;
     }
   | {

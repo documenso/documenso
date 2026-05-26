@@ -106,6 +106,7 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
           envelopeStatus={envelope.status}
           token={recipient?.token}
           envelopeItems={envelope.envelopeItems}
+          canDownloadPartial={canManageDocument}
           trigger={
             <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
               <div>

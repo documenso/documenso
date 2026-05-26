@@ -139,6 +139,8 @@ export const filesRoute = new Hono<HonoEnv>()
       return await handleEnvelopeItemFileRequest({
         title: envelopeItem.title,
         status: envelope.status,
+        envelopeId: envelope.id,
+        envelopeItemId: envelopeItem.id,
         documentData: envelopeItem.documentData,
         version: 'signed',
         isDownload: false,
@@ -205,6 +207,8 @@ export const filesRoute = new Hono<HonoEnv>()
       return await handleEnvelopeItemFileRequest({
         title: envelopeItem.title,
         status: envelope.status,
+        envelopeId: envelope.id,
+        envelopeItemId: envelopeItem.id,
         documentData: envelopeItem.documentData,
         version,
         isDownload: true,
@@ -257,6 +261,8 @@ export const filesRoute = new Hono<HonoEnv>()
       return await handleEnvelopeItemFileRequest({
         title: envelopeItem.title,
         status: envelopeItem.envelope.status,
+        envelopeId: envelopeItem.envelope.id,
+        envelopeItemId: envelopeItem.id,
         documentData: envelopeItem.documentData,
         version: 'signed',
         isDownload: false,
@@ -309,6 +315,8 @@ export const filesRoute = new Hono<HonoEnv>()
       return await handleEnvelopeItemFileRequest({
         title: envelopeItem.title,
         status: envelopeItem.envelope.status,
+        envelopeId: envelopeItem.envelope.id,
+        envelopeItemId: envelopeItem.id,
         documentData: envelopeItem.documentData,
         version,
         isDownload: true,
