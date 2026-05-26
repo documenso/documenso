@@ -331,7 +331,7 @@ export const SignUpForm = ({
                   siteKey={turnstileSiteKey}
                   options={{
                     size: 'flexible',
-                    appearance: 'interaction-only',
+                    appearance: 'always',
                   }}
                 />
               )}
