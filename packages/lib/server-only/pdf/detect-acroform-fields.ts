@@ -94,17 +94,43 @@ export const widgetRectToPercentages = (
 type PageInfo = { index: number; width: number; height: number };
 
 /**
+ * Whether a widget rectangle lies within a page's media box (assumed to start
+ * at the origin, which holds for the overwhelming majority of forms). Used as a
+ * last-resort heuristic to place a widget whose page references cannot be
+ * resolved any other way.
+ */
+const rectWithinPageBounds = (rect: [number, number, number, number], page: PageInfo): boolean => {
+  const [x1, y1, x2, y2] = rect;
+
+  const minX = Math.min(x1, x2);
+  const minY = Math.min(y1, y2);
+  const maxX = Math.max(x1, x2);
+  const maxY = Math.max(y1, y2);
+
+  return minX >= 0 && minY >= 0 && maxX <= page.width && maxY <= page.height;
+};
+
+/**
  * Resolve the page a widget belongs to.
  *
  * The `/P` (page) entry on a widget annotation is *optional* in the PDF spec,
  * and many real-world forms (especially Acrobat-generated government forms)
  * omit it. When it is missing we fall back to the page whose `/Annots` array
  * references the widget - the same fallback `@libpdf/core` uses internally when
- * flattening. Without this, every widget lacking `/P` is silently dropped and
- * only a handful (or none) of a form's fields get detected.
+ * flattening.
+ *
+ * Some forms defeat both lookups: their widget references cannot be reconciled
+ * with the page objects (e.g. an indirect-vs-direct reference mismatch in
+ * `@libpdf/core`), so neither `/P` nor `/Annots` matches for *any* widget. The
+ * PA government forms behave this way - all 98 widgets fail to resolve and the
+ * entire form is lost. Rather than drop those fields, fall back to:
+ *   1. page 0 for a single-page document (the only page it can belong to), and
+ *   2. the page whose bounds contain the widget rect for multi-page documents,
+ *      defaulting to the first page when nothing matches.
  */
 const resolveWidgetPage = (
   widget: WidgetAnnotation,
+  pages: PageInfo[],
   pageInfoByPageRef: Map<string, PageInfo>,
   pageInfoByAnnotRef: Map<string, PageInfo>,
 ): PageInfo | undefined => {
@@ -121,7 +147,21 @@ const resolveWidgetPage = (
   const annotRef = widget.ref?.toString();
 
   if (annotRef) {
-    return pageInfoByAnnotRef.get(annotRef);
+    const info = pageInfoByAnnotRef.get(annotRef);
+
+    if (info) {
+      return info;
+    }
+  }
+
+  // Both reference lookups missed - recover the page instead of dropping the
+  // field (see the doc comment above).
+  if (pages.length === 1) {
+    return pages[0];
+  }
+
+  if (pages.length > 1) {
+    return pages.find((page) => rectWithinPageBounds(widget.rect, page)) ?? pages[0];
   }
 
   return undefined;
@@ -248,6 +288,9 @@ export const detectAcroFormFields = async (pdf: Buffer): Promise<TDetectedField[
     // Fallback lookup for widgets that omit the optional `/P` entry: map each
     // annotation reference to the page whose `/Annots` array contains it.
     const pageInfoByAnnotRef = new Map<string, PageInfo>();
+    // Ordered list of pages, used by the last-resort fallbacks in
+    // `resolveWidgetPage` when neither reference lookup matches.
+    const pages: PageInfo[] = [];
 
     for (const page of pdfDoc.getPages()) {
       const pageInfo: PageInfo = {
@@ -255,6 +298,8 @@ export const detectAcroFormFields = async (pdf: Buffer): Promise<TDetectedField[
         width: page.width,
         height: page.height,
       };
+
+      pages.push(pageInfo);
 
       if (page.ref) {
         pageInfoByPageRef.set(page.ref.toString(), pageInfo);
@@ -287,9 +332,10 @@ export const detectAcroFormFields = async (pdf: Buffer): Promise<TDetectedField[
           continue;
         }
 
-        const pageInfo = resolveWidgetPage(widget, pageInfoByPageRef, pageInfoByAnnotRef);
+        const pageInfo = resolveWidgetPage(widget, pages, pageInfoByPageRef, pageInfoByAnnotRef);
 
-        // Skip widgets we cannot associate with a page - they cannot be placed.
+        // Only unreachable when the document has no pages; keep as a guard so a
+        // widget is never placed against a missing page.
         if (!pageInfo) {
           continue;
         }
