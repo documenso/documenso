@@ -1,21 +1,21 @@
 ---
-title: V2 Authoring
+title: V2 Editor
 description: Embed envelope creation and editing directly in your application.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 
-V2 authoring components allow your users to create and edit envelopes without leaving your application. Envelopes are the unified model for documents and templates in the V2 API.
+V2 editor components allow your users to create and edit envelopes without leaving your application. Envelopes are the unified model for documents and templates in the V2 API.
 
 <Callout type="warn">
-  Embedded authoring is included with [Enterprise](https://documen.so/enterprise-cta) plans. It is
+  Embedded editor is included with [Enterprise](https://documen.so/enterprise-cta) plans. It is
   also available as a paid add-on for the [Platform Plan](https://documen.so/platform-cta-pricing).
   Contact sales for access.
 </Callout>
 
 ## Components
 
-The SDK provides two V2 authoring components:
+The SDK provides two V2 editor components:
 
 | Component              | Purpose                  |
 | ---------------------- | ------------------------ |
@@ -26,7 +26,7 @@ The SDK provides two V2 authoring components:
 
 ## Presign Tokens
 
-All authoring components require a **presign token** for authentication. See the [Authoring overview](/docs/developers/embedding/authoring) for details on obtaining presign tokens.
+All editor components require a **presign token** for authentication. See the [Editor overview](/docs/developers/embedding/editor) for details on obtaining presign tokens.
 
 <Callout type="warn">
   A presigned token is NOT an API token
@@ -100,7 +100,7 @@ const EnvelopeEditor = ({ presignToken, envelopeId }) => {
 
 ## Props
 
-### All V2 Authoring Components
+### All V2 Editor Components
 
 | Prop             | Type      | Required | Description                                              |
 | ---------------- | --------- | -------- | -------------------------------------------------------- |
@@ -113,7 +113,7 @@ const EnvelopeEditor = ({ presignToken, envelopeId }) => {
 | `language`       | `string`  | No       | Set the UI language. See [Supported Languages](https://github.com/documenso/documenso/tree/main/packages/lib/constants/locales.ts) |
 | `className`      | `string`  | No       | CSS class for the iframe                                 |
 | `user`           | `object`  | No       | Current user info. When provided, enables the "Add Myself" button in the recipients list. Object with optional `email` and `name` fields |
-| `features`       | `object`  | No       | Feature toggles for the authoring experience             |
+| `features`       | `object`  | No       | Feature toggles for the editor experience                |
 
 ### Create Component Only
 
@@ -132,7 +132,7 @@ const EnvelopeEditor = ({ presignToken, envelopeId }) => {
 
 ## Feature Toggles
 
-V2 authoring provides rich, structured feature toggles organized into sections. Pass a partial configuration to customize the authoring experience — any omitted fields will use their defaults.
+V2 editor provides rich, structured feature toggles organized into sections. Pass a partial configuration to customize the editor experience — any omitted fields will use their defaults.
 
 ```jsx
 <EmbedCreateEnvelope
@@ -160,7 +160,7 @@ V2 authoring provides rich, structured feature toggles organized into sections. 
 
 ### General
 
-Controls the overall authoring flow and UI:
+Controls the overall editor flow and UI:
 
 | Property                        | Type      | Default | Description                                      |
 | ------------------------------- | --------- | ------- | ------------------------------------------------ |
@@ -188,7 +188,7 @@ Controls envelope configuration options. Set to `null` to hide envelope settings
 
 ### Actions
 
-Controls available actions during authoring:
+Controls available actions during editing:
 
 | Property           | Type      | Default | Description              |
 | ------------------ | --------- | ------- | ------------------------ |
@@ -221,7 +221,7 @@ Controls recipient configuration options. Set to `null` to prevent any recipient
 
 ### Disabling Steps
 
-You can also disable entire steps of the authoring flow. This allows you to skip steps that are not relevant to your use case:
+You can also disable entire steps of the editor flow. This allows you to skip steps that are not relevant to your use case:
 
 ```jsx
 <EmbedCreateEnvelope
@@ -338,7 +338,7 @@ const EnvelopeManager = ({ presignToken }) => {
 
 ## See Also
 
-- [Authoring Overview](/docs/developers/embedding/authoring) - V1 vs V2 comparison and presign tokens
-- [V1 Authoring](/docs/developers/embedding/authoring/v1) - V1 document and template authoring
+- [Editor Overview](/docs/developers/embedding/editor) - V1 vs V2 comparison and presign tokens
+- [V1 Editor](/docs/developers/embedding/editor/v1) - V1 document and template editor
 - [Embedding Overview](/docs/developers/embedding) - Signing embed concepts and props
 - [CSS Variables](/docs/developers/embedding/css-variables) - Customize appearance
