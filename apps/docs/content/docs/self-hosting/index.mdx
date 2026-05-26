@@ -3,6 +3,8 @@ title: Self-Hosting
 description: Deploy and manage your own Documenso instance for complete control over your data, compliance, and customization.
 ---
 
+import { Callout } from 'fumadocs-ui/components/callout';
+
 ## Getting Started
 
 <Cards>
@@ -17,6 +19,13 @@ description: Deploy and manage your own Documenso instance for complete control 
     href="/docs/self-hosting/getting-started/quick-start"
   />
 </Cards>
+
+<Callout type="error">
+  **You must generate a signing certificate.** Documenso does not ship with one. Without a
+  certificate, the application starts normally but document signing will fail.
+
+  Please see all the [requirements](/docs/self-hosting/getting-started/requirements) before proceeding.
+</Callout>
 
 ---
 

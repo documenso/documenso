@@ -156,7 +156,7 @@ const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<
             y: 10,
           }}
         >
-          <p ref={ref} id={formMessageId} className={cn('text-red-500 text-xs', className)} {...props}>
+          <p ref={ref} id={formMessageId} className={cn('text-destructive text-xs', className)} {...props}>
             {body}
           </p>
         </motion.div>

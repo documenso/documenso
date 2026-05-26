@@ -26,8 +26,14 @@ docker --version
 
 ## Pulling the Docker Image
 
+The Documenso image is available on both DockerHub and GitHub Container Registry:
+
 ```bash
+# DockerHub
 docker pull documenso/documenso:latest
+
+# GitHub Container Registry
+docker pull ghcr.io/documenso/documenso:latest
 ```
 
 ### Available Tags
@@ -195,6 +201,14 @@ Documenso provides health check endpoints for monitoring:
 | ------------------------- | -------------------------------------------------------------- |
 | `/api/health`             | Checks database connectivity and certificate status            |
 | `/api/certificate-status` | Returns whether a signing certificate is configured and usable |
+
+Both endpoints return a JSON response with a `status` field:
+
+| Status      | Meaning                                                              |
+| ----------- | -------------------------------------------------------------------- |
+| `"ok"`      | Everything is working properly                                       |
+| `"warning"` | Application is running but there are certificate issues              |
+| `"error"`   | Critical issues (database unreachable, missing configuration, etc.)  |
 
 ### Docker Health Check
 
