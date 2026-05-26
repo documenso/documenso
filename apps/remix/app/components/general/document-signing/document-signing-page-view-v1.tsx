@@ -142,7 +142,7 @@ export const DocumentSigningPageViewV1 = ({
       return undefined;
     }
 
-    const sortedRecipients = allRecipients.sort((a, b) => {
+    const sortedRecipients = [...allRecipients].sort((a, b) => {
       // Sort by signingOrder first (nulls last), then by id
       if (a.signingOrder === null && b.signingOrder === null) {
         return a.id - b.id;
