@@ -1,10 +1,9 @@
+import { trpc } from '@documenso/trpc/react';
+import { MultiSelect, type Option } from '@documenso/ui/primitives/multiselect';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { OrganisationGroupType } from '@prisma/client';
-
-import { trpc } from '@documenso/trpc/react';
-import { MultiSelect, type Option } from '@documenso/ui/primitives/multiselect';
 
 export type OrganisationGroupOption = {
   /** Organisation group ID. */
@@ -101,12 +100,12 @@ export const OrganisationGroupsMultiSelectCombobox = ({
       hidePlaceholderWhenSelected
       delay={300}
       loadingIndicator={
-        <p className="py-4 text-center text-sm text-muted-foreground">
+        <p className="py-4 text-center text-muted-foreground text-sm">
           <Trans>Loading...</Trans>
         </p>
       }
       emptyIndicator={
-        <p className="py-4 text-center text-sm text-muted-foreground">
+        <p className="py-4 text-center text-muted-foreground text-sm">
           <Trans>No groups found</Trans>
         </p>
       }

@@ -1,8 +1,7 @@
-import type { DocumentSource, DocumentStatus, Envelope, EnvelopeType } from '@prisma/client';
-import type { Expression, ExpressionBuilder, SelectQueryBuilder, SqlBool } from 'kysely';
-
 import { kyselyPrisma, prisma, sql } from '@documenso/prisma';
 import type { DB } from '@documenso/prisma/generated/types';
+import type { DocumentSource, DocumentStatus, Envelope, EnvelopeType } from '@prisma/client';
+import type { Expression, ExpressionBuilder, SelectQueryBuilder, SqlBool } from 'kysely';
 
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import type { FindResultResponse } from '../../types/search-params';
@@ -133,9 +132,7 @@ export const findEnvelopes = async ({
 
   // Folder filter
   qb =
-    folderId !== undefined
-      ? qb.where('Envelope.folderId', '=', folderId)
-      : qb.where('Envelope.folderId', 'is', null);
+    folderId !== undefined ? qb.where('Envelope.folderId', '=', folderId) : qb.where('Envelope.folderId', 'is', null);
 
   // Exclude soft-deleted envelopes
   qb = qb.where('Envelope.deletedAt', 'is', null);
@@ -223,10 +220,7 @@ export const findEnvelopes = async ({
 
   const offset = Math.max(page - 1, 0) * perPage;
 
-  const dataQuery = qb
-    .orderBy(`Envelope.${orderByColumn}`, orderByDirection)
-    .limit(perPage)
-    .offset(offset);
+  const dataQuery = qb.orderBy(`Envelope.${orderByColumn}`, orderByDirection).limit(perPage).offset(offset);
 
   // Count query: either windowed (fast, capped) or full (exact, for API consumers).
   const baseCountQuery = qb.clearSelect().select('Envelope.id');
@@ -239,10 +233,7 @@ export const findEnvelopes = async ({
         .selectFrom(baseCountQuery.as('filtered'))
         .select(({ fn }) => fn.count<number>('id').as('total'));
 
-  const [dataResult, countResult] = await Promise.all([
-    dataQuery.execute(),
-    countQuery.executeTakeFirstOrThrow(),
-  ]);
+  const [dataResult, countResult] = await Promise.all([dataQuery.execute(), countQuery.executeTakeFirstOrThrow()]);
 
   const ids = dataResult.map((row) => row.id);
 

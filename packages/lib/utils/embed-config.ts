@@ -21,9 +21,7 @@ export function buildEmbeddedEditorOptions(
   };
 }
 
-export const buildEmbeddedFeatures = (
-  features: DeepPartial<EnvelopeEditorConfig>,
-): EnvelopeEditorConfig => {
+export const buildEmbeddedFeatures = (features: DeepPartial<EnvelopeEditorConfig>): EnvelopeEditorConfig => {
   return {
     general: {
       allowConfigureEnvelopeTitle:
@@ -33,14 +31,10 @@ export const buildEmbeddedFeatures = (
         features.general?.allowUploadAndRecipientStep ??
         DEFAULT_EMBEDDED_EDITOR_CONFIG.general.allowUploadAndRecipientStep,
       allowAddFieldsStep:
-        features.general?.allowAddFieldsStep ??
-        DEFAULT_EMBEDDED_EDITOR_CONFIG.general.allowAddFieldsStep,
-      allowPreviewStep:
-        features.general?.allowPreviewStep ??
-        DEFAULT_EMBEDDED_EDITOR_CONFIG.general.allowPreviewStep,
+        features.general?.allowAddFieldsStep ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.general.allowAddFieldsStep,
+      allowPreviewStep: features.general?.allowPreviewStep ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.general.allowPreviewStep,
       minimizeLeftSidebar:
-        features.general?.minimizeLeftSidebar ??
-        DEFAULT_EMBEDDED_EDITOR_CONFIG.general.minimizeLeftSidebar,
+        features.general?.minimizeLeftSidebar ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.general.minimizeLeftSidebar,
     },
 
     settings:
@@ -80,25 +74,15 @@ export const buildEmbeddedFeatures = (
         : null,
 
     actions: {
-      allowAttachments:
-        features.actions?.allowAttachments ??
-        DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowAttachments,
+      allowAttachments: features.actions?.allowAttachments ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowAttachments,
       allowDistributing:
-        features.actions?.allowDistributing ??
-        DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowDistributing,
-      allowDirectLink:
-        features.actions?.allowDirectLink ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowDirectLink,
-      allowDuplication:
-        features.actions?.allowDuplication ??
-        DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowDuplication,
+        features.actions?.allowDistributing ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowDistributing,
+      allowDirectLink: features.actions?.allowDirectLink ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowDirectLink,
+      allowDuplication: features.actions?.allowDuplication ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowDuplication,
       allowSaveAsTemplate:
-        features.actions?.allowSaveAsTemplate ??
-        DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowSaveAsTemplate,
-      allowDownloadPDF:
-        features.actions?.allowDownloadPDF ??
-        DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowDownloadPDF,
-      allowDeletion:
-        features.actions?.allowDeletion ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowDeletion,
+        features.actions?.allowSaveAsTemplate ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowSaveAsTemplate,
+      allowDownloadPDF: features.actions?.allowDownloadPDF ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowDownloadPDF,
+      allowDeletion: features.actions?.allowDeletion ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.actions.allowDeletion,
     },
 
     envelopeItems:
@@ -111,14 +95,11 @@ export const buildEmbeddedFeatures = (
               features.envelopeItems?.allowConfigureOrder ??
               DEFAULT_EMBEDDED_EDITOR_CONFIG.envelopeItems.allowConfigureOrder,
             allowUpload:
-              features.envelopeItems?.allowUpload ??
-              DEFAULT_EMBEDDED_EDITOR_CONFIG.envelopeItems.allowUpload,
+              features.envelopeItems?.allowUpload ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.envelopeItems.allowUpload,
             allowDelete:
-              features.envelopeItems?.allowDelete ??
-              DEFAULT_EMBEDDED_EDITOR_CONFIG.envelopeItems.allowDelete,
+              features.envelopeItems?.allowDelete ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.envelopeItems.allowDelete,
             allowReplace:
-              features.envelopeItems?.allowReplace ??
-              DEFAULT_EMBEDDED_EDITOR_CONFIG.envelopeItems.allowReplace,
+              features.envelopeItems?.allowReplace ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.envelopeItems.allowReplace,
           }
         : null,
 
@@ -126,8 +107,7 @@ export const buildEmbeddedFeatures = (
       features.recipients !== null
         ? {
             allowAIDetection:
-              features.recipients?.allowAIDetection ??
-              DEFAULT_EMBEDDED_EDITOR_CONFIG.recipients.allowAIDetection,
+              features.recipients?.allowAIDetection ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.recipients.allowAIDetection,
             allowConfigureSigningOrder:
               features.recipients?.allowConfigureSigningOrder ??
               DEFAULT_EMBEDDED_EDITOR_CONFIG.recipients.allowConfigureSigningOrder,
@@ -135,23 +115,18 @@ export const buildEmbeddedFeatures = (
               features.recipients?.allowConfigureDictateNextSigner ??
               DEFAULT_EMBEDDED_EDITOR_CONFIG.recipients.allowConfigureDictateNextSigner,
             allowApproverRole:
-              features.recipients?.allowApproverRole ??
-              DEFAULT_EMBEDDED_EDITOR_CONFIG.recipients.allowApproverRole,
+              features.recipients?.allowApproverRole ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.recipients.allowApproverRole,
             allowViewerRole:
-              features.recipients?.allowViewerRole ??
-              DEFAULT_EMBEDDED_EDITOR_CONFIG.recipients.allowViewerRole,
+              features.recipients?.allowViewerRole ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.recipients.allowViewerRole,
             allowCCerRole:
-              features.recipients?.allowCCerRole ??
-              DEFAULT_EMBEDDED_EDITOR_CONFIG.recipients.allowCCerRole,
+              features.recipients?.allowCCerRole ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.recipients.allowCCerRole,
             allowAssistantRole:
-              features.recipients?.allowAssistantRole ??
-              DEFAULT_EMBEDDED_EDITOR_CONFIG.recipients.allowAssistantRole,
+              features.recipients?.allowAssistantRole ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.recipients.allowAssistantRole,
           }
         : null,
 
     fields: {
-      allowAIDetection:
-        features.fields?.allowAIDetection ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.fields.allowAIDetection,
+      allowAIDetection: features.fields?.allowAIDetection ?? DEFAULT_EMBEDDED_EDITOR_CONFIG.fields.allowAIDetection,
     },
   };
 };

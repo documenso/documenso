@@ -7,9 +7,5 @@ export const ZDeleteAdminOrganisationMemberRequestSchema = z.object({
 
 export const ZDeleteAdminOrganisationMemberResponseSchema = z.void();
 
-export type TDeleteAdminOrganisationMemberRequest = z.infer<
-  typeof ZDeleteAdminOrganisationMemberRequestSchema
->;
-export type TDeleteAdminOrganisationMemberResponse = z.infer<
-  typeof ZDeleteAdminOrganisationMemberResponseSchema
->;
+export type TDeleteAdminOrganisationMemberRequest = z.infer<typeof ZDeleteAdminOrganisationMemberRequestSchema>;
+export type TDeleteAdminOrganisationMemberResponse = z.infer<typeof ZDeleteAdminOrganisationMemberResponseSchema>;

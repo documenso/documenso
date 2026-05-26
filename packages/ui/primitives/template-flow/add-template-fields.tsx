@@ -1,5 +1,30 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
+import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
+import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
+import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
+import { getPdfPagesCount, PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
+import { type TFieldMetaSchema as FieldMeta, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import type { TRecipientLite } from '@documenso/lib/types/recipient';
+import { nanoid } from '@documenso/lib/universal/id';
+import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
+import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
+import { cn } from '@documenso/ui/lib/utils';
+import { Button } from '@documenso/ui/primitives/button';
+import { Card, CardContent } from '@documenso/ui/primitives/card';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@documenso/ui/primitives/command';
+import {
+  DocumentFlowFormContainerActions,
+  DocumentFlowFormContainerContent,
+  DocumentFlowFormContainerFooter,
+  DocumentFlowFormContainerHeader,
+  DocumentFlowFormContainerStep,
+} from '@documenso/ui/primitives/document-flow/document-flow-root';
+import { FieldItem } from '@documenso/ui/primitives/document-flow/field-item';
+import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
+import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/types';
+import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -18,55 +43,16 @@ import {
   Type,
   User,
 } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
-
-import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
-import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
-import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
-import { PDF_VIEWER_PAGE_SELECTOR, getPdfPagesCount } from '@documenso/lib/constants/pdf-viewer';
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
-import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
-import {
-  type TFieldMetaSchema as FieldMeta,
-  ZFieldMetaSchema,
-} from '@documenso/lib/types/field-meta';
-import type { TRecipientLite } from '@documenso/lib/types/recipient';
-import { nanoid } from '@documenso/lib/universal/id';
-import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
-import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from '@documenso/ui/primitives/command';
-import {
-  DocumentFlowFormContainerActions,
-  DocumentFlowFormContainerContent,
-  DocumentFlowFormContainerFooter,
-  DocumentFlowFormContainerHeader,
-  DocumentFlowFormContainerStep,
-} from '@documenso/ui/primitives/document-flow/document-flow-root';
-import { FieldItem } from '@documenso/ui/primitives/document-flow/field-item';
-import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/types';
-import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { getRecipientColorStyles } from '../../lib/recipient-colors';
 import type { FieldFormType } from '../document-flow/add-fields';
 import { FieldAdvancedSettings } from '../document-flow/field-item-advanced-settings';
 import { Form } from '../form/form';
 import { useStep } from '../stepper';
-import {
-  type TAddTemplateFieldsFormSchema,
-  ZAddTemplateFieldsFormSchema,
-} from './add-template-fields.types';
+import { type TAddTemplateFieldsFormSchema, ZAddTemplateFieldsFormSchema } from './add-template-fields.types';
 
 const MIN_HEIGHT_PX = 12;
 const MIN_WIDTH_PX = 36;
@@ -99,12 +85,8 @@ export const AddTemplateFieldsFormPartial = ({
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [currentField, setCurrentField] = useState<FieldFormType>();
   const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
-  const [lastActiveField, setLastActiveField] = useState<
-    TAddTemplateFieldsFormSchema['fields'][0] | null
-  >(null);
-  const [fieldClipboard, setFieldClipboard] = useState<
-    TAddTemplateFieldsFormSchema['fields'][0] | null
-  >(null);
+  const [lastActiveField, setLastActiveField] = useState<TAddTemplateFieldsFormSchema['fields'][0] | null>(null);
+  const [fieldClipboard, setFieldClipboard] = useState<TAddTemplateFieldsFormSchema['fields'][0] | null>(null);
 
   const form = useForm<TAddTemplateFieldsFormSchema>({
     defaultValues: {
@@ -118,10 +100,8 @@ export const AddTemplateFieldsFormPartial = ({
         pageWidth: Number(field.width),
         pageHeight: Number(field.height),
         recipientId: field.recipientId ?? -1,
-        signerEmail:
-          recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
-        signerToken:
-          recipients.find((recipient) => recipient.id === field.recipientId)?.token ?? '',
+        signerEmail: recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
+        signerToken: recipients.find((recipient) => recipient.id === field.recipientId)?.token ?? '',
         fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
       })),
     },
@@ -223,15 +203,7 @@ export const AddTemplateFieldsFormPartial = ({
         });
       }
     },
-    [
-      append,
-      lastActiveField,
-      selectedSigner?.email,
-      selectedSigner?.id,
-      selectedSigner?.token,
-      toast,
-      handleAutoSave,
-    ],
+    [append, lastActiveField, selectedSigner?.email, selectedSigner?.id, selectedSigner?.token, toast, handleAutoSave],
   );
 
   const onFieldPaste = useCallback(
@@ -255,14 +227,7 @@ export const AddTemplateFieldsFormPartial = ({
         void handleAutoSave();
       }
     },
-    [
-      append,
-      fieldClipboard,
-      selectedSigner?.email,
-      selectedSigner?.id,
-      selectedSigner?.token,
-      handleAutoSave,
-    ],
+    [append, fieldClipboard, selectedSigner?.email, selectedSigner?.id, selectedSigner?.token, handleAutoSave],
   );
 
   useHotkeys(['ctrl+c', 'meta+c'], (evt) => onFieldCopy(evt));
@@ -298,8 +263,7 @@ export const AddTemplateFieldsFormPartial = ({
     [localFields],
   );
 
-  const hasErrors =
-    emptyCheckboxFields.length > 0 || emptyRadioFields.length > 0 || emptySelectFields.length > 0;
+  const hasErrors = emptyCheckboxFields.length > 0 || emptyRadioFields.length > 0 || emptySelectFields.length > 0;
 
   const [isFieldWithinBounds, setIsFieldWithinBounds] = useState(false);
   const [coords, setCoords] = useState({
@@ -315,12 +279,7 @@ export const AddTemplateFieldsFormPartial = ({
   const onMouseMove = useCallback(
     (event: MouseEvent) => {
       setIsFieldWithinBounds(
-        isWithinPageBounds(
-          event,
-          PDF_VIEWER_PAGE_SELECTOR,
-          fieldBounds.current.width,
-          fieldBounds.current.height,
-        ),
+        isWithinPageBounds(event, PDF_VIEWER_PAGE_SELECTOR, fieldBounds.current.width, fieldBounds.current.height),
       );
 
       setCoords({
@@ -341,12 +300,7 @@ export const AddTemplateFieldsFormPartial = ({
 
       if (
         !$page ||
-        !isWithinPageBounds(
-          event,
-          PDF_VIEWER_PAGE_SELECTOR,
-          fieldBounds.current.width,
-          fieldBounds.current.height,
-        )
+        !isWithinPageBounds(event, PDF_VIEWER_PAGE_SELECTOR, fieldBounds.current.width, fieldBounds.current.height)
       ) {
         setSelectedField(null);
         return;
@@ -406,12 +360,7 @@ export const AddTemplateFieldsFormPartial = ({
         return;
       }
 
-      const {
-        x: pageX,
-        y: pageY,
-        width: pageWidth,
-        height: pageHeight,
-      } = getFieldPosition($page, node);
+      const { x: pageX, y: pageY, width: pageWidth, height: pageHeight } = getFieldPosition($page, node);
 
       update(index, {
         ...field,
@@ -509,23 +458,18 @@ export const AddTemplateFieldsFormPartial = ({
 
   useEffect(() => {
     const recipientsByRoleToDisplay = recipients.filter(
-      (recipient) =>
-        recipient.role !== RecipientRole.CC && recipient.role !== RecipientRole.ASSISTANT,
+      (recipient) => recipient.role !== RecipientRole.CC && recipient.role !== RecipientRole.ASSISTANT,
     );
 
     setSelectedSigner(
-      recipientsByRoleToDisplay.find((r) => r.sendStatus !== SendStatus.SENT) ??
-        recipientsByRoleToDisplay[0],
+      recipientsByRoleToDisplay.find((r) => r.sendStatus !== SendStatus.SENT) ?? recipientsByRoleToDisplay[0],
     );
   }, [recipients]);
 
   const recipientsByRoleToDisplay = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     return (Object.entries(recipientsByRole) as [RecipientRole, TRecipientLite[]][]).filter(
-      ([role]) =>
-        role !== RecipientRole.CC &&
-        role !== RecipientRole.VIEWER &&
-        role !== RecipientRole.ASSISTANT,
+      ([role]) => role !== RecipientRole.CC && role !== RecipientRole.VIEWER && role !== RecipientRole.ASSISTANT,
     );
   }, [recipientsByRole]);
 
@@ -558,10 +502,7 @@ export const AddTemplateFieldsFormPartial = ({
       {showAdvancedSettings && currentField ? (
         <FieldAdvancedSettings
           title={msg`Advanced settings`}
-          description={msg`Configure the ${parseMessageDescriptor(
-            _,
-            FRIENDLY_FIELD_TYPE[currentField.type],
-          )} field`}
+          description={msg`Configure the ${parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[currentField.type])} field`}
           field={currentField}
           fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
@@ -573,16 +514,13 @@ export const AddTemplateFieldsFormPartial = ({
         />
       ) : (
         <>
-          <DocumentFlowFormContainerHeader
-            title={documentFlow.title}
-            description={documentFlow.description}
-          />
+          <DocumentFlowFormContainerHeader title={documentFlow.title} description={documentFlow.description} />
           <DocumentFlowFormContainerContent>
             <div className="flex flex-col">
               {selectedField && (
                 <div
                   className={cn(
-                    'dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white text-muted-foreground ring-2 transition duration-200 [container-type:size]',
+                    'pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white text-muted-foreground ring-2 transition duration-200 [container-type:size] dark:text-muted-background',
                     selectedSignerStyles?.base,
                     {
                       '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
@@ -651,26 +589,22 @@ export const AddTemplateFieldsFormPartial = ({
                     variant="outline"
                     role="combobox"
                     className={cn(
-                      'mb-12 mt-2 justify-between bg-background font-normal text-muted-foreground hover:text-foreground',
+                      'mt-2 mb-12 justify-between bg-background font-normal text-muted-foreground hover:text-foreground',
                       selectedSignerStyles?.comboBoxTrigger,
                     )}
                   >
-                    {selectedSigner?.email &&
-                      !isTemplateRecipientEmailPlaceholder(selectedSigner.email) && (
-                        <span className="flex-1 truncate text-left">
-                          {selectedSigner?.name} ({selectedSigner?.email})
-                        </span>
-                      )}
+                    {selectedSigner?.email && !isTemplateRecipientEmailPlaceholder(selectedSigner.email) && (
+                      <span className="flex-1 truncate text-left">
+                        {selectedSigner?.name} ({selectedSigner?.email})
+                      </span>
+                    )}
 
-                    {selectedSigner?.email &&
-                      isTemplateRecipientEmailPlaceholder(selectedSigner.email) && (
-                        <span className="flex-1 truncate text-left">{selectedSigner?.name}</span>
-                      )}
+                    {selectedSigner?.email && isTemplateRecipientEmailPlaceholder(selectedSigner.email) && (
+                      <span className="flex-1 truncate text-left">{selectedSigner?.name}</span>
+                    )}
 
                     {!selectedSigner?.email && (
-                      <span className="gradie flex-1 truncate text-left">
-                        No recipient selected
-                      </span>
+                      <span className="gradie flex-1 truncate text-left">No recipient selected</span>
                     )}
 
                     <ChevronsUpDown className="ml-2 h-4 w-4" />
@@ -690,14 +624,14 @@ export const AddTemplateFieldsFormPartial = ({
                     {/* Note: This is duplicated in `add-fields.tsx` */}
                     {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
                       <CommandGroup key={roleIndex}>
-                        <div className="mb-1 ml-2 mt-2 text-xs font-medium text-muted-foreground">
+                        <div className="mt-2 mb-1 ml-2 font-medium text-muted-foreground text-xs">
                           {_(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
                         </div>
 
                         {roleRecipients.length === 0 && (
                           <div
                             key={`${role}-empty`}
-                            className="px-4 pb-4 pt-2.5 text-center text-xs text-muted-foreground/80"
+                            className="px-4 pt-2.5 pb-4 text-center text-muted-foreground/80 text-xs"
                           >
                             <Trans>No recipients with this role</Trans>
                           </div>
@@ -708,9 +642,7 @@ export const AddTemplateFieldsFormPartial = ({
                             key={recipient.id}
                             className={cn(
                               'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
-                              getRecipientColorStyles(
-                                recipients.findIndex((r) => r.id === recipient.id),
-                              )?.comboBoxItem,
+                              getRecipientColorStyles(recipients.findIndex((r) => r.id === recipient.id))?.comboBoxItem,
                             )}
                             onSelect={() => {
                               setSelectedSigner(recipient);
@@ -722,22 +654,19 @@ export const AddTemplateFieldsFormPartial = ({
                                 'text-foreground/80': recipient === selectedSigner,
                               })}
                             >
-                              {recipient.name &&
-                                !isTemplateRecipientEmailPlaceholder(recipient.email) && (
-                                  <span title={`${recipient.name} (${recipient.email})`}>
-                                    {recipient.name} ({recipient.email})
-                                  </span>
-                                )}
+                              {recipient.name && !isTemplateRecipientEmailPlaceholder(recipient.email) && (
+                                <span title={`${recipient.name} (${recipient.email})`}>
+                                  {recipient.name} ({recipient.email})
+                                </span>
+                              )}
 
-                              {recipient.name &&
-                                isTemplateRecipientEmailPlaceholder(recipient.email) && (
-                                  <span title={recipient.name}>{recipient.name}</span>
-                                )}
+                              {recipient.name && isTemplateRecipientEmailPlaceholder(recipient.email) && (
+                                <span title={recipient.name}>{recipient.name}</span>
+                              )}
 
-                              {!recipient.name &&
-                                !isTemplateRecipientEmailPlaceholder(recipient.email) && (
-                                  <span title={recipient.email}>{recipient.email}</span>
-                                )}
+                              {!recipient.name && !isTemplateRecipientEmailPlaceholder(recipient.email) && (
+                                <span title={recipient.email}>{recipient.email}</span>
+                              )}
                             </span>
                           </CommandItem>
                         ))}
@@ -766,7 +695,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 font-signature text-lg font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal font-signature text-lg text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <Trans>Signature</Trans>
@@ -791,7 +720,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
                             )}
                           >
                             <Contact className="h-4 w-4" />
@@ -817,7 +746,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
                             )}
                           >
                             <Mail className="h-4 w-4" />
@@ -843,7 +772,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
                             )}
                           >
                             <User className="h-4 w-4" />
@@ -869,7 +798,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
                             )}
                           >
                             <CalendarDays className="h-4 w-4" />
@@ -895,7 +824,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
                             )}
                           >
                             <Type className="h-4 w-4" />
@@ -921,7 +850,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
                             )}
                           >
                             <Hash className="h-4 w-4" />
@@ -947,7 +876,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
                             )}
                           >
                             <Disc className="h-4 w-4" />
@@ -973,7 +902,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
                             )}
                           >
                             <CheckSquare className="h-4 w-4" />
@@ -999,7 +928,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
                             )}
                           >
                             <ChevronDown className="h-4 w-4" />
@@ -1015,14 +944,10 @@ export const AddTemplateFieldsFormPartial = ({
               {hasErrors && (
                 <div className="mt-4">
                   <ul>
-                    <li className="text-sm text-red-500">
+                    <li className="text-red-500 text-sm">
                       <Trans>
                         To proceed further, please set at least one value for the{' '}
-                        {emptyCheckboxFields.length > 0
-                          ? 'Checkbox'
-                          : emptyRadioFields.length > 0
-                            ? 'Radio'
-                            : 'Select'}{' '}
+                        {emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'}{' '}
                         field.
                       </Trans>
                     </li>

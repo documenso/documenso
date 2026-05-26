@@ -1,7 +1,7 @@
+import type { ServerResponse } from 'node:http';
 import { TRPCError } from '@trpc/server';
 import type { FetchHandlerOptions } from '@trpc/server/adapters/fetch';
-import type { ServerResponse } from 'node:http';
-import { type OpenApiRouter, createOpenApiNodeHttpHandler } from 'trpc-to-openapi';
+import { createOpenApiNodeHttpHandler, type OpenApiRouter } from 'trpc-to-openapi';
 
 const CONTENT_TYPE_JSON = 'application/json';
 const CONTENT_TYPE_URLENCODED = 'application/x-www-form-urlencoded';

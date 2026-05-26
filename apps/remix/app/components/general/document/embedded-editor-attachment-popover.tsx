@@ -1,27 +1,19 @@
-import { useState } from 'react';
-
+import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
+import { nanoid } from '@documenso/lib/universal/id';
+import { cn } from '@documenso/ui/lib/utils';
+import { Button } from '@documenso/ui/primitives/button';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@documenso/ui/primitives/form/form';
+import { Input } from '@documenso/ui/primitives/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Paperclip, Plus, X } from 'lucide-react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
-import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
-import { nanoid } from '@documenso/lib/universal/id';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type EmbeddedEditorAttachmentPopoverProps = {
   buttonClassName?: string;
@@ -110,7 +102,7 @@ export const EmbeddedEditorAttachmentPopover = ({
             <h4 className="font-medium">
               <Trans>Attachments</Trans>
             </h4>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-1 text-muted-foreground text-sm">
               <Trans>Add links to relevant documents or resources.</Trans>
             </p>
           </div>
@@ -123,12 +115,12 @@ export const EmbeddedEditorAttachmentPopover = ({
                   className="flex items-center justify-between rounded-md border border-border p-2"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{attachment.label}</p>
+                    <p className="truncate font-medium text-sm">{attachment.label}</p>
                     <a
                       href={attachment.data}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="truncate text-xs text-muted-foreground underline hover:text-foreground"
+                      className="truncate text-muted-foreground text-xs underline hover:text-foreground"
                     >
                       {attachment.data}
                     </a>
@@ -148,12 +140,7 @@ export const EmbeddedEditorAttachmentPopover = ({
           )}
 
           {!isAdding && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full"
-              onClick={() => setIsAdding(true)}
-            >
+            <Button variant="outline" size="sm" className="w-full" onClick={() => setIsAdding(true)}>
               <Plus className="mr-2 h-4 w-4" />
               <Trans>Add Attachment</Trans>
             </Button>

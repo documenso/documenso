@@ -1,18 +1,14 @@
-import { OrganisationGroupType, TeamMemberRole } from '@prisma/client';
-import { match } from 'ts-pattern';
-
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getMemberRoles } from '@documenso/lib/server-only/team/get-member-roles';
 import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { buildTeamWhereQuery, isTeamRoleWithinUserHierarchy } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
+import { OrganisationGroupType, TeamMemberRole } from '@prisma/client';
+import { match } from 'ts-pattern';
 
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZCreateTeamMembersRequestSchema,
-  ZCreateTeamMembersResponseSchema,
-} from './create-team-members.types';
+import { ZCreateTeamMembersRequestSchema, ZCreateTeamMembersResponseSchema } from './create-team-members.types';
 
 export const createTeamMembersRoute = authenticatedProcedure
   .input(ZCreateTeamMembersRequestSchema)
@@ -44,11 +40,7 @@ type CreateTeamMembersOptions = {
   }[];
 };
 
-export const createTeamMembers = async ({
-  userId,
-  teamId,
-  membersToCreate,
-}: CreateTeamMembersOptions) => {
+export const createTeamMembers = async ({ userId, teamId, membersToCreate }: CreateTeamMembersOptions) => {
   const team = await prisma.team.findFirst({
     where: buildTeamWhereQuery({
       teamId,
@@ -136,11 +128,7 @@ export const createTeamMembers = async ({
     },
   });
 
-  if (
-    !membersToCreate.every((member) =>
-      isTeamRoleWithinUserHierarchy(currentUserTeamRole, member.teamRole),
-    )
-  ) {
+  if (!membersToCreate.every((member) => isTeamRoleWithinUserHierarchy(currentUserTeamRole, member.teamRole))) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'Cannot add a member with a role higher than your own',
     });
@@ -176,14 +164,11 @@ export const createTeamMembers = async ({
   });
 
   const existingPairs = new Set(
-    existingTeamGroupMemberships.map(
-      ({ organisationMemberId, groupId }) => `${organisationMemberId}:${groupId}`,
-    ),
+    existingTeamGroupMemberships.map(({ organisationMemberId, groupId }) => `${organisationMemberId}:${groupId}`),
   );
 
   const filteredMembersToCreate = membersToCreate.filter(
-    (member) =>
-      !existingPairs.has(`${member.organisationMemberId}:${teamRoleGroupId(member.teamRole)}`),
+    (member) => !existingPairs.has(`${member.organisationMemberId}:${teamRoleGroupId(member.teamRole)}`),
   );
 
   if (filteredMembersToCreate.length === 0) {

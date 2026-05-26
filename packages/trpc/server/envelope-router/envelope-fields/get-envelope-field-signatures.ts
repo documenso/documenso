@@ -1,8 +1,7 @@
-import { FieldType } from '@prisma/client';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { prisma } from '@documenso/prisma';
+import { FieldType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../../trpc';
 import {

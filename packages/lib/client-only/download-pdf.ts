@@ -32,12 +32,7 @@ const versionToFilenameSuffix = (version: DocumentVersion): string => {
   }
 };
 
-export const downloadPDF = async ({
-  envelopeItem,
-  token,
-  fileName,
-  version = 'signed',
-}: DownloadPDFProps) => {
+export const downloadPDF = async ({ envelopeItem, token, fileName, version = 'signed' }: DownloadPDFProps) => {
   const downloadUrl = getEnvelopeItemPdfUrl({
     type: 'download',
     envelopeItem: envelopeItem,

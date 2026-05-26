@@ -1,3 +1,13 @@
+import { authClient } from '@documenso/auth/client';
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
+import { AppError } from '@documenso/lib/errors/app-error';
+import { zEmail } from '@documenso/lib/utils/zod';
+import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
+import { Button } from '@documenso/ui/primitives/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
+import { Input } from '@documenso/ui/primitives/input';
+import { PasswordInput } from '@documenso/ui/primitives/password-input';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -5,24 +15,6 @@ import { Trans } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
-
-import { authClient } from '@documenso/auth/client';
-import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
-import { AppError } from '@documenso/lib/errors/app-error';
-import { zEmail } from '@documenso/lib/utils/zod';
-import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
-import { Button } from '@documenso/ui/primitives/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { PasswordInput } from '@documenso/ui/primitives/password-input';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { SIGNUP_ERROR_MESSAGES } from '~/components/forms/signup';
 
@@ -34,10 +26,7 @@ export type ClaimAccountProps = {
 
 export const ZClaimAccountFormSchema = z
   .object({
-    name: z
-      .string()
-      .trim()
-      .min(1, { message: msg`Please enter a valid name.`.id }),
+    name: z.string().trim().min(1, { message: msg`Please enter a valid name.`.id }),
     email: zEmail().min(1),
     password: ZPasswordSchema,
   })
@@ -91,8 +80,7 @@ export const ClaimAccount = ({ defaultName, defaultEmail }: ClaimAccountProps) =
     } catch (err) {
       const error = AppError.parseError(err);
 
-      const errorMessage =
-        SIGNUP_ERROR_MESSAGES[error.code] ?? SIGNUP_ERROR_MESSAGES.INVALID_REQUEST;
+      const errorMessage = SIGNUP_ERROR_MESSAGES[error.code] ?? SIGNUP_ERROR_MESSAGES.INVALID_REQUEST;
 
       toast({
         title: _(msg`An error occurred`),

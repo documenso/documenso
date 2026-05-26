@@ -1,14 +1,10 @@
+import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
+import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
 import { EnvelopeType } from '@prisma/client';
 import { match } from 'ts-pattern';
 
-import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
-import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
-
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZSetEnvelopeFieldsRequestSchema,
-  ZSetEnvelopeFieldsResponseSchema,
-} from './set-envelope-fields.types';
+import { ZSetEnvelopeFieldsRequestSchema, ZSetEnvelopeFieldsResponseSchema } from './set-envelope-fields.types';
 
 // Note: This is intended to always be an internal route.
 export const setEnvelopeFieldsRoute = authenticatedProcedure

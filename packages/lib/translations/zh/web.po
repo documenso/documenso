@@ -8,7 +8,7 @@ msgstr ""
 "Language: zh\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-05-07 05:08\n"
+"PO-Revision-Date: 2026-05-13 06:46\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -61,6 +61,12 @@ msgstr "“{title}”已成功隐藏"
 msgid "\"Team Name\" has invited you to sign \"example document\"."
 msgstr "“Team Name”已邀请您签署“example document”。"
 
+#. placeholder {0}: warning.line
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+msgid "(line {0})"
+msgstr "（第 {0} 行）"
+
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx
 #: apps/remix/app/components/general/envelope-signing/envelope-signer-form.tsx
@@ -89,6 +95,12 @@ msgstr "{0, plural, other {# 个字符超出限制}}"
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "{0, plural, one {# character remaining} other {# characters remaining}}"
 msgstr "{0, plural, other {# 个剩余字符}}"
+
+#. placeholder {0}: warnings.length
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+msgid "{0, plural, one {# CSS rule was dropped during sanitisation.} other {# CSS rules were dropped during sanitisation.}}"
+msgstr "{0, plural, other {# 条 CSS 规则在清理过程中被移除。}}"
 
 #. placeholder {0}: folder._count.documents
 #: apps/remix/app/components/general/folder/folder-card.tsx
@@ -1426,6 +1438,10 @@ msgstr "管理面板"
 msgid "Admins only"
 msgstr "仅限管理员"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Advanced — Custom CSS"
+msgstr "高级 — 自定义 CSS"
+
 #: packages/ui/primitives/document-flow/add-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "Advanced Options"
@@ -1605,6 +1621,7 @@ msgstr "每位成员都会收到一封包含邀请的邮件。"
 msgid "An email with this address already exists."
 msgstr "已存在使用该地址的邮箱。"
 
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-team-member-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
@@ -2170,6 +2187,10 @@ msgstr "返回"
 msgid "Back home"
 msgstr "返回首页"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Background"
+msgstr "背景"
+
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "Background Color"
 msgstr "背景颜色"
@@ -2190,6 +2211,14 @@ msgstr "备份代码"
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "Banner Updated"
 msgstr "横幅已更新"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Base background colour."
+msgstr "基础背景颜色。"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Base text colour."
+msgstr "基础文本颜色。"
 
 #: packages/email/template-components/template-confirmation-email.tsx
 msgid "Before you get started, please confirm your email address by clicking the button below:"
@@ -2213,9 +2242,25 @@ msgstr "黑色"
 msgid "Blue"
 msgstr "蓝色"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Border"
+msgstr "边框"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Border Radius"
+msgstr "边框圆角"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Border radius size in REM units (e.g. 0.5rem)."
+msgstr "边框圆角大小，以 REM 为单位（例如 0.5rem）。"
+
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Bottom"
 msgstr "底部对齐"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Brand Colours"
+msgstr "品牌颜色"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Brand Details"
@@ -2249,7 +2294,6 @@ msgstr "品牌 Logo"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Branding Preferences"
 msgstr "品牌偏好设置"
 
@@ -2257,6 +2301,11 @@ msgstr "品牌偏好设置"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Branding preferences updated"
 msgstr "品牌偏好设置已更新"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+msgid "Branding preferences updated with warnings"
+msgstr "品牌偏好已更新，但存在警告"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Branding URL"
@@ -2340,6 +2389,7 @@ msgid "Can't find someone?"
 msgstr "找不到某个人？"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
@@ -2793,7 +2843,7 @@ msgstr "配置模板"
 msgid "Configure Template"
 msgstr "配置模板"
 
-#. placeholder {0}: parseMessageDescriptor( _, FRIENDLY_FIELD_TYPE[currentField.type], )
+#. placeholder {0}: parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[currentField.type])
 #: apps/remix/app/components/embed/authoring/field-advanced-settings-drawer.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
@@ -2823,6 +2873,7 @@ msgstr "配置在何时以及多长频率向尚未完成签署的收件人发送
 msgid "Confirm"
 msgstr "确认"
 
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
@@ -3286,6 +3337,11 @@ msgstr "正在创建文档"
 msgid "Creating Template"
 msgstr "正在创建模板"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+msgid "CSS rules were dropped during sanitisation"
+msgstr "在清理过程中有部分 CSS 规则被移除"
+
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "CSV Structure"
 msgstr "CSV 结构"
@@ -3327,6 +3383,10 @@ msgstr "目前仅 Platform 及以上套餐可以配置邮箱域名。"
 msgid "Custom {0} MB file"
 msgstr "自定义 {0} MB 文件"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Custom CSS is sanitised on save. Layout-breaking properties, remote URLs, and pseudo-elements are stripped automatically. Any rules dropped during sanitisation will be shown after you save."
+msgstr "自定义 CSS 在保存时会进行清理。破坏布局的属性、远程 URL 和伪元素会被自动移除。任何在清理过程中被删除的规则都会在你保存后显示出来。"
+
 #: packages/ui/components/document/expiration-period-picker.tsx
 msgid "Custom duration"
 msgstr "自定义时长"
@@ -3338,6 +3398,14 @@ msgstr "自定义间隔"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Custom Organisation Groups"
 msgstr "自定义组织组"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Customise the colours used on your signing pages."
+msgstr "自定义用于签署页面的颜色。"
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Danger Zone"
+msgstr "危险区域"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Dark Mode"
@@ -3387,6 +3455,10 @@ msgstr "David 是员工，Lucas 是经理"
 #: packages/email/templates/organisation-invite.tsx
 msgid "Decline"
 msgstr "拒绝"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Default border colour."
+msgstr "默认边框颜色。"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Date Format"
@@ -3467,6 +3539,8 @@ msgstr "委派文档所有权"
 msgid "delete"
 msgstr "delete"
 
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
@@ -3515,6 +3589,10 @@ msgstr "delete {0}"
 #: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
 msgid "delete {emailDomain}"
 msgstr "删除 {emailDomain}"
+
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
+msgid "delete {organisationName}"
+msgstr "删除 {organisationName}"
 
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 msgid "delete {teamName}"
@@ -3568,6 +3646,8 @@ msgstr "删除信封"
 msgid "Delete Folder"
 msgstr "删除文件夹"
 
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.general.tsx
 msgid "Delete organisation"
 msgstr "删除组织"
@@ -3629,6 +3709,10 @@ msgstr "已删除"
 #: apps/remix/app/components/dialogs/account-delete-dialog.tsx
 msgid "Deleting account..."
 msgstr "正在删除账号..."
+
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
+msgid "Deletion scheduled"
+msgstr "删除已计划"
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Destination"
@@ -3923,6 +4007,12 @@ msgstr "文档完成邮件"
 #: apps/remix/app/components/embed/embed-document-completed.tsx
 msgid "Document Completed!"
 msgstr "文档已完成！"
+
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "Document conversion is temporarily unavailable. Please try again shortly or upload a PDF."
+msgstr "文档转换暂时不可用。请稍后重试或上传 PDF 文件。"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Document created"
@@ -4365,16 +4455,16 @@ msgid "Drafted Documents"
 msgstr "草稿文档数量"
 
 #: packages/ui/primitives/document-dropzone.tsx
-msgid "Drag & drop your PDF here."
-msgstr "将 PDF 拖放到此处。"
+msgid "Drag & drop your document here."
+msgstr "将您的文档拖放到此处。"
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Drag and drop or click to upload"
 msgstr "拖放或点击以上传"
 
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
-msgid "Drag and drop your PDF file here"
-msgstr "将 PDF 文件拖放到此处"
+msgid "Drag and drop your document here"
+msgstr "将您的文档拖放到此处"
 
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
@@ -4673,6 +4763,10 @@ msgstr "邮件已发送！"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Email Settings"
 msgstr "邮件设置"
+
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
+msgid "Email the organisation owner to notify them of the deletion."
+msgstr "向该组织所有者发送电子邮件，通知其此删除操作。"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Email the owner when a document is created from a direct template"
@@ -5125,7 +5219,7 @@ msgstr "到期时间"
 msgid "Expires {0}"
 msgstr "于 {0} 到期"
 
-#. placeholder {0}: DateTime.fromMillis(Math.max(millisecondsRemaining, 0)).toFormat( 'mm:ss', )
+#. placeholder {0}: DateTime.fromMillis(Math.max(millisecondsRemaining, 0)).toFormat('mm:ss')
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Expires in {0}"
 msgstr "将在 {0} 后过期"
@@ -5356,6 +5450,10 @@ msgstr "填写详细信息以创建新的订阅声明。"
 msgid "Filter by status"
 msgstr "按状态筛选"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Focus ring colour."
+msgstr "聚焦轮廓颜色。"
+
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
@@ -5413,6 +5511,10 @@ msgstr "请为每个收件人分别提供邮箱（必填）和姓名（可选）
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "For example, if the claim has a new flag \"FLAG_1\" set to true, then this organisation will get that flag added."
 msgstr "例如，如果声明中新加了一个标记“FLAG_1”并设为 true，则该组织会获得该标记。"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Foreground"
+msgstr "前景色"
 
 #: apps/remix/app/routes/_unauthenticated+/check-email.tsx
 msgid "Forgot password"
@@ -6048,6 +6150,10 @@ msgstr "发票"
 #: packages/lib/server-only/pdf/render-certificate.ts
 msgid "IP Address"
 msgstr "IP 地址"
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Irreversible actions for this organisation"
+msgstr "对此组织执行的不可逆操作"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Issuer URL"
@@ -7232,6 +7338,10 @@ msgstr "或者使用以下方式继续"
 msgid "Organisation"
 msgstr "组织"
 
+#: packages/lib/server-only/organisation/delete-organisation-email.ts
+msgid "Organisation \"{organisationName}\" has been deleted"
+msgstr "组织 \"{organisationName}\" 已被删除"
+
 #: packages/lib/constants/organisations-translations.ts
 msgid "Organisation Admin"
 msgstr "组织管理员"
@@ -7597,6 +7707,10 @@ msgstr "每月"
 msgid "per year"
 msgstr "每年"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Permanently delete this organisation. Documents will be orphaned (not deleted) so they remain accessible via the deleted-account service account."
+msgstr "永久删除此组织。文档将被孤立（不会被删除），因此仍可通过已删除账号的服务账户进行访问。"
+
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 msgctxt "Personal organisation (adjective)"
 msgid "Personal"
@@ -7914,6 +8028,18 @@ msgstr "在发送前预览文档"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 msgid "Preview what the signed document will look like with placeholder data"
 msgstr "使用占位数据预览签署后的文档效果"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Primary"
+msgstr "主色"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Primary action colour."
+msgstr "主要操作颜色。"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Primary Foreground"
+msgstr "主前景色"
 
 #: apps/remix/app/components/general/template/template-type.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
@@ -8667,6 +8793,10 @@ msgstr "撤销所有会话"
 msgid "Right"
 msgstr "右对齐"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Ring"
+msgstr "描边"
+
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
@@ -9246,6 +9376,10 @@ msgstr "签署文档"
 #: packages/email/template-components/template-document-reminder.tsx
 msgid "Sign Document"
 msgstr "签署文档"
+
+#: apps/remix/app/routes/_recipient+/_layout.tsx
+msgid "Sign Document - Documenso"
+msgstr "签署文档 - Documenso"
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "Sign Documents"
@@ -10216,6 +10350,10 @@ msgstr "文本对齐"
 msgid "Text Color"
 msgstr "文本颜色"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Text colour on primary buttons."
+msgstr "主按钮上的文字颜色。"
+
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "Text is required"
 msgstr "文本为必填项"
@@ -10267,6 +10405,10 @@ msgstr "横幅中要显示的内容，允许使用 HTML"
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "The default email to use when sending emails to recipients"
 msgstr "向收件人发送邮件时使用的默认邮箱"
+
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
+msgid "The deletion will run in the background, and can take up to a few minutes to complete. Do not re-run this deletion."
+msgstr "删除过程将在后台运行，可能需要几分钟才能完成。请不要重新执行此删除操作。"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/general/template/template-direct-link-badge.tsx
@@ -10393,6 +10535,14 @@ msgstr "您尝试移动模板到的文件夹不存在。"
 msgid "The following errors occurred:"
 msgstr "发生以下错误："
 
+#: packages/email/templates/organisation-delete.tsx
+msgid "The following organisation has been deleted by an administrator. You and your members will no longer be able to access this organisation, its teams, or its associated data."
+msgstr "以下组织已被管理员删除。您和您的成员将无法再访问此组织、其团队或其关联数据。"
+
+#: packages/email/templates/organisation-delete.tsx
+msgid "The following organisation has been deleted. You and your members will no longer be able to access this organisation, its teams, or its associated data."
+msgstr "以下组织已被删除。您和您的成员将无法再访问此组织、其团队或其关联数据。"
+
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 msgid "The following recipients require an email address:"
 msgstr "以下收件人需要电子邮件地址："
@@ -10430,6 +10580,10 @@ msgstr "您要查找的组织分组可能已被删除、重命名，或从未存
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "The organisation role that will be applied to all members in this group."
 msgstr "将应用于此组所有成员的组织角色。"
+
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
+msgid "The organisation will be deleted in the background. Documents will be orphaned, not deleted."
+msgstr "该组织将会在后台被删除。文档将被孤立，不会被删除。"
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -10819,6 +10973,12 @@ msgstr "此功能在您当前的方案中不可用"
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "此字段无法修改或删除。将此模板的直链分享出去或添加到您的公开主页后，任何访问该链接的人都可以输入自己的姓名和邮箱，并填写分配给 TA 的字段。"
 
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "This file type isn't supported. Please upload a PDF or Word document."
+msgstr "不支持该文件类型。请上传 PDF 或 Word 文档。"
+
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "This folder contains multiple items. Deleting it will remove all subfolders and move all nested documents and templates to the root folder."
 msgstr "此文件夹包含多个项目。删除它将移除所有子文件夹，并将其中的所有文档和模板移动到根文件夹。"
@@ -11077,7 +11237,6 @@ msgstr "要将此文档标记为已查看，你需要以 <0>{0}</0> 登录"
 msgid "To mark this document as viewed, you need to be logged in."
 msgstr "要将此文档标记为已查看，您需要先登录。"
 
-#. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
 #. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
@@ -12091,6 +12250,12 @@ msgstr "目前无法移除此通行密钥。请稍后再试。"
 msgid "We are unable to update this passkey at the moment. Please try again later."
 msgstr "目前无法更新此通行密钥。请稍后再试。"
 
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "We couldn't convert this file. Please check it's a valid Word document or upload a PDF instead."
+msgstr "我们无法转换此文件。请检查它是否为有效的 Word 文档，或改为上传 PDF。"
+
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "We couldn't create a Stripe customer. Please try again."
 msgstr "我们无法创建 Stripe 客户。请重试。"
@@ -12116,6 +12281,10 @@ msgstr "我们无法更新该组织。请重试。"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "We couldn't update the provider. Please try again."
 msgstr "我们未能更新该提供方。请重试。"
+
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
+msgid "We encountered an error while attempting to delete this organisation. Please try again later."
+msgstr "尝试删除此组织时遇到错误。请稍后重试。"
 
 #: packages/lib/client-only/providers/envelope-editor-provider.tsx
 #: packages/lib/client-only/providers/envelope-editor-provider.tsx
@@ -12620,6 +12789,10 @@ msgstr "您将要删除<0>\"{title}\"</0>"
 msgid "You are about to delete <0>{0}</0>. All data related to this organisation such as teams, documents, and all other resources will be deleted. This action is irreversible."
 msgstr "您即将删除 <0>{0}</0>。与该组织相关的所有数据（例如团队、文档及其他所有资源）都将被删除。此操作不可逆。"
 
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
+msgid "You are about to delete <0>{organisationName}</0>. This action is not reversible. All teams will be removed and all documents will be orphaned to the deleted-account service account."
+msgstr "你即将删除 <0>{organisationName}</0>。此操作无法撤销。所有团队都将被移除，且所有文档都会被转移到已删除账号的服务账户中。"
+
 #: apps/remix/app/components/dialogs/team-email-delete-dialog.tsx
 msgid "You are about to delete the following team email from <0>{teamName}</0>."
 msgstr "你即将从 <0>{teamName}</0> 中删除以下团队邮箱。"
@@ -13102,6 +13275,7 @@ msgstr "你已验证在 <0>{0}</0> 的邮箱地址。"
 msgid "You moved the document to team"
 msgstr "你已将此文档移动到团队"
 
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
@@ -13546,6 +13720,11 @@ msgstr "新密码不能与旧密码相同。"
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Your organisation has been created."
 msgstr "您的组织已创建。"
+
+#: packages/email/templates/organisation-delete.tsx
+#: packages/email/templates/organisation-delete.tsx
+msgid "Your organisation has been deleted"
+msgstr "你的组织已被删除"
 
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 msgid "Your organisation has been successfully deleted."

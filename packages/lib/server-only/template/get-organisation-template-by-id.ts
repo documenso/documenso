@@ -1,7 +1,6 @@
+import { prisma } from '@documenso/prisma';
 import type { Prisma, TeamMemberRole } from '@prisma/client';
 import { EnvelopeType, TemplateType } from '@prisma/client';
-
-import { prisma } from '@documenso/prisma';
 
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -23,11 +22,7 @@ export type GetOrganisationTemplateByIdOptions = {
  * that the template is of type ORGANISATION, and that the template's visibility is permitted
  * for the caller's role on their own team.
  */
-export const getOrganisationTemplateById = async ({
-  id,
-  userId,
-  teamId,
-}: GetOrganisationTemplateByIdOptions) => {
+export const getOrganisationTemplateById = async ({ id, userId, teamId }: GetOrganisationTemplateByIdOptions) => {
   const [callerTeam, { teamRole }] = await Promise.all([
     getTeamById({ teamId, userId }),
     getMemberRoles({

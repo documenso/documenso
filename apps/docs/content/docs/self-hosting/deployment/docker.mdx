@@ -26,8 +26,14 @@ docker --version
 
 ## Pulling the Docker Image
 
+The Documenso image is available on both DockerHub and GitHub Container Registry:
+
 ```bash
+# DockerHub
 docker pull documenso/documenso:latest
+
+# GitHub Container Registry
+docker pull ghcr.io/documenso/documenso:latest
 ```
 
 ### Available Tags
@@ -100,7 +106,11 @@ See [Email Configuration](/docs/self-hosting/configuration/email) for other tran
 | `NEXT_PRIVATE_SIGNING_PASSPHRASE`           | Passphrase for the signing certificate                         | -                         |
 | `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS`  | Base64-encoded `.p12` certificate (alternative to file path)   | -                         |
 | `NEXT_PUBLIC_UPLOAD_TRANSPORT`              | Document storage: `database` or `s3`                           | `database`                |
-| `NEXT_PUBLIC_DISABLE_SIGNUP`                | Disable public signups                                         | `false`                   |
+| `NEXT_PUBLIC_DISABLE_SIGNUP`                | Master switch — disable all signup methods                     | `false`                   |
+| `NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNUP` | Disable email/password signup only                             | `false`                   |
+| `NEXT_PUBLIC_DISABLE_GOOGLE_SIGNUP`         | Block new accounts via Google OAuth                            | `false`                   |
+| `NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP`      | Block new accounts via Microsoft OAuth                         | `false`                   |
+| `NEXT_PUBLIC_DISABLE_OIDC_SIGNUP`           | Block new accounts via OIDC (incl. organisation portal)        | `false`                   |
 | `NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS`       | Comma-separated list of allowed signup email domains           |                           |
 
 For the complete list, see [Environment Variables](/docs/self-hosting/configuration/environment).
@@ -191,6 +201,14 @@ Documenso provides health check endpoints for monitoring:
 | ------------------------- | -------------------------------------------------------------- |
 | `/api/health`             | Checks database connectivity and certificate status            |
 | `/api/certificate-status` | Returns whether a signing certificate is configured and usable |
+
+Both endpoints return a JSON response with a `status` field:
+
+| Status      | Meaning                                                              |
+| ----------- | -------------------------------------------------------------------- |
+| `"ok"`      | Everything is working properly                                       |
+| `"warning"` | Application is running but there are certificate issues              |
+| `"error"`   | Critical issues (database unreachable, missing configuration, etc.)  |
 
 ### Docker Health Check
 

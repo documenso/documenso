@@ -56,6 +56,12 @@ msgstr "\"{title}\" has been successfully hidden"
 msgid "\"Team Name\" has invited you to sign \"example document\"."
 msgstr "\"Team Name\" has invited you to sign \"example document\"."
 
+#. placeholder {0}: warning.line
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+msgid "(line {0})"
+msgstr "(line {0})"
+
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx
 #: apps/remix/app/components/general/envelope-signing/envelope-signer-form.tsx
@@ -84,6 +90,12 @@ msgstr "{0, plural, one {# character over the limit} other {# characters over th
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "{0, plural, one {# character remaining} other {# characters remaining}}"
 msgstr "{0, plural, one {# character remaining} other {# characters remaining}}"
+
+#. placeholder {0}: warnings.length
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+msgid "{0, plural, one {# CSS rule was dropped during sanitisation.} other {# CSS rules were dropped during sanitisation.}}"
+msgstr "{0, plural, one {# CSS rule was dropped during sanitisation.} other {# CSS rules were dropped during sanitisation.}}"
 
 #. placeholder {0}: folder._count.documents
 #: apps/remix/app/components/general/folder/folder-card.tsx
@@ -1421,6 +1433,10 @@ msgstr "Admin Panel"
 msgid "Admins only"
 msgstr "Admins only"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Advanced — Custom CSS"
+msgstr "Advanced — Custom CSS"
+
 #: packages/ui/primitives/document-flow/add-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "Advanced Options"
@@ -1600,6 +1616,7 @@ msgstr "An email containing an invitation will be sent to each member."
 msgid "An email with this address already exists."
 msgstr "An email with this address already exists."
 
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-team-member-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
@@ -2165,6 +2182,10 @@ msgstr "Back"
 msgid "Back home"
 msgstr "Back home"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Background"
+msgstr "Background"
+
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "Background Color"
 msgstr "Background Color"
@@ -2185,6 +2206,14 @@ msgstr "Backup codes"
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "Banner Updated"
 msgstr "Banner Updated"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Base background colour."
+msgstr "Base background colour."
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Base text colour."
+msgstr "Base text colour."
 
 #: packages/email/template-components/template-confirmation-email.tsx
 msgid "Before you get started, please confirm your email address by clicking the button below:"
@@ -2208,9 +2237,25 @@ msgstr "Black"
 msgid "Blue"
 msgstr "Blue"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Border"
+msgstr "Border"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Border Radius"
+msgstr "Border Radius"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Border radius size in REM units (e.g. 0.5rem)."
+msgstr "Border radius size in REM units (e.g. 0.5rem)."
+
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Bottom"
 msgstr "Bottom"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Brand Colours"
+msgstr "Brand Colours"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Brand Details"
@@ -2244,7 +2289,6 @@ msgstr "Branding Logo"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Branding Preferences"
 msgstr "Branding Preferences"
 
@@ -2252,6 +2296,11 @@ msgstr "Branding Preferences"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Branding preferences updated"
 msgstr "Branding preferences updated"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+msgid "Branding preferences updated with warnings"
+msgstr "Branding preferences updated with warnings"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Branding URL"
@@ -2335,6 +2384,7 @@ msgid "Can't find someone?"
 msgstr "Can't find someone?"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
@@ -2788,7 +2838,7 @@ msgstr "Configure template"
 msgid "Configure Template"
 msgstr "Configure Template"
 
-#. placeholder {0}: parseMessageDescriptor( _, FRIENDLY_FIELD_TYPE[currentField.type], )
+#. placeholder {0}: parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[currentField.type])
 #: apps/remix/app/components/embed/authoring/field-advanced-settings-drawer.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
@@ -2818,6 +2868,7 @@ msgstr "Configure when and how often reminder emails are sent to recipients who 
 msgid "Confirm"
 msgstr "Confirm"
 
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
@@ -3281,6 +3332,11 @@ msgstr "Creating Document"
 msgid "Creating Template"
 msgstr "Creating Template"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+msgid "CSS rules were dropped during sanitisation"
+msgstr "CSS rules were dropped during sanitisation"
+
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "CSV Structure"
 msgstr "CSV Structure"
@@ -3322,6 +3378,10 @@ msgstr "Currently email domains can only be configured for Platform and above pl
 msgid "Custom {0} MB file"
 msgstr "Custom {0} MB file"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Custom CSS is sanitised on save. Layout-breaking properties, remote URLs, and pseudo-elements are stripped automatically. Any rules dropped during sanitisation will be shown after you save."
+msgstr "Custom CSS is sanitised on save. Layout-breaking properties, remote URLs, and pseudo-elements are stripped automatically. Any rules dropped during sanitisation will be shown after you save."
+
 #: packages/ui/components/document/expiration-period-picker.tsx
 msgid "Custom duration"
 msgstr "Custom duration"
@@ -3333,6 +3393,14 @@ msgstr "Custom interval"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Custom Organisation Groups"
 msgstr "Custom Organisation Groups"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Customise the colours used on your signing pages."
+msgstr "Customise the colours used on your signing pages."
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Danger Zone"
+msgstr "Danger Zone"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Dark Mode"
@@ -3382,6 +3450,10 @@ msgstr "David is the Employee, Lucas is the Manager"
 #: packages/email/templates/organisation-invite.tsx
 msgid "Decline"
 msgstr "Decline"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Default border colour."
+msgstr "Default border colour."
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Date Format"
@@ -3462,6 +3534,8 @@ msgstr "Delegate Document Ownership"
 msgid "delete"
 msgstr "delete"
 
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
@@ -3510,6 +3584,10 @@ msgstr "delete {0}"
 #: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
 msgid "delete {emailDomain}"
 msgstr "delete {emailDomain}"
+
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
+msgid "delete {organisationName}"
+msgstr "delete {organisationName}"
 
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 msgid "delete {teamName}"
@@ -3563,6 +3641,8 @@ msgstr "Delete Envelope"
 msgid "Delete Folder"
 msgstr "Delete Folder"
 
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.general.tsx
 msgid "Delete organisation"
 msgstr "Delete organisation"
@@ -3624,6 +3704,10 @@ msgstr "Deleted"
 #: apps/remix/app/components/dialogs/account-delete-dialog.tsx
 msgid "Deleting account..."
 msgstr "Deleting account..."
+
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
+msgid "Deletion scheduled"
+msgstr "Deletion scheduled"
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Destination"
@@ -3918,6 +4002,12 @@ msgstr "Document completed email"
 #: apps/remix/app/components/embed/embed-document-completed.tsx
 msgid "Document Completed!"
 msgstr "Document Completed!"
+
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "Document conversion is temporarily unavailable. Please try again shortly or upload a PDF."
+msgstr "Document conversion is temporarily unavailable. Please try again shortly or upload a PDF."
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Document created"
@@ -4360,16 +4450,16 @@ msgid "Drafted Documents"
 msgstr "Drafted Documents"
 
 #: packages/ui/primitives/document-dropzone.tsx
-msgid "Drag & drop your PDF here."
-msgstr "Drag & drop your PDF here."
+msgid "Drag & drop your document here."
+msgstr "Drag & drop your document here."
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Drag and drop or click to upload"
 msgstr "Drag and drop or click to upload"
 
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
-msgid "Drag and drop your PDF file here"
-msgstr "Drag and drop your PDF file here"
+msgid "Drag and drop your document here"
+msgstr "Drag and drop your document here"
 
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
@@ -4668,6 +4758,10 @@ msgstr "Email sent!"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Email Settings"
 msgstr "Email Settings"
+
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
+msgid "Email the organisation owner to notify them of the deletion."
+msgstr "Email the organisation owner to notify them of the deletion."
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Email the owner when a document is created from a direct template"
@@ -5120,7 +5214,7 @@ msgstr "Expires"
 msgid "Expires {0}"
 msgstr "Expires {0}"
 
-#. placeholder {0}: DateTime.fromMillis(Math.max(millisecondsRemaining, 0)).toFormat( 'mm:ss', )
+#. placeholder {0}: DateTime.fromMillis(Math.max(millisecondsRemaining, 0)).toFormat('mm:ss')
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Expires in {0}"
 msgstr "Expires in {0}"
@@ -5351,6 +5445,10 @@ msgstr "Fill in the details to create a new subscription claim."
 msgid "Filter by status"
 msgstr "Filter by status"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Focus ring colour."
+msgstr "Focus ring colour."
+
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
@@ -5408,6 +5506,10 @@ msgstr "For each recipient, provide their email (required) and name (optional) i
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "For example, if the claim has a new flag \"FLAG_1\" set to true, then this organisation will get that flag added."
 msgstr "For example, if the claim has a new flag \"FLAG_1\" set to true, then this organisation will get that flag added."
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Foreground"
+msgstr "Foreground"
 
 #: apps/remix/app/routes/_unauthenticated+/check-email.tsx
 msgid "Forgot password"
@@ -6044,6 +6146,10 @@ msgstr "Invoice"
 msgid "IP Address"
 msgstr "IP Address"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Irreversible actions for this organisation"
+msgstr "Irreversible actions for this organisation"
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Issuer URL"
 msgstr "Issuer URL"
@@ -6333,6 +6439,8 @@ msgstr "Loading suggestions..."
 #: apps/remix/app/components/embed/embed-client-loading.tsx
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Loading..."
 msgstr "Loading..."
@@ -6909,9 +7017,17 @@ msgstr "No folders yet."
 msgid "No further action is required from you at this time."
 msgstr "No further action is required from you at this time."
 
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+msgid "No groups found"
+msgstr "No groups found"
+
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "No License Configured"
 msgstr "No License Configured"
+
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
+msgid "No members found"
+msgstr "No members found"
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "No members selected"
@@ -7216,6 +7332,10 @@ msgstr "Or continue with"
 #: packages/ui/components/template/template-type-select.tsx
 msgid "Organisation"
 msgstr "Organisation"
+
+#: packages/lib/server-only/organisation/delete-organisation-email.ts
+msgid "Organisation \"{organisationName}\" has been deleted"
+msgstr "Organisation \"{organisationName}\" has been deleted"
 
 #: packages/lib/constants/organisations-translations.ts
 msgid "Organisation Admin"
@@ -7582,6 +7702,10 @@ msgstr "per month"
 msgid "per year"
 msgstr "per year"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Permanently delete this organisation. Documents will be orphaned (not deleted) so they remain accessible via the deleted-account service account."
+msgstr "Permanently delete this organisation. Documents will be orphaned (not deleted) so they remain accessible via the deleted-account service account."
+
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 msgctxt "Personal organisation (adjective)"
 msgid "Personal"
@@ -7899,6 +8023,18 @@ msgstr "Preview the document before sending"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 msgid "Preview what the signed document will look like with placeholder data"
 msgstr "Preview what the signed document will look like with placeholder data"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Primary"
+msgstr "Primary"
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Primary action colour."
+msgstr "Primary action colour."
+
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Primary Foreground"
+msgstr "Primary Foreground"
 
 #: apps/remix/app/components/general/template/template-type.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
@@ -8652,6 +8788,10 @@ msgstr "Revoke all sessions"
 msgid "Right"
 msgstr "Right"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Ring"
+msgstr "Ring"
+
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
@@ -8772,9 +8912,17 @@ msgstr "Search documents..."
 msgid "Search folders..."
 msgstr "Search folders..."
 
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+msgid "Search groups by name"
+msgstr "Search groups by name"
+
 #: packages/ui/components/common/language-switcher-dialog.tsx
 msgid "Search languages..."
 msgstr "Search languages..."
+
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
+msgid "Search members by name or email"
+msgstr "Search members by name or email"
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "Secret"
@@ -8895,7 +9043,8 @@ msgstr "Select default role"
 msgid "Select direction"
 msgstr "Select direction"
 
-#: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
+#: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
 msgid "Select groups"
 msgstr "Select groups"
 
@@ -8907,9 +9056,8 @@ msgstr "Select groups of members to add to the team."
 msgid "Select groups to add to this team"
 msgstr "Select groups to add to this team"
 
-#: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
-#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
+#: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
 msgid "Select members"
 msgstr "Select members"
 
@@ -9223,6 +9371,10 @@ msgstr "Sign document"
 #: packages/email/template-components/template-document-reminder.tsx
 msgid "Sign Document"
 msgstr "Sign Document"
+
+#: apps/remix/app/routes/_recipient+/_layout.tsx
+msgid "Sign Document - Documenso"
+msgstr "Sign Document - Documenso"
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "Sign Documents"
@@ -10193,6 +10345,10 @@ msgstr "Text Align"
 msgid "Text Color"
 msgstr "Text Color"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Text colour on primary buttons."
+msgstr "Text colour on primary buttons."
+
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "Text is required"
 msgstr "Text is required"
@@ -10244,6 +10400,10 @@ msgstr "The content to show in the banner, HTML is allowed"
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "The default email to use when sending emails to recipients"
 msgstr "The default email to use when sending emails to recipients"
+
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
+msgid "The deletion will run in the background, and can take up to a few minutes to complete. Do not re-run this deletion."
+msgstr "The deletion will run in the background, and can take up to a few minutes to complete. Do not re-run this deletion."
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/general/template/template-direct-link-badge.tsx
@@ -10370,6 +10530,14 @@ msgstr "The folder you are trying to move the template to does not exist."
 msgid "The following errors occurred:"
 msgstr "The following errors occurred:"
 
+#: packages/email/templates/organisation-delete.tsx
+msgid "The following organisation has been deleted by an administrator. You and your members will no longer be able to access this organisation, its teams, or its associated data."
+msgstr "The following organisation has been deleted by an administrator. You and your members will no longer be able to access this organisation, its teams, or its associated data."
+
+#: packages/email/templates/organisation-delete.tsx
+msgid "The following organisation has been deleted. You and your members will no longer be able to access this organisation, its teams, or its associated data."
+msgstr "The following organisation has been deleted. You and your members will no longer be able to access this organisation, its teams, or its associated data."
+
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 msgid "The following recipients require an email address:"
 msgstr "The following recipients require an email address:"
@@ -10407,6 +10575,10 @@ msgstr "The organisation group you are looking for may have been removed, rename
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "The organisation role that will be applied to all members in this group."
 msgstr "The organisation role that will be applied to all members in this group."
+
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
+msgid "The organisation will be deleted in the background. Documents will be orphaned, not deleted."
+msgstr "The organisation will be deleted in the background. Documents will be orphaned, not deleted."
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -10796,6 +10968,12 @@ msgstr "This feature is not available on your current plan"
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "This file type isn't supported. Please upload a PDF or Word document."
+msgstr "This file type isn't supported. Please upload a PDF or Word document."
+
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "This folder contains multiple items. Deleting it will remove all subfolders and move all nested documents and templates to the root folder."
 msgstr "This folder contains multiple items. Deleting it will remove all subfolders and move all nested documents and templates to the root folder."
@@ -11054,7 +11232,6 @@ msgstr "To mark this document as viewed, you need to be logged in as <0>{0}</0>"
 msgid "To mark this document as viewed, you need to be logged in."
 msgstr "To mark this document as viewed, you need to be logged in."
 
-#. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
 #. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
@@ -12068,6 +12245,12 @@ msgstr "We are unable to remove this passkey at the moment. Please try again lat
 msgid "We are unable to update this passkey at the moment. Please try again later."
 msgstr "We are unable to update this passkey at the moment. Please try again later."
 
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "We couldn't convert this file. Please check it's a valid Word document or upload a PDF instead."
+msgstr "We couldn't convert this file. Please check it's a valid Word document or upload a PDF instead."
+
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "We couldn't create a Stripe customer. Please try again."
 msgstr "We couldn't create a Stripe customer. Please try again."
@@ -12093,6 +12276,10 @@ msgstr "We couldn't update the organisation. Please try again."
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "We couldn't update the provider. Please try again."
 msgstr "We couldn't update the provider. Please try again."
+
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
+msgid "We encountered an error while attempting to delete this organisation. Please try again later."
+msgstr "We encountered an error while attempting to delete this organisation. Please try again later."
 
 #: packages/lib/client-only/providers/envelope-editor-provider.tsx
 #: packages/lib/client-only/providers/envelope-editor-provider.tsx
@@ -12597,6 +12784,10 @@ msgstr "You are about to delete <0>\"{title}\"</0>"
 msgid "You are about to delete <0>{0}</0>. All data related to this organisation such as teams, documents, and all other resources will be deleted. This action is irreversible."
 msgstr "You are about to delete <0>{0}</0>. All data related to this organisation such as teams, documents, and all other resources will be deleted. This action is irreversible."
 
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
+msgid "You are about to delete <0>{organisationName}</0>. This action is not reversible. All teams will be removed and all documents will be orphaned to the deleted-account service account."
+msgstr "You are about to delete <0>{organisationName}</0>. This action is not reversible. All teams will be removed and all documents will be orphaned to the deleted-account service account."
+
 #: apps/remix/app/components/dialogs/team-email-delete-dialog.tsx
 msgid "You are about to delete the following team email from <0>{teamName}</0>."
 msgstr "You are about to delete the following team email from <0>{teamName}</0>."
@@ -13079,6 +13270,7 @@ msgstr "You have verified your email address for <0>{0}</0>."
 msgid "You moved the document to team"
 msgstr "You moved the document to team"
 
+#: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
@@ -13523,6 +13715,11 @@ msgstr "Your new password cannot be the same as your old password."
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Your organisation has been created."
 msgstr "Your organisation has been created."
+
+#: packages/email/templates/organisation-delete.tsx
+#: packages/email/templates/organisation-delete.tsx
+msgid "Your organisation has been deleted"
+msgstr "Your organisation has been deleted"
 
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 msgid "Your organisation has been successfully deleted."

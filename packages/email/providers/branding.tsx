@@ -18,10 +18,7 @@ const defaultBrandingContextValue: BrandingContextValue = {
   brandingHidePoweredBy: false,
 };
 
-export const BrandingProvider = (props: {
-  branding?: BrandingContextValue;
-  children: React.ReactNode;
-}) => {
+export const BrandingProvider = (props: { branding?: BrandingContextValue; children: React.ReactNode }) => {
   return (
     <BrandingContext.Provider value={props.branding ?? defaultBrandingContextValue}>
       {props.children}

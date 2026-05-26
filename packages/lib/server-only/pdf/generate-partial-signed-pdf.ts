@@ -1,7 +1,6 @@
+import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { PDF } from '@libpdf/core';
 import { groupBy } from 'remeda';
-
-import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 
 import { insertFieldInPDFV2 } from './insert-field-in-pdf-v2';
 
@@ -18,10 +17,7 @@ type GeneratePartialSignedPdfOptions = {
  * No PKI signature, no certificate page, no audit log appendix - this is a
  * preview of the in-progress envelope, not a final executed document.
  */
-export const generatePartialSignedPdf = async ({
-  pdfData,
-  fields,
-}: GeneratePartialSignedPdfOptions) => {
+export const generatePartialSignedPdf = async ({ pdfData, fields }: GeneratePartialSignedPdfOptions) => {
   const pdfDoc = await PDF.load(pdfData);
 
   pdfDoc.flattenAll();
