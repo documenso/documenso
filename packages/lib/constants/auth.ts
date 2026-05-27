@@ -40,6 +40,8 @@ export const IS_OIDC_SSO_ENABLED = Boolean(
 
 export const OIDC_PROVIDER_LABEL = env('NEXT_PRIVATE_OIDC_PROVIDER_LABEL');
 
+export const IS_OIDC_AUTO_REDIRECT_ENABLED = env('NEXT_PUBLIC_AUTO_REDIRECT_TO_OIDC') === 'true';
+
 export const USER_SECURITY_AUDIT_LOG_MAP: Record<string, string> = {
   ACCOUNT_SSO_LINK: 'Linked account to SSO',
   ACCOUNT_SSO_UNLINK: 'Unlinked account from SSO',
@@ -135,6 +137,25 @@ export const isSignupEnabledForProvider = (provider: 'email' | 'google' | 'micro
     google: 'NEXT_PUBLIC_DISABLE_GOOGLE_SIGNUP',
     microsoft: 'NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP',
     oidc: 'NEXT_PUBLIC_DISABLE_OIDC_SIGNUP',
+  } as const;
+
+  return env(flagMap[provider]) !== 'true';
+};
+
+/**
+ * Check if signin is enabled for the given provider.
+ * The master switch takes precedence over the per-provider flags.
+ */
+export const isSigninEnabledForProvider = (provider: 'email' | 'google' | 'microsoft' | 'oidc'): boolean => {
+  if (env('NEXT_PUBLIC_DISABLE_SIGNIN') === 'true') {
+    return false;
+  }
+
+  const flagMap = {
+    email: 'NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNIN',
+    google: 'NEXT_PUBLIC_DISABLE_GOOGLE_SIGNIN',
+    microsoft: 'NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN',
+    oidc: 'NEXT_PUBLIC_DISABLE_OIDC_SIGNIN',
   } as const;
 
   return env(flagMap[provider]) !== 'true';

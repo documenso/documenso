@@ -1,4 +1,8 @@
-import { isEmailDomainAllowedForSignup, isSignupEnabledForProvider } from '@documenso/lib/constants/auth';
+import {
+  isEmailDomainAllowedForSignup,
+  isSigninEnabledForProvider,
+  isSignupEnabledForProvider,
+} from '@documenso/lib/constants/auth';
 import { EMAIL_VERIFICATION_STATE } from '@documenso/lib/constants/email';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { jobsClient } from '@documenso/lib/jobs/client';
@@ -58,6 +62,12 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
    */
   .post('/authorize', sValidator('json', ZSignInSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
+
+    if (!isSigninEnabledForProvider('email')) {
+      throw new AppError(AuthenticationErrorCode.SigninDisabled, {
+        statusCode: 400,
+      });
+    }
 
     const { email, password, totpCode, backupCode, csrfToken, captchaToken } = c.req.valid('json');
 
@@ -235,6 +245,12 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     const { password, currentPassword } = c.req.valid('json');
     const requestMetadata = c.get('requestMetadata');
 
+    if (!isSigninEnabledForProvider('email')) {
+      throw new AppError(AuthenticationErrorCode.SigninDisabled, {
+        statusCode: 400,
+      });
+    }
+
     const { session, user } = await getSession(c);
 
     await updatePassword({
@@ -337,6 +353,12 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   .post('/forgot-password', sValidator('json', ZForgotPasswordSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
+    if (!isSigninEnabledForProvider('email')) {
+      throw new AppError(AuthenticationErrorCode.SigninDisabled, {
+        statusCode: 400,
+      });
+    }
+
     const { email } = c.req.valid('json');
 
     const forgotLimitResult = await forgotPasswordRateLimit.check({
@@ -367,6 +389,12 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
    */
   .post('/reset-password', sValidator('json', ZResetPasswordSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
+
+    if (!isSigninEnabledForProvider('email')) {
+      throw new AppError(AuthenticationErrorCode.SigninDisabled, {
+        statusCode: 400,
+      });
+    }
 
     const { token, password } = c.req.valid('json');
 
