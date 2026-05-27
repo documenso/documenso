@@ -307,9 +307,8 @@ const resolveTextSubtype = (
 };
 
 const pickLabel = (field: FormFieldWithDict): string | undefined => {
-  const label = field.alternateName ?? field.partialName;
-
-  return label && label.length > 0 ? label : undefined;
+  // /TU is the human-facing tooltip/label; /T is the internal field identifier.
+  return field.alternateName || undefined;
 };
 
 type RotationDegrees = 0 | 90 | 180 | 270;
@@ -641,8 +640,9 @@ export type ExtractAcroFormOptions = {
  * imports.
  *
  * Runs before flattening so widget geometry is still present in the buffer.
- * Returns an empty result for non-AcroForm PDFs, encrypted PDFs, XFA hybrids,
- * and on any internal error (with `skipReason` set so callers can log).
+ * Returns an empty result for non-AcroForm PDFs, encrypted PDFs, pure XFA forms
+ * with no AcroForm widgets, and on any internal error (with `skipReason` set so
+ * callers can log).
  */
 export const extractAcroFormFieldsFromPDF = async (
   pdf: Buffer,
@@ -657,14 +657,17 @@ export const extractAcroFormFieldsFromPDF = async (
 
     const resolver = makeResolver(pdfDoc);
 
-    if (hasXfa(pdfDoc, resolver)) {
-      return EMPTY_RESULT('xfa-hybrid');
-    }
-
+    const hasXfaForm = hasXfa(pdfDoc, resolver);
     const form = pdfDoc.getForm();
 
     if (!form) {
-      return EMPTY_RESULT('no-form');
+      return EMPTY_RESULT(hasXfaForm ? 'xfa-hybrid' : 'no-form');
+    }
+
+    const formFields = form.getFields();
+
+    if (hasXfaForm && formFields.length === 0) {
+      return EMPTY_RESULT('xfa-hybrid');
     }
 
     const pages = pdfDoc.getPages();
@@ -678,7 +681,7 @@ export const extractAcroFormFieldsFromPDF = async (
     const unsupported: AcroFormUnsupportedFieldInfo[] = [];
     let hasSignedSignature = false;
 
-    for (const field of form.getFields()) {
+    for (const field of formFields) {
       const acroFormType = field.type;
 
       if (

@@ -168,12 +168,12 @@ describe('extractAcroFormFieldsFromPDF', () => {
       }
     });
 
-    it('uses partialName as label when no /TU is set', async () => {
+    it('does not use /T partialName as a label when no /TU is set', async () => {
       const result = await extractAcroFormFieldsFromPDF(baseBuffer);
       const nameField = result.fields.find((f) => f.fieldName === 'CustomerName');
 
       expect(nameField).toBeDefined();
-      expect(nameField?.fieldAndMeta.fieldMeta?.label).toBe('CustomerName');
+      expect(nameField?.fieldAndMeta.fieldMeta?.label).toBeUndefined();
     });
 
     it('prefers AcroForm /TU (alternateName) over partialName for the label', async () => {
@@ -438,7 +438,7 @@ describe('extractAcroFormFieldsFromPDF — mocked scenarios', () => {
     expect(result.hasSignedSignature).toBe(false);
   });
 
-  it('returns skipReason "xfa-hybrid" when /AcroForm has /XFA (P2.1)', async () => {
+  it('returns skipReason "xfa-hybrid" when /AcroForm has /XFA and no AcroForm fields (P2.1)', async () => {
     const xfaCatalogDict = {
       getDict: (key: string) => (key === 'AcroForm' ? { has: (k: string) => k === 'XFA' } : undefined),
     };
@@ -454,6 +454,48 @@ describe('extractAcroFormFieldsFromPDF — mocked scenarios', () => {
 
     expect(result.skipReason).toBe('xfa-hybrid');
     expect(result.fields).toEqual([]);
+  });
+
+  it('imports AcroForm widgets even when /AcroForm also has /XFA', async () => {
+    const xfaCatalogDict = {
+      getDict: (key: string) => (key === 'AcroForm' ? { has: (k: string) => k === 'XFA' } : undefined),
+    };
+    const pageRef = { objectNumber: 1, generation: 0 } as unknown as PdfDict;
+    const widget = {
+      rect: [100, 600, 300, 624] as [number, number, number, number],
+      pageRef,
+      isHidden: () => false,
+      getOnValue: () => null,
+    };
+    const field = buildFieldStub({
+      type: 'text',
+      name: 'topmostSubform[0].Page1[0].f1_1[0]',
+      partialName: 'f1_1',
+      getValue: () => '',
+      getDefaultValue: () => '',
+      getWidgets: () => [widget],
+    });
+    const page = {
+      ref: pageRef,
+      width: 612,
+      height: 792,
+      rotation: 0,
+      getMediaBox: () => ({ x: 0, y: 0, width: 612, height: 792 }),
+    };
+
+    vi.spyOn(PDF, 'load').mockResolvedValueOnce({
+      isEncrypted: false,
+      context: { catalog: { getDict: () => xfaCatalogDict }, resolve: () => null },
+      getForm: () => ({ getFields: () => [field] }),
+      getPages: () => [page],
+    } as unknown as PDF);
+
+    const result = await extractAcroFormFieldsFromPDF(Buffer.from('stub'));
+
+    expect(result.skipReason).toBeUndefined();
+    expect(result.fields).toHaveLength(1);
+    expect(result.fields[0]?.fieldAndMeta.type).toBe(FieldType.TEXT);
+    expect(result.fields[0]?.fieldAndMeta.fieldMeta?.label).toBe('');
   });
 
   it('skips signed signature widgets and reports hasSignedSignature: true (P1.2)', async () => {

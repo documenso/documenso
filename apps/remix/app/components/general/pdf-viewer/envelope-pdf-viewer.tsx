@@ -16,7 +16,12 @@ export type EnvelopePdfViewerProps = {
   errorMessage: { title: MessageDescriptor; description: MessageDescriptor } | null;
 } & Omit<PDFViewerProps, 'data'>;
 
-export const EnvelopePdfViewer = ({ errorMessage, className, ...props }: EnvelopePdfViewerProps) => {
+export const EnvelopePdfViewer = ({
+  errorMessage,
+  className,
+  onAcroFormDetected,
+  ...props
+}: EnvelopePdfViewerProps) => {
   const { t } = useLingui();
 
   const $el = useRef<HTMLDivElement>(null);
@@ -46,10 +51,11 @@ export const EnvelopePdfViewer = ({ errorMessage, className, ...props }: Envelop
 
   return (
     <PDFViewerLazy
-      key={`${currentEnvelopeItem.envelopeId}-${currentEnvelopeItem.id}`}
+      key={`${currentEnvelopeItem.envelopeId}-${currentEnvelopeItem.id}-${currentEnvelopeItem.documentDataId}`}
       {...props}
       className={cn('h-full w-full max-w-[800px]', className)}
       data={currentEnvelopeItem.data}
+      onAcroFormDetected={onAcroFormDetected}
     />
   );
 };

@@ -31,7 +31,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
 import { FileTextIcon, FormInputIcon, PencilIcon, SparklesIcon } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRevalidator, useSearchParams } from 'react-router';
 import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
@@ -78,7 +78,8 @@ export const EnvelopeEditorFieldsPage = () => {
 
   const scrollableContainerRef = useRef<HTMLDivElement>(null);
 
-  const { envelope, editorFields, navigateToStep, editorConfig } = useCurrentEnvelopeEditor();
+  const { envelope, editorFields, navigateToStep, editorConfig, flushAutosave, syncEnvelope } =
+    useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem } = useCurrentEnvelopeRender();
 
@@ -86,11 +87,33 @@ export const EnvelopeEditorFieldsPage = () => {
 
   const [isAiFieldDialogOpen, setIsAiFieldDialogOpen] = useState(false);
   const [isAiEnableDialogOpen, setIsAiEnableDialogOpen] = useState(false);
+  const [acroFormHasFieldsByItemRevision, setAcroFormHasFieldsByItemRevision] = useState<Record<string, boolean>>({});
+
   const { revalidate } = useRevalidator();
   const { toast } = useToast();
 
   const { mutateAsync: importFieldsFromPdf, isPending: isImportingFieldsFromPdf } =
     trpc.envelope.field.importFromPdf.useMutation();
+
+  const currentEnvelopeItemRevision = currentEnvelopeItem
+    ? `${currentEnvelopeItem.id}:${currentEnvelopeItem.documentDataId}`
+    : null;
+  const currentItemHasAcroForm = currentEnvelopeItemRevision
+    ? acroFormHasFieldsByItemRevision[currentEnvelopeItemRevision] === true
+    : false;
+
+  const onAcroFormDetected = useCallback(
+    (hasFields: boolean) => {
+      if (!currentEnvelopeItemRevision) {
+        return;
+      }
+
+      setAcroFormHasFieldsByItemRevision((prev) =>
+        prev[currentEnvelopeItemRevision] === hasFields ? prev : { ...prev, [currentEnvelopeItemRevision]: hasFields },
+      );
+    },
+    [currentEnvelopeItemRevision],
+  );
 
   const envelopeItemPermissions = useMemo(
     () => getEnvelopeItemPermissions(envelope, envelope.recipients),
@@ -160,6 +183,7 @@ export const EnvelopeEditorFieldsPage = () => {
 
   const onImportFromPdfClick = async () => {
     try {
+      await flushAutosave();
       const result = await importFieldsFromPdf({ envelopeId: envelope.id });
 
       if (result.fieldsCreated === 0) {
@@ -172,7 +196,7 @@ export const EnvelopeEditorFieldsPage = () => {
         return;
       }
 
-      await revalidate();
+      await syncEnvelope();
 
       toast({
         title: _(msg`Fields imported`),
@@ -255,6 +279,7 @@ export const EnvelopeEditorFieldsPage = () => {
               customPageRenderer={EnvelopeEditorFieldsPageRenderer}
               scrollParentRef={scrollableContainerRef}
               errorMessage={PDF_VIEWER_ERROR_MESSAGES.editor}
+              onAcroFormDetected={onAcroFormDetected}
             />
           ) : (
             <div className="flex flex-col items-center justify-center py-32">
@@ -313,23 +338,6 @@ export const EnvelopeEditorFieldsPage = () => {
               selectedEnvelopeItemId={currentEnvelopeItem?.id ?? null}
             />
 
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="mt-4 w-full"
-              onClick={() => void onImportFromPdfClick()}
-              disabled={envelope.status !== DocumentStatus.DRAFT || isImportingFieldsFromPdf}
-              title={
-                envelope.status !== DocumentStatus.DRAFT
-                  ? _(msg`You can only import fields in draft envelopes`)
-                  : undefined
-              }
-            >
-              <FormInputIcon className="mr-2 -ml-1 h-4 w-4" />
-              {isImportingFieldsFromPdf ? <Trans>Importing...</Trans> : <Trans>Import from PDF form</Trans>}
-            </Button>
-
             {editorConfig.fields?.allowAIDetection && (
               <>
                 <Button
@@ -363,6 +371,20 @@ export const EnvelopeEditorFieldsPage = () => {
                   onEnabled={onAiFeaturesEnabled}
                 />
               </>
+            )}
+
+            {currentItemHasAcroForm && envelope.status === DocumentStatus.DRAFT && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-4 w-full"
+                onClick={() => void onImportFromPdfClick()}
+                disabled={isImportingFieldsFromPdf}
+              >
+                <FormInputIcon className="mr-2 -ml-1 h-4 w-4" />
+                {isImportingFieldsFromPdf ? <Trans>Importing...</Trans> : <Trans>Import from PDF form</Trans>}
+              </Button>
             )}
           </section>
 

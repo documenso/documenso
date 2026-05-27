@@ -43,6 +43,7 @@ type EnvelopeRenderItem = {
   title: string;
   order: number;
   envelopeId: string;
+  documentDataId: string;
 
   /**
    * The PDF data to render.

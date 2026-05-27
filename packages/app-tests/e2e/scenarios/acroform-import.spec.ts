@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { UNSAFE_importAcroFormFieldsFromEnvelope } from '@documenso/lib/server-only/envelope-item/import-acroform-fields';
+import { UNSAFE_replaceEnvelopeItemPdf } from '@documenso/lib/server-only/envelope-item/replace-envelope-item-pdf';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { prisma } from '@documenso/prisma';
@@ -103,6 +104,67 @@ test.describe('AcroForm Import', () => {
     // The stored PDF still carries the original AcroForm widgets — they
     // survive the upload pipeline and are available to the import button.
     const pdfBuffer = await getFileServerSide(envelope.envelopeItems[0].documentData);
+
+    expect(await pdfHasFormFields(pdfBuffer)).toBe(true);
+  });
+
+  test('replacement preserves widgets in the stored PDF for later import', async ({ request }) => {
+    const { user, team } = await seedUser();
+    const { token } = await createApiToken({
+      userId: user.id,
+      teamId: team.id,
+      tokenName: 'test',
+      expiresIn: null,
+    });
+
+    const response = await uploadAcroFormEnvelope({
+      request,
+      token,
+      payload: {
+        type: EnvelopeType.DOCUMENT,
+        title: 'AcroForm document',
+        recipients: [
+          {
+            email: 'signer@example.com',
+            name: 'Signer',
+            role: RecipientRole.SIGNER,
+          },
+        ],
+      },
+    });
+
+    const envelope = await loadEnvelopeForImport(response.id);
+    const oldDocumentDataId = envelope.envelopeItems[0].documentDataId;
+
+    await UNSAFE_replaceEnvelopeItemPdf({
+      envelope,
+      recipients: envelope.recipients,
+      envelopeItemId: envelope.envelopeItems[0].id,
+      oldDocumentDataId,
+      data: {
+        title: 'Replacement AcroForm document',
+        file: new File([ACROFORM_FIXTURE], 'replacement-acroform.pdf', { type: 'application/pdf' }),
+      },
+      user,
+      apiRequestMetadata: {
+        requestMetadata: {},
+        source: 'apiV1',
+        auth: 'api',
+      },
+    });
+
+    const after = await prisma.envelope.findUniqueOrThrow({
+      where: { id: response.id },
+      include: {
+        envelopeItems: { include: { documentData: true } },
+        fields: true,
+      },
+    });
+
+    expect(after.fields).toHaveLength(0);
+    expect(after.envelopeItems[0].documentDataId).not.toBe(oldDocumentDataId);
+
+    const pdfBuffer = await getFileServerSide(after.envelopeItems[0].documentData);
 
     expect(await pdfHasFormFields(pdfBuffer)).toBe(true);
   });
