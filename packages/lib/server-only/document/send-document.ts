@@ -104,10 +104,6 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
     recipientsToNotify = envelope.recipients
       .filter((r) => r.signingStatus === SigningStatus.NOT_SIGNED && r.role !== RecipientRole.CC)
       .slice(0, 1);
-
-    // Secondary filter so we aren't resending if the current active recipient has already
-    // received the envelope.
-    recipientsToNotify.filter((r) => r.sendStatus !== SendStatus.SENT);
   }
 
   if (envelope.envelopeItems.length === 0) {

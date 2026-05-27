@@ -372,7 +372,7 @@ export const SignInForm = ({
               siteKey={turnstileSiteKey}
               options={{
                 size: 'flexible',
-                appearance: 'interaction-only',
+                appearance: 'always',
               }}
             />
           )}
@@ -511,7 +511,7 @@ export const SignInForm = ({
                     siteKey={turnstileSiteKey}
                     options={{
                       size: 'flexible',
-                      appearance: 'interaction-only',
+                      appearance: 'always',
                     }}
                   />
                 </div>
