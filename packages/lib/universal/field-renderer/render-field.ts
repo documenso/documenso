@@ -5,6 +5,9 @@ import type Konva from 'konva';
 import { match } from 'ts-pattern';
 
 import type { TFieldMetaSchema } from '../../types/field-meta';
+import type { FieldCanvasStyleCache } from './field-canvas-style';
+import { resolveFieldCanvasStyle } from './field-canvas-style';
+import type { FieldRenderMode } from './field-renderer';
 import { renderCheckboxFieldElement } from './render-checkbox-field';
 import { renderDropdownFieldElement } from './render-dropdown-field';
 import { renderGenericTextFieldElement } from './render-generic-text-field';
@@ -14,16 +17,7 @@ import { renderSignatureFieldElement } from './render-signature-field';
 export const MIN_FIELD_HEIGHT_PX = 12;
 export const MIN_FIELD_WIDTH_PX = 36;
 
-/**
- * The render type.
- *
- * @default 'edit'
- *
- * - `edit` - The field is rendered in editor page.
- * - `sign` - The field is rendered for the signing page.
- * - `export` - The field is rendered for exporting and sealing into the PDF. No backgrounds, interactive elements, etc.
- */
-export type FieldRenderMode = 'edit' | 'sign' | 'export';
+export type { FieldRenderMode };
 
 export type FieldToRender = Pick<
   Field,
@@ -52,6 +46,7 @@ type RenderFieldOptions = {
 
   scale: number;
   editable?: boolean;
+  fieldCanvasStyleCache?: FieldCanvasStyleCache;
 };
 
 export const renderField = ({
@@ -64,6 +59,7 @@ export const renderField = ({
   scale,
   editable,
   color,
+  fieldCanvasStyleCache,
 }: RenderFieldOptions) => {
   const options = {
     pageLayer,
@@ -74,6 +70,7 @@ export const renderField = ({
     color,
     editable,
     scale,
+    fieldCanvasStyle: resolveFieldCanvasStyle(field, mode, fieldCanvasStyleCache),
   };
 
   // If the generic text field element array changes, update the `GenericTextFieldTypeMetas` type

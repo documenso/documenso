@@ -9,6 +9,10 @@ import { isBase64Image } from '@documenso/lib/constants/signatures';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import type { TEnvelope } from '@documenso/lib/types/envelope';
 import { ZFullFieldSchema } from '@documenso/lib/types/field';
+import {
+  createFieldCanvasStyleCache,
+  type FieldCanvasStyleCache,
+} from '@documenso/lib/universal/field-renderer/field-canvas-style';
 import { createSpinner } from '@documenso/lib/universal/field-renderer/field-generic-items';
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
@@ -121,7 +125,10 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
     });
   }, [envelope.recipients, pageNumber, currentEnvelopeItem?.id]);
 
-  const unsafeRenderFieldOnLayer = (unparsedField: Field & { signature?: Signature | null }) => {
+  const unsafeRenderFieldOnLayer = (
+    unparsedField: Field & { signature?: Signature | null },
+    fieldCanvasStyleCache: FieldCanvasStyleCache,
+  ) => {
     if (!pageLayer.current) {
       console.error('Layer not loaded yet');
       return;
@@ -152,6 +159,7 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
       pageHeight: unscaledViewport.height,
       color,
       mode: 'sign',
+      fieldCanvasStyleCache,
     });
 
     const handleFieldGroupClick = (e: KonvaEventObject<Event>) => {
@@ -395,9 +403,12 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
     fieldGroup.on('pointerdown', handleFieldGroupClick);
   };
 
-  const renderFieldOnLayer = (unparsedField: Field & { signature?: Signature | null }) => {
+  const renderFieldOnLayer = (
+    unparsedField: Field & { signature?: Signature | null },
+    fieldCanvasStyleCache: FieldCanvasStyleCache,
+  ) => {
     try {
-      unsafeRenderFieldOnLayer(unparsedField);
+      unsafeRenderFieldOnLayer(unparsedField, fieldCanvasStyleCache);
     } catch (err) {
       console.error(err);
       setRenderError(true);
@@ -410,9 +421,11 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
       return;
     }
 
+    const fieldCanvasStyleCache = createFieldCanvasStyleCache();
+
     // Render current recipient fields.
     for (const field of localPageFields) {
-      renderFieldOnLayer(field);
+      renderFieldOnLayer(field, fieldCanvasStyleCache);
     }
 
     // Render other recipient signed and inserted fields.
@@ -436,6 +449,7 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
           color: 'readOnly',
           editable: false,
           mode: 'sign',
+          fieldCanvasStyleCache,
         });
       } catch (err) {
         console.error('Unable to render one or more fields belonging to other recipients.');
