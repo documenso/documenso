@@ -45,7 +45,8 @@ export const putFile = async (file: File) => {
   const NEXT_PUBLIC_UPLOAD_TRANSPORT = env('NEXT_PUBLIC_UPLOAD_TRANSPORT');
 
   return await match(NEXT_PUBLIC_UPLOAD_TRANSPORT)
-    .with('s3', async () => putFileInS3(file))
+    .with('s3', async () => putFileInObjectStorage(file, {}))
+    .with('azure-blob', async () => putFileInObjectStorage(file, { 'x-ms-blob-type': 'BlockBlob' }))
     .otherwise(async () => putFileInDatabase(file));
 };
 
@@ -62,7 +63,7 @@ const putFileInDatabase = async (file: File) => {
   };
 };
 
-const putFileInS3 = async (file: File) => {
+const putFileInObjectStorage = async (file: File, extraHeaders: Record<string, string>) => {
   const getPresignedUrlResponse = await fetch(`${NEXT_PUBLIC_WEBAPP_URL()}/api/files/presigned-post-url`, {
     method: 'POST',
     headers: {
@@ -82,16 +83,17 @@ const putFileInS3 = async (file: File) => {
 
   const body = await file.arrayBuffer();
 
-  const reponse = await fetch(url, {
+  const response = await fetch(url, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/octet-stream',
+      ...extraHeaders,
     },
     body,
   });
 
-  if (!reponse.ok) {
-    throw new Error(`Failed to upload file "${file.name}", failed with status code ${reponse.status}`);
+  if (!response.ok) {
+    throw new Error(`Failed to upload file "${file.name}", failed with status code ${response.status}`);
   }
 
   return {
