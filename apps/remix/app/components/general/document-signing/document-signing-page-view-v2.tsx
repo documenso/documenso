@@ -150,7 +150,7 @@ export const DocumentSigningPageViewV2 = () => {
                   layoutId="document-flow-container-step"
                   className="absolute inset-y-0 left-0 bg-primary"
                   style={{
-                    width: `${100 - (100 / requiredRecipientFields.length) * (recipientFieldsRemaining.length ?? 0)}%`,
+                    width: `${requiredRecipientFields.length === 0 ? 100 : 100 - (100 / requiredRecipientFields.length) * (recipientFieldsRemaining.length ?? 0)}%`,
                   }}
                 />
               </div>

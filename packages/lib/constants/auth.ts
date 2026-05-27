@@ -14,6 +14,7 @@ export const ZNameSchema = z
   .string()
   .trim()
   .min(3, { message: 'Please enter a valid name.' })
+  .max(255, { message: 'Name cannot be more than 255 characters.' })
   .refine((value) => !URL_PATTERN.test(value), {
     message: 'Name cannot contain URLs.',
   });

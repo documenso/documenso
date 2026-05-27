@@ -338,8 +338,6 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
                 fieldGroup.add(loadingSpinnerGroup);
                 await signField(field.id, payload);
               }
-
-              loadingSpinnerGroup.destroy();
             })
             .finally(() => {
               loadingSpinnerGroup.destroy();

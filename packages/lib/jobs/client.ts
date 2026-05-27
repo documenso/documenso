@@ -1,6 +1,8 @@
 import { JobClient } from './client/client';
+import { SEND_ADMIN_USER_CREATED_EMAIL_JOB_DEFINITION } from './definitions/emails/send-admin-user-created-email';
 import { SEND_CONFIRMATION_EMAIL_JOB_DEFINITION } from './definitions/emails/send-confirmation-email';
 import { SEND_DOCUMENT_CANCELLED_EMAILS_JOB_DEFINITION } from './definitions/emails/send-document-cancelled-emails';
+import { SEND_DOCUMENT_COMPLETED_EMAILS_JOB_DEFINITION } from './definitions/emails/send-document-completed-emails';
 import { SEND_DOCUMENT_CREATED_FROM_DIRECT_TEMPLATE_EMAIL_JOB_DEFINITION } from './definitions/emails/send-document-created-from-direct-template-email';
 import { SEND_ORGANISATION_MEMBER_JOINED_EMAIL_JOB_DEFINITION } from './definitions/emails/send-organisation-member-joined-email';
 import { SEND_ORGANISATION_MEMBER_LEFT_EMAIL_JOB_DEFINITION } from './definitions/emails/send-organisation-member-left-email';
@@ -29,6 +31,7 @@ import { SYNC_EMAIL_DOMAINS_JOB_DEFINITION } from './definitions/internal/sync-e
  * triggering jobs.
  */
 export const jobsClient = new JobClient([
+  SEND_ADMIN_USER_CREATED_EMAIL_JOB_DEFINITION,
   SEND_SIGNING_EMAIL_JOB_DEFINITION,
   SEND_CONFIRMATION_EMAIL_JOB_DEFINITION,
   SEND_ORGANISATION_MEMBER_JOINED_EMAIL_JOB_DEFINITION,
@@ -39,6 +42,7 @@ export const jobsClient = new JobClient([
   SEND_PASSWORD_RESET_SUCCESS_EMAIL_JOB_DEFINITION,
   SEND_SIGNING_REJECTION_EMAILS_JOB_DEFINITION,
   SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION,
+  SEND_DOCUMENT_COMPLETED_EMAILS_JOB_DEFINITION,
   SEND_DOCUMENT_CANCELLED_EMAILS_JOB_DEFINITION,
   SEND_DOCUMENT_CREATED_FROM_DIRECT_TEMPLATE_EMAIL_JOB_DEFINITION,
   SEND_OWNER_RECIPIENT_EXPIRED_EMAIL_JOB_DEFINITION,
