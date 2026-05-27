@@ -1,12 +1,15 @@
 import { sendOrganisationAccountLinkConfirmationEmail } from '@documenso/ee/server-only/lib/send-organisation-account-link-confirmation-email';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { isSignupEnabledForProvider } from '@documenso/lib/constants/auth';
 import { AppError } from '@documenso/lib/errors/app-error';
+import { isTwoFactorAuthenticationEnabled } from '@documenso/lib/server-only/2fa/is-2fa-availble';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
 import { formatOrganisationLoginUrl } from '@documenso/lib/utils/organisation-authentication-portal';
 import { prisma } from '@documenso/prisma';
 import type { Context } from 'hono';
-
+import { setSignedCookie } from 'hono/cookie';
 import { AuthenticationErrorCode } from '../errors/error-codes';
+import { getAuthSecret, oauth2faCookieName, sessionCookieOptions } from '../session/session-cookies';
 import { onAuthorize } from './authorizer';
 import { validateOauth } from './handle-oauth-callback-url';
 import { getOrganisationAuthenticationPortalOptions } from './organisation-portal';
@@ -53,6 +56,18 @@ export const handleOAuthOrganisationCallbackUrl = async (options: HandleOAuthOrg
 
   // Directly log in user if account already exists.
   if (existingAccount) {
+    const user = existingAccount.user;
+
+    if (isTwoFactorAuthenticationEnabled({ user })) {
+      await setSignedCookie(c, oauth2faCookieName, String(user.id), getAuthSecret(), sessionCookieOptions);
+
+      const redirectUrl = new URL('/signin', NEXT_PUBLIC_WEBAPP_URL());
+      redirectUrl.searchParams.set('oauth2fa', 'true');
+      redirectUrl.searchParams.set('returnTo', `/o/${orgUrl}`);
+
+      return c.redirect(redirectUrl.toString(), 302);
+    }
+
     await onAuthorize({ userId: existingAccount.user.id }, c);
 
     return c.redirect(`/o/${orgUrl}`, 302);

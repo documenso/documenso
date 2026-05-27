@@ -1,6 +1,7 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { isEmailDomainAllowedForSignup, isSignupEnabledForProvider } from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { isTwoFactorAuthenticationEnabled } from '@documenso/lib/server-only/2fa/is-2fa-availble';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
 import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
 import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
@@ -9,10 +10,11 @@ import { prisma } from '@documenso/prisma';
 import { UserSecurityAuditLogType } from '@prisma/client';
 import { decodeIdToken, OAuth2Client } from 'arctic';
 import type { Context } from 'hono';
-import { deleteCookie } from 'hono/cookie';
+import { deleteCookie, setSignedCookie } from 'hono/cookie';
 
 import type { OAuthClientOptions } from '../../config';
 import { AuthenticationErrorCode } from '../errors/error-codes';
+import { getAuthSecret, oauth2faCookieName, sessionCookieOptions } from '../session/session-cookies';
 import { onAuthorize } from './authorizer';
 import { getOpenIdConfiguration } from './open-id';
 
@@ -45,6 +47,9 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
       user: {
         select: {
           id: true,
+          twoFactorEnabled: true,
+          twoFactorSecret: true,
+          twoFactorBackupCodes: true,
         },
       },
     },
@@ -52,6 +57,20 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
 
   // Directly log in user if account already exists.
   if (existingAccount) {
+    const user = existingAccount.user;
+
+    if (isTwoFactorAuthenticationEnabled({ user })) {
+      await setSignedCookie(c, oauth2faCookieName, String(user.id), getAuthSecret(), sessionCookieOptions);
+
+      const redirectUrl = new URL('/signin', NEXT_PUBLIC_WEBAPP_URL());
+      redirectUrl.searchParams.set('oauth2fa', 'true');
+      if (redirectPath && redirectPath !== '/') {
+        redirectUrl.searchParams.set('returnTo', redirectPath);
+      }
+
+      return c.redirect(redirectUrl.toString(), 302);
+    }
+
     await onAuthorize({ userId: existingAccount.user.id }, c);
 
     return c.redirect(redirectPath, 302);
@@ -64,11 +83,26 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
     select: {
       id: true,
       emailVerified: true,
+      twoFactorEnabled: true,
+      twoFactorSecret: true,
+      twoFactorBackupCodes: true,
     },
   });
 
   // Handle existing user but no account.
   if (userWithSameEmail) {
+    if (isTwoFactorAuthenticationEnabled({ user: userWithSameEmail })) {
+      await setSignedCookie(c, oauth2faCookieName, String(userWithSameEmail.id), getAuthSecret(), sessionCookieOptions);
+
+      const redirectUrl = new URL('/signin', NEXT_PUBLIC_WEBAPP_URL());
+      redirectUrl.searchParams.set('oauth2fa', 'true');
+      if (redirectPath && redirectPath !== '/') {
+        redirectUrl.searchParams.set('returnTo', redirectPath);
+      }
+
+      return c.redirect(redirectUrl.toString(), 302);
+    }
+
     await prisma.$transaction(async (tx) => {
       await tx.account.create({
         data: {
