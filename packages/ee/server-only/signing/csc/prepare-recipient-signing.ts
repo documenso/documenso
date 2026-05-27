@@ -185,6 +185,12 @@ export const prepareCscRecipientSigning = async (
 
     const anchorName = buildTspAnchorName(recipient.id, envelopeItem.id);
 
+    // Capture at B-B even though the eventual embed pass is B-T. The B-T
+    // signature timestamp is a CMS *unsigned* attribute, added by libpdf
+    // after `signer.sign()` runs over the signed-attrs digest — so B-B and
+    // B-T produce byte-identical signed-attrs for the same `(signer,
+    // documentHash, digestAlgorithm, signingTime)` tuple. See the matching
+    // note in `execute-tsp-sign.ts`.
     await capturePdfDoc.sign({
       signer: captureSigner,
       fieldName: anchorName,

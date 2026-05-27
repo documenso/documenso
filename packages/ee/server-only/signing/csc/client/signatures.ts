@@ -76,9 +76,12 @@ type CscTimestampOptions = TCscTimestampRequest & {
 
 /**
  * `signatures/timestamp` (§11.10) — request an RFC 3161 / RFC 5816 time-stamp
- * token for a pre-computed hash. Used by the B-LTA seal step when the TSP
- * advertises `signatures/timestamp` in its `info.methods`; otherwise the seal
- * step falls back to `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY`.
+ * token for a pre-computed hash. Driven by {@link CscTspTimestampAuthority}
+ * at sign time, when {@link resolveCscSignTimeTsa} selects the TSP source
+ * (TSP advertises `signatures/timestamp` in `info.methods`). The bearer is
+ * the current recipient's own service-scope token. Seal-time archival
+ * timestamps do not go through this endpoint — they use the env-configured
+ * RFC 3161 TSA directly.
  *
  * If `nonce` is supplied, the TSP MUST round-trip it in the token — we leave
  * verification to LibPDF / our TSA helper, not this client.

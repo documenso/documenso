@@ -7,6 +7,7 @@ import type { OAuth2Client } from 'arctic';
 import { cscInfo } from './client/info';
 import { createCscOAuthClient } from './client/oauth';
 import type { TCscInfoResponse } from './client/types';
+import { isEnvTsaConfigured } from './tsa-resolver';
 
 /**
  * Lazily-built, globally-cached CSC transport.
@@ -124,12 +125,29 @@ const buildCscTransport = async (): Promise<CscTransport> => {
     });
   }
 
+  const supportsTimestamp = info.methods.includes(CSC_TIMESTAMP_METHOD);
+
+  // Boot-time TSA invariant: `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY` is
+  // required unconditionally in CSC mode. Sign-time B-T can use the TSP's
+  // own `signatures/timestamp` endpoint when advertised, but seal-time
+  // B-LTA archival is env-only by design (operators should pin a dedicated
+  // qualified archival TSA — see `resolveCscSealTimeTsa`). Without env, an
+  // envelope would sign successfully and then hang in
+  // WAITING_FOR_SIGNATURE_COMPLETION when the seal job throws. Catch the
+  // misconfiguration at boot instead so the instance refuses to start.
+  if (!isEnvTsaConfigured()) {
+    throw new AppError(AppErrorCode.CSC_PROVIDER_NO_TSA, {
+      message:
+        'NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY is unset. AES/QES envelopes require a TSA for B-LTA archival at seal time regardless of whether the CSC TSP advertises signatures/timestamp for B-T sign-time. Configure NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY.',
+    });
+  }
+
   return {
     serviceBaseUrl,
     oauthBaseUrl: info.oauth2,
     oauthClient,
     oauthRedirectUri,
-    supportsTimestamp: info.methods.includes(CSC_TIMESTAMP_METHOD),
+    supportsTimestamp,
     info,
   };
 };

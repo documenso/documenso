@@ -1,4 +1,3 @@
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
@@ -7,8 +6,8 @@ import { prisma } from '@documenso/prisma';
 import { HttpTimestampAuthority, PDF, type TimestampAuthority } from '@libpdf/core';
 import type { DocumentData, DocumentMeta, Envelope, EnvelopeItem, Recipient, User } from '@prisma/client';
 import { DocumentStatus } from '@prisma/client';
-import { getCscTransport } from './transport';
-import { type CscTsaConfig, resolveCscTsa } from './tsa-resolver';
+
+import { resolveCscSealTimeTsa } from './tsa-resolver';
 
 /**
  * TSP envelope finalisation step run from the `seal-document` job.
@@ -53,8 +52,7 @@ export const finalizeTspEnvelopeCompletion = async (opts: FinalizeTspEnvelopeCom
 
   // Resolve the TSA up-front — fail fast if the instance is mis-configured
   // before we start round-tripping PDF bytes through storage.
-  const transport = await getCscTransport();
-  const tsa = resolveCscTsa(transport);
+  const tsa = resolveCscSealTimeTsa();
   const timestampAuthority = buildLibpdfTsa(tsa);
 
   const archivedItems: ArchivedItem[] = [];
@@ -114,23 +112,19 @@ export const finalizeTspEnvelopeCompletion = async (opts: FinalizeTspEnvelopeCom
 };
 
 /**
- * Wrap a resolved {@link CscTsaConfig} into a libpdf `TimestampAuthority`.
+ * Wrap a resolved seal-time TSA config into a libpdf `TimestampAuthority`.
  *
- * - `source: 'env'` — RFC 3161 endpoint, libpdf's `HttpTimestampAuthority`
- *   handles it directly. First URL only (V1; multi-URL fallback can layer
- *   on later via a composite wrapper).
- * - `source: 'tsp'` — CSC §11.10 JSON POST with a service-scope bearer.
- *   Requires resolving "whose service token" and round-tripping through
- *   the CSC client. Out of scope for V1; throws `NOT_SETUP` pointing
- *   operators at the env override so the failure mode is actionable.
+ * Env only at seal time — the archival `/DocTimeStamp` is the operator's
+ * long-term trust anchor and SHOULD point at a dedicated qualified archival
+ * TSA (e.g. DigiCert) that's independent of the per-recipient TSP. We
+ * deliberately don't fall back to the TSP here: doing so would couple the
+ * archive's longevity to a TSP that may revoke or rotate without notice,
+ * and would require keeping a live service-scope bearer around at the
+ * seal-document job which has no recipient context anyway.
+ *
+ * First URL only — multi-URL fallback can layer on later via a composite
+ * wrapper if operators need it.
  */
-const buildLibpdfTsa = (tsa: CscTsaConfig): TimestampAuthority => {
-  if (tsa.source === 'env') {
-    return new HttpTimestampAuthority(tsa.urls[0]);
-  }
-
-  throw new AppError(AppErrorCode.NOT_SETUP, {
-    message:
-      'CSC §11.10 timestamp wrapping is not implemented in V1. Set NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY to a RFC 3161 TSA URL to enable B-LTA archive timestamps.',
-  });
+const buildLibpdfTsa = (tsa: { urls: string[] }): TimestampAuthority => {
+  return new HttpTimestampAuthority(tsa.urls[0]);
 };

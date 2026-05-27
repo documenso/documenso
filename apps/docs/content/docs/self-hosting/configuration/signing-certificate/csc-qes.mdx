@@ -70,7 +70,7 @@ CSC produces multiple `DocumentData` rows per envelope item (one per recipient s
 | `NEXT_PRIVATE_SIGNING_CSC_OAUTH_CLIENT_ID`     | OAuth client ID registered with the CSC provider                                                                                  |         |
 | `NEXT_PRIVATE_SIGNING_CSC_OAUTH_CLIENT_SECRET` | OAuth client secret registered with the CSC provider                                                                              |         |
 | `NEXT_PRIVATE_SIGNING_CSC_SIGNATURE_LEVEL`     | Default legal tier for new envelopes when the caller does not specify one. `AES` or `QES`. Explicit requests always pass through. | `AES`   |
-| `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY`     | Comma-separated TSA URLs. Used for long-term archive timestamps when the TSP itself does not expose `signatures/timestamp`.       |         |
+| `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY`     | **Required.** Comma-separated RFC 3161 TSA URLs. Always used for B-LTA archival timestamps at seal time, and also serves as the B-T sign-time fallback when the TSP does not expose `signatures/timestamp`. The instance refuses to start in CSC mode without it. See [Timestamp Authority Resolution](#timestamp-authority-resolution). |         |
 
 <Callout type="info">
   `NEXT_PUBLIC_SIGNING_TRANSPORT_IS_CSC` is set automatically from
@@ -104,11 +104,26 @@ Any value other than `AES` or `QES` causes the instance to refuse to start. This
 
 ## Timestamp Authority Resolution
 
-Long-term archive timestamps (PAdES B-LTA) are required for AES/QES envelopes. Resolution order at seal time:
+AES/QES envelopes use TSA-attested timestamps in two distinct phases. Resolution differs per phase.
 
-1. If the TSP advertises `signatures/timestamp` in its `info` response, that endpoint is used.
-2. Otherwise, the first URL in `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY` is used.
-3. If neither is available, the instance fails at envelope completion (`CSC_PROVIDER_NO_TSA`).
+### Sign time — PAdES B-T per recipient
+
+Each recipient's CMS embeds a signature timestamp (CMS unsigned attribute) so proven time is bound to the recipient's signature itself. Resolution order:
+
+1. If the TSP advertises `signatures/timestamp` in its `info` response (CSC §11.10), the TSP endpoint is used. The call is authorised with **this recipient's** service-scope bearer token — the same one authorising the `signatures/signHash` call alongside it.
+2. Otherwise, the first URL from `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY` is used (RFC 3161 over HTTP).
+
+Selection is made at boot from the discovered transport, not at runtime; there is no try-then-fall-through. If the chosen source fails, the recipient's sign attempt fails.
+
+### Seal time — PAdES B-LTA archival
+
+The seal-document job emits a single archival `/DocTimeStamp` over the fully-signed envelope (plus DSS for the existing signatures and the timestamp's own chain). This phase is **env-only**: the first URL from `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY` is always used.
+
+The archival anchor is the operator's long-term trust anchor and SHOULD point at a dedicated qualified archival TSA (e.g. DigiCert) independent of the per-recipient TSP. We deliberately do not fall back to the TSP at seal time: archive longevity should not be coupled to a TSP that may rotate or revoke, and the seal-document job has no recipient context to carry a service-scope bearer.
+
+### Boot-time guard
+
+The instance refuses to start in CSC mode unless `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY` is set (`CSC_PROVIDER_NO_TSA` at transport construction). The env var is required unconditionally — even when the TSP advertises its own `signatures/timestamp`, seal-time B-LTA archival uses the env TSA. Catching this at boot prevents the failure mode where an envelope signs successfully at B-T and then hangs in `WAITING_FOR_SIGNATURE_COMPLETION` when the seal job throws.
 
 ## Switching Transports
 
@@ -166,7 +181,7 @@ CSC-specific error codes surfaced through the standard error channels:
 | -------------------------- | ------------------------------------------------ | ----------------------------------------------------------------------- |
 | `CSC_UNLICENSED`           | License flag absent at transport-create          | Operator: enable Enterprise Edition, restart                            |
 | `CSC_PROVIDER_INFO_FAILED` | `info` discovery failed at startup               | Operator: check TSP availability and `NEXT_PRIVATE_SIGNING_CSC_PROVIDER_BASE_URL` |
-| `CSC_PROVIDER_NO_TSA`      | TSP exposes no TSA and no env override is set    | Operator: configure `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY`          |
+| `CSC_PROVIDER_NO_TSA`      | `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY` is unset | Operator: configure `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY`        |
 | `CSC_CREDENTIAL_LIST_EMPTY`| TSP returned no credentials for the user         | Recipient: enrol with the TSP                                           |
 | `CSC_CERT_INVALID`         | Certificate refused at credential validation     | Recipient: contact the TSP                                              |
 | `CSC_ALGORITHM_REFUSED`    | Signature algorithm fails policy                 | Operator/recipient: TSP does not meet policy (see below)                |

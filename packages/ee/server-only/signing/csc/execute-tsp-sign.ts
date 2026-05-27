@@ -32,6 +32,7 @@ import { consumeCscSession, loadCscSession } from './sign-session';
 import { CscCaptureSigner } from './signers/capture-signer';
 import { CscFifoSigner } from './signers/fifo-signer';
 import { getCscTransport } from './transport';
+import { resolveCscSignTimeTsa } from './tsa-resolver';
 
 /**
  * CSC TSP sign-time orchestrator.
@@ -223,6 +224,14 @@ export const executeTspSign = async (opts: ExecuteTspSignOptions): Promise<Execu
 
     const anchorName = buildTspAnchorName(recipient.id, envelopeItem.id);
 
+    // Capture pass stays at B-B even though the embed pass below is B-T:
+    // libpdf's B-T signature timestamp is added as a CMS *unsigned*
+    // attribute *after* `signer.sign()` runs over the signed-attrs digest.
+    // The signed-attrs builder (see CAdESDetachedBuilder.create in
+    // @libpdf/core) takes only (signer, documentHash, digestAlgorithm,
+    // signingTime) — no level-conditional attributes — so B-B and B-T
+    // produce byte-identical signed-attrs for the same inputs. Capturing
+    // at B-B avoids dragging the TSA into the dry-run.
     await pdfDoc.sign({
       signer: captureSigner,
       fieldName: anchorName,
@@ -293,7 +302,14 @@ export const executeTspSign = async (opts: ExecuteTspSignOptions): Promise<Execu
 
   // Embed pass: per-item, reload the same prep-persisted PDF bytes and sign
   // with a single-signature FIFO signer. No re-render — bytes are exactly
-  // the ones whose digest the TSP just authorised.
+  // the ones whose digest the TSP just authorised. Level is B-T: each
+  // recipient's CMS gets a TSA-attested signature timestamp embedded as an
+  // unsigned attribute, binding proven time to the signature itself (the
+  // actual eIDAS AES/QES requirement). The TSA is resolved per-recipient
+  // via the sign-time resolver — TSP if advertised (authorised with this
+  // recipient's service-scope bearer), env otherwise.
+  const timestampAuthority = resolveCscSignTimeTsa(transport, serviceToken);
+
   const signedItemDataUpdates: SignedItemDataUpdate[] = [];
 
   for (let i = 0; i < capturedItems.length; i++) {
@@ -313,7 +329,8 @@ export const executeTspSign = async (opts: ExecuteTspSignOptions): Promise<Execu
       signer: fifoSigner,
       fieldName: captured.anchorName,
       signingTime: session.signingTime,
-      level: 'B-B',
+      level: 'B-T',
+      timestampAuthority,
       digestAlgorithm: algo.digestAlgorithm,
     });
 

@@ -239,7 +239,7 @@ The authoring UI uses this flag to gate features that AES/QES envelopes cannot s
 
 | Variable                                    | Description                                                 | Default    |
 | ------------------------------------------- | ----------------------------------------------------------- | ---------- |
-| `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY`  | Comma-separated timestamp authority URLs for LTV signatures |            |
+| `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY`  | Comma-separated timestamp authority URLs for LTV signatures. Optional for `local` / `gcloud-hsm` (signatures omit the timestamp when unset). **Required** when `NEXT_PRIVATE_SIGNING_TRANSPORT=csc` — the instance refuses to start without it. See [CSC (AES / QES)](/docs/self-hosting/configuration/signing-certificate/csc-qes#timestamp-authority-resolution). |            |
 | `NEXT_PUBLIC_SIGNING_CONTACT_INFO`          | Contact info embedded in PDF signatures                     | Webapp URL |
 | `NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER` | Use `adbe.pkcs7.detached` instead of `ETSI.CAdES.detached`  | `false`    |
 
