@@ -515,6 +515,9 @@ export const findDocuments = async ({
       envelopeItems: {
         select: { id: true, envelopeId: true, title: true, order: true },
       },
+      _count: {
+        select: { fields: true },
+      },
     },
   });
 

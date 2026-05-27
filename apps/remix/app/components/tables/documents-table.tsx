@@ -1,7 +1,8 @@
 import { useMemo, useTransition } from 'react';
 
-import { msg } from '@lingui/core/macro';
+import { msg, plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link } from 'react-router';
@@ -116,6 +117,24 @@ export const DocumentsTable = ({
         ),
       },
       {
+        header: _(msg`Fields`),
+        accessorKey: 'fieldCount',
+        cell: ({ row }) => {
+          const count = row.original.fieldCount;
+
+          if (count === 0) {
+            return (
+              <span className="text-muted-foreground">
+                <Trans>No fields</Trans>
+              </span>
+            );
+          }
+
+          return plural(count, { one: '# field', other: '# fields' });
+        },
+        size: 120,
+      },
+      {
         header: _(msg`Status`),
         accessorKey: 'status',
         cell: ({ row }) => <DocumentStatus status={row.original.status} />,
@@ -190,6 +209,9 @@ export const DocumentsTable = ({
                 <div className="flex w-full flex-row items-center">
                   <Skeleton className="h-10 w-10 flex-shrink-0 rounded-full" />
                 </div>
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4 w-16 rounded-full" />
               </TableCell>
               <TableCell>
                 <Skeleton className="h-4 w-20 rounded-full" />
