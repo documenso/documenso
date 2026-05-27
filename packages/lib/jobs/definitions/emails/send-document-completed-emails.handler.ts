@@ -5,29 +5,26 @@ import { msg } from '@lingui/core/macro';
 import { DocumentSource, EnvelopeType } from '@prisma/client';
 import { createElement } from 'react';
 
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
-import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
-import type { RequestMetadata } from '../../universal/extract-request-metadata';
-import { getFileServerSide } from '../../universal/upload/get-file.server';
-import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
-import type { EnvelopeIdOptions } from '../../utils/envelope';
-import { unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
-import { isRecipientEmailValidForSending } from '../../utils/recipients';
-import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { formatDocumentsPath } from '../../utils/teams';
-import { getEmailContext } from '../email/get-email-context';
+import { getI18nInstance } from '../../../client-only/providers/i18n-server';
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
+import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
+import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
+import { getFileServerSide } from '../../../universal/upload/get-file.server';
+import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
+import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
+import { isRecipientEmailValidForSending } from '../../../utils/recipients';
+import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
+import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
+import { formatDocumentsPath } from '../../../utils/teams';
+import type { JobRunIO } from '../../client/_internal/job';
+import type { TSendDocumentCompletedEmailsJobDefinition } from './send-document-completed-emails';
 
-export interface SendDocumentOptions {
-  id: EnvelopeIdOptions;
-  requestMetadata?: RequestMetadata;
-}
+export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmailsJobDefinition; io: JobRunIO }) => {
+  const { envelopeId, requestMetadata } = payload;
 
-export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOptions) => {
   const envelope = await prisma.envelope.findUnique({
-    where: unsafeBuildEnvelopeIdQuery(id, EnvelopeType.DOCUMENT),
+    where: unsafeBuildEnvelopeIdQuery({ type: 'envelopeId', id: envelopeId }, EnvelopeType.DOCUMENT),
     include: {
       envelopeItems: {
         include: {

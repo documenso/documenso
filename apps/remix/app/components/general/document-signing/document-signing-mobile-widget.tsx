@@ -97,7 +97,7 @@ export const DocumentSigningMobileWidget = () => {
                   layoutId="document-signing-mobile-widget-progress-bar"
                   className="absolute inset-y-0 left-0 bg-primary"
                   style={{
-                    width: `${100 - (100 / requiredRecipientFields.length) * (recipientFieldsRemaining.length ?? 0)}%`,
+                    width: `${requiredRecipientFields.length === 0 ? 100 : 100 - (100 / requiredRecipientFields.length) * (recipientFieldsRemaining.length ?? 0)}%`,
                   }}
                 />
               </div>
