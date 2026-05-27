@@ -108,6 +108,7 @@ type MapEnvelopeToDocumentManyOptions = Envelope & {
   user: Pick<User, 'id' | 'name' | 'email'>;
   team: Pick<Team, 'id' | 'url'>;
   recipients: Recipient[];
+  _count?: { fields: number };
 };
 
 /**
@@ -153,5 +154,6 @@ export const mapEnvelopesToDocumentMany = (
     recipients: envelope.recipients.map((recipient) =>
       mapRecipientToLegacyRecipient(recipient, envelope),
     ),
+    fieldCount: envelope._count?.fields ?? 0,
   };
 };
