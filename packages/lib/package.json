@@ -21,6 +21,7 @@
     "@aws-sdk/cloudfront-signer": "^3.998.0",
     "@aws-sdk/s3-request-presigner": "^3.998.0",
     "@aws-sdk/signature-v4-crt": "^3.998.0",
+    "@azure/storage-blob": "^12.31.0",
     "@bull-board/api": "^6.20.6",
     "@bull-board/hono": "^6.20.6",
     "@bull-board/ui": "^6.20.6",
