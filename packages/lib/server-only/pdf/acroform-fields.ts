@@ -68,6 +68,7 @@ const NAME_NAME_PATTERN = /name/i;
 const INITIALS_NAME_PATTERN = /initial/i;
 
 const ROW_TOLERANCE_PERCENT = 2;
+const ACROFORM_FIELD_SOURCE = 'acroform';
 
 export type AcroFormUnsupportedReason =
   | 'unsupported-type'
@@ -153,25 +154,15 @@ const hasXfa = (pdfDoc: PDF, resolver: RefResolver): boolean => {
   }
 };
 
-const isDateFieldByName = (name: string | null | undefined): boolean => {
-  return name ? DATE_NAME_PATTERN.test(name) : false;
-};
+const isDateFieldByName = (name: string | null | undefined): boolean => !!name && DATE_NAME_PATTERN.test(name);
 
-const isNumberFieldByName = (name: string | null | undefined): boolean => {
-  return name ? NUMBER_NAME_PATTERN.test(name) : false;
-};
+const isNumberFieldByName = (name: string | null | undefined): boolean => !!name && NUMBER_NAME_PATTERN.test(name);
 
-const isEmailFieldByName = (name: string | null | undefined): boolean => {
-  return name ? EMAIL_NAME_PATTERN.test(name) : false;
-};
+const isEmailFieldByName = (name: string | null | undefined): boolean => !!name && EMAIL_NAME_PATTERN.test(name);
 
-const isNameFieldByName = (name: string | null | undefined): boolean => {
-  return name ? NAME_NAME_PATTERN.test(name) : false;
-};
+const isNameFieldByName = (name: string | null | undefined): boolean => !!name && NAME_NAME_PATTERN.test(name);
 
-const isInitialsFieldByName = (name: string | null | undefined): boolean => {
-  return name ? INITIALS_NAME_PATTERN.test(name) : false;
-};
+const isInitialsFieldByName = (name: string | null | undefined): boolean => !!name && INITIALS_NAME_PATTERN.test(name);
 
 /**
  * Detect AcroForm format actions on a text field dictionary.
@@ -185,13 +176,7 @@ const isInitialsFieldByName = (name: string | null | undefined): boolean => {
  */
 const getTextFieldFormatHint = (fieldDict: PdfDict, resolver: RefResolver): 'date' | 'number' | null => {
   try {
-    const aaDict = fieldDict.getDict('AA', resolver);
-
-    if (!aaDict) {
-      return null;
-    }
-
-    const formatDict = aaDict.getDict('F', resolver);
+    const formatDict = fieldDict.getDict('AA', resolver)?.getDict('F', resolver);
 
     if (!formatDict) {
       return null;
@@ -416,7 +401,7 @@ const buildSignatureFieldAndMeta = (field: FormFieldWithDict): TFieldAndMeta => 
       ...FIELD_SIGNATURE_META_DEFAULT_VALUES,
       required: field.isRequired() || undefined,
       readOnly: field.isReadOnly() || undefined,
-      source: 'acroform' as const,
+      source: ACROFORM_FIELD_SOURCE,
     },
   });
 };
@@ -430,14 +415,15 @@ const buildTextFieldAndMeta = (
   const required = field.isRequired() || undefined;
   const readOnly = field.isReadOnly() || undefined;
 
+  const defaultValue = defaultText && defaultText.length > 0 ? defaultText : undefined;
   if (documensoType === FieldType.NUMBER) {
     const fieldMeta: TNumberFieldMeta = {
       ...FIELD_NUMBER_META_DEFAULT_VALUES,
       label: label ?? FIELD_NUMBER_META_DEFAULT_VALUES.label,
       required,
       readOnly,
-      source: 'acroform' as const,
-      value: defaultText && defaultText.length > 0 ? defaultText : undefined,
+      source: ACROFORM_FIELD_SOURCE,
+      value: defaultValue,
     };
 
     return ZEnvelopeFieldAndMetaSchema.parse({ type: documensoType, fieldMeta });
@@ -449,8 +435,8 @@ const buildTextFieldAndMeta = (
       label: label ?? FIELD_TEXT_META_DEFAULT_VALUES.label,
       required,
       readOnly,
-      source: 'acroform' as const,
-      text: defaultText && defaultText.length > 0 ? defaultText : FIELD_TEXT_META_DEFAULT_VALUES.text,
+      source: ACROFORM_FIELD_SOURCE,
+      text: defaultValue ?? FIELD_TEXT_META_DEFAULT_VALUES.text,
     };
 
     return ZEnvelopeFieldAndMetaSchema.parse({ type: documensoType, fieldMeta });
@@ -464,7 +450,7 @@ const buildTextFieldAndMeta = (
         label,
         required,
         readOnly,
-        source: 'acroform' as const,
+        source: ACROFORM_FIELD_SOURCE,
       },
     });
   }
@@ -477,7 +463,7 @@ const buildTextFieldAndMeta = (
         label,
         required,
         readOnly,
-        source: 'acroform' as const,
+        source: ACROFORM_FIELD_SOURCE,
       },
     });
   }
@@ -490,7 +476,7 @@ const buildTextFieldAndMeta = (
         label,
         required,
         readOnly,
-        source: 'acroform' as const,
+        source: ACROFORM_FIELD_SOURCE,
       },
     });
   }
@@ -502,7 +488,7 @@ const buildTextFieldAndMeta = (
       label,
       required,
       readOnly,
-      source: 'acroform' as const,
+      source: ACROFORM_FIELD_SOURCE,
     },
   });
 };
@@ -520,7 +506,7 @@ const buildCheckboxFieldAndMeta = (
     label: pickLabel(field) ?? FIELD_CHECKBOX_META_DEFAULT_VALUES.label,
     required: required || undefined,
     readOnly: field.isReadOnly() || undefined,
-    source: 'acroform' as const,
+    source: ACROFORM_FIELD_SOURCE,
     values: [{ id: 1, checked: isChecked, value }],
     validationRule: required ? 'at-least' : '',
     validationLength: required ? 1 : 0,
@@ -555,7 +541,7 @@ const buildRadioFieldAndMeta = (
     label: pickLabel(field) ?? '',
     required: field.isRequired() || undefined,
     readOnly: field.isReadOnly() || undefined,
-    source: 'acroform' as const,
+    source: ACROFORM_FIELD_SOURCE,
     values,
   };
 
@@ -572,7 +558,7 @@ const buildDropdownFieldAndMeta = (
     label: pickLabel(field) ?? '',
     required: field.isRequired() || undefined,
     readOnly: field.isReadOnly() || undefined,
-    source: 'acroform' as const,
+    source: ACROFORM_FIELD_SOURCE,
     values: options.length > 0 ? options.map((value) => ({ value })) : FIELD_DROPDOWN_META_DEFAULT_VALUES.values,
     defaultValue: defaultValue ?? '',
   };
@@ -661,6 +647,10 @@ export const extractAcroFormFieldsFromPDF = async (
     const fields: AcroFormFieldImportInfo[] = [];
     const unsupported: AcroFormUnsupportedFieldInfo[] = [];
     let hasSignedSignature = false;
+    const usePdfDefaults = !options.formValuesProvided;
+    const addUnsupported = (fieldName: string, acroFormType: string, reason: AcroFormUnsupportedReason): void => {
+      unsupported.push({ fieldName, acroFormType, reason });
+    };
 
     for (const field of formFields) {
       const acroFormType = field.type;
@@ -671,11 +661,7 @@ export const extractAcroFormFieldsFromPDF = async (
         acroFormType === 'unknown' ||
         acroFormType === 'non-terminal'
       ) {
-        unsupported.push({
-          fieldName: field.name,
-          acroFormType,
-          reason: 'unsupported-type',
-        });
+        addUnsupported(field.name, acroFormType, 'unsupported-type');
         continue;
       }
 
@@ -687,11 +673,7 @@ export const extractAcroFormFieldsFromPDF = async (
 
         if (typeof sigField.isSigned === 'function' && sigField.isSigned()) {
           hasSignedSignature = true;
-          unsupported.push({
-            fieldName: field.name,
-            acroFormType,
-            reason: 'signed-signature',
-          });
+          addUnsupported(field.name, acroFormType, 'signed-signature');
           continue;
         }
       }
@@ -701,38 +683,25 @@ export const extractAcroFormFieldsFromPDF = async (
       const { matched, unmatched } = resolveWidgetPages(widgets, pageByRef);
 
       for (let i = 0; i < unmatched.length; i += 1) {
-        unsupported.push({
-          fieldName: field.name,
-          acroFormType,
-          reason: 'no-page-match',
-        });
+        addUnsupported(field.name, acroFormType, 'no-page-match');
       }
 
       let widgetCounter = 0;
 
       for (const { widget, pageIndex, page } of matched) {
         if (widget.isHidden()) {
-          unsupported.push({
-            fieldName: field.name,
-            acroFormType,
-            reason: 'hidden',
-          });
+          addUnsupported(field.name, acroFormType, 'hidden');
           continue;
         }
 
         const { geometry, reason } = resolveGeometry(widget, pageIndex, page);
 
         if (!geometry) {
-          unsupported.push({
-            fieldName: field.name,
-            acroFormType,
-            reason: reason ?? 'zero-size',
-          });
+          addUnsupported(field.name, acroFormType, reason ?? 'zero-size');
           continue;
         }
 
         let fieldAndMeta: TFieldAndMeta;
-        const usePdfDefaults = !options.formValuesProvided;
 
         if (acroFormType === 'signature') {
           fieldAndMeta = buildSignatureFieldAndMeta(formField);
@@ -779,16 +748,12 @@ export const extractAcroFormFieldsFromPDF = async (
           const currentSelection = usePdfDefaults ? dropdown.getValue?.() || dropdown.getDefaultValue?.() || '' : '';
           fieldAndMeta = buildDropdownFieldAndMeta(formField, optionValues, currentSelection || undefined);
         } else {
-          unsupported.push({
-            fieldName: field.name,
-            acroFormType,
-            reason: 'unsupported-type',
-          });
+          addUnsupported(field.name, acroFormType, 'unsupported-type');
           continue;
         }
 
         fields.push({
-          source: 'acroform',
+          source: ACROFORM_FIELD_SOURCE,
           fieldName: field.name,
           widgetIndex: widgetCounter,
           fieldAndMeta,
@@ -845,9 +810,7 @@ export const convertAcroFormFieldsToFieldInputs = (
   recipientResolver: (fieldName: string) => Pick<Recipient, 'id'>,
   envelopeItemId?: string,
 ): FieldToCreate[] => {
-  const sorted = sortFieldsForCreate(fields);
-
-  return sorted.map((f) => {
+  return sortFieldsForCreate(fields).map((f) => {
     const xPercent = (f.x / f.pageWidth) * 100;
     const yPercent = (f.y / f.pageHeight) * 100;
     const widthPercent = (f.width / f.pageWidth) * 100;

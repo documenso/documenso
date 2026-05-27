@@ -98,9 +98,8 @@ export const EnvelopeEditorFieldsPage = () => {
   const currentEnvelopeItemRevision = currentEnvelopeItem
     ? `${currentEnvelopeItem.id}:${currentEnvelopeItem.documentDataId}`
     : null;
-  const currentItemHasAcroForm = currentEnvelopeItemRevision
-    ? acroFormHasFieldsByItemRevision[currentEnvelopeItemRevision] === true
-    : false;
+  const currentItemHasAcroForm =
+    currentEnvelopeItemRevision !== null && acroFormHasFieldsByItemRevision[currentEnvelopeItemRevision] === true;
 
   const onAcroFormDetected = useCallback(
     (hasFields: boolean) => {

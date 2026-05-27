@@ -110,11 +110,7 @@ export const UNSAFE_importAcroFormFieldsFromEnvelope = async ({
         extraction,
       };
 
-      if (extraction.fields.length === 0) {
-        return base;
-      }
-
-      if (extraction.hasSignedSignature) {
+      if (extraction.fields.length === 0 || extraction.hasSignedSignature) {
         return base;
       }
 
@@ -174,7 +170,7 @@ export const UNSAFE_importAcroFormFieldsFromEnvelope = async ({
         return null;
       }
 
-      return [...signable].sort((a, b) => {
+      return signable.sort((a, b) => {
         const aOrder = a.signingOrder ?? Number.MAX_SAFE_INTEGER;
         const bOrder = b.signingOrder ?? Number.MAX_SAFE_INTEGER;
 

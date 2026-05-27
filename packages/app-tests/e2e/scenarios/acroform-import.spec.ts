@@ -4,6 +4,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { UNSAFE_importAcroFormFieldsFromEnvelope } from '@documenso/lib/server-only/envelope-item/import-acroform-fields';
 import { UNSAFE_replaceEnvelopeItemPdf } from '@documenso/lib/server-only/envelope-item/replace-envelope-item-pdf';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { prisma } from '@documenso/prisma';
 import { EnvelopeType, RecipientRole } from '@documenso/prisma/client';
@@ -13,29 +14,61 @@ import type {
   TCreateEnvelopeResponse,
 } from '@documenso/trpc/server/envelope-router/create-envelope.types';
 import { PDF } from '@libpdf/core';
-import { expect, test } from '@playwright/test';
+import { type APIRequestContext, expect, test } from '@playwright/test';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 const baseUrl = `${WEBAPP_BASE_URL}/api/v2-beta`;
 
 const ACROFORM_FIXTURE = fs.readFileSync(path.join(__dirname, '../../../../assets/acroform-import-test.pdf'));
 
+const ACROFORM_DOCUMENT_PAYLOAD: TCreateEnvelopePayload = {
+  type: EnvelopeType.DOCUMENT,
+  title: 'AcroForm document',
+  recipients: [
+    {
+      email: 'signer@example.com',
+      name: 'Signer',
+      role: RecipientRole.SIGNER,
+    },
+  ],
+};
+
+const API_REQUEST_METADATA: ApiRequestMetadata = {
+  requestMetadata: {},
+  source: 'apiV1',
+  auth: 'api',
+};
+
+type TestUser = Awaited<ReturnType<typeof seedUser>>['user'];
+
+const seedUserWithApiToken = async (): Promise<{ token: string; user: TestUser }> => {
+  const { user, team } = await seedUser();
+  const { token } = await createApiToken({
+    userId: user.id,
+    teamId: team.id,
+    tokenName: 'test',
+    expiresIn: null,
+  });
+
+  return { token, user };
+};
+
 const pdfHasFormFields = async (pdf: Uint8Array): Promise<boolean> => {
   const pdfDoc = await PDF.load(new Uint8Array(pdf));
   const form = pdfDoc.getForm();
 
-  return Boolean(form && form.fieldCount > 0);
+  return (form?.fieldCount ?? 0) > 0;
 };
 
 const uploadAcroFormEnvelope = async ({
   request,
   token,
-  payload,
+  payload = ACROFORM_DOCUMENT_PAYLOAD,
 }: {
-  request: import('@playwright/test').APIRequestContext;
+  request: APIRequestContext;
   token: string;
-  payload: TCreateEnvelopePayload;
-}) => {
+  payload?: TCreateEnvelopePayload;
+}): Promise<TCreateEnvelopeResponse> => {
   const formData = new FormData();
 
   formData.append('payload', JSON.stringify(payload));
@@ -66,29 +99,9 @@ test.describe.configure({
 
 test.describe('AcroForm Import', () => {
   test('upload does not create fields and preserves widgets in the stored PDF', async ({ request }) => {
-    const { user, team } = await seedUser();
-    const { token } = await createApiToken({
-      userId: user.id,
-      teamId: team.id,
-      tokenName: 'test',
-      expiresIn: null,
-    });
+    const { token } = await seedUserWithApiToken();
 
-    const response = await uploadAcroFormEnvelope({
-      request,
-      token,
-      payload: {
-        type: EnvelopeType.DOCUMENT,
-        title: 'AcroForm document',
-        recipients: [
-          {
-            email: 'signer@example.com',
-            name: 'Signer',
-            role: RecipientRole.SIGNER,
-          },
-        ],
-      },
-    });
+    const response = await uploadAcroFormEnvelope({ request, token });
 
     const envelope = await prisma.envelope.findUniqueOrThrow({
       where: { id: response.id },
@@ -106,29 +119,9 @@ test.describe('AcroForm Import', () => {
   });
 
   test('replacement preserves widgets in the stored PDF for later import', async ({ request }) => {
-    const { user, team } = await seedUser();
-    const { token } = await createApiToken({
-      userId: user.id,
-      teamId: team.id,
-      tokenName: 'test',
-      expiresIn: null,
-    });
+    const { token, user } = await seedUserWithApiToken();
 
-    const response = await uploadAcroFormEnvelope({
-      request,
-      token,
-      payload: {
-        type: EnvelopeType.DOCUMENT,
-        title: 'AcroForm document',
-        recipients: [
-          {
-            email: 'signer@example.com',
-            name: 'Signer',
-            role: RecipientRole.SIGNER,
-          },
-        ],
-      },
-    });
+    const response = await uploadAcroFormEnvelope({ request, token });
 
     const envelope = await loadEnvelopeForImport(response.id);
     const oldDocumentDataId = envelope.envelopeItems[0].documentDataId;
@@ -143,11 +136,7 @@ test.describe('AcroForm Import', () => {
         file: new File([ACROFORM_FIXTURE], 'replacement-acroform.pdf', { type: 'application/pdf' }),
       },
       user,
-      apiRequestMetadata: {
-        requestMetadata: {},
-        source: 'apiV1',
-        auth: 'api',
-      },
+      apiRequestMetadata: API_REQUEST_METADATA,
     });
 
     const after = await prisma.envelope.findUniqueOrThrow({
@@ -167,40 +156,16 @@ test.describe('AcroForm Import', () => {
   });
 
   test('import creates fields assigned to the signer, flattens the PDF, and emits audit logs', async ({ request }) => {
-    const { user, team } = await seedUser();
-    const { token } = await createApiToken({
-      userId: user.id,
-      teamId: team.id,
-      tokenName: 'test',
-      expiresIn: null,
-    });
+    const { token } = await seedUserWithApiToken();
 
-    const response = await uploadAcroFormEnvelope({
-      request,
-      token,
-      payload: {
-        type: EnvelopeType.DOCUMENT,
-        title: 'AcroForm document',
-        recipients: [
-          {
-            email: 'signer@example.com',
-            name: 'Signer',
-            role: RecipientRole.SIGNER,
-          },
-        ],
-      },
-    });
+    const response = await uploadAcroFormEnvelope({ request, token });
 
     const envelope = await loadEnvelopeForImport(response.id);
     const oldDocumentDataId = envelope.envelopeItems[0].documentDataId;
 
     const result = await UNSAFE_importAcroFormFieldsFromEnvelope({
       envelope,
-      apiRequestMetadata: {
-        requestMetadata: {},
-        source: 'apiV1',
-        auth: 'api',
-      },
+      apiRequestMetadata: API_REQUEST_METADATA,
     });
 
     expect(result.fieldsCreated).toBeGreaterThan(0);
@@ -241,13 +206,7 @@ test.describe('AcroForm Import', () => {
   });
 
   test('import creates a placeholder Recipient 1 SIGNER when no recipients exist', async ({ request }) => {
-    const { user, team } = await seedUser();
-    const { token } = await createApiToken({
-      userId: user.id,
-      teamId: team.id,
-      tokenName: 'test',
-      expiresIn: null,
-    });
+    const { token } = await seedUserWithApiToken();
 
     const response = await uploadAcroFormEnvelope({
       request,
@@ -264,11 +223,7 @@ test.describe('AcroForm Import', () => {
 
     await UNSAFE_importAcroFormFieldsFromEnvelope({
       envelope,
-      apiRequestMetadata: {
-        requestMetadata: {},
-        source: 'apiV1',
-        auth: 'api',
-      },
+      apiRequestMetadata: API_REQUEST_METADATA,
     });
 
     const after = await prisma.envelope.findUniqueOrThrow({
