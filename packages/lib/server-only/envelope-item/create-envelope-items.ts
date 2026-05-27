@@ -53,8 +53,6 @@ export const UNSAFE_createEnvelopeItems = async ({
         buffer = await insertFormValuesInPdf({ pdf: buffer, formValues: envelope.formValues });
       }
 
-      // Preserve interactive AcroForm widgets so they can be imported as
-      // Documenso fields on demand via the editor's "Import from PDF" button.
       const normalized = await normalizePdf(buffer, {
         flattenForm: false,
       });

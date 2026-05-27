@@ -136,9 +136,6 @@ test.describe('Form Flattening', () => {
       expect(envelope.formValues).toEqual(TEST_FORM_VALUES);
       expect(envelope.type).toBe(EnvelopeType.DOCUMENT);
 
-      // DOCUMENT uploads no longer auto-flatten — the editor's "Import from
-      // PDF form" button is the new flatten trigger. Inserted values remain
-      // visible in the (still-interactive) widgets.
       const documentData = envelope.envelopeItems[0].documentData;
       const pdfBuffer = await getFileServerSide(documentData);
 
@@ -160,8 +157,6 @@ test.describe('Form Flattening', () => {
       const payload: TCreateEnvelopePayload = {
         type: EnvelopeType.DOCUMENT,
         title: 'Document without Form Values',
-        // No formValues - form fields stay interactive until the user clicks
-        // "Import from PDF form" in the editor.
       };
 
       const formData = new FormData();
@@ -188,7 +183,6 @@ test.describe('Form Flattening', () => {
         },
       });
 
-      // DOCUMENT uploads no longer auto-flatten.
       const documentData = envelope.envelopeItems[0].documentData;
       const pdfBuffer = await getFileServerSide(documentData);
 
@@ -749,7 +743,6 @@ test.describe('Form Flattening', () => {
         },
       });
 
-      // DOCUMENT uploads no longer auto-flatten; widgets remain interactive.
       const documentData = envelope.envelopeItems[0].documentData;
       const pdfBuffer = await getFileServerSide(documentData);
 
@@ -800,8 +793,6 @@ test.describe('Form Flattening', () => {
         [FORM_FIELDS.TEXT_FIELD]: 'Only this field',
       });
 
-      // DOCUMENT uploads no longer auto-flatten; widgets remain interactive
-      // and the inserted value is visible inside the still-editable field.
       const documentData = envelope.envelopeItems[0].documentData;
       const pdfBuffer = await getFileServerSide(documentData);
 

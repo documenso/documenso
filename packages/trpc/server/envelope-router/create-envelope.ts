@@ -118,8 +118,6 @@ export const createEnvelopeRouteCaller = async ({
         });
       }
 
-      // Preserve interactive AcroForm widgets so they can be imported as
-      // Documenso fields on demand via the editor's "Import from PDF" button.
       const normalized = await normalizePdf(pdf, {
         flattenForm: false,
       });

@@ -253,13 +253,7 @@ const resolveTextSubtype = (
 } => {
   const candidateNames = [field.partialName, field.alternateName];
 
-  let formatHint: 'date' | 'number' | null = null;
-
-  try {
-    formatHint = getTextFieldFormatHint(field.acroField(), resolver);
-  } catch {
-    formatHint = null;
-  }
+  const formatHint = getTextFieldFormatHint(field.acroField(), resolver);
 
   // AcroForm format actions take precedence over name tokens — Adobe set them
   // explicitly, so they're a stronger signal than a heuristic regex hit.
@@ -271,17 +265,7 @@ const resolveTextSubtype = (
     return { documensoType: FieldType.NUMBER };
   }
 
-  let maxLen = Number.POSITIVE_INFINITY;
-
-  try {
-    const lenEntry = field.acroField().getNumber('MaxLen', resolver);
-
-    if (lenEntry) {
-      maxLen = lenEntry.value;
-    }
-  } catch {
-    // Ignore — MaxLen is optional.
-  }
+  const maxLen = field.acroField().getNumber('MaxLen', resolver)?.value ?? Number.POSITIVE_INFINITY;
 
   if (candidateNames.some(isDateFieldByName)) {
     return { documensoType: FieldType.DATE };
@@ -623,9 +607,6 @@ const resolveWidgetPages = (
   return { matched, unmatched };
 };
 
-/**
- * Options for {@link extractAcroFormFieldsFromPDF}.
- */
 export type ExtractAcroFormOptions = {
   /**
    * When true, `insertFormValuesInPdf` already ran for this buffer. The
@@ -719,14 +700,12 @@ export const extractAcroFormFieldsFromPDF = async (
       const widgets = formField.getWidgets();
       const { matched, unmatched } = resolveWidgetPages(widgets, pageByRef);
 
-      for (const widget of unmatched) {
+      for (let i = 0; i < unmatched.length; i += 1) {
         unsupported.push({
           fieldName: field.name,
           acroFormType,
           reason: 'no-page-match',
         });
-        // Reference widget so it isn't tree-shaken in dev tooling; harmless at runtime.
-        void widget;
       }
 
       let widgetCounter = 0;

@@ -10,14 +10,6 @@ import {
   ZImportAcroFormFieldsResponseSchema,
 } from './import-acroform-fields.types';
 
-/**
- * Internal-only — driven by the "Import from PDF" button in the envelope editor.
- *
- * Extracts AcroForm widgets from each envelope item's stored PDF, creates
- * Documenso `Field` rows for the supported widgets, flattens the PDF in place
- * (so widgets do not visually duplicate the imported fields), and emits a
- * `FIELD_CREATED` audit entry per field on DOCUMENT envelopes.
- */
 export const importAcroFormFieldsRoute = authenticatedProcedure
   .input(ZImportAcroFormFieldsRequestSchema)
   .output(ZImportAcroFormFieldsResponseSchema)
@@ -69,7 +61,7 @@ export const importAcroFormFieldsRoute = authenticatedProcedure
       });
     }
 
-    return await UNSAFE_importAcroFormFieldsFromEnvelope({
+    return UNSAFE_importAcroFormFieldsFromEnvelope({
       envelope,
       apiRequestMetadata: metadata,
     });

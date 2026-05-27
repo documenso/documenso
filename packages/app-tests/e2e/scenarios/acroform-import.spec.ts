@@ -98,11 +98,8 @@ test.describe('AcroForm Import', () => {
       },
     });
 
-    // No fields are created at upload time.
     expect(envelope.fields).toHaveLength(0);
 
-    // The stored PDF still carries the original AcroForm widgets — they
-    // survive the upload pipeline and are available to the import button.
     const pdfBuffer = await getFileServerSide(envelope.envelopeItems[0].documentData);
 
     expect(await pdfHasFormFields(pdfBuffer)).toBe(true);
@@ -226,21 +223,18 @@ test.describe('AcroForm Import', () => {
       expect(meta?.source).toBe('acroform');
     }
 
-    // FIELD_CREATED audit log entries match the number of imported fields.
     const auditEntries = await prisma.documentAuditLog.findMany({
       where: { envelopeId: after.id, type: 'FIELD_CREATED' },
     });
 
     expect(auditEntries.length).toBe(after.fields.length);
 
-    // The envelope item now points at a new (flat) DocumentData record.
     expect(after.envelopeItems[0].documentDataId).not.toBe(oldDocumentDataId);
 
     const flattenedPdf = await getFileServerSide(after.envelopeItems[0].documentData);
 
     expect(await pdfHasFormFields(flattenedPdf)).toBe(false);
 
-    // The old DocumentData record has been cleaned up.
     const oldRecord = await prisma.documentData.findUnique({ where: { id: oldDocumentDataId } });
 
     expect(oldRecord).toBeNull();

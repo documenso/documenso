@@ -46,11 +46,6 @@ type PreparedItem = {
   envelopeItemTitle: string;
   oldDocumentDataId: string;
   extraction: AcroFormExtractionResult;
-  /**
-   * The new flattened DocumentData record. Only set when the item had widgets
-   * AND no signed signature (signed-sig items keep their original PDF so the
-   * signature stays valid; their other widgets are still imported).
-   */
   newDocumentData?: DocumentData;
 };
 
@@ -58,8 +53,6 @@ export const UNSAFE_importAcroFormFieldsFromEnvelope = async ({
   envelope,
   apiRequestMetadata,
 }: UnsafeImportAcroFormFieldsOptions): Promise<ImportAcroFormFieldsResult> => {
-  // 1. Per-item: load PDF, extract widgets, flatten + upload new PDF when needed.
-  //    Done outside the transaction — IO and PDF work is slow.
   const prepared: PreparedItem[] = await Promise.all(
     envelope.envelopeItems.map(async (item): Promise<PreparedItem> => {
       const buffer = await getFileServerSide(item.documentData);
@@ -117,19 +110,14 @@ export const UNSAFE_importAcroFormFieldsFromEnvelope = async ({
         extraction,
       };
 
-      // No fields to import → leave the PDF as-is.
       if (extraction.fields.length === 0) {
         return base;
       }
 
-      // Signed signature → keep widgets in the PDF so the signature stays valid.
-      // Other widgets still flow into Documenso fields below.
       if (extraction.hasSignedSignature) {
         return base;
       }
 
-      // Flatten the form, upload as a fresh DocumentData. The old record is
-      // deleted after the transaction commits.
       const flattened = await normalizePdf(Buffer.from(buffer), {
         flattenForm: true,
       });
@@ -178,8 +166,6 @@ export const UNSAFE_importAcroFormFieldsFromEnvelope = async ({
     };
   }
 
-  // 2. Transaction: resolve recipient, swap documentData, create fields,
-  //    write audit logs.
   const { createdFields, importedItemsCount } = await prisma.$transaction(async (tx) => {
     const pickFirstSignableRecipient = (recipients: Pick<Recipient, 'id' | 'email' | 'role' | 'signingOrder'>[]) => {
       const signable = recipients.filter((r) => r.role === RecipientRole.SIGNER || r.role === RecipientRole.APPROVER);
@@ -200,20 +186,17 @@ export const UNSAFE_importAcroFormFieldsFromEnvelope = async ({
       })[0];
     };
 
-    let availableRecipients = await tx.recipient.findMany({
-      where: { envelopeId: envelope.id },
-      select: { id: true, email: true, role: true, signingOrder: true },
-    });
+    let recipient = pickFirstSignableRecipient(
+      await tx.recipient.findMany({
+        where: { envelopeId: envelope.id },
+        select: { id: true, email: true, role: true, signingOrder: true },
+      }),
+    );
 
-    let firstSignableRecipient = pickFirstSignableRecipient(availableRecipients);
-
-    if (!firstSignableRecipient) {
-      // Mirror the placeholder branch in createEnvelope: create Recipient 1 as
-      // a SIGNER so the imported fields have somewhere to land. The user can
-      // reassign in the editor afterwards.
+    if (!recipient) {
       const placeholderEmail = 'recipient.1@documenso.com';
 
-      await tx.recipient.create({
+      recipient = await tx.recipient.create({
         data: {
           envelopeId: envelope.id,
           email: placeholderEmail,
@@ -224,23 +207,9 @@ export const UNSAFE_importAcroFormFieldsFromEnvelope = async ({
           sendStatus: SendStatus.NOT_SENT,
           signingStatus: SigningStatus.NOT_SIGNED,
         },
-      });
-
-      // eslint-disable-next-line require-atomic-updates
-      availableRecipients = await tx.recipient.findMany({
-        where: { envelopeId: envelope.id },
         select: { id: true, email: true, role: true, signingOrder: true },
       });
-
-      firstSignableRecipient = pickFirstSignableRecipient(availableRecipients);
     }
-
-    if (!firstSignableRecipient) {
-      // Should be unreachable — we just created one.
-      throw new Error('Failed to resolve a signable recipient for AcroForm import');
-    }
-
-    const recipient = firstSignableRecipient;
 
     const createdFields: Field[] = [];
     let importedItemsCount = 0;
@@ -250,7 +219,6 @@ export const UNSAFE_importAcroFormFieldsFromEnvelope = async ({
         continue;
       }
 
-      // Swap to the flattened PDF when we produced one.
       if (item.newDocumentData) {
         await tx.envelopeItem.update({
           where: { id: item.envelopeItemId },
@@ -306,8 +274,6 @@ export const UNSAFE_importAcroFormFieldsFromEnvelope = async ({
     return { createdFields, importedItemsCount };
   });
 
-  // 3. Delete orphaned old DocumentData records. Outside the transaction so a
-  //    delete failure does not undo the import.
   await Promise.all(
     prepared
       .filter((p) => p.newDocumentData !== undefined)
