@@ -1,6 +1,7 @@
 import { prisma } from '@documenso/prisma';
 import type { DocumentData, Envelope, EnvelopeItem, Field, Recipient } from '@prisma/client';
 import { EnvelopeType, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { nanoid } from '../../universal/id';
@@ -53,6 +54,12 @@ export const UNSAFE_importAcroFormFieldsFromEnvelope = async ({
   envelope,
   apiRequestMetadata,
 }: UnsafeImportAcroFormFieldsOptions): Promise<ImportAcroFormFieldsResult> => {
+  if (envelope.type !== EnvelopeType.DOCUMENT) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'AcroForm import is only supported for document envelopes',
+    });
+  }
+
   const prepared: PreparedItem[] = await Promise.all(
     envelope.envelopeItems.map(async (item): Promise<PreparedItem> => {
       const buffer = await getFileServerSide(item.documentData);
@@ -182,6 +189,54 @@ export const UNSAFE_importAcroFormFieldsFromEnvelope = async ({
       })[0];
     };
 
+    const signedItemIds = prepared
+      .filter((item) => item.extraction.hasSignedSignature && item.extraction.fields.length > 0)
+      .map((item) => item.envelopeItemId);
+
+    const alreadyImportedSignedItemIds = new Set<string>();
+
+    if (signedItemIds.length > 0) {
+      const existingImportedFields = await tx.field.findMany({
+        where: {
+          envelopeId: envelope.id,
+          envelopeItemId: {
+            in: signedItemIds,
+          },
+        },
+        select: {
+          envelopeItemId: true,
+          fieldMeta: true,
+        },
+      });
+
+      for (const field of existingImportedFields) {
+        const fieldMeta = field.fieldMeta;
+
+        if (
+          fieldMeta &&
+          typeof fieldMeta === 'object' &&
+          !Array.isArray(fieldMeta) &&
+          (fieldMeta as { source?: unknown }).source === 'acroform'
+        ) {
+          alreadyImportedSignedItemIds.add(field.envelopeItemId);
+        }
+      }
+    }
+
+    const itemsToImport = prepared.filter((item) => {
+      if (item.extraction.fields.length === 0) {
+        return false;
+      }
+
+      return !(item.extraction.hasSignedSignature && alreadyImportedSignedItemIds.has(item.envelopeItemId));
+    });
+
+    const createdFields: Field[] = [];
+
+    if (itemsToImport.length === 0) {
+      return { createdFields, importedItemsCount: 0 };
+    }
+
     let recipient = pickFirstSignableRecipient(
       await tx.recipient.findMany({
         where: { envelopeId: envelope.id },
@@ -207,14 +262,9 @@ export const UNSAFE_importAcroFormFieldsFromEnvelope = async ({
       });
     }
 
-    const createdFields: Field[] = [];
     let importedItemsCount = 0;
 
-    for (const item of prepared) {
-      if (item.extraction.fields.length === 0) {
-        continue;
-      }
-
+    for (const item of itemsToImport) {
       if (item.newDocumentData) {
         await tx.envelopeItem.update({
           where: { id: item.envelopeItemId },

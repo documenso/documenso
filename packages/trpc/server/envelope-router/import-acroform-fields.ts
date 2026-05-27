@@ -2,7 +2,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { UNSAFE_importAcroFormFieldsFromEnvelope } from '@documenso/lib/server-only/envelope-item/import-acroform-fields';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -21,7 +21,7 @@ export const importAcroFormFieldsRoute = authenticatedProcedure
 
     const { envelopeWhereInput } = await getEnvelopeWhereInput({
       id: { type: 'envelopeId', id: envelopeId },
-      type: null,
+      type: EnvelopeType.DOCUMENT,
       userId: user.id,
       teamId,
     });
