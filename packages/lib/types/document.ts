@@ -179,11 +179,6 @@ export const ZDocumentManySchema = LegacyDocumentSchema.pick({
     id: true,
     url: true,
   }).nullable(),
-  fieldCount: z
-    .number()
-    .int()
-    .nonnegative()
-    .describe('The total number of fields on the document.'),
 });
 
 export type TDocumentMany = z.infer<typeof ZDocumentManySchema>;

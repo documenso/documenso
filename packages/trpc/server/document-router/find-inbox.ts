@@ -100,9 +100,6 @@ export const findInbox = async ({ userId, page = 1, perPage = 10, orderBy }: Fin
             order: true,
           },
         },
-        _count: {
-          select: { fields: true },
-        },
       },
     }),
     prisma.envelope.count({

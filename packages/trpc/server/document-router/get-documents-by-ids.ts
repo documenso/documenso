@@ -56,9 +56,6 @@ export const getDocumentsByIdsRoute = authenticatedProcedure
             url: true,
           },
         },
-        _count: {
-          select: { fields: true },
-        },
       },
     });
 
