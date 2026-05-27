@@ -77,7 +77,8 @@ export const putFileServerSide = async (file: File) => {
   const NEXT_PUBLIC_UPLOAD_TRANSPORT = env('NEXT_PUBLIC_UPLOAD_TRANSPORT');
 
   return await match(NEXT_PUBLIC_UPLOAD_TRANSPORT)
-    .with('s3', async () => putFileInS3(file))
+    .with('s3', async () => putFileInObjectStorage(file))
+    .with('azure-blob', async () => putFileInObjectStorage(file))
     .otherwise(async () => putFileInDatabase(file));
 };
 
@@ -94,7 +95,7 @@ const putFileInDatabase = async (file: File) => {
   };
 };
 
-const putFileInS3 = async (file: File) => {
+const putFileInObjectStorage = async (file: File) => {
   const buffer = await file.arrayBuffer();
 
   const blob = new Blob([buffer], { type: file.type });
