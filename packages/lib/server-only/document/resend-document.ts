@@ -2,6 +2,7 @@ import { mailer } from '@documenso/email/mailer';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import { resolveExpiresAt } from '@documenso/lib/constants/envelope-expiration';
 import { RECIPIENT_ROLE_TO_EMAIL_TYPE, RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
@@ -26,6 +27,7 @@ import { isDocumentCompleted } from '../../utils/document';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { assertOrgEmailSendAllowed } from '../email/assert-org-email-send-allowed';
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -120,14 +122,15 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
     return envelope;
   }
 
-  const { branding, emailLanguage, organisationType, senderEmail, replyToEmail } = await getEmailContext({
-    emailType: 'RECIPIENT',
-    source: {
-      type: 'team',
-      teamId: envelope.teamId,
-    },
-    meta: envelope.documentMeta,
-  });
+  const { branding, emailLanguage, organisationType, senderEmail, replyToEmail, organisationId } =
+    await getEmailContext({
+      emailType: 'RECIPIENT',
+      source: {
+        type: 'team',
+        teamId: envelope.teamId,
+      },
+      meta: envelope.documentMeta,
+    });
 
   await Promise.all(
     recipientsToRemind.map(async (recipient) => {
@@ -199,6 +202,15 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
           plainText: true,
         }),
       ]);
+
+      const sendCheck = await assertOrgEmailSendAllowed({ organisationId });
+
+      if (!sendCheck.allowed) {
+        throw new AppError(AppErrorCode.TOO_MANY_REQUESTS, {
+          message: 'Organisation email send rate limit exceeded',
+          userMessage: 'Email send rate limit reached. Please try again in a few minutes.',
+        });
+      }
 
       // Send email outside any transaction to avoid holding a connection
       // open during network I/O.
