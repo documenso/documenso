@@ -207,17 +207,19 @@ const runSettingsFlow = async ({ root }: TEnvelopeEditorSurface, { externalId, i
 
   await root.getByRole('button', { name: 'Notifications' }).click();
 
-  // Distribution is NONE: email-content fields and recipient-facing checkboxes
-  // must be disabled; owner-facing checkboxes stay editable so we toggle them here.
+  // Distribution is NONE: email-content fields stay rendered but disabled,
+  // recipient-facing checkboxes are hidden entirely and replaced by an alert,
+  // owner-facing checkboxes stay editable so we toggle them here.
   await expect(root.locator('input[name="meta.subject"]')).toBeDisabled();
   await expect(root.locator('textarea[name="meta.message"]')).toBeDisabled();
   await expect(root.locator('input[name="meta.emailReplyTo"]')).toBeDisabled();
-  await expect(root.locator('#recipientSigned')).toBeDisabled();
-  await expect(root.locator('#recipientSigningRequest')).toBeDisabled();
-  await expect(root.locator('#recipientRemoved')).toBeDisabled();
-  await expect(root.locator('#documentPending')).toBeDisabled();
-  await expect(root.locator('#documentCompleted')).toBeDisabled();
-  await expect(root.locator('#documentDeleted')).toBeDisabled();
+  await expect(root.locator('#recipientSigned')).toHaveCount(0);
+  await expect(root.locator('#recipientSigningRequest')).toHaveCount(0);
+  await expect(root.locator('#recipientRemoved')).toHaveCount(0);
+  await expect(root.locator('#documentPending')).toHaveCount(0);
+  await expect(root.locator('#documentCompleted')).toHaveCount(0);
+  await expect(root.locator('#documentDeleted')).toHaveCount(0);
+  await expect(root.getByText(/Email distribution needs to be enabled/)).toBeVisible();
 
   // Email Sender select only renders when the org has the emailDomains feature
   // flag plus allowConfigureEmailSender, so the assertion is conditional.
@@ -294,12 +296,16 @@ const runSettingsFlow = async ({ root }: TEnvelopeEditorSurface, { externalId, i
   );
 
   await root.getByRole('button', { name: 'Notifications' }).click();
-  await expect(root.locator('#recipientSigned')).toHaveAttribute('aria-checked', 'false');
-  await expect(root.locator('#recipientSigningRequest')).toHaveAttribute('aria-checked', 'false');
-  await expect(root.locator('#recipientRemoved')).toHaveAttribute('aria-checked', 'false');
-  await expect(root.locator('#documentPending')).toHaveAttribute('aria-checked', 'false');
-  await expect(root.locator('#documentCompleted')).toHaveAttribute('aria-checked', 'false');
-  await expect(root.locator('#documentDeleted')).toHaveAttribute('aria-checked', 'false');
+  // Distribution persisted as NONE: recipient-facing checkboxes are hidden, owner-facing
+  // checkboxes remain visible and persist their stored values. Email-content fields are
+  // still rendered (disabled) and persist their stored values.
+  await expect(root.locator('#recipientSigned')).toHaveCount(0);
+  await expect(root.locator('#recipientSigningRequest')).toHaveCount(0);
+  await expect(root.locator('#recipientRemoved')).toHaveCount(0);
+  await expect(root.locator('#documentPending')).toHaveCount(0);
+  await expect(root.locator('#documentCompleted')).toHaveCount(0);
+  await expect(root.locator('#documentDeleted')).toHaveCount(0);
+  await expect(root.getByText(/Email distribution needs to be enabled/)).toBeVisible();
   await expect(root.locator('#ownerDocumentCompleted')).toHaveAttribute('aria-checked', 'false');
   await expect(root.locator('#ownerRecipientExpired')).toHaveAttribute('aria-checked', 'false');
   await expect(root.locator('#ownerDocumentCreated')).toHaveAttribute('aria-checked', 'false');

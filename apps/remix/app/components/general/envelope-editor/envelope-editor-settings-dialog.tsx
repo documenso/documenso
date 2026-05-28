@@ -39,6 +39,7 @@ import { ExpirationPeriodPicker } from '@documenso/ui/components/document/expira
 import { ReminderSettingsPicker } from '@documenso/ui/components/document/reminder-settings-picker';
 import { TemplateTypeSelect, TemplateTypeTooltip } from '@documenso/ui/components/template/template-type-select';
 import { cn } from '@documenso/ui/lib/utils';
+import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { CardDescription, CardHeader, CardTitle } from '@documenso/ui/primitives/card';
 import { Combobox } from '@documenso/ui/primitives/combobox';
@@ -862,8 +863,19 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                       <DocumentEmailCheckboxes
                         value={emailSettings}
                         onChange={(value) => form.setValue('meta.emailSettings', value)}
-                        disabledEvents={isEmailDistribution ? undefined : RECIPIENT_EMAIL_EVENTS}
+                        hiddenEvents={isEmailDistribution ? undefined : RECIPIENT_EMAIL_EVENTS}
                       />
+
+                      {!isEmailDistribution && (
+                        <Alert variant="warning">
+                          <AlertDescription>
+                            <Trans>
+                              Email distribution needs to be enabled in the general settings tab to configure recipient
+                              email related settings.
+                            </Trans>
+                          </AlertDescription>
+                        </Alert>
+                      )}
                     </>
                   ))
                   .with({ activeTab: 'security' }, () => (
