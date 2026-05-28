@@ -1,4 +1,8 @@
-import { isEmailDomainAllowedForSignup, isSignupEnabledForProvider } from '@documenso/lib/constants/auth';
+import {
+  isDisposableEmail,
+  isEmailDomainAllowedForSignup,
+  isSignupEnabledForProvider,
+} from '@documenso/lib/constants/auth';
 import { EMAIL_VERIFICATION_STATE } from '@documenso/lib/constants/email';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { jobsClient } from '@documenso/lib/jobs/client';
@@ -210,6 +214,12 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
     if (!isEmailDomainAllowedForSignup(email)) {
       throw new AppError(AuthenticationErrorCode.SignupDisabled, {
+        statusCode: 400,
+      });
+    }
+
+    if (isDisposableEmail(email)) {
+      throw new AppError(AuthenticationErrorCode.SignupDisposableEmail, {
         statusCode: 400,
       });
     }

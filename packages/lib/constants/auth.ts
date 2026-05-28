@@ -1,3 +1,4 @@
+import MailChecker from 'mailchecker';
 import { z } from 'zod';
 
 import { env } from '../utils/env';
@@ -119,6 +120,48 @@ export const isEmailDomainAllowedForSignup = (email: string): boolean => {
   }
 
   return allowedDomains.includes(emailDomain);
+};
+
+/**
+ * Check if the given email belongs to a known disposable / throwaway provider
+ * (e.g. mailinator, yopmail, 10minutemail, ...).
+ *
+ * Backed by the `mailchecker` package which bundles a static list of 55k+
+ * disposable domains. The check is offline and synchronous.
+ *
+ * Matching also covers subdomains (e.g. `foo.mailinator.com` resolves to
+ * `mailinator.com`).
+ *
+ * Returns `true` when the email is disposable and should be rejected.
+ * Email format validation is intentionally NOT performed here — that is
+ * handled by Zod upstream.
+ */
+export const isDisposableEmail = (email: string): boolean => {
+  const domain = email.toLowerCase().split('@').pop();
+
+  if (!domain) {
+    return false;
+  }
+
+  const blacklist = MailChecker.blacklist();
+
+  let currentDomain: string | undefined = domain;
+
+  while (currentDomain) {
+    if (blacklist.has(currentDomain)) {
+      return true;
+    }
+
+    const nextDot = currentDomain.indexOf('.');
+
+    if (nextDot === -1) {
+      break;
+    }
+
+    currentDomain = currentDomain.slice(nextDot + 1);
+  }
+
+  return false;
 };
 
 /**
