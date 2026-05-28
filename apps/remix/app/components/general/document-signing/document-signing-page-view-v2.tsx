@@ -269,6 +269,7 @@ export const DocumentSigningPageViewV2 = () => {
                     className={FIELD_ROOT_CONTAINER_PROBE_CLASS_NAME}
                     data-field-type=""
                     data-inserted="false"
+                    data-validate="false"
                     data-readonly="false"
                     style={{
                       position: 'absolute',

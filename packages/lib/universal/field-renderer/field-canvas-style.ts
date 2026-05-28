@@ -7,7 +7,7 @@ export type FieldCanvasStyleCache = Map<string, FieldCanvasStyle | undefined>;
 export const createFieldCanvasStyleCache = (): FieldCanvasStyleCache => new Map();
 
 export const getFieldCanvasStyleCacheKey = (field: FieldToRender) =>
-  `${field.type}:${field.inserted}:${field.fieldMeta?.readOnly ?? false}`;
+  `${field.type}:${field.inserted}:${field.fieldMeta?.readOnly ?? false}:${field.isValidating ?? false}`;
 
 export const getPixelValue = (value: string) => {
   const parsedValue = Number.parseFloat(value);
@@ -60,6 +60,7 @@ const computeFieldCanvasStyleFromProbe = (field: FieldToRender): FieldCanvasStyl
 
   $fieldRootContainer.dataset.fieldType = field.type;
   $fieldRootContainer.dataset.inserted = field.inserted ? 'true' : 'false';
+  $fieldRootContainer.dataset.validate = field.isValidating ? 'true' : 'false';
   $fieldRootContainer.dataset.readonly = field.fieldMeta?.readOnly ? 'true' : 'false';
 
   const computedStyle = window.getComputedStyle($fieldRootContainer);
