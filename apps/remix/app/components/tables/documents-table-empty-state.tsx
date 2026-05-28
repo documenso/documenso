@@ -1,7 +1,7 @@
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { Bird, CheckCircle2 } from 'lucide-react';
+import { Bird, CheckCircle2, TimerOff, XCircle } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 export type DocumentsTableEmptyStateProps = { status: ExtendedDocumentStatus };
@@ -23,6 +23,16 @@ export const DocumentsTableEmptyState = ({ status }: DocumentsTableEmptyStatePro
       title: msg`No active drafts`,
       message: msg`There are no active drafts at the current moment. You can upload a document to start drafting.`,
       icon: CheckCircle2,
+    }))
+    .with(ExtendedDocumentStatus.REJECTED, () => ({
+      title: msg`No rejected documents`,
+      message: msg`There are no rejected documents. Documents that a recipient declines to sign will appear here.`,
+      icon: XCircle,
+    }))
+    .with(ExtendedDocumentStatus.EXPIRED, () => ({
+      title: msg`No expired documents`,
+      message: msg`There are no documents with expired signing links. You can redistribute a document to renew its expiration.`,
+      icon: TimerOff,
     }))
     .with(ExtendedDocumentStatus.ALL, () => ({
       title: msg`We're all empty`,

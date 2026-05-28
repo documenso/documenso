@@ -37,6 +37,11 @@ export type FindDocumentsOptions = {
   query?: string;
   folderId?: string;
   /**
+   * When true, restrict results to envelopes with at least one recipient whose signing
+   * link has expired. Orthogonal to `status` — applied additively.
+   */
+  hasExpiredRecipients?: boolean;
+  /**
    * When true (default), use a windowed count that caps early for faster pagination.
    * When false, use a full COUNT(*) for exact totals — preferred for external API consumers.
    */
@@ -102,6 +107,23 @@ const senderEmailIs = (eb: EnvelopeExpressionBuilder, email: string) =>
       .select(sql.lit(1).as('one')),
   );
 
+/**
+ * Reusable EXISTS subquery: checks that the envelope has at least one recipient whose
+ * signing link has expired — `expiresAt` in the past, still unsigned, and not a CC.
+ * Mirrors `isRecipientExpired` (packages/lib/utils/recipients.ts).
+ */
+const hasExpiredRecipient = (eb: EnvelopeExpressionBuilder) =>
+  eb.exists(
+    eb
+      .selectFrom('Recipient')
+      .whereRef('Recipient.envelopeId', '=', 'Envelope.id')
+      .where('Recipient.expiresAt', 'is not', null)
+      .where('Recipient.expiresAt', '<=', new Date())
+      .where('Recipient.signingStatus', '=', sql.lit(SigningStatus.NOT_SIGNED))
+      .where('Recipient.role', '!=', sql.lit(RecipientRole.CC))
+      .select(sql.lit(1).as('one')),
+  );
+
 export const findDocuments = async ({
   userId,
   teamId,
@@ -115,6 +137,7 @@ export const findDocuments = async ({
   senderIds,
   query = '',
   folderId,
+  hasExpiredRecipients,
   useWindowedCount = true,
 }: FindDocumentsOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -197,6 +220,11 @@ export const findDocuments = async ({
           ),
         ]),
       );
+    }
+
+    // Expired recipient filter (orthogonal to status, additive)
+    if (hasExpiredRecipients) {
+      qb = qb.where((eb) => hasExpiredRecipient(eb));
     }
 
     return qb;
@@ -290,6 +318,15 @@ export const findDocuments = async ({
               ]),
             ]),
           ),
+      )
+      .with(ExtendedDocumentStatus.EXPIRED, () =>
+        qb.where((eb) =>
+          eb.and([
+            personalDeletedFilter(eb),
+            hasExpiredRecipient(eb),
+            eb.or([eb('Envelope.userId', '=', user.id), recipientExists(eb, user.email)]),
+          ]),
+        ),
       )
       .exhaustive();
   };
@@ -427,6 +464,18 @@ export const findDocuments = async ({
           }
 
           return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
+        }),
+      )
+      .with(ExtendedDocumentStatus.EXPIRED, () =>
+        qb.where((eb) => {
+          const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
+
+          if (teamEmail) {
+            accessBranches.push(senderEmailIs(eb, teamEmail));
+            accessBranches.push(recipientExists(eb, teamEmail));
+          }
+
+          return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), hasExpiredRecipient(eb), eb.or(accessBranches)]);
         }),
       )
       .exhaustive();
