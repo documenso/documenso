@@ -22,6 +22,7 @@ import {
   signupRateLimit,
   verifyEmailRateLimit,
 } from '@documenso/lib/server-only/rate-limit/rate-limits';
+import { getEmailBlocklistDomains } from '@documenso/lib/server-only/site-settings/get-email-blocklist-domains';
 import { createUser } from '@documenso/lib/server-only/user/create-user';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
 import { getMostRecentEmailVerificationToken } from '@documenso/lib/server-only/user/get-most-recent-email-verification-token';
@@ -214,7 +215,9 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       });
     }
 
-    if (isDisposableEmail(email)) {
+    const additionalBlockedDomains = await getEmailBlocklistDomains();
+
+    if (isDisposableEmail(email, additionalBlockedDomains)) {
       throw new AppError(AuthenticationErrorCode.SignupDisposableEmail, {
         statusCode: 400,
       });
