@@ -9,7 +9,7 @@ export const createFieldCanvasStyleCache = (): FieldCanvasStyleCache => new Map(
 export const getFieldCanvasStyleCacheKey = (field: FieldToRender) =>
   `${field.type}:${field.inserted}:${field.fieldMeta?.readOnly ?? false}`;
 
-const getPixelValue = (value: string) => {
+export const getPixelValue = (value: string) => {
   const parsedValue = Number.parseFloat(value);
 
   if (!Number.isFinite(parsedValue)) {
@@ -19,7 +19,7 @@ const getPixelValue = (value: string) => {
   return parsedValue;
 };
 
-const getOpacityValue = (value: string) => {
+export const getOpacityValue = (value: string) => {
   const parsedValue = Number.parseFloat(value);
 
   if (!Number.isFinite(parsedValue) || parsedValue === 1) {
@@ -29,7 +29,7 @@ const getOpacityValue = (value: string) => {
   return Math.max(0, Math.min(parsedValue, 1));
 };
 
-const getRenderableColor = (value: string | undefined) => {
+export const getRenderableColor = (value: string | undefined) => {
   if (!value) {
     return undefined;
   }
@@ -77,6 +77,12 @@ const computeFieldCanvasStyleFromProbe = (field: FieldToRender): FieldCanvasStyl
   };
 };
 
+/**
+ * Resolve the canvas style for a field by reading the probe element's computed CSS.
+ *
+ * Sign-mode only — the editor and export views intentionally use the renderer defaults,
+ * since the probe element is mounted by the signing page only.
+ */
 export const resolveFieldCanvasStyle = (
   field: FieldToRender,
   mode: FieldRenderMode,
