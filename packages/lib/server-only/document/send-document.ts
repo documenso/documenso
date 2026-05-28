@@ -165,7 +165,7 @@ export const sendDocument = async ({
       .join(', ');
 
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: `The following recipients are missing required fields: ${missingRecipientDescriptions}. Signers must have at least one signature field.`,
+      message: `The following recipients are missing required fields: ${missingRecipientDescriptions}. Signers must have at least one field assigned (a signature field if they need to sign, or any other field type if they only need to fill in data).`,
     });
   }
 

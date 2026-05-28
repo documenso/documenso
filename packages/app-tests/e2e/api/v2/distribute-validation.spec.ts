@@ -135,16 +135,16 @@ test.describe('Envelope distribute validation', () => {
 
     const errorResponse = await distributeRes.json();
     expect(errorResponse.message).toContain('missing required fields');
-    expect(errorResponse.message).toContain('Signers must have at least one signature field');
+    expect(errorResponse.message).toContain('Signers must have at least one field assigned');
   });
 
-  test('should fail to distribute when signer has non-signature fields only', async ({
+  test('should succeed when signer has non-signature fields only (form-filler recipient)', async ({
     request,
   }) => {
     const envelope = await createEnvelope(request, token);
     const envelopeData = await getEnvelope(request, token, envelope.id);
 
-    // Create a signer
+    // Create a signer who will only fill in data (no signature required).
     const recipients = await createRecipients(request, token, envelope.id, [
       {
         email: 'signer@example.com',
@@ -155,22 +155,19 @@ test.describe('Envelope distribute validation', () => {
       },
     ]);
 
-    // Add only a TEXT field (not a signature field)
+    // Add only a TEXT field (not a signature field). The recipient completes the document
+    // by filling the text field — no signature is required.
     await createFields(request, token, envelope.id, envelopeData.envelopeItems[0].id, [
       { recipientId: recipients[0].id, type: FieldType.TEXT },
     ]);
 
-    // Try to distribute
     const distributeRes = await request.post(`${baseUrl}/envelope/distribute`, {
       headers: { Authorization: `Bearer ${token}` },
       data: { envelopeId: envelope.id },
     });
 
-    expect(distributeRes.ok()).toBeFalsy();
-    expect(distributeRes.status()).toBe(400);
-
-    const errorResponse = await distributeRes.json();
-    expect(errorResponse.message).toContain('missing required fields');
+    expect(distributeRes.ok()).toBeTruthy();
+    expect(distributeRes.status()).toBe(200);
   });
 
   test('should succeed when signer has SIGNATURE field', async ({ request }) => {
@@ -321,9 +318,7 @@ test.describe('Envelope distribute validation', () => {
     expect(distributeRes.status()).toBe(200);
   });
 
-  test('should fail when one of multiple signers is missing signature field', async ({
-    request,
-  }) => {
+  test('should fail when one of multiple signers has no fields at all', async ({ request }) => {
     const envelope = await createEnvelope(request, token);
     const envelopeData = await getEnvelope(request, token, envelope.id);
 
@@ -345,12 +340,12 @@ test.describe('Envelope distribute validation', () => {
       },
     ]);
 
-    // Add signature field only for the first signer
+    // Add a field only for the first signer; the second has nothing to do.
     await createFields(request, token, envelope.id, envelopeData.envelopeItems[0].id, [
       { recipientId: recipients[0].id, type: FieldType.SIGNATURE },
     ]);
 
-    // Distribute should fail because second signer has no signature field
+    // Distribute should fail because the second signer has no fields assigned.
     const distributeRes = await request.post(`${baseUrl}/envelope/distribute`, {
       headers: { Authorization: `Bearer ${token}` },
       data: { envelopeId: envelope.id },
@@ -361,6 +356,44 @@ test.describe('Envelope distribute validation', () => {
 
     const errorResponse = await distributeRes.json();
     expect(errorResponse.message).toContain('missing required fields');
+  });
+
+  test('should succeed with a mix of signing and form-filler-only signers', async ({
+    request,
+  }) => {
+    const envelope = await createEnvelope(request, token);
+    const envelopeData = await getEnvelope(request, token, envelope.id);
+
+    // Two signers: one signs, the other only fills in a text field (e.g. account number).
+    const recipients = await createRecipients(request, token, envelope.id, [
+      {
+        email: 'signer@example.com',
+        name: 'Test Signer',
+        role: RecipientRole.SIGNER,
+        accessAuth: [],
+        actionAuth: [],
+      },
+      {
+        email: 'form-filler@example.com',
+        name: 'Test Form Filler',
+        role: RecipientRole.SIGNER,
+        accessAuth: [],
+        actionAuth: [],
+      },
+    ]);
+
+    await createFields(request, token, envelope.id, envelopeData.envelopeItems[0].id, [
+      { recipientId: recipients[0].id, type: FieldType.SIGNATURE },
+      { recipientId: recipients[1].id, type: FieldType.TEXT },
+    ]);
+
+    const distributeRes = await request.post(`${baseUrl}/envelope/distribute`, {
+      headers: { Authorization: `Bearer ${token}` },
+      data: { envelopeId: envelope.id },
+    });
+
+    expect(distributeRes.ok()).toBeTruthy();
+    expect(distributeRes.status()).toBe(200);
   });
 
   test('should succeed when all signers have signature fields', async ({ request }) => {

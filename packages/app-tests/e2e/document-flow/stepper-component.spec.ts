@@ -339,7 +339,9 @@ test('[DOCUMENT_FLOW]: should not be able to create a document without signature
 
   const missingSignatureDialog = page.getByRole('dialog');
 
-  await expect(missingSignatureDialog.getByText('No signature field found').first()).toBeVisible();
+  await expect(
+    missingSignatureDialog.getByText('No fields assigned to signer').first(),
+  ).toBeVisible();
 
   // The signer missing a field should be listed by name.
   await expect(missingSignatureDialog.getByText('User 1')).toBeVisible();

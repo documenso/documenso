@@ -1,8 +1,6 @@
 import type { Envelope } from '@prisma/client';
 import { type Field, RecipientRole, SigningStatus } from '@prisma/client';
 
-import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import { AppError, AppErrorCode } from '../errors/app-error';
 import type { TRecipientLite } from '../types/recipient';
@@ -12,14 +10,19 @@ import { zEmail } from './zod';
 /**
  * Roles that require fields to be assigned before a document can be distributed.
  *
- * Currently only SIGNER requires a signature field.
+ * SIGNERs must have at least one field assigned, but not necessarily a signature field —
+ * a SIGNER with text/checkbox/etc. fields completes the document by filling those fields.
+ * Senders make a recipient "form-filler only" by assigning non-signature fields and
+ * make them sign by including a signature field.
  */
 export const RECIPIENT_ROLES_THAT_REQUIRE_FIELDS = [RecipientRole.SIGNER] as const;
 
 /**
  * Returns recipients who are missing required fields for their role.
  *
- * Currently only SIGNERs are validated - they must have at least one signature field.
+ * SIGNERs must have at least one field of any type assigned. If no signature field is
+ * assigned, the recipient completes the document by filling their non-signature fields
+ * (a "form-filler only" recipient — no signature required).
  */
 export const getRecipientsWithMissingFields = <T extends Pick<TRecipientLite, 'id' | 'role'>>(
   recipients: T[],
@@ -27,11 +30,9 @@ export const getRecipientsWithMissingFields = <T extends Pick<TRecipientLite, 'i
 ): T[] => {
   return recipients.filter((recipient) => {
     if (recipient.role === RecipientRole.SIGNER) {
-      const hasSignatureField = fields.some(
-        (field) => field.recipientId === recipient.id && isSignatureFieldType(field.type),
-      );
+      const hasAnyField = fields.some((field) => field.recipientId === recipient.id);
 
-      return !hasSignatureField;
+      return !hasAnyField;
     }
 
     return false;

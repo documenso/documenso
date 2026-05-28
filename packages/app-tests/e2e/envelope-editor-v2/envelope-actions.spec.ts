@@ -210,26 +210,24 @@ test.describe('document editor', () => {
     expect(updatedEnvelope.status).toBe(DocumentStatus.PENDING);
   });
 
-  test('send document shows validation when signers lack signature fields', async ({ page }) => {
+  test('send document shows validation when signers have no fields assigned', async ({ page }) => {
     const surface = await openDocumentEnvelopeEditor(page);
 
     // Add the current user as a SIGNER recipient via the UI — but do NOT place any fields.
     await clickAddMyselfButton(surface.root);
     await expect(getRecipientEmailInputs(surface.root).first()).toHaveValue(surface.userEmail);
 
-    // Click the "Send Document" sidebar action without placing signature fields.
+    // Click the "Send Document" sidebar action without placing any fields.
     await page.locator('button[title="Send Envelope"]').click();
 
     // The distribute dialog should appear.
     await expect(page.getByRole('heading', { name: 'Send Document' })).toBeVisible();
 
     // The validation warning should be shown instead of the send form.
-    await expect(
-      page.getByText('The following signers are missing signature fields'),
-    ).toBeVisible();
+    await expect(page.getByText('The following signers have no fields assigned')).toBeVisible();
 
-    // The warning should point users to the Viewer/CC roles as an alternative to adding a field.
-    await expect(page.getByText('change their role', { exact: false }).first()).toBeVisible();
+    // The warning should explain the field-required-or-Viewer/CC alternatives.
+    await expect(page.getByText('Assign at least one field', { exact: false }).first()).toBeVisible();
 
     // The "Send" button should not be visible since we're in validation mode.
     await expect(page.getByRole('button', { name: 'Send', exact: true })).not.toBeVisible();
@@ -238,9 +236,7 @@ test.describe('document editor', () => {
     await page.getByRole('button', { name: 'Close' }).click();
 
     // The dialog should be closed.
-    await expect(
-      page.getByText('The following signers are missing signature fields'),
-    ).not.toBeVisible();
+    await expect(page.getByText('The following signers have no fields assigned')).not.toBeVisible();
   });
 
   test('resend document sends reminder', async ({ page }) => {

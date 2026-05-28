@@ -468,7 +468,7 @@ export const EnvelopeDistributeDialog = ({
                 ))
                 .with('MISSING_SIGNATURES', () => (
                   <AlertDescription>
-                    <Trans>The following signers are missing signature fields:</Trans>
+                    <Trans>The following signers have no fields assigned:</Trans>
 
                     <ul className="ml-2 mt-1 list-inside list-disc">
                       {recipientsMissingSignatureFields.map((recipient) => (
@@ -480,8 +480,10 @@ export const EnvelopeDistributeDialog = ({
 
                     <p className="mt-3">
                       <Trans>
-                        If a recipient only needs to receive or view the document, change their role
-                        to Viewer or CC — those recipients don't need a signature field.
+                        Assign at least one field to each signer — a signature field if they need
+                        to sign, or any other field type (e.g. Text) if they only need to fill in
+                        data. If a recipient only needs to receive or view the document, change
+                        their role to Viewer or CC instead.
                       </Trans>
                     </p>
                   </AlertDescription>
