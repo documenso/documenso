@@ -164,6 +164,11 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
     recipientSignature,
     isRecipientsTurn,
     includeSenderDetails: settings.includeSenderDetails,
+    branding: {
+      brandingEnabled: settings.brandingEnabled,
+      brandingLogo: settings.brandingLogo,
+      brandingUrl: settings.brandingUrl,
+    },
   } as const;
 };
 
@@ -338,6 +343,7 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
     isRecipientsTurn,
     allRecipients,
     includeSenderDetails,
+    branding,
     recipientWithFields,
   } = data;
 
@@ -410,6 +416,7 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
             isRecipientsTurn={isRecipientsTurn}
             allRecipients={allRecipients}
             includeSenderDetails={includeSenderDetails}
+            branding={branding}
           />
         </div>
       </DocumentSigningAuthProvider>

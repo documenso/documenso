@@ -1,4 +1,5 @@
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { getSafeBrandingUrl } from '@documenso/lib/utils/get-safe-branding-url';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -27,27 +28,37 @@ export const EnvelopeSignerHeader = () => {
   const { envelopeData, envelope, recipientFieldsRemaining, recipient } = useRequiredEnvelopeSigningContext();
 
   const isEmbedSigning = useEmbedSigningContext() !== null;
+  const hasCustomBrandingLogo = envelopeData.settings.brandingEnabled && Boolean(envelopeData.settings.brandingLogo);
+  const safeBrandingUrl = hasCustomBrandingLogo ? getSafeBrandingUrl(envelopeData.settings.brandingUrl) : null;
+  const customBrandingLogo = (
+    <img
+      src={`/api/branding/logo/team/${envelope.teamId}`}
+      alt={`${envelope.team.name}'s Logo`}
+      className="h-6 w-auto"
+    />
+  );
 
   return (
     <nav className="embed--DocumentWidgetHeader flex max-w-screen flex-row justify-between border-border border-b bg-background px-4 py-3 md:px-6">
       {/* Left side - Logo and title */}
       <div className="flex min-w-0 flex-1 items-center space-x-2 md:w-auto md:flex-none">
-        {!isEmbedSigning && (
-          <Link to="/" className="flex-shrink-0">
-            {envelopeData.settings.brandingEnabled && envelopeData.settings.brandingLogo ? (
-              <img
-                src={`/api/branding/logo/team/${envelope.teamId}`}
-                alt={`${envelope.team.name}'s Logo`}
-                className="h-6 w-auto"
-              />
-            ) : (
-              <>
-                <BrandingLogo className="hidden h-6 w-auto md:block" />
-                <BrandingLogoIcon className="h-6 w-auto md:hidden" />
-              </>
-            )}
-          </Link>
-        )}
+        {!isEmbedSigning &&
+          (hasCustomBrandingLogo && safeBrandingUrl ? (
+            <a href={safeBrandingUrl} target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
+              {customBrandingLogo}
+            </a>
+          ) : (
+            <Link to="/" className="flex-shrink-0">
+              {hasCustomBrandingLogo ? (
+                customBrandingLogo
+              ) : (
+                <>
+                  <BrandingLogo className="hidden h-6 w-auto md:block" />
+                  <BrandingLogoIcon className="h-6 w-auto md:hidden" />
+                </>
+              )}
+            </Link>
+          ))}
 
         <h1 title={envelope.title} className="min-w-0 truncate font-semibold text-base text-foreground md:hidden">
           {envelope.title}
