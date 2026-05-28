@@ -30,6 +30,7 @@ import { resealDocumentRoute } from './reseal-document';
 import { resetTwoFactorRoute } from './reset-two-factor-authentication';
 import { resyncLicenseRoute } from './resync-license';
 import { swapOrganisationSubscriptionRoute } from './swap-organisation-subscription';
+import { syncOrganisationSubscriptionRoute } from './sync-organisation-subscription';
 import { updateAdminOrganisationRoute } from './update-admin-organisation';
 import { updateOrganisationMemberRoleRoute } from './update-organisation-member-role';
 import { updateRecipientRoute } from './update-recipient';
@@ -45,6 +46,7 @@ export const adminRouter = router({
     update: updateAdminOrganisationRoute,
     delete: deleteOrganisationRoute,
     swapSubscription: swapOrganisationSubscriptionRoute,
+    syncSubscription: syncOrganisationSubscriptionRoute,
   },
   organisationMember: {
     promoteToOwner: promoteMemberToOwnerRoute,
