@@ -132,11 +132,16 @@ export const isEmailDomainAllowedForSignup = (email: string): boolean => {
  * Matching also covers subdomains (e.g. `foo.mailinator.com` resolves to
  * `mailinator.com`).
  *
+ * An optional `additionalBlockedDomains` list can be supplied to layer
+ * admin-configured custom domains on top of the bundled list. These are
+ * matched with the same subdomain-walking behaviour and are expected to be
+ * pre-normalised (trimmed + lowercased) by the caller.
+ *
  * Returns `true` when the email is disposable and should be rejected.
  * Email format validation is intentionally NOT performed here — that is
  * handled by Zod upstream.
  */
-export const isDisposableEmail = (email: string): boolean => {
+export const isDisposableEmail = (email: string, additionalBlockedDomains: string[] = []): boolean => {
   const domain = email.toLowerCase().split('@').pop();
 
   if (!domain) {
@@ -144,11 +149,12 @@ export const isDisposableEmail = (email: string): boolean => {
   }
 
   const blacklist = MailChecker.blacklist();
+  const blocklist = new Set(additionalBlockedDomains);
 
   let currentDomain: string | undefined = domain;
 
   while (currentDomain) {
-    if (blacklist.has(currentDomain)) {
+    if (blacklist.has(currentDomain) || blocklist.has(currentDomain)) {
       return true;
     }
 
