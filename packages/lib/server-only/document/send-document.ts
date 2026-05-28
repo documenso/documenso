@@ -39,6 +39,7 @@ import { toCheckboxCustomText, toRadioCustomText } from '../../utils/fields';
 import { getRecipientsWithMissingFields, isRecipientEmailValidForSending } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
+import { assertUserNotDisabledById } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type SendDocumentOptions = {
@@ -50,6 +51,11 @@ export type SendDocumentOptions = {
 };
 
 export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetadata }: SendDocumentOptions) => {
+  // Refuse to send on behalf of a disabled account. Guards distribute /
+  // redistribute / template-use routes, the bulk-send job, and direct
+  // templates that auto-send on creation.
+  await assertUserNotDisabledById({ userId });
+
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,
     type: EnvelopeType.DOCUMENT,

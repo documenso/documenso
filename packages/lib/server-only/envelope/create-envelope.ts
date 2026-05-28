@@ -37,6 +37,7 @@ import { createDocumentAuthOptions, createRecipientAuthOptions } from '../../uti
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-id';
 import { getTeamSettings } from '../team/get-team-settings';
+import { assertUserNotDisabledById } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 type CreateEnvelopeRecipientFieldOptions = TFieldAndMeta & {
@@ -116,6 +117,11 @@ export const createEnvelope = async ({
   internalVersion,
   bypassDefaultRecipients = false,
 }: CreateEnvelopeOptions) => {
+  // Refuse to create on behalf of a disabled account. Guards every route that
+  // funnels through here (document.create, envelope.use, template create,
+  // embedding template/document create, API v1) and the seed/job paths.
+  await assertUserNotDisabledById({ userId });
+
   const {
     type,
     title,
