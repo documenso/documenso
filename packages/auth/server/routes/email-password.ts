@@ -171,12 +171,8 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       });
     }
 
-    if (user.disabled) {
-      throw new AppError('ACCOUNT_DISABLED', {
-        message: 'Account disabled',
-      });
-    }
-
+    // The disabled check now lives inside `onAuthorize` so every sign-in path
+    // (password, passkey, OAuth, OIDC) shares the same enforcement.
     await onAuthorize({ userId: user.id }, c);
 
     return c.text('', 201);
