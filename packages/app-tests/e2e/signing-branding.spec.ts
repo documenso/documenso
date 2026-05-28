@@ -12,11 +12,6 @@ import { DocumentDataType, FieldType } from '@prisma/client';
 const BRANDING_URL = 'https://brand.example/signing?source=documenso';
 const PDF_PAGE_SELECTOR = 'img[data-page-number]';
 
-type EnableOrganisationBrandingOptions = {
-  organisationId: string;
-  brandingUrl?: string;
-};
-
 const readBrandingLogo = async () => {
   const logo = await fs.readFile(path.join(__dirname, '../../assets/logo.png'));
 
@@ -27,30 +22,17 @@ const readBrandingLogo = async () => {
 };
 
 const enableOrganisationBranding = async ({
-  organisationId,
+  organisationGlobalSettingsId,
   brandingUrl = BRANDING_URL,
-}: EnableOrganisationBrandingOptions) => {
-  const [brandingLogo, organisationGlobalSettings] = await Promise.all([
-    readBrandingLogo(),
-    prisma.organisationGlobalSettings.findFirstOrThrow({
-      where: {
-        organisation: {
-          id: organisationId,
-        },
-      },
-      select: {
-        id: true,
-      },
-    }),
-  ]);
-
+}: {
+  organisationGlobalSettingsId: string;
+  brandingUrl?: string;
+}) => {
   await prisma.organisationGlobalSettings.update({
-    where: {
-      id: organisationGlobalSettings.id,
-    },
+    where: { id: organisationGlobalSettingsId },
     data: {
       brandingEnabled: true,
-      brandingLogo,
+      brandingLogo: await readBrandingLogo(),
       brandingUrl,
     },
   });
@@ -68,7 +50,7 @@ test('[SIGNING_BRANDING]: V1 normal signing links custom logo to safe Brand Webs
   const { user, team, organisation } = await seedUser();
 
   await enableOrganisationBranding({
-    organisationId: organisation.id,
+    organisationGlobalSettingsId: organisation.organisationGlobalSettingsId,
   });
 
   const { recipients } = await seedPendingDocumentWithFullFields({
@@ -87,7 +69,7 @@ test('[SIGNING_BRANDING]: V2 signing links custom logo to safe Brand Website', a
   const { user, team, organisation } = await seedUser();
 
   await enableOrganisationBranding({
-    organisationId: organisation.id,
+    organisationGlobalSettingsId: organisation.organisationGlobalSettingsId,
   });
 
   const { recipients } = await seedPendingDocumentWithFullFields({
@@ -118,7 +100,7 @@ test('[SIGNING_BRANDING]: V1 and V2 custom logos keep internal link when Brand W
   const { user, team, organisation } = await seedUser();
 
   await enableOrganisationBranding({
-    organisationId: organisation.id,
+    organisationGlobalSettingsId: organisation.organisationGlobalSettingsId,
     brandingUrl: '',
   });
 
@@ -156,7 +138,7 @@ test('[SIGNING_BRANDING]: embedded signing does not render custom logo Brand Web
   const { user, team, organisation } = await seedUser();
 
   await enableOrganisationBranding({
-    organisationId: organisation.id,
+    organisationGlobalSettingsId: organisation.organisationGlobalSettingsId,
   });
 
   const { recipients } = await seedPendingDocumentWithFullFields({

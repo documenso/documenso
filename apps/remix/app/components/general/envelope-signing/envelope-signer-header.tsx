@@ -1,5 +1,4 @@
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
-import { getSafeBrandingUrl } from '@documenso/lib/utils/get-safe-branding-url';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -29,13 +28,22 @@ export const EnvelopeSignerHeader = () => {
 
   const isEmbedSigning = useEmbedSigningContext() !== null;
   const hasCustomBrandingLogo = envelopeData.settings.brandingEnabled && Boolean(envelopeData.settings.brandingLogo);
-  const safeBrandingUrl = hasCustomBrandingLogo ? getSafeBrandingUrl(envelopeData.settings.brandingUrl) : null;
-  const customBrandingLogo = (
+
+  const parsedBrandingUrl = hasCustomBrandingLogo ? URL.parse(envelopeData.settings.brandingUrl) : null;
+  const safeBrandingUrl =
+    parsedBrandingUrl?.protocol === 'http:' || parsedBrandingUrl?.protocol === 'https:' ? parsedBrandingUrl.href : null;
+
+  const logoContent = hasCustomBrandingLogo ? (
     <img
       src={`/api/branding/logo/team/${envelope.teamId}`}
       alt={`${envelope.team.name}'s Logo`}
       className="h-6 w-auto"
     />
+  ) : (
+    <>
+      <BrandingLogo className="hidden h-6 w-auto md:block" />
+      <BrandingLogoIcon className="h-6 w-auto md:hidden" />
+    </>
   );
 
   return (
@@ -43,20 +51,13 @@ export const EnvelopeSignerHeader = () => {
       {/* Left side - Logo and title */}
       <div className="flex min-w-0 flex-1 items-center space-x-2 md:w-auto md:flex-none">
         {!isEmbedSigning &&
-          (hasCustomBrandingLogo && safeBrandingUrl ? (
+          (safeBrandingUrl ? (
             <a href={safeBrandingUrl} target="_blank" rel="noopener noreferrer" className="flex-shrink-0">
-              {customBrandingLogo}
+              {logoContent}
             </a>
           ) : (
             <Link to="/" className="flex-shrink-0">
-              {hasCustomBrandingLogo ? (
-                customBrandingLogo
-              ) : (
-                <>
-                  <BrandingLogo className="hidden h-6 w-auto md:block" />
-                  <BrandingLogoIcon className="h-6 w-auto md:hidden" />
-                </>
-              )}
+              {logoContent}
             </Link>
           ))}
 
