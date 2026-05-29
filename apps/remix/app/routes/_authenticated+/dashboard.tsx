@@ -4,7 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { Plural, Trans, useLingui } from '@lingui/react/macro';
 import { Building2Icon, InboxIcon, SettingsIcon, UsersIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
-import { Link, redirect } from 'react-router';
+import { Link } from 'react-router';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
@@ -20,10 +20,6 @@ import { ScrollArea, ScrollBar } from '@documenso/ui/primitives/scroll-area';
 import { OrganisationInvitations } from '~/components/general/organisations/organisation-invitations';
 import { InboxTable } from '~/components/tables/inbox-table';
 import { appMetaTags } from '~/utils/meta';
-
-export function loader() {
-  throw redirect('/');
-}
 
 export function meta() {
   return appMetaTags(msg`Dashboard`);

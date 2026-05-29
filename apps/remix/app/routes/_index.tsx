@@ -41,8 +41,11 @@ export async function loader({ request }: Route.LoaderArgs) {
       currentTeam = teams[0];
     }
 
+    // Users who don't have a current/preferred team (e.g. organisation members who
+    // haven't been added to a team yet) land on the dashboard rather than a bare
+    // personal inbox, so they retain access to their organisation(s) and navigation.
     if (!currentTeam) {
-      throw redirect('/inbox');
+      throw redirect('/dashboard');
     }
 
     throw redirect(formatDocumentsPath(currentTeam.url));
