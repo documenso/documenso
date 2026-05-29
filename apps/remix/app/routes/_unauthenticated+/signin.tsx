@@ -117,6 +117,17 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
           </p>
         )}
       </div>
+
+      <p className="mt-4 text-center text-xs text-muted-foreground">
+        <a
+          href="https://support.psd401.net"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="duration-200 hover:opacity-70"
+        >
+          <Trans>PSD401 IT Support</Trans>
+        </a>
+      </p>
     </div>
   );
 }
