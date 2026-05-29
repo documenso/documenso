@@ -1,5 +1,5 @@
 import { sendOrganisationAccountLinkConfirmationEmail } from '@documenso/ee/server-only/lib/send-organisation-account-link-confirmation-email';
-import { isSignupEnabledForProvider } from '@documenso/lib/constants/auth';
+import { isDisposableEmail, isSignupEnabledForProvider } from '@documenso/lib/constants/auth';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
 import { formatOrganisationLoginUrl } from '@documenso/lib/utils/organisation-authentication-portal';
@@ -70,6 +70,15 @@ export const handleOAuthOrganisationCallbackUrl = async (options: HandleOAuthOrg
       const errorUrl = new URL(formatOrganisationLoginUrl(orgUrl));
 
       errorUrl.searchParams.set('error', AuthenticationErrorCode.SignupDisabled);
+
+      return c.redirect(errorUrl.toString(), 302);
+    }
+
+    // Reject disposable / throwaway email providers for new SSO users.
+    if (isDisposableEmail(email)) {
+      const errorUrl = new URL(formatOrganisationLoginUrl(orgUrl));
+
+      errorUrl.searchParams.set('error', AuthenticationErrorCode.SignupDisposableEmail);
 
       return c.redirect(errorUrl.toString(), 302);
     }
