@@ -849,6 +849,8 @@ model OrganisationGlobalSettings {
   documentTimezone          String? // Nullable to allow using local timezones if not set.
   documentDateFormat        String             @default("yyyy-MM-dd hh:mm a")
   delegateDocumentOwnership Boolean            @default(false)
+  // When enabled, only team admins and managers can send documents for signing.
+  restrictDocumentSending   Boolean            @default(false)
 
   typedSignatureEnabled  Boolean @default(true)
   uploadSignatureEnabled Boolean @default(true)
@@ -886,6 +888,8 @@ model TeamGlobalSettings {
   documentTimezone          String?
   documentDateFormat        String?
   delegateDocumentOwnership Boolean?
+  // Null = inherit from organisation. When enabled, only team admins and managers can send documents.
+  restrictDocumentSending   Boolean?
 
   includeSenderDetails      Boolean?
   includeSigningCertificate Boolean?

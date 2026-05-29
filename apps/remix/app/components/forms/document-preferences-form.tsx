@@ -79,6 +79,7 @@ export type TDocumentPreferencesFormSchema = {
   signatureTypes: DocumentSignatureType[];
   defaultRecipients: TDefaultRecipients | null;
   delegateDocumentOwnership: boolean | null;
+  restrictDocumentSending: boolean | null;
   aiFeaturesEnabled: boolean | null;
   envelopeExpirationPeriod: TEnvelopeExpirationPeriod | null;
   reminderSettings: TEnvelopeReminderSettings | null;
@@ -98,6 +99,7 @@ type SettingsSubset = Pick<
   | 'drawSignatureEnabled'
   | 'defaultRecipients'
   | 'delegateDocumentOwnership'
+  | 'restrictDocumentSending'
   | 'aiFeaturesEnabled'
   | 'envelopeExpirationPeriod'
   | 'reminderSettings'
@@ -139,6 +141,7 @@ export const DocumentPreferencesForm = ({
     }),
     defaultRecipients: ZDefaultRecipientsSchema.nullable(),
     delegateDocumentOwnership: z.boolean().nullable(),
+    restrictDocumentSending: z.boolean().nullable(),
     aiFeaturesEnabled: z.boolean().nullable(),
     envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullable(),
     reminderSettings: ZEnvelopeReminderSettings.nullable(),
@@ -161,6 +164,7 @@ export const DocumentPreferencesForm = ({
         ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients)
         : null,
       delegateDocumentOwnership: settings.delegateDocumentOwnership,
+      restrictDocumentSending: settings.restrictDocumentSending,
       aiFeaturesEnabled: settings.aiFeaturesEnabled,
       envelopeExpirationPeriod: settings.envelopeExpirationPeriod ?? null,
       reminderSettings: settings.reminderSettings ?? null,
@@ -681,6 +685,53 @@ export const DocumentPreferencesForm = ({
                 <FormDescription>
                   <Trans>
                     Enable team API tokens to delegate document ownership to another team member.
+                  </Trans>
+                </FormDescription>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="restrictDocumentSending"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>
+                  <Trans>Restrict Document Sending</Trans>
+                </FormLabel>
+
+                <Select
+                  {...field}
+                  value={field.value === null ? '-1' : field.value.toString()}
+                  onValueChange={(value) =>
+                    field.onChange(value === 'true' ? true : value === 'false' ? false : null)
+                  }
+                >
+                  <SelectTrigger className="bg-background text-muted-foreground">
+                    <SelectValue />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    <SelectItem value="true">
+                      <Trans>Yes</Trans>
+                    </SelectItem>
+
+                    <SelectItem value="false">
+                      <Trans>No</Trans>
+                    </SelectItem>
+
+                    {canInherit && (
+                      <SelectItem value={'-1'}>
+                        <Trans>Inherit from organisation</Trans>
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+
+                <FormDescription>
+                  <Trans>
+                    When enabled, only team admins and managers can send documents for signing.
+                    Members can still create and prepare documents.
                   </Trans>
                 </FormDescription>
               </FormItem>

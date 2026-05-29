@@ -53,6 +53,7 @@ export default function TeamsSettingsPage() {
         signatureTypes,
         defaultRecipients,
         delegateDocumentOwnership,
+        restrictDocumentSending,
         aiFeaturesEnabled,
         envelopeExpirationPeriod,
         reminderSettings,
@@ -84,6 +85,7 @@ export default function TeamsSettingsPage() {
                 drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
               }),
           delegateDocumentOwnership: delegateDocumentOwnership,
+          restrictDocumentSending: restrictDocumentSending,
         },
       });
 

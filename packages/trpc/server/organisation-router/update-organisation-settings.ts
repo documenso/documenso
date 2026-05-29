@@ -38,6 +38,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       drawSignatureEnabled,
       defaultRecipients,
       delegateDocumentOwnership,
+      restrictDocumentSending,
       envelopeExpirationPeriod,
       reminderSettings,
 
@@ -107,6 +108,9 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       delegateDocumentOwnership ??
       organisation.organisationGlobalSettings.delegateDocumentOwnership;
 
+    const derivedRestrictDocumentSending =
+      restrictDocumentSending ?? organisation.organisationGlobalSettings.restrictDocumentSending;
+
     if (
       derivedTypedSignatureEnabled === false &&
       derivedUploadSignatureEnabled === false &&
@@ -150,6 +154,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
             drawSignatureEnabled,
             defaultRecipients: defaultRecipients === null ? Prisma.DbNull : defaultRecipients,
             delegateDocumentOwnership: derivedDelegateDocumentOwnership,
+            restrictDocumentSending: derivedRestrictDocumentSending,
             envelopeExpirationPeriod:
               envelopeExpirationPeriod === null ? Prisma.DbNull : envelopeExpirationPeriod,
             reminderSettings: reminderSettings === null ? Prisma.DbNull : reminderSettings,

@@ -40,6 +40,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       uploadSignatureEnabled,
       drawSignatureEnabled,
       delegateDocumentOwnership,
+      restrictDocumentSending,
       envelopeExpirationPeriod,
       reminderSettings,
 
@@ -156,6 +157,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             uploadSignatureEnabled,
             drawSignatureEnabled,
             delegateDocumentOwnership,
+            restrictDocumentSending,
             envelopeExpirationPeriod:
               envelopeExpirationPeriod === null ? Prisma.DbNull : envelopeExpirationPeriod,
             reminderSettings: reminderSettings === null ? Prisma.DbNull : reminderSettings,

@@ -7,6 +7,7 @@ import {
   RecipientRole,
   SendStatus,
   SigningStatus,
+  TeamMemberRole,
   WebhookTriggerEvents,
 } from '@prisma/client';
 
@@ -44,8 +45,10 @@ import {
   getRecipientsWithMissingFields,
   isRecipientEmailValidForSending,
 } from '../../utils/recipients';
+import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
+import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type SendDocumentOptions = {
@@ -69,6 +72,28 @@ export const sendDocument = async ({
     userId,
     teamId,
   });
+
+  // When the team has restricted document sending, only admins and managers are
+  // allowed to send documents for signing. Members can still create and prepare
+  // documents, but not distribute them.
+  const settings = await getTeamSettings({ userId, teamId });
+
+  if (settings.restrictDocumentSending) {
+    const isManagerOrAbove = await prisma.team.findFirst({
+      where: buildTeamWhereQuery({
+        teamId,
+        userId,
+        roles: [TeamMemberRole.ADMIN, TeamMemberRole.MANAGER],
+      }),
+      select: { id: true },
+    });
+
+    if (!isManagerOrAbove) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'You do not have permission to send documents in this team.',
+      });
+    }
+  }
 
   const envelope = await prisma.envelope.findFirst({
     where: envelopeWhereInput,
