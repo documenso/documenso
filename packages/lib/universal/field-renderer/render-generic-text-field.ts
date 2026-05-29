@@ -182,11 +182,9 @@ export const renderGenericTextFieldElement = (
     fieldGroup.getLayer()?.batchDraw();
   });
 
-  // Handle export mode.
-  if (mode === 'export') {
-    // Hide the rectangle.
-    fieldRect.opacity(0);
-  }
+  // In export mode the field outline is rendered by `upsertFieldRect` (a
+  // transparent fill with a neutral border), so no extra handling is required
+  // here.
 
   if (color !== 'readOnly' && mode !== 'export') {
     createFieldHoverInteraction({ fieldGroup, fieldRect, options });

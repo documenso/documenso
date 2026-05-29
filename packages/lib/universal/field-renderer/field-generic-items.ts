@@ -12,6 +12,16 @@ export const konvaTextFontFamily =
   '"Noto Sans", "Noto Sans Japanese", "Noto Sans Chinese", "Noto Sans Korean", sans-serif';
 export const konvaTextFill = 'black';
 
+/**
+ * The outline drawn around each field in the exported/sealed PDF so that the
+ * fillable areas remain visibly delineated on the completed document.
+ *
+ * A neutral grey is used (rather than the recipient colour shown while editing
+ * and signing) to keep the final document looking clean and form-like.
+ */
+export const EXPORT_FIELD_OUTLINE_COLOR = '#9ca3af'; // tailwind grey-400
+export const EXPORT_FIELD_OUTLINE_WIDTH = 1;
+
 export const upsertFieldGroup = (
   field: FieldToRender,
   options: RenderFieldElementOptions,
@@ -66,15 +76,25 @@ export const upsertFieldRect = (
       name: 'field-rect',
     });
 
+  const isExport = mode === 'export';
+
   fieldRect.setAttrs({
     width: fieldWidth,
     height: fieldHeight,
-    fill: DEFAULT_RECT_BACKGROUND,
-    stroke: color ? getRecipientColorStyles(color).baseRing : '#e5e7eb',
-    strokeWidth: 2,
+    // In export mode keep the fill transparent so the underlying PDF content
+    // shows through, while still drawing the field outline below.
+    fill: isExport ? undefined : DEFAULT_RECT_BACKGROUND,
+    stroke: isExport
+      ? EXPORT_FIELD_OUTLINE_COLOR
+      : color
+        ? getRecipientColorStyles(color).baseRing
+        : '#e5e7eb',
+    strokeWidth: isExport ? EXPORT_FIELD_OUTLINE_WIDTH : 2,
     cornerRadius: 2,
     strokeScaleEnabled: false,
-    visible: mode !== 'export',
+    // Previously the rectangle was hidden entirely when exporting; it is now
+    // kept visible so the field outline is rendered on the final PDF.
+    visible: true,
   } satisfies Partial<Konva.RectConfig>);
 
   return fieldRect;
