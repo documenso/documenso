@@ -30,6 +30,7 @@ import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { assertOrgEmailSendAllowed } from '../email/assert-org-email-send-allowed';
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertUserNotDisabled } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type ResendDocumentOptions = {
@@ -49,8 +50,13 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
       id: true,
       email: true,
       name: true,
+      disabled: true,
     },
   });
+
+  // Refuse to resend on behalf of a disabled account. Guards
+  // document.redistribute / envelope.redistribute and the API v1 equivalent.
+  assertUserNotDisabled(user);
 
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,

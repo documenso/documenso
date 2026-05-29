@@ -1,6 +1,11 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { isEmailDomainAllowedForSignup, isSignupEnabledForProvider } from '@documenso/lib/constants/auth';
+import {
+  isDisposableEmail,
+  isEmailDomainAllowedForSignup,
+  isSignupEnabledForProvider,
+} from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { getEmailBlocklistDomains } from '@documenso/lib/server-only/site-settings/get-email-blocklist-domains';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
 import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
 import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
@@ -128,6 +133,17 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
     const errorUrl = new URL('/signin', NEXT_PUBLIC_WEBAPP_URL());
 
     errorUrl.searchParams.set('error', AuthenticationErrorCode.SignupDisabled);
+
+    return c.redirect(errorUrl.toString(), 302);
+  }
+
+  // Reject disposable / throwaway email providers for new SSO users.
+  const additionalBlockedDomains = await getEmailBlocklistDomains();
+
+  if (isDisposableEmail(email, additionalBlockedDomains)) {
+    const errorUrl = new URL('/signin', NEXT_PUBLIC_WEBAPP_URL());
+
+    errorUrl.searchParams.set('error', AuthenticationErrorCode.SignupDisposableEmail);
 
     return c.redirect(errorUrl.toString(), 302);
   }
