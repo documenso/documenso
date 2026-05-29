@@ -42,6 +42,7 @@ import { InitialsFieldAdvancedSettings } from './field-items-advanced-settings/i
 import { NameFieldAdvancedSettings } from './field-items-advanced-settings/name-field';
 import { NumberFieldAdvancedSettings } from './field-items-advanced-settings/number-field';
 import { RadioFieldAdvancedSettings } from './field-items-advanced-settings/radio-field';
+import { SignatureFieldAdvancedSettings } from './field-items-advanced-settings/signature-field';
 import { TextFieldAdvancedSettings } from './field-items-advanced-settings/text-field';
 
 export type FieldAdvancedSettingsProps = {
@@ -86,6 +87,11 @@ export type FieldMetaKeys =
 
 const getDefaultState = (fieldType: FieldType): FieldMeta => {
   switch (fieldType) {
+    case FieldType.SIGNATURE:
+      return {
+        type: 'signature',
+        showLine: false,
+      };
     case FieldType.INITIALS:
       return {
         type: 'initials',
@@ -308,6 +314,13 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
     const handleClose = onClose ?? onAdvancedSettings;
 
     const fieldSettingsForm = match(field.type)
+      .with(FieldType.SIGNATURE, () => (
+        <SignatureFieldAdvancedSettings
+          fieldState={fieldState}
+          handleFieldChange={handleFieldChange}
+          handleErrors={setErrors}
+        />
+      ))
       .with(FieldType.INITIALS, () => (
         <InitialsFieldAdvancedSettings
           fieldState={fieldState}

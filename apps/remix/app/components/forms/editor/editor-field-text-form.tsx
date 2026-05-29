@@ -31,6 +31,7 @@ import {
   EditorGenericLineHeightField,
   EditorGenericReadOnlyField,
   EditorGenericRequiredField,
+  EditorGenericShowLineField,
   EditorGenericTextAlignField,
   EditorGenericVerticalAlignField,
 } from './editor-field-generic-field-forms';
@@ -47,6 +48,7 @@ const ZTextFieldFormSchema = ZTextFieldMeta.pick({
   verticalAlign: true,
   required: true,
   readOnly: true,
+  showLine: true,
 }).refine(
   (data) => {
     // A read-only field must have text
@@ -88,6 +90,7 @@ export const EditorFieldTextForm = ({
       verticalAlign: value.verticalAlign ?? FIELD_DEFAULT_GENERIC_VERTICAL_ALIGN,
       required: value.required || false,
       readOnly: value.readOnly || false,
+      showLine: value.showLine ?? false,
     },
   });
 
@@ -240,6 +243,8 @@ export const EditorFieldTextForm = ({
           </div>
 
           <EditorGenericReadOnlyField formControl={form.control} />
+
+          <EditorGenericShowLineField formControl={form.control} />
         </fieldset>
       </form>
     </Form>

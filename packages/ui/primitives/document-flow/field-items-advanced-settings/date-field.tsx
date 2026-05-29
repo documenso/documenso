@@ -12,6 +12,8 @@ import {
   SelectValue,
 } from '@documenso/ui/primitives/select';
 
+import { ShowLineSetting } from './show-line-setting';
+
 type DateFieldAdvancedSettingsProps = {
   fieldState: DateFieldMeta;
   handleFieldChange: (key: keyof DateFieldMeta, value: string | boolean) => void;
@@ -93,6 +95,11 @@ export const DateFieldAdvancedSettings = ({
           </SelectContent>
         </Select>
       </div>
+
+      <ShowLineSetting
+        checked={Boolean(fieldState.showLine)}
+        onChange={(checked) => handleInput('showLine', checked)}
+      />
     </div>
   );
 };

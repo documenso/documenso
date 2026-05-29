@@ -61,6 +61,57 @@ export const upsertFieldGroup = (
   return fieldGroup;
 };
 
+// Horizontal padding and distance from the bottom edge for the optional field
+// line. Kept small so the line spans most of the field and sits just below any
+// rendered value/signature.
+export const FIELD_LINE_X_PADDING = 4;
+export const FIELD_LINE_BOTTOM_OFFSET = 4;
+
+/**
+ * Positions a field's optional "signature line" as a horizontal rule spanning
+ * the (padded) width of the field, near its bottom edge. Width/height are given
+ * in the same space the line is drawn in (i.e. already account for any group
+ * scaling that the caller counter-scales the line by).
+ */
+export const setFieldLinePoints = (line: Konva.Line, width: number, height: number) => {
+  const y = Math.max(0, height - FIELD_LINE_BOTTOM_OFFSET);
+  const endX = Math.max(FIELD_LINE_X_PADDING, width - FIELD_LINE_X_PADDING);
+
+  line.points([FIELD_LINE_X_PADDING, y, endX, y]);
+};
+
+/**
+ * Creates (or reuses) the horizontal line drawn beneath a field when its
+ * `showLine` meta flag is enabled. Visible in every render mode, including
+ * export, so it is sealed into the final PDF.
+ */
+export const upsertFieldLine = (
+  field: FieldToRender,
+  options: RenderFieldElementOptions,
+): Konva.Line => {
+  const { pageWidth, pageHeight, pageLayer } = options;
+
+  const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
+
+  const fieldLine: Konva.Line =
+    pageLayer.findOne(`#${field.renderId}-line`) ||
+    new Konva.Line({
+      id: `${field.renderId}-line`,
+      name: 'field-line',
+    });
+
+  fieldLine.setAttrs({
+    stroke: konvaTextFill,
+    strokeWidth: 1,
+    strokeScaleEnabled: false,
+    listening: false,
+  } satisfies Partial<Konva.LineConfig>);
+
+  setFieldLinePoints(fieldLine, fieldWidth, fieldHeight);
+
+  return fieldLine;
+};
+
 export const upsertFieldRect = (
   field: FieldToRender,
   options: RenderFieldElementOptions,

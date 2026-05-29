@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@documenso/ui/primitives/select';
+import { Switch } from '@documenso/ui/primitives/switch';
 
 // Can't seem to get the non-any type to work with correct types.
 // Eg Control<{ fontSize?: number } doesn't seem to work when there are required items.
@@ -308,6 +309,42 @@ export const EditorGenericReadOnlyField = ({
               </label>
             </div>
           </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
+
+export const EditorGenericShowLineField = ({
+  formControl,
+  className,
+}: {
+  formControl: FormControlType;
+  className?: string;
+}) => {
+  return (
+    <FormField
+      control={formControl}
+      name="showLine"
+      render={({ field }) => (
+        <FormItem className={cn('flex flex-col gap-1', className)}>
+          <div className="flex flex-row items-center gap-2">
+            <FormControl>
+              <Switch
+                data-testid="field-form-showLine"
+                className="bg-background"
+                checked={Boolean(field.value)}
+                onCheckedChange={field.onChange}
+              />
+            </FormControl>
+            <FormLabel className="text-muted-foreground text-sm">
+              <Trans>Show signature line</Trans>
+            </FormLabel>
+          </div>
+          <p className="text-muted-foreground text-xs">
+            <Trans>Draws a line beneath the field, like a paper form.</Trans>
+          </p>
           <FormMessage />
         </FormItem>
       )}

@@ -12,7 +12,9 @@ import {
   createFieldHoverInteraction,
   konvaTextFill,
   konvaTextFontFamily,
+  setFieldLinePoints,
   upsertFieldGroup,
+  upsertFieldLine,
   upsertFieldRect,
 } from './field-generic-items';
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
@@ -141,6 +143,13 @@ export const renderGenericTextFieldElement = (
   fieldGroup.add(fieldRect);
   fieldGroup.add(fieldText);
 
+  // Optionally render a horizontal "signature line" beneath the field value.
+  const fieldLine = field.fieldMeta?.showLine ? upsertFieldLine(field, options) : undefined;
+
+  if (fieldLine) {
+    fieldGroup.add(fieldLine);
+  }
+
   // This is to keep the text inside the field at the same size
   // when the field is resized. Without this the text would be stretched.
   fieldGroup.on('transform', () => {
@@ -161,6 +170,14 @@ export const renderGenericTextFieldElement = (
     // Force Konva to recalculate text layout
     fieldText.height();
 
+    // Keep the optional line spanning the field and pinned to the bottom while
+    // resizing (counter-scaled so it stays a hairline like the text).
+    if (fieldLine) {
+      fieldLine.scaleX(1 / groupScaleX);
+      fieldLine.scaleY(1 / groupScaleY);
+      setFieldLinePoints(fieldLine, rectWidth, rectHeight);
+    }
+
     fieldGroup.getLayer()?.batchDraw();
   });
 
@@ -178,6 +195,12 @@ export const renderGenericTextFieldElement = (
 
     // Force Konva to recalculate text layout
     fieldText.height();
+
+    if (fieldLine) {
+      fieldLine.scaleX(1);
+      fieldLine.scaleY(1);
+      setFieldLinePoints(fieldLine, rectWidth, rectHeight);
+    }
 
     fieldGroup.getLayer()?.batchDraw();
   });

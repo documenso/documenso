@@ -4,7 +4,9 @@ import { DEFAULT_SIGNATURE_TEXT_FONT_SIZE } from '../../constants/pdf';
 import { AppError } from '../../errors/app-error';
 import {
   createFieldHoverInteraction,
+  setFieldLinePoints,
   upsertFieldGroup,
+  upsertFieldLine,
   upsertFieldRect,
 } from './field-generic-items';
 import { calculateFieldPosition } from './field-renderer';
@@ -165,6 +167,13 @@ export const renderSignatureFieldElement = (
   fieldGroup.add(fieldRect);
   fieldGroup.add(fieldSignature);
 
+  // Optionally render a horizontal signature line beneath the signature.
+  const fieldLine = field.fieldMeta?.showLine ? upsertFieldLine(field, options) : undefined;
+
+  if (fieldLine) {
+    fieldGroup.add(fieldLine);
+  }
+
   // This is to keep the text inside the field at the same size
   // when the field is resized. Without this the text would be stretched.
   fieldGroup.on('transform', () => {
@@ -185,6 +194,12 @@ export const renderSignatureFieldElement = (
     // Force Konva to recalculate text layout
     fieldSignature.height();
 
+    if (fieldLine) {
+      fieldLine.scaleX(1 / groupScaleX);
+      fieldLine.scaleY(1 / groupScaleY);
+      setFieldLinePoints(fieldLine, rectWidth, rectHeight);
+    }
+
     fieldGroup.getLayer()?.batchDraw();
   });
 
@@ -202,6 +217,12 @@ export const renderSignatureFieldElement = (
 
     // Force Konva to recalculate text layout
     fieldSignature.height();
+
+    if (fieldLine) {
+      fieldLine.scaleX(1);
+      fieldLine.scaleY(1);
+      setFieldLinePoints(fieldLine, rectWidth, rectHeight);
+    }
 
     fieldGroup.getLayer()?.batchDraw();
   });

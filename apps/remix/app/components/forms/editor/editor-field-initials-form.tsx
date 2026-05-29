@@ -14,12 +14,14 @@ import { Form } from '@documenso/ui/primitives/form/form';
 
 import {
   EditorGenericFontSizeField,
+  EditorGenericShowLineField,
   EditorGenericTextAlignField,
 } from './editor-field-generic-field-forms';
 
 const ZInitialsFieldFormSchema = ZInitialsFieldMeta.pick({
   fontSize: true,
   textAlign: true,
+  showLine: true,
 });
 
 type TInitialsFieldFormSchema = z.infer<typeof ZInitialsFieldFormSchema>;
@@ -41,6 +43,7 @@ export const EditorFieldInitialsForm = ({
     defaultValues: {
       fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
       textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
+      showLine: value.showLine ?? false,
     },
   });
 
@@ -69,6 +72,8 @@ export const EditorFieldInitialsForm = ({
           <EditorGenericFontSizeField formControl={form.control} />
 
           <EditorGenericTextAlignField formControl={form.control} />
+
+          <EditorGenericShowLineField formControl={form.control} />
         </fieldset>
       </form>
     </Form>

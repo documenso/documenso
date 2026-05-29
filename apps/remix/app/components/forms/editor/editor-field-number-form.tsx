@@ -40,6 +40,7 @@ import {
   EditorGenericLineHeightField,
   EditorGenericReadOnlyField,
   EditorGenericRequiredField,
+  EditorGenericShowLineField,
   EditorGenericTextAlignField,
   EditorGenericVerticalAlignField,
 } from './editor-field-generic-field-forms';
@@ -58,6 +59,7 @@ const ZNumberFieldFormSchema = ZNumberFieldMeta.pick({
   readOnly: true,
   minValue: true,
   maxValue: true,
+  showLine: true,
 })
   .refine(
     (data) => {
@@ -119,6 +121,7 @@ export const EditorFieldNumberForm = ({
       readOnly: value.readOnly || false,
       minValue: value.minValue,
       maxValue: value.maxValue,
+      showLine: value.showLine ?? false,
     },
   });
 
@@ -248,6 +251,8 @@ export const EditorFieldNumberForm = ({
           </div>
 
           <EditorGenericReadOnlyField formControl={form.control} />
+
+          <EditorGenericShowLineField formControl={form.control} />
 
           {/* Validation section */}
           <section className="space-y-2">

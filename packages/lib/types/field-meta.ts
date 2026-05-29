@@ -48,6 +48,13 @@ export const ZBaseFieldMeta = z.object({
   required: z.boolean().optional(),
   readOnly: z.boolean().optional(),
   fontSize: z.number().min(8).max(96).default(DEFAULT_FIELD_FONT_SIZE).optional(),
+  /**
+   * When enabled, a horizontal "signature line" is drawn near the bottom of the
+   * field so the sealed document resembles a traditional paper form (e.g. a line
+   * to sign on, or a line beneath a name/date). Applies to the signature field
+   * and the generic text-based fields.
+   */
+  showLine: z.boolean().optional(),
 });
 
 export type TBaseFieldMeta = z.infer<typeof ZBaseFieldMeta>;

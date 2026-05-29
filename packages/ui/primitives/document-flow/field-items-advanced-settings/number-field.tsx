@@ -18,6 +18,7 @@ import {
 import { Switch } from '@documenso/ui/primitives/switch';
 
 import { numberFormatValues } from './constants';
+import { ShowLineSetting } from './show-line-setting';
 
 type NumberFieldAdvancedSettingsProps = {
   fieldState: NumberFieldMeta;
@@ -174,6 +175,11 @@ export const NumberFieldAdvancedSettings = ({
             <Trans>Read only</Trans>
           </Label>
         </div>
+
+        <ShowLineSetting
+          checked={Boolean(fieldState.showLine)}
+          onChange={(checked) => handleInput('showLine', checked)}
+        />
       </div>
       <Button
         className="bg-foreground/10 hover:bg-foreground/5 border-foreground/10 mt-2 border"

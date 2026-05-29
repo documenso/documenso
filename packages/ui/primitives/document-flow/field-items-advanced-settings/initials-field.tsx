@@ -6,6 +6,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../select';
+import { ShowLineSetting } from './show-line-setting';
 
 type InitialsFieldAdvancedSettingsProps = {
   fieldState: InitialsFieldMeta;
@@ -70,6 +71,11 @@ export const InitialsFieldAdvancedSettings = ({
           </SelectContent>
         </Select>
       </div>
+
+      <ShowLineSetting
+        checked={Boolean(fieldState.showLine)}
+        onChange={(checked) => handleInput('showLine', checked)}
+      />
     </div>
   );
 };

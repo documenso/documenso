@@ -14,6 +14,8 @@ import {
 import { Switch } from '@documenso/ui/primitives/switch';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 
+import { ShowLineSetting } from './show-line-setting';
+
 type TextFieldAdvancedSettingsProps = {
   fieldState: TextFieldMeta;
   handleFieldChange: (key: keyof TextFieldMeta, value: string | boolean) => void;
@@ -166,6 +168,11 @@ export const TextFieldAdvancedSettings = ({
             <Trans>Read only</Trans>
           </Label>
         </div>
+
+        <ShowLineSetting
+          checked={Boolean(fieldState.showLine)}
+          onChange={(checked) => handleInput('showLine', checked)}
+        />
       </div>
     </div>
   );

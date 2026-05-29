@@ -12,6 +12,8 @@ import {
   SelectValue,
 } from '@documenso/ui/primitives/select';
 
+import { ShowLineSetting } from './show-line-setting';
+
 type NameFieldAdvancedSettingsProps = {
   fieldState: NameFieldMeta;
   handleFieldChange: (key: keyof NameFieldMeta, value: string | boolean) => void;
@@ -75,6 +77,11 @@ export const NameFieldAdvancedSettings = ({
           </SelectContent>
         </Select>
       </div>
+
+      <ShowLineSetting
+        checked={Boolean(fieldState.showLine)}
+        onChange={(checked) => handleInput('showLine', checked)}
+      />
     </div>
   );
 };

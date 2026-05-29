@@ -123,6 +123,7 @@ const FieldItemInner = ({
     'EMAIL',
     'DATE',
     'NAME',
+    'SIGNATURE',
   ].includes(field.type);
 
   const calculateCoords = useCallback(() => {
