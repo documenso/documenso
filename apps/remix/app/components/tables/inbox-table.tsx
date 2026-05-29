@@ -15,13 +15,13 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus as DocumentStatusEnum, RecipientRole, SigningStatus } from '@prisma/client';
 import { CheckCircleIcon, DownloadIcon, EyeIcon, Loader, PencilIcon } from 'lucide-react';
-import { DateTime } from 'luxon';
 import { useMemo, useTransition } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { useOptionalCurrentTeam } from '~/providers/team';
+import { formatDocumentDate } from '~/utils/document-date-format';
 
 import { EnvelopeDownloadDialog } from '../dialogs/envelope-download-dialog';
 import { StackAvatarsWithTooltip } from '../general/stack-avatars-with-tooltip';
@@ -36,6 +36,7 @@ type DocumentsTableRow = TFindInboxResponse['data'][number];
 
 export const InboxTable = () => {
   const { _, i18n } = useLingui();
+  const { organisations } = useSession();
 
   const team = useOptionalCurrentTeam();
   const [isPending, startTransition] = useTransition();
@@ -52,11 +53,23 @@ export const InboxTable = () => {
   });
 
   const columns = useMemo(() => {
+    const getDateFormatForRow = (row: DocumentsTableRow) => {
+      if (team) {
+        return team.preferences.documentDateFormat;
+      }
+
+      const rowTeam = organisations
+        .flatMap((organisation) => organisation.teams)
+        .find((team) => team.id === row.teamId);
+
+      return rowTeam?.preferences.documentDateFormat ?? organisations[0]?.preferences.documentDateFormat;
+    };
+
     return [
       {
         header: _(msg`Created`),
         accessorKey: 'createdAt',
-        cell: ({ row }) => i18n.date(row.original.createdAt, { ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }),
+        cell: ({ row }) => formatDocumentDate(row.original.createdAt, getDateFormatForRow(row.original), i18n.locale),
       },
       {
         header: _(msg`Title`),
@@ -87,7 +100,7 @@ export const InboxTable = () => {
         cell: ({ row }) => <InboxTableActionButton row={row.original} />,
       },
     ] satisfies DataTableColumnDef<DocumentsTableRow>[];
-  }, [team]);
+  }, [team, organisations, i18n.locale]);
 
   const onPaginationChange = (page: number, perPage: number) => {
     startTransition(() => {

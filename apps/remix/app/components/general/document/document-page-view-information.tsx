@@ -7,6 +7,9 @@ import { Trans } from '@lingui/react/macro';
 import { DateTime } from 'luxon';
 import { useMemo } from 'react';
 
+import { useCurrentTeam } from '~/providers/team';
+import { formatDocumentDate } from '~/utils/document-date-format';
+
 export type DocumentPageViewInformationProps = {
   userId: number;
   envelope: TEnvelope;
@@ -16,6 +19,8 @@ export const DocumentPageViewInformation = ({ envelope, userId }: DocumentPageVi
   const isMounted = useIsMounted();
 
   const { _, i18n } = useLingui();
+  const team = useCurrentTeam();
+  const documentDateFormat = team.preferences.documentDateFormat;
 
   const documentInformation = useMemo(() => {
     return [
@@ -25,9 +30,7 @@ export const DocumentPageViewInformation = ({ envelope, userId }: DocumentPageVi
       },
       {
         description: msg`Created`,
-        value: DateTime.fromJSDate(envelope.createdAt)
-          .setLocale(i18n.locales?.[0] || i18n.locale)
-          .toFormat('MMMM d, yyyy'),
+        value: formatDocumentDate(envelope.createdAt, documentDateFormat, i18n.locales?.[0] || i18n.locale),
       },
       {
         description: msg`Last modified`,
@@ -41,7 +44,7 @@ export const DocumentPageViewInformation = ({ envelope, userId }: DocumentPageVi
       },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMounted, envelope, userId]);
+  }, [isMounted, envelope, userId, documentDateFormat, i18n.locales, i18n.locale]);
 
   return (
     <section className="flex flex-col rounded-xl border border-border bg-widget text-foreground dark:bg-background">

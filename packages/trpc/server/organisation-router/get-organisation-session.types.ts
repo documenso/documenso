@@ -6,6 +6,9 @@ import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import { z } from 'zod';
 
 export const ZGetOrganisationSessionResponseSchema = ZOrganisationSchema.extend({
+  preferences: z.object({
+    documentDateFormat: z.string(),
+  }),
   teams: z.array(
     TeamSchema.pick({
       id: true,
@@ -19,6 +22,7 @@ export const ZGetOrganisationSessionResponseSchema = ZOrganisationSchema.extend(
       teamEmail: TeamEmailSchema.pick({ email: true }).nullable(),
       preferences: z.object({
         aiFeaturesEnabled: z.boolean(),
+        documentDateFormat: z.string(),
       }),
     }),
   ),

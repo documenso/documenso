@@ -54,6 +54,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     organisationClaim,
     preferences: {
       aiFeaturesEnabled: teamSettings.aiFeaturesEnabled,
+      documentDateFormat: teamSettings.documentDateFormat,
     },
   };
 };
@@ -116,6 +117,7 @@ export default function AuthoringLayout() {
     currentTeamRole: TeamMemberRole.MEMBER,
     preferences: {
       aiFeaturesEnabled: preferences.aiFeaturesEnabled,
+      documentDateFormat: preferences.documentDateFormat,
     },
   };
 
@@ -136,6 +138,9 @@ export default function AuthoringLayout() {
     teams: [team],
     subscription: null,
     currentOrganisationRole: OrganisationMemberRole.MEMBER,
+    preferences: {
+      documentDateFormat: preferences.documentDateFormat,
+    },
   };
 
   return (

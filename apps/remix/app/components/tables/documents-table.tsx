@@ -13,13 +13,13 @@ import { TableCell } from '@documenso/ui/primitives/table';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
-import { DateTime } from 'luxon';
 import { useMemo, useTransition } from 'react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { useCurrentTeam } from '~/providers/team';
+import { formatDocumentDate } from '~/utils/document-date-format';
 
 import { StackAvatarsWithTooltip } from '../general/stack-avatars-with-tooltip';
 import { DocumentsTableActionButton } from './documents-table-action-button';
@@ -49,6 +49,7 @@ export const DocumentsTable = ({
   const { _, i18n } = useLingui();
 
   const team = useCurrentTeam();
+  const documentDateFormat = team.preferences.documentDateFormat;
   const [isPending, startTransition] = useTransition();
 
   const updateSearchParams = useUpdateSearchParams();
@@ -85,7 +86,7 @@ export const DocumentsTable = ({
       {
         header: _(msg`Created`),
         accessorKey: 'createdAt',
-        cell: ({ row }) => i18n.date(row.original.createdAt, { ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }),
+        cell: ({ row }) => formatDocumentDate(row.original.createdAt, documentDateFormat, i18n.locale),
       },
       {
         header: _(msg`Title`),
@@ -125,7 +126,7 @@ export const DocumentsTable = ({
     );
 
     return cols;
-  }, [team, onMoveDocument, enableSelection]);
+  }, [team, onMoveDocument, enableSelection, documentDateFormat, i18n.locale]);
 
   const onPaginationChange = (page: number, perPage: number) => {
     startTransition(() => {
