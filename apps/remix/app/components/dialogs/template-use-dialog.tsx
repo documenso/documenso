@@ -506,12 +506,10 @@ export function TemplateUseDialog({
                                     </h4>
                                     <p className="mt-0.5 text-xs text-muted-foreground">
                                       {field.value ? (
-                                        <div>
-                                          <Trans>
-                                            Custom {(field.value.size / (1024 * 1024)).toFixed(2)}{' '}
-                                            MB file
-                                          </Trans>
-                                        </div>
+                                        <Trans>
+                                          Custom {(field.value.size / (1024 * 1024)).toFixed(2)} MB
+                                          file
+                                        </Trans>
                                       ) : (
                                         <Trans>Default file</Trans>
                                       )}
