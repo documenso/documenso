@@ -10,6 +10,7 @@ import { getTeamById } from '../team/get-team';
 export type FindOrganisationTemplatesOptions = {
   userId: number;
   teamId: number;
+  query?: string;
   page?: number;
   perPage?: number;
 };
@@ -17,6 +18,7 @@ export type FindOrganisationTemplatesOptions = {
 export const findOrganisationTemplates = async ({
   userId,
   teamId,
+  query,
   page = 1,
   perPage = 10,
 }: FindOrganisationTemplatesOptions) => {
@@ -31,9 +33,12 @@ export const findOrganisationTemplates = async ({
     }),
   ]);
 
+  const searchQuery = query?.trim();
+
   const where: Prisma.EnvelopeWhereInput = {
     type: EnvelopeType.TEMPLATE,
     templateType: TemplateType.ORGANISATION,
+    title: searchQuery ? { contains: searchQuery, mode: 'insensitive' } : undefined,
     visibility: {
       in: TEAM_DOCUMENT_VISIBILITY_MAP[teamRole],
     },

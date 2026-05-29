@@ -21,6 +21,7 @@ import { EnvelopesBulkDeleteDialog } from '~/components/dialogs/envelopes-bulk-d
 import { EnvelopesBulkMoveDialog } from '~/components/dialogs/envelopes-bulk-move-dialog';
 import { EnvelopeDropZoneWrapper } from '~/components/general/envelope/envelope-drop-zone-wrapper';
 import { FolderGrid } from '~/components/general/folder/folder-grid';
+import { TemplateSearch } from '~/components/general/template/template-search';
 import { EnvelopesTableBulkActionBar } from '~/components/tables/envelopes-table-bulk-action-bar';
 import { TemplatesTable } from '~/components/tables/templates-table';
 import { useCurrentTeam } from '~/providers/team';
@@ -43,6 +44,7 @@ export default function TemplatesPage() {
 
   const page = Number(searchParams.get('page')) || 1;
   const perPage = Number(searchParams.get('perPage')) || 10;
+  const query = searchParams.get('query')?.trim() || undefined;
 
   const [view, setView] = useQueryState(
     'view',
@@ -71,6 +73,7 @@ export default function TemplatesPage() {
       page,
       perPage,
       folderId,
+      query,
     },
     {
       enabled: !isOrgView,
@@ -81,6 +84,7 @@ export default function TemplatesPage() {
     {
       page,
       perPage,
+      query,
     },
     {
       enabled: isOrgView,
@@ -103,17 +107,23 @@ export default function TemplatesPage() {
         {!isOrgView && <FolderGrid type={FolderType.TEMPLATE} parentId={folderId ?? null} />}
 
         <div className="mt-8">
-          <div className="flex flex-row items-center">
-            <Avatar className="mr-3 h-12 w-12 border-2 border-solid border-white dark:border-border">
-              {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
-              <AvatarFallback className="text-xs text-muted-foreground">
-                {team.name.slice(0, 1)}
-              </AvatarFallback>
-            </Avatar>
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-4">
+            <div className="flex flex-row items-center">
+              <Avatar className="mr-3 h-12 w-12 border-2 border-solid border-white dark:border-border">
+                {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
+                <AvatarFallback className="text-xs text-muted-foreground">
+                  {team.name.slice(0, 1)}
+                </AvatarFallback>
+              </Avatar>
 
-            <h1 className="truncate text-2xl font-semibold md:text-3xl">
-              <Trans>Templates</Trans>
-            </h1>
+              <h1 className="truncate text-2xl font-semibold md:text-3xl">
+                <Trans>Templates</Trans>
+              </h1>
+            </div>
+
+            <div className="w-full md:w-60">
+              <TemplateSearch initialValue={query ?? ''} />
+            </div>
           </div>
 
           {showOrgTab && (
@@ -146,11 +156,13 @@ export default function TemplatesPage() {
 
                 <div className="text-center">
                   <h3 className="text-lg font-semibold">
-                    <Trans>We're all empty</Trans>
+                    {query ? <Trans>No results found</Trans> : <Trans>We're all empty</Trans>}
                   </h3>
 
                   <p className="mt-2 max-w-[50ch]">
-                    {isOrgView ? (
+                    {query ? (
+                      <Trans>No templates match your search. Try a different search term.</Trans>
+                    ) : isOrgView ? (
                       <Trans>No organisation templates are shared with your team yet.</Trans>
                     ) : (
                       <Trans>
