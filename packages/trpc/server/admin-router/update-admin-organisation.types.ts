@@ -13,6 +13,7 @@ export const ZUpdateAdminOrganisationRequestSchema = z.object({
       teamCount: true,
       memberCount: true,
       envelopeItemCount: true,
+      recipientCount: true,
       flags: true,
       documentRateLimits: true,
       documentQuota: true,

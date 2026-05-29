@@ -191,6 +191,7 @@ export const createOrganisationClaimUpsertData = (subscriptionClaim: InternalCla
       ...subscriptionClaim.flags,
     },
     envelopeItemCount: subscriptionClaim.envelopeItemCount,
+    recipientCount: subscriptionClaim.recipientCount,
     teamCount: subscriptionClaim.teamCount,
     memberCount: subscriptionClaim.memberCount,
     documentRateLimits: subscriptionClaim.documentRateLimits ?? [],

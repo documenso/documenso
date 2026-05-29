@@ -575,6 +575,7 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
         teamCount: organisation.organisationClaim.teamCount,
         memberCount: organisation.organisationClaim.memberCount,
         envelopeItemCount: organisation.organisationClaim.envelopeItemCount,
+        recipientCount: organisation.organisationClaim.recipientCount,
         flags: organisation.organisationClaim.flags,
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         documentRateLimits: organisation.organisationClaim.documentRateLimits as NonNullable<
@@ -764,6 +765,30 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
               </FormControl>
               <FormDescription>
                 <Trans>Maximum number of uploaded files per envelope allowed</Trans>
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="claims.recipientCount"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                <Trans>Recipient Count</Trans>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  min={0}
+                  {...field}
+                  onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                />
+              </FormControl>
+              <FormDescription>
+                <Trans>Maximum number of recipients per document allowed. 0 = Unlimited</Trans>
               </FormDescription>
               <FormMessage />
             </FormItem>

@@ -51,6 +51,7 @@ export const SubscriptionClaimForm = ({
       teamCount: subscriptionClaim.teamCount,
       memberCount: subscriptionClaim.memberCount,
       envelopeItemCount: subscriptionClaim.envelopeItemCount,
+      recipientCount: subscriptionClaim.recipientCount,
       flags: subscriptionClaim.flags,
       documentRateLimits: subscriptionClaim.documentRateLimits,
       documentQuota: subscriptionClaim.documentQuota,
@@ -147,6 +148,30 @@ export const SubscriptionClaimForm = ({
                 </FormControl>
                 <FormDescription>
                   <Trans>Maximum number of uploaded files per envelope allowed</Trans>
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="recipientCount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Recipient Count</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                  />
+                </FormControl>
+                <FormDescription>
+                  <Trans>Maximum number of recipients per document allowed. 0 = Unlimited</Trans>
                 </FormDescription>
                 <FormMessage />
               </FormItem>

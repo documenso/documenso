@@ -119,6 +119,15 @@ export const createDocumentFromDirectTemplate = async ({
       team: {
         select: {
           organisationId: true,
+          organisation: {
+            select: {
+              organisationClaim: {
+                select: {
+                  recipientCount: true,
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -187,6 +196,21 @@ export const createDocumentFromDirectTemplate = async ({
   const nonDirectTemplateRecipients = directTemplateEnvelope.recipients.filter(
     (recipient) => recipient.id !== directTemplateRecipient.id,
   );
+
+  // The resulting document contains every non-direct template recipient plus the
+  // direct recipient that is signing now. A recipientCount of 0 means unlimited.
+  // This mirrors the check in `sendDocument`, but must be done here because this
+  // flow creates the document directly in PENDING and swallows `sendDocument` errors.
+  const maximumRecipientCount = directTemplateEnvelope.team.organisation.organisationClaim.recipientCount;
+  const resultingRecipientCount = nonDirectTemplateRecipients.length + 1;
+
+  if (maximumRecipientCount > 0 && resultingRecipientCount > maximumRecipientCount) {
+    throw new AppError('RECIPIENT_LIMIT_EXCEEDED', {
+      message: `You cannot send a document with more than ${maximumRecipientCount} recipients`,
+      statusCode: 400,
+    });
+  }
+
   const derivedDocumentMeta = extractDerivedDocumentMeta(settings, directTemplateEnvelope.documentMeta);
 
   // Associate, validate and map to a query every direct template recipient field with the provided fields.

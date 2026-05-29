@@ -146,6 +146,7 @@ export const internalClaims: InternalClaims = {
     teamCount: 1,
     memberCount: 1,
     envelopeItemCount: 5,
+    recipientCount: 20,
     locked: true,
     flags: {},
     documentRateLimits: [],
@@ -164,6 +165,7 @@ export const internalClaims: InternalClaims = {
     teamCount: 1,
     memberCount: 1,
     envelopeItemCount: 5,
+    recipientCount: 20,
     locked: true,
     flags: {
       unlimitedDocuments: true,
@@ -185,6 +187,7 @@ export const internalClaims: InternalClaims = {
     teamCount: 1,
     memberCount: 5,
     envelopeItemCount: 5,
+    recipientCount: 20,
     locked: true,
     flags: {
       unlimitedDocuments: true,
@@ -208,6 +211,7 @@ export const internalClaims: InternalClaims = {
     teamCount: 1,
     memberCount: 0,
     envelopeItemCount: 10,
+    recipientCount: 20,
     locked: true,
     flags: {
       unlimitedDocuments: true,
@@ -236,6 +240,7 @@ export const internalClaims: InternalClaims = {
     teamCount: 0,
     memberCount: 0,
     envelopeItemCount: 10,
+    recipientCount: 20,
     locked: true,
     flags: {
       unlimitedDocuments: true,
@@ -263,6 +268,7 @@ export const internalClaims: InternalClaims = {
     teamCount: 0,
     memberCount: 0,
     envelopeItemCount: 5,
+    recipientCount: 20,
     locked: true,
     flags: {
       unlimitedDocuments: true,
