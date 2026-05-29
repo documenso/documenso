@@ -72,7 +72,7 @@ const computeFieldCanvasStyleFromProbe = (field: FieldToRender): FieldCanvasStyl
   return {
     backgroundColor: getRenderableColor(computedStyle.backgroundColor),
     borderColor: hasBorderStyle ? borderColor : undefined,
-    borderRadius: borderRadius ? borderRadius : undefined,
+    borderRadius,
     borderWidth: hasBorderStyle ? borderWidth : undefined,
     opacity: getOpacityValue(computedStyle.opacity),
   };
