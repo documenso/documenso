@@ -20,6 +20,8 @@ import { useForm } from 'react-hook-form';
 import { Link } from 'react-router';
 import type { z } from 'zod';
 
+import { ClaimLimitFields } from '../general/claim-limit-fields';
+
 export type SubscriptionClaimFormValues = z.infer<typeof ZCreateSubscriptionClaimRequestSchema>;
 
 type SubscriptionClaimFormProps = {
@@ -50,6 +52,12 @@ export const SubscriptionClaimForm = ({
       memberCount: subscriptionClaim.memberCount,
       envelopeItemCount: subscriptionClaim.envelopeItemCount,
       flags: subscriptionClaim.flags,
+      documentRateLimits: subscriptionClaim.documentRateLimits,
+      documentQuota: subscriptionClaim.documentQuota,
+      emailRateLimits: subscriptionClaim.emailRateLimits,
+      emailQuota: subscriptionClaim.emailQuota,
+      apiRateLimits: subscriptionClaim.apiRateLimits,
+      apiQuota: subscriptionClaim.apiQuota,
     },
   });
 
@@ -202,6 +210,8 @@ export const SubscriptionClaimForm = ({
               </Alert>
             )}
           </div>
+
+          <ClaimLimitFields control={form.control} disabled={form.formState.isSubmitting} />
 
           {formSubmitTrigger}
         </fieldset>

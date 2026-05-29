@@ -42,7 +42,9 @@ import { AdminOrganisationMemberDeleteDialog } from '~/components/dialogs/admin-
 import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
 import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
 import { AdminGlobalSettingsSection } from '~/components/general/admin-global-settings-section';
+import { ClaimLimitFields } from '~/components/general/claim-limit-fields';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
+import { OrganisationUsagePanel } from '~/components/general/organisation-usage-panel';
 import { SettingsHeader } from '~/components/general/settings-header';
 
 import type { Route } from './+types/organisations.$id';
@@ -292,6 +294,14 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
               {organisation.organisationClaim.teamCount === 0 ? t`Unlimited` : organisation.organisationClaim.teamCount}
             </DetailsValue>
           </DetailsCard>
+        </div>
+
+        <div className="mt-4">
+          <OrganisationUsagePanel
+            organisationId={organisation.id}
+            monthlyStats={organisation.monthlyStats}
+            organisationClaim={organisation.organisationClaim}
+          />
         </div>
       </div>
 
@@ -566,6 +576,21 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
         memberCount: organisation.organisationClaim.memberCount,
         envelopeItemCount: organisation.organisationClaim.envelopeItemCount,
         flags: organisation.organisationClaim.flags,
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        documentRateLimits: organisation.organisationClaim.documentRateLimits as NonNullable<
+          TUpdateOrganisationBillingFormSchema['claims']
+        >['documentRateLimits'],
+        documentQuota: organisation.organisationClaim.documentQuota,
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        emailRateLimits: organisation.organisationClaim.emailRateLimits as NonNullable<
+          TUpdateOrganisationBillingFormSchema['claims']
+        >['emailRateLimits'],
+        emailQuota: organisation.organisationClaim.emailQuota,
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        apiRateLimits: organisation.organisationClaim.apiRateLimits as NonNullable<
+          TUpdateOrganisationBillingFormSchema['claims']
+        >['apiRateLimits'],
+        apiQuota: organisation.organisationClaim.apiQuota,
       },
       originalSubscriptionClaimId: organisation.organisationClaim.originalSubscriptionClaimId || '',
     },
@@ -802,6 +827,8 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
             </Alert>
           )}
         </div>
+
+        <ClaimLimitFields control={form.control} prefix="claims." />
 
         <div className="flex justify-end">
           <Button type="submit" loading={form.formState.isSubmitting}>

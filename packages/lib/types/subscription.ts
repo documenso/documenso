@@ -3,6 +3,22 @@ import type { SubscriptionClaim } from '@prisma/client';
 import { z } from 'zod';
 
 /**
+ * Rate limit window schema.
+ *
+ * Example: "5m", "1h", "1d"
+ */
+export const ZRateLimitWindowSchema = z.string().regex(/^\d+[smhd]$/);
+
+export const ZRateLimitArraySchema = z.array(
+  z.object({
+    window: ZRateLimitWindowSchema,
+    max: z.number().int().positive(),
+  }),
+);
+
+export type TRateLimitArray = z.infer<typeof ZRateLimitArraySchema>;
+
+/**
  * README:
  * - If you update this you MUST update the `backport-subscription-claims` schema as well.
  */
@@ -132,6 +148,15 @@ export const internalClaims: InternalClaims = {
     envelopeItemCount: 5,
     locked: true,
     flags: {},
+    documentRateLimits: [],
+    documentQuota: 5,
+    emailRateLimits: [
+      { window: '5m', max: 10 },
+      { window: '1h', max: 25 },
+    ],
+    emailQuota: 50,
+    apiRateLimits: [],
+    apiQuota: 0,
   },
   [INTERNAL_CLAIM_ID.INDIVIDUAL]: {
     id: INTERNAL_CLAIM_ID.INDIVIDUAL,
@@ -144,6 +169,15 @@ export const internalClaims: InternalClaims = {
       unlimitedDocuments: true,
       signingReminders: true,
     },
+    documentRateLimits: [],
+    documentQuota: 100,
+    emailRateLimits: [
+      { window: '5m', max: 50 },
+      { window: '1h', max: 500 },
+    ],
+    emailQuota: 1000,
+    apiRateLimits: [],
+    apiQuota: null,
   },
   [INTERNAL_CLAIM_ID.TEAM]: {
     id: INTERNAL_CLAIM_ID.TEAM,
@@ -158,6 +192,15 @@ export const internalClaims: InternalClaims = {
       embedSigning: true,
       signingReminders: true,
     },
+    documentRateLimits: [],
+    documentQuota: 500,
+    emailRateLimits: [
+      { window: '5m', max: 200 },
+      { window: '1h', max: 1000 },
+    ],
+    emailQuota: 2000,
+    apiRateLimits: [],
+    apiQuota: null,
   },
   [INTERNAL_CLAIM_ID.PLATFORM]: {
     id: INTERNAL_CLAIM_ID.PLATFORM,
@@ -177,6 +220,15 @@ export const internalClaims: InternalClaims = {
       embedSigningWhiteLabel: true,
       signingReminders: true,
     },
+    documentRateLimits: [],
+    documentQuota: 3000,
+    emailRateLimits: [
+      { window: '5m', max: 500 },
+      { window: '1h', max: 2000 },
+    ],
+    emailQuota: 3000,
+    apiRateLimits: [],
+    apiQuota: null,
   },
   [INTERNAL_CLAIM_ID.ENTERPRISE]: {
     id: INTERNAL_CLAIM_ID.ENTERPRISE,
@@ -198,6 +250,12 @@ export const internalClaims: InternalClaims = {
       authenticationPortal: true,
       signingReminders: true,
     },
+    documentRateLimits: [],
+    documentQuota: null,
+    emailRateLimits: [],
+    emailQuota: null,
+    apiRateLimits: [],
+    apiQuota: null,
   },
   [INTERNAL_CLAIM_ID.EARLY_ADOPTER]: {
     id: INTERNAL_CLAIM_ID.EARLY_ADOPTER,
@@ -214,6 +272,12 @@ export const internalClaims: InternalClaims = {
       embedSigningWhiteLabel: true,
       signingReminders: true,
     },
+    documentRateLimits: [],
+    documentQuota: null,
+    emailRateLimits: [],
+    emailQuota: null,
+    apiRateLimits: [],
+    apiQuota: null,
   },
 } as const;
 

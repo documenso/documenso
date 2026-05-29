@@ -193,6 +193,12 @@ export const createOrganisationClaimUpsertData = (subscriptionClaim: InternalCla
     envelopeItemCount: subscriptionClaim.envelopeItemCount,
     teamCount: subscriptionClaim.teamCount,
     memberCount: subscriptionClaim.memberCount,
+    documentRateLimits: subscriptionClaim.documentRateLimits ?? [],
+    documentQuota: subscriptionClaim.documentQuota,
+    emailRateLimits: subscriptionClaim.emailRateLimits ?? [],
+    emailQuota: subscriptionClaim.emailQuota,
+    apiRateLimits: subscriptionClaim.apiRateLimits ?? [],
+    apiQuota: subscriptionClaim.apiQuota,
   };
 
   return {

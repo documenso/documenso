@@ -12,5 +12,12 @@ export const generateDefaultSubscriptionClaim = (): Omit<
     envelopeItemCount: DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT,
     locked: false,
     flags: {},
+
+    documentRateLimits: [],
+    documentQuota: null,
+    emailRateLimits: [],
+    emailQuota: null,
+    apiRateLimits: [],
+    apiQuota: null,
   };
 };
