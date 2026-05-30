@@ -58,16 +58,8 @@ test.skip(process.env.DANGEROUS_BYPASS_RATE_LIMITS === 'true', 'Test skipped bec
 
 const examplePdfBuffer = fs.readFileSync(path.join(__dirname, '../../../../../assets/example.pdf'));
 
-// The three distinct org-rejection messages. They all share "contact support",
-// so each matcher keys off the part unique to that rejection:
-//   - Windowed limit: "...Contact support if you require higher limits." — this
-//     is the message that was made distinct from the GLOBAL limiter's plain
-//     "Too many requests, please try again later." so the two can be told apart.
-//   - Quota exceeded: "Your account has been flagged..."
-//   - Quota of zero:  "No quota available..."
 const WINDOWED_LIMIT_MESSAGE = /contact support if you require higher limits/i;
-const QUOTA_EXCEEDED_MESSAGE = /your account has been flagged/i;
-const NO_QUOTA_MESSAGE = /no quota available/i;
+const NO_QUOTA_MESSAGE = /request could not be completed at this time/i;
 
 // ---------------------------------------------------------------------------
 // Claim / usage control (direct Prisma) — mirrors recipient-count-limit.spec.ts
@@ -643,7 +635,7 @@ test.describe('Organisation dynamic rate limits & quotas', () => {
 
       const limitedRes = await findEnvelopes(request, token);
       const body = await expectOrgLimited(limitedRes);
-      expect(String(body.message)).toMatch(QUOTA_EXCEEDED_MESSAGE);
+      expect(String(body.message)).toMatch(NO_QUOTA_MESSAGE);
 
       // Quota rejections deliberately omit rate-limit headers (it isn't a window).
       expectNoOrgRateLimitHeader(limitedRes);
@@ -850,7 +842,7 @@ test.describe('Organisation dynamic rate limits & quotas', () => {
 
       const res = await redistributeEnvelope(request, token, envelopeId, recipientIds);
       const body = await expectOrgLimited(res);
-      expect(String(body.message)).toMatch(QUOTA_EXCEEDED_MESSAGE);
+      expect(String(body.message)).toMatch(NO_QUOTA_MESSAGE);
 
       // Quota rejection carries no rate-limit headers.
       expectNoOrgRateLimitHeader(res);
@@ -906,7 +898,7 @@ test.describe('Organisation dynamic rate limits & quotas', () => {
 
       // It must be the QUOTA that bound, not the window: the message is the quota
       // one (not the windowed-limit message) and there are no rate-limit headers.
-      expect(String(body.message)).toMatch(QUOTA_EXCEEDED_MESSAGE);
+      expect(String(body.message)).toMatch(NO_QUOTA_MESSAGE);
       expect(String(body.message)).not.toMatch(WINDOWED_LIMIT_MESSAGE);
       expectNoOrgRateLimitHeader(limitedRes);
 

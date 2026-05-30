@@ -25,7 +25,8 @@ export const checkMonthlyQuota = async (opts: CheckMonthlyQuotaOptions): Promise
 
   if (opts.quota === 0) {
     throw new AppError(AppErrorCode.TOO_MANY_REQUESTS, {
-      message: 'No quota available. Please contact support and we will review your account.',
+      message:
+        'Your request could not be completed at this time due to your account exceeding the fair use limits of your current plan. Please contact support.',
       // Not tossing headers here to avoid confusion, this isn't rate limits.
     });
   }
@@ -87,7 +88,7 @@ export const checkMonthlyQuota = async (opts: CheckMonthlyQuotaOptions): Promise
   if (isOverQuota) {
     throw new AppError(AppErrorCode.TOO_MANY_REQUESTS, {
       message:
-        'Your account has been flagged and this request could not be completed. Please contact support and we will review your account.',
+        'Your request could not be completed at this time due to your account exceeding the fair use limits of your current plan. Please contact support.',
       // Not tossing headers here to avoid confusion, this isn't rate limits.
     });
   }
