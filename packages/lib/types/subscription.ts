@@ -139,25 +139,33 @@ export type InternalClaims = {
   [key in INTERNAL_CLAIM_ID]: InternalClaim;
 };
 
+/**
+ * TODO: THIS NEEDS A REWORK
+ *
+ * Only the values within "free" claim (flags, etc) are directly used, the rest are taken
+ * from the actual SubscriptionClaim in the database.
+ *
+ * We need to remove all the content besides id/name and fetch free from the database.
+ */
 export const internalClaims: InternalClaims = {
+  /**
+   * Free plan has no rates and quotas since this may break self-hosters.
+   */
   [INTERNAL_CLAIM_ID.FREE]: {
     id: INTERNAL_CLAIM_ID.FREE,
     name: 'Free',
     teamCount: 1,
     memberCount: 1,
     envelopeItemCount: 5,
-    recipientCount: 20,
+    recipientCount: 0,
     locked: true,
     flags: {},
     documentRateLimits: [],
-    documentQuota: 5,
-    emailRateLimits: [
-      { window: '5m', max: 10 },
-      { window: '1h', max: 25 },
-    ],
-    emailQuota: 50,
+    documentQuota: null,
+    emailRateLimits: [],
+    emailQuota: null,
     apiRateLimits: [],
-    apiQuota: 0,
+    apiQuota: null,
   },
   [INTERNAL_CLAIM_ID.INDIVIDUAL]: {
     id: INTERNAL_CLAIM_ID.INDIVIDUAL,
