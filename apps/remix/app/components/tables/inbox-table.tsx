@@ -5,7 +5,14 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus as DocumentStatusEnum } from '@prisma/client';
 import { RecipientRole, SigningStatus } from '@prisma/client';
-import { CheckCircleIcon, DownloadIcon, EyeIcon, Loader, PencilIcon } from 'lucide-react';
+import {
+  CheckCircleIcon,
+  ClockIcon,
+  DownloadIcon,
+  EyeIcon,
+  Loader,
+  PencilIcon,
+} from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
@@ -14,13 +21,16 @@ import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-upda
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { trpc } from '@documenso/trpc/react';
+import type { TInboxFilter } from '@documenso/trpc/server/document-router/find-inbox.types';
 import type { TFindInboxResponse } from '@documenso/trpc/server/document-router/find-inbox.types';
+import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
+import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
@@ -28,6 +38,9 @@ import { useOptionalCurrentTeam } from '~/providers/team';
 
 import { EnvelopeDownloadDialog } from '../dialogs/envelope-download-dialog';
 import { StackAvatarsWithTooltip } from '../general/stack-avatars-with-tooltip';
+
+const parseInboxFilter = (value: string | null): TInboxFilter =>
+  value === 'WAITING' ? 'WAITING' : 'ALL';
 
 export type DocumentsTableProps = {
   data?: TFindInboxResponse;
@@ -37,8 +50,34 @@ export type DocumentsTableProps = {
 
 type DocumentsTableRow = TFindInboxResponse['data'][number];
 
+type InboxTurnStatus = 'YOUR_TURN' | 'WAITING_FOR_OTHERS' | 'NONE';
+
+/**
+ * Classify, from the signed-in user's perspective, whether a pending envelope is
+ * waiting on them (`YOUR_TURN`), waiting on an earlier signer (`WAITING_FOR_OTHERS`),
+ * or neither. `isWaitingForCurrentUser` is computed on the server using the signing
+ * order; the "waiting for others" case is the remaining pending-but-not-yet-my-turn state.
+ */
+const getInboxTurnStatus = (row: DocumentsTableRow, userEmail: string): InboxTurnStatus => {
+  if (row.isWaitingForCurrentUser) {
+    return 'YOUR_TURN';
+  }
+
+  const recipient = row.recipients.find(
+    (item) => item.email === userEmail && item.role !== RecipientRole.CC,
+  );
+
+  const isPendingSigner =
+    row.status === DocumentStatusEnum.PENDING &&
+    recipient?.signingStatus === SigningStatus.NOT_SIGNED &&
+    (recipient.role === RecipientRole.SIGNER || recipient.role === RecipientRole.APPROVER);
+
+  return isPendingSigner ? 'WAITING_FOR_OTHERS' : 'NONE';
+};
+
 export const InboxTable = () => {
   const { _, i18n } = useLingui();
+  const { user } = useSession();
 
   const team = useOptionalCurrentTeam();
   const [isPending, startTransition] = useTransition();
@@ -48,11 +87,22 @@ export const InboxTable = () => {
 
   const page = searchParams?.get?.('page') ? Number(searchParams.get('page')) : undefined;
   const perPage = searchParams?.get?.('perPage') ? Number(searchParams.get('perPage')) : undefined;
+  const filter = parseInboxFilter(searchParams?.get?.('filter') ?? null);
 
   const { data, isLoading, isLoadingError } = trpc.document.inbox.find.useQuery({
     page: page || 1,
     perPage: perPage || 10,
+    filter,
   });
+
+  const onFilterChange = (value: string) => {
+    startTransition(() => {
+      updateSearchParams({
+        filter: value === 'ALL' ? null : value,
+        page: 1,
+      });
+    });
+  };
 
   const columns = useMemo(() => {
     return [
@@ -64,11 +114,27 @@ export const InboxTable = () => {
       },
       {
         header: _(msg`Title`),
-        cell: ({ row }) => (
-          <span className="block max-w-[10rem] truncate font-medium md:max-w-[20rem]">
-            {row.original.title}
-          </span>
-        ),
+        cell: ({ row }) => {
+          const turnStatus = getInboxTurnStatus(row.original, user.email);
+
+          return (
+            <div className="flex max-w-[10rem] flex-col gap-1 md:max-w-[20rem]">
+              <span className="truncate font-medium">{row.original.title}</span>
+
+              {turnStatus === 'YOUR_TURN' && (
+                <Badge variant="secondary" size="small" className="w-fit">
+                  <Trans>Your turn to sign</Trans>
+                </Badge>
+              )}
+
+              {turnStatus === 'WAITING_FOR_OTHERS' && (
+                <Badge variant="neutral" size="small" className="w-fit">
+                  <Trans>Waiting for others</Trans>
+                </Badge>
+              )}
+            </div>
+          );
+        },
       },
       {
         id: 'sender',
@@ -96,7 +162,7 @@ export const InboxTable = () => {
         cell: ({ row }) => <InboxTableActionButton row={row.original} />,
       },
     ] satisfies DataTableColumnDef<DocumentsTableRow>[];
-  }, [team]);
+  }, [team, user.email]);
 
   const onPaginationChange = (page: number, perPage: number) => {
     startTransition(() => {
@@ -116,6 +182,17 @@ export const InboxTable = () => {
 
   return (
     <div className="relative">
+      <Tabs value={filter} onValueChange={onFilterChange} className="mb-4 w-fit">
+        <TabsList>
+          <TabsTrigger value="ALL" className="hover:text-foreground">
+            <Trans>All</Trans>
+          </TabsTrigger>
+          <TabsTrigger value="WAITING" className="hover:text-foreground">
+            <Trans>Waiting for me</Trans>
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
+
       <DataTable
         columns={columns}
         data={results.data}
@@ -132,7 +209,11 @@ export const InboxTable = () => {
         emptyState={
           <div className="text-muted-foreground/60 flex h-60 flex-col items-center justify-center gap-y-4">
             <p>
-              <Trans>Documents that require your attention will appear here</Trans>
+              {filter === 'WAITING' ? (
+                <Trans>No documents are waiting on you to sign right now</Trans>
+              ) : (
+                <Trans>Documents that require your attention will appear here</Trans>
+              )}
             </p>
           </div>
         }
@@ -203,12 +284,21 @@ export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => 
     return null;
   }
 
+  const isWaitingForOthers = getInboxTurnStatus(row, user.email) === 'WAITING_FOR_OTHERS';
+
   return match({
     isPending,
     isComplete,
     isSigned,
+    isWaitingForOthers,
     internalVersion: row.internalVersion,
   })
+    .with({ isPending: true, isSigned: false, isWaitingForOthers: true }, () => (
+      <Button className="w-32" variant="secondary" disabled={true}>
+        <ClockIcon className="-ml-1 mr-2 h-4 w-4" />
+        <Trans>Waiting</Trans>
+      </Button>
+    ))
     .with({ isPending: true, isSigned: false }, () => (
       <Button className="w-32" asChild>
         <Link to={`/sign/${recipient?.token}`}>
