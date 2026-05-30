@@ -1,6 +1,6 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { BRANDING_LOGO_SIZE_OPTIONS } from '@documenso/lib/constants/organisations';
+import { BRANDING_LOGO_SIZE_OPTIONS, BRANDING_LOGO_SIZE_VALUES } from '@documenso/lib/constants/organisations';
 import { DEFAULT_BRAND_COLORS, DEFAULT_BRAND_RADIUS } from '@documenso/lib/constants/theme';
 import { ZCssVarsSchema } from '@documenso/lib/types/css-vars';
 import { cn } from '@documenso/ui/lib/utils';
@@ -32,7 +32,7 @@ const ZBrandingPreferencesFormSchema = z.object({
     .refine((file) => ACCEPTED_FILE_TYPES.includes(file.type), 'Only .jpg, .png, and .webp files are accepted')
     .nullish(),
   brandingUrl: z.string().url().optional().or(z.literal('')),
-  brandingLogoSize: z.enum(['h-6', 'h-8', 'h-12', 'h-16']).optional(),
+  brandingLogoSize: z.enum(BRANDING_LOGO_SIZE_VALUES).optional(),
   brandingCompanyDetails: z.string().max(500).optional(),
   brandingColors: ZCssVarsSchema.default({}),
   brandingCss: z.string().max(10_000).default(''),
@@ -77,6 +77,9 @@ export function BrandingPreferencesForm({
 
   const parsedColors = ZCssVarsSchema.safeParse(settings.brandingColors);
   const initialColors = parsedColors.success ? parsedColors.data : {};
+  const logoSizeDefault = BRANDING_LOGO_SIZE_VALUES.includes(settings.brandingLogoSize as any)
+    ? (settings.brandingLogoSize as (typeof BRANDING_LOGO_SIZE_VALUES)[number])
+    : undefined;
 
   const form = useForm<TBrandingPreferencesFormSchema>({
     values: {
@@ -92,7 +95,7 @@ export function BrandingPreferencesForm({
         | undefined,
       brandingColors: initialColors,
       brandingCss: settings.brandingCss ?? '',
-      brandingLogoSize: (settings.brandingLogoSize ?? undefined) as 'h-6' | 'h-8' | 'h-12' | 'h-16' | undefined,
+      brandingLogoSize: logoSizeDefault,
     },
     resolver: zodResolver(ZBrandingPreferencesFormSchema),
   });

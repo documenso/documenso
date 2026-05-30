@@ -2,6 +2,7 @@ import { BRANDING_CSS_MAX_LENGTH } from '@documenso/lib/constants/branding';
 import { ZEnvelopeExpirationPeriod } from '@documenso/lib/constants/envelope-expiration';
 import { ZEnvelopeReminderSettings } from '@documenso/lib/constants/envelope-reminder';
 import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
+import { ZBrandingLogoSizeSchema } from '@documenso/lib/constants/organisations';
 import { ZCssVarsSchema } from '@documenso/lib/types/css-vars';
 import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
@@ -36,7 +37,7 @@ export const ZUpdateTeamSettingsRequestSchema = z.object({
     // Branding related settings.
     brandingEnabled: z.boolean().nullish(),
     brandingLogo: z.string().nullish(),
-    brandingLogoSize: z.string().nullish(),
+    brandingLogoSize: ZBrandingLogoSizeSchema.nullish(),
     brandingUrl: z.string().nullish(),
     brandingCompanyDetails: z.string().nullish(),
     brandingColors: ZCssVarsSchema.nullish(),
