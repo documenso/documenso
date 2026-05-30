@@ -125,9 +125,9 @@ export const generateDefaultOrganisationSettings = (): Omit<OrganisationGlobalSe
     brandingLogo: '',
     brandingUrl: '',
     brandingCompanyDetails: '',
-    brandingLogoSize: DEFAULT_BRANDING_LOGO_SIZE,
     brandingColors: null,
     brandingCss: '',
+    brandingLogoSize: DEFAULT_BRANDING_LOGO_SIZE,
 
     emailId: null,
     emailReplyTo: null,
