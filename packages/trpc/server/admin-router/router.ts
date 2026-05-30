@@ -27,6 +27,7 @@ import { getUserRoute } from './get-user';
 import { promoteMemberToOwnerRoute } from './promote-member-to-owner';
 import { reregisterEmailDomainRoute } from './reregister-email-domain';
 import { resealDocumentRoute } from './reseal-document';
+import { resetOrganisationMonthlyStatRoute } from './reset-organisation-monthly-stat';
 import { resetTwoFactorRoute } from './reset-two-factor-authentication';
 import { resyncLicenseRoute } from './resync-license';
 import { swapOrganisationSubscriptionRoute } from './swap-organisation-subscription';
@@ -45,6 +46,7 @@ export const adminRouter = router({
     update: updateAdminOrganisationRoute,
     delete: deleteOrganisationRoute,
     swapSubscription: swapOrganisationSubscriptionRoute,
+    resetMonthlyStat: resetOrganisationMonthlyStatRoute,
   },
   organisationMember: {
     promoteToOwner: promoteMemberToOwnerRoute,
