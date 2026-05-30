@@ -1,3 +1,4 @@
+import type { BrandingLogoSize } from '@documenso/lib/constants/organisations';
 import { DEFAULT_BRANDING_LOGO_SIZE } from '@documenso/lib/constants/organisations';
 import type { EmailBrandingColors } from '@documenso/lib/utils/email-branding-colors';
 import { createContext, useContext } from 'react';
@@ -6,8 +7,7 @@ type BrandingContextValue = {
   brandingEnabled: boolean;
   brandingUrl: string;
   brandingLogo: string;
-  // optional Tailwind height class for branding logo, e.g. 'h-16'
-  brandingLogoSize?: string;
+  brandingLogoSize?: BrandingLogoSize;
   brandingCompanyDetails: string;
   brandingHidePoweredBy: boolean;
   brandingColors?: EmailBrandingColors;

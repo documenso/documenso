@@ -171,45 +171,42 @@ export const buildTeamWhereQuery = ({
 /**
  * Majority of these are null which lets us inherit from the organisation settings.
  */
-export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | 'team'> => {
-  const defaults: Omit<TeamGlobalSettings, 'id' | 'team'> = {
-    documentVisibility: null,
-    documentLanguage: null,
-    documentTimezone: null,
-    documentDateFormat: null,
-    delegateDocumentOwnership: null,
+export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | 'team'> => ({
+  documentVisibility: null,
+  documentLanguage: null,
+  documentTimezone: null,
+  documentDateFormat: null,
+  delegateDocumentOwnership: null,
 
-    includeSenderDetails: null,
-    includeSigningCertificate: null,
-    includeAuditLog: null,
+  includeSenderDetails: null,
+  includeSigningCertificate: null,
+  includeAuditLog: null,
 
-    typedSignatureEnabled: null,
-    uploadSignatureEnabled: null,
-    drawSignatureEnabled: null,
+  typedSignatureEnabled: null,
+  uploadSignatureEnabled: null,
+  drawSignatureEnabled: null,
 
-    brandingEnabled: null,
-    brandingLogo: null,
-    brandingLogoSize: null,
-    brandingUrl: null,
-    brandingCompanyDetails: null,
-    brandingColors: null,
-    brandingCss: null,
+  brandingEnabled: null,
+  brandingLogo: null,
+  brandingLogoSize: null,
+  brandingUrl: null,
+  brandingCompanyDetails: null,
+  brandingColors: null,
+  brandingCss: null,
 
-    emailDocumentSettings: null,
-    emailId: null,
-    emailReplyTo: null,
-    // emailReplyToName: null,
+  emailDocumentSettings: null,
+  emailId: null,
+  emailReplyTo: null,
+  // emailReplyToName: null,
 
-    defaultRecipients: null,
+  defaultRecipients: null,
 
-    envelopeExpirationPeriod: null,
+  envelopeExpirationPeriod: null,
 
-    reminderSettings: null,
+  reminderSettings: null,
 
-    aiFeaturesEnabled: null,
-  };
-  return defaults;
-};
+  aiFeaturesEnabled: null,
+});
 
 /**
  * Derive the final settings for a team.
