@@ -368,6 +368,79 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
         }
       }
     })
+    .with(
+      { type: P.union(FieldType.NAME, FieldType.DATE, FieldType.INITIALS) },
+      (field) => {
+        /**
+         * NAME/DATE/INITIALS hold short, auto-populated single-line values. We
+         * draw them with `page.drawText()` centered in the field box (like the
+         * signature path) instead of an AcroForm text widget. AcroForm widgets
+         * anchor their baseline to the bottom of the box, which makes the text
+         * sit lower than the editor's vertically-centered rendering.
+         */
+        const fieldMetaParsers = {
+          [FieldType.NAME]: ZNameFieldMeta,
+          [FieldType.DATE]: ZDateFieldMeta,
+          [FieldType.INITIALS]: ZInitialsFieldMeta,
+        } as const;
+
+        const meta = fieldMetaParsers[field.type].safeParse(field.fieldMeta);
+
+        const customFontSize = meta.success && meta.data.fontSize ? meta.data.fontSize : null;
+        const textAlign = meta.success && meta.data.textAlign ? meta.data.textAlign : 'left';
+
+        const text = field.customText;
+
+        let fontSize = customFontSize || maxFontSize;
+        let textWidth = font.widthOfTextAtSize(text, fontSize);
+        let textHeight = font.heightAtSize(fontSize);
+
+        // Scale the font down to fit the field box when no explicit size was set.
+        if (!customFontSize) {
+          const scalingFactor = Math.min(fieldWidth / textWidth, fieldHeight / textHeight, 1);
+          fontSize = Math.max(Math.min(fontSize * scalingFactor, maxFontSize), minFontSize);
+          textWidth = font.widthOfTextAtSize(text, fontSize);
+          textHeight = font.heightAtSize(fontSize);
+        }
+
+        // Add padding similar to web display (roughly 0.5rem equivalent in PDF units)
+        const padding = 8;
+
+        // Horizontal position based on the field's alignment.
+        let textX = match(textAlign)
+          .with('left', () => fieldX + padding)
+          .with('center', () => fieldX + (fieldWidth - textWidth) / 2)
+          .with('right', () => fieldX + fieldWidth - textWidth - padding)
+          .exhaustive();
+
+        // Vertically center the text within the field box to match the editor.
+        let textY = fieldY + (fieldHeight - textHeight) / 2;
+
+        // Invert the Y axis since PDFs use a bottom-left coordinate system.
+        textY = pageHeight - textY - textHeight;
+
+        if (pageRotationInDegrees !== 0) {
+          const adjustedPosition = adjustPositionForRotation(
+            pageWidth,
+            pageHeight,
+            textX,
+            textY,
+            pageRotationInDegrees,
+          );
+
+          textX = adjustedPosition.xPos;
+          textY = adjustedPosition.yPos;
+        }
+
+        page.drawText(text, {
+          x: textX,
+          y: textY,
+          size: fontSize,
+          font,
+          rotate: degrees(pageRotationInDegrees),
+        });
+      },
+    )
     .otherwise((field) => {
       const fieldMetaParsers = {
         [FieldType.TEXT]: ZTextFieldMeta,

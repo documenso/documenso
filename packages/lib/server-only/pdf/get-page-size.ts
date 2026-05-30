@@ -40,6 +40,58 @@ export const getPageSize = (page: PDFPage) => {
   return mediaBox || cropBox || PDF_SIZE_A4_72PPI;
 };
 
+type CropBoxRect = { x: number; y: number; width: number; height: number };
+
+type V2OverlayPlacement = {
+  pageWidth: number;
+  pageHeight: number;
+  translateX: number;
+  translateY: number;
+};
+
+/**
+ * Compute the size and draw position for a V2 field overlay so it lines up with
+ * the page region the frontend (pdfjs) renders.
+ *
+ * pdfjs renders the page against its CropBox, whereas `@libpdf/core`'s
+ * `page.width`/`page.height` report the MediaBox. When the CropBox differs from
+ * the MediaBox (a smaller size and/or a non-zero origin), sizing/positioning the
+ * overlay from the MediaBox offsets the fields. Sizing from the CropBox and
+ * offsetting by its origin keeps fields aligned regardless of the CropBox.
+ *
+ * `cropBox` is the raw (unrotated) CropBox rectangle; `rotation` is the page
+ * rotation in degrees (0, 90, 180 or 270).
+ */
+export const getV2OverlayPlacement = (
+  cropBox: CropBoxRect,
+  rotation: number,
+): V2OverlayPlacement => {
+  const isRotated90 = rotation === 90 || rotation === 270;
+
+  const pageWidth = isRotated90 ? cropBox.height : cropBox.width;
+  const pageHeight = isRotated90 ? cropBox.width : cropBox.height;
+
+  let translateX = cropBox.x;
+  let translateY = cropBox.y;
+
+  switch (rotation) {
+    case 90:
+      translateX = cropBox.x + pageHeight;
+      translateY = cropBox.y;
+      break;
+    case 180:
+      translateX = cropBox.x + pageWidth;
+      translateY = cropBox.y + pageHeight;
+      break;
+    case 270:
+      translateX = cropBox.x;
+      translateY = cropBox.y + pageWidth;
+      break;
+  }
+
+  return { pageWidth, pageHeight, translateX, translateY };
+};
+
 export const getLastPageDimensions = (pdfDoc: PDF): { width: number; height: number } => {
   const lastPage = pdfDoc.getPage(pdfDoc.getPageCount() - 1);
 

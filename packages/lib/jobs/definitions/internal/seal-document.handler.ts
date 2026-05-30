@@ -15,7 +15,10 @@ import { groupBy } from 'remeda';
 import { addRejectionStampToPdf } from '@documenso/lib/server-only/pdf/add-rejection-stamp-to-pdf';
 import { generateAuditLogPdf } from '@documenso/lib/server-only/pdf/generate-audit-log-pdf';
 import { generateCertificatePdf } from '@documenso/lib/server-only/pdf/generate-certificate-pdf';
-import { getLastPageDimensions } from '@documenso/lib/server-only/pdf/get-page-size';
+import {
+  getLastPageDimensions,
+  getV2OverlayPlacement,
+} from '@documenso/lib/server-only/pdf/get-page-size';
 import { mergePageContentStreams } from '@documenso/lib/server-only/pdf/merge-page-content-streams';
 import { prisma } from '@documenso/prisma';
 import { signPdf } from '@documenso/signing';
@@ -442,8 +445,13 @@ const decorateAndSignPdf = async ({
         throw new Error(`Page ${pageNumber} does not exist`);
       }
 
-      const pageWidth = page.width;
-      const pageHeight = page.height;
+      // The frontend (pdfjs) renders the page against its CropBox, whereas
+      // `page.width`/`page.height` report the MediaBox. Size and position the
+      // overlay from the CropBox so it lines up regardless of the CropBox origin.
+      const { pageWidth, pageHeight, translateX, translateY } = getV2OverlayPlacement(
+        page.getCropBox(),
+        page.rotation,
+      );
 
       const overlayBytes = await insertFieldInPDFV2({
         pageWidth,
@@ -455,26 +463,8 @@ const decorateAndSignPdf = async ({
 
       const embeddedPage = await pdfDoc.embedPage(overlayPdf, 0);
 
-      // Rotate the page to the orientation that the react-pdf renders on the frontend.
-      let translateX = 0;
-      let translateY = 0;
-
-      switch (page.rotation) {
-        case 90:
-          translateX = pageHeight;
-          translateY = 0;
-          break;
-        case 180:
-          translateX = pageWidth;
-          translateY = pageHeight;
-          break;
-        case 270:
-          translateX = 0;
-          translateY = pageWidth;
-          break;
-      }
-
-      // Draw the overlay on the page
+      // Draw the overlay on the page (rotated to the orientation react-pdf
+      // renders on the frontend).
       page.drawPage(embeddedPage, {
         x: translateX,
         y: translateY,
