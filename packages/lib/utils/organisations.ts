@@ -7,6 +7,7 @@ import { DEFAULT_ENVELOPE_EXPIRATION_PERIOD } from '../constants/envelope-expira
 import { DEFAULT_ENVELOPE_REMINDER_SETTINGS } from '../constants/envelope-reminder';
 import { DEFAULT_BRANDING_LOGO_SIZE } from '../constants/organisations';
 import {
+  DEFAULT_BRANDING_LOGO_SIZE,
   LOWEST_ORGANISATION_ROLE,
   ORGANISATION_MEMBER_ROLE_HIERARCHY,
   ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP,
@@ -125,9 +126,9 @@ export const generateDefaultOrganisationSettings = (): Omit<OrganisationGlobalSe
     brandingLogo: '',
     brandingUrl: '',
     brandingCompanyDetails: '',
-    brandingLogoSize: DEFAULT_BRANDING_LOGO_SIZE,
     brandingColors: null,
     brandingCss: '',
+    brandingLogoSize: DEFAULT_BRANDING_LOGO_SIZE,
 
     emailId: null,
     emailReplyTo: null,

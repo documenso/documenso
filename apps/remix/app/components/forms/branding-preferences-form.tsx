@@ -18,8 +18,6 @@ import { Loader } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
-import { BRANDING_LOGO_SIZE_OPTIONS } from '@documenso/lib/constants/organisations';
 import { useOptionalCurrentTeam } from '~/providers/team';
 import { useCspNonce } from '~/utils/nonce';
 
@@ -94,13 +92,7 @@ export function BrandingPreferencesForm({
         | undefined,
       brandingColors: initialColors,
       brandingCss: settings.brandingCss ?? '',
-      brandingLogoSize: (settings.brandingLogoSize ?? undefined) as
-        | 'h-6'
-        | 'h-8'
-        | 'h-12'
-        | 'h-16'
-        | undefined,
-    },
+      brandingLogoSize: (settings.brandingLogoSize ?? undefined) as 'h-6' | 'h-8' | 'h-12' | 'h-16' | undefined,
     },
     resolver: zodResolver(ZBrandingPreferencesFormSchema),
   });
@@ -255,7 +247,7 @@ export function BrandingPreferencesForm({
                           type="button"
                           variant="link"
                           size="sm"
-                          className="text-xs text-destructive"
+                          className="text-destructive text-xs"
                           onClick={() => {
                             setPreviewUrl('');
                             onChange(null);
