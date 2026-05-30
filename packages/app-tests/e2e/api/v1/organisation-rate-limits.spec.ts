@@ -1,33 +1,46 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
-import { EnvelopeType, RecipientRole } from '@documenso/prisma/client';
+import { FieldType } from '@documenso/prisma/client';
+import { seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
-import type {
-  TCreateEnvelopePayload,
-  TCreateEnvelopeResponse,
-} from '@documenso/trpc/server/envelope-router/create-envelope.types';
 import { type APIRequestContext, type APIResponse, expect, test } from '@playwright/test';
 import type { Organisation, Team, User } from '@prisma/client';
 
 /**
- * Dynamic organisation rate-limit & quota tests.
+ * Dynamic organisation rate-limit & quota tests — API **v1** edition.
  *
- * Covers the feature added in `feat: add dynamic rate limits`:
+ * This is the v1 counterpart to `../v2/organisation-rate-limits.spec.ts`. It
+ * covers the feature added in `feat: add dynamic rate limits`:
  *   - Three counters: `api`, `document`, `email`.
  *   - Two enforcement stages per counter:
- *       1. Windowed rate limits (`*RateLimits`) — 429 WITH `X-RateLimit-*` headers.
+ *       1. Windowed rate limits (`*RateLimits`) — a 429 distinguished by its
+ *          message. NOTE: in v2 this 429 also carries `X-RateLimit-*` headers, but
+ *          v1 does NOT surface them (the ts-rest handler drops the headers the
+ *          middleware returns — see the windowed test), so v1 tells the windowed
+ *          stage apart from the quota stage by the MESSAGE alone.
  *       2. Monthly quota (`*Quota`) — 429 WITHOUT rate-limit headers; a `null`
  *          quota means unlimited and a `0` quota is a hard block.
  *
- * Where each counter is consumed:
- *   api      -> every authenticated v2 request (get-api-token-by-token).
- *   document -> envelope create where type === DOCUMENT (count 1).
- *   email    -> redistribute/remind consumes `recipientsToRemind.length`
- *               SYNCHRONOUSLY (resend-document), so we can assert on the HTTP
- *               response rather than racing async signing-email jobs.
+ * --- WHAT THIS V1 SUITE COVERS (and what it intentionally does NOT) ---
+ *   api      -> every authenticated v1 request (get-api-token-by-token). Ported
+ *               1:1 from the v2 suite against `GET /api/v1/documents`.
+ *   email    -> resend (`POST /api/v1/documents/:id/resend`) consumes
+ *               `recipientsToRemind.length` SYNCHRONOUSLY (resend-document), so we
+ *               can assert on the HTTP response rather than racing async jobs.
+ *               IMPORTANT V1 DIVERGENCE: the v1 `resendDocument` handler catches
+ *               EVERY error and returns a generic HTTP 500
+ *               (`{ message: 'An error has occured while resending the document' }`)
+ *               — it does NOT surface the org limiter's 429 / `X-RateLimit-*`
+ *               headers like the v2 `redistribute` endpoint does. These tests
+ *               therefore assert the v1 reality: a blocked resend returns 500 and
+ *               the monthly counter advances exactly as documented.
+ *   document -> INTENTIONALLY OMITTED. v1's `POST /api/v1/documents` create path
+ *               requires S3 upload transport (createEnvelope), which the local E2E
+ *               environment generally does not provide, so it cannot be exercised
+ *               deterministically here. Document-counter enforcement is covered by
+ *               the v2 suite (envelope/create).
  *
  * --- WHY THIS TEST IS SKIPPED IN CI ---
  * CI runs E2E with `DANGEROUS_BYPASS_RATE_LIMITS=true`, which short-circuits BOTH
@@ -36,8 +49,8 @@ import type { Organisation, Team, User } from '@prisma/client';
  * run deliberately and locally with the bypass OFF.
  *
  * --- GLOBAL LIMIT AWARENESS ---
- * apps/remix/server/router.ts applies a GLOBAL per-IP limiter to /api/v2/*:
- *   apiV2RateLimit = 100 requests / 1 minute (see rate-limits.ts).
+ * apps/remix/server/router.ts applies a GLOBAL per-IP limiter to /api/v1/*:
+ *   apiV1RateLimit = 100 requests / 1 minute (action `api.v1`, see rate-limits.ts).
  * Every per-org limit/quota configured here is kept FAR below that ceiling (single
  * digits) and the suite runs serially so the shared-IP global bucket is never the
  * thing that trips. A global-limit 429 is shaped `{ error }` whereas an org-limit
@@ -46,17 +59,15 @@ import type { Organisation, Team, User } from '@prisma/client';
  */
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
-const baseUrl = `${WEBAPP_BASE_URL}/api/v2-beta`;
+const baseUrl = `${WEBAPP_BASE_URL}/api/v1`;
 
-// Run serially: all workers share one IP, and the global /api/v2 limiter is
+// Run serially: all workers share one IP, and the global /api/v1 limiter is
 // per-IP. Serial execution keeps the shared global bucket well under 100/min.
 test.describe.configure({ mode: 'serial' });
 
 // This suite is only meaningful with real rate limiting enabled. CI sets the
 // bypass flag, so skip there; run it locally with the bypass turned off.
 test.skip(process.env.DANGEROUS_BYPASS_RATE_LIMITS === 'true', 'Test skipped because bypass rate limits is enabled.');
-
-const examplePdfBuffer = fs.readFileSync(path.join(__dirname, '../../../../../assets/example.pdf'));
 
 // The three distinct org-rejection messages. They all share "contact support",
 // so each matcher keys off the part unique to that rejection:
@@ -119,11 +130,11 @@ const setClaimLimits = async (team: Team, limits: ClaimLimits) => {
 
 /**
  * Clear the monthly quota counters, the org windowed rate-limit buckets AND the
- * GLOBAL /api/v2 IP bucket so a fresh scenario starts from zero.
+ * GLOBAL /api/v1 IP bucket so a fresh scenario starts from zero.
  *
  * - The org windowed limiter keys its rows `ip:org:<id>`.
- * - The GLOBAL limiter (apps/remix/server/router.ts -> apiV2RateLimit, 100/min
- *   per IP, action `api.v2`) is shared by EVERY v2 request from this test client.
+ * - The GLOBAL limiter (apps/remix/server/router.ts -> apiV1RateLimit, 100/min
+ *   per IP, action `api.v1`) is shared by EVERY v1 request from this test client.
  *   Across the suite (and especially across repeated local runs within the same
  *   minute) that shared bucket would otherwise fill up and trip BEFORE the org
  *   limit under test, producing a `{ error }` 429 instead of the org `{ message }`
@@ -144,7 +155,7 @@ const resetUsage = async (organisation: Organisation) => {
 
   await prisma.rateLimit.deleteMany({
     where: {
-      OR: [{ key: `ip:org:${organisation.id}` }, { action: 'api.v2' }],
+      OR: [{ key: `ip:org:${organisation.id}` }, { action: 'api.v1' }],
     },
   });
 };
@@ -175,40 +186,6 @@ const expectMonthlyCounter = async (organisation: Organisation, counter: Monthly
   const stat = await getMonthlyStat(organisation);
 
   expect(stat?.[counter] ?? 0, `${counter} should be exactly ${expected}`).toBe(expected);
-};
-
-/**
- * Wait until a monthly counter reaches `atLeast` and then stops changing.
- *
- * `distribute` fans out one async signing-request email job per recipient (the
- * local job runner fires them via fire-and-forget HTTP, so they complete after
- * the call returns). Each job increments emailCount. We poll until the counter
- * has reached the expected floor AND is stable across consecutive reads, which
- * guarantees no late job will increment the counter after the caller resets
- * usage — making the subsequent (synchronous) redistribute assertions exact.
- */
-const waitForCounterToSettle = async (
-  organisation: Organisation,
-  counter: MonthlyCounter,
-  atLeast: number,
-  timeoutMs = 20_000,
-): Promise<number> => {
-  const start = Date.now();
-  let previous = -1;
-
-  while (Date.now() - start < timeoutMs) {
-    const stat = await getMonthlyStat(organisation);
-    const current = stat?.[counter] ?? 0;
-
-    if (current >= atLeast && current === previous) {
-      return current;
-    }
-
-    previous = current;
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  }
-
-  throw new Error(`Timed out waiting for ${counter} to settle at >= ${atLeast}`);
 };
 
 /**
@@ -298,28 +275,14 @@ const expectOrgLimited = async (res: APIResponse): Promise<ApiErrorBody> => {
 };
 
 /**
- * Assert the org windowed-limit value is present in `X-RateLimit-Limit`.
+ * Assert NO org rate-limit header was surfaced — the GLOBAL /api/v1 middleware
+ * still stamps a single `X-RateLimit-Limit: 100`, so "no org header" means the
+ * value is either absent or exactly the lone global `100` (i.e. it does not
+ * contain a second, org-specific entry).
  *
- * Two limiters set this header: the GLOBAL /api/v2 middleware (max 100) sets it
- * first, then the org limiter's AppError sets it to the org `max`. Playwright
- * surfaces duplicate headers joined by ", " (e.g. "100, 4"), so we assert the
- * org value is one of the comma-separated entries rather than an exact match.
- */
-const expectRateLimitHeaderToInclude = (res: APIResponse, expectedMax: number) => {
-  const header = res.headers()['x-ratelimit-limit'] ?? '';
-  const values = header.split(',').map((v) => v.trim());
-
-  expect(values, `X-RateLimit-Limit "${header}" should include the org max ${expectedMax}`).toContain(
-    String(expectedMax),
-  );
-};
-
-/**
- * Assert NO org rate-limit header was added — used for quota rejections, which
- * intentionally omit rate-limit headers (a quota isn't a window). The GLOBAL
- * middleware still stamps a single `X-RateLimit-Limit: 100`, so "no org header"
- * means the value is either absent or exactly the lone global `100` (i.e. it does
- * not contain a second, org-specific entry).
+ * In v1 this holds for BOTH stages: quota rejections intentionally omit
+ * rate-limit headers, AND windowed rejections lose theirs because the ts-rest
+ * handler ignores the `headers` the middleware returns (see the windowed test).
  */
 const expectNoOrgRateLimitHeader = (res: APIResponse) => {
   const header = res.headers()['x-ratelimit-limit'];
@@ -340,148 +303,90 @@ const expectNotGlobalLimited = async (res: APIResponse) => {
 
     expect(
       'error' in body && !('message' in body),
-      'Hit the GLOBAL /api/v2 IP limiter, not the org limiter. Re-run this suite in isolation.',
+      'Hit the GLOBAL /api/v1 IP limiter, not the org limiter. Re-run this suite in isolation.',
     ).toBeFalsy();
   }
 };
 
 /** Cheap read endpoint — consumes exactly one `api` counter, no document/email. */
-const findEnvelopes = (request: APIRequestContext, token: string): Promise<APIResponse> =>
-  request.get(`${baseUrl}/envelope?perPage=1`, {
+const findDocuments = (request: APIRequestContext, token: string): Promise<APIResponse> =>
+  request.get(`${baseUrl}/documents?page=1&perPage=1`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
 /**
- * Create a DOCUMENT envelope. Consumes one `api` counter and, when
- * `type === DOCUMENT`, one `document` counter. Optionally seeds SIGNER recipients
- * (each with a signature field) so the envelope can later be distributed.
+ * Resend (remind) the given recipients. This runs the SYNCHRONOUS email assertion
+ * in resend-document with `count = recipients.length`.
+ *
+ * NOTE: unlike the v2 `redistribute` endpoint, the v1 `resendDocument` handler
+ * wraps everything in a try/catch and returns a generic HTTP 500 on ANY error
+ * (including the org limiter's TOO_MANY_REQUESTS AppError). So when the email
+ * limit/quota is exceeded this resolves to a 500, NOT a 429.
  */
-const createEnvelope = async (
+const resendDocument = (
   request: APIRequestContext,
   token: string,
-  options: { recipientCount?: number } = {},
-): Promise<APIResponse> => {
-  const { recipientCount = 0 } = options;
-
-  const payload: TCreateEnvelopePayload = {
-    title: `Rate limit test ${Date.now()}-${Math.random().toString(36).slice(2)}`,
-    type: EnvelopeType.DOCUMENT,
-    recipients:
-      recipientCount > 0
-        ? Array.from({ length: recipientCount }, (_, i) => ({
-            email: `rl-${Date.now()}-${i}-${Math.random().toString(36).slice(2)}@test.documenso.com`,
-            name: `Recipient ${i}`,
-            role: RecipientRole.SIGNER,
-            signingOrder: i + 1,
-            accessAuth: [],
-            actionAuth: [],
-            fields: [
-              {
-                type: 'SIGNATURE',
-                fieldMeta: { type: 'signature', overflow: 'crop' },
-                identifier: 0,
-                page: 1,
-                positionX: 10,
-                positionY: 80,
-                width: 20,
-                height: 5,
-              },
-            ],
-          }))
-        : undefined,
-    meta: {
-      subject: 'Rate limit test',
-      message: 'Automated rate-limit test. Ignore.',
-      distributionMethod: 'EMAIL',
-    },
-  };
-
-  const formData = new FormData();
-  formData.append('payload', JSON.stringify(payload));
-  formData.append('files', new File([examplePdfBuffer], 'example.pdf', { type: 'application/pdf' }));
-
-  return request.post(`${baseUrl}/envelope/create`, {
-    headers: { Authorization: `Bearer ${token}` },
-    multipart: formData,
-  });
-};
-
-/** Distribute an envelope to all of its recipients via EMAIL. */
-const distributeEnvelope = (request: APIRequestContext, token: string, envelopeId: string): Promise<APIResponse> =>
-  request.post(`${baseUrl}/envelope/distribute`, {
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    data: {
-      envelopeId,
-      meta: { distributionMethod: 'EMAIL', subject: 'Rate limit test', message: 'Rate limit test' },
-    },
-  });
-
-/**
- * Redistribute (remind) the given recipients. This runs the SYNCHRONOUS email
- * assertion in resend-document with `count = recipients.length`, returning a 429
- * directly when the email limit/quota is exceeded.
- */
-const redistributeEnvelope = (
-  request: APIRequestContext,
-  token: string,
-  envelopeId: string,
+  documentId: number,
   recipientIds: number[],
 ): Promise<APIResponse> =>
-  request.post(`${baseUrl}/envelope/redistribute`, {
+  request.post(`${baseUrl}/documents/${documentId}/resend`, {
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    data: { envelopeId, recipients: recipientIds },
+    data: { recipients: recipientIds },
   });
 
 /**
- * Build a fully-distributed envelope and return its NOT_SIGNED recipient IDs so a
- * subsequent redistribute can exercise the synchronous email assertion.
+ * Assert a resend was blocked by the org email limiter.
  *
- * Setup uses a GENEROUS email quota so the async signing-request emails fanned out
- * by `distribute` are counted, then waits for that counter to settle. This drains
- * the background jobs BEFORE the caller resets usage, so they can't pollute
- * emailCount mid-test. The caller then configures the email limit/quota under test
- * and resets usage, so only the (synchronous, deterministic) redistribute counts.
+ * v1's handler masks the limiter's 429 as a generic HTTP 500 (see `resendDocument`
+ * above), so the only signal available on the HTTP layer is the 500 status. The
+ * accompanying `expectMonthlyCounter` assertions in each test prove WHICH stage
+ * blocked it (windowed leaves the counter untouched; quota advances it).
  */
-const seedDistributedEnvelope = async ({
-  request,
-  token,
+const expectResendBlocked = async (res: APIResponse) => {
+  const bodyText = await res.text();
+
+  expect(
+    res.status(),
+    `Expected the v1 resend to be blocked (masked as HTTP 500) but got ${res.status()} with body: ${bodyText}`,
+  ).toBe(500);
+};
+
+/**
+ * Seed a PENDING document with `recipientCount` NOT_SIGNED signer recipients (each
+ * carrying a signature field) created directly via Prisma — so no async signing
+ * emails are fanned out and the monthly email counter starts clean. Returns the
+ * legacy document id (for the resend endpoint) and the recipient ids to remind.
+ */
+const seedRemindableDocument = async ({
+  owner,
   team,
-  organisation,
   recipientCount,
 }: {
-  request: APIRequestContext;
-  token: string;
+  owner: User;
   team: Team;
-  organisation: Organisation;
   recipientCount: number;
-}): Promise<{ envelopeId: string; recipientIds: number[] }> => {
-  await setClaimLimits(team, { emailQuota: 1000 });
-  await resetUsage(organisation);
-
-  const createRes = await createEnvelope(request, token, { recipientCount });
-  expect(createRes.ok(), `create failed: ${await createRes.text()}`).toBeTruthy();
-  const { id: envelopeId } = (await createRes.json()) as TCreateEnvelopeResponse;
-
-  const distributeRes = await distributeEnvelope(request, token, envelopeId);
-  expect(distributeRes.ok(), `distribute failed: ${await distributeRes.text()}`).toBeTruthy();
-
-  const recipients = await prisma.recipient.findMany({
-    where: { envelopeId },
-    select: { id: true },
+}): Promise<{ documentId: number; recipientIds: number[] }> => {
+  const { document, recipients } = await seedPendingDocumentWithFullFields({
+    owner,
+    teamId: team.id,
+    recipients: Array.from(
+      { length: recipientCount },
+      (_, i) => `rl-${Date.now()}-${i}-${Math.random().toString(36).slice(2)}@test.documenso.com`,
+    ),
+    fields: [FieldType.SIGNATURE],
   });
 
-  // Drain the async signing-request email jobs (one per recipient) so a late job
-  // cannot increment emailCount after the caller's resetUsage.
-  await waitForCounterToSettle(organisation, 'emailCount', recipientCount);
-
-  return { envelopeId, recipientIds: recipients.map((r) => r.id) };
+  return {
+    documentId: mapSecondaryIdToDocumentId(document.secondaryId),
+    recipientIds: recipients.map((recipient) => recipient.id),
+  };
 };
 
 // ===========================================================================
 // Tests
 // ===========================================================================
 
-test.describe('Organisation dynamic rate limits & quotas', () => {
+test.describe('Organisation dynamic rate limits & quotas (API v1)', () => {
   let user: User;
   let team: Team;
   let organisation: Organisation;
@@ -509,7 +414,7 @@ test.describe('Organisation dynamic rate limits & quotas', () => {
     await setClaimLimits(team, { apiQuota: 0 });
     await resetUsage(organisation);
 
-    const preflight = await findEnvelopes(request, token);
+    const preflight = await findDocuments(request, token);
     const enforced = await isOrgLimited(preflight);
 
     // Reset back to a clean slate before the real scenario runs.
@@ -537,19 +442,27 @@ test.describe('Organisation dynamic rate limits & quotas', () => {
 
       // Each request (including these GETs) consumes one api counter.
       for (let i = 0; i < MAX; i += 1) {
-        const res = await findEnvelopes(request, token);
+        const res = await findDocuments(request, token);
         await expectNotGlobalLimited(res);
         expect(res.status(), `request #${i + 1} should be allowed`).toBe(200);
       }
 
       // The next request is over the windowed limit.
-      const limitedRes = await findEnvelopes(request, token);
+      const limitedRes = await findDocuments(request, token);
       const body = await expectOrgLimited(limitedRes);
-      // The windowed limit uses a message distinct from the global limiter.
+      // The windowed limit uses a message distinct from the global limiter — and
+      // in v1 the MESSAGE is the only signal we get (see note below), so it is how
+      // we tell a windowed rejection apart from a quota one.
       expect(String(body.message)).toMatch(WINDOWED_LIMIT_MESSAGE);
-      expectRateLimitHeaderToInclude(limitedRes, MAX);
-      expect(limitedRes.headers()['x-ratelimit-remaining']).toContain('0');
-      expect(limitedRes.headers()['retry-after']).toBeTruthy();
+
+      // V1 DIVERGENCE: unlike v2, v1's ts-rest handler does not propagate the org
+      // limiter's `X-RateLimit-*` headers. `authenticatedMiddleware` returns them
+      // on the body object (`headers: err.headers`), which `@ts-rest/serverless`
+      // ignores (custom headers must be written to the `responseHeaders` Headers
+      // object). So only the global middleware's lone `X-RateLimit-Limit: 100`
+      // survives — the org `max` and `Retry-After`/`Remaining` never reach the
+      // client. We therefore assert no org-specific header is surfaced.
+      expectNoOrgRateLimitHeader(limitedRes);
 
       // Windowed limiting uses the RateLimit bucket table, NOT the monthly quota
       // counter (quota is null here), so apiCount must remain untouched.
@@ -563,11 +476,11 @@ test.describe('Organisation dynamic rate limits & quotas', () => {
       // Make sure both requests land inside a single 1m bucket.
       await ensureWindowHeadroom(60, 10_000);
 
-      const okRes = await findEnvelopes(request, token);
+      const okRes = await findDocuments(request, token);
       await expectNotGlobalLimited(okRes);
       expect(okRes.status()).toBe(200);
 
-      const limitedRes = await findEnvelopes(request, token);
+      const limitedRes = await findDocuments(request, token);
       const body = await expectOrgLimited(limitedRes);
       expect(String(body.message)).toMatch(WINDOWED_LIMIT_MESSAGE);
 
@@ -586,13 +499,13 @@ test.describe('Organisation dynamic rate limits & quotas', () => {
 
       // Exhaust the window.
       for (let i = 0; i < MAX; i += 1) {
-        const res = await findEnvelopes(request, token);
+        const res = await findDocuments(request, token);
         await expectNotGlobalLimited(res);
         expect(res.status(), `request #${i + 1} should be allowed`).toBe(200);
       }
 
       // The next request is blocked by the window.
-      const limitedRes = await findEnvelopes(request, token);
+      const limitedRes = await findDocuments(request, token);
       await expectOrgLimited(limitedRes);
 
       // Wait out the window using the server-provided Retry-After (plus a small
@@ -605,7 +518,7 @@ test.describe('Organisation dynamic rate limits & quotas', () => {
 
       // Window has elapsed: the same org can make requests again without any
       // manual intervention — the bucket rolled over on its own.
-      const afterReset = await findEnvelopes(request, token);
+      const afterReset = await findDocuments(request, token);
       await expectNotGlobalLimited(afterReset);
       expect(afterReset.status(), 'request after the window elapsed should be allowed').toBe(200);
     });
@@ -621,7 +534,7 @@ test.describe('Organisation dynamic rate limits & quotas', () => {
       await resetUsage(organisation);
 
       for (let i = 0; i < 6; i += 1) {
-        const res = await findEnvelopes(request, token);
+        const res = await findDocuments(request, token);
         await expectNotGlobalLimited(res);
         expect(res.status()).toBe(200);
       }
@@ -636,12 +549,12 @@ test.describe('Organisation dynamic rate limits & quotas', () => {
       await resetUsage(organisation);
 
       for (let i = 0; i < QUOTA; i += 1) {
-        const res = await findEnvelopes(request, token);
+        const res = await findDocuments(request, token);
         await expectNotGlobalLimited(res);
         expect(res.status(), `request #${i + 1} should be within quota`).toBe(200);
       }
 
-      const limitedRes = await findEnvelopes(request, token);
+      const limitedRes = await findDocuments(request, token);
       const body = await expectOrgLimited(limitedRes);
       expect(String(body.message)).toMatch(QUOTA_EXCEEDED_MESSAGE);
 
@@ -657,11 +570,11 @@ test.describe('Organisation dynamic rate limits & quotas', () => {
       await setClaimLimits(team, { apiQuota: 1 });
       await resetUsage(organisation);
 
-      const okRes = await findEnvelopes(request, token);
+      const okRes = await findDocuments(request, token);
       await expectNotGlobalLimited(okRes);
       expect(okRes.status()).toBe(200);
 
-      const limitedRes = await findEnvelopes(request, token);
+      const limitedRes = await findDocuments(request, token);
       await expectOrgLimited(limitedRes);
 
       // One allowed + one rejected, both incremented => exactly 2.
@@ -672,7 +585,7 @@ test.describe('Organisation dynamic rate limits & quotas', () => {
       await setClaimLimits(team, { apiQuota: 0 });
       await resetUsage(organisation);
 
-      const limitedRes = await findEnvelopes(request, token);
+      const limitedRes = await findDocuments(request, token);
       const body = await expectOrgLimited(limitedRes);
       expect(String(body.message)).toMatch(NO_QUOTA_MESSAGE);
 
@@ -682,128 +595,36 @@ test.describe('Organisation dynamic rate limits & quotas', () => {
   });
 
   // =========================================================================
-  // Document counter — windowed rate limit
-  // =========================================================================
-
-  test.describe('document rate limit (windowed)', () => {
-    test('allows creates up to the limit then 429s with headers', async ({ request }) => {
-      const MAX = 3;
-      // Keep api unlimited so only the document stage can trip.
-      await setClaimLimits(team, { documentRateLimits: [{ window: '1m', max: MAX }] });
-      await resetUsage(organisation);
-
-      // Make sure the MAX+1 create burst lands inside a single 1m bucket.
-      await ensureWindowHeadroom(60, 10_000);
-
-      for (let i = 0; i < MAX; i += 1) {
-        const res = await createEnvelope(request, token);
-        await expectNotGlobalLimited(res);
-        expect(res.ok(), `create #${i + 1} should succeed`).toBeTruthy();
-      }
-
-      const limitedRes = await createEnvelope(request, token);
-      const body = await expectOrgLimited(limitedRes);
-      expect(String(body.message)).toMatch(WINDOWED_LIMIT_MESSAGE);
-      expectRateLimitHeaderToInclude(limitedRes, MAX);
-      expect(limitedRes.headers()['retry-after']).toBeTruthy();
-
-      // Windowed limiting doesn't touch the quota counter (documentQuota is null).
-      await expectMonthlyCounter(organisation, 'documentCount', 0);
-    });
-  });
-
-  // =========================================================================
-  // Document counter — monthly quota
-  // =========================================================================
-
-  test.describe('document quota (monthly)', () => {
-    test('exhausting the document quota blocks further creates', async ({ request }) => {
-      const QUOTA = 2;
-      await setClaimLimits(team, { documentQuota: QUOTA });
-      await resetUsage(organisation);
-
-      for (let i = 0; i < QUOTA; i += 1) {
-        const res = await createEnvelope(request, token);
-        await expectNotGlobalLimited(res);
-        expect(res.ok(), `create #${i + 1} should be within quota`).toBeTruthy();
-      }
-
-      const limitedRes = await createEnvelope(request, token);
-      await expectOrgLimited(limitedRes);
-
-      // QUOTA successful creates + the rejected one (incremented before throwing).
-      await expectMonthlyCounter(organisation, 'documentCount', QUOTA + 1);
-    });
-
-    test('document quota of 0 hard-blocks creation', async ({ request }) => {
-      await setClaimLimits(team, { documentQuota: 0 });
-      await resetUsage(organisation);
-
-      const limitedRes = await createEnvelope(request, token);
-      const body = await expectOrgLimited(limitedRes);
-      expect(String(body.message)).toMatch(NO_QUOTA_MESSAGE);
-
-      // quota === 0 throws before the increment, so the counter stays at zero.
-      await expectMonthlyCounter(organisation, 'documentCount', 0);
-    });
-
-    test('null document quota allows creation', async ({ request }) => {
-      await setClaimLimits(team, { documentQuota: null });
-      await resetUsage(organisation);
-
-      const res = await createEnvelope(request, token);
-      await expectNotGlobalLimited(res);
-      expect(res.ok()).toBeTruthy();
-
-      // A null quota means "unlimited" and must not increment the counter.
-      await expectMonthlyCounter(organisation, 'documentCount', 0);
-    });
-  });
-
-  // =========================================================================
-  // Email counter — windowed rate limit (via synchronous redistribute)
+  // Email counter — windowed rate limit (via synchronous resend)
   // =========================================================================
 
   test.describe('email rate limit (windowed)', () => {
-    test('redistribute is allowed when recipient count is within the email window', async ({ request }) => {
-      const { envelopeId, recipientIds } = await seedDistributedEnvelope({
-        request,
-        token,
-        team,
-        organisation,
-        recipientCount: 2,
-      });
+    test('resend is allowed when recipient count is within the email window', async ({ request }) => {
+      const { documentId, recipientIds } = await seedRemindableDocument({ owner: user, team, recipientCount: 2 });
 
       // Window allows 5/min; reminding 2 recipients is fine. Reset usage so the
-      // create/distribute consumption above doesn't count against this window.
+      // seeding above doesn't count against this window.
       await setClaimLimits(team, { emailRateLimits: [{ window: '1m', max: 5 }] });
       await resetUsage(organisation);
 
-      const res = await redistributeEnvelope(request, token, envelopeId, recipientIds);
+      const res = await resendDocument(request, token, documentId, recipientIds);
       await expectNotGlobalLimited(res);
-      expect(res.ok(), `redistribute should succeed: ${await res.text()}`).toBeTruthy();
+      expect(res.ok(), `resend should succeed: ${await res.text()}`).toBeTruthy();
 
       // Windowed pass with a null quota must NOT touch the monthly counter.
       await expectMonthlyCounter(organisation, 'emailCount', 0);
     });
 
-    test('redistribute is blocked when recipient count exceeds the email window', async ({ request }) => {
-      const { envelopeId, recipientIds } = await seedDistributedEnvelope({
-        request,
-        token,
-        team,
-        organisation,
-        recipientCount: 3,
-      });
+    test('resend is blocked when recipient count exceeds the email window', async ({ request }) => {
+      const { documentId, recipientIds } = await seedRemindableDocument({ owner: user, team, recipientCount: 3 });
 
       // Window only allows 2 emails per minute; reminding 3 at once exceeds it.
       await setClaimLimits(team, { emailRateLimits: [{ window: '1m', max: 2 }] });
       await resetUsage(organisation);
 
-      const res = await redistributeEnvelope(request, token, envelopeId, recipientIds);
-      const body = await expectOrgLimited(res);
-      expect(String(body.message)).toMatch(WINDOWED_LIMIT_MESSAGE);
-      expectRateLimitHeaderToInclude(res, 2);
+      const res = await resendDocument(request, token, documentId, recipientIds);
+      // v1 masks the org 429 as a generic HTTP 500.
+      await expectResendBlocked(res);
 
       // Windowed limit trips BEFORE the quota stage, so the counter is untouched.
       await expectMonthlyCounter(organisation, 'emailCount', 0);
@@ -811,49 +632,34 @@ test.describe('Organisation dynamic rate limits & quotas', () => {
   });
 
   // =========================================================================
-  // Email counter — monthly quota (via synchronous redistribute)
+  // Email counter — monthly quota (via synchronous resend)
   // =========================================================================
 
   test.describe('email quota (monthly)', () => {
-    test('redistribute within the remaining email quota succeeds', async ({ request }) => {
-      const { envelopeId, recipientIds } = await seedDistributedEnvelope({
-        request,
-        token,
-        team,
-        organisation,
-        recipientCount: 2,
-      });
+    test('resend within the remaining email quota succeeds', async ({ request }) => {
+      const { documentId, recipientIds } = await seedRemindableDocument({ owner: user, team, recipientCount: 2 });
 
       await setClaimLimits(team, { emailQuota: 10 });
       await resetUsage(organisation);
 
-      const res = await redistributeEnvelope(request, token, envelopeId, recipientIds);
+      const res = await resendDocument(request, token, documentId, recipientIds);
       await expectNotGlobalLimited(res);
-      expect(res.ok(), `redistribute should succeed: ${await res.text()}`).toBeTruthy();
+      expect(res.ok(), `resend should succeed: ${await res.text()}`).toBeTruthy();
 
       // The synchronous assertion consumed exactly `recipientIds.length` of quota.
       await expectMonthlyCounter(organisation, 'emailCount', recipientIds.length);
     });
 
-    test('redistribute that would exceed the email quota is blocked', async ({ request }) => {
-      const { envelopeId, recipientIds } = await seedDistributedEnvelope({
-        request,
-        token,
-        team,
-        organisation,
-        recipientCount: 3,
-      });
+    test('resend that would exceed the email quota is blocked', async ({ request }) => {
+      const { documentId, recipientIds } = await seedRemindableDocument({ owner: user, team, recipientCount: 3 });
 
       // Quota of 2 but reminding 3 recipients in one synchronous call.
       await setClaimLimits(team, { emailQuota: 2 });
       await resetUsage(organisation);
 
-      const res = await redistributeEnvelope(request, token, envelopeId, recipientIds);
-      const body = await expectOrgLimited(res);
-      expect(String(body.message)).toMatch(QUOTA_EXCEEDED_MESSAGE);
-
-      // Quota rejection carries no rate-limit headers.
-      expectNoOrgRateLimitHeader(res);
+      const res = await resendDocument(request, token, documentId, recipientIds);
+      // v1 masks the org 429 as a generic HTTP 500.
+      await expectResendBlocked(res);
 
       // The count (3) is added BEFORE the over-quota check throws, so the counter
       // advances by the full batch even though the request was rejected.
@@ -861,20 +667,14 @@ test.describe('Organisation dynamic rate limits & quotas', () => {
     });
 
     test('email quota of 0 hard-blocks reminders', async ({ request }) => {
-      const { envelopeId, recipientIds } = await seedDistributedEnvelope({
-        request,
-        token,
-        team,
-        organisation,
-        recipientCount: 1,
-      });
+      const { documentId, recipientIds } = await seedRemindableDocument({ owner: user, team, recipientCount: 1 });
 
       await setClaimLimits(team, { emailQuota: 0 });
       await resetUsage(organisation);
 
-      const res = await redistributeEnvelope(request, token, envelopeId, recipientIds);
-      const body = await expectOrgLimited(res);
-      expect(String(body.message)).toMatch(NO_QUOTA_MESSAGE);
+      const res = await resendDocument(request, token, documentId, recipientIds);
+      // v1 masks the org 429 as a generic HTTP 500.
+      await expectResendBlocked(res);
 
       // quota === 0 throws before the increment, so the counter stays at zero.
       await expectMonthlyCounter(organisation, 'emailCount', 0);
@@ -896,12 +696,12 @@ test.describe('Organisation dynamic rate limits & quotas', () => {
       await resetUsage(organisation);
 
       for (let i = 0; i < QUOTA; i += 1) {
-        const res = await findEnvelopes(request, token);
+        const res = await findDocuments(request, token);
         await expectNotGlobalLimited(res);
         expect(res.status()).toBe(200);
       }
 
-      const limitedRes = await findEnvelopes(request, token);
+      const limitedRes = await findDocuments(request, token);
       const body = await expectOrgLimited(limitedRes);
 
       // It must be the QUOTA that bound, not the window: the message is the quota

@@ -64,15 +64,24 @@ export const checkMonthlyQuota = async (opts: CheckMonthlyQuotaOptions): Promise
   const didCrossQuota = isOverQuota && previousCount <= opts.quota;
 
   if (didCrossQuota) {
-    await jobsClient.triggerJob({
-      name: 'send.organisation-limit-exceeded.email',
-      payload: {
-        organisationId: opts.organisationId,
-        counter: opts.counter,
-        kind: 'quota',
-        period,
-      },
-    });
+    await jobsClient
+      .triggerJob({
+        name: 'send.organisation-limit-exceeded.email',
+        payload: {
+          organisationId: opts.organisationId,
+          counter: opts.counter,
+          kind: 'quota',
+          period,
+        },
+      })
+      .catch((error) => {
+        console.error({
+          msg: 'Failed to send organisation limit exceeded email',
+          error,
+        });
+
+        // Do nothing.
+      });
   }
 
   if (isOverQuota) {

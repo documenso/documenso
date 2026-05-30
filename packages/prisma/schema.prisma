@@ -323,10 +323,6 @@ model OrganisationMonthlyStat {
   emailCount    Int @default(0)
   apiCount      Int @default(0)
 
-  documentRateLimitNotifiedAt DateTime?
-  emailRateLimitNotifiedAt    DateTime?
-  apiRateLimitNotifiedAt      DateTime?
-
   @@unique([organisationId, period])
   @@index([organisationId])
 }

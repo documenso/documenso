@@ -8,7 +8,7 @@ type GetApiTokenByTokenOptions = {
   token: string;
 
   /**
-   * Defaults to true.
+   * Defaults to false.
    *
    * Will assert that the API request limit is not exceeded.
    */

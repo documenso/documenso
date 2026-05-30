@@ -20,9 +20,9 @@ export const resetOrganisationMonthlyStatRoute = adminProcedure
     ctx.logger.info({ organisationId, counter, period });
 
     const data: Prisma.OrganisationMonthlyStatUpdateInput = match(counter)
-      .with('document', () => ({ documentCount: 0, documentRateLimitNotifiedAt: null }))
-      .with('email', () => ({ emailCount: 0, emailRateLimitNotifiedAt: null }))
-      .with('api', () => ({ apiCount: 0, apiRateLimitNotifiedAt: null }))
+      .with('document', () => ({ documentCount: 0 }))
+      .with('email', () => ({ emailCount: 0 }))
+      .with('api', () => ({ apiCount: 0 }))
       .exhaustive();
 
     await prisma.organisationMonthlyStat.update({

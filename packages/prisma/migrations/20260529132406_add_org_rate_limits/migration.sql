@@ -38,9 +38,6 @@ CREATE TABLE "OrganisationMonthlyStat" (
     "documentCount" INTEGER NOT NULL DEFAULT 0,
     "emailCount" INTEGER NOT NULL DEFAULT 0,
     "apiCount" INTEGER NOT NULL DEFAULT 0,
-    "documentRateLimitNotifiedAt" TIMESTAMP(3),
-    "emailRateLimitNotifiedAt" TIMESTAMP(3),
-    "apiRateLimitNotifiedAt" TIMESTAMP(3),
 
     CONSTRAINT "OrganisationMonthlyStat_pkey" PRIMARY KEY ("id")
 );
