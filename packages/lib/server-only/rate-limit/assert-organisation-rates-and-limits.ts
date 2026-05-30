@@ -16,7 +16,7 @@ type AssertOrganisationRatesAndLimitsOptions = {
   organisationClaim?: OrganisationClaim;
 
   /**
-   * Units to reserve. Must be >= 1.
+   * Units to reserve. Must be >= 0.
    */
   count: number;
 
@@ -35,9 +35,14 @@ export const assertOrganisationRatesAndLimits = async (
 
   let { organisationClaim, count } = opts;
 
-  if (count <= 0) {
+  // Nothing to reserve, treat as a no-op.
+  if (count === 0) {
+    return;
+  }
+
+  if (count < 0) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Count must be greater than 0',
+      message: 'Count must be greater than or equal to 0',
     });
   }
 

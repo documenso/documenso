@@ -1,6 +1,8 @@
 import { INTERNAL_CLAIM_ID, internalClaims } from '@documenso/lib/types/subscription';
+
 import { prisma } from '@documenso/prisma';
 import type { SubscriptionClaim } from '@prisma/client';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export const getSubscriptionClaim = async (
   claimId: string,
@@ -16,7 +18,9 @@ export const getSubscriptionClaim = async (
       return internalClaims[INTERNAL_CLAIM_ID.FREE];
     }
 
-    throw new Error(`Subscription claim ${claimId} not found`);
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: `Subscription claim ${claimId} not found`,
+    });
   }
 
   return subscriptionClaim;

@@ -7,7 +7,7 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import type { ReactNode } from 'react';
 import type { Control, FieldValues, Path } from 'react-hook-form';
 
@@ -25,6 +25,8 @@ export const ClaimLimitFields = <T extends FieldValues>({
   prefix = '',
   disabled,
 }: ClaimLimitFieldsProps<T>) => {
+  const { t } = useLingui();
+
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const name = (key: string) => `${prefix}${key}` as Path<T>;
 
@@ -41,7 +43,7 @@ export const ClaimLimitFields = <T extends FieldValues>({
               min={0}
               disabled={disabled}
               value={field.value === null || field.value === undefined ? '' : field.value}
-              placeholder="Unlimited"
+              placeholder={t`Unlimited`}
               onChange={(e) => field.onChange(e.target.value === '' ? null : parseInt(e.target.value, 10))}
             />
           </FormControl>

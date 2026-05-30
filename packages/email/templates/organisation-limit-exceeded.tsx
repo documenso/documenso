@@ -26,7 +26,7 @@ export const OrganisationLimitExceededEmailTemplate = ({
   const { _ } = useLingui();
   const branding = useBranding();
 
-  const previewText = msg`Account Review Required`;
+  const previewText = msg`Organisation Review Required`;
 
   return (
     <Html>
@@ -44,7 +44,7 @@ export const OrganisationLimitExceededEmailTemplate = ({
 
             <Section className="p-2 text-slate-500">
               <Text className="text-center font-medium text-black text-lg">
-                <Trans>Account Review Required</Trans>
+                <Trans>Organisation Review Required</Trans>
               </Text>
 
               {kind === 'quota' ? (

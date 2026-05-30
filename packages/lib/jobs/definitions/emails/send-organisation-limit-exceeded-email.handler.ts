@@ -77,7 +77,7 @@ export const run = async ({
       await mailer.sendMail({
         to: member.user.email,
         from: senderEmail,
-        subject: i18n._(msg`Your organisation has reached a usage limit`),
+        subject: i18n._(msg`Organisation Review Required`),
         html,
         text,
       });

@@ -37,16 +37,13 @@ export const OrganisationUsagePanel = ({
     },
   ];
 
+  // Todo: This may not show if the organisation has no usage data for the current month.
   return (
     <div className="space-y-4 rounded-md border p-4">
       <div>
         <h3 className="font-medium text-sm">
-          <Trans>Usage this month (Will only show if there are quota/rates set)</Trans>
+          <Trans>Usage for period: {monthlyStats[0]?.period || 'N/A'}</Trans>
         </h3>
-
-        <p className="text-muted-foreground text-xs">
-          {monthlyStats[0]?.period && <Trans>Period: {monthlyStats[0]?.period}</Trans>}
-        </p>
       </div>
 
       {rows.map((row) => {
@@ -70,9 +67,11 @@ export const OrganisationUsagePanel = ({
 
             {row.effectiveLimit && row.effectiveLimit > 0 ? <Progress className="h-2 w-full" value={percent} /> : null}
 
-            <div className="flex w-full justify-end pt-1">
-              <OrganisationUsageResetButton organisationId={organisationId} counter={row.counter} />
-            </div>
+            {monthlyStats[0] && (
+              <div className="flex w-full justify-end pt-1">
+                <OrganisationUsageResetButton organisationId={organisationId} counter={row.counter} />
+              </div>
+            )}
           </div>
         );
       })}
