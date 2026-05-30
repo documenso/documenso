@@ -33,7 +33,9 @@ export const checkOrganisationRateLimits = async (opts: CheckOrganisationRateLim
 
     if (result.isLimited) {
       throw new AppError(AppErrorCode.TOO_MANY_REQUESTS, {
-        message: 'Too many requests, please try again later.',
+        // Note: Update the organisation-rate-limits.spec.ts message if you change this value.
+        // Used in the test to differentiate between the global and organisation rate limits.
+        message: 'Too many requests, please try again later. Contact support if you require higher limits.',
         headers: {
           'X-RateLimit-Limit': String(entry.max),
           'X-RateLimit-Remaining': '0',

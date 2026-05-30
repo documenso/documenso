@@ -26,7 +26,7 @@ export const OrganisationLimitExceededEmailTemplate = ({
   const { _ } = useLingui();
   const branding = useBranding();
 
-  const previewText = msg`Your organisation has been flagged`;
+  const previewText = msg`Account Review Required`;
 
   return (
     <Html>
@@ -44,7 +44,7 @@ export const OrganisationLimitExceededEmailTemplate = ({
 
             <Section className="p-2 text-slate-500">
               <Text className="text-center font-medium text-black text-lg">
-                <Trans>Account flagged for {organisationName}</Trans>
+                <Trans>Account Review Required</Trans>
               </Text>
 
               {kind === 'quota' ? (
@@ -52,20 +52,20 @@ export const OrganisationLimitExceededEmailTemplate = ({
                   {match(counter)
                     .with('document', () => (
                       <Trans>
-                        Due to excessive document activity, your account has been flagged. New document activity is
-                        temporarily disabled.
+                        We've noticed document activity on your account that exceeds the fair use limits of your current
+                        plan. As a precaution, new document activity has been temporarily paused pending review.
                       </Trans>
                     ))
                     .with('email', () => (
                       <Trans>
-                        Due to excessive email activity, your account has been flagged. New email activity is
-                        temporarily disabled.
+                        We've noticed email sending activity on your account that exceeds the fair use limits of your
+                        current plan. As a precaution, new email activity has been temporarily paused pending review.
                       </Trans>
                     ))
                     .with('api', () => (
                       <Trans>
-                        Due to excessive API activity, your account has been flagged. New API activity is temporarily
-                        disabled.
+                        We've noticed API activity on your account that exceeds the fair use limits of your current
+                        plan. As a precaution, new API activity has been temporarily paused pending review.
                       </Trans>
                     ))
                     .exhaustive()}
