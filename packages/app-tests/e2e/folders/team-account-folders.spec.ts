@@ -3001,3 +3001,105 @@ test('[TEAMS]: team admin can see all documents in everyone folder', async ({ pa
   await expect(page.getByText('Everyone Folder - Manager Document')).toBeVisible();
   await expect(page.getByText('Everyone Folder - Admin Document')).toBeVisible();
 });
+
+test('[TEAMS]: folder creator can delete their own folder above their visibility tier', async ({
+  page,
+}) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamMember = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Member',
+    role: TeamMemberRole.MEMBER,
+  });
+
+  // Simulates a folder created by the member while the team default visibility is ADMIN.
+  const folder = await seedBlankFolder(teamMember, team.id, {
+    createFolderOptions: {
+      name: 'Member Admin Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamMember.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  // The creator can see their own folder even though it is above their visibility tier.
+  await expect(page.getByText('Member Admin Folder')).toBeVisible();
+
+  const folderMoreBtn = page.getByTestId('folder-card-more-button');
+  await openDropdownMenu(page, folderMoreBtn);
+  await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
+  await page.getByRole('menuitem', { name: 'Delete' }).click();
+
+  await page.getByRole('textbox').fill(`delete ${folder.name}`);
+  await page.getByRole('button', { name: 'Delete' }).click();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+
+  await expect(page.locator(`[data-folder-id="${folder.id}"]`)).not.toBeVisible();
+});
+
+test('[TEAMS]: folder creator can move a document into their own folder above their visibility tier', async ({
+  page,
+}) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamMember = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Member',
+    role: TeamMemberRole.MEMBER,
+  });
+
+  // Simulates a folder created by the member while the team default visibility is ADMIN.
+  const folder = await seedBlankFolder(teamMember, team.id, {
+    createFolderOptions: {
+      name: 'Member Admin Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await seedBlankDocument(teamMember, team.id, {
+    createDocumentOptions: {
+      title: '[TEST] Member Document',
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamMember.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Member Admin Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Member Document')).toBeVisible();
+
+  const memberDocRow = page.getByRole('row', { name: /\[TEST\] Member Document/ });
+  const docActionBtn = memberDocRow.getByTestId('document-table-action-btn');
+  await openDropdownMenu(page, docActionBtn);
+  await expect(page.getByRole('menuitem', { name: 'Move' })).toBeVisible();
+  await page.getByRole('menuitem', { name: 'Move' }).click();
+
+  await expect(page.getByRole('button', { name: 'Member Admin Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Member Admin Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+
+  // The document should have left the root listing once moved into the folder.
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Member Document')).not.toBeVisible();
+
+  // And it should now be present inside the member's folder.
+  await page.goto(`/t/${team.url}/documents/f/${folder.id}`);
+  await expect(page.getByText('[TEST] Member Document')).toBeVisible();
+});

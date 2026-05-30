@@ -162,9 +162,16 @@ export const updateEnvelope = async ({
           userId,
         }),
         type: envelope.type === EnvelopeType.TEMPLATE ? FolderType.TEMPLATE : FolderType.DOCUMENT,
-        visibility: {
-          in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
-        },
+        // The creator can always move documents into their own folder regardless of
+        // its visibility tier, otherwise the folder must be visible to the user's role.
+        OR: [
+          {
+            visibility: {
+              in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
+            },
+          },
+          { userId },
+        ],
       },
     });
 

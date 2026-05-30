@@ -30,9 +30,16 @@ export const updateFolder = async ({ userId, teamId, folderId, data }: UpdateFol
         teamId,
         userId,
       }),
-      visibility: {
-        in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
-      },
+      // The creator can always find and manage their own folder regardless of its
+      // visibility tier, otherwise the folder must be visible to the user's role.
+      OR: [
+        {
+          visibility: {
+            in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
+          },
+        },
+        { userId },
+      ],
     },
   });
 

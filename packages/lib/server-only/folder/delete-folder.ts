@@ -21,9 +21,16 @@ export const deleteFolder = async ({ userId, teamId, folderId }: DeleteFolderOpt
         teamId,
         userId,
       }),
-      visibility: {
-        in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
-      },
+      // The creator can always find and manage their own folder regardless of its
+      // visibility tier, otherwise the folder must be visible to the user's role.
+      OR: [
+        {
+          visibility: {
+            in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
+          },
+        },
+        { userId },
+      ],
     },
   });
 
@@ -33,7 +40,10 @@ export const deleteFolder = async ({ userId, teamId, folderId }: DeleteFolderOpt
     });
   }
 
-  const hasPermission = canAccessTeamDocument(team.currentTeamRole, folder.visibility);
+  // Allow the action when the user is the folder creator, not only when their role
+  // can access the folder's visibility tier.
+  const hasPermission =
+    folder.userId === userId || canAccessTeamDocument(team.currentTeamRole, folder.visibility);
 
   if (!hasPermission) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
