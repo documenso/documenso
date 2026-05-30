@@ -6,6 +6,12 @@ export type TRecipientColor = 'readOnly' | (typeof AVAILABLE_RECIPIENT_COLORS)[n
 export type RecipientColorStyles = {
   base: string;
   baseRing: string;
+  /**
+   * A low-opacity variant of {@link baseRing}, used for the outline of
+   * checkbox/radio fields in the signer view so the ring does not obscure the
+   * document text those fields are commonly overlaid on.
+   */
+  baseRingFaded: string;
   baseRingHover: string;
   baseTextHover: string;
   fieldButton: string;
@@ -23,6 +29,7 @@ const RECIPIENT_COLOR_STYLES: Record<TRecipientColor, () => RecipientColorStyles
   readOnly: (): RecipientColorStyles => ({
     base: 'ring-neutral-400',
     baseRing: 'rgba(176, 176, 176, 1)',
+    baseRingFaded: 'rgba(176, 176, 176, 0.45)',
     baseRingHover: 'rgba(176, 176, 176, 1)',
     baseTextHover: 'rgba(176, 176, 176, 1)',
     fieldButton: 'border-neutral-400 hover:border-neutral-400',
@@ -52,6 +59,7 @@ const generateStyles = (recipientColor: TRecipientColor): RecipientColorStyles =
   return {
     base: `${ring}-${name} ${hover}:${bg}-${name}/30`,
     baseRing: color.toRgbString(),
+    baseRingFaded: color.alpha(0.4).toRgbString(),
     baseRingHover: color.alpha(0.3).toRgbString(),
     baseTextHover: color.toRgbString(),
     fieldButton: `${hover}:${border}-${name} ${hover}:${bg}-${name}/30`,

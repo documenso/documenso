@@ -196,7 +196,7 @@ export const renderRadioFieldElement = (
   });
 
   if (color !== 'readOnly' && mode !== 'export') {
-    createFieldHoverInteraction({ fieldGroup, fieldRect, options });
+    createFieldHoverInteraction({ fieldGroup, fieldRect, options, field });
   }
 
   return {

@@ -1,3 +1,4 @@
+import { FieldType } from '@prisma/client';
 import Konva from 'konva';
 
 import {
@@ -7,6 +8,31 @@ import {
 
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
 import { calculateFieldPosition } from './field-renderer';
+
+/**
+ * A fully transparent fill used (instead of {@link DEFAULT_RECT_BACKGROUND}) for
+ * the resting state of checkbox/radio fields in the signer view. Kept as an
+ * `rgba()` string rather than `undefined` so Konva tweens can animate to/from it.
+ */
+export const TRANSPARENT_RECT_BACKGROUND = 'rgba(255, 255, 255, 0)';
+
+/**
+ * Checkbox/radio fields are frequently placed over pre-printed form text. In the
+ * signer view we keep their rect transparent so that underlying text stays
+ * legible; every other field/mode keeps the standard near-opaque background.
+ */
+export const getFieldRestingFill = (
+  field: Pick<FieldToRender, 'type'>,
+  mode: RenderFieldElementOptions['mode'],
+): string => {
+  const isCheckboxOrRadio = field.type === FieldType.CHECKBOX || field.type === FieldType.RADIO;
+
+  if (mode === 'sign' && isCheckboxOrRadio) {
+    return TRANSPARENT_RECT_BACKGROUND;
+  }
+
+  return DEFAULT_RECT_BACKGROUND;
+};
 
 export const konvaTextFontFamily =
   '"Noto Sans", "Noto Sans Japanese", "Noto Sans Chinese", "Noto Sans Korean", sans-serif';
@@ -129,18 +155,25 @@ export const upsertFieldRect = (
 
   const isExport = mode === 'export';
 
+  // Checkbox/radio fields in the signer view get a faded, thinner outline and a
+  // transparent background so they do not obscure the document text they sit on.
+  const isFadedSignerField =
+    mode === 'sign' && (field.type === FieldType.CHECKBOX || field.type === FieldType.RADIO);
+
   fieldRect.setAttrs({
     width: fieldWidth,
     height: fieldHeight,
     // In export mode keep the fill transparent so the underlying PDF content
     // shows through, while still drawing the field outline below.
-    fill: isExport ? undefined : DEFAULT_RECT_BACKGROUND,
+    fill: isExport ? undefined : getFieldRestingFill(field, mode),
     stroke: isExport
       ? EXPORT_FIELD_OUTLINE_COLOR
       : color
-        ? getRecipientColorStyles(color).baseRing
+        ? isFadedSignerField
+          ? getRecipientColorStyles(color).baseRingFaded
+          : getRecipientColorStyles(color).baseRing
         : '#e5e7eb',
-    strokeWidth: isExport ? EXPORT_FIELD_OUTLINE_WIDTH : 2,
+    strokeWidth: isExport ? EXPORT_FIELD_OUTLINE_WIDTH : isFadedSignerField ? 1 : 2,
     cornerRadius: 2,
     strokeScaleEnabled: false,
     // Previously the rectangle was hidden entirely when exporting; it is now
@@ -205,6 +238,7 @@ type CreateFieldHoverInteractionOptions = {
   options: RenderFieldElementOptions;
   fieldGroup: Konva.Group;
   fieldRect: Konva.Rect;
+  field: Pick<FieldToRender, 'type'>;
 };
 
 /**
@@ -214,6 +248,7 @@ export const createFieldHoverInteraction = ({
   options,
   fieldGroup,
   fieldRect,
+  field,
 }: CreateFieldHoverInteractionOptions) => {
   const { mode } = options;
 
@@ -222,6 +257,10 @@ export const createFieldHoverInteraction = ({
   }
 
   const hoverColor = getRecipientColorStyles(options.color).baseRingHover;
+
+  // Resting fill the rect returns to when the pointer leaves / a transform ends.
+  // For faded signer fields this is transparent so text stays legible.
+  const restingFill = getFieldRestingFill(field, mode);
 
   fieldGroup.on('mouseover', () => {
     const layer = fieldRect.getLayer();
@@ -245,7 +284,7 @@ export const createFieldHoverInteraction = ({
     new Konva.Tween({
       node: fieldRect,
       duration: 0.3,
-      fill: DEFAULT_RECT_BACKGROUND,
+      fill: restingFill,
     }).play();
   });
 
@@ -271,7 +310,7 @@ export const createFieldHoverInteraction = ({
     new Konva.Tween({
       node: fieldRect,
       duration: 0.3,
-      fill: DEFAULT_RECT_BACKGROUND,
+      fill: restingFill,
     }).play();
   });
 };
