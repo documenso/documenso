@@ -45,7 +45,10 @@ import {
 } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
-import { putNormalizedPdfFileServerSide } from '../../universal/upload/put-file.server';
+import {
+  putFileServerSide,
+  putNormalizedPdfFileServerSide,
+} from '../../universal/upload/put-file.server';
 import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
@@ -462,6 +465,13 @@ export const createDocumentFromTemplate = async ({
         return customDocumentDataItem.envelopeItemId === item.id;
       });
 
+      // Custom uploads are already normalized by the upload route
+      // (`putNormalizedPdfFileServerSide` via /api/files/upload-pdf). Normalizing
+      // them again here runs `flattenAnnotations()` a second time on an
+      // already-flattened PDF, which corrupts it (appearance streams are consumed
+      // on the first pass), producing a blank/garbled render.
+      const isAlreadyNormalizedCustomUpload = Boolean(foundCustomDocumentData);
+
       if (foundCustomDocumentData) {
         documentDataIdToDuplicate = foundCustomDocumentData.documentDataId;
       }
@@ -490,11 +500,17 @@ export const createDocumentFromTemplate = async ({
         });
       }
 
-      const duplicatedFile = await putNormalizedPdfFileServerSide({
+      const fileToDuplicate = {
         name: titleToUse,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(buffer),
-      });
+      };
+
+      // Avoid double-normalizing already-normalized custom uploads; only normalize
+      // the template's own (potentially un-normalized) data.
+      const duplicatedFile = isAlreadyNormalizedCustomUpload
+        ? await putFileServerSide(fileToDuplicate)
+        : await putNormalizedPdfFileServerSide(fileToDuplicate);
 
       const newDocumentData = await prisma.documentData.create({
         data: {

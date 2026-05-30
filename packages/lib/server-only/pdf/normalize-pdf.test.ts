@@ -70,6 +70,20 @@ describe('normalizePdf', () => {
     expect(form === null || form.getFields().length === 0).toBe(true);
   });
 
+  it('does not blank the page when normalizing an already-normalized PDF (#78 regression)', async () => {
+    const marker = 'DOUBLE_NORMALIZE_MARKER';
+    const pdf = await buildArrayContentForm(marker);
+
+    const once = await normalizePdf(pdf, { flattenForm: true });
+    // Sanity: a single normalization renders fine.
+    expect(await extractAllText(once)).toContain(marker);
+
+    // Re-normalizing already-normalized data (the custom-upload-from-template
+    // double-normalization path) must not corrupt/blank the page.
+    const twice = await normalizePdf(once, { flattenForm: true });
+    expect(await extractAllText(twice)).toContain(marker);
+  });
+
   it('keeps the form interactive for templates (flattenForm: false)', async () => {
     const pdf = await buildArrayContentForm('TEMPLATE_MARKER');
 
