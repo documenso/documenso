@@ -16,8 +16,8 @@ import { createElement } from 'react';
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { RECIPIENT_ROLE_TO_EMAIL_TYPE, RECIPIENT_ROLES_DESCRIPTION } from '../../../constants/recipient-roles';
-import { assertOrgEmailSendAllowed } from '../../../server-only/email/assert-org-email-send-allowed';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
 import { updateRecipientNextReminder } from '../../../server-only/recipient/update-recipient-next-reminder';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
@@ -84,7 +84,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     return;
   }
 
-  const { branding, emailLanguage, settings, organisationType, senderEmail, replyToEmail, organisationId } =
+  const { branding, emailLanguage, settings, organisationType, senderEmail, replyToEmail, organisationId, claims } =
     await getEmailContext({
       emailType: 'RECIPIENT',
       source: {
@@ -164,19 +164,22 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
   });
 
   if (isRecipientEmailValidForSending(recipient)) {
-    const sendCheck = await assertOrgEmailSendAllowed({ organisationId });
-
-    if (!sendCheck.allowed) {
-      // TEMPORARY: silent drop on rate-limit hit. Job is consumed and NOT retried.
+    try {
+      await assertOrganisationRatesAndLimits({
+        organisationId,
+        organisationClaim: claims,
+        type: 'email',
+        count: 1,
+      });
+    } catch (_err) {
       io.logger.warn({
         msg: 'Recipient signing email dropped: org rate limit exceeded',
         organisationId,
         recipientId: recipient.id,
         envelopeId: envelope.id,
-        reason: sendCheck.reason,
-        resetsAt: sendCheck.resetsAt,
       });
 
+      // Job is consumed and NOT retried.
       return;
     }
 

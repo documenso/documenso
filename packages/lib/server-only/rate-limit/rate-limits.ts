@@ -97,17 +97,3 @@ export const fileUploadRateLimit = createRateLimit({
   max: 20,
   window: '1m',
 });
-
-// ---- Recipient email send (TEMPORARY: per-org abuse-prevention stopgap) ----
-
-export const recipientEmailRateLimit5m = createRateLimit({
-  action: 'email.send.recipient.5m',
-  max: 100,
-  window: '5m',
-});
-
-export const recipientEmailRateLimit1d = createRateLimit({
-  action: 'email.send.recipient.1d',
-  max: 1500,
-  window: '1d',
-});

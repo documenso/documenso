@@ -1,6 +1,7 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createOrganisationClaimUpsertData } from '@documenso/lib/server-only/organisation/create-organisation';
-import { INTERNAL_CLAIM_ID, internalClaims } from '@documenso/lib/types/subscription';
+import { getSubscriptionClaim } from '@documenso/lib/server-only/subscription/get-subscription-claim';
+import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
 import { prisma } from '@documenso/prisma';
 import { SubscriptionStatus } from '@prisma/client';
 
@@ -85,6 +86,8 @@ export const swapOrganisationSubscriptionRoute = adminProcedure
 
     const customerId = sourceOrg.customerId ?? sourceOrg.subscription.customerId;
 
+    const freeSubscriptionClaim = await getSubscriptionClaim(INTERNAL_CLAIM_ID.FREE);
+
     await prisma.$transaction(async (tx) => {
       // Delete stale INACTIVE subscription on target if present.
       if (targetOrg.subscription) {
@@ -120,6 +123,7 @@ export const swapOrganisationSubscriptionRoute = adminProcedure
             teamCount: sourceOrg.organisationClaim.teamCount,
             memberCount: sourceOrg.organisationClaim.memberCount,
             envelopeItemCount: sourceOrg.organisationClaim.envelopeItemCount,
+            recipientCount: sourceOrg.organisationClaim.recipientCount,
             flags: sourceOrg.organisationClaim.flags,
           },
         });
@@ -131,7 +135,7 @@ export const swapOrganisationSubscriptionRoute = adminProcedure
           where: { id: sourceOrg.organisationClaim.id },
           data: {
             originalSubscriptionClaimId: INTERNAL_CLAIM_ID.FREE,
-            ...createOrganisationClaimUpsertData(internalClaims[INTERNAL_CLAIM_ID.FREE]),
+            ...createOrganisationClaimUpsertData(freeSubscriptionClaim),
           },
         });
       }

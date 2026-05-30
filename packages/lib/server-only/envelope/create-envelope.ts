@@ -36,6 +36,7 @@ import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuthOptions, createRecipientAuthOptions } from '../../utils/document-auth';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-id';
+import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 import { getTeamSettings } from '../team/get-team-settings';
 import { assertUserNotDisabledById } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -152,6 +153,17 @@ export const createEnvelope = async ({
   if (!team) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Team not found',
+    });
+  }
+
+  // Enforce the organisation document-creation limit before doing any work.
+  // Only documents count towards the limit (templates are exempt).
+  if (type === EnvelopeType.DOCUMENT) {
+    await assertOrganisationRatesAndLimits({
+      organisationId: team.organisationId,
+      organisationClaim: team.organisation.organisationClaim,
+      type: 'document',
+      count: 1,
     });
   }
 
