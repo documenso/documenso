@@ -22,6 +22,7 @@ type DatabaseIdPrefix =
   | 'email_domain'
   | 'org'
   | 'org_email'
+  | 'org_monthly_stat'
   | 'org_claim'
   | 'org_group'
   | 'org_sso'

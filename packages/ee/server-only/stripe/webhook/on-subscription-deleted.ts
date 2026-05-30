@@ -1,9 +1,9 @@
 import { createOrganisationClaimUpsertData } from '@documenso/lib/server-only/organisation/create-organisation';
 import type { Stripe } from '@documenso/lib/server-only/stripe';
-import { INTERNAL_CLAIM_ID, internalClaims } from '@documenso/lib/types/subscription';
+import { getSubscriptionClaim } from '@documenso/lib/server-only/subscription/get-subscription-claim';
+import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
 import { prisma } from '@documenso/prisma';
 import { SubscriptionStatus } from '@prisma/client';
-
 import { extractStripeClaimId } from './on-subscription-updated';
 
 export type OnSubscriptionDeletedOptions = {
@@ -34,6 +34,8 @@ export const onSubscriptionDeleted = async ({ subscription }: OnSubscriptionDele
   // Individuals get their subscription deleted so they can return to the
   // free plan.
   if (subscriptionClaimId === INTERNAL_CLAIM_ID.INDIVIDUAL) {
+    const freeSubscriptionClaim = await getSubscriptionClaim(INTERNAL_CLAIM_ID.FREE);
+
     await prisma.$transaction(async (tx) => {
       await tx.subscription.delete({
         where: {
@@ -47,7 +49,7 @@ export const onSubscriptionDeleted = async ({ subscription }: OnSubscriptionDele
         },
         data: {
           originalSubscriptionClaimId: INTERNAL_CLAIM_ID.FREE,
-          ...createOrganisationClaimUpsertData(internalClaims[INTERNAL_CLAIM_ID.FREE]),
+          ...createOrganisationClaimUpsertData(freeSubscriptionClaim),
         },
       });
     });

@@ -84,6 +84,19 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
           },
         },
       },
+      team: {
+        select: {
+          organisation: {
+            select: {
+              organisationClaim: {
+                select: {
+                  recipientCount: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   });
 
@@ -93,6 +106,16 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
 
   if (envelope.recipients.length === 0) {
     throw new Error('Document has no recipients');
+  }
+
+  // A recipientCount of 0 means unlimited recipients are allowed.
+  const maximumRecipientCount = envelope.team.organisation.organisationClaim.recipientCount;
+
+  if (maximumRecipientCount > 0 && envelope.recipients.length > maximumRecipientCount) {
+    throw new AppError('RECIPIENT_LIMIT_EXCEEDED', {
+      message: `You cannot send a document with more than ${maximumRecipientCount} recipients`,
+      statusCode: 400,
+    });
   }
 
   if (isDocumentCompleted(envelope.status)) {
