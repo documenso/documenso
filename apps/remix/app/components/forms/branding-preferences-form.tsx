@@ -87,12 +87,6 @@ export function BrandingPreferencesForm({
       brandingUrl: settings.brandingUrl ?? '',
       brandingLogo: undefined,
       brandingCompanyDetails: settings.brandingCompanyDetails ?? '',
-      brandingLogoSize: (settings.brandingLogoSize ?? undefined) as
-        | 'h-6'
-        | 'h-8'
-        | 'h-12'
-        | 'h-16'
-        | undefined,
       brandingColors: initialColors,
       brandingCss: settings.brandingCss ?? '',
       brandingLogoSize: logoSizeDefault,
@@ -200,7 +194,7 @@ export function BrandingPreferencesForm({
                       {previewUrl ? (
                         <img src={previewUrl} alt="Logo preview" className="h-full w-full object-contain p-4" />
                       ) : (
-                        <div className="relative flex h-full w-full items-center justify-center bg-muted/20 text-sm text-muted-foreground dark:bg-muted">
+                        <div className="relative flex h-full w-full items-center justify-center bg-muted/20 text-muted-foreground text-sm dark:bg-muted">
                           <Trans>Please upload a logo</Trans>
 
                           {!hasLoadedPreview && (
