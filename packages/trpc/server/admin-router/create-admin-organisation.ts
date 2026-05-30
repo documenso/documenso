@@ -1,7 +1,7 @@
 import { createOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
-import { internalClaims } from '@documenso/lib/types/subscription';
+import { getSubscriptionClaim } from '@documenso/lib/server-only/subscription/get-subscription-claim';
+import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
 import { OrganisationType } from '@prisma/client';
-
 import { adminProcedure } from '../trpc';
 import {
   ZCreateAdminOrganisationRequestSchema,
@@ -20,11 +20,13 @@ export const createAdminOrganisationRoute = adminProcedure
       },
     });
 
+    const freeSubscriptionClaim = await getSubscriptionClaim(INTERNAL_CLAIM_ID.FREE);
+
     const organisation = await createOrganisation({
       userId: ownerUserId,
       name: data.name,
       type: OrganisationType.ORGANISATION,
-      claim: internalClaims.free,
+      claim: freeSubscriptionClaim,
     });
 
     return {
