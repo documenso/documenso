@@ -31,10 +31,11 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
 
   const requestMeta = c.get('requestMetadata');
 
-  const { email, name, sub, accessToken, accessTokenExpiresAt, idToken, redirectPath } = await validateOauth({
-    c,
-    clientOptions,
-  });
+  const { email, name, sub, accessToken, accessTokenExpiresAt, idToken, refreshToken, redirectPath } =
+    await validateOauth({
+      c,
+      clientOptions,
+    });
 
   if (email.toLowerCase() === legacyServiceAccountEmail() || email.toLowerCase() === deletedServiceAccountEmail()) {
     return c.text('FORBIDDEN', 403);
@@ -57,6 +58,17 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
 
   // Directly log in user if account already exists.
   if (existingAccount) {
+    // Update the stored OAuth tokens so session validation uses fresh values.
+    await prisma.account.update({
+      where: { id: existingAccount.id },
+      data: {
+        access_token: accessToken,
+        ...(refreshToken ? { refresh_token: refreshToken } : {}),
+        expires_at: Math.floor(accessTokenExpiresAt.getTime() / 1000),
+        id_token: idToken,
+      },
+    });
+
     await onAuthorize({ userId: existingAccount.user.id }, c);
 
     return c.redirect(redirectPath, 302);
@@ -81,6 +93,7 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
           provider: clientOptions.id,
           providerAccountId: sub,
           access_token: accessToken,
+          refresh_token: refreshToken,
           expires_at: Math.floor(accessTokenExpiresAt.getTime() / 1000),
           token_type: 'Bearer',
           id_token: idToken,
@@ -164,6 +177,7 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
         provider: clientOptions.id,
         providerAccountId: sub,
         access_token: accessToken,
+        refresh_token: refreshToken,
         expires_at: Math.floor(accessTokenExpiresAt.getTime() / 1000),
         token_type: 'Bearer',
         id_token: idToken,
@@ -228,6 +242,7 @@ export const validateOauth = async (options: HandleOAuthCallbackUrlOptions) => {
   const accessToken = tokens.accessToken();
   const accessTokenExpiresAt = tokens.accessTokenExpiresAt();
   const idToken = tokens.idToken();
+  const refreshToken = tokens.refreshToken() ?? null;
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const claims = decodeIdToken(tokens.idToken()) as Record<string, unknown>;
@@ -267,6 +282,7 @@ export const validateOauth = async (options: HandleOAuthCallbackUrlOptions) => {
     accessToken,
     accessTokenExpiresAt,
     idToken,
+    refreshToken,
     redirectPath,
   };
 };
