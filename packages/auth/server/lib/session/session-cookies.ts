@@ -92,3 +92,35 @@ export const setCsrfCookie = async (c: Context) => {
 
   return csrfToken;
 };
+
+export const oauth2faPendingCookieName = formatSecureCookieName('oauth2faPending');
+
+export const setOAuth2faPendingCookie = async (c: Context, data: { userId: number; redirectPath: string }) => {
+  await setSignedCookie(c, oauth2faPendingCookieName, JSON.stringify(data), getAuthSecret(), {
+    ...sessionCookieOptions,
+    expires: new Date(Date.now() + 1000 * 60 * 5), // 5 minutes
+  }).catch((err) => {
+    appLog('SetOAuth2faPendingCookie', `Error setting signed cookie: ${err}`);
+    throw err;
+  });
+};
+
+export const getOAuth2faPendingCookie = async (
+  c: Context,
+): Promise<{ userId: number; redirectPath: string } | null> => {
+  const cookieStr = await getSignedCookie(c, getAuthSecret(), oauth2faPendingCookieName);
+
+  if (!cookieStr) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(cookieStr);
+  } catch {
+    return null;
+  }
+};
+
+export const deleteOAuth2faPendingCookie = (c: Context) => {
+  deleteCookie(c, oauth2faPendingCookieName, sessionCookieOptions);
+};
