@@ -19,7 +19,8 @@ import {
   SigningStatus,
   WebhookTriggerEvents,
 } from '@prisma/client';
-
+import { DateTime } from 'luxon';
+import { IS_BILLING_ENABLED } from '../../constants/app';
 import type {
   TDocumentAccessAuthTypes,
   TDocumentActionAuthTypes,
@@ -29,6 +30,7 @@ import type {
 import type { TDocumentFormValues } from '../../types/document-form-values';
 import type { TEnvelopeAttachmentType } from '../../types/envelope-attachment';
 import type { TFieldAndMeta } from '../../types/field-meta';
+import { INTERNAL_CLAIM_ID } from '../../types/subscription';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
@@ -324,6 +326,43 @@ export const createEnvelope = async ({
   const envelopeOwnerId = delegatedOwner?.id ?? userId;
 
   const createdEnvelope = await prisma.$transaction(async (tx) => {
+    // Acquire a row-level lock to prevent concurrent quota bypasses for free tier organisations
+    if (
+      type === EnvelopeType.DOCUMENT &&
+      IS_BILLING_ENABLED() &&
+      team.organisation.organisationClaim.id === INTERNAL_CLAIM_ID.FREE
+    ) {
+      // Lock the organisation row to serialize concurrent checks
+      await tx.$executeRaw`
+        SELECT id FROM "Organisation" 
+        WHERE id = ${team.organisationId} 
+        FOR UPDATE
+      `;
+
+      // Re-verify the current month document count inside the locked transaction
+      const currentCount = await tx.envelope.count({
+        where: {
+          type: EnvelopeType.DOCUMENT,
+          team: {
+            organisationId: team.organisationId,
+          },
+          createdAt: {
+            gte: DateTime.utc().startOf('month').toJSDate(),
+          },
+          source: {
+            not: DocumentSource.TEMPLATE_DIRECT_LINK,
+          },
+        },
+      });
+
+      if (currentCount >= 5) {
+        throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
+          message: 'You have reached your document limit for this month. Please upgrade your plan.',
+          statusCode: 400,
+        });
+      }
+    }
+
     const envelope = await tx.envelope.create({
       data: {
         id: prefixedId('envelope'),

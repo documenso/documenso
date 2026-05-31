@@ -4,6 +4,7 @@ import { convertToPdf } from '@documenso/lib/server-only/document-conversion';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import { extractPdfPlaceholders } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
+import { documentCreationRateLimit } from '@documenso/lib/server-only/rate-limit/rate-limits';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { EnvelopeType } from '@prisma/client';
@@ -86,6 +87,20 @@ export const createEnvelopeRouteCaller = async ({
     attachments,
     delegatedDocumentOwner,
   } = payload;
+
+  if (type === EnvelopeType.DOCUMENT) {
+    const rateLimitResult = await documentCreationRateLimit.check({
+      ip: apiRequestMetadata.requestMetadata.ipAddress ?? 'unknown',
+      identifier: String(userId),
+    });
+
+    if (rateLimitResult.isLimited) {
+      throw new AppError(AppErrorCode.TOO_MANY_REQUESTS, {
+        message: 'Too many envelope creation requests. Please wait a few seconds and try again.',
+        statusCode: 429,
+      });
+    }
+  }
 
   const { remaining, maximumEnvelopeItemCount } = await getServerLimits({
     userId,

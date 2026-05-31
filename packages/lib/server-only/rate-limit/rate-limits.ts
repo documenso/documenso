@@ -97,3 +97,11 @@ export const fileUploadRateLimit = createRateLimit({
   max: 20,
   window: '1m',
 });
+
+// ---- Document Creation (Rate lock to prevent S3 leak/PDF CPU exhaust) ----
+
+export const documentCreationRateLimit = createRateLimit({
+  action: 'api.document-creation',
+  max: 1,
+  window: '3s',
+});
