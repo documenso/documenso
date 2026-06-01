@@ -1,4 +1,8 @@
-import { isEmailDomainAllowedForSignup, isSignupEnabledForProvider } from '@documenso/lib/constants/auth';
+import {
+  isDisposableEmail,
+  isEmailDomainAllowedForSignup,
+  isSignupEnabledForProvider,
+} from '@documenso/lib/constants/auth';
 import { EMAIL_VERIFICATION_STATE } from '@documenso/lib/constants/email';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { jobsClient } from '@documenso/lib/jobs/client';
@@ -18,6 +22,7 @@ import {
   signupRateLimit,
   verifyEmailRateLimit,
 } from '@documenso/lib/server-only/rate-limit/rate-limits';
+import { getEmailBlocklistDomains } from '@documenso/lib/server-only/site-settings/get-email-blocklist-domains';
 import { createUser } from '@documenso/lib/server-only/user/create-user';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
 import { getMostRecentEmailVerificationToken } from '@documenso/lib/server-only/user/get-most-recent-email-verification-token';
@@ -167,12 +172,8 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       });
     }
 
-    if (user.disabled) {
-      throw new AppError('ACCOUNT_DISABLED', {
-        message: 'Account disabled',
-      });
-    }
-
+    // The disabled check now lives inside `onAuthorize` so every sign-in path
+    // (password, passkey, OAuth, OIDC) shares the same enforcement.
     await onAuthorize({ userId: user.id }, c);
 
     return c.text('', 201);
@@ -210,6 +211,14 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
     if (!isEmailDomainAllowedForSignup(email)) {
       throw new AppError(AuthenticationErrorCode.SignupDisabled, {
+        statusCode: 400,
+      });
+    }
+
+    const additionalBlockedDomains = await getEmailBlocklistDomains();
+
+    if (isDisposableEmail(email, additionalBlockedDomains)) {
+      throw new AppError(AuthenticationErrorCode.SignupDisposableEmail, {
         statusCode: 400,
       });
     }

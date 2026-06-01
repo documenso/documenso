@@ -66,6 +66,7 @@ export type EmailContextResponse = {
   branding: BrandingSettings;
   settings: Omit<OrganisationGlobalSettings, 'id'>;
   claims: OrganisationClaim;
+  organisationId: string;
   organisationType: OrganisationType;
   senderEmail: {
     name: string;
@@ -164,6 +165,7 @@ const handleOrganisationEmailContext = async (organisationId: string) => {
     ),
     settings: organisation.organisationGlobalSettings,
     claims,
+    organisationId: organisation.id,
     organisationType: organisation.type,
   };
 };
@@ -208,6 +210,7 @@ const handleTeamEmailContext = async (teamId: number) => {
     branding: teamGlobalSettingsToBranding(teamSettings, teamId, claims.flags.hidePoweredBy ?? false),
     settings: teamSettings,
     claims,
+    organisationId: organisation.id,
     organisationType: organisation.type,
   };
 };

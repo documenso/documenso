@@ -20,6 +20,8 @@ import { useForm } from 'react-hook-form';
 import { Link } from 'react-router';
 import type { z } from 'zod';
 
+import { ClaimLimitFields } from '../general/claim-limit-fields';
+
 export type SubscriptionClaimFormValues = z.infer<typeof ZCreateSubscriptionClaimRequestSchema>;
 
 type SubscriptionClaimFormProps = {
@@ -49,7 +51,14 @@ export const SubscriptionClaimForm = ({
       teamCount: subscriptionClaim.teamCount,
       memberCount: subscriptionClaim.memberCount,
       envelopeItemCount: subscriptionClaim.envelopeItemCount,
+      recipientCount: subscriptionClaim.recipientCount,
       flags: subscriptionClaim.flags,
+      documentRateLimits: subscriptionClaim.documentRateLimits,
+      documentQuota: subscriptionClaim.documentQuota,
+      emailRateLimits: subscriptionClaim.emailRateLimits,
+      emailQuota: subscriptionClaim.emailQuota,
+      apiRateLimits: subscriptionClaim.apiRateLimits,
+      apiQuota: subscriptionClaim.apiQuota,
     },
   });
 
@@ -145,6 +154,30 @@ export const SubscriptionClaimForm = ({
             )}
           />
 
+          <FormField
+            control={form.control}
+            name="recipientCount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Recipient Count</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                  />
+                </FormControl>
+                <FormDescription>
+                  <Trans>Maximum number of recipients per document allowed. 0 = Unlimited</Trans>
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <div>
             <FormLabel>
               <Trans>Feature Flags</Trans>
@@ -202,6 +235,8 @@ export const SubscriptionClaimForm = ({
               </Alert>
             )}
           </div>
+
+          <ClaimLimitFields control={form.control} disabled={form.formState.isSubmitting} />
 
           {formSubmitTrigger}
         </fieldset>
