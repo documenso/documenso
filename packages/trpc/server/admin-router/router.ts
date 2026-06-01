@@ -17,6 +17,7 @@ import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
 import { findDocumentJobsRoute } from './find-document-jobs';
 import { findDocumentsRoute } from './find-documents';
 import { findEmailDomainsRoute } from './find-email-domains';
+import { findOrganisationStatsRoute } from './find-organisation-stats';
 import { findSubscriptionClaimsRoute } from './find-subscription-claims';
 import { findUnsealedDocumentsRoute } from './find-unsealed-documents';
 import { findUserTeamsRoute } from './find-user-teams';
@@ -47,6 +48,7 @@ export const adminRouter = router({
     delete: deleteOrganisationRoute,
     swapSubscription: swapOrganisationSubscriptionRoute,
     resetMonthlyStat: resetOrganisationMonthlyStatRoute,
+    findStats: findOrganisationStatsRoute,
   },
   organisationMember: {
     promoteToOwner: promoteMemberToOwnerRoute,

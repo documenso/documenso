@@ -2,7 +2,7 @@ import { prisma } from '@documenso/prisma';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobsClient } from '../../jobs/client';
 import { generateDatabaseId } from '../../universal/id';
-import { currentMonthlyPeriod } from './current-monthly-period';
+import { currentMonthlyPeriod } from '../../universal/monthly-period';
 import type { LimitCounter } from './types';
 
 type CheckMonthlyQuotaOptions = {
