@@ -69,6 +69,7 @@ export const upsertFieldRect = (field: FieldToRender, options: RenderFieldElemen
 export const createSpinner = ({ fieldWidth, fieldHeight }: { fieldWidth: number; fieldHeight: number }) => {
   const loadingGroup = new Konva.Group({
     name: 'loading-spinner-group',
+    listening: false,
   });
 
   const rect = new Konva.Rect({
