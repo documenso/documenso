@@ -89,12 +89,14 @@ COPY --from=builder /app/patches ./patches
 # Copy schema.prisma to generate client before making node_modules read-only
 COPY --from=installer /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
 
-# Install production dependencies, generate prisma client, and make node_modules read-only
+# Install production dependencies, generate prisma client, clean up dev binaries, and make node_modules read-only
 RUN npm ci --omit=dev --ignore-scripts \
     && npm prune --omit=dev \
     && npx prisma generate --schema ./packages/prisma/schema.prisma \
     && rm -rf ./packages/prisma/schema.prisma \
+    && rm -rf /app/node_modules/esbuild /app/node_modules/@esbuild /app/node_modules/typescript /app/node_modules/tsx \
     && chmod -R a-w /app/node_modules
+
 
 ###########################
 #     RUNNER CONTAINER    #
