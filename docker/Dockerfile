@@ -86,9 +86,14 @@ COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/package-lock.json ./package-lock.json
 COPY --from=builder /app/patches ./patches
 
-# Install strictly production dependencies and make node_modules read-only
+# Copy schema.prisma to generate client before making node_modules read-only
+COPY --from=installer /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
+
+# Install production dependencies, generate prisma client, and make node_modules read-only
 RUN npm ci --omit=dev --ignore-scripts \
     && npm prune --omit=dev \
+    && npx prisma generate --schema ./packages/prisma/schema.prisma \
+    && rm -rf ./packages/prisma/schema.prisma \
     && chmod -R a-w /app/node_modules
 
 ###########################
@@ -120,13 +125,11 @@ COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/public ./apps/remix/
 # Copy only the schema.prisma needed for the client (migrations are excluded from runtime container)
 COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
 
-# Generate the prisma client during build time
-RUN npx prisma generate --schema ./packages/prisma/schema.prisma
-
 # Get the start script from docker/
 COPY --chown=nodejs:nodejs ./docker/start.sh /app/apps/remix/start.sh
 
 WORKDIR /app/apps/remix
 
 CMD ["sh", "start.sh"]
+
 
