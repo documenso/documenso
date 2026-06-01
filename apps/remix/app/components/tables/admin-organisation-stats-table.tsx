@@ -41,7 +41,7 @@ export const AdminOrganisationStatsTable = () => {
   const orderByColumn = parseOrderByColumn(searchParams?.get('orderByColumn') ?? undefined);
   const orderByDirection = parseOrderByDirection(searchParams?.get('orderByDirection') ?? undefined);
 
-  const { data, isLoading, isLoadingError } = trpc.admin.organisation.findStats.useQuery({
+  const { data, isLoading, isLoadingError } = trpc.admin.organisation.stats.find.useQuery({
     query: parsedSearchParams.query,
     page: parsedSearchParams.page,
     perPage: parsedSearchParams.perPage,

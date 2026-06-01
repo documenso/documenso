@@ -32,6 +32,7 @@ import { resetOrganisationMonthlyStatRoute } from './reset-organisation-monthly-
 import { resetTwoFactorRoute } from './reset-two-factor-authentication';
 import { resyncLicenseRoute } from './resync-license';
 import { swapOrganisationSubscriptionRoute } from './swap-organisation-subscription';
+import { syncOrganisationSubscriptionRoute } from './sync-organisation-subscription';
 import { updateAdminOrganisationRoute } from './update-admin-organisation';
 import { updateOrganisationMemberRoleRoute } from './update-organisation-member-role';
 import { updateRecipientRoute } from './update-recipient';
@@ -46,9 +47,14 @@ export const adminRouter = router({
     create: createAdminOrganisationRoute,
     update: updateAdminOrganisationRoute,
     delete: deleteOrganisationRoute,
-    swapSubscription: swapOrganisationSubscriptionRoute,
-    resetMonthlyStat: resetOrganisationMonthlyStatRoute,
-    findStats: findOrganisationStatsRoute,
+    subscription: {
+      swap: swapOrganisationSubscriptionRoute,
+      sync: syncOrganisationSubscriptionRoute,
+    },
+    stats: {
+      find: findOrganisationStatsRoute,
+      reset: resetOrganisationMonthlyStatRoute,
+    },
   },
   organisationMember: {
     promoteToOwner: promoteMemberToOwnerRoute,
