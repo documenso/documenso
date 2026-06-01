@@ -43,19 +43,6 @@ ENV HUSKY 0
 ENV DOCKER_OUTPUT 1
 ENV NEXT_TELEMETRY_DISABLED 1
 
-# Encryption keys
-ARG NEXT_PRIVATE_ENCRYPTION_KEY="CAFEBABE"
-ENV NEXT_PRIVATE_ENCRYPTION_KEY="$NEXT_PRIVATE_ENCRYPTION_KEY"
-
-ARG NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="DEADBEEF"
-ENV NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="$NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY"
-
-# Telemetry credentials (optional, baked into image at build time)
-ARG NEXT_PRIVATE_TELEMETRY_KEY=""
-ENV NEXT_PRIVATE_TELEMETRY_KEY="$NEXT_PRIVATE_TELEMETRY_KEY"
-
-ARG NEXT_PRIVATE_TELEMETRY_HOST=""
-ENV NEXT_PRIVATE_TELEMETRY_HOST="$NEXT_PRIVATE_TELEMETRY_HOST"
 
 
 # Uncomment and use build args to enable remote caching
@@ -84,19 +71,33 @@ RUN npm install -g "turbo@^1.9.3"
 RUN turbo run build --filter=@documenso/remix...
 
 ###########################
+#    PROD-DEPS CONTAINER  #
+###########################
+FROM base AS prod-deps
+
+RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache jq
+# Required for node_modules/aws-crt
+RUN apk add --no-cache make cmake g++ openssl bash
+
+WORKDIR /app
+
+COPY --from=builder /app/out/json/ .
+COPY --from=builder /app/out/package-lock.json ./package-lock.json
+COPY --from=builder /app/patches ./patches
+
+# Install strictly production dependencies and make node_modules read-only
+RUN npm ci --omit=dev --ignore-scripts \
+    && npm prune --omit=dev \
+    && chmod -R a-w /app/node_modules
+
+###########################
 #     RUNNER CONTAINER    #
 ###########################
 FROM base AS runner
 
 ENV HUSKY 0
 ENV DOCKER_OUTPUT 1
-
-# Telemetry credentials (baked into image at build time, can be disabled at runtime)
-ARG NEXT_PRIVATE_TELEMETRY_KEY=""
-ENV NEXT_PRIVATE_TELEMETRY_KEY="$NEXT_PRIVATE_TELEMETRY_KEY"
-
-ARG NEXT_PRIVATE_TELEMETRY_HOST=""
-ENV NEXT_PRIVATE_TELEMETRY_HOST="$NEXT_PRIVATE_TELEMETRY_HOST"
 
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
@@ -106,26 +107,21 @@ USER nodejs
 
 WORKDIR /app
 
-COPY --from=builder --chown=nodejs:nodejs /app/out/json/ .
-# Copy the tailwind config files across
-COPY --from=builder --chown=nodejs:nodejs /app/out/full/packages/tailwind-config ./packages/tailwind-config
-# Copy the patches across
-COPY --from=builder --chown=nodejs:nodejs /app/patches ./patches
+# Allowlist production-only dependencies and manifests
+COPY --from=prod-deps --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/out/json/package.json ./package.json
+COPY --from=builder --chown=nodejs:nodejs /app/out/json/apps/remix/package.json ./apps/remix/package.json
+COPY --from=builder --chown=nodejs:nodejs /app/out/json/packages/prisma/package.json ./packages/prisma/package.json
 
-RUN npm ci --only=production
-
-# Automatically leverage output traces to reduce image size
-# https://nodejs.org/docs/advanced-features/output-file-tracing
+# Copy Remix build output (absolutely zero original source code)
 COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/build ./apps/remix/build
 COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/public ./apps/remix/public
 
-# Copy the prisma binary, schema and migrations
+# Copy only the schema.prisma needed for the client (migrations are excluded from runtime container)
 COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
-COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/migrations ./packages/prisma/migrations
 
-# Generate the prisma client again
+# Generate the prisma client during build time
 RUN npx prisma generate --schema ./packages/prisma/schema.prisma
-
 
 # Get the start script from docker/
 COPY --chown=nodejs:nodejs ./docker/start.sh /app/apps/remix/start.sh
@@ -133,3 +129,4 @@ COPY --chown=nodejs:nodejs ./docker/start.sh /app/apps/remix/start.sh
 WORKDIR /app/apps/remix
 
 CMD ["sh", "start.sh"]
+
