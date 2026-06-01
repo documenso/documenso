@@ -77,6 +77,10 @@ export default function OrganisationStats() {
       params.delete('query');
     }
 
+    if ((searchParams?.get('query') || '') !== debouncedSearchQuery) {
+      params.delete('page');
+    }
+
     // If nothing to change then do nothing.
     if (params.toString() === searchParams?.toString()) {
       return;
