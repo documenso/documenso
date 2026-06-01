@@ -49,7 +49,7 @@ export const AdminOrganisationSyncSubscriptionDialog = ({
     },
   });
 
-  const { mutateAsync: syncSubscription } = trpc.admin.organisation.syncSubscription.useMutation();
+  const { mutateAsync: syncSubscription } = trpc.admin.organisation.subscription.sync.useMutation();
 
   const onFormSubmit = async (values: TAdminOrganisationSyncSubscriptionFormSchema) => {
     try {

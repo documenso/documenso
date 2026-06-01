@@ -47,10 +47,14 @@ export const adminRouter = router({
     create: createAdminOrganisationRoute,
     update: updateAdminOrganisationRoute,
     delete: deleteOrganisationRoute,
-    swapSubscription: swapOrganisationSubscriptionRoute,
-    syncSubscription: syncOrganisationSubscriptionRoute,
-    resetMonthlyStat: resetOrganisationMonthlyStatRoute,
-    findStats: findOrganisationStatsRoute,
+    subscription: {
+      swap: swapOrganisationSubscriptionRoute,
+      sync: syncOrganisationSubscriptionRoute,
+    },
+    stats: {
+      find: findOrganisationStatsRoute,
+      reset: resetOrganisationMonthlyStatRoute,
+    },
   },
   organisationMember: {
     promoteToOwner: promoteMemberToOwnerRoute,
