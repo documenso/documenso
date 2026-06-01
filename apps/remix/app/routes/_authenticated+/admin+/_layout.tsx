@@ -10,6 +10,7 @@ import {
   BarChart3,
   Building2Icon,
   FileStack,
+  LineChartIcon,
   MailIcon,
   Settings,
   Trophy,
@@ -150,6 +151,20 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
             <Link to="/admin/organisation-insights">
               <Trophy className="mr-2 h-5 w-5" />
               <Trans>Organisation Insights</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/organisation-stats') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/organisation-stats">
+              <LineChartIcon className="mr-2 h-5 w-5" />
+              <Trans>Organisation Stats</Trans>
             </Link>
           </Button>
 

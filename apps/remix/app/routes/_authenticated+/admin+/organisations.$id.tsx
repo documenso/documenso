@@ -40,9 +40,12 @@ import type { z } from 'zod';
 import { AdminOrganisationDeleteDialog } from '~/components/dialogs/admin-organisation-delete-dialog';
 import { AdminOrganisationMemberDeleteDialog } from '~/components/dialogs/admin-organisation-member-delete-dialog';
 import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
+import { AdminOrganisationSyncSubscriptionDialog } from '~/components/dialogs/admin-organisation-sync-subscription-dialog';
 import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
 import { AdminGlobalSettingsSection } from '~/components/general/admin-global-settings-section';
+import { ClaimLimitFields } from '~/components/general/claim-limit-fields';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
+import { OrganisationUsagePanel } from '~/components/general/organisation-usage-panel';
 import { SettingsHeader } from '~/components/general/settings-header';
 
 import type { Route } from './+types/organisations.$id';
@@ -293,6 +296,14 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
             </DetailsValue>
           </DetailsCard>
         </div>
+
+        <div className="mt-4">
+          <OrganisationUsagePanel
+            organisationId={organisation.id}
+            monthlyStats={organisation.monthlyStats}
+            organisationClaim={organisation.organisationClaim}
+          />
+        </div>
       </div>
 
       <div className="mt-6 rounded-lg border p-4">
@@ -367,7 +378,16 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
         )}
 
         {organisation.subscription && (
-          <div>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <AdminOrganisationSyncSubscriptionDialog
+              organisationId={organisationId}
+              trigger={
+                <Button variant="outline">
+                  <Trans>Sync Stripe subscription</Trans>
+                </Button>
+              }
+            />
+
             <Button variant="outline" asChild>
               <Link
                 target="_blank"
@@ -565,7 +585,23 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
         teamCount: organisation.organisationClaim.teamCount,
         memberCount: organisation.organisationClaim.memberCount,
         envelopeItemCount: organisation.organisationClaim.envelopeItemCount,
+        recipientCount: organisation.organisationClaim.recipientCount,
         flags: organisation.organisationClaim.flags,
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        documentRateLimits: organisation.organisationClaim.documentRateLimits as NonNullable<
+          TUpdateOrganisationBillingFormSchema['claims']
+        >['documentRateLimits'],
+        documentQuota: organisation.organisationClaim.documentQuota,
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        emailRateLimits: organisation.organisationClaim.emailRateLimits as NonNullable<
+          TUpdateOrganisationBillingFormSchema['claims']
+        >['emailRateLimits'],
+        emailQuota: organisation.organisationClaim.emailQuota,
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        apiRateLimits: organisation.organisationClaim.apiRateLimits as NonNullable<
+          TUpdateOrganisationBillingFormSchema['claims']
+        >['apiRateLimits'],
+        apiQuota: organisation.organisationClaim.apiQuota,
       },
       originalSubscriptionClaimId: organisation.organisationClaim.originalSubscriptionClaimId || '',
     },
@@ -745,6 +781,30 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="claims.recipientCount"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                <Trans>Recipient Count</Trans>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  min={0}
+                  {...field}
+                  onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                />
+              </FormControl>
+              <FormDescription>
+                <Trans>Maximum number of recipients per document allowed. 0 = Unlimited</Trans>
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <div>
           <FormLabel>
             <Trans>Feature Flags</Trans>
@@ -802,6 +862,8 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
             </Alert>
           )}
         </div>
+
+        <ClaimLimitFields control={form.control} prefix="claims." />
 
         <div className="flex justify-end">
           <Button type="submit" loading={form.formState.isSubmitting}>

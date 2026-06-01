@@ -240,7 +240,7 @@ export const CheckboxFieldAdvancedSettings = ({
               />
               <button
                 type="button"
-                className="col-span-1 mt-auto inline-flex h-10 w-10 items-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+                className="col-span-1 mt-auto inline-flex h-10 w-10 items-center text-muted-foreground hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={() => removeValue(index)}
               >
                 <Trash className="h-5 w-5" />
