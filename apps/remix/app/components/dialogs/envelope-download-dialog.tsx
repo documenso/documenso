@@ -103,6 +103,7 @@ export const EnvelopeDownloadDialog = ({
   );
 
   const envelopeItems = envelopeItemsPayload?.data || [];
+  const isQrToken = Boolean(token?.startsWith('qr_'));
 
   const onDownload = async (envelopeItem: EnvelopeItemToDownload, version: 'original' | 'signed' | 'pending') => {
     const { id: envelopeItemId } = envelopeItem;
@@ -160,41 +161,41 @@ export const EnvelopeDownloadDialog = ({
         </DialogHeader>
 
         <div className="flex w-full flex-col gap-4 overflow-hidden">
-          {isLoadingEnvelopeItems
-            ? Array.from({ length: 1 }).map((_, index) => (
-                <div key={index} className="flex items-center gap-2 rounded-lg border border-border bg-card p-4">
-                  <Skeleton className="h-10 w-10 flex-shrink-0 rounded-lg" />
+          {isLoadingEnvelopeItems ? (
+            <div className="flex items-center gap-2 rounded-lg border border-border bg-card p-4">
+              <Skeleton className="h-10 w-10 flex-shrink-0 rounded-lg" />
 
-                  <div className="flex w-full flex-col gap-2">
-                    <Skeleton className="h-4 w-28 rounded-lg" />
-                    <Skeleton className="h-4 w-20 rounded-lg" />
+              <div className="flex w-full flex-col gap-2">
+                <Skeleton className="h-4 w-28 rounded-lg" />
+                <Skeleton className="h-4 w-20 rounded-lg" />
+              </div>
+
+              <Skeleton className="h-10 w-20 flex-shrink-0 rounded-lg" />
+            </div>
+          ) : (
+            envelopeItems.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-accent/50"
+              >
+                <div className="flex-shrink-0">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                    <FileTextIcon className="h-5 w-5 text-primary" />
                   </div>
-
-                  <Skeleton className="h-10 w-20 flex-shrink-0 rounded-lg" />
                 </div>
-              ))
-            : envelopeItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-accent/50"
-                >
-                  <div className="flex-shrink-0">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                      <FileTextIcon className="h-5 w-5 text-primary" />
-                    </div>
-                  </div>
 
-                  <div className="min-w-0 flex-1">
-                    {/* Todo: Envelopes - Fix overflow */}
-                    <h4 className="truncate font-medium text-foreground text-sm" title={item.title}>
-                      {item.title}
-                    </h4>
-                    <p className="mt-0.5 text-muted-foreground text-xs">
-                      <Trans>PDF Document</Trans>
-                    </p>
-                  </div>
+                <div className="min-w-0 flex-1">
+                  {/* Todo: Envelopes - Fix overflow */}
+                  <h4 className="truncate font-medium text-foreground text-sm" title={item.title}>
+                    {item.title}
+                  </h4>
+                  <p className="mt-0.5 text-muted-foreground text-xs">
+                    <Trans>PDF Document</Trans>
+                  </p>
+                </div>
 
-                  <div className="flex flex-shrink-0 items-center gap-2">
+                <div className="flex flex-shrink-0 items-center gap-2">
+                  {!isQrToken && (
                     <Button
                       variant="outline"
                       size="sm"
@@ -207,24 +208,26 @@ export const EnvelopeDownloadDialog = ({
                       )}
                       <Trans context="Original document (adjective)">Original</Trans>
                     </Button>
+                  )}
 
-                    {secondaryDownload && (
-                      <Button
-                        variant="default"
-                        size="sm"
-                        className="text-xs"
-                        onClick={async () => onDownload(item, secondaryDownload.version)}
-                        loading={isDownloadingState[generateDownloadKey(item.id, secondaryDownload.version)]}
-                      >
-                        {!isDownloadingState[generateDownloadKey(item.id, secondaryDownload.version)] && (
-                          <DownloadIcon className="mr-2 h-4 w-4" />
-                        )}
-                        {secondaryDownload.label}
-                      </Button>
-                    )}
-                  </div>
+                  {secondaryDownload && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="text-xs"
+                      onClick={async () => onDownload(item, secondaryDownload.version)}
+                      loading={isDownloadingState[generateDownloadKey(item.id, secondaryDownload.version)]}
+                    >
+                      {!isDownloadingState[generateDownloadKey(item.id, secondaryDownload.version)] && (
+                        <DownloadIcon className="mr-2 h-4 w-4" />
+                      )}
+                      {secondaryDownload.label}
+                    </Button>
+                  )}
                 </div>
-              ))}
+              </div>
+            ))
+          )}
         </div>
       </DialogContent>
     </Dialog>

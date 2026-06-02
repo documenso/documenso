@@ -1,8 +1,9 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { getOrganisationTemplateWhereInput } from '@documenso/lib/server-only/template/get-organisation-template-by-id';
+import { isPublicDocumentAccessEnabled } from '@documenso/lib/universal/document-access';
 import { prisma } from '@documenso/prisma';
-import { EnvelopeType } from '@prisma/client';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
 
 import { maybeAuthenticatedProcedure } from '../trpc';
 import {
@@ -56,20 +57,32 @@ export const getEnvelopeItemsByTokenRoute = maybeAuthenticatedProcedure
   });
 
 const handleGetEnvelopeItemsByToken = async ({ envelopeId, token }: { envelopeId: string; token: string }) => {
+  const isQrToken = token.startsWith('qr_');
+
   const envelope = await prisma.envelope.findFirst({
     where: {
       id: envelopeId,
-      type: EnvelopeType.DOCUMENT, // You cannot get template envelope items by token.
-      recipients: {
-        some: {
-          token,
-        },
-      },
+      type: EnvelopeType.DOCUMENT,
+      ...(isQrToken ? { qrToken: token, status: DocumentStatus.COMPLETED } : { recipients: { some: { token } } }),
     },
     include: {
       envelopeItems: {
         include: {
           documentData: true,
+        },
+      },
+      team: {
+        include: {
+          teamGlobalSettings: {
+            select: { allowPublicCompletedDocumentAccess: true },
+          },
+          organisation: {
+            include: {
+              organisationGlobalSettings: {
+                select: { allowPublicCompletedDocumentAccess: true },
+              },
+            },
+          },
         },
       },
     },
@@ -78,6 +91,12 @@ const handleGetEnvelopeItemsByToken = async ({ envelopeId, token }: { envelopeId
   if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Envelope could not be found',
+    });
+  }
+
+  if (isQrToken && !isPublicDocumentAccessEnabled(envelope.team)) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'Public completed-document access is disabled',
     });
   }
 

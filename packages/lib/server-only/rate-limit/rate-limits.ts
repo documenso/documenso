@@ -97,3 +97,10 @@ export const fileUploadRateLimit = createRateLimit({
   max: 20,
   window: '1m',
 });
+
+export const qrShareViewRateLimit = createRateLimit({
+  action: 'app.qr-share-view',
+  max: 20,
+  globalMax: 120,
+  window: '1m',
+});
