@@ -3,6 +3,22 @@ import type { SubscriptionClaim } from '@prisma/client';
 import { z } from 'zod';
 
 /**
+ * Rate limit window schema.
+ *
+ * Example: "5m", "1h", "1d"
+ */
+export const ZRateLimitWindowSchema = z.string().regex(/^\d+[smhd]$/);
+
+export const ZRateLimitArraySchema = z.array(
+  z.object({
+    window: ZRateLimitWindowSchema,
+    max: z.number().int().positive(),
+  }),
+);
+
+export type TRateLimitArray = z.infer<typeof ZRateLimitArraySchema>;
+
+/**
  * README:
  * - If you update this you MUST update the `backport-subscription-claims` schema as well.
  */
@@ -123,15 +139,33 @@ export type InternalClaims = {
   [key in INTERNAL_CLAIM_ID]: InternalClaim;
 };
 
+/**
+ * TODO: THIS NEEDS A REWORK
+ *
+ * Only the values within "free" claim (flags, etc) are directly used, the rest are taken
+ * from the actual SubscriptionClaim in the database.
+ *
+ * We need to remove all the content besides id/name and fetch free from the database.
+ */
 export const internalClaims: InternalClaims = {
+  /**
+   * Free plan has no rates and quotas since this may break self-hosters.
+   */
   [INTERNAL_CLAIM_ID.FREE]: {
     id: INTERNAL_CLAIM_ID.FREE,
     name: 'Free',
     teamCount: 1,
     memberCount: 1,
     envelopeItemCount: 5,
+    recipientCount: 0,
     locked: true,
     flags: {},
+    documentRateLimits: [],
+    documentQuota: null,
+    emailRateLimits: [],
+    emailQuota: null,
+    apiRateLimits: [],
+    apiQuota: null,
   },
   [INTERNAL_CLAIM_ID.INDIVIDUAL]: {
     id: INTERNAL_CLAIM_ID.INDIVIDUAL,
@@ -139,11 +173,18 @@ export const internalClaims: InternalClaims = {
     teamCount: 1,
     memberCount: 1,
     envelopeItemCount: 5,
+    recipientCount: 0,
     locked: true,
     flags: {
       unlimitedDocuments: true,
       signingReminders: true,
     },
+    documentRateLimits: [],
+    documentQuota: null,
+    emailRateLimits: [],
+    emailQuota: null,
+    apiRateLimits: [],
+    apiQuota: null,
   },
   [INTERNAL_CLAIM_ID.TEAM]: {
     id: INTERNAL_CLAIM_ID.TEAM,
@@ -151,6 +192,7 @@ export const internalClaims: InternalClaims = {
     teamCount: 1,
     memberCount: 5,
     envelopeItemCount: 5,
+    recipientCount: 0,
     locked: true,
     flags: {
       unlimitedDocuments: true,
@@ -158,6 +200,12 @@ export const internalClaims: InternalClaims = {
       embedSigning: true,
       signingReminders: true,
     },
+    documentRateLimits: [],
+    documentQuota: null,
+    emailRateLimits: [],
+    emailQuota: null,
+    apiRateLimits: [],
+    apiQuota: null,
   },
   [INTERNAL_CLAIM_ID.PLATFORM]: {
     id: INTERNAL_CLAIM_ID.PLATFORM,
@@ -165,6 +213,7 @@ export const internalClaims: InternalClaims = {
     teamCount: 1,
     memberCount: 0,
     envelopeItemCount: 10,
+    recipientCount: 0,
     locked: true,
     flags: {
       unlimitedDocuments: true,
@@ -177,6 +226,12 @@ export const internalClaims: InternalClaims = {
       embedSigningWhiteLabel: true,
       signingReminders: true,
     },
+    documentRateLimits: [],
+    documentQuota: null,
+    emailRateLimits: [],
+    emailQuota: null,
+    apiRateLimits: [],
+    apiQuota: null,
   },
   [INTERNAL_CLAIM_ID.ENTERPRISE]: {
     id: INTERNAL_CLAIM_ID.ENTERPRISE,
@@ -184,6 +239,7 @@ export const internalClaims: InternalClaims = {
     teamCount: 0,
     memberCount: 0,
     envelopeItemCount: 10,
+    recipientCount: 0,
     locked: true,
     flags: {
       unlimitedDocuments: true,
@@ -198,6 +254,12 @@ export const internalClaims: InternalClaims = {
       authenticationPortal: true,
       signingReminders: true,
     },
+    documentRateLimits: [],
+    documentQuota: null,
+    emailRateLimits: [],
+    emailQuota: null,
+    apiRateLimits: [],
+    apiQuota: null,
   },
   [INTERNAL_CLAIM_ID.EARLY_ADOPTER]: {
     id: INTERNAL_CLAIM_ID.EARLY_ADOPTER,
@@ -205,6 +267,7 @@ export const internalClaims: InternalClaims = {
     teamCount: 0,
     memberCount: 0,
     envelopeItemCount: 5,
+    recipientCount: 0,
     locked: true,
     flags: {
       unlimitedDocuments: true,
@@ -214,6 +277,12 @@ export const internalClaims: InternalClaims = {
       embedSigningWhiteLabel: true,
       signingReminders: true,
     },
+    documentRateLimits: [],
+    documentQuota: null,
+    emailRateLimits: [],
+    emailQuota: null,
+    apiRateLimits: [],
+    apiQuota: null,
   },
 } as const;
 

@@ -4,6 +4,7 @@ import OrganisationGlobalSettingsSchema from '@documenso/prisma/generated/zod/mo
 import OrganisationGroupMemberSchema from '@documenso/prisma/generated/zod/modelSchema/OrganisationGroupMemberSchema';
 import OrganisationGroupSchema from '@documenso/prisma/generated/zod/modelSchema/OrganisationGroupSchema';
 import OrganisationMemberSchema from '@documenso/prisma/generated/zod/modelSchema/OrganisationMemberSchema';
+import OrganisationMonthlyStatSchema from '@documenso/prisma/generated/zod/modelSchema/OrganisationMonthlyStatSchema';
 import SubscriptionSchema from '@documenso/prisma/generated/zod/modelSchema/SubscriptionSchema';
 import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import UserSchema from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
@@ -46,6 +47,14 @@ export const ZGetAdminOrganisationResponseSchema = ZOrganisationSchema.extend({
   }).array(),
   subscription: SubscriptionSchema.nullable(),
   organisationClaim: OrganisationClaimSchema,
+  monthlyStats: z.array(
+    OrganisationMonthlyStatSchema.pick({
+      period: true,
+      documentCount: true,
+      emailCount: true,
+      apiCount: true,
+    }),
+  ),
 });
 
 export type TGetAdminOrganisationResponse = z.infer<typeof ZGetAdminOrganisationResponseSchema>;

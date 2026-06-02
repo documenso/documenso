@@ -50,6 +50,7 @@ import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
+import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { getOrganisationTemplateWhereInput } from './get-organisation-template-by-id';
@@ -502,6 +503,13 @@ export const createDocumentFromTemplate = async ({
       };
     }),
   );
+
+  // Enforce the organisation document-creation limit before creating the document.
+  await assertOrganisationRatesAndLimits({
+    organisationId: callerTeam.organisationId,
+    type: 'document',
+    count: 1,
+  });
 
   const incrementedDocumentId = await incrementDocumentId();
 

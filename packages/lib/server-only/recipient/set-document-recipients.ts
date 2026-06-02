@@ -19,10 +19,12 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
+import { logger } from '../../utils/logger';
 import { canRecipientBeModified, isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 
 export interface SetDocumentRecipientsOptions {
   userId: number;
@@ -83,7 +85,7 @@ export const setDocumentRecipients = async ({
     throw new Error('Document already complete');
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, replyToEmail, organisationId, claims } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
       type: 'team',
@@ -284,6 +286,26 @@ export const setDocumentRecipients = async ({
           !isRecipientRemovedEmailEnabled ||
           !isRecipientEmailValidForSending(recipient)
         ) {
+          return;
+        }
+
+        // Meter against the organisation email quota/stats so add/remove churn
+        // can't be used to send unsolicited "removed" emails outside the limits.
+        try {
+          await assertOrganisationRatesAndLimits({
+            organisationId,
+            organisationClaim: claims,
+            type: 'email',
+            count: 1,
+          });
+        } catch (_err) {
+          logger.warn({
+            msg: 'Recipient removed email dropped: org email limit exceeded',
+            organisationId,
+            recipientId: recipient.id,
+            envelopeId: envelope.id,
+          });
+
           return;
         }
 

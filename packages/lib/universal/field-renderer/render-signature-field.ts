@@ -77,6 +77,7 @@ const createSignatureImage = (signatureImageAsBase64: string, fieldWidth: number
       y: 0,
       width: fieldWidth,
       height: fieldHeight,
+      listening: false,
     });
 
     img.onload = () => {
@@ -109,6 +110,7 @@ const createSignatureImage = (signatureImageAsBase64: string, fieldWidth: number
   return new Konva.Image({
     image: img,
     ...getImageDimensions(img, fieldWidth, fieldHeight),
+    listening: false,
   });
 };
 
@@ -121,6 +123,7 @@ const createFieldSignature = (field: FieldToRender, options: RenderFieldElementO
   const fieldText = new Konva.Text({
     id: `${field.renderId}-text`,
     name: 'field-text',
+    listening: false,
   });
 
   const fieldTypeName = translations?.[field.type] || field.type;

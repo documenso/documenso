@@ -256,7 +256,7 @@ model Subscription {
   @@index([organisationId])
 }
 
-/// @zod.import(["import { ZClaimFlagsSchema } from '@documenso/lib/types/subscription';"])
+/// @zod.import(["import { ZClaimFlagsSchema, ZRateLimitArraySchema } from '@documenso/lib/types/subscription';"])
 model SubscriptionClaim {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
@@ -268,11 +268,21 @@ model SubscriptionClaim {
   teamCount         Int
   memberCount       Int
   envelopeItemCount Int
+  recipientCount    Int
 
   flags Json /// [ClaimFlags] @zod.custom.use(ZClaimFlagsSchema)
+
+  documentRateLimits Json /// [RateLimitArray] @zod.custom.use(ZRateLimitArraySchema)
+  documentQuota      Int?
+
+  emailRateLimits Json /// [RateLimitArray] @zod.custom.use(ZRateLimitArraySchema)
+  emailQuota      Int?
+
+  apiRateLimits Json /// [RateLimitArray] @zod.custom.use(ZRateLimitArraySchema)
+  apiQuota      Int?
 }
 
-/// @zod.import(["import { ZClaimFlagsSchema } from '@documenso/lib/types/subscription';"])
+/// @zod.import(["import { ZClaimFlagsSchema, ZRateLimitArraySchema } from '@documenso/lib/types/subscription';"])
 model OrganisationClaim {
   id        String   @id
   createdAt DateTime @default(now())
@@ -284,8 +294,37 @@ model OrganisationClaim {
   teamCount         Int
   memberCount       Int
   envelopeItemCount Int
+  recipientCount    Int
 
   flags Json /// [ClaimFlags] @zod.custom.use(ZClaimFlagsSchema)
+
+  documentRateLimits Json /// [RateLimitArray] @zod.custom.use(ZRateLimitArraySchema)
+  documentQuota      Int?
+
+  emailRateLimits Json /// [RateLimitArray] @zod.custom.use(ZRateLimitArraySchema)
+  emailQuota      Int?
+
+  apiRateLimits Json /// [RateLimitArray] @zod.custom.use(ZRateLimitArraySchema)
+  apiQuota      Int?
+}
+
+model OrganisationMonthlyStat {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  /// UTC calendar month in `YYYY-MM` form, e.g. "2026-05".
+  period String
+
+  documentCount Int @default(0)
+  emailCount    Int @default(0)
+  apiCount      Int @default(0)
+
+  @@unique([organisationId, period])
+  @@index([organisationId])
 }
 
 model Account {
@@ -713,6 +752,8 @@ model Organisation {
 
   emailDomains       EmailDomain[]
   organisationEmails OrganisationEmail[]
+
+  monthlyStats OrganisationMonthlyStat[]
 
   avatarImage AvatarImage? @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
