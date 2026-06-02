@@ -1,5 +1,6 @@
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { FieldRootContainer } from '@documenso/ui/components/field/field';
 import { getRecipientColorStyles } from '@documenso/ui/lib/recipient-colors';
@@ -117,7 +118,12 @@ export const DocumentSigningFieldContainer = ({
   };
 
   return (
-    <FieldRootContainer color={getRecipientColorStyles(field.fieldMeta?.readOnly ? 'readOnly' : 0)} field={field}>
+    <FieldRootContainer
+      color={getRecipientColorStyles(
+        field.fieldMeta?.readOnly ? 'readOnly' : isFieldUnsignedAndRequired(field) ? 'required' : 0,
+      )}
+      field={field}
+    >
       {!field.inserted && !loading && !readOnlyField && (
         <button
           type="submit"

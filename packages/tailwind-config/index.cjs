@@ -116,6 +116,7 @@ module.exports = {
           orange: 'hsl(var(--recipient-orange))',
           yellow: 'hsl(var(--recipient-yellow))',
           pink: 'hsl(var(--recipient-pink))',
+          red: 'hsl(var(--recipient-red))',
         },
       },
       backgroundImage: {
