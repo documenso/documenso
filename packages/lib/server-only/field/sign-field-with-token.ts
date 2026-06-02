@@ -187,7 +187,7 @@ export const signFieldWithToken = async ({
     },
   });
 
-  const isSignatureField = field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE;
+  const isSignatureField = field.type === FieldType.SIGNATURE || field.type === FieldType.IMAGE_UPLOAD;
 
   let customText = !isSignatureField ? value : undefined;
 
@@ -286,7 +286,7 @@ export const signFieldWithToken = async ({
           recipientRole: recipient.role,
           fieldId: updatedField.secondaryId,
           field: match(updatedField.type)
-            .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
+            .with(FieldType.SIGNATURE, FieldType.IMAGE_UPLOAD, FieldType.FREE_SIGNATURE, (type) => ({
               type,
               data: signatureImageAsBase64 || typedSignature || '',
             }))

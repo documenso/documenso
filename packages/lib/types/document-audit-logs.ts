@@ -320,7 +320,11 @@ export const ZDocumentAuditLogEventDocumentFieldInsertedSchema = z.object({
         data: z.string(),
       }),
       z.object({
-        type: z.union([z.literal(FieldType.SIGNATURE), z.literal(FieldType.FREE_SIGNATURE)]),
+        type: z.union([
+          z.literal(FieldType.SIGNATURE),
+          z.literal(FieldType.IMAGE_UPLOAD),
+          z.literal(FieldType.FREE_SIGNATURE),
+        ]),
         data: z.string(),
       }),
       z.object({
@@ -420,7 +424,11 @@ export const ZDocumentAuditLogEventDocumentFieldPrefilledSchema = z.object({
         data: z.string(),
       }),
       z.object({
-        type: z.union([z.literal(FieldType.SIGNATURE), z.literal(FieldType.FREE_SIGNATURE)]),
+        type: z.union([
+          z.literal(FieldType.SIGNATURE),
+          z.literal(FieldType.IMAGE_UPLOAD),
+          z.literal(FieldType.FREE_SIGNATURE),
+        ]),
         data: z.string(),
       }),
       z.object({

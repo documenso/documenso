@@ -180,13 +180,22 @@ export type TDropdownFieldMeta = z.infer<typeof ZDropdownFieldMeta>;
 
 export const ZSignatureFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('signature'),
+  textAlign: ZFieldTextAlignSchema.optional(),
   overflow: ZFieldOverflowMode.optional().default(DEFAULT_SIGNATURE_OVERFLOW_MODE),
 });
 
 export type TSignatureFieldMeta = z.infer<typeof ZSignatureFieldMeta>;
 
+export const ZImageUploadFieldMeta = ZBaseFieldMeta.extend({
+  type: z.literal('IMAGE_UPLOAD'),
+  textAlign: ZFieldTextAlignSchema.optional(),
+});
+
+export type TImageUploadFieldMeta = z.infer<typeof ZImageUploadFieldMeta>;
+
 export const ZFieldMetaNotOptionalSchema = z.discriminatedUnion('type', [
   ZSignatureFieldMeta,
+  ZImageUploadFieldMeta,
   ZInitialsFieldMeta,
   ZNameFieldMeta,
   ZEmailFieldMeta,
@@ -265,6 +274,10 @@ export const ZFieldAndMetaSchema = z.discriminatedUnion('type', [
     fieldMeta: z.undefined(),
   }),
   z.object({
+    type: z.literal('IMAGE_UPLOAD'),
+    fieldMeta: ZImageUploadFieldMeta.optional(),
+  }),
+  z.object({
     type: z.literal(FieldType.INITIALS),
     fieldMeta: ZInitialsFieldMeta.optional(),
   }),
@@ -308,6 +321,7 @@ export const FIELD_DATE_META_DEFAULT_VALUES: TDateFieldMeta = {
   type: 'date',
   fontSize: DEFAULT_FIELD_FONT_SIZE,
   textAlign: 'left',
+  label: '',
   overflow: DEFAULT_DATE_OVERFLOW_MODE,
 };
 
@@ -336,24 +350,28 @@ export const FIELD_INITIALS_META_DEFAULT_VALUES: TInitialsFieldMeta = {
   type: 'initials',
   fontSize: DEFAULT_FIELD_FONT_SIZE,
   textAlign: 'left',
+  label: '',
 };
 
 export const FIELD_NAME_META_DEFAULT_VALUES: TNameFieldMeta = {
   type: 'name',
   fontSize: DEFAULT_FIELD_FONT_SIZE,
   textAlign: 'left',
+  label: '',
 };
 
 export const FIELD_EMAIL_META_DEFAULT_VALUES: TEmailFieldMeta = {
   type: 'email',
   fontSize: DEFAULT_FIELD_FONT_SIZE,
   textAlign: 'left',
+  label: '',
   overflow: DEFAULT_EMAIL_OVERFLOW_MODE,
 };
 
 export const FIELD_RADIO_META_DEFAULT_VALUES: TRadioFieldMeta = {
   type: 'radio',
   fontSize: DEFAULT_FIELD_FONT_SIZE,
+  label: '',
   values: [{ id: 1, checked: false, value: '' }],
   required: false,
   readOnly: false,
@@ -363,6 +381,7 @@ export const FIELD_RADIO_META_DEFAULT_VALUES: TRadioFieldMeta = {
 export const FIELD_CHECKBOX_META_DEFAULT_VALUES: TCheckboxFieldMeta = {
   type: 'checkbox',
   fontSize: DEFAULT_FIELD_FONT_SIZE,
+  label: '',
   values: [{ id: 1, checked: false, value: '' }],
   validationRule: '',
   validationLength: 0,
@@ -374,6 +393,7 @@ export const FIELD_CHECKBOX_META_DEFAULT_VALUES: TCheckboxFieldMeta = {
 export const FIELD_DROPDOWN_META_DEFAULT_VALUES: TDropdownFieldMeta = {
   type: 'dropdown',
   fontSize: DEFAULT_FIELD_FONT_SIZE,
+  label: '',
   values: [{ value: 'Option 1' }],
   defaultValue: '',
   required: false,
@@ -383,12 +403,22 @@ export const FIELD_DROPDOWN_META_DEFAULT_VALUES: TDropdownFieldMeta = {
 export const FIELD_SIGNATURE_META_DEFAULT_VALUES: TSignatureFieldMeta = {
   type: 'signature',
   fontSize: DEFAULT_SIGNATURE_TEXT_FONT_SIZE,
+  textAlign: FIELD_DEFAULT_GENERIC_ALIGN,
+  label: '',
   overflow: DEFAULT_SIGNATURE_OVERFLOW_MODE,
 };
 
-export const FIELD_META_DEFAULT_VALUES: Record<FieldType, TFieldMetaSchema> = {
+export const FIELD_IMAGE_UPLOAD_META_DEFAULT_VALUES: TImageUploadFieldMeta = {
+  type: 'IMAGE_UPLOAD',
+  fontSize: DEFAULT_FIELD_FONT_SIZE,
+  textAlign: 'center',
+  label: '',
+};
+
+export const FIELD_META_DEFAULT_VALUES = {
   [FieldType.SIGNATURE]: FIELD_SIGNATURE_META_DEFAULT_VALUES,
   [FieldType.FREE_SIGNATURE]: undefined,
+  IMAGE_UPLOAD: FIELD_IMAGE_UPLOAD_META_DEFAULT_VALUES,
   [FieldType.INITIALS]: FIELD_INITIALS_META_DEFAULT_VALUES,
   [FieldType.NAME]: FIELD_NAME_META_DEFAULT_VALUES,
   [FieldType.EMAIL]: FIELD_EMAIL_META_DEFAULT_VALUES,
@@ -398,7 +428,7 @@ export const FIELD_META_DEFAULT_VALUES: Record<FieldType, TFieldMetaSchema> = {
   [FieldType.RADIO]: FIELD_RADIO_META_DEFAULT_VALUES,
   [FieldType.CHECKBOX]: FIELD_CHECKBOX_META_DEFAULT_VALUES,
   [FieldType.DROPDOWN]: FIELD_DROPDOWN_META_DEFAULT_VALUES,
-} as const;
+} as Record<FieldType, TFieldMetaSchema>;
 
 export const ZEnvelopeFieldAndMetaSchema = z.discriminatedUnion('type', [
   z.object({
@@ -408,6 +438,10 @@ export const ZEnvelopeFieldAndMetaSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal(FieldType.FREE_SIGNATURE),
     fieldMeta: z.undefined(),
+  }),
+  z.object({
+    type: z.literal(FieldType.IMAGE_UPLOAD),
+    fieldMeta: ZImageUploadFieldMeta.optional().default(FIELD_IMAGE_UPLOAD_META_DEFAULT_VALUES),
   }),
   z.object({
     type: z.literal(FieldType.INITIALS),

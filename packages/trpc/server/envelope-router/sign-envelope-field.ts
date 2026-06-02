@@ -183,8 +183,8 @@ export const signEnvelopeFieldRoute = procedure
     let signatureImageAsBase64 = null;
     let typedSignature = null;
 
-    if (field.type === FieldType.SIGNATURE) {
-      if (fieldValue.type !== FieldType.SIGNATURE) {
+    if (field.type === FieldType.SIGNATURE || field.type === FieldType.IMAGE_UPLOAD) {
+      if (fieldValue.type !== FieldType.SIGNATURE && fieldValue.type !== FieldType.IMAGE_UPLOAD) {
         throw new AppError(AppErrorCode.INVALID_REQUEST, {
           message: `Field ${fieldId} is not a signature field`,
         });
@@ -212,7 +212,7 @@ export const signEnvelopeFieldRoute = procedure
         },
       });
 
-      if (field.type === FieldType.SIGNATURE) {
+      if (field.type === FieldType.SIGNATURE || field.type === FieldType.IMAGE_UPLOAD) {
         const signature = await tx.signature.upsert({
           where: {
             fieldId: field.id,
@@ -254,7 +254,7 @@ export const signEnvelopeFieldRoute = procedure
             recipientRole: recipient.role,
             fieldId: updatedField.secondaryId,
             field: match(updatedField.type)
-              .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
+              .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, FieldType.IMAGE_UPLOAD, (type) => ({
                 type,
                 data: signatureImageAsBase64 || typedSignature || '',
               }))
