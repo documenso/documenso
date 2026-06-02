@@ -18,14 +18,31 @@ import type { FindResultResponse } from '../../types/search-params';
 import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
 import { getTeamById } from '../team/get-team';
 
-export type PeriodSelectorValue = '' | '7d' | '14d' | '30d';
+export type PeriodSelectorValue = '' | 'all' | '7d' | '14d' | '30d';
+
+const normalizeStatuses = (
+  status: ExtendedDocumentStatus | ExtendedDocumentStatus[] | undefined,
+): ExtendedDocumentStatus[] => {
+  if (!status) {
+    return [ExtendedDocumentStatus.ALL];
+  }
+
+  const arr = Array.isArray(status) ? status : [status];
+  const deduped = Array.from(new Set(arr));
+
+  if (deduped.length === 0 || deduped.includes(ExtendedDocumentStatus.ALL)) {
+    return [ExtendedDocumentStatus.ALL];
+  }
+
+  return deduped;
+};
 
 export type FindDocumentsOptions = {
   userId: number;
   teamId?: number;
   templateId?: number;
-  source?: DocumentSource;
-  status?: ExtendedDocumentStatus;
+  source?: DocumentSource | DocumentSource[];
+  status?: ExtendedDocumentStatus | ExtendedDocumentStatus[];
   page?: number;
   perPage?: number;
   orderBy?: {
@@ -107,7 +124,7 @@ export const findDocuments = async ({
   teamId,
   templateId,
   source,
-  status = ExtendedDocumentStatus.ALL,
+  status,
   page = 1,
   perPage = 10,
   orderBy,
@@ -135,6 +152,8 @@ export const findDocuments = async ({
   const hasSearch = searchQuery.length > 0;
   const searchPattern = `%${searchQuery}%`;
 
+  const normalizedStatuses = normalizeStatuses(status);
+
   // ─── Base query with common filters ──────────────────────────────────
   //
   // Every code path starts from this base: Envelope rows filtered by type,
@@ -151,7 +170,7 @@ export const findDocuments = async ({
       folderId !== undefined ? qb.where('Envelope.folderId', '=', folderId) : qb.where('Envelope.folderId', 'is', null);
 
     // Period filter
-    if (period) {
+    if (period && period !== 'all') {
       const daysAgo = parseInt(period.replace(/d$/, ''), 10);
       const startOfPeriod = DateTime.now().minus({ days: daysAgo }).startOf('day');
 
@@ -165,7 +184,15 @@ export const findDocuments = async ({
 
     // Source filter (enum cast)
     if (source) {
-      qb = qb.where('Envelope.source', '=', sql.lit(source));
+      const sources = Array.isArray(source) ? source : [source];
+
+      if (sources.length > 0) {
+        qb = qb.where(
+          'Envelope.source',
+          'in',
+          sources.map((s) => sql.lit(s)),
+        );
+      }
     }
 
     // Template filter
@@ -204,35 +231,32 @@ export const findDocuments = async ({
 
   // ─── Personal path filters ───────────────────────────────────────────
 
-  const applyPersonalFilters = (qb: EnvelopeQueryBuilder): EnvelopeQueryBuilder | null => {
+  const buildPersonalStatusPredicate = (
+    eb: EnvelopeExpressionBuilder,
+    s: ExtendedDocumentStatus,
+  ): Expression<SqlBool> => {
     // Deleted filter: owned → deletedAt IS NULL, received → documentDeletedAt IS NULL
-    const personalDeletedFilter = (eb: EnvelopeExpressionBuilder) =>
-      eb.or([
-        eb.and([eb('Envelope.userId', '=', user.id), eb('Envelope.deletedAt', 'is', null)]),
-        recipientExists(eb, user.email, (reb) => reb('Recipient.documentDeletedAt', 'is', null)),
-      ]);
+    const personalDeletedFilter = eb.or([
+      eb.and([eb('Envelope.userId', '=', user.id), eb('Envelope.deletedAt', 'is', null)]),
+      recipientExists(eb, user.email, (reb) => reb('Recipient.documentDeletedAt', 'is', null)),
+    ]);
 
-    return match<ExtendedDocumentStatus, EnvelopeQueryBuilder | null>(status)
+    return match<ExtendedDocumentStatus, Expression<SqlBool>>(s)
       .with(ExtendedDocumentStatus.ALL, () =>
-        qb.where((eb) =>
-          eb.and([
-            personalDeletedFilter(eb),
-            eb.or([
-              eb('Envelope.userId', '=', user.id),
-              eb.and([
-                eb('Envelope.status', 'in', [sql.lit(DocumentStatus.COMPLETED), sql.lit(DocumentStatus.PENDING)]),
-                recipientExists(eb, user.email),
-              ]),
+        eb.and([
+          personalDeletedFilter,
+          eb.or([
+            eb('Envelope.userId', '=', user.id),
+            eb.and([
+              eb('Envelope.status', 'in', [sql.lit(DocumentStatus.COMPLETED), sql.lit(DocumentStatus.PENDING)]),
+              recipientExists(eb, user.email),
             ]),
           ]),
-        ),
+        ]),
       )
       .with(ExtendedDocumentStatus.INBOX, () =>
-        qb.where('Envelope.status', '!=', sql.lit(ExtendedDocumentStatus.DRAFT)).where((eb) =>
-          // Single EXISTS check: the recipient must be NOT_SIGNED, non-CC, and
-          // not soft-deleted. This replaces the previous personalDeletedFilter +
-          // separate recipientExists pair, eliminating a hashed SubPlan that
-          // materialised all recipient rows for this email (~125k for heavy users).
+        eb.and([
+          eb('Envelope.status', '!=', sql.lit(DocumentStatus.DRAFT)),
           recipientExists(eb, user.email, (reb) =>
             reb.and([
               reb('Recipient.documentDeletedAt', 'is', null),
@@ -240,66 +264,62 @@ export const findDocuments = async ({
               reb('role', '!=', sql.lit(RecipientRole.CC)),
             ]),
           ),
-        ),
+        ]),
       )
       .with(ExtendedDocumentStatus.DRAFT, () =>
-        qb
-          .where('Envelope.userId', '=', user.id)
-          .where('Envelope.deletedAt', 'is', null)
-          .where('Envelope.status', '=', sql.lit(DocumentStatus.DRAFT)),
+        eb.and([
+          eb('Envelope.userId', '=', user.id),
+          eb('Envelope.deletedAt', 'is', null),
+          eb('Envelope.status', '=', sql.lit(DocumentStatus.DRAFT)),
+        ]),
       )
       .with(ExtendedDocumentStatus.PENDING, () =>
-        qb
-          .where('Envelope.status', '=', sql.lit(DocumentStatus.PENDING))
-          .where((eb) =>
-            eb.and([
-              personalDeletedFilter(eb),
-              eb.or([
-                eb('Envelope.userId', '=', user.id),
-                recipientExists(eb, user.email, (reb) =>
-                  reb.and([
-                    reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.SIGNED)),
-                    reb('Recipient.role', '!=', sql.lit(RecipientRole.CC)),
-                  ]),
-                ),
+        eb.and([
+          eb('Envelope.status', '=', sql.lit(DocumentStatus.PENDING)),
+          personalDeletedFilter,
+          eb.or([
+            eb('Envelope.userId', '=', user.id),
+            recipientExists(eb, user.email, (reb) =>
+              reb.and([
+                reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.SIGNED)),
+                reb('Recipient.role', '!=', sql.lit(RecipientRole.CC)),
               ]),
-            ]),
-          ),
+            ),
+          ]),
+        ]),
       )
       .with(ExtendedDocumentStatus.COMPLETED, () =>
-        qb
-          .where('Envelope.status', '=', sql.lit(ExtendedDocumentStatus.COMPLETED))
-          .where((eb) =>
-            eb.and([
-              personalDeletedFilter(eb),
-              eb.or([eb('Envelope.userId', '=', user.id), recipientExists(eb, user.email)]),
-            ]),
-          ),
+        eb.and([
+          eb('Envelope.status', '=', sql.lit(DocumentStatus.COMPLETED)),
+          personalDeletedFilter,
+          eb.or([eb('Envelope.userId', '=', user.id), recipientExists(eb, user.email)]),
+        ]),
       )
       .with(ExtendedDocumentStatus.REJECTED, () =>
-        qb
-          .where('Envelope.status', '=', sql.lit(ExtendedDocumentStatus.REJECTED))
-          .where((eb) =>
-            eb.and([
-              personalDeletedFilter(eb),
-              eb.or([
-                eb('Envelope.userId', '=', user.id),
-                recipientExists(eb, user.email, (reb) =>
-                  reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.REJECTED)),
-                ),
-              ]),
-            ]),
-          ),
+        eb.and([
+          eb('Envelope.status', '=', sql.lit(DocumentStatus.REJECTED)),
+          personalDeletedFilter,
+          eb.or([
+            eb('Envelope.userId', '=', user.id),
+            recipientExists(eb, user.email, (reb) =>
+              reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.REJECTED)),
+            ),
+          ]),
+        ]),
       )
       .exhaustive();
   };
 
+  const applyPersonalFilters = (qb: EnvelopeQueryBuilder): EnvelopeQueryBuilder =>
+    qb.where((eb) => eb.or(normalizedStatuses.map((s) => buildPersonalStatusPredicate(eb, s))));
+
   // ─── Team path filters ───────────────────────────────────────────────
 
-  const applyTeamFilters = (
-    qb: EnvelopeQueryBuilder,
+  const buildTeamStatusPredicate = (
+    eb: EnvelopeExpressionBuilder,
     teamData: Team & { teamEmail: TeamEmail | null; currentTeamRole: TeamMemberRole },
-  ): EnvelopeQueryBuilder | null => {
+    s: ExtendedDocumentStatus,
+  ): Expression<SqlBool> | null => {
     const teamEmail = teamData.teamEmail?.email ?? null;
 
     const allowedVisibilities = match(teamData.currentTeamRole)
@@ -311,125 +331,150 @@ export const findDocuments = async ({
       .with(TeamMemberRole.MANAGER, () => [DocumentVisibility.EVERYONE, DocumentVisibility.MANAGER_AND_ABOVE])
       .otherwise(() => [DocumentVisibility.EVERYONE]);
 
-    // Visibility: meets role threshold OR directly involved
-    const visibilityFilter = (eb: EnvelopeExpressionBuilder) =>
-      eb.or([
-        eb(
-          'Envelope.visibility',
-          'in',
-          allowedVisibilities.map((v) => sql.lit(v)),
-        ),
-        eb('Envelope.userId', '=', user.id),
-        recipientExists(eb, user.email),
-      ]);
+    const visibilityFilter = eb.or([
+      eb(
+        'Envelope.visibility',
+        'in',
+        allowedVisibilities.map((v) => sql.lit(v)),
+      ),
+      eb('Envelope.userId', '=', user.id),
+      recipientExists(eb, user.email),
+    ]);
 
-    // Deleted filter for team path
-    const teamDeletedFilter = (eb: EnvelopeExpressionBuilder) => {
-      const branches = [eb.and([eb('Envelope.teamId', '=', teamData.id), eb('Envelope.deletedAt', 'is', null)])];
+    const teamDeletedBranches = [
+      eb.and([eb('Envelope.teamId', '=', teamData.id), eb('Envelope.deletedAt', 'is', null)]),
+    ];
 
-      if (teamEmail) {
-        branches.push(eb.and([senderEmailIs(eb, teamEmail), eb('Envelope.deletedAt', 'is', null)]));
-        branches.push(recipientExists(eb, teamEmail, (reb) => reb('Recipient.documentDeletedAt', 'is', null)));
-      }
+    if (teamEmail) {
+      teamDeletedBranches.push(eb.and([senderEmailIs(eb, teamEmail), eb('Envelope.deletedAt', 'is', null)]));
+      teamDeletedBranches.push(recipientExists(eb, teamEmail, (reb) => reb('Recipient.documentDeletedAt', 'is', null)));
+    }
 
-      return eb.or(branches);
-    };
+    const teamDeletedFilter = eb.or(teamDeletedBranches);
 
-    return match<ExtendedDocumentStatus, EnvelopeQueryBuilder | null>(status)
-      .with(ExtendedDocumentStatus.ALL, () =>
-        qb.where((eb) => {
-          const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
+    return match<ExtendedDocumentStatus, Expression<SqlBool> | null>(s)
+      .with(ExtendedDocumentStatus.ALL, () => {
+        const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
 
-          if (teamEmail) {
-            accessBranches.push(senderEmailIs(eb, teamEmail));
-            accessBranches.push(
-              eb.and([eb('status', '!=', sql.lit(ExtendedDocumentStatus.DRAFT)), recipientExists(eb, teamEmail)]),
-            );
-          }
+        if (teamEmail) {
+          accessBranches.push(senderEmailIs(eb, teamEmail));
+          accessBranches.push(
+            eb.and([eb('Envelope.status', '!=', sql.lit(DocumentStatus.DRAFT)), recipientExists(eb, teamEmail)]),
+          );
+        }
 
-          return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
-        }),
-      )
+        return eb.and([teamDeletedFilter, visibilityFilter, eb.or(accessBranches)]);
+      })
       .with(ExtendedDocumentStatus.INBOX, () => {
         if (!teamEmail) {
           return null;
         }
 
-        return qb.where('Envelope.status', '!=', sql.lit(ExtendedDocumentStatus.DRAFT)).where((eb) =>
-          eb.and([
-            visibilityFilter(eb),
-            // Single EXISTS check: the team-email recipient must be NOT_SIGNED,
-            // non-CC, and not soft-deleted. Replaces teamDeletedFilter + separate
-            // recipientExists, eliminating a hashed SubPlan (~79k rows).
+        return eb.and([
+          eb('Envelope.status', '!=', sql.lit(DocumentStatus.DRAFT)),
+          visibilityFilter,
+          recipientExists(eb, teamEmail, (reb) =>
+            reb.and([
+              reb('Recipient.documentDeletedAt', 'is', null),
+              reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.NOT_SIGNED)),
+              reb('Recipient.role', '!=', sql.lit(RecipientRole.CC)),
+            ]),
+          ),
+        ]);
+      })
+      .with(ExtendedDocumentStatus.DRAFT, () => {
+        const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
+
+        if (teamEmail) {
+          accessBranches.push(senderEmailIs(eb, teamEmail));
+        }
+
+        return eb.and([
+          eb('Envelope.status', '=', sql.lit(DocumentStatus.DRAFT)),
+          teamDeletedFilter,
+          visibilityFilter,
+          eb.or(accessBranches),
+        ]);
+      })
+      .with(ExtendedDocumentStatus.PENDING, () => {
+        const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
+
+        if (teamEmail) {
+          accessBranches.push(senderEmailIs(eb, teamEmail));
+          accessBranches.push(
             recipientExists(eb, teamEmail, (reb) =>
               reb.and([
-                reb('Recipient.documentDeletedAt', 'is', null),
-                reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.NOT_SIGNED)),
+                reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.SIGNED)),
                 reb('Recipient.role', '!=', sql.lit(RecipientRole.CC)),
               ]),
             ),
-          ]),
-        );
+          );
+        }
+
+        return eb.and([
+          eb('Envelope.status', '=', sql.lit(DocumentStatus.PENDING)),
+          teamDeletedFilter,
+          visibilityFilter,
+          eb.or(accessBranches),
+        ]);
       })
-      .with(ExtendedDocumentStatus.DRAFT, () =>
-        qb.where('Envelope.status', '=', sql.lit(ExtendedDocumentStatus.DRAFT)).where((eb) => {
-          const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
+      .with(ExtendedDocumentStatus.COMPLETED, () => {
+        const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
 
-          if (teamEmail) {
-            accessBranches.push(senderEmailIs(eb, teamEmail));
-          }
+        if (teamEmail) {
+          accessBranches.push(senderEmailIs(eb, teamEmail));
+          accessBranches.push(recipientExists(eb, teamEmail));
+        }
 
-          return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
-        }),
-      )
-      .with(ExtendedDocumentStatus.PENDING, () =>
-        qb.where('Envelope.status', '=', sql.lit(ExtendedDocumentStatus.PENDING)).where((eb) => {
-          const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
+        return eb.and([
+          eb('Envelope.status', '=', sql.lit(DocumentStatus.COMPLETED)),
+          teamDeletedFilter,
+          visibilityFilter,
+          eb.or(accessBranches),
+        ]);
+      })
+      .with(ExtendedDocumentStatus.REJECTED, () => {
+        const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
 
-          if (teamEmail) {
-            accessBranches.push(senderEmailIs(eb, teamEmail));
-            accessBranches.push(
-              recipientExists(eb, teamEmail, (reb) =>
-                reb.and([
-                  reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.SIGNED)),
-                  reb('Recipient.role', '!=', sql.lit(RecipientRole.CC)),
-                ]),
-              ),
-            );
-          }
+        if (teamEmail) {
+          accessBranches.push(senderEmailIs(eb, teamEmail));
+          accessBranches.push(
+            recipientExists(eb, teamEmail, (reb) =>
+              reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.REJECTED)),
+            ),
+          );
+        }
 
-          return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
-        }),
-      )
-      .with(ExtendedDocumentStatus.COMPLETED, () =>
-        qb.where('Envelope.status', '=', sql.lit(ExtendedDocumentStatus.COMPLETED)).where((eb) => {
-          const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
-
-          if (teamEmail) {
-            accessBranches.push(senderEmailIs(eb, teamEmail));
-            accessBranches.push(recipientExists(eb, teamEmail));
-          }
-
-          return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
-        }),
-      )
-      .with(ExtendedDocumentStatus.REJECTED, () =>
-        qb.where('Envelope.status', '=', sql.lit(ExtendedDocumentStatus.REJECTED)).where((eb) => {
-          const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
-
-          if (teamEmail) {
-            accessBranches.push(senderEmailIs(eb, teamEmail));
-            accessBranches.push(
-              recipientExists(eb, teamEmail, (reb) =>
-                reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.REJECTED)),
-              ),
-            );
-          }
-
-          return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
-        }),
-      )
+        return eb.and([
+          eb('Envelope.status', '=', sql.lit(DocumentStatus.REJECTED)),
+          teamDeletedFilter,
+          visibilityFilter,
+          eb.or(accessBranches),
+        ]);
+      })
       .exhaustive();
+  };
+
+  const applyTeamFilters = (
+    qb: EnvelopeQueryBuilder,
+    teamData: Team & { teamEmail: TeamEmail | null; currentTeamRole: TeamMemberRole },
+  ): EnvelopeQueryBuilder | null => {
+    const teamEmail = teamData.teamEmail?.email ?? null;
+
+    // INBOX requires a team email; drop statuses that produce no predicate.
+    const validStatuses = normalizedStatuses.filter((s) => !(s === ExtendedDocumentStatus.INBOX && !teamEmail));
+
+    if (validStatuses.length === 0) {
+      return null;
+    }
+
+    return qb.where((eb) => {
+      const predicates = validStatuses
+        .map((s) => buildTeamStatusPredicate(eb, teamData, s))
+        .filter((p): p is Expression<SqlBool> => p !== null);
+
+      return eb.or(predicates);
+    });
   };
 
   // ─── Assemble and execute ────────────────────────────────────────────
