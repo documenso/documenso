@@ -25,6 +25,7 @@ export const ZSetEnvelopeFieldsRequestSchema = z.object({
       positionY: ZClampedFieldPositionYSchema,
       width: ZClampedFieldWidthSchema,
       height: ZClampedFieldHeightSchema,
+      customText: z.string().optional(),
       fieldMeta: ZFieldMetaSchema,
     }),
   ),

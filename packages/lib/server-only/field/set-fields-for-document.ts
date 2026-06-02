@@ -209,6 +209,7 @@ export const setFieldsForDocument = async ({
             positionY: field.pageY,
             width: field.pageWidth,
             height: field.pageHeight,
+            customText: field.customText ?? '',
             fieldMeta: parsedFieldMeta,
           },
           create: {
@@ -218,7 +219,7 @@ export const setFieldsForDocument = async ({
             positionY: field.pageY,
             width: field.pageWidth,
             height: field.pageHeight,
-            customText: '',
+            customText: field.customText ?? '',
             inserted: false,
             fieldMeta: parsedFieldMeta,
             envelope: {
@@ -356,6 +357,7 @@ type FieldData = {
   pageY: number;
   pageWidth: number;
   pageHeight: number;
+  customText?: string;
   fieldMeta?: FieldMeta;
 };
 
@@ -371,6 +373,7 @@ const hasFieldBeenChanged = (field: Field, newFieldData: FieldData) => {
     field.positionY.toNumber() !== newFieldData.pageY ||
     field.width.toNumber() !== newFieldData.pageWidth ||
     field.height.toNumber() !== newFieldData.pageHeight ||
+    field.customText !== newFieldData.customText ||
     !isDeepEqual(currentFieldMeta, newFieldMeta)
   );
 };

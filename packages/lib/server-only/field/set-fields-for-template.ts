@@ -36,6 +36,7 @@ export type SetFieldsForTemplateOptions = {
     pageY: number;
     pageWidth: number;
     pageHeight: number;
+    customText?: string;
     fieldMeta?: FieldMeta;
   }[];
 };
@@ -179,6 +180,7 @@ export const setFieldsForTemplate = async ({ userId, teamId, id, fields }: SetFi
           positionY: field.pageY,
           width: field.pageWidth,
           height: field.pageHeight,
+          customText: field.customText ?? '',
           fieldMeta: parsedFieldMeta,
         },
         create: {
@@ -188,7 +190,7 @@ export const setFieldsForTemplate = async ({ userId, teamId, id, fields }: SetFi
           positionY: field.pageY,
           width: field.pageWidth,
           height: field.pageHeight,
-          customText: '',
+          customText: field.customText ?? '',
           inserted: false,
           fieldMeta: parsedFieldMeta,
           envelope: {

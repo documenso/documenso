@@ -10,10 +10,15 @@ import { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import type { z } from 'zod';
 
-import { EditorGenericFontSizeField, EditorGenericTextAlignField } from './editor-field-generic-field-forms';
+import {
+  EditorGenericFontSizeField,
+  EditorGenericLabelField,
+  EditorGenericTextAlignField,
+} from './editor-field-generic-field-forms';
 
 const ZNameFieldFormSchema = ZNameFieldMeta.pick({
   fontSize: true,
+  label: true,
   textAlign: true,
 });
 
@@ -35,6 +40,7 @@ export const EditorFieldNameForm = ({
     mode: 'onChange',
     defaultValues: {
       fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
+      label: value.label || '',
       textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
     },
   });
@@ -61,6 +67,8 @@ export const EditorFieldNameForm = ({
     <Form {...form}>
       <form>
         <fieldset className="flex flex-col gap-2">
+          <EditorGenericLabelField formControl={form.control} />
+
           <EditorGenericFontSizeField formControl={form.control} />
 
           <EditorGenericTextAlignField formControl={form.control} />
