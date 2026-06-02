@@ -1,0 +1,2330 @@
+diff --git a/apps/docs/content/docs/developers/api/fields.mdx b/apps/docs/content/docs/developers/api/fields.mdx
+index 71f680a62..194a750ed 100644
+--- a/apps/docs/content/docs/developers/api/fields.mdx
++++ b/apps/docs/content/docs/developers/api/fields.mdx
+@@ -61,7 +61,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+ | Type             | Description                               | Auto-filled |
+ | ---------------- | ----------------------------------------- | ----------- |
+ | `SIGNATURE`      | Drawn, typed, or uploaded signature       | No          |
+-| `FREE_SIGNATURE` | Unrestricted signature without validation | No          |
++| `IMAGE_UPLOAD`   | Unrestricted signature without validation | No          |
+ | `INITIALS`       | Recipient's initials                      | No          |
+ | `NAME`           | Recipient's full name                     | Yes         |
+ | `EMAIL`          | Recipient's email address                 | Yes         |
+diff --git a/apps/docs/content/docs/developers/getting-started/authentication.mdx b/apps/docs/content/docs/developers/getting-started/authentication.mdx
+index 40e595d6d..44dd7944c 100644
+--- a/apps/docs/content/docs/developers/getting-started/authentication.mdx
++++ b/apps/docs/content/docs/developers/getting-started/authentication.mdx
+@@ -73,14 +73,14 @@ Include the token in the `Authorization` header of your HTTP requests.
+ ### cURL
+ 
+ ```bash
+-curl https://app.documenso.com/api/v2/documents \
++curl https://app.documenso.com/api/v2/document \
+   -H "Authorization: api_xxxxxxxxxxxxxxxx"
+ ```
+ 
+ ### JavaScript / TypeScript
+ 
+ ```typescript
+-const response = await fetch('https://app.documenso.com/api/v2/documents', {
++const response = await fetch('https://app.documenso.com/api/v2/document', {
+   method: 'GET',
+   headers: {
+     Authorization: 'api_xxxxxxxxxxxxxxxx',
+diff --git a/apps/remix/app/components/dialogs/sign-field-image-upload-dialog.tsx b/apps/remix/app/components/dialogs/sign-field-image-upload-dialog.tsx
+new file mode 100644
+index 000000000..65a6e202f
+--- /dev/null
++++ b/apps/remix/app/components/dialogs/sign-field-image-upload-dialog.tsx
+@@ -0,0 +1,44 @@
++import { Button } from '@documenso/ui/primitives/button';
++import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@documenso/ui/primitives/dialog';
++import { ImageUploadField } from '@documenso/ui/primitives/image-upload-field';
++import { Trans } from '@lingui/react/macro';
++import { useState } from 'react';
++import { createCallable } from 'react-call';
++
++export type SignFieldImageUploadDialogProps = {
++  initialImage?: string;
++};
++
++export const SignFieldImageUploadDialog = createCallable<SignFieldImageUploadDialogProps, string | null>(
++  ({ call, initialImage }) => {
++    const [localImage, setLocalImage] = useState(initialImage);
++
++    return (
++      <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
++        <DialogContent position="center" className="max-w-lg">
++          <div>
++            <DialogHeader>
++              <DialogTitle>
++                <Trans>Upload Image</Trans>
++              </DialogTitle>
++            </DialogHeader>
++
++            <div className="my-4 rounded-lg border bg-muted/30 p-4">
++              <ImageUploadField value={localImage ?? ''} onChange={setLocalImage} />
++            </div>
++          </div>
++
++          <DialogFooter>
++            <Button type="button" variant="secondary" onClick={() => call.end(null)}>
++              <Trans>Cancel</Trans>
++            </Button>
++
++            <Button type="button" disabled={!localImage} onClick={() => call.end(localImage || null)}>
++              <Trans>Upload</Trans>
++            </Button>
++          </DialogFooter>
++        </DialogContent>
++      </Dialog>
++    );
++  },
++);
+diff --git a/apps/remix/app/components/forms/editor/editor-field-date-form.tsx b/apps/remix/app/components/forms/editor/editor-field-date-form.tsx
+index 43863e5f3..5cf7136a5 100644
+--- a/apps/remix/app/components/forms/editor/editor-field-date-form.tsx
++++ b/apps/remix/app/components/forms/editor/editor-field-date-form.tsx
+@@ -11,9 +11,14 @@ import { useEffect } from 'react';
+ import { useForm, useWatch } from 'react-hook-form';
+ import type { z } from 'zod';
+ 
+-import { EditorGenericFontSizeField, EditorGenericTextAlignField } from './editor-field-generic-field-forms';
++import {
++  EditorGenericFontSizeField,
++  EditorGenericLabelField,
++  EditorGenericTextAlignField,
++} from './editor-field-generic-field-forms';
+ 
+ const ZDateFieldFormSchema = ZDateFieldMeta.pick({
++  label: true,
+   fontSize: true,
+   textAlign: true,
+   overflow: true,
+@@ -36,6 +41,7 @@ export const EditorFieldDateForm = ({
+     resolver: zodResolver(ZDateFieldFormSchema),
+     mode: 'onChange',
+     defaultValues: {
++      label: value.label || '',
+       fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
+       textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
+       overflow: value.overflow || FIELD_DATE_META_DEFAULT_VALUES.overflow,
+@@ -64,6 +70,10 @@ export const EditorFieldDateForm = ({
+     <Form {...form}>
+       <form>
+         <fieldset className="flex flex-col gap-2">
++          <div>
++            <EditorGenericLabelField formControl={form.control} />
++          </div>
++
+           <EditorGenericFontSizeField formControl={form.control} />
+ 
+           <EditorGenericTextAlignField formControl={form.control} />
+diff --git a/apps/remix/app/components/forms/editor/editor-field-email-form.tsx b/apps/remix/app/components/forms/editor/editor-field-email-form.tsx
+index eff532954..f8185459e 100644
+--- a/apps/remix/app/components/forms/editor/editor-field-email-form.tsx
++++ b/apps/remix/app/components/forms/editor/editor-field-email-form.tsx
+@@ -11,9 +11,14 @@ import { useEffect } from 'react';
+ import { useForm, useWatch } from 'react-hook-form';
+ import type { z } from 'zod';
+ 
+-import { EditorGenericFontSizeField, EditorGenericTextAlignField } from './editor-field-generic-field-forms';
++import {
++  EditorGenericFontSizeField,
++  EditorGenericLabelField,
++  EditorGenericTextAlignField,
++} from './editor-field-generic-field-forms';
+ 
+ const ZEmailFieldFormSchema = ZEmailFieldMeta.pick({
++  label: true,
+   fontSize: true,
+   textAlign: true,
+   overflow: true,
+@@ -36,6 +41,7 @@ export const EditorFieldEmailForm = ({
+     resolver: zodResolver(ZEmailFieldFormSchema),
+     mode: 'onChange',
+     defaultValues: {
++      label: value.label || '',
+       fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
+       textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
+       overflow: value.overflow || FIELD_EMAIL_META_DEFAULT_VALUES.overflow,
+@@ -64,6 +70,7 @@ export const EditorFieldEmailForm = ({
+     <Form {...form}>
+       <form>
+         <fieldset className="flex flex-col gap-2">
++          <EditorGenericLabelField formControl={form.control} />
+           <EditorGenericFontSizeField formControl={form.control} />
+ 
+           <EditorGenericTextAlignField formControl={form.control} />
+diff --git a/apps/remix/app/components/forms/editor/editor-field-image-upload-form.tsx b/apps/remix/app/components/forms/editor/editor-field-image-upload-form.tsx
+new file mode 100644
+index 000000000..250313671
+--- /dev/null
++++ b/apps/remix/app/components/forms/editor/editor-field-image-upload-form.tsx
+@@ -0,0 +1,60 @@
++import { Form } from '@documenso/ui/primitives/form/form';
++import { zodResolver } from '@hookform/resolvers/zod';
++import { useEffect } from 'react';
++import { useForm } from 'react-hook-form';
++import { z } from 'zod';
++
++import { EditorGenericLabelField, EditorGenericTextAlignField } from './editor-field-generic-field-forms';
++
++const ZImageUploadFormSchema = z.object({
++  label: z.string().optional(),
++  textAlign: z.enum(['left', 'center', 'right']).optional(),
++});
++
++type TImageUploadFormSchema = z.infer<typeof ZImageUploadFormSchema>;
++
++type EditorFieldImageUploadFormProps = {
++  label: string | null;
++  textAlign: string | undefined;
++  onLabelChange: (value: string) => void;
++  onTextAlignChange: (value: string) => void;
++};
++
++export const EditorFieldImageUploadForm = ({
++  label,
++  textAlign,
++  onLabelChange,
++  onTextAlignChange,
++}: EditorFieldImageUploadFormProps) => {
++  const form = useForm<TImageUploadFormSchema>({
++    resolver: zodResolver(ZImageUploadFormSchema),
++    mode: 'onChange',
++    defaultValues: {
++      label: label || '',
++      textAlign: textAlign as 'left' | 'center' | 'right' | undefined,
++    },
++  });
++
++  const { control } = form;
++
++  useEffect(() => {
++    const subscription = form.watch((value) => {
++      onLabelChange(value.label || '');
++      if (value.textAlign) {
++        onTextAlignChange(value.textAlign);
++      }
++    });
++    return () => subscription.unsubscribe();
++  }, [form, onLabelChange, onTextAlignChange]);
++
++  return (
++    <Form {...form}>
++      <form>
++        <fieldset className="flex flex-col gap-2">
++          <EditorGenericLabelField formControl={control} />
++          <EditorGenericTextAlignField formControl={control} />
++        </fieldset>
++      </form>
++    </Form>
++  );
++};
+diff --git a/apps/remix/app/components/forms/editor/editor-field-initials-form.tsx b/apps/remix/app/components/forms/editor/editor-field-initials-form.tsx
+index 7a9a66030..67d6de6f9 100644
+--- a/apps/remix/app/components/forms/editor/editor-field-initials-form.tsx
++++ b/apps/remix/app/components/forms/editor/editor-field-initials-form.tsx
+@@ -10,9 +10,14 @@ import { useEffect } from 'react';
+ import { useForm, useWatch } from 'react-hook-form';
+ import type { z } from 'zod';
+ 
+-import { EditorGenericFontSizeField, EditorGenericTextAlignField } from './editor-field-generic-field-forms';
++import {
++  EditorGenericFontSizeField,
++  EditorGenericLabelField,
++  EditorGenericTextAlignField,
++} from './editor-field-generic-field-forms';
+ 
+ const ZInitialsFieldFormSchema = ZInitialsFieldMeta.pick({
++  label: true,
+   fontSize: true,
+   textAlign: true,
+ });
+@@ -34,6 +39,7 @@ export const EditorFieldInitialsForm = ({
+     resolver: zodResolver(ZInitialsFieldFormSchema),
+     mode: 'onChange',
+     defaultValues: {
++      label: value.label || '',
+       fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
+       textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
+     },
+@@ -61,6 +67,7 @@ export const EditorFieldInitialsForm = ({
+     <Form {...form}>
+       <form>
+         <fieldset className="flex flex-col gap-2">
++          <EditorGenericLabelField formControl={form.control} />
+           <EditorGenericFontSizeField formControl={form.control} />
+ 
+           <EditorGenericTextAlignField formControl={form.control} />
+diff --git a/apps/remix/app/components/forms/editor/editor-field-name-form.tsx b/apps/remix/app/components/forms/editor/editor-field-name-form.tsx
+index 435ce7e90..eac0938f6 100644
+--- a/apps/remix/app/components/forms/editor/editor-field-name-form.tsx
++++ b/apps/remix/app/components/forms/editor/editor-field-name-form.tsx
+@@ -10,10 +10,15 @@ import { useEffect } from 'react';
+ import { useForm, useWatch } from 'react-hook-form';
+ import type { z } from 'zod';
+ 
+-import { EditorGenericFontSizeField, EditorGenericTextAlignField } from './editor-field-generic-field-forms';
++import {
++  EditorGenericFontSizeField,
++  EditorGenericLabelField,
++  EditorGenericTextAlignField,
++} from './editor-field-generic-field-forms';
+ 
+ const ZNameFieldFormSchema = ZNameFieldMeta.pick({
+   fontSize: true,
++  label: true,
+   textAlign: true,
+ });
+ 
+@@ -35,6 +40,7 @@ export const EditorFieldNameForm = ({
+     mode: 'onChange',
+     defaultValues: {
+       fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
++      label: value.label || '',
+       textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
+     },
+   });
+@@ -61,6 +67,8 @@ export const EditorFieldNameForm = ({
+     <Form {...form}>
+       <form>
+         <fieldset className="flex flex-col gap-2">
++          <EditorGenericLabelField formControl={form.control} />
++
+           <EditorGenericFontSizeField formControl={form.control} />
+ 
+           <EditorGenericTextAlignField formControl={form.control} />
+diff --git a/apps/remix/app/components/forms/editor/editor-field-signature-form.tsx b/apps/remix/app/components/forms/editor/editor-field-signature-form.tsx
+index d585b90e7..650191f68 100644
+--- a/apps/remix/app/components/forms/editor/editor-field-signature-form.tsx
++++ b/apps/remix/app/components/forms/editor/editor-field-signature-form.tsx
+@@ -1,5 +1,6 @@
+ import { DEFAULT_SIGNATURE_TEXT_FONT_SIZE } from '@documenso/lib/constants/pdf';
+ import {
++  FIELD_DEFAULT_GENERIC_ALIGN,
+   FIELD_SIGNATURE_META_DEFAULT_VALUES,
+   type TSignatureFieldMeta,
+   ZSignatureFieldMeta,
+@@ -11,10 +12,16 @@ import { useEffect } from 'react';
+ import { useForm, useWatch } from 'react-hook-form';
+ import type { z } from 'zod';
+ 
+-import { EditorGenericFontSizeField } from './editor-field-generic-field-forms';
++import {
++  EditorGenericFontSizeField,
++  EditorGenericLabelField,
++  EditorGenericTextAlignField,
++} from './editor-field-generic-field-forms';
+ 
+ const ZSignatureFieldFormSchema = ZSignatureFieldMeta.pick({
++  label: true,
+   fontSize: true,
++  textAlign: true,
+   overflow: true,
+ });
+ 
+@@ -35,8 +42,10 @@ export const EditorFieldSignatureForm = ({
+     resolver: zodResolver(ZSignatureFieldFormSchema),
+     mode: 'onChange',
+     defaultValues: {
++      label: value.label || '',
+       overflow: value.overflow || FIELD_SIGNATURE_META_DEFAULT_VALUES.overflow,
+       fontSize: value.fontSize || DEFAULT_SIGNATURE_TEXT_FONT_SIZE,
++      textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
+     },
+   });
+ 
+@@ -62,12 +71,20 @@ export const EditorFieldSignatureForm = ({
+     <Form {...form}>
+       <form>
+         <fieldset className="flex flex-col gap-2">
++          <div>
++            <EditorGenericLabelField formControl={form.control} />
++          </div>
++
+           <div>
+             <EditorGenericFontSizeField formControl={form.control} />
+             <p className="mt-0.5 text-muted-foreground text-xs">
+               <Trans>The typed signature font size</Trans>
+             </p>
+           </div>
++
++          <div>
++            <EditorGenericTextAlignField formControl={form.control} />
++          </div>
+         </fieldset>
+       </form>
+     </Form>
+diff --git a/apps/remix/app/components/general/document-signing/document-signing-field-container.tsx b/apps/remix/app/components/general/document-signing/document-signing-field-container.tsx
+index ea64c9756..b3a654834 100644
+--- a/apps/remix/app/components/general/document-signing/document-signing-field-container.tsx
++++ b/apps/remix/app/components/general/document-signing/document-signing-field-container.tsx
+@@ -38,7 +38,18 @@ export type DocumentSigningFieldContainerProps = {
+    */
+   onSign?: (documentAuthValue?: TRecipientActionAuth) => Promise<void> | void;
+   onRemove?: (fieldType?: string) => Promise<void> | void;
+-  type?: 'Date' | 'Initials' | 'Email' | 'Name' | 'Signature' | 'Text' | 'Radio' | 'Dropdown' | 'Number' | 'Checkbox';
++  type?:
++    | 'Date'
++    | 'Initials'
++    | 'Email'
++    | 'Name'
++    | 'Signature'
++    | 'Seal'
++    | 'Text'
++    | 'Radio'
++    | 'Dropdown'
++    | 'Number'
++    | 'Checkbox';
+   tooltipText?: string | null;
+ };
+ 
+diff --git a/apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx b/apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
+index bbd85b48f..abfedda38 100644
+--- a/apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
++++ b/apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
+@@ -23,6 +23,7 @@ import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-d
+ import { SignFieldCheckboxDialog } from '~/components/dialogs/sign-field-checkbox-dialog';
+ import { SignFieldDropdownDialog } from '~/components/dialogs/sign-field-dropdown-dialog';
+ import { SignFieldEmailDialog } from '~/components/dialogs/sign-field-email-dialog';
++import { SignFieldImageUploadDialog } from '~/components/dialogs/sign-field-image-upload-dialog';
+ import { SignFieldInitialsDialog } from '~/components/dialogs/sign-field-initials-dialog';
+ import { SignFieldNameDialog } from '~/components/dialogs/sign-field-name-dialog';
+ import { SignFieldNumberDialog } from '~/components/dialogs/sign-field-number-dialog';
+@@ -88,6 +89,7 @@ export const DocumentSigningPageViewV2 = () => {
+       <SignFieldInitialsDialog.Root />
+       <SignFieldDropdownDialog.Root />
+       <SignFieldSignatureDialog.Root />
++      <SignFieldImageUploadDialog.Root />
+       <SignFieldCheckboxDialog.Root />
+ 
+       <EnvelopeSignerHeader />
+diff --git a/apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx b/apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx
+index 3ff8b1d68..d819c7515 100644
+--- a/apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx
++++ b/apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx
+@@ -7,6 +7,7 @@ import type {
+   TRemovedSignedFieldWithTokenMutationSchema,
+   TSignFieldWithTokenMutationSchema,
+ } from '@documenso/trpc/server/field-router/schema';
++import { cn } from '@documenso/ui/lib/utils';
+ import { Button } from '@documenso/ui/primitives/button';
+ import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
+ import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
+@@ -14,6 +15,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
+ import { msg } from '@lingui/core/macro';
+ import { useLingui } from '@lingui/react';
+ import { Trans } from '@lingui/react/macro';
++import { FieldType } from '@prisma/client';
+ import { Loader } from 'lucide-react';
+ import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+ import { useRevalidator } from 'react-router';
+@@ -70,6 +72,9 @@ export const DocumentSigningSignatureField = ({
+ 
+   const { signature } = field;
+ 
++  const isSeal = field.type === FieldType.IMAGE_UPLOAD;
++  const fieldLabel = isSeal ? 'Seal' : 'Signature';
++
+   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading;
+ 
+   const [showSignatureModal, setShowSignatureModal] = useState(false);
+@@ -229,7 +234,7 @@ export const DocumentSigningSignatureField = ({
+       onPreSign={onPreSign}
+       onSign={onSign}
+       onRemove={onRemove}
+-      type="Signature"
++      type={fieldLabel}
+     >
+       {isLoading && (
+         <div className="absolute inset-0 flex items-center justify-center rounded-md bg-background">
+@@ -238,24 +243,46 @@ export const DocumentSigningSignatureField = ({
+       )}
+ 
+       {state === 'empty' && (
+-        <p className="font-signature text-[clamp(0.575rem,25cqw,1.2rem)] text-muted-foreground text-xl duration-200 group-hover:text-primary group-hover:text-recipient-green">
+-          <Trans>Signature</Trans>
++        <p className="text-center font-signature text-[clamp(0.575rem,25cqw,1.2rem)] text-muted-foreground text-xl duration-200 group-hover:text-primary group-hover:text-recipient-green">
++          {fieldLabel}
+         </p>
+       )}
+ 
+       {state === 'signed-image' && signature?.signatureImageAsBase64 && (
+-        <img
+-          src={signature.signatureImageAsBase64}
+-          alt={`Signature for ${recipient.name}`}
+-          className="h-full w-full object-contain"
+-        />
++        <div
++          className={cn('flex h-full w-full items-center', {
++            'justify-start': (field.fieldMeta as any)?.textAlign === 'left',
++            'justify-center': !(field.fieldMeta as any)?.textAlign || (field.fieldMeta as any)?.textAlign === 'center',
++            'justify-end': (field.fieldMeta as any)?.textAlign === 'right',
++          })}
++        >
++          <img
++            src={signature.signatureImageAsBase64}
++            alt={`Signature for ${recipient.name}`}
++            className="h-full max-w-full object-contain"
++          />
++        </div>
+       )}
+ 
+       {state === 'signed-text' && (
+-        <div ref={containerRef} className="flex h-full w-full items-center justify-center p-2">
++        <div
++          ref={containerRef}
++          className={cn('flex h-full w-full items-center', {
++            'justify-start': (field.fieldMeta as any)?.textAlign === 'left',
++            'justify-center': !(field.fieldMeta as any)?.textAlign || (field.fieldMeta as any)?.textAlign === 'center',
++            'justify-end': (field.fieldMeta as any)?.textAlign === 'right',
++          })}
++        >
+           <p
+             ref={signatureRef}
+-            className="w-full overflow-hidden break-all text-center font-signature text-muted-foreground leading-tight duration-200"
++            className={cn(
++              'w-full overflow-hidden break-all font-signature text-muted-foreground leading-tight duration-200',
++              {
++                'text-left': (field.fieldMeta as any)?.textAlign === 'left',
++                'text-center': !(field.fieldMeta as any)?.textAlign || (field.fieldMeta as any)?.textAlign === 'center',
++                'text-right': (field.fieldMeta as any)?.textAlign === 'right',
++              },
++            )}
+             style={{ fontSize: `${fontSize}rem` }}
+           >
+             {signature?.typedSignature}
+diff --git a/apps/remix/app/components/general/document-signing/envelope-signing-provider.tsx b/apps/remix/app/components/general/document-signing/envelope-signing-provider.tsx
+index bfa92c55f..3100ced37 100644
+--- a/apps/remix/app/components/general/document-signing/envelope-signing-provider.tsx
++++ b/apps/remix/app/components/general/document-signing/envelope-signing-provider.tsx
+@@ -358,7 +358,7 @@ export const EnvelopeSigningProvider = ({
+       ...insertionValues,
+     };
+ 
+-    if (fieldValue.type === FieldType.SIGNATURE) {
++    if (fieldValue.type === FieldType.SIGNATURE || fieldValue.type === FieldType.IMAGE_UPLOAD) {
+       const isBase64 = isBase64Image(fieldValue.value || '');
+ 
+       updatedField.signature = fieldValue.value
+diff --git a/apps/remix/app/components/general/envelope-editor/envelope-editor-fields-drag-drop.tsx b/apps/remix/app/components/general/envelope-editor/envelope-editor-fields-drag-drop.tsx
+index 2c2c4516d..ffe19e15f 100644
+--- a/apps/remix/app/components/general/envelope-editor/envelope-editor-fields-drag-drop.tsx
++++ b/apps/remix/app/components/general/envelope-editor/envelope-editor-fields-drag-drop.tsx
+@@ -20,6 +20,7 @@ import {
+   HashIcon,
+   ListIcon,
+   MailIcon,
++  StampIcon,
+   TextIcon,
+   UserIcon,
+ } from 'lucide-react';
+@@ -30,14 +31,25 @@ const MIN_WIDTH_PX = 36;
+ 
+ const DEFAULT_HEIGHT_PX = MIN_HEIGHT_PX * 2.5;
+ const DEFAULT_WIDTH_PX = MIN_WIDTH_PX * 2.5;
+-
+-export const fieldButtonList = [
++const IMAGE_UPLOAD_FIELD_TYPE = 'IMAGE_UPLOAD' as FieldType;
++
++export const fieldButtonList: {
++  type: FieldType;
++  icon: any;
++  name: any;
++  className?: string;
++}[] = [
+   {
+     type: FieldType.SIGNATURE,
+     icon: SignatureIcon,
+     name: msg`Signature`,
+     className: 'font-signature text-lg',
+   },
++  {
++    type: IMAGE_UPLOAD_FIELD_TYPE,
++    icon: StampIcon,
++    name: msg`Image Upload`,
++  },
+   {
+     type: FieldType.EMAIL,
+     icon: MailIcon,
+@@ -150,11 +162,14 @@ export const EnvelopeEditorFieldDragDrop = ({
+       }
+ 
+       const $page = getPage(event, PDF_VIEWER_PAGE_SELECTOR);
++      const withinBounds = isWithinPageBounds(
++        event,
++        PDF_VIEWER_PAGE_SELECTOR,
++        fieldBounds.current.width,
++        fieldBounds.current.height,
++      );
+ 
+-      if (
+-        !$page ||
+-        !isWithinPageBounds(event, PDF_VIEWER_PAGE_SELECTOR, fieldBounds.current.width, fieldBounds.current.height)
+-      ) {
++      if (!$page || !withinBounds) {
+         setSelectedField(null);
+         return;
+       }
+@@ -245,8 +260,12 @@ export const EnvelopeEditorFieldDragDrop = ({
+             disabled={isFieldsDisabled}
+             key={field.type}
+             type="button"
+-            onClick={() => setSelectedField(field.type)}
+-            onMouseDown={() => setSelectedField(field.type)}
++            onClick={() => {
++              setSelectedField(field.type);
++            }}
++            onMouseDown={() => {
++              setSelectedField(field.type);
++            }}
+             data-selected={selectedField === field.type ? true : undefined}
+             className={cn(
+               'group flex h-12 cursor-pointer items-center justify-center rounded-lg border border-border px-4 transition-colors',
+diff --git a/apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx b/apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
+index 7573d5fb4..9562c3dd8 100644
+--- a/apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
++++ b/apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
+@@ -26,6 +26,22 @@ import { useEffect, useMemo, useRef, useState } from 'react';
+ import { fieldButtonList } from './envelope-editor-fields-drag-drop';
+ import { EnvelopeRecipientSelectorCommand } from './envelope-recipient-selector';
+ 
++const isEditableKeyboardTarget = (target: EventTarget | null) => {
++  if (!(target instanceof HTMLElement)) {
++    return false;
++  }
++
++  const tagName = target.tagName.toLowerCase();
++
++  return (
++    tagName === 'input' ||
++    tagName === 'textarea' ||
++    tagName === 'select' ||
++    target.isContentEditable ||
++    target.closest('[contenteditable="true"]') !== null
++  );
++};
++
+ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
+   const { t, i18n } = useLingui();
+   const { envelope, editorFields, getRecipientColorKey } = useCurrentEnvelopeEditor();
+@@ -53,6 +69,18 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
+     [editorFields.localFields, pageNumber, currentEnvelopeItem?.id],
+   );
+ 
++  useEffect(() => {
++    if (!pageLayer.current) {
++      return;
++    }
++
++    for (const field of localPageFields) {
++      renderFieldOnLayer(field);
++    }
++
++    pageLayer.current.batchDraw();
++  }, [localPageFields, pageLayer]);
++
+   const handleResizeOrMove = (event: KonvaEventObject<Event>) => {
+     const isDragEvent = event.type === 'dragend';
+ 
+@@ -118,7 +146,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
+       field: {
+         renderId: field.formId,
+         ...field,
+-        customText: '',
++        customText: field.customText ?? '',
+         inserted: false,
+         fieldMeta: field.fieldMeta,
+       },
+@@ -458,6 +486,27 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
+     setSelectedFields([]);
+   };
+ 
++  useEffect(() => {
++    const handleDeleteKeyDown = (event: KeyboardEvent) => {
++      if (event.key !== 'Delete' && event.key !== 'Backspace') {
++        return;
++      }
++
++      if (selectedKonvaFieldGroups.length === 0 || isEditableKeyboardTarget(event.target)) {
++        return;
++      }
++
++      event.preventDefault();
++      deletedSelectedFields();
++    };
++
++    window.addEventListener('keydown', handleDeleteKeyDown);
++
++    return () => {
++      window.removeEventListener('keydown', handleDeleteKeyDown);
++    };
++  }, [selectedKonvaFieldGroups]);
++
+   const changeSelectedFieldsRecipients = (recipientId: number) => {
+     const fields = selectedKonvaFieldGroups
+       .map((field) => editorFields.getFieldByFormId(field.id()))
+diff --git a/apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx b/apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
+index a5ec4ed16..ab7d7d5aa 100644
+--- a/apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
++++ b/apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
+@@ -9,6 +9,7 @@ import {
+   type TDropdownFieldMeta,
+   type TEmailFieldMeta,
+   type TFieldMetaSchema,
++  type TImageUploadFieldMeta,
+   type TInitialsFieldMeta,
+   type TNameFieldMeta,
+   type TNumberFieldMeta,
+@@ -41,6 +42,7 @@ import { EditorFieldCheckboxForm } from '~/components/forms/editor/editor-field-
+ import { EditorFieldDateForm } from '~/components/forms/editor/editor-field-date-form';
+ import { EditorFieldDropdownForm } from '~/components/forms/editor/editor-field-dropdown-form';
+ import { EditorFieldEmailForm } from '~/components/forms/editor/editor-field-email-form';
++import { EditorFieldImageUploadForm } from '~/components/forms/editor/editor-field-image-upload-form';
+ import { EditorFieldInitialsForm } from '~/components/forms/editor/editor-field-initials-form';
+ import { EditorFieldNameForm } from '~/components/forms/editor/editor-field-name-form';
+ import { EditorFieldNumberForm } from '~/components/forms/editor/editor-field-number-form';
+@@ -55,9 +57,10 @@ import { EnvelopeEditorFieldsPageRenderer } from './envelope-editor-fields-page-
+ import { EnvelopeRendererFileSelector } from './envelope-file-selector';
+ import { EnvelopeRecipientSelector } from './envelope-recipient-selector';
+ 
+-const FieldSettingsTypeTranslations: Record<FieldType, MessageDescriptor> = {
++const FieldSettingsTypeTranslations: Record<string, MessageDescriptor> = {
+   [FieldType.SIGNATURE]: msg`Signature Settings`,
+   [FieldType.FREE_SIGNATURE]: msg`Free Signature Settings`,
++  IMAGE_UPLOAD: msg`Image Upload Settings`,
+   [FieldType.TEXT]: msg`Text Settings`,
+   [FieldType.DATE]: msg`Date Settings`,
+   [FieldType.EMAIL]: msg`Email Settings`,
+@@ -379,6 +382,26 @@ export const EnvelopeEditorFieldsPage = () => {
+                         onValueChange={(value) => updateSelectedFieldMeta(value)}
+                       />
+                     ))
++                    .with('IMAGE_UPLOAD', () => (
++                      <EditorFieldImageUploadForm
++                        label={(selectedField?.fieldMeta as TImageUploadFieldMeta | undefined)?.label ?? null}
++                        textAlign={(selectedField?.fieldMeta as TImageUploadFieldMeta | undefined)?.textAlign}
++                        onLabelChange={(value) =>
++                          updateSelectedFieldMeta({
++                            ...selectedField.fieldMeta,
++                            type: 'IMAGE_UPLOAD',
++                            label: value,
++                          } as TImageUploadFieldMeta)
++                        }
++                        onTextAlignChange={(value) =>
++                          updateSelectedFieldMeta({
++                            ...selectedField.fieldMeta,
++                            type: 'IMAGE_UPLOAD',
++                            textAlign: value,
++                          } as TImageUploadFieldMeta)
++                        }
++                      />
++                    ))
+                     .with(FieldType.CHECKBOX, () => (
+                       <EditorFieldCheckboxForm
+                         value={selectedField?.fieldMeta as TCheckboxFieldMeta | undefined}
+diff --git a/apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx b/apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
+index 42144b6f8..d173281d3 100644
+--- a/apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
++++ b/apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
+@@ -192,6 +192,15 @@ export const EnvelopeEditorPreviewPage = () => {
+           .with({ type: FieldType.FREE_SIGNATURE }, () => {
+             return {
+               customText: '',
++              signature: {
++                signatureImageAsBase64: '',
++                typedSignature: recipientName,
++              },
++            };
++          })
++          .with({ type: 'IMAGE_UPLOAD' }, () => {
++            return {
++              customText: field.customText || '',
+             };
+           })
+           .exhaustive(),
+diff --git a/apps/remix/app/components/general/envelope-signing/envelope-signer-page-renderer.tsx b/apps/remix/app/components/general/envelope-signing/envelope-signer-page-renderer.tsx
+index ed4ccaf31..ad97f8829 100644
+--- a/apps/remix/app/components/general/envelope-signing/envelope-signer-page-renderer.tsx
++++ b/apps/remix/app/components/general/envelope-signing/envelope-signer-page-renderer.tsx
+@@ -390,6 +390,36 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
+               loadingSpinnerGroup.destroy();
+             });
+         })
++        /**
++         * IMAGE UPLOAD FIELD.
++         */
++        .with({ type: FieldType.IMAGE_UPLOAD }, (field) => {
++          handleSignatureFieldClick({
++            field,
++            signature: unparsedField.signature?.signatureImageAsBase64 || null,
++          })
++            .then(async (payload) => {
++              if (payload) {
++                fieldGroup.add(loadingSpinnerGroup);
++
++                if (payload.value) {
++                  void executeActionAuthProcedure({
++                    onReauthFormSubmit: async (authOptions) => {
++                      await signField(field.id, payload, authOptions);
++
++                      loadingSpinnerGroup.destroy();
++                    },
++                    actionTarget: field.type,
++                  });
++                } else {
++                  await signField(field.id, payload);
++                }
++              }
++            })
++            .finally(() => {
++              loadingSpinnerGroup.destroy();
++            });
++        })
+         .exhaustive();
+     };
+ 
+diff --git a/apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx b/apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+index d659dac4f..0c81b7b69 100644
+--- a/apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
++++ b/apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+@@ -198,7 +198,7 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
+   const getRecipientSignatureField = (recipientId: number) => {
+     return document.recipients
+       .find((recipient) => recipient.id === recipientId)
+-      ?.fields.find((field) => field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE);
++      ?.fields.find((field) => field.type === FieldType.SIGNATURE || field.type === FieldType.IMAGE_UPLOAD);
+   };
+ 
+   return (
+diff --git a/apps/remix/app/utils/field-signing/signature-field.ts b/apps/remix/app/utils/field-signing/signature-field.ts
+index 57890e549..4344e62ac 100644
+--- a/apps/remix/app/utils/field-signing/signature-field.ts
++++ b/apps/remix/app/utils/field-signing/signature-field.ts
+@@ -1,12 +1,13 @@
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+-import type { TFieldSignature } from '@documenso/lib/types/field';
++import type { TFieldImageUpload, TFieldSignature } from '@documenso/lib/types/field';
+ import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
+ import { FieldType } from '@prisma/client';
+ 
++import { SignFieldImageUploadDialog } from '~/components/dialogs/sign-field-image-upload-dialog';
+ import { SignFieldSignatureDialog } from '~/components/dialogs/sign-field-signature-dialog';
+ 
+ type HandleSignatureFieldClickOptions = {
+-  field: TFieldSignature;
++  field: TFieldSignature | TFieldImageUpload;
+   fullName?: string;
+   signature: string | null;
+   typedSignatureEnabled?: boolean;
+@@ -16,10 +17,13 @@ type HandleSignatureFieldClickOptions = {
+ 
+ export const handleSignatureFieldClick = async (
+   options: HandleSignatureFieldClickOptions,
+-): Promise<Extract<TSignEnvelopeFieldValue, { type: typeof FieldType.SIGNATURE }> | null> => {
++): Promise<Extract<
++  TSignEnvelopeFieldValue,
++  { type: typeof FieldType.SIGNATURE | typeof FieldType.IMAGE_UPLOAD }
++> | null> => {
+   const { field, fullName, signature, typedSignatureEnabled, uploadSignatureEnabled, drawSignatureEnabled } = options;
+ 
+-  if (field.type !== FieldType.SIGNATURE) {
++  if (field.type !== FieldType.SIGNATURE && field.type !== FieldType.IMAGE_UPLOAD) {
+     throw new AppError(AppErrorCode.INVALID_REQUEST, {
+       message: 'Invalid field type',
+     });
+@@ -27,7 +31,7 @@ export const handleSignatureFieldClick = async (
+ 
+   if (field.inserted) {
+     return {
+-      type: FieldType.SIGNATURE,
++      type: field.type,
+       value: null,
+     };
+   }
+@@ -35,12 +39,18 @@ export const handleSignatureFieldClick = async (
+   let signatureToInsert = signature;
+ 
+   if (!signatureToInsert) {
+-    signatureToInsert = await SignFieldSignatureDialog.call({
+-      fullName,
+-      typedSignatureEnabled,
+-      uploadSignatureEnabled,
+-      drawSignatureEnabled,
+-    });
++    if (field.type === FieldType.IMAGE_UPLOAD) {
++      signatureToInsert = await SignFieldImageUploadDialog.call({
++        initialImage: signature || undefined,
++      });
++    } else {
++      signatureToInsert = await SignFieldSignatureDialog.call({
++        fullName,
++        typedSignatureEnabled,
++        uploadSignatureEnabled,
++        drawSignatureEnabled,
++      });
++    }
+   }
+ 
+   if (!signatureToInsert) {
+@@ -48,7 +58,7 @@ export const handleSignatureFieldClick = async (
+   }
+ 
+   return {
+-    type: FieldType.SIGNATURE,
++    type: field.type,
+     value: signatureToInsert,
+   };
+ };
+diff --git a/packages/api/v1/implementation.ts b/packages/api/v1/implementation.ts
+index 5d8062894..3c3e3e099 100644
+--- a/packages/api/v1/implementation.ts
++++ b/packages/api/v1/implementation.ts
+@@ -1397,7 +1397,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
+               .with('DROPDOWN', () => ZDropdownFieldMeta.safeParse(fieldMeta))
+               .with('NUMBER', () => ZNumberFieldMeta.safeParse(fieldMeta))
+               .with('TEXT', () => ZTextFieldMeta.safeParse(fieldMeta))
+-              .with('SIGNATURE', 'INITIALS', 'DATE', 'EMAIL', 'NAME', () => ({
++              .with('SIGNATURE', 'INITIALS', 'DATE', 'EMAIL', 'NAME', 'IMAGE_UPLOAD', () => ({
+                 success: true,
+                 data: undefined,
+               }))
+diff --git a/packages/app-tests/e2e/api/v1/document-sending.spec.ts b/packages/app-tests/e2e/api/v1/document-sending.spec.ts
+index 01cfb82bb..96a4dbc8b 100644
+--- a/packages/app-tests/e2e/api/v1/document-sending.spec.ts
++++ b/packages/app-tests/e2e/api/v1/document-sending.spec.ts
+@@ -280,7 +280,7 @@ test.describe('Document API', () => {
+     expect(response.status()).toBe(200);
+   });
+ 
+-  test('sendDocument: should succeed when signer has FREE_SIGNATURE field', async ({ request }) => {
++  test('sendDocument: should succeed when signer has IMAGE_UPLOAD field', async ({ request }) => {
+     const { user, team } = await seedUser();
+ 
+     // Create a blank document and get it with envelope items
+@@ -301,10 +301,10 @@ test.describe('Document API', () => {
+       },
+     });
+ 
+-    // Add a FREE_SIGNATURE field
++    // Add an IMAGE_UPLOAD field
+     await prisma.field.create({
+       data: {
+-        type: FieldType.FREE_SIGNATURE,
++        type: FieldType.IMAGE_UPLOAD,
+         page: 1,
+         positionX: 100,
+         positionY: 100,
+diff --git a/packages/app-tests/e2e/api/v2/distribute-validation.spec.ts b/packages/app-tests/e2e/api/v2/distribute-validation.spec.ts
+index c89b9dc98..217762699 100644
+--- a/packages/app-tests/e2e/api/v2/distribute-validation.spec.ts
++++ b/packages/app-tests/e2e/api/v2/distribute-validation.spec.ts
+@@ -203,8 +203,8 @@ test.describe('Envelope distribute validation', () => {
+     expect(response.success).toBe(true);
+   });
+ 
+-  // Note: FREE_SIGNATURE field type is not supported via the v2 API for field creation,
+-  // so we only test with SIGNATURE fields here. The v1 tests cover FREE_SIGNATURE
++  // Note: IMAGE_UPLOAD field type is not supported via the v2 API for field creation,
++  // so we only test with SIGNATURE fields here. The v1 tests cover IMAGE_UPLOAD
+   // using direct Prisma creation.
+ 
+   test('should succeed when VIEWER has no fields', async ({ request }) => {
+diff --git a/packages/lib/client-only/hooks/use-editor-fields.ts b/packages/lib/client-only/hooks/use-editor-fields.ts
+index 8f86f0a2c..d67fca83a 100644
+--- a/packages/lib/client-only/hooks/use-editor-fields.ts
++++ b/packages/lib/client-only/hooks/use-editor-fields.ts
+@@ -16,13 +16,14 @@ export const ZLocalFieldSchema = z.object({
+   formId: z.string().min(1),
+   // This is the ID of the envelope item to put the field on.
+   envelopeItemId: z.string(),
+-  type: z.nativeEnum(FieldType),
++  type: z.union([z.nativeEnum(FieldType), z.literal('IMAGE_UPLOAD')]),
+   recipientId: z.number(),
+   page: z.number().min(1),
+   positionX: z.number().min(0),
+   positionY: z.number().min(0),
+   width: z.number().min(0),
+   height: z.number().min(0),
++  customText: z.string().optional(),
+   fieldMeta: ZFieldMetaSchema,
+ });
+ 
+@@ -82,6 +83,7 @@ export const useEditorFields = ({ envelope, handleFieldsUpdate }: EditorFieldsPr
+         width: Number(field.width),
+         height: Number(field.height),
+         recipientId: field.recipientId,
++        customText: field.customText ?? '',
+         fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
+       }),
+     );
+diff --git a/packages/lib/client-only/providers/envelope-editor-provider.tsx b/packages/lib/client-only/providers/envelope-editor-provider.tsx
+index 8b48e45f6..a3273b0f8 100644
+--- a/packages/lib/client-only/providers/envelope-editor-provider.tsx
++++ b/packages/lib/client-only/providers/envelope-editor-provider.tsx
+@@ -582,7 +582,7 @@ const mapLocalFieldsToFields = ({
+       height: new Prisma.Decimal(field.height),
+       secondaryId: foundField?.secondaryId || '',
+       inserted: foundField?.inserted || false,
+-      customText: foundField?.customText || '',
++      customText: field.customText || '',
+       fieldMeta: field.fieldMeta || null,
+     };
+   });
+diff --git a/packages/lib/server-only/document/send-document.ts b/packages/lib/server-only/document/send-document.ts
+index 6fc2a026d..bd02a3c2b 100644
+--- a/packages/lib/server-only/document/send-document.ts
++++ b/packages/lib/server-only/document/send-document.ts
+@@ -360,7 +360,14 @@ export const extractFieldAutoInsertValues = (
+   unknownField: Field,
+   recipient: Pick<Recipient, 'email'>,
+ ): { fieldId: number; customText: string } | null => {
+-  const parsedField = ZFieldAndMetaSchema.safeParse(unknownField);
++  // Normalize `fieldMeta: null` (stored in DB as JSON null) to `undefined` so
++  // the shared Zod schema treats it the same as an empty object/absent meta.
++  const normalizedField = {
++    ...unknownField,
++    fieldMeta: unknownField.fieldMeta === null ? undefined : unknownField.fieldMeta,
++  } as Field;
++
++  const parsedField = ZFieldAndMetaSchema.safeParse(normalizedField);
+ 
+   if (parsedField.error) {
+     throw new AppError(AppErrorCode.INVALID_REQUEST, {
+diff --git a/packages/lib/server-only/field/set-fields-for-document.ts b/packages/lib/server-only/field/set-fields-for-document.ts
+index 054724085..7fc8f9e36 100644
+--- a/packages/lib/server-only/field/set-fields-for-document.ts
++++ b/packages/lib/server-only/field/set-fields-for-document.ts
+@@ -209,6 +209,7 @@ export const setFieldsForDocument = async ({
+             positionY: field.pageY,
+             width: field.pageWidth,
+             height: field.pageHeight,
++            customText: field.customText ?? '',
+             fieldMeta: parsedFieldMeta,
+           },
+           create: {
+@@ -218,7 +219,7 @@ export const setFieldsForDocument = async ({
+             positionY: field.pageY,
+             width: field.pageWidth,
+             height: field.pageHeight,
+-            customText: '',
++            customText: field.customText ?? '',
+             inserted: false,
+             fieldMeta: parsedFieldMeta,
+             envelope: {
+@@ -356,6 +357,7 @@ type FieldData = {
+   pageY: number;
+   pageWidth: number;
+   pageHeight: number;
++  customText?: string;
+   fieldMeta?: FieldMeta;
+ };
+ 
+@@ -371,6 +373,7 @@ const hasFieldBeenChanged = (field: Field, newFieldData: FieldData) => {
+     field.positionY.toNumber() !== newFieldData.pageY ||
+     field.width.toNumber() !== newFieldData.pageWidth ||
+     field.height.toNumber() !== newFieldData.pageHeight ||
++    field.customText !== newFieldData.customText ||
+     !isDeepEqual(currentFieldMeta, newFieldMeta)
+   );
+ };
+diff --git a/packages/lib/server-only/field/set-fields-for-template.ts b/packages/lib/server-only/field/set-fields-for-template.ts
+index 1e40398f7..cab4e1361 100644
+--- a/packages/lib/server-only/field/set-fields-for-template.ts
++++ b/packages/lib/server-only/field/set-fields-for-template.ts
+@@ -36,6 +36,7 @@ export type SetFieldsForTemplateOptions = {
+     pageY: number;
+     pageWidth: number;
+     pageHeight: number;
++    customText?: string;
+     fieldMeta?: FieldMeta;
+   }[];
+ };
+@@ -179,6 +180,7 @@ export const setFieldsForTemplate = async ({ userId, teamId, id, fields }: SetFi
+           positionY: field.pageY,
+           width: field.pageWidth,
+           height: field.pageHeight,
++          customText: field.customText ?? '',
+           fieldMeta: parsedFieldMeta,
+         },
+         create: {
+@@ -188,7 +190,7 @@ export const setFieldsForTemplate = async ({ userId, teamId, id, fields }: SetFi
+           positionY: field.pageY,
+           width: field.pageWidth,
+           height: field.pageHeight,
+-          customText: '',
++          customText: field.customText ?? '',
+           inserted: false,
+           fieldMeta: parsedFieldMeta,
+           envelope: {
+diff --git a/packages/lib/server-only/field/sign-field-with-token.ts b/packages/lib/server-only/field/sign-field-with-token.ts
+index 84412d903..f4b46de50 100644
+--- a/packages/lib/server-only/field/sign-field-with-token.ts
++++ b/packages/lib/server-only/field/sign-field-with-token.ts
+@@ -187,7 +187,7 @@ export const signFieldWithToken = async ({
+     },
+   });
+ 
+-  const isSignatureField = field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE;
++  const isSignatureField = field.type === FieldType.SIGNATURE || field.type === FieldType.IMAGE_UPLOAD;
+ 
+   let customText = !isSignatureField ? value : undefined;
+ 
+@@ -286,7 +286,7 @@ export const signFieldWithToken = async ({
+           recipientRole: recipient.role,
+           fieldId: updatedField.secondaryId,
+           field: match(updatedField.type)
+-            .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
++            .with(FieldType.SIGNATURE, FieldType.IMAGE_UPLOAD, FieldType.FREE_SIGNATURE, (type) => ({
+               type,
+               data: signatureImageAsBase64 || typedSignature || '',
+             }))
+diff --git a/packages/lib/server-only/pdf/helpers.ts b/packages/lib/server-only/pdf/helpers.ts
+index 2d6a1bc7e..5d0fda9a6 100644
+--- a/packages/lib/server-only/pdf/helpers.ts
++++ b/packages/lib/server-only/pdf/helpers.ts
+@@ -55,7 +55,7 @@ export const parseFieldTypeFromPlaceholder = (fieldTypeString: string): FieldTyp
+ 
+   return match(normalizedType)
+     .with('SIGNATURE', () => FieldType.SIGNATURE)
+-    .with('FREE_SIGNATURE', () => FieldType.FREE_SIGNATURE)
++    .with('IMAGE_UPLOAD', () => FieldType.IMAGE_UPLOAD)
+     .with('INITIALS', () => FieldType.INITIALS)
+     .with('NAME', () => FieldType.NAME)
+     .with('EMAIL', () => FieldType.EMAIL)
+@@ -81,7 +81,7 @@ export const parseFieldMetaFromPlaceholder = (
+   rawFieldMeta: Record<string, string>,
+   fieldType: FieldType,
+ ): Record<string, unknown> | undefined => {
+-  if (fieldType === FieldType.SIGNATURE || fieldType === FieldType.FREE_SIGNATURE) {
++  if (fieldType === FieldType.SIGNATURE || fieldType === FieldType.IMAGE_UPLOAD) {
+     return;
+   }
+ 
+diff --git a/packages/lib/server-only/pdf/insert-field-in-pdf-v1.ts b/packages/lib/server-only/pdf/insert-field-in-pdf-v1.ts
+index db71e2f97..9ce3ddab2 100644
+--- a/packages/lib/server-only/pdf/insert-field-in-pdf-v1.ts
++++ b/packages/lib/server-only/pdf/insert-field-in-pdf-v1.ts
+@@ -19,16 +19,18 @@ import {
+   ZCheckboxFieldMeta,
+   ZDateFieldMeta,
+   ZEmailFieldMeta,
++  ZImageUploadFieldMeta,
+   ZInitialsFieldMeta,
+   ZNameFieldMeta,
+   ZNumberFieldMeta,
+   ZRadioFieldMeta,
++  ZSignatureFieldMeta,
+   ZTextFieldMeta,
+ } from '../../types/field-meta';
+ import { getPageSize } from './get-page-size';
+ 
+ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSignature) => {
+-  const [fontCaveat, fontNoto] = await Promise.all([
++  const [fontCaveatBytes, fontNotoBytes] = await Promise.all([
+     fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/caveat.ttf`).then(async (res) => res.arrayBuffer()),
+     fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(async (res) => res.arrayBuffer()),
+   ]);
+@@ -114,21 +116,54 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
+     });
+   }
+ 
+-  const font = await pdf.embedFont(
+-    isSignatureField ? fontCaveat : fontNoto,
+-    isSignatureField ? { features: { calt: false } } : undefined,
+-  );
+-
+-  if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
+-    await pdf.embedFont(fontCaveat);
+-  }
++  const fontNoto = await pdf.embedFont(fontNotoBytes);
++  const font = isSignatureField ? await pdf.embedFont(fontCaveatBytes, { features: { calt: false } }) : fontNoto;
+ 
+   await match(field)
+     .with(
+       {
+-        type: P.union(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE),
++        type: P.union(FieldType.SIGNATURE, FieldType.IMAGE_UPLOAD),
+       },
+       async (field) => {
++        const meta = (field.type === FieldType.SIGNATURE ? ZSignatureFieldMeta : ZImageUploadFieldMeta).safeParse(
++          field.fieldMeta,
++        );
++        if (meta.success && meta.data.label) {
++          const label = meta.data.label;
++          const textAlign = meta.data.textAlign ?? 'left';
++          const labelFontSize = 12;
++          const labelWidth = fontNoto.widthOfTextAtSize(label, labelFontSize);
++
++          let labelX = fieldX;
++          if (textAlign === 'center') {
++            labelX = fieldX + (fieldWidth - labelWidth) / 2;
++          } else if (textAlign === 'right') {
++            labelX = fieldX + fieldWidth - labelWidth;
++          }
++
++          let labelY = pageHeight - fieldY + 2;
++
++          if (pageRotationInDegrees !== 0) {
++            const adjustedPosition = adjustPositionForRotation(
++              pageWidth,
++              pageHeight,
++              labelX,
++              labelY,
++              pageRotationInDegrees,
++            );
++            labelX = adjustedPosition.xPos;
++            labelY = adjustedPosition.yPos;
++          }
++
++          page.drawText(label, {
++            x: labelX,
++            y: labelY,
++            size: labelFontSize,
++            font: fontNoto,
++            rotate: degrees(pageRotationInDegrees),
++          });
++        }
++
+         if (field.signature?.signatureImageAsBase64) {
+           const image = await pdf.embedPng(field.signature?.signatureImageAsBase64 ?? '');
+ 
+diff --git a/packages/lib/server-only/pdf/legacy-insert-field-in-pdf.ts b/packages/lib/server-only/pdf/legacy-insert-field-in-pdf.ts
+index fdd5515e8..b2729db75 100644
+--- a/packages/lib/server-only/pdf/legacy-insert-field-in-pdf.ts
++++ b/packages/lib/server-only/pdf/legacy-insert-field-in-pdf.ts
+@@ -19,16 +19,18 @@ import {
+   ZCheckboxFieldMeta,
+   ZDateFieldMeta,
+   ZEmailFieldMeta,
++  ZImageUploadFieldMeta,
+   ZInitialsFieldMeta,
+   ZNameFieldMeta,
+   ZNumberFieldMeta,
+   ZRadioFieldMeta,
++  ZSignatureFieldMeta,
+   ZTextFieldMeta,
+ } from '../../types/field-meta';
+ import { getPageSize } from './get-page-size';
+ 
+ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
+-  const [fontCaveat, fontNoto] = await Promise.all([
++  const [fontCaveatBytes, fontNotoBytes] = await Promise.all([
+     fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/caveat.ttf`).then(async (res) => res.arrayBuffer()),
+     fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(async (res) => res.arrayBuffer()),
+   ]);
+@@ -107,21 +109,54 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
+     });
+   }
+ 
+-  const font = await pdf.embedFont(
+-    isSignatureField ? fontCaveat : fontNoto,
+-    isSignatureField ? { features: { calt: false } } : undefined,
+-  );
+-
+-  if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
+-    await pdf.embedFont(fontCaveat);
+-  }
++  const fontNoto = await pdf.embedFont(fontNotoBytes);
++  const font = isSignatureField ? await pdf.embedFont(fontCaveatBytes, { features: { calt: false } }) : fontNoto;
+ 
+   await match(field)
+     .with(
+       {
+-        type: P.union(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE),
++        type: P.union(FieldType.SIGNATURE, FieldType.IMAGE_UPLOAD),
+       },
+       async (field) => {
++        const meta = (field.type === FieldType.SIGNATURE ? ZSignatureFieldMeta : ZImageUploadFieldMeta).safeParse(
++          field.fieldMeta,
++        );
++        if (meta.success && meta.data.label) {
++          const label = meta.data.label;
++          const textAlign = meta.data.textAlign ?? 'left';
++          const labelFontSize = 12;
++          const labelWidth = fontNoto.widthOfTextAtSize(label, labelFontSize);
++
++          let labelX = fieldX;
++          if (textAlign === 'center') {
++            labelX = fieldX + (fieldWidth - labelWidth) / 2;
++          } else if (textAlign === 'right') {
++            labelX = fieldX + fieldWidth - labelWidth;
++          }
++
++          let labelY = pageHeight - fieldY + 2;
++
++          if (pageRotationInDegrees !== 0) {
++            const adjustedPosition = adjustPositionForRotation(
++              pageWidth,
++              pageHeight,
++              labelX,
++              labelY,
++              pageRotationInDegrees,
++            );
++            labelX = adjustedPosition.xPos;
++            labelY = adjustedPosition.yPos;
++          }
++
++          page.drawText(label, {
++            x: labelX,
++            y: labelY,
++            size: labelFontSize,
++            font: fontNoto,
++            rotate: degrees(pageRotationInDegrees),
++          });
++        }
++
+         if (field.signature?.signatureImageAsBase64) {
+           const image = await pdf.embedPng(field.signature?.signatureImageAsBase64 ?? '');
+ 
+diff --git a/packages/lib/server-only/template/create-document-from-direct-template.ts b/packages/lib/server-only/template/create-document-from-direct-template.ts
+index b59c1920a..abcffc185 100644
+--- a/packages/lib/server-only/template/create-document-from-direct-template.ts
++++ b/packages/lib/server-only/template/create-document-from-direct-template.ts
+@@ -236,7 +236,7 @@ export const createDocumentFromDirectTemplate = async ({
+       const { value, isBase64 } = signedFieldValue;
+ 
+       const isSignatureField =
+-        templateField.type === FieldType.SIGNATURE || templateField.type === FieldType.FREE_SIGNATURE;
++        templateField.type === FieldType.SIGNATURE || templateField.type === FieldType.IMAGE_UPLOAD;
+ 
+       let customText = !isSignatureField ? value : '';
+ 
+@@ -563,7 +563,7 @@ export const createDocumentFromDirectTemplate = async ({
+             recipientRole: createdDirectRecipient.role,
+             fieldId: field.secondaryId,
+             field: match(field.type)
+-              .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
++              .with(FieldType.SIGNATURE, FieldType.IMAGE_UPLOAD, FieldType.FREE_SIGNATURE, (type) => ({
+                 type,
+                 data: field.signature?.signatureImageAsBase64 || field.signature?.typedSignature || '',
+               }))
+diff --git a/packages/lib/server-only/template/create-document-from-template.ts b/packages/lib/server-only/template/create-document-from-template.ts
+index 9469a417e..580a3b301 100644
+--- a/packages/lib/server-only/template/create-document-from-template.ts
++++ b/packages/lib/server-only/template/create-document-from-template.ts
+@@ -121,7 +121,16 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
+     return field.fieldMeta;
+   }
+ 
+-  const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN', 'TEXT'].includes(field.type);
++  const advancedField = [
++    'NUMBER',
++    'RADIO',
++    'CHECKBOX',
++    'DROPDOWN',
++    'TEXT',
++    'SIGNATURE',
++    'FREE_SIGNATURE',
++    'IMAGE_UPLOAD',
++  ].includes(field.type);
+ 
+   if (!advancedField) {
+     throw new AppError(AppErrorCode.INVALID_BODY, {
+diff --git a/packages/lib/types/document-audit-logs.ts b/packages/lib/types/document-audit-logs.ts
+index 9e102ee22..9e9e8221a 100644
+--- a/packages/lib/types/document-audit-logs.ts
++++ b/packages/lib/types/document-audit-logs.ts
+@@ -320,7 +320,11 @@ export const ZDocumentAuditLogEventDocumentFieldInsertedSchema = z.object({
+         data: z.string(),
+       }),
+       z.object({
+-        type: z.union([z.literal(FieldType.SIGNATURE), z.literal(FieldType.FREE_SIGNATURE)]),
++        type: z.union([
++          z.literal(FieldType.SIGNATURE),
++          z.literal(FieldType.IMAGE_UPLOAD),
++          z.literal(FieldType.FREE_SIGNATURE),
++        ]),
+         data: z.string(),
+       }),
+       z.object({
+@@ -420,7 +424,11 @@ export const ZDocumentAuditLogEventDocumentFieldPrefilledSchema = z.object({
+         data: z.string(),
+       }),
+       z.object({
+-        type: z.union([z.literal(FieldType.SIGNATURE), z.literal(FieldType.FREE_SIGNATURE)]),
++        type: z.union([
++          z.literal(FieldType.SIGNATURE),
++          z.literal(FieldType.IMAGE_UPLOAD),
++          z.literal(FieldType.FREE_SIGNATURE),
++        ]),
+         data: z.string(),
+       }),
+       z.object({
+diff --git a/packages/lib/types/field-meta.ts b/packages/lib/types/field-meta.ts
+index bb65bf782..993b942ad 100644
+--- a/packages/lib/types/field-meta.ts
++++ b/packages/lib/types/field-meta.ts
+@@ -180,13 +180,22 @@ export type TDropdownFieldMeta = z.infer<typeof ZDropdownFieldMeta>;
+ 
+ export const ZSignatureFieldMeta = ZBaseFieldMeta.extend({
+   type: z.literal('signature'),
++  textAlign: ZFieldTextAlignSchema.optional(),
+   overflow: ZFieldOverflowMode.optional().default(DEFAULT_SIGNATURE_OVERFLOW_MODE),
+ });
+ 
+ export type TSignatureFieldMeta = z.infer<typeof ZSignatureFieldMeta>;
+ 
++export const ZImageUploadFieldMeta = ZBaseFieldMeta.extend({
++  type: z.literal('IMAGE_UPLOAD'),
++  textAlign: ZFieldTextAlignSchema.optional(),
++});
++
++export type TImageUploadFieldMeta = z.infer<typeof ZImageUploadFieldMeta>;
++
+ export const ZFieldMetaNotOptionalSchema = z.discriminatedUnion('type', [
+   ZSignatureFieldMeta,
++  ZImageUploadFieldMeta,
+   ZInitialsFieldMeta,
+   ZNameFieldMeta,
+   ZEmailFieldMeta,
+@@ -264,6 +273,10 @@ export const ZFieldAndMetaSchema = z.discriminatedUnion('type', [
+     type: z.literal(FieldType.FREE_SIGNATURE),
+     fieldMeta: z.undefined(),
+   }),
++  z.object({
++    type: z.literal('IMAGE_UPLOAD'),
++    fieldMeta: ZImageUploadFieldMeta.optional(),
++  }),
+   z.object({
+     type: z.literal(FieldType.INITIALS),
+     fieldMeta: ZInitialsFieldMeta.optional(),
+@@ -308,6 +321,7 @@ export const FIELD_DATE_META_DEFAULT_VALUES: TDateFieldMeta = {
+   type: 'date',
+   fontSize: DEFAULT_FIELD_FONT_SIZE,
+   textAlign: 'left',
++  label: '',
+   overflow: DEFAULT_DATE_OVERFLOW_MODE,
+ };
+ 
+@@ -336,24 +350,28 @@ export const FIELD_INITIALS_META_DEFAULT_VALUES: TInitialsFieldMeta = {
+   type: 'initials',
+   fontSize: DEFAULT_FIELD_FONT_SIZE,
+   textAlign: 'left',
++  label: '',
+ };
+ 
+ export const FIELD_NAME_META_DEFAULT_VALUES: TNameFieldMeta = {
+   type: 'name',
+   fontSize: DEFAULT_FIELD_FONT_SIZE,
+   textAlign: 'left',
++  label: '',
+ };
+ 
+ export const FIELD_EMAIL_META_DEFAULT_VALUES: TEmailFieldMeta = {
+   type: 'email',
+   fontSize: DEFAULT_FIELD_FONT_SIZE,
+   textAlign: 'left',
++  label: '',
+   overflow: DEFAULT_EMAIL_OVERFLOW_MODE,
+ };
+ 
+ export const FIELD_RADIO_META_DEFAULT_VALUES: TRadioFieldMeta = {
+   type: 'radio',
+   fontSize: DEFAULT_FIELD_FONT_SIZE,
++  label: '',
+   values: [{ id: 1, checked: false, value: '' }],
+   required: false,
+   readOnly: false,
+@@ -363,6 +381,7 @@ export const FIELD_RADIO_META_DEFAULT_VALUES: TRadioFieldMeta = {
+ export const FIELD_CHECKBOX_META_DEFAULT_VALUES: TCheckboxFieldMeta = {
+   type: 'checkbox',
+   fontSize: DEFAULT_FIELD_FONT_SIZE,
++  label: '',
+   values: [{ id: 1, checked: false, value: '' }],
+   validationRule: '',
+   validationLength: 0,
+@@ -374,6 +393,7 @@ export const FIELD_CHECKBOX_META_DEFAULT_VALUES: TCheckboxFieldMeta = {
+ export const FIELD_DROPDOWN_META_DEFAULT_VALUES: TDropdownFieldMeta = {
+   type: 'dropdown',
+   fontSize: DEFAULT_FIELD_FONT_SIZE,
++  label: '',
+   values: [{ value: 'Option 1' }],
+   defaultValue: '',
+   required: false,
+@@ -383,12 +403,22 @@ export const FIELD_DROPDOWN_META_DEFAULT_VALUES: TDropdownFieldMeta = {
+ export const FIELD_SIGNATURE_META_DEFAULT_VALUES: TSignatureFieldMeta = {
+   type: 'signature',
+   fontSize: DEFAULT_SIGNATURE_TEXT_FONT_SIZE,
++  textAlign: FIELD_DEFAULT_GENERIC_ALIGN,
++  label: '',
+   overflow: DEFAULT_SIGNATURE_OVERFLOW_MODE,
+ };
+ 
+-export const FIELD_META_DEFAULT_VALUES: Record<FieldType, TFieldMetaSchema> = {
++export const FIELD_IMAGE_UPLOAD_META_DEFAULT_VALUES: TImageUploadFieldMeta = {
++  type: 'IMAGE_UPLOAD',
++  fontSize: DEFAULT_FIELD_FONT_SIZE,
++  textAlign: 'center',
++  label: '',
++};
++
++export const FIELD_META_DEFAULT_VALUES = {
+   [FieldType.SIGNATURE]: FIELD_SIGNATURE_META_DEFAULT_VALUES,
+   [FieldType.FREE_SIGNATURE]: undefined,
++  IMAGE_UPLOAD: FIELD_IMAGE_UPLOAD_META_DEFAULT_VALUES,
+   [FieldType.INITIALS]: FIELD_INITIALS_META_DEFAULT_VALUES,
+   [FieldType.NAME]: FIELD_NAME_META_DEFAULT_VALUES,
+   [FieldType.EMAIL]: FIELD_EMAIL_META_DEFAULT_VALUES,
+@@ -398,7 +428,7 @@ export const FIELD_META_DEFAULT_VALUES: Record<FieldType, TFieldMetaSchema> = {
+   [FieldType.RADIO]: FIELD_RADIO_META_DEFAULT_VALUES,
+   [FieldType.CHECKBOX]: FIELD_CHECKBOX_META_DEFAULT_VALUES,
+   [FieldType.DROPDOWN]: FIELD_DROPDOWN_META_DEFAULT_VALUES,
+-} as const;
++} as Record<FieldType, TFieldMetaSchema>;
+ 
+ export const ZEnvelopeFieldAndMetaSchema = z.discriminatedUnion('type', [
+   z.object({
+@@ -409,6 +439,10 @@ export const ZEnvelopeFieldAndMetaSchema = z.discriminatedUnion('type', [
+     type: z.literal(FieldType.FREE_SIGNATURE),
+     fieldMeta: z.undefined(),
+   }),
++  z.object({
++    type: z.literal(FieldType.IMAGE_UPLOAD),
++    fieldMeta: ZImageUploadFieldMeta.optional().default(FIELD_IMAGE_UPLOAD_META_DEFAULT_VALUES),
++  }),
+   z.object({
+     type: z.literal(FieldType.INITIALS),
+     fieldMeta: ZInitialsFieldMeta.optional().default(FIELD_INITIALS_META_DEFAULT_VALUES),
+diff --git a/packages/lib/types/field.ts b/packages/lib/types/field.ts
+index 683f027d6..7ad607ac6 100644
+--- a/packages/lib/types/field.ts
++++ b/packages/lib/types/field.ts
+@@ -3,11 +3,13 @@ import { FieldType, Prisma } from '@prisma/client';
+ import { z } from 'zod';
+ 
+ import {
++  FIELD_IMAGE_UPLOAD_META_DEFAULT_VALUES,
+   FIELD_SIGNATURE_META_DEFAULT_VALUES,
+   ZCheckboxFieldMeta,
+   ZDateFieldMeta,
+   ZDropdownFieldMeta,
+   ZEmailFieldMeta,
++  ZImageUploadFieldMeta,
+   ZInitialsFieldMeta,
+   ZNameFieldMeta,
+   ZNumberFieldMeta,
+@@ -116,9 +118,12 @@ export const ZFieldSignatureSchema = BaseFieldSchemaUsingNumbers.extend({
+ 
+ export type TFieldSignature = z.infer<typeof ZFieldSignatureSchema>;
+ 
+-export const ZFieldFreeSignatureSchema = ZFieldSignatureSchema;
++export const ZFieldImageUploadSchema = BaseFieldSchemaUsingNumbers.extend({
++  type: z.literal('IMAGE_UPLOAD'),
++  fieldMeta: ZImageUploadFieldMeta.catch(FIELD_IMAGE_UPLOAD_META_DEFAULT_VALUES),
++});
+ 
+-export type TFieldFreeSignature = z.infer<typeof ZFieldFreeSignatureSchema>;
++export type TFieldImageUpload = z.infer<typeof ZFieldImageUploadSchema>;
+ 
+ export const ZFieldInitialsSchema = BaseFieldSchemaUsingNumbers.extend({
+   type: z.literal(FieldType.INITIALS),
+@@ -182,6 +187,7 @@ export type TFieldDropdown = z.infer<typeof ZFieldDropdownSchema>;
+ export const ZFullFieldSchema = z.discriminatedUnion('type', [
+   ZFieldTextSchema,
+   ZFieldSignatureSchema,
++  ZFieldImageUploadSchema,
+   ZFieldInitialsSchema,
+   ZFieldNameSchema,
+   ZFieldEmailSchema,
+diff --git a/packages/lib/universal/field-renderer/render-dropdown-field.ts b/packages/lib/universal/field-renderer/render-dropdown-field.ts
+index 10c01fdc8..1a28ee062 100644
+--- a/packages/lib/universal/field-renderer/render-dropdown-field.ts
++++ b/packages/lib/universal/field-renderer/render-dropdown-field.ts
+@@ -53,7 +53,7 @@ export const renderDropdownFieldElement = (field: FieldToRender, options: Render
+ 
+   const dropdownMeta: TDropdownFieldMeta | null = (field.fieldMeta as TDropdownFieldMeta) || null;
+ 
+-  let selectedValue = translations?.[FieldType.DROPDOWN] || 'Select Option';
++  let selectedValue = field.fieldMeta?.label || translations?.[FieldType.DROPDOWN] || 'Select Option';
+ 
+   const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);
+ 
+diff --git a/packages/lib/universal/field-renderer/render-field.ts b/packages/lib/universal/field-renderer/render-field.ts
+index f4221c9d7..0065599e3 100644
+--- a/packages/lib/universal/field-renderer/render-field.ts
++++ b/packages/lib/universal/field-renderer/render-field.ts
+@@ -8,6 +8,7 @@ import type { TFieldMetaSchema } from '../../types/field-meta';
+ import { renderCheckboxFieldElement } from './render-checkbox-field';
+ import { renderDropdownFieldElement } from './render-dropdown-field';
+ import { renderGenericTextFieldElement } from './render-generic-text-field';
++import { renderImageUploadFieldElement } from './render-image-upload-field';
+ import { renderRadioFieldElement } from './render-radio-field';
+ import { renderSignatureFieldElement } from './render-signature-field';
+ 
+@@ -76,7 +77,6 @@ export const renderField = ({
+     scale,
+   };
+ 
+-  // If the generic text field element array changes, update the `GenericTextFieldTypeMetas` type
+   return match(field.type)
+     .with(FieldType.INITIALS, FieldType.NAME, FieldType.EMAIL, FieldType.DATE, FieldType.TEXT, FieldType.NUMBER, () =>
+       renderGenericTextFieldElement(field, options),
+@@ -85,8 +85,7 @@ export const renderField = ({
+     .with(FieldType.RADIO, () => renderRadioFieldElement(field, options))
+     .with(FieldType.DROPDOWN, () => renderDropdownFieldElement(field, options))
+     .with(FieldType.SIGNATURE, () => renderSignatureFieldElement(field, options))
+-    .with(FieldType.FREE_SIGNATURE, () => {
+-      throw new Error('Free signature fields are not supported');
+-    })
++    .with('FREE_SIGNATURE', () => renderSignatureFieldElement(field, options))
++    .with('IMAGE_UPLOAD', () => renderImageUploadFieldElement(field, options))
+     .exhaustive();
+ };
+diff --git a/packages/lib/universal/field-renderer/render-generic-text-field.ts b/packages/lib/universal/field-renderer/render-generic-text-field.ts
+index 11e3a0773..b1d44ba9b 100644
+--- a/packages/lib/universal/field-renderer/render-generic-text-field.ts
++++ b/packages/lib/universal/field-renderer/render-generic-text-field.ts
+@@ -47,8 +47,8 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
+   // isLabel tracks whether we're rendering the field type name (like "Text", "Date", "Email")
+   // or a user label — overflow should not apply to these, only to actual content.
+   let isLabel = true;
+-  let textToRender: string = fieldMeta?.label || fieldTypeName;
+-  let textAlign: 'left' | 'center' | 'right' = 'center';
++  let textToRender: string = field.customText || fieldMeta?.label || fieldTypeName;
++  let textAlign: 'left' | 'center' | 'right' = fieldMeta?.textAlign || 'center';
+   let textVerticalAlign: 'top' | 'middle' | 'bottom' = FIELD_DEFAULT_GENERIC_VERTICAL_ALIGN;
+   let textLineHeight = FIELD_DEFAULT_LINE_HEIGHT;
+   let textLetterSpacing = FIELD_DEFAULT_LETTER_SPACING;
+diff --git a/packages/lib/universal/field-renderer/render-image-upload-field.ts b/packages/lib/universal/field-renderer/render-image-upload-field.ts
+new file mode 100644
+index 000000000..6f5ba8bf2
+--- /dev/null
++++ b/packages/lib/universal/field-renderer/render-image-upload-field.ts
+@@ -0,0 +1,157 @@
++import Konva from 'konva';
++import type { TImageUploadFieldMeta } from '../../types/field-meta';
++import { createFieldHoverInteraction, upsertFieldGroup, upsertFieldRect } from './field-generic-items';
++import { calculateFieldPosition, type FieldToRender, type RenderFieldElementOptions } from './field-renderer';
++import { createSignatureImage } from './render-signature-field';
++
++type FieldImageUpload =
++  | {
++      node: Konva.Text;
++      isImage: false;
++      isLabel: boolean;
++    }
++  | {
++      node: Konva.Image;
++      isImage: true;
++      isLabel: boolean;
++    };
++
++const createFieldImageUpload = (field: FieldToRender, options: RenderFieldElementOptions): FieldImageUpload => {
++  const { pageWidth, pageHeight, mode = 'edit', translations } = options;
++
++  const { fieldX, fieldY, fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
++  const fontSize = field.fieldMeta?.fontSize || 12;
++
++  const fieldText = new Konva.Text({
++    id: `${field.renderId}-text`,
++    name: 'field-text',
++  });
++
++  const fieldTypeName = translations?.[field.type] || 'Image Upload';
++
++  // For image upload fields, prioritize the custom label over customText
++  const textToRender: string = field.fieldMeta?.label || field.customText || fieldTypeName;
++
++  const signature = field.signature;
++
++  // Handle edit, sign, and export modes.
++  if (
++    (mode === 'edit' && field.inserted && signature?.signatureImageAsBase64) ||
++    ((mode === 'sign' || mode === 'export') && signature?.signatureImageAsBase64)
++  ) {
++    return {
++      node: createSignatureImage(
++        signature.signatureImageAsBase64,
++        fieldWidth,
++        fieldHeight,
++        (field.fieldMeta as any)?.textAlign || 'center',
++      ),
++      isImage: true,
++      isLabel: false,
++    };
++  }
++
++  const fieldMeta = field.fieldMeta as TImageUploadFieldMeta | undefined;
++
++  // Whether we're rendering the field type name vs actual uploaded content.
++  const isLabel = true;
++
++  const fieldTextAttrs: Partial<Konva.TextConfig> = {
++    x: 0,
++    y: 0,
++    text: textToRender,
++    fontSize,
++    fontFamily: 'Inter, sans-serif',
++    align: fieldMeta?.textAlign || 'center',
++    verticalAlign: 'middle',
++    width: fieldWidth,
++    height: fieldHeight,
++  };
++
++  // Simple centering for the label since we don't need complex overflow for "Image Upload"
++  fieldText.setAttrs(fieldTextAttrs);
++
++  return { node: fieldText, isImage: false, isLabel };
++};
++
++export const renderImageUploadFieldElement = (field: FieldToRender, options: RenderFieldElementOptions) => {
++  const { mode = 'edit', pageLayer, pageWidth, pageHeight, color } = options;
++
++  const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);
++
++  const fieldGroup = upsertFieldGroup(field, options);
++
++  // Clear previous children and listeners to re-render fresh.
++  fieldGroup.removeChildren();
++  fieldGroup.off('transform');
++
++  // Assign elements to group and any listeners that should only be run on initialization.
++  if (isFirstRender) {
++    pageLayer.add(fieldGroup);
++  }
++
++  // Render the field background and text.
++  const fieldRect = upsertFieldRect(field, options);
++  const { node: fieldImage, isImage, isLabel } = createFieldImageUpload(field, options);
++
++  fieldGroup.add(fieldRect);
++  fieldGroup.add(fieldImage);
++
++  fieldGroup.on('transform', () => {
++    const groupScaleX = fieldGroup.scaleX();
++    const groupScaleY = fieldGroup.scaleY();
++
++    // Adjust image/text scale so it doesn't change while group is resized.
++    fieldImage.scaleX(1 / groupScaleX);
++    fieldImage.scaleY(1 / groupScaleY);
++
++    const rectWidth = fieldRect.width() * groupScaleX;
++    const rectHeight = fieldRect.height() * groupScaleY;
++
++    if (!isImage) {
++      fieldImage.x(0);
++      fieldImage.y(0);
++      fieldImage.wrap('word');
++    }
++
++    fieldImage.width(rectWidth);
++    fieldImage.height(rectHeight);
++
++    fieldGroup.getLayer()?.batchDraw();
++  });
++
++  fieldGroup.on('transformend', () => {
++    fieldImage.scaleX(1);
++    fieldImage.scaleY(1);
++
++    const rectWidth = fieldRect.width();
++    const rectHeight = fieldRect.height();
++
++    if (!isImage) {
++      fieldImage.x(0);
++      fieldImage.y(0);
++      fieldImage.width(rectWidth);
++      fieldImage.height(rectHeight);
++    } else {
++      fieldImage.width(rectWidth);
++      fieldImage.height(rectHeight);
++    }
++
++    fieldGroup.getLayer()?.batchDraw();
++  });
++
++  // Handle export mode.
++  if (mode === 'export') {
++    // Hide the rectangle.
++    fieldRect.opacity(0);
++  }
++
++  if (color !== 'readOnly' && mode !== 'export') {
++    createFieldHoverInteraction({ fieldGroup, fieldRect, options });
++  }
++
++  return {
++    fieldGroup,
++    isFirstRender,
++  };
++};
+diff --git a/packages/lib/universal/field-renderer/render-signature-field.ts b/packages/lib/universal/field-renderer/render-signature-field.ts
+index e29b6dc9e..979d5420a 100644
+--- a/packages/lib/universal/field-renderer/render-signature-field.ts
++++ b/packages/lib/universal/field-renderer/render-signature-field.ts
+@@ -1,7 +1,6 @@
+ import Konva from 'konva';
+ 
+ import { DEFAULT_SIGNATURE_TEXT_FONT_SIZE } from '../../constants/pdf';
+-import { AppError } from '../../errors/app-error';
+ import type { TSignatureFieldMeta } from '../../types/field-meta';
+ import { resolveFieldOverflowMode } from '../../types/field-meta';
+ import { calculateOverflowLayout } from './calculate-overflow-layout';
+@@ -19,16 +18,27 @@ void (async () => {
+   }
+ })();
+ 
+-const getImageDimensions = (img: HTMLImageElement, fieldWidth: number, fieldHeight: number) => {
++export const getImageDimensions = (
++  img: HTMLImageElement,
++  fieldWidth: number,
++  fieldHeight: number,
++  textAlign: string = 'center',
++) => {
+   let imageWidth = img.width;
+   let imageHeight = img.height;
+ 
+-  const scalingFactor = Math.min(fieldWidth / imageWidth, fieldHeight / imageHeight, 1);
++  const scalingFactor = Math.min(fieldWidth / imageWidth, fieldHeight / imageHeight);
+ 
+   imageWidth = imageWidth * scalingFactor;
+   imageHeight = imageHeight * scalingFactor;
+ 
+-  const imageX = (fieldWidth - imageWidth) / 2;
++  let imageX = (fieldWidth - imageWidth) / 2;
++  if (textAlign === 'left') {
++    imageX = 0;
++  } else if (textAlign === 'right') {
++    imageX = fieldWidth - imageWidth;
++  }
++
+   const imageY = (fieldHeight - imageHeight) / 2;
+ 
+   return {
+@@ -67,7 +77,12 @@ const SIGNATURE_IMAGE_CACHE_PIXEL_RATIO = 2;
+  * Build a Konva.Image for a base64 signature, sized to fit within the given
+  * field dimensions. Works in both browser and Node.js (via skia-canvas).
+  */
+-const createSignatureImage = (signatureImageAsBase64: string, fieldWidth: number, fieldHeight: number): Konva.Image => {
++export const createSignatureImage = (
++  signatureImageAsBase64: string,
++  fieldWidth: number,
++  fieldHeight: number,
++  textAlign: string = 'center',
++): Konva.Image => {
+   if (typeof window !== 'undefined') {
+     const img = new Image();
+ 
+@@ -82,7 +97,7 @@ const createSignatureImage = (signatureImageAsBase64: string, fieldWidth: number
+     img.onload = () => {
+       image.setAttrs({
+         image: img,
+-        ...getImageDimensions(img, fieldWidth, fieldHeight),
++        ...getImageDimensions(img, fieldWidth, fieldHeight, textAlign),
+       });
+ 
+       // Cache the image as a high-resolution bitmap so it stays sharp on
+@@ -108,7 +123,7 @@ const createSignatureImage = (signatureImageAsBase64: string, fieldWidth: number
+ 
+   return new Konva.Image({
+     image: img,
+-    ...getImageDimensions(img, fieldWidth, fieldHeight),
++    ...getImageDimensions(img, fieldWidth, fieldHeight, textAlign),
+   });
+ };
+ 
+@@ -129,14 +144,12 @@ const createFieldSignature = (field: FieldToRender, options: RenderFieldElementO
+   const textX = 0;
+   const textY = 0;
+ 
+-  let textToRender: string = fieldTypeName;
++  let textToRender: string = field.customText || field.fieldMeta?.label || fieldTypeName;
+ 
+   const signature = field.signature;
+ 
+   // Handle edit mode.
+   if (mode === 'edit') {
+-    textToRender = fieldTypeName;
+-
+     // If the field has already been signed and we have the signature data
+     // available, render it. Otherwise leave the field type label as a placeholder.
+     if (field.inserted && signature?.typedSignature) {
+@@ -145,7 +158,12 @@ const createFieldSignature = (field: FieldToRender, options: RenderFieldElementO
+ 
+     if (field.inserted && signature?.signatureImageAsBase64) {
+       return {
+-        node: createSignatureImage(signature.signatureImageAsBase64, fieldWidth, fieldHeight),
++        node: createSignatureImage(
++          signature.signatureImageAsBase64,
++          fieldWidth,
++          fieldHeight,
++          (field.fieldMeta as any)?.textAlign || 'center',
++        ),
+         isImageSignature: true,
+         isLabel: false,
+       };
+@@ -154,19 +172,18 @@ const createFieldSignature = (field: FieldToRender, options: RenderFieldElementO
+ 
+   // Handle sign mode.
+   if (mode === 'sign' || mode === 'export') {
+-    textToRender = fieldTypeName;
+-
+-    if (field.inserted && !signature) {
+-      throw new AppError('MISSING_SIGNATURE');
+-    }
+-
+     if (signature?.typedSignature) {
+       textToRender = signature.typedSignature;
+     }
+ 
+     if (signature?.signatureImageAsBase64) {
+       return {
+-        node: createSignatureImage(signature.signatureImageAsBase64, fieldWidth, fieldHeight),
++        node: createSignatureImage(
++          signature.signatureImageAsBase64,
++          fieldWidth,
++          fieldHeight,
++          (field.fieldMeta as any)?.textAlign || 'center',
++        ),
+         isImageSignature: true,
+         isLabel: false,
+       };
+@@ -187,7 +204,7 @@ const createFieldSignature = (field: FieldToRender, options: RenderFieldElementO
+     fontFamily: 'Caveat, sans-serif',
+     lineHeight: 1,
+     letterSpacing: 0,
+-    textAlign: 'center',
++    textAlign: fieldMeta?.textAlign || 'center',
+     verticalAlign: 'middle',
+     baseX: textX,
+     baseY: textY,
+@@ -280,7 +297,7 @@ export const renderSignatureFieldElement = (field: FieldToRender, options: Rende
+         fontFamily: 'Caveat, sans-serif',
+         lineHeight: 1,
+         letterSpacing: 0,
+-        textAlign: 'center',
++        textAlign: fieldMeta?.textAlign || 'center',
+         verticalAlign: 'middle',
+         baseX: 0,
+         baseY: 0,
+diff --git a/packages/lib/utils/envelope-signing.ts b/packages/lib/utils/envelope-signing.ts
+index 73c68479f..b389c4de6 100644
+--- a/packages/lib/utils/envelope-signing.ts
++++ b/packages/lib/utils/envelope-signing.ts
+@@ -249,5 +249,28 @@ export const extractFieldInsertionValues = ({
+         inserted: true,
+       };
+     })
++    .with({ type: FieldType.IMAGE_UPLOAD }, (fieldValue) => {
++      const { value } = fieldValue;
++
++      if (!value) {
++        return {
++          customText: '',
++          inserted: false,
++        };
++      }
++
++      const isBase64 = isBase64Image(value);
++
++      if (documentMeta.typedSignatureEnabled === false && !isBase64) {
++        throw new AppError(AppErrorCode.INVALID_BODY, {
++          message: 'Typed signatures are not allowed. Please draw your signature',
++        });
++      }
++
++      return {
++        customText: '',
++        inserted: true,
++      };
++    })
+     .exhaustive();
+ };
+diff --git a/packages/lib/utils/fields.ts b/packages/lib/utils/fields.ts
+index 02822a8cf..cfa55ff03 100644
+--- a/packages/lib/utils/fields.ts
++++ b/packages/lib/utils/fields.ts
+@@ -125,6 +125,7 @@ export const getClientSideFieldTranslations = ({ t }: I18n): Record<FieldType, s
+     [FieldType.DROPDOWN]: t(msg`Select Option`),
+     [FieldType.SIGNATURE]: t(msg`Signature`),
+     [FieldType.FREE_SIGNATURE]: t(msg`Free Signature`),
++    [FieldType.IMAGE_UPLOAD]: t(msg`Image Upload`),
+     [FieldType.INITIALS]: t(msg`Initials`),
+     [FieldType.NAME]: t(msg`Name`),
+     [FieldType.NUMBER]: t(msg`Number`),
+diff --git a/packages/prisma/guards/is-signature-field.ts b/packages/prisma/guards/is-signature-field.ts
+index 4941fd674..cf052894d 100644
+--- a/packages/prisma/guards/is-signature-field.ts
++++ b/packages/prisma/guards/is-signature-field.ts
+@@ -1,9 +1,9 @@
+ import { FieldType } from '@prisma/client';
+ 
+-const SignatureFieldTypes = [FieldType.SIGNATURE, FieldType.FREE_SIGNATURE] as const;
++const SignatureFieldTypes = [FieldType.SIGNATURE, FieldType.IMAGE_UPLOAD] as const;
+ 
+ type SignatureFieldType = (typeof SignatureFieldTypes)[number];
+ 
+ export const isSignatureFieldType = (type: FieldType): type is SignatureFieldType => {
+-  return type === FieldType.SIGNATURE || type === FieldType.FREE_SIGNATURE;
++  return type === FieldType.SIGNATURE || type === FieldType.IMAGE_UPLOAD;
+ };
+diff --git a/packages/prisma/migrations/20260520152742_add_free_signature_and_image_upload/migration.sql b/packages/prisma/migrations/20260520152742_add_free_signature_and_image_upload/migration.sql
+new file mode 100644
+index 000000000..155692083
+--- /dev/null
++++ b/packages/prisma/migrations/20260520152742_add_free_signature_and_image_upload/migration.sql
+@@ -0,0 +1,2 @@
++-- AlterEnum
++ALTER TYPE "FieldType" ADD VALUE 'IMAGE_UPLOAD';
+diff --git a/packages/prisma/schema.prisma b/packages/prisma/schema.prisma
+index 9af17faeb..1203b1713 100644
+--- a/packages/prisma/schema.prisma
++++ b/packages/prisma/schema.prisma
+@@ -620,6 +620,7 @@ model Recipient {
+ enum FieldType {
+   SIGNATURE
+   FREE_SIGNATURE
++  IMAGE_UPLOAD
+   INITIALS
+   NAME
+   EMAIL
+diff --git a/packages/prisma/seed/documents.ts b/packages/prisma/seed/documents.ts
+index 4010d0a38..2c668db51 100644
+--- a/packages/prisma/seed/documents.ts
++++ b/packages/prisma/seed/documents.ts
+@@ -592,7 +592,7 @@ export const seedPendingDocumentWithFullFields = async ({
+                 .with(FieldType.RADIO, () => FIELD_RADIO_META_DEFAULT_VALUES)
+                 .with(FieldType.DROPDOWN, () => FIELD_DROPDOWN_META_DEFAULT_VALUES)
+                 .with(FieldType.INITIALS, () => FIELD_INITIALS_META_DEFAULT_VALUES)
+-                .with(FieldType.FREE_SIGNATURE, () => undefined)
++                .with(FieldType.IMAGE_UPLOAD, () => undefined)
+                 .exhaustive(),
+             })),
+           },
+diff --git a/packages/trpc/server/envelope-router/set-envelope-fields.types.ts b/packages/trpc/server/envelope-router/set-envelope-fields.types.ts
+index ec83b985d..0ef82ec18 100644
+--- a/packages/trpc/server/envelope-router/set-envelope-fields.types.ts
++++ b/packages/trpc/server/envelope-router/set-envelope-fields.types.ts
+@@ -25,6 +25,7 @@ export const ZSetEnvelopeFieldsRequestSchema = z.object({
+       positionY: ZClampedFieldPositionYSchema,
+       width: ZClampedFieldWidthSchema,
+       height: ZClampedFieldHeightSchema,
++      customText: z.string().optional(),
+       fieldMeta: ZFieldMetaSchema,
+     }),
+   ),
+diff --git a/packages/trpc/server/envelope-router/sign-envelope-field.ts b/packages/trpc/server/envelope-router/sign-envelope-field.ts
+index 9ec3773ed..60772e78e 100644
+--- a/packages/trpc/server/envelope-router/sign-envelope-field.ts
++++ b/packages/trpc/server/envelope-router/sign-envelope-field.ts
+@@ -183,8 +183,8 @@ export const signEnvelopeFieldRoute = procedure
+     let signatureImageAsBase64 = null;
+     let typedSignature = null;
+ 
+-    if (field.type === FieldType.SIGNATURE) {
+-      if (fieldValue.type !== FieldType.SIGNATURE) {
++    if (field.type === FieldType.SIGNATURE || field.type === FieldType.IMAGE_UPLOAD) {
++      if (fieldValue.type !== FieldType.SIGNATURE && fieldValue.type !== FieldType.IMAGE_UPLOAD) {
+         throw new AppError(AppErrorCode.INVALID_REQUEST, {
+           message: `Field ${fieldId} is not a signature field`,
+         });
+@@ -212,7 +212,7 @@ export const signEnvelopeFieldRoute = procedure
+         },
+       });
+ 
+-      if (field.type === FieldType.SIGNATURE) {
++      if (field.type === FieldType.SIGNATURE || field.type === FieldType.IMAGE_UPLOAD) {
+         const signature = await tx.signature.upsert({
+           where: {
+             fieldId: field.id,
+@@ -254,7 +254,7 @@ export const signEnvelopeFieldRoute = procedure
+             recipientRole: recipient.role,
+             fieldId: updatedField.secondaryId,
+             field: match(updatedField.type)
+-              .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
++              .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, FieldType.IMAGE_UPLOAD, (type) => ({
+                 type,
+                 data: signatureImageAsBase64 || typedSignature || '',
+               }))
+diff --git a/packages/trpc/server/envelope-router/sign-envelope-field.types.ts b/packages/trpc/server/envelope-router/sign-envelope-field.types.ts
+index 7ce79deac..87044a796 100644
+--- a/packages/trpc/server/envelope-router/sign-envelope-field.types.ts
++++ b/packages/trpc/server/envelope-router/sign-envelope-field.types.ts
+@@ -45,6 +45,10 @@ export const ZSignEnvelopeFieldValue = z.discriminatedUnion('type', [
+     type: z.literal(FieldType.SIGNATURE),
+     value: z.string().nullable(),
+   }),
++  z.object({
++    type: z.literal(FieldType.IMAGE_UPLOAD),
++    value: z.string().nullable(),
++  }),
+ ]);
+ 
+ export const ZSignEnvelopeFieldRequestSchema = z.object({
+diff --git a/packages/ui/components/field/field.tsx b/packages/ui/components/field/field.tsx
+index 59ff42f84..3dbb03f93 100644
+--- a/packages/ui/components/field/field.tsx
++++ b/packages/ui/components/field/field.tsx
+@@ -120,7 +120,7 @@ export function FieldRootContainer({ field, children, color, className, readonly
+           'field--FieldRootContainer field-card-container dark-mode-disabled group relative z-20 flex h-full w-full items-center rounded-[2px] bg-white/90 ring-2 ring-gray-200 transition-all',
+           color?.base,
+           {
+-            'px-2': field.type !== FieldType.SIGNATURE && field.type !== FieldType.FREE_SIGNATURE,
++            'px-2': field.type !== FieldType.SIGNATURE && field.type !== FieldType.IMAGE_UPLOAD,
+             'justify-center': !field.inserted,
+             'ring-orange-300': isValidating && isFieldUnsignedAndRequired(field),
+           },
+diff --git a/packages/ui/primitives/document-flow/field-content.tsx b/packages/ui/primitives/document-flow/field-content.tsx
+index 925bf6184..568227cb7 100644
+--- a/packages/ui/primitives/document-flow/field-content.tsx
++++ b/packages/ui/primitives/document-flow/field-content.tsx
+@@ -144,7 +144,12 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
+   const labelToDisplay = fieldMeta?.label || _(FRIENDLY_FIELD_TYPE[type]) || '';
+   let textToDisplay: string | undefined;
+ 
+-  const isSignatureField = field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE;
++  const isSignatureField = field.type === FieldType.SIGNATURE || field.type === FieldType.IMAGE_UPLOAD;
++
++  // For image upload fields, prioritize the custom label over customText
++  if (field.type === FieldType.IMAGE_UPLOAD && field.fieldMeta?.label) {
++    textToDisplay = field.fieldMeta.label;
++  }
+ 
+   if (field.type === FieldType.TEXT && field.fieldMeta?.type === 'text' && field.fieldMeta?.text) {
+     textToDisplay = field.fieldMeta.text;
+diff --git a/packages/ui/primitives/document-flow/types.ts b/packages/ui/primitives/document-flow/types.ts
+index 63f6cb416..69a637cbe 100644
+--- a/packages/ui/primitives/document-flow/types.ts
++++ b/packages/ui/primitives/document-flow/types.ts
+@@ -44,6 +44,7 @@ export type TDocumentFlowFormSchema = z.infer<typeof ZDocumentFlowFormSchema>;
+ export const FRIENDLY_FIELD_TYPE: Record<FieldType, MessageDescriptor> = {
+   [FieldType.SIGNATURE]: msg`Signature`,
+   [FieldType.FREE_SIGNATURE]: msg`Free Signature`,
++  IMAGE_UPLOAD: msg`Image Upload`,
+   [FieldType.INITIALS]: msg`Initials`,
+   [FieldType.TEXT]: msg`Text`,
+   [FieldType.DATE]: msg`Date`,
+diff --git a/packages/ui/primitives/image-upload-field.tsx b/packages/ui/primitives/image-upload-field.tsx
+new file mode 100644
+index 000000000..ee77252bf
+--- /dev/null
++++ b/packages/ui/primitives/image-upload-field.tsx
+@@ -0,0 +1,172 @@
++import { SIGNATURE_CANVAS_DPI } from '@documenso/lib/constants/signatures';
++import { Trans, useLingui } from '@lingui/react/macro';
++import { motion } from 'framer-motion';
++import { UploadCloudIcon, XIcon } from 'lucide-react';
++import { useRef, useState } from 'react';
++import { cn } from '../lib/utils';
++
++const loadImage = async (file: File | undefined): Promise<HTMLImageElement> => {
++  if (!file) {
++    throw new Error('No file selected');
++  }
++
++  if (!file.type.startsWith('image/')) {
++    throw new Error('Invalid file type');
++  }
++
++  if (file.size > 5 * 1024 * 1024) {
++    throw new Error('Image size should be less than 5MB');
++  }
++
++  return new Promise((resolve, reject) => {
++    const img = new Image();
++    const objectUrl = URL.createObjectURL(file);
++
++    img.onload = () => {
++      URL.revokeObjectURL(objectUrl);
++      resolve(img);
++    };
++
++    img.onerror = () => {
++      URL.revokeObjectURL(objectUrl);
++      reject(new Error('Failed to load image'));
++    };
++
++    img.src = objectUrl;
++  });
++};
++
++const loadImageOntoCanvas = (
++  image: HTMLImageElement,
++  canvas: HTMLCanvasElement,
++  ctx: CanvasRenderingContext2D,
++): ImageData => {
++  const scale = Math.min(canvas.width / image.width, canvas.height / image.height);
++
++  const x = (canvas.width - image.width * scale) / 2;
++  const y = (canvas.height - image.height * scale) / 2;
++
++  ctx.clearRect(0, 0, canvas.width, canvas.height);
++
++  ctx.save();
++  ctx.imageSmoothingEnabled = true;
++  ctx.imageSmoothingQuality = 'high';
++
++  ctx.drawImage(image, x, y, image.width * scale, image.height * scale);
++
++  ctx.restore();
++
++  return ctx.getImageData(0, 0, canvas.width, canvas.height);
++};
++
++export type ImageUploadFieldProps = {
++  className?: string;
++  value: string;
++  onChange: (_imageDataUrl: string) => void;
++};
++
++export const ImageUploadField = ({ className, value, onChange, ...props }: ImageUploadFieldProps) => {
++  const { t } = useLingui();
++  const $canvas = useRef<HTMLCanvasElement>(null);
++  const $fileInput = useRef<HTMLInputElement>(null);
++  const [isUploading, setIsUploading] = useState(false);
++  const [error, setError] = useState<string | null>(null);
++
++  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
++    setIsUploading(true);
++    setError(null);
++    try {
++      const img = await loadImage(event.target.files?.[0]);
++
++      // 1. Create a normalized base64 image without padding.
++      const MAX_DIMENSION = 1000;
++      const scale = Math.min(1, MAX_DIMENSION / Math.max(img.width, img.height));
++      const width = img.width * scale;
++      const height = img.height * scale;
++
++      const offscreenCanvas = document.createElement('canvas');
++      offscreenCanvas.width = width;
++      offscreenCanvas.height = height;
++      const offscreenCtx = offscreenCanvas.getContext('2d');
++      if (offscreenCtx) {
++        offscreenCtx.drawImage(img, 0, 0, width, height);
++        onChange?.(offscreenCanvas.toDataURL('image/png'));
++      }
++
++      // 2. Update the preview canvas.
++      if ($canvas.current) {
++        const ctx = $canvas.current.getContext('2d');
++        if (ctx) {
++          $canvas.current.width = $canvas.current.clientWidth * SIGNATURE_CANVAS_DPI;
++          $canvas.current.height = $canvas.current.clientHeight * SIGNATURE_CANVAS_DPI;
++          loadImageOntoCanvas(img, $canvas.current, ctx);
++        }
++      }
++    } catch (err) {
++      if (err instanceof Error) {
++        setError(err.message);
++      } else {
++        setError(t`An unexpected error occurred`);
++      }
++      console.error('Image upload error:', err);
++    } finally {
++      setIsUploading(false);
++    }
++  };
++
++  const clearImage = () => {
++    onChange?.('');
++  };
++
++  return (
++    <div className={cn('relative h-[300px] max-h-[400px] w-full overflow-hidden', className)}>
++      {value ? (
++        <img src={value} className="absolute inset-0 h-full w-full object-contain" alt="Uploaded preview" />
++      ) : (
++        <canvas ref={$canvas} className="h-full w-full object-contain" style={{ touchAction: 'none' }} {...props} />
++      )}
++
++      <input ref={$fileInput} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
++
++      {!value && (
++        <div
++          className="absolute inset-0 z-50 flex h-full w-full cursor-pointer items-center justify-center rounded-lg border-2 border-muted-foreground/20 border-dashed bg-background/50 transition-colors hover:bg-background/80"
++          onClick={() => $fileInput.current?.click()}
++        >
++          <motion.div className="flex flex-col items-center justify-center text-muted-foreground">
++            <UploadCloudIcon className="mb-2 h-10 w-10" />
++            <span className="font-semibold text-lg">
++              <Trans>Upload Image</Trans>
++            </span>
++            <span className="text-sm opacity-70">
++              <Trans>PNG, JPG or JPEG (max 5MB)</Trans>
++            </span>
++          </motion.div>
++        </div>
++      )}
++
++      {value && (
++        <button
++          type="button"
++          className="absolute top-2 right-2 z-50 rounded-full border bg-background p-1 transition-colors hover:bg-muted"
++          onClick={clearImage}
++          title="Clear image"
++        >
++          <XIcon className="h-4 w-4" />
++        </button>
++      )}
++
++      {isUploading && (
++        <div className="absolute inset-0 z-[60] flex items-center justify-center bg-background/50">
++          <div className="h-8 w-8 animate-spin rounded-full border-primary border-b-2"></div>
++        </div>
++      )}
++
++      {error && (
++        <div className="fade-in slide-in-from-bottom-1 absolute bottom-2 left-1/2 z-[70] -translate-x-1/2 animate-in rounded bg-destructive px-2 py-1 font-medium text-destructive-foreground text-xs">
++          <Trans>{error}</Trans>
++        </div>
++      )}
++    </div>
++  );
++};
+diff --git a/packages/ui/primitives/signature-pad/signature-pad-draw.tsx b/packages/ui/primitives/signature-pad/signature-pad-draw.tsx
+index acc77f9a7..539e86ae1 100644
+--- a/packages/ui/primitives/signature-pad/signature-pad-draw.tsx
++++ b/packages/ui/primitives/signature-pad/signature-pad-draw.tsx
+@@ -6,7 +6,7 @@ import { Undo2 } from 'lucide-react';
+ import type { StrokeOptions } from 'perfect-freehand';
+ import { getStroke } from 'perfect-freehand';
+ import type { MouseEvent, PointerEvent, RefObject, TouchEvent } from 'react';
+-import { useMemo, useRef, useState } from 'react';
++import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+ 
+ import { cn } from '../../lib/utils';
+ import { getSvgPathFromStroke } from './helper';
+@@ -209,7 +209,7 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
+     setIsPressed(false);
+   };
+ 
+-  const onUndoClick = () => {
++  const onUndoClick = useCallback(() => {
+     if (lines.length === 0 || !$el.current) {
+       return;
+     }
+@@ -232,7 +232,28 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
+     });
+ 
+     onChange?.($el.current.toDataURL());
+-  };
++  }, [lines, onChange]);
++
++  useEffect(() => {
++    const onKeyDown = (event: KeyboardEvent) => {
++      if (event.key.toLowerCase() !== 'z' || (!event.metaKey && !event.ctrlKey) || event.shiftKey) {
++        return;
++      }
++
++      if (lines.length === 0) {
++        return;
++      }
++
++      event.preventDefault();
++      onUndoClick();
++    };
++
++    window.addEventListener('keydown', onKeyDown);
++
++    return () => {
++      window.removeEventListener('keydown', onKeyDown);
++    };
++  }, [lines.length, onUndoClick]);
+ 
+   unsafe_useEffectOnce(() => {
+     if ($el.current) {
