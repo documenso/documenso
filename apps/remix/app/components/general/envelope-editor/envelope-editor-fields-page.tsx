@@ -9,6 +9,7 @@ import {
   type TDropdownFieldMeta,
   type TEmailFieldMeta,
   type TFieldMetaSchema,
+  type TImageUploadFieldMeta,
   type TInitialsFieldMeta,
   type TNameFieldMeta,
   type TNumberFieldMeta,
@@ -41,6 +42,7 @@ import { EditorFieldCheckboxForm } from '~/components/forms/editor/editor-field-
 import { EditorFieldDateForm } from '~/components/forms/editor/editor-field-date-form';
 import { EditorFieldDropdownForm } from '~/components/forms/editor/editor-field-dropdown-form';
 import { EditorFieldEmailForm } from '~/components/forms/editor/editor-field-email-form';
+import { EditorFieldImageUploadForm } from '~/components/forms/editor/editor-field-image-upload-form';
 import { EditorFieldInitialsForm } from '~/components/forms/editor/editor-field-initials-form';
 import { EditorFieldNameForm } from '~/components/forms/editor/editor-field-name-form';
 import { EditorFieldNumberForm } from '~/components/forms/editor/editor-field-number-form';
@@ -55,9 +57,10 @@ import { EnvelopeEditorFieldsPageRenderer } from './envelope-editor-fields-page-
 import { EnvelopeRendererFileSelector } from './envelope-file-selector';
 import { EnvelopeRecipientSelector } from './envelope-recipient-selector';
 
-const FieldSettingsTypeTranslations: Record<FieldType, MessageDescriptor> = {
+const FieldSettingsTypeTranslations: Record<string, MessageDescriptor> = {
   [FieldType.SIGNATURE]: msg`Signature Settings`,
   [FieldType.FREE_SIGNATURE]: msg`Free Signature Settings`,
+  IMAGE_UPLOAD: msg`Image Upload Settings`,
   [FieldType.TEXT]: msg`Text Settings`,
   [FieldType.DATE]: msg`Date Settings`,
   [FieldType.EMAIL]: msg`Email Settings`,
@@ -377,6 +380,26 @@ export const EnvelopeEditorFieldsPage = () => {
                       <EditorFieldSignatureForm
                         value={selectedField?.fieldMeta as TSignatureFieldMeta | undefined}
                         onValueChange={(value) => updateSelectedFieldMeta(value)}
+                      />
+                    ))
+                    .with('IMAGE_UPLOAD', () => (
+                      <EditorFieldImageUploadForm
+                        label={(selectedField?.fieldMeta as TImageUploadFieldMeta | undefined)?.label ?? null}
+                        textAlign={(selectedField?.fieldMeta as TImageUploadFieldMeta | undefined)?.textAlign}
+                        onLabelChange={(value) =>
+                          updateSelectedFieldMeta({
+                            ...selectedField.fieldMeta,
+                            type: 'IMAGE_UPLOAD',
+                            label: value,
+                          } as TImageUploadFieldMeta)
+                        }
+                        onTextAlignChange={(value) =>
+                          updateSelectedFieldMeta({
+                            ...selectedField.fieldMeta,
+                            type: 'IMAGE_UPLOAD',
+                            textAlign: value,
+                          } as TImageUploadFieldMeta)
+                        }
                       />
                     ))
                     .with(FieldType.CHECKBOX, () => (

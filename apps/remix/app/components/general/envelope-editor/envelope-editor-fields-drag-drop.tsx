@@ -20,6 +20,7 @@ import {
   HashIcon,
   ListIcon,
   MailIcon,
+  StampIcon,
   TextIcon,
   UserIcon,
 } from 'lucide-react';
@@ -30,13 +31,24 @@ const MIN_WIDTH_PX = 36;
 
 const DEFAULT_HEIGHT_PX = MIN_HEIGHT_PX * 2.5;
 const DEFAULT_WIDTH_PX = MIN_WIDTH_PX * 2.5;
+const IMAGE_UPLOAD_FIELD_TYPE = 'IMAGE_UPLOAD' as FieldType;
 
-export const fieldButtonList = [
+export const fieldButtonList: {
+  type: FieldType;
+  icon: any;
+  name: any;
+  className?: string;
+}[] = [
   {
     type: FieldType.SIGNATURE,
     icon: SignatureIcon,
     name: msg`Signature`,
     className: 'font-signature text-lg',
+  },
+  {
+    type: IMAGE_UPLOAD_FIELD_TYPE,
+    icon: StampIcon,
+    name: msg`Image Upload`,
   },
   {
     type: FieldType.EMAIL,
@@ -150,11 +162,14 @@ export const EnvelopeEditorFieldDragDrop = ({
       }
 
       const $page = getPage(event, PDF_VIEWER_PAGE_SELECTOR);
+      const withinBounds = isWithinPageBounds(
+        event,
+        PDF_VIEWER_PAGE_SELECTOR,
+        fieldBounds.current.width,
+        fieldBounds.current.height,
+      );
 
-      if (
-        !$page ||
-        !isWithinPageBounds(event, PDF_VIEWER_PAGE_SELECTOR, fieldBounds.current.width, fieldBounds.current.height)
-      ) {
+      if (!$page || !withinBounds) {
         setSelectedField(null);
         return;
       }
@@ -245,8 +260,12 @@ export const EnvelopeEditorFieldDragDrop = ({
             disabled={isFieldsDisabled}
             key={field.type}
             type="button"
-            onClick={() => setSelectedField(field.type)}
-            onMouseDown={() => setSelectedField(field.type)}
+            onClick={() => {
+              setSelectedField(field.type);
+            }}
+            onMouseDown={() => {
+              setSelectedField(field.type);
+            }}
             data-selected={selectedField === field.type ? true : undefined}
             className={cn(
               'group flex h-12 cursor-pointer items-center justify-center rounded-lg border border-border px-4 transition-colors',
