@@ -1,4 +1,5 @@
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
+import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
@@ -38,6 +39,11 @@ import { useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 import * as z from 'zod';
 
+import {
+  EnvelopeEnclosingFieldsAlert,
+  getMutualEnclosingFields,
+} from '../general/envelope-editor/envelope-editor-fields-validator';
+
 export type EnvelopeDistributeDialogProps = {
   onDistribute?: () => Promise<void>;
   documentRootPath: string;
@@ -63,7 +69,9 @@ export const EnvelopeDistributeDialog = ({
 }: EnvelopeDistributeDialogProps) => {
   const organisation = useCurrentOrganisation();
 
-  const { envelope, syncEnvelope, isAutosaving, autosaveError } = useCurrentEnvelopeEditor();
+  const { envelope, syncEnvelope, isAutosaving, autosaveError, editorFields, navigateToStep } =
+    useCurrentEnvelopeEditor();
+  const { setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
 
   const { toast } = useToast();
   const { t } = useLingui();
@@ -136,6 +144,11 @@ export const EnvelopeDistributeDialog = ({
     });
   }, [recipientsWithIndex, envelope.authOptions]);
 
+  const mutualEnclosingFields = useMemo(
+    () => getMutualEnclosingFields(envelope.fields),
+    [envelope.fields],
+  );
+
   const invalidEnvelopeCode = useMemo(() => {
     if (recipientsMissingSignatureFields.length > 0) {
       return 'MISSING_SIGNATURES';
@@ -147,6 +160,10 @@ export const EnvelopeDistributeDialog = ({
 
     if (recipientsMissingRequiredEmail.length > 0) {
       return 'MISSING_REQUIRED_EMAIL';
+    }
+
+    if (mutualEnclosingFields.length > 0) {
+      return 'ENCLOSING_FIELDS';
     }
 
     return null;
@@ -205,6 +222,13 @@ export const EnvelopeDistributeDialog = ({
       void handleSync();
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    // Navigate to the addFields step to support field-navigation
+    if (isOpen && mutualEnclosingFields.length > 0) {
+      navigateToStep('addFields');
+    }
+  }, [isOpen, mutualEnclosingFields]);
 
   if (envelope.status !== DocumentStatus.DRAFT || envelope.type !== EnvelopeType.DOCUMENT) {
     return null;
@@ -460,6 +484,24 @@ export const EnvelopeDistributeDialog = ({
                       ))}
                     </ul>
                   </AlertDescription>
+                ))
+                .with('ENCLOSING_FIELDS', () => (
+                  <EnvelopeEnclosingFieldsAlert
+                    mutualEnclosingFields={mutualEnclosingFields}
+                    envelopeItems={envelope.envelopeItems}
+                    localFields={editorFields.localFields}
+                    onNavigateToField={(envelopeItemId, formId) => {
+                      setCurrentEnvelopeItem(envelopeItemId);
+                      setTimeout(() => {
+                        window.dispatchEvent(
+                          new CustomEvent('envelope:select-field', {
+                            detail: { formId },
+                          }),
+                        );
+                      }, 600);
+                      setIsOpen(false);
+                    }}
+                  />
                 ))
                 .exhaustive()}
             </Alert>
