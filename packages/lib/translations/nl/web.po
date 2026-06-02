@@ -8,7 +8,7 @@ msgstr ""
 "Language: nl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-05-22 05:21\n"
+"PO-Revision-Date: 2026-05-30 16:23\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -1350,6 +1350,10 @@ msgstr "Plaatshouder-ontvanger toevoegen"
 msgid "Add Placeholders"
 msgstr "Placeholders toevoegen"
 
+#: apps/remix/app/components/general/rate-limit-array-input.tsx
+msgid "Add rate limit"
+msgstr "Snelheidslimiet toevoegen"
+
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "Add recipients"
 msgstr "Ontvangers toevoegen"
@@ -1891,9 +1895,10 @@ msgstr "Er is een onverwachte fout opgetreden."
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/forms/team-update-form.tsx
+#: apps/remix/app/components/general/admin-email-blocklist-section.tsx
+#: apps/remix/app/components/general/admin-site-banner-section.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
-#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
 msgid "An unknown error occurred"
 msgstr "Er is een onbekende fout opgetreden"
@@ -1929,6 +1934,14 @@ msgstr "Elke bron"
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 msgid "Any Status"
 msgstr "Elke status"
+
+#: apps/remix/app/components/general/claim-limit-fields.tsx
+msgid "API rate limits"
+msgstr "API-snelheidslimieten"
+
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+msgid "API requests"
+msgstr "API-verzoeken"
 
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
@@ -2196,7 +2209,7 @@ msgstr "Terug naar startpagina"
 msgid "Background"
 msgstr "Achtergrond"
 
-#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "Background Color"
 msgstr "Achtergrondkleur"
 
@@ -2213,7 +2226,7 @@ msgstr "Back‑upcode"
 msgid "Backup codes"
 msgstr "Back‑upcodes"
 
-#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "Banner Updated"
 msgstr "Banner bijgewerkt"
 
@@ -2242,6 +2255,18 @@ msgstr "Facturatie"
 #: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
 msgid "Black"
 msgstr "Zwart"
+
+#: apps/remix/app/components/general/admin-email-blocklist-section.tsx
+msgid "Block signups from additional email domains on top of the bundled disposable email list. Subdomains are matched automatically (e.g. blocking \"bad.com\" also blocks \"foo.bad.com\")."
+msgstr "Blokkeer registraties van extra e‑maildomeinen boven op de meegeleverde lijst met tijdelijke e‑mailadressen. Subdomeinen worden automatisch herkend (bijv. het blokkeren van \"bad.com\" blokkeert ook \"foo.bad.com\")."
+
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+msgid "Blocked"
+msgstr "Geblokkeerd"
+
+#: apps/remix/app/components/general/admin-email-blocklist-section.tsx
+msgid "Blocked Domains"
+msgstr "Geblokkeerde domeinen"
 
 #: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
 msgid "Blue"
@@ -2725,6 +2750,10 @@ msgstr "Sluiten"
 msgid "Collapse sidebar"
 msgstr "Zijbalk samenvouwen"
 
+#: apps/remix/app/components/general/admin-email-blocklist-section.tsx
+msgid "Comma-separated list of email domains to block from signing up."
+msgstr "Komma-gescheiden lijst met e‑maildomeinen die voor registratie moeten worden geblokkeerd."
+
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 msgid "Communication"
 msgstr "Communicatie"
@@ -2922,7 +2951,7 @@ msgstr "Neem hier contact op met sales"
 msgid "Contact us"
 msgstr "Neem contact met ons op"
 
-#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "Content"
 msgstr "Inhoud"
 
@@ -3090,6 +3119,10 @@ msgstr "Token kopiëren"
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Copy Value"
 msgstr "Waarde kopiëren"
+
+#: apps/remix/app/components/general/organisation-usage-reset-button.tsx
+msgid "Counter reset."
+msgstr "Teller opnieuw ingesteld."
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
@@ -3919,6 +3952,10 @@ msgstr "Weergavenaam"
 msgid "Display your name and email in documents"
 msgstr "Toon je naam en e‑mail in documenten"
 
+#: apps/remix/app/components/forms/signup.tsx
+msgid "Disposable email addresses are not allowed. Please sign up with a permanent email address."
+msgstr "Wegwerp-e-mailadressen zijn niet toegestaan. Meld je aan met een permanent e-mailadres."
+
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 msgid "Distribute Document"
 msgstr "Document distribueren"
@@ -4191,6 +4228,10 @@ msgstr "Documentvoorkeuren"
 msgid "Document preferences updated"
 msgstr "Documentvoorkeuren bijgewerkt"
 
+#: apps/remix/app/components/general/claim-limit-fields.tsx
+msgid "Document rate limits"
+msgstr "Documentsnelheidslimieten"
+
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 msgid "Document re-sent"
 msgstr "Document opnieuw verzonden"
@@ -4323,6 +4364,7 @@ msgstr "Documentatie"
 #: apps/remix/app/components/general/app-nav-desktop.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
 #: apps/remix/app/components/general/skeletons/document-edit-skeleton.tsx
 #: apps/remix/app/components/general/user-profile-skeleton.tsx
 #: apps/remix/app/components/general/user-profile-timur.tsx
@@ -4679,6 +4721,14 @@ msgstr "E-mailadres al bevestigd"
 msgid "Email already exists"
 msgstr "E-mailadres bestaat al"
 
+#: apps/remix/app/components/general/admin-email-blocklist-section.tsx
+msgid "Email Blocklist"
+msgstr "E‑mailblokkeerlijst"
+
+#: apps/remix/app/components/general/admin-email-blocklist-section.tsx
+msgid "Email Blocklist Updated"
+msgstr "E‑mailblokkeerlijst bijgewerkt"
+
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 msgid "Email Confirmed!"
 msgstr "E‑mail bevestigd!"
@@ -4735,6 +4785,10 @@ msgstr "E-mailvoorkeuren"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.email.tsx
 msgid "Email preferences updated"
 msgstr "E-mailvoorkeuren bijgewerkt"
+
+#: apps/remix/app/components/general/claim-limit-fields.tsx
+msgid "Email rate limits"
+msgstr "E-mailsnelheidslimieten"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Email recipients when a pending document is deleted"
@@ -4813,6 +4867,7 @@ msgstr "E‑mailverificatie is verwijderd"
 msgid "Email verification has been resent"
 msgstr "E‑mailverificatie is opnieuw verzonden"
 
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
@@ -4823,6 +4878,12 @@ msgstr "E-mails"
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Embedding, 5 members included and more"
 msgstr "Inbedding, 5 leden inbegrepen en meer"
+
+#: apps/remix/app/components/general/claim-limit-fields.tsx
+#: apps/remix/app/components/general/claim-limit-fields.tsx
+#: apps/remix/app/components/general/claim-limit-fields.tsx
+msgid "Empty = Unlimited, 0 = Blocked"
+msgstr "Leeg = Onbeperkt, 0 = Geblokkeerd"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx
 msgid "Empty field"
@@ -4906,8 +4967,9 @@ msgstr "Schakel team-API-tokens in om documenteigendom aan een ander teamlid te 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
+#: apps/remix/app/components/general/admin-email-blocklist-section.tsx
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
-#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/components/general/admin-site-banner-section.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 #: packages/ui/components/document/reminder-settings-picker.tsx
@@ -5316,6 +5378,10 @@ msgstr "Bestand lezen mislukt"
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Failed to reseal document"
 msgstr "Opnieuw verzegelen van document mislukt"
+
+#: apps/remix/app/components/general/organisation-usage-reset-button.tsx
+msgid "Failed to reset counter."
+msgstr "Resetten van teller mislukt."
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Failed to revoke session"
@@ -6402,6 +6468,10 @@ msgstr "Lichte modus"
 msgid "Like to have your own public profile with agreements?"
 msgstr "Wil je een eigen openbaar profiel met overeenkomsten?"
 
+#: apps/remix/app/components/general/claim-limit-fields.tsx
+msgid "Limits"
+msgstr "Limieten"
+
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Line height"
 msgstr "Regelhoogte"
@@ -6704,6 +6774,11 @@ msgstr "Maximale bestandsgrootte: 4 MB. Maximaal 100 rijen per upload. Lege waar
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Maximum number of recipients per document allowed. 0 = Unlimited"
+msgstr "Maximaal aantal ontvangers per document toegestaan. 0 = Onbeperkt"
+
+#: apps/remix/app/components/forms/subscription-claim-form.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Maximum number of uploaded files per envelope allowed"
 msgstr "Maximaal toegestaan aantal geüploade bestanden per envelop"
 
@@ -6807,6 +6882,18 @@ msgstr "Maandelijks actieve gebruikers: gebruikers die ten minste één document
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Monthly Active Users: Users that had at least one of their documents completed"
 msgstr "Maandelijks actieve gebruikers: gebruikers van wie ten minste één document is voltooid"
+
+#: apps/remix/app/components/general/claim-limit-fields.tsx
+msgid "Monthly API quota"
+msgstr "Maandelijkse API-limiet"
+
+#: apps/remix/app/components/general/claim-limit-fields.tsx
+msgid "Monthly document quota"
+msgstr "Maandelijkse documentlimiet"
+
+#: apps/remix/app/components/general/claim-limit-fields.tsx
+msgid "Monthly email quota"
+msgstr "Maandelijkse e-maillimiet"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
@@ -7440,6 +7527,12 @@ msgstr "Organisatienaam"
 msgid "Organisation not found"
 msgstr "Organisatie niet gevonden"
 
+#: packages/email/templates/organisation-limit-exceeded.tsx
+#: packages/email/templates/organisation-limit-exceeded.tsx
+#: packages/lib/jobs/definitions/emails/send-organisation-limit-exceeded-email.handler.ts
+msgid "Organisation Review Required"
+msgstr "Organisatiereview vereist"
+
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Organisation role"
@@ -7853,6 +7946,10 @@ msgstr "Bevestig je e-mailadres"
 #: apps/remix/app/components/embed/embed-paywall.tsx
 msgid "Please contact <0>support</0> if you have any questions."
 msgstr "Neem contact op met <0>support</0> als je vragen hebt."
+
+#: packages/email/templates/organisation-limit-exceeded.tsx
+msgid "Please contact support at {SUPPORT_EMAIL} and we will review your account."
+msgstr "Neem contact op met support via {SUPPORT_EMAIL}, dan beoordelen wij je account."
 
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Please contact support if you would like to revert this action."
@@ -8296,6 +8393,11 @@ msgstr "Ontvanger heeft het document in CC gekregen"
 msgid "Recipient completed their task"
 msgstr "Ontvanger heeft zijn taak voltooid"
 
+#: apps/remix/app/components/forms/subscription-claim-form.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Recipient Count"
+msgstr "Aantal ontvangers"
+
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Recipient expired email"
 msgstr "E-mail over verlopen ondertekenaar"
@@ -8696,6 +8798,7 @@ msgstr "Verificatie opnieuw verzenden"
 #: apps/remix/app/components/forms/organisation-update-form.tsx
 #: apps/remix/app/components/forms/public-profile-form.tsx
 #: apps/remix/app/components/forms/team-update-form.tsx
+#: apps/remix/app/components/general/organisation-usage-reset-button.tsx
 msgid "Reset"
 msgstr "Resetten"
 
@@ -9655,7 +9758,7 @@ msgstr "Registratie is momenteel uitgeschakeld of niet beschikbaar voor jouw e�
 msgid "Since {0}"
 msgstr "Sinds {0}"
 
-#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "Site Banner"
 msgstr "Sitebanner"
 
@@ -10389,7 +10492,7 @@ msgstr "Tekst"
 msgid "Text Align"
 msgstr "Tekstuitlijning"
 
-#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "Text Color"
 msgstr "Tekstkleur"
 
@@ -10441,7 +10544,7 @@ msgstr "De authenticatiemethoden die vereist zijn voor ontvangers om het handtek
 msgid "The authentication methods required for recipients to view the document."
 msgstr "De authenticatiemethoden die vereist zijn voor ontvangers om het document te bekijken."
 
-#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "The content to show in the banner, HTML is allowed"
 msgstr "De inhoud die in de banner wordt weergegeven; HTML is toegestaan"
 
@@ -10532,6 +10635,10 @@ msgstr "De naam van het document"
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "The email address which will show up in the \"Reply To\" field in emails"
 msgstr "Het e-mailadres dat in het veld \"Reply-To\" in e-mails wordt weergegeven"
+
+#: apps/remix/app/components/general/admin-email-blocklist-section.tsx
+msgid "The email blocklist has been updated successfully."
+msgstr "De e‑mailblokkeerlijst is succesvol bijgewerkt."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "The email domain you are looking for may have been removed, renamed or may have never existed."
@@ -10729,7 +10836,7 @@ msgstr "Het ondertekenvenster voor \"{recipientName}\" voor document \"{document
 msgid "The signing window for {displayName} on document \"{documentName}\" has expired. You can resend the document to extend their deadline or cancel the document."
 msgstr "Het ondertekenvenster voor {displayName} voor document \"{documentName}\" is verlopen. Je kunt het document opnieuw versturen om hun deadline te verlengen of het document annuleren."
 
-#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "The site banner is a message that is shown at the top of the site. It can be used to display important information to your users."
 msgstr "De sitebanner is een bericht dat bovenaan de site wordt weergegeven. Je kunt hiermee belangrijke informatie aan je gebruikers tonen."
 
@@ -11614,6 +11721,8 @@ msgstr "Onbekende fout"
 msgid "Unknown name"
 msgstr "Onbekende naam"
 
+#: apps/remix/app/components/general/claim-limit-fields.tsx
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
 #: apps/remix/app/components/tables/admin-claims-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -11670,7 +11779,7 @@ msgstr "Naamloze groep"
 msgid "Update"
 msgstr "Bijwerken"
 
-#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "Update Banner"
 msgstr "Banner bijwerken"
 
@@ -11678,6 +11787,10 @@ msgstr "Banner bijwerken"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
 msgid "Update Billing"
 msgstr "Facturering bijwerken"
+
+#: apps/remix/app/components/general/admin-email-blocklist-section.tsx
+msgid "Update Blocklist"
+msgstr "Blokkeerlijst bijwerken"
 
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
 msgid "Update Claim"
@@ -11909,6 +12022,11 @@ msgstr "Uploaden"
 #: apps/remix/app/components/general/document/embedded-editor-attachment-popover.tsx
 msgid "URL"
 msgstr "URL"
+
+#. placeholder {0}: monthlyStats[0]?.period || 'N/A'
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+msgid "Usage for period: {0}"
+msgstr "Gebruik voor periode: {0}"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Use"
@@ -12481,9 +12599,13 @@ msgstr "Er is een onbekende fout opgetreden bij het inloggen. Probeer het later 
 msgid "We encountered an unknown error while attempting to sign you Up. Please try again later."
 msgstr "Er is een onbekende fout opgetreden bij het registreren. Probeer het later opnieuw."
 
-#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "We encountered an unknown error while attempting to update the banner. Please try again later."
 msgstr "Er is een onbekende fout opgetreden bij het bijwerken van de banner. Probeer het later opnieuw."
+
+#: apps/remix/app/components/general/admin-email-blocklist-section.tsx
+msgid "We encountered an unknown error while attempting to update the email blocklist. Please try again later."
+msgstr "Er is een onbekende fout opgetreden bij het bijwerken van de e-mailblokkeerlijst. Probeer het later opnieuw."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "We encountered an unknown error while attempting to update the envelope. Please try again later."
@@ -12652,6 +12774,18 @@ msgstr "We wachten nog steeds tot andere ondertekenaars dit document ondertekene
 #: packages/email/templates/reset-password.tsx
 msgid "We've changed your password as you asked. You can now sign in with your new password."
 msgstr "We hebben je wachtwoord gewijzigd zoals je hebt gevraagd. Je kunt nu inloggen met je nieuwe wachtwoord."
+
+#: packages/email/templates/organisation-limit-exceeded.tsx
+msgid "We've noticed API activity on your account that exceeds the fair use limits of your current plan. As a precaution, new API activity has been temporarily paused pending review."
+msgstr "We hebben API-activiteit op je account opgemerkt die de fair-use-limieten van je huidige abonnement overschrijdt. Als voorzorgsmaatregel is nieuwe API-activiteit tijdelijk gepauzeerd in afwachting van een beoordeling."
+
+#: packages/email/templates/organisation-limit-exceeded.tsx
+msgid "We've noticed document activity on your account that exceeds the fair use limits of your current plan. As a precaution, new document activity has been temporarily paused pending review."
+msgstr "We hebben documentactiviteit op je account opgemerkt die de fair-use-limieten van je huidige abonnement overschrijdt. Als voorzorgsmaatregel is nieuwe documentactiviteit tijdelijk gepauzeerd in afwachting van een beoordeling."
+
+#: packages/email/templates/organisation-limit-exceeded.tsx
+msgid "We've noticed email sending activity on your account that exceeds the fair use limits of your current plan. As a precaution, new email activity has been temporarily paused pending review."
+msgstr "We hebben e-mailverzendactiviteit op je account opgemerkt die de fair-use-limieten van je huidige abonnement overschrijdt. Als voorzorgsmaatregel is nieuwe e-mailactiviteit tijdelijk gepauzeerd in afwachting van een beoordeling."
 
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "We've sent a 6-digit verification code to your email. Please enter it below to complete the document."
@@ -13584,7 +13718,7 @@ msgstr "Je account is succesvol verwijderd."
 msgid "Your avatar has been updated successfully."
 msgstr "Je avatar is succesvol bijgewerkt."
 
-#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "Your banner has been updated successfully."
 msgstr "Je banner is succesvol bijgewerkt."
 
@@ -13797,6 +13931,18 @@ msgstr "Je organisatie is succesvol verwijderd."
 #: apps/remix/app/components/forms/organisation-update-form.tsx
 msgid "Your organisation has been successfully updated."
 msgstr "Je organisatie is succesvol bijgewerkt."
+
+#: packages/email/templates/organisation-limit-exceeded.tsx
+msgid "Your organisation is generating API requests faster than normal, so some requests are being temporarily throttled."
+msgstr "Je organisatie genereert API-verzoeken sneller dan normaal, daarom worden sommige verzoeken tijdelijk afgeremd."
+
+#: packages/email/templates/organisation-limit-exceeded.tsx
+msgid "Your organisation is generating documents faster than normal, so some requests are being temporarily throttled."
+msgstr "Je organisatie genereert documenten sneller dan normaal, daarom worden sommige verzoeken tijdelijk afgeremd."
+
+#: packages/email/templates/organisation-limit-exceeded.tsx
+msgid "Your organisation is generating emails faster than normal, so some requests are being temporarily throttled."
+msgstr "Je organisatie genereert e-mails sneller dan normaal, daarom worden sommige verzoeken tijdelijk afgeremd."
 
 #: apps/remix/app/components/forms/password.tsx
 #: apps/remix/app/components/forms/reset-password.tsx

@@ -8,6 +8,13 @@ import { match } from 'ts-pattern';
 export type OnSubscriptionUpdatedOptions = {
   subscription: Stripe.Subscription;
   previousAttributes: Partial<Stripe.Subscription> | null;
+  /**
+   * When true, the organisationClaim will not be synced.
+   *
+   * Used by the admin sync route to update only the Subscription
+   * row while leaving claim entitlements untouched.
+   */
+  bypassClaimUpdate?: boolean;
 };
 
 type StripeWebhookResponse = {
@@ -15,7 +22,11 @@ type StripeWebhookResponse = {
   message: string;
 };
 
-export const onSubscriptionUpdated = async ({ subscription, previousAttributes }: OnSubscriptionUpdatedOptions) => {
+export const onSubscriptionUpdated = async ({
+  subscription,
+  previousAttributes,
+  bypassClaimUpdate = false,
+}: OnSubscriptionUpdatedOptions) => {
   const customerId = typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
 
   // Todo: logging
@@ -121,7 +132,8 @@ export const onSubscriptionUpdated = async ({ subscription, previousAttributes }
     });
 
     // Override current organisation claim if new one is found.
-    if (newClaimFound) {
+    // Skipped when bypassClaimUpdate is set.
+    if (!bypassClaimUpdate && newClaimFound) {
       await tx.organisationClaim.update({
         where: {
           id: organisation.organisationClaim.id,
