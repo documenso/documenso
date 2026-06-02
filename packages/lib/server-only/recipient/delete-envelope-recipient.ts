@@ -4,7 +4,7 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 import { msg } from '@lingui/core/macro';
-import { EnvelopeType, SendStatus } from '@prisma/client';
+import { EnvelopeType, RecipientRole, SendStatus } from '@prisma/client';
 import { createElement } from 'react';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
@@ -12,11 +12,13 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { logger } from '../../utils/logger';
 import { canRecipientBeModified, isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 
 export interface DeleteEnvelopeRecipientOptions {
   userId: number;
@@ -137,6 +139,7 @@ export const deleteEnvelopeRecipient = async ({
   // Send email to deleted recipient.
   if (
     recipientToDelete.sendStatus === SendStatus.SENT &&
+    recipientToDelete.role !== RecipientRole.CC &&
     isRecipientRemovedEmailEnabled &&
     envelope.type === EnvelopeType.DOCUMENT &&
     isRecipientEmailValidForSending(recipientToDelete)
@@ -149,7 +152,7 @@ export const deleteEnvelopeRecipient = async ({
       assetBaseUrl,
     });
 
-    const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
+    const { branding, emailLanguage, senderEmail, replyToEmail, organisationId, claims } = await getEmailContext({
       emailType: 'RECIPIENT',
       source: {
         type: 'team',
@@ -157,6 +160,27 @@ export const deleteEnvelopeRecipient = async ({
       },
       meta: envelope.documentMeta,
     });
+
+    // Meter the removal email against the organisation email quota/stats.
+    // Add/remove churn can be used to blast unsolicited removal emails
+    // outside the email limits.
+    try {
+      await assertOrganisationRatesAndLimits({
+        organisationId,
+        organisationClaim: claims,
+        type: 'email',
+        count: 1,
+      });
+    } catch (_err) {
+      logger.warn({
+        msg: 'Recipient removed email dropped: org email limit exceeded',
+        organisationId,
+        recipientId: recipientToDelete.id,
+        envelopeId: envelope.id,
+      });
+
+      return deletedRecipient;
+    }
 
     const [html, text] = await Promise.all([
       renderEmailWithI18N(template, { lang: emailLanguage, branding }),
