@@ -73,6 +73,8 @@ const buildEmbedSrc = (host: string, token: string) => {
 };
 ```
 
+A complete example can be found in the [Embeds repository](https://github.com/documenso/embeds/blob/main/packages/mitosis/src/sign-document.lite.tsx).
+
 <Callout type="info" title="Why use the URL fragment?">
   The fragment is **not sent to the server** as part of the HTTP request, but it is available to the embedded app in
   the browser. This makes it a convenient way to pass client-side configuration without changing the base embed URL.
