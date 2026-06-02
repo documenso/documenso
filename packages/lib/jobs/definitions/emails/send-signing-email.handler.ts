@@ -55,6 +55,11 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
       },
       include: {
         documentMeta: true,
+        user: {
+          select: {
+            disabled: true,
+          },
+        },
         team: {
           select: {
             teamEmail: true,
@@ -84,15 +89,29 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     return;
   }
 
-  const { branding, emailLanguage, settings, organisationType, senderEmail, replyToEmail, organisationId, claims } =
-    await getEmailContext({
-      emailType: 'RECIPIENT',
-      source: {
-        type: 'team',
-        teamId: envelope.teamId,
-      },
-      meta: envelope.documentMeta,
-    });
+  const {
+    branding,
+    emailLanguage,
+    settings,
+    organisationType,
+    senderEmail,
+    replyToEmail,
+    organisationId,
+    claims,
+    isOrganisationOwnerDisabled,
+  } = await getEmailContext({
+    emailType: 'RECIPIENT',
+    source: {
+      type: 'team',
+      teamId: envelope.teamId,
+    },
+    meta: envelope.documentMeta,
+  });
+
+  // Don't send signing invitations on behalf of a disabled (e.g. banned) account.
+  if (envelope.user.disabled || isOrganisationOwnerDisabled) {
+    return;
+  }
 
   const customEmail = envelope?.documentMeta;
   const isDirectTemplate = envelope.source === DocumentSource.TEMPLATE_DIRECT_LINK;
