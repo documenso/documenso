@@ -10,7 +10,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router';
 
 import { SettingsHeader } from '~/components/general/settings-header';
-import { AdminOrganisationStatsTable } from '~/components/tables/admin-organisation-stats-table';
+import {
+  AdminOrganisationStatsTable,
+  type OrganisationStatsDisplayMode,
+} from '~/components/tables/admin-organisation-stats-table';
 
 const ALL_CLAIMS_VALUE = 'all';
 
@@ -53,7 +56,7 @@ export default function OrganisationStats() {
 
   const [searchQuery, setSearchQuery] = useState(() => searchParams?.get('query') ?? '');
 
-  const [displayMode, setDisplayMode] = useState<'quotas' | 'averages'>('quotas');
+  const [displayMode, setDisplayMode] = useState<OrganisationStatsDisplayMode>('usage');
 
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 500);
 
@@ -160,18 +163,27 @@ export default function OrganisationStats() {
       </div>
 
       <div className="mt-4">
-        <AdminOrganisationStatsTable showDailyAverages={displayMode === 'averages'} />
+        <AdminOrganisationStatsTable displayMode={displayMode} />
       </div>
 
       <RadioGroup
         value={displayMode}
-        onValueChange={(value) => setDisplayMode(value === 'averages' ? 'averages' : 'quotas')}
+        onValueChange={(value) =>
+          setDisplayMode(value === 'quotas' ? 'quotas' : value === 'averages' ? 'averages' : 'usage')
+        }
         className="mt-4 flex flex-col gap-3 rounded-lg border border-border p-4"
       >
         <div className="flex items-center gap-2">
+          <RadioGroupItem id="display-usage" value="usage" />
+          <label htmlFor="display-usage" className="text-muted-foreground text-sm">
+            <Trans>Show usage</Trans>
+          </label>
+        </div>
+
+        <div className="flex items-center gap-2">
           <RadioGroupItem id="display-quotas" value="quotas" />
           <label htmlFor="display-quotas" className="text-muted-foreground text-sm">
-            <Trans>Show quotas for documents, emails and API usages</Trans>
+            <Trans>Show usage with quotas</Trans>
           </label>
         </div>
 

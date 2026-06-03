@@ -57,11 +57,13 @@ const getPeriodDivisor = (period: string): number => {
   return new Date(Date.UTC(year, month, 0)).getUTCDate();
 };
 
+export type OrganisationStatsDisplayMode = 'usage' | 'quotas' | 'averages';
+
 type AdminOrganisationStatsTableProps = {
-  showDailyAverages?: boolean;
+  displayMode?: OrganisationStatsDisplayMode;
 };
 
-export const AdminOrganisationStatsTable = ({ showDailyAverages = true }: AdminOrganisationStatsTableProps) => {
+export const AdminOrganisationStatsTable = ({ displayMode = 'usage' }: AdminOrganisationStatsTableProps) => {
   const { t } = useLingui();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -127,15 +129,19 @@ export const AdminOrganisationStatsTable = ({ showDailyAverages = true }: AdminO
     };
 
     const renderUsageCell = (used: number, quota: number | null) => {
-      if (showDailyAverages) {
-        return <span>~{formatPerDay(used)}/day</span>;
+      if (displayMode === 'averages') {
+        return formatPerDay(used);
       }
 
-      return (
-        <span>
-          {used} / {quota === null ? '∞' : quota}
-        </span>
-      );
+      if (displayMode === 'quotas') {
+        return (
+          <span>
+            {used}/{quota === null ? '∞' : quota}
+          </span>
+        );
+      }
+
+      return <span>{used}</span>;
     };
 
     const sortableHeader = (label: string, column: OrderByColumn) => (
@@ -162,7 +168,7 @@ export const AdminOrganisationStatsTable = ({ showDailyAverages = true }: AdminO
         header: t`Organisation`,
         accessorKey: 'organisationName',
         cell: ({ row }) => (
-          <Link to={`/admin/organisations/${row.original.organisationId}`} className="text-xs hover:underline">
+          <Link to={`/admin/organisations/${row.original.organisationId}`} className="text-sm hover:underline">
             {row.original.organisationName}
           </Link>
         ),
@@ -170,12 +176,12 @@ export const AdminOrganisationStatsTable = ({ showDailyAverages = true }: AdminO
       {
         header: t`Claim`,
         accessorKey: 'originalClaimId',
-        cell: ({ row }) => <span className="text-muted-foreground text-xs">{row.original.originalClaimId ?? '—'}</span>,
+        cell: ({ row }) => <span className="text-muted-foreground text-sm">{row.original.originalClaimId ?? '—'}</span>,
       },
       {
         header: t`Period`,
         accessorKey: 'period',
-        cell: ({ row }) => <span className="text-xs">{row.original.period}</span>,
+        cell: ({ row }) => <span className="text-sm">{row.original.period}</span>,
       },
       {
         header: () => sortableHeader(t`Documents`, 'documentCount'),
@@ -208,14 +214,14 @@ export const AdminOrganisationStatsTable = ({ showDailyAverages = true }: AdminO
     // Without this, changing a filter (e.g. claimId) wouldn't refresh the memoised handler,
     // and sorting would merge onto stale params and drop the active filter.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [t, orderByColumn, orderByDirection, period, showDailyAverages, searchParams]);
+  }, [t, orderByColumn, orderByDirection, period, displayMode, searchParams]);
 
   return (
     <div>
       <DataTable
         columns={columns}
         data={results.data}
-        rowClassName="text-xs"
+        rowClassName="text-sm"
         perPage={results.perPage}
         currentPage={results.currentPage}
         totalPages={results.totalPages}
