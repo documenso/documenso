@@ -20,7 +20,7 @@ export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterP
             <Link className="text-[#7AC455]" href={reportUrl}>
               Click here to report the sender
             </Link>
-            .
+            . Never sign a document you don't recognize or weren't expecting.
           </Trans>
         </Text>
       )}

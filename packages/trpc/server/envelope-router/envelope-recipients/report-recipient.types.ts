@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const ZReportRecipientRequestSchema = z.object({
-  token: z.string().describe('The recipient token from the email link used to report the sender.'),
+  token: z.string().min(1).describe('The recipient token from the email link used to report the sender.'),
 });
 
 export const ZReportRecipientResponseSchema = z.void();

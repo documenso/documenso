@@ -17,6 +17,12 @@ export const reportRecipientRoute = procedure
   .mutation(async ({ input, ctx }) => {
     const { token } = input;
 
+    if (!token) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Token is required',
+      });
+    }
+
     const { ipAddress } = ctx.metadata.requestMetadata;
 
     const recipient = await prisma.recipient.findFirst({
