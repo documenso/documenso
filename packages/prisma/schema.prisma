@@ -322,6 +322,7 @@ model OrganisationMonthlyStat {
   documentCount Int @default(0)
   emailCount    Int @default(0)
   apiCount      Int @default(0)
+  emailReports  Int @default(0)
 
   @@unique([organisationId, period])
   @@index([organisationId])
