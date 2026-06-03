@@ -86,7 +86,9 @@ COPY turbo.json turbo.json
 
 RUN npm install -g "turbo@^1.9.3"
 
-RUN turbo run build --filter=@documenso/remix...
+# Raise the Node heap: the combined enterprise+pipeline codebase exceeds the
+# default ~2GB old-space during react-router typegen + tsc.
+RUN NODE_OPTIONS=--max-old-space-size=4096 turbo run build --filter=@documenso/remix...
 
 ###########################
 #     RUNNER CONTAINER    #
