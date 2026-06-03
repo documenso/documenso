@@ -81,12 +81,12 @@ describe('isPrivateUrl', () => {
       expect(isPrivateUrl('http://[fd12::1]')).toBe(true);
     });
 
-    it('should not catch IPv4-mapped IPv6 in URL form (URL parser normalizes to hex)', () => {
-      // new URL() normalizes "::ffff:127.0.0.1" to "::ffff:7f00:1" which none
-      // of the checks handle. This is fine because dns.lookup never returns
-      // IPv4-mapped addresses — it returns plain IPv4 (family: 4) instead.
-      expect(isPrivateUrl('http://[::ffff:127.0.0.1]')).toBe(false);
-      expect(isPrivateUrl('http://[::ffff:10.0.0.1]')).toBe(false);
+    it('should detect IPv4-mapped IPv6 loopback (normalized to hex by URL parser)', () => {
+      expect(isPrivateUrl('http://[::ffff:127.0.0.1]')).toBe(true);
+      expect(isPrivateUrl('http://[::ffff:10.0.0.1]')).toBe(true);
+    });
+
+    it('should not block public IPv4-mapped IPv6 addresses', () => {
       expect(isPrivateUrl('http://[::ffff:8.8.8.8]')).toBe(false);
     });
   });
