@@ -138,7 +138,7 @@ export const renderCheckboxFieldElement = (
       .with('sign', () => checkedValues.includes(index))
       .with('export', () => {
         // If it's read-only, check the originally checked state.
-        if (checkboxMeta.readOnly) {
+        if (checkboxMeta?.readOnly) {
           return checked;
         }
 
