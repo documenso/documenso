@@ -180,10 +180,6 @@ For full instructions, requirements, and configuration details, see the [Self Ho
 
 ### One-Click Deploys
 
-#### Railway
-
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/bG6D4p)
-
 #### Render
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
