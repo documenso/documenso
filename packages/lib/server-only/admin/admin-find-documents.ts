@@ -1,5 +1,6 @@
 import { prisma } from '@documenso/prisma';
 import { EnvelopeType, type Prisma } from '@prisma/client';
+import { z } from 'zod';
 
 import type { FindResultResponse } from '../../types/search-params';
 
@@ -8,6 +9,16 @@ export interface AdminFindDocumentsOptions {
   page?: number;
   perPage?: number;
 }
+
+const ZPositiveIntegerSchema = z.number().int().positive();
+
+const emptyResponse = {
+  data: [],
+  count: 0,
+  currentPage: 1,
+  perPage: 10,
+  totalPages: 0,
+};
 
 export const adminFindDocuments = async ({ query, page = 1, perPage = 10 }: AdminFindDocumentsOptions) => {
   let termFilters: Prisma.EnvelopeWhereInput | undefined = !query
@@ -20,26 +31,30 @@ export const adminFindDocuments = async ({ query, page = 1, perPage = 10 }: Admi
       };
 
   if (query?.startsWith('user:')) {
-    const userId = parseInt(query.slice('user:'.length), 10);
+    const parsedUserId = ZPositiveIntegerSchema.safeParse(query.slice('user:'.length));
 
-    if (Number.isInteger(userId)) {
+    if (parsedUserId.success) {
       termFilters = {
         userId: {
-          equals: userId,
+          equals: parsedUserId.data,
         },
       };
+    } else {
+      return emptyResponse;
     }
   }
 
   if (query?.startsWith('team:')) {
-    const teamId = parseInt(query.slice('team:'.length), 10);
+    const parsedTeamId = ZPositiveIntegerSchema.safeParse(query.slice('team:'.length));
 
-    if (Number.isInteger(teamId)) {
+    if (parsedTeamId.success) {
       termFilters = {
         teamId: {
-          equals: teamId,
+          equals: parsedTeamId.data,
         },
       };
+    } else {
+      return emptyResponse;
     }
   }
 

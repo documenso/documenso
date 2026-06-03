@@ -18,7 +18,7 @@ const getEmailReports = async (organisationId: string) => {
   return stat?.emailReports ?? 0;
 };
 
-test('[REPORT_SENDER]: reports the sender and increments the counter', async ({ page }) => {
+test('[REPORT_SENDER]: only reports the sender after the button is clicked', async ({ page }) => {
   const { user, team, organisation } = await seedUser();
 
   const document = await seedPendingDocument(user, team.id, ['recipient@documenso.com']);
@@ -27,6 +27,12 @@ test('[REPORT_SENDER]: reports the sender and increments the counter', async ({ 
   expect(await getEmailReports(organisation.id)).toBe(0);
 
   await page.goto(`/report/${token}`);
+
+  // Visiting the page (GET) must not register a report.
+  await expect(page.getByRole('heading', { name: 'Report this sender?' })).toBeVisible();
+  expect(await getEmailReports(organisation.id)).toBe(0);
+
+  await page.getByRole('button', { name: 'Report sender' }).click();
 
   await expect(page.getByRole('heading', { name: 'Sender reported' })).toBeVisible();
 
@@ -42,7 +48,12 @@ test('[REPORT_SENDER]: does not double count within the rate limit window', asyn
   const token = document.recipients[0].token;
 
   await page.goto(`/report/${token}`);
+  await page.getByRole('button', { name: 'Report sender' }).click();
+  await expect(page.getByRole('heading', { name: 'Sender reported' })).toBeVisible();
+
   await page.goto(`/report/${token}`);
+  await page.getByRole('button', { name: 'Report sender' }).click();
+  await expect(page.getByRole('heading', { name: 'Sender reported' })).toBeVisible();
 
   expect(await getEmailReports(organisation.id)).toBe(1);
 });

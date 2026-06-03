@@ -166,19 +166,19 @@ export default function OrganisationStats() {
       <RadioGroup
         value={displayMode}
         onValueChange={(value) => setDisplayMode(value === 'averages' ? 'averages' : 'quotas')}
-        className="mt-4 flex flex-col gap-3 rounded-lg border border-border p-4 sm:flex-row sm:gap-6"
+        className="mt-4 flex flex-col gap-3 rounded-lg border border-border p-4"
       >
         <div className="flex items-center gap-2">
           <RadioGroupItem id="display-quotas" value="quotas" />
           <label htmlFor="display-quotas" className="text-muted-foreground text-sm">
-            <Trans>Show quotas</Trans>
+            <Trans>Show quotas for documents, emails and API usages</Trans>
           </label>
         </div>
 
         <div className="flex items-center gap-2">
           <RadioGroupItem id="display-averages" value="averages" />
           <label htmlFor="display-averages" className="text-muted-foreground text-sm">
-            <Trans>Show daily averages</Trans>
+            <Trans>Show daily averages for documents, emails and API usages</Trans>
           </label>
         </div>
       </RadioGroup>
