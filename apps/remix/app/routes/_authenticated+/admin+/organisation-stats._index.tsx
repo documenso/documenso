@@ -3,6 +3,7 @@ import { currentMonthlyPeriod } from '@documenso/lib/universal/monthly-period';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Input } from '@documenso/ui/primitives/input';
+import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useEffect, useMemo, useState } from 'react';
@@ -51,6 +52,8 @@ export default function OrganisationStats() {
   const { pathname } = useLocation();
 
   const [searchQuery, setSearchQuery] = useState(() => searchParams?.get('query') ?? '');
+
+  const [displayMode, setDisplayMode] = useState<'quotas' | 'averages'>('quotas');
 
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 500);
 
@@ -157,8 +160,28 @@ export default function OrganisationStats() {
       </div>
 
       <div className="mt-4">
-        <AdminOrganisationStatsTable />
+        <AdminOrganisationStatsTable showDailyAverages={displayMode === 'averages'} />
       </div>
+
+      <RadioGroup
+        value={displayMode}
+        onValueChange={(value) => setDisplayMode(value === 'averages' ? 'averages' : 'quotas')}
+        className="mt-4 flex flex-col gap-3 rounded-lg border border-border p-4"
+      >
+        <div className="flex items-center gap-2">
+          <RadioGroupItem id="display-quotas" value="quotas" />
+          <label htmlFor="display-quotas" className="text-muted-foreground text-sm">
+            <Trans>Show quotas for documents, emails and API usages</Trans>
+          </label>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <RadioGroupItem id="display-averages" value="averages" />
+          <label htmlFor="display-averages" className="text-muted-foreground text-sm">
+            <Trans>Show daily averages for documents, emails and API usages</Trans>
+          </label>
+        </div>
+      </RadioGroup>
 
       <Alert variant="neutral" className="mt-4">
         <AlertDescription>

@@ -12,11 +12,17 @@ import { ChevronDownIcon, ChevronsUpDownIcon, ChevronUpIcon } from 'lucide-react
 import { useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router';
 
-type OrderByColumn = 'documentCount' | 'emailCount' | 'apiCount' | 'totalCount';
+type OrderByColumn = 'documentCount' | 'emailCount' | 'apiCount' | 'emailReports' | 'totalCount';
 type OrderByDirection = 'asc' | 'desc';
 
 const parseOrderByColumn = (value: string | undefined): OrderByColumn | undefined => {
-  if (value === 'documentCount' || value === 'emailCount' || value === 'apiCount' || value === 'totalCount') {
+  if (
+    value === 'documentCount' ||
+    value === 'emailCount' ||
+    value === 'apiCount' ||
+    value === 'emailReports' ||
+    value === 'totalCount'
+  ) {
     return value;
   }
 
@@ -27,10 +33,38 @@ const parseOrderByDirection = (value: string | undefined): OrderByDirection => {
   return value === 'asc' ? 'asc' : 'desc';
 };
 
-export const AdminOrganisationStatsTable = () => {
+/**
+ * Number of days to divide the period's usage by to get a per-day average.
+ *
+ * For the in-progress (current) month we divide by today's UTC day-of-month so the
+ * average reflects elapsed days only. For a fully-elapsed past month we divide by the
+ * total number of days in that month.
+ */
+const getPeriodDivisor = (period: string): number => {
+  if (period === currentMonthlyPeriod()) {
+    return new Date().getUTCDate();
+  }
+
+  const [yearStr, monthStr] = period.split('-');
+  const year = Number(yearStr);
+  const month = Number(monthStr);
+
+  if (Number.isNaN(year) || Number.isNaN(month)) {
+    return new Date().getUTCDate();
+  }
+
+  // Day 0 of the following month resolves to the last day of `month`.
+  return new Date(Date.UTC(year, month, 0)).getUTCDate();
+};
+
+type AdminOrganisationStatsTableProps = {
+  showDailyAverages?: boolean;
+};
+
+export const AdminOrganisationStatsTable = ({ showDailyAverages = true }: AdminOrganisationStatsTableProps) => {
   const { t } = useLingui();
 
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
@@ -61,10 +95,17 @@ export const AdminOrganisationStatsTable = () => {
   const handleColumnSort = (column: OrderByColumn) => {
     const nextDirection = orderByColumn === column && orderByDirection === 'desc' ? 'asc' : 'desc';
 
-    updateSearchParams({
-      orderByColumn: column,
-      orderByDirection: nextDirection,
-      page: 1,
+    // Use the functional updater so we merge onto the latest params. Reading the
+    // captured `searchParams` here would drop filters (e.g. claimId) that changed
+    // after this handler was memoised into the column definitions.
+    setSearchParams((previous) => {
+      const next = new URLSearchParams(previous);
+
+      next.set('orderByColumn', column);
+      next.set('orderByDirection', nextDirection);
+      next.set('page', '1');
+
+      return next;
     });
   };
 
@@ -76,6 +117,27 @@ export const AdminOrganisationStatsTable = () => {
   };
 
   const columns = useMemo(() => {
+    const divisor = getPeriodDivisor(period);
+
+    const formatPerDay = (used: number) => {
+      const perDay = divisor > 0 ? used / divisor : 0;
+      const rounded = Math.round(perDay * 10) / 10;
+
+      return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+    };
+
+    const renderUsageCell = (used: number, quota: number | null) => {
+      if (showDailyAverages) {
+        return <span>~{formatPerDay(used)}/day</span>;
+      }
+
+      return (
+        <span>
+          {used} / {quota === null ? '∞' : quota}
+        </span>
+      );
+    };
+
     const sortableHeader = (label: string, column: OrderByColumn) => (
       <button
         type="button"
@@ -100,7 +162,7 @@ export const AdminOrganisationStatsTable = () => {
         header: t`Organisation`,
         accessorKey: 'organisationName',
         cell: ({ row }) => (
-          <Link to={`/admin/organisations/${row.original.organisationId}`} className="hover:underline">
+          <Link to={`/admin/organisations/${row.original.organisationId}`} className="text-xs hover:underline">
             {row.original.organisationName}
           </Link>
         ),
@@ -108,27 +170,32 @@ export const AdminOrganisationStatsTable = () => {
       {
         header: t`Claim`,
         accessorKey: 'originalClaimId',
-        cell: ({ row }) => <span className="text-muted-foreground">{row.original.originalClaimId ?? '—'}</span>,
+        cell: ({ row }) => <span className="text-muted-foreground text-xs">{row.original.originalClaimId ?? '—'}</span>,
       },
       {
         header: t`Period`,
         accessorKey: 'period',
-        cell: ({ row }) => row.original.period,
+        cell: ({ row }) => <span className="text-xs">{row.original.period}</span>,
       },
       {
         header: () => sortableHeader(t`Documents`, 'documentCount'),
         accessorKey: 'documentCount',
-        cell: ({ row }) => row.original.documentCount,
+        cell: ({ row }) => renderUsageCell(row.original.documentCount, row.original.documentQuota),
       },
       {
         header: () => sortableHeader(t`Emails`, 'emailCount'),
         accessorKey: 'emailCount',
-        cell: ({ row }) => row.original.emailCount,
+        cell: ({ row }) => renderUsageCell(row.original.emailCount, row.original.emailQuota),
       },
       {
         header: () => sortableHeader(t`API`, 'apiCount'),
         accessorKey: 'apiCount',
-        cell: ({ row }) => row.original.apiCount,
+        cell: ({ row }) => renderUsageCell(row.original.apiCount, row.original.apiQuota),
+      },
+      {
+        header: () => sortableHeader(t`Reports`, 'emailReports'),
+        accessorKey: 'emailReports',
+        cell: ({ row }) => row.original.emailReports,
       },
       {
         header: () => sortableHeader(t`Total`, 'totalCount'),
@@ -136,14 +203,19 @@ export const AdminOrganisationStatsTable = () => {
         cell: ({ row }) => <span className="font-medium">{row.original.totalCount}</span>,
       },
     ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
+    // `searchParams` must be a dependency: `handleColumnSort` closes over `setSearchParams`,
+    // whose functional updater is bound to the `searchParams` captured at creation time.
+    // Without this, changing a filter (e.g. claimId) wouldn't refresh the memoised handler,
+    // and sorting would merge onto stale params and drop the active filter.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [t, orderByColumn, orderByDirection]);
+  }, [t, orderByColumn, orderByDirection, period, showDailyAverages, searchParams]);
 
   return (
     <div>
       <DataTable
         columns={columns}
         data={results.data}
+        rowClassName="text-xs"
         perPage={results.perPage}
         currentPage={results.currentPage}
         totalPages={results.totalPages}
@@ -164,6 +236,9 @@ export const AdminOrganisationStatsTable = () => {
               </TableCell>
               <TableCell>
                 <Skeleton className="h-4 w-16 rounded-full" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4 w-10 rounded-full" />
               </TableCell>
               <TableCell>
                 <Skeleton className="h-4 w-10 rounded-full" />

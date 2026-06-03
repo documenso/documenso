@@ -20,6 +20,7 @@ export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInvitePro
   teamEmail?: string;
   includeSenderDetails?: boolean;
   organisationType?: OrganisationType;
+  reportUrl?: string;
 };
 
 export const DocumentInviteEmailTemplate = ({
@@ -34,6 +35,7 @@ export const DocumentInviteEmailTemplate = ({
   teamName = '',
   includeSenderDetails,
   organisationType,
+  reportUrl,
 }: DocumentInviteEmailTemplateProps) => {
   const { _ } = useLingui();
   const branding = useBranding();
@@ -114,7 +116,7 @@ export const DocumentInviteEmailTemplate = ({
           <Hr className="mx-auto mt-12 max-w-xl" />
 
           <Container className="mx-auto max-w-xl">
-            <TemplateFooter />
+            <TemplateFooter reportUrl={reportUrl} />
           </Container>
         </Section>
       </Body>

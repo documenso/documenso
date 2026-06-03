@@ -165,6 +165,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
   const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
+  const reportUrl = `${NEXT_PUBLIC_WEBAPP_URL()}/report/${recipient.token}`;
 
   const template = createElement(DocumentInviteEmailTemplate, {
     documentName: envelope.title,
@@ -180,6 +181,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     teamName: team?.name,
     teamEmail: team?.teamEmail?.email,
     includeSenderDetails: settings.includeSenderDetails,
+    reportUrl,
   });
 
   if (isRecipientEmailValidForSending(recipient)) {

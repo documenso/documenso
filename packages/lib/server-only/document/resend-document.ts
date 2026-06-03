@@ -210,6 +210,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
 
       const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
       const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
+      const reportUrl = `${NEXT_PUBLIC_WEBAPP_URL()}/report/${recipient.token}`;
 
       const template = createElement(DocumentInviteEmailTemplate, {
         documentName: envelope.title,
@@ -225,6 +226,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
         selfSigner,
         organisationType,
         teamName: envelope.team?.name,
+        reportUrl,
       });
 
       const [html, text] = await Promise.all([
