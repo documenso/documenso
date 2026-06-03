@@ -8,6 +8,7 @@ import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '../../../constants/organisations';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { INTERNAL_CLAIM_ID } from '../../../types/subscription';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendOrganisationLimitExceededEmailJobDefinition } from './send-organisation-limit-exceeded-email';
@@ -24,6 +25,7 @@ export const run = async ({
       id: payload.organisationId,
     },
     include: {
+      organisationClaim: true,
       members: {
         where: {
           organisationGroupMembers: {
@@ -56,6 +58,16 @@ export const run = async ({
       organisationId: organisation.id,
     },
   });
+
+  // Do not send emails for "free" claims.
+  if (organisation.organisationClaim.originalSubscriptionClaimId === INTERNAL_CLAIM_ID.FREE) {
+    io.logger.info({
+      msg: 'Skipping organisation limit exceeded email for "free" claim',
+      organisationId: organisation.id,
+    });
+
+    return;
+  }
 
   for (const member of organisation.members) {
     await io.runTask(`send-organisation-limit-exceeded-email-${member.id}`, async () => {
