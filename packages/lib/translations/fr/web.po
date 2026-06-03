@@ -1487,6 +1487,11 @@ msgstr "Les fonctionnalités d’IA sont désactivées pour votre équipe. Veuil
 msgid "All"
 msgstr "Tout"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
+msgid "All claims"
+msgstr ""
+
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "All documents"
 msgstr "Tous les documents"
@@ -1934,6 +1939,10 @@ msgstr "Toute source"
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 msgid "Any Status"
 msgstr "Tout statut"
+
+#: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
+msgid "API"
+msgstr ""
 
 #: apps/remix/app/components/general/claim-limit-fields.tsx
 msgid "API rate limits"
@@ -2422,6 +2431,7 @@ msgstr "Vous ne trouvez pas quelqu’un ?"
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
+#: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-team-member-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-create-dialog.tsx
@@ -2652,6 +2662,10 @@ msgstr "Choisissez votre méthode d'authentification préférée:"
 #: apps/remix/app/components/forms/token.tsx
 msgid "Choose..."
 msgstr "Choisissez..."
+
+#: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
+msgid "Claim"
+msgstr ""
 
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Claim account"
@@ -4369,6 +4383,7 @@ msgstr "Documentation"
 #: apps/remix/app/components/general/user-profile-skeleton.tsx
 #: apps/remix/app/components/general/user-profile-timur.tsx
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
+#: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
@@ -4421,6 +4436,10 @@ msgstr "Documents consultés"
 #: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
 msgid "Documents where all recipients have signed but the document has not been sealed. Documents stuck for more than 6 hours are no longer retried by the sweep job."
 msgstr "Documents pour lesquels tous les destinataires ont signé mais qui n’ont pas été scellés. Les documents bloqués pendant plus de 6 heures ne sont plus relancés par la tâche de balayage."
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
+msgid "Documents, emails and api values may not be accurate since they record the amount of times the action was attempted. Meaning these values may go over the actual quota, get rejected, and will still be recorded."
+msgstr ""
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
@@ -4868,6 +4887,7 @@ msgid "Email verification has been resent"
 msgstr "La vérification par email a été renvoyée"
 
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
+#: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
@@ -5399,6 +5419,10 @@ msgstr "Impossible de se déconnecter de toutes les sessions"
 msgid "Failed to sync license"
 msgstr "Échec de la synchronisation de la licence"
 
+#: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
+msgid "Failed to sync subscription"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
 msgid "Failed to trigger seal"
 msgstr "Échec du déclenchement du scellage"
@@ -5452,6 +5476,10 @@ msgstr "Drapeaux de fonctionnalités"
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Features"
 msgstr "Fonctionnalités"
+
+#: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
+msgid "Fetch the latest subscription data from Stripe and apply it to this organisation."
+msgstr ""
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Field character limit"
@@ -7440,6 +7468,7 @@ msgid "Or continue with"
 msgstr "Ou continuez avec"
 
 #: apps/remix/app/components/general/template/template-type.tsx
+#: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 #: apps/remix/app/components/tables/admin-user-teams-table.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
@@ -7556,6 +7585,11 @@ msgstr "Paramètres de l'organisation"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Organisation SSO Portal"
 msgstr "Portail SSO de l'organisation"
+
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
+msgid "Organisation Stats"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Organisation Teams"
@@ -7827,6 +7861,11 @@ msgstr "par mois"
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "per year"
 msgstr "par an"
+
+#: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
+msgid "Period"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Permanently delete this organisation. Documents will be orphaned (not deleted) so they remain accessible via the deleted-account service account."
@@ -9041,6 +9080,10 @@ msgstr "Rechercher par ID d'organisation, nom, ID client ou e-mail du propriéta
 msgid "Search by organisation name"
 msgstr "Rechercher par nom d'organisation"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
+msgid "Search by organisation name, URL or ID"
+msgstr ""
+
 #: apps/remix/app/components/general/document/document-search.tsx
 msgid "Search documents..."
 msgstr "Rechercher des documents..."
@@ -10032,6 +10075,10 @@ msgstr "Abonnement déplacé avec succès"
 msgid "Subscription Status"
 msgstr "Statut de l’abonnement"
 
+#: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
+msgid "Subscription synced"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
@@ -10124,9 +10171,14 @@ msgstr "Assistance"
 msgid "Support ticket created"
 msgstr "Ticket de support créé"
 
+#: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "Sync"
 msgstr "Synchronisation"
+
+#: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
+msgid "Sync claims. This will overwrite the current claim with the one resolved from the Stripe subscription."
+msgstr ""
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "Sync Email Domains"
@@ -10139,6 +10191,12 @@ msgstr "Échec de la synchronisation, modifications non enregistrées"
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Sync license from server"
 msgstr "Synchroniser la licence depuis le serveur"
+
+#: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
+#: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Sync Stripe subscription"
+msgstr ""
 
 #: packages/lib/utils/document-audit-logs.ts
 #: packages/lib/utils/document-audit-logs.ts
@@ -10730,6 +10788,10 @@ msgstr "Le groupe d'organisation que vous recherchez a peut-être été supprim�
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "The organisation role that will be applied to all members in this group."
 msgstr "Le rôle d'organisation qui sera appliqué à tous les membres de ce groupe."
+
+#: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
+msgid "The organisation subscription has been synced with Stripe."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 msgid "The organisation will be deleted in the background. Documents will be orphaned, not deleted."
@@ -11495,6 +11557,10 @@ msgstr "Trop de requêtes"
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Top"
 msgstr "Haut"
+
+#: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
+msgid "Total"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Total Documents"
@@ -12328,6 +12394,10 @@ msgstr "Voir les équipes"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "View the DNS records for this email domain"
 msgstr "Voir les enregistrements DNS pour ce domaine de messagerie"
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
+msgid "View, sort and filter monthly usage stats across organisations"
+msgstr ""
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
@@ -14067,4 +14137,3 @@ msgstr "Votre code de vérification :"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
-
