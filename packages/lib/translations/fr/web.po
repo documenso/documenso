@@ -8,7 +8,7 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-05-30 16:23\n"
+"PO-Revision-Date: 2026-06-03 06:16\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -1490,7 +1490,7 @@ msgstr "Tout"
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "All claims"
-msgstr ""
+msgstr "Toutes les demandes"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "All documents"
@@ -1942,7 +1942,7 @@ msgstr "Tout statut"
 
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 msgid "API"
-msgstr ""
+msgstr "API"
 
 #: apps/remix/app/components/general/claim-limit-fields.tsx
 msgid "API rate limits"
@@ -2263,7 +2263,7 @@ msgstr "Facturation"
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "Bio"
-msgstr ""
+msgstr "Bio"
 
 #: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
 msgid "Black"
@@ -2669,7 +2669,7 @@ msgstr "Choisissez..."
 
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 msgid "Claim"
-msgstr ""
+msgstr "Demande"
 
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Claim account"
@@ -3850,7 +3850,7 @@ msgstr "Appareil"
 
 #: packages/email/template-components/template-footer.tsx
 msgid "Did not expect this email? <0>Click here to report the sender</0>. Never sign a document you don't recognize or weren't expecting."
-msgstr ""
+msgstr "Vous ne vous attendiez pas à recevoir cet e‑mail ? <0>Cliquez ici pour signaler l’expéditeur</0>. Ne signez jamais un document que vous ne reconnaissez pas ou que vous ne vous attendiez pas à recevoir."
 
 #: packages/email/templates/reset-password.tsx
 msgid "Didn't request a password change? We are here to help you secure your account, just <0>contact us</0>."
@@ -4447,7 +4447,7 @@ msgstr "Documents pour lesquels tous les destinataires ont signé mais qui n’o
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Documents, emails and api values may not be accurate since they record the amount of times the action was attempted. Meaning these values may go over the actual quota, get rejected, and will still be recorded."
-msgstr ""
+msgstr "Les valeurs concernant les documents, les e-mails et l’API peuvent ne pas être exactes, car elles enregistrent le nombre de tentatives d’exécution de l’action. Cela signifie que ces valeurs peuvent dépasser le quota réel, être rejetées et tout de même être enregistrées."
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
@@ -5429,7 +5429,7 @@ msgstr "Échec de la synchronisation de la licence"
 
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 msgid "Failed to sync subscription"
-msgstr ""
+msgstr "Échec de la synchronisation de l’abonnement"
 
 #: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
 msgid "Failed to trigger seal"
@@ -5487,7 +5487,7 @@ msgstr "Fonctionnalités"
 
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 msgid "Fetch the latest subscription data from Stripe and apply it to this organisation."
-msgstr ""
+msgstr "Récupérez les dernières données d’abonnement depuis Stripe et appliquez-les à cette organisation."
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Field character limit"
@@ -6026,7 +6026,7 @@ msgstr "Si vous utilisez l’environnement de staging, assurez-vous d’avoir d�
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "If you did not expect this email or believe it is spam, you can report the sender to our team for review."
-msgstr ""
+msgstr "Si vous ne vous attendiez pas à recevoir cet e‑mail ou si vous pensez qu’il s’agit de spam, vous pouvez signaler l’expéditeur à notre équipe pour vérification."
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "If you didn't expect this account or have any questions, please <0>contact support</0>."
@@ -7601,7 +7601,7 @@ msgstr "Portail SSO de l'organisation"
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Organisation Stats"
-msgstr ""
+msgstr "Statistiques de l’organisation"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Organisation Teams"
@@ -7877,7 +7877,7 @@ msgstr "par an"
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Period"
-msgstr ""
+msgstr "Période"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Permanently delete this organisation. Documents will be orphaned (not deleted) so they remain accessible via the deleted-account service account."
@@ -8771,16 +8771,16 @@ msgstr "Répondre à l’e-mail <0>(Optionnel)</0>"
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "Report sender"
-msgstr ""
+msgstr "Signaler l’expéditeur"
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "Report this sender?"
-msgstr ""
+msgstr "Signaler cet expéditeur ?"
 
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 msgid "Reports"
-msgstr ""
+msgstr "Signalements"
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Request"
@@ -9083,7 +9083,7 @@ msgstr "Recherche par ID de réclamation ou nom"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
 msgid "Search by document title, team:123 or user:123"
-msgstr ""
+msgstr "Rechercher par titre de document, team:123 ou user:123"
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 msgid "Search by domain or organisation name"
@@ -9107,7 +9107,7 @@ msgstr "Rechercher par nom d'organisation"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Search by organisation name, URL or ID"
-msgstr ""
+msgstr "Rechercher par nom d’organisation, URL ou ID"
 
 #: apps/remix/app/components/general/document/document-search.tsx
 msgid "Search documents..."
@@ -9443,7 +9443,7 @@ msgstr "Expéditeur"
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "Sender reported"
-msgstr ""
+msgstr "Expéditeur signalé"
 
 #: apps/remix/app/components/forms/forgot-password.tsx
 msgid "Sending Reset Email..."
@@ -9540,7 +9540,7 @@ msgstr "Afficher les paramètres avancés"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Show daily averages for documents, emails and API usages"
-msgstr ""
+msgstr "Afficher les moyennes quotidiennes pour les documents, les e-mails et l’utilisation de l’API"
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Show license key"
@@ -9548,7 +9548,7 @@ msgstr "Afficher la clé de licence"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Show quotas for documents, emails and API usages"
-msgstr ""
+msgstr "Afficher les quotas pour les documents, les e-mails et l’utilisation de l’API"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Show templates in your public profile for your audience to sign and get started quickly"
@@ -10115,7 +10115,7 @@ msgstr "Statut de l’abonnement"
 
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 msgid "Subscription synced"
-msgstr ""
+msgstr "Abonnement synchronisé"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-delete-dialog.tsx
@@ -10216,7 +10216,7 @@ msgstr "Synchronisation"
 
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 msgid "Sync claims. This will overwrite the current claim with the one resolved from the Stripe subscription."
-msgstr ""
+msgstr "Synchroniser les droits. Cela écrasera le droit actuel avec celui obtenu à partir de l’abonnement Stripe."
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "Sync Email Domains"
@@ -10234,7 +10234,7 @@ msgstr "Synchroniser la licence depuis le serveur"
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Sync Stripe subscription"
-msgstr ""
+msgstr "Synchroniser l’abonnement Stripe"
 
 #: packages/lib/utils/document-audit-logs.ts
 #: packages/lib/utils/document-audit-logs.ts
@@ -10610,7 +10610,7 @@ msgstr "Merci d'avoir complété le processus de signature."
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "Thank you for letting us know, we have flagged this sender for review. If you have any concerns please feel free to reach out to our <0>support team</0>."
-msgstr ""
+msgstr "Merci de nous en avoir informés, nous avons marqué cet expéditeur pour révision. Si vous avez la moindre préoccupation, n’hésitez pas à contacter notre <0>équipe d’assistance</0>."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
@@ -10833,7 +10833,7 @@ msgstr "Le rôle d'organisation qui sera appliqué à tous les membres de ce gro
 
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 msgid "The organisation subscription has been synced with Stripe."
-msgstr ""
+msgstr "L’abonnement de l’organisation a été synchronisé avec Stripe."
 
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 msgid "The organisation will be deleted in the background. Documents will be orphaned, not deleted."
@@ -11602,7 +11602,7 @@ msgstr "Haut"
 
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 msgid "Total"
-msgstr ""
+msgstr "Total"
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Total Documents"
@@ -12439,7 +12439,7 @@ msgstr "Voir les enregistrements DNS pour ce domaine de messagerie"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "View, sort and filter monthly usage stats across organisations"
-msgstr ""
+msgstr "Afficher, trier et filtrer les statistiques d’utilisation mensuelles pour toutes les organisations"
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
@@ -12798,7 +12798,7 @@ msgstr "Nous n'avons pas pu vous déconnecter pour le moment."
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "We were unable to report this sender at this time. Please try again later."
-msgstr ""
+msgstr "Nous n’avons pas pu signaler cet expéditeur pour le moment. Veuillez réessayer plus tard."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "We were unable to set your public profile to public. Please try again."
@@ -14183,3 +14183,4 @@ msgstr "Votre code de vérification :"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+

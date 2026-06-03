@@ -8,7 +8,7 @@ msgstr ""
 "Language: ko\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-05-30 16:23\n"
+"PO-Revision-Date: 2026-06-03 06:16\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -1490,7 +1490,7 @@ msgstr "전체"
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "All claims"
-msgstr ""
+msgstr "모든 청구 건"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "All documents"
@@ -1942,7 +1942,7 @@ msgstr "모든 상태"
 
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 msgid "API"
-msgstr ""
+msgstr "API"
 
 #: apps/remix/app/components/general/claim-limit-fields.tsx
 msgid "API rate limits"
@@ -2263,7 +2263,7 @@ msgstr "결제"
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "Bio"
-msgstr ""
+msgstr "소개"
 
 #: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
 msgid "Black"
@@ -2669,7 +2669,7 @@ msgstr "선택..."
 
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 msgid "Claim"
-msgstr ""
+msgstr "청구 건"
 
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Claim account"
@@ -3850,7 +3850,7 @@ msgstr "디바이스"
 
 #: packages/email/template-components/template-footer.tsx
 msgid "Did not expect this email? <0>Click here to report the sender</0>. Never sign a document you don't recognize or weren't expecting."
-msgstr ""
+msgstr "이 이메일을 예상하지 못하셨나요? <0>보낸 사람을 신고하려면 여기를 클릭하세요</0>. 잘 알지 못하거나 예상하지 못한 문서는 절대 서명하지 마세요."
 
 #: packages/email/templates/reset-password.tsx
 msgid "Didn't request a password change? We are here to help you secure your account, just <0>contact us</0>."
@@ -4447,7 +4447,7 @@ msgstr "모든 수신자가 서명했지만 문서가 아직 봉인되지 않은
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Documents, emails and api values may not be accurate since they record the amount of times the action was attempted. Meaning these values may go over the actual quota, get rejected, and will still be recorded."
-msgstr ""
+msgstr "문서, 이메일 및 API 값은 작업이 시도된 횟수를 기준으로 기록되기 때문에 정확하지 않을 수 있습니다. 즉, 이러한 값은 실제 할당량을 초과하거나 거부되더라도 여전히 기록될 수 있습니다."
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
@@ -5429,7 +5429,7 @@ msgstr "라이선스 동기화에 실패했습니다"
 
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 msgid "Failed to sync subscription"
-msgstr ""
+msgstr "구독 동기화에 실패했습니다."
 
 #: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
 msgid "Failed to trigger seal"
@@ -5487,7 +5487,7 @@ msgstr "기능"
 
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 msgid "Fetch the latest subscription data from Stripe and apply it to this organisation."
-msgstr ""
+msgstr "Stripe에서 최신 구독 데이터를 가져와 이 조직에 적용합니다."
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Field character limit"
@@ -6026,7 +6026,7 @@ msgstr "스테이징 환경을 사용 중인 경우, 임베딩 컴포넌트의 h
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "If you did not expect this email or believe it is spam, you can report the sender to our team for review."
-msgstr ""
+msgstr "이 이메일을 예상하지 못했거나 스팸이라고 생각되면, 검토를 위해 보낸 사람을 저희 팀에 신고할 수 있습니다."
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "If you didn't expect this account or have any questions, please <0>contact support</0>."
@@ -7601,7 +7601,7 @@ msgstr "조직 SSO 포털"
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Organisation Stats"
-msgstr ""
+msgstr "조직 통계"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Organisation Teams"
@@ -7877,7 +7877,7 @@ msgstr "연간"
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Period"
-msgstr ""
+msgstr "기간"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Permanently delete this organisation. Documents will be orphaned (not deleted) so they remain accessible via the deleted-account service account."
@@ -8771,16 +8771,16 @@ msgstr "이메일 회신 <0>(선택 사항)</0>"
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "Report sender"
-msgstr ""
+msgstr "발신자 신고하기"
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "Report this sender?"
-msgstr ""
+msgstr "이 발신자를 신고하시겠습니까?"
 
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 msgid "Reports"
-msgstr ""
+msgstr "신고"
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Request"
@@ -9083,7 +9083,7 @@ msgstr "클레임 ID 또는 이름으로 검색"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
 msgid "Search by document title, team:123 or user:123"
-msgstr ""
+msgstr "문서 제목, team:123 또는 user:123으로 검색"
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 msgid "Search by domain or organisation name"
@@ -9107,7 +9107,7 @@ msgstr "조직 이름으로 검색"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Search by organisation name, URL or ID"
-msgstr ""
+msgstr "조직 이름, URL 또는 ID로 검색"
 
 #: apps/remix/app/components/general/document/document-search.tsx
 msgid "Search documents..."
@@ -9443,7 +9443,7 @@ msgstr "보낸 사람"
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "Sender reported"
-msgstr ""
+msgstr "발신자가 신고되었습니다"
 
 #: apps/remix/app/components/forms/forgot-password.tsx
 msgid "Sending Reset Email..."
@@ -9540,7 +9540,7 @@ msgstr "고급 설정 표시"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Show daily averages for documents, emails and API usages"
-msgstr ""
+msgstr "문서, 이메일 및 API 사용량에 대한 일일 평균 표시"
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Show license key"
@@ -9548,7 +9548,7 @@ msgstr "라이선스 키 표시하기"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Show quotas for documents, emails and API usages"
-msgstr ""
+msgstr "문서, 이메일 및 API 사용량에 대한 할당량 표시"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Show templates in your public profile for your audience to sign and get started quickly"
@@ -10115,7 +10115,7 @@ msgstr "구독 상태"
 
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 msgid "Subscription synced"
-msgstr ""
+msgstr "구독이 동기화되었습니다."
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-delete-dialog.tsx
@@ -10216,7 +10216,7 @@ msgstr "동기화"
 
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 msgid "Sync claims. This will overwrite the current claim with the one resolved from the Stripe subscription."
-msgstr ""
+msgstr "클레임을 동기화합니다. 이렇게 하면 현재 클레임이 Stripe 구독에서 가져온 클레임으로 덮어써집니다."
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "Sync Email Domains"
@@ -10234,7 +10234,7 @@ msgstr "서버에서 라이선스 동기화"
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Sync Stripe subscription"
-msgstr ""
+msgstr "Stripe 구독 동기화"
 
 #: packages/lib/utils/document-audit-logs.ts
 #: packages/lib/utils/document-audit-logs.ts
@@ -10610,7 +10610,7 @@ msgstr "서명 프로세스를 완료해 주셔서 감사합니다."
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "Thank you for letting us know, we have flagged this sender for review. If you have any concerns please feel free to reach out to our <0>support team</0>."
-msgstr ""
+msgstr "알려주셔서 감사합니다. 이 발신자를 검토 대상으로 표시했습니다. 문제가 있으시면 언제든지 <0>지원팀</0>에 문의해 주세요."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
@@ -10833,7 +10833,7 @@ msgstr "이 그룹의 모든 구성원에게 적용될 조직 역할입니다."
 
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 msgid "The organisation subscription has been synced with Stripe."
-msgstr ""
+msgstr "조직 구독이 Stripe와 동기화되었습니다."
 
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 msgid "The organisation will be deleted in the background. Documents will be orphaned, not deleted."
@@ -11602,7 +11602,7 @@ msgstr "위"
 
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 msgid "Total"
-msgstr ""
+msgstr "합계"
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Total Documents"
@@ -12439,7 +12439,7 @@ msgstr "이 이메일 도메인에 대한 DNS 레코드를 확인합니다."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "View, sort and filter monthly usage stats across organisations"
-msgstr ""
+msgstr "조직별 월별 사용 통계를 조회, 정렬 및 필터링"
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
@@ -12798,7 +12798,7 @@ msgstr "현재 로그아웃할 수 없습니다."
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "We were unable to report this sender at this time. Please try again later."
-msgstr ""
+msgstr "현재 이 발신자를 신고할 수 없습니다. 잠시 후 다시 시도해 주세요."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "We were unable to set your public profile to public. Please try again."
@@ -14183,3 +14183,4 @@ msgstr "인증 코드:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+

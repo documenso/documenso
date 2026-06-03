@@ -8,7 +8,7 @@ msgstr ""
 "Language: ja\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-05-30 16:23\n"
+"PO-Revision-Date: 2026-06-03 06:16\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -1490,7 +1490,7 @@ msgstr "すべて"
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "All claims"
-msgstr ""
+msgstr "すべての請求件数"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "All documents"
@@ -1942,7 +1942,7 @@ msgstr "すべてのステータス"
 
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 msgid "API"
-msgstr ""
+msgstr "API"
 
 #: apps/remix/app/components/general/claim-limit-fields.tsx
 msgid "API rate limits"
@@ -2263,7 +2263,7 @@ msgstr "請求"
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "Bio"
-msgstr ""
+msgstr "自己紹介"
 
 #: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
 msgid "Black"
@@ -2669,7 +2669,7 @@ msgstr "選択..."
 
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 msgid "Claim"
-msgstr ""
+msgstr "請求"
 
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Claim account"
@@ -3850,7 +3850,7 @@ msgstr "デバイス"
 
 #: packages/email/template-components/template-footer.tsx
 msgid "Did not expect this email? <0>Click here to report the sender</0>. Never sign a document you don't recognize or weren't expecting."
-msgstr ""
+msgstr "このメールに心当たりがありませんか？<0>送信者を報告するにはこちらをクリックしてください</0>。覚えのない文書や、予期していない文書には署名しないでください。"
 
 #: packages/email/templates/reset-password.tsx
 msgid "Didn't request a password change? We are here to help you secure your account, just <0>contact us</0>."
@@ -4447,7 +4447,7 @@ msgstr "すべての受信者が署名したものの、まだ封印されてい
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Documents, emails and api values may not be accurate since they record the amount of times the action was attempted. Meaning these values may go over the actual quota, get rejected, and will still be recorded."
-msgstr ""
+msgstr "ドキュメント、メール、および API の数値は、アクションが試行された回数を記録しているため、正確ではない場合があります。つまり、これらの数値は実際のクォータを超えたり、拒否されたりしても、それでも記録される可能性があります。"
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
@@ -5429,7 +5429,7 @@ msgstr "ライセンスの同期に失敗しました"
 
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 msgid "Failed to sync subscription"
-msgstr ""
+msgstr "サブスクリプションの同期に失敗しました"
 
 #: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
 msgid "Failed to trigger seal"
@@ -5487,7 +5487,7 @@ msgstr "機能"
 
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 msgid "Fetch the latest subscription data from Stripe and apply it to this organisation."
-msgstr ""
+msgstr "最新のサブスクリプションデータを Stripe から取得し、この組織に適用します。"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Field character limit"
@@ -6026,7 +6026,7 @@ msgstr "ステージング環境を使用している場合は、埋め込みコ
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "If you did not expect this email or believe it is spam, you can report the sender to our team for review."
-msgstr ""
+msgstr "このメールに心当たりがない場合、またはスパムだと思われる場合は、当社チームによる確認のため送信者を報告できます。"
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "If you didn't expect this account or have any questions, please <0>contact support</0>."
@@ -7601,7 +7601,7 @@ msgstr "組織SSOポータル"
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Organisation Stats"
-msgstr ""
+msgstr "組織の統計情報"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Organisation Teams"
@@ -7877,7 +7877,7 @@ msgstr "年額"
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Period"
-msgstr ""
+msgstr "期間"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Permanently delete this organisation. Documents will be orphaned (not deleted) so they remain accessible via the deleted-account service account."
@@ -8771,16 +8771,16 @@ msgstr "返信先メールアドレス <0>（任意）</0>"
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "Report sender"
-msgstr ""
+msgstr "送信者を報告する"
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "Report this sender?"
-msgstr ""
+msgstr "この送信者を報告しますか？"
 
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 msgid "Reports"
-msgstr ""
+msgstr "レポート"
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Request"
@@ -9083,7 +9083,7 @@ msgstr "クレーム ID または名前で検索"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
 msgid "Search by document title, team:123 or user:123"
-msgstr ""
+msgstr "文書タイトル、team:123 または user:123 で検索"
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 msgid "Search by domain or organisation name"
@@ -9107,7 +9107,7 @@ msgstr "組織名で検索"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Search by organisation name, URL or ID"
-msgstr ""
+msgstr "組織名、URL、またはIDで検索"
 
 #: apps/remix/app/components/general/document/document-search.tsx
 msgid "Search documents..."
@@ -9443,7 +9443,7 @@ msgstr "送信者"
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "Sender reported"
-msgstr ""
+msgstr "送信者を報告しました"
 
 #: apps/remix/app/components/forms/forgot-password.tsx
 msgid "Sending Reset Email..."
@@ -9540,7 +9540,7 @@ msgstr "詳細設定を表示"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Show daily averages for documents, emails and API usages"
-msgstr ""
+msgstr "文書、メール、API 利用状況の日次平均を表示"
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Show license key"
@@ -9548,7 +9548,7 @@ msgstr "ライセンスキーを表示する"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Show quotas for documents, emails and API usages"
-msgstr ""
+msgstr "文書、メール、API 利用状況のクォータを表示"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Show templates in your public profile for your audience to sign and get started quickly"
@@ -10115,7 +10115,7 @@ msgstr "サブスクリプション状況"
 
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 msgid "Subscription synced"
-msgstr ""
+msgstr "サブスクリプションを同期しました"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-delete-dialog.tsx
@@ -10216,7 +10216,7 @@ msgstr "同期"
 
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 msgid "Sync claims. This will overwrite the current claim with the one resolved from the Stripe subscription."
-msgstr ""
+msgstr "クレームを同期します。これにより、現在のクレームは Stripe サブスクリプションから取得されたクレームで上書きされます。"
 
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "Sync Email Domains"
@@ -10234,7 +10234,7 @@ msgstr "サーバーからライセンスを同期"
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Sync Stripe subscription"
-msgstr ""
+msgstr "Stripe サブスクリプションを同期"
 
 #: packages/lib/utils/document-audit-logs.ts
 #: packages/lib/utils/document-audit-logs.ts
@@ -10610,7 +10610,7 @@ msgstr "署名プロセスを完了していただきありがとうございま
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "Thank you for letting us know, we have flagged this sender for review. If you have any concerns please feel free to reach out to our <0>support team</0>."
-msgstr ""
+msgstr "ご報告ありがとうございます。こちらの送信者を審査対象としてフラグしました。ご不明な点がありましたら、いつでも<0>サポートチーム</0>までお問い合わせください。"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
@@ -10833,7 +10833,7 @@ msgstr "このグループ内のすべてのメンバーに適用される組織
 
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 msgid "The organisation subscription has been synced with Stripe."
-msgstr ""
+msgstr "組織のサブスクリプションは Stripe と同期されました。"
 
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
 msgid "The organisation will be deleted in the background. Documents will be orphaned, not deleted."
@@ -11602,7 +11602,7 @@ msgstr "上"
 
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 msgid "Total"
-msgstr ""
+msgstr "合計"
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Total Documents"
@@ -12439,7 +12439,7 @@ msgstr "このメールドメインの DNS レコードを表示"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "View, sort and filter monthly usage stats across organisations"
-msgstr ""
+msgstr "組織全体の月次利用統計を表示、並べ替え、フィルター"
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
@@ -12798,7 +12798,7 @@ msgstr "現在、ログアウトできませんでした。"
 
 #: apps/remix/app/routes/_recipient+/report.$token.tsx
 msgid "We were unable to report this sender at this time. Please try again later."
-msgstr ""
+msgstr "現在この送信者を報告できませんでした。時間をおいてからもう一度お試しください。"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "We were unable to set your public profile to public. Please try again."
@@ -14183,3 +14183,4 @@ msgstr "認証コード:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
