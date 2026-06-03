@@ -19,7 +19,31 @@ export const adminFindDocuments = async ({ query, page = 1, perPage = 10 }: Admi
         },
       };
 
-  if (query && query.startsWith('envelope_')) {
+  if (query?.startsWith('user:')) {
+    const userId = parseInt(query.slice('user:'.length), 10);
+
+    if (Number.isInteger(userId)) {
+      termFilters = {
+        userId: {
+          equals: userId,
+        },
+      };
+    }
+  }
+
+  if (query?.startsWith('team:')) {
+    const teamId = parseInt(query.slice('team:'.length), 10);
+
+    if (Number.isInteger(teamId)) {
+      termFilters = {
+        teamId: {
+          equals: teamId,
+        },
+      };
+    }
+  }
+
+  if (query && query?.startsWith('envelope_')) {
     termFilters = {
       id: {
         equals: query,
@@ -27,7 +51,7 @@ export const adminFindDocuments = async ({ query, page = 1, perPage = 10 }: Admi
     };
   }
 
-  if (query && query.startsWith('document_')) {
+  if (query && query?.startsWith('document_')) {
     termFilters = {
       secondaryId: {
         equals: query,
