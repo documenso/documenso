@@ -1,3 +1,5 @@
+// ABOUTME: Upload button for envelopes (documents and templates).
+// ABOUTME: Intercepts uploads in the Default team to nudge users toward purpose-specific teams.
 import { useMemo, useState } from 'react';
 
 import { msg, plural } from '@lingui/core/macro';
@@ -27,6 +29,7 @@ import {
 } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { DefaultTeamUploadDialog } from '~/components/dialogs/default-team-upload-dialog';
 import { useCurrentTeam } from '~/providers/team';
 
 export type EnvelopeUploadButtonProps = {
@@ -55,6 +58,8 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
   const { quota, remaining, refreshLimits, maximumEnvelopeItemCount } = useLimits();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [defaultTeamDialogOpen, setDefaultTeamDialogOpen] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
   const { mutateAsync: createEnvelope } = trpc.envelope.create.useMutation();
 
@@ -70,11 +75,9 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
     if (!user.emailVerified) {
       return msg`Verify your email to upload documents.`;
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remaining.documents, user.emailVerified, team]);
 
-  const onFileDrop = async (files: File[]) => {
+  const doUpload = async (files: File[]) => {
     try {
       setIsLoading(true);
 
@@ -126,11 +129,8 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
       console.error(err);
 
       const errorMessage = match(error.code)
-        .with('INVALID_DOCUMENT_FILE', () => t`You cannot upload encrypted PDFs.`)
-        .with(
-          AppErrorCode.LIMIT_EXCEEDED,
-          () => t`You have reached your document limit for this month. Please upgrade your plan.`,
-        )
+        .with('INVALID_DOCUMENT_FILE', () => t`The uploaded file is not a valid document.`)
+        .with(AppErrorCode.LIMIT_EXCEEDED, () => t`You have reached your document limit.`)
         .with(
           'ENVELOPE_ITEM_LIMIT_EXCEEDED',
           () => t`You have reached the limit of the number of files per envelope.`,
@@ -146,6 +146,16 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const onFileDrop = (files: File[]) => {
+    if (team.url === 'default') {
+      setPendingFiles(files);
+      setDefaultTeamDialogOpen(true);
+      return;
+    }
+
+    void doUpload(files);
   };
 
   const onFileDropRejected = (fileRejections: FileRejection[]) => {
@@ -175,37 +185,45 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
   };
 
   return (
-    <div className={cn('relative', className)}>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div>
-              <DocumentUploadButton
-                loading={isLoading}
-                disabled={remaining.documents === 0 || !user.emailVerified}
-                disabledMessage={disabledMessage}
-                onDrop={onFileDrop}
-                onDropRejected={onFileDropRejected}
-                type={type}
-                internalVersion="2"
-                maxFiles={maximumEnvelopeItemCount}
-              />
-            </div>
-          </TooltipTrigger>
+    <>
+      <DefaultTeamUploadDialog
+        open={defaultTeamDialogOpen}
+        onOpenChange={setDefaultTeamDialogOpen}
+        onContinue={() => void doUpload(pendingFiles)}
+      />
 
-          {type === EnvelopeType.DOCUMENT &&
-            remaining.documents > 0 &&
-            Number.isFinite(remaining.documents) && (
-              <TooltipContent>
-                <p className="text-sm">
-                  <Trans>
-                    {remaining.documents} of {quota.documents} documents remaining this month.
-                  </Trans>
-                </p>
-              </TooltipContent>
-            )}
-        </Tooltip>
-      </TooltipProvider>
-    </div>
+      <div className={cn('relative', className)}>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <DocumentUploadButton
+                  loading={isLoading}
+                  disabled={remaining.documents === 0 || !user.emailVerified}
+                  disabledMessage={disabledMessage}
+                  onDrop={onFileDrop}
+                  onDropRejected={onFileDropRejected}
+                  type={type}
+                  internalVersion="2"
+                  maxFiles={maximumEnvelopeItemCount}
+                />
+              </div>
+            </TooltipTrigger>
+
+            {type === EnvelopeType.DOCUMENT &&
+              remaining.documents > 0 &&
+              Number.isFinite(remaining.documents) && (
+                <TooltipContent>
+                  <p className="text-sm">
+                    <Trans>
+                      {remaining.documents} of {quota.documents} documents remaining this month.
+                    </Trans>
+                  </p>
+                </TooltipContent>
+              )}
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+    </>
   );
 };

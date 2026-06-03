@@ -1,3 +1,5 @@
+// ABOUTME: Server-side file upload pipeline for PDF and office documents.
+// ABOUTME: Handles DOCX/DOC conversion to PDF, encrypted PDF decryption, and storage routing.
 import { PDF } from '@libpdf/core';
 import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
@@ -8,7 +10,27 @@ import { env } from '@documenso/lib/utils/env';
 import { AppError } from '../../errors/app-error';
 import { createDocumentData } from '../../server-only/document-data/create-document-data';
 import { normalizePdf } from '../../server-only/pdf/normalize-pdf';
+import { convertToPdf } from '../../server-only/utils/convert-to-pdf';
+import { decryptPdf } from '../../server-only/utils/decrypt-pdf';
 import { uploadS3File } from './server-actions';
+
+const OFFICE_EXTENSIONS: Record<string, string> = {
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+  'application/msword': 'doc',
+};
+
+const getOfficeExtension = (file: File): string | null => {
+  if (OFFICE_EXTENSIONS[file.type]) {
+    return OFFICE_EXTENSIONS[file.type];
+  }
+  const lower = file.name.toLowerCase();
+  for (const ext of Object.values(OFFICE_EXTENSIONS)) {
+    if (lower.endsWith(`.${ext}`)) {
+      return ext;
+    }
+  }
+  return null;
+};
 
 type File = {
   name: string;
@@ -21,9 +43,26 @@ type File = {
  * a document data record.
  */
 export const putPdfFileServerSide = async (file: File, initialData?: string) => {
-  const isEncryptedDocumentsAllowed = false; // Was feature flag.
+  const originalBuffer = await file.arrayBuffer();
+  let fileName = file.name;
 
-  const arrayBuffer = await file.arrayBuffer();
+  const officeExt = getOfficeExtension(file);
+  const convertedBuffer = officeExt
+    ? await convertToPdf(Buffer.from(originalBuffer), officeExt)
+    : null;
+  const arrayBuffer = convertedBuffer
+    ? convertedBuffer.buffer.slice(
+        convertedBuffer.byteOffset,
+        convertedBuffer.byteOffset + convertedBuffer.byteLength,
+      )
+    : originalBuffer;
+
+  if (officeExt) {
+    fileName = fileName.replace(/\.[^.]+$/, '.pdf');
+    if (!fileName.endsWith('.pdf')) {
+      fileName = `${fileName}.pdf`;
+    }
+  }
 
   const pdf = await PDF.load(new Uint8Array(arrayBuffer)).catch((e) => {
     console.error(`PDF upload parse error: ${e.message}`);
@@ -31,15 +70,48 @@ export const putPdfFileServerSide = async (file: File, initialData?: string) => 
     throw new AppError('INVALID_DOCUMENT_FILE');
   });
 
-  if (!isEncryptedDocumentsAllowed && pdf.isEncrypted) {
-    throw new AppError('INVALID_DOCUMENT_FILE');
+  if (pdf.isEncrypted) {
+    const decrypted = await decryptPdf(Buffer.from(arrayBuffer));
+    const decryptedBuffer = decrypted.buffer.slice(
+      decrypted.byteOffset,
+      decrypted.byteOffset + decrypted.byteLength,
+    );
+
+    const decryptedPdf = await PDF.load(new Uint8Array(decryptedBuffer)).catch((e) => {
+      console.error(`PDF upload parse error after decryption: ${e.message}`);
+      throw new AppError('INVALID_DOCUMENT_FILE');
+    });
+
+    if (!fileName.endsWith('.pdf')) {
+      fileName = `${fileName}.pdf`;
+    }
+
+    const uploadFile: File = {
+      name: fileName,
+      type: 'application/pdf',
+      arrayBuffer: async () => Promise.resolve(decryptedBuffer),
+    };
+
+    const { type, data } = await putFileServerSide(uploadFile);
+    const createdData = await createDocumentData({ type, data, initialData });
+
+    return {
+      documentData: createdData,
+      filePageCount: decryptedPdf.getPageCount(),
+    };
   }
 
-  if (!file.name.endsWith('.pdf')) {
-    file.name = `${file.name}.pdf`;
+  if (!fileName.endsWith('.pdf')) {
+    fileName = `${fileName}.pdf`;
   }
 
-  const { type, data } = await putFileServerSide(file);
+  const uploadFile: File = {
+    name: fileName,
+    type: 'application/pdf',
+    arrayBuffer: async () => Promise.resolve(arrayBuffer),
+  };
+
+  const { type, data } = await putFileServerSide(uploadFile);
 
   const createdData = await createDocumentData({ type, data, initialData });
 
@@ -56,11 +128,29 @@ export const putNormalizedPdfFileServerSide = async (
   file: File,
   options: { flattenForm?: boolean } = {},
 ) => {
-  const buffer = Buffer.from(await file.arrayBuffer());
+  let arrayBuffer = await file.arrayBuffer();
+  let fileName = file.name;
+
+  const officeExt = getOfficeExtension(file);
+  if (officeExt) {
+    const converted = await convertToPdf(Buffer.from(arrayBuffer), officeExt);
+    arrayBuffer = converted.buffer.slice(
+      converted.byteOffset,
+      converted.byteOffset + converted.byteLength,
+    );
+    fileName = fileName.replace(/\.[^.]+$/, '.pdf');
+    if (!fileName.endsWith('.pdf')) {
+      fileName = `${fileName}.pdf`;
+    }
+  }
+
+  const buffer = Buffer.from(arrayBuffer);
 
   const normalized = await normalizePdf(buffer, options);
 
-  const fileName = file.name.endsWith('.pdf') ? file.name : `${file.name}.pdf`;
+  if (!fileName.endsWith('.pdf')) {
+    fileName = `${fileName}.pdf`;
+  }
 
   const documentData = await putFileServerSide({
     name: fileName,

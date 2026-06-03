@@ -16,6 +16,8 @@ export const ZFolderSchema = FolderSchema.pick({
   updatedAt: true,
   visibility: true,
   type: true,
+  allowedUserIds: true,
+  allowedGroupIds: true,
 });
 
 export type TFolder = z.infer<typeof ZFolderSchema>;
@@ -62,6 +64,14 @@ export const ZUpdateFolderRequestSchema = z.object({
       .optional()
       .describe('The visibility of the folder'),
     pinned: z.boolean().optional().describe('Whether the folder should be pinned'),
+    allowedUserIds: z
+      .array(z.number())
+      .optional()
+      .describe('User IDs that can access this folder. Empty array means everyone.'),
+    allowedGroupIds: z
+      .array(z.string())
+      .optional()
+      .describe('Organisation group IDs that can access this folder. Empty array means everyone.'),
   }),
 });
 

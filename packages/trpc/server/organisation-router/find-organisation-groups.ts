@@ -13,7 +13,15 @@ import {
 } from './find-organisation-groups.types';
 
 export const findOrganisationGroupsRoute = authenticatedProcedure
-  // .meta(findOrganisationGroupsMeta)
+  .meta({
+    openapi: {
+      method: 'GET',
+      path: '/organisation/group',
+      summary: 'Find organisation groups',
+      description: 'Find groups for an organisation with members and team assignments',
+      tags: ['Organisation'],
+    },
+  })
   .input(ZFindOrganisationGroupsRequestSchema)
   .output(ZFindOrganisationGroupsResponseSchema)
   .query(async ({ input, ctx }) => {

@@ -1,8 +1,11 @@
+// ABOUTME: Konva renderer for radio field elements on the PDF canvas.
+// ABOUTME: Supports vertical, horizontal, and custom drag-positioned layouts.
 import Konva from 'konva';
 import { match } from 'ts-pattern';
 
 import { DEFAULT_STANDARD_FONT_SIZE } from '../../constants/pdf';
 import type { TRadioFieldMeta } from '../../types/field-meta';
+import { type OnItemDragEnd, setupItemDrag } from './field-drag-utils';
 import {
   createFieldHoverInteraction,
   konvaTextFill,
@@ -24,10 +27,12 @@ const calculateRadioSize = (fontSize: number) => {
 export const renderRadioFieldElement = (
   field: FieldToRender,
   options: RenderFieldElementOptions,
+  onItemDragEnd?: OnItemDragEnd,
 ) => {
   const { pageWidth, pageHeight, pageLayer, mode, color } = options;
 
-  const radioMeta: TRadioFieldMeta | null = (field.fieldMeta as TRadioFieldMeta) || null;
+  const radioMeta: TRadioFieldMeta | null =
+    field.fieldMeta?.type === 'radio' ? field.fieldMeta : null;
   const radioValues = radioMeta?.values || [];
 
   const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);
@@ -60,18 +65,12 @@ export const renderRadioFieldElement = (
     const rectWidth = fieldRect.width() * groupScaleX;
     const rectHeight = fieldRect.height() * groupScaleY;
 
-    const circles = fieldGroup.find('.radio-circle').sort((a, b) => a.id().localeCompare(b.id()));
-    const checkmarks = fieldGroup.find('.radio-dot').sort((a, b) => a.id().localeCompare(b.id()));
-    const text = fieldGroup.find('.radio-text').sort((a, b) => a.id().localeCompare(b.id()));
+    const itemGroups = fieldGroup
+      .find<Konva.Group>('.radio-item')
+      .sort((a, b) => a.id().localeCompare(b.id(), undefined, { numeric: true }));
 
-    const groupedItems = circles.map((circle, i) => ({
-      circleElement: circle,
-      checkmarkElement: checkmarks[i],
-      textElement: text[i],
-    }));
-
-    groupedItems.forEach((item, i) => {
-      const { circleElement, checkmarkElement, textElement } = item;
+    itemGroups.forEach((itemGroup, i) => {
+      const radioValue = radioValues[i];
 
       const { itemInputX, itemInputY, textX, textY, textWidth, textHeight } =
         calculateMultiItemPosition({
@@ -84,23 +83,28 @@ export const renderRadioFieldElement = (
           fieldPadding: radioFieldPadding,
           type: 'radio',
           direction: radioMeta?.direction || 'vertical',
+          item: radioValue,
         });
 
-      circleElement.setAttrs({
+      const circleElement = itemGroup.findOne('.radio-circle');
+      const dotElement = itemGroup.findOne('.radio-dot');
+      const textElement = itemGroup.findOne('.radio-text');
+
+      circleElement?.setAttrs({
         x: itemInputX,
         y: itemInputY,
         scaleX: 1,
         scaleY: 1,
       });
 
-      checkmarkElement.setAttrs({
+      dotElement?.setAttrs({
         x: itemInputX,
         y: itemInputY,
         scaleX: 1,
         scaleY: 1,
       });
 
-      textElement.setAttrs({
+      textElement?.setAttrs({
         x: textX,
         y: textY,
         scaleX: 1,
@@ -123,13 +127,15 @@ export const renderRadioFieldElement = (
 
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
-  radioValues.forEach(({ value, checked }, index) => {
+  radioValues.forEach((radioValue, index) => {
+    const { value, checked } = radioValue;
+
     const isRadioValueChecked = match(mode)
       .with('edit', () => checked)
       .with('sign', () => index.toString() === field.customText)
       .with('export', () => {
         // If it's read-only, check the originally checked state.
-        if (radioMeta.readOnly) {
+        if (radioMeta?.readOnly) {
           return checked;
         }
 
@@ -148,7 +154,14 @@ export const renderRadioFieldElement = (
         fieldPadding: radioFieldPadding,
         type: 'radio',
         direction: radioMeta?.direction || 'vertical',
+        item: radioValue,
       });
+
+    // Wrap each item's elements in a named group to support individual drag.
+    const itemGroup = new Konva.Group({
+      id: `radio-item-${index}`,
+      name: 'radio-item',
+    });
 
     // Circle which represents the radio button.
     const circle = new Konva.Circle({
@@ -190,10 +203,49 @@ export const renderRadioFieldElement = (
       verticalAlign: 'middle',
     });
 
-    fieldGroup.add(circle);
-    fieldGroup.add(dot);
-    fieldGroup.add(text);
+    itemGroup.add(circle);
+    itemGroup.add(dot);
+    itemGroup.add(text);
+
+    if (mode === 'edit' && radioMeta?.direction === 'custom' && onItemDragEnd) {
+      const radioSize = calculateRadioSize(fontSize);
+      const radioRadius = radioSize / 2;
+      const currentOX = radioValue.offsetX ?? 0;
+      const currentOY = radioValue.offsetY ?? 0;
+      const baseX = itemInputX - currentOX;
+      const baseY = itemInputY - currentOY;
+
+      setupItemDrag({
+        itemGroup,
+        index,
+        currentOffsetX: currentOX,
+        currentOffsetY: currentOY,
+        clampOffset: (rawOffsetX, rawOffsetY) => ({
+          offsetX: Math.max(
+            -(baseX - radioRadius),
+            Math.min(fieldWidth - baseX - radioRadius, rawOffsetX),
+          ),
+          offsetY: Math.max(
+            -(baseY - radioRadius),
+            Math.min(fieldHeight - baseY - radioRadius, rawOffsetY),
+          ),
+        }),
+        onItemDragEnd,
+      });
+    }
+
+    fieldGroup.add(itemGroup);
   });
+
+  if (radioMeta?.direction === 'custom' && radioValues.length > 0) {
+    const clientRect = fieldGroup.getClientRect({ relativeTo: fieldGroup });
+    fieldRect.setAttrs({
+      x: clientRect.x,
+      y: clientRect.y,
+      width: clientRect.width,
+      height: clientRect.height,
+    });
+  }
 
   if (color !== 'readOnly' && mode !== 'export') {
     createFieldHoverInteraction({ fieldGroup, fieldRect, options, field });

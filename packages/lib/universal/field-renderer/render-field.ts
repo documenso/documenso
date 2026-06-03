@@ -6,6 +6,7 @@ import { match } from 'ts-pattern';
 import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
 
 import type { TFieldMetaSchema } from '../../types/field-meta';
+import { type OnItemDragEnd } from './field-drag-utils';
 import { renderCheckboxFieldElement } from './render-checkbox-field';
 import { renderDropdownFieldElement } from './render-dropdown-field';
 import { renderGenericTextFieldElement } from './render-generic-text-field';
@@ -53,6 +54,9 @@ type RenderFieldOptions = {
 
   scale: number;
   editable?: boolean;
+
+  onCheckboxItemDragEnd?: OnItemDragEnd;
+  onRadioItemDragEnd?: OnItemDragEnd;
 };
 
 export const renderField = ({
@@ -65,6 +69,8 @@ export const renderField = ({
   scale,
   editable,
   color,
+  onCheckboxItemDragEnd,
+  onRadioItemDragEnd,
 }: RenderFieldOptions) => {
   const options = {
     pageLayer,
@@ -89,8 +95,10 @@ export const renderField = ({
       FieldType.CALCULATED,
       () => renderGenericTextFieldElement(field, options),
     )
-    .with(FieldType.CHECKBOX, () => renderCheckboxFieldElement(field, options))
-    .with(FieldType.RADIO, () => renderRadioFieldElement(field, options))
+    .with(FieldType.CHECKBOX, () =>
+      renderCheckboxFieldElement(field, options, onCheckboxItemDragEnd),
+    )
+    .with(FieldType.RADIO, () => renderRadioFieldElement(field, options, onRadioItemDragEnd))
     .with(FieldType.DROPDOWN, () => renderDropdownFieldElement(field, options))
     .with(FieldType.SIGNATURE, () => renderSignatureFieldElement(field, options))
     .with(FieldType.FREE_SIGNATURE, () => {

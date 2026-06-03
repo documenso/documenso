@@ -2,10 +2,11 @@ import { DateTime } from 'luxon';
 
 import { DEFAULT_DOCUMENT_TIME_ZONE } from './time-zones';
 
-export const DEFAULT_DOCUMENT_DATE_FORMAT = 'yyyy-MM-dd hh:mm a';
+export const DEFAULT_DOCUMENT_DATE_FORMAT = 'EEEE, MMMM dd, yyyy hh:mm a';
 
 export const VALID_DATE_FORMAT_VALUES = [
   DEFAULT_DOCUMENT_DATE_FORMAT,
+  'yyyy-MM-dd hh:mm a',
   'yyyy-MM-dd',
   'dd/MM/yyyy',
   'MM/dd/yyyy',
@@ -24,7 +25,6 @@ export const VALID_DATE_FORMAT_VALUES = [
   'yyyy-MM-dd HH:mm:ss',
   'MMMM dd, yyyy hh:mm a',
   'MMMM dd, yyyy HH:mm',
-  'EEEE, MMMM dd, yyyy hh:mm a',
   'EEEE, MMMM dd, yyyy HH:mm',
   "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
 ] as const;
@@ -33,8 +33,8 @@ export type ValidDateFormat = (typeof VALID_DATE_FORMAT_VALUES)[number];
 
 export const DATE_FORMATS = [
   {
-    key: 'yyyy-MM-dd_HH:mm_12H',
-    label: 'YYYY-MM-DD hh:mm AM/PM',
+    key: 'DayMonthYear_TIME_12H',
+    label: 'Day, Month Date, Year hh:mm AM/PM',
     value: DEFAULT_DOCUMENT_DATE_FORMAT,
   },
   {
@@ -98,9 +98,9 @@ export const DATE_FORMATS = [
     value: 'EEEE, MMMM dd, yyyy HH:mm',
   },
   {
-    key: 'DayMonthYear_TIME_12H',
-    label: 'Day, Month Year HH:mm AM/PM',
-    value: 'EEEE, MMMM dd, yyyy hh:mm a',
+    key: 'yyyy-MM-dd_HH:mm_12H',
+    label: 'YYYY-MM-DD hh:mm AM/PM',
+    value: 'yyyy-MM-dd hh:mm a',
   },
   {
     key: 'ISO8601',
@@ -170,5 +170,5 @@ export const convertToLocalSystemFormat = (
 };
 
 export const isValidDateFormat = (dateFormat: unknown): dateFormat is ValidDateFormat => {
-  return VALID_DATE_FORMAT_VALUES.includes(dateFormat as ValidDateFormat);
+  return VALID_DATE_FORMAT_VALUES.some((format) => format === dateFormat);
 };

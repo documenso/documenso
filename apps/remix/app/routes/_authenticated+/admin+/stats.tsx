@@ -10,7 +10,6 @@ import {
   Mail,
   MailOpen,
   PenTool,
-  UserPlus,
   UserSquare2,
   Users,
 } from 'lucide-react';
@@ -19,14 +18,11 @@ import { getDocumentStats } from '@documenso/lib/server-only/admin/get-documents
 import { getRecipientsStats } from '@documenso/lib/server-only/admin/get-recipients-stats';
 import {
   getMonthlyActiveUsers,
-  getOrganisationsWithSubscriptionsCount,
   getUserWithSignedDocumentMonthlyGrowth,
   getUsersCount,
 } from '@documenso/lib/server-only/admin/get-users-stats';
-import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import { getSignerConversionMonthly } from '@documenso/lib/server-only/user/get-signer-conversion';
 
-import { AdminLicenseCard } from '~/components/general/admin-license-card';
 import { MonthlyActiveUsersChart } from '~/components/general/admin-monthly-active-user-charts';
 import { AdminStatsSignerConversionChart } from '~/components/general/admin-stats-signer-conversion-chart';
 import { AdminStatsUsersWithDocumentsChart } from '~/components/general/admin-stats-users-with-documents';
@@ -38,33 +34,27 @@ import type { Route } from './+types/stats';
 export async function loader() {
   const [
     usersCount,
-    organisationsWithSubscriptionsCount,
     docStats,
     recipientStats,
     signerConversionMonthly,
     monthlyUsersWithDocuments,
     monthlyActiveUsers,
-    licenseData,
   ] = await Promise.all([
     getUsersCount(),
-    getOrganisationsWithSubscriptionsCount(),
     getDocumentStats(),
     getRecipientsStats(),
     getSignerConversionMonthly(),
     getUserWithSignedDocumentMonthlyGrowth(),
     getMonthlyActiveUsers(),
-    LicenseClient.getInstance()?.getCachedLicense(),
   ]);
 
   return {
     usersCount,
-    organisationsWithSubscriptionsCount,
     docStats,
     recipientStats,
     signerConversionMonthly,
     monthlyUsersWithDocuments,
     monthlyActiveUsers,
-    licenseData: licenseData || null,
   };
 }
 
@@ -73,13 +63,11 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
 
   const {
     usersCount,
-    organisationsWithSubscriptionsCount,
     docStats,
     recipientStats,
     signerConversionMonthly,
     monthlyUsersWithDocuments,
     monthlyActiveUsers,
-    licenseData,
   } = loaderData;
 
   return (
@@ -88,20 +76,10 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
         <Trans>Instance Stats</Trans>
       </h2>
 
-      <div className="mt-8 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-8 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <CardMetric icon={Users} title={_(msg`Total Users`)} value={usersCount} />
         <CardMetric icon={File} title={_(msg`Total Documents`)} value={docStats.ALL} />
-        <CardMetric
-          icon={UserPlus}
-          title={_(msg`Active Subscriptions`)}
-          value={organisationsWithSubscriptionsCount}
-        />
-
         <CardMetric icon={FileCog} title={_(msg`App Version`)} value={`v${version}`} />
-      </div>
-
-      <div className="mb-8 mt-4">
-        <AdminLicenseCard licenseData={licenseData} />
       </div>
 
       <div className="mt-16 gap-8">

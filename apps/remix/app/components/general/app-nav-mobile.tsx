@@ -86,7 +86,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
         <Link to="/" onClick={handleMenuItemClick}>
           <img
             src={LogoImage}
-            alt="Documenso Logo"
+            alt="PSD Document Signing"
             className="dark:invert"
             width={170}
             height={25}
@@ -124,7 +124,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
           </div>
 
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Documenso, Inc.
+            © {new Date().getFullYear()} Peninsula School District
             <br />
             <Trans>All rights reserved.</Trans>
           </p>

@@ -23,6 +23,19 @@ export const createOrganisationRoute = authenticatedProcedure
     const { name, priceId } = input;
     const { user } = ctx;
 
+    if (!IS_BILLING_ENABLED()) {
+      const fullUser = await prisma.user.findFirstOrThrow({
+        where: { id: user.id },
+        select: { roles: true },
+      });
+
+      if (!fullUser.roles.includes('ADMIN')) {
+        throw new AppError(AppErrorCode.UNAUTHORIZED, {
+          message: 'Only administrators can create organisations.',
+        });
+      }
+    }
+
     ctx.logger.info({
       input: {
         priceId,

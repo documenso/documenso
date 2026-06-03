@@ -21,6 +21,11 @@ export enum AppErrorCode {
   'TOO_MANY_REQUESTS' = 'TOO_MANY_REQUESTS',
   'TWO_FACTOR_AUTH_FAILED' = 'TWO_FACTOR_AUTH_FAILED',
   'WEBHOOK_INVALID_REQUEST' = 'WEBHOOK_INVALID_REQUEST',
+  'DEPENDENCY_MISSING' = 'DEPENDENCY_MISSING',
+  'CONVERSION_FAILED' = 'CONVERSION_FAILED',
+  'CONVERSION_TIMEOUT' = 'CONVERSION_TIMEOUT',
+  'ENCRYPTED_DOCUMENT_REQUIRES_PASSWORD' = 'ENCRYPTED_DOCUMENT_REQUIRES_PASSWORD',
+  'DECRYPTION_FAILED' = 'DECRYPTION_FAILED',
 }
 
 export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; status: number }> =
@@ -39,6 +44,11 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
     [AppErrorCode.SCHEMA_FAILED]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
     [AppErrorCode.TOO_MANY_REQUESTS]: { code: 'TOO_MANY_REQUESTS', status: 429 },
     [AppErrorCode.TWO_FACTOR_AUTH_FAILED]: { code: 'UNAUTHORIZED', status: 401 },
+    [AppErrorCode.DEPENDENCY_MISSING]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
+    [AppErrorCode.CONVERSION_FAILED]: { code: 'BAD_REQUEST', status: 422 },
+    [AppErrorCode.CONVERSION_TIMEOUT]: { code: 'BAD_REQUEST', status: 422 },
+    [AppErrorCode.ENCRYPTED_DOCUMENT_REQUIRES_PASSWORD]: { code: 'BAD_REQUEST', status: 422 },
+    [AppErrorCode.DECRYPTION_FAILED]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
   };
 
 export const ZAppErrorJsonSchema = z.object({

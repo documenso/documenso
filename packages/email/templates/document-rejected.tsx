@@ -44,7 +44,7 @@ export function DocumentRejectedEmail({
               ) : (
                 <Img
                   src={getAssetUrl('/static/logo.png')}
-                  alt="Documenso Logo"
+                  alt="PSD Document Signing"
                   className="mb-4 h-6"
                 />
               )}

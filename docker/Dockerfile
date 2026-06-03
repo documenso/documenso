@@ -3,8 +3,15 @@
 ###########################
 FROM node:22-alpine3.22 AS base
 
-RUN apk add --no-cache openssl
-RUN apk add --no-cache font-freefont
+ENV HTTP_PROXY=""
+ENV HTTPS_PROXY=""
+ENV http_proxy=""
+ENV https_proxy=""
+ENV NO_PROXY="*"
+ENV no_proxy="*"
+
+RUN sed -i 's|https://|http://|g' /etc/apk/repositories
+RUN apk add --no-cache openssl ca-certificates font-freefont && update-ca-certificates
 
 
 ###########################
@@ -12,9 +19,9 @@ RUN apk add --no-cache font-freefont
 ###########################
 FROM base AS builder
 
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
-RUN apk add --no-cache jq
+ENV NODE_TLS_REJECT_UNAUTHORIZED=0
+RUN npm config set strict-ssl false
+RUN apk add --no-cache libc6-compat jq
 WORKDIR /app
 
 COPY . .
@@ -30,11 +37,9 @@ RUN turbo prune --scope=@documenso/remix --docker
 ###########################
 FROM base AS installer
 
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
-RUN apk add --no-cache jq
-# Required for node_modules/aws-crt
-RUN apk add --no-cache make cmake g++ openssl bash
+ENV NODE_TLS_REJECT_UNAUTHORIZED=0
+RUN npm config set strict-ssl false
+RUN apk add --no-cache libc6-compat jq make cmake g++ openssl bash
 
 WORKDIR /app
 
@@ -90,6 +95,8 @@ FROM base AS runner
 
 ENV HUSKY 0
 ENV DOCKER_OUTPUT 1
+ENV NODE_TLS_REJECT_UNAUTHORIZED=0
+RUN npm config set strict-ssl false
 
 # Telemetry credentials (baked into image at build time, can be disabled at runtime)
 ARG NEXT_PRIVATE_TELEMETRY_KEY=""

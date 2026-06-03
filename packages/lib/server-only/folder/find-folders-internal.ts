@@ -2,8 +2,8 @@ import { EnvelopeType } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
-import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import type { TFolderType } from '../../types/folder-type';
+import { buildFolderAccessFilter, getUserTeamGroupIds } from '../../utils/folder-access';
 import { getTeamById } from '../team/get-team';
 
 export interface FindFoldersInternalOptions {
@@ -20,19 +20,16 @@ export const findFoldersInternal = async ({
   type,
 }: FindFoldersInternalOptions) => {
   const team = await getTeamById({ userId, teamId });
+  const userGroupIds = await getUserTeamGroupIds(userId, teamId);
 
-  const visibilityFilters = {
-    visibility: {
-      in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
-    },
-  };
+  const accessFilter = buildFolderAccessFilter(userId, team.currentTeamRole, userGroupIds);
 
   const whereClause = {
     AND: [
       { parentId },
       {
         OR: [
-          { teamId, ...visibilityFilters },
+          { teamId, ...accessFilter },
           { userId, teamId },
         ],
       },
@@ -56,7 +53,7 @@ export const findFoldersInternal = async ({
               where: {
                 parentId: folder.id,
                 teamId,
-                ...visibilityFilters,
+                ...accessFilter,
               },
               orderBy: {
                 createdAt: 'desc',
@@ -80,7 +77,7 @@ export const findFoldersInternal = async ({
               where: {
                 parentId: folder.id,
                 teamId,
-                ...visibilityFilters,
+                ...accessFilter,
               },
             }),
           ]);

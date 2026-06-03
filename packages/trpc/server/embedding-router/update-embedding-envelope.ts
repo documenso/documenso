@@ -178,17 +178,6 @@ export const updateEmbeddingEnvelopeRoute = procedure
       envelopeItemsToUpdate.length > 0 ||
       envelopeItemsToReplace.length > 0;
 
-    const organisationClaim = envelope.team.organisation.organisationClaim;
-    const resultingEnvelopeItemCount =
-      envelope.envelopeItems.length - envelopeItemIdsToDelete.length + envelopeItemsToCreate.length;
-
-    if (resultingEnvelopeItemCount > organisationClaim.envelopeItemCount) {
-      throw new AppError('ENVELOPE_ITEM_LIMIT_EXCEEDED', {
-        message: `You cannot upload more than ${organisationClaim.envelopeItemCount} envelope items`,
-        statusCode: 400,
-      });
-    }
-
     // Should be safe to use stale envelope.recipients since only signed or sent
     // recipients affect the outcome.
     if (willEnvelopeItemsBeModified) {

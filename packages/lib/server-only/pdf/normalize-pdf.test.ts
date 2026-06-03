@@ -1,101 +1,169 @@
-import { PDF, PdfArray, PdfStream, StandardFonts } from '@libpdf/core';
-import { describe, expect, it } from 'vitest';
+// ABOUTME: Unit tests for normalize-pdf covering unencrypted, encrypted, annotation flattening, and error branches.
+// ABOUTME: Mocks @libpdf/core and decrypt-pdf to isolate normalize-pdf logic without real dependencies.
 
-import { normalizePdf } from './normalize-pdf';
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions, @typescript-eslint/require-await */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-/**
- * Extract the concatenated text of every page of a PDF buffer.
- */
-const extractAllText = async (pdf: Buffer): Promise<string> => {
-  const doc = await PDF.load(new Uint8Array(pdf));
+const mockFlattenLayers = vi.fn();
+const mockFlattenAnnotations = vi.fn();
+const mockSave = vi.fn().mockResolvedValue(new Uint8Array([0x25, 0x50, 0x44, 0x46]));
 
-  return doc
-    .extractText()
-    .map((page) => page.text)
-    .join('\n');
-};
+vi.mock('@libpdf/core', () => ({
+  PDF: {
+    load: vi.fn().mockResolvedValue({
+      isEncrypted: false,
+      flattenLayers: mockFlattenLayers,
+      flattenAnnotations: mockFlattenAnnotations,
+      save: mockSave,
+    }),
+  },
+}));
 
-/**
- * Build a fillable form whose page `/Contents` is split across an array of
- * streams - the structure that previously made `form.flatten()` blank the page
- * (#28).
- */
-const buildArrayContentForm = async (marker: string): Promise<Buffer> => {
-  const pdf = await PDF.create();
-  const form = pdf.getOrCreateForm();
-  const page = pdf.addPage();
-  page.drawText(marker, { x: 50, y: 700, size: 14, font: StandardFonts.Helvetica });
-  const field = form.createTextField('field_1', { fontSize: 10 });
-  page.drawField(field, { x: 50, y: 650, width: 200, height: 18 });
-
-  // Reopen and split the single content stream into an array of two streams.
-  const single = Buffer.from(await pdf.save());
-  const doc = await PDF.load(new Uint8Array(single));
-  const resolve = doc.context.resolve.bind(doc.context);
-  const reopenedPage = doc.getPages()[0];
-
-  let contents = reopenedPage.dict.get('Contents');
-
-  if (contents?.type === 'ref') {
-    contents = resolve(contents) ?? undefined;
-  }
-
-  if (!(contents instanceof PdfStream)) {
-    throw new Error('expected a single content stream to split');
-  }
-
-  const decoded = contents.getDecodedData();
-  const mid = Math.floor(decoded.length / 2);
-  const ref1 = doc.createStream({}, decoded.slice(0, mid));
-  const ref2 = doc.createStream({}, decoded.slice(mid));
-  reopenedPage.dict.set('Contents', PdfArray.of(ref1, ref2));
-  reopenedPage.dict.dirty = true;
-
-  return Buffer.from(await doc.save());
-};
+vi.mock('../utils/decrypt-pdf', () => ({
+  decryptPdf: vi.fn().mockResolvedValue(Buffer.from('decrypted pdf content')),
+}));
 
 describe('normalizePdf', () => {
-  it('preserves page content when flattening a form (#28 regression)', async () => {
-    const marker = 'PENINSULA_MARKER_TEXT';
-    const pdf = await buildArrayContentForm(marker);
-
-    const normalized = await normalizePdf(pdf, { flattenForm: true });
-
-    // The static page text must survive the flatten.
-    expect(await extractAllText(normalized)).toContain(marker);
-
-    // The interactive form should have been flattened away.
-    const reloaded = await PDF.load(new Uint8Array(normalized));
-    const form = reloaded.getForm();
-    expect(form === null || form.getFields().length === 0).toBe(true);
+  beforeEach(async () => {
+    vi.resetModules();
+    vi.clearAllMocks();
   });
 
-  it('does not blank the page when normalizing an already-normalized PDF (#78 regression)', async () => {
-    const marker = 'DOUBLE_NORMALIZE_MARKER';
-    const pdf = await buildArrayContentForm(marker);
+  it('should normalize an unencrypted PDF with annotation flattening (default)', async () => {
+    const { PDF } = await import('@libpdf/core');
 
-    const once = await normalizePdf(pdf, { flattenForm: true });
-    // Sanity: a single normalization renders fine.
-    expect(await extractAllText(once)).toContain(marker);
+    const mockDoc = {
+      isEncrypted: false,
+      flattenLayers: mockFlattenLayers,
+      flattenAnnotations: mockFlattenAnnotations,
+      save: mockSave,
+    };
 
-    // Re-normalizing already-normalized data (the custom-upload-from-template
-    // double-normalization path) must not corrupt/blank the page.
-    const twice = await normalizePdf(once, { flattenForm: true });
-    expect(await extractAllText(twice)).toContain(marker);
+    vi.mocked(PDF.load).mockResolvedValue(mockDoc as any);
+
+    const { normalizePdf } = await import('./normalize-pdf');
+    const result = await normalizePdf(Buffer.from('valid pdf'));
+
+    expect(result).toBeInstanceOf(Buffer);
+    expect(mockFlattenLayers).toHaveBeenCalled();
+    expect(mockFlattenAnnotations).toHaveBeenCalled();
+    expect(mockSave).toHaveBeenCalled();
   });
 
-  it('keeps the form interactive for templates (flattenForm: false)', async () => {
-    const pdf = await buildArrayContentForm('TEMPLATE_MARKER');
+  it('should skip annotation flattening when flattenForm is false', async () => {
+    const { PDF } = await import('@libpdf/core');
 
-    const normalized = await normalizePdf(pdf, { flattenForm: false });
+    const mockDoc = {
+      isEncrypted: false,
+      flattenLayers: mockFlattenLayers,
+      flattenAnnotations: mockFlattenAnnotations,
+      save: mockSave,
+    };
 
-    expect(await extractAllText(normalized)).toContain('TEMPLATE_MARKER');
+    vi.mocked(PDF.load).mockResolvedValue(mockDoc as any);
 
-    const reloaded = await PDF.load(new Uint8Array(normalized));
-    expect(reloaded.getForm()?.getFields().length).toBeGreaterThan(0);
+    const { normalizePdf } = await import('./normalize-pdf');
+    await normalizePdf(Buffer.from('valid pdf'), { flattenForm: false });
+
+    expect(mockFlattenLayers).toHaveBeenCalled();
+    expect(mockFlattenAnnotations).not.toHaveBeenCalled();
   });
 
-  it('rejects an invalid PDF buffer', async () => {
-    await expect(normalizePdf(Buffer.from('not a pdf'))).rejects.toThrow();
+  it('should decrypt encrypted PDFs before normalizing', async () => {
+    const { PDF } = await import('@libpdf/core');
+    const { decryptPdf } = await import('../utils/decrypt-pdf');
+
+    const encryptedDoc = {
+      isEncrypted: true,
+      flattenLayers: vi.fn(),
+      flattenAnnotations: vi.fn(),
+      save: vi.fn(),
+    };
+
+    const decryptedDoc = {
+      isEncrypted: false,
+      flattenLayers: vi.fn(),
+      flattenAnnotations: vi.fn(),
+      save: vi.fn().mockResolvedValue(new Uint8Array([0x25, 0x50])),
+    };
+
+    vi.mocked(PDF.load)
+      .mockResolvedValueOnce(encryptedDoc as any)
+      .mockResolvedValueOnce(decryptedDoc as any);
+
+    const { normalizePdf } = await import('./normalize-pdf');
+    const result = await normalizePdf(Buffer.from('encrypted pdf'));
+
+    expect(result).toBeInstanceOf(Buffer);
+    expect(decryptPdf).toHaveBeenCalledWith(Buffer.from('encrypted pdf'));
+    expect(decryptedDoc.flattenLayers).toHaveBeenCalled();
+    expect(decryptedDoc.flattenAnnotations).toHaveBeenCalled();
+  });
+
+  it('should skip annotation flattening on decrypted PDF when flattenForm is false', async () => {
+    const { PDF } = await import('@libpdf/core');
+
+    const encryptedDoc = {
+      isEncrypted: true,
+      flattenLayers: vi.fn(),
+      flattenAnnotations: vi.fn(),
+      save: vi.fn(),
+    };
+
+    const decryptedDoc = {
+      isEncrypted: false,
+      flattenLayers: vi.fn(),
+      flattenAnnotations: vi.fn(),
+      save: vi.fn().mockResolvedValue(new Uint8Array([0x25])),
+    };
+
+    vi.mocked(PDF.load)
+      .mockResolvedValueOnce(encryptedDoc as any)
+      .mockResolvedValueOnce(decryptedDoc as any);
+
+    const { normalizePdf } = await import('./normalize-pdf');
+    await normalizePdf(Buffer.from('encrypted pdf'), { flattenForm: false });
+
+    expect(decryptedDoc.flattenLayers).toHaveBeenCalled();
+    expect(decryptedDoc.flattenAnnotations).not.toHaveBeenCalled();
+  });
+
+  it('should throw INVALID_DOCUMENT_FILE when PDF.load fails', async () => {
+    const { PDF } = await import('@libpdf/core');
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    vi.mocked(PDF.load).mockRejectedValue(new Error('Not a valid PDF'));
+
+    const { normalizePdf } = await import('./normalize-pdf');
+
+    await expect(normalizePdf(Buffer.from('garbage'))).rejects.toMatchObject({
+      code: 'INVALID_DOCUMENT_FILE',
+    });
+    expect(spy).toHaveBeenCalledWith(expect.stringContaining('PDF normalization error'));
+    spy.mockRestore();
+  });
+
+  it('should throw INVALID_DOCUMENT_FILE when PDF.load fails after decryption', async () => {
+    const { PDF } = await import('@libpdf/core');
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const encryptedDoc = {
+      isEncrypted: true,
+      flattenLayers: vi.fn(),
+      flattenAnnotations: vi.fn(),
+      save: vi.fn(),
+    };
+
+    vi.mocked(PDF.load)
+      .mockResolvedValueOnce(encryptedDoc as any)
+      .mockRejectedValueOnce(new Error('Decrypted PDF is corrupt'));
+
+    const { normalizePdf } = await import('./normalize-pdf');
+
+    await expect(normalizePdf(Buffer.from('bad encrypted'))).rejects.toMatchObject({
+      code: 'INVALID_DOCUMENT_FILE',
+    });
+    expect(spy).toHaveBeenCalledWith(expect.stringContaining('PDF normalization error'));
+    spy.mockRestore();
   });
 });

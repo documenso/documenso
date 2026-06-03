@@ -328,7 +328,7 @@ export const EnvelopeDistributeDialog = ({
                                             </SelectItem>
                                           ))}
 
-                                          <SelectItem value={'-1'}>Documenso</SelectItem>
+                                          <SelectItem value={'-1'}>PSD Document Signing</SelectItem>
                                         </SelectContent>
                                       </Select>
                                     </FormControl>
@@ -480,10 +480,10 @@ export const EnvelopeDistributeDialog = ({
 
                     <p className="mt-3">
                       <Trans>
-                        Assign at least one field to each signer — a signature field if they need
-                        to sign, or any other field type (e.g. Text) if they only need to fill in
-                        data. If a recipient only needs to receive or view the document, change
-                        their role to Viewer or CC instead.
+                        Assign at least one field to each signer — a signature field if they need to
+                        sign, or any other field type (e.g. Text) if they only need to fill in data.
+                        If a recipient only needs to receive or view the document, change their role
+                        to Viewer or CC instead.
                       </Trans>
                     </p>
                   </AlertDescription>

@@ -53,6 +53,12 @@ export const DocumentSigningCheckboxField = ({
     },
   );
 
+  const useCustomPositioning =
+    parsedFieldMeta.direction === 'custom' &&
+    parsedFieldMeta.values?.every(
+      (item) => item.offsetX !== undefined && item.offsetY !== undefined,
+    );
+
   const values = parsedFieldMeta.values?.map((item) => ({
     ...item,
     value: item.value.length > 0 ? item.value : `empty-value-${item.id}`,
@@ -265,8 +271,8 @@ export const DocumentSigningCheckboxField = ({
       type="Checkbox"
     >
       {isLoading && (
-        <div className="bg-background absolute inset-0 z-20 flex items-center justify-center rounded-md">
-          <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
+        <div className="absolute inset-0 z-20 flex items-center justify-center rounded-md bg-background">
+          <Loader className="h-5 w-5 animate-spin text-primary md:h-8 md:w-8" />
         </div>
       )}
 
@@ -279,35 +285,65 @@ export const DocumentSigningCheckboxField = ({
           )}
           <div
             className={cn(
-              'z-50 my-0.5 flex gap-1',
-              parsedFieldMeta.direction === 'horizontal'
-                ? 'flex-row flex-wrap'
-                : 'flex-col gap-y-1',
+              'z-50 my-0.5',
+              useCustomPositioning
+                ? 'relative'
+                : cn(
+                    'flex gap-1',
+                    parsedFieldMeta.direction === 'horizontal'
+                      ? 'flex-row flex-wrap'
+                      : 'flex-col gap-y-1',
+                  ),
             )}
           >
-            {values?.map((item: { id: number; value: string; checked: boolean }, index: number) => {
-              const itemValue = item.value || `empty-value-${item.id}`;
+            {values?.map(
+              (
+                item: {
+                  id: number;
+                  value: string;
+                  checked: boolean;
+                  offsetX?: number;
+                  offsetY?: number;
+                },
+                index: number,
+              ) => {
+                const itemValue = item.value || `empty-value-${item.id}`;
 
-              return (
-                <div key={index} className="flex items-center">
-                  <Checkbox
-                    className="h-3 w-3"
-                    id={`checkbox-${field.id}-${item.id}`}
-                    checked={checkedValues.includes(itemValue)}
-                    disabled={isReadOnly}
-                    onCheckedChange={() => handleCheckboxChange(item.value, item.id)}
-                  />
-                  {!item.value.includes('empty-value-') && item.value && (
-                    <Label
-                      htmlFor={`checkbox-${field.id}-${item.id}`}
-                      className="text-foreground ml-1.5 text-xs font-normal"
-                    >
-                      {item.value}
-                    </Label>
-                  )}
-                </div>
-              );
-            })}
+                return (
+                  <div
+                    key={index}
+                    className="flex items-center"
+                    style={
+                      useCustomPositioning &&
+                      item.offsetX !== undefined &&
+                      item.offsetY !== undefined
+                        ? {
+                            position: 'absolute',
+                            left: `${item.offsetX}%`,
+                            top: `${item.offsetY}%`,
+                          }
+                        : undefined
+                    }
+                  >
+                    <Checkbox
+                      className="h-3 w-3"
+                      id={`checkbox-${field.id}-${item.id}`}
+                      checked={checkedValues.includes(itemValue)}
+                      disabled={isReadOnly}
+                      onCheckedChange={() => handleCheckboxChange(item.value, item.id)}
+                    />
+                    {!item.value.includes('empty-value-') && item.value && (
+                      <Label
+                        htmlFor={`checkbox-${field.id}-${item.id}`}
+                        className="ml-1.5 text-xs font-normal text-foreground"
+                      >
+                        {item.value}
+                      </Label>
+                    )}
+                  </div>
+                );
+              },
+            )}
           </div>
         </>
       )}
@@ -315,33 +351,63 @@ export const DocumentSigningCheckboxField = ({
       {field.inserted && (
         <div
           className={cn(
-            'my-0.5 flex gap-1',
-            parsedFieldMeta.direction === 'horizontal' ? 'flex-row flex-wrap' : 'flex-col gap-y-1',
+            'my-0.5',
+            useCustomPositioning
+              ? 'relative'
+              : cn(
+                  'flex gap-1',
+                  parsedFieldMeta.direction === 'horizontal'
+                    ? 'flex-row flex-wrap'
+                    : 'flex-col gap-y-1',
+                ),
           )}
         >
-          {values?.map((item: { id: number; value: string; checked: boolean }, index: number) => {
-            const itemValue = item.value || `empty-value-${item.id}`;
+          {values?.map(
+            (
+              item: {
+                id: number;
+                value: string;
+                checked: boolean;
+                offsetX?: number;
+                offsetY?: number;
+              },
+              index: number,
+            ) => {
+              const itemValue = item.value || `empty-value-${item.id}`;
 
-            return (
-              <div key={index} className="flex items-center">
-                <Checkbox
-                  className="h-3 w-3"
-                  id={`checkbox-${field.id}-${item.id}`}
-                  checked={parsedCheckedValues.includes(itemValue)}
-                  disabled={isLoading || isReadOnly}
-                  onCheckedChange={() => void handleCheckboxOptionClick(item)}
-                />
-                {!item.value.includes('empty-value-') && item.value && (
-                  <Label
-                    htmlFor={`checkbox-${field.id}-${item.id}`}
-                    className="text-foreground ml-1.5 text-xs font-normal"
-                  >
-                    {item.value}
-                  </Label>
-                )}
-              </div>
-            );
-          })}
+              return (
+                <div
+                  key={index}
+                  className="flex items-center"
+                  style={
+                    useCustomPositioning && item.offsetX !== undefined && item.offsetY !== undefined
+                      ? {
+                          position: 'absolute',
+                          left: `${item.offsetX}%`,
+                          top: `${item.offsetY}%`,
+                        }
+                      : undefined
+                  }
+                >
+                  <Checkbox
+                    className="h-3 w-3"
+                    id={`checkbox-${field.id}-${item.id}`}
+                    checked={parsedCheckedValues.includes(itemValue)}
+                    disabled={isLoading || isReadOnly}
+                    onCheckedChange={() => void handleCheckboxOptionClick(item)}
+                  />
+                  {!item.value.includes('empty-value-') && item.value && (
+                    <Label
+                      htmlFor={`checkbox-${field.id}-${item.id}`}
+                      className="ml-1.5 text-xs font-normal text-foreground"
+                    >
+                      {item.value}
+                    </Label>
+                  )}
+                </div>
+              );
+            },
+          )}
         </div>
       )}
     </DocumentSigningFieldContainer>

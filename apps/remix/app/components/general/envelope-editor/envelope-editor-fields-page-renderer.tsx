@@ -15,6 +15,7 @@ import {
   useCurrentEnvelopeRender,
 } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { FIELD_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
+import type { TCheckboxFieldMeta, TRadioFieldMeta } from '@documenso/lib/types/field-meta';
 import {
   MIN_FIELD_HEIGHT_PX,
   MIN_FIELD_WIDTH_PX,
@@ -58,7 +59,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
   const handleResizeOrMove = (event: KonvaEventObject<Event>) => {
     const isDragEvent = event.type === 'dragend';
 
-    const fieldGroup = event.target as Konva.Group;
+    const fieldGroup = event.target;
     const fieldFormId = fieldGroup.id();
 
     // Note: This values are scaled.
@@ -115,6 +116,35 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     const isFieldEditable =
       recipient !== undefined && canRecipientFieldsBeModified(recipient, envelope.fields);
 
+    const onItemDragEnd = ({
+      itemIndex,
+      offsetX,
+      offsetY,
+    }: {
+      itemIndex: number;
+      offsetX: number;
+      offsetY: number;
+    }) => {
+      const meta = field.fieldMeta;
+
+      if (meta?.type !== 'checkbox' && meta?.type !== 'radio') {
+        return;
+      }
+
+      const values = meta.values ? [...meta.values] : [];
+      values[itemIndex] = { ...values[itemIndex], offsetX, offsetY };
+
+      const updatedMeta: TCheckboxFieldMeta | TRadioFieldMeta = {
+        ...meta,
+        direction: 'custom',
+        values,
+      };
+
+      editorFields.updateFieldByFormId(field.formId, {
+        fieldMeta: updatedMeta,
+      });
+    };
+
     const { fieldGroup } = renderField({
       scale,
       pageLayer: pageLayer.current,
@@ -131,6 +161,8 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       color: getRecipientColorKey(field.recipientId),
       editable: isFieldEditable,
       mode: 'edit',
+      onCheckboxItemDragEnd: onItemDragEnd,
+      onRadioItemDragEnd: onItemDragEnd,
     });
 
     if (!isFieldEditable) {
@@ -444,11 +476,13 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
   }, [localPageFields, selectedKonvaFieldGroups]);
 
   const setSelectedFields = (nodes: Konva.Node[]) => {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const fieldGroups = nodes.filter(
-      (node) =>
-        node.hasName('field-group') && Boolean(node.getStage()) && Boolean(node.getParent()),
-    ) as Konva.Group[];
+      (node): node is Konva.Group =>
+        node instanceof Konva.Group &&
+        node.hasName('field-group') &&
+        Boolean(node.getStage()) &&
+        Boolean(node.getParent()),
+    );
 
     interactiveTransformer.current?.nodes(fieldGroups);
     setSelectedKonvaFieldGroups(fieldGroups);

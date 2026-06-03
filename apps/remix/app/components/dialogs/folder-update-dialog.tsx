@@ -1,6 +1,9 @@
-import { useEffect } from 'react';
+// ABOUTME: Dialog for editing folder settings including name, visibility, and per-user/group access control.
+// allowedUserIds and allowedGroupIds restrict folder visibility when non-empty.
+import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
@@ -30,6 +33,7 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
+import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
 import {
   Select,
   SelectContent,
@@ -61,6 +65,19 @@ export const FolderUpdateDialog = ({ folder, isOpen, onOpenChange }: FolderUpdat
   const { toast } = useToast();
   const { mutateAsync: updateFolder } = trpc.folder.updateFolder.useMutation();
 
+  const { data: teamMembers } = trpc.team.member.getMany.useQuery(
+    { teamId: team?.id ?? 0 },
+    { enabled: isOpen && !!team },
+  );
+
+  const { data: teamGroups } = trpc.team.group.find.useQuery(
+    { teamId: team?.id ?? 0, perPage: 100 },
+    { enabled: isOpen && !!team },
+  );
+
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+  const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
+
   const form = useForm<z.infer<typeof ZUpdateFolderFormSchema>>({
     resolver: zodResolver(ZUpdateFolderFormSchema),
     defaultValues: {
@@ -75,8 +92,21 @@ export const FolderUpdateDialog = ({ folder, isOpen, onOpenChange }: FolderUpdat
         name: folder.name,
         visibility: folder.visibility ?? DocumentVisibility.EVERYONE,
       });
+
+      setSelectedUserIds((folder.allowedUserIds ?? []).map(String));
+      setSelectedGroupIds(folder.allowedGroupIds ?? []);
     }
   }, [folder, form]);
+
+  const memberOptions = (teamMembers ?? []).map((member) => ({
+    label: member.name ?? member.email,
+    value: member.userId.toString(),
+  }));
+
+  const groupOptions = (teamGroups?.data ?? []).map((group) => ({
+    label: group.name || group.organisationGroupId,
+    value: group.organisationGroupId,
+  }));
 
   const onFormSubmit = async (data: TUpdateFolderFormSchema) => {
     if (!folder) {
@@ -89,6 +119,8 @@ export const FolderUpdateDialog = ({ folder, isOpen, onOpenChange }: FolderUpdat
         data: {
           name: data.name,
           visibility: data.visibility,
+          allowedUserIds: selectedUserIds.map(Number),
+          allowedGroupIds: selectedGroupIds,
         },
       });
 
@@ -168,6 +200,46 @@ export const FolderUpdateDialog = ({ folder, isOpen, onOpenChange }: FolderUpdat
                 </FormItem>
               )}
             />
+
+            <FormItem>
+              <FormLabel>
+                <Trans>Restrict to Users</Trans>
+              </FormLabel>
+              <MultiSelectCombobox
+                emptySelectionPlaceholder={
+                  <p className="font-normal text-muted-foreground">
+                    <Trans>All team members</Trans>
+                  </p>
+                }
+                enableClearAllButton={true}
+                inputPlaceholder={msg`Search members`}
+                loading={!teamMembers}
+                options={memberOptions}
+                selectedValues={selectedUserIds}
+                onChange={setSelectedUserIds}
+              />
+            </FormItem>
+
+            {groupOptions.length > 0 && (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Restrict to Groups</Trans>
+                </FormLabel>
+                <MultiSelectCombobox
+                  emptySelectionPlaceholder={
+                    <p className="font-normal text-muted-foreground">
+                      <Trans>All groups</Trans>
+                    </p>
+                  }
+                  enableClearAllButton={true}
+                  inputPlaceholder={msg`Search groups`}
+                  loading={!teamGroups}
+                  options={groupOptions}
+                  selectedValues={selectedGroupIds}
+                  onChange={setSelectedGroupIds}
+                />
+              </FormItem>
+            )}
 
             <DialogFooter>
               <DialogClose asChild>

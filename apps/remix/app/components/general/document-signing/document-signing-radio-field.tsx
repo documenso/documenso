@@ -14,6 +14,7 @@ import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
+import { cn } from '@documenso/ui/lib/utils';
 import { Label } from '@documenso/ui/primitives/label';
 import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -38,10 +39,17 @@ export const DocumentSigningRadioField = ({
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
 
-  const { recipient, targetSigner, isAssistantMode } = useDocumentSigningRecipientContext();
+  const { recipient, isAssistantMode } = useDocumentSigningRecipientContext();
 
   const parsedFieldMeta = ZRadioFieldMeta.parse(field.fieldMeta);
   const isReadOnly = parsedFieldMeta.readOnly;
+
+  const useCustomPositioning =
+    parsedFieldMeta.direction === 'custom' &&
+    parsedFieldMeta.values?.every(
+      (item) => item.offsetX !== undefined && item.offsetY !== undefined,
+    );
+
   const values = parsedFieldMeta.values?.map((item) => ({
     ...item,
     value: item.value.length > 0 ? item.value : `empty-value-${item.id}`,
@@ -156,10 +164,31 @@ export const DocumentSigningRadioField = ({
       {!field.inserted && (
         <RadioGroup
           onValueChange={(value) => handleSelectItem(value)}
-          className="z-10 my-0.5 gap-y-1"
+          className={cn(
+            'z-10 my-0.5 gap-1',
+            useCustomPositioning
+              ? 'relative'
+              : cn(
+                  parsedFieldMeta.direction === 'horizontal'
+                    ? 'flex flex-row flex-wrap'
+                    : 'flex flex-col gap-y-1',
+                ),
+          )}
         >
           {values?.map((item, index) => (
-            <div key={index} className="flex items-center">
+            <div
+              key={index}
+              className="flex items-center"
+              style={
+                useCustomPositioning && item.offsetX !== undefined && item.offsetY !== undefined
+                  ? {
+                      position: 'absolute',
+                      left: `${item.offsetX}%`,
+                      top: `${item.offsetY}%`,
+                    }
+                  : undefined
+              }
+            >
               <RadioGroupItem
                 className="h-3 w-3 shrink-0"
                 value={item.value}
@@ -170,7 +199,7 @@ export const DocumentSigningRadioField = ({
               {!item.value.includes('empty-value-') && item.value && (
                 <Label
                   htmlFor={`option-${field.id}-${item.id}`}
-                  className="text-foreground ml-1.5 text-xs font-normal"
+                  className="ml-1.5 text-xs font-normal text-foreground"
                 >
                   {item.value}
                 </Label>
@@ -181,9 +210,32 @@ export const DocumentSigningRadioField = ({
       )}
 
       {field.inserted && (
-        <RadioGroup className="my-0.5 gap-y-1">
+        <RadioGroup
+          className={cn(
+            'my-0.5 gap-1',
+            useCustomPositioning
+              ? 'relative'
+              : cn(
+                  parsedFieldMeta.direction === 'horizontal'
+                    ? 'flex flex-row flex-wrap'
+                    : 'flex flex-col gap-y-1',
+                ),
+          )}
+        >
           {values?.map((item, index) => (
-            <div key={index} className="flex items-center">
+            <div
+              key={index}
+              className="flex items-center"
+              style={
+                useCustomPositioning && item.offsetX !== undefined && item.offsetY !== undefined
+                  ? {
+                      position: 'absolute',
+                      left: `${item.offsetX}%`,
+                      top: `${item.offsetY}%`,
+                    }
+                  : undefined
+              }
+            >
               <RadioGroupItem
                 className="h-3 w-3"
                 value={item.value}
@@ -194,7 +246,7 @@ export const DocumentSigningRadioField = ({
               {!item.value.includes('empty-value-') && item.value && (
                 <Label
                   htmlFor={`option-${field.id}-${item.id}`}
-                  className="text-foreground ml-1.5 text-xs font-normal"
+                  className="ml-1.5 text-xs font-normal text-foreground"
                 >
                   {item.value}
                 </Label>

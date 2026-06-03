@@ -2,12 +2,14 @@ import { EnvelopeType } from '@prisma/client';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import { extractPdfPlaceholders } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { detectAcroFormFields } from '@documenso/lib/server-only/pdf/detect-acroform-fields';
 import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
+import { convertToPdf } from '@documenso/lib/server-only/utils/convert-to-pdf';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
+import { putFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 
 import { insertFormValuesInPdf } from '../../../lib/server-only/pdf/insert-form-values-in-pdf';
 import { authenticatedProcedure } from '../trpc';
@@ -79,7 +81,7 @@ export const createEnvelopeRouteCaller = async ({
     delegatedDocumentOwner,
   } = payload;
 
-  const { remaining, maximumEnvelopeItemCount } = await getServerLimits({
+  const { remaining } = await getServerLimits({
     userId,
     teamId,
   });
@@ -91,24 +93,40 @@ export const createEnvelopeRouteCaller = async ({
     });
   }
 
-  if (files.length > maximumEnvelopeItemCount) {
-    throw new AppError('ENVELOPE_ITEM_LIMIT_EXCEEDED', {
-      message: `You cannot upload more than ${maximumEnvelopeItemCount} envelope items per envelope`,
-      statusCode: 400,
-    });
-  }
+  const ALLOWED_TYPES = new Set([
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/msword',
+  ]);
 
-  if (files.some((file) => !file.type.startsWith('application/pdf'))) {
+  if (files.some((file) => !ALLOWED_TYPES.has(file.type))) {
     throw new AppError('INVALID_DOCUMENT_FILE', {
-      message: 'You cannot upload non-PDF files',
+      message: 'Only PDF and Word documents are allowed',
       statusCode: 400,
     });
   }
 
-  // For each file: normalize, extract & clean placeholders, then upload.
+  const OFFICE_MIME_TO_EXT: Record<string, string> = {
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+    'application/msword': 'doc',
+  };
+
+  // For each file: convert if needed, normalize, extract & clean placeholders, then upload.
   const envelopeItems = await Promise.all(
     files.map(async (file) => {
-      let pdf = Buffer.from(await file.arrayBuffer());
+      let pdf: Buffer;
+      let fileName = file.name;
+      const officeExt = OFFICE_MIME_TO_EXT[file.type];
+
+      if (officeExt) {
+        pdf = await convertToPdf(Buffer.from(await file.arrayBuffer()), officeExt);
+        fileName = fileName.replace(/\.[^.]+$/, '.pdf');
+        if (!fileName.endsWith('.pdf')) {
+          fileName = `${fileName}.pdf`;
+        }
+      } else {
+        pdf = Buffer.from(await file.arrayBuffer());
+      }
 
       // Detect interactive form (AcroForm) fields before the form is flattened
       // by normalizePdf, since flattening permanently removes them.
@@ -129,14 +147,19 @@ export const createEnvelopeRouteCaller = async ({
       // Todo: Embeds - Might need to add this for client-side embeds in the future.
       const { cleanedPdf, placeholders } = await extractPdfPlaceholders(normalized);
 
-      const { documentData } = await putPdfFileServerSide({
-        name: file.name,
+      const { type: storageType, data: storageData } = await putFileServerSide({
+        name: fileName,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(cleanedPdf),
       });
 
+      const documentData = await createDocumentData({
+        type: storageType,
+        data: storageData,
+      });
+
       return {
-        title: file.name,
+        title: fileName,
         documentDataId: documentData.id,
         placeholders,
         detectedFields,

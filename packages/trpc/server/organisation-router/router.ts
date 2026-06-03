@@ -1,5 +1,6 @@
 import { router } from '../trpc';
 import { acceptOrganisationMemberInviteRoute } from './accept-organisation-member-invite';
+import { addOrganisationGroupMembersRoute } from './add-organisation-group-members';
 import { createOrganisationRoute } from './create-organisation';
 import { createOrganisationGroupRoute } from './create-organisation-group';
 import { createOrganisationMemberInvitesRoute } from './create-organisation-member-invites';
@@ -17,6 +18,7 @@ import { getOrganisationMemberInvitesRoute } from './get-organisation-member-inv
 import { getOrganisationSessionRoute } from './get-organisation-session';
 import { getOrganisationsRoute } from './get-organisations';
 import { leaveOrganisationRoute } from './leave-organisation';
+import { removeOrganisationGroupMembersRoute } from './remove-organisation-group-members';
 import { resendOrganisationMemberInviteRoute } from './resend-organisation-member-invite';
 import { updateOrganisationRoute } from './update-organisation';
 import { updateOrganisationGroupRoute } from './update-organisation-group';
@@ -50,6 +52,8 @@ export const organisationRouter = router({
     create: createOrganisationGroupRoute,
     update: updateOrganisationGroupRoute,
     delete: deleteOrganisationGroupRoute,
+    addMembers: addOrganisationGroupMembersRoute,
+    removeMembers: removeOrganisationGroupMembersRoute,
   },
   settings: {
     update: updateOrganisationSettingsRoute,

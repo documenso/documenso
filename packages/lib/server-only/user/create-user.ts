@@ -5,7 +5,11 @@ import { prisma } from '@documenso/prisma';
 
 import { SALT_ROUNDS } from '../../constants/auth';
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import { createPersonalOrganisation } from '../organisation/create-organisation';
+import { generateDatabaseId } from '../../universal/id';
+
+const PSD401_ORG_ID = 'org_psd401district';
+const PSD401_MEMBER_GROUP_ID = 'org_group_psd401_member';
+const PSD401_DEFAULT_TEAM_GROUP_ID = 'org_group_default_member';
 
 export interface CreateUserOptions {
   name: string;
@@ -37,36 +41,50 @@ export const createUser = async ({ name, email, password, signature }: CreateUse
       },
     });
 
-    // Todo: (RR7) Migrate to use this after RR7.
-    // await tx.account.create({
-    //   data: {
-    //     userId: user.id,
-    //     type: 'emailPassword', // Todo: (RR7)
-    //     provider: 'DOCUMENSO', // Todo: (RR7) Enums
-    //     providerAccountId: user.id.toString(),
-    //     password: hashedPassword,
-    //   },
-    // });
-
     return user;
   });
 
-  // Not used at the moment, uncomment if required.
   await onCreateUserHook(user).catch((err) => {
-    // Todo: (RR7) Add logging.
     console.error(err);
   });
 
   return user;
 };
 
-/**
- * Should be run after a user is created, example during email password signup or google sign in.
- *
- * @returns User
- */
 export const onCreateUserHook = async (user: User) => {
-  await createPersonalOrganisation({ userId: user.id });
+  await addUserToPsd401Org(user.id);
 
   return user;
+};
+
+const addUserToPsd401Org = async (userId: number) => {
+  const existing = await prisma.organisationMember.findFirst({
+    where: { userId, organisationId: PSD401_ORG_ID },
+  });
+
+  if (existing) {
+    return;
+  }
+
+  const memberId = generateDatabaseId('member');
+
+  await prisma.organisationMember.create({
+    data: {
+      id: memberId,
+      userId,
+      organisationId: PSD401_ORG_ID,
+      organisationGroupMembers: {
+        create: [
+          {
+            id: generateDatabaseId('group_member'),
+            groupId: PSD401_MEMBER_GROUP_ID,
+          },
+          {
+            id: generateDatabaseId('group_member'),
+            groupId: PSD401_DEFAULT_TEAM_GROUP_ID,
+          },
+        ],
+      },
+    },
+  });
 };

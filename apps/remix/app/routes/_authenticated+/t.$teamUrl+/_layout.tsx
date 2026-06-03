@@ -2,13 +2,9 @@ import { useMemo } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
-import { SubscriptionStatus } from '@prisma/client';
 import { Link, Outlet } from 'react-router';
 
-import {
-  DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT,
-  PAID_PLAN_LIMITS,
-} from '@documenso/ee/server-only/limits/constants';
+import { PAID_PLAN_LIMITS } from '@documenso/ee/server-only/limits/constants';
 import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client';
 import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { TrpcProvider } from '@documenso/trpc/react';
@@ -26,29 +22,10 @@ export default function Layout() {
       return undefined;
     }
 
-    if (
-      organisation?.subscription &&
-      organisation.subscription.status === SubscriptionStatus.INACTIVE
-    ) {
-      return {
-        quota: {
-          documents: 0,
-          recipients: 0,
-          directTemplates: 0,
-        },
-        remaining: {
-          documents: 0,
-          recipients: 0,
-          directTemplates: 0,
-        },
-        maximumEnvelopeItemCount: 0,
-      };
-    }
-
     return {
       quota: PAID_PLAN_LIMITS,
       remaining: PAID_PLAN_LIMITS,
-      maximumEnvelopeItemCount: DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT,
+      maximumEnvelopeItemCount: Number.MAX_SAFE_INTEGER,
     };
   }, [organisation?.subscription]);
 

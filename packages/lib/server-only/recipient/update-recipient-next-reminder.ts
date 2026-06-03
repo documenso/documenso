@@ -80,6 +80,8 @@ export const recomputeNextReminderForEnvelope = async (envelopeId: string) => {
       ? ZEnvelopeReminderSettings.parse(envelope.documentMeta.reminderSettings)
       : null;
 
+  const now = new Date();
+
   const recipients = await prisma.recipient.findMany({
     where: {
       envelopeId,
@@ -87,6 +89,8 @@ export const recomputeNextReminderForEnvelope = async (envelopeId: string) => {
       sendStatus: SendStatus.SENT,
       sentAt: { not: null },
       role: { not: RecipientRole.CC },
+      // Don't reschedule reminders for recipients whose deadline has passed.
+      OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
     },
     select: { id: true, sentAt: true, lastReminderSentAt: true },
   });

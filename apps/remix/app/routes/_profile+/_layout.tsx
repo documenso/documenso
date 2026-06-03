@@ -57,7 +57,7 @@ export default function PublicProfileLayout() {
 
               <img
                 src={LogoIcon}
-                alt="Documenso Logo"
+                alt="PSD Document Signing"
                 width={48}
                 height={48}
                 className="h-10 w-auto sm:hidden dark:invert"

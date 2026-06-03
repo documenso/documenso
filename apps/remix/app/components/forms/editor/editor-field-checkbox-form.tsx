@@ -183,7 +183,21 @@ export const EditorFieldCheckboxForm = ({
                   <Trans>Direction</Trans>
                 </FormLabel>
                 <FormControl>
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select
+                    value={field.value}
+                    onValueChange={(val) => {
+                      field.onChange(val);
+                      if (val !== 'custom') {
+                        const currentValues = form.getValues('values') || [];
+                        const clearedValues = currentValues.map((v) => ({
+                          ...v,
+                          offsetX: undefined,
+                          offsetY: undefined,
+                        }));
+                        form.setValue('values', clearedValues);
+                      }
+                    }}
+                  >
                     <SelectTrigger
                       data-testid="field-form-direction"
                       className="w-full bg-background text-muted-foreground"
@@ -196,6 +210,9 @@ export const EditorFieldCheckboxForm = ({
                       </SelectItem>
                       <SelectItem value="horizontal">
                         <Trans>Horizontal</Trans>
+                      </SelectItem>
+                      <SelectItem value="custom">
+                        <Trans>Custom</Trans>
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -333,12 +350,66 @@ export const EditorFieldCheckboxForm = ({
                     control={form.control}
                     name={`values.${index}.value`}
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex-1">
                         <FormControl>
                           <Input
                             data-testid={`field-form-values-${index}-value`}
                             className="w-full"
                             {...field}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name={`values.${index}.offsetX`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            data-testid={`field-form-values-${index}-offsetX`}
+                            className="w-16"
+                            placeholder="X"
+                            {...field}
+                            value={field.value ?? ''}
+                            onChange={(e) => {
+                              const val =
+                                e.target.value === '' ? undefined : Number(e.target.value);
+                              field.onChange(val);
+                              if (val !== undefined) {
+                                form.setValue('direction', 'custom');
+                              }
+                            }}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name={`values.${index}.offsetY`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            data-testid={`field-form-values-${index}-offsetY`}
+                            className="w-16"
+                            placeholder="Y"
+                            {...field}
+                            value={field.value ?? ''}
+                            onChange={(e) => {
+                              const val =
+                                e.target.value === '' ? undefined : Number(e.target.value);
+                              field.onChange(val);
+                              if (val !== undefined) {
+                                form.setValue('direction', 'custom');
+                              }
+                            }}
                           />
                         </FormControl>
                       </FormItem>

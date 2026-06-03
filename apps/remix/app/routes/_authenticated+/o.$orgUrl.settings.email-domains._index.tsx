@@ -4,7 +4,6 @@ import { Link } from 'react-router';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { canExecuteOrganisationAction, isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -27,10 +26,6 @@ export default function OrganisationSettingsEmailDomains() {
   const isPersonalLayoutMode = isPersonalLayout(organisations);
 
   const isEmailDomainsEnabled = organisation.organisationClaim.flags.emailDomains;
-
-  if (!IS_BILLING_ENABLED()) {
-    return null;
-  }
 
   return (
     <div>

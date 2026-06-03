@@ -31,7 +31,7 @@ export type DocumentUploadButtonProps = {
 };
 
 export const DocumentUploadButton = ({
-  className,
+  className: _className,
   loading,
   onDrop,
   onDropRejected,
@@ -54,6 +54,8 @@ export const DocumentUploadButton = ({
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
       'application/pdf': ['.pdf'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'application/msword': ['.doc'],
     },
     multiple: internalVersion === '2',
     disabled,
@@ -79,7 +81,7 @@ export const DocumentUploadButton = ({
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button className="hover:bg-warning/80 bg-warning" asChild>
+            <Button className="bg-warning hover:bg-warning/80" asChild>
               <Link
                 to={
                   isPersonalLayoutMode

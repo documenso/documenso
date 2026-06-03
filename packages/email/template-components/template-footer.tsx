@@ -15,9 +15,9 @@ export const TemplateFooter = ({ isDocument = true }: TemplateFooterProps) => {
       {isDocument && !branding.brandingHidePoweredBy && (
         <Text className="my-4 text-base text-slate-400">
           <Trans>
-            This document was sent using{' '}
-            <Link className="text-[#7AC455]" href="https://documen.so/mail-footer">
-              Documenso
+            Sent via{' '}
+            <Link className="text-[#1B3A4B]" href="https://documenso.psd401.net">
+              PSD Document Signing
             </Link>
             .
           </Trans>
@@ -39,9 +39,9 @@ export const TemplateFooter = ({ isDocument = true }: TemplateFooterProps) => {
 
       {!branding.brandingEnabled && (
         <Text className="my-8 text-sm text-slate-400">
-          Documenso, Inc.
+          Peninsula School District
           <br />
-          2261 Market Street, #5211, San Francisco, CA 94114, USA
+          14015 1st Ave S, Gig Harbor, WA 98332
         </Text>
       )}
     </Section>

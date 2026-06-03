@@ -568,10 +568,16 @@ export function TemplateUseDialog({
                                           return;
                                         }
 
-                                        if (file.type !== 'application/pdf') {
+                                        const allowedTypes = [
+                                          'application/pdf',
+                                          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                          'application/msword',
+                                        ];
+
+                                        if (!allowedTypes.includes(file.type)) {
                                           form.setError('customDocumentData', {
                                             type: 'manual',
-                                            message: _(msg`Please select a PDF file`),
+                                            message: _(msg`Please select a PDF, DOCX, or DOC file`),
                                           });
 
                                           return;

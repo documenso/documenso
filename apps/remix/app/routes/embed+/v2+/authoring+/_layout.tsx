@@ -116,6 +116,7 @@ export default function AuthoringLayout() {
     organisationId: '',
     teamEmail: null,
     currentTeamRole: TeamMemberRole.MEMBER,
+    isPersonal: false,
     preferences: {
       aiFeaturesEnabled: preferences.aiFeaturesEnabled,
     },
@@ -151,7 +152,7 @@ export default function AuthoringLayout() {
             initialValue={{
               quota: PAID_PLAN_LIMITS,
               remaining: PAID_PLAN_LIMITS,
-              maximumEnvelopeItemCount: organisationClaim.envelopeItemCount,
+              maximumEnvelopeItemCount: Number.MAX_SAFE_INTEGER,
             }}
             teamId={team.id}
           >
@@ -187,8 +188,8 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
               </li>
               <li>
                 <Trans>
-                  If you are using staging, ensure that you have set the host prop on the embedding
-                  component to the staging domain (https://stg-app.documenso.com)
+                  Ensure that you have set the host prop on the embedding component to the correct
+                  domain (https://documenso.psd401.net)
                 </Trans>
               </li>
             </ul>

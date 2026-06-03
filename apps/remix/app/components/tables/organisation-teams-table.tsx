@@ -14,6 +14,7 @@ import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { trpc } from '@documenso/trpc/react';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
+import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
@@ -22,7 +23,15 @@ import { TableCell } from '@documenso/ui/primitives/table';
 
 import { TeamDeleteDialog } from '../dialogs/team-delete-dialog';
 
-export const OrganisationTeamsTable = () => {
+export type OrganisationTeamsTableProps = {
+  selectedTeamIds?: Set<number>;
+  onSelectionChange?: (teamIds: Set<number>) => void;
+};
+
+export const OrganisationTeamsTable = ({
+  selectedTeamIds,
+  onSelectionChange,
+}: OrganisationTeamsTableProps) => {
   const { _, i18n } = useLingui();
 
   const [searchParams] = useSearchParams();
@@ -54,6 +63,28 @@ export const OrganisationTeamsTable = () => {
 
   const columns = useMemo(() => {
     return [
+      ...(onSelectionChange
+        ? [
+            {
+              id: 'select',
+              header: () => null,
+              cell: ({ row }: { row: { original: { id: number } } }) => (
+                <Checkbox
+                  checked={selectedTeamIds?.has(row.original.id) ?? false}
+                  onCheckedChange={(checked) => {
+                    const next = new Set(selectedTeamIds);
+                    if (checked) {
+                      next.add(row.original.id);
+                    } else {
+                      next.delete(row.original.id);
+                    }
+                    onSelectionChange(next);
+                  }}
+                />
+              ),
+            } satisfies DataTableColumnDef<(typeof results)['data'][number]>,
+          ]
+        : []),
       {
         header: _(msg`Team`),
         accessorKey: 'name',
@@ -99,7 +130,7 @@ export const OrganisationTeamsTable = () => {
         ),
       },
     ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
-  }, []);
+  }, [_, i18n, onSelectionChange, selectedTeamIds]);
 
   return (
     <DataTable

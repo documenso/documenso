@@ -2,9 +2,9 @@ import type { Prisma } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
-import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import type { TFolderType } from '../../types/folder-type';
 import type { FindResultResponse } from '../../types/search-params';
+import { buildFolderAccessFilter, getUserTeamGroupIds } from '../../utils/folder-access';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getTeamById } from '../team/get-team';
 
@@ -26,14 +26,13 @@ export const findFolders = async ({
   perPage = 10,
 }: FindFoldersOptions) => {
   const team = await getTeamById({ userId, teamId });
+  const userGroupIds = await getUserTeamGroupIds(userId, teamId);
 
   const whereClause: Prisma.FolderWhereInput = {
     parentId,
     team: buildTeamWhereQuery({ teamId, userId }),
     type,
-    visibility: {
-      in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
-    },
+    ...buildFolderAccessFilter(userId, team.currentTeamRole, userGroupIds),
   };
 
   const [data, count] = await Promise.all([

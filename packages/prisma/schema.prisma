@@ -52,6 +52,12 @@ model User {
   avatarImageId    String?
   disabled         Boolean          @default(false)
 
+  department            String?
+  title                 String?
+  orgUnitPath           String?
+  googleGroups          Json?
+  directoryLastSyncedAt DateTime?
+
   accounts            Account[]
   sessions            Session[]
   passwordResetTokens PasswordResetToken[]
@@ -369,8 +375,10 @@ model Folder {
   createdAt  DateTime           @default(now())
   updatedAt  DateTime           @default(now()) @updatedAt
   subfolders Folder[]           @relation("FolderToFolder")
-  visibility DocumentVisibility @default(EVERYONE)
-  type       FolderType
+  visibility     DocumentVisibility @default(EVERYONE)
+  type           FolderType
+  allowedUserIds  Int[]              @default([])
+  allowedGroupIds String[]           @default([])
 
   @@index([userId])
   @@index([teamId])

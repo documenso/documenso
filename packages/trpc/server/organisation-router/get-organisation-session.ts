@@ -84,9 +84,12 @@ export const getOrganisationSession = async ({
           team.teamGlobalSettings,
         );
 
+        const isPersonal = /^.+-\d+$/.test(team.url);
+
         return {
           ...team,
           currentTeamRole: getHighestTeamRoleInGroup(team.teamGroups),
+          isPersonal,
           preferences: {
             aiFeaturesEnabled: derivedSettings.aiFeaturesEnabled,
           },

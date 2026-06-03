@@ -112,9 +112,14 @@ type CalculateMultiItemPositionOptions = {
   /**
    * The direction of the items.
    */
-  direction: 'horizontal' | 'vertical';
+  direction: 'horizontal' | 'vertical' | 'custom';
 
   type: 'checkbox' | 'radio';
+
+  /**
+   * Per-item offset values used when direction is 'custom'.
+   */
+  item?: { offsetX?: number; offsetY?: number };
 };
 
 /**
@@ -131,12 +136,44 @@ export const calculateMultiItemPosition = (options: CalculateMultiItemPositionOp
     fieldPadding,
     direction,
     type,
+    item,
   } = options;
 
   const innerFieldHeight = fieldHeight - fieldPadding * 2;
   const innerFieldWidth = fieldWidth - fieldPadding; // This is purposefully not using fullPadding to allow flush text.
   const innerFieldX = fieldPadding;
   const innerFieldY = fieldPadding;
+
+  if (direction === 'custom') {
+    const offsetX = item?.offsetX ?? 0;
+    const offsetY = item?.offsetY ?? 0;
+
+    // Use vertical slot dimensions for text width/height when custom-positioned.
+    const itemHeight = innerFieldHeight / itemCount;
+    const y = itemIndex * itemHeight + innerFieldY;
+
+    let itemInputX = innerFieldX + offsetX;
+    let itemInputY = y + itemHeight / 2 - itemSize / 2 + offsetY;
+
+    if (type === 'radio') {
+      itemInputX = innerFieldX + itemSize / 2 + offsetX;
+      itemInputY = y + itemHeight / 2 + offsetY;
+    }
+
+    const textX = innerFieldX + offsetX + itemSize + spacingBetweenItemAndText;
+    const textY = y + offsetY;
+    const textWidth = innerFieldWidth - itemSize - spacingBetweenItemAndText;
+    const textHeight = itemHeight;
+
+    return {
+      itemInputX,
+      itemInputY,
+      textX,
+      textY,
+      textWidth,
+      textHeight,
+    };
+  }
 
   if (direction === 'horizontal') {
     const itemHeight = innerFieldHeight;

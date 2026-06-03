@@ -1,3 +1,5 @@
+// ABOUTME: Renders signature fields onto a Konva canvas layer for edit, sign, and export modes.
+// ABOUTME: Handles typed signatures (with auto-sized font via fitFontSize) and drawn/image signatures.
 import Konva from 'konva';
 
 import { DEFAULT_SIGNATURE_TEXT_FONT_SIZE } from '../../constants/pdf';
@@ -11,6 +13,14 @@ import {
 } from './field-generic-items';
 import { calculateFieldPosition } from './field-renderer';
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
+import { type TextMeasurer, fitFontSize } from './fit-font-size';
+
+const AUTO_FIT_MIN_FONT_SIZE = 10;
+
+const konvaTextMeasurer: TextMeasurer = (text, fontFamily, fontSize, width) => {
+  const probe = new Konva.Text({ text, fontFamily, fontSize, width, wrap: 'char' });
+  return probe.height();
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let SkiaImage: any = undefined;
@@ -49,7 +59,7 @@ const createFieldSignature = (
   const { pageWidth, pageHeight, mode = 'edit', translations } = options;
 
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
-  const fontSize = field.fieldMeta?.fontSize || DEFAULT_SIGNATURE_TEXT_FONT_SIZE;
+  let configuredFontSize = field.fieldMeta?.fontSize || DEFAULT_SIGNATURE_TEXT_FONT_SIZE;
 
   const fieldText = new Konva.Text({
     id: `${field.renderId}-text`,
@@ -81,6 +91,15 @@ const createFieldSignature = (
 
     if (signature?.typedSignature) {
       textToRender = signature.typedSignature;
+      configuredFontSize = fitFontSize(
+        signature.typedSignature,
+        'Caveat, sans-serif',
+        fieldWidth,
+        fieldHeight,
+        configuredFontSize,
+        AUTO_FIT_MIN_FONT_SIZE,
+        konvaTextMeasurer,
+      );
     }
 
     if (signature?.signatureImageAsBase64) {
@@ -131,7 +150,7 @@ const createFieldSignature = (
     verticalAlign: 'middle',
     wrap: 'char',
     text: textToRender,
-    fontSize,
+    fontSize: configuredFontSize,
     fontFamily: 'Caveat, sans-serif',
     align: 'center',
     width: fieldWidth,
@@ -154,6 +173,7 @@ export const renderSignatureFieldElement = (
   // Clear previous children and listeners to re-render fresh.
   fieldGroup.removeChildren();
   fieldGroup.off('transform');
+  fieldGroup.off('transformend');
 
   // Assign elements to group and any listeners that should only be run on initialization.
   if (isFirstRender) {
@@ -214,6 +234,22 @@ export const renderSignatureFieldElement = (
     // Update text dimensions
     fieldSignature.width(rectWidth); // Account for padding
     fieldSignature.height(rectHeight);
+
+    // Re-run auto-sizing for typed signatures after resize.
+    const typedSignature = field.signature?.typedSignature;
+    if (fieldSignature instanceof Konva.Text && typedSignature) {
+      const maxFontSize = field.fieldMeta?.fontSize || DEFAULT_SIGNATURE_TEXT_FONT_SIZE;
+      const autoFontSize = fitFontSize(
+        typedSignature,
+        'Caveat, sans-serif',
+        rectWidth,
+        rectHeight,
+        maxFontSize,
+        AUTO_FIT_MIN_FONT_SIZE,
+        konvaTextMeasurer,
+      );
+      fieldSignature.fontSize(autoFontSize);
+    }
 
     // Force Konva to recalculate text layout
     fieldSignature.height();

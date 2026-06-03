@@ -1,9 +1,12 @@
+// ABOUTME: Konva renderer for checkbox field elements on the PDF canvas.
+// ABOUTME: Supports vertical, horizontal, and custom drag-positioned layouts.
 import Konva from 'konva';
 import { match } from 'ts-pattern';
 
 import { DEFAULT_STANDARD_FONT_SIZE } from '../../constants/pdf';
 import type { TCheckboxFieldMeta } from '../../types/field-meta';
 import { parseCheckboxCustomText } from '../../utils/fields';
+import { type OnItemDragEnd, setupItemDrag } from './field-drag-utils';
 import {
   createFieldHoverInteraction,
   konvaTextFill,
@@ -25,12 +28,14 @@ const calculateCheckboxSize = (fontSize: number) => {
 export const renderCheckboxFieldElement = (
   field: FieldToRender,
   options: RenderFieldElementOptions,
+  onItemDragEnd?: OnItemDragEnd,
 ) => {
   const { pageWidth, pageHeight, pageLayer, mode, color } = options;
 
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
-  const checkboxMeta: TCheckboxFieldMeta | null = (field.fieldMeta as TCheckboxFieldMeta) || null;
+  const checkboxMeta: TCheckboxFieldMeta | null =
+    field.fieldMeta?.type === 'checkbox' ? field.fieldMeta : null;
   const checkboxValues = checkboxMeta?.values || [];
 
   const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);
@@ -63,24 +68,12 @@ export const renderCheckboxFieldElement = (
     const rectWidth = fieldRect.width() * groupScaleX;
     const rectHeight = fieldRect.height() * groupScaleY;
 
-    const squares = fieldGroup
-      .find('.checkbox-square')
-      .sort((a, b) => a.id().localeCompare(b.id(), undefined, { numeric: true }));
-    const checkmarks = fieldGroup
-      .find('.checkbox-checkmark')
-      .sort((a, b) => a.id().localeCompare(b.id(), undefined, { numeric: true }));
-    const text = fieldGroup
-      .find('.checkbox-text')
+    const itemGroups = fieldGroup
+      .find<Konva.Group>('.checkbox-item')
       .sort((a, b) => a.id().localeCompare(b.id(), undefined, { numeric: true }));
 
-    const groupedItems = squares.map((square, i) => ({
-      squareElement: square,
-      checkmarkElement: checkmarks[i],
-      textElement: text[i],
-    }));
-
-    groupedItems.forEach((item, i) => {
-      const { squareElement, checkmarkElement, textElement } = item;
+    itemGroups.forEach((itemGroup, i) => {
+      const checkboxValue = checkboxValues[i];
 
       const { itemInputX, itemInputY, textX, textY, textWidth, textHeight } =
         calculateMultiItemPosition({
@@ -93,21 +86,26 @@ export const renderCheckboxFieldElement = (
           fieldPadding: checkboxFieldPadding,
           direction: checkboxMeta?.direction || 'vertical',
           type: 'checkbox',
+          item: checkboxValue,
         });
 
-      squareElement.setAttrs({
+      const squareElement = itemGroup.findOne('.checkbox-square');
+      const checkmarkElement = itemGroup.findOne('.checkbox-checkmark');
+      const textElement = itemGroup.findOne('.checkbox-text');
+
+      squareElement?.setAttrs({
         x: itemInputX,
         y: itemInputY,
         scaleX: 1,
         scaleY: 1,
       });
 
-      checkmarkElement.setAttrs({
+      checkmarkElement?.setAttrs({
         x: itemInputX,
         y: itemInputY,
       });
 
-      textElement.setAttrs({
+      textElement?.setAttrs({
         x: textX,
         y: textY,
         scaleX: 1,
@@ -132,7 +130,9 @@ export const renderCheckboxFieldElement = (
 
   const checkedValues: number[] = field.customText ? parseCheckboxCustomText(field.customText) : [];
 
-  checkboxValues.forEach(({ value, checked }, index) => {
+  checkboxValues.forEach((checkboxValue, index) => {
+    const { value, checked } = checkboxValue;
+
     const isCheckboxChecked = match(mode)
       .with('edit', () => checked)
       .with('sign', () => checkedValues.includes(index))
@@ -159,7 +159,14 @@ export const renderCheckboxFieldElement = (
         fieldPadding: checkboxFieldPadding,
         direction: checkboxMeta?.direction || 'vertical',
         type: 'checkbox',
+        item: checkboxValue,
       });
+
+    // Wrap each item's elements in a named group to support individual drag.
+    const itemGroup = new Konva.Group({
+      id: `checkbox-item-${index}`,
+      name: 'checkbox-item',
+    });
 
     const square = new Konva.Rect({
       internalCheckboxIndex: index,
@@ -205,10 +212,41 @@ export const renderCheckboxFieldElement = (
       verticalAlign: 'middle',
     });
 
-    fieldGroup.add(square);
-    fieldGroup.add(checkmark);
-    fieldGroup.add(text);
+    itemGroup.add(square);
+    itemGroup.add(checkmark);
+    itemGroup.add(text);
+
+    if (mode === 'edit' && checkboxMeta?.direction === 'custom' && onItemDragEnd) {
+      const currentOX = checkboxValue.offsetX ?? 0;
+      const currentOY = checkboxValue.offsetY ?? 0;
+      const baseX = itemInputX - currentOX;
+      const baseY = itemInputY - currentOY;
+
+      setupItemDrag({
+        itemGroup,
+        index,
+        currentOffsetX: currentOX,
+        currentOffsetY: currentOY,
+        clampOffset: (rawOffsetX, rawOffsetY) => ({
+          offsetX: Math.max(-baseX, Math.min(fieldWidth - baseX - itemSize, rawOffsetX)),
+          offsetY: Math.max(-baseY, Math.min(fieldHeight - baseY - itemSize, rawOffsetY)),
+        }),
+        onItemDragEnd,
+      });
+    }
+
+    fieldGroup.add(itemGroup);
   });
+
+  if (checkboxMeta?.direction === 'custom' && checkboxValues.length > 0) {
+    const clientRect = fieldGroup.getClientRect({ relativeTo: fieldGroup });
+    fieldRect.setAttrs({
+      x: clientRect.x,
+      y: clientRect.y,
+      width: clientRect.width,
+      height: clientRect.height,
+    });
+  }
 
   if (color !== 'readOnly' && mode !== 'export') {
     createFieldHoverInteraction({ fieldGroup, fieldRect, options, field });

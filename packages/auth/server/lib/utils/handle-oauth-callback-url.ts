@@ -9,6 +9,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
 import { deletedServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
 import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
+import { syncGoogleDirectory } from '@documenso/lib/server-only/user/sync-google-directory';
 import { env } from '@documenso/lib/utils/env';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { prisma } from '@documenso/prisma';
@@ -55,6 +56,13 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
 
   // Directly log in user if account already exists.
   if (existingAccount) {
+    if (clientOptions.id === 'google') {
+      await syncGoogleDirectory(existingAccount.user.id, email).catch((err: unknown) => {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        console.warn(`[directory-sync] Sync failed: ${message}`);
+      });
+    }
+
     await onAuthorize({ userId: existingAccount.user.id }, c);
 
     return c.redirect(redirectPath, 302);
@@ -112,6 +120,13 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
       }
     });
 
+    if (clientOptions.id === 'google') {
+      await syncGoogleDirectory(userWithSameEmail.id, email).catch((err: unknown) => {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        console.warn(`[directory-sync] Sync failed: ${message}`);
+      });
+    }
+
     await onAuthorize({ userId: userWithSameEmail.id }, c);
 
     return c.redirect(redirectPath, 302);
@@ -165,6 +180,13 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
     // Todo: (RR7) Add logging.
     console.error(err);
   });
+
+  if (clientOptions.id === 'google') {
+    await syncGoogleDirectory(createdUser.id, email).catch((err: unknown) => {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      console.warn(`[directory-sync] Sync failed: ${message}`);
+    });
+  }
 
   await onAuthorize({ userId: createdUser.id }, c);
 
@@ -227,11 +249,11 @@ export const validateOauth = async (options: HandleOAuthCallbackUrlOptions) => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const claims = decodeIdToken(tokens.idToken()) as Record<string, unknown>;
 
-  const email = claims.email;
+  const rawEmail = claims.email;
   const name = claims.name;
   const sub = claims.sub;
 
-  if (typeof email !== 'string') {
+  if (typeof rawEmail !== 'string') {
     throw new AppError(AuthenticationErrorCode.InvalidRequest, {
       message: 'Missing email',
     });
@@ -248,6 +270,8 @@ export const validateOauth = async (options: HandleOAuthCallbackUrlOptions) => {
       message: 'Missing sub claim',
     });
   }
+
+  const email = rawEmail.toLowerCase();
 
   if (claims.email_verified !== true && !clientOptions.bypassEmailVerification) {
     throw new AppError(AuthenticationErrorCode.UnverifiedEmail, {

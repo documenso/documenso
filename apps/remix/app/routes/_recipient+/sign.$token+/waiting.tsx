@@ -56,7 +56,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       team = await getTeamById({
         userId: user.id,
         teamId: document.teamId,
-      });
+      }).catch(() => null);
     }
   }
 

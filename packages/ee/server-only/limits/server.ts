@@ -1,17 +1,6 @@
-import { DocumentSource, EnvelopeType, SubscriptionStatus } from '@prisma/client';
-import { DateTime } from 'luxon';
-
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
-import { prisma } from '@documenso/prisma';
-
-import {
-  FREE_PLAN_LIMITS,
-  INACTIVE_PLAN_LIMITS,
-  PAID_PLAN_LIMITS,
-  SELFHOSTED_PLAN_LIMITS,
-} from './constants';
-import { ERROR_CODES } from './errors';
+// ABOUTME: Server-side limits resolver for the self-hosted PSD401 deployment.
+// ABOUTME: Billing is stripped; all requests return SELFHOSTED_PLAN_LIMITS unconditionally.
+import { SELFHOSTED_PLAN_LIMITS } from './constants';
 import type { TLimitsResponseSchema } from './schema';
 
 export type GetServerLimitsOptions = {
@@ -19,109 +8,12 @@ export type GetServerLimitsOptions = {
   teamId: number;
 };
 
-export const getServerLimits = async ({
-  userId,
-  teamId,
-}: GetServerLimitsOptions): Promise<TLimitsResponseSchema> => {
-  const organisation = await prisma.organisation.findFirst({
-    where: {
-      teams: {
-        some: {
-          id: teamId,
-        },
-      },
-      members: {
-        some: {
-          userId,
-        },
-      },
-    },
-    include: {
-      subscription: true,
-      organisationClaim: true,
-    },
+export const getServerLimits = async (
+  _options: GetServerLimitsOptions,
+): Promise<TLimitsResponseSchema> => {
+  return Promise.resolve({
+    quota: SELFHOSTED_PLAN_LIMITS,
+    remaining: SELFHOSTED_PLAN_LIMITS,
+    maximumEnvelopeItemCount: Number.MAX_SAFE_INTEGER,
   });
-
-  if (!organisation) {
-    throw new Error(ERROR_CODES.USER_FETCH_FAILED);
-  }
-
-  const quota = structuredClone(FREE_PLAN_LIMITS);
-  const remaining = structuredClone(FREE_PLAN_LIMITS);
-
-  const subscription = organisation.subscription;
-  const maximumEnvelopeItemCount = organisation.organisationClaim.envelopeItemCount;
-
-  if (!IS_BILLING_ENABLED()) {
-    return {
-      quota: SELFHOSTED_PLAN_LIMITS,
-      remaining: SELFHOSTED_PLAN_LIMITS,
-      maximumEnvelopeItemCount,
-    };
-  }
-
-  // Bypass all limits even if plan expired for ENTERPRISE.
-  if (organisation.organisationClaimId === INTERNAL_CLAIM_ID.ENTERPRISE) {
-    return {
-      quota: PAID_PLAN_LIMITS,
-      remaining: PAID_PLAN_LIMITS,
-      maximumEnvelopeItemCount,
-    };
-  }
-
-  // Early return for users with an expired subscription.
-  if (subscription && subscription.status === SubscriptionStatus.INACTIVE) {
-    return {
-      quota: INACTIVE_PLAN_LIMITS,
-      remaining: INACTIVE_PLAN_LIMITS,
-      maximumEnvelopeItemCount,
-    };
-  }
-
-  // Allow unlimited documents for users with an unlimited documents claim.
-  // This also allows "free" claim users without subscriptions if they have this flag.
-  if (organisation.organisationClaim.flags.unlimitedDocuments) {
-    return {
-      quota: PAID_PLAN_LIMITS,
-      remaining: PAID_PLAN_LIMITS,
-      maximumEnvelopeItemCount,
-    };
-  }
-
-  const [documents, directTemplates] = await Promise.all([
-    prisma.envelope.count({
-      where: {
-        type: EnvelopeType.DOCUMENT,
-        team: {
-          organisationId: organisation.id,
-        },
-        createdAt: {
-          gte: DateTime.utc().startOf('month').toJSDate(),
-        },
-        source: {
-          not: DocumentSource.TEMPLATE_DIRECT_LINK,
-        },
-      },
-    }),
-    prisma.envelope.count({
-      where: {
-        type: EnvelopeType.TEMPLATE,
-        team: {
-          organisationId: organisation.id,
-        },
-        directLink: {
-          isNot: null,
-        },
-      },
-    }),
-  ]);
-
-  remaining.documents = Math.max(remaining.documents - documents, 0);
-  remaining.directTemplates = Math.max(remaining.directTemplates - directTemplates, 0);
-
-  return {
-    quota,
-    remaining,
-    maximumEnvelopeItemCount,
-  };
 };

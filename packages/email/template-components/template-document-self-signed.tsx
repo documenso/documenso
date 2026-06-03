@@ -39,7 +39,7 @@ export const TemplateDocumentSelfSigned = ({
           </Column>
         </Section>
 
-        <Text className="text-primary mb-0 mt-6 text-center text-lg font-semibold">
+        <Text className="mb-0 mt-6 text-center text-lg font-semibold text-primary">
           <Trans>You have signed “{documentName}”</Trans>
         </Text>
 
@@ -49,7 +49,7 @@ export const TemplateDocumentSelfSigned = ({
             <Link
               href={signUpUrl}
               target="_blank"
-              className="text-documenso-700 hover:text-documenso-600 whitespace-nowrap"
+              className="whitespace-nowrap text-documenso-700 hover:text-documenso-600"
             >
               free account
             </Link>{' '}
@@ -67,17 +67,6 @@ export const TemplateDocumentSelfSigned = ({
               className="mb-0.5 mr-2 inline h-5 w-5 align-middle"
             />
             <Trans>Create account</Trans>
-          </Button>
-
-          <Button
-            className="rounded-lg border border-solid border-slate-200 px-4 py-2 text-center text-sm font-medium text-black no-underline"
-            href="https://documenso.com/pricing"
-          >
-            <Img
-              src={getAssetUrl('/static/review.png')}
-              className="mb-0.5 mr-2 inline h-5 w-5 align-middle"
-            />
-            <Trans>View plans</Trans>
           </Button>
         </Section>
       </Section>

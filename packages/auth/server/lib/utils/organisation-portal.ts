@@ -1,4 +1,3 @@
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
@@ -37,12 +36,6 @@ export const getOrganisationAuthenticationPortalOptions = async (
   if (!organisation) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Organisation not found',
-    });
-  }
-
-  if (!IS_BILLING_ENABLED()) {
-    throw new AppError(AppErrorCode.NOT_SETUP, {
-      message: 'Billing is not enabled',
     });
   }
 

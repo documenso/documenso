@@ -9,7 +9,6 @@ import { match } from 'ts-pattern';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
-import { IS_BILLING_ENABLED } from '../../constants/app';
 import {
   LOWEST_ORGANISATION_ROLE,
   ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP,
@@ -90,7 +89,7 @@ export const createTeam = async ({
   }
 
   // Validate they have enough team slots. 0 means they can create unlimited teams.
-  if (organisation.organisationClaim.teamCount !== 0 && IS_BILLING_ENABLED()) {
+  if (organisation.organisationClaim.teamCount !== 0) {
     const teamCount = await prisma.team.count({
       where: {
         organisationId,
@@ -170,7 +169,7 @@ export const createTeam = async ({
 
         // Create the internal team groups.
         await Promise.all(
-          TEAM_INTERNAL_GROUPS.map(async (teamGroup) =>
+          TEAM_INTERNAL_GROUPS.map((teamGroup) =>
             tx.organisationGroup.create({
               data: {
                 id: generateDatabaseId('org_group'),

@@ -2,7 +2,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 import type { DocumentVisibility } from '@documenso/prisma/generated/types';
 
-import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
+import { buildFolderAccessFilter, getUserTeamGroupIds } from '../../utils/folder-access';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getTeamById } from '../team/get-team';
 
@@ -15,13 +15,16 @@ export interface UpdateFolderOptions {
     name?: string;
     visibility?: DocumentVisibility;
     pinned?: boolean;
+    allowedUserIds?: number[];
+    allowedGroupIds?: string[];
   };
 }
 
 export const updateFolder = async ({ userId, teamId, folderId, data }: UpdateFolderOptions) => {
-  const { parentId, name, visibility, pinned } = data;
+  const { parentId, name, visibility, pinned, allowedUserIds, allowedGroupIds } = data;
 
   const team = await getTeamById({ userId, teamId });
+  const userGroupIds = await getUserTeamGroupIds(userId, teamId);
 
   const folder = await prisma.folder.findFirst({
     where: {
@@ -30,16 +33,7 @@ export const updateFolder = async ({ userId, teamId, folderId, data }: UpdateFol
         teamId,
         userId,
       }),
-      // The creator can always find and manage their own folder regardless of its
-      // visibility tier, otherwise the folder must be visible to the user's role.
-      OR: [
-        {
-          visibility: {
-            in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
-          },
-        },
-        { userId },
-      ],
+      ...buildFolderAccessFilter(userId, team.currentTeamRole, userGroupIds),
     },
   });
 
@@ -109,6 +103,8 @@ export const updateFolder = async ({ userId, teamId, folderId, data }: UpdateFol
       visibility,
       parentId,
       pinned,
+      ...(allowedUserIds !== undefined ? { allowedUserIds } : {}),
+      ...(allowedGroupIds !== undefined ? { allowedGroupIds } : {}),
     },
   });
 };

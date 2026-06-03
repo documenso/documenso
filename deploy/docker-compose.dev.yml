@@ -1,0 +1,62 @@
+name: documenso-psd401-dev
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: documenso
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: documenso
+    ports:
+      - '54320:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  inbucket:
+    image: inbucket/inbucket
+    ports:
+      - '9000:9000' # Web UI
+      - '2500:2500' # SMTP
+      - '1100:1100' # POP3
+
+  documenso:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    hostname: mail.documenso.psd401.net
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - '3000:3000'
+    environment:
+      PORT: '3000'
+      NEXT_PRIVATE_DATABASE_URL: postgresql://documenso:devpassword@postgres:5432/documenso
+      NEXT_PRIVATE_DIRECT_DATABASE_URL: postgresql://documenso:devpassword@postgres:5432/documenso
+      NEXTAUTH_SECRET: 'dev-secret-do-not-use-in-production'
+      NEXT_PRIVATE_ENCRYPTION_KEY: '209f9557e82ed5972beac6828035b38d0e36ee91046cd459631d30ec9706c975'
+      NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: '7165c6cd3e5b4a1a7014ff4bae46e39c3ccd89dc67cd9ab48eedd59dbefe0ea3'
+      NEXT_PUBLIC_WEBAPP_URL: http://localhost:3000
+      NEXT_PRIVATE_INTERNAL_WEBAPP_URL: http://localhost:3000
+      NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: /opt/documenso/cert.p12
+      NEXT_PRIVATE_SIGNING_PASSPHRASE: 'documenso-demo'
+      NEXT_PUBLIC_UPLOAD_TRANSPORT: database
+      # Local mail catcher - no real emails sent
+      NEXT_PRIVATE_SMTP_TRANSPORT: smtp-auth
+      NEXT_PRIVATE_SMTP_HOST: inbucket
+      NEXT_PRIVATE_SMTP_PORT: '2500'
+      NEXT_PRIVATE_SMTP_FROM_NAME: PSD401 Document Signing
+      NEXT_PRIVATE_SMTP_FROM_ADDRESS: noreply-documenso@psd401.net
+      NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS: 'true'
+      NEXT_PUBLIC_DISABLE_SIGNUP: 'false'
+      # Billing enabled so we can test the enterprise feature gates
+      NEXT_PUBLIC_FEATURE_BILLING_ENABLED: 'true'
+      DOCUMENSO_DISABLE_TELEMETRY: 'true'
+    extra_hosts:
+      - 'license.documenso.com:127.0.0.1'
+    volumes:
+      - ./cert.p12:/opt/documenso/cert.p12:ro
+
+volumes:
+  pgdata:

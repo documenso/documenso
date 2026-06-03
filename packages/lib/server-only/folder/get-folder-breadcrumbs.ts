@@ -1,10 +1,7 @@
-import { TeamMemberRole } from '@prisma/client';
-import { match } from 'ts-pattern';
-
 import { prisma } from '@documenso/prisma';
 
-import { DocumentVisibility } from '../../types/document-visibility';
 import type { TFolderType } from '../../types/folder-type';
+import { buildFolderAccessFilter, getUserTeamGroupIds } from '../../utils/folder-access';
 import { getTeamById } from '../team/get-team';
 
 export interface GetFolderBreadcrumbsOptions {
@@ -21,29 +18,15 @@ export const getFolderBreadcrumbs = async ({
   type,
 }: GetFolderBreadcrumbsOptions) => {
   const team = await getTeamById({ userId, teamId });
+  const userGroupIds = await getUserTeamGroupIds(userId, teamId);
 
-  const visibilityFilters = match(team.currentTeamRole)
-    .with(TeamMemberRole.ADMIN, () => ({
-      visibility: {
-        in: [
-          DocumentVisibility.EVERYONE,
-          DocumentVisibility.MANAGER_AND_ABOVE,
-          DocumentVisibility.ADMIN,
-        ],
-      },
-    }))
-    .with(TeamMemberRole.MANAGER, () => ({
-      visibility: {
-        in: [DocumentVisibility.EVERYONE, DocumentVisibility.MANAGER_AND_ABOVE],
-      },
-    }))
-    .otherwise(() => ({ visibility: DocumentVisibility.EVERYONE }));
+  const accessFilter = buildFolderAccessFilter(userId, team.currentTeamRole, userGroupIds);
 
   const whereClause = (folderId: string) => ({
     id: folderId,
     ...(type ? { type } : {}),
     OR: [
-      { teamId, ...visibilityFilters },
+      { teamId, ...accessFilter },
       { userId, teamId },
     ],
   });

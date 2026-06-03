@@ -480,6 +480,10 @@ const decorateAndSignPdf = async ({
   mergePageContentStreams(pdfDoc);
   pdfDoc.flattenAll();
 
+  // @libpdf/core's flattenAll misses some AcroForm fields (e.g. Word-origin /Tx fields).
+  // Nuke the entire AcroForm dictionary so no interactive fields survive into the signed PDF.
+  pdfDoc.context.catalog.removeAcroForm();
+
   pdfDoc = await PDF.load(await pdfDoc.save({ useXRefStream: true }));
 
   const pdfBytes = await signPdf({ pdf: pdfDoc });

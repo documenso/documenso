@@ -6,9 +6,8 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { ExternalLinkIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { Link, useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
 import type { z } from 'zod';
 
@@ -340,8 +339,9 @@ const BillingPlanForm = ({
         className="flex w-full items-center justify-center"
         defaultValue="monthlyPrice"
         value={billingPeriod}
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        onValueChange={(value) => onBillingPeriodChange(value as 'monthlyPrice' | 'yearlyPrice')}
+        onValueChange={(value) =>
+          onBillingPeriodChange(value === 'monthlyPrice' ? 'monthlyPrice' : 'yearlyPrice')
+        }
       >
         <TabsList className="flex w-full justify-center">
           <TabsTrigger className="w-full" value="monthlyPrice">
@@ -357,9 +357,9 @@ const BillingPlanForm = ({
         <button
           onClick={() => onChange('')}
           className={cn(
-            'hover:border-primary flex cursor-pointer items-center space-x-2 rounded-md border p-4 transition-all hover:shadow-sm',
+            'flex cursor-pointer items-center space-x-2 rounded-md border p-4 transition-all hover:border-primary hover:shadow-sm',
             {
-              'ring-primary/10 border-primary ring-2 ring-offset-1': '' === value,
+              'border-primary ring-2 ring-primary/10 ring-offset-1': '' === value,
             },
           )}
           disabled={!canCreateFreeOrganisation}
@@ -390,9 +390,9 @@ const BillingPlanForm = ({
             key={plan[billingPeriod]?.id}
             onClick={() => onChange(plan[billingPeriod]?.id ?? '')}
             className={cn(
-              'hover:border-primary flex cursor-pointer items-center space-x-2 rounded-md border p-4 transition-all hover:shadow-sm',
+              'flex cursor-pointer items-center space-x-2 rounded-md border p-4 transition-all hover:border-primary hover:shadow-sm',
               {
-                'ring-primary/10 border-primary ring-2 ring-offset-1':
+                'border-primary ring-2 ring-primary/10 ring-offset-1':
                   plan[billingPeriod]?.id === value,
               },
             )}
@@ -403,7 +403,7 @@ const BillingPlanForm = ({
             </div>
             <div className="whitespace-nowrap text-right text-sm font-medium">
               <p>{plan[billingPeriod]?.friendlyPrice}</p>
-              <span className="text-muted-foreground text-xs">
+              <span className="text-xs text-muted-foreground">
                 {billingPeriod === 'monthlyPrice' ? (
                   <Trans>per month</Trans>
                 ) : (
@@ -413,33 +413,6 @@ const BillingPlanForm = ({
             </div>
           </button>
         ))}
-
-        <Link
-          to="https://documen.so/enterprise-cta"
-          target="_blank"
-          className="bg-muted/30 flex items-center space-x-2 rounded-md border p-4"
-        >
-          <div className="flex-1 font-normal">
-            <p className="text-muted-foreground font-medium">
-              <Trans>Enterprise</Trans>
-            </p>
-            <p className="text-muted-foreground flex flex-row items-center gap-1">
-              <Trans>Contact sales here</Trans>
-              <ExternalLinkIcon className="h-4 w-4" />
-            </p>
-          </div>
-        </Link>
-      </div>
-
-      <div className="mt-6 text-center">
-        <Link
-          to="https://documenso.com/pricing"
-          className="text-primary hover:text-primary/80 flex items-center justify-center gap-1 text-sm hover:underline"
-          target="_blank"
-        >
-          <Trans>Compare all plans and features in detail</Trans>
-          <ExternalLinkIcon className="h-4 w-4" />
-        </Link>
       </div>
     </div>
   );
