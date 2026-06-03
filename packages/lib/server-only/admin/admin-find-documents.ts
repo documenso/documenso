@@ -10,7 +10,7 @@ export interface AdminFindDocumentsOptions {
   perPage?: number;
 }
 
-const ZPositiveIntegerSchema = z.number().int().positive();
+const ZPositiveIntegerSchema = z.coerce.number().int().positive();
 
 const emptyResponse = {
   data: [],
