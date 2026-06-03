@@ -2256,6 +2256,10 @@ msgstr "Before you get started, please confirm your email address by clicking th
 msgid "Billing"
 msgstr "Billing"
 
+#: apps/remix/app/components/forms/public-profile-form.tsx
+msgid "Bio"
+msgstr "Bio"
+
 #: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
 msgid "Black"
 msgstr "Black"
@@ -3838,6 +3842,10 @@ msgstr "Developer Mode"
 #: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Device"
 msgstr "Device"
+
+#: packages/email/template-components/template-footer.tsx
+msgid "Did not expect this email? <0>Click here to report the sender</0>. Never sign a document you don't recognize or weren't expecting."
+msgstr "Did not expect this email? <0>Click here to report the sender</0>. Never sign a document you don't recognize or weren't expecting."
 
 #: packages/email/templates/reset-password.tsx
 msgid "Didn't request a password change? We are here to help you secure your account, just <0>contact us</0>."
@@ -6010,6 +6018,10 @@ msgstr "If there is any issue with your subscription, please contact us at <0>{S
 #: apps/remix/app/routes/embed+/v2+/authoring+/_layout.tsx
 msgid "If you are using staging, ensure that you have set the host prop on the embedding component to the staging domain (https://stg-app.documenso.com)"
 msgstr "If you are using staging, ensure that you have set the host prop on the embedding component to the staging domain (https://stg-app.documenso.com)"
+
+#: apps/remix/app/routes/_recipient+/report.$token.tsx
+msgid "If you did not expect this email or believe it is spam, you can report the sender to our team for review."
+msgstr "If you did not expect this email or believe it is spam, you can report the sender to our team for review."
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "If you didn't expect this account or have any questions, please <0>contact support</0>."
@@ -8752,6 +8764,19 @@ msgstr "Reply to email"
 msgid "Reply To Email <0>(Optional)</0>"
 msgstr "Reply To Email <0>(Optional)</0>"
 
+#: apps/remix/app/routes/_recipient+/report.$token.tsx
+msgid "Report sender"
+msgstr "Report sender"
+
+#: apps/remix/app/routes/_recipient+/report.$token.tsx
+msgid "Report this sender?"
+msgstr "Report this sender?"
+
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+#: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
+msgid "Reports"
+msgstr "Reports"
+
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Request"
 msgstr "Request"
@@ -9052,8 +9077,8 @@ msgid "Search by claim ID or name"
 msgstr "Search by claim ID or name"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
-msgid "Search by document title"
-msgstr "Search by document title"
+msgid "Search by document title, team:123 or user:123"
+msgstr "Search by document title, team:123 or user:123"
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 msgid "Search by domain or organisation name"
@@ -9411,6 +9436,10 @@ msgstr "Send Status"
 msgid "Sender"
 msgstr "Sender"
 
+#: apps/remix/app/routes/_recipient+/report.$token.tsx
+msgid "Sender reported"
+msgstr "Sender reported"
+
 #: apps/remix/app/components/forms/forgot-password.tsx
 msgid "Sending Reset Email..."
 msgstr "Sending Reset Email..."
@@ -9504,9 +9533,17 @@ msgstr "Show"
 msgid "Show advanced settings"
 msgstr "Show advanced settings"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
+msgid "Show daily averages for documents, emails and API usages"
+msgstr "Show daily averages for documents, emails and API usages"
+
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Show license key"
 msgstr "Show license key"
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
+msgid "Show quotas for documents, emails and API usages"
+msgstr "Show quotas for documents, emails and API usages"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Show templates in your public profile for your audience to sign and get started quickly"
@@ -9857,6 +9894,7 @@ msgstr "Some signers have not been assigned a signature field. Please assign at 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
+#: apps/remix/app/routes/_recipient+/report.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 #: packages/ui/components/document/document-share-button.tsx
@@ -10564,6 +10602,10 @@ msgstr "Text Settings"
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "Thank you for completing the signing process."
 msgstr "Thank you for completing the signing process."
+
+#: apps/remix/app/routes/_recipient+/report.$token.tsx
+msgid "Thank you for letting us know, we have flagged this sender for review. If you have any concerns please feel free to reach out to our <0>support team</0>."
+msgstr "Thank you for letting us know, we have flagged this sender for review. If you have any concerns please feel free to reach out to our <0>support team</0>."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
@@ -12084,7 +12126,7 @@ msgstr "Uploading"
 msgid "URL"
 msgstr "URL"
 
-#. placeholder {0}: monthlyStats[0]?.period || 'N/A'
+#. placeholder {0}: selectedStat?.period || 'N/A'
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 msgid "Usage for period: {0}"
 msgstr "Usage for period: {0}"
@@ -12748,6 +12790,10 @@ msgstr "We were unable to disable two-factor authentication for your account. Pl
 #: apps/remix/app/components/general/document-signing/document-signing-auth-page.tsx
 msgid "We were unable to log you out at this time."
 msgstr "We were unable to log you out at this time."
+
+#: apps/remix/app/routes/_recipient+/report.$token.tsx
+msgid "We were unable to report this sender at this time. Please try again later."
+msgstr "We were unable to report this sender at this time. Please try again later."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "We were unable to set your public profile to public. Please try again."

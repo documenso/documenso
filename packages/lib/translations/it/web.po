@@ -2261,6 +2261,10 @@ msgstr "Prima di iniziare, conferma il tuo indirizzo email facendo clic sul puls
 msgid "Billing"
 msgstr "Fatturazione"
 
+#: apps/remix/app/components/forms/public-profile-form.tsx
+msgid "Bio"
+msgstr ""
+
 #: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
 msgid "Black"
 msgstr "Nero"
@@ -3843,6 +3847,10 @@ msgstr "Modalità sviluppatore"
 #: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Device"
 msgstr "Dispositivo"
+
+#: packages/email/template-components/template-footer.tsx
+msgid "Did not expect this email? <0>Click here to report the sender</0>. Never sign a document you don't recognize or weren't expecting."
+msgstr ""
 
 #: packages/email/templates/reset-password.tsx
 msgid "Didn't request a password change? We are here to help you secure your account, just <0>contact us</0>."
@@ -6015,6 +6023,10 @@ msgstr "Se ci sono problemi con il tuo abbonamento, contattaci a <0>{SUPPORT_EMA
 #: apps/remix/app/routes/embed+/v2+/authoring+/_layout.tsx
 msgid "If you are using staging, ensure that you have set the host prop on the embedding component to the staging domain (https://stg-app.documenso.com)"
 msgstr "Se stai utilizzando l’ambiente di staging, assicurati di aver impostato la proprietà host del componente di embedding sul dominio di staging (https:\\/\\/stg-app.documenso.com)"
+
+#: apps/remix/app/routes/_recipient+/report.$token.tsx
+msgid "If you did not expect this email or believe it is spam, you can report the sender to our team for review."
+msgstr ""
 
 #: packages/email/template-components/template-admin-user-created.tsx
 msgid "If you didn't expect this account or have any questions, please <0>contact support</0>."
@@ -8757,6 +8769,19 @@ msgstr "Rispondi all'email"
 msgid "Reply To Email <0>(Optional)</0>"
 msgstr "Rispondi all'email <0>(facoltativo)</0>"
 
+#: apps/remix/app/routes/_recipient+/report.$token.tsx
+msgid "Report sender"
+msgstr ""
+
+#: apps/remix/app/routes/_recipient+/report.$token.tsx
+msgid "Report this sender?"
+msgstr ""
+
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+#: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
+msgid "Reports"
+msgstr ""
+
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Request"
 msgstr "Richiesta"
@@ -9057,8 +9082,8 @@ msgid "Search by claim ID or name"
 msgstr "Cerca per ID reclamo o nome"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
-msgid "Search by document title"
-msgstr "Cerca per titolo del documento"
+msgid "Search by document title, team:123 or user:123"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 msgid "Search by domain or organisation name"
@@ -9416,6 +9441,10 @@ msgstr "Stato di invio"
 msgid "Sender"
 msgstr "Mittente"
 
+#: apps/remix/app/routes/_recipient+/report.$token.tsx
+msgid "Sender reported"
+msgstr ""
+
 #: apps/remix/app/components/forms/forgot-password.tsx
 msgid "Sending Reset Email..."
 msgstr "Invio dell'email di ripristino..."
@@ -9509,9 +9538,17 @@ msgstr "Mostra"
 msgid "Show advanced settings"
 msgstr "Mostra impostazioni avanzate"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
+msgid "Show daily averages for documents, emails and API usages"
+msgstr ""
+
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Show license key"
 msgstr "Mostra chiave di licenza"
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
+msgid "Show quotas for documents, emails and API usages"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Show templates in your public profile for your audience to sign and get started quickly"
@@ -9862,6 +9899,7 @@ msgstr "Alcuni firmatari non hanno un campo firma assegnato. Assegna almeno 1 ca
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
+#: apps/remix/app/routes/_recipient+/report.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 #: packages/ui/components/document/document-share-button.tsx
@@ -10569,6 +10607,10 @@ msgstr "Impostazioni testo"
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "Thank you for completing the signing process."
 msgstr "Grazie per aver completato il processo di firma."
+
+#: apps/remix/app/routes/_recipient+/report.$token.tsx
+msgid "Thank you for letting us know, we have flagged this sender for review. If you have any concerns please feel free to reach out to our <0>support team</0>."
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
@@ -12089,7 +12131,7 @@ msgstr "Caricamento in corso"
 msgid "URL"
 msgstr "URL"
 
-#. placeholder {0}: monthlyStats[0]?.period || 'N/A'
+#. placeholder {0}: selectedStat?.period || 'N/A'
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 msgid "Usage for period: {0}"
 msgstr "Utilizzo per il periodo: {0}"
@@ -12753,6 +12795,10 @@ msgstr "Non siamo riusciti a disabilitare l'autenticazione a due fattori per il 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-page.tsx
 msgid "We were unable to log you out at this time."
 msgstr "Non siamo riusciti a disconnetterti in questo momento."
+
+#: apps/remix/app/routes/_recipient+/report.$token.tsx
+msgid "We were unable to report this sender at this time. Please try again later."
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "We were unable to set your public profile to public. Please try again."
