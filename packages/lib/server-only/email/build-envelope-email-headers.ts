@@ -1,6 +1,5 @@
 export type BuildEnvelopeEmailHeadersOptions = {
   userId: number;
-  // Envelope IDs are cuid strings (Envelope.id is `String @id`), not numbers.
   envelopeId: string;
   teamId: number;
 };
