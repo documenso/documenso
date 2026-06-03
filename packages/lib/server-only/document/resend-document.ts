@@ -27,6 +27,7 @@ import { isDocumentCompleted } from '../../utils/document';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { buildEnvelopeEmailHeaders } from '../email/build-envelope-email-headers';
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
@@ -255,6 +256,11 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
           : emailSubject,
         html,
         text,
+        headers: buildEnvelopeEmailHeaders({
+          userId: envelope.userId,
+          envelopeId: envelope.id,
+          teamId: envelope.teamId,
+        }),
       });
 
       await prisma.documentAuditLog.create({
