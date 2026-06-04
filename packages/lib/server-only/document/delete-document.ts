@@ -3,7 +3,7 @@ import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { prisma } from '@documenso/prisma';
 import { msg } from '@lingui/core/macro';
 import type { DocumentMeta, Envelope, Recipient, User } from '@prisma/client';
-import { DocumentStatus, EnvelopeType, SendStatus, WebhookTriggerEvents } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, RecipientRole, SendStatus, WebhookTriggerEvents } from '@prisma/client';
 import { createElement } from 'react';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
@@ -194,7 +194,11 @@ const handleDocumentOwnerDelete = async ({ envelope, user, requestMetadata }: Ha
   // Send cancellation emails to recipients.
   await Promise.all(
     envelope.recipients.map(async (recipient) => {
-      if (recipient.sendStatus !== SendStatus.SENT || !isRecipientEmailValidForSending(recipient)) {
+      if (
+        recipient.sendStatus !== SendStatus.SENT ||
+        !isRecipientEmailValidForSending(recipient) ||
+        recipient.role === RecipientRole.CC
+      ) {
         return;
       }
 

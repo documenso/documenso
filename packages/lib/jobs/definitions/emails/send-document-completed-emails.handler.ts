@@ -2,32 +2,30 @@ import { mailer } from '@documenso/email/mailer';
 import { DocumentCompletedEmailTemplate } from '@documenso/email/templates/document-completed';
 import { prisma } from '@documenso/prisma';
 import { msg } from '@lingui/core/macro';
-import { DocumentSource, EnvelopeType } from '@prisma/client';
+import { DocumentSource, EnvelopeType, RecipientRole } from '@prisma/client';
 import { createElement } from 'react';
 
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
-import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
-import type { RequestMetadata } from '../../universal/extract-request-metadata';
-import { getFileServerSide } from '../../universal/upload/get-file.server';
-import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
-import type { EnvelopeIdOptions } from '../../utils/envelope';
-import { unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
-import { isRecipientEmailValidForSending } from '../../utils/recipients';
-import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { formatDocumentsPath } from '../../utils/teams';
-import { getEmailContext } from '../email/get-email-context';
+import { getI18nInstance } from '../../../client-only/providers/i18n-server';
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
+import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
+import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
+import { getFileServerSide } from '../../../universal/upload/get-file.server';
+import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
+import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
+import { isRecipientEmailValidForSending } from '../../../utils/recipients';
+import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
+import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
+import { formatDocumentsPath } from '../../../utils/teams';
+import type { JobRunIO } from '../../client/_internal/job';
+import type { TSendDocumentCompletedEmailsJobDefinition } from './send-document-completed-emails';
 
-export interface SendDocumentOptions {
-  id: EnvelopeIdOptions;
-  requestMetadata?: RequestMetadata;
-}
+export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmailsJobDefinition; io: JobRunIO }) => {
+  const { envelopeId, requestMetadata } = payload;
 
-export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOptions) => {
   const envelope = await prisma.envelope.findUnique({
-    where: unsafeBuildEnvelopeIdQuery(id, EnvelopeType.DOCUMENT),
+    where: unsafeBuildEnvelopeIdQuery({ type: 'envelopeId', id: envelopeId }, EnvelopeType.DOCUMENT),
     include: {
       envelopeItems: {
         include: {
@@ -47,6 +45,7 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
           id: true,
           email: true,
           name: true,
+          disabled: true,
         },
       },
       team: {
@@ -68,14 +67,20 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
     throw new Error('Document has no recipients');
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
-    emailType: 'RECIPIENT',
-    source: {
-      type: 'team',
-      teamId: envelope.teamId,
-    },
-    meta: envelope.documentMeta,
-  });
+  const { branding, emailLanguage, senderEmail, replyToEmail, isOrganisationOwnerDisabled, organisationId, claims } =
+    await getEmailContext({
+      emailType: 'RECIPIENT',
+      source: {
+        type: 'team',
+        teamId: envelope.teamId,
+      },
+      meta: envelope.documentMeta,
+    });
+
+  // Don't send completion emails on behalf of a disabled (e.g. banned) account.
+  if (envelope.user.disabled || isOrganisationOwnerDisabled) {
+    return;
+  }
 
   const { user: owner } = envelope;
 
@@ -175,6 +180,30 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
 
   await Promise.all(
     recipientsToNotify.map(async (recipient) => {
+      // A CC recipient never asked to be part of this document, so their completion
+      // email is effectively unsolicited. Meter it against the organisation email
+      // quota/stats so it is correctly logged.
+      if (recipient.role === RecipientRole.CC) {
+        try {
+          await assertOrganisationRatesAndLimits({
+            organisationId,
+            organisationClaim: claims,
+            type: 'email',
+            count: 1,
+          });
+        } catch (_err) {
+          io.logger.warn({
+            msg: 'CC completion email dropped: org email limit exceeded',
+            organisationId,
+            recipientId: recipient.id,
+            envelopeId: envelope.id,
+          });
+
+          // On rate/quota exceeded, early return to allow other recipients to be processed.
+          return;
+        }
+      }
+
       const customEmailTemplate = {
         'signer.name': recipient.name,
         'signer.email': recipient.email,
@@ -182,6 +211,8 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
       };
 
       const downloadLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}/complete`;
+      const reportUrl =
+        recipient.role === RecipientRole.CC ? `${NEXT_PUBLIC_WEBAPP_URL()}/report/${recipient.token}` : undefined;
 
       const template = createElement(DocumentCompletedEmailTemplate, {
         documentName: envelope.title,
@@ -191,6 +222,7 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
           isDirectTemplate && envelope.documentMeta?.message
             ? renderCustomEmailTemplate(envelope.documentMeta.message, customEmailTemplate)
             : undefined,
+        reportUrl,
       });
 
       const [html, text] = await Promise.all([

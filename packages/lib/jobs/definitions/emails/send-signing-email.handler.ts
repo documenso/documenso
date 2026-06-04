@@ -16,7 +16,9 @@ import { createElement } from 'react';
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { RECIPIENT_ROLE_TO_EMAIL_TYPE, RECIPIENT_ROLES_DESCRIPTION } from '../../../constants/recipient-roles';
+import { buildEnvelopeEmailHeaders } from '../../../server-only/email/build-envelope-email-headers';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
 import { updateRecipientNextReminder } from '../../../server-only/recipient/update-recipient-next-reminder';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
@@ -54,6 +56,11 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
       },
       include: {
         documentMeta: true,
+        user: {
+          select: {
+            disabled: true,
+          },
+        },
         team: {
           select: {
             teamEmail: true,
@@ -83,7 +90,17 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     return;
   }
 
-  const { branding, emailLanguage, settings, organisationType, senderEmail, replyToEmail } = await getEmailContext({
+  const {
+    branding,
+    emailLanguage,
+    settings,
+    organisationType,
+    senderEmail,
+    replyToEmail,
+    organisationId,
+    claims,
+    isOrganisationOwnerDisabled,
+  } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
       type: 'team',
@@ -91,6 +108,11 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     },
     meta: envelope.documentMeta,
   });
+
+  // Don't send signing invitations on behalf of a disabled (e.g. banned) account.
+  if (envelope.user.disabled || isOrganisationOwnerDisabled) {
+    return;
+  }
 
   const customEmail = envelope?.documentMeta;
   const isDirectTemplate = envelope.source === DocumentSource.TEMPLATE_DIRECT_LINK;
@@ -144,6 +166,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
   const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
+  const reportUrl = `${NEXT_PUBLIC_WEBAPP_URL()}/report/${recipient.token}`;
 
   const template = createElement(DocumentInviteEmailTemplate, {
     documentName: envelope.title,
@@ -159,9 +182,29 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     teamName: team?.name,
     teamEmail: team?.teamEmail?.email,
     includeSenderDetails: settings.includeSenderDetails,
+    reportUrl,
   });
 
   if (isRecipientEmailValidForSending(recipient)) {
+    try {
+      await assertOrganisationRatesAndLimits({
+        organisationId,
+        organisationClaim: claims,
+        type: 'email',
+        count: 1,
+      });
+    } catch (_err) {
+      io.logger.warn({
+        msg: 'Recipient signing email dropped: org rate limit exceeded',
+        organisationId,
+        recipientId: recipient.id,
+        envelopeId: envelope.id,
+      });
+
+      // Job is consumed and NOT retried.
+      return;
+    }
+
     await io.runTask('send-signing-email', async () => {
       const [html, text] = await Promise.all([
         renderEmailWithI18N(template, { lang: emailLanguage, branding }),
@@ -182,6 +225,11 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
         subject: renderCustomEmailTemplate(documentMeta?.subject || emailSubject, customEmailTemplate),
         html,
         text,
+        headers: buildEnvelopeEmailHeaders({
+          userId,
+          envelopeId: envelope.id,
+          teamId: envelope.teamId,
+        }),
       });
     });
   }

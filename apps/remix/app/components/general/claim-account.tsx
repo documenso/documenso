@@ -178,7 +178,7 @@ export const ClaimAccount = ({ defaultName, defaultEmail }: ClaimAccountProps) =
                   siteKey={turnstileSiteKey}
                   options={{
                     size: 'flexible',
-                    appearance: 'interaction-only',
+                    appearance: 'always',
                   }}
                 />
               </div>

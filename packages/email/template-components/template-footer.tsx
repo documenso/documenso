@@ -5,13 +5,26 @@ import { useBranding } from '../providers/branding';
 
 export type TemplateFooterProps = {
   isDocument?: boolean;
+  reportUrl?: string;
 };
 
-export const TemplateFooter = ({ isDocument = true }: TemplateFooterProps) => {
+export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterProps) => {
   const branding = useBranding();
 
   return (
     <Section>
+      {reportUrl && (
+        <Text className="my-4 text-base text-slate-400">
+          <Trans>
+            Did not expect this email?{' '}
+            <Link className="text-[#7AC455]" href={reportUrl}>
+              Click here to report the sender
+            </Link>
+            . Never sign a document you don't recognize or weren't expecting.
+          </Trans>
+        </Text>
+      )}
+
       {isDocument && !branding.brandingHidePoweredBy && (
         <Text className="my-4 text-base text-slate-400">
           <Trans>
