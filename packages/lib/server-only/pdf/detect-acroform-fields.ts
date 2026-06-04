@@ -12,6 +12,8 @@ import { FieldType } from '@prisma/client';
 import type { TDetectedField } from '@documenso/lib/types/detected-field';
 import type { TFieldMetaNotOptionalSchema } from '@documenso/lib/types/field-meta';
 
+import { decryptPdf } from '../utils/decrypt-pdf';
+
 // `WidgetAnnotation` is not exported from `@libpdf/core`, so derive its type
 // from the field API instead.
 type WidgetAnnotation = ReturnType<FormField['getWidgets']>[number];
@@ -263,16 +265,40 @@ const buildFieldMeta = (
  * This must run on the *original* PDF buffer, before `normalizePdf` flattens
  * the form, since flattening permanently removes the interactive fields.
  *
+ * Encrypted PDFs (e.g. password-protected government forms) cannot be parsed by
+ * `@libpdf/core` while still encrypted, so they are decrypted and reloaded
+ * first - mirroring what `normalizePdf` does downstream. Without this, every
+ * field on an encrypted form was silently dropped.
+ *
  * Each visible widget becomes a detected field positioned at the widget's
  * location. Field types Documenso cannot represent (e.g. push buttons) are
- * skipped. Never throws - on any parsing failure it returns an empty array so
- * upload is never blocked by detection.
+ * skipped. Never throws - on any parsing failure (including a decryption
+ * failure) it returns an empty array so upload is never blocked by detection.
  */
 export const detectAcroFormFields = async (pdf: Buffer): Promise<TDetectedField[]> => {
   try {
-    const pdfDoc = await PDF.load(new Uint8Array(pdf)).catch(() => null);
+    let pdfDoc = await PDF.load(new Uint8Array(pdf)).catch(() => null);
 
-    if (!pdfDoc || pdfDoc.isEncrypted || !pdfDoc.hasForm()) {
+    if (!pdfDoc) {
+      return [];
+    }
+
+    // Encrypted PDFs must be decrypted before their form can be read. Decrypt
+    // and reload so detection runs against the decrypted document, the same way
+    // `normalizePdf` handles encryption. Decryption may throw (bad password,
+    // qpdf failure); that is caught below and yields an empty result, keeping
+    // detection best-effort so it never blocks an upload.
+    if (pdfDoc.isEncrypted) {
+      const decrypted = await decryptPdf(pdf);
+
+      pdfDoc = await PDF.load(new Uint8Array(decrypted)).catch(() => null);
+
+      if (!pdfDoc) {
+        return [];
+      }
+    }
+
+    if (!pdfDoc.hasForm()) {
       return [];
     }
 

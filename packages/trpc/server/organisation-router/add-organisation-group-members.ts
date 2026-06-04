@@ -2,8 +2,12 @@
 // Resolves emails to org member IDs, skips duplicates, reports results.
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { getMemberOrganisationRole } from '@documenso/lib/server-only/team/get-member-roles';
 import { generateDatabaseId } from '@documenso/lib/universal/id';
-import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
+import {
+  buildOrganisationWhereQuery,
+  isOrganisationRoleWithinUserHierarchy,
+} from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
 import { OrganisationGroupType } from '@documenso/prisma/generated/types';
 
@@ -42,9 +46,28 @@ export const addOrganisationGroupMembersRoute = authenticatedProcedure
       });
     }
 
-    if (group.type === OrganisationGroupType.INTERNAL_ORGANISATION) {
+    if (
+      group.type === OrganisationGroupType.INTERNAL_ORGANISATION ||
+      group.type === OrganisationGroupType.INTERNAL_TEAM
+    ) {
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'Cannot modify internal organisation groups',
+        message: 'Cannot modify internal groups',
+      });
+    }
+
+    const currentUserOrganisationRole = await getMemberOrganisationRole({
+      organisationId: group.organisationId,
+      reference: {
+        type: 'User',
+        id: user.id,
+      },
+    });
+
+    if (
+      !isOrganisationRoleWithinUserHierarchy(currentUserOrganisationRole, group.organisationRole)
+    ) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'You are not allowed to modify members of this organisation group',
       });
     }
 

@@ -34,6 +34,7 @@ import type { ApiRequestMetadata } from '../../universal/extract-request-metadat
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { isRequiredField } from '../../utils/advanced-fields-helpers';
+import { computeCalculatedFieldValue } from '../../utils/calculated-field';
 import { extractDerivedDocumentMeta } from '../../utils/document';
 import type { CreateDocumentAuditLogDataResponse } from '../../utils/document-audit-logs';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
@@ -745,6 +746,67 @@ export const createDocumentFromDirectTemplate = async ({
       recipientId: createdDirectRecipient.id,
     };
   });
+
+  // Authoritatively compute the direct recipient's calculated fields before the
+  // document is sealed. The signer never fills these in (they are read-only), so
+  // the server is the source of truth for the value sealed into the PDF. This
+  // mirrors the non-direct signing path in complete-document-with-token.
+  const allEnvelopeFields = await prisma.field.findMany({
+    where: { envelopeId: createdEnvelope.id },
+  });
+
+  const calculatedFields = allEnvelopeFields.filter(
+    (field) => field.type === FieldType.CALCULATED && field.recipientId === recipientId,
+  );
+
+  if (calculatedFields.length > 0) {
+    const computedUpdates = calculatedFields
+      .map((field) => ({
+        field,
+        display: computeCalculatedFieldValue(field, allEnvelopeFields).display,
+      }))
+      .filter(({ display }) => display !== '');
+
+    if (computedUpdates.length > 0) {
+      await prisma.$transaction(async (tx) => {
+        for (const { field, display } of computedUpdates) {
+          await tx.field.update({
+            where: { id: field.id },
+            data: {
+              customText: display,
+              inserted: true,
+            },
+          });
+        }
+
+        await tx.documentAuditLog.createMany({
+          data: computedUpdates.map(({ field, display }) =>
+            createDocumentAuditLogData({
+              type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
+              envelopeId: createdEnvelope.id,
+              user: {
+                id: user?.id,
+                name: user?.name,
+                email: directRecipientEmail,
+              },
+              metadata: requestMetadata,
+              data: {
+                recipientEmail: directRecipientEmail,
+                recipientId,
+                recipientName: directRecipientName ?? '',
+                recipientRole: directTemplateRecipient.role,
+                fieldId: field.secondaryId,
+                field: {
+                  type: FieldType.CALCULATED,
+                  data: display,
+                },
+              },
+            }),
+          ),
+        });
+      });
+    }
+  }
 
   const emailSettings = extractDerivedDocumentEmailSettings(documentMeta);
 

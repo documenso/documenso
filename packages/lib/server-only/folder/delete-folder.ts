@@ -2,7 +2,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
 import { buildFolderAccessFilter, getUserTeamGroupIds } from '../../utils/folder-access';
-import { buildTeamWhereQuery, canAccessTeamDocument } from '../../utils/teams';
+import { buildTeamWhereQuery } from '../../utils/teams';
 import { getTeamById } from '../team/get-team';
 
 export interface DeleteFolderOptions {
@@ -32,17 +32,10 @@ export const deleteFolder = async ({ userId, teamId, folderId }: DeleteFolderOpt
     });
   }
 
-  // Allow the action when the user is the folder creator, not only when their role
-  // can access the folder's visibility tier.
-  const hasPermission =
-    folder.userId === userId || canAccessTeamDocument(team.currentTeamRole, folder.visibility);
-
-  if (!hasPermission) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'You do not have permission to delete this folder',
-    });
-  }
-
+  // buildFolderAccessFilter already gates access in the query above: it honors the
+  // folder creator, per-user ACLs (allowedUserIds), per-group ACLs (allowedGroupIds),
+  // and role-based visibility tiers. A user with no access never reaches this point
+  // (folder is null -> NOT_FOUND), so no second, ACL-blind permission check is needed.
   return await prisma.folder.delete({
     where: {
       id: folder.id,

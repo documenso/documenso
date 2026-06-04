@@ -24,6 +24,20 @@ type HandleOAuthCallbackUrlOptions = {
   clientOptions: OAuthClientOptions;
 };
 
+/**
+ * Redirect back to the sign-in page with an error code in the query string.
+ *
+ * Used to reject an OAuth/SSO login without creating a session (e.g. a disabled
+ * account), mirroring the existing signup-disabled redirects below.
+ */
+const redirectToSignInWithError = (c: Context, error: AuthenticationErrorCode) => {
+  const errorUrl = new URL('/signin', NEXT_PUBLIC_WEBAPP_URL());
+
+  errorUrl.searchParams.set('error', error);
+
+  return c.redirect(errorUrl.toString(), 302);
+};
+
 export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOptions) => {
   const { c, clientOptions } = options;
 
@@ -49,6 +63,7 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
       user: {
         select: {
           id: true,
+          disabled: true,
         },
       },
     },
@@ -56,14 +71,18 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
 
   // Directly log in user if account already exists.
   if (existingAccount) {
+    if (existingAccount.user.disabled) {
+      return redirectToSignInWithError(c, AuthenticationErrorCode.AccountDisabled);
+    }
+
+    await onAuthorize({ userId: existingAccount.user.id }, c);
+
     if (clientOptions.id === 'google') {
-      await syncGoogleDirectory(existingAccount.user.id, email).catch((err: unknown) => {
+      void syncGoogleDirectory(existingAccount.user.id, email).catch((err: unknown) => {
         const message = err instanceof Error ? err.message : 'Unknown error';
         console.warn(`[directory-sync] Sync failed: ${message}`);
       });
     }
-
-    await onAuthorize({ userId: existingAccount.user.id }, c);
 
     return c.redirect(redirectPath, 302);
   }
@@ -75,6 +94,7 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
     select: {
       id: true,
       emailVerified: true,
+      disabled: true,
     },
   });
 
@@ -120,14 +140,18 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
       }
     });
 
+    if (userWithSameEmail.disabled) {
+      return redirectToSignInWithError(c, AuthenticationErrorCode.AccountDisabled);
+    }
+
+    await onAuthorize({ userId: userWithSameEmail.id }, c);
+
     if (clientOptions.id === 'google') {
-      await syncGoogleDirectory(userWithSameEmail.id, email).catch((err: unknown) => {
+      void syncGoogleDirectory(userWithSameEmail.id, email).catch((err: unknown) => {
         const message = err instanceof Error ? err.message : 'Unknown error';
         console.warn(`[directory-sync] Sync failed: ${message}`);
       });
     }
-
-    await onAuthorize({ userId: userWithSameEmail.id }, c);
 
     return c.redirect(redirectPath, 302);
   }
@@ -181,14 +205,14 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
     console.error(err);
   });
 
+  await onAuthorize({ userId: createdUser.id }, c);
+
   if (clientOptions.id === 'google') {
-    await syncGoogleDirectory(createdUser.id, email).catch((err: unknown) => {
+    void syncGoogleDirectory(createdUser.id, email).catch((err: unknown) => {
       const message = err instanceof Error ? err.message : 'Unknown error';
       console.warn(`[directory-sync] Sync failed: ${message}`);
     });
   }
-
-  await onAuthorize({ userId: createdUser.id }, c);
 
   return c.redirect(redirectPath, 302);
 };

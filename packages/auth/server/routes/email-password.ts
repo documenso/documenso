@@ -90,6 +90,15 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       ipAddress: requestMetadata.ipAddress,
     });
 
+    // Enforce the same domain allow-list that SSO and signup enforce. The UI is
+    // SSO-only, but this credentials endpoint is still reachable, so a domain
+    // outside the allow-list must not be able to sign in through it.
+    if (!isEmailDomainAllowedForSignup(email)) {
+      throw new AppError(AuthenticationErrorCode.InvalidCredentials, {
+        message: 'Invalid email or password',
+      });
+    }
+
     if (
       email.toLowerCase() === legacyServiceAccountEmail() ||
       email.toLowerCase() === deletedServiceAccountEmail()

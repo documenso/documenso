@@ -29,9 +29,20 @@ export const normalizePdf = async (pdf: Buffer, options: { flattenForm?: boolean
       });
     });
 
+    // Merge split content streams before flattening. `@libpdf/core`'s flatten
+    // routines corrupt pages whose `/Contents` is an array of streams, blanking
+    // the page behind the form fields (#28).
+    mergePageContentStreams(decryptedDoc);
+
     decryptedDoc.flattenLayers();
 
     if (shouldFlattenForm) {
+      const form = decryptedDoc.getForm();
+
+      if (form) {
+        form.flatten();
+      }
+
       decryptedDoc.flattenAnnotations();
     }
 
@@ -48,6 +59,12 @@ export const normalizePdf = async (pdf: Buffer, options: { flattenForm?: boolean
   pdfDoc.flattenLayers();
 
   if (shouldFlattenForm) {
+    const form = pdfDoc.getForm();
+
+    if (form) {
+      form.flatten();
+    }
+
     pdfDoc.flattenAnnotations();
   }
 

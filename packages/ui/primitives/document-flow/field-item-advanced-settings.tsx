@@ -16,6 +16,7 @@ import {
   type TDateFieldMeta as DateFieldMeta,
   type TDropdownFieldMeta as DropdownFieldMeta,
   type TEmailFieldMeta as EmailFieldMeta,
+  FIELD_DEFAULT_CALCULATED_PRECISION,
   type TFieldMetaSchema as FieldMeta,
   type TInitialsFieldMeta as InitialsFieldMeta,
   type TNameFieldMeta as NameFieldMeta,
@@ -142,6 +143,18 @@ const getDefaultState = (fieldType: FieldType): FieldMeta => {
         fontSize: 14,
         textAlign: 'left',
       };
+    case FieldType.CALCULATED:
+      return {
+        type: 'calculated',
+        label: '',
+        formula: '',
+        precision: FIELD_DEFAULT_CALCULATED_PRECISION,
+        required: false,
+        // Calculated fields are always read only — signers see the computed result.
+        readOnly: true,
+        fontSize: 14,
+        textAlign: 'left',
+      };
     case FieldType.RADIO:
       return {
         type: 'radio',
@@ -232,7 +245,6 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
           ...parsedFieldMeta,
         });
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fieldMeta]);
 
     const { scheduleSave } = useAutoSave(onAutoSave || (async () => {}));
@@ -259,7 +271,6 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
       if (errors.length === 0) {
         onFieldMetaChange?.(fieldState);
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fieldState]);
 
     const handleFieldChange = (
