@@ -16,6 +16,7 @@ import { createElement } from 'react';
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { RECIPIENT_ROLES_DESCRIPTION } from '../../../constants/recipient-roles';
+import { buildEnvelopeEmailHeaders } from '../../../server-only/email/build-envelope-email-headers';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
 import { updateRecipientNextReminder } from '../../../server-only/recipient/update-recipient-next-reminder';
@@ -211,6 +212,11 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
       subject: emailSubject,
       html,
       text,
+      headers: buildEnvelopeEmailHeaders({
+        userId: envelope.userId,
+        envelopeId: envelope.id,
+        teamId: envelope.teamId,
+      }),
     });
 
     await prisma.documentAuditLog.create({
