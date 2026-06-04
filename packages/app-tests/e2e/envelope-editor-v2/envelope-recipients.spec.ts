@@ -118,49 +118,54 @@ const runRecipientFlow = async (surface: TEnvelopeEditorSurface): Promise<Recipi
 
   await toggleSigningOrder(surface.root, true);
   await expect(getSigningOrderInputs(surface.root)).toHaveCount(2);
-  await setSigningOrderValue(surface.root, 0, 2);
+
+  // Assign the second recipient to the same signing order slot as the first so they
+  // sign in parallel within the sequential order (multiple recipients per slot).
+  await setSigningOrderValue(surface.root, 1, 1);
 
   await toggleAllowDictateSigners(surface.root, true);
 
   await navigateToAddFieldsAndBack(surface.root);
 
   await expect(getRecipientEmailInputs(surface.root)).toHaveCount(2);
-  await expect(getRecipientEmailInputs(surface.root).nth(0)).toHaveValue(
+  await expect(getRecipientEmailInputs(surface.root).nth(0)).toHaveValue(primaryRecipient.email);
+  await expect(getRecipientEmailInputs(surface.root).nth(1)).toHaveValue(
     TEST_RECIPIENT_VALUES.secondRecipient.email,
   );
-  await expect(getRecipientEmailInputs(surface.root).nth(1)).toHaveValue(primaryRecipient.email);
 
-  await expect(getRecipientNameInputs(surface.root).nth(0)).toHaveValue(
+  await expect(getRecipientNameInputs(surface.root).nth(0)).toHaveValue(primaryRecipient.name);
+  await expect(getRecipientNameInputs(surface.root).nth(1)).toHaveValue(
     TEST_RECIPIENT_VALUES.secondRecipient.name,
   );
-  await expect(getRecipientNameInputs(surface.root).nth(1)).toHaveValue(primaryRecipient.name);
 
-  await assertRecipientRole(surface.root, 0, 'Needs to approve');
-  await assertRecipientRole(surface.root, 1, 'Needs to sign');
+  await assertRecipientRole(surface.root, 0, 'Needs to sign');
+  await assertRecipientRole(surface.root, 1, 'Needs to approve');
 
   await expect(surface.root.locator('#signingOrder')).toHaveAttribute('aria-checked', 'true');
   await expect(surface.root.locator('#allowDictateNextSigner')).toHaveAttribute(
     'aria-checked',
     'true',
   );
+
+  // Both recipients share the same signing order slot.
   await expect(getSigningOrderInputs(surface.root).nth(0)).toHaveValue('1');
-  await expect(getSigningOrderInputs(surface.root).nth(1)).toHaveValue('2');
+  await expect(getSigningOrderInputs(surface.root).nth(1)).toHaveValue('1');
 
   return {
     externalId,
     removedRecipientEmail: TEST_RECIPIENT_VALUES.thirdRecipient.email,
     expectedRecipientsBySigningOrder: [
       {
+        email: primaryRecipient.email,
+        name: primaryRecipient.name,
+        role: RecipientRole.SIGNER,
+        signingOrder: 1,
+      },
+      {
         email: TEST_RECIPIENT_VALUES.secondRecipient.email,
         name: TEST_RECIPIENT_VALUES.secondRecipient.name,
         role: RecipientRole.APPROVER,
         signingOrder: 1,
-      },
-      {
-        email: primaryRecipient.email,
-        name: primaryRecipient.name,
-        role: RecipientRole.SIGNER,
-        signingOrder: 2,
       },
     ],
   };
@@ -187,9 +192,8 @@ const assertRecipientsPersistedInDatabase = async ({
     include: {
       documentMeta: true,
       recipients: {
-        orderBy: {
-          signingOrder: 'asc',
-        },
+        // `id` breaks ties between recipients that share a signing order slot.
+        orderBy: [{ signingOrder: 'asc' }, { id: 'asc' }],
       },
     },
     orderBy: {

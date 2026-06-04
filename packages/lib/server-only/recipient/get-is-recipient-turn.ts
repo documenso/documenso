@@ -32,14 +32,22 @@ export async function getIsRecipientsTurnToSign({ token }: GetIsRecipientTurnOpt
 
   const { recipients } = envelope;
 
-  const currentRecipientIndex = recipients.findIndex((r) => r.token === token);
+  const currentRecipient = recipients.find((r) => r.token === token);
 
-  if (currentRecipientIndex === -1) {
+  if (!currentRecipient) {
     return false;
   }
 
-  for (let i = 0; i < currentRecipientIndex; i++) {
-    if (recipients[i].signingStatus !== SigningStatus.SIGNED) {
+  // Multiple recipients may share the same signing order (a "slot"), in which case
+  // they sign in parallel. A recipient may sign once every recipient in a strictly
+  // earlier slot has signed. Recipients without a signing order are treated as last
+  // to mirror the `nulls: 'last'` ordering used elsewhere.
+  const slotOf = (signingOrder: number | null) => signingOrder ?? Number.MAX_SAFE_INTEGER;
+
+  const currentSlot = slotOf(currentRecipient.signingOrder);
+
+  for (const recipient of recipients) {
+    if (slotOf(recipient.signingOrder) < currentSlot && recipient.signingStatus !== SigningStatus.SIGNED) {
       return false;
     }
   }

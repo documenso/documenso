@@ -185,10 +185,25 @@ export const EnvelopeEditorRecipientForm = () => {
     return watchedSigners.some((signer) => signer.role === RecipientRole.ASSISTANT);
   }, [watchedSigners]);
 
+  // Normalizes signing orders into contiguous slots starting at 1 while preserving
+  // ties: recipients sharing the same signing order stay grouped in the same slot
+  // (parallel signing within a sequential order), and gaps are removed.
   const normalizeSigningOrders = (signers: typeof watchedSigners) => {
-    return signers
-      .sort((a, b) => (a.signingOrder ?? 0) - (b.signingOrder ?? 0))
-      .map((signer, index) => ({ ...signer, signingOrder: index + 1 }));
+    const sorted = [...signers].sort((a, b) => (a.signingOrder ?? 0) - (b.signingOrder ?? 0));
+
+    let slot = 0;
+    let previousOrder: number | null = null;
+
+    return sorted.map((signer) => {
+      const order = signer.signingOrder ?? 0;
+
+      if (previousOrder === null || order !== previousOrder) {
+        slot += 1;
+        previousOrder = order;
+      }
+
+      return { ...signer, signingOrder: slot };
+    });
   };
 
   const {
@@ -445,10 +460,11 @@ export const EnvelopeEditorRecipientForm = () => {
         return;
       }
 
+      // Only change the role here — leave each recipient's signing order slot untouched
+      // so that any shared (parallel) slots are preserved.
       const updatedSigners = currentSigners.map((signer, idx) => ({
         ...signer,
         role: idx === index ? role : signer.role,
-        signingOrder: !canRecipientBeModified(signer.id) ? signer.signingOrder : idx + 1,
       }));
 
       form.setValue('signers', updatedSigners, {
@@ -481,22 +497,28 @@ export const EnvelopeEditorRecipientForm = () => {
       const currentSigners = form.getValues('signers');
       const signer = currentSigners[index];
 
-      // Remove signer from current position and insert at new position
-      const remainingSigners = currentSigners.filter((_, idx) => idx !== index);
-      const newPosition = Math.min(Math.max(0, newOrder - 1), currentSigners.length - 1);
-      remainingSigners.splice(newPosition, 0, signer);
+      if (!canRecipientBeModified(signer.id)) {
+        return;
+      }
 
-      const updatedSigners = remainingSigners.map((s, idx) => ({
-        ...s,
-        signingOrder: !canRecipientBeModified(s.id) ? s.signingOrder : idx + 1,
-      }));
+      // Set this recipient's signing order slot directly. Multiple recipients may share
+      // the same slot, in which case they sign in parallel. Normalizing afterwards keeps
+      // the slots contiguous while preserving any shared slots.
+      const updatedSigners = normalizeSigningOrders(
+        currentSigners.map((s, idx) => (idx === index ? { ...s, signingOrder: newOrder } : s)),
+      );
 
       form.setValue('signers', updatedSigners, {
         shouldValidate: true,
         shouldDirty: true,
       });
 
-      if (signer.role === RecipientRole.ASSISTANT && newPosition === remainingSigners.length - 1) {
+      const updatedSigner = updatedSigners.find((s) => s.formId === signer.formId);
+      const isLastSlot =
+        updatedSigner?.signingOrder ===
+        Math.max(...updatedSigners.map((s) => s.signingOrder ?? 0));
+
+      if (signer.role === RecipientRole.ASSISTANT && isLastSlot) {
         toast({
           title: t`Warning: Assistant as last signer`,
           description: t`Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist.`,

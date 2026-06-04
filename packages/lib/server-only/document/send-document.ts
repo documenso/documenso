@@ -138,14 +138,24 @@ export const sendDocument = async ({
   let recipientsToNotify = envelope.recipients;
 
   if (signingOrder === DocumentSigningOrder.SEQUENTIAL) {
-    // Get the currently active recipient.
-    recipientsToNotify = envelope.recipients
-      .filter((r) => r.signingStatus === SigningStatus.NOT_SIGNED && r.role !== RecipientRole.CC)
-      .slice(0, 1);
+    // Get the currently active recipients. Multiple recipients can share the same
+    // signing order (a "slot"), in which case they all sign in parallel — so we notify
+    // everyone in the first pending slot, not just the single first recipient.
+    const slotOf = (order: number | null) => order ?? Number.MAX_SAFE_INTEGER;
 
-    // Secondary filter so we aren't resending if the current active recipient has already
-    // received the envelope.
-    recipientsToNotify.filter((r) => r.sendStatus !== SendStatus.SENT);
+    const activeRecipients = envelope.recipients.filter(
+      (r) => r.signingStatus === SigningStatus.NOT_SIGNED && r.role !== RecipientRole.CC,
+    );
+
+    const nextSlot = activeRecipients.reduce<number | null>(
+      (min, r) => (min === null ? slotOf(r.signingOrder) : Math.min(min, slotOf(r.signingOrder))),
+      null,
+    );
+
+    recipientsToNotify =
+      nextSlot === null
+        ? []
+        : activeRecipients.filter((r) => slotOf(r.signingOrder) === nextSlot);
   }
 
   if (envelope.envelopeItems.length === 0) {
