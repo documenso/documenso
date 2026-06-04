@@ -11,6 +11,7 @@ import { type TRecipientActionAuthTypes, ZRecipientAuthOptionsSchema } from '../
 import { nanoid } from '../../universal/id';
 import { createRecipientAuthOptions } from '../../utils/document-auth';
 import { type EnvelopeIdOptions, mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { getRecipientSigningOrder } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type SetTemplateRecipientsOptions = {
@@ -134,7 +135,7 @@ export const setTemplateRecipients = async ({ userId, teamId, id, recipients }: 
             name: recipient.name,
             email: recipient.email,
             role: recipient.role,
-            signingOrder: recipient.signingOrder,
+            signingOrder: getRecipientSigningOrder(recipient),
             envelopeId: envelope.id,
             authOptions,
           },
@@ -142,7 +143,7 @@ export const setTemplateRecipients = async ({ userId, teamId, id, recipients }: 
             name: recipient.name,
             email: recipient.email,
             role: recipient.role,
-            signingOrder: recipient.signingOrder,
+            signingOrder: getRecipientSigningOrder(recipient),
             token: nanoid(),
             envelopeId: envelope.id,
             authOptions,

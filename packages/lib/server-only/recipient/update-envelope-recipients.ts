@@ -11,7 +11,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractLegacyIds } from '../../universal/id';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapFieldToLegacyField } from '../../utils/fields';
-import { canRecipientBeModified } from '../../utils/recipients';
+import { canRecipientBeModified, getRecipientSigningOrder } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface UpdateEnvelopeRecipientsOptions {
@@ -131,7 +131,7 @@ export const updateEnvelopeRecipients = async ({
             name: mergedRecipient.name,
             email: mergedRecipient.email,
             role: mergedRecipient.role,
-            signingOrder: mergedRecipient.signingOrder,
+            signingOrder: getRecipientSigningOrder(mergedRecipient),
             envelopeId: envelope.id,
             sendStatus: mergedRecipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
             signingStatus: mergedRecipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
