@@ -30,6 +30,10 @@ export default function OrganisationSettingsTeamsPage() {
       params.delete('query');
     }
 
+    if (params.toString() === searchParams?.toString()) {
+      return;
+    }
+
     setSearchParams(params);
   }, [debouncedSearchQuery, pathname, searchParams]);
 
