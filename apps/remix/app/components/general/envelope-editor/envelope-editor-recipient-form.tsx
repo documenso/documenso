@@ -8,6 +8,7 @@ import type { TDetectedRecipientSchema } from '@documenso/lib/server-only/ai/env
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import {
+  isAssistantLastSigner,
   isCcRecipient,
   normalizeRecipientSigningOrders,
   canRecipientBeModified as utilCanRecipientBeModified,
@@ -163,13 +164,6 @@ export const EnvelopeEditorRecipientForm = () => {
   };
 
   const activeRecipientCount = watchedSigners.filter((signer) => !isCcRecipient(signer)).length;
-
-  const isAssistantLastActiveRecipient = (signers: typeof watchedSigners) => {
-    const activeRecipients = signers.filter((signer) => !isCcRecipient(signer));
-    const lastActiveRecipient = activeRecipients[activeRecipients.length - 1];
-
-    return lastActiveRecipient?.role === RecipientRole.ASSISTANT;
-  };
 
   const { fields: signers, remove: removeSigner } = useFieldArray({
     control,
@@ -397,7 +391,7 @@ export const EnvelopeEditorRecipientForm = () => {
         shouldDirty: true,
       });
 
-      if (isAssistantLastActiveRecipient(updatedSigners)) {
+      if (isAssistantLastSigner(updatedSigners)) {
         toast({
           title: t`Warning: Assistant as last signer`,
           description: t`Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist.`,
@@ -440,7 +434,7 @@ export const EnvelopeEditorRecipientForm = () => {
         shouldDirty: true,
       });
 
-      if (role === RecipientRole.ASSISTANT && isAssistantLastActiveRecipient(updatedSigners)) {
+      if (role === RecipientRole.ASSISTANT && isAssistantLastSigner(updatedSigners)) {
         toast({
           title: t`Warning: Assistant as last signer`,
           description: t`Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist.`,
@@ -469,26 +463,26 @@ export const EnvelopeEditorRecipientForm = () => {
         return;
       }
 
-      const signersWithSigningOrder = currentSigners.filter((s) => !isCcRecipient(s));
-      const signersWithoutSigningOrder = currentSigners.filter((s) => isCcRecipient(s));
-      const currentSigningOrderIndex = signersWithSigningOrder.findIndex((s) => s.formId === signer.formId);
+      const nonCcSigners = currentSigners.filter((s) => !isCcRecipient(s));
+      const ccSigners = currentSigners.filter((s) => isCcRecipient(s));
+      const currentSigningOrderIndex = nonCcSigners.findIndex((s) => s.formId === signer.formId);
 
       if (currentSigningOrderIndex === -1) {
         return;
       }
 
-      const [reorderedSigner] = signersWithSigningOrder.splice(currentSigningOrderIndex, 1);
-      const newPosition = Math.min(Math.max(0, newOrder - 1), signersWithSigningOrder.length);
-      signersWithSigningOrder.splice(newPosition, 0, reorderedSigner);
+      const [reorderedSigner] = nonCcSigners.splice(currentSigningOrderIndex, 1);
+      const newPosition = Math.min(Math.max(0, newOrder - 1), nonCcSigners.length);
+      nonCcSigners.splice(newPosition, 0, reorderedSigner);
 
-      const updatedSigners = normalizeSigningOrders([...signersWithSigningOrder, ...signersWithoutSigningOrder]);
+      const updatedSigners = normalizeSigningOrders([...nonCcSigners, ...ccSigners]);
 
       form.setValue('signers', updatedSigners, {
         shouldValidate: true,
         shouldDirty: true,
       });
 
-      if (signer.role === RecipientRole.ASSISTANT && isAssistantLastActiveRecipient(updatedSigners)) {
+      if (signer.role === RecipientRole.ASSISTANT && isAssistantLastSigner(updatedSigners)) {
         toast({
           title: t`Warning: Assistant as last signer`,
           description: t`Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist.`,

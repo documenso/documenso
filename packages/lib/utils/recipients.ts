@@ -54,14 +54,21 @@ export const sortRecipientsForSigningOrder = <T extends RecipientWithSigningOrde
   });
 };
 
+export const isAssistantLastSigner = (recipients: Pick<RecipientWithSigningOrder, 'role'>[]) => {
+  const nonCcRecipients = recipients.filter((recipient) => !isCcRecipient(recipient));
+  const lastNonCcRecipient = nonCcRecipients[nonCcRecipients.length - 1];
+
+  return lastNonCcRecipient?.role === RecipientRole.ASSISTANT;
+};
+
 export const normalizeRecipientSigningOrders = <T extends RecipientWithSigningOrder>(
   recipients: T[],
   canUpdateRecipient: CanUpdateRecipient<T> = canUpdateAnyRecipient,
 ): Array<T & { signingOrder?: number }> => {
-  const recipientsWithSigningOrder = recipients.filter((recipient) => !isCcRecipient(recipient));
+  const nonCcRecipients = recipients.filter((recipient) => !isCcRecipient(recipient));
   const ccRecipients = recipients.filter((recipient) => isCcRecipient(recipient));
 
-  const normalizedRecipients = recipientsWithSigningOrder.map((recipient, index) => ({
+  const normalizedNonCcRecipients = nonCcRecipients.map((recipient, index) => ({
     ...recipient,
     signingOrder: canUpdateRecipient(recipient) ? index + 1 : (recipient.signingOrder ?? index + 1),
   }));
@@ -71,7 +78,7 @@ export const normalizeRecipientSigningOrders = <T extends RecipientWithSigningOr
     signingOrder: undefined,
   }));
 
-  return [...normalizedRecipients, ...normalizedCcRecipients];
+  return [...normalizedNonCcRecipients, ...normalizedCcRecipients];
 };
 
 /**
