@@ -7,7 +7,11 @@ import { useOptionalSession } from '@documenso/lib/client-only/providers/session
 import type { TDetectedRecipientSchema } from '@documenso/lib/server-only/ai/envelope/detect-recipients/schema';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
-import { canRecipientBeModified as utilCanRecipientBeModified } from '@documenso/lib/utils/recipients';
+import {
+  isCcRecipient,
+  normalizeRecipientSigningOrders,
+  canRecipientBeModified as utilCanRecipientBeModified,
+} from '@documenso/lib/utils/recipients';
 import { trpc } from '@documenso/trpc/react';
 import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
 import {
@@ -154,17 +158,23 @@ export const EnvelopeEditorRecipientForm = () => {
     return watchedSigners.some((signer) => signer.role === RecipientRole.ASSISTANT);
   }, [watchedSigners]);
 
-  const normalizeSigningOrders = (signers: typeof watchedSigners) => {
-    return signers
-      .sort((a, b) => (a.signingOrder ?? 0) - (b.signingOrder ?? 0))
-      .map((signer, index) => ({ ...signer, signingOrder: index + 1 }));
+  const normalizeSigningOrders = (signers: typeof watchedSigners, options: { preserveOrder?: boolean } = {}) => {
+    return normalizeRecipientSigningOrders(signers, {
+      ...options,
+      canUpdateRecipient: (signer) => canRecipientBeModified(signer.id),
+    });
   };
 
-  const {
-    append: appendSigner,
-    fields: signers,
-    remove: removeSigner,
-  } = useFieldArray({
+  const activeRecipientCount = watchedSigners.filter((signer) => !isCcRecipient(signer)).length;
+
+  const isAssistantLastActiveRecipient = (signers: typeof watchedSigners) => {
+    const activeRecipients = signers.filter((signer) => !isCcRecipient(signer));
+    const lastActiveRecipient = activeRecipients[activeRecipients.length - 1];
+
+    return lastActiveRecipient?.role === RecipientRole.ASSISTANT;
+  };
+
+  const { fields: signers, remove: removeSigner } = useFieldArray({
     control,
     name: 'signers',
     keyName: 'nativeId',
@@ -207,14 +217,31 @@ export const EnvelopeEditorRecipientForm = () => {
     return utilCanRecipientBeModified(recipient, fields);
   };
 
+  const appendNormalizedSigner = (signer: (typeof watchedSigners)[number], shouldFocus = false) => {
+    const updatedSigners = normalizeSigningOrders([...form.getValues('signers'), signer]);
+
+    form.setValue('signers', updatedSigners, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+
+    if (shouldFocus) {
+      const signerIndex = updatedSigners.findIndex((updatedSigner) => updatedSigner.formId === signer.formId);
+
+      if (signerIndex !== -1) {
+        requestAnimationFrame(() => form.setFocus(`signers.${signerIndex}.email`));
+      }
+    }
+  };
+
   const onAddSigner = () => {
-    appendSigner({
+    appendNormalizedSigner({
       formId: nanoid(12),
       name: '',
       email: '',
       role: RecipientRole.SIGNER,
       actionAuth: [],
-      signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
+      signingOrder: activeRecipientCount + 1,
     });
   };
 
@@ -322,18 +349,16 @@ export const EnvelopeEditorRecipientForm = () => {
 
       form.setFocus(`signers.${emptySignerIndex}.email`);
     } else {
-      appendSigner(
+      appendNormalizedSigner(
         {
           formId: nanoid(12),
           name: currentEditorName ?? '',
           email: currentEditorEmail ?? '',
           role: RecipientRole.SIGNER,
           actionAuth: [],
-          signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
+          signingOrder: activeRecipientCount + 1,
         },
-        {
-          shouldFocus: true,
-        },
+        true,
       );
 
       void form.trigger('signers');
@@ -368,18 +393,14 @@ export const EnvelopeEditorRecipientForm = () => {
 
       items.splice(insertIndex, 0, reorderedSigner);
 
-      const updatedSigners = items.map((signer, index) => ({
-        ...signer,
-        signingOrder: !canRecipientBeModified(signer.id) ? signer.signingOrder : index + 1,
-      }));
+      const updatedSigners = normalizeSigningOrders(items, { preserveOrder: true });
 
       form.setValue('signers', updatedSigners, {
         shouldValidate: true,
         shouldDirty: true,
       });
 
-      const lastSigner = updatedSigners[updatedSigners.length - 1];
-      if (lastSigner.role === RecipientRole.ASSISTANT) {
+      if (isAssistantLastActiveRecipient(updatedSigners)) {
         toast({
           title: t`Warning: Assistant as last signer`,
           description: t`Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist.`,
@@ -410,18 +431,19 @@ export const EnvelopeEditorRecipientForm = () => {
         return;
       }
 
-      const updatedSigners = currentSigners.map((signer, idx) => ({
-        ...signer,
-        role: idx === index ? role : signer.role,
-        signingOrder: !canRecipientBeModified(signer.id) ? signer.signingOrder : idx + 1,
-      }));
+      const updatedSigners = normalizeSigningOrders(
+        currentSigners.map((signer, idx) => ({
+          ...signer,
+          role: idx === index ? role : signer.role,
+        })),
+      );
 
       form.setValue('signers', updatedSigners, {
         shouldValidate: true,
         shouldDirty: true,
       });
 
-      if (role === RecipientRole.ASSISTANT && index === updatedSigners.length - 1) {
+      if (role === RecipientRole.ASSISTANT && isAssistantLastActiveRecipient(updatedSigners)) {
         toast({
           title: t`Warning: Assistant as last signer`,
           description: t`Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist.`,
@@ -446,22 +468,32 @@ export const EnvelopeEditorRecipientForm = () => {
       const currentSigners = form.getValues('signers');
       const signer = currentSigners[index];
 
-      // Remove signer from current position and insert at new position
-      const remainingSigners = currentSigners.filter((_, idx) => idx !== index);
-      const newPosition = Math.min(Math.max(0, newOrder - 1), currentSigners.length - 1);
-      remainingSigners.splice(newPosition, 0, signer);
+      if (isCcRecipient(signer)) {
+        return;
+      }
 
-      const updatedSigners = remainingSigners.map((s, idx) => ({
-        ...s,
-        signingOrder: !canRecipientBeModified(s.id) ? s.signingOrder : idx + 1,
-      }));
+      const signersWithSigningOrder = currentSigners.filter((s) => !isCcRecipient(s));
+      const signersWithoutSigningOrder = currentSigners.filter((s) => isCcRecipient(s));
+      const currentSigningOrderIndex = signersWithSigningOrder.findIndex((s) => s.formId === signer.formId);
+
+      if (currentSigningOrderIndex === -1) {
+        return;
+      }
+
+      const [reorderedSigner] = signersWithSigningOrder.splice(currentSigningOrderIndex, 1);
+      const newPosition = Math.min(Math.max(0, newOrder - 1), signersWithSigningOrder.length);
+      signersWithSigningOrder.splice(newPosition, 0, reorderedSigner);
+
+      const updatedSigners = normalizeSigningOrders([...signersWithSigningOrder, ...signersWithoutSigningOrder], {
+        preserveOrder: true,
+      });
 
       form.setValue('signers', updatedSigners, {
         shouldValidate: true,
         shouldDirty: true,
       });
 
-      if (signer.role === RecipientRole.ASSISTANT && newPosition === remainingSigners.length - 1) {
+      if (signer.role === RecipientRole.ASSISTANT && isAssistantLastActiveRecipient(updatedSigners)) {
         toast({
           title: t`Warning: Assistant as last signer`,
           description: t`Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist.`,
@@ -475,10 +507,12 @@ export const EnvelopeEditorRecipientForm = () => {
     setShowSigningOrderConfirmation(false);
 
     const currentSigners = form.getValues('signers');
-    const updatedSigners = currentSigners.map((signer) => ({
-      ...signer,
-      role: signer.role === RecipientRole.ASSISTANT ? RecipientRole.SIGNER : signer.role,
-    }));
+    const updatedSigners = normalizeSigningOrders(
+      currentSigners.map((signer) => ({
+        ...signer,
+        role: signer.role === RecipientRole.ASSISTANT ? RecipientRole.SIGNER : signer.role,
+      })),
+    );
 
     form.setValue('signers', updatedSigners, {
       shouldValidate: true,
@@ -781,6 +815,7 @@ export const EnvelopeEditorRecipientForm = () => {
                         isDragDisabled={
                           !isSigningOrderSequential ||
                           isSubmitting ||
+                          isCcRecipient(signer) ||
                           !canRecipientBeModified(signer.id) ||
                           !signer.signingOrder
                         }
@@ -804,7 +839,11 @@ export const EnvelopeEditorRecipientForm = () => {
                               })}
                             >
                               <div className="flex flex-row items-center gap-x-2">
-                                {isSigningOrderSequential && (
+                                {isSigningOrderSequential && isCcRecipient(signer) && (
+                                  <div className="mt-auto h-10 w-[4.25rem] flex-shrink-0" />
+                                )}
+
+                                {isSigningOrderSequential && !isCcRecipient(signer) && (
                                   <FormField
                                     control={form.control}
                                     name={`signers.${index}.signingOrder`}
@@ -820,7 +859,7 @@ export const EnvelopeEditorRecipientForm = () => {
                                         <FormControl>
                                           <Input
                                             type="number"
-                                            max={signers.length}
+                                            max={activeRecipientCount}
                                             data-testid="signing-order-input"
                                             className={cn(
                                               'w-10 text-center',
@@ -961,7 +1000,6 @@ export const EnvelopeEditorRecipientForm = () => {
                                           onValueChange={(value) => {
                                             // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
                                             handleRoleChange(index, value as RecipientRole);
-                                            field.onChange(value);
                                           }}
                                           disabled={
                                             snapshot.isDragging || isSubmitting || !canRecipientBeModified(signer.id)
