@@ -1,19 +1,20 @@
 import { isPrivateUrl } from '@documenso/lib/server-only/webhooks/is-private-url';
+import { msg } from '@lingui/core/macro';
 import { WebhookTriggerEvents } from '@prisma/client';
 import { z } from 'zod';
 
 export const ZWebhookUrlSchema = z
   .string()
-  .url()
+  .url({ message: msg`Invalid URL`.id })
   .refine((url) => !isPrivateUrl(url), {
-    message: 'Webhook URL cannot point to a private or loopback address',
+    message: msg`Webhook URL cannot point to a private or loopback address`.id,
   });
 
 export const ZCreateWebhookRequestSchema = z.object({
   webhookUrl: ZWebhookUrlSchema,
   eventTriggers: z
     .array(z.nativeEnum(WebhookTriggerEvents))
-    .min(1, { message: 'At least one event trigger is required' }),
+    .min(1, { message: msg`At least one event trigger is required`.id }),
   secret: z.string().nullable(),
   enabled: z.boolean(),
 });
