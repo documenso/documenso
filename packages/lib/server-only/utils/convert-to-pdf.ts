@@ -63,6 +63,10 @@ export const convertToPdf = async (input: Buffer, extension: string): Promise<Bu
   const tmpDir = await mkdtemp(join(tmpdir(), 'documenso-convert-'));
   const inputPath = join(tmpDir, `input.${extension}`);
   const outputPath = join(tmpDir, 'input.pdf');
+  // Point LibreOffice at a throwaway profile inside the temp dir. The container
+  // runs as a non-root user without a writable $HOME, so the default
+  // ~/.config/libreoffice profile cannot be created and soffice would abort.
+  const userInstallation = `-env:UserInstallation=file://${join(tmpDir, 'profile')}`;
 
   try {
     await writeFile(inputPath, input);
@@ -71,7 +75,15 @@ export const convertToPdf = async (input: Buffer, extension: string): Promise<Bu
       async () =>
         await execFileAsync(
           sofficePath,
-          ['--headless', '--convert-to', 'pdf', '--outdir', tmpDir, inputPath],
+          [
+            '--headless',
+            userInstallation,
+            '--convert-to',
+            'pdf',
+            '--outdir',
+            tmpDir,
+            inputPath,
+          ],
           { timeout: CONVERSION_TIMEOUT_MS },
         ),
     );

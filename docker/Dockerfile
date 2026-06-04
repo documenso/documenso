@@ -100,6 +100,14 @@ ENV DOCKER_OUTPUT 1
 ENV NODE_TLS_REJECT_UNAUTHORIZED=0
 RUN npm config set strict-ssl false
 
+# Office-to-PDF conversion dependency. The on-the-fly DOCX/DOC -> PDF pipeline
+# (packages/lib/server-only/utils/convert-to-pdf.ts) shells out to LibreOffice's
+# `soffice --headless`; without it `findBinary('soffice')` throws DEPENDENCY_MISSING
+# and Word document uploads fail. libreoffice-writer pulls in libreoffice-common
+# which provides /usr/bin/soffice; font-liberation supplies the metric-compatible
+# Arial/Times/Courier substitutes Word documents rely on.
+RUN apk add --no-cache libreoffice-writer font-liberation
+
 # Telemetry credentials (baked into image at build time, can be disabled at runtime)
 ARG NEXT_PRIVATE_TELEMETRY_KEY=""
 ENV NEXT_PRIVATE_TELEMETRY_KEY="$NEXT_PRIVATE_TELEMETRY_KEY"
