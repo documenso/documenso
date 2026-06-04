@@ -369,7 +369,16 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
         /**
          * SIGNATURE FIELD.
          */
-        .with({ type: FieldType.SIGNATURE }, (field) => {
+          .with({ type: FieldType.SIGNATURE }, (field) => {
+          let spinnerDestroyed = false;
+
+          const destroySpinnerOnce = () => {
+            if (!spinnerDestroyed) {
+              spinnerDestroyed = true;
+              loadingSpinnerGroup.destroy();
+            }
+          };
+
           void handleSignatureFieldClick({
             field,
             fullName: fullName.current,
@@ -386,33 +395,28 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
               fieldGroup.add(loadingSpinnerGroup);
 
               if (payload.value) {
-                // executeActionAuthProcedure may resolve synchronously after
-                // opening a re-auth dialog, so the spinner must be destroyed
-                // inside onReauthFormSubmit (after the actual sign completes)
-                // rather than from a generic .finally() that would tear it
-                // down while auth is still pending.
                 await executeActionAuthProcedure({
                   onReauthFormSubmit: async (authOptions) => {
-                    try {
-                      await signField(field.id, payload, authOptions);
-                    } finally {
-                      loadingSpinnerGroup.destroy();
-                    }
+                    await signField(field.id, payload, authOptions);
+
+                    destroySpinnerOnce();
                   },
                   actionTarget: field.type,
                 });
 
                 setSignature(payload.value);
+
+                // Auth procedure resolved without re-auth (skip dialog or pre-calculated).
+                // The onReauthFormSubmit ran inline, so spinner is already destroyed.
+                // If auth dialog was opened (3rd branch), spinner is kept alive until
+                // the user submits OR cancels — handled by .finally() below.
               } else {
-                try {
-                  await signField(field.id, payload);
-                } finally {
-                  loadingSpinnerGroup.destroy();
-                }
+                await signField(field.id, payload);
+                destroySpinnerOnce();
               }
             })
-            .catch(() => {
-              loadingSpinnerGroup.destroy();
+            .finally(() => {
+              destroySpinnerOnce();
             });
         })
         .exhaustive();
