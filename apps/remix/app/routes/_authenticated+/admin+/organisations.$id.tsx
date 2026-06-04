@@ -40,6 +40,7 @@ import type { z } from 'zod';
 import { AdminOrganisationDeleteDialog } from '~/components/dialogs/admin-organisation-delete-dialog';
 import { AdminOrganisationMemberDeleteDialog } from '~/components/dialogs/admin-organisation-member-delete-dialog';
 import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
+import { AdminOrganisationSyncSubscriptionDialog } from '~/components/dialogs/admin-organisation-sync-subscription-dialog';
 import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
 import { AdminGlobalSettingsSection } from '~/components/general/admin-global-settings-section';
 import { ClaimLimitFields } from '~/components/general/claim-limit-fields';
@@ -377,7 +378,16 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
         )}
 
         {organisation.subscription && (
-          <div>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <AdminOrganisationSyncSubscriptionDialog
+              organisationId={organisationId}
+              trigger={
+                <Button variant="outline">
+                  <Trans>Sync Stripe subscription</Trans>
+                </Button>
+              }
+            />
+
             <Button variant="outline" asChild>
               <Link
                 target="_blank"

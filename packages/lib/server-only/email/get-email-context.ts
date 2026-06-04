@@ -74,6 +74,7 @@ export type EmailContextResponse = {
   };
   replyToEmail: string | undefined;
   emailLanguage: string;
+  isOrganisationOwnerDisabled: boolean;
 };
 
 export const getEmailContext = async (options: GetEmailContextOptions): Promise<EmailContextResponse> => {
@@ -135,6 +136,11 @@ const handleOrganisationEmailContext = async (organisationId: string) => {
       id: organisationId,
     },
     include: {
+      owner: {
+        select: {
+          disabled: true,
+        },
+      },
       organisationClaim: true,
       organisationGlobalSettings: true,
       emailDomains: {
@@ -167,6 +173,7 @@ const handleOrganisationEmailContext = async (organisationId: string) => {
     claims,
     organisationId: organisation.id,
     organisationType: organisation.type,
+    isOrganisationOwnerDisabled: organisation.owner.disabled,
   };
 };
 
@@ -179,6 +186,12 @@ const handleTeamEmailContext = async (teamId: number) => {
       teamGlobalSettings: true,
       organisation: {
         include: {
+          owner: {
+            select: {
+              id: true,
+              disabled: true,
+            },
+          },
           organisationClaim: true,
           organisationGlobalSettings: true,
           emailDomains: {
@@ -212,6 +225,7 @@ const handleTeamEmailContext = async (teamId: number) => {
     claims,
     organisationId: organisation.id,
     organisationType: organisation.type,
+    isOrganisationOwnerDisabled: organisation.owner.disabled,
   };
 };
 

@@ -2,7 +2,7 @@ import { prisma } from '@documenso/prisma';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobsClient } from '../../jobs/client';
 import { generateDatabaseId } from '../../universal/id';
-import { currentMonthlyPeriod } from './current-monthly-period';
+import { currentMonthlyPeriod } from '../../universal/monthly-period';
 import type { LimitCounter } from './types';
 
 type CheckMonthlyQuotaOptions = {
@@ -19,10 +19,6 @@ const COUNTER_COLUMN = {
 } as const satisfies Record<LimitCounter, string>;
 
 export const checkMonthlyQuota = async (opts: CheckMonthlyQuotaOptions): Promise<void> => {
-  if (opts.quota === null) {
-    return;
-  }
-
   if (opts.quota === 0) {
     throw new AppError(AppErrorCode.TOO_MANY_REQUESTS, {
       message:
@@ -51,6 +47,11 @@ export const checkMonthlyQuota = async (opts: CheckMonthlyQuotaOptions): Promise
       [column]: opts.count,
     },
   });
+
+  // For unlimited quotas, we still allow the request to send so we can collect the monthly stat.
+  if (opts.quota === null) {
+    return;
+  }
 
   const newCount = latestMonthlyStat[column];
   const previousCount = newCount - opts.count;

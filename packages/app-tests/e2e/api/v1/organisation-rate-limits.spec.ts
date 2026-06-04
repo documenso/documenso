@@ -168,7 +168,8 @@ const getMonthlyStat = async (organisation: Organisation) =>
  * The DB counter is the source of truth for quota enforcement, so checking its
  * exact value (not just the HTTP response) proves the documented increment
  * semantics in check-monthly-quota.ts:
- *   - quota === null -> never incremented (stays 0)
+ *   - quota === null -> unlimited: never blocks, but the request is STILL
+ *                       counted (the upsert now runs before the null return)
  *   - quota === 0    -> throws BEFORE increment (stays 0)
  *   - quota  >  0    -> incremented by `count` BEFORE the over-quota check, so
  *                       even the request that gets rejected still advances it
@@ -456,9 +457,10 @@ test.describe('Organisation dynamic rate limits & quotas (API v1)', () => {
       // client. We therefore assert no org-specific header is surfaced.
       expectNoOrgRateLimitHeader(limitedRes);
 
-      // Windowed limiting uses the RateLimit bucket table, NOT the monthly quota
-      // counter (quota is null here), so apiCount must remain untouched.
-      await expectMonthlyCounter(organisation, 'apiCount', 0);
+      // The windowed stage blocks the (MAX+1)th request before the quota upsert,
+      // but each of the MAX allowed requests still records usage (null quota now
+      // tracks instead of skipping), so the counter equals MAX.
+      await expectMonthlyCounter(organisation, 'apiCount', MAX);
     });
 
     test('a single allowed request succeeds when the limit is 1', async ({ request }) => {
@@ -476,7 +478,9 @@ test.describe('Organisation dynamic rate limits & quotas (API v1)', () => {
       const body = await expectOrgLimited(limitedRes);
       expect(String(body.message)).toMatch(WINDOWED_LIMIT_MESSAGE);
 
-      await expectMonthlyCounter(organisation, 'apiCount', 0);
+      // The one allowed request is counted (null quota still tracks); the blocked
+      // request trips the window before the quota upsert, so the counter is 1.
+      await expectMonthlyCounter(organisation, 'apiCount', 1);
     });
 
     test('the windowed limit RESETS once the window elapses (429 -> wait -> 200)', async ({ request }) => {
@@ -531,8 +535,9 @@ test.describe('Organisation dynamic rate limits & quotas (API v1)', () => {
         expect(res.status()).toBe(200);
       }
 
-      // A null quota means "unlimited" and must never increment the counter.
-      await expectMonthlyCounter(organisation, 'apiCount', 0);
+      // A null quota means "unlimited" (never blocks), but every request is now
+      // recorded so usage is visible on unlimited plans — so the counter is 6.
+      await expectMonthlyCounter(organisation, 'apiCount', 6);
     });
 
     test('exhausting the quota 429s without rate-limit headers and keeps counting', async ({ request }) => {
@@ -603,8 +608,9 @@ test.describe('Organisation dynamic rate limits & quotas (API v1)', () => {
       await expectNotGlobalLimited(res);
       expect(res.ok(), `resend should succeed: ${await res.text()}`).toBeTruthy();
 
-      // Windowed pass with a null quota must NOT touch the monthly counter.
-      await expectMonthlyCounter(organisation, 'emailCount', 0);
+      // The windowed pass is now recorded even though the quota is null, so the
+      // counter advances by the batch size (recipientIds.length).
+      await expectMonthlyCounter(organisation, 'emailCount', recipientIds.length);
     });
 
     test('resend is blocked when recipient count exceeds the email window', async ({ request }) => {

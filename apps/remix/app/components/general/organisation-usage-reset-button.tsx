@@ -14,7 +14,7 @@ export const OrganisationUsageResetButton = ({ organisationId, counter }: Organi
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
 
-  const { mutateAsync: reset, isPending } = trpc.admin.organisation.resetMonthlyStat.useMutation({
+  const { mutateAsync: reset, isPending } = trpc.admin.organisation.stats.reset.useMutation({
     onSuccess: async () => {
       toast({ title: t`Counter reset.` });
       await revalidate();
