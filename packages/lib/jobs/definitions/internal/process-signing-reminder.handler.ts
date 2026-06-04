@@ -154,6 +154,7 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
   const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
+  const reportUrl = `${NEXT_PUBLIC_WEBAPP_URL()}/report/${recipient.token}`;
 
   // Meter reminder emails against the organisation email quota/stats. Reminders
   // are unsolicited (the recipient didn't opt in to them) and can recur, so they
@@ -188,6 +189,7 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
       signDocumentLink,
       customBody: emailMessage,
       role: recipient.role,
+      reportUrl,
     });
 
     const [html, text] = await Promise.all([
