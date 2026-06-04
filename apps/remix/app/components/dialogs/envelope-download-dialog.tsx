@@ -12,6 +12,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -61,10 +62,17 @@ export const EnvelopeDownloadDialog = ({
     [envelopeItemIdAndVersion: string]: boolean;
   }>({});
 
+  const [isDownloadingAll, setIsDownloadingAll] = useState(false);
+
   const generateDownloadKey = (envelopeItemId: string, version: DownloadVersion) =>
     `${envelopeItemId}-${version}`;
 
   const showPartialOption = canDownloadPartial && envelopeStatus === DocumentStatus.PENDING;
+
+  // The version "Download all" grabs for each document: the final signed copy once
+  // the envelope is completed, otherwise the original upload.
+  const downloadAllVersion: DownloadVersion =
+    envelopeStatus === DocumentStatus.COMPLETED ? 'signed' : 'original';
 
   const { data: envelopeItemsPayload, isLoading: isLoadingEnvelopeItems } =
     trpc.envelope.item.getManyByToken.useQuery(
@@ -121,6 +129,43 @@ export const EnvelopeDownloadDialog = ({
     }
   };
 
+  const onDownloadAll = async () => {
+    if (isDownloadingAll || envelopeItems.length === 0) {
+      return;
+    }
+
+    setIsDownloadingAll(true);
+
+    const failedTitles: string[] = [];
+
+    // Download each document sequentially so the browser reliably triggers every
+    // save instead of throttling a burst of simultaneous downloads.
+    for (const envelopeItem of envelopeItems) {
+      try {
+        await downloadPDF({
+          envelopeItem,
+          token,
+          fileName: envelopeItem.title,
+          version: downloadAllVersion,
+        });
+      } catch (error) {
+        console.error(error);
+        failedTitles.push(envelopeItem.title);
+      }
+    }
+
+    setIsDownloadingAll(false);
+
+    if (failedTitles.length > 0) {
+      toast({
+        title: t`Some documents could not be downloaded`,
+        description: t`${failedTitles.length} of ${envelopeItems.length} documents failed to download. Please try again.`,
+        variant: 'destructive',
+        duration: 7500,
+      });
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={(value) => setOpen(value)}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -135,7 +180,7 @@ export const EnvelopeDownloadDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex w-full flex-col gap-4 overflow-hidden">
+        <div className="-mr-2 flex max-h-[60vh] w-full flex-col gap-4 overflow-y-auto pr-2">
           {isLoadingEnvelopeItems ? (
             <>
               {Array.from({ length: 1 }).map((_, index) => (
@@ -167,7 +212,6 @@ export const EnvelopeDownloadDialog = ({
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  {/* Todo: Envelopes - Fix overflow */}
                   <h4 className="text-foreground truncate text-sm font-medium" title={item.title}>
                     {item.title}
                   </h4>
@@ -225,6 +269,23 @@ export const EnvelopeDownloadDialog = ({
             ))
           )}
         </div>
+
+        <DialogFooter>
+          <Button
+            type="button"
+            className="w-full"
+            onClick={onDownloadAll}
+            loading={isDownloadingAll}
+            disabled={isLoadingEnvelopeItems || envelopeItems.length === 0}
+          >
+            {!isDownloadingAll && <DownloadIcon className="mr-2 h-4 w-4" />}
+            {downloadAllVersion === 'signed' ? (
+              <Trans>Download all (signed)</Trans>
+            ) : (
+              <Trans>Download all (original)</Trans>
+            )}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
