@@ -62,7 +62,7 @@ export const run = async ({ payload, io }: { payload: TSendOwnerRecipientExpired
     return;
   }
 
-  const { branding, emailLanguage, senderEmail } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, emailsDisabled } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
       type: 'team',
@@ -70,6 +70,11 @@ export const run = async ({ payload, io }: { payload: TSendOwnerRecipientExpired
     },
     meta: documentMeta,
   });
+
+  // Don't send any emails if the organisation has email sending disabled.
+  if (emailsDisabled) {
+    return;
+  }
 
   const i18n = await getI18nInstance(emailLanguage);
 

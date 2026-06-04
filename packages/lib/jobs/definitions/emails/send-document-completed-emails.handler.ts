@@ -67,7 +67,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
     throw new Error('Document has no recipients');
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail, isOrganisationOwnerDisabled, organisationId, claims } =
+  const { branding, emailLanguage, senderEmail, replyToEmail, organisationId, claims, emailsDisabled } =
     await getEmailContext({
       emailType: 'RECIPIENT',
       source: {
@@ -77,8 +77,8 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
       meta: envelope.documentMeta,
     });
 
-  // Don't send completion emails on behalf of a disabled (e.g. banned) account.
-  if (envelope.user.disabled || isOrganisationOwnerDisabled) {
+  // Don't send completion emails if the organisation has email sending disabled or the owner is disabled (e.g. banned).
+  if (envelope.user.disabled || emailsDisabled) {
     return;
   }
 

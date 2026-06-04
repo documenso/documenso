@@ -6,7 +6,6 @@ import { OrganisationMemberRole, OrganisationType, Prisma, type SubscriptionClai
 import { IS_BILLING_ENABLED } from '../../constants/app';
 import { ORGANISATION_INTERNAL_GROUPS } from '../../constants/organisations';
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import type { InternalClaim } from '../../types/subscription';
 import { INTERNAL_CLAIM_ID } from '../../types/subscription';
 import { generateDatabaseId, prefixedId } from '../../universal/id';
 import { generateDefaultOrganisationSettings } from '../../utils/organisations';
@@ -18,7 +17,7 @@ type CreateOrganisationOptions = {
   type: OrganisationType;
   url?: string;
   customerId?: string;
-  claim: InternalClaim;
+  claim: Omit<SubscriptionClaim, 'createdAt' | 'updatedAt'>;
 };
 
 export const createOrganisation = async ({ name, url, type, userId, customerId, claim }: CreateOrganisationOptions) => {

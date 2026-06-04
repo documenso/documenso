@@ -66,6 +66,12 @@ export type EmailContextResponse = {
   branding: BrandingSettings;
   settings: Omit<OrganisationGlobalSettings, 'id'>;
   claims: OrganisationClaim;
+  /**
+   * Whether the organisation is prevented from sending emails.
+   *
+   * When true, ALL emails sent on behalf of this organisation must be skipped.
+   */
+  emailsDisabled: boolean;
   organisationId: string;
   organisationType: OrganisationType;
   senderEmail: {
@@ -74,7 +80,6 @@ export type EmailContextResponse = {
   };
   replyToEmail: string | undefined;
   emailLanguage: string;
-  isOrganisationOwnerDisabled: boolean;
 };
 
 export const getEmailContext = async (options: GetEmailContextOptions): Promise<EmailContextResponse> => {
@@ -171,9 +176,9 @@ const handleOrganisationEmailContext = async (organisationId: string) => {
     ),
     settings: organisation.organisationGlobalSettings,
     claims,
+    emailsDisabled: organisation.owner.disabled || claims.flags.disableEmails === true,
     organisationId: organisation.id,
     organisationType: organisation.type,
-    isOrganisationOwnerDisabled: organisation.owner.disabled,
   };
 };
 
@@ -223,9 +228,9 @@ const handleTeamEmailContext = async (teamId: number) => {
     branding: teamGlobalSettingsToBranding(teamSettings, teamId, claims.flags.hidePoweredBy ?? false),
     settings: teamSettings,
     claims,
+    emailsDisabled: organisation.owner.disabled || claims.flags.disableEmails === true,
     organisationId: organisation.id,
     organisationType: organisation.type,
-    isOrganisationOwnerDisabled: organisation.owner.disabled,
   };
 };
 

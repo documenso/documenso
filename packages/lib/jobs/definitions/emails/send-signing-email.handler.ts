@@ -98,7 +98,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     replyToEmail,
     organisationId,
     claims,
-    isOrganisationOwnerDisabled,
+    emailsDisabled,
   } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
@@ -108,8 +108,8 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     meta: envelope.documentMeta,
   });
 
-  // Don't send signing invitations on behalf of a disabled (e.g. banned) account.
-  if (envelope.user.disabled || isOrganisationOwnerDisabled) {
+  // Don't send signing invitations if the organisation has email sending disabled or the owner is disabled (e.g. banned).
+  if (envelope.user.disabled || emailsDisabled) {
     return;
   }
 

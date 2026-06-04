@@ -126,7 +126,7 @@ const handleDocumentOwnerDelete = async ({ envelope, user, requestMetadata }: Ha
     return;
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, replyToEmail, emailsDisabled } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
       type: 'team',
@@ -187,7 +187,9 @@ const handleDocumentOwnerDelete = async ({ envelope, user, requestMetadata }: Ha
 
   const isEnvelopeDeleteEmailEnabled = extractDerivedDocumentEmailSettings(envelope.documentMeta).documentDeleted;
 
-  if (!isEnvelopeDeleteEmailEnabled) {
+  // Skip sending if the email is disabled for this document or the organisation
+  // has email sending disabled entirely.
+  if (!isEnvelopeDeleteEmailEnabled || emailsDisabled) {
     return deletedEnvelope;
   }
 

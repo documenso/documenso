@@ -150,15 +150,28 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
     return envelope;
   }
 
-  const { branding, emailLanguage, organisationType, senderEmail, replyToEmail, organisationId, claims } =
-    await getEmailContext({
-      emailType: 'RECIPIENT',
-      source: {
-        type: 'team',
-        teamId: envelope.teamId,
-      },
-      meta: envelope.documentMeta,
-    });
+  const {
+    branding,
+    emailLanguage,
+    organisationType,
+    senderEmail,
+    replyToEmail,
+    organisationId,
+    claims,
+    emailsDisabled,
+  } = await getEmailContext({
+    emailType: 'RECIPIENT',
+    source: {
+      type: 'team',
+      teamId: envelope.teamId,
+    },
+    meta: envelope.documentMeta,
+  });
+
+  // Don't resend any emails if the organisation has email sending disabled.
+  if (user.disabled || emailsDisabled) {
+    return envelope;
+  }
 
   // Assert that there is enough quota to send the emails.
   await assertOrganisationRatesAndLimits({

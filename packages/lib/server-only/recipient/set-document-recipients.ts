@@ -85,14 +85,15 @@ export const setDocumentRecipients = async ({
     throw new Error('Document already complete');
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail, organisationId, claims } = await getEmailContext({
-    emailType: 'RECIPIENT',
-    source: {
-      type: 'team',
-      teamId,
-    },
-    meta: envelope.documentMeta,
-  });
+  const { branding, emailLanguage, senderEmail, replyToEmail, organisationId, claims, emailsDisabled } =
+    await getEmailContext({
+      emailType: 'RECIPIENT',
+      source: {
+        type: 'team',
+        teamId,
+      },
+      meta: envelope.documentMeta,
+    });
 
   const recipientsHaveActionAuth = recipients.some(
     (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
@@ -281,6 +282,7 @@ export const setDocumentRecipients = async ({
     await Promise.all(
       removedRecipients.map(async (recipient) => {
         if (
+          emailsDisabled ||
           recipient.sendStatus !== SendStatus.SENT ||
           recipient.role === RecipientRole.CC ||
           !isRecipientRemovedEmailEnabled ||
