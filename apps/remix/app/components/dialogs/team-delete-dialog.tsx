@@ -68,7 +68,10 @@ export const TeamDeleteDialog = ({ trigger, teamId, teamName, redirectTo }: Team
     try {
       const transferTeamId = data.transferTeamId ? parseInt(data.transferTeamId, 10) : undefined;
 
-      await deleteTeam({ teamId, transferTeamId: transferTeamId || undefined });
+      await deleteTeam({
+        teamId,
+        transferTeamId: transferTeamId && transferTeamId > 0 ? transferTeamId : undefined,
+      });
 
       await refreshSession();
 

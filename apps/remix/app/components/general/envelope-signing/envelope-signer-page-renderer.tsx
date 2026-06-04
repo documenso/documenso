@@ -393,21 +393,32 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
               fieldGroup.add(loadingSpinnerGroup);
 
               if (payload.value) {
+                // executeActionAuthProcedure may resolve synchronously after
+                // opening a re-auth dialog, so the spinner must be destroyed
+                // inside onReauthFormSubmit (after the actual sign completes)
+                // rather than from a generic .finally() that would tear it
+                // down while auth is still pending.
                 await executeActionAuthProcedure({
                   onReauthFormSubmit: async (authOptions) => {
-                    await signField(field.id, payload, authOptions);
-
-                    loadingSpinnerGroup.destroy();
+                    try {
+                      await signField(field.id, payload, authOptions);
+                    } finally {
+                      loadingSpinnerGroup.destroy();
+                    }
                   },
                   actionTarget: field.type,
                 });
 
                 setSignature(payload.value);
               } else {
-                await signField(field.id, payload);
+                try {
+                  await signField(field.id, payload);
+                } finally {
+                  loadingSpinnerGroup.destroy();
+                }
               }
             })
-            .finally(() => {
+            .catch(() => {
               loadingSpinnerGroup.destroy();
             });
         })

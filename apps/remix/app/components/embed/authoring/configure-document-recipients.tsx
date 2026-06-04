@@ -98,7 +98,7 @@ export const ConfigureDocumentRecipients = ({ control, isSubmitting }: Configure
       // Update the form
       replace(updatedSigners);
     },
-    [signers, replace, getValues],
+    [signers, replace, getValues, signingOrder],
   );
 
   const onDragEnd = useCallback(
@@ -120,7 +120,7 @@ export const ConfigureDocumentRecipients = ({ control, isSubmitting }: Configure
       // Update the form with new ordering
       replace(updatedSigners);
     },
-    [move, replace, getValues],
+    [move, replace, getValues, signingOrder],
   );
 
   const onSigningOrderChange = (signingOrder: DocumentSigningOrder) => {

@@ -164,8 +164,9 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
   const currentPage = pages[pages.length - 1];
 
   const toggleOpen = () => {
-    setIsOpen((isOpen) => !isOpen);
-    onOpenChange?.(!isOpen);
+    const newOpen = !isOpen;
+    setIsOpen(newOpen);
+    onOpenChange?.(newOpen);
 
     if (isOpen) {
       setPages([]);
@@ -200,8 +201,16 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
   };
 
   const goToSettings = useCallback(() => push(SETTINGS_PAGES[0].path), [push]);
-  const goToDocuments = useCallback(() => push(documentPageLinks[0].path), [push]);
-  const goToTemplates = useCallback(() => push(templatePageLinks[0].path), [push]);
+  const goToDocuments = useCallback(() => {
+    if (documentPageLinks.length > 0) {
+      push(documentPageLinks[0].path);
+    }
+  }, [push, documentPageLinks]);
+  const goToTemplates = useCallback(() => {
+    if (templatePageLinks.length > 0) {
+      push(templatePageLinks[0].path);
+    }
+  }, [push, templatePageLinks]);
 
   useHotkeys(['ctrl+k', 'meta+k'], toggleOpen, { preventDefault: true });
   useHotkeys(SETTINGS_PAGE_SHORTCUT, goToSettings);
