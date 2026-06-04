@@ -8,17 +8,17 @@ import { Trans } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
 import { ErrorCode as DropzoneErrorCode, type FileRejection } from 'react-dropzone';
 import { useNavigate } from 'react-router';
-import { match } from 'ts-pattern';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import type { TCreateEnvelopePayload } from '@documenso/trpc/server/envelope-router/create-envelope.types';
 import { buildDropzoneRejectionDescription } from '@documenso/ui/lib/handle-dropzone-rejection';
+import { buildUploadErrorMessage } from '@documenso/ui/lib/handle-upload-error';
 import { cn } from '@documenso/ui/lib/utils';
 import { DocumentUploadButton } from '@documenso/ui/primitives/document-upload-button';
 import {
@@ -128,18 +128,11 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
 
       console.error(err);
 
-      const errorMessage = match(error.code)
-        .with('INVALID_DOCUMENT_FILE', () => t`The uploaded file is not a valid document.`)
-        .with(AppErrorCode.LIMIT_EXCEEDED, () => t`You have reached your document limit.`)
-        .with(
-          'ENVELOPE_ITEM_LIMIT_EXCEEDED',
-          () => t`You have reached the limit of the number of files per envelope.`,
-        )
-        .otherwise(() => t`An error occurred while uploading your document.`);
+      const errorMessage = buildUploadErrorMessage(error.code);
 
       toast({
         title: t`Error`,
-        description: errorMessage,
+        description: i18n._(errorMessage),
         variant: 'destructive',
         duration: 7500,
       });

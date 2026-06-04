@@ -6,19 +6,19 @@ import { Trans } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
 import type { FileRejection } from 'react-dropzone';
 import { useNavigate, useParams } from 'react-router';
-import { match } from 'ts-pattern';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import type { TCreateDocumentPayloadSchema } from '@documenso/trpc/server/document-router/create-document.types';
 import type { TCreateTemplatePayloadSchema } from '@documenso/trpc/server/template-router/schema';
 import { buildDropzoneRejectionDescription } from '@documenso/ui/lib/handle-dropzone-rejection';
+import { buildUploadErrorMessage } from '@documenso/ui/lib/handle-upload-error';
 import { cn } from '@documenso/ui/lib/utils';
 import { DocumentUploadButton as DocumentUploadButtonPrimitive } from '@documenso/ui/primitives/document-upload-button';
 import {
@@ -140,17 +140,7 @@ export const DocumentUploadButtonLegacy = ({
 
       console.error(err);
 
-      const errorMessage = match(error.code)
-        .with('INVALID_DOCUMENT_FILE', () => msg`You cannot upload encrypted PDFs.`)
-        .with(
-          AppErrorCode.LIMIT_EXCEEDED,
-          () => msg`You have reached your document limit for this month. Please upgrade your plan.`,
-        )
-        .with(
-          'ENVELOPE_ITEM_LIMIT_EXCEEDED',
-          () => msg`You have reached the limit of the number of files per envelope.`,
-        )
-        .otherwise(() => msg`An error occurred while uploading your document.`);
+      const errorMessage = buildUploadErrorMessage(error.code);
 
       toast({
         title: _(msg`Error`),
