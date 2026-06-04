@@ -8,12 +8,71 @@ import type { TRecipientLite } from '../types/recipient';
 import { extractLegacyIds } from '../universal/id';
 import { zEmail } from './zod';
 
+type RecipientWithSigningOrder = {
+  role: RecipientRole;
+  signingOrder?: number | null;
+};
+
+type CanUpdateRecipient<T extends RecipientWithSigningOrder> = (recipient: T) => boolean;
+
+const canUpdateAnyRecipient = () => true;
+
 /**
  * Roles that require fields to be assigned before a document can be distributed.
  *
  * Currently only SIGNER requires a signature field.
  */
 export const RECIPIENT_ROLES_THAT_REQUIRE_FIELDS = [RecipientRole.SIGNER] as const;
+
+export const isCcRecipient = (recipient: Pick<RecipientWithSigningOrder, 'role'>) => {
+  return recipient.role === RecipientRole.CC;
+};
+
+export const getRecipientSigningOrder = (recipient: Pick<RecipientWithSigningOrder, 'role' | 'signingOrder'>) => {
+  if (isCcRecipient(recipient)) {
+    return null;
+  }
+
+  return recipient.signingOrder ?? null;
+};
+
+export const sortRecipientsForSigningOrder = <T extends RecipientWithSigningOrder>(recipients: T[]): T[] => {
+  return [...recipients].sort((r1, r2) => {
+    const r1IsCcRecipient = isCcRecipient(r1);
+    const r2IsCcRecipient = isCcRecipient(r2);
+
+    // CC recipients always sort after non-CC recipients.
+    if (r1IsCcRecipient !== r2IsCcRecipient) {
+      return r1IsCcRecipient ? 1 : -1;
+    }
+
+    // Order by signing order; missing orders sort last.
+    const r1SigningOrder = r1.signingOrder ?? Number.MAX_SAFE_INTEGER;
+    const r2SigningOrder = r2.signingOrder ?? Number.MAX_SAFE_INTEGER;
+
+    return r1SigningOrder - r2SigningOrder;
+  });
+};
+
+export const normalizeRecipientSigningOrders = <T extends RecipientWithSigningOrder>(
+  recipients: T[],
+  canUpdateRecipient: CanUpdateRecipient<T> = canUpdateAnyRecipient,
+): Array<T & { signingOrder?: number }> => {
+  const recipientsWithSigningOrder = recipients.filter((recipient) => !isCcRecipient(recipient));
+  const ccRecipients = recipients.filter((recipient) => isCcRecipient(recipient));
+
+  const normalizedRecipients = recipientsWithSigningOrder.map((recipient, index) => ({
+    ...recipient,
+    signingOrder: canUpdateRecipient(recipient) ? index + 1 : (recipient.signingOrder ?? index + 1),
+  }));
+
+  const normalizedCcRecipients = ccRecipients.map((recipient) => ({
+    ...recipient,
+    signingOrder: undefined,
+  }));
+
+  return [...normalizedRecipients, ...normalizedCcRecipients];
+};
 
 /**
  * Returns recipients who are missing required fields for their role.

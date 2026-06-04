@@ -158,11 +158,8 @@ export const EnvelopeEditorRecipientForm = () => {
     return watchedSigners.some((signer) => signer.role === RecipientRole.ASSISTANT);
   }, [watchedSigners]);
 
-  const normalizeSigningOrders = (signers: typeof watchedSigners, options: { preserveOrder?: boolean } = {}) => {
-    return normalizeRecipientSigningOrders(signers, {
-      ...options,
-      canUpdateRecipient: (signer) => canRecipientBeModified(signer.id),
-    });
+  const normalizeSigningOrders = (signers: typeof watchedSigners) => {
+    return normalizeRecipientSigningOrders(signers, (signer) => canRecipientBeModified(signer.id));
   };
 
   const activeRecipientCount = watchedSigners.filter((signer) => !isCcRecipient(signer)).length;
@@ -393,7 +390,7 @@ export const EnvelopeEditorRecipientForm = () => {
 
       items.splice(insertIndex, 0, reorderedSigner);
 
-      const updatedSigners = normalizeSigningOrders(items, { preserveOrder: true });
+      const updatedSigners = normalizeSigningOrders(items);
 
       form.setValue('signers', updatedSigners, {
         shouldValidate: true,
@@ -484,9 +481,7 @@ export const EnvelopeEditorRecipientForm = () => {
       const newPosition = Math.min(Math.max(0, newOrder - 1), signersWithSigningOrder.length);
       signersWithSigningOrder.splice(newPosition, 0, reorderedSigner);
 
-      const updatedSigners = normalizeSigningOrders([...signersWithSigningOrder, ...signersWithoutSigningOrder], {
-        preserveOrder: true,
-      });
+      const updatedSigners = normalizeSigningOrders([...signersWithSigningOrder, ...signersWithoutSigningOrder]);
 
       form.setValue('signers', updatedSigners, {
         shouldValidate: true,
