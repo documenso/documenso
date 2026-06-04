@@ -1,7 +1,35 @@
+import { execFile } from 'child_process';
+import { mkdtemp, readFile, rm, writeFile } from 'fs/promises';
+import { tmpdir } from 'os';
+import { join } from 'path';
+import { promisify } from 'util';
+
 import { PDF, PdfArray, PdfStream, StandardFonts } from '@libpdf/core';
 import { describe, expect, it } from 'vitest';
 
 import { normalizePdf } from './normalize-pdf';
+
+const execFileAsync = promisify(execFile);
+
+/**
+ * Encrypt a PDF with qpdf (empty user + owner password) so it loads as encrypted
+ * but is decryptable with no password, mirroring how decryptPdf opens encrypted
+ * uploads (the encrypted government forms this fork handles).
+ */
+const encryptPdf = async (pdf: Buffer): Promise<Buffer> => {
+  const dir = await mkdtemp(join(tmpdir(), 'documenso-test-encrypt-'));
+  const inputPath = join(dir, 'input.pdf');
+  const outputPath = join(dir, 'encrypted.pdf');
+
+  try {
+    await writeFile(inputPath, pdf);
+    await execFileAsync('qpdf', ['--encrypt', '', '', '256', '--', inputPath, outputPath]);
+
+    return await readFile(outputPath);
+  } finally {
+    await rm(dir, { recursive: true, force: true }).catch(() => undefined);
+  }
+};
 
 /**
  * Extract the concatenated text of every page of a PDF buffer.
@@ -65,6 +93,25 @@ describe('normalizePdf', () => {
     expect(await extractAllText(normalized)).toContain(marker);
 
     // The interactive form should have been flattened away.
+    const reloaded = await PDF.load(new Uint8Array(normalized));
+    const form = reloaded.getForm();
+    expect(form === null || form.getFields().length === 0).toBe(true);
+  });
+
+  it('decrypts, preserves content, and flattens the form for an encrypted array-content PDF (#28 encrypted)', async () => {
+    const marker = 'ENCRYPTED_GOV_FORM_MARKER';
+    const encrypted = await encryptPdf(await buildArrayContentForm(marker));
+
+    // The fixture must actually be encrypted so the decrypt branch is exercised.
+    const encryptedDoc = await PDF.load(new Uint8Array(encrypted));
+    expect(encryptedDoc.isEncrypted).toBe(true);
+
+    const normalized = await normalizePdf(encrypted, { flattenForm: true });
+
+    // Content survived decrypt -> mergePageContentStreams -> flatten (not blanked).
+    expect(await extractAllText(normalized)).toContain(marker);
+
+    // The interactive form was flattened away (no editable AcroForm on a sealed doc).
     const reloaded = await PDF.load(new Uint8Array(normalized));
     const form = reloaded.getForm();
     expect(form === null || form.getFields().length === 0).toBe(true);
