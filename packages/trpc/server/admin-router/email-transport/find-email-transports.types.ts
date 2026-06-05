@@ -1,12 +1,12 @@
 import { ZEmailTransportPublicConfigSchema } from '@documenso/lib/server-only/email/email-transport-config';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
-import EmailTransportsSchema from '@documenso/prisma/generated/zod/modelSchema/EmailTransportsSchema';
+import EmailTransportSchema from '@documenso/prisma/generated/zod/modelSchema/EmailTransportSchema';
 import { z } from 'zod';
 
 export const ZFindEmailTransportsRequestSchema = ZFindSearchParamsSchema;
 
 export const ZFindEmailTransportsResponseSchema = ZFindResultResponse.extend({
-  data: EmailTransportsSchema.pick({
+  data: EmailTransportSchema.pick({
     id: true,
     name: true,
     type: true,

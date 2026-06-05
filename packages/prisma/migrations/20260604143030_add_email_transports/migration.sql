@@ -8,7 +8,7 @@ ALTER TABLE "OrganisationClaim" ADD COLUMN     "emailTransportId" TEXT;
 ALTER TABLE "SubscriptionClaim" ADD COLUMN     "emailTransportId" TEXT;
 
 -- CreateTable
-CREATE TABLE "EmailTransports" (
+CREATE TABLE "EmailTransport" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -18,11 +18,11 @@ CREATE TABLE "EmailTransports" (
     "fromAddress" TEXT NOT NULL,
     "config" TEXT NOT NULL,
 
-    CONSTRAINT "EmailTransports_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "EmailTransport_pkey" PRIMARY KEY ("id")
 );
 
 -- AddForeignKey
-ALTER TABLE "SubscriptionClaim" ADD CONSTRAINT "SubscriptionClaim_emailTransportId_fkey" FOREIGN KEY ("emailTransportId") REFERENCES "EmailTransports"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "SubscriptionClaim" ADD CONSTRAINT "SubscriptionClaim_emailTransportId_fkey" FOREIGN KEY ("emailTransportId") REFERENCES "EmailTransport"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "OrganisationClaim" ADD CONSTRAINT "OrganisationClaim_emailTransportId_fkey" FOREIGN KEY ("emailTransportId") REFERENCES "EmailTransports"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "OrganisationClaim" ADD CONSTRAINT "OrganisationClaim_emailTransportId_fkey" FOREIGN KEY ("emailTransportId") REFERENCES "EmailTransport"("id") ON DELETE SET NULL ON UPDATE CASCADE;

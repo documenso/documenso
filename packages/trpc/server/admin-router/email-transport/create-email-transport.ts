@@ -1,4 +1,5 @@
 import { encryptEmailTransportConfig } from '@documenso/lib/server-only/email/email-transport-config';
+import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 
 import { adminProcedure } from '../../trpc';
@@ -13,8 +14,9 @@ export const createEmailTransportRoute = adminProcedure
   .mutation(async ({ input }) => {
     const { name, fromName, fromAddress, config } = input;
 
-    const transport = await prisma.emailTransports.create({
+    const transport = await prisma.emailTransport.create({
       data: {
+        id: generateDatabaseId('email_transport'),
         name,
         type: config.type,
         fromName,

@@ -14,7 +14,7 @@ export const findEmailTransportsRoute = adminProcedure
   .query(async ({ input }) => {
     const { query, page = 1, perPage = 20 } = input;
 
-    const where: Prisma.EmailTransportsWhereInput = query
+    const where: Prisma.EmailTransportWhereInput = query
       ? {
           OR: [
             { name: { contains: query, mode: Prisma.QueryMode.insensitive } },
@@ -24,7 +24,7 @@ export const findEmailTransportsRoute = adminProcedure
       : {};
 
     const [transports, count] = await Promise.all([
-      prisma.emailTransports.findMany({
+      prisma.emailTransport.findMany({
         where,
         skip: (page - 1) * perPage,
         take: perPage,
@@ -35,7 +35,7 @@ export const findEmailTransportsRoute = adminProcedure
           },
         },
       }),
-      prisma.emailTransports.count({ where }),
+      prisma.emailTransport.count({ where }),
     ]);
 
     // Replace the encrypted `config` blob with the non-secret connection

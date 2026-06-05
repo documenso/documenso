@@ -282,7 +282,7 @@ model SubscriptionClaim {
   apiQuota      Int?
 
   emailTransportId String?
-  emailTransport   EmailTransports? @relation(fields: [emailTransportId], references: [id], onDelete: SetNull)
+  emailTransport   EmailTransport? @relation(fields: [emailTransportId], references: [id], onDelete: SetNull)
 }
 
 /// @zod.import(["import { ZClaimFlagsSchema, ZRateLimitArraySchema } from '@documenso/lib/types/subscription';"])
@@ -311,7 +311,7 @@ model OrganisationClaim {
   apiQuota      Int?
 
   emailTransportId String?
-  emailTransport   EmailTransports? @relation(fields: [emailTransportId], references: [id], onDelete: SetNull)
+  emailTransport   EmailTransport? @relation(fields: [emailTransportId], references: [id], onDelete: SetNull)
 }
 
 model OrganisationMonthlyStat {
@@ -1149,8 +1149,8 @@ enum EmailTransportType {
   MAILCHANNELS
 }
 
-model EmailTransports {
-  id        String   @id @default(cuid())
+model EmailTransport {
+  id        String   @id
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

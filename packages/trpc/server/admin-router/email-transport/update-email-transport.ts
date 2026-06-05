@@ -19,7 +19,7 @@ export const updateEmailTransportRoute = adminProcedure
   .mutation(async ({ input }) => {
     const { id, data } = input;
 
-    const existing = await prisma.emailTransports.findUnique({
+    const existing = await prisma.emailTransport.findUnique({
       where: { id },
     });
 
@@ -44,7 +44,7 @@ export const updateEmailTransportRoute = adminProcedure
 
     const config = ZEmailTransportConfigSchema.parse(merged);
 
-    await prisma.emailTransports.update({
+    await prisma.emailTransport.update({
       where: { id },
       data: {
         name: data.name,

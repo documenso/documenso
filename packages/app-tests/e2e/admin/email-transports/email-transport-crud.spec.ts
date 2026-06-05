@@ -21,7 +21,7 @@ const trackTransport = (name: string) => {
 
 test.afterEach(async () => {
   if (transportNamesToCleanup.length > 0) {
-    await prisma.emailTransports.deleteMany({ where: { name: { in: transportNamesToCleanup } } });
+    await prisma.emailTransport.deleteMany({ where: { name: { in: transportNamesToCleanup } } });
     transportNamesToCleanup.length = 0;
   }
 });
@@ -30,14 +30,14 @@ test.afterEach(async () => {
 
 const getTransportFromDbOrThrow = async (name: string) => {
   await expect
-    .poll(async () => prisma.emailTransports.findFirst({ where: { name }, select: { id: true } }), {
+    .poll(async () => prisma.emailTransport.findFirst({ where: { name }, select: { id: true } }), {
       message: `transport "${name}" was not persisted in time`,
       timeout: 10_000,
       intervals: [200, 400, 800],
     })
     .not.toBeNull();
 
-  return prisma.emailTransports.findFirstOrThrow({ where: { name } });
+  return prisma.emailTransport.findFirstOrThrow({ where: { name } });
 };
 
 const openCreateDialog = async (page: Page) => {
@@ -191,12 +191,12 @@ test('[ADMIN][EMAIL_TRANSPORT]: updating without a secret keeps the existing sec
   // The update ran (fromName changed) but the original secret is preserved.
   await expect
     .poll(async () => {
-      const row = await prisma.emailTransports.findFirstOrThrow({ where: { name } });
+      const row = await prisma.emailTransport.findFirstOrThrow({ where: { name } });
       return row.fromName;
     })
     .toBe('Renamed Sender');
 
-  const row = await prisma.emailTransports.findFirstOrThrow({ where: { name } });
+  const row = await prisma.emailTransport.findFirstOrThrow({ where: { name } });
   const config = decryptEmailTransportConfig(row.config);
   expect(config).toEqual({ type: 'RESEND', apiKey: originalApiKey });
 });
@@ -232,14 +232,14 @@ test('[ADMIN][EMAIL_TRANSPORT]: updating with a new secret replaces the stored s
 
   await expect
     .poll(async () => {
-      const row = await prisma.emailTransports.findFirstOrThrow({ where: { name } });
+      const row = await prisma.emailTransport.findFirstOrThrow({ where: { name } });
       const config = decryptEmailTransportConfig(row.config);
       return config.type === 'RESEND' ? config.apiKey : null;
     })
     .toBe(newApiKey);
 
   // And it definitely no longer decrypts to the old secret.
-  const row = await prisma.emailTransports.findFirstOrThrow({ where: { name } });
+  const row = await prisma.emailTransport.findFirstOrThrow({ where: { name } });
   expect(row.config).not.toContain(originalApiKey);
 });
 
@@ -270,7 +270,7 @@ test('[ADMIN][EMAIL_TRANSPORT]: delete removes the transport', async ({ page }) 
   await deleteDialog.getByRole('button', { name: 'Delete', exact: true }).click();
   await expect(deleteDialog).not.toBeVisible();
 
-  await expect.poll(async () => prisma.emailTransports.findUnique({ where: { id: row.id } })).toBeNull();
+  await expect.poll(async () => prisma.emailTransport.findUnique({ where: { id: row.id } })).toBeNull();
 });
 
 // ─── Access control ──────────────────────────────────────────────────────────

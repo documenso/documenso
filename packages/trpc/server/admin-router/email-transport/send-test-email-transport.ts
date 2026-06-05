@@ -18,7 +18,7 @@ export const sendTestEmailTransportRoute = adminProcedure
       },
     });
 
-    const transport = await prisma.emailTransports.findUnique({
+    const transport = await prisma.emailTransport.findUnique({
       where: {
         id: input.id,
       },

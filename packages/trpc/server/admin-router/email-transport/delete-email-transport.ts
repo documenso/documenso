@@ -16,7 +16,7 @@ export const deleteEmailTransportRoute = adminProcedure
       },
     });
 
-    await prisma.emailTransports.delete({
+    await prisma.emailTransport.delete({
       where: {
         id: input.id,
       },

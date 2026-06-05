@@ -1,5 +1,5 @@
 import { encryptEmailTransportConfig } from '@documenso/lib/server-only/email/email-transport-config';
-import { nanoid } from '@documenso/lib/universal/id';
+import { generateDatabaseId, nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, type Locator, type Page, test } from '@playwright/test';
@@ -16,7 +16,7 @@ const transportIdsToCleanup: string[] = [];
 
 test.afterEach(async () => {
   if (transportIdsToCleanup.length > 0) {
-    await prisma.emailTransports.deleteMany({ where: { id: { in: transportIdsToCleanup } } });
+    await prisma.emailTransport.deleteMany({ where: { id: { in: transportIdsToCleanup } } });
     transportIdsToCleanup.length = 0;
   }
 });
@@ -24,8 +24,9 @@ test.afterEach(async () => {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const seedTransport = async (label: string) => {
-  const transport = await prisma.emailTransports.create({
+  const transport = await prisma.emailTransport.create({
     data: {
+      id: generateDatabaseId('email_transport'),
       name: `e2e-transport-${label}-${nanoid()}`,
       type: 'RESEND',
       fromName: 'Seeded Transport',
