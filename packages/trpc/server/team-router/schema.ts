@@ -26,11 +26,13 @@ export const ZTeamUrlSchema = z
   .min(3, { message: msg`Team URL must be at least 3 characters long.`.id })
   .max(30, { message: msg`Team URL must not exceed 30 characters.`.id })
   .toLowerCase()
-  .regex(/^[a-z0-9].*[^_-]$/, 'Team URL cannot start or end with dashes or underscores.')
-  .regex(/^(?!.*[-_]{2})/, 'Team URL cannot contain consecutive dashes or underscores.')
-  .regex(/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/, 'Team URL can only contain letters, numbers, dashes and underscores.')
+  .regex(/^[a-z0-9].*[^_-]$/, { message: msg`Team URL cannot start or end with dashes or underscores.`.id })
+  .regex(/^(?!.*[-_]{2})/, { message: msg`Team URL cannot contain consecutive dashes or underscores.`.id })
+  .regex(/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/, {
+    message: msg`Team URL can only contain letters, numbers, dashes and underscores.`.id,
+  })
   .refine((value) => !PROTECTED_TEAM_URLS.includes(value), {
-    message: 'This URL is already in use.',
+    message: msg`This URL is already in use.`.id,
   });
 
 export const ZTeamNameSchema = z
