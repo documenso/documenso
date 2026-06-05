@@ -7,6 +7,7 @@ import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
@@ -72,7 +73,10 @@ export const DocumentSigningSignatureField = ({
   const { signature } = field;
 
   const isSeal = field.type === FieldType.IMAGE_UPLOAD;
+  const fieldContainerType: 'Signature' | 'Image Upload' = isSeal ? 'Image Upload' : 'Signature';
   const fieldLabel = isSeal ? _('Image Upload') : _('Signature');
+  const fieldMeta =
+    field.fieldMeta?.type === 'signature' || field.fieldMeta?.type === 'IMAGE_UPLOAD' ? field.fieldMeta : undefined;
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading;
 
@@ -233,7 +237,7 @@ export const DocumentSigningSignatureField = ({
       onPreSign={onPreSign}
       onSign={onSign}
       onRemove={onRemove}
-      type={fieldLabel}
+      type={fieldContainerType}
     >
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center rounded-md bg-background">
@@ -250,9 +254,9 @@ export const DocumentSigningSignatureField = ({
       {state === 'signed-image' && signature?.signatureImageAsBase64 && (
         <div
           className={cn('flex h-full w-full items-center', {
-            'justify-start': field.fieldMeta?.textAlign === 'left',
-            'justify-center': !field.fieldMeta?.textAlign || field.fieldMeta?.textAlign === 'center',
-            'justify-end': field.fieldMeta?.textAlign === 'right',
+            'justify-start': fieldMeta?.textAlign === 'left',
+            'justify-center': !fieldMeta?.textAlign || fieldMeta?.textAlign === 'center',
+            'justify-end': fieldMeta?.textAlign === 'right',
           })}
         >
           <img
@@ -267,9 +271,9 @@ export const DocumentSigningSignatureField = ({
         <div
           ref={containerRef}
           className={cn('flex h-full w-full items-center', {
-            'justify-start': field.fieldMeta?.textAlign === 'left',
-            'justify-center': !field.fieldMeta?.textAlign || field.fieldMeta?.textAlign === 'center',
-            'justify-end': field.fieldMeta?.textAlign === 'right',
+            'justify-start': fieldMeta?.textAlign === 'left',
+            'justify-center': !fieldMeta?.textAlign || fieldMeta?.textAlign === 'center',
+            'justify-end': fieldMeta?.textAlign === 'right',
           })}
         >
           <p
@@ -277,9 +281,9 @@ export const DocumentSigningSignatureField = ({
             className={cn(
               'w-full overflow-hidden break-all font-signature text-muted-foreground leading-tight duration-200',
               {
-                'text-left': field.fieldMeta?.textAlign === 'left',
-                'text-center': !field.fieldMeta?.textAlign || field.fieldMeta?.textAlign === 'center',
-                'text-right': field.fieldMeta?.textAlign === 'right',
+                'text-left': fieldMeta?.textAlign === 'left',
+                'text-center': !fieldMeta?.textAlign || fieldMeta?.textAlign === 'center',
+                'text-right': fieldMeta?.textAlign === 'right',
               },
             )}
             style={{ fontSize: `${fontSize}rem` }}

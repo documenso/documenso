@@ -16,7 +16,7 @@ type HandleSignatureFieldClickOptions = {
 
 export const handleSignatureFieldClick = async (
   options: HandleSignatureFieldClickOptions,
-): Promise<Extract<TSignEnvelopeFieldValue, { type: FieldType.SIGNATURE | FieldType.IMAGE_UPLOAD }> | null> => {
+): Promise<Extract<TSignEnvelopeFieldValue, { type: 'SIGNATURE' | 'IMAGE_UPLOAD' }> | null> => {
   const { field, fullName, signature, typedSignatureEnabled, uploadSignatureEnabled, drawSignatureEnabled } = options;
 
   if (field.type !== FieldType.SIGNATURE && field.type !== FieldType.IMAGE_UPLOAD) {

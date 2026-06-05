@@ -57,6 +57,9 @@ ENV NEXT_PRIVATE_TELEMETRY_KEY="$NEXT_PRIVATE_TELEMETRY_KEY"
 ARG NEXT_PRIVATE_TELEMETRY_HOST=""
 ENV NEXT_PRIVATE_TELEMETRY_HOST="$NEXT_PRIVATE_TELEMETRY_HOST"
 
+# The Remix build and typecheck can exceed the default Node heap inside Docker.
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 
 # Uncomment and use build args to enable remote caching
 # ARG TURBO_TEAM
