@@ -37,14 +37,16 @@ const loadImage = async (file: File | undefined): Promise<HTMLImageElement> => {
 };
 
 const loadImageOntoCanvas = (
-  image: HTMLImageElement,
+  image: CanvasImageSource,
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
 ): ImageData => {
-  const scale = Math.min(canvas.width / image.width, canvas.height / image.height);
+  const imageWidth = image instanceof HTMLImageElement ? image.naturalWidth : image.width;
+  const imageHeight = image instanceof HTMLImageElement ? image.naturalHeight : image.height;
+  const scale = Math.min(canvas.width / imageWidth, canvas.height / imageHeight);
 
-  const x = (canvas.width - image.width * scale) / 2;
-  const y = (canvas.height - image.height * scale) / 2;
+  const x = (canvas.width - imageWidth * scale) / 2;
+  const y = (canvas.height - imageHeight * scale) / 2;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -52,11 +54,71 @@ const loadImageOntoCanvas = (
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
 
-  ctx.drawImage(image, x, y, image.width * scale, image.height * scale);
+  ctx.drawImage(image, x, y, imageWidth * scale, imageHeight * scale);
 
   ctx.restore();
 
   return ctx.getImageData(0, 0, canvas.width, canvas.height);
+};
+
+const trimTransparentMargins = (image: HTMLImageElement): HTMLCanvasElement => {
+  const sourceCanvas = document.createElement('canvas');
+  sourceCanvas.width = image.naturalWidth;
+  sourceCanvas.height = image.naturalHeight;
+
+  const sourceCtx = sourceCanvas.getContext('2d');
+
+  if (!sourceCtx) {
+    return sourceCanvas;
+  }
+
+  sourceCtx.drawImage(image, 0, 0);
+
+  const imageData = sourceCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
+  const { data, width, height } = imageData;
+
+  let minX = width;
+  let minY = height;
+  let maxX = -1;
+  let maxY = -1;
+
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const alpha = data[(y * width + x) * 4 + 3];
+
+      if (alpha > 0) {
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+      }
+    }
+  }
+
+  if (maxX < 0 || maxY < 0) {
+    return sourceCanvas;
+  }
+
+  const trimmedWidth = maxX - minX + 1;
+  const trimmedHeight = maxY - minY + 1;
+
+  if (trimmedWidth === width && trimmedHeight === height) {
+    return sourceCanvas;
+  }
+
+  const trimmedCanvas = document.createElement('canvas');
+  trimmedCanvas.width = trimmedWidth;
+  trimmedCanvas.height = trimmedHeight;
+
+  const trimmedCtx = trimmedCanvas.getContext('2d');
+
+  if (!trimmedCtx) {
+    return sourceCanvas;
+  }
+
+  trimmedCtx.drawImage(sourceCanvas, minX, minY, trimmedWidth, trimmedHeight, 0, 0, trimmedWidth, trimmedHeight);
+
+  return trimmedCanvas;
 };
 
 export type ImageUploadFieldProps = {
@@ -77,19 +139,20 @@ export const ImageUploadField = ({ className, value, onChange, ...props }: Image
     setError(null);
     try {
       const img = await loadImage(event.target.files?.[0]);
+      const trimmedImage = trimTransparentMargins(img);
 
       // 1. Create a normalized base64 image without padding.
       const MAX_DIMENSION = 1000;
-      const scale = Math.min(1, MAX_DIMENSION / Math.max(img.width, img.height));
-      const width = img.width * scale;
-      const height = img.height * scale;
+      const scale = Math.min(1, MAX_DIMENSION / Math.max(trimmedImage.width, trimmedImage.height));
+      const width = trimmedImage.width * scale;
+      const height = trimmedImage.height * scale;
 
       const offscreenCanvas = document.createElement('canvas');
       offscreenCanvas.width = width;
       offscreenCanvas.height = height;
       const offscreenCtx = offscreenCanvas.getContext('2d');
       if (offscreenCtx) {
-        offscreenCtx.drawImage(img, 0, 0, width, height);
+        offscreenCtx.drawImage(trimmedImage, 0, 0, width, height);
         onChange?.(offscreenCanvas.toDataURL('image/png'));
       }
 
@@ -99,7 +162,7 @@ export const ImageUploadField = ({ className, value, onChange, ...props }: Image
         if (ctx) {
           $canvas.current.width = $canvas.current.clientWidth * SIGNATURE_CANVAS_DPI;
           $canvas.current.height = $canvas.current.clientHeight * SIGNATURE_CANVAS_DPI;
-          loadImageOntoCanvas(img, $canvas.current, ctx);
+          loadImageOntoCanvas(trimmedImage, $canvas.current, ctx);
         }
       }
     } catch (err) {
