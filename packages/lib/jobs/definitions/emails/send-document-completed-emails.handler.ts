@@ -1,4 +1,3 @@
-import { mailer } from '@documenso/email/mailer';
 import { DocumentCompletedEmailTemplate } from '@documenso/email/templates/document-completed';
 import { prisma } from '@documenso/prisma';
 import { msg } from '@lingui/core/macro';
@@ -67,7 +66,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
     throw new Error('Document has no recipients');
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail, organisationId, claims, emailsDisabled } =
+  const { branding, emailLanguage, senderEmail, replyToEmail, organisationId, claims, emailsDisabled, emailTransport } =
     await getEmailContext({
       emailType: 'RECIPIENT',
       source: {
@@ -139,7 +138,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
 
     const i18n = await getI18nInstance(emailLanguage);
 
-    await mailer.sendMail({
+    await emailTransport.sendMail({
       to: [
         {
           name: owner.name || '',
@@ -236,7 +235,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
 
       const i18n = await getI18nInstance(emailLanguage);
 
-      await mailer.sendMail({
+      await emailTransport.sendMail({
         to: [
           {
             name: recipient.name,

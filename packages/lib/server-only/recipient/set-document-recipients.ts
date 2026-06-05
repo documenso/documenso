@@ -1,4 +1,3 @@
-import { mailer } from '@documenso/email/mailer';
 import RecipientRemovedFromDocumentTemplate from '@documenso/email/templates/recipient-removed-from-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
@@ -85,7 +84,7 @@ export const setDocumentRecipients = async ({
     throw new Error('Document already complete');
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail, organisationId, claims, emailsDisabled } =
+  const { branding, emailLanguage, senderEmail, replyToEmail, organisationId, claims, emailsDisabled, emailTransport } =
     await getEmailContext({
       emailType: 'RECIPIENT',
       source: {
@@ -326,7 +325,7 @@ export const setDocumentRecipients = async ({
 
         const i18n = await getI18nInstance(emailLanguage);
 
-        await mailer.sendMail({
+        await emailTransport.sendMail({
           to: {
             address: recipient.email,
             name: recipient.name,

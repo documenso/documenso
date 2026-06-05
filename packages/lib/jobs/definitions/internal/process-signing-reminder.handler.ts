@@ -1,4 +1,3 @@
-import { mailer } from '@documenso/email/mailer';
 import DocumentReminderEmailTemplate from '@documenso/email/templates/document-reminder';
 import { prisma } from '@documenso/prisma';
 import { msg } from '@lingui/core/macro';
@@ -111,6 +110,7 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
     organisationId,
     claims,
     emailsDisabled,
+    emailTransport,
   } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
@@ -203,7 +203,7 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
       }),
     ]);
 
-    await mailer.sendMail({
+    await emailTransport.sendMail({
       to: {
         name: recipient.name,
         address: recipient.email,
