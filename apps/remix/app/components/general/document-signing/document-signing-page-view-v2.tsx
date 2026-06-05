@@ -23,6 +23,7 @@ import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-d
 import { SignFieldCheckboxDialog } from '~/components/dialogs/sign-field-checkbox-dialog';
 import { SignFieldDropdownDialog } from '~/components/dialogs/sign-field-dropdown-dialog';
 import { SignFieldEmailDialog } from '~/components/dialogs/sign-field-email-dialog';
+import { SignFieldImageRemoveConfirmationDialog } from '~/components/dialogs/sign-field-image-remove-confirmation-dialog';
 import { SignFieldImageUploadDialog } from '~/components/dialogs/sign-field-image-upload-dialog';
 import { SignFieldInitialsDialog } from '~/components/dialogs/sign-field-initials-dialog';
 import { SignFieldNameDialog } from '~/components/dialogs/sign-field-name-dialog';
@@ -87,9 +88,10 @@ export const DocumentSigningPageViewV2 = () => {
       <SignFieldNumberDialog.Root />
       <SignFieldNameDialog.Root />
       <SignFieldInitialsDialog.Root />
-      <SignFieldImageUploadDialog.Root />
       <SignFieldDropdownDialog.Root />
       <SignFieldSignatureDialog.Root />
+      <SignFieldImageUploadDialog.Root />
+      <SignFieldImageRemoveConfirmationDialog.Root />
       <SignFieldCheckboxDialog.Root />
 
       <EnvelopeSignerHeader />

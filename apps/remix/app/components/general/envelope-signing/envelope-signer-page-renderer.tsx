@@ -29,7 +29,7 @@ import { useEmbedSigningContext } from '~/components/embed/embed-signing-context
 import { handleCheckboxFieldClick } from '~/utils/field-signing/checkbox-field';
 import { handleDropdownFieldClick } from '~/utils/field-signing/dropdown-field';
 import { handleEmailFieldClick } from '~/utils/field-signing/email-field';
-import { handleImageUploadFieldClick } from '~/utils/field-signing/image-upload-field';
+import { handleImageUploadFieldClick } from '~/utils/field-signing/free-signature-field';
 import { handleInitialsFieldClick } from '~/utils/field-signing/initial-field';
 import { handleNameFieldClick } from '~/utils/field-signing/name-field';
 import { handleNumberFieldClick } from '~/utils/field-signing/number-field';
@@ -79,6 +79,7 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
   const { scale, pageNumber } = pageData;
 
   const { envelope } = envelopeData;
+
   const localPageFields = useMemo(() => {
     let fieldsToRender = recipientFields;
 
@@ -390,29 +391,30 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
               loadingSpinnerGroup.destroy();
             });
         })
-        .with({ type: FieldType.IMAGE_UPLOAD }, (field) => {
+        /**
+         * IMAGE UPLOAD FIELD.
+         */
+        .with({ type: 'IMAGE_UPLOAD' }, (field) => {
           handleImageUploadFieldClick({
             field,
-            initialImage: null,
+            initialSignature: unparsedField.signature?.signatureImageAsBase64 || null,
           })
             .then(async (payload) => {
-              if (!payload) {
-                return;
-              }
+              if (payload) {
+                fieldGroup.add(loadingSpinnerGroup);
 
-              fieldGroup.add(loadingSpinnerGroup);
+                if (payload.value) {
+                  void executeActionAuthProcedure({
+                    onReauthFormSubmit: async (authOptions) => {
+                      await signField(field.id, payload, authOptions);
 
-              if (payload.value) {
-                void executeActionAuthProcedure({
-                  onReauthFormSubmit: async (authOptions) => {
-                    await signField(field.id, payload, authOptions);
-
-                    loadingSpinnerGroup.destroy();
-                  },
-                  actionTarget: field.type,
-                });
-              } else {
-                await signField(field.id, payload);
+                      loadingSpinnerGroup.destroy();
+                    },
+                    actionTarget: field.type,
+                  });
+                } else {
+                  await signField(field.id, payload);
+                }
               }
             })
             .finally(() => {
