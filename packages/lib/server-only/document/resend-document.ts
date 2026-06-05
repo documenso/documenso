@@ -1,4 +1,3 @@
-import { mailer } from '@documenso/email/mailer';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import { resolveExpiresAt } from '@documenso/lib/constants/envelope-expiration';
 import { RECIPIENT_ROLE_TO_EMAIL_TYPE, RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
@@ -160,6 +159,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
     organisationId,
     claims,
     emailsDisabled,
+    emailTransport,
   } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
@@ -257,7 +257,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
 
       // Send email outside any transaction to avoid holding a connection
       // open during network I/O.
-      await mailer.sendMail({
+      await emailTransport.sendMail({
         to: {
           address: email,
           name,
