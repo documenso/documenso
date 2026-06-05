@@ -28,7 +28,7 @@ export function ErrorBoundary() {
         404: {
           heading: msg`Authentication Portal Not Found`,
           subHeading: msg`404 Not Found`,
-          message: msg`The organisation authentication portal does not exist, or is not configured`,
+          message: msg`The organization authentication portal does not exist, or is not configured`,
         },
       }}
       primaryButton={
@@ -48,7 +48,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
   const orgUrl = params.orgUrl;
 
-  const organisation = await prisma.organisation.findFirst({
+  const organization = await prisma.organisation.findFirst({
     where: {
       url: orgUrl,
     },
@@ -78,13 +78,13 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     });
   }
 
-  // Redirect to organisation if already signed in and a member of the organisation.
-  if (isAuthenticated && user && organisation.members.find((member) => member.userId === user.id)) {
+  // Redirect to organization if already signed in and a member of the organization.
+  if (isAuthenticated && user && organization.members.find((member) => member.userId === user.id)) {
     throw redirect(`/o/${orgUrl}`);
   }
 
   return {
-    organisationName: organisation.name,
+    organisationName: organization.name,
     orgUrl,
   };
 }
@@ -177,7 +177,7 @@ export default function OrganisationSignIn({ loaderData }: Route.ComponentProps)
             htmlFor={`flag-3rd-party-service`}
           >
             <Trans>
-              I understand that I am providing my credentials to a 3rd party service configured by this organisation
+              I understand that I am providing my credentials to a 3rd party service configured by this organization
             </Trans>
           </label>
         </div>

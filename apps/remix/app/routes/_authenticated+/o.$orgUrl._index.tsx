@@ -33,7 +33,7 @@ import { TeamDeleteDialog } from '~/components/dialogs/team-delete-dialog';
 export default function OrganisationSettingsTeamsPage() {
   const { t, i18n } = useLingui();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   // No teams view.
   if (organisation.teams.length === 0) {
@@ -47,11 +47,11 @@ export default function OrganisationSettingsTeamsPage() {
           <Trans>No teams yet</Trans>
         </h2>
 
-        {canExecuteOrganisationAction('MANAGE_ORGANISATION', organisation.currentOrganisationRole) ? (
+        {canExecuteOrganisationAction('MANAGE_ORGANISATION', organization.currentOrganisationRole) ? (
           <>
             <p className="mb-8 max-w-md text-center text-muted-foreground text-sm">
               <Trans>
-                Teams help you organise your work and collaborate with others. Create your first team to get started.
+                Teams help you organize your work and collaborate with others. Create your first team to get started.
               </Trans>
             </p>
 
@@ -93,7 +93,7 @@ export default function OrganisationSettingsTeamsPage() {
         ) : (
           <p className="mb-8 max-w-md text-center text-muted-foreground text-sm">
             <Trans>
-              You currently have no access to any teams within this organisation. Please contact your organisation to
+              You currently have no access to any teams within this organization. Please contact your organization to
               request access.
             </Trans>
           </p>

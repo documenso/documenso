@@ -56,16 +56,16 @@ const ZProviderFormSchema = ZUpdateOrganisationAuthenticationPortalRequestSchema
 type TProviderFormSchema = z.infer<typeof ZProviderFormSchema>;
 
 export function meta() {
-  return appMetaTags(msg`Organisation SSO Portal`);
+  return appMetaTags(msg`Organization SSO Portal`);
 }
 
 export default function OrganisationSettingSSOLoginPage() {
   const { t } = useLingui();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const { data: authenticationPortal, isLoading: isLoadingAuthenticationPortal } =
     trpc.enterprise.organisation.authenticationPortal.get.useQuery({
-      organisationId: organisation.id,
+      organisationId: organization.id,
     });
 
   if (isLoadingAuthenticationPortal || !authenticationPortal) {
@@ -75,8 +75,8 @@ export default function OrganisationSettingSSOLoginPage() {
   return (
     <div className="max-w-2xl">
       <SettingsHeader
-        title={t`Organisation SSO Portal`}
-        subtitle={t`Manage a custom SSO login portal for your organisation.`}
+        title={t`Organization SSO Portal`}
+        subtitle={t`Manage a custom SSO login portal for your organization.`}
       />
 
       <SSOProviderForm authenticationPortal={authenticationPortal} />
@@ -92,7 +92,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const { mutateAsync: updateOrganisationAuthenticationPortal } =
     trpc.enterprise.organisation.authenticationPortal.update.useMutation();
@@ -140,7 +140,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
 
     try {
       await updateOrganisationAuthenticationPortal({
-        organisationId: organisation.id,
+        organisationId: organization.id,
         data: {
           enabled,
           clientId,
@@ -177,7 +177,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
         <fieldset disabled={form.formState.isSubmitting} className="space-y-6">
           <div className="space-y-2">
             <Label>
-              <Trans>Organisation authentication portal URL</Trans>
+              <Trans>Organization authentication portal URL</Trans>
             </Label>
 
             <div className="relative">
@@ -191,7 +191,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
             </div>
 
             <p className="text-muted-foreground text-xs">
-              <Trans>This is the URL which users will use to sign in to your organisation.</Trans>
+              <Trans>This is the URL which users will use to sign in to your organization.</Trans>
             </p>
           </div>
 
@@ -294,7 +294,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  <Trans>Default Organisation Role for New Users</Trans>
+                  <Trans>Default Organization Role for New Users</Trans>
                 </FormLabel>
                 <FormControl>
                   <Select value={field.value} onValueChange={field.onChange}>
@@ -372,7 +372,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
                   <p className="text-muted-foreground text-sm">
                     <Trans>
                       When enabled, users signing in via SSO for the first time will also receive their own personal
-                      organisation.
+                      organization.
                     </Trans>
                   </p>
                 </div>
@@ -408,7 +408,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
           <Alert variant="warning">
             <AlertDescription>
               <Trans>
-                Please note that anyone who signs in through your portal will be added to your organisation as a member.
+                Please note that anyone who signs in through your portal will be added to your organization as a member.
               </Trans>
             </AlertDescription>
           </Alert>

@@ -39,7 +39,7 @@ export const DocumentUploadButtonLegacy = ({ className, type }: DocumentUploadBu
 
   const navigate = useNavigate();
   const analytics = useAnalytics();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const userTimezone =
     TIME_ZONES.find((timezone) => timezone === Intl.DateTimeFormat().resolvedOptions().timeZone) ??

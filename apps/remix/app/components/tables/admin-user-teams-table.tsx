@@ -71,7 +71,7 @@ export const AdminUserTeamsTable = ({ userId }: AdminUserTeamsTableProps) => {
         ),
       },
       {
-        header: t`Organisation`,
+        header: t`Organization`,
         accessorKey: 'organisation',
         cell: ({ row }) => (
           <Link to={`/admin/organisations/${row.original.organisation.id}`} className="hover:underline">

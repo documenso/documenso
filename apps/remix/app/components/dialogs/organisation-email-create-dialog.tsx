@@ -85,7 +85,7 @@ export const OrganisationEmailCreateDialog = ({
 
       toast({
         title: t`Email Created`,
-        description: t`The organisation email has been created successfully.`,
+        description: t`The organization email has been created successfully.`,
       });
 
       setOpen(false);
@@ -123,11 +123,11 @@ export const OrganisationEmailCreateDialog = ({
       <DialogContent position="center" className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>
-            <Trans>Add Organisation Email</Trans>
+            <Trans>Add Organization Email</Trans>
           </DialogTitle>
           <DialogDescription>
             <Trans>
-              Create a new email address for your organisation using the domain{' '}
+              Create a new email address for your organization using the domain{' '}
               <span className="font-bold">{emailDomain.domain}</span>.
             </Trans>
           </DialogDescription>
@@ -210,7 +210,7 @@ export const OrganisationEmailCreateDialog = ({
                     <FormDescription>
                       <Trans>
                         Optional no-reply email address attached to emails. Leave blank to default
-                        to the organisation settings reply-to email.
+                        to the organization settings reply-to email.
                       </Trans>
                     </FormDescription>
                   </FormItem>

@@ -165,7 +165,7 @@ export const AdminOrganisationStatsTable = ({ displayMode = 'usage' }: AdminOrga
 
     return [
       {
-        header: t`Organisation`,
+        header: t`Organization`,
         accessorKey: 'organisationName',
         cell: ({ row }) => (
           <Link to={`/admin/organisations/${row.original.organisationId}`} className="text-sm hover:underline">

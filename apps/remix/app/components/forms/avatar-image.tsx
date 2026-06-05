@@ -32,21 +32,21 @@ export type AvatarImageFormProps = {
     name: string;
     avatarImageId: string | null;
   };
-  organisation?: {
+  organization?: {
     id: string;
     name: string;
     avatarImageId: string | null;
   };
 };
 
-export const AvatarImageForm = ({ className, team, organisation }: AvatarImageFormProps) => {
+export const AvatarImageForm = ({ className, team, organization }: AvatarImageFormProps) => {
   const { user, refreshSession } = useSession();
   const { _ } = useLingui();
   const { toast } = useToast();
 
   const { mutateAsync: setProfileImage } = trpc.profile.setProfileImage.useMutation();
 
-  const initials = extractInitials(team?.name || organisation?.name || user.name || '');
+  const initials = extractInitials(team?.name || organization?.name || user.name || '');
 
   const hasAvatarImage = useMemo(() => {
     if (team) {
@@ -54,13 +54,13 @@ export const AvatarImageForm = ({ className, team, organisation }: AvatarImageFo
     }
 
     if (organisation) {
-      return organisation.avatarImageId !== null;
+      return organization.avatarImageId !== null;
     }
 
     return user.avatarImageId !== null;
-  }, [team, organisation, user.avatarImageId]);
+  }, [team, organization, user.avatarImageId]);
 
-  const avatarImageId = team ? team.avatarImageId : organisation ? organisation.avatarImageId : user.avatarImageId;
+  const avatarImageId = team ? team.avatarImageId : organization ? organization.avatarImageId : user.avatarImageId;
 
   const form = useForm<TAvatarImageFormSchema>({
     values: {
@@ -100,7 +100,7 @@ export const AvatarImageForm = ({ className, team, organisation }: AvatarImageFo
       await setProfileImage({
         bytes: data.bytes,
         teamId: team?.id ?? null,
-        organisationId: organisation?.id ?? null,
+        organisationId: organization?.id ?? null,
       });
 
       await refreshSession();

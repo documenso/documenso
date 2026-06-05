@@ -248,7 +248,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
                 {isOwnTeamTemplate ? (
                   <Trans>Manage and view template</Trans>
                 ) : (
-                  <Trans>View organisation template</Trans>
+                  <Trans>View organization template</Trans>
                 )}
               </p>
 

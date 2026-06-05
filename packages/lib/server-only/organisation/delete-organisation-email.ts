@@ -16,7 +16,7 @@ export type SendOrganisationDeleteEmailOptions = {
 };
 
 /**
- * Sends an "organisation deleted" notification email.
+ * Sends an "organization deleted" notification email.
  */
 export const sendOrganisationDeleteEmail = async ({
   email,
@@ -42,7 +42,7 @@ export const sendOrganisationDeleteEmail = async ({
   await mailer.sendMail({
     to: email,
     from: senderEmail,
-    subject: i18n._(msg`Organisation "${organisationName}" has been deleted`),
+    subject: i18n._(msg`Organization "${organisationName}" has been deleted`),
     html,
     text,
   });

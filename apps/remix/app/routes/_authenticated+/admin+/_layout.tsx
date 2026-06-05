@@ -78,7 +78,7 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
           >
             <Link to="/admin/organisations">
               <Building2Icon className="mr-2 h-5 w-5" />
-              <Trans>Organisations</Trans>
+              <Trans>Organizations</Trans>
             </Link>
           </Button>
 
@@ -150,7 +150,7 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
           >
             <Link to="/admin/organisation-insights">
               <Trophy className="mr-2 h-5 w-5" />
-              <Trans>Organisation Insights</Trans>
+              <Trans>Organization Insights</Trans>
             </Link>
           </Button>
 
@@ -164,7 +164,7 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
           >
             <Link to="/admin/organisation-stats">
               <LineChartIcon className="mr-2 h-5 w-5" />
-              <Trans>Organisation Stats</Trans>
+              <Trans>Organization Stats</Trans>
             </Link>
           </Button>
 

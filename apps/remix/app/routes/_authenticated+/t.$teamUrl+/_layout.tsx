@@ -14,14 +14,14 @@ import { useOptionalCurrentTeam } from '~/providers/team';
 
 export default function Layout() {
   const team = useOptionalCurrentTeam();
-  const organisation = useOptionalCurrentOrganisation();
+  const organization = useOptionalCurrentOrganisation();
 
   const limits = useMemo(() => {
     if (!organisation) {
       return undefined;
     }
 
-    if (organisation?.subscription && organisation.subscription.status === SubscriptionStatus.INACTIVE) {
+    if (organisation?.subscription && organization.subscription.status === SubscriptionStatus.INACTIVE) {
       return {
         quota: {
           documents: 0,

@@ -33,12 +33,12 @@ export default function DashboardPage() {
   const { user, organisations } = useSession();
 
   // Todo: Sort by recent access (TBD by cookies)
-  // Teams, flattened with the organisation data still attached.
+  // Teams, flattened with the organization data still attached.
   const teams = useMemo(() => {
     return organisations.flatMap((org) =>
       org.teams.map((team) => ({
         ...team,
-        organisation: {
+        organization: {
           ...org,
           teams: undefined,
         },
@@ -69,7 +69,7 @@ export default function DashboardPage() {
                 <Trans>No organisations found</Trans>
               </p>
               <p className="text-muted-foreground text-sm">
-                <Trans>Create an organisation to get started.</Trans>
+                <Trans>Create an organization to get started.</Trans>
               </p>
             </div>
 
@@ -88,7 +88,7 @@ export default function DashboardPage() {
               <div className="flex items-center gap-2">
                 <Building2Icon className="h-5 w-5 text-muted-foreground" />
                 <h2 className="font-semibold text-xl">
-                  <Trans>Organisations</Trans>
+                  <Trans>Organizations</Trans>
                 </h2>
               </div>
 

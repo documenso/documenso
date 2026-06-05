@@ -135,7 +135,7 @@ const AcceptOrganisationInvitationButton = ({ token }: { token: string }) => {
     onError: () => {
       toast({
         title: _(msg`Something went wrong`),
-        description: _(msg`Unable to join this organisation at this time.`),
+        description: _(msg`Unable to join this organization at this time.`),
         variant: 'destructive',
         duration: 10000,
       });

@@ -10,8 +10,8 @@ export default function TeamsSettingsMembersPage() {
   return (
     <div>
       <SettingsHeader
-        title={t`Custom Organisation Groups`}
-        subtitle={t`Manage the custom groups of members for your organisation.`}
+        title={t`Custom Organization Groups`}
+        subtitle={t`Manage the custom groups of members for your organization.`}
       >
         <OrganisationGroupCreateDialog />
       </SettingsHeader>

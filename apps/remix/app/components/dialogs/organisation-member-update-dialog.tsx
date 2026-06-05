@@ -84,7 +84,7 @@ export const OrganisationMemberUpdateDialog = ({
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(
-          msg`We encountered an unknown error while attempting to update this organisation member. Please try again later.`,
+          msg`We encountered an unknown error while attempting to update this organization member. Please try again later.`,
         ),
         variant: 'destructive',
       });
@@ -102,7 +102,7 @@ export const OrganisationMemberUpdateDialog = ({
       setOpen(false);
 
       toast({
-        title: _(msg`You cannot modify a organisation member who has a higher role than you.`),
+        title: _(msg`You cannot modify a organization member who has a higher role than you.`),
         variant: 'destructive',
       });
     }
@@ -114,7 +114,7 @@ export const OrganisationMemberUpdateDialog = ({
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
         {trigger ?? (
           <Button variant="secondary">
-            <Trans>Update organisation member</Trans>
+            <Trans>Update organization member</Trans>
           </Button>
         )}
       </DialogTrigger>
@@ -122,7 +122,7 @@ export const OrganisationMemberUpdateDialog = ({
       <DialogContent position="center">
         <DialogHeader>
           <DialogTitle>
-            <Trans>Update organisation member</Trans>
+            <Trans>Update organization member</Trans>
           </DialogTitle>
 
           <DialogDescription className="mt-4">

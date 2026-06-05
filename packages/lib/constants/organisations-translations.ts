@@ -13,7 +13,7 @@ export const ORGANISATION_MEMBER_ROLE_MAP: Record<keyof typeof OrganisationMembe
 };
 
 export const EXTENDED_ORGANISATION_MEMBER_ROLE_MAP: Record<keyof typeof OrganisationMemberRole, MessageDescriptor> = {
-  ADMIN: msg`Organisation Admin`,
-  MANAGER: msg`Organisation Manager`,
-  MEMBER: msg`Organisation Member`,
+  ADMIN: msg`Organization Admin`,
+  MANAGER: msg`Organization Manager`,
+  MEMBER: msg`Organization Member`,
 };

@@ -107,7 +107,7 @@ export const SettingsDesktopNav = ({ className, ...props }: SettingsDesktopNavPr
           className={cn('w-full justify-start', pathname?.startsWith('/settings/organisations') && 'bg-secondary')}
         >
           <Users className="mr-2 h-5 w-5" />
-          <Trans>Organisations</Trans>
+          <Trans>Organizations</Trans>
         </Button>
       </Link>
 

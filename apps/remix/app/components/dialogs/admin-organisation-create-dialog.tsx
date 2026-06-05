@@ -66,7 +66,7 @@ export const AdminOrganisationCreateDialog = ({ trigger, ownerUserId, ...props }
 
       toast({
         title: t`Success`,
-        description: t`Organisation created`,
+        description: t`Organization created`,
         duration: 5000,
       });
     } catch (err) {
@@ -76,7 +76,7 @@ export const AdminOrganisationCreateDialog = ({ trigger, ownerUserId, ...props }
 
       toast({
         title: t`An unknown error occurred`,
-        description: t`We encountered an unknown error while attempting to create a organisation. Please try again later.`,
+        description: t`We encountered an unknown error while attempting to create a organization. Please try again later.`,
         variant: 'destructive',
       });
     }
@@ -103,7 +103,7 @@ export const AdminOrganisationCreateDialog = ({ trigger, ownerUserId, ...props }
           </DialogTitle>
 
           <DialogDescription>
-            <Trans>Create an organisation for this user</Trans>
+            <Trans>Create an organization for this user</Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -116,7 +116,7 @@ export const AdminOrganisationCreateDialog = ({ trigger, ownerUserId, ...props }
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel required>
-                      <Trans>Organisation Name</Trans>
+                      <Trans>Organization Name</Trans>
                     </FormLabel>
                     <FormControl>
                       <Input {...field} />

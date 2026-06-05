@@ -21,11 +21,11 @@ export default function OrganisationSettingsEmailDomains() {
   const { t } = useLingui();
   const { organisations } = useSession();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const isPersonalLayoutMode = isPersonalLayout(organisations);
 
-  const isEmailDomainsEnabled = organisation.organisationClaim.flags.emailDomains;
+  const isEmailDomainsEnabled = organization.organisationClaim.flags.emailDomains;
 
   if (!IS_BILLING_ENABLED()) {
     return null;
@@ -33,7 +33,7 @@ export default function OrganisationSettingsEmailDomains() {
 
   return (
     <div>
-      <SettingsHeader title={t`Email Domains`} subtitle={t`Here you can add email domains to your organisation.`}>
+      <SettingsHeader title={t`Email Domains`} subtitle={t`Here you can add email domains to your organization.`}>
         {isEmailDomainsEnabled && <OrganisationEmailDomainCreateDialog />}
       </SettingsHeader>
 
@@ -53,7 +53,7 @@ export default function OrganisationSettingsEmailDomains() {
             </AlertDescription>
           </div>
 
-          {canExecuteOrganisationAction('MANAGE_BILLING', organisation.currentOrganisationRole) && (
+          {canExecuteOrganisationAction('MANAGE_BILLING', organization.currentOrganisationRole) && (
             <Button asChild variant="outline">
               <Link to={isPersonalLayoutMode ? '/settings/billing' : `/o/${organisation.url}/settings/billing`}>
                 <Trans>Update Billing</Trans>

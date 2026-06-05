@@ -21,14 +21,14 @@ import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags(msg`Organisation Settings`);
+  return appMetaTags(msg`Organization Settings`);
 }
 
 export default function SettingsLayout() {
   const { t } = useLingui();
 
   const isBillingEnabled = IS_BILLING_ENABLED();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const organisationSettingRoutes = [
     {
@@ -109,7 +109,7 @@ export default function SettingsLayout() {
     return true;
   });
 
-  if (!canExecuteOrganisationAction('MANAGE_ORGANISATION', organisation.currentOrganisationRole)) {
+  if (!canExecuteOrganisationAction('MANAGE_ORGANISATION', organization.currentOrganisationRole)) {
     return (
       <GenericErrorLayout
         errorCode={401}
@@ -135,7 +135,7 @@ export default function SettingsLayout() {
   return (
     <div>
       <h1 className="font-semibold text-4xl">
-        <Trans>Organisation Settings</Trans>
+        <Trans>Organization Settings</Trans>
       </h1>
 
       <div className="mt-4 grid grid-cols-12 gap-x-8 md:mt-8">

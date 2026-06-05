@@ -33,13 +33,13 @@ export const OrganisationGroupDeleteDialog = ({
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const { mutateAsync: deleteGroup, isPending: isDeleting } = trpc.organisation.group.delete.useMutation({
     onSuccess: () => {
       toast({
         title: _(msg`Success`),
-        description: _(msg`You have successfully removed this group from the organisation.`),
+        description: _(msg`You have successfully removed this group from the organization.`),
         duration: 5000,
       });
 
@@ -62,7 +62,7 @@ export const OrganisationGroupDeleteDialog = ({
       <DialogTrigger asChild>
         {trigger ?? (
           <Button variant="secondary">
-            <Trans>Delete organisation group</Trans>
+            <Trans>Delete organization group</Trans>
           </Button>
         )}
       </DialogTrigger>
@@ -97,7 +97,7 @@ export const OrganisationGroupDeleteDialog = ({
               loading={isDeleting}
               onClick={async () =>
                 deleteGroup({
-                  organisationId: organisation.id,
+                  organisationId: organization.id,
                   groupId: organisationGroupId,
                 })
               }

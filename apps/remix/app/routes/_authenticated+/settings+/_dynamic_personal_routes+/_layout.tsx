@@ -10,12 +10,12 @@ import { TeamProvider } from '~/providers/team';
 /**
  * These routes should only render if the user has:
  *
- * - 1 Personal organisation
+ * - 1 Personal organization
  * - Nothing else
  *
- * This removes the UX complexity for users who only have a single personal organisation, instead of showing them multiple settings pages:
+ * This removes the UX complexity for users who only have a single personal organization, instead of showing them multiple settings pages:
  *
- * - Organisation settings
+ * - Organization settings
  * - Teams settings
  */
 export default function Layout() {

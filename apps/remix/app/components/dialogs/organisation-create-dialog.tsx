@@ -98,7 +98,7 @@ export const OrganisationCreateDialog = ({ trigger, ...props }: OrganisationCrea
 
       toast({
         title: t`Success`,
-        description: t`Your organisation has been created.`,
+        description: t`Your organization has been created.`,
         duration: 5000,
       });
     } catch (err) {
@@ -108,7 +108,7 @@ export const OrganisationCreateDialog = ({ trigger, ...props }: OrganisationCrea
 
       toast({
         title: t`An unknown error occurred`,
-        description: t`We encountered an unknown error while attempting to create a organisation. Please try again later.`,
+        description: t`We encountered an unknown error while attempting to create a organization. Please try again later.`,
         variant: 'destructive',
       });
     }
@@ -193,7 +193,7 @@ export const OrganisationCreateDialog = ({ trigger, ...props }: OrganisationCrea
                 </DialogTitle>
 
                 <DialogDescription>
-                  <Trans>Create an organisation to collaborate with teams</Trans>
+                  <Trans>Create an organization to collaborate with teams</Trans>
                 </DialogDescription>
               </DialogHeader>
 
@@ -206,7 +206,7 @@ export const OrganisationCreateDialog = ({ trigger, ...props }: OrganisationCrea
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel required>
-                            <Trans>Organisation Name</Trans>
+                            <Trans>Organization Name</Trans>
                           </FormLabel>
                           <FormControl>
                             <Input {...field} />

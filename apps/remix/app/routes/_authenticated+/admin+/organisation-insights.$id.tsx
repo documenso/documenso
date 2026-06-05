@@ -31,7 +31,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   return {
     organisationId: id,
-    organisationName: organisation.name,
+    organisationName: organization.name,
     insights,
     page,
     perPage,

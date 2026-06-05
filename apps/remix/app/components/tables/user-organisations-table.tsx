@@ -41,7 +41,7 @@ export const UserOrganisationsTable = () => {
   const columns = useMemo(() => {
     return [
       {
-        header: _(msg`Organisation`),
+        header: _(msg`Organization`),
         accessorKey: 'name',
         cell: ({ row }) => (
           <Link
@@ -58,7 +58,7 @@ export const UserOrganisationsTable = () => {
                     ? _(
                         msg({
                           message: `Personal`,
-                          context: `Personal organisation (adjective)`,
+                          context: `Personal organization (adjective)`,
                         }),
                       )
                     : row.original.name}

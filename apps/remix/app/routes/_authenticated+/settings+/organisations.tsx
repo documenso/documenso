@@ -12,7 +12,7 @@ export default function TeamsSettingsPage() {
   return (
     <div>
       <SettingsHeader
-        title={_(msg`Organisations`)}
+        title={_(msg`Organizations`)}
         subtitle={_(msg`Manage all organisations you are currently associated with.`)}
       >
         <OrganisationCreateDialog />

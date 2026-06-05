@@ -5,7 +5,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
 export type OrganisationMemberOption = {
-  /** Organisation member ID. */
+  /** Organization member ID. */
   id: string;
   name: string;
   email: string;
@@ -20,7 +20,7 @@ type OrganisationMembersMultiSelectComboboxProps = {
   selectedMembers: OrganisationMemberOption[];
   onChange: (members: OrganisationMemberOption[]) => void;
   /**
-   * If set, organisation members already on this team are filtered out of the
+   * If set, organization members already on this team are filtered out of the
    * search results server-side. Used by "add members to team" flows.
    */
   excludeTeamId?: number;
@@ -45,11 +45,11 @@ const fromOption = (option: Option): OrganisationMemberOption => ({
 });
 
 /**
- * Searchable multi-select combobox for picking organisation members,
+ * Searchable multi-select combobox for picking organization members,
  * backed by `trpc.organisation.member.find` with server-side search.
  *
  * Renders selected members as chips and supports an unbounded number of
- * organisation members (paged out via debounced server queries).
+ * organization members (paged out via debounced server queries).
  */
 export const OrganisationMembersMultiSelectCombobox = ({
   organisationId,

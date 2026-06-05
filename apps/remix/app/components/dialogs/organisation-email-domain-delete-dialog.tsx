@@ -35,7 +35,7 @@ export const OrganisationEmailDomainDeleteDialog = ({
   const { t } = useLingui();
   const { toast } = useToast();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const deleteMessage = t`delete ${emailDomain}`;
 
@@ -57,7 +57,7 @@ export const OrganisationEmailDomainDeleteDialog = ({
       onSuccess: () => {
         toast({
           title: t`Success`,
-          description: t`You have successfully removed this email domain from the organisation.`,
+          description: t`You have successfully removed this email domain from the organization.`,
           duration: 5000,
         });
 

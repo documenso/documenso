@@ -45,7 +45,7 @@ export default function Organisations() {
         <Input
           defaultValue={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={t`Search by organisation ID, name, customer ID or owner email`}
+          placeholder={t`Search by organization ID, name, customer ID or owner email`}
           className="mb-4"
         />
 

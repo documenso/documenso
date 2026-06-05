@@ -44,7 +44,7 @@ export const EnvelopeEditorRecipientForm = () => {
   const { envelope, setRecipientsDebounced, updateEnvelope, editorRecipients, isEmbedded, editorConfig } =
     useCurrentEnvelopeEditor();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
   const team = useCurrentTeam();
 
   const { t } = useLingui();
@@ -993,7 +993,7 @@ export const EnvelopeEditorRecipientForm = () => {
                                 </Button>
                               </div>
 
-                              {showAdvancedSettings && organisation.organisationClaim.flags.cfr21 && (
+                              {showAdvancedSettings && organization.organisationClaim.flags.cfr21 && (
                                 <FormField
                                   control={form.control}
                                   name={`signers.${index}.actionAuth`}

@@ -26,7 +26,7 @@ export type FolderGridProps = {
 
 export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
   const team = useCurrentTeam();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const [isMovingFolder, setIsMovingFolder] = useState(false);
   const [folderToMove, setFolderToMove] = useState<TFolderWithSubfolders | null>(null);

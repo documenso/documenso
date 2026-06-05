@@ -18,18 +18,18 @@ export function meta() {
 export default function OrganisationSettingsGeneral() {
   const { _ } = useLingui();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   return (
     <div className="max-w-2xl">
-      <SettingsHeader title={_(msg`General`)} subtitle={_(msg`Here you can edit your organisation details.`)} />
+      <SettingsHeader title={_(msg`General`)} subtitle={_(msg`Here you can edit your organization details.`)} />
 
       <div className="space-y-8">
         <AvatarImageForm organisation={organisation} />
         <OrganisationUpdateForm />
       </div>
 
-      {canExecuteOrganisationAction('DELETE_ORGANISATION', organisation.currentOrganisationRole) && (
+      {canExecuteOrganisationAction('DELETE_ORGANISATION', organization.currentOrganisationRole) && (
         <>
           <hr className="my-4" />
 
@@ -40,7 +40,7 @@ export default function OrganisationSettingsGeneral() {
               </AlertTitle>
 
               <AlertDescription className="mr-2">
-                <Trans>This organisation, and any associated data will be permanently deleted.</Trans>
+                <Trans>This organization, and any associated data will be permanently deleted.</Trans>
               </AlertDescription>
             </div>
 

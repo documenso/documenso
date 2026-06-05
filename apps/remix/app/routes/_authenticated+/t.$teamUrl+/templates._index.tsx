@@ -34,7 +34,7 @@ export function meta() {
 
 export default function TemplatesPage() {
   const team = useCurrentTeam();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const { folderId } = useParams();
   const [searchParams] = useSearchParams();
@@ -45,7 +45,7 @@ export default function TemplatesPage() {
   const [view, setView] = useQueryState('view', parseAsStringLiteral(TEMPLATE_VIEWS).withDefault('team'));
 
   const isOrgView = view === 'organisation';
-  const showOrgTab = organisation.type !== OrganisationType.PERSONAL;
+  const showOrgTab = organization.type !== OrganisationType.PERSONAL;
 
   const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>('templates-bulk-selection', {});
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
@@ -119,10 +119,10 @@ export default function TemplatesPage() {
                   </TabsTrigger>
                   <TabsTrigger
                     className="min-w-[60px] hover:text-foreground"
-                    value="organisation"
+                    value="organization"
                     data-testid="template-tab-organisation"
                   >
-                    <Trans>Organisation</Trans>
+                    <Trans>Organization</Trans>
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
@@ -141,7 +141,7 @@ export default function TemplatesPage() {
 
                   <p className="mt-2 max-w-[50ch]">
                     {isOrgView ? (
-                      <Trans>No organisation templates are shared with your team yet.</Trans>
+                      <Trans>No organization templates are shared with your team yet.</Trans>
                     ) : (
                       <Trans>You have not yet created any templates. To create a template please upload one.</Trans>
                     )}

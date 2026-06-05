@@ -42,7 +42,7 @@ export const OrganisationLeaveDialog = ({
     onSuccess: () => {
       toast({
         title: t`Success`,
-        description: t`You have successfully left this organisation.`,
+        description: t`You have successfully left this organization.`,
         duration: 5000,
       });
 
@@ -51,7 +51,7 @@ export const OrganisationLeaveDialog = ({
     onError: () => {
       toast({
         title: t`An unknown error occurred`,
-        description: t`We encountered an unknown error while attempting to leave this organisation. Please try again later.`,
+        description: t`We encountered an unknown error while attempting to leave this organization. Please try again later.`,
         variant: 'destructive',
         duration: 10000,
       });
@@ -75,7 +75,7 @@ export const OrganisationLeaveDialog = ({
           </DialogTitle>
 
           <DialogDescription className="mt-4">
-            <Trans>You are about to leave the following organisation.</Trans>
+            <Trans>You are about to leave the following organization.</Trans>
           </DialogDescription>
         </DialogHeader>
 

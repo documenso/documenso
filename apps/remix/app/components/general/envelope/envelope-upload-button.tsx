@@ -38,7 +38,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
   const team = useCurrentTeam();
 
   const navigate = useNavigate();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const userTimezone = TIME_ZONES.find((timezone) => timezone === Intl.DateTimeFormat().resolvedOptions().timeZone);
 

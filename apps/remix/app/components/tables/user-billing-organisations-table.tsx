@@ -44,7 +44,7 @@ export const UserBillingOrganisationsTable = () => {
   const columns = useMemo(() => {
     return [
       {
-        header: t`Organisation`,
+        header: t`Organization`,
         accessorKey: 'name',
         cell: ({ row }) => (
           <Link to={`/o/${row.original.url}`} preventScrollReset={true}>

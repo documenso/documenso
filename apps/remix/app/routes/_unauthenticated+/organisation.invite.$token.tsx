@@ -23,7 +23,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       token,
     },
     include: {
-      organisation: {
+      organization: {
         select: {
           name: true,
         },
@@ -101,12 +101,12 @@ export default function AcceptInvitationPage({ loaderData }: Route.ComponentProp
     return (
       <div>
         <h1 className="font-semibold text-4xl">
-          <Trans>Organisation invitation</Trans>
+          <Trans>Organization invitation</Trans>
         </h1>
 
         <p className="mt-2 text-muted-foreground text-sm">
           <Trans>
-            You have been invited by <strong>{data.organisationName}</strong> to join their organisation.
+            You have been invited by <strong>{data.organisationName}</strong> to join their organization.
           </Trans>
         </p>
 
@@ -131,7 +131,7 @@ export default function AcceptInvitationPage({ loaderData }: Route.ComponentProp
 
       <p className="mt-2 mb-4 text-muted-foreground text-sm">
         <Trans>
-          You have accepted an invitation from <strong>{data.organisationName}</strong> to join their organisation.
+          You have accepted an invitation from <strong>{data.organisationName}</strong> to join their organization.
         </Trans>
       </p>
 

@@ -34,13 +34,13 @@ export const OrganisationMembersDataTable = () => {
 
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
   const { data, isLoading, isLoadingError } = trpc.organisation.member.find.useQuery(
     {
-      organisationId: organisation.id,
+      organisationId: organization.id,
       query: parsedSearchParams.query,
       page: parsedSearchParams.page,
       perPage: parsedSearchParams.perPage,
@@ -67,7 +67,7 @@ export const OrganisationMembersDataTable = () => {
   const columns = useMemo(() => {
     return [
       {
-        header: _(msg`Organisation Member`),
+        header: _(msg`Organization Member`),
         cell: ({ row }) => {
           const avatarFallbackText = row.original.name
             ? extractInitials(row.original.name)
@@ -87,7 +87,7 @@ export const OrganisationMembersDataTable = () => {
         header: _(msg`Role`),
         accessorKey: 'role',
         cell: ({ row }) =>
-          organisation.ownerUserId === row.original.userId
+          organization.ownerUserId === row.original.userId
             ? _(msg`Owner`)
             : _(EXTENDED_ORGANISATION_MEMBER_ROLE_MAP[row.original.currentOrganisationRole]),
       },
@@ -122,14 +122,14 @@ export const OrganisationMembersDataTable = () => {
                 trigger={
                   <DropdownMenuItem
                     disabled={
-                      organisation.ownerUserId === row.original.userId ||
+                      organization.ownerUserId === row.original.userId ||
                       !isOrganisationRoleWithinUserHierarchy(
-                        organisation.currentOrganisationRole,
+                        organization.currentOrganisationRole,
                         row.original.currentOrganisationRole,
                       )
                     }
                     onSelect={(e) => e.preventDefault()}
-                    title="Update organisation member role"
+                    title="Update organization member role"
                   >
                     <Edit className="mr-2 h-4 w-4" />
                     <Trans>Update role</Trans>
@@ -145,13 +145,13 @@ export const OrganisationMembersDataTable = () => {
                   <DropdownMenuItem
                     onSelect={(e) => e.preventDefault()}
                     disabled={
-                      organisation.ownerUserId === row.original.userId ||
+                      organization.ownerUserId === row.original.userId ||
                       !isOrganisationRoleWithinUserHierarchy(
-                        organisation.currentOrganisationRole,
+                        organization.currentOrganisationRole,
                         row.original.currentOrganisationRole,
                       )
                     }
-                    title={_(msg`Remove organisation member`)}
+                    title={_(msg`Remove organization member`)}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
                     <Trans>Remove</Trans>

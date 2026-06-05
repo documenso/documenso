@@ -29,7 +29,7 @@ import { useSearchParams } from 'react-router';
 export const OrganisationMemberInvitesTable = () => {
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const { _, i18n } = useLingui();
   const { toast } = useToast();
@@ -38,7 +38,7 @@ export const OrganisationMemberInvitesTable = () => {
 
   const { data, isLoading, isLoadingError } = trpc.organisation.member.invite.find.useQuery(
     {
-      organisationId: organisation.id,
+      organisationId: organization.id,
       query: parsedSearchParams.query,
       page: parsedSearchParams.page,
       perPage: parsedSearchParams.perPage,
@@ -98,7 +98,7 @@ export const OrganisationMemberInvitesTable = () => {
   const columns = useMemo(() => {
     return [
       {
-        header: _(msg`Organisation Member`),
+        header: _(msg`Organization Member`),
         cell: ({ row }) => {
           return (
             <AvatarWithText
@@ -135,7 +135,7 @@ export const OrganisationMemberInvitesTable = () => {
               <DropdownMenuItem
                 onClick={async () =>
                   resendOrganisationMemberInvitation({
-                    organisationId: organisation.id,
+                    organisationId: organization.id,
                     invitationId: row.original.id,
                   })
                 }
@@ -145,13 +145,13 @@ export const OrganisationMemberInvitesTable = () => {
               </DropdownMenuItem>
 
               {isOrganisationRoleWithinUserHierarchy(
-                organisation.currentOrganisationRole,
+                organization.currentOrganisationRole,
                 row.original.organisationRole,
               ) && (
                 <DropdownMenuItem
                   onClick={async () =>
                     deleteOrganisationMemberInvitations({
-                      organisationId: organisation.id,
+                      organisationId: organization.id,
                       invitationIds: [row.original.id],
                     })
                   }

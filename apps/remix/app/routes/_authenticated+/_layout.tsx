@@ -83,9 +83,9 @@ export default function Layout({ loaderData, params, matches }: Route.ComponentP
         errorCodeMap={{
           404: orgNotFound
             ? {
-                heading: msg`Organisation not found`,
-                subHeading: msg`404 Organisation not found`,
-                message: msg`The organisation you are looking for may have been removed, renamed or may have never existed.`,
+                heading: msg`Organization not found`,
+                subHeading: msg`404 Organization not found`,
+                message: msg`The organization you are looking for may have been removed, renamed or may have never existed.`,
               }
             : {
                 heading: msg`Team not found`,

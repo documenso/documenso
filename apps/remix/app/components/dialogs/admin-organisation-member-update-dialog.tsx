@@ -98,7 +98,7 @@ export const AdminOrganisationMemberUpdateDialog = ({
 
       toast({
         title: t`An unknown error occurred`,
-        description: t`We encountered an unknown error while attempting to update this organisation member. Please try again later.`,
+        description: t`We encountered an unknown error while attempting to update this organization member. Please try again later.`,
         variant: 'destructive',
       });
     }
@@ -128,7 +128,7 @@ export const AdminOrganisationMemberUpdateDialog = ({
       <DialogContent position="center">
         <DialogHeader>
           <DialogTitle>
-            <Trans>Update organisation member</Trans>
+            <Trans>Update organization member</Trans>
           </DialogTitle>
 
           <DialogDescription className="mt-4">

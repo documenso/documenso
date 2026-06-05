@@ -42,13 +42,13 @@ import type { Route } from './+types/o.$orgUrl.settings.groups.$id';
 export default function OrganisationGroupSettingsPage({ params }: Route.ComponentProps) {
   const { t } = useLingui();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const groupId = params.id;
 
   const { data: groupData, isLoading: isLoadingGroup } = trpc.organisation.group.find.useQuery(
     {
-      organisationId: organisation.id,
+      organisationId: organization.id,
       organisationGroupId: groupId,
       page: 1,
       perPage: 1,
@@ -76,9 +76,9 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
         errorCode={404}
         errorCodeMap={{
           404: {
-            heading: msg`Organisation group not found`,
-            subHeading: msg`404 Organisation group not found`,
-            message: msg`The organisation group you are looking for may have been removed, renamed or may have never existed.`,
+            heading: msg`Organization group not found`,
+            subHeading: msg`404 Organization group not found`,
+            message: msg`The organization group you are looking for may have been removed, renamed or may have never existed.`,
           },
         }}
         primaryButton={
@@ -95,12 +95,12 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
 
   return (
     <div>
-      <SettingsHeader title={t`Organisation Group Settings`} subtitle={t`Manage your organisation group settings.`}>
+      <SettingsHeader title={t`Organization Group Settings`} subtitle={t`Manage your organization group settings.`}>
         <OrganisationGroupDeleteDialog
           organisationGroupId={groupId}
           organisationGroupName={group.name || ''}
           trigger={
-            <Button variant="destructive" title={t`Remove organisation group`}>
+            <Button variant="destructive" title={t`Remove organization group`}>
               <Trans>Delete</Trans>
             </Button>
           }
@@ -128,7 +128,7 @@ const OrganisationGroupForm = ({ group }: OrganisationGroupFormOptions) => {
   const { toast } = useToast();
   const { t } = useLingui();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const { mutateAsync: updateOrganisationGroup } = trpc.organisation.group.update.useMutation();
 
@@ -211,11 +211,11 @@ const OrganisationGroupForm = ({ group }: OrganisationGroupFormOptions) => {
 
         <FormField
           control={form.control}
-          name="organisationRole"
+          name="organizationRole"
           render={({ field }) => (
             <FormItem>
               <FormLabel required>
-                <Trans>Organisation Role</Trans>
+                <Trans>Organization Role</Trans>
               </FormLabel>
               <FormControl>
                 <Select {...field} onValueChange={field.onChange}>
@@ -234,7 +234,7 @@ const OrganisationGroupForm = ({ group }: OrganisationGroupFormOptions) => {
               </FormControl>
               <FormMessage />
               <FormDescription>
-                <Trans>The organisation role that will be applied to all members in this group.</Trans>
+                <Trans>The organization role that will be applied to all members in this group.</Trans>
               </FormDescription>
             </FormItem>
           )}
@@ -277,7 +277,7 @@ const OrganisationGroupForm = ({ group }: OrganisationGroupFormOptions) => {
           </div>
 
           <FormDescription>
-            <Trans>Teams that this organisation group is currently assigned to</Trans>
+            <Trans>Teams that this organization group is currently assigned to</Trans>
           </FormDescription>
         </div>
 

@@ -35,7 +35,7 @@ export default function OrganisationSettingsTeamsPage() {
 
   return (
     <div>
-      <SettingsHeader title={t`Teams`} subtitle={t`Manage the teams in this organisation.`}>
+      <SettingsHeader title={t`Teams`} subtitle={t`Manage the teams in this organization.`}>
         <TeamCreateDialog />
       </SettingsHeader>
 

@@ -40,7 +40,7 @@ export const EnvelopeDropZoneWrapper = ({ children, type, className }: EnvelopeD
 
   const navigate = useNavigate();
   const analytics = useAnalytics();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const [isLoading, setIsLoading] = useState(false);
 

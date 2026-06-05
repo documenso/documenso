@@ -18,13 +18,13 @@ export function meta() {
 export default function SupportPage() {
   const [showForm, setShowForm] = useState(false);
   const { user } = useSession();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const [searchParams] = useSearchParams();
 
   const teamId = searchParams.get('team');
 
-  const subscriptionStatus = organisation.subscription?.status;
+  const subscriptionStatus = organization.subscription?.status;
 
   const handleSuccess = () => {
     setShowForm(false);

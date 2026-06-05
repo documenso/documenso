@@ -146,7 +146,7 @@ export default function AdminEmailDomainDetailPage({ loaderData }: Route.Compone
           <Trans>ID</Trans>: {emailDomain.id}
         </div>
         <div>
-          <Trans>Organisation</Trans>:{' '}
+          <Trans>Organization</Trans>:{' '}
           <Link to={`/admin/organisations/${emailDomain.organisation.id}`} className="hover:underline">
             {emailDomain.organisation.name}
           </Link>

@@ -52,7 +52,7 @@ export const TemplatesTable = ({
   const { remaining } = useLimits();
 
   const team = useCurrentTeam();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const [isPending, startTransition] = useTransition();
 
@@ -163,12 +163,12 @@ export const TemplatesTable = ({
                   <li>
                     <h2 className="mb-2 flex flex-row items-center font-semibold">
                       <Building2Icon className="mr-2 h-5 w-5 text-orange-500 dark:text-orange-300" />
-                      <Trans>Organisation</Trans>
+                      <Trans>Organization</Trans>
                     </h2>
 
                     <p>
                       <Trans>
-                        Organisation templates are shared across all teams within the same organisation. Only the owning
+                        Organization templates are shared across all teams within the same organization. Only the owning
                         team can edit them.
                       </Trans>
                     </p>

@@ -29,7 +29,7 @@ export function meta() {
 export default function OrganisationSettingsBrandingPage() {
   const { organisations } = useSession();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
   const team = useOptionalCurrentTeam();
 
   const { t } = useLingui();
@@ -44,7 +44,7 @@ export default function OrganisationSettingsBrandingPage() {
     isLoading: isLoadingOrganisation,
     refetch: refetchOrganisation,
   } = trpc.organisation.get.useQuery({
-    organisationReference: organisation.url,
+    organisationReference: organization.url,
   });
 
   const { mutateAsync: updateOrganisationSettings } = trpc.organisation.settings.update.useMutation();
@@ -65,7 +65,7 @@ export default function OrganisationSettingsBrandingPage() {
       }
 
       const result = await updateOrganisationSettings({
-        organisationId: organisation.id,
+        organisationId: organization.id,
         data: {
           brandingEnabled: brandingEnabled ?? undefined,
           brandingLogo: uploadedBrandingLogo,
@@ -121,7 +121,7 @@ export default function OrganisationSettingsBrandingPage() {
     ? t`Here you can set your general branding preferences.`
     : team
       ? t`Here you can set branding preferences for your team.`
-      : t`Here you can set branding preferences for your organisation. Teams will inherit these settings by default.`;
+      : t`Here you can set branding preferences for your organization. Teams will inherit these settings by default.`;
 
   return (
     <div className="max-w-2xl">
@@ -130,7 +130,7 @@ export default function OrganisationSettingsBrandingPage() {
       {organisationWithSettings.organisationClaim.flags.allowCustomBranding || !IS_BILLING_ENABLED() ? (
         <section>
           <BrandingPreferencesForm
-            context="Organisation"
+            context="Organization"
             hasAdvancedBranding={
               organisationWithSettings.organisationClaim.flags.embedSigningWhiteLabel === true || !IS_BILLING_ENABLED()
             }
@@ -174,7 +174,7 @@ export default function OrganisationSettingsBrandingPage() {
             </AlertDescription>
           </div>
 
-          {canExecuteOrganisationAction('MANAGE_BILLING', organisation.currentOrganisationRole) && (
+          {canExecuteOrganisationAction('MANAGE_BILLING', organization.currentOrganisationRole) && (
             <Button asChild variant="outline">
               <Link to={isPersonalLayoutMode ? '/settings/billing' : `/o/${organisation.url}/settings/billing`}>
                 <Trans>Update Billing</Trans>

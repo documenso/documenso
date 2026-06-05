@@ -106,7 +106,7 @@ export default function EnvelopeEditorHeader() {
                 {envelope.templateType === TemplateType.ORGANISATION && (
                   <Badge variant="orange" className="shrink-0">
                     <Building2Icon className="mr-2 size-4" />
-                    <Trans>Organisation Template</Trans>
+                    <Trans>Organization Template</Trans>
                   </Badge>
                 )}
                 {envelope.templateType === TemplateType.PUBLIC && (

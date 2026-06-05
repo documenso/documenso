@@ -122,7 +122,7 @@ export default function AuthoringLayout() {
   /**
    * Dummy data for providers.
    */
-  const organisation: OrganisationSession = {
+  const organization: OrganisationSession = {
     id: '',
     createdAt: new Date(),
     updatedAt: new Date(),

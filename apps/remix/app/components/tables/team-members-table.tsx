@@ -39,7 +39,7 @@ export const TeamMembersTable = () => {
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
   const team = useCurrentTeam();
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
@@ -143,7 +143,7 @@ export const TeamMembersTable = () => {
                 trigger={
                   <DropdownMenuItem
                     disabled={
-                      organisation.ownerUserId === row.original.userId ||
+                      organization.ownerUserId === row.original.userId ||
                       !isTeamRoleWithinUserHierarchy(team.currentTeamRole, row.original.teamRole)
                     }
                     onSelect={(e) => e.preventDefault()}
@@ -166,7 +166,7 @@ export const TeamMembersTable = () => {
                   <DropdownMenuItem
                     onSelect={(e) => e.preventDefault()}
                     disabled={
-                      organisation.ownerUserId === row.original.userId ||
+                      organization.ownerUserId === row.original.userId ||
                       !isTeamRoleWithinUserHierarchy(team.currentTeamRole, row.original.teamRole)
                     }
                     title={_(msg`Remove team member`)}

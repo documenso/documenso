@@ -97,7 +97,7 @@ export const FolderCreateDialog = ({ type, trigger, parentFolderId, ...props }: 
             <Trans>Create New Folder</Trans>
           </DialogTitle>
           <DialogDescription>
-            <Trans>Enter a name for your new folder. Folders help you organise your items.</Trans>
+            <Trans>Enter a name for your new folder. Folders help you organize your items.</Trans>
           </DialogDescription>
         </DialogHeader>
 

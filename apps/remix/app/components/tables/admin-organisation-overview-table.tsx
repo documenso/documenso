@@ -188,7 +188,7 @@ export const AdminOrganisationOverviewTable = ({
       <Input
         className="my-6 flex flex-row gap-4"
         type="text"
-        placeholder={_(msg`Search by organisation name`)}
+        placeholder={_(msg`Search by organization name`)}
         value={searchString}
         onChange={handleChange}
       />

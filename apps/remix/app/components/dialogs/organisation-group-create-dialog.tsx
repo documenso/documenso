@@ -57,7 +57,7 @@ export const OrganisationGroupCreateDialog = ({ trigger, ...props }: Organisatio
 
   const [open, setOpen] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<OrganisationMemberOption[]>([]);
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const form = useForm({
     resolver: zodResolver(ZCreateOrganisationGroupFormSchema),
@@ -73,7 +73,7 @@ export const OrganisationGroupCreateDialog = ({ trigger, ...props }: Organisatio
   const onFormSubmit = async ({ name, organisationRole, memberIds }: TCreateOrganisationGroupFormSchema) => {
     try {
       await createOrganisationGroup({
-        organisationId: organisation.id,
+        organisationId: organization.id,
         name,
         organisationRole,
         memberIds,
@@ -146,11 +146,11 @@ export const OrganisationGroupCreateDialog = ({ trigger, ...props }: Organisatio
 
               <FormField
                 control={form.control}
-                name="organisationRole"
+                name="organizationRole"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel required>
-                      <Trans>Organisation role</Trans>
+                      <Trans>Organization role</Trans>
                     </FormLabel>
                     <FormControl>
                       <Select {...field} onValueChange={field.onChange}>

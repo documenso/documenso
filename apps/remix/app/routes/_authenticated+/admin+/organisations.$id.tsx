@@ -68,7 +68,7 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
 
   const organisationId = params.id;
 
-  const { data: organisation, isLoading: isLoadingOrganisation } = trpc.admin.organisation.get.useQuery(
+  const { data: organization, isLoading: isLoadingOrganisation } = trpc.admin.organisation.get.useQuery(
     {
       organisationId,
     },
@@ -158,7 +158,7 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
       {
         header: t`Role`,
         cell: ({ row }) => {
-          const isOwner = row.original.userId === organisation.ownerUserId;
+          const isOwner = row.original.userId === organization.ownerUserId;
 
           if (isOwner) {
             return <Badge>{t`Owner`}</Badge>;
@@ -191,7 +191,7 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
       {
         header: t`Actions`,
         cell: ({ row }) => {
-          const isOwner = row.original.userId === organisation.ownerUserId;
+          const isOwner = row.original.userId === organization.ownerUserId;
 
           const memberName = row.original.user.name ?? row.original.user.email;
 
@@ -238,9 +238,9 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
         errorCode={404}
         errorCodeMap={{
           404: {
-            heading: msg`Organisation not found`,
-            subHeading: msg`404 Organisation not found`,
-            message: msg`The organisation you are looking for may have been removed, renamed or may have never existed.`,
+            heading: msg`Organization not found`,
+            subHeading: msg`404 Organization not found`,
+            message: msg`The organization you are looking for may have been removed, renamed or may have never existed.`,
           },
         }}
         primaryButton={
@@ -271,10 +271,10 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-medium text-sm">
-              <Trans>Organisation usage</Trans>
+              <Trans>Organization usage</Trans>
             </p>
             <p className="mt-1 text-muted-foreground text-sm">
-              <Trans>Current usage against organisation limits.</Trans>
+              <Trans>Current usage against organization limits.</Trans>
             </p>
           </div>
         </div>
@@ -285,14 +285,14 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
               {organisation.members.length} /{' '}
               {organisation.organisationClaim.memberCount === 0
                 ? t`Unlimited`
-                : organisation.organisationClaim.memberCount}
+                : organization.organisationClaim.memberCount}
             </DetailsValue>
           </DetailsCard>
 
           <DetailsCard label={<Trans>Teams</Trans>}>
             <DetailsValue>
               {organisation.teams.length} /{' '}
-              {organisation.organisationClaim.teamCount === 0 ? t`Unlimited` : organisation.organisationClaim.teamCount}
+              {organisation.organisationClaim.teamCount === 0 ? t`Unlimited` : organization.organisationClaim.teamCount}
             </DetailsValue>
           </DetailsCard>
         </div>
@@ -315,7 +315,7 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
                   <Trans>Global Settings</Trans>
                 </p>
                 <p className="mt-1 font-normal text-muted-foreground text-sm">
-                  <Trans>Default settings applied to this organisation.</Trans>
+                  <Trans>Default settings applied to this organization.</Trans>
                 </p>
               </div>
             </AccordionTrigger>
@@ -330,7 +330,7 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
 
       <SettingsHeader
         title={t`Manage subscription`}
-        subtitle={t`Manage the ${organisation.name} organisation subscription`}
+        subtitle={t`Manage the ${organisation.name} organization subscription`}
         className="mt-16"
       />
 
@@ -406,7 +406,7 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
       <div className="mt-16 space-y-10">
         <div>
           <label className="font-medium text-sm leading-none">
-            <Trans>Organisation Members</Trans>
+            <Trans>Organization Members</Trans>
           </label>
 
           <div className="my-2">
@@ -416,7 +416,7 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
 
         <div>
           <label className="font-medium text-sm leading-none">
-            <Trans>Organisation Teams</Trans>
+            <Trans>Organization Teams</Trans>
           </label>
 
           <div className="my-2">
@@ -439,7 +439,7 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
 
           <AlertDescription className="mr-2">
             <Trans>
-              Permanently delete this organisation. Documents will be orphaned (not deleted) so they remain accessible
+              Permanently delete this organization. Documents will be orphaned (not deleted) so they remain accessible
               via the deleted-account service account.
             </Trans>
           </AlertDescription>
@@ -461,11 +461,11 @@ const ZUpdateGenericOrganisationDataFormSchema = ZUpdateAdminOrganisationRequest
 type TUpdateGenericOrganisationDataFormSchema = z.infer<typeof ZUpdateGenericOrganisationDataFormSchema>;
 
 type OrganisationAdminFormOptions = {
-  organisation: TGetAdminOrganisationResponse;
+  organization: TGetAdminOrganisationResponse;
   licenseFlags?: TLicenseClaim;
 };
 
-const GenericOrganisationAdminForm = ({ organisation }: OrganisationAdminFormOptions) => {
+const GenericOrganisationAdminForm = ({ organization }: OrganisationAdminFormOptions) => {
   const { toast } = useToast();
   const { t } = useLingui();
 
@@ -474,21 +474,21 @@ const GenericOrganisationAdminForm = ({ organisation }: OrganisationAdminFormOpt
   const form = useForm<TUpdateGenericOrganisationDataFormSchema>({
     resolver: zodResolver(ZUpdateGenericOrganisationDataFormSchema),
     defaultValues: {
-      name: organisation.name,
-      url: organisation.url,
+      name: organization.name,
+      url: organization.url,
     },
   });
 
   const onSubmit = async (data: TUpdateGenericOrganisationDataFormSchema) => {
     try {
       await updateOrganisation({
-        organisationId: organisation.id,
+        organisationId: organization.id,
         data,
       });
 
       toast({
         title: t`Success`,
-        description: t`Organisation has been updated successfully`,
+        description: t`Organization has been updated successfully`,
         duration: 5000,
       });
     } catch (err) {
@@ -497,7 +497,7 @@ const GenericOrganisationAdminForm = ({ organisation }: OrganisationAdminFormOpt
 
       toast({
         title: t`An error occurred`,
-        description: t`We couldn't update the organisation. Please try again.`,
+        description: t`We couldn't update the organization. Please try again.`,
         variant: 'destructive',
       });
     }
@@ -512,7 +512,7 @@ const GenericOrganisationAdminForm = ({ organisation }: OrganisationAdminFormOpt
           render={({ field }) => (
             <FormItem>
               <FormLabel required>
-                <Trans>Organisation Name</Trans>
+                <Trans>Organization Name</Trans>
               </FormLabel>
               <FormControl>
                 <Input {...field} />
@@ -528,7 +528,7 @@ const GenericOrganisationAdminForm = ({ organisation }: OrganisationAdminFormOpt
           render={({ field }) => (
             <FormItem>
               <FormLabel required>
-                <Trans>Organisation URL</Trans>
+                <Trans>Organization URL</Trans>
               </FormLabel>
               <FormControl>
                 <Input {...field} />
@@ -566,7 +566,7 @@ const ZUpdateOrganisationBillingFormSchema = ZUpdateAdminOrganisationRequestSche
 
 type TUpdateOrganisationBillingFormSchema = z.infer<typeof ZUpdateOrganisationBillingFormSchema>;
 
-const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdminFormOptions) => {
+const OrganisationAdminForm = ({ organization, licenseFlags }: OrganisationAdminFormOptions) => {
   const { toast } = useToast();
   const { t } = useLingui();
 
@@ -580,43 +580,43 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
   const form = useForm<TUpdateOrganisationBillingFormSchema>({
     resolver: zodResolver(ZUpdateOrganisationBillingFormSchema),
     defaultValues: {
-      customerId: organisation.customerId || '',
+      customerId: organization.customerId || '',
       claims: {
-        teamCount: organisation.organisationClaim.teamCount,
-        memberCount: organisation.organisationClaim.memberCount,
-        envelopeItemCount: organisation.organisationClaim.envelopeItemCount,
-        recipientCount: organisation.organisationClaim.recipientCount,
-        flags: organisation.organisationClaim.flags,
+        teamCount: organization.organisationClaim.teamCount,
+        memberCount: organization.organisationClaim.memberCount,
+        envelopeItemCount: organization.organisationClaim.envelopeItemCount,
+        recipientCount: organization.organisationClaim.recipientCount,
+        flags: organization.organisationClaim.flags,
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        documentRateLimits: organisation.organisationClaim.documentRateLimits as NonNullable<
+        documentRateLimits: organization.organisationClaim.documentRateLimits as NonNullable<
           TUpdateOrganisationBillingFormSchema['claims']
         >['documentRateLimits'],
-        documentQuota: organisation.organisationClaim.documentQuota,
+        documentQuota: organization.organisationClaim.documentQuota,
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        emailRateLimits: organisation.organisationClaim.emailRateLimits as NonNullable<
+        emailRateLimits: organization.organisationClaim.emailRateLimits as NonNullable<
           TUpdateOrganisationBillingFormSchema['claims']
         >['emailRateLimits'],
-        emailQuota: organisation.organisationClaim.emailQuota,
+        emailQuota: organization.organisationClaim.emailQuota,
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        apiRateLimits: organisation.organisationClaim.apiRateLimits as NonNullable<
+        apiRateLimits: organization.organisationClaim.apiRateLimits as NonNullable<
           TUpdateOrganisationBillingFormSchema['claims']
         >['apiRateLimits'],
-        apiQuota: organisation.organisationClaim.apiQuota,
+        apiQuota: organization.organisationClaim.apiQuota,
       },
-      originalSubscriptionClaimId: organisation.organisationClaim.originalSubscriptionClaimId || '',
+      originalSubscriptionClaimId: organization.organisationClaim.originalSubscriptionClaimId || '',
     },
   });
 
   const onSubmit = async (values: TUpdateOrganisationBillingFormSchema) => {
     try {
       await updateOrganisation({
-        organisationId: organisation.id,
+        organisationId: organization.id,
         data: values,
       });
 
       toast({
         title: t`Success`,
-        description: t`Organisation has been updated successfully`,
+        description: t`Organization has been updated successfully`,
         duration: 5000,
       });
     } catch (err) {
@@ -625,7 +625,7 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
 
       toast({
         title: t`An error occurred`,
-        description: t`We couldn't update the organisation. Please try again.`,
+        description: t`We couldn't update the organization. Please try again.`,
         variant: 'destructive',
       });
     }
@@ -655,14 +655,14 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
 
                     <p>
                       <Trans>
-                        This is the claim that this organisation was initially created with. Any feature flag changes to
-                        this claim will be backported into this organisation.
+                        This is the claim that this organization was initially created with. Any feature flag changes to
+                        this claim will be backported into this organization.
                       </Trans>
                     </p>
 
                     <p>
                       <Trans>
-                        For example, if the claim has a new flag "FLAG_1" set to true, then this organisation will get
+                        For example, if the claim has a new flag "FLAG_1" set to true, then this organization will get
                         that flag added.
                       </Trans>
                     </p>

@@ -31,7 +31,7 @@ export default function OrganisationSettingsDocumentPage() {
   const { isAiFeaturesConfigured } = useLoaderData<typeof loader>();
 
   const { organisations } = useSession();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const { t } = useLingui();
   const { toast } = useToast();
@@ -39,7 +39,7 @@ export default function OrganisationSettingsDocumentPage() {
   const isPersonalLayoutMode = isPersonalLayout(organisations);
 
   const { data: organisationWithSettings, isLoading: isLoadingOrganisation } = trpc.organisation.get.useQuery({
-    organisationReference: organisation.url,
+    organisationReference: organization.url,
   });
 
   const { mutateAsync: updateOrganisationSettings } = trpc.organisation.settings.update.useMutation();
@@ -75,7 +75,7 @@ export default function OrganisationSettingsDocumentPage() {
       }
 
       await updateOrganisationSettings({
-        organisationId: organisation.id,
+        organisationId: organization.id,
         data: {
           documentVisibility,
           documentLanguage,
@@ -119,7 +119,7 @@ export default function OrganisationSettingsDocumentPage() {
   const settingsHeaderText = t`Document Preferences`;
   const settingsHeaderSubtitle = isPersonalLayoutMode
     ? t`Here you can set your general document preferences.`
-    : t`Here you can set document preferences for your organisation. Teams will inherit these settings by default.`;
+    : t`Here you can set document preferences for your organization. Teams will inherit these settings by default.`;
 
   return (
     <div className="max-w-2xl">

@@ -133,7 +133,7 @@ export const OrgMenuSwitcher = () => {
             <div className="flex h-12 items-center border-b p-2">
               <h3 className="flex items-center px-2 font-medium text-muted-foreground text-sm">
                 <Building2Icon className="mr-2 h-3.5 w-3.5" />
-                <Trans>Organisations</Trans>
+                <Trans>Organizations</Trans>
               </h3>
             </div>
             <div className="flex-1 space-y-1 overflow-y-auto p-1.5">
@@ -225,7 +225,7 @@ export const OrgMenuSwitcher = () => {
                   ))
                 ) : (
                   <div className="my-12 flex items-center justify-center px-2 text-center text-muted-foreground text-sm">
-                    <Trans>Select an organisation to view teams</Trans>
+                    <Trans>Select an organization to view teams</Trans>
                   </div>
                 )}
 
@@ -262,7 +262,7 @@ export const OrgMenuSwitcher = () => {
                 canExecuteOrganisationAction('MANAGE_ORGANISATION', currentOrganisation.currentOrganisationRole) && (
                   <DropdownMenuItem className="px-4 py-2 text-muted-foreground" asChild>
                     <Link to={`/o/${currentOrganisation.url}/settings`}>
-                      <Trans>Organisation settings</Trans>
+                      <Trans>Organization settings</Trans>
                     </Link>
                   </DropdownMenuItem>
                 )}

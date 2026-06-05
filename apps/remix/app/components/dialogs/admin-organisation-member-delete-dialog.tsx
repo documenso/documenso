@@ -44,7 +44,7 @@ export const AdminOrganisationMemberDeleteDialog = ({
     onSuccess: async () => {
       toast({
         title: _(msg`Success`),
-        description: _(msg`Member has been removed from the organisation.`),
+        description: _(msg`Member has been removed from the organization.`),
         duration: 5000,
       });
 
@@ -78,7 +78,7 @@ export const AdminOrganisationMemberDeleteDialog = ({
       <DialogContent>
         <DialogHeader className="space-y-4">
           <DialogTitle>
-            <Trans>Remove Organisation Member</Trans>
+            <Trans>Remove Organization Member</Trans>
           </DialogTitle>
 
           <Alert variant="destructive">

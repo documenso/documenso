@@ -54,7 +54,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
   const organisationEmails = await prisma.organisationEmail.findMany({
     where: {
-      organisation: {
+      organization: {
         members: {
           some: {
             userId: result.userId,

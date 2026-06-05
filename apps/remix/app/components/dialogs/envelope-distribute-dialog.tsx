@@ -61,7 +61,7 @@ export const EnvelopeDistributeDialog = ({
   documentRootPath,
   onDistribute,
 }: EnvelopeDistributeDialogProps) => {
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const { envelope, syncEnvelope, isAutosaving, autosaveError } = useCurrentEnvelopeEditor();
 
@@ -96,7 +96,7 @@ export const EnvelopeDistributeDialog = ({
 
   const { data: emailData, isLoading: isLoadingEmails } = trpc.enterprise.organisation.email.find.useQuery(
     {
-      organisationId: organisation.id,
+      organisationId: organization.id,
       perPage: 100,
     },
     {
@@ -249,7 +249,7 @@ export const EnvelopeDistributeDialog = ({
 
                 <div
                   className={cn('min-h-72', {
-                    'min-h-[23rem]': organisation.organisationClaim.flags.emailDomains,
+                    'min-h-[23rem]': organization.organisationClaim.flags.emailDomains,
                   })}
                 >
                   <AnimatePresence initial={false} mode="wait">

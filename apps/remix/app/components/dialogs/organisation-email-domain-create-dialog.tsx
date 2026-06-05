@@ -51,7 +51,7 @@ type DomainRecord = {
 export const OrganisationEmailDomainCreateDialog = ({ trigger, ...props }: OrganisationEmailCreateDialogProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<'domain' | 'verification'>('domain');
@@ -78,7 +78,7 @@ export const OrganisationEmailDomainCreateDialog = ({ trigger, ...props }: Organ
     try {
       const { records } = await createOrganisationEmail({
         domain,
-        organisationId: organisation.id,
+        organisationId: organization.id,
       });
 
       setRecordsToAdd(records);
@@ -127,7 +127,7 @@ export const OrganisationEmailDomainCreateDialog = ({ trigger, ...props }: Organ
             </DialogTitle>
             <DialogDescription>
               <Trans>
-                Add a custom domain to send emails on behalf of your organisation. We'll generate DKIM records that you
+                Add a custom domain to send emails on behalf of your organization. We'll generate DKIM records that you
                 need to add to your DNS provider.
               </Trans>
             </DialogDescription>

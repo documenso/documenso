@@ -188,7 +188,7 @@ const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
               <Trans>User Organisations</Trans>
             </h3>
             <p className="mt-1.5 text-muted-foreground text-sm">
-              <Trans>Organisations that the user is a member of.</Trans>
+              <Trans>Organizations that the user is a member of.</Trans>
             </p>
           </div>
 

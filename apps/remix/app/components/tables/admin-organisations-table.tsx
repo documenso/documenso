@@ -80,7 +80,7 @@ export const AdminOrganisationsTable = ({
   const columns = useMemo(() => {
     return [
       {
-        header: t`Organisation`,
+        header: t`Organization`,
         accessorKey: 'name',
         cell: ({ row }) => <Link to={`/admin/organisations/${row.original.id}`}>{row.original.name}</Link>,
       },

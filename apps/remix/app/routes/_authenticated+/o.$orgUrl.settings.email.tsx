@@ -17,10 +17,10 @@ export default function OrganisationSettingsGeneral() {
   const { t } = useLingui();
   const { toast } = useToast();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const { data: organisationWithSettings, isLoading: isLoadingOrganisation } = trpc.organisation.get.useQuery({
-    organisationReference: organisation.url,
+    organisationReference: organization.url,
   });
 
   const { mutateAsync: updateOrganisationSettings } = trpc.organisation.settings.update.useMutation();
@@ -30,7 +30,7 @@ export default function OrganisationSettingsGeneral() {
       const { emailId, emailReplyTo, emailDocumentSettings } = data;
 
       await updateOrganisationSettings({
-        organisationId: organisation.id,
+        organisationId: organization.id,
         data: {
           emailId,
           emailReplyTo: emailReplyTo || null,

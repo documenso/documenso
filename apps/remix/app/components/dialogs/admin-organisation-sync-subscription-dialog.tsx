@@ -60,7 +60,7 @@ export const AdminOrganisationSyncSubscriptionDialog = ({
 
       toast({
         title: t`Subscription synced`,
-        description: t`The organisation subscription has been synced with Stripe.`,
+        description: t`The organization subscription has been synced with Stripe.`,
         duration: 5000,
       });
 
@@ -104,7 +104,7 @@ export const AdminOrganisationSyncSubscriptionDialog = ({
           </DialogTitle>
 
           <DialogDescription>
-            <Trans>Fetch the latest subscription data from Stripe and apply it to this organisation.</Trans>
+            <Trans>Fetch the latest subscription data from Stripe and apply it to this organization.</Trans>
           </DialogDescription>
         </DialogHeader>
 

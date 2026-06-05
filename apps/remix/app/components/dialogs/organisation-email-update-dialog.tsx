@@ -150,7 +150,7 @@ export const OrganisationEmailUpdateDialog = ({
                     <FormDescription>
                       <Trans>
                         Optional no-reply email address attached to emails. Leave blank to default
-                        to the organisation settings reply-to email.
+                        to the organization settings reply-to email.
                       </Trans>
                     </FormDescription>
                   </FormItem>

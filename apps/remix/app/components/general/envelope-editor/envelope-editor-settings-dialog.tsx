@@ -158,7 +158,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
   const { settings } = editorConfig;
 
   const team = useCurrentTeam();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<EnvelopeEditorSettingsTabType>('general');
@@ -208,12 +208,12 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
 
   const { data: emailData, isLoading: isLoadingEmails } = trpc.enterprise.organisation.email.find.useQuery(
     {
-      organisationId: organisation.id,
+      organisationId: organization.id,
       perPage: 100,
     },
     {
       ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-      enabled: Boolean(organisationEmails !== undefined && organisation.id),
+      enabled: Boolean(organisationEmails !== undefined && organization.id),
     },
   );
 
@@ -732,7 +732,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                   ))
                   .with({ activeTab: 'email', settings: { allowConfigureDistribution: true } }, () => (
                     <>
-                      {settings.allowConfigureEmailSender && organisation.organisationClaim.flags.emailDomains && (
+                      {settings.allowConfigureEmailSender && organization.organisationClaim.flags.emailDomains && (
                         <FormField
                           control={form.control}
                           name="meta.emailId"

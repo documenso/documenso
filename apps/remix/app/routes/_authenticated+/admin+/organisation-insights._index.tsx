@@ -66,7 +66,7 @@ export default function Organisations({ loaderData }: Route.ComponentProps) {
     <div>
       <div className="flex items-center justify-between">
         <h2 className="font-semibold text-4xl">
-          <Trans>Organisation Insights</Trans>
+          <Trans>Organization Insights</Trans>
         </h2>
         <DateRangeFilter currentRange={dateRange} />
       </div>

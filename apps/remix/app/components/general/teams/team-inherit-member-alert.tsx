@@ -14,14 +14,14 @@ export const TeamInheritMemberAlert = ({ memberAccessTeamGroup }: TeamInheritMem
     <Alert className="flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
       <div className="mb-4 sm:mb-0">
         <AlertTitle>
-          <Trans>Inherit organisation members</Trans>
+          <Trans>Inherit organization members</Trans>
         </AlertTitle>
 
         <AlertDescription className="mr-2">
           {memberAccessTeamGroup ? (
-            <Trans>Currently all organisation members can access this team</Trans>
+            <Trans>Currently all organization members can access this team</Trans>
           ) : (
-            <Trans>You can enable access to allow all organisation members to access this team by default.</Trans>
+            <Trans>You can enable access to allow all organization members to access this team by default.</Trans>
           )}
         </AlertDescription>
       </div>

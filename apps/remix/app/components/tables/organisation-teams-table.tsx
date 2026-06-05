@@ -24,12 +24,12 @@ export const OrganisationTeamsTable = () => {
 
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
   const { data, isLoading, isLoadingError } = trpc.team.find.useQuery({
-    organisationId: organisation.id,
+    organisationId: organization.id,
     query: parsedSearchParams.query,
     page: parsedSearchParams.page,
     perPage: parsedSearchParams.perPage,

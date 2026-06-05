@@ -21,11 +21,11 @@ export function meta() {
 export default function TeamsSettingBillingPage() {
   const { _, i18n } = useLingui();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const { data: subscriptionQuery, isLoading: isLoadingSubscription } =
     trpc.enterprise.billing.subscription.get.useQuery({
-      organisationId: organisation.id,
+      organisationId: organization.id,
     });
 
   if (isLoadingSubscription || !subscriptionQuery) {
@@ -38,7 +38,7 @@ export default function TeamsSettingBillingPage() {
 
   const { subscription, plans } = subscriptionQuery;
 
-  const canManageBilling = canExecuteOrganisationAction('MANAGE_BILLING', organisation.currentOrganisationRole);
+  const canManageBilling = canExecuteOrganisationAction('MANAGE_BILLING', organization.currentOrganisationRole);
 
   const { organisationSubscription, stripeSubscription } = subscription || {};
 

@@ -40,7 +40,7 @@ export type EmailPreferencesFormProps = {
 };
 
 export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: EmailPreferencesFormProps) => {
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const form = useForm<TEmailPreferencesFormSchema>({
     defaultValues: {
@@ -53,7 +53,7 @@ export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: Ema
   });
 
   const { data: emailData, isLoading: isLoadingEmails } = trpc.enterprise.organisation.email.find.useQuery({
-    organisationId: organisation.id,
+    organisationId: organization.id,
     perPage: 100,
   });
 
@@ -129,7 +129,7 @@ export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: Ema
                   {canInherit && (
                     <span>
                       {'. '}
-                      <Trans>Leave blank to inherit from the organisation.</Trans>
+                      <Trans>Leave blank to inherit from the organization.</Trans>
                     </span>
                   )}
                 </FormDescription>
@@ -178,7 +178,7 @@ export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: Ema
                       </SelectItem>
 
                       <SelectItem value={'CONTROLLED'}>
-                        <Trans>Override organisation settings</Trans>
+                        <Trans>Override organization settings</Trans>
                       </SelectItem>
                     </SelectContent>
                   </Select>

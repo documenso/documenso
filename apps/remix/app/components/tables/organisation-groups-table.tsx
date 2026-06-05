@@ -23,13 +23,13 @@ export const OrganisationGroupsDataTable = () => {
 
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
   const { data, isLoading, isLoadingError } = trpc.organisation.group.find.useQuery(
     {
-      organisationId: organisation.id,
+      organisationId: organization.id,
       query: parsedSearchParams.query,
       page: parsedSearchParams.page,
       perPage: parsedSearchParams.perPage,
@@ -89,7 +89,7 @@ export const OrganisationGroupsDataTable = () => {
               organisationGroupId={row.original.id}
               organisationGroupName={row.original.name ?? ''}
               trigger={
-                <Button variant="destructive" title={_(msg`Remove organisation group`)}>
+                <Button variant="destructive" title={_(msg`Remove organization group`)}>
                   <Trans>Delete</Trans>
                 </Button>
               }

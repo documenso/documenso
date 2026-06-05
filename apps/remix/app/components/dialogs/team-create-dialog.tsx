@@ -51,12 +51,12 @@ export const TeamCreateDialog = ({ trigger, onCreated, ...props }: TeamCreateDia
 
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const [open, setOpen] = useState(false);
 
   const { data: fullOrganisation } = trpc.organisation.get.useQuery({
-    organisationReference: organisation.id,
+    organisationReference: organization.id,
   });
 
   const actionSearchParam = searchParams?.get('action');
@@ -75,7 +75,7 @@ export const TeamCreateDialog = ({ trigger, onCreated, ...props }: TeamCreateDia
   const onFormSubmit = async ({ teamName, teamUrl, inheritMembers }: TCreateTeamFormSchema) => {
     try {
       await createTeam({
-        organisationId: organisation.id,
+        organisationId: organization.id,
         teamName,
         teamUrl,
         inheritMembers,
@@ -262,7 +262,7 @@ export const TeamCreateDialog = ({ trigger, onCreated, ...props }: TeamCreateDia
                           <Checkbox id="inherit-members" checked={field.value} onCheckedChange={field.onChange} />
 
                           <label className="ml-2 text-muted-foreground text-sm" htmlFor="inherit-members">
-                            <Trans>Allow all organisation members to access this team</Trans>
+                            <Trans>Allow all organization members to access this team</Trans>
                           </label>
                         </div>
                       </FormControl>

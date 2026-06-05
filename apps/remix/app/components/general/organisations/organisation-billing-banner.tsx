@@ -30,7 +30,7 @@ export const OrganisationBillingBanner = () => {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const organisation = useOptionalCurrentOrganisation();
+  const organization = useOptionalCurrentOrganisation();
 
   const { mutateAsync: manageSubscription, isPending } = trpc.enterprise.billing.subscription.manage.useMutation();
 
@@ -53,7 +53,7 @@ export const OrganisationBillingBanner = () => {
     }
   };
 
-  const subscriptionStatus = organisation?.subscription?.status;
+  const subscriptionStatus = organization?.subscription?.status;
 
   if (!organisation || subscriptionStatus === undefined || subscriptionStatus === SubscriptionStatus.ACTIVE) {
     return null;
@@ -108,7 +108,7 @@ export const OrganisationBillingBanner = () => {
                 </DialogDescription>
               </DialogHeader>
 
-              {canExecuteOrganisationAction('MANAGE_BILLING', organisation.currentOrganisationRole) && (
+              {canExecuteOrganisationAction('MANAGE_BILLING', organization.currentOrganisationRole) && (
                 <DialogFooter>
                   <Button loading={isPending} onClick={async () => handleCreatePortal(organisation.id)}>
                     <Trans>Resolve payment</Trans>
@@ -140,7 +140,7 @@ export const OrganisationBillingBanner = () => {
                 </AlertDescription>
               </Alert>
 
-              {canExecuteOrganisationAction('MANAGE_BILLING', organisation.currentOrganisationRole) && (
+              {canExecuteOrganisationAction('MANAGE_BILLING', organization.currentOrganisationRole) && (
                 <DialogFooter>
                   <DialogClose asChild>
                     <Button asChild>

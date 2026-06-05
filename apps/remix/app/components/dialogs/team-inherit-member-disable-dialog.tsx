@@ -59,7 +59,7 @@ export const TeamMemberInheritDisableDialog = ({ group }: TeamMemberInheritDisab
 
           <DialogDescription className="mt-4">
             <Trans>
-              You are about to remove default access to this team for all organisation members. Any members not
+              You are about to remove default access to this team for all organization members. Any members not
               explicitly added to this team will no longer have access.
             </Trans>
           </DialogDescription>

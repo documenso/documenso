@@ -28,7 +28,7 @@ const TEMPLATE_TYPES: Record<TemplateTypes, TemplateTypeIcon> = {
     color: 'text-green-500 dark:text-green-300',
   },
   ORGANISATION: {
-    label: msg`Organisation`,
+    label: msg`Organization`,
     icon: Building2,
     color: 'text-orange-500 dark:text-orange-300',
   },

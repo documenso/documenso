@@ -123,7 +123,7 @@ export const AdminSwapSubscriptionDialog = ({
 
           <DialogDescription>
             <Trans>
-              Move the subscription from "{sourceOrganisationName}" to another organisation owned by this user.
+              Move the subscription from "{sourceOrganisationName}" to another organization owned by this user.
             </Trans>
           </DialogDescription>
         </DialogHeader>
@@ -159,7 +159,7 @@ export const AdminSwapSubscriptionDialog = ({
               <AlertDescription className="mt-0">
                 <Trans>
                   This will move the subscription from "{sourceOrganisationName}" to "{selectedOrg.name}". The source
-                  organisation will be reset to the free plan.
+                  organization will be reset to the free plan.
                 </Trans>
               </AlertDescription>
             </Alert>

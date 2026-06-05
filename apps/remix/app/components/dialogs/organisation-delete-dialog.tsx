@@ -36,7 +36,7 @@ export const OrganisationDeleteDialog = ({ trigger }: OrganisationDeleteDialogPr
   const { toast } = useToast();
   const { refreshSession } = useSession();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const deleteMessage = _(msg`delete ${organisation.name}`);
 
@@ -57,11 +57,11 @@ export const OrganisationDeleteDialog = ({ trigger }: OrganisationDeleteDialogPr
 
   const onFormSubmit = async () => {
     try {
-      await deleteOrganisation({ organisationId: organisation.id });
+      await deleteOrganisation({ organisationId: organization.id });
 
       toast({
         title: _(msg`Success`),
-        description: _(msg`Your organisation has been successfully deleted.`),
+        description: _(msg`Your organization has been successfully deleted.`),
         duration: 5000,
       });
 
@@ -76,7 +76,7 @@ export const OrganisationDeleteDialog = ({ trigger }: OrganisationDeleteDialogPr
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(
-          msg`We encountered an unknown error while attempting to delete this organisation. Please try again later.`,
+          msg`We encountered an unknown error while attempting to delete this organization. Please try again later.`,
         ),
         variant: 'destructive',
         duration: 10000,
@@ -103,13 +103,13 @@ export const OrganisationDeleteDialog = ({ trigger }: OrganisationDeleteDialogPr
       <DialogContent position="center">
         <DialogHeader>
           <DialogTitle>
-            <Trans>Are you sure you wish to delete this organisation?</Trans>
+            <Trans>Are you sure you wish to delete this organization?</Trans>
           </DialogTitle>
 
           <DialogDescription>
             <Trans>
               You are about to delete <span className="font-semibold">{organisation.name}</span>. All data related to
-              this organisation such as teams, documents, and all other resources will be deleted. This action is
+              this organization such as teams, documents, and all other resources will be deleted. This action is
               irreversible.
             </Trans>
           </DialogDescription>
@@ -120,7 +120,7 @@ export const OrganisationDeleteDialog = ({ trigger }: OrganisationDeleteDialogPr
             <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
               <FormField
                 control={form.control}
-                name="organisationName"
+                name="organizationName"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>

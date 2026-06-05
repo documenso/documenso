@@ -122,7 +122,7 @@ export default function OrganisationStats() {
     <div>
       <SettingsHeader
         hideDivider
-        title={t`Organisation Stats`}
+        title={t`Organization Stats`}
         subtitle={t`View, sort and filter monthly usage stats across organisations`}
       />
 
@@ -130,7 +130,7 @@ export default function OrganisationStats() {
         <Input
           defaultValue={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={t`Search by organisation name, URL or ID`}
+          placeholder={t`Search by organization name, URL or ID`}
           className="flex-1"
         />
 

@@ -78,7 +78,7 @@ export async function loader({ params }: Route.LoaderArgs) {
     });
   }
 
-  const organisation = await prisma.organisation.findFirst({
+  const organization = await prisma.organisation.findFirst({
     where: {
       id: metadata.data.organisationId,
     },
@@ -103,16 +103,16 @@ export async function loader({ params }: Route.LoaderArgs) {
       email: verificationToken.user.email,
       avatar: verificationToken.user.avatarImageId,
     },
-    organisation: {
-      name: organisation.name,
-      url: organisation.url,
-      avatar: organisation.avatarImageId,
+    organization: {
+      name: organization.name,
+      url: organization.url,
+      avatar: organization.avatarImageId,
     },
   } as const;
 }
 
 export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Route.ComponentProps) {
-  const { token, type, user, organisation } = loaderData;
+  const { token, type, user, organization } = loaderData;
 
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -163,9 +163,9 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
           </CardTitle>
           <CardDescription>
             {type === 'link' ? (
-              <Trans>An organisation wants to link your account. Please review the details below.</Trans>
+              <Trans>An organization wants to link your account. Please review the details below.</Trans>
             ) : (
-              <Trans>An organisation wants to create an account for you. Please review the details below.</Trans>
+              <Trans>An organization wants to create an account for you. Please review the details below.</Trans>
             )}
           </CardDescription>
         </CardHeader>
@@ -193,7 +193,7 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
 
           <Separator />
 
-          {/* Organisation Section */}
+          {/* Organization Section */}
           <div className="space-y-3">
             <h3 className="flex items-center gap-2 font-semibold text-muted-foreground">
               <Building2 className="h-4 w-4" />
@@ -208,7 +208,7 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
               />
 
               <Badge variant="secondary">
-                <Trans>Organisation</Trans>
+                <Trans>Organization</Trans>
               </Badge>
             </div>
           </div>
@@ -258,7 +258,7 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
               <Alert variant="warning" className="mt-3">
                 <AlertDescription>
                   <Trans>
-                    This organisation will have administrative control over your account. You can revoke this access
+                    This organization will have administrative control over your account. You can revoke this access
                     later, but they will retain access to any data they've already collected.
                   </Trans>
                 </AlertDescription>

@@ -71,12 +71,12 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
   const { toast } = useToast();
 
   const team = useCurrentTeam();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
   const utils = trpc.useUtils();
 
   const canInviteOrganisationMembers = canExecuteOrganisationAction(
     'MANAGE_ORGANISATION',
-    organisation.currentOrganisationRole,
+    organization.currentOrganisationRole,
   );
 
   const form = useForm<TAddTeamMembersFormSchema>({
@@ -187,7 +187,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                   </TooltipTrigger>
                   <TooltipContent className="z-[99999] max-w-xs text-muted-foreground">
                     <Trans>
-                      To be able to add members to a team, you must first add them to the organisation. For more
+                      To be able to add members to a team, you must first add them to the organization. For more
                       information, please see the{' '}
                       <Link
                         to="https://docs.documenso.com/users/organisations/members"
@@ -253,17 +253,17 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                                 <UserPlusIcon className="h-6 w-6 text-muted-foreground" />
                               </div>
                               <h3 className="mb-2 font-semibold text-sm">
-                                <Trans>No organisation members available</Trans>
+                                <Trans>No organization members available</Trans>
                               </h3>
                               <p className="mb-6 max-w-sm text-muted-foreground text-sm">
                                 {canInviteOrganisationMembers ? (
                                   <Trans>
-                                    To add members to this team, you must first add them to the organisation.
+                                    To add members to this team, you must first add them to the organization.
                                   </Trans>
                                 ) : (
                                   <Trans>
-                                    To add members to this team, they must first be invited to the organisation. Only
-                                    organisation admins and managers can invite new members — please contact one of them
+                                    To add members to this team, they must first be invited to the organization. Only
+                                    organization admins and managers can invite new members — please contact one of them
                                     to invite members on your behalf.
                                   </Trans>
                                 )}
@@ -275,7 +275,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                                   trigger={
                                     <Button type="button" variant="default">
                                       <UserPlusIcon className="mr-2 h-4 w-4" />
-                                      <Trans>Invite organisation members</Trans>
+                                      <Trans>Invite organization members</Trans>
                                     </Button>
                                   }
                                 />
@@ -325,7 +325,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                                         variant="link"
                                         className="h-auto p-0 font-medium text-documenso-700 text-sm hover:text-documenso-600"
                                       >
-                                        <Trans>Invite them to the organisation first</Trans>
+                                        <Trans>Invite them to the organization first</Trans>
                                       </Button>
                                     }
                                   />

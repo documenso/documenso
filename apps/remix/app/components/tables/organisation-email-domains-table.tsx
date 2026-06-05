@@ -27,7 +27,7 @@ export const OrganisationEmailDomainsDataTable = () => {
 
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
@@ -43,7 +43,7 @@ export const OrganisationEmailDomainsDataTable = () => {
 
   const { data, isLoading, isLoadingError } = trpc.enterprise.organisation.emailDomain.find.useQuery(
     {
-      organisationId: organisation.id,
+      organisationId: organization.id,
       query: parsedSearchParams.query,
       page: parsedSearchParams.page,
       perPage: parsedSearchParams.perPage,
@@ -179,7 +179,7 @@ export const OrganisationEmailDomainsDataTable = () => {
               loading={isVerifyingEmails}
               onClick={() => {
                 verifyEmails({
-                  organisationId: organisation.id,
+                  organisationId: organization.id,
                 });
               }}
             >

@@ -26,7 +26,7 @@ type TOrganisationUpdateFormSchema = z.infer<typeof ZOrganisationUpdateFormSchem
 
 export const OrganisationUpdateForm = () => {
   const navigate = useNavigate();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const { refreshSession } = useSession();
 
@@ -36,8 +36,8 @@ export const OrganisationUpdateForm = () => {
   const form = useForm({
     resolver: zodResolver(ZOrganisationUpdateFormSchema),
     defaultValues: {
-      name: organisation.name,
-      url: organisation.url,
+      name: organization.name,
+      url: organization.url,
     },
   });
 
@@ -50,18 +50,18 @@ export const OrganisationUpdateForm = () => {
           name,
           url,
         },
-        organisationId: organisation.id,
+        organisationId: organization.id,
       });
 
       await refreshSession();
 
-      if (url !== organisation.url) {
+      if (url !== organization.url) {
         await navigate(`/o/${url}/settings`);
       }
 
       toast({
         title: _(msg`Success`),
-        description: _(msg`Your organisation has been successfully updated.`),
+        description: _(msg`Your organization has been successfully updated.`),
         duration: 5000,
       });
 
@@ -84,7 +84,7 @@ export const OrganisationUpdateForm = () => {
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(
-          msg`We encountered an unknown error while attempting to update your organisation. Please try again later.`,
+          msg`We encountered an unknown error while attempting to update your organization. Please try again later.`,
         ),
         variant: 'destructive',
       });
@@ -101,7 +101,7 @@ export const OrganisationUpdateForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel required>
-                  <Trans>Organisation Name</Trans>
+                  <Trans>Organization Name</Trans>
                 </FormLabel>
                 <FormControl>
                   <Input className="bg-background" {...field} />
@@ -117,7 +117,7 @@ export const OrganisationUpdateForm = () => {
             render={({ field }) => (
               <FormItem className="mt-4">
                 <FormLabel required>
-                  <Trans>Organisation URL</Trans>
+                  <Trans>Organization URL</Trans>
                 </FormLabel>
                 <FormControl>
                   <Input className="bg-background" {...field} />

@@ -89,7 +89,7 @@ export const run = async ({
       await mailer.sendMail({
         to: member.user.email,
         from: senderEmail,
-        subject: i18n._(msg`Organisation Review Required`),
+        subject: i18n._(msg`Organization Review Required`),
         html,
         text,
       });

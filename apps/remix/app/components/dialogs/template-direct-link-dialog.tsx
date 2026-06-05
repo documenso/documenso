@@ -68,7 +68,7 @@ export const TemplateDirectLinkDialog = ({
   const [selectedRecipientId, setSelectedRecipientId] = useState<number | null>(null);
   const [currentStep, setCurrentStep] = useState<TemplateDirectLinkStep>(token ? 'MANAGE' : 'ONBOARD');
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const validDirectTemplateRecipients = useMemo(
     () =>

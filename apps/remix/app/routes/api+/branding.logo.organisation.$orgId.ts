@@ -14,13 +14,13 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     return Response.json(
       {
         status: 'error',
-        message: 'Invalid organisation ID',
+        message: 'Invalid organization ID',
       },
       { status: 400 },
     );
   }
 
-  const organisation = await prisma.organisation.findUnique({
+  const organization = await prisma.organisation.findUnique({
     where: {
       id: organisationId,
     },
@@ -29,7 +29,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     },
   });
 
-  const settings = organisation?.organisationGlobalSettings;
+  const settings = organization?.organisationGlobalSettings;
 
   if (!settings || !settings.brandingLogo) {
     return Response.json(

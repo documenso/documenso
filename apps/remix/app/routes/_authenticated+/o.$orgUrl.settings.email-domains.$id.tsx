@@ -33,7 +33,7 @@ import type { Route } from './+types/o.$orgUrl.settings.groups.$id';
 export default function OrganisationEmailDomainSettingsPage({ params }: Route.ComponentProps) {
   const { t } = useLingui();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const emailDomainId = params.id;
 

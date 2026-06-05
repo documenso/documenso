@@ -93,7 +93,7 @@ export const OrganisationMemberInviteDialog = ({ trigger, ...props }: Organisati
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const form = useForm<TInviteOrganisationMembersFormSchema>({
     resolver: zodResolver(ZInviteOrganisationMembersFormSchema),
@@ -119,7 +119,7 @@ export const OrganisationMemberInviteDialog = ({ trigger, ...props }: Organisati
   const { mutateAsync: createOrganisationMemberInvites } = trpc.organisation.member.invite.createMany.useMutation();
 
   const { data: fullOrganisation } = trpc.organisation.get.useQuery({
-    organisationReference: organisation.id,
+    organisationReference: organization.id,
   });
 
   const onAddOrganisationMemberInvite = () => {
@@ -132,13 +132,13 @@ export const OrganisationMemberInviteDialog = ({ trigger, ...props }: Organisati
   const onFormSubmit = async ({ invitations }: TInviteOrganisationMembersFormSchema) => {
     try {
       await createOrganisationMemberInvites({
-        organisationId: organisation.id,
+        organisationId: organization.id,
         invitations,
       });
 
       toast({
         title: _(msg`Success`),
-        description: _(msg`Organisation invitations have been sent.`),
+        description: _(msg`Organization invitations have been sent.`),
         duration: 5000,
       });
 
@@ -147,7 +147,7 @@ export const OrganisationMemberInviteDialog = ({ trigger, ...props }: Organisati
       toast({
         title: _(msg`An unknown error occurred`),
         description: _(
-          msg`We encountered an unknown error while attempting to invite organisation members. Please try again later.`,
+          msg`We encountered an unknown error while attempting to invite organization members. Please try again later.`,
         ),
         variant: 'destructive',
       });
@@ -263,7 +263,7 @@ export const OrganisationMemberInviteDialog = ({ trigger, ...props }: Organisati
       <DialogContent position="center">
         <DialogHeader>
           <DialogTitle>
-            <Trans>Invite organisation members</Trans>
+            <Trans>Invite organization members</Trans>
           </DialogTitle>
 
           <DialogDescription className="mt-4">
@@ -342,7 +342,7 @@ export const OrganisationMemberInviteDialog = ({ trigger, ...props }: Organisati
                               <FormItem className="w-full">
                                 {index === 0 && (
                                   <FormLabel required>
-                                    <Trans>Organisation Role</Trans>
+                                    <Trans>Organization Role</Trans>
                                   </FormLabel>
                                 )}
                                 <FormControl>

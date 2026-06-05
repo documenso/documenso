@@ -19,10 +19,10 @@ export const AiFeaturesEnableDialog = ({ open, onOpenChange, onEnabled }: AiFeat
   const { t } = useLingui();
 
   const team = useCurrentTeam();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const isTeamAdmin = team.currentTeamRole === TeamMemberRole.ADMIN;
-  const isOrganisationAdmin = organisation.currentOrganisationRole === OrganisationMemberRole.ADMIN;
+  const isOrganisationAdmin = organization.currentOrganisationRole === OrganisationMemberRole.ADMIN;
   const canEnableAiFeatures = isTeamAdmin || isOrganisationAdmin;
 
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +49,7 @@ export const AiFeaturesEnableDialog = ({ open, onOpenChange, onEnabled }: AiFeat
         });
       } else {
         await updateOrganisationSettings({
-          organisationId: organisation.id,
+          organisationId: organization.id,
           data: { aiFeaturesEnabled: true },
         });
       }
@@ -98,7 +98,7 @@ export const AiFeaturesEnableDialog = ({ open, onOpenChange, onEnabled }: AiFeat
           ) : (
             <p className="text-muted-foreground text-sm">
               <Trans>
-                AI features are disabled for your team. Please ask your team owner or organisation owner to enable them.
+                AI features are disabled for your team. Please ask your team owner or organization owner to enable them.
               </Trans>
             </p>
           )}

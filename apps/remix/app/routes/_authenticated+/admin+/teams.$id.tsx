@@ -75,7 +75,7 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
         cell: ({ row }) => <Badge variant="secondary">{_(TEAM_MEMBER_ROLE_MAP[row.original.teamRole])}</Badge>,
       },
       {
-        header: _(msg`Organisation role`),
+        header: _(msg`Organization role`),
         accessorKey: 'organisationRole',
         cell: ({ row }) => {
           const isOwner = row.original.userId === team.organisation.ownerUserId;
@@ -240,7 +240,7 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
           </DetailsCard>
 
           <DetailsCard
-            label={<Trans>Organisation ID</Trans>}
+            label={<Trans>Organization ID</Trans>}
             action={
               <Button
                 type="button"
@@ -248,7 +248,7 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
                 size="sm"
                 className="h-8 w-8 shrink-0 p-0"
                 onClick={() => void onCopyToClipboard(team.organisation.id)}
-                title={_(msg`Copy organisation ID`)}
+                title={_(msg`Copy organization ID`)}
               >
                 <CopyIcon className="h-4 w-4" />
               </Button>
@@ -281,7 +281,7 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
                     <Trans>Global Settings</Trans>
                   </p>
                   <p className="mt-1 font-normal text-muted-foreground text-sm">
-                    <Trans>Default settings applied to this team. Inherited values come from the organisation.</Trans>
+                    <Trans>Default settings applied to this team. Inherited values come from the organization.</Trans>
                   </p>
                 </div>
               </AccordionTrigger>
@@ -310,10 +310,10 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
 
       <div className="mt-8">
         <p className="font-medium text-sm">
-          <Trans>Pending Organisation Invites</Trans>
+          <Trans>Pending Organization Invites</Trans>
         </p>
         <p className="mt-1 text-muted-foreground text-sm">
-          <Trans>Organisation-level pending invites for this team's parent organisation.</Trans>
+          <Trans>Organization-level pending invites for this team's parent organization.</Trans>
         </p>
 
         <div className="mt-4">

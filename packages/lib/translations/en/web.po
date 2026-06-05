@@ -744,8 +744,8 @@ msgid "<0>Note</0> - If you use Links in combination with direct templates, you 
 msgstr "<0>Note</0> - If you use Links in combination with direct templates, you will need to manually send the links to the remaining recipients."
 
 #: packages/ui/components/template/template-type-select.tsx
-msgid "<0>Organisation</0> templates are shared across all teams in your organisation but can only be edited by the owning team."
-msgstr "<0>Organisation</0> templates are shared across all teams in your organisation but can only be edited by the owning team."
+msgid "<0>Organization</0> templates are shared across all teams in your organisation but can only be edited by the owning team."
+msgstr "<0>Organization</0> templates are shared across all teams in your organisation but can only be edited by the owning team."
 
 #: packages/ui/components/template/template-type-select.tsx
 msgid "<0>Private</0> templates can only be used by your team."
@@ -849,13 +849,13 @@ msgid "404 Not Found"
 msgstr "404 Not Found"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
-msgid "404 Organisation group not found"
-msgstr "404 Organisation group not found"
+msgid "404 Organization group not found"
+msgstr "404 Organization group not found"
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "404 Organisation not found"
-msgstr "404 Organisation not found"
+msgid "404 Organization not found"
+msgstr "404 Organization not found"
 
 #: apps/remix/app/routes/_profile+/_layout.tsx
 msgid "404 Profile not found"
@@ -1329,8 +1329,8 @@ msgid "Add Myself"
 msgstr "Add Myself"
 
 #: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
-msgid "Add Organisation Email"
-msgstr "Add Organisation Email"
+msgid "Add Organization Email"
+msgstr "Add Organization Email"
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
@@ -1563,8 +1563,8 @@ msgid "Allow document recipients to reply directly to this email address"
 msgstr "Allow document recipients to reply directly to this email address"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
-msgid "Allow Personal Organisations"
-msgstr "Allow Personal Organisations"
+msgid "Allow Personal Organizations"
+msgstr "Allow Personal Organizations"
 
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
@@ -3278,8 +3278,8 @@ msgstr "Create organisation"
 #: apps/remix/app/components/general/menu-switcher.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
-msgid "Create Organisation"
-msgstr "Create Organisation"
+msgid "Create Organization"
+msgstr "Create Organization"
 
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Create separate organisation"
@@ -3458,8 +3458,8 @@ msgid "Custom interval"
 msgstr "Custom interval"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
-msgid "Custom Organisation Groups"
-msgstr "Custom Organisation Groups"
+msgid "Custom Organization Groups"
+msgstr "Custom Organization Groups"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Customise the colours used on your signing pages."
@@ -3551,8 +3551,8 @@ msgid "Default file"
 msgstr "Default file"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
-msgid "Default Organisation Role for New Users"
-msgstr "Default Organisation Role for New Users"
+msgid "Default Organization Role for New Users"
+msgstr "Default Organization Role for New Users"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Recipients"
@@ -6668,8 +6668,8 @@ msgid "Manage organisation"
 msgstr "Manage organisation"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
-msgid "Manage Organisation"
-msgstr "Manage Organisation"
+msgid "Manage Organization"
+msgstr "Manage Organization"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations._index.tsx
 msgid "Manage organisations"
@@ -6969,8 +6969,8 @@ msgid "Move Templates to Folder"
 msgstr "Move Templates to Folder"
 
 #: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
-msgid "Move the subscription from \"{sourceOrganisationName}\" to another organisation owned by this user."
-msgstr "Move the subscription from \"{sourceOrganisationName}\" to another organisation owned by this user."
+msgid "Move the subscription from \"{sourceOrganizationName}\" to another organisation owned by this user."
+msgstr "Move the subscription from \"{sourceOrganizationName}\" to another organisation owned by this user."
 
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
@@ -7486,142 +7486,142 @@ msgstr "Or continue with"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 #: packages/ui/components/template/template-type-select.tsx
-msgid "Organisation"
-msgstr "Organisation"
+msgid "Organization"
+msgstr "Organization"
 
 #: packages/lib/server-only/organisation/delete-organisation-email.ts
-msgid "Organisation \"{organisationName}\" has been deleted"
-msgstr "Organisation \"{organisationName}\" has been deleted"
+msgid "Organization \"{organisationName}\" has been deleted"
+msgstr "Organization \"{organisationName}\" has been deleted"
 
 #: packages/lib/constants/organisations-translations.ts
-msgid "Organisation Admin"
-msgstr "Organisation Admin"
+msgid "Organization Admin"
+msgstr "Organization Admin"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
-msgid "Organisation authentication portal URL"
-msgstr "Organisation authentication portal URL"
+msgid "Organization authentication portal URL"
+msgstr "Organization authentication portal URL"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
-msgid "Organisation created"
-msgstr "Organisation created"
+msgid "Organization created"
+msgstr "Organization created"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
-msgid "Organisation group not found"
-msgstr "Organisation group not found"
+msgid "Organization group not found"
+msgstr "Organization group not found"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
-msgid "Organisation Group Settings"
-msgstr "Organisation Group Settings"
+msgid "Organization Group Settings"
+msgstr "Organization Group Settings"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "Organisation has been updated successfully"
-msgstr "Organisation has been updated successfully"
+msgid "Organization has been updated successfully"
+msgstr "Organization has been updated successfully"
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
-msgid "Organisation ID"
-msgstr "Organisation ID"
+msgid "Organization ID"
+msgstr "Organization ID"
 
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-insights._index.tsx
-msgid "Organisation Insights"
-msgstr "Organisation Insights"
+msgid "Organization Insights"
+msgstr "Organization Insights"
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
-msgid "Organisation invitation"
-msgstr "Organisation invitation"
+msgid "Organization invitation"
+msgstr "Organization invitation"
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
-msgid "Organisation invitations have been sent."
-msgstr "Organisation invitations have been sent."
+msgid "Organization invitations have been sent."
+msgstr "Organization invitations have been sent."
 
 #: packages/lib/constants/organisations-translations.ts
-msgid "Organisation Manager"
-msgstr "Organisation Manager"
+msgid "Organization Manager"
+msgstr "Organization Manager"
 
 #: apps/remix/app/components/tables/organisation-member-invites-table.tsx
 #: apps/remix/app/components/tables/organisation-members-table.tsx
 #: packages/lib/constants/organisations-translations.ts
-msgid "Organisation Member"
-msgstr "Organisation Member"
+msgid "Organization Member"
+msgstr "Organization Member"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.members.tsx
-msgid "Organisation Members"
-msgstr "Organisation Members"
+msgid "Organization Members"
+msgstr "Organization Members"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/forms/organisation-update-form.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "Organisation Name"
-msgstr "Organisation Name"
+msgid "Organization Name"
+msgstr "Organization Name"
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "Organisation not found"
-msgstr "Organisation not found"
+msgid "Organization not found"
+msgstr "Organization not found"
 
 #: packages/email/templates/organisation-limit-exceeded.tsx
 #: packages/email/templates/organisation-limit-exceeded.tsx
 #: packages/lib/jobs/definitions/emails/send-organisation-limit-exceeded-email.handler.ts
-msgid "Organisation Review Required"
-msgstr "Organisation Review Required"
+msgid "Organization Review Required"
+msgstr "Organization Review Required"
 
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
-msgid "Organisation role"
-msgstr "Organisation role"
+msgid "Organization role"
+msgstr "Organization role"
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
-msgid "Organisation Role"
-msgstr "Organisation Role"
+msgid "Organization Role"
+msgstr "Organization Role"
 
 #: apps/remix/app/components/general/org-menu-switcher.tsx
-msgid "Organisation settings"
-msgstr "Organisation settings"
+msgid "Organization settings"
+msgstr "Organization settings"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
-msgid "Organisation Settings"
-msgstr "Organisation Settings"
+msgid "Organization Settings"
+msgstr "Organization Settings"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
-msgid "Organisation SSO Portal"
-msgstr "Organisation SSO Portal"
+msgid "Organization SSO Portal"
+msgstr "Organization SSO Portal"
 
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
-msgid "Organisation Stats"
-msgstr "Organisation Stats"
+msgid "Organization Stats"
+msgstr "Organization Stats"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "Organisation Teams"
-msgstr "Organisation Teams"
+msgid "Organization Teams"
+msgstr "Organization Teams"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
-msgid "Organisation Template"
-msgstr "Organisation Template"
+msgid "Organization Template"
+msgstr "Organization Template"
 
 #: apps/remix/app/components/tables/templates-table.tsx
-msgid "Organisation templates are shared across all teams within the same organisation. Only the owning team can edit them."
-msgstr "Organisation templates are shared across all teams within the same organisation. Only the owning team can edit them."
+msgid "Organization templates are shared across all teams within the same organisation. Only the owning team can edit them."
+msgstr "Organization templates are shared across all teams within the same organisation. Only the owning team can edit them."
 
 #: apps/remix/app/components/forms/organisation-update-form.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "Organisation URL"
-msgstr "Organisation URL"
+msgid "Organization URL"
+msgstr "Organization URL"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "Organisation usage"
-msgstr "Organisation usage"
+msgid "Organization usage"
+msgstr "Organization usage"
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
-msgid "Organisation-level pending invites for this team's parent organisation."
-msgstr "Organisation-level pending invites for this team's parent organisation."
+msgid "Organization-level pending invites for this team's parent organisation."
+msgstr "Organization-level pending invites for this team's parent organisation."
 
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
@@ -7629,24 +7629,24 @@ msgstr "Organisation-level pending invites for this team's parent organisation."
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/organisations.tsx
-msgid "Organisations"
-msgstr "Organisations"
+msgid "Organizations"
+msgstr "Organizations"
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
-msgid "Organisations that the user is a member of."
-msgstr "Organisations that the user is a member of."
+msgid "Organizations that the user is a member of."
+msgstr "Organizations that the user is a member of."
 
 #: apps/remix/app/components/general/folder/folder-card.tsx
-msgid "Organise your documents"
-msgstr "Organise your documents"
+msgid "Organize your documents"
+msgstr "Organize your documents"
 
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
-msgid "Organise your members into groups which can be assigned to teams"
-msgstr "Organise your members into groups which can be assigned to teams"
+msgid "Organize your members into groups which can be assigned to teams"
+msgstr "Organize your members into groups which can be assigned to teams"
 
 #: apps/remix/app/components/general/folder/folder-card.tsx
-msgid "Organise your templates"
-msgstr "Organise your templates"
+msgid "Organize your templates"
+msgstr "Organize your templates"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Organize your documents and templates"
@@ -7852,8 +7852,8 @@ msgid "Pending invitations"
 msgstr "Pending invitations"
 
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
-msgid "Pending Organisation Invites"
-msgstr "Pending Organisation Invites"
+msgid "Pending Organization Invites"
+msgstr "Pending Organization Invites"
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Pending since"
@@ -8705,8 +8705,8 @@ msgid "Remove organisation member"
 msgstr "Remove organisation member"
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-delete-dialog.tsx
-msgid "Remove Organisation Member"
-msgstr "Remove Organisation Member"
+msgid "Remove Organization Member"
+msgstr "Remove Organization Member"
 
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "Remove recipient"
@@ -8782,8 +8782,8 @@ msgid "Request"
 msgstr "Request"
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
-msgid "Requesting Organisation"
-msgstr "Requesting Organisation"
+msgid "Requesting Organization"
+msgstr "Requesting Organization"
 
 #: packages/lib/constants/document-auth.ts
 msgid "Require 2FA"
@@ -10247,8 +10247,8 @@ msgid "System Theme"
 msgstr "System Theme"
 
 #: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
-msgid "Target Organisation"
-msgstr "Target Organisation"
+msgid "Target Organization"
+msgstr "Target Organization"
 
 #: apps/remix/app/components/tables/admin-user-teams-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
@@ -11348,8 +11348,8 @@ msgstr "This will delete the existing SES identity for <0>{0}</0> and recreate i
 
 #. placeholder {0}: selectedOrg.name
 #: apps/remix/app/components/dialogs/admin-swap-subscription-dialog.tsx
-msgid "This will move the subscription from \"{sourceOrganisationName}\" to \"{0}\". The source organisation will be reset to the free plan."
-msgstr "This will move the subscription from \"{sourceOrganisationName}\" to \"{0}\". The source organisation will be reset to the free plan."
+msgid "This will move the subscription from \"{sourceOrganizationName}\" to \"{0}\". The source organisation will be reset to the free plan."
+msgstr "This will move the subscription from \"{sourceOrganizationName}\" to \"{0}\". The source organisation will be reset to the free plan."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "This will ONLY backport feature flags which are set to true, anything disabled in the initial claim will not be backported"
@@ -12195,8 +12195,8 @@ msgid "User not found."
 msgstr "User not found."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
-msgid "User Organisations"
-msgstr "User Organisations"
+msgid "User Organizations"
+msgstr "User Organizations"
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "User profiles are here!"

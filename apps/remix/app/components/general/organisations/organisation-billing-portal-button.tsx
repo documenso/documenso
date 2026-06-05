@@ -15,19 +15,19 @@ export type OrganisationBillingPortalButtonProps = {
 export const OrganisationBillingPortalButton = ({ buttonProps }: OrganisationBillingPortalButtonProps) => {
   const { organisations } = useSession();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const { _ } = useLingui();
   const { toast } = useToast();
 
   const { mutateAsync: manageSubscription, isPending } = trpc.enterprise.billing.subscription.manage.useMutation();
 
-  const canManageBilling = canExecuteOrganisationAction('MANAGE_BILLING', organisation.currentOrganisationRole);
+  const canManageBilling = canExecuteOrganisationAction('MANAGE_BILLING', organization.currentOrganisationRole);
 
   const handleCreatePortal = async () => {
     try {
       const { redirectUrl } = await manageSubscription({
-        organisationId: organisation.id,
+        organisationId: organization.id,
         isPersonalLayoutMode: isPersonalLayout(organisations),
       });
 

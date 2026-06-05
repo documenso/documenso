@@ -49,7 +49,7 @@ const ZSearchParamsSchema = ZFindDocumentsInternalRequestSchema.pick({
 });
 
 export default function DocumentsPage() {
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
   const team = useCurrentTeam();
 
   const { folderId } = useParams();
@@ -99,7 +99,7 @@ export default function DocumentsPage() {
       params.delete('status');
     }
 
-    if (value === ExtendedDocumentStatus.INBOX && organisation.type === OrganisationType.PERSONAL) {
+    if (value === ExtendedDocumentStatus.INBOX && organization.type === OrganisationType.PERSONAL) {
       params.delete('status');
     }
 

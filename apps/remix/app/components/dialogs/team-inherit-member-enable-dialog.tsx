@@ -18,7 +18,7 @@ import { OrganisationGroupType, OrganisationMemberRole, TeamMemberRole } from '@
 import { useCurrentTeam } from '~/providers/team';
 
 export const TeamMemberInheritEnableDialog = () => {
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
   const team = useCurrentTeam();
 
   const { toast } = useToast();
@@ -42,7 +42,7 @@ export const TeamMemberInheritEnableDialog = () => {
   });
 
   const organisationGroupQuery = trpc.organisation.group.find.useQuery({
-    organisationId: organisation.id,
+    organisationId: organization.id,
     perPage: 1,
     types: [OrganisationGroupType.INTERNAL_ORGANISATION],
     organisationRoles: [OrganisationMemberRole.MEMBER],
@@ -80,7 +80,7 @@ export const TeamMemberInheritEnableDialog = () => {
 
           <DialogDescription className="mt-4">
             <Trans>
-              You are about to give all organisation members access to this team under their organisation role.
+              You are about to give all organization members access to this team under their organization role.
             </Trans>
           </DialogDescription>
         </DialogHeader>

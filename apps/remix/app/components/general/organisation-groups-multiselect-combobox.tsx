@@ -6,7 +6,7 @@ import { Trans } from '@lingui/react/macro';
 import { OrganisationGroupType } from '@prisma/client';
 
 export type OrganisationGroupOption = {
-  /** Organisation group ID. */
+  /** Organization group ID. */
   id: string;
   name: string;
 };
@@ -20,13 +20,13 @@ type OrganisationGroupsMultiSelectComboboxProps = {
   selectedGroups: OrganisationGroupOption[];
   onChange: (groups: OrganisationGroupOption[]) => void;
   /**
-   * If set, organisation groups already attached to this team are filtered
+   * If set, organization groups already attached to this team are filtered
    * out of the search results server-side. Used by "add groups to team" flows.
    */
   excludeTeamId?: number;
   /**
    * Restrict search to specific group types. Defaults to CUSTOM groups only,
-   * matching how groups are managed in the organisation settings UI.
+   * matching how groups are managed in the organization settings UI.
    */
   types?: OrganisationGroupType[];
   /** Number of groups to fetch per search call. Defaults to the schema cap (100). */
@@ -47,11 +47,11 @@ const fromOption = (option: Option): OrganisationGroupOption => ({
 });
 
 /**
- * Searchable multi-select combobox for picking organisation groups,
+ * Searchable multi-select combobox for picking organization groups,
  * backed by `trpc.organisation.group.find` with server-side search.
  *
  * Renders selected groups as chips and supports an unbounded number of
- * organisation groups (paged out via debounced server queries).
+ * organization groups (paged out via debounced server queries).
  */
 export const OrganisationGroupsMultiSelectCombobox = ({
   organisationId,

@@ -24,7 +24,7 @@ type BaseGetEmailContextOptions = {
   /**
    * The source to extract the email context from.
    * - "Team" will use the team settings followed by the inherited organisation settings
-   * - "Organisation" will use the organisation settings
+   * - "Organization" will use the organisation settings
    */
   source:
     | {

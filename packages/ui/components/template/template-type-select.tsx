@@ -22,7 +22,7 @@ export const TemplateTypeSelect = forwardRef<HTMLButtonElement, TemplateTypeSele
       <SelectContent>
         <SelectItem value={TemplateType.PRIVATE}>{t`Private`}</SelectItem>
         <SelectItem value={TemplateType.PUBLIC}>{t`Public`}</SelectItem>
-        <SelectItem value={TemplateType.ORGANISATION}>{t`Organisation`}</SelectItem>
+        <SelectItem value={TemplateType.ORGANISATION}>{t` param($m); if ($m.Value -ceq 'Organisation') { 'Organization' } elseif ($m.Value -ceq 'organisation') { 'organization' } else { 'organize' } `}</SelectItem>
       </SelectContent>
     </Select>
   );

@@ -136,10 +136,10 @@ const BillingDialog = ({ priceId, planName, claim }: { priceId: string; planName
   const { t } = useLingui();
   const { toast } = useToast();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const [subscriptionOption, setSubscriptionOption] = useState<'update' | 'create'>(
-    organisation.type === 'PERSONAL' && claim === INTERNAL_CLAIM_ID.INDIVIDUAL ? 'update' : 'create',
+    organization.type === 'PERSONAL' && claim === INTERNAL_CLAIM_ID.INDIVIDUAL ? 'update' : 'create',
   );
 
   const [step, setStep] = useState(0);
@@ -164,7 +164,7 @@ const BillingDialog = ({ priceId, planName, claim }: { priceId: string; planName
 
       if (subscriptionOption === 'update') {
         const createSubscriptionResponse = await createSubscription({
-          organisationId: organisation.id,
+          organisationId: organization.id,
           priceId,
         });
 
@@ -243,7 +243,7 @@ const BillingDialog = ({ priceId, planName, claim }: { priceId: string; planName
                   </Label>
                   <p className="text-muted-foreground text-sm">
                     <Trans>
-                      Create a new organisation with {planName} plan. Keep your current organisation on it's current
+                      Create a new organization with {planName} plan. Keep your current organization on it's current
                       plan
                     </Trans>
                   </p>
@@ -259,7 +259,7 @@ const BillingDialog = ({ priceId, planName, claim }: { priceId: string; planName
               render={({ field }) => (
                 <FormItem>
                   <FormLabel required>
-                    <Trans>Organisation Name</Trans>
+                    <Trans>Organization Name</Trans>
                   </FormLabel>
                   <FormControl>
                     <Input {...field} />
@@ -296,7 +296,7 @@ const BillingDialog = ({ priceId, planName, claim }: { priceId: string; planName
 /**
  * Custom checkout button for individual organisations in personal layout mode.
  *
- * This is so they don't create an additional organisation which is not needed since
+ * This is so they don't create an additional organization which is not needed since
  * it will clutter up the UI for them with unnecessary organisations.
  */
 export const IndividualPersonalLayoutCheckoutButton = ({

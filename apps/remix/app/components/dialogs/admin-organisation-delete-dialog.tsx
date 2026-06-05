@@ -68,7 +68,7 @@ export const AdminOrganisationDeleteDialog = ({
 
       toast({
         title: t`Deletion scheduled`,
-        description: t`The organisation will be deleted in the background. Documents will be orphaned, not deleted.`,
+        description: t`The organization will be deleted in the background. Documents will be orphaned, not deleted.`,
         duration: 7500,
       });
 
@@ -79,7 +79,7 @@ export const AdminOrganisationDeleteDialog = ({
 
       toast({
         title: t`An error occurred`,
-        description: t`We encountered an error while attempting to delete this organisation. Please try again later.`,
+        description: t`We encountered an error while attempting to delete this organization. Please try again later.`,
         variant: 'destructive',
         duration: 10000,
       });
@@ -131,7 +131,7 @@ export const AdminOrganisationDeleteDialog = ({
             <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
               <FormField
                 control={form.control}
-                name="organisationName"
+                name="organizationName"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
@@ -164,7 +164,7 @@ export const AdminOrganisationDeleteDialog = ({
                       htmlFor="admin-delete-organisation-send-email"
                       className="font-normal text-muted-foreground text-sm leading-snug"
                     >
-                      <Trans>Email the organisation owner to notify them of the deletion.</Trans>
+                      <Trans>Email the organization owner to notify them of the deletion.</Trans>
                     </label>
                   </FormItem>
                 )}

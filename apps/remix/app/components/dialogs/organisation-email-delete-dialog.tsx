@@ -27,13 +27,13 @@ export const OrganisationEmailDeleteDialog = ({ trigger, emailId, email }: Organ
   const { t } = useLingui();
   const { toast } = useToast();
 
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const { mutateAsync: deleteEmail, isPending: isDeleting } = trpc.enterprise.organisation.email.delete.useMutation({
     onSuccess: () => {
       toast({
         title: t`Success`,
-        description: t`You have successfully removed this email from the organisation.`,
+        description: t`You have successfully removed this email from the organization.`,
         duration: 5000,
       });
 

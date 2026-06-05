@@ -20,7 +20,7 @@ export async function loader({ params }: Route.LoaderArgs) {
       token,
     },
     include: {
-      organisation: {
+      organization: {
         select: {
           name: true,
         },
@@ -84,7 +84,7 @@ export default function DeclineInvitationPage({ loaderData }: Route.ComponentPro
 
       <p className="mt-2 mb-4 text-muted-foreground text-sm">
         <Trans>
-          You have declined the invitation from <strong>{data.organisationName}</strong> to join their organisation.
+          You have declined the invitation from <strong>{data.organisationName}</strong> to join their organization.
         </Trans>
       </p>
 

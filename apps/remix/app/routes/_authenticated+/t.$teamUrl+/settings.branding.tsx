@@ -19,7 +19,7 @@ import { useCurrentTeam } from '~/providers/team';
 
 export default function TeamsSettingsPage() {
   const team = useCurrentTeam();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const { t } = useLingui();
   const { toast } = useToast();
@@ -37,7 +37,7 @@ export default function TeamsSettingsPage() {
   const { mutateAsync: updateTeamSettings } = trpc.team.settings.update.useMutation();
 
   const canCustomBranding =
-    organisation.organisationClaim.flags.embedSigningWhiteLabel === true || !IS_BILLING_ENABLED();
+    organization.organisationClaim.flags.embedSigningWhiteLabel === true || !IS_BILLING_ENABLED();
 
   const onBrandingPreferencesFormSubmit = async (data: TBrandingPreferencesFormSchema) => {
     try {

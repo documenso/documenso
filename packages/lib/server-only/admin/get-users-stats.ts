@@ -36,7 +36,7 @@ export const getUserWithSignedDocumentMonthlyGrowth = async () => {
         COUNT(DISTINCT CASE WHEN "Envelope"."status" = 'COMPLETED' THEN "Envelope"."userId" END) as "signed_count"
       FROM "Envelope"
       INNER JOIN "Team" ON "Envelope"."teamId" = "Team"."id"
-      INNER JOIN "Organisation" ON "Team"."organisationId" = "Organisation"."id"
+      INNER JOIN "Organization" ON "Team"."organizationId" = "Organization"."id"
       WHERE "Envelope"."type" = 'DOCUMENT'::"EnvelopeType"
       GROUP BY "month"
       ORDER BY "month" DESC

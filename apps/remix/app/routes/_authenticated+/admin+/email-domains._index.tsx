@@ -66,7 +66,7 @@ export default function AdminEmailDomainsPage() {
         ),
       },
       {
-        header: _(msg`Organisation`),
+        header: _(msg`Organization`),
         accessorKey: 'organisation',
         cell: ({ row }) => (
           <Link to={`/admin/organisations/${row.original.organisation.id}`} className="hover:underline">
@@ -146,7 +146,7 @@ export default function AdminEmailDomainsPage() {
           <Input
             className="flex-1"
             type="search"
-            placeholder={_(msg`Search by domain or organisation name`)}
+            placeholder={_(msg`Search by domain or organization name`)}
             value={term}
             onChange={(e) => setTerm(e.target.value)}
           />

@@ -545,7 +545,7 @@ export const DocumentPreferencesForm = ({
                           <Trans>Inherit from organisation</Trans>
                         </SelectItem>
                         <SelectItem value={'0'}>
-                          <Trans>Override organisation settings</Trans>
+                          <Trans>Override organization settings</Trans>
                         </SelectItem>
                       </SelectContent>
                     </Select>

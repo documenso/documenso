@@ -63,7 +63,7 @@ export function BrandingPreferencesForm({
   const nonce = useCspNonce();
 
   const team = useOptionalCurrentTeam();
-  const organisation = useCurrentOrganisation();
+  const organization = useCurrentOrganisation();
 
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [hasLoadedPreview, setHasLoadedPreview] = useState(false);
@@ -250,7 +250,7 @@ export function BrandingPreferencesForm({
                       {canInherit && (
                         <span>
                           {'. '}
-                          <Trans>Leave blank to inherit from the organisation.</Trans>
+                          <Trans>Leave blank to inherit from the organization.</Trans>
                         </span>
                       )}
                     </FormDescription>
@@ -278,7 +278,7 @@ export function BrandingPreferencesForm({
                     {canInherit && (
                       <span>
                         {'. '}
-                        <Trans>Leave blank to inherit from the organisation.</Trans>
+                        <Trans>Leave blank to inherit from the organization.</Trans>
                       </span>
                     )}
                   </FormDescription>
@@ -310,7 +310,7 @@ export function BrandingPreferencesForm({
                     {canInherit && (
                       <span>
                         {'. '}
-                        <Trans>Leave blank to inherit from the organisation.</Trans>
+                        <Trans>Leave blank to inherit from the organization.</Trans>
                       </span>
                     )}
                   </FormDescription>
