@@ -38,10 +38,10 @@ export const ZTeamUrlSchema = z
 export const ZTeamNameSchema = z
   .string()
   .trim()
-  .min(3, { message: 'Team name must be at least 3 characters long.' })
-  .max(30, { message: 'Team name must not exceed 30 characters.' })
+  .min(3, { message: msg`Team name must be at least 3 characters long.`.id })
+  .max(30, { message: msg`Team name must not exceed 30 characters.`.id })
   .refine((value) => !URL_PATTERN.test(value), {
-    message: 'Team name cannot contain URLs.',
+    message: msg`Team name cannot contain URLs.`.id,
   });
 
 export const ZCreateTeamEmailVerificationMutationSchema = z.object({
