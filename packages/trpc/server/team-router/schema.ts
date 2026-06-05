@@ -1,6 +1,7 @@
 import { URL_PATTERN, ZNameSchema } from '@documenso/lib/constants/auth';
 import { PROTECTED_TEAM_URLS } from '@documenso/lib/constants/teams';
 import { zEmail } from '@documenso/lib/utils/zod';
+import { msg } from '@lingui/core/macro';
 import { TeamMemberRole } from '@prisma/client';
 import { z } from 'zod';
 
@@ -22,8 +23,8 @@ import { z } from 'zod';
 export const ZTeamUrlSchema = z
   .string()
   .trim()
-  .min(3, { message: 'Team URL must be at least 3 characters long.' })
-  .max(30, { message: 'Team URL must not exceed 30 characters.' })
+  .min(3, { message: msg`Team URL must be at least 3 characters long.`.id })
+  .max(30, { message: msg`Team URL must not exceed 30 characters.`.id })
   .toLowerCase()
   .regex(/^[a-z0-9].*[^_-]$/, 'Team URL cannot start or end with dashes or underscores.')
   .regex(/^(?!.*[-_]{2})/, 'Team URL cannot contain consecutive dashes or underscores.')
