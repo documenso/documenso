@@ -1,4 +1,3 @@
-import { mailer } from '@documenso/email/mailer';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
@@ -48,7 +47,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCancelledEmai
     },
   });
 
-  const { branding, emailLanguage, senderEmail, replyToEmail, organisationId, claims, emailsDisabled } =
+  const { branding, emailLanguage, senderEmail, replyToEmail, organisationId, claims, emailsDisabled, emailTransport } =
     await getEmailContext({
       emailType: 'RECIPIENT',
       source: {
@@ -143,7 +142,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCancelledEmai
           }),
         ]);
 
-        await mailer.sendMail({
+        await emailTransport.sendMail({
           to: {
             name: recipient.name,
             address: recipient.email,

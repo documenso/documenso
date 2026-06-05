@@ -64,7 +64,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmail
     return;
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail, emailsDisabled } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, replyToEmail, emailsDisabled, emailTransport } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
       type: 'team',
@@ -97,7 +97,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmail
         }),
       ]);
 
-      await mailer.sendMail({
+      await emailTransport.sendMail({
         to: {
           name: recipient.name,
           address: recipient.email,

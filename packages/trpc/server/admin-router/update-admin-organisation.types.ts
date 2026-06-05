@@ -21,6 +21,7 @@ export const ZUpdateAdminOrganisationRequestSchema = z.object({
       emailQuota: true,
       apiRateLimits: true,
       apiQuota: true,
+      emailTransportId: true,
     }).optional(),
     customerId: z.string().optional(),
     originalSubscriptionClaimId: z.string().optional(),

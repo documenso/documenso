@@ -24,6 +24,7 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -572,6 +573,10 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
 
   const { mutateAsync: updateOrganisation } = trpc.admin.organisation.update.useMutation();
 
+  const { data: transportsData } = trpc.admin.emailTransport.find.useQuery({ perPage: 100 });
+  const transports = transportsData?.data ?? [];
+  const NONE_VALUE = '__none__';
+
   const hasRestrictedEnterpriseFeatures = Object.values(SUBSCRIPTION_CLAIM_FEATURE_FLAGS).some(
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     (flag) => flag.isEnterprise && !licenseFlags?.[flag.key as keyof TLicenseClaim],
@@ -602,6 +607,7 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
           TUpdateOrganisationBillingFormSchema['claims']
         >['apiRateLimits'],
         apiQuota: organisation.organisationClaim.apiQuota,
+        emailTransportId: organisation.organisationClaim.emailTransportId ?? null,
       },
       originalSubscriptionClaimId: organisation.organisationClaim.originalSubscriptionClaimId || '',
     },
@@ -864,6 +870,40 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
         </div>
 
         <ClaimLimitFields control={form.control} prefix="claims." />
+
+        <FormField
+          control={form.control}
+          name="claims.emailTransportId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                <Trans>Email transport</Trans>
+              </FormLabel>
+              <Select
+                value={field.value ?? NONE_VALUE}
+                onValueChange={(value) => field.onChange(value === NONE_VALUE ? null : value)}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t`Default (system mailer)`} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value={NONE_VALUE}>{t`Default (system mailer)`}</SelectItem>
+                  {transports.map((transport) => (
+                    <SelectItem key={transport.id} value={transport.id}>
+                      {transport.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                <Trans>Organisations without a transport use the system default mailer.</Trans>
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <div className="flex justify-end">
           <Button type="submit" loading={form.formState.isSubmitting}>
