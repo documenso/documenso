@@ -3,6 +3,7 @@ import type { TFieldImageUpload } from '@documenso/lib/types/field';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
 import { FieldType } from '@prisma/client';
 
+import { SignFieldImageRemoveConfirmationDialog } from '~/components/dialogs/sign-field-image-remove-confirmation-dialog';
 import { SignFieldImageUploadDialog } from '~/components/dialogs/sign-field-image-upload-dialog';
 
 type HandleImageUploadFieldClickOptions = {
@@ -26,10 +27,16 @@ export const handleImageUploadFieldClick = async (
   }
 
   if (field.inserted) {
-    return {
-      type: FieldType.IMAGE_UPLOAD,
-      value: null,
-    };
+    const shouldRemove = await SignFieldImageRemoveConfirmationDialog.call({});
+
+    if (shouldRemove) {
+      return {
+        type: FieldType.IMAGE_UPLOAD,
+        value: null,
+      };
+    }
+
+    return null;
   }
 
   const image = await SignFieldImageUploadDialog.call({

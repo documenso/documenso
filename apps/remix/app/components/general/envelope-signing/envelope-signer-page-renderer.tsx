@@ -29,7 +29,7 @@ import { useEmbedSigningContext } from '~/components/embed/embed-signing-context
 import { handleCheckboxFieldClick } from '~/utils/field-signing/checkbox-field';
 import { handleDropdownFieldClick } from '~/utils/field-signing/dropdown-field';
 import { handleEmailFieldClick } from '~/utils/field-signing/email-field';
-import { handleImageUploadFieldClick } from '~/utils/field-signing/free-signature-field';
+import { handleImageUploadFieldClick } from '~/utils/field-signing/image-upload-field';
 import { handleInitialsFieldClick } from '~/utils/field-signing/initial-field';
 import { handleNameFieldClick } from '~/utils/field-signing/name-field';
 import { handleNumberFieldClick } from '~/utils/field-signing/number-field';
@@ -372,6 +372,11 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
                 fieldGroup.add(loadingSpinnerGroup);
 
                 if (payload.value) {
+                  if (typeof payload.value !== 'string') {
+                    loadingSpinnerGroup.destroy();
+                    return;
+                  }
+
                   void executeActionAuthProcedure({
                     onReauthFormSubmit: async (authOptions) => {
                       await signField(field.id, payload, authOptions);
@@ -397,7 +402,7 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
         .with({ type: 'IMAGE_UPLOAD' }, (field) => {
           handleImageUploadFieldClick({
             field,
-            initialSignature: unparsedField.signature?.signatureImageAsBase64 || null,
+            initialImage: unparsedField.signature?.signatureImageAsBase64 ?? undefined,
           })
             .then(async (payload) => {
               if (payload) {

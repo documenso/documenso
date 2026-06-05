@@ -38,7 +38,18 @@ export type DocumentSigningFieldContainerProps = {
    */
   onSign?: (documentAuthValue?: TRecipientActionAuth) => Promise<void> | void;
   onRemove?: (fieldType?: string) => Promise<void> | void;
-  type?: 'Date' | 'Initials' | 'Email' | 'Name' | 'Signature' | 'Text' | 'Radio' | 'Dropdown' | 'Number' | 'Checkbox';
+  type?:
+    | 'Date'
+    | 'Initials'
+    | 'Email'
+    | 'Name'
+    | 'Signature'
+    | 'Image Upload'
+    | 'Text'
+    | 'Radio'
+    | 'Dropdown'
+    | 'Number'
+    | 'Checkbox';
   tooltipText?: string | null;
 };
 

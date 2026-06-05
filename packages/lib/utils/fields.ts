@@ -125,11 +125,11 @@ export const getClientSideFieldTranslations = ({ t }: I18n): Record<FieldType, s
     [FieldType.DROPDOWN]: t(msg`Select Option`),
     [FieldType.SIGNATURE]: t(msg`Signature`),
     [FieldType.FREE_SIGNATURE]: t(msg`Free Signature`),
+    [FieldType.IMAGE_UPLOAD]: t(msg`Image Upload`),
     [FieldType.INITIALS]: t(msg`Initials`),
     [FieldType.NAME]: t(msg`Name`),
     [FieldType.NUMBER]: t(msg`Number`),
     [FieldType.DATE]: t(msg`Date`),
     [FieldType.EMAIL]: t(msg`Email`),
-    [FieldType.IMAGE_UPLOAD]: t(msg`Image Upload`),
   };
 };
