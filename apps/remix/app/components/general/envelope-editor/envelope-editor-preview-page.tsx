@@ -189,6 +189,15 @@ export const EnvelopeEditorPreviewPage = () => {
               },
             };
           })
+          .with({ type: FieldType.IMAGE_UPLOAD }, () => {
+            return {
+              customText: '',
+              signature: {
+                signatureImageAsBase64: '',
+                typedSignature: '',
+              },
+            };
+          })
           .with({ type: FieldType.FREE_SIGNATURE }, () => {
             return {
               customText: '',

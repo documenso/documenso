@@ -40,12 +40,7 @@ const createFieldImageUpload = (field: FieldToRender, options: RenderFieldElemen
     ((mode === 'sign' || mode === 'export') && signature?.signatureImageAsBase64)
   ) {
     return {
-      node: createSignatureImage(
-        signature.signatureImageAsBase64,
-        fieldWidth,
-        fieldHeight,
-        (field.fieldMeta as any)?.textAlign || 'center',
-      ),
+      node: createSignatureImage(signature.signatureImageAsBase64, fieldWidth, fieldHeight),
       isImage: true,
       isLabel: false,
     };

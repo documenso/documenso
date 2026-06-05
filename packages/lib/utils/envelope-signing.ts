@@ -249,5 +249,24 @@ export const extractFieldInsertionValues = ({
         inserted: true,
       };
     })
+    .with({ type: FieldType.IMAGE_UPLOAD }, (fieldValue) => {
+      if (!fieldValue.value) {
+        return {
+          customText: '',
+          inserted: false,
+        };
+      }
+
+      if (!isBase64Image(fieldValue.value)) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: 'Image upload fields must contain an uploaded image',
+        });
+      }
+
+      return {
+        customText: '',
+        inserted: true,
+      };
+    })
     .exhaustive();
 };

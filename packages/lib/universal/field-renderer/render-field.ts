@@ -8,6 +8,7 @@ import type { TFieldMetaSchema } from '../../types/field-meta';
 import { renderCheckboxFieldElement } from './render-checkbox-field';
 import { renderDropdownFieldElement } from './render-dropdown-field';
 import { renderGenericTextFieldElement } from './render-generic-text-field';
+import { renderImageUploadFieldElement } from './render-image-upload-field';
 import { renderRadioFieldElement } from './render-radio-field';
 import { renderSignatureFieldElement } from './render-signature-field';
 
@@ -85,6 +86,7 @@ export const renderField = ({
     .with(FieldType.RADIO, () => renderRadioFieldElement(field, options))
     .with(FieldType.DROPDOWN, () => renderDropdownFieldElement(field, options))
     .with(FieldType.SIGNATURE, () => renderSignatureFieldElement(field, options))
+    .with(FieldType.IMAGE_UPLOAD, () => renderImageUploadFieldElement(field, options))
     .with(FieldType.FREE_SIGNATURE, () => {
       throw new Error('Free signature fields are not supported');
     })

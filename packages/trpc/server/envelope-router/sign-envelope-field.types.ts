@@ -45,6 +45,10 @@ export const ZSignEnvelopeFieldValue = z.discriminatedUnion('type', [
     type: z.literal(FieldType.SIGNATURE),
     value: z.string().nullable(),
   }),
+  z.object({
+    type: z.literal(FieldType.IMAGE_UPLOAD),
+    value: z.string().nullable(),
+  }),
 ]);
 
 export const ZSignEnvelopeFieldRequestSchema = z.object({

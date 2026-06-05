@@ -186,7 +186,7 @@ export const signEnvelopeFieldRoute = procedure
     if (field.type === FieldType.SIGNATURE || field.type === FieldType.IMAGE_UPLOAD) {
       if (fieldValue.type !== FieldType.SIGNATURE && fieldValue.type !== FieldType.IMAGE_UPLOAD) {
         throw new AppError(AppErrorCode.INVALID_REQUEST, {
-          message: `Field ${fieldId} is not a signature field`,
+          message: `Field ${fieldId} is not a signature or image upload field`,
         });
       }
 

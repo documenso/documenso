@@ -67,7 +67,11 @@ const SIGNATURE_IMAGE_CACHE_PIXEL_RATIO = 2;
  * Build a Konva.Image for a base64 signature, sized to fit within the given
  * field dimensions. Works in both browser and Node.js (via skia-canvas).
  */
-const createSignatureImage = (signatureImageAsBase64: string, fieldWidth: number, fieldHeight: number): Konva.Image => {
+export const createSignatureImage = (
+  signatureImageAsBase64: string,
+  fieldWidth: number,
+  fieldHeight: number,
+): Konva.Image => {
   if (typeof window !== 'undefined') {
     const img = new Image();
 

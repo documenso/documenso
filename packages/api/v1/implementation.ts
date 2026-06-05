@@ -1401,6 +1401,10 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
                 success: true,
                 data: undefined,
               }))
+              .with('IMAGE_UPLOAD', () => ({
+                success: true,
+                data: undefined,
+              }))
               .with('FREE_SIGNATURE', () => ({
                 success: false,
                 error: 'FREE_SIGNATURE is not supported',
