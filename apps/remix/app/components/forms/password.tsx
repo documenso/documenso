@@ -22,7 +22,7 @@ export const ZPasswordFormSchema = z
     repeatedPassword: ZPasswordSchema,
   })
   .refine((data) => data.password === data.repeatedPassword, {
-    message: 'Passwords do not match',
+    message: msg`Passwords do not match`.id,
     path: ['repeatedPassword'],
   });
 
