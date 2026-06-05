@@ -372,12 +372,39 @@ export class LocalJobProvider extends BaseJobProvider {
     }
 
     console.log('Submitting job to endpoint:', endpoint);
+
+    // Fire-and-forget: we only wait up to 150ms so the caller isn't blocked on
+    // the handler running. The dispatch itself can still fail (the endpoint is
+    // unreachable, misconfigured NEXT_PRIVATE_INTERNAL_WEBAPP_URL, or a non-2xx
+    // response), and when it does the BackgroundJob row is left PENDING with no
+    // signal. Log those outcomes so a silently-undelivered job is diagnosable
+    // (e.g. webhooks never firing) instead of vanishing.
+    const dispatch = fetch(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers,
+    })
+      .then((res) => {
+        if (!res.ok) {
+          console.error(
+            `[JOBS]: dispatch for ${jobDefinitionId}/${jobId} returned HTTP ${res.status}; job may remain PENDING`,
+          );
+        }
+
+        return res;
+      })
+      .catch((err: unknown) => {
+        console.error(
+          `[JOBS]: dispatch for ${jobDefinitionId}/${jobId} failed (${
+            err instanceof Error ? err.message : String(err)
+          }); job may remain PENDING`,
+        );
+
+        return null;
+      });
+
     await Promise.race([
-      fetch(endpoint, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers,
-      }).catch(() => null),
+      dispatch,
       new Promise((resolve) => {
         setTimeout(resolve, 150);
       }),
