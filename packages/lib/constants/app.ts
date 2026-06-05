@@ -15,6 +15,15 @@ export const NEXT_PRIVATE_INTERNAL_WEBAPP_URL = () =>
 
 export const IS_BILLING_ENABLED = () => env('NEXT_PUBLIC_FEATURE_BILLING_ENABLED') === 'true';
 
+/**
+ * Team analytics dashboard rollout flag.
+ *
+ * Acts as a kill-switch: enabled by default and disabled only when the env var
+ * is explicitly set to "false". This keeps the feature available to all teams
+ * while leaving a single lever to gate it off during rollout.
+ */
+export const IS_TEAM_ANALYTICS_ENABLED = () => env('NEXT_PUBLIC_FEATURE_TEAM_ANALYTICS_ENABLED') !== 'false';
+
 export const API_V2_BETA_URL = '/api/v2-beta';
 export const API_V2_URL = '/api/v2';
 
