@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { z } from 'zod';
 
 // export const createOrganisationMeta: TrpcOpenApiMeta = {
@@ -12,8 +13,8 @@ import { z } from 'zod';
 
 export const ZOrganisationNameSchema = z
   .string()
-  .min(3, { message: 'Minimum 3 characters' })
-  .max(50, { message: 'Maximum 50 characters' });
+  .min(3, { message: msg`Minimum 3 characters`.id })
+  .max(50, { message: msg`Maximum 50 characterss`.id });
 
 export const ZCreateOrganisationRequestSchema = z.object({
   name: ZOrganisationNameSchema,
