@@ -349,6 +349,7 @@ const EnvelopeCreatePage = ({ embedAuthoringOptions }: EnvelopeCreatePageProps) 
       templateType: 'PRIVATE',
       completedAt: null,
       deletedAt: null,
+      scheduledAt: null,
       title: type === EnvelopeType.DOCUMENT ? 'Document Title' : 'Template Title',
       authOptions: {
         globalAccessAuth: [],

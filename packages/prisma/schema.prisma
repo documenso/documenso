@@ -409,6 +409,10 @@ model Envelope {
   source  DocumentSource
   qrToken String? /// @zod.string.describe("The token for viewing the document using the QR code on the certificate.")
 
+  /// When set on a DRAFT envelope, the envelope is scheduled to be sent automatically at this time
+  /// by the scheduled-send sweep job. Cleared once the envelope is sent or the schedule is cancelled.
+  scheduledAt DateTime? /// @zod.date.describe("The time at which a draft envelope is scheduled to be sent automatically.")
+
   internalVersion         Int
   useLegacyFieldInsertion Boolean @default(false)
 
@@ -451,6 +455,7 @@ model Envelope {
   @@index([teamId])
   @@index([folderId])
   @@index([createdAt])
+  @@index([scheduledAt])
 }
 
 model EnvelopeItem {

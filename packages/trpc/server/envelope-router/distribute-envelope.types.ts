@@ -18,6 +18,13 @@ export const distributeEnvelopeMeta: TrpcRouteMeta = {
 
 export const ZDistributeEnvelopeRequestSchema = z.object({
   envelopeId: z.string().describe('The ID of the envelope to send.'),
+  scheduledAt: z
+    .string()
+    .datetime()
+    .optional()
+    .describe(
+      'An ISO 8601 timestamp in the future. When provided, the envelope is scheduled to be sent automatically at this time instead of immediately.',
+    ),
   meta: ZDocumentMetaUpdateSchema.pick({
     subject: true,
     message: true,

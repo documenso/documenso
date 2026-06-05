@@ -1,4 +1,5 @@
 import { updateDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
+import { scheduleDocument } from '@documenso/lib/server-only/document/schedule-document';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { formatSigningLink } from '@documenso/lib/utils/recipients';
 
@@ -15,11 +16,12 @@ export const distributeEnvelopeRoute = authenticatedProcedure
   .output(ZDistributeEnvelopeResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
-    const { envelopeId, meta = {} } = input;
+    const { envelopeId, scheduledAt, meta = {} } = input;
 
     ctx.logger.info({
       input: {
         envelopeId,
+        scheduledAt,
       },
     });
 
@@ -45,15 +47,27 @@ export const distributeEnvelopeRoute = authenticatedProcedure
       });
     }
 
-    const envelope = await sendDocument({
-      userId: ctx.user.id,
-      id: {
-        type: 'envelopeId',
-        id: envelopeId,
-      },
-      teamId,
-      requestMetadata: ctx.metadata,
-    });
+    // When a future send time is provided, schedule the envelope instead of sending it now.
+    // The scheduled-send sweep job dispatches it via `sendDocument` once the time is reached.
+    const envelope = scheduledAt
+      ? await scheduleDocument({
+          userId: ctx.user.id,
+          id: {
+            type: 'envelopeId',
+            id: envelopeId,
+          },
+          teamId,
+          scheduledAt: new Date(scheduledAt),
+        })
+      : await sendDocument({
+          userId: ctx.user.id,
+          id: {
+            type: 'envelopeId',
+            id: envelopeId,
+          },
+          teamId,
+          requestMetadata: ctx.metadata,
+        });
 
     return {
       success: true,

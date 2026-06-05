@@ -17,6 +17,7 @@ import { EXECUTE_WEBHOOK_JOB_DEFINITION } from './definitions/internal/execute-w
 import { EXPIRE_RECIPIENTS_SWEEP_JOB_DEFINITION } from './definitions/internal/expire-recipients-sweep';
 import { PROCESS_RECIPIENT_EXPIRED_JOB_DEFINITION } from './definitions/internal/process-recipient-expired';
 import { PROCESS_SIGNING_REMINDER_JOB_DEFINITION } from './definitions/internal/process-signing-reminder';
+import { SCHEDULED_SEND_SWEEP_JOB_DEFINITION } from './definitions/internal/scheduled-send-sweep';
 import { SEAL_DOCUMENT_JOB_DEFINITION } from './definitions/internal/seal-document';
 import { SEAL_DOCUMENT_SWEEP_JOB_DEFINITION } from './definitions/internal/seal-document-sweep';
 import { SEND_SIGNING_REMINDERS_SWEEP_JOB_DEFINITION } from './definitions/internal/send-signing-reminders-sweep';
@@ -49,6 +50,7 @@ export const jobsClient = new JobClient([
   PROCESS_SIGNING_REMINDER_JOB_DEFINITION,
   CLEANUP_RATE_LIMITS_JOB_DEFINITION,
   SYNC_EMAIL_DOMAINS_JOB_DEFINITION,
+  SCHEDULED_SEND_SWEEP_JOB_DEFINITION,
 ] as const);
 
 export const jobs = jobsClient;

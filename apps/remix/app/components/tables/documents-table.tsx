@@ -3,7 +3,7 @@ import { useMemo, useTransition } from 'react';
 import { msg, plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { Loader } from 'lucide-react';
+import { CalendarClock, Loader } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
@@ -27,6 +27,26 @@ import { useCurrentTeam } from '~/providers/team';
 import { StackAvatarsWithTooltip } from '../general/stack-avatars-with-tooltip';
 import { DocumentsTableActionButton } from './documents-table-action-button';
 import { DocumentsTableActionDropdown } from './documents-table-action-dropdown';
+
+/**
+ * Indicator shown in place of the "Draft" status when a draft envelope has a future
+ * scheduled send time. The full date is exposed via the title attribute on hover.
+ */
+const DocumentScheduledBadge = ({ scheduledAt }: { scheduledAt: Date | string }) => {
+  const formatted = DateTime.fromJSDate(new Date(scheduledAt)).toLocaleString(
+    DateTime.DATETIME_SHORT,
+  );
+
+  return (
+    <span
+      className="flex items-center text-violet-600 dark:text-violet-300"
+      title={formatted}
+    >
+      <CalendarClock className="mr-2 inline-block h-4 w-4" />
+      <Trans>Scheduled</Trans>
+    </span>
+  );
+};
 
 export type DocumentsTableProps = {
   data?: TFindDocumentsResponse;
@@ -141,7 +161,15 @@ export const DocumentsTable = ({
       {
         header: _(msg`Status`),
         accessorKey: 'status',
-        cell: ({ row }) => <DocumentStatus status={row.original.status} />,
+        cell: ({ row }) => {
+          const { status, scheduledAt } = row.original;
+
+          if (status === 'DRAFT' && scheduledAt && new Date(scheduledAt) > new Date()) {
+            return <DocumentScheduledBadge scheduledAt={scheduledAt} />;
+          }
+
+          return <DocumentStatus status={status} />;
+        },
         size: 140,
       },
       {

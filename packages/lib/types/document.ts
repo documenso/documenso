@@ -180,6 +180,10 @@ export const ZDocumentManySchema = LegacyDocumentSchema.pick({
     url: true,
   }).nullable(),
   fieldCount: z.number().describe('The number of fields placed on the document.'),
+  scheduledAt: z
+    .date()
+    .nullable()
+    .describe('When set on a draft, the time the envelope is scheduled to be sent automatically.'),
 });
 
 export type TDocumentMany = z.infer<typeof ZDocumentManySchema>;

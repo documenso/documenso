@@ -249,6 +249,7 @@ export const ZEditorEnvelopeSchema = EnvelopeSchema.pick({
   externalId: true,
   completedAt: true,
   deletedAt: true,
+  scheduledAt: true,
   title: true,
   authOptions: true,
   publicTitle: true,

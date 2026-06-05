@@ -5,7 +5,7 @@ import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import { DocumentDistributionMethod, DocumentStatus, EnvelopeType } from '@prisma/client';
 import { AnimatePresence, motion } from 'framer-motion';
-import { InfoIcon } from 'lucide-react';
+import { CalendarClock, InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
@@ -22,6 +22,7 @@ import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/documen
 import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
+import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import {
   Dialog,
   DialogClose,
@@ -75,6 +76,19 @@ export const ZEnvelopeDistributeFormSchema = z.object({
 
 export type TEnvelopeDistributeFormSchema = z.infer<typeof ZEnvelopeDistributeFormSchema>;
 
+/**
+ * Format a Date as a value accepted by an `<input type="datetime-local">`
+ * (`YYYY-MM-DDTHH:mm`) in the user's local timezone.
+ */
+const toDateTimeLocalValue = (date: Date): string => {
+  const pad = (value: number) => String(value).padStart(2, '0');
+
+  return (
+    `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` +
+    `T${pad(date.getHours())}:${pad(date.getMinutes())}`
+  );
+};
+
 export const EnvelopeDistributeDialog = ({
   trigger,
   documentRootPath,
@@ -91,7 +105,16 @@ export const EnvelopeDistributeDialog = ({
   const [isOpen, setIsOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
 
+  const [isScheduled, setIsScheduled] = useState(Boolean(envelope.scheduledAt));
+  const [scheduledAtLocal, setScheduledAtLocal] = useState(
+    envelope.scheduledAt ? toDateTimeLocalValue(new Date(envelope.scheduledAt)) : '',
+  );
+  const [scheduleError, setScheduleError] = useState<string | null>(null);
+  const [isCancellingSchedule, setIsCancellingSchedule] = useState(false);
+
   const { mutateAsync: distributeEnvelope } = trpcReact.envelope.distribute.useMutation();
+  const { mutateAsync: cancelScheduledSend } =
+    trpcReact.envelope.cancelScheduledSend.useMutation();
 
   const form = useForm<TEnvelopeDistributeFormSchema>({
     defaultValues: {
@@ -175,11 +198,52 @@ export const EnvelopeDistributeDialog = ({
     return null;
   }, [envelope.recipients, recipientsMissingRequiredEmail, recipientsMissingSignatureFields]);
 
+  // Scheduling is only offered for email distribution — "None" just generates links immediately.
+  const canSchedule = distributionMethod === DocumentDistributionMethod.EMAIL;
+
   const onFormSubmit = async ({ meta }: TEnvelopeDistributeFormSchema) => {
+    let scheduledAt: string | undefined;
+
+    if (canSchedule && isScheduled) {
+      if (!scheduledAtLocal) {
+        setScheduleError(t`Please choose a date and time to send.`);
+        return;
+      }
+
+      const scheduledDate = new Date(scheduledAtLocal);
+
+      if (Number.isNaN(scheduledDate.getTime())) {
+        setScheduleError(t`Please choose a valid date and time.`);
+        return;
+      }
+
+      if (scheduledDate.getTime() <= Date.now()) {
+        setScheduleError(t`The scheduled time must be in the future.`);
+        return;
+      }
+
+      setScheduleError(null);
+      scheduledAt = scheduledDate.toISOString();
+    }
+
     try {
-      await distributeEnvelope({ envelopeId: envelope.id, meta });
+      await distributeEnvelope({ envelopeId: envelope.id, scheduledAt, meta });
 
       await onDistribute?.();
+
+      if (scheduledAt) {
+        toast({
+          title: t`Envelope scheduled`,
+          description: t`Your envelope will be sent automatically at the scheduled time.`,
+          duration: 5000,
+        });
+
+        setIsOpen(false);
+
+        await navigate(`${documentRootPath}/${envelope.id}`);
+
+        return;
+      }
 
       let redirectPath = `${documentRootPath}/${envelope.id}`;
 
@@ -203,6 +267,37 @@ export const EnvelopeDistributeDialog = ({
         variant: 'destructive',
         duration: 7500,
       });
+    }
+  };
+
+  const onCancelSchedule = async () => {
+    setIsCancellingSchedule(true);
+
+    try {
+      await cancelScheduledSend({ envelopeId: envelope.id });
+
+      setIsScheduled(false);
+      setScheduledAtLocal('');
+      setScheduleError(null);
+
+      toast({
+        title: t`Schedule cancelled`,
+        description: t`This envelope is back to a draft and will not be sent automatically.`,
+        duration: 5000,
+      });
+
+      setIsOpen(false);
+
+      await navigate(`${documentRootPath}/${envelope.id}`);
+    } catch (err) {
+      toast({
+        title: t`Something went wrong`,
+        description: t`The scheduled send could not be cancelled at this time. Please try again.`,
+        variant: 'destructive',
+        duration: 7500,
+      });
+    } finally {
+      setIsCancellingSchedule(false);
     }
   };
 
@@ -411,6 +506,59 @@ export const EnvelopeDistributeDialog = ({
                                 </FormItem>
                               )}
                             />
+
+                            <div className="flex flex-col gap-y-3 rounded-lg border p-3">
+                              <label className="flex cursor-pointer items-center gap-x-2 text-sm font-medium">
+                                <Checkbox
+                                  checked={isScheduled}
+                                  onCheckedChange={(checked) => {
+                                    setIsScheduled(checked === true);
+                                    setScheduleError(null);
+                                  }}
+                                />
+                                <CalendarClock className="h-4 w-4 text-muted-foreground" />
+                                <Trans>Schedule for later</Trans>
+                              </label>
+
+                              {isScheduled && (
+                                <div className="flex flex-col gap-y-2">
+                                  <Input
+                                    type="datetime-local"
+                                    className="bg-background"
+                                    value={scheduledAtLocal}
+                                    min={toDateTimeLocalValue(new Date())}
+                                    onChange={(event) => {
+                                      setScheduledAtLocal(event.target.value);
+                                      setScheduleError(null);
+                                    }}
+                                  />
+
+                                  <p className="text-xs text-muted-foreground">
+                                    <Trans>
+                                      The envelope will be sent automatically at this time, in your
+                                      local timezone.
+                                    </Trans>
+                                  </p>
+
+                                  {scheduleError && (
+                                    <p className="text-xs text-destructive">{scheduleError}</p>
+                                  )}
+                                </div>
+                              )}
+
+                              {envelope.scheduledAt && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-auto self-start p-0 text-xs text-destructive hover:bg-transparent"
+                                  loading={isCancellingSchedule}
+                                  onClick={onCancelSchedule}
+                                >
+                                  <Trans>Cancel scheduled send</Trans>
+                                </Button>
+                              )}
+                            </div>
                           </fieldset>
                         </Form>
                       </motion.div>
@@ -447,7 +595,9 @@ export const EnvelopeDistributeDialog = ({
                   </DialogClose>
 
                   <Button loading={isSubmitting} disabled={isSyncing} type="submit">
-                    {distributionMethod === DocumentDistributionMethod.EMAIL ? (
+                    {canSchedule && isScheduled ? (
+                      <Trans>Schedule</Trans>
+                    ) : distributionMethod === DocumentDistributionMethod.EMAIL ? (
                       <Trans>Send</Trans>
                     ) : (
                       <Trans>Generate Links</Trans>

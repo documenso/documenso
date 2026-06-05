@@ -155,5 +155,6 @@ export const mapEnvelopesToDocumentMany = (
       mapRecipientToLegacyRecipient(recipient, envelope),
     ),
     fieldCount: envelope._count?.fields ?? 0,
+    scheduledAt: envelope.scheduledAt,
   };
 };
