@@ -16,10 +16,10 @@ type HandleSignatureFieldClickOptions = {
 
 export const handleSignatureFieldClick = async (
   options: HandleSignatureFieldClickOptions,
-): Promise<Extract<TSignEnvelopeFieldValue, { type: typeof FieldType.SIGNATURE }> | null> => {
+): Promise<Extract<TSignEnvelopeFieldValue, { type: 'SIGNATURE' | 'IMAGE_UPLOAD' }> | null> => {
   const { field, fullName, signature, typedSignatureEnabled, uploadSignatureEnabled, drawSignatureEnabled } = options;
 
-  if (field.type !== FieldType.SIGNATURE) {
+  if (field.type !== FieldType.SIGNATURE && field.type !== FieldType.IMAGE_UPLOAD) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Invalid field type',
     });
@@ -27,7 +27,7 @@ export const handleSignatureFieldClick = async (
 
   if (field.inserted) {
     return {
-      type: FieldType.SIGNATURE,
+      type: field.type,
       value: null,
     };
   }
@@ -48,7 +48,7 @@ export const handleSignatureFieldClick = async (
   }
 
   return {
-    type: FieldType.SIGNATURE,
+    type: field.type,
     value: signatureToInsert,
   };
 };

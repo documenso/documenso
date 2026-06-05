@@ -137,6 +137,8 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       return;
     }
 
+    const fieldWithCustomText = field as TLocalField & { customText?: string };
+
     const recipient = envelope.recipients.find((r) => r.id === field.recipientId);
     const isFieldEditable = recipient !== undefined && canRecipientFieldsBeModified(recipient, envelope.fields);
 
@@ -146,7 +148,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       field: {
         renderId: field.formId,
         ...field,
-        customText: field.customText ?? '',
+        customText: fieldWithCustomText.customText ?? '',
         inserted: false,
         fieldMeta: field.fieldMeta,
       },

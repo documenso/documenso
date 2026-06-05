@@ -7,6 +7,7 @@ import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
@@ -14,6 +15,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
+import { FieldType } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useRevalidator } from 'react-router';
@@ -69,6 +71,12 @@ export const DocumentSigningSignatureField = ({
     trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const { signature } = field;
+
+  const isSeal = field.type === FieldType.IMAGE_UPLOAD;
+  const fieldContainerType: 'Signature' | 'Image Upload' = isSeal ? 'Image Upload' : 'Signature';
+  const fieldLabel = isSeal ? _('Image Upload') : _('Signature');
+  const fieldMeta =
+    field.fieldMeta?.type === 'signature' || field.fieldMeta?.type === 'IMAGE_UPLOAD' ? field.fieldMeta : undefined;
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading;
 
@@ -229,7 +237,7 @@ export const DocumentSigningSignatureField = ({
       onPreSign={onPreSign}
       onSign={onSign}
       onRemove={onRemove}
-      type="Signature"
+      type={fieldContainerType}
     >
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center rounded-md bg-background">
@@ -238,24 +246,46 @@ export const DocumentSigningSignatureField = ({
       )}
 
       {state === 'empty' && (
-        <p className="font-signature text-[clamp(0.575rem,25cqw,1.2rem)] text-muted-foreground text-xl duration-200 group-hover:text-primary group-hover:text-recipient-green">
-          <Trans>Signature</Trans>
+        <p className="text-center font-signature text-[clamp(0.575rem,25cqw,1.2rem)] text-muted-foreground text-xl duration-200 group-hover:text-primary group-hover:text-recipient-green">
+          {fieldLabel}
         </p>
       )}
 
       {state === 'signed-image' && signature?.signatureImageAsBase64 && (
-        <img
-          src={signature.signatureImageAsBase64}
-          alt={`Signature for ${recipient.name}`}
-          className="h-full w-full object-contain"
-        />
+        <div
+          className={cn('flex h-full w-full items-center', {
+            'justify-start': fieldMeta?.textAlign === 'left',
+            'justify-center': !fieldMeta?.textAlign || fieldMeta?.textAlign === 'center',
+            'justify-end': fieldMeta?.textAlign === 'right',
+          })}
+        >
+          <img
+            src={signature.signatureImageAsBase64}
+            alt={`Signature for ${recipient.name}`}
+            className="h-full max-w-full object-contain"
+          />
+        </div>
       )}
 
       {state === 'signed-text' && (
-        <div ref={containerRef} className="flex h-full w-full items-center justify-center p-2">
+        <div
+          ref={containerRef}
+          className={cn('flex h-full w-full items-center', {
+            'justify-start': fieldMeta?.textAlign === 'left',
+            'justify-center': !fieldMeta?.textAlign || fieldMeta?.textAlign === 'center',
+            'justify-end': fieldMeta?.textAlign === 'right',
+          })}
+        >
           <p
             ref={signatureRef}
-            className="w-full overflow-hidden break-all text-center font-signature text-muted-foreground leading-tight duration-200"
+            className={cn(
+              'w-full overflow-hidden break-all font-signature text-muted-foreground leading-tight duration-200',
+              {
+                'text-left': fieldMeta?.textAlign === 'left',
+                'text-center': !fieldMeta?.textAlign || fieldMeta?.textAlign === 'center',
+                'text-right': fieldMeta?.textAlign === 'right',
+              },
+            )}
             style={{ fontSize: `${fontSize}rem` }}
           >
             {signature?.typedSignature}
