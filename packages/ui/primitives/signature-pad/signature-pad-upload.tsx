@@ -7,7 +7,7 @@ import { useRef } from 'react';
 
 import { cn } from '../../lib/utils';
 
-const loadImage = async (file: File | undefined): Promise<HTMLImageElement> => {
+const loadImage = (file: File | undefined): Promise<HTMLImageElement> => {
   if (!file) {
     throw new Error('No file selected');
   }
@@ -43,7 +43,7 @@ const loadImageOntoCanvas = (
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
 ): ImageData => {
-  const scale = Math.min((canvas.width * 0.8) / image.width, (canvas.height * 0.8) / image.height);
+  const scale = Math.min(canvas.width / image.width, canvas.height / image.height);
 
   const x = (canvas.width - image.width * scale) / 2;
   const y = (canvas.height - image.height * scale) / 2;
