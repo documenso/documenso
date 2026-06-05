@@ -47,7 +47,7 @@ export const ZTeamNameSchema = z
 export const ZCreateTeamEmailVerificationMutationSchema = z.object({
   teamId: z.number(),
   name: ZNameSchema,
-  email: zEmail().trim().toLowerCase().min(1, 'Please enter a valid email.'),
+  email: zEmail().trim().toLowerCase().min(1, msg`Please enter a valid email.`.id),
 });
 
 export const ZDeleteTeamEmailMutationSchema = z.object({
