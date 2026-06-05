@@ -187,13 +187,19 @@ export const sendOrganisationMemberInviteEmail = async ({
     organisationName: organisation.name,
   });
 
-  const { branding, emailLanguage, senderEmail } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, emailsDisabled } = await getEmailContext({
     emailType: 'INTERNAL',
     source: {
       type: 'organisation',
       organisationId: organisation.id,
     },
   });
+
+  // Member invites can be sent to anyone, so block them when the organisation has email
+  // sending disabled.
+  if (emailsDisabled) {
+    return;
+  }
 
   const [html, text] = await Promise.all([
     renderEmailWithI18N(template, {

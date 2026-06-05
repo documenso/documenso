@@ -47,7 +47,7 @@ export const sendPendingEmail = async ({ id, recipientId }: SendPendingEmailOpti
     throw new Error('Document has no recipients');
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, replyToEmail, emailsDisabled } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
       type: 'team',
@@ -55,6 +55,11 @@ export const sendPendingEmail = async ({ id, recipientId }: SendPendingEmailOpti
     },
     meta: envelope.documentMeta,
   });
+
+  // Don't send any emails if the organisation has email sending disabled.
+  if (emailsDisabled) {
+    return;
+  }
 
   const isDocumentPendingEmailEnabled = extractDerivedDocumentEmailSettings(envelope.documentMeta).documentPending;
 

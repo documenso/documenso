@@ -48,7 +48,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCancelledEmai
     },
   });
 
-  const { branding, emailLanguage, senderEmail, replyToEmail, isOrganisationOwnerDisabled, organisationId, claims } =
+  const { branding, emailLanguage, senderEmail, replyToEmail, organisationId, claims, emailsDisabled } =
     await getEmailContext({
       emailType: 'RECIPIENT',
       source: {
@@ -60,8 +60,8 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCancelledEmai
 
   const { documentMeta, user: documentOwner } = envelope;
 
-  // Don't send cancellation emails on behalf of a disabled (e.g. banned) account.
-  if (isOrganisationOwnerDisabled || documentOwner.disabled) {
+  // Don't send cancellation emails if the organisation has email sending disabled or the owner is disabled (e.g. banned).
+  if (emailsDisabled || documentOwner.disabled) {
     return;
   }
 
