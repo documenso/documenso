@@ -11,7 +11,7 @@ import { cn } from '../../lib/utils';
 import { Checkbox } from '../checkbox';
 import { Label } from '../label';
 import { RadioGroup, RadioGroupItem } from '../radio-group';
-import { SignatureRender } from '../signature-pad/signature-render';
+import { SignatureFieldRender } from '../signature-field-render';
 import { FRIENDLY_FIELD_TYPE } from './types';
 
 type FieldIconProps = {
@@ -162,16 +162,18 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
     }
   }
 
-  if (
-    isSignatureField &&
-    field.inserted &&
-    field.signature &&
-    (field.signature.signatureImageAsBase64 || field.signature.typedSignature)
-  ) {
+  if (field.type === FieldType.SIGNATURE && field.signature?.signatureImageAsBase64 && field.inserted) {
     return (
-      <SignatureRender
+      <img src={field.signature.signatureImageAsBase64} alt="Signature" className="h-full w-full object-contain" />
+    );
+  }
+
+  if (isSignatureField && field.inserted && field.signature?.typedSignature) {
+    return (
+      <SignatureFieldRender
         className="h-full w-full"
-        value={field.signature.signatureImageAsBase64 || field.signature.typedSignature || ''}
+        value={field.signature.typedSignature}
+        textAlign={fieldMeta && 'textAlign' in fieldMeta ? fieldMeta.textAlign : 'center'}
       />
     );
   }

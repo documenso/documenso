@@ -1,6 +1,7 @@
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import type { TSignatureFieldMeta } from '@documenso/lib/types/field-meta';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -9,8 +10,8 @@ import type {
 } from '@documenso/trpc/server/field-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
+import { SignatureFieldRender } from '@documenso/ui/primitives/signature-field-render';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
-import { SignatureRender } from '@documenso/ui/primitives/signature-pad/signature-render';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -67,6 +68,7 @@ export const DocumentSigningSignatureField = ({
     trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const { signature } = field;
+  const fieldMeta = field.fieldMeta as TSignatureFieldMeta | undefined;
 
   const isSeal = field.type === FieldType.IMAGE_UPLOAD;
   const fieldContainerType: 'Signature' | 'Image Upload' = isSeal ? 'Image Upload' : 'Signature';
@@ -213,10 +215,19 @@ export const DocumentSigningSignatureField = ({
         </p>
       )}
 
-      {(state === 'signed-image' || state === 'signed-text') && (
-        <SignatureRender
+      {state === 'signed-image' && signature?.signatureImageAsBase64 && (
+        <img
+          src={signature.signatureImageAsBase64}
+          alt={`Signature for ${recipient.name}`}
+          className="h-full w-full object-contain"
+        />
+      )}
+
+      {state === 'signed-text' && signature?.typedSignature && (
+        <SignatureFieldRender
           className="h-full w-full"
-          value={signature?.signatureImageAsBase64 || signature?.typedSignature || ''}
+          value={signature.typedSignature}
+          textAlign={fieldMeta?.textAlign || 'center'}
         />
       )}
       <Dialog open={showSignatureModal} onOpenChange={setShowSignatureModal}>
