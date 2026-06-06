@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { UploadCloudIcon, XIcon } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { cn } from '../lib/utils';
+import { trimTransparentCanvasMargins } from './signature-pad/signature-image-utils';
 
 const loadImage = async (file: File | undefined): Promise<HTMLImageElement> => {
   if (!file) {
@@ -37,7 +38,7 @@ const loadImage = async (file: File | undefined): Promise<HTMLImageElement> => {
 };
 
 const loadImageOntoCanvas = (
-  image: CanvasImageSource,
+  image: HTMLImageElement | HTMLCanvasElement,
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
 ): ImageData => {
@@ -61,66 +62,6 @@ const loadImageOntoCanvas = (
   return ctx.getImageData(0, 0, canvas.width, canvas.height);
 };
 
-const trimTransparentMargins = (image: HTMLImageElement): HTMLCanvasElement => {
-  const sourceCanvas = document.createElement('canvas');
-  sourceCanvas.width = image.naturalWidth;
-  sourceCanvas.height = image.naturalHeight;
-
-  const sourceCtx = sourceCanvas.getContext('2d');
-
-  if (!sourceCtx) {
-    return sourceCanvas;
-  }
-
-  sourceCtx.drawImage(image, 0, 0);
-
-  const imageData = sourceCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
-  const { data, width, height } = imageData;
-
-  let minX = width;
-  let minY = height;
-  let maxX = -1;
-  let maxY = -1;
-
-  for (let y = 0; y < height; y += 1) {
-    for (let x = 0; x < width; x += 1) {
-      const alpha = data[(y * width + x) * 4 + 3];
-
-      if (alpha > 0) {
-        minX = Math.min(minX, x);
-        minY = Math.min(minY, y);
-        maxX = Math.max(maxX, x);
-        maxY = Math.max(maxY, y);
-      }
-    }
-  }
-
-  if (maxX < 0 || maxY < 0) {
-    return sourceCanvas;
-  }
-
-  const trimmedWidth = maxX - minX + 1;
-  const trimmedHeight = maxY - minY + 1;
-
-  if (trimmedWidth === width && trimmedHeight === height) {
-    return sourceCanvas;
-  }
-
-  const trimmedCanvas = document.createElement('canvas');
-  trimmedCanvas.width = trimmedWidth;
-  trimmedCanvas.height = trimmedHeight;
-
-  const trimmedCtx = trimmedCanvas.getContext('2d');
-
-  if (!trimmedCtx) {
-    return sourceCanvas;
-  }
-
-  trimmedCtx.drawImage(sourceCanvas, minX, minY, trimmedWidth, trimmedHeight, 0, 0, trimmedWidth, trimmedHeight);
-
-  return trimmedCanvas;
-};
-
 export type ImageUploadFieldProps = {
   className?: string;
   value: string;
@@ -139,7 +80,19 @@ export const ImageUploadField = ({ className, value, onChange, ...props }: Image
     setError(null);
     try {
       const img = await loadImage(event.target.files?.[0]);
-      const trimmedImage = trimTransparentMargins(img);
+      const sourceCanvas = document.createElement('canvas');
+      sourceCanvas.width = img.naturalWidth;
+      sourceCanvas.height = img.naturalHeight;
+
+      const sourceCtx = sourceCanvas.getContext('2d');
+
+      if (!sourceCtx) {
+        return;
+      }
+
+      sourceCtx.drawImage(img, 0, 0);
+
+      const trimmedImage = trimTransparentCanvasMargins(sourceCanvas);
 
       // 1. Create a normalized base64 image without padding.
       const MAX_DIMENSION = 1000;
@@ -153,7 +106,7 @@ export const ImageUploadField = ({ className, value, onChange, ...props }: Image
       const offscreenCtx = offscreenCanvas.getContext('2d');
       if (offscreenCtx) {
         offscreenCtx.drawImage(trimmedImage, 0, 0, width, height);
-        onChange?.(offscreenCanvas.toDataURL('image/png'));
+        onChange?.(trimTransparentCanvasMargins(offscreenCanvas).toDataURL('image/png'));
       }
 
       // 2. Update the preview canvas.

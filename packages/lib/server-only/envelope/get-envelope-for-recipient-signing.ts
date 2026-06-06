@@ -14,6 +14,7 @@ import { ZEnvelopeFieldSchema, ZFieldSchema } from '../../types/field';
 import { ZRecipientLiteSchema } from '../../types/recipient';
 import { isRecipientExpired } from '../../utils/recipients';
 import { isRecipientAuthorized } from '../document/is-recipient-authorized';
+import { getRecipientSignatures } from '../recipient/get-recipient-signatures';
 import { getTeamSettings } from '../team/get-team-settings';
 
 export type GetRecipientEnvelopeByTokenOptions = {
@@ -243,20 +244,8 @@ export const getEnvelopeForRecipientSigning = async ({
 
   const settings = await getTeamSettings({ teamId: envelope.teamId });
 
-  // Get the signature if they have put it in already.
-  const recipientSignature = await prisma.signature.findFirst({
-    where: {
-      field: {
-        recipientId: recipient.id,
-        envelopeId: envelope.id,
-      },
-    },
-    select: {
-      id: true,
-      recipientId: true,
-      signatureImageAsBase64: true,
-      typedSignature: true,
-    },
+  const [recipientSignature] = await getRecipientSignatures({
+    recipientId: recipient.id,
   });
 
   let isRecipientsTurn = true;
@@ -285,7 +274,7 @@ export const getEnvelopeForRecipientSigning = async ({
   return ZEnvelopeForSigningResponse.parse({
     envelope,
     recipient,
-    recipientSignature,
+    recipientSignature: recipientSignature ?? null,
     isRecipientsTurn,
     isCompleted: recipient.signingStatus === SigningStatus.SIGNED || envelope.status === DocumentStatus.COMPLETED,
     isRejected: recipient.signingStatus === SigningStatus.REJECTED || envelope.status === DocumentStatus.REJECTED,
