@@ -1,6 +1,5 @@
 import { unsafe_useEffectOnce } from '@documenso/lib/client-only/hooks/use-effect-once';
 import { SIGNATURE_CANVAS_DPI, SIGNATURE_MIN_COVERAGE_THRESHOLD } from '@documenso/lib/constants/signatures';
-
 import { Trans } from '@lingui/react/macro';
 import { Undo2 } from 'lucide-react';
 import type { StrokeOptions } from 'perfect-freehand';
@@ -8,66 +7,10 @@ import { getStroke } from 'perfect-freehand';
 import type { MouseEvent, PointerEvent, RefObject, TouchEvent } from 'react';
 import { useMemo, useRef, useState } from 'react';
 
-const getTrimmedSignatureDataUrl = (canvas: HTMLCanvasElement, padding = 10) => {
-  const ctx = canvas.getContext('2d');
-
-  if (!ctx) {
-    return canvas.toDataURL();
-  }
-
-  const { width, height } = canvas;
-  const imageData = ctx.getImageData(0, 0, width, height);
-  const data = imageData.data;
-
-  let minX = width;
-  let minY = height;
-  let maxX = 0;
-  let maxY = 0;
-  let hasContent = false;
-
-  for (let y = 0; y < height; y += 1) {
-    for (let x = 0; x < width; x += 1) {
-      const alpha = data[(y * width + x) * 4 + 3];
-
-      if (alpha > 10) {
-        hasContent = true;
-        minX = Math.min(minX, x);
-        minY = Math.min(minY, y);
-        maxX = Math.max(maxX, x);
-        maxY = Math.max(maxY, y);
-      }
-    }
-  }
-
-  if (!hasContent) {
-    return canvas.toDataURL();
-  }
-
-  minX = Math.max(0, minX - padding);
-  minY = Math.max(0, minY - padding);
-  maxX = Math.min(width, maxX + padding);
-  maxY = Math.min(height, maxY + padding);
-
-  const trimmedWidth = maxX - minX + 1;
-  const trimmedHeight = maxY - minY + 1;
-  const trimmedCanvas = document.createElement('canvas');
-  trimmedCanvas.width = trimmedWidth;
-  trimmedCanvas.height = trimmedHeight;
-
-  const trimmedCtx = trimmedCanvas.getContext('2d');
-
-  if (!trimmedCtx) {
-    return canvas.toDataURL();
-  }
-
-  trimmedCtx.putImageData(ctx.getImageData(minX, minY, trimmedWidth, trimmedHeight), 0, 0);
-
-  return trimmedCanvas.toDataURL();
-};
-
 import { cn } from '../../lib/utils';
 import { getSvgPathFromStroke } from './helper';
 import { Point } from './point';
+import { trimTransparentCanvasMargins } from './signature-image-utils';
 import { SignaturePadColorPicker } from './signature-pad-color-picker';
 
 const checkSignatureValidity = (element: RefObject<HTMLCanvasElement>) => {
@@ -218,7 +161,7 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
         setIsSignatureValid(isValidSignature);
 
         if (isValidSignature) {
-          onChange?.(getTrimmedSignatureDataUrl($el.current));
+          onChange?.(trimTransparentCanvasMargins($el.current).toDataURL());
         }
         ctx.save();
       }
@@ -288,7 +231,7 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
       ctx?.fill(pathData);
     });
 
-    onChange?.(getTrimmedSignatureDataUrl($el.current));
+    onChange?.(trimTransparentCanvasMargins($el.current).toDataURL());
   };
 
   unsafe_useEffectOnce(() => {
