@@ -1,4 +1,3 @@
-import { mailer } from '@documenso/email/mailer';
 import { DocumentPendingEmailTemplate } from '@documenso/email/templates/document-pending';
 import { prisma } from '@documenso/prisma';
 import { msg } from '@lingui/core/macro';
@@ -47,7 +46,7 @@ export const sendPendingEmail = async ({ id, recipientId }: SendPendingEmailOpti
     throw new Error('Document has no recipients');
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail, emailsDisabled } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, replyToEmail, emailsDisabled, emailTransport } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
       type: 'team',
@@ -94,7 +93,7 @@ export const sendPendingEmail = async ({ id, recipientId }: SendPendingEmailOpti
 
   const i18n = await getI18nInstance(emailLanguage);
 
-  await mailer.sendMail({
+  await emailTransport.sendMail({
     to: {
       address: email,
       name,
