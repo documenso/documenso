@@ -8,7 +8,7 @@ import { useRef } from 'react';
 import { cn } from '../../lib/utils';
 import { trimTransparentCanvasMargins } from './signature-image-utils';
 
-const loadImage = async (file: File | undefined): Promise<HTMLImageElement> => {
+const loadImage = (file: File | undefined): Promise<HTMLImageElement> => {
   if (!file) {
     throw new Error('No file selected');
   }
@@ -44,10 +44,23 @@ const loadImageOntoCanvas = (
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
 ): ImageData => {
-  const scale = Math.min((canvas.width * 0.8) / image.width, (canvas.height * 0.8) / image.height);
+  const sourceCanvas = document.createElement('canvas');
+  sourceCanvas.width = image.width;
+  sourceCanvas.height = image.height;
 
-  const x = (canvas.width - image.width * scale) / 2;
-  const y = (canvas.height - image.height * scale) / 2;
+  const sourceCtx = sourceCanvas.getContext('2d');
+  if (!sourceCtx) {
+    throw new Error('Failed to get canvas context');
+  }
+
+  sourceCtx.drawImage(image, 0, 0);
+
+  const trimmedSourceCanvas = trimTransparentCanvasMargins(sourceCanvas);
+
+  const scale = Math.max(canvas.width / trimmedSourceCanvas.width, canvas.height / trimmedSourceCanvas.height);
+
+  const x = (canvas.width - trimmedSourceCanvas.width * scale) / 2;
+  const y = (canvas.height - trimmedSourceCanvas.height * scale) / 2;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -55,7 +68,7 @@ const loadImageOntoCanvas = (
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
 
-  ctx.drawImage(image, x, y, image.width * scale, image.height * scale);
+  ctx.drawImage(trimmedSourceCanvas, x, y, trimmedSourceCanvas.width * scale, trimmedSourceCanvas.height * scale);
 
   ctx.restore();
 
@@ -122,7 +135,7 @@ export const SignaturePadUpload = ({ className, value, onChange, ...props }: Sig
 
         sourceCtx.drawImage(img, 0, 0);
         const trimmedCanvas = trimTransparentCanvasMargins(sourceCanvas);
-        const scale = Math.min(width / trimmedCanvas.width, height / trimmedCanvas.height);
+        const scale = Math.max(width / trimmedCanvas.width, height / trimmedCanvas.height);
         const scaledWidth = trimmedCanvas.width * scale;
         const scaledHeight = trimmedCanvas.height * scale;
         const x = (width - scaledWidth) / 2;

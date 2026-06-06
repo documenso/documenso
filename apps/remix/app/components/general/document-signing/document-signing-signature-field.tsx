@@ -7,17 +7,17 @@ import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
-import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
+import { SignatureRender } from '@documenso/ui/primitives/signature-pad/signature-render';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { FieldType } from '@prisma/client';
 import { Loader } from 'lucide-react';
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRevalidator } from 'react-router';
 
 import { DocumentSigningDisclosure } from '~/components/general/document-signing/document-signing-disclosure';
@@ -52,10 +52,6 @@ export const DocumentSigningSignatureField = ({
 
   const { recipient } = useDocumentSigningRecipientContext();
 
-  const signatureRef = useRef<HTMLParagraphElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [fontSize, setFontSize] = useState(2);
-
   const {
     fullName,
     signature: providedSignature,
@@ -75,8 +71,6 @@ export const DocumentSigningSignatureField = ({
   const isSeal = field.type === FieldType.IMAGE_UPLOAD;
   const fieldContainerType: 'Signature' | 'Image Upload' = isSeal ? 'Image Upload' : 'Signature';
   const fieldLabel = isSeal ? _('Image Upload') : _('Signature');
-  const fieldMeta =
-    field.fieldMeta?.type === 'signature' || field.fieldMeta?.type === 'IMAGE_UPLOAD' ? field.fieldMeta : undefined;
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading;
 
@@ -199,38 +193,6 @@ export const DocumentSigningSignatureField = ({
     }
   };
 
-  useLayoutEffect(() => {
-    if (!signatureRef.current || !containerRef.current || !signature?.typedSignature) {
-      return;
-    }
-
-    const adjustTextSize = () => {
-      const container = containerRef.current;
-      const text = signatureRef.current;
-
-      if (!container || !text) {
-        return;
-      }
-
-      let size = 2;
-      text.style.fontSize = `${size}rem`;
-
-      while ((text.scrollWidth > container.clientWidth || text.scrollHeight > container.clientHeight) && size > 0.8) {
-        size -= 0.1;
-        text.style.fontSize = `${size}rem`;
-      }
-
-      setFontSize(size);
-    };
-
-    const resizeObserver = new ResizeObserver(adjustTextSize);
-    resizeObserver.observe(containerRef.current);
-
-    adjustTextSize();
-
-    return () => resizeObserver.disconnect();
-  }, [signature?.typedSignature]);
-
   return (
     <DocumentSigningFieldContainer
       field={field}
@@ -251,48 +213,12 @@ export const DocumentSigningSignatureField = ({
         </p>
       )}
 
-      {state === 'signed-image' && signature?.signatureImageAsBase64 && (
-        <div
-          className={cn('flex h-full w-full items-center', {
-            'justify-start': fieldMeta?.textAlign === 'left',
-            'justify-center': !fieldMeta?.textAlign || fieldMeta?.textAlign === 'center',
-            'justify-end': fieldMeta?.textAlign === 'right',
-          })}
-        >
-          <img
-            src={signature.signatureImageAsBase64}
-            alt={`Signature for ${recipient.name}`}
-            className="h-full max-w-full object-contain"
-          />
-        </div>
+      {(state === 'signed-image' || state === 'signed-text') && (
+        <SignatureRender
+          className="h-full w-full"
+          value={signature?.signatureImageAsBase64 || signature?.typedSignature || ''}
+        />
       )}
-
-      {state === 'signed-text' && (
-        <div
-          ref={containerRef}
-          className={cn('flex h-full w-full items-center', {
-            'justify-start': fieldMeta?.textAlign === 'left',
-            'justify-center': !fieldMeta?.textAlign || fieldMeta?.textAlign === 'center',
-            'justify-end': fieldMeta?.textAlign === 'right',
-          })}
-        >
-          <p
-            ref={signatureRef}
-            className={cn(
-              'w-full overflow-hidden break-all font-signature text-muted-foreground leading-tight duration-200',
-              {
-                'text-left': fieldMeta?.textAlign === 'left',
-                'text-center': !fieldMeta?.textAlign || fieldMeta?.textAlign === 'center',
-                'text-right': fieldMeta?.textAlign === 'right',
-              },
-            )}
-            style={{ fontSize: `${fontSize}rem` }}
-          >
-            {signature?.typedSignature}
-          </p>
-        </div>
-      )}
-
       <Dialog open={showSignatureModal} onOpenChange={setShowSignatureModal}>
         <DialogContent>
           <DialogTitle>

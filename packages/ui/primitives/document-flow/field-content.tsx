@@ -11,6 +11,7 @@ import { cn } from '../../lib/utils';
 import { Checkbox } from '../checkbox';
 import { Label } from '../label';
 import { RadioGroup, RadioGroupItem } from '../radio-group';
+import { SignatureRender } from '../signature-pad/signature-render';
 import { FRIENDLY_FIELD_TYPE } from './types';
 
 type FieldIconProps = {
@@ -135,12 +136,6 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
     );
   }
 
-  if (field.type === FieldType.SIGNATURE && field.signature?.signatureImageAsBase64 && field.inserted) {
-    return (
-      <img src={field.signature.signatureImageAsBase64} alt="Signature" className="h-full w-full object-contain" />
-    );
-  }
-
   const labelToDisplay = fieldMeta?.label || _(FRIENDLY_FIELD_TYPE[type]) || '';
   let textToDisplay: string | undefined;
 
@@ -165,6 +160,20 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
     if (isSignatureField && field.signature?.typedSignature) {
       textToDisplay = field.signature.typedSignature;
     }
+  }
+
+  if (
+    isSignatureField &&
+    field.inserted &&
+    field.signature &&
+    (field.signature.signatureImageAsBase64 || field.signature.typedSignature)
+  ) {
+    return (
+      <SignatureRender
+        className="h-full w-full"
+        value={field.signature.signatureImageAsBase64 || field.signature.typedSignature || ''}
+      />
+    );
   }
 
   const textAlign = fieldMeta && 'textAlign' in fieldMeta ? fieldMeta.textAlign : 'left';
