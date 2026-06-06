@@ -1,4 +1,4 @@
-export const trimTransparentCanvasMargins = (canvas: HTMLCanvasElement, padding = 10) => {
+export const trimTransparentCanvasMargins = (canvas: HTMLCanvasElement, padding = 0) => {
   const ctx = canvas.getContext('2d');
 
   if (!ctx) {
