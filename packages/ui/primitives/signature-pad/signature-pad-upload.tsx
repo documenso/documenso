@@ -57,7 +57,7 @@ const loadImageOntoCanvas = (
 
   const trimmedSourceCanvas = trimTransparentCanvasMargins(sourceCanvas);
 
-  const scale = Math.max(canvas.width / trimmedSourceCanvas.width, canvas.height / trimmedSourceCanvas.height);
+  const scale = Math.min(canvas.width / trimmedSourceCanvas.width, canvas.height / trimmedSourceCanvas.height);
 
   const x = (canvas.width - trimmedSourceCanvas.width * scale) / 2;
   const y = (canvas.height - trimmedSourceCanvas.height * scale) / 2;
@@ -135,7 +135,7 @@ export const SignaturePadUpload = ({ className, value, onChange, ...props }: Sig
 
         sourceCtx.drawImage(img, 0, 0);
         const trimmedCanvas = trimTransparentCanvasMargins(sourceCanvas);
-        const scale = Math.max(width / trimmedCanvas.width, height / trimmedCanvas.height);
+        const scale = Math.min(width / trimmedCanvas.width, height / trimmedCanvas.height);
         const scaledWidth = trimmedCanvas.width * scale;
         const scaledHeight = trimmedCanvas.height * scale;
         const x = (width - scaledWidth) / 2;

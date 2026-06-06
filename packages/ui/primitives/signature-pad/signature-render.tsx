@@ -38,6 +38,28 @@ export const SignatureRender = ({ className, value }: SignatureRenderProps) => {
     ctx.drawImage(sourceCanvas, x, y, scaledWidth, scaledHeight);
   };
 
+  const drawCanvasWithCover = (sourceCanvas: HTMLCanvasElement) => {
+    if (!$el.current) {
+      return;
+    }
+
+    const ctx = $el.current.getContext('2d');
+
+    if (!ctx) {
+      return;
+    }
+
+    const { width, height } = $el.current;
+    const scale = Math.max(width / sourceCanvas.width, height / sourceCanvas.height);
+    const scaledWidth = sourceCanvas.width * scale;
+    const scaledHeight = sourceCanvas.height * scale;
+    const x = (width - scaledWidth) / 2;
+    const y = (height - scaledHeight) / 2;
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(sourceCanvas, x, y, scaledWidth, scaledHeight);
+  };
+
   const renderTypedSignature = () => {
     if (!$el.current) {
       return;
@@ -86,7 +108,7 @@ export const SignatureRender = ({ className, value }: SignatureRenderProps) => {
     ctx.fillText(value, canvasWidth / 2, canvasHeight / 2);
 
     const trimmedCanvas = trimTransparentCanvasMargins($el.current);
-    drawCanvasWithContain(trimmedCanvas);
+    drawCanvasWithCover(trimmedCanvas);
   };
 
   const renderImageSignature = () => {
