@@ -2,7 +2,6 @@ import { isBase64Image, SIGNATURE_CANVAS_DPI } from '@documenso/lib/constants/si
 import { useEffect, useRef } from 'react';
 
 import { cn } from '../../lib/utils';
-import { trimTransparentCanvasMargins } from './signature-image-utils';
 
 export type SignatureRenderProps = {
   className?: string;
@@ -16,50 +15,6 @@ export const SignatureRender = ({ className, value }: SignatureRenderProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
   const $imageData = useRef<ImageData | null>(null);
 
-  const drawCanvasWithContain = (sourceCanvas: HTMLCanvasElement) => {
-    if (!$el.current) {
-      return;
-    }
-
-    const ctx = $el.current.getContext('2d');
-
-    if (!ctx) {
-      return;
-    }
-
-    const { width, height } = $el.current;
-    const scale = Math.min(width / sourceCanvas.width, height / sourceCanvas.height);
-    const scaledWidth = sourceCanvas.width * scale;
-    const scaledHeight = sourceCanvas.height * scale;
-    const x = (width - scaledWidth) / 2;
-    const y = (height - scaledHeight) / 2;
-
-    ctx.clearRect(0, 0, width, height);
-    ctx.drawImage(sourceCanvas, x, y, scaledWidth, scaledHeight);
-  };
-
-  const drawCanvasWithCover = (sourceCanvas: HTMLCanvasElement) => {
-    if (!$el.current) {
-      return;
-    }
-
-    const ctx = $el.current.getContext('2d');
-
-    if (!ctx) {
-      return;
-    }
-
-    const { width, height } = $el.current;
-    const scale = Math.max(width / sourceCanvas.width, height / sourceCanvas.height);
-    const scaledWidth = sourceCanvas.width * scale;
-    const scaledHeight = sourceCanvas.height * scale;
-    const x = (width - scaledWidth) / 2;
-    const y = (height - scaledHeight) / 2;
-
-    ctx.clearRect(0, 0, width, height);
-    ctx.drawImage(sourceCanvas, x, y, scaledWidth, scaledHeight);
-  };
-
   const renderTypedSignature = () => {
     if (!$el.current) {
       return;
@@ -70,6 +25,8 @@ export const SignatureRender = ({ className, value }: SignatureRenderProps) => {
     if (!ctx) {
       return;
     }
+
+    ctx.clearRect(0, 0, $el.current.width, $el.current.height);
 
     const canvasWidth = $el.current.width;
     const canvasHeight = $el.current.height;
@@ -106,9 +63,6 @@ export const SignatureRender = ({ className, value }: SignatureRenderProps) => {
     // Set final font and render text
     ctx.font = `${fontSize}px ${fontFamily}`;
     ctx.fillText(value, canvasWidth / 2, canvasHeight / 2);
-
-    const trimmedCanvas = trimTransparentCanvasMargins($el.current);
-    drawCanvasWithCover(trimmedCanvas);
   };
 
   const renderImageSignature = () => {
@@ -116,33 +70,33 @@ export const SignatureRender = ({ className, value }: SignatureRenderProps) => {
       return;
     }
 
+    const ctx = $el.current.getContext('2d');
+
+    if (!ctx) {
+      return;
+    }
+
+    ctx.clearRect(0, 0, $el.current.width, $el.current.height);
+
     const { width, height } = $el.current;
 
     const img = new Image();
 
     img.onload = () => {
-      const offscreenCanvas = document.createElement('canvas');
-      offscreenCanvas.width = width;
-      offscreenCanvas.height = height;
-
-      const offscreenCtx = offscreenCanvas.getContext('2d');
-
-      if (!offscreenCtx) {
-        return;
-      }
-
+      // Calculate the scaled dimensions while maintaining aspect ratio
       const scale = Math.min(width / img.width, height / img.height);
       const scaledWidth = img.width * scale;
       const scaledHeight = img.height * scale;
+
+      // Calculate center position
       const x = (width - scaledWidth) / 2;
       const y = (height - scaledHeight) / 2;
 
-      offscreenCtx.clearRect(0, 0, width, height);
-      offscreenCtx.drawImage(img, x, y, scaledWidth, scaledHeight);
+      ctx?.drawImage(img, x, y, scaledWidth, scaledHeight);
 
-      const trimmedCanvas = trimTransparentCanvasMargins(offscreenCanvas);
-      drawCanvasWithContain(trimmedCanvas);
-      $imageData.current = $el.current?.getContext('2d')?.getImageData(0, 0, width, height) || null;
+      const defaultImageData = ctx?.getImageData(0, 0, width, height) || null;
+
+      $imageData.current = defaultImageData;
     };
 
     img.src = value;

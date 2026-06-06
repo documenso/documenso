@@ -2,7 +2,6 @@ import { useLingui } from '@lingui/react/macro';
 import { useEffect, useRef } from 'react';
 
 import { cn } from '../../lib/utils';
-import { SignatureRender } from './signature-render';
 
 export type SignaturePadTypeProps = {
   className?: string;
@@ -15,9 +14,7 @@ export const SignaturePadType = ({ className, value, defaultValue, onChange }: S
   const { t } = useLingui();
 
   const $isDirty = useRef(false);
-  const $input = useRef<HTMLInputElement>(null);
-
-  const displayValue = value || defaultValue || '';
+  // Colors don't actually work for text.
 
   useEffect(() => {
     if (!$isDirty.current && !value && defaultValue) {
@@ -27,15 +24,12 @@ export const SignaturePadType = ({ className, value, defaultValue, onChange }: S
   }, [defaultValue, value, onChange]);
 
   return (
-    <div className={cn('relative h-full w-full overflow-hidden', className)}>
-      <SignatureRender className="pointer-events-none absolute inset-0" value={displayValue} />
-
+    <div className={cn('flex h-full w-full items-center justify-center', className)}>
       <input
-        ref={$input}
         data-testid="signature-pad-type-input"
         placeholder={t`Type your signature`}
-        className="absolute inset-0 w-full min-w-0 bg-transparent px-4 text-center font-signature text-transparent leading-none caret-transparent placeholder:text-foreground/40 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
-        aria-label={t`Type your signature`}
+        className="w-full bg-transparent px-4 text-center font-signature text-7xl text-foreground placeholder:text-4xl focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+        // style={{ color: selectedColor }}
         value={value}
         onChange={(event) => {
           onChange(event.target.value.trimStart());
