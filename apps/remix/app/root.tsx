@@ -28,6 +28,7 @@ import { langCookie } from './storage/lang-cookie.server';
 import { themeSessionResolver } from './storage/theme-session.server';
 import { appMetaTags } from './utils/meta';
 import { nonce } from './utils/nonce';
+import { getRecipientDocumentLanguage } from './utils/recipient-document-language.server';
 
 export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: stylesheet }];
 
@@ -49,11 +50,22 @@ export async function loader({ context, request }: Route.LoaderArgs) {
 
   const cookieHeader = request.headers.get('cookie') ?? '';
 
-  let lang: SupportedLanguageCodes = await langCookie.parse(cookieHeader);
+  // Resolve the persisted/browser locale first. This is what we keep storing in
+  // the `lang` cookie so a recipient who later visits the rest of the app is not
+  // permanently switched to a document's language.
+  let cookieLang: SupportedLanguageCodes = await langCookie.parse(cookieHeader);
 
-  if (!APP_I18N_OPTIONS.supportedLangs.includes(lang)) {
-    lang = extractLocaleData({ headers: request.headers }).lang;
+  if (!APP_I18N_OPTIONS.supportedLangs.includes(cookieLang)) {
+    cookieLang = extractLocaleData({ headers: request.headers }).lang;
   }
+
+  // For the public signing routes, the rendered UI language (and therefore the
+  // `<html lang>` attribute that drives client-side hydration in
+  // `entry.client.tsx`) follows the document's configured language. Returns
+  // `null` everywhere else, so non-signing routes keep the cookie/browser lang.
+  const documentLang = await getRecipientDocumentLanguage(request);
+
+  const lang: SupportedLanguageCodes = documentLang ?? cookieLang;
 
   const disableAnimations = cookieHeader.includes('__disable_animations=true');
 
@@ -83,7 +95,10 @@ export async function loader({ context, request }: Route.LoaderArgs) {
     },
     {
       headers: {
-        'Set-Cookie': await langCookie.serialize(lang),
+        // Persist the cookie/browser lang only — never the per-document signing
+        // language — so visiting a `pt-BR` signing link doesn't permanently
+        // change the recipient's locale for the rest of the app.
+        'Set-Cookie': await langCookie.serialize(cookieLang),
       },
     },
   );

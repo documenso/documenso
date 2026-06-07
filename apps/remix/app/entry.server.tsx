@@ -11,6 +11,7 @@ import type { AppLoadContext, EntryContext } from 'react-router';
 import { ServerRouter } from 'react-router';
 
 import { langCookie } from './storage/lang-cookie.server';
+import { getRecipientDocumentLanguage } from './utils/recipient-document-language.server';
 
 export const streamTimeout = 5_000;
 
@@ -21,7 +22,13 @@ export default async function handleRequest(
   routerContext: EntryContext,
   loadContext: AppLoadContext,
 ) {
-  let language = await langCookie.parse(request.headers.get('cookie') ?? '');
+  // Public recipient signing routes (`/sign/...`, `/d/...`) should render in the
+  // document's configured language (`DocumentMeta.language`) rather than the
+  // recipient's browser `accept-language`. Returns `null` for every other route,
+  // so the default cookie/accept-language resolution below is preserved.
+  const documentLanguage = await getRecipientDocumentLanguage(request);
+
+  let language = documentLanguage ?? (await langCookie.parse(request.headers.get('cookie') ?? ''));
 
   if (!APP_I18N_OPTIONS.supportedLangs.includes(language)) {
     language = extractLocaleData({ headers: request.headers }).lang;
