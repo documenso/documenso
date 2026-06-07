@@ -1,10 +1,10 @@
+import { mailer } from '@documenso/email/mailer';
 import OrganisationLimitExceededEmailTemplate from '@documenso/email/templates/organisation-limit-exceeded';
 import { prisma } from '@documenso/prisma';
 import { msg } from '@lingui/core/macro';
 import { createElement } from 'react';
-
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL, SUPPORT_EMAIL } from '../../../constants/app';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '../../../constants/organisations';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { INTERNAL_CLAIM_ID } from '../../../types/subscription';
@@ -94,4 +94,20 @@ export const run = async ({
       });
     });
   }
+
+  const i18n = await getI18nInstance('en');
+
+  // Email our support team.
+  await mailer.sendMail({
+    to: SUPPORT_EMAIL,
+    from: senderEmail,
+    subject: i18n._(msg`An organisation has exceeded their fair use limits`),
+    text: `
+      Organisation: ${organisation.name}
+      Organisation ID: ${organisation.id}
+      Counter: ${payload.counter}
+      Kind: ${payload.kind}
+      Period: ${payload.period}
+    `,
+  });
 };
