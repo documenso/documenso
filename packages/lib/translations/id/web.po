@@ -34,7 +34,7 @@ msgid "<0>Admins only</0> - Only admins can access and view the document"
 msgstr "<0>Admin saja</0> - Hanya admin yang bisa mengakses dan melihat dokumen"
 
 msgid "<0>Drawn</0> - A signature that is drawn using a mouse or stylus."
-msgstr "<0>Digambar</0> - Tanda tangan yang digambar menggunakan mouse atau stylus."
+msgstr "<0>Digambar</0> - Tkamu tangan yang digambar menggunakan mouse atau stylus."
 
 msgid "<0>Everyone</0> - Everyone can access and view the document"
 msgstr "<0>Semua orang</0> - Semua orang bisa mengakses dan melihat dokumen"
@@ -70,13 +70,13 @@ msgid "<0>Require passkey</0> - The recipient must have an account and passkey c
 msgstr "<0>Wajib passkey</0> - Penerima harus punya akun dan passkey yang dikonfigurasi melalui pengaturan mereka"
 
 msgid "<0>Require password</0> - The recipient must have an account and password configured via their settings, the password will be verified during signing"
-msgstr "<0>Wajib password</0> - Penerima harus punya akun dan password yang dikonfigurasi melalui pengaturan mereka, password akan diverifikasi saat menandatangani"
+msgstr "<0>Wajib password</0> - Penerima harus punya akun dan password yang dikonfigurasi melalui pengaturan mereka, password akan diverifikasi saat menkamutangani"
 
 msgid "<0>Typed</0> - A signature that is typed using a keyboard."
-msgstr "<0>Diketik</0> - Tanda tangan yang diketik menggunakan keyboard."
+msgstr "<0>Diketik</0> - Tkamu tangan yang diketik menggunakan keyboard."
 
 msgid "<0>Uploaded</0> - A signature that is uploaded from a file."
-msgstr "<0>Diunggah</0> - Tanda tangan yang diunggah dari file."
+msgstr "<0>Diunggah</0> - Tkamu tangan yang diunggah dari file."
 
 msgid "Add a document"
 msgstr "Tambah dokumen"
@@ -100,7 +100,7 @@ msgid "Advanced Options"
 msgstr "Opsi Lanjutan"
 
 msgid "Assistant role is only available when the document is in sequential signing mode."
-msgstr "Peran asisten hanya tersedia saat dokumen dalam mode penandatanganan berurutan."
+msgstr "Peran asisten hanya tersedia saat dokumen dalam mode penkamutanganan berurutan."
 
 msgid "Black"
 msgstr "Hitam"
@@ -118,7 +118,7 @@ msgid "Clear filters"
 msgstr "Hapus filter"
 
 msgid "Clear Signature"
-msgstr "Hapus Tanda Tangan"
+msgstr "Hapus Tkamu Tangan"
 
 msgid "Copy Link"
 msgstr "Salin Tautan"
@@ -169,19 +169,19 @@ msgid "Email recipients when they're removed from a pending document"
 msgstr "Email penerima saat mereka dihapus dari dokumen tertunda"
 
 msgid "Email recipients with a signing request"
-msgstr "Email penerima dengan permintaan penandatanganan"
+msgstr "Email penerima dengan permintaan penkamutanganan"
 
 msgid "Email the owner when a document is created from a direct template"
 msgstr "Email pemilik saat dokumen dibuat dari templat langsung"
 
 msgid "Email the owner when a recipient signs"
-msgstr "Email pemilik saat penerima menandatangani"
+msgstr "Email pemilik saat penerima menkamutangani"
 
 msgid "Email the owner when the document is completed"
 msgstr "Email pemilik saat dokumen selesai"
 
 msgid "Email the signer if the document is still pending"
-msgstr "Email penandatangan jika dokumen masih tertunda"
+msgstr "Email penkamutangan jika dokumen masih tertunda"
 
 msgid "Empty field"
 msgstr "Kolom kosong"
@@ -229,7 +229,7 @@ msgid "Needs to approve"
 msgstr "Perlu menyetujui"
 
 msgid "Needs to sign"
-msgstr "Perlu menandatangani"
+msgstr "Perlu menkamutangani"
 
 msgid "Needs to view"
 msgstr "Perlu melihat"
@@ -247,7 +247,7 @@ msgid "No results found"
 msgstr "Tidak ada hasil ditemukan"
 
 msgid "No signature field found"
-msgstr "Tidak ada kolom tanda tangan ditemukan"
+msgstr "Tidak ada kolom tkamu tangan ditemukan"
 
 msgid "No suggestions found"
 msgstr "Tidak ada saran ditemukan"
@@ -271,10 +271,10 @@ msgid "Recipient removed email"
 msgstr "Email penerima dihapus"
 
 msgid "Recipient signed email"
-msgstr "Email penerima menandatangani"
+msgstr "Email penerima menkamutangani"
 
 msgid "Recipient signing request email"
-msgstr "Email permintaan penandatanganan penerima"
+msgstr "Email permintaan penkamutanganan penerima"
 
 msgid "Red"
 msgstr "Merah"
@@ -283,7 +283,7 @@ msgid "Required field"
 msgstr "Kolom wajib"
 
 msgid "Rest assured, your document is strictly confidential and will never be shared. Only your signing experience will be highlighted. Share your personalized signing card to showcase your signature!"
-msgstr "Tenang saja, dokumen kamu bersifat rahasia dan tidak akan pernah dibagikan. Hanya pengalaman menandatanganimu yang akan ditampilkan. Bagikan kartu tanda tangan pribadimu untuk memamerkan tanda tangan kamu!"
+msgstr "Tenang saja, dokumen kamu bersifat rahasia dan tidak akan pernah dibagikan. Hanya pengalaman menkamutanganimu yang akan ditampilkan. Bagikan kartu tkamu tangan pribadimu untuk memamerkan tkamu tangan kamu!"
 
 msgid "Rows per page"
 msgstr "Baris per halaman"
@@ -310,16 +310,16 @@ msgid "Send recipient expired email to the owner"
 msgstr "Kirim email penerima kedaluwarsa ke pemilik"
 
 msgid "Share your signing experience!"
-msgstr "Bagikan pengalaman menandatanganimu!"
+msgstr "Bagikan pengalaman menkamutanganimu!"
 
 msgid "Signature is too small"
-msgstr "Tanda tangan terlalu kecil"
+msgstr "Tkamu tangan terlalu kecil"
 
 msgid "Signature types"
-msgstr "Jenis tanda tangan"
+msgstr "Jenis tkamu tangan"
 
 msgid "Some signers have not been assigned a signature field. Please assign at least 1 signature field to each signer before proceeding."
-msgstr "Beberapa penandatangan belum diberi kolom tanda tangan. Harap tetapkan setidaknya 1 kolom tanda tangan untuk setiap penandatangan sebelum melanjutkan."
+msgstr "Beberapa penkamutangan belum diberi kolom tkamu tangan. Harap tetapkan setidaknya 1 kolom tkamu tangan untuk setiap penkamutangan sebelum melanjutkan."
 
 msgid "Something went wrong."
 msgstr "Terjadi kesalahan."
@@ -334,10 +334,10 @@ msgid "Template title"
 msgstr "Judul templat"
 
 msgid "The authentication methods required for recipients to sign fields"
-msgstr "Metode autentikasi yang diperlukan penerima untuk menandatangani kolom"
+msgstr "Metode autentikasi yang diperlukan penerima untuk menkamutangani kolom"
 
 msgid "The authentication methods required for recipients to sign the signature field."
-msgstr "Metode autentikasi yang diperlukan penerima untuk menandatangani kolom tanda tangan."
+msgstr "Metode autentikasi yang diperlukan penerima untuk menkamutangani kolom tkamu tangan."
 
 msgid "The authentication methods required for recipients to view the document."
 msgstr "Metode autentikasi yang diperlukan penerima untuk melihat dokumen."
@@ -346,7 +346,7 @@ msgid "The document's name"
 msgstr "Nama dokumen"
 
 msgid "The recipient can prepare the document for later signers by pre-filling suggest values."
-msgstr "Penerima bisa mempersiapkan dokumen untuk penandatangan berikutnya dengan mengisi nilai saran sebelumnya."
+msgstr "Penerima bisa mempersiapkan dokumen untuk penkamutangan berikutnya dengan mengisi nilai saran sebelumnya."
 
 msgid "The recipient is not required to take any action and receives a copy of the document after it is completed."
 msgstr "Penerima tidak diwajibkan melakukan tindakan apa pun dan menerima salinan dokumen setelah selesai."
@@ -355,7 +355,7 @@ msgid "The recipient is required to approve the document for it to be completed.
 msgstr "Penerima diwajibkan menyetujui dokumen agar bisa diselesaikan."
 
 msgid "The recipient is required to sign the document for it to be completed."
-msgstr "Penerima diwajibkan menandatangani dokumen agar bisa diselesaikan."
+msgstr "Penerima diwajibkan menkamutangani dokumen agar bisa diselesaikan."
 
 msgid "The recipient is required to view the document for it to be completed."
 msgstr "Penerima diwajibkan melihat dokumen agar bisa diselesaikan."
@@ -367,13 +367,13 @@ msgid "The sharing link has been copied to your clipboard."
 msgstr "Tautan berbagi telah disalin ke clipboard kamu."
 
 msgid "The signer's email"
-msgstr "Email penandatangan"
+msgstr "Email penkamutangan"
 
 msgid "The signer's name"
-msgstr "Nama penandatangan"
+msgstr "Nama penkamutangan"
 
 msgid "The types of signatures that recipients are allowed to use when signing the document."
-msgstr "Jenis tanda tangan yang boleh digunakan penerima saat menandatangani dokumen."
+msgstr "Jenis tkamu tangan yang boleh digunakan penerima saat menkamutangani dokumen."
 
 msgid "The visibility of the document to the recipient."
 msgstr "Visibilitas dokumen ke penerima."
@@ -391,16 +391,16 @@ msgid "This email is sent to the document owner when a recipient creates a docum
 msgstr "Email ini dikirim ke pemilik dokumen saat penerima membuat dokumen melalui tautan templat langsung."
 
 msgid "This email is sent to the document owner when a recipient has signed the document."
-msgstr "Email ini dikirim ke pemilik dokumen saat penerima telah menandatangani dokumen."
+msgstr "Email ini dikirim ke pemilik dokumen saat penerima telah menkamutangani dokumen."
 
 msgid "This email is sent to the recipient if they are removed from a pending document."
 msgstr "Email ini dikirim ke penerima jika mereka dihapus dari dokumen tertunda."
 
 msgid "This email is sent to the recipient requesting them to sign the document."
-msgstr "Email ini dikirim ke penerima meminta mereka menandatangani dokumen."
+msgstr "Email ini dikirim ke penerima meminta mereka menkamutangani dokumen."
 
 msgid "This email will be sent to the recipient who has just signed the document, if there are still other recipients who have not signed yet."
-msgstr "Email ini akan dikirim ke penerima yang baru saja menandatangani dokumen, jika masih ada penerima lain yang belum menandatangani."
+msgstr "Email ini akan dikirim ke penerima yang baru saja menkamutangani dokumen, jika masih ada penerima lain yang belum menkamutangani."
 
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "Kolom ini tidak bisa dimodifikasi atau dihapus. Saat kamu membagikan tautan langsung templat ini atau menambahkannya ke profil publik kamu, siapa pun yang mengaksesnya bisa memasukkan nama dan email mereka, serta mengisi kolom yang ditugaskan kepada mereka."
@@ -415,13 +415,13 @@ msgid "This will be sent to the document owner once the document has been fully 
 msgstr "Ini akan dikirim ke pemilik dokumen setelah dokumen selesai sepenuhnya."
 
 msgid "This will be sent to the document owner when a recipient's signing window has expired."
-msgstr "Ini akan dikirim ke pemilik dokumen saat jendela penandatanganan penerima telah kedaluwarsa."
+msgstr "Ini akan dikirim ke pemilik dokumen saat jendela penkamutanganan penerima telah kedaluwarsa."
 
 msgid "Title cannot be empty"
 msgstr "Judul tidak boleh kosong"
 
 msgid "Type your signature"
-msgstr "Ketik tanda tangan kamu"
+msgstr "Ketik tkamu tangan kamu"
 
 msgid "Undo"
 msgstr "Urungkan"
@@ -433,7 +433,7 @@ msgid "Upgrade"
 msgstr "Naikkan versi"
 
 msgid "Upload Signature"
-msgstr "Unggah Tanda Tangan"
+msgstr "Unggah Tkamu Tangan"
 
 msgid "Upload Template Document"
 msgstr "Unggah Dokumen Templat"
@@ -496,13 +496,13 @@ msgid "{user} sent the document"
 msgstr "{user} mengirim dokumen"
 
 msgid "{user} signed a field"
-msgstr "{user} menandatangani kolom"
+msgstr "{user} menkamutangani kolom"
 
 msgid "{user} signed the document"
-msgstr "{user} menandatangani dokumen"
+msgstr "{user} menkamutangani dokumen"
 
 msgid "{user} unsigned a field"
-msgstr "{user} membatalkan tanda tangan kolom"
+msgstr "{user} membatalkan tkamu tangan kolom"
 
 msgid "{user} updated a field"
 msgstr "{user} memperbarui kolom"
@@ -523,7 +523,7 @@ msgid "{user} updated the document external ID"
 msgstr "{user} memperbarui external ID dokumen"
 
 msgid "{user} updated the document signing auth requirements"
-msgstr "{user} memperbarui persyaratan auth penandatanganan dokumen"
+msgstr "{user} memperbarui persyaratan auth penkamutanganan dokumen"
 
 msgid "{user} updated the document title"
 msgstr "{user} memperbarui judul dokumen"
@@ -538,7 +538,7 @@ msgid "{user} viewed the document"
 msgstr "{user} melihat dokumen"
 
 msgid "A document was created by your direct template that requires you to {recipientActionVerb} it."
-msgstr "Sebuah dokumen dibuat oleh templat langsung Anda yang mengharuskan Anda untuk {recipientActionVerb}."
+msgstr "Sebuah dokumen dibuat oleh templat langsung kamu yang mengharuskan kamu untuk {recipientActionVerb}."
 
 msgid "A field was added"
 msgstr "Kolom ditambahkan"
@@ -550,10 +550,10 @@ msgid "A field was updated"
 msgstr "Kolom diperbarui"
 
 msgid "A member has left your organisation"
-msgstr "Seorang anggota telah meninggalkan organisasi Anda"
+msgstr "Seorang anggota telah meninggalkan organisasi kamu"
 
 msgid "A new member has joined your organisation"
-msgstr "Seorang anggota baru telah bergabung dengan organisasi Anda"
+msgstr "Seorang anggota baru telah bergabung dengan organisasi kamu"
 
 msgid "A recipient was added"
 msgstr "Penerima ditambahkan"
@@ -565,7 +565,7 @@ msgid "A recipient was updated"
 msgstr "Penerima diperbarui"
 
 msgid "After submission, a document will be automatically generated and added to your documents page. You will also receive a notification via email."
-msgstr "Setelah dikirim, dokumen akan dibuat secara otomatis dan ditambahkan ke halaman dokumen Anda. Anda juga akan menerima notifikasi melalui email."
+msgstr "Setelah dikirim, dokumen akan dibuat secara otomatis dan ditambahkan ke halaman dokumen kamu. kamu juga akan menerima notifikasi melalui email."
 
 msgid "Approve"
 msgstr "Setujui"
@@ -649,7 +649,7 @@ msgid "Document sent"
 msgstr "Dokumen dikirim"
 
 msgid "Document signing auth updated"
-msgstr "Auth penandatanganan dokumen diperbarui"
+msgstr "Auth penkamutanganan dokumen diperbarui"
 
 msgid "Document title updated"
 msgstr "Judul dokumen diperbarui"
@@ -667,7 +667,7 @@ msgid "Draw"
 msgstr "Gambar"
 
 msgid "Dutch"
-msgstr "Bahasa Belanda"
+msgstr "Bahasa Belkamu"
 
 msgid "Email resent"
 msgstr "Email dikirim ulang"
@@ -697,16 +697,16 @@ msgid "Field prefilled by assistant"
 msgstr "Kolom diisi sebelumnya oleh asisten"
 
 msgid "Field signed"
-msgstr "Kolom ditandatangani"
+msgstr "Kolom ditkamutangani"
 
 msgid "Field unsigned"
-msgstr "Tanda tangan kolom dibatalkan"
+msgstr "Tkamu tangan kolom dibatalkan"
 
 msgid "Forgot Password?"
 msgstr "Lupa Password?"
 
 msgid "Free Signature"
-msgstr "Tanda Tangan Bebas"
+msgstr "Tkamu Tangan Bebas"
 
 msgid "French"
 msgstr "Bahasa Prancis"
@@ -715,7 +715,7 @@ msgid "German"
 msgstr "Bahasa Jerman"
 
 msgid "I am a signer of this document"
-msgstr "Saya adalah penandatangan dokumen ini"
+msgstr "Saya adalah penkamutangan dokumen ini"
 
 msgid "I am a viewer of this document"
 msgstr "Saya adalah viewer dokumen ini"
@@ -742,10 +742,10 @@ msgid "None (Overrides global settings)"
 msgstr "Tidak Ada (Mengesampingkan pengaturan global)"
 
 msgid "Once enabled, you can select any active recipient to be a direct link signing recipient, or create a new one. This recipient type cannot be edited or deleted."
-msgstr "Setelah diaktifkan, Anda dapat memilih penerima aktif mana pun untuk menjadi penerima penandatanganan tautan langsung, atau buat yang baru. Tipe penerima ini tidak dapat diedit atau dihapus."
+msgstr "Setelah diaktifkan, kamu dapat memilih penerima aktif mana pun untuk menjadi penerima penkamutanganan tautan langsung, atau buat yang baru. Tipe penerima ini tidak dapat diedit atau dihapus."
 
 msgid "Once your template is set up, share the link anywhere you want. The person who opens the link will be able to enter their information in the direct link recipient field and complete any other fields assigned to them."
-msgstr "Setelah templat Anda siap, bagikan tautannya di mana pun Anda mau. Orang yang membuka tautan akan dapat memasukkan informasi mereka di kolom penerima tautan langsung dan menyelesaikan kolom lain yang ditugaskan kepada mereka."
+msgstr "Setelah templat kamu siap, bagikan tautannya di mana pun kamu mau. Orang yang membuka tautan akan dapat memasukkan informasi mereka di kolom penerima tautan langsung dan menyelesaikan kolom lain yang ditugaskan kepada mereka."
 
 msgid "Organisation Admin"
 msgstr "Admin Organisasi"
@@ -757,13 +757,13 @@ msgid "Please {recipientActionVerb} this document"
 msgstr "Silakan {recipientActionVerb} dokumen ini"
 
 msgid "Please {recipientActionVerb} this document created by your direct template"
-msgstr "Silakan {recipientActionVerb} dokumen ini yang dibuat oleh templat langsung Anda"
+msgstr "Silakan {recipientActionVerb} dokumen ini yang dibuat oleh templat langsung kamu"
 
 msgid "Please {recipientActionVerb} your document"
-msgstr "Silakan {recipientActionVerb} dokumen Anda"
+msgstr "Silakan {recipientActionVerb} dokumen kamu"
 
 msgid "Please confirm your email"
-msgstr "Silakan konfirmasi email Anda"
+msgstr "Silakan konfirmasi email kamu"
 
 msgid "Polish"
 msgstr "Bahasa Polandia"
@@ -790,10 +790,10 @@ msgid "Recipient requested a 2FA token for the document"
 msgstr "Penerima meminta token 2FA untuk dokumen"
 
 msgid "Recipient signed the document"
-msgstr "Penerima menandatangani dokumen"
+msgstr "Penerima menkamutangani dokumen"
 
 msgid "Recipient signing window expired"
-msgstr "Masa penandatanganan penerima berakhir"
+msgstr "Masa penkamutanganan penerima berakhir"
 
 msgid "Recipient validated a 2FA token for the document"
 msgstr "Penerima memvalidasi token 2FA untuk dokumen"
@@ -805,7 +805,7 @@ msgid "Reminder: Please {recipientActionVerb} this document"
 msgstr "Pengingat: Silakan {recipientActionVerb} dokumen ini"
 
 msgid "Reminder: Please {recipientActionVerb} your document"
-msgstr "Pengingat: Silakan {recipientActionVerb} dokumen Anda"
+msgstr "Pengingat: Silakan {recipientActionVerb} dokumen kamu"
 
 msgid "Require 2FA"
 msgstr "Wajib 2FA"
@@ -829,22 +829,22 @@ msgid "Share the Link"
 msgstr "Bagikan Tautan"
 
 msgid "Sign"
-msgstr "Tanda Tangan"
+msgstr "Tkamu Tangan"
 
 msgid "Signed"
-msgstr "Ditandatangani"
+msgstr "Ditkamutangani"
 
 msgid "Signer"
-msgstr "Penandatangan"
+msgstr "Penkamutangan"
 
 msgid "Signers"
-msgstr "Para Penandatangan"
+msgstr "Para Penkamutangan"
 
 msgid "Signing"
-msgstr "Menandatangani"
+msgstr "Menkamutangani"
 
 msgid "Signing Complete!"
-msgstr "Penandatanganan Selesai!"
+msgstr "Penkamutanganan Selesai!"
 
 msgid "Something went wrong while rendering the document, please try again or contact our support."
 msgstr "Terjadi kesalahan saat merender dokumen, silakan coba lagi atau hubungi dukungan kami."
@@ -871,7 +871,7 @@ msgid "Type"
 msgstr "Ketik"
 
 msgid "Update the role and add fields as required for the direct recipient. The individual who uses the direct link will sign the document as the direct recipient."
-msgstr "Perbarui peran dan tambahkan kolom sesuai kebutuhan untuk penerima langsung. Individu yang menggunakan tautan langsung akan menandatangani dokumen sebagai penerima langsung."
+msgstr "Perbarui peran dan tambahkan kolom sesuai kebutuhan untuk penerima langsung. Individu yang menggunakan tautan langsung akan menkamutangani dokumen sebagai penerima langsung."
 
 msgid "Upload"
 msgstr "Unggah"
@@ -892,115 +892,115 @@ msgid "Viewing"
 msgstr "Melihat"
 
 msgid "Waiting for others to complete signing."
-msgstr "Menunggu orang lain menyelesaikan penandatanganan."
+msgstr "Menunggu orang lain menyelesaikan penkamutanganan."
 
 msgid "We encountered an error while attempting to save your changes. Your changes cannot be saved at this time."
-msgstr "Kami mengalami kesalahan saat mencoba menyimpan perubahan Anda. Perubahan Anda tidak dapat disimpan saat ini."
+msgstr "Kami mengalami kesalahan saat mencoba menyimpan perubahan kamu. Perubahan kamu tidak dapat disimpan saat ini."
 
 msgid "Welcome to Documenso"
 msgstr "Selamat datang di Documenso"
 
 msgid "You added a field"
-msgstr "Anda menambahkan kolom"
+msgstr "kamu menambahkan kolom"
 
 msgid "You added a recipient"
-msgstr "Anda menambahkan penerima"
+msgstr "kamu menambahkan penerima"
 
 msgid "You approved the document"
-msgstr "Anda menyetujui dokumen"
+msgstr "kamu menyetujui dokumen"
 
 msgid "You CC'd the document"
-msgstr "Anda memberi CC pada dokumen"
+msgstr "kamu memberi CC pada dokumen"
 
 msgid "You completed your task"
-msgstr "Anda menyelesaikan tugas Anda"
+msgstr "kamu menyelesaikan tugas kamu"
 
 msgid "You created the document"
-msgstr "Anda membuat dokumen"
+msgstr "kamu membuat dokumen"
 
 msgid "You deleted the document"
-msgstr "Anda menghapus dokumen"
+msgstr "kamu menghapus dokumen"
 
 msgid "You failed to validate a 2FA token for the document"
-msgstr "Anda gagal memvalidasi token 2FA untuk dokumen"
+msgstr "kamu gagal memvalidasi token 2FA untuk dokumen"
 
 msgid "You have been removed from a document"
-msgstr "Anda telah dihapus dari dokumen"
+msgstr "kamu telah dihapus dari dokumen"
 
 msgid "You moved the document to team"
-msgstr "Anda memindahkan dokumen ke tim"
+msgstr "kamu memindahkan dokumen ke tim"
 
 msgid "You opened the document"
-msgstr "Anda membuka dokumen"
+msgstr "kamu membuka dokumen"
 
 msgid "You prefilled a field"
-msgstr "Anda mengisi kolom sebelumnya"
+msgstr "kamu mengisi kolom sebelumnya"
 
 msgid "You rejected the document"
-msgstr "Anda menolak dokumen"
+msgstr "kamu menolak dokumen"
 
 msgid "You removed a field"
-msgstr "Anda menghapus kolom"
+msgstr "kamu menghapus kolom"
 
 msgid "You removed a recipient"
-msgstr "Anda menghapus penerima"
+msgstr "kamu menghapus penerima"
 
 msgid "You requested a 2FA token for the document"
-msgstr "Anda meminta token 2FA untuk dokumen"
+msgstr "kamu meminta token 2FA untuk dokumen"
 
 msgid "You sent the document"
-msgstr "Anda mengirim dokumen"
+msgstr "kamu mengirim dokumen"
 
 msgid "You signed a field"
-msgstr "Anda menandatangani kolom"
+msgstr "kamu menkamutangani kolom"
 
 msgid "You signed the document"
-msgstr "Anda menandatangani dokumen"
+msgstr "kamu menkamutangani dokumen"
 
 msgid "You unsigned a field"
-msgstr "Anda membatalkan tanda tangan kolom"
+msgstr "kamu membatalkan tkamu tangan kolom"
 
 msgid "You updated a field"
-msgstr "Anda memperbarui kolom"
+msgstr "kamu memperbarui kolom"
 
 msgid "You updated a recipient"
-msgstr "Anda memperbarui penerima"
+msgstr "kamu memperbarui penerima"
 
 msgid "You updated an envelope item"
-msgstr "Anda memperbarui item amplop"
+msgstr "kamu memperbarui item amplop"
 
 msgid "You updated the document"
-msgstr "Anda memperbarui dokumen"
+msgstr "kamu memperbarui dokumen"
 
 msgid "You updated the document access auth requirements"
-msgstr "Anda memperbarui persyaratan auth akses dokumen"
+msgstr "kamu memperbarui persyaratan auth akses dokumen"
 
 msgid "You updated the document external ID"
-msgstr "Anda memperbarui external ID dokumen"
+msgstr "kamu memperbarui external ID dokumen"
 
 msgid "You updated the document signing auth requirements"
-msgstr "Anda memperbarui persyaratan auth penandatanganan dokumen"
+msgstr "kamu memperbarui persyaratan auth penkamutanganan dokumen"
 
 msgid "You updated the document title"
-msgstr "Anda memperbarui judul dokumen"
+msgstr "kamu memperbarui judul dokumen"
 
 msgid "You updated the document visibility"
-msgstr "Anda memperbarui visibilitas dokumen"
+msgstr "kamu memperbarui visibilitas dokumen"
 
 msgid "You validated a 2FA token for the document"
-msgstr "Anda memvalidasi token 2FA untuk dokumen"
+msgstr "kamu memvalidasi token 2FA untuk dokumen"
 
 msgid "You viewed the document"
-msgstr "Anda melihat dokumen"
+msgstr "kamu melihat dokumen"
 
 msgid "Your two-factor authentication code"
-msgstr "Kode autentikasi dua faktor Anda"
+msgstr "Kode autentikasi dua faktor kamu"
 
 msgid "“{documentName}” has been signed"
-msgstr "“{documentName}” telah ditandatangani"
+msgstr "“{documentName}” telah ditkamutangani"
 
 msgid "“{documentName}” was signed by all signers"
-msgstr "“{documentName}” telah ditandatangani oleh semua penandatangan"
+msgstr "“{documentName}” telah ditkamutangani oleh semua penkamutangan"
 
 msgid "{expiresInMinutes, plural, one {This code will expire in # minute.} other {This code will expire in # minutes.}}"
 msgstr "{expiresInMinutes, plural, one {Kode ini akan kedaluwarsa dalam # menit.} other {Kode ini akan kedaluwarsa dalam # menit.}}"
@@ -1009,7 +1009,7 @@ msgid "{inviterName} <0>({inviterEmail})</0>"
 msgstr "{inviterName} <0>({inviterEmail})</0>"
 
 msgid "{inviterName} has cancelled the document {documentName}, you don't need to sign it anymore."
-msgstr "{inviterName} telah membatalkan dokumen {documentName}, kamu tidak perlu menandatanganinya lagi."
+msgstr "{inviterName} telah membatalkan dokumen {documentName}, kamu tidak perlu menkamutanganinya lagi."
 
 msgid "{inviterName} has invited you to {action} {documentName}"
 msgstr "{inviterName} telah mengundang kamu untuk {action} {documentName}"
@@ -1018,16 +1018,16 @@ msgid "{inviterName} has removed you from the document {documentName}."
 msgstr "{inviterName} telah menghapus kamu dari dokumen {documentName}."
 
 msgid "{recipientName} {action} a document by using one of your direct links"
-msgstr "{recipientName} {action} dokumen menggunakan salah satu tautan langsung Anda"
+msgstr "{recipientName} {action} dokumen menggunakan salah satu tautan langsung kamu"
 
 msgid "{recipientName} has rejected the document '{documentName}'"
 msgstr "{recipientName} telah menolak dokumen '{documentName}'"
 
 msgid "{recipientReference} has completed signing the document."
-msgstr "{recipientReference} telah selesai menandatangani dokumen."
+msgstr "{recipientReference} telah selesai menkamutangani dokumen."
 
 msgid "{recipientReference} has signed {documentName}"
-msgstr "{recipientReference} telah menandatangani {documentName}"
+msgstr "{recipientReference} telah menkamutangani {documentName}"
 
 msgid "{teamName} has invited you to {action} {documentName}"
 msgstr "{teamName} telah mengundang kamu untuk {action} {documentName}"
@@ -1072,7 +1072,7 @@ msgid "Account creation request"
 msgstr "Permintaan pembuatan akun"
 
 msgid "All signatures have been voided."
-msgstr "Semua tanda tangan telah dibatalkan."
+msgstr "Semua tkamu tangan telah dibatalkan."
 
 msgid "Allow document recipients to reply directly to this email address"
 msgstr "Izinkan penerima dokumen untuk membalas langsung ke alamat email ini"
@@ -1102,16 +1102,16 @@ msgid "Continue by downloading the document."
 msgstr "Lanjutkan dengan mengunduh dokumen."
 
 msgid "Continue by signing the document."
-msgstr "Lanjutkan dengan menandatangani dokumen."
+msgstr "Lanjutkan dengan menkamutangani dokumen."
 
 msgid "Continue by viewing the document."
 msgstr "Lanjutkan dengan melihat dokumen."
 
 msgid "Create a <0>free account</0> to access your signed documents at any time."
-msgstr "Buat <0>akun gratis</0> untuk mengakses dokumen yang sudah ditandatangani kapan saja."
+msgstr "Buat <0>akun gratis</0> untuk mengakses dokumen yang sudah ditkamutangani kapan saja."
 
 msgid "Did not expect this email? <0>Click here to report the sender</0>. Never sign a document you don't recognize or weren't expecting."
-msgstr "Tidak menyangka email ini? <0>Klik di sini untuk melaporkan pengirim</0>. Jangan pernah menandatangani dokumen yang tidak kamu kenali atau tidak kamu harapkan."
+msgstr "Tidak menyangka email ini? <0>Klik di sini untuk melaporkan pengirim</0>. Jangan pernah menkamutangani dokumen yang tidak kamu kenali atau tidak kamu harapkan."
 
 msgid "Didn't request a password change? We are here to help you secure your account, just <0>contact us</0>."
 msgstr "Tidak meminta perubahan password? Kami di sini untuk membantu mengamankan akun kamu, <0>hubungi kami</0>."
@@ -1267,7 +1267,7 @@ msgid "View Document to assist"
 msgstr "Lihat Dokumen untuk membantu"
 
 msgid "View Document to sign"
-msgstr "Lihat Dokumen untuk menandatangani"
+msgstr "Lihat Dokumen untuk menkamutangani"
 
 msgid "View plans"
 msgstr "Lihat paket"
@@ -1276,7 +1276,7 @@ msgid "Waiting for others"
 msgstr "Menunggu yang lain"
 
 msgid "We're still waiting for other signers to sign this document.<0/>We'll notify you as soon as it's ready."
-msgstr "Kami masih menunggu penandatangan lain untuk menandatangani dokumen ini.<0/>Kami akan memberi tahu kamu segera setelah siap."
+msgstr "Kami masih menunggu penkamutangan lain untuk menkamutangani dokumen ini.<0/>Kami akan memberi tahu kamu segera setelah siap."
 
 msgid "We've changed your password as you asked. You can now sign in with your new password."
 msgstr "Kami telah mengubah password kamu sesuai permintaan. Kamu sekarang bisa masuk dengan password baru kamu."
@@ -1306,7 +1306,7 @@ msgid "You can view the document and its status by clicking the button below."
 msgstr "Kamu dapat melihat dokumen dan statusnya dengan mengklik tombol di bawah."
 
 msgid "You don't need to sign it anymore."
-msgstr "Kamu tidak perlu menandatanganinya lagi."
+msgstr "Kamu tidak perlu menkamutanganinya lagi."
 
 msgid "You have been invited to join the following organisation"
 msgstr "Kamu telah diundang untuk bergabung dengan organisasi berikut"
@@ -1315,7 +1315,7 @@ msgid "You have rejected the document '{documentName}'"
 msgstr "Kamu telah menolak dokumen '{documentName}'"
 
 msgid "You have signed “{documentName}”"
-msgstr "Kamu telah menandatangani “{documentName}”"
+msgstr "Kamu telah menkamutangani “{documentName}”"
 
 msgid "Your document has been deleted by an admin!"
 msgstr "Dokumen kamu telah dihapus oleh admin!"
@@ -1345,12 +1345,12 @@ msgid ".PDF documents accepted (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
 msgstr ".Dokumen PDF diterima (maks {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
 
 msgid "(You)"
-msgstr "(Anda)"
+msgstr "(kamu)"
 
 msgid "{browserInfo} on {os}"
 msgstr "{browserInfo} di {os}"
 
-msgid "{charactersRemaining, plural, one {1 karakter tersisa} other {{charactersRemaining} karakter tersisa}}"
+msgid "{charactersRemaining, plural, one {1 character remaining} other {{charactersRemaining} characters remaining}}"
 msgstr "{charactersRemaining, plural, one {1 karakter tersisa} other {{charactersRemaining} karakter tersisa}}"
 
 msgid "{MAXIMUM_PASSKEYS, plural, one {Kamu tidak bisa punya lebih dari # passkey.} other {Kamu tidak bisa punya lebih dari # passkey.}}"
@@ -1368,7 +1368,7 @@ msgstr "{recipientActionVerb} dokumen untuk menyelesaikan proses."
 msgid "{recipientCount} recipients"
 msgstr "{recipientCount} penerima"
 
-msgid "{remaningLength, plural, one {# karakter tersisa} other {# karakter tersisa}}"
+msgid "{remaningLength, plural, one {# character remaining} other {# characters remaining}}"
 msgstr "{remaningLength, plural, one {# karakter tersisa} other {# karakter tersisa}}"
 
 msgid "{selectedCount} selected"
@@ -1377,13 +1377,13 @@ msgstr "{selectedCount} dipilih"
 msgid "{userAgent}"
 msgstr "{userAgent}"
 
-msgid "{validationLength, plural, one {Pilih minimal # opsi} other {Pilih minimal # opsi}}"
+msgid "{validationLength, plural, one {Select at least # option} other {Select at least # options}}"
 msgstr "{validationLength, plural, one {Pilih minimal # opsi} other {Pilih minimal # opsi}}"
 
-msgid "{validationLength, plural, one {Pilih maksimal # opsi} other {Pilih maksimal # opsi}}"
+msgid "{validationLength, plural, one {Select at most # option} other {Select at most # options}}"
 msgstr "{validationLength, plural, one {Pilih maksimal # opsi} other {Pilih maksimal # opsi}}"
 
-msgid "{validationLength, plural, one {Pilih tepat # opsi} other {Pilih tepat # opsi}}"
+msgid "{validationLength, plural, one {Select exactly # option} other {Select exactly # options}}"
 msgstr "{validationLength, plural, one {Pilih tepat # opsi} other {Pilih tepat # opsi}}"
 
 msgid "<0>{senderName} {senderEmail}</0> has invited you to approve this document"
@@ -1393,19 +1393,19 @@ msgid "<0>{senderName} {senderEmail}</0> has invited you to assist this document
 msgstr "<0>{senderName} {senderEmail}</0> telah mengundang kamu untuk membantu dokumen ini"
 
 msgid "<0>{senderName} {senderEmail}</0> has invited you to sign this document"
-msgstr "<0>{senderName} {senderEmail}</0> telah mengundang kamu untuk menandatangani dokumen ini"
+msgstr "<0>{senderName} {senderEmail}</0> telah mengundang kamu untuk menkamutangani dokumen ini"
 
 msgid "<0>{senderName} {senderEmail}</0> has invited you to view this document"
 msgstr "<0>{senderName} {senderEmail}</0> telah mengundang kamu untuk melihat dokumen ini"
 
 msgid "<0>Account management:</0> Modify your account settings, permissions, and preferences"
-msgstr "<0>Manajemen akun:</0> Ubah pengaturan akun, izin, dan preferensi Anda"
+msgstr "<0>Manajemen akun:</0> Ubah pengaturan akun, izin, dan preferensi kamu"
 
 msgid "<0>Data access:</0> Access all data associated with your account"
-msgstr "<0>Akses data:</0> Akses semua data yang terkait dengan akun Anda"
+msgstr "<0>Akses data:</0> Akses semua data yang terkait dengan akun kamu"
 
 msgid "<0>Email</0> - The recipient will be emailed the document to sign, approve, etc."
-msgstr "<0>Email</0> - Penerima akan dikirimi email dokumen untuk ditandatangani, disetujui, dll."
+msgstr "<0>Email</0> - Penerima akan dikirimi email dokumen untuk ditkamutangani, disetujui, dll."
 
 msgid "<0>Events:</0> All"
 msgstr "<0>Acara:</0> Semua"
@@ -1504,7 +1504,7 @@ msgid "7 days"
 msgstr "7 hari"
 
 msgid "A confirmation email has been sent, and it should arrive in your inbox shortly."
-msgstr "Email konfirmasi telah dikirim, dan akan segera tiba di inbox Anda."
+msgstr "Email konfirmasi telah dikirim, dan akan segera tiba di inbox kamu."
 
 msgid "A device capable of accessing, opening, and reading documents"
 msgstr "Perangkat yang mampu mengakses, membuka, dan membaca dokumen"
@@ -1513,7 +1513,7 @@ msgid "A draft document will be created"
 msgstr "Sebuah dokumen draf akan dibuat"
 
 msgid "A means to print or download documents for your records"
-msgstr "Sarana untuk mencetak atau mengunduh dokumen untuk catatan Anda"
+msgstr "Sarana untuk mencetak atau mengunduh dokumen untuk catatan kamu"
 
 msgid "A new token was created successfully."
 msgstr "Token baru berhasil dibuat."
@@ -1528,16 +1528,16 @@ msgid "A stable internet connection"
 msgstr "Koneksi internet yang stabil"
 
 msgid "A unique URL to access your profile"
-msgstr "URL unik untuk mengakses profil Anda"
+msgstr "URL unik untuk mengakses profil kamu"
 
 msgid "A unique URL to identify the organisation"
 msgstr "URL unik untuk mengidentifikasi organisasi"
 
 msgid "A unique URL to identify your organisation"
-msgstr "URL unik untuk mengidentifikasi organisasi Anda"
+msgstr "URL unik untuk mengidentifikasi organisasi kamu"
 
 msgid "A unique URL to identify your team"
-msgstr "URL unik untuk mengidentifikasi tim Anda"
+msgstr "URL unik untuk mengidentifikasi tim kamu"
 
 msgid "A valid email is required"
 msgstr "Email yang valid diperlukan"
@@ -1618,13 +1618,13 @@ msgid "Add"
 msgstr "Tambah"
 
 msgid "Add 2 or more signers to enable signing order."
-msgstr "Tambahkan 2 atau lebih penandatangan untuk mengaktifkan urutan penandatanganan."
+msgstr "Tambahkan 2 atau lebih penkamutangan untuk mengaktifkan urutan penkamutanganan."
 
 msgid "Add a custom domain to send emails on behalf of your organisation. We'll generate DKIM records that you need to add to your DNS provider."
 msgstr "Tambahkan domain kustom untuk mengirim email atas nama organisasi kamu. Kami akan membuat record DKIM yang perlu kamu tambahkan ke provider DNS kamu."
 
 msgid "Add a URL to redirect the user to once the document is signed"
-msgstr "Tambahkan URL untuk mengarahkan user setelah dokumen ditandatangani"
+msgstr "Tambahkan URL untuk mengarahkan user setelah dokumen ditkamutangani"
 
 msgid "Add all relevant fields for each recipient."
 msgstr "Tambahkan semua kolom yang relevan untuk setiap penerima."
@@ -1633,10 +1633,10 @@ msgid "Add all relevant placeholders for each recipient."
 msgstr "Tambahkan semua placeholder yang relevan untuk setiap penerima."
 
 msgid "Add an authenticator to serve as a secondary authentication method for signing documents."
-msgstr "Tambahkan authenticator sebagai metode autentikasi sekunder untuk menandatangani dokumen."
+msgstr "Tambahkan authenticator sebagai metode autentikasi sekunder untuk menkamutangani dokumen."
 
 msgid "Add an authenticator to serve as a secondary authentication method when signing in, or when signing documents."
-msgstr "Tambahkan authenticator sebagai metode autentikasi sekunder saat login, atau saat menandatangani dokumen."
+msgstr "Tambahkan authenticator sebagai metode autentikasi sekunder saat login, atau saat menkamutangani dokumen."
 
 msgid "Add an external ID to the document. This can be used to identify the document in external systems."
 msgstr "Tambahkan external ID ke dokumen. Ini bisa digunakan untuk mengidentifikasi dokumen di sistem eksternal."
@@ -1708,16 +1708,16 @@ msgid "Add Recipients"
 msgstr "Tambah Penerima"
 
 msgid "Add recipients to your document"
-msgstr "Tambah penerima ke dokumen Anda"
+msgstr "Tambah penerima ke dokumen kamu"
 
 msgid "Add Signer"
-msgstr "Tambah Penandatangan"
+msgstr "Tambah Penkamutangan"
 
 msgid "Add Signers"
-msgstr "Tambah Penandatangan"
+msgstr "Tambah Penkamutangan"
 
 msgid "Add signers and configure signing preferences"
-msgstr "Tambah penandatangan dan konfigurasi preferensi penandatanganan"
+msgstr "Tambah penkamutangan dan konfigurasi preferensi penkamutanganan"
 
 msgid "Add team email"
 msgstr "Tambah email tim"
@@ -1729,16 +1729,16 @@ msgid "Add text to the field"
 msgstr "Tambah teks ke kolom"
 
 msgid "Add the people who will sign the document."
-msgstr "Tambahkan orang yang akan menandatangani dokumen."
+msgstr "Tambahkan orang yang akan menkamutangani dokumen."
 
 msgid "Add the recipients to create the document with"
 msgstr "Tambahkan penerima untuk membuat dokumen"
 
 msgid "Add these DNS records to verify your domain ownership"
-msgstr "Tambahkan catatan DNS ini untuk memverifikasi kepemilikan domain Anda"
+msgstr "Tambahkan catatan DNS ini untuk memverifikasi kepemilikan domain kamu"
 
 msgid "Add this URL to your provider's allowed redirect URIs"
-msgstr "Tambahkan URL ini ke URI redirect yang diizinkan oleh penyedia Anda"
+msgstr "Tambahkan URL ini ke URI redirect yang diizinkan oleh penyedia kamu"
 
 msgid "Additional brand information to display at the bottom of emails"
 msgstr "Informasi brand tambahan untuk ditampilkan di bagian bawah email"
@@ -1768,7 +1768,7 @@ msgid "Advanced Settings"
 msgstr "Pengaturan Lanjutan"
 
 msgid "After signing a document electronically, you will be provided the opportunity to view, download, and print the document for your records. It is highly recommended that you retain a copy of all electronically signed documents for your personal records. We will also retain a copy of the signed document for our records however we may not be able to provide you with a copy of the signed document after a certain period of time."
-msgstr "Setelah menandatangani dokumen secara elektronik, kamu akan diberi kesempatan untuk melihat, mengunduh, dan mencetak dokumen untuk arsip kamu. Sangat disarankan untuk menyimpan salinan semua dokumen yang ditandatangani secara elektronik untuk arsip pribadi kamu. Kami juga akan menyimpan salinan dokumen yang ditandatangani untuk arsip kami, namun kami mungkin tidak bisa memberikan salinan dokumen yang ditandatangani setelah periode waktu tertentu."
+msgstr "Setelah menkamutangani dokumen secara elektronik, kamu akan diberi kesempatan untuk melihat, mengunduh, dan mencetak dokumen untuk arsip kamu. Sangat disarankan untuk menyimpan salinan semua dokumen yang ditkamutangani secara elektronik untuk arsip pribadi kamu. Kami juga akan menyimpan salinan dokumen yang ditkamutangani untuk arsip kami, namun kami mungkin tidak bisa memberikan salinan dokumen yang ditkamutangani setelah periode waktu tertentu."
 
 msgid "AI features"
 msgstr "Fitur AI"
@@ -1795,7 +1795,7 @@ msgid "All documents have been processed. Any new documents that are sent or rec
 msgstr "Semua dokumen sudah diproses. Dokumen baru yang dikirim atau diterima akan muncul di sini."
 
 msgid "All documents related to the electronic signing process will be provided to you electronically through our platform or via email. It is your responsibility to ensure that your email address is current and that you can receive and open our emails."
-msgstr "Semua dokumen terkait proses penandatanganan elektronik akan diberikan kepada kamu secara elektronik melalui platform kami atau via email. Tanggung jawab kamu untuk memastikan alamat email kamu aktif dan kamu bisa menerima serta membuka email kami."
+msgstr "Semua dokumen terkait proses penkamutanganan elektronik akan diberikan kepada kamu secara elektronik melalui platform kami atau via email. Tanggung jawab kamu untuk memastikan alamat email kamu aktif dan kamu bisa menerima serta membuka email kami."
 
 msgid "All email domains have been synced successfully"
 msgstr "Semua domain email berhasil disinkronkan"
@@ -1804,13 +1804,13 @@ msgid "All Folders"
 msgstr "Semua Folder"
 
 msgid "All inserted signatures will be voided"
-msgstr "Semua tanda tangan yang dimasukkan akan dibatalkan"
+msgstr "Semua tkamu tangan yang dimasukkan akan dibatalkan"
 
 msgid "All items must be of the same type."
 msgstr "Semua item harus bertipe sama."
 
 msgid "All recipients have signed. The document is being processed and you will receive an email copy shortly."
-msgstr "Semua penerima sudah menandatangani. Dokumen sedang diproses dan kamu akan menerima salinan email sebentar lagi."
+msgstr "Semua penerima sudah menkamutangani. Dokumen sedang diproses dan kamu akan menerima salinan email sebentar lagi."
 
 msgid "All recipients will be notified"
 msgstr "Semua penerima akan diberitahu"
@@ -1819,7 +1819,7 @@ msgid "All rights reserved."
 msgstr "Hak cipta dilindungi."
 
 msgid "All signing links have been copied to your clipboard."
-msgstr "Semua tautan penandatanganan telah disalin ke clipboard Anda."
+msgstr "Semua tautan penkamutanganan telah disalin ke clipboard kamu."
 
 msgid "All Statuses"
 msgstr "Semua Status"
@@ -1837,13 +1837,13 @@ msgid "Allow Personal Organisations"
 msgstr "Izinkan Organisasi Pribadi"
 
 msgid "Allow signers to dictate next signer"
-msgstr "Izinkan penandatangan menentukan penandatangan berikutnya"
+msgstr "Izinkan penkamutangan menentukan penkamutangan berikutnya"
 
 msgid "Allowed Email Domains"
 msgstr "Domain Email yang Diizinkan"
 
 msgid "Allowed Signature Types"
-msgstr "Tipe Tanda Tangan yang Diizinkan"
+msgstr "Tipe Tkamu Tangan yang Diizinkan"
 
 msgid "Allowed teams"
 msgstr "Tim yang diizinkan"
@@ -1861,7 +1861,7 @@ msgid "Amount"
 msgstr "Jumlah"
 
 msgid "An electronic signature provided by you on our platform, achieved through clicking through to a document and entering your name, or any other electronic signing method we provide, is legally binding. It carries the same weight and enforceability as a manual signature written with ink on paper."
-msgstr "Tanda tangan elektronik yang diberikan oleh kamu di platform kami, yang dilakukan dengan mengklik dokumen dan memasukkan nama kamu, atau metode penandatanganan elektronik lain yang kami sediakan, bersifat mengikat secara hukum. Ini memiliki kekuatan dan keberlakuan yang sama dengan tanda tangan manual yang ditulis dengan tinta di atas kertas."
+msgstr "Tkamu tangan elektronik yang diberikan oleh kamu di platform kami, yang dilakukan dengan mengklik dokumen dan memasukkan nama kamu, atau metode penkamutanganan elektronik lain yang kami sediakan, bersifat mengikat secara hukum. Ini memiliki kekuatan dan keberlakuan yang sama dengan tkamu tangan manual yang ditulis dengan tinta di atas kertas."
 
 msgid "An email account"
 msgstr "Akun email"
@@ -1882,7 +1882,7 @@ msgid "An error occurred while adding fields."
 msgstr "Terjadi error saat menambahkan kolom."
 
 msgid "An error occurred while adding signers."
-msgstr "Terjadi error saat menambahkan penandatangan."
+msgstr "Terjadi error saat menambahkan penkamutangan."
 
 msgid "An error occurred while adding the fields."
 msgstr "Terjadi error saat menambahkan kolom."
@@ -1906,7 +1906,7 @@ msgid "An error occurred while auto-saving the template settings."
 msgstr "Terjadi error saat menyimpan otomatis pengaturan templat."
 
 msgid "An error occurred while auto-signing the document, some fields may not be signed. Please review and manually sign any remaining fields."
-msgstr "Terjadi error saat auto-sign dokumen, beberapa kolom mungkin belum ditandatangani. Harap periksa dan tanda tangani secara manual kolom yang tersisa."
+msgstr "Terjadi error saat auto-sign dokumen, beberapa kolom mungkin belum ditkamutangani. Harap periksa dan tkamu tangani secara manual kolom yang tersisa."
 
 msgid "An error occurred while completing the document. Please try again."
 msgstr "Terjadi error saat menyelesaikan dokumen. Silakan coba lagi."
@@ -1924,13 +1924,13 @@ msgid "An error occurred while deleting the user."
 msgstr "Terjadi error saat menghapus pengguna."
 
 msgid "An error occurred while disabling direct link signing."
-msgstr "Terjadi error saat menonaktifkan penandatanganan tautan langsung."
+msgstr "Terjadi error saat menonaktifkan penkamutanganan tautan langsung."
 
 msgid "An error occurred while disabling the user."
 msgstr "Terjadi error saat menonaktifkan pengguna."
 
 msgid "An error occurred while enabling direct link signing."
-msgstr "Terjadi error saat mengaktifkan penandatanganan tautan langsung."
+msgstr "Terjadi error saat mengaktifkan penkamutanganan tautan langsung."
 
 msgid "An error occurred while enabling the user."
 msgstr "Terjadi error saat mengaktifkan pengguna."
@@ -1957,7 +1957,7 @@ msgid "An error occurred while removing the selection."
 msgstr "Terjadi error saat menghapus pilihan."
 
 msgid "An error occurred while removing the signature."
-msgstr "Terjadi error saat menghapus tanda tangan."
+msgstr "Terjadi error saat menghapus tkamu tangan."
 
 msgid "An error occurred while resetting two factor authentication for the user."
 msgstr "Terjadi error saat mereset autentikasi dua faktor untuk pengguna."
@@ -1966,16 +1966,16 @@ msgid "An error occurred while sending the document."
 msgstr "Terjadi error saat mengirim dokumen."
 
 msgid "An error occurred while sending your confirmation email"
-msgstr "Terjadi error saat mengirim email konfirmasi Anda"
+msgstr "Terjadi error saat mengirim email konfirmasi kamu"
 
 msgid "An error occurred while signing as assistant."
-msgstr "Terjadi error saat menandatangani sebagai asisten."
+msgstr "Terjadi error saat menkamutangani sebagai asisten."
 
 msgid "An error occurred while signing the document."
-msgstr "Terjadi error saat menandatangani dokumen."
+msgstr "Terjadi error saat menkamutangani dokumen."
 
 msgid "An error occurred while signing the field."
-msgstr "Terjadi error saat menandatangani kolom."
+msgstr "Terjadi error saat menkamutangani kolom."
 
 msgid "An error occurred while trying to create a checkout session."
 msgstr "Terjadi error saat mencoba membuat sesi checkout."
@@ -1984,13 +1984,13 @@ msgid "An error occurred while updating the document settings."
 msgstr "Terjadi error saat memperbarui pengaturan dokumen."
 
 msgid "An error occurred while updating the signature."
-msgstr "Terjadi error saat memperbarui tanda tangan."
+msgstr "Terjadi error saat memperbarui tkamu tangan."
 
 msgid "An error occurred while updating your profile."
-msgstr "Terjadi error saat memperbarui profil Anda."
+msgstr "Terjadi error saat memperbarui profil kamu."
 
 msgid "An error occurred while uploading your document."
-msgstr "Terjadi error saat mengunggah dokumen Anda."
+msgstr "Terjadi error saat mengunggah dokumen kamu."
 
 msgid "An error occurred. Please try again later."
 msgstr "Terjadi error. Silakan coba lagi nanti."
@@ -2023,7 +2023,7 @@ msgid "Analyzing pages"
 msgstr "Menganalisis halaman"
 
 msgid "Any documents that you have been invited to will appear here"
-msgstr "Dokumen apa pun yang Anda diundang akan muncul di sini"
+msgstr "Dokumen apa pun yang kamu diundang akan muncul di sini"
 
 msgid "Any Source"
 msgstr "Sumber Mana Pun"
@@ -2053,28 +2053,28 @@ msgid "Are you sure you want to complete the document? This action cannot be und
 msgstr "Kamu yakin ingin menyelesaikan dokumen? Tindakan ini tidak bisa dibatalkan. Pastikan kamu sudah mengisi semua kolom yang relevan sebelum melanjutkan."
 
 msgid "Are you sure you want to delete the following claim?"
-msgstr "Apakah Anda yakin ingin menghapus klaim berikut?"
+msgstr "Apakah kamu yakin ingin menghapus klaim berikut?"
 
 msgid "Are you sure you want to delete this folder?"
-msgstr "Apakah Anda yakin ingin menghapus folder ini?"
+msgstr "Apakah kamu yakin ingin menghapus folder ini?"
 
 msgid "Are you sure you want to delete this token?"
-msgstr "Apakah Anda yakin ingin menghapus token ini?"
+msgstr "Apakah kamu yakin ingin menghapus token ini?"
 
 msgid "Are you sure you want to reject this document? This action cannot be undone."
 msgstr "Kamu yakin ingin menolak dokumen ini? Tindakan ini tidak bisa dibatalkan."
 
 msgid "Are you sure you want to remove the <0>{passkeyName}</0> passkey?"
-msgstr "Apakah Anda yakin ingin menghapus passkey <0>{passkeyName}</0>?"
+msgstr "Apakah kamu yakin ingin menghapus passkey <0>{passkeyName}</0>?"
 
 msgid "Are you sure you wish to delete this organisation?"
-msgstr "Apakah Anda yakin ingin menghapus organisasi ini?"
+msgstr "Apakah kamu yakin ingin menghapus organisasi ini?"
 
 msgid "Are you sure you wish to delete this team?"
-msgstr "Apakah Anda yakin ingin menghapus tim ini?"
+msgstr "Apakah kamu yakin ingin menghapus tim ini?"
 
 msgid "Are you sure?"
-msgstr "Apakah Anda yakin?"
+msgstr "Apakah kamu yakin?"
 
 msgid "Assigned Teams"
 msgstr "Tim yang Ditugaskan"
@@ -2083,13 +2083,13 @@ msgid "Assist Document"
 msgstr "Bantu Dokumen"
 
 msgid "Assist with signing"
-msgstr "Bantu penandatanganan"
+msgstr "Bantu penkamutanganan"
 
 msgid "Assistants and Copy roles are currently not compatible with the multi-sign experience."
 msgstr "Peran Assistant dan Copy saat ini tidak kompatibel dengan pengalaman multi-sign."
 
 msgid "At least one signature type must be enabled"
-msgstr "Setidaknya satu tipe tanda tangan harus diaktifkan"
+msgstr "Setidaknya satu tipe tkamu tangan harus diaktifkan"
 
 msgid "Attachment added successfully."
 msgstr "Lampiran berhasil ditambahkan."
@@ -2125,7 +2125,7 @@ msgid "Authenticator app"
 msgstr "Aplikasi autentikator"
 
 msgid "Automatically sign fields"
-msgstr "Tandatangani kolom secara otomatis"
+msgstr "Tkamutangani kolom secara otomatis"
 
 msgid "Avatar"
 msgstr "Avatar"
@@ -2140,7 +2140,7 @@ msgid "Back"
 msgstr "Kembali"
 
 msgid "Back home"
-msgstr "Kembali ke beranda"
+msgstr "Kembali ke berkamu"
 
 msgid "Background"
 msgstr "Latar Belakang"
@@ -2245,16 +2245,16 @@ msgid "By enabling 2FA, you will be required to enter a code from your authentic
 msgstr "Dengan mengaktifkan 2FA, kamu akan diminta memasukkan kode dari aplikasi authenticator setiap kali login menggunakan email dan password."
 
 msgid "By proceeding to use the electronic signature service provided by Documenso, you affirm that you have read and understood this disclosure. You agree to all terms and conditions related to the use of electronic signatures and electronic transactions as outlined herein."
-msgstr "Dengan melanjutkan menggunakan layanan tanda tangan elektronik yang disediakan oleh Documenso, kamu menyatakan bahwa kamu sudah membaca dan memahami pengungkapan ini. Kamu setuju dengan semua syarat dan ketentuan terkait penggunaan tanda tangan elektronik dan transaksi elektronik sebagaimana dijelaskan di sini."
+msgstr "Dengan melanjutkan menggunakan layanan tkamu tangan elektronik yang disediakan oleh Documenso, kamu menyatakan bahwa kamu sudah membaca dan memahami pengungkapan ini. Kamu setuju dengan semua syarat dan ketentuan terkait penggunaan tkamu tangan elektronik dan transaksi elektronik sebagaimana dijelaskan di sini."
 
 msgid "By proceeding with your electronic signature, you acknowledge and consent that it will be used to sign the given document and holds the same legal validity as a handwritten signature. By completing the electronic signing process, you affirm your understanding and acceptance of these conditions."
-msgstr "Dengan melanjutkan tanda tangan elektronik kamu, kamu mengakui dan menyetujui bahwa ini akan digunakan untuk menandatangani dokumen yang diberikan dan memiliki keabsahan hukum yang sama dengan tanda tangan tulisan tangan. Dengan menyelesaikan proses penandatanganan elektronik, kamu menyatakan pemahaman dan penerimaan kamu terhadap ketentuan ini."
+msgstr "Dengan melanjutkan tkamu tangan elektronik kamu, kamu mengakui dan menyetujui bahwa ini akan digunakan untuk menkamutangani dokumen yang diberikan dan memiliki keabsahan hukum yang sama dengan tkamu tangan tulisan tangan. Dengan menyelesaikan proses penkamutanganan elektronik, kamu menyatakan pemahaman dan penerimaan kamu terhadap ketentuan ini."
 
 msgid "By proceeding, you agree to our <0>Terms of Service</0> and <1>Privacy Policy</1>."
 msgstr "Dengan melanjutkan, kamu setuju dengan <0>Ketentuan Layanan</0> dan <1>Kebijakan Privasi</1> kami."
 
 msgid "By using the electronic signature feature, you are consenting to conduct transactions and receive disclosures electronically. You acknowledge that your electronic signature on documents is binding and that you accept the terms outlined in the documents you are signing."
-msgstr "Dengan menggunakan fitur tanda tangan elektronik, kamu menyetujui untuk melakukan transaksi dan menerima pengungkapan secara elektronik. Kamu mengakui bahwa tanda tangan elektronik kamu pada dokumen bersifat mengikat dan kamu menerima ketentuan yang diuraikan dalam dokumen yang kamu tandatangani."
+msgstr "Dengan menggunakan fitur tkamu tangan elektronik, kamu menyetujui untuk melakukan transaksi dan menerima pengungkapan secara elektronik. Kamu mengakui bahwa tkamu tangan elektronik kamu pada dokumen bersifat mengikat dan kamu menerima ketentuan yang diuraikan dalam dokumen yang kamu tkamutangani."
 
 msgid "Can't find someone?"
 msgstr "Tidak dapat menemukan seseorang?"
@@ -2269,7 +2269,7 @@ msgid "Cannot remove document"
 msgstr "Tidak dapat menghapus dokumen"
 
 msgid "Cannot remove signer"
-msgstr "Tidak dapat menghapus penandatangan"
+msgstr "Tidak dapat menghapus penkamutangan"
 
 msgid "Cannot upload items after the document has been sent"
 msgstr "Tidak dapat mengunggah item setelah dokumen dikirim"
@@ -2317,13 +2317,13 @@ msgid "Choose how the document will reach recipients"
 msgstr "Pilih bagaimana dokumen akan mencapai penerima"
 
 msgid "Choose how to distribute your document to recipients. Email will send notifications, None will generate signing links for manual distribution."
-msgstr "Pilih cara mendistribusikan dokumen kamu ke penerima. Email akan mengirim notifikasi, None akan membuat link penandatanganan untuk distribusi manual."
+msgstr "Pilih cara mendistribusikan dokumen kamu ke penerima. Email akan mengirim notifikasi, None akan membuat link penkamutanganan untuk distribusi manual."
 
 msgid "Choose verification method"
 msgstr "Pilih metode verifikasi"
 
 msgid "Choose your preferred authentication method:"
-msgstr "Pilih metode autentikasi yang Anda inginkan:"
+msgstr "Pilih metode autentikasi yang kamu inginkan:"
 
 msgid "Choose..."
 msgstr "Pilih..."
@@ -2350,7 +2350,7 @@ msgid "Click here to upload"
 msgstr "Klik di sini untuk mengunggah"
 
 msgid "Click to copy signing link for sending to recipient"
-msgstr "Klik untuk menyalin tautan penandatanganan untuk dikirim ke penerima"
+msgstr "Klik untuk menyalin tautan penkamutanganan untuk dikirim ke penerima"
 
 msgid "Click to insert field"
 msgstr "Klik untuk menyisipkan kolom"
@@ -2389,7 +2389,7 @@ msgid "Complete Document"
 msgstr "Selesaikan Dokumen"
 
 msgid "Complete the fields for the following signers."
-msgstr "Lengkapi kolom untuk penandatangan berikut."
+msgstr "Lengkapi kolom untuk penkamutangan berikut."
 
 msgid "Completed"
 msgstr "Selesai"
@@ -2431,7 +2431,7 @@ msgid "Configure security settings for the document."
 msgstr "Konfigurasi pengaturan keamanan untuk dokumen."
 
 msgid "Configure signing reminder settings for the document."
-msgstr "Konfigurasi pengaturan pengingat penandatanganan untuk dokumen."
+msgstr "Konfigurasi pengaturan pengingat penkamutanganan untuk dokumen."
 
 msgid "Configure template"
 msgstr "Konfigurasi templat"
@@ -2440,7 +2440,7 @@ msgid "Configure Template"
 msgstr "Konfigurasi Templat"
 
 msgid "Configure the fields you want to place on the document."
-msgstr "Konfigurasi kolom yang ingin Anda tempatkan di dokumen."
+msgstr "Konfigurasi kolom yang ingin kamu tempatkan di dokumen."
 
 msgid "Configure the team roles for each group"
 msgstr "Konfigurasi peran tim untuk setiap grup"
@@ -2449,7 +2449,7 @@ msgid "Configure the team roles for each member"
 msgstr "Konfigurasi peran tim untuk setiap anggota"
 
 msgid "Configure when and how often reminder emails are sent to recipients who have not yet completed signing. Uses the team default when set to inherit."
-msgstr "Konfigurasi kapan dan seberapa sering email pengingat dikirim ke penerima yang belum menyelesaikan penandatanganan. Menggunakan default tim saat diatur ke inherit."
+msgstr "Konfigurasi kapan dan seberapa sering email pengingat dikirim ke penerima yang belum menyelesaikan penkamutanganan. Menggunakan default tim saat diatur ke inherit."
 
 msgid "Confirm"
 msgstr "Konfirmasi"
@@ -2494,7 +2494,7 @@ msgid "Continue to login"
 msgstr "Lanjutkan ke login"
 
 msgid "Controls how long recipients have to complete signing before the document expires. After expiration, recipients can no longer sign the document."
-msgstr "Mengontrol berapa lama penerima punya waktu untuk menyelesaikan penandatanganan sebelum dokumen kedaluwarsa. Setelah kedaluwarsa, penerima tidak bisa lagi menandatangani dokumen."
+msgstr "Mengontrol berapa lama penerima punya waktu untuk menyelesaikan penkamutanganan sebelum dokumen kedaluwarsa. Setelah kedaluwarsa, penerima tidak bisa lagi menkamutangani dokumen."
 
 msgid "Controls the default email settings when new documents or templates are created. Updating these settings will not affect existing documents or templates."
 msgstr "Mengontrol pengaturan email default saat dokumen atau template baru dibuat. Memperbarui pengaturan ini tidak akan mempengaruhi dokumen atau template yang sudah ada."
@@ -2506,22 +2506,22 @@ msgid "Controls the default visibility of an uploaded document."
 msgstr "Mengontrol visibilitas default dari dokumen yang diunggah."
 
 msgid "Controls the formatting of the message that will be sent when inviting a recipient to sign a document. If a custom message has been provided while configuring the document, it will be used instead."
-msgstr "Mengontrol format pesan yang akan dikirim saat mengundang penerima untuk menandatangani dokumen. Jika pesan kustom sudah diberikan saat mengonfigurasi dokumen, pesan itu yang akan digunakan."
+msgstr "Mengontrol format pesan yang akan dikirim saat mengundang penerima untuk menkamutangani dokumen. Jika pesan kustom sudah diberikan saat mengonfigurasi dokumen, pesan itu yang akan digunakan."
 
 msgid "Controls the language for the document, including the language to be used for email notifications, and the final certificate that is generated and attached to the document."
 msgstr "Mengontrol bahasa untuk dokumen, termasuk bahasa yang digunakan untuk notifikasi email, dan sertifikat akhir yang dibuat dan dilampirkan ke dokumen."
 
 msgid "Controls when and how often reminder emails are sent to recipients who have not yet completed signing."
-msgstr "Mengontrol kapan dan seberapa sering email pengingat dikirim ke penerima yang belum menyelesaikan penandatanganan."
+msgstr "Mengontrol kapan dan seberapa sering email pengingat dikirim ke penerima yang belum menyelesaikan penkamutanganan."
 
 msgid "Controls whether the audit logs will be included in the document when it is downloaded. The audit logs can still be downloaded from the logs page separately."
 msgstr "Mengontrol apakah log audit akan disertakan dalam dokumen saat diunduh. Log audit tetap bisa diunduh dari halaman log secara terpisah."
 
 msgid "Controls whether the signing certificate will be included in the document when it is downloaded. The signing certificate can still be downloaded from the logs page separately."
-msgstr "Mengontrol apakah sertifikat penandatanganan akan disertakan dalam dokumen saat diunduh. Sertifikat penandatanganan tetap bisa diunduh dari halaman log secara terpisah."
+msgstr "Mengontrol apakah sertifikat penkamutanganan akan disertakan dalam dokumen saat diunduh. Sertifikat penkamutanganan tetap bisa diunduh dari halaman log secara terpisah."
 
 msgid "Controls which signatures are allowed to be used when signing a document."
-msgstr "Mengontrol tanda tangan mana yang diizinkan digunakan saat menandatangani dokumen."
+msgstr "Mengontrol tkamu tangan mana yang diizinkan digunakan saat menkamutangani dokumen."
 
 msgid "Copied"
 msgstr "Tersalin"
@@ -2548,7 +2548,7 @@ msgid "Copy Shareable Link"
 msgstr "Salin Tautan yang Dapat Dibagikan"
 
 msgid "Copy Signing Links"
-msgstr "Salin Tautan Penandatanganan"
+msgstr "Salin Tautan Penkamutanganan"
 
 msgid "Copy team ID"
 msgstr "Salin ID tim"
@@ -2578,7 +2578,7 @@ msgid "Create a support ticket"
 msgstr "Buat tiket dukungan"
 
 msgid "Create a team to collaborate with your team members."
-msgstr "Buat tim untuk berkolaborasi dengan anggota tim Anda."
+msgstr "Buat tim untuk berkolaborasi dengan anggota tim kamu."
 
 msgid "Create a template from this document."
 msgstr "Buat templat dari dokumen ini."
@@ -2614,7 +2614,7 @@ msgid "Create Direct Link"
 msgstr "Buat Tautan Langsung"
 
 msgid "Create Direct Signing Link"
-msgstr "Buat Tautan Penandatanganan Langsung"
+msgstr "Buat Tautan Penkamutanganan Langsung"
 
 msgid "Create Document"
 msgstr "Buat Dokumen"
@@ -2656,7 +2656,7 @@ msgid "Create separate organisation"
 msgstr "Buat organisasi terpisah"
 
 msgid "Create signing links"
-msgstr "Buat tautan penandatanganan"
+msgstr "Buat tautan penkamutanganan"
 
 msgid "Create Stripe customer"
 msgstr "Buat pelanggan Stripe"
@@ -2677,7 +2677,7 @@ msgid "Create Template"
 msgstr "Buat Templat"
 
 msgid "Create the document as pending and ready to sign."
-msgstr "Buat dokumen sebagai tertunda dan siap ditandatangani."
+msgstr "Buat dokumen sebagai tertunda dan siap ditkamutangani."
 
 msgid "Create token"
 msgstr "Buat token"
@@ -2692,10 +2692,10 @@ msgid "Create Webhook"
 msgstr "Buat Webhook"
 
 msgid "Create your account and start using state-of-the-art document signing."
-msgstr "Buat akun kamu dan mulai gunakan penandatanganan dokumen tercanggih."
+msgstr "Buat akun kamu dan mulai gunakan penkamutanganan dokumen tercanggih."
 
 msgid "Create your account and start using state-of-the-art document signing. Open and beautiful signing is within your grasp."
-msgstr "Buat akun kamu dan mulai gunakan penandatanganan dokumen tercanggih. Penandatanganan yang terbuka dan indah ada dalam genggaman kamu."
+msgstr "Buat akun kamu dan mulai gunakan penkamutanganan dokumen tercanggih. Penkamutanganan yang terbuka dan indah ada dalam genggaman kamu."
 
 msgid "Created"
 msgstr "Dibuat"
@@ -2752,7 +2752,7 @@ msgid "Custom Organisation Groups"
 msgstr "Grup Organisasi Kustom"
 
 msgid "Customise the colours used on your signing pages."
-msgstr "Sesuaikan warna yang digunakan di halaman penandatanganan Anda."
+msgstr "Sesuaikan warna yang digunakan di halaman penkamutanganan kamu."
 
 msgid "Danger Zone"
 msgstr "Zona Berbahaya"
@@ -2821,10 +2821,10 @@ msgid "Default settings applied to this team. Inherited values come from the org
 msgstr "Pengaturan default yang diterapkan ke tim ini. Nilai yang diwarisi berasal dari organisasi."
 
 msgid "Default Signature Settings"
-msgstr "Pengaturan Tanda Tangan Default"
+msgstr "Pengaturan Tkamu Tangan Default"
 
 msgid "Default Signing Reminders"
-msgstr "Pengingat Penandatanganan Default"
+msgstr "Pengingat Penkamutanganan Default"
 
 msgid "Default Time Zone"
 msgstr "Zona Waktu Default"
@@ -2968,7 +2968,7 @@ msgid "Detecting recipients"
 msgstr "Mendeteksi penerima"
 
 msgid "Detecting signature areas"
-msgstr "Mendeteksi area tanda tangan"
+msgstr "Mendeteksi area tkamu tangan"
 
 msgid "Detection failed"
 msgstr "Deteksi gagal"
@@ -2992,16 +2992,16 @@ msgid "direct link disabled"
 msgstr "tautan langsung dinonaktifkan"
 
 msgid "Direct Link Signing"
-msgstr "Penandatanganan Tautan Langsung"
+msgstr "Penkamutanganan Tautan Langsung"
 
 msgid "Direct link signing has been disabled"
-msgstr "Penandatanganan tautan langsung telah dinonaktifkan"
+msgstr "Penkamutanganan tautan langsung telah dinonaktifkan"
 
 msgid "Direct link signing has been enabled"
-msgstr "Penandatanganan tautan langsung telah diaktifkan"
+msgstr "Penkamutanganan tautan langsung telah diaktifkan"
 
 msgid "Direct link templates contain one dynamic recipient placeholder. Anyone with access to this link can sign the document, and it will then appear on your documents page."
-msgstr "Direct link template berisi satu placeholder penerima dinamis. Siapa pun yang memiliki akses ke link ini bisa menandatangani dokumen, dan dokumen akan muncul di halaman dokumen kamu."
+msgstr "Direct link template berisi satu placeholder penerima dinamis. Siapa pun yang memiliki akses ke link ini bisa menkamutangani dokumen, dan dokumen akan muncul di halaman dokumen kamu."
 
 msgid "Direct links associated with templates will be removed"
 msgstr "Tautan langsung yang terkait dengan templat akan dihapus"
@@ -3028,7 +3028,7 @@ msgid "Disable Account"
 msgstr "Nonaktifkan Akun"
 
 msgid "Disable Two Factor Authentication before deleting your account."
-msgstr "Nonaktifkan Autentikasi Dua Faktor sebelum menghapus akun Anda."
+msgstr "Nonaktifkan Autentikasi Dua Faktor sebelum menghapus akun kamu."
 
 msgid "Disabled"
 msgstr "Dinonaktifkan"
@@ -3046,7 +3046,7 @@ msgid "Display Name"
 msgstr "Nama Tampilan"
 
 msgid "Display your name and email in documents"
-msgstr "Tampilkan nama dan email Anda di dokumen"
+msgstr "Tampilkan nama dan email kamu di dokumen"
 
 msgid "Disposable email addresses are not allowed. Please sign up with a permanent email address."
 msgstr "Alamat email sekali pakai tidak diizinkan. Silakan daftar dengan alamat email permanen."
@@ -3067,7 +3067,7 @@ msgid "Documenso License"
 msgstr "Lisensi Documenso"
 
 msgid "Documenso will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
-msgstr "Documenso akan menghapus <0>semua dokumen kamu</0>, beserta semua dokumen yang sudah selesai, tanda tangan, dan semua sumber daya lain milik Akun kamu."
+msgstr "Documenso akan menghapus <0>semua dokumen kamu</0>, beserta semua dokumen yang sudah selesai, tkamu tangan, dan semua sumber daya lain milik Akun kamu."
 
 msgid "Document"
 msgstr "Dokumen"
@@ -3106,13 +3106,13 @@ msgid "Document draft"
 msgstr "Draf dokumen"
 
 msgid "Document Duplicated"
-msgstr "Dokumen Digandakan"
+msgstr "Dokumen Digkamukan"
 
 msgid "Document Editor"
 msgstr "Editor Dokumen"
 
 msgid "Document found in your account"
-msgstr "Dokumen ditemukan di akun Anda"
+msgstr "Dokumen ditemukan di akun kamu"
 
 msgid "Document hidden"
 msgstr "Dokumen disembunyikan"
@@ -3145,7 +3145,7 @@ msgid "Document moved"
 msgstr "Dokumen dipindahkan"
 
 msgid "Document no longer available to sign"
-msgstr "Dokumen tidak lagi tersedia untuk ditandatangani"
+msgstr "Dokumen tidak lagi tersedia untuk ditkamutangani"
 
 msgid "Document pending"
 msgstr "Dokumen tertunda"
@@ -3175,10 +3175,10 @@ msgid "Document Settings"
 msgstr "Pengaturan Dokumen"
 
 msgid "Document Signed"
-msgstr "Dokumen Ditandatangani"
+msgstr "Dokumen Ditkamutangani"
 
 msgid "Document signing process will be cancelled"
-msgstr "Proses penandatanganan dokumen akan dibatalkan"
+msgstr "Proses penkamutanganan dokumen akan dibatalkan"
 
 msgid "Document status"
 msgstr "Status dokumen"
@@ -3244,13 +3244,13 @@ msgid "Documents Received"
 msgstr "Dokumen Diterima"
 
 msgid "Documents that require your attention will appear here"
-msgstr "Dokumen yang memerlukan perhatian Anda akan muncul di sini"
+msgstr "Dokumen yang memerlukan perhatian kamu akan muncul di sini"
 
 msgid "Documents Viewed"
 msgstr "Dokumen Dilihat"
 
 msgid "Documents where all recipients have signed but the document has not been sealed. Documents stuck for more than 6 hours are no longer retried by the sweep job."
-msgstr "Dokumen di mana semua penerima sudah menandatangani tetapi dokumen belum disegel. Dokumen yang macet lebih dari 6 jam tidak akan dicoba lagi oleh sweep job."
+msgstr "Dokumen di mana semua penerima sudah menkamutangani tetapi dokumen belum disegel. Dokumen yang macet lebih dari 6 jam tidak akan dicoba lagi oleh sweep job."
 
 msgid "Documents, emails and api values may not be accurate since they record the amount of times the action was attempted. Meaning these values may go over the actual quota, get rejected, and will still be recorded."
 msgstr "Dokumen, email, dan nilai API mungkin tidak akurat karena mereka mencatat jumlah percobaan tindakan. Artinya nilai-nilai ini mungkin melebihi kuota sebenarnya, ditolak, dan tetap akan dicatat."
@@ -3307,16 +3307,16 @@ msgid "Drag and drop or click to upload"
 msgstr "Seret dan lepas atau klik untuk mengunggah"
 
 msgid "Drag and drop your document here"
-msgstr "Seret dan lepas dokumen Anda di sini"
+msgstr "Seret dan lepas dokumen kamu di sini"
 
 msgid "Draw signature"
-msgstr "Gambar tanda tangan"
+msgstr "Gambar tkamu tangan"
 
 msgid "Drop PDF here or click to select"
 msgstr "Letakkan PDF di sini atau klik untuk memilih"
 
 msgid "Drop your document here"
-msgstr "Letakkan dokumen Anda di sini"
+msgstr "Letakkan dokumen kamu di sini"
 
 msgid "Dropdown"
 msgstr "Dropdown"
@@ -3376,7 +3376,7 @@ msgid "Electronic Delivery of Documents"
 msgstr "Pengiriman Dokumen Elektronik"
 
 msgid "Electronic Signature Disclosure"
-msgstr "Pengungkapan Tanda Tangan Elektronik"
+msgstr "Pengungkapan Tkamu Tangan Elektronik"
 
 msgid "Email"
 msgstr "Email"
@@ -3505,13 +3505,13 @@ msgid "Enable custom branding for all documents in this team"
 msgstr "Aktifkan branding kustom untuk semua dokumen di tim ini"
 
 msgid "Enable direct link signing"
-msgstr "Aktifkan penandatanganan tautan langsung"
+msgstr "Aktifkan penkamutanganan tautan langsung"
 
 msgid "Enable Direct Link Signing"
-msgstr "Aktifkan Penandatanganan Tautan Langsung"
+msgstr "Aktifkan Penkamutanganan Tautan Langsung"
 
 msgid "Enable signing order"
-msgstr "Aktifkan urutan penandatanganan"
+msgstr "Aktifkan urutan penkamutanganan"
 
 msgid "Enable SSO portal"
 msgstr "Aktifkan portal SSO"
@@ -3529,7 +3529,7 @@ msgid "Enclosed Document"
 msgstr "Dokumen Terlampir"
 
 msgid "Ensure that you are using the embedding token, not the API token"
-msgstr "Pastikan Anda menggunakan token embedding, bukan token API"
+msgstr "Pastikan kamu menggunakan token embedding, bukan token API"
 
 msgid "Enter"
 msgstr "Masukkan"
@@ -3562,37 +3562,37 @@ msgid "Enter the domain you want to use for sending emails (without http:// or w
 msgstr "Masukkan domain yang ingin kamu gunakan untuk mengirim email (tanpa http:// atau www)"
 
 msgid "Enter the next signer's email"
-msgstr "Masukkan email penandatangan berikutnya"
+msgstr "Masukkan email penkamutangan berikutnya"
 
 msgid "Enter the next signer's name"
-msgstr "Masukkan nama penandatangan berikutnya"
+msgstr "Masukkan nama penkamutangan berikutnya"
 
 msgid "Enter verification code"
 msgstr "Masukkan kode verifikasi"
 
 msgid "Enter your 2FA code"
-msgstr "Masukkan kode 2FA Anda"
+msgstr "Masukkan kode 2FA kamu"
 
 msgid "Enter your brand details"
-msgstr "Masukkan detail brand Anda"
+msgstr "Masukkan detail brand kamu"
 
 msgid "Enter your email"
-msgstr "Masukkan email Anda"
+msgstr "Masukkan email kamu"
 
 msgid "Enter your email address to receive the completed document."
-msgstr "Masukkan alamat email Anda untuk menerima dokumen yang selesai."
+msgstr "Masukkan alamat email kamu untuk menerima dokumen yang selesai."
 
 msgid "Enter your name"
-msgstr "Masukkan nama Anda"
+msgstr "Masukkan nama kamu"
 
 msgid "Enter your number here"
-msgstr "Masukkan nomor Anda di sini"
+msgstr "Masukkan nomor kamu di sini"
 
 msgid "Enter your password"
-msgstr "Masukkan password Anda"
+msgstr "Masukkan password kamu"
 
 msgid "Enter your text here"
-msgstr "Masukkan teks Anda di sini"
+msgstr "Masukkan teks kamu di sini"
 
 msgid "Enterprise"
 msgstr "Enterprise"
@@ -3643,10 +3643,10 @@ msgid "Everyone can access and view the document"
 msgstr "Semua orang dapat mengakses dan melihat dokumen"
 
 msgid "Everyone has signed"
-msgstr "Semua telah menandatangani"
+msgstr "Semua telah menkamutangani"
 
 msgid "Everyone has signed! You will receive an email copy of the signed document."
-msgstr "Semua sudah menandatangani! Kamu akan menerima salinan email dari dokumen yang ditandatangani."
+msgstr "Semua sudah menkamutangani! Kamu akan menerima salinan email dari dokumen yang ditkamutangani."
 
 msgid "Exceeded timeout"
 msgstr "Waktu habis"
@@ -3829,7 +3829,7 @@ msgid "Font Size"
 msgstr "Ukuran Font"
 
 msgid "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>{SUPPORT_EMAIL}</0>"
-msgstr "Untuk pertanyaan apa pun mengenai pengungkapan ini, tanda tangan elektronik, atau proses terkait, silakan hubungi kami di: <0>{SUPPORT_EMAIL}</0>"
+msgstr "Untuk pertanyaan apa pun mengenai pengungkapan ini, tkamu tangan elektronik, atau proses terkait, silakan hubungi kami di: <0>{SUPPORT_EMAIL}</0>"
 
 msgid "For each recipient, provide their email (required) and name (optional) in separate columns. Download the template CSV below for the correct format."
 msgstr "Untuk setiap penerima, berikan email (wajib) dan nama (opsional) di kolom terpisah. Unduh template CSV di bawah untuk format yang benar."
@@ -3844,13 +3844,13 @@ msgid "Forgot Password"
 msgstr "Lupa Password"
 
 msgid "Forgot your password?"
-msgstr "Lupa password Anda?"
+msgstr "Lupa password kamu?"
 
 msgid "Free"
 msgstr "Gratis"
 
 msgid "Free Signature Settings"
-msgstr "Pengaturan Tanda Tangan Gratis"
+msgstr "Pengaturan Tkamu Tangan Gratis"
 
 msgid "Full Name"
 msgstr "Nama Lengkap"
@@ -3874,13 +3874,13 @@ msgid "Go Back"
 msgstr "Kembali"
 
 msgid "Go back home"
-msgstr "Kembali ke beranda"
+msgstr "Kembali ke berkamu"
 
 msgid "Go Back Home"
-msgstr "Kembali ke Beranda"
+msgstr "Kembali ke Berkamu"
 
 msgid "Go home"
-msgstr "Ke beranda"
+msgstr "Ke berkamu"
 
 msgid "Go to document"
 msgstr "Ke dokumen"
@@ -3910,49 +3910,49 @@ msgid "Groups"
 msgstr "Grup"
 
 msgid "Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist."
-msgstr "Memiliki assistant sebagai penandatangan terakhir berarti mereka tidak bisa melakukan tindakan apa pun karena tidak ada penandatangan berikutnya yang bisa dibantu."
+msgstr "Memiliki assistant sebagai penkamutangan terakhir berarti mereka tidak bisa melakukan tindakan apa pun karena tidak ada penkamutangan berikutnya yang bisa dibantu."
 
 msgid "Height:"
 msgstr "Tinggi:"
 
 msgid "Help complete the document for other signers."
-msgstr "Bantu menyelesaikan dokumen untuk penandatangan lain."
+msgstr "Bantu menyelesaikan dokumen untuk penkamutangan lain."
 
 msgid "Help the AI assign fields to the right recipients."
 msgstr "Bantu AI menetapkan kolom ke penerima yang tepat."
 
 msgid "Here you can add email domains to your organisation."
-msgstr "Di sini Anda dapat menambahkan domain email ke organisasi Anda."
+msgstr "Di sini kamu dapat menambahkan domain email ke organisasi kamu."
 
 msgid "Here you can edit your organisation details."
-msgstr "Di sini Anda dapat mengedit detail organisasi Anda."
+msgstr "Di sini kamu dapat mengedit detail organisasi kamu."
 
 msgid "Here you can edit your personal details."
-msgstr "Di sini Anda dapat mengedit detail pribadi Anda."
+msgstr "Di sini kamu dapat mengedit detail pribadi kamu."
 
 msgid "Here you can manage your password and security settings."
-msgstr "Di sini Anda dapat mengelola password dan pengaturan keamanan Anda."
+msgstr "Di sini kamu dapat mengelola password dan pengaturan keamanan kamu."
 
 msgid "Here you can set branding preferences for your organisation. Teams will inherit these settings by default."
 msgstr "Di sini kamu bisa mengatur preferensi branding untuk organisasi kamu. Tim akan mewarisi pengaturan ini secara default."
 
 msgid "Here you can set branding preferences for your team."
-msgstr "Di sini Anda dapat mengatur preferensi branding untuk tim Anda."
+msgstr "Di sini kamu dapat mengatur preferensi branding untuk tim kamu."
 
 msgid "Here you can set document preferences for your organisation. Teams will inherit these settings by default."
 msgstr "Di sini kamu bisa mengatur preferensi dokumen untuk organisasi kamu. Tim akan mewarisi pengaturan ini secara default."
 
 msgid "Here you can set preferences and defaults for branding."
-msgstr "Di sini Anda dapat mengatur preferensi dan default untuk branding."
+msgstr "Di sini kamu dapat mengatur preferensi dan default untuk branding."
 
 msgid "Here you can set preferences and defaults for your team."
-msgstr "Di sini Anda dapat mengatur preferensi dan default untuk tim Anda."
+msgstr "Di sini kamu dapat mengatur preferensi dan default untuk tim kamu."
 
 msgid "Here you can set your general branding preferences."
-msgstr "Di sini Anda dapat mengatur preferensi branding umum Anda."
+msgstr "Di sini kamu dapat mengatur preferensi branding umum kamu."
 
 msgid "Here you can set your general document preferences."
-msgstr "Di sini Anda dapat mengatur preferensi dokumen umum Anda."
+msgstr "Di sini kamu dapat mengatur preferensi dokumen umum kamu."
 
 msgid "Here's how it works:"
 msgstr "Begini cara kerjanya:"
@@ -3967,10 +3967,10 @@ msgid "Hide license key"
 msgstr "Sembunyikan kunci lisensi"
 
 msgid "Home"
-msgstr "Beranda"
+msgstr "Berkamu"
 
 msgid "Home (No Folder)"
-msgstr "Beranda (Tidak Ada Folder)"
+msgstr "Berkamu (Tidak Ada Folder)"
 
 msgid "Horizontal"
 msgstr "Horizontal"
@@ -4048,13 +4048,13 @@ msgid "Include sender details"
 msgstr "Sertakan detail pengirim"
 
 msgid "Include signing certificate"
-msgstr "Sertakan sertifikat penandatanganan"
+msgstr "Sertakan sertifikat penkamutanganan"
 
 msgid "Include the Audit Logs in the Document"
 msgstr "Sertakan Log Audit dalam Dokumen"
 
 msgid "Include the Signing Certificate in the Document"
-msgstr "Sertakan Sertifikat Penandatanganan dalam Dokumen"
+msgstr "Sertakan Sertifikat Penkamutanganan dalam Dokumen"
 
 msgid "Includes:"
 msgstr "Termasuk:"
@@ -4186,10 +4186,10 @@ msgid "It seems that there is no token provided, if you are trying to verify you
 msgstr "Sepertinya tidak ada token yang diberikan, jika kamu mencoba memverifikasi email, silakan ikuti link di email kamu."
 
 msgid "It's currently not your turn to sign. Please check back soon as this document should be available for you to sign shortly."
-msgstr "Saat ini belum giliran kamu untuk menandatangani. Silakan cek lagi sebentar karena dokumen ini akan tersedia untuk kamu tandatangani dalam waktu dekat."
+msgstr "Saat ini belum giliran kamu untuk menkamutangani. Silakan cek lagi sebentar karena dokumen ini akan tersedia untuk kamu tkamutangani dalam waktu dekat."
 
 msgid "It's currently not your turn to sign. You will receive an email with instructions once it's your turn to sign the document."
-msgstr "Saat ini belum giliran kamu untuk menandatangani. Kamu akan menerima email dengan instruksi setelah giliran kamu untuk menandatangani dokumen."
+msgstr "Saat ini belum giliran kamu untuk menkamutangani. Kamu akan menerima email dengan instruksi setelah giliran kamu untuk menkamutangani dokumen."
 
 msgid "Join our community on <0>Discord</0> for community support and discussion."
 msgstr "Bergabunglah dengan komunitas kami di <0>Discord</0> untuk dukungan dan diskusi komunitas."
@@ -4231,7 +4231,7 @@ msgid "Last Retried"
 msgstr "Terakhir Dicoba Ulang"
 
 msgid "Last Signed"
-msgstr "Terakhir Ditandatangani"
+msgstr "Terakhir Ditkamutangani"
 
 msgid "Last updated"
 msgstr "Terakhir diperbarui"
@@ -4267,7 +4267,7 @@ msgid "Left"
 msgstr "Kiri"
 
 msgid "Legality of Electronic Signatures"
-msgstr "Legalitas Tanda Tangan Elektronik"
+msgstr "Legalitas Tkamu Tangan Elektronik"
 
 msgid "Letter spacing"
 msgstr "Spasi huruf"
@@ -4348,16 +4348,16 @@ msgid "Looking for form fields"
 msgstr "Mencari kolom formulir"
 
 msgid "Looking for signature fields"
-msgstr "Mencari kolom tanda tangan"
+msgstr "Mencari kolom tkamu tangan"
 
 msgid "Manage"
 msgstr "Kelola"
 
 msgid "Manage a custom SSO login portal for your organisation."
-msgstr "Kelola portal login SSO kustom untuk organisasi Anda."
+msgstr "Kelola portal login SSO kustom untuk organisasi kamu."
 
 msgid "Manage all organisations you are currently associated with."
-msgstr "Kelola semua organisasi yang saat ini terkait dengan Anda."
+msgstr "Kelola semua organisasi yang saat ini terkait dengan kamu."
 
 msgid "Manage all subscription claims"
 msgstr "Kelola semua klaim langganan"
@@ -4411,16 +4411,16 @@ msgid "Manage team"
 msgstr "Kelola tim"
 
 msgid "Manage the custom groups of members for your organisation."
-msgstr "Kelola grup kustom anggota untuk organisasi Anda."
+msgstr "Kelola grup kustom anggota untuk organisasi kamu."
 
 msgid "Manage the direct link signing for this template"
-msgstr "Kelola penandatanganan tautan langsung untuk templat ini"
+msgstr "Kelola penkamutanganan tautan langsung untuk templat ini"
 
 msgid "Manage the groups assigned to this team."
 msgstr "Kelola grup yang ditetapkan ke tim ini."
 
 msgid "Manage the members of your team."
-msgstr "Kelola anggota tim Anda."
+msgstr "Kelola anggota tim kamu."
 
 msgid "Manage the members or invite new members."
 msgstr "Kelola anggota atau undang anggota baru."
@@ -4435,16 +4435,16 @@ msgid "Manage users"
 msgstr "Kelola pengguna"
 
 msgid "Manage your email domain settings."
-msgstr "Kelola pengaturan domain email Anda."
+msgstr "Kelola pengaturan domain email kamu."
 
 msgid "Manage your organisation group settings."
-msgstr "Kelola pengaturan grup organisasi Anda."
+msgstr "Kelola pengaturan grup organisasi kamu."
 
 msgid "Manage your passkeys."
-msgstr "Kelola passkey Anda."
+msgstr "Kelola passkey kamu."
 
 msgid "Manage your site settings here"
-msgstr "Kelola pengaturan situs Anda di sini"
+msgstr "Kelola pengaturan situs kamu di sini"
 
 msgid "Manager"
 msgstr "Manajer"
@@ -4456,10 +4456,10 @@ msgid "Mapping fields to recipients"
 msgstr "Memetakan kolom ke penerima"
 
 msgid "Mark as viewed"
-msgstr "Tandai sebagai dilihat"
+msgstr "Tkamui sebagai dilihat"
 
 msgid "Mark as Viewed"
-msgstr "Tandai sebagai Dilihat"
+msgstr "Tkamui sebagai Dilihat"
 
 msgid "MAU (created document)"
 msgstr "MAU (membuat dokumen)"
@@ -4585,7 +4585,7 @@ msgid "Name Settings"
 msgstr "Pengaturan Nama"
 
 msgid "Need to sign documents?"
-msgstr "Perlu menandatangani dokumen?"
+msgstr "Perlu menkamutangani dokumen?"
 
 msgid "Never"
 msgstr "Tidak Pernah"
@@ -4639,7 +4639,7 @@ msgid "No features enabled"
 msgstr "Tidak ada fitur diaktifkan"
 
 msgid "No fields were detected in your document."
-msgstr "Tidak ada kolom yang terdeteksi di dokumen Anda."
+msgstr "Tidak ada kolom yang terdeteksi di dokumen kamu."
 
 msgid "No folders found"
 msgstr "Tidak ada folder ditemukan"
@@ -4648,7 +4648,7 @@ msgid "No folders yet."
 msgstr "Belum ada folder."
 
 msgid "No further action is required from you at this time."
-msgstr "Tidak ada tindakan lebih lanjut yang diperlukan dari Anda saat ini."
+msgstr "Tidak ada tindakan lebih lanjut yang diperlukan dari kamu saat ini."
 
 msgid "No groups found"
 msgstr "Tidak ada grup ditemukan"
@@ -4666,7 +4666,7 @@ msgid "No organisation members available"
 msgstr "Tidak ada anggota organisasi tersedia"
 
 msgid "No organisation templates are shared with your team yet."
-msgstr "Belum ada templat organisasi yang dibagikan ke tim Anda."
+msgstr "Belum ada templat organisasi yang dibagikan ke tim kamu."
 
 msgid "No organisations found"
 msgstr "Tidak ada organisasi ditemukan"
@@ -4687,7 +4687,7 @@ msgid "No recipients"
 msgstr "Tidak ada penerima"
 
 msgid "No recipients were detected in your document."
-msgstr "Tidak ada penerima yang terdeteksi di dokumen Anda."
+msgstr "Tidak ada penerima yang terdeteksi di dokumen kamu."
 
 msgid "No recipients with this role"
 msgstr "Tidak ada penerima dengan peran ini"
@@ -4765,7 +4765,7 @@ msgid "On"
 msgstr "Hidup"
 
 msgid "On this page, you can create a new webhook."
-msgstr "Di halaman ini, Anda dapat membuat webhook baru."
+msgstr "Di halaman ini, kamu dapat membuat webhook baru."
 
 msgid "On this page, you can create and manage API tokens. See our <0>Documentation</0> for more information."
 msgstr "Di halaman ini, kamu bisa membuat dan mengelola token API. Lihat <0>Dokumentasi</0> kami untuk informasi lebih lanjut."
@@ -4777,10 +4777,10 @@ msgid "Once confirmed, the following will occur:"
 msgstr "Setelah dikonfirmasi, berikut yang akan terjadi:"
 
 msgid "Once you have scanned the QR code or entered the code manually, enter the code provided by your authenticator app below."
-msgstr "Setelah Anda memindai kode QR atau memasukkan kode secara manual, masukkan kode yang diberikan oleh aplikasi autentikator Anda di bawah."
+msgstr "Setelah kamu memindai kode QR atau memasukkan kode secara manual, masukkan kode yang diberikan oleh aplikasi autentikator kamu di bawah."
 
 msgid "One of the documents in the current bundle has a signing role that is not compatible with the current signing experience."
-msgstr "Salah satu dokumen dalam bundel saat ini memiliki peran penandatanganan yang tidak kompatibel dengan pengalaman penandatanganan saat ini."
+msgstr "Salah satu dokumen dalam bundel saat ini memiliki peran penkamutanganan yang tidak kompatibel dengan pengalaman penkamutanganan saat ini."
 
 msgid "Only admins can access and view the document"
 msgstr "Hanya admin yang dapat mengakses dan melihat dokumen"
@@ -4900,16 +4900,16 @@ msgid "Organisations that the user is a member of."
 msgstr "Organisasi tempat pengguna menjadi anggota."
 
 msgid "Organise your documents"
-msgstr "Atur dokumen Anda"
+msgstr "Atur dokumen kamu"
 
 msgid "Organise your members into groups which can be assigned to teams"
-msgstr "Atur anggota Anda ke dalam grup yang bisa ditugaskan ke tim"
+msgstr "Atur anggota kamu ke dalam grup yang bisa ditugaskan ke tim"
 
 msgid "Organise your templates"
-msgstr "Atur templat Anda"
+msgstr "Atur templat kamu"
 
 msgid "Organize your documents and templates"
-msgstr "Atur dokumen dan templat Anda"
+msgstr "Atur dokumen dan templat kamu"
 
 msgid "Original"
 msgstr "Asli"
@@ -4969,7 +4969,7 @@ msgid "Passkeys"
 msgstr "Passkeys"
 
 msgid "Passkeys allow you to sign in and authenticate using biometrics, password managers, etc."
-msgstr "Passkeys memungkinkan Anda login dan autentikasi menggunakan biometrik, password manager, dll."
+msgstr "Passkeys memungkinkan kamu login dan autentikasi menggunakan biometrik, password manager, dll."
 
 msgid "Passkeys are not supported on this browser"
 msgstr "Passkeys tidak didukung di browser ini"
@@ -5005,7 +5005,7 @@ msgid "Pending Documents"
 msgstr "Dokumen Tertunda"
 
 msgid "Pending documents will have their signing process cancelled"
-msgstr "Dokumen tertunda akan dibatalkan proses penandatanganannya"
+msgstr "Dokumen tertunda akan dibatalkan proses penkamutanganannya"
 
 msgid "Pending invitations"
 msgstr "Undangan tertunda"
@@ -5044,7 +5044,7 @@ msgid "Pick a password"
 msgstr "Pilih password"
 
 msgid "Pick any of the following agreements below and start signing to get started"
-msgstr "Pilih salah satu perjanjian di bawah dan mulai menandatangani untuk memulai"
+msgstr "Pilih salah satu perjanjian di bawah dan mulai menkamutangani untuk memulai"
 
 msgid "Pin"
 msgstr "Sematkan"
@@ -5062,10 +5062,10 @@ msgid "Please check with the parent application for more information."
 msgstr "Harap periksa aplikasi induk untuk informasi lebih lanjut."
 
 msgid "Please check your email for updates."
-msgstr "Harap periksa email Anda untuk pembaruan."
+msgstr "Harap periksa email kamu untuk pembaruan."
 
 msgid "Please choose your new password"
-msgstr "Harap pilih password baru Anda"
+msgstr "Harap pilih password baru kamu"
 
 msgid "Please complete the CAPTCHA challenge before signing in."
 msgstr "Harap selesaikan CAPTCHA sebelum login."
@@ -5086,7 +5086,7 @@ msgid "Please contact the site owner for further assistance."
 msgstr "Harap hubungi pemilik situs untuk bantuan lebih lanjut."
 
 msgid "Please enter a meaningful name for your token. This will help you identify it later."
-msgstr "Harap masukkan nama yang bermakna untuk token Anda. Ini akan membantu Anda mengidentifikasinya nanti."
+msgstr "Harap masukkan nama yang bermakna untuk token kamu. Ini akan membantu kamu mengidentifikasinya nanti."
 
 msgid "Please enter a number"
 msgstr "Harap masukkan nomor"
@@ -5101,22 +5101,22 @@ msgid "Please enter a value"
 msgstr "Harap masukkan nilai"
 
 msgid "Please enter your email address"
-msgstr "Harap masukkan alamat email Anda"
+msgstr "Harap masukkan alamat email kamu"
 
 msgid "Please enter your full name"
-msgstr "Harap masukkan nama lengkap Anda"
+msgstr "Harap masukkan nama lengkap kamu"
 
 msgid "Please enter your initials"
-msgstr "Harap masukkan inisial Anda"
+msgstr "Harap masukkan inisial kamu"
 
 msgid "Please mark as viewed to complete"
-msgstr "Harap tandai sebagai dilihat untuk menyelesaikan"
+msgstr "Harap tkamui sebagai dilihat untuk menyelesaikan"
 
 msgid "Please mark as viewed to complete."
-msgstr "Harap tandai sebagai dilihat untuk menyelesaikan."
+msgstr "Harap tkamui sebagai dilihat untuk menyelesaikan."
 
 msgid "Please note that anyone who signs in through your portal will be added to your organisation as a member."
-msgstr "Harap dicatat bahwa siapa pun yang login melalui portal Anda akan ditambahkan ke organisasi sebagai anggota."
+msgstr "Harap dicatat bahwa siapa pun yang login melalui portal kamu akan ditambahkan ke organisasi sebagai anggota."
 
 msgid "Please note that proceeding will remove direct linking recipient and turn it into a placeholder."
 msgstr "Harap dicatat bahwa melanjutkan akan menghapus penerima tautan langsung dan mengubahnya menjadi placeholder."
@@ -5131,16 +5131,16 @@ msgid "Please note that this action is <0>irreversible</0>. Once confirmed, this
 msgstr "Harap dicatat bahwa tindakan ini <0>tidak dapat dibatalkan</0>. Setelah dikonfirmasi, templat ini akan dihapus secara permanen."
 
 msgid "Please note that this action is irreversible. Once confirmed, your token will be permanently deleted."
-msgstr "Harap dicatat bahwa tindakan ini tidak dapat dibatalkan. Setelah dikonfirmasi, token Anda akan dihapus secara permanen."
+msgstr "Harap dicatat bahwa tindakan ini tidak dapat dibatalkan. Setelah dikonfirmasi, token kamu akan dihapus secara permanen."
 
 msgid "Please note that this action is irreversible. Once confirmed, your webhook will be permanently deleted."
-msgstr "Harap dicatat bahwa tindakan ini tidak dapat dibatalkan. Setelah dikonfirmasi, webhook Anda akan dihapus secara permanen."
+msgstr "Harap dicatat bahwa tindakan ini tidak dapat dibatalkan. Setelah dikonfirmasi, webhook kamu akan dihapus secara permanen."
 
 msgid "Please note that you will lose access to all documents associated with this team & all the members will be removed and notified"
-msgstr "Harap dicatat bahwa Anda akan kehilangan akses ke semua dokumen yang terkait dengan tim ini & semua anggota akan dihapus dan diberitahu"
+msgstr "Harap dicatat bahwa kamu akan kehilangan akses ke semua dokumen yang terkait dengan tim ini & semua anggota akan dihapus dan diberitahu"
 
 msgid "Please open your authenticator app and enter the 6-digit code for this document."
-msgstr "Harap buka aplikasi autentikator Anda dan masukkan kode 6 digit untuk dokumen ini."
+msgstr "Harap buka aplikasi autentikator kamu dan masukkan kode 6 digit untuk dokumen ini."
 
 msgid "Please provide a reason for rejecting this document"
 msgstr "Harap berikan alasan untuk menolak dokumen ini"
@@ -5149,13 +5149,13 @@ msgid "Please provide a token from the authenticator, or a backup code. If you d
 msgstr "Harap berikan token dari autentikator, atau kode cadangan. Jika tidak memiliki kode cadangan, harap hubungi support."
 
 msgid "Please provide a token from your authenticator, or a backup code."
-msgstr "Harap berikan token dari autentikator Anda, atau kode cadangan."
+msgstr "Harap berikan token dari autentikator kamu, atau kode cadangan."
 
 msgid "Please review the document before approving."
 msgstr "Harap tinjau dokumen sebelum menyetujui."
 
 msgid "Please review the document before signing."
-msgstr "Harap tinjau dokumen sebelum menandatangani."
+msgstr "Harap tinjau dokumen sebelum menkamutangani."
 
 msgid "Please select a PDF file"
 msgstr "Harap pilih file PDF"
@@ -5164,13 +5164,13 @@ msgid "Please select at least one member to add to the team."
 msgstr "Harap pilih setidaknya satu anggota untuk ditambahkan ke tim."
 
 msgid "Please select how you'd like to receive your verification code."
-msgstr "Harap pilih bagaimana Anda ingin menerima kode verifikasi."
+msgstr "Harap pilih bagaimana kamu ingin menerima kode verifikasi."
 
 msgid "Please try a different domain."
 msgstr "Harap coba domain lain."
 
 msgid "Please try again and make sure you enter the correct email address."
-msgstr "Harap coba lagi dan pastikan Anda memasukkan alamat email yang benar."
+msgstr "Harap coba lagi dan pastikan kamu memasukkan alamat email yang benar."
 
 msgid "Please try again or contact our support."
 msgstr "Harap coba lagi atau hubungi support kami."
@@ -5209,7 +5209,7 @@ msgid "Preview the document before sending"
 msgstr "Pratinjau dokumen sebelum dikirim"
 
 msgid "Preview what the signed document will look like with placeholder data"
-msgstr "Pratinjau seperti apa dokumen yang ditandatangani dengan data placeholder"
+msgstr "Pratinjau seperti apa dokumen yang ditkamutangani dengan data placeholder"
 
 msgid "Primary"
 msgstr "Primer"
@@ -5227,7 +5227,7 @@ msgid "Private Template"
 msgstr "Templat Pribadi"
 
 msgid "Private templates can only be modified and viewed by you."
-msgstr "Templat pribadi hanya bisa dimodifikasi dan dilihat oleh Anda."
+msgstr "Templat pribadi hanya bisa dimodifikasi dan dilihat oleh kamu."
 
 msgid "Proceed"
 msgstr "Lanjutkan"
@@ -5269,7 +5269,7 @@ msgid "Public Template"
 msgstr "Templat Publik"
 
 msgid "Public templates are connected to your public profile. Any modifications to public templates will also appear in your public profile."
-msgstr "Templat publik terhubung ke profil publik Anda. Modifikasi apa pun pada templat publik juga akan muncul di profil publik Anda."
+msgstr "Templat publik terhubung ke profil publik kamu. Modifikasi apa pun pada templat publik juga akan muncul di profil publik kamu."
 
 msgid "Quick Actions"
 msgstr "Aksi Cepat"
@@ -5299,10 +5299,10 @@ msgid "Read Status"
 msgstr "Status Baca"
 
 msgid "Read the full <0>signature disclosure</0>."
-msgstr "Baca <0>pengungkapan tanda tangan</0> selengkapnya."
+msgstr "Baca <0>pengungkapan tkamu tangan</0> selengkapnya."
 
 msgid "Reading your document"
-msgstr "Membaca dokumen Anda"
+msgstr "Membaca dokumen kamu"
 
 msgid "Ready"
 msgstr "Siap"
@@ -5317,7 +5317,7 @@ msgid "Reason must be less than 500 characters"
 msgstr "Alasan harus kurang dari 500 karakter"
 
 msgid "Reauthentication is required to sign this field"
-msgstr "Re-autentikasi diperlukan untuk menandatangani kolom ini"
+msgstr "Re-autentikasi diperlukan untuk menkamutangani kolom ini"
 
 msgid "Recent activity"
 msgstr "Aktivitas terbaru"
@@ -5341,10 +5341,10 @@ msgid "Recipient removed"
 msgstr "Penerima dihapus"
 
 msgid "Recipient signed"
-msgstr "Penerima menandatangani"
+msgstr "Penerima menkamutangani"
 
 msgid "Recipient signing request"
-msgstr "Permintaan penandatanganan penerima"
+msgstr "Permintaan penkamutanganan penerima"
 
 msgid "Recipient updated"
 msgstr "Penerima diperbarui"
@@ -5359,7 +5359,7 @@ msgid "Recipients that will be automatically added to new documents."
 msgstr "Penerima yang akan otomatis ditambahkan ke dokumen baru."
 
 msgid "Recipients will be able to sign the document once sent"
-msgstr "Penerima akan bisa menandatangani dokumen setelah dikirim"
+msgstr "Penerima akan bisa menkamutangani dokumen setelah dikirim"
 
 msgid "Recipients will still retain their copy of the document"
 msgstr "Penerima tetap akan menyimpan salinan dokumen mereka"
@@ -5563,7 +5563,7 @@ msgid "Return"
 msgstr "Kembali"
 
 msgid "Return Home"
-msgstr "Kembali ke Beranda"
+msgstr "Kembali ke Berkamu"
 
 msgid "Return to Documenso sign in page here"
 msgstr "Kembali ke halaman login Documenso di sini"
@@ -5572,7 +5572,7 @@ msgid "Return to documents"
 msgstr "Kembali ke dokumen"
 
 msgid "Return to Home"
-msgstr "Kembali ke Beranda"
+msgstr "Kembali ke Berkamu"
 
 msgid "Return to sign in"
 msgstr "Kembali ke login"
@@ -5692,10 +5692,10 @@ msgid "Select a team to view its dashboard"
 msgstr "Pilih tim untuk melihat dashboard-nya"
 
 msgid "Select a template you'd like to display on your public profile"
-msgstr "Pilih templat yang ingin ditampilkan di profil publik Anda"
+msgstr "Pilih templat yang ingin ditampilkan di profil publik kamu"
 
 msgid "Select a template you'd like to display on your team's public profile"
-msgstr "Pilih templat yang ingin ditampilkan di profil publik tim Anda"
+msgstr "Pilih templat yang ingin ditampilkan di profil publik tim kamu"
 
 msgid "Select a time zone"
 msgstr "Pilih zona waktu"
@@ -5761,7 +5761,7 @@ msgid "Select row"
 msgstr "Pilih baris"
 
 msgid "Select signature types"
-msgstr "Pilih tipe tanda tangan"
+msgstr "Pilih tipe tkamu tangan"
 
 msgid "Select text align"
 msgstr "Pilih perataan teks"
@@ -5803,7 +5803,7 @@ msgid "Send"
 msgstr "Kirim"
 
 msgid "Send a test webhook with sample data to verify your integration is working correctly."
-msgstr "Kirim webhook uji dengan contoh data untuk memverifikasi integrasi Anda bekerja dengan benar."
+msgstr "Kirim webhook uji dengan contoh data untuk memverifikasi integrasi kamu bekerja dengan benar."
 
 msgid "Send confirmation email"
 msgstr "Kirim email konfirmasi"
@@ -5857,10 +5857,10 @@ msgid "Set a password"
 msgstr "Tetapkan password"
 
 msgid "Set up your document properties and recipient information"
-msgstr "Atur properti dokumen dan info penerima Anda"
+msgstr "Atur properti dokumen dan info penerima kamu"
 
 msgid "Set up your template properties and recipient information"
-msgstr "Atur properti templat dan info penerima Anda"
+msgstr "Atur properti templat dan info penerima kamu"
 
 msgid "Settings"
 msgstr "Pengaturan"
@@ -5872,7 +5872,7 @@ msgid "Share"
 msgstr "Bagikan"
 
 msgid "Share Signing Card"
-msgstr "Bagikan Kartu Tanda Tangan"
+msgstr "Bagikan Kartu Tkamu Tangan"
 
 msgid "Show"
 msgstr "Tampilkan"
@@ -5890,40 +5890,40 @@ msgid "Show quotas for documents, emails and API usages"
 msgstr "Tampilkan kuota untuk dokumen, email, dan penggunaan API"
 
 msgid "Show templates in your public profile for your audience to sign and get started quickly"
-msgstr "Tampilkan templat di profil publik Anda agar audiens Anda bisa menandatangani dan memulai dengan cepat"
+msgstr "Tampilkan templat di profil publik kamu agar audiens kamu bisa menkamutangani dan memulai dengan cepat"
 
 msgid "Sign document"
-msgstr "Tanda tangani dokumen"
+msgstr "Tkamu tangani dokumen"
 
 msgid "Sign Document"
-msgstr "Tanda Tangani Dokumen"
+msgstr "Tkamu Tangani Dokumen"
 
 msgid "Sign Document - Documenso"
-msgstr "Tanda Tangani Dokumen - Documenso"
+msgstr "Tkamu Tangani Dokumen - Documenso"
 
 msgid "Sign Documents"
-msgstr "Tanda Tangani Dokumen"
+msgstr "Tkamu Tangani Dokumen"
 
 msgid "Sign field"
-msgstr "Kolom tanda tangan"
+msgstr "Kolom tkamu tangan"
 
 msgid "Sign Here"
-msgstr "Tanda Tangan di Sini"
+msgstr "Tkamu Tangan di Sini"
 
 msgid "Sign In"
 msgstr "Masuk"
 
 msgid "Sign in to your account"
-msgstr "Masuk ke akun Anda"
+msgstr "Masuk ke akun kamu"
 
 msgid "Sign Out"
 msgstr "Keluar"
 
 msgid "Sign Signature Field"
-msgstr "Kolom Tanda Tangan"
+msgstr "Kolom Tkamu Tangan"
 
 msgid "Sign the document to complete the process."
-msgstr "Tanda tangani dokumen untuk menyelesaikan proses."
+msgstr "Tkamu tangani dokumen untuk menyelesaikan proses."
 
 msgid "Sign up"
 msgstr "Daftar"
@@ -5941,58 +5941,58 @@ msgid "Sign Up with OIDC"
 msgstr "Daftar dengan OIDC"
 
 msgid "Signature"
-msgstr "Tanda Tangan"
+msgstr "Tkamu Tangan"
 
 msgid "Signature ID"
-msgstr "ID Tanda Tangan"
+msgstr "ID Tkamu Tangan"
 
 msgid "Signature Pad cannot be empty."
-msgstr "Papan tanda tangan tidak boleh kosong."
+msgstr "Papan tkamu tangan tidak boleh kosong."
 
 msgid "Signature Settings"
-msgstr "Pengaturan Tanda Tangan"
+msgstr "Pengaturan Tkamu Tangan"
 
 msgid "Signatures Collected"
-msgstr "Tanda Tangan Terkumpul"
+msgstr "Tkamu Tangan Terkumpul"
 
 msgid "Signer Events"
-msgstr "Event Penandatangan"
+msgstr "Event Penkamutangan"
 
 msgid "Signing Certificate"
-msgstr "Sertifikat Penandatanganan"
+msgstr "Sertifikat Penkamutanganan"
 
 msgid "Signing certificate provided by"
-msgstr "Sertifikat penandatanganan disediakan oleh"
+msgstr "Sertifikat penkamutanganan disediakan oleh"
 
 msgid "Signing Deadline Expired"
-msgstr "Batas Waktu Penandatanganan Kedaluwarsa"
+msgstr "Batas Waktu Penkamutanganan Kedaluwarsa"
 
 msgid "Signing for"
-msgstr "Menandatangani untuk"
+msgstr "Menkamutangani untuk"
 
 msgid "Signing in..."
 msgstr "Sedang masuk..."
 
 msgid "Signing Links"
-msgstr "Tautan Penandatanganan"
+msgstr "Tautan Penkamutanganan"
 
 msgid "Signing links have been generated for this document."
-msgstr "Tautan penandatanganan telah dibuat untuk dokumen ini."
+msgstr "Tautan penkamutanganan telah dibuat untuk dokumen ini."
 
 msgid "Signing order is enabled."
-msgstr "Urutan penandatanganan diaktifkan."
+msgstr "Urutan penkamutanganan diaktifkan."
 
 msgid "Signing Reminders"
-msgstr "Pengingat Penandatanganan"
+msgstr "Pengingat Penkamutanganan"
 
 msgid "Signing Status"
-msgstr "Status Penandatanganan"
+msgstr "Status Penkamutanganan"
 
 msgid "Signing Window Expired"
-msgstr "Jendela Penandatanganan Kedaluwarsa"
+msgstr "Jendela Penkamutanganan Kedaluwarsa"
 
 msgid "Signup is currently disabled or not available for your email domain."
-msgstr "Pendaftaran saat ini dinonaktifkan atau tidak tersedia untuk domain email Anda."
+msgstr "Pendaftaran saat ini dinonaktifkan atau tidak tersedia untuk domain email kamu."
 
 msgid "Site Banner"
 msgstr "Banner Situs"
@@ -6016,7 +6016,7 @@ msgid "Something went wrong while loading the document."
 msgstr "Terjadi kesalahan saat memuat dokumen."
 
 msgid "Something went wrong while loading your passkeys."
-msgstr "Terjadi kesalahan saat memuat passkey Anda."
+msgstr "Terjadi kesalahan saat memuat passkey kamu."
 
 msgid "Something went wrong while replacing the PDF"
 msgstr "Terjadi kesalahan saat mengganti PDF"
@@ -6226,7 +6226,7 @@ msgid "Team Only"
 msgstr "Khusus Tim"
 
 msgid "Team only templates are not linked anywhere and are visible only to your team."
-msgstr "Templat khusus tim tidak ditautkan di mana pun dan hanya terlihat oleh tim Anda."
+msgstr "Templat khusus tim tidak ditautkan di mana pun dan hanya terlihat oleh tim kamu."
 
 msgid "Team role"
 msgstr "Peran tim"
@@ -6250,7 +6250,7 @@ msgid "Teams"
 msgstr "Tim"
 
 msgid "Teams help you organise your work and collaborate with others. Create your first team to get started."
-msgstr "Tim membantu Anda mengatur pekerjaan dan berkolaborasi dengan orang lain. Buat tim pertama Anda untuk memulai."
+msgstr "Tim membantu kamu mengatur pekerjaan dan berkolaborasi dengan orang lain. Buat tim pertama kamu untuk memulai."
 
 msgid "Teams that this organisation group is currently assigned to"
 msgstr "Tim tempat grup organisasi ini saat ini ditugaskan"
@@ -6271,13 +6271,13 @@ msgid "Template document uploaded"
 msgstr "Dokumen templat diunggah"
 
 msgid "Template Duplicated"
-msgstr "Templat Digandakan"
+msgstr "Templat Digkamukan"
 
 msgid "Template Editor"
 msgstr "Editor Templat"
 
 msgid "Template has been removed from your public profile."
-msgstr "Templat telah dihapus dari profil publik Anda."
+msgstr "Templat telah dihapus dari profil publik kamu."
 
 msgid "Template has been updated."
 msgstr "Templat telah diperbarui."
@@ -6355,13 +6355,13 @@ msgid "Text Settings"
 msgstr "Pengaturan Teks"
 
 msgid "Thank you for completing the signing process."
-msgstr "Terima kasih telah menyelesaikan proses penandatanganan."
+msgstr "Terima kasih telah menyelesaikan proses penkamutanganan."
 
 msgid "Thank you for letting us know, we have flagged this sender for review. If you have any concerns please feel free to reach out to our <0>support team</0>."
-msgstr "Terima kasih telah memberi tahu kami, kami telah menandai pengirim ini untuk ditinjau. Jika ada kekhawatiran, jangan ragu untuk menghubungi <0>tim support</0> kami."
+msgstr "Terima kasih telah memberi tahu kami, kami telah menkamui pengirim ini untuk ditinjau. Jika ada kekhawatiran, jangan ragu untuk menghubungi <0>tim support</0> kami."
 
 msgid "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
-msgstr "Terima kasih telah menggunakan Documenso untuk melakukan penandatanganan dokumen elektronik Anda. Tujuan pengungkapan ini adalah untuk memberi tahu Anda tentang proses, legalitas, dan hak Anda terkait penggunaan tanda tangan elektronik di platform kami. Dengan memilih menggunakan tanda tangan elektronik, Anda menyetujui syarat dan ketentuan yang dijelaskan di bawah ini."
+msgstr "Terima kasih telah menggunakan Documenso untuk melakukan penkamutanganan dokumen elektronik kamu. Tujuan pengungkapan ini adalah untuk memberi tahu kamu tentang proses, legalitas, dan hak kamu terkait penggunaan tkamu tangan elektronik di platform kami. Dengan memilih menggunakan tkamu tangan elektronik, kamu menyetujui syarat dan ketentuan yang dijelaskan di bawah ini."
 
 msgid "The account has been deleted successfully."
 msgstr "Akun berhasil dihapus."
@@ -6382,7 +6382,7 @@ msgid "The deletion will run in the background, and can take up to a few minutes
 msgstr "Penghapusan akan berjalan di latar belakang, dan bisa memakan waktu hingga beberapa menit. Jangan jalankan ulang penghapusan ini."
 
 msgid "The direct link has been copied to your clipboard"
-msgstr "Tautan langsung telah disalin ke clipboard Anda"
+msgstr "Tautan langsung telah disalin ke clipboard kamu"
 
 msgid "The display name for this email address"
 msgstr "Nama tampilan untuk alamat email ini"
@@ -6406,34 +6406,34 @@ msgid "The document is now completed, please follow any instructions provided wi
 msgstr "Dokumen sekarang selesai, harap ikuti instruksi yang diberikan dalam aplikasi induk."
 
 msgid "The document owner has been notified of your decision. They may contact you with further instructions if necessary."
-msgstr "Pemilik dokumen telah diberitahu tentang keputusan Anda. Mereka mungkin menghubungi Anda dengan instruksi lebih lanjut jika diperlukan."
+msgstr "Pemilik dokumen telah diberitahu tentang keputusan kamu. Mereka mungkin menghubungi kamu dengan instruksi lebih lanjut jika diperlukan."
 
 msgid "The document was created but could not be sent to recipients."
 msgstr "Dokumen dibuat tetapi tidak dapat dikirim ke penerima."
 
 msgid "The document will be hidden from your account"
-msgstr "Dokumen akan disembunyikan dari akun Anda"
+msgstr "Dokumen akan disembunyikan dari akun kamu"
 
 msgid "The document will be immediately sent to recipients if this is checked."
 msgstr "Dokumen akan segera dikirim ke penerima jika ini dicentang."
 
 msgid "The document you are looking for could not be found."
-msgstr "Dokumen yang Anda cari tidak dapat ditemukan."
+msgstr "Dokumen yang kamu cari tidak dapat ditemukan."
 
 msgid "The document you are looking for may have been removed, renamed or may have never existed."
-msgstr "Dokumen yang Anda cari mungkin telah dihapus, diubah nama, atau mungkin tidak pernah ada."
+msgstr "Dokumen yang kamu cari mungkin telah dihapus, diubah nama, atau mungkin tidak pernah ada."
 
 msgid "The email blocklist has been updated successfully."
 msgstr "Daftar blokir email berhasil diperbarui."
 
 msgid "The email domain you are looking for may have been removed, renamed or may have never existed."
-msgstr "Domain email yang Anda cari mungkin telah dihapus, diubah nama, atau mungkin tidak pernah ada."
+msgstr "Domain email yang kamu cari mungkin telah dihapus, diubah nama, atau mungkin tidak pernah ada."
 
 msgid "The email or password provided is incorrect."
 msgstr "Email atau password yang diberikan salah."
 
 msgid "The events that will trigger a webhook to be sent to your URL."
-msgstr "Event yang akan memicu webhook untuk dikirim ke URL Anda."
+msgstr "Event yang akan memicu webhook untuk dikirim ke URL kamu."
 
 msgid "The fields have been updated to the new field insertion method successfully"
 msgstr "Kolom telah berhasil diperbarui ke metode penyisipan kolom baru"
@@ -6442,10 +6442,10 @@ msgid "The file is not a valid PDF."
 msgstr "File bukan PDF yang valid."
 
 msgid "The folder you are trying to delete does not exist."
-msgstr "Folder yang ingin Anda hapus tidak ada."
+msgstr "Folder yang ingin kamu hapus tidak ada."
 
 msgid "The folder you are trying to move does not exist."
-msgstr "Folder yang ingin Anda pindahkan tidak ada."
+msgstr "Folder yang ingin kamu pindahkan tidak ada."
 
 msgid "The folder you are trying to move the document to does not exist."
 msgstr "Folder tujuan untuk memindahkan dokumen tidak ada."
@@ -6460,10 +6460,10 @@ msgid "The following recipients require an email address:"
 msgstr "Penerima berikut memerlukan alamat email:"
 
 msgid "The following signers are missing signature fields:"
-msgstr "Penandatangan berikut kehilangan kolom tanda tangan:"
+msgstr "Penkamutangan berikut kehilangan kolom tkamu tangan:"
 
 msgid "The OpenID discovery endpoint URL for your provider"
-msgstr "URL endpoint discovery OpenID untuk provider Anda"
+msgstr "URL endpoint discovery OpenID untuk provider kamu"
 
 msgid "The organisation authentication portal does not exist, or is not configured"
 msgstr "Portal autentikasi organisasi tidak ada, atau tidak dikonfigurasi"
@@ -6472,7 +6472,7 @@ msgid "The organisation email has been created successfully."
 msgstr "Email organisasi berhasil dibuat."
 
 msgid "The organisation group you are looking for may have been removed, renamed or may have never existed."
-msgstr "Grup organisasi yang Anda cari mungkin telah dihapus, diubah nama, atau mungkin tidak pernah ada."
+msgstr "Grup organisasi yang kamu cari mungkin telah dihapus, diubah nama, atau mungkin tidak pernah ada."
 
 msgid "The organisation role that will be applied to all members in this group."
 msgstr "Peran organisasi yang akan diterapkan ke semua anggota di grup ini."
@@ -6484,25 +6484,25 @@ msgid "The organisation will be deleted in the background. Documents will be orp
 msgstr "Organisasi akan dihapus di latar belakang. Dokumen akan menjadi yatim, tidak dihapus."
 
 msgid "The organisation you are looking for may have been removed, renamed or may have never existed."
-msgstr "Organisasi yang Anda cari mungkin telah dihapus, diubah nama, atau mungkin tidak pernah ada."
+msgstr "Organisasi yang kamu cari mungkin telah dihapus, diubah nama, atau mungkin tidak pernah ada."
 
 msgid "The page you are looking for was moved, removed, renamed or might never have existed."
-msgstr "Halaman yang Anda cari telah dipindahkan, dihapus, diubah nama, atau mungkin tidak pernah ada."
+msgstr "Halaman yang kamu cari telah dipindahkan, dihapus, diubah nama, atau mungkin tidak pernah ada."
 
 msgid "The preselected values will be ignored unless they meet the validation criteria."
 msgstr "Nilai yang telah dipilih akan diabaikan kecuali memenuhi kriteria validasi."
 
 msgid "The profile link has been copied to your clipboard"
-msgstr "Tautan profil telah disalin ke clipboard Anda"
+msgstr "Tautan profil telah disalin ke clipboard kamu"
 
 msgid "The profile you are looking for could not be found."
-msgstr "Profil yang Anda cari tidak dapat ditemukan."
+msgstr "Profil yang kamu cari tidak dapat ditemukan."
 
 msgid "The public description that will be displayed with this template"
 msgstr "Deskripsi publik yang akan ditampilkan dengan templat ini"
 
 msgid "The public name for your template"
-msgstr "Nama publik untuk templat Anda"
+msgstr "Nama publik untuk templat kamu"
 
 msgid "The recipient has been updated successfully"
 msgstr "Penerima berhasil diperbarui"
@@ -6511,16 +6511,16 @@ msgid "The SES identity has been deleted and recreated with the same keys. DNS r
 msgstr "Identitas SES telah dihapus dan dibuat ulang dengan kunci yang sama. DNS record tetap tidak berubah."
 
 msgid "The signing deadline for this document has passed. Please contact the document owner if you need a new copy to sign."
-msgstr "Batas waktu penandatanganan untuk dokumen ini telah berlalu. Harap hubungi pemilik dokumen jika Anda perlu salinan baru untuk ditandatangani."
+msgstr "Batas waktu penkamutanganan untuk dokumen ini telah berlalu. Harap hubungi pemilik dokumen jika kamu perlu salinan baru untuk ditkamutangani."
 
 msgid "The signing link has been copied to your clipboard."
-msgstr "Tautan penandatanganan telah disalin ke clipboard Anda."
+msgstr "Tautan penkamutanganan telah disalin ke clipboard kamu."
 
 msgid "The site banner is a message that is shown at the top of the site. It can be used to display important information to your users."
-msgstr "Banner situs adalah pesan yang ditampilkan di bagian atas situs. Ini dapat digunakan untuk menampilkan informasi penting kepada pengguna Anda."
+msgstr "Banner situs adalah pesan yang ditampilkan di bagian atas situs. Ini dapat digunakan untuk menampilkan informasi penting kepada pengguna kamu."
 
 msgid "The team you are looking for may have been removed, renamed or may have never existed."
-msgstr "Tim yang Anda cari mungkin telah dihapus, diubah nama, atau mungkin tidak pernah ada."
+msgstr "Tim yang kamu cari mungkin telah dihapus, diubah nama, atau mungkin tidak pernah ada."
 
 msgid "The template has been moved successfully."
 msgstr "Templat berhasil dipindahkan."
@@ -6529,22 +6529,22 @@ msgid "The template or one of its recipients could not be found."
 msgstr "Templat atau salah satu penerimanya tidak dapat ditemukan."
 
 msgid "The template will be removed from your profile"
-msgstr "Templat akan dihapus dari profil Anda"
+msgstr "Templat akan dihapus dari profil kamu"
 
 msgid "The template you are looking for could not be found."
-msgstr "Templat yang Anda cari tidak dapat ditemukan."
+msgstr "Templat yang kamu cari tidak dapat ditemukan."
 
 msgid "The template you are looking for may have been removed, renamed or may have never existed."
-msgstr "Templat yang Anda cari mungkin telah dihapus, diubah nama, atau mungkin tidak pernah ada."
+msgstr "Templat yang kamu cari mungkin telah dihapus, diubah nama, atau mungkin tidak pernah ada."
 
 msgid "The test webhook has been successfully sent to your endpoint."
-msgstr "Webhook uji berhasil dikirim ke endpoint Anda."
+msgstr "Webhook uji berhasil dikirim ke endpoint kamu."
 
 msgid "The token is invalid or has expired."
 msgstr "Token tidak valid atau telah kedaluwarsa."
 
 msgid "The token was copied to your clipboard."
-msgstr "Token telah disalin ke clipboard Anda."
+msgstr "Token telah disalin ke clipboard kamu."
 
 msgid "The token was deleted successfully."
 msgstr "Token berhasil dihapus."
@@ -6556,13 +6556,13 @@ msgid "The two-factor authentication code provided is incorrect."
 msgstr "Kode autentikasi dua faktor yang diberikan salah."
 
 msgid "The typed signature font size"
-msgstr "Ukuran font tanda tangan ketik"
+msgstr "Ukuran font tkamu tangan ketik"
 
 msgid "The URL for Documenso to send webhook events to."
 msgstr "URL untuk Documenso mengirim event webhook."
 
 msgid "The user you are looking for may have been removed, renamed or may have never existed."
-msgstr "Pengguna yang Anda cari mungkin telah dihapus, diubah nama, atau mungkin tidak pernah ada."
+msgstr "Pengguna yang kamu cari mungkin telah dihapus, diubah nama, atau mungkin tidak pernah ada."
 
 msgid "The user's two factor authentication has been reset successfully."
 msgstr "Autentikasi dua faktor pengguna berhasil direset."
@@ -6577,7 +6577,7 @@ msgid "The webhook was successfully created."
 msgstr "Webhook berhasil dibuat."
 
 msgid "The webhook you are looking for may have been removed, renamed or may have never existed."
-msgstr "Webhook yang Anda cari mungkin telah dihapus, diubah nama, atau mungkin tidak pernah ada."
+msgstr "Webhook yang kamu cari mungkin telah dihapus, diubah nama, atau mungkin tidak pernah ada."
 
 msgid "There are no active drafts at the current moment. You can upload a document to start drafting."
 msgstr "There are no active drafts at the current moment. You can upload a document to start drafting."
@@ -6586,19 +6586,19 @@ msgid "There are no completed documents yet. Documents that you have created or 
 msgstr "There are no completed documents yet. Documents that you have created or received will appear here once completed."
 
 msgid "There was an error uploading your file. Please try again."
-msgstr "Terjadi error saat mengunggah file Anda. Silakan coba lagi."
+msgstr "Terjadi error saat mengunggah file kamu. Silakan coba lagi."
 
 msgid "They have permission on your behalf to:"
-msgstr "Mereka memiliki izin atas nama Anda untuk:"
+msgstr "Mereka memiliki izin atas nama kamu untuk:"
 
 msgid "This account has been disabled. Please contact support."
 msgstr "Akun ini telah dinonaktifkan. Harap hubungi support."
 
 msgid "This account has not been verified. Please verify your account before signing in."
-msgstr "Akun ini belum diverifikasi. Harap verifikasi akun Anda sebelum login."
+msgstr "Akun ini belum diverifikasi. Harap verifikasi akun kamu sebelum login."
 
 msgid "This action is irreversible. Please ensure you have informed the user before proceeding."
-msgstr "Tindakan ini tidak dapat dibatalkan. Harap pastikan Anda telah memberi tahu pengguna sebelum melanjutkan."
+msgstr "Tindakan ini tidak dapat dibatalkan. Harap pastikan kamu telah memberi tahu pengguna sebelum melanjutkan."
 
 msgid "This action is not reversible. Please be certain."
 msgstr "Tindakan ini tidak dapat dibatalkan. Harap pastikan."
@@ -6607,7 +6607,7 @@ msgid "This action is reversible, but please be careful as the account may be af
 msgstr "This action is reversible, but please be careful as the account may be affected permanently (e.g. their settings and contents not being restored properly)."
 
 msgid "This can take a minute or two depending on the size of your document."
-msgstr "Ini bisa memakan waktu satu atau dua menit tergantung ukuran dokumen Anda."
+msgstr "Ini bisa memakan waktu satu atau dua menit tergantung ukuran dokumen kamu."
 
 msgid "This claim is locked and cannot be deleted."
 msgstr "Klaim ini terkunci dan tidak dapat dihapus."
@@ -6622,7 +6622,7 @@ msgid "This document could not be downloaded at this time. Please try again."
 msgstr "Dokumen ini tidak dapat diunduh saat ini. Silakan coba lagi."
 
 msgid "This document could not be duplicated at this time. Please try again."
-msgstr "Dokumen ini tidak dapat digandakan saat ini. Silakan coba lagi."
+msgstr "Dokumen ini tidak dapat digkamukan saat ini. Silakan coba lagi."
 
 msgid "This document could not be re-sent at this time. Please try again."
 msgstr "Dokumen ini tidak dapat dikirim ulang saat ini. Silakan coba lagi."
@@ -6631,10 +6631,10 @@ msgid "This document could not be saved as a template at this time. Please try a
 msgstr "Dokumen ini tidak dapat disimpan sebagai templat saat ini. Silakan coba lagi."
 
 msgid "This document has already been sent to this recipient. You can no longer edit this recipient."
-msgstr "Dokumen ini sudah dikirim ke penerima ini. Anda tidak dapat lagi mengedit penerima ini."
+msgstr "Dokumen ini sudah dikirim ke penerima ini. kamu tidak dapat lagi mengedit penerima ini."
 
 msgid "This document has been cancelled by the owner and is no longer available for others to sign."
-msgstr "Dokumen ini telah dibatalkan oleh pemilik dan tidak lagi tersedia untuk ditandatangani orang lain."
+msgstr "Dokumen ini telah dibatalkan oleh pemilik dan tidak lagi tersedia untuk ditkamutangani orang lain."
 
 msgid "This document has been cancelled by the owner."
 msgstr "Dokumen ini telah dibatalkan oleh pemilik."
@@ -6643,7 +6643,7 @@ msgid "This document has been rejected by a recipient"
 msgstr "Dokumen ini telah ditolak oleh penerima"
 
 msgid "This document has been signed by all recipients"
-msgstr "Dokumen ini telah ditandatangani oleh semua penerima"
+msgstr "Dokumen ini telah ditkamutangani oleh semua penerima"
 
 msgid "This document is available in your Documenso account. You can view more details, recipients, and audit logs there."
 msgstr "This document is available in your Documenso account. You can view more details, recipients, and audit logs there."
@@ -6655,13 +6655,13 @@ msgid "This document is using legacy field insertion, we recommend using the new
 msgstr "Dokumen ini menggunakan penyisipan kolom legacy, kami merekomendasikan metode penyisipan kolom baru untuk hasil yang lebih akurat."
 
 msgid "This document was created by you or a team member using the template above."
-msgstr "Dokumen ini dibuat oleh Anda atau anggota tim menggunakan templat di atas."
+msgstr "Dokumen ini dibuat oleh kamu atau anggota tim menggunakan templat di atas."
 
 msgid "This document was created using a direct link."
 msgstr "Dokumen ini dibuat menggunakan tautan langsung."
 
 msgid "This document will be duplicated."
-msgstr "Dokumen ini akan digandakan."
+msgstr "Dokumen ini akan digkamukan."
 
 msgid "This email is already being used by another team."
 msgstr "Email ini sudah digunakan oleh tim lain."
@@ -6673,7 +6673,7 @@ msgid "This envelope could not be resent at this time. Please try again."
 msgstr "Amplop ini tidak dapat dikirim ulang saat ini. Silakan coba lagi."
 
 msgid "This feature is not available on your current plan"
-msgstr "Fitur ini tidak tersedia di paket Anda saat ini"
+msgstr "Fitur ini tidak tersedia di paket kamu saat ini"
 
 msgid "This file type isn't supported. Please upload a PDF or Word document."
 msgstr "Tipe file ini tidak didukung. Harap unggah PDF atau dokumen Word."
@@ -6682,25 +6682,25 @@ msgid "This folder contains multiple items. Deleting it will remove all subfolde
 msgstr "Folder ini berisi beberapa item. Menghapusnya akan menghapus semua subfolder dan memindahkan semua dokumen dan templat bersarang ke folder root."
 
 msgid "This is how the document will reach the recipients once the document is ready for signing."
-msgstr "Ini adalah cara dokumen akan mencapai penerima setelah dokumen siap ditandatangani."
+msgstr "Ini adalah cara dokumen akan mencapai penerima setelah dokumen siap ditkamutangani."
 
 msgid "This is the claim that this organisation was initially created with. Any feature flag changes to this claim will be backported into this organisation."
 msgstr "Ini adalah klaim yang digunakan saat organisasi ini pertama kali dibuat. Setiap perubahan feature flag pada klaim ini akan di-backport ke organisasi ini."
 
 msgid "This is the required scopes you must set in your provider's settings"
-msgstr "Ini adalah scopes wajib yang harus Anda atur di pengaturan provider Anda"
+msgstr "Ini adalah scopes wajib yang harus kamu atur di pengaturan provider kamu"
 
 msgid "This is the URL which users will use to sign in to your organisation."
-msgstr "Ini adalah URL yang akan digunakan pengguna untuk login ke organisasi Anda."
+msgstr "Ini adalah URL yang akan digunakan pengguna untuk login ke organisasi kamu."
 
 msgid "This item cannot be deleted"
 msgstr "Item ini tidak dapat dihapus"
 
 msgid "This link is invalid or has expired. Please contact your team to resend a verification."
-msgstr "Tautan ini tidak valid atau telah kedaluwarsa. Harap hubungi tim Anda untuk mengirim ulang verifikasi."
+msgstr "Tautan ini tidak valid atau telah kedaluwarsa. Harap hubungi tim kamu untuk mengirim ulang verifikasi."
 
 msgid "This organisation will have administrative control over your account. You can revoke this access later, but they will retain access to any data they've already collected."
-msgstr "Organisasi ini akan memiliki kontrol administratif atas akun Anda. Anda dapat mencabut akses ini nanti, tetapi mereka akan tetap memiliki akses ke data yang telah mereka kumpulkan."
+msgstr "Organisasi ini akan memiliki kontrol administratif atas akun kamu. kamu dapat mencabut akses ini nanti, tetapi mereka akan tetap memiliki akses ke data yang telah mereka kumpulkan."
 
 msgid "This organisation, and any associated data will be permanently deleted."
 msgstr "Organisasi ini, dan semua data terkait akan dihapus secara permanen."
@@ -6712,13 +6712,13 @@ msgid "This passkey is not configured for this application. Please login and add
 msgstr "Passkey ini tidak dikonfigurasi untuk aplikasi ini. Silakan login dan tambahkan satu di pengaturan pengguna."
 
 msgid "This recipient can no longer be modified as they have signed a field, or completed the document."
-msgstr "Penerima ini tidak dapat dimodifikasi lagi karena telah menandatangani kolom, atau menyelesaikan dokumen."
+msgstr "Penerima ini tidak dapat dimodifikasi lagi karena telah menkamutangani kolom, atau menyelesaikan dokumen."
 
 msgid "This session has expired. Please try again."
 msgstr "Sesi ini telah kedaluwarsa. Silakan coba lagi."
 
 msgid "This signer has already signed the document."
-msgstr "Penandatangan ini telah menandatangani dokumen."
+msgstr "Penkamutangan ini telah menkamutangani dokumen."
 
 msgid "This team, and any associated data excluding billing invoices will be permanently deleted."
 msgstr "Tim ini, dan semua data terkait tidak termasuk faktur penagihan akan dihapus secara permanen."
@@ -6727,19 +6727,19 @@ msgid "This template could not be deleted at this time. Please try again."
 msgstr "Templat ini tidak dapat dihapus saat ini. Silakan coba lagi."
 
 msgid "This template could not be duplicated at this time. Please try again."
-msgstr "Templat ini tidak dapat digandakan saat ini. Silakan coba lagi."
+msgstr "Templat ini tidak dapat digkamukan saat ini. Silakan coba lagi."
 
 msgid "This template is using legacy field insertion, we recommend using the new field insertion method for more accurate results."
 msgstr "Templat ini menggunakan penyisipan kolom legacy, kami merekomendasikan menggunakan metode penyisipan kolom baru untuk hasil yang lebih akurat."
 
 msgid "This template will be duplicated."
-msgstr "Templat ini akan digandakan."
+msgstr "Templat ini akan digkamukan."
 
 msgid "This token is invalid or has expired. No action is needed."
 msgstr "Token ini tidak valid atau telah kedaluwarsa. Tidak perlu tindakan."
 
 msgid "This token is invalid or has expired. Please contact your team for a new invitation."
-msgstr "Token ini tidak valid atau telah kedaluwarsa. Harap hubungi tim Anda untuk undangan baru."
+msgstr "Token ini tidak valid atau telah kedaluwarsa. Harap hubungi tim kamu untuk undangan baru."
 
 msgid "This URL is already in use."
 msgstr "URL ini sudah digunakan."
@@ -6754,7 +6754,7 @@ msgid "This will remove all emails associated with this email domain"
 msgstr "Ini akan menghapus semua email yang terkait dengan domain email ini"
 
 msgid "This will sign you out of all other devices. You will need to sign in again on those devices to continue using your account."
-msgstr "Ini akan mengeluarkan Anda dari semua perangkat lain. Anda perlu masuk lagi di perangkat tersebut untuk terus menggunakan akun Anda."
+msgstr "Ini akan mengeluarkan kamu dari semua perangkat lain. kamu perlu masuk lagi di perangkat tersebut untuk terus menggunakan akun kamu."
 
 msgid "Time"
 msgstr "Waktu"
@@ -6769,67 +6769,67 @@ msgid "Title"
 msgstr "Judul"
 
 msgid "To accept this invitation you must create an account."
-msgstr "Untuk menerima undangan ini Anda harus membuat akun."
+msgstr "Untuk menerima undangan ini kamu harus membuat akun."
 
 msgid "To add members to this team, they must first be invited to the organisation. Only organisation admins and managers can invite new members — please contact one of them to invite members on your behalf."
-msgstr "Untuk menambahkan anggota ke tim ini, mereka harus diundang ke organisasi terlebih dahulu. Hanya admin dan manager organisasi yang dapat mengundang anggota baru — harap hubungi salah satu dari mereka untuk mengundang anggota atas nama Anda."
+msgstr "Untuk menambahkan anggota ke tim ini, mereka harus diundang ke organisasi terlebih dahulu. Hanya admin dan manager organisasi yang dapat mengundang anggota baru — harap hubungi salah satu dari mereka untuk mengundang anggota atas nama kamu."
 
 msgid "To add members to this team, you must first add them to the organisation."
-msgstr "Untuk menambahkan anggota ke tim ini, Anda harus menambahkannya ke organisasi terlebih dahulu."
+msgstr "Untuk menambahkan anggota ke tim ini, kamu harus menambahkannya ke organisasi terlebih dahulu."
 
 msgid "To approve this document, you need to be logged in."
-msgstr "Untuk menyetujui dokumen ini, Anda harus login."
+msgstr "Untuk menyetujui dokumen ini, kamu harus login."
 
 msgid "To approve this field, you need to be logged in."
-msgstr "Untuk menyetujui kolom ini, Anda harus login."
+msgstr "Untuk menyetujui kolom ini, kamu harus login."
 
 msgid "To assist with this document, you need to be logged in."
-msgstr "Untuk membantu dokumen ini, Anda harus login."
+msgstr "Untuk membantu dokumen ini, kamu harus login."
 
 msgid "To assist with this field, you need to be logged in."
-msgstr "Untuk membantu kolom ini, Anda harus login."
+msgstr "Untuk membantu kolom ini, kamu harus login."
 
 msgid "To be able to add members to a team, you must first add them to the organisation. For more information, please see the <0>documentation</0>."
-msgstr "Untuk dapat menambahkan anggota ke tim, Anda harus menambahkannya ke organisasi terlebih dahulu. Untuk info lebih lanjut, lihat <0>dokumentasi</0>."
+msgstr "Untuk dapat menambahkan anggota ke tim, kamu harus menambahkannya ke organisasi terlebih dahulu. Untuk info lebih lanjut, lihat <0>dokumentasi</0>."
 
 msgid "To change the email you must remove and add a new email address."
-msgstr "Untuk mengubah email, Anda harus menghapus dan menambahkan alamat email baru."
+msgstr "Untuk mengubah email, kamu harus menghapus dan menambahkan alamat email baru."
 
 msgid "To confirm, please enter the reason"
 msgstr "Untuk konfirmasi, harap masukkan alasan"
 
 msgid "To enable two-factor authentication, scan the following QR code using your authenticator app."
-msgstr "Untuk mengaktifkan autentikasi dua faktor, pindai kode QR berikut menggunakan aplikasi autentikator Anda."
+msgstr "Untuk mengaktifkan autentikasi dua faktor, pindai kode QR berikut menggunakan aplikasi autentikator kamu."
 
 msgid "To gain access to your account, please confirm your email address by clicking on the confirmation link from your inbox."
-msgstr "Untuk mendapatkan akses ke akun Anda, harap konfirmasi alamat email Anda dengan mengklik tautan konfirmasi dari inbox Anda."
+msgstr "Untuk mendapatkan akses ke akun kamu, harap konfirmasi alamat email kamu dengan mengklik tautan konfirmasi dari inbox kamu."
 
 msgid "To mark this document as viewed, you need to be logged in."
-msgstr "Untuk menandai dokumen ini sebagai dilihat, Anda harus login."
+msgstr "Untuk menkamui dokumen ini sebagai dilihat, kamu harus login."
 
 msgid "To sign this document, you need to be logged in."
-msgstr "Untuk menandatangani dokumen ini, Anda harus login."
+msgstr "Untuk menkamutangani dokumen ini, kamu harus login."
 
 msgid "To sign this field, you need to be logged in."
-msgstr "Untuk menandatangani kolom ini, Anda harus login."
+msgstr "Untuk menkamutangani kolom ini, kamu harus login."
 
 msgid "To use our electronic signature service, you must have access to:"
-msgstr "Untuk menggunakan layanan tanda tangan elektronik kami, Anda harus memiliki akses ke:"
+msgstr "Untuk menggunakan layanan tkamu tangan elektronik kami, kamu harus memiliki akses ke:"
 
 msgid "To view this document you need to be signed into your account, please sign in to continue."
-msgstr "Untuk melihat dokumen ini Anda harus masuk ke akun Anda, silakan masuk untuk melanjutkan."
+msgstr "Untuk melihat dokumen ini kamu harus masuk ke akun kamu, silakan masuk untuk melanjutkan."
 
 msgid "To view this document, you need to be logged in."
-msgstr "Untuk melihat dokumen ini, Anda harus login."
+msgstr "Untuk melihat dokumen ini, kamu harus login."
 
 msgid "To view this field, you need to be logged in."
-msgstr "Untuk melihat kolom ini, Anda harus login."
+msgstr "Untuk melihat kolom ini, kamu harus login."
 
 msgid "Toggle the switch to hide your profile from the public."
-msgstr "Alihkan sakelar untuk menyembunyikan profil Anda dari publik."
+msgstr "Alihkan sakelar untuk menyembunyikan profil kamu dari publik."
 
 msgid "Toggle the switch to show your profile to the public."
-msgstr "Alihkan sakelar untuk menampilkan profil Anda ke publik."
+msgstr "Alihkan sakelar untuk menampilkan profil kamu ke publik."
 
 msgid "Token"
 msgstr "Token"
@@ -6874,7 +6874,7 @@ msgid "Total Recipients"
 msgstr "Total Penerima"
 
 msgid "Total Signers that Signed Up"
-msgstr "Total Penandatangan yang Mendaftar"
+msgstr "Total Penkamutangan yang Mendaftar"
 
 msgid "Total Users"
 msgstr "Total Pengguna"
@@ -6889,13 +6889,13 @@ msgid "Try again"
 msgstr "Coba lagi"
 
 msgid "Turn on AI detection to automatically find recipients and fields in your documents. AI providers do not retain your data for training."
-msgstr "Nyalakan deteksi AI untuk secara otomatis menemukan penerima dan kolom di dokumen Anda. Provider AI tidak menyimpan data Anda untuk pelatihan."
+msgstr "Nyalakan deteksi AI untuk secara otomatis menemukan penerima dan kolom di dokumen kamu. Provider AI tidak menyimpan data kamu untuk pelatihan."
 
 msgid "Two factor authentication"
 msgstr "Autentikasi dua faktor"
 
 msgid "Two factor authentication recovery codes are used to access your account in the event that you lose access to your authenticator app."
-msgstr "Kode pemulihan autentikasi dua faktor digunakan untuk mengakses akun Anda jika Anda kehilangan akses ke aplikasi autentikator Anda."
+msgstr "Kode pemulihan autentikasi dua faktor digunakan untuk mengakses akun kamu jika kamu kehilangan akses ke aplikasi autentikator kamu."
 
 msgid "Two-Factor Authentication"
 msgstr "Autentikasi Dua Faktor"
@@ -6907,7 +6907,7 @@ msgid "Two-factor authentication enabled"
 msgstr "Autentikasi dua faktor diaktifkan"
 
 msgid "Two-factor authentication has been disabled for your account. You will no longer be required to enter a code from your authenticator app when signing in."
-msgstr "Autentikasi dua faktor telah dinonaktifkan untuk akun Anda. Anda tidak perlu lagi memasukkan kode dari aplikasi autentikator saat login."
+msgstr "Autentikasi dua faktor telah dinonaktifkan untuk akun kamu. kamu tidak perlu lagi memasukkan kode dari aplikasi autentikator saat login."
 
 msgid "Two-Factor Re-Authentication"
 msgstr "Re-Autentikasi Dua Faktor"
@@ -6919,13 +6919,13 @@ msgid "Type an email address to add a recipient"
 msgstr "Ketik alamat email untuk menambahkan penerima"
 
 msgid "Typed signature"
-msgstr "Tanda tangan ketik"
+msgstr "Tkamu tangan ketik"
 
 msgid "Typed signatures are not allowed. Please draw your signature."
-msgstr "Tanda tangan ketik tidak diizinkan. Harap gambar tanda tangan Anda."
+msgstr "Tkamu tangan ketik tidak diizinkan. Harap gambar tkamu tangan kamu."
 
 msgid "Uh oh! Looks like you're missing a token"
-msgstr "Uh oh! Sepertinya Anda kehilangan token"
+msgstr "Uh oh! Sepertinya kamu kehilangan token"
 
 msgid "Unable to change the language at this time. Please try again later."
 msgstr "Tidak dapat mengubah bahasa saat ini. Silakan coba lagi nanti."
@@ -6961,7 +6961,7 @@ msgid "Unable to load documents"
 msgstr "Tidak dapat memuat dokumen"
 
 msgid "Unable to load your public profile templates at this time"
-msgstr "Tidak dapat memuat templat profil publik Anda saat ini"
+msgstr "Tidak dapat memuat templat profil publik kamu saat ini"
 
 msgid "Unable to remove email verification at this time. Please try again."
 msgstr "Tidak dapat menghapus verifikasi email saat ini. Silakan coba lagi."
@@ -7099,10 +7099,10 @@ msgid "Updating Template"
 msgstr "Memperbarui Templat"
 
 msgid "Updating Your Information"
-msgstr "Memperbarui Informasi Anda"
+msgstr "Memperbarui Informasi kamu"
 
 msgid "Upgrade your plan to upload more documents"
-msgstr "Tingkatkan paket Anda untuk mengunggah lebih banyak dokumen"
+msgstr "Tingkatkan paket kamu untuk mengunggah lebih banyak dokumen"
 
 msgid "Upload a CSV file to create multiple documents from this template. Each row represents one document with its recipient details."
 msgstr "Unggah file CSV untuk membuat banyak dokumen dari templat ini. Setiap baris mewakili satu dokumen dengan detail penerimanya."
@@ -7135,13 +7135,13 @@ msgid "Upload failed"
 msgstr "Unggah gagal"
 
 msgid "Upload signature"
-msgstr "Unggah tanda tangan"
+msgstr "Unggah tkamu tangan"
 
 msgid "Upload Template"
 msgstr "Unggah Templat"
 
 msgid "Upload your brand logo (max 5MB, JPG, PNG, or WebP)"
-msgstr "Unggah logo merek Anda (maks 5MB, JPG, PNG, atau WebP)"
+msgstr "Unggah logo merek kamu (maks 5MB, JPG, PNG, atau WebP)"
 
 msgid "Uploaded by"
 msgstr "Diunggah oleh"
@@ -7174,10 +7174,10 @@ msgid "Use Template"
 msgstr "Gunakan Templat"
 
 msgid "Use your authenticator app to generate a code"
-msgstr "Gunakan aplikasi autentikator Anda untuk menghasilkan kode"
+msgstr "Gunakan aplikasi autentikator kamu untuk menghasilkan kode"
 
 msgid "Use your passkey for authentication"
-msgstr "Gunakan passkey Anda untuk autentikasi"
+msgstr "Gunakan passkey kamu untuk autentikasi"
 
 msgid "User"
 msgstr "Pengguna"
@@ -7240,13 +7240,13 @@ msgid "Verify Now"
 msgstr "Verifikasi Sekarang"
 
 msgid "Verify your email address"
-msgstr "Verifikasi alamat email Anda"
+msgstr "Verifikasi alamat email kamu"
 
 msgid "Verify your email address to unlock all features."
-msgstr "Verifikasi alamat email Anda untuk membuka semua fitur."
+msgstr "Verifikasi alamat email kamu untuk membuka semua fitur."
 
 msgid "Verify your email to upload documents."
-msgstr "Verifikasi email Anda untuk mengunggah dokumen."
+msgstr "Verifikasi email kamu untuk mengunggah dokumen."
 
 msgid "Vertical"
 msgstr "Vertikal"
@@ -7258,25 +7258,25 @@ msgid "View activity"
 msgstr "Lihat aktivitas"
 
 msgid "View all documents sent to your account"
-msgstr "Lihat semua dokumen yang dikirim ke akun Anda"
+msgstr "Lihat semua dokumen yang dikirim ke akun kamu"
 
 msgid "View all folders"
 msgstr "Lihat semua folder"
 
 msgid "View all recent security activity related to your account."
-msgstr "Lihat semua aktivitas keamanan terbaru terkait akun Anda."
+msgstr "Lihat semua aktivitas keamanan terbaru terkait akun kamu."
 
 msgid "View all related documents"
 msgstr "Lihat semua dokumen terkait"
 
 msgid "View all security activity related to your account."
-msgstr "Lihat semua aktivitas keamanan terkait akun Anda."
+msgstr "Lihat semua aktivitas keamanan terkait akun kamu."
 
 msgid "View and manage all active sessions for your account."
-msgstr "Lihat dan kelola semua sesi aktif untuk akun Anda."
+msgstr "Lihat dan kelola semua sesi aktif untuk akun kamu."
 
 msgid "View and manage all login methods linked to your account."
-msgstr "Lihat dan kelola semua metode login yang tertaut ke akun Anda."
+msgstr "Lihat dan kelola semua metode login yang tertaut ke akun kamu."
 
 msgid "View Audit Logs"
 msgstr "Lihat Log Audit"
@@ -7333,19 +7333,19 @@ msgid "Waiting"
 msgstr "Menunggu"
 
 msgid "Waiting for others to sign"
-msgstr "Menunggu orang lain menandatangani"
+msgstr "Menunggu orang lain menkamutangani"
 
 msgid "Waiting for Your Turn"
-msgstr "Menunggu Giliran Anda"
+msgstr "Menunggu Giliran kamu"
 
 msgid "Want to send slick signing links like this one? <0>Check out Documenso</0>."
-msgstr "Ingin mengirim tautan penandatanganan keren seperti ini? <0>Coba Documenso</0>."
+msgstr "Ingin mengirim tautan penkamutanganan keren seperti ini? <0>Coba Documenso</0>."
 
 msgid "Want your own public profile?"
 msgstr "Ingin profil publik sendiri?"
 
 msgid "Warning: Assistant as last signer"
-msgstr "Peringatan: Asisten sebagai penandatangan terakhir"
+msgstr "Peringatan: Asisten sebagai penkamutangan terakhir"
 
 msgid "We are unable to proceed to the billing portal at this time. Please try again, or contact support."
 msgstr "Kami tidak dapat melanjutkan ke portal penagihan saat ini. Silakan coba lagi, atau hubungi support."
@@ -7390,7 +7390,7 @@ msgid "We encountered an error while removing the direct template link. Please t
 msgstr "Kami mengalami error saat menghapus tautan templat langsung. Silakan coba lagi nanti."
 
 msgid "We encountered an error while sending the test webhook. Please check your endpoint and try again."
-msgstr "Kami mengalami error saat mengirim webhook uji. Harap periksa endpoint Anda dan coba lagi."
+msgstr "Kami mengalami error saat mengirim webhook uji. Harap periksa endpoint kamu dan coba lagi."
 
 msgid "We encountered an error while updating the webhook. Please try again later."
 msgstr "Kami mengalami error saat memperbarui webhook. Silakan coba lagi nanti."
@@ -7402,7 +7402,7 @@ msgid "We encountered an unknown error while attempting to add this email. Pleas
 msgstr "Kami mengalami error tak dikenal saat mencoba menambahkan email ini. Silakan coba lagi nanti."
 
 msgid "We encountered an unknown error while attempting to add your domain. Please try again later."
-msgstr "Kami mengalami error tak dikenal saat mencoba menambahkan domain Anda. Silakan coba lagi nanti."
+msgstr "Kami mengalami error tak dikenal saat mencoba menambahkan domain kamu. Silakan coba lagi nanti."
 
 msgid "We encountered an unknown error while attempting to create a group. Please try again later."
 msgstr "Kami mengalami error tak dikenal saat mencoba membuat grup. Silakan coba lagi nanti."
@@ -7426,10 +7426,10 @@ msgid "We encountered an unknown error while attempting to delete this token. Pl
 msgstr "Kami mengalami error tak dikenal saat mencoba menghapus token ini. Silakan coba lagi nanti."
 
 msgid "We encountered an unknown error while attempting to delete your account. Please try again later."
-msgstr "Kami mengalami error tak dikenal saat mencoba menghapus akun Anda. Silakan coba lagi nanti."
+msgstr "Kami mengalami error tak dikenal saat mencoba menghapus akun kamu. Silakan coba lagi nanti."
 
 msgid "We encountered an unknown error while attempting to delete your document. Please try again later."
-msgstr "Kami mengalami error tak dikenal saat mencoba menghapus dokumen Anda. Silakan coba lagi nanti."
+msgstr "Kami mengalami error tak dikenal saat mencoba menghapus dokumen kamu. Silakan coba lagi nanti."
 
 msgid "We encountered an unknown error while attempting to disable access."
 msgstr "Kami mengalami error tak dikenal saat mencoba menonaktifkan akses."
@@ -7456,7 +7456,7 @@ msgid "We encountered an unknown error while attempting to remove this group. Pl
 msgstr "Kami mengalami error tak dikenal saat mencoba menghapus grup ini. Silakan coba lagi nanti."
 
 msgid "We encountered an unknown error while attempting to remove this template from your profile. Please try again later."
-msgstr "Kami mengalami error tak dikenal saat mencoba menghapus templat ini dari profil Anda. Silakan coba lagi nanti."
+msgstr "Kami mengalami error tak dikenal saat mencoba menghapus templat ini dari profil kamu. Silakan coba lagi nanti."
 
 msgid "We encountered an unknown error while attempting to remove this user. Please try again later."
 msgstr "Kami mengalami error tak dikenal saat mencoba menghapus pengguna ini. Silakan coba lagi nanti."
@@ -7465,7 +7465,7 @@ msgid "We encountered an unknown error while attempting to request the two-facto
 msgstr "Kami mengalami error tak dikenal saat mencoba meminta kode autentikasi dua faktor. Silakan coba lagi nanti."
 
 msgid "We encountered an unknown error while attempting to reset your password. Please try again later."
-msgstr "Kami mengalami error tak dikenal saat mencoba mereset password Anda. Silakan coba lagi nanti."
+msgstr "Kami mengalami error tak dikenal saat mencoba mereset password kamu. Silakan coba lagi nanti."
 
 msgid "We encountered an unknown error while attempting to revoke access. Please try again or contact support."
 msgstr "Kami mengalami error tak dikenal saat mencoba mencabut akses. Silakan coba lagi atau hubungi support."
@@ -7495,106 +7495,106 @@ msgid "We encountered an unknown error while attempting to update this team memb
 msgstr "Kami mengalami error tak dikenal saat mencoba memperbarui anggota tim ini. Silakan coba lagi nanti."
 
 msgid "We encountered an unknown error while attempting to update your organisation. Please try again later."
-msgstr "Kami mengalami error tak dikenal saat mencoba memperbarui organisasi Anda. Silakan coba lagi nanti."
+msgstr "Kami mengalami error tak dikenal saat mencoba memperbarui organisasi kamu. Silakan coba lagi nanti."
 
 msgid "We encountered an unknown error while attempting to update your password. Please try again later."
-msgstr "Kami mengalami error tak dikenal saat mencoba memperbarui password Anda. Silakan coba lagi nanti."
+msgstr "Kami mengalami error tak dikenal saat mencoba memperbarui password kamu. Silakan coba lagi nanti."
 
 msgid "We encountered an unknown error while attempting to update your public profile. Please try again later."
-msgstr "Kami mengalami error tak dikenal saat mencoba memperbarui profil publik Anda. Silakan coba lagi nanti."
+msgstr "Kami mengalami error tak dikenal saat mencoba memperbarui profil publik kamu. Silakan coba lagi nanti."
 
 msgid "We encountered an unknown error while attempting to update your team. Please try again later."
-msgstr "Kami mengalami error tak dikenal saat mencoba memperbarui tim Anda. Silakan coba lagi nanti."
+msgstr "Kami mengalami error tak dikenal saat mencoba memperbarui tim kamu. Silakan coba lagi nanti."
 
 msgid "We encountered an unknown error while attempting update the team email. Please try again later."
 msgstr "Kami mengalami error tak dikenal saat mencoba memperbarui email tim. Silakan coba lagi nanti."
 
 msgid "We encountered an unknown error while attempting update your profile. Please try again later."
-msgstr "Kami mengalami error tak dikenal saat mencoba memperbarui profil Anda. Silakan coba lagi nanti."
+msgstr "Kami mengalami error tak dikenal saat mencoba memperbarui profil kamu. Silakan coba lagi nanti."
 
 msgid "We have sent a confirmation email for verification."
 msgstr "Kami telah mengirim email konfirmasi untuk verifikasi."
 
 msgid "We need your signature to sign documents"
-msgstr "Kami memerlukan tanda tangan Anda untuk menandatangani dokumen"
+msgstr "Kami memerlukan tkamu tangan kamu untuk menkamutangani dokumen"
 
 msgid "We were unable to copy the token to your clipboard. Please try again."
-msgstr "Kami tidak dapat menyalin token ke clipboard Anda. Silakan coba lagi."
+msgstr "Kami tidak dapat menyalin token ke clipboard kamu. Silakan coba lagi."
 
 msgid "We were unable to copy your recovery code to your clipboard. Please try again."
-msgstr "Kami tidak dapat menyalin kode pemulihan ke clipboard Anda. Silakan coba lagi."
+msgstr "Kami tidak dapat menyalin kode pemulihan ke clipboard kamu. Silakan coba lagi."
 
 msgid "We were unable to create your account. If you already have an account, try signing in instead."
-msgstr "Kami tidak dapat membuat akun Anda. Jika sudah memiliki akun, coba masuk saja."
+msgstr "Kami tidak dapat membuat akun kamu. Jika sudah memiliki akun, coba masuk saja."
 
 msgid "We were unable to create your account. Please review the information you provided and try again."
-msgstr "Kami tidak dapat membuat akun Anda. Harap tinjau informasi yang Anda berikan dan coba lagi."
+msgstr "Kami tidak dapat membuat akun kamu. Harap tinjau informasi yang kamu berikan dan coba lagi."
 
 msgid "We were unable to disable two-factor authentication for your account. Please ensure that you have entered your password and backup code correctly and try again."
-msgstr "Kami tidak dapat menonaktifkan autentikasi dua faktor untuk akun Anda. Harap pastikan Anda memasukkan password dan kode cadangan dengan benar dan coba lagi."
+msgstr "Kami tidak dapat menonaktifkan autentikasi dua faktor untuk akun kamu. Harap pastikan kamu memasukkan password dan kode cadangan dengan benar dan coba lagi."
 
 msgid "We were unable to log you out at this time."
-msgstr "Kami tidak dapat mengeluarkan Anda saat ini."
+msgstr "Kami tidak dapat mengeluarkan kamu saat ini."
 
 msgid "We were unable to report this sender at this time. Please try again later."
 msgstr "Kami tidak dapat melaporkan pengirim ini saat ini. Silakan coba lagi nanti."
 
 msgid "We were unable to set your public profile to public. Please try again."
-msgstr "Kami tidak dapat mengatur profil publik Anda menjadi publik. Silakan coba lagi."
+msgstr "Kami tidak dapat mengatur profil publik kamu menjadi publik. Silakan coba lagi."
 
 msgid "We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again."
-msgstr "Kami tidak dapat mengatur autentikasi dua faktor untuk akun Anda. Harap pastikan Anda memasukkan kode dengan benar dan coba lagi."
+msgstr "Kami tidak dapat mengatur autentikasi dua faktor untuk akun kamu. Harap pastikan kamu memasukkan kode dengan benar dan coba lagi."
 
 msgid "We were unable to submit this document at this time. Please try again later."
 msgstr "Kami tidak dapat mengirimkan dokumen ini saat ini. Silakan coba lagi nanti."
 
 msgid "We were unable to update your branding preferences at this time, please try again later"
-msgstr "Kami tidak dapat memperbarui preferensi branding Anda saat ini, harap coba lagi nanti"
+msgstr "Kami tidak dapat memperbarui preferensi branding kamu saat ini, harap coba lagi nanti"
 
 msgid "We were unable to update your document preferences at this time, please try again later"
-msgstr "Kami tidak dapat memperbarui preferensi dokumen Anda saat ini, harap coba lagi nanti"
+msgstr "Kami tidak dapat memperbarui preferensi dokumen kamu saat ini, harap coba lagi nanti"
 
 msgid "We were unable to update your email preferences at this time, please try again later"
-msgstr "Kami tidak dapat memperbarui preferensi email Anda saat ini, harap coba lagi nanti"
+msgstr "Kami tidak dapat memperbarui preferensi email kamu saat ini, harap coba lagi nanti"
 
 msgid "We were unable to verify that you're human. Please try again."
-msgstr "Kami tidak dapat memverifikasi bahwa Anda manusia. Silakan coba lagi."
+msgstr "Kami tidak dapat memverifikasi bahwa kamu manusia. Silakan coba lagi."
 
 msgid "We were unable to verify your details. Please try again or contact support"
-msgstr "Kami tidak dapat memverifikasi detail Anda. Silakan coba lagi atau hubungi support"
+msgstr "Kami tidak dapat memverifikasi detail kamu. Silakan coba lagi atau hubungi support"
 
 msgid "We were unable to verify your email at this time."
-msgstr "Kami tidak dapat memverifikasi email Anda saat ini."
+msgstr "Kami tidak dapat memverifikasi email kamu saat ini."
 
 msgid "We were unable to verify your email. If your email is not verified already, please try again."
-msgstr "Kami tidak dapat memverifikasi email Anda. Jika email Anda belum terverifikasi, silakan coba lagi."
+msgstr "Kami tidak dapat memverifikasi email kamu. Jika email kamu belum terverifikasi, silakan coba lagi."
 
 msgid "We will generate signing links for you, which you can send to the recipients through your method of choice."
-msgstr "Kami akan membuatkan tautan penandatanganan untuk Anda, yang dapat Anda kirim ke penerima melalui metode pilihan Anda."
+msgstr "Kami akan membuatkan tautan penkamutanganan untuk kamu, yang dapat kamu kirim ke penerima melalui metode pilihan kamu."
 
 msgid "We won't send anything to notify recipients."
 msgstr "Kami tidak akan mengirim apa pun untuk memberi tahu penerima."
 
 msgid "We'll get back to you as soon as possible via email."
-msgstr "Kami akan menghubungi Anda secepat mungkin melalui email."
+msgstr "Kami akan menghubungi kamu secepat mungkin melalui email."
 
 msgid "We'll scan your document to find form fields like signature lines, text inputs, checkboxes, and more. Detected fields will be suggested for you to review."
-msgstr "Kami akan memindai dokumen Anda untuk menemukan kolom formulir seperti garis tanda tangan, input teks, kotak centang, dan lainnya. Kolom yang terdeteksi akan disarankan untuk Anda tinjau."
+msgstr "Kami akan memindai dokumen kamu untuk menemukan kolom formulir seperti garis tkamu tangan, input teks, kotak centang, dan lainnya. Kolom yang terdeteksi akan disarankan untuk kamu tinjau."
 
 msgid "We'll scan your document to find signature fields and identify who needs to sign. Detected recipients will be suggested for you to review."
-msgstr "Kami akan memindai dokumen Anda untuk menemukan kolom tanda tangan dan mengidentifikasi siapa yang perlu menandatangani. Penerima yang terdeteksi akan disarankan untuk Anda tinjau."
+msgstr "Kami akan memindai dokumen kamu untuk menemukan kolom tkamu tangan dan mengidentifikasi siapa yang perlu menkamutangani. Penerima yang terdeteksi akan disarankan untuk kamu tinjau."
 
 msgid "We'll send a 6-digit code to your email"
-msgstr "Kami akan mengirim kode 6 digit ke email Anda"
+msgstr "Kami akan mengirim kode 6 digit ke email kamu"
 
 msgid "We're all empty"
 msgstr "Semua kosong"
 
 msgid "We've sent a 6-digit verification code to your email. Please enter it below to complete the document."
-msgstr "Kami telah mengirim kode verifikasi 6 digit ke email Anda. Harap masukkan di bawah untuk menyelesaikan dokumen."
+msgstr "Kami telah mengirim kode verifikasi 6 digit ke email kamu. Harap masukkan di bawah untuk menyelesaikan dokumen."
 
 msgid "We've sent a confirmation email to <0>{email}</0>. Please check your inbox and click the link in the email to verify your account."
-msgstr "Kami telah mengirim email konfirmasi ke <0>{email}</0>. Harap periksa inbox Anda dan klik tautan di email untuk memverifikasi akun Anda."
+msgstr "Kami telah mengirim email konfirmasi ke <0>{email}</0>. Harap periksa inbox kamu dan klik tautan di email untuk memverifikasi akun kamu."
 
 msgid "Webhook"
 msgstr "Webhook"
@@ -7630,7 +7630,7 @@ msgid "Welcome back, we are lucky to have you."
 msgstr "Selamat datang kembali, kami beruntung memilikimu."
 
 msgid "Welcome back! Here's an overview of your account."
-msgstr "Selamat datang kembali! Berikut ringkasan akun Anda."
+msgstr "Selamat datang kembali! Berikut ringkasan akun kamu."
 
 msgid "Welcome to {organisationName}"
 msgstr "Selamat Datang di {organisationName}"
@@ -7639,37 +7639,37 @@ msgid "Well-known URL is required"
 msgstr "URL Well-known wajib diisi"
 
 msgid "Were you trying to edit this document instead?"
-msgstr "Atau Anda mencoba mengedit dokumen ini?"
+msgstr "Atau kamu mencoba mengedit dokumen ini?"
 
 msgid "What you can do with teams:"
-msgstr "Apa yang bisa Anda lakukan dengan tim:"
+msgstr "Apa yang bisa kamu lakukan dengan tim:"
 
 msgid "When enabled, signers can choose who should sign next in the sequence instead of following the predefined order."
-msgstr "Jika diaktifkan, penandatangan dapat memilih siapa yang harus menandatangani berikutnya dalam urutan, bukan mengikuti urutan yang telah ditentukan."
+msgstr "Jika diaktifkan, penkamutangan dapat memilih siapa yang harus menkamutangani berikutnya dalam urutan, bukan mengikuti urutan yang telah ditentukan."
 
 msgid "When enabled, users signing in via SSO for the first time will also receive their own personal organisation."
 msgstr "Jika diaktifkan, pengguna yang login via SSO untuk pertama kali juga akan menerima organisasi pribadi mereka sendiri."
 
 msgid "When you click continue, you will be prompted to add the first available authenticator on your system."
-msgstr "Saat Anda klik lanjutkan, Anda akan diminta untuk menambahkan autentikator pertama yang tersedia di sistem Anda."
+msgstr "Saat kamu klik lanjutkan, kamu akan diminta untuk menambahkan autentikator pertama yang tersedia di sistem kamu."
 
 msgid "When you sign a document, we can automatically fill in and sign the following fields using information that has already been provided. You can also manually sign or remove any automatically signed fields afterwards if you desire."
-msgstr "Saat Anda menandatangani dokumen, kami dapat secara otomatis mengisi dan menandatangani kolom berikut menggunakan informasi yang telah diberikan. Anda juga dapat menandatangani secara manual atau menghapus kolom yang ditandatangani secara otomatis setelahnya jika diinginkan."
+msgstr "Saat kamu menkamutangani dokumen, kami dapat secara otomatis mengisi dan menkamutangani kolom berikut menggunakan informasi yang telah diberikan. kamu juga dapat menkamutangani secara manual atau menghapus kolom yang ditkamutangani secara otomatis setelahnya jika diinginkan."
 
 msgid "When you use our platform to affix your electronic signature to documents, you are consenting to do so under the Electronic Signatures in Global and National Commerce Act (E-Sign Act) and other applicable laws. This action indicates your agreement to use electronic means to sign documents and receive notifications."
-msgstr "Saat Anda menggunakan platform kami untuk membubuhkan tanda tangan elektronik ke dokumen, Anda menyetujui untuk melakukannya berdasarkan Electronic Signatures in Global and National Commerce Act (E-Sign Act) dan hukum lain yang berlaku. Tindakan ini menunjukkan persetujuan Anda untuk menggunakan cara elektronik untuk menandatangani dokumen dan menerima notifikasi."
+msgstr "Saat kamu menggunakan platform kami untuk membubuhkan tkamu tangan elektronik ke dokumen, kamu menyetujui untuk melakukannya berdasarkan Electronic Signatures in Global and National Commerce Act (E-Sign Act) dan hukum lain yang berlaku. Tindakan ini menunjukkan persetujuan kamu untuk menggunakan cara elektronik untuk menkamutangani dokumen dan menerima notifikasi."
 
 msgid "Whether to enable the SSO portal for your organisation"
-msgstr "Apakah akan mengaktifkan portal SSO untuk organisasi Anda"
+msgstr "Apakah akan mengaktifkan portal SSO untuk organisasi kamu"
 
 msgid "While waiting for them to do so you can create your own Documenso account and get started with document signing right away."
-msgstr "Sambil menunggu mereka melakukannya, Anda dapat membuat akun Documenso sendiri dan mulai menandatangani dokumen langsung."
+msgstr "Sambil menunggu mereka melakukannya, kamu dapat membuat akun Documenso sendiri dan mulai menkamutangani dokumen langsung."
 
 msgid "Whitelabeling, unlimited members and more"
 msgstr "Whitelabeling, anggota tak terbatas, dan lainnya"
 
 msgid "Who do you want to remind?"
-msgstr "Siapa yang ingin Anda ingatkan?"
+msgstr "Siapa yang ingin kamu ingatkan?"
 
 msgid "Width:"
 msgstr "Lebar:"
@@ -7678,7 +7678,7 @@ msgid "Withdrawing Consent"
 msgstr "Menarik Persetujuan"
 
 msgid "Write a description to display on your public profile"
-msgstr "Tulis deskripsi untuk ditampilkan di profil publik Anda"
+msgstr "Tulis deskripsi untuk ditampilkan di profil publik kamu"
 
 msgid "Yearly"
 msgstr "Tahunan"
@@ -7687,548 +7687,548 @@ msgid "Yes"
 msgstr "Ya"
 
 msgid "You"
-msgstr "Anda"
+msgstr "kamu"
 
 msgid "You are about to complete approving the following document"
-msgstr "Anda akan menyelesaikan persetujuan dokumen berikut"
+msgstr "kamu akan menyelesaikan persetujuan dokumen berikut"
 
 msgid "You are about to complete assisting the following document"
-msgstr "Anda akan menyelesaikan bantuan untuk dokumen berikut"
+msgstr "kamu akan menyelesaikan bantuan untuk dokumen berikut"
 
 msgid "You are about to complete signing the following document"
-msgstr "Anda akan menyelesaikan penandatanganan dokumen berikut"
+msgstr "kamu akan menyelesaikan penkamutanganan dokumen berikut"
 
 msgid "You are about to complete viewing the following document"
-msgstr "Anda akan menyelesaikan peninjauan dokumen berikut"
+msgstr "kamu akan menyelesaikan peninjauan dokumen berikut"
 
 msgid "You are about to delete <0>{organisationName}</0>. This action is not reversible. All teams will be removed and all documents will be orphaned to the deleted-account service account."
-msgstr "Anda akan menghapus <0>{organisationName}</0>. Tindakan ini tidak dapat dibatalkan. Semua tim akan dihapus dan semua dokumen akan menjadi yatim di akun layanan akun-terhapus."
+msgstr "kamu akan menghapus <0>{organisationName}</0>. Tindakan ini tidak dapat dibatalkan. Semua tim akan dihapus dan semua dokumen akan menjadi yatim di akun layanan akun-terhapus."
 
 msgid "You are about to delete the following team email from <0>{teamName}</0>."
-msgstr "Anda akan menghapus email tim berikut dari <0>{teamName}</0>."
+msgstr "kamu akan menghapus email tim berikut dari <0>{teamName}</0>."
 
 msgid "You are about to give all organisation members access to this team under their organisation role."
-msgstr "Anda akan memberikan semua anggota organisasi akses ke tim ini berdasarkan peran organisasi mereka."
+msgstr "kamu akan memberikan semua anggota organisasi akses ke tim ini berdasarkan peran organisasi mereka."
 
 msgid "You are about to leave the following organisation."
-msgstr "Anda akan meninggalkan organisasi berikut."
+msgstr "kamu akan meninggalkan organisasi berikut."
 
 msgid "You are about to remove default access to this team for all organisation members. Any members not explicitly added to this team will no longer have access."
-msgstr "Anda akan menghapus akses default ke tim ini untuk semua anggota organisasi. Anggota yang tidak ditambahkan secara eksplisit ke tim ini tidak akan lagi memiliki akses."
+msgstr "kamu akan menghapus akses default ke tim ini untuk semua anggota organisasi. Anggota yang tidak ditambahkan secara eksplisit ke tim ini tidak akan lagi memiliki akses."
 
 msgid "You are about to remove the <0>{provider}</0> login method from your account."
-msgstr "Anda akan menghapus metode login <0>{provider}</0> dari akun Anda."
+msgstr "kamu akan menghapus metode login <0>{provider}</0> dari akun kamu."
 
 msgid "You are about to remove the following document and all associated fields"
-msgstr "Anda akan menghapus dokumen berikut dan semua kolom terkait"
+msgstr "kamu akan menghapus dokumen berikut dan semua kolom terkait"
 
 msgid "You are about to remove the following user from <0>{teamName}</0>."
-msgstr "Anda akan menghapus pengguna berikut dari <0>{teamName}</0>."
+msgstr "kamu akan menghapus pengguna berikut dari <0>{teamName}</0>."
 
 msgid "You are about to remove the following user from the organisation <0>{organisationName}</0>:"
-msgstr "Anda akan menghapus pengguna berikut dari organisasi <0>{organisationName}</0>:"
+msgstr "kamu akan menghapus pengguna berikut dari organisasi <0>{organisationName}</0>:"
 
 msgid "You are about to remove the following user from the team <0>{teamName}</0>:"
-msgstr "Anda akan menghapus pengguna berikut dari tim <0>{teamName}</0>:"
+msgstr "kamu akan menghapus pengguna berikut dari tim <0>{teamName}</0>:"
 
 msgid "You are about to subscribe to the {planName}"
-msgstr "Anda akan berlangganan {planName}"
+msgstr "kamu akan berlangganan {planName}"
 
 msgid "You are currently on the <0>Free Plan</0>."
-msgstr "Anda saat ini menggunakan <0>Paket Gratis</0>."
+msgstr "kamu saat ini menggunakan <0>Paket Gratis</0>."
 
 msgid "You are currently subscribed to <0>{currentProductName}</0>."
-msgstr "Anda saat ini berlangganan <0>{currentProductName}</0>."
+msgstr "kamu saat ini berlangganan <0>{currentProductName}</0>."
 
 msgid "You are currently updating <0>{memberName}</0>."
-msgstr "Anda sedang memperbarui <0>{memberName}</0>."
+msgstr "kamu sedang memperbarui <0>{memberName}</0>."
 
 msgid "You are currently updating <0>{organisationMemberName}</0>."
-msgstr "Anda sedang memperbarui <0>{organisationMemberName}</0>."
+msgstr "kamu sedang memperbarui <0>{organisationMemberName}</0>."
 
 msgid "You are currently updating the <0>{passkeyName}</0> passkey."
-msgstr "Anda sedang memperbarui passkey <0>{passkeyName}</0>."
+msgstr "kamu sedang memperbarui passkey <0>{passkeyName}</0>."
 
 msgid "You are currently updating the <0>{teamGroupName}</0> team group."
-msgstr "Anda sedang memperbarui grup tim <0>{teamGroupName}</0>."
+msgstr "kamu sedang memperbarui grup tim <0>{teamGroupName}</0>."
 
 msgid "You are not allowed to move these items."
-msgstr "Anda tidak diizinkan memindahkan item ini."
+msgstr "kamu tidak diizinkan memindahkan item ini."
 
 msgid "You are not allowed to move this document."
-msgstr "Anda tidak diizinkan memindahkan dokumen ini."
+msgstr "kamu tidak diizinkan memindahkan dokumen ini."
 
 msgid "You are not authorized to access this page."
-msgstr "Anda tidak diotorisasi mengakses halaman ini."
+msgstr "kamu tidak diotorisasi mengakses halaman ini."
 
 msgid "You are not authorized to delete this user."
-msgstr "Anda tidak diotorisasi menghapus pengguna ini."
+msgstr "kamu tidak diotorisasi menghapus pengguna ini."
 
 msgid "You are not authorized to disable this user."
-msgstr "Anda tidak diotorisasi menonaktifkan pengguna ini."
+msgstr "kamu tidak diotorisasi menonaktifkan pengguna ini."
 
 msgid "You are not authorized to enable this user."
-msgstr "Anda tidak diotorisasi mengaktifkan pengguna ini."
+msgstr "kamu tidak diotorisasi mengaktifkan pengguna ini."
 
 msgid "You are not authorized to reset two factor authentcation for this user."
-msgstr "Anda tidak diotorisasi mereset autentikasi dua faktor untuk pengguna ini."
+msgstr "kamu tidak diotorisasi mereset autentikasi dua faktor untuk pengguna ini."
 
 msgid "You can add fields manually in the editor."
-msgstr "Anda dapat menambahkan kolom secara manual di editor."
+msgstr "kamu dapat menambahkan kolom secara manual di editor."
 
 msgid "You can add recipients manually in the editor."
-msgstr "Anda dapat menambahkan penerima secara manual di editor."
+msgstr "kamu dapat menambahkan penerima secara manual di editor."
 
 msgid "You can choose to enable or disable the profile for public view."
-msgstr "Anda dapat memilih untuk mengaktifkan atau menonaktifkan profil untuk tampilan publik."
+msgstr "kamu dapat memilih untuk mengaktifkan atau menonaktifkan profil untuk tampilan publik."
 
 msgid "You can copy and share these links to recipients so they can action the document."
-msgstr "Anda dapat menyalin dan membagikan tautan ini ke penerima sehingga mereka dapat menindaklanjuti dokumen."
+msgstr "kamu dapat menyalin dan membagikan tautan ini ke penerima sehingga mereka dapat menindaklanjuti dokumen."
 
 msgid "You can enable access to allow all organisation members to access this team by default."
-msgstr "Anda dapat mengaktifkan akses untuk memberikan semua anggota organisasi akses ke tim ini secara default."
+msgstr "kamu dapat mengaktifkan akses untuk memberikan semua anggota organisasi akses ke tim ini secara default."
 
 msgid "You can manage your email preferences here."
-msgstr "Anda dapat mengelola preferensi email Anda di sini."
+msgstr "kamu dapat mengelola preferensi email kamu di sini."
 
 msgid "You can only detect fields in draft envelopes"
-msgstr "Anda hanya dapat mendeteksi kolom di amplop draf"
+msgstr "kamu hanya dapat mendeteksi kolom di amplop draf"
 
 msgid "You can update the profile URL by updating the team URL in the general settings page."
-msgstr "Anda dapat memperbarui URL profil dengan memperbarui URL tim di halaman pengaturan umum."
+msgstr "kamu dapat memperbarui URL profil dengan memperbarui URL tim di halaman pengaturan umum."
 
 msgid "You can view documents associated with this email and use this identity when sending documents."
-msgstr "Anda dapat melihat dokumen yang terkait dengan email ini dan menggunakan identitas ini saat mengirim dokumen."
+msgstr "kamu dapat melihat dokumen yang terkait dengan email ini dan menggunakan identitas ini saat mengirim dokumen."
 
 msgid "You cannot add assistants when signing order is disabled."
-msgstr "Anda tidak dapat menambahkan asisten saat urutan penandatanganan dinonaktifkan."
+msgstr "kamu tidak dapat menambahkan asisten saat urutan penkamutanganan dinonaktifkan."
 
 msgid "You cannot delete a group which has a higher role than you."
-msgstr "Anda tidak dapat menghapus grup yang memiliki peran lebih tinggi dari Anda."
+msgstr "kamu tidak dapat menghapus grup yang memiliki peran lebih tinggi dari kamu."
 
 msgid "You cannot delete this item because the document has been sent to recipients."
-msgstr "Anda tidak dapat menghapus item ini karena dokumen telah dikirim ke penerima."
+msgstr "kamu tidak dapat menghapus item ini karena dokumen telah dikirim ke penerima."
 
 msgid "You cannot modify a group which has a higher role than you."
-msgstr "Anda tidak dapat memodifikasi grup yang memiliki peran lebih tinggi dari Anda."
+msgstr "kamu tidak dapat memodifikasi grup yang memiliki peran lebih tinggi dari kamu."
 
 msgid "You cannot modify a organisation member who has a higher role than you."
-msgstr "Anda tidak dapat memodifikasi anggota organisasi yang memiliki peran lebih tinggi dari Anda."
+msgstr "kamu tidak dapat memodifikasi anggota organisasi yang memiliki peran lebih tinggi dari kamu."
 
 msgid "You cannot modify a team member who has a higher role than you."
-msgstr "Anda tidak dapat memodifikasi anggota tim yang memiliki peran lebih tinggi dari Anda."
+msgstr "kamu tidak dapat memodifikasi anggota tim yang memiliki peran lebih tinggi dari kamu."
 
 msgid "You cannot remove members from this team if the inherit member feature is enabled."
-msgstr "Anda tidak dapat menghapus anggota dari tim ini jika fitur warisi anggota diaktifkan."
+msgstr "kamu tidak dapat menghapus anggota dari tim ini jika fitur warisi anggota diaktifkan."
 
 msgid "You cannot upload encrypted PDFs."
-msgstr "Anda tidak dapat mengunggah PDF terenkripsi."
+msgstr "kamu tidak dapat mengunggah PDF terenkripsi."
 
 msgid "You currently have an active plan."
-msgstr "Anda saat ini memiliki paket aktif."
+msgstr "kamu saat ini memiliki paket aktif."
 
 msgid "You currently have an inactive <0>{currentProductName}</0> subscription."
-msgstr "Anda saat ini memiliki langganan <0>{currentProductName}</0> yang tidak aktif."
+msgstr "kamu saat ini memiliki langganan <0>{currentProductName}</0> yang tidak aktif."
 
 msgid "You currently have no access to any teams within this organisation. Please contact your organisation to request access."
-msgstr "Anda saat ini tidak memiliki akses ke tim mana pun dalam organisasi ini. Harap hubungi organisasi Anda untuk meminta akses."
+msgstr "kamu saat ini tidak memiliki akses ke tim mana pun dalam organisasi ini. Harap hubungi organisasi kamu untuk meminta akses."
 
 msgid "You do not have permission to create a token for this team."
-msgstr "Anda tidak memiliki izin untuk membuat token untuk tim ini."
+msgstr "kamu tidak memiliki izin untuk membuat token untuk tim ini."
 
 msgid "You don't manage billing for any organisations."
-msgstr "Anda tidak mengelola penagihan untuk organisasi mana pun."
+msgstr "kamu tidak mengelola penagihan untuk organisasi mana pun."
 
 msgid "You have been requested to sign the following documents. Review each document carefully and complete the signing process."
-msgstr "Anda diminta untuk menandatangani dokumen berikut. Tinjau setiap dokumen dengan cermat dan selesaikan proses penandatanganan."
+msgstr "kamu diminta untuk menkamutangani dokumen berikut. Tinjau setiap dokumen dengan cermat dan selesaikan proses penkamutanganan."
 
 msgid "You have no webhooks yet. Your webhooks will be shown here once you create them."
-msgstr "Anda belum memiliki webhook. Webhook Anda akan ditampilkan di sini setelah Anda membuatnya."
+msgstr "kamu belum memiliki webhook. Webhook kamu akan ditampilkan di sini setelah kamu membuatnya."
 
 msgid "You have not yet created any templates. To create a template please upload one."
-msgstr "Anda belum membuat templat apa pun. Untuk membuat templat, silakan unggah satu."
+msgstr "kamu belum membuat templat apa pun. Untuk membuat templat, silakan unggah satu."
 
 msgid "You have not yet created or received any documents. To create a document please upload one."
-msgstr "Anda belum membuat atau menerima dokumen apa pun. Untuk membuat dokumen, silakan unggah satu."
+msgstr "kamu belum membuat atau menerima dokumen apa pun. Untuk membuat dokumen, silakan unggah satu."
 
 msgid "You have reached the limit of the number of files per envelope."
-msgstr "Anda telah mencapai batas jumlah file per amplop."
+msgstr "kamu telah mencapai batas jumlah file per amplop."
 
 msgid "You have reached the maximum number of teams for your plan. Please contact sales at <0>{SUPPORT_EMAIL}</0> if you would like to adjust your plan."
-msgstr "Anda telah mencapai jumlah maksimum tim untuk paket Anda. Harap hubungi sales di <0>{SUPPORT_EMAIL}</0> jika ingin menyesuaikan paket Anda."
+msgstr "kamu telah mencapai jumlah maksimum tim untuk paket kamu. Harap hubungi sales di <0>{SUPPORT_EMAIL}</0> jika ingin menyesuaikan paket kamu."
 
 msgid "You have reached your document limit for this month. Please upgrade your plan."
-msgstr "Anda telah mencapai batas dokumen untuk bulan ini. Silakan tingkatkan paket Anda."
+msgstr "kamu telah mencapai batas dokumen untuk bulan ini. Silakan tingkatkan paket kamu."
 
 msgid "You have reached your document limit for this plan."
-msgstr "Anda telah mencapai batas dokumen untuk paket ini."
+msgstr "kamu telah mencapai batas dokumen untuk paket ini."
 
 msgid "You have reached your document limit."
-msgstr "Anda telah mencapai batas dokumen."
+msgstr "kamu telah mencapai batas dokumen."
 
 msgid "You have reached your document limit. <0>Upgrade your account to continue!</0>"
-msgstr "Anda telah mencapai batas dokumen. <0>Tingkatkan akun Anda untuk melanjutkan!</0>"
+msgstr "kamu telah mencapai batas dokumen. <0>Tingkatkan akun kamu untuk melanjutkan!</0>"
 
 msgid "You have rejected this document"
-msgstr "Anda telah menolak dokumen ini"
+msgstr "kamu telah menolak dokumen ini"
 
 msgid "You have successfully left this organisation."
-msgstr "Anda berhasil meninggalkan organisasi ini."
+msgstr "kamu berhasil meninggalkan organisasi ini."
 
 msgid "You have successfully registered. Please verify your account by clicking on the link you received in the email."
-msgstr "Anda berhasil mendaftar. Harap verifikasi akun Anda dengan mengklik tautan yang Anda terima di email."
+msgstr "kamu berhasil mendaftar. Harap verifikasi akun kamu dengan mengklik tautan yang kamu terima di email."
 
 msgid "You have successfully removed this email domain from the organisation."
-msgstr "Anda berhasil menghapus domain email ini dari organisasi."
+msgstr "kamu berhasil menghapus domain email ini dari organisasi."
 
 msgid "You have successfully removed this email from the organisation."
-msgstr "Anda berhasil menghapus email ini dari organisasi."
+msgstr "kamu berhasil menghapus email ini dari organisasi."
 
 msgid "You have successfully removed this envelope item."
-msgstr "Anda berhasil menghapus item amplop ini."
+msgstr "kamu berhasil menghapus item amplop ini."
 
 msgid "You have successfully removed this group from the organisation."
-msgstr "Anda berhasil menghapus grup ini dari organisasi."
+msgstr "kamu berhasil menghapus grup ini dari organisasi."
 
 msgid "You have successfully removed this group from the team."
-msgstr "Anda berhasil menghapus grup ini dari tim."
+msgstr "kamu berhasil menghapus grup ini dari tim."
 
 msgid "You have successfully removed this user from the organisation."
-msgstr "Anda berhasil menghapus pengguna ini dari organisasi."
+msgstr "kamu berhasil menghapus pengguna ini dari organisasi."
 
 msgid "You have successfully removed this user from the team."
-msgstr "Anda berhasil menghapus pengguna ini dari tim."
+msgstr "kamu berhasil menghapus pengguna ini dari tim."
 
 msgid "You have successfully revoked access."
-msgstr "Anda berhasil mencabut akses."
+msgstr "kamu berhasil mencabut akses."
 
 msgid "You have the right to withdraw your consent to use electronic signatures at any time before completing the signing process. To withdraw your consent, please contact the sender of the document. In failing to contact the sender you may reach out to <0>{SUPPORT_EMAIL}</0> for assistance. Be aware that withdrawing consent may delay or halt the completion of the related transaction or service."
-msgstr "Kamu berhak menarik persetujuan kamu untuk menggunakan tanda tangan elektronik kapan saja sebelum menyelesaikan proses penandatanganan. Untuk menarik persetujuan, silakan hubungi pengirim dokumen. Jika gagal menghubungi pengirim, kamu bisa menghubungi <0>{SUPPORT_EMAIL}</0> untuk bantuan. Perlu diketahui bahwa menarik persetujuan dapat menunda atau menghentikan penyelesaian transaksi atau layanan terkait."
+msgstr "Kamu berhak menarik persetujuan kamu untuk menggunakan tkamu tangan elektronik kapan saja sebelum menyelesaikan proses penkamutanganan. Untuk menarik persetujuan, silakan hubungi pengirim dokumen. Jika gagal menghubungi pengirim, kamu bisa menghubungi <0>{SUPPORT_EMAIL}</0> untuk bantuan. Perlu diketahui bahwa menarik persetujuan dapat menunda atau menghentikan penyelesaian transaksi atau layanan terkait."
 
 msgid "You have updated {memberName}."
-msgstr "Anda telah memperbarui {memberName}."
+msgstr "kamu telah memperbarui {memberName}."
 
 msgid "You have updated {organisationMemberName}."
-msgstr "Anda telah memperbarui {organisationMemberName}."
+msgstr "kamu telah memperbarui {organisationMemberName}."
 
 msgid "You have updated the team group."
-msgstr "Anda telah memperbarui grup tim."
+msgstr "kamu telah memperbarui grup tim."
 
 msgid "You must enter '{deleteMessage}' to proceed"
-msgstr "Anda harus memasukkan '{deleteMessage}' untuk melanjutkan"
+msgstr "kamu harus memasukkan '{deleteMessage}' untuk melanjutkan"
 
 msgid "You must select at least one item"
-msgstr "Anda harus memilih setidaknya satu item"
+msgstr "kamu harus memilih setidaknya satu item"
 
 msgid "You must type '{deleteMessage}' to confirm"
-msgstr "Anda harus mengetik '{deleteMessage}' untuk konfirmasi"
+msgstr "kamu harus mengetik '{deleteMessage}' untuk konfirmasi"
 
 msgid "You need at least one recipient to add fields"
-msgstr "Anda memerlukan setidaknya satu penerima untuk menambahkan kolom"
+msgstr "kamu memerlukan setidaknya satu penerima untuk menambahkan kolom"
 
 msgid "You need at least one recipient to send a document"
-msgstr "Anda memerlukan setidaknya satu penerima untuk mengirim dokumen"
+msgstr "kamu memerlukan setidaknya satu penerima untuk mengirim dokumen"
 
 msgid "You need to be an admin to manage API tokens."
-msgstr "Anda harus menjadi admin untuk mengelola token API."
+msgstr "kamu harus menjadi admin untuk mengelola token API."
 
 msgid "You need to be logged in as <0>{email}</0> to view this page."
-msgstr "Anda harus login sebagai <0>{email}</0> untuk melihat halaman ini."
+msgstr "kamu harus login sebagai <0>{email}</0> untuk melihat halaman ini."
 
 msgid "You need to be logged in to view this page."
-msgstr "Anda harus login untuk melihat halaman ini."
+msgstr "kamu harus login untuk melihat halaman ini."
 
 msgid "You need to setup 2FA to approve this document."
-msgstr "Anda perlu mengatur 2FA untuk menyetujui dokumen ini."
+msgstr "kamu perlu mengatur 2FA untuk menyetujui dokumen ini."
 
 msgid "You need to setup 2FA to approve this field."
-msgstr "Anda perlu mengatur 2FA untuk menyetujui kolom ini."
+msgstr "kamu perlu mengatur 2FA untuk menyetujui kolom ini."
 
 msgid "You need to setup 2FA to assist with this document."
-msgstr "Anda perlu mengatur 2FA untuk membantu dokumen ini."
+msgstr "kamu perlu mengatur 2FA untuk membantu dokumen ini."
 
 msgid "You need to setup 2FA to assist with this field."
-msgstr "Anda perlu mengatur 2FA untuk membantu kolom ini."
+msgstr "kamu perlu mengatur 2FA untuk membantu kolom ini."
 
 msgid "You need to setup 2FA to mark this document as viewed."
-msgstr "Anda perlu mengatur 2FA untuk menandai dokumen ini sebagai dilihat."
+msgstr "kamu perlu mengatur 2FA untuk menkamui dokumen ini sebagai dilihat."
 
 msgid "You need to setup 2FA to sign this document."
-msgstr "Anda perlu mengatur 2FA untuk menandatangani dokumen ini."
+msgstr "kamu perlu mengatur 2FA untuk menkamutangani dokumen ini."
 
 msgid "You need to setup 2FA to sign this field."
-msgstr "Anda perlu mengatur 2FA untuk menandatangani kolom ini."
+msgstr "kamu perlu mengatur 2FA untuk menkamutangani kolom ini."
 
 msgid "You need to setup 2FA to view this document."
-msgstr "Anda perlu mengatur 2FA untuk melihat dokumen ini."
+msgstr "kamu perlu mengatur 2FA untuk melihat dokumen ini."
 
 msgid "You need to setup 2FA to view this field."
-msgstr "Anda perlu mengatur 2FA untuk melihat kolom ini."
+msgstr "kamu perlu mengatur 2FA untuk melihat kolom ini."
 
 msgid "You need to setup a passkey to approve this document."
-msgstr "Anda perlu mengatur passkey untuk menyetujui dokumen ini."
+msgstr "kamu perlu mengatur passkey untuk menyetujui dokumen ini."
 
 msgid "You need to setup a passkey to approve this field."
-msgstr "Anda perlu mengatur passkey untuk menyetujui kolom ini."
+msgstr "kamu perlu mengatur passkey untuk menyetujui kolom ini."
 
 msgid "You need to setup a passkey to assist with this document."
-msgstr "Anda perlu mengatur passkey untuk membantu dokumen ini."
+msgstr "kamu perlu mengatur passkey untuk membantu dokumen ini."
 
 msgid "You need to setup a passkey to assist with this field."
-msgstr "Anda perlu mengatur passkey untuk membantu kolom ini."
+msgstr "kamu perlu mengatur passkey untuk membantu kolom ini."
 
 msgid "You need to setup a passkey to mark this document as viewed."
-msgstr "Anda perlu mengatur passkey untuk menandai dokumen ini sebagai dilihat."
+msgstr "kamu perlu mengatur passkey untuk menkamui dokumen ini sebagai dilihat."
 
 msgid "You need to setup a passkey to sign this document."
-msgstr "Anda perlu mengatur passkey untuk menandatangani dokumen ini."
+msgstr "kamu perlu mengatur passkey untuk menkamutangani dokumen ini."
 
 msgid "You need to setup a passkey to sign this field."
-msgstr "Anda perlu mengatur passkey untuk menandatangani kolom ini."
+msgstr "kamu perlu mengatur passkey untuk menkamutangani kolom ini."
 
 msgid "You need to setup a passkey to view this document."
-msgstr "Anda perlu mengatur passkey untuk melihat dokumen ini."
+msgstr "kamu perlu mengatur passkey untuk melihat dokumen ini."
 
 msgid "You need to setup a passkey to view this field."
-msgstr "Anda perlu mengatur passkey untuk melihat kolom ini."
+msgstr "kamu perlu mengatur passkey untuk melihat kolom ini."
 
 msgid "You will need to configure any claims or subscription after creating this organisation"
-msgstr "Anda perlu mengonfigurasi klaim atau langganan setelah membuat organisasi ini"
+msgstr "kamu perlu mengonfigurasi klaim atau langganan setelah membuat organisasi ini"
 
 msgid "You will now be required to enter a code from your authenticator app when signing in."
-msgstr "Anda sekarang akan diminta memasukkan kode dari aplikasi autentikator saat login."
+msgstr "kamu sekarang akan diminta memasukkan kode dari aplikasi autentikator saat login."
 
 msgid "You will receive an email copy of the signed document once everyone has signed."
-msgstr "Anda akan menerima salinan email dari dokumen yang ditandatangani setelah semua orang menandatangani."
+msgstr "kamu akan menerima salinan email dari dokumen yang ditkamutangani setelah semua orang menkamutangani."
 
 msgid "You're an admin. You can enable AI features for this team right away. Everyone on the team will see AI detection once enabled."
-msgstr "Anda seorang admin. Anda dapat mengaktifkan fitur AI untuk tim ini langsung. Semua orang di tim akan melihat deteksi AI setelah diaktifkan."
+msgstr "kamu seorang admin. kamu dapat mengaktifkan fitur AI untuk tim ini langsung. Semua orang di tim akan melihat deteksi AI setelah diaktifkan."
 
 msgid "You've made too many detection requests. Please wait a minute before trying again."
-msgstr "Anda terlalu banyak melakukan permintaan deteksi. Harap tunggu sebentar sebelum mencoba lagi."
+msgstr "kamu terlalu banyak melakukan permintaan deteksi. Harap tunggu sebentar sebelum mencoba lagi."
 
 msgid "Your Account"
-msgstr "Akun Anda"
+msgstr "Akun kamu"
 
 msgid "Your account has been deleted successfully."
-msgstr "Akun Anda berhasil dihapus."
+msgstr "Akun kamu berhasil dihapus."
 
 msgid "Your avatar has been updated successfully."
-msgstr "Avatar Anda berhasil diperbarui."
+msgstr "Avatar kamu berhasil diperbarui."
 
 msgid "Your banner has been updated successfully."
-msgstr "Banner Anda berhasil diperbarui."
+msgstr "Banner kamu berhasil diperbarui."
 
 msgid "Your brand website URL"
-msgstr "URL website merek Anda"
+msgstr "URL website merek kamu"
 
 msgid "Your branding preferences have been updated"
-msgstr "Preferensi branding Anda telah diperbarui"
+msgstr "Preferensi branding kamu telah diperbarui"
 
 msgid "Your browser does not support passkeys, which is required to approve this document."
-msgstr "Browser Anda tidak mendukung passkey, yang diperlukan untuk menyetujui dokumen ini."
+msgstr "Browser kamu tidak mendukung passkey, yang diperlukan untuk menyetujui dokumen ini."
 
 msgid "Your browser does not support passkeys, which is required to approve this field."
-msgstr "Browser Anda tidak mendukung passkey, yang diperlukan untuk menyetujui kolom ini."
+msgstr "Browser kamu tidak mendukung passkey, yang diperlukan untuk menyetujui kolom ini."
 
 msgid "Your browser does not support passkeys, which is required to assist with this document."
-msgstr "Browser Anda tidak mendukung passkey, yang diperlukan untuk membantu dokumen ini."
+msgstr "Browser kamu tidak mendukung passkey, yang diperlukan untuk membantu dokumen ini."
 
 msgid "Your browser does not support passkeys, which is required to assist with this field."
-msgstr "Browser Anda tidak mendukung passkey, yang diperlukan untuk membantu kolom ini."
+msgstr "Browser kamu tidak mendukung passkey, yang diperlukan untuk membantu kolom ini."
 
 msgid "Your browser does not support passkeys, which is required to mark this document as viewed."
-msgstr "Browser Anda tidak mendukung passkey, yang diperlukan untuk menandai dokumen ini sebagai dilihat."
+msgstr "Browser kamu tidak mendukung passkey, yang diperlukan untuk menkamui dokumen ini sebagai dilihat."
 
 msgid "Your browser does not support passkeys, which is required to sign this document."
-msgstr "Browser Anda tidak mendukung passkey, yang diperlukan untuk menandatangani dokumen ini."
+msgstr "Browser kamu tidak mendukung passkey, yang diperlukan untuk menkamutangani dokumen ini."
 
 msgid "Your browser does not support passkeys, which is required to sign this field."
-msgstr "Browser Anda tidak mendukung passkey, yang diperlukan untuk menandatangani kolom ini."
+msgstr "Browser kamu tidak mendukung passkey, yang diperlukan untuk menkamutangani kolom ini."
 
 msgid "Your browser does not support passkeys, which is required to view this document."
-msgstr "Browser Anda tidak mendukung passkey, yang diperlukan untuk melihat dokumen ini."
+msgstr "Browser kamu tidak mendukung passkey, yang diperlukan untuk melihat dokumen ini."
 
 msgid "Your browser does not support passkeys, which is required to view this field."
-msgstr "Browser Anda tidak mendukung passkey, yang diperlukan untuk melihat kolom ini."
+msgstr "Browser kamu tidak mendukung passkey, yang diperlukan untuk melihat kolom ini."
 
 msgid "Your bulk send has been initiated. You will receive an email notification upon completion."
-msgstr "Kiriman massal Anda telah dimulai. Anda akan menerima notifikasi email setelah selesai."
+msgstr "Kiriman massal kamu telah dimulai. kamu akan menerima notifikasi email setelah selesai."
 
 msgid "Your current {currentProductName} plan is past due. Please update your payment information."
-msgstr "Paket {currentProductName} Anda saat ini jatuh tempo. Harap perbarui informasi pembayaran Anda."
+msgstr "Paket {currentProductName} kamu saat ini jatuh tempo. Harap perbarui informasi pembayaran kamu."
 
 msgid "Your current license does not include these features."
-msgstr "Lisensi Anda saat ini tidak mencakup fitur-fitur ini."
+msgstr "Lisensi kamu saat ini tidak mencakup fitur-fitur ini."
 
 msgid "Your current plan includes the following support channels:"
-msgstr "Paket Anda saat ini mencakup saluran support berikut:"
+msgstr "Paket kamu saat ini mencakup saluran support berikut:"
 
 msgid "Your current plan is inactive."
-msgstr "Paket Anda saat ini tidak aktif."
+msgstr "Paket kamu saat ini tidak aktif."
 
 msgid "Your current plan is past due."
-msgstr "Paket Anda saat ini jatuh tempo."
+msgstr "Paket kamu saat ini jatuh tempo."
 
 msgid "Your direct signing templates"
-msgstr "Templat penandatanganan langsung Anda"
+msgstr "Templat penkamutanganan langsung kamu"
 
 msgid "Your document content will be sent securely to our AI provider solely for detection and will not be stored or used for training."
-msgstr "Konten dokumen Anda akan dikirim dengan aman ke provider AI kami semata-mata untuk deteksi dan tidak akan disimpan atau digunakan untuk pelatihan."
+msgstr "Konten dokumen kamu akan dikirim dengan aman ke provider AI kami semata-mata untuk deteksi dan tidak akan disimpan atau digunakan untuk pelatihan."
 
 msgid "Your document failed to upload."
-msgstr "Dokumen Anda gagal diunggah."
+msgstr "Dokumen kamu gagal diunggah."
 
 msgid "Your document has been created from the template successfully."
-msgstr "Dokumen Anda berhasil dibuat dari templat."
+msgstr "Dokumen kamu berhasil dibuat dari templat."
 
 msgid "Your document has been created successfully"
-msgstr "Dokumen Anda berhasil dibuat"
+msgstr "Dokumen kamu berhasil dibuat"
 
 msgid "Your document has been re-sent successfully."
-msgstr "Dokumen Anda berhasil dikirim ulang."
+msgstr "Dokumen kamu berhasil dikirim ulang."
 
 msgid "Your document has been saved as a template."
-msgstr "Dokumen Anda telah disimpan sebagai templat."
+msgstr "Dokumen kamu telah disimpan sebagai templat."
 
 msgid "Your document has been sent successfully."
-msgstr "Dokumen Anda berhasil dikirim."
+msgstr "Dokumen kamu berhasil dikirim."
 
 msgid "Your document has been successfully duplicated."
-msgstr "Dokumen Anda berhasil digandakan."
+msgstr "Dokumen kamu berhasil digkamukan."
 
 msgid "Your document has been successfully renamed."
-msgstr "Dokumen Anda berhasil diubah namanya."
+msgstr "Dokumen kamu berhasil diubah namanya."
 
 msgid "Your document has been updated successfully"
-msgstr "Dokumen Anda berhasil diperbarui"
+msgstr "Dokumen kamu berhasil diperbarui"
 
 msgid "Your document has been uploaded successfully."
-msgstr "Dokumen Anda berhasil diunggah."
+msgstr "Dokumen kamu berhasil diunggah."
 
 msgid "Your document has been uploaded successfully. You will be redirected to the template page."
-msgstr "Dokumen Anda berhasil diunggah. Anda akan dialihkan ke halaman templat."
+msgstr "Dokumen kamu berhasil diunggah. kamu akan dialihkan ke halaman templat."
 
 msgid "Your document is processed securely using AI services that don't retain your data."
-msgstr "Dokumen Anda diproses dengan aman menggunakan layanan AI yang tidak menyimpan data Anda."
+msgstr "Dokumen kamu diproses dengan aman menggunakan layanan AI yang tidak menyimpan data kamu."
 
 msgid "Your document preferences have been updated"
-msgstr "Preferensi dokumen Anda telah diperbarui"
+msgstr "Preferensi dokumen kamu telah diperbarui"
 
 msgid "Your documents"
-msgstr "Dokumen Anda"
+msgstr "Dokumen kamu"
 
 msgid "Your Email"
-msgstr "Email Anda"
+msgstr "Email kamu"
 
 msgid "Your email has already been confirmed. You can now use all features of Documenso."
-msgstr "Email Anda sudah dikonfirmasi. Anda sekarang dapat menggunakan semua fitur Documenso."
+msgstr "Email kamu sudah dikonfirmasi. kamu sekarang dapat menggunakan semua fitur Documenso."
 
 msgid "Your email has been successfully confirmed! You can now use all features of Documenso."
-msgstr "Email Anda berhasil dikonfirmasi! Anda sekarang dapat menggunakan semua fitur Documenso."
+msgstr "Email kamu berhasil dikonfirmasi! kamu sekarang dapat menggunakan semua fitur Documenso."
 
 msgid "Your email preferences have been updated"
-msgstr "Preferensi email Anda telah diperbarui"
+msgstr "Preferensi email kamu telah diperbarui"
 
 msgid "Your envelope has been distributed successfully."
-msgstr "Amplop Anda berhasil didistribusikan."
+msgstr "Amplop kamu berhasil didistribusikan."
 
 msgid "Your envelope has been resent successfully."
-msgstr "Amplop Anda berhasil dikirim ulang."
+msgstr "Amplop kamu berhasil dikirim ulang."
 
 msgid "Your existing tokens"
-msgstr "Token Anda yang ada"
+msgstr "Token kamu yang ada"
 
 msgid "Your Name"
-msgstr "Nama Anda"
+msgstr "Nama kamu"
 
 msgid "Your new password cannot be the same as your old password."
-msgstr "Password baru Anda tidak boleh sama dengan password lama."
+msgstr "Password baru kamu tidak boleh sama dengan password lama."
 
 msgid "Your organisation has been created."
-msgstr "Organisasi Anda telah dibuat."
+msgstr "Organisasi kamu telah dibuat."
 
 msgid "Your organisation has been successfully deleted."
-msgstr "Organisasi Anda berhasil dihapus."
+msgstr "Organisasi kamu berhasil dihapus."
 
 msgid "Your organisation has been successfully updated."
-msgstr "Organisasi Anda berhasil diperbarui."
+msgstr "Organisasi kamu berhasil diperbarui."
 
 msgid "Your password has been updated successfully."
-msgstr "Password Anda berhasil diperbarui."
+msgstr "Password kamu berhasil diperbarui."
 
 msgid "Your payment is overdue. Please settle the payment to avoid any service disruptions."
-msgstr "Pembayaran Anda terlambat. Harap selesaikan pembayaran untuk menghindari gangguan layanan."
+msgstr "Pembayaran kamu terlambat. Harap selesaikan pembayaran untuk menghindari gangguan layanan."
 
 msgid "Your personal organisation"
-msgstr "Organisasi pribadi Anda"
+msgstr "Organisasi pribadi kamu"
 
 msgid "Your plan does not support inviting members. Please upgrade or your plan or contact sales at <0>{SUPPORT_EMAIL}</0> if you would like to discuss your options."
-msgstr "Paket Anda tidak mendukung mengundang anggota. Silakan tingkatkan paket Anda atau hubungi sales di <0>{SUPPORT_EMAIL}</0> jika ingin mendiskusikan opsi Anda."
+msgstr "Paket kamu tidak mendukung mengundang anggota. Silakan tingkatkan paket kamu atau hubungi sales di <0>{SUPPORT_EMAIL}</0> jika ingin mendiskusikan opsi kamu."
 
 msgid "Your plan is no longer valid. Please subscribe to a new plan to continue using Documenso."
-msgstr "Paket Anda tidak lagi valid. Silakan berlangganan paket baru untuk terus menggunakan Documenso."
+msgstr "Paket kamu tidak lagi valid. Silakan berlangganan paket baru untuk terus menggunakan Documenso."
 
 msgid "Your profile has been updated successfully."
-msgstr "Profil Anda berhasil diperbarui."
+msgstr "Profil kamu berhasil diperbarui."
 
 msgid "Your profile has been updated."
-msgstr "Profil Anda telah diperbarui."
+msgstr "Profil kamu telah diperbarui."
 
 msgid "Your public profile has been updated."
-msgstr "Profil publik Anda telah diperbarui."
+msgstr "Profil publik kamu telah diperbarui."
 
 msgid "Your recovery code has been copied to your clipboard."
-msgstr "Kode pemulihan Anda telah disalin ke clipboard Anda."
+msgstr "Kode pemulihan kamu telah disalin ke clipboard kamu."
 
 msgid "Your recovery codes are listed below. Please store them in a safe place."
-msgstr "Kode pemulihan Anda tercantum di bawah. Harap simpan di tempat yang aman."
+msgstr "Kode pemulihan kamu tercantum di bawah. Harap simpan di tempat yang aman."
 
 msgid "Your signing window for this document has expired. Please contact the sender for a new invitation."
-msgstr "Jendela penandatanganan Anda untuk dokumen ini telah kedaluwarsa. Harap hubungi pengirim untuk undangan baru."
+msgstr "Jendela penkamutanganan kamu untuk dokumen ini telah kedaluwarsa. Harap hubungi pengirim untuk undangan baru."
 
 msgid "Your support request has been submitted. We'll get back to you soon!"
-msgstr "Permintaan support Anda telah dikirim. Kami akan menghubungi Anda segera!"
+msgstr "Permintaan support kamu telah dikirim. Kami akan menghubungi kamu segera!"
 
 msgid "Your team has been created."
-msgstr "Tim Anda telah dibuat."
+msgstr "Tim kamu telah dibuat."
 
 msgid "Your team has been successfully deleted."
-msgstr "Tim Anda berhasil dihapus."
+msgstr "Tim kamu berhasil dihapus."
 
 msgid "Your team has been successfully updated."
-msgstr "Tim Anda berhasil diperbarui."
+msgstr "Tim kamu berhasil diperbarui."
 
 msgid "Your template has been created successfully"
-msgstr "Templat Anda berhasil dibuat"
+msgstr "Templat kamu berhasil dibuat"
 
 msgid "Your template has been successfully duplicated."
-msgstr "Templat Anda berhasil digandakan."
+msgstr "Templat kamu berhasil digkamukan."
 
 msgid "Your template has been successfully renamed."
-msgstr "Templat Anda berhasil diubah namanya."
+msgstr "Templat kamu berhasil diubah namanya."
 
 msgid "Your template has been updated successfully"
-msgstr "Templat Anda berhasil diperbarui"
+msgstr "Templat kamu berhasil diperbarui"
 
 msgid "Your template has been uploaded successfully."
-msgstr "Templat Anda berhasil diunggah."
+msgstr "Templat kamu berhasil diunggah."
 
 msgid "Your templates"
-msgstr "Templat Anda"
+msgstr "Templat kamu"
 
 msgid "Your templates has been saved successfully."
-msgstr "Templat Anda berhasil disimpan."
+msgstr "Templat kamu berhasil disimpan."
 
 msgid "Your token has expired!"
-msgstr "Token Anda telah kedaluwarsa!"
+msgstr "Token kamu telah kedaluwarsa!"
 
 msgid "Your token was created successfully! Make sure to copy it because you won't be able to see it again!"
-msgstr "Token Anda berhasil dibuat! Pastikan untuk menyalinnya karena Anda tidak akan bisa melihatnya lagi!"
+msgstr "Token kamu berhasil dibuat! Pastikan untuk menyalinnya karena kamu tidak akan bisa melihatnya lagi!"
 
 msgid "Your tokens will be shown here once you create them."
-msgstr "Token Anda akan ditampilkan di sini setelah Anda membuatnya."
+msgstr "Token kamu akan ditampilkan di sini setelah kamu membuatnya."
 
 msgid "your-domain.com another-domain.com"
-msgstr "domain-anda.com domain-lain.com"
+msgstr "your-domain.com another-domain.com"
 
