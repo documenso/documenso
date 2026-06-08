@@ -23,6 +23,7 @@ export const createSubscriptionClaimRoute = adminProcedure
       emailQuota,
       apiRateLimits,
       apiQuota,
+      emailTransportId,
     } = input;
 
     ctx.logger.info({
@@ -43,6 +44,7 @@ export const createSubscriptionClaimRoute = adminProcedure
         emailQuota,
         apiRateLimits,
         apiQuota,
+        emailTransportId,
       },
     });
   });
