@@ -222,7 +222,7 @@ export const ManagePublicTemplateDialog = ({
             .with({ currentStep: 'SELECT_TEMPLATE' }, () => (
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>
+                  <DialogTitle className="w-full max-w-full whitespace-pre-line break-words">
                     {team?.name ? (
                       <Trans>{team.name} direct signing templates</Trans>
                     ) : (
