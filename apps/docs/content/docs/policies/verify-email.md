@@ -1,0 +1,78 @@
+---
+title: Verifying Emails from Documenso
+description: How to confirm that an email is genuinely from Documenso, and what to do if you receive a suspicious message.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+## Check the Sender Domain
+
+All email sent by Documenso originates from one of the following domains. If you receive an email claiming to be from Documenso and the sender address does not end in one of these domains, treat it as suspicious.
+
+| Domain                   | Used for                                                       |
+| ------------------------ | -------------------------------------------------------------- |
+| `documenso.com`          | Transactional email for paid plan accounts                     |
+| `documensomail.com`      | Transactional email for free plan accounts                     |
+
+Typical sender addresses include:
+
+- `noreply@documenso.com`
+- `noreply@documensomail.com`
+
+<Callout type="info">
+  Enterprise customers who have configured a [custom email domain](/docs/users/organisations/email-domains) will receive document-related emails from their organisation's own domain, not from the domains listed above.
+</Callout>
+
+## Types of Email Documenso Sends
+
+Documenso sends email only for the following purposes:
+
+- **Account verification** — confirming your email address when you sign up or change it
+- **Password reset** — a link to reset your password that you requested
+- **Document invitations** — notifying you that a document has been shared with you to sign, approve, or view
+- **Signing reminders** — follow-up reminders for pending document actions
+- **Completed document notifications** — confirmation that all parties have signed a document
+- **Team invitations** — inviting you to join an organisation or team
+
+## What Documenso Will Never Do
+
+- Ask for your password via email
+- Send you an attachment and ask you to open it to verify your identity
+- Ask you to confirm payment details or billing information over email
+- Send unsolicited marketing emails if you have not opted in
+
+## How to Tell If an Email Is Legitimate
+
+1. **Check the sender address** — the domain must be `documenso.com` or `documensomail.com`
+2. **Look at the link destination** — hover over any link before clicking; it should point to `app.documenso.com` or `documenso.com`
+3. **Watch for urgency or threats** — legitimate Documenso emails do not threaten account suspension to pressure you into clicking a link immediately
+4. **Verify the action yourself** — if in doubt, log in to [app.documenso.com](https://app.documenso.com) directly (not via the email link) and check whether the document or notification exists there
+
+## About the documensomail.com Domain
+
+`documensomail.com` is a Documenso-owned sending domain used exclusively for email delivery from free-plan accounts. It exists separately from `documenso.com` to allow reliable deliverability. Both domains are legitimate.
+
+<Callout type="warn">
+  A misspelling such as `documenso-mail.com`, `documensomaiI.com` (capital i instead of l), or any other variation is not a Documenso domain.
+</Callout>
+
+## Report a Suspicious Email
+
+If you receive an email that appears to impersonate Documenso:
+
+1. Do not click any links or download any attachments
+2. Forward the email as an attachment to **support@documenso.com**
+3. Delete the email from your inbox
+
+You can also report phishing emails directly to your email provider using their built-in reporting tools.
+
+## Contact
+
+- **Security concerns**: security@documenso.com
+- **General support**: support@documenso.com
+
+## Related
+
+- [Security Policy](/docs/policies/security) — Documenso's security practices and vulnerability disclosure process
+- [Create an Account](/docs/users/getting-started/create-account) — What to expect during sign-up
+- [Security Settings](/docs/users/settings/security) — Enable two-factor authentication and manage sessions
