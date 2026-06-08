@@ -74,9 +74,6 @@ export const getOrganisationSession = async ({
 
     return {
       ...organisation,
-      preferences: {
-        documentDateFormat: organisationGlobalSettings.documentDateFormat,
-      },
       teams: organisation.teams.map((team) => {
         const derivedSettings = extractDerivedTeamSettings(organisationGlobalSettings, team.teamGlobalSettings);
 
@@ -85,7 +82,6 @@ export const getOrganisationSession = async ({
           currentTeamRole: getHighestTeamRoleInGroup(team.teamGroups),
           preferences: {
             aiFeaturesEnabled: derivedSettings.aiFeaturesEnabled,
-            documentDateFormat: derivedSettings.documentDateFormat,
           },
         };
       }),
