@@ -1,6 +1,7 @@
 import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { SUPPORT_EMAIL } from '@documenso/lib/constants/app';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION, SKIP_QUERY_BATCH_META } from '@documenso/lib/constants/trpc';
+import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -38,7 +39,13 @@ export const OrganisationQuotaBanner = () => {
   );
 
   // Every member of the organisation sees the banner when a quota is exhausted.
-  if (!organisation || !quotaFlags || !isAnyQuotaExceeded) {
+  // Note: Skipping free plan banner for now because their quota can incorrectly show as exceeded.
+  if (
+    !organisation ||
+    !quotaFlags ||
+    !isAnyQuotaExceeded ||
+    organisation.organisationClaim.originalSubscriptionClaimId === INTERNAL_CLAIM_ID.FREE
+  ) {
     return null;
   }
 
