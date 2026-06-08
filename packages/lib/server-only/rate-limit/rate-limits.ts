@@ -66,6 +66,12 @@ export const linkOrgAccountRateLimit = createRateLimit({
   window: '1h',
 });
 
+export const reportSenderRateLimit = createRateLimit({
+  action: 'recipient.report-sender',
+  max: 1,
+  window: '7d',
+});
+
 // ---- API (Tier 4 - Standard) ----
 
 export const apiV1RateLimit = createRateLimit({
