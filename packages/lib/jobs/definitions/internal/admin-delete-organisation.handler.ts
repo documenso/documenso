@@ -1,10 +1,8 @@
 import { prisma } from '@documenso/prisma';
 
-import { ORGANISATION_USER_ACCOUNT_TYPE } from '../../../constants/organisations';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
-import { orphanEnvelopes } from '../../../server-only/envelope/orphan-envelopes';
+import { deleteOrganisation } from '../../../server-only/organisation/delete-organisation';
 import { sendOrganisationDeleteEmail } from '../../../server-only/organisation/delete-organisation-email';
-import { jobs } from '../../client';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TAdminDeleteOrganisationJobDefinition } from './admin-delete-organisation';
 
@@ -63,32 +61,13 @@ export const run = async ({ payload, io }: { payload: TAdminDeleteOrganisationJo
     return serializableContext;
   });
 
-  // 1. Orphan all envelopes for every team.
-  for (const team of organisation.teams) {
-    await io.runTask(`orphan-envelopes--team-${team.id}`, async () => {
-      await orphanEnvelopes({ teamId: team.id });
-    });
-  }
-
-  // 2. Delete the organisation. Matches the transaction in organisation-router/delete-organisation.ts.
+  // 1. Orphan envelopes, delete the organisation, and schedule the Stripe
+  // subscription cancellation. Shared with organisation-router/delete-organisation.ts.
   await io.runTask('delete-organisation', async () => {
-    await prisma.$transaction(async (tx) => {
-      await tx.account.deleteMany({
-        where: {
-          type: ORGANISATION_USER_ACCOUNT_TYPE,
-          provider: organisation.id,
-        },
-      });
-
-      await tx.organisation.delete({
-        where: {
-          id: organisation.id,
-        },
-      });
-    });
+    await deleteOrganisation({ organisation });
   });
 
-  // 3. Send the owner notification.
+  // 2. Send the owner notification.
   if (sendEmailToOwner) {
     await io.runTask('send-organisation-deleted-email', async () => {
       await sendOrganisationDeleteEmail({
@@ -97,19 +76,6 @@ export const run = async ({ payload, io }: { payload: TAdminDeleteOrganisationJo
         deletedByAdmin: true,
         emailContext,
       });
-    });
-  }
-
-  // 4. If the organisation has a Stripe subscription, schedule it to be cancelled at the end of the current billing period.
-  if (organisation.subscription) {
-    const stripeSubscriptionId = organisation.subscription.planId;
-
-    await jobs.triggerJob({
-      name: 'internal.cancel-organisation-subscription',
-      payload: {
-        stripeSubscriptionId,
-        organisationId: organisation.id,
-      },
     });
   }
 };
