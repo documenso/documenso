@@ -1,4 +1,5 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { ORGANISATION_USER_ACCOUNT_TYPE } from '@documenso/lib/constants/organisations';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
@@ -203,6 +204,7 @@ test('[USER][DELETE_ACCOUNT]: docs in orgs the user is a member of are transferr
     where: { id: ownedCompleted.id },
     select: { teamId: true, userId: true, deletedAt: true },
   });
+  expect(ownedAfter, 'owned-org envelope should survive as an orphan').not.toBeNull();
   expect(ownedAfter?.teamId).toBe(service.teamId);
   expect(ownedAfter?.userId).toBe(service.id);
   expect(ownedAfter?.deletedAt).not.toBeNull();
@@ -237,6 +239,7 @@ test('[USER][DELETE_ACCOUNT]: deleting the owner removes the org but keeps membe
     where: { id: memberCompleted.id },
     select: { teamId: true, userId: true, deletedAt: true },
   });
+  expect(after, 'member-authored envelope should survive as an orphan').not.toBeNull();
   expect(after?.teamId).toBe(service.teamId);
   expect(after?.userId).toBe(service.id);
   expect(after?.deletedAt).not.toBeNull();
@@ -295,6 +298,49 @@ test('[USER][DELETE_ACCOUNT]: a cancel-subscription job is enqueued for an owned
       },
     )
     .toBe(planId);
+
+  // The local Subscription row cascades away with the organisation — which is
+  // exactly why the planId has to be captured into the job payload beforehand.
+  expect(await prisma.subscription.findUnique({ where: { planId } })).toBeNull();
+});
+
+// ─── Owned org account (SSO) rows are cleaned up, members survive ────────────
+
+test('[USER][DELETE_ACCOUNT]: org-linked account rows are removed when an owned org is torn down', async ({ page }) => {
+  const { user: owner, organisation } = await seedUser();
+
+  const [member] = await seedOrganisationMembers({
+    organisationId: organisation.id,
+    members: [{ organisationRole: 'MEMBER' }],
+  });
+
+  // Simulate a member who linked their login through the organisation's SSO.
+  // These rows are keyed by `provider = organisation.id` and have no foreign key
+  // to the organisation, so they must be deleted explicitly during teardown.
+  const orgAccount = await prisma.account.create({
+    data: {
+      userId: member.id,
+      type: ORGANISATION_USER_ACCOUNT_TYPE,
+      provider: organisation.id,
+      providerAccountId: `oidc-${nanoid()}`,
+    },
+  });
+
+  await deleteAccountViaUi(page, owner.email);
+
+  await waitForOrganisationToBeGone(organisation.id);
+
+  // The org-linked account row is gone...
+  expect(await prisma.account.findUnique({ where: { id: orgAccount.id } })).toBeNull();
+  expect(
+    await prisma.account.count({
+      where: { type: ORGANISATION_USER_ACCOUNT_TYPE, provider: organisation.id },
+    }),
+  ).toBe(0);
+
+  // ...but the member user it belonged to survives (only the org + owner are removed).
+  expect(await prisma.user.findUnique({ where: { id: member.id } })).not.toBeNull();
+  expect(await prisma.user.findUnique({ where: { id: owner.id } })).toBeNull();
 });
 
 // ─── Sad path: no subscription means no cancel job is enqueued ────────────────
