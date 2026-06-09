@@ -1,9 +1,7 @@
-import { mailer } from '@documenso/email/mailer';
 import OrganisationLimitExceededEmailTemplate from '@documenso/email/templates/organisation-limit-exceeded';
 import { prisma } from '@documenso/prisma';
 import { msg } from '@lingui/core/macro';
 import { createElement } from 'react';
-
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '../../../constants/organisations';
@@ -51,7 +49,7 @@ export const run = async ({
     },
   });
 
-  const { branding, emailLanguage, senderEmail } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, emailTransport } = await getEmailContext({
     emailType: 'INTERNAL',
     source: {
       type: 'organisation',
@@ -86,7 +84,7 @@ export const run = async ({
 
       const i18n = await getI18nInstance(emailLanguage);
 
-      await mailer.sendMail({
+      await emailTransport.sendMail({
         to: member.user.email,
         from: senderEmail,
         subject: i18n._(msg`Organisation Review Required`),
@@ -95,4 +93,22 @@ export const run = async ({
       });
     });
   }
+
+  // Todo: Logging
+  // Todo: Decide if we want to send an email or alert via another software.
+  // const i18n = await getI18nInstance('en');
+
+  // // Email our support team.
+  // await mailer.sendMail({
+  //   to: SUPPORT_EMAIL,
+  //   from: senderEmail,
+  //   subject: i18n._(msg`An organisation has exceeded their fair use limits`),
+  //   text: `
+  //     Organisation: ${organisation.name}
+  //     Organisation ID: ${organisation.id}
+  //     Counter: ${payload.counter}
+  //     Kind: ${payload.kind}
+  //     Period: ${payload.period}
+  //   `,
+  // });
 };

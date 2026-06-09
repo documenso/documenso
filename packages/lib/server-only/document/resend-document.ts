@@ -1,4 +1,3 @@
-import { mailer } from '@documenso/email/mailer';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import { resolveExpiresAt } from '@documenso/lib/constants/envelope-expiration';
 import { RECIPIENT_ROLE_TO_EMAIL_TYPE, RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
@@ -151,15 +150,29 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
     return envelope;
   }
 
-  const { branding, emailLanguage, organisationType, senderEmail, replyToEmail, organisationId, claims } =
-    await getEmailContext({
-      emailType: 'RECIPIENT',
-      source: {
-        type: 'team',
-        teamId: envelope.teamId,
-      },
-      meta: envelope.documentMeta,
-    });
+  const {
+    branding,
+    emailLanguage,
+    organisationType,
+    senderEmail,
+    replyToEmail,
+    organisationId,
+    claims,
+    emailsDisabled,
+    emailTransport,
+  } = await getEmailContext({
+    emailType: 'RECIPIENT',
+    source: {
+      type: 'team',
+      teamId: envelope.teamId,
+    },
+    meta: envelope.documentMeta,
+  });
+
+  // Don't resend any emails if the organisation has email sending disabled.
+  if (user.disabled || emailsDisabled) {
+    return envelope;
+  }
 
   // Assert that there is enough quota to send the emails.
   await assertOrganisationRatesAndLimits({
@@ -244,7 +257,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
 
       // Send email outside any transaction to avoid holding a connection
       // open during network I/O.
-      await mailer.sendMail({
+      await emailTransport.sendMail({
         to: {
           address: email,
           name,

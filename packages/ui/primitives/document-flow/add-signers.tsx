@@ -34,6 +34,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { DocumentReadOnlyFields, mapFieldsWithRecipients } from '../../components/document/document-read-only-fields';
 import type { RecipientAutoCompleteOption } from '../../components/recipient/recipient-autocomplete-input';
 import { RecipientAutoCompleteInput } from '../../components/recipient/recipient-autocomplete-input';
+import { Alert, AlertDescription } from '../alert';
 import { Button } from '../button';
 import { Checkbox } from '../checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../form/form';
@@ -514,10 +515,24 @@ export const AddSignersFormPartial = ({
     void handleAutoSave();
   }, [form]);
 
+  const recipientCountLimit = organisation.organisationClaim.recipientCount;
+  const isOverRecipientLimit = recipientCountLimit > 0 && signers.length > recipientCountLimit;
+
   return (
     <>
       <DocumentFlowFormContainerHeader title={documentFlow.title} description={documentFlow.description} />
       <DocumentFlowFormContainerContent>
+        {isOverRecipientLimit && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>
+              <Trans>
+                This envelope cannot have more than {recipientCountLimit} recipients. Please contact support if you need
+                more.
+              </Trans>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {isDocumentPdfLoaded && (
           <DocumentReadOnlyFields
             showRecipientColors={true}

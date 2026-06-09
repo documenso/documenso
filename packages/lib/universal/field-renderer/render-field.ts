@@ -3,6 +3,8 @@ import { FieldType } from '@prisma/client';
 import type Konva from 'konva';
 import { match } from 'ts-pattern';
 
+import type { FieldCanvasStyleCache } from './field-canvas-style';
+import { resolveFieldCanvasStyle } from './field-canvas-style';
 import type { FieldRenderMode, FieldToRender } from './field-renderer';
 import { renderCheckboxFieldElement } from './render-checkbox-field';
 import { renderDropdownFieldElement } from './render-dropdown-field';
@@ -27,6 +29,7 @@ type RenderFieldOptions = {
 
   scale: number;
   editable?: boolean;
+  fieldCanvasStyleCache?: FieldCanvasStyleCache;
 };
 
 export const renderField = ({
@@ -39,6 +42,7 @@ export const renderField = ({
   scale,
   editable,
   color,
+  fieldCanvasStyleCache,
 }: RenderFieldOptions) => {
   const options = {
     pageLayer,
@@ -49,6 +53,7 @@ export const renderField = ({
     color,
     editable,
     scale,
+    fieldCanvasStyle: resolveFieldCanvasStyle(field, mode, fieldCanvasStyleCache),
   };
 
   // If the generic text field element array changes, update the `GenericTextFieldTypeMetas` type

@@ -16,6 +16,7 @@ export type FieldToRender = Pick<
   height: number;
   positionX: number;
   positionY: number;
+  isValidating?: boolean;
   fieldMeta?: TFieldMetaSchema | null;
   signature?: Pick<Signature, 'signatureImageAsBase64' | 'typedSignature'> | null;
 };
@@ -39,7 +40,16 @@ export type RenderFieldElementOptions = {
   editable?: boolean;
   scale: number;
   color?: TRecipientColor;
+  fieldCanvasStyle?: FieldCanvasStyle;
   translations: Record<FieldType, string> | null;
+};
+
+export type FieldCanvasStyle = {
+  backgroundColor?: string;
+  borderColor?: string;
+  borderRadius?: number;
+  borderWidth?: number;
+  opacity?: number;
 };
 
 /**
