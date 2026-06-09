@@ -272,7 +272,7 @@ export class LocalJobProvider extends BaseJobProvider {
         payload = result.data;
       }
 
-      console.log(`[JOBS]: Triggering job ${options.name} with payload`, options.payload);
+      console.log(`[JOBS]: Triggering job ${options.name} with payload`, payload);
 
       let backgroundJob = await prisma.backgroundJob
         .update({
