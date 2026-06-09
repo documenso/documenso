@@ -2,6 +2,7 @@ import { Trans } from '@lingui/react/macro';
 
 import { Link, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
+import { getSafeBrandingUrl } from '../utils/branding-url';
 
 export type TemplateFooterProps = {
   isDocument?: boolean;
@@ -10,6 +11,8 @@ export type TemplateFooterProps = {
 
 export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterProps) => {
   const branding = useBranding();
+
+  const safeBrandingUrl = branding.brandingEnabled ? getSafeBrandingUrl(branding.brandingUrl) : null;
 
   return (
     <Section>
@@ -47,6 +50,14 @@ export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterP
               </>
             );
           })}
+        </Text>
+      )}
+
+      {branding.brandingEnabled && safeBrandingUrl && (
+        <Text className="my-8 text-slate-400 text-sm">
+          <Link href={safeBrandingUrl} target="_blank">
+            {safeBrandingUrl}
+          </Link>
         </Text>
       )}
 
