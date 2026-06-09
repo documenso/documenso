@@ -1,21 +1,12 @@
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
-import type { Envelope } from '@prisma/client';
-import { type Field, RecipientRole, SigningStatus } from '@prisma/client';
+import type { Envelope, Field, Recipient } from '@prisma/client';
+import { RecipientRole, SigningStatus } from '@prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import { AppError, AppErrorCode } from '../errors/app-error';
 import type { TRecipientLite } from '../types/recipient';
 import { extractLegacyIds } from '../universal/id';
 import { zEmail } from './zod';
-
-type RecipientWithSigningOrder = {
-  role: RecipientRole;
-  signingOrder?: number | null;
-};
-
-type CanUpdateRecipient<T extends RecipientWithSigningOrder> = (recipient: T) => boolean;
-
-const canUpdateAnyRecipient = () => true;
 
 /**
  * Roles that require fields to be assigned before a document can be distributed.
@@ -24,16 +15,26 @@ const canUpdateAnyRecipient = () => true;
  */
 export const RECIPIENT_ROLES_THAT_REQUIRE_FIELDS = [RecipientRole.SIGNER] as const;
 
-export const isCcRecipient = (recipient: Pick<RecipientWithSigningOrder, 'role'>) => {
+// signingOrder isn't required when submitting the recipient form (Zod: z.number().optional())
+type RecipientWithSigningOrder = Pick<Recipient, 'role'> & Partial<Pick<Recipient, 'signingOrder'>>;
+
+export const isCcRecipient = (recipient: Pick<Recipient, 'role'>) => {
   return recipient.role === RecipientRole.CC;
 };
 
-export const getRecipientSigningOrder = (recipient: Pick<RecipientWithSigningOrder, 'role' | 'signingOrder'>) => {
+export const getRecipientSigningOrder = (recipient: RecipientWithSigningOrder) => {
   if (isCcRecipient(recipient)) {
     return null;
   }
 
   return recipient.signingOrder ?? null;
+};
+
+export const isAssistantLastSigner = (recipients: Pick<Recipient, 'role'>[]) => {
+  const nonCcRecipients = recipients.filter((recipient) => !isCcRecipient(recipient));
+  const lastNonCcRecipient = nonCcRecipients[nonCcRecipients.length - 1];
+
+  return lastNonCcRecipient?.role === RecipientRole.ASSISTANT;
 };
 
 export const sortRecipientsForSigningOrder = <T extends RecipientWithSigningOrder>(recipients: T[]): T[] => {
@@ -54,16 +55,9 @@ export const sortRecipientsForSigningOrder = <T extends RecipientWithSigningOrde
   });
 };
 
-export const isAssistantLastSigner = (recipients: Pick<RecipientWithSigningOrder, 'role'>[]) => {
-  const nonCcRecipients = recipients.filter((recipient) => !isCcRecipient(recipient));
-  const lastNonCcRecipient = nonCcRecipients[nonCcRecipients.length - 1];
-
-  return lastNonCcRecipient?.role === RecipientRole.ASSISTANT;
-};
-
 export const normalizeRecipientSigningOrders = <T extends RecipientWithSigningOrder>(
   recipients: T[],
-  canUpdateRecipient: CanUpdateRecipient<T> = canUpdateAnyRecipient,
+  canUpdateRecipient: (recipient: T) => boolean = () => true,
 ): Array<T & { signingOrder?: number }> => {
   const nonCcRecipients = recipients.filter((recipient) => !isCcRecipient(recipient));
   const ccRecipients = recipients.filter((recipient) => isCcRecipient(recipient));
