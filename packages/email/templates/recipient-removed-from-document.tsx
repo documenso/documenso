@@ -2,8 +2,8 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
-import { Body, Container, Head, Hr, Html, Img, Preview, Section, Text } from '../components';
-import { useBranding } from '../providers/branding';
+import { Body, Container, Head, Hr, Html, Preview, Section, Text } from '../components';
+import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
 import type { TemplateDocumentCancelProps } from '../template-components/template-document-cancel';
 import TemplateDocumentImage from '../template-components/template-document-image';
 import { TemplateFooter } from '../template-components/template-footer';
@@ -16,13 +16,8 @@ export const RecipientRemovedFromDocumentTemplate = ({
   assetBaseUrl = 'http://localhost:3002',
 }: DocumentCancelEmailTemplateProps) => {
   const { _ } = useLingui();
-  const branding = useBranding();
 
   const previewText = msg`${inviterName} has removed you from the document ${documentName}.`;
-
-  const getAssetUrl = (path: string) => {
-    return new URL(path, assetBaseUrl).toString();
-  };
 
   return (
     <Html>
@@ -33,11 +28,7 @@ export const RecipientRemovedFromDocumentTemplate = ({
         <Section>
           <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid p-4 backdrop-blur-sm">
             <Section>
-              {branding.brandingEnabled && branding.brandingLogo ? (
-                <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
-              ) : (
-                <Img src={getAssetUrl('/static/logo.png')} alt="Documenso Logo" className="mb-4 h-6" />
-              )}
+              <TemplateBrandingLogo assetBaseUrl={assetBaseUrl} className="mb-4 h-6" />
 
               <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 

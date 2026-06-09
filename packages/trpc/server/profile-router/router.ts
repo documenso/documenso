@@ -36,6 +36,12 @@ export const profileRouter = router({
   }),
 
   deleteAccount: authenticatedProcedure.mutation(async ({ ctx }) => {
+    ctx.logger.info({
+      input: {
+        userId: ctx.user.id,
+      },
+    });
+
     await deleteUser({
       id: ctx.user.id,
     });

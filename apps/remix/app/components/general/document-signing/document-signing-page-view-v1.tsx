@@ -50,6 +50,11 @@ import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-p
 import { DocumentSigningCompleteDialog } from './document-signing-complete-dialog';
 import { DocumentSigningRecipientProvider } from './document-signing-recipient-provider';
 
+type DocumentSigningBranding = {
+  brandingEnabled: boolean;
+  brandingLogo: string;
+};
+
 export type DocumentSigningPageViewV1Props = {
   recipient: RecipientWithFields;
   document: DocumentAndSender;
@@ -57,6 +62,7 @@ export type DocumentSigningPageViewV1Props = {
   completedFields: CompletedField[];
   isRecipientsTurn: boolean;
   allRecipients?: RecipientWithFields[];
+  branding: DocumentSigningBranding;
   includeSenderDetails: boolean;
 };
 
@@ -68,6 +74,7 @@ export const DocumentSigningPageViewV1 = ({
   isRecipientsTurn,
   allRecipients = [],
   includeSenderDetails,
+  branding,
 }: DocumentSigningPageViewV1Props) => {
   const { documentData, documentMeta } = document;
 
@@ -168,10 +175,12 @@ export const DocumentSigningPageViewV1 = ({
   const pendingFields = fieldsRequiringValidation.filter((field) => !field.inserted);
   const hasPendingFields = pendingFields.length > 0;
 
+  const hasCustomBrandingLogo = branding.brandingEnabled && Boolean(branding.brandingLogo);
+
   return (
     <DocumentSigningRecipientProvider recipient={recipient} targetSigner={targetSigner}>
       <div className="mx-auto w-full max-w-screen-xl sm:px-6">
-        {document.team.teamGlobalSettings.brandingEnabled && document.team.teamGlobalSettings.brandingLogo && (
+        {hasCustomBrandingLogo && (
           <img
             src={`/api/branding/logo/team/${document.teamId}`}
             alt={`${document.team.name}'s Logo`}

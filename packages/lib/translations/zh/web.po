@@ -8,7 +8,7 @@ msgstr ""
 "Language: zh\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-06-03 06:16\n"
+"PO-Revision-Date: 2026-06-09 05:23\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -405,7 +405,7 @@ msgstr "{maximumEnvelopeItemCount, plural, other {每个信封最多只能上传
 
 #: apps/remix/app/components/dialogs/email-transport-delete-dialog.tsx
 msgid "{organisationClaimCount, plural, one {# Organisation claim} other {# Organisation claims}}"
-msgstr ""
+msgstr "{organisationClaimCount, plural, other {# 机构认领}}"
 
 #: apps/remix/app/components/general/direct-template/direct-template-page.tsx
 msgid "{recipientActionVerb} document"
@@ -460,7 +460,7 @@ msgstr "{signerName} 已拒签文档“{documentName}”。"
 
 #: apps/remix/app/components/dialogs/email-transport-delete-dialog.tsx
 msgid "{subscriptionClaimCount, plural, one {# Subscription claim} other {# Subscription claims}}"
-msgstr ""
+msgstr "{subscriptionClaimCount, plural, other {# 订阅认领}}"
 
 #. placeholder {0}: _(actionVerb).toLowerCase()
 #: packages/email/template-components/template-document-invite.tsx
@@ -1292,7 +1292,7 @@ msgstr "添加邮箱域名"
 
 #: apps/remix/app/components/dialogs/email-transport-create-dialog.tsx
 msgid "Add Email Transport"
-msgstr ""
+msgstr "添加电子邮件传输方式"
 
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 msgid "Add fields"
@@ -1425,7 +1425,7 @@ msgstr "将此 URL 添加到您的身份提供商的允许重定向 URI 中"
 
 #: apps/remix/app/components/dialogs/email-transport-create-dialog.tsx
 msgid "Add transport"
-msgstr ""
+msgstr "添加传输方式"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Additional brand information to display at the bottom of emails"
@@ -1744,7 +1744,7 @@ msgstr "禁用用户时发生错误。"
 
 #: apps/remix/app/utils/toast-error-messages.ts
 msgid "An error occurred while distributing the document."
-msgstr ""
+msgstr "分发文档时发生错误。"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "An error occurred while enabling direct link signing."
@@ -1959,7 +1959,7 @@ msgstr "API"
 #: apps/remix/app/components/forms/email-transport-form.tsx
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "API key"
-msgstr ""
+msgstr "API 密钥"
 
 #: apps/remix/app/components/general/claim-limit-fields.tsx
 msgid "API rate limits"
@@ -1971,7 +1971,7 @@ msgstr "API 请求"
 
 #: apps/remix/app/components/general/organisations/organisation-quota-banner.tsx
 msgid "API requests have been temporarily paused"
-msgstr ""
+msgstr "API 请求已被暂时暂停"
 
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
@@ -2044,7 +2044,7 @@ msgstr "确定要删除以下声明吗？"
 
 #: apps/remix/app/components/dialogs/email-transport-delete-dialog.tsx
 msgid "Are you sure you want to delete the following transport?"
-msgstr ""
+msgstr "确定要删除以下传输方式吗？"
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "Are you sure you want to delete this folder?"
@@ -2253,7 +2253,7 @@ msgstr "后台任务"
 
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
 msgid "Backport email transport"
-msgstr ""
+msgstr "回移电子邮件传输方式"
 
 #: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx
 #: apps/remix/app/components/forms/signin.tsx
@@ -2615,6 +2615,10 @@ msgstr "抄送人"
 msgid "Center"
 msgstr "居中"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
+msgid "Change Field Type"
+msgstr "更改字段类型"
+
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Change language"
 msgstr "更改语言"
@@ -2912,7 +2916,7 @@ msgstr "配置模板的一般设置。"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Configure notification settings for the document."
-msgstr ""
+msgstr "为该文档配置通知设置。"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Configure security settings for the document."
@@ -3564,7 +3568,7 @@ msgstr "拒绝"
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Default (system mailer)"
-msgstr ""
+msgstr "默认（系统邮件程序）"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Default border colour."
@@ -3752,7 +3756,7 @@ msgstr "删除邮箱域名"
 
 #: apps/remix/app/components/dialogs/email-transport-delete-dialog.tsx
 msgid "Delete Email Transport"
-msgstr ""
+msgstr "删除电子邮件传输方式"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Delete Envelope"
@@ -4174,7 +4178,7 @@ msgstr "文档创建"
 
 #: apps/remix/app/components/general/organisations/organisation-quota-banner.tsx
 msgid "Document creation has been temporarily paused"
-msgstr ""
+msgstr "文档创建已被暂时暂停"
 
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
@@ -4690,7 +4694,7 @@ msgstr "例如：100"
 
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "e.g. Resend (free plans)"
-msgstr ""
+msgstr "例如：Resend（免费套餐）"
 
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
@@ -4708,7 +4712,7 @@ msgstr "编辑"
 
 #: apps/remix/app/components/dialogs/email-transport-update-dialog.tsx
 msgid "Edit Email Transport"
-msgstr ""
+msgstr "编辑电子邮件传输方式"
 
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Edit Item"
@@ -4826,7 +4830,7 @@ msgstr "邮箱已创建"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Email distribution needs to be enabled in the general settings tab to configure recipient email related settings."
-msgstr ""
+msgstr "要配置收件人电子邮件相关设置，必须先在“常规设置”选项卡中启用电子邮件分发。"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Email document settings"
@@ -4915,7 +4919,7 @@ msgstr "邮件发件人"
 
 #: apps/remix/app/components/general/organisations/organisation-quota-banner.tsx
 msgid "Email sending has been temporarily paused"
-msgstr ""
+msgstr "电子邮件发送已被暂时暂停"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
@@ -4953,12 +4957,12 @@ msgstr "如果文档仍在待处理状态，则向签署人发送电子邮件通
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Email transport"
-msgstr ""
+msgstr "电子邮件传输方式"
 
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-transports._index.tsx
 msgid "Email Transports"
-msgstr ""
+msgstr "电子邮件传输方式"
 
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Email verification"
@@ -5096,7 +5100,7 @@ msgstr "随附文件"
 
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "Endpoint (optional)"
-msgstr ""
+msgstr "端点（可选）"
 
 #: packages/lib/constants/i18n.ts
 msgid "English"
@@ -5462,7 +5466,7 @@ msgstr "创建支持工单失败"
 
 #: apps/remix/app/components/dialogs/email-transport-create-dialog.tsx
 msgid "Failed to create transport."
-msgstr ""
+msgstr "创建传输方式失败。"
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "Failed to delete folder"
@@ -5474,7 +5478,7 @@ msgstr "删除订阅声明失败。"
 
 #: apps/remix/app/components/dialogs/email-transport-delete-dialog.tsx
 msgid "Failed to delete transport."
-msgstr ""
+msgstr "删除传输方式失败。"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Failed to download audit logs. Please try again later."
@@ -5518,7 +5522,7 @@ msgstr "保存设置失败。"
 
 #: apps/remix/app/components/dialogs/email-transport-update-dialog.tsx
 msgid "Failed to save transport."
-msgstr ""
+msgstr "保存传输方式失败。"
 
 #: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 msgid "Failed to sign out all sessions"
@@ -5579,7 +5583,7 @@ msgstr "失败：{failedCount}"
 #: apps/remix/app/components/general/organisations/organisation-quota-banner.tsx
 #: apps/remix/app/utils/toast-error-messages.ts
 msgid "Fair use limit exceeded"
-msgstr ""
+msgstr "已超出合理使用限制"
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 #: apps/remix/app/components/tables/admin-claims-table.tsx
@@ -5669,7 +5673,7 @@ msgstr "文件大小超过 {APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB 限制"
 
 #: apps/remix/app/components/dialogs/email-transport-create-dialog.tsx
 msgid "Fill in the details to create a new email transport."
-msgstr ""
+msgstr "填写详细信息以创建新的电子邮件传输方式。"
 
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Fill in the details to create a new subscription claim."
@@ -5789,15 +5793,15 @@ msgstr "法语"
 
 #: apps/remix/app/components/tables/admin-email-transports-table.tsx
 msgid "From"
-msgstr ""
+msgstr "发件人"
 
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "From address"
-msgstr ""
+msgstr "发件地址"
 
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "From name"
-msgstr ""
+msgstr "发件人名称"
 
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
@@ -6074,7 +6078,7 @@ msgstr "水平"
 
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "Host"
-msgstr ""
+msgstr "主机"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "How long recipients have to complete this document after it is sent. Uses the team default when set to inherit."
@@ -6588,7 +6592,7 @@ msgstr "留空以继承组织设置。"
 
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "Leave blank to keep current"
-msgstr ""
+msgstr "留空则保持当前设置"
 
 #: apps/remix/app/components/dialogs/organisation-leave-dialog.tsx
 msgid "Leave organisation"
@@ -6758,7 +6762,7 @@ msgstr "为您的组织管理自定义 SSO 登录门户。"
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-transports._index.tsx
 msgid "Manage all email transports"
-msgstr ""
+msgstr "管理所有电子邮件传输方式"
 
 #: apps/remix/app/routes/_authenticated+/settings+/organisations.tsx
 msgid "Manage all organisations you are currently associated with."
@@ -7043,7 +7047,7 @@ msgstr "修改收件人"
 
 #: apps/remix/app/components/dialogs/email-transport-update-dialog.tsx
 msgid "Modify the details of the email transport."
-msgstr ""
+msgstr "修改该电子邮件传输方式的详细信息。"
 
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
 msgid "Modify the details of the subscription claim."
@@ -7293,6 +7297,10 @@ msgstr "此域名尚未配置任何电子邮件。"
 msgid "No features enabled"
 msgstr "未启用任何功能"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
+msgid "No field type matching this description was found."
+msgstr "未找到与此描述匹配的字段类型。"
+
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 msgid "No fields were detected in your document."
 msgstr "在您的文档中未检测到任何字段。"
@@ -7483,7 +7491,7 @@ msgstr "暂无待处理事项"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Notifications"
-msgstr ""
+msgstr "通知"
 
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-number-field.tsx
@@ -7788,7 +7796,7 @@ msgstr "用户所属的组织。"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Organisations without a transport use the system default mailer."
-msgstr ""
+msgstr "没有配置传输方式的组织将使用系统默认邮件程序。"
 
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "Organise your documents"
@@ -8083,7 +8091,7 @@ msgstr "占位符"
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Plans without a transport use the system default mailer."
-msgstr ""
+msgstr "没有配置传输方式的套餐将使用系统默认邮件程序。"
 
 #. placeholder {0}: _(actionVerb).toLowerCase()
 #: packages/email/template-components/template-document-invite.tsx
@@ -8310,7 +8318,7 @@ msgstr "波兰语"
 
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "Port"
-msgstr ""
+msgstr "端口"
 
 #: packages/lib/constants/i18n.ts
 msgid "Portuguese (Brazil)"
@@ -9205,7 +9213,7 @@ msgstr "另存为模板"
 
 #: apps/remix/app/components/dialogs/email-transport-update-dialog.tsx
 msgid "Save changes"
-msgstr ""
+msgstr "保存更改"
 
 #: packages/lib/client-only/providers/envelope-editor-provider.tsx
 #: packages/lib/client-only/providers/envelope-editor-provider.tsx
@@ -9261,7 +9269,7 @@ msgstr "按姓名或邮箱搜索"
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-transports._index.tsx
 msgid "Search by name or from address"
-msgstr ""
+msgstr "按名称或发件地址搜索"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations._index.tsx
 msgid "Search by organisation ID, name, customer ID or owner email"
@@ -9335,6 +9343,10 @@ msgstr "选择"
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "Select a destination for this folder."
 msgstr "请选择此文件夹的目标位置。"
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
+msgid "Select a field type"
+msgstr "选择字段类型"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "Select a folder to move this document to."
@@ -9549,7 +9561,7 @@ msgstr "发送"
 
 #: apps/remix/app/components/dialogs/email-transport-send-test-dialog.tsx
 msgid "Send a test email using this transport to verify the configuration."
-msgstr ""
+msgstr "使用此传输方式发送测试电子邮件以验证配置。"
 
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Send a test webhook with sample data to verify your integration is working correctly."
@@ -9609,11 +9621,11 @@ msgstr "发送状态"
 
 #: apps/remix/app/components/tables/admin-email-transports-table.tsx
 msgid "Send test"
-msgstr ""
+msgstr "发送测试"
 
 #: apps/remix/app/components/dialogs/email-transport-send-test-dialog.tsx
 msgid "Send Test Email"
-msgstr ""
+msgstr "发送测试邮件"
 
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
@@ -9731,11 +9743,11 @@ msgstr "在公开资料中展示模板，方便你的用户快速签署上手"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Show usage"
-msgstr ""
+msgstr "显示使用情况"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-stats._index.tsx
 msgid "Show usage with quotas"
-msgstr ""
+msgstr "显示使用情况和配额"
 
 #: apps/remix/app/components/dialogs/sign-field-signature-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
@@ -10737,11 +10749,11 @@ msgstr "测试"
 
 #: apps/remix/app/components/dialogs/email-transport-send-test-dialog.tsx
 msgid "Test email sent."
-msgstr ""
+msgstr "测试电子邮件已发送。"
 
 #: apps/remix/app/components/dialogs/email-transport-send-test-dialog.tsx
 msgid "Test failed."
-msgstr ""
+msgstr "测试失败。"
 
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Test Webhook"
@@ -10757,7 +10769,7 @@ msgstr "测试 Webhook 已发送"
 
 #: apps/remix/app/components/dialogs/email-transport-send-test-dialog.tsx
 msgid "test@example.com"
-msgstr ""
+msgstr "test@example.com"
 
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
@@ -11345,7 +11357,7 @@ msgstr "该文档已由所有收件人签署"
 
 #: apps/remix/app/utils/toast-error-messages.ts
 msgid "This document has too many recipients. Please remove some recipients or contact support if you need more."
-msgstr ""
+msgstr "此文档的收件人数量过多。请删除部分收件人，或在需要更多收件人时联系支持。"
 
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 msgid "This document is available in your Documenso account. You can view more details, recipients, and audit logs there."
@@ -11406,7 +11418,7 @@ msgstr "如果仍有其他收件人尚未签署，将向刚完成签署的收件
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
 msgid "This envelope cannot have more than {recipientCountLimit} recipients. Please contact support if you need more."
-msgstr ""
+msgstr "此信封的收件人数量不能超过 {recipientCountLimit} 个。如需更多收件人，请联系支持。"
 
 #: apps/remix/app/components/embed/embed-paywall.tsx
 msgid "This feature is not available on your current plan"
@@ -11780,7 +11792,7 @@ msgstr "未找到令牌"
 
 #: apps/remix/app/utils/toast-error-messages.ts
 msgid "Too many recipients"
-msgstr ""
+msgstr "收件人数量过多"
 
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
@@ -11821,23 +11833,23 @@ msgstr "将文档转移到其他团队"
 
 #: apps/remix/app/components/dialogs/email-transport-create-dialog.tsx
 msgid "Transport created."
-msgstr ""
+msgstr "传输已创建。"
 
 #: apps/remix/app/components/dialogs/email-transport-delete-dialog.tsx
 msgid "Transport deleted."
-msgstr ""
+msgstr "传输已删除。"
 
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "Transport type"
-msgstr ""
+msgstr "传输类型"
 
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "Transport type cannot be changed after creation."
-msgstr ""
+msgstr "传输类型在创建后无法更改。"
 
 #: apps/remix/app/components/dialogs/email-transport-update-dialog.tsx
 msgid "Transport updated."
-msgstr ""
+msgstr "传输已更新。"
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
@@ -12377,7 +12389,7 @@ msgstr "使用您的通行密钥进行认证"
 
 #: apps/remix/app/components/tables/admin-email-transports-table.tsx
 msgid "Used by claims"
-msgstr ""
+msgstr "被声明使用"
 
 #: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
@@ -12429,7 +12441,7 @@ msgstr "用户设置"
 
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "Username"
-msgstr ""
+msgstr "用户名"
 
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
@@ -12728,7 +12740,7 @@ msgstr "想拥有自己的公开资料吗？"
 
 #: apps/remix/app/components/dialogs/email-transport-delete-dialog.tsx
 msgid "Warning, this email transport is currently being used by:"
-msgstr ""
+msgstr "警告，此电子邮件传输当前正被以下主体使用："
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
@@ -13713,7 +13725,7 @@ msgstr "您本月的文档数量已达到上限。请升级您的套餐。"
 
 #: apps/remix/app/utils/toast-error-messages.ts
 msgid "You have reached your document limit for this plan. Please upgrade your plan."
-msgstr ""
+msgstr "您在当前方案中的文档数量已达上限。请升级您的方案。"
 
 #: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
@@ -14265,15 +14277,15 @@ msgstr "您的组织已成功更新。"
 
 #: apps/remix/app/components/general/organisations/organisation-quota-banner.tsx
 msgid "Your organisation has exceeded a fair use limit"
-msgstr ""
+msgstr "您的组织已超出合理使用限制"
 
 #: apps/remix/app/components/general/organisations/organisation-quota-banner.tsx
 msgid "Your organisation has exceeded a fair use limit. Please contact <0>support</0> to review your plan's limits."
-msgstr ""
+msgstr "您的组织已超出合理使用限制。请联系<0>支持</0>以查看您方案的限制。"
 
 #: apps/remix/app/utils/toast-error-messages.ts
 msgid "Your organisation has reached its plan's fair use limit. Please contact your organisation administrator or support to continue."
-msgstr ""
+msgstr "您的组织已达到当前方案的合理使用限制。要继续使用，请联系您组织的管理员或支持团队。"
 
 #: packages/email/templates/organisation-limit-exceeded.tsx
 msgid "Your organisation is generating API requests faster than normal, so some requests are being temporarily throttled."
@@ -14410,3 +14422,4 @@ msgstr "您的验证码："
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
