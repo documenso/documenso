@@ -3,6 +3,7 @@ name: Publish Docker
 on:
   push:
     branches: ['release']
+    tags: ['v*']
   workflow_dispatch:
     inputs:
       tag:
@@ -45,9 +46,11 @@ jobs:
           BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
           NEXT_PRIVATE_TELEMETRY_KEY: ${{ secrets.NEXT_PRIVATE_TELEMETRY_KEY }}
           NEXT_PRIVATE_TELEMETRY_HOST: ${{ secrets.NEXT_PRIVATE_TELEMETRY_HOST }}
-          APP_VERSION: ${{ inputs.tag || '' }}
+          APP_VERSION: ${{ inputs.tag || github.ref_name || '' }}
         run: |
           if [ -z "$APP_VERSION" ]; then
+            APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          elif [ "$APP_VERSION" = "release" ]; then
             APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
           fi
           GIT_SHA="$(git rev-parse HEAD)"
@@ -101,9 +104,11 @@ jobs:
 
       - name: Create and push DockerHub manifest
         env:
-          APP_VERSION: ${{ inputs.tag || '' }}
+          APP_VERSION: ${{ inputs.tag || github.ref_name || '' }}
         run: |
           if [ -z "$APP_VERSION" ]; then
+            APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          elif [ "$APP_VERSION" = "release" ]; then
             APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
           fi
           GIT_SHA="$(git rev-parse HEAD)"
@@ -142,9 +147,11 @@ jobs:
 
       - name: Create and push Github Container Registry manifest
         env:
-          APP_VERSION: ${{ inputs.tag || '' }}
+          APP_VERSION: ${{ inputs.tag || github.ref_name || '' }}
         run: |
           if [ -z "$APP_VERSION" ]; then
+            APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          elif [ "$APP_VERSION" = "release" ]; then
             APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
           fi
           GIT_SHA="$(git rev-parse HEAD)"
