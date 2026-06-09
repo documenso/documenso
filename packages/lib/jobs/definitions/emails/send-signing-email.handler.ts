@@ -1,4 +1,3 @@
-import { mailer } from '@documenso/email/mailer';
 import DocumentInviteEmailTemplate from '@documenso/email/templates/document-invite';
 import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
@@ -16,6 +15,7 @@ import { createElement } from 'react';
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { RECIPIENT_ROLE_TO_EMAIL_TYPE, RECIPIENT_ROLES_DESCRIPTION } from '../../../constants/recipient-roles';
+import { buildEnvelopeEmailHeaders } from '../../../server-only/email/build-envelope-email-headers';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
 import { updateRecipientNextReminder } from '../../../server-only/recipient/update-recipient-next-reminder';
@@ -98,7 +98,8 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     replyToEmail,
     organisationId,
     claims,
-    isOrganisationOwnerDisabled,
+    emailsDisabled,
+    emailTransport,
   } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
@@ -108,8 +109,8 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     meta: envelope.documentMeta,
   });
 
-  // Don't send signing invitations on behalf of a disabled (e.g. banned) account.
-  if (envelope.user.disabled || isOrganisationOwnerDisabled) {
+  // Don't send signing invitations if the organisation has email sending disabled or the owner is disabled (e.g. banned).
+  if (envelope.user.disabled || emailsDisabled) {
     return;
   }
 
@@ -165,6 +166,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
   const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
+  const reportUrl = `${NEXT_PUBLIC_WEBAPP_URL()}/report/${recipient.token}`;
 
   const template = createElement(DocumentInviteEmailTemplate, {
     documentName: envelope.title,
@@ -180,6 +182,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     teamName: team?.name,
     teamEmail: team?.teamEmail?.email,
     includeSenderDetails: settings.includeSenderDetails,
+    reportUrl,
   });
 
   if (isRecipientEmailValidForSending(recipient)) {
@@ -212,7 +215,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
         }),
       ]);
 
-      await mailer.sendMail({
+      await emailTransport.sendMail({
         to: {
           name: recipient.name,
           address: recipient.email,
@@ -222,6 +225,11 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
         subject: renderCustomEmailTemplate(documentMeta?.subject || emailSubject, customEmailTemplate),
         html,
         text,
+        headers: buildEnvelopeEmailHeaders({
+          userId,
+          envelopeId: envelope.id,
+          teamId: envelope.teamId,
+        }),
       });
     });
   }

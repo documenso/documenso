@@ -29,6 +29,7 @@ export const upsertFieldGroup = (field: FieldToRender, options: RenderFieldEleme
     x: fieldX,
     y: fieldY,
     draggable: editable,
+    opacity: options.fieldCanvasStyle?.opacity ?? 1,
     dragBoundFunc: (pos) => {
       const newX = Math.max(0, Math.min(maxXPosition, pos.x));
       const newY = Math.max(0, Math.min(maxYPosition, pos.y));
@@ -42,6 +43,7 @@ export const upsertFieldGroup = (field: FieldToRender, options: RenderFieldEleme
 
 export const upsertFieldRect = (field: FieldToRender, options: RenderFieldElementOptions): Konva.Rect => {
   const { pageWidth, pageHeight, mode, pageLayer, color } = options;
+  const { fieldCanvasStyle } = options;
 
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
@@ -55,10 +57,10 @@ export const upsertFieldRect = (field: FieldToRender, options: RenderFieldElemen
   fieldRect.setAttrs({
     width: fieldWidth,
     height: fieldHeight,
-    fill: DEFAULT_RECT_BACKGROUND,
-    stroke: color ? getRecipientColorStyles(color).baseRing : '#e5e7eb',
-    strokeWidth: 2,
-    cornerRadius: 2,
+    fill: fieldCanvasStyle?.backgroundColor ?? DEFAULT_RECT_BACKGROUND,
+    stroke: fieldCanvasStyle?.borderColor ?? (color ? getRecipientColorStyles(color).baseRing : '#e5e7eb'),
+    strokeWidth: fieldCanvasStyle?.borderWidth ?? 2,
+    cornerRadius: fieldCanvasStyle?.borderRadius ?? 2,
     strokeScaleEnabled: false,
     visible: mode !== 'export',
   } satisfies Partial<Konva.RectConfig>);
@@ -124,6 +126,10 @@ export const createFieldHoverInteraction = ({ options, fieldGroup, fieldRect }: 
   const { mode } = options;
 
   if (mode === 'export' || !options.color) {
+    return;
+  }
+
+  if (options.fieldCanvasStyle?.backgroundColor) {
     return;
   }
 

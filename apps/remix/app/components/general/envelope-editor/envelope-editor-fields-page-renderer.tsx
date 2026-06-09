@@ -14,13 +14,22 @@ import {
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
-import { CommandDialog } from '@documenso/ui/primitives/command';
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@documenso/ui/primitives/command';
+import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/types';
 import { useLingui } from '@lingui/react/macro';
 import type { FieldType } from '@prisma/client';
 import Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { Transformer } from 'konva/lib/shapes/Transformer';
-import { CopyPlusIcon, SquareStackIcon, TrashIcon, UserCircleIcon } from 'lucide-react';
+import { CopyPlusIcon, ShapesIcon, SquareStackIcon, TrashIcon, UserCircleIcon } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { fieldButtonList } from './envelope-editor-fields-drag-drop';
@@ -470,6 +479,22 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     }
   };
 
+  const changeSelectedFieldsType = (type: FieldType) => {
+    const fields = selectedKonvaFieldGroups
+      .map((field) => editorFields.getFieldByFormId(field.id()))
+      .filter((field) => field !== undefined);
+
+    for (const field of fields) {
+      if (field.type !== type) {
+        editorFields.updateFieldByFormId(field.formId, {
+          type,
+          fieldMeta: structuredClone(FIELD_META_DEFAULT_VALUES[type]),
+          id: undefined,
+        });
+      }
+    }
+  };
+
   const duplicatedSelectedFields = () => {
     const fields = selectedKonvaFieldGroups
       .map((field) => editorFields.getFieldByFormId(field.id()))
@@ -554,6 +579,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
           handleDuplicateSelectedFieldsOnAllPages={duplicatedSelectedFieldsOnAllPages}
           handleDeleteSelectedFields={deletedSelectedFields}
           handleChangeRecipient={changeSelectedFieldsRecipients}
+          handleChangeFieldType={changeSelectedFieldsType}
           selectedFieldFormId={selectedKonvaFieldGroups.map((field) => field.id())}
           style={{
             position: 'absolute',
@@ -602,6 +628,7 @@ type FieldActionButtonsProps = React.HTMLAttributes<HTMLDivElement> & {
   handleDuplicateSelectedFieldsOnAllPages: () => void;
   handleDeleteSelectedFields: () => void;
   handleChangeRecipient: (recipientId: number) => void;
+  handleChangeFieldType: (type: FieldType) => void;
   selectedFieldFormId: string[];
 };
 
@@ -610,14 +637,39 @@ const FieldActionButtons = ({
   handleDuplicateSelectedFieldsOnAllPages,
   handleDeleteSelectedFields,
   handleChangeRecipient,
+  handleChangeFieldType,
   selectedFieldFormId,
   ...props
 }: FieldActionButtonsProps) => {
   const { t } = useLingui();
 
   const [showRecipientSelector, setShowRecipientSelector] = useState(false);
+  const [showFieldTypeSelector, setShowFieldTypeSelector] = useState(false);
 
   const { editorFields, envelope } = useCurrentEnvelopeEditor();
+
+  /**
+   * Decide the preselected field type in the command input.
+   *
+   * If all fields share the same type, use that as the default selection.
+   * Otherwise show no preselection.
+   */
+  const preselectedFieldType = useMemo(() => {
+    if (selectedFieldFormId.length === 0) {
+      return null;
+    }
+
+    const fields = editorFields.localFields.filter((field) => selectedFieldFormId.includes(field.formId));
+
+    if (fields.length === 0) {
+      return null;
+    }
+
+    const firstType = fields[0].type;
+    const isTypesSame = fields.every((field) => field.type === firstType);
+
+    return isTypesSame ? firstType : null;
+  }, [editorFields.localFields, selectedFieldFormId]);
 
   /**
    * Decide the preselected recipient in the command input.
@@ -656,6 +708,7 @@ const FieldActionButtons = ({
     <div className="flex flex-col items-center" {...props}>
       <div className="group flex w-fit items-center justify-evenly gap-x-1 rounded-md border bg-gray-900 p-0.5">
         <button
+          type="button"
           title={t`Change Recipient`}
           className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
           onClick={() => setShowRecipientSelector(true)}
@@ -665,6 +718,17 @@ const FieldActionButtons = ({
         </button>
 
         <button
+          type="button"
+          title={t`Change Field Type`}
+          className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+          onClick={() => setShowFieldTypeSelector(true)}
+          onTouchEnd={() => setShowFieldTypeSelector(true)}
+        >
+          <ShapesIcon className="h-3 w-3" />
+        </button>
+
+        <button
+          type="button"
           title={t`Duplicate`}
           className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
           onClick={handleDuplicateSelectedFields}
@@ -674,6 +738,7 @@ const FieldActionButtons = ({
         </button>
 
         <button
+          type="button"
           title={t`Duplicate on all pages`}
           className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
           onClick={handleDuplicateSelectedFieldsOnAllPages}
@@ -683,6 +748,7 @@ const FieldActionButtons = ({
         </button>
 
         <button
+          type="button"
           title={t`Remove`}
           className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
           onClick={handleDeleteSelectedFields}
@@ -704,6 +770,41 @@ const FieldActionButtons = ({
           recipients={envelope.recipients}
           fields={envelope.fields}
         />
+      </CommandDialog>
+
+      <CommandDialog position="start" open={showFieldTypeSelector} onOpenChange={setShowFieldTypeSelector}>
+        <Command defaultValue={preselectedFieldType ? t(FRIENDLY_FIELD_TYPE[preselectedFieldType]) : undefined}>
+          <CommandInput placeholder={t`Select a field type`} />
+
+          <CommandList>
+            <CommandEmpty>
+              <span className="inline-block px-4 text-muted-foreground">
+                {t`No field type matching this description was found.`}
+              </span>
+            </CommandEmpty>
+
+            <CommandGroup>
+              {fieldButtonList.map((field) => {
+                const FieldIcon = field.icon;
+                const label = t(FRIENDLY_FIELD_TYPE[field.type]);
+
+                return (
+                  <CommandItem
+                    key={field.type}
+                    className="px-2"
+                    onSelect={() => {
+                      handleChangeFieldType(field.type);
+                      setShowFieldTypeSelector(false);
+                    }}
+                  >
+                    <FieldIcon className="mr-2 h-4 w-4" />
+                    <span className="truncate">{label}</span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          </CommandList>
+        </Command>
       </CommandDialog>
     </div>
   );

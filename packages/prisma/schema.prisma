@@ -280,6 +280,9 @@ model SubscriptionClaim {
 
   apiRateLimits Json /// [RateLimitArray] @zod.custom.use(ZRateLimitArraySchema)
   apiQuota      Int?
+
+  emailTransportId String?
+  emailTransport   EmailTransport? @relation(fields: [emailTransportId], references: [id], onDelete: SetNull)
 }
 
 /// @zod.import(["import { ZClaimFlagsSchema, ZRateLimitArraySchema } from '@documenso/lib/types/subscription';"])
@@ -306,6 +309,9 @@ model OrganisationClaim {
 
   apiRateLimits Json /// [RateLimitArray] @zod.custom.use(ZRateLimitArraySchema)
   apiQuota      Int?
+
+  emailTransportId String?
+  emailTransport   EmailTransport? @relation(fields: [emailTransportId], references: [id], onDelete: SetNull)
 }
 
 model OrganisationMonthlyStat {
@@ -322,6 +328,7 @@ model OrganisationMonthlyStat {
   documentCount Int @default(0)
   emailCount    Int @default(0)
   apiCount      Int @default(0)
+  emailReports  Int @default(0)
 
   @@unique([organisationId, period])
   @@index([organisationId])
@@ -1133,6 +1140,32 @@ model OrganisationEmail {
 
   organisationGlobalSettings OrganisationGlobalSettings[]
   teamGlobalSettings         TeamGlobalSettings[]
+}
+
+enum EmailTransportType {
+  SMTP_AUTH
+  SMTP_API
+  RESEND
+  MAILCHANNELS
+}
+
+model EmailTransport {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+  type EmailTransportType
+
+  // Required from-address override (plaintext, non-secret).
+  fromName    String
+  fromAddress String
+
+  // Encrypted JSON blob of the full transport config (secrets + non-secrets).
+  config String
+
+  subscriptionClaims SubscriptionClaim[]
+  organisationClaims OrganisationClaim[]
 }
 
 model OrganisationAuthenticationPortal {

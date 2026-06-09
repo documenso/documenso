@@ -3,16 +3,32 @@ import { Fragment } from 'react';
 
 import { Link, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
+import { getSafeBrandingUrl } from '../utils/branding-url';
 
 export type TemplateFooterProps = {
   isDocument?: boolean;
+  reportUrl?: string;
 };
 
-export const TemplateFooter = ({ isDocument = true }: TemplateFooterProps) => {
+export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterProps) => {
   const branding = useBranding();
+
+  const safeBrandingUrl = branding.brandingEnabled ? getSafeBrandingUrl(branding.brandingUrl) : null;
 
   return (
     <Section>
+      {reportUrl && (
+        <Text className="my-4 text-base text-slate-400">
+          <Trans>
+            Did not expect this email?{' '}
+            <Link className="text-[#7AC455]" href={reportUrl}>
+              Click here to report the sender
+            </Link>
+            . Never sign a document you don't recognize or weren't expecting.
+          </Trans>
+        </Text>
+      )}
+
       {isDocument && !branding.brandingHidePoweredBy && (
         <Text className="my-4 text-base text-slate-400">
           <Trans>
@@ -35,6 +51,14 @@ export const TemplateFooter = ({ isDocument = true }: TemplateFooterProps) => {
               </Fragment>
             );
           })}
+        </Text>
+      )}
+
+      {branding.brandingEnabled && safeBrandingUrl && (
+        <Text className="my-8 text-slate-400 text-sm">
+          <Link href={safeBrandingUrl} target="_blank">
+            {safeBrandingUrl}
+          </Link>
         </Text>
       )}
 

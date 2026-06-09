@@ -3,10 +3,10 @@ import {
   createOrganisationClaimUpsertData,
 } from '@documenso/lib/server-only/organisation/create-organisation';
 import type { Stripe } from '@documenso/lib/server-only/stripe';
-import type { InternalClaim, StripeOrganisationCreateMetadata } from '@documenso/lib/types/subscription';
+import type { StripeOrganisationCreateMetadata } from '@documenso/lib/types/subscription';
 import { INTERNAL_CLAIM_ID, ZStripeOrganisationCreateMetadataSchema } from '@documenso/lib/types/subscription';
 import { prisma } from '@documenso/prisma';
-import { OrganisationType, SubscriptionStatus } from '@prisma/client';
+import { OrganisationType, type SubscriptionClaim, SubscriptionStatus } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { extractStripeClaim } from './on-subscription-updated';
@@ -108,7 +108,7 @@ export const onSubscriptionCreated = async ({ subscription }: OnSubscriptionCrea
 
 type HandleOrganisationCreateOptions = {
   customerId: string;
-  claim: InternalClaim;
+  claim: Omit<SubscriptionClaim, 'createdAt' | 'updatedAt'>;
   unknownCreateData: string;
 };
 
@@ -147,7 +147,7 @@ const handleOrganisationCreate = async ({ customerId, claim, unknownCreateData }
 
 type HandleOrganisationUpdateOptions = {
   customerId: string;
-  claim: InternalClaim;
+  claim: Omit<SubscriptionClaim, 'createdAt' | 'updatedAt'>;
 };
 
 /**

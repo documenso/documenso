@@ -1,4 +1,3 @@
-import { mailer } from '@documenso/email/mailer';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import { resolveExpiresAt } from '@documenso/lib/constants/envelope-expiration';
 import { RECIPIENT_ROLE_TO_EMAIL_TYPE, RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
@@ -27,6 +26,7 @@ import { isDocumentCompleted } from '../../utils/document';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { buildEnvelopeEmailHeaders } from '../email/build-envelope-email-headers';
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
@@ -150,15 +150,29 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
     return envelope;
   }
 
-  const { branding, emailLanguage, organisationType, senderEmail, replyToEmail, organisationId, claims } =
-    await getEmailContext({
-      emailType: 'RECIPIENT',
-      source: {
-        type: 'team',
-        teamId: envelope.teamId,
-      },
-      meta: envelope.documentMeta,
-    });
+  const {
+    branding,
+    emailLanguage,
+    organisationType,
+    senderEmail,
+    replyToEmail,
+    organisationId,
+    claims,
+    emailsDisabled,
+    emailTransport,
+  } = await getEmailContext({
+    emailType: 'RECIPIENT',
+    source: {
+      type: 'team',
+      teamId: envelope.teamId,
+    },
+    meta: envelope.documentMeta,
+  });
+
+  // Don't resend any emails if the organisation has email sending disabled.
+  if (user.disabled || emailsDisabled) {
+    return envelope;
+  }
 
   // Assert that there is enough quota to send the emails.
   await assertOrganisationRatesAndLimits({
@@ -210,6 +224,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
 
       const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
       const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
+      const reportUrl = `${NEXT_PUBLIC_WEBAPP_URL()}/report/${recipient.token}`;
 
       const template = createElement(DocumentInviteEmailTemplate, {
         documentName: envelope.title,
@@ -225,6 +240,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
         selfSigner,
         organisationType,
         teamName: envelope.team?.name,
+        reportUrl,
       });
 
       const [html, text] = await Promise.all([
@@ -241,7 +257,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
 
       // Send email outside any transaction to avoid holding a connection
       // open during network I/O.
-      await mailer.sendMail({
+      await emailTransport.sendMail({
         to: {
           address: email,
           name,
@@ -253,6 +269,11 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
           : emailSubject,
         html,
         text,
+        headers: buildEnvelopeEmailHeaders({
+          userId: envelope.userId,
+          envelopeId: envelope.id,
+          teamId: envelope.teamId,
+        }),
       });
 
       await prisma.documentAuditLog.create({
