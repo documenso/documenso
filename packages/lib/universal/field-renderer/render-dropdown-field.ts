@@ -107,6 +107,7 @@ export const renderDropdownFieldElement = (field: FieldToRender, options: Render
     fontFamily: konvaTextFontFamily,
     fill: konvaTextFill,
     verticalAlign: 'middle',
+    listening: false,
   });
 
   const arrow = new Konva.Line({
@@ -120,6 +121,7 @@ export const renderDropdownFieldElement = (field: FieldToRender, options: Render
     lineJoin: 'round',
     closed: false,
     visible: mode !== 'export',
+    listening: false,
   });
 
   fieldGroup.add(selectedText);

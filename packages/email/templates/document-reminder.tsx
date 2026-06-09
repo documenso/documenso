@@ -16,6 +16,7 @@ export type DocumentReminderEmailTemplateProps = {
   assetBaseUrl?: string;
   customBody?: string;
   role: RecipientRole;
+  reportUrl?: string;
 };
 
 export const DocumentReminderEmailTemplate = ({
@@ -25,6 +26,7 @@ export const DocumentReminderEmailTemplate = ({
   assetBaseUrl = 'http://localhost:3002',
   customBody,
   role = RecipientRole.SIGNER,
+  reportUrl,
 }: DocumentReminderEmailTemplateProps) => {
   const { _ } = useLingui();
   const branding = useBranding();
@@ -75,7 +77,7 @@ export const DocumentReminderEmailTemplate = ({
           <Hr className="mx-auto mt-12 max-w-xl" />
 
           <Container className="mx-auto max-w-xl">
-            <TemplateFooter />
+            <TemplateFooter reportUrl={reportUrl} />
           </Container>
         </Section>
       </Body>

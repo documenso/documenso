@@ -14,7 +14,6 @@ import { groupBy } from 'remeda';
 
 import { NEXT_PRIVATE_USE_PLAYWRIGHT_PDF } from '../../../constants/app';
 import { AppError, AppErrorCode } from '../../../errors/app-error';
-import { sendCompletedEmail } from '../../../server-only/document/send-completed-email';
 import { getAuditLogsPdf } from '../../../server-only/htmltopdf/get-audit-logs-pdf';
 import { getCertificatePdf } from '../../../server-only/htmltopdf/get-certificate-pdf';
 import { insertFieldInPDFV1 } from '../../../server-only/pdf/insert-field-in-pdf-v1';
@@ -31,6 +30,7 @@ import { fieldsContainUnsignedRequiredField } from '../../../utils/advanced-fiel
 import { isDocumentCompleted } from '../../../utils/document';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import { mapDocumentIdToSecondaryId } from '../../../utils/envelope';
+import { jobs } from '../../client';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSealDocumentJobDefinition } from './seal-document';
 
@@ -294,21 +294,6 @@ export const run = async ({ payload, io }: { payload: TSealDocumentJobDefinition
     };
   });
 
-  await io.runTask('send-completed-email', async () => {
-    let shouldSendCompletedEmail = sendEmail && !isResealing && !isRejected;
-
-    if (isResealing && !isDocumentCompleted(envelopeStatus)) {
-      shouldSendCompletedEmail = sendEmail;
-    }
-
-    if (shouldSendCompletedEmail) {
-      await sendCompletedEmail({
-        id: { type: 'envelopeId', id: envelopeId },
-        requestMetadata,
-      });
-    }
-  });
-
   const updatedEnvelope = await prisma.envelope.findFirstOrThrow({
     where: {
       id: envelopeId,
@@ -325,6 +310,22 @@ export const run = async ({ payload, io }: { payload: TSealDocumentJobDefinition
     userId: updatedEnvelope.userId,
     teamId: updatedEnvelope.teamId ?? undefined,
   });
+
+  let shouldSendCompletedEmail = sendEmail && !isResealing && !isRejected;
+
+  if (isResealing && !isDocumentCompleted(envelopeStatus)) {
+    shouldSendCompletedEmail = sendEmail;
+  }
+
+  if (shouldSendCompletedEmail) {
+    await jobs.triggerJob({
+      name: 'send.document.completed.emails',
+      payload: {
+        envelopeId,
+        requestMetadata,
+      },
+    });
+  }
 };
 
 type DecorateAndSignPdfOptions = {

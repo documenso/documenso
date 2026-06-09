@@ -25,7 +25,7 @@ export const CardMetric = ({ icon: Icon, title, value, className, children }: Ca
             </div>
           )}
 
-          <h3 className="mb-2 flex items-end font-medium text-primary-forground text-sm leading-tight">{title}</h3>
+          <h3 className="mb-2 flex items-end font-medium text-sm leading-tight">{title}</h3>
         </div>
 
         {children || (

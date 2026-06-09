@@ -944,7 +944,7 @@ export const AddTemplateFieldsFormPartial = ({
               {hasErrors && (
                 <div className="mt-4">
                   <ul>
-                    <li className="text-red-500 text-sm">
+                    <li className="text-destructive text-sm">
                       <Trans>
                         To proceed further, please set at least one value for the{' '}
                         {emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'}{' '}
