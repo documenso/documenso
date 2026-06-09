@@ -17,6 +17,8 @@ export const ZCreateSubscriptionClaimRequestSchema = z.object({
 
   apiRateLimits: ZRateLimitArraySchema,
   apiQuota: z.number().int().min(0).nullable(),
+
+  emailTransportId: z.string().nullable(),
 });
 
 export const ZCreateSubscriptionClaimResponseSchema = z.void();

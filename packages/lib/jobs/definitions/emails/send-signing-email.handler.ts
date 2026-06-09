@@ -1,4 +1,3 @@
-import { mailer } from '@documenso/email/mailer';
 import DocumentInviteEmailTemplate from '@documenso/email/templates/document-invite';
 import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
@@ -99,7 +98,8 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     replyToEmail,
     organisationId,
     claims,
-    isOrganisationOwnerDisabled,
+    emailsDisabled,
+    emailTransport,
   } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
@@ -109,8 +109,8 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     meta: envelope.documentMeta,
   });
 
-  // Don't send signing invitations on behalf of a disabled (e.g. banned) account.
-  if (envelope.user.disabled || isOrganisationOwnerDisabled) {
+  // Don't send signing invitations if the organisation has email sending disabled or the owner is disabled (e.g. banned).
+  if (envelope.user.disabled || emailsDisabled) {
     return;
   }
 
@@ -215,7 +215,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
         }),
       ]);
 
-      await mailer.sendMail({
+      await emailTransport.sendMail({
         to: {
           name: recipient.name,
           address: recipient.email,

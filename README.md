@@ -182,7 +182,7 @@ For full instructions, requirements, and configuration details, see the [Self Ho
 
 #### Railway
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/bG6D4p)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/DjrRRX?referralCode=EZR3s0&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
 #### Render
 

@@ -52,13 +52,15 @@ export const run = async ({ payload, io }: { payload: TAdminDeleteOrganisationJo
   const ownerEmail = organisation.owner.email;
 
   const emailContext = await io.runTask('get-email-context', async () => {
-    return await getEmailContext({
+    const { emailTransport: _emailTransport, ...serializableContext } = await getEmailContext({
       emailType: 'INTERNAL',
       source: {
         type: 'organisation',
         organisationId: organisation.id,
       },
     });
+
+    return serializableContext;
   });
 
   // 1. Orphan all envelopes for every team.
