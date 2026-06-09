@@ -167,7 +167,6 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
     branding: {
       brandingEnabled: settings.brandingEnabled,
       brandingLogo: settings.brandingLogo,
-      brandingUrl: settings.brandingUrl,
     },
   } as const;
 };

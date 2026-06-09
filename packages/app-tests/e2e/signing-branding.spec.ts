@@ -38,15 +38,24 @@ const enableOrganisationBranding = async ({
   });
 };
 
-const expectExternalBrandingLink = async (page: Page, logoName: string) => {
-  const logoLink = page.getByRole('link', { name: logoName });
+/**
+ * On signing surfaces the custom branding logo must render as a plain image.
+ * It must not be wrapped in any link, and the Brand Website must never appear
+ * as a link on these pages.
+ */
+const expectPlainBrandingLogo = async (page: Page, logoName: string) => {
+  const logo = page.getByRole('img', { name: logoName });
 
-  await expect(logoLink).toHaveAttribute('href', BRANDING_URL);
-  await expect(logoLink).toHaveAttribute('target', '_blank');
-  await expect(logoLink).toHaveAttribute('rel', 'noopener noreferrer');
+  await expect(logo).toBeVisible();
+
+  // The custom logo must not be wrapped in a link.
+  await expect(page.getByRole('link', { name: logoName })).toHaveCount(0);
+
+  // The Brand Website must never be rendered as a link on signing pages.
+  await expect(page.locator(`a[href="${BRANDING_URL}"]`)).toHaveCount(0);
 };
 
-test('[SIGNING_BRANDING]: V1 normal signing links custom logo to safe Brand Website', async ({ page }) => {
+test('[SIGNING_BRANDING]: V1 normal signing renders custom logo as a plain image', async ({ page }) => {
   const { user, team, organisation } = await seedUser();
 
   await enableOrganisationBranding({
@@ -62,10 +71,10 @@ test('[SIGNING_BRANDING]: V1 normal signing links custom logo to safe Brand Webs
 
   await page.goto(`/sign/${recipients[0].token}`);
 
-  await expectExternalBrandingLink(page, `${team.name}'s Logo`);
+  await expectPlainBrandingLogo(page, `${team.name}'s Logo`);
 });
 
-test('[SIGNING_BRANDING]: V2 signing links custom logo to safe Brand Website', async ({ page }) => {
+test('[SIGNING_BRANDING]: V2 signing renders custom logo as a plain image', async ({ page }) => {
   const { user, team, organisation } = await seedUser();
 
   await enableOrganisationBranding({
@@ -88,50 +97,28 @@ test('[SIGNING_BRANDING]: V2 signing links custom logo to safe Brand Website', a
   });
 
   await page.goto(`/sign/${recipients[0].token}`);
-  await expectExternalBrandingLink(page, `${team.name}'s Logo`);
+  await expectPlainBrandingLogo(page, `${team.name}'s Logo`);
 
   await page.goto(formatDirectTemplatePath(directTemplate.directLink?.token || ''));
-  await expectExternalBrandingLink(page, `${team.name}'s Logo`);
+  await expectPlainBrandingLogo(page, `${team.name}'s Logo`);
 });
 
-test('[SIGNING_BRANDING]: V1 and V2 custom logos keep internal link when Brand Website is missing', async ({
-  page,
-}) => {
-  const { user, team, organisation } = await seedUser();
+test('[SIGNING_BRANDING]: V2 signing keeps internal link for the Documenso fallback logo', async ({ page }) => {
+  const { user, team } = await seedUser();
 
-  await enableOrganisationBranding({
-    organisationGlobalSettingsId: organisation.organisationGlobalSettingsId,
-    brandingUrl: '',
-  });
-
-  const { recipients: recipientsV1 } = await seedPendingDocumentWithFullFields({
+  const { recipients } = await seedPendingDocumentWithFullFields({
     owner: user,
     teamId: team.id,
-    recipients: ['v1-branding-no-url-signer@test.documenso.com'],
-    fields: [FieldType.SIGNATURE],
-  });
-
-  const { recipients: recipientsV2 } = await seedPendingDocumentWithFullFields({
-    owner: user,
-    teamId: team.id,
-    recipients: ['v2-branding-no-url-signer@test.documenso.com'],
+    recipients: ['v2-fallback-signer@test.documenso.com'],
     fields: [FieldType.SIGNATURE],
     updateDocumentOptions: { internalVersion: 2 },
   });
 
-  await page.goto(`/sign/${recipientsV1[0].token}`);
+  await page.goto(`/sign/${recipients[0].token}`);
 
-  const logoLinkV1 = page.getByRole('link', { name: `${team.name}'s Logo` });
+  const fallbackLogoLink = page.locator('a[href="/"]').first();
 
-  await expect(logoLinkV1).toHaveAttribute('href', '/');
-  await expect(logoLinkV1).not.toHaveAttribute('target', '_blank');
-
-  await page.goto(`/sign/${recipientsV2[0].token}`);
-
-  const logoLinkV2 = page.getByRole('link', { name: `${team.name}'s Logo` });
-
-  await expect(logoLinkV2).toHaveAttribute('href', '/');
-  await expect(logoLinkV2).not.toHaveAttribute('target', '_blank');
+  await expect(fallbackLogoLink).toBeVisible();
 });
 
 test('[SIGNING_BRANDING]: embedded signing does not render custom logo Brand Website links', async ({ page }) => {

@@ -27,7 +27,7 @@ import type { Field } from '@prisma/client';
 import { FieldType, RecipientRole } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { match, P } from 'ts-pattern';
 
 import { DocumentSigningAttachmentsPopover } from '~/components/general/document-signing/document-signing-attachments-popover';
@@ -53,7 +53,6 @@ import { DocumentSigningRecipientProvider } from './document-signing-recipient-p
 type DocumentSigningBranding = {
   brandingEnabled: boolean;
   brandingLogo: string;
-  brandingUrl: string;
 };
 
 export type DocumentSigningPageViewV1Props = {
@@ -178,29 +177,16 @@ export const DocumentSigningPageViewV1 = ({
 
   const hasCustomBrandingLogo = branding.brandingEnabled && Boolean(branding.brandingLogo);
 
-  const parsedBrandingUrl = hasCustomBrandingLogo ? URL.parse(branding.brandingUrl) : null;
-  const safeBrandingUrl =
-    parsedBrandingUrl?.protocol === 'http:' || parsedBrandingUrl?.protocol === 'https:' ? parsedBrandingUrl.href : null;
-
-  const customBrandingLogo = (
-    <img
-      src={`/api/branding/logo/team/${document.teamId}`}
-      alt={`${document.team.name}'s Logo`}
-      className="mb-4 h-12 w-12 md:mb-2"
-    />
-  );
-
   return (
     <DocumentSigningRecipientProvider recipient={recipient} targetSigner={targetSigner}>
       <div className="mx-auto w-full max-w-screen-xl sm:px-6">
-        {hasCustomBrandingLogo &&
-          (safeBrandingUrl ? (
-            <a href={safeBrandingUrl} target="_blank" rel="noopener noreferrer">
-              {customBrandingLogo}
-            </a>
-          ) : (
-            <Link to="/">{customBrandingLogo}</Link>
-          ))}
+        {hasCustomBrandingLogo && (
+          <img
+            src={`/api/branding/logo/team/${document.teamId}`}
+            alt={`${document.team.name}'s Logo`}
+            className="mb-4 h-12 w-12 md:mb-2"
+          />
+        )}
         <h1
           className="block max-w-[20rem] truncate font-semibold text-2xl sm:mt-4 md:max-w-[30rem] md:text-3xl"
           title={document.title}

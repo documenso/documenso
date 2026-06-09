@@ -166,7 +166,6 @@ export const getEnvelopeForDirectTemplateSigning = async ({
       includeSenderDetails: settings.includeSenderDetails,
       brandingEnabled: settings.brandingEnabled,
       brandingLogo: settings.brandingLogo,
-      brandingUrl: settings.brandingUrl,
     },
   } satisfies EnvelopeForSigningResponse);
 };
