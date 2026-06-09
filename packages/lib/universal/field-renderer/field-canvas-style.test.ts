@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { getFieldCanvasStyleCacheKey, getOpacityValue, getPixelValue, getRenderableColor } from './field-canvas-style';
+import {
+  getFieldCanvasStyleCacheKey,
+  getOpacityValue,
+  getPixelValue,
+  getRenderableColor,
+  TRANSPARENT_COLOR,
+} from './field-canvas-style';
 import type { FieldToRender } from './field-renderer';
 
 const createField = (overrides: Partial<FieldToRender> = {}) =>
@@ -66,17 +72,31 @@ describe('getRenderableColor', () => {
     expect(getRenderableColor('')).toBeUndefined();
   });
 
-  it('treats the `transparent` keyword as undefined regardless of case or whitespace', () => {
-    expect(getRenderableColor('transparent')).toBeUndefined();
-    expect(getRenderableColor('TRANSPARENT')).toBeUndefined();
-    expect(getRenderableColor('  Transparent  ')).toBeUndefined();
+  it('normalizes the `transparent` keyword to a renderable transparent color, regardless of case or whitespace', () => {
+    expect(getRenderableColor('transparent')).toBe(TRANSPARENT_COLOR);
+    expect(getRenderableColor('TRANSPARENT')).toBe(TRANSPARENT_COLOR);
+    expect(getRenderableColor('  Transparent  ')).toBe(TRANSPARENT_COLOR);
   });
 
-  it('treats fully transparent rgba() colors as undefined', () => {
-    expect(getRenderableColor('rgba(0, 0, 0, 0)')).toBeUndefined();
-    expect(getRenderableColor('rgba(255, 0, 0, 0)')).toBeUndefined();
-    expect(getRenderableColor('rgba(255, 0, 0, 0.0)')).toBeUndefined();
-    expect(getRenderableColor('rgba(255, 0, 0, 0.00)')).toBeUndefined();
+  it('normalizes fully transparent rgba() colors to a renderable transparent color', () => {
+    expect(getRenderableColor('rgba(0, 0, 0, 0)')).toBe(TRANSPARENT_COLOR);
+    expect(getRenderableColor('rgba(255, 0, 0, 0)')).toBe(TRANSPARENT_COLOR);
+    expect(getRenderableColor('rgba(255, 0, 0, 0.0)')).toBe(TRANSPARENT_COLOR);
+    expect(getRenderableColor('rgba(255, 0, 0, 0.00)')).toBe(TRANSPARENT_COLOR);
+  });
+
+  it('normalizes space-separated (CSS Color 4) fully transparent colors to a renderable transparent color', () => {
+    expect(getRenderableColor('rgb(0 128 0 / 0)')).toBe(TRANSPARENT_COLOR);
+    expect(getRenderableColor('rgba(255 0 0 / 0)')).toBe(TRANSPARENT_COLOR);
+  });
+
+  it('passes space-separated (CSS Color 4) colors through unchanged', () => {
+    expect(getRenderableColor('rgb(0 128 0 / 0.5)')).toBe('rgb(0 128 0 / 0.5)');
+  });
+
+  it('returns undefined for unparseable color values', () => {
+    expect(getRenderableColor('none')).toBeUndefined();
+    expect(getRenderableColor('not-a-color')).toBeUndefined();
   });
 
   it('does not strip non-zero alpha colors', () => {

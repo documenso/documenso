@@ -1,7 +1,6 @@
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
-import { FIELD_ROOT_CONTAINER_PROBE_CLASS_NAME } from '@documenso/ui/lib/field-root-container-classes';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
@@ -263,31 +262,12 @@ export const DocumentSigningPageViewV2 = () => {
             {/* Document View */}
             <div className="embed--DocumentViewer flex flex-col items-center justify-center p-2 sm:mt-4 sm:p-4">
               {currentEnvelopeItem ? (
-                <>
-                  <div
-                    aria-hidden="true"
-                    className={FIELD_ROOT_CONTAINER_PROBE_CLASS_NAME}
-                    data-field-type=""
-                    data-inserted="false"
-                    data-validate="false"
-                    data-readonly="false"
-                    style={{
-                      position: 'absolute',
-                      width: 0,
-                      height: 0,
-                      overflow: 'hidden',
-                      pointerEvents: 'none',
-                      visibility: 'hidden',
-                    }}
-                  />
-
-                  <EnvelopePdfViewer
-                    key={currentEnvelopeItem.id}
-                    customPageRenderer={EnvelopeSignerPageRenderer}
-                    scrollParentRef={scrollableContainerRef}
-                    errorMessage={PDF_VIEWER_ERROR_MESSAGES.signing}
-                  />
-                </>
+                <EnvelopePdfViewer
+                  key={currentEnvelopeItem.id}
+                  customPageRenderer={EnvelopeSignerPageRenderer}
+                  scrollParentRef={scrollableContainerRef}
+                  errorMessage={PDF_VIEWER_ERROR_MESSAGES.signing}
+                />
               ) : (
                 <div className="flex flex-col items-center justify-center py-32">
                   <p className="text-foreground text-sm">
