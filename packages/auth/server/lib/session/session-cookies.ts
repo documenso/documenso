@@ -54,16 +54,16 @@ export const getSessionCookie = async (c: Context): Promise<string | null> => {
  * @param c - The Hono context.
  * @param sessionToken - The session token to set.
  */
- export const setSessionCookie = async (c: Context, sessionToken: string) => {
-   await setSignedCookie(c, sessionCookieName, sessionToken, getAuthSecret(), {
-     ...sessionCookieOptions,
-     expires: new Date(Date.now() + AUTH_SESSION_LIFETIME),
-   }).catch((err) => {
-     appLog('SetSessionCookie', `Error setting signed cookie: ${err}`);
+export const setSessionCookie = async (c: Context, sessionToken: string) => {
+  await setSignedCookie(c, sessionCookieName, sessionToken, getAuthSecret(), {
+    ...sessionCookieOptions,
+    expires: new Date(Date.now() + AUTH_SESSION_LIFETIME),
+  }).catch((err) => {
+    appLog('SetSessionCookie', `Error setting signed cookie: ${err}`);
 
-     throw err;
-   });
- };
+    throw err;
+  });
+};
 
 /**
  * Set the session cookie into the Hono context.
