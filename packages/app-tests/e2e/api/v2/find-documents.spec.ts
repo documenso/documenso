@@ -1,7 +1,13 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
+import {
+  DocumentStatus,
+  DocumentVisibility,
+  RecipientRole,
+  SigningStatus,
+  TeamMemberRole,
+} from '@documenso/prisma/client';
 import {
   seedBlankDocument,
   seedCompletedDocument,
@@ -1558,5 +1564,125 @@ test.describe('Find Documents API - Adversarial: Cross-Team templateId', () => {
     });
     expect(ownTemplate!.data).toHaveLength(1);
     expect(ownTemplate!.data[0].title).toBe('TeamA Doc from Template');
+  });
+});
+
+test.describe('Find Documents API - Expired Recipient Filter', () => {
+  const PAST = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const FUTURE = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+  test('hasExpiredRecipients=true returns only docs with an expired, unsigned, non-CC recipient', async ({
+    request,
+  }) => {
+    const { user, team } = await seedUser();
+    const { user: recipient } = await seedUser();
+
+    const { token } = await createApiToken({
+      userId: user.id,
+      teamId: team.id,
+      tokenName: 'expired-token',
+      expiresIn: null,
+    });
+
+    const expiredDoc = await seedPendingDocument(user, team.id, [recipient], {
+      createDocumentOptions: { title: 'Expired Recipient Doc' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: expiredDoc.id },
+      data: { expiresAt: PAST },
+    });
+
+    const activeDoc = await seedPendingDocument(user, team.id, [recipient], {
+      createDocumentOptions: { title: 'Active Recipient Doc' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: activeDoc.id },
+      data: { expiresAt: FUTURE },
+    });
+
+    await seedPendingDocument(user, team.id, [recipient], {
+      createDocumentOptions: { title: 'No Expiry Doc' },
+    });
+
+    const { json } = await findDocuments(request, token, { hasExpiredRecipients: 'true' });
+    const titles = json!.data.map((d) => d.title);
+    expect(titles).toContain('Expired Recipient Doc');
+    expect(titles).not.toContain('Active Recipient Doc');
+    expect(titles).not.toContain('No Expiry Doc');
+    expect(json!.count).toBe(1);
+  });
+
+  test('hasExpiredRecipients=false (and omitted) does not filter by expiry', async ({ request }) => {
+    const { user, team } = await seedUser();
+    const { user: recipient } = await seedUser();
+
+    const { token } = await createApiToken({
+      userId: user.id,
+      teamId: team.id,
+      tokenName: 'expired-false-token',
+      expiresIn: null,
+    });
+
+    const expiredDoc = await seedPendingDocument(user, team.id, [recipient], {
+      createDocumentOptions: { title: 'Expired Doc' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: expiredDoc.id },
+      data: { expiresAt: PAST },
+    });
+
+    await seedPendingDocument(user, team.id, [recipient], {
+      createDocumentOptions: { title: 'Active Doc' },
+    });
+
+    // "false" must NOT be coerced to true — both docs should be returned.
+    const { json: falseJson } = await findDocuments(request, token, { hasExpiredRecipients: 'false' });
+    expect(falseJson!.count).toBe(2);
+
+    const { json: omittedJson } = await findDocuments(request, token);
+    expect(omittedJson!.count).toBe(2);
+  });
+
+  test('excludes signed and CC recipients from the expired filter', async ({ request }) => {
+    const { user, team } = await seedUser();
+    const { user: recipient } = await seedUser();
+
+    const { token } = await createApiToken({
+      userId: user.id,
+      teamId: team.id,
+      tokenName: 'expired-exclude-token',
+      expiresIn: null,
+    });
+
+    const signedDoc = await seedPendingDocument(user, team.id, [recipient], {
+      createDocumentOptions: { title: 'Expired but Signed' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: signedDoc.id },
+      data: { expiresAt: PAST, signingStatus: SigningStatus.SIGNED },
+    });
+
+    const ccDoc = await seedPendingDocument(user, team.id, [recipient], {
+      createDocumentOptions: { title: 'Expired but CC' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: ccDoc.id },
+      data: { expiresAt: PAST, role: RecipientRole.CC },
+    });
+
+    const validDoc = await seedPendingDocument(user, team.id, [recipient], {
+      createDocumentOptions: { title: 'Expired Unsigned Signer' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: validDoc.id },
+      data: { expiresAt: PAST },
+    });
+
+    const { json } = await findDocuments(request, token, { hasExpiredRecipients: 'true' });
+    const titles = json!.data.map((d) => d.title);
+    expect(titles).toContain('Expired Unsigned Signer');
+    expect(titles).not.toContain('Expired but Signed');
+    expect(titles).not.toContain('Expired but CC');
+    expect(json!.count).toBe(1);
   });
 });

@@ -19,6 +19,11 @@ export const ZFindDocumentsRequestSchema = ZFindSearchParamsSchema.extend({
   templateId: z.number().describe('Filter documents by the template ID used to create it.').optional(),
   source: z.nativeEnum(DocumentSource).describe('Filter documents by how it was created.').optional(),
   status: z.nativeEnum(DocumentStatus).describe('Filter documents by the current status').optional(),
+  hasExpiredRecipients: z
+    .enum(['true', 'false'])
+    .describe('Filter for documents that have at least one recipient whose signing link has expired.')
+    .transform((value) => value === 'true')
+    .optional(),
   folderId: z.string().describe('Filter documents by folder ID').optional(),
   orderByColumn: z.enum(['createdAt']).optional(),
   orderByDirection: z.enum(['asc', 'desc']).describe('').default('desc'),

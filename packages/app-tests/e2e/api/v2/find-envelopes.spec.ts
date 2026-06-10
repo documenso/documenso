@@ -1055,3 +1055,38 @@ test.describe('Find Envelopes API - Cross-User Isolation', () => {
     expect(titles).not.toContain('Member Org Team Env');
   });
 });
+
+test.describe('Find Envelopes API - Expired Recipient Filter', () => {
+  test('hasExpiredRecipients=true returns only envelopes with an expired, unsigned recipient', async ({ request }) => {
+    const { user, team } = await seedUser();
+    const { user: recipient } = await seedUser();
+
+    const { token } = await createApiToken({
+      userId: user.id,
+      teamId: team.id,
+      tokenName: 'env-expired-token',
+      expiresIn: null,
+    });
+
+    const expiredEnvelope = await seedPendingDocument(user, team.id, [recipient], {
+      createDocumentOptions: { title: 'Expired Envelope' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: expiredEnvelope.id },
+      data: { expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+    });
+
+    await seedPendingDocument(user, team.id, [recipient], {
+      createDocumentOptions: { title: 'Active Envelope' },
+    });
+
+    const { json } = await findEnvelopes(request, token, {
+      type: EnvelopeType.DOCUMENT,
+      hasExpiredRecipients: 'true',
+    });
+    const titles = json!.data.map((d) => d.title);
+    expect(titles).toContain('Expired Envelope');
+    expect(titles).not.toContain('Active Envelope');
+    expect(json!.count).toBe(1);
+  });
+});
