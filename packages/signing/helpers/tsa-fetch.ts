@@ -5,7 +5,7 @@ import { getProxyForUrl } from 'proxy-from-env';
 
 export type TsaFetch = (input: string | URL | Request, init?: RequestInit) => Promise<Response>;
 
-const TSA_FETCH_TIMEOUT_MS = 30_000;
+const TSA_FETCH_TIMEOUT_MS = 60_000;
 
 const resolveRequestUrl = (input: string | URL | Request): string => {
   if (typeof input === 'string') {
@@ -45,6 +45,10 @@ export const createTsaFetch = (): TsaFetch => {
     const url = resolveRequestUrl(input);
 
     const proxyUrl = getProxyForUrl(url);
+
+    if (proxyUrl) {
+      console.log(`[TSA] Requesting timestamp from ${url} via proxy ${proxyUrl}`);
+    }
 
     const agent = proxyUrl ? getProxyAgent(proxyUrl) : undefined;
 
