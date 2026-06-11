@@ -1,7 +1,4 @@
-import {
-  assertMemberCountWithinCap,
-  syncMemberCountWithStripeSeatPlan,
-} from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
+import { assertMemberCountWithinCap } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import { OrganisationInviteEmailTemplate } from '@documenso/email/templates/organisation-invite';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
@@ -126,11 +123,11 @@ export const createOrganisationMemberInvites = async ({
 
   const totalMemberCountWithInvites = numberOfCurrentMembers + numberOfCurrentInvites + numberOfNewInvites;
 
-  // Enforce the seat cap and sync billing for seat based plans.
+  // Early UX guard for capped plans: prevents inviting more people than the
+  // cap allows. Billing itself happens when an invite is accepted, the
+  // authoritative cap check runs there too.
   if (subscription) {
     await assertMemberCountWithinCap(subscription, organisationClaim, totalMemberCountWithInvites);
-
-    await syncMemberCountWithStripeSeatPlan(subscription, organisationClaim, totalMemberCountWithInvites);
   }
 
   await prisma.organisationMemberInvite.createMany({

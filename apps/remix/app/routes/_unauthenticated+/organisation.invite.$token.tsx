@@ -1,9 +1,11 @@
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { acceptOrganisationInvitation } from '@documenso/lib/server-only/organisation/accept-organisation-invitation';
 import { prisma } from '@documenso/prisma';
 import { Button } from '@documenso/ui/primitives/button';
 import { Trans } from '@lingui/react/macro';
 import { Link } from 'react-router';
+import { match } from 'ts-pattern';
 
 import type { Route } from './+types/organisation.invite.$token';
 
@@ -51,7 +53,24 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   // Directly convert the team member invite to a team member if they already have an account.
   if (user) {
-    await acceptOrganisationInvitation({ token: organisationMemberInvite.token });
+    try {
+      await acceptOrganisationInvitation({ token: organisationMemberInvite.token });
+    } catch (err) {
+      console.error(err);
+
+      const error = AppError.parseError(err);
+
+      const failureReason = match(error.code)
+        .with(AppErrorCode.LIMIT_EXCEEDED, () => 'CapExceeded' as const)
+        .with(AppErrorCode.SUBSCRIPTION_INACTIVE, () => 'SubscriptionInactive' as const)
+        .otherwise(() => 'Unknown' as const);
+
+      return {
+        state: 'AcceptanceFailed',
+        failureReason,
+        organisationName: organisationMemberInvite.organisation.name,
+      } as const;
+    }
   }
 
   if (!user) {
@@ -85,6 +104,47 @@ export default function AcceptInvitationPage({ loaderData }: Route.ComponentProp
 
           <p className="mt-2 mb-4 text-muted-foreground text-sm">
             <Trans>This token is invalid or has expired. Please contact your team for a new invitation.</Trans>
+          </p>
+
+          <Button asChild>
+            <Link to="/">
+              <Trans>Return</Trans>
+            </Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (data.state === 'AcceptanceFailed') {
+    return (
+      <div className="w-screen max-w-lg px-4">
+        <div className="w-full">
+          <h1 className="font-semibold text-4xl">
+            <Trans>Unable to join organisation</Trans>
+          </h1>
+
+          <p className="mt-2 mb-4 text-muted-foreground text-sm">
+            {match(data.failureReason)
+              .with('CapExceeded', () => (
+                <Trans>
+                  <strong>{data.organisationName}</strong> has reached its member limit. Please contact the organisation
+                  administrator to upgrade their plan before accepting this invitation.
+                </Trans>
+              ))
+              .with('SubscriptionInactive', () => (
+                <Trans>
+                  <strong>{data.organisationName}</strong> does not have an active subscription. Please contact the
+                  organisation administrator to renew their plan before accepting this invitation.
+                </Trans>
+              ))
+              .with('Unknown', () => (
+                <Trans>
+                  We were unable to add you to <strong>{data.organisationName}</strong> at this time. Please try again
+                  later, or contact the organisation administrator.
+                </Trans>
+              ))
+              .exhaustive()}
           </p>
 
           <Button asChild>

@@ -5,6 +5,9 @@ import { prisma } from '@documenso/prisma';
 import { OrganisationType, SubscriptionStatus } from '@prisma/client';
 import { match } from 'ts-pattern';
 
+import { isPriceSeatsBased } from '../is-price-seats-based';
+import { reconcileSeatsWithMemberCount } from '../update-subscription-item-quantity';
+
 export type OnSubscriptionUpdatedOptions = {
   subscription: Stripe.Subscription;
   previousAttributes: Partial<Stripe.Subscription> | null;
@@ -117,6 +120,13 @@ export const onSubscriptionUpdated = async ({
     });
   }
 
+  // Fetched whenever the claim overwrite below will run. Note that
+  // newClaimFound is true for any event without items in previous_attributes
+  // (renewals included), not just plan changes — the memberCount guard below
+  // must cover all of them to protect the paid seat high-water mark.
+  const isUpdatedPriceSeatsBased =
+    !bypassClaimUpdate && newClaimFound ? await isPriceSeatsBased(updatedItem.price.id) : false;
+
   await prisma.$transaction(async (tx) => {
     await tx.subscription.update({
       where: {
@@ -134,17 +144,42 @@ export const onSubscriptionUpdated = async ({
     // Override current organisation claim if new one is found.
     // Skipped when bypassClaimUpdate is set.
     if (!bypassClaimUpdate && newClaimFound) {
+      const claimUpsertData = createOrganisationClaimUpsertData(updatedSubscriptionClaim);
+
+      // For seat-based plans the claim's memberCount is the paid seat
+      // high-water mark mirroring the Stripe quantity. Preserve the billed
+      // quantity instead of resetting to the claim template value. An
+      // unlimited template (0) stays unlimited.
+      if (isUpdatedPriceSeatsBased && claimUpsertData.memberCount !== 0) {
+        claimUpsertData.memberCount = updatedItem.quantity ?? 1;
+      }
+
       await tx.organisationClaim.update({
         where: {
           id: organisation.organisationClaim.id,
         },
         data: {
           originalSubscriptionClaimId: updatedSubscriptionClaim.id,
-          ...createOrganisationClaimUpsertData(updatedSubscriptionClaim),
+          ...claimUpsertData,
         },
       });
     }
   });
+
+  // When the billing period advances (renewal), reconcile the seat quantity
+  // and claim with the actual member count. The renewal invoice was already
+  // generated at the high-water quantity; the reconciled count applies from
+  // the next invoice. Anchor resets also land here, where the absolute
+  // write is harmless. Runs after the transaction so the reconciled values
+  // win over any claim overwrite above.
+  const previousPeriodStart = previousAttributes?.current_period_start;
+
+  const hasPeriodAdvanced =
+    typeof previousPeriodStart === 'number' && subscription.current_period_start > previousPeriodStart;
+
+  if (hasPeriodAdvanced && status === SubscriptionStatus.ACTIVE && !bypassClaimUpdate) {
+    await reconcileSeatsWithMemberCount(organisation.id);
+  }
 };
 
 /**
