@@ -14,6 +14,7 @@ import { getPlansRoute } from './get-plans';
 import { getSubscriptionRoute } from './get-subscription';
 import { linkOrganisationAccountRoute } from './link-organisation-account';
 import { manageSubscriptionRoute } from './manage-subscription';
+import { syncSubscriptionRoute } from './sync-subscription';
 import { updateOrganisationAuthenticationPortalRoute } from './update-organisation-authentication-portal';
 import { updateOrganisationEmailRoute } from './update-organisation-email';
 import { verifyOrganisationEmailDomainRoute } from './verify-organisation-email-domain';
@@ -48,6 +49,7 @@ export const enterpriseRouter = router({
       get: getSubscriptionRoute,
       create: createSubscriptionRoute,
       manage: manageSubscriptionRoute,
+      sync: syncSubscriptionRoute,
     },
     invoices: {
       get: getInvoicesRoute,
