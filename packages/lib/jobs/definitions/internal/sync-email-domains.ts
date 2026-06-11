@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import type { JobDefinition } from '../../client/_internal/job';
+import { getJobCronExpression } from '../../get-job-cron-expression';
 
 const SYNC_EMAIL_DOMAINS_JOB_DEFINITION_ID = 'internal.sync-email-domains';
 
@@ -15,7 +16,7 @@ export const SYNC_EMAIL_DOMAINS_JOB_DEFINITION = {
   trigger: {
     name: SYNC_EMAIL_DOMAINS_JOB_DEFINITION_ID,
     schema: SYNC_EMAIL_DOMAINS_JOB_DEFINITION_SCHEMA,
-    cron: '0 * * * *', // Every hour, on the hour.
+    cron: getJobCronExpression('NEXT_PRIVATE_JOBS_SYNC_EMAIL_DOMAINS_CRON', '0 * * * *'), // Every hour, on the hour.
   },
   handler: async ({ payload, io }) => {
     const handler = await import('./sync-email-domains.handler');
