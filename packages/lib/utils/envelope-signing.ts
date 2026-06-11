@@ -15,6 +15,7 @@ import {
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { toCheckboxCustomText, toRadioCustomText } from '@documenso/lib/utils/fields';
+import { assertSignatureModeAllowed } from '@documenso/lib/utils/signature-mode';
 import { zEmail } from '@documenso/lib/utils/zod';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
 import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
@@ -27,7 +28,10 @@ import { z } from 'zod';
 export type ExtractFieldInsertionValuesOptions = {
   fieldValue: TSignEnvelopeFieldValue;
   field: Field;
-  documentMeta: Pick<TDocumentMeta, 'timezone' | 'dateFormat' | 'typedSignatureEnabled'>;
+  documentMeta: Pick<
+    TDocumentMeta,
+    'timezone' | 'dateFormat' | 'typedSignatureEnabled' | 'drawSignatureEnabled' | 'uploadSignatureEnabled'
+  >;
 };
 
 export const extractFieldInsertionValues = ({
@@ -238,11 +242,7 @@ export const extractFieldInsertionValues = ({
 
       const isBase64 = isBase64Image(value);
 
-      if (documentMeta.typedSignatureEnabled === false && !isBase64) {
-        throw new AppError(AppErrorCode.INVALID_BODY, {
-          message: 'Typed signatures are not allowed. Please draw your signature',
-        });
-      }
+      assertSignatureModeAllowed(isBase64 ? 'image' : 'typed', documentMeta);
 
       return {
         customText: '',
