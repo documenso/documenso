@@ -33,10 +33,11 @@ export const syncStripeCustomerSubscription = async ({
   customerId,
   bypassClaimUpdate = false,
 }: SyncStripeCustomerSubscriptionOptions) => {
+  // Note: `data.items.data.price.product` would exceed Stripe's 4-level expansion
+  // limit on list endpoints, so the product is fetched separately when needed.
   const stripeSubscriptions = await stripe.subscriptions.list({
     customer: customerId,
     status: 'all',
-    expand: ['data.items.data.price.product'],
     limit: 100,
   });
 
