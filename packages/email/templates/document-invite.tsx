@@ -5,8 +5,8 @@ import { Trans } from '@lingui/react/macro';
 import type { RecipientRole } from '@prisma/client';
 import { OrganisationType } from '@prisma/client';
 
-import { Body, Container, Head, Hr, Html, Img, Link, Preview, Section, Text } from '../components';
-import { useBranding } from '../providers/branding';
+import { Body, Container, Head, Hr, Html, Link, Preview, Section, Text } from '../components';
+import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
 import { TemplateCustomMessageBody } from '../template-components/template-custom-message-body';
 import type { TemplateDocumentInviteProps } from '../template-components/template-document-invite';
 import { TemplateDocumentInvite } from '../template-components/template-document-invite';
@@ -20,6 +20,7 @@ export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInvitePro
   teamEmail?: string;
   includeSenderDetails?: boolean;
   organisationType?: OrganisationType;
+  reportUrl?: string;
 };
 
 export const DocumentInviteEmailTemplate = ({
@@ -34,9 +35,9 @@ export const DocumentInviteEmailTemplate = ({
   teamName = '',
   includeSenderDetails,
   organisationType,
+  reportUrl,
 }: DocumentInviteEmailTemplateProps) => {
   const { _ } = useLingui();
-  const branding = useBranding();
 
   const action = _(RECIPIENT_ROLES_DESCRIPTION[role].actionVerb).toLowerCase();
 
@@ -52,10 +53,6 @@ export const DocumentInviteEmailTemplate = ({
     previewText = msg`Please ${action} your document ${documentName}`;
   }
 
-  const getAssetUrl = (path: string) => {
-    return new URL(path, assetBaseUrl).toString();
-  };
-
   return (
     <Html>
       <Head />
@@ -65,11 +62,7 @@ export const DocumentInviteEmailTemplate = ({
         <Section>
           <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid p-4 backdrop-blur-sm">
             <Section>
-              {branding.brandingEnabled && branding.brandingLogo ? (
-                <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
-              ) : (
-                <Img src={getAssetUrl('/static/logo.png')} alt="Documenso Logo" className="mb-4 h-6" />
-              )}
+              <TemplateBrandingLogo assetBaseUrl={assetBaseUrl} className="mb-4 h-6" />
 
               <TemplateDocumentInvite
                 inviterName={inviterName}
@@ -114,7 +107,7 @@ export const DocumentInviteEmailTemplate = ({
           <Hr className="mx-auto mt-12 max-w-xl" />
 
           <Container className="mx-auto max-w-xl">
-            <TemplateFooter />
+            <TemplateFooter reportUrl={reportUrl} />
           </Container>
         </Section>
       </Body>

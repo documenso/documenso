@@ -10,6 +10,7 @@ export type OrganisationSummary = {
   activeDocuments: number;
   completedDocuments: number;
   volumeThisPeriod: number;
+  documentsThisPeriod: number;
   volumeAllTime: number;
 };
 
@@ -305,6 +306,10 @@ async function getOrganisationSummary(
         ? sql<number>`count(case when e.status = 'COMPLETED' and e."createdAt" >= ${createdAtFrom} then 1 end)`
         : sql<number>`count(case when e.status = 'COMPLETED' then 1 end)`
       ).as('volumeThisPeriod'),
+      (createdAtFrom
+        ? sql<number>`count(case when e."createdAt" >= ${createdAtFrom} then 1 end)`
+        : sql<number>`count(e.id)`
+      ).as('documentsThisPeriod'),
     ])
     .executeTakeFirst();
 
@@ -321,6 +326,7 @@ async function getOrganisationSummary(
     activeDocuments: Number(envelopeStats?.activeDocuments || 0),
     completedDocuments: Number(envelopeStats?.completedDocuments || 0),
     volumeThisPeriod: Number(envelopeStats?.volumeThisPeriod || 0),
+    documentsThisPeriod: Number(envelopeStats?.documentsThisPeriod || 0),
     volumeAllTime: Number(envelopeStats?.volumeAllTime || 0),
   };
 }
