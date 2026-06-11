@@ -7,6 +7,7 @@ import { Link, useNavigate } from 'react-router';
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
+import { isBulkSendPrefillableFieldType } from '@documenso/lib/utils/bulk-send';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
@@ -17,6 +18,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { Spinner } from '@documenso/ui/primitives/spinner';
 
+import type { TemplateBulkSendMergeField } from '~/components/dialogs/template-bulk-send-dialog';
 import { TemplateBulkSendDialog } from '~/components/dialogs/template-bulk-send-dialog';
 import { TemplateDirectLinkDialog } from '~/components/dialogs/template-direct-link-dialog';
 import { TemplateUseDialog } from '~/components/dialogs/template-use-dialog';
@@ -119,6 +121,25 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
 
   const isMultiEnvelopeItem = envelope.envelopeItems.length > 1 && envelope.internalVersion === 2;
 
+  // Template fields that can receive per-recipient merge data during a bulk send.
+  const bulkSendMergeFields: TemplateBulkSendMergeField[] = envelope.fields
+    .filter((field) => isBulkSendPrefillableFieldType(field.type))
+    .map((field) => {
+      const meta = (field.fieldMeta ?? {}) as {
+        label?: string | null;
+        text?: string | null;
+        value?: string | null;
+        defaultValue?: string | null;
+      };
+
+      return {
+        id: field.id,
+        label: meta.label?.trim() || `${field.type} field`,
+        type: field.type,
+        example: meta.text ?? meta.value ?? meta.defaultValue ?? '',
+      };
+    });
+
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
       <div className="flex flex-row justify-between">
@@ -143,6 +164,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
               <TemplateBulkSendDialog
                 templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
                 recipients={envelope.recipients}
+                fields={bulkSendMergeFields}
               />
 
               <Button asChild size="sm">

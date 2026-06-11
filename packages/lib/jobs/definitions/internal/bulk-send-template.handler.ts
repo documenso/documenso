@@ -9,6 +9,7 @@ import { BulkSendCompleteEmail } from '@documenso/email/templates/bulk-send-comp
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
+import { buildBulkSendPrefillFields } from '@documenso/lib/utils/bulk-send';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { prisma } from '@documenso/prisma';
 
@@ -57,7 +58,7 @@ export const run = async ({
     throw new Error('Maximum 100 rows allowed per upload');
   }
 
-  const { recipients } = template;
+  const { recipients, fields } = template;
 
   // Validate CSV structure
   const csvHeaders = Object.keys(rows[0]);
@@ -104,6 +105,8 @@ export const run = async ({
         }
       }
 
+      const prefillFields = buildBulkSendPrefillFields(fields, row);
+
       const envelope = await io.runTask(`create-document-${rowIndex}`, async () => {
         return await createDocumentFromTemplate({
           id: {
@@ -121,6 +124,7 @@ export const run = async ({
               signingOrder: recipient.signingOrder,
             };
           }),
+          prefillFields,
           requestMetadata: {
             source: 'app',
             auth: 'session',

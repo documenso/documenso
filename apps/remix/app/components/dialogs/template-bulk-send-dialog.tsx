@@ -6,6 +6,7 @@ import { File as FileIcon, Upload, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { getBulkSendFieldColumnName } from '@documenso/lib/utils/bulk-send';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
@@ -30,9 +31,19 @@ const ZBulkSendFormSchema = z.object({
 
 type TBulkSendFormSchema = z.infer<typeof ZBulkSendFormSchema>;
 
+export type TemplateBulkSendMergeField = {
+  id: number;
+  label: string;
+  type: string;
+  /** Current default value on the template, used as example data in the generated CSV. */
+  example?: string;
+};
+
 export type TemplateBulkSendDialogProps = {
   templateId: number;
   recipients: Array<{ email: string; name?: string | null }>;
+  /** Template fields that can receive per-recipient merge data (text, number, etc.). */
+  fields?: TemplateBulkSendMergeField[];
   trigger?: React.ReactNode;
   onSuccess?: () => void;
 };
@@ -40,6 +51,7 @@ export type TemplateBulkSendDialogProps = {
 export const TemplateBulkSendDialog = ({
   templateId,
   recipients,
+  fields = [],
   trigger,
   onSuccess,
 }: TemplateBulkSendDialogProps) => {
@@ -57,13 +69,27 @@ export const TemplateBulkSendDialog = ({
 
   const { mutateAsync: uploadBulkSend } = trpc.template.uploadBulkSend.useMutation();
 
+  const escapeCsvValue = (value: string) =>
+    /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+
   const onDownloadTemplate = () => {
-    const headers = recipients.flatMap((_, index) => [
+    const recipientHeaders = recipients.flatMap((_, index) => [
       `recipient_${index + 1}_email`,
       `recipient_${index + 1}_name`,
     ]);
 
-    const exampleRow = recipients.flatMap((recipient) => [recipient.email, recipient.name || '']);
+    const fieldHeaders = fields.map((field) => getBulkSendFieldColumnName(field.id));
+
+    const headers = [...recipientHeaders, ...fieldHeaders];
+
+    const recipientExamples = recipients.flatMap((recipient) => [
+      recipient.email,
+      recipient.name || '',
+    ]);
+
+    const fieldExamples = fields.map((field) => field.example ?? '');
+
+    const exampleRow = [...recipientExamples, ...fieldExamples].map(escapeCsvValue);
 
     const csv = [headers.join(','), exampleRow.join(',')].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -130,7 +156,7 @@ export const TemplateBulkSendDialog = ({
           <DialogDescription>
             <Trans>
               Upload a CSV file to create multiple documents from this template. Each row represents
-              one document with its recipient details.
+              one document with its recipient details and any per-recipient merge data.
             </Trans>
           </DialogDescription>
         </DialogHeader>
@@ -160,6 +186,31 @@ export const TemplateBulkSendDialog = ({
                   </li>
                 ))}
               </ul>
+
+              {fields.length > 0 && (
+                <>
+                  <p className="mt-4 text-sm">
+                    <Trans>Merge fields:</Trans>
+                  </p>
+
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    <Trans>
+                      Fill the matching column to merge a value into each recipient's document. Leave
+                      a cell blank to keep the template's default.
+                    </Trans>
+                  </p>
+
+                  <ul className="mt-2 list-inside list-disc text-sm text-muted-foreground">
+                    {fields.map((field) => (
+                      <li key={field.id}>
+                        <code className="text-foreground">{getBulkSendFieldColumnName(field.id)}</code>{' '}
+                        — {field.label}{' '}
+                        <span className="text-xs uppercase">({field.type.toLowerCase()})</span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
             </div>
 
             <div className="flex flex-col gap-y-2">
