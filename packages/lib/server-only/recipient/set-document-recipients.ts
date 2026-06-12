@@ -19,7 +19,11 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { logger } from '../../utils/logger';
-import { canRecipientBeModified, isRecipientEmailValidForSending } from '../../utils/recipients';
+import {
+  canRecipientBeModified,
+  getRecipientSigningOrder,
+  isRecipientEmailValidForSending,
+} from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
@@ -166,7 +170,7 @@ export const setDocumentRecipients = async ({
             name: recipient.name,
             email: recipient.email,
             role: recipient.role,
-            signingOrder: recipient.signingOrder,
+            signingOrder: getRecipientSigningOrder(recipient),
             envelopeId: envelope.id,
             sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
             signingStatus: recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
@@ -176,7 +180,7 @@ export const setDocumentRecipients = async ({
             name: recipient.name,
             email: recipient.email,
             role: recipient.role,
-            signingOrder: recipient.signingOrder,
+            signingOrder: getRecipientSigningOrder(recipient),
             token: nanoid(),
             envelopeId: envelope.id,
             sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,

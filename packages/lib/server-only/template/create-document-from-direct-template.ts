@@ -39,6 +39,7 @@ import {
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { getRecipientSigningOrder } from '../../utils/recipients';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
 import { incrementDocumentId } from '../envelope/increment-id';
@@ -386,7 +387,7 @@ export const createDocumentFromDirectTemplate = async ({
                 }),
                 sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
                 signingStatus: recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
-                signingOrder: recipient.signingOrder,
+                signingOrder: getRecipientSigningOrder(recipient),
                 token: nanoid(),
               };
             }),
