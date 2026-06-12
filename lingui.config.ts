@@ -9,7 +9,7 @@ const config: LinguiConfig = {
   catalogs: [
     {
       path: '<rootDir>/packages/lib/translations/{locale}/web',
-      include: ['apps/remix/app', 'packages/ui', 'packages/lib', 'packages/email'],
+      include: ['apps/remix/app', 'packages/ui', 'packages/lib', 'packages/email', 'packages/trpc/server'],
       exclude: ['**/node_modules/**'],
     },
   ],
