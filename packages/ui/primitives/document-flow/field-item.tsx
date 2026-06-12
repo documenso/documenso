@@ -59,6 +59,34 @@ export const FieldItem = (props: FieldItemProps) => {
   return <FieldItemInner {...props} />;
 };
 
+const HANDLE_SIZE = 12;
+
+const ResizeHandle = ({ position }: { position: string }) => {
+  const positionClasses: Record<string, string> = {
+    top: '-translate-x-1/2 left-1/2',
+    bottom: '-translate-x-1/2 left-1/2',
+    left: '-translate-y-1/2 top-1/2',
+    right: '-translate-y-1/2 top-1/2',
+    topLeft: '',
+    topRight: '',
+    bottomLeft: '',
+    bottomRight: '',
+  };
+
+  return (
+    <div
+      className={cn(
+        'absolute z-50 rounded-sm border border-blue-400 bg-blue-500/70 shadow-sm transition-colors hover:bg-blue-500',
+        positionClasses[position] || '',
+      )}
+      style={{
+        width: HANDLE_SIZE,
+        height: HANDLE_SIZE,
+      }}
+    />
+  );
+};
+
 const FieldItemInner = ({
   fieldClassName,
   field,
@@ -257,10 +285,24 @@ const FieldItemInner = ({
       onMouseLeave={() => onBlur?.()}
       enableResizing={!fixedSize}
       resizeHandleStyles={{
-        bottom: { bottom: -8, cursor: 'ns-resize' },
-        top: { top: -8, cursor: 'ns-resize' },
-        left: { cursor: 'ew-resize' },
-        right: { cursor: 'ew-resize' },
+        bottom: { bottom: -6, cursor: 'ns-resize' },
+        top: { top: -6, cursor: 'ns-resize' },
+        left: { left: -6, cursor: 'ew-resize' },
+        right: { right: -6, cursor: 'ew-resize' },
+        topLeft: { top: -6, left: -6, cursor: 'nwse-resize' },
+        topRight: { top: -6, right: -6, cursor: 'nesw-resize' },
+        bottomLeft: { bottom: -6, left: -6, cursor: 'nesw-resize' },
+        bottomRight: { bottom: -6, right: -6, cursor: 'nwse-resize' },
+      }}
+      resizeHandleComponent={{
+        bottom: <ResizeHandle position="bottom" />,
+        top: <ResizeHandle position="top" />,
+        left: <ResizeHandle position="left" />,
+        right: <ResizeHandle position="right" />,
+        topLeft: <ResizeHandle position="topLeft" />,
+        topRight: <ResizeHandle position="topRight" />,
+        bottomLeft: <ResizeHandle position="bottomLeft" />,
+        bottomRight: <ResizeHandle position="bottomRight" />,
       }}
       onResizeStop={(_e, _d, ref) => {
         onFieldDeactivate?.();
