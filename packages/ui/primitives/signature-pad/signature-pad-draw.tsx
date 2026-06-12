@@ -1,6 +1,5 @@
 import { unsafe_useEffectOnce } from '@documenso/lib/client-only/hooks/use-effect-once';
 import { SIGNATURE_CANVAS_DPI, SIGNATURE_MIN_COVERAGE_THRESHOLD } from '@documenso/lib/constants/signatures';
-
 import { Trans } from '@lingui/react/macro';
 import { Undo2 } from 'lucide-react';
 import type { StrokeOptions } from 'perfect-freehand';
@@ -11,6 +10,7 @@ import { useMemo, useRef, useState } from 'react';
 import { cn } from '../../lib/utils';
 import { getSvgPathFromStroke } from './helper';
 import { Point } from './point';
+import { trimTransparentCanvasMargins } from './signature-image-utils';
 import { SignaturePadColorPicker } from './signature-pad-color-picker';
 
 const checkSignatureValidity = (element: RefObject<HTMLCanvasElement>) => {
@@ -161,7 +161,7 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
         setIsSignatureValid(isValidSignature);
 
         if (isValidSignature) {
-          onChange?.($el.current.toDataURL());
+          onChange?.(trimTransparentCanvasMargins($el.current).toDataURL());
         }
         ctx.save();
       }
@@ -231,7 +231,7 @@ export const SignaturePadDraw = ({ className, value, onChange, ...props }: Signa
       ctx?.fill(pathData);
     });
 
-    onChange?.($el.current.toDataURL());
+    onChange?.(trimTransparentCanvasMargins($el.current).toDataURL());
   };
 
   unsafe_useEffectOnce(() => {
