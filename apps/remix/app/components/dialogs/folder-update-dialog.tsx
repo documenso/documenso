@@ -1,3 +1,4 @@
+import { ZNameSchema } from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { trpc } from '@documenso/trpc/react';
@@ -23,8 +24,6 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
-
 export type FolderUpdateDialogProps = {
   folder: TFolderWithSubfolders | null;
   isOpen: boolean;
@@ -32,7 +31,7 @@ export type FolderUpdateDialogProps = {
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 export const ZUpdateFolderFormSchema = z.object({
-  name: z.string().min(1),
+  name: ZNameSchema,
   visibility: z.nativeEnum(DocumentVisibility).optional(),
 });
 
@@ -40,7 +39,6 @@ export type TUpdateFolderFormSchema = z.infer<typeof ZUpdateFolderFormSchema>;
 
 export const FolderUpdateDialog = ({ folder, isOpen, onOpenChange }: FolderUpdateDialogProps) => {
   const { t } = useLingui();
-  const team = useOptionalCurrentTeam();
 
   const { toast } = useToast();
   const { mutateAsync: updateFolder } = trpc.folder.updateFolder.useMutation();
