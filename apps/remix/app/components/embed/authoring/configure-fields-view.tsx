@@ -182,8 +182,8 @@ export const ConfigureFieldsView = ({
             ...structuredClone(lastActiveField),
             nativeId: undefined,
             formId: nanoid(12),
-            signerEmail: selectedRecipient?.email ?? lastActiveField.signerEmail,
-            recipientId: selectedRecipient?.id ?? lastActiveField.recipientId,
+            signerEmail: lastActiveField.signerEmail,
+            recipientId: lastActiveField.recipientId,
             pageX: lastActiveField.pageX + 3,
             pageY: lastActiveField.pageY + 3,
           };
@@ -209,8 +209,8 @@ export const ConfigureFieldsView = ({
               ...structuredClone(lastActiveField),
               nativeId: undefined,
               formId: nanoid(12),
-              signerEmail: selectedRecipient?.email ?? lastActiveField.signerEmail,
-              recipientId: selectedRecipient?.id ?? lastActiveField.recipientId,
+              signerEmail: lastActiveField.signerEmail,
+              recipientId: lastActiveField.recipientId,
               pageNumber,
             };
 
@@ -228,7 +228,7 @@ export const ConfigureFieldsView = ({
         });
       }
     },
-    [append, lastActiveField, selectedRecipient?.email, selectedRecipient?.id, toast],
+    [_, append, lastActiveField, toast],
   );
 
   const onFieldPaste = useCallback(
@@ -409,15 +409,15 @@ export const ConfigureFieldsView = ({
 
   useEffect(() => {
     const observer = new MutationObserver((_mutations) => {
-      const $page = document.querySelector(PDF_VIEWER_PAGE_SELECTOR);
+      const $page = document.querySelector<HTMLElement>(PDF_VIEWER_PAGE_SELECTOR);
 
       if (!$page) {
         return;
       }
 
       fieldBounds.current = {
-        height: Math.max(DEFAULT_HEIGHT_PX),
-        width: Math.max(DEFAULT_WIDTH_PX),
+        height: Math.max($page.offsetHeight, DEFAULT_HEIGHT_PX),
+        width: Math.max($page.offsetWidth, DEFAULT_WIDTH_PX),
       };
     });
 

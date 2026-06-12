@@ -18,6 +18,7 @@ import { useCallback, useRef } from 'react';
 import type { Control } from 'react-hook-form';
 import { useFieldArray, useFormContext, useFormState } from 'react-hook-form';
 
+import { useCspNonce } from '../../../utils/nonce';
 import { useConfigureDocument } from './configure-document-context';
 import type { TConfigureEmbedFormSchema } from './configure-document-view.types';
 
@@ -32,6 +33,7 @@ export interface ConfigureDocumentRecipientsProps {
 export const ConfigureDocumentRecipients = ({ control, isSubmitting }: ConfigureDocumentRecipientsProps) => {
   const { _ } = useLingui();
   const { isTemplate } = useConfigureDocument();
+  const nonceVal = useCspNonce();
 
   const $sensorApi = useRef<SensorAPI | null>(null);
 
@@ -98,7 +100,7 @@ export const ConfigureDocumentRecipients = ({ control, isSubmitting }: Configure
       // Update the form
       replace(updatedSigners);
     },
-    [signers, replace, getValues],
+    [signers, replace, getValues, signingOrder],
   );
 
   const onDragEnd = useCallback(
@@ -120,7 +122,7 @@ export const ConfigureDocumentRecipients = ({ control, isSubmitting }: Configure
       // Update the form with new ordering
       replace(updatedSigners);
     },
-    [move, replace, getValues],
+    [move, replace, getValues, signingOrder],
   );
 
   const onSigningOrderChange = (signingOrder: DocumentSigningOrder) => {
@@ -212,6 +214,7 @@ export const ConfigureDocumentRecipients = ({ control, isSubmitting }: Configure
       />
 
       <DragDropContext
+        nonce={nonceVal}
         onDragEnd={onDragEnd}
         sensors={[
           (api: SensorAPI) => {

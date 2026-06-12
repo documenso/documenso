@@ -1,4 +1,5 @@
 import type { TSiteSettingsBannerSchema } from '@documenso/lib/server-only/site-settings/schemas/banner';
+import DOMPurify from 'isomorphic-dompurify';
 
 export type AppBannerProps = {
   banner: TSiteSettingsBannerSchema;
@@ -16,7 +17,7 @@ export const AppBanner = ({ banner }: AppBannerProps) => {
         style={{ color: banner.data.textColor }}
       >
         <div className="flex items-center">
-          <span dangerouslySetInnerHTML={{ __html: banner.data.content }} />
+          <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(banner.data.content) }} />
         </div>
       </div>
     </div>

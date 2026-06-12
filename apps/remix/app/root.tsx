@@ -144,6 +144,21 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
 
         {/* Fix: https://stackoverflow.com/questions/21147149/flash-of-unstyled-content-fouc-in-firefox-only-is-ff-slow-renderer */}
         <script nonce={nonce(cspNonce)}>0</script>
+
+        {/*
+          `react-remove-scroll-bar` (via `use-sidecar`, pulled in by Radix
+          portals) stamps its injected inline <style> with the value of the
+          `__webpack_nonce__` global. Set it here so those styles satisfy the
+          strict CSP nonce instead of being blocked.
+        */}
+        {cspNonce && (
+          <script
+            nonce={nonce(cspNonce)}
+            dangerouslySetInnerHTML={{
+              __html: `window.__webpack_nonce__ = ${JSON.stringify(cspNonce)}`,
+            }}
+          />
+        )}
       </head>
       <body className={isRecipientRoute ? 'documenso-branded' : undefined}>
         {/* Global license banner currently disabled. Need to wait until after a few releases. */}
