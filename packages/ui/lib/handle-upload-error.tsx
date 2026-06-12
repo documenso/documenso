@@ -48,4 +48,9 @@ export const buildUploadErrorMessage = (errorCode: string): MessageDescriptor =>
       AppErrorCode.CONVERSION_TIMEOUT,
       () => msg`The document took too long to convert. Please try a smaller file, or upload it as a PDF.`,
     )
+    .with(
+      AppErrorCode.DEPENDENCY_MISSING,
+      () =>
+        msg`This document needs server-side processing that is currently unavailable. Please contact support or try a different file.`,
+    )
     .otherwise(() => msg`An error occurred while uploading your document. Please try again.`);

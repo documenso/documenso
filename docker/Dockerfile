@@ -106,7 +106,13 @@ RUN npm config set strict-ssl false
 # and Word document uploads fail. libreoffice-writer pulls in libreoffice-common
 # which provides /usr/bin/soffice; font-liberation supplies the metric-compatible
 # Arial/Times/Courier substitutes Word documents rely on.
-RUN apk add --no-cache libreoffice-writer font-liberation
+#
+# Encrypted-PDF dependency. normalizePdf (packages/lib/server-only/pdf/normalize-pdf.ts)
+# detects pdfDoc.isEncrypted and calls decryptPdf (packages/lib/server-only/utils/decrypt-pdf.ts),
+# which shells out to `qpdf --decrypt`; without it `findBinary('qpdf')` throws
+# DEPENDENCY_MISSING and every encrypted/password-protected PDF upload fails. qpdf
+# provides /usr/bin/qpdf.
+RUN apk add --no-cache libreoffice-writer font-liberation qpdf
 
 # Telemetry credentials (baked into image at build time, can be disabled at runtime)
 ARG NEXT_PRIVATE_TELEMETRY_KEY=""
