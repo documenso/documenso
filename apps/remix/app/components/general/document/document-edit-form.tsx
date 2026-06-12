@@ -298,11 +298,15 @@ export const DocumentEditForm = ({ className, initialDocument, documentRootPath 
       await saveFieldsData(data);
 
       // Clear all field data from localStorage
+      const keysToRemove: string[] = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key && key.startsWith('field_')) {
-          localStorage.removeItem(key);
+          keysToRemove.push(key);
         }
+      }
+      for (const key of keysToRemove) {
+        localStorage.removeItem(key);
       }
 
       setStep('subject');

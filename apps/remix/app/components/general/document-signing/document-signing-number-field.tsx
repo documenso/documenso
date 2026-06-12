@@ -215,7 +215,8 @@ export const DocumentSigningNumberField = ({ field, onSignField, onUnsignField }
         actionTarget: field.type,
       });
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onSign]);
 
   let fieldDisplayName = 'Number';
 

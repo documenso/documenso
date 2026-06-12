@@ -184,6 +184,7 @@ export const ManagePublicTemplateDialog = ({
 
   useEffect(() => {
     const initialTemplate = directTemplates.find((template) => template.id === initialTemplateId);
+    const newSelectedId = initialTemplate?.id ?? null;
 
     if (initialTemplate) {
       setSelectedTemplateId(initialTemplate.id);
@@ -196,7 +197,7 @@ export const ManagePublicTemplateDialog = ({
       setSelectedTemplateId(null);
     }
 
-    const step = initialStep || (selectedTemplateId ? 'MANAGE' : 'SELECT_TEMPLATE');
+    const step = initialStep || (newSelectedId ? 'MANAGE' : 'SELECT_TEMPLATE');
 
     setCurrentStep(step);
 
