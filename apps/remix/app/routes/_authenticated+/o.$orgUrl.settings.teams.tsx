@@ -22,16 +22,18 @@ export default function OrganisationSettingsTeamsPage() {
    * Handle debouncing the search query.
    */
   useEffect(() => {
-    const params = new URLSearchParams(searchParams?.toString());
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev?.toString());
 
-    params.set('query', debouncedSearchQuery);
+      if (debouncedSearchQuery === '') {
+        params.delete('query');
+      } else {
+        params.set('query', debouncedSearchQuery);
+      }
 
-    if (debouncedSearchQuery === '') {
-      params.delete('query');
-    }
-
-    setSearchParams(params);
-  }, [debouncedSearchQuery, pathname, searchParams]);
+      return params;
+    });
+  }, [debouncedSearchQuery, pathname]);
 
   return (
     <div>
