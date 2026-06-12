@@ -1,13 +1,13 @@
-import { mailer } from '@documenso/email/mailer';
 import { DocumentCompletedEmailTemplate } from '@documenso/email/templates/document-completed';
 import { prisma } from '@documenso/prisma';
 import { msg } from '@lingui/core/macro';
-import { DocumentSource, EnvelopeType } from '@prisma/client';
+import { DocumentSource, EnvelopeType, RecipientRole } from '@prisma/client';
 import { createElement } from 'react';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { getFileServerSide } from '../../../universal/upload/get-file.server';
@@ -44,6 +44,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
           id: true,
           email: true,
           name: true,
+          disabled: true,
         },
       },
       team: {
@@ -65,14 +66,20 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
     throw new Error('Document has no recipients');
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
-    emailType: 'RECIPIENT',
-    source: {
-      type: 'team',
-      teamId: envelope.teamId,
-    },
-    meta: envelope.documentMeta,
-  });
+  const { branding, emailLanguage, senderEmail, replyToEmail, organisationId, claims, emailsDisabled, emailTransport } =
+    await getEmailContext({
+      emailType: 'RECIPIENT',
+      source: {
+        type: 'team',
+        teamId: envelope.teamId,
+      },
+      meta: envelope.documentMeta,
+    });
+
+  // Don't send completion emails if the organisation has email sending disabled or the owner is disabled (e.g. banned).
+  if (envelope.user.disabled || emailsDisabled) {
+    return;
+  }
 
   const { user: owner } = envelope;
 
@@ -131,7 +138,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
 
     const i18n = await getI18nInstance(emailLanguage);
 
-    await mailer.sendMail({
+    await emailTransport.sendMail({
       to: [
         {
           name: owner.name || '',
@@ -172,6 +179,30 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
 
   await Promise.all(
     recipientsToNotify.map(async (recipient) => {
+      // A CC recipient never asked to be part of this document, so their completion
+      // email is effectively unsolicited. Meter it against the organisation email
+      // quota/stats so it is correctly logged.
+      if (recipient.role === RecipientRole.CC) {
+        try {
+          await assertOrganisationRatesAndLimits({
+            organisationId,
+            organisationClaim: claims,
+            type: 'email',
+            count: 1,
+          });
+        } catch (_err) {
+          io.logger.warn({
+            msg: 'CC completion email dropped: org email limit exceeded',
+            organisationId,
+            recipientId: recipient.id,
+            envelopeId: envelope.id,
+          });
+
+          // On rate/quota exceeded, early return to allow other recipients to be processed.
+          return;
+        }
+      }
+
       const customEmailTemplate = {
         'signer.name': recipient.name,
         'signer.email': recipient.email,
@@ -179,6 +210,8 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
       };
 
       const downloadLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}/complete`;
+      const reportUrl =
+        recipient.role === RecipientRole.CC ? `${NEXT_PUBLIC_WEBAPP_URL()}/report/${recipient.token}` : undefined;
 
       const template = createElement(DocumentCompletedEmailTemplate, {
         documentName: envelope.title,
@@ -188,6 +221,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
           isDirectTemplate && envelope.documentMeta?.message
             ? renderCustomEmailTemplate(envelope.documentMeta.message, customEmailTemplate)
             : undefined,
+        reportUrl,
       });
 
       const [html, text] = await Promise.all([
@@ -201,7 +235,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
 
       const i18n = await getI18nInstance(emailLanguage);
 
-      await mailer.sendMail({
+      await emailTransport.sendMail({
         to: [
           {
             name: recipient.name,
