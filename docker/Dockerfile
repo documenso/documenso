@@ -86,10 +86,35 @@ RUN turbo run build --filter=@documenso/remix...
 ###########################
 #     RUNNER CONTAINER    #
 ###########################
-FROM base AS runner
+FROM node:22-bookworm-slim AS runner
 
-ENV HUSKY 0
-ENV DOCKER_OUTPUT 1
+USER root
+
+# System libs & fonts for headless Chromium
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates curl git \
+      libpango-1.0-0 libcairo2 \
+      libnss3 libnss3-tools libatk1.0-0 libatk-bridge2.0-0 libcups2 libxkbcommon0 \
+      libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 \
+      libasound2 libx11-6 libxext6 libxshmfence1 libxrender1 \
+      fonts-liberation fonts-noto fonts-noto-cjk fonts-noto-color-emoji \
+  && rm -rf /var/lib/apt/lists/*
+
+# Where Playwright will put browsers (make it now and chown later)
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+RUN mkdir -p /ms-playwright
+
+# Create non-root user WITH a real home directory
+RUN addgroup --system --gid 1001 nodejs \
+ && adduser  --system --uid 1001 --home /home/nodejs --ingroup nodejs nodejs \
+ && mkdir -p /home/nodejs/.npm /app \
+ && chown -R nodejs:nodejs /home/nodejs /ms-playwright /app
+
+# Make sure npm knows where to write cache/logs as this user
+ENV HOME=/home/nodejs
+ENV NPM_CONFIG_CACHE=/home/nodejs/.npm
+ENV HUSKY=0
+ENV DOCKER_OUTPUT=1
 
 # Telemetry credentials (baked into image at build time, can be disabled at runtime)
 ARG NEXT_PRIVATE_TELEMETRY_KEY=""
@@ -98,21 +123,23 @@ ENV NEXT_PRIVATE_TELEMETRY_KEY="$NEXT_PRIVATE_TELEMETRY_KEY"
 ARG NEXT_PRIVATE_TELEMETRY_HOST=""
 ENV NEXT_PRIVATE_TELEMETRY_HOST="$NEXT_PRIVATE_TELEMETRY_HOST"
 
-# Don't run production as root
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nodejs
-
+WORKDIR /app
 USER nodejs
 
-WORKDIR /app
-
+# Ensure the lockfile is present for `npm ci`
 COPY --from=builder --chown=nodejs:nodejs /app/out/json/ .
-# Copy the tailwind config files across
+COPY --from=builder --chown=nodejs:nodejs /app/out/package-lock.json ./package-lock.json
+# Tailwind config
 COPY --from=builder --chown=nodejs:nodejs /app/out/full/packages/tailwind-config ./packages/tailwind-config
 # Copy the patches across
 COPY --from=builder --chown=nodejs:nodejs /app/patches ./patches
 
+# Now this will succeed
 RUN npm ci --only=production
+
+# download browsers that MATCH the local Playwright version
+# (no --with-deps needed on Debian; system libs already installed)
+RUN npx playwright install chromium
 
 # Automatically leverage output traces to reduce image size
 # https://nodejs.org/docs/advanced-features/output-file-tracing
