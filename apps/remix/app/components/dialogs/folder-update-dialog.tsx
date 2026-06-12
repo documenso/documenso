@@ -1,5 +1,6 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
+import { ZFolderNameSchema } from '@documenso/lib/utils/folder-name';
 import { trpc } from '@documenso/trpc/react';
 import type { TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
@@ -32,7 +33,7 @@ export type FolderUpdateDialogProps = {
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 export const ZUpdateFolderFormSchema = z.object({
-  name: z.string().min(1),
+  name: ZFolderNameSchema,
   visibility: z.nativeEnum(DocumentVisibility).optional(),
 });
 

@@ -1,3 +1,4 @@
+import { ZFolderNameSchema } from '@documenso/lib/utils/folder-name';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -23,7 +24,7 @@ import { useParams } from 'react-router';
 import { z } from 'zod';
 
 const ZCreateFolderFormSchema = z.object({
-  name: z.string().min(1, { message: 'Folder name is required' }),
+  name: ZFolderNameSchema,
 });
 
 type TCreateFolderFormSchema = z.infer<typeof ZCreateFolderFormSchema>;
