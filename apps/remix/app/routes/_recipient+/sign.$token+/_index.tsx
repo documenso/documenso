@@ -174,6 +174,10 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
     recipientSignature,
     isRecipientsTurn,
     includeSenderDetails: settings.includeSenderDetails,
+    branding: {
+      brandingEnabled: settings.brandingEnabled,
+      brandingLogo: settings.brandingLogo,
+    },
   } as const;
 };
 
@@ -411,6 +415,7 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
     isRecipientsTurn,
     allRecipients,
     includeSenderDetails,
+    branding,
     recipientWithFields,
   } = data;
 
@@ -433,8 +438,7 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
 
           <h2 className="mt-6 max-w-[35ch] text-center font-semibold text-2xl leading-normal md:text-3xl lg:text-4xl">
             <Trans>
-              <span className="mt-1.5 block">"{document.title}"</span>
-              is no longer available to sign
+              <span className="mt-1.5 block">"{document.title}"</span> is no longer available to sign
             </Trans>
           </h2>
 
@@ -483,6 +487,7 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
             isRecipientsTurn={isRecipientsTurn}
             allRecipients={allRecipients}
             includeSenderDetails={includeSenderDetails}
+            branding={branding}
           />
         </div>
       </DocumentSigningAuthProvider>
@@ -532,8 +537,7 @@ const SigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV2Loade
 
           <h2 className="mt-6 max-w-[35ch] text-center font-semibold text-2xl leading-normal md:text-3xl lg:text-4xl">
             <Trans>
-              <span className="mt-1.5 block">"{envelope.title}"</span>
-              is no longer available to sign
+              <span className="mt-1.5 block">"{envelope.title}"</span> is no longer available to sign
             </Trans>
           </h2>
 

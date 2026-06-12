@@ -39,7 +39,9 @@ import { buildTeamWhereQuery } from '../../utils/teams';
 import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-id';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
+import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 import { getTeamSettings } from '../team/get-team-settings';
+import { assertUserNotDisabledById } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 type CreateEnvelopeRecipientFieldOptions = TFieldAndMeta & {
@@ -120,6 +122,11 @@ export const createEnvelope = async ({
   internalVersion,
   bypassDefaultRecipients = false,
 }: CreateEnvelopeOptions) => {
+  // Refuse to create on behalf of a disabled account. Guards every route that
+  // funnels through here (document.create, envelope.use, template create,
+  // embedding template/document create, API v1) and the seed/job paths.
+  await assertUserNotDisabledById({ userId });
+
   const {
     type,
     title,
@@ -156,6 +163,17 @@ export const createEnvelope = async ({
   if (!team) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Team not found',
+    });
+  }
+
+  // Enforce the organisation document-creation limit before doing any work.
+  // Only documents count towards the limit (templates are exempt).
+  if (type === EnvelopeType.DOCUMENT) {
+    await assertOrganisationRatesAndLimits({
+      organisationId: team.organisationId,
+      organisationClaim: team.organisation.organisationClaim,
+      type: 'document',
+      count: 1,
     });
   }
 

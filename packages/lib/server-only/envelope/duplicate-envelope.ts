@@ -11,6 +11,7 @@ import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-id';
 import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
+import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export interface DuplicateEnvelopeOptions {
@@ -27,7 +28,7 @@ export interface DuplicateEnvelopeOptions {
 export const duplicateEnvelope = async ({ id, userId, teamId, overrides }: DuplicateEnvelopeOptions) => {
   const { duplicateAsTemplate = false, includeRecipients = true, includeFields = true } = overrides ?? {};
 
-  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+  const { envelopeWhereInput, team } = await getEnvelopeWhereInput({
     id,
     type: null,
     userId,
@@ -85,6 +86,15 @@ export const duplicateEnvelope = async ({ id, userId, teamId, overrides }: Dupli
   }
 
   const targetType = duplicateAsTemplate ? EnvelopeType.TEMPLATE : envelope.type;
+
+  // Enforce the organisation document-creation limit before creating the duplicate.
+  if (targetType === EnvelopeType.DOCUMENT) {
+    await assertOrganisationRatesAndLimits({
+      organisationId: team.organisationId,
+      type: 'document',
+      count: 1,
+    });
+  }
 
   const [{ legacyNumberId, secondaryId }, createdDocumentMeta] = await Promise.all([
     targetType === EnvelopeType.DOCUMENT

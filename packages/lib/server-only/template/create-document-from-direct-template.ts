@@ -44,6 +44,7 @@ import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
 import { incrementDocumentId } from '../envelope/increment-id';
 import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
+import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -115,6 +116,20 @@ export const createDocumentFromDirectTemplate = async ({
           id: true,
           email: true,
           name: true,
+        },
+      },
+      team: {
+        select: {
+          organisationId: true,
+          organisation: {
+            select: {
+              organisationClaim: {
+                select: {
+                  recipientCount: true,
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -194,6 +209,22 @@ export const createDocumentFromDirectTemplate = async ({
   });
 
   const derivedDocumentMeta = extractDerivedDocumentMeta(settings, directTemplateEnvelope.documentMeta, signatureLevel);
+  
+  // The resulting document contains every non-direct template recipient plus the
+  // direct recipient that is signing now. A recipientCount of 0 means unlimited.
+  // This mirrors the check in `sendDocument`, but must be done here because this
+  // flow creates the document directly in PENDING and swallows `sendDocument` errors.
+  const maximumRecipientCount = directTemplateEnvelope.team.organisation.organisationClaim.recipientCount;
+  const resultingRecipientCount = nonDirectTemplateRecipients.length + 1;
+
+  if (maximumRecipientCount > 0 && resultingRecipientCount > maximumRecipientCount) {
+    throw new AppError('RECIPIENT_LIMIT_EXCEEDED', {
+      message: `You cannot send a document with more than ${maximumRecipientCount} recipients`,
+      statusCode: 400,
+    });
+  }
+
+  const derivedDocumentMeta = extractDerivedDocumentMeta(settings, directTemplateEnvelope.documentMeta);
 
   // Associate, validate and map to a query every direct template recipient field with the provided fields.
   // Only process fields that are either required or have been signed by the user
@@ -280,6 +311,13 @@ export const createDocumentFromDirectTemplate = async ({
   const directTemplateNonSignatureFields = createDirectRecipientFieldArgs.filter(({ signature }) => signature === null);
 
   const directTemplateSignatureFields = createDirectRecipientFieldArgs.filter(({ signature }) => signature !== null);
+
+  // Enforce the organisation document-creation limit before creating the document.
+  await assertOrganisationRatesAndLimits({
+    organisationId: directTemplateEnvelope.team.organisationId,
+    type: 'document',
+    count: 1,
+  });
 
   const initialRequestTime = new Date();
 

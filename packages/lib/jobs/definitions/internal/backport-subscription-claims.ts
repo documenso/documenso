@@ -21,6 +21,7 @@ const BACKPORT_SUBSCRIPTION_CLAIM_JOB_DEFINITION_SCHEMA = z.object({
     hipaa: z.literal(true).optional(),
     signingReminders: z.literal(true).optional(),
     cscQesSigning: z.literal(true).optional(),
+    // Do NOT backport disableEmails.
     // Todo: Envelopes - Do we need to check?
     // authenticationPortal & emailDomains missing here.
   }),
@@ -39,7 +40,7 @@ export const BACKPORT_SUBSCRIPTION_CLAIM_JOB_DEFINITION = {
   handler: async ({ payload, io }) => {
     const handler = await import('./backport-subscription-claims.handler');
 
-    await handler.run({ payload, io });
+    await handler.run({ payload: BACKPORT_SUBSCRIPTION_CLAIM_JOB_DEFINITION_SCHEMA.parse(payload), io });
   },
 } as const satisfies JobDefinition<
   typeof BACKPORT_SUBSCRIPTION_CLAIM_JOB_DEFINITION_ID,
