@@ -45,7 +45,9 @@ export interface HonoEnv {
   };
 }
 
-const app = new Hono<HonoEnv>();
+const basePath = (env('NEXT_PUBLIC_BASE_PATH') ?? '').replace(/\/$/, '');
+
+const app = new Hono<HonoEnv>().basePath(basePath || '/');
 
 /**
  * Database-backed rate limiting for API routes.

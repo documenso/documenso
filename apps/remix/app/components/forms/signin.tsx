@@ -1,5 +1,6 @@
 import { authClient } from '@documenso/auth/client';
 import { AuthenticationErrorCode } from '@documenso/auth/server/lib/errors/error-codes';
+import { getBasePath } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { env } from '@documenso/lib/utils/env';
 import { zEmail } from '@documenso/lib/utils/zod';
@@ -44,7 +45,7 @@ const handleFallbackErrorMessages = (code: string) => {
   return message;
 };
 
-const LOGIN_REDIRECT_PATH = '/';
+const LOGIN_REDIRECT_PATH = `${getBasePath()}/`;
 
 export const ZSignInFormSchema = z.object({
   email: zEmail().min(1),

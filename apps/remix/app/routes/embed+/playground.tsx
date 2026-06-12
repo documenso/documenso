@@ -9,6 +9,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useNavigate, useSearchParams } from 'react-router';
 
+import { getBasePath } from '@documenso/lib/constants/app';
+
 export const loader = () => {
   if (process.env.NODE_ENV !== 'development') {
     throw new Error('This page is only available in development mode.');
@@ -147,7 +149,7 @@ export default function EmbedPlaygroundPage() {
       return inputToken;
     }
 
-    const response = await fetch('/api/v2/embedding/create-presign-token', {
+    const response = await fetch(`${getBasePath()}/api/v2/embedding/create-presign-token`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${inputToken}`,
