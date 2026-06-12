@@ -642,8 +642,8 @@ msgstr "{visibleRows, plural, other {총 #개 결과 중 표시 중입니다.}}"
 #. placeholder {0}: envelope.title
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
-msgid "<0>\"{0}\"</0>is no longer available to sign"
-msgstr "<0>\"{0}\"</0>은(는) 더 이상 서명할 수 없습니다"
+msgid "<0>\"{0}\"</0> is no longer available to sign"
+msgstr ""
 
 #: packages/email/templates/organisation-account-link-confirmation.tsx
 msgid "<0>{organisationName}</0> has requested to create an account on your behalf."
@@ -5778,6 +5778,11 @@ msgctxt "Subscription status"
 msgid "Free"
 msgstr "무료"
 
+#: apps/remix/app/components/tables/user-billing-organisations-table.tsx
+msgctxt "Subscription status"
+msgid "Free (Pending)"
+msgstr ""
+
 #: packages/lib/utils/fields.ts
 #: packages/ui/primitives/document-flow/types.ts
 msgid "Free Signature"
@@ -6146,6 +6151,7 @@ msgstr "입력 필드 식별 중"
 msgid "Identifying recipients"
 msgstr "수신자 식별 중"
 
+#: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "If there is any issue with your subscription, please contact us at <0>{SUPPORT_EMAIL}</0>."
 msgstr "구독 관련 문제가 있는 경우 <0>{SUPPORT_EMAIL}</0>로 연락해 주세요."
@@ -6780,6 +6786,7 @@ msgstr "템플릿 관리 및 보기"
 msgid "Manage billing"
 msgstr "결제 관리"
 
+#: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgid "Manage Billing"
@@ -7973,6 +7980,11 @@ msgstr "연체"
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "Payment overdue"
 msgstr "결제 지연"
+
+#: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
+#: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
+msgid "Payment required"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
 msgid "PDF Document"
@@ -11461,6 +11473,10 @@ msgstr "이 항목은 삭제할 수 없습니다"
 msgid "This link is invalid or has expired. Please contact your team to resend a verification."
 msgstr "이 링크는 유효하지 않거나 만료되었습니다. 팀에 문의해 인증 메일을 다시 보내 달라고 요청해 주세요."
 
+#: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
+msgid "This organisation is awaiting payment. Complete checkout to unlock it."
+msgstr ""
+
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "This organisation will have administrative control over your account. You can revoke this access later, but they will retain access to any data they've already collected."
 msgstr "이 조직은 귀하의 계정을 관리할 수 있는 권한을 갖게 됩니다. 나중에 이 액세스를 취소할 수 있지만, 이미 수집한 데이터에는 계속 액세스할 수 있습니다."
@@ -14422,4 +14438,3 @@ msgstr "인증 코드:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
-
