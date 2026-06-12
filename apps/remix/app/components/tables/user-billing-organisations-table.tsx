@@ -1,6 +1,7 @@
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
+import { isOrganisationPendingPayment } from '@documenso/lib/utils/billing';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import { Badge } from '@documenso/ui/primitives/badge';
@@ -21,8 +22,8 @@ export const UserBillingOrganisationsTable = () => {
     return organisations.filter((org) => canExecuteOrganisationAction('MANAGE_BILLING', org.currentOrganisationRole));
   }, [organisations]);
 
-  const getSubscriptionStatusDisplay = (status: SubscriptionStatus | undefined) => {
-    return match(status)
+  const getSubscriptionStatusDisplay = (organisation: (typeof billingOrganisations)[number]) => {
+    return match(organisation.subscription?.status)
       .with(SubscriptionStatus.ACTIVE, () => ({
         label: t({ message: `Active`, context: `Subscription status` }),
         variant: 'default' as const,
@@ -35,10 +36,19 @@ export const UserBillingOrganisationsTable = () => {
         label: t({ message: `Inactive`, context: `Subscription status` }),
         variant: 'neutral' as const,
       }))
-      .otherwise(() => ({
-        label: t({ message: `Free`, context: `Subscription status` }),
-        variant: 'neutral' as const,
-      }));
+      .otherwise(() => {
+        if (isOrganisationPendingPayment(organisation)) {
+          return {
+            label: t({ message: `Free (Pending)`, context: `Subscription status` }),
+            variant: 'warning' as const,
+          };
+        }
+
+        return {
+          label: t({ message: `Free`, context: `Subscription status` }),
+          variant: 'neutral' as const,
+        };
+      });
   };
 
   const columns = useMemo(() => {
@@ -62,9 +72,7 @@ export const UserBillingOrganisationsTable = () => {
         header: t`Subscription Status`,
         accessorKey: 'subscription',
         cell: ({ row }) => {
-          const subscription = row.original.subscription;
-          const status = subscription?.status;
-          const { label, variant } = getSubscriptionStatusDisplay(status);
+          const { label, variant } = getSubscriptionStatusDisplay(row.original);
 
           return <Badge variant={variant}>{label}</Badge>;
         },
