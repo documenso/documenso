@@ -3,6 +3,11 @@ declare namespace NodeJS {
     PORT?: string;
     NEXT_PUBLIC_WEBAPP_URL?: string;
     NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY?: string;
+    /**
+     * TODO(csc-qes-v1): REMOVE BEFORE MERGE — paired with the bypass in
+     * `packages/lib/server-only/license/assert-licensed-for.ts`. Dev-only.
+     */
+    TEMP_BYPASS_LICENSE_ASSERTION?: 'true' | 'false';
 
     NEXT_PRIVATE_GOOGLE_CLIENT_ID?: string;
     NEXT_PRIVATE_GOOGLE_CLIENT_SECRET?: string;
@@ -37,7 +42,12 @@ declare namespace NodeJS {
     NEXT_PRIVATE_UPLOAD_AZURE_CONTAINER?: string;
     NEXT_PRIVATE_UPLOAD_AZURE_ENDPOINT?: string;
 
-    NEXT_PRIVATE_SIGNING_TRANSPORT?: 'local' | 'http' | 'gcloud-hsm';
+    NEXT_PRIVATE_SIGNING_TRANSPORT?: 'local' | 'http' | 'gcloud-hsm' | 'csc';
+    /**
+     * Derived from `NEXT_PRIVATE_SIGNING_TRANSPORT` in `createPublicEnv()`; do
+     * not set manually. Lets the client detect CSC mode for authoring UI gating.
+     */
+    NEXT_PUBLIC_SIGNING_TRANSPORT_IS_CSC?: 'true' | 'false';
     NEXT_PRIVATE_SIGNING_PASSPHRASE?: string;
     NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH?: string;
     NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS?: string;
@@ -49,6 +59,10 @@ declare namespace NodeJS {
     NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_FILE_PATH?: string;
     NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_CONTENTS?: string;
     NEXT_PRIVATE_SIGNING_GCLOUD_HSM_SECRET_MANAGER_CERT_PATH?: string;
+    NEXT_PRIVATE_SIGNING_CSC_PROVIDER_BASE_URL?: string;
+    NEXT_PRIVATE_SIGNING_CSC_OAUTH_CLIENT_ID?: string;
+    NEXT_PRIVATE_SIGNING_CSC_OAUTH_CLIENT_SECRET?: string;
+    NEXT_PRIVATE_SIGNING_CSC_SIGNATURE_LEVEL?: 'AES' | 'QES';
     NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY?: string;
     NEXT_PUBLIC_SIGNING_CONTACT_INFO?: string;
     NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER?: string;

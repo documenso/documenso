@@ -13,7 +13,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import type { Field, Recipient } from '@prisma/client';
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router';
 
 import { useRequiredDocumentSigningAuthContext } from '~/components/general/document-signing/document-signing-auth-provider';
 import { useRequiredDocumentSigningContext } from '~/components/general/document-signing/document-signing-provider';
@@ -37,7 +37,6 @@ export const DirectTemplatePageView = ({
   directTemplateRecipient,
   directTemplateToken,
 }: DirectTemplatePageViewProps) => {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const { _ } = useLingui();
@@ -119,7 +118,7 @@ export const DirectTemplatePageView = ({
       if (redirectUrl) {
         window.location.href = redirectUrl;
       } else {
-        await navigate(`/sign/${token}/complete`);
+        window.location.href = `/sign/${token}/complete`;
       }
     } catch (err) {
       const error = AppError.parseError(err);

@@ -4,11 +4,13 @@ import pMap from 'p-map';
 import { omit } from 'remeda';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { ZSignatureLevelSchema } from '../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { nanoid, prefixedId } from '../../universal/id';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-id';
+import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -40,6 +42,7 @@ export const duplicateEnvelope = async ({ id, userId, teamId, overrides }: Dupli
       title: true,
       userId: true,
       internalVersion: true,
+      signatureLevel: true,
       templateType: true,
       publicTitle: true,
       publicDescription: true,
@@ -116,12 +119,21 @@ export const duplicateEnvelope = async ({ id, userId, teamId, overrides }: Dupli
       ? 'PRIVATE'
       : (envelope.templateType ?? undefined);
 
+  // The source level is a free-form TEXT column — parse defensively before
+  // handing to the resolver. Coerce (not strict) because instance mode may have
+  // changed since the source envelope was created.
+  const duplicatedSignatureLevel = resolveSignatureLevel({
+    requested: ZSignatureLevelSchema.parse(envelope.signatureLevel),
+    strict: false,
+  });
+
   const duplicatedEnvelope = await prisma.envelope.create({
     data: {
       id: prefixedId('envelope'),
       secondaryId,
       type: targetType,
       internalVersion: envelope.internalVersion,
+      signatureLevel: duplicatedSignatureLevel,
       userId,
       teamId,
       title: envelope.title + ' (copy)',
