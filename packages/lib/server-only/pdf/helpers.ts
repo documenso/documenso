@@ -45,6 +45,88 @@ type RecipientPlaceholderInfo = {
   recipientIndex: number;
 };
 
+const CHECKBOX_VALIDATION_RULE_BY_ALIAS: Record<string, string> = {
+  atLeast: 'Select at least',
+  exactly: 'Select exactly',
+  atMost: 'Select at most',
+};
+
+const splitPlaceholderToken = (value: string, delimiter: string): string[] => {
+  const parts: string[] = [];
+  let currentPart = '';
+
+  for (let index = 0; index < value.length; index++) {
+    const char = value[index];
+    const nextChar = value[index + 1];
+
+    if (char === '\\' && nextChar) {
+      currentPart += char + nextChar;
+      index++;
+      continue;
+    }
+
+    if (char === delimiter) {
+      parts.push(currentPart);
+      currentPart = '';
+      continue;
+    }
+
+    currentPart += char;
+  }
+
+  parts.push(currentPart);
+
+  return parts;
+};
+
+const splitPlaceholderKeyValue = (value: string): [string, string] | null => {
+  const [key, ...valueParts] = splitPlaceholderToken(value, '=');
+
+  if (!key || valueParts.length === 0) {
+    return null;
+  }
+
+  return [key.trim(), valueParts.join('=').trim()];
+};
+
+const unescapePlaceholderValue = (value: string): string => {
+  return value.replace(/\\([,=|\\])/g, '$1');
+};
+
+const normalizePlaceholderSelectionValue = (value: string): string => {
+  return unescapePlaceholderValue(value).replace(/\s+/g, ' ').trim();
+};
+
+const parsePlaceholderOptions = (value: string): string[] => {
+  return splitPlaceholderToken(value, '|')
+    .map((option) => normalizePlaceholderSelectionValue(option))
+    .filter((option) => option.length > 0);
+};
+
+export const parsePlaceholderData = (value: string): string[] => {
+  return splitPlaceholderToken(value, ',').map((token) => token.trim());
+};
+
+export const parseRawFieldMetaFromPlaceholder = (
+  fieldMetaData: string[],
+): Record<string, string> => {
+  const rawFieldMeta: Record<string, string> = {};
+
+  for (const fieldMeta of fieldMetaData) {
+    const keyValue = splitPlaceholderKeyValue(fieldMeta);
+
+    if (!keyValue) {
+      continue;
+    }
+
+    const [key, value] = keyValue;
+
+    rawFieldMeta[key] = value;
+  }
+
+  return rawFieldMeta;
+};
+
 /*
   Parse field type string to FieldType enum.
   Normalizes the input (uppercase, trim) and validates it's a valid field type.
@@ -72,6 +154,181 @@ export const parseFieldTypeFromPlaceholder = (fieldTypeString: string): FieldTyp
     });
 };
 
+const getDefaultFieldMetaValue = (rawFieldMeta: Record<string, string>) => {
+  const defaultValue = rawFieldMeta.defaultValue ?? rawFieldMeta.default ?? rawFieldMeta.selected;
+
+  return defaultValue ? normalizePlaceholderSelectionValue(defaultValue) : undefined;
+};
+
+const getCheckedFieldMetaValues = (rawFieldMeta: Record<string, string>) => {
+  const checkedValue = rawFieldMeta.checked;
+
+  return checkedValue ? parsePlaceholderOptions(checkedValue) : [];
+};
+
+const parseCheckboxValidationRule = (value: string): string => {
+  const validationRule = CHECKBOX_VALIDATION_RULE_BY_ALIAS[value];
+
+  if (!validationRule) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: `Invalid checkbox placeholder validation rule: ${value}`,
+    });
+  }
+
+  return validationRule;
+};
+
+const parseSelectionFieldOptions = (
+  rawFieldMeta: Record<string, string>,
+  fieldType: FieldType,
+): string[] | undefined => {
+  const rawOptions = rawFieldMeta.options;
+
+  if (rawOptions === undefined) {
+    return;
+  }
+
+  const parsedOptions = parsePlaceholderOptions(rawOptions);
+
+  if (parsedOptions.length === 0) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: `${fieldType} placeholder options must contain at least one value`,
+    });
+  }
+
+  return parsedOptions;
+};
+
+const applyRadioFieldOptions = (
+  parsedFieldMeta: Record<string, unknown>,
+  rawFieldMeta: Record<string, string>,
+) => {
+  const options = parseSelectionFieldOptions(rawFieldMeta, FieldType.RADIO);
+  const defaultValue = getDefaultFieldMetaValue(rawFieldMeta);
+
+  if (!options && defaultValue) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Radio placeholder default value requires options',
+    });
+  }
+
+  if (!options) {
+    return;
+  }
+
+  const selectedOptionIndex = defaultValue
+    ? options.findIndex((option) => option === defaultValue)
+    : -1;
+
+  if (defaultValue && selectedOptionIndex === -1) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: `Radio placeholder default value "${defaultValue}" must match one of the options`,
+    });
+  }
+
+  parsedFieldMeta.values = options.map((option, index) => ({
+    id: index + 1,
+    checked: index === selectedOptionIndex,
+    value: option,
+  }));
+};
+
+const applyCheckboxFieldOptions = (
+  parsedFieldMeta: Record<string, unknown>,
+  rawFieldMeta: Record<string, string>,
+) => {
+  const options = parseSelectionFieldOptions(rawFieldMeta, FieldType.CHECKBOX);
+  const checkedValues = getCheckedFieldMetaValues(rawFieldMeta);
+
+  if (!options && checkedValues.length > 0) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Checkbox placeholder checked values require options',
+    });
+  }
+
+  if (!options) {
+    return;
+  }
+
+  const unmatchedCheckedValues = checkedValues.filter(
+    (checkedValue) => !options.includes(checkedValue),
+  );
+
+  if (unmatchedCheckedValues.length > 0) {
+    const unmatchedCheckedValue = unmatchedCheckedValues[0];
+
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: [
+        `Checkbox placeholder checked value "${unmatchedCheckedValue}"`,
+        'must match one of the options',
+      ].join(' '),
+    });
+  }
+
+  parsedFieldMeta.values = options.map((option, index) => ({
+    id: index + 1,
+    checked: checkedValues.includes(option),
+    value: option,
+  }));
+};
+
+const applyDropdownFieldOptions = (
+  parsedFieldMeta: Record<string, unknown>,
+  rawFieldMeta: Record<string, string>,
+) => {
+  const options = parseSelectionFieldOptions(rawFieldMeta, FieldType.DROPDOWN);
+  const defaultValue = getDefaultFieldMetaValue(rawFieldMeta);
+
+  if (!options && defaultValue) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Dropdown placeholder default value requires options',
+    });
+  }
+
+  if (!options) {
+    return;
+  }
+
+  if (defaultValue && !options.includes(defaultValue)) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: `Dropdown placeholder default value "${defaultValue}" must match one of the options`,
+    });
+  }
+
+  parsedFieldMeta.values = options.map((option) => ({
+    value: option,
+  }));
+
+  if (defaultValue) {
+    parsedFieldMeta.defaultValue = defaultValue;
+  }
+};
+
+const isSelectionFieldType = (fieldType: FieldType): boolean => {
+  return (
+    fieldType === FieldType.CHECKBOX ||
+    fieldType === FieldType.RADIO ||
+    fieldType === FieldType.DROPDOWN
+  );
+};
+
+const shouldSkipGenericFieldMetaParsing = (property: string, fieldType: FieldType): boolean => {
+  if (property === 'options' || property === 'default' || property === 'selected') {
+    return true;
+  }
+
+  if (!isSelectionFieldType(fieldType)) {
+    return false;
+  }
+
+  return (
+    property === 'label' ||
+    property === 'placeholder' ||
+    property === 'defaultValue' ||
+    (property === 'checked' && fieldType === FieldType.CHECKBOX)
+  );
+};
+
 /*
   Transform raw field metadata from placeholder format to schema format.
   Users should provide properly capitalized property names (e.g., readOnly, fontSize, textAlign).
@@ -91,7 +348,7 @@ export const parseFieldMetaFromPlaceholder = (
 
   const fieldTypeString = String(fieldType).toLowerCase();
 
-  const parsedFieldMeta: Record<string, boolean | number | string> = {
+  const parsedFieldMeta: Record<string, unknown> = {
     type: fieldTypeString,
   };
 
@@ -104,22 +361,43 @@ export const parseFieldMetaFromPlaceholder = (
   const rawFieldMetaEntries = Object.entries(rawFieldMeta);
 
   for (const [property, value] of rawFieldMetaEntries) {
+    if (shouldSkipGenericFieldMetaParsing(property, fieldType)) {
+      continue;
+    }
+
+    const unescapedValue = unescapePlaceholderValue(value);
+
     if (property === 'readOnly' || property === 'required') {
-      parsedFieldMeta[property] = value === 'true';
+      parsedFieldMeta[property] = unescapedValue.toLowerCase() === 'true';
+    } else if (property === 'validationRule' && fieldType === FieldType.CHECKBOX) {
+      parsedFieldMeta[property] = parseCheckboxValidationRule(unescapedValue);
     } else if (
       property === 'fontSize' ||
       property === 'maxValue' ||
       property === 'minValue' ||
-      property === 'characterLimit'
+      property === 'characterLimit' ||
+      property === 'validationLength'
     ) {
-      const numValue = Number(value);
+      const numValue = Number(unescapedValue);
 
       if (!Number.isNaN(numValue)) {
         parsedFieldMeta[property] = numValue;
       }
     } else {
-      parsedFieldMeta[property] = value;
+      parsedFieldMeta[property] = unescapedValue;
     }
+  }
+
+  if (fieldType === FieldType.RADIO) {
+    applyRadioFieldOptions(parsedFieldMeta, rawFieldMeta);
+  }
+
+  if (fieldType === FieldType.CHECKBOX) {
+    applyCheckboxFieldOptions(parsedFieldMeta, rawFieldMeta);
+  }
+
+  if (fieldType === FieldType.DROPDOWN) {
+    applyDropdownFieldOptions(parsedFieldMeta, rawFieldMeta);
   }
 
   return parsedFieldMeta;
