@@ -1853,6 +1853,18 @@ msgstr "Ocurrió un error al actualizar tu perfil."
 msgid "An error occurred while uploading your document."
 msgstr "Ocurrió un error al subir tu documento."
 
+#: packages/email/templates/organisation-invite-declined.tsx
+msgid "An invitation to join your organisation {organisationName} was declined"
+msgstr ""
+
+#: packages/lib/jobs/definitions/emails/send-organisation-member-invite-declined-email.handler.ts
+msgid "An organisation invitation was declined"
+msgstr ""
+
+#: packages/email/templates/organisation-invite-declined.tsx
+msgid "An organisation invitation was declined on Documenso"
+msgstr ""
+
 #: apps/remix/app/components/forms/support-ticket-form.tsx
 msgid "An error occurred. Please try again later."
 msgstr "Ocurrió un error. Por favor intenta de nuevo más tarde."

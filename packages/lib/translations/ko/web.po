@@ -1853,6 +1853,18 @@ msgstr "프로필을 업데이트하는 중 오류가 발생했습니다."
 msgid "An error occurred while uploading your document."
 msgstr "문서를 업로드하는 중 오류가 발생했습니다."
 
+#: packages/email/templates/organisation-invite-declined.tsx
+msgid "An invitation to join your organisation {organisationName} was declined"
+msgstr ""
+
+#: packages/lib/jobs/definitions/emails/send-organisation-member-invite-declined-email.handler.ts
+msgid "An organisation invitation was declined"
+msgstr ""
+
+#: packages/email/templates/organisation-invite-declined.tsx
+msgid "An organisation invitation was declined on Documenso"
+msgstr ""
+
 #: apps/remix/app/components/forms/support-ticket-form.tsx
 msgid "An error occurred. Please try again later."
 msgstr "오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
