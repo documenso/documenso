@@ -13,6 +13,7 @@ export type FindTemplatesOptions = {
   page?: number;
   perPage?: number;
   folderId?: string;
+  query?: string;
 };
 
 export const findTemplates = async ({
@@ -22,6 +23,7 @@ export const findTemplates = async ({
   page = 1,
   perPage = 10,
   folderId,
+  query = '',
 }: FindTemplatesOptions) => {
   const { teamRole } = await getMemberRoles({
     teamId,
@@ -30,6 +32,15 @@ export const findTemplates = async ({
       id: userId,
     },
   });
+
+  const searchFilter: Prisma.EnvelopeWhereInput = {
+    OR: [
+      { title: { contains: query, mode: 'insensitive' } },
+      { externalId: { contains: query, mode: 'insensitive' } },
+      { recipients: { some: { name: { contains: query, mode: 'insensitive' } } } },
+      { recipients: { some: { email: { contains: query, mode: 'insensitive' } } } },
+    ],
+  };
 
   const where: Prisma.EnvelopeWhereInput = {
     type: EnvelopeType.TEMPLATE,
@@ -47,6 +58,7 @@ export const findTemplates = async ({
         ],
       },
       folderId ? { folderId } : { folderId: null },
+      searchFilter,
     ],
   };
 
