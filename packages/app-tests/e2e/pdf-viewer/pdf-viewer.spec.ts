@@ -13,9 +13,9 @@ import {
 } from '@documenso/prisma/seed/documents';
 import { seedBlankTemplate, seedDirectTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
-import { expect, test } from '@playwright/test';
+import { expect, type Locator, test } from '@playwright/test';
 import { FieldType } from '@prisma/client';
-
+import { apiSeedPendingDocument } from '../fixtures/api-seeds';
 import { apiSignin } from '../fixtures/authentication';
 
 export const PDF_PAGE_SELECTOR = 'img[data-page-number]';
@@ -44,6 +44,16 @@ async function addSecondEnvelopeItem(envelopeId: string) {
       envelopeId,
     },
   });
+}
+
+async function getLocatorWidth(locator: Locator) {
+  const box = await locator.boundingBox();
+
+  if (!box) {
+    throw new Error('Locator bounding box not found');
+  }
+
+  return box.width;
 }
 
 test.describe('PDF Viewer Rendering', () => {
@@ -101,6 +111,38 @@ test.describe('PDF Viewer Rendering', () => {
       await page.goto(`/t/${team.url}/documents/${documentV1.id}`);
       await page.locator(PDF_PAGE_SELECTOR).first().waitFor({ state: 'visible', timeout: 30_000 });
     });
+
+    test('should zoom in and reset to fit width', async ({ page }) => {
+      const { user, team } = await seedUser();
+      const document = await seedBlankDocument(user, team.id, { internalVersion: 2 });
+
+      await apiSignin({
+        page,
+        email: user.email,
+        redirectPath: `/t/${team.url}/documents/${document.id}`,
+      });
+
+      const pageImage = page.locator(PDF_PAGE_SELECTOR).first();
+      const pdfContent = page.locator('[data-pdf-content]');
+
+      await expect(pageImage).toBeVisible({ timeout: 30_000 });
+
+      const initialImageWidth = await getLocatorWidth(pageImage);
+      const initialContentWidth = await getLocatorWidth(pdfContent);
+
+      expect(Math.abs(initialImageWidth - initialContentWidth)).toBeLessThanOrEqual(2);
+
+      await page.getByRole('button', { name: 'Zoom in' }).click();
+
+      await expect.poll(async () => await getLocatorWidth(pageImage)).toBeGreaterThan(initialImageWidth);
+      await expect.poll(async () => await getLocatorWidth(pdfContent)).toBeGreaterThan(initialContentWidth);
+
+      await page.getByRole('button', { name: 'Reset zoom' }).click();
+
+      await expect
+        .poll(async () => Math.abs((await getLocatorWidth(pageImage)) - initialImageWidth))
+        .toBeLessThanOrEqual(2);
+    });
   });
 
   test.describe('Recipient Signing', () => {
@@ -130,6 +172,68 @@ test.describe('PDF Viewer Rendering', () => {
       await expect(page.locator(PDF_PAGE_SELECTOR).first()).toBeVisible({ timeout: 30_000 });
       await page.getByRole('button', { name: /Page 2/ }).click();
       await expect(page.locator(PDF_PAGE_SELECTOR).first()).toBeVisible({ timeout: 30_000 });
+    });
+
+    test('should keep V2 signing fields clickable after zooming', async ({ page, request }) => {
+      const { distributeResult, envelope } = await apiSeedPendingDocument(request, {
+        recipients: [{ email: 'pdf-zoom-signer@test.documenso.com', name: 'PDF Zoom Signer' }],
+        fieldsPerRecipient: [
+          [
+            {
+              type: FieldType.SIGNATURE,
+              page: 1,
+              positionX: 10,
+              positionY: 10,
+              width: 15,
+              height: 5,
+            },
+          ],
+        ],
+      });
+
+      const { token } = distributeResult.recipients[0];
+
+      await page.goto(`/sign/${token}`);
+
+      await expect(page.locator(PDF_PAGE_SELECTOR).first()).toBeVisible({ timeout: 30_000 });
+
+      const canvas = page.locator('.konva-container canvas').first();
+      await expect(canvas).toBeVisible({ timeout: 30_000 });
+      await expect(page.getByText('1 Field Remaining').first()).toBeVisible();
+
+      const initialCanvasWidth = await getLocatorWidth(canvas);
+
+      await page.getByRole('button', { name: 'Zoom in' }).click();
+
+      await expect.poll(async () => await getLocatorWidth(canvas)).toBeGreaterThan(initialCanvasWidth);
+
+      await page.getByTestId('signature-pad-dialog-button').click();
+      await page.getByRole('tab', { name: 'Type' }).click();
+      await page.getByTestId('signature-pad-type-input').fill('Signature');
+      await page.getByRole('button', { name: 'Next' }).click();
+
+      const signatureField = envelope.fields.find((field) => field.type === FieldType.SIGNATURE);
+
+      if (!signatureField) {
+        throw new Error('Signature field not found');
+      }
+
+      const canvasBox = await canvas.boundingBox();
+
+      if (!canvasBox) {
+        throw new Error('Canvas bounding box not found');
+      }
+
+      const x =
+        (Number(signatureField.positionX) / 100) * canvasBox.width +
+        ((Number(signatureField.width) / 100) * canvasBox.width) / 2;
+      const y =
+        (Number(signatureField.positionY) / 100) * canvasBox.height +
+        ((Number(signatureField.height) / 100) * canvasBox.height) / 2;
+
+      await canvas.click({ position: { x, y } });
+
+      await expect(page.getByText('0 Fields Remaining').first()).toBeVisible({ timeout: 10_000 });
     });
   });
 
@@ -168,7 +272,7 @@ test.describe('PDF Viewer Rendering', () => {
       const qrTokenV1 = prefixedId('qr');
       const qrTokenV2 = prefixedId('qr');
 
-      const documentV1 = await seedCompletedDocument(user, team.id, ['share-v1@test.documenso.com'], {
+      await seedCompletedDocument(user, team.id, ['share-v1@test.documenso.com'], {
         createDocumentOptions: { qrToken: qrTokenV1 },
       });
 

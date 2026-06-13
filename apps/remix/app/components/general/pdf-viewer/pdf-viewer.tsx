@@ -1,8 +1,10 @@
 import type { ImageLoadingState, PageRenderData } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { PDF_VIEWER_PAGE_CLASSNAME } from '@documenso/lib/constants/pdf-viewer';
 import { cn } from '@documenso/ui/lib/utils';
+import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { Trans, useLingui } from '@lingui/react/macro';
+import { MinusIcon, PlusIcon, RotateCcwIcon } from 'lucide-react';
 import pMap from 'p-map';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker?url';
@@ -27,6 +29,10 @@ type LoadingState = 'loading' | 'loaded' | 'error';
 const LOW_RENDER_RESOLUTION = 1;
 const HIGH_RENDER_RESOLUTION = 2;
 const IDLE_RENDER_DELAY = 200;
+const DEFAULT_ZOOM = 1;
+const MIN_ZOOM = 0.5;
+const MAX_ZOOM = 2;
+const ZOOM_STEP = 0.25;
 
 export type PDFViewerProps = {
   className?: string;
@@ -72,6 +78,22 @@ export default function PDFViewer({
   const $el = useRef<HTMLDivElement>(null);
 
   const [loadingState, setLoadingState] = useState<LoadingState>('loading');
+  const [zoom, setZoom] = useState(DEFAULT_ZOOM);
+
+  const canZoomOut = zoom > MIN_ZOOM;
+  const canZoomIn = zoom < MAX_ZOOM;
+
+  const zoomOut = () => {
+    setZoom((currentZoom) => Math.max(MIN_ZOOM, currentZoom - ZOOM_STEP));
+  };
+
+  const resetZoom = () => {
+    setZoom(DEFAULT_ZOOM);
+  };
+
+  const zoomIn = () => {
+    setZoom((currentZoom) => Math.min(MAX_ZOOM, currentZoom + ZOOM_STEP));
+  };
 
   const pdfRef = useRef<pdfjsLib.PDFDocumentProxy | null>(null);
 
@@ -88,6 +110,7 @@ export default function PDFViewer({
       try {
         setLoadingState('loading');
         setPages([]);
+        setZoom(DEFAULT_ZOOM);
 
         if (isCancelled) {
           return;
@@ -109,7 +132,11 @@ export default function PDFViewer({
           return;
         }
 
-        const loadedPdf = await pdfjsLib.getDocument({ data: result!, cMapUrl: '/static/cmaps/' }).promise;
+        if (!result) {
+          throw new Error('Failed to load PDF data');
+        }
+
+        const loadedPdf = await pdfjsLib.getDocument({ data: result, cMapUrl: '/static/cmaps/' }).promise;
 
         if (isCancelled) {
           await loadedPdf.destroy();
@@ -191,12 +218,56 @@ export default function PDFViewer({
   }
 
   return (
-    <div ref={$el} className={cn('h-full w-full', className)} {...props}>
+    <div ref={$el} className={cn('h-full w-full overflow-x-auto', className)} {...props}>
       {/* Loading State */}
       {isLoading && <PdfViewerLoadingState />}
 
       {/* Error State */}
       {hasError && <PdfViewerErrorState />}
+
+      {loadingState === 'loaded' && (
+        <div className="sticky top-2 right-2 z-20 ml-auto flex w-fit items-center gap-1 rounded-md border bg-background/95 p-1 shadow-sm">
+          <Button
+            type="button"
+            variant="ghost"
+            className="h-8 w-8 p-0"
+            disabled={!canZoomOut}
+            aria-label={t`Zoom out`}
+            onClick={zoomOut}
+          >
+            <MinusIcon className="h-4 w-4" />
+            <span className="sr-only">
+              <Trans>Zoom out</Trans>
+            </span>
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
+            className="h-8 min-w-12 px-2 font-medium text-xs tabular-nums"
+            disabled={zoom === DEFAULT_ZOOM}
+            aria-label={t`Reset zoom`}
+            onClick={resetZoom}
+          >
+            <RotateCcwIcon className="mr-1 h-3.5 w-3.5" />
+            {Math.round(zoom * 100)}%
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
+            className="h-8 w-8 p-0"
+            disabled={!canZoomIn}
+            aria-label={t`Zoom in`}
+            onClick={zoomIn}
+          >
+            <PlusIcon className="h-4 w-4" />
+            <span className="sr-only">
+              <Trans>Zoom in</Trans>
+            </span>
+          </Button>
+        </div>
+      )}
 
       {/* Loaded State */}
       {loadingState === 'loaded' && pages.length > 0 && pdfRef.current && (
@@ -206,6 +277,7 @@ export default function PDFViewer({
           numPages={pages.length}
           pages={pages}
           pdf={pdfRef.current}
+          zoom={zoom}
           customPageRenderer={customPageRenderer}
         />
       )}
@@ -220,6 +292,7 @@ type VirtualizedPageListProps = {
   numPages: number;
   pdf: pdfjsLib.PDFDocumentProxy;
   customPageRenderer?: React.FunctionComponent<{ pageData: PageRenderData }>;
+  zoom: number;
 };
 
 const VirtualizedPageList = ({
@@ -229,6 +302,7 @@ const VirtualizedPageList = ({
   numPages,
   pdf,
   customPageRenderer,
+  zoom,
 }: VirtualizedPageListProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -240,9 +314,9 @@ const VirtualizedPageList = ({
     itemSize: (index, width) => {
       const pageMeta = pages[index];
 
-      // Calculate height based on aspect ratio and available width
+      // Calculate height based on aspect ratio and zoomed width
       const aspectRatio = pageMeta.height / pageMeta.width;
-      const scaledHeight = width * aspectRatio;
+      const scaledHeight = width * zoom * aspectRatio;
 
       // Add 32px for the page number text and margins (my-2 = 8px * 2 + text height ~16px)
       // Add additional 2px for the top and bottom borders.
@@ -261,7 +335,7 @@ const VirtualizedPageList = ({
       data-page-count={numPages}
       style={{
         height: `${totalSize}px`,
-        width: '100%',
+        width: `${Math.max(constraintWidth, constraintWidth * zoom)}px`,
         position: 'relative',
       }}
     >
@@ -270,20 +344,22 @@ const VirtualizedPageList = ({
         const pageMeta = pages[index];
         const pageNumber = index + 1;
 
-        // Calculate scale based on constraint width
-        const scale = constraintWidth / pageMeta.width;
+        // Calculate scale based on fit-to-width plus viewer zoom
+        const pageDisplayWidth = constraintWidth * zoom;
+        const scale = pageDisplayWidth / pageMeta.width;
 
         const scaledWidth = Math.floor(pageMeta.width * scale);
         const scaledHeight = Math.floor(pageMeta.height * scale);
 
         return (
           <div
+            className="flex flex-col items-center"
             key={virtualItem.key}
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
-              width: constraintWidth,
+              width: Math.max(constraintWidth, scaledWidth),
               height: `${virtualItem.size}px`,
               transform: `translateY(${virtualItem.start}px)`,
             }}
@@ -373,6 +449,7 @@ const usePdfPageImage = ({ pageNumber, pdf, scale, scaledWidth, scaledHeight }: 
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const renderedResolutionRef = useRef<number | null>(null);
+  const renderedScaleRef = useRef<number | null>(null);
   const renderedPageNumberRef = useRef<number | null>(null);
   const renderedPdfRef = useRef<pdfjsLib.PDFDocumentProxy | null>(null);
 
@@ -392,7 +469,8 @@ const usePdfPageImage = ({ pageNumber, pdf, scale, scaledWidth, scaledHeight }: 
       return (
         renderedPdfRef.current === pdf &&
         renderedPageNumberRef.current === pageNumber &&
-        renderedResolutionRef.current === resolution
+        renderedResolutionRef.current === resolution &&
+        renderedScaleRef.current === scale
       );
     };
 
@@ -400,6 +478,7 @@ const usePdfPageImage = ({ pageNumber, pdf, scale, scaledWidth, scaledHeight }: 
       renderedPdfRef.current = pdf;
       renderedPageNumberRef.current = pageNumber;
       renderedResolutionRef.current = resolution;
+      renderedScaleRef.current = scale;
     };
 
     const renderAtResolution = async (resolution: number) => {
