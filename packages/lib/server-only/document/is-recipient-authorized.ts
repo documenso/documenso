@@ -31,6 +31,7 @@ type IsRecipientAuthorizedOptions = {
    * using the user ID.
    */
   authOptions?: TDocumentAuthMethods;
+  recipientToken?: string;
 };
 
 const getUserByEmail = async (email: string) => {
@@ -56,6 +57,7 @@ export const isRecipientAuthorized = async ({
   recipient,
   userId,
   authOptions,
+  recipientToken,
 }: IsRecipientAuthorizedOptions): Promise<boolean> => {
   const { derivedRecipientAccessAuth, derivedRecipientActionAuth } = extractDocumentAuthMethods({
     documentAuth: documentAuthOptions,
@@ -162,6 +164,21 @@ export const isRecipientAuthorized = async ({
         userId,
         password,
       });
+    })
+    .with({ type: DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH }, async () => {
+      if (!recipientToken) {
+        return false;
+      }
+
+      const validProof = await prisma.signingSessionTwoFactorProof.findFirst({
+        where: {
+          sessionId: recipientToken,
+          envelopeId: recipient.envelopeId,
+          expiresAt: { gt: new Date() },
+        },
+      });
+
+      return !!validProof;
     })
     .with({ type: DocumentAuth.EXPLICIT_NONE }, () => {
       return true;
