@@ -81,7 +81,7 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
   }
 
   const normalized = await normalizePdf(buffer, {
-    flattenForm: envelope.type !== 'TEMPLATE',
+    flattenForm: false,
   });
 
   const { cleanedPdf, placeholders } = await extractPdfPlaceholders(normalized);
