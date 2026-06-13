@@ -6,6 +6,7 @@ import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from '@oslojs/enco
 import { type Session, type User, UserSecurityAuditLogType } from '@prisma/client';
 
 import { AUTH_SESSION_LIFETIME } from '../../config';
+import { validateOAuthGrant, clearOAuthCache } from './oauth-revocation-check';
 
 /**
  * The user object to pass around the app.
@@ -103,6 +104,15 @@ export const validateSessionToken = async (token: string): Promise<SessionValida
     return { session: null, user: null, isAuthenticated: false };
   }
 
+  // Check if the user's OAuth grant has been revoked.
+  // Uses a cached check (10-min interval) to avoid rate-limiting OAuth providers.
+  const oauthValid = await validateOAuthGrant(user.id);
+  if (!oauthValid) {
+    // OAuth grant revoked - invalidate this session
+    await prisma.session.delete({ where: { id: sessionId } });
+    return { session: null, user: null, isAuthenticated: false };
+  }
+
   if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 15) {
     session.expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
 
@@ -135,6 +145,9 @@ export const invalidateSessions = async ({
   if (sessionIds.length === 0) {
     return;
   }
+
+  // Clear OAuth cache so re-validation happens on next login
+  clearOAuthCache(userId);
 
   await prisma.$transaction(async (tx) => {
     const { count } = await tx.session.deleteMany({
