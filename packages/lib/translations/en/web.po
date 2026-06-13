@@ -449,6 +449,10 @@ msgstr "{remaningLength, plural, one {# character remaining} other {# characters
 msgid "{selectedCount} selected"
 msgstr "{selectedCount} selected"
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "{sender} has sent you a document to sign"
+msgstr "{sender} has sent you a document to sign"
+
 #: packages/email/template-components/template-document-rejected.tsx
 msgid "{signerName} has rejected the document \"{documentName}\"."
 msgstr "{signerName} has rejected the document \"{documentName}\"."
@@ -4052,6 +4056,7 @@ msgstr "Documenso will delete <0>all of your documents</0>, along with all of yo
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
 msgid "Document"
 msgstr "Document"
 
@@ -5723,6 +5728,10 @@ msgstr "Folder updated successfully"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Font Size"
 msgstr "Font Size"
+
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "For {recipientName}"
+msgstr "For {recipientName}"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>{SUPPORT_EMAIL}</0>"
@@ -9770,6 +9779,7 @@ msgstr "Sign as<0>{0} <1>({1})</1></0>"
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
 msgid "Sign document"
 msgstr "Sign document"
 
@@ -9881,6 +9891,10 @@ msgstr "Signature is too small"
 #: apps/remix/app/components/forms/profile.tsx
 msgid "Signature Pad cannot be empty."
 msgstr "Signature Pad cannot be empty."
+
+#: apps/remix/app/routes/_recipient+/sign.$token+/opengraph.tsx
+msgid "Signature requested"
+msgstr "Signature requested"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Signature Settings"
