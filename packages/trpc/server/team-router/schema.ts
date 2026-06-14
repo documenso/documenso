@@ -1,6 +1,7 @@
 import { URL_PATTERN, ZNameSchema } from '@documenso/lib/constants/auth';
 import { PROTECTED_TEAM_URLS } from '@documenso/lib/constants/teams';
 import { zEmail } from '@documenso/lib/utils/zod';
+import { msg } from '@lingui/core/macro';
 import { TeamMemberRole } from '@prisma/client';
 import { z } from 'zod';
 
@@ -22,29 +23,29 @@ import { z } from 'zod';
 export const ZTeamUrlSchema = z
   .string()
   .trim()
-  .min(3, { message: 'Team URL must be at least 3 characters long.' })
-  .max(30, { message: 'Team URL must not exceed 30 characters.' })
+  .min(3, { message: msg`Team URL must be at least 3 characters long.`.id })
+  .max(30, { message: msg`Team URL must not exceed 30 characters.`.id })
   .toLowerCase()
-  .regex(/^[a-z0-9].*[^_-]$/, 'Team URL cannot start or end with dashes or underscores.')
-  .regex(/^(?!.*[-_]{2})/, 'Team URL cannot contain consecutive dashes or underscores.')
-  .regex(/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/, 'Team URL can only contain letters, numbers, dashes and underscores.')
+  .regex(/^[a-z0-9].*[^_-]$/, msg`Team URL cannot start or end with dashes or underscores.`.id)
+  .regex(/^(?!.*[-_]{2})/, msg`Team URL cannot contain consecutive dashes or underscores.`.id)
+  .regex(/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/, msg`Team URL can only contain letters, numbers, dashes and underscores.`.id)
   .refine((value) => !PROTECTED_TEAM_URLS.includes(value), {
-    message: 'This URL is already in use.',
+    message: msg`This URL is already in use.`.id,
   });
 
 export const ZTeamNameSchema = z
   .string()
   .trim()
-  .min(3, { message: 'Team name must be at least 3 characters long.' })
-  .max(30, { message: 'Team name must not exceed 30 characters.' })
+  .min(3, { message: msg`Team name must be at least 3 characters long.`.id })
+  .max(30, { message: msg`Team name must not exceed 30 characters.`.id })
   .refine((value) => !URL_PATTERN.test(value), {
-    message: 'Team name cannot contain URLs.',
+    message: msg`Team name cannot contain URLs.`.id,
   });
 
 export const ZCreateTeamEmailVerificationMutationSchema = z.object({
   teamId: z.number(),
   name: ZNameSchema,
-  email: zEmail().trim().toLowerCase().min(1, 'Please enter a valid email.'),
+  email: zEmail().trim().toLowerCase().min(1, msg`Please enter a valid email.`.id),
 });
 
 export const ZDeleteTeamEmailMutationSchema = z.object({
