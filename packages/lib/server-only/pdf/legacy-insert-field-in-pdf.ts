@@ -1,10 +1,6 @@
 // https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
-import type { PDFDocument, PDFFont } from '@cantoo/pdf-lib';
+import type { PDFDocument } from '@cantoo/pdf-lib';
 import { degrees, RotationTypes, radiansToDegrees, rgb } from '@cantoo/pdf-lib';
-import fontkit from '@pdf-lib/fontkit';
-import { FieldType } from '@prisma/client';
-import { match, P } from 'ts-pattern';
-
 import {
   DEFAULT_HANDWRITING_FONT_SIZE,
   DEFAULT_STANDARD_FONT_SIZE,
@@ -14,7 +10,11 @@ import {
 import { fromCheckboxValue } from '@documenso/lib/universal/field-checkbox';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+import fontkit from '@pdf-lib/fontkit';
+import { FieldType } from '@prisma/client';
+import { match, P } from 'ts-pattern';
 
+import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
 import {
   ZCheckboxFieldMeta,
   ZDateFieldMeta,
@@ -25,10 +25,14 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '../../types/field-meta';
-import { embedSignatureFont, getSignatureFontKey } from './font-selection';
 import { getPageSize } from './get-page-size';
 
 export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
+  const [fontCaveat, fontNoto] = await Promise.all([
+    fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/caveat.ttf`).then(async (res) => res.arrayBuffer()),
+    fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(async (res) => res.arrayBuffer()),
+  ]);
+
   const isSignatureField = isSignatureFieldType(field.type);
   const isDebugMode =
     // eslint-disable-next-line turbo/no-undeclared-env-vars
@@ -103,18 +107,14 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
     });
   }
 
-  // Embeds the right font for a typed signature based on the script of the
-  // text. Image signatures render the embedded base64 image and don't need
-  // a font, so callers skip this when `signatureImageAsBase64` is present.
-  // embedSignatureFont caches embedded PDFFont instances per document so
-  // repeated calls for the same (font, options) pair are essentially free.
-  const embedTypedSignatureFont = async (typedSignatureText: string): Promise<PDFFont> => {
-    const signatureFontKey = getSignatureFontKey(typedSignatureText);
+  const font = await pdf.embedFont(
+    isSignatureField ? fontCaveat : fontNoto,
+    isSignatureField ? { features: { calt: false } } : undefined,
+  );
 
-    return signatureFontKey === 'caveat'
-      ? embedSignatureFont(pdf, 'caveat', { features: { calt: false } })
-      : embedSignatureFont(pdf, signatureFontKey);
-  };
+  if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
+    await pdf.embedFont(fontCaveat);
+  }
 
   await match(field)
     .with(
@@ -161,7 +161,6 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
           });
         } else {
           const signatureText = field.signature?.typedSignature ?? '';
-          const font = await embedTypedSignatureFont(signatureText);
 
           const longestLineInTextForWidth = signatureText.split('\n').sort((a, b) => b.length - a.length)[0];
 
@@ -204,7 +203,7 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
         }
       },
     )
-    .with({ type: FieldType.CHECKBOX }, async (field) => {
+    .with({ type: FieldType.CHECKBOX }, (field) => {
       const meta = ZCheckboxFieldMeta.safeParse(field.fieldMeta);
 
       if (!meta.success) {
@@ -212,8 +211,6 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
 
         throw new Error('Invalid checkbox field meta');
       }
-
-      const font = await embedSignatureFont(pdf, 'noto-sans');
 
       const values = meta.data.values?.map((item) => ({
         ...item,
@@ -247,7 +244,7 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
         });
       }
     })
-    .with({ type: FieldType.RADIO }, async (field) => {
+    .with({ type: FieldType.RADIO }, (field) => {
       const meta = ZRadioFieldMeta.safeParse(field.fieldMeta);
 
       if (!meta.success) {
@@ -255,8 +252,6 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
 
         throw new Error('Invalid radio field meta');
       }
-
-      const font = await embedSignatureFont(pdf, 'noto-sans');
 
       const values = meta?.data.values?.map((item) => ({
         ...item,
@@ -290,7 +285,7 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
         }
       }
     })
-    .otherwise(async (field) => {
+    .otherwise((field) => {
       const fieldMetaParsers = {
         [FieldType.TEXT]: ZTextFieldMeta,
         [FieldType.NUMBER]: ZNumberFieldMeta,
@@ -299,8 +294,6 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
         [FieldType.NAME]: ZNameFieldMeta,
         [FieldType.INITIALS]: ZInitialsFieldMeta,
       } as const;
-
-      const font = await embedSignatureFont(pdf, 'noto-sans');
 
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       const Parser = fieldMetaParsers[field.type as keyof typeof fieldMetaParsers];
