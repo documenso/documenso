@@ -29,9 +29,12 @@ export const CAVEAT_FONT_PATH = () => `${NEXT_PUBLIC_WEBAPP_URL()}/fonts/caveat.
  * cleanly. Updating the TTFs (or renaming the @font-face declarations)
  * requires updating this string too.
  *
- * Multi-word family names are wrapped in double quotes so they parse as a
- * single family per the CSS font-family spec (otherwise strict parsers would
- * read "Noto Sans" as two families: "Noto" and "Sans").
+ * Multi-word family names are wrapped in double quotes for clarity and
+ * cross-parser consistency. The CSS Fonts spec actually permits unquoted
+ * multi-word identifiers (`Noto Sans` parses as a single family), but
+ * quoting makes the family boundaries unambiguous at a glance and avoids
+ * surprises in non-CSS consumers that may interpret the same string (e.g.
+ * PDF appearance streams or other downstream tooling).
  *
  * Order matters: Noto Sans Chinese is listed before Noto Sans Japanese because
  * the Japanese font also contains Han ideographs (for kanji). Without this

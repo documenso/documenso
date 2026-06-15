@@ -49,6 +49,19 @@ describe('getSignatureFontKey', () => {
     expect(getSignatureFontKey('عربي')).toBe('noto-sans');
   });
 
+  it('should return noto-sans for scripts not explicitly enumerated', async () => {
+    // Regression: an earlier shape enumerated specific non-Caveat scripts and
+    // silently defaulted unknown ones to Caveat, which would render as tofu.
+    // The current shape inverts the test (Caveat only when chars are
+    // Latin/Cyrillic/Common/Inherited), so any unlisted script lands on
+    // noto-sans.
+    const { getSignatureFontKey } = await import('./font-selection');
+
+    expect(getSignatureFontKey('ሰላም')).toBe('noto-sans'); // Ethiopic
+    expect(getSignatureFontKey('សួស្ដី')).toBe('noto-sans'); // Khmer
+    expect(getSignatureFontKey('ᠮᠣᠩᠭᠣᠯ')).toBe('noto-sans'); // Mongolian
+  });
+
   it('should return noto-sans-korean for Korean characters', async () => {
     const { getSignatureFontKey } = await import('./font-selection');
 

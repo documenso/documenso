@@ -26,13 +26,18 @@ const JAPANESE_REGEX = /[\p{Script=Hiragana}\p{Script=Katakana}]/u;
 // constant for the matching CSS fallback order in Konva paths.
 const CJK_REGEX = /\p{Script=Han}/u;
 
-// Scripts that Caveat does NOT support and need Noto Sans as a fallback.
-// Caveat itself covers Latin (basic + extended) and Cyrillic, so Cyrillic is
-// deliberately excluded here - keeping it routed to Caveat preserves the
-// handwriting style for Russian/Bulgarian/Serbian/etc. names. CJK, Japanese
-// kana, and Korean Hangul are matched by the more specific regexes above.
-const NON_CAVEAT_SCRIPT_REGEX =
-  /[\p{Script=Greek}\p{Script=Armenian}\p{Script=Hebrew}\p{Script=Arabic}\p{Script=Syriac}\p{Script=Thaana}\p{Script=Devanagari}\p{Script=Bengali}\p{Script=Gurmukhi}\p{Script=Gujarati}\p{Script=Oriya}\p{Script=Tamil}\p{Script=Telugu}\p{Script=Kannada}\p{Script=Malayalam}\p{Script=Sinhala}\p{Script=Thai}\p{Script=Lao}\p{Script=Tibetan}\p{Script=Myanmar}\p{Script=Georgian}]/u;
+// Matches any character that Caveat cannot render. The handwriting font covers
+// Latin (basic + extended) and Cyrillic; punctuation, whitespace, and digits
+// are mostly Script=Common (shared across all scripts) or Script=Inherited
+// (combining marks). Anything else - Greek, Hebrew, Arabic, Indic, Thai,
+// Ethiopic, Khmer, Mongolian, etc. - is foreign to Caveat and forces a Noto
+// Sans fallback. The regex is a negative character class against the
+// Caveat-compatible set rather than an enumerated list of "known" non-Caveat
+// scripts, so unlisted scripts never silently fall through to Caveat and
+// render as tofu. CJK ideographs and Japanese kana / Korean Hangul are
+// matched by the more specific regexes above and routed before this check.
+const CAVEAT_INCOMPATIBLE_REGEX =
+  /[^\p{Script=Latin}\p{Script=Cyrillic}\p{Script_Extensions=Common}\p{Script_Extensions=Inherited}]/u;
 
 /**
  * Determine which font to use for the given typed signature text.
@@ -66,7 +71,7 @@ export const getSignatureFontKey = (text: string): PdfFontKey => {
     return 'noto-sans-chinese';
   }
 
-  if (NON_CAVEAT_SCRIPT_REGEX.test(text)) {
+  if (CAVEAT_INCOMPATIBLE_REGEX.test(text)) {
     return 'noto-sans';
   }
 
