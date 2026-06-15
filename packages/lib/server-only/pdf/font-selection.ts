@@ -119,7 +119,7 @@ const fetchFontBytes = async (fontKey: PdfFontKey): Promise<ArrayBuffer> => {
     // diagnostics (some fetch implementations include the resolved URL or
     // host in `err.message`, which we don't want in the public AppError) and
     // throw the same AppError shape callers get for non-OK HTTP responses.
-    console.error('[fetchPdfFontBytes] network failure', { fontKey, fileName, err });
+    console.error('[font-selection] network failure fetching bundled font', { fontKey, fileName, err });
 
     throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
       message: `Failed to fetch bundled PDF font "${fontKey}" (file: ${fileName}, network error)`,
