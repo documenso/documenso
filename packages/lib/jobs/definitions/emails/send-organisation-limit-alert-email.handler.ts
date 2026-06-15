@@ -28,6 +28,16 @@ export const run = async ({
     },
     include: {
       organisationClaim: true,
+      monthlyStats: {
+        where: {
+          period: payload.period,
+        },
+        select: {
+          documentCount: true,
+          emailCount: true,
+          apiCount: true,
+        },
+      },
       members: {
         where: {
           organisationGroupMembers: {
@@ -119,6 +129,10 @@ export const run = async ({
       text: `
         Organisation: ${organisation.name}
         Organisation ID: ${organisation.id}
+        Organisation Claim Original ID: ${organisation.organisationClaim.originalSubscriptionClaimId}
+        Email Quota: ${organisation.monthlyStats[0]?.emailCount || 0}/${organisation.organisationClaim.emailQuota ?? 'Unlimited'}
+        API Quota: ${organisation.monthlyStats[0]?.apiCount || 0}/${organisation.organisationClaim.apiQuota ?? 'Unlimited'}
+        Document Quota: ${organisation.monthlyStats[0]?.documentCount || 0}/${organisation.organisationClaim.documentQuota ?? 'Unlimited'}
         Counter: ${payload.counter}
         Kind: ${payload.kind}
         Period: ${payload.period}
