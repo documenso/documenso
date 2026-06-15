@@ -12,7 +12,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
  * Caveat does not cover (Greek, Hebrew, Arabic, Indic, Thai, CJK, Japanese
  * kana, Korean Hangul, etc.).
  */
-export type SignatureFontKey = 'caveat' | 'noto-sans' | 'noto-sans-japanese' | 'noto-sans-chinese' | 'noto-sans-korean';
+export type PdfFontKey = 'caveat' | 'noto-sans' | 'noto-sans-japanese' | 'noto-sans-chinese' | 'noto-sans-korean';
 
 // Korean (Hangul) - covers Hangul Syllables, Hangul Jamo, and Hangul Compatibility Jamo.
 const KOREAN_REGEX = /\p{Script=Hangul}/u;
@@ -53,7 +53,7 @@ const NON_CAVEAT_SCRIPT_REGEX =
  * chain in `SIGNATURE_FONT_FAMILY`. A locale-aware override could improve this
  * if it ever becomes a noticeable problem.
  */
-export const getSignatureFontKey = (text: string): SignatureFontKey => {
+export const getSignatureFontKey = (text: string): PdfFontKey => {
   if (KOREAN_REGEX.test(text)) {
     return 'noto-sans-korean';
   }
@@ -73,7 +73,15 @@ export const getSignatureFontKey = (text: string): SignatureFontKey => {
   return 'caveat';
 };
 
-const FONT_FILE_MAP: Record<SignatureFontKey, string> = {
+// The TTFs listed here MUST ship at apps/remix/public/fonts/<filename> in every
+// deployment - the fetch below resolves against NEXT_PRIVATE_INTERNAL_WEBAPP_URL.
+// The same files are also declared by `@font-face` rules in apps/remix/app/app.css
+// and registered with skia-canvas via `FontLibrary.use(...)` in helpers.ts;
+// the family names in SIGNATURE_FONT_FAMILY (constants/pdf.ts) are the names
+// declared there, not the TTF's internal name table (which differs - e.g. the
+// Noto CJK files advertise as "Noto Sans JP/KR/SC"). If a font is added/removed
+// or renamed, update all three places to keep them in sync.
+const FONT_FILE_MAP: Record<PdfFontKey, string> = {
   caveat: 'caveat.ttf',
   'noto-sans': 'noto-sans.ttf',
   'noto-sans-japanese': 'noto-sans-japanese.ttf',
@@ -85,15 +93,15 @@ const FONT_FILE_MAP: Record<SignatureFontKey, string> = {
 // re-download multi-MB fonts. Storing the in-flight Promise also dedupes concurrent
 // fetches; on failure the entry is evicted so the next call can retry.
 //
-// Memory footprint is bounded by the SignatureFontKey enum (5 entries max).
+// Memory footprint is bounded by the PdfFontKey enum (5 entries max).
 // Worst case ~30MB if all three Noto CJK variants get loaded (~10MB each);
 // Caveat and Noto Sans regular together are <1MB. Once loaded, fonts stay in
 // memory for the process lifetime — a process restart (or container recycle)
 // is the only way to free them. For memory-constrained deployments this is
 // still a clear win over re-fetching multi-MB fonts on every sealed PDF.
-const fontCache = new Map<SignatureFontKey, Promise<ArrayBuffer>>();
+const fontCache = new Map<PdfFontKey, Promise<ArrayBuffer>>();
 
-const fetchFontBytes = async (fontKey: SignatureFontKey): Promise<ArrayBuffer> => {
+const fetchFontBytes = async (fontKey: PdfFontKey): Promise<ArrayBuffer> => {
   const fileName = FONT_FILE_MAP[fontKey];
   const fontUrl = `${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/${fileName}`;
   const res = await fetch(fontUrl);
@@ -115,7 +123,7 @@ const fetchFontBytes = async (fontKey: SignatureFontKey): Promise<ArrayBuffer> =
  * Fetch the font data (ArrayBuffer) for the given font key from the internal webapp URL.
  * Results are cached per process; failures are not cached.
  */
-export const fetchSignatureFont = async (fontKey: SignatureFontKey): Promise<ArrayBuffer> => {
+export const fetchSignatureFont = async (fontKey: PdfFontKey): Promise<ArrayBuffer> => {
   const cached = fontCache.get(fontKey);
 
   if (cached) {
@@ -156,7 +164,7 @@ export type EmbedPdfTextFontOptions = {
   disableContextualAlternates?: boolean;
 };
 
-const getEmbedCacheKey = (fontKey: SignatureFontKey, options?: EmbedPdfTextFontOptions): string =>
+const getEmbedCacheKey = (fontKey: PdfFontKey, options?: EmbedPdfTextFontOptions): string =>
   options?.disableContextualAlternates ? `${fontKey}:calt-off` : fontKey;
 
 /**
@@ -172,7 +180,7 @@ const getEmbedCacheKey = (fontKey: SignatureFontKey, options?: EmbedPdfTextFontO
  */
 export const embedPdfTextFont = async (
   pdf: PDFDocument,
-  fontKey: SignatureFontKey,
+  fontKey: PdfFontKey,
   options?: EmbedPdfTextFontOptions,
 ): Promise<PDFFont> => {
   const cacheKey = getEmbedCacheKey(fontKey, options);

@@ -20,6 +20,15 @@ export const CAVEAT_FONT_PATH = () => `${NEXT_PUBLIC_WEBAPP_URL()}/fonts/caveat.
  *   - "Noto Sans Japanese" Hiragana, Katakana
  *   - "Noto Sans Korean"  Hangul
  *
+ * The family names here are the ones declared by `@font-face` rules in
+ * `apps/remix/app/app.css` and registered with skia-canvas via
+ * `FontLibrary.use(...)` in `packages/lib/server-only/pdf/helpers.ts`.
+ * They do NOT necessarily match the TTF's internal name table - the shipped
+ * Noto CJK files advertise themselves as "Noto Sans JP/KR/SC" but are
+ * registered under the longer names below so the fallback chain resolves
+ * cleanly. Updating the TTFs (or renaming the @font-face declarations)
+ * requires updating this string too.
+ *
  * Multi-word family names are wrapped in double quotes so they parse as a
  * single family per the CSS font-family spec (otherwise strict parsers would
  * read "Noto Sans" as two families: "Noto" and "Sans").
