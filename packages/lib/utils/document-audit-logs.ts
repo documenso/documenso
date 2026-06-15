@@ -555,6 +555,18 @@ export const formatDocumentAuditLogAction = (
       you: msg({ message: `Document completed`, context: `Audit log format` }),
       user: msg({ message: `Document completed`, context: `Audit log format` }),
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED_EARLY }, ({ data }) => {
+      const count = data.pendingRecipients.length;
+
+      return {
+        anonymous: msg({
+          message: `Document finalized without all signatures (${count} recipient(s) had not signed)`,
+          context: `Audit log format`,
+        }),
+        you: msg`You finalized the document without all signatures (${count} recipient(s) had not signed)`,
+        user: msg`${user} finalized the document without all signatures (${count} recipient(s) had not signed)`,
+      };
+    })
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_CREATED }, ({ data }) => ({
       anonymous: msg({
         message: `Envelope item created`,

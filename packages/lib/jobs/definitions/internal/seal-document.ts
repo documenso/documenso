@@ -9,6 +9,13 @@ const SEAL_DOCUMENT_JOB_DEFINITION_SCHEMA = z.object({
   documentId: z.number(),
   sendEmail: z.boolean().optional(),
   isResealing: z.boolean().optional(),
+  /**
+   * When true, the document is being finalized by its owner before every
+   * required recipient has signed. The "all recipients signed" and "no unsigned
+   * required fields" gates are relaxed so the PDF is sealed with whatever
+   * signatures have been captured so far.
+   */
+  isEarlyCompletion: z.boolean().optional(),
   requestMetadata: ZRequestMetadataSchema.optional(),
 });
 

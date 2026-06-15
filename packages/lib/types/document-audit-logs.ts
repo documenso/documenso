@@ -29,6 +29,7 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
 
   // Document events.
   'DOCUMENT_COMPLETED', // When the document is sealed and fully completed.
+  'DOCUMENT_COMPLETED_EARLY', // When the owner finalizes the document before all requested recipients have signed.
   'DOCUMENT_CREATED', // When the document is created.
   'DOCUMENT_DELETED', // When the document is soft deleted.
   'DOCUMENT_FIELDS_AUTO_INSERTED', // When a field is auto inserted during send due to default values (radio/dropdown/checkbox).
@@ -259,6 +260,27 @@ export const ZDocumentAuditLogEventDocumentCompletedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED),
   data: z.object({
     transactionId: z.string(),
+  }),
+});
+
+/**
+ * Event: Document completed early.
+ *
+ * Recorded when the document owner finalizes a pending document before every
+ * requested recipient has signed. Captures which recipients had not signed at
+ * the time of finalization for the audit trail.
+ */
+export const ZDocumentAuditLogEventDocumentCompletedEarlySchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED_EARLY),
+  data: z.object({
+    pendingRecipients: z.array(
+      z.object({
+        recipientId: z.number(),
+        recipientName: z.string(),
+        recipientEmail: z.string(),
+        recipientRole: z.string(),
+      }),
+    ),
   }),
 });
 
@@ -766,6 +788,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventEnvelopeItemPdfReplacedSchema,
     ZDocumentAuditLogEventEmailSentSchema,
     ZDocumentAuditLogEventDocumentCompletedSchema,
+    ZDocumentAuditLogEventDocumentCompletedEarlySchema,
     ZDocumentAuditLogEventDocumentCreatedSchema,
     ZDocumentAuditLogEventDocumentDeletedSchema,
     ZDocumentAuditLogEventDocumentMovedToTeamSchema,

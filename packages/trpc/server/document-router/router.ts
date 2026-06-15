@@ -4,6 +4,7 @@ import { createAttachmentRoute } from './attachment/create-attachment';
 import { deleteAttachmentRoute } from './attachment/delete-attachment';
 import { findAttachmentsRoute } from './attachment/find-attachments';
 import { updateAttachmentRoute } from './attachment/update-attachment';
+import { completeDocumentRoute } from './complete-document';
 import { createDocumentRoute } from './create-document';
 import { createDocumentTemporaryRoute } from './create-document-temporary';
 import { deleteDocumentRoute } from './delete-document';
@@ -37,6 +38,7 @@ export const documentRouter = router({
   downloadCertificate: downloadDocumentCertificateRoute,
   distribute: distributeDocumentRoute,
   redistribute: redistributeDocumentRoute,
+  complete: completeDocumentRoute,
   search: searchDocumentRoute,
   share: shareDocumentRoute,
 

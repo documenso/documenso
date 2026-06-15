@@ -34,6 +34,7 @@ import {
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
 
+import { DocumentCompleteDialog } from '~/components/dialogs/document-complete-dialog';
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
 import { EnvelopeDeleteDialog } from '~/components/dialogs/envelope-delete-dialog';
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
@@ -99,6 +100,15 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
             <Pencil className="mr-2 h-4 w-4" />
             <Trans>Rename</Trans>
           </DropdownMenuItem>
+        )}
+
+        {canManageDocument && isPending && (
+          <DocumentCompleteDialog
+            documentId={mapSecondaryIdToDocumentId(envelope.secondaryId)}
+            status={envelope.status}
+            recipients={envelope.recipients}
+            canManageDocument={canManageDocument}
+          />
         )}
 
         <EnvelopeDownloadDialog

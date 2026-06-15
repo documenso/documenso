@@ -58,7 +58,13 @@ export const run = async ({
   payload: TSealDocumentJobDefinition;
   io: JobRunIO;
 }) => {
-  const { documentId, sendEmail = true, isResealing = false, requestMetadata } = payload;
+  const {
+    documentId,
+    sendEmail = true,
+    isResealing = false,
+    isEarlyCompletion = false,
+    requestMetadata,
+  } = payload;
 
   const { envelopeId, envelopeStatus, isRejected } = await io.runTask('seal-document', async () => {
     const envelope = await prisma.envelope.findFirstOrThrow({
@@ -120,7 +126,10 @@ export const run = async ({
           recipient.signingStatus === SigningStatus.SIGNED || recipient.role === RecipientRole.CC,
       );
 
-    if (!isComplete) {
+    // When the owner finalizes the document early we intentionally bypass the
+    // "every recipient has signed" gate so the document can complete with the
+    // signatures captured so far.
+    if (!isComplete && !isEarlyCompletion) {
       throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
         message: 'Document is not complete',
       });
@@ -148,8 +157,10 @@ export const run = async ({
     // Get the rejection reason from the rejected recipient
     const rejectionReason = rejectedRecipient?.rejectionReason ?? '';
 
-    // Skip the field check if the document is rejected
-    if (!isRejected && fieldsContainUnsignedRequiredField(fields)) {
+    // Skip the field check if the document is rejected, or if the owner is
+    // finalizing early (unsigned recipients legitimately leave required fields
+    // uninserted — those fields simply won't be sealed into the PDF).
+    if (!isRejected && !isEarlyCompletion && fieldsContainUnsignedRequiredField(fields)) {
       throw new Error(`Document ${envelope.id} has unsigned required fields`);
     }
 
@@ -208,12 +219,20 @@ export const run = async ({
     const newDocumentData: Array<{ oldDocumentDataId: string; newDocumentDataId: string }> = [];
 
     for (const { envelopeItem, pdfData } of prefetchedItems) {
-      const envelopeItemFields = envelope.envelopeItems.find(
+      let envelopeItemFields = envelope.envelopeItems.find(
         (item) => item.id === envelopeItem.id,
       )?.field;
 
       if (!envelopeItemFields) {
         throw new Error(`Envelope item fields not found for envelope item ${envelopeItem.id}`);
+      }
+
+      // When finalizing early, only seal the fields that were actually filled in.
+      // Fields belonging to recipients who never signed are left uninserted and
+      // must not be drawn onto the sealed PDF. (The V1 insertion path already
+      // guards on `field.inserted`; this protects the V2 overlay path.)
+      if (isEarlyCompletion) {
+        envelopeItemFields = envelopeItemFields.filter((field) => field.inserted);
       }
 
       let certificateDoc: PDF | null = null;
