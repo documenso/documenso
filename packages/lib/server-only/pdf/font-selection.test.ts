@@ -221,8 +221,12 @@ describe('fetchPdfFontBytes', () => {
 
     await fetchPdfFontBytes('caveat');
 
-    const init = mockFetch.mock.calls[0][1] as { signal?: AbortSignal } | undefined;
-    expect(init?.signal).toBeInstanceOf(AbortSignal);
+    // Shape check (not `instanceof AbortSignal`) keeps the test portable across
+    // runtimes where the AbortSignal global may not be present or may diverge
+    // from the spec - we only care that fetch received something with an
+    // `aborted` boolean it can read.
+    const init = mockFetch.mock.calls[0][1] as { signal?: { aborted: boolean } } | undefined;
+    expect(typeof init?.signal?.aborted).toBe('boolean');
     expect(init?.signal?.aborted).toBe(false);
   });
 

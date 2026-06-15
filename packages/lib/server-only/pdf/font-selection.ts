@@ -44,8 +44,7 @@ const CJK_REGEX = /\p{Script=Han}/u;
 // scripts, so unlisted scripts never silently fall through to Caveat and
 // render as tofu. CJK ideographs and Japanese kana / Korean Hangul are
 // matched by the more specific regexes above and routed before this check.
-const CAVEAT_INCOMPATIBLE_REGEX =
-  /[^\p{Script=Latin}\p{Script=Cyrillic}\p{Script_Extensions=Common}\p{Script_Extensions=Inherited}]/u;
+const CAVEAT_INCOMPATIBLE_REGEX = /[^\p{Script=Latin}\p{Script=Cyrillic}\p{Script=Common}\p{Script=Inherited}]/u;
 
 /**
  * Determine which font to use for the given typed signature text.
