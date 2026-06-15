@@ -1,0 +1,27 @@
+# Cloud Build config for building the Documenso container image.
+#
+# The Dockerfile lives at docker/Dockerfile (not the repo root), so `gcloud
+# builds submit --tag ...` can't be used directly — this config points the
+# build at the correct Dockerfile while keeping the repo root as the context.
+#
+# Usage (normally invoked by deploy/gcp/03-build.sh):
+#   gcloud builds submit --config=cloudbuild.yaml \
+#     --substitutions=_IMAGE=REGION-docker.pkg.dev/PROJECT/REPO/documenso:latest .
+
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --file=docker/Dockerfile
+      - --tag=${_IMAGE}
+      - .
+
+images:
+  - ${_IMAGE}
+
+options:
+  # The monorepo build (turbo prune + install + build) is CPU heavy; use a
+  # larger machine so it doesn't time out on the default worker.
+  machineType: E2_HIGHCPU_8
+
+timeout: 2400s

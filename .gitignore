@@ -74,3 +74,8 @@ tmp/
 
 # opencode
 .opencode/package-lock.json
+
+# gcp deployment (local config + generated certs/keys — never commit)
+deploy/gcp/config.sh
+deploy/gcp/*.p12
+deploy/gcp/*.pem
