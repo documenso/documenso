@@ -1,4 +1,4 @@
-import type { EmbedFontOptions, PDFDocument, PDFFont } from '@cantoo/pdf-lib';
+import type { PDFDocument, PDFFont } from '@cantoo/pdf-lib';
 
 import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -12,12 +12,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
  * Caveat does not cover (Greek, Hebrew, Arabic, Indic, Thai, CJK, Japanese
  * kana, Korean Hangul, etc.).
  */
-export type SignatureFontKey =
-  | 'caveat'
-  | 'noto-sans'
-  | 'noto-sans-japanese'
-  | 'noto-sans-chinese'
-  | 'noto-sans-korean';
+export type SignatureFontKey = 'caveat' | 'noto-sans' | 'noto-sans-japanese' | 'noto-sans-chinese' | 'noto-sans-korean';
 
 // Korean (Hangul) - covers Hangul Syllables, Hangul Jamo, and Hangul Compatibility Jamo.
 const KOREAN_REGEX = /\p{Script=Hangul}/u;
@@ -133,11 +128,25 @@ export const fetchSignatureFont = async (fontKey: SignatureFontKey): Promise<Arr
 // the PDFDocument is discarded.
 const embedCache = new WeakMap<PDFDocument, Map<string, Promise<PDFFont>>>();
 
-// Cache key must distinguish the same font embedded with different pdf-lib
-// options, since embed options affect the emitted glyph program. In practice
-// only `features.calt` varies (Caveat disables contextual alternates).
-const getEmbedCacheKey = (fontKey: SignatureFontKey, options?: EmbedFontOptions): string =>
-  options?.features?.calt === false ? `${fontKey}:calt-off` : fontKey;
+/**
+ * Embed options exposed by embedSignatureFont. Deliberately narrower than
+ * pdf-lib's full EmbedFontOptions so the cache key (which incorporates every
+ * relevant flag) can never go out of sync with the options actually passed to
+ * pdf-lib's embedFont. If new options become necessary, add a field here AND
+ * include it in getEmbedCacheKey so two different option sets don't alias to
+ * the same cached PDFFont.
+ */
+export type EmbedSignatureFontOptions = {
+  /**
+   * Disable Caveat's contextual alternates (calt) so signed text doesn't
+   * substitute connected-script glyphs at letter joins. Required when
+   * embedding Caveat for signatures.
+   */
+  disableContextualAlternates?: boolean;
+};
+
+const getEmbedCacheKey = (fontKey: SignatureFontKey, options?: EmbedSignatureFontOptions): string =>
+  options?.disableContextualAlternates ? `${fontKey}:calt-off` : fontKey;
 
 /**
  * Embed a signature font into the given PDFDocument, reusing a previously
@@ -148,7 +157,7 @@ const getEmbedCacheKey = (fontKey: SignatureFontKey, options?: EmbedFontOptions)
 export const embedSignatureFont = async (
   pdf: PDFDocument,
   fontKey: SignatureFontKey,
-  options?: EmbedFontOptions,
+  options?: EmbedSignatureFontOptions,
 ): Promise<PDFFont> => {
   const cacheKey = getEmbedCacheKey(fontKey, options);
 
@@ -165,7 +174,9 @@ export const embedSignatureFont = async (
     return cached;
   }
 
-  const promise = fetchSignatureFont(fontKey).then(async (bytes) => pdf.embedFont(bytes, options));
+  const pdfLibOptions = options?.disableContextualAlternates ? { features: { calt: false } } : undefined;
+
+  const promise = fetchSignatureFont(fontKey).then(async (bytes) => pdf.embedFont(bytes, pdfLibOptions));
 
   // Evict on failure so a subsequent call can retry. The catch is purely a
   // side effect - rejection still propagates to awaiters of `promise`.

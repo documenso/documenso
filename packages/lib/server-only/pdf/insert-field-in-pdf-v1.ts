@@ -110,15 +110,15 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
   }
 
   // Embeds the right font for a typed signature based on the script of the
-  // text. Image signatures render the embedded base64 image and don't need
-  // a font, so callers skip this when `signatureImageAsBase64` is present.
-  // embedSignatureFont caches embedded PDFFont instances per document so
-  // repeated calls for the same (font, options) pair are essentially free.
+  // text. Only called from the typed-signature branch below; image signatures
+  // render the embedded base64 image and never invoke this. embedSignatureFont
+  // caches embedded PDFFont instances per document so repeated calls for the
+  // same (font, options) pair are essentially free.
   const embedTypedSignatureFont = async (typedSignatureText: string): Promise<PDFFont> => {
     const signatureFontKey = getSignatureFontKey(typedSignatureText);
 
     return signatureFontKey === 'caveat'
-      ? embedSignatureFont(pdf, 'caveat', { features: { calt: false } })
+      ? embedSignatureFont(pdf, 'caveat', { disableContextualAlternates: true })
       : embedSignatureFont(pdf, signatureFontKey);
   };
 

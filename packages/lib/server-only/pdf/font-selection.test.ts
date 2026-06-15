@@ -63,6 +63,16 @@ describe('getSignatureFontKey', () => {
 
 // fetchSignatureFont and embedSignatureFont hold module-level caches, so each
 // test imports the module fresh via vi.resetModules() to start with empty caches.
+// Tests mock `fetch` to return a minimal fetch-like object (the shape
+// fetchSignatureFont actually depends on) instead of constructing
+// `new Response(...)`, so they don't require the global Response constructor
+// to be present in the test runtime.
+const mockFetchResponse = (bytes: Uint8Array, status: number) => ({
+  ok: status >= 200 && status < 300,
+  status,
+  arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
+});
+
 describe('fetchSignatureFont', () => {
   beforeEach(() => {
     vi.resetModules();
@@ -78,9 +88,7 @@ describe('fetchSignatureFont', () => {
   });
 
   it('fetches the font once and caches subsequent calls', async () => {
-    const mockFetch = vi
-      .fn()
-      .mockResolvedValue(new Response(new Uint8Array([0x42, 0x42, 0x42]), { status: 200 }));
+    const mockFetch = vi.fn().mockResolvedValue(mockFetchResponse(new Uint8Array([0x42, 0x42, 0x42]), 200));
 
     vi.stubGlobal('fetch', mockFetch);
 
@@ -96,9 +104,7 @@ describe('fetchSignatureFont', () => {
   });
 
   it('dedupes concurrent calls onto a single in-flight fetch', async () => {
-    const mockFetch = vi
-      .fn()
-      .mockResolvedValue(new Response(new Uint8Array([1, 2, 3]), { status: 200 }));
+    const mockFetch = vi.fn().mockResolvedValue(mockFetchResponse(new Uint8Array([1, 2, 3]), 200));
 
     vi.stubGlobal('fetch', mockFetch);
 
@@ -116,7 +122,7 @@ describe('fetchSignatureFont', () => {
   });
 
   it('throws AppError with descriptive message on non-ok response', async () => {
-    const mockFetch = vi.fn().mockResolvedValue(new Response('Not Found', { status: 404 }));
+    const mockFetch = vi.fn().mockResolvedValue(mockFetchResponse(new Uint8Array(0), 404));
 
     vi.stubGlobal('fetch', mockFetch);
 
@@ -136,8 +142,8 @@ describe('fetchSignatureFont', () => {
   it('evicts the cache entry on failure so subsequent calls retry', async () => {
     const mockFetch = vi
       .fn()
-      .mockResolvedValueOnce(new Response('Service Unavailable', { status: 503 }))
-      .mockResolvedValueOnce(new Response(new Uint8Array([7, 7, 7]), { status: 200 }));
+      .mockResolvedValueOnce(mockFetchResponse(new Uint8Array(0), 503))
+      .mockResolvedValueOnce(mockFetchResponse(new Uint8Array([7, 7, 7]), 200));
 
     vi.stubGlobal('fetch', mockFetch);
 
@@ -169,10 +175,7 @@ describe('embedSignatureFont', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.stubEnv('NEXT_PRIVATE_INTERNAL_WEBAPP_URL', 'http://internal.test');
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue(new Response(new Uint8Array([1, 2, 3]), { status: 200 })),
-    );
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockFetchResponse(new Uint8Array([1, 2, 3]), 200)));
   });
 
   afterEach(() => {
@@ -196,7 +199,7 @@ describe('embedSignatureFont', () => {
     const { embedSignatureFont } = await import('./font-selection');
     const pdf = createMockPdf();
 
-    const calted = await embedSignatureFont(pdf, 'caveat', { features: { calt: false } });
+    const calted = await embedSignatureFont(pdf, 'caveat', { disableContextualAlternates: true });
     const defaulted = await embedSignatureFont(pdf, 'caveat');
 
     expect(calted).not.toBe(defaulted);
@@ -223,9 +226,7 @@ describe('embedSignatureFont', () => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const embedMock = pdf.embedFont as unknown as ReturnType<typeof vi.fn>;
     embedMock.mockReset();
-    embedMock
-      .mockRejectedValueOnce(new Error('embed failed'))
-      .mockResolvedValueOnce(Symbol('embed-result'));
+    embedMock.mockRejectedValueOnce(new Error('embed failed')).mockResolvedValueOnce(Symbol('embed-result'));
 
     await expect(embedSignatureFont(pdf, 'noto-sans')).rejects.toThrow('embed failed');
 
