@@ -1,4 +1,4 @@
-import { ZNameSchema } from '@documenso/lib/constants/auth';
+import { ZNameSchema } from '@documenso/lib/types/name';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {

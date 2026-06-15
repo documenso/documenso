@@ -1,5 +1,5 @@
-import { ZNameSchema } from '@documenso/lib/constants/auth';
 import { ZFolderTypeSchema } from '@documenso/lib/types/folder-type';
+import { ZNameSchema } from '@documenso/lib/types/name';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { DocumentVisibility } from '@documenso/prisma/generated/types';
 import FolderSchema from '@documenso/prisma/generated/zod/modelSchema/FolderSchema';
