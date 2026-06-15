@@ -35,6 +35,9 @@ import { saveAsTemplateRoute } from './save-as-template';
 import { setEnvelopeFieldsRoute } from './set-envelope-fields';
 import { setEnvelopeRecipientsRoute } from './set-envelope-recipients';
 import { signEnvelopeFieldRoute } from './sign-envelope-field';
+import { getSigningTwoFactorStatusRoute } from './signing-2fa/get-signing-two-factor-status';
+import { issueSigningTwoFactorTokenRoute } from './signing-2fa/issue-signing-two-factor-token';
+import { verifySigningTwoFactorTokenRoute } from './signing-2fa/verify-signing-two-factor-token';
 import { signingStatusEnvelopeRoute } from './signing-status-envelope';
 import { updateEnvelopeRoute } from './update-envelope';
 import { updateEnvelopeItemsRoute } from './update-envelope-items';
@@ -99,5 +102,10 @@ export const envelopeRouter = router({
   saveAsTemplate: saveAsTemplateRoute,
   distribute: distributeEnvelopeRoute,
   redistribute: redistributeEnvelopeRoute,
+  signing2fa: {
+    issue: issueSigningTwoFactorTokenRoute,
+    verify: verifySigningTwoFactorTokenRoute,
+    getStatus: getSigningTwoFactorStatusRoute,
+  },
   signingStatus: signingStatusEnvelopeRoute,
 });
