@@ -8,7 +8,7 @@ msgstr ""
 "Language: nl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-06-09 05:23\n"
+"PO-Revision-Date: 2026-06-12 07:37\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -642,8 +642,8 @@ msgstr "{visibleRows, plural, one {# resultaat wordt getoond.} other {# resultat
 #. placeholder {0}: envelope.title
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
-msgid "<0>\"{0}\"</0>is no longer available to sign"
-msgstr "<0>\"{0}\"</0>is niet langer beschikbaar om te ondertekenen"
+msgid "<0>\"{0}\"</0> is no longer available to sign"
+msgstr "<0>\"{0}\"</0> is niet langer beschikbaar om te ondertekenen"
 
 #: packages/email/templates/organisation-account-link-confirmation.tsx
 msgid "<0>{organisationName}</0> has requested to create an account on your behalf."
@@ -5778,6 +5778,11 @@ msgctxt "Subscription status"
 msgid "Free"
 msgstr "Gratis"
 
+#: apps/remix/app/components/tables/user-billing-organisations-table.tsx
+msgctxt "Subscription status"
+msgid "Free (Pending)"
+msgstr "Gratis (in behandeling)"
+
 #: packages/lib/utils/fields.ts
 #: packages/ui/primitives/document-flow/types.ts
 msgid "Free Signature"
@@ -6146,6 +6151,7 @@ msgstr "Invoervelden identificeren"
 msgid "Identifying recipients"
 msgstr "Ontvangers identificeren"
 
+#: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "If there is any issue with your subscription, please contact us at <0>{SUPPORT_EMAIL}</0>."
 msgstr "Als er een probleem is met je abonnement, neem dan contact met ons op via <0>{SUPPORT_EMAIL}</0>."
@@ -6780,6 +6786,7 @@ msgstr "Sjabloon beheren en bekijken"
 msgid "Manage billing"
 msgstr "Facturering beheren"
 
+#: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgid "Manage Billing"
@@ -7973,6 +7980,11 @@ msgstr "Achterstallig"
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "Payment overdue"
 msgstr "Betaling achterstallig"
+
+#: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
+#: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
+msgid "Payment required"
+msgstr "Betaling vereist"
 
 #: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
 msgid "PDF Document"
@@ -11460,6 +11472,10 @@ msgstr "Dit item kan niet worden verwijderd"
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "This link is invalid or has expired. Please contact your team to resend a verification."
 msgstr "Deze link is ongeldig of verlopen. Neem contact op met je team om de verificatie opnieuw te laten verzenden."
+
+#: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
+msgid "This organisation is awaiting payment. Complete checkout to unlock it."
+msgstr "Deze organisatie wacht op betaling. Rond de betaling af om deze te ontgrendelen."
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "This organisation will have administrative control over your account. You can revoke this access later, but they will retain access to any data they've already collected."
