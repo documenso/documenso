@@ -1,60 +1,90 @@
 import type { PDFDocument } from '@cantoo/pdf-lib';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { getSignatureFontKey } from './font-selection';
-
+// The rest of this file uses `vi.resetModules()` + dynamic `await import(...)`
+// so each describe block starts with empty module-level caches in
+// `font-selection.ts`. The `getSignatureFontKey` suite below follows the same
+// pattern even though the function is pure today, so the whole file uses one
+// module-loading strategy and a future module-scope state addition can't
+// silently introduce cross-suite coupling.
 describe('getSignatureFontKey', () => {
-  it('should return caveat for Latin-only text', () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it('should return caveat for Latin-only text', async () => {
+    const { getSignatureFontKey } = await import('./font-selection');
+
     expect(getSignatureFontKey('John Doe')).toBe('caveat');
     expect(getSignatureFontKey('Jane Smith')).toBe('caveat');
     expect(getSignatureFontKey('')).toBe('caveat');
   });
 
-  it('should return noto-sans for Greek characters', () => {
+  it('should return noto-sans for Greek characters', async () => {
+    const { getSignatureFontKey } = await import('./font-selection');
+
     expect(getSignatureFontKey('Ελληνικά')).toBe('noto-sans');
     expect(getSignatureFontKey('αβγδ')).toBe('noto-sans');
     expect(getSignatureFontKey('Ωmega')).toBe('noto-sans');
   });
 
-  it('should return caveat for Cyrillic characters (Caveat covers Cyrillic)', () => {
+  it('should return caveat for Cyrillic characters (Caveat covers Cyrillic)', async () => {
+    const { getSignatureFontKey } = await import('./font-selection');
+
     expect(getSignatureFontKey('Кириллица')).toBe('caveat');
     expect(getSignatureFontKey('Иванов')).toBe('caveat');
   });
 
-  it('should return noto-sans when Cyrillic is mixed with another non-Caveat script', () => {
+  it('should return noto-sans when Cyrillic is mixed with another non-Caveat script', async () => {
+    const { getSignatureFontKey } = await import('./font-selection');
+
     // Greek wins because Caveat cannot render it, so the whole signature
     // must fall back to a font that covers both.
     expect(getSignatureFontKey('Иван Ωmega')).toBe('noto-sans');
   });
 
-  it('should return noto-sans for Arabic characters', () => {
+  it('should return noto-sans for Arabic characters', async () => {
+    const { getSignatureFontKey } = await import('./font-selection');
+
     expect(getSignatureFontKey('عربي')).toBe('noto-sans');
   });
 
-  it('should return noto-sans-korean for Korean characters', () => {
+  it('should return noto-sans-korean for Korean characters', async () => {
+    const { getSignatureFontKey } = await import('./font-selection');
+
     expect(getSignatureFontKey('도큐멘소')).toBe('noto-sans-korean');
     expect(getSignatureFontKey('한글')).toBe('noto-sans-korean');
   });
 
-  it('should return noto-sans-japanese for Japanese characters', () => {
+  it('should return noto-sans-japanese for Japanese characters', async () => {
+    const { getSignatureFontKey } = await import('./font-selection');
+
     expect(getSignatureFontKey('こんにちは')).toBe('noto-sans-japanese');
     expect(getSignatureFontKey('カタカナ')).toBe('noto-sans-japanese');
   });
 
-  it('should return noto-sans-chinese for Chinese characters', () => {
+  it('should return noto-sans-chinese for Chinese characters', async () => {
+    const { getSignatureFontKey } = await import('./font-selection');
+
     expect(getSignatureFontKey('中文签名')).toBe('noto-sans-chinese');
     expect(getSignatureFontKey('签署')).toBe('noto-sans-chinese');
   });
 
-  it('should prioritize Korean over CJK for mixed text', () => {
+  it('should prioritize Korean over CJK for mixed text', async () => {
+    const { getSignatureFontKey } = await import('./font-selection');
+
     expect(getSignatureFontKey('한글中文')).toBe('noto-sans-korean');
   });
 
-  it('should prioritize Japanese over CJK for mixed text', () => {
+  it('should prioritize Japanese over CJK for mixed text', async () => {
+    const { getSignatureFontKey } = await import('./font-selection');
+
     expect(getSignatureFontKey('ひらがな中文')).toBe('noto-sans-japanese');
   });
 
-  it('should handle Latin + non-Latin mixed text', () => {
+  it('should handle Latin + non-Latin mixed text', async () => {
+    const { getSignatureFontKey } = await import('./font-selection');
+
     expect(getSignatureFontKey('Hello 안녕')).toBe('noto-sans-korean');
     expect(getSignatureFontKey('Sign Ελληνικά')).toBe('noto-sans');
     expect(getSignatureFontKey('Name 中文')).toBe('noto-sans-chinese');
