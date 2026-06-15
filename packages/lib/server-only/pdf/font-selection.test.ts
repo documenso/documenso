@@ -170,6 +170,9 @@ describe('fetchPdfFontBytes', () => {
   });
 
   it('throws AppError when fetch itself rejects (network / DNS / timeout)', async () => {
+    // Deliberately suppress the console.error the SUT emits with the underlying
+    // network error so the test output stays clean.
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const mockFetch = vi.fn().mockRejectedValue(new TypeError('fetch failed: ECONNREFUSED'));
 
     vi.stubGlobal('fetch', mockFetch);
@@ -180,9 +183,34 @@ describe('fetchPdfFontBytes', () => {
     const promise = fetchPdfFontBytes('noto-sans-korean');
 
     await expect(promise).rejects.toBeInstanceOf(AppError);
+    // Message must NOT include the underlying err.message (which could
+    // include resolved URLs/hostnames in some fetch implementations).
     await expect(promise).rejects.toThrow(
-      /Failed to fetch bundled PDF font "noto-sans-korean" \(file: noto-sans-korean\.ttf, network error: fetch failed: ECONNREFUSED\)/,
+      /Failed to fetch bundled PDF font "noto-sans-korean" \(file: noto-sans-korean\.ttf, network error\)$/,
     );
+    expect(errorSpy).toHaveBeenCalled();
+  });
+
+  it('resetPdfFontBytesCache forces a fresh fetch on the next call', async () => {
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValueOnce(mockFetchResponse(new Uint8Array([1]), 200))
+      .mockResolvedValueOnce(mockFetchResponse(new Uint8Array([2]), 200));
+
+    vi.stubGlobal('fetch', mockFetch);
+
+    const { fetchPdfFontBytes, resetPdfFontBytesCache } = await import('./font-selection');
+
+    await fetchPdfFontBytes('caveat');
+    await fetchPdfFontBytes('caveat');
+
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+
+    resetPdfFontBytesCache();
+
+    await fetchPdfFontBytes('caveat');
+
+    expect(mockFetch).toHaveBeenCalledTimes(2);
   });
 
   it('evicts the cache entry on failure so subsequent calls retry', async () => {

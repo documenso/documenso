@@ -114,13 +114,15 @@ const fetchFontBytes = async (fontKey: PdfFontKey): Promise<ArrayBuffer> => {
   try {
     res = await fetch(fontUrl);
   } catch (err) {
-    // Network-level failure (DNS, TCP, timeout, CORS, etc.) — fetch throws
-    // before producing a Response. Wrap so callers see the same AppError
-    // shape they get for non-OK HTTP responses.
-    const cause = err instanceof Error ? `: ${err.message}` : '';
+    // Network-level failure (DNS, TCP, timeout, CORS, etc.) - fetch throws
+    // before producing a Response. Log the underlying error server-side for
+    // diagnostics (some fetch implementations include the resolved URL or
+    // host in `err.message`, which we don't want in the public AppError) and
+    // throw the same AppError shape callers get for non-OK HTTP responses.
+    console.error('[fetchPdfFontBytes] network failure', { fontKey, fileName, err });
 
     throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-      message: `Failed to fetch bundled PDF font "${fontKey}" (file: ${fileName}, network error${cause})`,
+      message: `Failed to fetch bundled PDF font "${fontKey}" (file: ${fileName}, network error)`,
     });
   }
 
@@ -131,6 +133,19 @@ const fetchFontBytes = async (fontKey: PdfFontKey): Promise<ArrayBuffer> => {
   }
 
   return res.arrayBuffer();
+};
+
+/**
+ * Clear the process-level bundled-font byte cache. Intended for operational
+ * tooling or tests that need to force a re-fetch (e.g. after the deployed
+ * fonts are updated without a process restart, or to free memory in a
+ * constrained environment between long-idle periods). Not used in the
+ * normal production code path - sealing a document never needs to call
+ * this. The per-document embed cache is GC'd alongside the PDFDocument
+ * and doesn't need explicit clearing.
+ */
+export const resetPdfFontBytesCache = (): void => {
+  fontCache.clear();
 };
 
 /**
