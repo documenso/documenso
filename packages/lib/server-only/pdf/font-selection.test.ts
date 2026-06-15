@@ -143,7 +143,9 @@ describe('fetchPdfFontBytes', () => {
     expect(a.byteLength).toBe(3);
     expect(b.byteLength).toBe(3);
     expect(mockFetch).toHaveBeenCalledTimes(1);
-    expect(mockFetch).toHaveBeenCalledWith('http://internal.test/fonts/caveat.ttf');
+    // fetch is called with the URL plus a `{ signal }` init for the abort
+    // timeout - assert against the URL specifically.
+    expect(mockFetch).toHaveBeenCalledWith('http://internal.test/fonts/caveat.ttf', expect.anything());
   });
 
   it('dedupes concurrent calls onto a single in-flight fetch', async () => {
@@ -183,15 +185,16 @@ describe('fetchPdfFontBytes', () => {
   });
 
   it('throws AppError when fetch itself rejects (network / DNS / timeout)', async () => {
-    // Deliberately suppress the console.error the SUT emits with the underlying
-    // network error so the test output stays clean.
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const mockFetch = vi.fn().mockRejectedValue(new TypeError('fetch failed: ECONNREFUSED'));
 
     vi.stubGlobal('fetch', mockFetch);
 
     const { fetchPdfFontBytes } = await import('./font-selection');
     const { AppError } = await import('../../errors/app-error');
+    const { logger } = await import('../../utils/logger');
+
+    // Suppress the project logger output while still asserting it was called.
+    const logErrorSpy = vi.spyOn(logger, 'error').mockImplementation(() => logger);
 
     const promise = fetchPdfFontBytes('noto-sans-korean');
 
@@ -201,7 +204,26 @@ describe('fetchPdfFontBytes', () => {
     await expect(promise).rejects.toThrow(
       /Failed to fetch bundled PDF font "noto-sans-korean" \(file: noto-sans-korean\.ttf, network error\)$/,
     );
-    expect(errorSpy).toHaveBeenCalled();
+    expect(logErrorSpy).toHaveBeenCalled();
+  });
+
+  it('passes an AbortSignal to fetch so a hung request can be cancelled', async () => {
+    // Verify the SUT wires up an AbortSignal on every fetch. The fact that
+    // the signal eventually fires (via setTimeout) is straightforward setTimeout
+    // + AbortController plumbing - not worth a fake-timers test that risks
+    // unhandled rejections; the contract that matters is "fetch receives a
+    // signal" so it CAN be aborted.
+    const mockFetch = vi.fn().mockResolvedValue(mockFetchResponse(new Uint8Array([1]), 200));
+
+    vi.stubGlobal('fetch', mockFetch);
+
+    const { fetchPdfFontBytes } = await import('./font-selection');
+
+    await fetchPdfFontBytes('caveat');
+
+    const init = mockFetch.mock.calls[0][1] as { signal?: AbortSignal } | undefined;
+    expect(init?.signal).toBeInstanceOf(AbortSignal);
+    expect(init?.signal?.aborted).toBe(false);
   });
 
   it('resetPdfFontBytesCache forces a fresh fetch on the next call', async () => {

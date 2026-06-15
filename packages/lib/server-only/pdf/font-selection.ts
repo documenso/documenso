@@ -2,6 +2,14 @@ import type { PDFDocument, PDFFont } from '@cantoo/pdf-lib';
 
 import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { logger } from '../../utils/logger';
+
+// Time budget for fetching a bundled font over the internal webapp URL.
+// Internal-network roundtrip should be milliseconds; 10s is comfortably
+// above that and below any reasonable seal-document job timeout, so a
+// hung request aborts cleanly instead of pinning a rejected-Promise cache
+// entry and blocking every subsequent caller.
+const FONT_FETCH_TIMEOUT_MS = 10_000;
 
 /**
  * Detect the script category of a text string to select the appropriate font
@@ -114,30 +122,45 @@ const fetchFontBytes = async (fontKey: PdfFontKey): Promise<ArrayBuffer> => {
   // below so internal hostnames/topology don't leak if the error propagates
   // to a client-visible surface. The file name is enough to identify which
   // font is missing; the full URL is available in server-side request logs.
-  let res: Response;
+
+  // AbortController gives the fetch a hard time budget. Without it a hung
+  // connection would pin a never-resolving Promise in fontCache and block
+  // every subsequent caller; on abort the catch below evicts the cache via
+  // the wrapper in fetchPdfFontBytes.
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), FONT_FETCH_TIMEOUT_MS);
 
   try {
-    res = await fetch(fontUrl);
+    const res = await fetch(fontUrl, { signal: controller.signal });
+
+    if (!res.ok) {
+      throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+        message: `Failed to fetch bundled PDF font "${fontKey}" (file: ${fileName}, status: ${res.status})`,
+      });
+    }
+
+    return await res.arrayBuffer();
   } catch (err) {
-    // Network-level failure (DNS, TCP, timeout, CORS, etc.) - fetch throws
-    // before producing a Response. Log the underlying error server-side for
-    // diagnostics (some fetch implementations include the resolved URL or
-    // host in `err.message`, which we don't want in the public AppError) and
-    // throw the same AppError shape callers get for non-OK HTTP responses.
-    console.error('[font-selection] network failure fetching bundled font', { fontKey, fileName, err });
+    // Re-throw our own AppError untouched so the non-OK branch above keeps
+    // its specific status message.
+    if (err instanceof AppError) {
+      throw err;
+    }
+
+    // Network-level failure (DNS, TCP, timeout/abort, CORS, etc.) - fetch
+    // threw before producing a usable Response. Log the underlying error
+    // through the project logger for diagnostics (some fetch implementations
+    // include the resolved URL or host in `err.message`, which we don't want
+    // in the public AppError) and throw the same AppError shape callers get
+    // for non-OK HTTP responses.
+    logger.error({ fontKey, fileName, err }, '[font-selection] network failure fetching bundled font');
 
     throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
       message: `Failed to fetch bundled PDF font "${fontKey}" (file: ${fileName}, network error)`,
     });
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  if (!res.ok) {
-    throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-      message: `Failed to fetch bundled PDF font "${fontKey}" (file: ${fileName}, status: ${res.status})`,
-    });
-  }
-
-  return res.arrayBuffer();
 };
 
 /**
