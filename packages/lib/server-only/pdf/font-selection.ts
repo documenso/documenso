@@ -84,6 +84,13 @@ const FONT_FILE_MAP: Record<SignatureFontKey, string> = {
 // Process-level cache so repeated signature insertions (one call per field) don't
 // re-download multi-MB fonts. Storing the in-flight Promise also dedupes concurrent
 // fetches; on failure the entry is evicted so the next call can retry.
+//
+// Memory footprint is bounded by the SignatureFontKey enum (5 entries max).
+// Worst case ~30MB if all three Noto CJK variants get loaded (~10MB each);
+// Caveat and Noto Sans regular together are <1MB. Once loaded, fonts stay in
+// memory for the process lifetime — a process restart (or container recycle)
+// is the only way to free them. For memory-constrained deployments this is
+// still a clear win over re-fetching multi-MB fonts on every sealed PDF.
 const fontCache = new Map<SignatureFontKey, Promise<ArrayBuffer>>();
 
 const fetchFontBytes = async (fontKey: SignatureFontKey): Promise<ArrayBuffer> => {
@@ -92,8 +99,12 @@ const fetchFontBytes = async (fontKey: SignatureFontKey): Promise<ArrayBuffer> =
   const res = await fetch(fontUrl);
 
   if (!res.ok) {
+    // Deliberately exclude the full fetch URL from the public AppError message
+    // so internal hostnames/topology don't leak if the error propagates to a
+    // client-visible surface. The file name is enough to identify which font
+    // is missing; the full URL is available in server-side request logs.
     throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-      message: `Failed to fetch signature font "${fontKey}" (status: ${res.status}, url: ${fontUrl})`,
+      message: `Failed to fetch signature font "${fontKey}" (file: ${fileName}, status: ${res.status})`,
     });
   }
 
@@ -129,14 +140,14 @@ export const fetchSignatureFont = async (fontKey: SignatureFontKey): Promise<Arr
 const embedCache = new WeakMap<PDFDocument, Map<string, Promise<PDFFont>>>();
 
 /**
- * Embed options exposed by embedSignatureFont. Deliberately narrower than
+ * Embed options exposed by embedPdfTextFont. Deliberately narrower than
  * pdf-lib's full EmbedFontOptions so the cache key (which incorporates every
  * relevant flag) can never go out of sync with the options actually passed to
  * pdf-lib's embedFont. If new options become necessary, add a field here AND
  * include it in getEmbedCacheKey so two different option sets don't alias to
  * the same cached PDFFont.
  */
-export type EmbedSignatureFontOptions = {
+export type EmbedPdfTextFontOptions = {
   /**
    * Disable Caveat's contextual alternates (calt) so signed text doesn't
    * substitute connected-script glyphs at letter joins. Required when
@@ -145,19 +156,24 @@ export type EmbedSignatureFontOptions = {
   disableContextualAlternates?: boolean;
 };
 
-const getEmbedCacheKey = (fontKey: SignatureFontKey, options?: EmbedSignatureFontOptions): string =>
+const getEmbedCacheKey = (fontKey: SignatureFontKey, options?: EmbedPdfTextFontOptions): string =>
   options?.disableContextualAlternates ? `${fontKey}:calt-off` : fontKey;
 
 /**
- * Embed a signature font into the given PDFDocument, reusing a previously
- * embedded PDFFont if the same (document, fontKey, options) combination has
- * already been embedded. The caller must have already registered fontkit
- * on the document via `pdf.registerFontkit(fontkit)`.
+ * Embed one of the bundled signature fonts into the given PDFDocument and
+ * return the resulting PDFFont. Caches results per (document, fontKey,
+ * options) so repeated calls within the same PDF reuse a single embedded
+ * font stream — important when sealing a document with many fields.
+ *
+ * Also used for non-signature text fields (Noto Sans for name / email /
+ * date / text / checkbox / radio labels) since they share the same font
+ * inventory. The caller must have already registered fontkit on the
+ * document via `pdf.registerFontkit(fontkit)`.
  */
-export const embedSignatureFont = async (
+export const embedPdfTextFont = async (
   pdf: PDFDocument,
   fontKey: SignatureFontKey,
-  options?: EmbedSignatureFontOptions,
+  options?: EmbedPdfTextFontOptions,
 ): Promise<PDFFont> => {
   const cacheKey = getEmbedCacheKey(fontKey, options);
 
@@ -187,4 +203,23 @@ export const embedSignatureFont = async (
   perDocCache.set(cacheKey, promise);
 
   return promise;
+};
+
+/**
+ * Embed the right font for a typed signature based on the script of the text.
+ * Picks Caveat (with contextual alternates disabled) for Latin/Cyrillic and
+ * the matching Noto Sans variant for everything else. The decision lives here
+ * so the policy stays consistent across any PDF insertion path that renders
+ * typed signatures.
+ *
+ * Cached per (document, fontKey, options) via `embedPdfTextFont`, so repeated
+ * calls for the same text/document return the same PDFFont reference. The
+ * caller must have already registered fontkit on the document.
+ */
+export const embedTypedSignatureFont = async (pdf: PDFDocument, typedSignatureText: string): Promise<PDFFont> => {
+  const fontKey = getSignatureFontKey(typedSignatureText);
+
+  return fontKey === 'caveat'
+    ? embedPdfTextFont(pdf, 'caveat', { disableContextualAlternates: true })
+    : embedPdfTextFont(pdf, fontKey);
 };

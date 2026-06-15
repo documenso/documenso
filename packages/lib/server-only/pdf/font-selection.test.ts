@@ -61,7 +61,7 @@ describe('getSignatureFontKey', () => {
   });
 });
 
-// fetchSignatureFont and embedSignatureFont hold module-level caches, so each
+// fetchSignatureFont and embedPdfTextFont hold module-level caches, so each
 // test imports the module fresh via vi.resetModules() to start with empty caches.
 // Tests mock `fetch` to return a minimal fetch-like object (the shape
 // fetchSignatureFont actually depends on) instead of constructing
@@ -135,7 +135,7 @@ describe('fetchSignatureFont', () => {
 
     await expect(promise).rejects.toBeInstanceOf(AppError);
     await expect(promise).rejects.toThrow(
-      /Failed to fetch signature font "noto-sans-chinese" \(status: 404, url: http:\/\/internal\.test\/fonts\/noto-sans-chinese\.ttf\)/,
+      /Failed to fetch signature font "noto-sans-chinese" \(file: noto-sans-chinese\.ttf, status: 404\)/,
     );
   });
 
@@ -158,7 +158,7 @@ describe('fetchSignatureFont', () => {
   });
 });
 
-describe('embedSignatureFont', () => {
+describe('embedPdfTextFont', () => {
   // Mock just the embedFont method we need. Each call returns a unique Symbol
   // so callers can compare references to verify cache hits and misses without
   // exercising real pdf-lib internals (already covered by pdf-lib's own tests).
@@ -185,34 +185,34 @@ describe('embedSignatureFont', () => {
   });
 
   it('embeds once per (document, fontKey) and returns the same PDFFont reference', async () => {
-    const { embedSignatureFont } = await import('./font-selection');
+    const { embedPdfTextFont } = await import('./font-selection');
     const pdf = createMockPdf();
 
-    const a = await embedSignatureFont(pdf, 'caveat');
-    const b = await embedSignatureFont(pdf, 'caveat');
+    const a = await embedPdfTextFont(pdf, 'caveat');
+    const b = await embedPdfTextFont(pdf, 'caveat');
 
     expect(a).toBe(b);
     expect(pdf.embedFont).toHaveBeenCalledTimes(1);
   });
 
   it('keys the cache separately for different options (calt-off vs default)', async () => {
-    const { embedSignatureFont } = await import('./font-selection');
+    const { embedPdfTextFont } = await import('./font-selection');
     const pdf = createMockPdf();
 
-    const calted = await embedSignatureFont(pdf, 'caveat', { disableContextualAlternates: true });
-    const defaulted = await embedSignatureFont(pdf, 'caveat');
+    const calted = await embedPdfTextFont(pdf, 'caveat', { disableContextualAlternates: true });
+    const defaulted = await embedPdfTextFont(pdf, 'caveat');
 
     expect(calted).not.toBe(defaulted);
     expect(pdf.embedFont).toHaveBeenCalledTimes(2);
   });
 
   it('uses separate caches per PDFDocument', async () => {
-    const { embedSignatureFont } = await import('./font-selection');
+    const { embedPdfTextFont } = await import('./font-selection');
     const pdfA = createMockPdf();
     const pdfB = createMockPdf();
 
-    const fontA = await embedSignatureFont(pdfA, 'noto-sans');
-    const fontB = await embedSignatureFont(pdfB, 'noto-sans');
+    const fontA = await embedPdfTextFont(pdfA, 'noto-sans');
+    const fontB = await embedPdfTextFont(pdfB, 'noto-sans');
 
     expect(fontA).not.toBe(fontB);
     expect(pdfA.embedFont).toHaveBeenCalledTimes(1);
@@ -220,7 +220,7 @@ describe('embedSignatureFont', () => {
   });
 
   it('evicts the cache entry on embed failure so subsequent calls retry', async () => {
-    const { embedSignatureFont } = await import('./font-selection');
+    const { embedPdfTextFont } = await import('./font-selection');
     const pdf = createMockPdf();
 
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -228,11 +228,61 @@ describe('embedSignatureFont', () => {
     embedMock.mockReset();
     embedMock.mockRejectedValueOnce(new Error('embed failed')).mockResolvedValueOnce(Symbol('embed-result'));
 
-    await expect(embedSignatureFont(pdf, 'noto-sans')).rejects.toThrow('embed failed');
+    await expect(embedPdfTextFont(pdf, 'noto-sans')).rejects.toThrow('embed failed');
 
-    const font = await embedSignatureFont(pdf, 'noto-sans');
+    const font = await embedPdfTextFont(pdf, 'noto-sans');
 
     expect(font).toBeDefined();
     expect(pdf.embedFont).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('embedTypedSignatureFont', () => {
+  const createMockPdf = () => {
+    // eslint-disable-next-line @typescript-eslint/require-await
+    const embedFont = vi.fn(async () => Symbol('embed-result'));
+
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    return { embedFont } as unknown as PDFDocument;
+  };
+
+  beforeEach(() => {
+    vi.resetModules();
+    vi.stubEnv('NEXT_PRIVATE_INTERNAL_WEBAPP_URL', 'http://internal.test');
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockFetchResponse(new Uint8Array([1, 2, 3]), 200)));
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it('embeds Caveat with contextual alternates disabled for Latin text', async () => {
+    const { embedTypedSignatureFont } = await import('./font-selection');
+    const pdf = createMockPdf();
+
+    await embedTypedSignatureFont(pdf, 'John Doe');
+
+    expect(pdf.embedFont).toHaveBeenCalledTimes(1);
+    expect(pdf.embedFont).toHaveBeenCalledWith(expect.anything(), { features: { calt: false } });
+  });
+
+  it('embeds Caveat for Cyrillic text (Caveat covers Cyrillic)', async () => {
+    const { embedTypedSignatureFont } = await import('./font-selection');
+    const pdf = createMockPdf();
+
+    await embedTypedSignatureFont(pdf, 'Иванов');
+
+    expect(pdf.embedFont).toHaveBeenCalledWith(expect.anything(), { features: { calt: false } });
+  });
+
+  it('embeds the Noto Sans variant without calt-off for non-Caveat scripts', async () => {
+    const { embedTypedSignatureFont } = await import('./font-selection');
+    const pdf = createMockPdf();
+
+    await embedTypedSignatureFont(pdf, '도큐멘소');
+
+    expect(pdf.embedFont).toHaveBeenCalledWith(expect.anything(), undefined);
   });
 });
