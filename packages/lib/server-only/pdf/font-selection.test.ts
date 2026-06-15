@@ -91,10 +91,10 @@ describe('getSignatureFontKey', () => {
   });
 });
 
-// fetchSignatureFont and embedPdfTextFont hold module-level caches, so each
+// fetchPdfFontBytes and embedPdfTextFont hold module-level caches, so each
 // test imports the module fresh via vi.resetModules() to start with empty caches.
 // Tests mock `fetch` to return a minimal fetch-like object (the shape
-// fetchSignatureFont actually depends on) instead of constructing
+// fetchPdfFontBytes actually depends on) instead of constructing
 // `new Response(...)`, so they don't require the global Response constructor
 // to be present in the test runtime.
 const mockFetchResponse = (bytes: Uint8Array, status: number) => ({
@@ -103,7 +103,7 @@ const mockFetchResponse = (bytes: Uint8Array, status: number) => ({
   arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
 });
 
-describe('fetchSignatureFont', () => {
+describe('fetchPdfFontBytes', () => {
   beforeEach(() => {
     vi.resetModules();
     // vi.stubEnv is reversed by vi.unstubAllEnvs in afterEach so we don't leak
@@ -122,10 +122,10 @@ describe('fetchSignatureFont', () => {
 
     vi.stubGlobal('fetch', mockFetch);
 
-    const { fetchSignatureFont } = await import('./font-selection');
+    const { fetchPdfFontBytes } = await import('./font-selection');
 
-    const a = await fetchSignatureFont('caveat');
-    const b = await fetchSignatureFont('caveat');
+    const a = await fetchPdfFontBytes('caveat');
+    const b = await fetchPdfFontBytes('caveat');
 
     expect(a.byteLength).toBe(3);
     expect(b.byteLength).toBe(3);
@@ -138,12 +138,12 @@ describe('fetchSignatureFont', () => {
 
     vi.stubGlobal('fetch', mockFetch);
 
-    const { fetchSignatureFont } = await import('./font-selection');
+    const { fetchPdfFontBytes } = await import('./font-selection');
 
     const [a, b, c] = await Promise.all([
-      fetchSignatureFont('noto-sans'),
-      fetchSignatureFont('noto-sans'),
-      fetchSignatureFont('noto-sans'),
+      fetchPdfFontBytes('noto-sans'),
+      fetchPdfFontBytes('noto-sans'),
+      fetchPdfFontBytes('noto-sans'),
     ]);
 
     expect(a).toBe(b);
@@ -158,14 +158,30 @@ describe('fetchSignatureFont', () => {
 
     // Both modules must come from the freshly-reset module graph - the static
     // AppError class identity differs from the dynamic one after resetModules.
-    const { fetchSignatureFont } = await import('./font-selection');
+    const { fetchPdfFontBytes } = await import('./font-selection');
     const { AppError } = await import('../../errors/app-error');
 
-    const promise = fetchSignatureFont('noto-sans-chinese');
+    const promise = fetchPdfFontBytes('noto-sans-chinese');
 
     await expect(promise).rejects.toBeInstanceOf(AppError);
     await expect(promise).rejects.toThrow(
-      /Failed to fetch signature font "noto-sans-chinese" \(file: noto-sans-chinese\.ttf, status: 404\)/,
+      /Failed to fetch bundled PDF font "noto-sans-chinese" \(file: noto-sans-chinese\.ttf, status: 404\)/,
+    );
+  });
+
+  it('throws AppError when fetch itself rejects (network / DNS / timeout)', async () => {
+    const mockFetch = vi.fn().mockRejectedValue(new TypeError('fetch failed: ECONNREFUSED'));
+
+    vi.stubGlobal('fetch', mockFetch);
+
+    const { fetchPdfFontBytes } = await import('./font-selection');
+    const { AppError } = await import('../../errors/app-error');
+
+    const promise = fetchPdfFontBytes('noto-sans-korean');
+
+    await expect(promise).rejects.toBeInstanceOf(AppError);
+    await expect(promise).rejects.toThrow(
+      /Failed to fetch bundled PDF font "noto-sans-korean" \(file: noto-sans-korean\.ttf, network error: fetch failed: ECONNREFUSED\)/,
     );
   });
 
@@ -177,11 +193,11 @@ describe('fetchSignatureFont', () => {
 
     vi.stubGlobal('fetch', mockFetch);
 
-    const { fetchSignatureFont } = await import('./font-selection');
+    const { fetchPdfFontBytes } = await import('./font-selection');
 
-    await expect(fetchSignatureFont('noto-sans-japanese')).rejects.toThrow();
+    await expect(fetchPdfFontBytes('noto-sans-japanese')).rejects.toThrow();
 
-    const bytes = await fetchSignatureFont('noto-sans-japanese');
+    const bytes = await fetchPdfFontBytes('noto-sans-japanese');
 
     expect(bytes.byteLength).toBe(3);
     expect(mockFetch).toHaveBeenCalledTimes(2);

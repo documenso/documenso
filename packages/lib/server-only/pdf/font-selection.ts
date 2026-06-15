@@ -104,15 +104,29 @@ const fontCache = new Map<PdfFontKey, Promise<ArrayBuffer>>();
 const fetchFontBytes = async (fontKey: PdfFontKey): Promise<ArrayBuffer> => {
   const fileName = FONT_FILE_MAP[fontKey];
   const fontUrl = `${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/${fileName}`;
-  const res = await fetch(fontUrl);
+
+  // Deliberately exclude the full fetch URL from the public AppError messages
+  // below so internal hostnames/topology don't leak if the error propagates
+  // to a client-visible surface. The file name is enough to identify which
+  // font is missing; the full URL is available in server-side request logs.
+  let res: Response;
+
+  try {
+    res = await fetch(fontUrl);
+  } catch (err) {
+    // Network-level failure (DNS, TCP, timeout, CORS, etc.) — fetch throws
+    // before producing a Response. Wrap so callers see the same AppError
+    // shape they get for non-OK HTTP responses.
+    const cause = err instanceof Error ? `: ${err.message}` : '';
+
+    throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+      message: `Failed to fetch bundled PDF font "${fontKey}" (file: ${fileName}, network error${cause})`,
+    });
+  }
 
   if (!res.ok) {
-    // Deliberately exclude the full fetch URL from the public AppError message
-    // so internal hostnames/topology don't leak if the error propagates to a
-    // client-visible surface. The file name is enough to identify which font
-    // is missing; the full URL is available in server-side request logs.
     throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-      message: `Failed to fetch signature font "${fontKey}" (file: ${fileName}, status: ${res.status})`,
+      message: `Failed to fetch bundled PDF font "${fontKey}" (file: ${fileName}, status: ${res.status})`,
     });
   }
 
@@ -120,10 +134,13 @@ const fetchFontBytes = async (fontKey: PdfFontKey): Promise<ArrayBuffer> => {
 };
 
 /**
- * Fetch the font data (ArrayBuffer) for the given font key from the internal webapp URL.
+ * Fetch the bytes of one of the bundled PDF text fonts (Caveat / Noto Sans /
+ * Noto Sans CJK / JP / KR) from the internal webapp URL. Used by
+ * `embedPdfTextFont` for every text field type, not just typed signatures.
+ *
  * Results are cached per process; failures are not cached.
  */
-export const fetchSignatureFont = async (fontKey: PdfFontKey): Promise<ArrayBuffer> => {
+export const fetchPdfFontBytes = async (fontKey: PdfFontKey): Promise<ArrayBuffer> => {
   const cached = fontCache.get(fontKey);
 
   if (cached) {
@@ -200,7 +217,7 @@ export const embedPdfTextFont = async (
 
   const pdfLibOptions = options?.disableContextualAlternates ? { features: { calt: false } } : undefined;
 
-  const promise = fetchSignatureFont(fontKey).then(async (bytes) => pdf.embedFont(bytes, pdfLibOptions));
+  const promise = fetchPdfFontBytes(fontKey).then(async (bytes) => pdf.embedFont(bytes, pdfLibOptions));
 
   // Evict on failure so a subsequent call can retry. The catch is purely a
   // side effect - rejection still propagates to awaiters of `promise`.
