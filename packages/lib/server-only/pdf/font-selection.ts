@@ -148,7 +148,11 @@ const fontCache = new Map<PdfFontKey, Promise<ArrayBuffer>>();
 
 const fetchFontBytes = async (fontKey: PdfFontKey): Promise<ArrayBuffer> => {
   const fileName = FONT_FILE_MAP[fontKey];
-  const fontUrl = `${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/${fileName}`;
+  // Build the URL via the WHATWG URL API rather than string interpolation so a
+  // trailing slash on NEXT_PRIVATE_INTERNAL_WEBAPP_URL doesn't produce a
+  // double-slash and so reserved characters in the (statically-known) file
+  // name are still encoded correctly.
+  const fontUrl = new URL(`/fonts/${fileName}`, NEXT_PRIVATE_INTERNAL_WEBAPP_URL()).toString();
 
   // Deliberately exclude the full fetch URL from the public AppError messages
   // below so internal hostnames/topology don't leak if the error propagates

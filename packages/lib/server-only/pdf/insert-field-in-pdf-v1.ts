@@ -110,10 +110,13 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
   }
 
   // Default text font for non-signature fields (text, name, email, date,
-  // checkbox/radio labels). Lazy: the typed-signature path picks a font
-  // based on the script of the signature text via embedTypedSignatureFont,
-  // and the image-signature path doesn't need any font at all. Hoisting
-  // this here would re-introduce an unused embed for image-only fields.
+  // checkbox/radio labels). Deliberately a zero-arg helper that DEFERS the
+  // `await embedPdfTextFont(...)` to the first branch that actually needs
+  // it - the typed-signature path picks a font based on the script of the
+  // signature text via `embedTypedSignatureFont`, and the image-signature
+  // path doesn't need any font at all. Eagerly awaiting the embed up here
+  // would do a wasted font load (and a fetch on cache miss) for image-only
+  // fields.
   const embedDefaultTextFont = (): Promise<PDFFont> => embedPdfTextFont(pdf, 'noto-sans');
 
   await match(field)
