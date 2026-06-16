@@ -12,15 +12,50 @@ import { logger } from '../../utils/logger';
 const FONT_FETCH_TIMEOUT_MS = 10_000;
 
 /**
- * Detect the script category of a text string to select the appropriate font
- * for PDF rendering with pdf-lib (which only supports a single font per drawText call).
+ * The bundled PDF text fonts and the public-asset filename each one resolves
+ * to. This map is the single source of truth: `PdfFontKey` is derived from
+ * its keys, so adding/removing/renaming a font is a one-line edit here that
+ * fails at compile time everywhere else in the file. `as const` is required
+ * for the `keyof typeof` to narrow to the string-literal union.
  *
- * Returns 'caveat' for scripts the Caveat handwriting font can render
- * (Latin and Cyrillic), or the appropriate Noto Sans variant for scripts
- * Caveat does not cover (Greek, Hebrew, Arabic, Indic, Thai, CJK, Japanese
- * kana, Korean Hangul, etc.).
+ * Adding, removing, or renaming a font here requires coordinated updates in
+ * every one of these locations - they each carry a different shape of the same
+ * identifier and there is no single source of truth that derives them:
+ *
+ *   1. apps/remix/public/fonts/<filename>.ttf
+ *        - the asset the fetch below resolves against
+ *          NEXT_PRIVATE_INTERNAL_WEBAPP_URL.
+ *   2. apps/remix/app/app.css
+ *        - the `@font-face { font-family: ...; src: url(/fonts/<filename>.ttf) }`
+ *          declaration that the browser and Konva paths consume.
+ *   3. packages/lib/server-only/pdf/helpers.ts
+ *        - the `FontLibrary.use(<family>, [...])` registration for skia-canvas.
+ *   4. packages/lib/constants/pdf.ts (SIGNATURE_FONT_FAMILY)
+ *        - the CSS family fallback chain used by Konva/skia-canvas; family
+ *          names must match the @font-face / FontLibrary.use names, NOT the
+ *          TTF's internal name table (e.g. Noto CJK files advertise as
+ *          "Noto Sans JP/KR/SC" but are registered under longer names).
+ *   5. FONT_FILE_MAP below itself.
  */
-export type PdfFontKey = 'caveat' | 'noto-sans' | 'noto-sans-japanese' | 'noto-sans-chinese' | 'noto-sans-korean';
+const FONT_FILE_MAP = {
+  caveat: 'caveat.ttf',
+  'noto-sans': 'noto-sans.ttf',
+  'noto-sans-japanese': 'noto-sans-japanese.ttf',
+  'noto-sans-chinese': 'noto-sans-chinese.ttf',
+  'noto-sans-korean': 'noto-sans-korean.ttf',
+} as const;
+
+/**
+ * Script category used to pick the right PDF text font in the pdf-lib path
+ * (which only supports a single font per `drawText` call). The string-literal
+ * union is derived from FONT_FILE_MAP so adding a font is a one-line edit
+ * there.
+ *
+ * 'caveat' is the handwriting font for Latin and Cyrillic; the four 'noto-sans*'
+ * variants cover scripts Caveat does not (Greek, Hebrew, Arabic, Indic, Thai,
+ * CJK, Japanese kana, Korean Hangul, etc.).
+ */
+export type PdfFontKey = keyof typeof FONT_FILE_MAP;
 
 // Korean (Hangul) - covers Hangul Syllables, Hangul Jamo, and Hangul Compatibility Jamo.
 const KOREAN_REGEX = /\p{Script=Hangul}/u;
@@ -83,33 +118,6 @@ export const getSignatureFontKey = (text: string): PdfFontKey => {
   }
 
   return 'caveat';
-};
-
-// Adding, removing, or renaming a font here requires coordinated updates in
-// every one of these locations - they each carry a different shape of the same
-// identifier and there is no single source of truth that derives them:
-//
-//   1. apps/remix/public/fonts/<filename>.ttf
-//        - the asset the fetch below resolves against
-//          NEXT_PRIVATE_INTERNAL_WEBAPP_URL.
-//   2. apps/remix/app/app.css
-//        - the `@font-face { font-family: ...; src: url(/fonts/<filename>.ttf) }`
-//          declaration that the browser and Konva paths consume.
-//   3. packages/lib/server-only/pdf/helpers.ts
-//        - the `FontLibrary.use(<family>, [...])` registration for skia-canvas.
-//   4. packages/lib/constants/pdf.ts (SIGNATURE_FONT_FAMILY)
-//        - the CSS family fallback chain used by Konva/skia-canvas; family
-//          names must match the @font-face / FontLibrary.use names, NOT the
-//          TTF's internal name table (e.g. Noto CJK files advertise as
-//          "Noto Sans JP/KR/SC" but are registered under longer names).
-//   5. FONT_FILE_MAP below
-//        - the pdf-lib-path lookup from PdfFontKey to the public asset name.
-const FONT_FILE_MAP: Record<PdfFontKey, string> = {
-  caveat: 'caveat.ttf',
-  'noto-sans': 'noto-sans.ttf',
-  'noto-sans-japanese': 'noto-sans-japanese.ttf',
-  'noto-sans-chinese': 'noto-sans-chinese.ttf',
-  'noto-sans-korean': 'noto-sans-korean.ttf',
 };
 
 // Process-level cache so repeated signature insertions (one call per field) don't

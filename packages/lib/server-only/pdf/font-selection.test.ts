@@ -308,6 +308,20 @@ describe('embedPdfTextFont', () => {
     expect(pdf.embedFont).toHaveBeenCalledTimes(1);
   });
 
+  it('dedupes concurrent calls onto a single embedFont invocation', async () => {
+    // The cache stores the in-flight Promise<PDFFont>, so two concurrent
+    // callers should resolve to the same reference without double-embedding
+    // the font stream. Regression guard against a future refactor that
+    // stores the resolved PDFFont (which would race on first call).
+    const { embedPdfTextFont } = await import('./font-selection');
+    const pdf = createMockPdf();
+
+    const [a, b] = await Promise.all([embedPdfTextFont(pdf, 'caveat'), embedPdfTextFont(pdf, 'caveat')]);
+
+    expect(a).toBe(b);
+    expect(pdf.embedFont).toHaveBeenCalledTimes(1);
+  });
+
   it('keys the cache separately for different options (calt-off vs default)', async () => {
     const { embedPdfTextFont } = await import('./font-selection');
     const pdf = createMockPdf();
