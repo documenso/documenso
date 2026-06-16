@@ -32,14 +32,6 @@ type AssertLicensedForOptions = {
  *   → throws.
  */
 export const assertLicensedFor = async (flag: LicenseFlag, options?: AssertLicensedForOptions): Promise<void> => {
-  // TODO(csc-qes-v1): REMOVE BEFORE MERGE — dev-only bypass for local
-  // testing of CSC-gated paths without provisioning a real licence key.
-  // Delete this block and the matching `TEMP_BYPASS_LICENSE_ASSERTION` entry
-  // in `packages/tsconfig/process-env.d.ts` before opening the PR.
-  if (env('TEMP_BYPASS_LICENSE_ASSERTION') === 'true') {
-    return;
-  }
-
   const denied = (): AppError =>
     new AppError(options?.errorCode ?? AppErrorCode.FORBIDDEN, {
       message: options?.message ?? `License does not include the "${flag}" feature.`,

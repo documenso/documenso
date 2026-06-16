@@ -190,6 +190,7 @@ CSC-specific error codes surfaced through the standard error channels:
 | `CSC_EMBED_FAILED`         | Sign-time digest diverged from prep capture      | Recipient: retry from Sign                                              |
 | `CSC_BASE_DOCUMENT_MUTATED`| Document data changed between prep and sign      | Operator: investigate (structural guard violation)                      |
 | `CSC_INSTANCE_MODE_MISMATCH`| Envelope created with wrong level for transport | Caller: use a level matching the instance transport                     |
+| `CSC_REQUEST_FAILED`       | TSP HTTP transport failure — network error, non-2xx, or malformed response | Operator: check TSP availability; carries the TSP HTTP status and error in the message |
 
 ## Algorithm Policy
 

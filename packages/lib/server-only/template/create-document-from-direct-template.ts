@@ -43,8 +43,8 @@ import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
 import { incrementDocumentId } from '../envelope/increment-id';
-import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
+import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -209,7 +209,7 @@ export const createDocumentFromDirectTemplate = async ({
   });
 
   const derivedDocumentMeta = extractDerivedDocumentMeta(settings, directTemplateEnvelope.documentMeta, signatureLevel);
-  
+
   // The resulting document contains every non-direct template recipient plus the
   // direct recipient that is signing now. A recipientCount of 0 means unlimited.
   // This mirrors the check in `sendDocument`, but must be done here because this
@@ -223,8 +223,6 @@ export const createDocumentFromDirectTemplate = async ({
       statusCode: 400,
     });
   }
-
-  const derivedDocumentMeta = extractDerivedDocumentMeta(settings, directTemplateEnvelope.documentMeta);
 
   // Associate, validate and map to a query every direct template recipient field with the provided fields.
   // Only process fields that are either required or have been signed by the user

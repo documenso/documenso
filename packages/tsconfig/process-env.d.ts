@@ -3,11 +3,6 @@ declare namespace NodeJS {
     PORT?: string;
     NEXT_PUBLIC_WEBAPP_URL?: string;
     NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY?: string;
-    /**
-     * TODO(csc-qes-v1): REMOVE BEFORE MERGE — paired with the bypass in
-     * `packages/lib/server-only/license/assert-licensed-for.ts`. Dev-only.
-     */
-    TEMP_BYPASS_LICENSE_ASSERTION?: 'true' | 'false';
 
     NEXT_PRIVATE_GOOGLE_CLIENT_ID?: string;
     NEXT_PRIVATE_GOOGLE_CLIENT_SECRET?: string;
