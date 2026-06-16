@@ -2,13 +2,7 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData, diffDocumentMetaChanges } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import {
-  type DocumentDistributionMethod,
-  type DocumentSigningOrder,
-  EnvelopeType,
-  RecipientRole,
-  SendStatus,
-} from '@prisma/client';
+import { type DocumentDistributionMethod, type DocumentSigningOrder, EnvelopeType } from '@prisma/client';
 
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -95,28 +89,6 @@ export const updateDocumentMeta = async ({
     if (!email) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
         message: 'Email not found',
-      });
-    }
-  }
-
-  if (
-    envelope.type === EnvelopeType.DOCUMENT &&
-    includeAuditLog !== undefined &&
-    includeAuditLog !== envelope.documentMeta.includeAuditLog
-  ) {
-    const sentRecipientCount = await prisma.recipient.count({
-      where: {
-        envelopeId: envelope.id,
-        role: {
-          not: RecipientRole.CC,
-        },
-        sendStatus: SendStatus.SENT,
-      },
-    });
-
-    if (sentRecipientCount > 0) {
-      throw new AppError(AppErrorCode.INVALID_BODY, {
-        message: 'Audit log embedding can only be changed before the document is sent',
       });
     }
   }

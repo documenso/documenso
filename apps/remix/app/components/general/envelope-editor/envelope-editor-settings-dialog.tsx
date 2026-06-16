@@ -915,7 +915,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                                 <Checkbox
                                   id="include-audit-log"
                                   checked={field.value}
-                                  disabled={field.disabled || envelopeHasBeenSent}
+                                  disabled={field.disabled}
                                   onCheckedChange={(checked) => field.onChange(Boolean(checked))}
                                 />
                               </FormControl>
