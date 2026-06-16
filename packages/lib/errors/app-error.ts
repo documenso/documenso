@@ -36,7 +36,6 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
   [AppErrorCode.INVALID_BODY]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.INVALID_REQUEST]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.INVALID_CAPTCHA]: { code: 'BAD_REQUEST', status: 400 },
-  [AppErrorCode.LIMIT_EXCEEDED]: { code: 'TOO_MANY_REQUESTS', status: 429 },
   [AppErrorCode.NOT_FOUND]: { code: 'NOT_FOUND', status: 404 },
   [AppErrorCode.NOT_IMPLEMENTED]: { code: 'INTERNAL_SERVER_ERROR', status: 501 },
   [AppErrorCode.NOT_SETUP]: { code: 'BAD_REQUEST', status: 400 },

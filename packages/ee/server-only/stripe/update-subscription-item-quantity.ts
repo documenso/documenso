@@ -165,16 +165,7 @@ export const syncMemberCountWithStripeSeatPlan = async (
 /**
  * Reconciles the Stripe seat quantity and organisation claim with the actual
  * member count at the start of a new billing period.
- *
- * Called from the `customer.subscription.updated` webhook when the billing
- * period advances. The renewal invoice has already been generated at the
- * previous (high-water) quantity by then — the reconciled count takes effect
- * on the next invoice (accepted trade-off: removed seats bill for exactly
- * one extra period).
- *
- * Runs with no prorations in either direction: no credits when shrinking,
- * no retroactive charges when healing upward drift (e.g. unbilled SSO
- * portal joins or lost grow races).
+
  */
 export const reconcileSeatsWithMemberCount = async (organisationId: string) => {
   const organisation = await prisma.organisation.findUnique({
