@@ -25,6 +25,8 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '../../types/field-meta';
+import { getFontAssetBytesForField } from '../fonts/font-assets';
+import { drawStyledFieldText, hasPdfTextStyle } from './field-text-style';
 import { getPageSize } from './get-page-size';
 
 export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSignature) => {
@@ -41,9 +43,8 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
    * Blue box is the adjusted field width, height and position. It will represent
    * where the text will overflow into.
    */
-  const isDebugMode =
-    // eslint-disable-next-line turbo/no-undeclared-env-vars
-    process.env.DEBUG_PDF_INSERT === '1' || process.env.DEBUG_PDF_INSERT === 'true';
+  // biome-ignore lint/nursery/noUndeclaredEnvVars: DEBUG_PDF_INSERT is a local debugging flag.
+  const isDebugMode = process.env.DEBUG_PDF_INSERT === '1' || process.env.DEBUG_PDF_INSERT === 'true';
 
   pdf.registerFontkit(fontkit);
 
@@ -118,6 +119,11 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
     isSignatureField ? fontCaveat : fontNoto,
     isSignatureField ? { features: { calt: false } } : undefined,
   );
+  const getFieldFont = async (fontFamily: string | undefined | null) => {
+    const uploadedFont = await getFontAssetBytesForField(fontFamily);
+
+    return uploadedFont ? await pdf.embedFont(uploadedFont.bytes) : font;
+  };
 
   if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
     await pdf.embedFont(fontCaveat);
@@ -348,7 +354,7 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
         }
       }
     })
-    .otherwise((field) => {
+    .otherwise(async (field) => {
       const fieldMetaParsers = {
         [FieldType.TEXT]: ZTextFieldMeta,
         [FieldType.NUMBER]: ZNumberFieldMeta,
@@ -364,10 +370,11 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
 
       const customFontSize = meta?.success && meta.data.fontSize ? meta.data.fontSize : null;
       const textAlign = meta?.success && meta.data.textAlign ? meta.data.textAlign : 'left';
+      const fieldFont = meta?.success ? await getFieldFont(meta.data.fontFamily) : font;
 
       let fontSize = customFontSize || maxFontSize;
-      const textWidth = font.widthOfTextAtSize(field.customText, fontSize);
-      const textHeight = font.heightAtSize(fontSize);
+      const textWidth = fieldFont.widthOfTextAtSize(field.customText, fontSize);
+      const textHeight = fieldFont.heightAtSize(fontSize);
 
       // Scale font only if no custom font and height exceeds field height.
       if (!customFontSize) {
@@ -391,9 +398,7 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
       // Invert the Y axis since PDFs use a bottom-left coordinate system
       let textFieldBoxY = pageHeight - fieldY - fieldHeight;
       const textFieldBoxX = textAlignmentOptions.xPos;
-
-      const textField = pdf.getForm().createTextField(`text.${field.secondaryId}`);
-      textField.setAlignment(textAlignmentOptions.textAlignment);
+      const shouldDrawStyledText = meta?.success && hasPdfTextStyle(meta.data);
 
       /**
        * From now on we will adjust the field size and position so the text
@@ -411,11 +416,7 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
 
       // Handle multiline text, which will overflow on the Y axis.
       if (isMultiline) {
-        textToInsert = breakLongString(textToInsert, adjustedFieldWidth, font, fontSize);
-
-        textField.enableMultiline();
-        textField.disableCombing();
-        textField.disableScrolling();
+        textToInsert = breakLongString(textToInsert, adjustedFieldWidth, fieldFont, fontSize);
 
         // Adjust the textFieldBox so it extends to the bottom of the page so text can wrap.
         textFieldBoxY = pageHeight - fieldY - fieldHeight;
@@ -476,8 +477,62 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
         adjustedFieldY = adjustedPosition.yPos;
       }
 
+      if (shouldDrawStyledText) {
+        const longestStyledLine = textToInsert.split('\n').sort((a, b) => b.length - a.length)[0] ?? textToInsert;
+        const styledTextWidth = fieldFont.widthOfTextAtSize(longestStyledLine, fontSize);
+
+        let styledTextX = fieldX + padding;
+
+        if (textAlign === 'center') {
+          styledTextX = fieldX + (fieldWidth - styledTextWidth) / 2;
+        }
+
+        if (textAlign === 'right') {
+          styledTextX = fieldX + fieldWidth - styledTextWidth - padding;
+        }
+
+        let styledTextY = isMultiline
+          ? pageHeight - fieldY - fontSize - padding
+          : pageHeight - (fieldY + (fieldHeight - fontSize) / 2) - fontSize;
+
+        if (pageRotationInDegrees !== 0) {
+          const adjustedPosition = adjustPositionForRotation(
+            pageWidth,
+            pageHeight,
+            styledTextX,
+            styledTextY,
+            pageRotationInDegrees,
+          );
+
+          styledTextX = adjustedPosition.xPos;
+          styledTextY = adjustedPosition.yPos;
+        }
+
+        drawStyledFieldText({
+          page,
+          text: textToInsert,
+          x: styledTextX,
+          y: styledTextY,
+          size: fontSize,
+          font: fieldFont,
+          rotate: degrees(pageRotationInDegrees),
+          fieldMeta: meta.data,
+        });
+
+        return;
+      }
+
+      const textField = pdf.getForm().createTextField(`text.${field.secondaryId}`);
+      textField.setAlignment(textAlignmentOptions.textAlignment);
+
+      if (isMultiline) {
+        textField.enableMultiline();
+        textField.disableCombing();
+        textField.disableScrolling();
+      }
+
       // Set properties for the text field
-      setTextFieldFontSize(textField, font, fontSize);
+      setTextFieldFontSize(textField, fieldFont, fontSize);
       textField.setText(textToInsert);
 
       // Set the position and size of the text field
@@ -488,7 +543,7 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
         height: adjustedFieldHeight,
         rotate: degrees(pageRotationInDegrees),
 
-        font,
+        font: fieldFont,
 
         // Hide borders.
         borderWidth: 0,
@@ -672,7 +727,7 @@ const setTextFieldFontSize = (textField: PDFTextField, font: PDFFont, fontSize: 
 
   try {
     textField.setFontSize(fontSize);
-  } catch (err) {
+  } catch (_err) {
     let da = textField.acroField.getDefaultAppearance() ?? '';
 
     da += `\n ${setFontAndSize(font.name, fontSize)}`;

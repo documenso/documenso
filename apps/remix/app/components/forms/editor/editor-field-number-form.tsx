@@ -7,6 +7,7 @@ import {
   type TNumberFieldMeta as NumberFieldMeta,
   ZNumberFieldMeta,
 } from '@documenso/lib/types/field-meta';
+import type { FieldFontOption } from '@documenso/lib/universal/field-fonts';
 import { numberFormatValues } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
@@ -19,7 +20,9 @@ import { useForm, useWatch } from 'react-hook-form';
 import type { z } from 'zod';
 
 import {
+  EditorGenericFontFamilyField,
   EditorGenericFontSizeField,
+  EditorGenericFontStyleFields,
   EditorGenericLabelField,
   EditorGenericLetterSpacingField,
   EditorGenericLineHeightField,
@@ -35,6 +38,9 @@ const ZNumberFieldFormSchema = ZNumberFieldMeta.pick({
   value: true,
   numberFormat: true,
   fontSize: true,
+  fontFamily: true,
+  fontWeight: true,
+  fontStyle: true,
   textAlign: true,
   lineHeight: true,
   letterSpacing: true,
@@ -77,6 +83,7 @@ type TNumberFieldFormSchema = z.infer<typeof ZNumberFieldFormSchema>;
 type EditorFieldNumberFormProps = {
   value: NumberFieldMeta | undefined;
   onValueChange: (value: NumberFieldMeta) => void;
+  fontOptions?: FieldFontOption[];
 };
 
 export const EditorFieldNumberForm = ({
@@ -84,6 +91,7 @@ export const EditorFieldNumberForm = ({
     type: 'number',
   },
   onValueChange,
+  fontOptions,
 }: EditorFieldNumberFormProps) => {
   const { t } = useLingui();
 
@@ -96,6 +104,9 @@ export const EditorFieldNumberForm = ({
       value: value.value || '',
       numberFormat: value.numberFormat || null,
       fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
+      fontFamily: value.fontFamily || '',
+      fontWeight: value.fontWeight || 'normal',
+      fontStyle: value.fontStyle || 'normal',
       textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
       lineHeight: value.lineHeight ?? FIELD_DEFAULT_LINE_HEIGHT,
       letterSpacing: value.letterSpacing ?? FIELD_DEFAULT_LETTER_SPACING,
@@ -134,6 +145,10 @@ export const EditorFieldNumberForm = ({
       <form>
         <fieldset className="flex flex-col gap-2">
           <EditorGenericFontSizeField className="w-full" formControl={form.control} />
+
+          <EditorGenericFontFamilyField className="w-full" formControl={form.control} fontOptions={fontOptions} />
+
+          <EditorGenericFontStyleFields formControl={form.control} />
 
           <div className="flex w-full flex-row gap-x-4">
             <EditorGenericTextAlignField className="w-full" formControl={form.control} />

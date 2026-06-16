@@ -1,9 +1,15 @@
+import { mkdir, writeFile } from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { getUploadedFieldFontIds } from '@documenso/lib/universal/field-fonts';
+import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import type { Recipient } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 import { FontLibrary } from 'skia-canvas';
 import { match } from 'ts-pattern';
+
+import { getFontAssetBytesForField } from '../fonts/font-assets';
 
 /**
  * Ensure all required fonts are registered in the skia-canvas FontLibrary.
@@ -35,6 +41,38 @@ export const ensureFontLibrary = () => {
       ['Noto Sans Japanese']: [path.join(fontPath, 'noto-sans-japanese.ttf')],
       ['Noto Sans Chinese']: [path.join(fontPath, 'noto-sans-chinese.ttf')],
       ['Noto Sans Korean']: [path.join(fontPath, 'noto-sans-korean.ttf')],
+    });
+  }
+};
+
+export const ensureUploadedFieldFontLibrary = async (fields: FieldWithSignature[]) => {
+  const fontIds = getUploadedFieldFontIds(fields);
+
+  if (fontIds.length === 0) {
+    return;
+  }
+
+  const fontDirectory = path.join(os.tmpdir(), 'documenso-fonts');
+  await mkdir(fontDirectory, { recursive: true });
+
+  for (const fontId of fontIds) {
+    if (FontLibrary.has(fontId)) {
+      continue;
+    }
+
+    const fontAsset = await getFontAssetBytesForField(fontId);
+
+    if (!fontAsset) {
+      continue;
+    }
+
+    const extension = fontAsset.fontAsset.fileName.toLowerCase().endsWith('.otf') ? 'otf' : 'ttf';
+    const fontPath = path.join(fontDirectory, `${fontId}.${extension}`);
+
+    await writeFile(fontPath, fontAsset.bytes);
+
+    FontLibrary.use({
+      [fontId]: [fontPath],
     });
   }
 };

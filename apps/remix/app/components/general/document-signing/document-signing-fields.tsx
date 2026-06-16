@@ -1,3 +1,5 @@
+import { getFieldRenderFontFamily } from '@documenso/lib/universal/field-fonts';
+import { getFieldTextStyle } from '@documenso/lib/universal/field-text-style';
 import { cn } from '@documenso/ui/lib/utils';
 import { Loader } from 'lucide-react';
 
@@ -26,12 +28,22 @@ type DocumentSigningFieldsInsertedProps = {
    * Defaults to left.
    */
   textAlign?: 'left' | 'center' | 'right';
+  fontFamily?: string | null;
+  fontWeight?: 'normal' | 'bold' | null;
+  fontStyle?: 'normal' | 'italic' | null;
 };
 
-export const DocumentSigningFieldsInserted = ({ children, textAlign = 'left' }: DocumentSigningFieldsInsertedProps) => {
+export const DocumentSigningFieldsInserted = ({
+  children,
+  textAlign = 'left',
+  fontFamily,
+  fontWeight,
+  fontStyle,
+}: DocumentSigningFieldsInsertedProps) => {
   return (
     <div className="flex h-full w-full items-center overflow-hidden">
       <p
+        style={{ fontFamily: getFieldRenderFontFamily(fontFamily), ...getFieldTextStyle({ fontWeight, fontStyle }) }}
         className={cn(
           'w-full whitespace-pre-wrap text-left text-[clamp(0.425rem,25cqw,0.825rem)] text-foreground duration-200',
           {
