@@ -36,6 +36,12 @@ jobs:
             -t "$REGISTRY/$IMAGE_NAME:$GIT_SHA" \
             .
 
+          # Regression guard (#95/#96, #28 encrypted): never push an image that cannot convert
+          # DOCX (soffice) or decrypt encrypted PDFs (qpdf).
+          docker run --rm "$REGISTRY/$IMAGE_NAME:$GIT_SHA" sh -c 'command -v soffice'
+          docker run --rm "$REGISTRY/$IMAGE_NAME:$GIT_SHA" sh -c 'command -v qpdf'
+          docker run --rm "$REGISTRY/$IMAGE_NAME:$GIT_SHA" sh -c 'fc-list | grep -iq liberation'
+
           docker push "$REGISTRY/$IMAGE_NAME:latest"
           docker push "$REGISTRY/$IMAGE_NAME:$GIT_SHA"
 

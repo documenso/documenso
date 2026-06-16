@@ -53,11 +53,22 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: false
+          load: true
           context: .
           file: ./docker/Dockerfile
           tags: documenso-${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+      - name: Smoke test — document-conversion deps in the runtime image
+        run: |
+          # Regression guard (#95/#96, #28 encrypted): the runtime image must ship LibreOffice
+          # (soffice) + Liberation fonts for .docx/.doc upload, and qpdf for encrypted-PDF
+          # decryption, or those uploads fail with DEPENDENCY_MISSING. convert-to-pdf.ts and
+          # decrypt-pdf.ts resolve the binaries via `which`, so assert both are on PATH.
+          docker run --rm documenso-${{ github.sha }} sh -c 'command -v soffice'
+          docker run --rm documenso-${{ github.sha }} sh -c 'command -v qpdf'
+          docker run --rm documenso-${{ github.sha }} sh -c 'fc-list | grep -iq liberation'
 
       - # Temp fix
         # https://github.com/docker/build-push-action/issues/252
