@@ -10,7 +10,6 @@ import {
   SigningStatus,
   WebhookTriggerEvents,
 } from '@prisma/client';
-import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
@@ -65,6 +64,7 @@ import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { getOrganisationTemplateWhereInput } from './get-organisation-template-by-id';
+import { parsePrefillDate } from './parse-prefill-date';
 
 type FinalRecipient = Pick<
   Recipient,
@@ -705,15 +705,15 @@ export const createDocumentFromTemplate = async ({
                   });
                 }
 
-                const date = new Date(selector.value);
+                const parsed = parsePrefillDate(selector.value);
 
-                if (isNaN(date.getTime())) {
+                if (!parsed) {
                   throw new AppError(AppErrorCode.INVALID_BODY, {
                     message: `Invalid date value for field ${field.id}: ${selector.value}`,
                   });
                 }
 
-                payload.customText = DateTime.fromJSDate(date).toFormat(
+                payload.customText = parsed.toFormat(
                   template.documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
                 );
 
