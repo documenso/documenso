@@ -44,7 +44,6 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
    * Blue box is the adjusted field width, height and position. It will represent
    * where the text will overflow into.
    */
-  // biome-ignore lint/nursery/noUndeclaredEnvVars: DEBUG_PDF_INSERT is a local debugging flag.
   const isDebugMode = process.env.DEBUG_PDF_INSERT === '1' || process.env.DEBUG_PDF_INSERT === 'true';
 
   pdf.registerFontkit(fontkit);

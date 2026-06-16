@@ -37,7 +37,6 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
   ]);
 
   const isSignatureField = isSignatureFieldType(field.type);
-  // biome-ignore lint/nursery/noUndeclaredEnvVars: DEBUG_PDF_INSERT is a local debugging flag.
   const isDebugMode = process.env.DEBUG_PDF_INSERT === '1' || process.env.DEBUG_PDF_INSERT === 'true';
 
   pdf.registerFontkit(fontkit);
