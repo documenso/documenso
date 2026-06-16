@@ -85,14 +85,25 @@ export const getSignatureFontKey = (text: string): PdfFontKey => {
   return 'caveat';
 };
 
-// The TTFs listed here MUST ship at apps/remix/public/fonts/<filename> in every
-// deployment - the fetch below resolves against NEXT_PRIVATE_INTERNAL_WEBAPP_URL.
-// The same files are also declared by `@font-face` rules in apps/remix/app/app.css
-// and registered with skia-canvas via `FontLibrary.use(...)` in helpers.ts;
-// the family names in SIGNATURE_FONT_FAMILY (constants/pdf.ts) are the names
-// declared there, not the TTF's internal name table (which differs - e.g. the
-// Noto CJK files advertise as "Noto Sans JP/KR/SC"). If a font is added/removed
-// or renamed, update all three places to keep them in sync.
+// Adding, removing, or renaming a font here requires coordinated updates in
+// every one of these locations - they each carry a different shape of the same
+// identifier and there is no single source of truth that derives them:
+//
+//   1. apps/remix/public/fonts/<filename>.ttf
+//        - the asset the fetch below resolves against
+//          NEXT_PRIVATE_INTERNAL_WEBAPP_URL.
+//   2. apps/remix/app/app.css
+//        - the `@font-face { font-family: ...; src: url(/fonts/<filename>.ttf) }`
+//          declaration that the browser and Konva paths consume.
+//   3. packages/lib/server-only/pdf/helpers.ts
+//        - the `FontLibrary.use(<family>, [...])` registration for skia-canvas.
+//   4. packages/lib/constants/pdf.ts (SIGNATURE_FONT_FAMILY)
+//        - the CSS family fallback chain used by Konva/skia-canvas; family
+//          names must match the @font-face / FontLibrary.use names, NOT the
+//          TTF's internal name table (e.g. Noto CJK files advertise as
+//          "Noto Sans JP/KR/SC" but are registered under longer names).
+//   5. FONT_FILE_MAP below
+//        - the pdf-lib-path lookup from PdfFontKey to the public asset name.
 const FONT_FILE_MAP: Record<PdfFontKey, string> = {
   caveat: 'caveat.ttf',
   'noto-sans': 'noto-sans.ttf',
