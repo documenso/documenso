@@ -90,6 +90,10 @@ export const ensureUploadedFieldFontLibrary = async (fields: FieldWithSignature[
 
   const fontLibraryContext = fields[0] ? await getFieldFontLibraryContext(fields[0]) : null;
 
+  if (!fontLibraryContext) {
+    return;
+  }
+
   const fontDirectory = path.join(os.tmpdir(), 'documenso-fonts');
   await mkdir(fontDirectory, { recursive: true });
 

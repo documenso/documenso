@@ -308,10 +308,7 @@ export const isUploadedFontAssetId = (fontFamily: string | undefined | null) => 
   return Boolean(fontFamily && /^[A-Za-z0-9_-]+$/.test(fontFamily));
 };
 
-export const getFontAssetBytesForField = async (
-  fontFamily: string | undefined | null,
-  context?: FontLibraryContext | null,
-) => {
+export const getFontAssetBytesForField = async (fontFamily: string | undefined | null, context: FontLibraryContext) => {
   if (!isUploadedFontAssetId(fontFamily)) {
     return null;
   }
@@ -326,7 +323,7 @@ export const getFontAssetBytesForField = async (
     return null;
   }
 
-  if (context && !isFontAssetVisibleToContext(fontAsset, context)) {
+  if (!isFontAssetVisibleToContext(fontAsset, context)) {
     return null;
   }
 
