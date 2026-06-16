@@ -6,6 +6,8 @@ import { prisma } from '@documenso/prisma';
 import { OrganisationType, type Prisma, SubscriptionStatus } from '@prisma/client';
 import { match } from 'ts-pattern';
 
+import { reconcileSeatsWithMemberCount } from './update-subscription-item-quantity';
+
 const LIVE_SUBSCRIPTION_STATUSES: Stripe.Subscription.Status[] = ['active', 'trialing', 'past_due'];
 
 export type SyncStripeCustomerSubscriptionOptions = {
@@ -229,6 +231,19 @@ const handleLiveSubscription = async ({
       });
     }
   });
+
+  // Detect a billing-period roll by comparing the persisted period end with
+  // the freshly-fetched one — the convergent equivalent of the old
+  // `previous_attributes.current_period_start` signal. On renewal, reconcile
+  // the seat quantity and claim down to the actual member count. The reconcile
+  // itself no-ops for non-seat/unlimited plans and non-ACTIVE subscriptions.
+  const previousPeriodEnd = organisation.subscription?.periodEnd ?? null;
+
+  const hasPeriodAdvanced = previousPeriodEnd !== null && periodEnd.getTime() > previousPeriodEnd.getTime();
+
+  if (hasPeriodAdvanced && !bypassClaimUpdate) {
+    await reconcileSeatsWithMemberCount(organisation.id);
+  }
 };
 
 /**
