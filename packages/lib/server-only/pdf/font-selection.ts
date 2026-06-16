@@ -13,14 +13,16 @@ const FONT_FETCH_TIMEOUT_MS = 10_000;
 
 /**
  * The bundled PDF text fonts and the public-asset filename each one resolves
- * to. This map is the single source of truth: `PdfFontKey` is derived from
- * its keys, so adding/removing/renaming a font is a one-line edit here that
- * fails at compile time everywhere else in the file. `as const` is required
- * for the `keyof typeof` to narrow to the string-literal union.
+ * to. Within this module this map is the single source of truth: `PdfFontKey`
+ * is derived from its keys, so adding/removing/renaming a font is a one-line
+ * edit here that fails at compile time everywhere else in the file. `as const`
+ * is required for the `keyof typeof` to narrow to the string-literal union.
  *
- * Adding, removing, or renaming a font here requires coordinated updates in
- * every one of these locations - they each carry a different shape of the same
- * identifier and there is no single source of truth that derives them:
+ * Outside this module the same fontKey/filename/family-name information is
+ * restated in several other shapes (each consumer wants a different shape, and
+ * we don't currently have an automated way to derive them all from one place).
+ * Adding, removing, or renaming a font therefore still requires manual updates
+ * in every location listed below:
  *
  *   1. apps/remix/public/fonts/<filename>.ttf
  *        - the asset the fetch below resolves against
@@ -69,16 +71,28 @@ const JAPANESE_REGEX = /[\p{Script=Hiragana}\p{Script=Katakana}]/u;
 // constant for the matching CSS fallback order in Konva paths.
 const CJK_REGEX = /\p{Script=Han}/u;
 
-// Matches any character that Caveat cannot render. The handwriting font covers
-// Latin (basic + extended) and Cyrillic; punctuation, whitespace, and digits
-// are mostly Script=Common (shared across all scripts) or Script=Inherited
-// (combining marks). Anything else - Greek, Hebrew, Arabic, Indic, Thai,
-// Ethiopic, Khmer, Mongolian, etc. - is foreign to Caveat and forces a Noto
-// Sans fallback. The regex is a negative character class against the
-// Caveat-compatible set rather than an enumerated list of "known" non-Caveat
-// scripts, so unlisted scripts never silently fall through to Caveat and
-// render as tofu. CJK ideographs and Japanese kana / Korean Hangul are
-// matched by the more specific regexes above and routed before this check.
+// Heuristic match for "this character is likely outside Caveat's coverage".
+// The handwriting font covers Latin (basic + extended) and Cyrillic;
+// punctuation, whitespace, and digits are mostly Script=Common (shared across
+// all scripts) or Script=Inherited (combining marks), and we treat the whole
+// Common/Inherited set as Caveat-compatible. Anything outside Latin / Cyrillic
+// / Common / Inherited - Greek, Hebrew, Arabic, Indic, Thai, Ethiopic, Khmer,
+// Mongolian, etc. - forces a Noto Sans fallback.
+//
+// This is a heuristic, not a precise per-glyph coverage test: Script=Common
+// also contains a long tail of symbols and pictographs (incl. emoji) that
+// Caveat does not have, so inputs like "John 😀" would still render the
+// pictograph as tofu under Caveat. We don't ship a Noto Emoji file in this
+// repo, so routing those to noto-sans wouldn't actually fix the rendering
+// either (and would strip the handwriting style from the Latin parts).
+// Symbol/emoji coverage is intentionally out of scope here and would need a
+// separate emoji font in the asset set.
+//
+// The regex is a negative character class against the Caveat-compatible set
+// rather than an enumerated list of "known" non-Caveat scripts, so unlisted
+// scripts (Ethiopic, Khmer, Mongolian, etc.) never silently fall through to
+// Caveat. CJK ideographs and Japanese kana / Korean Hangul are matched by the
+// more specific regexes above and routed before this check.
 const CAVEAT_INCOMPATIBLE_REGEX = /[^\p{Script=Latin}\p{Script=Cyrillic}\p{Script=Common}\p{Script=Inherited}]/u;
 
 /**
