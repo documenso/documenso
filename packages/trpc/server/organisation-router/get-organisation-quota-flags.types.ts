@@ -12,6 +12,9 @@ export const ZGetOrganisationQuotaFlagsResponseSchema = z.object({
   isDocumentQuotaExceeded: z.boolean(),
   isEmailQuotaExceeded: z.boolean(),
   isApiQuotaExceeded: z.boolean(),
+  isDocumentQuotaNearing: z.boolean(),
+  isEmailQuotaNearing: z.boolean(),
+  isApiQuotaNearing: z.boolean(),
 });
 
 export type TGetOrganisationQuotaFlagsResponse = z.infer<typeof ZGetOrganisationQuotaFlagsResponseSchema>;
