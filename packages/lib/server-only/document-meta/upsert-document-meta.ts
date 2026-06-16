@@ -25,6 +25,7 @@ export type CreateDocumentMetaOptions = {
   signingOrder?: DocumentSigningOrder;
   allowDictateNextSigner?: boolean;
   distributionMethod?: DocumentDistributionMethod;
+  includeAuditLog?: boolean;
   typedSignatureEnabled?: boolean;
   uploadSignatureEnabled?: boolean;
   drawSignatureEnabled?: boolean;
@@ -47,6 +48,7 @@ export const updateDocumentMeta = async ({
   emailReplyTo,
   emailSettings,
   distributionMethod,
+  includeAuditLog,
   typedSignatureEnabled,
   uploadSignatureEnabled,
   drawSignatureEnabled,
@@ -108,6 +110,7 @@ export const updateDocumentMeta = async ({
         emailReplyTo,
         emailSettings,
         distributionMethod,
+        includeAuditLog,
         typedSignatureEnabled,
         uploadSignatureEnabled,
         drawSignatureEnabled,
