@@ -1,4 +1,10 @@
-import { DocumentStatus, EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
+import {
+  DocumentStatus,
+  EnvelopeType,
+  RecipientRole,
+  SigningStatus,
+  TeamMemberRole,
+} from '@prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -35,7 +41,7 @@ export const completeDocumentEarly = async ({
   teamId,
   requestMetadata,
 }: CompleteDocumentEarlyOptions) => {
-  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+  const { envelopeWhereInput, team } = await getEnvelopeWhereInput({
     id,
     type: EnvelopeType.DOCUMENT,
     userId,
@@ -52,6 +58,17 @@ export const completeDocumentEarly = async ({
   if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
+    });
+  }
+
+  const isOwner = envelope.userId === userId;
+  const isTeamManagerOrAbove =
+    team.currentTeamRole === TeamMemberRole.ADMIN ||
+    team.currentTeamRole === TeamMemberRole.MANAGER;
+
+  if (!isOwner && !isTeamManagerOrAbove) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'You are not allowed to finalize this document',
     });
   }
 
@@ -77,12 +94,22 @@ export const completeDocumentEarly = async ({
     });
   }
 
+  const signedRecipients = envelope.recipients.filter(
+    (recipient) =>
+      recipient.role !== RecipientRole.CC && recipient.signingStatus === SigningStatus.SIGNED,
+  );
+
+  if (signedRecipients.length === 0) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Cannot finalize a document before anyone has signed',
+    });
+  }
+
   // Recipients (excluding CCs, who never sign) that still have not signed at the
   // time the owner finalizes the document.
   const pendingRecipients = envelope.recipients.filter(
     (recipient) =>
-      recipient.role !== RecipientRole.CC &&
-      recipient.signingStatus !== SigningStatus.SIGNED,
+      recipient.role !== RecipientRole.CC && recipient.signingStatus !== SigningStatus.SIGNED,
   );
 
   const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
