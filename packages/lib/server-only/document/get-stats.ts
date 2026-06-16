@@ -109,7 +109,7 @@ export const getStats = async ({ userId, teamId, period, search = '', folderId, 
       folderId !== undefined ? qb.where('Envelope.folderId', '=', folderId) : qb.where('Envelope.folderId', 'is', null);
 
     // Period filter
-    if (period) {
+    if (period && period !== 'all') {
       const daysAgo = parseInt(period.replace(/d$/, ''), 10);
       const startOfPeriod = DateTime.now().minus({ days: daysAgo }).startOf('day');
 

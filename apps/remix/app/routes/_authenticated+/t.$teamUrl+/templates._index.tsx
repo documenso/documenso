@@ -1,7 +1,9 @@
 import { useSessionStorage } from '@documenso/lib/client-only/hooks/use-session-storage';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { FolderType } from '@documenso/lib/types/folder-type';
+import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
+import { parseToStringArray } from '@documenso/lib/utils/params';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
@@ -9,6 +11,7 @@ import type { RowSelectionState } from '@documenso/ui/primitives/data-table';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
+import type { TemplateType } from '@prisma/client';
 import { EnvelopeType, OrganisationType } from '@prisma/client';
 import { Bird } from 'lucide-react';
 import { parseAsStringLiteral, useQueryState } from 'nuqs';
@@ -21,6 +24,7 @@ import { EnvelopeDropZoneWrapper } from '~/components/general/envelope/envelope-
 import { FolderGrid } from '~/components/general/folder/folder-grid';
 import { EnvelopesTableBulkActionBar } from '~/components/tables/envelopes-table-bulk-action-bar';
 import { TemplatesTable } from '~/components/tables/templates-table';
+import { TemplatesTableToolbar } from '~/components/tables/templates-table-toolbar';
 import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
@@ -32,6 +36,12 @@ export function meta() {
   return appMetaTags(msg`Templates`);
 }
 
+const ZTemplatesSearchParamsSchema = ZFindSearchParamsSchema.pick({
+  query: true,
+  page: true,
+  perPage: true,
+});
+
 export default function TemplatesPage() {
   const team = useCurrentTeam();
   const organisation = useCurrentOrganisation();
@@ -39,8 +49,15 @@ export default function TemplatesPage() {
   const { folderId } = useParams();
   const [searchParams] = useSearchParams();
 
-  const page = Number(searchParams.get('page')) || 1;
-  const perPage = Number(searchParams.get('perPage')) || 10;
+  const findTemplatesSearchParams = useMemo(
+    () => ZTemplatesSearchParamsSchema.safeParse(Object.fromEntries(searchParams.entries())).data || {},
+    [searchParams],
+  );
+
+  const typeFilter = useMemo(() => {
+    const selected = parseToStringArray(searchParams.get('type'));
+    return selected.length === 1 ? (selected[0] as TemplateType) : undefined;
+  }, [searchParams]);
 
   const [view, setView] = useQueryState('view', parseAsStringLiteral(TEMPLATE_VIEWS).withDefault('team'));
 
@@ -60,8 +77,8 @@ export default function TemplatesPage() {
 
   const teamTemplatesQuery = trpc.template.findTemplates.useQuery(
     {
-      page,
-      perPage,
+      ...findTemplatesSearchParams,
+      type: typeFilter,
       folderId,
     },
     {
@@ -71,8 +88,8 @@ export default function TemplatesPage() {
 
   const orgTemplatesQuery = trpc.template.findOrganisationTemplates.useQuery(
     {
-      page,
-      perPage,
+      page: findTemplatesSearchParams.page,
+      perPage: findTemplatesSearchParams.perPage,
     },
     {
       enabled: isOrgView,
@@ -126,6 +143,12 @@ export default function TemplatesPage() {
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
+            </div>
+          )}
+
+          {!isOrgView && (
+            <div className="mt-8">
+              <TemplatesTableToolbar />
             </div>
           )}
 

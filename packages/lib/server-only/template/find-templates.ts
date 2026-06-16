@@ -9,7 +9,8 @@ import { getMemberRoles } from '../team/get-member-roles';
 export type FindTemplatesOptions = {
   userId: number;
   teamId: number;
-  type?: TemplateType;
+  type?: TemplateType | TemplateType[];
+  query?: string;
   page?: number;
   perPage?: number;
   folderId?: string;
@@ -19,6 +20,7 @@ export const findTemplates = async ({
   userId,
   teamId,
   type,
+  query = '',
   page = 1,
   perPage = 10,
   folderId,
@@ -31,9 +33,11 @@ export const findTemplates = async ({
     },
   });
 
+  const templateTypeFilter = type ? { in: Array.isArray(type) ? type : [type] } : undefined;
+
   const where: Prisma.EnvelopeWhereInput = {
     type: EnvelopeType.TEMPLATE,
-    templateType: type,
+    templateType: templateTypeFilter,
     AND: [
       { teamId },
       {
@@ -47,6 +51,26 @@ export const findTemplates = async ({
         ],
       },
       folderId ? { folderId } : { folderId: null },
+      ...(query
+        ? [
+            {
+              OR: [
+                {
+                  title: {
+                    contains: query,
+                    mode: 'insensitive' as const,
+                  },
+                },
+                {
+                  externalId: {
+                    contains: query,
+                    mode: 'insensitive' as const,
+                  },
+                },
+              ],
+            },
+          ]
+        : []),
     ],
   };
 
