@@ -27,7 +27,6 @@ import type { Field } from '@prisma/client';
 import { FieldType, RecipientRole } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
 import { match, P } from 'ts-pattern';
 
 import { DocumentSigningAttachmentsPopover } from '~/components/general/document-signing/document-signing-attachments-popover';
@@ -84,7 +83,6 @@ export const DocumentSigningPageViewV1 = ({
     ? authUser.twoFactorEnabled && authUser.email === recipient.email
     : false;
 
-  const navigate = useNavigate();
   const analytics = useAnalytics();
 
   const [selectedSignerId, setSelectedSignerId] = useState<number | null>(allRecipients?.[0]?.id);
@@ -129,7 +127,7 @@ export const DocumentSigningPageViewV1 = ({
     if (documentMeta?.redirectUrl) {
       window.location.href = documentMeta.redirectUrl;
     } else {
-      await navigate(`/sign/${recipient.token}/complete`);
+      window.location.href = `/sign/${recipient.token}/complete`;
     }
   };
 

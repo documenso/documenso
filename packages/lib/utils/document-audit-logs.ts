@@ -597,6 +597,31 @@ export const formatDocumentAuditLogAction = (i18n: I18n, auditLog: TDocumentAudi
         user: message,
       };
     })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_AUTHENTICATED }, () => ({
+      anonymous: msg`Recipient authenticated with the signing provider`,
+      you: msg`You authenticated with the signing provider`,
+      user: msg`${user} authenticated with the signing provider`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_AUTHENTICATION_FAILED }, () => ({
+      anonymous: msg`Recipient's signing provider authentication failed`,
+      you: msg`Your signing provider authentication failed`,
+      user: msg`${user}'s signing provider authentication failed`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_SIGN_REQUESTED }, () => ({
+      anonymous: msg`Recipient requested a remote signature`,
+      you: msg`You requested a remote signature`,
+      user: msg`${user} requested a remote signature`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_AUTHORIZED }, () => ({
+      anonymous: msg`Recipient authorised the remote signature`,
+      you: msg`You authorised the remote signature`,
+      user: msg`${user} authorised the remote signature`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_SIGNED }, () => ({
+      anonymous: msg`Recipient's remote signature was applied`,
+      you: msg`Your remote signature was applied`,
+      user: msg`${user}'s remote signature was applied`,
+    }))
     .exhaustive();
 
   let selectedDescription = description.anonymous;

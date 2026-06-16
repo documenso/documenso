@@ -66,7 +66,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
     ))
     .with({ isRecipient: true, isPending: true, isSigned: false }, () => (
       <Button className="w-32" asChild>
-        <Link to={`/sign/${recipient?.token}`}>
+        <a href={`/sign/${recipient?.token}`}>
           {match(role)
             .with(RecipientRole.SIGNER, () => (
               <>
@@ -86,7 +86,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
                 <Trans>View</Trans>
               </>
             ))}
-        </Link>
+        </a>
       </Button>
     ))
     .with({ isPending: true, isSigned: true }, () => (
