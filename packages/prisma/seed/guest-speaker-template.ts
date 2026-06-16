@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { incrementTemplateId } from '@documenso/lib/server-only/envelope/increment-id';
 import {
   FIELD_DATE_META_DEFAULT_VALUES,
   FIELD_NAME_META_DEFAULT_VALUES,
@@ -8,7 +9,6 @@ import {
   FIELD_TEXT_META_DEFAULT_VALUES,
 } from '@documenso/lib/types/field-meta';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
-import { incrementTemplateId } from '@documenso/lib/server-only/envelope/increment-id';
 import { prefixedId } from '@documenso/lib/universal/id';
 
 import { prisma } from '..';
@@ -73,14 +73,68 @@ const TEMPLATE_FIELDS: TemplateFieldSpec[] = [
   staffText(32.68, 36.36, 'Building / School'),
 
   // Requesting staff signature block.
-  { signer: 'staff', type: FieldType.SIGNATURE, page: 1, positionX: 9.8, positionY: 53.03, width: 39.22, height: 5.05, fieldMeta: FIELD_SIGNATURE_META_DEFAULT_VALUES },
-  { signer: 'staff', type: FieldType.NAME, page: 1, positionX: 52.29, positionY: 55.56, width: 37.91, height: 2.53, fieldMeta: FIELD_NAME_META_DEFAULT_VALUES },
-  { signer: 'staff', type: FieldType.DATE, page: 1, positionX: 9.8, positionY: 61.24, width: 39.22, height: 2.53, fieldMeta: FIELD_DATE_META_DEFAULT_VALUES },
+  {
+    signer: 'staff',
+    type: FieldType.SIGNATURE,
+    page: 1,
+    positionX: 9.8,
+    positionY: 53.03,
+    width: 39.22,
+    height: 5.05,
+    fieldMeta: FIELD_SIGNATURE_META_DEFAULT_VALUES,
+  },
+  {
+    signer: 'staff',
+    type: FieldType.NAME,
+    page: 1,
+    positionX: 52.29,
+    positionY: 55.56,
+    width: 37.91,
+    height: 2.53,
+    fieldMeta: FIELD_NAME_META_DEFAULT_VALUES,
+  },
+  {
+    signer: 'staff',
+    type: FieldType.DATE,
+    page: 1,
+    positionX: 9.8,
+    positionY: 61.24,
+    width: 39.22,
+    height: 2.53,
+    fieldMeta: FIELD_DATE_META_DEFAULT_VALUES,
+  },
 
   // Building administrator approval block.
-  { signer: 'administrator', type: FieldType.SIGNATURE, page: 1, positionX: 9.8, positionY: 72.6, width: 39.22, height: 5.05, fieldMeta: FIELD_SIGNATURE_META_DEFAULT_VALUES },
-  { signer: 'administrator', type: FieldType.NAME, page: 1, positionX: 52.29, positionY: 75.13, width: 37.91, height: 2.53, fieldMeta: FIELD_NAME_META_DEFAULT_VALUES },
-  { signer: 'administrator', type: FieldType.DATE, page: 1, positionX: 9.8, positionY: 80.81, width: 39.22, height: 2.53, fieldMeta: FIELD_DATE_META_DEFAULT_VALUES },
+  {
+    signer: 'administrator',
+    type: FieldType.SIGNATURE,
+    page: 1,
+    positionX: 9.8,
+    positionY: 72.6,
+    width: 39.22,
+    height: 5.05,
+    fieldMeta: FIELD_SIGNATURE_META_DEFAULT_VALUES,
+  },
+  {
+    signer: 'administrator',
+    type: FieldType.NAME,
+    page: 1,
+    positionX: 52.29,
+    positionY: 75.13,
+    width: 37.91,
+    height: 2.53,
+    fieldMeta: FIELD_NAME_META_DEFAULT_VALUES,
+  },
+  {
+    signer: 'administrator',
+    type: FieldType.DATE,
+    page: 1,
+    positionX: 9.8,
+    positionY: 80.81,
+    width: 39.22,
+    height: 2.53,
+    fieldMeta: FIELD_DATE_META_DEFAULT_VALUES,
+  },
 ];
 
 function staffText(positionX: number, positionY: number, label: string): TemplateFieldSpec {
@@ -128,109 +182,113 @@ export const provisionGuestSpeakerTemplate = async (
 
   const pdfBase64 = fs.readFileSync(GUEST_SPEAKER_PDF_PATH).toString('base64');
 
-  const documentData = await prisma.documentData.create({
-    data: {
-      type: DocumentDataType.BYTES_64,
-      data: pdfBase64,
-      initialData: pdfBase64,
-    },
-  });
-
-  const documentMeta = await prisma.documentMeta.create({
-    data: {
-      signingOrder: DocumentSigningOrder.SEQUENTIAL,
-      subject: 'Guest Speaker Request & Approval',
-      message:
-        'Please review and sign the guest speaker request. It will route to the building administrator for approval once you sign.',
-    },
-  });
-
+  // incrementTemplateId uses its own internal prisma counter — keep it outside the
+  // transaction so a rollback doesn't leave the counter in an inconsistent state.
+  // Skipped counter values are harmless.
   const templateId = await incrementTemplateId();
 
-  const template = await prisma.envelope.create({
-    data: {
-      id: prefixedId('envelope'),
-      secondaryId: templateId.formattedTemplateId,
-      internalVersion: 1,
-      type: EnvelopeType.TEMPLATE,
-      title,
-      templateType: TemplateType.ORGANISATION,
-      publicTitle: 'Guest Speaker Request & Approval Form',
-      publicDescription:
-        'Submit a guest speaker request and route it for the required signatures.',
-      source: DocumentSource.TEMPLATE,
-      documentMetaId: documentMeta.id,
-      userId,
-      teamId,
-      envelopeItems: {
-        create: {
-          id: prefixedId('envelope_item'),
-          title,
-          documentDataId: documentData.id,
-          order: 1,
+  const template = await prisma.$transaction(async (tx) => {
+    const documentData = await tx.documentData.create({
+      data: {
+        type: DocumentDataType.BYTES_64,
+        data: pdfBase64,
+        initialData: pdfBase64,
+      },
+    });
+
+    const documentMeta = await tx.documentMeta.create({
+      data: {
+        signingOrder: DocumentSigningOrder.SEQUENTIAL,
+        subject: 'Guest Speaker Request & Approval',
+        message:
+          'Please review and sign the guest speaker request. It will route to the building administrator for approval once you sign.',
+      },
+    });
+
+    const createdEnvelope = await tx.envelope.create({
+      data: {
+        id: prefixedId('envelope'),
+        secondaryId: templateId.formattedTemplateId,
+        internalVersion: 1,
+        type: EnvelopeType.TEMPLATE,
+        title,
+        templateType: TemplateType.ORGANISATION,
+        publicTitle: 'Guest Speaker Request & Approval Form',
+        publicDescription:
+          'Submit a guest speaker request and route it for the required signatures.',
+        source: DocumentSource.TEMPLATE,
+        documentMetaId: documentMeta.id,
+        userId,
+        teamId,
+        envelopeItems: {
+          create: {
+            id: prefixedId('envelope_item'),
+            title,
+            documentDataId: documentData.id,
+            order: 1,
+          },
+        },
+        recipients: {
+          create: [
+            {
+              email: REQUESTING_STAFF_EMAIL,
+              name: 'Requesting Staff Member',
+              token: prefixedId('recipient'),
+              signingOrder: 1,
+              role: RecipientRole.SIGNER,
+              sendStatus: SendStatus.NOT_SENT,
+              signingStatus: SigningStatus.NOT_SIGNED,
+              readStatus: ReadStatus.NOT_OPENED,
+            },
+            {
+              email: ADMINISTRATOR_EMAIL,
+              name: 'Building Administrator',
+              token: prefixedId('recipient'),
+              signingOrder: 2,
+              role: RecipientRole.APPROVER,
+              sendStatus: SendStatus.NOT_SENT,
+              signingStatus: SigningStatus.NOT_SIGNED,
+              readStatus: ReadStatus.NOT_OPENED,
+            },
+          ],
         },
       },
-      recipients: {
-        create: [
-          {
-            email: REQUESTING_STAFF_EMAIL,
-            name: 'Requesting Staff Member',
-            token: prefixedId('recipient'),
-            signingOrder: 1,
-            role: RecipientRole.SIGNER,
-            sendStatus: SendStatus.NOT_SENT,
-            signingStatus: SigningStatus.NOT_SIGNED,
-            readStatus: ReadStatus.NOT_OPENED,
-          },
-          {
-            email: ADMINISTRATOR_EMAIL,
-            name: 'Building Administrator',
-            token: prefixedId('recipient'),
-            signingOrder: 2,
-            role: RecipientRole.APPROVER,
-            sendStatus: SendStatus.NOT_SENT,
-            signingStatus: SigningStatus.NOT_SIGNED,
-            readStatus: ReadStatus.NOT_OPENED,
-          },
-        ],
+      include: {
+        recipients: true,
+        envelopeItems: true,
       },
-    },
-    include: {
-      recipients: true,
-      envelopeItems: true,
-    },
-  });
+    });
 
-  const envelopeItem = template.envelopeItems[0];
-  const recipientBySigner: Record<SignerKey, number> = {
-    staff: getRecipientId(template.recipients, REQUESTING_STAFF_EMAIL),
-    administrator: getRecipientId(template.recipients, ADMINISTRATOR_EMAIL),
-  };
+    const envelopeItem = createdEnvelope.envelopeItems[0];
+    const recipientBySigner: Record<SignerKey, number> = {
+      staff: getRecipientId(createdEnvelope.recipients, REQUESTING_STAFF_EMAIL),
+      administrator: getRecipientId(createdEnvelope.recipients, ADMINISTRATOR_EMAIL),
+    };
 
-  await prisma.field.createMany({
-    data: TEMPLATE_FIELDS.map((field) => ({
-      envelopeId: template.id,
-      envelopeItemId: envelopeItem.id,
-      recipientId: recipientBySigner[field.signer],
-      type: field.type,
-      page: field.page,
-      positionX: field.positionX,
-      positionY: field.positionY,
-      width: field.width,
-      height: field.height,
-      customText: '',
-      inserted: false,
-      fieldMeta: field.fieldMeta,
-    })),
+    await tx.field.createMany({
+      data: TEMPLATE_FIELDS.map((field) => ({
+        envelopeId: createdEnvelope.id,
+        envelopeItemId: envelopeItem.id,
+        recipientId: recipientBySigner[field.signer],
+        type: field.type,
+        page: field.page,
+        positionX: field.positionX,
+        positionY: field.positionY,
+        width: field.width,
+        height: field.height,
+        customText: '',
+        inserted: false,
+        fieldMeta: field.fieldMeta,
+      })),
+    });
+
+    return createdEnvelope;
   });
 
   return { template, created: true };
 };
 
-function getRecipientId(
-  recipients: { id: number; email: string }[],
-  email: string,
-): number {
+function getRecipientId(recipients: { id: number; email: string }[], email: string): number {
   const recipient = recipients.find((item) => item.email === email);
 
   if (!recipient) {
