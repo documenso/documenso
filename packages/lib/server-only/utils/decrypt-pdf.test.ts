@@ -65,6 +65,23 @@ describe('decryptPdf', () => {
     });
   });
 
+  it('should throw DECRYPTION_TIMEOUT when qpdf process is killed (timeout)', async () => {
+    vi.mocked(childProcess.execFile).mockImplementation((_cmd, _args, _opts, callback) => {
+      const err: ExecFileException = Object.assign(new Error('Process killed'), {
+        code: null,
+        killed: true,
+        signal: 'SIGKILL' as NodeJS.Signals,
+      });
+      callback?.(err, '', '');
+      return createChildStub();
+    });
+
+    const { decryptPdf } = await import('./decrypt-pdf');
+    await expect(decryptPdf(Buffer.from('pdf'), 'pass')).rejects.toMatchObject({
+      code: 'DECRYPTION_TIMEOUT',
+    });
+  });
+
   it('should throw DECRYPTION_FAILED when qpdf exits with a non-password error', async () => {
     vi.mocked(childProcess.execFile).mockImplementation((_cmd, _args, _opts, callback) => {
       const err: ExecFileException = Object.assign(new Error('damaged pdf'), { code: 3 });

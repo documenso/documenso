@@ -26,6 +26,7 @@ export enum AppErrorCode {
   'CONVERSION_TIMEOUT' = 'CONVERSION_TIMEOUT',
   'ENCRYPTED_DOCUMENT_REQUIRES_PASSWORD' = 'ENCRYPTED_DOCUMENT_REQUIRES_PASSWORD',
   'DECRYPTION_FAILED' = 'DECRYPTION_FAILED',
+  'DECRYPTION_TIMEOUT' = 'DECRYPTION_TIMEOUT',
 }
 
 export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; status: number }> =
@@ -49,6 +50,7 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
     [AppErrorCode.CONVERSION_TIMEOUT]: { code: 'BAD_REQUEST', status: 422 },
     [AppErrorCode.ENCRYPTED_DOCUMENT_REQUIRES_PASSWORD]: { code: 'BAD_REQUEST', status: 422 },
     [AppErrorCode.DECRYPTION_FAILED]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
+    [AppErrorCode.DECRYPTION_TIMEOUT]: { code: 'BAD_REQUEST', status: 422 },
   };
 
 export const ZAppErrorJsonSchema = z.object({

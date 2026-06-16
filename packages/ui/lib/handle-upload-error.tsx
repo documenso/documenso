@@ -37,7 +37,11 @@ export const buildUploadErrorMessage = (errorCode: string): MessageDescriptor =>
     .with(
       AppErrorCode.DECRYPTION_FAILED,
       () =>
-        msg`We couldn't process this encrypted PDF. Please remove its password protection and try again.`,
+        msg`We couldn't process this PDF. It may be corrupted or use unsupported encryption — please try a different file, or contact support.`,
+    )
+    .with(
+      AppErrorCode.DECRYPTION_TIMEOUT,
+      () => msg`The encrypted PDF took too long to process. Please try a smaller file.`,
     )
     .with(
       AppErrorCode.CONVERSION_FAILED,
@@ -46,7 +50,8 @@ export const buildUploadErrorMessage = (errorCode: string): MessageDescriptor =>
     )
     .with(
       AppErrorCode.CONVERSION_TIMEOUT,
-      () => msg`The document took too long to convert. Please try a smaller file, or upload it as a PDF.`,
+      () =>
+        msg`The document took too long to convert. Please try a smaller file, or upload it as a PDF.`,
     )
     .with(
       AppErrorCode.DEPENDENCY_MISSING,

@@ -50,8 +50,8 @@ export const decryptPdf = async (pdf: Buffer, password = ''): Promise<Buffer> =>
     const killed = isErrorObject && 'killed' in err ? err.killed : undefined;
 
     if (killed) {
-      throw new AppError('DECRYPTION_FAILED', {
-        message: 'PDF decryption timed out',
+      throw new AppError('DECRYPTION_TIMEOUT', {
+        message: `qpdf timed out after ${QPDF_TIMEOUT_MS / 1000}s`,
       });
     }
 
