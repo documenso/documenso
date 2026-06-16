@@ -6,9 +6,7 @@ import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
+import { useLingui } from '@lingui/react/macro';
 import { FileType2Icon, Trash2Icon, UploadIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -19,6 +17,7 @@ type FontManagementFormProps = {
 };
 
 const ACCEPTED_FONT_TYPES = '.ttf,.otf,font/ttf,font/otf,application/x-font-ttf,application/x-font-otf';
+const MAX_FONT_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 
 const canDeleteFontForTarget = (
   font: { userId: number | null; teamId: number | null; organisationId: string | null },
@@ -36,7 +35,7 @@ const canDeleteFontForTarget = (
 };
 
 export const FontManagementForm = ({ target }: FontManagementFormProps) => {
-  const { _ } = useLingui();
+  const { t } = useLingui();
   const { toast } = useToast();
   const trpcUtils = trpc.useUtils();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -54,9 +53,19 @@ export const FontManagementForm = ({ target }: FontManagementFormProps) => {
       return;
     }
 
-    const bytes = new Uint8Array(await selectedFile.arrayBuffer());
+    if (selectedFile.size > MAX_FONT_FILE_SIZE_BYTES) {
+      toast({
+        title: t`File too large`,
+        description: t`Font files must be 5MB or smaller.`,
+        variant: 'destructive',
+      });
+
+      return;
+    }
 
     try {
+      const bytes = new Uint8Array(await selectedFile.arrayBuffer());
+
       await uploadFont({
         target,
         fileName: selectedFile.name,
@@ -71,16 +80,16 @@ export const FontManagementForm = ({ target }: FontManagementFormProps) => {
       await invalidateFonts();
 
       toast({
-        title: _(msg`Font uploaded`),
-        description: _(msg`Your font has been added to the font library.`),
+        title: t`Font uploaded`,
+        description: t`Your font has been added to the font library.`,
       });
     } catch (err) {
       const error = AppError.parseError(err);
       console.error(error);
 
       toast({
-        title: _(msg`Something went wrong`),
-        description: _(msg`We were unable to upload this font.`),
+        title: t`Something went wrong`,
+        description: t`We were unable to upload this font.`,
         variant: 'destructive',
       });
     }
@@ -92,16 +101,16 @@ export const FontManagementForm = ({ target }: FontManagementFormProps) => {
       await invalidateFonts();
 
       toast({
-        title: _(msg`Font deleted`),
-        description: _(msg`The font has been removed from the library.`),
+        title: t`Font deleted`,
+        description: t`The font has been removed from the library.`,
       });
     } catch (err) {
       const error = AppError.parseError(err);
       console.error(error);
 
       toast({
-        title: _(msg`Unable to delete font`),
-        description: _(msg`This font may still be used by one or more fields.`),
+        title: t`Unable to delete font`,
+        description: t`This font may still be used by one or more fields.`,
         variant: 'destructive',
       });
     }
@@ -113,7 +122,7 @@ export const FontManagementForm = ({ target }: FontManagementFormProps) => {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
           <div className="flex-1">
             <label className="font-medium text-sm" htmlFor="font-upload">
-              <Trans>Upload font</Trans>
+              {t`Upload font`}
             </label>
 
             <Input
@@ -134,7 +143,7 @@ export const FontManagementForm = ({ target }: FontManagementFormProps) => {
 
           <div className="flex-1">
             <label className="font-medium text-sm" htmlFor="font-display-name">
-              <Trans>Display name</Trans>
+              {t`Display name`}
             </label>
 
             <Input
@@ -142,37 +151,33 @@ export const FontManagementForm = ({ target }: FontManagementFormProps) => {
               value={displayName}
               maxLength={120}
               className="mt-2"
-              placeholder={_(msg`Font display name`)}
+              placeholder={t`Font display name`}
               onChange={(event) => setDisplayName(event.target.value)}
             />
           </div>
 
           <Button type="button" disabled={!selectedFile || isUploading} loading={isUploading} onClick={onUpload}>
             <UploadIcon className="mr-2 h-4 w-4" />
-            <Trans>Upload</Trans>
+            {t`Upload`}
           </Button>
         </div>
 
         <p className="mt-2 text-muted-foreground text-sm">
-          <Trans>Supported formats: TTF and OTF. Maximum file size is 5MB.</Trans>
+          {t`Supported formats: TTF and OTF. Maximum file size is 5MB.`}
         </p>
       </div>
 
       <div className="flex flex-col gap-3">
-        {isLoading && (
-          <p className="text-muted-foreground text-sm">
-            <Trans>Loading fonts...</Trans>
-          </p>
-        )}
+        {isLoading && <p className="text-muted-foreground text-sm">{t`Loading fonts...`}</p>}
 
         {!isLoading && fonts.length === 0 && (
           <div className="rounded-lg border border-border border-dashed p-8 text-center text-muted-foreground text-sm">
-            <Trans>No custom fonts have been uploaded yet.</Trans>
+            {t`No custom fonts have been uploaded yet.`}
           </div>
         )}
 
         {fonts.map((font) => {
-          const owner = font.userId ? _(msg`Personal`) : font.teamId ? _(msg`Team`) : _(msg`Organisation`);
+          const owner = font.userId ? t`Personal` : font.teamId ? t`Team` : t`Organisation`;
           const canDelete = canDeleteFontForTarget(font, target);
 
           return (
@@ -192,7 +197,7 @@ export const FontManagementForm = ({ target }: FontManagementFormProps) => {
 
                 <p className="truncate text-muted-foreground text-sm">{font.fileName}</p>
                 <p className="mt-2 text-xl" style={{ fontFamily: `"${font.id}", "${font.family}", sans-serif` }}>
-                  <Trans>The quick brown fox jumps over the lazy dog</Trans>
+                  {t`The quick brown fox jumps over the lazy dog`}
                 </p>
               </div>
 
@@ -201,7 +206,7 @@ export const FontManagementForm = ({ target }: FontManagementFormProps) => {
               {canDelete && (
                 <Button type="button" variant="outline" disabled={isDeleting} onClick={() => void onDelete(font.id)}>
                   <Trash2Icon className="mr-2 h-4 w-4" />
-                  <Trans>Delete</Trans>
+                  {t`Delete`}
                 </Button>
               )}
             </div>

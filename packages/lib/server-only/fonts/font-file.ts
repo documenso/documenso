@@ -1,3 +1,4 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import fontkit from '@pdf-lib/fontkit';
 
 export const SUPPORTED_FONT_MIME_TYPES = ['font/ttf', 'font/otf', 'application/x-font-ttf', 'application/x-font-otf'];
@@ -19,7 +20,9 @@ export const parseFontFile = ({ bytes, fallbackName }: { bytes: Uint8Array; fall
       family,
     };
   } catch (_err) {
-    throw new Error('Invalid font file');
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Invalid font file',
+    });
   }
 };
 
@@ -35,4 +38,8 @@ export const isSupportedFontMimeType = (mimeType: string | undefined | null) => 
   }
 
   return SUPPORTED_FONT_MIME_TYPES.includes(mimeType);
+};
+
+export const inferFontMimeType = (fileName: string) => {
+  return fileName.toLowerCase().endsWith('.otf') ? 'font/otf' : 'font/ttf';
 };

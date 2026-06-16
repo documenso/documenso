@@ -12,7 +12,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> => {
 };
 
 export const isUploadedFieldFontFamily = (fontFamily: string | undefined | null) => {
-  return Boolean(fontFamily && !fontFamily.includes(',') && !fontFamily.includes(' '));
+  return Boolean(fontFamily && /^[A-Za-z0-9_-]+$/.test(fontFamily));
 };
 
 export const getFieldRenderFontFamily = (fontFamily: string | undefined | null) => {

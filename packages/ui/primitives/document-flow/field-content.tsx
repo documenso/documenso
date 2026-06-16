@@ -170,13 +170,17 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
   }
 
   const textAlign = fieldMeta && 'textAlign' in fieldMeta ? fieldMeta.textAlign : 'left';
-  const fontFamily = fieldMeta && 'fontFamily' in fieldMeta ? fieldMeta.fontFamily : null;
-  const textStyle = getFieldTextStyle(fieldMeta);
+  const shouldApplyGenericTextStyle = !isSignatureField;
+  const fontFamily =
+    shouldApplyGenericTextStyle && fieldMeta && 'fontFamily' in fieldMeta ? fieldMeta.fontFamily : null;
+  const textStyle = shouldApplyGenericTextStyle ? getFieldTextStyle(fieldMeta) : undefined;
 
   return (
     <div className="flex h-full w-full items-center overflow-hidden">
       <p
-        style={{ fontFamily: getFieldRenderFontFamily(fontFamily), ...textStyle }}
+        style={
+          shouldApplyGenericTextStyle ? { fontFamily: getFieldRenderFontFamily(fontFamily), ...textStyle } : undefined
+        }
         className={cn(
           'w-full whitespace-pre-wrap text-left text-[clamp(0.07rem,25cqw,0.825rem)] text-foreground duration-200',
           {

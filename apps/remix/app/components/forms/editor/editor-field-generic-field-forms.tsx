@@ -18,7 +18,7 @@ import { type Control, useFormContext } from 'react-hook-form';
 
 // Can't seem to get the non-any type to work with correct types.
 // Eg Control<{ fontSize?: number } doesn't seem to work when there are required items.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: react-hook-form control typing is intentionally widened for shared field forms.
 type FormControlType = Control<any>;
 
 export const EditorGenericFontFamilyField = ({
@@ -115,6 +115,8 @@ export const EditorGenericFontStyleFields = ({
   formControl: FormControlType;
   className?: string;
 }) => {
+  const { t } = useLingui();
+
   return (
     <div className={cn('grid grid-cols-2 gap-2', className)}>
       <FormField
@@ -127,7 +129,7 @@ export const EditorGenericFontStyleFields = ({
             </FormLabel>
             <FormControl>
               <Toggle
-                aria-label="Bold"
+                aria-label={t`Bold`}
                 data-testid="field-form-fontWeight"
                 pressed={field.value === 'bold'}
                 size="sm"
@@ -153,7 +155,7 @@ export const EditorGenericFontStyleFields = ({
             </FormLabel>
             <FormControl>
               <Toggle
-                aria-label="Italic"
+                aria-label={t`Italic`}
                 data-testid="field-form-fontStyle"
                 pressed={field.value === 'italic'}
                 size="sm"

@@ -1,3 +1,4 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getFontAssetFile } from '@documenso/lib/server-only/fonts/font-assets';
 import { sha256 } from '@documenso/lib/universal/crypto';
 
@@ -21,9 +22,11 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const result = await getFontAssetFile({
     fontId,
   }).catch((error) => {
-    console.error(error);
+    if (error instanceof AppError && error.code === AppErrorCode.NOT_FOUND) {
+      return null;
+    }
 
-    return null;
+    throw error;
   });
 
   if (!result) {

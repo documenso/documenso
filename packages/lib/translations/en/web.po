@@ -2332,6 +2332,8 @@ msgid "Blue"
 msgstr "Blue"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
+#: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-style-controls.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-style-controls.tsx
 msgid "Bold"
 msgstr "Bold"
@@ -5710,6 +5712,10 @@ msgstr "File is too small"
 msgid "File size exceeds the limit of {APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB"
 msgstr "File size exceeds the limit of {APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB"
 
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "File too large"
+msgstr "File too large"
+
 #: apps/remix/app/components/dialogs/email-transport-create-dialog.tsx
 msgid "Fill in the details to create a new email transport."
 msgstr "Fill in the details to create a new email transport."
@@ -5773,6 +5779,10 @@ msgstr "Font deleted"
 #: apps/remix/app/components/forms/font-management-form.tsx
 msgid "Font display name"
 msgstr "Font display name"
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Font files must be 5MB or smaller."
+msgstr "Font files must be 5MB or smaller."
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/date-field.tsx
@@ -6534,6 +6544,8 @@ msgid "Italian"
 msgstr "Italian"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
+#: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-style-controls.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-style-controls.tsx
 msgid "Italic"
 msgstr "Italic"

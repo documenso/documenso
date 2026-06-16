@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_FIELD_RENDER_FONT_FAMILY, getFieldRenderFontFamily, getUploadedFieldFontIds } from './field-fonts';
+import {
+  DEFAULT_FIELD_RENDER_FONT_FAMILY,
+  getFieldRenderFontFamily,
+  getUploadedFieldFontIds,
+  isUploadedFieldFontFamily,
+} from './field-fonts';
 
 describe('field fonts', () => {
   it('uses the default font family when no uploaded font is selected', () => {
@@ -21,5 +26,13 @@ describe('field fonts', () => {
         { fieldMeta: null },
       ]),
     ).toEqual(['font_a']);
+  });
+
+  it('rejects unsafe uploaded font ids before CSS interpolation', () => {
+    expect(isUploadedFieldFontFamily('font"asset')).toBe(false);
+    expect(isUploadedFieldFontFamily('font;asset')).toBe(false);
+    expect(isUploadedFieldFontFamily('font{asset')).toBe(false);
+    expect(isUploadedFieldFontFamily('font}asset')).toBe(false);
+    expect(isUploadedFieldFontFamily('font\nasset')).toBe(false);
   });
 });

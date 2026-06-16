@@ -28,6 +28,7 @@ import {
 import { getFontAssetBytesForField } from '../fonts/font-assets';
 import { drawStyledFieldText, hasPdfTextStyle } from './field-text-style';
 import { getPageSize } from './get-page-size';
+import { getFieldFontLibraryContext } from './helpers';
 
 export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSignature) => {
   const [fontCaveat, fontNoto] = await Promise.all([
@@ -43,7 +44,7 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
    * Blue box is the adjusted field width, height and position. It will represent
    * where the text will overflow into.
    */
-  // biome-ignore lint/nursery/noUndeclaredEnvVars: DEBUG_PDF_INSERT is a local debugging flag.
+  // biome-ignore lint: DEBUG_PDF_INSERT is a local debugging flag.
   const isDebugMode = process.env.DEBUG_PDF_INSERT === '1' || process.env.DEBUG_PDF_INSERT === 'true';
 
   pdf.registerFontkit(fontkit);
@@ -119,8 +120,9 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
     isSignatureField ? fontCaveat : fontNoto,
     isSignatureField ? { features: { calt: false } } : undefined,
   );
+  const fontLibraryContext = await getFieldFontLibraryContext(field);
   const getFieldFont = async (fontFamily: string | undefined | null) => {
-    const uploadedFont = await getFontAssetBytesForField(fontFamily);
+    const uploadedFont = await getFontAssetBytesForField(fontFamily, fontLibraryContext);
 
     return uploadedFont ? await pdf.embedFont(uploadedFont.bytes) : font;
   };

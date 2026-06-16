@@ -1,3 +1,4 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createFontAsset, deleteFontAsset, listFontAssets } from '@documenso/lib/server-only/fonts/font-assets';
 import { base64 } from '@documenso/lib/universal/base64';
 
@@ -15,17 +16,31 @@ export const fontRouter = router({
   upload: authenticatedProcedure.input(ZUploadFontRequestSchema).mutation(async ({ input, ctx }) => {
     const bytes = base64.decode(input.bytes);
 
-    return await createFontAsset({
-      userId: ctx.user.id,
-      target: input.target,
-      file: {
-        name: input.fileName,
-        displayName: input.displayName,
-        type: input.mimeType,
-        size: input.fileSize,
-        arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
-      },
-    });
+    try {
+      return await createFontAsset({
+        userId: ctx.user.id,
+        target: input.target,
+        file: {
+          name: input.fileName,
+          displayName: input.displayName,
+          type: input.mimeType,
+          size: input.fileSize,
+          arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
+        },
+      });
+    } catch (error) {
+      const appError = AppError.parseError(error);
+
+      if (
+        appError.code === AppErrorCode.INVALID_BODY ||
+        appError.code === AppErrorCode.LIMIT_EXCEEDED ||
+        appError.code === AppErrorCode.NOT_FOUND
+      ) {
+        throw appError;
+      }
+
+      throw error;
+    }
   }),
 
   delete: authenticatedProcedure.input(ZDeleteFontRequestSchema).mutation(async ({ input, ctx }) => {

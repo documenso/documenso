@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { BoldIcon, ItalicIcon } from 'lucide-react';
 
 import { Label } from '../../label';
@@ -13,6 +13,8 @@ export const TextStyleControls = <TFieldState extends { fontWeight?: string | nu
   fieldState,
   onChange,
 }: TextStyleControlsProps<TFieldState>) => {
+  const { t } = useLingui();
+
   return (
     <div className="grid grid-cols-2 gap-2">
       <div>
@@ -21,7 +23,7 @@ export const TextStyleControls = <TFieldState extends { fontWeight?: string | nu
         </Label>
 
         <Toggle
-          aria-label="Bold"
+          aria-label={t`Bold`}
           pressed={fieldState.fontWeight === 'bold'}
           size="sm"
           variant="outline"
@@ -38,7 +40,7 @@ export const TextStyleControls = <TFieldState extends { fontWeight?: string | nu
         </Label>
 
         <Toggle
-          aria-label="Italic"
+          aria-label={t`Italic`}
           pressed={fieldState.fontStyle === 'italic'}
           size="sm"
           variant="outline"

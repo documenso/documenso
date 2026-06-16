@@ -7,9 +7,15 @@ import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putFileServerSide } from '../../universal/upload/put-file.server';
 import { buildOrganisationWhereQuery } from '../../utils/organisations';
 import { buildTeamWhereQuery } from '../../utils/teams';
-import { type FontLibraryContext, getVisibleFontOwners } from './font-access';
+import { type FontLibraryContext, type FontOwnerSelector, getVisibleFontOwners } from './font-access';
 import { resolveFontDisplayName } from './font-display-name';
-import { isSupportedFontFileName, isSupportedFontMimeType, MAX_FONT_FILE_SIZE, parseFontFile } from './font-file';
+import {
+  inferFontMimeType,
+  isSupportedFontFileName,
+  isSupportedFontMimeType,
+  MAX_FONT_FILE_SIZE,
+  parseFontFile,
+} from './font-file';
 
 type FontLibraryTarget =
   | {
@@ -122,6 +128,28 @@ const getVisibleFontWhere = (context: FontLibraryContext) => {
   };
 };
 
+const isFontOwnerMatch = (
+  fontAsset: { userId: number | null; teamId: number | null; organisationId: string | null },
+  owner: FontOwnerSelector,
+) => {
+  if ('userId' in owner) {
+    return fontAsset.userId === owner.userId;
+  }
+
+  if ('teamId' in owner) {
+    return fontAsset.teamId === owner.teamId;
+  }
+
+  return fontAsset.organisationId === owner.organisationId;
+};
+
+export const isFontAssetVisibleToContext = (
+  fontAsset: { userId: number | null; teamId: number | null; organisationId: string | null },
+  context: FontLibraryContext,
+) => {
+  return getVisibleFontOwners(context).some((owner) => isFontOwnerMatch(fontAsset, owner));
+};
+
 export const listFontAssets = async ({ userId, target }: { userId: number; target: FontLibraryTarget }) => {
   const context = await resolveFontLibraryContext({
     userId,
@@ -168,6 +196,7 @@ export const createFontAsset = async ({
   });
 
   const bytes = new Uint8Array(await file.arrayBuffer());
+  const mimeType = file.type || inferFontMimeType(file.name);
   const parsedFont = parseFontFile({
     bytes,
     fallbackName: file.name,
@@ -175,7 +204,7 @@ export const createFontAsset = async ({
 
   const storedFile = await putFileServerSide({
     name: file.name,
-    type: file.type || 'font/ttf',
+    type: mimeType,
     arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
   });
 
@@ -188,7 +217,7 @@ export const createFontAsset = async ({
       }),
       family: parsedFont.family,
       fileName: file.name,
-      mimeType: file.type || 'font/ttf',
+      mimeType,
       fileSize: file.size,
       dataType: storedFile.type,
       data: storedFile.data,
@@ -276,10 +305,13 @@ export const deleteFontAsset = async ({ userId, fontId }: { userId: number; font
 };
 
 export const isUploadedFontAssetId = (fontFamily: string | undefined | null) => {
-  return Boolean(fontFamily && !fontFamily.includes(',') && !fontFamily.includes(' '));
+  return Boolean(fontFamily && /^[A-Za-z0-9_-]+$/.test(fontFamily));
 };
 
-export const getFontAssetBytesForField = async (fontFamily: string | undefined | null) => {
+export const getFontAssetBytesForField = async (
+  fontFamily: string | undefined | null,
+  context?: FontLibraryContext | null,
+) => {
   if (!isUploadedFontAssetId(fontFamily)) {
     return null;
   }
@@ -291,6 +323,10 @@ export const getFontAssetBytesForField = async (fontFamily: string | undefined |
   });
 
   if (!fontAsset) {
+    return null;
+  }
+
+  if (context && !isFontAssetVisibleToContext(fontAsset, context)) {
     return null;
   }
 
