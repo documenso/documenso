@@ -4,7 +4,6 @@ import {
   EnvelopeType,
   FieldType,
   RecipientRole,
-  SendStatus,
   SigningStatus,
   WebhookTriggerEvents,
 } from '@prisma/client';
@@ -491,9 +490,10 @@ export const completeDocumentWithToken = async ({
         Boolean(nextSigner) &&
         Boolean(envelope.documentMeta?.allowDictateNextSigner);
 
-      await prisma.$transaction(async (tx) => {
-        for (const nextRecipient of nextRecipients) {
-          if (canDictateNextSigner && nextSigner) {
+      if (canDictateNextSigner && nextSigner) {
+        await prisma.$transaction(async (tx) => {
+          // nextRecipients has exactly one element when canDictateNextSigner is true.
+          for (const nextRecipient of nextRecipients) {
             await tx.documentAuditLog.create({
               data: createDocumentAuditLogData({
                 type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
@@ -523,23 +523,17 @@ export const completeDocumentWithToken = async ({
                 },
               }),
             });
-          }
 
-          await tx.recipient.update({
-            where: { id: nextRecipient.id },
-            data: {
-              sendStatus: SendStatus.SENT,
-              sentAt: new Date(),
-              ...(canDictateNextSigner && nextSigner
-                ? {
-                    name: nextSigner.name,
-                    email: nextSigner.email,
-                  }
-                : {}),
-            },
-          });
-        }
-      });
+            await tx.recipient.update({
+              where: { id: nextRecipient.id },
+              data: {
+                name: nextSigner.name,
+                email: nextSigner.email,
+              },
+            });
+          }
+        });
+      }
 
       for (const nextRecipient of nextRecipients) {
         await jobs.triggerJob({
