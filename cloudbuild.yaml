@@ -8,6 +8,8 @@
 #   gcloud builds submit --config=cloudbuild.yaml \
 #     --substitutions=_IMAGE=REGION-docker.pkg.dev/PROJECT/REPO/documenso:latest .
 
+# Auto-deploy trigger active
+
 steps:
   - name: gcr.io/cloud-builders/docker
     args:
