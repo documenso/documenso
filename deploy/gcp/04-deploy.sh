@@ -18,6 +18,7 @@ env_kv=(
   "NEXT_PUBLIC_UPLOAD_TRANSPORT=${UPLOAD_TRANSPORT}"
   "NEXT_PRIVATE_SIGNING_TRANSPORT=local"
   "NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12"
+  "NEXT_PUBLIC_DISABLE_SIGNUP=${DISABLE_SIGNUP:-true}"
 )
 
 if [[ -n "${SMTP_HOST:-}" ]]; then
@@ -62,6 +63,8 @@ gcloud_q run deploy "$SERVICE" \
   --image="$IMAGE" \
   --region="$REGION" \
   --platform=managed \
+  --allow-unauthenticated \
+  --no-invoker-iam-check \
   --add-cloudsql-instances="$CONNECTION_NAME" \
   --service-account="$(runtime_sa)" \
   --memory="$RUN_MEMORY" \

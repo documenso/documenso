@@ -37,7 +37,7 @@ fi
 : "${RUN_MIN_INSTANCES:=1}"
 : "${RUN_MAX_INSTANCES:=10}"
 : "${RUN_CONCURRENCY:=40}"
-: "${SMTP_PORT:=465}"
+: "${SMTP_PORT:=587}"
 : "${SMTP_FROM_NAME:=KeepContracts}"
 : "${SIGNING_CERT_CN:=KeepContracts Self-Signed}"
 

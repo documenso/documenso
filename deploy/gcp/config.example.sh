@@ -56,7 +56,7 @@ export UPLOAD_TRANSPORT="database"
 # Resend SMTP settings. Get your API key from resend.com.
 # SMTP_PASSWORD is your Resend API key (re_...).
 export SMTP_HOST="smtp.resend.com"
-export SMTP_PORT="465"
+export SMTP_PORT="587"
 export SMTP_USERNAME="resend"
 export SMTP_PASSWORD=""
 export SMTP_FROM_NAME="KeepContracts"
@@ -69,3 +69,7 @@ export SMTP_FROM_ADDRESS="sign@mail.keepcontracts.com"
 # cert or switch to Cloud KMS HSM signing (see README.md).
 export SIGNING_PASSPHRASE=""
 export SIGNING_CERT_CN="KeepContracts Signing Certificate"
+
+# ─── App settings ─────────────────────────────────────────────────────────────
+
+export DISABLE_SIGNUP="true" # disable public signups
