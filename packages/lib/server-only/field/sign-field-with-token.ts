@@ -298,6 +298,10 @@ export const signFieldWithToken = async ({
               type,
               data: updatedField.customText,
             }))
+            .with(FieldType.MARK_ON_PICTURE, (type) => ({
+              type,
+              data: updatedField.customText,
+            }))
             .exhaustive(),
           fieldSecurity: derivedRecipientActionAuth
             ? {

@@ -19,7 +19,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { Field } from '@prisma/client';
 import { FieldType, Prisma, RecipientRole, SendStatus } from '@prisma/client';
-import { CalendarDays, CheckSquare, ChevronDown, Contact, Disc, Hash, Mail, Type, User } from 'lucide-react';
+import { CalendarDays, CheckSquare, ChevronDown, Contact, Disc, Hash, Mail, MousePointerClick, Type, User } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -907,6 +907,31 @@ export const AddFieldsFormPartial = ({
                           >
                             <ChevronDown className="h-4 w-4" />
                             <Trans>Dropdown</Trans>
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="group h-full w-full"
+                      onClick={() => setSelectedField(FieldType.MARK_ON_PICTURE)}
+                      onMouseDown={() => setSelectedField(FieldType.MARK_ON_PICTURE)}
+                      data-selected={selectedField === FieldType.MARK_ON_PICTURE ? true : undefined}
+                    >
+                      <Card
+                        className={cn(
+                          'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                        )}
+                      >
+                        <CardContent className="p-4">
+                          <p
+                            className={cn(
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
+                            )}
+                          >
+                            <MousePointerClick className="h-4 w-4" />
+                            <Trans>Mark on Picture</Trans>
                           </p>
                         </CardContent>
                       </Card>
