@@ -22,8 +22,7 @@ images:
   - ${_IMAGE}
 
 options:
-  # The monorepo build (turbo prune + install + build) is CPU heavy; use a
-  # larger machine so it doesn't time out on the default worker.
   machineType: E2_HIGHCPU_8
+  logging: CLOUD_LOGGING_ONLY
 
 timeout: 2400s
