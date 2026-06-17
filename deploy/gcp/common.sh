@@ -24,11 +24,11 @@ fi
 : "${REGION:?Set REGION in config.sh}"
 
 # Defaults for anything the user may have trimmed from their config.sh.
-: "${REPO:=documenso}"
-: "${SERVICE:=documenso}"
-: "${DB_INSTANCE:=documenso-db}"
-: "${DB_NAME:=documenso}"
-: "${DB_USER:=documenso}"
+: "${REPO:=keepcontracts}"
+: "${SERVICE:=keepcontracts}"
+: "${DB_INSTANCE:=keepcontracts-db}"
+: "${DB_NAME:=keepcontracts}"
+: "${DB_USER:=keepcontracts}"
 : "${DB_TIER:=db-custom-1-3840}"
 : "${SECRET_PREFIX:=$SERVICE}"
 : "${UPLOAD_TRANSPORT:=database}"
@@ -37,9 +37,9 @@ fi
 : "${RUN_MIN_INSTANCES:=1}"
 : "${RUN_MAX_INSTANCES:=10}"
 : "${RUN_CONCURRENCY:=40}"
-: "${SMTP_PORT:=587}"
+: "${SMTP_PORT:=465}"
 : "${SMTP_FROM_NAME:=KeepContracts}"
-: "${SIGNING_CERT_CN:=Documenso Self-Signed}"
+: "${SIGNING_CERT_CN:=KeepContracts Self-Signed}"
 
 # Derived values
 IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO}/${SERVICE}:latest"

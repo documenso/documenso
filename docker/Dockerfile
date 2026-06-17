@@ -102,9 +102,10 @@ ENV NEXT_PRIVATE_TELEMETRY_HOST="$NEXT_PRIVATE_TELEMETRY_HOST"
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nodejs
 
-USER nodejs
-
 WORKDIR /app
+RUN chown nodejs:nodejs /app
+
+USER nodejs
 
 COPY --from=builder --chown=nodejs:nodejs /app/out/json/ .
 # Copy the tailwind config files across

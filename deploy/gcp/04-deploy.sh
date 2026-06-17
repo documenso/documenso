@@ -62,7 +62,6 @@ gcloud_q run deploy "$SERVICE" \
   --image="$IMAGE" \
   --region="$REGION" \
   --platform=managed \
-  --allow-unauthenticated \
   --add-cloudsql-instances="$CONNECTION_NAME" \
   --service-account="$(runtime_sa)" \
   --memory="$RUN_MEMORY" \
@@ -72,6 +71,9 @@ gcloud_q run deploy "$SERVICE" \
   --no-cpu-throttling \
   --concurrency="$RUN_CONCURRENCY" \
   --timeout=300 \
+  --network=default \
+  --subnet=default \
+  --vpc-egress=private-ranges-only \
   --set-env-vars="^|^${env_str}" \
   --set-secrets="$secret_str"
 

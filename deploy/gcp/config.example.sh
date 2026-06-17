@@ -14,30 +14,28 @@
 export PROJECT_ID=""
 
 # Region for Cloud Run, Cloud SQL and Artifact Registry.
-export REGION="us-central1"
+export REGION="us-west1"
 
 # ─── Naming (sensible defaults — override only if you want) ──────────────────
 
-export REPO="documenso"          # Artifact Registry repository
-export SERVICE="documenso"       # Cloud Run service name
-export DB_INSTANCE="documenso-db" # Cloud SQL instance name
-export DB_NAME="documenso"        # Database name
-export DB_USER="documenso"        # Database user
-export DB_TIER="db-custom-1-3840" # Cloud SQL machine type (1 vCPU / 3.75 GB)
+export REPO="keepcontracts"
+export SERVICE="keepcontracts"
+export DB_INSTANCE="keepcontracts-db"
+export DB_NAME="keepcontracts"
+export DB_USER="keepcontracts"
+export DB_TIER="db-custom-1-3840"
 
 # Secrets are named "<SECRET_PREFIX>-enc-key", etc. Defaults to SERVICE.
-# export SECRET_PREFIX="documenso"
+# export SECRET_PREFIX="keepcontracts"
 
 # Optional: deploy under a dedicated runtime service account instead of the
 # default Compute Engine SA. Leave unset to use the default.
-# export RUNTIME_SA="documenso-run@PROJECT_ID.iam.gserviceaccount.com"
+# export RUNTIME_SA="keepcontracts-run@PROJECT_ID.iam.gserviceaccount.com"
 
 # ─── Public URL ──────────────────────────────────────────────────────────────
 
-# Leave blank to use the auto-assigned Cloud Run URL (the deploy script will
-# detect it and wire it in automatically). Set this to your custom domain if
-# you've mapped one (recommended for production) e.g. https://app.keepcontracts.com
-export WEBAPP_URL=""
+# Leave blank to use the auto-assigned Cloud Run URL.
+export WEBAPP_URL="https://keepcontracts.com"
 
 # ─── Cloud Run sizing ────────────────────────────────────────────────────────
 
@@ -51,20 +49,18 @@ export RUN_CONCURRENCY="40"
 
 # ─── Storage ─────────────────────────────────────────────────────────────────
 
-# "database" stores uploaded documents in Postgres (simplest, keeps Cloud Run
-# stateless). Use "s3" with a GCS bucket via its S3-compatible API for scale.
 export UPLOAD_TRANSPORT="database"
 
 # ─── Email / SMTP (required to actually send email) ──────────────────────────
 
-# Leave SMTP_HOST blank to deploy without email wired up (the app will boot but
-# outbound email will fail until you configure this and redeploy).
-export SMTP_HOST=""
-export SMTP_PORT="587"
-export SMTP_USERNAME=""
-export SMTP_PASSWORD=""   # stored in Secret Manager, never committed
+# Resend SMTP settings. Get your API key from resend.com.
+# SMTP_PASSWORD is your Resend API key (re_...).
+export SMTP_HOST="smtp.resend.com"
+export SMTP_PORT="465"
+export SMTP_USERNAME="resend"
+export SMTP_PASSWORD=""
 export SMTP_FROM_NAME="KeepContracts"
-export SMTP_FROM_ADDRESS="noreply@keepcontracts.com"
+export SMTP_FROM_ADDRESS="sign@mail.keepcontracts.com"
 
 # ─── Document signing ────────────────────────────────────────────────────────
 
@@ -72,4 +68,4 @@ export SMTP_FROM_ADDRESS="noreply@keepcontracts.com"
 # one doesn't already exist. For production, replace the secret with a real
 # cert or switch to Cloud KMS HSM signing (see README.md).
 export SIGNING_PASSPHRASE=""
-export SIGNING_CERT_CN="KeepContracts Self-Signed"
+export SIGNING_CERT_CN="KeepContracts Signing Certificate"

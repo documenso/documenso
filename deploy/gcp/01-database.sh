@@ -35,11 +35,11 @@ user_exists="$(gcloud_q sql users list --instance="$DB_INSTANCE" --format='value
 
 if [[ "$user_exists" == "0" ]]; then
   info "Creating database user '${DB_USER}'..."
-  DB_PASSWORD="$(openssl rand -base64 24 | tr -dc 'A-Za-z0-9')"
+  DB_PASSWORD="$(openssl rand -base64 24 | tr -dc 'A-Za-z0-9')Kc1"
   gcloud_q sql users create "$DB_USER" --instance="$DB_INSTANCE" --password="$DB_PASSWORD"
 elif ! secret_exists "$DB_URL_SECRET"; then
   warn "DB user '${DB_USER}' exists but no '${DB_URL_SECRET}' secret was found — rotating its password to capture a fresh connection string."
-  DB_PASSWORD="$(openssl rand -base64 24 | tr -dc 'A-Za-z0-9')"
+  DB_PASSWORD="$(openssl rand -base64 24 | tr -dc 'A-Za-z0-9')Kc1"
   gcloud_q sql users set-password "$DB_USER" --instance="$DB_INSTANCE" --password="$DB_PASSWORD"
 else
   info "DB user and connection-string secret already exist — leaving the password untouched."
