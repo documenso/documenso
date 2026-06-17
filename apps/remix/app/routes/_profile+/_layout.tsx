@@ -54,7 +54,7 @@ export default function PublicProfileLayout() {
 
               <img
                 src={LogoIcon}
-                alt="Documenso Logo"
+                alt="Keep Contracts Logo"
                 width={48}
                 height={48}
                 className="h-10 w-auto sm:hidden dark:invert"

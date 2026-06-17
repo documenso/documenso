@@ -1,20 +1,20 @@
-name: documenso-development
+name: keepcontracts-development
 
 services:
   database:
     image: postgres:15
     container_name: database
     volumes:
-      - documenso_database:/var/lib/postgresql/data
+      - keepcontracts_database:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
       interval: 10s
       timeout: 5s
       retries: 5
     environment:
-      - POSTGRES_USER=documenso
+      - POSTGRES_USER=keepcontracts
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=documenso
+      - POSTGRES_DB=keepcontracts
     ports:
       - 54320:5432
 
@@ -43,16 +43,16 @@ services:
     volumes:
       - minio:/data
     environment:
-      MINIO_ROOT_USER: documenso
+      MINIO_ROOT_USER: keepcontracts
       MINIO_ROOT_PASSWORD: password
     entrypoint: sh
-    command: -c 'mkdir -p /data/documenso && minio server /data --console-address ":9001" --address ":9002"'
+    command: -c 'mkdir -p /data/keepcontracts && minio server /data --console-address ":9001" --address ":9002"'
 
   gotenberg:
     build:
       context: .
       dockerfile: Dockerfile.gotenberg
-    image: documenso-dev-gotenberg:latest
+    image: keepcontracts-dev-gotenberg:latest
     container_name: gotenberg
     restart: unless-stopped
     ports:
@@ -61,7 +61,7 @@ services:
       # Basic auth credentials Gotenberg checks when `--api-enable-basic-auth`
       # is passed. Dev defaults are non-secret — match
       # `NEXT_PRIVATE_DOCUMENT_CONVERSION_USERNAME` / `_PASSWORD` in `.env`.
-      GOTENBERG_API_BASIC_AUTH_USERNAME: documenso
+      GOTENBERG_API_BASIC_AUTH_USERNAME: keepcontracts
       GOTENBERG_API_BASIC_AUTH_PASSWORD: password
     command:
       - gotenberg
@@ -97,4 +97,4 @@ services:
 volumes:
   minio:
   redis:
-  documenso_database:
+  keepcontracts_database:

@@ -25,7 +25,7 @@ export const OrganisationAccountLinkConfirmationTemplate = ({
   const previewText =
     type === 'create'
       ? msg`A request has been made to create an account for you`
-      : msg`A request has been made to link your Documenso account`;
+      : msg`A request has been made to link your Keep Contracts account`;
 
   return (
     <Html>
@@ -45,7 +45,7 @@ export const OrganisationAccountLinkConfirmationTemplate = ({
                 {type === 'create' ? (
                   <Trans>Account creation request</Trans>
                 ) : (
-                  <Trans>Link your Documenso account</Trans>
+                  <Trans>Link your Keep Contracts account</Trans>
                 )}
               </Text>
 
@@ -57,8 +57,8 @@ export const OrganisationAccountLinkConfirmationTemplate = ({
                   </Trans>
                 ) : (
                   <Trans>
-                    <span className="font-bold">{organisationName}</span> has requested to link your current Documenso
-                    account to their organisation.
+                    <span className="font-bold">{organisationName}</span> has requested to link your current Keep
+                    Contracts account to their organisation.
                   </Trans>
                 )}
               </Text>
@@ -86,7 +86,7 @@ export const OrganisationAccountLinkConfirmationTemplate = ({
 
                 <Text className="mt-2 text-sm">
                   <Trans>
-                    You can unlink your account at any time in your security settings on Documenso{' '}
+                    You can unlink your account at any time in your security settings on Keep Contracts{' '}
                     <Link href={`${assetBaseUrl}/settings/security/linked-accounts`}>here.</Link>
                   </Trans>
                 </Text>

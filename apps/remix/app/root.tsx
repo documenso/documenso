@@ -146,18 +146,6 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
         <script nonce={nonce(cspNonce)}>0</script>
       </head>
       <body className={isRecipientRoute ? 'documenso-branded' : undefined}>
-        {/* Global license banner currently disabled. Need to wait until after a few releases. */}
-        {/* {licenseStatus === '?' && (
-          <div className="bg-destructive text-destructive-foreground">
-            <div className="mx-auto flex h-auto max-w-screen-xl items-center justify-center px-4 py-3 text-sm font-medium">
-              <div className="flex items-center">
-                <AlertTriangleIcon className="mr-2 h-4 w-4" />
-                <Trans>This is an expired license instance of Documenso</Trans>
-              </div>
-            </div>
-          </div>
-        )} */}
-
         <NuqsAdapter>
           <SessionProvider initialSession={session}>
             <TooltipProvider>

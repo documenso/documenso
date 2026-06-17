@@ -88,7 +88,7 @@ export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
         </div>
 
         <h3 className="mb-2 flex items-end font-medium text-primary-forground text-sm leading-tight">
-          <Trans>Documenso License</Trans>
+          <Trans>Keep Contracts License</Trans>
         </h3>
 
         {match(license.status)
