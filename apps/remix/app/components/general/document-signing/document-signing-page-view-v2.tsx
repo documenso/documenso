@@ -84,7 +84,7 @@ export const DocumentSigningPageViewV2 = () => {
 
   return (
     <div className="min-h-screen w-screen bg-gray-50 dark:bg-background">
-      <FontFaceStyles fields={fontFields} />
+      <FontFaceStyles fields={fontFields} recipientToken={recipient.token} />
 
       <SignFieldEmailDialog.Root />
       <SignFieldTextDialog.Root />

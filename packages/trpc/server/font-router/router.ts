@@ -24,7 +24,7 @@ export const fontRouter = router({
           name: input.fileName,
           displayName: input.displayName,
           type: input.mimeType,
-          size: input.fileSize,
+          size: bytes.byteLength,
           arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
         },
       });

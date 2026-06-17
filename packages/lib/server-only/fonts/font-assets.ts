@@ -1,5 +1,6 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
+import type { DocumentDataType } from '@prisma/client';
 
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/organisations';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
@@ -196,6 +197,13 @@ export const createFontAsset = async ({
   });
 
   const bytes = new Uint8Array(await file.arrayBuffer());
+
+  if (bytes.byteLength > MAX_FONT_FILE_SIZE) {
+    throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
+      message: 'Font file is too large',
+    });
+  }
+
   const mimeType = file.type || inferFontMimeType(file.name);
   const parsedFont = parseFontFile({
     bytes,
@@ -218,20 +226,19 @@ export const createFontAsset = async ({
       family: parsedFont.family,
       fileName: file.name,
       mimeType,
-      fileSize: file.size,
+      fileSize: bytes.byteLength,
       dataType: storedFile.type,
       data: storedFile.data,
     },
   });
 };
 
-export const getFontAssetFile = async ({ fontId }: { fontId: string }) => {
-  const fontAsset = await prisma.fontAsset.findUnique({
-    where: {
-      id: fontId,
-    },
-  });
-
+const getFontAssetFileFromAsset = async (fontAsset: {
+  dataType: DocumentDataType;
+  data: string;
+  mimeType: string;
+  [key: string]: unknown;
+}) => {
   if (!fontAsset) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Font not found',
@@ -245,6 +252,86 @@ export const getFontAssetFile = async ({ fontId }: { fontId: string }) => {
       data: fontAsset.data,
     }),
   };
+};
+
+export const getFontAssetFileForUser = async ({ userId, fontId }: { userId: number; fontId: string }) => {
+  const fontAsset = await prisma.fontAsset.findFirst({
+    where: {
+      id: fontId,
+      OR: [
+        {
+          userId,
+        },
+        {
+          team: buildTeamWhereQuery({
+            teamId: undefined,
+            userId,
+          }),
+        },
+        {
+          organisation: buildOrganisationWhereQuery({
+            organisationId: undefined,
+            userId,
+          }),
+        },
+      ],
+    },
+  });
+
+  if (!fontAsset) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Font not found',
+    });
+  }
+
+  return await getFontAssetFileFromAsset(fontAsset);
+};
+
+export const getFontAssetFileForRecipientToken = async ({ fontId, token }: { fontId: string; token: string }) => {
+  const recipient = await prisma.recipient.findFirst({
+    where: {
+      token,
+    },
+    select: {
+      envelope: {
+        select: {
+          userId: true,
+          teamId: true,
+          team: {
+            select: {
+              organisationId: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!recipient) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Font not found',
+    });
+  }
+
+  const fontAsset = await prisma.fontAsset.findFirst({
+    where: {
+      id: fontId,
+      ...getVisibleFontWhere({
+        type: 'team',
+        userId: recipient.envelope.userId,
+        teamId: recipient.envelope.teamId,
+        organisationId: recipient.envelope.team.organisationId,
+      }),
+    },
+  });
+
+  if (!fontAsset) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Font not found',
+    });
+  }
+
+  return await getFontAssetFileFromAsset(fontAsset);
 };
 
 export const deleteFontAsset = async ({ userId, fontId }: { userId: number; fontId: string }) => {
