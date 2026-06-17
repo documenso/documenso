@@ -3,7 +3,7 @@ import type { TDocumentMany as TDocumentRow } from '@documenso/lib/types/documen
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { findRecipientByEmail } from '@documenso/lib/utils/recipients';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
+import { formatDocumentsPath, isMemberManagerOrAbove } from '@documenso/lib/utils/teams';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import {
@@ -30,11 +30,13 @@ import {
   Pencil,
   Share,
   Trash2,
+  XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router';
 
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
+import { EnvelopeCancelDialog } from '~/components/dialogs/envelope-cancel-dialog';
 import { EnvelopeDeleteDialog } from '~/components/dialogs/envelope-delete-dialog';
 import { EnvelopeDuplicateDialog } from '~/components/dialogs/envelope-duplicate-dialog';
 import { EnvelopeSaveAsTemplateDialog } from '~/components/dialogs/envelope-save-as-template-dialog';
@@ -73,6 +75,12 @@ export const DocumentsTableActionDropdown = ({ row, onMoveDocument }: DocumentsT
   // const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
   const isCurrentTeamDocument = team && row.team?.url === team.url;
   const canManageDocument = Boolean(isOwner || isCurrentTeamDocument);
+
+  // Cancelling a document is restricted server-side to the document owner or a
+  // privileged team member (ADMIN/MANAGER). Mirror that here so plain MEMBERs
+  // don't see a Cancel action that would fail on the server.
+  const isPrivilegedTeamMember = isMemberManagerOrAbove(team.currentTeamRole);
+  const canCancelDocument = isOwner || isPrivilegedTeamMember;
 
   const { canTitleBeChanged } = getEnvelopeItemPermissions(
     {
@@ -184,11 +192,23 @@ export const DocumentsTableActionDropdown = ({ row, onMoveDocument }: DocumentsT
           </DropdownMenuItem>
         )}
 
-        {/* No point displaying this if there's no functionality. */}
-        {/* <DropdownMenuItem disabled>
-          <XCircle className="mr-2 h-4 w-4" />
-          Void
-        </DropdownMenuItem> */}
+        {canCancelDocument && isPending && (
+          <EnvelopeCancelDialog
+            id={row.envelopeId}
+            title={row.title}
+            onCancel={async () => {
+              await trpcUtils.document.findDocumentsInternal.invalidate();
+            }}
+            trigger={
+              <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+                <div>
+                  <XCircle className="mr-2 h-4 w-4" />
+                  <Trans>Cancel</Trans>
+                </div>
+              </DropdownMenuItem>
+            }
+          />
+        )}
 
         <EnvelopeDeleteDialog
           id={row.envelopeId}

@@ -12,7 +12,9 @@ import { mapRecipientToLegacyRecipient } from './recipients';
 export const isDocumentCompleted = (document: Pick<Envelope, 'status'> | DocumentStatus) => {
   const status = typeof document === 'string' ? document : document.status;
 
-  return status === DocumentStatus.COMPLETED || status === DocumentStatus.REJECTED;
+  return (
+    status === DocumentStatus.COMPLETED || status === DocumentStatus.REJECTED || status === DocumentStatus.CANCELLED
+  );
 };
 
 /**
