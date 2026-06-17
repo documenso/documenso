@@ -16,6 +16,7 @@ import { canRecipientBeModified, isRecipientEmailValidForSending } from '../../u
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEmailContext } from '../email/get-email-context';
+import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 
@@ -72,6 +73,8 @@ export const deleteEnvelopeRecipient = async ({
     });
   }
 
+  assertEnvelopeMutable(envelope);
+
   if (envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Document already complete',
@@ -109,6 +112,8 @@ export const deleteEnvelopeRecipient = async ({
   });
 
   const deletedRecipient = await prisma.$transaction(async (tx) => {
+    await assertEnvelopeMutable(envelope, tx);
+
     if (envelope.type === EnvelopeType.DOCUMENT) {
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({

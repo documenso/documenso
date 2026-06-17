@@ -14,6 +14,7 @@ import {
   FIELD_SIGNATURE_META_DEFAULT_VALUES,
   FIELD_TEXT_META_DEFAULT_VALUES,
 } from '@documenso/lib/types/field-meta';
+import { SignatureLevel } from '@documenso/lib/types/signature-level';
 import { prefixedId } from '@documenso/lib/universal/id';
 import type { Team, User } from '@prisma/client';
 import { nanoid } from 'nanoid';
@@ -93,6 +94,7 @@ export const seedBlankDocument = async (owner: User, teamId: number, options: Cr
       id: prefixedId('envelope'),
       secondaryId: documentId.formattedDocumentId,
       internalVersion,
+      signatureLevel: SignatureLevel.SES,
       type: EnvelopeType.DOCUMENT,
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
@@ -313,6 +315,7 @@ export const seedDraftDocument = async (
       id: prefixedId('envelope'),
       secondaryId: documentId.formattedDocumentId,
       internalVersion,
+      signatureLevel: SignatureLevel.SES,
       type: EnvelopeType.DOCUMENT,
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
@@ -407,6 +410,7 @@ export const seedPendingDocument = async (
       id: prefixedId('envelope'),
       secondaryId: documentId.formattedDocumentId,
       internalVersion,
+      signatureLevel: SignatureLevel.SES,
       type: EnvelopeType.DOCUMENT,
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
@@ -660,6 +664,7 @@ export const seedCompletedDocument = async (
       id: prefixedId('envelope'),
       secondaryId: documentId.formattedDocumentId,
       internalVersion,
+      signatureLevel: SignatureLevel.SES,
       type: EnvelopeType.DOCUMENT,
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
