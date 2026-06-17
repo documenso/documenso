@@ -13,7 +13,7 @@ export const validateApiToken = async ({ authorization }: ValidateApiTokenOption
       throw new Error('Missing API token');
     }
 
-    return await getApiTokenByToken({ token });
+    return await getApiTokenByToken({ token, bypassRateLimit: true });
   } catch (err) {
     throw new Error(`Failed to validate API token`);
   }

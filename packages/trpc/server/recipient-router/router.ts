@@ -1,3 +1,4 @@
+import { prepareCscRecipientSigning } from '@documenso/ee/server-only/signing/csc/prepare-recipient-signing';
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
 import { createEnvelopeRecipients } from '@documenso/lib/server-only/recipient/create-envelope-recipients';
@@ -6,6 +7,9 @@ import { getRecipientById } from '@documenso/lib/server-only/recipient/get-recip
 import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
 import { setTemplateRecipients } from '@documenso/lib/server-only/recipient/set-template-recipients';
 import { updateEnvelopeRecipients } from '@documenso/lib/server-only/recipient/update-envelope-recipients';
+import { isTspEnvelope } from '@documenso/lib/types/signature-level';
+import { unsafeBuildEnvelopeIdQuery } from '@documenso/lib/utils/envelope';
+import { prisma } from '@documenso/prisma';
 import { EnvelopeType } from '@prisma/client';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
@@ -13,6 +17,7 @@ import { authenticatedProcedure, procedure, router } from '../trpc';
 import { findRecipientSuggestionsRoute } from './find-recipient-suggestions';
 import {
   ZCompleteDocumentWithTokenMutationSchema,
+  ZCompleteDocumentWithTokenResponseSchema,
   ZCreateDocumentRecipientRequestSchema,
   ZCreateDocumentRecipientResponseSchema,
   ZCreateDocumentRecipientsRequestSchema,
@@ -559,6 +564,7 @@ export const recipientRouter = router({
    */
   completeDocumentWithToken: procedure
     .input(ZCompleteDocumentWithTokenMutationSchema)
+    .output(ZCompleteDocumentWithTokenResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { token, documentId, accessAuthOptions, nextSigner, recipientOverride } = input;
 
@@ -567,6 +573,25 @@ export const recipientRouter = router({
           documentId,
         },
       });
+
+      // Branch on TSP envelopes before any SES side effects: TSP recipients
+      // can't complete via this route — they go through the CSC sync sign
+      // flow (`enterprise.csc.signEnvelope`). This route returns the redirect URL
+      // for the credential-scope OAuth round-trip.
+      const envelope = await prisma.envelope.findFirstOrThrow({
+        where: {
+          ...unsafeBuildEnvelopeIdQuery({ type: 'documentId', id: documentId }, EnvelopeType.DOCUMENT),
+          recipients: { some: { token } },
+        },
+        select: { signatureLevel: true, internalVersion: true },
+      });
+
+      if (isTspEnvelope(envelope)) {
+        return await prepareCscRecipientSigning({
+          recipientToken: token,
+          requestMetadata: ctx.metadata.requestMetadata,
+        });
+      }
 
       await completeDocumentWithToken({
         token,
@@ -580,6 +605,8 @@ export const recipientRouter = router({
         userId: ctx.user?.id,
         requestMetadata: ctx.metadata.requestMetadata,
       });
+
+      return { status: 'SIGNED' as const };
     }),
 
   /**

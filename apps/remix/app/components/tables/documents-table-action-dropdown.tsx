@@ -105,7 +105,7 @@ export const DocumentsTableActionDropdown = ({ row, onMoveDocument }: DocumentsT
           recipient?.role !== RecipientRole.CC &&
           recipient?.role !== RecipientRole.ASSISTANT && (
             <DropdownMenuItem disabled={!recipient || isComplete} asChild>
-              <Link to={`/sign/${recipient?.token}`}>
+              <a href={`/sign/${recipient?.token}`}>
                 {recipient?.role === RecipientRole.VIEWER && (
                   <>
                     <EyeIcon className="mr-2 h-4 w-4" />
@@ -126,7 +126,7 @@ export const DocumentsTableActionDropdown = ({ row, onMoveDocument }: DocumentsT
                     <Trans>Approve</Trans>
                   </>
                 )}
-              </Link>
+              </a>
             </DropdownMenuItem>
           )}
 

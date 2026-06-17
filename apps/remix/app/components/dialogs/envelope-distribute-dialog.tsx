@@ -1,6 +1,7 @@
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { getRecipientsWithMissingFields } from '@documenso/lib/utils/recipients';
 import { zEmail } from '@documenso/lib/utils/zod';
@@ -37,6 +38,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 import * as z from 'zod';
+import { getDistributeErrorMessage } from '~/utils/toast-error-messages';
 
 export type EnvelopeDistributeDialogProps = {
   onDistribute?: () => Promise<void>;
@@ -66,7 +68,7 @@ export const EnvelopeDistributeDialog = ({
   const { envelope, syncEnvelope, isAutosaving, autosaveError } = useCurrentEnvelopeEditor();
 
   const { toast } = useToast();
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const navigate = useNavigate();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -174,9 +176,13 @@ export const EnvelopeDistributeDialog = ({
 
       setIsOpen(false);
     } catch (err) {
+      const error = AppError.parseError(err);
+
+      const errorMessage = getDistributeErrorMessage(error.code);
+
       toast({
-        title: t`Something went wrong`,
-        description: t`This envelope could not be distributed at this time. Please try again.`,
+        title: i18n._(errorMessage.title),
+        description: i18n._(errorMessage.description),
         variant: 'destructive',
         duration: 7500,
       });
