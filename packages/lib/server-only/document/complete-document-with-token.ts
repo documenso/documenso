@@ -451,6 +451,41 @@ export const completeDocumentWithToken = async ({
           requestMetadata,
         },
       });
+    } else if (
+      recipient.role === RecipientRole.ASSISTANT &&
+      envelope.documentMeta?.signingOrder !== DocumentSigningOrder.SEQUENTIAL
+    ) {
+      // In PARALLEL mode, when an assistant completes, notify all remaining non-CC signers.
+      // Assistants always act before signers regardless of signing order.
+      const unsentSigners = pendingRecipients.filter(
+        (r) => r.role !== RecipientRole.CC && r.role !== RecipientRole.ASSISTANT,
+      );
+
+      await prisma.$transaction(async (tx) => {
+        for (const signer of unsentSigners) {
+          await tx.recipient.update({
+            where: { id: signer.id },
+            data: {
+              sendStatus: SendStatus.SENT,
+              sentAt: new Date(),
+            },
+          });
+        }
+      });
+
+      await Promise.all(
+        unsentSigners.map(async (signer) => {
+          await jobs.triggerJob({
+            name: 'send.signing.requested.email',
+            payload: {
+              userId: envelope.userId,
+              documentId: legacyDocumentId,
+              recipientId: signer.id,
+              requestMetadata,
+            },
+          });
+        }),
+      );
     }
   }
 

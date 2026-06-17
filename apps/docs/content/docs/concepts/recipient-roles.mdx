@@ -89,7 +89,7 @@ Viewers must acknowledge that they have viewed the document. They cannot add sig
 </Tab>
   <Tab value="Assistant">
 
-Assistants can prepare the document by pre-filling fields on behalf of other signers. This role is only available when sequential signing is enabled.
+Assistants can prepare the document by pre-filling fields on behalf of other signers. The assistant always completes their tasks before any signers receive the document, regardless of whether signing is parallel or sequential.
 
 **What they can do:**
 
@@ -101,7 +101,6 @@ Assistants can prepare the document by pre-filling fields on behalf of other sig
 
 - Sign on behalf of other recipients
 - Submit the document as complete
-- Be used in parallel signing mode
 
 **When to use this role:**
 
@@ -110,8 +109,7 @@ Assistants can prepare the document by pre-filling fields on behalf of other sig
 - Situations where you want to reduce the burden on the final signer
 
 <Callout type="info">
-  The Assistant role requires sequential signing to be enabled. You cannot use this role when
-  recipients sign in parallel.
+  The Assistant always acts before signers. When a document has an assistant, they receive the document first. After the assistant completes, signers are notified (all at once in parallel mode, or in order in sequential mode).
 </Callout>
 
 </Tab>
@@ -160,7 +158,9 @@ To enable sequential signing:
 3. Recipients with the same order number can act simultaneously
 4. The document proceeds to the next order number only when all recipients at the current level have completed their actions
 
-<Callout type="info">Sequential signing is required if you want to use the Assistant role.</Callout>
+<Callout type="info">
+  When using the Assistant role, the assistant always completes their tasks first before any signers receive the document, regardless of whether signing is parallel or sequential.
+</Callout>
 
 </Tab>
 </Tabs>

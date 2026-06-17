@@ -129,13 +129,10 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
                 </TooltipTrigger>
                 <TooltipContent className="z-9999 max-w-md p-4 text-foreground">
                   <p>
-                    {isAssistantEnabled ? (
-                      <Trans>
-                        The recipient can prepare the document for later signers by pre-filling suggest values.
-                      </Trans>
-                    ) : (
-                      <Trans>Assistant role is only available when the document is in sequential signing mode.</Trans>
-                    )}
+                    <Trans>
+                      The recipient can prepare the document for later signers by pre-filling suggest values. The assistant
+                      always completes their tasks before any signers receive the document.
+                    </Trans>
                   </p>
                 </TooltipContent>
               </Tooltip>

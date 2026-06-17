@@ -133,6 +133,16 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
     recipientsToNotify = envelope.recipients
       .filter((r) => r.signingStatus === SigningStatus.NOT_SIGNED && r.role !== RecipientRole.CC)
       .slice(0, 1);
+  } else {
+    // In PARALLEL mode, if there are assistant recipients, notify them first.
+    // Assistants always act before signers regardless of signing order.
+    const assistantRecipients = envelope.recipients.filter(
+      (r) => r.role === RecipientRole.ASSISTANT && r.signingStatus === SigningStatus.NOT_SIGNED,
+    );
+
+    if (assistantRecipients.length > 0) {
+      recipientsToNotify = assistantRecipients;
+    }
   }
 
   if (envelope.envelopeItems.length === 0) {

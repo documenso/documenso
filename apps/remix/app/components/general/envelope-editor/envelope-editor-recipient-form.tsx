@@ -396,19 +396,8 @@ export const EnvelopeEditorRecipientForm = () => {
       const currentSigners = form.getValues('signers');
       const signingOrder = form.getValues('signingOrder');
 
-      // Handle parallel to sequential conversion for assistants
-      if (role === RecipientRole.ASSISTANT && signingOrder === DocumentSigningOrder.PARALLEL) {
-        form.setValue('signingOrder', DocumentSigningOrder.SEQUENTIAL, {
-          shouldValidate: true,
-          shouldDirty: true,
-        });
-        toast({
-          title: t`Signing order is enabled.`,
-          description: t`You cannot add assistants when signing order is disabled.`,
-          variant: 'destructive',
-        });
-        return;
-      }
+      // Assistant recipients always act before signers, regardless of signing order.
+      // No conversion needed — the workflow logic handles assistants as a pre-signing phase.
 
       const updatedSigners = currentSigners.map((signer, idx) => ({
         ...signer,
@@ -475,12 +464,9 @@ export const EnvelopeEditorRecipientForm = () => {
     setShowSigningOrderConfirmation(false);
 
     const currentSigners = form.getValues('signers');
-    const updatedSigners = currentSigners.map((signer) => ({
-      ...signer,
-      role: signer.role === RecipientRole.ASSISTANT ? RecipientRole.SIGNER : signer.role,
-    }));
 
-    form.setValue('signers', updatedSigners, {
+    // Keep assistant roles as-is — assistants always act before signers regardless of signing order.
+    form.setValue('signers', currentSigners, {
       shouldValidate: true,
       shouldDirty: true,
     });
@@ -957,7 +943,7 @@ export const EnvelopeEditorRecipientForm = () => {
                                           hideCCerRole={!editorConfig.recipients?.allowCCerRole}
                                           hideViewerRole={!editorConfig.recipients?.allowViewerRole}
                                           hideApproverRole={!editorConfig.recipients?.allowApproverRole}
-                                          isAssistantEnabled={isSigningOrderSequential}
+                                          isAssistantEnabled={true}
                                           onValueChange={(value) => {
                                             // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
                                             handleRoleChange(index, value as RecipientRole);
