@@ -26,8 +26,10 @@ import {
 } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
+import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
+import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 
 export interface SetDocumentRecipientsOptions {
   userId: number;
@@ -84,6 +86,8 @@ export const setDocumentRecipients = async ({
     throw new Error('Document not found');
   }
 
+  assertEnvelopeMutable(envelope);
+
   if (envelope.completedAt) {
     throw new Error('Document already complete');
   }
@@ -106,6 +110,13 @@ export const setDocumentRecipients = async ({
   if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'You do not have permission to set the action auth',
+    });
+  }
+
+  for (const recipient of recipients) {
+    assertCompatibleRecipientRole({
+      signatureLevel: envelope.signatureLevel,
+      role: recipient.role,
     });
   }
 
@@ -143,6 +154,8 @@ export const setDocumentRecipients = async ({
   });
 
   const persistedRecipients = await prisma.$transaction(async (tx) => {
+    await assertEnvelopeMutable(envelope, tx);
+
     return await Promise.all(
       linkedRecipients.map(async (recipient) => {
         let authOptions = ZRecipientAuthOptionsSchema.parse(recipient._persisted?.authOptions);

@@ -1,0 +1,213 @@
+---
+title: CSC (AES / QES)
+description: Configure Cloud Signature Consortium signing for Advanced and Qualified Electronic Signatures via a third-party Trust Service Provider.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+The `csc` signing transport routes signatures through a third-party Trust Service Provider (TSP) using the [Cloud Signature Consortium API v1.0.4.0](https://cloudsignatureconsortium.org/). Each recipient authenticates directly with the TSP (Strong Customer Authentication) and the TSP returns a per-recipient signature bound to the document hash. Documenso assembles the resulting PAdES signature inside the PDF.
+
+This transport enables **Advanced Electronic Signatures (AES)** and **Qualified Electronic Signatures (QES)** under eIDAS. See [Signature Levels](/docs/compliance/signature-levels) for the legal framework.
+
+<Callout type="warn">
+  CSC mode is **instance-wide**: one CSC provider per Documenso install. All envelopes created
+  while the instance runs in `csc` mode use AES or QES. Switching `NEXT_PRIVATE_SIGNING_TRANSPORT`
+  is a one-way operational migration — see [Switching Transports](#switching-transports).
+</Callout>
+
+<Callout type="warn">
+  CSC mode requires an active [Enterprise Edition](/docs/policies/enterprise-edition) license. The
+  instance refuses to start in `csc` mode without it.
+</Callout>
+
+## Prerequisites
+
+{/* prettier-ignore */}
+<Steps>
+<Step>
+
+### A TSP account
+
+Establish a relationship with a CSC-compatible Trust Service Provider. The TSP issues qualified or advanced certificates to your signers, holds the private keys in its HSM, and exposes a CSC v1.0.4.0-compliant API.
+
+</Step>
+<Step>
+
+### OAuth client credentials
+
+Register Documenso as an OAuth client with the TSP. You will receive a client ID and client secret, and must supply Documenso's callback URL when registering:
+
+```
+${NEXT_PUBLIC_WEBAPP_URL}/api/csc/oauth/callback
+```
+
+The callback URL is fixed — Documenso derives it from `NEXT_PUBLIC_WEBAPP_URL` and the route mount path. There is no env var to override it; ensuring the registered URL matches your instance's webapp URL exactly is the operator's responsibility.
+
+</Step>
+<Step>
+
+### Enterprise Edition license
+
+CSC mode is gated by the `instanceCscSigning` license flag. Without a valid Enterprise license, the transport refuses to start (`CSC_UNLICENSED`).
+
+</Step>
+<Step>
+
+### S3 storage (strongly recommended)
+
+CSC produces multiple `DocumentData` rows per envelope item (one per recipient signature, plus the materialised and source rows). Database-backed storage base64-inflates each row by ~33% and is impractical at meaningful PDF sizes. Configure [S3 storage](/docs/self-hosting/configuration/storage) before enabling CSC.
+
+</Step>
+</Steps>
+
+## Environment Variables
+
+| Variable                                       | Description                                                                                                                       | Default |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `NEXT_PRIVATE_SIGNING_TRANSPORT`               | Set to `csc`                                                                                                                      |         |
+| `NEXT_PRIVATE_SIGNING_CSC_PROVIDER_BASE_URL`   | Base URL of the CSC provider's API                                                                                                |         |
+| `NEXT_PRIVATE_SIGNING_CSC_OAUTH_CLIENT_ID`     | OAuth client ID registered with the CSC provider                                                                                  |         |
+| `NEXT_PRIVATE_SIGNING_CSC_OAUTH_CLIENT_SECRET` | OAuth client secret registered with the CSC provider                                                                              |         |
+| `NEXT_PRIVATE_SIGNING_CSC_SIGNATURE_LEVEL`     | Default legal tier for new envelopes when the caller does not specify one. `AES` or `QES`. Explicit requests always pass through. | `AES`   |
+| `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY`     | **Required.** Comma-separated RFC 3161 TSA URLs. Always used for B-LTA archival timestamps at seal time, and also serves as the B-T sign-time fallback when the TSP does not expose `signatures/timestamp`. The instance refuses to start in CSC mode without it. See [Timestamp Authority Resolution](#timestamp-authority-resolution). |         |
+
+<Callout type="info">
+  `NEXT_PUBLIC_SIGNING_TRANSPORT_IS_CSC` is set automatically from
+  `NEXT_PRIVATE_SIGNING_TRANSPORT` at server startup. Do not set it manually — see
+  [Environment Variables](/docs/self-hosting/configuration/environment#derived-public-variables).
+</Callout>
+
+## Configuration Example
+
+```bash
+NEXT_PRIVATE_SIGNING_TRANSPORT=csc
+NEXT_PRIVATE_SIGNING_CSC_PROVIDER_BASE_URL=https://api.example-tsp.com/csc/v1
+NEXT_PRIVATE_SIGNING_CSC_OAUTH_CLIENT_ID=documenso-prod
+NEXT_PRIVATE_SIGNING_CSC_OAUTH_CLIENT_SECRET=...
+NEXT_PRIVATE_SIGNING_CSC_SIGNATURE_LEVEL=QES
+NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY=http://timestamp.example.com
+```
+
+Register `${NEXT_PUBLIC_WEBAPP_URL}/api/csc/oauth/callback` (e.g. `https://sign.example.com/api/csc/oauth/callback`) as the OAuth callback URL with the TSP.
+
+## Default Signature Level
+
+`NEXT_PRIVATE_SIGNING_CSC_SIGNATURE_LEVEL` selects the legal tier applied to envelopes that do not specify one explicitly. It is a default, not a capability gate: callers may still create AES or QES envelopes explicitly regardless of this setting.
+
+| Configured value | Caller passes nothing | Caller passes `AES` | Caller passes `QES` |
+| ---------------- | --------------------- | ------------------- | ------------------- |
+| `AES` (default)  | Envelope is `AES`     | Envelope is `AES`   | Envelope is `QES`   |
+| `QES`            | Envelope is `QES`     | Envelope is `AES`   | Envelope is `QES`   |
+
+Any value other than `AES` or `QES` causes the instance to refuse to start. This prevents silent qualified-to-advanced downgrades from a typo.
+
+## Timestamp Authority Resolution
+
+AES/QES envelopes use TSA-attested timestamps in two distinct phases. Resolution differs per phase.
+
+### Sign time — PAdES B-T per recipient
+
+Each recipient's CMS embeds a signature timestamp (CMS unsigned attribute) so proven time is bound to the recipient's signature itself. Resolution order:
+
+1. If the TSP advertises `signatures/timestamp` in its `info` response (CSC §11.10), the TSP endpoint is used. The call is authorised with **this recipient's** service-scope bearer token — the same one authorising the `signatures/signHash` call alongside it.
+2. Otherwise, the first URL from `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY` is used (RFC 3161 over HTTP).
+
+Selection is made at boot from the discovered transport, not at runtime; there is no try-then-fall-through. If the chosen source fails, the recipient's sign attempt fails.
+
+### Seal time — PAdES B-LTA archival
+
+The seal-document job emits a single archival `/DocTimeStamp` over the fully-signed envelope (plus DSS for the existing signatures and the timestamp's own chain). This phase is **env-only**: the first URL from `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY` is always used.
+
+The archival anchor is the operator's long-term trust anchor and SHOULD point at a dedicated qualified archival TSA (e.g. DigiCert) independent of the per-recipient TSP. We deliberately do not fall back to the TSP at seal time: archive longevity should not be coupled to a TSP that may rotate or revoke, and the seal-document job has no recipient context to carry a service-scope bearer.
+
+### Boot-time guard
+
+The instance refuses to start in CSC mode unless `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY` is set (`CSC_PROVIDER_NO_TSA` at transport construction). The env var is required unconditionally — even when the TSP advertises its own `signatures/timestamp`, seal-time B-LTA archival uses the env TSA. Catching this at boot prevents the failure mode where an envelope signs successfully at B-T and then hangs in `WAITING_FOR_SIGNATURE_COMPLETION` when the seal job throws.
+
+## Switching Transports
+
+`NEXT_PRIVATE_SIGNING_TRANSPORT` is a one-way operational migration. Existing envelopes route per the `signatureLevel` column they were created with — the runtime branching looks at the envelope, not the env var. After a switch:
+
+- Envelopes already at `SES` continue to use the new transport for sealing, but the new transport's signer must produce SES-compatible signatures (only `local` and `gcloud-hsm` qualify).
+- Envelopes already at `AES` / `QES` will fail at sign or seal time if the new transport is not `csc`.
+
+Plan migrations during a quiet window with no in-flight envelopes.
+
+## Behavioural Notes
+
+CSC mode changes a number of envelope-authoring behaviours that operators should communicate to users.
+
+### Mutation lock at distribution
+
+For AES/QES envelopes, all authoring routes refuse mutations once the envelope leaves DRAFT. This locks the PDF before any recipient begins Strong Customer Authentication, closing the PDF-swap window that would otherwise allow an owner to replace the PDF between view and sign and break the legal "what you see is what you sign" guarantee.
+
+In practice: edit envelope, recipients, fields, and items freely while DRAFT; once sent, no changes are accepted (including from the API).
+
+### Sequential signing only
+
+Parallel signing produces conflicting incremental updates over the same base PDF, breaking the per-recipient `/ByteRange` invariant. The signing order is forced to `SEQUENTIAL` on AES/QES envelopes — at the schema layer, at send time, and in the UI (the parallel-signing toggle is hidden).
+
+### Assistant role and Dictate Next Signer disabled
+
+Both features modify the recipient set after the envelope is sent, which is incompatible with the AES/QES mutation lock. They are hidden in the UI and rejected at the server schema layer.
+
+### Sidecar PDFs at download
+
+The signed PDF must remain byte-identical to what each recipient's TSP signature authorised — Documenso cannot decorate it after signing. Audit logs and the Certificate of Completion are generated on demand and delivered as separate PDFs:
+
+- `GET /sign/{token}/download` returns the signed PDF only (or a ZIP for multi-item envelopes).
+- `GET /sign/{token}/download?version=bundle` returns a ZIP containing the signed PDFs, audit log PDF, and Certificate of Completion.
+- The completion email attaches all three.
+
+## Recipient Flow
+
+For context when supporting end users, here is what a recipient experiences on an AES/QES envelope:
+
+1. Opens the email link, lands on the signing page.
+2. Documenso redirects to the TSP for Strong Customer Authentication (first visit only; cached for the session lifetime).
+3. Fills fields as normal.
+4. Clicks Sign → redirected to the TSP for a second authentication round (issues a per-document Signature Activation Data token).
+5. Returns to Documenso; the signing call completes within ~15 seconds.
+6. Sees the standard completion screen.
+
+If the TSP returns no eligible credentials for the recipient (e.g. they have not enrolled), they see a blocking page directing them to enrol with the TSP and retry.
+
+## Error Codes
+
+CSC-specific error codes surfaced through the standard error channels:
+
+| Code                       | Meaning                                          | Recovery                                                                |
+| -------------------------- | ------------------------------------------------ | ----------------------------------------------------------------------- |
+| `CSC_UNLICENSED`           | License flag absent at transport-create          | Operator: enable Enterprise Edition, restart                            |
+| `CSC_PROVIDER_INFO_FAILED` | `info` discovery failed at startup               | Operator: check TSP availability and `NEXT_PRIVATE_SIGNING_CSC_PROVIDER_BASE_URL` |
+| `CSC_PROVIDER_NO_TSA`      | `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY` is unset | Operator: configure `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY`        |
+| `CSC_CREDENTIAL_LIST_EMPTY`| TSP returned no credentials for the user         | Recipient: enrol with the TSP                                           |
+| `CSC_CERT_INVALID`         | Certificate refused at credential validation     | Recipient: contact the TSP                                              |
+| `CSC_ALGORITHM_REFUSED`    | Signature algorithm fails policy                 | Operator/recipient: TSP does not meet policy (see below)                |
+| `CSC_SAD_EXPIRED_PRE_SIGN` | Signature Activation Data expired before signing | Recipient: retry from Sign                                              |
+| `CSC_TSP_TIMEOUT`          | 15-second synchronous timeout reached            | Recipient: retry (idempotent — the TSP enforces single-use SAD binding) |
+| `CSC_EMBED_FAILED`         | Sign-time digest diverged from prep capture      | Recipient: retry from Sign                                              |
+| `CSC_BASE_DOCUMENT_MUTATED`| Document data changed between prep and sign      | Operator: investigate (structural guard violation)                      |
+| `CSC_INSTANCE_MODE_MISMATCH`| Envelope created with wrong level for transport | Caller: use a level matching the instance transport                     |
+| `CSC_REQUEST_FAILED`       | TSP HTTP transport failure — network error, non-2xx, or malformed response | Operator: check TSP availability; carries the TSP HTTP status and error in the message |
+
+## Algorithm Policy
+
+Documenso refuses TSP credentials that do not meet the following minimums, at the OAuth callback boundary and again at sign time:
+
+| Class | Allowed                            | Refused                                                |
+| ----- | ---------------------------------- | ------------------------------------------------------ |
+| RSA   | `key.len >= 2048`                  | Missing `key.len`, `key.len < 2048`                    |
+| ECDSA | P-256, P-384, P-521                | Missing `key.curve`, P-192, P-224, other curves        |
+| Hash  | SHA-256, SHA-384, SHA-512          | SHA-1, MD5                                             |
+| Other | —                                  | DSA                                                    |
+
+This is the union of CSC v1.0.4.0 §11.5 requirements and current cryptographic guidance.
+
+## Related
+
+- [Signature Levels](/docs/compliance/signature-levels) — AES / QES legal framework
+- [Signing Certificate](/docs/self-hosting/configuration/signing-certificate) — overview of all signing transports
+- [Environment Variables](/docs/self-hosting/configuration/environment) — full env reference
+- [Enterprise Edition](/docs/policies/enterprise-edition) — license requirements
