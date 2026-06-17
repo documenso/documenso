@@ -51,6 +51,8 @@ export const ZClaimFlagsSchema = z.object({
 
   signingReminders: z.boolean().optional(),
 
+  cscQesSigning: z.boolean().optional(),
+  
   /**
    * Controls whether an organisation is prevented from sending emails.
    *
@@ -127,6 +129,11 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   signingReminders: {
     key: 'signingReminders',
     label: 'Signing reminders',
+  },
+  cscQesSigning: {
+    key: 'cscQesSigning',
+    label: 'QES signing',
+    isEnterprise: true,
   },
   disableEmails: {
     key: 'disableEmails',
