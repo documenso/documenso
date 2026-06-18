@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { getSignatureFontFamily } from './pdf';
 
 describe('getSignatureFontFamily', () => {
-  // toContain (not toBe) so the chain can grow without rewriting tests.
   const expectCaveat = (family: string) => expect(family).toBe('Caveat');
+  // toContain (not toBe) so the chain can grow without rewriting tests.
   const expectNotoChain = (family: string) => {
     expect(family).toContain('Noto Sans');
     expect(family).toContain('Noto Sans Chinese');
