@@ -1,5 +1,6 @@
 import { prisma } from '@documenso/prisma';
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { createPersonalOrganisation } from '../organisation/create-organisation';
 
 export interface CreateAdminUserOptions {
   name: string;
@@ -12,8 +13,6 @@ export interface CreateAdminUserOptions {
  * Unlike normal signup, this function:
  * - Leaves the password unset (`null`); the user must set it later via a password reset/onboarding link
  * - Marks the email as verified immediately because this route is only called by admins
- * - Does NOT create a personal organisation (user will be added to real org)
- * - Returns the user immediately without side effects
  */
 export const createAdminUser = async ({ name, email }: CreateAdminUserOptions) => {
   const userExists = await prisma.user.findFirst({
@@ -38,6 +37,8 @@ export const createAdminUser = async ({ name, email }: CreateAdminUserOptions) =
       emailVerified: new Date(),
     },
   });
+
+  await createPersonalOrganisation({ userId: user.id, throwErrorOnOrganisationCreationFailure: true });
 
   return user;
 };

@@ -40,10 +40,6 @@ export const appMetaTags = (title?: MessageDescriptor) => {
       content: 'summary_large_image',
     },
     {
-      name: 'twitter:site',
-      content: '@datathink',
-    },
-    {
       name: 'twitter:description',
       content: description,
     },

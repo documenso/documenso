@@ -1,6 +1,53 @@
-# Documenso Architecture
+# Keep Contracts Architecture
 
-This document provides a high-level overview of the Documenso codebase to help humans and agents understand how the application is structured.
+This document provides a high-level overview of the Keep Contracts (KC) codebase to help humans and agents understand how the application is structured.
+
+---
+
+## Keep Contracts Product Overview
+
+**What Keep Contracts is:** A document signing engine (white-labeled Documenso), running at keepcontracts.com. It is invisible infrastructure. End users never interact with it directly. Signup is disabled and only DataThink admins have accounts.
+
+### What is an Envelope
+
+An envelope is a single signing transaction. It holds a document, a list of recipients, and tracks status.
+
+- 1 contractor signing an NDA → 1 envelope
+- 1 teacher sending a permission slip to 30 parents → 30 envelopes (one per parent)
+
+### How Integration Works
+
+```
+1. DataThink apps (i.e. Ladderly or KeepHours) calls KC API using a service account key
+2. KC creates the envelope and emails the recipient a magic link
+3. Recipient clicks the link and signs (no KC account needed)
+4. KC webhooks back to the DataThink app on completion
+5. DataThink app downloads and permanently stores the signed PDF
+6. KC is done. The DataThink app owns the record
+```
+
+### How Multiple Documents Get Connected to the Same Person
+
+KC doesn't do this, the DataThink app does. When KC creates an envelope it returns an `envelope_id`. Your app stores that ID linked to the relevant person in your own database:
+
+| contractor_id | envelope_id      | document | sent_at |
+| ------------- | ---------------- | -------- | ------- |
+| 99            | kc-envelope-abc  | NDA      | Jan 15  |
+| 99            | kc-envelope-xyz  | W9 Form  | Feb 15  |
+
+`WHERE contractor_id = 99` → full history, regardless of how many envelopes.
+
+### Use Cases
+
+**Ladderly:** Teacher clicks "send" in Ladderly → Ladderly calls KC API → parent receives magic link → signs → KC webhooks to Ladderly → Ladderly stores signed PDF. Teacher sees all their documents in Ladderly filtered by `teacher_id`. Teacher never touches keepcontracts.com.
+
+**KeepHours:** DataThink sends NDA to contractor via KC API → contractor signs via magic link → KC webhooks to KeepHours → KeepHours stores signed PDF. Contractor logs into KeepHours and sees only their own documents — scoped by `contractor_id` in KeepHours' DB.
+
+---
+
+## Codebase Overview
+
+This section covers the technical architecture of the Keep Contracts codebase (forked from Documenso).
 
 ## Overview
 

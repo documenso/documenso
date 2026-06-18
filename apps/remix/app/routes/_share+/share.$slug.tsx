@@ -30,22 +30,6 @@ export function meta({ params: { slug } }: Route.MetaArgs) {
       property: 'og:image',
       content: `${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}/opengraph`,
     },
-    {
-      name: 'twitter:site',
-      content: '@documenso',
-    },
-    {
-      name: 'twitter:card',
-      content: 'summary_large_image',
-    },
-    {
-      name: 'twitter:image',
-      content: `${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}/opengraph`,
-    },
-    {
-      name: 'twitter:description',
-      content: 'I just signed with Keep Contracts!',
-    },
   ];
 }
 
