@@ -3,8 +3,10 @@ import { createAttachmentRoute } from './attachment/create-attachment';
 import { deleteAttachmentRoute } from './attachment/delete-attachment';
 import { findAttachmentsRoute } from './attachment/find-attachments';
 import { updateAttachmentRoute } from './attachment/update-attachment';
+import { bulkCancelEnvelopesRoute } from './bulk-cancel-envelopes';
 import { bulkDeleteEnvelopesRoute } from './bulk-delete-envelopes';
 import { bulkMoveEnvelopesRoute } from './bulk-move-envelopes';
+import { cancelEnvelopeRoute } from './cancel-envelope';
 import { createEnvelopeRoute } from './create-envelope';
 import { createEnvelopeItemsRoute } from './create-envelope-items';
 import { deleteEnvelopeRoute } from './delete-envelope';
@@ -85,6 +87,7 @@ export const envelopeRouter = router({
   bulk: {
     move: bulkMoveEnvelopesRoute,
     delete: bulkDeleteEnvelopesRoute,
+    cancel: bulkCancelEnvelopesRoute,
   },
   editor: {
     get: getEditorEnvelopeRoute,
@@ -95,6 +98,7 @@ export const envelopeRouter = router({
   use: useEnvelopeRoute,
   update: updateEnvelopeRoute,
   delete: deleteEnvelopeRoute,
+  cancel: cancelEnvelopeRoute,
   duplicate: duplicateEnvelopeRoute,
   saveAsTemplate: saveAsTemplateRoute,
   distribute: distributeEnvelopeRoute,

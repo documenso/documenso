@@ -382,6 +382,7 @@ enum DocumentStatus {
   PENDING
   COMPLETED
   REJECTED
+  CANCELLED
 }
 
 enum DocumentSource {
