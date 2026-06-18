@@ -113,6 +113,15 @@ const splitPlaceholderKeyValue = (value: string): [string, string] | null => {
   return [key.trim(), valueParts.join('=').trim()];
 };
 
+/*
+  Removes the escape backslashes left over after splitting, so \,=, \|, \\ become their literal characters.
+
+  E.g.
+  'Legal\, Compliance' -> 'Legal, Compliance'
+  'Card\|Check'        -> 'Card|Check'
+  'A\=B'               -> 'A=B'
+  'C\D'                -> 'C\D'
+*/
 const unescapePlaceholderValue = (value: string): string => {
   return value.replace(/\\([,=|\\])/g, '$1');
 };
@@ -147,6 +156,13 @@ export const parsePlaceholderData = (value: string): string[] => {
   return splitPlaceholderToken(value, ',').map((token) => token.trim());
 };
 
+/*
+  Transforms the field metadata string array into a record of key/value pairs.
+
+  E.g.
+  ['required=true', 'fontSize=12']
+    -> { required: 'true', fontSize: '12' }
+*/
 export const parseRawFieldMetaFromPlaceholder = (fieldMetaData: string[]): Record<string, string> => {
   const rawFieldMeta: Record<string, string> = {};
 
