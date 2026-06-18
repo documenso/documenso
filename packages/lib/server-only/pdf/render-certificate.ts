@@ -303,7 +303,7 @@ const renderColumnTwo = (options: RenderColumnOptions) => {
         x: 2,
         text: recipient.signatureField?.signature?.typedSignature,
         padding: 4,
-        fontFamily: getSignatureFontFamily(recipient.signatureField.signature.typedSignature),
+        fontFamily: getSignatureFontFamily(recipient.signatureField?.signature?.typedSignature),
         fontSize: 16,
         align: 'center',
         verticalAlign: 'middle',

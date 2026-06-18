@@ -4,12 +4,11 @@ import { getSignatureFontFamily } from './pdf';
 
 describe('getSignatureFontFamily', () => {
   const expectCaveat = (family: string) => expect(family).toBe('Caveat');
-  // toContain (not toBe) so the chain can grow without rewriting tests.
   const expectNotoChain = (family: string) => {
-    expect(family).toContain('Noto Sans');
-    expect(family).toContain('Noto Sans Chinese');
-    expect(family).toContain('Noto Sans Japanese');
-    expect(family).toContain('Noto Sans Korean');
+    expect(family).toContain('"Noto Sans"');
+    expect(family).toContain('"Noto Sans Chinese"');
+    expect(family).toContain('"Noto Sans Japanese"');
+    expect(family).toContain('"Noto Sans Korean"');
     expect(family).toContain('sans-serif');
     expect(family).not.toContain('Caveat');
   };
