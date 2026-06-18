@@ -1,4 +1,6 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { type TFieldAndMeta, ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
+import { logger } from '@documenso/lib/utils/logger';
 import { PDF, rgb } from '@libpdf/core';
 import type { FieldType, Recipient } from '@prisma/client';
 
@@ -114,14 +116,49 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
 
       const recipient = recipientOrMeta;
 
-      const rawFieldMeta = parseRawFieldMetaFromPlaceholder(fieldMetaData);
+      /*
+        Parse and validate the field metadata. A malformed selection placeholder
+        (e.g. an unknown validation rule or a default value that doesn't match an
+        option) is skipped like an invalid field type rather than aborting the whole
+        upload, which may contain other valid placeholders and files.
+      */
+      let fieldAndMeta: TFieldAndMeta;
 
-      const parsedFieldMeta = parseFieldMetaFromPlaceholder(rawFieldMeta, fieldType);
+      try {
+        const rawFieldMeta = parseRawFieldMetaFromPlaceholder(fieldMetaData);
+        const parsedFieldMeta = parseFieldMetaFromPlaceholder(rawFieldMeta, fieldType);
 
-      const fieldAndMeta: TFieldAndMeta = ZEnvelopeFieldAndMetaSchema.parse({
-        type: fieldType,
-        fieldMeta: parsedFieldMeta,
-      });
+        const parsedFieldAndMeta = ZEnvelopeFieldAndMetaSchema.safeParse({
+          type: fieldType,
+          fieldMeta: parsedFieldMeta,
+        });
+
+        /*
+          Surface schema failures as INVALID_BODY (400) instead of letting the raw
+          ZodError bubble up to the caller as an INTERNAL_SERVER_ERROR (500).
+        */
+        if (!parsedFieldAndMeta.success) {
+          throw new AppError(AppErrorCode.INVALID_BODY, {
+            message: `Invalid field metadata for placeholder "${placeholder}": ${parsedFieldAndMeta.error.message}`,
+          });
+        }
+
+        fieldAndMeta = parsedFieldAndMeta.data;
+      } catch (error) {
+        const appError = AppError.parseError(error);
+
+        logger.warn(
+          {
+            placeholder,
+            page: page.index + 1,
+            code: appError.code,
+            message: appError.message,
+          },
+          'Skipping placeholder with invalid field metadata',
+        );
+
+        continue;
+      }
 
       /*
         LibPDF returns bbox in points with bottom-left origin.

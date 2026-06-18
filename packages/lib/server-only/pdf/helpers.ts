@@ -198,12 +198,6 @@ const getDefaultFieldMetaValue = (rawFieldMeta: Record<string, string>) => {
   return defaultValue ? normalizePlaceholderSelectionValue(defaultValue) : undefined;
 };
 
-const getCheckedFieldMetaValues = (rawFieldMeta: Record<string, string>) => {
-  const checkedValue = rawFieldMeta.checked;
-
-  return checkedValue ? parsePlaceholderOptions(checkedValue) : [];
-};
-
 const parseCheckboxValidationRule = (value: string): string => {
   const validationRule = CHECKBOX_VALIDATION_RULE_BY_ALIAS[value];
 
@@ -268,7 +262,7 @@ const applyRadioFieldOptions = (parsedFieldMeta: Record<string, unknown>, rawFie
 
 const applyCheckboxFieldOptions = (parsedFieldMeta: Record<string, unknown>, rawFieldMeta: Record<string, string>) => {
   const options = parseSelectionFieldOptions(rawFieldMeta, FieldType.CHECKBOX);
-  const checkedValues = getCheckedFieldMetaValues(rawFieldMeta);
+  const checkedValues = rawFieldMeta.checked ? parsePlaceholderOptions(rawFieldMeta.checked) : [];
 
   if (!options && checkedValues.length > 0) {
     throw new AppError(AppErrorCode.INVALID_BODY, {
@@ -328,21 +322,37 @@ const applyDropdownFieldOptions = (parsedFieldMeta: Record<string, unknown>, raw
   }
 };
 
+/*
+  Generic field metadata properties are simple properties consisting of a key and a value.
+  E.g. 'required=true', 'fontSize=12', 'textAlign=left'
+  They don't require special handling.
+
+  Special field metadata properties are complex properties consisting of a key and a value with multiple parts.
+  E.g. 'options=Card/Check|Bank Transfer', 'checked=Card|Check', 'selected=Bank Transfer'
+  They require special handling.
+*/
 const shouldSkipGenericFieldMetaParsing = (property: string, fieldType: FieldType): boolean => {
   if (property === 'options' || property === 'default' || property === 'selected') {
     return true;
   }
 
-  if (fieldType !== FieldType.CHECKBOX && fieldType !== FieldType.RADIO && fieldType !== FieldType.DROPDOWN) {
+  const isSelectionField =
+    fieldType === FieldType.CHECKBOX || fieldType === FieldType.RADIO || fieldType === FieldType.DROPDOWN;
+
+  if (!isSelectionField) {
     return false;
   }
 
-  return (
+  if (
     property === 'label' ||
     property === 'placeholder' ||
     property === 'defaultValue' ||
-    (property === 'checked' && fieldType === FieldType.CHECKBOX)
-  );
+    (fieldType === FieldType.CHECKBOX && property === 'checked')
+  ) {
+    return true;
+  }
+
+  return false;
 };
 
 /*
@@ -404,17 +414,11 @@ export const parseFieldMetaFromPlaceholder = (
     }
   }
 
-  if (fieldType === FieldType.RADIO) {
-    applyRadioFieldOptions(parsedFieldMeta, rawFieldMeta);
-  }
-
-  if (fieldType === FieldType.CHECKBOX) {
-    applyCheckboxFieldOptions(parsedFieldMeta, rawFieldMeta);
-  }
-
-  if (fieldType === FieldType.DROPDOWN) {
-    applyDropdownFieldOptions(parsedFieldMeta, rawFieldMeta);
-  }
+  match(fieldType)
+    .with(FieldType.RADIO, () => applyRadioFieldOptions(parsedFieldMeta, rawFieldMeta))
+    .with(FieldType.CHECKBOX, () => applyCheckboxFieldOptions(parsedFieldMeta, rawFieldMeta))
+    .with(FieldType.DROPDOWN, () => applyDropdownFieldOptions(parsedFieldMeta, rawFieldMeta))
+    .otherwise(() => undefined);
 
   return parsedFieldMeta;
 };
