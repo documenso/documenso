@@ -12,6 +12,11 @@ steps:
       - --tag=${_IMAGE}
       - .
 
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - ${_IMAGE}
+
   - name: gcr.io/cloud-builders/gcloud
     args:
       - run
