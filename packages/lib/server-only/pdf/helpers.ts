@@ -51,6 +51,22 @@ const CHECKBOX_VALIDATION_RULE_BY_ALIAS: Record<string, string> = {
   atMost: 'Select at most',
 };
 
+/*
+  Split a string on a delimiter, treating `\` as an escape for the next character.
+  Delimiters preceded by `\` are kept in the output instead of splitting (e.g. `\,`, `\=`, `\|`).
+
+  With delimiter ',' (top-level placeholder parts):
+  'radio, r1, options=Card/Check|Bank Transfer, selected=Bank Transfer'
+    -> ['radio', ' r1', ' options=Card/Check|Bank Transfer', ' selected=Bank Transfer']
+
+  With delimiter '=' (split one field metadata token into key + value):
+  'options=Card/Check|Bank Transfer'
+    -> ['options', 'Card/Check|Bank Transfer']
+
+  With delimiter '|' (split option list inside 'options='):
+  'Card/Check|Bank Transfer'
+    -> ['Card/Check', 'Bank Transfer']
+*/
 const splitPlaceholderToken = (value: string, delimiter: string): string[] => {
   const parts: string[] = [];
   let currentPart = '';
@@ -79,6 +95,14 @@ const splitPlaceholderToken = (value: string, delimiter: string): string[] => {
   return parts;
 };
 
+/*
+  Split a metadata token (e.g. 'required=true') into [key, value].
+  Splits on the first unescaped '='; returns null if there is no key or value.
+
+  E.g.
+  'options=Card/Check|Bank Transfer' -> ['options', 'Card/Check|Bank Transfer']
+  'required=true'                    -> ['required', 'true']
+*/
 const splitPlaceholderKeyValue = (value: string): [string, string] | null => {
   const [key, ...valueParts] = splitPlaceholderToken(value, '=');
 
@@ -97,19 +121,33 @@ const normalizePlaceholderSelectionValue = (value: string): string => {
   return unescapePlaceholderValue(value).replace(/\s+/g, ' ').trim();
 };
 
+/*
+  Split an options string into individual choices.
+  Splits on unescaped '|', then unescapes, trims, and drops empty entries.
+
+  E.g.
+  'Card/Check|Bank Transfer'     -> ['Card/Check', 'Bank Transfer']
+  'Card\\|Check|Bank Transfer'   -> ['Card|Check', 'Bank Transfer']
+*/
 const parsePlaceholderOptions = (value: string): string[] => {
   return splitPlaceholderToken(value, '|')
     .map((option) => normalizePlaceholderSelectionValue(option))
     .filter((option) => option.length > 0);
 };
 
+/*
+  Split a placeholder string into top-level parts (field type, recipient, metadata).
+  Splits on unescaped commas, then trims whitespace.
+
+  E.g.
+  'SIGNATURE, r1, required=true'
+    -> ['SIGNATURE', 'r1', 'required=true']
+*/
 export const parsePlaceholderData = (value: string): string[] => {
   return splitPlaceholderToken(value, ',').map((token) => token.trim());
 };
 
-export const parseRawFieldMetaFromPlaceholder = (
-  fieldMetaData: string[],
-): Record<string, string> => {
+export const parseRawFieldMetaFromPlaceholder = (fieldMetaData: string[]): Record<string, string> => {
   const rawFieldMeta: Record<string, string> = {};
 
   for (const fieldMeta of fieldMetaData) {
@@ -199,10 +237,7 @@ const parseSelectionFieldOptions = (
   return parsedOptions;
 };
 
-const applyRadioFieldOptions = (
-  parsedFieldMeta: Record<string, unknown>,
-  rawFieldMeta: Record<string, string>,
-) => {
+const applyRadioFieldOptions = (parsedFieldMeta: Record<string, unknown>, rawFieldMeta: Record<string, string>) => {
   const options = parseSelectionFieldOptions(rawFieldMeta, FieldType.RADIO);
   const defaultValue = getDefaultFieldMetaValue(rawFieldMeta);
 
@@ -216,9 +251,7 @@ const applyRadioFieldOptions = (
     return;
   }
 
-  const selectedOptionIndex = defaultValue
-    ? options.findIndex((option) => option === defaultValue)
-    : -1;
+  const selectedOptionIndex = defaultValue ? options.findIndex((option) => option === defaultValue) : -1;
 
   if (defaultValue && selectedOptionIndex === -1) {
     throw new AppError(AppErrorCode.INVALID_BODY, {
@@ -233,10 +266,7 @@ const applyRadioFieldOptions = (
   }));
 };
 
-const applyCheckboxFieldOptions = (
-  parsedFieldMeta: Record<string, unknown>,
-  rawFieldMeta: Record<string, string>,
-) => {
+const applyCheckboxFieldOptions = (parsedFieldMeta: Record<string, unknown>, rawFieldMeta: Record<string, string>) => {
   const options = parseSelectionFieldOptions(rawFieldMeta, FieldType.CHECKBOX);
   const checkedValues = getCheckedFieldMetaValues(rawFieldMeta);
 
@@ -250,18 +280,15 @@ const applyCheckboxFieldOptions = (
     return;
   }
 
-  const unmatchedCheckedValues = checkedValues.filter(
-    (checkedValue) => !options.includes(checkedValue),
-  );
+  const unmatchedCheckedValues = checkedValues.filter((checkedValue) => !options.includes(checkedValue));
 
   if (unmatchedCheckedValues.length > 0) {
     const unmatchedCheckedValue = unmatchedCheckedValues[0];
 
     throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: [
-        `Checkbox placeholder checked value "${unmatchedCheckedValue}"`,
-        'must match one of the options',
-      ].join(' '),
+      message: [`Checkbox placeholder checked value "${unmatchedCheckedValue}"`, 'must match one of the options'].join(
+        ' ',
+      ),
     });
   }
 
@@ -272,10 +299,7 @@ const applyCheckboxFieldOptions = (
   }));
 };
 
-const applyDropdownFieldOptions = (
-  parsedFieldMeta: Record<string, unknown>,
-  rawFieldMeta: Record<string, string>,
-) => {
+const applyDropdownFieldOptions = (parsedFieldMeta: Record<string, unknown>, rawFieldMeta: Record<string, string>) => {
   const options = parseSelectionFieldOptions(rawFieldMeta, FieldType.DROPDOWN);
   const defaultValue = getDefaultFieldMetaValue(rawFieldMeta);
 
@@ -304,20 +328,12 @@ const applyDropdownFieldOptions = (
   }
 };
 
-const isSelectionFieldType = (fieldType: FieldType): boolean => {
-  return (
-    fieldType === FieldType.CHECKBOX ||
-    fieldType === FieldType.RADIO ||
-    fieldType === FieldType.DROPDOWN
-  );
-};
-
 const shouldSkipGenericFieldMetaParsing = (property: string, fieldType: FieldType): boolean => {
   if (property === 'options' || property === 'default' || property === 'selected') {
     return true;
   }
 
-  if (!isSelectionFieldType(fieldType)) {
+  if (fieldType !== FieldType.CHECKBOX && fieldType !== FieldType.RADIO && fieldType !== FieldType.DROPDOWN) {
     return false;
   }
 
