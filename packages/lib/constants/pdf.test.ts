@@ -38,7 +38,6 @@ describe('getSignatureFontFamily', () => {
   });
 
   it('returns the Noto chain for scripts not covered by a dedicated Noto file', () => {
-    // Rendering for these relies on the chain's final sans-serif fallback.
     expectNotoChain(getSignatureFontFamily('ሰላም')); // Ethiopic
     expectNotoChain(getSignatureFontFamily('សួស្ដី')); // Khmer
     expectNotoChain(getSignatureFontFamily('ᠮᠣᠩᠭᠣᠯ')); // Mongolian
