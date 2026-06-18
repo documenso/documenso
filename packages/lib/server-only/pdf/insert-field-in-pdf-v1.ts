@@ -14,6 +14,7 @@ import fontkit from '@pdf-lib/fontkit';
 import { FieldType } from '@prisma/client';
 import { match, P } from 'ts-pattern';
 
+import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
 import {
   ZCheckboxFieldMeta,
   ZDateFieldMeta,
@@ -24,10 +25,14 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '../../types/field-meta';
-import { embedPdfTextFont, embedTypedSignatureFont } from './font-selection';
 import { getPageSize } from './get-page-size';
 
 export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSignature) => {
+  const [fontCaveat, fontNoto] = await Promise.all([
+    fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/caveat.ttf`).then(async (res) => res.arrayBuffer()),
+    fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(async (res) => res.arrayBuffer()),
+  ]);
+
   const isSignatureField = isSignatureFieldType(field.type);
 
   /**
@@ -109,15 +114,14 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
     });
   }
 
-  // Default text font for non-signature fields (text, name, email, date,
-  // checkbox/radio labels). Deliberately a zero-arg helper that DEFERS the
-  // `await embedPdfTextFont(...)` to the first branch that actually needs
-  // it - the typed-signature path picks a font based on the script of the
-  // signature text via `embedTypedSignatureFont`, and the image-signature
-  // path doesn't need any font at all. Eagerly awaiting the embed up here
-  // would do a wasted font load (and a fetch on cache miss) for image-only
-  // fields.
-  const embedDefaultTextFont = (): Promise<PDFFont> => embedPdfTextFont(pdf, 'noto-sans');
+  const font = await pdf.embedFont(
+    isSignatureField ? fontCaveat : fontNoto,
+    isSignatureField ? { features: { calt: false } } : undefined,
+  );
+
+  if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
+    await pdf.embedFont(fontCaveat);
+  }
 
   await match(field)
     .with(
@@ -164,7 +168,6 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
           });
         } else {
           const signatureText = field.signature?.typedSignature ?? '';
-          const font = await embedTypedSignatureFont(pdf, signatureText);
 
           const longestLineInTextForWidth = signatureText.split('\n').sort((a, b) => b.length - a.length)[0];
 
@@ -207,7 +210,7 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
         }
       },
     )
-    .with({ type: FieldType.CHECKBOX }, async (field) => {
+    .with({ type: FieldType.CHECKBOX }, (field) => {
       const meta = ZCheckboxFieldMeta.safeParse(field.fieldMeta);
 
       if (!meta.success) {
@@ -215,8 +218,6 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
 
         throw new Error('Invalid checkbox field meta');
       }
-
-      const font = await embedDefaultTextFont();
 
       const values = meta.data.values?.map((item) => ({
         ...item,
@@ -299,7 +300,7 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
         }
       }
     })
-    .with({ type: FieldType.RADIO }, async (field) => {
+    .with({ type: FieldType.RADIO }, (field) => {
       const meta = ZRadioFieldMeta.safeParse(field.fieldMeta);
 
       if (!meta.success) {
@@ -307,8 +308,6 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
 
         throw new Error('Invalid radio field meta');
       }
-
-      const font = await embedDefaultTextFont();
 
       const values = meta?.data.values?.map((item) => ({
         ...item,
@@ -349,7 +348,7 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
         }
       }
     })
-    .otherwise(async (field) => {
+    .otherwise((field) => {
       const fieldMetaParsers = {
         [FieldType.TEXT]: ZTextFieldMeta,
         [FieldType.NUMBER]: ZNumberFieldMeta,
@@ -358,8 +357,6 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
         [FieldType.NAME]: ZNameFieldMeta,
         [FieldType.INITIALS]: ZInitialsFieldMeta,
       } as const;
-
-      const font = await embedDefaultTextFont();
 
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       const fieldMetaParser = fieldMetaParsers[field.type as keyof typeof fieldMetaParsers];
