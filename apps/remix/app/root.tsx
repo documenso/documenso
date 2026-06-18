@@ -123,8 +123,7 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="icon" type="image/png" sizes="40x40" href="/favicon-40x40.png" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="google" content="notranslate" />
@@ -146,18 +145,6 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
         <script nonce={nonce(cspNonce)}>0</script>
       </head>
       <body className={isRecipientRoute ? 'documenso-branded' : undefined}>
-        {/* Global license banner currently disabled. Need to wait until after a few releases. */}
-        {/* {licenseStatus === '?' && (
-          <div className="bg-destructive text-destructive-foreground">
-            <div className="mx-auto flex h-auto max-w-screen-xl items-center justify-center px-4 py-3 text-sm font-medium">
-              <div className="flex items-center">
-                <AlertTriangleIcon className="mr-2 h-4 w-4" />
-                <Trans>This is an expired license instance of Documenso</Trans>
-              </div>
-            </div>
-          </div>
-        )} */}
-
         <NuqsAdapter>
           <SessionProvider initialSession={session}>
             <TooltipProvider>

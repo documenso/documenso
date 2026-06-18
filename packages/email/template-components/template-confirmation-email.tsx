@@ -15,7 +15,7 @@ export const TemplateConfirmationEmail = ({ confirmationLink, assetBaseUrl }: Te
 
       <Section className="flex-row items-center justify-center">
         <Text className="mx-auto mb-0 max-w-[80%] text-center font-semibold text-lg text-primary">
-          <Trans>Welcome to Documenso!</Trans>
+          <Trans>Welcome to Keep Contracts!</Trans>
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">

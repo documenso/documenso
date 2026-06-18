@@ -36,10 +36,10 @@ import { apiSignin } from '../fixtures/authentication';
 //     await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
 
 //     // Add 2 signers.
-//     await page.getByPlaceholder('Email').fill('recipient1@documenso.com');
+//     await page.getByPlaceholder('Email').fill('recipient1@keepcontracts.com');
 //     await page.getByPlaceholder('Name').fill('Recipient 1');
 //     await page.getByRole('button', { name: 'Add Placeholder Recipient' }).click();
-//     await page.getByPlaceholder('Email').nth(1).fill('recipient2@documenso.com');
+//     await page.getByPlaceholder('Email').nth(1).fill('recipient2@keepcontracts.com');
 //     await page.getByPlaceholder('Name').nth(1).fill('Recipient 2');
 
 //     // Display advanced settings.
@@ -86,10 +86,10 @@ test('[TEMPLATE_FLOW]: add placeholder', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
 
   // Add 2 signers.
-  await page.getByPlaceholder('Email').fill('recipient1@documenso.com');
+  await page.getByPlaceholder('Email').fill('recipient1@keepcontracts.com');
   await page.getByPlaceholder('Name').fill('Recipient 1');
   await page.getByRole('button', { name: 'Add Placeholder Recipient' }).click();
-  await page.getByPlaceholder('Email').nth(1).fill('recipient2@documenso.com');
+  await page.getByPlaceholder('Email').nth(1).fill('recipient2@keepcontracts.com');
   await page.getByPlaceholder('Name').nth(1).fill('Recipient 2');
 
   // Advanced settings should not be visible for non EE users.

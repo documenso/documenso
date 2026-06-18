@@ -8,10 +8,10 @@ export const OpenAPIV1 = Object.assign(
     ApiContractV1,
     {
       info: {
-        title: 'Documenso API',
+        title: 'Keep Contracts API',
         version: '1.0.0',
         description:
-          'API V1 is deprecated, but will continue to be supported. For more details, see https://docs.documenso.com/developers/public-api. \n\nThe Documenso API for retrieving, creating, updating and deleting documents.',
+          'API V1 is deprecated, but will continue to be supported. For more details, see https://docs.documenso.com/developers/public-api. \n\nThe Keep Contracts API for retrieving, creating, updating and deleting documents.',
       },
       servers: [
         {

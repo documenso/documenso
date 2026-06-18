@@ -318,7 +318,7 @@ test.describe('PDF Viewer Rendering', () => {
 
       const emailInput = page.getByPlaceholder('Email').first();
       await emailInput.click();
-      await emailInput.fill('test-signer@documenso.com');
+      await emailInput.fill('test-signer@keepcontracts.com');
 
       const [fileChooser] = await Promise.all([
         page.waitForEvent('filechooser'),

@@ -35,7 +35,7 @@ test.describe.configure({ mode: 'parallel', timeout: 60000 });
 test.skip('seed overflow test document', async ({ page }) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
-      email: 'example@documenso.com',
+      email: 'example@keepcontracts.com',
     },
     include: {
       ownedOrganisations: {

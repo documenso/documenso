@@ -34,7 +34,7 @@ const triggerAutosave = async (page: Page) => {
 };
 
 const addSignerAndSave = async (page: Page) => {
-  await page.getByPlaceholder('Email').fill('recipient1@documenso.com');
+  await page.getByPlaceholder('Email').fill('recipient1@keepcontracts.com');
   await page.getByPlaceholder('Name').fill('Recipient 1');
 
   await triggerAutosave(page);
@@ -54,7 +54,7 @@ test.describe('AutoSave Signers Step', () => {
       });
 
       expect(retrievedRecipients.length).toBe(1);
-      expect(retrievedRecipients[0].email).toBe('recipient1@documenso.com');
+      expect(retrievedRecipients[0].email).toBe('recipient1@keepcontracts.com');
       expect(retrievedRecipients[0].name).toBe('Recipient 1');
     }).toPass();
   });
@@ -89,7 +89,7 @@ test.describe('AutoSave Signers Step', () => {
     await addSignerAndSave(page);
 
     await page.getByPlaceholder('Name').fill('Documenso Manager');
-    await page.getByPlaceholder('Email').fill('manager@documenso.com');
+    await page.getByPlaceholder('Email').fill('manager@keepcontracts.com');
 
     await triggerAutosave(page);
 
@@ -106,7 +106,7 @@ test.describe('AutoSave Signers Step', () => {
       });
 
       expect(retrievedRecipients.length).toBe(1);
-      expect(retrievedRecipients[0].email).toBe('manager@documenso.com');
+      expect(retrievedRecipients[0].email).toBe('manager@keepcontracts.com');
       expect(retrievedRecipients[0].name).toBe('Documenso Manager');
       expect(retrievedRecipients[0].role).toBe('CC');
     }).toPass();
@@ -119,12 +119,12 @@ test.describe('AutoSave Signers Step', () => {
 
     await page.getByRole('button', { name: 'Add signer' }).click();
 
-    await page.getByTestId('signer-email-input').nth(1).fill('recipient2@documenso.com');
+    await page.getByTestId('signer-email-input').nth(1).fill('recipient2@keepcontracts.com');
     await page.getByLabel('Name').nth(1).fill('Recipient 2');
 
     await page.getByRole('button', { name: 'Add Signer' }).click();
 
-    await page.getByTestId('signer-email-input').nth(2).fill('recipient3@documenso.com');
+    await page.getByTestId('signer-email-input').nth(2).fill('recipient3@keepcontracts.com');
     await page.getByLabel('Name').nth(2).fill('Recipient 3');
 
     await triggerAutosave(page);
@@ -166,9 +166,9 @@ test.describe('AutoSave Signers Step', () => {
       expect(retrievedDocumentData.documentMeta?.allowDictateNextSigner).toBe(true);
       expect(retrievedRecipients.length).toBe(3);
 
-      const firstRecipient = retrievedRecipients.find((r) => r.email === 'recipient1@documenso.com');
-      const secondRecipient = retrievedRecipients.find((r) => r.email === 'recipient2@documenso.com');
-      const thirdRecipient = retrievedRecipients.find((r) => r.email === 'recipient3@documenso.com');
+      const firstRecipient = retrievedRecipients.find((r) => r.email === 'recipient1@keepcontracts.com');
+      const secondRecipient = retrievedRecipients.find((r) => r.email === 'recipient2@keepcontracts.com');
+      const thirdRecipient = retrievedRecipients.find((r) => r.email === 'recipient3@keepcontracts.com');
 
       expect(firstRecipient?.signingOrder).toBe(2);
       expect(secondRecipient?.signingOrder).toBe(3);

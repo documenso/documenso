@@ -5,7 +5,7 @@ import { DocumentStatus } from '../client';
 import { seedBlankDocument } from './documents';
 import { seedUser } from './users';
 
-const MEDIUM_ACCOUNT_EMAIL = 'medium-account@documenso.com';
+const MEDIUM_ACCOUNT_EMAIL = 'medium-account@keepcontracts.com';
 const DOCUMENT_COUNT = 1000;
 
 const STATUSES = [DocumentStatus.DRAFT, DocumentStatus.PENDING, DocumentStatus.COMPLETED];
@@ -28,7 +28,7 @@ export const seedDatabase = async () => {
     email: MEDIUM_ACCOUNT_EMAIL,
   });
 
-  const recipientEmails = Array.from({ length: 20 }, (_, i) => `recipient-${i}@test.documenso.com`);
+  const recipientEmails = Array.from({ length: 20 }, (_, i) => `recipient-${i}@test.keepcontracts.com`);
 
   for (let i = 0; i < DOCUMENT_COUNT; i++) {
     const status = STATUSES[i % STATUSES.length];

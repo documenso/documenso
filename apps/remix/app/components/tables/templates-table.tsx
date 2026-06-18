@@ -1,6 +1,5 @@
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 import type { TFindTemplatesResponse } from '@documenso/trpc/server/template-router/schema';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
@@ -52,8 +51,6 @@ export const TemplatesTable = ({
   const { remaining } = useLimits();
 
   const team = useCurrentTeam();
-  const organisation = useCurrentOrganisation();
-
   const [isPending, startTransition] = useTransition();
 
   const updateSearchParams = useUpdateSearchParams();
@@ -251,12 +248,7 @@ export const TemplatesTable = ({
             <Trans>Document Limit Exceeded!</Trans>
           </AlertTitle>
           <AlertDescription className="mt-2">
-            <Trans>
-              You have reached your document limit.{' '}
-              <Link className="underline underline-offset-4" to={`/o/${organisation.url}/settings/billing`}>
-                Upgrade your account to continue!
-              </Link>
-            </Trans>
+            <Trans>You have reached your document limit. Please contact your administrator.</Trans>
           </AlertDescription>
         </Alert>
       )}

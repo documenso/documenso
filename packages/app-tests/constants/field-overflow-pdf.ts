@@ -255,7 +255,7 @@ export const OVERFLOW_TEST_FIELDS: OverflowFieldTestData[] = [
     seedFieldMeta: { type: 'email', overflow: 'auto' },
     page: 2,
     ...calculateSingleLinePosition(0),
-    customText: 'example@documenso.com',
+    customText: 'example@keepcontracts.com',
   },
   {
     type: FieldType.EMAIL,
@@ -263,7 +263,7 @@ export const OVERFLOW_TEST_FIELDS: OverflowFieldTestData[] = [
     seedFieldMeta: { type: 'email', overflow: 'auto' },
     page: 2,
     ...calculateSingleLinePosition(1),
-    customText: 'example+medium-overflow-test@documenso.com',
+    customText: 'example+medium-overflow-test@keepcontracts.com',
   },
   {
     type: FieldType.EMAIL,
@@ -272,7 +272,7 @@ export const OVERFLOW_TEST_FIELDS: OverflowFieldTestData[] = [
     page: 2,
     ...calculateSingleLinePosition(2),
     customText:
-      'example+maximum-overflow-testing-across-the-page-width-to-verify-text-extends-beyond-field@documenso.com',
+      'example+maximum-overflow-testing-across-the-page-width-to-verify-text-extends-beyond-field@keepcontracts.com',
   },
   // Multi-line 3×3: Row 0 = TA_LEFT (short / medium / long)
   {
@@ -281,7 +281,7 @@ export const OVERFLOW_TEST_FIELDS: OverflowFieldTestData[] = [
     seedFieldMeta: { type: 'email', overflow: 'auto', textAlign: 'left' },
     page: 2,
     ...calculateMultiLinePosition(0, 0),
-    customText: 'example@documenso.com',
+    customText: 'example@keepcontracts.com',
   },
   {
     type: FieldType.EMAIL,
@@ -289,7 +289,7 @@ export const OVERFLOW_TEST_FIELDS: OverflowFieldTestData[] = [
     seedFieldMeta: { type: 'email', overflow: 'auto', textAlign: 'left' },
     page: 2,
     ...calculateMultiLinePosition(0, 1),
-    customText: 'example+medium-wrapped-text@documenso.com',
+    customText: 'example+medium-wrapped-text@keepcontracts.com',
   },
   {
     type: FieldType.EMAIL,
@@ -298,7 +298,7 @@ export const OVERFLOW_TEST_FIELDS: OverflowFieldTestData[] = [
     page: 2,
     ...calculateMultiLinePosition(0, 2),
     customText:
-      'example+this-is-an-extremely-long-email-address-that-is-designed-to-overflow-vertically-out-of-the-field-box-and-extend-well-beyond-the-bottom-of-the-page-to-verify-that-the-vertical-overflow-logic-correctly-handles-text-that-wraps@documenso.com',
+      'example+this-is-an-extremely-long-email-address-that-is-designed-to-overflow-vertically-out-of-the-field-box-and-extend-well-beyond-the-bottom-of-the-page-to-verify-that-the-vertical-overflow-logic-correctly-handles-text-that-wraps@keepcontracts.com',
   },
   // Multi-line 3×3: Row 1 = TA_CENTER (short / medium / long)
   {
@@ -307,7 +307,7 @@ export const OVERFLOW_TEST_FIELDS: OverflowFieldTestData[] = [
     seedFieldMeta: { type: 'email', overflow: 'auto', textAlign: 'center' },
     page: 2,
     ...calculateMultiLinePosition(1, 0),
-    customText: 'example@documenso.com',
+    customText: 'example@keepcontracts.com',
   },
   {
     type: FieldType.EMAIL,
@@ -315,7 +315,7 @@ export const OVERFLOW_TEST_FIELDS: OverflowFieldTestData[] = [
     seedFieldMeta: { type: 'email', overflow: 'auto', textAlign: 'center' },
     page: 2,
     ...calculateMultiLinePosition(1, 1),
-    customText: 'example+medium-wrapped-text@documenso.com',
+    customText: 'example+medium-wrapped-text@keepcontracts.com',
   },
   {
     type: FieldType.EMAIL,
@@ -324,7 +324,7 @@ export const OVERFLOW_TEST_FIELDS: OverflowFieldTestData[] = [
     page: 2,
     ...calculateMultiLinePosition(1, 2),
     customText:
-      'example+this-is-an-extremely-long-email-address-that-is-designed-to-overflow-vertically-out-of-the-field-box-and-extend-well-beyond-the-bottom-of-the-page-to-verify-that-the-vertical-overflow-logic-correctly-handles-text-that-wraps@documenso.com',
+      'example+this-is-an-extremely-long-email-address-that-is-designed-to-overflow-vertically-out-of-the-field-box-and-extend-well-beyond-the-bottom-of-the-page-to-verify-that-the-vertical-overflow-logic-correctly-handles-text-that-wraps@keepcontracts.com',
   },
   // Multi-line 3×3: Row 2 = TA_RIGHT (short / medium / long)
   {
@@ -333,7 +333,7 @@ export const OVERFLOW_TEST_FIELDS: OverflowFieldTestData[] = [
     seedFieldMeta: { type: 'email', overflow: 'auto', textAlign: 'right' },
     page: 2,
     ...calculateMultiLinePosition(2, 0),
-    customText: 'example@documenso.com',
+    customText: 'example@keepcontracts.com',
   },
   {
     type: FieldType.EMAIL,
@@ -341,7 +341,7 @@ export const OVERFLOW_TEST_FIELDS: OverflowFieldTestData[] = [
     seedFieldMeta: { type: 'email', overflow: 'auto', textAlign: 'right' },
     page: 2,
     ...calculateMultiLinePosition(2, 1),
-    customText: 'example+medium-wrapped-text@documenso.com',
+    customText: 'example+medium-wrapped-text@keepcontracts.com',
   },
   {
     type: FieldType.EMAIL,
@@ -350,7 +350,7 @@ export const OVERFLOW_TEST_FIELDS: OverflowFieldTestData[] = [
     page: 2,
     ...calculateMultiLinePosition(2, 2),
     customText:
-      'example+this-is-an-extremely-long-email-address-that-is-designed-to-overflow-vertically-out-of-the-field-box-and-extend-well-beyond-the-bottom-of-the-page-to-verify-that-the-vertical-overflow-logic-correctly-handles-text-that-wraps@documenso.com',
+      'example+this-is-an-extremely-long-email-address-that-is-designed-to-overflow-vertically-out-of-the-field-box-and-extend-well-beyond-the-bottom-of-the-page-to-verify-that-the-vertical-overflow-logic-correctly-handles-text-that-wraps@keepcontracts.com',
   },
 
   /**

@@ -47,7 +47,7 @@ export const getUploadErrorMessage = (code: string): ToastMessageDescriptor => {
     }))
     .with(AppErrorCode.LIMIT_EXCEEDED, () => ({
       title: msg`Error`,
-      description: msg`You have reached your document limit for this month. Please upgrade your plan.`,
+      description: msg`You have reached your document limit for this month. Please contact your administrator.`,
     }))
     .with('ENVELOPE_ITEM_LIMIT_EXCEEDED', () => ({
       title: msg`Error`,
@@ -87,7 +87,7 @@ export const getTemplateUseErrorMessage = (code: string): ToastMessageDescriptor
     }))
     .with(AppErrorCode.LIMIT_EXCEEDED, () => ({
       title: msg`Error`,
-      description: msg`You have reached your document limit for this plan. Please upgrade your plan.`,
+      description: msg`You have reached your document limit. Please contact your administrator.`,
     }))
     .with(AppErrorCode.TOO_MANY_REQUESTS, () => FAIR_USE_LIMIT_EXCEEDED_ERROR_MESSAGE)
     .otherwise(() => ({
