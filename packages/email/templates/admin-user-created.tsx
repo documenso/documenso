@@ -26,7 +26,7 @@ export const AdminUserCreatedTemplate = ({
         <Section>
           <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid p-4 backdrop-blur-sm">
             <Section>
-              <Img src={getAssetUrl('/static/logo.png')} alt="Keep Contracts Logo" className="mb-4 h-6" />
+              <Img src={getAssetUrl('/static/logo.png?v=2')} alt="Keep Contracts Logo" className="mb-4 h-6" />
 
               <TemplateAdminUserCreated resetPasswordLink={resetPasswordLink} assetBaseUrl={assetBaseUrl} />
             </Section>
