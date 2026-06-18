@@ -137,7 +137,7 @@ const extractRecipientPlaceholder = (placeholder: string): RecipientPlaceholderI
   const recipientIndex = Number(indexMatch[1]);
 
   return {
-    email: `recipient.${recipientIndex}@documenso.com`,
+    email: `recipient.${recipientIndex}@keepcontracts.com`,
     name: `Recipient ${recipientIndex}`,
     recipientIndex,
   };

@@ -35,7 +35,7 @@ const triggerAutosave = async (page: Page) => {
 };
 
 const addSignerAndSave = async (page: Page) => {
-  await page.getByPlaceholder('Email').fill('recipient1@documenso.com');
+  await page.getByPlaceholder('Email').fill('recipient1@keepcontracts.com');
   await page.getByPlaceholder('Name').fill('Recipient 1');
 
   await triggerAutosave(page);
@@ -55,7 +55,7 @@ test.describe('AutoSave Signers Step - Templates', () => {
       });
 
       expect(retrievedRecipients.length).toBe(1);
-      expect(retrievedRecipients[0].email).toBe('recipient1@documenso.com');
+      expect(retrievedRecipients[0].email).toBe('recipient1@keepcontracts.com');
       expect(retrievedRecipients[0].name).toBe('Recipient 1');
     }).toPass();
   });
@@ -90,7 +90,7 @@ test.describe('AutoSave Signers Step - Templates', () => {
     await addSignerAndSave(page);
 
     await page.getByPlaceholder('Name').fill('Documenso Manager');
-    await page.getByPlaceholder('Email').fill('manager@documenso.com');
+    await page.getByPlaceholder('Email').fill('manager@keepcontracts.com');
 
     await triggerAutosave(page);
 
@@ -107,7 +107,7 @@ test.describe('AutoSave Signers Step - Templates', () => {
       });
 
       expect(retrievedRecipients.length).toBe(1);
-      expect(retrievedRecipients[0].email).toBe('manager@documenso.com');
+      expect(retrievedRecipients[0].email).toBe('manager@keepcontracts.com');
       expect(retrievedRecipients[0].name).toBe('Documenso Manager');
       expect(retrievedRecipients[0].role).toBe('CC');
     }).toPass();
@@ -120,12 +120,12 @@ test.describe('AutoSave Signers Step - Templates', () => {
 
     await page.getByRole('button', { name: 'Add placeholder recipient' }).click();
 
-    await page.getByTestId('placeholder-recipient-email-input').nth(1).fill('recipient2@documenso.com');
+    await page.getByTestId('placeholder-recipient-email-input').nth(1).fill('recipient2@keepcontracts.com');
     await page.getByTestId('placeholder-recipient-name-input').nth(1).fill('Recipient 2');
 
     await page.getByRole('button', { name: 'Add placeholder recipient' }).click();
 
-    await page.getByTestId('placeholder-recipient-email-input').nth(2).fill('recipient3@documenso.com');
+    await page.getByTestId('placeholder-recipient-email-input').nth(2).fill('recipient3@keepcontracts.com');
     await page.getByTestId('placeholder-recipient-name-input').nth(2).fill('Recipient 3');
 
     await triggerAutosave(page);

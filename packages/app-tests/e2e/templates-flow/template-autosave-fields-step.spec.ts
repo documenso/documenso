@@ -20,12 +20,12 @@ const setupTemplateAndNavigateToFieldsStep = async (page: Page) => {
 
   await page.getByRole('button', { name: 'Continue' }).click();
 
-  await page.getByPlaceholder('Email').fill('recipient1@documenso.com');
+  await page.getByPlaceholder('Email').fill('recipient1@keepcontracts.com');
   await page.getByPlaceholder('Name').fill('Recipient 1');
 
   await page.getByRole('button', { name: 'Add Placeholder Recipient' }).click();
 
-  await page.getByPlaceholder('Email').nth(1).fill('recipient2@documenso.com');
+  await page.getByPlaceholder('Email').nth(1).fill('recipient2@keepcontracts.com');
   await page.getByPlaceholder('Name').nth(1).fill('Recipient 2');
 
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -69,7 +69,7 @@ test.describe('AutoSave Fields Step', () => {
     await triggerAutosave(page);
 
     await page.getByRole('combobox').first().click();
-    await page.getByRole('option', { name: 'Recipient 2 (recipient2@documenso.com)' }).click();
+    await page.getByRole('option', { name: 'Recipient 2 (recipient2@keepcontracts.com)' }).click();
 
     await page.getByRole('button', { name: 'Signature' }).click();
     await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
@@ -127,7 +127,7 @@ test.describe('AutoSave Fields Step', () => {
     await triggerAutosave(page);
 
     await page.getByRole('combobox').first().click();
-    await page.getByRole('option', { name: 'Recipient 2 (recipient2@documenso.com)' }).click();
+    await page.getByRole('option', { name: 'Recipient 2 (recipient2@keepcontracts.com)' }).click();
 
     await page.getByRole('button', { name: 'Signature' }).click();
     await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
@@ -140,7 +140,7 @@ test.describe('AutoSave Fields Step', () => {
     await triggerAutosave(page);
 
     await page.getByRole('combobox').first().click();
-    await page.getByRole('option', { name: 'Recipient 1 (recipient1@documenso.com)' }).click();
+    await page.getByRole('option', { name: 'Recipient 1 (recipient1@keepcontracts.com)' }).click();
 
     await page.getByText('Text').nth(1).click();
     await page.getByRole('button', { name: 'Remove' }).click();
@@ -193,7 +193,7 @@ test.describe('AutoSave Fields Step', () => {
     await triggerAutosave(page);
 
     await page.getByRole('combobox').first().click();
-    await page.getByRole('option', { name: 'Recipient 2 (recipient2@documenso.com)' }).click();
+    await page.getByRole('option', { name: 'Recipient 2 (recipient2@keepcontracts.com)' }).click();
 
     await page.getByRole('button', { name: 'Signature' }).click();
     await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
@@ -206,7 +206,7 @@ test.describe('AutoSave Fields Step', () => {
     await triggerAutosave(page);
 
     await page.getByRole('combobox').first().click();
-    await page.getByRole('option', { name: 'Recipient 1 (recipient1@documenso.com)' }).click();
+    await page.getByRole('option', { name: 'Recipient 1 (recipient1@keepcontracts.com)' }).click();
 
     await page.getByText('Signature').nth(1).click();
     await page.getByRole('button', { name: 'Duplicate', exact: true }).click();

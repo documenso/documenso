@@ -14,7 +14,7 @@ type LoginOptions = {
 
 export const apiSignin = async ({
   page,
-  email = 'example@documenso.com',
+  email = 'example@keepcontracts.com',
   password = 'password',
   redirectPath = '/',
 }: LoginOptions) => {
@@ -22,13 +22,18 @@ export const apiSignin = async ({
 
   const csrfToken = await getCsrfToken(page);
 
-  await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/email-password/authorize`, {
+  const authResponse = await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/email-password/authorize`, {
     data: {
       email,
       password,
       csrfToken,
     },
   });
+
+  if (!authResponse.ok()) {
+    const body = await authResponse.text().catch(() => '');
+    throw new Error(`Sign-in failed for ${email}: ${authResponse.status()} ${body}`);
+  }
 
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}${redirectPath}`);
   await page.waitForTimeout(500);

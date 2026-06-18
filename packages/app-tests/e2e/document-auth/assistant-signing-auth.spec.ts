@@ -25,13 +25,13 @@ const seedTwoPendingEnvelopes = async (request: APIRequestContext): Promise<Seed
     title: '[TEST] Envelope A',
     recipients: [
       {
-        email: `assistant-${Date.now()}@documenso.com`,
+        email: `assistant-${Date.now()}@keepcontracts.com`,
         name: 'Assistant',
         role: 'ASSISTANT',
         signingOrder: 1,
       },
       {
-        email: `signer-a-${Date.now()}@documenso.com`,
+        email: `signer-a-${Date.now()}@keepcontracts.com`,
         name: 'Signer A',
         role: 'SIGNER',
         signingOrder: 2,
@@ -54,7 +54,7 @@ const seedTwoPendingEnvelopes = async (request: APIRequestContext): Promise<Seed
     title: '[TEST] Envelope B',
     recipients: [
       {
-        email: `signer-b-${Date.now()}@documenso.com`,
+        email: `signer-b-${Date.now()}@keepcontracts.com`,
         name: 'Signer B',
         role: 'SIGNER',
         signingOrder: 1,

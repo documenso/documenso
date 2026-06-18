@@ -110,7 +110,7 @@ test.describe('Default Recipients', () => {
     await page.getByRole('button', { name: 'Add Signer' }).click();
 
     // Add a regular signer using the v2 editor
-    await page.getByTestId('signer-email-input').last().fill('regular-signer@documenso.com');
+    await page.getByTestId('signer-email-input').last().fill('regular-signer@keepcontracts.com');
     await page
       .getByPlaceholder(/Recipient/)
       .first()
@@ -139,7 +139,7 @@ test.describe('Default Recipients', () => {
       expect(defaultRecipient).toBeDefined();
       expect(defaultRecipient?.role).toBe(RecipientRole.CC);
 
-      const regularSigner = envelope.recipients.find((r) => r.email === 'regular-signer@documenso.com');
+      const regularSigner = envelope.recipients.find((r) => r.email === 'regular-signer@keepcontracts.com');
       expect(regularSigner).toBeDefined();
     }).toPass();
   });
@@ -203,7 +203,7 @@ test.describe('Default Recipients', () => {
     const documentId = urlParts.find((part) => part.startsWith('envelope_'));
 
     // Replace the default recipient with a regular signer
-    await page.getByTestId('signer-email-input').first().fill('regular-signer@documenso.com');
+    await page.getByTestId('signer-email-input').first().fill('regular-signer@keepcontracts.com');
     await page
       .getByPlaceholder(/Recipient/)
       .first()
@@ -281,7 +281,7 @@ test.describe('Default Recipients', () => {
       title: 'Test Document with Default Recipients',
       recipients: [
         {
-          email: 'api-recipient@documenso.com',
+          email: 'api-recipient@keepcontracts.com',
           name: 'API Recipient',
           role: RecipientRole.SIGNER,
         },
@@ -316,7 +316,7 @@ test.describe('Default Recipients', () => {
 
     expect(envelope.recipients.length).toBe(2);
 
-    const apiRecipient = envelope.recipients.find((r) => r.email === 'api-recipient@documenso.com');
+    const apiRecipient = envelope.recipients.find((r) => r.email === 'api-recipient@keepcontracts.com');
     expect(apiRecipient).toBeDefined();
     expect(apiRecipient?.role).toBe(RecipientRole.SIGNER);
 
@@ -372,7 +372,7 @@ test.describe('Default Recipients', () => {
     await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
 
     // Add a template recipient
-    await page.getByPlaceholder('Email').fill('template-recipient@documenso.com');
+    await page.getByPlaceholder('Email').fill('template-recipient@keepcontracts.com');
     await page.getByPlaceholder('Name').fill('Template Recipient');
 
     await page.getByRole('button', { name: 'Continue' }).click();
@@ -402,7 +402,7 @@ test.describe('Default Recipients', () => {
 
     expect(document.recipients.length).toBe(2);
 
-    const templateRecipient = document.recipients.find((r) => r.email === 'template-recipient@documenso.com');
+    const templateRecipient = document.recipients.find((r) => r.email === 'template-recipient@keepcontracts.com');
     expect(templateRecipient).toBeDefined();
 
     const defaultRecipient = document.recipients.find(
