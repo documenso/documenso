@@ -3,9 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { getSignatureFontFamily } from './pdf';
 
 describe('getSignatureFontFamily', () => {
-  // The two literal family strings the helper picks between. Asserted by
-  // shape (starts-with / contains the right family) rather than by full
-  // equality so the chain can grow without breaking tests.
+  // Shape-assert the Noto chain so the chain can grow without rewriting tests.
   const expectCaveat = (family: string) => expect(family).toBe('Caveat');
   const expectNotoChain = (family: string) => {
     expect(family).toContain('Noto Sans');
@@ -22,7 +20,6 @@ describe('getSignatureFontFamily', () => {
   });
 
   it('returns Caveat for Latin-extended text (accents, umlauts, eszett)', () => {
-    // Common Western European names that must stay in handwriting style.
     expectCaveat(getSignatureFontFamily('François'));
     expectCaveat(getSignatureFontFamily('Müller'));
     expectCaveat(getSignatureFontFamily('Søren'));
@@ -42,20 +39,15 @@ describe('getSignatureFontFamily', () => {
     expectNotoChain(getSignatureFontFamily('こんにちは')); // Japanese kana
   });
 
-  it('returns the Noto chain for any mixed-script input that includes a non-Caveat script', () => {
-    // Even one non-Caveat character bumps the whole signature to Noto -
-    // deliberately all-or-nothing so we never split a signature between
-    // handwriting and sans-serif.
+  it('returns the Noto chain for mixed-script input containing any non-Caveat script', () => {
     expectNotoChain(getSignatureFontFamily('Hello 안녕'));
     expectNotoChain(getSignatureFontFamily('Иван Ωmega'));
   });
 
   it('returns the Noto chain for scripts not explicitly listed in the chain', () => {
-    // Regression guard: the chain handles Greek/Hebrew/Arabic/etc. via
-    // "Noto Sans" (Latin Noto, which actually covers many scripts). Less
-    // common scripts that fall outside Noto Sans's coverage still get
-    // routed away from Caveat by this helper - they end up rendered as
-    // sans-serif fallback rather than tofu'ing under Caveat.
+    // Negative-match regex guarantees these don't silently fall through to
+    // Caveat (which would tofu). They render via sans-serif at the end of
+    // the chain.
     expectNotoChain(getSignatureFontFamily('ሰላም')); // Ethiopic
     expectNotoChain(getSignatureFontFamily('សួស្ដី')); // Khmer
     expectNotoChain(getSignatureFontFamily('ᠮᠣᠩᠭᠣᠯ')); // Mongolian
