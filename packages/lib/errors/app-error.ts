@@ -27,6 +27,7 @@ export enum AppErrorCode {
   ENVELOPE_DRAFT = 'ENVELOPE_DRAFT',
   ENVELOPE_COMPLETED = 'ENVELOPE_COMPLETED',
   ENVELOPE_REJECTED = 'ENVELOPE_REJECTED',
+  ENVELOPE_CANCELLED = 'ENVELOPE_CANCELLED',
   ENVELOPE_LEGACY = 'ENVELOPE_LEGACY',
   /**
    * Authoring mutation rejected because the envelope is an AES/QES envelope
@@ -80,6 +81,7 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
   [AppErrorCode.ENVELOPE_DRAFT]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_COMPLETED]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_REJECTED]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.ENVELOPE_CANCELLED]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_LEGACY]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_TSP_LOCKED]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.CSC_INSTANCE_MODE_MISMATCH]: { code: 'BAD_REQUEST', status: 400 },
@@ -286,6 +288,7 @@ export class AppError extends Error {
         AppErrorCode.ENVELOPE_DRAFT,
         AppErrorCode.ENVELOPE_COMPLETED,
         AppErrorCode.ENVELOPE_REJECTED,
+        AppErrorCode.ENVELOPE_CANCELLED,
         AppErrorCode.ENVELOPE_LEGACY,
         AppErrorCode.ENVELOPE_TSP_LOCKED,
         AppErrorCode.CSC_INSTANCE_MODE_MISMATCH,
