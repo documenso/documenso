@@ -65,6 +65,13 @@ export const leaveOrganisationRoute = authenticatedProcedure
       });
     });
 
+    // A member was removed — queue a seat sync to true the Stripe quantity down
+    // to the new count (no proration, no credit).
+    await jobs.triggerJob({
+      name: 'sync.organisation-seats',
+      payload: { organisationId },
+    });
+
     await jobs.triggerJob({
       name: 'send.organisation-member-left.email',
       payload: {

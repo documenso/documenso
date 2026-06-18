@@ -5,8 +5,7 @@ import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
 import { prisma } from '@documenso/prisma';
 import { OrganisationType, type Prisma, SubscriptionStatus } from '@prisma/client';
 import { match } from 'ts-pattern';
-
-import { reconcileSeatsWithMemberCount } from './update-subscription-item-quantity';
+import { reconcileOrganisationClaimWithStripeSubscriptionQuantity } from './update-subscription-item-quantity';
 
 const LIVE_SUBSCRIPTION_STATUSES: Stripe.Subscription.Status[] = ['active', 'trialing', 'past_due'];
 
@@ -242,7 +241,7 @@ const handleLiveSubscription = async ({
   const hasPeriodAdvanced = previousPeriodEnd !== null && periodEnd.getTime() > previousPeriodEnd.getTime();
 
   if (hasPeriodAdvanced && !bypassClaimUpdate) {
-    await reconcileSeatsWithMemberCount(organisation.id);
+    await reconcileOrganisationClaimWithStripeSubscriptionQuantity(organisation.id);
   }
 };
 

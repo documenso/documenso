@@ -26,6 +26,7 @@ import { SEAL_DOCUMENT_JOB_DEFINITION } from './definitions/internal/seal-docume
 import { SEAL_DOCUMENT_SWEEP_JOB_DEFINITION } from './definitions/internal/seal-document-sweep';
 import { SEND_SIGNING_REMINDERS_SWEEP_JOB_DEFINITION } from './definitions/internal/send-signing-reminders-sweep';
 import { SYNC_EMAIL_DOMAINS_JOB_DEFINITION } from './definitions/internal/sync-email-domains';
+import { SYNC_ORGANISATION_SEATS_JOB_DEFINITION } from './definitions/internal/sync-organisation-seats';
 
 /**
  * The `as const` assertion is load bearing as it provides the correct level of type inference for
@@ -59,6 +60,7 @@ export const jobsClient = new JobClient([
   SYNC_EMAIL_DOMAINS_JOB_DEFINITION,
   ADMIN_DELETE_ORGANISATION_JOB_DEFINITION,
   CANCEL_ORGANISATION_SUBSCRIPTION_JOB_DEFINITION,
+  SYNC_ORGANISATION_SEATS_JOB_DEFINITION,
 ] as const);
 
 export const jobs = jobsClient;

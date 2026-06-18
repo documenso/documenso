@@ -3,7 +3,6 @@ import { stripe } from '@documenso/lib/server-only/stripe';
 import { appLog } from '@documenso/lib/utils/debugger';
 import { prisma } from '@documenso/prisma';
 import type { OrganisationClaim, Subscription } from '@prisma/client';
-import { SubscriptionStatus } from '@prisma/client';
 import type Stripe from 'stripe';
 
 import { isPriceSeatsBased } from './is-price-seats-based';
@@ -96,39 +95,26 @@ export const assertMemberCountWithinCap = async (
 };
 
 /**
- * Syncs the organisation's member count with the Stripe subscription quantity.
+ * Syncs the Stripe subscription quantity with the organisation's member count.
  *
- * For seat-based plans, `organisationClaim.memberCount` is the paid seat
- * high-water mark for the current billing period and always mirrors the
- * Stripe quantity.
+ * This is a Stripe <-> Database sync operation.
  *
- * - Mode `grow`: will skip if the new count is within the paid
- *   high-water mark (the seat is already paid for); anything above the mark
- *   is invoiced immediately.
- * - Mode `reconcile`: writes the actual member count with no prorations in
- *   either direction (renewal-time true-up).
- *
- * No-ops for plans that are not seats-based and for organisations with
- * unlimited seats (`organisationClaim.memberCount === 0`).
+ * Note: `organisationClaim.memberCount` is the paid seat high-water mark for the
+ * current billing period — the highest count we've already billed for.
  *
  * @param subscription - The subscription to sync the member count with.
  * @param organisationClaim - The organisation claim.
  * @param quantity - The new total member count to sync.
- * @param mode - Whether this is a grow operation or a renewal reconcile.
+ * @param mode - The member-count change that triggered the sync.
  */
 export const syncMemberCountWithStripeSeatPlan = async (
   subscription: Subscription,
   organisationClaim: OrganisationClaim,
   quantity: number,
-  mode: 'grow' | 'reconcile',
+  mode: 'grow' | 'shrink',
 ) => {
-  // Early return if the organisation has unlimited seats.
+  // Unlimited seats — nothing to meter.
   if (organisationClaim.memberCount === 0) {
-    return;
-  }
-
-  // Early return if the new count is less than the paid high-water mark for grow mode.
-  if (mode === 'grow' && quantity <= organisationClaim.memberCount) {
     return;
   }
 
@@ -139,80 +125,87 @@ export const syncMemberCountWithStripeSeatPlan = async (
     return;
   }
 
-  appLog('BILLING', `Updating seat based plan (${mode})`);
+  // Whether to immediately invoice for new seats if the quantity is greater than
+  // the high-water mark.
+  const billsForNewSeats = mode === 'grow' && quantity > organisationClaim.memberCount;
+
+  appLog('BILLING', `Syncing seat based plan (${mode}, quantity ${quantity})`);
 
   await updateSubscriptionItemQuantity({
     priceId: subscription.priceId,
     subscriptionId: subscription.planId,
     quantity,
-    prorationBehaviour: mode === 'grow' ? 'always_invoice' : 'none',
+    prorationBehaviour: billsForNewSeats ? 'always_invoice' : 'none',
   });
 
-  // The claim mirrors the Stripe quantity (the paid seat high-water mark).
-  // This write is the only place the mark advances on grow — the
-  // subscription webhook's claim overwrite preserves the already-billed
-  // Stripe quantity but never advances it.
-  await prisma.organisationClaim.update({
-    where: {
-      id: organisationClaim.id,
-    },
-    data: {
-      memberCount: quantity,
-    },
-  });
+  // Advance the high-water mark when billing for new seats reset it to the
+  // actual count on reconcile. Re-adds and shrinks deliberately leave it so a
+  // seat already paid for this period is never re-charged.
+  if (billsForNewSeats) {
+    await prisma.organisationClaim.update({
+      where: {
+        id: organisationClaim.id,
+      },
+      data: {
+        memberCount: quantity,
+      },
+    });
+  }
 };
 
 /**
- * Reconciles the Stripe seat quantity and organisation claim with the actual
- * member count at the start of a new billing period.
-
+ * Pulls stripe subscription quantity and reconciles it with the organisation claim.
+ *
+ * This is a Stripe -> Database sync operation.
  */
-export const reconcileSeatsWithMemberCount = async (organisationId: string) => {
-  const organisation = await prisma.organisation.findUnique({
+export const reconcileOrganisationClaimWithStripeSubscriptionQuantity = async (organisationId: string) => {
+  const organisation = await prisma.organisation.findFirst({
     where: {
       id: organisationId,
     },
     include: {
-      subscription: true,
       organisationClaim: true,
+      subscription: true,
     },
   });
+
+  console.log('Reconciling organisation claim with stripe subscription quantity');
 
   if (!organisation || !organisation.subscription) {
-    appLog('BILLING', 'Reconcile skipped: organisation or subscription not found');
-
+    console.log('No organisation or subscription found');
     return;
   }
 
-  // Only ACTIVE subscriptions reconcile. INACTIVE (canceled) subscriptions
-  // cannot have their quantity updated in Stripe, and skipping PAST_DUE is
-  // deliberate: drift heals at the first renewal after recovery.
-  if (organisation.subscription.status !== SubscriptionStatus.ACTIVE) {
-    appLog('BILLING', 'Reconcile skipped: subscription not active');
+  const { subscription, organisationClaim } = organisation;
 
+  const isSeatsBased = await isPriceSeatsBased(subscription.priceId);
+
+  // Only seat-based plans support seat syncing.
+  if (!isSeatsBased) {
+    console.log('Not a seats-based plan');
     return;
   }
 
-  const memberCount = await prisma.organisationMember.count({
-    where: {
-      organisationId,
-    },
-  });
+  const stripeSubscription = await stripe.subscriptions.retrieve(subscription.planId);
 
-  // An organisation always has at least its owner. Guarding zero protects
-  // more than the Stripe quantity: writing 0 to the claim would flip
-  // memberCount to the unlimited sentinel and permanently exempt the
-  // organisation from seat billing.
-  if (memberCount === 0) {
-    appLog('BILLING', 'Reconcile skipped: organisation has no members');
+  // Get the highest quantity item in the subscription. There should only ever be one
+  // but this is a safeguard.
+  const stripeSeatsQuantity =
+    stripeSubscription.items.data.length > 0
+      ? Math.max(...stripeSubscription.items.data.map((item) => item.quantity ?? 0))
+      : 0;
 
-    return;
+  console.log('Stripe seats quantity', stripeSeatsQuantity);
+
+  // Never sync a quantity of 0 since that gives unlimited seats.
+  if (stripeSeatsQuantity > 0) {
+    await prisma.organisationClaim.update({
+      where: {
+        id: organisationClaim.id,
+      },
+      data: {
+        memberCount: stripeSeatsQuantity,
+      },
+    });
   }
-
-  await syncMemberCountWithStripeSeatPlan(
-    organisation.subscription,
-    organisation.organisationClaim,
-    memberCount,
-    'reconcile',
-  );
 };
