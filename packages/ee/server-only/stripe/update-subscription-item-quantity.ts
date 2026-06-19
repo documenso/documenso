@@ -154,11 +154,16 @@ export const syncMemberCountWithStripeSeatPlan = async (
 };
 
 /**
- * Pulls stripe subscription quantity and reconciles it with the organisation claim.
+ * Reconciles the organisation claim seat counter, and the stripe quantity with the
+ * actual member count.
  *
- * This is a Stripe -> Database sync operation.
+ * Uses the member count as the authoritative source of truth. Meaning:
+ * - Update the organisation claim with the member count
+ * - Update the Stripe subscription quantity to the member count
+ *
+ * This should only be called when the billing period rolls over.
  */
-export const reconcileOrganisationClaimWithStripeSubscriptionQuantity = async (organisationId: string) => {
+export const reconcileSeatBasedPlans = async (organisationId: string) => {
   const organisation = await prisma.organisation.findFirst({
     where: {
       id: organisationId,
@@ -169,43 +174,48 @@ export const reconcileOrganisationClaimWithStripeSubscriptionQuantity = async (o
     },
   });
 
-  console.log('Reconciling organisation claim with stripe subscription quantity');
-
   if (!organisation || !organisation.subscription) {
-    console.log('No organisation or subscription found');
     return;
   }
 
   const { subscription, organisationClaim } = organisation;
 
+  // Unlimited seats — nothing to meter.
+  if (organisationClaim.memberCount === 0) {
+    return;
+  }
+
   const isSeatsBased = await isPriceSeatsBased(subscription.priceId);
 
   // Only seat-based plans support seat syncing.
   if (!isSeatsBased) {
-    console.log('Not a seats-based plan');
     return;
   }
 
-  const stripeSubscription = await stripe.subscriptions.retrieve(subscription.planId);
+  const memberCount = await prisma.organisationMember.count({
+    where: {
+      organisationId,
+    },
+  });
 
-  // Get the highest quantity item in the subscription. There should only ever be one
-  // but this is a safeguard.
-  const stripeSeatsQuantity =
-    stripeSubscription.items.data.length > 0
-      ? Math.max(...stripeSubscription.items.data.map((item) => item.quantity ?? 0))
-      : 0;
-
-  console.log('Stripe seats quantity', stripeSeatsQuantity);
-
-  // Never sync a quantity of 0 since that gives unlimited seats.
-  if (stripeSeatsQuantity > 0) {
-    await prisma.organisationClaim.update({
-      where: {
-        id: organisationClaim.id,
-      },
-      data: {
-        memberCount: stripeSeatsQuantity,
-      },
-    });
+  // An organisation always retains its owner; never write the unlimited sentinel.
+  if (memberCount === 0) {
+    return;
   }
+
+  await updateSubscriptionItemQuantity({
+    priceId: subscription.priceId,
+    subscriptionId: subscription.planId,
+    quantity: memberCount,
+    prorationBehaviour: 'none',
+  });
+
+  await prisma.organisationClaim.update({
+    where: {
+      id: organisationClaim.id,
+    },
+    data: {
+      memberCount,
+    },
+  });
 };
