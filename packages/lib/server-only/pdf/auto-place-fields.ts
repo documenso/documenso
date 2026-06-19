@@ -68,7 +68,15 @@ export type FieldToCreate = TFieldAndMeta & {
   height: number;
 };
 
-export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<PlaceholderInfo[]> => {
+type ExtractPlaceholdersLogContext = {
+  envelopeId?: string;
+  fileName?: string;
+};
+
+export const extractPlaceholdersFromPDF = async (
+  pdf: Buffer,
+  logContext?: ExtractPlaceholdersLogContext,
+): Promise<PlaceholderInfo[]> => {
   const pdfDoc = await PDF.load(new Uint8Array(pdf));
 
   const placeholders: PlaceholderInfo[] = [];
@@ -149,6 +157,8 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
 
         logger.warn(
           {
+            envelopeId: logContext?.envelopeId,
+            fileName: logContext?.fileName,
             placeholder,
             page: page.index + 1,
             code: appError.code,
@@ -224,8 +234,9 @@ export const removePlaceholdersFromPDF = async (pdf: Buffer, placeholders?: Plac
  */
 export const extractPdfPlaceholders = async (
   pdf: Buffer,
+  logContext?: ExtractPlaceholdersLogContext,
 ): Promise<{ cleanedPdf: Buffer; placeholders: PlaceholderInfo[] }> => {
-  const placeholders = await extractPlaceholdersFromPDF(pdf);
+  const placeholders = await extractPlaceholdersFromPDF(pdf, logContext);
 
   if (placeholders.length === 0) {
     return { cleanedPdf: pdf, placeholders: [] };
