@@ -96,24 +96,6 @@ const splitPlaceholderToken = (value: string, delimiter: string): string[] => {
 };
 
 /*
-  Split a metadata token (e.g. 'required=true') into [key, value].
-  Splits on the first unescaped '='; returns null if there is no key or value.
-
-  E.g.
-  'options=Card/Check|Bank Transfer' -> ['options', 'Card/Check|Bank Transfer']
-  'required=true'                    -> ['required', 'true']
-*/
-const splitPlaceholderKeyValue = (value: string): [string, string] | null => {
-  const [key, ...valueParts] = splitPlaceholderToken(value, '=');
-
-  if (!key || valueParts.length === 0) {
-    return null;
-  }
-
-  return [key.trim(), valueParts.join('=').trim()];
-};
-
-/*
   Removes the escape backslashes left over after splitting, so \,=, \|, \\ become their literal characters.
 
   E.g.
@@ -158,22 +140,25 @@ export const parsePlaceholderData = (value: string): string[] => {
 
 /*
   Transforms the field metadata string array into a record of key/value pairs.
+  Each token is split on the first unescaped '='; tokens with no key or no '=' are dropped.
 
   E.g.
-  ['required=true', 'fontSize=12']
-    -> { required: 'true', fontSize: '12' }
+  ['required=true', 'fontSize=12', 'label=a=b']
+    -> { required: 'true', fontSize: '12', label: 'a=b' }
 */
 export const parseRawFieldMetaFromPlaceholder = (fieldMetaData: string[]): Record<string, string> => {
   const rawFieldMeta: Record<string, string> = {};
 
   for (const fieldMeta of fieldMetaData) {
-    const keyValue = splitPlaceholderKeyValue(fieldMeta);
+    // Split on the first '=' only; any further '=' stays part of the value (e.g. 'label=a=b').
+    const [rawKey, ...valueParts] = splitPlaceholderToken(fieldMeta, '=');
 
-    if (!keyValue) {
+    if (!rawKey || valueParts.length === 0) {
       continue;
     }
 
-    const [key, value] = keyValue;
+    const key = rawKey.trim();
+    const value = valueParts.join('=').trim();
 
     rawFieldMeta[key] = value;
   }
