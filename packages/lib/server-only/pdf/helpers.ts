@@ -108,6 +108,13 @@ const unescapePlaceholderValue = (value: string): string => {
   return value.replace(/\\([,=|\\])/g, '$1');
 };
 
+/*
+  Cleans up a selection option/default after splitting:
+  unescapes literal delimiters, collapses repeated whitespace, and trims the ends.
+
+  E.g.
+  '  Legal\,   Compliance  ' -> 'Legal, Compliance'
+*/
 const normalizePlaceholderSelectionValue = (value: string): string => {
   return unescapePlaceholderValue(value).replace(/\s+/g, ' ').trim();
 };
