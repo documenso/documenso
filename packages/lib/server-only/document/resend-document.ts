@@ -41,6 +41,10 @@ export type ResendDocumentOptions = {
   requestMetadata: ApiRequestMetadata;
 };
 
+const isPromiseRejected = <T>(
+  result: PromiseSettledResult<T>,
+): result is PromiseRejectedResult => result.status === 'rejected';
+
 export const resendDocument = async ({ id, userId, recipients, teamId, requestMetadata }: ResendDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -182,7 +186,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
     type: 'email',
   });
 
-  await Promise.all(
+  const resendResults = await Promise.allSettled(
     recipientsToRemind.map(async (recipient) => {
       if (recipient.role === RecipientRole.CC || !isRecipientEmailValidForSending(recipient)) {
         return;
@@ -293,6 +297,12 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
       });
     }),
   );
+
+  const failedResends = resendResults.filter(isPromiseRejected);
+
+  if (failedResends.length > 0) {
+    throw failedResends[0].reason;
+  }
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_REMINDER_SENT,
