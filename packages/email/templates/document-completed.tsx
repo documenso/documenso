@@ -26,9 +26,8 @@ export const DocumentCompletedEmailTemplate = ({
   return (
     <Html>
       <Head />
-      <Preview>{_(previewText)}</Preview>
-
       <Body className="mx-auto my-auto font-sans">
+        <Preview>{_(previewText)}</Preview>
         <Section className="bg-white">
           <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid p-2 backdrop-blur-sm">
             <Section className="p-2">

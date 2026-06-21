@@ -13,6 +13,7 @@
   ],
   "scripts": {
     "dev": "email dev --port 3002 --dir templates",
+    "test": "vitest run",
     "clean": "rimraf node_modules"
   },
   "dependencies": {
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@documenso/tsconfig": "*",
-    "@types/nodemailer": "^8.0.0"
+    "@types/nodemailer": "^8.0.0",
+    "vitest": "^4.0.18"
   }
 }
