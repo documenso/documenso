@@ -31,6 +31,7 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_COMPLETED', // When the document is sealed and fully completed.
   'DOCUMENT_CREATED', // When the document is created.
   'DOCUMENT_DELETED', // When the document is soft deleted.
+  'DOCUMENT_CANCELLED', // When a privileged member cancels the document.
   'DOCUMENT_FIELDS_AUTO_INSERTED', // When a field is auto inserted during send due to default values (radio/dropdown/checkbox).
   'DOCUMENT_FIELD_INSERTED', // When a field is inserted (signed/approved/etc) by a recipient.
   'DOCUMENT_FIELD_UNINSERTED', // When a field is uninserted by a recipient.
@@ -54,6 +55,13 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_ACCESS_AUTH_2FA_REQUESTED', // When ACCESS AUTH 2FA is requested.
   'DOCUMENT_ACCESS_AUTH_2FA_VALIDATED', // When ACCESS AUTH 2FA is successfully validated.
   'DOCUMENT_ACCESS_AUTH_2FA_FAILED', // When ACCESS AUTH 2FA validation fails.
+
+  // CSC / TSP signing events.
+  'DOCUMENT_RECIPIENT_CSC_AUTHENTICATED', // Service-scope OAuth complete; CSC credential persisted.
+  'DOCUMENT_RECIPIENT_CSC_AUTHENTICATION_FAILED', // Service-scope OAuth completed but TSP returned a blocking error (empty credential list / invalid cert / refused algorithm).
+  'DOCUMENT_RECIPIENT_CSC_SIGN_REQUESTED', // Recipient clicked Sign; CSC session created with captured per-item hashes.
+  'DOCUMENT_RECIPIENT_CSC_AUTHORIZED', // Credential-scope OAuth complete; SAD attached to the CSC session.
+  'DOCUMENT_RECIPIENT_CSC_SIGNED', // TSP returned signatures and they were embedded into the recipient's PDF bytes.
 ]);
 
 export const ZDocumentAuditLogEmailTypeSchema = z.enum([
@@ -286,6 +294,16 @@ export const ZDocumentAuditLogEventDocumentDeletedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED),
   data: z.object({
     type: z.enum(['SOFT', 'HARD']),
+  }),
+});
+
+/**
+ * Event: Document cancelled.
+ */
+export const ZDocumentAuditLogEventDocumentCancelledSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CANCELLED),
+  data: z.object({
+    reason: z.string().optional(),
   }),
 });
 
@@ -722,6 +740,71 @@ export const ZDocumentAuditLogEventRecipientExpiredSchema = z.object({
   }),
 });
 
+/**
+ * Event: Recipient completed CSC service-scope OAuth — credential discovered, certificate persisted.
+ */
+export const ZDocumentAuditLogEventDocumentRecipientCscAuthenticatedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_AUTHENTICATED),
+  data: ZBaseRecipientDataSchema.extend({
+    providerId: z.string(),
+    credentialId: z.string(),
+    signatureAlgorithm: z.string(),
+    digestAlgorithm: z.string(),
+  }),
+});
+
+/**
+ * Event: Recipient's CSC service-scope OAuth completed but the TSP returned a blocking error.
+ */
+export const ZDocumentAuditLogEventDocumentRecipientCscAuthenticationFailedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_AUTHENTICATION_FAILED),
+  data: ZBaseRecipientDataSchema.extend({
+    providerId: z.string(),
+    reason: z.string(),
+  }),
+});
+
+/**
+ * Event: Recipient initiated TSP signing — CSC session created with per-item hashes.
+ */
+export const ZDocumentAuditLogEventDocumentRecipientCscSignRequestedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_SIGN_REQUESTED),
+  data: ZBaseRecipientDataSchema.extend({
+    providerId: z.string(),
+    credentialId: z.string(),
+    sessionId: z.string(),
+    numSignatures: z.number(),
+  }),
+});
+
+/**
+ * Event: Recipient completed CSC credential-scope OAuth — SAD attached to session.
+ */
+export const ZDocumentAuditLogEventDocumentRecipientCscAuthorizedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_AUTHORIZED),
+  data: ZBaseRecipientDataSchema.extend({
+    providerId: z.string(),
+    credentialId: z.string(),
+    sessionId: z.string(),
+    sadExpiresAt: z.coerce.date(),
+  }),
+});
+
+/**
+ * Event: TSP returned signatures and they were embedded into the recipient's PDF bytes.
+ */
+export const ZDocumentAuditLogEventDocumentRecipientCscSignedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_SIGNED),
+  data: ZBaseRecipientDataSchema.extend({
+    providerId: z.string(),
+    credentialId: z.string(),
+    sessionId: z.string(),
+    numItemsSigned: z.number(),
+    signatureAlgorithm: z.string(),
+    digestAlgorithm: z.string(),
+  }),
+});
+
 export const ZDocumentAuditLogBaseSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
@@ -743,6 +826,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventDocumentCompletedSchema,
     ZDocumentAuditLogEventDocumentCreatedSchema,
     ZDocumentAuditLogEventDocumentDeletedSchema,
+    ZDocumentAuditLogEventDocumentCancelledSchema,
     ZDocumentAuditLogEventDocumentMovedToTeamSchema,
     ZDocumentAuditLogEventDocumentDelegatedOwnerCreatedSchema,
     ZDocumentAuditLogEventDocumentFieldsAutoInsertedSchema,
@@ -770,6 +854,11 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventRecipientUpdatedSchema,
     ZDocumentAuditLogEventRecipientRemovedSchema,
     ZDocumentAuditLogEventRecipientExpiredSchema,
+    ZDocumentAuditLogEventDocumentRecipientCscAuthenticatedSchema,
+    ZDocumentAuditLogEventDocumentRecipientCscAuthenticationFailedSchema,
+    ZDocumentAuditLogEventDocumentRecipientCscSignRequestedSchema,
+    ZDocumentAuditLogEventDocumentRecipientCscAuthorizedSchema,
+    ZDocumentAuditLogEventDocumentRecipientCscSignedSchema,
   ]),
 );
 

@@ -33,6 +33,7 @@ import type {
   TTextFieldMeta,
 } from '../../types/field-meta';
 import { ZCheckboxFieldMeta, ZDropdownFieldMeta, ZFieldMetaSchema, ZRadioFieldMeta } from '../../types/field-meta';
+import { ZSignatureLevelSchema } from '../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
@@ -50,6 +51,7 @@ import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
+import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -513,23 +515,36 @@ export const createDocumentFromTemplate = async ({
 
   const incrementedDocumentId = await incrementDocumentId();
 
+  // Carry the template's level forward, coercing if the instance mode has
+  // changed since the template was created. ZSignatureLevelSchema parses the
+  // free-form TEXT column defensively. Resolved before meta extraction so
+  // signingOrder picks up the TSP-appropriate default + assertion.
+  const signatureLevel = resolveSignatureLevel({
+    requested: ZSignatureLevelSchema.parse(template.signatureLevel),
+    strict: false,
+  });
+
   const documentMeta = await prisma.documentMeta.create({
-    data: extractDerivedDocumentMeta(settings, {
-      subject: override?.subject || template.documentMeta?.subject,
-      message: override?.message || template.documentMeta?.message,
-      timezone: override?.timezone || template.documentMeta?.timezone,
-      dateFormat: override?.dateFormat || template.documentMeta?.dateFormat,
-      redirectUrl: override?.redirectUrl || template.documentMeta?.redirectUrl,
-      distributionMethod: override?.distributionMethod || template.documentMeta?.distributionMethod,
-      emailSettings: override?.emailSettings || template.documentMeta?.emailSettings,
-      signingOrder: override?.signingOrder || template.documentMeta?.signingOrder,
-      language: override?.language || template.documentMeta?.language || settings.documentLanguage,
-      typedSignatureEnabled: override?.typedSignatureEnabled ?? template.documentMeta?.typedSignatureEnabled,
-      uploadSignatureEnabled: override?.uploadSignatureEnabled ?? template.documentMeta?.uploadSignatureEnabled,
-      drawSignatureEnabled: override?.drawSignatureEnabled ?? template.documentMeta?.drawSignatureEnabled,
-      allowDictateNextSigner: override?.allowDictateNextSigner ?? template.documentMeta?.allowDictateNextSigner,
-      envelopeExpirationPeriod: override?.envelopeExpirationPeriod ?? template.documentMeta?.envelopeExpirationPeriod,
-    }),
+    data: extractDerivedDocumentMeta(
+      settings,
+      {
+        subject: override?.subject || template.documentMeta?.subject,
+        message: override?.message || template.documentMeta?.message,
+        timezone: override?.timezone || template.documentMeta?.timezone,
+        dateFormat: override?.dateFormat || template.documentMeta?.dateFormat,
+        redirectUrl: override?.redirectUrl || template.documentMeta?.redirectUrl,
+        distributionMethod: override?.distributionMethod || template.documentMeta?.distributionMethod,
+        emailSettings: override?.emailSettings || template.documentMeta?.emailSettings,
+        signingOrder: override?.signingOrder || template.documentMeta?.signingOrder,
+        language: override?.language || template.documentMeta?.language || settings.documentLanguage,
+        typedSignatureEnabled: override?.typedSignatureEnabled ?? template.documentMeta?.typedSignatureEnabled,
+        uploadSignatureEnabled: override?.uploadSignatureEnabled ?? template.documentMeta?.uploadSignatureEnabled,
+        drawSignatureEnabled: override?.drawSignatureEnabled ?? template.documentMeta?.drawSignatureEnabled,
+        allowDictateNextSigner: override?.allowDictateNextSigner ?? template.documentMeta?.allowDictateNextSigner,
+        envelopeExpirationPeriod: override?.envelopeExpirationPeriod ?? template.documentMeta?.envelopeExpirationPeriod,
+      },
+      signatureLevel,
+    ),
   });
 
   const { envelope, createdEnvelope } = await prisma.$transaction(async (tx) => {
@@ -539,6 +554,7 @@ export const createDocumentFromTemplate = async ({
         secondaryId: incrementedDocumentId.formattedDocumentId,
         type: EnvelopeType.DOCUMENT,
         internalVersion: template.internalVersion,
+        signatureLevel,
         qrToken: prefixedId('qr'),
         source: DocumentSource.TEMPLATE,
         externalId: externalId || template.externalId,

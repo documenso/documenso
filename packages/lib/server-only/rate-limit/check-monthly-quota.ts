@@ -3,6 +3,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobsClient } from '../../jobs/client';
 import { generateDatabaseId } from '../../universal/id';
 import { currentMonthlyPeriod } from '../../universal/monthly-period';
+import { getQuotaAlertKind } from './get-quota-alert-kind';
 import type { LimitCounter } from './types';
 
 type CheckMonthlyQuotaOptions = {
@@ -56,29 +57,33 @@ export const checkMonthlyQuota = async (opts: CheckMonthlyQuotaOptions): Promise
   const newCount = latestMonthlyStat[column];
   const previousCount = newCount - opts.count;
 
-  const isOverQuota = newCount > opts.quota;
+  // Returns 'quota' on the single request that reached (or jumped past) the quota,
+  // 'quotaNearing' on the single request that reached the warning threshold,
+  // otherwise null. See getQuotaAlertKind for the exactly-once guarantee.
+  const alertKind = getQuotaAlertKind({
+    previousCount,
+    newCount,
+    quota: opts.quota,
+  });
 
-  // Only notify on the single request that crossed the threshold: the count was
-  // at/under quota before this request and over it after. Because the DB
-  // serializes the atomic increment, the post-increment values are distinct and
-  // monotonic, so exactly one request's (previousCount, newCount] interval
-  // contains the quota boundary — guaranteeing the notification fires once.
-  const didCrossQuota = isOverQuota && previousCount <= opts.quota;
-
-  if (didCrossQuota) {
+  // Trigger the alert before the over-quota check — the 'quota' alert usually fires
+  // on the successful request that consumes the last unit of allowance, but when a
+  // batch jumps past the boundary it fires on this rejected request. Either way it
+  // will never fire again this period, so it must be enqueued before any throw.
+  if (alertKind) {
     await jobsClient
       .triggerJob({
-        name: 'send.organisation-limit-exceeded.email',
+        name: 'send.organisation-limit-alert.email',
         payload: {
           organisationId: opts.organisationId,
           counter: opts.counter,
-          kind: 'quota',
+          kind: alertKind,
           period,
         },
       })
       .catch((error) => {
         console.error({
-          msg: 'Failed to send organisation limit exceeded email',
+          msg: 'Failed to send organisation limit alert email',
           error,
         });
 
@@ -86,7 +91,7 @@ export const checkMonthlyQuota = async (opts: CheckMonthlyQuotaOptions): Promise
       });
   }
 
-  if (isOverQuota) {
+  if (newCount > opts.quota) {
     throw new AppError(AppErrorCode.TOO_MANY_REQUESTS, {
       message:
         'Your request could not be completed at this time due to your account exceeding the fair use limits of your current plan. Please contact support.',
