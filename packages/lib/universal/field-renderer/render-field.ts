@@ -9,6 +9,7 @@ import type { FieldRenderMode, FieldToRender } from './field-renderer';
 import { renderCheckboxFieldElement } from './render-checkbox-field';
 import { renderDropdownFieldElement } from './render-dropdown-field';
 import { renderGenericTextFieldElement } from './render-generic-text-field';
+import { renderHighlightFieldElement } from './render-highlight-field';
 import { renderMarkOnPictureFieldElement } from './render-mark-on-picture-field';
 import { renderRadioFieldElement } from './render-radio-field';
 import { renderSignatureFieldElement } from './render-signature-field';
@@ -67,6 +68,7 @@ export const renderField = ({
     .with(FieldType.DROPDOWN, () => renderDropdownFieldElement(field, options))
     .with(FieldType.SIGNATURE, () => renderSignatureFieldElement(field, options))
     .with(FieldType.MARK_ON_PICTURE, () => renderMarkOnPictureFieldElement(field, options))
+    .with(FieldType.HIGHLIGHT, () => renderHighlightFieldElement(field, options))
     .with(FieldType.FREE_SIGNATURE, () => {
       throw new Error('Free signature fields are not supported');
     })

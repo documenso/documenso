@@ -194,6 +194,20 @@ export const EnvelopeEditorPreviewPage = () => {
               customText: '',
             };
           })
+          .with({ type: FieldType.MARK_ON_PICTURE }, ({ fieldMeta }) => {
+            const marks = fieldMeta?.marks ?? [];
+
+            return {
+              customText: marks.length > 0 ? JSON.stringify(marks) : '',
+            };
+          })
+          .with({ type: FieldType.HIGHLIGHT }, ({ fieldMeta }) => {
+            const highlights = fieldMeta?.highlights ?? [];
+
+            return {
+              customText: highlights.length > 0 ? JSON.stringify(highlights) : '',
+            };
+          })
           .exhaustive(),
       };
     });

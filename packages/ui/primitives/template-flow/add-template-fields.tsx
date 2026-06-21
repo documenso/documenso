@@ -40,6 +40,7 @@ import {
   Disc,
   Hash,
   Mail,
+  MousePointerClick,
   Type,
   User,
 } from 'lucide-react';
@@ -933,6 +934,56 @@ export const AddTemplateFieldsFormPartial = ({
                           >
                             <ChevronDown className="h-4 w-4" />
                             <Trans>Dropdown</Trans>
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="group h-full w-full"
+                      onClick={() => setSelectedField(FieldType.MARK_ON_PICTURE)}
+                      onMouseDown={() => setSelectedField(FieldType.MARK_ON_PICTURE)}
+                      data-selected={selectedField === FieldType.MARK_ON_PICTURE ? true : undefined}
+                    >
+                      <Card
+                        className={cn(
+                          'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                        )}
+                      >
+                        <CardContent className="p-4">
+                          <p
+                            className={cn(
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
+                            )}
+                          >
+                            <MousePointerClick className="h-4 w-4" />
+                            <Trans>Mark on Picture</Trans>
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="group h-full w-full"
+                      onClick={() => setSelectedField(FieldType.HIGHLIGHT)}
+                      onMouseDown={() => setSelectedField(FieldType.HIGHLIGHT)}
+                      data-selected={selectedField === FieldType.HIGHLIGHT ? true : undefined}
+                    >
+                      <Card
+                        className={cn(
+                          'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                        )}
+                      >
+                        <CardContent className="p-4">
+                          <p
+                            className={cn(
+                              'flex items-center justify-center gap-x-1.5 font-normal text-muted-foreground text-sm group-data-[selected]:text-foreground',
+                            )}
+                          >
+                            <span className="flex h-4 w-4 items-center justify-center rounded-sm bg-yellow-400" />
+                            <Trans>Highlight</Trans>
                           </p>
                         </CardContent>
                       </Card>

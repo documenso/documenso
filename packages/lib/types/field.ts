@@ -8,6 +8,7 @@ import {
   ZDateFieldMeta,
   ZDropdownFieldMeta,
   ZEmailFieldMeta,
+  ZHighlightFieldMeta,
   ZInitialsFieldMeta,
   ZMarkOnPictureFieldMeta,
   ZNameFieldMeta,
@@ -184,6 +185,13 @@ export const ZFieldMarkOnPictureSchema = BaseFieldSchemaUsingNumbers.extend({
 
 export type TFieldMarkOnPicture = z.infer<typeof ZFieldMarkOnPictureSchema>;
 
+export const ZFieldHighlightSchema = BaseFieldSchemaUsingNumbers.extend({
+  type: z.literal(FieldType.HIGHLIGHT),
+  fieldMeta: ZHighlightFieldMeta,
+});
+
+export type TFieldHighlight = z.infer<typeof ZFieldHighlightSchema>;
+
 /**
  * The full field schema which will enforce all types and meta fields.
  */
@@ -199,6 +207,7 @@ export const ZFullFieldSchema = z.discriminatedUnion('type', [
   ZFieldCheckboxSchema,
   ZFieldDropdownSchema,
   ZFieldMarkOnPictureSchema,
+  ZFieldHighlightSchema,
 ]);
 
 export type TFullFieldSchema = z.infer<typeof ZFullFieldSchema>;

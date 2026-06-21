@@ -131,5 +131,6 @@ export const getClientSideFieldTranslations = ({ t }: I18n): Record<FieldType, s
     [FieldType.DATE]: t(msg`Date`),
     [FieldType.EMAIL]: t(msg`Email`),
     [FieldType.MARK_ON_PICTURE]: t(msg`Mark on Picture`),
+    [FieldType.HIGHLIGHT]: t(msg`Highlight`),
   };
 };

@@ -11,6 +11,7 @@ export const ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING: FieldType[] = [
   FieldType.RADIO,
   FieldType.CHECKBOX,
   FieldType.MARK_ON_PICTURE,
+  FieldType.HIGHLIGHT,
 ];
 
 /**

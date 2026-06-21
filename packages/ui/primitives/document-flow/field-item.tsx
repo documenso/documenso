@@ -110,6 +110,8 @@ const FieldItemInner = ({
     'EMAIL',
     'DATE',
     'NAME',
+    'MARK_ON_PICTURE',
+    'HIGHLIGHT',
   ].includes(field.type);
 
   const calculateCoords = useCallback(() => {

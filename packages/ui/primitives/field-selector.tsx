@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/react/macro';
 import { FieldType } from '@prisma/client';
-import { CalendarDays, CheckSquare, ChevronDown, Contact, Disc, Hash, Mail, Type, User } from 'lucide-react';
+import { CalendarDays, CheckSquare, ChevronDown, Contact, Disc, Hash, Mail, MousePointerClick, Type, User } from 'lucide-react';
 
 import { cn } from '../lib/utils';
 import { Card, CardContent } from './card';
@@ -68,6 +68,16 @@ export const FieldSelector = ({
       type: FieldType.DROPDOWN,
       label: 'Dropdown',
       icon: ChevronDown,
+    },
+    {
+      type: FieldType.MARK_ON_PICTURE,
+      label: 'Mark on Picture',
+      icon: MousePointerClick,
+    },
+    {
+      type: FieldType.HIGHLIGHT,
+      label: 'Highlight',
+      icon: null,
     },
   ];
 

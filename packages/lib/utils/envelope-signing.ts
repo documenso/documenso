@@ -262,5 +262,18 @@ export const extractFieldInsertionValues = ({
         inserted: true,
       };
     })
+    .with({ type: FieldType.HIGHLIGHT }, (fieldValue) => {
+      if (!fieldValue.value || fieldValue.value.length === 0) {
+        return {
+          customText: '',
+          inserted: false,
+        };
+      }
+
+      return {
+        customText: JSON.stringify(fieldValue.value),
+        inserted: true,
+      };
+    })
     .exhaustive();
 };

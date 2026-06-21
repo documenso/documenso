@@ -67,6 +67,8 @@ const FieldSettingsTypeTranslations: Record<FieldType, MessageDescriptor> = {
   [FieldType.RADIO]: msg`Radio Settings`,
   [FieldType.CHECKBOX]: msg`Checkbox Settings`,
   [FieldType.DROPDOWN]: msg`Dropdown Settings`,
+  [FieldType.MARK_ON_PICTURE]: msg`Mark on Picture Settings`,
+  [FieldType.HIGHLIGHT]: msg`Highlight Settings`,
 };
 
 export const EnvelopeEditorFieldsPage = () => {

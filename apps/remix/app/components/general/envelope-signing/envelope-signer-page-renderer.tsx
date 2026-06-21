@@ -33,6 +33,7 @@ import { useEmbedSigningContext } from '~/components/embed/embed-signing-context
 import { handleCheckboxFieldClick } from '~/utils/field-signing/checkbox-field';
 import { handleDropdownFieldClick } from '~/utils/field-signing/dropdown-field';
 import { handleEmailFieldClick } from '~/utils/field-signing/email-field';
+import { handleHighlightFieldClick } from '~/utils/field-signing/highlight-field';
 import { handleInitialsFieldClick } from '~/utils/field-signing/initial-field';
 import { handleNameFieldClick } from '~/utils/field-signing/name-field';
 import { handleNumberFieldClick } from '~/utils/field-signing/number-field';
@@ -376,6 +377,18 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
         /**
          * SIGNATURE FIELD.
          */
+        .with({ type: FieldType.HIGHLIGHT }, (field) => {
+          void handleHighlightFieldClick({ field })
+            .then(async (payload) => {
+              if (payload) {
+                fieldGroup.add(loadingSpinnerGroup);
+                await signField(field.id, payload);
+              }
+            })
+            .finally(() => {
+              loadingSpinnerGroup.destroy();
+            });
+        })
         .with({ type: FieldType.SIGNATURE }, (field) => {
           void handleSignatureFieldClick({
             field,

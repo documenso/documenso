@@ -8,6 +8,7 @@ import {
   type TDropdownFieldMeta as DropdownFieldMeta,
   type TEmailFieldMeta as EmailFieldMeta,
   type TFieldMetaSchema as FieldMeta,
+  type THighlightFieldMeta as HighlightFieldMeta,
   type TInitialsFieldMeta as InitialsFieldMeta,
   type TNameFieldMeta as NameFieldMeta,
   type TNumberFieldMeta as NumberFieldMeta,
@@ -62,7 +63,8 @@ export type FieldMetaKeys =
   | keyof InitialsFieldMeta
   | keyof NameFieldMeta
   | keyof EmailFieldMeta
-  | keyof DateFieldMeta;
+  | keyof DateFieldMeta
+  | keyof HighlightFieldMeta;
 
 const getDefaultState = (fieldType: FieldType): FieldMeta => {
   switch (fieldType) {
@@ -143,6 +145,16 @@ const getDefaultState = (fieldType: FieldType): FieldMeta => {
         defaultValue: '',
         required: false,
         readOnly: false,
+      };
+    case FieldType.MARK_ON_PICTURE:
+      return {
+        type: 'mark_on_picture',
+        marks: [],
+      };
+    case FieldType.HIGHLIGHT:
+      return {
+        type: 'highlight',
+        highlights: [],
       };
     default:
       throw new Error(`Unsupported field type: ${fieldType}`);

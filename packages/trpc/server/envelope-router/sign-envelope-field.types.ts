@@ -58,6 +58,26 @@ export const ZSignEnvelopeFieldValue = z.discriminatedUnion('type', [
       )
       .nullable(),
   }),
+  z.object({
+    type: z.literal(FieldType.HIGHLIGHT),
+    value: z
+      .array(
+        z.object({
+          id: z.number(),
+          color: z.string(),
+          pageNumber: z.number(),
+          bounds: z.array(
+            z.object({
+              x: z.number(),
+              y: z.number(),
+              width: z.number(),
+              height: z.number(),
+            }),
+          ),
+        }),
+      )
+      .nullable(),
+  }),
 ]);
 
 export const ZSignEnvelopeFieldRequestSchema = z.object({

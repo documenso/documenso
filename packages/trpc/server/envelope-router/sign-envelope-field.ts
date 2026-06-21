@@ -270,6 +270,10 @@ export const signEnvelopeFieldRoute = procedure
                 type,
                 data: updatedField.customText,
               }))
+              .with(FieldType.HIGHLIGHT, (type) => ({
+                type,
+                data: updatedField.customText,
+              }))
               .exhaustive(),
             fieldSecurity: derivedRecipientActionAuth
               ? {
