@@ -1,4 +1,5 @@
 import { Trans } from '@lingui/react/macro';
+import { Fragment } from 'react';
 
 import { Link, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
@@ -44,10 +45,10 @@ export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterP
         <Text className="my-8 text-slate-400 text-sm">
           {branding.brandingCompanyDetails.split('\n').map((line, idx) => {
             return (
-              <>
+              <Fragment key={idx}>
                 {idx > 0 && <br />}
                 {line}
-              </>
+              </Fragment>
             );
           })}
         </Text>
