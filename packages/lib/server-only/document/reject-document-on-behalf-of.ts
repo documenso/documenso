@@ -1,3 +1,11 @@
+// This is closely related to `reject-document-with-token.ts` but is intentionally
+// kept as a separate method rather than merged into one. This file focuses on
+// rejection from an API/programmatic perspective (an authenticated API user acting
+// on behalf of a recipient), whereas `reject-document-with-token.ts` focuses on it
+// from a recipient perspective (the recipient rejecting via their token).
+//
+// Code changes in one should probably be mirrored to the other, particularly in
+// relation to the jobs triggered after a rejection.
 import { jobs } from '@documenso/lib/jobs/client';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
