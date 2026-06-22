@@ -226,6 +226,7 @@ model ApiToken {
   algorithm ApiTokenAlgorithm @default(SHA512)
   expires   DateTime?
   createdAt DateTime          @default(now())
+  lastUsedAt DateTime?
   userId    Int?
   user      User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
   teamId    Int
