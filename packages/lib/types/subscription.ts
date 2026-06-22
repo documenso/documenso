@@ -6,14 +6,37 @@ import { z } from 'zod';
  *
  * Example: "5m", "1h", "1d"
  */
-export const ZRateLimitWindowSchema = z.string().regex(/^\d+[smhd]$/);
+export const RATE_LIMIT_WINDOW_REGEX = /^\d+[smhd]$/;
 
-export const ZRateLimitArraySchema = z.array(
-  z.object({
-    window: ZRateLimitWindowSchema,
-    max: z.number().int().positive(),
-  }),
-);
+export const ZRateLimitWindowSchema = z.string().trim().regex(RATE_LIMIT_WINDOW_REGEX, {
+  message: 'Use a duration with a unit, e.g. 5m, 1h, or 24h',
+});
+
+export const ZRateLimitArraySchema = z
+  .array(
+    z.object({
+      window: ZRateLimitWindowSchema,
+      max: z.number().int().positive(),
+    }),
+  )
+  .superRefine((entries, ctx) => {
+    const windows = new Map<string, number>();
+
+    entries.forEach((entry, index) => {
+      const window = entry.window.trim();
+      const duplicateIndex = windows.get(window);
+
+      if (duplicateIndex !== undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Use a unique window for each rate limit',
+          path: [index, 'window'],
+        });
+      }
+
+      windows.set(window, index);
+    });
+  });
 
 export type TRateLimitArray = z.infer<typeof ZRateLimitArraySchema>;
 
@@ -52,7 +75,7 @@ export const ZClaimFlagsSchema = z.object({
   signingReminders: z.boolean().optional(),
 
   cscQesSigning: z.boolean().optional(),
-  
+
   /**
    * Controls whether an organisation is prevented from sending emails.
    *

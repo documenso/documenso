@@ -42,7 +42,6 @@ import { AdminOrganisationDeleteDialog } from '~/components/dialogs/admin-organi
 import { AdminOrganisationMemberDeleteDialog } from '~/components/dialogs/admin-organisation-member-delete-dialog';
 import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
 import { AdminOrganisationSyncSubscriptionDialog } from '~/components/dialogs/admin-organisation-sync-subscription-dialog';
-import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
 import { AdminGlobalSettingsSection } from '~/components/general/admin-global-settings-section';
 import { ClaimLimitFields } from '~/components/general/claim-limit-fields';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
@@ -268,54 +267,32 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
 
       <GenericOrganisationAdminForm organisation={organisation} />
 
-      <div className="mt-6 rounded-lg border p-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="font-medium text-sm">
-              <Trans>Organisation usage</Trans>
-            </p>
-            <p className="mt-1 text-muted-foreground text-sm">
-              <Trans>Current usage against organisation limits.</Trans>
-            </p>
-          </div>
-        </div>
+      <SettingsHeader
+        title={t`Organisation usage`}
+        subtitle={t`Current usage against organisation limits.`}
+        className="mt-6"
+        hideDivider
+      />
 
-        <div className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-          <DetailsCard label={<Trans>Members</Trans>}>
-            <DetailsValue>
-              {organisation.members.length} /{' '}
-              {organisation.organisationClaim.memberCount === 0
-                ? t`Unlimited`
-                : organisation.organisationClaim.memberCount}
-            </DetailsValue>
-          </DetailsCard>
-
-          <DetailsCard label={<Trans>Teams</Trans>}>
-            <DetailsValue>
-              {organisation.teams.length} /{' '}
-              {organisation.organisationClaim.teamCount === 0 ? t`Unlimited` : organisation.organisationClaim.teamCount}
-            </DetailsValue>
-          </DetailsCard>
-        </div>
-
-        <div className="mt-4">
-          <OrganisationUsagePanel
-            organisationId={organisation.id}
-            monthlyStats={organisation.monthlyStats}
-            organisationClaim={organisation.organisationClaim}
-          />
-        </div>
-      </div>
+      <OrganisationUsagePanel
+        organisationId={organisation.id}
+        monthlyStats={organisation.monthlyStats}
+        organisationClaim={organisation.organisationClaim}
+        capacityUsage={{
+          members: organisation.members.length,
+          teams: organisation.teams.length,
+        }}
+      />
 
       <div className="mt-6 rounded-lg border p-4">
         <Accordion type="single" collapsible>
           <AccordionItem value="global-settings" className="border-b-0">
             <AccordionTrigger className="py-0">
               <div className="text-left">
-                <p className="font-medium text-sm">
+                <p className="font-semibold text-base">
                   <Trans>Global Settings</Trans>
                 </p>
-                <p className="mt-1 font-normal text-muted-foreground text-sm">
+                <p className="mt-1 text-muted-foreground text-sm">
                   <Trans>Default settings applied to this organisation.</Trans>
                 </p>
               </div>
@@ -406,21 +383,27 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
 
       <div className="mt-16 space-y-10">
         <div>
-          <label className="font-medium text-sm leading-none">
+          <h3 className="font-semibold text-base">
             <Trans>Organisation Members</Trans>
-          </label>
+          </h3>
+          <p className="mt-1 text-muted-foreground text-sm">
+            <Trans>People with access to this organisation.</Trans>
+          </p>
 
-          <div className="my-2">
+          <div className="mt-3">
             <DataTable columns={organisationMembersColumns} data={organisation.members} />
           </div>
         </div>
 
         <div>
-          <label className="font-medium text-sm leading-none">
+          <h3 className="font-semibold text-base">
             <Trans>Organisation Teams</Trans>
-          </label>
+          </h3>
+          <p className="mt-1 text-muted-foreground text-sm">
+            <Trans>Teams that belong to this organisation.</Trans>
+          </p>
 
-          <div className="my-2">
+          <div className="mt-3">
             <DataTable columns={teamsColumns} data={organisation.teams} />
           </div>
         </div>
@@ -715,108 +698,113 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="claims.teamCount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                <Trans>Team Count</Trans>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={0}
-                  {...field}
-                  onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
-                />
-              </FormControl>
-              <FormDescription>
-                <Trans>Number of teams allowed. 0 = Unlimited</Trans>
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="claims.teamCount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Team Count</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                  />
+                </FormControl>
+                <FormDescription>
+                  <Trans>Number of teams allowed. 0 = Unlimited</Trans>
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="claims.memberCount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                <Trans>Member Count</Trans>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={0}
-                  {...field}
-                  onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
-                />
-              </FormControl>
-              <FormDescription>
-                <Trans>Number of members allowed. 0 = Unlimited</Trans>
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="claims.memberCount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Member Count</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                  />
+                </FormControl>
+                <FormDescription>
+                  <Trans>Number of members allowed. 0 = Unlimited</Trans>
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="claims.envelopeItemCount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                <Trans>Envelope Item Count</Trans>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={1}
-                  {...field}
-                  onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
-                />
-              </FormControl>
-              <FormDescription>
-                <Trans>Maximum number of uploaded files per envelope allowed</Trans>
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="claims.envelopeItemCount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Envelope Item Count</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={1}
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                  />
+                </FormControl>
+                <FormDescription>
+                  <Trans>Maximum number of uploaded files per envelope allowed</Trans>
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="claims.recipientCount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                <Trans>Recipient Count</Trans>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={0}
-                  {...field}
-                  onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
-                />
-              </FormControl>
-              <FormDescription>
-                <Trans>Maximum number of recipients per document allowed. 0 = Unlimited</Trans>
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="claims.recipientCount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Recipient Count</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                  />
+                </FormControl>
+                <FormDescription>
+                  <Trans>Maximum number of recipients per document allowed. 0 = Unlimited</Trans>
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <div>
-          <FormLabel>
+          <h3 className="font-semibold text-base">
             <Trans>Feature Flags</Trans>
-          </FormLabel>
+          </h3>
+          <p className="mt-1 text-muted-foreground text-sm">
+            <Trans>Capabilities enabled for this organisation.</Trans>
+          </p>
 
-          <div className="mt-2 space-y-2 rounded-md border p-4">
+          <div className="mt-3 space-y-2 rounded-md border p-4">
             {Object.values(SUBSCRIPTION_CLAIM_FEATURE_FLAGS).map(({ key, label, isEnterprise }) => {
               const isRestrictedFeature = isEnterprise && !licenseFlags?.[key as keyof TLicenseClaim]; // eslint-disable-line @typescript-eslint/consistent-type-assertions
 

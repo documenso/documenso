@@ -1,4 +1,6 @@
-export const QUOTA_WARNING_THRESHOLD = 0.8;
+import { QUOTA_WARNING_THRESHOLD } from '../../universal/quota-usage';
+
+export { QUOTA_WARNING_THRESHOLD };
 
 export type QuotaAlertKind = 'quota' | 'quotaNearing';
 
