@@ -4,7 +4,7 @@ import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-e
 import { generateCertificatePdf } from '@documenso/lib/server-only/pdf/generate-certificate-pdf';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { prisma } from '@documenso/prisma';
-import { EnvelopeType } from '@prisma/client';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -60,7 +60,9 @@ export const downloadDocumentCertificateRoute = authenticatedProcedure
       });
     }
 
-    if (!isDocumentCompleted(envelope.status)) {
+    // A cancelled document was never sealed/completed, so a signing certificate
+    // must not be generated for it. REJECTED and COMPLETED keep their prior behavior.
+    if (!isDocumentCompleted(envelope.status) || envelope.status === DocumentStatus.CANCELLED) {
       throw new AppError('DOCUMENT_NOT_COMPLETE');
     }
 

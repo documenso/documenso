@@ -186,9 +186,9 @@ Documenso requires a certificate to digitally sign documents.
 
 ### Transport Selection
 
-| Variable                         | Description                              | Default |
-| -------------------------------- | ---------------------------------------- | ------- |
-| `NEXT_PRIVATE_SIGNING_TRANSPORT` | Signing backend: `local` or `gcloud-hsm` | `local` |
+| Variable                         | Description                                       | Default |
+| -------------------------------- | ------------------------------------------------- | ------- |
+| `NEXT_PRIVATE_SIGNING_TRANSPORT` | Signing backend: `local`, `gcloud-hsm`, or `csc`  | `local` |
 
 ### Local Signing
 
@@ -210,11 +210,36 @@ Documenso requires a certificate to digitally sign documents.
 | `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_CONTENTS`          | Base64-encoded certificate chain                     |
 | `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_SECRET_MANAGER_CERT_PATH`     | Google Secret Manager path for certificate retrieval |
 
+### Cloud Signature Consortium (CSC)
+
+Routes signing through a third-party Trust Service Provider for Advanced and Qualified Electronic Signatures (AES/QES). Instance-wide; set `NEXT_PRIVATE_SIGNING_TRANSPORT=csc` to enable. See [CSC (AES / QES)](/docs/self-hosting/configuration/signing-certificate/csc-qes) for the full setup walkthrough.
+
+CSC mode requires an active [Enterprise Edition](/docs/policies/enterprise-edition) license. Without a valid license, the instance will refuse to start in `csc` mode.
+
+| Variable                                       | Description                                                                                                                | Default |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `NEXT_PRIVATE_SIGNING_CSC_PROVIDER_BASE_URL`   | Base URL of the CSC provider's API                                                                                         |         |
+| `NEXT_PRIVATE_SIGNING_CSC_OAUTH_CLIENT_ID`     | OAuth client ID registered with the CSC provider                                                                           |         |
+| `NEXT_PRIVATE_SIGNING_CSC_OAUTH_CLIENT_SECRET` | OAuth client secret registered with the CSC provider                                                                       |         |
+| `NEXT_PRIVATE_SIGNING_CSC_SIGNATURE_LEVEL`     | Default legal tier for new envelopes when the caller doesn't specify one. `AES` or `QES`. Explicit requests pass through.  | `AES`   |
+
+The OAuth callback URL registered with the CSC provider is fixed at `${NEXT_PUBLIC_WEBAPP_URL}/api/csc/oauth/callback` — register this exact URL with the TSP.
+
+#### Derived Public Variables
+
+The following client-visible variable is **derived automatically** from the private transport at server startup. Do not set it manually — any value set in the environment is overwritten on boot.
+
+| Variable                              | Derived from                                       | Value                                             |
+| ------------------------------------- | -------------------------------------------------- | ------------------------------------------------- |
+| `NEXT_PUBLIC_SIGNING_TRANSPORT_IS_CSC` | `NEXT_PRIVATE_SIGNING_TRANSPORT === 'csc'`        | `'true'` when CSC mode is active, else `'false'` |
+
+The authoring UI uses this flag to gate features that AES/QES envelopes cannot support (parallel signing, assistant role, dictate next signer). Deriving it from the private transport prevents the client-side flag from drifting from the real server-side configuration.
+
 ### Signature Options
 
 | Variable                                    | Description                                                 | Default    |
 | ------------------------------------------- | ----------------------------------------------------------- | ---------- |
-| `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY`  | Comma-separated timestamp authority URLs for LTV signatures |            |
+| `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY`  | Comma-separated timestamp authority URLs for LTV signatures. Optional for `local` / `gcloud-hsm` (signatures omit the timestamp when unset). **Required** when `NEXT_PRIVATE_SIGNING_TRANSPORT=csc` — the instance refuses to start without it. See [CSC (AES / QES)](/docs/self-hosting/configuration/signing-certificate/csc-qes#timestamp-authority-resolution). |            |
 | `NEXT_PUBLIC_SIGNING_CONTACT_INFO`          | Contact info embedded in PDF signatures                     | Webapp URL |
 | `NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER` | Use `adbe.pkcs7.detached` instead of `ETSI.CAdES.detached`  | `false`    |
 

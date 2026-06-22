@@ -382,6 +382,7 @@ enum DocumentStatus {
   PENDING
   COMPLETED
   REJECTED
+  CANCELLED
 }
 
 enum DocumentSource {
@@ -429,7 +430,7 @@ enum EnvelopeType {
   TEMPLATE
 }
 
-/// @zod.import(["import { ZDocumentAuthOptionsSchema } from '@documenso/lib/types/document-auth';", "import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';"])
+/// @zod.import(["import { ZDocumentAuthOptionsSchema } from '@documenso/lib/types/document-auth';", "import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';", "import { ZSignatureLevelSchema } from '@documenso/lib/types/signature-level';"])
 model Envelope {
   id          String  @id
   secondaryId String  @unique
@@ -446,6 +447,8 @@ model Envelope {
   status  DocumentStatus @default(DRAFT)
   source  DocumentSource
   qrToken String? /// @zod.string.describe("The token for viewing the document using the QR code on the certificate.")
+
+  signatureLevel String /// [SignatureLevel] @zod.custom.use(ZSignatureLevelSchema)
 
   internalVersion         Int
   useLegacyFieldInsertion Boolean @default(false)
@@ -650,6 +653,9 @@ model Recipient {
   fields               Field[]
   signatures           Signature[]
 
+  cscCredential CscCredential?
+  cscSession    CscSession?
+
   @@index([token])
   @@index([email])
   @@index([envelopeId])
@@ -715,6 +721,72 @@ model Signature {
   field     Field     @relation(fields: [fieldId], references: [id], onDelete: Cascade)
 
   @@index([recipientId])
+}
+
+/// Per-recipient cached credential metadata for the configured Cloud Signature
+/// Consortium (CSC) provider. Holds the TSP-validated certificate chain and the
+/// symmetric-encrypted service-scope access token. One row per recipient on a
+/// CSC envelope; absent for SES recipients.
+model CscCredential {
+  id           String @id @default(cuid())
+  providerId   String
+  credentialId String
+
+  /// TSP-validated certificate chain (length-prefixed). Nullable until the
+  /// service-scope OAuth callback successfully retrieves and validates it.
+  certCache Bytes?
+
+  /// Algorithm metadata derived from the CSC `credentials/info` response.
+  /// Held as flat scalars so each is independently queryable.
+  signatureAlgorithm String
+  keyType            String
+  digestAlgorithm    String
+  keyLenBits         Int?
+  signAlgoParams     String?
+
+  /// Service-scope access token, symmetric-encrypted at the application layer
+  /// before persistence. Nullable until the service-scope OAuth callback runs.
+  serviceTokenCiphertext Bytes?
+  serviceTokenExpiresAt  DateTime?
+
+  recipientId Int       @unique
+  recipient   Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Per-recipient transient sign-time state held across the credential-scope
+/// OAuth round-trip. The `recipientId @unique` constraint caps each recipient
+/// to at most one in-flight session — re-clicking Sign UPSERTs the row.
+/// Cleaned up transitively when the Recipient is deleted.
+/// @zod.import(["import { ZCscSessionItemsSchema } from '@documenso/lib/types/csc-session';"])
+model CscSession {
+  id String @id @default(cuid())
+
+  /// Denormalised envelope id for ergonomic lookups. No FK relation — cleanup
+  /// flows through the Recipient cascade.
+  envelopeId String
+
+  /// Pinned at prep time; stable across overlay re-renders so the captured
+  /// signedAttrs digest matches the bytes the TSP signs.
+  signingTime DateTime
+
+  /// Contract between prep and sign: an array of
+  /// `{ envelopeItemId, documentDataId, hashB64, ordinal }` per envelope item.
+  /// `documentDataId` pins the immutable bytes that produced the captured
+  /// digest so sign-time can re-derive the same hash against the same content.
+  itemsJson Json /// [CscSessionItems] @zod.custom.use(ZCscSessionItemsSchema)
+
+  /// Populated by the credential-scope OAuth callback. Both nullable at row
+  /// creation; set together when the SAD is exchanged.
+  encryptedSad Bytes?
+  sadExpiresAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  recipientId Int       @unique
+  recipient   Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
 }
 
 model DocumentShareLink {
