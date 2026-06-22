@@ -18,10 +18,10 @@ export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterP
   return (
     <Section>
       {reportUrl && (
-        <Text className="my-4 text-base text-slate-400">
+        <Text className="my-4 text-base text-muted-foreground">
           <Trans>
             Did not expect this email?{' '}
-            <Link className="text-[#7AC455]" href={reportUrl}>
+            <Link className="text-primary" href={reportUrl}>
               Click here to report the sender
             </Link>
             . Never sign a document you don't recognize or weren't expecting.
@@ -30,10 +30,10 @@ export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterP
       )}
 
       {isDocument && !branding.brandingHidePoweredBy && (
-        <Text className="my-4 text-base text-slate-400">
+        <Text className="my-4 text-base text-muted-foreground">
           <Trans>
             This document was sent using{' '}
-            <Link className="text-[#7AC455]" href="https://documen.so/mail-footer">
+            <Link className="text-primary" href="https://documen.so/mail-footer">
               Documenso
             </Link>
             .
@@ -42,7 +42,7 @@ export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterP
       )}
 
       {branding.brandingEnabled && branding.brandingCompanyDetails && (
-        <Text className="my-8 text-slate-400 text-sm">
+        <Text className="my-8 text-muted-foreground text-sm">
           {branding.brandingCompanyDetails.split('\n').map((line, idx) => {
             return (
               <Fragment key={idx}>
@@ -55,7 +55,7 @@ export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterP
       )}
 
       {branding.brandingEnabled && safeBrandingUrl && (
-        <Text className="my-8 text-slate-400 text-sm">
+        <Text className="my-8 text-muted-foreground text-sm">
           <Link href={safeBrandingUrl} target="_blank">
             {safeBrandingUrl}
           </Link>
@@ -63,7 +63,7 @@ export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterP
       )}
 
       {!branding.brandingEnabled && (
-        <Text className="my-8 text-slate-400 text-sm">
+        <Text className="my-8 text-muted-foreground text-sm">
           Documenso, Inc.
           <br />
           2261 Market Street, #5211, San Francisco, CA 94114, USA
