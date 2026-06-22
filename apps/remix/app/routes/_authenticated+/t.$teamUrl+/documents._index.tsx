@@ -16,10 +16,9 @@ import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType, FolderType, OrganisationType } from '@prisma/client';
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
 import { z } from 'zod';
 
-import { DocumentMoveToFolderDialog } from '~/components/dialogs/document-move-to-folder-dialog';
 import { EnvelopesBulkCancelDialog } from '~/components/dialogs/envelopes-bulk-cancel-dialog';
 import { EnvelopesBulkDeleteDialog } from '~/components/dialogs/envelopes-bulk-delete-dialog';
 import { EnvelopesBulkMoveDialog } from '~/components/dialogs/envelopes-bulk-move-dialog';
@@ -55,9 +54,12 @@ export default function DocumentsPage() {
 
   const { folderId } = useParams();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const documentsPath = formatDocumentsPath(team.url);
 
   const [isMovingDocument, setIsMovingDocument] = useState(false);
-  const [documentToMove, setDocumentToMove] = useState<number | null>(null);
+  const [documentToMove, setDocumentToMove] = useState<string | null>(null);
 
   const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>('documents-bulk-selection', {});
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
@@ -200,8 +202,8 @@ export default function DocumentsPage() {
                 data={data}
                 isLoading={isLoading}
                 isLoadingError={isLoadingError}
-                onMoveDocument={(documentId) => {
-                  setDocumentToMove(documentId);
+                onMoveDocument={(envelopeId) => {
+                  setDocumentToMove(envelopeId);
                   setIsMovingDocument(true);
                 }}
                 enableSelection
@@ -213,8 +215,9 @@ export default function DocumentsPage() {
         </div>
 
         {documentToMove && (
-          <DocumentMoveToFolderDialog
-            documentId={documentToMove}
+          <EnvelopesBulkMoveDialog
+            envelopeIds={[documentToMove]}
+            envelopeType={EnvelopeType.DOCUMENT}
             open={isMovingDocument}
             currentFolderId={folderId}
             onOpenChange={(open) => {
@@ -224,6 +227,9 @@ export default function DocumentsPage() {
                 setDocumentToMove(null);
               }
             }}
+            onSuccess={(destinationFolderId) =>
+              navigate(destinationFolderId ? `${documentsPath}/f/${destinationFolderId}` : documentsPath)
+            }
           />
         )}
 
