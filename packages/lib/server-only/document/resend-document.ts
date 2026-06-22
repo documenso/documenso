@@ -13,6 +13,7 @@ import {
   EnvelopeType,
   OrganisationType,
   RecipientRole,
+  SendStatus,
   SigningStatus,
   WebhookTriggerEvents,
 } from '@prisma/client';
@@ -274,6 +275,18 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
           envelopeId: envelope.id,
           teamId: envelope.teamId,
         }),
+      });
+
+      // Mark the recipient as sent if they were not already sent.
+      await prisma.recipient.updateMany({
+        where: {
+          id: recipient.id,
+          sendStatus: SendStatus.NOT_SENT,
+        },
+        data: {
+          sendStatus: SendStatus.SENT,
+          sentAt: new Date(),
+        },
       });
 
       await prisma.documentAuditLog.create({
