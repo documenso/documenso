@@ -277,19 +277,17 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
         }),
       });
 
-      // Mark the recipient as sent now that the (reminder) email has been
-      // dispatched. A recipient can reach a resend while still NOT_SENT (e.g.
-      // the initial distribution skipped their email), so this keeps the
-      // send status accurate after a successful resend.
-      if (recipient.sendStatus !== SendStatus.SENT) {
-        await prisma.recipient.update({
-          where: { id: recipient.id },
-          data: {
-            sendStatus: SendStatus.SENT,
-            sentAt: new Date(),
-          },
-        });
-      }
+      // Mark the recipient as sent if they were not already sent.
+      await prisma.recipient.updateMany({
+        where: {
+          id: recipient.id,
+          sendStatus: SendStatus.NOT_SENT,
+        },
+        data: {
+          sendStatus: SendStatus.SENT,
+          sentAt: new Date(),
+        },
+      });
 
       await prisma.documentAuditLog.create({
         data: createDocumentAuditLogData({
