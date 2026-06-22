@@ -206,6 +206,11 @@ export const EnvelopeDistributeDialog = ({
   };
 
   useEffect(() => {
+    // Default the distribution method tab to the envelope's configured setting.
+    if (isOpen && envelope.documentMeta) {
+      setValue('meta.distributionMethod', envelope.documentMeta.distributionMethod);
+    }
+
     // Resync the whole envelope if the envelope is mid saving.
     if (isOpen && (isAutosaving || autosaveError)) {
       void handleSync();
