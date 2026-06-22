@@ -22,8 +22,6 @@ export function meta() {
   return appMetaTags(msg`Active Sessions`);
 }
 
-const parser = new UAParser();
-
 export default function SettingsSecuritySessions() {
   const { t } = useLingui();
 
@@ -43,9 +41,7 @@ export default function SettingsSecuritySessions() {
         accessorKey: 'userAgent',
         cell: ({ row }) => {
           const userAgent = row.original.userAgent || '';
-          parser.setUA(userAgent);
-
-          const result = parser.getResult();
+          const result = new UAParser(userAgent).getResult();
           const browser = result.browser.name || t`Unknown`;
           const os = result.os.name || t`Unknown`;
           const isCurrentSession = row.original.id === session?.id;
@@ -90,7 +86,7 @@ export default function SettingsSecuritySessions() {
         ),
       },
     ] satisfies DataTableColumnDef<(typeof results)[number]>[];
-  }, []);
+  }, [t, session, refetch]);
 
   return (
     <div>

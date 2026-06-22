@@ -376,7 +376,16 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
         /**
          * SIGNATURE FIELD.
          */
-        .with({ type: FieldType.SIGNATURE }, (field) => {
+          .with({ type: FieldType.SIGNATURE }, (field) => {
+          let spinnerDestroyed = false;
+
+          const destroySpinnerOnce = () => {
+            if (!spinnerDestroyed) {
+              spinnerDestroyed = true;
+              loadingSpinnerGroup.destroy();
+            }
+          };
+
           void handleSignatureFieldClick({
             field,
             fullName: fullName.current,
@@ -397,18 +406,24 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
                   onReauthFormSubmit: async (authOptions) => {
                     await signField(field.id, payload, authOptions);
 
-                    loadingSpinnerGroup.destroy();
+                    destroySpinnerOnce();
                   },
                   actionTarget: field.type,
                 });
 
                 setSignature(payload.value);
+
+                // Auth procedure resolved without re-auth (skip dialog or pre-calculated).
+                // The onReauthFormSubmit ran inline, so spinner is already destroyed.
+                // If auth dialog was opened (3rd branch), spinner is kept alive until
+                // the user submits OR cancels — handled by .finally() below.
               } else {
                 await signField(field.id, payload);
+                destroySpinnerOnce();
               }
             })
             .finally(() => {
-              loadingSpinnerGroup.destroy();
+              destroySpinnerOnce();
             });
         })
         .exhaustive();
