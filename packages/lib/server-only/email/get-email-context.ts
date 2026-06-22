@@ -12,6 +12,7 @@ import { EmailDomainStatus, type OrganisationClaim, type OrganisationGlobalSetti
 import type { Transporter } from 'nodemailer';
 import { match, P } from 'ts-pattern';
 
+import { IS_BILLING_ENABLED } from '../../constants/app';
 import { DOCUMENSO_INTERNAL_EMAIL } from '../../constants/email';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { logger } from '../../utils/logger';
@@ -108,7 +109,6 @@ export const getEmailContext = async (options: GetEmailContextOptions): Promise<
   // "no transport". Surface it (alertable) before silently falling back to the
   // system mailer + Documenso sender, so the degraded organisation is findable.
   if (emailContext.claims.emailTransportId && !transportResolution) {
-    // Todo: Logging
     logger.error({
       msg: 'Configured email transport could not be resolved; falling back to the system mailer',
       emailTransportId: emailContext.claims.emailTransportId,
@@ -217,13 +217,21 @@ const handleOrganisationEmailContext = async (organisationId: string) => {
 
   const allowedEmails = getAllowedEmails(organisation);
 
+  const branding = organisationGlobalSettingsToBranding(
+    organisation.organisationGlobalSettings,
+    organisation.id,
+    claims.flags.hidePoweredBy ?? false,
+  );
+
+  const allowBrandedEmailColors = !IS_BILLING_ENABLED() || claims.flags.embedSigningWhiteLabel === true;
+
+  if (!allowBrandedEmailColors) {
+    branding.brandingColors = undefined;
+  }
+
   return {
     allowedEmails,
-    branding: organisationGlobalSettingsToBranding(
-      organisation.organisationGlobalSettings,
-      organisation.id,
-      claims.flags.hidePoweredBy ?? false,
-    ),
+    branding,
     settings: organisation.organisationGlobalSettings,
     claims,
     emailsDisabled: organisation.owner.disabled || claims.flags.disableEmails === true,
@@ -273,9 +281,17 @@ const handleTeamEmailContext = async (teamId: number) => {
 
   const teamSettings = extractDerivedTeamSettings(organisation.organisationGlobalSettings, team.teamGlobalSettings);
 
+  const branding = teamGlobalSettingsToBranding(teamSettings, teamId, claims.flags.hidePoweredBy ?? false);
+
+  const allowBrandedEmailColors = !IS_BILLING_ENABLED() || claims.flags.embedSigningWhiteLabel === true;
+
+  if (!allowBrandedEmailColors) {
+    branding.brandingColors = undefined;
+  }
+
   return {
     allowedEmails,
-    branding: teamGlobalSettingsToBranding(teamSettings, teamId, claims.flags.hidePoweredBy ?? false),
+    branding,
     settings: teamSettings,
     claims,
     emailsDisabled: organisation.owner.disabled || claims.flags.disableEmails === true,
