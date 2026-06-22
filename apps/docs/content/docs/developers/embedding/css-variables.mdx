@@ -134,6 +134,15 @@ Specific parts of the embed can be targeted with CSS classes for granular stylin
 | `.embed--WaitingForTurn`          | Waiting screen when it is not the user's turn |
 | `.embed--DocumentCompleted`       | Completion screen after signing               |
 | `.field--FieldRootContainer`      | Base container for document fields            |
+| `.field--FieldRootContainerHover` | Hover state for document fields               |
+
+<Callout type="info">
+  Fields are rendered onto a canvas, which has no real `:hover` pseudo-class. To
+  style a field's hover state, target the `.field--FieldRootContainerHover` class
+  instead of `:hover`. The properties that take effect on hover are
+  `background-color`, `border-color`, `border-width`, `border-radius` and
+  `opacity`. Any of these you leave unset keep their resting value.
+</Callout>
 
 ### Field Data Attributes
 
@@ -157,6 +166,12 @@ Fields expose data attributes for state-based styling:
 .field--FieldRootContainer[data-inserted='true'] {
   background-color: var(--primary);
   opacity: 0.2;
+}
+
+/* Style the field hover state */
+.field--FieldRootContainerHover {
+  background-color: rgba(0, 0, 0, 0.04);
+  border-color: var(--primary);
 }
 
 /* Custom widget styling */

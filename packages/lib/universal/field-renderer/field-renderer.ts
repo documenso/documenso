@@ -44,12 +44,22 @@ export type RenderFieldElementOptions = {
   translations: Record<FieldType, string> | null;
 };
 
-export type FieldCanvasStyle = {
+export type FieldCanvasStyleProps = {
   backgroundColor?: string;
   borderColor?: string;
   borderRadius?: number;
   borderWidth?: number;
   opacity?: number;
+};
+
+export type FieldCanvasStyle = FieldCanvasStyleProps & {
+  /**
+   * The custom hover state, resolved from the `field--FieldRootContainerHover`
+   * class. Mirrors the resting prop set so any canvas-handled property can change
+   * on hover. Properties left unset fall back to the resting value (and the
+   * background falls back to the default recipient hover color).
+   */
+  hover?: FieldCanvasStyleProps;
 };
 
 /**

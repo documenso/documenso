@@ -8,6 +8,11 @@ export const konvaTextFontFamily =
   '"Noto Sans", "Noto Sans Japanese", "Noto Sans Chinese", "Noto Sans Korean", sans-serif';
 export const konvaTextFill = 'black';
 
+// Renderer defaults, shared between `upsertFieldRect` and the hover interaction so
+// hover tweens return the field to its actual idle state rather than a guess.
+const DEFAULT_FIELD_STROKE_WIDTH = 2;
+const DEFAULT_FIELD_CORNER_RADIUS = 2;
+
 export const upsertFieldGroup = (field: FieldToRender, options: RenderFieldElementOptions): Konva.Group => {
   const { pageWidth, pageHeight, pageLayer, editable, scale } = options;
 
@@ -59,8 +64,8 @@ export const upsertFieldRect = (field: FieldToRender, options: RenderFieldElemen
     height: fieldHeight,
     fill: fieldCanvasStyle?.backgroundColor ?? DEFAULT_RECT_BACKGROUND,
     stroke: fieldCanvasStyle?.borderColor ?? (color ? getRecipientColorStyles(color).baseRing : '#e5e7eb'),
-    strokeWidth: fieldCanvasStyle?.borderWidth ?? 2,
-    cornerRadius: fieldCanvasStyle?.borderRadius ?? 2,
+    strokeWidth: fieldCanvasStyle?.borderWidth ?? DEFAULT_FIELD_STROKE_WIDTH,
+    cornerRadius: fieldCanvasStyle?.borderRadius ?? DEFAULT_FIELD_CORNER_RADIUS,
     strokeScaleEnabled: false,
     visible: mode !== 'export',
   } satisfies Partial<Konva.RectConfig>);
@@ -119,71 +124,92 @@ type CreateFieldHoverInteractionOptions = {
   fieldRect: Konva.Rect;
 };
 
+type FieldHoverTweenState = {
+  fill: string;
+  stroke: string;
+  strokeWidth: number;
+  cornerRadius: number;
+  opacity: number;
+};
+
 /**
  * Adds smooth transition-like behavior for hover effects to the field group and rectangle.
+ *
+ * Resting and hover states both derive from the resolved field canvas style (read
+ * from a probe, so custom embed CSS is honored — hover via the
+ * `field--FieldRootContainerHover` class). Every canvas-handled property is
+ * respected on hover: fill, stroke, stroke width, corner radius and opacity. When
+ * the embedder hasn't customized a hover property (its probed value matches the
+ * resting value), it falls back to the resting value — except the background,
+ * which falls back to the default recipient hover color to preserve the built-in
+ * hover effect for teams without custom branding.
  */
 export const createFieldHoverInteraction = ({ options, fieldGroup, fieldRect }: CreateFieldHoverInteractionOptions) => {
-  const { mode } = options;
+  const { mode, color, fieldCanvasStyle } = options;
 
-  if (mode === 'export' || !options.color) {
+  if (mode === 'export' || !color) {
     return;
   }
 
-  if (options.fieldCanvasStyle?.backgroundColor) {
-    return;
-  }
+  const recipientStyles = getRecipientColorStyles(color);
 
-  const hoverColor = getRecipientColorStyles(options.color).baseRingHover;
+  const restingState: FieldHoverTweenState = {
+    fill: fieldCanvasStyle?.backgroundColor ?? DEFAULT_RECT_BACKGROUND,
+    stroke: fieldCanvasStyle?.borderColor ?? recipientStyles.baseRing,
+    strokeWidth: fieldCanvasStyle?.borderWidth ?? DEFAULT_FIELD_STROKE_WIDTH,
+    cornerRadius: fieldCanvasStyle?.borderRadius ?? DEFAULT_FIELD_CORNER_RADIUS,
+    opacity: fieldCanvasStyle?.opacity ?? 1,
+  };
 
-  fieldGroup.on('mouseover', () => {
-    const layer = fieldRect.getLayer();
-    if (!layer) {
+  const hover = fieldCanvasStyle?.hover;
+
+  // A hover prop is "customized" only when it differs from the resting value;
+  // otherwise the hover class resolved to nothing and we keep the resting value.
+  const pickHover = <T>(hoverValue: T | undefined, restingValue: T, customizedFallback: T): T => {
+    if (hoverValue === undefined || hoverValue === restingValue) {
+      return customizedFallback;
+    }
+
+    return hoverValue;
+  };
+
+  const hoverState: FieldHoverTweenState = {
+    // Background is special: when uncustomized, fall back to the recipient hover
+    // color rather than the resting fill so the default hover effect still shows.
+    fill: pickHover(hover?.backgroundColor, restingState.fill, recipientStyles.baseRingHover),
+    stroke: pickHover(hover?.borderColor, restingState.stroke, restingState.stroke),
+    strokeWidth: pickHover(hover?.borderWidth, restingState.strokeWidth, restingState.strokeWidth),
+    cornerRadius: pickHover(hover?.borderRadius, restingState.cornerRadius, restingState.cornerRadius),
+    opacity: pickHover(hover?.opacity, restingState.opacity, restingState.opacity),
+  };
+
+  const tweenTo = (state: FieldHoverTweenState) => {
+    if (!fieldRect.getLayer()) {
       return;
     }
 
     new Konva.Tween({
       node: fieldRect,
       duration: 0.3,
-      fill: hoverColor,
+      fill: state.fill,
+      stroke: state.stroke,
+      strokeWidth: state.strokeWidth,
+      cornerRadius: state.cornerRadius,
     }).play();
-  });
-
-  fieldGroup.on('mouseout', () => {
-    const layer = fieldRect.getLayer();
-    if (!layer) {
-      return;
-    }
 
     new Konva.Tween({
-      node: fieldRect,
+      node: fieldGroup,
       duration: 0.3,
-      fill: DEFAULT_RECT_BACKGROUND,
+      opacity: state.opacity,
     }).play();
-  });
+  };
 
-  fieldGroup.on('transformstart', () => {
-    const layer = fieldRect.getLayer();
-    if (!layer) {
-      return;
-    }
+  // Field groups are reused across re-renders (upserted via `findOne`), so clear
+  // any previously-bound hover listeners before re-registering to avoid stacking.
+  fieldGroup.off('mouseover.fieldHover mouseout.fieldHover transformstart.fieldHover transformend.fieldHover');
 
-    new Konva.Tween({
-      node: fieldRect,
-      duration: 0.3,
-      fill: hoverColor,
-    }).play();
-  });
-
-  fieldGroup.on('transformend', () => {
-    const layer = fieldRect.getLayer();
-    if (!layer) {
-      return;
-    }
-
-    new Konva.Tween({
-      node: fieldRect,
-      duration: 0.3,
-      fill: DEFAULT_RECT_BACKGROUND,
-    }).play();
-  });
+  fieldGroup.on('mouseover.fieldHover', () => tweenTo(hoverState));
+  fieldGroup.on('mouseout.fieldHover', () => tweenTo(restingState));
+  fieldGroup.on('transformstart.fieldHover', () => tweenTo(hoverState));
+  fieldGroup.on('transformend.fieldHover', () => tweenTo(restingState));
 };

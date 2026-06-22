@@ -1,10 +1,11 @@
 import {
   FIELD_PROBE_ANCHOR_SELECTOR,
+  FIELD_ROOT_CONTAINER_HOVER_CLASS_NAME,
   FIELD_ROOT_CONTAINER_PROBE_CLASS_NAME,
 } from '@documenso/ui/lib/field-root-container-classes';
 import { colord } from 'colord';
 
-import type { FieldCanvasStyle, FieldRenderMode, FieldToRender } from './field-renderer';
+import type { FieldCanvasStyle, FieldCanvasStyleProps, FieldRenderMode, FieldToRender } from './field-renderer';
 
 export type FieldCanvasStyleCache = Map<string, FieldCanvasStyle | undefined>;
 
@@ -98,6 +99,25 @@ const createFieldProbeElement = (field: FieldToRender): HTMLElement => {
   return $probe;
 };
 
+/**
+ * Map a probe's computed style onto the canvas-handled prop set. Shared by the
+ * resting and hover reads so both honor every property the renderer can apply
+ * (see `field-generic-items.ts`): fill, stroke, stroke width, corner radius and
+ * group opacity.
+ */
+const extractCanvasStyleProps = (computedStyle: CSSStyleDeclaration): FieldCanvasStyleProps => {
+  const borderWidth = getPixelValue(computedStyle.borderTopWidth);
+  const hasBorderStyle = computedStyle.borderTopStyle !== 'none' && Boolean(borderWidth);
+
+  return {
+    backgroundColor: getRenderableColor(computedStyle.backgroundColor),
+    borderColor: hasBorderStyle ? getRenderableColor(computedStyle.borderTopColor) : undefined,
+    borderRadius: getPixelValue(computedStyle.borderTopLeftRadius),
+    borderWidth: hasBorderStyle ? borderWidth : undefined,
+    opacity: getOpacityValue(computedStyle.opacity),
+  };
+};
+
 const computeFieldCanvasStyleFromProbe = (field: FieldToRender): FieldCanvasStyle | undefined => {
   if (typeof document === 'undefined' || typeof window === 'undefined') {
     return undefined;
@@ -119,18 +139,17 @@ const computeFieldCanvasStyleFromProbe = (field: FieldToRender): FieldCanvasStyl
   $anchor.appendChild($probe);
 
   try {
-    const computedStyle = window.getComputedStyle($probe);
-    const borderWidth = getPixelValue(computedStyle.borderTopWidth);
-    const borderColor = getRenderableColor(computedStyle.borderTopColor);
-    const hasBorderStyle = computedStyle.borderTopStyle !== 'none' && Boolean(borderWidth);
-    const borderRadius = getPixelValue(computedStyle.borderTopLeftRadius);
+    const restingStyle = extractCanvasStyleProps(window.getComputedStyle($probe));
+
+    // Reuse the same element for the hover read: adding the hover class makes
+    // `getComputedStyle` resolve the hovered cascade synchronously — no real
+    // pointer or `:hover` pseudo-class needed.
+    $probe.classList.add(FIELD_ROOT_CONTAINER_HOVER_CLASS_NAME);
+    const hoverStyle = extractCanvasStyleProps(window.getComputedStyle($probe));
 
     return {
-      backgroundColor: getRenderableColor(computedStyle.backgroundColor),
-      borderColor: hasBorderStyle ? borderColor : undefined,
-      borderRadius,
-      borderWidth: hasBorderStyle ? borderWidth : undefined,
-      opacity: getOpacityValue(computedStyle.opacity),
+      ...restingStyle,
+      hover: hoverStyle,
     };
   } finally {
     $probe.remove();
