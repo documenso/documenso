@@ -6,6 +6,7 @@ import { UploadCloudIcon } from 'lucide-react';
 import { useRef } from 'react';
 
 import { cn } from '../../lib/utils';
+import { trimTransparentCanvasMargins } from './signature-image-utils';
 
 const loadImage = async (file: File | undefined): Promise<HTMLImageElement> => {
   if (!file) {
@@ -88,7 +89,7 @@ export const SignaturePadUpload = ({ className, value, onChange, ...props }: Sig
       }
 
       $imageData.current = loadImageOntoCanvas(img, $el.current, ctx);
-      onChange?.($el.current.toDataURL());
+      onChange?.(trimTransparentCanvasMargins($el.current).toDataURL());
     } catch (error) {
       console.error(error);
     }
@@ -109,7 +110,26 @@ export const SignaturePadUpload = ({ className, value, onChange, ...props }: Sig
       const img = new Image();
 
       img.onload = () => {
-        ctx?.drawImage(img, 0, 0, Math.min(width, img.width), Math.min(height, img.height));
+        const sourceCanvas = document.createElement('canvas');
+        sourceCanvas.width = img.width;
+        sourceCanvas.height = img.height;
+
+        const sourceCtx = sourceCanvas.getContext('2d');
+
+        if (!sourceCtx) {
+          return;
+        }
+
+        sourceCtx.drawImage(img, 0, 0);
+        const trimmedCanvas = trimTransparentCanvasMargins(sourceCanvas);
+        const scale = Math.min(width / trimmedCanvas.width, height / trimmedCanvas.height);
+        const scaledWidth = trimmedCanvas.width * scale;
+        const scaledHeight = trimmedCanvas.height * scale;
+        const x = (width - scaledWidth) / 2;
+        const y = (height - scaledHeight) / 2;
+
+        ctx?.clearRect(0, 0, width, height);
+        ctx?.drawImage(trimmedCanvas, x, y, scaledWidth, scaledHeight);
 
         const defaultImageData = ctx?.getImageData(0, 0, width, height) || null;
 

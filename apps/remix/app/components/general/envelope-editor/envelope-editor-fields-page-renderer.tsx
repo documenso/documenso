@@ -35,6 +35,22 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { fieldButtonList } from './envelope-editor-fields-drag-drop';
 import { EnvelopeRecipientSelectorCommand } from './envelope-recipient-selector';
 
+const isEditableKeyboardTarget = (target: EventTarget | null) => {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  const tagName = target.tagName.toLowerCase();
+
+  return (
+    tagName === 'input' ||
+    tagName === 'textarea' ||
+    tagName === 'select' ||
+    target.isContentEditable ||
+    target.closest('[contenteditable="true"]') !== null
+  );
+};
+
 export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageRenderData }) => {
   const { t, i18n } = useLingui();
   const { envelope, editorFields, getRecipientColorKey } = useCurrentEnvelopeEditor();
@@ -61,6 +77,18 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       ),
     [editorFields.localFields, pageNumber, currentEnvelopeItem?.id],
   );
+
+  useEffect(() => {
+    if (!pageLayer.current) {
+      return;
+    }
+
+    for (const field of localPageFields) {
+      renderFieldOnLayer(field);
+    }
+
+    pageLayer.current.batchDraw();
+  }, [localPageFields, pageLayer]);
 
   const handleResizeOrMove = (event: KonvaEventObject<Event>) => {
     const isDragEvent = event.type === 'dragend';
@@ -118,6 +146,8 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       return;
     }
 
+    const fieldWithCustomText = field as TLocalField & { customText?: string };
+
     const recipient = envelope.recipients.find((r) => r.id === field.recipientId);
     const isFieldEditable = recipient !== undefined && canRecipientFieldsBeModified(recipient, envelope.fields);
 
@@ -127,7 +157,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       field: {
         renderId: field.formId,
         ...field,
-        customText: '',
+        customText: fieldWithCustomText.customText ?? '',
         inserted: false,
         fieldMeta: field.fieldMeta,
       },
@@ -466,6 +496,27 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
 
     setSelectedFields([]);
   };
+
+  useEffect(() => {
+    const handleDeleteKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Delete' && event.key !== 'Backspace') {
+        return;
+      }
+
+      if (selectedKonvaFieldGroups.length === 0 || isEditableKeyboardTarget(event.target)) {
+        return;
+      }
+
+      event.preventDefault();
+      deletedSelectedFields();
+    };
+
+    window.addEventListener('keydown', handleDeleteKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleDeleteKeyDown);
+    };
+  }, [selectedKonvaFieldGroups]);
 
   const changeSelectedFieldsRecipients = (recipientId: number) => {
     const fields = selectedKonvaFieldGroups

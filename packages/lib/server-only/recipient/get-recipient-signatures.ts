@@ -1,4 +1,5 @@
 import { prisma } from '@documenso/prisma';
+import { FieldType } from '@prisma/client';
 
 export type GetRecipientSignaturesOptions = {
   recipientId: number;
@@ -9,7 +10,13 @@ export const getRecipientSignatures = async ({ recipientId }: GetRecipientSignat
     where: {
       field: {
         recipientId,
+        type: {
+          in: [FieldType.SIGNATURE, FieldType.FREE_SIGNATURE],
+        },
       },
+    },
+    orderBy: {
+      created: 'desc',
     },
   });
 };
