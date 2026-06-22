@@ -25,6 +25,7 @@ import {
   EyeIcon,
   FileOutputIcon,
   FolderInput,
+  History,
   Loader,
   MoreHorizontal,
   Pencil,
@@ -35,10 +36,10 @@ import {
 import { useState } from 'react';
 import { Link } from 'react-router';
 
-import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
 import { EnvelopeCancelDialog } from '~/components/dialogs/envelope-cancel-dialog';
 import { EnvelopeDeleteDialog } from '~/components/dialogs/envelope-delete-dialog';
 import { EnvelopeDuplicateDialog } from '~/components/dialogs/envelope-duplicate-dialog';
+import { EnvelopeRedistributeDialog } from '~/components/dialogs/envelope-redistribute-dialog';
 import { EnvelopeSaveAsTemplateDialog } from '~/components/dialogs/envelope-save-as-template-dialog';
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
 import { useCurrentTeam } from '~/providers/team';
@@ -94,8 +95,6 @@ export const DocumentsTableActionDropdown = ({ row, onMoveDocument }: DocumentsT
 
   const documentsPath = formatDocumentsPath(team.url);
   const formatPath = `${documentsPath}/${row.envelopeId}/edit`;
-
-  const nonSignedRecipients = row.recipients.filter((item) => item.signingStatus !== 'SIGNED');
 
   return (
     <DropdownMenu>
@@ -244,7 +243,25 @@ export const DocumentsTableActionDropdown = ({ row, onMoveDocument }: DocumentsT
           />
         )}
 
-        <DocumentResendDialog document={row} recipients={nonSignedRecipients} />
+        {canManageDocument && (
+          <EnvelopeRedistributeDialog
+            envelope={{
+              id: row.envelopeId,
+              status: row.status,
+              type: EnvelopeType.DOCUMENT,
+              recipients: row.recipients,
+            }}
+            envelopeType={EnvelopeType.DOCUMENT}
+            trigger={
+              <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+                <div>
+                  <History className="mr-2 h-4 w-4" />
+                  <Trans>Resend</Trans>
+                </div>
+              </DropdownMenuItem>
+            }
+          />
+        )}
 
         <DocumentShareButton
           documentId={row.id}
