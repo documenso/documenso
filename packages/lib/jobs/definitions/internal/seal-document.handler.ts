@@ -32,7 +32,6 @@ import { fieldsContainUnsignedRequiredField } from '../../../utils/advanced-fiel
 import { isDocumentCompleted } from '../../../utils/document';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import { mapDocumentIdToSecondaryId } from '../../../utils/envelope';
-import { jobs } from '../../client';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSealDocumentJobDefinition } from './seal-document';
 
@@ -347,12 +346,16 @@ export const run = async ({ payload, io }: { payload: TSealDocumentJobDefinition
   }
 
   if (shouldSendCompletedEmail) {
-    await jobs.triggerJob({
-      name: 'send.document.completed.emails',
-      payload: {
-        envelopeId,
-        requestMetadata,
-      },
+    await io.runTask('send-completed-email', async () => {
+      const { run: sendDocumentCompletedEmails } = await import('../emails/send-document-completed-emails.handler');
+
+      await sendDocumentCompletedEmails({
+        payload: {
+          envelopeId,
+          requestMetadata,
+        },
+        io,
+      });
     });
   }
 };

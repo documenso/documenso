@@ -12,8 +12,8 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { getFileServerSide } from '../../../universal/upload/get-file.server';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
+import { getDocumentCompletedEmailRecipients } from '../../../utils/document-completed-email-recipients';
 import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
-import { isRecipientEmailValidForSending } from '../../../utils/recipients';
 import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import { formatDocumentsPath } from '../../../utils/teams';
@@ -171,11 +171,11 @@ export const run = async ({ payload, io }: { payload: TSendDocumentCompletedEmai
     });
   }
 
-  if (!isDocumentCompletedEmailEnabled) {
+  const recipientsToNotify = getDocumentCompletedEmailRecipients(envelope.recipients, emailSettings);
+
+  if (recipientsToNotify.length === 0) {
     return;
   }
-
-  const recipientsToNotify = envelope.recipients.filter((recipient) => isRecipientEmailValidForSending(recipient));
 
   await Promise.all(
     recipientsToNotify.map(async (recipient) => {
