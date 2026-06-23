@@ -1,3 +1,4 @@
+import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import type { TLocalField } from '@documenso/lib/client-only/hooks/use-editor-fields';
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
@@ -13,6 +14,7 @@ import {
 } from '@documenso/lib/universal/field-renderer/field-renderer';
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
+import { getOverlappingFieldPairs } from '@documenso/lib/utils/fields-overlap';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import {
   Command,
@@ -61,6 +63,36 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       ),
     [editorFields.localFields, pageNumber, currentEnvelopeItem?.id],
   );
+
+  /**
+   * Debounce the fields used for overlap highlighting so we don't recompute on every
+   * small drag/resize tick. Overlaps only occur within the same page and envelope
+   * item, so computing from this page's fields alone is sufficient.
+   */
+  const debouncedPageFields = useDebouncedValue(localPageFields, 300);
+
+  const overlappingFieldFormIds = useMemo(() => {
+    const formIds = new Set<string>();
+
+    const pairs = getOverlappingFieldPairs(
+      debouncedPageFields.map((field) => ({
+        id: field.formId,
+        envelopeItemId: field.envelopeItemId,
+        page: field.page,
+        positionX: field.positionX,
+        positionY: field.positionY,
+        width: field.width,
+        height: field.height,
+      })),
+    );
+
+    for (const pair of pairs) {
+      formIds.add(pair.fieldA.id);
+      formIds.add(pair.fieldB.id);
+    }
+
+    return formIds;
+  }, [debouncedPageFields]);
 
   const handleResizeOrMove = (event: KonvaEventObject<Event>) => {
     const isDragEvent = event.type === 'dragend';
@@ -113,6 +145,62 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     pageLayer.current?.batchDraw();
   };
 
+  /**
+   * Draws (or removes) a dashed warning outline over a field that significantly
+   * overlaps another field. The highlight is a child of the field group so it moves
+   * and resizes with the field, and sits on top of the field's own rect (which is
+   * re-styled on every render and would otherwise clobber a direct stroke change).
+   */
+  const syncOverlapHighlight = (fieldGroup: Konva.Group, isOverlapping: boolean) => {
+    const existingHighlight = fieldGroup.findOne('.field-overlap-highlight');
+
+    // Skip while a field is actively being dragged/resized. The highlight is driven
+    // by debounced field data, so it would lag behind and distort during the gesture.
+    // It is repainted once the gesture settles (the effect re-runs on isFieldChanging).
+    if (isFieldChanging) {
+      existingHighlight?.destroy();
+      return;
+    }
+
+    if (!isOverlapping) {
+      existingHighlight?.destroy();
+      return;
+    }
+
+    const fieldRect = fieldGroup.findOne('.field-rect');
+
+    if (!fieldRect) {
+      return;
+    }
+
+    const highlightAttrs = {
+      x: 0,
+      y: 0,
+      width: fieldRect.width(),
+      height: fieldRect.height(),
+      stroke: '#f59e0b',
+      strokeWidth: 2,
+      dash: [6, 4],
+      cornerRadius: 2,
+      strokeScaleEnabled: false,
+      listening: false,
+    } satisfies Partial<Konva.RectConfig>;
+
+    if (existingHighlight instanceof Konva.Rect) {
+      existingHighlight.setAttrs(highlightAttrs);
+      existingHighlight.moveToTop();
+      return;
+    }
+
+    const highlight = new Konva.Rect({
+      name: 'field-overlap-highlight',
+      ...highlightAttrs,
+    });
+
+    fieldGroup.add(highlight);
+    highlight.moveToTop();
+  };
+
   const unsafeRenderFieldOnLayer = (field: TLocalField) => {
     if (!pageLayer.current) {
       return;
@@ -138,6 +226,8 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       editable: isFieldEditable,
       mode: 'edit',
     });
+
+    syncOverlapHighlight(fieldGroup, overlappingFieldFormIds.has(field.formId));
 
     if (!isFieldEditable) {
       return;
@@ -435,7 +525,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     interactiveTransformer.current?.forceUpdate();
 
     pageLayer.current.batchDraw();
-  }, [localPageFields, selectedKonvaFieldGroups]);
+  }, [localPageFields, selectedKonvaFieldGroups, overlappingFieldFormIds, isFieldChanging]);
 
   const setSelectedFields = (nodes: Konva.Node[]) => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
