@@ -1,5 +1,7 @@
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { IS_TEAM_ANALYTICS_ENABLED } from '@documenso/lib/constants/app';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
+import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { msg } from '@lingui/core/macro';
@@ -45,7 +47,7 @@ export const AppNavDesktop = ({ className, setIsCommandMenuOpen, ...props }: App
       return [];
     }
 
-    return [
+    const links = [
       {
         href: `/t/${teamUrl}/documents`,
         label: msg`Documents`,
@@ -55,6 +57,19 @@ export const AppNavDesktop = ({ className, setIsCommandMenuOpen, ...props }: App
         label: msg`Templates`,
       },
     ];
+
+    if (
+      currentTeam &&
+      IS_TEAM_ANALYTICS_ENABLED() &&
+      canExecuteTeamAction('MANAGE_TEAM', currentTeam.currentTeamRole)
+    ) {
+      links.push({
+        href: `/t/${currentTeam.url}/analytics`,
+        label: msg`Analytics`,
+      });
+    }
+
+    return links;
   }, [currentTeam, organisations]);
 
   return (
