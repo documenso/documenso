@@ -8,6 +8,7 @@ import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisa
 import { trpc } from '@documenso/trpc/react';
 import type { TGetAdminOrganisationResponse } from '@documenso/trpc/server/admin-router/get-admin-organisation.types';
 import { ZUpdateAdminOrganisationRequestSchema } from '@documenso/trpc/server/admin-router/update-admin-organisation.types';
+import { cn } from '@documenso/ui/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@documenso/ui/primitives/accordion';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Badge } from '@documenso/ui/primitives/badge';
@@ -30,7 +31,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { OrganisationMemberRole } from '@prisma/client';
+import { OrganisationMemberRole, SubscriptionStatus } from '@prisma/client';
 import { ExternalLinkIcon, InfoIcon, Loader } from 'lucide-react';
 import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
@@ -312,7 +313,15 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
         className="mt-16"
       />
 
-      <Alert className="my-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
+      <Alert
+        className={cn(
+          'my-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center',
+          organisation.subscription?.status === SubscriptionStatus.ACTIVE &&
+            'border border-green-600/20 bg-green-50 dark:border-green-500/20 dark:bg-green-500/10',
+          organisation.subscription?.status === SubscriptionStatus.INACTIVE && 'opacity-60',
+        )}
+        variant="neutral"
+      >
         <div className="mb-4 sm:mb-0">
           <AlertTitle>
             <Trans>Subscription</Trans>
@@ -320,7 +329,12 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
 
           <AlertDescription className="mr-2">
             {organisation.subscription ? (
-              <span>{i18n._(SUBSCRIPTION_STATUS_MAP[organisation.subscription.status])} subscription found</span>
+              <span className="flex items-center gap-2">
+                {organisation.subscription.status === SubscriptionStatus.ACTIVE && (
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-green-600 dark:bg-green-400" aria-hidden="true" />
+                )}
+                <span>{i18n._(SUBSCRIPTION_STATUS_MAP[organisation.subscription.status])} subscription found</span>
+              </span>
             ) : (
               <span>
                 <Trans>No subscription found</Trans>
@@ -333,6 +347,7 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
           <div>
             <Button
               variant="outline"
+              className="bg-background"
               loading={isCreatingStripeCustomer}
               onClick={async () => createStripeCustomer({ organisationId })}
             >
@@ -343,7 +358,7 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
 
         {organisation.customerId && !organisation.subscription && (
           <div>
-            <Button variant="outline" asChild>
+            <Button variant="outline" className="bg-background" asChild>
               <Link
                 target="_blank"
                 to={`https://dashboard.stripe.com/customers/${organisation.customerId}?create=subscription&subscription_default_customer=${organisation.customerId}`}
@@ -360,13 +375,13 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
             <AdminOrganisationSyncSubscriptionDialog
               organisationId={organisationId}
               trigger={
-                <Button variant="outline">
+                <Button variant="outline" className="bg-background">
                   <Trans>Sync Stripe subscription</Trans>
                 </Button>
               }
             />
 
-            <Button variant="outline" asChild>
+            <Button variant="outline" className="bg-background" asChild>
               <Link
                 target="_blank"
                 to={`https://dashboard.stripe.com/subscriptions/${organisation.subscription.planId}`}
@@ -631,7 +646,7 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
               <FormLabel className="flex items-center">
                 <Trans>Inherited subscription claim</Trans>
                 <Tooltip>
-                  <TooltipTrigger>
+                  <TooltipTrigger type="button">
                     <InfoIcon className="mx-2 h-4 w-4" />
                   </TooltipTrigger>
 
@@ -664,10 +679,15 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
                   </TooltipContent>
                 </Tooltip>
               </FormLabel>
-              <FormControl>
-                <Input disabled {...field} />
-              </FormControl>
-              <FormMessage />
+              <div className="rounded-lg border bg-muted/40 px-3 py-2.5 text-sm">
+                {field.value ? (
+                  <span className="font-mono text-foreground">{field.value}</span>
+                ) : (
+                  <span className="text-muted-foreground">
+                    <Trans>No inherited claim</Trans>
+                  </span>
+                )}
+              </div>
             </FormItem>
           )}
         />

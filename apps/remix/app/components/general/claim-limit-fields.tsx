@@ -6,6 +6,13 @@ import type { Control, FieldValues, Path } from 'react-hook-form';
 
 import { RateLimitArrayInput } from './rate-limit-array-input';
 
+/**
+ * The rate-limit editor renders its own per-row inline errors, but a submit
+ * attempt can still surface array-level Zod issues (e.g. a committed duplicate
+ * window). Rendering the field's message here guarantees the form never fails
+ * silently when those errors are not tied to a row the editor is showing.
+ */
+
 type ClaimLimitFieldsProps<T extends FieldValues> = {
   control: Control<T>;
   /** e.g. '' for the claim form, 'claims.' for the org admin form. */
@@ -81,6 +88,7 @@ export const ClaimLimitFields = <T extends FieldValues>({
           <FormControl>
             <RateLimitArrayInput value={field.value ?? []} onChange={field.onChange} disabled={disabled} />
           </FormControl>
+          <FormMessage />
         </FormItem>
       )}
     />
