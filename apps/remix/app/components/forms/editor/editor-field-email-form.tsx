@@ -5,16 +5,25 @@ import {
   FIELD_EMAIL_META_DEFAULT_VALUES,
   ZEmailFieldMeta,
 } from '@documenso/lib/types/field-meta';
+import type { FieldFontOption } from '@documenso/lib/universal/field-fonts';
 import { Form } from '@documenso/ui/primitives/form/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import type { z } from 'zod';
 
-import { EditorGenericFontSizeField, EditorGenericTextAlignField } from './editor-field-generic-field-forms';
+import {
+  EditorGenericFontFamilyField,
+  EditorGenericFontSizeField,
+  EditorGenericFontStyleFields,
+  EditorGenericTextAlignField,
+} from './editor-field-generic-field-forms';
 
 const ZEmailFieldFormSchema = ZEmailFieldMeta.pick({
   fontSize: true,
+  fontFamily: true,
+  fontWeight: true,
+  fontStyle: true,
   textAlign: true,
   overflow: true,
 });
@@ -24,6 +33,7 @@ type TEmailFieldFormSchema = z.infer<typeof ZEmailFieldFormSchema>;
 type EditorFieldEmailFormProps = {
   value: z.input<typeof ZEmailFieldMeta> | undefined;
   onValueChange: (value: EmailFieldMeta) => void;
+  fontOptions?: FieldFontOption[];
 };
 
 export const EditorFieldEmailForm = ({
@@ -31,12 +41,16 @@ export const EditorFieldEmailForm = ({
     type: 'email',
   },
   onValueChange,
+  fontOptions,
 }: EditorFieldEmailFormProps) => {
   const form = useForm<TEmailFieldFormSchema>({
     resolver: zodResolver(ZEmailFieldFormSchema),
     mode: 'onChange',
     defaultValues: {
       fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
+      fontFamily: value.fontFamily || '',
+      fontWeight: value.fontWeight || 'normal',
+      fontStyle: value.fontStyle || 'normal',
       textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
       overflow: value.overflow || FIELD_EMAIL_META_DEFAULT_VALUES.overflow,
     },
@@ -65,6 +79,10 @@ export const EditorFieldEmailForm = ({
       <form>
         <fieldset className="flex flex-col gap-2">
           <EditorGenericFontSizeField formControl={form.control} />
+
+          <EditorGenericFontFamilyField formControl={form.control} fontOptions={fontOptions} />
+
+          <EditorGenericFontStyleFields formControl={form.control} />
 
           <EditorGenericTextAlignField formControl={form.control} />
         </fieldset>

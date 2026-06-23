@@ -2389,6 +2389,13 @@ msgstr "已拦截的域名"
 msgid "Blue"
 msgstr "蓝色"
 
+#: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
+#: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-style-controls.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-style-controls.tsx
+msgid "Bold"
+msgstr "加粗"
+
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Border"
 msgstr "边框"
@@ -3657,6 +3664,10 @@ msgstr "David 是员工，Lucas 是经理"
 msgid "Decline"
 msgstr "拒绝"
 
+#: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
+msgid "Default"
+msgstr ""
+
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -3767,6 +3778,7 @@ msgstr "delete"
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
+#: apps/remix/app/components/forms/font-management-form.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/general/folder/folder-card.tsx
 #: apps/remix/app/components/tables/admin-claims-table.tsx
@@ -4110,6 +4122,10 @@ msgstr "禁用用户后，该用户将无法再使用账户。与其相关的所
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Discord"
 msgstr "Discord"
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Display name"
+msgstr "显示名称"
 
 #: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
@@ -5783,6 +5799,10 @@ msgstr "文件太小"
 msgid "File size exceeds the limit of {APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB"
 msgstr "文件大小超过 {APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB 限制"
 
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "File too large"
+msgstr "文件过大"
+
 #: apps/remix/app/components/dialogs/email-transport-create-dialog.tsx
 msgid "Fill in the details to create a new email transport."
 msgstr "填写详细信息以创建新的电子邮件传输方式。"
@@ -5834,6 +5854,22 @@ msgid "Folder updated successfully"
 msgstr "文件夹更新成功"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
+msgid "Font"
+msgstr "字体"
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Font deleted"
+msgstr "字体已删除"
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Font display name"
+msgstr "字体显示名称"
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Font files must be 5MB or smaller."
+msgstr "字体文件大小必须不超过 5MB。"
+
+#: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/date-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/email-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/initials-field.tsx
@@ -5842,6 +5878,23 @@ msgstr "文件夹更新成功"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Font Size"
 msgstr "字体大小"
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Font uploaded"
+msgstr "字体已上传"
+
+#: apps/remix/app/components/general/settings-nav-desktop.tsx
+#: apps/remix/app/components/general/settings-nav-mobile.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.fonts.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.fonts.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/_dynamic_personal_routes+/fonts.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/_dynamic_personal_routes+/fonts.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.fonts.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.fonts.tsx
+msgid "Fonts"
+msgstr "字体"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>{SUPPORT_EMAIL}</0>"
@@ -6575,6 +6628,13 @@ msgstr "现在还不是你签署的顺序。轮到你签署时，你会收到一
 msgid "Italian"
 msgstr "意大利语"
 
+#: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
+#: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-style-controls.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-style-controls.tsx
+msgid "Italic"
+msgstr "斜体"
+
 #: packages/lib/constants/i18n.ts
 msgid "Japanese"
 msgstr "日语"
@@ -6829,6 +6889,10 @@ msgstr "正在加载文档..."
 msgid "Loading Document..."
 msgstr "正在加载文档..."
 
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Loading fonts..."
+msgstr "正在加载字体..."
+
 #: packages/ui/components/recipient/recipient-autocomplete-input.tsx
 msgid "Loading suggestions..."
 msgstr "正在加载建议…"
@@ -6921,6 +6985,18 @@ msgstr "管理直接链接"
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
 msgid "Manage documents"
 msgstr "管理文档"
+
+#: apps/remix/app/routes/_authenticated+/settings+/_dynamic_personal_routes+/fonts.tsx
+msgid "Manage fonts available in your personal workspace."
+msgstr "管理个人工作区可用的字体。"
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.fonts.tsx
+msgid "Manage fonts available to documents in this team."
+msgstr "管理此团队文档可用的字体。"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.fonts.tsx
+msgid "Manage fonts inherited by teams in this organisation."
+msgstr "管理此组织下团队可继承的字体。"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "Manage linked accounts"
@@ -7374,6 +7450,10 @@ msgstr "否"
 msgid "No active drafts"
 msgstr "没有活动草稿"
 
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "No custom fonts have been uploaded yet."
+msgstr "尚未上传自定义字体。"
+
 #: apps/remix/app/components/general/pdf-viewer/envelope-pdf-viewer.tsx
 #: apps/remix/app/components/general/pdf-viewer/pdf-viewer.tsx
 msgid "No document found"
@@ -7751,6 +7831,7 @@ msgstr "或"
 msgid "Or continue with"
 msgstr "或者使用以下方式继续"
 
+#: apps/remix/app/components/forms/font-management-form.tsx
 #: apps/remix/app/components/general/template/template-type.tsx
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
@@ -7941,6 +8022,11 @@ msgstr "原始"
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Otherwise, the document will be created as a draft."
 msgstr "否则将把文档创建为草稿。"
+
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
+msgid "Overlapping fields detected"
+msgstr ""
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/email-preferences-form.tsx
@@ -8164,6 +8250,10 @@ msgstr "周期"
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Permanently delete this organisation. Documents will be orphaned (not deleted) so they remain accessible via the deleted-account service account."
 msgstr "永久删除此组织。文档将被孤立（不会被删除），因此仍可通过已删除账号的服务账户进行访问。"
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Personal"
+msgstr "个人"
 
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 msgctxt "Personal organisation (adjective)"
@@ -9592,6 +9682,10 @@ msgstr "选择默认角色"
 msgid "Select direction"
 msgstr "选择方向"
 
+#: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
+msgid "Select font"
+msgstr "选择字体"
+
 #: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
 #: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
 msgid "Select groups"
@@ -10219,6 +10313,11 @@ msgstr "站点设置"
 msgid "Skip"
 msgstr "跳过"
 
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
+msgid "Some fields are placed on top of each other. This may complicate the signing process or cause fields to not work as expected."
+msgstr ""
+
 #: packages/ui/primitives/document-flow/missing-signature-field-dialog.tsx
 msgid "Some signers have not been assigned a signature field. Please assign at least 1 signature field to each signer before proceeding."
 msgstr "部分签署人尚未被分配签名字段。请在继续前为每位签署人至少分配 1 个签名字段。"
@@ -10237,6 +10336,7 @@ msgstr "部分签署人尚未被分配签名字段。请在继续前为每位签
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
+#: apps/remix/app/components/forms/font-management-form.tsx
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
@@ -10582,6 +10682,10 @@ msgstr "支持"
 msgid "Support ticket created"
 msgstr "支持工单已创建"
 
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Supported formats: TTF and OTF. Maximum file size is 5MB."
+msgstr "支持格式：TTF 和 OTF。最大文件大小为 5MB。"
+
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "Sync"
@@ -10628,6 +10732,7 @@ msgstr "系统主题"
 msgid "Target Organisation"
 msgstr "目标组织"
 
+#: apps/remix/app/components/forms/font-management-form.tsx
 #: apps/remix/app/components/tables/admin-user-teams-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/components/tables/organisation-teams-table.tsx
@@ -11208,6 +11313,10 @@ msgstr "以下签署人缺少签名字段："
 msgid "The following team has been deleted. You will no longer be able to access this team and its documents"
 msgstr "以下团队已被删除。您将无法再访问该团队及其文档"
 
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "The font has been removed from the library."
+msgstr "字体已从字体库移除。"
+
 #. placeholder {0}: form.watch('name')
 #. placeholder {1}: form.watch('email')
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
@@ -11275,6 +11384,10 @@ msgstr "此模板的公开描述，将与模板一同显示"
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "The public name for your template"
 msgstr "模板的公开名称"
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "The quick brown fox jumps over the lazy dog"
+msgstr "字体预览文字"
 
 #: packages/email/template-components/template-document-super-delete.tsx
 msgid "The reason provided for deletion is the following:"
@@ -11646,6 +11759,10 @@ msgstr "不支持该文件类型。请上传 PDF 或 Word 文档。"
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "This folder contains multiple items. Deleting it will remove all subfolders and move all nested documents and templates to the root folder."
 msgstr "此文件夹包含多个项目。删除它将移除所有子文件夹，并将其中的所有文档和模板移动到根文件夹。"
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "This font may still be used by one or more fields."
+msgstr "此字体可能仍被一个或多个字段使用。"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
@@ -12174,6 +12291,10 @@ msgstr "无法创建直接模板访问。请稍后再试。"
 msgid "Unable to decline this invitation at this time."
 msgstr "当前无法拒绝此邀请。"
 
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Unable to delete font"
+msgstr "无法删除字体"
+
 #: apps/remix/app/components/tables/organisation-member-invites-table.tsx
 msgid "Unable to delete invitation. Please try again."
 msgstr "无法删除邀请。请重试。"
@@ -12478,6 +12599,7 @@ msgid "Upgrade your plan to upload more documents"
 msgstr "升级您的套餐以上传更多文档"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
+#: apps/remix/app/components/forms/font-management-form.tsx
 msgid "Upload"
 msgstr "上传"
 
@@ -12531,6 +12653,10 @@ msgstr "上传文档并添加收件人"
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
 msgid "Upload failed"
 msgstr "上传失败"
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Upload font"
+msgstr "上传字体"
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Upload signature"
@@ -13290,6 +13416,10 @@ msgstr "目前无法更新你的文档偏好设置，请稍后再试"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.email.tsx
 msgid "We were unable to update your email preferences at this time, please try again later"
 msgstr "我们目前无法更新您的邮件偏好设置，请稍后重试"
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "We were unable to upload this font."
+msgstr "无法上传此字体。"
 
 #: apps/remix/app/components/forms/signin.tsx
 msgid "We were unable to verify that you're human. Please try again."
@@ -14495,6 +14625,10 @@ msgstr "您的信封已成功重新发送。"
 msgid "Your existing tokens"
 msgstr "你现有的令牌"
 
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Your font has been added to the font library."
+msgstr "字体已添加到字体库。"
+
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "Your Name"
 msgstr "您的姓名"
@@ -14716,4 +14850,3 @@ msgstr "您的验证码："
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
-

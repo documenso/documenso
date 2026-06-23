@@ -12,6 +12,7 @@ import {
   MailIcon,
   PaletteIcon,
   Settings2Icon,
+  TypeIcon,
   User,
   Users,
   WebhookIcon,
@@ -63,6 +64,16 @@ export const SettingsMobileNav = ({ className, ...props }: SettingsMobileNavProp
             >
               <PaletteIcon className="mr-2 h-5 w-5" />
               <Trans>Branding Preferences</Trans>
+            </Button>
+          </Link>
+
+          <Link to="/settings/fonts">
+            <Button
+              variant="ghost"
+              className={cn('w-full justify-start', pathname?.startsWith('/settings/fonts') && 'bg-secondary')}
+            >
+              <TypeIcon className="mr-2 h-5 w-5" />
+              <Trans>Fonts</Trans>
             </Button>
           </Link>
 

@@ -4,19 +4,70 @@ import {
   FIELD_MIN_LETTER_SPACING,
   FIELD_MIN_LINE_HEIGHT,
 } from '@documenso/lib/types/field-meta';
+import type { FieldFontOption } from '@documenso/lib/universal/field-fonts';
 import { cn } from '@documenso/ui/lib/utils';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
+import { Toggle } from '@documenso/ui/primitives/toggle';
 import { Trans, useLingui } from '@lingui/react/macro';
+import { BoldIcon, ItalicIcon } from 'lucide-react';
 import { useEffect } from 'react';
 import { type Control, useFormContext } from 'react-hook-form';
 
 // Can't seem to get the non-any type to work with correct types.
 // Eg Control<{ fontSize?: number } doesn't seem to work when there are required items.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: react-hook-form control typing is intentionally widened for shared field forms.
 type FormControlType = Control<any>;
+
+export const EditorGenericFontFamilyField = ({
+  formControl,
+  fontOptions,
+  className,
+}: {
+  formControl: FormControlType;
+  fontOptions?: FieldFontOption[];
+  className?: string;
+}) => {
+  const { t } = useLingui();
+
+  return (
+    <FormField
+      control={formControl}
+      name="fontFamily"
+      render={({ field }) => (
+        <FormItem className={className}>
+          <FormLabel>
+            <Trans>Font</Trans>
+          </FormLabel>
+          <FormControl>
+            <Select
+              value={field.value || 'default'}
+              onValueChange={(value) => field.onChange(value === 'default' ? '' : value)}
+            >
+              <SelectTrigger data-testid="field-form-fontFamily">
+                <SelectValue placeholder={t`Select font`} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="default">
+                  <Trans>Default</Trans>
+                </SelectItem>
+
+                {(fontOptions ?? []).map((font) => (
+                  <SelectItem key={font.id} value={font.id}>
+                    {font.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
 
 export const EditorGenericFontSizeField = ({
   formControl,
@@ -54,6 +105,72 @@ export const EditorGenericFontSizeField = ({
         </FormItem>
       )}
     />
+  );
+};
+
+export const EditorGenericFontStyleFields = ({
+  formControl,
+  className,
+}: {
+  formControl: FormControlType;
+  className?: string;
+}) => {
+  const { t } = useLingui();
+
+  return (
+    <div className={cn('grid grid-cols-2 gap-2', className)}>
+      <FormField
+        control={formControl}
+        name="fontWeight"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>
+              <Trans>Bold</Trans>
+            </FormLabel>
+            <FormControl>
+              <Toggle
+                aria-label={t`Bold`}
+                data-testid="field-form-fontWeight"
+                pressed={field.value === 'bold'}
+                size="sm"
+                variant="outline"
+                className="w-full"
+                onPressedChange={(pressed) => field.onChange(pressed ? 'bold' : 'normal')}
+              >
+                <BoldIcon className="h-4 w-4" />
+              </Toggle>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={formControl}
+        name="fontStyle"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>
+              <Trans>Italic</Trans>
+            </FormLabel>
+            <FormControl>
+              <Toggle
+                aria-label={t`Italic`}
+                data-testid="field-form-fontStyle"
+                pressed={field.value === 'italic'}
+                size="sm"
+                variant="outline"
+                className="w-full"
+                onPressedChange={(pressed) => field.onChange(pressed ? 'italic' : 'normal')}
+              >
+                <ItalicIcon className="h-4 w-4" />
+              </Toggle>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </div>
   );
 };
 
