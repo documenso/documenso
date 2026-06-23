@@ -41,9 +41,13 @@ export type ResendDocumentOptions = {
   requestMetadata: ApiRequestMetadata;
 };
 
-const isPromiseRejected = <T>(
-  result: PromiseSettledResult<T>,
-): result is PromiseRejectedResult => result.status === 'rejected';
+const isPromiseRejected = <T>(result: PromiseSettledResult<T>): result is PromiseRejectedResult =>
+  result.status === 'rejected';
+
+type ResendFailure = {
+  recipientId: number;
+  reason: unknown;
+};
 
 export const resendDocument = async ({ id, userId, recipients, teamId, requestMetadata }: ResendDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -298,9 +302,20 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
     }),
   );
 
-  const failedResends = resendResults.filter(isPromiseRejected);
+  const failedResends: ResendFailure[] = resendResults
+    .map((result, index) => {
+      if (!isPromiseRejected(result)) {
+        return null;
+      }
 
-  if (failedResends.length > 0) {
+      return {
+        recipientId: recipientsToRemind[index].id,
+        reason: result.reason,
+      } satisfies ResendFailure;
+    })
+    .filter((result): result is ResendFailure => result !== null);
+
+  if (failedResends.length === recipientsToRemind.length && failedResends.length > 0) {
     throw failedResends[0].reason;
   }
 
