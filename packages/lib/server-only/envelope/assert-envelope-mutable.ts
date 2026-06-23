@@ -34,8 +34,9 @@ type EnvelopeIdRef = Pick<Envelope, 'id'>;
  * Throws:
  * - `ENVELOPE_TSP_LOCKED` when the envelope is PENDING (the case unique to
  *   the TSP lock — SES routes happily allow PENDING).
- * - `ENVELOPE_COMPLETED` / `ENVELOPE_REJECTED` for those terminal states, to
- *   stay consistent with the existing envelope-state error vocabulary.
+ * - `ENVELOPE_COMPLETED` / `ENVELOPE_REJECTED` / `ENVELOPE_CANCELLED` for those
+ *   terminal states, to stay consistent with the existing envelope-state error
+ *   vocabulary.
  */
 export function assertEnvelopeMutable(envelope: EnvelopeMutableSnapshot): Promise<void>;
 export function assertEnvelopeMutable(envelope: EnvelopeIdRef, tx: Prisma.TransactionClient): Promise<void>;
@@ -73,6 +74,7 @@ const assertSnapshotMutable = (envelope: EnvelopeMutableSnapshot): void => {
     .with(DocumentStatus.PENDING, () => AppErrorCode.ENVELOPE_TSP_LOCKED)
     .with(DocumentStatus.COMPLETED, () => AppErrorCode.ENVELOPE_COMPLETED)
     .with(DocumentStatus.REJECTED, () => AppErrorCode.ENVELOPE_REJECTED)
+    .with(DocumentStatus.CANCELLED, () => AppErrorCode.ENVELOPE_CANCELLED)
     .otherwise(() => AppErrorCode.INVALID_REQUEST);
 
   throw new AppError(errorCode, {

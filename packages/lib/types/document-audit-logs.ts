@@ -31,6 +31,7 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_COMPLETED', // When the document is sealed and fully completed.
   'DOCUMENT_CREATED', // When the document is created.
   'DOCUMENT_DELETED', // When the document is soft deleted.
+  'DOCUMENT_CANCELLED', // When a privileged member cancels the document.
   'DOCUMENT_FIELDS_AUTO_INSERTED', // When a field is auto inserted during send due to default values (radio/dropdown/checkbox).
   'DOCUMENT_FIELD_INSERTED', // When a field is inserted (signed/approved/etc) by a recipient.
   'DOCUMENT_FIELD_UNINSERTED', // When a field is uninserted by a recipient.
@@ -297,6 +298,16 @@ export const ZDocumentAuditLogEventDocumentDeletedSchema = z.object({
 });
 
 /**
+ * Event: Document cancelled.
+ */
+export const ZDocumentAuditLogEventDocumentCancelledSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CANCELLED),
+  data: z.object({
+    reason: z.string().optional(),
+  }),
+});
+
+/**
  * Event: Document field inserted.
  */
 export const ZDocumentAuditLogEventDocumentFieldInsertedSchema = z.object({
@@ -549,12 +560,24 @@ export const ZDocumentAuditLogEventDocumentRecipientCompleteSchema = z.object({
 });
 
 /**
- * Event: Document recipient completed the document (the recipient has fully actioned and completed their required steps for the document).
+ * Event: Document recipient rejected the document.
  */
 export const ZDocumentAuditLogEventDocumentRecipientRejectedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED),
   data: ZBaseRecipientDataSchema.extend({
     reason: z.string(),
+    /**
+     * Whether the rejection was recorded externally on behalf of the recipient
+     * via the API, rather than by the recipient directly on the platform.
+     */
+    isExternal: z.boolean().optional(),
+    /**
+     * The team member the external rejection was recorded on behalf of, when
+     * the API caller elected a specific member to attribute the action to.
+     * Absent when the rejection is attributed to the API user/token itself.
+     */
+    onBehalfOfUserEmail: z.string().optional(),
+    onBehalfOfUserName: z.string().nullable().optional(),
   }),
 });
 
@@ -815,6 +838,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventDocumentCompletedSchema,
     ZDocumentAuditLogEventDocumentCreatedSchema,
     ZDocumentAuditLogEventDocumentDeletedSchema,
+    ZDocumentAuditLogEventDocumentCancelledSchema,
     ZDocumentAuditLogEventDocumentMovedToTeamSchema,
     ZDocumentAuditLogEventDocumentDelegatedOwnerCreatedSchema,
     ZDocumentAuditLogEventDocumentFieldsAutoInsertedSchema,
