@@ -252,6 +252,31 @@ describe('sanitizeBrandingCss', () => {
       expect(result.warnings).toHaveLength(1);
       expect(result.warnings[0].kind).toBe('value');
     });
+
+    it('drops a url() smuggled past the blocklist via a CSS escape (\\75rl)', () => {
+      // `\75rl(...)` is `url(...)` to a browser but contains no literal
+      // "url(" substring, so a raw match would let it through.
+      const result = sanitizeBrandingCss('.x { background: \\75rl("http://evil"); }');
+
+      expect(result.css).not.toContain('evil');
+      expect(result.warnings).toHaveLength(1);
+      expect(result.warnings[0].kind).toBe('value');
+    });
+
+    it('drops a url() written with fully escaped, mixed-case characters (\\55RL)', () => {
+      const result = sanitizeBrandingCss('.x { background: \\55RL("http://evil"); }');
+
+      expect(result.css).not.toContain('evil');
+      expect(result.warnings).toHaveLength(1);
+      expect(result.warnings[0].kind).toBe('value');
+    });
+
+    it('keeps a harmless value that merely contains CSS escapes (\\72 ed -> red)', () => {
+      const result = sanitizeBrandingCss('.x { color: \\72 ed; }');
+
+      expect(result.warnings).toEqual([]);
+      expect(result.css).toContain('color');
+    });
   });
 
   describe('!important stripping', () => {
