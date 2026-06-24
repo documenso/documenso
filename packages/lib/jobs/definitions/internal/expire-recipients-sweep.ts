@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import type { JobDefinition } from '../../client/_internal/job';
+import { getJobCronExpression } from '../../get-job-cron-expression';
 
 const EXPIRE_RECIPIENTS_SWEEP_JOB_DEFINITION_ID = 'internal.expire-recipients-sweep';
 
@@ -15,7 +16,7 @@ export const EXPIRE_RECIPIENTS_SWEEP_JOB_DEFINITION = {
   trigger: {
     name: EXPIRE_RECIPIENTS_SWEEP_JOB_DEFINITION_ID,
     schema: EXPIRE_RECIPIENTS_SWEEP_JOB_DEFINITION_SCHEMA,
-    cron: '*/15 * * * *', // Every 15 minutes.
+    cron: getJobCronExpression('NEXT_PRIVATE_JOBS_EXPIRE_RECIPIENTS_SWEEP_CRON', '*/15 * * * *'), // Every 15 minutes.
   },
   handler: async ({ payload, io }) => {
     const handler = await import('./expire-recipients-sweep.handler');

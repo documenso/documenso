@@ -356,6 +356,18 @@ No additional configuration required. Jobs are stored in PostgreSQL and processe
 | `INNGEST_SIGNING_KEY`            | Yes      | Inngest signing key for webhook verification |
 | `NEXT_PRIVATE_INNGEST_APP_ID`    | No       | Custom Inngest app ID                        |
 
+### Scheduled Jobs
+
+| Variable                                         | Description                     | Default        |
+| ------------------------------------------------ | ------------------------------- | -------------- |
+| `NEXT_PRIVATE_JOBS_SIGNING_REMINDERS_SWEEP_CRON` | Sends configured signing reminders | `*/15 * * * *` |
+| `NEXT_PRIVATE_JOBS_SEAL_DOCUMENT_SWEEP_CRON`     | Seals completed documents       | `*/15 * * * *` |
+| `NEXT_PRIVATE_JOBS_EXPIRE_RECIPIENTS_SWEEP_CRON` | Processes expired recipients    | `*/15 * * * *` |
+| `NEXT_PRIVATE_JOBS_CLEANUP_RATE_LIMITS_CRON`     | Cleans expired rate limit rows  | `*/15 * * * *` |
+| `NEXT_PRIVATE_JOBS_SYNC_EMAIL_DOMAINS_CRON`      | Syncs email domain status       | `0 * * * *`    |
+
+Invalid cron expressions will prevent the application from starting.
+
 For setup guides and provider recommendations, see [Background Jobs](/docs/self-hosting/configuration/background-jobs).
 
 ---
