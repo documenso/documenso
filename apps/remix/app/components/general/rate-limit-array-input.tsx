@@ -15,11 +15,12 @@ type RateLimitArrayInputProps = {
 
 const EMPTY_ENTRY: RateLimitEntryValue = { window: '', max: 0 };
 
+/** A row counts as "started" once either field has input; fully-empty rows are dropped on commit. */
+const hasEntryInput = (entry: RateLimitEntryValue) => entry.window.trim() !== '' || entry.max > 0;
+
 /** Keep in-progress rows; drop rows that are completely empty. */
 const persistEntries = (entries: RateLimitEntryValue[]) => {
-  return entries
-    .map((entry) => ({ ...entry, window: entry.window.trim() }))
-    .filter((entry) => entry.window !== '' || entry.max > 0);
+  return entries.map((entry) => ({ ...entry, window: entry.window.trim() })).filter(hasEntryInput);
 };
 
 export const RateLimitArrayInput = ({ value, onChange, disabled }: RateLimitArrayInputProps) => {
@@ -31,7 +32,7 @@ export const RateLimitArrayInput = ({ value, onChange, disabled }: RateLimitArra
   const getWindowError = (entry: RateLimitEntryValue, index: number) => {
     const window = entry.window.trim();
 
-    if (window === '' && entry.max <= 0) {
+    if (!hasEntryInput(entry)) {
       return null;
     }
 
@@ -51,7 +52,7 @@ export const RateLimitArrayInput = ({ value, onChange, disabled }: RateLimitArra
   };
 
   const getMaxError = (entry: RateLimitEntryValue) => {
-    if (entry.window.trim() === '' && entry.max <= 0) {
+    if (!hasEntryInput(entry)) {
       return null;
     }
 
@@ -61,9 +62,8 @@ export const RateLimitArrayInput = ({ value, onChange, disabled }: RateLimitArra
   const updateEntry = (index: number, patch: Partial<RateLimitEntryValue>) => {
     if (index >= value.length) {
       const nextDraftEntry = { ...(draftEntry ?? EMPTY_ENTRY), ...patch };
-      const shouldPersistDraft = nextDraftEntry.window.trim() !== '' || nextDraftEntry.max > 0;
 
-      if (shouldPersistDraft) {
+      if (hasEntryInput(nextDraftEntry)) {
         onChange(persistEntries([...value, nextDraftEntry]));
         setDraftEntry(null);
         return;

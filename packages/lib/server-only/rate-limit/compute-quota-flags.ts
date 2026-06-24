@@ -1,6 +1,4 @@
-import { isQuotaExceeded, isQuotaNearing, QUOTA_WARNING_THRESHOLD } from '../../universal/quota-usage';
-
-export { QUOTA_WARNING_THRESHOLD };
+import { isQuotaExceeded, isQuotaNearing } from '../../universal/quota-usage';
 
 export type QuotaFlags = {
   isDocumentQuotaExceeded: boolean;

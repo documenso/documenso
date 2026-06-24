@@ -1,6 +1,4 @@
-import { getQuotaWarningCount, QUOTA_WARNING_THRESHOLD } from '../../universal/quota-usage';
-
-export { QUOTA_WARNING_THRESHOLD };
+import { getQuotaWarningCount } from '../../universal/quota-usage';
 
 export type QuotaAlertKind = 'quota' | 'quotaNearing';
 

@@ -84,15 +84,22 @@ const getUsageCardState = ({ used, limit, footnote }: UsageCardStateOptions): Us
     };
   }
 
-  if (isQuotaExceeded(limit, used)) {
+  if (used > limit) {
     return {
-      status: {
-        label: used > limit ? <Trans>Exceeded</Trans> : <Trans>Limit reached</Trans>,
-        variant: 'destructive',
-      },
+      status: { label: <Trans>Exceeded</Trans>, variant: 'destructive' },
       percent,
       hasFiniteLimit,
       progressClassName: '[&>div]:bg-destructive',
+      subtext: footnote ?? null,
+    };
+  }
+
+  if (isQuotaExceeded(limit, used)) {
+    return {
+      status: { label: <Trans>Limit reached</Trans>, variant: 'orange' },
+      percent,
+      hasFiniteLimit,
+      progressClassName: '[&>div]:bg-orange-500 dark:[&>div]:bg-orange-400',
       subtext: footnote ?? null,
     };
   }
