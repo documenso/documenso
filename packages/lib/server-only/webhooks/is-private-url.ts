@@ -68,11 +68,27 @@ export const isPrivateUrl = (url: string): boolean => {
       }
     }
 
-    // IPv4-mapped IPv6 (e.g. ::ffff:127.0.0.1)
-    const v4Mapped = normalizedHost.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i);
+    // IPv4-mapped IPv6 (e.g. ::ffff:127.0.0.1 or ::ffff:7f00:1)
+    const v4Mapped = normalizedHost.match(/^::ffff:(.+)$/i);
 
     if (v4Mapped) {
-      return isPrivateUrl(`http://${v4Mapped[1]}`);
+      const embedded = v4Mapped[1];
+
+      // Handle dotted-decimal form: ::ffff:127.0.0.1
+      if (/^\d+\.\d+\.\d+\.\d+$/.test(embedded)) {
+        return isPrivateUrl(`http://${embedded}`);
+      }
+
+      // Handle hex-group form: ::ffff:7f00:1 (normalized by URL parser)
+      const hexGroups = embedded.match(/^([0-9a-f]{1,4}):([0-9a-f]{1,4})$/i);
+      if (hexGroups) {
+        const toOctets = (hex: string) => {
+          const padded = hex.padStart(4, '0');
+          return `${parseInt(padded.slice(0, 2), 16)}.${parseInt(padded.slice(2, 4), 16)}`;
+        };
+        const ipv4 = `${toOctets(hexGroups[1])}.${toOctets(hexGroups[2])}`;
+        return isPrivateUrl(`http://${ipv4}`);
+      }
     }
 
     return false;
