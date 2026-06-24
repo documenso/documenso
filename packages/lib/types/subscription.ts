@@ -8,8 +8,11 @@ import { z } from 'zod';
  */
 export const RATE_LIMIT_WINDOW_REGEX = /^\d+[smhd]$/;
 
+const RATE_LIMIT_WINDOW_ERROR_MESSAGE = 'Use a duration with a unit, e.g. 5m, 1h, or 24h';
+const RATE_LIMIT_DUPLICATE_WINDOW_ERROR_MESSAGE = 'Use a unique window for each rate limit';
+
 export const ZRateLimitWindowSchema = z.string().trim().regex(RATE_LIMIT_WINDOW_REGEX, {
-  message: 'Use a duration with a unit, e.g. 5m, 1h, or 24h',
+  message: RATE_LIMIT_WINDOW_ERROR_MESSAGE,
 });
 
 export const ZRateLimitArraySchema = z
@@ -20,21 +23,20 @@ export const ZRateLimitArraySchema = z
     }),
   )
   .superRefine((entries, ctx) => {
-    const windows = new Map<string, number>();
+    const windows = new Set<string>();
 
     entries.forEach((entry, index) => {
       const window = entry.window.trim();
-      const duplicateIndex = windows.get(window);
 
-      if (duplicateIndex !== undefined) {
+      if (windows.has(window)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Use a unique window for each rate limit',
+          message: RATE_LIMIT_DUPLICATE_WINDOW_ERROR_MESSAGE,
           path: [index, 'window'],
         });
       }
 
-      windows.set(window, index);
+      windows.add(window);
     });
   });
 
