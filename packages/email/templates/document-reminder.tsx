@@ -39,9 +39,9 @@ export const DocumentReminderEmailTemplate = ({
       <Head />
       <Preview>{_(previewText)}</Preview>
 
-      <Body className="mx-auto my-auto bg-white font-sans">
+      <Body className="mx-auto my-auto bg-background font-sans">
         <Section>
-          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid p-4 backdrop-blur-sm">
+          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-border border-solid p-4 backdrop-blur-sm">
             <Section>
               <TemplateBrandingLogo assetBaseUrl={assetBaseUrl} className="mb-4 h-6" />
 
@@ -58,7 +58,7 @@ export const DocumentReminderEmailTemplate = ({
           {customBody && (
             <Container className="mx-auto mt-12 max-w-xl">
               <Section>
-                <Text className="mt-2 text-base text-slate-400">
+                <Text className="mt-2 text-base text-muted-foreground">
                   <TemplateCustomMessageBody text={customBody} />
                 </Text>
               </Section>

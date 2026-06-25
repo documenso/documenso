@@ -3,12 +3,13 @@ import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/org
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { hasOverlappingFields } from '@documenso/lib/utils/fields-overlap';
 import { getRecipientsWithMissingFields } from '@documenso/lib/utils/recipients';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc, trpc as trpcReact } from '@documenso/trpc/react';
 import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/document/document-send-email-message-helper';
 import { cn } from '@documenso/ui/lib/utils';
-import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
+import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -32,7 +33,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentDistributionMethod, DocumentStatus, EnvelopeType } from '@prisma/client';
 import { AnimatePresence, motion } from 'framer-motion';
-import { InfoIcon } from 'lucide-react';
+import { AlertTriangleIcon, InfoIcon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
@@ -138,6 +139,27 @@ export const EnvelopeDistributeDialog = ({
     });
   }, [recipientsWithIndex, envelope.authOptions]);
 
+  /**
+   * Whether any fields significantly overlap each other. This is surfaced as a
+   * non-blocking warning since overlapping fields still allow sending, but can
+   * complicate the signing process or cause fields to behave unexpectedly.
+   */
+  const hasOverlappingEnvelopeFields = useMemo(
+    () =>
+      hasOverlappingFields(
+        envelope.fields.map((field) => ({
+          id: field.id,
+          envelopeItemId: field.envelopeItemId,
+          page: field.page,
+          positionX: Number(field.positionX),
+          positionY: Number(field.positionY),
+          width: Number(field.width),
+          height: Number(field.height),
+        })),
+      ),
+    [envelope.fields],
+  );
+
   const invalidEnvelopeCode = useMemo(() => {
     if (recipientsMissingSignatureFields.length > 0) {
       return 'MISSING_SIGNATURES';
@@ -206,6 +228,11 @@ export const EnvelopeDistributeDialog = ({
   };
 
   useEffect(() => {
+    // Default the distribution method tab to the envelope's configured setting.
+    if (isOpen && envelope.documentMeta) {
+      setValue('meta.distributionMethod', envelope.documentMeta.distributionMethod);
+    }
+
     // Resync the whole envelope if the envelope is mid saving.
     if (isOpen && (isAutosaving || autosaveError)) {
       void handleSync();
@@ -235,6 +262,24 @@ export const EnvelopeDistributeDialog = ({
           <Form {...form}>
             <form onSubmit={handleSubmit(onFormSubmit)}>
               <fieldset disabled={isSubmitting}>
+                {hasOverlappingEnvelopeFields && (
+                  <Alert variant="warning" className="mb-4 flex flex-row items-start gap-3">
+                    <AlertTriangleIcon className="mt-0.5 h-5 w-5 flex-shrink-0" />
+
+                    <div className="flex flex-col gap-1">
+                      <AlertTitle>
+                        <Trans>Overlapping fields detected</Trans>
+                      </AlertTitle>
+                      <AlertDescription>
+                        <Trans>
+                          Some fields are placed on top of each other. This may complicate the signing process or cause
+                          fields to not work as expected.
+                        </Trans>
+                      </AlertDescription>
+                    </div>
+                  </Alert>
+                )}
+
                 <Tabs
                   onValueChange={(value) =>
                     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
