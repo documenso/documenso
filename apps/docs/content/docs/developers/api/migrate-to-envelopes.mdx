@@ -20,9 +20,9 @@ The following items have been deprecated and will be removed on the <strong>1st 
 - <strong>EmbedUpdateDocumentV1</strong>
 - <strong>EmbedUpdateTemplateV1</strong>
 
-The beta endpoint `/api/v2-beta` will also be removed, please use `/api/v2` instead which can be directly dropped in place.
+The beta endpoint `/api/v2-beta` will also be removed. Use `/api/v2` instead, which is a drop-in replacement.
 
-Nothing breaks before 1st of March 2027 — you have time to migrate at your own pace.
+Nothing breaks before 1st of March 2027, so you can migrate at your own pace.
 
 ## What are legacy documents and templates
 
@@ -41,12 +41,12 @@ These are documents and templates created by the following endpoints:
 
 At the end of 2025 we introduced a unified system for documents and templates, called <strong>envelopes</strong>.
 
-We will still reference documents and templates throughout documentation and the application as a method to distinguish them, but internally they are envelopes.
+We still reference documents and templates throughout the documentation and application to distinguish them, but internally they are envelopes.
 
-By moving to the new envelope system, you get access to:
+Moving to the envelope system gives you:
 
-- **Multiple PDFs in one envelope** — send several documents to sign in a single request.
-- **One API for documents and templates** — learn one set of endpoints instead of two parallel trees.
+- **Multiple PDFs in one envelope.** Send several documents to sign in a single request.
+- **One API for documents and templates.** Learn one set of endpoints instead of two misaligned ones.
 - **A better editor and signing experience** for you and your recipients.
 
 ## How to migrate
@@ -61,7 +61,7 @@ By moving to the new envelope system, you get access to:
   <Step>
     ### Set the envelope `type` on create
 
-    A single endpoint, `POST /api/v2/envelope/create`, creates both documents and templates. Set `type` to `DOCUMENT` or `TEMPLATE`. You can now upload more than one PDF using the `files` field.
+    A single endpoint, `POST /api/v2/envelope/create`, can create both documents and templates. Set `type` to `DOCUMENT` or `TEMPLATE`. You can now upload more than one PDF using the `files` field.
   </Step>
   <Step>
     ### Update how you store IDs
@@ -85,7 +85,7 @@ See the [Documents API](/docs/developers/api/documents) and [Templates API](/doc
 
 ### Deprecated V1 API Endpoints
 
-Verify these in the [V1 OpenAPI reference](https://openapi-v1.documenso.com).
+Full reference in the [V1 OpenAPI reference](https://openapi-v1.documenso.com).
 
 | Deprecated endpoint                                      | Replacement                                           |
 | -------------------------------------------------------- | ----------------------------------------------------- |
@@ -111,7 +111,7 @@ Verify these in the [V1 OpenAPI reference](https://openapi-v1.documenso.com).
 
 ### Deprecated V2 API Endpoints
 
-Verify these in the [V2 OpenAPI reference](https://openapi.documenso.com).
+Full reference in the [V2 OpenAPI reference](https://openapi.documenso.com).
 
 #### Documents
 
@@ -215,20 +215,19 @@ See the [embedding guide](/docs/developers/embedding) for the envelope component
   </Accordion>
   <Accordion title="Will my existing documents and templates keep working?">
     Yes. Documents and templates you already created remain in your account and continue to work. They will automatically be converted to envelopes. Only
-    the deprecated endpoints you call are going away — your data is not deleted.
+    the deprecated endpoints you call are going away. Your data is not deleted.
   </Accordion>
   <Accordion title="Do I need a new API token?">
-    No. Authentication is unchanged — the same API token works for the envelope endpoints under
+    No. Authentication is unchanged. The same API token works for the envelope endpoints under
     `https://app.documenso.com/api/v2`.
   </Accordion>
   <Accordion title="What is the difference between a document and a template now?">
     Both are envelopes, distinguished by a `type` field of `DOCUMENT` or `TEMPLATE`. They share the same
     endpoints, recipients, fields, and attachments.
   </Accordion>
-  <Accordion title="I use an official SDK — what should I do?">
+  <Accordion title="I use an official SDK, what should I do?">
     The function calls to the legacy endpoints will break on the 1st of March 2027. Update to the latest SDK version and switch to its envelope methods.
-    The deprecated document and
-    template methods map to the envelope endpoints in the tables above.
+    The deprecated document and template methods map to the envelope endpoints in the tables above.
   </Accordion>
   <Accordion title="I need more time or help migrating">
     Reach out to [support@documenso.com](mailto:support@documenso.com) with your use case and we will
@@ -238,13 +237,13 @@ See the [embedding guide](/docs/developers/embedding) for the envelope component
 
 ## Getting help
 
-- [V2 OpenAPI reference](https://openapi.documenso.com) — the always up-to-date envelope API.
-- [V1 OpenAPI reference](https://openapi-v1.documenso.com) — the deprecated V1 API.
-- [support@documenso.com](mailto:support@documenso.com) — migration questions and extensions.
+- [V2 OpenAPI reference](https://openapi.documenso.com): the up-to-date envelope API.
+- [V1 OpenAPI reference](https://openapi-v1.documenso.com): the deprecated V1 API.
+- [support@documenso.com](mailto:support@documenso.com): migration questions and extensions.
 
 ## See also
 
-- [Documents API](/docs/developers/api/documents) — create and manage envelopes
-- [Templates API](/docs/developers/api/templates) — work with templates and direct links
+- [Documents API](/docs/developers/api/documents): create and manage envelopes
+- [Templates API](/docs/developers/api/templates): work with templates and direct links
 - [Fields API](/docs/developers/api/fields) and [Recipients API](/docs/developers/api/recipients)
-- [API Versioning](/docs/developers/api/versioning) — how Documenso versions the public API
+- [API Versioning](/docs/developers/api/versioning): how Documenso versions the public API
