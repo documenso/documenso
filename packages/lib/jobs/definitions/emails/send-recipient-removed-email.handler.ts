@@ -8,6 +8,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { assertOrganisationRatesAndLimits } from '../../../server-only/rate-limit/assert-organisation-rates-and-limits';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
+import { isRecipientEmailValidForSending } from '../../../utils/recipients';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendRecipientRemovedEmailJobDefinition } from './send-recipient-removed-email';
@@ -26,7 +27,7 @@ export const run = async ({ payload, io }: { payload: TSendRecipientRemovedEmail
 
   // The envelope may have been deleted between the recipient removal and this
   // job running. Treat as a no-op so the job doesn't retry forever.
-  if (!envelope || !recipientEmail) {
+  if (!envelope || !recipientEmail || !isRecipientEmailValidForSending({ email: recipientEmail })) {
     return;
   }
 
