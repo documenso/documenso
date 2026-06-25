@@ -43,7 +43,6 @@ model User {
   emailVerified    DateTime?
   password         String? // Todo: (RR7) Remove after RR7 migration.
   source           String?
-  signature        String?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @default(now()) @updatedAt
   lastSignedIn     DateTime         @default(now())
@@ -224,7 +223,7 @@ model ApiToken {
   name      String
   token     String            @unique
   algorithm ApiTokenAlgorithm @default(SHA512)
-  expires   DateTime?
+  expires   DateTime
   createdAt DateTime          @default(now())
   userId    Int?
   user      User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -440,8 +439,8 @@ model Envelope {
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  completedAt DateTime?
-  deletedAt   DateTime?
+  completedAt DateTime
+  deletedAt   DateTime
 
   title   String
   status  DocumentStatus @default(DRAFT)
@@ -563,7 +562,7 @@ model DocumentMeta {
   message                String?
   timezone               String?              @default("Etc/UTC") @db.Text
   dateFormat             String?              @default("yyyy-MM-dd hh:mm a") @db.Text
-  redirectUrl            String?
+  redirectUrl            String
   signingOrder           DocumentSigningOrder @default(PARALLEL)
   allowDictateNextSigner Boolean              @default(false)
 
@@ -642,7 +641,7 @@ model Recipient {
   signedAt             DateTime?
   lastReminderSentAt   DateTime?
   nextReminderAt       DateTime?
-  reminderCount        Int           @default(0)
+  reminderCount        Int           @unique @default(0)
   authOptions          Json? /// [RecipientAuthOptions] @zod.custom.use(ZRecipientAuthOptionsSchema)
   signingOrder         Int? /// @zod.number.describe("The order in which the recipient should sign the document. Only works if the document is set to sequential signing.")
   rejectionReason      String?
@@ -701,7 +700,7 @@ model Field {
   inserted       Boolean
   envelopeItem   EnvelopeItem @relation(fields: [envelopeItemId], references: [id], onDelete: Cascade)
   envelope       Envelope     @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
-  recipient      Recipient    @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  recipient      Recipient    @relation(fields: [recipientId], references: [id], onDelete: Restrict)
   signature      Signature?
   fieldMeta      Json? /// [FieldMeta] @zod.custom.use(ZFieldMetaNotOptionalSchema)
 
