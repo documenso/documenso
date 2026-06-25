@@ -440,7 +440,7 @@ model Envelope {
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  completedAt DateTime?
+  completedAt DateTime
   deletedAt   DateTime?
 
   title   String
