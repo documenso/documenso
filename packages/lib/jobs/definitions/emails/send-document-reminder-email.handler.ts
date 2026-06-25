@@ -27,7 +27,7 @@ import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendDocumentReminderEmailJobDefinition } from './send-document-reminder-email';
 
 export const run = async ({ payload, io }: { payload: TSendDocumentReminderEmailJobDefinition; io: JobRunIO }) => {
-  const { userId, documentId, recipientId, requestMetadata, auditUser } = payload;
+  const { userId, envelopeId, recipientId, requestMetadata, auditUser } = payload;
 
   const [user, envelope, recipient] = await Promise.all([
     prisma.user.findFirst({
@@ -45,8 +45,8 @@ export const run = async ({ payload, io }: { payload: TSendDocumentReminderEmail
       where: {
         ...unsafeBuildEnvelopeIdQuery(
           {
-            type: 'documentId',
-            id: documentId,
+            type: 'envelopeId',
+            id: envelopeId,
           },
           EnvelopeType.DOCUMENT,
         ),

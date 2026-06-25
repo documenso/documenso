@@ -8,7 +8,7 @@ import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { isDocumentCompleted } from '../../utils/document';
-import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
+import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
@@ -142,8 +142,6 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
     meta: envelope.documentMeta,
   });
 
-  const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
-
   // Don't resend any emails if the organisation has email sending disabled.
   if (user.disabled || emailsDisabled) {
     return envelope;
@@ -167,7 +165,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
         name: 'send.document.reminder.email',
         payload: {
           userId,
-          documentId: legacyDocumentId,
+          envelopeId: envelope.id,
           recipientId: recipient.id,
           requestMetadata: requestMetadata?.requestMetadata,
           auditUser: requestMetadata?.auditUser,

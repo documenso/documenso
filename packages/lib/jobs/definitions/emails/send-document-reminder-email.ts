@@ -7,7 +7,7 @@ const SEND_DOCUMENT_REMINDER_EMAIL_JOB_DEFINITION_ID = 'send.document.reminder.e
 
 const SEND_DOCUMENT_REMINDER_EMAIL_JOB_DEFINITION_SCHEMA = z.object({
   userId: z.number(),
-  documentId: z.number(),
+  envelopeId: z.string(),
   recipientId: z.number(),
   requestMetadata: ZRequestMetadataSchema.optional(),
   /**
