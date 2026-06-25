@@ -38,7 +38,7 @@ enum Role {
 
 model User {
   id               Int              @id @default(autoincrement())
-  name             String?
+  name             String
   email            String           @unique
   emailVerified    DateTime?
   password         String? // Todo: (RR7) Remove after RR7 migration.
