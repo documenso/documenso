@@ -65,6 +65,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentReminderEmail
     prisma.recipient.findFirst({
       where: {
         id: recipientId,
+        envelopeId,
       },
     }),
   ]);
