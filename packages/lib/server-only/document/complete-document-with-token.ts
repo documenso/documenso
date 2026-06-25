@@ -29,7 +29,6 @@ import { assertRecipientNotExpired } from '../../utils/recipients';
 import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { isRecipientAuthorized } from './is-recipient-authorized';
-import { sendPendingEmail } from './send-pending-email';
 
 export type CompleteDocumentWithTokenOptions = {
   token: string;
@@ -389,7 +388,13 @@ export const completeDocumentWithToken = async ({
   });
 
   if (pendingRecipients.length > 0) {
-    await sendPendingEmail({ id, recipientId: recipient.id });
+    await jobs.triggerJob({
+      name: 'send.document.pending.email',
+      payload: {
+        envelopeId: envelope.id,
+        recipientId: recipient.id,
+      },
+    });
 
     if (envelope.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL) {
       const [nextRecipient] = pendingRecipients;

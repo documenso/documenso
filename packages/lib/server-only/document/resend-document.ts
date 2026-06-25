@@ -13,6 +13,7 @@ import {
   EnvelopeType,
   OrganisationType,
   RecipientRole,
+  SendStatus,
   SigningStatus,
   WebhookTriggerEvents,
 } from '@prisma/client';
@@ -30,6 +31,7 @@ import { buildEnvelopeEmailHeaders } from '../email/build-envelope-email-headers
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
+import { updateRecipientNextReminder } from '../recipient/update-recipient-next-reminder';
 import { assertUserNotDisabled } from '../user/assert-user-not-disabled';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -117,7 +119,6 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
     });
   }
 
-  // Refresh the expiresAt on each resent recipient.
   const expiresAt = resolveExpiresAt(envelope.documentMeta?.envelopeExpirationPeriod ?? null);
 
   const recipientsToRemind = envelope.recipients.filter(
@@ -127,7 +128,6 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
       recipient.role !== RecipientRole.CC,
   );
 
-  // Extend the expiration deadline for recipients being resent.
   if (expiresAt && recipientsToRemind.length > 0) {
     await prisma.recipient.updateMany({
       where: {
@@ -141,6 +141,22 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
       },
     });
   }
+
+  // A manual resend restarts the reminder cycle from scratch, mirroring the
+  // initial send, so a recipient that hit the threshold can be reminded again.
+  const resentAt = new Date();
+
+  await Promise.all(
+    recipientsToRemind.map((recipient) =>
+      updateRecipientNextReminder({
+        recipientId: recipient.id,
+        envelopeId: envelope.id,
+        sentAt: resentAt,
+        lastReminderSentAt: null,
+        resetReminderCount: true,
+      }),
+    ),
+  );
 
   const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
     envelope.documentMeta,
@@ -274,6 +290,18 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
           envelopeId: envelope.id,
           teamId: envelope.teamId,
         }),
+      });
+
+      // Mark the recipient as sent if they were not already sent.
+      await prisma.recipient.updateMany({
+        where: {
+          id: recipient.id,
+          sendStatus: SendStatus.NOT_SENT,
+        },
+        data: {
+          sendStatus: SendStatus.SENT,
+          sentAt: new Date(),
+        },
       });
 
       await prisma.documentAuditLog.create({
