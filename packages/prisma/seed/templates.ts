@@ -6,6 +6,7 @@ import {
   DIRECT_TEMPLATE_RECIPIENT_NAME,
 } from '@documenso/lib/constants/direct-templates';
 import { incrementTemplateId } from '@documenso/lib/server-only/envelope/increment-id';
+import { SignatureLevel } from '@documenso/lib/types/signature-level';
 import { prefixedId } from '@documenso/lib/universal/id';
 
 import { prisma } from '..';
@@ -57,6 +58,7 @@ export const seedBlankTemplate = async (owner: User, teamId: number, options: Cr
       id: prefixedId('envelope'),
       secondaryId: templateId.formattedTemplateId,
       internalVersion: 1,
+      signatureLevel: SignatureLevel.SES,
       type: EnvelopeType.TEMPLATE,
       title: `[TEST] Template ${key}`,
       teamId,
@@ -105,6 +107,7 @@ export const seedTemplate = async (options: SeedTemplateOptions) => {
       id: prefixedId('envelope'),
       secondaryId: templateId.formattedTemplateId,
       internalVersion: options.internalVersion ?? 1,
+      signatureLevel: SignatureLevel.SES,
       type: EnvelopeType.TEMPLATE,
       title,
       envelopeItems: {
@@ -164,6 +167,7 @@ export const seedDirectTemplate = async (options: SeedTemplateOptions) => {
       id: prefixedId('envelope'),
       secondaryId: templateId.formattedTemplateId,
       internalVersion: options.internalVersion ?? 1,
+      signatureLevel: SignatureLevel.SES,
       type: EnvelopeType.TEMPLATE,
       title,
       envelopeItems: {

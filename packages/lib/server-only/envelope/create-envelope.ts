@@ -29,6 +29,7 @@ import type {
 import type { TDocumentFormValues } from '../../types/document-form-values';
 import type { TEnvelopeAttachmentType } from '../../types/envelope-attachment';
 import type { TFieldAndMeta } from '../../types/field-meta';
+import type { TSignatureLevel } from '../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
@@ -36,6 +37,8 @@ import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuthOptions, createRecipientAuthOptions } from '../../utils/document-auth';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-id';
+import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
+import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 import { getTeamSettings } from '../team/get-team-settings';
 import { assertUserNotDisabledById } from '../user/assert-user-not-disabled';
@@ -89,6 +92,7 @@ export type CreateEnvelopeOptions = {
     recipients?: CreateEnvelopeRecipientOptions[];
     folderId?: string;
     delegatedDocumentOwner?: string;
+    signatureLevel?: TSignatureLevel;
   };
   attachments?: Array<{
     label: string;
@@ -137,7 +141,13 @@ export const createEnvelope = async ({
     publicDescription,
     visibility: visibilityOverride,
     delegatedDocumentOwner,
+    signatureLevel: requestedSignatureLevel,
   } = data;
+
+  const signatureLevel = resolveSignatureLevel({
+    requested: requestedSignatureLevel,
+    strict: true,
+  });
 
   const team = await prisma.team.findFirst({
     where: buildTeamWhereQuery({ teamId, userId }),
@@ -192,6 +202,17 @@ export const createEnvelope = async ({
   if (data.envelopeItems.length !== 1 && internalVersion === 1) {
     throw new AppError(AppErrorCode.INVALID_BODY, {
       message: 'Envelope items must have exactly 1 item for version 1',
+    });
+  }
+
+  // CSC / TSP signing flows assume the V2 envelope shape: per-recipient
+  // anchors, materialised PDF lineage, sequential signing, mutation lock.
+  // The legacy V1 (Document) model can't carry that state, so AES/QES on V1
+  // is structurally unsupported and must fail at create time — not later at
+  // sign or seal time when the cause is harder to attribute.
+  if (signatureLevel !== 'SES' && internalVersion === 1) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: `Envelopes signed at '${signatureLevel}' require internalVersion=2; the legacy V1 envelope shape cannot host TSP signing.`,
     });
   }
 
@@ -255,6 +276,10 @@ export const createEnvelope = async ({
     });
   }
 
+  for (const recipient of data.recipients ?? []) {
+    assertCompatibleRecipientRole({ signatureLevel, role: recipient.role });
+  }
+
   const visibility = visibilityOverride || settings.documentVisibility;
 
   const emailId = meta?.emailId;
@@ -311,10 +336,14 @@ export const createEnvelope = async ({
 
   const [documentMeta, secondaryId, delegatedOwner] = await Promise.all([
     prisma.documentMeta.create({
-      data: extractDerivedDocumentMeta(settings, {
-        ...meta,
-        timezone: timezoneToUse,
-      }),
+      data: extractDerivedDocumentMeta(
+        settings,
+        {
+          ...meta,
+          timezone: timezoneToUse,
+        },
+        signatureLevel,
+      ),
     }),
     type === EnvelopeType.DOCUMENT
       ? incrementDocumentId().then((v) => v.formattedDocumentId)
@@ -331,6 +360,7 @@ export const createEnvelope = async ({
         internalVersion,
         type,
         title,
+        signatureLevel,
         qrToken: prefixedId('qr'),
         externalId,
         envelopeItems: {
