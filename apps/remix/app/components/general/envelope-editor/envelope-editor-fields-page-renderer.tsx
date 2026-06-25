@@ -521,11 +521,42 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       setSelectedFields(liveSelectedFieldGroups);
     }
 
+    // Mirror the editor's single selected field onto the canvas (Konva) selection.
+    //
+    // `addField` already marks a newly created field as the selected field, so this
+    // makes a field placed via the palette (drag-drop) or marquee creation show its
+    // resize handles immediately -- no second click needed. It also clears the canvas
+    // selection when the selected field is cleared (e.g. when the author starts
+    // placing another field), so the floating action toolbar can't intercept the next
+    // placement click. Runs after the render loop above so the field's group exists.
+    const selectedFormId = editorFields.selectedField?.formId ?? null;
+    const isSingleCanvasSelection = selectedKonvaFieldGroups.length === 1;
+
+    if (selectedFormId && localPageFields.some((field) => field.formId === selectedFormId)) {
+      const isAlreadySelected = isSingleCanvasSelection && selectedKonvaFieldGroups[0].id() === selectedFormId;
+
+      if (!isAlreadySelected) {
+        const fieldGroupToSelect = pageLayer.current.findOne(`#${selectedFormId}`);
+
+        if (fieldGroupToSelect instanceof Konva.Group) {
+          setSelectedFields([fieldGroupToSelect]);
+        }
+      }
+    } else if (selectedFormId === null && isSingleCanvasSelection) {
+      setSelectedFields([]);
+    }
+
     // Rerender the transformer
     interactiveTransformer.current?.forceUpdate();
 
     pageLayer.current.batchDraw();
-  }, [localPageFields, selectedKonvaFieldGroups, overlappingFieldFormIds, isFieldChanging]);
+  }, [
+    localPageFields,
+    selectedKonvaFieldGroups,
+    overlappingFieldFormIds,
+    isFieldChanging,
+    editorFields.selectedField?.formId,
+  ]);
 
   const setSelectedFields = (nodes: Konva.Node[]) => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions

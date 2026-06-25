@@ -237,6 +237,16 @@ export const EnvelopeEditorFieldDragDrop = ({
     [selectedRecipientId, getRecipientColorKey],
   );
 
+  /**
+   * Begin placing a field type. Also clears the current field selection so the
+   * previously placed field's action toolbar can't intercept the next placement
+   * click on the canvas (the renderer mirrors this onto the canvas selection).
+   */
+  const handleStartPlacingField = (type: FieldType) => {
+    setSelectedField(type);
+    editorFields.setSelectedField(null);
+  };
+
   return (
     <>
       <div className="grid grid-cols-2 gap-x-2 gap-y-2.5">
@@ -245,8 +255,8 @@ export const EnvelopeEditorFieldDragDrop = ({
             disabled={isFieldsDisabled}
             key={field.type}
             type="button"
-            onClick={() => setSelectedField(field.type)}
-            onMouseDown={() => setSelectedField(field.type)}
+            onClick={() => handleStartPlacingField(field.type)}
+            onMouseDown={() => handleStartPlacingField(field.type)}
             data-selected={selectedField === field.type ? true : undefined}
             className={cn(
               'group flex h-12 cursor-pointer items-center justify-center rounded-lg border border-border px-4 transition-colors',
