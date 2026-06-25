@@ -248,7 +248,11 @@ export const findDocuments = async ({
             eb.or([
               eb('Envelope.userId', '=', user.id),
               eb.and([
-                eb('Envelope.status', 'in', [sql.lit(DocumentStatus.COMPLETED), sql.lit(DocumentStatus.PENDING)]),
+                eb('Envelope.status', 'in', [
+                  sql.lit(DocumentStatus.COMPLETED),
+                  sql.lit(DocumentStatus.PENDING),
+                  sql.lit(DocumentStatus.CANCELLED),
+                ]),
                 recipientExists(eb, user.email),
               ]),
             ]),
@@ -316,6 +320,16 @@ export const findDocuments = async ({
                   reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.REJECTED)),
                 ),
               ]),
+            ]),
+          ),
+      )
+      .with(ExtendedDocumentStatus.CANCELLED, () =>
+        qb
+          .where('Envelope.status', '=', sql.lit(ExtendedDocumentStatus.CANCELLED))
+          .where((eb) =>
+            eb.and([
+              personalDeletedFilter(eb),
+              eb.or([eb('Envelope.userId', '=', user.id), recipientExists(eb, user.email)]),
             ]),
           ),
       )
@@ -461,6 +475,18 @@ export const findDocuments = async ({
                 reb('Recipient.signingStatus', '=', sql.lit(SigningStatus.REJECTED)),
               ),
             );
+          }
+
+          return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
+        }),
+      )
+      .with(ExtendedDocumentStatus.CANCELLED, () =>
+        qb.where('Envelope.status', '=', sql.lit(ExtendedDocumentStatus.CANCELLED)).where((eb) => {
+          const accessBranches = [eb('Envelope.teamId', '=', teamData.id)];
+
+          if (teamEmail) {
+            accessBranches.push(senderEmailIs(eb, teamEmail));
+            accessBranches.push(recipientExists(eb, teamEmail));
           }
 
           return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);

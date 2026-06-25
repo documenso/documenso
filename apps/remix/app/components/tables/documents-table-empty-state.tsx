@@ -24,6 +24,11 @@ export const DocumentsTableEmptyState = ({ status }: DocumentsTableEmptyStatePro
       message: msg`There are no active drafts at the current moment. You can upload a document to start drafting.`,
       icon: CheckCircle2,
     }))
+    .with(ExtendedDocumentStatus.CANCELLED, () => ({
+      title: msg`Nothing cancelled`,
+      message: msg`There are no cancelled documents. Documents you cancel will remain here as a record that they were distributed.`,
+      icon: XCircle,
+    }))
     .with(ExtendedDocumentStatus.REJECTED, () => ({
       title: msg`No rejected documents`,
       message: msg`There are no rejected documents. Documents that a recipient declines to sign will appear here.`,
