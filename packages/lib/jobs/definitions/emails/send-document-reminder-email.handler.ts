@@ -83,7 +83,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentReminderEmail
   // narrows `recipient.role` away from CC for the email-type lookup below.
   if (
     recipient.role === RecipientRole.CC ||
-    recipient.signingStatus === SigningStatus.SIGNED ||
+    recipient.signingStatus !== SigningStatus.NOT_SIGNED ||
     !isRecipientEmailValidForSending(recipient)
   ) {
     return;
