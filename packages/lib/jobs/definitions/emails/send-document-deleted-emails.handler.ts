@@ -5,6 +5,7 @@ import { createElement } from 'react';
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { isRecipientEmailValidForSending } from '../../../utils/recipients';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendDocumentDeletedEmailsJobDefinition } from './send-document-deleted-emails';
@@ -35,33 +36,35 @@ export const run = async ({ payload, io }: { payload: TSendDocumentDeletedEmails
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
   const i18n = await getI18nInstance(emailLanguage);
 
-  await io.runTask('send-document-deleted-emails', async () => {
-    await Promise.all(
-      recipients.map(async (recipient) => {
-        const template = createElement(DocumentCancelTemplate, {
-          documentName,
-          inviterName: inviterName || undefined,
-          inviterEmail,
-          assetBaseUrl,
-        });
+  for (const recipient of recipients) {
+    await io.runTask(`send-document-deleted-emails-${recipient.email}`, async () => {
+      if (!isRecipientEmailValidForSending(recipient)) {
+        return;
+      }
 
-        const [html, text] = await Promise.all([
-          renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-          renderEmailWithI18N(template, { lang: emailLanguage, branding, plainText: true }),
-        ]);
+      const template = createElement(DocumentCancelTemplate, {
+        documentName,
+        inviterName: inviterName || undefined,
+        inviterEmail,
+        assetBaseUrl,
+      });
 
-        await emailTransport.sendMail({
-          to: {
-            address: recipient.email,
-            name: recipient.name,
-          },
-          from: senderEmail,
-          replyTo: replyToEmail,
-          subject: i18n._(msg`Document Cancelled`),
-          html,
-          text,
-        });
-      }),
-    );
-  });
+      const [html, text] = await Promise.all([
+        renderEmailWithI18N(template, { lang: emailLanguage, branding }),
+        renderEmailWithI18N(template, { lang: emailLanguage, branding, plainText: true }),
+      ]);
+
+      await emailTransport.sendMail({
+        to: {
+          address: recipient.email,
+          name: recipient.name,
+        },
+        from: senderEmail,
+        replyTo: replyToEmail,
+        subject: i18n._(msg`Document Cancelled`),
+        html,
+        text,
+      });
+    });
+  }
 };
