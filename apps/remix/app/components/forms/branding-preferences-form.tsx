@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { BrandingPreferencesResetDialog } from '~/components/dialogs/branding-preferences-reset-dialog';
 import { useOptionalCurrentTeam } from '~/providers/team';
 import { useCspNonce } from '~/utils/nonce';
 
@@ -67,6 +68,7 @@ export function BrandingPreferencesForm({
 
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [hasLoadedPreview, setHasLoadedPreview] = useState(false);
+  const [colorPickerKey, setColorPickerKey] = useState(0);
 
   const parsedColors = ZCssVarsSchema.safeParse(settings.brandingColors);
   const initialColors = parsedColors.success ? parsedColors.data : {};
@@ -84,6 +86,27 @@ export function BrandingPreferencesForm({
   });
 
   const isBrandingEnabled = form.watch('brandingEnabled');
+
+  const handleResetToDefaults = async () => {
+    const data: TBrandingPreferencesFormSchema = {
+      brandingEnabled: canInherit ? null : false,
+      brandingLogo: null,
+      brandingUrl: '',
+      brandingCompanyDetails: '',
+      brandingColors: {},
+      brandingCss: '',
+    };
+
+    await onFormSubmit(data);
+
+    if (previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
+    setPreviewUrl('');
+    setColorPickerKey((key) => key + 1);
+    form.reset(data);
+  };
 
   useEffect(() => {
     if (settings.brandingLogo) {
@@ -346,6 +369,7 @@ export function BrandingPreferencesForm({
                         </FormDescription>
                         <FormControl>
                           <ColorPicker
+                            key={`background-${colorPickerKey}`}
                             nonce={nonce}
                             value={field.value ?? ''}
                             defaultValue={DEFAULT_BRAND_COLORS.background}
@@ -369,6 +393,7 @@ export function BrandingPreferencesForm({
                         </FormDescription>
                         <FormControl>
                           <ColorPicker
+                            key={`foreground-${colorPickerKey}`}
                             nonce={nonce}
                             value={field.value ?? ''}
                             defaultValue={DEFAULT_BRAND_COLORS.foreground}
@@ -392,6 +417,7 @@ export function BrandingPreferencesForm({
                         </FormDescription>
                         <FormControl>
                           <ColorPicker
+                            key={`primary-${colorPickerKey}`}
                             nonce={nonce}
                             value={field.value ?? ''}
                             defaultValue={DEFAULT_BRAND_COLORS.primary}
@@ -415,6 +441,7 @@ export function BrandingPreferencesForm({
                         </FormDescription>
                         <FormControl>
                           <ColorPicker
+                            key={`primary-foreground-${colorPickerKey}`}
                             nonce={nonce}
                             value={field.value ?? ''}
                             defaultValue={DEFAULT_BRAND_COLORS.primaryForeground}
@@ -438,6 +465,7 @@ export function BrandingPreferencesForm({
                         </FormDescription>
                         <FormControl>
                           <ColorPicker
+                            key={`border-${colorPickerKey}`}
                             nonce={nonce}
                             value={field.value ?? ''}
                             defaultValue={DEFAULT_BRAND_COLORS.border}
@@ -461,6 +489,7 @@ export function BrandingPreferencesForm({
                         </FormDescription>
                         <FormControl>
                           <ColorPicker
+                            key={`ring-${colorPickerKey}`}
                             nonce={nonce}
                             value={field.value ?? ''}
                             defaultValue={DEFAULT_BRAND_COLORS.ring}
@@ -542,6 +571,11 @@ export function BrandingPreferencesForm({
             <Button type="submit" loading={form.formState.isSubmitting}>
               <Trans>Update</Trans>
             </Button>
+            <BrandingPreferencesResetDialog
+              hasAdvancedBranding={hasAdvancedBranding}
+              isSubmitting={form.formState.isSubmitting}
+              onReset={handleResetToDefaults}
+            />
           </div>
         </fieldset>
       </form>
