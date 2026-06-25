@@ -2,6 +2,7 @@ import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/org
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { DEFAULT_BRAND_COLORS, DEFAULT_BRAND_RADIUS } from '@documenso/lib/constants/theme';
 import { ZCssVarsSchema } from '@documenso/lib/types/css-vars';
+import { normalizeBrandingColors } from '@documenso/lib/utils/normalize-branding-colors';
 import { cn } from '@documenso/ui/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@documenso/ui/primitives/accordion';
 import { Button } from '@documenso/ui/primitives/button';
@@ -86,6 +87,20 @@ export function BrandingPreferencesForm({
   });
 
   const isBrandingEnabled = form.watch('brandingEnabled');
+
+  const hasResetBrandingColors =
+    settings.brandingColors === null ||
+    settings.brandingColors === undefined ||
+    (parsedColors.success && normalizeBrandingColors(parsedColors.data) === null);
+
+  const isResetDisabled =
+    !form.formState.isDirty &&
+    settings.brandingEnabled === (canInherit ? null : false) &&
+    !settings.brandingLogo &&
+    !settings.brandingUrl &&
+    !settings.brandingCompanyDetails &&
+    !settings.brandingCss &&
+    hasResetBrandingColors;
 
   const handleResetToDefaults = async () => {
     const data: TBrandingPreferencesFormSchema = {
@@ -572,6 +587,7 @@ export function BrandingPreferencesForm({
               <Trans>Update</Trans>
             </Button>
             <BrandingPreferencesResetDialog
+              disabled={isResetDisabled}
               hasAdvancedBranding={hasAdvancedBranding}
               isSubmitting={form.formState.isSubmitting}
               onReset={handleResetToDefaults}
