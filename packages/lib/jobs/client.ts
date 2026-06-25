@@ -6,7 +6,6 @@ import { SEND_DOCUMENT_COMPLETED_EMAILS_JOB_DEFINITION } from './definitions/ema
 import { SEND_DOCUMENT_CREATED_FROM_DIRECT_TEMPLATE_EMAIL_JOB_DEFINITION } from './definitions/emails/send-document-created-from-direct-template-email';
 import { SEND_DOCUMENT_DELETED_EMAILS_JOB_DEFINITION } from './definitions/emails/send-document-deleted-emails';
 import { SEND_DOCUMENT_PENDING_EMAIL_JOB_DEFINITION } from './definitions/emails/send-document-pending-email';
-import { SEND_DOCUMENT_REMINDER_EMAIL_JOB_DEFINITION } from './definitions/emails/send-document-reminder-email';
 import { SEND_ORGANISATION_LIMIT_ALERT_EMAIL_JOB_DEFINITION } from './definitions/emails/send-organisation-limit-alert-email';
 import { SEND_ORGANISATION_MEMBER_JOINED_EMAIL_JOB_DEFINITION } from './definitions/emails/send-organisation-member-joined-email';
 import { SEND_ORGANISATION_MEMBER_LEFT_EMAIL_JOB_DEFINITION } from './definitions/emails/send-organisation-member-left-email';
@@ -54,7 +53,6 @@ export const jobsClient = new JobClient([
   SEND_DOCUMENT_CANCELLED_EMAILS_JOB_DEFINITION,
   SEND_DOCUMENT_CREATED_FROM_DIRECT_TEMPLATE_EMAIL_JOB_DEFINITION,
   SEND_DOCUMENT_PENDING_EMAIL_JOB_DEFINITION,
-  SEND_DOCUMENT_REMINDER_EMAIL_JOB_DEFINITION,
   SEND_OWNER_RECIPIENT_EXPIRED_EMAIL_JOB_DEFINITION,
   BACKPORT_SUBSCRIPTION_CLAIM_JOB_DEFINITION,
   BULK_SEND_TEMPLATE_JOB_DEFINITION,
