@@ -1,27 +1,24 @@
 import { DocumentPendingEmailTemplate } from '@documenso/email/templates/document-pending';
+import { unsafeBuildEnvelopeIdQuery } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import { msg } from '@lingui/core/macro';
 import { EnvelopeType } from '@prisma/client';
 import { createElement } from 'react';
+import { getI18nInstance } from '../../../client-only/providers/i18n-server';
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
+import { getEmailContext } from '../../../server-only/email/get-email-context';
+import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
+import { isRecipientEmailValidForSending } from '../../../utils/recipients';
+import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
+import type { JobRunIO } from '../../client/_internal/job';
+import type { TSendDocumentPendingEmailJobDefinition } from './send-document-pending-email';
 
-import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
-import type { EnvelopeIdOptions } from '../../utils/envelope';
-import { unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
-import { isRecipientEmailValidForSending } from '../../utils/recipients';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { getEmailContext } from '../email/get-email-context';
+export const run = async ({ payload }: { payload: TSendDocumentPendingEmailJobDefinition; io: JobRunIO }) => {
+  const { envelopeId, recipientId } = payload;
 
-export interface SendPendingEmailOptions {
-  id: EnvelopeIdOptions;
-  recipientId: number;
-}
-
-export const sendPendingEmail = async ({ id, recipientId }: SendPendingEmailOptions) => {
   const envelope = await prisma.envelope.findFirst({
     where: {
-      ...unsafeBuildEnvelopeIdQuery(id, EnvelopeType.DOCUMENT),
+      ...unsafeBuildEnvelopeIdQuery({ type: 'envelopeId', id: envelopeId }, EnvelopeType.DOCUMENT),
       recipients: {
         some: {
           id: recipientId,
@@ -38,12 +35,8 @@ export const sendPendingEmail = async ({ id, recipientId }: SendPendingEmailOpti
     },
   });
 
-  if (!envelope) {
-    throw new Error('Document not found');
-  }
-
-  if (envelope.recipients.length === 0) {
-    throw new Error('Document has no recipients');
+  if (!envelope || envelope.recipients.length === 0) {
+    return;
   }
 
   const { branding, emailLanguage, senderEmail, replyToEmail, emailsDisabled, emailTransport } = await getEmailContext({
