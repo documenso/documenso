@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { OrganisationMemberRole } from '@prisma/client';
 import { z } from 'zod';
 
@@ -14,7 +15,7 @@ import { z } from 'zod';
 export const ZCreateOrganisationGroupRequestSchema = z.object({
   organisationId: z.string(),
   organisationRole: z.nativeEnum(OrganisationMemberRole),
-  name: z.string().max(100),
+  name: z.string().max(100, { message: msg`Cannot be more than 100 characters in length`.id }),
   memberIds: z.array(z.string()),
 });
 
