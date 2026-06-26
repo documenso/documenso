@@ -46,6 +46,7 @@ const updateExternalId = async (surface: TEnvelopeEditorSurface, externalId: str
 
   if (!surface.isEmbedded) {
     await expectToastTextToBeVisible(surface.root, 'Envelope updated');
+    await surface.root.getByTestId('toast-close').click();
   }
 };
 

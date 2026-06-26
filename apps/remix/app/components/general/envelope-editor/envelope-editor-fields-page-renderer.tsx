@@ -49,6 +49,13 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
   const [isFieldChanging, setIsFieldChanging] = useState(false);
   const [pendingFieldCreation, setPendingFieldCreation] = useState<Konva.Rect | null>(null);
 
+  /**
+   * Whether the field was automatically selected on creation (drag-drop or marquee).
+   *
+   * We purposefully supress the floating toolbar for newly created fields.
+   */
+  const [isAutoSelectedField, setIsAutoSelectedField] = useState(false);
+
   const { stage, pageLayer, konvaContainer, scaledViewport, unscaledViewport } = usePageRenderer(
     ({ stage, pageLayer }) => createPageCanvas(stage, pageLayer),
     pageData,
@@ -539,7 +546,7 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
         const fieldGroupToSelect = pageLayer.current.findOne(`#${selectedFormId}`);
 
         if (fieldGroupToSelect instanceof Konva.Group) {
-          setSelectedFields([fieldGroupToSelect]);
+          setSelectedFields([fieldGroupToSelect], { isAutoSelect: true });
         }
       }
     } else if (selectedFormId === null && isSingleCanvasSelection) {
@@ -558,7 +565,11 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     editorFields.selectedField?.formId,
   ]);
 
-  const setSelectedFields = (nodes: Konva.Node[]) => {
+  const setSelectedFields = (nodes: Konva.Node[], options?: { isAutoSelect?: boolean }) => {
+    // Any explicit (user-driven) selection shows the action toolbar; only auto-selection
+    // on field creation suppresses it.
+    setIsAutoSelectedField(Boolean(options?.isAutoSelect));
+
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const fieldGroups = nodes.filter(
       (node) => node.hasName('field-group') && Boolean(node.getStage()) && Boolean(node.getParent()),
@@ -694,25 +705,30 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
 
   return (
     <>
-      {selectedKonvaFieldGroups.length > 0 && interactiveTransformer.current && !isFieldChanging && (
-        <FieldActionButtons
-          handleDuplicateSelectedFields={duplicatedSelectedFields}
-          handleDuplicateSelectedFieldsOnAllPages={duplicatedSelectedFieldsOnAllPages}
-          handleDeleteSelectedFields={deletedSelectedFields}
-          handleChangeRecipient={changeSelectedFieldsRecipients}
-          handleChangeFieldType={changeSelectedFieldsType}
-          selectedFieldFormId={selectedKonvaFieldGroups.map((field) => field.id())}
-          style={{
-            position: 'absolute',
-            top: interactiveTransformer.current.y() + interactiveTransformer.current.getClientRect().height + 5 + 'px',
-            left: interactiveTransformer.current.x() + interactiveTransformer.current.getClientRect().width / 2 + 'px',
-            transform: 'translateX(-50%)',
-            gap: '8px',
-            pointerEvents: 'auto',
-            zIndex: 50,
-          }}
-        />
-      )}
+      {selectedKonvaFieldGroups.length > 0 &&
+        interactiveTransformer.current &&
+        !isFieldChanging &&
+        !isAutoSelectedField && (
+          <FieldActionButtons
+            handleDuplicateSelectedFields={duplicatedSelectedFields}
+            handleDuplicateSelectedFieldsOnAllPages={duplicatedSelectedFieldsOnAllPages}
+            handleDeleteSelectedFields={deletedSelectedFields}
+            handleChangeRecipient={changeSelectedFieldsRecipients}
+            handleChangeFieldType={changeSelectedFieldsType}
+            selectedFieldFormId={selectedKonvaFieldGroups.map((field) => field.id())}
+            style={{
+              position: 'absolute',
+              top:
+                interactiveTransformer.current.y() + interactiveTransformer.current.getClientRect().height + 5 + 'px',
+              left:
+                interactiveTransformer.current.x() + interactiveTransformer.current.getClientRect().width / 2 + 'px',
+              transform: 'translateX(-50%)',
+              gap: '8px',
+              pointerEvents: 'auto',
+              zIndex: 50,
+            }}
+          />
+        )}
 
       {pendingFieldCreation && (
         <div
