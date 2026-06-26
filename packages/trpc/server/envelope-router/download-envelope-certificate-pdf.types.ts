@@ -5,7 +5,7 @@ import type { TrpcRouteMeta } from '../trpc';
 export const downloadEnvelopeCertificatePdfMeta: TrpcRouteMeta = {
   openapi: {
     method: 'GET',
-    path: '/envelope/{envelopeId}/certificate/pdf',
+    path: '/envelope/{envelopeId}/certificate/download',
     summary: 'Download envelope certificate PDF',
     description: 'Download the signing certificate for a completed document as a PDF.',
     tags: ['Envelope'],
