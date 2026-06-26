@@ -23,6 +23,9 @@ const cMapsDir = normalizePath(path.join(pdfjsDistPath, 'cmaps'));
  * Do not configure any envs here.
  */
 export default defineConfig({
+  base: process.env.NEXT_PUBLIC_BASE_PATH
+    ? `${process.env.NEXT_PUBLIC_BASE_PATH.replace(/\/$/, '')}/`
+    : '/',
   css: {
     postcss: {
       plugins: [tailwindcss, autoprefixer],

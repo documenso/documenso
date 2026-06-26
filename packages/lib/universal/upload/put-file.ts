@@ -4,7 +4,7 @@ import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
 import { match } from 'ts-pattern';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL, getBasePath } from '../../constants/app';
 import { AppError } from '../../errors/app-error';
 
 type File = {
@@ -43,7 +43,7 @@ export const putPdfFile = async (file: File, options?: PutFileOptions) => {
 
   formData.append('file', properFile);
 
-  const response = await fetch('/api/files/upload-pdf', {
+  const response = await fetch(`${getBasePath()}/api/files/upload-pdf`, {
     method: 'POST',
     headers: buildUploadAuthHeaders(options),
     body: formData,

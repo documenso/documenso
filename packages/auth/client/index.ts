@@ -36,10 +36,22 @@ type TPasskeySignin = InferRequestType<AuthClientType['passkey']['authorize']['$
 export class AuthClient {
   public client: AuthClientType;
 
-  private signOutredirectPath: string = '/signin';
+  private signOutredirectPath: string;
 
   constructor(options: { baseUrl: string }) {
     this.client = hc<AuthAppType>(options.baseUrl);
+
+    // Derive the sign-out destination from the base URL so apps served under
+    // a sub-path (e.g. /ESign) redirect to <subpath>/signin instead of /signin.
+    let subPath = '';
+
+    try {
+      subPath = new URL(options.baseUrl).pathname.replace(/\/$/, '');
+    } catch {
+      subPath = '';
+    }
+
+    this.signOutredirectPath = `${subPath}/signin`;
   }
 
   public async signOut({ redirectPath }: { redirectPath?: string } = {}) {
