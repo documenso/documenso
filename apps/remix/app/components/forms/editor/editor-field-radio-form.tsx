@@ -178,19 +178,17 @@ export const EditorFieldRadioForm = ({
                             className="h-5 w-5 border-foreground/30 data-[state=checked]:bg-primary"
                             checked={field.value}
                             onCheckedChange={(value) => {
-                              // Uncheck all other values.
+                              const isChecked = Boolean(value);
                               const currentValues = form.getValues('values') || [];
 
-                              if (value) {
-                                const newValues = currentValues.map((val) => ({
-                                  ...val,
-                                  checked: false,
-                                }));
+                              // Compute the full final state in a single write so we never leave
+                              // a window where two options appear checked simultaneously.
+                              const newValues = currentValues.map((val, valIndex) => ({
+                                ...val,
+                                checked: valIndex === index ? isChecked : isChecked ? false : val.checked,
+                              }));
 
-                                form.setValue('values', newValues);
-                              }
-
-                              field.onChange(value);
+                              form.setValue('values', newValues, { shouldValidate: true, shouldDirty: true });
                             }}
                           />
                         </FormControl>
