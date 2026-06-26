@@ -11,7 +11,6 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType, type Recipient } from '@prisma/client';
 import { ChevronLeft } from 'lucide-react';
-import { DateTime } from 'luxon';
 import { Link } from 'react-router';
 
 import { DocumentAuditLogDownloadButton } from '~/components/general/document/document-audit-log-download-button';
@@ -102,15 +101,11 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
     },
     {
       description: msg`Date created`,
-      value: DateTime.fromJSDate(document.createdAt)
-        .setLocale(i18n.locales?.[0] || i18n.locale)
-        .toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS),
+      value: i18n.date(document.createdAt, { dateStyle: 'medium', timeStyle: 'medium' }),
     },
     {
       description: msg`Last updated`,
-      value: DateTime.fromJSDate(document.updatedAt)
-        .setLocale(i18n.locales?.[0] || i18n.locale)
-        .toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS),
+      value: i18n.date(document.updatedAt, { dateStyle: 'medium', timeStyle: 'medium' }),
     },
     {
       description: msg`Time zone`,
