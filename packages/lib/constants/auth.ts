@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import MailChecker from 'mailchecker';
 import { z } from 'zod';
 
@@ -14,10 +15,10 @@ export const URL_PATTERN = /https?:\/\/|www\./i;
 export const ZNameSchema = z
   .string()
   .trim()
-  .min(3, { message: 'Please enter a valid name.' })
-  .max(255, { message: 'Name cannot be more than 255 characters.' })
+  .min(3, { message: msg`Please enter a valid name.`.id })
+  .max(255, { message: msg`Name cannot be more than 255 characters.`.id })
   .refine((value) => !URL_PATTERN.test(value), {
-    message: 'Name cannot contain URLs.',
+    message: msg`Name cannot contain URLs.`.id,
   });
 
 export const IDENTITY_PROVIDER_NAME: Record<string, string> = {
