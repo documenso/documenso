@@ -8,10 +8,11 @@ import { ZSignatureLevelSchema } from '../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { nanoid, prefixedId } from '../../universal/id';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { getRecipientSigningOrder } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-id';
-import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
+import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export interface DuplicateEnvelopeOptions {
@@ -190,7 +191,7 @@ export const duplicateEnvelope = async ({ id, userId, teamId, overrides }: Dupli
             email: recipient.email,
             name: recipient.name,
             role: recipient.role,
-            signingOrder: recipient.signingOrder,
+            signingOrder: getRecipientSigningOrder(recipient),
             token: nanoid(),
             fields: includeFields
               ? {

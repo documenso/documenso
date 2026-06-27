@@ -7,8 +7,9 @@ import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 import { useId } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
-import { prop, sortBy } from 'remeda';
 import { z } from 'zod';
+
+import { isCcRecipient, normalizeRecipientSigningOrders, sortRecipientsForSigningOrder } from '../../utils/recipients';
 
 const LocalRecipientSchema = z.object({
   formId: z.string().min(1),
@@ -94,13 +95,13 @@ export const useEditorRecipients = ({ envelope }: EditorRecipientsProps): UseEdi
       name: recipient.name,
       email: recipient.email,
       role: recipient.role,
-      signingOrder: recipient.signingOrder ?? index + 1,
+      signingOrder: isCcRecipient(recipient) ? undefined : (recipient.signingOrder ?? index + 1),
       actionAuth: ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? undefined,
     }));
 
     const signers: TLocalRecipient[] =
       formRecipients.length > 0
-        ? sortBy(formRecipients, [prop('signingOrder'), 'asc'], [prop('id'), 'asc'])
+        ? normalizeRecipientSigningOrders(sortRecipientsForSigningOrder(formRecipients))
         : [
             {
               formId: initialId,

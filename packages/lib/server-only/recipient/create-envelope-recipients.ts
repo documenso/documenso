@@ -9,7 +9,7 @@ import { EnvelopeType, RecipientRole, SendStatus, SigningStatus } from '@prisma/
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
-import { mapRecipientToLegacyRecipient } from '../../utils/recipients';
+import { getRecipientSigningOrder, mapRecipientToLegacyRecipient } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
@@ -112,7 +112,7 @@ export const createEnvelopeRecipients = async ({
             name: recipient.name,
             email: recipient.email,
             role: recipient.role,
-            signingOrder: recipient.signingOrder,
+            signingOrder: getRecipientSigningOrder(recipient),
             token: nanoid(),
             sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
             signingStatus: recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
