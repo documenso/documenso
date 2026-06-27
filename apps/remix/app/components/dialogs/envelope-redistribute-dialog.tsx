@@ -68,11 +68,25 @@ export const EnvelopeRedistributeDialog = ({ envelope, trigger }: EnvelopeRedist
 
   const onFormSubmit = async ({ recipients }: TEnvelopeRedistributeFormSchema) => {
     try {
-      await redistributeEnvelope({ envelopeId: envelope.id, recipients });
+      const updatedEnvelope = await redistributeEnvelope({ envelopeId: envelope.id, recipients });
+
+      const selectedRecipientCount = recipients.length;
+      const resentRecipientCount = updatedEnvelope.recipients.filter((recipient) =>
+        recipients.includes(recipient.id),
+      ).length;
+      const failedRecipientCount = Math.max(selectedRecipientCount - resentRecipientCount, 0);
+      const allSelectedRecipientsFailed = selectedRecipientCount > 0 && resentRecipientCount === 0;
+
+      if (allSelectedRecipientsFailed) {
+        throw new AppError('DOCUMENT_SEND_FAILED');
+      }
 
       toast({
-        title: t`Envelope resent`,
-        description: t`Your envelope has been resent successfully.`,
+        title: failedRecipientCount > 0 ? t`Envelope partially resent` : t`Envelope resent`,
+        description:
+          failedRecipientCount > 0
+            ? t`${resentRecipientCount} reminder(s) sent, ${failedRecipientCount} failed.`
+            : t`Your envelope has been resent successfully.`,
         duration: 5000,
       });
 

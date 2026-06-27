@@ -397,7 +397,8 @@ test.describe('document editor', () => {
     await page.getByLabel(failingRecipientEmail).check();
     await page.getByRole('button', { name: 'Send reminder' }).click();
 
-    await expectToastTextToBeVisible(page, 'Envelope resent');
+    await expectToastTextToBeVisible(page, 'Envelope partially resent');
+    await expectToastTextToBeVisible(page, '1 reminder(s) sent, 1 failed.');
   });
 
   test('duplicate document', async ({ page }) => {
