@@ -5,7 +5,7 @@
     "apps/*",
     "packages/*"
   ],
-  "version": "2.13.0",
+  "version": "2.14.0",
   "scripts": {
     "postinstall": "patch-package",
     "build": "turbo run build",
@@ -35,7 +35,6 @@
     "with:env": "dotenv -e .env -e .env.local --",
     "reset:hard": "npm run clean && npm i && npm run prisma:generate",
     "precommit": "npm install && git add package.json package-lock.json",
-    "trigger:dev": "npm run with:env -- npx trigger-cli dev --handler-path=\"/api/jobs\"",
     "inngest:dev": "inngest dev -u http://localhost:3000/api/jobs",
     "make:version": "npm version --workspace @documenso/remix --include-workspace-root --no-git-tag-version -m \"v%s\"",
     "translate": "npm run translate:extract && npm run translate:compile",
