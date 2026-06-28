@@ -8,8 +8,9 @@ import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
-import { mapSecondaryIdToDocumentId, unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
+import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { isMemberManagerOrAbove } from '../../utils/teams';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { getMemberRoles } from '../team/get-member-roles';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -22,9 +23,18 @@ export type CancelDocumentOptions = {
 };
 
 export const cancelDocument = async ({ id, userId, teamId, reason, requestMetadata }: CancelDocumentOptions) => {
-  // Note: This is an unsafe request, we validate the ownership/permission later in the function.
-  const envelope = await prisma.envelope.findUnique({
-    where: unsafeBuildEnvelopeIdQuery(id, EnvelopeType.DOCUMENT),
+  // Resolve the envelope through the visibility-aware helper so the caller must
+  // have read access (ownership OR team membership with sufficient visibility OR
+  // team-email). This prevents cancelling a document the caller cannot see.
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id,
+    userId,
+    teamId,
+    type: EnvelopeType.DOCUMENT,
+  });
+
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       recipients: true,
       documentMeta: true,
@@ -48,16 +58,6 @@ export const cancelDocument = async ({ id, userId, teamId, reason, requestMetada
   })
     .then((roles) => roles.teamRole)
     .catch(() => null);
-
-  const isUserTeamMember = teamRole !== null;
-
-  // Callers with no relationship to the document must not be able to determine
-  // whether it exists, so respond as if it was not found.
-  if (!isUserOwner && !isUserTeamMember) {
-    throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Document not found',
-    });
-  }
 
   const isPrivilegedTeamMember = teamRole && isMemberManagerOrAbove(teamRole);
 
