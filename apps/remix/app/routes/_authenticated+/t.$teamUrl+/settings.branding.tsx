@@ -1,14 +1,17 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
+import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import type { SanitizeBrandingCssWarning } from '@documenso/lib/utils/sanitize-branding-css';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
+import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { plural } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
 import { useState } from 'react';
+import { Link } from 'react-router';
 
 import {
   BrandingPreferencesForm,
@@ -35,6 +38,8 @@ export default function TeamsSettingsPage() {
   });
 
   const { mutateAsync: updateTeamSettings } = trpc.team.settings.update.useMutation();
+
+  const canConfigureBranding = organisation.organisationClaim.flags.allowCustomBranding || !IS_BILLING_ENABLED();
 
   const canCustomBranding =
     organisation.organisationClaim.flags.embedSigningWhiteLabel === true || !IS_BILLING_ENABLED();
@@ -112,39 +117,61 @@ export default function TeamsSettingsPage() {
         subtitle={t`Here you can set preferences and defaults for branding.`}
       />
 
-      <section>
-        <BrandingPreferencesForm
-          canInherit={true}
-          hasAdvancedBranding={canCustomBranding}
-          context="Team"
-          settings={teamWithSettings.teamSettings}
-          onFormSubmit={onBrandingPreferencesFormSubmit}
-        />
+      {canConfigureBranding ? (
+        <section>
+          <BrandingPreferencesForm
+            canInherit={true}
+            hasAdvancedBranding={canCustomBranding}
+            context="Team"
+            settings={teamWithSettings.teamSettings}
+            onFormSubmit={onBrandingPreferencesFormSubmit}
+          />
 
-        {cssWarnings.length > 0 && (
-          <Alert variant="warning" className="mt-6">
+          {cssWarnings.length > 0 && (
+            <Alert variant="warning" className="mt-6">
+              <AlertTitle>
+                <Trans>CSS rules were dropped during sanitisation</Trans>
+              </AlertTitle>
+
+              <AlertDescription>
+                <ul className="list-disc pl-5">
+                  {cssWarnings.map((warning, index) => (
+                    <li key={index}>
+                      {warning.detail}
+                      {warning.line !== undefined && (
+                        <span className="text-muted-foreground">
+                          {' '}
+                          <Trans>(line {warning.line})</Trans>
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
+          )}
+        </section>
+      ) : (
+        <Alert className="mt-8 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
+          <div className="mb-4 sm:mb-0">
             <AlertTitle>
-              <Trans>CSS rules were dropped during sanitisation</Trans>
+              <Trans>Branding Preferences</Trans>
             </AlertTitle>
 
-            <AlertDescription>
-              <ul className="list-disc pl-5">
-                {cssWarnings.map((warning, index) => (
-                  <li key={index}>
-                    {warning.detail}
-                    {warning.line !== undefined && (
-                      <span className="text-muted-foreground">
-                        {' '}
-                        <Trans>(line {warning.line})</Trans>
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ul>
+            <AlertDescription className="mr-2">
+              <Trans>Currently branding can only be configured for Teams and above plans.</Trans>
             </AlertDescription>
-          </Alert>
-        )}
-      </section>
+          </div>
+
+          {canExecuteOrganisationAction('MANAGE_BILLING', organisation.currentOrganisationRole) && (
+            <Button asChild variant="outline">
+              <Link to={`/o/${organisation.url}/settings/billing`}>
+                <Trans>Update Billing</Trans>
+              </Link>
+            </Button>
+          )}
+        </Alert>
+      )}
     </div>
   );
 }
