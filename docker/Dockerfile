@@ -107,8 +107,6 @@ USER nodejs
 WORKDIR /app
 
 COPY --from=builder --chown=nodejs:nodejs /app/out/json/ .
-# Copy the tailwind config files across
-COPY --from=builder --chown=nodejs:nodejs /app/out/full/packages/tailwind-config ./packages/tailwind-config
 # Copy the patches across
 COPY --from=builder --chown=nodejs:nodejs /app/patches ./patches
 

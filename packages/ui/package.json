@@ -15,7 +15,6 @@
     "clean": "rimraf node_modules"
   },
   "devDependencies": {
-    "@documenso/tailwind-config": "*",
     "@documenso/tsconfig": "*",
     "@types/luxon": "^3.7.1",
     "@types/react": "18.3.27",
