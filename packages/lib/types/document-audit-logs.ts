@@ -560,12 +560,24 @@ export const ZDocumentAuditLogEventDocumentRecipientCompleteSchema = z.object({
 });
 
 /**
- * Event: Document recipient completed the document (the recipient has fully actioned and completed their required steps for the document).
+ * Event: Document recipient rejected the document.
  */
 export const ZDocumentAuditLogEventDocumentRecipientRejectedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED),
   data: ZBaseRecipientDataSchema.extend({
     reason: z.string(),
+    /**
+     * Whether the rejection was recorded externally on behalf of the recipient
+     * via the API, rather than by the recipient directly on the platform.
+     */
+    isExternal: z.boolean().optional(),
+    /**
+     * The team member the external rejection was recorded on behalf of, when
+     * the API caller elected a specific member to attribute the action to.
+     * Absent when the rejection is attributed to the API user/token itself.
+     */
+    onBehalfOfUserEmail: z.string().optional(),
+    onBehalfOfUserName: z.string().nullable().optional(),
   }),
 });
 
