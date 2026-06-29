@@ -1,5 +1,15 @@
 @import "@documenso/ui/styles/theme.css";
 
+/* Content sources: this app plus the shared `ui` and `email` packages it renders. */
+@source "./**/*.{ts,tsx}";
+@source "../../../packages/ui/primitives/**/*.{ts,tsx}";
+@source "../../../packages/ui/components/**/*.{ts,tsx}";
+@source "../../../packages/ui/icons/**/*.{ts,tsx}";
+@source "../../../packages/ui/lib/**/*.{ts,tsx}";
+@source "../../../packages/email/templates/**/*.{ts,tsx}";
+@source "../../../packages/email/template-components/**/*.{ts,tsx}";
+@source "../../../packages/email/providers/**/*.{ts,tsx}";
+
 /* Inter Variable Fonts */
 @font-face {
   font-family: "Inter";
@@ -64,8 +74,9 @@
 
 @layer base {
   :root {
-    --font-sans: "Inter";
-    --font-signature: "Caveat";
-    --font-noto: "Noto Sans", "Noto Sans Korean", "Noto Sans Japanese", "Noto Sans Chinese";
+    /* Consumed by the `--font-*` theme tokens in @documenso/ui/styles/theme.css. */
+    --font-family-sans: "Inter";
+    --font-family-signature: "Caveat";
+    --font-family-noto: "Noto Sans", "Noto Sans Korean", "Noto Sans Japanese", "Noto Sans Chinese";
   }
 }

@@ -1,15 +1,17 @@
 /* biome-ignore-all lint/suspicious/noDuplicateProperties: twv3-space-* lists both --value(number) and --value([length]) forms; v4 keeps only one per class. */
 
+/* Shared theme. Apps declare their own `@source` file globs in their CSS entry. */
 @import "tailwindcss";
 
-@config "../tailwind.config.cjs";
+@plugin "tailwindcss-animate";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark:not(.dark-mode-disabled) *));
 
-/* `print:` variant; defining it as a JS `screen` breaks the `container` utility under v4. */
+/* `print:` as a screen would break the `container` utility under v4. */
 @custom-variant print (@media print);
 
-/* Safelist for the runtime recipient color classes (v4 ignores the JS config `safelist`). */
+/* Recipient color safelist (built dynamically at runtime). */
 @source inline("{ring,bg,border,text}-recipient-{green,blue,purple,orange,yellow,pink}");
 @source inline("hover:bg-recipient-{green,blue,purple,orange,yellow,pink}/{15,30}");
 @source inline("active:bg-recipient-{green,blue,purple,orange,yellow,pink}/15");
@@ -17,17 +19,163 @@
 @source inline("group-hover:text-recipient-{green,blue,purple,orange,yellow,pink}");
 @source inline("group-hover/field-item:bg-recipient-{green,blue,purple,orange,yellow,pink}");
 
-/* Restore the v3 `ring` defaults (v4 changed them to 1px / currentColor). */
 @theme {
+  /* Restore v3 `ring` defaults (v4 uses 1px / currentColor). */
   --default-ring-width: 3px;
   --default-ring-color: hsl(var(--ring));
+
+  /* Families are injected at runtime via `--font-family-*` (see the app entry). */
+  --font-sans:
+    var(--font-family-sans), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
+  --font-signature: var(--font-family-signature);
+  --font-noto: var(--font-family-noto);
+
+  --breakpoint-3xl: 1920px;
+  --breakpoint-4xl: 2560px;
+  --breakpoint-5xl: 3840px;
+
+  --aspect-signature-pad: 16 / 7;
+
+  --radius: 0.5rem;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 2px);
+  --radius-2xl: calc(var(--radius) + 4px);
+
+  /* Themed colors (driven by the runtime HSL vars below). */
+  --color-border: hsl(var(--border));
+  --color-field-border: hsl(var(--field-border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-envelope-editor-background: hsl(var(--envelope-editor-background));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-warning: hsl(var(--warning));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-field-card: hsl(var(--field-card));
+  --color-field-card-border: hsl(var(--field-card-border));
+  --color-field-card-foreground: hsl(var(--field-card-foreground));
+
+  --color-widget: hsl(var(--widget));
+  --color-widget-foreground: hsl(var(--widget-foreground));
+
+  /* Static brand palettes */
+  --color-documenso: #a2e771;
+  --color-documenso-50: #ffffff;
+  --color-documenso-100: #fdfffd;
+  --color-documenso-200: #e7f9da;
+  --color-documenso-300: #d0f3b7;
+  --color-documenso-400: #b9ed94;
+  --color-documenso-500: #a2e771;
+  --color-documenso-600: #83df41;
+  --color-documenso-700: #66c622;
+  --color-documenso-800: #4d9619;
+  --color-documenso-900: #356611;
+  --color-documenso-950: #284e0d;
+
+  --color-dawn: #aaa89f;
+  --color-dawn-50: #f8f8f8;
+  --color-dawn-100: #f1f1ef;
+  --color-dawn-200: #e6e5e2;
+  --color-dawn-300: #d4d3cd;
+  --color-dawn-400: #b9b7b0;
+  --color-dawn-500: #aaa89f;
+  --color-dawn-600: #88857a;
+  --color-dawn-700: #706e65;
+  --color-dawn-800: #5f5d55;
+  --color-dawn-900: #52514a;
+  --color-dawn-950: #2a2925;
+
+  --color-water: #d7e4f3;
+  --color-water-50: #f3f6fb;
+  --color-water-100: #e3ebf6;
+  --color-water-200: #d7e4f3;
+  --color-water-300: #abc7e5;
+  --color-water-400: #82abd8;
+  --color-water-500: #658ecc;
+  --color-water-600: #5175bf;
+  --color-water-700: #4764ae;
+  --color-water-800: #3e538f;
+  --color-water-900: #364772;
+  --color-water-950: #252d46;
+
+  --color-recipient-green: hsl(var(--recipient-green));
+  --color-recipient-blue: hsl(var(--recipient-blue));
+  --color-recipient-purple: hsl(var(--recipient-purple));
+  --color-recipient-orange: hsl(var(--recipient-orange));
+  --color-recipient-yellow: hsl(var(--recipient-yellow));
+  --color-recipient-pink: hsl(var(--recipient-pink));
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-caret-blink: caret-blink 1.25s ease-out infinite;
 }
 
-/*
- * v3-compatible `space-*` utilities. v4's built-in `space-*` uses a zero-specificity
- * `:where()` selector that lets child margins collapse the gaps; these reproduce the v3
- * selector/edges so existing layouts keep working. Pair with `twv3-space-{x,y}-reverse`.
- */
+@utility z-9999 {
+  z-index: 9999;
+}
+
+/* Bare `rounded` differs from `--radius`, so it can't be a theme token. */
+@utility rounded {
+  border-radius: calc(var(--radius) - 3px);
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@keyframes caret-blink {
+  0%,
+  70%,
+  100% {
+    opacity: 1;
+  }
+  20%,
+  50% {
+    opacity: 0;
+  }
+}
+
+/* v3-compatible `space-*`; v4's built-in uses a `:where()` selector that collapses gaps. */
 @utility twv3-space-y-* {
   & > :not([hidden]) ~ :not([hidden]) {
     --tw-space-y-reverse: 0;
@@ -48,7 +196,6 @@
   }
 }
 
-/* Reverse companions for the twv3-space-* utilities above (built-in ones use a different selector). */
 @utility twv3-space-y-reverse {
   & > :not([hidden]) ~ :not([hidden]) {
     --tw-space-y-reverse: 1;
@@ -271,14 +418,7 @@
   }
 }
 
-/*
- * Custom CSS for printing reports
- * - Sets page margins to 0.5 inches
- * - Hides the header and footer
- * - Hides the print button
- * - Sets page size to A4
- * - Sets the font size to 12pt
- */
+/* Print page setup for reports. */
 @page {
   margin: 1in;
   size: A4;
@@ -311,21 +451,6 @@
   display: none;
 }
 
-/* .custom-scrollbar::-webkit-scrollbar-track {
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgb(100 116 139 / 1);
-  border-radius: 10px;
-  width: 8px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgb(100 116 139 / 0.5);
-} */
-
-/* Custom Swagger Dark Theme */
 .swagger-dark-theme .swagger-ui {
   filter: invert(88%) hue-rotate(180deg);
 }

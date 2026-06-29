@@ -18,8 +18,7 @@
       "@documenso/lib": ["../../packages/lib"],
       "@documenso/prisma": ["../../packages/prisma"],
       "@documenso/trpc": ["../../packages/trpc"],
-      "@documenso/ui": ["../../packages/ui"],
-      "@documenso/tailwind-config": ["../../packages/tailwind-config"]
+      "@documenso/ui": ["../../packages/ui"]
     },
     "esModuleInterop": true,
     "verbatimModuleSyntax": true,

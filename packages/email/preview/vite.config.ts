@@ -12,14 +12,12 @@ import tsconfigPaths from 'vite-tsconfig-paths';
  *
  * Emails render server-side through the real `renderEmailWithI18N` pipeline
  * (see `app/routes/preview.tsx`), so the SSR config mirrors the main Remix app:
- * Prisma, the tailwind config, and native modules stay external.
+ * Prisma and native modules stay external.
  */
 export default defineConfig({
   root: __dirname,
   css: {
     postcss: {
-      // The JS config is loaded via `@config` in app/app.css (v4 no longer
-      // auto-detects it or accepts a path argument here).
       plugins: [tailwindcss()],
     },
   },
@@ -49,7 +47,6 @@ export default defineConfig({
       '@napi-rs/canvas',
       '@node-rs/bcrypt',
       '@prisma/client',
-      '@documenso/tailwind-config',
       'playwright',
       'playwright-core',
       '@playwright/browser-chromium',
