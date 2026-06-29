@@ -13,7 +13,7 @@ import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { type EnvelopeIdOptions, unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
 import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { getEmailContext } from '../email/get-email-context';
-import { getMemberRoles } from '../team/get-member-roles';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type DeleteDocumentOptions = {
@@ -36,7 +36,9 @@ export const deleteDocument = async ({ id, userId, teamId, requestMetadata }: De
     });
   }
 
-  // Note: This is an unsafe request, we validate the ownership later in the function.
+  // Note: This is an unsafe request. It is used purely to resolve the recipient
+  // self-hide path below. The authoritative delete authorization is performed
+  // via the visibility-aware `getEnvelopeWhereInput` helper.
   const envelope = await prisma.envelope.findUnique({
     where: unsafeBuildEnvelopeIdQuery(id, EnvelopeType.DOCUMENT),
     include: {
@@ -51,27 +53,36 @@ export const deleteDocument = async ({ id, userId, teamId, requestMetadata }: De
     });
   }
 
-  const isUserTeamMember = await getMemberRoles({
-    teamId: envelope.teamId,
-    reference: {
-      type: 'User',
-      id: userId,
-    },
+  // Determine whether the user has authorized delete access using the
+  // visibility-aware helper. This enforces ownership OR (team membership AND
+  // the document's visibility is permitted for the member's role) OR team-email
+  // access. A bare team member without sufficient visibility will resolve to
+  // null here and therefore must not be able to delete the document.
+  const hasDeleteAccess = await getEnvelopeWhereInput({
+    id,
+    userId,
+    teamId,
+    type: EnvelopeType.DOCUMENT,
   })
-    .then(() => true)
+    .then(({ envelopeWhereInput }) =>
+      prisma.envelope.findFirst({
+        where: envelopeWhereInput,
+        select: { id: true },
+      }),
+    )
+    .then((result) => Boolean(result))
     .catch(() => false);
 
-  const isUserOwner = envelope.userId === userId;
   const userRecipient = envelope.recipients.find((recipient) => recipient.email === user.email);
 
-  if (!isUserOwner && !isUserTeamMember && !userRecipient) {
+  if (!hasDeleteAccess && !userRecipient) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'Not allowed',
     });
   }
 
   // Handle hard or soft deleting the actual document if user has permission.
-  if (isUserOwner || isUserTeamMember) {
+  if (hasDeleteAccess) {
     await handleDocumentOwnerDelete({
       envelope,
       user,
