@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { fontFamily } = require('tailwindcss/defaultTheme');
-const { default: flattenColorPalette } = require('tailwindcss/lib/util/flattenColorPalette');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: ['variant', '&:is(.dark:not(.dark-mode-disabled) *)'],
+  // `dark:` is driven by `@custom-variant dark` in theme.css; the JS `darkMode` key is ignored under v4.
   content: ['src/**/*.{ts,tsx}'],
   theme: {
     extend: {
@@ -118,10 +117,6 @@ module.exports = {
           pink: 'hsl(var(--recipient-pink))',
         },
       },
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-      },
       borderRadius: {
         DEFAULT: 'calc(var(--radius) - 3px)',
         '2xl': 'calc(var(--radius) + 4px)',
@@ -153,23 +148,15 @@ module.exports = {
         '3xl': '1920px',
         '4xl': '2560px',
         '5xl': '3840px',
-        print: { raw: 'print' },
+        // `print` is defined as `@custom-variant print` in theme.css, not here:
+        // a `screens` entry would break the `container` utility under v4.
       },
     },
   },
   plugins: [
     require('tailwindcss-animate'),
     require('@tailwindcss/typography'),
-    require('@tailwindcss/container-queries'),
-    addVariablesForColors,
+    // container-queries and the old `addVariablesForColors` plugin were dropped:
+    // the former is built into v4 core, the latter broke the themed `--*` color vars.
   ],
 };
-
-function addVariablesForColors({ addBase, theme }) {
-  const allColors = flattenColorPalette(theme('colors'));
-  const newVars = Object.fromEntries(Object.entries(allColors).map(([key, val]) => [`--${key}`, val]));
-
-  addBase({
-    ':root': newVars,
-  });
-}

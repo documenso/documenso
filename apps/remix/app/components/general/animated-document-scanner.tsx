@@ -45,12 +45,12 @@ export const AnimatedDocumentScanner = ({ className, interval = 2500 }: Animated
             className="absolute top-0 left-0 h-full w-[calc(50%)] origin-right overflow-hidden rounded-l-md border border-border bg-card shadow-md"
             style={{ transform: 'rotateY(15deg) skewY(-1deg)' }}
           >
-            <div className="absolute inset-3 space-y-2">
-              <div className="h-1.5 w-3/4 rounded-sm bg-muted" />
-              <div className="h-1.5 w-full rounded-sm bg-muted" />
-              <div className="h-1.5 w-5/6 rounded-sm bg-muted" />
-              <div className="h-1.5 w-2/3 rounded-sm bg-muted" />
-              <div className="mt-3 h-6 w-3/4 rounded border border-primary border-dashed" />
+            <div className="twv3-space-y-2 absolute inset-3">
+              <div className="h-1.5 w-3/4 rounded-xs bg-muted" />
+              <div className="h-1.5 w-full rounded-xs bg-muted" />
+              <div className="h-1.5 w-5/6 rounded-xs bg-muted" />
+              <div className="h-1.5 w-2/3 rounded-xs bg-muted" />
+              <div className="mt-3 h-6 w-3/4 rounded-sm border border-primary border-dashed" />
             </div>
           </div>
 
@@ -59,12 +59,12 @@ export const AnimatedDocumentScanner = ({ className, interval = 2500 }: Animated
             className="absolute top-0 right-0 h-full w-[calc(50%)] origin-left overflow-hidden rounded-r-md border border-border bg-card shadow-md"
             style={{ transform: 'rotateY(-15deg) skewY(1deg)' }}
           >
-            <div className="absolute inset-3 space-y-2">
-              <div className="h-1.5 w-full rounded-sm bg-muted" />
-              <div className="h-1.5 w-4/5 rounded-sm bg-muted" />
-              <div className="h-1.5 w-full rounded-sm bg-muted" />
-              <div className="h-1.5 w-3/5 rounded-sm bg-muted" />
-              <div className="mt-3 h-6 w-2/3 rounded border border-primary border-dashed" />
+            <div className="twv3-space-y-2 absolute inset-3">
+              <div className="h-1.5 w-full rounded-xs bg-muted" />
+              <div className="h-1.5 w-4/5 rounded-xs bg-muted" />
+              <div className="h-1.5 w-full rounded-xs bg-muted" />
+              <div className="h-1.5 w-3/5 rounded-xs bg-muted" />
+              <div className="mt-3 h-6 w-2/3 rounded-sm border border-primary border-dashed" />
             </div>
           </div>
         </div>

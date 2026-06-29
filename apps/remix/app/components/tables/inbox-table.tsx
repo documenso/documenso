@@ -140,14 +140,14 @@ export const InboxTable = () => {
               </TableCell>
               <TableCell className="py-4">
                 <div className="flex w-full flex-row items-center">
-                  <Skeleton className="h-10 w-10 flex-shrink-0 rounded-full" />
+                  <Skeleton className="h-10 w-10 shrink-0 rounded-full" />
                 </div>
               </TableCell>
               <TableCell>
                 <Skeleton className="h-4 w-20 rounded-full" />
               </TableCell>
               <TableCell>
-                <Skeleton className="h-10 w-24 rounded" />
+                <Skeleton className="h-10 w-24 rounded-sm" />
               </TableCell>
             </>
           ),

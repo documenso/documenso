@@ -158,7 +158,7 @@ export const ConfigureDocumentUpload = ({ isSubmitting = false }: ConfigureDocum
                         />
 
                         <div
-                          className={cn('flex flex-col space-y-1', {
+                          className={cn('twv3-space-y-1 flex flex-col', {
                             'text-primary': isDragActive,
                             'text-muted-foreground': !isDragActive,
                           })}

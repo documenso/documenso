@@ -1,6 +1,7 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* v4 no longer auto-detects the JS config; load the standalone preview config. */
+@config "../tailwind.config.cjs";
 
 html,
 body {

@@ -315,7 +315,7 @@ const FieldItemInner = ({
               'flex h-5 w-5 flex-col items-center justify-center rounded-r-md font-bold text-[0.5rem] text-white opacity-0 transition duration-200 group-hover/field-item:opacity-100',
               signerStyles.fieldItemInitials,
               {
-                '!opacity-50': disabled || passive,
+                'opacity-50!': disabled || passive,
               },
             )}
           >
@@ -324,7 +324,7 @@ const FieldItemInner = ({
         </div>
 
         {isDevMode && (
-          <div className="absolute bottom-full left-1/2 z-50 mb-1 -translate-x-1/2 rounded-md border border-border bg-background/95 px-2 py-1 shadow-sm backdrop-blur-sm">
+          <div className="absolute bottom-full left-1/2 z-50 mb-1 -translate-x-1/2 rounded-md border border-border bg-background/95 px-2 py-1 shadow-xs backdrop-blur-xs">
             <div className="flex flex-col gap-0.5 text-[9px]">
               {field.nativeId && (
                 <span>
@@ -375,7 +375,7 @@ const FieldItemInner = ({
             {advancedField && (
               <button
                 title={_(msg`Advanced settings`)}
-                className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+                className="rounded-xs p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
                 onClick={onAdvancedSettings}
                 onTouchEnd={onAdvancedSettings}
               >
@@ -385,7 +385,7 @@ const FieldItemInner = ({
 
             <button
               title={_(msg`Duplicate`)}
-              className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+              className="rounded-xs p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
               onClick={onDuplicate}
               onTouchEnd={onDuplicate}
             >
@@ -394,7 +394,7 @@ const FieldItemInner = ({
 
             <button
               title={_(msg`Duplicate on all pages`)}
-              className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+              className="rounded-xs p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
               onClick={onDuplicateAllPages}
               onTouchEnd={onDuplicateAllPages}
             >
@@ -403,7 +403,7 @@ const FieldItemInner = ({
 
             <button
               title={_(msg`Remove`)}
-              className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+              className="rounded-xs p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
               onClick={onRemove}
               onTouchEnd={onRemove}
             >

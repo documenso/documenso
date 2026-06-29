@@ -579,7 +579,7 @@ export const EnvelopeEditorRecipientForm = () => {
           </CardDescription>
         </div>
 
-        <div className="flex flex-row items-center space-x-2">
+        <div className="twv3-space-x-2 flex flex-row items-center">
           {editorConfig.recipients?.allowAIDetection && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -644,7 +644,7 @@ export const EnvelopeEditorRecipientForm = () => {
 
         <Form {...form}>
           <div
-            className={cn('-mt-2 mb-2 space-y-4 rounded-md bg-accent/50 p-4', {
+            className={cn('twv3-space-y-4 -mt-2 mb-2 rounded-md bg-accent/50 p-4', {
               hidden:
                 !editorConfig.recipients?.allowConfigureSigningOrder && !organisation.organisationClaim.flags.cfr21,
             })}
@@ -671,7 +671,7 @@ export const EnvelopeEditorRecipientForm = () => {
                 control={form.control}
                 name="signingOrder"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                  <FormItem className="twv3-space-x-2 twv3-space-y-0 flex flex-row items-center">
                     <FormControl>
                       <Checkbox
                         {...field}
@@ -728,7 +728,7 @@ export const EnvelopeEditorRecipientForm = () => {
                 control={form.control}
                 name="allowDictateNextSigner"
                 render={({ field: { value, ...field } }) => (
-                  <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                  <FormItem className="twv3-space-x-2 twv3-space-y-0 flex flex-row items-center">
                     <FormControl>
                       <Checkbox
                         {...field}
@@ -825,13 +825,13 @@ export const EnvelopeEditorRecipientForm = () => {
                                     name={`signers.${index}.signingOrder`}
                                     render={({ field }) => (
                                       <FormItem
-                                        className={cn('mt-auto flex items-center gap-x-1 space-y-0', {
+                                        className={cn('twv3-space-y-0 mt-auto flex items-center gap-x-1', {
                                           'mb-6':
                                             form.formState.errors.signers?.[index] &&
                                             !form.formState.errors.signers[index]?.signingOrder,
                                         })}
                                       >
-                                        <GripVerticalIcon className="h-5 w-5 flex-shrink-0 opacity-40" />
+                                        <GripVerticalIcon className="h-5 w-5 shrink-0 opacity-40" />
                                         <FormControl>
                                           <Input
                                             type="number"

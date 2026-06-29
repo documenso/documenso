@@ -27,7 +27,7 @@ export default function AdminSiteSettingsPage({ loaderData }: Route.ComponentPro
     <div>
       <SettingsHeader title={_(msg`Site Settings`)} subtitle={_(msg`Manage your site settings here`)} />
 
-      <div className="mt-8 space-y-12">
+      <div className="twv3-space-y-12 mt-8">
         <AdminSiteBannerSection banner={banner} />
 
         <AdminEmailBlocklistSection emailBlocklist={emailBlocklist} />

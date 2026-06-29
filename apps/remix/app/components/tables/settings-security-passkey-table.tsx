@@ -107,9 +107,9 @@ export const SettingsSecurityPasskeyTable = () => {
               <Skeleton className="h-4 w-12 rounded-full" />
             </TableCell>
             <TableCell>
-              <div className="flex flex-row space-x-2">
-                <Skeleton className="h-8 w-16 rounded" />
-                <Skeleton className="h-8 w-16 rounded" />
+              <div className="twv3-space-x-2 flex flex-row">
+                <Skeleton className="h-8 w-16 rounded-sm" />
+                <Skeleton className="h-8 w-16 rounded-sm" />
               </div>
             </TableCell>
           </>

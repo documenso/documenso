@@ -105,7 +105,7 @@ export const FolderUpdateDialog = ({ folder, isOpen, onOpenChange }: FolderUpdat
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onFormSubmit)} className="twv3-space-y-4">
             <FormField
               control={form.control}
               name="name"

@@ -28,7 +28,7 @@ export const RateLimitArrayInput = ({ value, onChange, disabled }: RateLimitArra
   };
 
   return (
-    <div className="space-y-2">
+    <div className="twv3-space-y-2">
       {entries.map((entry, index) => (
         <div key={index} className="flex items-center gap-2">
           <Input

@@ -78,7 +78,7 @@ export const EnvelopeItemTitleInput = ({
         disabled={disabled}
         style={{ width: `${inputWidth}px`, maxWidth: '100%' }}
         className={cn(
-          'max-w-full rounded-sm border-0 bg-transparent p-1 font-medium text-foreground text-sm outline-none hover:outline hover:outline-1 hover:outline-muted-foreground focus:outline focus:outline-1 focus:outline-muted-foreground',
+          'max-w-full rounded-xs border-0 bg-transparent p-1 font-medium text-foreground text-sm outline-hidden hover:outline hover:outline-1 hover:outline-muted-foreground focus:outline focus:outline-1 focus:outline-muted-foreground',
           className,
           {
             'outline-red-500': isError,

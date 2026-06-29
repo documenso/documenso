@@ -63,7 +63,7 @@ export const InternalAuditLogTable = ({ logs }: AuditLogDataTableProps) => {
   const parser = new UAParser();
 
   return (
-    <div className="space-y-4">
+    <div className="twv3-space-y-4">
       {logs.map((log, index) => {
         parser.setUA(log.userAgent || '');
         const formattedAction = formatDocumentAuditLogAction(i18n, log);
@@ -73,7 +73,7 @@ export const InternalAuditLogTable = ({ logs }: AuditLogDataTableProps) => {
           <Card
             key={index}
             // Add top margin for the first card to ensure it's not cut off from the 2nd page onwards
-            className={`border shadow-sm ${index > 0 ? 'print:mt-8' : ''}`}
+            className={`border shadow-xs ${index > 0 ? 'print:mt-8' : ''}`}
             style={{
               pageBreakInside: 'avoid',
               breakInside: 'avoid',

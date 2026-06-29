@@ -91,7 +91,7 @@ export const RecipientActionAuthSelect = ({
             <Trans>These will override any global settings. Multiple methods can be selected.</Trans>
           </p>
 
-          <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
+          <ul className="twv3-space-y-0.5 ml-3.5 list-outside list-disc py-2">
             <li>
               <Trans>
                 <strong>Inherit authentication method</strong> - Use the global action signing authentication method

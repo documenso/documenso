@@ -173,7 +173,7 @@ export const AddSettingsFormPartial = ({
         )}
 
         <Form {...form}>
-          <fieldset className="flex h-full flex-col space-y-6" disabled={form.formState.isSubmitting}>
+          <fieldset className="twv3-space-y-6 flex h-full flex-col" disabled={form.formState.isSubmitting}>
             <FormField
               control={form.control}
               name="title"
@@ -209,7 +209,7 @@ export const AddSettingsFormPartial = ({
                         <InfoIcon className="mx-2 h-4 w-4" />
                       </TooltipTrigger>
 
-                      <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+                      <TooltipContent className="twv3-space-y-2 max-w-md p-4 text-foreground">
                         <Trans>
                           Controls the language for the document, including the language to be used for email
                           notifications, and the final certificate that is generated and attached to the document.
@@ -327,12 +327,12 @@ export const AddSettingsFormPartial = ({
 
             <Accordion type="multiple" className="mt-6">
               <AccordionItem value="advanced-options" className="border-none">
-                <AccordionTrigger className="mb-2 rounded border px-3 py-2 text-left text-foreground hover:bg-neutral-200/30 hover:no-underline">
+                <AccordionTrigger className="mb-2 rounded-sm border px-3 py-2 text-left text-foreground hover:bg-neutral-200/30 hover:no-underline">
                   <Trans>Advanced Options</Trans>
                 </AccordionTrigger>
 
                 <AccordionContent className="-mx-1 px-1 pt-2 text-muted-foreground text-sm leading-relaxed">
-                  <div className="flex flex-col space-y-6">
+                  <div className="twv3-space-y-6 flex flex-col">
                     <FormField
                       control={form.control}
                       name="externalId"

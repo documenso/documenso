@@ -163,14 +163,14 @@ export const EnvelopeDownloadDialog = ({
           {isLoadingEnvelopeItems
             ? Array.from({ length: 1 }).map((_, index) => (
                 <div key={index} className="flex items-center gap-2 rounded-lg border border-border bg-card p-4">
-                  <Skeleton className="h-10 w-10 flex-shrink-0 rounded-lg" />
+                  <Skeleton className="h-10 w-10 shrink-0 rounded-lg" />
 
                   <div className="flex w-full flex-col gap-2">
                     <Skeleton className="h-4 w-28 rounded-lg" />
                     <Skeleton className="h-4 w-20 rounded-lg" />
                   </div>
 
-                  <Skeleton className="h-10 w-20 flex-shrink-0 rounded-lg" />
+                  <Skeleton className="h-10 w-20 shrink-0 rounded-lg" />
                 </div>
               ))
             : envelopeItems.map((item) => (
@@ -178,7 +178,7 @@ export const EnvelopeDownloadDialog = ({
                   key={item.id}
                   className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-accent/50"
                 >
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                       <FileTextIcon className="h-5 w-5 text-primary" />
                     </div>
@@ -194,7 +194,7 @@ export const EnvelopeDownloadDialog = ({
                     </p>
                   </div>
 
-                  <div className="flex flex-shrink-0 items-center gap-2">
+                  <div className="flex shrink-0 items-center gap-2">
                     <Button
                       variant="outline"
                       size="sm"

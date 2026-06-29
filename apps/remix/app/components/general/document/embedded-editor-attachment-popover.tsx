@@ -97,7 +97,7 @@ export const EmbeddedEditorAttachmentPopover = ({
       </PopoverTrigger>
 
       <PopoverContent className="w-96" align="end">
-        <div className="space-y-4">
+        <div className="twv3-space-y-4">
           <div>
             <h4 className="font-medium">
               <Trans>Attachments</Trans>
@@ -108,7 +108,7 @@ export const EmbeddedEditorAttachmentPopover = ({
           </div>
 
           {attachments.length > 0 && (
-            <div className="space-y-2">
+            <div className="twv3-space-y-2">
               {attachments.map((attachment) => (
                 <div
                   key={attachment.id}
@@ -148,7 +148,7 @@ export const EmbeddedEditorAttachmentPopover = ({
 
           {isAdding && (
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="twv3-space-y-3">
                 <FormField
                   control={form.control}
                   name="label"

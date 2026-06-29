@@ -213,7 +213,7 @@ export const EnvelopeEditorFieldsPage = () => {
             editorConfig.envelopeItems.allowReplace &&
             envelopeItemPermissions.canFileBeChanged
               ? (item) => (
-                  <div className="relative flex h-5 w-5 flex-shrink-0 items-center justify-center">
+                  <div className="relative flex h-5 w-5 shrink-0 items-center justify-center">
                     <div
                       className={cn('h-2 w-2 rounded-full transition-opacity duration-150 group-hover:opacity-0', {
                         'bg-green-500': currentEnvelopeItem?.id === item.id,
@@ -243,7 +243,7 @@ export const EnvelopeEditorFieldsPage = () => {
           {envelope.recipients.length === 0 && (
             <Alert
               variant="neutral"
-              className="mb-4 flex max-w-[800px] flex-row items-center justify-between space-y-0 rounded-sm border border-border bg-background"
+              className="twv3-space-y-0 mb-4 flex max-w-[800px] flex-row items-center justify-between rounded-xs border border-border bg-background"
             >
               <div className="flex flex-col gap-1">
                 <AlertTitle>
@@ -263,10 +263,10 @@ export const EnvelopeEditorFieldsPage = () => {
           {overlappingFieldPairs.length > 0 && (
             <Alert
               variant="warning"
-              className="mt-20 mb-4 flex w-full max-w-[800px] flex-row items-center justify-between space-y-0 rounded-sm"
+              className="twv3-space-y-0 mt-20 mb-4 flex w-full max-w-[800px] flex-row items-center justify-between rounded-xs"
             >
               <div className="flex flex-row items-start gap-3">
-                <AlertTriangleIcon className="mt-0.5 h-5 w-5 flex-shrink-0" />
+                <AlertTriangleIcon className="mt-0.5 h-5 w-5 shrink-0" />
 
                 <div className="flex flex-col gap-1">
                   <AlertTitle>
@@ -305,7 +305,7 @@ export const EnvelopeEditorFieldsPage = () => {
 
       {/* Right Section - Form Fields Panel */}
       {currentEnvelopeItem && envelope.recipients.length > 0 && (
-        <div className="sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-border border-l bg-background py-4">
+        <div className="sticky top-0 h-full w-80 shrink-0 overflow-y-auto border-border border-l bg-background py-4">
           {/* Recipient selector section. */}
           <section className="px-4">
             <h3 className="mb-2 font-semibold text-foreground text-sm">
@@ -395,7 +395,7 @@ export const EnvelopeEditorFieldsPage = () => {
                         <Trans>Developer Mode</Trans>
                       </h3>
 
-                      <div className="space-y-2 rounded-md border border-border bg-muted/50 p-3 text-foreground text-sm">
+                      <div className="twv3-space-y-2 rounded-md border border-border bg-muted/50 p-3 text-foreground text-sm">
                         {selectedField.id && (
                           <p>
                             <span className="min-w-12 text-muted-foreground">

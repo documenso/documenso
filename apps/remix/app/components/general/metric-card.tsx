@@ -13,7 +13,7 @@ export const CardMetric = ({ icon: Icon, title, value, className, children }: Ca
   return (
     <div
       className={cn(
-        'h-32 max-h-32 max-w-full overflow-hidden rounded-lg border border-border bg-background shadow shadow-transparent duration-200 hover:shadow-border/80',
+        'h-32 max-h-32 max-w-full overflow-hidden rounded-lg border border-border bg-background shadow-sm shadow-transparent duration-200 hover:shadow-border/80',
         className,
       )}
     >

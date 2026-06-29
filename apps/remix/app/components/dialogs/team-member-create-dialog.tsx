@@ -241,7 +241,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                     control={form.control}
                     name="members"
                     render={({ field }) => (
-                      <FormItem className="space-y-2">
+                      <FormItem className="twv3-space-y-2">
                         <FormLabel>
                           <Trans>Members</Trans>
                         </FormLabel>
@@ -310,7 +310,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                             </FormDescription>
 
                             {canInviteOrganisationMembers && (
-                              <Alert variant="neutral" className="mt-2 flex items-center gap-2 space-y-0">
+                              <Alert variant="neutral" className="twv3-space-y-0 mt-2 flex items-center gap-2">
                                 <div>
                                   <UserPlusIcon className="h-5 w-5 text-muted-foreground" />
                                 </div>
@@ -358,10 +358,10 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
 
               {step === 'MEMBERS' && (
                 <>
-                  <div className="custom-scrollbar -m-1 max-h-[60vh] space-y-4 overflow-y-auto p-1">
+                  <div className="custom-scrollbar twv3-space-y-4 -m-1 max-h-[60vh] overflow-y-auto p-1">
                     {form.getValues('members').map((member, index) => (
-                      <div className="flex w-full flex-row space-x-4" key={index}>
-                        <div className="w-full space-y-2">
+                      <div className="twv3-space-x-4 flex w-full flex-row" key={index}>
+                        <div className="twv3-space-y-2 w-full">
                           {index === 0 && (
                             <FormLabel>
                               <Trans>Member</Trans>

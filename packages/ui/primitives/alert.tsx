@@ -32,7 +32,12 @@ const Alert = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
 >(({ className, variant, padding, ...props }, ref) => (
-  <div ref={ref} role="alert" className={cn('space-y-2', alertVariants({ variant, padding }), className)} {...props} />
+  <div
+    ref={ref}
+    role="alert"
+    className={cn('twv3-space-y-2', alertVariants({ variant, padding }), className)}
+    {...props}
+  />
 ));
 
 Alert.displayName = 'Alert';

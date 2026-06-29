@@ -214,7 +214,7 @@ export const ManagePublicTemplateDialog = ({
 
   return (
     <Dialog {...props} open={isOpen || open} onOpenChange={handleOnOpenChange}>
-      <fieldset disabled={isLoading} className="relative flex-shrink-0">
+      <fieldset disabled={isLoading} className="relative shrink-0">
         <DialogTrigger asChild>{trigger}</DialogTrigger>
 
         <AnimateGenericFadeInOut motionKey={currentStep}>
@@ -311,7 +311,7 @@ export const ManagePublicTemplateDialog = ({
                 </DialogHeader>
 
                 <Form {...form}>
-                  <form className="flex h-full flex-col space-y-4" onSubmit={form.handleSubmit(onFormSubmit)}>
+                  <form className="twv3-space-y-4 flex h-full flex-col" onSubmit={form.handleSubmit(onFormSubmit)}>
                     <FormField
                       control={form.control}
                       name="publicTitle"

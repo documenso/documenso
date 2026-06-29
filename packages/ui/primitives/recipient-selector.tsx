@@ -155,7 +155,7 @@ export const RecipientSelector = ({
                     {recipient.sendStatus !== SendStatus.SENT ? (
                       <Check
                         aria-hidden={recipient.id !== selectedRecipient?.id}
-                        className={cn('h-4 w-4 flex-shrink-0', {
+                        className={cn('h-4 w-4 shrink-0', {
                           'opacity-0': recipient.id !== selectedRecipient?.id,
                           'opacity-100': recipient.id === selectedRecipient?.id,
                         })}

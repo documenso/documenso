@@ -145,7 +145,7 @@ export const AiRecipientDetectionDialog = ({
                 </Trans>
               </p>
 
-              <Alert className="mt-4 flex items-center gap-2 space-y-0" variant="neutral">
+              <Alert className="twv3-space-y-0 mt-4 flex items-center gap-2" variant="neutral">
                 <ShieldCheckIcon className="h-5 w-5 stroke-green-600" />
                 <AlertDescription className="mt-0">
                   <Trans>Your document is processed securely using AI services that don't retain your data.</Trans>

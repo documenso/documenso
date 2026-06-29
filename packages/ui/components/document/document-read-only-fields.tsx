@@ -151,7 +151,7 @@ export const DocumentReadOnlyFields = ({
                     </p>
 
                     <button
-                      className="absolute top-0 right-0 my-1 p-2 focus:outline-none focus-visible:ring-0"
+                      className="absolute top-0 right-0 my-1 p-2 focus:outline-hidden focus-visible:ring-0"
                       onClick={() => handleHideField(field.secondaryId)}
                       title="Hide field"
                     >

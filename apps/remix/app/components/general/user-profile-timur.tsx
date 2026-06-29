@@ -53,13 +53,13 @@ export const UserProfileTimur = ({ className, rows = 2 }: UserProfileTimurProps)
                 <div className="flex items-center gap-x-2">
                   <File className="h-8 w-8 text-muted-foreground/80" strokeWidth={1.5} />
 
-                  <div className="space-y-2">
+                  <div className="twv3-space-y-2">
                     <div className="h-1.5 w-24 rounded-full bg-neutral-300 md:w-36 dark:bg-foreground/30" />
                     <div className="h-1.5 w-16 rounded-full bg-neutral-200 md:w-24 dark:bg-foreground/20" />
                   </div>
                 </div>
 
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <Button type="button" size="sm" className="pointer-events-none w-32">
                     <Trans>Sign</Trans>
                   </Button>

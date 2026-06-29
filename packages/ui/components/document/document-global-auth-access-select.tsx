@@ -72,7 +72,7 @@ export const DocumentGlobalAuthAccessTooltip = () => (
       <InfoIcon className="mx-2 h-4 w-4" />
     </TooltipTrigger>
 
-    <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+    <TooltipContent className="twv3-space-y-2 max-w-md p-4 text-foreground">
       <h2>
         <strong>
           <Trans>Document access</Trans>
@@ -87,7 +87,7 @@ export const DocumentGlobalAuthAccessTooltip = () => (
         <Trans>Multiple access methods can be selected.</Trans>
       </p>
 
-      <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
+      <ul className="twv3-space-y-0.5 ml-3.5 list-outside list-disc py-2">
         <li>
           <Trans>
             <strong>Require account</strong> - The recipient must be signed in to view the document

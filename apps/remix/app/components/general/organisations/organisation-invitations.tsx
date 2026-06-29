@@ -93,7 +93,7 @@ export const OrganisationInvitations = ({ className }: { className?: string }) =
                             }
                             secondaryText={`/o/${invitation.organisation.url}`}
                             rightSideComponent={
-                              <div className="ml-auto space-x-2">
+                              <div className="twv3-space-x-2 ml-auto">
                                 <DeclineOrganisationInvitationButton token={invitation.token} />
                                 <AcceptOrganisationInvitationButton token={invitation.token} />
                               </div>

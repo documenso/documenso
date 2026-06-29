@@ -14,7 +14,7 @@ export type MonthlyActiveUsersChartProps = {
 const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
   if (active && payload && payload.length) {
     return (
-      <div className="z-100 w-60 space-y-1 rounded-md border border-solid bg-white p-2 px-3">
+      <div className="twv3-space-y-1 z-100 w-60 rounded-md border border-solid bg-white p-2 px-3">
         <p>{label}</p>
         <p className="text-documenso">
           {payload[0].name === 'cume_count' ? 'Cumulative MAU' : 'Monthly Active Users'}:{' '}

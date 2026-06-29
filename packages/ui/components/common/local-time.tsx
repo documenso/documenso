@@ -78,7 +78,7 @@ export const LocalTime = ({ date, className }: LocalTimeProps) => {
         }}
         onMouseLeave={onMouseLeave}
       >
-        <div className="space-y-1.5 text-xs">
+        <div className="twv3-space-y-1.5 text-xs">
           <TimeRow
             label="Local"
             value={local}

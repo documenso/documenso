@@ -71,7 +71,7 @@ export const AiFeaturesEnableDialog = ({ open, onOpenChange, onEnabled }: AiFeat
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="twv3-space-y-4">
           <p className="text-muted-foreground text-sm">
             <Trans>
               Turn on AI detection to automatically find recipients and fields in your documents. AI providers do not

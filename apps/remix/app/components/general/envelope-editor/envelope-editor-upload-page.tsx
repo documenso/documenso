@@ -447,7 +447,7 @@ export const EnvelopeEditorUploadPage = () => {
   };
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 p-8">
+    <div className="twv3-space-y-6 mx-auto max-w-4xl p-8">
       <input {...getReplaceInputProps()} />
       <Card backdropBlur={false} className="border">
         <CardHeader className="pb-3">
@@ -483,7 +483,7 @@ export const EnvelopeEditorUploadPage = () => {
                     data-testid="envelope-items-list"
                     {...provided.droppableProps}
                     ref={provided.innerRef}
-                    className="space-y-2"
+                    className="twv3-space-y-2"
                   >
                     {localFiles.map((localFile, index) => (
                       <Draggable
@@ -507,14 +507,14 @@ export const EnvelopeEditorUploadPage = () => {
                               snapshot.isDragging ? 'shadow-md' : ''
                             }`}
                           >
-                            <div className="flex min-w-0 items-center space-x-3">
+                            <div className="twv3-space-x-3 flex min-w-0 items-center">
                               {uploadConfig?.allowConfigureOrder && (
                                 <div
                                   {...provided.dragHandleProps}
                                   data-testid={`envelope-item-drag-handle-${localFile.id}`}
                                   className="cursor-grab active:cursor-grabbing"
                                 >
-                                  <GripVerticalIcon className="h-5 w-5 flex-shrink-0 opacity-40" />
+                                  <GripVerticalIcon className="h-5 w-5 shrink-0 opacity-40" />
                                 </div>
                               )}
 
@@ -546,7 +546,7 @@ export const EnvelopeEditorUploadPage = () => {
                                 </div>
                               </div>
                             </div>
-                            <div className="flex shrink-0 items-center space-x-2">
+                            <div className="twv3-space-x-2 flex shrink-0 items-center">
                               {localFile.isUploading && (
                                 <div className="flex h-6 w-10 items-center justify-center">
                                   <Loader2Icon className="h-4 w-4 animate-spin text-muted-foreground" />

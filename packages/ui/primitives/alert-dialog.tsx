@@ -22,7 +22,7 @@ const AlertDialogOverlay = React.forwardRef<
 >(({ className, children: _children, ...props }, ref) => (
   <AlertDialogPrimitive.Overlay
     className={cn(
-      'fade-in fixed inset-0 z-50 animate-in bg-background/80 backdrop-blur-sm transition-opacity',
+      'fade-in fixed inset-0 z-50 animate-in bg-background/80 backdrop-blur-xs transition-opacity',
       className,
     )}
     {...props}
@@ -52,13 +52,13 @@ const AlertDialogContent = React.forwardRef<
 AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName;
 
 const AlertDialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('flex flex-col space-y-2 text-center sm:text-left', className)} {...props} />
+  <div className={cn('twv3-space-y-2 flex flex-col text-center sm:text-left', className)} {...props} />
 );
 
 AlertDialogHeader.displayName = 'AlertDialogHeader';
 
 const AlertDialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)} {...props} />
+  <div className={cn('sm:twv3-space-x-2 flex flex-col-reverse sm:flex-row sm:justify-end', className)} {...props} />
 );
 
 AlertDialogFooter.displayName = 'AlertDialogFooter';

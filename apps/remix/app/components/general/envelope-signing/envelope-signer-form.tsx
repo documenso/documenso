@@ -42,7 +42,7 @@ export default function EnvelopeSignerForm() {
     return (
       <fieldset className="embed--DocumentWidgetForm rounded-2xl border-border sm:border sm:p-3 dark:bg-background">
         <RadioGroup
-          className="gap-0 space-y-2 shadow-none sm:space-y-3"
+          className="twv3-space-y-2 sm:twv3-space-y-3 gap-0 shadow-none"
           value={selectedAssistantRecipient?.id?.toString()}
           onValueChange={(value) => {
             setSelectedAssistantRecipientId(Number(value));

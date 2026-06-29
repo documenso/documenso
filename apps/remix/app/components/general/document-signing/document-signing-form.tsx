@@ -161,7 +161,7 @@ export const DocumentSigningForm = ({
                   rules={{ required: 'Please select a signer' }}
                   render={({ field }) => (
                     <RadioGroup
-                      className="gap-0 space-y-3 shadow-none"
+                      className="twv3-space-y-3 gap-0 shadow-none"
                       value={field.value?.toString()}
                       onValueChange={(value) => {
                         field.onChange(value);

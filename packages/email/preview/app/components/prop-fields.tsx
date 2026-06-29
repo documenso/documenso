@@ -30,7 +30,7 @@ type PropFieldProps = {
 };
 
 const inputClass =
-  'w-full rounded-md border border-neutral-300 bg-white px-2 py-1 text-neutral-900 text-xs focus:border-neutral-500 focus:outline-none';
+  'w-full rounded-md border border-neutral-300 bg-white px-2 py-1 text-neutral-900 text-xs focus:border-neutral-500 focus:outline-hidden';
 
 const PropField = ({ name, field, value, onChange }: PropFieldProps) => {
   const id = `prop-${name}`;

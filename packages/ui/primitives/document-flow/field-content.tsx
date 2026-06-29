@@ -175,8 +175,8 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
         className={cn(
           'w-full whitespace-pre-wrap text-left text-[clamp(0.07rem,25cqw,0.825rem)] text-foreground duration-200',
           {
-            '!text-center': textAlign === 'center' || !textToDisplay,
-            '!text-right': textAlign === 'right',
+            'text-center!': textAlign === 'center' || !textToDisplay,
+            'text-right!': textAlign === 'right',
             'font-signature text-[clamp(0.07rem,25cqw,1.125rem)]': isSignatureField,
           },
         )}

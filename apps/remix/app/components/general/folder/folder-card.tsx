@@ -58,16 +58,16 @@ export const FolderCard = ({ folder, onMove, onSettings, onDelete }: FolderCardP
       <Card className="h-full border border-border transition-all hover:bg-muted/50">
         <CardContent className="p-4">
           <div className="flex min-w-0 items-center gap-3">
-            <FolderIcon className="h-6 w-6 flex-shrink-0 text-documenso" />
+            <FolderIcon className="h-6 w-6 shrink-0 text-documenso" />
 
             <div className="flex w-full min-w-0 items-center justify-between">
               <div className="min-w-0 flex-1">
                 <h3 className="flex min-w-0 items-center gap-2 font-medium">
                   <span className="truncate">{folder.name}</span>
-                  {folder.pinned && <PinIcon className="h-3 w-3 flex-shrink-0 text-documenso" />}
+                  {folder.pinned && <PinIcon className="h-3 w-3 shrink-0 text-documenso" />}
                 </h3>
 
-                <div className="mt-1 flex space-x-2 truncate text-muted-foreground text-xs">
+                <div className="twv3-space-x-2 mt-1 flex truncate text-muted-foreground text-xs">
                   <span>
                     {folder.type === FolderType.TEMPLATE ? (
                       <Plural
@@ -145,7 +145,7 @@ export const FolderCardEmpty = ({ type }: { type: FolderType }) => {
               <Trans>Create folder</Trans>
             </h3>
 
-            <div className="mt-1 flex space-x-2 truncate text-muted-foreground/60 text-xs">
+            <div className="twv3-space-x-2 mt-1 flex truncate text-muted-foreground/60 text-xs">
               {type === FolderType.DOCUMENT ? (
                 <Trans>Organise your documents</Trans>
               ) : (

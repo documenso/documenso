@@ -109,7 +109,7 @@ export const OrgMenuSwitcher = () => {
         <Button
           data-testid="menu-switcher"
           variant="none"
-          className="relative flex h-12 flex-row items-center px-0 py-2 ring-0 focus:outline-none focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-transparent md:px-2"
+          className="relative flex h-12 flex-row items-center px-0 py-2 ring-0 focus:outline-hidden focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-transparent md:px-2"
         >
           <AvatarWithText
             avatarSrc={dropdownMenuAvatarText.avatarSrc}
@@ -136,7 +136,7 @@ export const OrgMenuSwitcher = () => {
                 <Trans>Organisations</Trans>
               </h3>
             </div>
-            <div className="flex-1 space-y-1 overflow-y-auto p-1.5">
+            <div className="twv3-space-y-1 flex-1 overflow-y-auto p-1.5">
               {organisations.map((org) => (
                 <div className="group relative" key={org.id} onMouseEnter={() => setHoveredOrgId(org.id)}>
                   <DropdownMenuItem
@@ -147,7 +147,7 @@ export const OrgMenuSwitcher = () => {
                     )}
                     asChild
                   >
-                    <Link to={`/o/${org.url}`} className="flex items-center space-x-2 pr-8">
+                    <Link to={`/o/${org.url}`} className="twv3-space-x-2 flex items-center pr-8">
                       <span
                         className={cn('min-w-0 flex-1 truncate', {
                           'font-semibold': org.id === selectedOrg?.id,
@@ -162,7 +162,7 @@ export const OrgMenuSwitcher = () => {
                     <div className="absolute top-0 right-0 bottom-0 flex items-center justify-center">
                       <Link
                         to={`/o/${org.url}/settings`}
-                        className="mr-2 rounded-sm border p-1 text-muted-foreground transition-opacity duration-200 group-hover:opacity-100 md:opacity-0"
+                        className="mr-2 rounded-xs border p-1 text-muted-foreground transition-opacity duration-200 group-hover:opacity-100 md:opacity-0"
                       >
                         <Settings2Icon className="h-3.5 w-3.5" />
                       </Link>
@@ -188,7 +188,7 @@ export const OrgMenuSwitcher = () => {
                 <Trans>Teams</Trans>
               </h3>
             </div>
-            <div className="flex-1 space-y-1 overflow-y-auto p-1.5">
+            <div className="twv3-space-y-1 flex-1 overflow-y-auto p-1.5">
               <AnimateGenericFadeInOut key={displayedOrg ? 'displayed-org' : 'no-org'}>
                 {hoveredOrg ? (
                   hoveredOrg.teams.map((team) => (
@@ -200,7 +200,7 @@ export const OrgMenuSwitcher = () => {
                         )}
                         asChild
                       >
-                        <Link to={`/t/${team.url}`} className="flex items-center space-x-2 pr-8">
+                        <Link to={`/t/${team.url}`} className="twv3-space-x-2 flex items-center pr-8">
                           <span
                             className={cn('min-w-0 flex-1 truncate', {
                               'font-semibold': team.id === currentTeam?.id,
@@ -215,7 +215,7 @@ export const OrgMenuSwitcher = () => {
                         <div className="absolute top-0 right-0 bottom-0 flex items-center justify-center">
                           <Link
                             to={`/t/${team.url}/settings`}
-                            className="mr-2 rounded-sm border p-1 text-muted-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                            className="mr-2 rounded-xs border p-1 text-muted-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100"
                           >
                             <Settings2Icon className="h-3.5 w-3.5" />
                           </Link>
@@ -308,7 +308,7 @@ export const OrgMenuSwitcher = () => {
               )}
 
               <DropdownMenuItem
-                className="hover:!text-muted-foreground px-4 py-2 text-muted-foreground"
+                className="px-4 py-2 text-muted-foreground hover:text-muted-foreground!"
                 onSelect={async () => authClient.signOut()}
               >
                 <Trans>Sign Out</Trans>

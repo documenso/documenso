@@ -118,7 +118,7 @@ export const DocumentCertificateQRView = ({
       ) : (
         <>
           <div className="flex w-full flex-col justify-between gap-4 md:flex-row md:items-end">
-            <div className="space-y-1">
+            <div className="twv3-space-y-1">
               <h1 className="font-medium text-xl">{title}</h1>
               <div className="flex flex-col gap-0.5 text-muted-foreground text-sm">
                 <p>
@@ -178,7 +178,7 @@ const DocumentCertificateQrV2 = ({ title, recipientCount, formattedDate, token }
   return (
     <div className="flex min-h-screen flex-col items-start">
       <div className="flex w-full flex-col justify-between gap-4 md:flex-row md:items-end">
-        <div className="space-y-1">
+        <div className="twv3-space-y-1">
           <h1 className="font-medium text-xl">{title}</h1>
           <div className="flex flex-col gap-0.5 text-muted-foreground text-sm">
             <p>

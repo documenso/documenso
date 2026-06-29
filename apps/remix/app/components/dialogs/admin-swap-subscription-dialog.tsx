@@ -128,7 +128,7 @@ export const AdminSwapSubscriptionDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <fieldset className="flex flex-col space-y-4" disabled={isSubmitting}>
+        <fieldset className="twv3-space-y-4 flex flex-col" disabled={isSubmitting}>
           <div className="flex flex-col gap-2">
             <label className="font-medium text-sm">
               <Trans>Target Organisation</Trans>

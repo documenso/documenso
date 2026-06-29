@@ -24,7 +24,7 @@ export default function OrganisationSettingsGeneral() {
     <div className="max-w-2xl">
       <SettingsHeader title={_(msg`General`)} subtitle={_(msg`Here you can edit your organisation details.`)} />
 
-      <div className="space-y-8">
+      <div className="twv3-space-y-8">
         <AvatarImageForm organisation={organisation} />
         <OrganisationUpdateForm />
       </div>

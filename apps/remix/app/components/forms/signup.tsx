@@ -209,7 +209,7 @@ export const SignUpForm = ({
   return (
     <div className={cn('flex justify-center gap-x-12', className)}>
       <div className="relative hidden flex-1 overflow-hidden rounded-xl border border-border xl:flex">
-        <div className="absolute -inset-8 -z-[2] backdrop-blur">
+        <div className="absolute -inset-8 -z-[2] backdrop-blur-sm">
           <img
             src={communityCardsImage}
             alt="community-cards"

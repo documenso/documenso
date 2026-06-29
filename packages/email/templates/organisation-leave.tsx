@@ -35,7 +35,7 @@ export const OrganisationLeaveEmailTemplate = ({
 
       <Body className="mx-auto my-auto font-sans">
         <Section className="bg-background text-muted-foreground">
-          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-border border-solid p-2 backdrop-blur-sm">
+          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-border border-solid p-2 backdrop-blur-xs">
             <TemplateBrandingLogo assetBaseUrl={assetBaseUrl} className="mb-4 h-6 p-2" />
 
             <Section>

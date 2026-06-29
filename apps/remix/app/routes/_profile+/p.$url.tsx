@@ -77,7 +77,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
                 />
               </TooltipTrigger>
 
-              <TooltipContent className="!pl-3 !pr-3.5 flex flex-row items-start py-2">
+              <TooltipContent className="flex flex-row items-start py-2 pr-3.5! pl-3!">
                 <img
                   className="mt-0.5"
                   alt="Profile badge"
@@ -97,7 +97,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
           )}
         </div>
 
-        <div className="mt-4 space-y-1 text-muted-foreground">
+        <div className="twv3-space-y-1 mt-4 text-muted-foreground">
           {(profile.bio ?? '').split('\n').map((line, index) => (
             <p key={index} className="max-w-[60ch] whitespace-pre-wrap break-words text-center text-sm">
               {line}
@@ -148,7 +148,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
                 <TableRow key={template.id}>
                   <TableCell className="flex flex-col justify-between overflow-hidden text-muted-foreground text-sm sm:flex-row">
                     <div className="flex flex-1 items-start justify-start gap-2">
-                      <FileIcon className="h-8 w-8 flex-shrink-0 text-muted-foreground/40" strokeWidth={1.5} />
+                      <FileIcon className="h-8 w-8 shrink-0 text-muted-foreground/40" strokeWidth={1.5} />
 
                       <div className="flex flex-1 flex-col gap-4 overflow-hidden md:flex-row md:items-start md:justify-between">
                         <div>

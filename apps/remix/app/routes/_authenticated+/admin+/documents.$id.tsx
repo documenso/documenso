@@ -166,7 +166,7 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
       </h2>
 
       <div className="mt-4">
-        <Accordion type="multiple" className="space-y-4">
+        <Accordion type="multiple" className="twv3-space-y-4">
           {envelope.recipients.map((recipient) => (
             <AccordionItem key={recipient.id} value={recipient.id.toString()} className="rounded-lg border">
               <AccordionTrigger className="px-4">

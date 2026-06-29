@@ -123,7 +123,7 @@ export const EmailPlayground = ({ slug, fields, defaultProps }: PlaygroundProps)
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-neutral-100 font-sans text-neutral-900">
       {/* Sidebar */}
-      <aside className="flex h-full w-60 flex-shrink-0 flex-col overflow-y-auto border-neutral-200 border-r bg-white">
+      <aside className="flex h-full w-60 shrink-0 flex-col overflow-y-auto border-neutral-200 border-r bg-white">
         <div className="border-neutral-200 border-b px-4 py-3">
           <h1 className="font-semibold text-sm">Email Preview</h1>
           <p className="text-neutral-500 text-xs">{Object.keys(templates).length} templates</p>
@@ -154,7 +154,7 @@ export const EmailPlayground = ({ slug, fields, defaultProps }: PlaygroundProps)
       </aside>
 
       {/* Props panel */}
-      <section className="flex h-full w-72 flex-shrink-0 flex-col overflow-y-auto border-neutral-200 border-r bg-white px-4 py-3">
+      <section className="flex h-full w-72 shrink-0 flex-col overflow-y-auto border-neutral-200 border-r bg-white px-4 py-3">
         <h2 className="mb-3 font-medium text-neutral-500 text-xs uppercase tracking-wide">Props</h2>
         <PropFields fields={fields} values={props} onChange={handlePropChange} />
       </section>
@@ -180,10 +180,7 @@ export const EmailPlayground = ({ slug, fields, defaultProps }: PlaygroundProps)
             theme === 'dark' ? 'bg-neutral-800' : 'bg-neutral-200'
           }`}
         >
-          <div
-            className="flex-shrink-0 overflow-hidden rounded-lg bg-white shadow-lg"
-            style={{ width: viewport.width }}
-          >
+          <div className="shrink-0 overflow-hidden rounded-lg bg-white shadow-lg" style={{ width: viewport.width }}>
             <iframe
               title={`${viewport.name} ${theme}`}
               srcDoc={displayHtml}
@@ -330,7 +327,7 @@ const ColorInput = (props: ColorInputProps) => {
         type="color"
         value={props.value}
         onChange={(event) => props.onChange(event.target.value)}
-        className="h-6 w-6 cursor-pointer rounded border border-neutral-300 bg-white p-0"
+        className="h-6 w-6 cursor-pointer rounded-sm border border-neutral-300 bg-white p-0"
       />
     </label>
   );

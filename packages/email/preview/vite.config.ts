@@ -1,8 +1,7 @@
 import path from 'node:path';
 import { lingui } from '@lingui/vite-plugin';
 import { reactRouter } from '@react-router/dev/vite';
-import autoprefixer from 'autoprefixer';
-import tailwindcss from 'tailwindcss';
+import tailwindcss from '@tailwindcss/postcss';
 import { defineConfig } from 'vite';
 import macrosPlugin from 'vite-plugin-babel-macros';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
@@ -19,7 +18,9 @@ export default defineConfig({
   root: __dirname,
   css: {
     postcss: {
-      plugins: [tailwindcss(path.join(__dirname, 'tailwind.config.cjs')), autoprefixer],
+      // The JS config is loaded via `@config` in app/app.css (v4 no longer
+      // auto-detects it or accepts a path argument here).
+      plugins: [tailwindcss()],
     },
   },
   server: {

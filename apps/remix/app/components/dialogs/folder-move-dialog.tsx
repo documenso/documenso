@@ -126,14 +126,14 @@ export const FolderMoveDialog = ({ foldersData, folder, isOpen, onOpenChange }: 
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
-            <fieldset disabled={form.formState.isSubmitting} className="space-y-4">
+            <fieldset disabled={form.formState.isSubmitting} className="twv3-space-y-4">
               <FormField
                 control={form.control}
                 name="targetFolderId"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <div className="max-h-96 space-y-2 overflow-y-auto">
+                      <div className="twv3-space-y-2 max-h-96 overflow-y-auto">
                         <Button
                           type="button"
                           variant={!field.value ? 'default' : 'outline'}

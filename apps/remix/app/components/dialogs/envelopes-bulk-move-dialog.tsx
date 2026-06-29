@@ -173,7 +173,7 @@ export const EnvelopesBulkMoveDialog = ({
                   </FormLabel>
 
                   <FormControl>
-                    <div className="max-h-96 space-y-2 overflow-y-auto">
+                    <div className="twv3-space-y-2 max-h-96 overflow-y-auto">
                       {isFoldersLoading ? (
                         <div className="flex h-10 items-center justify-center">
                           <Loader2 className="h-4 w-4 animate-spin" />

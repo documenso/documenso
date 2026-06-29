@@ -74,7 +74,7 @@ export const OrganisationTeamsTable = () => {
       {
         id: 'actions',
         cell: ({ row }) => (
-          <div className="flex justify-end space-x-2">
+          <div className="twv3-space-x-2 flex justify-end">
             <Button variant="outline" asChild>
               <Link to={`/t/${row.original.url}/settings`}>
                 <Trans>Manage</Trans>
@@ -114,9 +114,9 @@ export const OrganisationTeamsTable = () => {
           <>
             <TableCell className="w-1/3 py-4 pr-4">
               <div className="flex w-full flex-row items-center">
-                <Skeleton className="h-12 w-12 flex-shrink-0 rounded-full" />
+                <Skeleton className="h-12 w-12 shrink-0 rounded-full" />
 
-                <div className="ml-2 flex flex-grow flex-col">
+                <div className="ml-2 flex grow flex-col">
                   <Skeleton className="h-4 w-1/2 max-w-[8rem]" />
                   <Skeleton className="mt-1 h-4 w-2/3 max-w-[12rem]" />
                 </div>
@@ -129,9 +129,9 @@ export const OrganisationTeamsTable = () => {
               <Skeleton className="h-4 w-20 rounded-full" />
             </TableCell>
             <TableCell>
-              <div className="flex flex-row justify-end space-x-2">
-                <Skeleton className="h-10 w-20 rounded" />
-                <Skeleton className="h-10 w-16 rounded" />
+              <div className="twv3-space-x-2 flex flex-row justify-end">
+                <Skeleton className="h-10 w-20 rounded-sm" />
+                <Skeleton className="h-10 w-16 rounded-sm" />
               </div>
             </TableCell>
           </>

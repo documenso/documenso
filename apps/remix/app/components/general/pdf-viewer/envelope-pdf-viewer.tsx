@@ -34,7 +34,7 @@ export const EnvelopePdfViewer = ({ errorMessage, className, ...props }: Envelop
             </AlertDescription>
           </Alert>
         ) : (
-          <div className="flex h-[80vh] max-h-[60rem] w-full flex-col items-center justify-center overflow-hidden rounded">
+          <div className="flex h-[80vh] max-h-[60rem] w-full flex-col items-center justify-center overflow-hidden rounded-sm">
             <p className="text-muted-foreground text-sm">
               <Trans>No document found</Trans>
             </p>

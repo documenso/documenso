@@ -290,7 +290,7 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
                     </TableCell>
 
                     <TableCell truncate={false} className="w-[min-content] align-top">
-                      <div className="space-y-1">
+                      <div className="twv3-space-y-1">
                         <p className="text-muted-foreground text-sm print:text-xs">
                           <span className="font-medium">{_(msg`Sent`)}:</span>{' '}
                           <span className="inline-block">
@@ -364,7 +364,7 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
       </Card>
 
       {!hidePoweredBy && (
-        <div className="my-8 flex-row-reverse space-y-4">
+        <div className="twv3-space-y-4 my-8 flex-row-reverse">
           <div className="flex items-end justify-end gap-x-4">
             <div
               className="flex h-24 w-24 justify-center"
@@ -377,9 +377,7 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
           </div>
 
           <div className="flex items-end justify-end gap-x-4">
-            <p className="flex-shrink-0 font-medium text-sm print:text-xs">
-              {_(msg`Signing certificate provided by`)}:
-            </p>
+            <p className="shrink-0 font-medium text-sm print:text-xs">{_(msg`Signing certificate provided by`)}:</p>
             <BrandingLogo className="max-h-6 print:max-h-4" />
           </div>
         </div>

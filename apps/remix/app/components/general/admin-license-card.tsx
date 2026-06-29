@@ -77,7 +77,7 @@ export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
   const enabledFlags = Object.entries(license.flags).filter(([, enabled]) => enabled);
 
   return (
-    <div className="relative max-w-full overflow-hidden rounded-lg border border-border bg-background px-4 pt-4 pb-6 shadow shadow-transparent duration-200 hover:shadow-border/80">
+    <div className="relative max-w-full overflow-hidden rounded-lg border border-border bg-background px-4 pt-4 pb-6 shadow-sm shadow-transparent duration-200 hover:shadow-border/80">
       <div className="absolute top-3 right-3">
         <AdminLicenseResyncButton />
       </div>

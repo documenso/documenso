@@ -148,7 +148,7 @@ export const PublicProfileForm = ({ className, profile, onProfileUpdate }: Publi
                           <Button
                             type="button"
                             variant="none"
-                            className="h-7 rounded bg-neutral-50 pr-0.5 pl-2 font-normal dark:border dark:border-neutral-500 dark:bg-neutral-600"
+                            className="h-7 rounded-sm bg-neutral-50 pr-0.5 pl-2 font-normal dark:border dark:border-neutral-500 dark:bg-neutral-600"
                             onClick={async () => onCopy()}
                           >
                             <p>
@@ -156,7 +156,7 @@ export const PublicProfileForm = ({ className, profile, onProfileUpdate }: Publi
                               <span className="font-semibold">{field.value}</span>
                             </p>
 
-                            <div className="ml-1 flex h-6 w-6 items-center justify-center rounded transition-all hover:bg-neutral-200 hover:active:bg-neutral-300 dark:hover:bg-neutral-500 dark:hover:active:bg-neutral-400">
+                            <div className="ml-1 flex h-6 w-6 items-center justify-center rounded-sm transition-all hover:bg-neutral-200 hover:active:bg-neutral-300 dark:hover:bg-neutral-500 dark:hover:active:bg-neutral-400">
                               <AnimatePresence mode="wait" initial={false}>
                                 <motion.div
                                   key={copiedTimeout ? 'copied' : 'copy'}
@@ -228,7 +228,7 @@ export const PublicProfileForm = ({ className, profile, onProfileUpdate }: Publi
             }}
           />
 
-          <div className="flex flex-row justify-end space-x-4">
+          <div className="twv3-space-x-4 flex flex-row justify-end">
             <AnimatePresence>
               {form.formState.isDirty && (
                 <motion.div

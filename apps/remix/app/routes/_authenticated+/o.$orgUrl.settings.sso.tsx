@@ -174,8 +174,8 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <fieldset disabled={form.formState.isSubmitting} className="space-y-6">
-          <div className="space-y-2">
+        <fieldset disabled={form.formState.isSubmitting} className="twv3-space-y-6">
+          <div className="twv3-space-y-2">
             <Label>
               <Trans>Organisation authentication portal URL</Trans>
             </Label>
@@ -195,7 +195,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
             </p>
           </div>
 
-          <div className="space-y-2">
+          <div className="twv3-space-y-2">
             <Label>
               <Trans>Redirect URI</Trans>
             </Label>
@@ -215,7 +215,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
             </p>
           </div>
 
-          <div className="space-y-2">
+          <div className="twv3-space-y-2">
             <Label>
               <Trans>Required scopes</Trans>
             </Label>
@@ -344,7 +344,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
             name="autoProvisionUsers"
             render={({ field }) => (
               <FormItem className="flex items-center justify-between rounded-lg border px-4 py-3">
-                <div className="space-y-0.5">
+                <div className="twv3-space-y-0.5">
                   <FormLabel>
                     <Trans>Auto-provision Users</Trans>
                   </FormLabel>
@@ -365,7 +365,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
             name="allowPersonalOrganisations"
             render={({ field }) => (
               <FormItem className="flex items-center justify-between rounded-lg border px-4 py-3">
-                <div className="space-y-0.5">
+                <div className="twv3-space-y-0.5">
                   <FormLabel>
                     <Trans>Allow Personal Organisations</Trans>
                   </FormLabel>
@@ -389,7 +389,7 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
             name="enabled"
             render={({ field }) => (
               <FormItem className="flex items-center justify-between rounded-lg border px-4 py-3">
-                <div className="space-y-0.5">
+                <div className="twv3-space-y-0.5">
                   <FormLabel>
                     <Trans>Enable SSO portal</Trans>
                   </FormLabel>

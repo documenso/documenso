@@ -524,7 +524,7 @@ export const AddSignersFormPartial = ({
               control={form.control}
               name="signingOrder"
               render={({ field }) => (
-                <FormItem className="mb-6 flex flex-row items-center space-x-2 space-y-0">
+                <FormItem className="twv3-space-x-2 twv3-space-y-0 mb-6 flex flex-row items-center">
                   <FormControl>
                     <Checkbox
                       {...field}
@@ -581,7 +581,7 @@ export const AddSignersFormPartial = ({
               control={form.control}
               name="allowDictateNextSigner"
               render={({ field: { value, ...field } }) => (
-                <FormItem className="mb-6 flex flex-row items-center space-x-2 space-y-0">
+                <FormItem className="twv3-space-x-2 twv3-space-y-0 mb-6 flex flex-row items-center">
                   <FormControl>
                     <Checkbox
                       {...field}
@@ -669,13 +669,13 @@ export const AddSignersFormPartial = ({
                                   name={`signers.${index}.signingOrder`}
                                   render={({ field }) => (
                                     <FormItem
-                                      className={cn('col-span-2 mt-auto flex items-center gap-x-1 space-y-0', {
+                                      className={cn('twv3-space-y-0 col-span-2 mt-auto flex items-center gap-x-1', {
                                         'mb-6':
                                           form.formState.errors.signers?.[index] &&
                                           !form.formState.errors.signers[index]?.signingOrder,
                                       })}
                                     >
-                                      <GripVerticalIcon className="h-5 w-5 flex-shrink-0 opacity-40" />
+                                      <GripVerticalIcon className="h-5 w-5 shrink-0 opacity-40" />
                                       <FormControl>
                                         <Input
                                           type="number"
@@ -906,7 +906,7 @@ export const AddSignersFormPartial = ({
             />
 
             <div
-              className={cn('mt-2 flex flex-row items-center space-x-4', {
+              className={cn('twv3-space-x-4 mt-2 flex flex-row items-center', {
                 'mt-4': showAdvancedSettings,
               })}
             >

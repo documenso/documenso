@@ -34,7 +34,7 @@ export default function SettingsProfile() {
 
       <hr className="my-4 max-w-xl" />
 
-      <div className="max-w-xl space-y-8">
+      <div className="twv3-space-y-8 max-w-xl">
         <AnimatePresence>
           {(!isPersonalLayoutMode || user.email !== teamEmail?.email) && teamEmail && (
             <AnimateGenericFadeInOut>

@@ -49,7 +49,7 @@ export const SignFieldNameDialog = createCallable<SignFieldNameDialogProps, stri
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit((data) => call.end(data.name))}>
-            <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
+            <fieldset className="twv3-space-y-4 flex h-full flex-col" disabled={form.formState.isSubmitting}>
               <FormField
                 control={form.control}
                 name="name"

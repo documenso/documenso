@@ -240,9 +240,9 @@ export function TemplateUseDialog({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <fieldset className="flex h-full flex-col" disabled={form.formState.isSubmitting}>
-              <div className="custom-scrollbar -m-1 max-h-[60vh] space-y-4 overflow-y-auto p-1">
+              <div className="custom-scrollbar twv3-space-y-4 -m-1 max-h-[60vh] overflow-y-auto p-1">
                 {formRecipients.map((recipient, index) => (
-                  <div className="flex w-full flex-row space-x-4" key={recipient.id}>
+                  <div className="twv3-space-x-4 flex w-full flex-row" key={recipient.id}>
                     {templateSigningOrder === DocumentSigningOrder.SEQUENTIAL && (
                       <FormField
                         control={form.control}
@@ -337,7 +337,7 @@ export function TemplateUseDialog({
                                     <InfoIcon className="mx-1 h-4 w-4" />
                                   </TooltipTrigger>
 
-                                  <TooltipContent className="z-[99999] max-w-md space-y-2 p-4 text-muted-foreground">
+                                  <TooltipContent className="twv3-space-y-2 z-[99999] max-w-md p-4 text-muted-foreground">
                                     <p>
                                       <Trans>
                                         The document will be immediately sent to recipients if this is checked.
@@ -362,7 +362,7 @@ export function TemplateUseDialog({
                                   <TooltipTrigger type="button">
                                     <InfoIcon className="mx-1 h-4 w-4" />
                                   </TooltipTrigger>
-                                  <TooltipContent className="z-[99999] max-w-md space-y-2 p-4 text-muted-foreground">
+                                  <TooltipContent className="twv3-space-y-2 z-[99999] max-w-md p-4 text-muted-foreground">
                                     <p>
                                       <Trans>Create the document as pending and ready to sign.</Trans>
                                     </p>
@@ -414,7 +414,7 @@ export function TemplateUseDialog({
                             <TooltipTrigger type="button">
                               <InfoIcon className="mx-1 h-4 w-4" />
                             </TooltipTrigger>
-                            <TooltipContent className="z-[99999] max-w-md space-y-2 p-4 text-muted-foreground">
+                            <TooltipContent className="twv3-space-y-2 z-[99999] max-w-md p-4 text-muted-foreground">
                               <p>
                                 <Trans>
                                   Upload a custom document to use instead of the template's default document
@@ -429,7 +429,7 @@ export function TemplateUseDialog({
                 />
 
                 {form.watch('useCustomDocument') && (
-                  <div className="my-4 space-y-2">
+                  <div className="twv3-space-y-2 my-4">
                     {isLoadingEnvelopeItems ? (
                       <SpinnerBox className="py-16" />
                     ) : (
@@ -445,7 +445,7 @@ export function TemplateUseDialog({
                                   key={item.id}
                                   className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-accent/10"
                                 >
-                                  <div className="flex-shrink-0">
+                                  <div className="shrink-0">
                                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                                       <FileTextIcon className="h-5 w-5 text-primary" />
                                     </div>
@@ -464,7 +464,7 @@ export function TemplateUseDialog({
                                     </p>
                                   </div>
 
-                                  <div className="flex flex-shrink-0 items-center gap-2">
+                                  <div className="flex shrink-0 items-center gap-2">
                                     {field.value ? (
                                       <div className="">
                                         <Button

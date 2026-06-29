@@ -211,7 +211,7 @@ export const TemplateDirectLinkDialog = ({
                     </DialogDescription>
                   </DialogHeader>
 
-                  <ul className="mt-4 space-y-4 pl-12">
+                  <ul className="twv3-space-y-4 mt-4 pl-12">
                     {DIRECT_TEMPLATE_DOCUMENTATION.map((step, index) => (
                       <li className="relative" key={index}>
                         <div className="absolute -left-12">
@@ -259,7 +259,7 @@ export const TemplateDirectLinkDialog = ({
               .with({ token: P.nullish, currentStep: 'SELECT_RECIPIENT' }, () => (
                 <DialogContent className="relative">
                   {isCreatingTemplateDirectLink && validDirectTemplateRecipients.length !== 0 && (
-                    <div className="absolute inset-0 z-50 flex items-center justify-center rounded bg-white/50 dark:bg-black/50">
+                    <div className="absolute inset-0 z-50 flex items-center justify-center rounded-sm bg-white/50 dark:bg-black/50">
                       <LoaderIcon className="h-6 w-6 animate-spin text-gray-500" />
                     </div>
                   )}
@@ -405,7 +405,7 @@ export const TemplateDirectLinkDialog = ({
                             className="h-8 w-8"
                             onClick={() => void onCopyClick(token)}
                           >
-                            <ClipboardCopyIcon className="h-4 w-4 flex-shrink-0" />
+                            <ClipboardCopyIcon className="h-4 w-4 shrink-0" />
                           </Button>
                         </div>
                       </div>

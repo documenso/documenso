@@ -90,7 +90,7 @@ export const AdminOrganisationCreateDialog = ({ trigger, ownerUserId, ...props }
     <Dialog {...props} open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
         {trigger ?? (
-          <Button className="flex-shrink-0" variant="secondary">
+          <Button className="shrink-0" variant="secondary">
             <Trans>Create organisation</Trans>
           </Button>
         )}
@@ -109,7 +109,7 @@ export const AdminOrganisationCreateDialog = ({ trigger, ownerUserId, ...props }
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
-            <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
+            <fieldset className="twv3-space-y-4 flex h-full flex-col" disabled={form.formState.isSubmitting}>
               <FormField
                 control={form.control}
                 name="name"

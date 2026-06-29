@@ -70,7 +70,7 @@ export default function EnvelopeEditorHeader() {
   return (
     <nav className="w-full border-border border-b bg-background px-4 py-3 md:px-6">
       <div className="flex items-center justify-between gap-4">
-        <div className="flex min-w-0 flex-1 items-center space-x-4">
+        <div className="twv3-space-x-4 flex min-w-0 flex-1 items-center">
           {editorConfig.embedded?.customBrandingLogo ? (
             <img src={`/api/branding/logo/team/${envelope.teamId}`} alt="Logo" className="h-6 w-auto" />
           ) : (
@@ -80,7 +80,7 @@ export default function EnvelopeEditorHeader() {
           )}
           <Separator orientation="vertical" className="h-6 shrink-0" />
 
-          <div className="flex min-w-0 items-center space-x-2">
+          <div className="twv3-space-x-2 flex min-w-0 items-center">
             <EnvelopeItemTitleInput
               dataTestId="envelope-title-input"
               disabled={!envelopeItemPermissions.canTitleBeChanged || !allowConfigureEnvelopeTitle}
@@ -177,7 +177,7 @@ export default function EnvelopeEditorHeader() {
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center space-x-2">
+        <div className="twv3-space-x-2 flex shrink-0 items-center">
           {allowAttachments &&
             (isEmbedded ? (
               <EmbeddedEditorAttachmentPopover buttonSize="sm" />

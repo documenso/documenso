@@ -114,7 +114,7 @@ export const OrganisationEmailCreateDialog = ({
     <Dialog {...props} open={open} onOpenChange={(value) => !isPending && setOpen(value)}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
         {trigger ?? (
-          <Button className="flex-shrink-0" variant="secondary">
+          <Button className="shrink-0" variant="secondary">
             <Trans>Add Email</Trans>
           </Button>
         )}
@@ -135,7 +135,7 @@ export const OrganisationEmailCreateDialog = ({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
-            <fieldset className="flex h-full flex-col space-y-4" disabled={isPending}>
+            <fieldset className="twv3-space-y-4 flex h-full flex-col" disabled={isPending}>
               <FormField
                 control={form.control}
                 name="emailName"

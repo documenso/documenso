@@ -119,7 +119,7 @@ export function DocumentSigningRejectDialog({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onRejectDocument)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onRejectDocument)} className="twv3-space-y-4">
             <FormField
               control={form.control}
               name="reason"

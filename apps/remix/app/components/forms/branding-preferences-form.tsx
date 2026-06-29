@@ -500,7 +500,7 @@ export function BrandingPreferencesForm({
 
               <Accordion type="single" collapsible>
                 <AccordionItem value="custom-css" className="border-none">
-                  <AccordionTrigger className="rounded border px-3 py-2 text-left text-foreground hover:bg-muted/40 hover:no-underline">
+                  <AccordionTrigger className="rounded-sm border px-3 py-2 text-left text-foreground hover:bg-muted/40 hover:no-underline">
                     <Trans>Advanced — Custom CSS</Trans>
                   </AccordionTrigger>
 
@@ -538,7 +538,7 @@ export function BrandingPreferencesForm({
             </div>
           )}
 
-          <div className="flex flex-row justify-end space-x-4">
+          <div className="twv3-space-x-4 flex flex-row justify-end">
             <Button type="submit" loading={form.formState.isSubmitting}>
               <Trans>Update</Trans>
             </Button>

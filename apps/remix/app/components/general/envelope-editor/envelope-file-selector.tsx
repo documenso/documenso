@@ -22,7 +22,7 @@ export const EnvelopeItemSelector = ({
   return (
     <button
       title={typeof primaryText === 'string' ? primaryText : undefined}
-      className={`group flex h-fit max-w-72 flex-shrink-0 cursor-pointer items-center space-x-3 rounded-lg border px-4 py-3 transition-colors ${
+      className={`group twv3-space-x-3 flex h-fit max-w-72 shrink-0 cursor-pointer items-center rounded-lg border px-4 py-3 transition-colors ${
         isSelected
           ? 'border-green-200 bg-green-50 text-green-900 dark:border-green-400/30 dark:bg-green-400/10 dark:text-green-400'
           : 'border-border bg-muted/50 hover:bg-muted/70'
@@ -30,7 +30,7 @@ export const EnvelopeItemSelector = ({
       {...buttonProps}
     >
       <div
-        className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full font-medium text-xs ${
+        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-medium text-xs ${
           isSelected ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-600'
         }`}
       >
@@ -42,7 +42,7 @@ export const EnvelopeItemSelector = ({
       </div>
       {actionSlot ?? (
         <div
-          className={cn('h-2 w-2 flex-shrink-0 rounded-full', {
+          className={cn('h-2 w-2 shrink-0 rounded-full', {
             'bg-green-500': isSelected,
           })}
         />
@@ -67,7 +67,7 @@ export const EnvelopeRendererFileSelector = ({
   const { envelopeItems, currentEnvelopeItem, setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
 
   return (
-    <div className={cn('scrollbar-hidden flex h-fit flex-shrink-0 space-x-2 overflow-x-auto p-4', className)}>
+    <div className={cn('scrollbar-hidden twv3-space-x-2 flex h-fit shrink-0 overflow-x-auto p-4', className)}>
       {envelopeItems.map((doc, i) => (
         <EnvelopeItemSelector
           key={doc.id}

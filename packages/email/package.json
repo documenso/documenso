@@ -44,6 +44,8 @@
   },
   "devDependencies": {
     "@documenso/tsconfig": "*",
-    "@types/nodemailer": "^8.0.0"
+    "@tailwindcss/postcss": "^4.3.1",
+    "@types/nodemailer": "^8.0.0",
+    "tailwindcss": "^4.3.1"
   }
 }

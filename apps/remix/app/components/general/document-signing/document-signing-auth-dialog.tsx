@@ -104,7 +104,7 @@ export const DocumentSigningAuthDialog = ({
 
         {/* Show chooser if no auth type is selected and there are multiple options */}
         {!selectedAuthType && validAuthTypes.length > 1 && (
-          <div className="space-y-4">
+          <div className="twv3-space-y-4">
             <p className="text-muted-foreground text-sm">
               <Trans>Choose your preferred authentication method:</Trans>
             </p>

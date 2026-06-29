@@ -19,7 +19,7 @@ const PopoverContent = React.forwardRef<
       align={align}
       sideOffset={sideOffset}
       className={cn(
-        'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-72 animate-in rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none',
+        'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-72 animate-in rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-hidden',
         className,
       )}
       {...props}
@@ -73,7 +73,7 @@ const PopoverHover = ({ trigger, children, contentProps, side = 'top' }: Popover
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger
-        className="flex cursor-pointer outline-none"
+        className="flex cursor-pointer outline-hidden"
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >

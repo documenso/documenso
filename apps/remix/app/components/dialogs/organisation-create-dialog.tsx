@@ -136,7 +136,7 @@ export const OrganisationCreateDialog = ({ trigger, ...props }: OrganisationCrea
     <Dialog {...props} open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
         {trigger ?? (
-          <Button className="flex-shrink-0" variant="secondary">
+          <Button className="shrink-0" variant="secondary">
             <Trans>Create organisation</Trans>
           </Button>
         )}
@@ -199,7 +199,7 @@ export const OrganisationCreateDialog = ({ trigger, ...props }: OrganisationCrea
 
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onFormSubmit)}>
-                  <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
+                  <fieldset className="twv3-space-y-4 flex h-full flex-col" disabled={form.formState.isSubmitting}>
                     <FormField
                       control={form.control}
                       name="name"
@@ -305,7 +305,7 @@ const BillingPlanForm = ({ value, onChange, plans, canCreateFreeOrganisation }: 
   };
 
   return (
-    <div className="space-y-4">
+    <div className="twv3-space-y-4">
       <Tabs
         className="flex w-full items-center justify-center"
         defaultValue="monthlyPrice"
@@ -327,7 +327,7 @@ const BillingPlanForm = ({ value, onChange, plans, canCreateFreeOrganisation }: 
         <button
           onClick={() => onChange('')}
           className={cn(
-            'flex cursor-pointer items-center space-x-2 rounded-md border p-4 transition-all hover:border-primary hover:shadow-sm',
+            'twv3-space-x-2 flex cursor-pointer items-center rounded-md border p-4 transition-all hover:border-primary hover:shadow-xs',
             {
               'border-primary ring-2 ring-primary/10 ring-offset-1': '' === value,
             },
@@ -360,7 +360,7 @@ const BillingPlanForm = ({ value, onChange, plans, canCreateFreeOrganisation }: 
             key={plan[billingPeriod]?.id}
             onClick={() => onChange(plan[billingPeriod]?.id ?? '')}
             className={cn(
-              'flex cursor-pointer items-center space-x-2 rounded-md border p-4 transition-all hover:border-primary hover:shadow-sm',
+              'twv3-space-x-2 flex cursor-pointer items-center rounded-md border p-4 transition-all hover:border-primary hover:shadow-xs',
               {
                 'border-primary ring-2 ring-primary/10 ring-offset-1': plan[billingPeriod]?.id === value,
               },
@@ -382,7 +382,7 @@ const BillingPlanForm = ({ value, onChange, plans, canCreateFreeOrganisation }: 
         <Link
           to="https://documen.so/enterprise-cta"
           target="_blank"
-          className="flex items-center space-x-2 rounded-md border bg-muted/30 p-4"
+          className="twv3-space-x-2 flex items-center rounded-md border bg-muted/30 p-4"
         >
           <div className="flex-1 font-normal">
             <p className="font-medium text-muted-foreground">

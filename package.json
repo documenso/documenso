@@ -54,6 +54,7 @@
     "@datadog/pprof": "^5.13.5",
     "@lingui/cli": "^5.6.0",
     "@prisma/client": "^6.19.0",
+    "@tailwindcss/postcss": "^4.1.18",
     "@trpc/client": "11.8.1",
     "@trpc/react-query": "11.8.1",
     "@trpc/server": "11.8.1",
@@ -109,6 +110,9 @@
     "zod": "$zod",
     "fumadocs-mdx": {
       "zod": "^4.3.5"
+    },
+    "@ts-rest/serverless": {
+      "next": "16.2.9"
     }
   }
 }

@@ -49,7 +49,7 @@ export const DocumentSigningAuthAccount = ({
   };
 
   return (
-    <fieldset disabled={isSigningOut} className="space-y-4">
+    <fieldset disabled={isSigningOut} className="twv3-space-y-4">
       <Alert variant="warning">
         <AlertDescription>
           <span>

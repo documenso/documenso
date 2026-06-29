@@ -55,7 +55,7 @@ export default function AdminTeamPage({ params }: Route.ComponentProps) {
       {
         header: _(msg`Member`),
         cell: ({ row }) => (
-          <div className="space-y-1">
+          <div className="twv3-space-y-1">
             <Link className="font-medium hover:underline" to={`/admin/users/${row.original.user.id}`}>
               {row.original.user.name ?? row.original.user.email}
             </Link>

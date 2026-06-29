@@ -155,7 +155,7 @@ export const AdminDocumentLogsTable = ({ envelopeId }: AdminDocumentLogsTablePro
                 <Skeleton className="h-4 w-12 rounded-full" />
               </TableCell>
               <TableCell className="w-1/2 py-4 pr-4">
-                <div className="ml-2 flex flex-grow flex-col">
+                <div className="ml-2 flex grow flex-col">
                   <Skeleton className="h-4 w-1/3 max-w-[8rem]" />
                   <Skeleton className="mt-1 h-4 w-1/2 max-w-[12rem]" />
                 </div>

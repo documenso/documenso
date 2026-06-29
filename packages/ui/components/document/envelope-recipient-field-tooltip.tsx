@@ -180,7 +180,7 @@ export function EnvelopeRecipientFieldTooltip({
         <p className="mt-1 text-center text-muted-foreground text-xs">{getRecipientDisplayText(field.recipient)}</p>
 
         <button
-          className="absolute top-0 right-0 my-1 p-2 focus:outline-none focus-visible:ring-0"
+          className="absolute top-0 right-0 my-1 p-2 focus:outline-hidden focus-visible:ring-0"
           onClick={() => setHideField(true)}
           title="Hide field"
         >

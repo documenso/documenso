@@ -63,7 +63,7 @@ export const TemplatePageViewRecentActivity = ({
 
       {data && (
         <>
-          <ul role="list" className="space-y-6 p-4">
+          <ul role="list" className="twv3-space-y-6 p-4">
             {data.data.length > 0 && results.totalPages > 1 && (
               <li className="relative flex gap-x-4">
                 <div className="absolute top-0 -bottom-6 left-0 flex w-6 justify-center">

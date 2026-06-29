@@ -258,7 +258,7 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
 
           <WebhookEventCombobox />
 
-          <Tabs value={parsedSearchParams.status || ''} className="flex-shrink-0">
+          <Tabs value={parsedSearchParams.status || ''} className="shrink-0">
             <TabsList>
               <TabsTrigger className="min-w-[60px] hover:text-foreground" value="" asChild>
                 <Link to={getTabHref('')}>

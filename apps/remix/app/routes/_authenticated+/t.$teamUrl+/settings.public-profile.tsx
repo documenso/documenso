@@ -136,10 +136,13 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
         <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
           <TooltipTrigger asChild>
             <div
-              className={cn('flex flex-row items-center justify-center space-x-2 text-muted-foreground/50 text-xs', {
-                '[&>*:first-child]:text-muted-foreground': !isPublicProfileVisible,
-                '[&>*:last-child]:text-muted-foreground': isPublicProfileVisible,
-              })}
+              className={cn(
+                'twv3-space-x-2 flex flex-row items-center justify-center text-muted-foreground/50 text-xs',
+                {
+                  '[&>*:first-child]:text-muted-foreground': !isPublicProfileVisible,
+                  '[&>*:last-child]:text-muted-foreground': isPublicProfileVisible,
+                },
+              )}
             >
               <span>
                 <Trans>Hide</Trans>
@@ -155,7 +158,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
             </div>
           </TooltipTrigger>
 
-          <TooltipContent className="max-w-[40ch] space-y-2 py-2 text-muted-foreground">
+          <TooltipContent className="twv3-space-y-2 max-w-[40ch] py-2 text-muted-foreground">
             {isPublicProfileVisible ? (
               <>
                 <p>

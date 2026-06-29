@@ -113,7 +113,7 @@ export const FolderDeleteDialog = ({ folder, isOpen, onOpenChange }: FolderDelet
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
-            <fieldset disabled={form.formState.isSubmitting} className="space-y-4">
+            <fieldset disabled={form.formState.isSubmitting} className="twv3-space-y-4">
               <FormField
                 control={form.control}
                 name="confirmText"

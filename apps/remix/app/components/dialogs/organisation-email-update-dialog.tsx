@@ -115,7 +115,7 @@ export const OrganisationEmailUpdateDialog = ({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
-            <fieldset className="flex h-full flex-col space-y-4" disabled={isPending}>
+            <fieldset className="twv3-space-y-4 flex h-full flex-col" disabled={isPending}>
               <FormField
                 control={form.control}
                 name="emailName"

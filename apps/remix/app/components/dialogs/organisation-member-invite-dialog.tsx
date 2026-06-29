@@ -313,10 +313,10 @@ export const OrganisationMemberInviteDialog = ({ trigger, ...props }: Organisati
             <TabsContent value="INDIVIDUAL">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onFormSubmit)}>
-                  <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
-                    <div className="custom-scrollbar -m-1 max-h-[60vh] space-y-4 overflow-y-auto p-1">
+                  <fieldset className="twv3-space-y-4 flex h-full flex-col" disabled={form.formState.isSubmitting}>
+                    <div className="custom-scrollbar twv3-space-y-4 -m-1 max-h-[60vh] overflow-y-auto p-1">
                       {organisationMemberInvites.map((organisationMemberInvite, index) => (
-                        <div className="flex w-full flex-row space-x-4" key={organisationMemberInvite.id}>
+                        <div className="twv3-space-x-4 flex w-full flex-row" key={organisationMemberInvite.id}>
                           <FormField
                             control={form.control}
                             name={`invitations.${index}.email`}
@@ -409,7 +409,7 @@ export const OrganisationMemberInviteDialog = ({ trigger, ...props }: Organisati
             </TabsContent>
 
             <TabsContent value="BULK">
-              <div className="mt-4 space-y-4">
+              <div className="twv3-space-y-4 mt-4">
                 <Card gradient className="h-32">
                   <CardContent
                     className="flex h-full cursor-pointer flex-col items-center justify-center rounded-lg p-0 text-muted-foreground/80 transition-colors hover:text-muted-foreground/90"

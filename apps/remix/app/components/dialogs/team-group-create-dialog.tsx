@@ -202,10 +202,10 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
 
               {step === 'ROLES' && (
                 <>
-                  <div className="custom-scrollbar -m-1 max-h-[60vh] space-y-4 overflow-y-auto p-1">
+                  <div className="custom-scrollbar twv3-space-y-4 -m-1 max-h-[60vh] overflow-y-auto p-1">
                     {form.getValues('groups').map((group, index) => (
-                      <div className="flex w-full flex-row space-x-4" key={index}>
-                        <div className="w-full space-y-2">
+                      <div className="twv3-space-x-4 flex w-full flex-row" key={index}>
+                        <div className="twv3-space-y-2 w-full">
                           {index === 0 && (
                             <FormLabel>
                               <Trans>Group</Trans>

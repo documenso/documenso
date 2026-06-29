@@ -170,9 +170,9 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-6">
+        <CardContent className="twv3-space-y-6">
           {/* Current User Section */}
-          <div className="space-y-3">
+          <div className="twv3-space-y-3">
             <h3 className="flex items-center gap-2 font-semibold text-muted-foreground">
               <UserCircle2 className="h-4 w-4" />
               <Trans>Your Account</Trans>
@@ -194,7 +194,7 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
           <Separator />
 
           {/* Organisation Section */}
-          <div className="space-y-3">
+          <div className="twv3-space-y-3">
             <h3 className="flex items-center gap-2 font-semibold text-muted-foreground">
               <Building2 className="h-4 w-4" />
               <Trans>Requesting Organisation</Trans>
@@ -216,18 +216,18 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
           <Separator />
 
           {/* Warnings Section */}
-          <div className="space-y-3">
+          <div className="twv3-space-y-3">
             <h3 className="flex items-center gap-2 font-semibold text-muted-foreground">
               <AlertTriangle className="h-4 w-4" />
               <Trans>Important: What This Means</Trans>
             </h3>
-            <div className="space-y-3 rounded-lg border p-4">
+            <div className="twv3-space-y-3 rounded-lg border p-4">
               <p className="font-medium text-sm">
                 <Trans>By accepting this request, you grant {organisation.name} the following permissions:</Trans>
               </p>
-              <ul className="space-y-2 text-sm">
+              <ul className="twv3-space-y-2 text-sm">
                 <li className="flex items-start gap-2">
-                  <Eye className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                  <Eye className="mt-0.5 h-4 w-4 shrink-0" />
                   <span>
                     <Trans>
                       <span className="font-semibold text-muted-foreground">Full account access:</span> View all your
@@ -236,7 +236,7 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Settings className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                  <Settings className="mt-0.5 h-4 w-4 shrink-0" />
                   <span>
                     <Trans>
                       <span className="font-semibold text-muted-foreground">Account management:</span> Modify your
@@ -245,7 +245,7 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Database className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                  <Database className="mt-0.5 h-4 w-4 shrink-0" />
                   <span>
                     <Trans>
                       <span className="font-semibold text-muted-foreground">Data access:</span> Access all data

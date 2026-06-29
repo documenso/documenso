@@ -98,7 +98,7 @@ export const DisableAuthenticatorAppDialog = () => {
   return (
     <Dialog open={isOpen} onOpenChange={onCloseTwoFactorDisableDialog}>
       <DialogTrigger asChild={true}>
-        <Button className="flex-shrink-0" variant="destructive">
+        <Button className="shrink-0" variant="destructive">
           <Trans>Disable 2FA</Trans>
         </Button>
       </DialogTrigger>

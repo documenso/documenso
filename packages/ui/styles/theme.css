@@ -1,6 +1,65 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* biome-ignore-all lint/suspicious/noDuplicateProperties: twv3-space-* lists both --value(number) and --value([length]) forms; v4 keeps only one per class. */
+
+@import "tailwindcss";
+
+@config "../tailwind.config.cjs";
+
+@custom-variant dark (&:is(.dark:not(.dark-mode-disabled) *));
+
+/* `print:` variant; defining it as a JS `screen` breaks the `container` utility under v4. */
+@custom-variant print (@media print);
+
+/* Safelist for the runtime recipient color classes (v4 ignores the JS config `safelist`). */
+@source inline("{ring,bg,border,text}-recipient-{green,blue,purple,orange,yellow,pink}");
+@source inline("hover:bg-recipient-{green,blue,purple,orange,yellow,pink}/{15,30}");
+@source inline("active:bg-recipient-{green,blue,purple,orange,yellow,pink}/15");
+@source inline("hover:border-recipient-{green,blue,purple,orange,yellow,pink}");
+@source inline("group-hover:text-recipient-{green,blue,purple,orange,yellow,pink}");
+@source inline("group-hover/field-item:bg-recipient-{green,blue,purple,orange,yellow,pink}");
+
+/* Restore the v3 `ring` defaults (v4 changed them to 1px / currentColor). */
+@theme {
+  --default-ring-width: 3px;
+  --default-ring-color: hsl(var(--ring));
+}
+
+/*
+ * v3-compatible `space-*` utilities. v4's built-in `space-*` uses a zero-specificity
+ * `:where()` selector that lets child margins collapse the gaps; these reproduce the v3
+ * selector/edges so existing layouts keep working. Pair with `twv3-space-{x,y}-reverse`.
+ */
+@utility twv3-space-y-* {
+  & > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(--spacing(--value(number)) * calc(1 - var(--tw-space-y-reverse)));
+    margin-top: calc(--value([length]) * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(--spacing(--value(number)) * var(--tw-space-y-reverse));
+    margin-bottom: calc(--value([length]) * var(--tw-space-y-reverse));
+  }
+}
+
+@utility twv3-space-x-* {
+  & > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-left: calc(--spacing(--value(number)) * calc(1 - var(--tw-space-x-reverse)));
+    margin-left: calc(--value([length]) * calc(1 - var(--tw-space-x-reverse)));
+    margin-right: calc(--spacing(--value(number)) * var(--tw-space-x-reverse));
+    margin-right: calc(--value([length]) * var(--tw-space-x-reverse));
+  }
+}
+
+/* Reverse companions for the twv3-space-* utilities above (built-in ones use a different selector). */
+@utility twv3-space-y-reverse {
+  & > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-y-reverse: 1;
+  }
+}
+
+@utility twv3-space-x-reverse {
+  & > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 1;
+  }
+}
 
 @layer base {
   :root,
@@ -193,6 +252,17 @@
     @apply border-border;
   }
 
+  /* Restore v3 preflight defaults that v4 changed. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: hsl(var(--muted-foreground));
+  }
+
   body {
     @apply bg-background text-foreground;
     font-feature-settings:
@@ -209,11 +279,9 @@
  * - Sets page size to A4
  * - Sets the font size to 12pt
  */
-.print-provider {
-  @page {
-    margin: 1in;
-    size: A4;
-  }
+@page {
+  margin: 1in;
+  size: A4;
 }
 
 .gradient-border-mask::before {

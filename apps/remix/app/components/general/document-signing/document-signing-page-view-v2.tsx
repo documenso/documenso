@@ -97,7 +97,7 @@ export const DocumentSigningPageViewV2 = () => {
         {/* Left Section - Step Navigation */}
         <div
           className={cn(
-            'embed--DocumentWidgetContainer hidden flex-shrink-0 flex-col border-border border-r bg-background transition-[width] duration-300 lg:flex',
+            'embed--DocumentWidgetContainer hidden shrink-0 flex-col border-border border-r bg-background transition-[width] duration-300 lg:flex',
             isSidebarCollapsed ? 'w-12' : 'w-80',
           )}
         >
@@ -125,7 +125,7 @@ export const DocumentSigningPageViewV2 = () => {
                   .otherwise(() => null)}
 
                 <div className="ml-2 flex items-center gap-1">
-                  <span className="rounded border bg-muted/50 px-2 py-0.5 text-muted-foreground text-xs">
+                  <span className="rounded-sm border bg-muted/50 px-2 py-0.5 text-muted-foreground text-xs">
                     <Plural
                       value={recipientFieldsRemaining.length}
                       one="1 Field Remaining"
@@ -155,7 +155,7 @@ export const DocumentSigningPageViewV2 = () => {
                 />
               </div>
 
-              <div className="embed--DocumentWidgetContent mt-6 space-y-3">
+              <div className="embed--DocumentWidgetContent twv3-space-y-3 mt-6">
                 <EnvelopeSignerForm />
               </div>
             </div>
@@ -164,7 +164,7 @@ export const DocumentSigningPageViewV2 = () => {
 
             {/* Quick Actions. */}
             {!isDirectTemplate && (
-              <div className="embed--Actions space-y-3 px-4">
+              <div className="embed--Actions twv3-space-y-3 px-4">
                 <h4 className="font-semibold text-foreground text-sm">
                   <Trans>Actions</Trans>
                 </h4>
@@ -239,7 +239,7 @@ export const DocumentSigningPageViewV2 = () => {
           <div className="flex flex-col">
             {/* Horizontal envelope item selector */}
             {envelopeItems.length > 1 && (
-              <div className="flex h-fit space-x-2 overflow-x-auto p-2 pt-4 sm:p-4">
+              <div className="twv3-space-x-2 flex h-fit overflow-x-auto p-2 pt-4 sm:p-4">
                 {envelopeItems.map((doc, i) => (
                   <EnvelopeItemSelector
                     key={doc.id}

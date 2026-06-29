@@ -87,7 +87,7 @@ export const DirectTemplateConfigureForm = ({
         )}
 
         <Form {...form}>
-          <fieldset className="flex h-full flex-col space-y-6" disabled={form.formState.isSubmitting}>
+          <fieldset className="twv3-space-y-6 flex h-full flex-col" disabled={form.formState.isSubmitting}>
             <FormField
               control={form.control}
               name="email"

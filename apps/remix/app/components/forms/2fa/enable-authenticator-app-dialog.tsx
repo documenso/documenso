@@ -139,7 +139,7 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild={true}>
         <Button
-          className="flex-shrink-0"
+          className="shrink-0"
           loading={isSettingUp2FA}
           onClick={(e) => {
             e.preventDefault();

@@ -94,7 +94,7 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
     <Dialog open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)} {...props}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
         {trigger ?? (
-          <Button className="flex-shrink-0">
+          <Button className="shrink-0">
             <Trans>Create Webhook</Trans>
           </Button>
         )}
@@ -112,7 +112,7 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
+            <fieldset className="twv3-space-y-4 flex h-full flex-col" disabled={form.formState.isSubmitting}>
               <div className="flex flex-col-reverse gap-4 md:flex-row">
                 <FormField
                   control={form.control}

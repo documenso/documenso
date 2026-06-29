@@ -94,7 +94,7 @@ export const AdminClaimsTable = ({ licenseFlags }: AdminClaimsTableProps) => {
           }
 
           return (
-            <ul className="list-disc space-y-1 text-muted-foreground text-xs">
+            <ul className="twv3-space-y-1 list-disc text-muted-foreground text-xs">
               {flags.map(({ key, label }) => (
                 <li key={key}>{label}</li>
               ))}
@@ -178,8 +178,8 @@ export const AdminClaimsTable = ({ licenseFlags }: AdminClaimsTableProps) => {
                 <Skeleton className="h-4 w-12 rounded-full" />
               </TableCell>
               <TableCell>
-                <div className="flex flex-row justify-end space-x-2">
-                  <Skeleton className="h-2 w-6 rounded" />
+                <div className="twv3-space-x-2 flex flex-row justify-end">
+                  <Skeleton className="h-2 w-6 rounded-sm" />
                 </div>
               </TableCell>
             </>

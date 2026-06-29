@@ -75,7 +75,7 @@ export const ConfigureDocumentView = ({
   const onFormSubmit = handleSubmit(onSubmit);
 
   return (
-    <div className="flex w-full flex-col space-y-8">
+    <div className="twv3-space-y-8 flex w-full flex-col">
       <div>
         <h2 className="mb-1 font-semibold text-foreground text-xl">
           {isTemplate ? <Trans>Configure Template</Trans> : <Trans>Configure Document</Trans>}
@@ -91,7 +91,7 @@ export const ConfigureDocumentView = ({
       </div>
 
       <Form {...form}>
-        <div className="flex flex-col space-y-8">
+        <div className="twv3-space-y-8 flex flex-col">
           <div>
             <FormField
               control={control}

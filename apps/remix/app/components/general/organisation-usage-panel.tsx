@@ -52,7 +52,7 @@ export const OrganisationUsagePanel = ({
   ];
 
   return (
-    <div className="space-y-4 rounded-md border p-4">
+    <div className="twv3-space-y-4 rounded-md border p-4">
       <div className="flex items-center justify-between gap-2">
         <h3 className="font-medium text-sm">
           <Trans>Usage for period: {selectedStat?.period || 'N/A'}</Trans>
@@ -81,7 +81,7 @@ export const OrganisationUsagePanel = ({
             : 0;
 
         return (
-          <div key={row.counter} className="space-y-1">
+          <div key={row.counter} className="twv3-space-y-1">
             <div className="flex items-center justify-between text-sm">
               <span>{row.label}</span>
               <span className="text-muted-foreground">
@@ -104,7 +104,7 @@ export const OrganisationUsagePanel = ({
         );
       })}
 
-      <div className="space-y-1">
+      <div className="twv3-space-y-1">
         <div className="flex items-center justify-between text-sm">
           <span>
             <Trans>Reports</Trans>

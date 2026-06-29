@@ -20,7 +20,7 @@ export default function TeamsSettingsPage() {
 
       <UserOrganisationsTable />
 
-      <div className="mt-8 space-y-8">
+      <div className="twv3-space-y-8 mt-8">
         <OrganisationInvitations />
       </div>
     </div>

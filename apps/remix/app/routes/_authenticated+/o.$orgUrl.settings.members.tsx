@@ -51,14 +51,14 @@ export default function TeamsSettingsMembersPage() {
       </SettingsHeader>
 
       <div>
-        <div className="my-4 flex flex-row items-center justify-between space-x-4">
+        <div className="twv3-space-x-4 my-4 flex flex-row items-center justify-between">
           <Input
             defaultValue={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={_(msg`Search`)}
           />
 
-          <Tabs value={currentTab} className="flex-shrink-0 overflow-x-auto">
+          <Tabs value={currentTab} className="shrink-0 overflow-x-auto">
             <TabsList>
               <TabsTrigger className="min-w-[60px]" value="members" asChild>
                 <Link to={pathname ?? '/'}>

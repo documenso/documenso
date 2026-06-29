@@ -75,7 +75,7 @@ export const ConfigureDocumentAdvancedSettings = ({
         </TabsList>
 
         <TabsContent value="general" className="mt-0">
-          <div className="flex flex-col space-y-6">
+          <div className="twv3-space-y-6 flex flex-col">
             {features.allowConfigureSignatureTypes && (
               <FormField
                 control={control}
@@ -215,7 +215,7 @@ export const ConfigureDocumentAdvancedSettings = ({
 
         {features.allowConfigureCommunication && (
           <TabsContent value="communication" className="mt-0">
-            <div className="flex flex-col space-y-6">
+            <div className="twv3-space-y-6 flex flex-col">
               <FormField
                 control={control}
                 name="meta.distributionMethod"
@@ -254,7 +254,7 @@ export const ConfigureDocumentAdvancedSettings = ({
               />
 
               <fieldset
-                className="flex flex-col space-y-6 disabled:cursor-not-allowed disabled:opacity-60"
+                className="twv3-space-y-6 flex flex-col disabled:cursor-not-allowed disabled:opacity-60"
                 disabled={!isEmailDistribution}
               >
                 <FormField

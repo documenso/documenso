@@ -693,13 +693,13 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
             zIndex: 50,
           }}
           // Don't use darkmode for this component, it should look the same for both light/dark modes.
-          className="grid w-max grid-cols-5 gap-x-1 gap-y-0.5 rounded-md border border-gray-300 bg-white p-1 text-gray-500 shadow-sm"
+          className="grid w-max grid-cols-5 gap-x-1 gap-y-0.5 rounded-md border border-gray-300 bg-white p-1 text-gray-500 shadow-xs"
         >
           {fieldButtonList.map((field) => (
             <button
               key={field.type}
               onClick={() => createFieldFromPendingTemplate(pendingFieldCreation, field.type)}
-              className="col-span-1 w-full flex-shrink-0 rounded-sm px-2 py-1 text-xs hover:bg-gray-100 hover:text-gray-600"
+              className="col-span-1 w-full shrink-0 rounded-xs px-2 py-1 text-xs hover:bg-gray-100 hover:text-gray-600"
             >
               {t(field.name)}
             </button>
@@ -800,7 +800,7 @@ const FieldActionButtons = ({
         <button
           type="button"
           title={t`Change Recipient`}
-          className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+          className="rounded-xs p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
           onClick={() => setShowRecipientSelector(true)}
           onTouchEnd={() => setShowRecipientSelector(true)}
         >
@@ -810,7 +810,7 @@ const FieldActionButtons = ({
         <button
           type="button"
           title={t`Change Field Type`}
-          className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+          className="rounded-xs p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
           onClick={() => setShowFieldTypeSelector(true)}
           onTouchEnd={() => setShowFieldTypeSelector(true)}
         >
@@ -820,7 +820,7 @@ const FieldActionButtons = ({
         <button
           type="button"
           title={t`Duplicate`}
-          className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+          className="rounded-xs p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
           onClick={handleDuplicateSelectedFields}
           onTouchEnd={handleDuplicateSelectedFields}
         >
@@ -830,7 +830,7 @@ const FieldActionButtons = ({
         <button
           type="button"
           title={t`Duplicate on all pages`}
-          className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+          className="rounded-xs p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
           onClick={handleDuplicateSelectedFieldsOnAllPages}
           onTouchEnd={handleDuplicateSelectedFieldsOnAllPages}
         >
@@ -840,7 +840,7 @@ const FieldActionButtons = ({
         <button
           type="button"
           title={t`Remove`}
-          className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+          className="rounded-xs p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
           onClick={handleDeleteSelectedFields}
           onTouchEnd={handleDeleteSelectedFields}
         >

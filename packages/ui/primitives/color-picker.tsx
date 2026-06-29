@@ -55,7 +55,7 @@ export const ColorPicker = ({
           disabled={disabled}
           className="h-12 w-12 rounded-md border bg-background p-1 disabled:pointer-events-none disabled:opacity-50"
         >
-          <div className="h-full w-full rounded-sm" style={{ backgroundColor: color }} />
+          <div className="h-full w-full rounded-xs" style={{ backgroundColor: color }} />
         </button>
       </PopoverTrigger>
 

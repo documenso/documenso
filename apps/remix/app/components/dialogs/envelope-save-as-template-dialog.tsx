@@ -116,12 +116,12 @@ export const EnvelopeSaveAsTemplateDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="twv3-space-y-4">
           <Controller
             control={form.control}
             name="includeRecipients"
             render={({ field }) => (
-              <div className="flex items-center space-x-2">
+              <div className="twv3-space-x-2 flex items-center">
                 <Checkbox
                   id="envelopeIncludeRecipients"
                   checked={field.value}
@@ -144,7 +144,7 @@ export const EnvelopeSaveAsTemplateDialog = ({
             control={form.control}
             name="includeFields"
             render={({ field }) => (
-              <div className="flex items-center space-x-2">
+              <div className="twv3-space-x-2 flex items-center">
                 <Checkbox
                   id="envelopeIncludeFields"
                   checked={field.value}

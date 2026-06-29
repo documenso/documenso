@@ -76,7 +76,7 @@ export const AdminOrganisationMemberDeleteDialog = ({
       </DialogTrigger>
 
       <DialogContent>
-        <DialogHeader className="space-y-4">
+        <DialogHeader className="twv3-space-y-4">
           <DialogTitle>
             <Trans>Remove Organisation Member</Trans>
           </DialogTitle>
