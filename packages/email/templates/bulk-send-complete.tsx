@@ -24,11 +24,14 @@ export const BulkSendCompleteEmail = ({
 }: BulkSendCompleteEmailProps) => {
   const { _ } = useLingui();
 
+  const previewText = msg`Bulk send operation complete for template "${templateName}"`;
+
   return (
     <Html>
       <Head />
-      <Preview>{_(msg`Bulk send operation complete for template "${templateName}"`)}</Preview>
       <Body className="mx-auto my-auto bg-background font-sans">
+        <Preview>{_(previewText)}</Preview>
+
         <Section>
           <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-border border-solid p-4 backdrop-blur-sm">
             <Section>
