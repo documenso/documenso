@@ -44,7 +44,6 @@
   },
   "devDependencies": {
     "@documenso/tsconfig": "*",
-    "@types/nodemailer": "^8.0.0",
-    "vitest": "^4.0.18"
+    "@types/nodemailer": "^8.0.0"
   }
 }
