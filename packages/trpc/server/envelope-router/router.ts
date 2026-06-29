@@ -12,6 +12,8 @@ import { createEnvelopeItemsRoute } from './create-envelope-items';
 import { deleteEnvelopeRoute } from './delete-envelope';
 import { deleteEnvelopeItemRoute } from './delete-envelope-item';
 import { distributeEnvelopeRoute } from './distribute-envelope';
+import { downloadEnvelopeAuditLogPdfRoute } from './download-envelope-audit-log-pdf';
+import { downloadEnvelopeCertificatePdfRoute } from './download-envelope-certificate-pdf';
 import { downloadEnvelopeItemRoute } from './download-envelope-item';
 import { duplicateEnvelopeRoute } from './duplicate-envelope';
 import { createEnvelopeFieldsRoute } from './envelope-fields/create-envelope-fields';
@@ -85,6 +87,10 @@ export const envelopeRouter = router({
   find: findEnvelopesRoute,
   auditLog: {
     find: findEnvelopeAuditLogsRoute,
+    downloadPdf: downloadEnvelopeAuditLogPdfRoute,
+  },
+  certificate: {
+    downloadPdf: downloadEnvelopeCertificatePdfRoute,
   },
   bulk: {
     move: bulkMoveEnvelopesRoute,

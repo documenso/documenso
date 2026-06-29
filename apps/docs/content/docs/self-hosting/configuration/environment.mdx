@@ -86,6 +86,21 @@ Callback URL: `https://<your-domain>/api/auth/callback/microsoft`
 | `NEXT_PRIVATE_OIDC_SKIP_VERIFY`    | `false` | Skip email verification for OIDC accounts          |
 | `NEXT_PRIVATE_OIDC_PROMPT`         | `login` | OIDC prompt parameter. Set to empty string to omit |
 
+### Webhooks
+
+| Variable                                | Default | Description                                                              |
+| --------------------------------------- | ------- | ------------------------------------------------------------------------ |
+| `NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS` | -       | Comma-separated hostnames or IPs allowed to resolve to private addresses |
+
+Before delivering a webhook, Documenso checks whether the target resolves to a
+private or loopback address and blocks it if so. This check is best-effort and
+fails open. Use `NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS` to allow specific
+internal hosts, for example when delivering to a service on your own network:
+
+```bash
+NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS="hooks.internal.example,10.0.0.5"
+```
+
 ---
 
 ## Email Configuration
