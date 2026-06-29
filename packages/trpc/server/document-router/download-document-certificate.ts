@@ -17,18 +17,18 @@ export const downloadDocumentCertificateRoute = authenticatedProcedure
   .output(ZDownloadDocumentCertificateResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { teamId } = ctx;
-    const { documentId } = input;
+    const { envelopeId } = input;
 
     ctx.logger.info({
       input: {
-        documentId,
+        envelopeId,
       },
     });
 
     const { envelopeWhereInput } = await getEnvelopeWhereInput({
       id: {
-        type: 'documentId',
-        id: documentId,
+        type: 'envelopeId',
+        id: envelopeId,
       },
       type: EnvelopeType.DOCUMENT,
       userId: ctx.user.id,
@@ -81,10 +81,8 @@ export const downloadDocumentCertificateRoute = authenticatedProcedure
 
     const result = await certificatePdf.save();
 
-    const base64 = Buffer.from(result).toString('base64');
-
     return {
-      data: base64,
+      data: Buffer.from(result).toString('base64'),
       envelopeTitle: envelope.title,
     };
   });

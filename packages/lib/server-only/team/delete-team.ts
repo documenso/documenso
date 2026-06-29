@@ -85,6 +85,7 @@ export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
     // Purge all internal organisation groups that have no teams.
     await tx.organisationGroup.deleteMany({
       where: {
+        organisationId: team.organisationId,
         type: OrganisationGroupType.INTERNAL_TEAM,
         teamGroups: {
           none: {},
