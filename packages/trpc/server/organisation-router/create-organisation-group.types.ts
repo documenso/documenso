@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { OrganisationMemberRole } from '@prisma/client';
 import { z } from 'zod';
 

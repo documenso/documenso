@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { z } from 'zod';
 
 /**
@@ -11,7 +12,7 @@ import { z } from 'zod';
 const EMAIL_REGEX =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~\u{0080}-\u{FFFF}-]+@[a-zA-Z0-9\u{0080}-\u{FFFF}](?:[a-zA-Z0-9\u{0080}-\u{FFFF}-]{0,61}[a-zA-Z0-9\u{0080}-\u{FFFF}])?(?:\.[a-zA-Z0-9\u{0080}-\u{FFFF}](?:[a-zA-Z0-9\u{0080}-\u{FFFF}-]{0,61}[a-zA-Z0-9\u{0080}-\u{FFFF}])?)*$/u;
 
-const DEFAULT_EMAIL_MESSAGE = 'Invalid email address';
+const DEFAULT_EMAIL_MESSAGE = msg`Invalid email address`.id;
 
 /**
  * Creates a Zod email schema using an RFC 5322 compliant regex.
