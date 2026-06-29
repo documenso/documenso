@@ -2,16 +2,28 @@ import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import type { Stripe } from '@documenso/lib/server-only/stripe';
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { env } from '@documenso/lib/utils/env';
-import { match } from 'ts-pattern';
 
-import { onSubscriptionCreated } from './on-subscription-created';
-import { onSubscriptionDeleted } from './on-subscription-deleted';
-import { onSubscriptionUpdated } from './on-subscription-updated';
+import { syncStripeCustomerSubscription } from '../sync-stripe-customer-subscription';
 
 type StripeWebhookResponse = {
   success: boolean;
   message: string;
 };
+
+/**
+ * Events that trigger a sync of the customer's subscription state.
+ *
+ * The event payload is never trusted beyond extracting the customer ID,
+ * the sync function fetches the current truth from Stripe.
+ */
+const SYNCED_EVENT_TYPES: string[] = [
+  'customer.subscription.created',
+  'customer.subscription.updated',
+  'customer.subscription.deleted',
+  'checkout.session.completed',
+  'invoice.payment_succeeded',
+  'invoice.payment_failed',
+];
 
 export const stripeWebhookHandler = async (req: Request): Promise<Response> => {
   try {
@@ -60,68 +72,44 @@ export const stripeWebhookHandler = async (req: Request): Promise<Response> => {
 
     const event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
 
-    /**
-     * Notes:
-     * - Dropped invoice.payment_succeeded
-     * - Dropped invoice.payment_failed
-     * - Dropped checkout-session.completed
-     */
-    return await match(event.type)
-      .with('customer.subscription.created', async () => {
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        const subscription = event.data.object as Stripe.Subscription;
+    if (!SYNCED_EVENT_TYPES.includes(event.type)) {
+      return Response.json(
+        {
+          success: true,
+          message: 'Webhook received',
+        } satisfies StripeWebhookResponse,
+        { status: 200 },
+      );
+    }
 
-        await onSubscriptionCreated({ subscription });
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const eventObject = event.data.object as { customer?: string | Stripe.Customer | null };
 
-        return Response.json({ success: true, message: 'Webhook received' } satisfies StripeWebhookResponse, {
-          status: 200,
-        });
-      })
-      .with('customer.subscription.updated', async () => {
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        const subscription = event.data.object as Stripe.Subscription;
+    const customerId = typeof eventObject.customer === 'string' ? eventObject.customer : eventObject.customer?.id;
 
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        const previousAttributes = event.data.previous_attributes as Partial<Stripe.Subscription> | null;
+    if (!customerId) {
+      console.error(`No customer found on ${event.type} event ${event.id}, nothing to sync`);
 
-        await onSubscriptionUpdated({ subscription, previousAttributes });
+      return Response.json(
+        {
+          success: true,
+          message: 'Webhook received',
+        } satisfies StripeWebhookResponse,
+        { status: 200 },
+      );
+    }
 
-        return Response.json({ success: true, message: 'Webhook received' } satisfies StripeWebhookResponse, {
-          status: 200,
-        });
-      })
-      .with('customer.subscription.deleted', async () => {
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        const subscription = event.data.object as Stripe.Subscription;
+    await syncStripeCustomerSubscription({ customerId });
 
-        await onSubscriptionDeleted({ subscription });
-
-        return Response.json(
-          {
-            success: true,
-            message: 'Webhook received',
-          } satisfies StripeWebhookResponse,
-          { status: 200 },
-        );
-      })
-      .otherwise(() => {
-        return Response.json(
-          {
-            success: true,
-            message: 'Webhook received',
-          } satisfies StripeWebhookResponse,
-          { status: 200 },
-        );
-      });
+    return Response.json(
+      {
+        success: true,
+        message: 'Webhook received',
+      } satisfies StripeWebhookResponse,
+      { status: 200 },
+    );
   } catch (err) {
     console.error(err);
-
-    if (err instanceof Response) {
-      const message = await err.json();
-      console.error(message);
-
-      return err;
-    }
 
     return Response.json(
       {

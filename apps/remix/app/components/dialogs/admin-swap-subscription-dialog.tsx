@@ -67,7 +67,7 @@ export const AdminSwapSubscriptionDialog = ({
 
   const selectedOrg = eligibleOrgs.find((org) => org.id === selectedOrgId);
 
-  const { mutateAsync: swapSubscription } = trpc.admin.organisation.swapSubscription.useMutation();
+  const { mutateAsync: swapSubscription } = trpc.admin.organisation.subscription.swap.useMutation();
 
   const onSubmit = async () => {
     if (!selectedOrgId) {
