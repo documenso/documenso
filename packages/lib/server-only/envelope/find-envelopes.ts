@@ -1,6 +1,7 @@
 import { kyselyPrisma, prisma, sql } from '@documenso/prisma';
 import type { DB } from '@documenso/prisma/generated/types';
 import type { DocumentSource, DocumentStatus, Envelope, EnvelopeType } from '@prisma/client';
+import { RecipientRole, SigningStatus } from '@prisma/client';
 import type { Expression, ExpressionBuilder, SelectQueryBuilder, SqlBool } from 'kysely';
 
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
@@ -23,6 +24,11 @@ export type FindEnvelopesOptions = {
   };
   query?: string;
   folderId?: string;
+  /**
+   * When true, restrict results to envelopes with at least one recipient whose signing
+   * link has expired. Orthogonal to `status` — applied additively.
+   */
+  hasExpiredRecipients?: boolean;
   /**
    * When true (default), use a windowed count that caps early for faster pagination.
    * When false, use a full COUNT(*) for exact totals — preferred for external API consumers.
@@ -88,6 +94,23 @@ const senderEmailIs = (eb: EnvelopeExpressionBuilder, email: string) =>
   );
 
 /**
+ * Reusable EXISTS subquery: checks that the envelope has at least one recipient whose
+ * signing link has expired — `expiresAt` in the past, still unsigned, and not a CC.
+ * Mirrors `isRecipientExpired` (packages/lib/utils/recipients.ts).
+ */
+const hasExpiredRecipient = (eb: EnvelopeExpressionBuilder) =>
+  eb.exists(
+    eb
+      .selectFrom('Recipient')
+      .whereRef('Recipient.envelopeId', '=', 'Envelope.id')
+      .where('Recipient.expiresAt', 'is not', null)
+      .where('Recipient.expiresAt', '<=', new Date())
+      .where('Recipient.signingStatus', '=', sql.lit(SigningStatus.NOT_SIGNED))
+      .where('Recipient.role', '!=', sql.lit(RecipientRole.CC))
+      .select(sql.lit(1).as('one')),
+  );
+
+/**
  * Find envelopes visible to the requesting user within a team.
  *
  * Unlike `findDocuments` (used by the UI), being a recipient does NOT override
@@ -106,6 +129,7 @@ export const findEnvelopes = async ({
   orderBy,
   query = '',
   folderId,
+  hasExpiredRecipients,
   useWindowedCount = true,
 }: FindEnvelopesOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -180,6 +204,11 @@ export const findEnvelopes = async ({
         ),
       ]),
     );
+  }
+
+  // Expired recipient filter (orthogonal to status, additive)
+  if (hasExpiredRecipients) {
+    qb = qb.where((eb) => hasExpiredRecipient(eb));
   }
 
   // ─── Access control ──────────────────────────────────────────────────

@@ -9,7 +9,7 @@ export const redistributeDocumentMeta: TrpcRouteMeta = {
     path: '/document/redistribute',
     summary: 'Redistribute document',
     description:
-      'Redistribute the document to the provided recipients who have not actioned the document. Will use the distribution method set in the document',
+      'Redistribute the document to the provided recipients who have not actioned the document. Will use the distribution method set in the document. This also refreshes the signing-link expiration for the targeted unsigned recipients, renewing any expired links.',
     tags: ['Document'],
   },
 };

@@ -51,6 +51,23 @@ const senderEmailIs = (eb: EnvelopeExpressionBuilder, email: string) =>
       .select(sql.lit(1).as('one')),
   );
 
+/**
+ * Reusable EXISTS subquery: checks that the envelope has at least one recipient whose
+ * signing link has expired — `expiresAt` in the past, still unsigned, and not a CC.
+ * Mirrors `isRecipientExpired` (packages/lib/utils/recipients.ts).
+ */
+const hasExpiredRecipient = (eb: EnvelopeExpressionBuilder) =>
+  eb.exists(
+    eb
+      .selectFrom('Recipient')
+      .whereRef('Recipient.envelopeId', '=', 'Envelope.id')
+      .where('Recipient.expiresAt', 'is not', null)
+      .where('Recipient.expiresAt', '<=', new Date())
+      .where('Recipient.signingStatus', '=', sql.lit(SigningStatus.NOT_SIGNED))
+      .where('Recipient.role', '!=', sql.lit(RecipientRole.CC))
+      .select(sql.lit(1).as('one')),
+  );
+
 export type GetStatsInput = {
   userId: number;
   teamId: number;
@@ -253,6 +270,19 @@ export const getStats = async ({ userId, teamId, period, search = '', folderId, 
       return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), eb.or(accessBranches)]);
     });
 
+  // EXPIRED: docs visible to the team/user with at least one expired, unsigned recipient.
+  // Access control mirrors the EXPIRED branch in findDocuments so the count matches the listing.
+  const expiredQuery = buildBaseQuery().where((eb) => {
+    const accessBranches = [eb('Envelope.teamId', '=', team.id)];
+
+    if (teamEmail) {
+      accessBranches.push(senderEmailIs(eb, teamEmail));
+      accessBranches.push(recipientExists(eb, teamEmail));
+    }
+
+    return eb.and([teamDeletedFilter(eb), visibilityFilter(eb), hasExpiredRecipient(eb), eb.or(accessBranches)]);
+  });
+
   // INBOX: non-draft docs where team email is a NOT_SIGNED, non-CC recipient
   // Returns 0 if the team has no team email.
   const inboxQuery = teamEmail
@@ -274,15 +304,17 @@ export const getStats = async ({ userId, teamId, period, search = '', folderId, 
 
   // ─── Execute all counts in parallel ──────────────────────────────────
 
-  const [draft, pending, completed, rejected, cancelled, inbox] = await Promise.all([
+  const [draft, pending, completed, rejected, cancelled, expired, inbox] = await Promise.all([
     cappedCount(draftQuery),
     cappedCount(pendingQuery),
     cappedCount(completedQuery),
     cappedCount(rejectedQuery),
     cappedCount(cancelledQuery),
+    cappedCount(expiredQuery),
     inboxQuery ? cappedCount(inboxQuery) : Promise.resolve(0),
   ]);
 
+  // `expired` is intentionally excluded from `all` — it overlaps PENDING.
   const all = Math.min(draft + pending + completed + rejected + cancelled + inbox, STATS_COUNT_CAP);
 
   const stats: Record<ExtendedDocumentStatus, number> = {
@@ -291,6 +323,7 @@ export const getStats = async ({ userId, teamId, period, search = '', folderId, 
     [ExtendedDocumentStatus.COMPLETED]: completed,
     [ExtendedDocumentStatus.REJECTED]: rejected,
     [ExtendedDocumentStatus.CANCELLED]: cancelled,
+    [ExtendedDocumentStatus.EXPIRED]: expired,
     [ExtendedDocumentStatus.INBOX]: inbox,
     [ExtendedDocumentStatus.ALL]: all,
   };
