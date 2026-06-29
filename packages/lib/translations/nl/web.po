@@ -4230,8 +4230,8 @@ msgstr "Document geannuleerd"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
+#: packages/lib/jobs/definitions/emails/send-document-deleted-emails.handler.ts
 #: packages/lib/server-only/admin/admin-super-delete-document.ts
-#: packages/lib/server-only/document/delete-document.ts
 msgid "Document Cancelled"
 msgstr "Document geannuleerd"
 
@@ -13068,7 +13068,7 @@ msgstr "Wachten"
 msgid "Waiting for others"
 msgstr "Wachten op anderen"
 
-#: packages/lib/server-only/document/send-pending-email.ts
+#: packages/lib/jobs/definitions/emails/send-document-pending-email.handler.ts
 msgid "Waiting for others to complete signing."
 msgstr "Wachten tot anderen het ondertekenen hebben voltooid."
 
@@ -14046,8 +14046,7 @@ msgstr "Je bent uitgenodigd om {0} op Documenso te joinen"
 msgid "You have been invited to join the following organisation"
 msgstr "Je bent uitgenodigd om lid te worden van de volgende organisatie"
 
-#: packages/lib/server-only/recipient/delete-envelope-recipient.ts
-#: packages/lib/server-only/recipient/set-document-recipients.ts
+#: packages/lib/jobs/definitions/emails/send-recipient-removed-email.handler.ts
 msgid "You have been removed from a document"
 msgstr "Je bent verwijderd uit een document"
 

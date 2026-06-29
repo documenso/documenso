@@ -4230,8 +4230,8 @@ msgstr "문서가 취소되었습니다"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
+#: packages/lib/jobs/definitions/emails/send-document-deleted-emails.handler.ts
 #: packages/lib/server-only/admin/admin-super-delete-document.ts
-#: packages/lib/server-only/document/delete-document.ts
 msgid "Document Cancelled"
 msgstr "문서가 취소됨"
 
@@ -13068,7 +13068,7 @@ msgstr "대기 중"
 msgid "Waiting for others"
 msgstr "다른 사람을 기다리는 중"
 
-#: packages/lib/server-only/document/send-pending-email.ts
+#: packages/lib/jobs/definitions/emails/send-document-pending-email.handler.ts
 msgid "Waiting for others to complete signing."
 msgstr "다른 서명자들이 이 문서에 서명 완료하기를 기다리는 중입니다."
 
@@ -14046,8 +14046,7 @@ msgstr "Documenso에서 {0} 조직에 초대되었습니다."
 msgid "You have been invited to join the following organisation"
 msgstr "다음 조직에 참여하라는 초대를 받았습니다."
 
-#: packages/lib/server-only/recipient/delete-envelope-recipient.ts
-#: packages/lib/server-only/recipient/set-document-recipients.ts
+#: packages/lib/jobs/definitions/emails/send-recipient-removed-email.handler.ts
 msgid "You have been removed from a document"
 msgstr "문서에서 제거되었습니다."
 

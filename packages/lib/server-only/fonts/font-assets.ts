@@ -184,12 +184,6 @@ export const createFontAsset = async ({
     });
   }
 
-  if (!isSupportedFontMimeType(file.type)) {
-    throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: 'Unsupported font file type',
-    });
-  }
-
   const context = await resolveFontLibraryContext({
     userId,
     target,
@@ -205,6 +199,13 @@ export const createFontAsset = async ({
   }
 
   const mimeType = file.type || inferFontMimeType(file.name);
+
+  if (!isSupportedFontMimeType(mimeType)) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Unsupported font file type',
+    });
+  }
+
   const parsedFont = parseFontFile({
     bytes,
     fallbackName: file.name,

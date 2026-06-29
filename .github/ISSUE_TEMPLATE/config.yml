@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/documenso/documenso/security/advisories/new
+    about: Please report security vulnerabilities privately via GitHub Security Advisories. Do not open a public issue.
+  - name: Questions & Discussions
+    url: https://github.com/documenso/documenso/discussions
+    about: Ask questions, share ideas, and discuss Documenso with the community.
+  - name: Discord
+    url: https://documen.so/discord
+    about: Chat with the community and the team.

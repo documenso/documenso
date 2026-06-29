@@ -4230,8 +4230,8 @@ msgstr "文档已被取消"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
+#: packages/lib/jobs/definitions/emails/send-document-deleted-emails.handler.ts
 #: packages/lib/server-only/admin/admin-super-delete-document.ts
-#: packages/lib/server-only/document/delete-document.ts
 msgid "Document Cancelled"
 msgstr "文档已取消"
 
@@ -13068,7 +13068,7 @@ msgstr "等待中"
 msgid "Waiting for others"
 msgstr "等待其他人"
 
-#: packages/lib/server-only/document/send-pending-email.ts
+#: packages/lib/jobs/definitions/emails/send-document-pending-email.handler.ts
 msgid "Waiting for others to complete signing."
 msgstr "正在等待其他人完成签署。"
 
@@ -14046,8 +14046,7 @@ msgstr "您已被邀请加入 Documenso 上的 {0}"
 msgid "You have been invited to join the following organisation"
 msgstr "您已被邀请加入以下组织"
 
-#: packages/lib/server-only/recipient/delete-envelope-recipient.ts
-#: packages/lib/server-only/recipient/set-document-recipients.ts
+#: packages/lib/jobs/definitions/emails/send-recipient-removed-email.handler.ts
 msgid "You have been removed from a document"
 msgstr "您已被从某个文档中移除"
 

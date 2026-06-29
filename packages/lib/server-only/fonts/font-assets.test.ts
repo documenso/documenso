@@ -135,6 +135,36 @@ describe('font assets', () => {
     );
   });
 
+  it('infers and validates the MIME type when the uploaded file has no client MIME type', async () => {
+    const bytes = new Uint8Array([1, 2, 3, 4]);
+
+    await createFontAsset({
+      userId: 1,
+      target: {
+        type: 'personal',
+      },
+      file: {
+        name: 'small.otf',
+        type: '',
+        size: bytes.byteLength,
+        arrayBuffer: async () => bytes.buffer,
+      },
+    });
+
+    expect(putFileServerSideMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'font/otf',
+      }),
+    );
+    expect(prismaMock.fontAsset.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          mimeType: 'font/otf',
+        }),
+      }),
+    );
+  });
+
   it('requires user-visible ownership before reading font bytes for a user', async () => {
     const fontAsset = {
       id: 'font_asset_1',
