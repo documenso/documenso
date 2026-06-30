@@ -277,7 +277,7 @@ For detailed certificate setup, see [Signing Certificate](/docs/self-hosting/con
 | `NEXT_PUBLIC_DISABLE_GOOGLE_SIGNIN`          | Hide the Google signin button                                                       | `false` |
 | `NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN`       | Hide the Microsoft signin button                                                    | `false` |
 | `NEXT_PUBLIC_DISABLE_OIDC_SIGNIN`            | Hide the OIDC signin button                                                         | `false` |
-| `NEXT_PUBLIC_AUTO_REDIRECT_TO_OIDC`          | Auto-redirect `/signin` to the OIDC provider; renders a spinner instead of the form | `false` |
+| `NEXT_PUBLIC_DISABLE_OIDC_AUTO_REDIRECT`     | Disable the automatic `/signin` redirect when OIDC is the only enabled transport    | `false` |
 | `NEXT_PUBLIC_POSTHOG_KEY`             | PostHog API key for analytics and feature flags                                     |         |
 | `NEXT_PUBLIC_FEATURE_BILLING_ENABLED` | Enable billing features                                                             | `false` |
 
@@ -331,18 +331,20 @@ NEXT_PUBLIC_DISABLE_SIGNIN="true"
 
 ### OIDC Auto-redirect
 
-When OIDC is the only signin method on your instance, you can skip the signin form entirely and send users straight to the OIDC provider.
+When OIDC is the only enabled signin transport on your instance, `/signin` automatically redirects users straight to the OIDC provider instead of showing the signin form. The page renders a spinner while the redirect happens. No extra configuration is required — disabling every other signin method is enough to trigger it.
 
-- **`NEXT_PUBLIC_AUTO_REDIRECT_TO_OIDC`**: Set to `true` to auto-redirect `/signin` to the configured OIDC provider on page load. The page renders a spinner while the redirect happens, instead of showing the signin form. Has no effect when OIDC is not configured.
+- **`NEXT_PUBLIC_DISABLE_OIDC_AUTO_REDIRECT`**: Set to `true` to opt out of the automatic redirect and keep rendering the signin page even when OIDC is the only enabled transport.
 
-This flag is a UI optimisation. It does not change server-side behaviour and does not disable any other signin methods on its own — combine it with the per-provider signin flags to fully restrict the signin page to OIDC.
+The redirect only triggers when OIDC is configured and email/password, Google, and Microsoft signin are all disabled. If any other transport remains enabled, the signin form is shown as normal.
 
 ```bash
-# OIDC-only signin: hide all other methods and skip the signin form UI
+# OIDC-only signin: disabling all other methods auto-redirects to the provider
 NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNIN="true"
 NEXT_PUBLIC_DISABLE_GOOGLE_SIGNIN="true"
 NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN="true"
-NEXT_PUBLIC_AUTO_REDIRECT_TO_OIDC="true"
+
+# Opt out of the auto-redirect while still OIDC-only
+# NEXT_PUBLIC_DISABLE_OIDC_AUTO_REDIRECT="true"
 ```
 
 ---
@@ -496,8 +498,8 @@ NEXT_PRIVATE_SIGNING_PASSPHRASE="your-certificate-password"
 # NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN="true"
 # NEXT_PUBLIC_DISABLE_OIDC_SIGNIN="true"
 
-# Auto-redirect /signin to OIDC (optional)
-# NEXT_PUBLIC_AUTO_REDIRECT_TO_OIDC="true"
+# Opt out of the automatic OIDC redirect when OIDC is the only enabled transport (optional)
+# NEXT_PUBLIC_DISABLE_OIDC_AUTO_REDIRECT="true"
 ```
 
 ---

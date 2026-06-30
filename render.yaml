@@ -173,7 +173,7 @@ services:
         sync: false
       - key: NEXT_PUBLIC_DISABLE_OIDC_SIGNIN
         sync: false
-      - key: NEXT_PUBLIC_AUTO_REDIRECT_TO_OIDC
+      - key: NEXT_PUBLIC_DISABLE_OIDC_AUTO_REDIRECT
         sync: false
       - key: NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS
         sync: false

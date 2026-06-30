@@ -41,7 +41,13 @@ export const IS_OIDC_SSO_ENABLED = Boolean(
 
 export const OIDC_PROVIDER_LABEL = env('NEXT_PRIVATE_OIDC_PROVIDER_LABEL');
 
-export const IS_OIDC_AUTO_REDIRECT_ENABLED = env('NEXT_PUBLIC_AUTO_REDIRECT_TO_OIDC') === 'true';
+/**
+ * Opt-out flag for the automatic OIDC redirect.
+ *
+ * When OIDC is the only enabled signin transport we redirect to the provider
+ * automatically. Set this to "true" to keep rendering the signin page instead.
+ */
+export const IS_OIDC_AUTO_REDIRECT_DISABLED = env('NEXT_PUBLIC_DISABLE_OIDC_AUTO_REDIRECT') === 'true';
 
 export const USER_SECURITY_AUDIT_LOG_MAP: Record<string, string> = {
   ACCOUNT_SSO_LINK: 'Linked account to SSO',

@@ -3,7 +3,7 @@ import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session
 import {
   IS_GOOGLE_SSO_ENABLED,
   IS_MICROSOFT_SSO_ENABLED,
-  IS_OIDC_AUTO_REDIRECT_ENABLED,
+  IS_OIDC_AUTO_REDIRECT_DISABLED,
   IS_OIDC_SSO_ENABLED,
   isSigninEnabledForProvider,
   isSignupEnabledForProvider,
@@ -36,8 +36,16 @@ export async function loader({ request }: Route.LoaderArgs) {
   const isGoogleSSOEnabled = IS_GOOGLE_SSO_ENABLED && isSigninEnabledForProvider('google');
   const isMicrosoftSSOEnabled = IS_MICROSOFT_SSO_ENABLED && isSigninEnabledForProvider('microsoft');
   const isOIDCSSOEnabled = IS_OIDC_SSO_ENABLED && isSigninEnabledForProvider('oidc');
-  const shouldAutoRedirectToOIDC = IS_OIDC_AUTO_REDIRECT_ENABLED && isOIDCSSOEnabled;
+
+  // Automatically redirect to OIDC when it is the only enabled signin transport,
+  // unless the redirect has been explicitly disabled via env.
+  const isOIDCOnlyTransport =
+    isOIDCSSOEnabled && !isEmailPasswordSigninEnabled && !isGoogleSSOEnabled && !isMicrosoftSSOEnabled;
+
+  const shouldAutoRedirectToOIDC = isOIDCOnlyTransport && !IS_OIDC_AUTO_REDIRECT_DISABLED;
+
   const oidcProviderLabel = OIDC_PROVIDER_LABEL;
+
   const isSignupEnabled =
     isSignupEnabledForProvider('email') ||
     (IS_GOOGLE_SSO_ENABLED && isSignupEnabledForProvider('google')) ||

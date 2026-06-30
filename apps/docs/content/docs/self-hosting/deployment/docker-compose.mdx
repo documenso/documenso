@@ -173,9 +173,9 @@ NEXT_PUBLIC_DISABLE_SIGNUP=false
 # NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN=true
 # NEXT_PUBLIC_DISABLE_OIDC_SIGNIN=true
 
-# Auto-redirect /signin to OIDC (optional). Combine with the signin restrictions
-# above for an OIDC-only signin experience.
-# NEXT_PUBLIC_AUTO_REDIRECT_TO_OIDC=true
+# When OIDC is the only enabled transport, /signin auto-redirects to the provider.
+# Set this to opt out and keep showing the signin page (optional).
+# NEXT_PUBLIC_DISABLE_OIDC_AUTO_REDIRECT=true
 ```
 
 <Callout type="info">Generate secure secrets using: `openssl rand -base64 32`</Callout>
