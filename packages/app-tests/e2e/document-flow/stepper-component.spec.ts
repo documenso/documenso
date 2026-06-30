@@ -225,15 +225,20 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   await page.getByLabel('Receives copy').click();
   await page.getByRole('button', { name: 'Add Signer' }).click();
 
-  await page.getByLabel('Email').nth(2).fill('user3@example.com');
-  await page.getByLabel('Name').nth(2).fill('User 3');
-  await page.getByRole('combobox').nth(2).click();
+  // CC recipients are kept last, so new rows are inserted above the CC row.
+  await expect(page.getByLabel('Email')).toHaveCount(3);
+
+  await page.getByLabel('Email').nth(1).fill('user3@example.com');
+  await page.getByLabel('Name').nth(1).fill('User 3');
+  await page.getByRole('combobox').nth(1).click();
   await page.getByLabel('Needs to approve').click();
   await page.getByRole('button', { name: 'Add Signer' }).click();
 
-  await page.getByLabel('Email').nth(3).fill('user4@example.com');
-  await page.getByLabel('Name').nth(3).fill('User 4');
-  await page.getByRole('combobox').nth(3).click();
+  await expect(page.getByLabel('Email')).toHaveCount(4);
+
+  await page.getByLabel('Email').nth(2).fill('user4@example.com');
+  await page.getByLabel('Name').nth(2).fill('User 4');
+  await page.getByRole('combobox').nth(2).click();
   await page.getByLabel('Needs to view').click();
 
   await page.getByRole('button', { name: 'Continue' }).click();
