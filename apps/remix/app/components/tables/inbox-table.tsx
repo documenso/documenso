@@ -15,7 +15,6 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus as DocumentStatusEnum, RecipientRole, SigningStatus } from '@prisma/client';
 import { CheckCircleIcon, DownloadIcon, EyeIcon, Loader, PencilIcon } from 'lucide-react';
-import { DateTime } from 'luxon';
 import { useMemo, useTransition } from 'react';
 import { useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
@@ -56,7 +55,7 @@ export const InboxTable = () => {
       {
         header: _(msg`Created`),
         accessorKey: 'createdAt',
-        cell: ({ row }) => i18n.date(row.original.createdAt, { ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }),
+        cell: ({ row }) => i18n.date(row.original.createdAt, { dateStyle: 'medium', timeStyle: 'short' }),
       },
       {
         header: _(msg`Title`),
