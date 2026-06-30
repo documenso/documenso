@@ -340,3 +340,67 @@ test.describe('[ORGANISATION_PERMISSION_HIERARCHY]: leaving an organisation', ()
     expect(deleted).toBeNull();
   });
 });
+
+test.describe('[ORGANISATION_PERMISSION_HIERARCHY]: group membership scoping', () => {
+  test('cannot add a member from another organisation to a group', async ({ page }) => {
+    // Organisation A, where the actor is the owner/admin.
+    const { user: actor, organisation: organisationA } = await seedUser({
+      isPersonalOrganisation: false,
+    });
+
+    // A separate organisation B with a member the actor has no authority over.
+    const { organisation: organisationB } = await seedUser({ isPersonalOrganisation: false });
+    const [foreignUser] = await seedOrganisationMembers({
+      members: [{ name: 'Foreign', organisationRole: 'MEMBER' }],
+      organisationId: organisationB.id,
+    });
+
+    const foreignMember = await getOrganisationMember(foreignUser.id, organisationB.id);
+
+    // A custom group the actor legitimately controls in organisation A.
+    const groupA = await createCustomGroup(organisationA.id, 'MEMBER');
+
+    await apiSignin({ page, email: actor.email });
+
+    const res = await trpcMutation(page, 'organisation.group.update', {
+      id: groupA.id,
+      memberIds: [foreignMember.id],
+    });
+
+    expect(res.ok()).toBeFalsy();
+
+    const injectedMembership = await prisma.organisationGroupMember.findFirst({
+      where: { groupId: groupA.id, organisationMemberId: foreignMember.id },
+    });
+
+    expect(injectedMembership).toBeNull();
+  });
+
+  test('can add a member from the same organisation to a group (positive control)', async ({ page }) => {
+    const { user: actor, organisation } = await seedUser({ isPersonalOrganisation: false });
+
+    const [memberUser] = await seedOrganisationMembers({
+      members: [{ name: 'Member', organisationRole: 'MEMBER' }],
+      organisationId: organisation.id,
+    });
+
+    const member = await getOrganisationMember(memberUser.id, organisation.id);
+
+    const group = await createCustomGroup(organisation.id, 'MEMBER');
+
+    await apiSignin({ page, email: actor.email });
+
+    const res = await trpcMutation(page, 'organisation.group.update', {
+      id: group.id,
+      memberIds: [member.id],
+    });
+
+    expect(res.ok()).toBeTruthy();
+
+    const membership = await prisma.organisationGroupMember.findFirst({
+      where: { groupId: group.id, organisationMemberId: member.id },
+    });
+
+    expect(membership).not.toBeNull();
+  });
+});
