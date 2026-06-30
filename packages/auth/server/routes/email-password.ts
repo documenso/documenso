@@ -1,6 +1,7 @@
 import {
   isDisposableEmail,
   isEmailDomainAllowedForSignup,
+  isSigninEnabledForProvider,
   isSignupEnabledForProvider,
 } from '@documenso/lib/constants/auth';
 import { EMAIL_VERIFICATION_STATE } from '@documenso/lib/constants/email';
