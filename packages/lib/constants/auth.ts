@@ -1,24 +1,9 @@
 import MailChecker from 'mailchecker';
-import { z } from 'zod';
 
 import { env } from '../utils/env';
 import { NEXT_PUBLIC_WEBAPP_URL } from './app';
 
 export const SALT_ROUNDS = 12;
-
-export const URL_PATTERN = /https?:\/\/|www\./i;
-
-/**
- * Shared name schema that disallows URLs to prevent phishing via email rendering.
- */
-export const ZNameSchema = z
-  .string()
-  .trim()
-  .min(3, { message: 'Please enter a valid name.' })
-  .max(255, { message: 'Name cannot be more than 255 characters.' })
-  .refine((value) => !URL_PATTERN.test(value), {
-    message: 'Name cannot contain URLs.',
-  });
 
 export const IDENTITY_PROVIDER_NAME: Record<string, string> = {
   DOCUMENSO: 'Documenso',
