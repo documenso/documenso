@@ -40,7 +40,7 @@ export const TemplateDocumentInvite = ({
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
       <Section>
-        <Text className="mx-auto mb-0 max-w-[80%] text-center font-semibold text-lg text-primary">
+        <Text className="mx-auto mb-0 max-w-[80%] text-center font-semibold text-foreground text-lg">
           {match({ selfSigner, organisationType, includeSenderDetails, teamName })
             .with({ selfSigner: true }, () => (
               <Trans>
@@ -75,7 +75,7 @@ export const TemplateDocumentInvite = ({
             ))}
         </Text>
 
-        <Text className="my-1 text-center text-base text-slate-400">
+        <Text className="my-1 text-center text-base text-muted-foreground">
           {match(role)
             .with(RecipientRole.SIGNER, () => <Trans>Continue by signing the document.</Trans>)
             .with(RecipientRole.VIEWER, () => <Trans>Continue by viewing the document.</Trans>)
@@ -87,7 +87,7 @@ export const TemplateDocumentInvite = ({
 
         <Section className="mt-8 mb-6 text-center">
           <Button
-            className="inline-flex items-center justify-center rounded-lg bg-documenso-500 px-6 py-3 text-center font-medium text-black text-sbase no-underline"
+            className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-center font-medium text-primary-foreground text-sbase no-underline"
             href={signDocumentLink}
           >
             {match(role)

@@ -30,19 +30,19 @@ export const TeamEmailRemovedTemplate = ({
   return (
     <Html>
       <Head />
-      <Preview>{_(previewText)}</Preview>
-
       <Body className="mx-auto my-auto font-sans">
-        <Section className="bg-white text-slate-500">
-          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid px-2 pt-2 backdrop-blur-sm">
+        <Preview>{_(previewText)}</Preview>
+
+        <Section className="bg-background text-muted-foreground">
+          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-border border-solid px-2 pt-2 backdrop-blur-sm">
             <TemplateBrandingLogo assetBaseUrl={assetBaseUrl} className="mb-4 h-6 p-2" />
 
             <Section>
               <TemplateImage className="mx-auto" assetBaseUrl={assetBaseUrl} staticAsset="mail-open-alert.png" />
             </Section>
 
-            <Section className="p-2 text-slate-500">
-              <Text className="text-center font-medium text-black text-lg">
+            <Section className="p-2 text-muted-foreground">
+              <Text className="text-center font-medium text-foreground text-lg">
                 <Trans>Team email removed</Trans>
               </Text>
 
@@ -52,7 +52,7 @@ export const TeamEmailRemovedTemplate = ({
                 </Trans>
               </Text>
 
-              <div className="mx-auto mt-2 mb-6 w-fit rounded-lg bg-gray-50 px-4 py-2 font-medium text-base text-slate-600">
+              <div className="mx-auto mt-2 mb-6 w-fit rounded-lg bg-muted px-4 py-2 font-medium text-base text-muted-foreground">
                 {formatTeamUrl(teamUrl, baseUrl)}
               </div>
             </Section>

@@ -22,7 +22,7 @@ export function TemplateDocumentRejectionConfirmed({
           <Trans>Rejection Confirmed</Trans>
         </Heading>
 
-        <Text className="text-base text-primary">
+        <Text className="text-base text-foreground">
           <Trans>
             This email confirms that you have rejected the document{' '}
             <strong className="font-bold">"{documentName}"</strong> sent by {documentOwnerName}.
@@ -30,7 +30,7 @@ export function TemplateDocumentRejectionConfirmed({
         </Text>
 
         {reason && (
-          <Text className="font-medium text-base text-slate-400">
+          <Text className="font-medium text-base text-muted-foreground">
             <Trans>Rejection reason: {reason}</Trans>
           </Text>
         )}
