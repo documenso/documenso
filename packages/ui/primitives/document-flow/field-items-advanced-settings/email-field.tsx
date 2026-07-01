@@ -5,6 +5,8 @@ import { Label } from '@documenso/ui/primitives/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Trans, useLingui } from '@lingui/react/macro';
 
+import { TextStyleControls } from './text-style-controls';
+
 type EmailFieldAdvancedSettingsProps = {
   fieldState: EmailFieldMeta;
   handleFieldChange: (key: keyof EmailFieldMeta, value: string | boolean) => void;
@@ -48,6 +50,8 @@ export const EmailFieldAdvancedSettings = ({
           max={96}
         />
       </div>
+
+      <TextStyleControls fieldState={fieldState} onChange={handleInput} />
 
       <div>
         <Label>

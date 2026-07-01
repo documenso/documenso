@@ -30,6 +30,7 @@ import { SignFieldSignatureDialog } from '~/components/dialogs/sign-field-signat
 import { SignFieldTextDialog } from '~/components/dialogs/sign-field-text-dialog';
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 import { EnvelopeSignerPageRenderer } from '~/components/general/envelope-signing/envelope-signer-page-renderer';
+import { FontFaceStyles } from '~/components/general/font-face-styles';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
 
 import { BrandingLogo } from '../branding-logo';
@@ -79,8 +80,12 @@ export const DocumentSigningPageViewV2 = () => {
     return recipientFields.filter((field) => !field.inserted);
   }, [recipientFieldsRemaining, selectedAssistantRecipientFields, currentEnvelopeItem]);
 
+  const fontFields = useMemo(() => envelope.recipients.flatMap((recipient) => recipient.fields), [envelope.recipients]);
+
   return (
     <div className="min-h-screen w-screen bg-gray-50 dark:bg-background">
+      <FontFaceStyles fields={fontFields} recipientToken={recipient.token} />
+
       <SignFieldEmailDialog.Root />
       <SignFieldTextDialog.Root />
       <SignFieldNumberDialog.Root />

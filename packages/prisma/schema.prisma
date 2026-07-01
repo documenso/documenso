@@ -65,6 +65,7 @@ model User {
 
   folders   Folder[]
   envelopes Envelope[]
+  fontAssets FontAsset[]
 
   verificationTokens VerificationToken[]
   apiTokens          ApiToken[]
@@ -551,6 +552,33 @@ model DocumentData {
   envelopeItem EnvelopeItem?
 }
 
+model FontAsset {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name     String
+  family   String
+  fileName String
+  mimeType String
+  fileSize Int
+
+  dataType DocumentDataType
+  data     String
+
+  userId         Int?
+  teamId         Int?
+  organisationId String?
+
+  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team         Team?         @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  organisation Organisation? @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([teamId])
+  @@index([organisationId])
+}
+
 enum DocumentDistributionMethod {
   EMAIL
   NONE
@@ -834,6 +862,7 @@ model Organisation {
   organisationEmails OrganisationEmail[]
 
   monthlyStats OrganisationMonthlyStat[]
+  fontAssets   FontAsset[]
 
   avatarImage AvatarImage? @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
@@ -1055,6 +1084,7 @@ model Team {
   apiTokens  ApiToken[]
   webhooks   Webhook[]
   teamGroups TeamGroup[]
+  fontAssets FontAsset[]
 
   organisationId String
   organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)

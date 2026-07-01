@@ -2389,6 +2389,13 @@ msgstr "Geblokkeerde domeinen"
 msgid "Blue"
 msgstr "Blauw"
 
+#: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
+#: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-style-controls.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-style-controls.tsx
+msgid "Bold"
+msgstr ""
+
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Border"
 msgstr "Rand"
@@ -3657,6 +3664,10 @@ msgstr "David is de werknemer, Lucas is de manager"
 msgid "Decline"
 msgstr "Weigeren"
 
+#: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
+msgid "Default"
+msgstr ""
+
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -3767,6 +3778,7 @@ msgstr "verwijderen"
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
+#: apps/remix/app/components/forms/font-management-form.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/general/folder/folder-card.tsx
 #: apps/remix/app/components/tables/admin-claims-table.tsx
@@ -4111,6 +4123,10 @@ msgstr "Als je de gebruiker uitschakelt, kan deze het account niet meer gebruike
 msgid "Discord"
 msgstr "Discord"
 
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Display name"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
@@ -4214,8 +4230,8 @@ msgstr "Document geannuleerd"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
+#: packages/lib/jobs/definitions/emails/send-document-deleted-emails.handler.ts
 #: packages/lib/server-only/admin/admin-super-delete-document.ts
-#: packages/lib/server-only/document/delete-document.ts
 msgid "Document Cancelled"
 msgstr "Document geannuleerd"
 
@@ -5783,6 +5799,10 @@ msgstr "Bestand is te klein"
 msgid "File size exceeds the limit of {APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB"
 msgstr "Bestandsgrootte overschrijdt de limiet van {APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB"
 
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "File too large"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/email-transport-create-dialog.tsx
 msgid "Fill in the details to create a new email transport."
 msgstr "Vul de details in om een nieuw e-mailtransport aan te maken."
@@ -5834,6 +5854,22 @@ msgid "Folder updated successfully"
 msgstr "Map succesvol bijgewerkt"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
+msgid "Font"
+msgstr ""
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Font deleted"
+msgstr ""
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Font display name"
+msgstr ""
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Font files must be 5MB or smaller."
+msgstr ""
+
+#: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/date-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/email-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/initials-field.tsx
@@ -5842,6 +5878,23 @@ msgstr "Map succesvol bijgewerkt"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Font Size"
 msgstr "Lettergrootte"
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Font uploaded"
+msgstr ""
+
+#: apps/remix/app/components/general/settings-nav-desktop.tsx
+#: apps/remix/app/components/general/settings-nav-mobile.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.fonts.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.fonts.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/_dynamic_personal_routes+/fonts.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/_dynamic_personal_routes+/fonts.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.fonts.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.fonts.tsx
+msgid "Fonts"
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>{SUPPORT_EMAIL}</0>"
@@ -6575,6 +6628,13 @@ msgstr "Het is momenteel niet jouw beurt om te ondertekenen. Je ontvangt een eâ€
 msgid "Italian"
 msgstr "Italiaans"
 
+#: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
+#: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-style-controls.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-style-controls.tsx
+msgid "Italic"
+msgstr ""
+
 #: packages/lib/constants/i18n.ts
 msgid "Japanese"
 msgstr "Japans"
@@ -6829,6 +6889,10 @@ msgstr "Document wordt geladen..."
 msgid "Loading Document..."
 msgstr "Document wordt geladen..."
 
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Loading fonts..."
+msgstr ""
+
 #: packages/ui/components/recipient/recipient-autocomplete-input.tsx
 msgid "Loading suggestions..."
 msgstr "Suggesties laden..."
@@ -6921,6 +6985,18 @@ msgstr "Directe link beheren"
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
 msgid "Manage documents"
 msgstr "Documenten beheren"
+
+#: apps/remix/app/routes/_authenticated+/settings+/_dynamic_personal_routes+/fonts.tsx
+msgid "Manage fonts available in your personal workspace."
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.fonts.tsx
+msgid "Manage fonts available to documents in this team."
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.fonts.tsx
+msgid "Manage fonts inherited by teams in this organisation."
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "Manage linked accounts"
@@ -7374,6 +7450,10 @@ msgstr "Nee"
 msgid "No active drafts"
 msgstr "Geen actieve concepten"
 
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "No custom fonts have been uploaded yet."
+msgstr ""
+
 #: apps/remix/app/components/general/pdf-viewer/envelope-pdf-viewer.tsx
 #: apps/remix/app/components/general/pdf-viewer/pdf-viewer.tsx
 msgid "No document found"
@@ -7751,6 +7831,7 @@ msgstr "OF"
 msgid "Or continue with"
 msgstr "Of ga verder met"
 
+#: apps/remix/app/components/forms/font-management-form.tsx
 #: apps/remix/app/components/general/template/template-type.tsx
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
@@ -7941,6 +8022,11 @@ msgstr "Origineel"
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Otherwise, the document will be created as a draft."
 msgstr "Anders wordt het document als concept aangemaakt."
+
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
+msgid "Overlapping fields detected"
+msgstr ""
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/email-preferences-form.tsx
@@ -8164,6 +8250,10 @@ msgstr "Periode"
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Permanently delete this organisation. Documents will be orphaned (not deleted) so they remain accessible via the deleted-account service account."
 msgstr "Verwijder deze organisatie permanent. Documenten worden verweesd (niet verwijderd), zodat ze toegankelijk blijven via het serviceaccount voor verwijderde accounts."
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Personal"
+msgstr ""
 
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 msgctxt "Personal organisation (adjective)"
@@ -9597,6 +9687,10 @@ msgstr "Selecteer standaardrol"
 msgid "Select direction"
 msgstr "Selecteer richting"
 
+#: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
+msgid "Select font"
+msgstr ""
+
 #: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
 #: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
 msgid "Select groups"
@@ -10224,6 +10318,11 @@ msgstr "Siteâ€‘instellingen"
 msgid "Skip"
 msgstr "Overslaan"
 
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
+msgid "Some fields are placed on top of each other. This may complicate the signing process or cause fields to not work as expected."
+msgstr ""
+
 #: packages/ui/primitives/document-flow/missing-signature-field-dialog.tsx
 msgid "Some signers have not been assigned a signature field. Please assign at least 1 signature field to each signer before proceeding."
 msgstr "Sommige ondertekenaars hebben geen handtekeningveld toegewezen gekregen. Wijs ten minste 1 handtekeningveld toe aan elke ondertekenaar voordat je doorgaat."
@@ -10242,6 +10341,7 @@ msgstr "Sommige ondertekenaars hebben geen handtekeningveld toegewezen gekregen.
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
+#: apps/remix/app/components/forms/font-management-form.tsx
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
@@ -10587,6 +10687,10 @@ msgstr "Support"
 msgid "Support ticket created"
 msgstr "Supportticket aangemaakt"
 
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Supported formats: TTF and OTF. Maximum file size is 5MB."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/admin-organisation-sync-subscription-dialog.tsx
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "Sync"
@@ -10633,6 +10737,7 @@ msgstr "Systeemthema"
 msgid "Target Organisation"
 msgstr "Doelorganisatie"
 
+#: apps/remix/app/components/forms/font-management-form.tsx
 #: apps/remix/app/components/tables/admin-user-teams-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/components/tables/organisation-teams-table.tsx
@@ -11213,6 +11318,10 @@ msgstr "De volgende ondertekenaars missen handtekeningvelden:"
 msgid "The following team has been deleted. You will no longer be able to access this team and its documents"
 msgstr "Het volgende team is verwijderd. Je hebt geen toegang meer tot dit team en de documenten."
 
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "The font has been removed from the library."
+msgstr ""
+
 #. placeholder {0}: form.watch('name')
 #. placeholder {1}: form.watch('email')
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
@@ -11280,6 +11389,10 @@ msgstr "De openbare beschrijving die met deze sjabloon wordt weergegeven"
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "The public name for your template"
 msgstr "De openbare naam voor je sjabloon"
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "The quick brown fox jumps over the lazy dog"
+msgstr ""
 
 #: packages/email/template-components/template-document-super-delete.tsx
 msgid "The reason provided for deletion is the following:"
@@ -11651,6 +11764,10 @@ msgstr "Dit bestandstype wordt niet ondersteund. Upload een PDF- of Word-documen
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "This folder contains multiple items. Deleting it will remove all subfolders and move all nested documents and templates to the root folder."
 msgstr "Deze map bevat meerdere items. Verwijderen zorgt ervoor dat alle submappen worden verwijderd en alle geneste documenten en sjablonen naar de hoofdmap worden verplaatst."
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "This font may still be used by one or more fields."
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
@@ -12179,6 +12296,10 @@ msgstr "Kan geen toegang via directe sjabloon maken. Probeer het later opnieuw."
 msgid "Unable to decline this invitation at this time."
 msgstr "De uitnodiging kan op dit moment niet worden geweigerd."
 
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Unable to delete font"
+msgstr ""
+
 #: apps/remix/app/components/tables/organisation-member-invites-table.tsx
 msgid "Unable to delete invitation. Please try again."
 msgstr "Kan uitnodiging niet verwijderen. Probeer het opnieuw."
@@ -12483,6 +12604,7 @@ msgid "Upgrade your plan to upload more documents"
 msgstr "Upgrade je abonnement om meer documenten te uploaden"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
+#: apps/remix/app/components/forms/font-management-form.tsx
 msgid "Upload"
 msgstr "Uploaden"
 
@@ -12536,6 +12658,10 @@ msgstr "Upload documenten en voeg ontvangers toe"
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
 msgid "Upload failed"
 msgstr "Uploaden mislukt"
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Upload font"
+msgstr ""
 
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Upload signature"
@@ -12947,7 +13073,7 @@ msgstr "Wachten"
 msgid "Waiting for others"
 msgstr "Wachten op anderen"
 
-#: packages/lib/server-only/document/send-pending-email.ts
+#: packages/lib/jobs/definitions/emails/send-document-pending-email.handler.ts
 msgid "Waiting for others to complete signing."
 msgstr "Wachten tot anderen het ondertekenen hebben voltooid."
 
@@ -13295,6 +13421,10 @@ msgstr "We konden je documentvoorkeuren nu niet bijwerken; probeer het later opn
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.email.tsx
 msgid "We were unable to update your email preferences at this time, please try again later"
 msgstr "We konden je e-mailvoorkeuren op dit moment niet bijwerken, probeer het later opnieuw"
+
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "We were unable to upload this font."
+msgstr ""
 
 #: apps/remix/app/components/forms/signin.tsx
 msgid "We were unable to verify that you're human. Please try again."
@@ -13921,8 +14051,7 @@ msgstr "Je bent uitgenodigd om {0} op Documenso te joinen"
 msgid "You have been invited to join the following organisation"
 msgstr "Je bent uitgenodigd om lid te worden van de volgende organisatie"
 
-#: packages/lib/server-only/recipient/delete-envelope-recipient.ts
-#: packages/lib/server-only/recipient/set-document-recipients.ts
+#: packages/lib/jobs/definitions/emails/send-recipient-removed-email.handler.ts
 msgid "You have been removed from a document"
 msgstr "Je bent verwijderd uit een document"
 
@@ -14500,6 +14629,10 @@ msgstr "Uw envelop is succesvol opnieuw verzonden."
 msgid "Your existing tokens"
 msgstr "Je bestaande tokens"
 
+#: apps/remix/app/components/forms/font-management-form.tsx
+msgid "Your font has been added to the font library."
+msgstr ""
+
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "Your Name"
 msgstr "Uw naam"
@@ -14721,4 +14854,3 @@ msgstr "Uw verificatiecode:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
-
