@@ -88,7 +88,7 @@ export default function OrganisationSettingsDocumentPage() {
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
-          delegateDocumentOwnership: delegateDocumentOwnership,
+          delegateDocumentOwnership,
           aiFeaturesEnabled,
           envelopeExpirationPeriod: envelopeExpirationPeriod ?? undefined,
           reminderSettings: reminderSettings ?? undefined,
@@ -99,7 +99,7 @@ export default function OrganisationSettingsDocumentPage() {
         title: t`Document preferences updated`,
         description: t`Your document preferences have been updated`,
       });
-    } catch (err) {
+    } catch {
       toast({
         title: t`Something went wrong!`,
         description: t`We were unable to update your document preferences at this time, please try again later`,
