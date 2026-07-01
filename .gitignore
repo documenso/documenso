@@ -74,3 +74,5 @@ tmp/
 
 # opencode
 .opencode/package-lock.json
+
+SUPPORT_KNOWLEDGE_BASE.md

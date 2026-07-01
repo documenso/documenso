@@ -1,19 +1,21 @@
 import { useSessionStorage } from '@documenso/lib/client-only/hooks/use-session-storage';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { FolderType } from '@documenso/lib/types/folder-type';
+import { TagType } from '@documenso/lib/types/tag-type';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import type { RowSelectionState } from '@documenso/ui/primitives/data-table';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
+import { TagFilter } from '@documenso/ui/primitives/tag/tag-filter';
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType, OrganisationType } from '@prisma/client';
-import { Bird } from 'lucide-react';
+import { Bird, ChevronLeft } from 'lucide-react';
 import { parseAsStringLiteral, useQueryState } from 'nuqs';
 import { useMemo, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router';
+import { Link, useParams, useSearchParams } from 'react-router';
 
 import { EnvelopesBulkDeleteDialog } from '~/components/dialogs/envelopes-bulk-delete-dialog';
 import { EnvelopesBulkMoveDialog } from '~/components/dialogs/envelopes-bulk-move-dialog';
@@ -36,16 +38,20 @@ export default function TemplatesPage() {
   const team = useCurrentTeam();
   const organisation = useCurrentOrganisation();
 
-  const { folderId } = useParams();
+  const { folderId, tagId } = useParams();
   const [searchParams] = useSearchParams();
 
   const page = Number(searchParams.get('page')) || 1;
   const perPage = Number(searchParams.get('perPage')) || 10;
 
+  const urlTagIds = searchParams.get('tagIds')?.split(',').filter(Boolean) ?? [];
+  // Route param tagId takes priority over URL search param tagIds.
+  const effectiveTagIds = tagId ? [tagId] : urlTagIds;
+
   const [view, setView] = useQueryState('view', parseAsStringLiteral(TEMPLATE_VIEWS).withDefault('team'));
 
-  const isOrgView = view === 'organisation';
-  const showOrgTab = organisation.type !== OrganisationType.PERSONAL;
+  const isOrgView = !tagId && view === 'organisation';
+  const showOrgTab = !tagId && organisation.type !== OrganisationType.PERSONAL;
 
   const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>('templates-bulk-selection', {});
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
@@ -63,6 +69,8 @@ export default function TemplatesPage() {
       page,
       perPage,
       folderId,
+      includeAllFolders: tagId !== undefined,
+      tagIds: effectiveTagIds.length > 0 ? effectiveTagIds : undefined,
     },
     {
       enabled: !isOrgView,
@@ -92,7 +100,14 @@ export default function TemplatesPage() {
   return (
     <EnvelopeDropZoneWrapper type={EnvelopeType.TEMPLATE}>
       <div className="mx-auto max-w-screen-xl px-4 md:px-8">
-        {!isOrgView && <FolderGrid type={FolderType.TEMPLATE} parentId={folderId ?? null} />}
+        {tagId && (
+          <Link to={templateRootPath} className="mb-4 flex items-center text-documenso-700 hover:opacity-80">
+            <ChevronLeft className="mr-2 inline-block h-5 w-5" />
+            <Trans>All templates</Trans>
+          </Link>
+        )}
+
+        {!isOrgView && !tagId && <FolderGrid type={FolderType.TEMPLATE} parentId={folderId ?? null} />}
 
         <div className="mt-8">
           <div className="flex flex-row items-center">
@@ -129,6 +144,12 @@ export default function TemplatesPage() {
             </div>
           )}
 
+          {!isOrgView && !tagId && (
+            <div className="mt-6">
+              <TagFilter type={TagType.TEMPLATE} />
+            </div>
+          )}
+
           <div className="mt-8">
             {activeQuery.data && activeQuery.data.count === 0 ? (
               <div className="flex h-96 flex-col items-center justify-center gap-y-4 text-muted-foreground/60">
@@ -156,6 +177,7 @@ export default function TemplatesPage() {
                 documentRootPath={documentRootPath}
                 templateRootPath={templateRootPath}
                 enableSelection={!isOrgView}
+                enableTagLinks={!isOrgView}
                 rowSelection={isOrgView ? {} : rowSelection}
                 onRowSelectionChange={isOrgView ? undefined : setRowSelection}
               />

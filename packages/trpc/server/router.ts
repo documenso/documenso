@@ -10,6 +10,7 @@ import { folderRouter } from './folder-router/router';
 import { organisationRouter } from './organisation-router/router';
 import { profileRouter } from './profile-router/router';
 import { recipientRouter } from './recipient-router/router';
+import { tagRouter } from './tag-router/router';
 import { teamRouter } from './team-router/router';
 import { templateRouter } from './template-router/router';
 import { router } from './trpc';
@@ -29,6 +30,7 @@ export const appRouter = router({
   apiToken: apiTokenRouter,
   team: teamRouter,
   template: templateRouter,
+  tag: tagRouter,
   webhook: webhookRouter,
   embeddingPresign: embeddingPresignRouter,
 });

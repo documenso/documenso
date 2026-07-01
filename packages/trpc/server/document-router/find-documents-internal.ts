@@ -26,6 +26,8 @@ export const findDocumentsInternalRoute = authenticatedProcedure
       period,
       senderIds,
       folderId,
+      includeAllFolders,
+      tagIds,
     } = input;
 
     const [stats, documents] = await Promise.all([
@@ -35,7 +37,9 @@ export const findDocumentsInternalRoute = authenticatedProcedure
         period,
         search: query,
         folderId,
+        includeAllFolders,
         senderIds,
+        tagIds,
       }),
       findDocuments({
         userId: user.id,
@@ -49,6 +53,8 @@ export const findDocumentsInternalRoute = authenticatedProcedure
         period,
         senderIds,
         folderId,
+        includeAllFolders,
+        tagIds,
         orderBy: orderByColumn ? { column: orderByColumn, direction: orderByDirection } : undefined,
       }),
     ]);

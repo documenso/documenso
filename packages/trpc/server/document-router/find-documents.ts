@@ -11,7 +11,8 @@ export const findDocumentsRoute = authenticatedProcedure
   .query(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
 
-    const { query, templateId, page, perPage, orderByDirection, orderByColumn, source, status, folderId } = input;
+    const { query, templateId, page, perPage, orderByDirection, orderByColumn, source, status, folderId, tagIds } =
+      input;
 
     const documents = await findDocuments({
       userId: user.id,
@@ -23,6 +24,7 @@ export const findDocumentsRoute = authenticatedProcedure
       page,
       perPage,
       folderId,
+      tagIds,
       orderBy: orderByColumn ? { column: orderByColumn, direction: orderByDirection } : undefined,
       useWindowedCount: false,
     });

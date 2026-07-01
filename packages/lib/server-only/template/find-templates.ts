@@ -13,6 +13,8 @@ export type FindTemplatesOptions = {
   page?: number;
   perPage?: number;
   folderId?: string;
+  includeAllFolders?: boolean;
+  tagIds?: string[];
 };
 
 export const findTemplates = async ({
@@ -22,6 +24,8 @@ export const findTemplates = async ({
   page = 1,
   perPage = 10,
   folderId,
+  includeAllFolders = false,
+  tagIds,
 }: FindTemplatesOptions) => {
   const { teamRole } = await getMemberRoles({
     teamId,
@@ -46,7 +50,8 @@ export const findTemplates = async ({
           { userId, teamId },
         ],
       },
-      folderId ? { folderId } : { folderId: null },
+      ...(includeAllFolders ? [] : [folderId ? { folderId } : { folderId: null }]),
+      ...(tagIds && tagIds.length > 0 ? [{ tags: { some: { tagId: { in: tagIds } } } }] : []),
     ],
   };
 
@@ -65,6 +70,11 @@ export const findTemplates = async ({
       select: {
         token: true,
         enabled: true,
+      },
+    },
+    tags: {
+      include: {
+        tag: true,
       },
     },
   } as const;

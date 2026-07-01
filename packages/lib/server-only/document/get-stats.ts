@@ -1,4 +1,4 @@
-import type { PeriodSelectorValue } from '@documenso/lib/server-only/document/find-documents';
+import { applyEnvelopeTagFilter, type PeriodSelectorValue } from '@documenso/lib/server-only/document/find-documents';
 import { kyselyPrisma, prisma, sql } from '@documenso/prisma';
 import type { DB } from '@documenso/prisma/generated/types';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
@@ -57,7 +57,9 @@ export type GetStatsInput = {
   period?: PeriodSelectorValue;
   search?: string;
   folderId?: string;
+  includeAllFolders?: boolean;
   senderIds?: number[];
+  tagIds?: string[];
 };
 
 /**
@@ -80,7 +82,16 @@ const cappedCount = async (qb: EnvelopeQueryBuilder): Promise<number> => {
   return Math.min(Number(result.total ?? 0), STATS_COUNT_CAP);
 };
 
-export const getStats = async ({ userId, teamId, period, search = '', folderId, senderIds }: GetStatsInput) => {
+export const getStats = async ({
+  userId,
+  teamId,
+  period,
+  search = '',
+  folderId,
+  includeAllFolders = false,
+  senderIds,
+  tagIds,
+}: GetStatsInput) => {
   const user = await prisma.user.findFirstOrThrow({
     where: { id: userId },
     select: { id: true, email: true },
@@ -105,8 +116,12 @@ export const getStats = async ({ userId, teamId, period, search = '', folderId, 
     qb = qb.where('Envelope.type', '=', sql.lit(EnvelopeType.DOCUMENT));
 
     // Folder filter
-    qb =
-      folderId !== undefined ? qb.where('Envelope.folderId', '=', folderId) : qb.where('Envelope.folderId', 'is', null);
+    if (!includeAllFolders) {
+      qb =
+        folderId !== undefined
+          ? qb.where('Envelope.folderId', '=', folderId)
+          : qb.where('Envelope.folderId', 'is', null);
+    }
 
     // Period filter
     if (period) {
@@ -120,6 +135,9 @@ export const getStats = async ({ userId, teamId, period, search = '', folderId, 
     if (senderIds && senderIds.length > 0) {
       qb = qb.where('Envelope.userId', 'in', senderIds);
     }
+
+    // Tag filter (OR semantics — envelope must have at least one of the selected tags)
+    qb = applyEnvelopeTagFilter(qb, tagIds);
 
     // Search filter
     if (hasSearch) {

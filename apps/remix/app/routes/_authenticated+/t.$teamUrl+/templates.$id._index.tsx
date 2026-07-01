@@ -1,6 +1,7 @@
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
+import { TagType } from '@documenso/lib/types/tag-type';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
@@ -21,6 +22,7 @@ import { TemplateDirectLinkDialog } from '~/components/dialogs/template-direct-l
 import { TemplateUseDialog } from '~/components/dialogs/template-use-dialog';
 import { EnvelopeRendererFileSelector } from '~/components/general/envelope-editor/envelope-file-selector';
 import { EnvelopeGenericPageRenderer } from '~/components/general/envelope-editor/envelope-generic-page-renderer';
+import { EnvelopeTagsSection } from '~/components/general/envelope-tags-section';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
 import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
@@ -270,6 +272,9 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
 
             {/* Template information section. */}
             <TemplatePageViewInformation template={envelope} userId={user.id} />
+
+            {/* Tags section. */}
+            <EnvelopeTagsSection envelopeId={envelope.id} type={TagType.TEMPLATE} />
 
             {/* Recipients section. */}
             <TemplatePageViewRecipients

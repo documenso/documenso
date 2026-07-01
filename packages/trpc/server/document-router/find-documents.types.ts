@@ -20,6 +20,7 @@ export const ZFindDocumentsRequestSchema = ZFindSearchParamsSchema.extend({
   source: z.nativeEnum(DocumentSource).describe('Filter documents by how it was created.').optional(),
   status: z.nativeEnum(DocumentStatus).describe('Filter documents by the current status').optional(),
   folderId: z.string().describe('Filter documents by folder ID').optional(),
+  tagIds: z.array(z.string()).describe('Filter documents by tag IDs').optional(),
   orderByColumn: z.enum(['createdAt']).optional(),
   orderByDirection: z.enum(['asc', 'desc']).describe('').default('desc'),
 });

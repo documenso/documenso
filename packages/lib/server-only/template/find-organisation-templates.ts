@@ -58,6 +58,11 @@ export const findOrganisationTemplates = async ({
         enabled: true,
       },
     },
+    tags: {
+      include: {
+        tag: true,
+      },
+    },
   } as const;
 
   const [data, count] = await Promise.all([

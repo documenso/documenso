@@ -2,6 +2,7 @@ import { getMultipleEnvelopeWhereInput } from '@documenso/lib/server-only/envelo
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { mapFieldToLegacyField } from '@documenso/lib/utils/fields';
 import { mapRecipientToLegacyRecipient } from '@documenso/lib/utils/recipients';
+import { mapEnvelopeTagsToTags } from '@documenso/lib/utils/tags';
 import { prisma } from '@documenso/prisma';
 import { EnvelopeType } from '@prisma/client';
 
@@ -69,6 +70,11 @@ export const getTemplatesByIdsRoute = authenticatedProcedure
             enabled: true,
           },
         },
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
       },
     });
 
@@ -115,6 +121,7 @@ export const getTemplatesByIdsRoute = authenticatedProcedure
             }
           : null,
         templateDocumentDataId: firstTemplateDocumentData.id, // Backwards compatibility.
+        tags: mapEnvelopeTagsToTags(envelope.tags),
       };
     });
 

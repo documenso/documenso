@@ -2,6 +2,7 @@ import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/env
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
+import { TagType } from '@documenso/lib/types/tag-type';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
@@ -34,6 +35,7 @@ import {
 } from '~/components/general/document/document-status';
 import { EnvelopeRendererFileSelector } from '~/components/general/envelope-editor/envelope-file-selector';
 import { EnvelopeGenericPageRenderer } from '~/components/general/envelope-editor/envelope-generic-page-renderer';
+import { EnvelopeTagsSection } from '~/components/general/envelope-tags-section';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
 import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
@@ -251,6 +253,9 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
 
             {/* Document information section. */}
             <DocumentPageViewInformation envelope={envelope} userId={user.id} />
+
+            {/* Tags section. */}
+            <EnvelopeTagsSection envelopeId={envelope.id} type={TagType.DOCUMENT} />
 
             {/* Recipients section. */}
             <DocumentPageViewRecipients envelope={envelope} documentRootPath={documentRootPath} />

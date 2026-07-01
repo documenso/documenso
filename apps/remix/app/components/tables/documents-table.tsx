@@ -10,6 +10,7 @@ import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
+import { TagList } from '@documenso/ui/primitives/tag/tag-list';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
@@ -49,6 +50,8 @@ export const DocumentsTable = ({
   const { _, i18n } = useLingui();
 
   const team = useCurrentTeam();
+
+  const documentsPath = formatDocumentsPath(team?.url ?? '');
   const [isPending, startTransition] = useTransition();
 
   const updateSearchParams = useUpdateSearchParams();
@@ -95,6 +98,11 @@ export const DocumentsTable = ({
         id: 'sender',
         header: _(msg`Sender`),
         cell: ({ row }) => row.original.user.name ?? row.original.user.email,
+      },
+      {
+        header: _(msg`Tags`),
+        cell: ({ row }) => <TagList tags={row.original.tags} getTagHref={(tag) => `${documentsPath}/tag/${tag.id}`} />,
+        size: 160,
       },
       {
         header: _(msg`Recipient`),

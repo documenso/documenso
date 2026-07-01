@@ -6,9 +6,9 @@ import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSche
 import { UserSchema } from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
 import { LegacyDocumentSchema } from '@documenso/prisma/types/document-legacy-schema';
 import { z } from 'zod';
-
 import { ZFieldSchema } from './field';
 import { ZRecipientLiteSchema } from './recipient';
+import { ZTagLiteSchema } from './tag';
 
 /**
  * The full document response schema.
@@ -169,6 +169,7 @@ export const ZDocumentManySchema = LegacyDocumentSchema.pick({
     id: true,
     url: true,
   }).nullable(),
+  tags: ZTagLiteSchema.array(),
 });
 
 export type TDocumentMany = z.infer<typeof ZDocumentManySchema>;

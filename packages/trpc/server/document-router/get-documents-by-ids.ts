@@ -55,6 +55,11 @@ export const getDocumentsByIdsRoute = authenticatedProcedure
             url: true,
           },
         },
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
       },
     });
 

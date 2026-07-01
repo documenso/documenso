@@ -26,6 +26,7 @@ import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-action
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { mapFieldToLegacyField } from '@documenso/lib/utils/fields';
 import { mapRecipientToLegacyRecipient } from '@documenso/lib/utils/recipients';
+import { mapEnvelopeTagsToTags } from '@documenso/lib/utils/tags';
 import { mapEnvelopeToTemplateLite } from '@documenso/lib/utils/templates';
 import type { Envelope } from '@prisma/client';
 import { DocumentDataType, EnvelopeType } from '@prisma/client';
@@ -120,6 +121,7 @@ export const templateRouter = router({
             recipients: envelope.recipients.map((recipient) => mapRecipientToLegacyRecipient(recipient, envelope)),
             templateMeta: envelope.documentMeta,
             directLink: envelope.directLink,
+            tags: mapEnvelopeTagsToTags(envelope.tags),
           };
         }),
       };
@@ -167,6 +169,7 @@ export const templateRouter = router({
             recipients: envelope.recipients.map((recipient) => mapRecipientToLegacyRecipient(recipient, envelope)),
             templateMeta: envelope.documentMeta,
             directLink: envelope.directLink,
+            tags: mapEnvelopeTagsToTags(envelope.tags),
           };
         }),
       };

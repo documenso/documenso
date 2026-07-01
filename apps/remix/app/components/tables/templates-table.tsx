@@ -10,6 +10,7 @@ import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
+import { TagList } from '@documenso/ui/primitives/tag/tag-list';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -32,6 +33,7 @@ type TemplatesTableProps = {
   documentRootPath: string;
   templateRootPath: string;
   enableSelection?: boolean;
+  enableTagLinks?: boolean;
   rowSelection?: RowSelectionState;
   onRowSelectionChange?: (selection: RowSelectionState) => void;
 };
@@ -45,6 +47,7 @@ export const TemplatesTable = ({
   documentRootPath,
   templateRootPath,
   enableSelection,
+  enableTagLinks = true,
   rowSelection,
   onRowSelectionChange,
 }: TemplatesTableProps) => {
@@ -108,6 +111,16 @@ export const TemplatesTable = ({
             {row.original.title}
           </Link>
         ),
+      },
+      {
+        header: _(msg`Tags`),
+        cell: ({ row }) => (
+          <TagList
+            tags={row.original.tags}
+            getTagHref={enableTagLinks ? (tag) => `${templateRootPath}/tag/${tag.id}` : undefined}
+          />
+        ),
+        size: 160,
       },
       {
         header: () => (

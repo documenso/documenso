@@ -10,6 +10,8 @@ export const ZFindDocumentsInternalRequestSchema = ZFindDocumentsRequestSchema.e
   senderIds: z.array(z.number()).optional(),
   status: z.nativeEnum(ExtendedDocumentStatus).optional(),
   folderId: z.string().optional(),
+  includeAllFolders: z.boolean().optional(),
+  tagIds: z.array(z.string()).optional(),
 });
 
 export const ZFindDocumentsInternalResponseSchema = ZFindResultResponse.extend({

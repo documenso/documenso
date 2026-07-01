@@ -6,9 +6,9 @@ import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import { UserSchema } from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
 import { LegacyTemplateDirectLinkSchema, TemplateSchema } from '@documenso/prisma/types/template-legacy-schema';
 import { z } from 'zod';
-
 import { ZFieldSchema } from './field';
 import { ZRecipientLiteSchema } from './recipient';
+import { ZTagLiteSchema } from './tag';
 
 /**
  * The full template response schema.
@@ -156,6 +156,7 @@ export const ZTemplateManySchema = TemplateSchema.pick({
   }).nullable(),
   // Backwards compatibility.
   templateDocumentDataId: z.string().default(''),
+  tags: ZTagLiteSchema.array(),
 });
 
 export type TTemplateMany = z.infer<typeof ZTemplateManySchema>;

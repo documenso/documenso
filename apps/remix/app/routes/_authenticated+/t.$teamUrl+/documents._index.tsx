@@ -2,6 +2,7 @@ import { useSessionStorage } from '@documenso/lib/client-only/hooks/use-session-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { STATS_COUNT_CAP } from '@documenso/lib/constants/document';
 import { SKIP_QUERY_BATCH_META } from '@documenso/lib/constants/trpc';
+import { TagType } from '@documenso/lib/types/tag-type';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { parseToIntegerArray } from '@documenso/lib/utils/params';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
@@ -12,9 +13,11 @@ import { ZFindDocumentsInternalRequestSchema } from '@documenso/trpc/server/docu
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import type { RowSelectionState } from '@documenso/ui/primitives/data-table';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
+import { TagFilter } from '@documenso/ui/primitives/tag/tag-filter';
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType, FolderType, OrganisationType } from '@prisma/client';
+import { ChevronLeft } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
 import { z } from 'zod';
@@ -46,13 +49,18 @@ const ZSearchParamsSchema = ZFindDocumentsInternalRequestSchema.pick({
   query: true,
 }).extend({
   senderIds: z.string().transform(parseToIntegerArray).optional().catch([]),
+  tagIds: z
+    .string()
+    .optional()
+    .catch(undefined)
+    .transform((val) => val?.split(',').filter(Boolean)),
 });
 
 export default function DocumentsPage() {
   const organisation = useCurrentOrganisation();
   const team = useCurrentTeam();
 
-  const { folderId } = useParams();
+  const { folderId, tagId } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -85,10 +93,15 @@ export default function DocumentsPage() {
     [searchParams],
   );
 
+  // Route param tagId takes priority over URL search param tagIds.
+  const effectiveTagIds = tagId ? [tagId] : findDocumentSearchParams.tagIds;
+
   const { data, isLoading, isLoadingError } = trpc.document.findDocumentsInternal.useQuery(
     {
       ...findDocumentSearchParams,
       folderId,
+      includeAllFolders: tagId !== undefined,
+      tagIds: effectiveTagIds,
     },
     {
       ...SKIP_QUERY_BATCH_META,
@@ -114,7 +127,9 @@ export default function DocumentsPage() {
 
     let path = formatDocumentsPath(team.url);
 
-    if (folderId) {
+    if (tagId) {
+      path += `/tag/${tagId}`;
+    } else if (folderId) {
       path += `/f/${folderId}`;
     }
 
@@ -134,7 +149,14 @@ export default function DocumentsPage() {
   return (
     <EnvelopeDropZoneWrapper type={EnvelopeType.DOCUMENT}>
       <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-        <FolderGrid type={FolderType.DOCUMENT} parentId={folderId ?? null} />
+        {tagId && (
+          <Link to={documentsPath} className="mb-4 flex items-center text-documenso-700 hover:opacity-80">
+            <ChevronLeft className="mr-2 inline-block h-5 w-5" />
+            <Trans>All documents</Trans>
+          </Link>
+        )}
+
+        {!tagId && <FolderGrid type={FolderType.DOCUMENT} parentId={folderId ?? null} />}
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-x-4 gap-y-8">
           <div className="flex flex-row items-center">
@@ -183,6 +205,8 @@ export default function DocumentsPage() {
             </Tabs>
 
             {team && <DocumentsTableSenderFilter teamId={team.id} />}
+
+            {!tagId && <TagFilter type={TagType.DOCUMENT} />}
 
             <div className="flex w-48 flex-wrap items-center justify-between gap-x-2 gap-y-4">
               <PeriodSelector />

@@ -36,6 +36,8 @@ export type FindDocumentsOptions = {
   senderIds?: number[];
   query?: string;
   folderId?: string;
+  includeAllFolders?: boolean;
+  tagIds?: string[];
   /**
    * When true (default), use a windowed count that caps early for faster pagination.
    * When false, use a full COUNT(*) for exact totals — preferred for external API consumers.
@@ -102,6 +104,22 @@ const senderEmailIs = (eb: EnvelopeExpressionBuilder, email: string) =>
       .select(sql.lit(1).as('one')),
   );
 
+export const applyEnvelopeTagFilter = (qb: EnvelopeQueryBuilder, tagIds?: string[]) => {
+  if (!tagIds || tagIds.length === 0) {
+    return qb;
+  }
+
+  return qb.where((eb) =>
+    eb.exists(
+      eb
+        .selectFrom('EnvelopeTag')
+        .whereRef('EnvelopeTag.envelopeId', '=', 'Envelope.id')
+        .where('EnvelopeTag.tagId', 'in', tagIds)
+        .select(sql.lit(1).as('one')),
+    ),
+  );
+};
+
 export const findDocuments = async ({
   userId,
   teamId,
@@ -115,6 +133,8 @@ export const findDocuments = async ({
   senderIds,
   query = '',
   folderId,
+  includeAllFolders = false,
+  tagIds,
   useWindowedCount = true,
 }: FindDocumentsOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -147,8 +167,12 @@ export const findDocuments = async ({
     qb = qb.where('Envelope.type', '=', sql.lit(EnvelopeType.DOCUMENT));
 
     // Folder filter
-    qb =
-      folderId !== undefined ? qb.where('Envelope.folderId', '=', folderId) : qb.where('Envelope.folderId', 'is', null);
+    if (!includeAllFolders) {
+      qb =
+        folderId !== undefined
+          ? qb.where('Envelope.folderId', '=', folderId)
+          : qb.where('Envelope.folderId', 'is', null);
+    }
 
     // Period filter
     if (period) {
@@ -198,6 +222,9 @@ export const findDocuments = async ({
         ]),
       );
     }
+
+    // Tag filter (OR semantics — envelope must have at least one of the selected tags)
+    qb = applyEnvelopeTagFilter(qb, tagIds);
 
     return qb;
   };
@@ -520,6 +547,7 @@ export const findDocuments = async ({
       envelopeItems: {
         select: { id: true, envelopeId: true, title: true, order: true },
       },
+      tags: { include: { tag: true } },
     },
   });
 

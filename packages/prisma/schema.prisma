@@ -66,6 +66,8 @@ model User {
   folders   Folder[]
   envelopes Envelope[]
 
+  envelopeTags EnvelopeTag[]
+
   verificationTokens VerificationToken[]
   apiTokens          ApiToken[]
   securityAuditLogs  UserSecurityAuditLog[]
@@ -402,6 +404,40 @@ enum FolderType {
   TEMPLATE
 }
 
+enum TagType {
+  DOCUMENT
+  TEMPLATE
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String
+  normalizedName String
+  type      TagType
+  teamId    Int
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  envelopes EnvelopeTag[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@unique([teamId, normalizedName, type])
+  @@index([teamId])
+  @@index([teamId, type])
+}
+
+model EnvelopeTag {
+  envelopeId String
+  envelope   Envelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  tagId      String
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  assignedBy Int?
+  assignedByUser User? @relation(fields: [assignedBy], references: [id], onDelete: SetNull)
+  assignedAt DateTime @default(now())
+
+  @@id([envelopeId, tagId])
+  @@index([tagId])
+}
+
 model Folder {
   id         String             @id @default(cuid())
   name       String
@@ -485,6 +521,8 @@ model Envelope {
   documentMeta   DocumentMeta @relation(fields: [documentMetaId], references: [id])
 
   envelopeAttachments EnvelopeAttachment[]
+
+  tags EnvelopeTag[]
 
   @@index([type])
   @@index([status])
@@ -1052,6 +1090,7 @@ model Team {
 
   envelopes  Envelope[]
   folders    Folder[]
+  tags       Tag[]
   apiTokens  ApiToken[]
   webhooks   Webhook[]
   teamGroups TeamGroup[]
