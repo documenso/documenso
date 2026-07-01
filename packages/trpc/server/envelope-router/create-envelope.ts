@@ -124,7 +124,9 @@ export const createEnvelopeRouteCaller = async ({
       });
 
       // Todo: Embeds - Might need to add this for client-side embeds in the future.
-      const { cleanedPdf, placeholders } = await extractPdfPlaceholders(normalized);
+      const { cleanedPdf, placeholders } = await extractPdfPlaceholders(normalized, {
+        fileName: file.name,
+      });
 
       const { documentData } = await putPdfFileServerSide({
         name: file.name,
