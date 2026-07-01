@@ -1,5 +1,10 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import {
+  BRANDING_LOGO_ALLOWED_TYPES,
+  BRANDING_LOGO_MAX_SIZE_BYTES,
+  BRANDING_LOGO_MAX_SIZE_MB,
+} from '@documenso/lib/constants/branding';
 import { DEFAULT_BRAND_COLORS, DEFAULT_BRAND_RADIUS } from '@documenso/lib/constants/theme';
 import { ZCssVarsSchema } from '@documenso/lib/types/css-vars';
 import { cn } from '@documenso/ui/lib/utils';
@@ -21,15 +26,15 @@ import { z } from 'zod';
 import { useOptionalCurrentTeam } from '~/providers/team';
 import { useCspNonce } from '~/utils/nonce';
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ACCEPTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-
 const ZBrandingPreferencesFormSchema = z.object({
   brandingEnabled: z.boolean().nullable(),
   brandingLogo: z
     .instanceof(File)
-    .refine((file) => file.size <= MAX_FILE_SIZE, 'File size must be less than 5MB')
-    .refine((file) => ACCEPTED_FILE_TYPES.includes(file.type), 'Only .jpg, .png, and .webp files are accepted')
+    .refine(
+      (file) => file.size <= BRANDING_LOGO_MAX_SIZE_BYTES,
+      `File size must be less than ${BRANDING_LOGO_MAX_SIZE_MB}MB`,
+    )
+    .refine((file) => BRANDING_LOGO_ALLOWED_TYPES.includes(file.type), 'Only .jpg, .png, and .webp files are accepted')
     .nullish(),
   brandingUrl: z.string().url().optional().or(z.literal('')),
   brandingCompanyDetails: z.string().max(500).optional(),
@@ -199,7 +204,7 @@ export function BrandingPreferencesForm({
                       <FormControl className="relative">
                         <Input
                           type="file"
-                          accept={ACCEPTED_FILE_TYPES.join(',')}
+                          accept={BRANDING_LOGO_ALLOWED_TYPES.join(',')}
                           disabled={!isBrandingEnabled}
                           onChange={(e) => {
                             const file = e.target.files?.[0];
