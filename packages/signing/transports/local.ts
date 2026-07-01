@@ -8,18 +8,13 @@ const loadP12 = (): Uint8Array => {
   if (localFileContents) {
     return Buffer.from(localFileContents, 'base64');
   }
-
-  const localFilePath = env('NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH');
-
-  if (localFilePath) {
+  const defaultPath =
+    env('NODE_ENV') === 'production' ? '/opt/documenso/cert.p12' : './example/cert.p12';
+  const localFilePath = env('NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH') || defaultPath;
+  if (fs.existsSync(localFilePath)) {
     return fs.readFileSync(localFilePath);
   }
-
-  if (env('NODE_ENV') !== 'production') {
-    return fs.readFileSync('./example/cert.p12');
-  }
-
-  throw new Error('No certificate found for local signing');
+  throw new Error(`No certificate found for local signing. Tried: ${localFilePath}`);
 };
 
 export const createLocalSigner = async () => {
