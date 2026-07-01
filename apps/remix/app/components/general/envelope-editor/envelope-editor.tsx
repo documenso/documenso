@@ -182,7 +182,7 @@ export const EnvelopeEditor = () => {
       <div className="flex h-[calc(100vh-4rem)] w-screen">
         {/* Left Section - Step Navigation */}
         <div
-          className={cn('flex w-80 flex-shrink-0 flex-col overflow-y-auto border-border border-r bg-background py-4', {
+          className={cn('flex w-80 shrink-0 flex-col overflow-y-auto border-border border-r bg-background py-4', {
             'w-14': minimizeLeftSidebar,
           })}
         >
@@ -232,7 +232,7 @@ export const EnvelopeEditor = () => {
               <h3 className="flex items-end justify-between font-semibold text-foreground text-sm">
                 {isDocument ? <Trans>Document Editor</Trans> : <Trans>Template Editor</Trans>}
 
-                <span className="ml-2 rounded border bg-muted/50 px-2 py-0.5 text-muted-foreground text-xs">
+                <span className="ml-2 rounded-sm border bg-muted/50 px-2 py-0.5 text-muted-foreground text-xs">
                   <Trans context="The step counter">
                     Step {currentStepData.order}/{envelopeEditorSteps.length}
                   </Trans>
@@ -253,7 +253,7 @@ export const EnvelopeEditor = () => {
           )}
 
           <div
-            className={cn('space-y-3', {
+            className={cn('twv3-space-y-3', {
               'px-4': !minimizeLeftSidebar,
               'mt-4 flex flex-col items-center': minimizeLeftSidebar,
             })}
@@ -279,9 +279,9 @@ export const EnvelopeEditor = () => {
                   )}
                   onClick={() => void navigateToStep(step.id as EnvelopeEditorStep)}
                 >
-                  <div className="flex items-center space-x-3">
+                  <div className="twv3-space-x-3 flex items-center">
                     <div
-                      className={`rounded border p-2 ${
+                      className={`rounded-sm border p-2 ${
                         isActive
                           ? 'border-green-200 bg-green-50 dark:border-green-500/20 dark:bg-green-500/10'
                           : 'border-gray-100 bg-gray-100 dark:border-gray-400/20 dark:bg-gray-400/10'
@@ -318,7 +318,7 @@ export const EnvelopeEditor = () => {
 
           {/* Quick Actions. */}
           <div
-            className={cn('space-y-3 px-4 [&_.lucide]:text-muted-foreground', {
+            className={cn('twv3-space-y-3 px-4 [&_.lucide]:text-muted-foreground', {
               'px-2': minimizeLeftSidebar,
             })}
           >
@@ -505,7 +505,7 @@ export const EnvelopeEditor = () => {
                 asChild
               >
                 <Link to={relativePath.basePath}>
-                  <ArrowLeftIcon className="h-4 w-4 flex-shrink-0" />
+                  <ArrowLeftIcon className="h-4 w-4 shrink-0" />
 
                   {!minimizeLeftSidebar && (
                     <span className="ml-2">

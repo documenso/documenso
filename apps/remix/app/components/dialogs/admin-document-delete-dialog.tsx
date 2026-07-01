@@ -71,7 +71,7 @@ export const AdminDocumentDeleteDialog = ({ envelopeId }: AdminDocumentDeleteDia
             </AlertDescription>
           </div>
 
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="destructive">
@@ -80,7 +80,7 @@ export const AdminDocumentDeleteDialog = ({ envelopeId }: AdminDocumentDeleteDia
               </DialogTrigger>
 
               <DialogContent>
-                <DialogHeader className="space-y-4">
+                <DialogHeader className="twv3-space-y-4">
                   <DialogTitle>
                     <Trans>Delete Document</Trans>
                   </DialogTitle>

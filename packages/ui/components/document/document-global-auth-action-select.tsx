@@ -74,7 +74,7 @@ export const DocumentGlobalAuthActionTooltip = () => (
       <InfoIcon className="mx-2 h-4 w-4" />
     </TooltipTrigger>
 
-    <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+    <TooltipContent className="twv3-space-y-2 max-w-md p-4 text-foreground">
       <h2>
         <Trans>Global recipient action authentication</Trans>
       </h2>
@@ -90,7 +90,7 @@ export const DocumentGlobalAuthActionTooltip = () => (
         </Trans>
       </p>
 
-      <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
+      <ul className="twv3-space-y-0.5 ml-3.5 list-outside list-disc py-2">
         <li>
           <Trans>
             <strong>Require passkey</strong> - The recipient must have an account and passkey configured via their

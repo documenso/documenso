@@ -1,10 +1,11 @@
 import { createMDX } from 'fumadocs-mdx/next';
+import type { NextConfig } from 'next';
 
 const withMDX = createMDX();
 
-/** @type {import('next').NextConfig} */
-const config = {
+const config: NextConfig = {
   reactStrictMode: true,
+  // biome-ignore lint/suspicious/useAwait: config file
   async rewrites() {
     return [
       {
@@ -13,6 +14,7 @@ const config = {
       },
     ];
   },
+  // biome-ignore lint/suspicious/useAwait: config file
   async redirects() {
     return [
       // ============================================================

@@ -158,7 +158,7 @@ export const AiFieldDetectionDialog = ({
               </DialogTitle>
             </DialogHeader>
 
-            <div className="space-y-4">
+            <div className="twv3-space-y-4">
               <p className="text-muted-foreground text-sm">
                 <Trans>
                   We'll scan your document to find form fields like signature lines, text inputs, checkboxes, and more.
@@ -166,14 +166,14 @@ export const AiFieldDetectionDialog = ({
                 </Trans>
               </p>
 
-              <Alert className="flex items-center gap-2 space-y-0" variant="neutral">
+              <Alert className="twv3-space-y-0 flex items-center gap-2" variant="neutral">
                 <ShieldCheckIcon className="h-5 w-5 stroke-green-600" />
                 <AlertDescription className="mt-0">
                   <Trans>Your document is processed securely using AI services that don't retain your data.</Trans>
                 </AlertDescription>
               </Alert>
 
-              <div className="space-y-1.5">
+              <div className="twv3-space-y-1.5">
                 <Label htmlFor="context">
                   <Trans>Context</Trans>
                 </Label>

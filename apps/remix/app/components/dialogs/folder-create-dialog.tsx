@@ -103,7 +103,7 @@ export const FolderCreateDialog = ({ type, trigger, parentFolderId, ...props }: 
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <fieldset disabled={form.formState.isSubmitting} className="space-y-4">
+            <fieldset disabled={form.formState.isSubmitting} className="twv3-space-y-4">
               <FormField
                 control={form.control}
                 name="name"

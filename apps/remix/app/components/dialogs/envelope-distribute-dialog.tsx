@@ -264,7 +264,7 @@ export const EnvelopeDistributeDialog = ({
               <fieldset disabled={isSubmitting}>
                 {hasOverlappingEnvelopeFields && (
                   <Alert variant="warning" className="mb-4 flex flex-row items-start gap-3">
-                    <AlertTriangleIcon className="mt-0.5 h-5 w-5 flex-shrink-0" />
+                    <AlertTriangleIcon className="mt-0.5 h-5 w-5 shrink-0" />
 
                     <div className="flex flex-col gap-1">
                       <AlertTitle>

@@ -78,7 +78,7 @@ export const OrganisationGroupsDataTable = () => {
       {
         header: _(msg`Actions`),
         cell: ({ row }) => (
-          <div className="flex justify-end space-x-2">
+          <div className="twv3-space-x-2 flex justify-end">
             <Button asChild variant="outline">
               <Link to={`/o/${organisation.url}/settings/groups/${row.original.id}`}>
                 <Trans>Manage</Trans>
@@ -118,9 +118,9 @@ export const OrganisationGroupsDataTable = () => {
           <>
             <TableCell className="w-1/2 py-4 pr-4">
               <div className="flex w-full flex-row items-center">
-                <Skeleton className="h-12 w-12 flex-shrink-0 rounded-full" />
+                <Skeleton className="h-12 w-12 shrink-0 rounded-full" />
 
-                <div className="ml-2 flex flex-grow flex-col">
+                <div className="ml-2 flex grow flex-col">
                   <Skeleton className="h-4 w-1/3 max-w-[8rem]" />
                   <Skeleton className="mt-1 h-4 w-1/2 max-w-[12rem]" />
                 </div>

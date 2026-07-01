@@ -552,7 +552,7 @@ export const DocumentPreferencesForm = ({
                   )}
 
                   {(field.value !== null || !canInherit) && (
-                    <div className="space-y-4">
+                    <div className="twv3-space-y-4">
                       <DefaultRecipientsMultiSelectCombobox
                         listValues={recipients}
                         onChange={field.onChange}
@@ -756,7 +756,7 @@ export const DocumentPreferencesForm = ({
             />
           )}
 
-          <div className="flex flex-row justify-end space-x-4">
+          <div className="twv3-space-x-4 flex flex-row justify-end">
             <Button type="submit" loading={form.formState.isSubmitting}>
               <Trans>Update</Trans>
             </Button>

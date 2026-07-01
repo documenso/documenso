@@ -183,7 +183,7 @@ export const AddTemplateSettingsFormPartial = ({
         )}
 
         <Form {...form}>
-          <fieldset className="flex h-full flex-col space-y-6" disabled={form.formState.isSubmitting}>
+          <fieldset className="twv3-space-y-6 flex h-full flex-col" disabled={form.formState.isSubmitting}>
             <FormField
               control={form.control}
               name="title"
@@ -213,7 +213,7 @@ export const AddTemplateSettingsFormPartial = ({
                         <InfoIcon className="mx-2 h-4 w-4" />
                       </TooltipTrigger>
 
-                      <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+                      <TooltipContent className="twv3-space-y-2 max-w-md p-4 text-foreground">
                         Controls the language for the document, including the language to be used for email
                         notifications, and the final certificate that is generated and attached to the document.
                       </TooltipContent>
@@ -333,7 +333,7 @@ export const AddTemplateSettingsFormPartial = ({
                         <InfoIcon className="mx-2 h-4 w-4" />
                       </TooltipTrigger>
 
-                      <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+                      <TooltipContent className="twv3-space-y-2 max-w-md p-4 text-foreground">
                         <h2>
                           <strong>
                             <Trans>Document Distribution Method</Trans>
@@ -346,7 +346,7 @@ export const AddTemplateSettingsFormPartial = ({
                           </Trans>
                         </p>
 
-                        <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
+                        <ul className="twv3-space-y-0.5 ml-3.5 list-outside list-disc py-2">
                           <li>
                             <Trans>
                               <strong>Email</strong> - The recipient will be emailed the document to sign, approve, etc.
@@ -454,12 +454,12 @@ export const AddTemplateSettingsFormPartial = ({
             {distributionMethod === DocumentDistributionMethod.EMAIL && (
               <Accordion type="multiple">
                 <AccordionItem value="email-options" className="border-none">
-                  <AccordionTrigger className="rounded border px-3 py-2 text-left text-foreground hover:bg-neutral-200/30 hover:no-underline">
+                  <AccordionTrigger className="rounded-sm border px-3 py-2 text-left text-foreground hover:bg-neutral-200/30 hover:no-underline">
                     <Trans>Email Options</Trans>
                   </AccordionTrigger>
 
                   <AccordionContent className="-mx-1 px-1 pt-4 text-muted-foreground text-sm leading-relaxed [&>div]:pb-0">
-                    <div className="flex flex-col space-y-6">
+                    <div className="twv3-space-y-6 flex flex-col">
                       {organisation.organisationClaim.flags.emailDomains && (
                         <FormField
                           control={form.control}
@@ -588,12 +588,12 @@ export const AddTemplateSettingsFormPartial = ({
 
             <Accordion type="multiple">
               <AccordionItem value="advanced-options" className="border-none">
-                <AccordionTrigger className="rounded border px-3 py-2 text-left text-foreground hover:bg-neutral-200/30 hover:no-underline">
+                <AccordionTrigger className="rounded-sm border px-3 py-2 text-left text-foreground hover:bg-neutral-200/30 hover:no-underline">
                   <Trans>Advanced Options</Trans>
                 </AccordionTrigger>
 
                 <AccordionContent className="-mx-1 px-1 pt-4 text-muted-foreground text-sm leading-relaxed">
-                  <div className="flex flex-col space-y-6">
+                  <div className="twv3-space-y-6 flex flex-col">
                     <FormField
                       control={form.control}
                       name="externalId"

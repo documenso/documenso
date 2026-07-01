@@ -83,7 +83,7 @@ export const DocumentSigningAuthPassword = ({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onFormSubmit)}>
         <fieldset disabled={isCurrentlyAuthenticating}>
-          <div className="space-y-4">
+          <div className="twv3-space-y-4">
             {formErrorCode && (
               <Alert variant="destructive">
                 <AlertTitle>

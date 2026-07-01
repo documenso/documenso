@@ -25,7 +25,7 @@ export const AdminUserCreatedTemplate = ({
         <Preview>{_(previewText)}</Preview>
 
         <Section>
-          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-border border-solid p-4 backdrop-blur-sm">
+          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-border border-solid p-4 backdrop-blur-xs">
             <Section>
               <Img src={getAssetUrl('/static/logo.png')} alt="Documenso Logo" className="mb-4 h-6" />
 

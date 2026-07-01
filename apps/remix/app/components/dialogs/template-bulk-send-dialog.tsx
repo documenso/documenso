@@ -222,7 +222,7 @@ export const TemplateBulkSendDialog = ({ templateId, recipients, trigger, onSucc
               control={form.control}
               name="sendImmediately"
               render={({ field }) => (
-                <FormItem className="flex items-center space-x-2">
+                <FormItem className="twv3-space-x-2 flex items-center">
                   <FormControl>
                     <div className="flex items-center">
                       <Checkbox id="send-immediately" checked={field.value} onCheckedChange={field.onChange} />

@@ -109,17 +109,17 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
           {Array.from({ length: 4 }).map((_, index) => (
             <div key={index} className="h-full rounded-lg border border-border bg-card px-4 py-5">
               <div className="flex items-center gap-3">
-                <Skeleton className="h-8 w-8 rounded" />
+                <Skeleton className="h-8 w-8 rounded-sm" />
                 <div className="flex w-full items-center justify-between">
                   <div className="flex-1">
                     <Skeleton className="mb-2 h-4 w-24" />
-                    <div className="flex space-x-2">
+                    <div className="twv3-space-x-2 flex">
                       <Skeleton className="h-3 w-16" />
                       <Skeleton className="h-3 w-3" />
                       <Skeleton className="h-3 w-12" />
                     </div>
                   </div>
-                  <Skeleton className="h-8 w-2 rounded" />
+                  <Skeleton className="h-8 w-2 rounded-sm" />
                 </div>
               </div>
             </div>
@@ -138,7 +138,7 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
         </div>
       ) : (
         foldersData && (
-          <div key="content" className="space-y-4">
+          <div key="content" className="twv3-space-y-4">
             {pinnedFolders.length > 0 && (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {pinnedFolders.map((folder) => (

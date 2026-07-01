@@ -84,7 +84,7 @@ export const SettingsPublicProfileTemplatesTable = () => {
                     <div className="flex gap-x-2">
                       <FileIcon className="h-8 w-8 text-muted-foreground/40" strokeWidth={1.5} />
 
-                      <div className="space-y-2">
+                      <div className="twv3-space-y-2">
                         <Skeleton className="h-4 w-24" />
                         <Skeleton className="h-4 w-48" />
                       </div>
@@ -128,7 +128,7 @@ export const SettingsPublicProfileTemplatesTable = () => {
         {publicDirectTemplates.map((template) => (
           <div key={template.id} className="flex items-center justify-between gap-x-6 bg-background p-4">
             <div className="flex gap-x-2">
-              <FileIcon className="h-8 w-8 flex-shrink-0 text-muted-foreground/40" strokeWidth={1.5} />
+              <FileIcon className="h-8 w-8 shrink-0 text-muted-foreground/40" strokeWidth={1.5} />
 
               <div>
                 <p className="break-all text-sm">{template.publicTitle}</p>

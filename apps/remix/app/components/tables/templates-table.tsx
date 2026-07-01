@@ -118,8 +118,8 @@ export const TemplatesTable = ({
                 <InfoIcon className="mx-2 h-4 w-4" />
               </TooltipTrigger>
 
-              <TooltipContent className="!p-0 max-w-md space-y-2 text-foreground">
-                <ul className="space-y-0.5 divide-y text-muted-foreground [&>li]:p-4">
+              <TooltipContent className="twv3-space-y-2 max-w-md p-0! text-foreground">
+                <ul className="twv3-space-y-0.5 divide-y text-muted-foreground [&>li]:p-4">
                   <li>
                     <h2 className="mb-2 flex flex-row items-center font-semibold">
                       <Globe2Icon className="mr-2 h-5 w-5 text-green-500 dark:text-green-300" />
@@ -134,7 +134,7 @@ export const TemplatesTable = ({
                     </p>
                   </li>
                   <li>
-                    <div className="mb-2 flex w-fit flex-row items-center rounded border border-neutral-300 bg-neutral-200 px-1.5 py-0.5 text-xs dark:border-neutral-500 dark:bg-neutral-600">
+                    <div className="mb-2 flex w-fit flex-row items-center rounded-sm border border-neutral-300 bg-neutral-200 px-1.5 py-0.5 text-xs dark:border-neutral-500 dark:bg-neutral-600">
                       <Link2Icon className="mr-1 h-3 w-3" />
                       <Trans>direct link</Trans>
                     </div>
@@ -282,7 +282,7 @@ export const TemplatesTable = ({
             <>
               {enableSelection && (
                 <TableCell className="w-10">
-                  <Skeleton className="h-4 w-4 rounded" />
+                  <Skeleton className="h-4 w-4 rounded-sm" />
                 </TableCell>
               )}
               <TableCell>
@@ -293,14 +293,14 @@ export const TemplatesTable = ({
               </TableCell>
               <TableCell className="py-4">
                 <div className="flex w-full flex-row items-center">
-                  <Skeleton className="h-10 w-10 flex-shrink-0 rounded-full" />
+                  <Skeleton className="h-10 w-10 shrink-0 rounded-full" />
                 </div>
               </TableCell>
               <TableCell>
                 <Skeleton className="h-4 w-20 rounded-full" />
               </TableCell>
               <TableCell>
-                <Skeleton className="h-10 w-24 rounded" />
+                <Skeleton className="h-10 w-24 rounded-sm" />
               </TableCell>
             </>
           ),

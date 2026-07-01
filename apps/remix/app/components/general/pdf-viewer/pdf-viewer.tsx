@@ -343,7 +343,10 @@ const PdfViewerPage = ({
   });
 
   return (
-    <div className="relative w-full rounded border border-border" style={{ width: scaledWidth, height: scaledHeight }}>
+    <div
+      className="relative w-full rounded-sm border border-border"
+      style={{ width: scaledWidth, height: scaledHeight }}
+    >
       {CustomPageRenderer && imageLoadingState === 'loaded' && (
         <CustomPageRenderer
           pageData={{

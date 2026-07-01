@@ -77,7 +77,7 @@ export const GenericErrorLayout = ({
         </motion.div>
       </div>
 
-      <div className="inset-0 mx-auto flex h-full flex-grow items-center justify-center px-6 py-32">
+      <div className="inset-0 mx-auto flex h-full grow items-center justify-center px-6 py-32">
         <div>
           <p className="font-semibold text-muted-foreground">{_(subHeading)}</p>
 

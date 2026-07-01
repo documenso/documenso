@@ -147,7 +147,7 @@ export const ConfigureDocumentRecipients = ({ control, isSubmitting }: Configure
         control={control}
         name="meta.signingOrder"
         render={({ field }) => (
-          <FormItem className="mb-6 flex flex-row items-center space-x-2 space-y-0">
+          <FormItem className="twv3-space-x-2 twv3-space-y-0 mb-6 flex flex-row items-center">
             <FormControl>
               <Checkbox
                 {...field}
@@ -173,7 +173,7 @@ export const ConfigureDocumentRecipients = ({ control, isSubmitting }: Configure
         control={control}
         name="meta.allowDictateNextSigner"
         render={({ field: { value, ...field } }) => (
-          <FormItem className="mb-6 flex flex-row items-center space-x-2 space-y-0">
+          <FormItem className="twv3-space-x-2 twv3-space-y-0 mb-6 flex flex-row items-center">
             <FormControl>
               <Checkbox
                 {...field}
@@ -221,7 +221,7 @@ export const ConfigureDocumentRecipients = ({ control, isSubmitting }: Configure
       >
         <Droppable droppableId="signers">
           {(provided) => (
-            <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+            <div {...provided.droppableProps} ref={provided.innerRef} className="twv3-space-y-2">
               {signers.map((signer, index) => (
                 <Draggable
                   key={signer.id}
@@ -254,7 +254,7 @@ export const ConfigureDocumentRecipients = ({ control, isSubmitting }: Configure
                                   'mb-6': errors?.signers?.[index] && !errors?.signers?.[index]?.signingOrder,
                                 })}
                               >
-                                <GripVertical className="h-5 w-5 flex-shrink-0 opacity-40" />
+                                <GripVertical className="h-5 w-5 shrink-0 opacity-40" />
                                 <FormControl>
                                   <Input
                                     type="number"

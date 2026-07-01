@@ -75,7 +75,7 @@ export const ClaimUpdateDialog = ({ claim, trigger, licenseFlags }: ClaimUpdateD
           licenseFlags={licenseFlags}
           formSubmitTrigger={
             <>
-              <div className="flex items-center space-x-2">
+              <div className="twv3-space-x-2 flex items-center">
                 <Checkbox
                   id="backport-email-transport"
                   checked={backportEmailTransport}

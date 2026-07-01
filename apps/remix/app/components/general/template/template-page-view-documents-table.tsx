@@ -123,8 +123,8 @@ export const TemplatePageViewDocumentsTable = ({ templateId }: TemplatePageViewD
                 <InfoIcon className="mx-2 h-4 w-4" />
               </TooltipTrigger>
 
-              <TooltipContent className="!p-0 max-w-md space-y-2 text-foreground">
-                <ul className="space-y-0.5 divide-y text-muted-foreground [&>li]:p-4">
+              <TooltipContent className="twv3-space-y-2 max-w-md p-0! text-foreground">
+                <ul className="twv3-space-y-0.5 divide-y text-muted-foreground [&>li]:p-4">
                   <li>
                     <h2 className="mb-2 flex flex-row items-center font-semibold">
                       <Trans>Template</Trans>
@@ -158,7 +158,7 @@ export const TemplatePageViewDocumentsTable = ({ templateId }: TemplatePageViewD
         id: 'actions',
         header: _(msg`Actions`),
         cell: ({ row }) => (
-          <div className="flex items-center space-x-2">
+          <div className="twv3-space-x-2 flex items-center">
             <DocumentsTableActionButton row={row.original} />
 
             <DocumentsTableActionDropdown row={row.original} />
@@ -170,7 +170,7 @@ export const TemplatePageViewDocumentsTable = ({ templateId }: TemplatePageViewD
 
   return (
     <div>
-      <div className="mb-4 flex flex-row space-x-4">
+      <div className="twv3-space-x-4 mb-4 flex flex-row">
         <DocumentSearch />
 
         <SearchParamSelector
@@ -231,7 +231,7 @@ export const TemplatePageViewDocumentsTable = ({ templateId }: TemplatePageViewD
                 <Skeleton className="h-4 w-24 rounded-full" />
               </TableCell>
               <TableCell className="py-4 pr-4">
-                <Skeleton className="h-12 w-12 flex-shrink-0 rounded-full" />
+                <Skeleton className="h-12 w-12 shrink-0 rounded-full" />
               </TableCell>
               <TableCell>
                 <Skeleton className="h-4 w-12 rounded-full" />
@@ -240,8 +240,8 @@ export const TemplatePageViewDocumentsTable = ({ templateId }: TemplatePageViewD
                 <Skeleton className="h-4 w-12 rounded-full" />
               </TableCell>
               <TableCell>
-                <div className="flex flex-row justify-end space-x-2">
-                  <Skeleton className="h-10 w-20 rounded" />
+                <div className="twv3-space-x-2 flex flex-row justify-end">
+                  <Skeleton className="h-10 w-20 rounded-sm" />
                 </div>
               </TableCell>
             </>

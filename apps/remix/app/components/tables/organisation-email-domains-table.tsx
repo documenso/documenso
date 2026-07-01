@@ -100,7 +100,7 @@ export const OrganisationEmailDomainsDataTable = () => {
       {
         header: t`Actions`,
         cell: ({ row }) => (
-          <div className="flex justify-end space-x-2">
+          <div className="twv3-space-x-2 flex justify-end">
             <Button asChild variant="outline">
               <Link to={`/o/${organisation.url}/settings/email-domains/${row.original.id}`}>Manage</Link>
             </Button>
@@ -141,15 +141,15 @@ export const OrganisationEmailDomainsDataTable = () => {
                 <Skeleton className="h-4 w-20 rounded-full" />
               </TableCell>
               <TableCell>
-                <Skeleton className="h-6 w-20 rounded" />
+                <Skeleton className="h-6 w-20 rounded-sm" />
               </TableCell>
               <TableCell>
                 <Skeleton className="h-4 w-12 rounded-full" />
               </TableCell>
               <TableCell>
-                <div className="flex flex-row justify-end space-x-2">
-                  <Skeleton className="h-10 w-20 rounded" />
-                  <Skeleton className="h-10 w-20 rounded" />
+                <div className="twv3-space-x-2 flex flex-row justify-end">
+                  <Skeleton className="h-10 w-20 rounded-sm" />
+                  <Skeleton className="h-10 w-20 rounded-sm" />
                 </div>
               </TableCell>
             </>

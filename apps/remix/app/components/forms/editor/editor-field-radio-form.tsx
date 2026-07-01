@@ -149,7 +149,7 @@ export const EditorFieldRadioForm = ({
 
           <EditorGenericReadOnlyField formControl={form.control} />
 
-          <section className="space-y-2">
+          <section className="twv3-space-y-2">
             <div className="-mx-4 mt-2 mb-4">
               <Separator />
             </div>
@@ -164,7 +164,7 @@ export const EditorFieldRadioForm = ({
               </button>
             </div>
 
-            <ul className="space-y-2">
+            <ul className="twv3-space-y-2">
               {(formValues.values || []).map((value, index) => (
                 <li key={`radio-value-${index}`} className="flex flex-row items-center gap-2">
                   <FormField

@@ -144,7 +144,7 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
   return (
     <div className="py-4">
       {step === 'method-selection' && (
-        <div className="space-y-4">
+        <div className="twv3-space-y-4">
           <div>
             <h3 className="font-semibold text-lg">
               <Trans>Choose verification method</Trans>
@@ -160,7 +160,7 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
             </Alert>
           )}
 
-          <div className="space-y-3">
+          <div className="twv3-space-y-3">
             <Button
               type="button"
               variant="outline"
@@ -203,7 +203,7 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
       )}
 
       {step === 'code-input' && (
-        <div className="space-y-4">
+        <div className="twv3-space-y-4">
           <div className="flex items-center gap-2">
             <Button type="button" variant="ghost" size="sm" onClick={onGoBack}>
               <ArrowLeftIcon className="h-4 w-4" />
@@ -225,7 +225,7 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
           </div>
 
           <Form {...form}>
-            <form id="access-auth-2fa-form" className="space-y-4" onSubmit={form.handleSubmit(onFormSubmit)}>
+            <form id="access-auth-2fa-form" className="twv3-space-y-4" onSubmit={form.handleSubmit(onFormSubmit)}>
               <fieldset disabled={isRequesting2FAEmail || form.formState.isSubmitting}>
                 <FormField
                   control={form.control}
@@ -266,7 +266,7 @@ export const AccessAuth2FAForm = ({ onSubmit, token, error }: AccessAuth2FAFormP
                   )}
                 />
 
-                <div className="mt-4 space-y-2">
+                <div className="twv3-space-y-2 mt-4">
                   <Button
                     type="submit"
                     form="access-auth-2fa-form"

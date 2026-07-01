@@ -141,7 +141,7 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
       {
         header: t`Member`,
         cell: ({ row }) => (
-          <div className="space-y-1">
+          <div className="twv3-space-y-1">
             <Link className="font-medium hover:underline" to={`/admin/users/${row.original.user.id}`}>
               {row.original.user.name ?? row.original.user.email}
             </Link>
@@ -197,7 +197,7 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
           const memberName = row.original.user.name ?? row.original.user.email;
 
           return (
-            <div className="flex justify-end space-x-2">
+            <div className="twv3-space-x-2 flex justify-end">
               <AdminOrganisationMemberUpdateDialog
                 trigger={
                   <Button variant="outline">
@@ -404,7 +404,7 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
 
       <OrganisationAdminForm organisation={organisation} licenseFlags={licenseFlags} />
 
-      <div className="mt-16 space-y-10">
+      <div className="twv3-space-y-10 mt-16">
         <div>
           <label className="font-medium text-sm leading-none">
             <Trans>Organisation Members</Trans>
@@ -506,7 +506,7 @@ const GenericOrganisationAdminForm = ({ organisation }: OrganisationAdminFormOpt
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="twv3-space-y-6">
         <FormField
           control={form.control}
           name="name"
@@ -639,7 +639,7 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="twv3-space-y-6">
         <FormField
           control={form.control}
           name="originalSubscriptionClaimId"
@@ -652,7 +652,7 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
                     <InfoIcon className="mx-2 h-4 w-4" />
                   </TooltipTrigger>
 
-                  <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+                  <TooltipContent className="twv3-space-y-2 max-w-md p-4 text-foreground">
                     <h2>
                       <strong>
                         <Trans>Inherited subscription claim</Trans>
@@ -816,7 +816,7 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
             <Trans>Feature Flags</Trans>
           </FormLabel>
 
-          <div className="mt-2 space-y-2 rounded-md border p-4">
+          <div className="twv3-space-y-2 mt-2 rounded-md border p-4">
             {Object.values(SUBSCRIPTION_CLAIM_FEATURE_FLAGS).map(({ key, label, isEnterprise }) => {
               const isRestrictedFeature = isEnterprise && !licenseFlags?.[key as keyof TLicenseClaim]; // eslint-disable-line @typescript-eslint/consistent-type-assertions
 
@@ -826,7 +826,7 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
                   control={form.control}
                   name={`claims.flags.${key}`}
                   render={({ field }) => (
-                    <FormItem className="flex items-center space-x-2">
+                    <FormItem className="twv3-space-x-2 flex items-center">
                       <FormControl>
                         <div className="flex items-center">
                           <Checkbox

@@ -72,7 +72,7 @@ export const SubscriptionClaimForm = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onFormSubmit)}>
-        <fieldset disabled={form.formState.isSubmitting} className="space-y-4">
+        <fieldset disabled={form.formState.isSubmitting} className="twv3-space-y-4">
           <FormField
             control={form.control}
             name="name"
@@ -190,7 +190,7 @@ export const SubscriptionClaimForm = ({
               <Trans>Feature Flags</Trans>
             </FormLabel>
 
-            <div className="mt-2 space-y-2 rounded-md border p-4">
+            <div className="twv3-space-y-2 mt-2 rounded-md border p-4">
               {Object.values(SUBSCRIPTION_CLAIM_FEATURE_FLAGS).map(({ key, label, isEnterprise }) => {
                 const isRestrictedFeature = isEnterprise && !licenseFlags?.[key as keyof TLicenseClaim]; // eslint-disable-line @typescript-eslint/consistent-type-assertions
 
@@ -200,7 +200,7 @@ export const SubscriptionClaimForm = ({
                     control={form.control}
                     name={`flags.${key}`}
                     render={({ field }) => (
-                      <FormItem className="flex items-center space-x-2">
+                      <FormItem className="twv3-space-x-2 flex items-center">
                         <FormControl>
                           <div className="flex items-center">
                             <Checkbox

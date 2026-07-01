@@ -102,8 +102,8 @@ export const SignFieldCheckboxDialog = createCallable<SignFieldCheckboxDialogPro
                 call.end(data.values.map((value, i) => (value.checked ? i : null)).filter((value) => value !== null)),
               )}
             >
-              <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
-                <ul className="space-y-3">
+              <fieldset className="twv3-space-y-4 flex h-full flex-col" disabled={form.formState.isSubmitting}>
+                <ul className="twv3-space-y-3">
                   {(formValues.values || []).map((value, index) => (
                     <li key={`checkbox-${index}`}>
                       <FormField

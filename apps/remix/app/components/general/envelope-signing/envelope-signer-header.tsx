@@ -32,16 +32,16 @@ export const EnvelopeSignerHeader = () => {
   return (
     <nav className="embed--DocumentWidgetHeader flex max-w-screen flex-row justify-between border-border border-b bg-background px-4 py-3 md:px-6">
       {/* Left side - Logo and title */}
-      <div className="flex min-w-0 flex-1 items-center space-x-2 md:w-auto md:flex-none">
+      <div className="twv3-space-x-2 flex min-w-0 flex-1 items-center md:w-auto md:flex-none">
         {!isEmbedSigning &&
           (hasCustomBrandingLogo ? (
             <img
               src={`/api/branding/logo/team/${envelope.teamId}`}
               alt={`${envelope.team.name}'s Logo`}
-              className="h-6 w-auto flex-shrink-0"
+              className="h-6 w-auto shrink-0"
             />
           ) : (
-            <Link to="/" className="flex-shrink-0">
+            <Link to="/" className="shrink-0">
               <BrandingLogo className="hidden h-6 w-auto md:block" />
               <BrandingLogoIcon className="h-6 w-auto md:hidden" />
             </Link>
@@ -53,7 +53,7 @@ export const EnvelopeSignerHeader = () => {
 
         {!isEmbedSigning && <Separator orientation="vertical" className="hidden h-6 md:block" />}
 
-        <div className="hidden items-center space-x-2 md:flex">
+        <div className="twv3-space-x-2 hidden items-center md:flex">
           <h1 className="whitespace-nowrap font-medium text-foreground text-sm">{envelope.title}</h1>
 
           <Badge>
@@ -68,8 +68,8 @@ export const EnvelopeSignerHeader = () => {
       </div>
 
       {/* Right side - Desktop content */}
-      <div className="hidden items-center space-x-2 lg:flex">
-        <p className="mr-2 flex-shrink-0 text-muted-foreground text-sm">
+      <div className="twv3-space-x-2 hidden items-center lg:flex">
+        <p className="mr-2 shrink-0 text-muted-foreground text-sm">
           <Plural one="1 Field Remaining" other="# Fields Remaining" value={recipientFieldsRemaining.length} />
         </p>
 
@@ -77,7 +77,7 @@ export const EnvelopeSignerHeader = () => {
       </div>
 
       {/* Mobile Actions button */}
-      <div className="flex-shrink-0 lg:hidden">
+      <div className="shrink-0 lg:hidden">
         <MobileDropdownMenu />
       </div>
     </nav>

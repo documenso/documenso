@@ -230,7 +230,7 @@ export const EditorFieldNumberForm = ({
           <EditorGenericReadOnlyField formControl={form.control} />
 
           {/* Validation section */}
-          <section className="space-y-2">
+          <section className="twv3-space-y-2">
             <div className="-mx-4 mt-2 mb-4">
               <Separator />
             </div>

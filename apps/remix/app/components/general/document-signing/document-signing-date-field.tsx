@@ -147,8 +147,8 @@ export const DocumentSigningDateField = ({
             className={cn(
               'w-full whitespace-nowrap text-left text-[clamp(0.425rem,25cqw,0.825rem)] text-foreground duration-200',
               {
-                '!text-center': parsedFieldMeta?.textAlign === 'center',
-                '!text-right': parsedFieldMeta?.textAlign === 'right',
+                'text-center!': parsedFieldMeta?.textAlign === 'center',
+                'text-right!': parsedFieldMeta?.textAlign === 'right',
               },
             )}
           >

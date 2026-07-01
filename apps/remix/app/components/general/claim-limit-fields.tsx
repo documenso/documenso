@@ -71,7 +71,7 @@ export const ClaimLimitFields = <T extends FieldValues>({
   );
 
   return (
-    <div className="space-y-4 rounded-md border p-4">
+    <div className="twv3-space-y-4 rounded-md border p-4">
       <FormLabel>
         <Trans>Limits</Trans>
       </FormLabel>

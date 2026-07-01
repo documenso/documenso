@@ -20,7 +20,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className, hiddenEven
   const isHidden = (event: DocumentEmailEvents) => hiddenEvents?.includes(event) ?? false;
 
   return (
-    <div className={cn('space-y-3', className)}>
+    <div className={cn('twv3-space-y-3', className)}>
       {!isHidden(DocumentEmailEvents.RecipientSigned) && (
         <div className="flex flex-row items-center">
           <Checkbox
@@ -43,7 +43,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className, hiddenEven
                 <InfoIcon className="mx-2 h-4 w-4" />
               </TooltipTrigger>
 
-              <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+              <TooltipContent className="twv3-space-y-2 max-w-md p-4 text-foreground">
                 <h2>
                   <strong>
                     <Trans>Recipient signed email</Trans>
@@ -81,7 +81,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className, hiddenEven
                 <InfoIcon className="mx-2 h-4 w-4" />
               </TooltipTrigger>
 
-              <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+              <TooltipContent className="twv3-space-y-2 max-w-md p-4 text-foreground">
                 <h2>
                   <strong>
                     <Trans>Recipient signing request email</Trans>
@@ -119,7 +119,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className, hiddenEven
                 <InfoIcon className="mx-2 h-4 w-4" />
               </TooltipTrigger>
 
-              <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+              <TooltipContent className="twv3-space-y-2 max-w-md p-4 text-foreground">
                 <h2>
                   <strong>
                     <Trans>Recipient removed email</Trans>
@@ -157,7 +157,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className, hiddenEven
                 <InfoIcon className="mx-2 h-4 w-4" />
               </TooltipTrigger>
 
-              <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+              <TooltipContent className="twv3-space-y-2 max-w-md p-4 text-foreground">
                 <h2>
                   <strong>
                     <Trans>Document pending email</Trans>
@@ -198,7 +198,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className, hiddenEven
                 <InfoIcon className="mx-2 h-4 w-4" />
               </TooltipTrigger>
 
-              <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+              <TooltipContent className="twv3-space-y-2 max-w-md p-4 text-foreground">
                 <h2>
                   <strong>
                     <Trans>Document completed email</Trans>
@@ -236,7 +236,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className, hiddenEven
                 <InfoIcon className="mx-2 h-4 w-4" />
               </TooltipTrigger>
 
-              <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+              <TooltipContent className="twv3-space-y-2 max-w-md p-4 text-foreground">
                 <h2>
                   <strong>
                     <Trans>Document deleted email</Trans>
@@ -274,7 +274,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className, hiddenEven
                 <InfoIcon className="mx-2 h-4 w-4" />
               </TooltipTrigger>
 
-              <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+              <TooltipContent className="twv3-space-y-2 max-w-md p-4 text-foreground">
                 <h2>
                   <strong>
                     <Trans>Document completed email</Trans>
@@ -312,7 +312,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className, hiddenEven
                 <InfoIcon className="mx-2 h-4 w-4" />
               </TooltipTrigger>
 
-              <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+              <TooltipContent className="twv3-space-y-2 max-w-md p-4 text-foreground">
                 <h2>
                   <strong>
                     <Trans>Document created from direct template email</Trans>
@@ -353,7 +353,7 @@ export const DocumentEmailCheckboxes = ({ value, onChange, className, hiddenEven
                 <InfoIcon className="mx-2 h-4 w-4" />
               </TooltipTrigger>
 
-              <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+              <TooltipContent className="twv3-space-y-2 max-w-md p-4 text-foreground">
                 <h2>
                   <strong>
                     <Trans>Recipient expired email</Trans>

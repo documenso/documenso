@@ -91,7 +91,7 @@ export const SettingsSecurityPasskeyTableActions = ({
   });
 
   return (
-    <div className={cn('flex justify-end space-x-2', className)}>
+    <div className={cn('twv3-space-x-2 flex justify-end', className)}>
       <Dialog open={isUpdateDialogOpen} onOpenChange={(value) => !isUpdatingPasskey && setIsUpdateDialogOpen(value)}>
         <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
           <Button variant="outline">

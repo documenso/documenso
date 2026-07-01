@@ -45,7 +45,7 @@ export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) 
 
       <TeamUpdateForm teamId={team.id} teamName={team.name} teamUrl={team.url} />
 
-      <section className="mt-6 space-y-6">
+      <section className="twv3-space-y-6 mt-6">
         {(team.teamEmail || team.emailVerification) && (
           <Alert className="p-6" variant="neutral">
             <AlertTitle>

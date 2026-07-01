@@ -133,7 +133,7 @@ export const AdminGlobalSettingsSection = ({ settings, isTeam = false }: AdminGl
 
       {isTeam && parsedEmailSettings.success && (
         <DetailsCard label={<Trans>Email document settings</Trans>}>
-          <div className="mt-1 space-y-1 pr-3 pb-2 text-xs">
+          <div className="twv3-space-y-1 mt-1 pr-3 pb-2 text-xs">
             {emailSettingsKeys.map((key) => (
               <div key={key} className="flex items-center justify-between gap-2">
                 <span className="text-muted-foreground">{_(EMAIL_SETTINGS_LABELS[key])}</span>

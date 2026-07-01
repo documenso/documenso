@@ -3,9 +3,8 @@ import path from 'node:path';
 import { defaultOptions as devServerDefaults } from '@hono/vite-dev-server';
 import { lingui } from '@lingui/vite-plugin';
 import { reactRouter } from '@react-router/dev/vite';
-import autoprefixer from 'autoprefixer';
+import tailwindcss from '@tailwindcss/postcss';
 import serverAdapter from 'hono-react-router-adapter/vite';
-import tailwindcss from 'tailwindcss';
 import { defineConfig, normalizePath } from 'vite';
 import macrosPlugin from 'vite-plugin-babel-macros';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
@@ -25,7 +24,7 @@ const cMapsDir = normalizePath(path.join(pdfjsDistPath, 'cmaps'));
 export default defineConfig({
   css: {
     postcss: {
-      plugins: [tailwindcss, autoprefixer],
+      plugins: [tailwindcss()],
     },
   },
   server: {
@@ -69,7 +68,6 @@ export default defineConfig({
       '@napi-rs/canvas',
       '@node-rs/bcrypt',
       '@prisma/client',
-      '@documenso/tailwind-config',
       'playwright',
       'playwright-core',
       '@playwright/browser-chromium',

@@ -87,7 +87,7 @@ export const DocumentSigningAuth2FA = ({
 
   if (!user?.twoFactorEnabled && !is2FASetupSuccessful) {
     return (
-      <div className="space-y-4">
+      <div className="twv3-space-y-4">
         <Alert variant="warning">
           <AlertDescription>
             <p>
@@ -147,7 +147,7 @@ export const DocumentSigningAuth2FA = ({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onFormSubmit)}>
         <fieldset disabled={isCurrentlyAuthenticating}>
-          <div className="space-y-4">
+          <div className="twv3-space-y-4">
             <FormField
               control={form.control}
               name="token"

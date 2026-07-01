@@ -225,7 +225,7 @@ export const EnvelopeItemEditDialog = ({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <fieldset disabled={form.formState.isSubmitting} className="space-y-4">
+            <fieldset disabled={form.formState.isSubmitting} className="twv3-space-y-4">
               <FormField
                 control={form.control}
                 name="title"
@@ -253,13 +253,13 @@ export const EnvelopeItemEditDialog = ({
                 </FormLabel>
 
                 {replacementFile ? (
-                  <div className="mt-1.5 space-y-2">
+                  <div className="twv3-space-y-2 mt-1.5">
                     <div
                       data-testid="envelope-item-edit-selected-file"
                       className="flex items-center justify-between rounded-md border border-border bg-muted/50 px-3 py-2"
                     >
-                      <div className="flex min-w-0 items-center space-x-2">
-                        <FileIcon className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                      <div className="twv3-space-x-2 flex min-w-0 items-center">
+                        <FileIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
                         <div className="min-w-0">
                           <p className="truncate font-medium text-sm">{replacementFile.file.name}</p>
                           <p className="text-muted-foreground text-xs">
@@ -309,7 +309,7 @@ export const EnvelopeItemEditDialog = ({
                     )}
                   >
                     <input {...getInputProps()} />
-                    <div className="flex items-center space-x-2 text-muted-foreground text-sm">
+                    <div className="twv3-space-x-2 flex items-center text-muted-foreground text-sm">
                       <UploadIcon className="h-4 w-4" />
                       <span>
                         <Trans>Drop PDF here or click to select</Trans>

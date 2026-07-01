@@ -109,7 +109,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
           </button>
         </div>
 
-        <div className="mt-auto flex w-full flex-col space-y-4 self-end">
+        <div className="twv3-space-y-4 mt-auto flex w-full flex-col self-end">
           <div className="w-fit">
             <ThemeSwitcher />
           </div>

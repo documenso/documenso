@@ -90,7 +90,7 @@ export const AdminUserResetTwoFactorDialog = ({ className, user }: AdminUserRese
           </AlertDescription>
         </div>
 
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
               <Button variant="destructive">
@@ -99,7 +99,7 @@ export const AdminUserResetTwoFactorDialog = ({ className, user }: AdminUserRese
             </DialogTrigger>
 
             <DialogContent>
-              <DialogHeader className="space-y-4">
+              <DialogHeader className="twv3-space-y-4">
                 <DialogTitle>
                   <Trans>Reset Two Factor Authentication</Trans>
                 </DialogTitle>

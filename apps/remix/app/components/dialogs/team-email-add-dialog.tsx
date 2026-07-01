@@ -119,7 +119,7 @@ export const TeamEmailAddDialog = ({ teamId, trigger, ...props }: TeamEmailAddDi
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
-            <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
+            <fieldset className="twv3-space-y-4 flex h-full flex-col" disabled={form.formState.isSubmitting}>
               <FormField
                 control={form.control}
                 name="name"

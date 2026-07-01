@@ -332,13 +332,13 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
     <Dialog {...props} open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
         {trigger ?? (
-          <Button className="flex-shrink-0" variant="secondary">
+          <Button className="shrink-0" variant="secondary">
             <Trans>Settings</Trans>
           </Button>
         )}
       </DialogTrigger>
 
-      <DialogContent className="!max-w-5xl flex w-full flex-row gap-0 p-0">
+      <DialogContent className="flex w-full max-w-5xl! flex-row gap-0 p-0">
         {/* Sidebar. */}
         <div className="flex w-80 flex-col border-r bg-accent/20">
           <DialogHeader className="p-6 pb-4" data-testid="envelope-editor-settings-dialog-header">
@@ -384,7 +384,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onFormSubmit)}>
               <fieldset
-                className="flex h-[45rem] max-h-[calc(100vh-14rem)] w-full flex-col space-y-6 overflow-y-auto px-6 py-6"
+                className="twv3-space-y-6 flex h-[45rem] max-h-[calc(100vh-14rem)] w-full flex-col overflow-y-auto px-6 py-6"
                 disabled={form.formState.isSubmitting}
                 key={activeTab}
               >
@@ -404,7 +404,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                                     <InfoIcon className="mx-2 h-4 w-4" />
                                   </TooltipTrigger>
 
-                                  <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+                                  <TooltipContent className="twv3-space-y-2 max-w-md p-4 text-foreground">
                                     <Trans>
                                       Controls the language for the document, including the language to be used for
                                       email notifications, and the final certificate that is generated and attached to
@@ -620,7 +620,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                                     <InfoIcon className="mx-2 h-4 w-4" />
                                   </TooltipTrigger>
 
-                                  <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+                                  <TooltipContent className="twv3-space-y-2 max-w-md p-4 text-foreground">
                                     <h2>
                                       <strong>
                                         <Trans>Document Distribution Method</Trans>
@@ -634,7 +634,7 @@ export const EnvelopeEditorSettingsDialog = ({ trigger, ...props }: EnvelopeEdit
                                       </Trans>
                                     </p>
 
-                                    <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
+                                    <ul className="twv3-space-y-0.5 ml-3.5 list-outside list-disc py-2">
                                       <li>
                                         <Trans>
                                           <strong>Email</strong> - The recipient will be emailed the document to sign,

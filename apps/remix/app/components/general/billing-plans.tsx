@@ -215,13 +215,13 @@ const BillingDialog = ({ priceId, planName, claim }: { priceId: string; planName
         {step === 0 ? (
           <div>
             <RadioGroup
-              className="space-y-2"
+              className="twv3-space-y-2"
               value={subscriptionOption}
               onValueChange={(value) => setSubscriptionOption(value as 'update' | 'create')}
             >
-              <div className="flex items-start space-x-3 space-y-0">
+              <div className="twv3-space-x-3 twv3-space-y-0 flex items-start">
                 <RadioGroupItem value="update" id="update" />
-                <div className="space-y-1.5 leading-none">
+                <div className="twv3-space-y-1.5 leading-none">
                   <Label htmlFor="update" className="flex items-center gap-2 font-medium">
                     <Building2Icon className="h-4 w-4" />
                     <Trans>Update current organisation</Trans>
@@ -234,9 +234,9 @@ const BillingDialog = ({ priceId, planName, claim }: { priceId: string; planName
                 </div>
               </div>
 
-              <div className="flex items-start space-x-3 space-y-0">
+              <div className="twv3-space-x-3 twv3-space-y-0 flex items-start">
                 <RadioGroupItem value="create" id="create" />
-                <div className="space-y-1.5 leading-none">
+                <div className="twv3-space-y-1.5 leading-none">
                   <Label htmlFor="create" className="flex items-center gap-2 font-medium">
                     <PlusIcon className="h-4 w-4" />
                     <Trans>Create separate organisation</Trans>

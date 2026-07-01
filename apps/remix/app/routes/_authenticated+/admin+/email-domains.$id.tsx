@@ -217,7 +217,7 @@ export default function AdminEmailDomainDetailPage({ loaderData }: Route.Compone
         <Trans>DNS Records</Trans>
       </h3>
 
-      <div className="mt-4 space-y-4">
+      <div className="twv3-space-y-4 mt-4">
         {dnsRecords.map((record, index) => (
           <div key={index} className="rounded-lg border p-4">
             <div className="flex items-center justify-between">
@@ -231,18 +231,18 @@ export default function AdminEmailDomainDetailPage({ loaderData }: Route.Compone
               </Button>
             </div>
 
-            <div className="mt-2 space-y-1 text-sm">
+            <div className="twv3-space-y-1 mt-2 text-sm">
               <div>
                 <span className="text-muted-foreground">
                   <Trans>Name</Trans>:{' '}
                 </span>
-                <code className="rounded bg-muted px-1 py-0.5">{record.name}</code>
+                <code className="rounded-sm bg-muted px-1 py-0.5">{record.name}</code>
               </div>
               <div>
                 <span className="text-muted-foreground">
                   <Trans>Value</Trans>:{' '}
                 </span>
-                <code className="block break-all rounded bg-muted px-1 py-0.5">{record.value}</code>
+                <code className="block break-all rounded-sm bg-muted px-1 py-0.5">{record.value}</code>
               </div>
             </div>
           </div>

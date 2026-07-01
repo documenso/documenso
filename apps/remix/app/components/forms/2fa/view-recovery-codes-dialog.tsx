@@ -75,7 +75,7 @@ export const ViewRecoveryCodesDialog = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="flex-shrink-0">
+        <Button className="shrink-0">
           <Trans>View Codes</Trans>
         </Button>
       </DialogTrigger>
@@ -120,7 +120,7 @@ export const ViewRecoveryCodesDialog = () => {
                 </DialogDescription>
               </DialogHeader>
 
-              <fieldset className="flex flex-col space-y-4" disabled={form.formState.isSubmitting}>
+              <fieldset className="twv3-space-y-4 flex flex-col" disabled={form.formState.isSubmitting}>
                 <FormField
                   name="token"
                   control={form.control}

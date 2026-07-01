@@ -237,7 +237,7 @@ export const EditorGenericRequiredField = ({
       control={formControl}
       name="required"
       render={({ field }) => (
-        <FormItem className={cn('flex items-center space-x-2', className)}>
+        <FormItem className={cn('twv3-space-x-2 flex items-center', className)}>
           <FormControl>
             <div className="flex items-center">
               <Checkbox
@@ -281,7 +281,7 @@ export const EditorGenericReadOnlyField = ({
       control={formControl}
       name="readOnly"
       render={({ field }) => (
-        <FormItem className={cn('flex items-center space-x-2', className)}>
+        <FormItem className={cn('twv3-space-x-2 flex items-center', className)}>
           <FormControl>
             <div className="flex items-center">
               <Checkbox

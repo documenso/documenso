@@ -109,7 +109,7 @@ export const DocumentSigningAuthPasskey = ({
 
   if (!browserSupportsWebAuthn()) {
     return (
-      <div className="space-y-4">
+      <div className="twv3-space-y-4">
         <Alert variant="warning">
           <AlertDescription>
             {match({ role: recipient.role, actionTarget })
@@ -168,7 +168,7 @@ export const DocumentSigningAuthPasskey = ({
 
   if (passkeyData.isError) {
     return (
-      <div className="h-28 space-y-4">
+      <div className="twv3-space-y-4 h-28">
         <Alert variant="destructive">
           <AlertDescription>
             <Trans>Something went wrong while loading your passkeys.</Trans>
@@ -190,7 +190,7 @@ export const DocumentSigningAuthPasskey = ({
 
   if (passkeyData.passkeys.length === 0) {
     return (
-      <div className="space-y-4">
+      <div className="twv3-space-y-4">
         <Alert variant="warning">
           <AlertDescription>
             {match({ role: recipient.role, actionTarget })
@@ -250,7 +250,7 @@ export const DocumentSigningAuthPasskey = ({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onFormSubmit)}>
         <fieldset disabled={isCurrentlyAuthenticating}>
-          <div className="space-y-4">
+          <div className="twv3-space-y-4">
             <FormField
               control={form.control}
               name="passkeyId"

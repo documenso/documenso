@@ -51,7 +51,7 @@ export const SignFieldEmailDialog = createCallable<SignFieldEmailDialogProps, st
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit((data) => call.end(data.email))}>
-              <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
+              <fieldset className="twv3-space-y-4 flex h-full flex-col" disabled={form.formState.isSubmitting}>
                 <FormField
                   control={form.control}
                   name="email"

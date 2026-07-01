@@ -37,7 +37,7 @@ export const TemplateTypeTooltip = ({ organisationTeamCount }: { organisationTea
         <InfoIcon className="mx-2 h-4 w-4" />
       </TooltipTrigger>
 
-      <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+      <TooltipContent className="twv3-space-y-2 max-w-md p-4 text-foreground">
         <p>
           <Trans>
             <strong>Private</strong> templates can only be used by your team.

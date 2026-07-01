@@ -46,9 +46,9 @@ export const DocumentSigningMobileWidget = () => {
                     aria-label={isExpanded ? 'Collapse' : 'Expand'}
                   >
                     {isExpanded ? (
-                      <LucideChevronDown className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
+                      <LucideChevronDown className="h-5 w-5 shrink-0 text-muted-foreground" />
                     ) : (
-                      <LucideChevronUp className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
+                      <LucideChevronUp className="h-5 w-5 shrink-0 text-muted-foreground" />
                     )}
                   </Button>
                 )}
@@ -110,7 +110,7 @@ export const DocumentSigningMobileWidget = () => {
               <EnvelopeSignerForm />
 
               {!hidePoweredBy && (
-                <div className="mt-2 inline-block rounded bg-primary px-2 py-1 font-medium text-primary-foreground text-xs opacity-60 hover:opacity-100 lg:hidden">
+                <div className="mt-2 inline-block rounded-sm bg-primary px-2 py-1 font-medium text-primary-foreground text-xs opacity-60 hover:opacity-100 lg:hidden">
                   <span>
                     <Trans>Powered by</Trans>
                   </span>

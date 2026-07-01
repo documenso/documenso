@@ -59,11 +59,11 @@ export const OrganisationEmailDomainRecordContent = ({ records }: { records: Dom
         </DialogDescription>
       </DialogHeader>
 
-      <div className="space-y-6">
-        <div className="space-y-4">
+      <div className="twv3-space-y-6">
+        <div className="twv3-space-y-4">
           {records.map((record) => (
-            <div className="space-y-4 rounded-md border p-4" key={record.name}>
-              <div className="space-y-2">
+            <div className="twv3-space-y-4 rounded-md border p-4" key={record.name}>
+              <div className="twv3-space-y-2">
                 <Label>
                   <Trans>Record Type</Trans>
                 </Label>
@@ -79,7 +79,7 @@ export const OrganisationEmailDomainRecordContent = ({ records }: { records: Dom
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="twv3-space-y-2">
                 <Label>
                   <Trans>Record Name</Trans>
                 </Label>
@@ -95,7 +95,7 @@ export const OrganisationEmailDomainRecordContent = ({ records }: { records: Dom
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="twv3-space-y-2">
                 <Label>
                   <Trans>Record Value</Trans>
                 </Label>

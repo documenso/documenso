@@ -50,7 +50,7 @@ export const ClaimCreateDialog = ({ licenseFlags }: ClaimCreateDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
-        <Button className="flex-shrink-0" variant="secondary">
+        <Button className="shrink-0" variant="secondary">
           <Trans>Create claim</Trans>
         </Button>
       </DialogTrigger>

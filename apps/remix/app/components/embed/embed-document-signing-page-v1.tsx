@@ -304,7 +304,7 @@ export const EmbedSignDocumentV1ClientPage = ({
           {/* Widget */}
           <div
             key={isExpanded ? 'expanded' : 'collapsed'}
-            className="embed--DocumentWidgetContainer group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:top-4 md:bottom-[unset] md:z-auto md:w-[350px] md:px-0"
+            className="embed--DocumentWidgetContainer group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full shrink-0 px-6 md:sticky md:top-4 md:bottom-[unset] md:z-auto md:w-[350px] md:px-0"
             data-expanded={isExpanded || undefined}
           >
             <div className="embed--DocumentWidget flex w-full flex-col rounded-xl border border-border bg-widget px-4 py-4 md:py-6">
@@ -369,7 +369,7 @@ export const EmbedSignDocumentV1ClientPage = ({
 
                       <fieldset className="mt-2 rounded-2xl border border-border bg-white p-3 dark:bg-background">
                         <RadioGroup
-                          className="gap-0 space-y-3 shadow-none"
+                          className="twv3-space-y-3 gap-0 shadow-none"
                           value={selectedSignerId?.toString()}
                           onValueChange={(value) => setSelectedSignerId(Number(value))}
                         >

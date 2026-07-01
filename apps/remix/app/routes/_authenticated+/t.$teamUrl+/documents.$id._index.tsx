@@ -210,7 +210,7 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
         )}
 
         <div className={cn('col-span-12 lg:col-span-6 xl:col-span-5', isMultiEnvelopeItem && 'mt-20')}>
-          <div className="space-y-6">
+          <div className="twv3-space-y-6">
             <section className="flex flex-col rounded-xl border border-border bg-widget pt-6 pb-4">
               <div className="flex flex-row items-center justify-between px-4">
                 <h3 className="font-semibold text-2xl text-foreground">

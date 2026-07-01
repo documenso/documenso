@@ -462,7 +462,7 @@ export const ConfigureFieldsView = ({
 
               <hr className="my-6" />
 
-              <div className="space-y-2">
+              <div className="twv3-space-y-2">
                 <FieldSelector
                   selectedField={selectedField}
                   onSelectedFieldChange={setSelectedField}
@@ -604,7 +604,7 @@ export const ConfigureFieldsView = ({
 
             <hr className="my-6" />
 
-            <div className="space-y-2">
+            <div className="twv3-space-y-2">
               <FieldSelector
                 selectedField={selectedField}
                 onSelectedFieldChange={(field) => {

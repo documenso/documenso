@@ -77,7 +77,7 @@ export const AdminUserDeleteDialog = ({ className, user }: AdminUserDeleteDialog
           </AlertDescription>
         </div>
 
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="destructive">
@@ -86,7 +86,7 @@ export const AdminUserDeleteDialog = ({ className, user }: AdminUserDeleteDialog
             </DialogTrigger>
 
             <DialogContent>
-              <DialogHeader className="space-y-4">
+              <DialogHeader className="twv3-space-y-4">
                 <DialogTitle>
                   <Trans>Delete Account</Trans>
                 </DialogTitle>

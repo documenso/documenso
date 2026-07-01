@@ -190,7 +190,7 @@ export const EditorFieldDropdownForm = ({
 
           <EditorGenericReadOnlyField formControl={form.control} />
 
-          <section className="space-y-2">
+          <section className="twv3-space-y-2">
             <div className="-mx-4 mt-2 mb-4">
               <Separator />
             </div>
@@ -205,7 +205,7 @@ export const EditorFieldDropdownForm = ({
               </button>
             </div>
 
-            <ul className="space-y-2">
+            <ul className="twv3-space-y-2">
               {(formValues.values || []).map((value, index) => (
                 <li key={`dropdown-value-${index}`} className="flex flex-row gap-2">
                   <FormField

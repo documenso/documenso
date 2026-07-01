@@ -44,7 +44,7 @@ export const MenuSwitcher = () => {
         <Button
           data-testid="menu-switcher"
           variant="none"
-          className="relative flex h-12 flex-row items-center px-0 py-2 ring-0 focus:outline-none focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-transparent md:px-2"
+          className="relative flex h-12 flex-row items-center px-0 py-2 ring-0 focus:outline-hidden focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-transparent md:px-2"
         >
           <AvatarWithText
             avatarSrc={formatAvatarUrl(user.avatarImageId)}
@@ -91,7 +91,7 @@ export const MenuSwitcher = () => {
         </DropdownMenuItem>
 
         <DropdownMenuItem
-          className="hover:!text-destructive px-4 py-2 text-destructive/90"
+          className="px-4 py-2 text-destructive/90 hover:text-destructive!"
           onSelect={async () => authClient.signOut()}
         >
           <Trans>Sign Out</Trans>

@@ -59,7 +59,7 @@ export const EmailTransportCreateDialog = ({ trigger }: EmailTransportCreateDial
     <Dialog open={open} onOpenChange={(value) => !isPending && setOpen(value)}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
         {trigger ?? (
-          <Button className="flex-shrink-0">
+          <Button className="shrink-0">
             <Trans>Add transport</Trans>
           </Button>
         )}

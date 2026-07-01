@@ -402,7 +402,7 @@ const MultiSelect = ({
     >
       <div
         className={cn(
-          'relative min-h-[38px] rounded-md border border-input text-sm outline-none transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-aria-invalid:border-destructive has-disabled:opacity-50 has-aria-invalid:ring-destructive/20 dark:has-aria-invalid:ring-destructive/40',
+          'relative min-h-[38px] rounded-md border border-input text-sm outline-hidden transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-aria-invalid:border-destructive has-disabled:opacity-50 has-aria-invalid:ring-destructive/20 dark:has-aria-invalid:ring-destructive/40',
           {
             'p-1': selected.length !== 0,
             'cursor-text': !disabled && selected.length !== 0,
@@ -431,7 +431,7 @@ const MultiSelect = ({
               >
                 {option.label}
                 <button
-                  className="absolute -inset-y-px -end-px flex size-7 items-center justify-center rounded-e-md border border-transparent p-0 text-muted-foreground/80 outline-none transition-[color,box-shadow] hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                  className="absolute -inset-y-px -end-px flex size-7 items-center justify-center rounded-e-md border border-transparent p-0 text-muted-foreground/80 outline-hidden transition-[color,box-shadow] hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       handleUnselect(option);
@@ -474,7 +474,7 @@ const MultiSelect = ({
             }}
             placeholder={hidePlaceholderWhenSelected && selected.length !== 0 ? '' : placeholder}
             className={cn(
-              'flex-1 bg-transparent outline-none placeholder:text-muted-foreground/70 disabled:cursor-not-allowed',
+              'flex-1 bg-transparent outline-hidden placeholder:text-muted-foreground/70 disabled:cursor-not-allowed',
               {
                 'w-full': hidePlaceholderWhenSelected,
                 'px-3 py-2': selected.length === 0,
@@ -490,7 +490,7 @@ const MultiSelect = ({
               onChange?.(selected.filter((s) => s.fixed));
             }}
             className={cn(
-              'absolute end-0 top-0 flex size-9 items-center justify-center rounded-md border border-transparent text-muted-foreground/80 outline-none transition-[color,box-shadow] hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
+              'absolute end-0 top-0 flex size-9 items-center justify-center rounded-md border border-transparent text-muted-foreground/80 outline-hidden transition-[color,box-shadow] hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
               (hideClearAllButton ||
                 disabled ||
                 selected.length < 1 ||
@@ -514,7 +514,7 @@ const MultiSelect = ({
         >
           {open && (
             <CommandList
-              className="bg-popover text-popover-foreground shadow-lg outline-none"
+              className="bg-popover text-popover-foreground shadow-lg outline-hidden"
               onMouseLeave={() => {
                 setOnScrollbar(false);
               }}

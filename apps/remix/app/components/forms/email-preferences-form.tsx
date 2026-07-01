@@ -185,7 +185,7 @@ export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: Ema
                 )}
 
                 {field.value && (
-                  <div className="space-y-2 rounded-md border p-4">
+                  <div className="twv3-space-y-2 rounded-md border p-4">
                     <DocumentEmailCheckboxes
                       value={field.value ?? DEFAULT_DOCUMENT_EMAIL_SETTINGS}
                       onChange={(value) => field.onChange(value)}
@@ -203,7 +203,7 @@ export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: Ema
             )}
           />
 
-          <div className="flex flex-row justify-end space-x-4">
+          <div className="twv3-space-x-4 flex flex-row justify-end">
             <Button type="submit" loading={form.formState.isSubmitting}>
               <Trans>Update</Trans>
             </Button>

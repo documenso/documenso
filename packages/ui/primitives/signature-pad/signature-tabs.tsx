@@ -84,7 +84,7 @@ export function TabsTrigger({ value, icon, children, className, ...props }: Tabs
       onClick={() => onValueChange(value)}
       className={cn(
         'relative flex items-center px-4 py-3 font-medium text-sm transition-all',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         isSelected ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
         className,
       )}

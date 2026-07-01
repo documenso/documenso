@@ -118,12 +118,12 @@ export const EnvelopeDuplicateDialog = ({ envelopeId, envelopeType, trigger }: E
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="twv3-space-y-4">
           <Controller
             control={form.control}
             name="includeRecipients"
             render={({ field }) => (
-              <div className="flex items-center space-x-2">
+              <div className="twv3-space-x-2 flex items-center">
                 <Checkbox
                   id="envelopeDuplicateIncludeRecipients"
                   checked={field.value}
@@ -146,7 +146,7 @@ export const EnvelopeDuplicateDialog = ({ envelopeId, envelopeType, trigger }: E
             control={form.control}
             name="includeFields"
             render={({ field }) => (
-              <div className="flex items-center space-x-2">
+              <div className="twv3-space-x-2 flex items-center">
                 <Checkbox
                   id="envelopeDuplicateIncludeFields"
                   checked={field.value}

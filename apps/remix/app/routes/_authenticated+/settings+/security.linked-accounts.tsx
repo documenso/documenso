@@ -86,7 +86,7 @@ export default function SettingsSecurityLinkedAccounts() {
                   <Skeleton className="h-4 w-24 rounded-full" />
                 </TableCell>
                 <TableCell>
-                  <Skeleton className="h-8 w-16 rounded" />
+                  <Skeleton className="h-8 w-16 rounded-sm" />
                 </TableCell>
               </>
             ),

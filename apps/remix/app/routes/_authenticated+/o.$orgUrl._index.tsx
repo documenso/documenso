@@ -68,7 +68,7 @@ export default function OrganisationSettingsTeamsPage() {
               <h3 className="mb-2 font-medium">
                 <Trans>What you can do with teams:</Trans>
               </h3>
-              <ul className="space-y-2 text-muted-foreground text-sm">
+              <ul className="twv3-space-y-2 text-muted-foreground text-sm">
                 <li className="flex flex-row items-center gap-2">
                   <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-muted font-bold">
                     <span className="text-xs">1</span>

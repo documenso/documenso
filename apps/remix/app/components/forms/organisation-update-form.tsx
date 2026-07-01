@@ -137,7 +137,7 @@ export const OrganisationUpdateForm = () => {
             )}
           />
 
-          <div className="flex flex-row justify-end space-x-4">
+          <div className="twv3-space-x-4 flex flex-row justify-end">
             <AnimatePresence>
               {form.formState.isDirty && (
                 <motion.div

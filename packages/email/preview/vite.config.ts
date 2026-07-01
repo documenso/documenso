@@ -1,8 +1,7 @@
 import path from 'node:path';
 import { lingui } from '@lingui/vite-plugin';
 import { reactRouter } from '@react-router/dev/vite';
-import autoprefixer from 'autoprefixer';
-import tailwindcss from 'tailwindcss';
+import tailwindcss from '@tailwindcss/postcss';
 import { defineConfig } from 'vite';
 import macrosPlugin from 'vite-plugin-babel-macros';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
@@ -13,13 +12,13 @@ import tsconfigPaths from 'vite-tsconfig-paths';
  *
  * Emails render server-side through the real `renderEmailWithI18N` pipeline
  * (see `app/routes/preview.tsx`), so the SSR config mirrors the main Remix app:
- * Prisma, the tailwind config, and native modules stay external.
+ * Prisma and native modules stay external.
  */
 export default defineConfig({
   root: __dirname,
   css: {
     postcss: {
-      plugins: [tailwindcss(path.join(__dirname, 'tailwind.config.cjs')), autoprefixer],
+      plugins: [tailwindcss()],
     },
   },
   server: {
@@ -48,7 +47,6 @@ export default defineConfig({
       '@napi-rs/canvas',
       '@node-rs/bcrypt',
       '@prisma/client',
-      '@documenso/tailwind-config',
       'playwright',
       'playwright-core',
       '@playwright/browser-chromium',

@@ -110,12 +110,12 @@ export const AdminOrganisationSyncSubscriptionDialog = ({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
-            <fieldset className="flex h-full flex-col space-y-4" disabled={form.formState.isSubmitting}>
+            <fieldset className="twv3-space-y-4 flex h-full flex-col" disabled={form.formState.isSubmitting}>
               <FormField
                 control={form.control}
                 name="syncClaims"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                  <FormItem className="twv3-space-x-3 twv3-space-y-0 flex flex-row items-center">
                     <FormControl>
                       <Checkbox
                         id="admin-sync-subscription-sync-claims"

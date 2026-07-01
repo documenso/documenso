@@ -41,14 +41,14 @@ export default function PublicProfileLayout() {
       ) : (
         <header
           className={cn(
-            'sticky top-0 z-[60] flex h-16 w-full items-center border-b border-b-transparent bg-background/95 backdrop-blur duration-200 supports-backdrop-blur:bg-background/60',
+            'sticky top-0 z-[60] flex h-16 w-full items-center border-b border-b-transparent bg-background/95 backdrop-blur-sm duration-200 supports-backdrop-blur:bg-background/60',
             scrollY > 5 && 'border-b-border',
           )}
         >
           <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between gap-x-4 px-4 md:px-8">
             <Link
               to="/"
-              className="rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:inline"
+              className="rounded-md ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:inline"
             >
               <BrandingLogo className="hidden h-6 w-auto sm:block" />
 
