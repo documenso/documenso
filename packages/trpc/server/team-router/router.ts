@@ -16,6 +16,7 @@ import { findTeamGroupsRoute } from './find-team-groups';
 import { findTeamMembersRoute } from './find-team-members';
 import { findTeamsRoute } from './find-teams';
 import { getTeamRoute } from './get-team';
+import { getTeamAnalyticsRoute } from './get-team-analytics';
 import { getTeamMembersRoute } from './get-team-members';
 import {
   ZCreateTeamEmailVerificationMutationSchema,
@@ -32,6 +33,7 @@ import { updateTeamSettingsRoute } from './update-team-settings';
 export const teamRouter = router({
   find: findTeamsRoute,
   get: getTeamRoute,
+  getAnalytics: getTeamAnalyticsRoute,
   create: createTeamRoute,
   update: updateTeamRoute,
   delete: deleteTeamRoute,
