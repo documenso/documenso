@@ -8424,7 +8424,7 @@ msgstr "Veuillez réessayer ou contacter notre support."
 #. placeholder {0}: `'${t(deleteMessage)}'`
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "Please type {0} to confirm"
-msgstr "Veuiillez taper {0} pour confirmer"
+msgstr "Veuillez taper {0} pour confirmer"
 
 #. placeholder {0}: user.email
 #: apps/remix/app/components/dialogs/account-delete-dialog.tsx
@@ -8916,6 +8916,11 @@ msgstr "URL de redirection"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.edit.tsx
 msgid "Redirecting"
 msgstr "Redirection"
+
+#. placeholder {0}: oidcProviderLabel || 'OIDC'
+#: apps/remix/app/routes/_unauthenticated+/signin.tsx
+msgid "Redirecting to {0}..."
+msgstr ""
 
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/claim-account.tsx

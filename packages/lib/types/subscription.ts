@@ -52,7 +52,7 @@ export const ZClaimFlagsSchema = z.object({
   signingReminders: z.boolean().optional(),
 
   cscQesSigning: z.boolean().optional(),
-  
+
   /**
    * Controls whether an organisation is prevented from sending emails.
    *
