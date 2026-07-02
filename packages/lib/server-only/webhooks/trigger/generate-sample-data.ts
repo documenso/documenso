@@ -17,6 +17,7 @@ export const generateSampleWebhookPayload = (event: WebhookTriggerEvents, webhoo
   const now = new Date();
   const basePayload = {
     id: 10,
+    envelopeId: 'env_123',
     externalId: null,
     userId: 1,
     authOptions: null,
@@ -53,6 +54,7 @@ export const generateSampleWebhookPayload = (event: WebhookTriggerEvents, webhoo
     recipients: [
       {
         id: 52,
+        envelopeId: 'env_123',
         documentId: 10,
         templateId: null,
         email: 'signer@documenso.com',
@@ -74,6 +76,7 @@ export const generateSampleWebhookPayload = (event: WebhookTriggerEvents, webhoo
     Recipient: [
       {
         id: 52,
+        envelopeId: 'env_123',
         documentId: 10,
         templateId: null,
         email: 'signer@documenso.com',
@@ -270,6 +273,7 @@ export const generateSampleWebhookPayload = (event: WebhookTriggerEvents, webhoo
         recipients: [
           {
             id: 50,
+            envelopeId: 'env_123',
             documentId: 10,
             templateId: null,
             email: 'signer2@documenso.com',
@@ -292,6 +296,7 @@ export const generateSampleWebhookPayload = (event: WebhookTriggerEvents, webhoo
           },
           {
             id: 51,
+            envelopeId: 'env_123',
             documentId: 10,
             templateId: null,
             email: 'signer1@documenso.com',
@@ -316,6 +321,7 @@ export const generateSampleWebhookPayload = (event: WebhookTriggerEvents, webhoo
         Recipient: [
           {
             id: 50,
+            envelopeId: 'env_123',
             documentId: 10,
             templateId: null,
             email: 'signer2@documenso.com',
@@ -338,6 +344,7 @@ export const generateSampleWebhookPayload = (event: WebhookTriggerEvents, webhoo
           },
           {
             id: 51,
+            envelopeId: 'env_123',
             documentId: 10,
             templateId: null,
             email: 'signer1@documenso.com',
@@ -445,6 +452,7 @@ export const generateSampleWebhookPayload = (event: WebhookTriggerEvents, webhoo
         recipients: [
           {
             id: 7,
+            envelopeId: 'env_123',
             documentId: 7,
             templateId: null,
             email: 'signer1@documenso.com',
@@ -469,6 +477,7 @@ export const generateSampleWebhookPayload = (event: WebhookTriggerEvents, webhoo
         Recipient: [
           {
             id: 7,
+            envelopeId: 'env_123',
             documentId: 7,
             templateId: null,
             email: 'signer@documenso.com',

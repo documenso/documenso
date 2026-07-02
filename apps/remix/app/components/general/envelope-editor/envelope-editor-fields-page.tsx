@@ -1,3 +1,4 @@
+import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
@@ -17,6 +18,7 @@ import {
   type TTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
+import { getOverlappingFieldPairs } from '@documenso/lib/utils/fields-overlap';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { cn } from '@documenso/ui/lib/utils';
@@ -28,7 +30,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
-import { FileTextIcon, PencilIcon, SparklesIcon } from 'lucide-react';
+import { AlertTriangleIcon, FileTextIcon, PencilIcon, SparklesIcon } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRevalidator, useSearchParams } from 'react-router';
 import { isDeepEqual } from 'remeda';
@@ -78,7 +80,7 @@ export const EnvelopeEditorFieldsPage = () => {
 
   const { envelope, editorFields, navigateToStep, editorConfig } = useCurrentEnvelopeEditor();
 
-  const { currentEnvelopeItem } = useCurrentEnvelopeRender();
+  const { currentEnvelopeItem, setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
 
   const { _ } = useLingui();
 
@@ -92,6 +94,53 @@ export const EnvelopeEditorFieldsPage = () => {
   );
 
   const selectedField = useMemo(() => structuredClone(editorFields.selectedField), [editorFields.selectedField]);
+
+  /**
+   * Debounce the fields used for overlap detection so we don't recompute on every
+   * small drag/resize movement, which is expensive on large field counts and can
+   * bog down lower-end devices.
+   */
+  const debouncedLocalFields = useDebouncedValue(editorFields.localFields, 300);
+
+  /**
+   * Fields that significantly overlap each other. Overlapping fields render poorly in
+   * the editor and can behave unexpectedly during signing, so we warn the author here.
+   */
+  const overlappingFieldPairs = useMemo(
+    () =>
+      getOverlappingFieldPairs(
+        debouncedLocalFields.map((field) => ({
+          id: field.formId,
+          envelopeItemId: field.envelopeItemId,
+          page: field.page,
+          positionX: field.positionX,
+          positionY: field.positionY,
+          width: field.width,
+          height: field.height,
+        })),
+      ),
+    [debouncedLocalFields],
+  );
+
+  const handleReviewOverlappingField = () => {
+    const firstPair = overlappingFieldPairs[0];
+
+    if (!firstPair) {
+      return;
+    }
+
+    const targetField = editorFields.localFields.find((field) => field.formId === firstPair.fieldA.id);
+
+    if (!targetField) {
+      return;
+    }
+
+    if (targetField.envelopeItemId !== currentEnvelopeItem?.id) {
+      setCurrentEnvelopeItem(targetField.envelopeItemId);
+    }
+
+    editorFields.setSelectedField(targetField.formId);
+  };
 
   const updateSelectedFieldMeta = (fieldMeta: TFieldMetaSchema) => {
     if (!selectedField) {
@@ -208,6 +257,29 @@ export const EnvelopeEditorFieldsPage = () => {
               <Button variant="outline" onClick={() => void navigateToStep('upload')}>
                 <Trans>Add Recipients</Trans>
               </Button>
+            </Alert>
+          )}
+
+          {overlappingFieldPairs.length > 0 && (
+            <Alert
+              variant="warning"
+              className="mt-20 mb-4 flex w-full max-w-[800px] flex-row items-center justify-between space-y-0 rounded-sm"
+            >
+              <div className="flex flex-row items-start gap-3">
+                <AlertTriangleIcon className="mt-0.5 h-5 w-5 flex-shrink-0" />
+
+                <div className="flex flex-col gap-1">
+                  <AlertTitle>
+                    <Trans>Overlapping fields detected</Trans>
+                  </AlertTitle>
+                  <AlertDescription>
+                    <Trans>
+                      Some fields are placed on top of each other. This may complicate the signing process or cause
+                      fields to not work as expected.
+                    </Trans>
+                  </AlertDescription>
+                </div>
+              </div>
             </Alert>
           )}
 

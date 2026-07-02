@@ -1,7 +1,7 @@
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import { orphanEnvelopes } from '../envelope/orphan-envelopes';
+import { deleteOrganisation } from '../organisation/delete-organisation';
 
 export type DeleteUserOptions = {
   id: number;
@@ -18,6 +18,11 @@ export const deleteUser = async ({ id }: DeleteUserOptions) => {
           teams: {
             select: {
               id: true,
+            },
+          },
+          subscription: {
+            select: {
+              planId: true,
             },
           },
         },
@@ -44,9 +49,6 @@ export const deleteUser = async ({ id }: DeleteUserOptions) => {
     });
   }
 
-  // Get team IDs from organisations the user owns.
-  const ownedTeamIds = user.ownedOrganisations.flatMap((org) => org.teams.map((team) => team.id));
-
   // Get team IDs from organisations the user is a member of (but not owner).
   const memberTeams = user.organisationMember
     .filter((member) => member.organisation.ownerUserId !== user.id)
@@ -57,8 +59,13 @@ export const deleteUser = async ({ id }: DeleteUserOptions) => {
       })),
     );
 
-  // For teams where user is the org owner - orphan their envelopes.
-  await Promise.all(ownedTeamIds.map(async (teamId) => orphanEnvelopes({ teamId })));
+  // For organisations the user owns - fully tear them down (orphan envelopes,
+  // delete the organisation, and cancel any Stripe subscription). Without this
+  // the organisations would only cascade away when the user row is deleted,
+  // leaving their subscriptions billing and account rows behind.
+  for (const organisation of user.ownedOrganisations) {
+    await deleteOrganisation({ organisation });
+  }
 
   // For teams where user is a member (not owner) - transfer envelopes to team owner.
   await Promise.all(

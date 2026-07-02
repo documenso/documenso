@@ -21,6 +21,7 @@ import { mapSecondaryIdToDocumentId, mapSecondaryIdToTemplateId } from '../utils
  */
 export const ZWebhookRecipientSchema = z.object({
   id: z.number(),
+  envelopeId: z.string(),
   documentId: z.number().nullable(),
   templateId: z.number().nullable(),
   email: z.string(),
@@ -65,6 +66,7 @@ export const ZWebhookDocumentMetaSchema = z.object({
  */
 export const ZWebhookDocumentSchema = z.object({
   id: z.number(),
+  envelopeId: z.string(),
   externalId: z.string().nullable(),
   userId: z.number(),
   authOptions: z.any().nullable(),
@@ -118,6 +120,7 @@ export const mapEnvelopeToWebhookDocumentPayload = (
 
   const mappedRecipients = rawRecipients.map((recipient) => ({
     id: recipient.id,
+    envelopeId: envelope.id,
     documentId: envelope.type === EnvelopeType.DOCUMENT ? legacyId : null,
     templateId: envelope.type === EnvelopeType.TEMPLATE ? legacyId : null,
     email: recipient.email,
@@ -138,6 +141,7 @@ export const mapEnvelopeToWebhookDocumentPayload = (
 
   return {
     id: legacyId,
+    envelopeId: envelope.id,
     externalId: envelope.externalId,
     userId: envelope.userId,
     authOptions: envelope.authOptions,

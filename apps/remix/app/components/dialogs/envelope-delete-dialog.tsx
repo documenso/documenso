@@ -166,7 +166,7 @@ export const EnvelopeDeleteDialog = ({
                   </ul>
                 </AlertDescription>
               ))
-              .with(P.union(DocumentStatus.COMPLETED, DocumentStatus.REJECTED), () => (
+              .with(P.union(DocumentStatus.COMPLETED, DocumentStatus.REJECTED, DocumentStatus.CANCELLED), () => (
                 <AlertDescription>
                   <p>
                     <Trans>By deleting this document, the following will occur:</Trans>
