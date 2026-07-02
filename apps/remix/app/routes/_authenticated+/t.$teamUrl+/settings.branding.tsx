@@ -99,6 +99,9 @@ export default function TeamsSettingsPage() {
         description: t`We were unable to update your branding preferences at this time, please try again later`,
         variant: 'destructive',
       });
+
+      // Rethrow so the form knows the save failed and keeps the unsaved changes.
+      throw err;
     }
   };
 
