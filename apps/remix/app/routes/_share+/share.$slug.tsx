@@ -199,6 +199,12 @@ export const loader = async ({ request, params: { slug } }: Route.LoaderArgs) =>
         userAgent: requestMetadata.userAgent,
       });
 
+      // Unknown/invalid tokens keep the pre-existing public contract of
+      // redirecting home. Policy denials below render status-coded pages.
+      if (code === 'QR_VIEW_NOT_FOUND') {
+        throw redirect('/');
+      }
+
       throw createQrShareErrorResponse({
         status,
         code,
