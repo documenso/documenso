@@ -3,7 +3,7 @@ import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
 import { prisma } from '@documenso/prisma';
 import { PDF } from '@libpdf/core';
 import { expect, type Page, test } from '@playwright/test';
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus, type Field } from '@prisma/client';
 import { apiCreateTestContext, apiSeedDraftDocument, apiSeedPendingDocument } from '../fixtures/api-seeds';
 import { apiSignin } from '../fixtures/authentication';
 import { signSignaturePad } from '../fixtures/signature';
@@ -58,22 +58,40 @@ const completeSigning = async ({
   page,
   signingUrl,
   recipientToken,
-  fieldId,
+  field,
 }: {
   page: Page;
   signingUrl: string;
   recipientToken: string;
-  fieldId: number;
+  field: Pick<Field, 'positionX' | 'positionY' | 'width' | 'height'>;
 }) => {
   await page.goto(signingUrl);
 
+  // V2 envelopes render fields on a Konva canvas — wait for the PDF and canvas.
+  await expect(page.locator('img[data-page-number]').first()).toBeVisible({ timeout: 30_000 });
+
+  const canvas = page.locator('.konva-container canvas').first();
+  await expect(canvas).toBeVisible({ timeout: 30_000 });
+
   await signSignaturePad(page);
 
-  await page.locator(`#field-${fieldId}`).getByRole('button').click();
-  await expect(page.locator(`#field-${fieldId}`)).toHaveAttribute('data-inserted', 'true');
+  const canvasBox = await canvas.boundingBox();
+
+  if (!canvasBox) {
+    throw new Error('Canvas bounding box not found');
+  }
+
+  const x = (Number(field.positionX) / 100) * canvasBox.width + ((Number(field.width) / 100) * canvasBox.width) / 2;
+  const y =
+    (Number(field.positionY) / 100) * canvasBox.height + ((Number(field.height) / 100) * canvasBox.height) / 2;
+
+  await canvas.click({ position: { x, y } });
+
+  await expect(page.getByText('0 Fields Remaining').first()).toBeVisible({ timeout: 10_000 });
 
   await page.getByRole('button', { name: 'Complete' }).click();
-  await page.getByRole('button', { name: 'Sign' }).click({ force: true });
+  await expect(page.getByRole('heading', { name: 'Are you sure?' })).toBeVisible();
+  await page.getByRole('button', { name: 'Sign' }).click();
   await page.waitForURL(/\/complete$/);
 
   await expect(async () => {
@@ -142,7 +160,7 @@ test.describe('Document audit log embedding', () => {
       page,
       signingUrl: signer.signingUrl,
       recipientToken: signer.token,
-      fieldId: signatureField.id,
+      field: signatureField,
     });
 
     await expect(async () => {
@@ -182,7 +200,7 @@ test.describe('Document audit log embedding', () => {
       page,
       signingUrl: signer.signingUrl,
       recipientToken: signer.token,
-      fieldId: signatureField.id,
+      field: signatureField,
     });
 
     await expect(async () => {
