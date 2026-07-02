@@ -2436,6 +2436,7 @@ msgstr "Branding Logo"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Branding Preferences"
 msgstr "Branding Preferences"
 
@@ -3567,6 +3568,7 @@ msgid "Currently all organisation members can access this team"
 msgstr "Currently all organisation members can access this team"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Currently branding can only be configured for Teams and above plans."
 msgstr "Currently branding can only be configured for Teams and above plans."
 
@@ -4209,8 +4211,8 @@ msgstr "Document cancelled"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
+#: packages/lib/jobs/definitions/emails/send-document-deleted-emails.handler.ts
 #: packages/lib/server-only/admin/admin-super-delete-document.ts
-#: packages/lib/server-only/document/delete-document.ts
 msgid "Document Cancelled"
 msgstr "Document Cancelled"
 
@@ -7937,6 +7939,11 @@ msgstr "Original"
 msgid "Otherwise, the document will be created as a draft."
 msgstr "Otherwise, the document will be created as a draft."
 
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
+msgid "Overlapping fields detected"
+msgstr "Overlapping fields detected"
+
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Override organisation settings"
@@ -8772,6 +8779,10 @@ msgstr "Recipient ID:"
 msgid "Recipient rejected the document"
 msgstr "Recipient rejected the document"
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient rejected the document externally"
+msgstr "Recipient rejected the document externally"
+
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "Recipient removed"
 msgstr "Recipient removed"
@@ -9188,9 +9199,7 @@ msgstr "Resend Envelope"
 msgid "Resend verification"
 msgstr "Resend verification"
 
-#: apps/remix/app/components/forms/organisation-update-form.tsx
 #: apps/remix/app/components/forms/public-profile-form.tsx
-#: apps/remix/app/components/forms/team-update-form.tsx
 #: apps/remix/app/components/general/organisation-usage-reset-button.tsx
 msgid "Reset"
 msgstr "Reset"
@@ -9375,6 +9384,7 @@ msgid "Save as Template"
 msgstr "Save as Template"
 
 #: apps/remix/app/components/dialogs/email-transport-update-dialog.tsx
+#: apps/remix/app/components/forms/form-sticky-save-bar.tsx
 msgid "Save changes"
 msgstr "Save changes"
 
@@ -10214,6 +10224,11 @@ msgstr "Site Settings"
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "Skip"
 msgstr "Skip"
+
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
+msgid "Some fields are placed on top of each other. This may complicate the signing process or cause fields to not work as expected."
+msgstr "Some fields are placed on top of each other. This may complicate the signing process or cause fields to not work as expected."
 
 #: packages/ui/primitives/document-flow/missing-signature-field-dialog.tsx
 msgid "Some signers have not been assigned a signature field. Please assign at least 1 signature field to each signer before proceeding."
@@ -11092,6 +11107,23 @@ msgstr "The document signing process will be stopped"
 #: apps/remix/app/utils/toast-error-messages.ts
 msgid "The document was created but could not be sent to recipients."
 msgstr "The document was created but could not be sent to recipients."
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "The document was rejected externally by {onBehalfOf} on behalf of {user}"
+msgstr "The document was rejected externally by {onBehalfOf} on behalf of {user}"
+
+#: packages/lib/utils/document-audit-logs.ts
+#: packages/lib/utils/document-audit-logs.ts
+msgid "The document was rejected externally by {onBehalfOf} on behalf of the recipient"
+msgstr "The document was rejected externally by {onBehalfOf} on behalf of the recipient"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "The document was rejected externally on behalf of {user}"
+msgstr "The document was rejected externally on behalf of {user}"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "The document was rejected externally on behalf of the recipient"
+msgstr "The document was rejected externally on behalf of the recipient"
 
 #: apps/remix/app/components/dialogs/envelope-delete-dialog.tsx
 msgid "The document will be hidden from your account"
@@ -12228,6 +12260,7 @@ msgstr "Unauthorized"
 msgid "Uncompleted"
 msgstr "Uncompleted"
 
+#: apps/remix/app/components/forms/form-sticky-save-bar.tsx
 #: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
 msgid "Undo"
 msgstr "Undo"
@@ -12277,6 +12310,10 @@ msgstr "Unlink"
 msgid "Unpin"
 msgstr "Unpin"
 
+#: apps/remix/app/components/forms/form-sticky-save-bar.tsx
+msgid "Unsaved changes"
+msgstr "Unsaved changes"
+
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
 msgid "Unsealed Documents"
@@ -12296,9 +12333,6 @@ msgstr "Untitled Group"
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
-#: apps/remix/app/components/forms/branding-preferences-form.tsx
-#: apps/remix/app/components/forms/document-preferences-form.tsx
-#: apps/remix/app/components/forms/email-preferences-form.tsx
 #: apps/remix/app/components/forms/public-profile-form.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: apps/remix/app/components/tables/admin-claims-table.tsx
@@ -12321,6 +12355,7 @@ msgstr "Update Banner"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Update Billing"
 msgstr "Update Billing"
 
@@ -12347,10 +12382,6 @@ msgstr "Update email"
 #: apps/remix/app/components/general/legacy-field-warning-popover.tsx
 msgid "Update Fields"
 msgstr "Update Fields"
-
-#: apps/remix/app/components/forms/organisation-update-form.tsx
-msgid "Update organisation"
-msgstr "Update organisation"
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
@@ -12386,10 +12417,6 @@ msgstr "Update role"
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
 msgid "Update Subscription Claim"
 msgstr "Update Subscription Claim"
-
-#: apps/remix/app/components/forms/team-update-form.tsx
-msgid "Update team"
-msgstr "Update team"
 
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
@@ -12921,7 +12948,7 @@ msgstr "Waiting"
 msgid "Waiting for others"
 msgstr "Waiting for others"
 
-#: packages/lib/server-only/document/send-pending-email.ts
+#: packages/lib/jobs/definitions/emails/send-document-pending-email.handler.ts
 msgid "Waiting for others to complete signing."
 msgstr "Waiting for others to complete signing."
 
@@ -13895,8 +13922,7 @@ msgstr "You have been invited to join {0} on Documenso"
 msgid "You have been invited to join the following organisation"
 msgstr "You have been invited to join the following organisation"
 
-#: packages/lib/server-only/recipient/delete-envelope-recipient.ts
-#: packages/lib/server-only/recipient/set-document-recipients.ts
+#: packages/lib/jobs/definitions/emails/send-recipient-removed-email.handler.ts
 msgid "You have been removed from a document"
 msgstr "You have been removed from a document"
 
@@ -14015,6 +14041,10 @@ msgstr "You have successfully revoked access."
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "You have the right to withdraw your consent to use electronic signatures at any time before completing the signing process. To withdraw your consent, please contact the sender of the document. In failing to contact the sender you may reach out to <0>{SUPPORT_EMAIL}</0> for assistance. Be aware that withdrawing consent may delay or halt the completion of the related transaction or service."
 msgstr "You have the right to withdraw your consent to use electronic signatures at any time before completing the signing process. To withdraw your consent, please contact the sender of the document. In failing to contact the sender you may reach out to <0>{SUPPORT_EMAIL}</0> for assistance. Be aware that withdrawing consent may delay or halt the completion of the related transaction or service."
+
+#: apps/remix/app/components/forms/form-sticky-save-bar.tsx
+msgid "You have unsaved changes"
+msgstr "You have unsaved changes"
 
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 msgid "You have updated {memberName}."
