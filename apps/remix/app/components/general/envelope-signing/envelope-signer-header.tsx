@@ -27,27 +27,25 @@ export const EnvelopeSignerHeader = () => {
   const { envelopeData, envelope, recipientFieldsRemaining, recipient } = useRequiredEnvelopeSigningContext();
 
   const isEmbedSigning = useEmbedSigningContext() !== null;
+  const hasCustomBrandingLogo = envelopeData.settings.brandingEnabled && Boolean(envelopeData.settings.brandingLogo);
 
   return (
     <nav className="embed--DocumentWidgetHeader flex max-w-screen flex-row justify-between border-border border-b bg-background px-4 py-3 md:px-6">
       {/* Left side - Logo and title */}
       <div className="flex min-w-0 flex-1 items-center space-x-2 md:w-auto md:flex-none">
-        {!isEmbedSigning && (
-          <Link to="/" className="flex-shrink-0">
-            {envelopeData.settings.brandingEnabled && envelopeData.settings.brandingLogo ? (
-              <img
-                src={`/api/branding/logo/team/${envelope.teamId}`}
-                alt={`${envelope.team.name}'s Logo`}
-                className="h-6 w-auto"
-              />
-            ) : (
-              <>
-                <BrandingLogo className="hidden h-6 w-auto md:block" />
-                <BrandingLogoIcon className="h-6 w-auto md:hidden" />
-              </>
-            )}
-          </Link>
-        )}
+        {!isEmbedSigning &&
+          (hasCustomBrandingLogo ? (
+            <img
+              src={`/api/branding/logo/team/${envelope.teamId}`}
+              alt={`${envelope.team.name}'s Logo`}
+              className="h-6 w-auto flex-shrink-0"
+            />
+          ) : (
+            <Link to="/" className="flex-shrink-0">
+              <BrandingLogo className="hidden h-6 w-auto md:block" />
+              <BrandingLogoIcon className="h-6 w-auto md:hidden" />
+            </Link>
+          ))}
 
         <h1 title={envelope.title} className="min-w-0 truncate font-semibold text-base text-foreground md:hidden">
           {envelope.title}

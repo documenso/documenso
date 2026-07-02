@@ -256,7 +256,7 @@ model Subscription {
   @@index([organisationId])
 }
 
-/// @zod.import(["import { ZClaimFlagsSchema } from '@documenso/lib/types/subscription';"])
+/// @zod.import(["import { ZClaimFlagsSchema, ZRateLimitArraySchema } from '@documenso/lib/types/subscription';"])
 model SubscriptionClaim {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
@@ -268,11 +268,24 @@ model SubscriptionClaim {
   teamCount         Int
   memberCount       Int
   envelopeItemCount Int
+  recipientCount    Int
 
   flags Json /// [ClaimFlags] @zod.custom.use(ZClaimFlagsSchema)
+
+  documentRateLimits Json /// [RateLimitArray] @zod.custom.use(ZRateLimitArraySchema)
+  documentQuota      Int?
+
+  emailRateLimits Json /// [RateLimitArray] @zod.custom.use(ZRateLimitArraySchema)
+  emailQuota      Int?
+
+  apiRateLimits Json /// [RateLimitArray] @zod.custom.use(ZRateLimitArraySchema)
+  apiQuota      Int?
+
+  emailTransportId String?
+  emailTransport   EmailTransport? @relation(fields: [emailTransportId], references: [id], onDelete: SetNull)
 }
 
-/// @zod.import(["import { ZClaimFlagsSchema } from '@documenso/lib/types/subscription';"])
+/// @zod.import(["import { ZClaimFlagsSchema, ZRateLimitArraySchema } from '@documenso/lib/types/subscription';"])
 model OrganisationClaim {
   id        String   @id
   createdAt DateTime @default(now())
@@ -284,8 +297,41 @@ model OrganisationClaim {
   teamCount         Int
   memberCount       Int
   envelopeItemCount Int
+  recipientCount    Int
 
   flags Json /// [ClaimFlags] @zod.custom.use(ZClaimFlagsSchema)
+
+  documentRateLimits Json /// [RateLimitArray] @zod.custom.use(ZRateLimitArraySchema)
+  documentQuota      Int?
+
+  emailRateLimits Json /// [RateLimitArray] @zod.custom.use(ZRateLimitArraySchema)
+  emailQuota      Int?
+
+  apiRateLimits Json /// [RateLimitArray] @zod.custom.use(ZRateLimitArraySchema)
+  apiQuota      Int?
+
+  emailTransportId String?
+  emailTransport   EmailTransport? @relation(fields: [emailTransportId], references: [id], onDelete: SetNull)
+}
+
+model OrganisationMonthlyStat {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  /// UTC calendar month in `YYYY-MM` form, e.g. "2026-05".
+  period String
+
+  documentCount Int @default(0)
+  emailCount    Int @default(0)
+  apiCount      Int @default(0)
+  emailReports  Int @default(0)
+
+  @@unique([organisationId, period])
+  @@index([organisationId])
 }
 
 model Account {
@@ -336,6 +382,7 @@ enum DocumentStatus {
   PENDING
   COMPLETED
   REJECTED
+  CANCELLED
 }
 
 enum DocumentSource {
@@ -383,7 +430,7 @@ enum EnvelopeType {
   TEMPLATE
 }
 
-/// @zod.import(["import { ZDocumentAuthOptionsSchema } from '@documenso/lib/types/document-auth';", "import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';"])
+/// @zod.import(["import { ZDocumentAuthOptionsSchema } from '@documenso/lib/types/document-auth';", "import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';", "import { ZSignatureLevelSchema } from '@documenso/lib/types/signature-level';"])
 model Envelope {
   id          String  @id
   secondaryId String  @unique
@@ -400,6 +447,8 @@ model Envelope {
   status  DocumentStatus @default(DRAFT)
   source  DocumentSource
   qrToken String? /// @zod.string.describe("The token for viewing the document using the QR code on the certificate.")
+
+  signatureLevel String /// [SignatureLevel] @zod.custom.use(ZSignatureLevelSchema)
 
   internalVersion         Int
   useLegacyFieldInsertion Boolean @default(false)
@@ -593,6 +642,7 @@ model Recipient {
   signedAt             DateTime?
   lastReminderSentAt   DateTime?
   nextReminderAt       DateTime?
+  reminderCount        Int           @default(0)
   authOptions          Json? /// [RecipientAuthOptions] @zod.custom.use(ZRecipientAuthOptionsSchema)
   signingOrder         Int? /// @zod.number.describe("The order in which the recipient should sign the document. Only works if the document is set to sequential signing.")
   rejectionReason      String?
@@ -603,6 +653,9 @@ model Recipient {
   envelope             Envelope      @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
   fields               Field[]
   signatures           Signature[]
+
+  cscCredential CscCredential?
+  cscSession    CscSession?
 
   @@index([token])
   @@index([email])
@@ -671,6 +724,72 @@ model Signature {
   @@index([recipientId])
 }
 
+/// Per-recipient cached credential metadata for the configured Cloud Signature
+/// Consortium (CSC) provider. Holds the TSP-validated certificate chain and the
+/// symmetric-encrypted service-scope access token. One row per recipient on a
+/// CSC envelope; absent for SES recipients.
+model CscCredential {
+  id           String @id @default(cuid())
+  providerId   String
+  credentialId String
+
+  /// TSP-validated certificate chain (length-prefixed). Nullable until the
+  /// service-scope OAuth callback successfully retrieves and validates it.
+  certCache Bytes?
+
+  /// Algorithm metadata derived from the CSC `credentials/info` response.
+  /// Held as flat scalars so each is independently queryable.
+  signatureAlgorithm String
+  keyType            String
+  digestAlgorithm    String
+  keyLenBits         Int?
+  signAlgoParams     String?
+
+  /// Service-scope access token, symmetric-encrypted at the application layer
+  /// before persistence. Nullable until the service-scope OAuth callback runs.
+  serviceTokenCiphertext Bytes?
+  serviceTokenExpiresAt  DateTime?
+
+  recipientId Int       @unique
+  recipient   Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Per-recipient transient sign-time state held across the credential-scope
+/// OAuth round-trip. The `recipientId @unique` constraint caps each recipient
+/// to at most one in-flight session — re-clicking Sign UPSERTs the row.
+/// Cleaned up transitively when the Recipient is deleted.
+/// @zod.import(["import { ZCscSessionItemsSchema } from '@documenso/lib/types/csc-session';"])
+model CscSession {
+  id String @id @default(cuid())
+
+  /// Denormalised envelope id for ergonomic lookups. No FK relation — cleanup
+  /// flows through the Recipient cascade.
+  envelopeId String
+
+  /// Pinned at prep time; stable across overlay re-renders so the captured
+  /// signedAttrs digest matches the bytes the TSP signs.
+  signingTime DateTime
+
+  /// Contract between prep and sign: an array of
+  /// `{ envelopeItemId, documentDataId, hashB64, ordinal }` per envelope item.
+  /// `documentDataId` pins the immutable bytes that produced the captured
+  /// digest so sign-time can re-derive the same hash against the same content.
+  itemsJson Json /// [CscSessionItems] @zod.custom.use(ZCscSessionItemsSchema)
+
+  /// Populated by the credential-scope OAuth callback. Both nullable at row
+  /// creation; set together when the SAD is exchanged.
+  encryptedSad Bytes?
+  sadExpiresAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  recipientId Int       @unique
+  recipient   Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+}
+
 model DocumentShareLink {
   id         Int      @id @default(autoincrement())
   email      String
@@ -713,6 +832,8 @@ model Organisation {
 
   emailDomains       EmailDomain[]
   organisationEmails OrganisationEmail[]
+
+  monthlyStats OrganisationMonthlyStat[]
 
   avatarImage AvatarImage? @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
@@ -1092,6 +1213,32 @@ model OrganisationEmail {
 
   organisationGlobalSettings OrganisationGlobalSettings[]
   teamGlobalSettings         TeamGlobalSettings[]
+}
+
+enum EmailTransportType {
+  SMTP_AUTH
+  SMTP_API
+  RESEND
+  MAILCHANNELS
+}
+
+model EmailTransport {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+  type EmailTransportType
+
+  // Required from-address override (plaintext, non-secret).
+  fromName    String
+  fromAddress String
+
+  // Encrypted JSON blob of the full transport config (secrets + non-secrets).
+  config String
+
+  subscriptionClaims SubscriptionClaim[]
+  organisationClaims OrganisationClaim[]
 }
 
 model OrganisationAuthenticationPortal {

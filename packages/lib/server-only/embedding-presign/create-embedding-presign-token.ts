@@ -22,7 +22,7 @@ export const createEmbeddingPresignToken = async ({
 }: CreateEmbeddingPresignTokenOptions) => {
   try {
     // Validate the API token
-    const validatedToken = await getApiTokenByToken({ token: apiToken });
+    const validatedToken = await getApiTokenByToken({ token: apiToken, bypassRateLimit: true });
 
     const now = DateTime.now();
 

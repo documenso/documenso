@@ -60,7 +60,7 @@ test('[ORGANISATIONS]: manage general settings', async ({ page }) => {
   await page.getByLabel('Organisation URL*').clear();
   await page.getByLabel('Organisation URL*').fill(updatedOrganisationId);
 
-  await page.getByRole('button', { name: 'Update organisation' }).click();
+  await page.getByRole('button', { name: 'Save changes' }).click();
 
   // Check we have been redirected to the new organisation URL and the name is updated.
   await page.waitForURL(`/o/${updatedOrganisationId}/settings/general`);

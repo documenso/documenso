@@ -270,7 +270,7 @@ test('[ENVELOPE_EXPIRATION]: resending refreshes expiresAt', async ({ page }) =>
   await page.getByLabel('test.documenso.com').first().click();
   await page.getByRole('button', { name: 'Send reminder' }).click();
 
-  await expect(page.getByText('Document re-sent', { exact: true })).toBeVisible({
+  await expect(page.getByText('Document resent', { exact: true })).toBeVisible({
     timeout: 10_000,
   });
 

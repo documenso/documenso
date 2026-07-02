@@ -12,6 +12,7 @@ import { nanoid } from '../../universal/id';
 import { createRecipientAuthOptions } from '../../utils/document-auth';
 import { type EnvelopeIdOptions, mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 
 export type SetTemplateRecipientsOptions = {
   userId: number;
@@ -57,6 +58,13 @@ export const setTemplateRecipients = async ({ userId, teamId, id, recipients }: 
   if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'You do not have permission to set the action auth',
+    });
+  }
+
+  for (const recipient of recipients) {
+    assertCompatibleRecipientRole({
+      signatureLevel: envelope.signatureLevel,
+      role: recipient.role,
     });
   }
 

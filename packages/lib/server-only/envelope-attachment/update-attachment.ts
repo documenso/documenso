@@ -2,7 +2,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus } from '@prisma/client';
 
-import { buildTeamWhereQuery } from '../../utils/teams';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type UpdateAttachmentOptions = {
   id: string;
@@ -15,9 +15,6 @@ export const updateAttachment = async ({ id, teamId, userId, data }: UpdateAttac
   const attachment = await prisma.envelopeAttachment.findFirst({
     where: {
       id,
-      envelope: {
-        team: buildTeamWhereQuery({ teamId, userId }),
-      },
     },
     include: {
       envelope: true,
@@ -25,6 +22,24 @@ export const updateAttachment = async ({ id, teamId, userId, data }: UpdateAttac
   });
 
   if (!attachment) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Attachment not found',
+    });
+  }
+
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: { type: 'envelopeId', id: attachment.envelopeId },
+    userId,
+    teamId,
+    type: null,
+  });
+
+  // Additional validation to check the user has visibility-aware access to the envelope.
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
+  });
+
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Attachment not found',
     });

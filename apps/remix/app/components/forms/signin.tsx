@@ -58,6 +58,7 @@ export type TSignInFormSchema = z.infer<typeof ZSignInFormSchema>;
 export type SignInFormProps = {
   className?: string;
   initialEmail?: string;
+  isEmailPasswordSigninEnabled?: boolean;
   isGoogleSSOEnabled?: boolean;
   isMicrosoftSSOEnabled?: boolean;
   isOIDCSSOEnabled?: boolean;
@@ -68,6 +69,7 @@ export type SignInFormProps = {
 export const SignInForm = ({
   className,
   initialEmail,
+  isEmailPasswordSigninEnabled = true,
   isGoogleSSOEnabled,
   isMicrosoftSSOEnabled,
   isOIDCSSOEnabled,
@@ -89,7 +91,6 @@ export const SignInForm = ({
   const turnstileSiteKey = env('NEXT_PUBLIC_TURNSTILE_SITE_KEY');
   const turnstileRef = useRef<TurnstileInstance>(null);
   const twoFactorTurnstileRef = useRef<TurnstileInstance>(null);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
 
@@ -197,13 +198,31 @@ export const SignInForm = ({
   };
 
   const onFormSubmit = async ({ email, password, totpCode, backupCode }: TSignInFormSchema) => {
+    const $turnstile = isTwoFactorAuthenticationDialogOpen ? twoFactorTurnstileRef.current : turnstileRef.current;
+
     try {
+      let token: string | undefined;
+
+      if (turnstileSiteKey) {
+        token = await $turnstile?.getResponsePromise(3000).catch((_err) => undefined);
+
+        if (!token) {
+          toast({
+            title: _(msg`Human verification required`),
+            description: _(msg`Please complete the CAPTCHA challenge before signing in.`),
+            variant: 'destructive',
+          });
+
+          return;
+        }
+      }
+
       await authClient.emailPassword.signIn({
         email,
         password,
         totpCode,
         backupCode,
-        captchaToken: captchaToken ?? undefined,
+        captchaToken: token ?? undefined,
         redirectPath,
       });
     } catch (err) {
@@ -214,10 +233,6 @@ export const SignInForm = ({
       if (error.code === 'TWO_FACTOR_MISSING_CREDENTIALS') {
         setIsTwoFactorAuthenticationDialogOpen(true);
 
-        // Turnstile tokens are single-use. Clear the consumed one so the
-        // dialog's fresh widget mounts cleanly and the dialog can't be
-        // submitted with the stale token before a new one is issued.
-        setCaptchaToken(null);
         return;
       }
 
@@ -247,8 +262,7 @@ export const SignInForm = ({
         variant: 'destructive',
       });
 
-      turnstileRef.current?.reset();
-      setCaptchaToken(null);
+      $turnstile?.reset();
     }
   };
 
@@ -312,68 +326,78 @@ export const SignInForm = ({
     <Form {...form}>
       <form className={cn('flex w-full flex-col gap-y-4', className)} onSubmit={form.handleSubmit(onFormSubmit)}>
         <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting || isPasskeyLoading}>
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  <Trans>Email</Trans>
-                </FormLabel>
+          {isEmailPasswordSigninEnabled && (
+            <>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      <Trans>Email</Trans>
+                    </FormLabel>
 
-                <FormControl>
-                  <Input type="email" {...field} />
-                </FormControl>
+                    <FormControl>
+                      <Input type="email" {...field} />
+                    </FormControl>
 
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  <Trans>Password</Trans>
-                </FormLabel>
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      <Trans>Password</Trans>
+                    </FormLabel>
 
-                <FormControl>
-                  <PasswordInput {...field} />
-                </FormControl>
+                    <FormControl>
+                      <PasswordInput {...field} />
+                    </FormControl>
 
-                <FormMessage />
+                    <FormMessage />
 
-                <p className="mt-2 text-right">
-                  <Link to="/forgot-password" className="text-muted-foreground text-sm duration-200 hover:opacity-70">
-                    <Trans>Forgot your password?</Trans>
-                  </Link>
-                </p>
-              </FormItem>
-            )}
-          />
+                    <p className="mt-2 text-right">
+                      <Link
+                        to="/forgot-password"
+                        className="text-muted-foreground text-sm duration-200 hover:opacity-70"
+                      >
+                        <Trans>Forgot your password?</Trans>
+                      </Link>
+                    </p>
+                  </FormItem>
+                )}
+              />
 
-          {turnstileSiteKey && !isTwoFactorAuthenticationDialogOpen && (
-            <Turnstile
-              ref={turnstileRef}
-              siteKey={turnstileSiteKey}
-              onSuccess={setCaptchaToken}
-              onExpire={() => setCaptchaToken(null)}
-              options={{
-                size: 'flexible',
-                appearance: 'interaction-only',
-              }}
-            />
+              {turnstileSiteKey && !isTwoFactorAuthenticationDialogOpen && (
+                <Turnstile
+                  ref={turnstileRef}
+                  siteKey={turnstileSiteKey}
+                  options={{
+                    size: 'flexible',
+                    appearance: 'always',
+                  }}
+                />
+              )}
+
+              <Button
+                type="submit"
+                size="lg"
+                loading={isSubmitting}
+                className="dark:bg-documenso dark:hover:opacity-90"
+              >
+                {isSubmitting ? <Trans>Signing in...</Trans> : <Trans>Sign In</Trans>}
+              </Button>
+            </>
           )}
-
-          <Button type="submit" size="lg" loading={isSubmitting} className="dark:bg-documenso dark:hover:opacity-90">
-            {isSubmitting ? <Trans>Signing in...</Trans> : <Trans>Sign In</Trans>}
-          </Button>
 
           {!isEmbeddedRedirect && (
             <>
-              {hasSocialAuthEnabled && (
+              {isEmailPasswordSigninEnabled && hasSocialAuthEnabled && (
                 <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
                   <div className="h-px flex-1 bg-border" />
                   <span className="bg-transparent text-muted-foreground">
@@ -499,11 +523,9 @@ export const SignInForm = ({
                   <Turnstile
                     ref={twoFactorTurnstileRef}
                     siteKey={turnstileSiteKey}
-                    onSuccess={setCaptchaToken}
-                    onExpire={() => setCaptchaToken(null)}
                     options={{
                       size: 'flexible',
-                      appearance: 'interaction-only',
+                      appearance: 'always',
                     }}
                   />
                 </div>
@@ -518,7 +540,7 @@ export const SignInForm = ({
                   )}
                 </Button>
 
-                <Button type="submit" loading={isSubmitting} disabled={Boolean(turnstileSiteKey) && !captchaToken}>
+                <Button type="submit" loading={isSubmitting}>
                   {isSubmitting ? <Trans>Signing in...</Trans> : <Trans>Sign In</Trans>}
                 </Button>
               </DialogFooter>
