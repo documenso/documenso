@@ -2,7 +2,7 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { AnimatePresence, motion } from 'framer-motion';
-import { TriangleAlertIcon } from 'lucide-react';
+import { AlertTriangleIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 export type FormStickySaveBarProps = {
@@ -91,7 +91,7 @@ export const FormStickySaveBar = ({ isDirty, isSubmitting, onReset }: FormSticky
               transition={{ duration: 0.15 }}
               className="flex min-h-9 min-w-0 items-center gap-x-2 text-sm"
             >
-              <TriangleAlertIcon className="h-4 w-4 flex-shrink-0 text-destructive" />
+              <AlertTriangleIcon className="h-5 w-5 flex-shrink-0 text-destructive" />
               <span className="font-medium text-xs md:text-sm">
                 <Trans>You have unsaved changes</Trans>
               </span>
