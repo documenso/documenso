@@ -44,10 +44,16 @@ export const EnvelopesTableBulkActionBar = ({
   return (
     <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-x-1 rounded-xl bg-popover p-1.5 text-popover-foreground shadow-lg ring-1 ring-black/10 dark:ring-white/10">
       <div className="flex items-center gap-x-2 px-2">
-        <span className="flex h-5 min-w-5 items-center justify-center rounded-md bg-primary px-1 font-semibold text-primary-foreground text-xs tabular-nums">
+        <span className="sr-only" aria-live="polite">
+          <Trans>{selectedCount} selected</Trans>
+        </span>
+        <span
+          aria-hidden="true"
+          className="flex h-5 min-w-5 items-center justify-center rounded-md bg-primary px-1 font-semibold text-primary-foreground text-xs tabular-nums"
+        >
           {selectedCount}
         </span>
-        <span className="font-medium text-foreground text-sm max-[420px]:hidden">
+        <span aria-hidden="true" className="font-medium text-foreground text-sm max-[420px]:hidden">
           <Trans>selected</Trans>
         </span>
       </div>
