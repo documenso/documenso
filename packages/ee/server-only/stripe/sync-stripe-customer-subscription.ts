@@ -235,7 +235,7 @@ const handleLiveSubscription = async ({
   // the freshly-fetched one — the convergent equivalent of the old
   // `previous_attributes.current_period_start` signal. On renewal, reconcile
   // the seat quantity and claim down to the actual member count. The reconcile
-  // itself no-ops for non-seat/unlimited plans and non-ACTIVE subscriptions.
+  // itself no-ops for non-seat/unlimited plans and inactive subscriptions.
   const previousPeriodEnd = organisation.subscription?.periodEnd ?? null;
 
   const hasPeriodAdvanced = previousPeriodEnd !== null && periodEnd.getTime() > previousPeriodEnd.getTime();

@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import type { JobDefinition } from '../../client/_internal/job';
 
-const SYNC_ORGANISATION_SEATS_JOB_DEFINITION_ID = 'sync.organisation-seats';
+const SYNC_ORGANISATION_SEATS_JOB_DEFINITION_ID = 'internal.sync-organisation-seats';
 
 const SYNC_ORGANISATION_SEATS_JOB_DEFINITION_SCHEMA = z.object({
   organisationId: z.string(),

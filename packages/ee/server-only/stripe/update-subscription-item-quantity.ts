@@ -3,6 +3,7 @@ import { stripe } from '@documenso/lib/server-only/stripe';
 import { appLog } from '@documenso/lib/utils/debugger';
 import { prisma } from '@documenso/prisma';
 import type { OrganisationClaim, Subscription } from '@prisma/client';
+import { SubscriptionStatus } from '@prisma/client';
 import type Stripe from 'stripe';
 
 import { isPriceSeatsBased } from './is-price-seats-based';
@@ -138,9 +139,10 @@ export const syncMemberCountWithStripeSeatPlan = async (
     prorationBehaviour: billsForNewSeats ? 'always_invoice' : 'none',
   });
 
-  // Advance the high-water mark when billing for new seats reset it to the
-  // actual count on reconcile. Re-adds and shrinks deliberately leave it so a
-  // seat already paid for this period is never re-charged.
+  // Advance the high-water mark when billing for new seats; it is reset to the
+  // actual member count when the billing period rolls over. Re-adds and shrinks
+  // deliberately leave it untouched so a seat already paid for this period is
+  // never re-charged.
   if (billsForNewSeats) {
     await prisma.organisationClaim.update({
       where: {
@@ -179,6 +181,12 @@ export const reconcileSeatBasedPlans = async (organisationId: string) => {
   }
 
   const { subscription, organisationClaim } = organisation;
+
+  // Stripe rejects quantity updates on canceled subscriptions. PAST_DUE is
+  // still live and a no-proration sync is safe, so it's allowed through.
+  if (subscription.status === SubscriptionStatus.INACTIVE) {
+    return;
+  }
 
   // Unlimited seats — nothing to meter.
   if (organisationClaim.memberCount === 0) {

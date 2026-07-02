@@ -92,7 +92,7 @@ export const deleteAdminOrganisationMemberRoute = adminProcedure
     // A member was removed — queue a seat sync to true the Stripe quantity down
     // to the new count (no proration, no credit).
     await jobs.triggerJob({
-      name: 'sync.organisation-seats',
+      name: 'internal.sync-organisation-seats',
       payload: { organisationId },
     });
 
