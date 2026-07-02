@@ -16,25 +16,25 @@ test('[TEAMS]: settings save bar docks at the bottom of the form', async ({ page
 
   const saveButton = page.getByRole('button', { name: 'Save changes' });
 
-  // Pristine: the docked Save button is present but disabled; no Reset, no floating notice.
+  // Pristine: the docked Save button is present but disabled; no Undo, no floating notice.
   await expect(saveButton).toBeVisible();
   await expect(saveButton).toBeDisabled();
-  await expect(page.getByRole('button', { name: 'Reset' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Undo' })).toHaveCount(0);
   await expect(page.getByText('You have unsaved changes')).not.toBeVisible();
 
-  // Make a change → Save enables and Reset appears.
+  // Make a change → Save enables and Undo appears.
   const updatedName = `team-${Date.now()}`;
   await page.getByLabel('Team Name*').clear();
   await page.getByLabel('Team Name*').fill(updatedName);
 
   await expect(saveButton).toBeEnabled();
-  await expect(page.getByRole('button', { name: 'Reset' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Undo' })).toBeVisible();
 
-  // Reset → value restored, Save disabled again, Reset gone.
-  await page.getByRole('button', { name: 'Reset' }).click();
+  // Undo → value restored, Save disabled again, Undo gone.
+  await page.getByRole('button', { name: 'Undo' }).click();
   await expect(page.getByLabel('Team Name*')).toHaveValue(team.name);
   await expect(saveButton).toBeDisabled();
-  await expect(page.getByRole('button', { name: 'Reset' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Undo' })).toHaveCount(0);
 
   // Change again → Save → success toast, returns to a pristine (disabled) state.
   await page.getByLabel('Team Name*').clear();
