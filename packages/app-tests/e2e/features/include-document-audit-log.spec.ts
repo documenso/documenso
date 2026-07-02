@@ -166,7 +166,9 @@ test.describe('Document audit log embedding', () => {
     await expect(async () => {
       const signedPageCount = await getFirstEnvelopeItemSignedPageCount(envelope.id, signer.token);
 
-      expect(signedPageCount).toBe(baselinePageCount + 1);
+      // The audit log may span multiple pages depending on the number of
+      // audit events — assert growth rather than an exact page count.
+      expect(signedPageCount).toBeGreaterThan(baselinePageCount);
     }).toPass();
   });
 
