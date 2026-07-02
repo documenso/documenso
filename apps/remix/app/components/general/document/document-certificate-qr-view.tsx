@@ -207,7 +207,9 @@ const DocumentCertificateQrV2 = ({ title, recipientCount, formattedDate, token }
       </div>
 
       <div className="mt-12 w-full">
-        <EnvelopeRendererFileSelector className="mb-4 p-0" fields={[]} secondaryOverride={''} />
+        {envelopeItems.length > 1 && (
+          <EnvelopeRendererFileSelector className="mb-4 p-0" fields={[]} secondaryOverride={''} />
+        )}
 
         <EnvelopePdfViewer
           scrollParentRef="window"

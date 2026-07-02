@@ -66,10 +66,6 @@ export const EnvelopeRendererFileSelector = ({
 }: EnvelopeRendererFileSelectorProps) => {
   const { envelopeItems, currentEnvelopeItem, setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
 
-  if (envelopeItems.length <= 1) {
-    return null;
-  }
-
   return (
     <div className={cn('scrollbar-hidden flex h-fit flex-shrink-0 space-x-2 overflow-x-auto p-4', className)}>
       {envelopeItems.map((doc, i) => (
