@@ -102,7 +102,7 @@ export const FormStickySaveBar = ({ isDirty, isSubmitting, onReset }: FormSticky
         <div className="ml-auto flex flex-shrink-0 items-center gap-x-2">
           {isDirty && (
             <Button type="button" variant="secondary" size="sm" onClick={onReset} disabled={isSubmitting}>
-              <Trans>Reset</Trans>
+              <Trans>Undo</Trans>
             </Button>
           )}
 
