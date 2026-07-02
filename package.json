@@ -108,6 +108,19 @@
     "zod": "$zod",
     "fumadocs-mdx": {
       "zod": "^4.3.5"
-    }
+    },
+    "axios": "^1.16.0",
+    "protobufjs": "^7.5.7",
+    "picomatch": "^4.0.4",
+    "fast-uri": "^3.1.2",
+    "kysely": "^0.29.2",
+    "@rvf/set-get": "^7.0.2",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/sdk-node": "^0.218.0",
+    "path-to-regexp": ">=0.1.12",
+    "semver": ">=7.5.2",
+    "cross-spawn": ">=7.0.5",
+    "ws": ">=7.5.10",
+    "esbuild": ">=0.25.3"
   }
 }
