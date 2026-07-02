@@ -67,7 +67,9 @@ test('[DOCUMENTS]: cancelling a pending document keeps it in the owner dashboard
   await checkDocumentTabCount(page, 'All', 1);
 
   // The cancelled document is still listed.
-  await page.getByRole('tab', { name: 'Cancelled' }).click();
+  await page.getByRole('button', { name: /Status/ }).click();
+  await page.getByRole('option', { name: 'Cancelled' }).click();
+  await page.keyboard.press('Escape');
   await expect(page.getByRole('link', { name: 'Document 1 - Pending' })).toBeVisible();
 
   // The envelope status is persisted as CANCELLED.
@@ -131,7 +133,9 @@ test('[DOCUMENTS]: a cancelled document can be deleted, hiding it from the owner
   await expectToastTextToBeVisible(page, 'Document cancelled');
 
   // Delete the now-cancelled document. Being terminal, it should soft delete (hide).
-  await page.getByRole('tab', { name: 'Cancelled' }).click();
+  await page.getByRole('button', { name: /Status/ }).click();
+  await page.getByRole('option', { name: 'Cancelled' }).click();
+  await page.keyboard.press('Escape');
 
   const documentActionBtn = page
     .locator('tr', { hasText: 'Document 1 - Pending' })

@@ -7,6 +7,8 @@ export const checkDocumentTabCount = async (page: Page, tabName: string, count: 
     Pending: 'PENDING',
     Completed: 'COMPLETED',
     Draft: 'DRAFT',
+    Cancelled: 'CANCELLED',
+    Rejected: 'REJECTED',
     All: undefined,
   };
 
