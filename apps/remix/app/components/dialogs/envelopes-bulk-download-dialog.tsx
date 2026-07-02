@@ -80,6 +80,7 @@ export const EnvelopesBulkDownloadDialog = ({
       .with(DocumentStatus.PENDING, () => t`Pending`)
       .with(DocumentStatus.DRAFT, () => t`Draft`)
       .with(DocumentStatus.REJECTED, () => t`Rejected`)
+      .with(DocumentStatus.CANCELLED, () => t`Cancelled`)
       .exhaustive();
 
   const onDownload = async () => {

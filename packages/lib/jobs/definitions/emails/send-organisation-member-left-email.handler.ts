@@ -1,4 +1,3 @@
-import { mailer } from '@documenso/email/mailer';
 import OrganisationLeaveEmailTemplate from '@documenso/email/templates/organisation-leave';
 import { prisma } from '@documenso/prisma';
 import { msg } from '@lingui/core/macro';
@@ -60,7 +59,7 @@ export const run = async ({
     },
   });
 
-  const { branding, emailLanguage, senderEmail } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, emailTransport } = await getEmailContext({
     emailType: 'INTERNAL',
     source: {
       type: 'organisation',
@@ -97,7 +96,7 @@ export const run = async ({
 
       const i18n = await getI18nInstance(emailLanguage);
 
-      await mailer.sendMail({
+      await emailTransport.sendMail({
         to: member.user.email,
         from: senderEmail,
         subject: i18n._(msg`A member has left your organisation`),

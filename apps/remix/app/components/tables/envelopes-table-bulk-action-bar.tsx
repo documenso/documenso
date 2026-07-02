@@ -1,6 +1,6 @@
 import { Button } from '@documenso/ui/primitives/button';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { DownloadIcon, FolderInputIcon, Trash2Icon, XIcon } from 'lucide-react';
+import { DownloadIcon, FolderInputIcon, Trash2Icon, XCircleIcon, XIcon } from 'lucide-react';
 import { useEffect } from 'react';
 
 export type EnvelopesTableBulkActionBarProps = {
@@ -8,6 +8,7 @@ export type EnvelopesTableBulkActionBarProps = {
   onDownloadClick?: () => void;
   onMoveClick: () => void;
   onDeleteClick: () => void;
+  onCancelClick?: () => void;
   onClearSelection: () => void;
 };
 
@@ -16,6 +17,7 @@ export const EnvelopesTableBulkActionBar = ({
   onDownloadClick,
   onMoveClick,
   onDeleteClick,
+  onCancelClick,
   onClearSelection,
 }: EnvelopesTableBulkActionBarProps) => {
   const { t } = useLingui();
@@ -73,6 +75,19 @@ export const EnvelopesTableBulkActionBar = ({
         >
           <DownloadIcon className="size-4 shrink-0" />
           <Trans>Download</Trans>
+        </Button>
+      )}
+
+      {onCancelClick && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={onCancelClick}
+          className="h-8 gap-x-1.5 py-1.5 pr-2.5 pl-2"
+        >
+          <XCircleIcon className="size-4 shrink-0" />
+          <Trans>Cancel</Trans>
         </Button>
       )}
 

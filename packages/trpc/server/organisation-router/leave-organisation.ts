@@ -51,6 +51,14 @@ export const leaveOrganisationRoute = authenticatedProcedure
       throw new AppError(AppErrorCode.NOT_FOUND);
     }
 
+    // The organisation owner cannot leave their own organisation. Ownership must
+    // be transferred to another member first.
+    if (organisation.ownerUserId === userId) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'You cannot leave an organisation you own. Please transfer ownership first.',
+      });
+    }
+
     const { organisationClaim } = organisation;
 
     const inviteCount = organisation.invites.length;
