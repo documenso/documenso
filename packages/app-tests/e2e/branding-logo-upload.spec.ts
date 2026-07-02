@@ -22,7 +22,7 @@ const enableBrandingAndUpload = async (page: Page) => {
   // Upload the logo file through the real multipart route.
   await page.locator('input[type="file"]').setInputFiles(LOGO_PATH);
 
-  await page.getByRole('button', { name: 'Update' }).first().click();
+  await page.getByRole('button', { name: 'Save changes' }).first().click();
   await expect(page.getByText('Your branding preferences have been updated').first()).toBeVisible();
 };
 
@@ -131,7 +131,7 @@ test('[BRANDING_LOGO]: clears the organisation branding logo when the user remov
 
   // Remove the logo and save again.
   await page.getByRole('button', { name: 'Remove' }).click();
-  await page.getByRole('button', { name: 'Update' }).first().click();
+  await page.getByRole('button', { name: 'Save changes' }).first().click();
 
   // Clearing the logo persists an empty string via the dedicated route.
   await expect
