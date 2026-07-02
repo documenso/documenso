@@ -1,3 +1,4 @@
+import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import type { TLocalField } from '@documenso/lib/client-only/hooks/use-editor-fields';
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
@@ -13,14 +14,24 @@ import {
 } from '@documenso/lib/universal/field-renderer/field-renderer';
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
+import { getOverlappingFieldPairs } from '@documenso/lib/utils/fields-overlap';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
-import { CommandDialog } from '@documenso/ui/primitives/command';
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@documenso/ui/primitives/command';
+import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/types';
 import { useLingui } from '@lingui/react/macro';
 import type { FieldType } from '@prisma/client';
 import Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { Transformer } from 'konva/lib/shapes/Transformer';
-import { CopyPlusIcon, SquareStackIcon, TrashIcon, UserCircleIcon } from 'lucide-react';
+import { CopyPlusIcon, ShapesIcon, SquareStackIcon, TrashIcon, UserCircleIcon } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { fieldButtonList } from './envelope-editor-fields-drag-drop';
@@ -38,6 +49,13 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
   const [isFieldChanging, setIsFieldChanging] = useState(false);
   const [pendingFieldCreation, setPendingFieldCreation] = useState<Konva.Rect | null>(null);
 
+  /**
+   * Whether the field was automatically selected on creation (drag-drop or marquee).
+   *
+   * We purposefully supress the floating toolbar for newly created fields.
+   */
+  const [isAutoSelectedField, setIsAutoSelectedField] = useState(false);
+
   const { stage, pageLayer, konvaContainer, scaledViewport, unscaledViewport } = usePageRenderer(
     ({ stage, pageLayer }) => createPageCanvas(stage, pageLayer),
     pageData,
@@ -52,6 +70,36 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       ),
     [editorFields.localFields, pageNumber, currentEnvelopeItem?.id],
   );
+
+  /**
+   * Debounce the fields used for overlap highlighting so we don't recompute on every
+   * small drag/resize tick. Overlaps only occur within the same page and envelope
+   * item, so computing from this page's fields alone is sufficient.
+   */
+  const debouncedPageFields = useDebouncedValue(localPageFields, 300);
+
+  const overlappingFieldFormIds = useMemo(() => {
+    const formIds = new Set<string>();
+
+    const pairs = getOverlappingFieldPairs(
+      debouncedPageFields.map((field) => ({
+        id: field.formId,
+        envelopeItemId: field.envelopeItemId,
+        page: field.page,
+        positionX: field.positionX,
+        positionY: field.positionY,
+        width: field.width,
+        height: field.height,
+      })),
+    );
+
+    for (const pair of pairs) {
+      formIds.add(pair.fieldA.id);
+      formIds.add(pair.fieldB.id);
+    }
+
+    return formIds;
+  }, [debouncedPageFields]);
 
   const handleResizeOrMove = (event: KonvaEventObject<Event>) => {
     const isDragEvent = event.type === 'dragend';
@@ -104,6 +152,62 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     pageLayer.current?.batchDraw();
   };
 
+  /**
+   * Draws (or removes) a dashed warning outline over a field that significantly
+   * overlaps another field. The highlight is a child of the field group so it moves
+   * and resizes with the field, and sits on top of the field's own rect (which is
+   * re-styled on every render and would otherwise clobber a direct stroke change).
+   */
+  const syncOverlapHighlight = (fieldGroup: Konva.Group, isOverlapping: boolean) => {
+    const existingHighlight = fieldGroup.findOne('.field-overlap-highlight');
+
+    // Skip while a field is actively being dragged/resized. The highlight is driven
+    // by debounced field data, so it would lag behind and distort during the gesture.
+    // It is repainted once the gesture settles (the effect re-runs on isFieldChanging).
+    if (isFieldChanging) {
+      existingHighlight?.destroy();
+      return;
+    }
+
+    if (!isOverlapping) {
+      existingHighlight?.destroy();
+      return;
+    }
+
+    const fieldRect = fieldGroup.findOne('.field-rect');
+
+    if (!fieldRect) {
+      return;
+    }
+
+    const highlightAttrs = {
+      x: 0,
+      y: 0,
+      width: fieldRect.width(),
+      height: fieldRect.height(),
+      stroke: '#f59e0b',
+      strokeWidth: 2,
+      dash: [6, 4],
+      cornerRadius: 2,
+      strokeScaleEnabled: false,
+      listening: false,
+    } satisfies Partial<Konva.RectConfig>;
+
+    if (existingHighlight instanceof Konva.Rect) {
+      existingHighlight.setAttrs(highlightAttrs);
+      existingHighlight.moveToTop();
+      return;
+    }
+
+    const highlight = new Konva.Rect({
+      name: 'field-overlap-highlight',
+      ...highlightAttrs,
+    });
+
+    fieldGroup.add(highlight);
+    highlight.moveToTop();
+  };
+
   const unsafeRenderFieldOnLayer = (field: TLocalField) => {
     if (!pageLayer.current) {
       return;
@@ -130,6 +234,8 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       mode: 'edit',
     });
 
+    syncOverlapHighlight(fieldGroup, overlappingFieldFormIds.has(field.formId));
+
     if (!isFieldEditable) {
       return;
     }
@@ -138,10 +244,26 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     fieldGroup.off('transformend');
     fieldGroup.off('dragend');
 
-    // Set up field selection.
-    fieldGroup.on('click', () => {
+    // Set up field selection. Shift + click toggles this field in/out of the current
+    // multi-selection, so fields can be added to a group by clicking them --
+    // complementing marquee drag-selection. A plain click (no modifier) selects just
+    // this field.
+    fieldGroup.on('click', (event) => {
       removePendingField();
-      setSelectedFields([fieldGroup]);
+
+      const isMultiSelectModifier = event.evt.shiftKey;
+
+      if (isMultiSelectModifier) {
+        const currentNodes = interactiveTransformer.current?.nodes() ?? [];
+        const isAlreadySelected = currentNodes.includes(fieldGroup);
+
+        setSelectedFields(
+          isAlreadySelected ? currentNodes.filter((node) => node !== fieldGroup) : [...currentNodes, fieldGroup],
+        );
+      } else {
+        setSelectedFields([fieldGroup]);
+      }
+
       pageLayer.current?.batchDraw();
     });
 
@@ -346,43 +468,18 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       }
     });
 
-    // Clicks should select/deselect shapes
+    // Clicking empty stage area clears the selection. Field clicks -- including
+    // Shift+click multi-select -- are handled by each field group's own click
+    // handler in `unsafeRenderFieldOnLayer`.
     currentStage.on('click tap', (e) => {
-      // if we are selecting with rect, do nothing
+      // If we are selecting with the marquee rectangle, do nothing.
       if (selectionRectangle.visible() && selectionRectangle.width() > 0 && selectionRectangle.height() > 0) {
         return;
       }
 
-      // If empty area clicked, remove all selections
+      // If empty area clicked, remove all selections.
       if (e.target === stage.current) {
         setSelectedFields([]);
-        return;
-      }
-
-      // Do nothing if field not clicked, or if field is not editable
-      if (!e.target.hasName('field-group') || e.target.draggable() === false) {
-        return;
-      }
-
-      // do we pressed shift or ctrl?
-      const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey;
-      const isSelected = transformer.nodes().indexOf(e.target) >= 0;
-
-      if (!metaPressed && !isSelected) {
-        // if no key pressed and the node is not selected
-        // select just one
-        setSelectedFields([e.target]);
-      } else if (metaPressed && isSelected) {
-        // if we pressed keys and node was selected
-        // we need to remove it from selection:
-        const nodes = transformer.nodes().slice(); // use slice to have new copy of array
-        // remove node from array
-        nodes.splice(nodes.indexOf(e.target), 1);
-        setSelectedFields(nodes);
-      } else if (metaPressed && !isSelected) {
-        // add the node into selection
-        const nodes = transformer.nodes().concat([e.target]);
-        setSelectedFields(nodes);
       }
     });
 
@@ -422,13 +519,48 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
       setSelectedFields(liveSelectedFieldGroups);
     }
 
+    // Mirror the editor's single selected field onto the canvas (Konva) selection.
+    //
+    // `addField` already marks a newly created field as the selected field, so this
+    // makes a field placed via the palette (drag-drop) or marquee creation show its
+    // resize handles immediately -- no second click needed. It also clears the canvas
+    // selection when the selected field is cleared (e.g. when the author starts
+    // placing another field), so the floating action toolbar can't intercept the next
+    // placement click. Runs after the render loop above so the field's group exists.
+    const selectedFormId = editorFields.selectedField?.formId ?? null;
+    const isSingleCanvasSelection = selectedKonvaFieldGroups.length === 1;
+
+    if (selectedFormId && localPageFields.some((field) => field.formId === selectedFormId)) {
+      const isAlreadySelected = isSingleCanvasSelection && selectedKonvaFieldGroups[0].id() === selectedFormId;
+
+      if (!isAlreadySelected) {
+        const fieldGroupToSelect = pageLayer.current.findOne(`#${selectedFormId}`);
+
+        if (fieldGroupToSelect instanceof Konva.Group) {
+          setSelectedFields([fieldGroupToSelect], { isAutoSelect: true });
+        }
+      }
+    } else if (selectedFormId === null && isSingleCanvasSelection) {
+      setSelectedFields([]);
+    }
+
     // Rerender the transformer
     interactiveTransformer.current?.forceUpdate();
 
     pageLayer.current.batchDraw();
-  }, [localPageFields, selectedKonvaFieldGroups]);
+  }, [
+    localPageFields,
+    selectedKonvaFieldGroups,
+    overlappingFieldFormIds,
+    isFieldChanging,
+    editorFields.selectedField?.formId,
+  ]);
 
-  const setSelectedFields = (nodes: Konva.Node[]) => {
+  const setSelectedFields = (nodes: Konva.Node[], options?: { isAutoSelect?: boolean }) => {
+    // Any explicit (user-driven) selection shows the action toolbar; only auto-selection
+    // on field creation suppresses it.
+    setIsAutoSelectedField(Boolean(options?.isAutoSelect));
+
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const fieldGroups = nodes.filter(
       (node) => node.hasName('field-group') && Boolean(node.getStage()) && Boolean(node.getParent()),
@@ -466,6 +598,22 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
     for (const field of fields) {
       if (field.recipientId !== recipientId) {
         editorFields.updateFieldByFormId(field.formId, { recipientId, id: undefined });
+      }
+    }
+  };
+
+  const changeSelectedFieldsType = (type: FieldType) => {
+    const fields = selectedKonvaFieldGroups
+      .map((field) => editorFields.getFieldByFormId(field.id()))
+      .filter((field) => field !== undefined);
+
+    for (const field of fields) {
+      if (field.type !== type) {
+        editorFields.updateFieldByFormId(field.formId, {
+          type,
+          fieldMeta: structuredClone(FIELD_META_DEFAULT_VALUES[type]),
+          id: undefined,
+        });
       }
     }
   };
@@ -548,24 +696,30 @@ export const EnvelopeEditorFieldsPageRenderer = ({ pageData }: { pageData: PageR
 
   return (
     <>
-      {selectedKonvaFieldGroups.length > 0 && interactiveTransformer.current && !isFieldChanging && (
-        <FieldActionButtons
-          handleDuplicateSelectedFields={duplicatedSelectedFields}
-          handleDuplicateSelectedFieldsOnAllPages={duplicatedSelectedFieldsOnAllPages}
-          handleDeleteSelectedFields={deletedSelectedFields}
-          handleChangeRecipient={changeSelectedFieldsRecipients}
-          selectedFieldFormId={selectedKonvaFieldGroups.map((field) => field.id())}
-          style={{
-            position: 'absolute',
-            top: interactiveTransformer.current.y() + interactiveTransformer.current.getClientRect().height + 5 + 'px',
-            left: interactiveTransformer.current.x() + interactiveTransformer.current.getClientRect().width / 2 + 'px',
-            transform: 'translateX(-50%)',
-            gap: '8px',
-            pointerEvents: 'auto',
-            zIndex: 50,
-          }}
-        />
-      )}
+      {selectedKonvaFieldGroups.length > 0 &&
+        interactiveTransformer.current &&
+        !isFieldChanging &&
+        !isAutoSelectedField && (
+          <FieldActionButtons
+            handleDuplicateSelectedFields={duplicatedSelectedFields}
+            handleDuplicateSelectedFieldsOnAllPages={duplicatedSelectedFieldsOnAllPages}
+            handleDeleteSelectedFields={deletedSelectedFields}
+            handleChangeRecipient={changeSelectedFieldsRecipients}
+            handleChangeFieldType={changeSelectedFieldsType}
+            selectedFieldFormId={selectedKonvaFieldGroups.map((field) => field.id())}
+            style={{
+              position: 'absolute',
+              top:
+                interactiveTransformer.current.y() + interactiveTransformer.current.getClientRect().height + 5 + 'px',
+              left:
+                interactiveTransformer.current.x() + interactiveTransformer.current.getClientRect().width / 2 + 'px',
+              transform: 'translateX(-50%)',
+              gap: '8px',
+              pointerEvents: 'auto',
+              zIndex: 50,
+            }}
+          />
+        )}
 
       {pendingFieldCreation && (
         <div
@@ -602,6 +756,7 @@ type FieldActionButtonsProps = React.HTMLAttributes<HTMLDivElement> & {
   handleDuplicateSelectedFieldsOnAllPages: () => void;
   handleDeleteSelectedFields: () => void;
   handleChangeRecipient: (recipientId: number) => void;
+  handleChangeFieldType: (type: FieldType) => void;
   selectedFieldFormId: string[];
 };
 
@@ -610,14 +765,39 @@ const FieldActionButtons = ({
   handleDuplicateSelectedFieldsOnAllPages,
   handleDeleteSelectedFields,
   handleChangeRecipient,
+  handleChangeFieldType,
   selectedFieldFormId,
   ...props
 }: FieldActionButtonsProps) => {
   const { t } = useLingui();
 
   const [showRecipientSelector, setShowRecipientSelector] = useState(false);
+  const [showFieldTypeSelector, setShowFieldTypeSelector] = useState(false);
 
   const { editorFields, envelope } = useCurrentEnvelopeEditor();
+
+  /**
+   * Decide the preselected field type in the command input.
+   *
+   * If all fields share the same type, use that as the default selection.
+   * Otherwise show no preselection.
+   */
+  const preselectedFieldType = useMemo(() => {
+    if (selectedFieldFormId.length === 0) {
+      return null;
+    }
+
+    const fields = editorFields.localFields.filter((field) => selectedFieldFormId.includes(field.formId));
+
+    if (fields.length === 0) {
+      return null;
+    }
+
+    const firstType = fields[0].type;
+    const isTypesSame = fields.every((field) => field.type === firstType);
+
+    return isTypesSame ? firstType : null;
+  }, [editorFields.localFields, selectedFieldFormId]);
 
   /**
    * Decide the preselected recipient in the command input.
@@ -656,6 +836,7 @@ const FieldActionButtons = ({
     <div className="flex flex-col items-center" {...props}>
       <div className="group flex w-fit items-center justify-evenly gap-x-1 rounded-md border bg-gray-900 p-0.5">
         <button
+          type="button"
           title={t`Change Recipient`}
           className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
           onClick={() => setShowRecipientSelector(true)}
@@ -665,6 +846,17 @@ const FieldActionButtons = ({
         </button>
 
         <button
+          type="button"
+          title={t`Change Field Type`}
+          className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+          onClick={() => setShowFieldTypeSelector(true)}
+          onTouchEnd={() => setShowFieldTypeSelector(true)}
+        >
+          <ShapesIcon className="h-3 w-3" />
+        </button>
+
+        <button
+          type="button"
           title={t`Duplicate`}
           className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
           onClick={handleDuplicateSelectedFields}
@@ -674,6 +866,7 @@ const FieldActionButtons = ({
         </button>
 
         <button
+          type="button"
           title={t`Duplicate on all pages`}
           className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
           onClick={handleDuplicateSelectedFieldsOnAllPages}
@@ -683,6 +876,7 @@ const FieldActionButtons = ({
         </button>
 
         <button
+          type="button"
           title={t`Remove`}
           className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
           onClick={handleDeleteSelectedFields}
@@ -704,6 +898,41 @@ const FieldActionButtons = ({
           recipients={envelope.recipients}
           fields={envelope.fields}
         />
+      </CommandDialog>
+
+      <CommandDialog position="start" open={showFieldTypeSelector} onOpenChange={setShowFieldTypeSelector}>
+        <Command defaultValue={preselectedFieldType ? t(FRIENDLY_FIELD_TYPE[preselectedFieldType]) : undefined}>
+          <CommandInput placeholder={t`Select a field type`} />
+
+          <CommandList>
+            <CommandEmpty>
+              <span className="inline-block px-4 text-muted-foreground">
+                {t`No field type matching this description was found.`}
+              </span>
+            </CommandEmpty>
+
+            <CommandGroup>
+              {fieldButtonList.map((field) => {
+                const FieldIcon = field.icon;
+                const label = t(FRIENDLY_FIELD_TYPE[field.type]);
+
+                return (
+                  <CommandItem
+                    key={field.type}
+                    className="px-2"
+                    onSelect={() => {
+                      handleChangeFieldType(field.type);
+                      setShowFieldTypeSelector(false);
+                    }}
+                  >
+                    <FieldIcon className="mr-2 h-4 w-4" />
+                    <span className="truncate">{label}</span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          </CommandList>
+        </Command>
       </CommandDialog>
     </div>
   );

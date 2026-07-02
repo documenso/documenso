@@ -1,5 +1,6 @@
 import { AppError, genericErrorCodeToTrpcErrorCodeMap } from '@documenso/lib/errors/app-error';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
+import { assertUserNotDisabled } from '@documenso/lib/server-only/user/assert-user-not-disabled';
 import type { TrpcApiLog } from '@documenso/lib/types/api-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { alphaid } from '@documenso/lib/universal/id';
@@ -96,6 +97,10 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path, me
 
     const apiToken = await getApiTokenByToken({ token });
 
+    // Reject API requests from a disabled account. The token may still be
+    // present in the DB (e.g. before `disableUser` runs) so we enforce here.
+    assertUserNotDisabled(apiToken.user);
+
     const trpcApiV2Logger = ctx.logger.child({
       ...baseLogAttributes,
       auth: 'api',
@@ -139,6 +144,11 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path, me
       message: 'Invalid session or API token.',
     });
   }
+
+  // Reject session requests from a disabled account. The session may still be
+  // valid (sessions aren't invalidated by `disableUser`), so we gate every
+  // authenticated TRPC call here.
+  assertUserNotDisabled(ctx.user);
 
   // Recreate the logger with a sub request ID to differentiate between batched
   // requests, as well as identifying attributes so every subsequent log line
@@ -199,6 +209,11 @@ export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next, pat
 
     const apiToken = await getApiTokenByToken({ token });
 
+    // Reject API requests from a disabled account. Presenting an API token is
+    // an explicit attempt to act under that account, so we don't downgrade to
+    // anonymous here — we reject.
+    assertUserNotDisabled(apiToken.user);
+
     // Attach identifying attributes to the logger so every subsequent log line
     // within this request (including errors) inherits them.
     const trpcApiV2Logger = ctx.logger.child({
@@ -238,9 +253,17 @@ export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next, pat
     });
   }
 
+  // Treat a disabled session as anonymous. Most routes wired through
+  // `maybeAuthenticatedProcedure` are signer/invite flows that key off an
+  // input token rather than `ctx.user`, so downgrading lets those keep
+  // working while routes that genuinely need an account naturally fall
+  // through to their own auth checks.
+  const sessionUser = ctx.user && !ctx.user.disabled ? ctx.user : null;
+  const sessionRecord = sessionUser ? ctx.session : null;
+
   // Resolve `auth` once so it stays in sync between the logger bindings and
   // the outgoing metadata.
-  const auth = ctx.session ? 'session' : null;
+  const auth = sessionRecord ? 'session' : null;
 
   // Recreate the logger with a sub request ID to differentiate between batched
   // requests, as well as identifying attributes so every subsequent log line
@@ -249,7 +272,7 @@ export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next, pat
     ...baseLogAttributes,
     auth,
     nonBatchedRequestId: alphaid(),
-    userId: ctx.user?.id,
+    userId: sessionUser?.id,
     apiTokenId: null,
   } satisfies TrpcApiLog);
 
@@ -261,15 +284,15 @@ export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next, pat
     ctx: {
       ...ctx,
       logger: trpcSessionLogger,
-      user: ctx.user,
-      session: ctx.session,
+      user: sessionUser,
+      session: sessionRecord,
       metadata: {
         ...ctx.metadata,
-        auditUser: ctx.user
+        auditUser: sessionUser
           ? {
-              id: ctx.user.id,
-              name: ctx.user.name,
-              email: ctx.user.email,
+              id: sessionUser.id,
+              name: sessionUser.name,
+              email: sessionUser.email,
             }
           : undefined,
         auth,
@@ -285,6 +308,9 @@ export const adminMiddleware = t.middleware(async ({ ctx, next, path }) => {
       message: 'You must be logged in to perform this action.',
     });
   }
+
+  // Disabled admins shouldn't be able to do anything either.
+  assertUserNotDisabled(ctx.user);
 
   const isUserAdmin = isAdmin(ctx.user);
 

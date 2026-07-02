@@ -1,0 +1,81 @@
+---
+title: iframe
+description: Embed the signing experience directly in your application using an iframe.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+<Callout type="warn" title="iframes are not recommended">
+  Embedding via iframe is not recommended. We strongly recommend using the [official SDKs](/docs/developers/embedding/sdks) instead.
+</Callout>
+
+### Basic iframe Embedding
+
+```html
+<iframe
+  src="https://app.documenso.com/embed/sign/abc123xyz"
+  width="100%"
+  height="800"
+  frameborder="0"
+  allow="clipboard-write"
+></iframe>
+```
+
+<Callout title="Use the correct embed URL">
+  The URL you embed depends on the embed mode you’re using (for example direct links vs sign-token embeds). Use the
+  embed URL provided by Documenso for your flow.
+</Callout>
+
+### iframe Customization
+
+You can customize the embedded signing experience by passing **encoded options in the iframe URL fragment** (everything
+after `#`).
+
+Documenso expects the fragment to be **base64** of:
+
+- `encodeURIComponent(JSON.stringify(options))`
+
+#### Supported options
+
+| Option | Type | Description |
+| ------ | ---- | ----------- |
+| `name` | `string` | Prefill signer name. |
+| `email` | `string` | Prefill signer email. |
+| `lockName` | `boolean` | Lock the name field (prevents editing). |
+| `lockEmail` | `boolean` | Lock the email field (prevents editing). |
+| `language` | `string` | Force the embed language (e.g. `en`). |
+| `darkModeDisabled` | `boolean` | Disable dark mode behavior. |
+| `allowDocumentRejection` | `boolean` | Allow or disallow document rejection. |
+| `css` | `string` | Inject custom CSS into the embed. |
+| `cssVars` | `object` | Override embed CSS variables (see the CSS Variables page). |
+
+#### Example
+
+```ts
+const buildEmbedSrc = (host: string, token: string) => {
+  const options = {
+    name: 'Ada Lovelace',
+    email: 'ada@example.com',
+    lockName: true,
+    lockEmail: true,
+    language: 'en',
+    darkModeDisabled: false,
+    allowDocumentRejection: true,
+    css: ':root { --radius: 12px; }',
+    cssVars: {},
+  };
+
+  const encodedOptions = btoa(encodeURIComponent(JSON.stringify(options)));
+
+  return `${new URL(`/embed/sign/${token}`, host).toString()}#${encodedOptions}`;
+};
+```
+
+A complete example can be found in the [Embeds repository](https://github.com/documenso/embeds/blob/main/packages/mitosis/src/sign-document.lite.tsx).
+
+<Callout type="info" title="Why use the URL fragment?">
+  The fragment is **not sent to the server** as part of the HTTP request, but it is available to the embedded app in
+  the browser. This makes it a convenient way to pass client-side configuration without changing the base embed URL.
+</Callout>

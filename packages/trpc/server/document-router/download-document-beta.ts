@@ -3,7 +3,7 @@ import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelop
 import { getPresignGetUrl } from '@documenso/lib/universal/upload/server-actions';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import type { DocumentData } from '@prisma/client';
-import { DocumentDataType, EnvelopeType } from '@prisma/client';
+import { DocumentDataType, DocumentStatus, EnvelopeType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -58,7 +58,12 @@ export const downloadDocumentBetaRoute = authenticatedProcedure
       });
     }
 
-    if (version === 'signed' && !isDocumentCompleted(envelope.status)) {
+    // A cancelled document was never sealed, so its data is the unsigned original.
+    // Treat it as not-completed here so a "signed" version is never served for it.
+    // REJECTED and COMPLETED keep their prior behavior.
+    const hasSignedArtifact = isDocumentCompleted(envelope.status) && envelope.status !== DocumentStatus.CANCELLED;
+
+    if (version === 'signed' && !hasSignedArtifact) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Document is not completed yet.',
       });

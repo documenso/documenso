@@ -165,10 +165,10 @@ See [Backups](/docs/self-hosting/maintenance/backups) for automated backup strat
 ### Pull the new image
 
 ```bash
-docker pull documenso/documenso:1.6.0
+docker pull documenso/documenso:<version>
 ```
 
-Replace `1.6.0` with your target version.
+Replace `<version>` with your target version.
 
 </Step>
 <Step>
@@ -189,7 +189,7 @@ docker run -d \
   -p 3000:3000 \
   --env-file .env \
   -v /path/to/cert.p12:/opt/documenso/cert.p12:ro \
-  documenso/documenso:1.6.0
+  documenso/documenso:<version>
 ```
 
 </Step>
@@ -223,14 +223,14 @@ Edit `compose.yml` or your `.env` file to specify the new version:
 ```yaml
 services:
   documenso:
-    image: documenso/documenso:1.6.0
+    image: documenso/documenso:<version>
 ```
 
 Or if using environment variable substitution:
 
 ```bash
 # In .env
-DOCUMENSO_VERSION=1.6.0
+DOCUMENSO_VERSION=<version>
 ```
 
 ```yaml
@@ -283,7 +283,7 @@ Edit the deployment directly:
 
 ```bash
 kubectl set image deployment/documenso \
-  documenso=documenso/documenso:1.6.0 \
+  documenso=documenso/documenso:<version> \
   -n documenso
 ```
 
@@ -295,7 +295,7 @@ spec:
     spec:
       containers:
         - name: documenso
-          image: documenso/documenso:1.6.0
+          image: documenso/documenso:<version>
 ```
 
 Then apply:
@@ -421,12 +421,12 @@ To run migrations manually before upgrading:
 
 ```bash
 # Pull the new image
-docker pull documenso/documenso:1.6.0
+docker pull documenso/documenso:<version>
 
 # Run migrations only
 docker run --rm \
   -e NEXT_PRIVATE_DATABASE_URL="postgresql://user:password@host:5432/documenso" \
-  documenso/documenso:1.6.0 \
+  documenso/documenso:<version> \
   npx prisma migrate deploy
 ```
 
@@ -516,7 +516,7 @@ docker run -d \
   -p 3000:3000 \
   --env-file .env \
   -v /path/to/cert.p12:/opt/documenso/cert.p12:ro \
-  documenso/documenso:1.5.0
+  documenso/documenso:<previous-version>
 ```
 
 </Tab>
