@@ -1,8 +1,8 @@
 import communityCardsImage from '@documenso/assets/images/community-cards.png';
 import { authClient } from '@documenso/auth/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
-import { ZNameSchema } from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { ZNameSchema } from '@documenso/lib/types/name';
 import { env } from '@documenso/lib/utils/env';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
@@ -49,6 +49,7 @@ export const ZSignUpFormSchema = z
 
 export const SIGNUP_ERROR_MESSAGES: Record<string, MessageDescriptor> = {
   SIGNUP_DISABLED: msg`Signup is currently disabled or not available for your email domain.`,
+  SIGNUP_DISPOSABLE_EMAIL: msg`Disposable email addresses are not allowed. Please sign up with a permanent email address.`,
   [AppErrorCode.ALREADY_EXISTS]: msg`We were unable to create your account. If you already have an account, try signing in instead.`,
   [AppErrorCode.INVALID_REQUEST]: msg`We were unable to create your account. Please review the information you provided and try again.`,
 };

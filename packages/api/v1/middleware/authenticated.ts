@@ -95,13 +95,22 @@ export const authenticatedMiddleware = <
         { metadata, logger: apiLogger },
       );
     } catch (err) {
-      console.log({ err });
-
-      apiLogger.info(infoToLog);
+      apiLogger.info({
+        ...infoToLog,
+        error: err,
+      });
 
       let message = 'Unauthorized';
 
       if (err instanceof AppError) {
+        if (err.code === AppErrorCode.TOO_MANY_REQUESTS) {
+          return {
+            status: 429,
+            body: { message: err.message },
+            headers: err.headers,
+          } as const;
+        }
+
         message = err.message;
       }
 

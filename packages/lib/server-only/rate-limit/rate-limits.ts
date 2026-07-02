@@ -66,6 +66,20 @@ export const linkOrgAccountRateLimit = createRateLimit({
   window: '1h',
 });
 
+export const reportSenderRateLimit = createRateLimit({
+  action: 'recipient.report-sender',
+  max: 1,
+  window: '7d',
+});
+
+// ---- Billing ----
+
+export const syncSubscriptionRateLimit = createRateLimit({
+  action: 'billing.sync-subscription',
+  max: 10,
+  window: '15m',
+});
+
 // ---- API (Tier 4 - Standard) ----
 
 export const apiV1RateLimit = createRateLimit({
