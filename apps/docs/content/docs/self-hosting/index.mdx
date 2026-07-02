@@ -27,6 +27,14 @@ import { Callout } from 'fumadocs-ui/components/callout';
   Please see all the [requirements](/docs/self-hosting/getting-started/requirements) before proceeding.
 </Callout>
 
+<Callout type="warn">
+  **You are responsible for your own network security.** Documenso applies best-effort, non-exhaustive
+  checks to outbound requests such as webhooks, but these are not a complete SSRF mitigation and they
+  fail open. A self-hosted instance can reach internal addresses on your network. Restricting outbound
+  traffic, egress filtering, and blocking access to internal services and cloud metadata endpoints is
+  your responsibility through your firewall and network configuration.
+</Callout>
+
 ---
 
 ## Deployment Options

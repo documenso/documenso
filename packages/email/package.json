@@ -12,12 +12,13 @@
     "index.ts"
   ],
   "scripts": {
-    "dev": "email dev --port 3002 --dir templates",
+    "dev": "react-router dev --config preview/vite.config.ts",
+    "preview:build": "react-router build --config preview/vite.config.ts",
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "@documenso/tailwind-config": "*",
     "@documenso/nodemailer-resend": "4.0.0",
+    "@documenso/tailwind-config": "*",
     "@react-email/body": "0.2.0",
     "@react-email/button": "0.2.0",
     "@react-email/code-block": "0.2.0",

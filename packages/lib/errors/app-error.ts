@@ -14,6 +14,7 @@ export enum AppErrorCode {
   NOT_FOUND = 'NOT_FOUND',
   NOT_IMPLEMENTED = 'NOT_IMPLEMENTED',
   NOT_SETUP = 'NOT_SETUP',
+  MISSING_ENV_VAR = 'MISSING_ENV_VAR',
   INVALID_CAPTCHA = 'INVALID_CAPTCHA',
   UNAUTHORIZED = 'UNAUTHORIZED',
   FORBIDDEN = 'FORBIDDEN',
@@ -26,7 +27,37 @@ export enum AppErrorCode {
   ENVELOPE_DRAFT = 'ENVELOPE_DRAFT',
   ENVELOPE_COMPLETED = 'ENVELOPE_COMPLETED',
   ENVELOPE_REJECTED = 'ENVELOPE_REJECTED',
+  ENVELOPE_CANCELLED = 'ENVELOPE_CANCELLED',
   ENVELOPE_LEGACY = 'ENVELOPE_LEGACY',
+  /**
+   * Authoring mutation rejected because the envelope is an AES/QES envelope
+   * past DRAFT — the TSP mutation lock fires at distribution to preserve
+   * WYSIWYS. SES envelopes never hit this code.
+   */
+  ENVELOPE_TSP_LOCKED = 'ENVELOPE_TSP_LOCKED',
+
+  /**
+   * CSC (Cloud Signature Consortium) error codes. See the CSC QES V1 spec
+   * for the recovery taxonomy.
+   */
+  CSC_INSTANCE_MODE_MISMATCH = 'CSC_INSTANCE_MODE_MISMATCH',
+  CSC_UNLICENSED = 'CSC_UNLICENSED',
+  CSC_PROVIDER_INFO_FAILED = 'CSC_PROVIDER_INFO_FAILED',
+  CSC_PROVIDER_NO_TSA = 'CSC_PROVIDER_NO_TSA',
+  CSC_CREDENTIAL_LIST_EMPTY = 'CSC_CREDENTIAL_LIST_EMPTY',
+  CSC_CERT_INVALID = 'CSC_CERT_INVALID',
+  CSC_ALGORITHM_REFUSED = 'CSC_ALGORITHM_REFUSED',
+  CSC_SAD_EXPIRED_PRE_SIGN = 'CSC_SAD_EXPIRED_PRE_SIGN',
+  CSC_TSP_TIMEOUT = 'CSC_TSP_TIMEOUT',
+  CSC_EMBED_FAILED = 'CSC_EMBED_FAILED',
+  CSC_BASE_DOCUMENT_MUTATED = 'CSC_BASE_DOCUMENT_MUTATED',
+  /**
+   * Generic catch-all for CSC HTTP transport failures — network error, non-2xx
+   * response without a more specific semantic match, malformed JSON, or
+   * response schema mismatch. Carries the TSP's HTTP status in `statusCode`
+   * and the TSP's `error` / `error_description` in the message when available.
+   */
+  CSC_REQUEST_FAILED = 'CSC_REQUEST_FAILED',
 }
 
 export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; status: number }> = {
@@ -39,6 +70,7 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
   [AppErrorCode.NOT_FOUND]: { code: 'NOT_FOUND', status: 404 },
   [AppErrorCode.NOT_IMPLEMENTED]: { code: 'INTERNAL_SERVER_ERROR', status: 501 },
   [AppErrorCode.NOT_SETUP]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.MISSING_ENV_VAR]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
   [AppErrorCode.UNAUTHORIZED]: { code: 'UNAUTHORIZED', status: 401 },
   [AppErrorCode.FORBIDDEN]: { code: 'FORBIDDEN', status: 403 },
   [AppErrorCode.UNKNOWN_ERROR]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
@@ -49,7 +81,25 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
   [AppErrorCode.ENVELOPE_DRAFT]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_COMPLETED]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_REJECTED]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.ENVELOPE_CANCELLED]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_LEGACY]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.ENVELOPE_TSP_LOCKED]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.CSC_INSTANCE_MODE_MISMATCH]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.CSC_UNLICENSED]: { code: 'FORBIDDEN', status: 403 },
+  [AppErrorCode.CSC_PROVIDER_INFO_FAILED]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
+  [AppErrorCode.CSC_PROVIDER_NO_TSA]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
+  [AppErrorCode.CSC_CREDENTIAL_LIST_EMPTY]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.CSC_CERT_INVALID]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.CSC_ALGORITHM_REFUSED]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.CSC_SAD_EXPIRED_PRE_SIGN]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.CSC_TSP_TIMEOUT]: { code: 'TIMEOUT', status: 408 },
+  [AppErrorCode.CSC_EMBED_FAILED]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.CSC_BASE_DOCUMENT_MUTATED]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
+  // Generic transport failure — the TSP is upstream so server-side from our
+  // perspective; 500 keeps the caller surface conservative. The TSP's actual
+  // HTTP status rides along in AppError.statusCode for the few callers that
+  // need to discriminate (e.g. 401 → re-auth, 429 → backoff).
+  [AppErrorCode.CSC_REQUEST_FAILED]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
 };
 
 export const ZAppErrorJsonSchema = z.object({
@@ -238,11 +288,19 @@ export class AppError extends Error {
         AppErrorCode.ENVELOPE_DRAFT,
         AppErrorCode.ENVELOPE_COMPLETED,
         AppErrorCode.ENVELOPE_REJECTED,
+        AppErrorCode.ENVELOPE_CANCELLED,
         AppErrorCode.ENVELOPE_LEGACY,
+        AppErrorCode.ENVELOPE_TSP_LOCKED,
+        AppErrorCode.CSC_INSTANCE_MODE_MISMATCH,
+        AppErrorCode.CSC_CREDENTIAL_LIST_EMPTY,
+        AppErrorCode.CSC_CERT_INVALID,
+        AppErrorCode.CSC_ALGORITHM_REFUSED,
+        AppErrorCode.CSC_SAD_EXPIRED_PRE_SIGN,
+        AppErrorCode.CSC_EMBED_FAILED,
         () => 400 as const,
       )
       .with(AppErrorCode.UNAUTHORIZED, () => 401 as const)
-      .with(AppErrorCode.FORBIDDEN, () => 403 as const)
+      .with(AppErrorCode.FORBIDDEN, AppErrorCode.CSC_UNLICENSED, () => 403 as const)
       .with(AppErrorCode.NOT_FOUND, () => 404 as const)
       .with(AppErrorCode.NOT_IMPLEMENTED, () => 501 as const)
       .otherwise(() => 500 as const);

@@ -49,6 +49,7 @@ export const ZSignUpFormSchema = z
 
 export const SIGNUP_ERROR_MESSAGES: Record<string, MessageDescriptor> = {
   SIGNUP_DISABLED: msg`Signup is currently disabled or not available for your email domain.`,
+  SIGNUP_DISPOSABLE_EMAIL: msg`Disposable email addresses are not allowed. Please sign up with a permanent email address.`,
   [AppErrorCode.ALREADY_EXISTS]: msg`We were unable to create your account. If you already have an account, try signing in instead.`,
   [AppErrorCode.INVALID_REQUEST]: msg`We were unable to create your account. Please review the information you provided and try again.`,
 };
@@ -331,7 +332,7 @@ export const SignUpForm = ({
                   siteKey={turnstileSiteKey}
                   options={{
                     size: 'flexible',
-                    appearance: 'interaction-only',
+                    appearance: 'always',
                   }}
                 />
               )}

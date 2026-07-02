@@ -116,11 +116,12 @@ export const EditorFieldDropdownForm = ({
     }
 
     const newValues = [...currentValues];
+    const removedValue = currentValues[index].value;
     newValues.splice(index, 1);
 
     form.setValue('values', newValues);
 
-    if (form.getValues('defaultValue') === newValues[index].value) {
+    if (form.getValues('defaultValue') === removedValue) {
       form.setValue('defaultValue', undefined);
     }
   };

@@ -105,6 +105,8 @@ export default function OrganisationSettingsDocumentPage() {
         description: t`We were unable to update your document preferences at this time, please try again later`,
         variant: 'destructive',
       });
+
+      throw err;
     }
   };
 
