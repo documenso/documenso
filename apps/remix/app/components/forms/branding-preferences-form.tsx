@@ -21,6 +21,8 @@ import { z } from 'zod';
 import { useOptionalCurrentTeam } from '~/providers/team';
 import { useCspNonce } from '~/utils/nonce';
 
+import { FormStickySaveBar } from './form-sticky-save-bar';
+
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
@@ -71,37 +73,81 @@ export function BrandingPreferencesForm({
   const parsedColors = ZCssVarsSchema.safeParse(settings.brandingColors);
   const initialColors = parsedColors.success ? parsedColors.data : {};
 
+  // The saved state the form maps to. Used both as the reactive `values` source and as
+  // the explicit target for a Reset (see handleReset).
+  const savedValues: TBrandingPreferencesFormSchema = {
+    brandingEnabled: settings.brandingEnabled ?? null,
+    brandingUrl: settings.brandingUrl ?? '',
+    brandingLogo: undefined,
+    brandingCompanyDetails: settings.brandingCompanyDetails ?? '',
+    brandingColors: initialColors,
+    brandingCss: settings.brandingCss ?? '',
+  };
+
   const form = useForm<TBrandingPreferencesFormSchema>({
-    values: {
-      brandingEnabled: settings.brandingEnabled ?? null,
-      brandingUrl: settings.brandingUrl ?? '',
-      brandingLogo: undefined,
-      brandingCompanyDetails: settings.brandingCompanyDetails ?? '',
-      brandingColors: initialColors,
-      brandingCss: settings.brandingCss ?? '',
-    },
+    values: savedValues,
     resolver: zodResolver(ZBrandingPreferencesFormSchema),
   });
 
   const isBrandingEnabled = form.watch('brandingEnabled');
 
+  const getSavedLogoPreviewUrl = () => {
+    if (!settings.brandingLogo) {
+      return '';
+    }
+
+    const file = JSON.parse(settings.brandingLogo);
+
+    if (!('type' in file) || !('data' in file)) {
+      return '';
+    }
+
+    const logoUrl =
+      context === 'Team'
+        ? `${NEXT_PUBLIC_WEBAPP_URL()}/api/branding/logo/team/${team?.id}`
+        : `${NEXT_PUBLIC_WEBAPP_URL()}/api/branding/logo/organisation/${organisation?.id}`;
+
+    return `${logoUrl}?v=${Date.now()}`;
+  };
+
   useEffect(() => {
-    if (settings.brandingLogo) {
-      const file = JSON.parse(settings.brandingLogo);
+    const savedLogoPreviewUrl = getSavedLogoPreviewUrl();
 
-      if ('type' in file && 'data' in file) {
-        const logoUrl =
-          context === 'Team'
-            ? `${NEXT_PUBLIC_WEBAPP_URL()}/api/branding/logo/team/${team?.id}`
-            : `${NEXT_PUBLIC_WEBAPP_URL()}/api/branding/logo/organisation/${organisation?.id}`;
-
-        setPreviewUrl(logoUrl + '?v=' + Date.now());
-        setHasLoadedPreview(true);
-      }
+    if (savedLogoPreviewUrl) {
+      setPreviewUrl(savedLogoPreviewUrl);
     }
 
     setHasLoadedPreview(true);
   }, [settings.brandingLogo]);
+
+  // Reset the form to the saved values. The form is driven by the `values` prop (no
+  // `defaultValues`), so `reset()` with no argument doesn't re-baseline the dirty check;
+  // passing the saved values clears the per-field dirty tracking (dirtyFields).
+  const handleReset = () => {
+    setPreviewUrl(getSavedLogoPreviewUrl());
+    form.reset(savedValues);
+  };
+
+  // `formState.isDirty` is unreliable for a `values`-driven form: after a reset (or a
+  // save + refetch) it can stay true even though every field already matches its saved
+  // value and `dirtyFields` is empty. Derive the flag from `dirtyFields` instead so the
+  // sticky save bar reliably disappears.
+  const hasUnsavedChanges = Object.keys(form.formState.dirtyFields).length > 0;
+
+  // Re-baseline the form to the just-saved state after a successful submit. The `values`
+  // prop re-syncs most fields once the route refetches, but write-only fields (the logo
+  // is a File that isn't reflected back into `values`) would otherwise stay dirty and
+  // keep the save bar visible. Relies on the page handler rethrowing on error so we only
+  // re-baseline on success.
+  const handleFormSubmit = form.handleSubmit(async (data) => {
+    try {
+      await onFormSubmit(data);
+    } catch {
+      return;
+    }
+
+    form.reset(form.getValues());
+  });
 
   // Cleanup ObjectURL on unmount or when previewUrl changes
   useEffect(() => {
@@ -114,7 +160,7 @@ export function BrandingPreferencesForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onFormSubmit)}>
+      <form onSubmit={handleFormSubmit}>
         <fieldset className="flex h-full flex-col gap-y-4" disabled={form.formState.isSubmitting}>
           <FormField
             control={form.control}
@@ -167,7 +213,7 @@ export function BrandingPreferencesForm({
           />
 
           <div className="relative flex w-full flex-col gap-y-4">
-            {!isBrandingEnabled && <div className="absolute inset-0 z-[9998] bg-background/60" />}
+            {!isBrandingEnabled && <div className="absolute inset-0 z-30 bg-background/60" />}
 
             <FormField
               control={form.control}
@@ -321,7 +367,7 @@ export function BrandingPreferencesForm({
 
           {hasAdvancedBranding && (
             <div className="relative flex w-full flex-col gap-y-6">
-              {!isBrandingEnabled && <div className="absolute inset-0 z-[9998] bg-background/60" />}
+              {!isBrandingEnabled && <div className="absolute inset-0 z-30 bg-background/60" />}
 
               <div>
                 <FormLabel>
@@ -538,11 +584,11 @@ export function BrandingPreferencesForm({
             </div>
           )}
 
-          <div className="flex flex-row justify-end space-x-4">
-            <Button type="submit" loading={form.formState.isSubmitting}>
-              <Trans>Update</Trans>
-            </Button>
-          </div>
+          <FormStickySaveBar
+            isDirty={hasUnsavedChanges}
+            isSubmitting={form.formState.isSubmitting}
+            onReset={handleReset}
+          />
         </fieldset>
       </form>
     </Form>

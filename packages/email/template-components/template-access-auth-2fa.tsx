@@ -27,24 +27,24 @@ export const TemplateAccessAuth2FA = ({
       <Img src={getAssetUrl('/static/document.png')} alt="Document" className="mx-auto h-12 w-12" />
 
       <Section className="mt-8">
-        <Heading className="text-center font-semibold text-lg text-slate-900">
+        <Heading className="text-center font-semibold text-foreground text-lg">
           <Trans>Verification Code Required</Trans>
         </Heading>
 
-        <Text className="mt-2 text-center text-slate-700">
+        <Text className="mt-2 text-center text-foreground">
           <Trans>
             Hi {userName}, you need to enter a verification code to complete the document "{documentTitle}".
           </Trans>
         </Text>
 
-        <Section className="mt-6 rounded-lg bg-slate-50 p-6 text-center">
-          <Text className="mb-2 font-medium text-slate-600 text-sm">
+        <Section className="mt-6 rounded-lg bg-muted p-6 text-center">
+          <Text className="mb-2 font-medium text-muted-foreground text-sm">
             <Trans>Your verification code:</Trans>
           </Text>
-          <Text className="font-bold text-2xl text-slate-900 tracking-wider">{code}</Text>
+          <Text className="font-bold text-2xl text-foreground tracking-wider">{code}</Text>
         </Section>
 
-        <Text className="mt-4 text-center text-slate-600 text-sm">
+        <Text className="mt-4 text-center text-muted-foreground text-sm">
           <Plural
             value={expiresInMinutes}
             one="This code will expire in # minute."
@@ -52,7 +52,7 @@ export const TemplateAccessAuth2FA = ({
           />
         </Text>
 
-        <Text className="mt-4 text-center text-slate-500 text-sm">
+        <Text className="mt-4 text-center text-muted-foreground text-sm">
           <Trans>If you didn't request this verification code, you can safely ignore this email.</Trans>
         </Text>
       </Section>

@@ -10,8 +10,9 @@ import type { Prisma } from '@prisma/client';
 import { Hono } from 'hono';
 
 import type { HonoEnv } from '../../router';
-import { checkEnvelopeFileAccess, handleEnvelopeItemFileRequest } from './files.helpers';
+import { checkEnvelopeFileAccess, handleEnvelopeItemFileRequest, resolveFileUploadUserId } from './files.helpers';
 import {
+  isAllowedUploadContentType,
   type TGetPresignedPostUrlResponse,
   ZGetEnvelopeItemFileDownloadRequestParamsSchema,
   ZGetEnvelopeItemFileRequestParamsSchema,
@@ -31,6 +32,12 @@ export const filesRoute = new Hono<HonoEnv>()
    */
   .post('/upload-pdf', sValidator('form', ZUploadPdfRequestSchema), async (c) => {
     try {
+      const userId = await resolveFileUploadUserId(c);
+
+      if (!userId) {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+
       const { file } = c.req.valid('form');
 
       if (!file) {
@@ -55,10 +62,20 @@ export const filesRoute = new Hono<HonoEnv>()
     }
   })
   .post('/presigned-post-url', sValidator('json', ZGetPresignedPostUrlRequestSchema), async (c) => {
+    const userId = await resolveFileUploadUserId(c);
+
+    if (!userId) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
     const { fileName, contentType } = c.req.valid('json');
 
+    if (!isAllowedUploadContentType(contentType)) {
+      return c.json({ error: 'Unsupported content type' }, 400);
+    }
+
     try {
-      const { key, url } = await getPresignPostUrl(fileName, contentType);
+      const { key, url } = await getPresignPostUrl(fileName, contentType, userId);
 
       return c.json({ key, url } satisfies TGetPresignedPostUrlResponse);
     } catch (err) {

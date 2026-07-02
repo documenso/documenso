@@ -1,4 +1,3 @@
-import { mailer } from '@documenso/email/mailer';
 import { DocumentCreatedFromDirectTemplateEmailTemplate } from '@documenso/email/templates/document-created-from-direct-template';
 import { prisma } from '@documenso/prisma';
 import { msg } from '@lingui/core/macro';
@@ -51,7 +50,7 @@ export const run = async ({ payload }: { payload: TSendDocumentCreatedFromDirect
   const [recipient] = envelope.recipients;
   const { user: templateOwner } = envelope;
 
-  const { branding, emailLanguage, senderEmail } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, emailTransport } = await getEmailContext({
     emailType: 'INTERNAL',
     source: {
       type: 'team',
@@ -79,7 +78,7 @@ export const run = async ({ payload }: { payload: TSendDocumentCreatedFromDirect
     renderEmailWithI18N(emailTemplate, { lang: emailLanguage, branding, plainText: true }),
   ]);
 
-  await mailer.sendMail({
+  await emailTransport.sendMail({
     to: [
       {
         name: templateOwner.name || '',

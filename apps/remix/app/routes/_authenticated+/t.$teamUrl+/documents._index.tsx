@@ -16,10 +16,10 @@ import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType, FolderType, OrganisationType } from '@prisma/client';
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
 import { z } from 'zod';
 
-import { DocumentMoveToFolderDialog } from '~/components/dialogs/document-move-to-folder-dialog';
+import { EnvelopesBulkCancelDialog } from '~/components/dialogs/envelopes-bulk-cancel-dialog';
 import { EnvelopesBulkDeleteDialog } from '~/components/dialogs/envelopes-bulk-delete-dialog';
 import { EnvelopesBulkMoveDialog } from '~/components/dialogs/envelopes-bulk-move-dialog';
 import { DocumentSearch } from '~/components/general/document/document-search';
@@ -54,13 +54,17 @@ export default function DocumentsPage() {
 
   const { folderId } = useParams();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const documentsPath = formatDocumentsPath(team.url);
 
   const [isMovingDocument, setIsMovingDocument] = useState(false);
-  const [documentToMove, setDocumentToMove] = useState<number | null>(null);
+  const [documentToMove, setDocumentToMove] = useState<string | null>(null);
 
   const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>('documents-bulk-selection', {});
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
+  const [isBulkCancelDialogOpen, setIsBulkCancelDialogOpen] = useState(false);
 
   const selectedEnvelopeIds = useMemo(() => {
     return Object.keys(rowSelection).filter((id) => rowSelection[id]);
@@ -71,6 +75,7 @@ export default function DocumentsPage() {
     [ExtendedDocumentStatus.PENDING]: 0,
     [ExtendedDocumentStatus.COMPLETED]: 0,
     [ExtendedDocumentStatus.REJECTED]: 0,
+    [ExtendedDocumentStatus.CANCELLED]: 0,
     [ExtendedDocumentStatus.INBOX]: 0,
     [ExtendedDocumentStatus.ALL]: 0,
   });
@@ -150,6 +155,7 @@ export default function DocumentsPage() {
                   ExtendedDocumentStatus.INBOX,
                   ExtendedDocumentStatus.PENDING,
                   ExtendedDocumentStatus.COMPLETED,
+                  ExtendedDocumentStatus.CANCELLED,
                   ExtendedDocumentStatus.DRAFT,
                   ExtendedDocumentStatus.ALL,
                 ]
@@ -196,8 +202,8 @@ export default function DocumentsPage() {
                 data={data}
                 isLoading={isLoading}
                 isLoadingError={isLoadingError}
-                onMoveDocument={(documentId) => {
-                  setDocumentToMove(documentId);
+                onMoveDocument={(envelopeId) => {
+                  setDocumentToMove(envelopeId);
                   setIsMovingDocument(true);
                 }}
                 enableSelection
@@ -209,8 +215,9 @@ export default function DocumentsPage() {
         </div>
 
         {documentToMove && (
-          <DocumentMoveToFolderDialog
-            documentId={documentToMove}
+          <EnvelopesBulkMoveDialog
+            envelopeIds={[documentToMove]}
+            envelopeType={EnvelopeType.DOCUMENT}
             open={isMovingDocument}
             currentFolderId={folderId}
             onOpenChange={(open) => {
@@ -220,6 +227,9 @@ export default function DocumentsPage() {
                 setDocumentToMove(null);
               }
             }}
+            onSuccess={(destinationFolderId) =>
+              navigate(destinationFolderId ? `${documentsPath}/f/${destinationFolderId}` : documentsPath)
+            }
           />
         )}
 
@@ -227,6 +237,7 @@ export default function DocumentsPage() {
           selectedCount={selectedEnvelopeIds.length}
           onMoveClick={() => setIsBulkMoveDialogOpen(true)}
           onDeleteClick={() => setIsBulkDeleteDialogOpen(true)}
+          onCancelClick={() => setIsBulkCancelDialogOpen(true)}
           onClearSelection={() => setRowSelection({})}
         />
 
@@ -244,6 +255,13 @@ export default function DocumentsPage() {
           envelopeType={EnvelopeType.DOCUMENT}
           open={isBulkDeleteDialogOpen}
           onOpenChange={setIsBulkDeleteDialogOpen}
+          onSuccess={() => setRowSelection({})}
+        />
+
+        <EnvelopesBulkCancelDialog
+          envelopeIds={selectedEnvelopeIds}
+          open={isBulkCancelDialogOpen}
+          onOpenChange={setIsBulkCancelDialogOpen}
           onSuccess={() => setRowSelection({})}
         />
       </div>
