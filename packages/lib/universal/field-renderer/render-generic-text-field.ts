@@ -36,6 +36,7 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     new Konva.Text({
       id: `${field.renderId}-text`,
       name: 'field-text',
+      listening: false,
     });
 
   // Calculate text positioning based on alignment

@@ -25,6 +25,7 @@ import type { TRecipientActionAuthTypes } from '../../types/document-auth';
 import { DocumentAccessAuth, ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { ZFieldMetaSchema } from '../../types/field-meta';
+import { ZSignatureLevelSchema } from '../../types/signature-level';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
@@ -42,6 +43,8 @@ import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
 import { incrementDocumentId } from '../envelope/increment-id';
+import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
+import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -115,6 +118,20 @@ export const createDocumentFromDirectTemplate = async ({
           name: true,
         },
       },
+      team: {
+        select: {
+          organisationId: true,
+          organisation: {
+            select: {
+              organisationClaim: {
+                select: {
+                  recipientCount: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   });
 
@@ -181,7 +198,31 @@ export const createDocumentFromDirectTemplate = async ({
   const nonDirectTemplateRecipients = directTemplateEnvelope.recipients.filter(
     (recipient) => recipient.id !== directTemplateRecipient.id,
   );
-  const derivedDocumentMeta = extractDerivedDocumentMeta(settings, directTemplateEnvelope.documentMeta);
+
+  // Carry the template's level forward, coercing if the instance mode has
+  // changed since the template was created. ZSignatureLevelSchema parses the
+  // free-form TEXT column defensively. Resolved before meta extraction so
+  // signingOrder picks up the TSP-appropriate default + assertion.
+  const signatureLevel = resolveSignatureLevel({
+    requested: ZSignatureLevelSchema.parse(directTemplateEnvelope.signatureLevel),
+    strict: false,
+  });
+
+  const derivedDocumentMeta = extractDerivedDocumentMeta(settings, directTemplateEnvelope.documentMeta, signatureLevel);
+
+  // The resulting document contains every non-direct template recipient plus the
+  // direct recipient that is signing now. A recipientCount of 0 means unlimited.
+  // This mirrors the check in `sendDocument`, but must be done here because this
+  // flow creates the document directly in PENDING and swallows `sendDocument` errors.
+  const maximumRecipientCount = directTemplateEnvelope.team.organisation.organisationClaim.recipientCount;
+  const resultingRecipientCount = nonDirectTemplateRecipients.length + 1;
+
+  if (maximumRecipientCount > 0 && resultingRecipientCount > maximumRecipientCount) {
+    throw new AppError('RECIPIENT_LIMIT_EXCEEDED', {
+      message: `You cannot send a document with more than ${maximumRecipientCount} recipients`,
+      statusCode: 400,
+    });
+  }
 
   // Associate, validate and map to a query every direct template recipient field with the provided fields.
   // Only process fields that are either required or have been signed by the user
@@ -269,6 +310,13 @@ export const createDocumentFromDirectTemplate = async ({
 
   const directTemplateSignatureFields = createDirectRecipientFieldArgs.filter(({ signature }) => signature !== null);
 
+  // Enforce the organisation document-creation limit before creating the document.
+  await assertOrganisationRatesAndLimits({
+    organisationId: directTemplateEnvelope.team.organisationId,
+    type: 'document',
+    count: 1,
+  });
+
   const initialRequestTime = new Date();
 
   // Key = original envelope item ID
@@ -315,6 +363,7 @@ export const createDocumentFromDirectTemplate = async ({
         secondaryId: incrementedDocumentId.formattedDocumentId,
         type: EnvelopeType.DOCUMENT,
         internalVersion: directTemplateEnvelope.internalVersion,
+        signatureLevel,
         qrToken: prefixedId('qr'),
         source: DocumentSource.TEMPLATE_DIRECT_LINK,
         templateId: directTemplateEnvelopeLegacyId,
