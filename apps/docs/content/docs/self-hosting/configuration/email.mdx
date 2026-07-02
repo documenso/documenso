@@ -278,7 +278,9 @@ Test your email configuration by creating an account or resetting a password. Th
 
 ### Using a Test SMTP Server
 
-For development or testing, use a local SMTP server like [Mailhog](https://github.com/mailhog/MailHog) or [Mailpit](https://github.com/axllent/mailpit):
+For development or testing, use a local SMTP server like [Inbucket](https://www.inbucket.org/), [Mailpit](https://github.com/axllent/mailpit), or [Mailhog](https://github.com/mailhog/MailHog). The default development setup (`docker/development/compose.yml`) already runs Inbucket, with its web UI on port 9000 and SMTP on port 2500.
+
+To run one standalone instead:
 
 ```bash
 # Using Docker
