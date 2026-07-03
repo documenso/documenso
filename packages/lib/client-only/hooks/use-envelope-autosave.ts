@@ -1,35 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
- * Debounced, self-serialising autosave helper.
+ * Debounced autosave for the envelope editor (recipients, fields, settings).
  *
- * Guarantees:
- * - At most one `saveFn` call is in-flight at any time, so saves can never run
- *   concurrently and land out of order.
- * - The most recently queued payload is always committed. In particular calling
- *   `flush()` while an older save is still in-flight waits for that save AND then
- *   commits any newer payload queued in the meantime.
- *
- * The second guarantee is the important one: previously `flush()` would await an
- * in-flight save and return immediately, silently dropping any newer payload that
- * had been queued (and whose debounce timer it had just cleared). Under network
- * lag this lost the user's latest changes - e.g. a freshly typed recipient would
- * never be persisted and the editor would fall back to the "Recipient 1"
- * placeholder.
+ * Only one save runs at a time and the latest edit always wins. If the user
+ * keeps editing while a save is on the wire, their newest changes get saved
+ * right after, never dropped.
  */
 export function useEnvelopeAutosave<T>(saveFn: (data: T) => Promise<void>, delay = 1000) {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // The most recently queued, not-yet-saved payload. Wrapped in an object so that
-  // a queued falsy payload is still distinguishable from "nothing queued".
+  // The edit waiting to be saved. Wrapped in an object so null always means "nothing queued".
   const pendingRef = useRef<{ value: T } | null>(null);
 
-  // The in-flight commit pump. Concurrent callers await this same promise rather
-  // than starting a second, overlapping save.
+  // The save currently running, if any. Shared so we never kick off two at once.
   const commitPromiseRef = useRef<Promise<void> | null>(null);
 
-  // Always invoke the latest `saveFn` (which may close over fresh state) without
-  // having to rebuild `triggerSave`/`flush` on every render.
+  // saveFn closes over editor state, so keep the latest one around without
+  // making triggerSave/flush depend on it.
   const saveFnRef = useRef(saveFn);
   saveFnRef.current = saveFn;
 
@@ -37,17 +25,14 @@ export function useEnvelopeAutosave<T>(saveFn: (data: T) => Promise<void>, delay
   const [isCommiting, setIsCommiting] = useState(false);
 
   /**
-   * Drains the queued payload, running `saveFn` one save at a time until nothing
-   * is left to save. If a newer payload is queued while a save is in-flight it is
-   * picked up on the next loop iteration, so the latest changes are never lost.
+   * Runs saves one at a time until the queue is empty. Anything queued
+   * mid-save gets picked up on the next loop.
    */
   const commit = useCallback((): Promise<void> => {
-    // A pump is already running → share it instead of starting a second one.
     if (commitPromiseRef.current) {
       return commitPromiseRef.current;
     }
 
-    // Nothing queued and nothing in-flight → no work to do.
     if (!pendingRef.current) {
       return Promise.resolve();
     }
@@ -79,7 +64,6 @@ export function useEnvelopeAutosave<T>(saveFn: (data: T) => Promise<void>, delay
     (data: T) => {
       pendingRef.current = { value: data };
 
-      // A debounce timer or an in-flight save means something is pending.
       setIsPending(true);
 
       if (timeoutRef.current) {
@@ -94,6 +78,10 @@ export function useEnvelopeAutosave<T>(saveFn: (data: T) => Promise<void>, delay
     [commit, delay],
   );
 
+  /**
+   * Skip the debounce and save now. The editor calls this when it needs
+   * everything persisted, e.g. before sending or switching steps.
+   */
   const flush = useCallback(async () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -103,6 +91,7 @@ export function useEnvelopeAutosave<T>(saveFn: (data: T) => Promise<void>, delay
     await commit();
   }, [commit]);
 
+  // Last-ditch attempt to save if the tab closes with unsaved edits.
   useEffect(() => {
     const handleBeforeUnload = () => {
       if (timeoutRef.current || pendingRef.current || commitPromiseRef.current) {
