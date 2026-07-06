@@ -148,8 +148,8 @@ export default function DocumentsPage() {
             </h2>
           </div>
 
-          <div className="-m-1 flex flex-wrap gap-x-4 gap-y-6 overflow-hidden p-1">
-            <Tabs value={findDocumentSearchParams.status || 'ALL'} className="overflow-x-auto">
+          <div className="-m-1 flex flex-wrap gap-x-4 gap-y-6 overflow-hidden p-1 xl:grow xl:flex-nowrap">
+            <Tabs value={findDocumentSearchParams.status || 'ALL'} className="overflow-x-auto xl:shrink-0">
               <TabsList>
                 {[
                   ExtendedDocumentStatus.INBOX,
@@ -182,12 +182,12 @@ export default function DocumentsPage() {
               </TabsList>
             </Tabs>
 
-            {team && <DocumentsTableSenderFilter teamId={team.id} />}
+            {team && <DocumentsTableSenderFilter teamId={team.id} className="w-[160px]" />}
 
-            <div className="flex w-48 flex-wrap items-center justify-between gap-x-2 gap-y-4">
+            <div className="flex w-40 flex-shrink-0 flex-wrap items-center justify-between gap-x-2 gap-y-4">
               <PeriodSelector />
             </div>
-            <div className="flex w-48 flex-wrap items-center justify-between gap-x-2 gap-y-4">
+            <div className="flex w-40 flex-shrink-0 flex-wrap items-center justify-between gap-x-2 gap-y-4 xl:w-auto xl:grow">
               <DocumentSearch initialValue={findDocumentSearchParams.query} />
             </div>
           </div>
