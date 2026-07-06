@@ -83,15 +83,17 @@ export const deleteDocument = async ({ id, userId, teamId, requestMetadata }: De
 
   // Handle hard or soft deleting the actual document if user has permission.
   if (hasDeleteAccess) {
-    await handleDocumentOwnerDelete({
+    const updatedEnvelope = await handleDocumentOwnerDelete({
       envelope,
       user,
       requestMetadata,
     });
 
+    const envelopeForWebhook = { ...envelope, ...(updatedEnvelope ?? {}) };
+
     await triggerWebhook({
       event: WebhookTriggerEvents.DOCUMENT_CANCELLED,
-      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelopeForWebhook)),
       userId,
       teamId,
     });

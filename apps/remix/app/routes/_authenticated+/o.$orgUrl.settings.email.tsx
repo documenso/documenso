@@ -49,6 +49,8 @@ export default function OrganisationSettingsGeneral() {
         description: t`We were unable to update your email preferences at this time, please try again later`,
         variant: 'destructive',
       });
+
+      throw err;
     }
   };
 
