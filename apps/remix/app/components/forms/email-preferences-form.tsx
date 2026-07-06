@@ -4,7 +4,6 @@ import { DEFAULT_DOCUMENT_EMAIL_SETTINGS, ZDocumentEmailSettingsSchema } from '@
 import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc } from '@documenso/trpc/react';
 import { DocumentEmailCheckboxes } from '@documenso/ui/components/document/document-email-checkboxes';
-import { Button } from '@documenso/ui/primitives/button';
 import {
   Form,
   FormControl,
@@ -21,6 +20,8 @@ import { Trans } from '@lingui/react/macro';
 import type { TeamGlobalSettings } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
+import { FormStickySaveBar } from './form-sticky-save-bar';
 
 const ZEmailPreferencesFormSchema = z.object({
   emailId: z.string().nullable(),
@@ -59,9 +60,21 @@ export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: Ema
 
   const emails = emailData?.data || [];
 
+  const handleFormSubmit = form.handleSubmit(async (data) => {
+    try {
+      await onFormSubmit(data);
+    } catch {
+      // The page handler surfaces its own error toast. Keep the form dirty so
+      // the save bar stays visible and the user can retry.
+      return;
+    }
+
+    form.reset(data);
+  });
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onFormSubmit)}>
+      <form onSubmit={handleFormSubmit}>
         <fieldset className="flex h-full max-w-2xl flex-col gap-y-6" disabled={form.formState.isSubmitting}>
           {organisation.organisationClaim.flags.emailDomains && (
             <FormField
@@ -203,11 +216,11 @@ export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: Ema
             )}
           />
 
-          <div className="flex flex-row justify-end space-x-4">
-            <Button type="submit" loading={form.formState.isSubmitting}>
-              <Trans>Update</Trans>
-            </Button>
-          </div>
+          <FormStickySaveBar
+            isDirty={form.formState.isDirty}
+            isSubmitting={form.formState.isSubmitting}
+            onReset={() => form.reset()}
+          />
         </fieldset>
       </form>
     </Form>

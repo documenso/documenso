@@ -1,12 +1,21 @@
+import { isSigninEnabledForProvider } from '@documenso/lib/constants/auth';
 import { Button } from '@documenso/ui/primitives/button';
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
-import { Link } from 'react-router';
+import { Link, redirect } from 'react-router';
 
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
   return appMetaTags(msg`Reset Password`);
+}
+
+export async function loader() {
+  if (!isSigninEnabledForProvider('email')) {
+    throw redirect('/signin');
+  }
+
+  return null;
 }
 
 export default function ResetPasswordPage() {
