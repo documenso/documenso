@@ -5,7 +5,6 @@ description: Activate your Enterprise license key to unlock enterprise features 
 
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
-import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 A license key activates the Enterprise features available to your self-hosted instance, such as CSC signing, SSO, embed white-labelling, and 21 CFR Part 11 compliance.
@@ -19,9 +18,6 @@ A license key activates the Enterprise features available to your self-hosted in
 
 - An active Enterprise license key
 - A running self-hosted Documenso instance that you're able to restart
-- An **admin account** on your instance (needed for Steps 3 and 4). Every account created through
-  signup is a regular user with no admin panel access — you have to grant the admin role yourself.
-  See [Granting Admin Access](/docs/self-hosting/getting-started/quick-start#granting-admin-access).
 
 ## Step 1: Set the environment variable
 
@@ -76,72 +72,29 @@ docker compose restart documenso
 docker restart documenso
 ```
 
-On startup, Documenso sends the key to the Documenso license server and caches the result locally for future startups (so a brief license-server outage won't lock you out).
+On startup, Documenso validates the key against the Documenso license server and caches the result locally for future startups, so a brief license-server outage won't lock you out.
 
-## Step 3: Verify it's active
+## What the license enables
 
-Open **Admin Panel → Stats** in your instance. A **Documenso License** card shows a status badge (Active, Past Due, or Expired), the license name, expiry date, the masked license key, and which features it includes.
+A valid license doesn't turn every enterprise feature on everywhere — activation depends on the feature:
 
-If the card shows **Invalid License Key**, **No License Configured**, or a status other than **Active**, double check:
-
-- The key was set in the environment the running container/process actually uses (not just a local `.env` file that isn't mounted)
-- The instance was fully restarted, not just reloaded
-- The key wasn't truncated or has extra whitespace when copied in
-
-<Callout type="info">
-  There's also a resync button (the refresh icon in the top-right of the license card) in **Admin
-  Panel → Stats** that re-checks the license against the license server immediately, without a
-  restart.
-</Callout>
-
-## Step 4: Enable features
-
-A valid license doesn't automatically turn every enterprise feature on everywhere — how each feature is enabled differs:
-
-<Accordions type="multiple">
-  <Accordion title="CSC signing">
-    CSC signing is enabled instance-wide as soon as the license is active and CSC transport is
-    configured. See [CSC / QES Signing](/docs/self-hosting/configuration/signing-certificate/csc-qes)
-    for the full setup.
-  </Accordion>
-  <Accordion title="SSO, embed white-label, 21 CFR Part 11, and similar">
-    These are granted per-organisation rather than instance-wide. As an instance admin:
-
-    1. Go to **Admin Panel → Claims** and create (or edit) a subscription claim that enables the
-       features you need. Only enable features your license covers — enabling one it doesn't will
-       flag the instance as unauthorized (see the warning below).
-    2. Go to **Admin Panel → Organisations**, open the organisation, and assign that claim to it.
-    3. Organisation admins can then configure the feature under their organisation's settings — for
-       example, SSO is configured under **Organisation Settings → SSO**.
-
-  </Accordion>
-</Accordions>
-
-<Callout type="warn">
-  If an organisation is assigned a feature your license doesn't cover, the admin panel shows an
-  **Invalid License Type** banner ("Your Documenso instance is using features that are not part of
-  your license") until the enabled features are brought back in line with your license.
-</Callout>
+- **CSC signing** activates instance-wide automatically once the license is active and CSC transport is configured. See [CSC / QES Signing](/docs/self-hosting/configuration/signing-certificate/csc-qes) for the full setup.
+- **SSO, embed white-labelling, 21 CFR Part 11, and similar** are provisioned per organisation. Follow each feature's own guide to configure it once the license is active.
 
 ## Troubleshooting
 
 <Accordions type="multiple">
-  <Accordion title="License shows as invalid or not found">
+  <Accordion title="Enterprise features are still unavailable after applying the key">
     - Confirm the key is present in the environment the running process actually reads — `docker
       exec` into the container and check `env | grep LICENSE` if unsure.
-    - Confirm the instance was restarted after the variable was set, not just left running.
+    - Confirm the instance was fully restarted after the variable was set, not just reloaded.
     - Re-copy the key to rule out truncation or accidental whitespace.
   </Accordion>
-  <Accordion title="License is active, but a feature is still unavailable">
-    Instance-wide features (like CSC signing) only need an active license and correct
-    configuration. Per-organisation features (like SSO) also need the organisation's claim to
-    include that feature — see Step 4 above.
-  </Accordion>
-  <Accordion title="Admin panel shows an 'Invalid License Type' banner">
-    This means an organisation on your instance has an enterprise feature enabled that your license
-    doesn't cover. Disable the feature for that organisation under **Admin Panel → Organisations**,
-    or adjust the claim under **Admin Panel → Claims**, so the enabled features match what your
-    license includes.
+  <Accordion title="A specific feature still isn't working">
+    Instance-wide features (like CSC signing) also need their own configuration — an active license
+    alone isn't enough. Check that feature's guide to confirm the required settings are in place.
+    Per-organisation features additionally need to be provisioned for the organisation that's using
+    them.
   </Accordion>
 </Accordions>
 
