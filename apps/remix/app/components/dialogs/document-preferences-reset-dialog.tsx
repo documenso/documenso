@@ -20,7 +20,6 @@ export type DocumentPreferencesResetDialogProps = {
   showAiFeatures?: boolean;
   showDocumentVisibility?: boolean;
   showIncludeSenderDetails?: boolean;
-  trigger?: React.ReactNode;
 };
 
 export const DocumentPreferencesResetDialog = ({
@@ -30,7 +29,6 @@ export const DocumentPreferencesResetDialog = ({
   showAiFeatures = false,
   showDocumentVisibility = false,
   showIncludeSenderDetails = false,
-  trigger,
 }: DocumentPreferencesResetDialogProps) => {
   const [open, setOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
@@ -51,11 +49,9 @@ export const DocumentPreferencesResetDialog = ({
   return (
     <Dialog open={open} onOpenChange={(value) => !isLoading && setOpen(value)}>
       <DialogTrigger asChild>
-        {trigger ?? (
-          <Button variant="destructive" type="button" disabled={disabled || isLoading}>
-            <Trans>Reset</Trans>
-          </Button>
-        )}
+        <Button variant="destructive" type="button" size="sm" disabled={disabled || isLoading}>
+          <Trans>Reset to defaults</Trans>
+        </Button>
       </DialogTrigger>
 
       <DialogContent>

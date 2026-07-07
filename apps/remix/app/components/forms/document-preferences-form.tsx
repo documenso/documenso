@@ -21,7 +21,6 @@ import { ReminderSettingsPicker } from '@documenso/ui/components/document/remind
 import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
 import { Alert } from '@documenso/ui/primitives/alert';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
-import { Button } from '@documenso/ui/primitives/button';
 import { Combobox } from '@documenso/ui/primitives/combobox';
 import {
   Form,
@@ -46,6 +45,7 @@ import { DocumentPreferencesResetDialog } from '~/components/dialogs/document-pr
 import { useOptionalCurrentTeam } from '~/providers/team';
 
 import { DefaultRecipientsMultiSelectCombobox } from '../general/default-recipients-multiselect-combobox';
+import { FormStickySaveBar } from './form-sticky-save-bar';
 
 /**
  * Can't infer this from the schema since we need to keep the schema inside the component to allow
@@ -168,9 +168,21 @@ export const DocumentPreferencesForm = ({
     form.reset(resetValues);
   };
 
+  const handleFormSubmit = form.handleSubmit(async (data) => {
+    try {
+      await onFormSubmit(data);
+    } catch {
+      // The page handler surfaces its own error toast. Keep the form dirty so
+      // the save bar stays visible and the user can retry.
+      return;
+    }
+
+    form.reset(data);
+  });
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onFormSubmit)}>
+      <form onSubmit={handleFormSubmit}>
         <fieldset className="flex h-full max-w-2xl flex-col gap-y-6" disabled={form.formState.isSubmitting}>
           {!isPersonalLayoutMode && (
             <FormField
@@ -777,19 +789,21 @@ export const DocumentPreferencesForm = ({
             />
           )}
 
-          <div className="flex flex-row justify-end space-x-4">
-            <Button type="submit" loading={form.formState.isSubmitting}>
-              <Trans>Update</Trans>
-            </Button>
-            <DocumentPreferencesResetDialog
-              disabled={isResetDisabled}
-              isSubmitting={form.formState.isSubmitting}
-              onReset={handleResetToDefaults}
-              showAiFeatures={isAiFeaturesConfigured}
-              showDocumentVisibility={!isPersonalLayoutMode}
-              showIncludeSenderDetails={!isPersonalLayoutMode && !isPersonalOrganisation}
-            />
-          </div>
+          <FormStickySaveBar
+            isDirty={form.formState.isDirty}
+            isSubmitting={form.formState.isSubmitting}
+            onReset={() => form.reset()}
+            resetToDefaults={
+              <DocumentPreferencesResetDialog
+                disabled={isResetDisabled}
+                isSubmitting={form.formState.isSubmitting}
+                onReset={handleResetToDefaults}
+                showAiFeatures={isAiFeaturesConfigured}
+                showDocumentVisibility={!isPersonalLayoutMode}
+                showIncludeSenderDetails={!isPersonalLayoutMode && !isPersonalOrganisation}
+              />
+            }
+          />
         </fieldset>
       </form>
     </Form>

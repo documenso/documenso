@@ -526,7 +526,7 @@ test('[ADMIN]: verify organisation access after ownership change', async ({ page
   // Should be able to access organisation settings
   await expect(page.getByText('Organisation Settings')).toBeVisible();
   await expect(page.getByLabel('Organisation Name*')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Update organisation' })).toBeVisible();
+  await expect(page.getByLabel('Organisation Name*')).toBeEnabled();
 
   // Should have delete permissions
   await expect(page.getByRole('button', { name: 'Delete' })).toBeVisible();
