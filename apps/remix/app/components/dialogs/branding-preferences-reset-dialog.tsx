@@ -49,7 +49,7 @@ export const BrandingPreferencesResetDialog = ({
       <DialogTrigger asChild>
         {trigger ?? (
           <Button variant="destructive" type="button" disabled={disabled || isLoading}>
-            <Trans>Reset</Trans>
+            <Trans>Reset to defaults</Trans>
           </Button>
         )}
       </DialogTrigger>

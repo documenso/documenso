@@ -88,7 +88,7 @@ export default function OrganisationSettingsDocumentPage() {
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
-          delegateDocumentOwnership: delegateDocumentOwnership,
+          delegateDocumentOwnership,
           aiFeaturesEnabled,
           envelopeExpirationPeriod: envelopeExpirationPeriod ?? undefined,
           reminderSettings: reminderSettings ?? undefined,
@@ -105,6 +105,8 @@ export default function OrganisationSettingsDocumentPage() {
         description: t`We were unable to update your document preferences at this time, please try again later`,
         variant: 'destructive',
       });
+
+      throw err;
     }
   };
 
