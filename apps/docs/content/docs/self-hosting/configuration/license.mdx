@@ -77,17 +77,18 @@ On startup, Documenso sends the key to the Documenso license server and caches t
 
 ## Step 3: Verify it's active
 
-Open **Admin Panel → Stats** in your instance. A license card shows the status (Active, Past Due, or Expired), license name, expiry date, and which features it includes.
+Open **Admin Panel → Stats** in your instance. A **Documenso License** card shows a status badge (Active, Past Due, or Expired), the license name, expiry date, the masked license key, and which features it includes.
 
-If the status doesn't say **Active**, double check:
+If the card shows **Invalid License Key**, **No License Configured**, or a status other than **Active**, double check:
 
 - The key was set in the environment the running container/process actually uses (not just a local `.env` file that isn't mounted)
 - The instance was fully restarted, not just reloaded
 - The key wasn't truncated or has extra whitespace when copied in
 
 <Callout type="info">
-  There's also a resync button on the license card in **Admin Panel → Stats** that re-checks the
-  license against the license server immediately, without a restart.
+  There's also a resync button (the refresh icon in the top-right of the license card) in **Admin
+  Panel → Stats** that re-checks the license against the license server immediately, without a
+  restart.
 </Callout>
 
 ## Step 4: Enable features
@@ -103,8 +104,9 @@ A valid license doesn't automatically turn every enterprise feature on everywher
   <Accordion title="SSO, embed white-label, 21 CFR Part 11, and similar">
     These are granted per-organisation rather than instance-wide. As an instance admin:
 
-    1. Go to **Admin Panel → Claims** and create (or edit) a subscription claim with the features
-       you need enabled. Only features included in your license can be added.
+    1. Go to **Admin Panel → Claims** and create (or edit) a subscription claim that enables the
+       features you need. Only enable features your license covers — enabling one it doesn't will
+       flag the instance as unauthorized (see the warning below).
     2. Go to **Admin Panel → Organisations**, open the organisation, and assign that claim to it.
     3. Organisation admins can then configure the feature under their organisation's settings — for
        example, SSO is configured under **Organisation Settings → SSO**.
@@ -113,9 +115,9 @@ A valid license doesn't automatically turn every enterprise feature on everywher
 </Accordions>
 
 <Callout type="warn">
-  If an organisation's claim includes a feature your license doesn't cover, the license status
-  will show as unauthorized in the admin panel until the claim is brought back in line with your
-  license.
+  If an organisation is assigned a feature your license doesn't cover, the admin panel shows an
+  **Invalid License Type** banner ("Your Documenso instance is using features that are not part of
+  your license") until the enabled features are brought back in line with your license.
 </Callout>
 
 ## Troubleshooting
@@ -132,9 +134,10 @@ A valid license doesn't automatically turn every enterprise feature on everywher
     configuration. Per-organisation features (like SSO) also need the organisation's claim to
     include that feature — see Step 4 above.
   </Accordion>
-  <Accordion title="Status shows Unauthorized">
-    This means an organisation on your instance has a feature enabled in its claim that your
-    license doesn't cover. Adjust the claim in **Admin Panel → Claims** so it matches what your
+  <Accordion title="Admin panel shows an 'Invalid License Type' banner">
+    This means an organisation on your instance has an enterprise feature enabled that your license
+    doesn't cover. Disable the feature for that organisation under **Admin Panel → Organisations**,
+    or adjust the claim under **Admin Panel → Claims**, so the enabled features match what your
     license includes.
   </Accordion>
 </Accordions>
