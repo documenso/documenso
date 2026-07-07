@@ -1,0 +1,146 @@
+---
+title: Apply Your License Key
+description: Activate your Enterprise license key to unlock enterprise features on your self-hosted instance.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+A license key activates the Enterprise features available to your self-hosted instance, such as CSC signing, SSO, embed white-labelling, and 21 CFR Part 11 compliance.
+
+<Callout type="info">
+  The license key applies to your **whole instance**, not an individual user account. There's one
+  key per deployment.
+</Callout>
+
+## Prerequisites
+
+- An active Enterprise license key
+- A running self-hosted Documenso instance that you're able to restart
+
+## Step 1: Set the environment variable
+
+Set `NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY` to your license key.
+
+<Tabs items={['Docker Compose', 'docker run', '.env']}>
+<Tab value="Docker Compose">
+
+Add the variable to your `.env` file (or directly under `environment:` in `compose.yml`):
+
+```bash
+NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY=your-license-key-here
+```
+
+Then apply it:
+
+```bash
+docker compose up -d
+```
+
+</Tab>
+<Tab value="docker run">
+
+```bash
+docker run -d \
+  --name documenso \
+  -e NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY=your-license-key-here \
+  documenso/documenso:latest
+```
+
+</Tab>
+<Tab value=".env">
+
+If you're running Documenso directly (not in a container), add the variable to your `.env` file:
+
+```bash
+NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY=your-license-key-here
+```
+
+</Tab>
+</Tabs>
+
+## Step 2: Restart the instance
+
+The license key is only read once, at process startup. Setting the variable in a running container or shell has no effect until the process restarts.
+
+```bash
+# Docker Compose
+docker compose restart documenso
+
+# Docker
+docker restart documenso
+```
+
+On startup, Documenso sends the key to the Documenso license server and caches the result locally for future startups (so a brief license-server outage won't lock you out).
+
+## Step 3: Verify it's active
+
+Open **Admin Panel → Stats** in your instance. A license card shows the status (Active, Past Due, or Expired), license name, expiry date, and which features it includes.
+
+If the status doesn't say **Active**, double check:
+
+- The key was set in the environment the running container/process actually uses (not just a local `.env` file that isn't mounted)
+- The instance was fully restarted, not just reloaded
+- The key wasn't truncated or has extra whitespace when copied in
+
+<Callout type="info">
+  There's also a resync button on the license card in **Admin Panel → Stats** that re-checks the
+  license against the license server immediately, without a restart.
+</Callout>
+
+## Step 4: Enable features
+
+A valid license doesn't automatically turn every enterprise feature on everywhere — how each feature is enabled differs:
+
+<Accordions type="multiple">
+  <Accordion title="CSC signing">
+    CSC signing is enabled instance-wide as soon as the license is active and CSC transport is
+    configured. See [CSC / QES Signing](/docs/self-hosting/configuration/signing-certificate/csc-qes)
+    for the full setup.
+  </Accordion>
+  <Accordion title="SSO, embed white-label, 21 CFR Part 11, and similar">
+    These are granted per-organisation rather than instance-wide. As an instance admin:
+
+    1. Go to **Admin Panel → Claims** and create (or edit) a subscription claim with the features
+       you need enabled. Only features included in your license can be added.
+    2. Go to **Admin Panel → Organisations**, open the organisation, and assign that claim to it.
+    3. Organisation admins can then configure the feature under their organisation's settings — for
+       example, SSO is configured under **Organisation Settings → SSO**.
+
+  </Accordion>
+</Accordions>
+
+<Callout type="warn">
+  If an organisation's claim includes a feature your license doesn't cover, the license status
+  will show as unauthorized in the admin panel until the claim is brought back in line with your
+  license.
+</Callout>
+
+## Troubleshooting
+
+<Accordions type="multiple">
+  <Accordion title="License shows as invalid or not found">
+    - Confirm the key is present in the environment the running process actually reads — `docker
+      exec` into the container and check `env | grep LICENSE` if unsure.
+    - Confirm the instance was restarted after the variable was set, not just left running.
+    - Re-copy the key to rule out truncation or accidental whitespace.
+  </Accordion>
+  <Accordion title="License is active, but a feature is still unavailable">
+    Instance-wide features (like CSC signing) only need an active license and correct
+    configuration. Per-organisation features (like SSO) also need the organisation's claim to
+    include that feature — see Step 4 above.
+  </Accordion>
+  <Accordion title="Status shows Unauthorized">
+    This means an organisation on your instance has a feature enabled in its claim that your
+    license doesn't cover. Adjust the claim in **Admin Panel → Claims** so it matches what your
+    license includes.
+  </Accordion>
+</Accordions>
+
+## See Also
+
+- [Environment Variables](/docs/self-hosting/configuration/environment) - Complete configuration reference
+- [Enterprise Edition](/docs/policies/enterprise-edition) - What's included and how to purchase a license
+- [CSC / QES Signing](/docs/self-hosting/configuration/signing-certificate/csc-qes) - Enable CSC-based signing
