@@ -90,7 +90,7 @@ export default function TeamsSettingsPage() {
         title: t`Document preferences updated`,
         description: t`Your document preferences have been updated`,
       });
-    } catch {
+    } catch (err) {
       toast({
         title: t`Something went wrong!`,
         description: t`We were unable to update your document preferences at this time, please try again later`,
