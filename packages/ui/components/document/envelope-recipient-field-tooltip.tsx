@@ -154,7 +154,7 @@ export function EnvelopeRecipientFieldTooltip({
         }
         contentProps={{
           className: 'flex w-64 flex-col overflow-hidden p-0 text-sm',
-          sideOffset: 6,
+          sideOffset: 20,
         }}
       >
         <div className="flex items-center gap-2 p-3">
