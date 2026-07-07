@@ -59,7 +59,9 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
         <Avatar className="h-24 w-24 border-2 border-solid dark:border-border">
           {publicProfile.avatarImageId && <AvatarImage src={formatAvatarUrl(publicProfile.avatarImageId)} />}
 
-          <AvatarFallback className="text-gray-400 text-sm">{extractInitials(publicProfile.name)}</AvatarFallback>
+          <AvatarFallback className="text-muted-foreground text-sm">
+            {extractInitials(publicProfile.name)}
+          </AvatarFallback>
         </Avatar>
 
         <div className="mt-4 flex flex-row items-center justify-center">
@@ -138,7 +140,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
           <Table className="w-full" overflowHidden>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-full rounded-tl-md bg-neutral-50 dark:bg-neutral-700">
+                <TableHead className="w-full rounded-tl-md bg-muted">
                   <Trans>Documents</Trans>
                 </TableHead>
               </TableRow>

@@ -261,7 +261,7 @@ export const EnvelopeEditorPreviewPage = () => {
 
         {/* Right Section - Form Fields Panel */}
         {currentEnvelopeItem && false && (
-          <div className="sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-gray-200 border-l bg-white py-4">
+          <div className="sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-border border-l bg-background py-4">
             {/* Add fields section. */}
             <section className="px-4">
               {/* <h3 className="mb-2 text-sm font-semibold text-gray-900">
@@ -326,7 +326,7 @@ export const EnvelopeEditorPreviewPage = () => {
 
                     {/* Recipient selector section. */}
                     <section className="px-4">
-                      <h3 className="mb-2 font-semibold text-gray-900 text-sm">
+                      <h3 className="mb-2 font-semibold text-foreground text-sm">
                         <Trans>Selected Recipient</Trans>
                       </h3>
 

@@ -63,7 +63,7 @@ const AvatarWithText = ({
   <div className={cn('flex w-full max-w-xs items-center gap-2', className)}>
     <Avatar className={cn('h-10 w-10 border-2 border-white border-solid dark:border-border', avatarClass)}>
       {avatarSrc && <AvatarImage src={avatarSrc} />}
-      <AvatarFallback className="text-gray-400 text-xs">{avatarFallback}</AvatarFallback>
+      <AvatarFallback className="text-muted-foreground text-xs">{avatarFallback}</AvatarFallback>
     </Avatar>
 
     <div className={cn('flex flex-col truncate text-left font-normal text-sm', textSectionClassName)}>
