@@ -94,7 +94,7 @@ export default function SettingsSecuritySessions() {
 
   return (
     <div>
-      <SettingsHeader title={t`Active sessions`} subtitle={t`View and manage all active sessions for your account.`}>
+      <SettingsHeader title={t`Active Sessions`} subtitle={t`View and manage all active sessions for your account.`}>
         <SessionLogoutAllDialog onSuccess={refetch} disabled={results.length === 1 || isLoading} />
       </SettingsHeader>
 

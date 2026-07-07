@@ -79,7 +79,7 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
 
       toast({
         title: t`Success`,
-        description: t`Team members have been added.`,
+        description: t`Team groups have been added.`,
         duration: 5000,
       });
 
@@ -87,7 +87,7 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
     } catch {
       toast({
         title: t`An unknown error occurred`,
-        description: t`We encountered an unknown error while attempting to add team members. Please try again later.`,
+        description: t`We encountered an unknown error while attempting to add the groups. Please try again later.`,
         variant: 'destructive',
       });
     }
@@ -134,7 +134,7 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
               </DialogTitle>
 
               <DialogDescription>
-                <Trans>Configure the team roles for each group</Trans>
+                <Trans>Configure the team roles for each group.</Trans>
               </DialogDescription>
             </DialogHeader>
           ))
@@ -260,7 +260,7 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
                     </Button>
 
                     <Button type="submit" loading={form.formState.isSubmitting}>
-                      <Trans>Create Groups</Trans>
+                      <Trans>Add Groups</Trans>
                     </Button>
                   </DialogFooter>
                 </>

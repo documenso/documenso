@@ -115,10 +115,10 @@ export default function TeamsSettingsPage() {
   }
 
   return (
-    <div className="max-w-2xl">
+    <div>
       <SettingsHeader
         title={t`Branding Preferences`}
-        subtitle={t`Here you can set preferences and defaults for branding.`}
+        subtitle={t`Set the default branding for documents sent by your team.`}
       />
 
       {canConfigureBranding ? (

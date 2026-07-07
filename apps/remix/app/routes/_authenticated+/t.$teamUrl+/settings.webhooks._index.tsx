@@ -88,10 +88,7 @@ export default function WebhookPage() {
 
   return (
     <div>
-      <SettingsHeader
-        title={t`Webhooks`}
-        subtitle={t`On this page, you can create new Webhooks and manage the existing ones.`}
-      >
+      <SettingsHeader title={t`Webhooks`} subtitle={t`Create and manage webhooks for document events.`}>
         <WebhookCreateDialog />
       </SettingsHeader>
       {isLoading && (

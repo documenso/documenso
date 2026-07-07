@@ -5,7 +5,7 @@ import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { CheckCircle2, Clock } from 'lucide-react';
 import { match, P } from 'ts-pattern';
 
@@ -33,13 +33,15 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 }
 
 export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) {
+  const { t } = useLingui();
+
   const { team } = loaderData;
 
   const currentTeam = useCurrentTeam();
 
   return (
-    <div className="max-w-2xl">
-      <SettingsHeader title="General settings" subtitle="Here you can edit your team's details." />
+    <div>
+      <SettingsHeader title={t`General`} subtitle={t`Update your team's details.`} />
 
       <AvatarImageForm team={currentTeam} className="mb-8" />
 

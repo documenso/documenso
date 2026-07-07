@@ -30,7 +30,7 @@ export default function ApiTokensPage() {
         title={<Trans>API Tokens</Trans>}
         subtitle={
           <Trans>
-            On this page, you can create and manage API tokens. See our{' '}
+            Create and manage API tokens. See our{' '}
             <a
               className="text-primary underline"
               href={'https://docs.documenso.com/developers/public-api'}
@@ -57,7 +57,7 @@ export default function ApiTokensPage() {
         </Alert>
       ) : (
         <>
-          <ApiTokenForm className="max-w-xl" tokens={tokens} />
+          <ApiTokenForm tokens={tokens} />
 
           <hr className="mt-8 mb-4" />
 
@@ -74,7 +74,7 @@ export default function ApiTokensPage() {
           )}
 
           {tokens && tokens.length > 0 && (
-            <div className="mt-4 flex max-w-xl flex-col gap-y-4">
+            <div className="mt-4 flex flex-col gap-y-4">
               {tokens.map((token) => (
                 <div key={token.id} className="rounded-lg border border-border p-4">
                   <div className="flex items-center justify-between gap-x-4">

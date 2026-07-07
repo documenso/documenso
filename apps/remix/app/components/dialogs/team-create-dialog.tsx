@@ -155,7 +155,7 @@ export const TeamCreateDialog = ({ trigger, onCreated, ...props }: TeamCreateDia
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
         {trigger ?? (
           <Button className="flex-shrink-0" variant="secondary">
-            <Trans>Create team</Trans>
+            <Trans>Create Team</Trans>
           </Button>
         )}
       </DialogTrigger>
@@ -163,7 +163,7 @@ export const TeamCreateDialog = ({ trigger, onCreated, ...props }: TeamCreateDia
       <DialogContent position="center">
         <DialogHeader>
           <DialogTitle>
-            <Trans>Create team</Trans>
+            <Trans>Create Team</Trans>
           </DialogTitle>
 
           <DialogDescription>

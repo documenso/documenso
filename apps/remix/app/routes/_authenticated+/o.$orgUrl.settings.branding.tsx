@@ -123,13 +123,13 @@ export default function OrganisationSettingsBrandingPage() {
   const settingsHeaderText = t`Branding Preferences`;
 
   const settingsHeaderSubtitle = isPersonalLayoutMode
-    ? t`Here you can set your general branding preferences.`
+    ? t`Set the default branding for documents you send.`
     : team
-      ? t`Here you can set branding preferences for your team.`
-      : t`Here you can set branding preferences for your organisation. Teams will inherit these settings by default.`;
+      ? t`Set the default branding for documents sent by your team.`
+      : t`Set the default branding for your organisation. Teams inherit these settings by default.`;
 
   return (
-    <div className="max-w-2xl">
+    <div>
       <SettingsHeader title={settingsHeaderText} subtitle={settingsHeaderSubtitle} />
 
       {organisationWithSettings.organisationClaim.flags.allowCustomBranding || !IS_BILLING_ENABLED() ? (

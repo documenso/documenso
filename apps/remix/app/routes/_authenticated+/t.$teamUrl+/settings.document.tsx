@@ -110,11 +110,8 @@ export default function TeamsSettingsPage() {
   }
 
   return (
-    <div className="max-w-2xl">
-      <SettingsHeader
-        title={t`Document Preferences`}
-        subtitle={t`Here you can set preferences and defaults for your team.`}
-      />
+    <div>
+      <SettingsHeader title={t`Document Preferences`} subtitle={t`Set the default document settings for your team.`} />
 
       <section>
         <DocumentPreferencesForm

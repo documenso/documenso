@@ -75,7 +75,7 @@ export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: Ema
   return (
     <Form {...form}>
       <form onSubmit={handleFormSubmit}>
-        <fieldset className="flex h-full max-w-2xl flex-col gap-y-6" disabled={form.formState.isSubmitting}>
+        <fieldset className="flex h-full flex-col gap-y-6" disabled={form.formState.isSubmitting}>
           {organisation.organisationClaim.flags.emailDomains && (
             <FormField
               control={form.control}

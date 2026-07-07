@@ -355,8 +355,8 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
   await page.getByRole('button', { name: 'Next' }).click();
   await page.getByRole('combobox').click();
   await page.getByRole('option', { name: 'Manager' }).click();
-  await page.getByRole('button', { name: 'Create Groups' }).click();
-  await expect(page.getByText('Team members have been added').first()).toBeVisible();
+  await page.getByRole('button', { name: 'Add Groups' }).click();
+  await expect(page.getByText('Team groups have been added').first()).toBeVisible();
 
   // Assign CUSTOM_GROUP_B to TeamA
   await page.goto(`/t/${teamA}/settings/groups`);
@@ -368,8 +368,8 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
   await page.getByRole('button', { name: 'Next' }).click();
   await page.getByRole('combobox').click();
   await page.getByRole('option', { name: 'Manager' }).click();
-  await page.getByRole('button', { name: 'Create Groups' }).click();
-  await expect(page.getByText('Team members have been added').first()).toBeVisible();
+  await page.getByRole('button', { name: 'Add Groups' }).click();
+  await expect(page.getByText('Team groups have been added').first()).toBeVisible();
 
   // Update CUSTOM_GROUP_B
   const updateBtn = page.getByRole('row', { name: 'CUSTOM_GROUP_B' }).getByRole('button');

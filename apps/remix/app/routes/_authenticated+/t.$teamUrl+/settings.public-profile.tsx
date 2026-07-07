@@ -128,11 +128,8 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
   }, [profile.enabled]);
 
   return (
-    <div className="max-w-2xl">
-      <SettingsHeader
-        title={t`Public Profile`}
-        subtitle={t`You can choose to enable or disable the profile for public view.`}
-      >
+    <div>
+      <SettingsHeader title={t`Public Profile`} subtitle={t`Manage your public profile and the templates shown on it.`}>
         <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
           <TooltipTrigger asChild>
             <div
@@ -190,7 +187,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
       <div className="mt-4">
         <SettingsHeader
           title={t`Templates`}
-          subtitle={t`Show templates in your public profile for your audience to sign and get started quickly`}
+          subtitle={t`Show templates in your public profile for your audience to sign and get started quickly.`}
           hideDivider={true}
           className="mt-8 [&>*>h3]:text-base"
         >

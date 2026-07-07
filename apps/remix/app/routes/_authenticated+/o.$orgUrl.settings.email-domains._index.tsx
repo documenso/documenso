@@ -33,7 +33,7 @@ export default function OrganisationSettingsEmailDomains() {
 
   return (
     <div>
-      <SettingsHeader title={t`Email Domains`} subtitle={t`Here you can add email domains to your organisation.`}>
+      <SettingsHeader title={t`Email Domains`} subtitle={t`Add and verify email domains for your organisation.`}>
         {isEmailDomainsEnabled && <OrganisationEmailDomainCreateDialog />}
       </SettingsHeader>
 

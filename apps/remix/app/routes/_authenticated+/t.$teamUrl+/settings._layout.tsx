@@ -1,14 +1,14 @@
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
-import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { BracesIcon, Globe2Icon, GroupIcon, Settings2Icon, SettingsIcon, Users2Icon, WebhookIcon } from 'lucide-react';
-import { Link, NavLink, Outlet, redirect } from 'react-router';
+import { Link, Outlet, redirect } from 'react-router';
 
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
+import { SettingsNav, type SettingsNavRoute } from '~/components/general/settings-nav';
 import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
@@ -40,17 +40,18 @@ export default function TeamsSettingsLayout() {
 
   const team = useCurrentTeam();
 
-  const teamSettingRoutes = [
+  const teamSettingRoutes: SettingsNavRoute[] = [
     {
       path: `/t/${team.url}/settings`,
       label: t`General`,
       icon: SettingsIcon,
+      end: true,
     },
     {
       path: `/t/${team.url}/settings/document`,
       label: t`Preferences`,
       icon: Settings2Icon,
-      isSubNavParent: true,
+      isSectionLabel: true,
     },
     {
       path: `/t/${team.url}/settings/document`,
@@ -124,31 +125,9 @@ export default function TeamsSettingsLayout() {
       </h1>
 
       <div className="mt-4 grid grid-cols-12 gap-x-8 md:mt-8">
-        <div
-          className={cn(
-            'col-span-12 mb-8 flex flex-wrap items-center justify-start gap-x-2 gap-y-4 md:col-span-3 md:w-full md:flex-col md:items-start md:gap-y-2',
-          )}
-        >
-          {teamSettingRoutes.map((route) => (
-            <NavLink
-              to={route.path}
-              className={cn('group w-full justify-start', route.isSubNav && 'pl-8')}
-              key={route.path}
-            >
-              <Button
-                variant="ghost"
-                className={cn('w-full justify-start', {
-                  'group-aria-[current]:bg-secondary': !route.isSubNavParent,
-                })}
-              >
-                {route.icon && <route.icon className="mr-2 h-5 w-5" />}
-                <Trans>{route.label}</Trans>
-              </Button>
-            </NavLink>
-          ))}
-        </div>
+        <SettingsNav routes={teamSettingRoutes} className="col-span-12 mb-8 md:col-span-3 md:mb-0" />
 
-        <div className="col-span-12 md:col-span-9">
+        <div className="col-span-12 max-w-3xl md:col-span-9">
           <Outlet />
         </div>
       </div>

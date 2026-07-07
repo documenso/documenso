@@ -106,7 +106,7 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
             <Trans>Create webhook</Trans>
           </DialogTitle>
           <DialogDescription>
-            <Trans>On this page, you can create a new webhook.</Trans>
+            <Trans>Receive real-time notifications when document events occur.</Trans>
           </DialogDescription>
         </DialogHeader>
 

@@ -89,9 +89,9 @@ export default function TeamsSettingBillingPage() {
 
   return (
     <div>
-      <div className="flex flex-row items-end justify-between">
+      <div className="flex flex-row items-center justify-between">
         <div>
-          <h3 className="font-semibold text-2xl">
+          <h3 className="font-medium text-lg">
             <Trans>Billing</Trans>
           </h3>
 

@@ -10,10 +10,10 @@ import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags(msg`Settings`);
+  return appMetaTags(msg`Email Preferences`);
 }
 
-export default function TeamEmailSettingsGeneral() {
+export default function TeamEmailSettingsPage() {
   const { t } = useLingui();
   const { toast } = useToast();
 
@@ -59,8 +59,8 @@ export default function TeamEmailSettingsGeneral() {
   }
 
   return (
-    <div className="max-w-2xl">
-      <SettingsHeader title={t`Email Preferences`} subtitle={t`You can manage your email preferences here.`} />
+    <div>
+      <SettingsHeader title={t`Email Preferences`} subtitle={t`Manage the default email settings for your team.`} />
 
       <section>
         <EmailPreferencesForm

@@ -162,7 +162,7 @@ export const DocumentPreferencesForm = ({
   return (
     <Form {...form}>
       <form onSubmit={handleFormSubmit}>
-        <fieldset className="flex h-full max-w-2xl flex-col gap-y-6" disabled={form.formState.isSubmitting}>
+        <fieldset className="flex h-full flex-col gap-y-6" disabled={form.formState.isSubmitting}>
           {!isPersonalLayoutMode && (
             <FormField
               control={form.control}

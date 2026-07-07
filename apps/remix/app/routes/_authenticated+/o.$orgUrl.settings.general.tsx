@@ -21,8 +21,8 @@ export default function OrganisationSettingsGeneral() {
   const organisation = useCurrentOrganisation();
 
   return (
-    <div className="max-w-2xl">
-      <SettingsHeader title={_(msg`General`)} subtitle={_(msg`Here you can edit your organisation details.`)} />
+    <div>
+      <SettingsHeader title={_(msg`General`)} subtitle={_(msg`Update your organisation's details.`)} />
 
       <div className="space-y-8">
         <AvatarImageForm organisation={organisation} />

@@ -62,10 +62,7 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
 
   return (
     <div>
-      <SettingsHeader
-        title={_(msg`Security`)}
-        subtitle={_(msg`Here you can manage your password and security settings.`)}
-      />
+      <SettingsHeader title={_(msg`Security`)} subtitle={_(msg`Manage your password and security settings.`)} />
       {hasEmailPasswordAccount && (
         <>
           <PasswordForm user={user} />

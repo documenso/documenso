@@ -1,4 +1,6 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { useSession } from '@documenso/lib/client-only/providers/session';
+import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -13,11 +15,15 @@ export function meta() {
   return appMetaTags(msg`Email Preferences`);
 }
 
-export default function OrganisationSettingsGeneral() {
+export default function OrganisationSettingsEmailPage() {
   const { t } = useLingui();
   const { toast } = useToast();
 
   const organisation = useCurrentOrganisation();
+
+  const { organisations } = useSession();
+
+  const isPersonalLayoutMode = isPersonalLayout(organisations);
 
   const { data: organisationWithSettings, isLoading: isLoadingOrganisation } = trpc.organisation.get.useQuery({
     organisationReference: organisation.url,
@@ -59,8 +65,15 @@ export default function OrganisationSettingsGeneral() {
   }
 
   return (
-    <div className="max-w-2xl">
-      <SettingsHeader title={t`Email Preferences`} subtitle={t`You can manage your email preferences here.`} />
+    <div>
+      <SettingsHeader
+        title={t`Email Preferences`}
+        subtitle={
+          isPersonalLayoutMode
+            ? t`Manage your default email settings.`
+            : t`Manage the default email settings for your organisation. Teams inherit these settings by default.`
+        }
+      />
 
       <section>
         <EmailPreferencesForm

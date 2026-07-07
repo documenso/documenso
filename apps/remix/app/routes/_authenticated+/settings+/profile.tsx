@@ -27,14 +27,14 @@ export default function SettingsProfile() {
 
   return (
     <div>
-      <SettingsHeader title={_(msg`Profile`)} subtitle={_(msg`Here you can edit your personal details.`)} />
+      <SettingsHeader title={_(msg`Profile`)} subtitle={_(msg`Update your personal details.`)} />
 
-      <AvatarImageForm className="mb-8 max-w-xl" />
-      <ProfileForm className="mb-8 max-w-xl" />
+      <AvatarImageForm className="mb-8" />
+      <ProfileForm className="mb-8" />
 
-      <hr className="my-4 max-w-xl" />
+      <hr className="my-4" />
 
-      <div className="max-w-xl space-y-8">
+      <div className="space-y-8">
         <AnimatePresence>
           {(!isPersonalLayoutMode || user.email !== teamEmail?.email) && teamEmail && (
             <AnimateGenericFadeInOut>

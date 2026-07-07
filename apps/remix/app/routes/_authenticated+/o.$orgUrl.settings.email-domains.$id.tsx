@@ -132,7 +132,7 @@ export default function OrganisationEmailDomainSettingsPage({ params }: Route.Co
 
   return (
     <div>
-      <SettingsHeader title={t`Email Domain Settings`} subtitle={t`Manage your email domain settings.`}>
+      <SettingsHeader title={t`Email Domain Settings`} subtitle={t`Manage the email addresses for this domain.`}>
         <OrganisationEmailCreateDialog emailDomain={emailDomain} />
       </SettingsHeader>
 

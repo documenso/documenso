@@ -46,7 +46,10 @@ export default function TeamsSettingsMembersPage() {
 
   return (
     <div>
-      <SettingsHeader title={_(msg`Organisation Members`)} subtitle={_(msg`Manage the members or invite new members.`)}>
+      <SettingsHeader
+        title={_(msg`Organisation Members`)}
+        subtitle={_(msg`Manage the members and invitations for your organisation.`)}
+      >
         <OrganisationMemberInviteDialog />
       </SettingsHeader>
 
