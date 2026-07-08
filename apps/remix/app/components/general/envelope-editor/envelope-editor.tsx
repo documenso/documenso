@@ -9,9 +9,10 @@ import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowLeftIcon,
+  CheckIcon,
   CopyPlusIcon,
   DownloadCloudIcon,
   EyeIcon,
@@ -229,101 +230,125 @@ export const EnvelopeEditor = () => {
             </div>
           ) : (
             <div className="px-4">
-              <h3 className="flex items-end justify-between font-semibold text-foreground text-sm">
+              <h3 className="flex items-baseline justify-between font-semibold text-foreground text-sm tracking-tight">
                 {isDocument ? <Trans>Document Editor</Trans> : <Trans>Template Editor</Trans>}
 
-                <span className="ml-2 rounded border bg-muted/50 px-2 py-0.5 text-muted-foreground text-xs">
+                <span className="text-muted-foreground text-xs tabular-nums">
                   <Trans context="The step counter">
                     Step {currentStepData.order}/{envelopeEditorSteps.length}
                   </Trans>
                 </span>
               </h3>
-
-              <div className="relative my-4 h-[4px] rounded-md bg-muted">
-                <motion.div
-                  layout="size"
-                  layoutId="document-flow-container-step"
-                  className="absolute inset-y-0 left-0 bg-primary"
-                  style={{
-                    width: `${(100 / envelopeEditorSteps.length) * (currentStepData.order ?? 0)}%`,
-                  }}
-                />
-              </div>
             </div>
           )}
 
-          <div
-            className={cn('space-y-3', {
-              'px-4': !minimizeLeftSidebar,
-              'mt-4 flex flex-col items-center': minimizeLeftSidebar,
+          <nav
+            className={cn('flex flex-col', {
+              'mt-5 px-4': !minimizeLeftSidebar,
+              'mt-4 items-center': minimizeLeftSidebar,
             })}
           >
-            {envelopeEditorSteps.map((step) => {
+            {envelopeEditorSteps.map((step, index) => {
               const Icon = step.icon;
               const isActive = searchParamsStep === step.id;
+              const isCompleted = (currentStepData.order ?? 0) > step.order;
+              const isLast = index === envelopeEditorSteps.length - 1;
 
               return (
                 <button
                   key={step.id}
                   data-testid={`envelope-editor-step-${step.id}`}
                   type="button"
-                  className={cn(
-                    `cursor-pointer rounded-lg text-left transition-colors ${
-                      isActive
-                        ? 'border border-green-200 bg-green-50 dark:border-green-500/20 dark:bg-green-500/10'
-                        : 'border border-gray-200 hover:bg-gray-50 dark:border-gray-400/20 dark:hover:bg-gray-400/10'
-                    }`,
-                    {
-                      'p-3': !minimizeLeftSidebar,
-                    },
-                  )}
+                  title={minimizeLeftSidebar ? t(step.title) : undefined}
+                  aria-current={isActive ? 'step' : undefined}
+                  className="group flex cursor-pointer rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   onClick={() => void navigateToStep(step.id as EnvelopeEditorStep)}
                 >
-                  <div className="flex items-center space-x-3">
+                  <div className="flex flex-col items-center">
                     <div
-                      className={`rounded border p-2 ${
-                        isActive
-                          ? 'border-green-200 bg-green-50 dark:border-green-500/20 dark:bg-green-500/10'
-                          : 'border-gray-100 bg-gray-100 dark:border-gray-400/20 dark:bg-gray-400/10'
-                      }`}
+                      className={cn(
+                        'flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border transition-[color,border-color,background-color,box-shadow] duration-150',
+                        {
+                          'border-primary bg-primary text-primary-foreground': isCompleted,
+                          'border-primary bg-primary/10 text-documenso-700 ring-4 ring-primary/10 dark:text-primary':
+                            isActive,
+                          'border-border bg-background text-muted-foreground group-hover:border-muted-foreground/40 group-hover:text-foreground':
+                            !isActive && !isCompleted,
+                        },
+                      )}
                     >
-                      <Icon className={`h-4 w-4 ${isActive ? 'text-green-600' : 'text-gray-600'}`} />
+                      {isCompleted ? (
+                        <motion.span
+                          className="flex"
+                          initial={{ scale: 0.5, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                        >
+                          <CheckIcon className="h-3.5 w-3.5" />
+                        </motion.span>
+                      ) : (
+                        <Icon className="h-3.5 w-3.5" />
+                      )}
                     </div>
 
-                    {!minimizeLeftSidebar && (
-                      <div>
-                        <div
-                          className={`font-medium text-sm ${
-                            isActive
-                              ? 'text-green-900 dark:text-green-400'
-                              : 'text-foreground dark:text-muted-foreground'
-                          }`}
-                        >
-                          {t(step.title)}
-                        </div>
-                        <div className="text-muted-foreground text-xs">{t(step.description)}</div>
+                    {!isLast && (
+                      <div className="relative my-1 min-h-4 w-px flex-1 overflow-hidden bg-border">
+                        <motion.div
+                          className="absolute inset-x-0 top-0 bg-primary"
+                          initial={false}
+                          animate={{ height: isCompleted ? '100%' : '0%' }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                        />
                       </div>
                     )}
                   </div>
+
+                  {!minimizeLeftSidebar && (
+                    <div className={cn('ml-3 min-w-0 pt-1', !isLast && 'pb-5')}>
+                      <div
+                        className={cn('font-medium text-sm transition-colors duration-150', {
+                          'text-documenso-800 dark:text-primary': isActive,
+                          'text-foreground': isCompleted,
+                          'text-muted-foreground group-hover:text-foreground': !isActive && !isCompleted,
+                        })}
+                      >
+                        {t(step.title)}
+                      </div>
+
+                      <AnimatePresence initial={false}>
+                        {isActive && (
+                          <motion.div
+                            className="overflow-hidden"
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.15, ease: 'easeOut' }}
+                          >
+                            <div className="mt-0.5 text-muted-foreground text-xs">{t(step.description)}</div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  )}
                 </button>
               );
             })}
-          </div>
+          </nav>
 
           <Separator
-            className={cn('my-6', {
+            className={cn('my-5', {
               'mx-auto mb-4 w-4/5': minimizeLeftSidebar,
             })}
           />
 
           {/* Quick Actions. */}
           <div
-            className={cn('space-y-3 px-4 [&_.lucide]:text-muted-foreground', {
+            className={cn('space-y-1 px-4 [&_.lucide]:text-muted-foreground', {
               'px-2': minimizeLeftSidebar,
             })}
           >
             {!minimizeLeftSidebar && (
-              <h4 className="font-semibold text-foreground text-sm">
+              <h4 className="mb-2 px-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">
                 <Trans>Quick Actions</Trans>
               </h4>
             )}
@@ -467,7 +492,7 @@ export const EnvelopeEditor = () => {
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="w-full justify-start"
+                    className="w-full justify-start hover:bg-destructive/10 hover:text-destructive hover:[&_.lucide]:text-destructive"
                     title={t(msg`Delete Envelope`)}
                   >
                     <Trash2Icon className="h-4 w-4" />
@@ -493,13 +518,14 @@ export const EnvelopeEditor = () => {
           {/* Footer of left sidebar. */}
           {!editorConfig.embedded && (
             <div
-              className={cn('mt-auto px-4', {
+              className={cn('mt-auto border-border border-t px-4 pt-3', {
                 'px-2': minimizeLeftSidebar,
               })}
             >
               <Button
                 variant="ghost"
-                className={cn('w-full justify-start', {
+                size="sm"
+                className={cn('w-full justify-start text-muted-foreground hover:text-foreground', {
                   'flex items-center justify-center': minimizeLeftSidebar,
                 })}
                 asChild

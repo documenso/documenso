@@ -216,7 +216,7 @@ export const EnvelopeEditorFieldsPage = () => {
                   <div className="relative flex h-5 w-5 flex-shrink-0 items-center justify-center">
                     <div
                       className={cn('h-2 w-2 rounded-full transition-opacity duration-150 group-hover:opacity-0', {
-                        'bg-green-500': currentEnvelopeItem?.id === item.id,
+                        'bg-primary': currentEnvelopeItem?.id === item.id,
                       })}
                     />
                     <EnvelopeItemEditDialog
