@@ -1,9 +1,9 @@
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { cn } from '@documenso/ui/lib/utils';
 import { Plural } from '@lingui/react/macro';
+import { FileTextIcon } from 'lucide-react';
 
 type EnvelopeItemSelectorProps = {
-  number: number;
   primaryText: React.ReactNode;
   secondaryText: React.ReactNode;
   isSelected: boolean;
@@ -12,7 +12,6 @@ type EnvelopeItemSelectorProps = {
 };
 
 export const EnvelopeItemSelector = ({
-  number,
   primaryText,
   secondaryText,
   isSelected,
@@ -20,34 +19,42 @@ export const EnvelopeItemSelector = ({
   actionSlot,
 }: EnvelopeItemSelectorProps) => {
   return (
-    <button
-      title={typeof primaryText === 'string' ? primaryText : undefined}
-      className={`group flex h-fit max-w-72 flex-shrink-0 cursor-pointer items-center space-x-3 rounded-lg border px-4 py-3 transition-colors ${
+    <div
+      className={cn(
+        'group relative flex h-9 max-w-64 flex-shrink-0 items-center rounded-md border transition-colors',
         isSelected
-          ? 'border-green-200 bg-green-50 text-green-900 dark:border-green-400/30 dark:bg-green-400/10 dark:text-green-400'
-          : 'border-border bg-muted/50 hover:bg-muted/70'
-      }`}
-      {...buttonProps}
-    >
-      <div
-        className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full font-medium text-xs ${
-          isSelected ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-600'
-        }`}
-      >
-        {number}
-      </div>
-      <div className="min-w-0 text-left">
-        <div className="truncate font-medium text-sm">{primaryText}</div>
-        <div className="text-gray-500 text-xs">{secondaryText}</div>
-      </div>
-      {actionSlot ?? (
-        <div
-          className={cn('h-2 w-2 flex-shrink-0 rounded-full', {
-            'bg-green-500': isSelected,
-          })}
-        />
+          ? 'border-border bg-background text-foreground shadow-sm'
+          : 'border-transparent text-muted-foreground hover:bg-muted/70 hover:text-foreground',
       )}
-    </button>
+    >
+      <button
+        type="button"
+        title={typeof primaryText === 'string' ? primaryText : undefined}
+        aria-pressed={isSelected}
+        className={cn(
+          'flex h-full min-w-0 cursor-pointer items-center gap-2 rounded-md pl-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          actionSlot ? 'pr-1' : 'pr-3',
+        )}
+        {...buttonProps}
+      >
+        <FileTextIcon className="h-4 w-4 flex-shrink-0 opacity-60" />
+        <span className="truncate font-medium text-sm">{primaryText}</span>
+        {secondaryText ? (
+          <span
+            className={cn(
+              'flex-shrink-0 rounded-full px-1.5 py-px text-xs tabular-nums',
+              isSelected
+                ? 'bg-green-100 text-green-700 dark:bg-green-400/20 dark:text-green-400'
+                : 'bg-muted text-muted-foreground',
+            )}
+          >
+            {secondaryText}
+          </span>
+        ) : null}
+      </button>
+
+      {actionSlot && <div className="flex flex-shrink-0 items-center pr-2">{actionSlot}</div>}
+    </div>
   );
 };
 
@@ -67,11 +74,10 @@ export const EnvelopeRendererFileSelector = ({
   const { envelopeItems, currentEnvelopeItem, setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
 
   return (
-    <div className={cn('scrollbar-hidden flex h-fit flex-shrink-0 space-x-2 overflow-x-auto p-4', className)}>
-      {envelopeItems.map((doc, i) => (
+    <div className={cn('scrollbar-hidden flex h-fit flex-shrink-0 gap-1.5 overflow-x-auto py-3', className)}>
+      {envelopeItems.map((doc) => (
         <EnvelopeItemSelector
           key={doc.id}
-          number={i + 1}
           primaryText={doc.title}
           secondaryText={
             secondaryOverride ?? (

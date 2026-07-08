@@ -21,7 +21,6 @@ import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { getOverlappingFieldPairs } from '@documenso/lib/utils/fields-overlap';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
-import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
@@ -213,26 +212,19 @@ export const EnvelopeEditorFieldsPage = () => {
             editorConfig.envelopeItems.allowReplace &&
             envelopeItemPermissions.canFileBeChanged
               ? (item) => (
-                  <div className="relative flex h-5 w-5 flex-shrink-0 items-center justify-center">
-                    <div
-                      className={cn('h-2 w-2 rounded-full transition-opacity duration-150 group-hover:opacity-0', {
-                        'bg-green-500': currentEnvelopeItem?.id === item.id,
-                      })}
-                    />
-                    <EnvelopeItemEditDialog
-                      envelopeItem={item}
-                      allowConfigureTitle={editorConfig.envelopeItems?.allowConfigureTitle ?? false}
-                      trigger={
-                        <span
-                          className="absolute inset-0 flex cursor-pointer items-center justify-center opacity-0 transition-opacity duration-150 group-hover:opacity-100"
-                          onClick={(e) => e.stopPropagation()}
-                          data-testid={`envelope-item-edit-button-${item.id}`}
-                        >
-                          <PencilIcon className="h-3.5 w-3.5" />
-                        </span>
-                      }
-                    />
-                  </div>
+                  <EnvelopeItemEditDialog
+                    envelopeItem={item}
+                    allowConfigureTitle={editorConfig.envelopeItems?.allowConfigureTitle ?? false}
+                    trigger={
+                      <button
+                        type="button"
+                        className="flex h-5 w-5 flex-shrink-0 cursor-pointer items-center justify-center rounded text-muted-foreground opacity-0 transition-opacity duration-150 hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover:opacity-100"
+                        data-testid={`envelope-item-edit-button-${item.id}`}
+                      >
+                        <PencilIcon className="h-3.5 w-3.5" />
+                      </button>
+                    }
+                  />
                 )
               : undefined
           }

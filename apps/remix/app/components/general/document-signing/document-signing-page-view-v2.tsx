@@ -240,10 +240,9 @@ export const DocumentSigningPageViewV2 = () => {
             {/* Horizontal envelope item selector */}
             {envelopeItems.length > 1 && (
               <div className="flex h-fit space-x-2 overflow-x-auto p-2 pt-4 sm:p-4">
-                {envelopeItems.map((doc, i) => (
+                {envelopeItems.map((doc) => (
                   <EnvelopeItemSelector
                     key={doc.id}
-                    number={i + 1}
                     primaryText={doc.title}
                     secondaryText={
                       <Plural
