@@ -1,6 +1,6 @@
 import Konva from 'konva';
 
-import { DEFAULT_STANDARD_FONT_SIZE } from '../../constants/pdf';
+import { DEFAULT_STANDARD_FONT_SIZE, MIN_STANDARD_FONT_SIZE } from '../../constants/pdf';
 import type { GenericTextFieldTypeMetas } from '../../types/field-meta';
 import {
   FIELD_DEFAULT_GENERIC_ALIGN,
@@ -19,6 +19,7 @@ import {
 } from './field-generic-items';
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
 import { calculateFieldPosition } from './field-renderer';
+import { type TextMeasurer, fitFontSize } from './fit-font-size';
 
 const DEFAULT_TEXT_X_PADDING = 6;
 
@@ -49,6 +50,7 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
   let textVerticalAlign: 'top' | 'middle' | 'bottom' = FIELD_DEFAULT_GENERIC_VERTICAL_ALIGN;
   let textLineHeight = FIELD_DEFAULT_LINE_HEIGHT;
   let textLetterSpacing = FIELD_DEFAULT_LETTER_SPACING;
+  let isRenderingValue = false;
 
   // Render default values for text/number if provided for editing mode.
   if (mode === 'edit' && (fieldMeta?.type === 'text' || fieldMeta?.type === 'number')) {
@@ -81,6 +83,8 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
       textAlign = fieldMeta.textAlign || FIELD_DEFAULT_GENERIC_ALIGN;
       textLetterSpacing = fieldMeta.letterSpacing || FIELD_DEFAULT_LETTER_SPACING;
       textLineHeight = fieldMeta.lineHeight || FIELD_DEFAULT_LINE_HEIGHT;
+
+      isRenderingValue = true;
     }
   }
 
@@ -95,6 +99,38 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
       textLetterSpacing = fieldMeta.letterSpacing || FIELD_DEFAULT_LETTER_SPACING;
       textLineHeight = fieldMeta.lineHeight || FIELD_DEFAULT_LINE_HEIGHT;
     }
+
+    isRenderingValue = true;
+  }
+
+  const textAreaWidth = fieldWidth - DEFAULT_TEXT_X_PADDING * 2;
+
+  let resolvedFontSize = textFontSize;
+
+  if (isRenderingValue) {
+    const measureFieldText: TextMeasurer = (text, fontFamily, fontSize, width) => {
+      const probe = new Konva.Text({
+        text,
+        fontFamily,
+        fontSize,
+        width,
+        wrap: 'word',
+        lineHeight: textLineHeight,
+        letterSpacing: textLetterSpacing,
+      });
+
+      return probe.height();
+    };
+
+    resolvedFontSize = fitFontSize(
+      textToRender,
+      konvaTextFontFamily,
+      textAreaWidth,
+      fieldHeight,
+      textFontSize,
+      MIN_STANDARD_FONT_SIZE,
+      measureFieldText,
+    );
   }
 
   // Note: Do not use native text padding since it's uniform.
@@ -105,13 +141,13 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     verticalAlign: textVerticalAlign,
     wrap: 'word',
     text: textToRender,
-    fontSize: textFontSize,
+    fontSize: resolvedFontSize,
     align: textAlign,
     lineHeight: textLineHeight,
     letterSpacing: textLetterSpacing,
     fontFamily: konvaTextFontFamily,
     fill: konvaTextFill,
-    width: fieldWidth - DEFAULT_TEXT_X_PADDING * 2,
+    width: textAreaWidth,
     height: fieldHeight,
   } satisfies Partial<Konva.TextConfig>);
 
