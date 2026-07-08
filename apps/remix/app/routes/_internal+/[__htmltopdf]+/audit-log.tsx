@@ -7,7 +7,6 @@ import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-
 import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { getTranslations } from '@documenso/lib/utils/i18n';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { EnvelopeType } from '@prisma/client';
@@ -106,82 +105,86 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="print-provider pointer-events-none mx-auto max-w-screen-md">
-      <div className="mb-6 border-b pb-4">
-        <h1 className="font-semibold text-xl">{_(msg`Audit Log`)}</h1>
-      </div>
+      <header>
+        <h1 className="font-semibold text-lg tracking-tight">{_(msg`Audit Log`)}</h1>
 
-      <Card>
-        <CardContent className="grid grid-cols-2 gap-4 p-6 text-sm print:text-xs">
-          <p>
-            <span className="font-medium">{_(msg`Envelope ID`)}</span>
+        <p className="mt-1 text-pretty text-muted-foreground text-sm">{document.title}</p>
+      </header>
 
-            <span className="mt-1 block break-words">{document.envelopeId}</span>
-          </p>
+      <dl className="mt-6 grid grid-cols-2 gap-x-8 gap-y-5">
+        <div>
+          <dt className="font-medium text-muted-foreground text-xs">{_(msg`Envelope ID`)}</dt>
 
-          <p>
-            <span className="font-medium">{_(msg`Enclosed Document`)}</span>
+          <dd className="mt-1 break-all text-foreground text-sm print:text-xs">{document.envelopeId}</dd>
+        </div>
 
-            <span className="mt-1 block break-words">{document.title}</span>
-          </p>
+        <div>
+          <dt className="font-medium text-muted-foreground text-xs">{_(msg`Owner`)}</dt>
 
-          <p>
-            <span className="font-medium">{_(msg`Status`)}</span>
+          <dd className="mt-1 break-words text-foreground text-sm print:text-xs">
+            {document.user.name} ({document.user.email})
+          </dd>
+        </div>
 
-            <span className="mt-1 block">
-              {_(document.deletedAt ? msg`Deleted` : DOCUMENT_STATUS[document.status].description).toUpperCase()}
-            </span>
-          </p>
+        <div>
+          <dt className="font-medium text-muted-foreground text-xs">{_(msg`Status`)}</dt>
 
-          <p>
-            <span className="font-medium">{_(msg`Owner`)}</span>
+          <dd className="mt-1 text-foreground text-sm print:text-xs">
+            {_(document.deletedAt ? msg`Deleted` : DOCUMENT_STATUS[document.status].description)}
+          </dd>
+        </div>
 
-            <span className="mt-1 block break-words">
-              {document.user.name} ({document.user.email})
-            </span>
-          </p>
+        <div>
+          <dt className="font-medium text-muted-foreground text-xs">{_(msg`Time Zone`)}</dt>
 
-          <p>
-            <span className="font-medium">{_(msg`Created At`)}</span>
+          <dd className="mt-1 break-words text-foreground text-sm print:text-xs">
+            {document.documentMeta?.timezone ?? 'N/A'}
+          </dd>
+        </div>
 
-            <span className="mt-1 block">
-              {DateTime.fromJSDate(document.createdAt)
-                .setLocale(APP_I18N_OPTIONS.defaultLocale)
-                .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')}
-            </span>
-          </p>
+        <div>
+          <dt className="font-medium text-muted-foreground text-xs">{_(msg`Created At`)}</dt>
 
-          <p>
-            <span className="font-medium">{_(msg`Last Updated`)}</span>
+          <dd className="mt-1 text-foreground text-sm print:text-xs">
+            {DateTime.fromJSDate(document.createdAt)
+              .setLocale(APP_I18N_OPTIONS.defaultLocale)
+              .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')}
+          </dd>
+        </div>
 
-            <span className="mt-1 block">
-              {DateTime.fromJSDate(document.updatedAt)
-                .setLocale(APP_I18N_OPTIONS.defaultLocale)
-                .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')}
-            </span>
-          </p>
+        <div>
+          <dt className="font-medium text-muted-foreground text-xs">{_(msg`Last Updated`)}</dt>
 
-          <p>
-            <span className="font-medium">{_(msg`Time Zone`)}</span>
+          <dd className="mt-1 text-foreground text-sm print:text-xs">
+            {DateTime.fromJSDate(document.updatedAt)
+              .setLocale(APP_I18N_OPTIONS.defaultLocale)
+              .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')}
+          </dd>
+        </div>
 
-            <span className="mt-1 block break-words">{document.documentMeta?.timezone ?? 'N/A'}</span>
-          </p>
+        <div>
+          <dt className="font-medium text-muted-foreground text-xs">{_(msg`Enclosed Document`)}</dt>
 
-          <div>
-            <p className="font-medium">{_(msg`Recipients`)}</p>
+          <dd className="mt-1 break-words text-foreground text-sm print:text-xs">{document.title}</dd>
+        </div>
 
-            <ul className="mt-1 list-inside list-disc">
+        <div>
+          <dt className="font-medium text-muted-foreground text-xs">{_(msg`Recipients`)}</dt>
+
+          <dd className="mt-1 text-foreground text-sm print:text-xs">
+            <ul className="space-y-0.5">
               {document.recipients.map((recipient) => (
-                <li key={recipient.id}>
+                <li key={recipient.id} className="break-words">
+                  {recipient.name} ({recipient.email}) ·{' '}
                   <span className="text-muted-foreground">
-                    [{_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}]
-                  </span>{' '}
-                  {recipient.name} ({recipient.email})
+                    {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
+                  </span>
                 </li>
               ))}
             </ul>
-          </div>
-        </CardContent>
-      </Card>
+          </dd>
+        </div>
+      </dl>
 
       <div className="mt-8">
         <InternalAuditLogTable logs={auditLogs} />

@@ -47,6 +47,7 @@ export type CertificateRecipient = {
 type GenerateCertificateOptions = {
   recipients: CertificateRecipient[];
   envelopeId: string;
+  envelopeTitle: string;
   qrToken: string | null;
   hidePoweredBy: boolean;
   i18n: I18n;
@@ -73,122 +74,208 @@ const getDevice = (userAgent?: string | null): string => {
   return `${result.os.name} - ${result.browser.name} ${result.browser.version}`;
 };
 
-const textMutedForegroundLight = '#929DAE';
 const textForeground = '#000';
 const textMutedForeground = '#64748B';
-const textRejectedRed = '#dc2626';
-const textBase = 10;
-const textSm = 9;
-const textXs = 8;
-const fontMedium = '500';
+const textMutedForegroundLight = '#929DAE';
+const textRejectedRed = '#DC2626';
+const hairlineColor = '#E5E7EB';
 
-const columnWidthPercentages = [30, 30, 40];
-const rowPadding = 12;
-const tableHeaderHeight = 38;
-const pageTopMargin = 72;
-const pageBottomMargin = 24;
-const contentMaxWidth = 768;
+const fontMedium = '500';
+const fontSemibold = '600';
+
+const textXs = 8;
+const textSm = 9.5;
+
+const pageMarginX = 48;
+const pageTopMargin = 56;
+const pageBottomMargin = 64;
+const contentMaxWidth = 640;
 
 const titleFontSize = 18;
+const headerGap = 24;
 
-type RenderLabelAndTextOptions = {
+const columnWidthPercentages = [30, 30, 40];
+const columnGap = 16;
+const rowVerticalPadding = 12;
+const fieldGap = 10;
+
+/**
+ * Formats a timestamp consistently across the certificate.
+ */
+const formatTimestamp = (date: Date) =>
+  DateTime.fromJSDate(date).setLocale(APP_I18N_OPTIONS.defaultLocale).toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)');
+
+type RenderedRow = {
+  group: Konva.Group;
+  height: number;
+};
+
+type RenderFieldOptions = {
   label: string;
   text: string;
   width: number;
   y?: number;
   labelFill?: string;
   valueFill?: string;
+  valueFontFamily?: string;
+  wrapChar?: boolean;
 };
 
-const renderLabelAndText = (options: RenderLabelAndTextOptions) => {
-  const { width, y } = options;
+/**
+ * A single description-list field: a small muted label above its value.
+ */
+const renderField = (options: RenderFieldOptions) => {
+  const { label, text, width, y, labelFill, valueFill, valueFontFamily, wrapChar } = options;
 
   const group = new Konva.Group({
-    y,
+    y: y ?? 0,
   });
 
-  const labelFill = options.labelFill ?? textMutedForeground;
-  const valueFill = options.valueFill ?? textMutedForeground;
-
-  const label = new Konva.Text({
-    x: 0,
-    y: 0,
-    text: `${options.label}: `,
+  const labelText = new Konva.Text({
+    text: label,
+    fontFamily: 'Inter',
+    fontSize: textXs,
     fontStyle: fontMedium,
-    fontFamily: 'Inter',
-    fill: labelFill,
-    fontSize: textSm,
+    fill: labelFill ?? textMutedForeground,
   });
 
-  group.add(label);
+  group.add(labelText);
 
-  const value = new Konva.Text({
-    x: label.width(),
-    y: 0,
-    width: width - label.width(),
-    fontFamily: 'Inter',
-    text: options.text,
-    fill: valueFill,
-    wrap: 'char',
-    fontSize: textSm,
+  const valueText = new Konva.Text({
+    y: labelText.height() + 4,
+    width,
+    text,
+    fontFamily: valueFontFamily ?? 'Inter',
+    fontSize: textXs + 0.5,
+    lineHeight: 1.35,
+    fill: valueFill ?? textForeground,
+    wrap: wrapChar ? 'char' : 'word',
   });
 
-  group.add(value);
+  group.add(valueText);
 
   return group;
 };
 
-type RenderRowHeaderOptions = {
-  columnWidths: number[];
+type RenderDocumentHeaderOptions = {
+  envelopeTitle: string;
+  width: number;
   i18n: I18n;
 };
 
-const renderRowHeader = (options: RenderRowHeaderOptions) => {
-  const { columnWidths, i18n } = options;
+/**
+ * First page header: title with the document title underneath.
+ */
+const renderDocumentHeader = (options: RenderDocumentHeaderOptions) => {
+  const { envelopeTitle, width, i18n } = options;
 
-  const columnOneWidth = columnWidths[0];
-  const columnTwoWidth = columnWidths[1];
-  const columnThreeWidth = columnWidths[2];
+  const group = new Konva.Group();
 
-  const headerRow = new Konva.Group();
-
-  const headerFontStyling = {
+  const title = new Konva.Text({
+    text: i18n._(msg`Signing Certificate`),
     fontFamily: 'Inter',
-    fontSize: 11,
-    fontStyle: fontMedium,
-    verticalAlign: 'middle',
+    fontSize: titleFontSize,
+    fontStyle: fontSemibold,
+    letterSpacing: -0.2,
+    fill: textForeground,
+  });
+
+  group.add(title);
+
+  const subtitle = new Konva.Text({
+    y: title.height() + 6,
+    width,
+    text: envelopeTitle,
+    fontFamily: 'Inter',
+    fontSize: textSm,
+    lineHeight: 1.4,
     fill: textMutedForeground,
-    height: tableHeaderHeight,
-  };
-
-  const header1 = new Konva.Text({
-    x: rowPadding,
-    width: columnOneWidth,
-    text: i18n._(msg`Signer Events`),
-    ...headerFontStyling,
   });
-  headerRow.add(header1);
 
-  const header2 = new Konva.Text({
-    x: columnOneWidth + rowPadding,
-    width: columnTwoWidth,
-    text: i18n._(msg`Signature`),
-    ...headerFontStyling,
-  });
-  headerRow.add(header2);
+  group.add(subtitle);
 
-  const header3 = new Konva.Text({
-    x: columnOneWidth + columnTwoWidth + rowPadding,
-    width: columnThreeWidth,
-    text: i18n._(msg`Details`),
-    ...headerFontStyling,
-  });
-  headerRow.add(header3);
-
-  return headerRow;
+  return group;
 };
 
-const columnPadding = 10;
+type RenderContinuationHeaderOptions = {
+  width: number;
+  i18n: I18n;
+};
+
+/**
+ * Compact running header for pages after the first.
+ */
+const renderContinuationHeader = (options: RenderContinuationHeaderOptions) => {
+  const { width, i18n } = options;
+
+  const group = new Konva.Group();
+
+  const title = new Konva.Text({
+    text: i18n._(msg`Signing Certificate`),
+    fontFamily: 'Inter',
+    fontSize: textSm,
+    fontStyle: fontMedium,
+    fill: textMutedForeground,
+  });
+
+  group.add(title);
+
+  const rule = new Konva.Line({
+    points: [0, 0, width, 0],
+    stroke: hairlineColor,
+    strokeWidth: 1,
+    y: title.height() + 10,
+  });
+
+  group.add(rule);
+
+  return group;
+};
+
+type RenderTableHeaderOptions = {
+  columnWidths: ColumnWidths;
+  i18n: I18n;
+};
+
+/**
+ * Column labels for the recipients table with a hairline rule underneath.
+ */
+const renderTableHeader = (options: RenderTableHeaderOptions) => {
+  const { columnWidths, i18n } = options;
+
+  const group = new Konva.Group();
+
+  const labels = [i18n._(msg`Signer Events`), i18n._(msg`Signature`), i18n._(msg`Details`)];
+
+  let x = 0;
+
+  for (const [index, label] of labels.entries()) {
+    const labelText = new Konva.Text({
+      x,
+      width: columnWidths[index] - columnGap,
+      text: label,
+      fontFamily: 'Inter',
+      fontSize: textXs,
+      fontStyle: fontMedium,
+      fill: textMutedForeground,
+    });
+
+    group.add(labelText);
+
+    x += columnWidths[index];
+  }
+
+  const rule = new Konva.Line({
+    points: [0, 0, columnWidths[0] + columnWidths[1] + columnWidths[2], 0],
+    stroke: hairlineColor,
+    strokeWidth: 1,
+    y: group.getClientRect().height + 8,
+  });
+
+  group.add(rule);
+
+  return group;
+};
 
 type RenderColumnOptions = {
   recipient: CertificateRecipient;
@@ -203,75 +290,63 @@ type RenderColumnOptions = {
 const renderColumnOne = (options: RenderColumnOptions) => {
   const { recipient, width, i18n } = options;
 
-  const columnGroup = new Konva.Group();
-
-  const textSectionPadding = 8;
-
-  const textFontStyling = {
-    x: 0,
-    fontFamily: 'Inter',
-    wrap: 'char',
-    lineHeight: 1.2,
-    fill: textMutedForeground,
-    width: width - columnPadding,
-  };
+  const column = new Konva.Group();
 
   if (recipient.name) {
     const nameText = new Konva.Text({
-      y: 0,
+      width,
       text: recipient.name,
-      fontSize: textBase,
-      ...textFontStyling,
+      fontFamily: 'Inter',
+      fontSize: textSm,
       fontStyle: fontMedium,
+      lineHeight: 1.35,
+      fill: textForeground,
     });
 
-    columnGroup.add(nameText);
+    column.add(nameText);
   }
 
   const emailText = new Konva.Text({
-    y: columnGroup.getClientRect().height,
+    y: column.getClientRect().height + (recipient.name ? 2 : 0),
+    width,
     text: recipient.email,
-    fontSize: textBase,
-    ...textFontStyling,
+    fontFamily: 'Inter',
+    fontSize: textXs,
+    lineHeight: 1.35,
+    fill: textMutedForeground,
+    wrap: 'char',
   });
 
-  columnGroup.add(emailText);
+  column.add(emailText);
 
   const roleText = new Konva.Text({
-    y: columnGroup.getClientRect().height + textSectionPadding,
+    y: emailText.y() + emailText.height() + 3,
+    width,
     text: i18n._(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName),
-    fontSize: textSm,
-    ...textFontStyling,
+    fontFamily: 'Inter',
+    fontSize: textXs,
+    lineHeight: 1.35,
+    fill: textMutedForeground,
   });
-  columnGroup.add(roleText);
 
-  const authLabel = new Konva.Text({
-    y: columnGroup.getClientRect().height + textSectionPadding,
-    text: `${i18n._(msg`Authentication Level`)}:`,
-    fontSize: textSm,
-    fontStyle: fontMedium,
-    ...textFontStyling,
-  });
-  columnGroup.add(authLabel);
+  column.add(roleText);
 
-  const authValue = new Konva.Text({
-    y: columnGroup.getClientRect().height,
+  const authField = renderField({
+    label: i18n._(msg`Authentication Level`),
     text: recipient.authLevel,
-    fontSize: textSm,
-    ...textFontStyling,
+    width,
+    y: roleText.y() + roleText.height() + fieldGap,
   });
-  columnGroup.add(authValue);
 
-  return columnGroup;
+  column.add(authField);
+
+  return column;
 };
 
 const renderColumnTwo = (options: RenderColumnOptions) => {
   const { recipient, width, i18n } = options;
 
-  // Column 2: Signature
   const column = new Konva.Group();
-
-  const columnWidth = width - columnPadding;
 
   const isRejected = Boolean(recipient.logs.rejected);
 
@@ -348,60 +423,46 @@ const renderColumnTwo = (options: RenderColumnOptions) => {
     });
     signatureContainer.add(signatureShadow);
 
-    // Signature ID
-    const sigIdLabel = new Konva.Text({
-      x: 0,
-      y: isRejected ? 0 : signatureHeight + 10,
-      text: `${i18n._(msg`Signature ID`)}:`,
-      fill: textMutedForeground,
-      width: columnWidth,
-      fontFamily: 'Inter',
-      fontSize: textSm,
-      fontStyle: fontMedium,
-      lineHeight: 1.4,
-    });
-    column.add(sigIdLabel);
-
-    const sigIdValue = new Konva.Text({
-      x: 0,
-      y: column.getClientRect().height,
+    const signatureIdField = renderField({
+      label: i18n._(msg`Signature ID`),
       text: recipient.signatureField.secondaryId.toUpperCase(),
-      fill: textMutedForeground,
-      fontFamily: 'monospace',
-      fontSize: textSm,
-      width: columnWidth,
-      wrap: 'char',
+      width,
+      y: isRejected ? 0 : signatureHeight + fieldGap,
+      valueFontFamily: 'monospace',
+      wrapChar: true,
     });
-    column.add(sigIdValue);
+
+    column.add(signatureIdField);
   } else {
     const naText = new Konva.Text({
-      x: 0,
-      y: 0,
-      text: 'N/A',
+      text: i18n._(msg`N/A`),
       fill: textMutedForeground,
       fontFamily: 'Inter',
-      fontSize: textSm,
+      fontSize: textXs + 0.5,
     });
+
     column.add(naText);
   }
 
   const relevantLog = isRejected ? recipient.logs.rejected : recipient.logs.completed;
 
-  const ipLabelAndText = renderLabelAndText({
+  const ipField = renderField({
     label: i18n._(msg`IP Address`),
     text: relevantLog?.ipAddress ?? i18n._(msg`Unknown`),
     width,
-    y: column.getClientRect().height + 6,
+    y: column.getClientRect().height + fieldGap,
   });
-  column.add(ipLabelAndText);
 
-  const deviceLabelAndText = renderLabelAndText({
+  column.add(ipField);
+
+  const deviceField = renderField({
     label: i18n._(msg`Device`),
     text: getDevice(relevantLog?.userAgent),
     width,
-    y: column.getClientRect().height + 6,
+    y: column.getClientRect().height + fieldGap,
   });
-  column.add(deviceLabelAndText);
+
+  column.add(deviceField);
 
   return column;
 };
@@ -422,42 +483,28 @@ const renderColumnThree = (options: RenderColumnOptions) => {
     {
       label: i18n._(msg`Sent`),
       value: recipient.logs.emailed
-        ? DateTime.fromJSDate(recipient.logs.emailed.createdAt)
-            .setLocale(APP_I18N_OPTIONS.defaultLocale)
-            .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+        ? formatTimestamp(recipient.logs.emailed.createdAt)
         : recipient.logs.sent
-          ? DateTime.fromJSDate(recipient.logs.sent.createdAt)
-              .setLocale(APP_I18N_OPTIONS.defaultLocale)
-              .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+          ? formatTimestamp(recipient.logs.sent.createdAt)
           : i18n._(msg`Unknown`),
     },
     {
       label: i18n._(msg`Viewed`),
-      value: recipient.logs.opened
-        ? DateTime.fromJSDate(recipient.logs.opened.createdAt)
-            .setLocale(APP_I18N_OPTIONS.defaultLocale)
-            .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
-        : i18n._(msg`Unknown`),
+      value: recipient.logs.opened ? formatTimestamp(recipient.logs.opened.createdAt) : i18n._(msg`Unknown`),
     },
   ];
 
   if (recipient.logs.rejected) {
     itemsToRender.push({
       label: i18n._(msg`Rejected`),
-      value: DateTime.fromJSDate(recipient.logs.rejected.createdAt)
-        .setLocale(APP_I18N_OPTIONS.defaultLocale)
-        .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)'),
+      value: formatTimestamp(recipient.logs.rejected.createdAt),
       labelFill: textRejectedRed,
       valueFill: textRejectedRed,
     });
   } else {
     itemsToRender.push({
       label: i18n._(msg`Signed`),
-      value: recipient.logs.completed
-        ? DateTime.fromJSDate(recipient.logs.completed.createdAt)
-            .setLocale(APP_I18N_OPTIONS.defaultLocale)
-            .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
-        : i18n._(msg`Unknown`),
+      value: recipient.logs.completed ? formatTimestamp(recipient.logs.completed.createdAt) : i18n._(msg`Unknown`),
     });
   }
 
@@ -474,15 +521,16 @@ const renderColumnThree = (options: RenderColumnOptions) => {
   });
 
   for (const [index, item] of itemsToRender.entries()) {
-    const labelAndText = renderLabelAndText({
+    const field = renderField({
       label: item.label,
       text: item.value,
       width,
-      y: column.getClientRect().height + (index === 0 ? 0 : 8),
+      y: column.getClientRect().height + (index === 0 ? 0 : fieldGap),
       labelFill: item.labelFill,
       valueFill: item.valueFill,
     });
-    column.add(labelAndText);
+
+    column.add(field);
   }
 
   return column;
@@ -498,69 +546,37 @@ type RenderRowOptions = {
   };
 };
 
-const renderRow = (options: RenderRowOptions) => {
+const renderRow = (options: RenderRowOptions): RenderedRow => {
   const { recipient, columnWidths, i18n, envelopeOwner } = options;
 
-  const rowGroup = new Konva.Group();
+  const group = new Konva.Group();
 
-  const width = columnWidths[0] + columnWidths[1] + columnWidths[2];
+  const columns = [renderColumnOne, renderColumnTwo, renderColumnThree];
 
-  // Draw top border line.
-  const borderLine = new Konva.Line({
-    points: [0, 0, width + rowPadding * 2, 0],
-    stroke: '#e5e7eb',
-    strokeWidth: 1,
-  });
+  let x = 0;
+  let maxColumnBottom = 0;
 
-  rowGroup.add(borderLine);
+  for (const [index, renderColumn] of columns.entries()) {
+    const column = renderColumn({
+      recipient,
+      width: columnWidths[index] - columnGap,
+      i18n,
+      envelopeOwner,
+    });
 
-  // Column 1: Signer Events
-  const columnGroup = renderColumnOne({
-    recipient,
-    width: columnWidths[0],
-    i18n,
-    envelopeOwner,
-  });
-  columnGroup.setAttrs({
-    x: rowPadding,
-    y: rowPadding,
-  } satisfies Partial<Konva.GroupConfig>);
-  rowGroup.add(columnGroup);
+    column.setAttrs({
+      x,
+      y: rowVerticalPadding,
+    } satisfies Partial<Konva.GroupConfig>);
 
-  const columnTwoGroup = renderColumnTwo({
-    recipient,
-    width: columnWidths[1],
-    i18n,
-    envelopeOwner,
-  });
-  columnTwoGroup.setAttrs({
-    x: rowPadding + columnWidths[0],
-    y: rowPadding,
-  } satisfies Partial<Konva.GroupConfig>);
-  rowGroup.add(columnTwoGroup);
+    group.add(column);
 
-  // Column 3: Details
-  const columnThreeGroup = renderColumnThree({
-    recipient,
-    width: columnWidths[2],
-    i18n,
-    envelopeOwner,
-  });
-  columnThreeGroup.setAttrs({
-    x: rowPadding + columnWidths[0] + columnWidths[1],
-    y: rowPadding,
-  } satisfies Partial<Konva.GroupConfig>);
-  rowGroup.add(columnThreeGroup);
+    maxColumnBottom = Math.max(maxColumnBottom, rowVerticalPadding + column.getClientRect().height);
 
-  const rowBottomPadding = new Konva.Rect({
-    x: 0,
-    y: rowGroup.getClientRect().height,
-    width: rowGroup.getClientRect().width,
-    height: rowPadding,
-  });
-  rowGroup.add(rowBottomPadding);
+    x += columnWidths[index];
+  }
 
-  return rowGroup;
+  return { group, height: maxColumnBottom + rowVerticalPadding };
 };
 
 const renderBranding = async ({ qrToken, i18n }: { qrToken: string | null; i18n: I18n }) => {
@@ -571,10 +587,11 @@ const renderBranding = async ({ qrToken, i18n }: { qrToken: string | null; i18n:
   const text = new Konva.Text({
     x: 0,
     verticalAlign: 'middle',
-    text: i18n._(msg`Signing certificate provided by`) + ':',
+    text: `${i18n._(msg`Signing certificate provided by`)}:`,
     fontStyle: fontMedium,
     fontFamily: 'Inter',
-    fontSize: textSm,
+    fontSize: textXs,
+    fill: textMutedForeground,
     height: brandingHeight,
   });
 
@@ -594,7 +611,7 @@ const renderBranding = async ({ qrToken, i18n }: { qrToken: string | null; i18n:
   const qrSize = qrToken ? 72 : 0;
 
   const logoGroup = new Konva.Group({
-    y: qrSize + 16,
+    y: qrSize ? qrSize + 16 : 0,
   });
   logoGroup.add(text);
   logoGroup.add(documensoImage);
@@ -633,89 +650,51 @@ type GroupRowsIntoPagesOptions = {
     name: string;
     email: string;
   };
+  firstPageContentHeight: number;
+  continuationHeaderHeight: number;
+  tableHeaderHeight: number;
 };
 
 const groupRowsIntoPages = (options: GroupRowsIntoPagesOptions) => {
-  const { recipients, maxHeight, i18n, columnWidths, envelopeOwner } = options;
+  const {
+    recipients,
+    maxHeight,
+    i18n,
+    columnWidths,
+    envelopeOwner,
+    firstPageContentHeight,
+    continuationHeaderHeight,
+    tableHeaderHeight,
+  } = options;
 
-  const rowHeader = renderRowHeader({ columnWidths, i18n });
-  const rowHeaderHeight = rowHeader.getClientRect().height;
+  const groupedRows: RenderedRow[][] = [[]];
 
-  const groupedRows: Konva.Group[][] = [[]];
-
-  let availablePageHeight = maxHeight - rowHeaderHeight;
+  // First page has the document header, then every page has the table header.
+  let availableHeight = maxHeight - pageTopMargin - firstPageContentHeight - tableHeaderHeight;
   let currentGroupedRowIndex = 0;
 
-  // Group rows into pages.
   for (const recipient of recipients) {
     const row = renderRow({ recipient, columnWidths, i18n, envelopeOwner });
 
-    const rowHeight = row.getClientRect().height;
-
-    if (rowHeight > availablePageHeight) {
+    if (row.height > availableHeight && groupedRows[currentGroupedRowIndex].length > 0) {
       currentGroupedRowIndex++;
-      groupedRows[currentGroupedRowIndex] = [row];
-      availablePageHeight = maxHeight - rowHeaderHeight;
-    } else {
-      groupedRows[currentGroupedRowIndex].push(row);
+      groupedRows[currentGroupedRowIndex] = [];
+
+      availableHeight = maxHeight - pageTopMargin - continuationHeaderHeight - tableHeaderHeight;
     }
 
-    // Reduce available height by the row height.
-    availablePageHeight -= rowHeight;
+    groupedRows[currentGroupedRowIndex].push(row);
+
+    availableHeight -= row.height;
   }
 
   return groupedRows;
 };
 
-type RenderTablesOptions = {
-  groupedRows: Konva.Group[][];
-  columnWidths: ColumnWidths;
-  i18n: I18n;
-};
-
-const renderTables = (options: RenderTablesOptions) => {
-  const { groupedRows, columnWidths, i18n } = options;
-
-  const tables: Konva.Group[] = [];
-
-  // Render the rows for each page.
-  for (const rows of groupedRows) {
-    const table = new Konva.Group();
-    const tableHeader = renderRowHeader({ columnWidths, i18n });
-
-    table.add(tableHeader);
-
-    for (const row of rows) {
-      row.setAttrs({
-        x: 0,
-        y: table.getClientRect().height,
-      } satisfies Partial<Konva.GroupConfig>);
-
-      table.add(row);
-    }
-
-    // Add table background and border.
-    const tableClientRect = table.getClientRect();
-    const cardRect = new Konva.Rect({
-      x: tableClientRect.x,
-      y: tableClientRect.y,
-      width: tableClientRect.width,
-      height: tableClientRect.height,
-      stroke: '#e5e7eb',
-      strokeWidth: 1.5,
-      cornerRadius: 8,
-    });
-    table.add(cardRect);
-
-    tables.push(table);
-  }
-
-  return tables;
-};
-
 export async function renderCertificate({
   recipients,
   envelopeId,
+  envelopeTitle,
   qrToken,
   hidePoweredBy,
   i18n,
@@ -725,93 +704,153 @@ export async function renderCertificate({
 }: GenerateCertificateOptions) {
   ensureFontLibrary();
 
-  const minimumMargin = 10;
+  const contentWidth = Math.min(pageWidth - pageMarginX * 2, contentMaxWidth);
+  const margin = (pageWidth - contentWidth) / 2;
 
-  const tableWidth = Math.min(pageWidth - minimumMargin * 2, contentMaxWidth);
-  const tableContentWidth = tableWidth - rowPadding * 2;
-  const margin = (pageWidth - tableWidth) / 2;
+  const columnWidths: ColumnWidths = [
+    (contentWidth * columnWidthPercentages[0]) / 100,
+    (contentWidth * columnWidthPercentages[1]) / 100,
+    (contentWidth * columnWidthPercentages[2]) / 100,
+  ];
 
-  const columnOneWidth = (tableContentWidth * columnWidthPercentages[0]) / 100;
-  const columnTwoWidth = (tableContentWidth * columnWidthPercentages[1]) / 100;
-  const columnThreeWidth = (tableContentWidth * columnWidthPercentages[2]) / 100;
-
-  const columnWidths: ColumnWidths = [columnOneWidth, columnTwoWidth, columnThreeWidth];
-
-  // Helper to render a Konva stage to a PNG buffer
   let stage: Konva.Stage | null = new Konva.Stage({ width: pageWidth, height: pageHeight });
 
-  const maxTableHeight = pageHeight - pageTopMargin - pageBottomMargin;
+  const documentHeader = renderDocumentHeader({ envelopeTitle, width: contentWidth, i18n });
+  const documentHeaderHeight = documentHeader.getClientRect().height;
+  const firstPageContentHeight = documentHeaderHeight + headerGap;
+
+  const continuationHeader = renderContinuationHeader({ width: contentWidth, i18n });
+  const continuationHeaderHeight = continuationHeader.getClientRect().height + headerGap;
+
+  const tableHeaderHeight = renderTableHeader({ columnWidths, i18n }).getClientRect().height;
 
   const groupedRows = groupRowsIntoPages({
     recipients,
-    maxHeight: maxTableHeight,
+    maxHeight: pageHeight - pageBottomMargin,
     columnWidths,
     i18n,
     envelopeOwner,
+    firstPageContentHeight,
+    continuationHeaderHeight,
+    tableHeaderHeight,
   });
 
-  const tables = renderTables({ groupedRows, columnWidths, i18n });
+  // Assemble the content group for each page so heights are known before
+  // footers and branding are placed.
+  const pageGroups: Konva.Group[] = [];
 
-  const brandingGroup = await renderBranding({ qrToken, i18n });
-  const brandingRect = brandingGroup.getClientRect();
+  for (const [pageIndex, rows] of groupedRows.entries()) {
+    const pageGroup = new Konva.Group({
+      x: margin,
+      y: pageTopMargin,
+    });
+
+    let yCursor = 0;
+
+    if (pageIndex === 0) {
+      pageGroup.add(documentHeader);
+      yCursor += documentHeaderHeight + headerGap;
+    } else {
+      const header = renderContinuationHeader({ width: contentWidth, i18n });
+      pageGroup.add(header);
+      yCursor += header.getClientRect().height + headerGap;
+    }
+
+    const tableHeader = renderTableHeader({ columnWidths, i18n });
+    tableHeader.y(yCursor);
+    pageGroup.add(tableHeader);
+    yCursor += tableHeaderHeight;
+
+    for (const [rowIndex, row] of rows.entries()) {
+      if (rowIndex > 0) {
+        const separator = new Konva.Line({
+          points: [0, 0, contentWidth, 0],
+          stroke: hairlineColor,
+          strokeWidth: 0.75,
+          y: yCursor,
+        });
+
+        pageGroup.add(separator);
+      }
+
+      row.group.y(yCursor);
+      pageGroup.add(row.group);
+
+      yCursor += row.height;
+    }
+
+    pageGroups.push(pageGroup);
+  }
+
+  const brandingGroup = !hidePoweredBy ? await renderBranding({ qrToken, i18n }) : null;
   const brandingTopPadding = 24;
+
+  // Work out whether the branding fits below the content of the last page, or
+  // whether it needs a page of its own, so the total page count is known
+  // before rendering footers.
+  let isBrandingPlacedOnLastPage = false;
+
+  if (brandingGroup) {
+    const lastPageGroup = pageGroups[pageGroups.length - 1];
+    const lastPageContentBottom = lastPageGroup.y() + lastPageGroup.getClientRect().height;
+    const brandingRect = brandingGroup.getClientRect();
+
+    isBrandingPlacedOnLastPage =
+      lastPageContentBottom + brandingTopPadding + brandingRect.height <= pageHeight - pageBottomMargin;
+  }
+
+  const totalPages = pageGroups.length + (brandingGroup && !isBrandingPlacedOnLastPage ? 1 : 0);
+
+  const renderFooter = (page: Konva.Layer, pageNumber: number) => {
+    const footerY = pageHeight - pageBottomMargin + 24;
+
+    const envelopeIdText = new Konva.Text({
+      x: margin,
+      y: footerY,
+      width: contentWidth,
+      text: `${i18n._(msg`Envelope ID`)}: ${envelopeId}`,
+      fontFamily: 'Inter',
+      fontSize: textXs - 0.5,
+      fill: textMutedForegroundLight,
+    });
+
+    const pageNumberText = new Konva.Text({
+      x: margin,
+      y: footerY,
+      width: contentWidth,
+      align: 'right',
+      text: `${pageNumber} / ${totalPages}`,
+      fontFamily: 'Inter',
+      fontSize: textXs - 0.5,
+      fill: textMutedForegroundLight,
+    });
+
+    page.add(envelopeIdText);
+    page.add(pageNumberText);
+  };
 
   const pages: Uint8Array[] = [];
 
-  let isQrPlaced = false;
-
-  // Add a table to each page.
-  for (const [index, table] of tables.entries()) {
+  for (const [index, pageGroup] of pageGroups.entries()) {
     stage.destroyChildren();
     const page = new Konva.Layer();
 
-    const group = new Konva.Group();
+    page.add(pageGroup);
+    renderFooter(page, index + 1);
 
-    const titleText = new Konva.Text({
-      x: margin,
-      y: 0,
-      height: pageTopMargin,
-      verticalAlign: 'middle',
-      text: i18n._(msg`Signing Certificate`),
-      fontFamily: 'Inter',
-      fontSize: titleFontSize,
-      fontStyle: '700',
-    });
+    if (brandingGroup && isBrandingPlacedOnLastPage && index === pageGroups.length - 1) {
+      const brandingRect = brandingGroup.getClientRect();
 
-    table.setAttrs({
-      x: margin,
-      y: pageTopMargin,
-    } satisfies Partial<Konva.GroupConfig>);
+      // Anchor the branding to the bottom of the page rather than letting it
+      // float directly under the content.
+      brandingGroup.setAttrs({
+        x: pageWidth - brandingRect.width - margin,
+        y: pageHeight - pageBottomMargin - brandingRect.height,
+      } satisfies Partial<Konva.GroupConfig>);
 
-    group.add(titleText);
-    group.add(table);
-
-    // Add QR code and branding on the last page if there is space.
-    if (index === tables.length - 1 && !hidePoweredBy) {
-      const remainingHeight = pageHeight - group.getClientRect().height - pageBottomMargin;
-
-      if (brandingRect.height + brandingTopPadding <= remainingHeight) {
-        brandingGroup.setAttrs({
-          x: pageWidth - brandingRect.width - margin,
-          y: group.getClientRect().height + brandingTopPadding,
-        } satisfies Partial<Konva.GroupConfig>);
-
-        page.add(brandingGroup);
-        isQrPlaced = true;
-      }
+      page.add(brandingGroup);
     }
 
-    const footerText = new Konva.Text({
-      x: margin,
-      y: pageHeight - textXs - 10,
-      text: `${i18n._(msg`Envelope ID`)}: ${envelopeId}`,
-      fontFamily: 'Inter',
-      fontSize: textXs,
-      fill: textMutedForegroundLight,
-    });
-    page.add(footerText);
-
-    page.add(group);
     stage.add(page);
 
     // Export the page and save it.
@@ -820,26 +859,21 @@ export async function renderCertificate({
     pages.push(new Uint8Array(buffer));
   }
 
-  // Need to create an empty page for the QR code if it hasn't been placed yet.
-  if (!hidePoweredBy && !isQrPlaced) {
+  // Branding gets a page of its own when it does not fit under the last page.
+  if (brandingGroup && !isBrandingPlacedOnLastPage) {
+    stage.destroyChildren();
     const page = new Konva.Layer();
+
+    const brandingRect = brandingGroup.getClientRect();
 
     brandingGroup.setAttrs({
       x: pageWidth - brandingRect.width - margin,
-      y: pageTopMargin / 2, // Less padding since there's nothing else on this page.
+      y: pageHeight - pageBottomMargin - brandingRect.height,
     } satisfies Partial<Konva.GroupConfig>);
 
-    const overflowFooterText = new Konva.Text({
-      x: margin,
-      y: pageHeight - textXs - 10,
-      text: `${i18n._(msg`Envelope ID`)}: ${envelopeId}`,
-      fontFamily: 'Inter',
-      fontSize: textXs,
-      fill: textMutedForegroundLight,
-    });
-    page.add(overflowFooterText);
-
     page.add(brandingGroup);
+    renderFooter(page, totalPages);
+
     stage.add(page);
 
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
