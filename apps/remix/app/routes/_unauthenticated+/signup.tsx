@@ -5,8 +5,8 @@ import {
   IS_GOOGLE_SSO_ENABLED,
   IS_MICROSOFT_SSO_ENABLED,
   IS_OIDC_SSO_ENABLED,
+  isPasswordSignupDisabled,
 } from '@documenso/lib/constants/auth';
-import { env } from '@documenso/lib/utils/env';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 
 import { SignUpForm } from '~/components/forms/signup';
@@ -19,14 +19,12 @@ export function meta() {
 }
 
 export function loader({ request }: Route.LoaderArgs) {
-  const NEXT_PUBLIC_DISABLE_SIGNUP = env('NEXT_PUBLIC_DISABLE_SIGNUP');
-
   // SSR env variables.
   const isGoogleSSOEnabled = IS_GOOGLE_SSO_ENABLED;
   const isMicrosoftSSOEnabled = IS_MICROSOFT_SSO_ENABLED;
   const isOIDCSSOEnabled = IS_OIDC_SSO_ENABLED;
 
-  if (NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
+  if (isPasswordSignupDisabled()) {
     throw redirect('/signin');
   }
 

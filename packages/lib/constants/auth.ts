@@ -20,8 +20,8 @@ export const IS_MICROSOFT_SSO_ENABLED = Boolean(
 
 export const IS_OIDC_SSO_ENABLED = Boolean(
   env('NEXT_PRIVATE_OIDC_WELL_KNOWN') &&
-    env('NEXT_PRIVATE_OIDC_CLIENT_ID') &&
-    env('NEXT_PRIVATE_OIDC_CLIENT_SECRET'),
+  env('NEXT_PRIVATE_OIDC_CLIENT_ID') &&
+  env('NEXT_PRIVATE_OIDC_CLIENT_SECRET'),
 );
 
 export const OIDC_PROVIDER_LABEL = env('NEXT_PRIVATE_OIDC_PROVIDER_LABEL');
@@ -86,6 +86,14 @@ export const getAllowedSignupDomains = (): string[] => {
     .map((d) => d.trim().toLowerCase())
     .filter(Boolean);
 };
+
+/**
+ * Check if email/password signup is disabled.
+ * True when either the blanket signup flag or the password-signup-specific flag is set.
+ */
+export const isPasswordSignupDisabled = (): boolean =>
+  env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true' ||
+  env('NEXT_PUBLIC_DISABLE_PASSWORD_SIGNUP') === 'true';
 
 /**
  * Check if email domain is allowed for signup.
