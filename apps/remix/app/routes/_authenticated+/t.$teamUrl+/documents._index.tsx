@@ -1,12 +1,3 @@
-import { useEffect, useMemo, useState } from 'react';
-
-import { Trans } from '@lingui/react/macro';
-import { EnvelopeType } from '@prisma/client';
-import { FolderType, OrganisationType } from '@prisma/client';
-import { useParams, useSearchParams } from 'react-router';
-import { Link } from 'react-router';
-import { z } from 'zod';
-
 import { useSessionStorage } from '@documenso/lib/client-only/hooks/use-session-storage';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { STATS_COUNT_CAP } from '@documenso/lib/constants/document';
@@ -21,8 +12,14 @@ import { ZFindDocumentsInternalRequestSchema } from '@documenso/trpc/server/docu
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import type { RowSelectionState } from '@documenso/ui/primitives/data-table';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
+import { msg } from '@lingui/core/macro';
+import { Trans } from '@lingui/react/macro';
+import { EnvelopeType, FolderType, OrganisationType } from '@prisma/client';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
+import { z } from 'zod';
 
-import { DocumentMoveToFolderDialog } from '~/components/dialogs/document-move-to-folder-dialog';
+import { EnvelopesBulkCancelDialog } from '~/components/dialogs/envelopes-bulk-cancel-dialog';
 import { EnvelopesBulkDeleteDialog } from '~/components/dialogs/envelopes-bulk-delete-dialog';
 import { EnvelopesBulkMoveDialog } from '~/components/dialogs/envelopes-bulk-move-dialog';
 import { DocumentSearch } from '~/components/general/document/document-search';
@@ -38,7 +35,7 @@ import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Documents');
+  return appMetaTags(msg`Documents`);
 }
 
 const ZSearchParamsSchema = ZFindDocumentsInternalRequestSchema.pick({
@@ -57,16 +54,17 @@ export default function DocumentsPage() {
 
   const { folderId } = useParams();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const documentsPath = formatDocumentsPath(team.url);
 
   const [isMovingDocument, setIsMovingDocument] = useState(false);
-  const [documentToMove, setDocumentToMove] = useState<number | null>(null);
+  const [documentToMove, setDocumentToMove] = useState<string | null>(null);
 
-  const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>(
-    'documents-bulk-selection',
-    {},
-  );
+  const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>('documents-bulk-selection', {});
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
+  const [isBulkCancelDialogOpen, setIsBulkCancelDialogOpen] = useState(false);
 
   const selectedEnvelopeIds = useMemo(() => {
     return Object.keys(rowSelection).filter((id) => rowSelection[id]);
@@ -77,6 +75,7 @@ export default function DocumentsPage() {
     [ExtendedDocumentStatus.PENDING]: 0,
     [ExtendedDocumentStatus.COMPLETED]: 0,
     [ExtendedDocumentStatus.REJECTED]: 0,
+    [ExtendedDocumentStatus.CANCELLED]: 0,
     [ExtendedDocumentStatus.INBOX]: 0,
     [ExtendedDocumentStatus.ALL]: 0,
   });
@@ -139,14 +138,12 @@ export default function DocumentsPage() {
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-x-4 gap-y-8">
           <div className="flex flex-row items-center">
-            <Avatar className="mr-3 h-12 w-12 border-2 border-solid border-white dark:border-border">
+            <Avatar className="mr-3 h-12 w-12 border-2 border-white border-solid dark:border-border">
               {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
-              <AvatarFallback className="text-xs text-muted-foreground">
-                {team.name.slice(0, 1)}
-              </AvatarFallback>
+              <AvatarFallback className="text-muted-foreground text-xs">{team.name.slice(0, 1)}</AvatarFallback>
             </Avatar>
 
-            <h2 className="text-4xl font-semibold">
+            <h2 className="font-semibold text-4xl">
               <Trans>Documents</Trans>
             </h2>
           </div>
@@ -158,6 +155,7 @@ export default function DocumentsPage() {
                   ExtendedDocumentStatus.INBOX,
                   ExtendedDocumentStatus.PENDING,
                   ExtendedDocumentStatus.COMPLETED,
+                  ExtendedDocumentStatus.CANCELLED,
                   ExtendedDocumentStatus.DRAFT,
                   ExtendedDocumentStatus.ALL,
                 ]
@@ -169,20 +167,13 @@ export default function DocumentsPage() {
                     return true;
                   })
                   .map((value) => (
-                    <TabsTrigger
-                      key={value}
-                      className="min-w-[60px] hover:text-foreground"
-                      value={value}
-                      asChild
-                    >
+                    <TabsTrigger key={value} className="min-w-[60px] hover:text-foreground" value={value} asChild>
                       <Link to={getTabHref(value)} preventScrollReset>
                         <DocumentStatus status={value} />
 
                         {value !== ExtendedDocumentStatus.ALL && (
                           <span className="ml-1 inline-block opacity-50">
-                            {stats[value] >= STATS_COUNT_CAP
-                              ? `${STATS_COUNT_CAP.toLocaleString()}+`
-                              : stats[value]}
+                            {stats[value] >= STATS_COUNT_CAP ? `${STATS_COUNT_CAP.toLocaleString()}+` : stats[value]}
                           </span>
                         )}
                       </Link>
@@ -205,16 +196,14 @@ export default function DocumentsPage() {
         <div className="mt-8">
           <div>
             {data && data.count === 0 ? (
-              <DocumentsTableEmptyState
-                status={findDocumentSearchParams.status || ExtendedDocumentStatus.ALL}
-              />
+              <DocumentsTableEmptyState status={findDocumentSearchParams.status || ExtendedDocumentStatus.ALL} />
             ) : (
               <DocumentsTable
                 data={data}
                 isLoading={isLoading}
                 isLoadingError={isLoadingError}
-                onMoveDocument={(documentId) => {
-                  setDocumentToMove(documentId);
+                onMoveDocument={(envelopeId) => {
+                  setDocumentToMove(envelopeId);
                   setIsMovingDocument(true);
                 }}
                 enableSelection
@@ -226,8 +215,9 @@ export default function DocumentsPage() {
         </div>
 
         {documentToMove && (
-          <DocumentMoveToFolderDialog
-            documentId={documentToMove}
+          <EnvelopesBulkMoveDialog
+            envelopeIds={[documentToMove]}
+            envelopeType={EnvelopeType.DOCUMENT}
             open={isMovingDocument}
             currentFolderId={folderId}
             onOpenChange={(open) => {
@@ -237,6 +227,9 @@ export default function DocumentsPage() {
                 setDocumentToMove(null);
               }
             }}
+            onSuccess={(destinationFolderId) =>
+              navigate(destinationFolderId ? `${documentsPath}/f/${destinationFolderId}` : documentsPath)
+            }
           />
         )}
 
@@ -244,6 +237,7 @@ export default function DocumentsPage() {
           selectedCount={selectedEnvelopeIds.length}
           onMoveClick={() => setIsBulkMoveDialogOpen(true)}
           onDeleteClick={() => setIsBulkDeleteDialogOpen(true)}
+          onCancelClick={() => setIsBulkCancelDialogOpen(true)}
           onClearSelection={() => setRowSelection({})}
         />
 
@@ -261,6 +255,13 @@ export default function DocumentsPage() {
           envelopeType={EnvelopeType.DOCUMENT}
           open={isBulkDeleteDialogOpen}
           onOpenChange={setIsBulkDeleteDialogOpen}
+          onSuccess={() => setRowSelection({})}
+        />
+
+        <EnvelopesBulkCancelDialog
+          envelopeIds={selectedEnvelopeIds}
+          open={isBulkCancelDialogOpen}
+          onOpenChange={setIsBulkCancelDialogOpen}
           onSuccess={() => setRowSelection({})}
         />
       </div>

@@ -1,15 +1,15 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { UNSAFE_deleteEnvelopeItem } from '@documenso/lib/server-only/envelope-item/delete-envelope-item';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
-import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
+import { UNSAFE_deleteEnvelopeItem } from '@documenso/lib/server-only/envelope-item/delete-envelope-item';
+import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 
 import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';
 import {
+  deleteEnvelopeItemMeta,
   ZDeleteEnvelopeItemRequestSchema,
   ZDeleteEnvelopeItemResponseSchema,
-  deleteEnvelopeItemMeta,
 } from './delete-envelope-item.types';
 
 export const deleteEnvelopeItemRoute = authenticatedProcedure
@@ -50,7 +50,9 @@ export const deleteEnvelopeItemRoute = authenticatedProcedure
       });
     }
 
-    if (!canEnvelopeItemsBeModified(envelope, envelope.recipients)) {
+    const { canFileBeChanged } = getEnvelopeItemPermissions(envelope, envelope.recipients);
+
+    if (!canFileBeChanged) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Envelope item is not editable',
       });

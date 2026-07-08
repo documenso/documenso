@@ -1,14 +1,14 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { UNSAFE_createEnvelopeItems } from '@documenso/lib/server-only/envelope-item/create-envelope-items';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
-import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
+import { UNSAFE_createEnvelopeItems } from '@documenso/lib/server-only/envelope-item/create-envelope-items';
+import { getEnvelopeItemPermissions } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
 import {
+  createEnvelopeItemsMeta,
   ZCreateEnvelopeItemsRequestSchema,
   ZCreateEnvelopeItemsResponseSchema,
-  createEnvelopeItemsMeta,
 } from './create-envelope-items.types';
 
 export const createEnvelopeItemsRoute = authenticatedProcedure
@@ -63,7 +63,9 @@ export const createEnvelopeItemsRoute = authenticatedProcedure
       });
     }
 
-    if (!canEnvelopeItemsBeModified(envelope, envelope.recipients)) {
+    const { canFileBeChanged } = getEnvelopeItemPermissions(envelope, envelope.recipients);
+
+    if (!canFileBeChanged) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Envelope item is not editable',
       });
@@ -71,8 +73,7 @@ export const createEnvelopeItemsRoute = authenticatedProcedure
 
     const organisationClaim = envelope.team.organisation.organisationClaim;
 
-    const remainingEnvelopeItems =
-      organisationClaim.envelopeItemCount - envelope.envelopeItems.length - files.length;
+    const remainingEnvelopeItems = organisationClaim.envelopeItemCount - envelope.envelopeItems.length - files.length;
 
     if (remainingEnvelopeItems < 0) {
       throw new AppError('ENVELOPE_ITEM_LIMIT_EXCEEDED', {

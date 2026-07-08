@@ -1,6 +1,5 @@
-import { DocumentStatus, EnvelopeType, RecipientRole } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { DocumentStatus, EnvelopeType, RecipientRole } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
 import { ZGetInboxCountRequestSchema, ZGetInboxCountResponseSchema } from './get-inbox-count.types';
@@ -23,7 +22,7 @@ export const getInboxCountRoute = authenticatedProcedure
         envelope: {
           type: EnvelopeType.DOCUMENT,
           status: {
-            not: DocumentStatus.DRAFT,
+            notIn: [DocumentStatus.DRAFT, DocumentStatus.REJECTED],
           },
           deletedAt: null,
         },

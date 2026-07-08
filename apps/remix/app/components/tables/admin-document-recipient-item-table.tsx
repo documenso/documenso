@@ -1,40 +1,20 @@
-import { useMemo } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import {
-  type Field,
-  type Recipient,
-  RecipientRole,
-  type Signature,
-  SigningStatus,
-} from '@prisma/client';
-import { useForm } from 'react-hook-form';
-import { useRevalidator } from 'react-router';
-import { z } from 'zod';
-
+import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { type Field, type Recipient, RecipientRole, type Signature, SigningStatus } from '@prisma/client';
+import { useMemo } from 'react';
+import { useForm } from 'react-hook-form';
+import { useRevalidator } from 'react-router';
+import { z } from 'zod';
 
 const RECIPIENT_ROLE_LABELS: Record<RecipientRole, string> = {
   [RecipientRole.SIGNER]: 'Signer',
@@ -46,7 +26,7 @@ const RECIPIENT_ROLE_LABELS: Record<RecipientRole, string> = {
 
 const ZAdminUpdateRecipientFormSchema = z.object({
   name: z.string().min(1),
-  email: z.string().email(),
+  email: zEmail(),
   role: z.nativeEnum(RecipientRole),
 });
 
@@ -104,9 +84,7 @@ export const AdminDocumentRecipientItemTable = ({ recipient }: RecipientItemProp
         accessorKey: 'signature',
         cell: ({ row }) => (
           <div>
-            {row.original.signature?.typedSignature && (
-              <span>{row.original.signature.typedSignature}</span>
-            )}
+            {row.original.signature?.typedSignature && <span>{row.original.signature.typedSignature}</span>}
 
             {row.original.signature?.signatureImageAsBase64 && (
               <img
@@ -121,11 +99,7 @@ export const AdminDocumentRecipientItemTable = ({ recipient }: RecipientItemProp
     ] satisfies DataTableColumnDef<(typeof recipient)['fields'][number]>[];
   }, []);
 
-  const onUpdateRecipientFormSubmit = async ({
-    name,
-    email,
-    role,
-  }: TAdminUpdateRecipientFormSchema) => {
+  const onUpdateRecipientFormSubmit = async ({ name, email, role }: TAdminUpdateRecipientFormSchema) => {
     try {
       await updateRecipient({
         id: recipient.id,
@@ -155,9 +129,7 @@ export const AdminDocumentRecipientItemTable = ({ recipient }: RecipientItemProp
         <form onSubmit={form.handleSubmit(onUpdateRecipientFormSubmit)}>
           <fieldset
             className="flex h-full max-w-xl flex-col gap-y-4"
-            disabled={
-              form.formState.isSubmitting || recipient.signingStatus === SigningStatus.SIGNED
-            }
+            disabled={form.formState.isSubmitting || recipient.signingStatus === SigningStatus.SIGNED}
           >
             <FormField
               control={form.control}
@@ -208,10 +180,7 @@ export const AdminDocumentRecipientItemTable = ({ recipient }: RecipientItemProp
                     <Select
                       value={field.value}
                       onValueChange={field.onChange}
-                      disabled={
-                        form.formState.isSubmitting ||
-                        recipient.signingStatus === SigningStatus.SIGNED
-                      }
+                      disabled={form.formState.isSubmitting || recipient.signingStatus === SigningStatus.SIGNED}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -243,7 +212,7 @@ export const AdminDocumentRecipientItemTable = ({ recipient }: RecipientItemProp
 
       <hr className="my-4" />
 
-      <h2 className="mb-4 text-lg font-semibold">
+      <h2 className="mb-4 font-semibold text-lg">
         <Trans>Fields</Trans>
       </h2>
 

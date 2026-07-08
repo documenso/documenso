@@ -1,11 +1,11 @@
-import { useLingui } from '@lingui/react/macro';
-import { Loader } from 'lucide-react';
-import { useLoaderData } from 'react-router';
-
 import { IS_AI_FEATURES_CONFIGURED } from '@documenso/lib/constants/app';
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react/macro';
+import { Loader } from 'lucide-react';
+import { useLoaderData } from 'react-router';
 
 import {
   DocumentPreferencesForm,
@@ -16,7 +16,7 @@ import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Document Preferences');
+  return appMetaTags(msg`Document Preferences`);
 }
 
 export const loader = () => {
@@ -54,6 +54,7 @@ export default function TeamsSettingsPage() {
         delegateDocumentOwnership,
         aiFeaturesEnabled,
         envelopeExpirationPeriod,
+        reminderSettings,
       } = data;
 
       await updateTeamSettings({
@@ -69,6 +70,7 @@ export default function TeamsSettingsPage() {
           defaultRecipients,
           aiFeaturesEnabled,
           envelopeExpirationPeriod,
+          reminderSettings,
           ...(signatureTypes.length === 0
             ? {
                 typedSignatureEnabled: null,
@@ -94,6 +96,8 @@ export default function TeamsSettingsPage() {
         description: t`We were unable to update your document preferences at this time, please try again later`,
         variant: 'destructive',
       });
+
+      throw err;
     }
   };
 

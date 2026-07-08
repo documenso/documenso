@@ -2,7 +2,7 @@ import { WebhookTriggerEvents } from '@prisma/client';
 import { z } from 'zod';
 
 import { ZRequestMetadataSchema } from '../../../universal/extract-request-metadata';
-import { type JobDefinition } from '../../client/_internal/job';
+import type { JobDefinition } from '../../client/_internal/job';
 
 const EXECUTE_WEBHOOK_JOB_DEFINITION_ID = 'internal.execute-webhook';
 
@@ -28,7 +28,4 @@ export const EXECUTE_WEBHOOK_JOB_DEFINITION = {
 
     await handler.run({ payload, io });
   },
-} as const satisfies JobDefinition<
-  typeof EXECUTE_WEBHOOK_JOB_DEFINITION_ID,
-  TExecuteWebhookJobDefinition
->;
+} as const satisfies JobDefinition<typeof EXECUTE_WEBHOOK_JOB_DEFINITION_ID, TExecuteWebhookJobDefinition>;

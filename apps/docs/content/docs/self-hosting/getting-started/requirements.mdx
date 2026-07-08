@@ -7,13 +7,28 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 ## What You Need
 
-Documenso requires the following external services:
+Documenso requires the following items and external services:
 
 | Service       | Purpose                      | Minimum Version |
 | ------------- | ---------------------------- | --------------- |
+| Signing certificate | Digital signature for documents | N/A             |
 | PostgreSQL    | Primary database             | 14+             |
 | SMTP server   | Sending emails to recipients | Any             |
 | Reverse proxy | SSL termination, routing     | Any             |
+
+
+### Signing Certificate
+
+<Callout type="error">
+  Documenso does not ship with a signing certificate. Without one, the application starts normally
+  but all document signing will fail. You must generate or provide a `.p12` certificate before going
+  to production.
+</Callout>
+
+Every completed document is digitally signed using an X.509 certificate. You can generate a self-signed certificate for free or use one from a Certificate Authority (CA).
+
+- [Generate a local certificate](/docs/self-hosting/configuration/signing-certificate/local) — step-by-step instructions to create a `.p12` certificate
+- [All certificate options](/docs/self-hosting/configuration/signing-certificate) — self-signed, CA-issued, and Google Cloud HSM
 
 ### PostgreSQL Database
 
@@ -85,9 +100,13 @@ See [Storage Configuration](/docs/self-hosting/configuration/storage) for setup 
 
 ### Background Jobs
 
-Documenso processes background jobs (email delivery, document processing) using a PostgreSQL-based queue. No additional services like Redis are required: the job queue is built into the application and uses your existing database.
+Documenso processes background jobs (email delivery, document processing) using a PostgreSQL-based queue by default. No additional services are required: the job queue is built into the application and uses your existing database.
 
-For high-throughput deployments, Documenso optionally supports [Inngest](https://www.inngest.com/) as an alternative job provider. Set `NEXT_PRIVATE_JOBS_PROVIDER=inngest` and configure `INNGEST_EVENT_KEY` and `INNGEST_SIGNING_KEY`. Most self-hosted instances do not need this.
+For production deployments that need higher throughput or more reliable job processing, Documenso supports [BullMQ](https://docs.bullmq.io/) as an alternative provider. BullMQ requires a **Redis** instance (v6.2+). Set `NEXT_PRIVATE_JOBS_PROVIDER=bullmq` and configure `NEXT_PRIVATE_REDIS_URL`.
+
+For managed/cloud deployments, [Inngest](https://www.inngest.com/) is also supported as a job provider. Set `NEXT_PRIVATE_JOBS_PROVIDER=inngest` and configure `INNGEST_EVENT_KEY` and `INNGEST_SIGNING_KEY`.
+
+See [Background Jobs Configuration](/docs/self-hosting/configuration/background-jobs) for full details.
 
 ---
 
@@ -122,8 +141,8 @@ If building from source (not using Docker images):
 
 | Requirement | Version |
 | ----------- | ------- |
-| Node.js     | 18+     |
-| npm         | 8+      |
+| Node.js     | 22+     |
+| npm         | 11+     |
 
 ---
 
@@ -150,7 +169,7 @@ Documenso runs on:
 | MySQL/MariaDB  | PostgreSQL-specific features required |
 | SQLite         | Not suitable for production workloads |
 | MongoDB        | Relational database required          |
-| Node.js < 18   | Modern JavaScript features required   |
+| Node.js < 22   | Modern JavaScript features required   |
 
 ---
 

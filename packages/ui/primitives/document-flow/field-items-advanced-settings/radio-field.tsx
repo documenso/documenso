@@ -1,17 +1,15 @@
-import { useEffect, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
-
 import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
-import { type TRadioFieldMeta as RadioFieldMeta } from '@documenso/lib/types/field-meta';
+import type { TRadioFieldMeta as RadioFieldMeta } from '@documenso/lib/types/field-meta';
 import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { Switch } from '@documenso/ui/primitives/switch';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export type RadioFieldAdvancedSettingsProps = {
   fieldState: RadioFieldMeta;
@@ -30,9 +28,7 @@ export const RadioFieldAdvancedSettings = ({
   const { _ } = useLingui();
 
   const [showValidation, setShowValidation] = useState(false);
-  const [values, setValues] = useState(
-    fieldState.values ?? [{ id: 1, checked: false, value: _(msg`Default value`) }],
-  );
+  const [values, setValues] = useState(fieldState.values ?? [{ id: 1, checked: false, value: _(msg`Default value`) }]);
   const [readOnly, setReadOnly] = useState(fieldState.readOnly ?? false);
   const [required, setRequired] = useState(fieldState.required ?? false);
 
@@ -46,7 +42,9 @@ export const RadioFieldAdvancedSettings = ({
   };
 
   const removeValue = (id: number) => {
-    if (values.length === 1) return;
+    if (values.length === 1) {
+      return;
+    }
 
     const newValues = values.filter((val) => val.id !== id);
     setValues(newValues);
@@ -178,7 +176,7 @@ export const RadioFieldAdvancedSettings = ({
               />
               <button
                 type="button"
-                className="col-span-1 mt-auto inline-flex h-10 w-10 items-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50 dark:text-white"
+                className="col-span-1 mt-auto inline-flex h-10 w-10 items-center text-muted-foreground hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={() => removeValue(value.id)}
               >
                 <Trash className="h-5 w-5" />
@@ -186,7 +184,7 @@ export const RadioFieldAdvancedSettings = ({
             </div>
           ))}
           <Button
-            className="ml-9 mt-4 border border-foreground/10 bg-foreground/10 hover:bg-foreground/5"
+            className="mt-4 ml-9 border border-foreground/10 bg-foreground/10 hover:bg-foreground/5"
             variant="outline"
             onClick={addValue}
           >

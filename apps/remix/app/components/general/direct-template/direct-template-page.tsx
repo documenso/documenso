@@ -1,12 +1,5 @@
-import { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import type { Field } from '@prisma/client';
-import { type Recipient } from '@prisma/client';
-import { useNavigate, useSearchParams } from 'react-router';
-
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { AppError } from '@documenso/lib/errors/app-error';
 import type { TTemplate } from '@documenso/lib/types/template';
 import { isRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
@@ -16,19 +9,19 @@ import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flo
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import type { Field, Recipient } from '@prisma/client';
+import { useState } from 'react';
+import { useSearchParams } from 'react-router';
 
 import { useRequiredDocumentSigningAuthContext } from '~/components/general/document-signing/document-signing-auth-provider';
 import { useRequiredDocumentSigningContext } from '~/components/general/document-signing/document-signing-provider';
 import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
+import { getDirectTemplateErrorMessage } from '~/utils/toast-error-messages';
 
-import {
-  DirectTemplateConfigureForm,
-  type TDirectTemplateConfigureFormSchema,
-} from './direct-template-configure-form';
-import {
-  type DirectTemplateLocalField,
-  DirectTemplateSigningForm,
-} from './direct-template-signing-form';
+import { DirectTemplateConfigureForm, type TDirectTemplateConfigureFormSchema } from './direct-template-configure-form';
+import { type DirectTemplateLocalField, DirectTemplateSigningForm } from './direct-template-signing-form';
 
 export type DirectTemplatePageViewProps = {
   template: Omit<TTemplate, 'user'>;
@@ -44,7 +37,6 @@ export const DirectTemplatePageView = ({
   directTemplateRecipient,
   directTemplateToken,
 }: DirectTemplatePageViewProps) => {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const { _ } = useLingui();
@@ -56,9 +48,7 @@ export const DirectTemplatePageView = ({
   const [step, setStep] = useState<DirectTemplateStep>('configure');
   const [isDocumentPdfLoaded, setIsDocumentPdfLoaded] = useState(false);
 
-  const recipientActionVerb = _(
-    RECIPIENT_ROLES_DESCRIPTION[directTemplateRecipient.role].actionVerb,
-  );
+  const recipientActionVerb = _(RECIPIENT_ROLES_DESCRIPTION[directTemplateRecipient.role].actionVerb);
 
   const directTemplateFlow: Record<DirectTemplateStep, DocumentFlowStep> = {
     configure: {
@@ -128,14 +118,15 @@ export const DirectTemplatePageView = ({
       if (redirectUrl) {
         window.location.href = redirectUrl;
       } else {
-        await navigate(`/sign/${token}/complete`);
+        window.location.href = `/sign/${token}/complete`;
       }
     } catch (err) {
+      const error = AppError.parseError(err);
+      const errorMessage = getDirectTemplateErrorMessage(error.code);
+
       toast({
-        title: _(msg`Something went wrong`),
-        description: _(
-          msg`We were unable to submit this document at this time. Please try again later.`,
-        ),
+        title: _(errorMessage.title),
+        description: _(errorMessage.description),
         variant: 'destructive',
       });
 
@@ -147,10 +138,7 @@ export const DirectTemplatePageView = ({
 
   return (
     <div className="grid w-full grid-cols-12 gap-8">
-      <Card
-        className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7"
-        gradient
-      >
+      <Card className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7" gradient>
         <CardContent className="p-2">
           <PDFViewerLazy
             key={template.id}
@@ -169,10 +157,7 @@ export const DirectTemplatePageView = ({
       </Card>
 
       <div className="col-span-12 lg:col-span-6 xl:col-span-5">
-        <DocumentFlowFormContainer
-          className="lg:h-[calc(100vh-6rem)]"
-          onSubmit={(e) => e.preventDefault()}
-        >
+        <DocumentFlowFormContainer className="lg:h-[calc(100vh-6rem)]" onSubmit={(e) => e.preventDefault()}>
           <Stepper
             currentStep={currentDocumentFlow.stepIndex}
             setCurrentStep={(step) => setStep(DirectTemplateSteps[step - 1])}

@@ -84,6 +84,15 @@ npm run prisma:seed -w @documenso/prisma
 </Step>
 
 <Step>
+### Optional: configure job provider
+
+The default local job provider does not support scheduled jobs required for document reminders.
+
+See the [Background Jobs](/docs/self-hosting/configuration/background-jobs) page for more information.
+
+</Step>
+
+<Step>
 ### Start the application
 
 Run `npm run dev` in the root directory to start the application.
@@ -104,6 +113,20 @@ Access the Documenso application by visiting `http://localhost:3000` in your web
   Terminal or Windows Subsystem for Linux (WSL), see **[Create your signing
   certificate](/docs/developers/local-development/signing-certificate)**.
 </Callout>
+
+## Running Scripts with Environment Variables
+
+If a package script does not automatically load your `.env` and `.env.local` files, wrap it with the `with:env` script:
+
+```bash
+npm run with:env -- npm run myscript
+```
+
+The same works for `npx` when running bin scripts:
+
+```bash
+npm run with:env -- npx myscript
+```
 
 ## See Also
 

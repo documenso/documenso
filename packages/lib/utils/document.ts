@@ -1,23 +1,20 @@
-import type {
-  DocumentMeta,
-  Envelope,
-  OrganisationGlobalSettings,
-  Recipient,
-  Team,
-  User,
-} from '@prisma/client';
-import { DocumentDistributionMethod, DocumentSigningOrder, DocumentStatus } from '@prisma/client';
+import type { DocumentMeta, Envelope, OrganisationGlobalSettings, Recipient, Team, User } from '@prisma/client';
+import { DocumentDistributionMethod, DocumentStatus } from '@prisma/client';
 
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../constants/time-zones';
+import { resolveSigningOrder } from '../server-only/signature-level/resolve-signing-order';
 import type { TDocumentLite, TDocumentMany } from '../types/document';
 import { DEFAULT_DOCUMENT_EMAIL_SETTINGS } from '../types/document-email';
+import { SignatureLevel } from '../types/signature-level';
 import { mapSecondaryIdToDocumentId } from './envelope';
 import { mapRecipientToLegacyRecipient } from './recipients';
 
 export const isDocumentCompleted = (document: Pick<Envelope, 'status'> | DocumentStatus) => {
   const status = typeof document === 'string' ? document : document.status;
 
-  return status === DocumentStatus.COMPLETED || status === DocumentStatus.REJECTED;
+  return (
+    status === DocumentStatus.COMPLETED || status === DocumentStatus.REJECTED || status === DocumentStatus.CANCELLED
+  );
 };
 
 /**
@@ -30,11 +27,17 @@ export const isDocumentCompleted = (document: Pick<Envelope, 'status'> | Documen
  *
  * @param settings - The merged organisation/team settings.
  * @param overrideMeta - The meta to override the settings with.
+ * @param signatureLevel - The envelope's signature level. Optional; defaults
+ *   to `SES` for backward compatibility, which preserves the legacy `PARALLEL`
+ *   signing-order default. New callers should pass the resolved level so the
+ *   TSP envelopes get the `SEQUENTIAL` default + assertion against explicit
+ *   `PARALLEL`.
  * @returns The derived document meta.
  */
 export const extractDerivedDocumentMeta = (
   settings: Omit<OrganisationGlobalSettings, 'id'>,
   overrideMeta: Partial<DocumentMeta> | undefined | null,
+  signatureLevel: string = SignatureLevel.SES,
 ) => {
   const meta = overrideMeta ?? {};
 
@@ -48,7 +51,7 @@ export const extractDerivedDocumentMeta = (
     subject: meta.subject || null,
     redirectUrl: meta.redirectUrl || null,
 
-    signingOrder: meta.signingOrder || DocumentSigningOrder.PARALLEL,
+    signingOrder: resolveSigningOrder({ signatureLevel, requested: meta.signingOrder }),
     allowDictateNextSigner: meta.allowDictateNextSigner ?? false,
     distributionMethod: meta.distributionMethod || DocumentDistributionMethod.EMAIL, // Todo: Make this a setting.
 
@@ -60,12 +63,13 @@ export const extractDerivedDocumentMeta = (
     // Email settings.
     emailId: meta.emailId ?? settings.emailId,
     emailReplyTo: meta.emailReplyTo ?? settings.emailReplyTo,
-    emailSettings:
-      meta.emailSettings || settings.emailDocumentSettings || DEFAULT_DOCUMENT_EMAIL_SETTINGS,
+    emailSettings: meta.emailSettings || settings.emailDocumentSettings || DEFAULT_DOCUMENT_EMAIL_SETTINGS,
 
     // Envelope expiration.
-    envelopeExpirationPeriod:
-      meta.envelopeExpirationPeriod ?? settings.envelopeExpirationPeriod ?? null,
+    envelopeExpirationPeriod: meta.envelopeExpirationPeriod ?? settings.envelopeExpirationPeriod ?? null,
+
+    // Reminder settings.
+    reminderSettings: meta.reminderSettings ?? settings.reminderSettings ?? null,
   } satisfies Omit<DocumentMeta, 'id'>;
 };
 
@@ -112,9 +116,7 @@ type MapEnvelopeToDocumentManyOptions = Envelope & {
  *
  * Do not use spread operator here to avoid unexpected behavior.
  */
-export const mapEnvelopesToDocumentMany = (
-  envelope: MapEnvelopeToDocumentManyOptions,
-): TDocumentMany => {
+export const mapEnvelopesToDocumentMany = (envelope: MapEnvelopeToDocumentManyOptions): TDocumentMany => {
   const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 
   return {
@@ -147,8 +149,6 @@ export const mapEnvelopesToDocumentMany = (
       id: envelope.teamId,
       url: envelope.team.url,
     },
-    recipients: envelope.recipients.map((recipient) =>
-      mapRecipientToLegacyRecipient(recipient, envelope),
-    ),
+    recipients: envelope.recipients.map((recipient) => mapRecipientToLegacyRecipient(recipient, envelope)),
   };
 };

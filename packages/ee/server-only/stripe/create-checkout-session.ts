@@ -1,5 +1,3 @@
-import type Stripe from 'stripe';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { stripe } from '@documenso/lib/server-only/stripe';
 
@@ -7,15 +5,9 @@ export type CreateCheckoutSessionOptions = {
   customerId: string;
   priceId: string;
   returnUrl: string;
-  subscriptionMetadata?: Stripe.Metadata;
 };
 
-export const createCheckoutSession = async ({
-  customerId,
-  priceId,
-  returnUrl,
-  subscriptionMetadata,
-}: CreateCheckoutSessionOptions) => {
+export const createCheckoutSession = async ({ customerId, priceId, returnUrl }: CreateCheckoutSessionOptions) => {
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
     mode: 'subscription',
@@ -27,9 +19,7 @@ export const createCheckoutSession = async ({
     ],
     success_url: `${returnUrl}?success=true`,
     cancel_url: `${returnUrl}?canceled=true`,
-    subscription_data: {
-      metadata: subscriptionMetadata,
-    },
+    billing_address_collection: 'required',
   });
 
   if (!session.url) {

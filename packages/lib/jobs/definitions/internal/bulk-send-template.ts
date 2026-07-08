@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { ZRequestMetadataSchema } from '../../../universal/extract-request-metadata';
-import { type JobDefinition } from '../../client/_internal/job';
+import type { JobDefinition } from '../../client/_internal/job';
 
 const BULK_SEND_TEMPLATE_JOB_DEFINITION_ID = 'internal.bulk-send-template';
 
@@ -14,9 +14,7 @@ const BULK_SEND_TEMPLATE_JOB_DEFINITION_SCHEMA = z.object({
   requestMetadata: ZRequestMetadataSchema.optional(),
 });
 
-export type TBulkSendTemplateJobDefinition = z.infer<
-  typeof BULK_SEND_TEMPLATE_JOB_DEFINITION_SCHEMA
->;
+export type TBulkSendTemplateJobDefinition = z.infer<typeof BULK_SEND_TEMPLATE_JOB_DEFINITION_SCHEMA>;
 
 export const BULK_SEND_TEMPLATE_JOB_DEFINITION = {
   id: BULK_SEND_TEMPLATE_JOB_DEFINITION_ID,
@@ -31,7 +29,4 @@ export const BULK_SEND_TEMPLATE_JOB_DEFINITION = {
 
     await handler.run({ payload, io });
   },
-} as const satisfies JobDefinition<
-  typeof BULK_SEND_TEMPLATE_JOB_DEFINITION_ID,
-  TBulkSendTemplateJobDefinition
->;
+} as const satisfies JobDefinition<typeof BULK_SEND_TEMPLATE_JOB_DEFINITION_ID, TBulkSendTemplateJobDefinition>;

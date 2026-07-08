@@ -1,6 +1,5 @@
-import { UserSecurityAuditLogType } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
+import { UserSecurityAuditLogType } from '@prisma/client';
 
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 
@@ -10,11 +9,7 @@ export interface DeletePasskeyOptions {
   requestMetadata?: RequestMetadata;
 }
 
-export const deletePasskey = async ({
-  userId,
-  passkeyId,
-  requestMetadata,
-}: DeletePasskeyOptions) => {
+export const deletePasskey = async ({ userId, passkeyId, requestMetadata }: DeletePasskeyOptions) => {
   await prisma.passkey.findFirstOrThrow({
     where: {
       id: passkeyId,

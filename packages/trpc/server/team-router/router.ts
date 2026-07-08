@@ -25,6 +25,7 @@ import {
   ZUpdateTeamEmailMutationSchema,
 } from './schema';
 import { updateTeamRoute } from './update-team';
+import { updateTeamBrandingLogoRoute } from './update-team-branding-logo';
 import { updateTeamGroupRoute } from './update-team-group';
 import { updateTeamMemberRoute } from './update-team-member';
 import { updateTeamSettingsRoute } from './update-team-settings';
@@ -50,6 +51,7 @@ export const teamRouter = router({
   },
   settings: {
     update: updateTeamSettingsRoute,
+    updateBrandingLogo: updateTeamBrandingLogoRoute,
   },
 
   // Old routes (to be migrated)
@@ -58,37 +60,33 @@ export const teamRouter = router({
     get: authenticatedProcedure.query(async ({ ctx }) => {
       return await getTeamEmailByEmail({ email: ctx.user.email });
     }),
-    update: authenticatedProcedure
-      .input(ZUpdateTeamEmailMutationSchema)
-      .mutation(async ({ input, ctx }) => {
-        ctx.logger.info({
-          input: {
-            teamId: input.teamId,
-          },
-        });
+    update: authenticatedProcedure.input(ZUpdateTeamEmailMutationSchema).mutation(async ({ input, ctx }) => {
+      ctx.logger.info({
+        input: {
+          teamId: input.teamId,
+        },
+      });
 
-        return await updateTeamEmail({
-          userId: ctx.user.id,
-          ...input,
-        });
-      }),
-    delete: authenticatedProcedure
-      .input(ZDeleteTeamEmailMutationSchema)
-      .mutation(async ({ input, ctx }) => {
-        const { teamId } = input;
+      return await updateTeamEmail({
+        userId: ctx.user.id,
+        ...input,
+      });
+    }),
+    delete: authenticatedProcedure.input(ZDeleteTeamEmailMutationSchema).mutation(async ({ input, ctx }) => {
+      const { teamId } = input;
 
-        ctx.logger.info({
-          input: {
-            teamId,
-          },
-        });
-
-        return await deleteTeamEmail({
-          userId: ctx.user.id,
-          userEmail: ctx.user.email,
+      ctx.logger.info({
+        input: {
           teamId,
-        });
-      }),
+        },
+      });
+
+      return await deleteTeamEmail({
+        userId: ctx.user.id,
+        userEmail: ctx.user.email,
+        teamId,
+      });
+    }),
     verification: {
       send: authenticatedProcedure
         .input(ZCreateTeamEmailVerificationMutationSchema)

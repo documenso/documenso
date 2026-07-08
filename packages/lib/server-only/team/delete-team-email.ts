@@ -1,12 +1,9 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
-
-import { mailer } from '@documenso/email/mailer';
 import { TeamEmailRemovedTemplate } from '@documenso/email/templates/team-email-removed';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { prisma } from '@documenso/prisma';
+import { msg } from '@lingui/core/macro';
+import { createElement } from 'react';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { env } from '../../utils/env';
@@ -26,7 +23,7 @@ export type DeleteTeamEmailOptions = {
  * The user must either be part of the team with the required permissions, or the owner of the email.
  */
 export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamEmailOptions) => {
-  const { branding, emailLanguage, senderEmail } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, emailTransport } = await getEmailContext({
     emailType: 'INTERNAL',
     source: {
       type: 'team',
@@ -89,7 +86,7 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
 
     const i18n = await getI18nInstance(emailLanguage);
 
-    await mailer.sendMail({
+    await emailTransport.sendMail({
       to: {
         address: team.organisation.owner.email,
         name: team.organisation.owner.name ?? '',

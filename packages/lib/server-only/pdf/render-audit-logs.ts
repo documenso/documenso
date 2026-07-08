@@ -1,24 +1,22 @@
 import type { I18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import type { DocumentMeta } from '@prisma/client';
-import type { Envelope, RecipientRole } from '@prisma/client';
+import type { DocumentMeta, Envelope, RecipientRole } from '@prisma/client';
 import Konva from 'konva';
 import 'konva/skia-backend';
-import type { DateTimeFormatOptions } from 'luxon';
-import { DateTime } from 'luxon';
 import fs from 'node:fs';
 import path from 'node:path';
+import type { DateTimeFormatOptions } from 'luxon';
+import { DateTime } from 'luxon';
 import type { Canvas } from 'skia-canvas';
 import { Image as SkiaImage } from 'skia-canvas';
-import { match } from 'ts-pattern';
-import { P } from 'ts-pattern';
+import { match, P } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 
 import { DOCUMENT_STATUS } from '../../constants/document';
 import { APP_I18N_OPTIONS } from '../../constants/i18n';
 import { RECIPIENT_ROLES_DESCRIPTION } from '../../constants/recipient-roles';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { TDocumentAuditLog } from '../../types/document-audit-logs';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { formatDocumentAuditLogAction } from '../../utils/document-audit-logs';
 import { ensureFontLibrary } from './helpers';
 
@@ -57,7 +55,7 @@ const textXs = 8;
 const fontMedium = '500';
 
 const pageTopMargin = 60;
-const pageBottomMargin = 15;
+const pageBottomMargin = 27;
 const contentMaxWidth = 768;
 const rowPadding = 10;
 const titleFontSize = 18;
@@ -219,9 +217,7 @@ const renderOverviewCard = (options: RenderOverviewCardOptions) => {
 
   const statusLabel = renderOverviewCardLabels({
     label: i18n._(msg`Status`),
-    text: i18n
-      ._(envelope.deletedAt ? msg`Deleted` : DOCUMENT_STATUS[envelope.status].description)
-      .toUpperCase(),
+    text: i18n._(envelope.deletedAt ? msg`Deleted` : DOCUMENT_STATUS[envelope.status].description).toUpperCase(),
     width: columnWidth,
   });
   const timeZoneLabel = renderOverviewCardLabels({
@@ -352,9 +348,7 @@ const renderRow = (options: RenderRowOptions) => {
   const auditLogTimestampText = new Konva.Text({
     x: columnWidth + columnSpacing,
     width: columnWidth,
-    text: DateTime.fromJSDate(auditLog.createdAt)
-      .setLocale(APP_I18N_OPTIONS.defaultLocale)
-      .toLocaleString(dateFormat),
+    text: DateTime.fromJSDate(auditLog.createdAt).setLocale(APP_I18N_OPTIONS.defaultLocale).toLocaleString(dateFormat),
     fontFamily: 'Inter',
     align: 'right',
     fontSize: textSm,
@@ -595,7 +589,7 @@ export async function renderAuditLogs({
 
   const groupedRows = groupRowsIntoPages({
     auditLogs,
-    maxHeight: pageHeight,
+    maxHeight: pageHeight - pageBottomMargin,
     contentWidth,
     i18n,
     overviewCard,
@@ -621,6 +615,16 @@ export async function renderAuditLogs({
   for (const [index, pageGroup] of pageGroups.entries()) {
     stage.destroyChildren();
     const page = new Konva.Layer();
+
+    const footerText = new Konva.Text({
+      x: margin,
+      y: pageHeight - textXs - 10,
+      text: `${i18n._(msg`Envelope ID`)}: ${envelope.id}`,
+      fontFamily: 'Inter',
+      fontSize: textXs,
+      fill: textMutedForegroundLight,
+    });
+    page.add(footerText);
 
     page.add(pageGroup);
 
@@ -657,6 +661,16 @@ export async function renderAuditLogs({
       y: pageTopMargin,
     } satisfies Partial<Konva.GroupConfig>);
 
+    const overflowFooterText = new Konva.Text({
+      x: margin,
+      y: pageHeight - textXs - 10,
+      text: `${i18n._(msg`Envelope ID`)}: ${envelope.id}`,
+      fontFamily: 'Inter',
+      fontSize: textXs,
+      fill: textMutedForegroundLight,
+    });
+    page.add(overflowFooterText);
+
     page.add(brandingGroup);
     stage.add(page);
 
@@ -687,10 +701,7 @@ const getAuditLogIndicatorColor = (type: string) =>
     .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED, () => '#ef4444') // bg-red-500
     .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT, () => '#f97316') // bg-orange-500
     .with(
-      P.union(
-        DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
-        DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED,
-      ),
+      P.union(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED, DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED),
       () => '#3b82f6', // bg-blue-500
     )
     .otherwise(() => '#f1f5f9'); // bg-muted

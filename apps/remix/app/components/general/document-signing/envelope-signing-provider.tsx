@@ -1,26 +1,17 @@
-import { createContext, useContext, useMemo, useState } from 'react';
-
-import {
-  EnvelopeType,
-  type Field,
-  FieldType,
-  type Recipient,
-  RecipientRole,
-  SigningStatus,
-} from '@prisma/client';
-import { prop, sortBy } from 'remeda';
-
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import type { EnvelopeForSigningResponse } from '@documenso/lib/server-only/envelope/get-envelope-for-recipient-signing';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
-import {
-  isFieldUnsignedAndRequired,
-  isRequiredField,
-} from '@documenso/lib/utils/advanced-fields-helpers';
+import { isFieldUnsignedAndRequired, isRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
 import { trpc } from '@documenso/trpc/react';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
+import { EnvelopeType, type Field, FieldType, type Recipient, RecipientRole, SigningStatus } from '@prisma/client';
+import { DateTime } from 'luxon';
+import { createContext, useContext, useMemo, useState } from 'react';
+import { prop, sortBy } from 'remeda';
 
 export type EnvelopeSigningContextValue = {
   isDirectTemplate: boolean;
@@ -83,6 +74,52 @@ export interface EnvelopeSigningProviderProps {
   children: React.ReactNode;
 }
 
+/**
+ * Inject prefilled date fields for the current recipient.
+ *
+ * The dates are filled in correctly when the recipient "completes" the document.
+ */
+const prefillDateFields = (data: EnvelopeForSigningResponse): EnvelopeForSigningResponse => {
+  const { timezone, dateFormat } = data.envelope.documentMeta;
+
+  const formattedDate = DateTime.now()
+    .setZone(timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
+    .toFormat(dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
+
+  const prefillField = <T extends { type: FieldType; inserted: boolean; customText: string; fieldMeta: unknown }>(
+    field: T,
+  ): T => {
+    if (field.type !== FieldType.DATE || field.inserted) {
+      return field;
+    }
+
+    return {
+      ...field,
+      customText: formattedDate,
+      inserted: true,
+      fieldMeta: {
+        ...(typeof field.fieldMeta === 'object' ? field.fieldMeta : {}),
+        readOnly: true,
+      },
+    };
+  };
+
+  return {
+    ...data,
+    envelope: {
+      ...data.envelope,
+      recipients: data.envelope.recipients.map((recipient) => ({
+        ...recipient,
+        fields: recipient.fields.map(prefillField),
+      })),
+    },
+    recipient: {
+      ...data.recipient,
+      fields: data.recipient.fields.map(prefillField),
+    },
+  };
+};
+
 export const EnvelopeSigningProvider = ({
   fullName: initialFullName,
   email: initialEmail,
@@ -90,7 +127,7 @@ export const EnvelopeSigningProvider = ({
   envelopeData: initialEnvelopeData,
   children,
 }: EnvelopeSigningProviderProps) => {
-  const [envelopeData, setEnvelopeData] = useState(initialEnvelopeData);
+  const [envelopeData, setEnvelopeData] = useState(() => prefillDateFields(initialEnvelopeData));
 
   const { envelope, recipient } = envelopeData;
 
@@ -121,9 +158,7 @@ export const EnvelopeSigningProvider = ({
         },
         recipient: {
           ...prev.recipient,
-          fields: prev.recipient.fields.map((field) =>
-            field.id === data.signedField.id ? data.signedField : field,
-          ),
+          fields: prev.recipient.fields.map((field) => (field.id === data.signedField.id ? data.signedField : field)),
         },
       }));
     },
@@ -137,25 +172,17 @@ export const EnvelopeSigningProvider = ({
 
       if (
         !sig &&
-        (envelope.documentMeta.uploadSignatureEnabled ||
-          envelope.documentMeta.drawSignatureEnabled) &&
+        (envelope.documentMeta.uploadSignatureEnabled || envelope.documentMeta.drawSignatureEnabled) &&
         envelopeData.recipientSignature?.signatureImageAsBase64
       ) {
         return envelopeData.recipientSignature.signatureImageAsBase64;
       }
 
-      if (
-        !sig &&
-        envelope.documentMeta.typedSignatureEnabled &&
-        envelopeData.recipientSignature?.typedSignature
-      ) {
+      if (!sig && envelope.documentMeta.typedSignatureEnabled && envelopeData.recipientSignature?.typedSignature) {
         return envelopeData.recipientSignature.typedSignature;
       }
 
-      if (
-        isBase64 &&
-        (envelope.documentMeta.uploadSignatureEnabled || envelope.documentMeta.drawSignatureEnabled)
-      ) {
+      if (isBase64 && (envelope.documentMeta.uploadSignatureEnabled || envelope.documentMeta.drawSignatureEnabled)) {
         return sig;
       }
 
@@ -174,9 +201,7 @@ export const EnvelopeSigningProvider = ({
     const requiredFields = envelopeData.recipient.fields
       .filter((field) => isFieldUnsignedAndRequired(field))
       .map((field) => {
-        const envelopeItem = envelope.envelopeItems.find(
-          (item) => item.id === field.envelopeItemId,
-        );
+        const envelopeItem = envelope.envelopeItems.find((item) => item.id === field.envelopeItemId);
 
         if (!envelopeItem) {
           throw new Error('Missing envelope item');
@@ -228,8 +253,7 @@ export const EnvelopeSigningProvider = ({
     recipient.role === RecipientRole.ASSISTANT
       ? assistantRecipients
           .filter((r) => r.signingStatus !== SigningStatus.SIGNED)
-          .map((r) => r.fields.filter((field) => field.type !== FieldType.SIGNATURE))
-          .flat()
+          .flatMap((r) => r.fields.filter((field) => field.type !== FieldType.SIGNATURE))
       : [];
 
   /**
@@ -266,19 +290,24 @@ export const EnvelopeSigningProvider = ({
     .filter((field) => field.inserted);
 
   const nextRecipient = useMemo(() => {
-    if (
-      !envelope.documentMeta.signingOrder ||
-      envelope.documentMeta.signingOrder !== 'SEQUENTIAL'
-    ) {
+    if (!envelope.documentMeta.signingOrder || envelope.documentMeta.signingOrder !== 'SEQUENTIAL') {
       return null;
     }
 
-    const sortedRecipients = envelope.recipients.sort((a, b) => {
+    const sortedRecipients = [...envelope.recipients].sort((a, b) => {
       // Sort by signingOrder first (nulls last), then by id
-      if (a.signingOrder === null && b.signingOrder === null) return a.id - b.id;
-      if (a.signingOrder === null) return 1;
-      if (b.signingOrder === null) return -1;
-      if (a.signingOrder === b.signingOrder) return a.id - b.id;
+      if (a.signingOrder === null && b.signingOrder === null) {
+        return a.id - b.id;
+      }
+      if (a.signingOrder === null) {
+        return 1;
+      }
+      if (b.signingOrder === null) {
+        return -1;
+      }
+      if (a.signingOrder === b.signingOrder) {
+        return a.id - b.id;
+      }
       return a.signingOrder - b.signingOrder;
     });
 
@@ -311,10 +340,7 @@ export const EnvelopeSigningProvider = ({
     return signedField;
   };
 
-  const handleDirectTemplateFieldInsertion = (
-    fieldId: number,
-    fieldValue: TSignEnvelopeFieldValue,
-  ) => {
+  const handleDirectTemplateFieldInsertion = (fieldId: number, fieldValue: TSignEnvelopeFieldValue) => {
     const foundField = recipient.fields.find((field) => field.id === fieldId);
 
     if (!foundField) {

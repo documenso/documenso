@@ -1,12 +1,12 @@
-import { EnvelopeType } from '@prisma/client';
-
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
+import { EnvelopeType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
+import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface DeleteDocumentFieldOptions {
@@ -16,12 +16,7 @@ export interface DeleteDocumentFieldOptions {
   requestMetadata: ApiRequestMetadata;
 }
 
-export const deleteDocumentField = async ({
-  userId,
-  teamId,
-  fieldId,
-  requestMetadata,
-}: DeleteDocumentFieldOptions) => {
+export const deleteDocumentField = async ({ userId, teamId, fieldId, requestMetadata }: DeleteDocumentFieldOptions) => {
   // Unauthenticated check, we do the real check later.
   const field = await prisma.field.findFirst({
     where: {
@@ -65,6 +60,8 @@ export const deleteDocumentField = async ({
     });
   }
 
+  assertEnvelopeMutable(envelope);
+
   if (envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Document already complete',
@@ -87,6 +84,8 @@ export const deleteDocumentField = async ({
   }
 
   return await prisma.$transaction(async (tx) => {
+    await assertEnvelopeMutable(envelope, tx);
+
     const deletedField = await tx.field.delete({
       where: {
         id: fieldId,

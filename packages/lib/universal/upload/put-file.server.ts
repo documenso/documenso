@@ -1,9 +1,8 @@
+import { env } from '@documenso/lib/utils/env';
 import { PDF } from '@libpdf/core';
 import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
 import { match } from 'ts-pattern';
-
-import { env } from '@documenso/lib/utils/env';
 
 import { AppError } from '../../errors/app-error';
 import { createDocumentData } from '../../server-only/document-data/create-document-data';
@@ -41,16 +40,18 @@ export const putPdfFileServerSide = async (file: File, initialData?: string) => 
 
   const { type, data } = await putFileServerSide(file);
 
-  return await createDocumentData({ type, data, initialData });
+  const createdData = await createDocumentData({ type, data, initialData });
+
+  return {
+    documentData: createdData,
+    filePageCount: pdf.getPageCount(),
+  };
 };
 
 /**
  * Uploads a pdf file and normalizes it.
  */
-export const putNormalizedPdfFileServerSide = async (
-  file: File,
-  options: { flattenForm?: boolean } = {},
-) => {
+export const putNormalizedPdfFileServerSide = async (file: File, options: { flattenForm?: boolean } = {}) => {
   const buffer = Buffer.from(await file.arrayBuffer());
 
   const normalized = await normalizePdf(buffer, options);
@@ -76,7 +77,8 @@ export const putFileServerSide = async (file: File) => {
   const NEXT_PUBLIC_UPLOAD_TRANSPORT = env('NEXT_PUBLIC_UPLOAD_TRANSPORT');
 
   return await match(NEXT_PUBLIC_UPLOAD_TRANSPORT)
-    .with('s3', async () => putFileInS3(file))
+    .with('s3', async () => putFileInObjectStorage(file))
+    .with('azure-blob', async () => putFileInObjectStorage(file))
     .otherwise(async () => putFileInDatabase(file));
 };
 
@@ -93,7 +95,7 @@ const putFileInDatabase = async (file: File) => {
   };
 };
 
-const putFileInS3 = async (file: File) => {
+const putFileInObjectStorage = async (file: File) => {
   const buffer = await file.arrayBuffer();
 
   const blob = new Blob([buffer], { type: file.type });

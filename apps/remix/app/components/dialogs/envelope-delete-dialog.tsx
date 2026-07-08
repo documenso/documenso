@@ -1,11 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
-import { P, match } from 'ts-pattern';
-
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
@@ -22,6 +14,11 @@ import {
 } from '@documenso/ui/primitives/dialog';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
+import { useEffect, useState } from 'react';
+import { match, P } from 'ts-pattern';
 
 type EnvelopeDeleteDialogProps = {
   id: string;
@@ -52,13 +49,23 @@ export const EnvelopeDeleteDialog = ({
   const [inputValue, setInputValue] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(status === DocumentStatus.DRAFT);
 
+  const isDocument = type === EnvelopeType.DOCUMENT;
+
   const { mutateAsync: deleteEnvelope, isPending } = trpcReact.envelope.delete.useMutation({
     onSuccess: async () => {
       void refreshLimits();
 
       toast({
-        title: t`Document deleted`,
-        description: t`"${title}" has been successfully deleted`,
+        title: canManageDocument
+          ? isDocument
+            ? t`Document deleted`
+            : t`Template deleted`
+          : isDocument
+            ? t`Document hidden`
+            : t`Template hidden`,
+        description: canManageDocument
+          ? t`"${title}" has been successfully deleted`
+          : t`"${title}" has been successfully hidden`,
         duration: 5000,
       });
 
@@ -69,7 +76,9 @@ export const EnvelopeDeleteDialog = ({
     onError: () => {
       toast({
         title: t`Something went wrong`,
-        description: t`This document could not be deleted at this time. Please try again.`,
+        description: isDocument
+          ? t`This document could not be deleted at this time. Please try again.`
+          : t`This template could not be deleted at this time. Please try again.`,
         variant: 'destructive',
         duration: 7500,
       });
@@ -118,13 +127,13 @@ export const EnvelopeDeleteDialog = ({
                 <AlertDescription>
                   {type === EnvelopeType.DOCUMENT ? (
                     <Trans>
-                      Please note that this action is <strong>irreversible</strong>. Once confirmed,
-                      this document will be permanently deleted.
+                      Please note that this action is <strong>irreversible</strong>. Once confirmed, this document will
+                      be permanently deleted.
                     </Trans>
                   ) : (
                     <Trans>
-                      Please note that this action is <strong>irreversible</strong>. Once confirmed,
-                      this template will be permanently deleted.
+                      Please note that this action is <strong>irreversible</strong>. Once confirmed, this template will
+                      be permanently deleted.
                     </Trans>
                   )}
                 </AlertDescription>
@@ -157,7 +166,7 @@ export const EnvelopeDeleteDialog = ({
                   </ul>
                 </AlertDescription>
               ))
-              .with(P.union(DocumentStatus.COMPLETED, DocumentStatus.REJECTED), () => (
+              .with(P.union(DocumentStatus.COMPLETED, DocumentStatus.REJECTED, DocumentStatus.CANCELLED), () => (
                 <AlertDescription>
                   <p>
                     <Trans>By deleting this document, the following will occur:</Trans>

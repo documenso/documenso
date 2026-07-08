@@ -1,9 +1,8 @@
+import { prisma } from '@documenso/prisma';
 import { sha256 } from '@noble/hashes/sha2';
 import { BackgroundJobStatus, Prisma } from '@prisma/client';
 import { CronExpressionParser } from 'cron-parser';
 import type { Context as HonoContext } from 'hono';
-
-import { prisma } from '@documenso/prisma';
 
 import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
 import { sign } from '../../server-only/crypto/sign';
@@ -50,11 +49,11 @@ export class LocalJobProvider extends BaseJobProvider {
   }
 
   static getInstance() {
-    if (!this._instance) {
-      this._instance = new LocalJobProvider();
+    if (!LocalJobProvider._instance) {
+      LocalJobProvider._instance = new LocalJobProvider();
     }
 
-    return this._instance;
+    return LocalJobProvider._instance;
   }
 
   public defineJob<N extends string, T>(definition: JobDefinition<N, T>) {
@@ -192,9 +191,7 @@ export class LocalJobProvider extends BaseJobProvider {
   }
 
   public async triggerJob(options: SimpleTriggerJobOptions) {
-    const eligibleJobs = Object.values(this._jobDefinitions).filter(
-      (job) => job.trigger.name === options.name,
-    );
+    const eligibleJobs = Object.values(this._jobDefinitions).filter((job) => job.trigger.name === options.name);
 
     await Promise.all(
       eligibleJobs.map(async (job) => {
@@ -245,11 +242,7 @@ export class LocalJobProvider extends BaseJobProvider {
 
       const definition = this._jobDefinitions[options.name];
 
-      if (
-        typeof jobId !== 'string' ||
-        typeof signature !== 'string' ||
-        typeof options !== 'object'
-      ) {
+      if (typeof jobId !== 'string' || typeof signature !== 'string' || typeof options !== 'object') {
         return c.text('Bad request', 400);
       }
 
@@ -267,15 +260,19 @@ export class LocalJobProvider extends BaseJobProvider {
         return c.text('Unauthorized', 401);
       }
 
+      let payload = options.payload;
+
       if (definition.trigger.schema) {
-        const result = definition.trigger.schema.safeParse(options.payload);
+        const result = definition.trigger.schema.safeParse(payload);
 
         if (!result.success) {
           return c.text('Bad request', 400);
         }
+
+        payload = result.data;
       }
 
-      console.log(`[JOBS]: Triggering job ${options.name} with payload`, options.payload);
+      console.log(`[JOBS]: Triggering job ${options.name} with payload`, payload);
 
       let backgroundJob = await prisma.backgroundJob
         .update({
@@ -299,7 +296,7 @@ export class LocalJobProvider extends BaseJobProvider {
 
       try {
         await definition.handler({
-          payload: options.payload,
+          payload,
           io: this.createJobRunIO(jobId),
         });
 
@@ -318,8 +315,7 @@ export class LocalJobProvider extends BaseJobProvider {
 
         const taskHasExceededRetries = error instanceof BackgroundTaskExceededRetriesError;
         const jobHasExceededRetries =
-          backgroundJob.retried >= backgroundJob.maxRetries &&
-          !(error instanceof BackgroundTaskFailedError);
+          backgroundJob.retried >= backgroundJob.maxRetries && !(error instanceof BackgroundTaskFailedError);
 
         if (taskHasExceededRetries || jobHasExceededRetries) {
           backgroundJob = await prisma.backgroundJob.update({

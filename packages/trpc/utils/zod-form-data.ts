@@ -1,5 +1,41 @@
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
+import {
+  BRANDING_LOGO_ALLOWED_TYPES,
+  BRANDING_LOGO_MAX_SIZE_BYTES,
+  BRANDING_LOGO_MAX_SIZE_MB,
+} from '@documenso/lib/constants/branding';
+import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 import type { ZodRawShape } from 'zod';
 import z from 'zod';
+import { zfd } from 'zod-form-data';
+
+/**
+ * A `zfd.file()` schema with a max file size constraint based on
+ * `APP_DOCUMENT_UPLOAD_SIZE_LIMIT`. Use this instead of bare `zfd.file()`
+ * to ensure server-side file size validation.
+ */
+export const zfdFile = () => {
+  const maxBytes = megabytesToBytes(APP_DOCUMENT_UPLOAD_SIZE_LIMIT);
+
+  return zfd.file().refine((file) => file.size <= maxBytes, {
+    message: `File cannot be larger than ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB`,
+  });
+};
+
+/**
+ * A `zfd.file()` schema constrained to branding-logo images: size-limited and
+ * restricted to a MIME allowlist. Use for server-side branding logo uploads.
+ */
+export const zfdBrandingImageFile = () => {
+  return zfd
+    .file()
+    .refine((file) => file.size <= BRANDING_LOGO_MAX_SIZE_BYTES, {
+      message: `File cannot be larger than ${BRANDING_LOGO_MAX_SIZE_MB}MB`,
+    })
+    .refine((file) => BRANDING_LOGO_ALLOWED_TYPES.includes(file.type), {
+      message: 'File must be a JPG, PNG, or WebP image',
+    });
+};
 
 /**
  * This helper takes the place of the `z.object` at the root of your schema.

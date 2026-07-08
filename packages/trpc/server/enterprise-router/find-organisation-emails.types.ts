@@ -1,7 +1,6 @@
-import { z } from 'zod';
-
 import { ZOrganisationEmailManySchema } from '@documenso/lib/types/organisation-email';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { z } from 'zod';
 
 export const ZFindOrganisationEmailsRequestSchema = ZFindSearchParamsSchema.extend({
   organisationId: z.string(),

@@ -1,12 +1,6 @@
-import { Hono } from 'hono';
-import { contextStorage } from 'hono/context-storage';
-import { cors } from 'hono/cors';
-import type { RequestIdVariables } from 'hono/request-id';
-import { requestId } from 'hono/request-id';
-import type { Logger } from 'pino';
-
 import { tsRestHonoApp } from '@documenso/api/hono';
 import { auth } from '@documenso/auth/server';
+import { csc } from '@documenso/ee/server-only/signing/csc/hono';
 import { jobsClient } from '@documenso/lib/jobs/client';
 import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import { createRateLimitMiddleware } from '@documenso/lib/server-only/rate-limit/rate-limit-middleware';
@@ -23,19 +17,32 @@ import { migrateLegacyServiceAccount } from '@documenso/lib/server-only/user/ser
 import { env } from '@documenso/lib/utils/env';
 import { logger } from '@documenso/lib/utils/logger';
 import { openApiDocument } from '@documenso/trpc/server/open-api';
+import { Hono } from 'hono';
+import { contextStorage } from 'hono/context-storage';
+import { cors } from 'hono/cors';
+import type { RequestIdVariables } from 'hono/request-id';
+import { requestId } from 'hono/request-id';
+import type { Logger } from 'pino';
 
 import { aiRoute } from './api/ai/route';
 import { downloadRoute } from './api/download/download';
 import { filesRoute } from './api/files/files';
 import { type AppContext, appContext } from './context';
 import { appMiddleware } from './middleware';
+import { securityHeadersMiddleware } from './security-headers';
 import { openApiTrpcServerHandler } from './trpc/hono-trpc-open-api';
 import { reactRouterTrpcServer } from './trpc/hono-trpc-remix';
+
+// Re-export so the rollup build (entry: server/router.ts) bundles
+// load-context.ts. server/main.js imports getLoadContext from the rolled-up
+// output to wire it into the React Router adapter.
+export { getLoadContext } from './load-context';
 
 export interface HonoEnv {
   Variables: RequestIdVariables & {
     context: AppContext;
     logger: Logger;
+    cspNonce: string;
   };
 }
 
@@ -55,6 +62,15 @@ const fileRateLimitMiddleware = createRateLimitMiddleware(fileUploadRateLimit);
  */
 app.use(contextStorage());
 app.use(appContext);
+
+/**
+ * Emit response security headers (CSP with per-request nonce, plus
+ * Referrer-Policy and X-Content-Type-Options on embed routes). Must run
+ * after `contextStorage()` so the nonce is readable via `getContext()` from
+ * `getLoadContext`, and before the React Router handler so the response
+ * carries the header.
+ */
+app.use(securityHeadersMiddleware);
 
 /**
  * RR7 app middleware.
@@ -89,16 +105,19 @@ app.route('/api/auth', auth);
 
 // Files route.
 app.use('/api/files/upload-pdf', fileRateLimitMiddleware);
-app.use('/api/files/presigned-post-url', fileRateLimitMiddleware);
 app.route('/api/files', filesRoute);
 
 // AI route.
 app.use('/api/ai/*', aiRateLimitMiddleware);
 app.route('/api/ai', aiRoute);
 
+// CSC OAuth routes (mounted from @documenso/ee).
+app.route('/api/csc', csc);
+
 // API servers.
 app.route('/api/v1', tsRestHonoApp);
 app.use('/api/jobs/*', jobsClient.getApiHandler());
+
 app.use('/api/trpc/*', trpcRateLimitMiddleware);
 app.use('/api/trpc/*', reactRouterTrpcServer);
 

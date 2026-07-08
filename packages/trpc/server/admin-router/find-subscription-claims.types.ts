@@ -1,7 +1,6 @@
-import type { z } from 'zod';
-
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import SubscriptionClaimSchema from '@documenso/prisma/generated/zod/modelSchema/SubscriptionClaimSchema';
+import type { z } from 'zod';
 
 export const ZFindSubscriptionClaimsRequestSchema = ZFindSearchParamsSchema.extend({});
 
@@ -14,8 +13,16 @@ export const ZFindSubscriptionClaimsResponseSchema = ZFindResultResponse.extend(
     teamCount: true,
     memberCount: true,
     envelopeItemCount: true,
+    recipientCount: true,
     locked: true,
     flags: true,
+    documentRateLimits: true,
+    documentQuota: true,
+    emailRateLimits: true,
+    emailQuota: true,
+    apiRateLimits: true,
+    apiQuota: true,
+    emailTransportId: true,
   }).array(),
 });
 

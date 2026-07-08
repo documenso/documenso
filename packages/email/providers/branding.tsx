@@ -1,3 +1,4 @@
+import type { EmailBrandingColors } from '@documenso/lib/utils/email-branding-colors';
 import { createContext, useContext } from 'react';
 
 type BrandingContextValue = {
@@ -6,6 +7,7 @@ type BrandingContextValue = {
   brandingLogo: string;
   brandingCompanyDetails: string;
   brandingHidePoweredBy: boolean;
+  brandingColors?: EmailBrandingColors;
 };
 
 const BrandingContext = createContext<BrandingContextValue | undefined>(undefined);
@@ -18,10 +20,7 @@ const defaultBrandingContextValue: BrandingContextValue = {
   brandingHidePoweredBy: false,
 };
 
-export const BrandingProvider = (props: {
-  branding?: BrandingContextValue;
-  children: React.ReactNode;
-}) => {
+export const BrandingProvider = (props: { branding?: BrandingContextValue; children: React.ReactNode }) => {
   return (
     <BrandingContext.Provider value={props.branding ?? defaultBrandingContextValue}>
       {props.children}

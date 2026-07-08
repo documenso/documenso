@@ -1,13 +1,3 @@
-import { useMemo, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { DateTime } from 'luxon';
-import type { DateTimeFormatOptions } from 'luxon';
-import { useSearchParams } from 'react-router';
-import { UAParser } from 'ua-parser-js';
-
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import type { TDocumentAuditLog } from '@documenso/lib/types/document-audit-logs';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
@@ -22,6 +12,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@documenso/ui/
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import type { DateTimeFormatOptions } from 'luxon';
+import { DateTime } from 'luxon';
+import { useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router';
+import { UAParser } from 'ua-parser-js';
 
 export type AdminDocumentLogsTableProps = {
   envelopeId: string;
@@ -104,9 +102,7 @@ export const AdminDocumentLogsTable = ({ envelopeId }: AdminDocumentLogsTablePro
       {
         header: _(msg`Action`),
         accessorKey: 'type',
-        cell: ({ row }) => (
-          <span>{formatDocumentAuditLogAction(i18n, row.original).description}</span>
-        ),
+        cell: ({ row }) => <span>{formatDocumentAuditLogAction(i18n, row.original).description}</span>,
       },
       {
         header: _(msg`IP Address`),
@@ -193,14 +189,14 @@ export const AdminDocumentLogsTable = ({ envelopeId }: AdminDocumentLogsTablePro
 
           {selectedAuditLog && (
             <div className="group relative">
-              <div className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
+              <div className="absolute top-2 right-2 opacity-0 transition-opacity group-hover:opacity-100">
                 <CopyTextButton
                   value={JSON.stringify(selectedAuditLog, null, 2)}
                   onCopySuccess={() => toast({ title: _(msg`Copied to clipboard`) })}
                 />
               </div>
 
-              <pre className="max-h-[60vh] overflow-auto whitespace-pre-wrap break-all rounded-lg border border-border bg-muted/50 p-4 font-mono text-xs leading-relaxed text-foreground">
+              <pre className="max-h-[60vh] overflow-auto whitespace-pre-wrap break-all rounded-lg border border-border bg-muted/50 p-4 font-mono text-foreground text-xs leading-relaxed">
                 {JSON.stringify(selectedAuditLog, null, 2)}
               </pre>
             </div>

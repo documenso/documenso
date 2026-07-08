@@ -1,8 +1,5 @@
-import { expect, test } from '@playwright/test';
-import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
-import { customAlphabet } from 'nanoid';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { FIELD_SIGNATURE_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
 import { createDocumentAuthOptions } from '@documenso/lib/utils/document-auth';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
@@ -10,14 +7,59 @@ import { prisma } from '@documenso/prisma';
 import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedDirectTemplate, seedTemplate } from '@documenso/prisma/seed/templates';
 import { seedTestEmail, seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
+import { DocumentSigningOrder, FieldType, RecipientRole } from '@prisma/client';
+import { customAlphabet } from 'nanoid';
 
 import { apiSignin } from '../fixtures/authentication';
+import { signSignaturePad } from '../fixtures/signature';
 
 // Duped from `packages/lib/utils/teams.ts` due to errors when importing that file.
 const formatDocumentsPath = (teamUrl: string) => `/t/${teamUrl}/documents`;
 const formatTemplatesPath = (teamUrl: string) => `/t/${teamUrl}/templates`;
 
 const nanoid = customAlphabet('1234567890abcdef', 10);
+
+const expectSigningRequestJobForRecipient = async (recipientId: number) => {
+  const job = await prisma.backgroundJob.findFirst({
+    where: {
+      jobId: 'send.signing.requested.email',
+      payload: {
+        path: ['recipientId'],
+        equals: recipientId,
+      },
+    },
+  });
+
+  expect(job).not.toBeNull();
+};
+
+const seedSignatureFieldForRecipient = async (options: {
+  envelopeId: string;
+  recipientId: number;
+  positionY: number;
+}) => {
+  const envelopeItem = await prisma.envelopeItem.findFirstOrThrow({
+    where: { envelopeId: options.envelopeId },
+  });
+
+  return await prisma.field.create({
+    data: {
+      envelopeId: options.envelopeId,
+      envelopeItemId: envelopeItem.id,
+      recipientId: options.recipientId,
+      type: FieldType.SIGNATURE,
+      page: 1,
+      positionX: 5,
+      positionY: options.positionY,
+      width: 20,
+      height: 5,
+      customText: '',
+      inserted: false,
+      fieldMeta: FIELD_SIGNATURE_META_DEFAULT_VALUES,
+    },
+  });
+};
 
 test('[DIRECT_TEMPLATES]: create direct link for template', async ({ page }) => {
   const { team, owner, organisation } = await seedTeam({
@@ -139,9 +181,7 @@ test('[DIRECT_TEMPLATES]: V1 direct template link auth access', async ({ page })
     },
   });
 
-  const directTemplatePath = formatDirectTemplatePath(
-    directTemplateWithAuth.directLink?.token || '',
-  );
+  const directTemplatePath = formatDirectTemplatePath(directTemplateWithAuth.directLink?.token || '');
 
   await page.goto(directTemplatePath);
 
@@ -181,9 +221,7 @@ test('[DIRECT_TEMPLATES]: V2 direct template link auth access', async ({ page })
     },
   });
 
-  const directTemplatePath = formatDirectTemplatePath(
-    directTemplateWithAuth.directLink?.token || '',
-  );
+  const directTemplatePath = formatDirectTemplatePath(directTemplateWithAuth.directLink?.token || '');
 
   await page.goto(directTemplatePath);
 
@@ -261,11 +299,24 @@ test('[DIRECT_TEMPLATES]: V1 use direct template link with 2 recipients with nex
     },
   });
 
+  const directTemplateRecipient = template.recipients[0];
+
+  if (!directTemplateRecipient) {
+    throw new Error('Expected direct template recipient to exist');
+  }
+
+  // All SIGNER recipients need a signature field for sendDocument to dispatch emails.
+  const directSignatureField = await seedSignatureFieldForRecipient({
+    envelopeId: template.id,
+    recipientId: directTemplateRecipient.id,
+    positionY: 10,
+  });
+
   const originalName = 'Signer 2';
   const originalSecondSignerEmail = seedTestEmail();
 
   // Add another signer
-  await prisma.recipient.create({
+  const secondRecipient = await prisma.recipient.create({
     data: {
       signingOrder: 2,
       envelopeId: template.id,
@@ -276,6 +327,12 @@ test('[DIRECT_TEMPLATES]: V1 use direct template link with 2 recipients with nex
     },
   });
 
+  await seedSignatureFieldForRecipient({
+    envelopeId: template.id,
+    recipientId: secondRecipient.id,
+    positionY: 20,
+  });
+
   // Check that the direct template link is accessible.
   await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
   await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
@@ -284,6 +341,12 @@ test('[DIRECT_TEMPLATES]: V1 use direct template link with 2 recipients with nex
   await page.getByPlaceholder('recipient@documenso.com').fill(seedTestEmail());
 
   await page.getByRole('button', { name: 'Continue' }).click();
+
+  // Sign the direct template recipient's signature field via the UI.
+  await signSignaturePad(page);
+  await page.locator(`#field-${directSignatureField.id}`).getByRole('button').click();
+  await expect(page.locator(`#field-${directSignatureField.id}`)).toHaveAttribute('data-inserted', 'true');
+
   await page.getByRole('button', { name: 'Complete' }).click();
 
   await expect(page.getByText('Next Recipient Name')).toBeVisible();
@@ -312,12 +375,17 @@ test('[DIRECT_TEMPLATES]: V1 use direct template link with 2 recipients with nex
     },
   });
 
-  const updatedSecondRecipient = createdEnvelopeRecipients.find(
-    (recipient) => recipient.signingOrder === 2,
-  );
+  const updatedSecondRecipient = createdEnvelopeRecipients.find((recipient) => recipient.signingOrder === 2);
 
-  expect(updatedSecondRecipient?.name).toBe(newName);
-  expect(updatedSecondRecipient?.email).toBe(newSecondSignerEmail);
+  expect(updatedSecondRecipient).toBeDefined();
+
+  if (!updatedSecondRecipient) {
+    throw new Error('Expected second recipient to exist');
+  }
+
+  expect(updatedSecondRecipient.name).toBe(newName);
+  expect(updatedSecondRecipient.email).toBe(newSecondSignerEmail);
+  await expectSigningRequestJobForRecipient(updatedSecondRecipient.id);
 });
 
 test('[DIRECT_TEMPLATES]: V2 use direct template link with 2 recipients with next signer dictation', async ({
@@ -345,11 +413,24 @@ test('[DIRECT_TEMPLATES]: V2 use direct template link with 2 recipients with nex
     },
   });
 
+  const directTemplateRecipient = template.recipients[0];
+
+  if (!directTemplateRecipient) {
+    throw new Error('Expected direct template recipient to exist');
+  }
+
+  // All SIGNER recipients need a signature field for sendDocument to dispatch emails.
+  const directSignatureField = await seedSignatureFieldForRecipient({
+    envelopeId: template.id,
+    recipientId: directTemplateRecipient.id,
+    positionY: 10,
+  });
+
   const originalName = 'Signer 2';
   const originalSecondSignerEmail = seedTestEmail();
 
   // Add another signer
-  await prisma.recipient.create({
+  const secondRecipient = await prisma.recipient.create({
     data: {
       signingOrder: 2,
       envelopeId: template.id,
@@ -360,10 +441,39 @@ test('[DIRECT_TEMPLATES]: V2 use direct template link with 2 recipients with nex
     },
   });
 
+  await seedSignatureFieldForRecipient({
+    envelopeId: template.id,
+    recipientId: secondRecipient.id,
+    positionY: 20,
+  });
+
   // Check that the direct template link is accessible.
   await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
   await expect(page.getByRole('heading', { name: 'Team direct template link 1' })).toBeVisible();
-  await page.waitForTimeout(100);
+
+  // Wait for the PDF and the Konva canvas overlay to be ready.
+  await expect(page.locator('img[data-page-number]').first()).toBeVisible({ timeout: 30_000 });
+  const canvas = page.locator('.konva-container canvas').first();
+  await expect(canvas).toBeVisible({ timeout: 30_000 });
+
+  // Sign the direct template recipient's signature field via the canvas-based V2 UI.
+  await signSignaturePad(page);
+
+  const canvasBox = await canvas.boundingBox();
+
+  if (!canvasBox) {
+    throw new Error('Canvas bounding box not found');
+  }
+
+  const x =
+    (Number(directSignatureField.positionX) / 100) * canvasBox.width +
+    ((Number(directSignatureField.width) / 100) * canvasBox.width) / 2;
+  const y =
+    (Number(directSignatureField.positionY) / 100) * canvasBox.height +
+    ((Number(directSignatureField.height) / 100) * canvasBox.height) / 2;
+
+  await canvas.click({ position: { x, y } });
+  await expect(page.getByText('0 Fields Remaining').first()).toBeVisible({ timeout: 10_000 });
 
   await page.getByRole('button', { name: 'Complete' }).click();
 
@@ -399,10 +509,15 @@ test('[DIRECT_TEMPLATES]: V2 use direct template link with 2 recipients with nex
     },
   });
 
-  const updatedSecondRecipient = createdEnvelopeRecipients.find(
-    (recipient) => recipient.signingOrder === 2,
-  );
+  const updatedSecondRecipient = createdEnvelopeRecipients.find((recipient) => recipient.signingOrder === 2);
 
-  expect(updatedSecondRecipient?.name).toBe(newName);
-  expect(updatedSecondRecipient?.email).toBe(newSecondSignerEmail);
+  expect(updatedSecondRecipient).toBeDefined();
+
+  if (!updatedSecondRecipient) {
+    throw new Error('Expected second recipient to exist');
+  }
+
+  expect(updatedSecondRecipient.name).toBe(newName);
+  expect(updatedSecondRecipient.email).toBe(newSecondSignerEmail);
+  await expectSigningRequestJobForRecipient(updatedSecondRecipient.id);
 });

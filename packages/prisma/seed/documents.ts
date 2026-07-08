@@ -1,12 +1,24 @@
-import type { Team, User } from '@prisma/client';
-import { nanoid } from 'nanoid';
 import fs from 'node:fs';
 import path from 'node:path';
-import { match } from 'ts-pattern';
-
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import { incrementDocumentId } from '@documenso/lib/server-only/envelope/increment-id';
+import {
+  FIELD_CHECKBOX_META_DEFAULT_VALUES,
+  FIELD_DATE_META_DEFAULT_VALUES,
+  FIELD_DROPDOWN_META_DEFAULT_VALUES,
+  FIELD_EMAIL_META_DEFAULT_VALUES,
+  FIELD_INITIALS_META_DEFAULT_VALUES,
+  FIELD_NAME_META_DEFAULT_VALUES,
+  FIELD_NUMBER_META_DEFAULT_VALUES,
+  FIELD_RADIO_META_DEFAULT_VALUES,
+  FIELD_SIGNATURE_META_DEFAULT_VALUES,
+  FIELD_TEXT_META_DEFAULT_VALUES,
+} from '@documenso/lib/types/field-meta';
+import { SignatureLevel } from '@documenso/lib/types/signature-level';
 import { prefixedId } from '@documenso/lib/universal/id';
+import type { Team, User } from '@prisma/client';
+import { nanoid } from 'nanoid';
+import { match } from 'ts-pattern';
 
 import { prisma } from '..';
 import {
@@ -23,9 +35,7 @@ import {
 import { seedTeam } from './teams';
 import { seedUser } from './users';
 
-const examplePdf = fs
-  .readFileSync(path.join(__dirname, '../../../assets/example.pdf'))
-  .toString('base64');
+const examplePdf = fs.readFileSync(path.join(__dirname, '../../../assets/example.pdf')).toString('base64');
 
 type DocumentToSeed = {
   sender: User;
@@ -62,11 +72,7 @@ export const seedDocuments = async (documents: DocumentToSeed[]) => {
   );
 };
 
-export const seedBlankDocument = async (
-  owner: User,
-  teamId: number,
-  options: CreateDocumentOptions = {},
-) => {
+export const seedBlankDocument = async (owner: User, teamId: number, options: CreateDocumentOptions = {}) => {
   const { key, createDocumentOptions = {}, internalVersion = 1 } = options;
 
   const documentData = await prisma.documentData.create({
@@ -88,6 +94,7 @@ export const seedBlankDocument = async (
       id: prefixedId('envelope'),
       secondaryId: documentId.formattedDocumentId,
       internalVersion,
+      signatureLevel: SignatureLevel.SES,
       type: EnvelopeType.DOCUMENT,
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
@@ -308,6 +315,7 @@ export const seedDraftDocument = async (
       id: prefixedId('envelope'),
       secondaryId: documentId.formattedDocumentId,
       internalVersion,
+      signatureLevel: SignatureLevel.SES,
       type: EnvelopeType.DOCUMENT,
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
@@ -402,6 +410,7 @@ export const seedPendingDocument = async (
       id: prefixedId('envelope'),
       secondaryId: documentId.formattedDocumentId,
       internalVersion,
+      signatureLevel: SignatureLevel.SES,
       type: EnvelopeType.DOCUMENT,
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
@@ -576,6 +585,19 @@ export const seedPendingDocumentWithFullFields = async ({
               height: new Prisma.Decimal(5),
               envelopeId: document.id,
               envelopeItemId: firstItem.id,
+              fieldMeta: match(fieldType)
+                .with(FieldType.DATE, () => FIELD_DATE_META_DEFAULT_VALUES)
+                .with(FieldType.EMAIL, () => FIELD_EMAIL_META_DEFAULT_VALUES)
+                .with(FieldType.NAME, () => FIELD_NAME_META_DEFAULT_VALUES)
+                .with(FieldType.SIGNATURE, () => FIELD_SIGNATURE_META_DEFAULT_VALUES)
+                .with(FieldType.TEXT, () => FIELD_TEXT_META_DEFAULT_VALUES)
+                .with(FieldType.NUMBER, () => FIELD_NUMBER_META_DEFAULT_VALUES)
+                .with(FieldType.CHECKBOX, () => FIELD_CHECKBOX_META_DEFAULT_VALUES)
+                .with(FieldType.RADIO, () => FIELD_RADIO_META_DEFAULT_VALUES)
+                .with(FieldType.DROPDOWN, () => FIELD_DROPDOWN_META_DEFAULT_VALUES)
+                .with(FieldType.INITIALS, () => FIELD_INITIALS_META_DEFAULT_VALUES)
+                .with(FieldType.FREE_SIGNATURE, () => undefined)
+                .exhaustive(),
             })),
           },
         },
@@ -642,6 +664,7 @@ export const seedCompletedDocument = async (
       id: prefixedId('envelope'),
       secondaryId: documentId.formattedDocumentId,
       internalVersion,
+      signatureLevel: SignatureLevel.SES,
       type: EnvelopeType.DOCUMENT,
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
@@ -683,6 +706,91 @@ export const seedCompletedDocument = async (
             page: 1,
             type: FieldType.NAME,
             inserted: true,
+            customText: name,
+            positionX: new Prisma.Decimal(1),
+            positionY: new Prisma.Decimal(1),
+            width: new Prisma.Decimal(1),
+            height: new Prisma.Decimal(1),
+            envelopeId: document.id,
+            envelopeItemId: document.envelopeItems[0].id,
+          },
+        },
+      },
+    });
+  }
+
+  return document;
+};
+
+export const seedCancelledDocument = async (
+  sender: User,
+  teamId: number,
+  recipients: (User | string)[],
+  options: CreateDocumentOptions = {},
+) => {
+  const { key, createDocumentOptions = {}, internalVersion = 1 } = options;
+
+  const documentData = await prisma.documentData.create({
+    data: {
+      type: DocumentDataType.BYTES_64,
+      data: examplePdf,
+      initialData: examplePdf,
+    },
+  });
+
+  const documentMeta = await prisma.documentMeta.create({
+    data: {},
+  });
+
+  const documentId = await incrementDocumentId();
+
+  const document = await prisma.envelope.create({
+    data: {
+      id: prefixedId('envelope'),
+      secondaryId: documentId.formattedDocumentId,
+      internalVersion,
+      signatureLevel: SignatureLevel.SES,
+      type: EnvelopeType.DOCUMENT,
+      documentMetaId: documentMeta.id,
+      source: DocumentSource.DOCUMENT,
+      teamId,
+      title: `[TEST] Document ${key} - Cancelled`,
+      status: DocumentStatus.CANCELLED,
+      completedAt: new Date(),
+      envelopeItems: {
+        create: {
+          id: prefixedId('envelope_item'),
+          title: `[TEST] Document ${key} - Cancelled`,
+          documentDataId: documentData.id,
+          order: 1,
+        },
+      },
+      userId: sender.id,
+      ...createDocumentOptions,
+    },
+    include: {
+      envelopeItems: true,
+    },
+  });
+
+  for (const recipient of recipients) {
+    const email = typeof recipient === 'string' ? recipient : recipient.email;
+    const name = typeof recipient === 'string' ? recipient : (recipient.name ?? '');
+
+    await prisma.recipient.create({
+      data: {
+        email,
+        name,
+        token: nanoid(),
+        readStatus: ReadStatus.OPENED,
+        sendStatus: SendStatus.SENT,
+        signingStatus: SigningStatus.NOT_SIGNED,
+        envelopeId: document.id,
+        fields: {
+          create: {
+            page: 1,
+            type: FieldType.NAME,
+            inserted: false,
             customText: name,
             positionX: new Prisma.Decimal(1),
             positionY: new Prisma.Decimal(1),

@@ -4,8 +4,8 @@ import { createRateLimit } from './rate-limit';
 
 export const signupRateLimit = createRateLimit({
   action: 'auth.signup',
-  max: 10,
-  window: '1h',
+  max: 3,
+  window: '3h',
 });
 
 export const forgotPasswordRateLimit = createRateLimit({
@@ -64,6 +64,20 @@ export const linkOrgAccountRateLimit = createRateLimit({
   max: 5,
   globalMax: 20,
   window: '1h',
+});
+
+export const reportSenderRateLimit = createRateLimit({
+  action: 'recipient.report-sender',
+  max: 1,
+  window: '7d',
+});
+
+// ---- Billing ----
+
+export const syncSubscriptionRateLimit = createRateLimit({
+  action: 'billing.sync-subscription',
+  max: 10,
+  window: '15m',
 });
 
 // ---- API (Tier 4 - Standard) ----

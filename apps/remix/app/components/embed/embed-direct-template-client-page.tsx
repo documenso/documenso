@@ -1,5 +1,29 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
-
+import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
+import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
+import { AppError } from '@documenso/lib/errors/app-error';
+import { ZDirectTemplateEmbedDataSchema } from '@documenso/lib/types/embed-direct-template-schema';
+import { isFieldUnsignedAndRequired, isRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
+import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
+import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { dynamicActivate } from '@documenso/lib/utils/i18n';
+import { zEmail } from '@documenso/lib/utils/zod';
+import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
+import { trpc } from '@documenso/trpc/react';
+import type {
+  TRemovedSignedFieldWithTokenMutationSchema,
+  TSignFieldWithTokenMutationSchema,
+} from '@documenso/trpc/server/field-router/schema';
+import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
+import { cn } from '@documenso/ui/lib/utils';
+import { Button } from '@documenso/ui/primitives/button';
+import { ElementVisible } from '@documenso/ui/primitives/element-visible';
+import { Input } from '@documenso/ui/primitives/input';
+import { Label } from '@documenso/ui/primitives/label';
+import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -13,38 +37,13 @@ import {
 } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { DateTime } from 'luxon';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
-
-import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
-import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
-import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
-import { ZDirectTemplateEmbedDataSchema } from '@documenso/lib/types/embed-direct-template-schema';
-import {
-  isFieldUnsignedAndRequired,
-  isRequiredField,
-} from '@documenso/lib/utils/advanced-fields-helpers';
-import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
-import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
-import { dynamicActivate } from '@documenso/lib/utils/i18n';
-import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
-import { trpc } from '@documenso/trpc/react';
-import type {
-  TRemovedSignedFieldWithTokenMutationSchema,
-  TSignFieldWithTokenMutationSchema,
-} from '@documenso/trpc/server/field-router/schema';
-import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
-import { Button } from '@documenso/ui/primitives/button';
-import { ElementVisible } from '@documenso/ui/primitives/element-visible';
-import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
-import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
 import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 import { injectCss } from '~/utils/css-vars';
+import { getDirectTemplateErrorMessage } from '~/utils/toast-error-messages';
 
 import type { DirectTemplateLocalField } from '../general/direct-template/direct-template-signing-form';
 import { DocumentSigningAttachmentsPopover } from '../general/document-signing/document-signing-attachments-popover';
@@ -81,8 +80,7 @@ export const EmbedDirectTemplateClientPage = ({
 
   const [searchParams] = useSearchParams();
 
-  const { fullName, email, signature, setFullName, setEmail, setSignature } =
-    useRequiredDocumentSigningContext();
+  const { fullName, email, signature, setFullName, setEmail, setSignature } = useRequiredDocumentSigningContext();
 
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
   const [hasDocumentLoaded, setHasDocumentLoaded] = useState(false);
@@ -94,6 +92,7 @@ export const EmbedDirectTemplateClientPage = ({
   const [isNameLocked, setIsNameLocked] = useState(false);
 
   const [showPendingFieldTooltip, setShowPendingFieldTooltip] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   const [throttledOnCompleteClick, isThrottled] = useThrottleFn(() => void onCompleteClick(), 500);
 
@@ -131,10 +130,8 @@ export const EmbedDirectTemplateClientPage = ({
             created: new Date(),
             recipientId: 1,
             fieldId: 1,
-            signatureImageAsBase64:
-              payload.value && payload.value.startsWith('data:') ? payload.value : null,
-            typedSignature:
-              payload.value && !payload.value.startsWith('data:') ? payload.value : null,
+            signatureImageAsBase64: payload.value && payload.value.startsWith('data:') ? payload.value : null,
+            typedSignature: payload.value && !payload.value.startsWith('data:') ? payload.value : null,
           } satisfies Signature;
         }
 
@@ -207,6 +204,14 @@ export const EmbedDirectTemplateClientPage = ({
         return;
       }
 
+      const { success: isEmailValid } = zEmail().safeParse(email);
+
+      if (!isEmailValid) {
+        setEmailError(_(msg`A valid email is required`));
+        setIsExpanded(true);
+        return;
+      }
+
       let directTemplateExternalId = searchParams?.get('externalId') || undefined;
 
       if (directTemplateExternalId) {
@@ -256,11 +261,12 @@ export const EmbedDirectTemplateClientPage = ({
         );
       }
 
+      const error = AppError.parseError(err);
+      const errorMessage = getDirectTemplateErrorMessage(error.code);
+
       toast({
-        title: _(msg`Something went wrong`),
-        description: _(
-          msg`We were unable to submit this document at this time. Please try again later.`,
-        ),
+        title: _(errorMessage.title),
+        description: _(errorMessage.description),
         variant: 'destructive',
       });
     }
@@ -366,31 +372,23 @@ export const EmbedDirectTemplateClientPage = ({
         {/* Widget */}
         <div
           key={isExpanded ? 'expanded' : 'collapsed'}
-          className="group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:bottom-[unset] md:top-4 md:z-auto md:w-[350px] md:px-0"
+          className="group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:top-4 md:bottom-[unset] md:z-auto md:w-[350px] md:px-0"
           data-expanded={isExpanded || undefined}
         >
           <div className="flex h-fit w-full flex-col rounded-xl border border-border bg-widget px-4 py-4 md:min-h-[min(calc(100dvh-2rem),48rem)] md:py-6">
             {/* Header */}
             <div>
               <div className="flex items-center justify-between gap-x-2">
-                <h3 className="text-xl font-semibold text-foreground md:text-2xl">
+                <h3 className="font-semibold text-foreground text-xl md:text-2xl">
                   <Trans>Sign document</Trans>
                 </h3>
 
                 {isExpanded ? (
-                  <Button
-                    variant="outline"
-                    className="h-8 w-8 p-0 md:hidden"
-                    onClick={() => setIsExpanded(false)}
-                  >
+                  <Button variant="outline" className="h-8 w-8 p-0 md:hidden" onClick={() => setIsExpanded(false)}>
                     <LucideChevronDown className="h-5 w-5 text-muted-foreground" />
                   </Button>
                 ) : pendingFields.length > 0 ? (
-                  <Button
-                    variant="outline"
-                    className="h-8 w-8 p-0 md:hidden"
-                    onClick={() => setIsExpanded(true)}
-                  >
+                  <Button variant="outline" className="h-8 w-8 p-0 md:hidden" onClick={() => setIsExpanded(true)}>
                     <LucideChevronUp className="h-5 w-5 text-muted-foreground" />
                   </Button>
                 ) : (
@@ -409,11 +407,11 @@ export const EmbedDirectTemplateClientPage = ({
             </div>
 
             <div className="hidden group-data-[expanded]/document-widget:block md:block">
-              <p className="mt-2 text-sm text-muted-foreground">
+              <p className="mt-2 text-muted-foreground text-sm">
                 <Trans>Sign the document to complete the process.</Trans>
               </p>
 
-              <hr className="mb-8 mt-4 border-border" />
+              <hr className="mt-4 mb-8 border-border" />
             </div>
 
             {/* Form */}
@@ -442,11 +440,18 @@ export const EmbedDirectTemplateClientPage = ({
                   <Input
                     type="email"
                     id="email"
-                    className="mt-2 bg-background"
+                    className={cn('mt-2 bg-background', emailError && 'border-destructive ring-2 ring-destructive/20')}
                     disabled={isEmailLocked}
                     value={email}
-                    onChange={(e) => !isEmailLocked && setEmail(e.target.value.trim())}
+                    onChange={(e) => {
+                      if (!isEmailLocked) {
+                        setEmail(e.target.value.trim());
+                        setEmailError(null);
+                      }
+                    }}
                   />
+
+                  {emailError && <p className="mt-2 font-medium text-destructive text-xs">{emailError}</p>}
                 </div>
 
                 {hasSignatureField && (
@@ -493,9 +498,7 @@ export const EmbedDirectTemplateClientPage = ({
         </div>
 
         {showPendingFieldTooltip && pendingFields.length > 0 && (
-          <ElementVisible
-            target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${pendingFields[0].page}"]`}
-          >
+          <ElementVisible target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${pendingFields[0].page}"]`}>
             <FieldToolTip key={pendingFields[0].id} field={pendingFields[0]} color="warning">
               <Trans>Click to insert field</Trans>
             </FieldToolTip>
@@ -512,7 +515,7 @@ export const EmbedDirectTemplateClientPage = ({
       </div>
 
       {!hidePoweredBy && (
-        <div className="fixed bottom-0 left-0 z-40 rounded-tr bg-primary px-2 py-1 text-xs font-medium text-primary-foreground opacity-60 hover:opacity-100">
+        <div className="fixed bottom-0 left-0 z-40 rounded-tr bg-primary px-2 py-1 font-medium text-primary-foreground text-xs opacity-60 hover:opacity-100">
           <span>
             <Trans>Powered by</Trans>
           </span>

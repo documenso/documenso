@@ -1,7 +1,6 @@
+import { prisma } from '@documenso/prisma';
 import type { OrganisationGroup, OrganisationMemberRole } from '@prisma/client';
 import { OrganisationGroupType, OrganisationMemberInviteStatus } from '@prisma/client';
-
-import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
@@ -11,9 +10,7 @@ export type AcceptOrganisationInvitationOptions = {
   token: string;
 };
 
-export const acceptOrganisationInvitation = async ({
-  token,
-}: AcceptOrganisationInvitationOptions) => {
+export const acceptOrganisationInvitation = async ({ token }: AcceptOrganisationInvitationOptions) => {
   const organisationMemberInvite = await prisma.organisationMemberInvite.findFirst({
     where: {
       token,
@@ -101,8 +98,7 @@ export const addUserToOrganisation = async ({
 }) => {
   const organisationGroupToUse = organisationGroups.find(
     (group) =>
-      group.type === OrganisationGroupType.INTERNAL_ORGANISATION &&
-      group.organisationRole === organisationMemberRole,
+      group.type === OrganisationGroupType.INTERNAL_ORGANISATION && group.organisationRole === organisationMemberRole,
   );
 
   if (!organisationGroupToUse) {

@@ -1,9 +1,16 @@
-import { useLingui } from '@lingui/react/macro';
-import { Loader } from 'lucide-react';
-
-import { putFile } from '@documenso/lib/universal/upload/put-file';
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
+import type { SanitizeBrandingCssWarning } from '@documenso/lib/utils/sanitize-branding-css';
 import { trpc } from '@documenso/trpc/react';
+import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
+import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { plural } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { Loader } from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router';
 
 import {
   BrandingPreferencesForm,
@@ -11,65 +18,98 @@ import {
 } from '~/components/forms/branding-preferences-form';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { useCurrentTeam } from '~/providers/team';
-import { appMetaTags } from '~/utils/meta';
-
-export function meta() {
-  return appMetaTags('Branding Preferences');
-}
 
 export default function TeamsSettingsPage() {
   const team = useCurrentTeam();
+  const organisation = useCurrentOrganisation();
 
   const { t } = useLingui();
   const { toast } = useToast();
 
-  const { data: teamWithSettings, isLoading: isLoadingTeam } = trpc.team.get.useQuery({
+  const [cssWarnings, setCssWarnings] = useState<SanitizeBrandingCssWarning[]>([]);
+
+  const {
+    data: teamWithSettings,
+    isLoading: isLoadingTeam,
+    refetch: refetchTeam,
+  } = trpc.team.get.useQuery({
     teamReference: team.id,
   });
 
   const { mutateAsync: updateTeamSettings } = trpc.team.settings.update.useMutation();
+  const { mutateAsync: updateTeamBrandingLogo } = trpc.team.settings.updateBrandingLogo.useMutation();
+
+  const canConfigureBranding = organisation.organisationClaim.flags.allowCustomBranding || !IS_BILLING_ENABLED();
+
+  const canCustomBranding =
+    organisation.organisationClaim.flags.embedSigningWhiteLabel === true || !IS_BILLING_ENABLED();
 
   const onBrandingPreferencesFormSubmit = async (data: TBrandingPreferencesFormSchema) => {
     try {
-      const { brandingEnabled, brandingLogo, brandingUrl, brandingCompanyDetails } = data;
+      const { brandingEnabled, brandingLogo, brandingUrl, brandingCompanyDetails, brandingColors, brandingCss } = data;
 
-      let uploadedBrandingLogo = teamWithSettings?.teamSettings?.brandingLogo;
+      // Upload (or clear) the logo through the dedicated, server-validated route.
+      if (brandingLogo instanceof File || brandingLogo === null) {
+        const formData = new FormData();
 
-      if (brandingLogo) {
-        uploadedBrandingLogo = JSON.stringify(await putFile(brandingLogo));
+        formData.append('payload', JSON.stringify({ teamId: team.id }));
+
+        if (brandingLogo instanceof File) {
+          formData.append('brandingLogo', brandingLogo);
+        }
+
+        await updateTeamBrandingLogo(formData);
       }
 
-      if (brandingLogo === null) {
-        uploadedBrandingLogo = '';
-      }
-
-      await updateTeamSettings({
+      const result = await updateTeamSettings({
         teamId: team.id,
         data: {
           brandingEnabled,
-          brandingLogo: uploadedBrandingLogo || null,
           brandingUrl: brandingUrl || null,
           brandingCompanyDetails: brandingCompanyDetails || null,
+          brandingColors,
+          brandingCss,
         },
       });
 
-      toast({
-        title: t`Branding preferences updated`,
-        description: t`Your branding preferences have been updated`,
-      });
+      // Refetch so the form re-syncs with the sanitised CSS that was
+      // actually persisted (sanitiser may have dropped rules).
+      await refetchTeam();
+
+      const warnings = result?.cssWarnings ?? [];
+      setCssWarnings(warnings);
+
+      if (warnings.length > 0) {
+        toast({
+          title: t`Branding preferences updated with warnings`,
+          description: plural(warnings.length, {
+            one: '# CSS rule was dropped during sanitisation.',
+            other: '# CSS rules were dropped during sanitisation.',
+          }),
+          duration: 8000,
+        });
+      } else {
+        toast({
+          title: t`Branding preferences updated`,
+          description: t`Your branding preferences have been updated`,
+        });
+      }
     } catch (err) {
       toast({
         title: t`Something went wrong`,
         description: t`We were unable to update your branding preferences at this time, please try again later`,
         variant: 'destructive',
       });
+
+      // Rethrow so the form knows the save failed and keeps the unsaved changes.
+      throw err;
     }
   };
 
   if (isLoadingTeam || !teamWithSettings) {
     return (
       <div className="flex items-center justify-center rounded-lg py-32">
-        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
+        <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -81,14 +121,61 @@ export default function TeamsSettingsPage() {
         subtitle={t`Here you can set preferences and defaults for branding.`}
       />
 
-      <section>
-        <BrandingPreferencesForm
-          canInherit={true}
-          context="Team"
-          settings={teamWithSettings.teamSettings}
-          onFormSubmit={onBrandingPreferencesFormSubmit}
-        />
-      </section>
+      {canConfigureBranding ? (
+        <section>
+          <BrandingPreferencesForm
+            canInherit={true}
+            hasAdvancedBranding={canCustomBranding}
+            context="Team"
+            settings={teamWithSettings.teamSettings}
+            onFormSubmit={onBrandingPreferencesFormSubmit}
+          />
+
+          {cssWarnings.length > 0 && (
+            <Alert variant="warning" className="mt-6">
+              <AlertTitle>
+                <Trans>CSS rules were dropped during sanitisation</Trans>
+              </AlertTitle>
+
+              <AlertDescription>
+                <ul className="list-disc pl-5">
+                  {cssWarnings.map((warning, index) => (
+                    <li key={index}>
+                      {warning.detail}
+                      {warning.line !== undefined && (
+                        <span className="text-muted-foreground">
+                          {' '}
+                          <Trans>(line {warning.line})</Trans>
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
+          )}
+        </section>
+      ) : (
+        <Alert className="mt-8 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
+          <div className="mb-4 sm:mb-0">
+            <AlertTitle>
+              <Trans>Branding Preferences</Trans>
+            </AlertTitle>
+
+            <AlertDescription className="mr-2">
+              <Trans>Currently branding can only be configured for Teams and above plans.</Trans>
+            </AlertDescription>
+          </div>
+
+          {canExecuteOrganisationAction('MANAGE_BILLING', organisation.currentOrganisationRole) && (
+            <Button asChild variant="outline">
+              <Link to={`/o/${organisation.url}/settings/billing`}>
+                <Trans>Update Billing</Trans>
+              </Link>
+            </Button>
+          )}
+        </Alert>
+      )}
     </div>
   );
 }

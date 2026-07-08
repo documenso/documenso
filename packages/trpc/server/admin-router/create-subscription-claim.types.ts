@@ -1,13 +1,25 @@
+import { ZNameSchema } from '@documenso/lib/types/name';
+import { ZClaimFlagsSchema, ZRateLimitArraySchema } from '@documenso/lib/types/subscription';
 import { z } from 'zod';
 
-import { ZClaimFlagsSchema } from '@documenso/lib/types/subscription';
-
 export const ZCreateSubscriptionClaimRequestSchema = z.object({
-  name: z.string().min(1),
+  name: ZNameSchema,
   teamCount: z.number().int().min(0),
   memberCount: z.number().int().min(0),
   envelopeItemCount: z.number().int().min(1),
+  recipientCount: z.number().int().min(0),
   flags: ZClaimFlagsSchema,
+
+  documentRateLimits: ZRateLimitArraySchema,
+  documentQuota: z.number().int().min(0).nullable(),
+
+  emailRateLimits: ZRateLimitArraySchema,
+  emailQuota: z.number().int().min(0).nullable(),
+
+  apiRateLimits: ZRateLimitArraySchema,
+  apiQuota: z.number().int().min(0).nullable(),
+
+  emailTransportId: z.string().nullable(),
 });
 
 export const ZCreateSubscriptionClaimResponseSchema = z.void();

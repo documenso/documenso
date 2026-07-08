@@ -1,0 +1,30 @@
+{
+  "include": ["**/*", ".react-router/types/**/*"],
+  "compilerOptions": {
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "types": ["node", "vite/client"],
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "rootDirs": [".", "./.react-router/types"],
+    "baseUrl": ".",
+    "paths": {
+      "@documenso/email/*": ["../*"],
+      "@documenso/lib": ["../../lib"],
+      "@documenso/lib/*": ["../../lib/*"],
+      "@documenso/prisma": ["../../prisma"],
+      "@documenso/tailwind-config": ["../../tailwind-config"],
+      "@documenso/ui": ["../../ui"]
+    },
+    "esModuleInterop": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+    "moduleDetection": "force",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "useUnknownInCatchVariables": false
+  }
+}

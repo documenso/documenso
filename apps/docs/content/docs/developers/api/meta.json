@@ -8,6 +8,7 @@
     "teams",
     "rate-limits",
     "versioning",
-    "developer-mode"
+    "developer-mode",
+    "common-errors"
   ]
 }

@@ -1,9 +1,8 @@
+import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { Bird, CheckCircle2 } from 'lucide-react';
+import { Bird, CheckCircle2, XCircle } from 'lucide-react';
 import { match } from 'ts-pattern';
-
-import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
 export type DocumentsTableEmptyStateProps = { status: ExtendedDocumentStatus };
 
@@ -25,6 +24,11 @@ export const DocumentsTableEmptyState = ({ status }: DocumentsTableEmptyStatePro
       message: msg`There are no active drafts at the current moment. You can upload a document to start drafting.`,
       icon: CheckCircle2,
     }))
+    .with(ExtendedDocumentStatus.CANCELLED, () => ({
+      title: msg`Nothing cancelled`,
+      message: msg`There are no cancelled documents. Documents you cancel will remain here as a record that they were distributed.`,
+      icon: XCircle,
+    }))
     .with(ExtendedDocumentStatus.ALL, () => ({
       title: msg`We're all empty`,
       message: msg`You have not yet created or received any documents. To create a document please upload one.`,
@@ -38,13 +42,13 @@ export const DocumentsTableEmptyState = ({ status }: DocumentsTableEmptyStatePro
 
   return (
     <div
-      className="text-muted-foreground/60 flex h-60 flex-col items-center justify-center gap-y-4"
+      className="flex h-60 flex-col items-center justify-center gap-y-4 text-muted-foreground/60"
       data-testid="empty-document-state"
     >
       <Icon className="h-12 w-12" strokeWidth={1.5} />
 
       <div className="text-center">
-        <h3 className="text-lg font-semibold">{_(title)}</h3>
+        <h3 className="font-semibold text-lg">{_(title)}</h3>
 
         <p className="mt-2 max-w-[60ch]">{_(message)}</p>
       </div>

@@ -1,7 +1,7 @@
+import { docs } from 'fumadocs-mdx:collections/server';
 import type * as PageTree from 'fumadocs-core/page-tree';
 import { type InferPageType, loader } from 'fumadocs-core/source';
 import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
-import { docs } from 'fumadocs-mdx:collections/server';
 
 // See https://fumadocs.dev/docs/headless/source-api for more info
 export const source = loader({
@@ -30,9 +30,7 @@ export function getFilteredPageTree(rootName: string): PageTree.Root {
   // Find the main section folder
   const rootFolder = fullTree.children.find(
     (child): child is PageTree.Folder =>
-      child.type === 'folder' &&
-      typeof child.name === 'string' &&
-      child.name.toLowerCase() === rootName.toLowerCase(),
+      child.type === 'folder' && typeof child.name === 'string' && child.name.toLowerCase() === rootName.toLowerCase(),
   );
 
   if (!rootFolder) {
@@ -42,9 +40,7 @@ export function getFilteredPageTree(rootName: string): PageTree.Root {
   // Find shared section folders
   const sharedFolders = fullTree.children.filter(
     (child): child is PageTree.Folder =>
-      child.type === 'folder' &&
-      typeof child.name === 'string' &&
-      SHARED_SECTIONS.includes(child.name.toLowerCase()),
+      child.type === 'folder' && typeof child.name === 'string' && SHARED_SECTIONS.includes(child.name.toLowerCase()),
   );
 
   // Create separator for main section

@@ -1,11 +1,9 @@
-import { type Page, expect, test } from '@playwright/test';
-import { DocumentStatus, EnvelopeType, FieldType, RecipientRole } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { prisma } from '@documenso/prisma';
+import { seedDraftDocument } from '@documenso/prisma/seed/documents';
 import { seedTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 import type {
@@ -15,6 +13,8 @@ import type {
 import type { TDistributeEnvelopeRequest } from '@documenso/trpc/server/envelope-router/distribute-envelope.types';
 import type { TCreateEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/envelope-recipients/create-envelope-recipients.types';
 import type { TGetEnvelopeResponse } from '@documenso/trpc/server/envelope-router/get-envelope.types';
+import { expect, type Page, test } from '@playwright/test';
+import { DocumentStatus, EnvelopeType, FieldType, RecipientRole } from '@prisma/client';
 
 import { apiSignin } from '../fixtures/authentication';
 import {
@@ -34,11 +34,7 @@ const examplePdfBuffer = fs.readFileSync(path.join(__dirname, '../../../../asset
 /**
  * Place a field on the PDF canvas in the envelope editor.
  */
-const placeFieldOnPdf = async (
-  root: Page,
-  fieldName: 'Signature' | 'Text',
-  position: { x: number; y: number },
-) => {
+const placeFieldOnPdf = async (root: Page, fieldName: 'Signature' | 'Text', position: { x: number; y: number }) => {
   await root.getByRole('button', { name: fieldName, exact: true }).click();
 
   const canvas = root.locator('.konva-container canvas').first();
@@ -72,10 +68,7 @@ const createPendingEnvelopeViaApi = async () => {
 
   const formData = new FormData();
   formData.append('payload', JSON.stringify(payload));
-  formData.append(
-    'files',
-    new File([examplePdfBuffer], 'example.pdf', { type: 'application/pdf' }),
-  );
+  formData.append('files', new File([examplePdfBuffer], 'example.pdf', { type: 'application/pdf' }));
 
   const createRes = await fetch(`${V2_API_BASE_URL}/envelope/create`, {
     method: 'POST',
@@ -224,9 +217,7 @@ test.describe('document editor', () => {
     await expect(page.getByRole('heading', { name: 'Send Document' })).toBeVisible();
 
     // The validation warning should be shown instead of the send form.
-    await expect(
-      page.getByText('The following signers are missing signature fields'),
-    ).toBeVisible();
+    await expect(page.getByText('The following signers are missing signature fields')).toBeVisible();
 
     // The "Send" button should not be visible since we're in validation mode.
     await expect(page.getByRole('button', { name: 'Send', exact: true })).not.toBeVisible();
@@ -235,9 +226,7 @@ test.describe('document editor', () => {
     await page.getByRole('button', { name: 'Close' }).click();
 
     // The dialog should be closed.
-    await expect(
-      page.getByText('The following signers are missing signature fields'),
-    ).not.toBeVisible();
+    await expect(page.getByText('The following signers are missing signature fields')).not.toBeVisible();
   });
 
   test('resend document sends reminder', async ({ page }) => {
@@ -296,7 +285,7 @@ test.describe('document editor', () => {
     await page.getByRole('button', { name: 'Duplicate' }).click();
 
     // Assert toast appears.
-    await expectToastTextToBeVisible(page, 'Envelope Duplicated');
+    await expectToastTextToBeVisible(page, 'Document Duplicated');
 
     // The page should have navigated to the new document's edit page.
     await expect(page).toHaveURL(/\/documents\/.*\/edit/);
@@ -312,6 +301,95 @@ test.describe('document editor', () => {
 
     // Should have original + duplicate.
     expect(envelopes.length).toBeGreaterThanOrEqual(2);
+  });
+
+  test('duplicate document without recipients excludes recipients and fields', async ({ page }) => {
+    const { user, team } = await seedUser();
+
+    // Seed a draft document that has a recipient with a field.
+    const document = await seedDraftDocument(user, team.id, ['signer@test.documenso.com'], {
+      key: `dup-exclude-recipients-${Date.now()}`,
+      internalVersion: 2,
+    });
+
+    await apiSignin({
+      page,
+      email: user.email,
+      redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
+    });
+
+    await expect(page.getByRole('heading', { name: 'Documents' })).toBeVisible();
+
+    // Open the duplicate dialog.
+    await page.locator('button[title="Duplicate Envelope"]').click();
+    await expect(page.getByRole('heading', { name: 'Duplicate Document' })).toBeVisible();
+
+    // Uncheck "Include Recipients" — this also disables and unchecks "Include Fields".
+    await page.getByLabel('Include Recipients').click();
+    await expect(page.getByLabel('Include Fields')).toBeDisabled();
+
+    // Duplicate.
+    await page.getByRole('button', { name: 'Duplicate' }).click();
+    await expectToastTextToBeVisible(page, 'Document Duplicated');
+    await expect(page).toHaveURL(/\/documents\/.*\/edit/);
+
+    // The duplicate should have neither recipients nor fields.
+    const duplicate = await prisma.envelope.findFirstOrThrow({
+      where: {
+        teamId: team.id,
+        type: EnvelopeType.DOCUMENT,
+        id: { not: document.id },
+      },
+      include: { recipients: true, fields: true },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    expect(duplicate.recipients).toHaveLength(0);
+    expect(duplicate.fields).toHaveLength(0);
+  });
+
+  test('duplicate document without fields keeps recipients but excludes fields', async ({ page }) => {
+    const { user, team } = await seedUser();
+
+    // Seed a draft document that has a recipient with a field.
+    const document = await seedDraftDocument(user, team.id, ['signer@test.documenso.com'], {
+      key: `dup-exclude-fields-${Date.now()}`,
+      internalVersion: 2,
+    });
+
+    await apiSignin({
+      page,
+      email: user.email,
+      redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
+    });
+
+    await expect(page.getByRole('heading', { name: 'Documents' })).toBeVisible();
+
+    // Open the duplicate dialog.
+    await page.locator('button[title="Duplicate Envelope"]').click();
+    await expect(page.getByRole('heading', { name: 'Duplicate Document' })).toBeVisible();
+
+    // Uncheck only "Include Fields" (recipients stay included).
+    await page.getByLabel('Include Fields').click();
+
+    // Duplicate.
+    await page.getByRole('button', { name: 'Duplicate' }).click();
+    await expectToastTextToBeVisible(page, 'Document Duplicated');
+    await expect(page).toHaveURL(/\/documents\/.*\/edit/);
+
+    // The duplicate should keep the recipient but have no fields.
+    const duplicate = await prisma.envelope.findFirstOrThrow({
+      where: {
+        teamId: team.id,
+        type: EnvelopeType.DOCUMENT,
+        id: { not: document.id },
+      },
+      include: { recipients: true, fields: true },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    expect(duplicate.recipients).toHaveLength(1);
+    expect(duplicate.fields).toHaveLength(0);
   });
 
   test('download PDF dialog shows envelope items', async ({ page }) => {
@@ -422,7 +500,7 @@ test.describe('template editor', () => {
     await page.getByRole('button', { name: 'Duplicate' }).click();
 
     // Assert toast appears.
-    await expectToastTextToBeVisible(page, 'Envelope Duplicated');
+    await expectToastTextToBeVisible(page, 'Template Duplicated');
 
     // The page should have navigated to the new template's edit page.
     await expect(page).toHaveURL(/\/templates\/.*\/edit/);

@@ -1,12 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { msg, t } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { TeamGlobalSettings } from '@prisma/client';
-import { DocumentVisibility, OrganisationType, type RecipientRole } from '@prisma/client';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { DATE_FORMATS } from '@documenso/lib/constants/date-formats';
@@ -15,27 +6,21 @@ import {
   type TEnvelopeExpirationPeriod,
   ZEnvelopeExpirationPeriod,
 } from '@documenso/lib/constants/envelope-expiration';
-import {
-  SUPPORTED_LANGUAGES,
-  SUPPORTED_LANGUAGE_CODES,
-  isValidLanguageCode,
-} from '@documenso/lib/constants/i18n';
+import { type TEnvelopeReminderSettings, ZEnvelopeReminderSettings } from '@documenso/lib/constants/envelope-reminder';
+import { isValidLanguageCode, SUPPORTED_LANGUAGE_CODES, SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import type { TDefaultRecipients } from '@documenso/lib/types/default-recipients';
 import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
-import {
-  type TDocumentMetaDateFormat,
-  ZDocumentMetaTimezoneSchema,
-} from '@documenso/lib/types/document-meta';
+import { type TDocumentMetaDateFormat, ZDocumentMetaTimezoneSchema } from '@documenso/lib/types/document-meta';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import { extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
 import { DocumentSignatureSettingsTooltip } from '@documenso/ui/components/document/document-signature-settings-tooltip';
 import { ExpirationPeriodPicker } from '@documenso/ui/components/document/expiration-period-picker';
+import { ReminderSettingsPicker } from '@documenso/ui/components/document/reminder-settings-picker';
 import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
 import { Alert } from '@documenso/ui/primitives/alert';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
-import { Button } from '@documenso/ui/primitives/button';
 import { Combobox } from '@documenso/ui/primitives/combobox';
 import {
   Form,
@@ -47,17 +32,20 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg, t } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import type { TeamGlobalSettings } from '@prisma/client';
+import { DocumentVisibility, OrganisationType, type RecipientRole } from '@prisma/client';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
 
 import { DefaultRecipientsMultiSelectCombobox } from '../general/default-recipients-multiselect-combobox';
+import { FormStickySaveBar } from './form-sticky-save-bar';
 
 /**
  * Can't infer this from the schema since we need to keep the schema inside the component to allow
@@ -76,6 +64,7 @@ export type TDocumentPreferencesFormSchema = {
   delegateDocumentOwnership: boolean | null;
   aiFeaturesEnabled: boolean | null;
   envelopeExpirationPeriod: TEnvelopeExpirationPeriod | null;
+  reminderSettings: TEnvelopeReminderSettings | null;
 };
 
 type SettingsSubset = Pick<
@@ -94,6 +83,7 @@ type SettingsSubset = Pick<
   | 'delegateDocumentOwnership'
   | 'aiFeaturesEnabled'
   | 'envelopeExpirationPeriod'
+  | 'reminderSettings'
 >;
 
 export type DocumentPreferencesFormProps = {
@@ -134,14 +124,13 @@ export const DocumentPreferencesForm = ({
     delegateDocumentOwnership: z.boolean().nullable(),
     aiFeaturesEnabled: z.boolean().nullable(),
     envelopeExpirationPeriod: ZEnvelopeExpirationPeriod.nullable(),
+    reminderSettings: ZEnvelopeReminderSettings.nullable(),
   });
 
   const form = useForm<TDocumentPreferencesFormSchema>({
     defaultValues: {
       documentVisibility: settings.documentVisibility,
-      documentLanguage: isValidLanguageCode(settings.documentLanguage)
-        ? settings.documentLanguage
-        : null,
+      documentLanguage: isValidLanguageCode(settings.documentLanguage) ? settings.documentLanguage : null,
       documentTimezone: settings.documentTimezone,
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       documentDateFormat: settings.documentDateFormat as TDocumentMetaDateFormat | null,
@@ -149,23 +138,31 @@ export const DocumentPreferencesForm = ({
       includeSigningCertificate: settings.includeSigningCertificate,
       includeAuditLog: settings.includeAuditLog,
       signatureTypes: extractTeamSignatureSettings({ ...settings }),
-      defaultRecipients: settings.defaultRecipients
-        ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients)
-        : null,
+      defaultRecipients: settings.defaultRecipients ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients) : null,
       delegateDocumentOwnership: settings.delegateDocumentOwnership,
       aiFeaturesEnabled: settings.aiFeaturesEnabled,
       envelopeExpirationPeriod: settings.envelopeExpirationPeriod ?? null,
+      reminderSettings: settings.reminderSettings ?? null,
     },
     resolver: zodResolver(ZDocumentPreferencesFormSchema),
   });
 
+  const handleFormSubmit = form.handleSubmit(async (data) => {
+    try {
+      await onFormSubmit(data);
+    } catch {
+      // The page handler surfaces its own error toast. Keep the form dirty so
+      // the save bar stays visible and the user can retry.
+      return;
+    }
+
+    form.reset(data);
+  });
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onFormSubmit)}>
-        <fieldset
-          className="flex h-full max-w-2xl flex-col gap-y-6"
-          disabled={form.formState.isSubmitting}
-        >
+      <form onSubmit={handleFormSubmit}>
+        <fieldset className="flex h-full max-w-2xl flex-col gap-y-6" disabled={form.formState.isSubmitting}>
           {!isPersonalLayoutMode && (
             <FormField
               control={form.control}
@@ -255,8 +252,8 @@ export const DocumentPreferencesForm = ({
 
                 <FormDescription>
                   <Trans>
-                    Controls the default language of an uploaded document. This will be used as the
-                    language in email communications with the recipients.
+                    Controls the default language of an uploaded document. This will be used as the language in email
+                    communications with the recipients.
                   </Trans>
                 </FormDescription>
               </FormItem>
@@ -313,9 +310,7 @@ export const DocumentPreferencesForm = ({
 
                 <FormControl>
                   <Combobox
-                    triggerPlaceholder={
-                      canInherit ? t`Inherit from organisation` : t`Local timezone`
-                    }
+                    triggerPlaceholder={canInherit ? t`Inherit from organisation` : t`Local timezone`}
                     placeholder={t`Select a time zone`}
                     options={TIME_ZONES}
                     value={field.value}
@@ -349,9 +344,7 @@ export const DocumentPreferencesForm = ({
                     onChange={field.onChange}
                     className="w-full bg-background"
                     enableSearch={false}
-                    emptySelectionPlaceholder={
-                      canInherit ? t`Inherit from organisation` : t`Select signature types`
-                    }
+                    emptySelectionPlaceholder={canInherit ? t`Inherit from organisation` : t`Select signature types`}
                     testId="signature-types-trigger"
                   />
                 </FormControl>
@@ -360,9 +353,7 @@ export const DocumentPreferencesForm = ({
                   <FormMessage />
                 ) : (
                   <FormDescription>
-                    <Trans>
-                      Controls which signatures are allowed to be used when signing a document.
-                    </Trans>
+                    <Trans>Controls which signatures are allowed to be used when signing a document.</Trans>
                   </FormDescription>
                 )}
               </FormItem>
@@ -413,15 +404,14 @@ export const DocumentPreferencesForm = ({
                   </FormControl>
 
                   <div className="pt-2">
-                    <div className="text-xs font-medium text-muted-foreground">
+                    <div className="font-medium text-muted-foreground text-xs">
                       <Trans>Preview</Trans>
                     </div>
 
                     <Alert variant="neutral" className="mt-1 px-2.5 py-1.5 text-sm">
                       {field.value ? (
                         <Trans>
-                          "{placeholderEmail}" on behalf of "Team Name" has invited you to sign
-                          "example document".
+                          "{placeholderEmail}" on behalf of "Team Name" has invited you to sign "example document".
                         </Trans>
                       ) : (
                         <Trans>"Team Name" has invited you to sign "example document".</Trans>
@@ -431,9 +421,9 @@ export const DocumentPreferencesForm = ({
 
                   <FormDescription>
                     <Trans>
-                      Controls the formatting of the message that will be sent when inviting a
-                      recipient to sign a document. If a custom message has been provided while
-                      configuring the document, it will be used instead.
+                      Controls the formatting of the message that will be sent when inviting a recipient to sign a
+                      document. If a custom message has been provided while configuring the document, it will be used
+                      instead.
                     </Trans>
                   </FormDescription>
                 </FormItem>
@@ -485,9 +475,8 @@ export const DocumentPreferencesForm = ({
 
                 <FormDescription>
                   <Trans>
-                    Controls whether the signing certificate will be included in the document when
-                    it is downloaded. The signing certificate can still be downloaded from the logs
-                    page separately.
+                    Controls whether the signing certificate will be included in the document when it is downloaded. The
+                    signing certificate can still be downloaded from the logs page separately.
                   </Trans>
                 </FormDescription>
               </FormItem>
@@ -535,9 +524,8 @@ export const DocumentPreferencesForm = ({
 
                 <FormDescription>
                   <Trans>
-                    Controls whether the audit logs will be included in the document when it is
-                    downloaded. The audit logs can still be downloaded from the logs page
-                    separately.
+                    Controls whether the audit logs will be included in the document when it is downloaded. The audit
+                    logs can still be downloaded from the logs page separately.
                   </Trans>
                 </FormDescription>
               </FormItem>
@@ -593,15 +581,11 @@ export const DocumentPreferencesForm = ({
                             <AvatarWithText
                               avatarFallback={recipientAbbreviation(recipient)}
                               primaryText={
-                                <span className="text-sm font-medium">
-                                  {recipient.name || recipient.email}
-                                </span>
+                                <span className="font-medium text-sm">{recipient.name || recipient.email}</span>
                               }
                               secondaryText={
                                 recipient.name ? (
-                                  <span className="text-xs text-muted-foreground">
-                                    {recipient.email}
-                                  </span>
+                                  <span className="text-muted-foreground text-xs">{recipient.email}</span>
                                 ) : undefined
                               }
                               className="flex-1"
@@ -644,9 +628,7 @@ export const DocumentPreferencesForm = ({
                 <Select
                   {...field}
                   value={field.value === null ? '-1' : field.value.toString()}
-                  onValueChange={(value) =>
-                    field.onChange(value === 'true' ? true : value === 'false' ? false : null)
-                  }
+                  onValueChange={(value) => field.onChange(value === 'true' ? true : value === 'false' ? false : null)}
                 >
                   <SelectTrigger className="bg-background text-muted-foreground">
                     <SelectValue />
@@ -670,9 +652,7 @@ export const DocumentPreferencesForm = ({
                 </Select>
 
                 <FormDescription>
-                  <Trans>
-                    Enable team API tokens to delegate document ownership to another team member.
-                  </Trans>
+                  <Trans>Enable team API tokens to delegate document ownership to another team member.</Trans>
                 </FormDescription>
               </FormItem>
             )}
@@ -697,8 +677,37 @@ export const DocumentPreferencesForm = ({
 
                 <FormDescription>
                   <Trans>
-                    Controls how long recipients have to complete signing before the document
-                    expires. After expiration, recipients can no longer sign the document.
+                    Controls how long recipients have to complete signing before the document expires. After expiration,
+                    recipients can no longer sign the document.
+                  </Trans>
+                </FormDescription>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="reminderSettings"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>
+                  <Trans>Default Signing Reminders</Trans>
+                </FormLabel>
+
+                <FormControl>
+                  <ReminderSettingsPicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    inheritLabel={canInherit ? t`Inherit from organisation` : undefined}
+                  />
+                </FormControl>
+
+                <FormDescription>
+                  <Trans>
+                    Controls when and how often reminder emails are sent to recipients who have not yet completed
+                    signing.
                   </Trans>
                 </FormDescription>
 
@@ -749,10 +758,9 @@ export const DocumentPreferencesForm = ({
 
                   <FormDescription>
                     <Trans>
-                      Enable AI-powered features such as automatic recipient detection. When
-                      enabled, document content will be sent to AI providers. We only use providers
-                      that do not retain data for training and prefer European regions where
-                      available.
+                      Enable AI-powered features such as automatic recipient detection. When enabled, document content
+                      will be sent to AI providers. We only use providers that do not retain data for training and
+                      prefer European regions where available.
                     </Trans>
                   </FormDescription>
                 </FormItem>
@@ -760,11 +768,11 @@ export const DocumentPreferencesForm = ({
             />
           )}
 
-          <div className="flex flex-row justify-end space-x-4">
-            <Button type="submit" loading={form.formState.isSubmitting}>
-              <Trans>Update</Trans>
-            </Button>
-          </div>
+          <FormStickySaveBar
+            isDirty={form.formState.isDirty}
+            isSubmitting={form.formState.isSubmitting}
+            onReset={() => form.reset()}
+          />
         </fieldset>
       </form>
     </Form>

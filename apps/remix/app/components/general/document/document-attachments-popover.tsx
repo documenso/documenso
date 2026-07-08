@@ -1,28 +1,21 @@
-import { useState } from 'react';
-
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
+import { AppError } from '@documenso/lib/errors/app-error';
+import { isHttpUrl, toSafeHref } from '@documenso/lib/utils/is-http-url';
+import { trpc } from '@documenso/trpc/react';
+import { cn } from '@documenso/ui/lib/utils';
+import { Button } from '@documenso/ui/primitives/button';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@documenso/ui/primitives/form/form';
+import { Input } from '@documenso/ui/primitives/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Paperclip, Plus, X } from 'lucide-react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
-import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
-import { AppError } from '@documenso/lib/errors/app-error';
-import { trpc } from '@documenso/trpc/react';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DocumentAttachmentsPopoverProps = {
   envelopeId: string;
@@ -32,7 +25,7 @@ export type DocumentAttachmentsPopoverProps = {
 
 const ZAttachmentFormSchema = z.object({
   label: z.string().min(1, 'Label is required'),
-  url: z.string().url('Must be a valid URL'),
+  url: z.string().url('Must be a valid URL').refine(isHttpUrl, 'URL must use the http or https protocol'),
 });
 
 type TAttachmentFormSchema = z.infer<typeof ZAttachmentFormSchema>;
@@ -62,12 +55,11 @@ export const DocumentAttachmentsPopover = ({
     },
   );
 
-  const { mutateAsync: createAttachment, isPending: isCreating } =
-    trpc.envelope.attachment.create.useMutation({
-      onSuccess: () => {
-        void utils.envelope.attachment.find.invalidate({ envelopeId });
-      },
-    });
+  const { mutateAsync: createAttachment, isPending: isCreating } = trpc.envelope.attachment.create.useMutation({
+    onSuccess: () => {
+      void utils.envelope.attachment.find.invalidate({ envelopeId });
+    },
+  });
 
   const { mutateAsync: deleteAttachment } = trpc.envelope.attachment.delete.useMutation({
     onSuccess: () => {
@@ -139,9 +131,7 @@ export const DocumentAttachmentsPopover = ({
 
           <span>
             <Trans>Attachments</Trans>
-            {attachments && attachments.data.length > 0 && (
-              <span className="ml-1">({attachments.data.length})</span>
-            )}
+            {attachments && attachments.data.length > 0 && <span className="ml-1">({attachments.data.length})</span>}
           </span>
         </Button>
       </PopoverTrigger>
@@ -152,7 +142,7 @@ export const DocumentAttachmentsPopover = ({
             <h4 className="font-medium">
               <Trans>Attachments</Trans>
             </h4>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-1 text-muted-foreground text-sm">
               <Trans>Add links to relevant documents or resources.</Trans>
             </p>
           </div>
@@ -165,12 +155,12 @@ export const DocumentAttachmentsPopover = ({
                   className="flex items-center justify-between rounded-md border border-border p-2"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{attachment.label}</p>
+                    <p className="truncate font-medium text-sm">{attachment.label}</p>
                     <a
-                      href={attachment.data}
+                      href={toSafeHref(attachment.data)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="truncate text-xs text-muted-foreground underline hover:text-foreground"
+                      className="truncate text-muted-foreground text-xs underline hover:text-foreground"
                     >
                       {attachment.data}
                     </a>
@@ -190,12 +180,7 @@ export const DocumentAttachmentsPopover = ({
           )}
 
           {!isAdding && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full"
-              onClick={() => setIsAdding(true)}
-            >
+            <Button variant="outline" size="sm" className="w-full" onClick={() => setIsAdding(true)}>
               <Plus className="mr-2 h-4 w-4" />
               <Trans>Add Attachment</Trans>
             </Button>

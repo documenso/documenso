@@ -12,12 +12,13 @@
     "index.ts"
   ],
   "scripts": {
-    "dev": "email dev --port 3002 --dir templates",
+    "dev": "react-router dev --config preview/vite.config.ts",
+    "preview:build": "react-router build --config preview/vite.config.ts",
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "@documenso/tailwind-config": "*",
     "@documenso/nodemailer-resend": "4.0.0",
+    "@documenso/tailwind-config": "*",
     "@react-email/body": "0.2.0",
     "@react-email/button": "0.2.0",
     "@react-email/code-block": "0.2.0",
@@ -37,12 +38,12 @@
     "@react-email/section": "0.0.16",
     "@react-email/tailwind": "^2.0.1",
     "@react-email/text": "0.1.5",
-    "nodemailer": "^7.0.10",
+    "nodemailer": "^8.0.5",
     "react-email": "^5.0.6",
     "resend": "^6.5.2"
   },
   "devDependencies": {
     "@documenso/tsconfig": "*",
-    "@types/nodemailer": "^7.0.4"
+    "@types/nodemailer": "^8.0.0"
   }
 }

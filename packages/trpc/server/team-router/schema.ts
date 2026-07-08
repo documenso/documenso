@@ -1,7 +1,8 @@
+import { PROTECTED_TEAM_URLS } from '@documenso/lib/constants/teams';
+import { ZNameSchema } from '@documenso/lib/types/name';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { TeamMemberRole } from '@prisma/client';
 import { z } from 'zod';
-
-import { PROTECTED_TEAM_URLS } from '@documenso/lib/constants/teams';
 
 /**
  * Restrict team URLs schema.
@@ -26,24 +27,15 @@ export const ZTeamUrlSchema = z
   .toLowerCase()
   .regex(/^[a-z0-9].*[^_-]$/, 'Team URL cannot start or end with dashes or underscores.')
   .regex(/^(?!.*[-_]{2})/, 'Team URL cannot contain consecutive dashes or underscores.')
-  .regex(
-    /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/,
-    'Team URL can only contain letters, numbers, dashes and underscores.',
-  )
+  .regex(/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/, 'Team URL can only contain letters, numbers, dashes and underscores.')
   .refine((value) => !PROTECTED_TEAM_URLS.includes(value), {
     message: 'This URL is already in use.',
   });
 
-export const ZTeamNameSchema = z
-  .string()
-  .trim()
-  .min(3, { message: 'Team name must be at least 3 characters long.' })
-  .max(30, { message: 'Team name must not exceed 30 characters.' });
-
 export const ZCreateTeamEmailVerificationMutationSchema = z.object({
   teamId: z.number(),
-  name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
-  email: z.string().trim().email().toLowerCase().min(1, 'Please enter a valid email.'),
+  name: ZNameSchema,
+  email: zEmail().trim().toLowerCase().min(1, 'Please enter a valid email.'),
 });
 
 export const ZDeleteTeamEmailMutationSchema = z.object({
@@ -61,7 +53,7 @@ export const ZGetTeamMembersQuerySchema = z.object({
 export const ZUpdateTeamEmailMutationSchema = z.object({
   teamId: z.number(),
   data: z.object({
-    name: z.string().trim().min(1),
+    name: ZNameSchema,
   }),
 });
 
@@ -77,13 +69,9 @@ export const ZResendTeamEmailVerificationMutationSchema = z.object({
   teamId: z.number(),
 });
 
-export type TCreateTeamEmailVerificationMutationSchema = z.infer<
-  typeof ZCreateTeamEmailVerificationMutationSchema
->;
+export type TCreateTeamEmailVerificationMutationSchema = z.infer<typeof ZCreateTeamEmailVerificationMutationSchema>;
 
 export type TDeleteTeamEmailMutationSchema = z.infer<typeof ZDeleteTeamEmailMutationSchema>;
 export type TGetTeamMembersQuerySchema = z.infer<typeof ZGetTeamMembersQuerySchema>;
 export type TUpdateTeamEmailMutationSchema = z.infer<typeof ZUpdateTeamEmailMutationSchema>;
-export type TResendTeamEmailVerificationMutationSchema = z.infer<
-  typeof ZResendTeamEmailVerificationMutationSchema
->;
+export type TResendTeamEmailVerificationMutationSchema = z.infer<typeof ZResendTeamEmailVerificationMutationSchema>;

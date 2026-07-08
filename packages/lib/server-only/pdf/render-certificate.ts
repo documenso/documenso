@@ -1,13 +1,12 @@
 import type { I18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import type { Field, Signature } from '@prisma/client';
+import type { Field, RecipientRole, Signature } from '@prisma/client';
 import { SigningStatus } from '@prisma/client';
-import type { RecipientRole } from '@prisma/client';
 import Konva from 'konva';
 import 'konva/skia-backend';
-import { DateTime } from 'luxon';
 import fs from 'node:fs';
 import path from 'node:path';
+import { DateTime } from 'luxon';
 import type { Canvas } from 'skia-canvas';
 import { Image as SkiaImage } from 'skia-canvas';
 import { UAParser } from 'ua-parser-js';
@@ -15,10 +14,8 @@ import { renderSVG } from 'uqr';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { APP_I18N_OPTIONS } from '../../constants/i18n';
-import {
-  RECIPIENT_ROLES_DESCRIPTION,
-  RECIPIENT_ROLE_SIGNING_REASONS,
-} from '../../constants/recipient-roles';
+import { getSignatureFontFamily } from '../../constants/pdf';
+import { RECIPIENT_ROLE_SIGNING_REASONS, RECIPIENT_ROLES_DESCRIPTION } from '../../constants/recipient-roles';
 import type { TDocumentAuditLogBaseSchema } from '../../types/document-audit-logs';
 import { svgToPng } from '../../utils/images/svg-to-png';
 import { ensureFontLibrary } from './helpers';
@@ -49,6 +46,7 @@ export type CertificateRecipient = {
 
 type GenerateCertificateOptions = {
   recipients: CertificateRecipient[];
+  envelopeId: string;
   qrToken: string | null;
   hidePoweredBy: boolean;
   i18n: I18n;
@@ -88,7 +86,7 @@ const columnWidthPercentages = [30, 30, 40];
 const rowPadding = 12;
 const tableHeaderHeight = 38;
 const pageTopMargin = 72;
-const pageBottomMargin = 12;
+const pageBottomMargin = 24;
 const contentMaxWidth = 768;
 
 const titleFontSize = 18;
@@ -305,7 +303,7 @@ const renderColumnTwo = (options: RenderColumnOptions) => {
         x: 2,
         text: recipient.signatureField?.signature?.typedSignature,
         padding: 4,
-        fontFamily: 'Caveat',
+        fontFamily: getSignatureFontFamily(recipient.signatureField?.signature?.typedSignature),
         fontSize: 16,
         align: 'center',
         verticalAlign: 'middle',
@@ -717,6 +715,7 @@ const renderTables = (options: RenderTablesOptions) => {
 
 export async function renderCertificate({
   recipients,
+  envelopeId,
   qrToken,
   hidePoweredBy,
   i18n,
@@ -802,6 +801,16 @@ export async function renderCertificate({
       }
     }
 
+    const footerText = new Konva.Text({
+      x: margin,
+      y: pageHeight - textXs - 10,
+      text: `${i18n._(msg`Envelope ID`)}: ${envelopeId}`,
+      fontFamily: 'Inter',
+      fontSize: textXs,
+      fill: textMutedForegroundLight,
+    });
+    page.add(footerText);
+
     page.add(group);
     stage.add(page);
 
@@ -819,6 +828,16 @@ export async function renderCertificate({
       x: pageWidth - brandingRect.width - margin,
       y: pageTopMargin / 2, // Less padding since there's nothing else on this page.
     } satisfies Partial<Konva.GroupConfig>);
+
+    const overflowFooterText = new Konva.Text({
+      x: margin,
+      y: pageHeight - textXs - 10,
+      text: `${i18n._(msg`Envelope ID`)}: ${envelopeId}`,
+      fontFamily: 'Inter',
+      fontSize: textXs,
+      fill: textMutedForegroundLight,
+    });
+    page.add(overflowFooterText);
 
     page.add(brandingGroup);
     stage.add(page);

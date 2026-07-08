@@ -1,13 +1,11 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { EnvelopeType, SendStatus, SigningStatus } from '@prisma/client';
-
 import { mailer } from '@documenso/email/mailer';
 import DocumentRejectedEmail from '@documenso/email/templates/document-rejected';
 import DocumentRejectionConfirmedEmail from '@documenso/email/templates/document-rejection-confirmed';
 import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
+import { msg } from '@lingui/core/macro';
+import { EnvelopeType, SendStatus, SigningStatus } from '@prisma/client';
+import { createElement } from 'react';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
@@ -20,13 +18,7 @@ import { formatDocumentsPath } from '../../../utils/teams';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendSigningRejectionEmailsJobDefinition } from './send-rejection-emails';
 
-export const run = async ({
-  payload,
-  io,
-}: {
-  payload: TSendSigningRejectionEmailsJobDefinition;
-  io: JobRunIO;
-}) => {
+export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmailsJobDefinition; io: JobRunIO }) => {
   const { documentId, recipientId } = payload;
 
   const [envelope, recipient] = await Promise.all([
@@ -66,15 +58,13 @@ export const run = async ({
 
   const { user: documentOwner } = envelope;
 
-  const isEmailEnabled = extractDerivedDocumentEmailSettings(
-    envelope.documentMeta,
-  ).recipientSigningRequest;
+  const isEmailEnabled = extractDerivedDocumentEmailSettings(envelope.documentMeta).recipientSigningRequest;
 
   if (!isEmailEnabled) {
     return;
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, replyToEmail, emailsDisabled, emailTransport } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
       type: 'team',
@@ -85,8 +75,10 @@ export const run = async ({
 
   const i18n = await getI18nInstance(emailLanguage);
 
-  // Send confirmation email to the recipient who rejected
-  if (isRecipientEmailValidForSending(recipient)) {
+  // Send confirmation email to the recipient who rejected.
+  // Skipped when the organisation has email sending disabled, since this is sent on its behalf.
+  // The owner notification below intentionally uses the internal Documenso email, so it still sends.
+  if (!emailsDisabled && isRecipientEmailValidForSending(recipient)) {
     await io.runTask('send-rejection-confirmation-email', async () => {
       const recipientTemplate = createElement(DocumentRejectionConfirmedEmail, {
         recipientName: recipient.name,
@@ -105,7 +97,7 @@ export const run = async ({
         }),
       ]);
 
-      await mailer.sendMail({
+      await emailTransport.sendMail({
         to: {
           name: recipient.name,
           address: recipient.email,
@@ -124,9 +116,7 @@ export const run = async ({
     const ownerTemplate = createElement(DocumentRejectedEmail, {
       recipientName: recipient.name,
       documentName: envelope.title,
-      documentUrl: `${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(envelope.team?.url)}/${
-        envelope.id
-      }`,
+      documentUrl: `${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(envelope.team?.url)}/${envelope.id}`,
       rejectionReason: recipient.rejectionReason || '',
       assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
     });

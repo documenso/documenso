@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const ZDownloadDocumentAuditLogsRequestSchema = z.object({
-  documentId: z.number(),
+  envelopeId: z.string(),
 });
 
 export const ZDownloadDocumentAuditLogsResponseSchema = z.object({
@@ -9,9 +9,5 @@ export const ZDownloadDocumentAuditLogsResponseSchema = z.object({
   envelopeTitle: z.string(),
 });
 
-export type TDownloadDocumentAuditLogsRequest = z.infer<
-  typeof ZDownloadDocumentAuditLogsRequestSchema
->;
-export type TDownloadDocumentAuditLogsResponse = z.infer<
-  typeof ZDownloadDocumentAuditLogsResponseSchema
->;
+export type TDownloadDocumentAuditLogsRequest = z.infer<typeof ZDownloadDocumentAuditLogsRequestSchema>;
+export type TDownloadDocumentAuditLogsResponse = z.infer<typeof ZDownloadDocumentAuditLogsResponseSchema>;

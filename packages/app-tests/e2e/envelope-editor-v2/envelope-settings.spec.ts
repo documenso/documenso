@@ -1,16 +1,15 @@
-import { type Page, expect, test } from '@playwright/test';
-import { DocumentDistributionMethod, DocumentVisibility } from '@prisma/client';
-
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
+import { expect, type Page, test } from '@playwright/test';
+import { DocumentDistributionMethod, DocumentVisibility } from '@prisma/client';
 
 import {
-  type TEnvelopeEditorSurface,
   getEnvelopeEditorSettingsTrigger,
   openDocumentEnvelopeEditor,
   openEmbeddedEnvelopeEditor,
   openTemplateEnvelopeEditor,
   persistEmbeddedEnvelope,
+  type TEnvelopeEditorSurface,
 } from '../fixtures/envelope-editor';
 import { expectToastTextToBeVisible } from '../fixtures/generic';
 
@@ -31,6 +30,12 @@ const TEST_SETTINGS_VALUES = {
   expirationMode: 'Custom duration',
   expirationAmount: 5,
   expirationUnit: 'Weeks',
+  reminderMode: 'Enabled',
+  reminderSendAfterAmount: 3,
+  reminderSendAfterUnit: 'Days',
+  reminderRepeatMode: 'Custom interval',
+  reminderRepeatAmount: 7,
+  reminderRepeatUnit: 'Days',
   accessAuth: 'Require account',
   actionAuth: 'Require password',
   visibility: 'Managers and above',
@@ -42,6 +47,10 @@ const DB_EXPECTED_VALUES = {
   timezone: 'Europe/London',
   distributionMethod: DocumentDistributionMethod.NONE,
   envelopeExpirationPeriod: { unit: 'week', amount: 5 },
+  reminderSettings: {
+    sendAfter: { unit: 'day', amount: 3 },
+    repeatEvery: { unit: 'day', amount: 7 },
+  },
   visibility: DocumentVisibility.MANAGER_AND_ABOVE,
   globalAccessAuth: ['ACCOUNT'],
   globalActionAuth: ['PASSWORD'],
@@ -54,6 +63,7 @@ const DB_EXPECTED_VALUES = {
     documentDeleted: false,
     ownerDocumentCompleted: false,
     ownerRecipientExpired: false,
+    ownerDocumentCreated: false,
   },
 };
 
@@ -67,11 +77,7 @@ const clickSettingsDialogHeader = async (root: Page) => {
 };
 
 const getComboboxByLabel = (root: Page, label: string) =>
-  root
-    .locator(`label:has-text("${label}")`)
-    .locator('xpath=..')
-    .locator('[role="combobox"]')
-    .first();
+  root.locator(`label:has-text("${label}")`).locator('xpath=..').locator('[role="combobox"]').first();
 
 const selectMultiSelectOption = async (
   root: Page,
@@ -85,10 +91,7 @@ const selectMultiSelectOption = async (
   await clickSettingsDialogHeader(root);
 };
 
-const runSettingsFlow = async (
-  { root }: TEnvelopeEditorSurface,
-  { externalId, isEmbedded }: SettingsFlowData,
-) => {
+const runSettingsFlow = async ({ root }: TEnvelopeEditorSurface, { externalId, isEmbedded }: SettingsFlowData) => {
   await openSettingsDialog(root);
 
   await getComboboxByLabel(root, 'Language').click();
@@ -112,6 +115,21 @@ const runSettingsFlow = async (
 
   await root.locator('input[name="externalId"]').fill(externalId);
   await root.locator('input[name="meta.redirectUrl"]').fill(TEST_SETTINGS_VALUES.redirectUrl);
+  await root.getByRole('button', { name: 'Notifications' }).click();
+  // Fill email-content fields and toggle recipient-facing notification checkboxes
+  // while distributionMethod is still EMAIL. After it flips to NONE below, these
+  // controls are disabled because no email is sent to recipients.
+  await root.locator('input[name="meta.subject"]').fill(TEST_SETTINGS_VALUES.subject);
+  await root.locator('textarea[name="meta.message"]').fill(TEST_SETTINGS_VALUES.message);
+  await root.locator('input[name="meta.emailReplyTo"]').fill(TEST_SETTINGS_VALUES.replyTo);
+  await root.locator('#recipientSigned').click();
+  await root.locator('#recipientSigningRequest').click();
+  await root.locator('#recipientRemoved').click();
+  await root.locator('#documentPending').click();
+  await root.locator('#documentCompleted').click();
+  await root.locator('#documentDeleted').click();
+
+  await root.getByRole('button', { name: 'General' }).click();
 
   await root.locator('[data-testid="documentDistributionMethodSelectValue"]').click();
   await root.getByRole('option', { name: TEST_SETTINGS_VALUES.distributionMethod }).click();
@@ -129,18 +147,93 @@ const runSettingsFlow = async (
   await root.getByRole('option', { name: TEST_SETTINGS_VALUES.expirationUnit }).click();
   await clickSettingsDialogHeader(root);
 
-  await root.getByRole('button', { name: 'Email' }).click();
-  await root.locator('#recipientSigned').click();
-  await root.locator('#recipientSigningRequest').click();
-  await root.locator('#recipientRemoved').click();
-  await root.locator('#documentPending').click();
-  await root.locator('#documentCompleted').click();
-  await root.locator('#documentDeleted').click();
+  // Configure reminder settings.
+  await root.getByRole('button', { name: 'Reminders' }).click();
+
+  await root.locator('[data-testid="reminder-mode-select"]').click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderMode }).click();
+  await clickSettingsDialogHeader(root);
+
+  await root.locator('[data-testid="reminder-send-after-amount"]').clear();
+  await root
+    .locator('[data-testid="reminder-send-after-amount"]')
+    .fill(String(TEST_SETTINGS_VALUES.reminderSendAfterAmount));
+
+  await root.locator('[data-testid="reminder-send-after-unit"]').click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderSendAfterUnit }).click();
+  await clickSettingsDialogHeader(root);
+
+  await root.locator('[data-testid="reminder-repeat-mode-select"]').click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderRepeatMode }).click();
+  await clickSettingsDialogHeader(root);
+
+  await root.locator('[data-testid="reminder-repeat-amount"]').clear();
+  await root.locator('[data-testid="reminder-repeat-amount"]').fill(String(TEST_SETTINGS_VALUES.reminderRepeatAmount));
+
+  await root.locator('[data-testid="reminder-repeat-unit"]').click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderRepeatUnit }).click();
+  await clickSettingsDialogHeader(root);
+
+  const spinbuttons = root.getByRole('spinbutton');
+  await spinbuttons.first().clear();
+  await spinbuttons.first().fill(String(TEST_SETTINGS_VALUES.reminderSendAfterAmount));
+
+  const sendAfterUnitTrigger = root
+    .locator('button[role="combobox"]')
+    .filter({ hasText: /Days|Weeks|Months/ })
+    .first();
+  await sendAfterUnitTrigger.click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderSendAfterUnit }).click();
+  await clickSettingsDialogHeader(root);
+
+  const repeatModeSelect = root
+    .locator('button[role="combobox"]')
+    .filter({ hasText: /Custom interval|Don't repeat/ })
+    .first();
+  await repeatModeSelect.click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderRepeatMode }).click();
+  await clickSettingsDialogHeader(root);
+
+  await spinbuttons.last().clear();
+  await spinbuttons.last().fill(String(TEST_SETTINGS_VALUES.reminderRepeatAmount));
+
+  const repeatUnitTrigger = root
+    .locator('button[role="combobox"]')
+    .filter({ hasText: /Days|Weeks|Months/ })
+    .last();
+  await repeatUnitTrigger.click();
+  await root.getByRole('option', { name: TEST_SETTINGS_VALUES.reminderRepeatUnit }).click();
+  await clickSettingsDialogHeader(root);
+
+  await root.getByRole('button', { name: 'Notifications' }).click();
+
+  // Distribution is NONE: email-content fields stay rendered but disabled,
+  // recipient-facing checkboxes are hidden entirely and replaced by an alert,
+  // owner-facing checkboxes stay editable so we toggle them here.
+  await expect(root.locator('input[name="meta.subject"]')).toBeDisabled();
+  await expect(root.locator('textarea[name="meta.message"]')).toBeDisabled();
+  await expect(root.locator('input[name="meta.emailReplyTo"]')).toBeDisabled();
+  await expect(root.locator('#recipientSigned')).toHaveCount(0);
+  await expect(root.locator('#recipientSigningRequest')).toHaveCount(0);
+  await expect(root.locator('#recipientRemoved')).toHaveCount(0);
+  await expect(root.locator('#documentPending')).toHaveCount(0);
+  await expect(root.locator('#documentCompleted')).toHaveCount(0);
+  await expect(root.locator('#documentDeleted')).toHaveCount(0);
+  await expect(root.getByText(/Email distribution needs to be enabled/)).toBeVisible();
+
+  // Email Sender select only renders when the org has the emailDomains feature
+  // flag plus allowConfigureEmailSender, so the assertion is conditional.
+  const emailSenderSelect = getComboboxByLabel(root, 'Email Sender');
+  const hasEmailSenderSelect = (await emailSenderSelect.count()) > 0;
+
+  if (hasEmailSenderSelect) {
+    await expect(emailSenderSelect).toBeDisabled();
+  }
+
+  await expect(root.locator('#ownerDocumentCompleted')).toBeEnabled();
   await root.locator('#ownerDocumentCompleted').click();
   await root.locator('#ownerRecipientExpired').click();
-  await root.locator('input[name="meta.emailReplyTo"]').fill(TEST_SETTINGS_VALUES.replyTo);
-  await root.locator('input[name="meta.subject"]').fill(TEST_SETTINGS_VALUES.subject);
-  await root.locator('textarea[name="meta.message"]').fill(TEST_SETTINGS_VALUES.message);
+  await root.locator('#ownerDocumentCreated').click();
 
   await root.getByRole('button', { name: 'Security' }).click();
   await selectMultiSelectOption(root, 'documentAccessSelectValue', TEST_SETTINGS_VALUES.accessAuth);
@@ -149,11 +242,7 @@ const runSettingsFlow = async (
   const hasActionAuthSelect = (await actionAuthSelect.count()) > 0;
 
   if (hasActionAuthSelect) {
-    await selectMultiSelectOption(
-      root,
-      'documentActionSelectValue',
-      TEST_SETTINGS_VALUES.actionAuth,
-    );
+    await selectMultiSelectOption(root, 'documentActionSelectValue', TEST_SETTINGS_VALUES.actionAuth);
   }
 
   if (isEmbedded) {
@@ -173,49 +262,56 @@ const runSettingsFlow = async (
   await openSettingsDialog(root);
 
   await expect(root.locator('input[name="externalId"]')).toHaveValue(externalId);
-  await expect(root.locator('input[name="meta.redirectUrl"]')).toHaveValue(
-    TEST_SETTINGS_VALUES.redirectUrl,
-  );
+  await expect(root.locator('input[name="meta.redirectUrl"]')).toHaveValue(TEST_SETTINGS_VALUES.redirectUrl);
   await expect(getComboboxByLabel(root, 'Language')).toContainText(TEST_SETTINGS_VALUES.language);
   await expect(getComboboxByLabel(root, 'Allowed Signature Types')).not.toContainText('Upload');
-  await expect(getComboboxByLabel(root, 'Date Format')).toContainText(
-    TEST_SETTINGS_VALUES.dateFormat,
-  );
+  await expect(getComboboxByLabel(root, 'Date Format')).toContainText(TEST_SETTINGS_VALUES.dateFormat);
   await expect(getComboboxByLabel(root, 'Time Zone')).toContainText(TEST_SETTINGS_VALUES.timezone);
   await expect(root.locator('[data-testid="documentDistributionMethodSelectValue"]')).toContainText(
     TEST_SETTINGS_VALUES.distributionMethod,
   );
-  await expect(getComboboxByLabel(root, 'Expiration')).toContainText(
-    TEST_SETTINGS_VALUES.expirationMode,
-  );
-  await expect(root.getByRole('spinbutton')).toHaveValue(
-    String(TEST_SETTINGS_VALUES.expirationAmount),
-  );
+  await expect(getComboboxByLabel(root, 'Expiration')).toContainText(TEST_SETTINGS_VALUES.expirationMode);
+  await expect(root.getByRole('spinbutton')).toHaveValue(String(TEST_SETTINGS_VALUES.expirationAmount));
   await expect(
-    root
-      .locator('button[role="combobox"]')
-      .filter({ hasText: TEST_SETTINGS_VALUES.expirationUnit })
-      .first(),
+    root.locator('button[role="combobox"]').filter({ hasText: TEST_SETTINGS_VALUES.expirationUnit }).first(),
   ).toBeVisible();
 
-  await root.getByRole('button', { name: 'Email' }).click();
-  await expect(root.locator('#recipientSigned')).toHaveAttribute('aria-checked', 'false');
-  await expect(root.locator('#recipientSigningRequest')).toHaveAttribute('aria-checked', 'false');
-  await expect(root.locator('#recipientRemoved')).toHaveAttribute('aria-checked', 'false');
-  await expect(root.locator('#documentPending')).toHaveAttribute('aria-checked', 'false');
-  await expect(root.locator('#documentCompleted')).toHaveAttribute('aria-checked', 'false');
-  await expect(root.locator('#documentDeleted')).toHaveAttribute('aria-checked', 'false');
+  // Verify reminder settings persisted in UI.
+  await root.getByRole('button', { name: 'Reminders' }).click();
+  await expect(root.locator('[data-testid="reminder-mode-select"]')).toContainText(TEST_SETTINGS_VALUES.reminderMode);
+  await expect(root.locator('[data-testid="reminder-send-after-amount"]')).toHaveValue(
+    String(TEST_SETTINGS_VALUES.reminderSendAfterAmount),
+  );
+  await expect(root.locator('[data-testid="reminder-send-after-unit"]')).toContainText(
+    TEST_SETTINGS_VALUES.reminderSendAfterUnit,
+  );
+  await expect(root.locator('[data-testid="reminder-repeat-mode-select"]')).toContainText(
+    TEST_SETTINGS_VALUES.reminderRepeatMode,
+  );
+  await expect(root.locator('[data-testid="reminder-repeat-amount"]')).toHaveValue(
+    String(TEST_SETTINGS_VALUES.reminderRepeatAmount),
+  );
+  await expect(root.locator('[data-testid="reminder-repeat-unit"]')).toContainText(
+    TEST_SETTINGS_VALUES.reminderRepeatUnit,
+  );
+
+  await root.getByRole('button', { name: 'Notifications' }).click();
+  // Distribution persisted as NONE: recipient-facing checkboxes are hidden, owner-facing
+  // checkboxes remain visible and persist their stored values. Email-content fields are
+  // still rendered (disabled) and persist their stored values.
+  await expect(root.locator('#recipientSigned')).toHaveCount(0);
+  await expect(root.locator('#recipientSigningRequest')).toHaveCount(0);
+  await expect(root.locator('#recipientRemoved')).toHaveCount(0);
+  await expect(root.locator('#documentPending')).toHaveCount(0);
+  await expect(root.locator('#documentCompleted')).toHaveCount(0);
+  await expect(root.locator('#documentDeleted')).toHaveCount(0);
+  await expect(root.getByText(/Email distribution needs to be enabled/)).toBeVisible();
   await expect(root.locator('#ownerDocumentCompleted')).toHaveAttribute('aria-checked', 'false');
   await expect(root.locator('#ownerRecipientExpired')).toHaveAttribute('aria-checked', 'false');
-  await expect(root.locator('input[name="meta.emailReplyTo"]')).toHaveValue(
-    TEST_SETTINGS_VALUES.replyTo,
-  );
-  await expect(root.locator('input[name="meta.subject"]')).toHaveValue(
-    TEST_SETTINGS_VALUES.subject,
-  );
-  await expect(root.locator('textarea[name="meta.message"]')).toHaveValue(
-    TEST_SETTINGS_VALUES.message,
-  );
+  await expect(root.locator('#ownerDocumentCreated')).toHaveAttribute('aria-checked', 'false');
+  await expect(root.locator('input[name="meta.emailReplyTo"]')).toHaveValue(TEST_SETTINGS_VALUES.replyTo);
+  await expect(root.locator('input[name="meta.subject"]')).toHaveValue(TEST_SETTINGS_VALUES.subject);
+  await expect(root.locator('textarea[name="meta.message"]')).toHaveValue(TEST_SETTINGS_VALUES.message);
 
   await root.getByRole('button', { name: 'Security' }).click();
   await expect(root.locator('[data-testid="documentAccessSelectValue"]')).toContainText(
@@ -279,9 +375,8 @@ const assertEnvelopeSettingsPersistedInDatabase = async ({
   expect(envelope.documentMeta.dateFormat).toBe(DB_EXPECTED_VALUES.dateFormat);
   expect(envelope.documentMeta.timezone).toBe(DB_EXPECTED_VALUES.timezone);
   expect(envelope.documentMeta.distributionMethod).toBe(DB_EXPECTED_VALUES.distributionMethod);
-  expect(envelope.documentMeta.envelopeExpirationPeriod).toEqual(
-    DB_EXPECTED_VALUES.envelopeExpirationPeriod,
-  );
+  expect(envelope.documentMeta.envelopeExpirationPeriod).toEqual(DB_EXPECTED_VALUES.envelopeExpirationPeriod);
+  expect(envelope.documentMeta.reminderSettings).toEqual(DB_EXPECTED_VALUES.reminderSettings);
   expect(envelope.documentMeta.redirectUrl).toBe(TEST_SETTINGS_VALUES.redirectUrl);
   expect(envelope.documentMeta.emailReplyTo).toBe(TEST_SETTINGS_VALUES.replyTo);
   expect(envelope.documentMeta.subject).toBe(TEST_SETTINGS_VALUES.subject);
@@ -300,9 +395,7 @@ const assertEnvelopeSettingsPersistedInDatabase = async ({
   }
 };
 
-const parseAuthOptions = (
-  authOptions: unknown,
-): { globalAccessAuth: string[]; globalActionAuth: string[] } => {
+const parseAuthOptions = (authOptions: unknown): { globalAccessAuth: string[]; globalActionAuth: string[] } => {
   if (!isRecord(authOptions)) {
     return {
       globalAccessAuth: [],
@@ -320,8 +413,7 @@ const parseAuthOptions = (
   };
 };
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null;
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
 
 test.describe('document editor', () => {
   test('update and persist settings', async ({ page }) => {

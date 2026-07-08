@@ -1,18 +1,9 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/react/macro';
-import type { TeamGlobalSettings } from '@prisma/client';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { FROM_ADDRESS } from '@documenso/lib/constants/email';
-import {
-  DEFAULT_DOCUMENT_EMAIL_SETTINGS,
-  ZDocumentEmailSettingsSchema,
-} from '@documenso/lib/types/document-email';
+import { DEFAULT_DOCUMENT_EMAIL_SETTINGS, ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import { zEmail } from '@documenso/lib/utils/zod';
 import { trpc } from '@documenso/trpc/react';
 import { DocumentEmailCheckboxes } from '@documenso/ui/components/document/document-email-checkboxes';
-import { Button } from '@documenso/ui/primitives/button';
 import {
   Form,
   FormControl,
@@ -23,27 +14,25 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans } from '@lingui/react/macro';
+import type { TeamGlobalSettings } from '@prisma/client';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import { FormStickySaveBar } from './form-sticky-save-bar';
 
 const ZEmailPreferencesFormSchema = z.object({
   emailId: z.string().nullable(),
-  emailReplyTo: z.string().email().nullable(),
+  emailReplyTo: zEmail().nullable(),
   // emailReplyToName: z.string(),
   emailDocumentSettings: ZDocumentEmailSettingsSchema.nullable(),
 });
 
 export type TEmailPreferencesFormSchema = z.infer<typeof ZEmailPreferencesFormSchema>;
 
-type SettingsSubset = Pick<
-  TeamGlobalSettings,
-  'emailId' | 'emailReplyTo' | 'emailDocumentSettings'
->;
+type SettingsSubset = Pick<TeamGlobalSettings, 'emailId' | 'emailReplyTo' | 'emailDocumentSettings'>;
 
 export type EmailPreferencesFormProps = {
   settings: SettingsSubset;
@@ -51,11 +40,7 @@ export type EmailPreferencesFormProps = {
   onFormSubmit: (data: TEmailPreferencesFormSchema) => Promise<void>;
 };
 
-export const EmailPreferencesForm = ({
-  settings,
-  onFormSubmit,
-  canInherit,
-}: EmailPreferencesFormProps) => {
+export const EmailPreferencesForm = ({ settings, onFormSubmit, canInherit }: EmailPreferencesFormProps) => {
   const organisation = useCurrentOrganisation();
 
   const form = useForm<TEmailPreferencesFormSchema>({
@@ -68,21 +53,29 @@ export const EmailPreferencesForm = ({
     resolver: zodResolver(ZEmailPreferencesFormSchema),
   });
 
-  const { data: emailData, isLoading: isLoadingEmails } =
-    trpc.enterprise.organisation.email.find.useQuery({
-      organisationId: organisation.id,
-      perPage: 100,
-    });
+  const { data: emailData, isLoading: isLoadingEmails } = trpc.enterprise.organisation.email.find.useQuery({
+    organisationId: organisation.id,
+    perPage: 100,
+  });
 
   const emails = emailData?.data || [];
 
+  const handleFormSubmit = form.handleSubmit(async (data) => {
+    try {
+      await onFormSubmit(data);
+    } catch {
+      // The page handler surfaces its own error toast. Keep the form dirty so
+      // the save bar stays visible and the user can retry.
+      return;
+    }
+
+    form.reset(data);
+  });
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onFormSubmit)}>
-        <fieldset
-          className="flex h-full max-w-2xl flex-col gap-y-6"
-          disabled={form.formState.isSubmitting}
-        >
+      <form onSubmit={handleFormSubmit}>
+        <fieldset className="flex h-full max-w-2xl flex-col gap-y-6" disabled={form.formState.isSubmitting}>
           {organisation.organisationClaim.flags.emailDomains && (
             <FormField
               control={form.control}
@@ -144,9 +137,7 @@ export const EmailPreferencesForm = ({
                 </FormControl>
                 <FormMessage />
                 <FormDescription>
-                  <Trans>
-                    The email address which will show up in the "Reply To" field in emails
-                  </Trans>
+                  <Trans>The email address which will show up in the "Reply To" field in emails</Trans>
 
                   {canInherit && (
                     <span>
@@ -187,9 +178,7 @@ export const EmailPreferencesForm = ({
                   <Select
                     value={field.value === null ? 'INHERIT' : 'CONTROLLED'}
                     onValueChange={(value) =>
-                      field.onChange(
-                        value === 'CONTROLLED' ? DEFAULT_DOCUMENT_EMAIL_SETTINGS : null,
-                      )
+                      field.onChange(value === 'CONTROLLED' ? DEFAULT_DOCUMENT_EMAIL_SETTINGS : null)
                     }
                   >
                     <SelectTrigger>
@@ -219,18 +208,19 @@ export const EmailPreferencesForm = ({
 
                 <FormDescription>
                   <Trans>
-                    Controls the default email settings when new documents or templates are created
+                    Controls the default email settings when new documents or templates are created. Updating these
+                    settings will not affect existing documents or templates.
                   </Trans>
                 </FormDescription>
               </FormItem>
             )}
           />
 
-          <div className="flex flex-row justify-end space-x-4">
-            <Button type="submit" loading={form.formState.isSubmitting}>
-              <Trans>Update</Trans>
-            </Button>
-          </div>
+          <FormStickySaveBar
+            isDirty={form.formState.isDirty}
+            isSubmitting={form.formState.isSubmitting}
+            onReset={() => form.reset()}
+          />
         </fieldset>
       </form>
     </Form>
