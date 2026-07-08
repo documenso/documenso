@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { seedDraftDocument } from '@documenso/prisma/seed/documents';
+import { seedDraftDocument, seedPendingDocument } from '@documenso/prisma/seed/documents';
 import { seedBlankFolder } from '@documenso/prisma/seed/folders';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -250,4 +250,42 @@ test('[BULK_ACTIONS]: can move documents from folder to home (root)', async ({ p
 
   await page.goto(`/t/${sender.team.url}/documents/f/${folder.id}`);
   await expect(page.getByRole('link', { name: 'Bulk Test Doc 1' })).not.toBeVisible();
+});
+
+test('[BULK_ACTIONS]: can resend reminders for multiple pending documents', async ({ page }) => {
+  const sender = await seedUser({ setTeamEmailAsOwner: true });
+
+  await Promise.all([
+    seedPendingDocument(sender.user, sender.team.id, ['recipient1@example.com'], {
+      key: 'Resend A',
+      createDocumentOptions: { title: 'Bulk Resend Doc 1' },
+    }),
+    seedPendingDocument(sender.user, sender.team.id, ['recipient2@example.com'], {
+      key: 'Resend B',
+      createDocumentOptions: { title: 'Bulk Resend Doc 2' },
+    }),
+  ]);
+
+  await apiSignin({
+    page,
+    email: sender.user.email,
+    redirectPath: `/t/${sender.team.url}/documents?status=PENDING`,
+  });
+
+  await page.locator('tr', { hasText: 'Bulk Resend Doc 1' }).getByRole('checkbox').click();
+  await page.locator('tr', { hasText: 'Bulk Resend Doc 2' }).getByRole('checkbox').click();
+  await expect(page.getByText('2 selected')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Resend' }).click();
+
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await expect(page.getByText('Resend Documents')).toBeVisible();
+  await expect(page.getByText('You are about to resend 2 documents')).toBeVisible();
+
+  await page.getByRole('dialog').getByRole('button', { name: 'Resend' }).click();
+
+  await expectToastTextToBeVisible(page, 'Reminders sent');
+
+  // Selection clears after a successful resend.
+  await expect(page.getByText(/\d+ selected/)).not.toBeVisible();
 });

@@ -1,6 +1,6 @@
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import { FolderInputIcon, Trash2Icon, XIcon } from 'lucide-react';
+import { FolderInputIcon, SendIcon, Trash2Icon, XIcon } from 'lucide-react';
 
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -8,6 +8,7 @@ export type EnvelopesTableBulkActionBarProps = {
   selectedCount: number;
   onMoveClick: () => void;
   onDeleteClick: () => void;
+  onResendClick?: () => void;
   onClearSelection: () => void;
 };
 
@@ -15,6 +16,7 @@ export const EnvelopesTableBulkActionBar = ({
   selectedCount,
   onMoveClick,
   onDeleteClick,
+  onResendClick,
   onClearSelection,
 }: EnvelopesTableBulkActionBarProps) => {
   const { t } = useLingui();
@@ -30,6 +32,13 @@ export const EnvelopesTableBulkActionBar = ({
       </span>
 
       <div className="h-6 w-px bg-border" />
+
+      {onResendClick && (
+        <Button type="button" variant="outline" size="sm" onClick={onResendClick}>
+          <SendIcon className="mr-2 h-4 w-4" />
+          <Trans>Resend</Trans>
+        </Button>
+      )}
 
       <Button type="button" variant="outline" size="sm" onClick={onMoveClick}>
         <FolderInputIcon className="mr-2 h-4 w-4" />
