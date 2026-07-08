@@ -2,6 +2,7 @@
   "title": "Configuration",
   "pages": [
     "environment",
+    "license",
     "database",
     "email",
     "storage",
