@@ -42,19 +42,15 @@ const getUploadedDocumentTitle = (customDocumentData?: TTemplateUseCustomDocumen
 };
 
 export const getTemplateUseDocumentTitle = (data: TTemplateUseDocumentNameData) => {
-  switch (data.documentNameSource) {
-    case DOCUMENT_NAME_SOURCE.TEMPLATE:
-      return undefined;
-    case DOCUMENT_NAME_SOURCE.UPLOAD:
-      return getUploadedDocumentTitle(data.customDocumentData);
-    case DOCUMENT_NAME_SOURCE.CUSTOM:
-      return data.customDocumentName.trim();
-    default: {
-      const exhaustiveCheck: never = data.documentNameSource;
-
-      return exhaustiveCheck;
-    }
+  if (data.documentNameSource === DOCUMENT_NAME_SOURCE.UPLOAD) {
+    return getUploadedDocumentTitle(data.customDocumentData);
   }
+
+  if (data.documentNameSource === DOCUMENT_NAME_SOURCE.CUSTOM) {
+    return data.customDocumentName.trim();
+  }
+
+  return undefined;
 };
 
 export const refineTemplateUseDocumentName = (data: TTemplateUseDocumentNameData, ctx: z.RefinementCtx) => {
