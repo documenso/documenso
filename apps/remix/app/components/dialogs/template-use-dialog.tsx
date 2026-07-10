@@ -38,27 +38,44 @@ import { useNavigate } from 'react-router';
 import * as z from 'zod';
 import { getTemplateUseErrorMessage } from '~/utils/toast-error-messages';
 
-const ZAddRecipientsForNewDocumentSchema = z.object({
-  distributeDocument: z.boolean(),
-  useCustomDocument: z.boolean().default(false),
-  customDocumentData: z
-    .array(
+import {
+  DOCUMENT_NAME_SOURCE,
+  getTemplateUseDocumentTitle,
+  refineTemplateUseDocumentName,
+  TemplateUseDialogDocumentName,
+} from './template-use-dialog-document-name';
+
+const ZAddRecipientsForNewDocumentSchema = z
+  .object({
+    distributeDocument: z.boolean(),
+    useCustomDocument: z.boolean().default(false),
+    documentNameSource: z.enum([
+      DOCUMENT_NAME_SOURCE.TEMPLATE,
+      DOCUMENT_NAME_SOURCE.UPLOAD,
+      DOCUMENT_NAME_SOURCE.CUSTOM,
+    ]),
+    customDocumentName: z.string(),
+    customDocumentData: z
+      .array(
+        z.object({
+          title: z.string(),
+          data: z.instanceof(File).optional(),
+          envelopeItemId: z.string(),
+        }),
+      )
+      .optional(),
+    recipients: z.array(
       z.object({
-        title: z.string(),
-        data: z.instanceof(File).optional(),
-        envelopeItemId: z.string(),
+        id: z.number(),
+        email: ZRecipientEmailSchema,
+        name: z.string(),
+        signingOrder: z.number().optional(),
       }),
-    )
-    .optional(),
-  recipients: z.array(
-    z.object({
-      id: z.number(),
-      email: ZRecipientEmailSchema,
-      name: z.string(),
-      signingOrder: z.number().optional(),
-    }),
-  ),
-});
+    ),
+  })
+  .superRefine((data, ctx) => {
+    refineTemplateUseDocumentName(data, ctx);
+  });
 
 type TAddRecipientsForNewDocumentSchema = z.infer<typeof ZAddRecipientsForNewDocumentSchema>;
 
@@ -106,6 +123,8 @@ export function TemplateUseDialog({
     return {
       distributeDocument: false,
       useCustomDocument: false,
+      documentNameSource: DOCUMENT_NAME_SOURCE.TEMPLATE,
+      customDocumentName: '',
       customDocumentData: envelopeItems.map((item) => ({
         title: item.title,
         data: undefined,
@@ -142,6 +161,8 @@ export function TemplateUseDialog({
 
   const onSubmit = async (data: TAddRecipientsForNewDocumentSchema) => {
     try {
+      const documentTitle = getTemplateUseDocumentTitle(data);
+
       const customFilesToUpload = (data.customDocumentData || []).filter(
         (item): item is { data: File; envelopeItemId: string; title: string } =>
           item.data !== undefined && item.envelopeItemId !== undefined && item.title !== undefined,
@@ -163,6 +184,7 @@ export function TemplateUseDialog({
         recipients: data.recipients,
         distributeDocument: data.distributeDocument,
         customDocumentData,
+        ...(documentTitle ? { override: { title: documentTitle } } : {}),
       });
 
       toast({
@@ -194,6 +216,8 @@ export function TemplateUseDialog({
     control: form.control,
     name: 'recipients',
   });
+
+  const useCustomDocument = form.watch('useCustomDocument');
 
   useEffect(() => {
     if (open) {
@@ -401,7 +425,16 @@ export function TemplateUseDialog({
                           onCheckedChange={(checked) => {
                             field.onChange(checked);
                             if (!checked) {
-                              form.setValue('customDocumentData', undefined);
+                              const customDocumentData = form.getValues('customDocumentData');
+
+                              form.setValue(
+                                'customDocumentData',
+                                customDocumentData?.map((item) => ({
+                                  ...item,
+                                  data: undefined,
+                                })),
+                              );
+                              form.clearErrors('customDocumentData');
                             }
                           }}
                         />
@@ -428,7 +461,7 @@ export function TemplateUseDialog({
                   )}
                 />
 
-                {form.watch('useCustomDocument') && (
+                {useCustomDocument && (
                   <div className="my-4 space-y-2">
                     {isLoadingEnvelopeItems ? (
                       <SpinnerBox className="py-16" />
@@ -537,6 +570,7 @@ export function TemplateUseDialog({
                                         }
 
                                         field.onChange(file);
+                                        form.clearErrors('customDocumentData');
                                       }}
                                     />
                                   </div>
@@ -550,6 +584,8 @@ export function TemplateUseDialog({
                     )}
                   </div>
                 )}
+
+                <TemplateUseDialogDocumentName />
               </div>
 
               <DialogFooter className="mt-4">
