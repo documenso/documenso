@@ -6,6 +6,7 @@ import {
   DIRECT_TEMPLATE_RECIPIENT_NAME,
 } from '@documenso/lib/constants/direct-templates';
 import { incrementTemplateId } from '@documenso/lib/server-only/envelope/increment-id';
+import { FIELD_SIGNATURE_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
 import { SignatureLevel } from '@documenso/lib/types/signature-level';
 import { prefixedId } from '@documenso/lib/universal/id';
 
@@ -15,6 +16,7 @@ import {
   DocumentDataType,
   DocumentSource,
   EnvelopeType,
+  FieldType,
   ReadStatus,
   RecipientRole,
   SendStatus,
@@ -29,6 +31,11 @@ type SeedTemplateOptions = {
   teamId: number;
   internalVersion?: 1 | 2;
   createTemplateOptions?: Partial<Prisma.EnvelopeUncheckedCreateInput>;
+  /**
+   * Only used by seedDirectTemplate. Creates a signature field for the direct
+   * recipient so the seeded direct template is valid. Defaults to true.
+   */
+  createDirectRecipientSignatureField?: boolean;
 };
 
 type CreateTemplateOptions = {
@@ -214,6 +221,31 @@ export const seedDirectTemplate = async (options: SeedTemplateOptions) => {
       directTemplateRecipientId: directTemplateRecpient.id,
     },
   });
+
+  const { createDirectRecipientSignatureField = true } = options;
+
+  if (createDirectRecipientSignatureField) {
+    const envelopeItem = await prisma.envelopeItem.findFirstOrThrow({
+      where: { envelopeId: template.id },
+    });
+
+    await prisma.field.create({
+      data: {
+        envelopeId: template.id,
+        envelopeItemId: envelopeItem.id,
+        recipientId: directTemplateRecpient.id,
+        type: FieldType.SIGNATURE,
+        page: 1,
+        positionX: 5,
+        positionY: 10,
+        width: 20,
+        height: 5,
+        customText: '',
+        inserted: false,
+        fieldMeta: FIELD_SIGNATURE_META_DEFAULT_VALUES,
+      },
+    });
+  }
 
   return await prisma.envelope.findFirstOrThrow({
     where: {
