@@ -205,11 +205,11 @@ export const seedDirectTemplate = async (options: SeedTemplateOptions) => {
     },
   });
 
-  const directTemplateRecpient = template.recipients.find(
+  const directTemplateRecipient = template.recipients.find(
     (recipient) => recipient.email === DIRECT_TEMPLATE_RECIPIENT_EMAIL,
   );
 
-  if (!directTemplateRecpient) {
+  if (!directTemplateRecipient) {
     throw new Error('Need to create a direct template recipient');
   }
 
@@ -218,7 +218,7 @@ export const seedDirectTemplate = async (options: SeedTemplateOptions) => {
       envelopeId: template.id,
       enabled: true,
       token: Math.random().toString(),
-      directTemplateRecipientId: directTemplateRecpient.id,
+      directTemplateRecipientId: directTemplateRecipient.id,
     },
   });
 
@@ -233,7 +233,7 @@ export const seedDirectTemplate = async (options: SeedTemplateOptions) => {
       data: {
         envelopeId: template.id,
         envelopeItemId: envelopeItem.id,
-        recipientId: directTemplateRecpient.id,
+        recipientId: directTemplateRecipient.id,
         type: FieldType.SIGNATURE,
         page: 1,
         positionX: 5,
