@@ -46,7 +46,7 @@ export const EnvelopeEditorInvalidDirectTemplateAlert = ({
 
         <ul className="list-disc pl-5">
           {signersMissingSignatureFields.map((recipient, i) => (
-            <li key={i}>{recipient.email || recipient.name || `Recipient ${i + 1}`}</li>
+            <li key={recipient.id}>{recipient.email || recipient.name || `Recipient ${i + 1}`}</li>
           ))}
         </ul>
       </AlertDescription>
