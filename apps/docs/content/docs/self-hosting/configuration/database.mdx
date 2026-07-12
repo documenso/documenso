@@ -213,7 +213,7 @@ npx prisma migrate deploy
 <Accordions type="multiple">
   <Accordion title="Migration failed midway">
     Check the `_prisma_migrations` table:
-    
+
     ```sql
     SELECT * FROM _prisma_migrations WHERE finished_at IS NULL;
     ```
@@ -229,7 +229,7 @@ npx prisma migrate deploy
   </Accordion>
   <Accordion title="Connection timeout during migration">
     Use the direct database URL and increase timeout:
-    
+
     ```bash
     NEXT_PRIVATE_DIRECT_DATABASE_URL="postgresql://user:password@host:5432/documenso?connect_timeout=60"
     ```
@@ -425,7 +425,7 @@ Monitor these metrics:
     - PostgreSQL not running
     - Incorrect host or port
     - Firewall blocking
-    
+
     Solutions:
     - Verify PostgreSQL is running with `pg_isready -h host -p 5432`
     - Check the connection string
@@ -433,11 +433,11 @@ Monitor these metrics:
     with `pg_isready -h host -p 5432`, check the connection string, verify firewall rules.
   </Accordion>
   <Accordion title="Authentication failed">
-    Causes: 
+    Causes:
     - Incorrect password
     - User doesn't exist
     - Password contains special characters
-    
+
     Solutions:
     - Reset password with `ALTER USER documenso WITH PASSWORD 'newpassword';`
     - Verify credentials in `pg_hba.conf`
@@ -452,11 +452,11 @@ Monitor these metrics:
 
   </Accordion>
   <Accordion title="Too many connections">
-    Causes: 
+    Causes:
     - Connection pool exhausted
     - Connections not released
     - Multiple instances exceeding limits
-    
+
     Solutions:
     - Reduce `connection_limit`
     - Increase `max_connections`
@@ -464,7 +464,7 @@ Monitor these metrics:
   </Accordion>
   <Accordion title="Database does not exist">
     Create the database:
-    
+
     ```sql
     CREATE DATABASE documenso;
     GRANT ALL PRIVILEGES ON DATABASE documenso TO documenso;
@@ -472,7 +472,7 @@ Monitor these metrics:
   </Accordion>
   <Accordion title="Permission denied">
     Grant permissions:
-    
+
     ```sql
     GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO documenso;
     GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO documenso;

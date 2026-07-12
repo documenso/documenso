@@ -603,8 +603,8 @@ psql "postgresql://user:password@host:5432/documenso" < backup-20240115-120000.s
     - Clear browser cache and cookies
     - Check for new environment variables in release notes
     - Verify all environment variables are correctly set
-    - Check application logs: 
-    
+    - Check application logs:
+
     ```bash
     docker logs documenso 2>&1 | grep -i -E "(warn|error)"
     ```

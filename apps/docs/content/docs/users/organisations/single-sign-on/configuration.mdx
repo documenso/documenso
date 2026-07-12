@@ -193,33 +193,33 @@ Once SSO is enabled, your organisation's SSO portal URL is displayed at the top 
   {/* prettier-ignore */}
   <Accordion title="Invalid issuer URL">
     - Verify the URL is correct and publicly accessible
-    
+
     - Ensure the URL points to an OpenID Connect discovery document
-    
+
     - Check that the URL includes the full path (usually ending in `/.well-known/openid-configuration`)
   </Accordion>
   {/* prettier-ignore */}
   <Accordion title="Client authentication failed">
-  - Verify the client ID and secret match your identity provider exactly 
-  
-  - Check that the OIDC application hasn't been deleted or disabled. 
-  
+  - Verify the client ID and secret match your identity provider exactly
+
+  - Check that the OIDC application hasn't been deleted or disabled.
+
   - Regenerate the client secret if you suspect it's incorrect.
 </Accordion>
   {/* prettier-ignore */}
   <Accordion title="Redirect URI mismatch">
   - Copy the redirect URI exactly from Documenso's SSO settings
-  
-  - Check for trailing slashes. They must match exactly. 
-  
+
+  - Check for trailing slashes. They must match exactly.
+
   - Ensure you're using HTTPS.
 </Accordion>
   {/* prettier-ignore */}
   <Accordion title="User not provisioned">
   - Verify the user's email domain is in the allowed domains list
-  
+
   - Check that the user exists in your identity provider
-  
+
   - Ensure the user's account in your identity provider has an email address
 </Accordion>
   {/* prettier-ignore */}
