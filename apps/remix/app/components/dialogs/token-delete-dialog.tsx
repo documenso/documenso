@@ -126,7 +126,7 @@ export default function TokenDeleteDialog({ token, onDelete, children }: TokenDe
                     <FormLabel>
                       <Trans>
                         Confirm by typing:{' '}
-                        <span className="font-semibold font-sm text-destructive">{deleteMessage}</span>
+                        <span className="font-semibold text-destructive text-sm">{deleteMessage}</span>
                       </Trans>
                     </FormLabel>
 
