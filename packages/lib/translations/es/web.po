@@ -2441,6 +2441,7 @@ msgstr "Logotipo de Marca"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Branding Preferences"
 msgstr "Preferencias de marca"
 
@@ -3572,6 +3573,7 @@ msgid "Currently all organisation members can access this team"
 msgstr "Actualmente, todos los miembros de la organización pueden acceder a este equipo"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Currently branding can only be configured for Teams and above plans."
 msgstr "Actualmente la marca solo se puede configurar para Equipos y planes superiores."
 
@@ -4214,8 +4216,8 @@ msgstr "Documento cancelado"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
+#: packages/lib/jobs/definitions/emails/send-document-deleted-emails.handler.ts
 #: packages/lib/server-only/admin/admin-super-delete-document.ts
-#: packages/lib/server-only/document/delete-document.ts
 msgid "Document Cancelled"
 msgstr "Documento cancelado"
 
@@ -7942,6 +7944,11 @@ msgstr "Original"
 msgid "Otherwise, the document will be created as a draft."
 msgstr "De lo contrario, el documento se creará como un borrador."
 
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
+msgid "Overlapping fields detected"
+msgstr ""
+
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Override organisation settings"
@@ -8917,6 +8924,11 @@ msgstr "URL de redirección"
 msgid "Redirecting"
 msgstr "Redireccionando"
 
+#. placeholder {0}: oidcProviderLabel || 'OIDC'
+#: apps/remix/app/routes/_unauthenticated+/signin.tsx
+msgid "Redirecting to {0}..."
+msgstr ""
+
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Registration Successful"
@@ -9192,9 +9204,7 @@ msgstr "Reenviar sobre (envelope)"
 msgid "Resend verification"
 msgstr "Reenviar verificación"
 
-#: apps/remix/app/components/forms/organisation-update-form.tsx
 #: apps/remix/app/components/forms/public-profile-form.tsx
-#: apps/remix/app/components/forms/team-update-form.tsx
 #: apps/remix/app/components/general/organisation-usage-reset-button.tsx
 msgid "Reset"
 msgstr "Restablecer"
@@ -9379,6 +9389,7 @@ msgid "Save as Template"
 msgstr "Guardar como plantilla"
 
 #: apps/remix/app/components/dialogs/email-transport-update-dialog.tsx
+#: apps/remix/app/components/forms/form-sticky-save-bar.tsx
 msgid "Save changes"
 msgstr "Guardar cambios"
 
@@ -10218,6 +10229,11 @@ msgstr "Configuraciones del sitio"
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "Skip"
 msgstr "Omitir"
+
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
+msgid "Some fields are placed on top of each other. This may complicate the signing process or cause fields to not work as expected."
+msgstr ""
 
 #: packages/ui/primitives/document-flow/missing-signature-field-dialog.tsx
 msgid "Some signers have not been assigned a signature field. Please assign at least 1 signature field to each signer before proceeding."
@@ -12249,6 +12265,7 @@ msgstr "No autorizado"
 msgid "Uncompleted"
 msgstr "Incompleto"
 
+#: apps/remix/app/components/forms/form-sticky-save-bar.tsx
 #: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
 msgid "Undo"
 msgstr "Deshacer"
@@ -12298,6 +12315,10 @@ msgstr "Desvincular"
 msgid "Unpin"
 msgstr "Desanclar"
 
+#: apps/remix/app/components/forms/form-sticky-save-bar.tsx
+msgid "Unsaved changes"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
 msgid "Unsealed Documents"
@@ -12317,9 +12338,6 @@ msgstr "Grupo sin título"
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
-#: apps/remix/app/components/forms/branding-preferences-form.tsx
-#: apps/remix/app/components/forms/document-preferences-form.tsx
-#: apps/remix/app/components/forms/email-preferences-form.tsx
 #: apps/remix/app/components/forms/public-profile-form.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: apps/remix/app/components/tables/admin-claims-table.tsx
@@ -12342,6 +12360,7 @@ msgstr "Actualizar banner"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Update Billing"
 msgstr "Actualizar facturación"
 
@@ -12368,10 +12387,6 @@ msgstr "Actualizar correo electrónico"
 #: apps/remix/app/components/general/legacy-field-warning-popover.tsx
 msgid "Update Fields"
 msgstr "Actualizar Campos"
-
-#: apps/remix/app/components/forms/organisation-update-form.tsx
-msgid "Update organisation"
-msgstr "Actualizar organización"
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
@@ -12407,10 +12422,6 @@ msgstr "Actualizar rol"
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
 msgid "Update Subscription Claim"
 msgstr "Actualizar reclamo de suscripción"
-
-#: apps/remix/app/components/forms/team-update-form.tsx
-msgid "Update team"
-msgstr "Actualizar equipo"
 
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
@@ -12942,7 +12953,7 @@ msgstr "Esperando"
 msgid "Waiting for others"
 msgstr "Esperando a otros"
 
-#: packages/lib/server-only/document/send-pending-email.ts
+#: packages/lib/jobs/definitions/emails/send-document-pending-email.handler.ts
 msgid "Waiting for others to complete signing."
 msgstr "Esperando a que otros completen la firma."
 
@@ -13916,8 +13927,7 @@ msgstr "Te han invitado a unirte a {0} en Documenso"
 msgid "You have been invited to join the following organisation"
 msgstr "Has sido invitado a unirte a la siguiente organización"
 
-#: packages/lib/server-only/recipient/delete-envelope-recipient.ts
-#: packages/lib/server-only/recipient/set-document-recipients.ts
+#: packages/lib/jobs/definitions/emails/send-recipient-removed-email.handler.ts
 msgid "You have been removed from a document"
 msgstr "Te han eliminado de un documento"
 
@@ -14036,6 +14046,10 @@ msgstr "Has revocado el acceso con éxito."
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "You have the right to withdraw your consent to use electronic signatures at any time before completing the signing process. To withdraw your consent, please contact the sender of the document. In failing to contact the sender you may reach out to <0>{SUPPORT_EMAIL}</0> for assistance. Be aware that withdrawing consent may delay or halt the completion of the related transaction or service."
 msgstr "Usted tiene el derecho de retirar su consentimiento para usar firmas electrónicas en cualquier momento antes de completar el proceso de firma. Para retirar su consentimiento, comuníquese con el remitente del documento. Si no se comunica con el remitente, puede comunicarse con <0>{SUPPORT_EMAIL}</0> para obtener asistencia. Tenga en cuenta que retirar el consentimiento puede retrasar o detener la finalización de la transacción o servicio relacionado."
+
+#: apps/remix/app/components/forms/form-sticky-save-bar.tsx
+msgid "You have unsaved changes"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 msgid "You have updated {memberName}."
@@ -14716,4 +14730,3 @@ msgstr "Su código de verificación:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "su-dominio.com otro-dominio.com"
-
