@@ -5,7 +5,7 @@
     "apps/*",
     "packages/*"
   ],
-  "version": "2.14.0",
+  "version": "2.15.0",
   "scripts": {
     "postinstall": "patch-package",
     "build": "turbo run build",
@@ -66,7 +66,7 @@
     "inngest-cli": "^1.17.9",
     "lint-staged": "^16.2.7",
     "nanoid": "^5.1.6",
-    "nodemailer": "^8.0.5",
+    "nodemailer": "^9.0.0",
     "pdfjs-dist": "5.4.296",
     "pino": "^9.14.0",
     "pino-pretty": "^13.1.2",

@@ -9,6 +9,7 @@
     "background-jobs",
     "signing-certificate",
     "telemetry",
+    "organisation-limits",
     "advanced"
   ]
 }
