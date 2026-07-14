@@ -8,6 +8,7 @@ import { AppError } from '@documenso/lib/errors/app-error';
 import { type TRecipientLite, ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { trpc } from '@documenso/trpc/react';
+import { DOCUMENT_TITLE_MAX_LENGTH } from '@documenso/trpc/server/document-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
@@ -23,6 +24,7 @@ import {
 } from '@documenso/ui/primitives/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
+import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
 import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -32,18 +34,62 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
 import { FileTextIcon, InfoIcon, Plus, UploadCloudIcon, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
+import { match } from 'ts-pattern';
 import * as z from 'zod';
 import { getTemplateUseErrorMessage } from '~/utils/toast-error-messages';
 
-import {
-  DOCUMENT_NAME_SOURCE,
-  getTemplateUseDocumentTitle,
-  refineTemplateUseDocumentName,
-  TemplateUseDialogDocumentName,
-} from './template-use-dialog-document-name';
+const DOCUMENT_NAME_SOURCE = {
+  TEMPLATE: 'template',
+  UPLOAD: 'upload',
+  CUSTOM: 'custom',
+} as const;
+
+type TDocumentNameSource = (typeof DOCUMENT_NAME_SOURCE)[keyof typeof DOCUMENT_NAME_SOURCE];
+
+type TCustomDocumentData = {
+  data?: File;
+  uploadSequence?: number;
+};
+
+const getUploadedDocumentTitle = (file: File) => {
+  return file.name.replace(/\.[^/.]+$/, '').trim();
+};
+
+const getLastUploadedFile = (customDocumentData?: TCustomDocumentData[]) => {
+  const uploadedFiles = customDocumentData?.filter(
+    (item): item is Required<TCustomDocumentData> => item.data !== undefined && item.uploadSequence !== undefined,
+  );
+
+  if (!uploadedFiles || uploadedFiles.length === 0) {
+    return undefined;
+  }
+
+  return uploadedFiles.reduce((lastUploadedFile, uploadedFile) =>
+    uploadedFile.uploadSequence > lastUploadedFile.uploadSequence ? uploadedFile : lastUploadedFile,
+  ).data;
+};
+
+const getTemplateUseDocumentTitle = ({
+  documentNameSource,
+  customDocumentName,
+  customDocumentData,
+}: {
+  documentNameSource: TDocumentNameSource;
+  customDocumentName: string;
+  customDocumentData?: TCustomDocumentData[];
+}) =>
+  match(documentNameSource)
+    .with(DOCUMENT_NAME_SOURCE.UPLOAD, () => {
+      const uploadedFile = getLastUploadedFile(customDocumentData);
+
+      return uploadedFile ? getUploadedDocumentTitle(uploadedFile) : undefined;
+    })
+    .with(DOCUMENT_NAME_SOURCE.CUSTOM, () => customDocumentName.trim())
+    .with(DOCUMENT_NAME_SOURCE.TEMPLATE, () => undefined)
+    .exhaustive();
 
 const ZAddRecipientsForNewDocumentSchema = z
   .object({
@@ -60,6 +106,7 @@ const ZAddRecipientsForNewDocumentSchema = z
         z.object({
           title: z.string(),
           data: z.instanceof(File).optional(),
+          uploadSequence: z.number().optional(),
           envelopeItemId: z.string(),
         }),
       )
@@ -74,7 +121,30 @@ const ZAddRecipientsForNewDocumentSchema = z
     ),
   })
   .superRefine((data, ctx) => {
-    refineTemplateUseDocumentName(data, ctx);
+    if (data.documentNameSource === DOCUMENT_NAME_SOURCE.TEMPLATE) {
+      return;
+    }
+
+    const title = getTemplateUseDocumentTitle(data);
+    const path = data.documentNameSource === DOCUMENT_NAME_SOURCE.CUSTOM ? 'customDocumentName' : 'documentNameSource';
+
+    if (!title) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: msg`Document name is required`.id,
+        path: [path],
+      });
+
+      return;
+    }
+
+    if (title.length > DOCUMENT_TITLE_MAX_LENGTH) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: msg`Document name is too long`.id,
+        path: [path],
+      });
+    }
   });
 
 type TAddRecipientsForNewDocumentSchema = z.infer<typeof ZAddRecipientsForNewDocumentSchema>;
@@ -104,6 +174,7 @@ export function TemplateUseDialog({
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
+  const uploadSequenceRef = useRef(0);
 
   const { data: response, isLoading: isLoadingEnvelopeItems } = trpc.envelope.item.getMany.useQuery(
     {
@@ -163,9 +234,8 @@ export function TemplateUseDialog({
     try {
       const documentTitle = getTemplateUseDocumentTitle(data);
 
-      const customFilesToUpload = (data.customDocumentData || []).filter(
-        (item): item is { data: File; envelopeItemId: string; title: string } =>
-          item.data !== undefined && item.envelopeItemId !== undefined && item.title !== undefined,
+      const customFilesToUpload = (data.customDocumentData ?? []).filter(
+        (item): item is typeof item & { data: File } => item.data !== undefined,
       );
 
       const customDocumentData = await Promise.all(
@@ -218,6 +288,10 @@ export function TemplateUseDialog({
   });
 
   const useCustomDocument = form.watch('useCustomDocument');
+  const documentNameSource = form.watch('documentNameSource');
+  const customDocumentData = form.watch('customDocumentData');
+  const lastUploadedFile = useCustomDocument ? getLastUploadedFile(customDocumentData) : undefined;
+  const canUseUploadedDocumentName = Boolean(lastUploadedFile);
 
   useEffect(() => {
     if (open) {
@@ -236,6 +310,15 @@ export function TemplateUseDialog({
       );
     }
   }, [envelopeItems, form, open]);
+
+  useEffect(() => {
+    if (documentNameSource !== DOCUMENT_NAME_SOURCE.UPLOAD || canUseUploadedDocumentName) {
+      return;
+    }
+
+    form.setValue('documentNameSource', DOCUMENT_NAME_SOURCE.TEMPLATE);
+    form.clearErrors('documentNameSource');
+  }, [canUseUploadedDocumentName, documentNameSource, form]);
 
   return (
     <Dialog open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
@@ -262,9 +345,9 @@ export function TemplateUseDialog({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <fieldset className="flex h-full flex-col" disabled={form.formState.isSubmitting}>
-              <div className="custom-scrollbar -m-1 max-h-[60vh] space-y-4 overflow-y-auto p-1">
+          <form className="min-w-0" onSubmit={form.handleSubmit(onSubmit)}>
+            <fieldset className="flex h-full min-w-0 flex-col" disabled={form.formState.isSubmitting}>
+              <div className="custom-scrollbar -m-1 max-h-[60vh] w-full min-w-0 max-w-full space-y-4 overflow-y-auto overflow-x-hidden p-1">
                 {formRecipients.map((recipient, index) => (
                   <div className="flex w-full flex-row space-x-4" key={recipient.id}>
                     {templateSigningOrder === DocumentSigningOrder.SEQUENTIAL && (
@@ -476,7 +559,7 @@ export function TemplateUseDialog({
                               <FormControl>
                                 <div
                                   key={item.id}
-                                  className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-accent/10"
+                                  className="flex w-full min-w-0 items-center gap-4 overflow-hidden rounded-lg border border-border bg-card p-4 transition-colors hover:bg-accent/10"
                                 >
                                   <div className="flex-shrink-0">
                                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
@@ -484,13 +567,15 @@ export function TemplateUseDialog({
                                     </div>
                                   </div>
 
-                                  <div className="min-w-0 flex-1">
-                                    <h4 className="truncate font-medium text-foreground text-sm">{item.title}</h4>
+                                  <div className="min-w-0 flex-1 overflow-hidden">
+                                    <h4 className="truncate font-medium text-foreground text-sm">
+                                      {field.value ? getUploadedDocumentTitle(field.value) : item.title}
+                                    </h4>
                                     <p className="mt-0.5 text-muted-foreground text-xs">
                                       {field.value ? (
-                                        <div>
+                                        <span>
                                           <Trans>Custom {(field.value.size / (1024 * 1024)).toFixed(2)} MB file</Trans>
-                                        </div>
+                                        </span>
                                       ) : (
                                         <Trans>Default file</Trans>
                                       )}
@@ -570,6 +655,10 @@ export function TemplateUseDialog({
                                         }
 
                                         field.onChange(file);
+                                        form.setValue(
+                                          `customDocumentData.${i}.uploadSequence`,
+                                          ++uploadSequenceRef.current,
+                                        );
                                         form.clearErrors('customDocumentData');
                                       }}
                                     />
@@ -585,7 +674,110 @@ export function TemplateUseDialog({
                   </div>
                 )}
 
-                <TemplateUseDialogDocumentName />
+                <FormField
+                  control={form.control}
+                  name="documentNameSource"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        <Trans>Document name</Trans>
+                      </FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          aria-label={_(msg`Document name`)}
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          className="space-y-2"
+                        >
+                          <div className="flex items-center gap-2">
+                            <RadioGroupItem id="document-name-source-template" value={DOCUMENT_NAME_SOURCE.TEMPLATE} />
+                            <label className="text-sm" htmlFor="document-name-source-template">
+                              <Trans>Use template name</Trans>
+                            </label>
+                          </div>
+
+                          <div className="flex items-start gap-2">
+                            <RadioGroupItem
+                              id="document-name-source-upload"
+                              value={DOCUMENT_NAME_SOURCE.UPLOAD}
+                              disabled={!canUseUploadedDocumentName}
+                              className="mt-0.5"
+                            />
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1">
+                                <label
+                                  className={cn('text-sm', {
+                                    'cursor-not-allowed text-muted-foreground': !canUseUploadedDocumentName,
+                                  })}
+                                  htmlFor="document-name-source-upload"
+                                >
+                                  <Trans>Use uploaded file name</Trans>
+                                </label>
+
+                                <Tooltip>
+                                  <TooltipTrigger
+                                    type="button"
+                                    aria-label={_(msg`About uploaded file naming`)}
+                                    className="text-muted-foreground"
+                                  >
+                                    <InfoIcon className="h-4 w-4" />
+                                  </TooltipTrigger>
+                                  <TooltipContent className="z-[99999] max-w-xs">
+                                    <Trans>
+                                      The document name will use the most recently uploaded file name without its
+                                      extension.
+                                    </Trans>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </div>
+
+                              {lastUploadedFile && (
+                                <p
+                                  className="max-w-sm truncate text-muted-foreground text-xs"
+                                  title={lastUploadedFile.name}
+                                >
+                                  {lastUploadedFile.name}
+                                </p>
+                              )}
+
+                              {!canUseUploadedDocumentName && (
+                                <p className="text-muted-foreground text-xs">
+                                  <Trans>Upload a custom document to use its file name.</Trans>
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <RadioGroupItem id="document-name-source-custom" value={DOCUMENT_NAME_SOURCE.CUSTOM} />
+                            <label className="text-sm" htmlFor="document-name-source-custom">
+                              <Trans>Enter custom document name</Trans>
+                            </label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {documentNameSource === DOCUMENT_NAME_SOURCE.CUSTOM && (
+                  <FormField
+                    control={form.control}
+                    name="customDocumentName"
+                    render={({ field }) => (
+                      <FormItem className="ml-6">
+                        <FormLabel>
+                          <Trans>Custom document name</Trans>
+                        </FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder={_(msg`Enter a document name`)} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
               </div>
 
               <DialogFooter className="mt-4">
