@@ -84,6 +84,14 @@ export default function ApiTokensPage() {
                       <p className="mt-2 text-muted-foreground text-xs">
                         <Trans>Created on {i18n.date(token.createdAt, DateTime.DATETIME_FULL)}</Trans>
                       </p>
+                      {token.lastUsedAt && (
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          <Trans>
+                            Last used on {i18n.date(token.lastUsedAt, DateTime.DATETIME_FULL)}
+                          </Trans>
+                        </p>
+                      )}
+
                       {token.expires ? (
                         <p className="mt-1 text-muted-foreground text-xs">
                           <Trans>Expires on {i18n.date(token.expires, DateTime.DATETIME_FULL)}</Trans>
