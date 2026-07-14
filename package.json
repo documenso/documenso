@@ -61,6 +61,7 @@
     "@ts-rest/serverless": "^3.52.1",
     "dotenv": "^17.2.3",
     "dotenv-cli": "^11.0.0",
+    "esbuild": "^0.27.0",
     "husky": "^9.1.7",
     "inngest": "^3.54.0",
     "inngest-cli": "^1.17.9",
