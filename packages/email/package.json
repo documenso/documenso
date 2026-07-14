@@ -17,7 +17,7 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "@documenso/nodemailer-resend": "4.0.0",
+    "@documenso/nodemailer-resend": "5.0.0",
     "@documenso/tailwind-config": "*",
     "@react-email/body": "0.2.0",
     "@react-email/button": "0.2.0",
