@@ -3,7 +3,7 @@
 /* Inter Variable Fonts */
 @font-face {
   font-family: "Inter";
-  src: url("/fonts/inter-variablefont_opsz,wght.ttf") format("truetype-variations");
+  src: url("/fonts/inter-variablefont_opsz,wght.woff2") format("woff2");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -12,7 +12,7 @@
 /* Inter Italic Variable Fonts */
 @font-face {
   font-family: "Inter";
-  src: url("/fonts/inter-italic-variablefont_opsz,wght.ttf") format("truetype-variations");
+  src: url("/fonts/inter-italic-variablefont_opsz,wght.woff2") format("woff2");
   font-weight: 100 900;
   font-style: italic;
   font-display: swap;
@@ -21,7 +21,7 @@
 /* Caveat Variable Font */
 @font-face {
   font-family: "Caveat";
-  src: url("/fonts/caveat-variablefont_wght.ttf") format("truetype-variations");
+  src: url("/fonts/caveat-variablefont_wght.woff2") format("woff2");
   font-weight: 400 600;
   font-style: normal;
   font-display: swap;
@@ -29,8 +29,8 @@
 
 @font-face {
   font-family: "Noto Sans";
-  src: url("/fonts/noto-sans.ttf") format("truetype-variations");
-  font-weight: 100 900;
+  src: url("/fonts/noto-sans.woff2") format("woff2");
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
@@ -38,7 +38,7 @@
 /* Korean noto sans */
 @font-face {
   font-family: "Noto Sans Korean";
-  src: url("/fonts/noto-sans-korean.ttf") format("truetype-variations");
+  src: url("/fonts/noto-sans-korean.woff2") format("woff2");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -47,7 +47,7 @@
 /* Japanese noto sans */
 @font-face {
   font-family: "Noto Sans Japanese";
-  src: url("/fonts/noto-sans-japanese.ttf") format("truetype-variations");
+  src: url("/fonts/noto-sans-japanese.woff2") format("woff2");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -56,13 +56,19 @@
 /* Chinese noto sans */
 @font-face {
   font-family: "Noto Sans Chinese";
-  src: url("/fonts/noto-sans-chinese.ttf") format("truetype-variations");
-  font-weight: 100 900;
+  src: url("/fonts/noto-sans-chinese.woff2") format("woff2");
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @layer base {
+  html {
+    @apply antialiased;
+    font-optical-sizing: auto;
+    font-synthesis: none;
+  }
+
   :root {
     --font-sans: "Inter";
     --font-signature: "Caveat";

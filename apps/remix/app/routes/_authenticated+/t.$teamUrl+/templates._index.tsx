@@ -101,7 +101,7 @@ export default function TemplatesPage() {
               <AvatarFallback className="text-muted-foreground text-xs">{team.name.slice(0, 1)}</AvatarFallback>
             </Avatar>
 
-            <h1 className="truncate font-semibold text-2xl md:text-3xl">
+            <h1 className="font-semibold text-2xl leading-tight tracking-tight md:text-3xl">
               <Trans>Templates</Trans>
             </h1>
           </div>
@@ -131,15 +131,15 @@ export default function TemplatesPage() {
 
           <div className="mt-8">
             {activeQuery.data && activeQuery.data.count === 0 ? (
-              <div className="flex h-96 flex-col items-center justify-center gap-y-4 text-muted-foreground/60">
-                <Bird className="h-12 w-12" strokeWidth={1.5} />
+              <div className="flex h-96 flex-col items-center justify-center gap-y-4">
+                <Bird className="h-12 w-12 text-muted-foreground/60" strokeWidth={1.5} />
 
                 <div className="text-center">
-                  <h3 className="font-semibold text-lg">
+                  <h3 className="font-semibold text-foreground text-lg">
                     <Trans>We're all empty</Trans>
                   </h3>
 
-                  <p className="mt-2 max-w-[50ch]">
+                  <p className="mt-2 max-w-[50ch] text-muted-foreground [text-wrap:pretty]">
                     {isOrgView ? (
                       <Trans>No organisation templates are shared with your team yet.</Trans>
                     ) : (
