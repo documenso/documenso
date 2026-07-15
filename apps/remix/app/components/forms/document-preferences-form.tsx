@@ -58,6 +58,7 @@ export type TDocumentPreferencesFormSchema = {
   documentDateFormat: TDocumentMetaDateFormat | null;
   includeSenderDetails: boolean | null;
   includeSigningCertificate: boolean | null;
+  allowPublicCompletedDocumentAccess: boolean | null;
   includeAuditLog: boolean | null;
   signatureTypes: DocumentSignatureType[];
   defaultRecipients: TDefaultRecipients | null;
@@ -75,6 +76,7 @@ type SettingsSubset = Pick<
   | 'documentDateFormat'
   | 'includeSenderDetails'
   | 'includeSigningCertificate'
+  | 'allowPublicCompletedDocumentAccess'
   | 'includeAuditLog'
   | 'typedSignatureEnabled'
   | 'uploadSignatureEnabled'
@@ -116,6 +118,7 @@ export const DocumentPreferencesForm = ({
     documentDateFormat: ZDocumentMetaTimezoneSchema.nullable(),
     includeSenderDetails: z.boolean().nullable(),
     includeSigningCertificate: z.boolean().nullable(),
+    allowPublicCompletedDocumentAccess: z.boolean().nullable(),
     includeAuditLog: z.boolean().nullable(),
     signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(canInherit ? 0 : 1, {
       message: msg`At least one signature type must be enabled`.id,
@@ -136,6 +139,7 @@ export const DocumentPreferencesForm = ({
       documentDateFormat: settings.documentDateFormat as TDocumentMetaDateFormat | null,
       includeSenderDetails: settings.includeSenderDetails,
       includeSigningCertificate: settings.includeSigningCertificate,
+      allowPublicCompletedDocumentAccess: settings.allowPublicCompletedDocumentAccess,
       includeAuditLog: settings.includeAuditLog,
       signatureTypes: extractTeamSignatureSettings({ ...settings }),
       defaultRecipients: settings.defaultRecipients ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients) : null,
@@ -477,6 +481,58 @@ export const DocumentPreferencesForm = ({
                   <Trans>
                     Controls whether the signing certificate will be included in the document when it is downloaded. The
                     signing certificate can still be downloaded from the logs page separately.
+                  </Trans>
+                </FormDescription>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="allowPublicCompletedDocumentAccess"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>
+                  <Trans>Allow Public Access to Completed Documents via QR/Share Link</Trans>
+                </FormLabel>
+
+                <FormControl>
+                  <Select
+                    {...field}
+                    value={field.value === null ? '-1' : field.value.toString()}
+                    onValueChange={(value) =>
+                      field.onChange(value === 'true' ? true : value === 'false' ? false : null)
+                    }
+                  >
+                    <SelectTrigger
+                      className="bg-background text-muted-foreground"
+                      data-testid="allow-public-completed-document-access-trigger"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      <SelectItem value="true">
+                        <Trans>Yes</Trans>
+                      </SelectItem>
+
+                      <SelectItem value="false">
+                        <Trans>No</Trans>
+                      </SelectItem>
+
+                      {canInherit && (
+                        <SelectItem value={'-1'}>
+                          <Trans>Inherit from organisation</Trans>
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+
+                <FormDescription>
+                  <Trans>
+                    Controls whether recipients can open completed documents online through QR/share links, including
+                    recipients outside your team.
                   </Trans>
                 </FormDescription>
               </FormItem>
