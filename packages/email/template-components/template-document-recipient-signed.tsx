@@ -29,7 +29,7 @@ export const TemplateDocumentRecipientSigned = ({
       <Section>
         <Section className="mb-4">
           <Column align="center">
-            <Text className="font-semibold text-[#2063B0] text-base">
+            <Text className="font-semibold text-base text-documenso-500">
               <Img src={getAssetUrl('/static/completed.png')} className="-mt-0.5 mr-2 inline h-7 w-7 align-middle" />
               <Trans>Completed</Trans>
             </Text>

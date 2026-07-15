@@ -4,9 +4,9 @@
 
 @theme {
   /* Brand utility colors */
-  --color-documenso: hsl(95.08, 71.08%, 67.45%);
-  --color-documenso-dark: hsl(95.08, 71.08%, 54%);
-  --color-documenso-darker: hsl(95.08, 71.08%, 41%);
+  --color-documenso: hsl(207, 60%, 36%);
+  --color-documenso-dark: hsl(207, 61%, 29%);
+  --color-documenso-darker: hsl(207, 60%, 22%);
 }
 
 :root {
@@ -16,8 +16,8 @@
   --card-foreground: hsl(222.2222 47.3684% 11.1765%);
   --popover: hsl(0 0% 100%);
   --popover-foreground: hsl(222.2222 47.3684% 11.1765%);
-  --primary: hsl(95.0847 71.0843% 42.451%);
-  --primary-foreground: hsl(95.6757 72.549% 10%);
+  --primary: hsl(207 60% 36%);
+  --primary-foreground: hsl(207 60% 10%);
   --secondary: hsl(210 40% 96.0784%);
   --secondary-foreground: hsl(222.2222 47.3684% 11.1765%);
   --muted: hsl(210 40% 96.0784%);
@@ -28,7 +28,7 @@
   --destructive-foreground: hsl(210 40% 98.0392%);
   --border: hsl(214.2857 31.8182% 91.3725%);
   --input: hsl(214.2857 31.8182% 91.3725%);
-  --ring: hsl(95.0847 71.0843% 67.451%);
+  --ring: hsl(207 60% 36%);
   --chart-1: hsl(211.788 101.9718% 78.6759%);
   --chart-2: hsl(217.4076 91.3672% 59.5787%);
   --chart-3: hsl(221.4336 86.3731% 54.0624%);
@@ -74,19 +74,19 @@
   --card-foreground: hsl(0 0% 94.902%);
   --popover: hsl(0 0% 14.902%);
   --popover-foreground: hsl(0 0% 90.1961%);
-  --primary: hsl(95.0847 71.0843% 67.451%);
-  --primary-foreground: hsl(95.6757 72.549% 10%);
+  --primary: hsl(207 60% 36%);
+  --primary-foreground: hsl(207 60% 10%);
   --secondary: hsl(0 0% 23.5294%);
-  --secondary-foreground: hsl(95.0847 71.0843% 67.451%);
+  --secondary-foreground: hsl(207 60% 67.451%);
   --muted: hsl(0 0% 23.5294%);
   --muted-foreground: hsl(0 0% 85.098%);
   --accent: hsl(0 0% 27.8431%);
-  --accent-foreground: hsl(95.0847 71.0843% 67.451%);
+  --accent-foreground: hsl(207 60% 67.451%);
   --destructive: hsl(0 86.5979% 61.9608%);
   --destructive-foreground: hsl(0 87.6289% 19.0196%);
   --border: hsl(0 0% 27.8431%);
   --input: hsl(0 0% 27.8431%);
-  --ring: hsl(95.0847 71.0843% 67.451%);
+  --ring: hsl(207 60% 36%);
   --chart-1: hsl(211.788 101.9718% 78.6759%);
   --chart-2: hsl(217.4076 91.3672% 59.5787%);
   --chart-3: hsl(221.4336 86.3731% 54.0624%);

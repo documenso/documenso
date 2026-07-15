@@ -29,10 +29,10 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
 
-    --primary: 212 69% 41%;
+    --primary: 207 60% 36%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
+    --secondary: 208 84% 88%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --accent: 210 40% 96.1%;
@@ -41,7 +41,7 @@
     --destructive: 0 100% 50%;
     --destructive-foreground: 210 40% 98%;
 
-    --ring: 212 69% 41%;
+    --ring: 207 60% 36%;
 
     --radius: 0.5rem;
 
@@ -82,18 +82,18 @@
     --new-white-800: 0, 0%, 90%;
     --new-white-900: 0, 0%, 100%;
 
-    /* Primary - DataThink Blue */
-    --new-primary-50: 212, 69%, 96%;
-    --new-primary-100: 212, 69%, 91%;
-    --new-primary-200: 212, 69%, 82%;
-    --new-primary-300: 212, 69%, 69%;
-    --new-primary-400: 212, 69%, 57%;
-    --new-primary-500: 212, 69%, 41%;
-    --new-primary-600: 212, 69%, 33%;
-    --new-primary-700: 212, 69%, 25%;
-    --new-primary-800: 212, 69%, 17%;
-    --new-primary-900: 212, 69%, 10%;
-    --new-primary-950: 212, 69%, 6%;
+    /* Primary - Keep Contracts Blue */
+    --new-primary-50: 207, 60%, 96%;
+    --new-primary-100: 207, 60%, 91%;
+    --new-primary-200: 207, 60%, 82%;
+    --new-primary-300: 207, 60%, 69%;
+    --new-primary-400: 207, 60%, 57%;
+    --new-primary-500: 207, 60%, 36%;
+    --new-primary-600: 207, 60%, 33%;
+    --new-primary-700: 207, 60%, 25%;
+    --new-primary-800: 207, 60%, 17%;
+    --new-primary-900: 207, 60%, 10%;
+    --new-primary-950: 207, 60%, 6%;
 
     /* Secondary - Info */
     --new-info-50: 210, 54%, 95%;
@@ -164,19 +164,19 @@
 
     --field-border: 214.3 31.8% 91.4%;
 
-    --primary: 212 69% 41%;
+    --primary: 207 60% 36%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 23.4%;
-    --secondary-foreground: 212 69% 72%;
+    --secondary-foreground: 207 60% 72%;
 
     --accent: 0 0% 27.9%;
-    --accent-foreground: 212 69% 72%;
+    --accent-foreground: 207 60% 72%;
 
     --destructive: 0 87% 62%;
     --destructive-foreground: 0 87% 19%;
 
-    --ring: 212 69% 41%;
+    --ring: 207 60% 36%;
 
     --radius: 0.5rem;
 
