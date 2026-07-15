@@ -5,7 +5,7 @@ export const appMetaTags = (title?: MessageDescriptor) => {
 
   return [
     {
-      title: title ? `${i18n._(title)} - Keep Contracts` : 'Keep Contracts',
+      title: title ? `${i18n._(title)} | Keep Contracts` : 'Keep Contracts',
     },
     {
       name: 'description',
