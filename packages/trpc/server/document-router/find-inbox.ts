@@ -12,7 +12,7 @@ export const findInboxRoute = authenticatedProcedure
   .input(ZFindInboxRequestSchema)
   .output(ZFindInboxResponseSchema)
   .query(async ({ input, ctx }) => {
-    const { page, perPage } = input;
+    const { page, perPage, query, status } = input;
 
     const userId = ctx.user.id;
 
@@ -20,6 +20,8 @@ export const findInboxRoute = authenticatedProcedure
       userId,
       page,
       perPage,
+      query,
+      status,
     });
 
     return {
@@ -30,6 +32,8 @@ export const findInboxRoute = authenticatedProcedure
 
 export type FindInboxOptions = {
   userId: number;
+  query?: string;
+  status?: DocumentStatus;
   page?: number;
   perPage?: number;
   orderBy?: {
@@ -38,7 +42,7 @@ export type FindInboxOptions = {
   };
 };
 
-export const findInbox = async ({ userId, page = 1, perPage = 10, orderBy }: FindInboxOptions) => {
+export const findInbox = async ({ userId, query = '', status, page = 1, perPage = 10, orderBy }: FindInboxOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -51,12 +55,11 @@ export const findInbox = async ({ userId, page = 1, perPage = 10, orderBy }: Fin
 
   const orderByColumn = orderBy?.column ?? 'createdAt';
   const orderByDirection = orderBy?.direction ?? 'desc';
+  const searchQuery = query.trim();
 
   const whereClause: Prisma.EnvelopeWhereInput = {
     type: EnvelopeType.DOCUMENT,
-    status: {
-      not: DocumentStatus.DRAFT,
-    },
+    status: status ? { equals: status, not: DocumentStatus.DRAFT } : { not: DocumentStatus.DRAFT },
     deletedAt: null,
     recipients: {
       some: {
@@ -67,6 +70,43 @@ export const findInbox = async ({ userId, page = 1, perPage = 10, orderBy }: Fin
       },
     },
   };
+
+  if (searchQuery.length > 0) {
+    whereClause.OR = [
+      {
+        title: {
+          contains: searchQuery,
+          mode: 'insensitive',
+        },
+      },
+      {
+        externalId: {
+          contains: searchQuery,
+          mode: 'insensitive',
+        },
+      },
+      {
+        recipients: {
+          some: {
+            OR: [
+              {
+                email: {
+                  contains: searchQuery,
+                  mode: 'insensitive',
+                },
+              },
+              {
+                name: {
+                  contains: searchQuery,
+                  mode: 'insensitive',
+                },
+              },
+            ],
+          },
+        },
+      },
+    ];
+  }
 
   const [data, count] = await Promise.all([
     prisma.envelope.findMany({
