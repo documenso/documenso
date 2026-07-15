@@ -132,6 +132,8 @@ export const assertNotPrivateUrl = async (
       throw err;
     }
 
-    return;
+    throw new AppError(AppErrorCode.WEBHOOK_INVALID_REQUEST, {
+      message: 'Webhook URL resolves to a private or loopback address',
+    });
   }
 };
