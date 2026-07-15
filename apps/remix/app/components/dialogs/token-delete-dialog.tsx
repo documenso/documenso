@@ -105,7 +105,7 @@ export default function TokenDeleteDialog({ token, onDelete, children }: TokenDe
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            <Trans>Are you sure you want to delete this token?</Trans>
+            <Trans>Delete token</Trans>
           </DialogTitle>
 
           <DialogDescription>
@@ -139,21 +139,18 @@ export default function TokenDeleteDialog({ token, onDelete, children }: TokenDe
               />
 
               <DialogFooter>
-                <div className="flex w-full flex-nowrap gap-4">
-                  <Button type="button" variant="secondary" className="flex-1" onClick={() => setIsOpen(false)}>
-                    <Trans>Cancel</Trans>
-                  </Button>
+                <Button type="button" variant="secondary" onClick={() => setIsOpen(false)}>
+                  <Trans>Cancel</Trans>
+                </Button>
 
-                  <Button
-                    type="submit"
-                    variant="destructive"
-                    className="flex-1"
-                    disabled={!form.formState.isValid}
-                    loading={form.formState.isSubmitting}
-                  >
-                    <Trans>I'm sure! Delete it</Trans>
-                  </Button>
-                </div>
+                <Button
+                  type="submit"
+                  variant="destructive"
+                  disabled={!form.formState.isValid}
+                  loading={form.formState.isSubmitting}
+                >
+                  <Trans>Delete</Trans>
+                </Button>
               </DialogFooter>
             </fieldset>
           </form>
