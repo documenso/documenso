@@ -119,7 +119,16 @@ export const TokenCreateDialog = ({ trigger, ...props }: TokenCreateDialogProps)
         )}
       </DialogTrigger>
 
-      <DialogContent className="max-w-lg" position="center">
+      <DialogContent
+        className="max-w-lg"
+        position="center"
+        onInteractOutside={(event) => {
+          // Prevent losing the created token by accidentally clicking outside the dialog.
+          if (createdToken) {
+            event.preventDefault();
+          }
+        }}
+      >
         {createdToken ? (
           <>
             <DialogHeader>
