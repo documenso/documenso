@@ -21,6 +21,14 @@ type EnvelopeItemToDownload = Pick<EnvelopeItem, 'id' | 'envelopeId' | 'title' |
 
 type EnvelopeDownloadDialogProps = {
   envelopeId: string;
+
+  /**
+   * The envelope (document) title. Optional: when provided it is used as the
+   * initial download filename for single-item envelopes, avoiding a brief
+   * fallback to the (potentially stale) envelope item title before the items
+   * query resolves. When omitted, the title from the query response is used.
+   */
+  envelopeTitle?: string;
   envelopeStatus: DocumentStatus;
 
   /**
@@ -48,6 +56,7 @@ type EnvelopeDownloadDialogProps = {
 
 export const EnvelopeDownloadDialog = ({
   envelopeId,
+  envelopeTitle: initialEnvelopeTitle,
   envelopeStatus,
   isLegacy,
   envelopeItems: initialEnvelopeItems,
@@ -98,7 +107,9 @@ export const EnvelopeDownloadDialog = ({
       access: token ? { type: 'recipient', token } : { type: 'user' },
     },
     {
-      initialData: initialEnvelopeItems ? { data: initialEnvelopeItems, envelopeTitle: '' } : undefined,
+      initialData: initialEnvelopeItems
+        ? { data: initialEnvelopeItems, envelopeTitle: initialEnvelopeTitle ?? '' }
+        : undefined,
       enabled: open,
     },
   );
