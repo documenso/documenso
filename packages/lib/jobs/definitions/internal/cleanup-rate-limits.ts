@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import type { JobDefinition } from '../../client/_internal/job';
+import { getJobCronExpression } from '../../get-job-cron-expression';
 
 const CLEANUP_RATE_LIMITS_JOB_DEFINITION_ID = 'internal.cleanup-rate-limits';
 
@@ -15,7 +16,7 @@ export const CLEANUP_RATE_LIMITS_JOB_DEFINITION = {
   trigger: {
     name: CLEANUP_RATE_LIMITS_JOB_DEFINITION_ID,
     schema: CLEANUP_RATE_LIMITS_JOB_DEFINITION_SCHEMA,
-    cron: '*/15 * * * *', // Every 15 minutes.
+    cron: getJobCronExpression('NEXT_PRIVATE_JOBS_CLEANUP_RATE_LIMITS_CRON', '*/15 * * * *'), // Every 15 minutes.
   },
   handler: async ({ payload, io }) => {
     const handler = await import('./cleanup-rate-limits.handler');
