@@ -21,17 +21,32 @@ export async function dynamicActivate(locale: string) {
 }
 
 const parseLanguageFromLocale = (locale: string): SupportedLanguageCodes | null => {
-  const [language, _country] = locale.split('-');
+  // Accept-Language entries may carry a quality value (e.g. "pt-BR;q=0.9").
+  const normalizedLocale = locale.split(';')[0].trim().toLowerCase();
 
-  const foundSupportedLanguage = APP_I18N_OPTIONS.supportedLangs.find(
-    (lang): lang is SupportedLanguageCodes => lang === language,
-  );
-
-  if (!foundSupportedLanguage) {
+  if (!normalizedLocale) {
     return null;
   }
 
-  return foundSupportedLanguage;
+  const [language] = normalizedLocale.split('-');
+
+  // Prefer an exact match on the full locale so region-qualified supported
+  // languages (e.g. "pt-BR") are matched, then fall back to the base language
+  // (e.g. "en-US" -> "en"). Accept-Language casing is not guaranteed, so we
+  // compare case-insensitively while returning the canonical supported code.
+  const exactMatch = APP_I18N_OPTIONS.supportedLangs.find(
+    (lang): lang is SupportedLanguageCodes => lang.toLowerCase() === normalizedLocale,
+  );
+
+  if (exactMatch) {
+    return exactMatch;
+  }
+
+  const languageMatch = APP_I18N_OPTIONS.supportedLangs.find(
+    (lang): lang is SupportedLanguageCodes => lang.toLowerCase() === language,
+  );
+
+  return languageMatch ?? null;
 };
 
 /**
