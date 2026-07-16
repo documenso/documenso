@@ -1,11 +1,11 @@
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { DM_Sans } from 'next/font/google';
 import PlausibleProvider from 'next-plausible';
 
 import './global.css';
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ['latin'],
 });
 
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="en" className={inter.className} suppressHydrationWarning>
+    <html lang="en" className={dmSans.className} suppressHydrationWarning>
       <body className="flex min-h-screen flex-col">
         <PlausibleProvider domain="documenso.com">
           <RootProvider>{children}</RootProvider>

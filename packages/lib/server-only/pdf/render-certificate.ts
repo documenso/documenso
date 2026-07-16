@@ -114,7 +114,7 @@ const renderLabelAndText = (options: RenderLabelAndTextOptions) => {
     y: 0,
     text: `${options.label}: `,
     fontStyle: fontMedium,
-    fontFamily: 'Inter',
+    fontFamily: 'DM Sans',
     fill: labelFill,
     fontSize: textSm,
   });
@@ -125,7 +125,7 @@ const renderLabelAndText = (options: RenderLabelAndTextOptions) => {
     x: label.width(),
     y: 0,
     width: width - label.width(),
-    fontFamily: 'Inter',
+    fontFamily: 'DM Sans',
     text: options.text,
     fill: valueFill,
     wrap: 'char',
@@ -152,7 +152,7 @@ const renderRowHeader = (options: RenderRowHeaderOptions) => {
   const headerRow = new Konva.Group();
 
   const headerFontStyling = {
-    fontFamily: 'Inter',
+    fontFamily: 'DM Sans',
     fontSize: 11,
     fontStyle: fontMedium,
     verticalAlign: 'middle',
@@ -208,7 +208,7 @@ const renderColumnOne = (options: RenderColumnOptions) => {
 
   const textFontStyling = {
     x: 0,
-    fontFamily: 'Inter',
+    fontFamily: 'DM Sans',
     wrap: 'char',
     lineHeight: 1.2,
     fill: textMutedForeground,
@@ -354,7 +354,7 @@ const renderColumnTwo = (options: RenderColumnOptions) => {
       text: `${i18n._(msg`Signature ID`)}:`,
       fill: textMutedForeground,
       width: columnWidth,
-      fontFamily: 'Inter',
+      fontFamily: 'DM Sans',
       fontSize: textSm,
       fontStyle: fontMedium,
       lineHeight: 1.4,
@@ -378,7 +378,7 @@ const renderColumnTwo = (options: RenderColumnOptions) => {
       y: 0,
       text: 'N/A',
       fill: textMutedForeground,
-      fontFamily: 'Inter',
+      fontFamily: 'DM Sans',
       fontSize: textSm,
     });
     column.add(naText);
@@ -572,7 +572,7 @@ const renderBranding = async ({ qrToken, i18n }: { qrToken: string | null; i18n:
     verticalAlign: 'middle',
     text: i18n._(msg`Signing certificate provided by`) + ':',
     fontStyle: fontMedium,
-    fontFamily: 'Inter',
+    fontFamily: 'DM Sans',
     fontSize: textSm,
     height: brandingHeight,
   });
@@ -772,7 +772,7 @@ export async function renderCertificate({
       height: pageTopMargin,
       verticalAlign: 'middle',
       text: i18n._(msg`Signing Certificate`),
-      fontFamily: 'Inter',
+      fontFamily: 'DM Sans',
       fontSize: titleFontSize,
       fontStyle: '700',
     });
@@ -804,7 +804,7 @@ export async function renderCertificate({
       x: margin,
       y: pageHeight - textXs - 10,
       text: `${i18n._(msg`Envelope ID`)}: ${envelopeId}`,
-      fontFamily: 'Inter',
+      fontFamily: 'DM Sans',
       fontSize: textXs,
       fill: textMutedForegroundLight,
     });
@@ -832,7 +832,7 @@ export async function renderCertificate({
       x: margin,
       y: pageHeight - textXs - 10,
       text: `${i18n._(msg`Envelope ID`)}: ${envelopeId}`,
-      fontFamily: 'Inter',
+      fontFamily: 'DM Sans',
       fontSize: textXs,
       fill: textMutedForegroundLight,
     });
