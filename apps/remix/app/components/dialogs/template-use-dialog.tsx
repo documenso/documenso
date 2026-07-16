@@ -635,7 +635,7 @@ export function TemplateUseDialog({
                                         }
 
                                         if (file.type !== 'application/pdf') {
-                                          form.setError('customDocumentData', {
+                                          form.setError(`customDocumentData.${i}.data`, {
                                             type: 'manual',
                                             message: _(msg`Please select a PDF file`),
                                           });
@@ -644,7 +644,7 @@ export function TemplateUseDialog({
                                         }
 
                                         if (file.size > APP_DOCUMENT_UPLOAD_SIZE_LIMIT * 1024 * 1024) {
-                                          form.setError('customDocumentData', {
+                                          form.setError(`customDocumentData.${i}.data`, {
                                             type: 'manual',
                                             message: _(
                                               msg`File size exceeds the limit of ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB`,
@@ -659,7 +659,7 @@ export function TemplateUseDialog({
                                           `customDocumentData.${i}.uploadSequence`,
                                           ++uploadSequenceRef.current,
                                         );
-                                        form.clearErrors('customDocumentData');
+                                        form.clearErrors(`customDocumentData.${i}.data`);
                                       }}
                                     />
                                   </div>
