@@ -19,7 +19,7 @@ import {
   useLoaderData,
   useMatches,
 } from 'react-router';
-import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
+import { PreventFlashOnWrongTheme, Theme, ThemeProvider, useTheme } from 'remix-themes';
 
 import type { Route } from './+types/root';
 import stylesheet from './app.css?url';
@@ -92,8 +92,15 @@ export async function loader({ context, request }: Route.LoaderArgs) {
 export function Layout({ children }: { children: React.ReactNode }) {
   const { theme } = useLoaderData<typeof loader>() || {};
 
+  // Recipient/signing routes are always rendered in LIGHT theme so the brand
+  // (white surfaces) stays consistent regardless of the visitor's OS preference,
+  // and dark-mode utilities (e.g. dark:text-white on the signature input) don't
+  // override branding on the signing page.
+  const matches = useMatches();
+  const isRecipientRoute = matches.some((m) => m.id?.startsWith('routes/_recipient+'));
+
   return (
-    <ThemeProvider specifiedTheme={theme} themeAction="/api/theme">
+    <ThemeProvider specifiedTheme={isRecipientRoute ? Theme.LIGHT : theme} themeAction="/api/theme">
       <LayoutContent>{children}</LayoutContent>
     </ThemeProvider>
   );
@@ -135,7 +142,10 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links nonce={nonce(cspNonce)} />
         <meta name="google" content="notranslate" />
-        <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} nonce={nonce(cspNonce)} />
+        <PreventFlashOnWrongTheme
+          ssrTheme={isRecipientRoute ? true : Boolean(data.theme)}
+          nonce={nonce(cspNonce)}
+        />
 
         {disableAnimations && (
           <style
