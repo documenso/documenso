@@ -1,4 +1,25 @@
 import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
+import { z } from 'zod';
+
+export const BRANDING_LOGO_SIZE_VALUES = ['h-6', 'h-8', 'h-12', 'h-16'] as const;
+
+export const ZBrandingLogoSizeSchema = z.enum(BRANDING_LOGO_SIZE_VALUES);
+
+export type BrandingLogoSize = z.infer<typeof ZBrandingLogoSizeSchema>;
+
+const BRANDING_LOGO_SIZE_LABELS: Record<(typeof BRANDING_LOGO_SIZE_VALUES)[number], string> = {
+  'h-6': 'Small',
+  'h-8': 'Medium',
+  'h-12': 'Large',
+  'h-16': 'Extra large',
+};
+
+export const BRANDING_LOGO_SIZE_OPTIONS = BRANDING_LOGO_SIZE_VALUES.map((v) => ({
+  value: v,
+  label: BRANDING_LOGO_SIZE_LABELS[v],
+}));
+
+export const DEFAULT_BRANDING_LOGO_SIZE = BRANDING_LOGO_SIZE_OPTIONS[0].value;
 
 export const ORGANISATION_URL_ROOT_REGEX = /^\/t\/[^/]+\/?$/;
 export const ORGANISATION_URL_REGEX = /^\/t\/[^/]+/;

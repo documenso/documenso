@@ -44,6 +44,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
 
       // Branding related settings.
       brandingEnabled,
+      brandingLogoSize,
       brandingUrl,
       brandingCompanyDetails,
       brandingColors,
@@ -173,6 +174,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
 
             // Branding related settings.
             brandingEnabled,
+            brandingLogoSize,
             brandingUrl,
             brandingCompanyDetails,
             brandingColors: normalizedBrandingColors === null ? Prisma.DbNull : normalizedBrandingColors,
