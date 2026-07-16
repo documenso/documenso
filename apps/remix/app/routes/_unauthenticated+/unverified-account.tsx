@@ -11,7 +11,7 @@ export default function UnverifiedAccount() {
           <Mails className="h-10 w-10 text-primary" strokeWidth={2} />
         </div>
         <div className="">
-          <h2 className="font-bold text-2xl md:text-4xl">
+          <h2 className="font-bold text-2xl md:text-3xl">
             <Trans>Confirm email</Trans>
           </h2>
 

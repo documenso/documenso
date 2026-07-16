@@ -21,10 +21,10 @@ export const ensureFontLibrary = () => {
     });
   }
 
-  if (!FontLibrary.has('Inter')) {
+  if (!FontLibrary.has('DM Sans')) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     FontLibrary.use({
-      ['Inter']: [path.join(fontPath, 'inter-variablefont_opsz,wght.ttf')],
+      ['DM Sans']: [path.join(fontPath, 'dm-sans-variablefont_opsz,wght.ttf')],
     });
   }
 

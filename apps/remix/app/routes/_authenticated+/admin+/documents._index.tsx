@@ -123,7 +123,7 @@ export default function AdminDocumentsPage() {
 
   return (
     <div>
-      <h2 className="font-semibold text-4xl">
+      <h2 className="font-semibold text-3xl">
         <Trans>Manage documents</Trans>
       </h2>
 

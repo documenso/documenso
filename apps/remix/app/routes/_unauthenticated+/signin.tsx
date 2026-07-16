@@ -78,7 +78,7 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="w-screen max-w-lg px-4">
-      <div className="z-10 rounded-xl border border-border bg-neutral-100 p-6 dark:bg-background">
+      <div className="z-10 rounded-xl border border-border bg-card p-6 shadow-lg">
         {signupError && (
           <Alert variant="destructive" className="mb-4">
             <AlertDescription>{_(signupError)}</AlertDescription>
@@ -86,11 +86,11 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
         )}
 
         <h1 className="font-semibold text-2xl">
-          <Trans>Sign in to your account</Trans>
+          <Trans>Sign In</Trans>
         </h1>
 
         <p className="mt-2 text-muted-foreground text-sm">
-          <Trans>Welcome back, we are lucky to have you.</Trans>
+          <Trans>Enter your credentials to access your account</Trans>
         </p>
         <hr className="-mx-6 my-4" />
 

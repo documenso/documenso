@@ -82,7 +82,7 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
           </div>
 
           <div>
-            <h2 className="font-bold text-2xl md:text-4xl">
+            <h2 className="font-bold text-2xl md:text-3xl">
               <Trans>Something went wrong</Trans>
             </h2>
 
@@ -109,7 +109,7 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
           </div>
 
           <div>
-            <h2 className="font-bold text-2xl md:text-4xl">
+            <h2 className="font-bold text-2xl md:text-3xl">
               <Trans>Your token has expired!</Trans>
             </h2>
 
@@ -137,7 +137,7 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
           </div>
 
           <div>
-            <h2 className="font-bold text-2xl md:text-4xl">
+            <h2 className="font-bold text-2xl md:text-3xl">
               <Trans>Email Confirmed!</Trans>
             </h2>
 
@@ -162,7 +162,7 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
           </div>
 
           <div>
-            <h2 className="font-bold text-2xl md:text-4xl">
+            <h2 className="font-bold text-2xl md:text-3xl">
               <Trans>Email already confirmed</Trans>
             </h2>
 

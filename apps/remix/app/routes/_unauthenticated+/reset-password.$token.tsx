@@ -32,7 +32,7 @@ export default function ResetPasswordPage({ loaderData }: Route.ComponentProps) 
   return (
     <div className="w-screen max-w-lg px-4">
       <div className="w-full">
-        <h1 className="font-semibold text-4xl">
+        <h1 className="font-semibold text-3xl">
           <Trans>Reset Password</Trans>
         </h1>
 

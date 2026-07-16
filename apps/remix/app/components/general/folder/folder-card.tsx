@@ -56,7 +56,7 @@ export const FolderCard = ({ folder, onMove, onSettings, onDelete }: FolderCardP
   return (
     <Link to={formatPath()} data-folder-id={folder.id} data-folder-name={folder.name}>
       <Card className="h-full border border-border transition-all hover:bg-muted/50">
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="flex min-w-0 items-center gap-3">
             <FolderIcon className="h-6 w-6 flex-shrink-0 text-documenso" />
 

@@ -7,19 +7,19 @@ import { getPageImage, source } from '@/lib/source';
 export const revalidate = false;
 
 const loadAssets = async () => {
-  const [logoBuffer, interRegularData, interSemiBoldData, interBoldData] = await Promise.all([
+  const [logoBuffer, dmSansRegularData, dmSansSemiBoldData, dmSansBoldData] = await Promise.all([
     readFile(fileURLToPath(new URL('../../../../../public/logo.png', import.meta.url))),
-    readFile(fileURLToPath(new URL('../../../../../public/fonts/inter-regular.ttf', import.meta.url))),
-    readFile(fileURLToPath(new URL('../../../../../public/fonts/inter-semibold.ttf', import.meta.url))),
-    readFile(fileURLToPath(new URL('../../../../../public/fonts/inter-bold.ttf', import.meta.url))),
+    readFile(fileURLToPath(new URL('../../../../../public/fonts/dm-sans-regular.ttf', import.meta.url))),
+    readFile(fileURLToPath(new URL('../../../../../public/fonts/dm-sans-semibold.ttf', import.meta.url))),
+    readFile(fileURLToPath(new URL('../../../../../public/fonts/dm-sans-bold.ttf', import.meta.url))),
   ]);
 
   return {
     logoSrc: `data:image/png;base64,${logoBuffer.toString('base64')}`,
     fonts: [
-      { name: 'Inter', data: interRegularData, weight: 400 as const, style: 'normal' as const },
-      { name: 'Inter', data: interSemiBoldData, weight: 600 as const, style: 'normal' as const },
-      { name: 'Inter', data: interBoldData, weight: 700 as const, style: 'normal' as const },
+      { name: 'DM Sans', data: dmSansRegularData, weight: 400 as const, style: 'normal' as const },
+      { name: 'DM Sans', data: dmSansSemiBoldData, weight: 600 as const, style: 'normal' as const },
+      { name: 'DM Sans', data: dmSansBoldData, weight: 700 as const, style: 'normal' as const },
     ],
   };
 };
@@ -43,11 +43,11 @@ export async function GET(_req: Request, { params }: RouteContext<'/og/docs/[...
         height: '100%',
         backgroundColor: 'white',
         padding: '60px 80px',
-        fontFamily: 'Inter',
+        fontFamily: 'DM Sans',
         position: 'relative',
       }}
     >
-      {/* Green accent bar */}
+      {/* Brand accent bar */}
       <div
         style={{
           position: 'absolute',
@@ -55,7 +55,7 @@ export async function GET(_req: Request, { params }: RouteContext<'/og/docs/[...
           left: 0,
           right: 0,
           height: '6px',
-          backgroundColor: '#6DC947',
+          backgroundColor: '#256395',
         }}
       />
 
@@ -68,7 +68,7 @@ export async function GET(_req: Request, { params }: RouteContext<'/og/docs/[...
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={logoSrc} alt="Documenso" height="28" />
+        <img src={logoSrc} alt="Keep Contracts" height={28} />
         <span
           style={{
             color: '#D4D4D8',

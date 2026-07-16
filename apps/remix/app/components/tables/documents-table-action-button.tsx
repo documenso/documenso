@@ -57,7 +57,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
     internalVersion: row.internalVersion,
   })
     .with(isOwner ? { isDraft: true, isOwner: true } : { isDraft: true, isCurrentTeamDocument: true }, () => (
-      <Button className="w-32" asChild>
+      <Button className="w-28" asChild>
         <Link to={formatPath}>
           <Edit className="mr-2 -ml-1 h-4 w-4" />
           <Trans>Edit</Trans>
@@ -65,7 +65,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
       </Button>
     ))
     .with({ isRecipient: true, isPending: true, isSigned: false }, () => (
-      <Button className="w-32" asChild>
+      <Button className="w-28" asChild>
         <Link to={`/sign/${recipient?.token}`}>
           {match(role)
             .with(RecipientRole.SIGNER, () => (
@@ -90,7 +90,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
       </Button>
     ))
     .with({ isPending: true, isSigned: true }, () => (
-      <Button className="w-32" disabled={true}>
+      <Button className="w-28" disabled={true}>
         <EyeIcon className="mr-2 -ml-1 h-4 w-4" />
         <Trans>View</Trans>
       </Button>
@@ -101,7 +101,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
         envelopeStatus={row.status}
         token={recipient?.token}
         trigger={
-          <Button className="w-32">
+          <Button className="w-28">
             <Download className="mr-2 -ml-1 inline h-4 w-4" />
             <Trans>Download</Trans>
           </Button>

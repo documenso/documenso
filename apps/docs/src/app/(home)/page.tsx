@@ -10,10 +10,10 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <main className="mx-auto max-w-4xl px-4 py-12">
+    <main className="mx-auto max-w-3xl px-4 py-12">
       {/* Hero */}
       <div className="mb-16 pt-6 text-center">
-        <h1 className="mb-4 font-bold text-4xl tracking-tight">Documenso Documentation</h1>
+        <h1 className="mb-4 font-bold text-3xl tracking-tight">Documenso Documentation</h1>
         <p className="mx-auto mb-8 max-w-2xl text-fd-muted-foreground text-lg">
           The open-source document signing platform. Send documents for signatures, integrate with your apps, or
           self-host with full control.

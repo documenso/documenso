@@ -20,7 +20,7 @@ export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterP
         <Text className="my-4 text-base text-slate-400">
           <Trans>
             Did not expect this email?{' '}
-            <Link className="text-[#2063B0]" href={reportUrl}>
+            <Link className="text-documenso-500" href={reportUrl}>
               Click here to report the sender
             </Link>
             . Never sign a document you don't recognize or weren't expecting.

@@ -50,7 +50,7 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <AdminLicenseStatusBanner license={license} />
 
-      <h1 className="font-semibold text-4xl">
+      <h1 className="font-semibold text-3xl">
         <Trans>Admin Panel</Trans>
       </h1>
 

@@ -8,7 +8,7 @@ export const EmbedDocumentRejected = () => {
         <div className="flex items-center gap-x-4">
           <XCircle className="h-10 w-10 text-destructive" />
 
-          <h2 className="max-w-[35ch] text-center font-semibold text-2xl leading-normal md:text-3xl lg:text-4xl">
+          <h2 className="max-w-[35ch] text-center font-semibold text-2xl leading-normal md:text-3xl lg:text-3xl">
             <Trans>Document Rejected</Trans>
           </h2>
         </div>

@@ -1,4 +1,3 @@
-import LogoIcon from '@documenso/assets/logo_icon.png';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -10,6 +9,7 @@ import { isRouteErrorResponse, Link, Outlet } from 'react-router';
 
 import { Header as AuthenticatedHeader } from '~/components/general/app-header';
 import { BrandingLogo } from '~/components/general/branding-logo';
+import { BrandingLogoIcon } from '~/components/general/branding-logo-icon';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { appMetaTags } from '~/utils/meta';
 
@@ -52,13 +52,7 @@ export default function PublicProfileLayout() {
             >
               <BrandingLogo className="hidden h-6 w-auto sm:block" />
 
-              <img
-                src={LogoIcon}
-                alt="Keep Contracts Logo"
-                width={48}
-                height={48}
-                className="h-10 w-auto sm:hidden dark:invert"
-              />
+              <BrandingLogoIcon className="h-10 w-auto sm:hidden" />
             </Link>
 
             <div className="flex flex-row items-center justify-center">

@@ -19,7 +19,7 @@ export default function EmailVerificationWithoutTokenPage() {
         </div>
 
         <div>
-          <h2 className="font-bold text-2xl md:text-4xl">
+          <h2 className="font-bold text-2xl md:text-3xl">
             <Trans>Uh oh! Looks like you're missing a token</Trans>
           </h2>
 

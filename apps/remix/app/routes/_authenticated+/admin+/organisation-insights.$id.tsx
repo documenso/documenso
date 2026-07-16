@@ -46,7 +46,7 @@ export default function OrganisationInsights({ loaderData }: Route.ComponentProp
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-4xl">{organisationName}</h2>
+        <h2 className="font-semibold text-3xl">{organisationName}</h2>
         <Button variant="outline" asChild>
           <Link to={`/admin/organisations/${organisationId}`}>
             <Trans>Manage organisation</Trans>

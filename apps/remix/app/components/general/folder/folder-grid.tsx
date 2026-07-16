@@ -105,9 +105,9 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
       </div>
 
       {isPending ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, index) => (
-            <div key={index} className="h-full rounded-lg border border-border bg-card px-4 py-5">
+            <div key={index} className="h-full rounded-lg border border-border bg-card px-3 py-3">
               <div className="flex items-center gap-3">
                 <Skeleton className="h-8 w-8 rounded" />
                 <div className="flex w-full items-center justify-between">
@@ -126,7 +126,7 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
           ))}
         </div>
       ) : foldersData && foldersData.folders.length === 0 ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           <FolderCreateDialog
             type={type}
             trigger={
@@ -140,7 +140,7 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
         foldersData && (
           <div key="content" className="space-y-4">
             {pinnedFolders.length > 0 && (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {pinnedFolders.map((folder) => (
                   <FolderCard
                     key={folder.id}
@@ -163,7 +163,7 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
             )}
 
             {unpinnedFolders.length > 0 && (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {unpinnedFolders.slice(0, 12).map((folder) => (
                   <FolderCard
                     key={folder.id}
