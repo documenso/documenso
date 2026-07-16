@@ -1,14 +1,18 @@
 import { trpc } from '@documenso/trpc/react';
+import type { TGetApiTokensResponse } from '@documenso/trpc/server/api-token-router/get-api-tokens.types';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
+import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
+import { DataTable, type DataTableColumnDef } from '@documenso/ui/primitives/data-table';
+import { Skeleton } from '@documenso/ui/primitives/skeleton';
+import { TableCell } from '@documenso/ui/primitives/table';
 import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { TeamMemberRole } from '@prisma/client';
-import { DateTime } from 'luxon';
+import { useMemo } from 'react';
 
+import { TokenCreateDialog } from '~/components/dialogs/token-create-dialog';
 import TokenDeleteDialog from '~/components/dialogs/token-delete-dialog';
-import { ApiTokenForm } from '~/components/forms/token';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { useOptionalCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
@@ -18,11 +22,64 @@ export function meta() {
 }
 
 export default function ApiTokensPage() {
-  const { i18n } = useLingui();
-
-  const { data: tokens } = trpc.apiToken.getMany.useQuery();
+  const { t, i18n } = useLingui();
 
   const team = useOptionalCurrentTeam();
+
+  const isUnauthorized = !!team && team.currentTeamRole !== TeamMemberRole.ADMIN;
+
+  const {
+    data: tokens,
+    isLoading,
+    isError,
+  } = trpc.apiToken.getMany.useQuery(undefined, {
+    enabled: !isUnauthorized,
+  });
+
+  const columns = useMemo(() => {
+    return [
+      {
+        header: t`Name`,
+        cell: ({ row }) => <span className="font-medium text-foreground">{row.original.name}</span>,
+      },
+      {
+        header: t`Created`,
+        cell: ({ row }) => i18n.date(row.original.createdAt),
+      },
+      {
+        header: t`Expires`,
+        cell: ({ row }) => {
+          if (!row.original.expires) {
+            return (
+              <span className="text-muted-foreground">
+                <Trans>Never</Trans>
+              </span>
+            );
+          }
+
+          if (row.original.expires < new Date()) {
+            return (
+              <Badge variant="destructive" size="small">
+                <Trans>Expired</Trans>
+              </Badge>
+            );
+          }
+
+          return i18n.date(row.original.expires);
+        },
+      },
+      {
+        header: t`Actions`,
+        cell: ({ row }) => (
+          <TokenDeleteDialog token={row.original}>
+            <Button variant="destructive">
+              <Trans>Delete</Trans>
+            </Button>
+          </TokenDeleteDialog>
+        ),
+      },
+    ] satisfies DataTableColumnDef<TGetApiTokensResponse[number]>[];
+  }, []);
 
   return (
     <div>
@@ -30,21 +87,23 @@ export default function ApiTokensPage() {
         title={<Trans>API Tokens</Trans>}
         subtitle={
           <Trans>
-            On this page, you can create and manage API tokens. See our{' '}
+            Create and manage API tokens. See our{' '}
             <a
               className="text-primary underline"
               href={'https://docs.documenso.com/developers/public-api'}
               target="_blank"
               rel="noopener"
             >
-              Documentation
+              documentation
             </a>{' '}
             for more information.
           </Trans>
         }
-      />
+      >
+        {!isUnauthorized && <TokenCreateDialog />}
+      </SettingsHeader>
 
-      {team && team?.currentTeamRole !== TeamMemberRole.ADMIN ? (
+      {isUnauthorized ? (
         <Alert className="flex flex-col items-center justify-between gap-4 p-6 md:flex-row" variant="warning">
           <div>
             <AlertTitle>
@@ -56,58 +115,43 @@ export default function ApiTokensPage() {
           </div>
         </Alert>
       ) : (
-        <>
-          <ApiTokenForm className="max-w-xl" tokens={tokens} />
-
-          <hr className="mt-8 mb-4" />
-
-          <h4 className="font-medium text-xl">
-            <Trans>Your existing tokens</Trans>
-          </h4>
-
-          {tokens && tokens.length === 0 && (
-            <div className="mb-4">
-              <p className="mt-2 text-muted-foreground text-sm italic">
-                <Trans>Your tokens will be shown here once you create them.</Trans>
+        <DataTable
+          columns={columns}
+          data={tokens ?? []}
+          perPage={0}
+          currentPage={0}
+          totalPages={0}
+          error={{
+            enable: isError,
+          }}
+          emptyState={
+            <div className="flex h-60 flex-col items-center justify-center gap-y-4 text-muted-foreground/60">
+              <p>
+                <Trans>You have no API tokens yet. Your tokens will be shown here once you create them.</Trans>
               </p>
             </div>
-          )}
-
-          {tokens && tokens.length > 0 && (
-            <div className="mt-4 flex max-w-xl flex-col gap-y-4">
-              {tokens.map((token) => (
-                <div key={token.id} className="rounded-lg border border-border p-4">
-                  <div className="flex items-center justify-between gap-x-4">
-                    <div>
-                      <h5 className="text-base">{token.name}</h5>
-
-                      <p className="mt-2 text-muted-foreground text-xs">
-                        <Trans>Created on {i18n.date(token.createdAt, DateTime.DATETIME_FULL)}</Trans>
-                      </p>
-                      {token.expires ? (
-                        <p className="mt-1 text-muted-foreground text-xs">
-                          <Trans>Expires on {i18n.date(token.expires, DateTime.DATETIME_FULL)}</Trans>
-                        </p>
-                      ) : (
-                        <p className="mt-1 text-muted-foreground text-xs">
-                          <Trans>Token doesn't have an expiration date</Trans>
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <TokenDeleteDialog token={token}>
-                        <Button variant="destructive">
-                          <Trans>Delete</Trans>
-                        </Button>
-                      </TokenDeleteDialog>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </>
+          }
+          skeleton={{
+            enable: isLoading,
+            rows: 3,
+            component: (
+              <>
+                <TableCell>
+                  <Skeleton className="h-4 w-24 rounded-full" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-16 rounded-full" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-16 rounded-full" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-12 rounded-full" />
+                </TableCell>
+              </>
+            ),
+          }}
+        />
       )}
     </div>
   );

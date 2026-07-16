@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "next build",
+    "build": "NEXT_IGNORE_INCORRECT_LOCKFILE=true next build",
     "dev": "next dev",
     "start": "next start",
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
@@ -29,7 +29,7 @@
     "@types/node": "^25.1.0",
     "@types/react": "^19.2.10",
     "@types/react-dom": "^19.2.3",
-    "postcss": "^8.5.14",
+    "postcss": "^8.5.19",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3"
   }
