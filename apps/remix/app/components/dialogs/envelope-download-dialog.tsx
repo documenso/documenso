@@ -1,4 +1,5 @@
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
+import { getEnvelopeDownloadFileName } from '@documenso/lib/utils/get-envelope-download-filename';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -97,12 +98,13 @@ export const EnvelopeDownloadDialog = ({
       access: token ? { type: 'recipient', token } : { type: 'user' },
     },
     {
-      initialData: initialEnvelopeItems ? { data: initialEnvelopeItems } : undefined,
+      initialData: initialEnvelopeItems ? { data: initialEnvelopeItems, envelopeTitle: '' } : undefined,
       enabled: open,
     },
   );
 
   const envelopeItems = envelopeItemsPayload?.data || [];
+  const envelopeTitle = envelopeItemsPayload?.envelopeTitle ?? '';
 
   const onDownload = async (envelopeItem: EnvelopeItemToDownload, version: 'original' | 'signed' | 'pending') => {
     const { id: envelopeItemId } = envelopeItem;
@@ -120,7 +122,11 @@ export const EnvelopeDownloadDialog = ({
       await downloadPDF({
         envelopeItem,
         token,
-        fileName: envelopeItem.title,
+        fileName: getEnvelopeDownloadFileName({
+          itemCount: envelopeItems.length,
+          itemTitle: envelopeItem.title,
+          envelopeTitle,
+        }),
         version,
       });
 
