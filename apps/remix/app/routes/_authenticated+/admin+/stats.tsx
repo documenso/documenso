@@ -83,7 +83,7 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
 
   return (
     <div>
-      <h2 className="font-semibold text-4xl">
+      <h2 className="font-semibold text-3xl">
         <Trans>Instance Stats</Trans>
       </h2>
 

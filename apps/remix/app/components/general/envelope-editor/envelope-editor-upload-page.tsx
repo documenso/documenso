@@ -447,7 +447,7 @@ export const EnvelopeEditorUploadPage = () => {
   };
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 p-8">
+    <div className="mx-auto max-w-3xl space-y-6 p-8">
       <input {...getReplaceInputProps()} />
       <Card backdropBlur={false} className="border">
         <CardHeader className="pb-3">

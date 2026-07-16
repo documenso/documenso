@@ -148,7 +148,7 @@ export default function AdminUnsealedDocumentsPage() {
     <div>
       <div className="flex items-center gap-3">
         <AlertTriangleIcon className="h-8 w-8 text-destructive" />
-        <h2 className="font-semibold text-4xl">
+        <h2 className="font-semibold text-3xl">
           <Trans>Unsealed Documents</Trans>
         </h2>
       </div>

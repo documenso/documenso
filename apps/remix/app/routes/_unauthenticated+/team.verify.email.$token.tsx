@@ -93,7 +93,7 @@ export default function VerifyTeamEmailPage({ loaderData }: Route.ComponentProps
     return (
       <div className="w-screen max-w-lg px-4">
         <div className="w-full">
-          <h1 className="font-semibold text-4xl">
+          <h1 className="font-semibold text-3xl">
             <Trans>Invalid link</Trans>
           </h1>
 
@@ -114,7 +114,7 @@ export default function VerifyTeamEmailPage({ loaderData }: Route.ComponentProps
   if (data.state === 'AlreadyCompleted') {
     return (
       <div>
-        <h1 className="font-semibold text-4xl">
+        <h1 className="font-semibold text-3xl">
           <Trans>Team email already verified!</Trans>
         </h1>
 
@@ -136,7 +136,7 @@ export default function VerifyTeamEmailPage({ loaderData }: Route.ComponentProps
   if (data.state === 'VerificationError') {
     return (
       <div>
-        <h1 className="font-semibold text-4xl">
+        <h1 className="font-semibold text-3xl">
           <Trans>Team email verification</Trans>
         </h1>
 
@@ -152,7 +152,7 @@ export default function VerifyTeamEmailPage({ loaderData }: Route.ComponentProps
 
   return (
     <div>
-      <h1 className="font-semibold text-4xl">
+      <h1 className="font-semibold text-3xl">
         <Trans>Team email verified!</Trans>
       </h1>
 

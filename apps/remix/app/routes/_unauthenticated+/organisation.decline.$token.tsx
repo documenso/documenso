@@ -58,7 +58,7 @@ export default function DeclineInvitationPage({ loaderData }: Route.ComponentPro
     return (
       <div className="w-screen max-w-lg px-4">
         <div className="w-full">
-          <h1 className="font-semibold text-4xl">
+          <h1 className="font-semibold text-3xl">
             <Trans>Invalid token</Trans>
           </h1>
 
@@ -78,7 +78,7 @@ export default function DeclineInvitationPage({ loaderData }: Route.ComponentPro
 
   return (
     <div className="w-screen max-w-lg px-4">
-      <h1 className="font-semibold text-4xl">
+      <h1 className="font-semibold text-3xl">
         <Trans>Invitation declined</Trans>
       </h1>
 

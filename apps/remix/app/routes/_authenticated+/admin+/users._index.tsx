@@ -29,7 +29,7 @@ export default function AdminManageUsersPage({ loaderData }: Route.ComponentProp
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="font-semibold text-4xl">
+        <h2 className="font-semibold text-3xl">
           <Trans>Manage users</Trans>
         </h2>
 

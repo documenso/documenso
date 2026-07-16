@@ -13,7 +13,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="w-screen max-w-lg px-4">
       <div className="w-full">
-        <h1 className="font-semibold text-4xl">
+        <h1 className="font-semibold text-3xl">
           <Trans>Email sent!</Trans>
         </h1>
 

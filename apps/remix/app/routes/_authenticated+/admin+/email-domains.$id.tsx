@@ -103,7 +103,7 @@ export default function AdminEmailDomainDetailPage({ loaderData }: Route.Compone
   if (isLoading || !emailDomain) {
     return (
       <div>
-        <h2 className="font-semibold text-4xl">
+        <h2 className="font-semibold text-3xl">
           <Trans>Email Domain</Trans>
         </h2>
         <p className="mt-4 text-muted-foreground">

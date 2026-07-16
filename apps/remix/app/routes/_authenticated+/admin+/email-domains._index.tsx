@@ -137,7 +137,7 @@ export default function AdminEmailDomainsPage() {
 
   return (
     <div>
-      <h2 className="font-semibold text-4xl">
+      <h2 className="font-semibold text-3xl">
         <Trans>Email Domains</Trans>
       </h2>
 

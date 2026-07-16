@@ -98,7 +98,7 @@ export default function ExpiredSigningPage({ loaderData }: Route.ComponentProps)
           <div className="flex items-center gap-x-4">
             <TimerOffIcon className="h-10 w-10 text-orange-500" />
 
-            <h2 className="max-w-[35ch] text-center font-semibold text-2xl leading-normal md:text-3xl lg:text-4xl">
+            <h2 className="max-w-[35ch] text-center font-semibold text-2xl leading-normal md:text-3xl lg:text-3xl">
               <Trans>Signing Deadline Expired</Trans>
             </h2>
           </div>

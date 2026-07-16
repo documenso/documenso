@@ -115,7 +115,7 @@ const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
 
   return (
     <div>
-      <h2 className="font-semibold text-4xl">
+      <h2 className="font-semibold text-3xl">
         <Trans>Manage {user?.name}'s profile</Trans>
       </h2>
       <Form {...form}>

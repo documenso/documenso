@@ -134,7 +134,7 @@ export default function SettingsLayout() {
 
   return (
     <div>
-      <h1 className="font-semibold text-4xl">
+      <h1 className="font-semibold text-3xl">
         <Trans>Organisation Settings</Trans>
       </h1>
 

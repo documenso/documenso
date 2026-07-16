@@ -119,7 +119,7 @@ export default function TeamsSettingsLayout() {
 
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-      <h1 className="font-semibold text-4xl">
+      <h1 className="font-semibold text-3xl">
         <Trans>Team Settings</Trans>
       </h1>
 

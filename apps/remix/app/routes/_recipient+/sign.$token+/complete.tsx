@@ -181,7 +181,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
               signingCelebrationImage={signingCelebration}
             />
 
-            <h2 className="mt-6 max-w-[35ch] text-center font-semibold text-2xl leading-normal md:text-3xl lg:text-4xl">
+            <h2 className="mt-6 max-w-[35ch] text-center font-semibold text-2xl leading-normal md:text-3xl lg:text-3xl">
               {recipient.role === RecipientRole.SIGNER && <Trans>Document Signed</Trans>}
               {recipient.role === RecipientRole.VIEWER && <Trans>Document Viewed</Trans>}
               {recipient.role === RecipientRole.APPROVER && <Trans>Document Approved</Trans>}
