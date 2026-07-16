@@ -66,16 +66,16 @@ export const AppNavDesktop = ({ className, setIsCommandMenuOpen, ...props }: App
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex items-baseline gap-x-6"
+              className="flex items-center gap-x-2"
             >
               {menuNavigationLinks.map(({ href, label }) => (
                 <Link
                   key={href}
                   to={href}
                   className={cn(
-                    'rounded-md font-medium text-muted-foreground leading-5 ring-offset-background hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:text-muted-foreground/60',
+                    'rounded-md px-3 py-1.5 font-medium text-muted-foreground leading-5 ring-offset-background transition-colors hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:text-muted-foreground/60',
                     {
-                      'text-foreground dark:text-muted-foreground': pathname?.startsWith(href),
+                      'bg-muted text-foreground dark:text-muted-foreground': pathname?.startsWith(href),
                     },
                   )}
                 >
