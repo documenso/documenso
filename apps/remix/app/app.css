@@ -66,7 +66,7 @@
   html {
     @apply antialiased;
     font-optical-sizing: auto;
-    font-synthesis: none;
+    font-synthesis: style;
   }
 
   :root {
