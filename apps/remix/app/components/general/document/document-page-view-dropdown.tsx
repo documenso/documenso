@@ -27,7 +27,7 @@ import {
   Share,
   Trash2,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 
 import { EnvelopeDeleteDialog } from '~/components/dialogs/envelope-delete-dialog';
@@ -53,6 +53,21 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
 
   const [isRenameDialogOpen, setRenameDialogOpen] = useState(false);
   const [isSaveAsTemplateDialogOpen, setSaveAsTemplateDialogOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkIfMobile();
+
+    window.addEventListener('resize', checkIfMobile);
+
+    return () => {
+      window.removeEventListener('resize', checkIfMobile);
+    };
+  }, []);
 
   const recipient = envelope.recipients.find((recipient) => recipient.email === user.email);
 
@@ -74,7 +89,7 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
         <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-52" align="start" forceMount>
+      <DropdownMenuContent className="w-52" align={isMobile ? 'end' : 'start'} forceMount>
         <DropdownMenuLabel>
           <Trans>Action</Trans>
         </DropdownMenuLabel>
