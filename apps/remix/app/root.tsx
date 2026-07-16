@@ -119,7 +119,11 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
   const isRecipientRoute = matches.some((m) => m.id?.startsWith('routes/_recipient+'));
 
   return (
-    <html translate="no" lang={lang} data-theme={theme} className={theme ?? ''}>
+    // `suppressHydrationWarning` because `remix-themes` intentionally mutates
+    // `data-theme`/`class` on <html> before hydration (PreventFlashOnWrongTheme),
+    // so the server-rendered attributes never match the client render when the
+    // theme is resolved from the system preference. Attribute-only, one level deep.
+    <html translate="no" lang={lang} data-theme={theme} className={theme ?? ''} suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -173,7 +177,11 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
         <script
           nonce={nonce(cspNonce)}
           dangerouslySetInnerHTML={{
-            __html: `window.__ENV__ = ${JSON.stringify(publicEnv)}`,
+            // `__webpack_nonce__` is read by `get-nonce` (used by
+            // react-remove-scroll / react-style-singleton inside Radix menus and
+            // dialogs) to stamp runtime-injected <style> elements. Without it the
+            // strict `style-src-elem` CSP blocks the scroll-lock styles.
+            __html: `window.__ENV__ = ${JSON.stringify(publicEnv)}; window.__webpack_nonce__ = ${JSON.stringify(cspNonce ?? '')}`,
           }}
         />
 
