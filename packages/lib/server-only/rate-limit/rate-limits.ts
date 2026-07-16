@@ -96,7 +96,7 @@ export const apiV2RateLimit = createRateLimit({
 
 export const apiTrpcRateLimit = createRateLimit({
   action: 'api.trpc',
-  max: 1000,
+  max: 100,
   window: '1m',
 });
 
