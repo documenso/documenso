@@ -9,6 +9,13 @@ import { HydratedRouter } from 'react-router/dom';
 
 import './utils/polyfills/promise-with-resolvers';
 
+import { holostaff } from '@holostaff/sdk';
+
+holostaff.init({
+  tenantId: 'workspace_urZYaISXD2Pcx2jCgTE57vyYCQu2',
+  sourceId: 'ks_mrp2mc59_f1kkq8',
+});
+
 function PosthogInit() {
   const postHogConfig = extractPostHogConfig();
 
