@@ -1,0 +1,70 @@
+# Holostaff deployment-rig stack for the documenso target
+# (holostaff-agent documents/prd-test-rig.md P2).
+#
+# Minimal production-shaped stack: Postgres + Mailpit + the app built
+# from THIS checkout (so merged Holostaff PRs are exercised). Jobs use
+# the default local provider (no Redis); uploads use the database
+# transport (no MinIO); only PDF uploads are exercised (no Gotenberg).
+#
+# The rig runner invokes:
+#   docker compose -f rig/compose.yml down -v   # fresh DB every run
+#   docker compose -f rig/compose.yml up -d --build
+# with RIG_APP_PORT, RIG_PUBLIC_ORIGIN and RIG_CERT_PATH in the
+# environment. RIG_CERT_PATH must point at a host-side self-signed
+# cert.p12 (the runner generates one; see rig/README.md for manual use).
+#
+# All credentials below are rig-local throwaways for an ephemeral test
+# database that never holds real data.
+
+name: rig-documenso
+
+services:
+  database:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=documenso
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=documenso
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U documenso']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:v1.24
+    # SMTP :1025 / web UI + API :8025, internal to the compose network.
+    # Exposed on the host for debugging verification mails if needed.
+    ports:
+      - '127.0.0.1:8026:8025'
+
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      - PORT=${RIG_APP_PORT:-4180}
+      - NEXTAUTH_SECRET=rig-local-nextauth-secret-2f8a1c
+      - NEXT_PRIVATE_ENCRYPTION_KEY=rig-local-encryption-key-77aa
+      - NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=rig-local-secondary-key-88bb
+      - NEXT_PUBLIC_WEBAPP_URL=${RIG_PUBLIC_ORIGIN:-http://localhost:4180}
+      - NEXT_PRIVATE_INTERNAL_WEBAPP_URL=http://localhost:${RIG_APP_PORT:-4180}
+      - NEXT_PRIVATE_DATABASE_URL=postgresql://documenso:password@database:5432/documenso
+      - NEXT_PRIVATE_DIRECT_DATABASE_URL=postgresql://documenso:password@database:5432/documenso
+      - NEXT_PUBLIC_UPLOAD_TRANSPORT=database
+      - NEXT_PRIVATE_SMTP_TRANSPORT=smtp-auth
+      - NEXT_PRIVATE_SMTP_HOST=mailpit
+      - NEXT_PRIVATE_SMTP_PORT=1025
+      - NEXT_PRIVATE_SMTP_SECURE=false
+      - NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS=true
+      - NEXT_PRIVATE_SMTP_FROM_NAME=Documenso Rig
+      - NEXT_PRIVATE_SMTP_FROM_ADDRESS=noreply@rig.holostaff.ai
+      - NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
+      - NEXT_PRIVATE_SIGNING_PASSPHRASE=
+    ports:
+      - '${RIG_APP_PORT:-4180}:${RIG_APP_PORT:-4180}'
+    volumes:
+      - '${RIG_CERT_PATH:?set RIG_CERT_PATH to a host-side self-signed cert.p12}:/opt/documenso/cert.p12:ro'
