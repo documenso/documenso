@@ -13,7 +13,7 @@ import { getSvgPathFromStroke } from './helper';
 import { Point } from './point';
 import { SignaturePadColorPicker } from './signature-pad-color-picker';
 
-const checkSignatureValidity = (element: RefObject<HTMLCanvasElement>) => {
+const checkSignatureValidity = (element: RefObject<HTMLCanvasElement | null>) => {
   if (!element.current) {
     return false;
   }
