@@ -290,7 +290,7 @@ type RecipientRow = {
 
 const mapRecipient = (recipient: RecipientRow): AdminGlobalSearchResult => ({
   label: recipient.email,
-  sublabel: joinSublabel([recipient.name, `on "${recipient.envelope.title}"`]),
+  sublabel: joinSublabel([`#${recipient.id}`, recipient.name, `on "${recipient.envelope.title}"`]),
   path: `/admin/documents/${recipient.envelope.id}`,
   value: `recipient ${recipient.id} ${recipient.name} ${recipient.email} ${recipient.envelope.title}`,
 });
