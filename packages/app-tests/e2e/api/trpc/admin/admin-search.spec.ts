@@ -122,7 +122,7 @@ test('[ADMIN][TRPC][SEARCH]: numeric query returns verified document and recipie
   expect(recipientGroup?.results).toHaveLength(1);
   expect(recipientGroup?.results[0].path).toBe(`/admin/documents/${document.id}`);
   expect(recipientGroup?.results[0].label).toBe(recipient.email);
-  expect(recipientGroup?.results[0].sublabel).toContain(`#${recipient.id}`);
+  expect(recipientGroup?.results[0].sublabel).toBe(`#${recipient.id} · ${recipient.name} · ${document.title}`);
 
   // Search by the full document_<id> secondary ID: exercises the prefix branch.
   const secondaryIdSearch = await callAdminSearch(page, document.secondaryId);
