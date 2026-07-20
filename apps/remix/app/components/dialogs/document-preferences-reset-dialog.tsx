@@ -39,6 +39,9 @@ export const DocumentPreferencesResetDialog = ({
     try {
       await onReset();
       setOpen(false);
+    } catch {
+      // The submit handler surfaces its own error toast. Keep the dialog open
+      // so the user can retry.
     } finally {
       setIsResetting(false);
     }

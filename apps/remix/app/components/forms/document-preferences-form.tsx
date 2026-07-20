@@ -160,10 +160,8 @@ export const DocumentPreferencesForm = ({
     resolver: zodResolver(ZDocumentPreferencesFormSchema),
   });
 
-  const currentValues = form.watch();
-
   // Parse both sides through the schema so we compare canonical representations
-  const parsedCurrentValues = ZDocumentPreferencesFormSchema.safeParse(currentValues);
+  const parsedCurrentValues = ZDocumentPreferencesFormSchema.safeParse(defaultValues);
   const parsedResetValues = ZDocumentPreferencesFormSchema.safeParse(resetValues);
 
   const isResetToDefaultsVisible =
