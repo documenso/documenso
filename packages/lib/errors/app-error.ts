@@ -37,6 +37,13 @@ export enum AppErrorCode {
   ENVELOPE_TSP_LOCKED = 'ENVELOPE_TSP_LOCKED',
 
   /**
+   * A signer recipient does not have a signature field assigned. Thrown when
+   * distributing an envelope or using a direct template where at least one
+   * signer has no signature field.
+   */
+  MISSING_SIGNATURE_FIELD = 'MISSING_SIGNATURE_FIELD',
+
+  /**
    * CSC (Cloud Signature Consortium) error codes. See the CSC QES V1 spec
    * for the recovery taxonomy.
    */
@@ -84,6 +91,7 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
   [AppErrorCode.ENVELOPE_CANCELLED]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_LEGACY]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.ENVELOPE_TSP_LOCKED]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.MISSING_SIGNATURE_FIELD]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.CSC_INSTANCE_MODE_MISMATCH]: { code: 'BAD_REQUEST', status: 400 },
   [AppErrorCode.CSC_UNLICENSED]: { code: 'FORBIDDEN', status: 403 },
   [AppErrorCode.CSC_PROVIDER_INFO_FAILED]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
@@ -291,6 +299,7 @@ export class AppError extends Error {
         AppErrorCode.ENVELOPE_CANCELLED,
         AppErrorCode.ENVELOPE_LEGACY,
         AppErrorCode.ENVELOPE_TSP_LOCKED,
+        AppErrorCode.MISSING_SIGNATURE_FIELD,
         AppErrorCode.CSC_INSTANCE_MODE_MISMATCH,
         AppErrorCode.CSC_CREDENTIAL_LIST_EMPTY,
         AppErrorCode.CSC_CERT_INVALID,
