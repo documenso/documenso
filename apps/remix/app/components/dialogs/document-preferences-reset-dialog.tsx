@@ -14,7 +14,6 @@ import { Trans } from '@lingui/react/macro';
 import { useState } from 'react';
 
 export type DocumentPreferencesResetDialogProps = {
-  disabled?: boolean;
   isSubmitting: boolean;
   onReset: () => Promise<void>;
   showAiFeatures?: boolean;
@@ -23,7 +22,6 @@ export type DocumentPreferencesResetDialogProps = {
 };
 
 export const DocumentPreferencesResetDialog = ({
-  disabled = false,
   isSubmitting,
   onReset,
   showAiFeatures = false,
@@ -49,7 +47,7 @@ export const DocumentPreferencesResetDialog = ({
   return (
     <Dialog open={open} onOpenChange={(value) => !isLoading && setOpen(value)}>
       <DialogTrigger asChild>
-        <Button variant="destructive" type="button" size="sm" disabled={disabled || isLoading}>
+        <Button variant="destructive" type="button" size="sm" disabled={isLoading}>
           <Trans>Reset to defaults</Trans>
         </Button>
       </DialogTrigger>

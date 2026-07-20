@@ -161,7 +161,15 @@ export const DocumentPreferencesForm = ({
   });
 
   const currentValues = form.watch();
-  const isResetDisabled = !form.formState.isDirty && JSON.stringify(currentValues) === JSON.stringify(resetValues);
+
+  // Parse both sides through the schema so we compare canonical representations
+  const parsedCurrentValues = ZDocumentPreferencesFormSchema.safeParse(currentValues);
+  const parsedResetValues = ZDocumentPreferencesFormSchema.safeParse(resetValues);
+
+  const isResetToDefaultsVisible =
+    !parsedCurrentValues.success ||
+    !parsedResetValues.success ||
+    JSON.stringify(parsedCurrentValues.data) !== JSON.stringify(parsedResetValues.data);
 
   const handleResetToDefaults = async () => {
     await onFormSubmit(resetValues);
@@ -794,14 +802,15 @@ export const DocumentPreferencesForm = ({
             isSubmitting={form.formState.isSubmitting}
             onReset={() => form.reset()}
             resetToDefaults={
-              <DocumentPreferencesResetDialog
-                disabled={isResetDisabled}
-                isSubmitting={form.formState.isSubmitting}
-                onReset={handleResetToDefaults}
-                showAiFeatures={isAiFeaturesConfigured}
-                showDocumentVisibility={!isPersonalLayoutMode}
-                showIncludeSenderDetails={!isPersonalLayoutMode && !isPersonalOrganisation}
-              />
+              isResetToDefaultsVisible ? (
+                <DocumentPreferencesResetDialog
+                  isSubmitting={form.formState.isSubmitting}
+                  onReset={handleResetToDefaults}
+                  showAiFeatures={isAiFeaturesConfigured}
+                  showDocumentVisibility={!isPersonalLayoutMode}
+                  showIncludeSenderDetails={!isPersonalLayoutMode && !isPersonalOrganisation}
+                />
+              ) : undefined
             }
           />
         </fieldset>

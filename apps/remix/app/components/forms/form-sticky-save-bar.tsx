@@ -10,8 +10,8 @@ export type FormStickySaveBarProps = {
   isSubmitting: boolean;
   onReset: () => void;
   /**
-   * Slot for a "reset to defaults" action, rendered after the Save button. Only shown
-   * while the form is unchanged so it never competes with the Undo/unsaved-changes UI.
+   * Slot for a "reset to defaults" action, rendered before the Undo button. Hidden while
+   * the bar is floating so it never appears in the unsaved-changes island.
    */
   resetToDefaults?: ReactNode;
 };
@@ -105,6 +105,8 @@ export const FormStickySaveBar = ({ isDirty, isSubmitting, onReset, resetToDefau
         </AnimatePresence>
 
         <div className="ml-auto flex flex-shrink-0 items-center gap-x-2">
+          {!isFloating && resetToDefaults}
+
           {isDirty && (
             <Button type="button" variant="secondary" size="sm" onClick={onReset} disabled={isSubmitting}>
               <Trans>Undo</Trans>
@@ -114,8 +116,6 @@ export const FormStickySaveBar = ({ isDirty, isSubmitting, onReset, resetToDefau
           <Button type="submit" className="shrink-0" size="sm" loading={isSubmitting} disabled={!isDirty}>
             <Trans>Save changes</Trans>
           </Button>
-
-          {!isDirty && resetToDefaults}
         </div>
       </div>
 
