@@ -39,6 +39,7 @@ type Recipient = {
 
 type CreateAndSendResult = {
   envelopeId: string;
+  externalId: string;
   recipients: Array<{
     email: string;
     signingUrl: string;
@@ -49,6 +50,7 @@ async function createAndSendDocument(
   pdfBuffer: Buffer,
   filename: string,
   title: string,
+  externalId: string,
   recipients: Recipient[],
 ): Promise<CreateAndSendResult> {
   const recipientPayload = recipients.map((recipient, index) => ({
@@ -87,6 +89,7 @@ async function createAndSendDocument(
     JSON.stringify({
       type: 'DOCUMENT',
       title,
+      externalId,
       recipients: recipientPayload,
       meta: {
         subject: `Please sign: ${title}`,
@@ -127,6 +130,7 @@ async function createAndSendDocument(
 
   return {
     envelopeId,
+    externalId,
     recipients: distributeResult.recipients.map(
       (r: { email: string; signingUrl: string }) => ({
         email: r.email,
@@ -143,6 +147,7 @@ const result = await createAndSendDocument(
   pdfBuffer,
   'contract.pdf',
   'Service Agreement',
+  'contract-2025-001',
   [
     { email: 'client@example.com', name: 'John Smith', role: 'SIGNER' },
     { email: 'manager@company.com', name: 'Jane Doe', role: 'SIGNER' },
@@ -151,6 +156,7 @@ const result = await createAndSendDocument(
 );
 
 console.log('Document sent:', result.envelopeId);
+console.log('External ID:', result.externalId);
 result.recipients.forEach((r) => console.log(`${r.email}: ${r.signingUrl}`));
 ````
 </Tab>
@@ -170,6 +176,7 @@ ENVELOPE_RESPONSE=$(curl -s -X POST "${BASE_URL}/envelope/create" \
   -F 'payload={
     "type": "DOCUMENT",
     "title": "Service Agreement",
+    "externalId": "contract-2025-001",
     "recipients": [
       {
         "email": "client@example.com",
@@ -224,6 +231,7 @@ ENVELOPE_RESPONSE=$(curl -s -X POST "${BASE_URL}/envelope/create" \
 
 ENVELOPE_ID=$(echo $ENVELOPE_RESPONSE | jq -r '.id')
 echo "Created envelope: ${ENVELOPE_ID}"
+echo "External ID: contract-2025-001"
 
 # Step 2: Distribute (send) the document
 echo "Sending document..."
@@ -238,6 +246,108 @@ echo $DISTRIBUTE_RESPONSE | jq '.recipients[] | {email, signingUrl}'
 
 </Tab>
 </Tabs>
+
+### Correlate Completion and Download the Signed PDF
+
+Use `externalId` for your application's stable record ID. Webhook payloads include that value as
+`payload.externalId`, while `payload.id` is Documenso's numeric document ID. That numeric ID is
+the same value encoded in an envelope `secondaryId` like `document_123`.
+
+<Callout type="info">
+  When handling webhooks, respond with a 2xx status quickly and process longer work, such as
+  downloading and storing signed PDFs, in a background job.
+</Callout>
+
+```typescript
+import express from 'express';
+
+const app = express();
+app.use(express.json());
+
+const API_TOKEN = process.env.DOCUMENSO_API_TOKEN;
+const BASE_URL = 'https://app.documenso.com/api/v2';
+const WEBHOOK_SECRET = process.env.DOCUMENSO_WEBHOOK_SECRET;
+
+type DocumensoWebhookBody = {
+  event: string;
+  payload: {
+    id: number;
+    externalId: string | null;
+    status: string;
+    completedAt: string | null;
+    recipients: Array<{
+      email: string;
+      signingStatus: string;
+      signedAt: string | null;
+    }>;
+  };
+  createdAt: string;
+  webhookEndpoint: string;
+};
+
+app.post('/webhooks/documenso', (req, res) => {
+  const secret = req.headers['x-documenso-secret'];
+
+  if (secret !== WEBHOOK_SECRET) {
+    return res.status(401).send('Unauthorized');
+  }
+
+  const { event, payload } = req.body as DocumensoWebhookBody;
+
+  if (event === 'DOCUMENT_COMPLETED' && payload.externalId) {
+    void downloadSignedPdfForExternalRecord({
+      externalId: payload.externalId,
+      documentId: payload.id,
+    }).catch((error) => {
+      console.error('Failed to store signed PDF', {
+        externalId: payload.externalId,
+        documentId: payload.id,
+        error,
+      });
+    });
+  }
+
+  return res.status(200).send('OK');
+});
+
+async function downloadSignedPdfForExternalRecord({
+  externalId,
+  documentId,
+}: {
+  externalId: string;
+  documentId: number;
+}) {
+  const response = await fetch(`${BASE_URL}/document/${documentId}/download`, {
+    headers: { Authorization: API_TOKEN },
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(`Failed to download signed PDF: ${error.message}`);
+  }
+
+  const signedPdf = Buffer.from(await response.arrayBuffer());
+
+  await saveSignedPdf({
+    externalId,
+    filename: `${externalId}_signed.pdf`,
+    data: signedPdf,
+  });
+}
+
+async function saveSignedPdf({
+  externalId,
+  filename,
+  data,
+}: {
+  externalId: string;
+  filename: string;
+  data: Buffer;
+}) {
+  // Store the PDF in your application database, object storage, or document archive.
+  console.log(`Saving ${filename} for ${externalId}: ${data.length} bytes`);
+}
+````
 
 ---
 
