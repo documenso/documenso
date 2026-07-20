@@ -116,8 +116,6 @@ export const FormStickySaveBar = ({ isDirty, isSubmitting, onReset, resetToDefau
           <Button type="submit" className="shrink-0" size="sm" loading={isSubmitting} disabled={!isDirty}>
             <Trans>Save changes</Trans>
           </Button>
-
-          {!isDirty && resetToDefaults}
         </div>
       </div>
 

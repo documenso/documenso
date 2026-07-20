@@ -14,7 +14,6 @@ import { Trans } from '@lingui/react/macro';
 import { useState } from 'react';
 
 export type BrandingPreferencesResetDialogProps = {
-  disabled?: boolean;
   hasAdvancedBranding: boolean;
   isSubmitting: boolean;
   onReset: () => Promise<void>;
@@ -22,7 +21,6 @@ export type BrandingPreferencesResetDialogProps = {
 };
 
 export const BrandingPreferencesResetDialog = ({
-  disabled = false,
   hasAdvancedBranding,
   isSubmitting,
   onReset,
@@ -39,16 +37,19 @@ export const BrandingPreferencesResetDialog = ({
     try {
       await onReset();
       setOpen(false);
+    } catch {
+      // The submit handler surfaces its own error toast. Keep the dialog open
+      // so the user can retry.
     } finally {
       setIsResetting(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !isLoading && !disabled && setOpen(value)}>
+    <Dialog open={open} onOpenChange={(value) => !isLoading && setOpen(value)}>
       <DialogTrigger asChild>
         {trigger ?? (
-          <Button variant="destructive" type="button" disabled={disabled || isLoading}>
+          <Button variant="destructive" type="button" size="sm" disabled={isLoading}>
             <Trans>Reset to defaults</Trans>
           </Button>
         )}

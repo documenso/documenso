@@ -104,14 +104,15 @@ export function BrandingPreferencesForm({
     settings.brandingColors === undefined ||
     (parsedColors.success && normalizeBrandingColors(parsedColors.data) === null);
 
-  const isResetDisabled =
-    !form.formState.isDirty &&
-    settings.brandingEnabled === (canInherit ? null : false) &&
-    !settings.brandingLogo &&
-    !settings.brandingUrl &&
-    !settings.brandingCompanyDetails &&
-    !settings.brandingCss &&
-    hasResetBrandingColors;
+  // Only show the reset action when the saved settings actually differ from the
+  // defaults, so it never renders as a pointless disabled button.
+  const isResetToDefaultsVisible =
+    settings.brandingEnabled !== (canInherit ? null : false) ||
+    !!settings.brandingLogo ||
+    !!settings.brandingUrl ||
+    !!settings.brandingCompanyDetails ||
+    !!settings.brandingCss ||
+    !hasResetBrandingColors;
 
   const handleResetToDefaults = async () => {
     const data: TBrandingPreferencesFormSchema = {
@@ -638,12 +639,13 @@ export function BrandingPreferencesForm({
             isSubmitting={form.formState.isSubmitting}
             onReset={handleReset}
             resetToDefaults={
-              <BrandingPreferencesResetDialog
-                disabled={isResetDisabled}
-                hasAdvancedBranding={hasAdvancedBranding}
-                isSubmitting={form.formState.isSubmitting}
-                onReset={handleResetToDefaults}
-              />
+              isResetToDefaultsVisible ? (
+                <BrandingPreferencesResetDialog
+                  hasAdvancedBranding={hasAdvancedBranding}
+                  isSubmitting={form.formState.isSubmitting}
+                  onReset={handleResetToDefaults}
+                />
+              ) : undefined
             }
           />
         </fieldset>
