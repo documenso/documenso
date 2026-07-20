@@ -1416,8 +1416,8 @@ msgid "Add Placeholders"
 msgstr "플레이스홀더 추가"
 
 #: apps/remix/app/components/general/rate-limit-array-input.tsx
-msgid "Add rate limit"
-msgstr "요청 한도 추가"
+msgid "Add rate limit window"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "Add recipients"
@@ -2008,6 +2008,7 @@ msgstr "모든 소스"
 msgid "Any Status"
 msgstr "모든 상태"
 
+#: apps/remix/app/components/general/claim-limit-fields.tsx
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 msgid "API"
 msgstr "API"
@@ -2016,10 +2017,6 @@ msgstr "API"
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "API key"
 msgstr "API 키"
-
-#: apps/remix/app/components/general/claim-limit-fields.tsx
-msgid "API rate limits"
-msgstr "API 요청 한도"
 
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 msgid "API requests"
@@ -2448,6 +2445,7 @@ msgstr "브랜딩 로고"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Branding Preferences"
 msgstr "브랜딩 환경설정"
 
@@ -2686,6 +2684,10 @@ msgstr "서명자를 제거할 수 없습니다."
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 msgid "Cannot upload items after the document has been sent"
 msgstr "문서를 전송한 이후에는 항목을 업로드할 수 없습니다."
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Capabilities enabled for this organisation."
+msgstr ""
 
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role name"
@@ -3579,6 +3581,7 @@ msgid "Currently all organisation members can access this team"
 msgstr "현재 모든 조직 구성원이 이 팀에 접근할 수 있습니다."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Currently branding can only be configured for Teams and above plans."
 msgstr "브랜딩은 현재 Teams 요금제 이상에서만 구성할 수 있습니다."
 
@@ -4421,10 +4424,6 @@ msgstr "문서 기본 설정"
 msgid "Document preferences updated"
 msgstr "문서 환경설정이 업데이트되었습니다"
 
-#: apps/remix/app/components/general/claim-limit-fields.tsx
-msgid "Document rate limits"
-msgstr "문서 요청 한도"
-
 #: apps/remix/app/components/general/document-signing/document-signing-reject-dialog.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
 msgid "Document rejected"
@@ -4560,6 +4559,7 @@ msgstr "문서"
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-nav-desktop.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/claim-limit-fields.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 #: apps/remix/app/components/general/skeletons/document-edit-skeleton.tsx
@@ -5009,10 +5009,6 @@ msgstr "이메일 기본 설정"
 msgid "Email preferences updated"
 msgstr "이메일 기본 설정이 업데이트되었습니다."
 
-#: apps/remix/app/components/general/claim-limit-fields.tsx
-msgid "Email rate limits"
-msgstr "이메일 요청 한도"
-
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Email recipients when a pending document is deleted"
 msgstr "보류 중인 문서가 삭제되면 수신자에게 이메일 보내기"
@@ -5108,6 +5104,7 @@ msgstr "이메일 인증이 제거되었습니다"
 msgid "Email verification has been resent"
 msgstr "이메일 인증이 다시 전송되었습니다"
 
+#: apps/remix/app/components/general/claim-limit-fields.tsx
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
@@ -5121,15 +5118,13 @@ msgstr "이메일"
 msgid "Embedding, 5 members included and more"
 msgstr "임베딩, 5명의 구성원 포함 등"
 
-#: apps/remix/app/components/general/claim-limit-fields.tsx
-#: apps/remix/app/components/general/claim-limit-fields.tsx
-#: apps/remix/app/components/general/claim-limit-fields.tsx
-msgid "Empty = Unlimited, 0 = Blocked"
-msgstr "비워 두기 = 무제한, 0 = 차단됨"
-
 #: packages/ui/primitives/document-flow/add-fields.tsx
 msgid "Empty field"
 msgstr "빈 필드"
+
+#: apps/remix/app/components/general/claim-limit-fields.tsx
+msgid "Empty quota means unlimited, 0 blocks the resource. Rate limit windows accept values like 5m, 1h or 24h."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/team-inherit-member-enable-dialog.tsx
 msgid "Enable"
@@ -5250,6 +5245,10 @@ msgstr "임베딩 토큰이 아닌 API 토큰을 사용하고 있지 않은지 �
 msgid "Enter"
 msgstr "입력하세요"
 
+#: apps/remix/app/components/general/rate-limit-array-input.tsx
+msgid "Enter a max request count greater than 0"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Enter a name for your new folder. Folders help you organise your items."
 msgstr "새 폴더 이름을 입력하세요. 폴더는 항목을 정리하는 데 도움이 됩니다."
@@ -5257,6 +5256,10 @@ msgstr "새 폴더 이름을 입력하세요. 폴더는 항목을 정리하는 �
 #: apps/remix/app/components/dialogs/envelope-rename-dialog.tsx
 msgid "Enter a new title"
 msgstr "새 제목을 입력하세요."
+
+#: apps/remix/app/components/general/rate-limit-array-input.tsx
+msgid "Enter a window, e.g. 5m"
+msgstr ""
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Enter claim name"
@@ -5515,6 +5518,10 @@ msgstr "모든 사람이 서명했습니다"
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Everyone has signed! You will receive an email copy of the signed document."
 msgstr "모두 서명했습니다! 서명된 문서의 사본이 이메일로 전송됩니다."
+
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+msgid "Exceeded"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "Exceeded timeout"
@@ -6823,6 +6830,10 @@ msgstr "라이트 모드"
 msgid "Like to have your own public profile with agreements?"
 msgstr "계약이 포함된 나만의 공개 프로필을 원하시나요?"
 
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+msgid "Limit reached"
+msgstr ""
+
 #: apps/remix/app/components/general/claim-limit-fields.tsx
 msgid "Limits"
 msgstr "제한"
@@ -7144,6 +7155,10 @@ msgstr "MAU(로그인 기준)"
 msgid "Max"
 msgstr "최대"
 
+#: apps/remix/app/components/general/rate-limit-array-input.tsx
+msgid "Max requests"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Maximum file size: 4MB. Maximum 100 rows per upload. Blank values will use template defaults."
 msgstr "최대 파일 크기: 4MB. 업로드당 최대 100행. 비어 있는 값은 템플릿 기본값이 사용됩니다."
@@ -7190,12 +7205,12 @@ msgstr "가입일"
 
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
 #: apps/remix/app/components/tables/admin-organisation-overview-table.tsx
 #: apps/remix/app/components/tables/organisation-groups-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/components/tables/team-groups-table.tsx
-#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
@@ -7264,16 +7279,12 @@ msgid "Monthly Active Users: Users that had at least one of their documents comp
 msgstr "월간 활성 사용자: 문서가 하나 이상 완료된 사용자"
 
 #: apps/remix/app/components/general/claim-limit-fields.tsx
-msgid "Monthly API quota"
-msgstr "월간 API 할당량"
+msgid "Monthly quota"
+msgstr ""
 
-#: apps/remix/app/components/general/claim-limit-fields.tsx
-msgid "Monthly document quota"
-msgstr "월간 문서 할당량"
-
-#: apps/remix/app/components/general/claim-limit-fields.tsx
-msgid "Monthly email quota"
-msgstr "월간 이메일 할당량"
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+msgid "Monthly usage"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
@@ -7364,13 +7375,16 @@ msgid "Name"
 msgstr "이름"
 
 #: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "Name is required"
 msgstr "이름은 필수 항목입니다."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Name Settings"
 msgstr "이름 설정"
+
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+msgid "Near limit"
+msgstr ""
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Need to sign documents?"
@@ -7514,6 +7528,10 @@ msgstr "현재 추가로 수행해야 할 작업은 없습니다."
 #: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
 msgid "No groups found"
 msgstr "그룹을 찾을 수 없습니다."
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "No inherited claim"
+msgstr ""
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "No License Configured"
@@ -8232,6 +8250,10 @@ msgstr "보류 중인 조직 초대"
 msgid "Pending since"
 msgstr "다음 시점부터 보류 중"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "People with access to this organisation."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "per month"
@@ -8397,10 +8419,6 @@ msgstr "토큰을 나중에 식별할 수 있도록 의미 있는 이름을 입�
 #: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
 msgid "Please enter a number"
 msgstr "숫자를 입력하세요"
-
-#: apps/remix/app/components/general/claim-account.tsx
-msgid "Please enter a valid name."
-msgstr "올바른 이름을 입력해 주세요."
 
 #: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
 msgid "Please enter a valid number"
@@ -9007,6 +9025,11 @@ msgstr "리디렉션 URL"
 msgid "Redirecting"
 msgstr "리디렉션 중"
 
+#. placeholder {0}: oidcProviderLabel || 'OIDC'
+#: apps/remix/app/routes/_unauthenticated+/signin.tsx
+msgid "Redirecting to {0}..."
+msgstr ""
+
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Registration Successful"
@@ -9134,6 +9157,10 @@ msgstr "조직 구성원 제거"
 #: apps/remix/app/components/dialogs/admin-organisation-member-delete-dialog.tsx
 msgid "Remove Organisation Member"
 msgstr "조직 구성원 제거"
+
+#: apps/remix/app/components/general/rate-limit-array-input.tsx
+msgid "Remove rate limit"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "Remove recipient"
@@ -9282,9 +9309,7 @@ msgstr "봉투 다시 보내기"
 msgid "Resend verification"
 msgstr "인증 다시 보내기"
 
-#: apps/remix/app/components/forms/organisation-update-form.tsx
 #: apps/remix/app/components/forms/public-profile-form.tsx
-#: apps/remix/app/components/forms/team-update-form.tsx
 #: apps/remix/app/components/general/organisation-usage-reset-button.tsx
 msgid "Reset"
 msgstr "초기화"
@@ -9326,6 +9351,10 @@ msgstr "해결"
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "Resolve payment"
 msgstr "결제 해결"
+
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+msgid "Resource blocked"
+msgstr ""
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Response"
@@ -9469,6 +9498,7 @@ msgid "Save as Template"
 msgstr "템플릿으로 저장"
 
 #: apps/remix/app/components/dialogs/email-transport-update-dialog.tsx
+#: apps/remix/app/components/forms/form-sticky-save-bar.tsx
 msgid "Save changes"
 msgstr "변경 사항 저장"
 
@@ -9905,6 +9935,10 @@ msgstr "전송 중..."
 #: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Sent"
 msgstr "발송됨"
+
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+msgid "Sent this period"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Session revoked"
@@ -10894,10 +10928,10 @@ msgid "Team URL"
 msgstr "팀 URL"
 
 #: apps/remix/app/components/general/org-menu-switcher.tsx
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
 #: apps/remix/app/components/tables/admin-organisation-overview-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
-#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.teams.tsx
@@ -10907,6 +10941,10 @@ msgstr "팀"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Teams help you organise your work and collaborate with others. Create your first team to get started."
 msgstr "팀은 작업을 조직하고 다른 사람과 협업하는 데 도움이 됩니다. 첫 번째 팀을 생성하여 시작하세요."
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Teams that belong to this organisation."
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "Teams that this organisation group is currently assigned to"
@@ -12370,6 +12408,7 @@ msgstr "권한이 없습니다"
 msgid "Uncompleted"
 msgstr "미완료"
 
+#: apps/remix/app/components/forms/form-sticky-save-bar.tsx
 #: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
 msgid "Undo"
 msgstr "실행 취소"
@@ -12401,8 +12440,6 @@ msgstr "이름을 알 수 없음"
 #: apps/remix/app/components/general/claim-limit-fields.tsx
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 #: apps/remix/app/components/tables/admin-claims-table.tsx
-#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Unlimited"
 msgstr "무제한"
 
@@ -12418,6 +12455,10 @@ msgstr "연결 해제"
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "Unpin"
 msgstr "고정 해제"
+
+#: apps/remix/app/components/forms/form-sticky-save-bar.tsx
+msgid "Unsaved changes"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
@@ -12438,9 +12479,6 @@ msgstr "제목 없는 그룹"
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
-#: apps/remix/app/components/forms/branding-preferences-form.tsx
-#: apps/remix/app/components/forms/document-preferences-form.tsx
-#: apps/remix/app/components/forms/email-preferences-form.tsx
 #: apps/remix/app/components/forms/public-profile-form.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: apps/remix/app/components/tables/admin-claims-table.tsx
@@ -12463,6 +12501,7 @@ msgstr "배너 업데이트"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Update Billing"
 msgstr "결제 정보 업데이트"
 
@@ -12489,10 +12528,6 @@ msgstr "이메일 업데이트"
 #: apps/remix/app/components/general/legacy-field-warning-popover.tsx
 msgid "Update Fields"
 msgstr "필드 업데이트"
-
-#: apps/remix/app/components/forms/organisation-update-form.tsx
-msgid "Update organisation"
-msgstr "조직 업데이트"
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
@@ -12528,10 +12563,6 @@ msgstr "역할 업데이트"
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
 msgid "Update Subscription Claim"
 msgstr "구독 클레임 업데이트"
-
-#: apps/remix/app/components/forms/team-update-form.tsx
-msgid "Update team"
-msgstr "팀 업데이트"
 
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
@@ -12706,14 +12737,17 @@ msgstr "업로드 중"
 msgid "URL"
 msgstr "URL"
 
-#. placeholder {0}: selectedStat?.period || 'N/A'
-#: apps/remix/app/components/general/organisation-usage-panel.tsx
-msgid "Usage for period: {0}"
-msgstr "기간별 사용량: {0}"
-
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Use"
 msgstr "사용"
+
+#: apps/remix/app/components/general/rate-limit-array-input.tsx
+msgid "Use a duration with a unit, e.g. 5m, 1h, or 24h"
+msgstr ""
+
+#: apps/remix/app/components/general/rate-limit-array-input.tsx
+msgid "Use a unique window for each rate limit"
+msgstr ""
 
 #: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx
 #: apps/remix/app/components/forms/signin.tsx
@@ -13620,9 +13654,17 @@ msgstr "화이트라벨, 무제한 구성원 등"
 msgid "Width:"
 msgstr "너비:"
 
+#: apps/remix/app/components/general/rate-limit-array-input.tsx
+msgid "Window"
+msgstr ""
+
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Withdrawing Consent"
 msgstr "동의 철회"
+
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+msgid "Within limit"
+msgstr ""
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "Write a description to display on your public profile"
@@ -14165,6 +14207,10 @@ msgstr "접근 권한을 성공적으로 철회했습니다."
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "You have the right to withdraw your consent to use electronic signatures at any time before completing the signing process. To withdraw your consent, please contact the sender of the document. In failing to contact the sender you may reach out to <0>{SUPPORT_EMAIL}</0> for assistance. Be aware that withdrawing consent may delay or halt the completion of the related transaction or service."
 msgstr "전자 서명을 완료하기 전 언제든지 전자 서명 사용에 대한 동의를 철회할 권리가 있습니다. 동의를 철회하려면 문서 발송자에게 문의해 주세요. 발송자에게 연락할 수 없는 경우 <0>{SUPPORT_EMAIL}</0>로 도움을 요청해 주세요. 동의를 철회하면 관련 거래나 서비스가 지연되거나 중단될 수 있습니다."
+
+#: apps/remix/app/components/forms/form-sticky-save-bar.tsx
+msgid "You have unsaved changes"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 msgid "You have updated {memberName}."
