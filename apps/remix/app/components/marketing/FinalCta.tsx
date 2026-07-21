@@ -23,7 +23,7 @@ export function FinalCta() {
             Your next contract could be signed by lunch
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed opacity-85">
-            No back-and-forth, no printing or scanning. Send your first document and see how fast getting it signed can
+            No back-and-forth, no printing and scanning. Send your first document and see how fast getting it signed can
             be.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
