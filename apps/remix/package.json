@@ -100,11 +100,11 @@
     "esbuild": "^0.27.0",
     "remix-flat-routes": "^0.8.5",
     "rollup": "^4.53.3",
-    "tsx": "^4.20.6",
+    "tsx": "^4.23.1",
     "typescript": "5.6.2",
     "vite": "^7.2.4",
     "vite-plugin-babel-macros": "^1.0.6",
     "vite-tsconfig-paths": "^5.1.4"
   },
-  "version": "2.15.0"
+  "version": "2.16.0"
 }
