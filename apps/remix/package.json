@@ -36,8 +36,8 @@
     "@lingui/react": "^5.6.0",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
-    "@react-router/node": "^7.12.0",
-    "@react-router/serve": "^7.12.0",
+    "@react-router/node": "^7.18.1",
+    "@react-router/serve": "^7.18.1",
     "@simplewebauthn/browser": "^13.2.2",
     "@simplewebauthn/server": "^13.2.2",
     "@tanstack/react-query": "5.90.10",
@@ -81,8 +81,8 @@
     "@babel/preset-typescript": "^7.28.5",
     "@lingui/babel-plugin-lingui-macro": "^5.6.0",
     "@lingui/vite-plugin": "^5.6.0",
-    "@react-router/dev": "^7.12.0",
-    "@react-router/remix-routes-option-adapter": "^7.12.0",
+    "@react-router/dev": "^7.18.1",
+    "@react-router/remix-routes-option-adapter": "^7.18.1",
     "@rollup/plugin-babel": "^6.1.0",
     "@rollup/plugin-commonjs": "^28.0.9",
     "@rollup/plugin-json": "^6.1.0",
@@ -100,11 +100,11 @@
     "esbuild": "^0.27.0",
     "remix-flat-routes": "^0.8.5",
     "rollup": "^4.53.3",
-    "tsx": "^4.20.6",
+    "tsx": "^4.23.1",
     "typescript": "5.6.2",
     "vite": "^7.2.4",
     "vite-plugin-babel-macros": "^1.0.6",
     "vite-tsconfig-paths": "^5.1.4"
   },
-  "version": "2.13.0"
+  "version": "2.16.0"
 }

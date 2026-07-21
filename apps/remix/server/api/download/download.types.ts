@@ -30,3 +30,17 @@ export const ZDownloadDocumentRequestParamsSchema = z.object({
 });
 
 export type TDownloadDocumentRequestParams = z.infer<typeof ZDownloadDocumentRequestParamsSchema>;
+
+export const ZDownloadEnvelopeAuditLogPdfRequestParamsSchema = z.object({
+  envelopeId: z.string().describe('The ID of the envelope to download the audit log for.'),
+});
+
+export type TDownloadEnvelopeAuditLogPdfRequestParams = z.infer<typeof ZDownloadEnvelopeAuditLogPdfRequestParamsSchema>;
+
+export const ZDownloadEnvelopeCertificatePdfRequestParamsSchema = z.object({
+  envelopeId: z.string().describe('The ID of the envelope to download the certificate for.'),
+});
+
+export type TDownloadEnvelopeCertificatePdfRequestParams = z.infer<
+  typeof ZDownloadEnvelopeCertificatePdfRequestParamsSchema
+>;

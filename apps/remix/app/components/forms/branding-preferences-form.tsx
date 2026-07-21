@@ -1,7 +1,13 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import {
+  BRANDING_LOGO_ALLOWED_TYPES,
+  BRANDING_LOGO_MAX_SIZE_BYTES,
+  BRANDING_LOGO_MAX_SIZE_MB,
+} from '@documenso/lib/constants/branding';
 import { DEFAULT_BRAND_COLORS, DEFAULT_BRAND_RADIUS } from '@documenso/lib/constants/theme';
 import { ZCssVarsSchema } from '@documenso/lib/types/css-vars';
+import { normalizeBrandingColors } from '@documenso/lib/utils/normalize-branding-colors';
 import { cn } from '@documenso/ui/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@documenso/ui/primitives/accordion';
 import { Button } from '@documenso/ui/primitives/button';
@@ -18,18 +24,21 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { BrandingPreferencesResetDialog } from '~/components/dialogs/branding-preferences-reset-dialog';
 import { useOptionalCurrentTeam } from '~/providers/team';
 import { useCspNonce } from '~/utils/nonce';
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ACCEPTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+import { FormStickySaveBar } from './form-sticky-save-bar';
 
 const ZBrandingPreferencesFormSchema = z.object({
   brandingEnabled: z.boolean().nullable(),
   brandingLogo: z
     .instanceof(File)
-    .refine((file) => file.size <= MAX_FILE_SIZE, 'File size must be less than 5MB')
-    .refine((file) => ACCEPTED_FILE_TYPES.includes(file.type), 'Only .jpg, .png, and .webp files are accepted')
+    .refine(
+      (file) => file.size <= BRANDING_LOGO_MAX_SIZE_BYTES,
+      `File size must be less than ${BRANDING_LOGO_MAX_SIZE_MB}MB`,
+    )
+    .refine((file) => BRANDING_LOGO_ALLOWED_TYPES.includes(file.type), 'Only .jpg, .png, and .webp files are accepted')
     .nullish(),
   brandingUrl: z.string().url().optional().or(z.literal('')),
   brandingCompanyDetails: z.string().max(500).optional(),
@@ -67,41 +76,122 @@ export function BrandingPreferencesForm({
 
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [hasLoadedPreview, setHasLoadedPreview] = useState(false);
+  const [colorPickerKey, setColorPickerKey] = useState(0);
 
   const parsedColors = ZCssVarsSchema.safeParse(settings.brandingColors);
   const initialColors = parsedColors.success ? parsedColors.data : {};
 
+  // The saved state the form maps to. Used both as the reactive `values` source and as
+  // the explicit target for a Reset (see handleReset).
+  const savedValues: TBrandingPreferencesFormSchema = {
+    brandingEnabled: settings.brandingEnabled ?? null,
+    brandingUrl: settings.brandingUrl ?? '',
+    brandingLogo: undefined,
+    brandingCompanyDetails: settings.brandingCompanyDetails ?? '',
+    brandingColors: initialColors,
+    brandingCss: settings.brandingCss ?? '',
+  };
+
   const form = useForm<TBrandingPreferencesFormSchema>({
-    values: {
-      brandingEnabled: settings.brandingEnabled ?? null,
-      brandingUrl: settings.brandingUrl ?? '',
-      brandingLogo: undefined,
-      brandingCompanyDetails: settings.brandingCompanyDetails ?? '',
-      brandingColors: initialColors,
-      brandingCss: settings.brandingCss ?? '',
-    },
+    values: savedValues,
     resolver: zodResolver(ZBrandingPreferencesFormSchema),
   });
 
   const isBrandingEnabled = form.watch('brandingEnabled');
 
+  const hasResetBrandingColors =
+    settings.brandingColors === null ||
+    settings.brandingColors === undefined ||
+    (parsedColors.success && normalizeBrandingColors(parsedColors.data) === null);
+
+  // Only show the reset action when the saved settings actually differ from the
+  // defaults, so it never renders as a pointless disabled button.
+  const isResetToDefaultsVisible =
+    settings.brandingEnabled !== (canInherit ? null : false) ||
+    !!settings.brandingLogo ||
+    !!settings.brandingUrl ||
+    !!settings.brandingCompanyDetails ||
+    !!settings.brandingCss ||
+    !hasResetBrandingColors;
+
+  const handleResetToDefaults = async () => {
+    const data: TBrandingPreferencesFormSchema = {
+      brandingEnabled: canInherit ? null : false,
+      brandingLogo: null,
+      brandingUrl: '',
+      brandingCompanyDetails: '',
+      brandingColors: {},
+      brandingCss: '',
+    };
+
+    await onFormSubmit(data);
+
+    if (previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
+    setPreviewUrl('');
+    setColorPickerKey((key) => key + 1);
+    form.reset(data);
+  };
+
+  const getSavedLogoPreviewUrl = () => {
+    if (!settings.brandingLogo) {
+      return '';
+    }
+
+    const file = JSON.parse(settings.brandingLogo);
+
+    if (!('type' in file) || !('data' in file)) {
+      return '';
+    }
+
+    const logoUrl =
+      context === 'Team'
+        ? `${NEXT_PUBLIC_WEBAPP_URL()}/api/branding/logo/team/${team?.id}`
+        : `${NEXT_PUBLIC_WEBAPP_URL()}/api/branding/logo/organisation/${organisation?.id}`;
+
+    return `${logoUrl}?v=${Date.now()}`;
+  };
+
   useEffect(() => {
-    if (settings.brandingLogo) {
-      const file = JSON.parse(settings.brandingLogo);
+    const savedLogoPreviewUrl = getSavedLogoPreviewUrl();
 
-      if ('type' in file && 'data' in file) {
-        const logoUrl =
-          context === 'Team'
-            ? `${NEXT_PUBLIC_WEBAPP_URL()}/api/branding/logo/team/${team?.id}`
-            : `${NEXT_PUBLIC_WEBAPP_URL()}/api/branding/logo/organisation/${organisation?.id}`;
-
-        setPreviewUrl(logoUrl + '?v=' + Date.now());
-        setHasLoadedPreview(true);
-      }
+    if (savedLogoPreviewUrl) {
+      setPreviewUrl(savedLogoPreviewUrl);
     }
 
     setHasLoadedPreview(true);
   }, [settings.brandingLogo]);
+
+  // Reset the form to the saved values. The form is driven by the `values` prop (no
+  // `defaultValues`), so `reset()` with no argument doesn't re-baseline the dirty check;
+  // passing the saved values clears the per-field dirty tracking (dirtyFields).
+  const handleReset = () => {
+    setPreviewUrl(getSavedLogoPreviewUrl());
+    form.reset(savedValues);
+  };
+
+  // `formState.isDirty` is unreliable for a `values`-driven form: after a reset (or a
+  // save + refetch) it can stay true even though every field already matches its saved
+  // value and `dirtyFields` is empty. Derive the flag from `dirtyFields` instead so the
+  // sticky save bar reliably disappears.
+  const hasUnsavedChanges = Object.keys(form.formState.dirtyFields).length > 0;
+
+  // Re-baseline the form to the just-saved state after a successful submit. The `values`
+  // prop re-syncs most fields once the route refetches, but write-only fields (the logo
+  // is a File that isn't reflected back into `values`) would otherwise stay dirty and
+  // keep the save bar visible. Relies on the page handler rethrowing on error so we only
+  // re-baseline on success.
+  const handleFormSubmit = form.handleSubmit(async (data) => {
+    try {
+      await onFormSubmit(data);
+    } catch {
+      return;
+    }
+
+    form.reset(form.getValues());
+  });
 
   // Cleanup ObjectURL on unmount or when previewUrl changes
   useEffect(() => {
@@ -114,7 +204,7 @@ export function BrandingPreferencesForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onFormSubmit)}>
+      <form onSubmit={handleFormSubmit}>
         <fieldset className="flex h-full flex-col gap-y-4" disabled={form.formState.isSubmitting}>
           <FormField
             control={form.control}
@@ -167,7 +257,7 @@ export function BrandingPreferencesForm({
           />
 
           <div className="relative flex w-full flex-col gap-y-4">
-            {!isBrandingEnabled && <div className="absolute inset-0 z-[9998] bg-background/60" />}
+            {!isBrandingEnabled && <div className="absolute inset-0 z-30 bg-background/60" />}
 
             <FormField
               control={form.control}
@@ -199,7 +289,7 @@ export function BrandingPreferencesForm({
                       <FormControl className="relative">
                         <Input
                           type="file"
-                          accept={ACCEPTED_FILE_TYPES.join(',')}
+                          accept={BRANDING_LOGO_ALLOWED_TYPES.join(',')}
                           disabled={!isBrandingEnabled}
                           onChange={(e) => {
                             const file = e.target.files?.[0];
@@ -321,7 +411,7 @@ export function BrandingPreferencesForm({
 
           {hasAdvancedBranding && (
             <div className="relative flex w-full flex-col gap-y-6">
-              {!isBrandingEnabled && <div className="absolute inset-0 z-[9998] bg-background/60" />}
+              {!isBrandingEnabled && <div className="absolute inset-0 z-30 bg-background/60" />}
 
               <div>
                 <FormLabel>
@@ -346,6 +436,7 @@ export function BrandingPreferencesForm({
                         </FormDescription>
                         <FormControl>
                           <ColorPicker
+                            key={`background-${colorPickerKey}`}
                             nonce={nonce}
                             value={field.value ?? ''}
                             defaultValue={DEFAULT_BRAND_COLORS.background}
@@ -369,6 +460,7 @@ export function BrandingPreferencesForm({
                         </FormDescription>
                         <FormControl>
                           <ColorPicker
+                            key={`foreground-${colorPickerKey}`}
                             nonce={nonce}
                             value={field.value ?? ''}
                             defaultValue={DEFAULT_BRAND_COLORS.foreground}
@@ -392,6 +484,7 @@ export function BrandingPreferencesForm({
                         </FormDescription>
                         <FormControl>
                           <ColorPicker
+                            key={`primary-${colorPickerKey}`}
                             nonce={nonce}
                             value={field.value ?? ''}
                             defaultValue={DEFAULT_BRAND_COLORS.primary}
@@ -415,6 +508,7 @@ export function BrandingPreferencesForm({
                         </FormDescription>
                         <FormControl>
                           <ColorPicker
+                            key={`primary-foreground-${colorPickerKey}`}
                             nonce={nonce}
                             value={field.value ?? ''}
                             defaultValue={DEFAULT_BRAND_COLORS.primaryForeground}
@@ -438,6 +532,7 @@ export function BrandingPreferencesForm({
                         </FormDescription>
                         <FormControl>
                           <ColorPicker
+                            key={`border-${colorPickerKey}`}
                             nonce={nonce}
                             value={field.value ?? ''}
                             defaultValue={DEFAULT_BRAND_COLORS.border}
@@ -461,6 +556,7 @@ export function BrandingPreferencesForm({
                         </FormDescription>
                         <FormControl>
                           <ColorPicker
+                            key={`ring-${colorPickerKey}`}
                             nonce={nonce}
                             value={field.value ?? ''}
                             defaultValue={DEFAULT_BRAND_COLORS.ring}
@@ -538,11 +634,20 @@ export function BrandingPreferencesForm({
             </div>
           )}
 
-          <div className="flex flex-row justify-end space-x-4">
-            <Button type="submit" loading={form.formState.isSubmitting}>
-              <Trans>Update</Trans>
-            </Button>
-          </div>
+          <FormStickySaveBar
+            isDirty={hasUnsavedChanges}
+            isSubmitting={form.formState.isSubmitting}
+            onReset={handleReset}
+            resetToDefaults={
+              isResetToDefaultsVisible ? (
+                <BrandingPreferencesResetDialog
+                  hasAdvancedBranding={hasAdvancedBranding}
+                  isSubmitting={form.formState.isSubmitting}
+                  onReset={handleResetToDefaults}
+                />
+              ) : undefined
+            }
+          />
         </fieldset>
       </form>
     </Form>
