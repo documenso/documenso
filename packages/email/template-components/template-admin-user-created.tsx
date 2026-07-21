@@ -44,7 +44,7 @@ export const TemplateAdminUserCreated = ({ resetPasswordLink, assetBaseUrl }: Te
           <Text className="text-center text-muted-foreground text-sm">
             <Trans>
               If you didn't expect this account or have any questions, please{' '}
-              <Link href="mailto:mangelsona@datathink.dev" className="text-documenso-500">
+              <Link href="mailto:mangelsona@datathink.dev" className="text-primary">
                 contact support
               </Link>
               .
