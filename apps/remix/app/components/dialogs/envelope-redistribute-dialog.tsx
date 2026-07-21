@@ -25,14 +25,16 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentStatus, EnvelopeType, SigningStatus } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
 import * as z from 'zod';
 import { getDistributeErrorMessage } from '~/utils/toast-error-messages';
 import { StackAvatar } from '../general/stack-avatar';
 
 export type EnvelopeRedistributeDialogProps = {
-  envelope: Pick<TEnvelope, 'id' | 'userId' | 'teamId' | 'status' | 'type' | 'documentMeta'> & {
+  envelope: Pick<TEnvelope, 'id' | 'status' | 'type'> & {
     recipients: TEnvelopeRecipientLite[];
   };
+  envelopeType?: EnvelopeType;
   trigger?: React.ReactNode;
 };
 
@@ -44,7 +46,7 @@ export const ZEnvelopeRedistributeFormSchema = z.object({
 
 export type TEnvelopeRedistributeFormSchema = z.infer<typeof ZEnvelopeRedistributeFormSchema>;
 
-export const EnvelopeRedistributeDialog = ({ envelope, trigger }: EnvelopeRedistributeDialogProps) => {
+export const EnvelopeRedistributeDialog = ({ envelope, envelopeType, trigger }: EnvelopeRedistributeDialogProps) => {
   const recipients = envelope.recipients;
 
   const { toast } = useToast();
@@ -70,9 +72,23 @@ export const EnvelopeRedistributeDialog = ({ envelope, trigger }: EnvelopeRedist
     try {
       await redistributeEnvelope({ envelopeId: envelope.id, recipients });
 
+      const successMessage = match(envelopeType)
+        .with(EnvelopeType.DOCUMENT, () => ({
+          title: t`Document resent`,
+          description: t`Your document has been resent successfully.`,
+        }))
+        .with(EnvelopeType.TEMPLATE, () => ({
+          title: t`Template resent`,
+          description: t`Your template has been resent successfully.`,
+        }))
+        .otherwise(() => ({
+          title: t`Envelope resent`,
+          description: t`Your envelope has been resent successfully.`,
+        }));
+
       toast({
-        title: t`Envelope resent`,
-        description: t`Your envelope has been resent successfully.`,
+        title: successMessage.title,
+        description: successMessage.description,
         duration: 5000,
       });
 

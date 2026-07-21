@@ -32,6 +32,10 @@ export const getDirectTemplateErrorMessage = (code: string): ToastMessageDescrip
   return match(code)
     .with('RECIPIENT_LIMIT_EXCEEDED', () => RECIPIENT_LIMIT_EXCEEDED_ERROR_MESSAGE)
     .with(AppErrorCode.TOO_MANY_REQUESTS, () => FAIR_USE_LIMIT_EXCEEDED_ERROR_MESSAGE)
+    .with(AppErrorCode.MISSING_SIGNATURE_FIELD, () => ({
+      title: msg`Missing signature fields`,
+      description: msg`This direct link template cannot be used because one or more signers do not have a signature field assigned.`,
+    }))
     .otherwise(() => ({
       title: msg`Something went wrong`,
       description: msg`We were unable to submit this document at this time. Please try again later.`,
@@ -76,6 +80,10 @@ export const getTemplateUseErrorMessage = (code: string): ToastMessageDescriptor
     .with('DOCUMENT_SEND_FAILED', () => ({
       title: msg`Error`,
       description: msg`The document was created but could not be sent to recipients.`,
+    }))
+    .with(AppErrorCode.MISSING_SIGNATURE_FIELD, () => ({
+      title: msg`Missing signature fields`,
+      description: msg`The document could not be sent because some signers do not have a signature field. Please edit the template and add a signature field for each signer.`,
     }))
     .with(AppErrorCode.INVALID_BODY, AppErrorCode.INVALID_REQUEST, () => ({
       title: msg`Error`,
