@@ -483,7 +483,7 @@ The API returns standard HTTP status codes and JSON error responses:
 
 ### Handling Rate Limits
 
-The API allows 100 requests per minute per IP address. When rate limited, wait at least 60 seconds before retrying:
+The API allows 1000 requests per minute per IP address. Your organisation may have its own lower rate limits. When rate limited, wait at least 60 seconds before retrying:
 
 ```javascript
 async function fetchWithRetry(url, options, maxRetries = 3) {

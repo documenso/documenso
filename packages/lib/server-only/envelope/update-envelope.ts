@@ -15,7 +15,10 @@ import { createDocumentAuthOptions, extractDocumentAuthMethods } from '../../uti
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { buildTeamWhereQuery, canAccessTeamDocument } from '../../utils/teams';
 import { recomputeNextReminderForEnvelope } from '../recipient/update-recipient-next-reminder';
+import { assertCompatibleDictateNextSigner } from '../signature-level/assert-compatible-dictate-next-signer';
+import { assertCompatibleSigningOrder } from '../signature-level/assert-compatible-signing-order';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
+import { assertEnvelopeMutable } from './assert-envelope-mutable';
 import { getEnvelopeWhereInput } from './get-envelope-by-id';
 
 export type UpdateEnvelopeOptions = {
@@ -73,6 +76,22 @@ export const updateEnvelope = async ({
   if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Envelope not found',
+    });
+  }
+
+  assertEnvelopeMutable(envelope);
+
+  if (meta.signingOrder !== undefined) {
+    assertCompatibleSigningOrder({
+      signatureLevel: envelope.signatureLevel,
+      signingOrder: meta.signingOrder,
+    });
+  }
+
+  if (meta.allowDictateNextSigner !== undefined) {
+    assertCompatibleDictateNextSigner({
+      signatureLevel: envelope.signatureLevel,
+      allowDictateNextSigner: meta.allowDictateNextSigner,
     });
   }
 
@@ -297,6 +316,8 @@ export const updateEnvelope = async ({
   // }
 
   const updatedEnvelope = await prisma.$transaction(async (tx) => {
+    await assertEnvelopeMutable(envelope, tx);
+
     const result = await tx.envelope.update({
       where: {
         id: envelope.id,

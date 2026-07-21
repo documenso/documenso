@@ -2,7 +2,7 @@ import { mailer } from '@documenso/email/mailer';
 import { OrganisationAccountLinkConfirmationTemplate } from '@documenso/email/templates/organisation-account-link-confirmation';
 import { getI18nInstance } from '@documenso/lib/client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { DOCUMENSO_INTERNAL_EMAIL } from '@documenso/lib/constants/email';
+import { KEEPCONTRACTS_INTERNAL_EMAIL } from '@documenso/lib/constants/email';
 import { ORGANISATION_ACCOUNT_LINK_VERIFICATION_TOKEN_IDENTIFIER } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEmailContext } from '@documenso/lib/server-only/email/get-email-context';
@@ -78,7 +78,7 @@ export const sendOrganisationAccountLinkConfirmationEmail = async ({
   // We only take `emailLanguage` here and intentionally ignore the resolved
   // `emailTransport`/`senderEmail`. Unlike other INTERNAL emails, this is an
   // auth-critical SSO account creation/linking confirmation: it must always be
-  // delivered from trusted Documenso infrastructure (see the `mailer.sendMail`
+  // delivered from trusted KeepContracts infrastructure (see the `mailer.sendMail`
   // below). Routing it through the organisation's own (potentially
   // misconfigured) transport could block account linking and lock users out of
   // their own SSO setup.
@@ -108,7 +108,7 @@ export const sendOrganisationAccountLinkConfirmationEmail = async ({
 
   const i18n = await getI18nInstance(emailLanguage);
 
-  // Deliberately uses the global Documenso mailer + internal sender (not the
+  // Deliberately uses the global KeepContracts mailer + internal sender (not the
   // organisation's configured email transport) so auth/SSO confirmation mail is
   // always sent from trusted, controlled infrastructure. See the note on the
   // getEmailContext call above.
@@ -117,7 +117,7 @@ export const sendOrganisationAccountLinkConfirmationEmail = async ({
       address: user.email,
       name: user.name || '',
     },
-    from: DOCUMENSO_INTERNAL_EMAIL,
+    from: KEEPCONTRACTS_INTERNAL_EMAIL,
     subject: type === 'create' ? i18n._(msg`Account creation request`) : i18n._(msg`Account linking request`),
     html,
     text,

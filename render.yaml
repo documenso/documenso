@@ -10,7 +10,7 @@ services:
     envVars:
       # Node Version
       - key: NODE_VERSION
-        value: 18.17.0
+        value: 22.13.0
 
       - key: PORT
         value: 10000
@@ -162,6 +162,18 @@ services:
       - key: NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP
         sync: false
       - key: NEXT_PUBLIC_DISABLE_OIDC_SIGNUP
+        sync: false
+      - key: NEXT_PUBLIC_DISABLE_SIGNIN
+        sync: false
+      - key: NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNIN
+        sync: false
+      - key: NEXT_PUBLIC_DISABLE_GOOGLE_SIGNIN
+        sync: false
+      - key: NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN
+        sync: false
+      - key: NEXT_PUBLIC_DISABLE_OIDC_SIGNIN
+        sync: false
+      - key: NEXT_PUBLIC_DISABLE_OIDC_AUTO_REDIRECT
         sync: false
       - key: NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS
         sync: false

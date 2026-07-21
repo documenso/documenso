@@ -1,8 +1,7 @@
-import communityCardsImage from '@documenso/assets/images/community-cards.png';
 import { authClient } from '@documenso/auth/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
-import { ZNameSchema } from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { ZNameSchema } from '@documenso/lib/types/name';
 import { env } from '@documenso/lib/utils/env';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
@@ -26,8 +25,6 @@ import { FaIdCardClip } from 'react-icons/fa6';
 import { FcGoogle } from 'react-icons/fc';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { z } from 'zod';
-
-import { UserProfileTimur } from '~/components/general/user-profile-timur';
 
 export const ZSignUpFormSchema = z
   .object({
@@ -96,7 +93,7 @@ export const SignUpForm = ({
       password: '',
       signature: '',
     },
-    mode: 'onBlur',
+    mode: 'onChange',
     resolver: zodResolver(ZSignUpFormSchema),
   });
 
@@ -208,45 +205,75 @@ export const SignUpForm = ({
 
   return (
     <div className={cn('flex justify-center gap-x-12', className)}>
-      <div className="relative hidden flex-1 overflow-hidden rounded-xl border border-border xl:flex">
-        <div className="absolute -inset-8 -z-[2] backdrop-blur">
-          <img
-            src={communityCardsImage}
-            alt="community-cards"
-            className="h-full w-full object-cover dark:brightness-95 dark:contrast-[70%] dark:invert"
-          />
-        </div>
-
-        <div className="absolute -inset-8 -z-[1] bg-background/50 backdrop-blur-[2px]" />
-
-        <div className="relative flex h-full w-full flex-col items-center justify-evenly">
-          <div className="rounded-2xl border bg-background px-4 py-1 font-medium text-sm">
-            <Trans>User profiles are here!</Trans>
-          </div>
-
-          <div className="w-full max-w-md">
-            <UserProfileTimur rows={2} className="rounded-2xl border border-border bg-background shadow-md" />
-          </div>
-
-          <div />
-        </div>
-      </div>
-
       <div className="relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border border-border bg-neutral-100 p-6 dark:bg-background">
-        <div className="h-20">
+        <div className="pb-6">
           <h1 className="font-semibold text-xl md:text-2xl">
             <Trans>Create a new account</Trans>
           </h1>
 
-          <p className="mt-2 text-muted-foreground text-xs md:text-sm">
+          <p className="mt-2 text-muted-foreground text-sm">
             <Trans>
-              Create your account and start using state-of-the-art document signing. Open and beautiful signing is
-              within your grasp.
+              Already have an account?{' '}
+              <Link to="/signin" className="text-primary duration-200 hover:opacity-70">
+                Sign in instead
+              </Link>
             </Trans>
           </p>
         </div>
 
-        <hr className="-mx-6 my-4" />
+        <div className="flex flex-col gap-y-2">
+          {isGoogleSignupEnabled && (
+            <Button
+              type="button"
+              size="lg"
+              variant={'outline'}
+              className="border bg-background text-muted-foreground"
+              disabled={isSubmitting}
+              onClick={onSignUpWithGoogleClick}
+            >
+              <FcGoogle className="mr-2 h-5 w-5" />
+              <Trans>Sign Up with Google</Trans>
+            </Button>
+          )}
+
+          {isMicrosoftSignupEnabled && (
+            <Button
+              type="button"
+              size="lg"
+              variant={'outline'}
+              className="border bg-background text-muted-foreground"
+              disabled={isSubmitting}
+              onClick={onSignUpWithMicrosoftClick}
+            >
+              <img className="mr-2 h-4 w-4" alt="Microsoft Logo" src={'/static/microsoft.svg'} />
+              <Trans>Sign Up with Microsoft</Trans>
+            </Button>
+          )}
+
+          {isOidcSignupEnabled && (
+            <Button
+              type="button"
+              size="lg"
+              variant={'outline'}
+              className="border bg-background text-muted-foreground"
+              disabled={isSubmitting}
+              onClick={onSignUpWithOIDCClick}
+            >
+              <FaIdCardClip className="mr-2 h-5 w-5" />
+              <Trans>Sign Up with OIDC</Trans>
+            </Button>
+          )}
+        </div>
+
+        {hasSocialAuthEnabled && (
+          <div className="relative flex items-center justify-center gap-x-4 py-4 text-xs uppercase">
+            <div className="h-px flex-1 bg-border" />
+            <span className="bg-transparent text-muted-foreground">
+              <Trans>Or</Trans>
+            </span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+        )}
 
         <Form {...form}>
           <form className="flex w-full flex-1 flex-col gap-y-4" onSubmit={form.handleSubmit(onFormSubmit)}>
@@ -313,6 +340,7 @@ export const SignUpForm = ({
                         </FormLabel>
                         <FormControl>
                           <SignaturePadDialog
+                            className="aspect-[16/5]"
                             disabled={isSubmitting}
                             value={value}
                             onChange={(v) => onChange(v ?? '')}
@@ -336,67 +364,6 @@ export const SignUpForm = ({
                   }}
                 />
               )}
-
-              {hasSocialAuthEnabled && (
-                <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-                  <div className="h-px flex-1 bg-border" />
-                  <span className="bg-transparent text-muted-foreground">
-                    <Trans>Or</Trans>
-                  </span>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
-              )}
-
-              {isGoogleSignupEnabled && (
-                <Button
-                  type="button"
-                  size="lg"
-                  variant={'outline'}
-                  className="border bg-background text-muted-foreground"
-                  disabled={isSubmitting}
-                  onClick={onSignUpWithGoogleClick}
-                >
-                  <FcGoogle className="mr-2 h-5 w-5" />
-                  <Trans>Sign Up with Google</Trans>
-                </Button>
-              )}
-
-              {isMicrosoftSignupEnabled && (
-                <Button
-                  type="button"
-                  size="lg"
-                  variant={'outline'}
-                  className="border bg-background text-muted-foreground"
-                  disabled={isSubmitting}
-                  onClick={onSignUpWithMicrosoftClick}
-                >
-                  <img className="mr-2 h-4 w-4" alt="Microsoft Logo" src={'/static/microsoft.svg'} />
-                  <Trans>Sign Up with Microsoft</Trans>
-                </Button>
-              )}
-
-              {isOidcSignupEnabled && (
-                <Button
-                  type="button"
-                  size="lg"
-                  variant={'outline'}
-                  className="border bg-background text-muted-foreground"
-                  disabled={isSubmitting}
-                  onClick={onSignUpWithOIDCClick}
-                >
-                  <FaIdCardClip className="mr-2 h-5 w-5" />
-                  <Trans>Sign Up with OIDC</Trans>
-                </Button>
-              )}
-
-              <p className="mt-4 text-muted-foreground text-sm">
-                <Trans>
-                  Already have an account?{' '}
-                  <Link to="/signin" className="text-documenso-700 duration-200 hover:opacity-70">
-                    Sign in instead
-                  </Link>
-                </Trans>
-              </p>
             </fieldset>
 
             {isEmailPasswordSignupEnabled && (
@@ -406,27 +373,6 @@ export const SignUpForm = ({
             )}
           </form>
         </Form>
-        <p className="mt-6 text-muted-foreground text-xs">
-          <Trans>
-            By proceeding, you agree to our{' '}
-            <Link
-              to="https://documen.so/terms"
-              target="_blank"
-              className="text-documenso-700 duration-200 hover:opacity-70"
-            >
-              Terms of Service
-            </Link>{' '}
-            and{' '}
-            <Link
-              to="https://documen.so/privacy"
-              target="_blank"
-              className="text-documenso-700 duration-200 hover:opacity-70"
-            >
-              Privacy Policy
-            </Link>
-            .
-          </Trans>
-        </p>
       </div>
     </div>
   );

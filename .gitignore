@@ -79,3 +79,6 @@ tmp/
 deploy/gcp/config.sh
 deploy/gcp/*.p12
 deploy/gcp/*.pem
+
+# local dev signing certificate — never commit
+certs/

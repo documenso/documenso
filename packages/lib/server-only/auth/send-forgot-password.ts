@@ -6,7 +6,7 @@ import { createElement } from 'react';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { env } from '../../utils/env';
+import { KEEPCONTRACTS_INTERNAL_EMAIL } from '../../constants/email';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
 export interface SendForgotPasswordOptions {
@@ -56,10 +56,7 @@ export const sendForgotPassword = async ({ userId }: SendForgotPasswordOptions) 
       address: user.email,
       name: user.name || '',
     },
-    from: {
-      name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
-      address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@keepcontracts.com',
-    },
+    from: KEEPCONTRACTS_INTERNAL_EMAIL,
     subject: i18n._(msg`Forgot Password?`),
     html,
     text,

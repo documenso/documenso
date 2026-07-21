@@ -9,7 +9,7 @@ import { createElement } from 'react';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
-import { DOCUMENSO_INTERNAL_EMAIL } from '../../../constants/email';
+import { KEEPCONTRACTS_INTERNAL_EMAIL } from '../../../constants/email';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
@@ -77,7 +77,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmail
 
   // Send confirmation email to the recipient who rejected.
   // Skipped when the organisation has email sending disabled, since this is sent on its behalf.
-  // The owner notification below intentionally uses the internal Documenso email, so it still sends.
+  // The owner notification below intentionally uses the internal KeepContracts email, so it still sends.
   if (!emailsDisabled && isRecipientEmailValidForSending(recipient)) {
     await io.runTask('send-rejection-confirmation-email', async () => {
       const recipientTemplate = createElement(DocumentRejectionConfirmedEmail, {
@@ -135,7 +135,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmail
         name: documentOwner.name || '',
         address: documentOwner.email,
       },
-      from: DOCUMENSO_INTERNAL_EMAIL, // Purposefully using internal email here.
+      from: KEEPCONTRACTS_INTERNAL_EMAIL, // Purposefully using internal email here.
       subject: i18n._(msg`Document "${envelope.title}" - Rejected by ${recipient.name}`),
       html,
       text,

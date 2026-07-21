@@ -6,7 +6,7 @@ import { createElement } from 'react';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { DOCUMENSO_INTERNAL_EMAIL, USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER } from '../../constants/email';
+import { KEEPCONTRACTS_INTERNAL_EMAIL, USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER } from '../../constants/email';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
 export interface SendConfirmationEmailProps {
@@ -57,7 +57,7 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
       address: user.email,
       name: user.name || '',
     },
-    from: DOCUMENSO_INTERNAL_EMAIL,
+    from: KEEPCONTRACTS_INTERNAL_EMAIL,
     subject: i18n._(msg`Please confirm your email`),
     html,
     text,
