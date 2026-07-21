@@ -11,8 +11,13 @@ Documenso enforces rate limits on all API endpoints to ensure service stability.
 
 ## HTTP Rate Limits
 
-**Limit:** 100 requests per minute per IP address  
+**Limit:** 1000 requests per minute per IP address  
 **Response:** 429 Too Many Requests
+
+<Callout type="info">
+  This is the global per-IP ceiling. Your organisation may have its own rate limits configured below
+  this value, in which case you can be rate-limited before reaching the global limit.
+</Callout>
 
 ### Rate Limit Response
 
