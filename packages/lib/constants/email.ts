@@ -3,7 +3,7 @@ import { env } from '../utils/env';
 export const FROM_ADDRESS = env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@keepcontracts.com';
 export const FROM_NAME = env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Keep Contracts';
 
-export const DOCUMENSO_INTERNAL_EMAIL = {
+export const KEEPCONTRACTS_INTERNAL_EMAIL = {
   name: FROM_NAME,
   address: FROM_ADDRESS,
 };

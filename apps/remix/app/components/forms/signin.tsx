@@ -326,6 +326,62 @@ export const SignInForm = ({
     <Form {...form}>
       <form className={cn('flex w-full flex-col gap-y-4', className)} onSubmit={form.handleSubmit(onFormSubmit)}>
         <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting || isPasskeyLoading}>
+          {!isEmbeddedRedirect && (
+            <>
+              {isGoogleSSOEnabled && (
+                <Button
+                  type="button"
+                  size="lg"
+                  variant="outline"
+                  className="border bg-background text-muted-foreground"
+                  disabled={isSubmitting}
+                  onClick={onSignInWithGoogleClick}
+                >
+                  <FcGoogle className="mr-2 h-5 w-5" />
+                  Google
+                </Button>
+              )}
+
+              {isMicrosoftSSOEnabled && (
+                <Button
+                  type="button"
+                  size="lg"
+                  variant="outline"
+                  className="border bg-background text-muted-foreground"
+                  disabled={isSubmitting}
+                  onClick={onSignInWithMicrosoftClick}
+                >
+                  <img className="mr-2 h-4 w-4" alt="Microsoft Logo" src={'/static/microsoft.svg'} />
+                  Microsoft
+                </Button>
+              )}
+
+              {isOIDCSSOEnabled && (
+                <Button
+                  type="button"
+                  size="lg"
+                  variant="outline"
+                  className="border bg-background text-muted-foreground"
+                  disabled={isSubmitting}
+                  onClick={onSignInWithOIDCClick}
+                >
+                  <FaIdCardClip className="mr-2 h-5 w-5" />
+                  {oidcProviderLabel || 'OIDC'}
+                </Button>
+              )}
+
+              {isEmailPasswordSigninEnabled && hasSocialAuthEnabled && (
+                <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
+                  <div className="h-px flex-1 bg-border" />
+                  <span className="bg-transparent text-muted-foreground">
+                    <Trans>Or</Trans>
+                  </span>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
+              )}
+            </>
+          )}
+
           {isEmailPasswordSigninEnabled && (
             <>
               <FormField
@@ -392,62 +448,6 @@ export const SignInForm = ({
               >
                 {isSubmitting ? <Trans>Signing in...</Trans> : <Trans>Sign In</Trans>}
               </Button>
-            </>
-          )}
-
-          {!isEmbeddedRedirect && (
-            <>
-              {isEmailPasswordSigninEnabled && hasSocialAuthEnabled && (
-                <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-                  <div className="h-px flex-1 bg-border" />
-                  <span className="bg-transparent text-muted-foreground">
-                    <Trans>Or continue with</Trans>
-                  </span>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
-              )}
-
-              {isGoogleSSOEnabled && (
-                <Button
-                  type="button"
-                  size="lg"
-                  variant="outline"
-                  className="border bg-background text-muted-foreground"
-                  disabled={isSubmitting}
-                  onClick={onSignInWithGoogleClick}
-                >
-                  <FcGoogle className="mr-2 h-5 w-5" />
-                  Google
-                </Button>
-              )}
-
-              {isMicrosoftSSOEnabled && (
-                <Button
-                  type="button"
-                  size="lg"
-                  variant="outline"
-                  className="border bg-background text-muted-foreground"
-                  disabled={isSubmitting}
-                  onClick={onSignInWithMicrosoftClick}
-                >
-                  <img className="mr-2 h-4 w-4" alt="Microsoft Logo" src={'/static/microsoft.svg'} />
-                  Microsoft
-                </Button>
-              )}
-
-              {isOIDCSSOEnabled && (
-                <Button
-                  type="button"
-                  size="lg"
-                  variant="outline"
-                  className="border bg-background text-muted-foreground"
-                  disabled={isSubmitting}
-                  onClick={onSignInWithOIDCClick}
-                >
-                  <FaIdCardClip className="mr-2 h-5 w-5" />
-                  {oidcProviderLabel || 'OIDC'}
-                </Button>
-              )}
             </>
           )}
 

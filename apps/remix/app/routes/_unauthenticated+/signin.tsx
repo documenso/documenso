@@ -137,9 +137,9 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
         <p className="mt-2 text-muted-foreground text-sm">
           <Trans>Enter your credentials to access your account</Trans>
         </p>
-        <hr className="-mx-6 my-4" />
 
         <SignInForm
+          className="mt-4"
           isEmailPasswordSigninEnabled={isEmailPasswordSigninEnabled}
           isGoogleSSOEnabled={isGoogleSSOEnabled}
           isMicrosoftSSOEnabled={isMicrosoftSSOEnabled}

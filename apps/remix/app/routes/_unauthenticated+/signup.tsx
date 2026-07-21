@@ -54,7 +54,7 @@ export default function SignUp({ loaderData }: Route.ComponentProps) {
 
   return (
     <SignUpForm
-      className="w-screen max-w-screen-2xl px-4 md:px-16 lg:-my-16"
+      className="w-screen max-w-screen-2xl px-4 md:px-16"
       isEmailPasswordSignupEnabled={isEmailPasswordSignupEnabled}
       isGoogleSignupEnabled={isGoogleSignupEnabled}
       isMicrosoftSignupEnabled={isMicrosoftSignupEnabled}

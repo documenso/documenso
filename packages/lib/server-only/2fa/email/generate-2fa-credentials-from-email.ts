@@ -4,7 +4,7 @@ import { createTOTPKeyURI } from 'oslo/otp';
 
 import { DOCUMENSO_ENCRYPTION_KEY } from '../../../constants/crypto';
 
-const ISSUER = 'Documenso Email 2FA';
+const ISSUER = 'Keep Contracts Email 2FA';
 
 export type GenerateTwoFactorCredentialsFromEmailOptions = {
   envelopeId: string;

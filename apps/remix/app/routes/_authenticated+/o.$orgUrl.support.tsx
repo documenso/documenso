@@ -63,33 +63,6 @@ export default function SupportPage() {
               <Trans>Read our documentation to get started with Keep Contracts.</Trans>
             </p>
           </div>
-          <div className="rounded-lg border p-4">
-            <h2 className="flex items-center gap-2 font-bold text-lg">
-              <Link2Icon className="h-5 w-5 text-muted-foreground" />
-              <Link
-                to="https://documen.so/discord"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:underline"
-              >
-                <Trans>Discord</Trans>
-              </Link>
-            </h2>
-            <p className="mt-1 text-muted-foreground">
-              <Trans>
-                Join our community on{' '}
-                <Link
-                  to="https://documen.so/discord"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:underline"
-                >
-                  Discord
-                </Link>{' '}
-                for community support and discussion.
-              </Trans>
-            </p>
-          </div>
           {organisation && IS_BILLING_ENABLED() && subscriptionStatus && (
             <div className="rounded-lg border p-4">
               <h2 className="flex items-center gap-2 font-bold text-lg">

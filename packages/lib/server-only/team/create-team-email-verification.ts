@@ -138,7 +138,7 @@ export const sendTeamEmailVerificationEmail = async (email: string, token: strin
   await emailTransport.sendMail({
     to: email,
     from: senderEmail,
-    subject: i18n._(msg`A request to use your email has been initiated by ${team.name} on Documenso`),
+    subject: i18n._(msg`A request to use your email has been initiated by ${team.name} on Keep Contracts`),
     html,
     text,
   });

@@ -13,7 +13,7 @@ import type { Transporter } from 'nodemailer';
 import { match, P } from 'ts-pattern';
 
 import { IS_BILLING_ENABLED } from '../../constants/app';
-import { DOCUMENSO_INTERNAL_EMAIL } from '../../constants/email';
+import { KEEPCONTRACTS_INTERNAL_EMAIL } from '../../constants/email';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { logger } from '../../utils/logger';
 import {
@@ -107,7 +107,7 @@ export const getEmailContext = async (options: GetEmailContextOptions): Promise<
 
   // A configured transport that fails to resolve is an operational problem, not
   // "no transport". Surface it (alertable) before silently falling back to the
-  // system mailer + Documenso sender, so the degraded organisation is findable.
+  // system mailer + KeepContracts sender, so the degraded organisation is findable.
   if (emailContext.claims.emailTransportId && !transportResolution) {
     logger.error({
       msg: 'Configured email transport could not be resolved; falling back to the system mailer',
@@ -123,8 +123,8 @@ export const getEmailContext = async (options: GetEmailContextOptions): Promise<
         transport: transportResolution.transporter,
       }
     : {
-        name: DOCUMENSO_INTERNAL_EMAIL.name,
-        address: DOCUMENSO_INTERNAL_EMAIL.address,
+        name: KEEPCONTRACTS_INTERNAL_EMAIL.name,
+        address: KEEPCONTRACTS_INTERNAL_EMAIL.address,
         transport: mailer,
       };
 
@@ -147,7 +147,7 @@ export const getEmailContext = async (options: GetEmailContextOptions): Promise<
   const senderEmailId = match(meta?.emailId)
     .with(P.string, (emailId) => emailId) // Explicit string means to use the provided email ID.
     .with(undefined, () => emailContext.settings.emailId) // Undefined means to use the inherited email ID.
-    .with(null, () => null) // Explicit null means to use the Documenso email.
+    .with(null, () => null) // Explicit null means to use the KeepContracts email.
     .exhaustive();
 
   const foundSenderEmail = emailContext.allowedEmails.find((email) => email.id === senderEmailId);

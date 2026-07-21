@@ -7,7 +7,7 @@ import { msg } from '@lingui/core/macro';
 import { createElement } from 'react';
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
-import { DOCUMENSO_INTERNAL_EMAIL } from '../../../constants/email';
+import { KEEPCONTRACTS_INTERNAL_EMAIL } from '../../../constants/email';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '../../../constants/organisations';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { INTERNAL_CLAIM_ID } from '../../../types/subscription';
@@ -124,7 +124,7 @@ export const run = async ({
   await io.runTask('send-organisation-limit-alert-support-email', async () => {
     await mailer.sendMail({
       to: SUPPORT_EMAIL,
-      from: DOCUMENSO_INTERNAL_EMAIL,
+      from: KEEPCONTRACTS_INTERNAL_EMAIL,
       subject: i18n._(supportSubject),
       text: `
         Organisation: ${organisation.name}

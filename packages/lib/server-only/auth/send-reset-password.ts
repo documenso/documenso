@@ -4,7 +4,7 @@ import { prisma } from '@documenso/prisma';
 import { createElement } from 'react';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { env } from '../../utils/env';
+import { KEEPCONTRACTS_INTERNAL_EMAIL } from '../../constants/email';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
 export interface SendResetPasswordOptions {
@@ -36,10 +36,7 @@ export const sendResetPassword = async ({ userId }: SendResetPasswordOptions) =>
       address: user.email,
       name: user.name || '',
     },
-    from: {
-      name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
-      address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@keepcontracts.com',
-    },
+    from: KEEPCONTRACTS_INTERNAL_EMAIL,
     subject: 'Password Reset Success!',
     html,
     text,
