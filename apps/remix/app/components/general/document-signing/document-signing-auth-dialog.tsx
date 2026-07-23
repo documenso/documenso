@@ -13,6 +13,7 @@ import { match, P } from 'ts-pattern';
 
 import { DocumentSigningAuth2FA } from './document-signing-auth-2fa';
 import { DocumentSigningAuthAccount } from './document-signing-auth-account';
+import { DocumentSigningAuthExternal2FA } from './document-signing-auth-external-2fa';
 import { DocumentSigningAuthPasskey } from './document-signing-auth-passkey';
 import { DocumentSigningAuthPassword } from './document-signing-auth-password';
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
@@ -58,15 +59,8 @@ export const DocumentSigningAuthDialog = ({
       return;
     }
 
-    // Reset selected auth type when dialog closes
     if (!value) {
-      setSelectedAuthType(() => {
-        if (validAuthTypes.length === 1) {
-          return validAuthTypes[0];
-        }
-
-        return null;
-      });
+      setSelectedAuthType(validAuthTypes.length === 1 ? validAuthTypes[0] : null);
     }
 
     onOpenChange(value);
@@ -123,6 +117,7 @@ export const DocumentSigningAuthDialog = ({
                         .with(DocumentAuth.ACCOUNT, () => <Trans>Account</Trans>)
                         .with(DocumentAuth.PASSKEY, () => <Trans>Passkey</Trans>)
                         .with(DocumentAuth.TWO_FACTOR_AUTH, () => <Trans>2FA</Trans>)
+                        .with(DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH, () => <Trans>Verification code</Trans>)
                         .with(DocumentAuth.PASSWORD, () => <Trans>Password</Trans>)
                         .exhaustive()}
                     </div>
@@ -132,6 +127,9 @@ export const DocumentSigningAuthDialog = ({
                         .with(DocumentAuth.ACCOUNT, () => <Trans>Sign in to your account</Trans>)
                         .with(DocumentAuth.PASSKEY, () => <Trans>Use your passkey for authentication</Trans>)
                         .with(DocumentAuth.TWO_FACTOR_AUTH, () => <Trans>Enter your 2FA code</Trans>)
+                        .with(DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH, () => (
+                          <Trans>Enter the verification code provided to you</Trans>
+                        ))
                         .with(DocumentAuth.PASSWORD, () => <Trans>Enter your password</Trans>)
                         .exhaustive()}
                     </div>
@@ -164,6 +162,13 @@ export const DocumentSigningAuthDialog = ({
             ))
             .with({ documentAuthType: DocumentAuth.PASSWORD }, () => (
               <DocumentSigningAuthPassword
+                open={open}
+                onOpenChange={onOpenChange}
+                onReauthFormSubmit={onReauthFormSubmit}
+              />
+            ))
+            .with({ documentAuthType: DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH }, () => (
+              <DocumentSigningAuthExternal2FA
                 open={open}
                 onOpenChange={onOpenChange}
                 onReauthFormSubmit={onReauthFormSubmit}
