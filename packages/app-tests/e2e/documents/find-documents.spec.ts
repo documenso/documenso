@@ -807,8 +807,8 @@ test.describe('Find Documents UI - Data Isolation & No Leaking', () => {
     await checkDocumentTabCount(page, 'Draft', 1);
     await checkDocumentTabCount(page, 'Completed', 1);
 
-    // Verify no B docs leaked
-    await page.getByRole('tab', { name: 'All' }).click();
+    // Verify no B docs leaked (default view shows all statuses)
+    await page.goto(`/t/${teamA.url}/documents`);
     await expect(page.getByRole('link', { name: 'A Own Draft' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'B Draft Private', exact: true })).not.toBeVisible();
     await expect(page.getByRole('link', { name: 'B Pending Private', exact: true })).not.toBeVisible();
@@ -1156,7 +1156,7 @@ test.describe('Find Documents UI - Sender Filter', () => {
     await checkDocumentTabCount(page, 'All', 3);
 
     // Filter by member1
-    await page.locator('button').filter({ hasText: 'Sender: All' }).click();
+    await page.getByRole('button', { name: /Sender/ }).click();
     await page.getByRole('option', { name: member1.name ?? '' }).click();
     await page.waitForURL(/senderIds/);
 
