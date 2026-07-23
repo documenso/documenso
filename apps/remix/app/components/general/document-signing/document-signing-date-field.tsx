@@ -4,6 +4,8 @@ import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/tr
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { ZDateFieldMeta } from '@documenso/lib/types/field-meta';
+import { getFieldRenderFontFamily } from '@documenso/lib/universal/field-fonts';
+import { getFieldTextStyle } from '@documenso/lib/universal/field-text-style';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -144,6 +146,10 @@ export const DocumentSigningDateField = ({
       {field.inserted && (
         <div className="flex h-full w-full items-center">
           <p
+            style={{
+              fontFamily: getFieldRenderFontFamily(parsedFieldMeta?.fontFamily),
+              ...getFieldTextStyle(parsedFieldMeta),
+            }}
             className={cn(
               'w-full whitespace-nowrap text-left text-[clamp(0.425rem,25cqw,0.825rem)] text-foreground duration-200',
               {

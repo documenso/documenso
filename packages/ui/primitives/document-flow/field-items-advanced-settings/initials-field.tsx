@@ -5,6 +5,7 @@ import { Label } from '@documenso/ui/primitives/label';
 import { Trans, useLingui } from '@lingui/react/macro';
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../select';
+import { TextStyleControls } from './text-style-controls';
 
 type InitialsFieldAdvancedSettingsProps = {
   fieldState: InitialsFieldMeta;
@@ -48,6 +49,8 @@ export const InitialsFieldAdvancedSettings = ({
           max={96}
         />
       </div>
+
+      <TextStyleControls fieldState={fieldState} onChange={handleInput} />
 
       <div>
         <Label>

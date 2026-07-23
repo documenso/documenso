@@ -5,6 +5,8 @@ import { Label } from '@documenso/ui/primitives/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Trans, useLingui } from '@lingui/react/macro';
 
+import { TextStyleControls } from './text-style-controls';
+
 type NameFieldAdvancedSettingsProps = {
   fieldState: NameFieldMeta;
   handleFieldChange: (key: keyof NameFieldMeta, value: string | boolean) => void;
@@ -47,6 +49,8 @@ export const NameFieldAdvancedSettings = ({
           max={96}
         />
       </div>
+
+      <TextStyleControls fieldState={fieldState} onChange={handleInput} />
 
       <div>
         <Label>

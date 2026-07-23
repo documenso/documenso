@@ -1,11 +1,11 @@
 import { DEFAULT_RECT_BACKGROUND, getRecipientColorStyles } from '@documenso/ui/lib/recipient-colors';
 import Konva from 'konva';
 
+import { DEFAULT_FIELD_RENDER_FONT_FAMILY } from '../field-fonts';
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
 import { calculateFieldPosition } from './field-renderer';
 
-export const konvaTextFontFamily =
-  '"Noto Sans", "Noto Sans Japanese", "Noto Sans Chinese", "Noto Sans Korean", sans-serif';
+export const konvaTextFontFamily = DEFAULT_FIELD_RENDER_FONT_FAMILY;
 export const konvaTextFill = 'black';
 
 export const upsertFieldGroup = (field: FieldToRender, options: RenderFieldElementOptions): Konva.Group => {

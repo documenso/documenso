@@ -10,6 +10,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 
 import { numberFormatValues } from './constants';
+import { TextStyleControls } from './text-style-controls';
 
 type NumberFieldAdvancedSettingsProps = {
   fieldState: NumberFieldMeta;
@@ -104,6 +105,8 @@ export const NumberFieldAdvancedSettings = ({
           </SelectContent>
         </Select>
       </div>
+
+      <TextStyleControls fieldState={fieldState} onChange={handleInput} />
 
       <div>
         <Label>
