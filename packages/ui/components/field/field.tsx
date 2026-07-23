@@ -119,7 +119,7 @@ export function FieldRootContainer({ field, children, color, className, readonly
         data-readonly={readonly ? 'true' : 'false'}
         className={cn(
           FIELD_ROOT_CONTAINER_CLASS_NAME,
-          color?.base,
+          !(isValidating && isFieldUnsignedAndRequired(field)) && color?.base,
           {
             'px-2': field.type !== FieldType.SIGNATURE && field.type !== FieldType.FREE_SIGNATURE,
             'justify-center': !field.inserted,

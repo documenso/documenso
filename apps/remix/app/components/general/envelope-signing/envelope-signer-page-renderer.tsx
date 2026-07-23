@@ -152,7 +152,13 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
 
     const isValidating = showPendingFieldTooltip && isFieldUnsignedAndRequired(fieldToRender);
 
-    const color = fieldToRender.fieldMeta?.readOnly ? 'readOnly' : isValidating ? 'orange' : 'green';
+    const color = fieldToRender.fieldMeta?.readOnly
+      ? 'readOnly'
+      : isValidating
+        ? 'orange'
+        : isFieldUnsignedAndRequired(fieldToRender)
+          ? 'required'
+          : 'green';
 
     const { fieldGroup } = renderField({
       scale,
