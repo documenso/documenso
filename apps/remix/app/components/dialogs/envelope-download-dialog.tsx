@@ -1,4 +1,5 @@
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
+import { getEnvelopeDownloadFileName } from '@documenso/lib/utils/get-envelope-download-filename';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -20,6 +21,14 @@ type EnvelopeItemToDownload = Pick<EnvelopeItem, 'id' | 'envelopeId' | 'title' |
 
 type EnvelopeDownloadDialogProps = {
   envelopeId: string;
+
+  /**
+   * The envelope (document) title. Optional: when provided it is used as the
+   * initial download filename for single-item envelopes, avoiding a brief
+   * fallback to the (potentially stale) envelope item title before the items
+   * query resolves. When omitted, the title from the query response is used.
+   */
+  envelopeTitle?: string;
   envelopeStatus: DocumentStatus;
 
   /**
@@ -47,6 +56,7 @@ type EnvelopeDownloadDialogProps = {
 
 export const EnvelopeDownloadDialog = ({
   envelopeId,
+  envelopeTitle: initialEnvelopeTitle,
   envelopeStatus,
   isLegacy,
   envelopeItems: initialEnvelopeItems,
@@ -97,12 +107,15 @@ export const EnvelopeDownloadDialog = ({
       access: token ? { type: 'recipient', token } : { type: 'user' },
     },
     {
-      initialData: initialEnvelopeItems ? { data: initialEnvelopeItems } : undefined,
+      initialData: initialEnvelopeItems
+        ? { data: initialEnvelopeItems, envelopeTitle: initialEnvelopeTitle ?? '' }
+        : undefined,
       enabled: open,
     },
   );
 
   const envelopeItems = envelopeItemsPayload?.data || [];
+  const envelopeTitle = envelopeItemsPayload?.envelopeTitle ?? '';
 
   const onDownload = async (envelopeItem: EnvelopeItemToDownload, version: 'original' | 'signed' | 'pending') => {
     const { id: envelopeItemId } = envelopeItem;
@@ -120,7 +133,11 @@ export const EnvelopeDownloadDialog = ({
       await downloadPDF({
         envelopeItem,
         token,
-        fileName: envelopeItem.title,
+        fileName: getEnvelopeDownloadFileName({
+          itemCount: envelopeItems.length,
+          itemTitle: envelopeItem.title,
+          envelopeTitle,
+        }),
         version,
       });
 
