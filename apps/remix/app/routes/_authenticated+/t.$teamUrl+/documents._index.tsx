@@ -143,9 +143,9 @@ export default function DocumentsPage() {
               <AvatarFallback className="text-muted-foreground text-xs">{team.name.slice(0, 1)}</AvatarFallback>
             </Avatar>
 
-            <h2 className="font-semibold text-4xl">
+            <h1 className="font-semibold text-2xl leading-tight tracking-tight md:text-3xl">
               <Trans>Documents</Trans>
-            </h2>
+            </h1>
           </div>
 
           <div className="-m-1 flex flex-wrap gap-x-4 gap-y-6 overflow-hidden p-1">
@@ -172,7 +172,7 @@ export default function DocumentsPage() {
                         <DocumentStatus status={value} />
 
                         {value !== ExtendedDocumentStatus.ALL && (
-                          <span className="ml-1 inline-block opacity-50">
+                          <span className="ml-1 inline-block tabular-nums opacity-50">
                             {stats[value] >= STATS_COUNT_CAP ? `${STATS_COUNT_CAP.toLocaleString()}+` : stats[value]}
                           </span>
                         )}

@@ -71,7 +71,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
             <InboxIcon className="h-5 w-5 flex-shrink-0 text-muted-foreground transition-colors hover:text-foreground" />
 
             {unreadCountData && unreadCountData.count > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary font-semibold text-[10px] text-primary-foreground">
+              <span className="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 font-semibold text-primary-foreground text-xs tabular-nums leading-none">
                 {unreadCountData.count > 99 ? '99+' : unreadCountData.count}
               </span>
             )}
