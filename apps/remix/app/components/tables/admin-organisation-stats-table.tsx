@@ -77,15 +77,20 @@ export const AdminOrganisationStatsTable = ({ displayMode = 'usage' }: AdminOrga
   const orderByColumn = parseOrderByColumn(searchParams?.get('orderByColumn') ?? undefined);
   const orderByDirection = parseOrderByDirection(searchParams?.get('orderByDirection') ?? undefined);
 
-  const { data, isLoading, isLoadingError } = trpc.admin.organisation.stats.find.useQuery({
-    query: parsedSearchParams.query,
-    page: parsedSearchParams.page,
-    perPage: parsedSearchParams.perPage,
-    period,
-    claimId,
-    orderByColumn,
-    orderByDirection,
-  });
+  const { data, isLoading, isLoadingError } = trpc.admin.organisation.stats.find.useQuery(
+    {
+      query: parsedSearchParams.query,
+      page: parsedSearchParams.page,
+      perPage: parsedSearchParams.perPage,
+      period,
+      claimId,
+      orderByColumn,
+      orderByDirection,
+    },
+    {
+      placeholderData: (previousData) => previousData,
+    },
+  );
 
   const onPaginationChange = (page: number, perPage: number) => {
     updateSearchParams({

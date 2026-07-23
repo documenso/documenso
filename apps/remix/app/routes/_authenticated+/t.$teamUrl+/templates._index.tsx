@@ -66,6 +66,7 @@ export default function TemplatesPage() {
     },
     {
       enabled: !isOrgView,
+      placeholderData: (previousData) => previousData,
     },
   );
 
@@ -76,6 +77,7 @@ export default function TemplatesPage() {
     },
     {
       enabled: isOrgView,
+      placeholderData: (previousData) => previousData,
     },
   );
 

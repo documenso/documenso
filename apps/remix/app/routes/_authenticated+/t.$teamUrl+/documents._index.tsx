@@ -91,6 +91,7 @@ export default function DocumentsPage() {
       folderId,
     },
     {
+      placeholderData: (previousData) => previousData,
       ...SKIP_QUERY_BATCH_META,
     },
   );
