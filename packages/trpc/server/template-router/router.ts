@@ -72,8 +72,10 @@ export const templateRouter = router({
         method: 'GET',
         path: '/template',
         summary: 'Find templates',
-        description: 'Find templates based on a search criteria',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Find templates based on a search criteria',
         tags: ['Template'],
+        deprecated: true,
       },
     })
     .input(ZFindTemplatesRequestSchema)
@@ -201,7 +203,10 @@ export const templateRouter = router({
         method: 'GET',
         path: '/template/{templateId}',
         summary: 'Get template',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide.',
         tags: ['Template'],
+        deprecated: true,
       },
     })
     .input(ZGetTemplateByIdRequestSchema)
@@ -245,8 +250,10 @@ export const templateRouter = router({
         path: '/template/create',
         contentTypes: ['multipart/form-data'],
         summary: 'Create template',
-        description: 'Create a new template',
+        description:
+          'Create a new template. Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide.',
         tags: ['Template'],
+        deprecated: true,
       },
     })
     .input(ZCreateTemplateMutationSchema)
@@ -334,8 +341,9 @@ export const templateRouter = router({
         path: '/template/create/beta',
         summary: 'Create template',
         description:
-          'You will need to upload the PDF to the provided URL returned. Note: Once V2 API is released, this will be removed since we will allow direct uploads, instead of using an upload URL.',
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. You will need to upload the PDF to the provided URL returned. Note: Once V2 API is released, this will be removed since we will allow direct uploads, instead of using an upload URL.',
         tags: ['Template'],
+        deprecated: true,
       },
     })
     .input(ZCreateTemplateV2RequestSchema)
@@ -418,7 +426,10 @@ export const templateRouter = router({
         method: 'POST',
         path: '/template/update',
         summary: 'Update template',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide.',
         tags: ['Template'],
+        deprecated: true,
       },
     })
     .input(ZUpdateTemplateRequestSchema)
@@ -461,7 +472,10 @@ export const templateRouter = router({
         method: 'POST',
         path: '/template/duplicate',
         summary: 'Duplicate template',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide.',
         tags: ['Template'],
+        deprecated: true,
       },
     })
     .input(ZDuplicateTemplateMutationSchema)
@@ -497,7 +511,10 @@ export const templateRouter = router({
         method: 'POST',
         path: '/template/delete',
         summary: 'Delete template',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide.',
         tags: ['Template'],
+        deprecated: true,
       },
     })
     .input(ZDeleteTemplateMutationSchema)
@@ -534,8 +551,10 @@ export const templateRouter = router({
         method: 'POST',
         path: '/template/use',
         summary: 'Use template',
-        description: 'Use the template to create a document',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Use the template to create a document',
         tags: ['Template'],
+        deprecated: true,
       },
     })
     .input(ZCreateDocumentFromTemplateRequestSchema)
@@ -687,8 +706,10 @@ export const templateRouter = router({
         method: 'POST',
         path: '/template/direct/create',
         summary: 'Create direct link',
-        description: 'Create a direct link for a template',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Create a direct link for a template',
         tags: ['Template'],
+        deprecated: true,
       },
     })
     .input(ZCreateTemplateDirectLinkRequestSchema)
@@ -743,8 +764,10 @@ export const templateRouter = router({
         method: 'POST',
         path: '/template/direct/delete',
         summary: 'Delete direct link',
-        description: 'Delete a direct link for a template',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Delete a direct link for a template',
         tags: ['Template'],
+        deprecated: true,
       },
     })
     .input(ZDeleteTemplateDirectLinkRequestSchema)
@@ -775,8 +798,10 @@ export const templateRouter = router({
         method: 'POST',
         path: '/template/direct/toggle',
         summary: 'Toggle direct link',
-        description: 'Enable or disable a direct link for a template',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Enable or disable a direct link for a template',
         tags: ['Template'],
+        deprecated: true,
       },
     })
     .input(ZToggleTemplateDirectLinkRequestSchema)

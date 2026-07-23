@@ -6,6 +6,7 @@ import { expect, test } from '@playwright/test';
 
 import { apiSignin } from '../fixtures/authentication';
 import { expectToastTextToBeVisible } from '../fixtures/generic';
+import { signSignaturePad } from '../fixtures/signature';
 
 test('[PUBLIC_PROFILE]: create team profile', async ({ page }) => {
   const { user, team } = await seedUser();
@@ -73,8 +74,19 @@ test('[PUBLIC_PROFILE]: create team profile', async ({ page }) => {
   await expect(page.locator('body')).toContainText('public-direct-template-title');
   await expect(page.locator('body')).toContainText('public-direct-template-description');
 
+  const directSignatureField = directTemplate.fields[0];
+
+  if (!directSignatureField) {
+    throw new Error('Expected seeded direct template signature field to exist');
+  }
+
   await page.getByRole('link', { name: 'Sign' }).click();
   await page.getByRole('button', { name: 'Continue' }).click();
+
+  await signSignaturePad(page);
+  await page.locator(`#field-${directSignatureField.id}`).getByRole('button').click();
+  await expect(page.locator(`#field-${directSignatureField.id}`)).toHaveAttribute('data-inserted', 'true');
+
   await page.getByRole('button', { name: 'Complete' }).click();
   await page.getByRole('button', { name: 'Sign' }).click();
 

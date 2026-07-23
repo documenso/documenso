@@ -8,6 +8,8 @@ import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
+<EnvelopeWarning />
+
 ## Workflow 1: Send a Document for Signature
 
 The most common workflow: upload a PDF, add recipients with signature fields, and send for signing.
@@ -472,7 +474,7 @@ Send the same document to multiple recipients in parallel. Useful for policy ack
     <code>distributeDocument: true</code>
   </Step>
   <Step>
-    Process in batches with a short delay to respect rate limits (e.g. 100 requests/minute)
+    Process in batches with a short delay to respect rate limits (e.g. 1000 requests/minute)
   </Step>
 </Steps>
 
@@ -638,8 +640,8 @@ done
 </Tabs>
 
 <Callout type="info">
-  The API allows 100 requests per minute. For large batches, implement rate limiting with delays
-  between requests to avoid hitting limits.
+  The API allows 1000 requests per minute (your organisation may have its own lower limit). For large
+  batches, implement rate limiting with delays between requests to avoid hitting limits.
 </Callout>
 
 ---

@@ -10,8 +10,10 @@ export const ZFindDocumentsMeta: TrpcRouteMeta = {
     method: 'GET',
     path: '/document',
     summary: 'Find documents',
-    description: 'Find documents based on a search criteria',
+    description:
+      'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Find documents based on a search criteria',
     tags: ['Document'],
+    deprecated: true,
   },
 };
 
