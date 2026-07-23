@@ -767,11 +767,12 @@ export function TemplateUseDialog({
                     name="customDocumentName"
                     render={({ field }) => (
                       <FormItem className="ml-6">
-                        <FormLabel>
-                          <Trans>Custom document name</Trans>
-                        </FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder={_(msg`Enter a document name`)} />
+                          <Input
+                            {...field}
+                            aria-label={_(msg`Custom document name`)}
+                            placeholder={_(msg`Enter a document name`)}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
