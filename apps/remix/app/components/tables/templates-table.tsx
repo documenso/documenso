@@ -134,7 +134,7 @@ export const TemplatesTable = ({
                     </p>
                   </li>
                   <li>
-                    <div className="mb-2 flex w-fit flex-row items-center rounded border border-neutral-300 bg-neutral-200 px-1.5 py-0.5 text-xs dark:border-neutral-500 dark:bg-neutral-600">
+                    <div className="mb-2 flex w-fit flex-row items-center rounded border border-border bg-muted px-1.5 py-0.5 text-xs">
                       <Link2Icon className="mr-1 h-3 w-3" />
                       <Trans>direct link</Trans>
                     </div>
@@ -310,8 +310,8 @@ export const TemplatesTable = ({
       </DataTable>
 
       {isPending && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/50">
-          <Loader className="h-8 w-8 animate-spin text-gray-500" />
+        <div className="absolute inset-0 flex items-center justify-center bg-background/50">
+          <Loader className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       )}
     </div>
