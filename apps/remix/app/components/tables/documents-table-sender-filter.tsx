@@ -7,9 +7,10 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router';
 
 type DocumentsTableSenderFilterProps = {
   teamId: number;
+  className?: string;
 };
 
-export const DocumentsTableSenderFilter = ({ teamId }: DocumentsTableSenderFilterProps) => {
+export const DocumentsTableSenderFilter = ({ teamId, className }: DocumentsTableSenderFilterProps) => {
   const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -52,6 +53,7 @@ export const DocumentsTableSenderFilter = ({ teamId }: DocumentsTableSenderFilte
           </Trans>
         </p>
       }
+      className={className}
       enableClearAllButton={true}
       inputPlaceholder={msg`Search`}
       loading={!isMounted || isLoading}
