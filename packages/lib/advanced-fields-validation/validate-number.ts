@@ -2,6 +2,25 @@ import { numberFormatValues } from '@documenso/ui/primitives/document-flow/field
 
 import type { TNumberFieldMeta as NumberFieldMeta } from '../types/field-meta';
 
+/**
+ * The number formats use a separator that `parseFloat` stops at, so the raw
+ * value cannot be compared against `minValue`/`maxValue` directly - it has to
+ * be normalised to a plain decimal first.
+ *
+ * `123.456.789,00` groups with dots and uses a comma for the decimal; the
+ * other formats (and an unset format, whose values are still allowed to
+ * contain commas) group with commas and use a dot.
+ */
+export const parseNumberFieldValue = (value: string, numberFormat?: string | null): number => {
+  const trimmed = value.trim();
+
+  if (numberFormat === '123.456.789,00') {
+    return parseFloat(trimmed.replace(/\./g, '').replace(',', '.'));
+  }
+
+  return parseFloat(trimmed.replace(/,/g, ''));
+};
+
 export const validateNumberField = (
   value: string,
   fieldMeta?: NumberFieldMeta,
@@ -23,7 +42,7 @@ export const validateNumberField = (
     }
   }
 
-  const numberValue = parseFloat(value);
+  const numberValue = parseNumberFieldValue(value, numberFormat);
 
   if (isSigningPage && required && !value) {
     errors.push('Value is required');
