@@ -53,9 +53,81 @@ export const getEnvelopeReminderDuration = (period: TEnvelopeReminderDurationPer
 };
 
 /**
+ * Parse a raw reminder-settings value (coming from a JSON column or an
+ * incoming payload) into a concrete `TEnvelopeReminderSettings`.
+ *
+ * Returns `null` when the value is absent (`null`/`undefined`), a JSON null
+ * marker (e.g. `Prisma.DbNull`) or does not match the schema. This lets the
+ * cascade treat "no value" the same as "inherit from the next level up".
+ */
+const parseReminderSettings = (raw: unknown): TEnvelopeReminderSettings | null => {
+  if (raw === null || raw === undefined) {
+    return null;
+  }
+
+  const result = ZEnvelopeReminderSettings.safeParse(raw);
+
+  return result.success ? result.data : null;
+};
+
+/**
+ * Resolve the effective reminder settings that apply to an envelope, given
+ * the raw values stored at each level of the cascade.
+ *
+ * The cascade is:
+ *   1. Document-level override (when set)
+ *   2. Team-level override (when set)
+ *   3. Organisation-level default (when set)
+ *   4. `null` (reminders disabled) when nothing is configured
+ *
+ * Each level may be:
+ *   - a valid `TEnvelopeReminderSettings` object (enabled or explicitly disabled)
+ *   - `null`/`undefined`/JSON-null (inherit from the level below)
+ *
+ * An explicitly disabled config (`{ sendAfter: { disabled: true }, repeatEvery:
+ * { disabled: true } }`) is a real override — it stops the cascade and is
+ * returned as-is so that `resolveNextReminderAt` honours the "no reminders"
+ * semantics.
+ *
+ * The `disabled` flags inside an otherwise-enabled config (e.g. a first
+ * reminder that is turned off) are NOT resolved here; `resolveNextReminderAt`
+ * interprets them at scheduling time.
+ *
+ * NOTE: manual distribution (link sharing) is intentionally NOT handled here.
+ * The server-side caller is responsible for returning `null` when the envelope
+ * is distributed manually, because that gating is unrelated to the settings
+ * cascade and differs per call site.
+ */
+export const deriveEffectiveReminderSettings = (options: {
+  documentReminderSettings: unknown;
+  teamReminderSettings: unknown;
+  organisationReminderSettings: unknown;
+}): TEnvelopeReminderSettings | null => {
+  const document = parseReminderSettings(options.documentReminderSettings);
+
+  if (document) {
+    return document;
+  }
+
+  const team = parseReminderSettings(options.teamReminderSettings);
+
+  if (team) {
+    return team;
+  }
+
+  const organisation = parseReminderSettings(options.organisationReminderSettings);
+
+  if (organisation) {
+    return organisation;
+  }
+
+  return null;
+};
+
+/**
  * Resolve the next reminder timestamp from the config and the last reminder sent time.
  *
- * - `null` config means reminders are disabled (inherit = no override, resolved as disabled).
+ * - `null` config means reminders are disabled (no override at any cascade level).
  * - `{ sendAfter: { disabled: true }, ... }` means never send the first reminder.
  * - `{ repeatEvery: { disabled: true }, ... }` means don't repeat after the first reminder.
  *

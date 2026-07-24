@@ -1,14 +1,24 @@
 import { prisma } from '@documenso/prisma';
-import { DocumentDistributionMethod, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
+import { RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 
-import { resolveNextReminderAt, ZEnvelopeReminderSettings } from '../../constants/envelope-reminder';
+import { resolveNextReminderAt, type TEnvelopeReminderSettings } from '../../constants/envelope-reminder';
+import { resolveEnvelopeReminderSettings } from './resolve-envelope-reminder-settings';
 
 /**
  * Compute and store `nextReminderAt` for a single recipient.
  *
+ * The effective reminder settings are resolved through the
+ * Document -> Team -> Organisation cascade via `resolveEnvelopeReminderSettings`
+ * so that a document whose settings are "inherit" (i.e. `null` at the document
+ * level) still picks up the team/organisation default.
+ *
  * Pass `resetReminderCount: true` to restart the reminder cycle (e.g. on a
  * manual resend): the count is zeroed and the schedule recomputed as if the
  * request was freshly sent at `sentAt`.
+ *
+ * Callers may pass an explicit `reminderSettings` override (already parsed) to
+ * skip the cascade lookup; otherwise the envelope's effective settings are
+ * fetched.
  */
 export const updateRecipientNextReminder = async (options: {
   recipientId: number;
@@ -17,21 +27,14 @@ export const updateRecipientNextReminder = async (options: {
   lastReminderSentAt: Date | null;
   reminderCount?: number;
   resetReminderCount?: boolean;
-  reminderSettings?: ReturnType<typeof ZEnvelopeReminderSettings.parse> | null;
+  reminderSettings?: TEnvelopeReminderSettings | null;
 }) => {
   const { recipientId, envelopeId, sentAt, lastReminderSentAt, reminderCount = 0, resetReminderCount } = options;
 
   let settings = options.reminderSettings;
 
   if (settings === undefined) {
-    const envelope = await prisma.envelope.findFirst({
-      where: { id: envelopeId },
-      select: { documentMeta: { select: { reminderSettings: true } } },
-    });
-
-    settings = envelope?.documentMeta?.reminderSettings
-      ? ZEnvelopeReminderSettings.parse(envelope.documentMeta.reminderSettings)
-      : null;
+    settings = await resolveEnvelopeReminderSettings(envelopeId);
   }
 
   const nextReminderAt = resolveNextReminderAt({
@@ -52,25 +55,30 @@ export const updateRecipientNextReminder = async (options: {
 
 /**
  * Recompute `nextReminderAt` for all active (unsigned, sent) recipients
- * of a given envelope. Call when document-level reminder settings change.
+ * of a given envelope. Call when document-level reminder settings change so
+ * that switching to/from "inherit" or editing an explicit schedule is
+ * immediately reflected for every unsigned recipient.
+ *
+ * Recipients that must NOT be re-queued:
+ *   - CC recipients
+ *   - recipients not yet sent or already signed/declined
+ *   - recipients whose signing deadline has passed
+ *
+ * Manually distributed envelopes (`DocumentDistributionMethod.NONE`) and
+ * envelopes with no effective reminder config (inherit-without-default or
+ * explicitly disabled) produce `nextReminderAt = null`, which the sweep job
+ * treats as "no reminder scheduled".
+ *
+ * The 30-day window, `MAX_REMINDERS_BEFORE_RESEND` cap, and manual-resend
+ * reset semantics are enforced inside `resolveNextReminderAt` /
+ * `updateRecipientNextReminder` and are unchanged by this recompute.
  */
 export const recomputeNextReminderForEnvelope = async (envelopeId: string) => {
-  const envelope = await prisma.envelope.findFirst({
-    where: { id: envelopeId },
-    select: {
-      documentMeta: {
-        select: { reminderSettings: true, distributionMethod: true },
-      },
-    },
-  });
-
-  // No reminders for manually distributed documents.
-  const isEmailDistribution = envelope?.documentMeta?.distributionMethod !== DocumentDistributionMethod.NONE;
-
-  const settings =
-    isEmailDistribution && envelope?.documentMeta?.reminderSettings
-      ? ZEnvelopeReminderSettings.parse(envelope.documentMeta.reminderSettings)
-      : null;
+  // `resolveEnvelopeReminderSettings` already returns `null` for manually
+  // distributed envelopes and for inherit-with-no-default, which causes
+  // `resolveNextReminderAt` to produce `null` and clear any previously
+  // scheduled reminder for each active recipient below.
+  const settings = await resolveEnvelopeReminderSettings(envelopeId);
 
   const now = new Date();
 
