@@ -160,3 +160,40 @@ export const invalidateSessions = async ({
     });
   });
 };
+
+type InvalidateAllUserSessionsOptions = {
+  userId: number;
+  metadata?: RequestMetadata;
+  isRevoke?: boolean;
+};
+
+export const invalidateAllUserSessions = async ({
+  userId,
+  metadata = {},
+  isRevoke = true,
+}: InvalidateAllUserSessionsOptions): Promise<void> => {
+  await prisma.$transaction(async (tx) => {
+    const userSessions = await tx.session.findMany({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (userSessions.length === 0) {
+      return;
+    }
+
+    await tx.session.deleteMany({
+      where: { userId },
+    });
+
+    await tx.userSecurityAuditLog.createMany({
+      data: userSessions.map(() => ({
+        userId,
+        ipAddress: metadata.ipAddress ?? null,
+        userAgent: metadata.userAgent ?? null,
+        type: isRevoke ? UserSecurityAuditLogType.SESSION_REVOKED : UserSecurityAuditLogType.SIGN_OUT,
+      })),
+    });
+  });
+};
+
