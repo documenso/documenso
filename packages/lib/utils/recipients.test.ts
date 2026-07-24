@@ -1,12 +1,7 @@
 import { RecipientRole } from '@prisma/client';
 import { describe, expect, it } from 'vitest';
 
-import {
-  getRecipientSigningOrder,
-  isAssistantLastSigner,
-  normalizeRecipientSigningOrders,
-  sortRecipientsForSigningOrder,
-} from './recipients';
+import { isAssistantLastSigner, normalizeRecipientSigningOrders, sortRecipientsForSigningOrder } from './recipients';
 
 describe('recipient signing order helpers', () => {
   it('sorts CC recipients after ordered active recipients', () => {
@@ -54,11 +49,6 @@ describe('recipient signing order helpers', () => {
       { id: 1, role: RecipientRole.SIGNER, signingOrder: 2 },
       { id: 3, role: RecipientRole.CC, signingOrder: undefined },
     ]);
-  });
-
-  it('coerces CC signing order to null for persistence', () => {
-    expect(getRecipientSigningOrder({ role: RecipientRole.CC, signingOrder: 1 })).toBeNull();
-    expect(getRecipientSigningOrder({ role: RecipientRole.SIGNER, signingOrder: 1 })).toBe(1);
   });
 
   it('checks whether the last non-CC recipient is an assistant', () => {

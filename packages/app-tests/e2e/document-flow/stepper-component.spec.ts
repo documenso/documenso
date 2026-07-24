@@ -4,7 +4,14 @@ import { prisma } from '@documenso/prisma';
 import { seedBlankDocument, seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, test } from '@playwright/test';
-import { DocumentSigningOrder, DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
+import {
+  DocumentSigningOrder,
+  DocumentStatus,
+  FieldType,
+  RecipientRole,
+  SendStatus,
+  SigningStatus,
+} from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { apiSignin } from '../fixtures/authentication';
@@ -665,4 +672,183 @@ test('[DOCUMENT_FLOW]: should prevent out-of-order signing in sequential mode', 
 
   await expect(page).not.toHaveURL(`/sign/${activeRecipient?.token}/waiting`);
   await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
+});
+
+test('[DOCUMENT_FLOW]: should skip CC recipients in sequential signing order', async ({ page }) => {
+  const { user, team } = await seedUser();
+
+  const { document, recipients } = await seedPendingDocumentWithFullFields({
+    teamId: team.id,
+    owner: user,
+    recipients: ['signer1@example.com', 'cc@example.com', 'signer2@example.com'],
+    fields: [FieldType.SIGNATURE],
+    recipientsCreateOptions: [
+      { signingOrder: 1 },
+      {
+        // CC recipients are created pre-signed, mirroring production behaviour.
+        signingOrder: 2,
+        role: RecipientRole.CC,
+        signingStatus: SigningStatus.SIGNED,
+        sendStatus: SendStatus.SENT,
+      },
+      { signingOrder: 3 },
+    ],
+  });
+
+  await prisma.documentMeta.update({
+    where: {
+      id: document.documentMetaId,
+    },
+    data: {
+      signingOrder: DocumentSigningOrder.SEQUENTIAL,
+    },
+  });
+
+  const firstSigner = recipients.find((r) => r.email === 'signer1@example.com');
+  const ccRecipient = recipients.find((r) => r.email === 'cc@example.com');
+  const lastSigner = recipients.find((r) => r.email === 'signer2@example.com');
+
+  // CC recipients cannot have fields.
+  await prisma.field.deleteMany({
+    where: {
+      recipientId: ccRecipient?.id,
+    },
+  });
+
+  // Sequential order is enforced: the last signer must wait while the first signer is pending.
+  await page.goto(`/sign/${lastSigner?.token}`);
+  await expect(page).toHaveURL(`/sign/${lastSigner?.token}/waiting`);
+
+  // Sign as the first signer.
+  await page.goto(`/sign/${firstSigner?.token}`);
+  await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
+  await signSignaturePad(page);
+
+  const firstSignerField = await prisma.field.findFirstOrThrow({
+    where: { recipientId: firstSigner?.id },
+  });
+
+  await page.locator(`#field-${firstSignerField.id}`).getByRole('button').click();
+
+  await page.getByRole('button', { name: 'Complete' }).click();
+  await page.getByRole('button', { name: 'Sign' }).click();
+  await page.waitForURL(`/sign/${firstSigner?.token}/complete`);
+
+  // The CC recipient at order 2 must not block the last signer at order 3.
+  await page.goto(`/sign/${lastSigner?.token}`);
+  await expect(page).not.toHaveURL(`/sign/${lastSigner?.token}/waiting`);
+  await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
+
+  await signSignaturePad(page);
+
+  const lastSignerField = await prisma.field.findFirstOrThrow({
+    where: { recipientId: lastSigner?.id },
+  });
+
+  await page.locator(`#field-${lastSignerField.id}`).getByRole('button').click();
+
+  await page.getByRole('button', { name: 'Complete' }).click();
+  await page.getByRole('button', { name: 'Sign' }).click();
+  await page.waitForURL(`/sign/${lastSigner?.token}/complete`);
+
+  // The document completes without any action from the CC recipient.
+  await expect
+    .poll(
+      async () => {
+        const finalDocument = await prisma.envelope.findFirstOrThrow({
+          where: { id: document.id },
+        });
+
+        return finalDocument.status;
+      },
+      { timeout: 30_000 },
+    )
+    .toBe(DocumentStatus.COMPLETED);
+});
+
+test('[DOCUMENT_FLOW]: should skip unsigned CC recipients in sequential signing order', async ({ page }) => {
+  const { user, team } = await seedUser();
+
+  const { document, recipients } = await seedPendingDocumentWithFullFields({
+    teamId: team.id,
+    owner: user,
+    recipients: ['signer1@example.com', 'cc@example.com', 'signer2@example.com'],
+    fields: [FieldType.SIGNATURE],
+    recipientsCreateOptions: [
+      { signingOrder: 1 },
+      {
+        // Legacy/inconsistent data: a CC recipient that was never marked as signed.
+        signingOrder: 2,
+        role: RecipientRole.CC,
+        signingStatus: SigningStatus.NOT_SIGNED,
+      },
+      { signingOrder: 3 },
+    ],
+  });
+
+  await prisma.documentMeta.update({
+    where: {
+      id: document.documentMetaId,
+    },
+    data: {
+      signingOrder: DocumentSigningOrder.SEQUENTIAL,
+    },
+  });
+
+  const firstSigner = recipients.find((r) => r.email === 'signer1@example.com');
+  const ccRecipient = recipients.find((r) => r.email === 'cc@example.com');
+  const lastSigner = recipients.find((r) => r.email === 'signer2@example.com');
+
+  // CC recipients cannot have fields.
+  await prisma.field.deleteMany({
+    where: {
+      recipientId: ccRecipient?.id,
+    },
+  });
+
+  // Sign as the first signer.
+  await page.goto(`/sign/${firstSigner?.token}`);
+  await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
+  await signSignaturePad(page);
+
+  const firstSignerField = await prisma.field.findFirstOrThrow({
+    where: { recipientId: firstSigner?.id },
+  });
+
+  await page.locator(`#field-${firstSignerField.id}`).getByRole('button').click();
+
+  await page.getByRole('button', { name: 'Complete' }).click();
+  await page.getByRole('button', { name: 'Sign' }).click();
+  await page.waitForURL(`/sign/${firstSigner?.token}/complete`);
+
+  // The unsigned CC recipient at order 2 must not block the last signer at order 3.
+  await page.goto(`/sign/${lastSigner?.token}`);
+  await expect(page).not.toHaveURL(`/sign/${lastSigner?.token}/waiting`);
+  await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
+
+  await signSignaturePad(page);
+
+  const lastSignerField = await prisma.field.findFirstOrThrow({
+    where: { recipientId: lastSigner?.id },
+  });
+
+  await page.locator(`#field-${lastSignerField.id}`).getByRole('button').click();
+
+  await page.getByRole('button', { name: 'Complete' }).click();
+  await page.getByRole('button', { name: 'Sign' }).click();
+  await page.waitForURL(`/sign/${lastSigner?.token}/complete`);
+
+  // The document completes without any action from the CC recipient.
+  await expect
+    .poll(
+      async () => {
+        const finalDocument = await prisma.envelope.findFirstOrThrow({
+          where: { id: document.id },
+        });
+
+        return finalDocument.status;
+      },
+      { timeout: 30_000 },
+    )
+    .toBe(DocumentStatus.COMPLETED);
 });

@@ -47,7 +47,6 @@ import {
 } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
-import { getRecipientSigningOrder } from '../../utils/recipients';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
@@ -592,7 +591,7 @@ export const createDocumentFromTemplate = async ({
                 }),
                 sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
                 signingStatus: recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
-                signingOrder: getRecipientSigningOrder(recipient),
+                signingOrder: recipient.signingOrder,
                 token: recipient.token,
               };
             }),

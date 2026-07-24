@@ -22,14 +22,6 @@ export const isCcRecipient = (recipient: Pick<Recipient, 'role'>) => {
   return recipient.role === RecipientRole.CC;
 };
 
-export const getRecipientSigningOrder = (recipient: RecipientWithSigningOrder) => {
-  if (isCcRecipient(recipient)) {
-    return null;
-  }
-
-  return recipient.signingOrder ?? null;
-};
-
 export const isAssistantLastSigner = (recipients: Pick<Recipient, 'role'>[]) => {
   const nonCcRecipients = recipients.filter((recipient) => !isCcRecipient(recipient));
   const lastNonCcRecipient = nonCcRecipients[nonCcRecipients.length - 1];
