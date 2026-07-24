@@ -18,7 +18,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { keepPreviousData } from '@tanstack/react-query';
-import { commandScore } from 'cmdk/dist/command-score';
+import { defaultFilter as commandScore } from 'cmdk';
 import {
   ArrowLeftIcon,
   CheckIcon,

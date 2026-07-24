@@ -103,15 +103,10 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
   ) {
     return (
       <div className="flex flex-col gap-y-2 py-0.5">
-        <RadioGroup className="gap-y-1">
+        <RadioGroup value={field.customText ?? ''} className="gap-y-1">
           {field.fieldMeta.values.map((item, index) => (
             <div key={index} className="flex items-center">
-              <RadioGroupItem
-                className="pointer-events-none h-3 w-3"
-                value={item.value}
-                id={`option-${index}`}
-                checked={item.value === field.customText}
-              />
+              <RadioGroupItem className="pointer-events-none h-3 w-3" value={item.value} id={`option-${index}`} />
               {item.value && (
                 <Label htmlFor={`option-${index}`} className="ml-1.5 font-normal text-foreground text-xs">
                   {item.value}
