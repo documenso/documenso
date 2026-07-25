@@ -1,5 +1,7 @@
+import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { RecipientRole } from '@prisma/client';
 
 import { Body, Container, Head, Html, Preview, Section } from '../components';
 import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
@@ -10,6 +12,7 @@ export interface DocumentRecipientSignedEmailTemplateProps {
   documentName?: string;
   recipientName?: string;
   recipientEmail?: string;
+  recipientRole?: RecipientRole;
   assetBaseUrl?: string;
 }
 
@@ -17,13 +20,16 @@ export const DocumentRecipientSignedEmailTemplate = ({
   documentName = 'Open Source Pledge.pdf',
   recipientName = 'John Doe',
   recipientEmail = 'lucas@documenso.com',
+  recipientRole = RecipientRole.SIGNER,
   assetBaseUrl = 'http://localhost:3002',
 }: DocumentRecipientSignedEmailTemplateProps) => {
   const { _ } = useLingui();
 
   const recipientReference = recipientName || recipientEmail;
 
-  const previewText = msg`${recipientReference} has signed ${documentName}`;
+  const actioned = _(RECIPIENT_ROLES_DESCRIPTION[recipientRole].actioned).toLowerCase();
+
+  const previewText = msg`${recipientReference} has ${actioned} ${documentName}`;
 
   return (
     <Html>
@@ -40,6 +46,7 @@ export const DocumentRecipientSignedEmailTemplate = ({
                 documentName={documentName}
                 recipientName={recipientName}
                 recipientEmail={recipientEmail}
+                recipientRole={recipientRole}
                 assetBaseUrl={assetBaseUrl}
               />
             </Section>

@@ -6,6 +6,7 @@ import { createElement } from 'react';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
+import { RECIPIENT_ROLES_DESCRIPTION } from '../../../constants/recipient-roles';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
@@ -64,7 +65,7 @@ export const run = async ({ payload, io }: { payload: TSendRecipientSignedEmailJ
   }
 
   const [recipient] = envelope.recipients;
-  const { email: recipientEmail, name: recipientName } = recipient;
+  const { email: recipientEmail, name: recipientName, role: recipientRole } = recipient;
   const { user: owner } = envelope;
 
   const recipientReference = recipientName || recipientEmail;
@@ -91,6 +92,7 @@ export const run = async ({ payload, io }: { payload: TSendRecipientSignedEmailJ
     documentName: envelope.title,
     recipientName,
     recipientEmail,
+    recipientRole,
     assetBaseUrl,
   });
 
@@ -110,7 +112,9 @@ export const run = async ({ payload, io }: { payload: TSendRecipientSignedEmailJ
         address: owner.email,
       },
       from: senderEmail,
-      subject: i18n._(msg`${recipientReference} has signed "${envelope.title}"`),
+      subject: i18n._(
+        msg`${recipientReference} has ${i18n._(RECIPIENT_ROLES_DESCRIPTION[recipientRole].actioned).toLowerCase()} "${envelope.title}"`,
+      ),
       html,
       text,
     });
