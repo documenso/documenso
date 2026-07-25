@@ -73,8 +73,9 @@ export default function OrganisationSettingSSOLoginPage() {
   }
 
   return (
-    <div className="max-w-2xl">
+    <div>
       <SettingsHeader
+        hideDivider
         title={t`Organisation SSO Portal`}
         subtitle={t`Manage a custom SSO login portal for your organisation.`}
       />

@@ -1,6 +1,7 @@
 import { authClient } from '@documenso/auth/client';
 import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { EXTENDED_ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
 import { EXTENDED_TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
@@ -54,6 +55,12 @@ export const OrgMenuSwitcher = () => {
 
   const currentOrganisation = useOptionalCurrentOrganisation();
   const currentTeam = useOptionalCurrentTeam();
+
+  const canAccessOrganisationSettings =
+    currentOrganisation &&
+    canExecuteOrganisationAction('MANAGE_ORGANISATION', currentOrganisation.currentOrganisationRole);
+
+  const canAccessTeamSettings = currentTeam && canExecuteTeamAction('MANAGE_TEAM', currentTeam.currentTeamRole);
 
   // Use hovered org for teams display if available,
   // otherwise use current team's org if in a team,
@@ -258,26 +265,23 @@ export const OrgMenuSwitcher = () => {
                 </DropdownMenuItem>
               )}
 
-              {currentOrganisation &&
-                canExecuteOrganisationAction('MANAGE_ORGANISATION', currentOrganisation.currentOrganisationRole) && (
-                  <DropdownMenuItem className="px-4 py-2 text-muted-foreground" asChild>
-                    <Link to={`/o/${currentOrganisation.url}/settings`}>
-                      <Trans>Organisation settings</Trans>
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-
-              {currentTeam && canExecuteTeamAction('MANAGE_TEAM', currentTeam.currentTeamRole) && (
-                <DropdownMenuItem className="px-4 py-2 text-muted-foreground" asChild>
-                  <Link to={`/t/${currentTeam.url}/settings`}>
-                    <Trans>Team settings</Trans>
-                  </Link>
-                </DropdownMenuItem>
-              )}
-
               <DropdownMenuItem className="px-4 py-2 text-muted-foreground" asChild>
                 <Link to="/inbox">
-                  <Trans>Personal Inbox</Trans>
+                  <Trans>Inbox</Trans>
+                </Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem className="px-4 py-2 text-muted-foreground" asChild>
+                <Link
+                  to={
+                    canAccessOrganisationSettings
+                      ? `/o/${currentOrganisation?.url}/settings`
+                      : canAccessTeamSettings
+                        ? `/t/${currentTeam?.url}/settings`
+                        : '/settings'
+                  }
+                >
+                  <Trans>Settings</Trans>
                 </Link>
               </DropdownMenuItem>
 
@@ -286,6 +290,14 @@ export const OrgMenuSwitcher = () => {
                   <Trans>Account</Trans>
                 </Link>
               </DropdownMenuItem>
+
+              {IS_BILLING_ENABLED() && (
+                <DropdownMenuItem className="px-4 py-2 text-muted-foreground" asChild>
+                  <Link to="/settings/billing">
+                    <Trans>Billing</Trans>
+                  </Link>
+                </DropdownMenuItem>
+              )}
 
               <DropdownMenuItem
                 className="px-4 py-2 text-muted-foreground"

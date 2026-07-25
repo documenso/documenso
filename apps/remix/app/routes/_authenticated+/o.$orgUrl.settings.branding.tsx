@@ -129,7 +129,7 @@ export default function OrganisationSettingsBrandingPage() {
       : t`Here you can set branding preferences for your organisation. Teams will inherit these settings by default.`;
 
   return (
-    <div className="max-w-2xl">
+    <div>
       <SettingsHeader title={settingsHeaderText} subtitle={settingsHeaderSubtitle} />
 
       {organisationWithSettings.organisationClaim.flags.allowCustomBranding || !IS_BILLING_ENABLED() ? (

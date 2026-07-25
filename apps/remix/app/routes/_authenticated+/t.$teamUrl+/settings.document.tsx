@@ -2,7 +2,6 @@ import { IS_AI_FEATURES_CONFIGURED } from '@documenso/lib/constants/app';
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
 import { useLoaderData } from 'react-router';
@@ -13,11 +12,6 @@ import {
 } from '~/components/forms/document-preferences-form';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { useCurrentTeam } from '~/providers/team';
-import { appMetaTags } from '~/utils/meta';
-
-export function meta() {
-  return appMetaTags(msg`Document Preferences`);
-}
 
 export const loader = () => {
   return {
@@ -46,15 +40,10 @@ export default function TeamsSettingsPage() {
         documentLanguage,
         documentTimezone,
         documentDateFormat,
-        includeSenderDetails,
-        includeSigningCertificate,
-        includeAuditLog,
         signatureTypes,
         defaultRecipients,
         delegateDocumentOwnership,
         aiFeaturesEnabled,
-        envelopeExpirationPeriod,
-        reminderSettings,
       } = data;
 
       await updateTeamSettings({
@@ -64,13 +53,8 @@ export default function TeamsSettingsPage() {
           documentLanguage,
           documentTimezone,
           documentDateFormat,
-          includeSenderDetails,
-          includeSigningCertificate,
-          includeAuditLog,
           defaultRecipients,
           aiFeaturesEnabled,
-          envelopeExpirationPeriod,
-          reminderSettings,
           ...(signatureTypes.length === 0
             ? {
                 typedSignatureEnabled: null,
@@ -110,7 +94,7 @@ export default function TeamsSettingsPage() {
   }
 
   return (
-    <div className="max-w-2xl">
+    <div>
       <SettingsHeader
         title={t`Document Preferences`}
         subtitle={t`Here you can set preferences and defaults for your team.`}
