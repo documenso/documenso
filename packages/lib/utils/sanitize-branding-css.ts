@@ -140,8 +140,34 @@ const validateSelector = (rawSelector: string): SelectorValidationResult => {
   return { kind: 'ok' };
 };
 
+/**
+ * Decode CSS escape sequences so they can't smuggle a blocked token past the
+ * substring check below. CSS lets any character in a value be written as an
+ * escape, so `\75rl(` is just `url(` to the browser and `url\28 …\29` is
+ * `url(…)` — but a naive `.includes('url(')` never sees them. We decode first.
+ * Malformed escapes are mapped to U+FFFD (never throw) per CSS Syntax §4.3.7.
+ */
+const decodeCssEscapes = (input: string): string =>
+  input.replace(
+    /\\([0-9a-fA-F]{1,6})[ \t\n\f\r]?|\\\n|\\([^\n])/g,
+    (_match, hex: string | undefined, char: string | undefined) => {
+      if (hex !== undefined) {
+        const codePoint = Number.parseInt(hex, 16);
+
+        if (codePoint === 0 || codePoint > 0x10ffff || (codePoint >= 0xd800 && codePoint <= 0xdfff)) {
+          return '�';
+        }
+
+        return String.fromCodePoint(codePoint);
+      }
+
+      // `\\\n` (line continuation) matches neither group — it is removed.
+      return char ?? '';
+    },
+  );
+
 const valueIsBlocked = (rawValue: string): boolean => {
-  const lowered = rawValue.toLowerCase();
+  const lowered = decodeCssEscapes(rawValue).toLowerCase();
 
   return BLOCKED_VALUE_SUBSTRINGS.some((needle) => lowered.includes(needle));
 };
