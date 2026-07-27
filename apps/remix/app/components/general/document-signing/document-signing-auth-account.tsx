@@ -1,4 +1,5 @@
 import { authClient } from '@documenso/auth/client';
+import { getBasePath } from '@documenso/lib/constants/app';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { DialogFooter } from '@documenso/ui/primitives/dialog';
@@ -34,7 +35,7 @@ export const DocumentSigningAuthAccount = ({
       const currentPath = `${window.location.pathname}${window.location.search}${window.location.hash}`;
 
       await authClient.signOut({
-        redirectPath: `/signin?returnTo=${encodeURIComponent(currentPath)}#embedded=true&email=${isDirectTemplate ? '' : email}`,
+        redirectPath: `${getBasePath()}/signin?returnTo=${encodeURIComponent(currentPath)}#embedded=true&email=${isDirectTemplate ? '' : email}`,
       });
     } catch {
       setIsSigningOut(false);

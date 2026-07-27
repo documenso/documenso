@@ -1,4 +1,5 @@
 import { authClient } from '@documenso/auth/client';
+import { getBasePath } from '@documenso/lib/constants/app';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { msg } from '@lingui/core/macro';
@@ -21,10 +22,12 @@ export const DocumentSigningAuthPageView = ({ email, emailHasAccount }: Document
     try {
       setIsSigningOut(true);
 
-      let redirectPath = '/signin';
+      const basePath = getBasePath();
+
+      let redirectPath = `${basePath}/signin`;
 
       if (email) {
-        redirectPath = emailHasAccount ? `/signin#email=${email}` : `/signup#email=${email}`;
+        redirectPath = emailHasAccount ? `${basePath}/signin#email=${email}` : `${basePath}/signup#email=${email}`;
       }
 
       await authClient.signOut({
