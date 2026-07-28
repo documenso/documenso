@@ -170,6 +170,8 @@ export const ZCreateDocumentMutationSchema = z.object({
       typedSignatureEnabled: z.boolean().optional().default(true),
       uploadSignatureEnabled: z.boolean().optional().default(true),
       drawSignatureEnabled: z.boolean().optional().default(true),
+      // No default: omission must fall through to team/org settings.
+      qrSignatureEnabled: z.boolean().optional(),
       distributionMethod: z.nativeEnum(DocumentDistributionMethod).optional(),
       emailSettings: ZDocumentEmailSettingsSchema.optional(),
     })
@@ -340,6 +342,7 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
       typedSignatureEnabled: z.boolean(),
       uploadSignatureEnabled: z.boolean(),
       drawSignatureEnabled: z.boolean(),
+      qrSignatureEnabled: z.boolean(),
       emailSettings: ZDocumentEmailSettingsSchema,
     })
     .partial()

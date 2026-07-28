@@ -77,9 +77,20 @@ export class Point implements PointLike {
     let x = Math.min(Math.max(left, clientX), right) - left;
     let y = Math.min(Math.max(top, clientY), bottom) - top;
 
-    // adjust for DPI
-    x *= dpi;
-    y *= dpi;
+    // Adjust for DPI. Canvas bitmaps are sized once at mount, so if the element
+    // has been resized since (fluid container, device rotation) the nominal dpi
+    // no longer matches reality — use the actual bitmap / CSS box ratio so the
+    // ink always lands under the pointer.
+    let scaleX = dpi;
+    let scaleY = dpi;
+
+    if (target instanceof HTMLCanvasElement && right - left > 0 && bottom - top > 0) {
+      scaleX = target.width / (right - left);
+      scaleY = target.height / (bottom - top);
+    }
+
+    x *= scaleX;
+    y *= scaleY;
 
     return new Point(x, y);
   }

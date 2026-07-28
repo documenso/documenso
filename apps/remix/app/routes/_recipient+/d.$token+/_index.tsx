@@ -215,6 +215,7 @@ const DirectSigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV
       typedSignatureEnabled={template.templateMeta?.typedSignatureEnabled}
       uploadSignatureEnabled={template.templateMeta?.uploadSignatureEnabled}
       drawSignatureEnabled={template.templateMeta?.drawSignatureEnabled}
+      qrSignatureEnabled={template.templateMeta?.qrSignatureEnabled}
     >
       <DocumentSigningAuthProvider
         documentAuthOptions={template.authOptions}

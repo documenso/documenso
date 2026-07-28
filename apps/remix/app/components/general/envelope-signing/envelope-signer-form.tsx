@@ -121,6 +121,8 @@ export default function EnvelopeSignerForm() {
               typedSignatureEnabled={envelope.documentMeta.typedSignatureEnabled}
               uploadSignatureEnabled={envelope.documentMeta.uploadSignatureEnabled}
               drawSignatureEnabled={envelope.documentMeta.drawSignatureEnabled}
+              qrSignatureEnabled={envelope.documentMeta.qrSignatureEnabled}
+              qrSignatureContext={{ type: 'DOCUMENT_SIGNATURE', recipientToken: recipient.token }}
             />
           </div>
         )}
