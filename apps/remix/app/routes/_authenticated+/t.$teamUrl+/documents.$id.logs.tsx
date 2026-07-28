@@ -153,11 +153,11 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
           <div className="mt-4 flex w-full flex-row sm:mt-0 sm:w-auto sm:self-end">
             <DocumentCertificateDownloadButton
               className="mr-2"
-              documentId={document.id}
+              envelopeId={document.envelopeId}
               documentStatus={document.status}
             />
 
-            <DocumentAuditLogDownloadButton documentId={document.id} />
+            <DocumentAuditLogDownloadButton envelopeId={document.envelopeId} />
           </div>
         </div>
       </div>

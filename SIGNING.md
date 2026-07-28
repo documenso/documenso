@@ -1,67 +1,9 @@
-# Creating your own signing certificate
+# Signing Certificate
 
-For the digital signature of your documents you need a signing certificate in .p12 format (public and private key). You can buy one (not recommended for dev) or use the steps to create a self-signed one:
+Documenso needs a signing certificate to digitally sign documents. For full, up-to-date instructions on generating, converting, and configuring a certificate, see the official documentation:
 
-1. Generate a private key using the OpenSSL command. You can run the following command to generate a 2048-bit RSA key:
+- [Signing Certificate](https://docs.documenso.com/docs/self-hosting/configuration/signing-certificate): Overview and all certificate options
+- [Local Certificate](https://docs.documenso.com/docs/self-hosting/configuration/signing-certificate/local): Generate a self-signed `.p12` certificate with OpenSSL
+- [Google Cloud HSM](https://docs.documenso.com/docs/self-hosting/configuration/signing-certificate/google-cloud-hsm): Sign using Google Cloud KMS
 
-   `openssl genrsa -out private.key 2048`
-
-2. Generate a self-signed certificate using the private key. You can run the following command to generate a self-signed certificate:
-
-   `openssl req -new -x509 -key private.key -out certificate.crt -days 365`
-
-   This will prompt you to enter some information, such as the Common Name (CN) for the certificate. Make sure you enter the correct information. The `-days` parameter sets the number of days for which the certificate is valid.
-
-3. Combine the private key and the self-signed certificate to create the p12 certificate. You can run the following commands to do this:
-
-   ```bash
-   # Set certificate password securely (won't appear in command history)
-   read -s -p "Enter certificate password: " CERT_PASS
-   echo
-   
-   # Create the p12 certificate using the environment variable
-   openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt \
-       -password env:CERT_PASS \
-       -keypbe PBE-SHA1-3DES \
-       -certpbe PBE-SHA1-3DES \
-       -macalg sha1
-   ```
-
-4. **IMPORTANT**: A certificate password is required to prevent signing failures. Make sure to use a strong password (minimum 4 characters) when prompted. Certificates without passwords will cause "Failed to get private key bags" errors during document signing.
-
-5. Place the certificate `/apps/remix/resources/certificate.p12` (If the path does not exist, it needs to be created)
-
-## Docker
-
-> We are still working on the publishing of docker images, in the meantime you can follow the steps below to create a production ready docker image.
-
-Want to create a production ready docker image? Follow these steps:
-
-- cd into `docker` directory
-- Make `build.sh` executable by running `chmod +x build.sh`
-- Run `./build.sh` to start building the docker image.
-- Publish the image to your docker registry of choice (or) If you prefer running the image from local, run the below command
-
-```
-docker run -d --restart=unless-stopped -p 3000:3000 -v documenso:/app/data --name documenso documenso:latest
-```
-
-Command Breakdown:
-
-- `-d` - Let's you run the container in background
-- `-p` - Passes down which ports to use. First half is the host port, Second half is the app port. You can change the first half anything you want and reverse proxy to that port.
-- `-v` - Volume let's you persist the data
-- `--name` - Name of the container
-- `documenso:latest` - Image you have built
-
-## Deployment
-
-We support a variety of deployment methods, and are actively working on adding more. Stay tuned for updates!
-
-## Railway
-
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/DjrRRX?referralCode=EZR3s0&utm_medium=integration&utm_source=template&utm_campaign=generic)
-
-## Render
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
+For deploying Documenso with Docker, see the [Docker Deployment](https://docs.documenso.com/docs/self-hosting/deployment/docker) and [Docker Compose](https://docs.documenso.com/docs/self-hosting/deployment/docker-compose) guides.

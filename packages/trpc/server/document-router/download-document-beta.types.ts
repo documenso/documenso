@@ -7,8 +7,10 @@ export const downloadDocumentMeta: TrpcRouteMeta = {
     method: 'GET',
     path: '/document/{documentId}/download-beta',
     summary: 'Download document (beta)',
-    description: 'Get a pre-signed download URL for the original or signed version of a document',
+    description:
+      'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Get a pre-signed download URL for the original or signed version of a document',
     tags: ['Document'],
+    deprecated: true,
   },
 };
 

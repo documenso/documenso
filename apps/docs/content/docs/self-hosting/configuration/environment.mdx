@@ -86,6 +86,21 @@ Callback URL: `https://<your-domain>/api/auth/callback/microsoft`
 | `NEXT_PRIVATE_OIDC_SKIP_VERIFY`    | `false` | Skip email verification for OIDC accounts          |
 | `NEXT_PRIVATE_OIDC_PROMPT`         | `login` | OIDC prompt parameter. Set to empty string to omit |
 
+### Webhooks
+
+| Variable                                | Default | Description                                                              |
+| --------------------------------------- | ------- | ------------------------------------------------------------------------ |
+| `NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS` | -       | Comma-separated hostnames or IPs allowed to resolve to private addresses |
+
+Before delivering a webhook, Documenso checks whether the target resolves to a
+private or loopback address and blocks it if so. This check is best-effort and
+fails open. Use `NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS` to allow specific
+internal hosts, for example when delivering to a service on your own network:
+
+```bash
+NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS="hooks.internal.example,10.0.0.5"
+```
+
 ---
 
 ## Email Configuration
@@ -257,6 +272,12 @@ For detailed certificate setup, see [Signing Certificate](/docs/self-hosting/con
 | `NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP`       | Block new accounts via Microsoft. Existing linked users can still sign in           | `false` |
 | `NEXT_PUBLIC_DISABLE_OIDC_SIGNUP`            | Block new accounts via OIDC, including the organisation portal                      | `false` |
 | `NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS`        | Comma-separated list of email domains allowed to sign up (e.g., `example.com,acme.org`) |         |
+| `NEXT_PUBLIC_DISABLE_SIGNIN`                 | Master switch. Disable all signin methods application-wide                          | `false` |
+| `NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNIN`  | Disable email/password signin. Also closes `/forgot-password` and `/reset-password` | `false` |
+| `NEXT_PUBLIC_DISABLE_GOOGLE_SIGNIN`          | Hide the Google signin button                                                       | `false` |
+| `NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN`       | Hide the Microsoft signin button                                                    | `false` |
+| `NEXT_PUBLIC_DISABLE_OIDC_SIGNIN`            | Hide the OIDC signin button                                                         | `false` |
+| `NEXT_PUBLIC_DISABLE_OIDC_AUTO_REDIRECT`     | Disable the automatic `/signin` redirect when OIDC is the only enabled transport    | `false` |
 | `NEXT_PUBLIC_POSTHOG_KEY`             | PostHog API key for analytics and feature flags                                     |         |
 | `NEXT_PUBLIC_FEATURE_BILLING_ENABLED` | Enable billing features                                                             | `false` |
 
@@ -286,6 +307,44 @@ NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP="true"
 
 # Or disable signups entirely
 NEXT_PUBLIC_DISABLE_SIGNUP="true"
+```
+
+### Sign-in Restrictions
+
+You can control which methods are available for users to sign in with the following environment variables:
+
+- **`NEXT_PUBLIC_DISABLE_SIGNIN`** (master switch): Set to `true` to block all signin methods (email/password, Google, Microsoft, OIDC). Hides every signin entry point on `/signin` and rejects email/password signin server-side with a `SIGNIN_DISABLED` error.
+- **`NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNIN`**: Set to `true` to disable email/password signin only. The email/password form is hidden, the `/forgot-password` and `/reset-password` pages redirect to `/signin`, and the corresponding server endpoints reject requests. SSO signin is unaffected.
+- **`NEXT_PUBLIC_DISABLE_GOOGLE_SIGNIN`**, **`NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN`**, **`NEXT_PUBLIC_DISABLE_OIDC_SIGNIN`**: Set to `true` to hide the matching SSO button on the signin page. Useful when an SSO provider is kept configured for account linking but not advertised as a signin entry point.
+
+These flags are opt-in: when none are set, signin behaviour is unchanged from a stock Documenso instance.
+
+```bash
+# Allow only OIDC signin (e.g. enterprise SSO-only)
+NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNIN="true"
+NEXT_PUBLIC_DISABLE_GOOGLE_SIGNIN="true"
+NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN="true"
+
+# Or disable signin entirely
+NEXT_PUBLIC_DISABLE_SIGNIN="true"
+```
+
+### OIDC Auto-redirect
+
+When OIDC is the only enabled signin transport on your instance, `/signin` automatically redirects users straight to the OIDC provider instead of showing the signin form. The page renders a spinner while the redirect happens. No extra configuration is required — disabling every other signin method is enough to trigger it.
+
+- **`NEXT_PUBLIC_DISABLE_OIDC_AUTO_REDIRECT`**: Set to `true` to opt out of the automatic redirect and keep rendering the signin page even when OIDC is the only enabled transport.
+
+The redirect only triggers when OIDC is configured and email/password, Google, and Microsoft signin are all disabled. If any other transport remains enabled, the signin form is shown as normal.
+
+```bash
+# OIDC-only signin: disabling all other methods auto-redirects to the provider
+NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNIN="true"
+NEXT_PUBLIC_DISABLE_GOOGLE_SIGNIN="true"
+NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN="true"
+
+# Opt out of the auto-redirect while still OIDC-only
+# NEXT_PUBLIC_DISABLE_OIDC_AUTO_REDIRECT="true"
 ```
 
 ---
@@ -384,11 +443,11 @@ Telemetry collects only: app version, installation ID, and node ID. No personal 
 
 ## Enterprise Features
 
-These variables require an active [Enterprise Edition](/docs/policies/enterprise-edition) license. Obtain a license key from [license.documenso.com](https://license.documenso.com) and set it below to unlock enterprise features such as SSO, embed editor, and 21 CFR Part 11 compliance.
+These variables require an active [Enterprise Edition](/docs/policies/enterprise-edition) license. Obtain a license key from [license.documenso.com](https://license.documenso.com) and set it below to unlock enterprise features such as SSO, embed editor, and 21 CFR Part 11 compliance. See [Apply Your License Key](/docs/self-hosting/configuration/license) for step-by-step setup.
 
 | Variable                             | Description                                      |
 | ------------------------------------ | ------------------------------------------------ |
-| `NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY` | License key for enterprise features              |
+| `NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY` | License key for enterprise features — see [Apply Your License Key](/docs/self-hosting/configuration/license) for how to apply it |
 | `NEXT_PRIVATE_STRIPE_API_KEY`        | Stripe API key for billing                       |
 | `NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET` | Stripe webhook secret                            |
 | `NEXT_PRIVATE_SES_ACCESS_KEY_ID`     | AWS SES access key for email domain verification |
@@ -431,6 +490,16 @@ NEXT_PRIVATE_SIGNING_PASSPHRASE="your-certificate-password"
 # NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP="true"
 # NEXT_PUBLIC_DISABLE_OIDC_SIGNUP="true"
 # NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS="example.com,acme.org"
+
+# Sign-in restrictions (optional)
+# NEXT_PUBLIC_DISABLE_SIGNIN="true"
+# NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNIN="true"
+# NEXT_PUBLIC_DISABLE_GOOGLE_SIGNIN="true"
+# NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNIN="true"
+# NEXT_PUBLIC_DISABLE_OIDC_SIGNIN="true"
+
+# Opt out of the automatic OIDC redirect when OIDC is the only enabled transport (optional)
+# NEXT_PUBLIC_DISABLE_OIDC_AUTO_REDIRECT="true"
 ```
 
 ---
@@ -441,4 +510,5 @@ NEXT_PRIVATE_SIGNING_PASSPHRASE="your-certificate-password"
 - [Email Configuration](/docs/self-hosting/configuration/email) - Configure email delivery
 - [Storage Configuration](/docs/self-hosting/configuration/storage) - Set up S3 storage
 - [Signing Certificate](/docs/self-hosting/configuration/signing-certificate) - Configure document signing
+- [Organisation Limits](/docs/self-hosting/configuration/organisation-limits) - Set per-organisation document, email, and API limits from the admin panel
 - [Troubleshooting](/docs/self-hosting/maintenance/troubleshooting) - Common configuration issues

@@ -174,7 +174,7 @@ export const EnvelopeDropZoneWrapper = ({ children, type, className }: EnvelopeD
               {type === EnvelopeType.DOCUMENT ? <Trans>Upload Document</Trans> : <Trans>Upload Template</Trans>}
             </h2>
 
-            <p className="mt-4 text-md text-muted-foreground">
+            <p className="mt-4 text-base text-muted-foreground">
               <Trans>Drag and drop your document here</Trans>
             </p>
 

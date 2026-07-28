@@ -1,10 +1,16 @@
-import { syncMemberCountWithStripeSeatPlan } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
-import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
+import {
+  ORGANISATION_MEMBER_ROLE_HIERARCHY,
+  ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP,
+} from '@documenso/lib/constants/organisations';
+
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobs } from '@documenso/lib/jobs/client';
-import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
+import {
+  buildOrganisationWhereQuery,
+  getHighestOrganisationRoleInGroup,
+  isOrganisationRoleWithinUserHierarchy,
+} from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
-import { OrganisationMemberInviteStatus } from '@documenso/prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -52,25 +58,18 @@ export const deleteOrganisationMembers = async ({
       roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
     }),
     include: {
-      subscription: true,
-      organisationClaim: true,
       teams: {
         select: {
           id: true,
         },
       },
       members: {
-        select: {
-          id: true,
-          userId: true,
-        },
-      },
-      invites: {
-        where: {
-          status: OrganisationMemberInviteStatus.PENDING,
-        },
-        select: {
-          id: true,
+        include: {
+          organisationGroupMembers: {
+            include: {
+              group: true,
+            },
+          },
         },
       },
     },
@@ -80,17 +79,41 @@ export const deleteOrganisationMembers = async ({
     throw new AppError(AppErrorCode.UNAUTHORIZED);
   }
 
-  const { organisationClaim } = organisation;
-
   const membersToDelete = organisation.members.filter((member) => organisationMemberIds.includes(member.id));
 
-  const inviteCount = organisation.invites.length;
-  const newMemberCount = organisation.members.length + inviteCount - membersToDelete.length;
+  const currentUserMember = organisation.members.find((member) => member.userId === userId);
 
-  // Removing members is a reducing operation, so we don't gate it on the
-  // subscription being present. Sync Stripe only when one exists.
-  if (organisation.subscription) {
-    await syncMemberCountWithStripeSeatPlan(organisation.subscription, organisationClaim, newMemberCount);
+  if (!currentUserMember) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED);
+  }
+
+  const currentUserOrganisationRole = getHighestOrganisationRoleInGroup(
+    currentUserMember.organisationGroupMembers.map(({ group }) => group),
+  );
+
+  // The roles the current user is allowed to act on (their own role and below).
+  const manageableOrganisationRoles = ORGANISATION_MEMBER_ROLE_HIERARCHY[currentUserOrganisationRole];
+
+  for (const member of membersToDelete) {
+    // The organisation owner can never be removed via this route. Ownership must
+    // be transferred first (mirrors the admin and update-member routes).
+    if (member.userId === organisation.ownerUserId) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'Cannot remove the organisation owner',
+      });
+    }
+
+    const memberOrganisationRole = getHighestOrganisationRoleInGroup(
+      member.organisationGroupMembers.map(({ group }) => group),
+    );
+
+    // A user cannot remove a member whose role is higher than their own
+    // (e.g. a manager removing an admin).
+    if (!isOrganisationRoleWithinUserHierarchy(currentUserOrganisationRole, memberOrganisationRole)) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'Cannot remove a member with a higher role',
+      });
+    }
   }
 
   const removedUserIds = membersToDelete.map((member) => member.userId);
@@ -123,8 +146,27 @@ export const deleteOrganisationMembers = async ({
           in: organisationMemberIds,
         },
         organisationId,
+        userId: {
+          not: organisation.ownerUserId,
+        },
+        organisationGroupMembers: {
+          none: {
+            group: {
+              organisationRole: {
+                notIn: manageableOrganisationRoles,
+              },
+            },
+          },
+        },
       },
     });
+  });
+
+  // Members were removed — queue a seat sync to true the Stripe quantity down to
+  // the new count (no proration, no credit).
+  await jobs.triggerJob({
+    name: 'internal.sync-organisation-seats',
+    payload: { organisationId },
   });
 
   for (const member of membersToDelete) {

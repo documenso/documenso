@@ -324,10 +324,7 @@ test.describe('Signing Certificate Tests', () => {
       .click();
     await page.getByRole('option', { name: 'No' }).click();
 
-    await page
-      .getByRole('button', { name: /Update/ })
-      .first()
-      .click();
+    await page.getByRole('button', { name: 'Save changes' }).first().click();
 
     await page.waitForTimeout(1000);
 
@@ -347,10 +344,7 @@ test.describe('Signing Certificate Tests', () => {
       .getByRole('combobox')
       .click();
     await page.getByRole('option', { name: 'Yes' }).click();
-    await page
-      .getByRole('button', { name: /Update/ })
-      .first()
-      .click();
+    await page.getByRole('button', { name: 'Save changes' }).first().click();
 
     await page.waitForTimeout(1000);
 

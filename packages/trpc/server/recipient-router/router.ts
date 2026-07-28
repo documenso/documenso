@@ -60,8 +60,9 @@ export const recipientRouter = router({
         path: '/document/recipient/{recipientId}',
         summary: 'Get document recipient',
         description:
-          'Returns a single recipient. If you want to retrieve all the recipients for a document, use the "Get Document" endpoint.',
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Returns a single recipient. If you want to retrieve all the recipients for a document, use the "Get Document" endpoint.',
         tags: ['Document Recipients'],
+        deprecated: true,
       },
     })
     .input(ZGetRecipientRequestSchema)
@@ -93,8 +94,10 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/document/recipient/create',
         summary: 'Create document recipient',
-        description: 'Create a single recipient for a document.',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Create a single recipient for a document.',
         tags: ['Document Recipients'],
+        deprecated: true,
       },
     })
     .input(ZCreateDocumentRecipientRequestSchema)
@@ -132,8 +135,10 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/document/recipient/create-many',
         summary: 'Create document recipients',
-        description: 'Create multiple recipients for a document.',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Create multiple recipients for a document.',
         tags: ['Document Recipients'],
+        deprecated: true,
       },
     })
     .input(ZCreateDocumentRecipientsRequestSchema)
@@ -169,8 +174,10 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/document/recipient/update',
         summary: 'Update document recipient',
-        description: 'Update a single recipient for a document.',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Update a single recipient for a document.',
         tags: ['Document Recipients'],
+        deprecated: true,
       },
     })
     .input(ZUpdateDocumentRecipientRequestSchema)
@@ -208,8 +215,10 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/document/recipient/update-many',
         summary: 'Update document recipients',
-        description: 'Update multiple recipients for a document.',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Update multiple recipients for a document.',
         tags: ['Document Recipients'],
+        deprecated: true,
       },
     })
     .input(ZUpdateDocumentRecipientsRequestSchema)
@@ -245,7 +254,10 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/document/recipient/delete',
         summary: 'Delete document recipient',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide.',
         tags: ['Document Recipients'],
+        deprecated: true,
       },
     })
     .input(ZDeleteDocumentRecipientRequestSchema)
@@ -315,8 +327,9 @@ export const recipientRouter = router({
         path: '/template/recipient/{recipientId}',
         summary: 'Get template recipient',
         description:
-          'Returns a single recipient. If you want to retrieve all the recipients for a template, use the "Get Template" endpoint.',
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Returns a single recipient. If you want to retrieve all the recipients for a template, use the "Get Template" endpoint.',
         tags: ['Template Recipients'],
+        deprecated: true,
       },
     })
     .input(ZGetRecipientRequestSchema)
@@ -348,8 +361,10 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/template/recipient/create',
         summary: 'Create template recipient',
-        description: 'Create a single recipient for a template.',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Create a single recipient for a template.',
         tags: ['Template Recipients'],
+        deprecated: true,
       },
     })
     .input(ZCreateTemplateRecipientRequestSchema)
@@ -387,8 +402,10 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/template/recipient/create-many',
         summary: 'Create template recipients',
-        description: 'Create multiple recipients for a template.',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Create multiple recipients for a template.',
         tags: ['Template Recipients'],
+        deprecated: true,
       },
     })
     .input(ZCreateTemplateRecipientsRequestSchema)
@@ -424,8 +441,10 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/template/recipient/update',
         summary: 'Update template recipient',
-        description: 'Update a single recipient for a template.',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Update a single recipient for a template.',
         tags: ['Template Recipients'],
+        deprecated: true,
       },
     })
     .input(ZUpdateTemplateRecipientRequestSchema)
@@ -463,8 +482,10 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/template/recipient/update-many',
         summary: 'Update template recipients',
-        description: 'Update multiple recipients for a template.',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Update multiple recipients for a template.',
         tags: ['Template Recipients'],
+        deprecated: true,
       },
     })
     .input(ZUpdateTemplateRecipientsRequestSchema)
@@ -500,7 +521,10 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/template/recipient/delete',
         summary: 'Delete template recipient',
+        description:
+          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide.',
         tags: ['Template Recipients'],
+        deprecated: true,
       },
     })
     .input(ZDeleteTemplateRecipientRequestSchema)

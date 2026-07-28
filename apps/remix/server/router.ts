@@ -105,7 +105,6 @@ app.route('/api/auth', auth);
 
 // Files route.
 app.use('/api/files/upload-pdf', fileRateLimitMiddleware);
-app.use('/api/files/presigned-post-url', fileRateLimitMiddleware);
 app.route('/api/files', filesRoute);
 
 // AI route.
