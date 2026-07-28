@@ -4,7 +4,7 @@ import {
   TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX,
 } from '@documenso/lib/constants/template';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION, SKIP_QUERY_BATCH_META } from '@documenso/lib/constants/trpc';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { type TRecipientLite, ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { trpc } from '@documenso/trpc/react';
@@ -35,8 +35,8 @@ import { FileTextIcon, InfoIcon, Plus, UploadCloudIcon, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
-import { match } from 'ts-pattern';
 import * as z from 'zod';
+import { getTemplateUseErrorMessage } from '~/utils/toast-error-messages';
 
 const ZAddRecipientsForNewDocumentSchema = z.object({
   distributeDocument: z.boolean(),
@@ -180,22 +180,11 @@ export function TemplateUseDialog({
       await navigate(documentPath);
     } catch (err) {
       const error = AppError.parseError(err);
-
-      const errorMessage = match(error.code)
-        .with('DOCUMENT_SEND_FAILED', () => msg`The document was created but could not be sent to recipients.`)
-        .with(
-          AppErrorCode.INVALID_BODY,
-          AppErrorCode.INVALID_REQUEST,
-          () =>
-            msg`The document could not be created because of missing or invalid information. Please review the template's recipients and fields.`,
-        )
-        .with(AppErrorCode.NOT_FOUND, () => msg`The template or one of its recipients could not be found.`)
-        .with(AppErrorCode.LIMIT_EXCEEDED, () => msg`You have reached your document limit for this plan.`)
-        .otherwise(() => msg`An error occurred while creating document from template.`);
+      const errorMessage = getTemplateUseErrorMessage(error.code);
 
       toast({
-        title: _(msg`Error`),
-        description: _(errorMessage),
+        title: _(errorMessage.title),
+        description: _(errorMessage.description),
         variant: 'destructive',
       });
     }

@@ -3,7 +3,7 @@ import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import type { TCreateDocumentPayloadSchema } from '@documenso/trpc/server/document-router/create-document.types';
@@ -20,9 +20,9 @@ import { EnvelopeType } from '@prisma/client';
 import { useMemo, useState } from 'react';
 import type { FileRejection } from 'react-dropzone';
 import { useNavigate, useParams } from 'react-router';
-import { match } from 'ts-pattern';
 
 import { useCurrentTeam } from '~/providers/team';
+import { getUploadErrorMessage } from '~/utils/toast-error-messages';
 
 export type DocumentUploadButtonLegacyProps = {
   className?: string;
@@ -130,30 +130,11 @@ export const DocumentUploadButtonLegacy = ({ className, type }: DocumentUploadBu
 
       console.error(err);
 
-      const errorMessage = match(error.code)
-        .with('INVALID_DOCUMENT_FILE', () => msg`You cannot upload encrypted PDFs.`)
-        .with(
-          AppErrorCode.LIMIT_EXCEEDED,
-          () => msg`You have reached your document limit for this month. Please upgrade your plan.`,
-        )
-        .with(
-          'ENVELOPE_ITEM_LIMIT_EXCEEDED',
-          () => msg`You have reached the limit of the number of files per envelope.`,
-        )
-        .with('UNSUPPORTED_FILE_TYPE', () => msg`This file type isn't supported. Please upload a PDF or Word document.`)
-        .with(
-          'CONVERSION_SERVICE_UNAVAILABLE',
-          () => msg`Document conversion is temporarily unavailable. Please try again shortly or upload a PDF.`,
-        )
-        .with(
-          'CONVERSION_FAILED',
-          () => msg`We couldn't convert this file. Please check it's a valid Word document or upload a PDF instead.`,
-        )
-        .otherwise(() => msg`An error occurred while uploading your document.`);
+      const errorMessage = getUploadErrorMessage(error.code);
 
       toast({
-        title: _(msg`Error`),
-        description: _(errorMessage),
+        title: _(errorMessage.title),
+        description: _(errorMessage.description),
         variant: 'destructive',
         duration: 7500,
       });

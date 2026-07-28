@@ -7,7 +7,7 @@ import type React from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import type { TEnvelope } from '../../types/envelope';
-import type { FieldRenderMode } from '../../universal/field-renderer/render-field';
+import type { FieldRenderMode } from '../../universal/field-renderer/field-renderer';
 
 /**
  * The signature data for an inserted signature field.

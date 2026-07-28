@@ -17,7 +17,7 @@ import { DocumentStatus as DocumentStatusEnum, RecipientRole, SigningStatus } fr
 import { CheckCircleIcon, DownloadIcon, EyeIcon, Loader, PencilIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useMemo, useTransition } from 'react';
-import { Link, useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
@@ -200,7 +200,7 @@ export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => 
   })
     .with({ isPending: true, isSigned: false }, () => (
       <Button className="w-32" asChild>
-        <Link to={`/sign/${recipient?.token}`}>
+        <a href={`/sign/${recipient?.token}`}>
           {match(role)
             .with(RecipientRole.SIGNER, () => (
               <>
@@ -220,7 +220,7 @@ export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => 
                 <Trans>View</Trans>
               </>
             ))}
-        </Link>
+        </a>
       </Button>
     ))
     .with({ isPending: true, isSigned: true }, () => (

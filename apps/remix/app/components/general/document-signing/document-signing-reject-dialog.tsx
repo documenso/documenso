@@ -17,7 +17,7 @@ import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate, useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router';
 import { z } from 'zod';
 
 const ZRejectDocumentFormSchema = z.object({
@@ -41,7 +41,6 @@ export function DocumentSigningRejectDialog({
 }: DocumentSigningRejectDialogProps) {
   const { t } = useLingui();
   const { toast } = useToast();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -74,7 +73,7 @@ export function DocumentSigningRejectDialog({
       if (onRejected) {
         await onRejected(reason);
       } else {
-        await navigate(`/sign/${token}/rejected`);
+        window.location.href = `/sign/${token}/rejected`;
       }
     } catch (err) {
       toast({

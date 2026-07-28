@@ -1,8 +1,8 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Hr, Html, Img, Preview, Section, Text } from '../components';
-import { useBranding } from '../providers/branding';
+import { Body, Container, Head, Hr, Html, Preview, Section, Text } from '../components';
+import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
 import { TemplateFooter } from '../template-components/template-footer';
 import TemplateImage from '../template-components/template-image';
 
@@ -22,7 +22,6 @@ export const OrganisationDeleteEmailTemplate = ({
   deletedByAdmin = false,
 }: OrganisationDeleteEmailProps) => {
   const { _ } = useLingui();
-  const branding = useBranding();
 
   const previewText = msg`Your organisation has been deleted`;
 
@@ -35,27 +34,23 @@ export const OrganisationDeleteEmailTemplate = ({
   return (
     <Html>
       <Head />
-      <Preview>{_(previewText)}</Preview>
-
       <Body className="mx-auto my-auto font-sans">
-        <Section className="bg-white text-slate-500">
-          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid p-2 backdrop-blur-sm">
-            {branding.brandingEnabled && branding.brandingLogo ? (
-              <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6 p-2" />
-            ) : (
-              <TemplateImage assetBaseUrl={assetBaseUrl} className="mb-4 h-6 p-2" staticAsset="logo.png" />
-            )}
+        <Preview>{_(previewText)}</Preview>
+
+        <Section className="bg-background text-muted-foreground">
+          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-border border-solid p-2 backdrop-blur-sm">
+            <TemplateBrandingLogo assetBaseUrl={assetBaseUrl} className="mb-4 h-6 p-2" />
 
             <Section>
               <TemplateImage className="mx-auto" assetBaseUrl={assetBaseUrl} staticAsset="delete-team.png" />
             </Section>
 
-            <Section className="p-2 text-slate-500">
-              <Text className="text-center font-medium text-black text-lg">{_(title)}</Text>
+            <Section className="p-2 text-muted-foreground">
+              <Text className="text-center font-medium text-foreground text-lg">{_(title)}</Text>
 
               <Text className="my-1 text-center text-base">{_(description)}</Text>
 
-              <div className="mx-auto my-2 w-fit rounded-lg bg-gray-50 px-4 py-2 font-medium text-base text-slate-600">
+              <div className="mx-auto my-2 w-fit rounded-lg bg-muted px-4 py-2 font-medium text-base text-muted-foreground">
                 {organisationName}
               </div>
             </Section>

@@ -73,5 +73,12 @@ if [ -z "$NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET" ]; then
   echo "╚═════════════════════════════════════════════════════════════════════╝"
 fi
 
+NEXT_PUBLIC_WEBAPP_URL=$(load_env_var "NEXT_PUBLIC_WEBAPP_URL")
+
+if [ -z "$NEXT_PUBLIC_WEBAPP_URL" ]; then
+  NEXT_PUBLIC_WEBAPP_URL="http://localhost:3000"
+  echo "[INFO]: NEXT_PUBLIC_WEBAPP_URL not set, defaulting to $NEXT_PUBLIC_WEBAPP_URL"
+fi
+
 echo "[INFO]: Starting Stripe webhook listener..."
-stripe listen --api-key "$NEXT_PRIVATE_STRIPE_API_KEY" --forward-to http://localhost:3000/api/stripe/webhook
+stripe listen --api-key "$NEXT_PRIVATE_STRIPE_API_KEY" --forward-to "$NEXT_PUBLIC_WEBAPP_URL/api/stripe/webhook"

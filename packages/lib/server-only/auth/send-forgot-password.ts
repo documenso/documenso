@@ -32,9 +32,12 @@ export const sendForgotPassword = async ({ userId }: SendForgotPasswordOptions) 
     throw new Error('User not found');
   }
 
-  const token = user.passwordResetTokens[0].token;
+  const token = user.passwordResetTokens[0]?.token;
+  if (!token) {
+    throw new Error('Password reset token not found for user');
+  }
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
-  const resetPasswordLink = `${NEXT_PUBLIC_WEBAPP_URL()}/reset-password/${token}`;
+  const resetPasswordLink = `${assetBaseUrl}/reset-password/${token}`;
 
   const template = createElement(ForgotPasswordTemplate, {
     assetBaseUrl,

@@ -82,7 +82,7 @@ export default function WaitingForTurnToSignPage({ loaderData }: Route.Component
       <RecipientBranding branding={branding} cspNonce={cspNonce} />
       <div className="relative flex flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
         <div className="w-full max-w-md text-center">
-          <h2 className="font-bold text-3xl tracking-tigh">
+          <h2 className="font-bold text-3xl tracking-tight">
             <Trans>Waiting for Your Turn</Trans>
           </h2>
 

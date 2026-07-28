@@ -1,4 +1,3 @@
-import { mailer } from '@documenso/email/mailer';
 import { DocumentRecipientSignedEmailTemplate } from '@documenso/email/templates/document-recipient-signed';
 import { prisma } from '@documenso/prisma';
 import { msg } from '@lingui/core/macro';
@@ -75,7 +74,7 @@ export const run = async ({ payload, io }: { payload: TSendRecipientSignedEmailJ
     return;
   }
 
-  const { branding, emailLanguage, senderEmail } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, emailTransport } = await getEmailContext({
     emailType: 'INTERNAL',
     source: {
       type: 'team',
@@ -105,7 +104,7 @@ export const run = async ({ payload, io }: { payload: TSendRecipientSignedEmailJ
       }),
     ]);
 
-    await mailer.sendMail({
+    await emailTransport.sendMail({
       to: {
         name: owner.name ?? '',
         address: owner.email,

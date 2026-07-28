@@ -23,6 +23,9 @@ export const DOCUMENT_STATUS: {
   [DocumentStatus.REJECTED]: {
     description: msg`Rejected`,
   },
+  [DocumentStatus.CANCELLED]: {
+    description: msg`Cancelled`,
+  },
   [DocumentStatus.DRAFT]: {
     description: msg`Draft`,
   },

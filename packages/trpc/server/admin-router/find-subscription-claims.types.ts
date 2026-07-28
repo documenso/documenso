@@ -22,6 +22,7 @@ export const ZFindSubscriptionClaimsResponseSchema = ZFindResultResponse.extend(
     emailQuota: true,
     apiRateLimits: true,
     apiQuota: true,
+    emailTransportId: true,
   }).array(),
 });
 

@@ -1,4 +1,3 @@
-import { mailer } from '@documenso/email/mailer';
 import { ConfirmTeamEmailTemplate } from '@documenso/email/templates/confirm-team-email';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
@@ -117,7 +116,7 @@ export const sendTeamEmailVerificationEmail = async (email: string, token: strin
     token,
   });
 
-  const { branding, emailLanguage, senderEmail } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, emailTransport } = await getEmailContext({
     emailType: 'INTERNAL',
     source: {
       type: 'team',
@@ -136,7 +135,7 @@ export const sendTeamEmailVerificationEmail = async (email: string, token: strin
 
   const i18n = await getI18nInstance(emailLanguage);
 
-  await mailer.sendMail({
+  await emailTransport.sendMail({
     to: email,
     from: senderEmail,
     subject: i18n._(msg`A request to use your email has been initiated by ${team.name} on Documenso`),

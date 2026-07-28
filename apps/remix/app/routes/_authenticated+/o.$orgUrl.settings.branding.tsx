@@ -1,7 +1,6 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { canExecuteOrganisationAction, isPersonalLayout } from '@documenso/lib/utils/organisations';
 import type { SanitizeBrandingCssWarning } from '@documenso/lib/utils/sanitize-branding-css';
 import { trpc } from '@documenso/trpc/react';
@@ -49,26 +48,29 @@ export default function OrganisationSettingsBrandingPage() {
 
   const { mutateAsync: updateOrganisationSettings } = trpc.organisation.settings.update.useMutation();
 
+  const { mutateAsync: updateOrganisationBrandingLogo } = trpc.organisation.settings.updateBrandingLogo.useMutation();
+
   const onBrandingPreferencesFormSubmit = async (data: TBrandingPreferencesFormSchema) => {
     try {
       const { brandingEnabled, brandingLogo, brandingUrl, brandingCompanyDetails, brandingColors, brandingCss } = data;
 
-      let uploadedBrandingLogo: string | undefined;
+      // Upload (or clear) the logo through the dedicated, server-validated route.
+      if (brandingLogo instanceof File || brandingLogo === null) {
+        const formData = new FormData();
 
-      if (brandingLogo) {
-        uploadedBrandingLogo = JSON.stringify(await putFile(brandingLogo));
-      }
+        formData.append('payload', JSON.stringify({ organisationId: organisation.id }));
 
-      // Empty the branding logo if the user unsets it.
-      if (brandingLogo === null) {
-        uploadedBrandingLogo = '';
+        if (brandingLogo instanceof File) {
+          formData.append('brandingLogo', brandingLogo);
+        }
+
+        await updateOrganisationBrandingLogo(formData);
       }
 
       const result = await updateOrganisationSettings({
         organisationId: organisation.id,
         data: {
           brandingEnabled: brandingEnabled ?? undefined,
-          brandingLogo: uploadedBrandingLogo,
           brandingUrl,
           brandingCompanyDetails,
           brandingColors,
@@ -104,6 +106,9 @@ export default function OrganisationSettingsBrandingPage() {
         description: t`We were unable to update your branding preferences at this time, please try again later`,
         variant: 'destructive',
       });
+
+      // Rethrow so the form knows the save failed and keeps the unsaved changes.
+      throw err;
     }
   };
 

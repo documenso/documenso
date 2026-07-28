@@ -31,8 +31,7 @@ vscode:
   extensions:
     - aaron-bond.better-comments
     - bradlc.vscode-tailwindcss
-    - dbaeumer.vscode-eslint
-    - esbenp.prettier-vscode
+    - biomejs.biome
     - mikestead.dotenv
     - unifiedjs.vscode-mdx
     - GitHub.vscode-pull-request-github

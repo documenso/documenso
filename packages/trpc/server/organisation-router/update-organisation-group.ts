@@ -38,6 +38,15 @@ export const updateOrganisationGroupRoute = authenticatedProcedure
       },
       include: {
         organisationGroupMembers: true,
+        organisation: {
+          include: {
+            members: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -77,6 +86,15 @@ export const updateOrganisationGroupRoute = authenticatedProcedure
     }
 
     const groupMemberIds = unique(data.memberIds || []);
+
+    // Validate that members belong to the same organisation as the group.
+    groupMemberIds.forEach((memberId) => {
+      const member = organisationGroup.organisation.members.find(({ id }) => id === memberId);
+
+      if (!member) {
+        throw new AppError(AppErrorCode.NOT_FOUND);
+      }
+    });
 
     const membersToDelete = organisationGroup.organisationGroupMembers.filter(
       (member) => !groupMemberIds.includes(member.organisationMemberId),

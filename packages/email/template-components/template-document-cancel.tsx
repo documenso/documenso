@@ -22,18 +22,18 @@ export const TemplateDocumentCancel = ({
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
       <Section>
-        <Text className="mx-auto mb-0 max-w-[80%] text-center font-semibold text-lg text-primary">
+        <Text className="mx-auto mb-0 max-w-[80%] text-center font-semibold text-foreground text-lg">
           <Trans>
             {inviterName} has cancelled the document
             <br />"{documentName}"
           </Trans>
         </Text>
 
-        <Text className="my-1 text-center text-base text-slate-400">
+        <Text className="my-1 text-center text-base text-muted-foreground">
           <Trans>All signatures have been voided.</Trans>
         </Text>
 
-        <Text className="my-1 text-center text-base text-slate-400">
+        <Text className="my-1 text-center text-base text-muted-foreground">
           <Trans>You don't need to sign it anymore.</Trans>
         </Text>
 

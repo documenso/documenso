@@ -10,7 +10,9 @@ import { EnvelopeType, RecipientRole, SendStatus, SigningStatus } from '@prisma/
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapRecipientToLegacyRecipient } from '../../utils/recipients';
+import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 
 export interface CreateEnvelopeRecipientsOptions {
   userId: number;
@@ -63,6 +65,8 @@ export const createEnvelopeRecipients = async ({
     });
   }
 
+  assertEnvelopeMutable(envelope);
+
   if (envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Envelope already complete',
@@ -80,12 +84,21 @@ export const createEnvelopeRecipients = async ({
     });
   }
 
+  for (const recipient of recipientsToCreate) {
+    assertCompatibleRecipientRole({
+      signatureLevel: envelope.signatureLevel,
+      role: recipient.role,
+    });
+  }
+
   const normalizedRecipients = recipientsToCreate.map((recipient) => ({
     ...recipient,
     email: recipient.email.toLowerCase(),
   }));
 
   const createdRecipients = await prisma.$transaction(async (tx) => {
+    await assertEnvelopeMutable(envelope, tx);
+
     return await Promise.all(
       normalizedRecipients.map(async (recipient) => {
         const authOptions = createRecipientAuthOptions({

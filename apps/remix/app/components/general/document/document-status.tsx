@@ -40,6 +40,12 @@ export const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus>
     icon: XCircle,
     color: 'text-red-500 dark:text-red-300',
   },
+  CANCELLED: {
+    label: msg`Cancelled`,
+    labelExtended: msg`Document cancelled`,
+    icon: XCircle,
+    color: 'text-red-500 dark:text-red-300',
+  },
   INBOX: {
     label: msg`Inbox`,
     labelExtended: msg`Document inbox`,

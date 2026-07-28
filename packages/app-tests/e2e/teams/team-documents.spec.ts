@@ -238,7 +238,7 @@ test('[TEAMS]: resend pending team document', async ({ page }) => {
   await page.getByLabel('test.documenso.com').first().click();
   await page.getByRole('button', { name: 'Send reminder' }).click();
 
-  await expectToastTextToBeVisible(page, 'Document re-sent');
+  await expectToastTextToBeVisible(page, 'Document resent');
 });
 
 test('[TEAMS]: delete draft team document', async ({ page }) => {

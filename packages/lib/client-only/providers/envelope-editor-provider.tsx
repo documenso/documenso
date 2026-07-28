@@ -1,3 +1,4 @@
+import { IS_INSTANCE_CSC_MODE } from '@documenso/lib/constants/app';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import {
   DEFAULT_EDITOR_CONFIG,
@@ -36,6 +37,12 @@ type EnvelopeEditorProviderValue = {
   isEmbedded: boolean;
   isDocument: boolean;
   isTemplate: boolean;
+  /**
+   * Whether the instance is running in CSC (Cloud Signature Consortium) mode.
+   * Components can branch on this for any additional CSC-only UI gating
+   * beyond the overrides already baked into `editorConfig`.
+   */
+  isCscMode: boolean;
 
   setLocalEnvelope: (localEnvelope: Partial<TEditorEnvelope>) => void;
   updateEnvelope: (envelopeUpdates: UpdateEnvelopePayload) => void;
@@ -91,7 +98,7 @@ export const useCurrentEnvelopeEditor = () => {
 
 export const EnvelopeEditorProvider = ({
   children,
-  editorConfig = DEFAULT_EDITOR_CONFIG,
+  editorConfig: providedEditorConfig = DEFAULT_EDITOR_CONFIG,
   initialEnvelope,
   organisationEmails,
 }: EnvelopeEditorProviderProps) => {
@@ -102,6 +109,31 @@ export const EnvelopeEditorProvider = ({
 
   const [envelope, _setEnvelope] = useState(initialEnvelope);
   const [autosaveError, setAutosaveError] = useState<boolean>(false);
+
+  const isCscMode = IS_INSTANCE_CSC_MODE();
+
+  /**
+   * CSC-mode overrides applied on top of any caller-supplied editor config.
+   * TSP envelopes are forced SEQUENTIAL at send-time and the sign path has no
+   * nextSigner dictation; the assistant role's pre-fill semantics don't map
+   * onto each recipient signing their own complete PDF state. Hide all three
+   * up-front so authors don't pick options that would get silently coerced.
+   */
+  const editorConfig = useMemo<EnvelopeEditorConfig>(() => {
+    if (!isCscMode || !providedEditorConfig.recipients) {
+      return providedEditorConfig;
+    }
+
+    return {
+      ...providedEditorConfig,
+      recipients: {
+        ...providedEditorConfig.recipients,
+        allowConfigureSigningOrder: false,
+        allowConfigureDictateNextSigner: false,
+        allowAssistantRole: false,
+      },
+    };
+  }, [isCscMode, providedEditorConfig]);
 
   const envelopeRef = useRef(initialEnvelope);
 
@@ -467,6 +499,7 @@ export const EnvelopeEditorProvider = ({
         isEmbedded,
         isDocument: envelope.type === EnvelopeType.DOCUMENT,
         isTemplate: envelope.type === EnvelopeType.TEMPLATE,
+        isCscMode,
         setLocalEnvelope,
         getRecipientColorKey,
         updateEnvelope,

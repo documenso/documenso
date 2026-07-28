@@ -1,5 +1,6 @@
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
+import { isOrganisationPendingPayment } from '@documenso/lib/utils/billing';
 import { prisma } from '@documenso/prisma';
 import { DocumentSource, EnvelopeType, SubscriptionStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
@@ -62,6 +63,15 @@ export const getServerLimits = async ({ userId, teamId }: GetServerLimitsOptions
 
   // Early return for users with an expired subscription.
   if (subscription && subscription.status === SubscriptionStatus.INACTIVE) {
+    return {
+      quota: INACTIVE_PLAN_LIMITS,
+      remaining: INACTIVE_PLAN_LIMITS,
+      maximumEnvelopeItemCount,
+    };
+  }
+
+  // Early return for organisations created ahead of a paid checkout that are still awaiting payment.
+  if (isOrganisationPendingPayment(organisation)) {
     return {
       quota: INACTIVE_PLAN_LIMITS,
       remaining: INACTIVE_PLAN_LIMITS,

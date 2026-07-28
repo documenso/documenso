@@ -19,6 +19,7 @@ export const ZFindDocumentsInternalResponseSchema = ZFindResultResponse.extend({
     [ExtendedDocumentStatus.PENDING]: z.number(),
     [ExtendedDocumentStatus.COMPLETED]: z.number(),
     [ExtendedDocumentStatus.REJECTED]: z.number(),
+    [ExtendedDocumentStatus.CANCELLED]: z.number(),
     [ExtendedDocumentStatus.INBOX]: z.number(),
     [ExtendedDocumentStatus.ALL]: z.number(),
   }),

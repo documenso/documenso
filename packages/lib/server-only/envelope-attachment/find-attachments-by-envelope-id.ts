@@ -1,7 +1,7 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
-import { buildTeamWhereQuery } from '../../utils/teams';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type FindAttachmentsByEnvelopeIdOptions = {
   envelopeId: string;
@@ -14,11 +14,15 @@ export const findAttachmentsByEnvelopeId = async ({
   userId,
   teamId,
 }: FindAttachmentsByEnvelopeIdOptions) => {
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: { type: 'envelopeId', id: envelopeId },
+    userId,
+    teamId,
+    type: null,
+  });
+
   const envelope = await prisma.envelope.findFirst({
-    where: {
-      id: envelopeId,
-      team: buildTeamWhereQuery({ teamId, userId }),
-    },
+    where: envelopeWhereInput,
   });
 
   if (!envelope) {

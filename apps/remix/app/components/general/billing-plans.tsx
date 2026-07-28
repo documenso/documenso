@@ -54,7 +54,6 @@ export const BillingPlans = ({ plans }: BillingPlansProps) => {
       if (plan[interval] && plan[interval].isVisibleInApp) {
         prices.push({
           ...plan[interval],
-          memberCount: plan.memberCount,
           claim: plan.id,
         });
       }
@@ -120,12 +119,7 @@ export const BillingPlans = ({ plans }: BillingPlansProps) => {
                     <Trans>Subscribe</Trans>
                   </IndividualPersonalLayoutCheckoutButton>
                 ) : (
-                  <BillingDialog
-                    priceId={price.id}
-                    planName={price.product.name}
-                    memberCount={price.memberCount}
-                    claim={price.claim}
-                  />
+                  <BillingDialog priceId={price.id} planName={price.product.name} claim={price.claim} />
                 )}
               </CardContent>
             </MotionCard>
@@ -136,16 +130,7 @@ export const BillingPlans = ({ plans }: BillingPlansProps) => {
   );
 };
 
-const BillingDialog = ({
-  priceId,
-  planName,
-  claim,
-}: {
-  priceId: string;
-  planName: string;
-  memberCount: number;
-  claim: string;
-}) => {
+const BillingDialog = ({ priceId, planName, claim }: { priceId: string; planName: string; claim: string }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const { t } = useLingui();

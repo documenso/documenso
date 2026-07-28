@@ -1,6 +1,7 @@
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
+import { getMemberOrganisationRole } from '@documenso/lib/server-only/team/get-member-roles';
+import { buildOrganisationWhereQuery, isOrganisationRoleWithinUserHierarchy } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
 import { OrganisationGroupType } from '@prisma/client';
 
@@ -56,6 +57,22 @@ export const deleteOrganisationGroupRoute = authenticatedProcedure
     ) {
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
         message: 'You are not allowed to delete internal groups',
+      });
+    }
+
+    const currentUserOrganisationRole = await getMemberOrganisationRole({
+      organisationId,
+      reference: {
+        type: 'User',
+        id: user.id,
+      },
+    });
+
+    // A user cannot delete a group whose role is higher than their own
+    // (e.g. a manager deleting an admin-role group).
+    if (!isOrganisationRoleWithinUserHierarchy(currentUserOrganisationRole, group.organisationRole)) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'You are not allowed to delete this organisation group',
       });
     }
 

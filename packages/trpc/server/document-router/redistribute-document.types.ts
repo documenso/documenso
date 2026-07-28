@@ -9,8 +9,9 @@ export const redistributeDocumentMeta: TrpcRouteMeta = {
     path: '/document/redistribute',
     summary: 'Redistribute document',
     description:
-      'Redistribute the document to the provided recipients who have not actioned the document. Will use the distribution method set in the document',
+      'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Redistribute the document to the provided recipients who have not actioned the document. Will use the distribution method set in the document',
     tags: ['Document'],
+    deprecated: true,
   },
 };
 
