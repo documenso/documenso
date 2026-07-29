@@ -1686,3 +1686,187 @@ test.describe('Find Documents API - Expired Recipient Filter', () => {
     expect(json!.count).toBe(1);
   });
 });
+
+// ─── Adversarial: Expired Recipient Filter cross-tenant isolation ────────────
+// The expired filter adds an EXISTS subquery over Recipient. These tests ensure
+// that predicate never widens visibility past the caller's team/access scope.
+
+test.describe('Find Documents API - Adversarial: Cross-Team Expired Recipient Filter', () => {
+  const PAST = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+  test('token scoped to team A must NOT see team B docs with expired recipients', async ({ request }) => {
+    const { user: userA, team: teamA } = await seedUser();
+    const { user: userB, team: teamB } = await seedUser();
+    const { user: recipient } = await seedUser();
+
+    const { token: tokenA } = await createApiToken({
+      userId: userA.id,
+      teamId: teamA.id,
+      tokenName: 'teamA-expired-token',
+      expiresIn: null,
+    });
+
+    // Team A: one expired doc the caller is legitimately allowed to see.
+    const teamADoc = await seedPendingDocument(userA, teamA.id, [recipient], {
+      createDocumentOptions: { title: 'TeamA Expired Doc' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: teamADoc.id },
+      data: { expiresAt: PAST },
+    });
+
+    // Team B: an expired doc that must remain invisible to team A's token.
+    const teamBDoc = await seedPendingDocument(userB, teamB.id, [recipient], {
+      createDocumentOptions: { title: 'TeamB Expired Doc' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: teamBDoc.id },
+      data: { expiresAt: PAST },
+    });
+
+    const { json } = await findDocuments(request, tokenA, { hasExpiredRecipients: 'true' });
+    const titles = json!.data.map((d) => d.title);
+    expect(titles).toContain('TeamA Expired Doc');
+    expect(titles).not.toContain('TeamB Expired Doc');
+    expect(json!.count).toBe(1);
+  });
+
+  test('shared recipient email across teams does not leak the other team expired docs', async ({ request }) => {
+    // A recipient with the SAME email is on expired docs in both teams. The
+    // filter must still scope strictly to the token's team.
+    const { user: userA, team: teamA } = await seedUser();
+    const { user: userB, team: teamB } = await seedUser();
+    const { user: sharedRecipient } = await seedUser();
+
+    const { token: tokenB } = await createApiToken({
+      userId: userB.id,
+      teamId: teamB.id,
+      tokenName: 'teamB-expired-token',
+      expiresIn: null,
+    });
+
+    const teamADoc = await seedPendingDocument(userA, teamA.id, [sharedRecipient], {
+      createDocumentOptions: { title: 'TeamA Shared-Recipient Expired' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: teamADoc.id },
+      data: { expiresAt: PAST },
+    });
+
+    const teamBDoc = await seedPendingDocument(userB, teamB.id, [sharedRecipient], {
+      createDocumentOptions: { title: 'TeamB Shared-Recipient Expired' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: teamBDoc.id },
+      data: { expiresAt: PAST },
+    });
+
+    const { json } = await findDocuments(request, tokenB, { hasExpiredRecipients: 'true' });
+    const titles = json!.data.map((d) => d.title);
+    expect(titles).toContain('TeamB Shared-Recipient Expired');
+    expect(titles).not.toContain('TeamA Shared-Recipient Expired');
+    expect(json!.count).toBe(1);
+  });
+
+  test('x-team-id spoofing with status=EXPIRED is rejected for a non-member', async ({ page }) => {
+    const { team: teamA, owner: ownerA } = await seedTeam();
+    const { team: teamB, owner: ownerB } = await seedTeam();
+    const { user: recipient } = await seedUser();
+
+    const teamADoc = await seedPendingDocument(ownerA, teamA.id, [recipient], {
+      createDocumentOptions: { title: 'TeamA Expired Secret' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: teamADoc.id },
+      data: { expiresAt: PAST },
+    });
+
+    // ownerB is NOT a member of teamA.
+    await apiSignin({ page, email: ownerB.email });
+
+    const res = await trpcQuery(page, 'document.findDocumentsInternal', teamA.id, {
+      status: 'EXPIRED',
+      page: 1,
+      perPage: 100,
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('EXPIRED pseudo-status via session only returns the caller team expired docs (positive control)', async ({
+    page,
+  }) => {
+    const { team: teamA, owner: ownerA } = await seedTeam();
+    const { team: teamB, owner: ownerB } = await seedTeam();
+    const { user: recipient } = await seedUser();
+
+    const teamADoc = await seedPendingDocument(ownerA, teamA.id, [recipient], {
+      createDocumentOptions: { title: 'TeamA Expired Visible' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: teamADoc.id },
+      data: { expiresAt: PAST },
+    });
+
+    const teamBDoc = await seedPendingDocument(ownerB, teamB.id, [recipient], {
+      createDocumentOptions: { title: 'TeamB Expired Hidden' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: teamBDoc.id },
+      data: { expiresAt: PAST },
+    });
+
+    await apiSignin({ page, email: ownerA.email });
+
+    const res = await trpcQuery(page, 'document.findDocumentsInternal', teamA.id, {
+      status: 'EXPIRED',
+      page: 1,
+      perPage: 100,
+    });
+
+    expect(res.ok()).toBeTruthy();
+    const data = await res.json();
+    const docs = data.result.data.json.data;
+    const titles = docs.map((d: { title: string }) => d.title);
+    expect(titles).toContain('TeamA Expired Visible');
+    expect(titles).not.toContain('TeamB Expired Hidden');
+  });
+
+  test('EXPIRED stats count is scoped to the caller team and excludes other-team expired docs', async ({ page }) => {
+    const { team: teamA, owner: ownerA } = await seedTeam();
+    const { team: teamB, owner: ownerB } = await seedTeam();
+    const { user: recipient } = await seedUser();
+
+    // One expired doc in team A.
+    const teamADoc = await seedPendingDocument(ownerA, teamA.id, [recipient], {
+      createDocumentOptions: { title: 'TeamA Expired For Stats' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: teamADoc.id },
+      data: { expiresAt: PAST },
+    });
+
+    // Two expired docs in team B — must NOT bleed into team A's EXPIRED count.
+    for (const title of ['TeamB Expired For Stats 1', 'TeamB Expired For Stats 2']) {
+      const doc = await seedPendingDocument(ownerB, teamB.id, [recipient], {
+        createDocumentOptions: { title },
+      });
+      await prisma.recipient.updateMany({
+        where: { envelopeId: doc.id },
+        data: { expiresAt: PAST },
+      });
+    }
+
+    await apiSignin({ page, email: ownerA.email });
+
+    const res = await trpcQuery(page, 'document.findDocumentsInternal', teamA.id, {
+      page: 1,
+      perPage: 100,
+    });
+
+    expect(res.ok()).toBeTruthy();
+    const data = await res.json();
+    expect(data.result.data.json.stats.EXPIRED).toBe(1);
+  });
+});

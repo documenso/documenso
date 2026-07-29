@@ -1,13 +1,13 @@
 import { kyselyPrisma, prisma, sql } from '@documenso/prisma';
 import type { DB } from '@documenso/prisma/generated/types';
 import type { DocumentSource, DocumentStatus, Envelope, EnvelopeType } from '@prisma/client';
-import { RecipientRole, SigningStatus } from '@prisma/client';
 import type { Expression, ExpressionBuilder, SelectQueryBuilder, SqlBool } from 'kysely';
 
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import type { FindResultResponse } from '../../types/search-params';
 import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
 import { getTeamById } from '../team/get-team';
+import { hasExpiredRecipient } from './query-helpers';
 
 export type FindEnvelopesOptions = {
   userId: number;
@@ -90,23 +90,6 @@ const senderEmailIs = (eb: EnvelopeExpressionBuilder, email: string) =>
       .selectFrom('User')
       .whereRef('User.id', '=', 'Envelope.userId')
       .where('User.email', '=', email)
-      .select(sql.lit(1).as('one')),
-  );
-
-/**
- * Reusable EXISTS subquery: checks that the envelope has at least one recipient whose
- * signing link has expired — `expiresAt` in the past, still unsigned, and not a CC.
- * Mirrors `isRecipientExpired` (packages/lib/utils/recipients.ts).
- */
-const hasExpiredRecipient = (eb: EnvelopeExpressionBuilder) =>
-  eb.exists(
-    eb
-      .selectFrom('Recipient')
-      .whereRef('Recipient.envelopeId', '=', 'Envelope.id')
-      .where('Recipient.expiresAt', 'is not', null)
-      .where('Recipient.expiresAt', '<=', new Date())
-      .where('Recipient.signingStatus', '=', sql.lit(SigningStatus.NOT_SIGNED))
-      .where('Recipient.role', '!=', sql.lit(RecipientRole.CC))
       .select(sql.lit(1).as('one')),
   );
 
