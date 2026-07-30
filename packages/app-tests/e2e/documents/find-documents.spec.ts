@@ -10,7 +10,14 @@ import { seedOrganisationMembers } from '@documenso/prisma/seed/organisations';
 import { seedTeam, seedTeamEmail, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, test } from '@playwright/test';
-import { DocumentStatus, DocumentVisibility, OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
+import {
+  DocumentStatus,
+  DocumentVisibility,
+  OrganisationMemberRole,
+  RecipientRole,
+  SigningStatus,
+  TeamMemberRole,
+} from '@prisma/client';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
 import { checkDocumentTabCount } from '../fixtures/documents';
@@ -1163,5 +1170,134 @@ test.describe('Find Documents UI - Sender Filter', () => {
     // Should only show member1's doc
     await checkDocumentTabCount(page, 'All', 1);
     await expect(page.getByRole('link', { name: 'Member1 Sent Doc' })).toBeVisible();
+  });
+});
+
+test.describe('Find Documents UI - Rejected and Expired Tabs', () => {
+  const PAST = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+  test('rejected tab lists rejected documents and counts them independently', async ({ page }) => {
+    const { user: owner, team } = await seedUser();
+    const { user: recipient } = await seedUser();
+
+    // A rejected document: envelope status REJECTED + a recipient who rejected.
+    const rejectedDoc = await seedPendingDocument(owner, team.id, [recipient], {
+      createDocumentOptions: { title: 'Rejected Doc' },
+    });
+    await prisma.envelope.update({
+      where: { id: rejectedDoc.id },
+      data: { status: DocumentStatus.REJECTED },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: rejectedDoc.id },
+      data: { signingStatus: SigningStatus.REJECTED },
+    });
+
+    // A plain pending document (noise — must not appear under Rejected).
+    await seedPendingDocument(owner, team.id, [recipient], {
+      createDocumentOptions: { title: 'Plain Pending Doc' },
+    });
+
+    await apiSignin({
+      page,
+      email: owner.email,
+      redirectPath: `/t/${team.url}/documents`,
+    });
+
+    await checkDocumentTabCount(page, 'Rejected', 1);
+    await expect(page.getByRole('link', { name: 'Rejected Doc' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Plain Pending Doc' })).not.toBeVisible();
+  });
+
+  test('expired tab lists documents with an expired recipient and shows empty state otherwise', async ({ page }) => {
+    const { user: owner, team } = await seedUser();
+    const { user: recipient } = await seedUser();
+
+    const expiredDoc = await seedPendingDocument(owner, team.id, [recipient], {
+      createDocumentOptions: { title: 'Expired Doc' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: expiredDoc.id },
+      data: { expiresAt: PAST },
+    });
+
+    // Active pending doc — recipient link not expired.
+    await seedPendingDocument(owner, team.id, [recipient], {
+      createDocumentOptions: { title: 'Active Doc' },
+    });
+
+    await apiSignin({
+      page,
+      email: owner.email,
+      redirectPath: `/t/${team.url}/documents`,
+    });
+
+    // Expired doc is still PENDING, so it appears under both Pending and Expired.
+    await checkDocumentTabCount(page, 'Pending', 2);
+    await checkDocumentTabCount(page, 'Expired', 1);
+    await expect(page.getByRole('link', { name: 'Expired Doc' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Active Doc' })).not.toBeVisible();
+  });
+
+  test('expired tab excludes signed and CC recipients', async ({ page }) => {
+    const { user: owner, team } = await seedUser();
+    const { user: recipient } = await seedUser();
+
+    // Expired but already signed — must NOT count as expired.
+    const signedDoc = await seedPendingDocument(owner, team.id, [recipient], {
+      createDocumentOptions: { title: 'Expired Signed Doc' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: signedDoc.id },
+      data: { expiresAt: PAST, signingStatus: SigningStatus.SIGNED },
+    });
+
+    // Expired but CC — must NOT count as expired.
+    const ccDoc = await seedPendingDocument(owner, team.id, [recipient], {
+      createDocumentOptions: { title: 'Expired CC Doc' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: ccDoc.id },
+      data: { expiresAt: PAST, role: RecipientRole.CC },
+    });
+
+    // Expired, unsigned, non-CC — the only one that should appear.
+    const validDoc = await seedPendingDocument(owner, team.id, [recipient], {
+      createDocumentOptions: { title: 'Expired Valid Doc' },
+    });
+    await prisma.recipient.updateMany({
+      where: { envelopeId: validDoc.id },
+      data: { expiresAt: PAST },
+    });
+
+    await apiSignin({
+      page,
+      email: owner.email,
+      redirectPath: `/t/${team.url}/documents`,
+    });
+
+    await checkDocumentTabCount(page, 'Expired', 1);
+    await expect(page.getByRole('link', { name: 'Expired Valid Doc' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Expired Signed Doc' })).not.toBeVisible();
+    await expect(page.getByRole('link', { name: 'Expired CC Doc' })).not.toBeVisible();
+  });
+
+  test('rejected and expired tabs show tailored empty states when nothing matches', async ({ page }) => {
+    const { user: owner, team } = await seedUser();
+    const { user: recipient } = await seedUser();
+
+    await seedPendingDocument(owner, team.id, [recipient], {
+      createDocumentOptions: { title: 'Just Pending' },
+    });
+
+    await apiSignin({
+      page,
+      email: owner.email,
+      redirectPath: `/t/${team.url}/documents`,
+    });
+
+    // count === 0 asserts the empty-document-state is visible.
+    await checkDocumentTabCount(page, 'Rejected', 0);
+    await checkDocumentTabCount(page, 'Expired', 0);
   });
 });
