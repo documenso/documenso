@@ -35,7 +35,9 @@ The rate limit applies to:
 
 ### Rate Limit Headers
 
-Every response from `/api/v1/*`, `/api/v2/*`, and `/api/v2-beta/*` includes these headers:
+Responses from `/api/v1/*`, `/api/v2/*`, and `/api/v2-beta/*` include these headers. The only
+exception is CORS preflight (`OPTIONS`) requests, which are answered before the rate limiter runs
+and carry no rate limit headers:
 
 | Header                  | Description                                                            |
 | ----------------------- | ---------------------------------------------------------------------- |
@@ -60,23 +62,40 @@ Beyond HTTP rate limits, your account has usage limits based on your subscriptio
 | Total Recipients | 10   | Unlimited | Unlimited   | Unlimited  |
 | Direct Templates | 3    | Unlimited | Unlimited   | Unlimited  |
 
-### AppError-Based 429 Response
+### Organisation Limit 429 Responses
 
-Organisation windowed limits and monthly envelope quotas return an AppError response rather than
-the global per-IP limiter's `{ "error": "..." }` response. For example, an organisation windowed
-limit returns:
+Organisation windowed limits and organisation monthly quotas produce 429 responses whose body
+shape depends on the API version, and neither matches the global per-IP limiter's
+`{ "error": "..." }` body.
+
+On `/api/v1/*`, the body contains only a message:
 
 ```json
 {
-  "code": "TOO_MANY_REQUESTS",
-  "message": "Too many requests, please try again later. Contact support if you require higher limits.",
-  "statusCode": 429
+  "message": "Too many requests, please try again later. Contact support if you require higher limits."
 }
 ```
 
-The monthly quota response uses the same `code`, `message`, and `statusCode` shape with a
-quota-specific message. It does not add quota-specific rate limit headers or `Retry-After` because
-the quota is not a time window. The global API headers described above may still be present.
+On `/api/v2/*` and `/api/v2-beta/*`, the body is a structured error object:
+
+```json
+{
+  "message": "Too many requests, please try again later. Contact support if you require higher limits.",
+  "code": "TOO_MANY_REQUESTS",
+  "data": {
+    "code": "TOO_MANY_REQUESTS",
+    "httpStatus": 429,
+    "appError": {
+      "code": "TOO_MANY_REQUESTS",
+      "message": "Too many requests, please try again later. Contact support if you require higher limits."
+    }
+  }
+}
+```
+
+Organisation windowed limit responses include the `X-RateLimit-*` headers and `Retry-After` for
+their own window. Monthly quota responses carry no quota-specific rate limit headers or
+`Retry-After` because the quota is not a time window; rely on the status code and message instead.
 
 ## Error Codes
 
@@ -87,10 +106,11 @@ the quota is not a time window. The global API headers described above may still
 
 There are three sources of `TOO_MANY_REQUESTS` responses:
 
-1. The global per-IP limit returns the `{ "error": "..." }` body shown above.
-2. Organisation windowed limits return the AppError body shown above.
-3. The monthly envelope quota returns an AppError body but does not add quota-specific rate limit
-   headers or `Retry-After`.
+1. The global per-IP limit, returning the `{ "error": "..." }` body shown above.
+2. Organisation windowed rate limits for the `api`, `document`, and `email` counters.
+3. Organisation monthly quotas for the same three counters. Every authenticated API request
+   consumes the `api` counter, so any endpoint can return this 429 once the monthly API quota is
+   exhausted — not just envelope-related ones.
 
 ---
 
