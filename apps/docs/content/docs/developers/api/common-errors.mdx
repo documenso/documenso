@@ -15,6 +15,7 @@ This guide provides a comprehensive troubleshooting matrix for the standard erro
 | `INVALID_REQUEST` | The overall request is malformed or invalid. | Review your API call parameters, including the URL, query parameters, and headers. Correct the request syntax. |
 | `RECIPIENT_EXPIRED` | The signing link or recipient access has expired. | Generate and resend a new invitation to the affected recipient. |
 | `LIMIT_EXCEEDED` | Your account usage quota has been exceeded. | Check your current plan limits. Upgrade your subscription or wait until your billing cycle renews. |
+| `MISSING_SIGNATURE_FIELD` | A signer has no signature field placed on the document (400). Returned when distributing an envelope. | Add at least one signature field for every recipient with a signing role before calling `/envelope/distribute`. |
 | `NOT_FOUND` | The requested resource could not be found (404). | Verify the resource ID (envelope, document, webhook) passed in the URL. Ensure the resource has not been deleted. |
 | `NOT_IMPLEMENTED` | The requested feature is not currently supported by the server. | Consult the API documentation to verify available methods. Do not use this endpoint at this time. |
 | `NOT_SETUP` | The required configuration for this action is incomplete. | Access your account or integration settings and complete the necessary configuration before retrying. |
