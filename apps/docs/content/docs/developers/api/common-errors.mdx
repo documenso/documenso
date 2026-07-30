@@ -37,7 +37,28 @@ The following errors occur when attempting to perform actions on an envelope tha
 | `ENVELOPE_DRAFT` | The action cannot be performed because the envelope is still in a draft state. | Finalize the envelope configuration and transition it to the `PENDING` (sent) state before attempting this operation. |
 | `ENVELOPE_COMPLETED` | The action cannot be performed because the envelope is already completed. | No further modifications (e.g., adding signers, modifying documents) can be made to an envelope once the signing process is finished. |
 | `ENVELOPE_REJECTED` | The action cannot be performed because the envelope was rejected by a recipient. | The signing flow is permanently halted. Create a new envelope if you wish to resubmit the document. |
+| `ENVELOPE_CANCELLED` | The action cannot be performed because the envelope was cancelled (400). | Create a new envelope if you need to restart the signing process. |
 | `ENVELOPE_LEGACY` | The action cannot be performed because the envelope uses an obsolete format. | This envelope was created with a legacy version of the system. Recreate the envelope using the current API version to interact with it. |
+| `ENVELOPE_TSP_LOCKED` | An AES/QES envelope cannot be modified after it leaves the draft state (400). | Make changes while the envelope is in `DRAFT`, or create a new envelope. |
+
+## CSC Signing Errors
+
+These errors apply to Cloud Signature Consortium (CSC) signing flows.
+
+| Error Code | Description | Recommended Action |
+| :--- | :--- | :--- |
+| `CSC_INSTANCE_MODE_MISMATCH` | The requested signature level does not match the instance's CSC mode (400). | Use the signature level supported by the instance's signing configuration. |
+| `CSC_UNLICENSED` | CSC signing is not licensed for this instance (403). | Enable the CSC signing license before retrying. |
+| `CSC_PROVIDER_INFO_FAILED` | The CSC provider's discovery request failed or returned unusable information (500). | Check the provider URL, availability, and OAuth configuration. |
+| `CSC_PROVIDER_NO_TSA` | A timestamp authority is unavailable or unusable for CSC signing (500). | Configure `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY` and verify provider timestamp access. |
+| `CSC_CREDENTIAL_LIST_EMPTY` | The CSC provider returned no signing credentials for the authenticated user (400). | Enrol a signing credential with the provider, then authenticate again. |
+| `CSC_CERT_INVALID` | The selected signing certificate is missing, invalid, or outside its validity period (400). | Select or renew a valid certificate, then authenticate again. |
+| `CSC_ALGORITHM_REFUSED` | The signing credential uses an unsupported key or digest algorithm (400). | Select a credential that satisfies the instance's CSC algorithm policy. |
+| `CSC_SAD_EXPIRED_PRE_SIGN` | The signature activation data is missing, expired, or unreadable before signing (400). | Repeat the credential authorization flow. |
+| `CSC_TSP_TIMEOUT` | The trust service provider did not complete the signing request before the timeout (408). | Retry the signing request after checking provider availability. |
+| `CSC_EMBED_FAILED` | The returned CSC signature could not be embedded into the envelope items (400). | Restart the signing attempt. If it fails again, contact support. |
+| `CSC_BASE_DOCUMENT_MUTATED` | The document changed between signature preparation and signing (500). | Restart signing from the current envelope state. |
+| `CSC_REQUEST_FAILED` | A CSC provider request failed without a more specific CSC error (500). | Check provider availability and configuration, then retry. |
 
 ## See Also
 
