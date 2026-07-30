@@ -19,7 +19,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 | `secondaryId`    | string         | Secondary identifier for audit logs          |
 | `type`           | string         | Field type (see [Field Types](#field-types)) |
 | `recipientId`    | number         | ID of the recipient assigned to this field   |
-| `envelopeId`     | number         | ID of the parent envelope                    |
+| `envelopeId`     | string         | ID of the parent envelope                    |
 | `envelopeItemId` | string         | ID of the PDF item the field is placed on    |
 | `page`           | number         | Page number (1-indexed)                      |
 | `positionX`      | number         | X coordinate as percentage (0-100)           |
@@ -38,7 +38,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
   "secondaryId": "field_abc123",
   "type": "SIGNATURE",
   "recipientId": 123,
-  "envelopeId": 789,
+  "envelopeId": "clu1abc2def3ghi4jkl",
   "envelopeItemId": "envelope_item_xyz",
   "page": 1,
   "positionX": 10,
@@ -134,10 +134,10 @@ POST /envelope/field/create-many
 
 ### Request Body
 
-| Field       | Type   | Required | Description                     |
-| ----------- | ------ | -------- | ------------------------------- |
-| `documentId`| number | Yes      | The document ID                 |
-| `fields`    | array  | Yes      | Array of field configurations   |
+| Field        | Type   | Required | Description                     |
+| ------------ | ------ | -------- | ------------------------------- |
+| `envelopeId` | string | Yes      | The envelope ID                 |
+| `data`       | array  | Yes      | Array of field configurations   |
 
 ### Code Examples
 
@@ -148,32 +148,32 @@ curl -X POST "https://app.documenso.com/api/v2/envelope/field/create-many" \
   -H "Authorization: api_xxxxxxxxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
-    "documentId": 123,
-    "fields": [
+    "envelopeId": "clu1abc2def3ghi4jkl",
+    "data": [
       {
         "type": "SIGNATURE",
         "recipientId": 456,
-        "pageNumber": 1,
-        "pageX": 10,
-        "pageY": 80,
+        "page": 1,
+        "positionX": 10,
+        "positionY": 80,
         "width": 30,
         "height": 5
       },
       {
         "type": "DATE",
         "recipientId": 456,
-        "pageNumber": 1,
-        "pageX": 50,
-        "pageY": 80,
+        "page": 1,
+        "positionX": 50,
+        "positionY": 80,
         "width": 20,
         "height": 3
       },
       {
         "type": "TEXT",
         "recipientId": 456,
-        "pageNumber": 1,
-        "pageX": 10,
-        "pageY": 70,
+        "page": 1,
+        "positionX": 10,
+        "positionY": 70,
         "width": 40,
         "height": 4,
         "fieldMeta": {
@@ -199,32 +199,32 @@ const response = await fetch(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      documentId: 123,
-      fields: [
+      envelopeId: 'clu1abc2def3ghi4jkl',
+      data: [
         {
           type: 'SIGNATURE',
           recipientId: 456,
-          pageNumber: 1,
-          pageX: 10,
-          pageY: 80,
+          page: 1,
+          positionX: 10,
+          positionY: 80,
           width: 30,
           height: 5,
         },
         {
           type: 'DATE',
           recipientId: 456,
-          pageNumber: 1,
-          pageX: 50,
-          pageY: 80,
+          page: 1,
+          positionX: 50,
+          positionY: 80,
           width: 20,
           height: 3,
         },
         {
           type: 'TEXT',
           recipientId: 456,
-          pageNumber: 1,
-          pageX: 10,
-          pageY: 70,
+          page: 1,
+          positionX: 10,
+          positionY: 70,
           width: 40,
           height: 4,
           fieldMeta: {
@@ -239,8 +239,8 @@ const response = await fetch(
   }
 );
 
-const { fields } = await response.json();
-console.log(`Created ${fields.length} fields`);
+const { data } = await response.json();
+console.log(`Created ${data.length} fields`);
 
 ````
 </Tab>
@@ -250,36 +250,63 @@ console.log(`Created ${fields.length} fields`);
 
 ```json
 {
-  "fields": [
+  "data": [
     {
       "id": 101,
+      "secondaryId": "field_abc123",
+      "envelopeId": "clu1abc2def3ghi4jkl",
+      "envelopeItemId": "envelope_item_xyz",
       "type": "SIGNATURE",
       "recipientId": 456,
       "page": 1,
       "positionX": 10,
       "positionY": 80,
       "width": 30,
-      "height": 5
+      "height": 5,
+      "customText": "",
+      "inserted": false,
+      "fieldMeta": {
+        "type": "signature"
+      }
     },
     {
       "id": 102,
+      "secondaryId": "field_def456",
+      "envelopeId": "clu1abc2def3ghi4jkl",
+      "envelopeItemId": "envelope_item_xyz",
       "type": "DATE",
       "recipientId": 456,
       "page": 1,
       "positionX": 50,
       "positionY": 80,
       "width": 20,
-      "height": 3
+      "height": 3,
+      "customText": "",
+      "inserted": false,
+      "fieldMeta": {
+        "type": "date"
+      }
     },
     {
       "id": 103,
+      "secondaryId": "field_ghi789",
+      "envelopeId": "clu1abc2def3ghi4jkl",
+      "envelopeItemId": "envelope_item_xyz",
       "type": "TEXT",
       "recipientId": 456,
       "page": 1,
       "positionX": 10,
       "positionY": 70,
       "width": 40,
-      "height": 4
+      "height": 4,
+      "customText": "",
+      "inserted": false,
+      "fieldMeta": {
+        "type": "text",
+        "label": "Job Title",
+        "placeholder": "Enter your job title",
+        "required": true
+      }
     }
   ]
 }
@@ -299,8 +326,8 @@ POST /envelope/field/update-many
 
 | Field        | Type   | Required | Description                   |
 | ------------ | ------ | -------- | ----------------------------- |
-| `documentId` | number | Yes      | The document ID               |
-| `fields`     | array  | Yes      | Array of field update objects |
+| `envelopeId` | string | Yes      | The envelope ID               |
+| `data`       | array  | Yes      | Array of field update objects |
 
 ### Code Examples
 
@@ -311,17 +338,17 @@ curl -X POST "https://app.documenso.com/api/v2/envelope/field/update-many" \
   -H "Authorization: api_xxxxxxxxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
-    "documentId": 123,
-    "fields": [
+    "envelopeId": "clu1abc2def3ghi4jkl",
+    "data": [
       {
         "id": 101,
         "type": "SIGNATURE",
-        "pageY": 85
+        "positionY": 85
       },
       {
         "id": 102,
         "type": "DATE",
-        "pageY": 85
+        "positionY": 85
       }
     ]
   }'
@@ -338,16 +365,16 @@ const response = await fetch(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      documentId: 123,
-      fields: [
-        { id: 101, type: 'SIGNATURE', pageY: 85 },
-        { id: 102, type: 'DATE', pageY: 85 },
+      envelopeId: 'clu1abc2def3ghi4jkl',
+      data: [
+        { id: 101, type: 'SIGNATURE', positionY: 85 },
+        { id: 102, type: 'DATE', positionY: 85 },
       ],
     }),
   }
 );
 
-const { fields } = await response.json();
+const { data } = await response.json();
 
 ````
 </Tab>
@@ -357,9 +384,43 @@ const { fields } = await response.json();
 
 ```json
 {
-  "fields": [
-    { "id": 101, "type": "SIGNATURE", "positionY": 85 },
-    { "id": 102, "type": "DATE", "positionY": 85 }
+  "data": [
+    {
+      "id": 101,
+      "secondaryId": "field_abc123",
+      "envelopeId": "clu1abc2def3ghi4jkl",
+      "envelopeItemId": "envelope_item_xyz",
+      "type": "SIGNATURE",
+      "recipientId": 456,
+      "page": 1,
+      "positionX": 10,
+      "positionY": 85,
+      "width": 30,
+      "height": 5,
+      "customText": "",
+      "inserted": false,
+      "fieldMeta": {
+        "type": "signature"
+      }
+    },
+    {
+      "id": 102,
+      "secondaryId": "field_def456",
+      "envelopeId": "clu1abc2def3ghi4jkl",
+      "envelopeItemId": "envelope_item_xyz",
+      "type": "DATE",
+      "recipientId": 456,
+      "page": 1,
+      "positionX": 50,
+      "positionY": 85,
+      "width": 20,
+      "height": 3,
+      "customText": "",
+      "inserted": false,
+      "fieldMeta": {
+        "type": "date"
+      }
+    }
   ]
 }
 ````
@@ -443,8 +504,8 @@ Fields use percentage-based coordinates relative to the PDF page dimensions.
 (0,0) ─────────────────────────── (100,0)
   │                                   │
   │    ┌─────────┐                    │
-  │    │  Field  │ (pageX: 10,        │
-  │    │         │  pageY: 20,        │
+  │    │  Field  │ (positionX: 10,    │
+  │    │         │  positionY: 20,    │
   │    └─────────┘  width: 30,        │
   │                 height: 5)        │
   │                                   │
@@ -457,9 +518,9 @@ Fields use percentage-based coordinates relative to the PDF page dimensions.
 const field = {
   type: 'SIGNATURE',
   recipientId: 123,
-  pageNumber: 1,
-  pageX: 60, // 60% from left
-  pageY: 85, // 85% from top (near bottom)
+  page: 1,
+  positionX: 60, // 60% from left
+  positionY: 85, // 85% from top (near bottom)
   width: 30, // 30% of page width
   height: 8, // 8% of page height
 };
@@ -643,15 +704,15 @@ All field types support these base options:
 Create a document with a signature block containing multiple field types:
 
 ```typescript
-async function addSignatureBlock(documentId: number, recipientId: number) {
-  const fields = [
+async function addSignatureBlock(envelopeId: string, recipientId: number) {
+  const data = [
     // Signature
     {
       type: 'SIGNATURE',
       recipientId,
-      pageNumber: 1,
-      pageX: 10,
-      pageY: 80,
+      page: 1,
+      positionX: 10,
+      positionY: 80,
       width: 30,
       height: 8,
       fieldMeta: {
@@ -663,9 +724,9 @@ async function addSignatureBlock(documentId: number, recipientId: number) {
     {
       type: 'NAME',
       recipientId,
-      pageNumber: 1,
-      pageX: 10,
-      pageY: 90,
+      page: 1,
+      positionX: 10,
+      positionY: 90,
       width: 30,
       height: 4,
       fieldMeta: {
@@ -677,9 +738,9 @@ async function addSignatureBlock(documentId: number, recipientId: number) {
     {
       type: 'DATE',
       recipientId,
-      pageNumber: 1,
-      pageX: 50,
-      pageY: 80,
+      page: 1,
+      positionX: 50,
+      positionY: 80,
       width: 20,
       height: 4,
       fieldMeta: {
@@ -691,9 +752,9 @@ async function addSignatureBlock(documentId: number, recipientId: number) {
     {
       type: 'TEXT',
       recipientId,
-      pageNumber: 1,
-      pageX: 50,
-      pageY: 90,
+      page: 1,
+      positionX: 50,
+      positionY: 90,
       width: 30,
       height: 4,
       fieldMeta: {
@@ -710,7 +771,7 @@ async function addSignatureBlock(documentId: number, recipientId: number) {
       Authorization: 'api_xxxxxxxxxxxxxxxx',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ documentId, fields }),
+    body: JSON.stringify({ envelopeId, data }),
   });
 
   return response.json();
