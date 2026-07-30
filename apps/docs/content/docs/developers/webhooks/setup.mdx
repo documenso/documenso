@@ -148,7 +148,7 @@ func main() {
 </Tabs>
 
 <Callout type="warn">
-  Always respond with a `200 OK` status within 30 seconds. Documenso will retry failed deliveries.
+  Always respond with a `2xx` status within 10 seconds. Documenso will retry failed deliveries according to the configured background-job provider.
 </Callout>
 
 ## Configuring Webhooks in Documenso via the Dashboard
@@ -184,7 +184,7 @@ Fill in the following fields:
 
 | Field | Description |
 | ----- | ----------- |
-| **Webhook URL** | The HTTPS endpoint that will receive webhook events |
+| **Webhook URL** | The HTTP or HTTPS endpoint that will receive webhook events |
 | **Events** | Select which events should trigger this webhook |
 | **Secret** (optional) | A secret key used to sign the payload for verification |
 </Step>
@@ -202,11 +202,17 @@ Your webhook endpoint must meet these requirements:
 
 | Requirement | Details |
 | ----------- | ------- |
-| **Protocol** | HTTPS required (HTTP not allowed in production) |
-| **Response** | Must return `2xx` status code within 30 seconds |
+| **Protocol** | HTTP and HTTPS are accepted; use HTTPS in production |
+| **Response** | Must return a `2xx` status code within 10 seconds |
 | **Method** | Must accept HTTP POST requests |
 | **Content-Type** | Must accept `application/json` payloads |
 | **Availability** | Must be publicly accessible from the internet |
+
+<Callout type="warn">
+  Documenso blocks webhook URLs that use or resolve to private or loopback addresses. Self-hosters
+  that need to deliver to a hostname resolving to a private address can add that hostname to the
+  comma-separated `NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS` environment variable.
+</Callout>
 
 <Callout type="info">
   For local development, use a tunneling service like [ngrok](https://ngrok.com) or [localtunnel](https://localtunnel.me) to expose your local server.
@@ -225,7 +231,8 @@ When creating a webhook, you can subscribe to one or more events:
 | `DOCUMENT_RECIPIENT_COMPLETED` | A recipient completes their required action |
 | `DOCUMENT_COMPLETED` | All recipients have completed their actions |
 | `DOCUMENT_REJECTED` | A recipient rejects the document |
-| `DOCUMENT_CANCELLED` | The document owner deletes the document |
+| `DOCUMENT_CANCELLED` | A pending document is explicitly cancelled or a document owner deletes it |
+| `RECIPIENT_EXPIRED` | A recipient's signing deadline passes before they sign or reject |
 | `DOCUMENT_REMINDER_SENT` | A reminder email is sent to a recipient |
 | `TEMPLATE_CREATED` | A new template is created |
 | `TEMPLATE_UPDATED` | A template is modified |
@@ -318,17 +325,17 @@ Documenso will attempt to deliver the same payload again
 
 ## Retry Policy
 
-When a webhook delivery fails (non-2xx response or timeout), Documenso automatically retries with exponential backoff:
+A delivery fails when the endpoint returns a non-`2xx` response, the 10-second timeout expires, or the request fails. Redirects are not followed, so `3xx` responses also fail. Network and SSRF-blocked requests are recorded with response code `0`.
 
-| Attempt | Delay |
-| ------- | ----- |
-| 1 | Immediate |
-| 2 | 1 minute |
-| 3 | 5 minutes |
-| 4 | 30 minutes |
-| 5 | 2 hours |
+For self-hosted deployments, retries are handled by the background-job provider selected with `NEXT_PRIVATE_JOBS_PROVIDER`:
 
-After 5 failed attempts, the webhook is marked as failed and no further automatic retries occur. You can manually resend failed webhooks from the dashboard.
+| Provider | Total attempts | Retry timing |
+| -------- | -------------- | ------------ |
+| Local (default) | 4 | Back-to-back, with no backoff |
+| BullMQ | 3 | Exponential backoff starting at 1 second |
+| Inngest | 5 | Inngest platform backoff |
+
+Only the individual delivery (`WebhookCall`) record is marked as failed. Documenso does not automatically disable the webhook or apply a circuit breaker, so future matching events continue to be delivered. After automatic attempts are exhausted, you can manually resend a failed delivery from the dashboard.
 
 <Callout type="warn">
   If your endpoint consistently fails, consider reviewing your server logs and ensuring your endpoint meets all [URL requirements](#webhook-url-requirements).
