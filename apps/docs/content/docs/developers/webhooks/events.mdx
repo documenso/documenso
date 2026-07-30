@@ -114,7 +114,7 @@ Triggered when a new document is created.
   "event": "DOCUMENT_CREATED",
   "payload": {
     "id": 10,
-    "envelopeId": "envelope_abc123def456xy78",
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "externalId": null,
     "userId": 1,
     "authOptions": null,
@@ -148,7 +148,7 @@ Triggered when a new document is created.
     "recipients": [
       {
         "id": 52,
-        "envelopeId": "envelope_abc123def456xy78",
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 10,
         "templateId": null,
         "email": "signer@example.com",
@@ -170,7 +170,7 @@ Triggered when a new document is created.
     "Recipient": [
       {
         "id": 52,
-        "envelopeId": "envelope_abc123def456xy78",
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 10,
         "templateId": null,
         "email": "signer@example.com",
@@ -208,7 +208,7 @@ The document status changes to `PENDING` and recipients have `sendStatus: "SENT"
   "event": "DOCUMENT_SENT",
   "payload": {
     "id": 10,
-    "envelopeId": "envelope_abc123def456xy78",
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "externalId": null,
     "userId": 1,
     "authOptions": null,
@@ -242,7 +242,7 @@ The document status changes to `PENDING` and recipients have `sendStatus: "SENT"
     "recipients": [
       {
         "id": 52,
-        "envelopeId": "envelope_abc123def456xy78",
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 10,
         "templateId": null,
         "email": "signer@example.com",
@@ -264,7 +264,7 @@ The document status changes to `PENDING` and recipients have `sendStatus: "SENT"
     "Recipient": [
       {
         "id": 52,
-        "envelopeId": "envelope_abc123def456xy78",
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 10,
         "templateId": null,
         "email": "signer@example.com",
@@ -302,14 +302,14 @@ The recipient's `readStatus` changes to `OPENED`.
   "event": "DOCUMENT_OPENED",
   "payload": {
     "id": 10,
-    "envelopeId": "envelope_abc123def456xy78",
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "status": "PENDING",
     "title": "contract.pdf",
     "source": "DOCUMENT",
     "recipients": [
       {
         "id": 52,
-        "envelopeId": "envelope_abc123def456xy78",
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "email": "signer@example.com",
         "name": "John Doe",
         "role": "SIGNER",
@@ -337,7 +337,7 @@ The recipient's `signingStatus` changes to `SIGNED` and `signedAt` is populated.
   "event": "DOCUMENT_SIGNED",
   "payload": {
     "id": 10,
-    "envelopeId": "envelope_abc123def456xy78",
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "status": "COMPLETED",
     "title": "contract.pdf",
     "source": "DOCUMENT",
@@ -345,7 +345,7 @@ The recipient's `signingStatus` changes to `SIGNED` and `signedAt` is populated.
     "recipients": [
       {
         "id": 51,
-        "envelopeId": "envelope_abc123def456xy78",
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "email": "signer@example.com",
         "name": "John Doe",
         "role": "SIGNER",
@@ -372,14 +372,14 @@ Triggered when an individual recipient completes their required action (signing,
   "event": "DOCUMENT_RECIPIENT_COMPLETED",
   "payload": {
     "id": 10,
-    "envelopeId": "envelope_abc123def456xy78",
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "status": "PENDING",
     "title": "contract.pdf",
     "source": "DOCUMENT",
     "recipients": [
       {
         "id": 52,
-        "envelopeId": "envelope_abc123def456xy78",
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "email": "signer@example.com",
         "name": "John Doe",
         "role": "SIGNER",
@@ -408,7 +408,7 @@ The document status changes to `COMPLETED` and `completedAt` is set.
   "event": "DOCUMENT_COMPLETED",
   "payload": {
     "id": 10,
-    "envelopeId": "envelope_abc123def456xy78",
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "externalId": null,
     "userId": 1,
     "authOptions": null,
@@ -442,7 +442,7 @@ The document status changes to `COMPLETED` and `completedAt` is set.
     "recipients": [
       {
         "id": 50,
-        "envelopeId": "envelope_abc123def456xy78",
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 10,
         "templateId": null,
         "email": "reviewer@example.com",
@@ -465,7 +465,7 @@ The document status changes to `COMPLETED` and `completedAt` is set.
       },
       {
         "id": 51,
-        "envelopeId": "envelope_abc123def456xy78",
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 10,
         "templateId": null,
         "email": "signer@example.com",
@@ -490,7 +490,7 @@ The document status changes to `COMPLETED` and `completedAt` is set.
     "Recipient": [
       {
         "id": 50,
-        "envelopeId": "envelope_abc123def456xy78",
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 10,
         "templateId": null,
         "email": "reviewer@example.com",
@@ -513,7 +513,7 @@ The document status changes to `COMPLETED` and `completedAt` is set.
       },
       {
         "id": 51,
-        "envelopeId": "envelope_abc123def456xy78",
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 10,
         "templateId": null,
         "email": "signer@example.com",
@@ -554,14 +554,14 @@ The recipient's `signingStatus` changes to `REJECTED` and `rejectionReason` cont
   "event": "DOCUMENT_REJECTED",
   "payload": {
     "id": 10,
-    "envelopeId": "envelope_abc123def456xy78",
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "status": "PENDING",
     "title": "contract.pdf",
     "source": "DOCUMENT",
     "recipients": [
       {
         "id": 52,
-        "envelopeId": "envelope_abc123def456xy78",
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "email": "signer@example.com",
         "name": "John Doe",
         "role": "SIGNER",
@@ -591,7 +591,7 @@ This event is **not** triggered when a recipient hides a document from their inb
   "event": "DOCUMENT_CANCELLED",
   "payload": {
     "id": 7,
-    "envelopeId": "envelope_abc123def456xy78",
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "externalId": null,
     "userId": 3,
     "authOptions": null,
@@ -625,7 +625,7 @@ This event is **not** triggered when a recipient hides a document from their inb
     "recipients": [
       {
         "id": 7,
-        "envelopeId": "envelope_abc123def456xy78",
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 7,
         "templateId": null,
         "email": "signer@example.com",
@@ -647,7 +647,7 @@ This event is **not** triggered when a recipient hides a document from their inb
     "Recipient": [
       {
         "id": 7,
-        "envelopeId": "envelope_abc123def456xy78",
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 7,
         "templateId": null,
         "email": "signer@example.com",
@@ -685,14 +685,14 @@ The recipient's `expiresAt` contains the signing deadline, and `expirationNotifi
   "event": "RECIPIENT_EXPIRED",
   "payload": {
     "id": 10,
-    "envelopeId": "envelope_abc123def456xy78",
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "status": "PENDING",
     "title": "contract.pdf",
     "source": "DOCUMENT",
     "recipients": [
       {
         "id": 52,
-        "envelopeId": "envelope_abc123def456xy78",
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "documentId": 10,
         "templateId": null,
         "email": "signer@example.com",
@@ -722,14 +722,14 @@ Triggered when a reminder email is sent to a recipient who has not yet completed
   "event": "DOCUMENT_REMINDER_SENT",
   "payload": {
     "id": 10,
-    "envelopeId": "envelope_abc123def456xy78",
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "status": "PENDING",
     "title": "contract.pdf",
     "source": "DOCUMENT",
     "recipients": [
       {
         "id": 52,
-        "envelopeId": "envelope_abc123def456xy78",
+        "envelopeId": "envelope_abcdefhiklmnorst",
         "email": "signer@example.com",
         "name": "John Doe",
         "role": "SIGNER",
@@ -748,7 +748,7 @@ Triggered when a reminder email is sent to a recipient who has not yet completed
 
 ## Template Events
 
-Template events track changes to reusable document templates. Template payloads use the same structure as document payloads, with `source` set to `TEMPLATE` and `templateId` populated.
+Template events track changes to reusable document templates. Template payloads use the same structure as document payloads. For `TEMPLATE_CREATED`, `TEMPLATE_UPDATED`, and `TEMPLATE_DELETED` the template's own legacy numeric ID is in `id` and `templateId` is `null`. Only `TEMPLATE_USED` — whose payload describes the new document envelope created from the template — carries the originating template's legacy ID in `templateId`, with `source` set to `TEMPLATE`.
 
 ### `template.created`
 
@@ -761,7 +761,7 @@ Triggered when a new template is created.
   "event": "TEMPLATE_CREATED",
   "payload": {
     "id": 10,
-    "envelopeId": "envelope_abc123def456xy78",
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "title": "My Template",
     "status": "DRAFT",
     "templateId": null,
@@ -784,7 +784,7 @@ Triggered when a template's settings, recipients, or fields are modified.
   "event": "TEMPLATE_UPDATED",
   "payload": {
     "id": 10,
-    "envelopeId": "envelope_abc123def456xy78",
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "title": "My Updated Template",
     "status": "DRAFT",
     "templateId": null,
@@ -807,7 +807,7 @@ Triggered when a template is deleted.
   "event": "TEMPLATE_DELETED",
   "payload": {
     "id": 10,
-    "envelopeId": "envelope_abc123def456xy78",
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "title": "Deleted Template",
     "status": "DRAFT",
     "templateId": null,
@@ -830,7 +830,7 @@ Triggered when a document is created from a template. This event fires alongside
   "event": "TEMPLATE_USED",
   "payload": {
     "id": 10,
-    "envelopeId": "envelope_abc123def456xy78",
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "title": "Document from Template",
     "status": "DRAFT",
     "templateId": 10,

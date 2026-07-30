@@ -209,9 +209,12 @@ Your webhook endpoint must meet these requirements:
 | **Availability** | Must be publicly accessible from the internet |
 
 <Callout type="warn">
-  Documenso blocks webhook URLs that use or resolve to private or loopback addresses. Self-hosters
-  that need to deliver to a hostname resolving to a private address can add that hostname to the
-  comma-separated `NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS` environment variable.
+  Documenso performs a best-effort check that rejects webhook URLs which use or resolve to private
+  or loopback addresses. This is not a complete SSRF mitigation — it does not cover DNS rebinding
+  and fails open on DNS lookup errors or timeouts — so self-hosted deployments should still enforce
+  network-level egress rules. Self-hosters that need to deliver to a hostname resolving to a
+  private address can add that hostname to the comma-separated
+  `NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS` environment variable.
 </Callout>
 
 <Callout type="info">
