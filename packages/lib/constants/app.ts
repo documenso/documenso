@@ -9,6 +9,14 @@ export const NEXT_PUBLIC_WEBAPP_URL = () => env('NEXT_PUBLIC_WEBAPP_URL') ?? 'ht
 export const NEXT_PUBLIC_SIGNING_CONTACT_INFO = () =>
   env('NEXT_PUBLIC_SIGNING_CONTACT_INFO') ?? NEXT_PUBLIC_WEBAPP_URL();
 
+export const NEXT_PUBLIC_TERMS_OF_SERVICE_URL = () =>
+  env('NEXT_PUBLIC_TERMS_OF_SERVICE_URL') ?? 'https://documen.so/terms';
+
+export const NEXT_PUBLIC_PRIVACY_POLICY_URL = () =>
+  env('NEXT_PUBLIC_PRIVACY_POLICY_URL') ?? 'https://documen.so/privacy';
+
+export const NEXT_PUBLIC_IMPRINT_URL = () => env('NEXT_PUBLIC_IMPRINT_URL');
+
 export const NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER = () =>
   env('NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER') === 'true';
 
