@@ -22,10 +22,10 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 | `envelopeId`     | string         | ID of the parent envelope                    |
 | `envelopeItemId` | string         | ID of the PDF item the field is placed on    |
 | `page`           | number         | Page number (1-indexed)                      |
-| `positionX`      | number         | X coordinate as percentage (0-100)           |
-| `positionY`      | number         | Y coordinate as percentage (0-100)           |
-| `width`          | number         | Width as percentage of page (0-100)          |
-| `height`         | number         | Height as percentage of page (0-100)         |
+| `positionX`      | string         | X coordinate as percentage (0-100), a decimal serialized as a string |
+| `positionY`      | string         | Y coordinate as percentage (0-100), a decimal serialized as a string |
+| `width`          | string         | Width as percentage of page (0-100), a decimal serialized as a string |
+| `height`         | string         | Height as percentage of page (0-100), a decimal serialized as a string |
 | `customText`     | string         | Value entered by the recipient               |
 | `inserted`       | boolean        | Whether the field has been completed         |
 | `fieldMeta`      | object \| null | Type-specific configuration options          |
@@ -38,18 +38,19 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
   "secondaryId": "field_abc123",
   "type": "SIGNATURE",
   "recipientId": 123,
-  "envelopeId": "clu1abc2def3ghi4jkl",
-  "envelopeItemId": "envelope_item_xyz",
+  "envelopeId": "envelope_abcdefhiklmnorst",
+  "envelopeItemId": "envelope_item_abcdefhiklmnorst",
   "page": 1,
-  "positionX": 10,
-  "positionY": 80,
-  "width": 30,
-  "height": 5,
+  "positionX": "10",
+  "positionY": "80",
+  "width": "30",
+  "height": "5",
   "customText": "",
   "inserted": false,
   "fieldMeta": {
     "type": "signature",
-    "required": true
+    "required": true,
+    "overflow": "auto"
   }
 }
 ```
@@ -148,7 +149,7 @@ curl -X POST "https://app.documenso.com/api/v2/envelope/field/create-many" \
   -H "Authorization: api_xxxxxxxxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
-    "envelopeId": "clu1abc2def3ghi4jkl",
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "data": [
       {
         "type": "SIGNATURE",
@@ -199,7 +200,7 @@ const response = await fetch(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      envelopeId: 'clu1abc2def3ghi4jkl',
+      envelopeId: 'envelope_abcdefhiklmnorst',
       data: [
         {
           type: 'SIGNATURE',
@@ -254,51 +255,56 @@ console.log(`Created ${data.length} fields`);
     {
       "id": 101,
       "secondaryId": "field_abc123",
-      "envelopeId": "clu1abc2def3ghi4jkl",
-      "envelopeItemId": "envelope_item_xyz",
+      "envelopeId": "envelope_abcdefhiklmnorst",
+      "envelopeItemId": "envelope_item_abcdefhiklmnorst",
       "type": "SIGNATURE",
       "recipientId": 456,
       "page": 1,
-      "positionX": 10,
-      "positionY": 80,
-      "width": 30,
-      "height": 5,
+      "positionX": "10",
+      "positionY": "80",
+      "width": "30",
+      "height": "5",
       "customText": "",
       "inserted": false,
       "fieldMeta": {
-        "type": "signature"
+        "type": "signature",
+        "fontSize": 18,
+        "overflow": "auto"
       }
     },
     {
       "id": 102,
       "secondaryId": "field_def456",
-      "envelopeId": "clu1abc2def3ghi4jkl",
-      "envelopeItemId": "envelope_item_xyz",
+      "envelopeId": "envelope_abcdefhiklmnorst",
+      "envelopeItemId": "envelope_item_abcdefhiklmnorst",
       "type": "DATE",
       "recipientId": 456,
       "page": 1,
-      "positionX": 50,
-      "positionY": 80,
-      "width": 20,
-      "height": 3,
+      "positionX": "50",
+      "positionY": "80",
+      "width": "20",
+      "height": "3",
       "customText": "",
       "inserted": false,
       "fieldMeta": {
-        "type": "date"
+        "type": "date",
+        "fontSize": 12,
+        "textAlign": "left",
+        "overflow": "auto"
       }
     },
     {
       "id": 103,
       "secondaryId": "field_ghi789",
-      "envelopeId": "clu1abc2def3ghi4jkl",
-      "envelopeItemId": "envelope_item_xyz",
+      "envelopeId": "envelope_abcdefhiklmnorst",
+      "envelopeItemId": "envelope_item_abcdefhiklmnorst",
       "type": "TEXT",
       "recipientId": 456,
       "page": 1,
-      "positionX": 10,
-      "positionY": 70,
-      "width": 40,
-      "height": 4,
+      "positionX": "10",
+      "positionY": "70",
+      "width": "40",
+      "height": "4",
       "customText": "",
       "inserted": false,
       "fieldMeta": {
@@ -338,7 +344,7 @@ curl -X POST "https://app.documenso.com/api/v2/envelope/field/update-many" \
   -H "Authorization: api_xxxxxxxxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
-    "envelopeId": "clu1abc2def3ghi4jkl",
+    "envelopeId": "envelope_abcdefhiklmnorst",
     "data": [
       {
         "id": 101,
@@ -365,7 +371,7 @@ const response = await fetch(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      envelopeId: 'clu1abc2def3ghi4jkl',
+      envelopeId: 'envelope_abcdefhiklmnorst',
       data: [
         { id: 101, type: 'SIGNATURE', positionY: 85 },
         { id: 102, type: 'DATE', positionY: 85 },
@@ -388,37 +394,42 @@ const { data } = await response.json();
     {
       "id": 101,
       "secondaryId": "field_abc123",
-      "envelopeId": "clu1abc2def3ghi4jkl",
-      "envelopeItemId": "envelope_item_xyz",
+      "envelopeId": "envelope_abcdefhiklmnorst",
+      "envelopeItemId": "envelope_item_abcdefhiklmnorst",
       "type": "SIGNATURE",
       "recipientId": 456,
       "page": 1,
-      "positionX": 10,
-      "positionY": 85,
-      "width": 30,
-      "height": 5,
+      "positionX": "10",
+      "positionY": "85",
+      "width": "30",
+      "height": "5",
       "customText": "",
       "inserted": false,
       "fieldMeta": {
-        "type": "signature"
+        "type": "signature",
+        "fontSize": 18,
+        "overflow": "auto"
       }
     },
     {
       "id": 102,
       "secondaryId": "field_def456",
-      "envelopeId": "clu1abc2def3ghi4jkl",
-      "envelopeItemId": "envelope_item_xyz",
+      "envelopeId": "envelope_abcdefhiklmnorst",
+      "envelopeItemId": "envelope_item_abcdefhiklmnorst",
       "type": "DATE",
       "recipientId": 456,
       "page": 1,
-      "positionX": 50,
-      "positionY": 85,
-      "width": 20,
-      "height": 3,
+      "positionX": "50",
+      "positionY": "85",
+      "width": "20",
+      "height": "3",
       "customText": "",
       "inserted": false,
       "fieldMeta": {
-        "type": "date"
+        "type": "date",
+        "fontSize": 12,
+        "textAlign": "left",
+        "overflow": "auto"
       }
     }
   ]
