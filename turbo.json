@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "pipeline": {
+  "tasks": {
     "build": {
       "dependsOn": ["prebuild", "^build"],
       "outputs": [".next/**", "!.next/cache/**"]
@@ -143,6 +143,7 @@
     "GOOGLE_VERTEX_API_KEY",
     "CI",
     "NODE_ENV",
+    "NEXT_IGNORE_INCORRECT_LOCKFILE",
     "POSTGRES_URL",
     "DATABASE_URL",
     "DATABASE_URL_UNPOOLED",

@@ -3,12 +3,17 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertTriangleIcon } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 export type FormStickySaveBarProps = {
   isDirty: boolean;
   isSubmitting: boolean;
   onReset: () => void;
+  /**
+   * Slot for a "reset to defaults" action, rendered before the Undo button. Hidden while
+   * the bar is floating so it never appears in the unsaved-changes island.
+   */
+  resetToDefaults?: ReactNode;
 };
 
 /**
@@ -24,7 +29,7 @@ export type FormStickySaveBarProps = {
  * shared-layout morph). A 1px sentinel below it detects the stuck state so we can toggle
  * the pill chrome.
  */
-export const FormStickySaveBar = ({ isDirty, isSubmitting, onReset }: FormStickySaveBarProps) => {
+export const FormStickySaveBar = ({ isDirty, isSubmitting, onReset, resetToDefaults }: FormStickySaveBarProps) => {
   const { t } = useLingui();
 
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -100,6 +105,8 @@ export const FormStickySaveBar = ({ isDirty, isSubmitting, onReset }: FormSticky
         </AnimatePresence>
 
         <div className="ml-auto flex flex-shrink-0 items-center gap-x-2">
+          {!isFloating && resetToDefaults}
+
           {isDirty && (
             <Button type="button" variant="secondary" size="sm" onClick={onReset} disabled={isSubmitting}>
               <Trans>Undo</Trans>

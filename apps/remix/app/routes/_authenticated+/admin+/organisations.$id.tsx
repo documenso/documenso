@@ -8,6 +8,7 @@ import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisa
 import { trpc } from '@documenso/trpc/react';
 import type { TGetAdminOrganisationResponse } from '@documenso/trpc/server/admin-router/get-admin-organisation.types';
 import { ZUpdateAdminOrganisationRequestSchema } from '@documenso/trpc/server/admin-router/update-admin-organisation.types';
+import { cn } from '@documenso/ui/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@documenso/ui/primitives/accordion';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Badge } from '@documenso/ui/primitives/badge';
@@ -30,7 +31,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { OrganisationMemberRole } from '@prisma/client';
+import { OrganisationMemberRole, SubscriptionStatus } from '@prisma/client';
 import { ExternalLinkIcon, InfoIcon, Loader } from 'lucide-react';
 import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
@@ -42,7 +43,6 @@ import { AdminOrganisationDeleteDialog } from '~/components/dialogs/admin-organi
 import { AdminOrganisationMemberDeleteDialog } from '~/components/dialogs/admin-organisation-member-delete-dialog';
 import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
 import { AdminOrganisationSyncSubscriptionDialog } from '~/components/dialogs/admin-organisation-sync-subscription-dialog';
-import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
 import { AdminGlobalSettingsSection } from '~/components/general/admin-global-settings-section';
 import { ClaimLimitFields } from '~/components/general/claim-limit-fields';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
@@ -268,54 +268,32 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
 
       <GenericOrganisationAdminForm organisation={organisation} />
 
-      <div className="mt-6 rounded-lg border p-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="font-medium text-sm">
-              <Trans>Organisation usage</Trans>
-            </p>
-            <p className="mt-1 text-muted-foreground text-sm">
-              <Trans>Current usage against organisation limits.</Trans>
-            </p>
-          </div>
-        </div>
+      <SettingsHeader
+        title={t`Organisation usage`}
+        subtitle={t`Current usage against organisation limits.`}
+        className="mt-6"
+        hideDivider
+      />
 
-        <div className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-          <DetailsCard label={<Trans>Members</Trans>}>
-            <DetailsValue>
-              {organisation.members.length} /{' '}
-              {organisation.organisationClaim.memberCount === 0
-                ? t`Unlimited`
-                : organisation.organisationClaim.memberCount}
-            </DetailsValue>
-          </DetailsCard>
-
-          <DetailsCard label={<Trans>Teams</Trans>}>
-            <DetailsValue>
-              {organisation.teams.length} /{' '}
-              {organisation.organisationClaim.teamCount === 0 ? t`Unlimited` : organisation.organisationClaim.teamCount}
-            </DetailsValue>
-          </DetailsCard>
-        </div>
-
-        <div className="mt-4">
-          <OrganisationUsagePanel
-            organisationId={organisation.id}
-            monthlyStats={organisation.monthlyStats}
-            organisationClaim={organisation.organisationClaim}
-          />
-        </div>
-      </div>
+      <OrganisationUsagePanel
+        organisationId={organisation.id}
+        monthlyStats={organisation.monthlyStats}
+        organisationClaim={organisation.organisationClaim}
+        capacityUsage={{
+          members: organisation.members.length,
+          teams: organisation.teams.length,
+        }}
+      />
 
       <div className="mt-6 rounded-lg border p-4">
         <Accordion type="single" collapsible>
           <AccordionItem value="global-settings" className="border-b-0">
             <AccordionTrigger className="py-0">
               <div className="text-left">
-                <p className="font-medium text-sm">
+                <p className="font-semibold text-base">
                   <Trans>Global Settings</Trans>
                 </p>
-                <p className="mt-1 font-normal text-muted-foreground text-sm">
+                <p className="mt-1 text-muted-foreground text-sm">
                   <Trans>Default settings applied to this organisation.</Trans>
                 </p>
               </div>
@@ -335,7 +313,15 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
         className="mt-16"
       />
 
-      <Alert className="my-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
+      <Alert
+        className={cn(
+          'my-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center',
+          organisation.subscription?.status === SubscriptionStatus.ACTIVE &&
+            'border border-green-600/20 bg-green-50 dark:border-green-500/20 dark:bg-green-500/10',
+          organisation.subscription?.status === SubscriptionStatus.INACTIVE && 'opacity-60',
+        )}
+        variant="neutral"
+      >
         <div className="mb-4 sm:mb-0">
           <AlertTitle>
             <Trans>Subscription</Trans>
@@ -343,7 +329,12 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
 
           <AlertDescription className="mr-2">
             {organisation.subscription ? (
-              <span>{i18n._(SUBSCRIPTION_STATUS_MAP[organisation.subscription.status])} subscription found</span>
+              <span className="flex items-center gap-2">
+                {organisation.subscription.status === SubscriptionStatus.ACTIVE && (
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-green-600 dark:bg-green-400" aria-hidden="true" />
+                )}
+                <span>{i18n._(SUBSCRIPTION_STATUS_MAP[organisation.subscription.status])} subscription found</span>
+              </span>
             ) : (
               <span>
                 <Trans>No subscription found</Trans>
@@ -356,6 +347,7 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
           <div>
             <Button
               variant="outline"
+              className="bg-background"
               loading={isCreatingStripeCustomer}
               onClick={async () => createStripeCustomer({ organisationId })}
             >
@@ -366,7 +358,7 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
 
         {organisation.customerId && !organisation.subscription && (
           <div>
-            <Button variant="outline" asChild>
+            <Button variant="outline" className="bg-background" asChild>
               <Link
                 target="_blank"
                 to={`https://dashboard.stripe.com/customers/${organisation.customerId}?create=subscription&subscription_default_customer=${organisation.customerId}`}
@@ -383,13 +375,13 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
             <AdminOrganisationSyncSubscriptionDialog
               organisationId={organisationId}
               trigger={
-                <Button variant="outline">
+                <Button variant="outline" className="bg-background">
                   <Trans>Sync Stripe subscription</Trans>
                 </Button>
               }
             />
 
-            <Button variant="outline" asChild>
+            <Button variant="outline" className="bg-background" asChild>
               <Link
                 target="_blank"
                 to={`https://dashboard.stripe.com/subscriptions/${organisation.subscription.planId}`}
@@ -406,21 +398,27 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
 
       <div className="mt-16 space-y-10">
         <div>
-          <label className="font-medium text-sm leading-none">
+          <h3 className="font-semibold text-base">
             <Trans>Organisation Members</Trans>
-          </label>
+          </h3>
+          <p className="mt-1 text-muted-foreground text-sm">
+            <Trans>People with access to this organisation.</Trans>
+          </p>
 
-          <div className="my-2">
+          <div className="mt-3">
             <DataTable columns={organisationMembersColumns} data={organisation.members} />
           </div>
         </div>
 
         <div>
-          <label className="font-medium text-sm leading-none">
+          <h3 className="font-semibold text-base">
             <Trans>Organisation Teams</Trans>
-          </label>
+          </h3>
+          <p className="mt-1 text-muted-foreground text-sm">
+            <Trans>Teams that belong to this organisation.</Trans>
+          </p>
 
-          <div className="my-2">
+          <div className="mt-3">
             <DataTable columns={teamsColumns} data={organisation.teams} />
           </div>
         </div>
@@ -648,7 +646,7 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
               <FormLabel className="flex items-center">
                 <Trans>Inherited subscription claim</Trans>
                 <Tooltip>
-                  <TooltipTrigger>
+                  <TooltipTrigger type="button">
                     <InfoIcon className="mx-2 h-4 w-4" />
                   </TooltipTrigger>
 
@@ -681,10 +679,15 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
                   </TooltipContent>
                 </Tooltip>
               </FormLabel>
-              <FormControl>
-                <Input disabled {...field} />
-              </FormControl>
-              <FormMessage />
+              <div className="rounded-lg border bg-muted/40 px-3 py-2.5 text-sm">
+                {field.value ? (
+                  <span className="font-mono text-foreground">{field.value}</span>
+                ) : (
+                  <span className="text-muted-foreground">
+                    <Trans>No inherited claim</Trans>
+                  </span>
+                )}
+              </div>
             </FormItem>
           )}
         />
@@ -715,108 +718,113 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="claims.teamCount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                <Trans>Team Count</Trans>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={0}
-                  {...field}
-                  onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
-                />
-              </FormControl>
-              <FormDescription>
-                <Trans>Number of teams allowed. 0 = Unlimited</Trans>
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="claims.teamCount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Team Count</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                  />
+                </FormControl>
+                <FormDescription>
+                  <Trans>Number of teams allowed. 0 = Unlimited</Trans>
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="claims.memberCount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                <Trans>Member Count</Trans>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={0}
-                  {...field}
-                  onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
-                />
-              </FormControl>
-              <FormDescription>
-                <Trans>Number of members allowed. 0 = Unlimited</Trans>
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="claims.memberCount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Member Count</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                  />
+                </FormControl>
+                <FormDescription>
+                  <Trans>Number of members allowed. 0 = Unlimited</Trans>
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="claims.envelopeItemCount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                <Trans>Envelope Item Count</Trans>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={1}
-                  {...field}
-                  onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
-                />
-              </FormControl>
-              <FormDescription>
-                <Trans>Maximum number of uploaded files per envelope allowed</Trans>
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="claims.envelopeItemCount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Envelope Item Count</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={1}
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                  />
+                </FormControl>
+                <FormDescription>
+                  <Trans>Maximum number of uploaded files per envelope allowed</Trans>
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="claims.recipientCount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                <Trans>Recipient Count</Trans>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={0}
-                  {...field}
-                  onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
-                />
-              </FormControl>
-              <FormDescription>
-                <Trans>Maximum number of recipients per document allowed. 0 = Unlimited</Trans>
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="claims.recipientCount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Recipient Count</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                  />
+                </FormControl>
+                <FormDescription>
+                  <Trans>Maximum number of recipients per document allowed. 0 = Unlimited</Trans>
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <div>
-          <FormLabel>
+          <h3 className="font-semibold text-base">
             <Trans>Feature Flags</Trans>
-          </FormLabel>
+          </h3>
+          <p className="mt-1 text-muted-foreground text-sm">
+            <Trans>Capabilities enabled for this organisation.</Trans>
+          </p>
 
-          <div className="mt-2 space-y-2 rounded-md border p-4">
+          <div className="mt-3 space-y-2 rounded-md border p-4">
             {Object.values(SUBSCRIPTION_CLAIM_FEATURE_FLAGS).map(({ key, label, isEnterprise }) => {
               const isRestrictedFeature = isEnterprise && !licenseFlags?.[key as keyof TLicenseClaim]; // eslint-disable-line @typescript-eslint/consistent-type-assertions
 

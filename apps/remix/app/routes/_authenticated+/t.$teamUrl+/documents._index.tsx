@@ -86,6 +86,7 @@ export default function DocumentsPage() {
     [ExtendedDocumentStatus.COMPLETED]: 0,
     [ExtendedDocumentStatus.REJECTED]: 0,
     [ExtendedDocumentStatus.CANCELLED]: 0,
+    [ExtendedDocumentStatus.EXPIRED]: 0,
     [ExtendedDocumentStatus.INBOX]: 0,
     [ExtendedDocumentStatus.ALL]: 0,
   });
@@ -199,6 +200,8 @@ export default function DocumentsPage() {
                   ExtendedDocumentStatus.COMPLETED,
                   ExtendedDocumentStatus.CANCELLED,
                   ExtendedDocumentStatus.DRAFT,
+                  ExtendedDocumentStatus.REJECTED,
+                  ExtendedDocumentStatus.EXPIRED,
                   ExtendedDocumentStatus.ALL,
                 ]
                   .filter((value) => {

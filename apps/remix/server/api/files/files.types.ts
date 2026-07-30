@@ -13,27 +13,6 @@ export const ZUploadPdfResponseSchema = DocumentDataSchema.pick({
 export type TUploadPdfRequest = z.infer<typeof ZUploadPdfRequestSchema>;
 export type TUploadPdfResponse = z.infer<typeof ZUploadPdfResponseSchema>;
 
-export const ALLOWED_UPLOAD_CONTENT_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'] as const;
-
-export const isAllowedUploadContentType = (contentType: string): boolean => {
-  const normalizedContentType = contentType.split(';').at(0)?.trim().toLowerCase();
-
-  return ALLOWED_UPLOAD_CONTENT_TYPES.some((allowed) => allowed === normalizedContentType);
-};
-
-export const ZGetPresignedPostUrlRequestSchema = z.object({
-  fileName: z.string().min(1),
-  contentType: z.string().min(1),
-});
-
-export const ZGetPresignedPostUrlResponseSchema = z.object({
-  key: z.string().min(1),
-  url: z.string().min(1),
-});
-
-export type TGetPresignedPostUrlRequest = z.infer<typeof ZGetPresignedPostUrlRequestSchema>;
-export type TGetPresignedPostUrlResponse = z.infer<typeof ZGetPresignedPostUrlResponseSchema>;
-
 export const ZGetEnvelopeItemFileRequestParamsSchema = z.object({
   envelopeId: z.string().min(1),
   envelopeItemId: z.string().min(1),

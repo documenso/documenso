@@ -336,7 +336,7 @@ const BillingPlanForm = ({ value, onChange, plans, canCreateFreeOrganisation }: 
         >
           <div className="w-full text-left">
             <div className="flex items-center justify-between">
-              <p className="text-medium">
+              <p className="font-medium">
                 <Trans context="Plan price">Free</Trans>
               </p>
 

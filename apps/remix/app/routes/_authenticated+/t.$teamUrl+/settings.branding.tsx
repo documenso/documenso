@@ -1,6 +1,5 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import type { SanitizeBrandingCssWarning } from '@documenso/lib/utils/sanitize-branding-css';
 import { trpc } from '@documenso/trpc/react';
@@ -38,6 +37,7 @@ export default function TeamsSettingsPage() {
   });
 
   const { mutateAsync: updateTeamSettings } = trpc.team.settings.update.useMutation();
+  const { mutateAsync: updateTeamBrandingLogo } = trpc.team.settings.updateBrandingLogo.useMutation();
 
   const canConfigureBranding = organisation.organisationClaim.flags.allowCustomBranding || !IS_BILLING_ENABLED();
 
@@ -48,22 +48,23 @@ export default function TeamsSettingsPage() {
     try {
       const { brandingEnabled, brandingLogo, brandingUrl, brandingCompanyDetails, brandingColors, brandingCss } = data;
 
-      let uploadedBrandingLogo: string | undefined;
+      // Upload (or clear) the logo through the dedicated, server-validated route.
+      if (brandingLogo instanceof File || brandingLogo === null) {
+        const formData = new FormData();
 
-      if (brandingLogo) {
-        uploadedBrandingLogo = JSON.stringify(await putFile(brandingLogo));
-      }
+        formData.append('payload', JSON.stringify({ teamId: team.id }));
 
-      // Empty the branding logo if the user unsets it.
-      if (brandingLogo === null) {
-        uploadedBrandingLogo = '';
+        if (brandingLogo instanceof File) {
+          formData.append('brandingLogo', brandingLogo);
+        }
+
+        await updateTeamBrandingLogo(formData);
       }
 
       const result = await updateTeamSettings({
         teamId: team.id,
         data: {
           brandingEnabled,
-          brandingLogo: uploadedBrandingLogo,
           brandingUrl: brandingUrl || null,
           brandingCompanyDetails: brandingCompanyDetails || null,
           brandingColors,
