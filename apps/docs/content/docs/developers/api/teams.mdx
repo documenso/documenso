@@ -141,18 +141,18 @@ Retrieve all documents belonging to the team:
 <Tab value="curl">
 ```bash
 # List all team documents
-curl -X GET "https://app.documenso.com/api/v2/envelope" \
+curl -X GET "https://app.documenso.com/api/v2/envelope?type=DOCUMENT" \
   -H "Authorization: api_team_xxxxxxxxxxxxxxxx"
 
 # Filter by status
-curl -X GET "https://app.documenso.com/api/v2/envelope?status=PENDING" \
+curl -X GET "https://app.documenso.com/api/v2/envelope?type=DOCUMENT&status=PENDING" \
   -H "Authorization: api_team_xxxxxxxxxxxxxxxx"
 ````
 
 </Tab>
 <Tab value="TypeScript">
 ```typescript
-const response = await fetch('https://app.documenso.com/api/v2/envelope', {
+const response = await fetch('https://app.documenso.com/api/v2/envelope?type=DOCUMENT', {
   method: 'GET',
   headers: {
     Authorization: TEAM_API_TOKEN,
@@ -317,13 +317,13 @@ const SALES_TEAM_TOKEN = process.env.SALES_TEAM_API_TOKEN;
 const LEGAL_TEAM_TOKEN = process.env.LEGAL_TEAM_API_TOKEN;
 
 // Get pending documents from sales team
-const salesResponse = await fetch('https://app.documenso.com/api/v2/envelope?status=PENDING', {
+const salesResponse = await fetch('https://app.documenso.com/api/v2/envelope?type=DOCUMENT&status=PENDING', {
   headers: { Authorization: SALES_TEAM_TOKEN },
 });
 const salesDocs = await salesResponse.json();
 
 // Get completed documents from legal team
-const legalResponse = await fetch('https://app.documenso.com/api/v2/envelope?status=COMPLETED', {
+const legalResponse = await fetch('https://app.documenso.com/api/v2/envelope?type=DOCUMENT&status=COMPLETED', {
   headers: { Authorization: LEGAL_TEAM_TOKEN },
 });
 const legalDocs = await legalResponse.json();
