@@ -7,6 +7,7 @@ import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import type { FindResultResponse } from '../../types/search-params';
 import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
 import { getTeamById } from '../team/get-team';
+import { hasExpiredRecipient } from './query-helpers';
 
 export type FindEnvelopesOptions = {
   userId: number;
@@ -23,6 +24,11 @@ export type FindEnvelopesOptions = {
   };
   query?: string;
   folderId?: string;
+  /**
+   * When true, restrict results to envelopes with at least one recipient whose signing
+   * link has expired. Orthogonal to `status` — applied additively.
+   */
+  hasExpiredRecipients?: boolean;
   /**
    * When true (default), use a windowed count that caps early for faster pagination.
    * When false, use a full COUNT(*) for exact totals — preferred for external API consumers.
@@ -106,6 +112,7 @@ export const findEnvelopes = async ({
   orderBy,
   query = '',
   folderId,
+  hasExpiredRecipients,
   useWindowedCount = true,
 }: FindEnvelopesOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -180,6 +187,11 @@ export const findEnvelopes = async ({
         ),
       ]),
     );
+  }
+
+  // Expired recipient filter (orthogonal to status, additive)
+  if (hasExpiredRecipients) {
+    qb = qb.where((eb) => hasExpiredRecipient(eb));
   }
 
   // ─── Access control ──────────────────────────────────────────────────
