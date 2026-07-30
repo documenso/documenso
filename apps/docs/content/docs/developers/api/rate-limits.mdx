@@ -11,6 +11,12 @@ Documenso enforces rate limits on all API endpoints to ensure service stability.
 
 ## HTTP Rate Limits
 
+The rate limit applies to:
+
+- `/api/v1/*`
+- `/api/v2/*`
+- `/api/v2-beta/*`
+
 **Limit:** 1000 requests per minute per IP address  
 **Response:** 429 Too Many Requests
 
@@ -19,7 +25,7 @@ Documenso enforces rate limits on all API endpoints to ensure service stability.
   this value, in which case you can be rate-limited before reaching the global limit.
 </Callout>
 
-### Rate Limit Response
+### Global per-IP 429 Response
 
 ```json
 {
@@ -27,10 +33,20 @@ Documenso enforces rate limits on all API endpoints to ensure service stability.
 }
 ```
 
-<Callout type="warn">
-  No rate limit headers are currently provided. When you receive a 429 response, wait at least 60
-  seconds before retrying.
-</Callout>
+### Rate Limit Headers
+
+Every response from `/api/v1/*`, `/api/v2/*`, and `/api/v2-beta/*` includes these headers:
+
+| Header                  | Description                                                            |
+| ----------------------- | ---------------------------------------------------------------------- |
+| `X-RateLimit-Limit`     | Maximum requests allowed in the current global window                  |
+| `X-RateLimit-Remaining` | Requests remaining in the current global window                        |
+| `X-RateLimit-Reset`     | End of the current global window, as a Unix epoch timestamp in seconds |
+
+A 429 response from a windowed limiter also includes `Retry-After`, in seconds, with a minimum
+value of `1`. The global API limit uses fixed, epoch-aligned one-minute buckets, so the actual wait
+until the next window is between 1 and 60 seconds. Honor `Retry-After` exactly instead of sleeping
+for a fixed 60 seconds. See the [Retry-After handling example](/docs/developers/examples/common-workflows#error-handling-patterns).
 
 ## Resource Limits
 
@@ -44,24 +60,37 @@ Beyond HTTP rate limits, your account has usage limits based on your subscriptio
 | Total Recipients | 10   | Unlimited | Unlimited   | Unlimited  |
 | Direct Templates | 3    | Unlimited | Unlimited   | Unlimited  |
 
-### Error Response
+### AppError-Based 429 Response
 
-When you exceed a resource limit:
+Organisation windowed limits and monthly envelope quotas return an AppError response rather than
+the global per-IP limiter's `{ "error": "..." }` response. For example, an organisation windowed
+limit returns:
 
 ```json
 {
-  "error": "You have reached your document limit for this month. Please upgrade your plan.",
-  "code": "LIMIT_EXCEEDED",
-  "statusCode": 400
+  "code": "TOO_MANY_REQUESTS",
+  "message": "Too many requests, please try again later. Contact support if you require higher limits.",
+  "statusCode": 429
 }
 ```
 
+The monthly quota response uses the same `code`, `message`, and `statusCode` shape with a
+quota-specific message. It does not add quota-specific rate limit headers or `Retry-After` because
+the quota is not a time window. The global API headers described above may still be present.
+
 ## Error Codes
 
-| Code                | Status | Description                   |
-| ------------------- | ------ | ----------------------------- |
-| `TOO_MANY_REQUESTS` | 429    | HTTP rate limit exceeded      |
-| `LIMIT_EXCEEDED`    | 400    | Resource usage limit exceeded |
+| Code                | Status | Description                                                        |
+| ------------------- | ------ | ------------------------------------------------------------------ |
+| `TOO_MANY_REQUESTS` | 429    | Global per-IP, organisation windowed, or monthly quota exceeded    |
+| `LIMIT_EXCEEDED`    | 400    | Resource usage limit exceeded                                      |
+
+There are three sources of `TOO_MANY_REQUESTS` responses:
+
+1. The global per-IP limit returns the `{ "error": "..." }` body shown above.
+2. Organisation windowed limits return the AppError body shown above.
+3. The monthly envelope quota returns an AppError body but does not add quota-specific rate limit
+   headers or `Retry-After`.
 
 ---
 
