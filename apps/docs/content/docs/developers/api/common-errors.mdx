@@ -15,6 +15,7 @@ This guide provides a comprehensive troubleshooting matrix for the standard erro
 | `INVALID_REQUEST` | The overall request is malformed or invalid. | Review your API call parameters, including the URL, query parameters, and headers. Correct the request syntax. |
 | `RECIPIENT_EXPIRED` | The signing link or recipient access has expired. | Generate and resend a new invitation to the affected recipient. |
 | `LIMIT_EXCEEDED` | Your account usage quota has been exceeded. | Check your current plan limits. Upgrade your subscription or wait until your billing cycle renews. |
+| `MISSING_ENV_VAR` | A required environment variable is not configured on the server (500). | Primarily affects self-hosted instances: set the environment variable named in the error message and restart. On Documenso Cloud, contact support. |
 | `MISSING_SIGNATURE_FIELD` | A signer has no signature field placed on the document (400). Returned when distributing an envelope. | Add at least one signature field for every recipient with a signing role before calling `/envelope/distribute`. |
 | `NOT_FOUND` | The requested resource could not be found (404). | Verify the resource ID (envelope, document, webhook) passed in the URL. Ensure the resource has not been deleted. |
 | `NOT_IMPLEMENTED` | The requested feature is not currently supported by the server. | Consult the API documentation to verify available methods. Do not use this endpoint at this time. |
