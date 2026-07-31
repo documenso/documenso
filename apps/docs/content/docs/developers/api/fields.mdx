@@ -6,6 +6,8 @@ description: Add signature and form fields to documents via API.
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
+<EnvelopeWarning />
+
 <Callout type="warn">
   This guide may not reflect the latest endpoints or parameters. For an always up-to-date reference,
   see the [OpenAPI Reference](https://openapi.documenso.com).
@@ -62,7 +64,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 | Type             | Description                               | Auto-filled |
 | ---------------- | ----------------------------------------- | ----------- |
 | `SIGNATURE`      | Drawn, typed, or uploaded signature       | No          |
-| `FREE_SIGNATURE` | Unrestricted signature without validation | No          |
+| `FREE_SIGNATURE` | Legacy free-form signature. Accepted by the v2 create schema but rejected by the v1 API and unsupported in the signing UI — avoid in new integrations | No          |
 | `INITIALS`       | Recipient's initials                      | No          |
 | `NAME`           | Recipient's full name                     | Yes         |
 | `EMAIL`          | Recipient's email address                 | Yes         |
@@ -139,6 +141,8 @@ POST /envelope/field/create-many
 | ------------ | ------ | -------- | ------------------------------- |
 | `envelopeId` | string | Yes      | The envelope ID                 |
 | `data`       | array  | Yes      | Array of field configurations   |
+
+Each entry in `data` requires a `type`, a `recipientId`, and a position — either explicit coordinates (`page`, `positionX`, `positionY`, `width`, `height`) or a [text placeholder](#placeholder-based-field-positioning) (`placeholder` with optional `width`, `height`, and `matchAll`). Optional per-entry properties: `envelopeItemId` (which PDF in the envelope to place the field on; defaults to the first item) and `fieldMeta`.
 
 ### Code Examples
 
@@ -334,6 +338,8 @@ POST /envelope/field/update-many
 | ------------ | ------ | -------- | ----------------------------- |
 | `envelopeId` | string | Yes      | The envelope ID               |
 | `data`       | array  | Yes      | Array of field update objects |
+
+Each entry in `data` requires the field `id` and `type`. Position properties (`page`, `positionX`, `positionY`, `width`, `height`), `envelopeItemId`, and `fieldMeta` are optional — only supplied values are updated. Placeholder positioning is not supported when updating; use coordinates.
 
 ### Code Examples
 
@@ -550,6 +556,33 @@ This approach is useful when generating PDFs programmatically or using templates
 </Callout>
 
 See the [PDF Placeholders](/docs/users/documents/advanced/pdf-placeholders) guide for the full placeholder format reference, including supported field types, recipient identifiers, and field options.
+
+### Placeholder Positioning via the API
+
+`POST /envelope/field/create-many` accepts a placeholder position in place of coordinates. Instead of `page`, `positionX`, `positionY`, `width`, and `height`, pass:
+
+| Field         | Type    | Required | Description                                                                                                  |
+| ------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------ |
+| `placeholder` | string  | Yes      | Text to search for in the PDF (e.g. `{{name}}`). The field is placed at the bounding box of the first match. |
+| `width`       | number  | No       | Override the field width. Defaults to the width of the matched text.                                          |
+| `height`      | number  | No       | Override the field height. Defaults to the height of the matched text.                                        |
+| `matchAll`    | boolean | No       | Create a field at every occurrence of the placeholder instead of only the first.                              |
+
+```json
+{
+  "envelopeId": "envelope_abcdefhiklmnorst",
+  "data": [
+    {
+      "type": "SIGNATURE",
+      "recipientId": 456,
+      "placeholder": "{{signature}}",
+      "matchAll": true
+    }
+  ]
+}
+```
+
+`POST /envelope/field/update-many` does not accept placeholders — field updates are coordinate-only.
 
 ---
 
