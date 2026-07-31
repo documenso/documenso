@@ -1,0 +1,18 @@
+services:
+  documenso-node:
+    build:
+      context: ${TPI_DOCUMENSO_FRONT_PATH:-.}/
+      dockerfile: docker/ci/Dockerfile
+    volumes:
+      - ${TPI_DOCUMENSO_FRONT_PATH:-.}/:/srv/tpi-documenso-front/current/
+    environment:
+      UID: ${USER_UID?-Please export your UID in env var USER_UID}
+      GID: ${USER_GID?-Please export your GID in env var USER_GID}
+
+      HUSKY: 0
+      NEXT_TELEMETRY_DISABLED: 1
+      NODE_OPTIONS: --max-old-space-size=8192
+
+      # Dummy encryption keys, only needed at build time
+      NEXT_PRIVATE_ENCRYPTION_KEY: CAFEBABE
+      NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: DEADBEEF

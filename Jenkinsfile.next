@@ -1,0 +1,20 @@
+indbApplication([
+    dockerCompose: [
+        files: ["docker-compose.ci.yml"],
+        startStack: false
+    ],
+    build: [
+        "service": "documenso-node",
+    ],
+    package: [
+        include: ['./'],
+        exclude: ['.turbo', 'docker'],
+        chdir: './'
+    ],
+    nexus: [
+        repositories: [
+            snapshots: "tpi-snapshots",
+            releases: "tpi-releases"
+        ]
+    ]
+])

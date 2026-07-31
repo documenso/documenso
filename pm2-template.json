@@ -1,0 +1,10 @@
+{
+  "name": "tpi-documenso-front",
+  "script": "build/server/main.js",
+  "cwd": "${PM2_CWD}",
+  "instances": "${PM2_INSTANCES}",
+  "exec_mode": "${PM2_EXEC_MODE}",
+  "output": "${PM2_LOG_OUPUT}",
+  "error": "${PM2_LOG_ERROR}",
+  "log_date_format": "YYYY-MM-DD HH:mm:ss"
+}
