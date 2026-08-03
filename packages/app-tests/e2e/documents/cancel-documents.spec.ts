@@ -7,7 +7,7 @@ import { expect, type Page, test } from '@playwright/test';
 import { DocumentStatus, TeamMemberRole } from '@prisma/client';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
-import { checkDocumentTabCount, selectDocumentStatusFilter } from '../fixtures/documents';
+import { checkDocumentCounts, selectDocumentStatusFilter } from '../fixtures/documents';
 import { expectToastTextToBeVisible, openDropdownMenu } from '../fixtures/generic';
 
 test.describe.configure({ mode: 'serial' });
@@ -61,10 +61,7 @@ test('[DOCUMENTS]: cancelling a pending document keeps it in the owner dashboard
   await expectToastTextToBeVisible(page, 'Document cancelled');
 
   // The document must remain in the dashboard, unlike deleting a pending document.
-  await checkDocumentTabCount(page, 'Inbox', 0);
-  await checkDocumentTabCount(page, 'Pending', 0);
-  await checkDocumentTabCount(page, 'Cancelled', 1);
-  await checkDocumentTabCount(page, 'All', 1);
+  await checkDocumentCounts(page, { inbox: 0, pending: 0, cancelled: 1, all: 1 });
 
   // The cancelled document is still listed.
   await selectDocumentStatusFilter(page, 'Cancelled');
