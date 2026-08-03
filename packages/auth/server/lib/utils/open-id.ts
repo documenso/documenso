@@ -4,6 +4,7 @@ const ZOpenIdConfigurationSchema = z.object({
   authorization_endpoint: z.string(),
   token_endpoint: z.string(),
   scopes_supported: z.array(z.string()).optional(),
+  jwks_uri: z.string().optional(),
 });
 
 type OpenIdConfiguration = z.infer<typeof ZOpenIdConfigurationSchema>;
