@@ -14,13 +14,22 @@ import type { RowSelectionState } from '@documenso/ui/primitives/data-table';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
-import { EnvelopeType, FolderType, OrganisationType } from '@prisma/client';
+import {
+  EnvelopeType,
+  FolderType,
+  OrganisationType,
+  type DocumentStatus as PrismaDocumentStatus,
+} from '@prisma/client';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
 import { z } from 'zod';
 
 import { EnvelopesBulkCancelDialog } from '~/components/dialogs/envelopes-bulk-cancel-dialog';
 import { EnvelopesBulkDeleteDialog } from '~/components/dialogs/envelopes-bulk-delete-dialog';
+import {
+  type EnvelopeBulkDownloadItem,
+  EnvelopesBulkDownloadDialog,
+} from '~/components/dialogs/envelopes-bulk-download-dialog';
 import { EnvelopesBulkMoveDialog } from '~/components/dialogs/envelopes-bulk-move-dialog';
 import { DocumentSearch } from '~/components/general/document/document-search';
 import { DocumentStatus } from '~/components/general/document/document-status';
@@ -37,6 +46,14 @@ import { appMetaTags } from '~/utils/meta';
 export function meta() {
   return appMetaTags(msg`Documents`);
 }
+
+type EnvelopeMetaCache = Record<string, { title: string; status: PrismaDocumentStatus; isLegacy: boolean }>;
+
+// Stable initial values: `useSessionStorage` keeps its setter identity stable
+// only while the initial value reference is stable, and the metadata cache
+// effect below depends on that setter.
+const EMPTY_ROW_SELECTION: RowSelectionState = {};
+const EMPTY_ENVELOPE_META_CACHE: EnvelopeMetaCache = {};
 
 const ZSearchParamsSchema = ZFindDocumentsInternalRequestSchema.pick({
   status: true,
@@ -61,9 +78,18 @@ export default function DocumentsPage() {
   const [isMovingDocument, setIsMovingDocument] = useState(false);
   const [documentToMove, setDocumentToMove] = useState<string | null>(null);
 
-  const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>('documents-bulk-selection', {});
+  // Scoped by team so selections made in one team never leak into another.
+  const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>(
+    `documents-bulk-selection-${team.id}`,
+    EMPTY_ROW_SELECTION,
+  );
+  const [envelopeMetaCache, setEnvelopeMetaCache] = useSessionStorage<EnvelopeMetaCache>(
+    `documents-bulk-selection-meta-${team.id}`,
+    EMPTY_ENVELOPE_META_CACHE,
+  );
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
+  const [isBulkDownloadDialogOpen, setIsBulkDownloadDialogOpen] = useState(false);
   const [isBulkCancelDialogOpen, setIsBulkCancelDialogOpen] = useState(false);
 
   const selectedEnvelopeIds = useMemo(() => {
@@ -95,6 +121,51 @@ export default function DocumentsPage() {
       ...SKIP_QUERY_BATCH_META,
     },
   );
+
+  useEffect(() => {
+    setEnvelopeMetaCache((prev) => {
+      const next: EnvelopeMetaCache = {};
+
+      for (const id of Object.keys(prev)) {
+        if (rowSelection[id]) {
+          next[id] = prev[id];
+        }
+      }
+
+      for (const document of data?.data ?? []) {
+        if (rowSelection[document.envelopeId]) {
+          next[document.envelopeId] = {
+            title: document.title,
+            status: document.status,
+            isLegacy: document.internalVersion === 1,
+          };
+        }
+      }
+
+      return next;
+    });
+  }, [data?.data, rowSelection, setEnvelopeMetaCache]);
+
+  const selectedEnvelopesForDownload = useMemo(() => {
+    return selectedEnvelopeIds
+      .map((id): EnvelopeBulkDownloadItem | null => {
+        const meta = envelopeMetaCache[id];
+
+        if (!meta) {
+          return null;
+        }
+
+        return {
+          id,
+          title: meta.title,
+          status: meta.status,
+          // Stale cache entries predating this field are treated as legacy so
+          // the Partial option is never offered without certainty.
+          isLegacy: meta.isLegacy ?? true,
+        };
+      })
+      .filter((item): item is EnvelopeBulkDownloadItem => item !== null);
+  }, [selectedEnvelopeIds, envelopeMetaCache]);
 
   const getTabHref = (value: keyof typeof ExtendedDocumentStatus) => {
     const params = new URLSearchParams(searchParams);
@@ -238,10 +309,26 @@ export default function DocumentsPage() {
 
         <EnvelopesTableBulkActionBar
           selectedCount={selectedEnvelopeIds.length}
+          onDownloadClick={() => setIsBulkDownloadDialogOpen(true)}
           onMoveClick={() => setIsBulkMoveDialogOpen(true)}
           onDeleteClick={() => setIsBulkDeleteDialogOpen(true)}
           onCancelClick={() => setIsBulkCancelDialogOpen(true)}
           onClearSelection={() => setRowSelection({})}
+        />
+
+        <EnvelopesBulkDownloadDialog
+          envelopes={selectedEnvelopesForDownload}
+          open={isBulkDownloadDialogOpen}
+          onOpenChange={setIsBulkDownloadDialogOpen}
+          onSuccess={(successfulEnvelopeIds) => {
+            setRowSelection((prev) => {
+              const next = { ...prev };
+              for (const id of successfulEnvelopeIds) {
+                delete next[id];
+              }
+              return next;
+            });
+          }}
         />
 
         <EnvelopesBulkMoveDialog
