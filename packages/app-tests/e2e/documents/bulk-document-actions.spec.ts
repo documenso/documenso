@@ -1,10 +1,13 @@
+import fs from 'node:fs';
+import { createTeam } from '@documenso/lib/server-only/team/create-team';
 import { prisma } from '@documenso/prisma';
 import { seedCompletedDocument, seedDraftDocument, seedPendingDocument } from '@documenso/prisma/seed/documents';
 import { seedBlankFolder } from '@documenso/prisma/seed/folders';
 import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
-import { type Download, expect, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { DocumentStatus, TeamMemberRole } from '@prisma/client';
+import { unzipSync } from 'fflate';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
 import { expectToastTextToBeVisible } from '../fixtures/generic';
@@ -113,8 +116,77 @@ test('[BULK_ACTIONS]: can move multiple documents to a folder', async ({ page })
   await expect(page.getByRole('link', { name: 'Bulk Test Doc 2' })).toBeVisible();
 });
 
-test('[BULK_ACTIONS]: can bulk download multiple documents', async ({ page }) => {
+test('[BULK_ACTIONS]: selection does not leak between teams', async ({ page }) => {
   const { sender } = await seedBulkActionsTestRequirements();
+
+  const teamBUrl = `team-b-${Date.now()}`;
+
+  await createTeam({
+    userId: sender.user.id,
+    teamName: 'Team B',
+    teamUrl: teamBUrl,
+    organisationId: sender.organisation.id,
+    inheritMembers: true,
+  });
+
+  const teamB = await prisma.team.findFirstOrThrow({
+    where: { url: teamBUrl },
+  });
+
+  await seedDraftDocument(sender.user, teamB.id, [], {
+    createDocumentOptions: { title: 'Team B Doc' },
+  });
+
+  await apiSignin({
+    page,
+    email: sender.user.email,
+    redirectPath: `/t/${sender.team.url}/documents`,
+  });
+
+  await page.locator('tr', { hasText: 'Bulk Test Doc 1' }).getByRole('checkbox').click();
+  await expect(page.getByText(/1\s*selected/)).toBeVisible();
+
+  // The selection made in team A must not appear in team B.
+  await page.goto(`/t/${teamBUrl}/documents`);
+  await expect(page.getByRole('link', { name: 'Team B Doc' })).toBeVisible();
+  await expect(page.getByText(/\d+\s*selected/)).not.toBeVisible();
+
+  // Returning to team A restores its selection.
+  await page.goto(`/t/${sender.team.url}/documents`);
+  await expect(page.getByText(/1\s*selected/)).toBeVisible();
+});
+
+test('[BULK_ACTIONS]: escape clears selection unless a dialog is open', async ({ page }) => {
+  const { sender } = await seedBulkActionsTestRequirements();
+
+  await apiSignin({
+    page,
+    email: sender.user.email,
+    redirectPath: `/t/${sender.team.url}/documents`,
+  });
+
+  await page.locator('tr', { hasText: 'Bulk Test Doc 1' }).getByRole('checkbox').click();
+  await expect(page.getByText(/1\s*selected/)).toBeVisible();
+
+  // Escape while a dialog is open should close the dialog but keep the selection.
+  await page.getByRole('button', { name: 'Move', exact: true }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+
+  await page.keyboard.press('Escape');
+
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+  await expect(page.getByText(/1\s*selected/)).toBeVisible();
+
+  // Escape with no dialog open should clear the selection.
+  await page.keyboard.press('Escape');
+
+  await expect(page.getByText(/1\s*selected/)).not.toBeVisible();
+});
+
+test('[BULK_ACTIONS]: can bulk download multiple documents as a zip', async ({ page }) => {
+  const { sender, documents } = await seedBulkActionsTestRequirements();
+
+  const [doc1, doc2] = documents;
 
   await apiSignin({
     page,
@@ -135,16 +207,26 @@ test('[BULK_ACTIONS]: can bulk download multiple documents', async ({ page }) =>
   await expect(dialog.getByText('Bulk Test Doc 2')).toBeVisible();
   await expect(dialog.getByText('Draft').first()).toBeVisible();
 
-  const downloads: Download[] = [];
-  page.on('download', (d) => downloads.push(d));
+  const downloadPromise = page.waitForEvent('download', { timeout: 10_000 });
 
   await dialog.getByRole('button', { name: 'Download' }).click();
 
-  await expect.poll(() => downloads.length, { timeout: 10_000 }).toBe(2);
+  const download = await downloadPromise;
 
-  expect(downloads.map((d) => d.suggestedFilename())).toEqual(
-    expect.arrayContaining(['Bulk Test Doc 1.pdf', 'Bulk Test Doc 2.pdf']),
+  expect(download.suggestedFilename()).toMatch(/^documenso-documents-\d{4}-\d{2}-\d{2}\.zip$/);
+
+  const downloadPath = await download.path();
+  const zipContents = unzipSync(new Uint8Array(fs.readFileSync(downloadPath)));
+
+  // Each envelope's files are nested inside an `envelopeId_title` folder.
+  expect(Object.keys(zipContents).sort()).toEqual(
+    [`${doc1.id}_Bulk Test Doc 1/Bulk Test Doc 1.pdf`, `${doc2.id}_Bulk Test Doc 2/Bulk Test Doc 2.pdf`].sort(),
   );
+
+  // Each entry should be a valid non-empty PDF (%PDF magic bytes).
+  for (const entry of Object.values(zipContents)) {
+    expect(Array.from(entry.slice(0, 4))).toEqual([0x25, 0x50, 0x44, 0x46]);
+  }
 
   await expectToastTextToBeVisible(page, 'Documents downloaded');
   await expect(page.getByText(/\d+\s*selected/)).not.toBeVisible();

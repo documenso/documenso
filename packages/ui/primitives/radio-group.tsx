@@ -35,4 +35,43 @@ const RadioGroupItem = React.forwardRef<
 
 RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName;
 
-export { RadioGroup, RadioGroupItem };
+/**
+ * A segmented-control style radio group where each item renders as a small
+ * toggle button rather than a radio circle.
+ */
+const RadioGroupSegmented = React.forwardRef<
+  React.ElementRef<typeof RadioGroupPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
+>(({ className, ...props }, ref) => {
+  return (
+    <RadioGroupPrimitive.Root
+      className={cn('inline-flex items-center gap-0.5 rounded-md bg-muted p-0.5', className)}
+      {...props}
+      ref={ref}
+    />
+  );
+});
+
+RadioGroupSegmented.displayName = 'RadioGroupSegmented';
+
+const RadioGroupSegmentedItem = React.forwardRef<
+  React.ElementRef<typeof RadioGroupPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
+>(({ className, children, ...props }, ref) => {
+  return (
+    <RadioGroupPrimitive.Item
+      ref={ref}
+      className={cn(
+        'rounded-sm px-2 py-0.5 font-medium text-muted-foreground text-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-background data-[state=checked]:text-foreground data-[state=checked]:shadow-sm',
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </RadioGroupPrimitive.Item>
+  );
+});
+
+RadioGroupSegmentedItem.displayName = 'RadioGroupSegmentedItem';
+
+export { RadioGroup, RadioGroupItem, RadioGroupSegmented, RadioGroupSegmentedItem };

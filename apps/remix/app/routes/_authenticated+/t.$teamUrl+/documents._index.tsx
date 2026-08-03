@@ -26,7 +26,10 @@ import { z } from 'zod';
 
 import { EnvelopesBulkCancelDialog } from '~/components/dialogs/envelopes-bulk-cancel-dialog';
 import { EnvelopesBulkDeleteDialog } from '~/components/dialogs/envelopes-bulk-delete-dialog';
-import { EnvelopesBulkDownloadDialog } from '~/components/dialogs/envelopes-bulk-download-dialog';
+import {
+  type EnvelopeBulkDownloadItem,
+  EnvelopesBulkDownloadDialog,
+} from '~/components/dialogs/envelopes-bulk-download-dialog';
 import { EnvelopesBulkMoveDialog } from '~/components/dialogs/envelopes-bulk-move-dialog';
 import { DocumentSearch } from '~/components/general/document/document-search';
 import { DocumentStatus } from '~/components/general/document/document-status';
@@ -43,6 +46,14 @@ import { appMetaTags } from '~/utils/meta';
 export function meta() {
   return appMetaTags(msg`Documents`);
 }
+
+type EnvelopeMetaCache = Record<string, { title: string; status: PrismaDocumentStatus; isLegacy: boolean }>;
+
+// Stable initial values: `useSessionStorage` keeps its setter identity stable
+// only while the initial value reference is stable, and the metadata cache
+// effect below depends on that setter.
+const EMPTY_ROW_SELECTION: RowSelectionState = {};
+const EMPTY_ENVELOPE_META_CACHE: EnvelopeMetaCache = {};
 
 const ZSearchParamsSchema = ZFindDocumentsInternalRequestSchema.pick({
   status: true,
@@ -67,10 +78,15 @@ export default function DocumentsPage() {
   const [isMovingDocument, setIsMovingDocument] = useState(false);
   const [documentToMove, setDocumentToMove] = useState<string | null>(null);
 
-  const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>('documents-bulk-selection', {});
-  const [envelopeMetaCache, setEnvelopeMetaCache] = useSessionStorage<
-    Record<string, { title: string; status: PrismaDocumentStatus }>
-  >('documents-bulk-selection-meta', {});
+  // Scoped by team so selections made in one team never leak into another.
+  const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>(
+    `documents-bulk-selection-${team.id}`,
+    EMPTY_ROW_SELECTION,
+  );
+  const [envelopeMetaCache, setEnvelopeMetaCache] = useSessionStorage<EnvelopeMetaCache>(
+    `documents-bulk-selection-meta-${team.id}`,
+    EMPTY_ENVELOPE_META_CACHE,
+  );
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
   const [isBulkDownloadDialogOpen, setIsBulkDownloadDialogOpen] = useState(false);
@@ -108,7 +124,7 @@ export default function DocumentsPage() {
 
   useEffect(() => {
     setEnvelopeMetaCache((prev) => {
-      const next: Record<string, { title: string; status: PrismaDocumentStatus }> = {};
+      const next: EnvelopeMetaCache = {};
 
       for (const id of Object.keys(prev)) {
         if (rowSelection[id]) {
@@ -121,6 +137,7 @@ export default function DocumentsPage() {
           next[document.envelopeId] = {
             title: document.title,
             status: document.status,
+            isLegacy: document.internalVersion === 1,
           };
         }
       }
@@ -131,11 +148,23 @@ export default function DocumentsPage() {
 
   const selectedEnvelopesForDownload = useMemo(() => {
     return selectedEnvelopeIds
-      .map((id) => {
+      .map((id): EnvelopeBulkDownloadItem | null => {
         const meta = envelopeMetaCache[id];
-        return meta ? { id, title: meta.title, status: meta.status } : null;
+
+        if (!meta) {
+          return null;
+        }
+
+        return {
+          id,
+          title: meta.title,
+          status: meta.status,
+          // Stale cache entries predating this field are treated as legacy so
+          // the Partial option is never offered without certainty.
+          isLegacy: meta.isLegacy ?? true,
+        };
       })
-      .filter((item): item is { id: string; title: string; status: PrismaDocumentStatus } => item !== null);
+      .filter((item): item is EnvelopeBulkDownloadItem => item !== null);
   }, [selectedEnvelopeIds, envelopeMetaCache]);
 
   const getTabHref = (value: keyof typeof ExtendedDocumentStatus) => {

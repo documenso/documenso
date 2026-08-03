@@ -28,7 +28,10 @@ export const EnvelopesTableBulkActionBar = ({
     }
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      // Radix dismissable layers (dialogs, dropdowns, etc) call preventDefault
+      // when handling Escape, so this only clears the selection when nothing
+      // else consumed the key press.
+      if (event.key === 'Escape' && !event.defaultPrevented) {
         onClearSelection();
       }
     };
