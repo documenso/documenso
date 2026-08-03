@@ -2,38 +2,24 @@ import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounce
 import { Input } from '@documenso/ui/primitives/input';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { useCallback, useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router';
+import { useQueryState } from 'nuqs';
+import { useEffect, useState } from 'react';
 
-export const DocumentSearch = ({ initialValue = '' }: { initialValue?: string }) => {
+import { documentsSearchParams } from '~/utils/documents-search-params';
+
+export const DocumentSearch = () => {
   const { _ } = useLingui();
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [query, setQuery] = useQueryState('query', documentsSearchParams.query);
 
-  const [searchTerm, setSearchTerm] = useState(initialValue);
+  const [searchTerm, setSearchTerm] = useState(query ?? '');
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 500);
 
-  const handleSearch = useCallback(
-    (term: string) => {
-      const params = new URLSearchParams(searchParams?.toString() ?? '');
-      if (term) {
-        params.set('query', term);
-      } else {
-        params.delete('query');
-      }
-
-      setSearchParams(params);
-    },
-    [searchParams],
-  );
-
   useEffect(() => {
-    const currentQueryParam = searchParams.get('query') || '';
-
-    if (debouncedSearchTerm !== currentQueryParam) {
-      handleSearch(debouncedSearchTerm);
+    if (debouncedSearchTerm !== (query ?? '')) {
+      void setQuery(debouncedSearchTerm || null);
     }
-  }, [debouncedSearchTerm, searchParams]);
+  }, [debouncedSearchTerm, query, setQuery]);
 
   return (
     <Input

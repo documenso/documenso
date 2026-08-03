@@ -20,7 +20,7 @@ import {
 } from '@prisma/client';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
-import { checkDocumentTabCount } from '../fixtures/documents';
+import { checkDocumentTabCount, clearDocumentStatusFilter } from '../fixtures/documents';
 
 test.describe.configure({
   mode: 'parallel',
@@ -815,7 +815,7 @@ test.describe('Find Documents UI - Data Isolation & No Leaking', () => {
     await checkDocumentTabCount(page, 'Completed', 1);
 
     // Verify no B docs leaked
-    await page.getByRole('tab', { name: 'All' }).click();
+    await clearDocumentStatusFilter(page);
     await expect(page.getByRole('link', { name: 'A Own Draft' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'B Draft Private', exact: true })).not.toBeVisible();
     await expect(page.getByRole('link', { name: 'B Pending Private', exact: true })).not.toBeVisible();
@@ -1163,9 +1163,10 @@ test.describe('Find Documents UI - Sender Filter', () => {
     await checkDocumentTabCount(page, 'All', 3);
 
     // Filter by member1
-    await page.locator('button').filter({ hasText: 'Sender: All' }).click();
+    await page.getByTestId('documents-table-sender-filter').click();
     await page.getByRole('option', { name: member1.name ?? '' }).click();
     await page.waitForURL(/senderIds/);
+    await page.keyboard.press('Escape');
 
     // Should only show member1's doc
     await checkDocumentTabCount(page, 'All', 1);
