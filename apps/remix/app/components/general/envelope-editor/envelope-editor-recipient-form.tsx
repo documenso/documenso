@@ -147,8 +147,10 @@ export const EnvelopeEditorRecipientForm = () => {
 
   const hasCurrentEditorInfo = Boolean(currentEditorEmail || currentEditorName);
 
+  // Note: Watched signer entries can be transiently partial while react-hook-form
+  // re-registers reordered array fields, so guard optional access here.
   const isUserAlreadyARecipient = watchedSigners.some(
-    (signer) => signer.email.toLowerCase() === currentEditorEmail?.toLowerCase(),
+    (signer) => Boolean(currentEditorEmail) && signer.email?.toLowerCase() === currentEditorEmail?.toLowerCase(),
   );
 
   const hasDocumentBeenSent = recipients.some(
