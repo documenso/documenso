@@ -25,6 +25,7 @@ import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToDocumentId, unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
+import { filterRecipientsInFirstSigningGroup } from '../../utils/recipient-groups';
 import { assertRecipientNotExpired } from '../../utils/recipients';
 import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -372,6 +373,7 @@ export const completeDocumentWithToken = async ({
       name: true,
       email: true,
       role: true,
+      sendStatus: true,
     },
     where: {
       envelopeId: envelope.id,
@@ -397,10 +399,25 @@ export const completeDocumentWithToken = async ({
     });
 
     if (envelope.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL) {
-      const [nextRecipient] = pendingRecipients;
+      // The active group: every pending recipient sharing the lowest pending
+      // signing order. Members already activated (sendStatus SENT) are group
+      // peers who were notified earlier — activating only fresh members means
+      // a mid-group completion is a no-op and a step transition activates the
+      // whole next group at once.
+      const nextGroup = filterRecipientsInFirstSigningGroup(pendingRecipients);
+      const recipientsToActivate = nextGroup.filter((r) => r.sendStatus !== SendStatus.SENT);
+
+      // Dictation only applies when advancing to a single-recipient step.
+      const canDictateNextSigner =
+        Boolean(nextSigner) &&
+        Boolean(envelope.documentMeta?.allowDictateNextSigner) &&
+        nextGroup.length === 1 &&
+        recipientsToActivate.length === 1;
 
       await prisma.$transaction(async (tx) => {
-        if (nextSigner && envelope.documentMeta?.allowDictateNextSigner) {
+        if (canDictateNextSigner && nextSigner) {
+          const [nextRecipient] = recipientsToActivate;
+
           await tx.documentAuditLog.create({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
@@ -432,30 +449,34 @@ export const completeDocumentWithToken = async ({
           });
         }
 
-        await tx.recipient.update({
-          where: { id: nextRecipient.id },
-          data: {
-            sendStatus: SendStatus.SENT,
-            sentAt: new Date(),
-            ...(nextSigner && envelope.documentMeta?.allowDictateNextSigner
-              ? {
-                  name: nextSigner.name,
-                  email: nextSigner.email,
-                }
-              : {}),
-          },
-        });
+        for (const nextRecipient of recipientsToActivate) {
+          await tx.recipient.update({
+            where: { id: nextRecipient.id },
+            data: {
+              sendStatus: SendStatus.SENT,
+              sentAt: new Date(),
+              ...(canDictateNextSigner && nextSigner
+                ? {
+                    name: nextSigner.name,
+                    email: nextSigner.email,
+                  }
+                : {}),
+            },
+          });
+        }
       });
 
-      await jobs.triggerJob({
-        name: 'send.signing.requested.email',
-        payload: {
-          userId: envelope.userId,
-          documentId: legacyDocumentId,
-          recipientId: nextRecipient.id,
-          requestMetadata,
-        },
-      });
+      for (const nextRecipient of recipientsToActivate) {
+        await jobs.triggerJob({
+          name: 'send.signing.requested.email',
+          payload: {
+            userId: envelope.userId,
+            documentId: legacyDocumentId,
+            recipientId: nextRecipient.id,
+            requestMetadata,
+          },
+        });
+      }
     }
   }
 
