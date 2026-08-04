@@ -1,7 +1,15 @@
 import { RecipientRole } from '@prisma/client';
 import { describe, expect, it } from 'vitest';
 
-import { groupRecipientsBySigningOrder, normalizeGroupedSigningOrders } from './recipient-groups';
+import {
+  extractRecipientToNewStep,
+  groupRecipientsBySigningOrder,
+  mergeSteps,
+  moveRecipientToStep,
+  normalizeGroupedSigningOrders,
+  reorderStep,
+  ungroupStep,
+} from './recipient-groups';
 
 describe('groupRecipientsBySigningOrder', () => {
   it('groups non-CC recipients sharing a signing order into steps', () => {
@@ -129,5 +137,193 @@ describe('normalizeGroupedSigningOrders', () => {
       ['peer', 2],
       ['a', 3],
     ]);
+  });
+});
+
+const makeSigners = () => [
+  { formId: 'a', role: RecipientRole.SIGNER, signingOrder: 1 },
+  { formId: 'b', role: RecipientRole.SIGNER, signingOrder: 2 },
+  { formId: 'c', role: RecipientRole.SIGNER, signingOrder: 3 },
+  { formId: 'd', role: RecipientRole.SIGNER, signingOrder: 4 },
+];
+
+const ordersOf = (signers: Array<{ formId: string; signingOrder?: number }>) =>
+  signers.map((signer) => [signer.formId, signer.signingOrder]);
+
+describe('mergeSteps', () => {
+  it('merges all members of the source step into the target step', () => {
+    const merged = mergeSteps(makeSigners(), 2, 1);
+
+    expect(ordersOf(merged)).toEqual([
+      ['a', 1],
+      ['b', 2],
+      ['c', 2],
+      ['d', 3],
+    ]);
+  });
+
+  it('merges a whole group into another step', () => {
+    const signers = [
+      { formId: 'a', role: RecipientRole.SIGNER, signingOrder: 1 },
+      { formId: 'b', role: RecipientRole.SIGNER, signingOrder: 2 },
+      { formId: 'c', role: RecipientRole.SIGNER, signingOrder: 2 },
+      { formId: 'd', role: RecipientRole.SIGNER, signingOrder: 3 },
+    ];
+
+    const merged = mergeSteps(signers, 1, 2);
+
+    expect(ordersOf(merged)).toEqual([
+      ['a', 1],
+      ['d', 2],
+      ['b', 2],
+      ['c', 2],
+    ]);
+  });
+
+  it('returns the input unchanged for an invalid step index', () => {
+    const signers = makeSigners();
+
+    expect(mergeSteps(signers, 7, 1)).toEqual(signers);
+  });
+});
+
+describe('moveRecipientToStep', () => {
+  it('appends the recipient to the target step members', () => {
+    const moved = moveRecipientToStep(makeSigners(), 'a', 2);
+
+    expect(ordersOf(moved)).toEqual([
+      ['b', 1],
+      ['c', 2],
+      ['a', 2],
+      ['d', 3],
+    ]);
+  });
+
+  it('dissolves a group of two when one member joins another step', () => {
+    const signers = [
+      { formId: 'a', role: RecipientRole.SIGNER, signingOrder: 1 },
+      { formId: 'b', role: RecipientRole.SIGNER, signingOrder: 1 },
+      { formId: 'c', role: RecipientRole.SIGNER, signingOrder: 2 },
+    ];
+
+    const moved = moveRecipientToStep(signers, 'b', 1);
+
+    expect(ordersOf(moved)).toEqual([
+      ['a', 1],
+      ['c', 2],
+      ['b', 2],
+    ]);
+  });
+
+  it('is a no-op when the recipient is already a member of the target step', () => {
+    const signers = makeSigners();
+
+    expect(ordersOf(moveRecipientToStep(signers, 'b', 1))).toEqual(ordersOf(signers));
+  });
+});
+
+describe('extractRecipientToNewStep', () => {
+  it('extracts a group member into its own step at the given gap', () => {
+    const signers = [
+      { formId: 'a', role: RecipientRole.SIGNER, signingOrder: 1 },
+      { formId: 'b', role: RecipientRole.SIGNER, signingOrder: 2 },
+      { formId: 'c', role: RecipientRole.SIGNER, signingOrder: 2 },
+      { formId: 'd', role: RecipientRole.SIGNER, signingOrder: 3 },
+    ];
+
+    // Gap 2 = before the step containing 'd'.
+    const extracted = extractRecipientToNewStep(signers, 'c', 2);
+
+    expect(ordersOf(extracted)).toEqual([
+      ['a', 1],
+      ['b', 2],
+      ['c', 3],
+      ['d', 4],
+    ]);
+  });
+
+  it('extracts to the end for an out-of-bounds gap index', () => {
+    const signers = [
+      { formId: 'a', role: RecipientRole.SIGNER, signingOrder: 1 },
+      { formId: 'b', role: RecipientRole.SIGNER, signingOrder: 1 },
+      { formId: 'c', role: RecipientRole.SIGNER, signingOrder: 2 },
+    ];
+
+    const extracted = extractRecipientToNewStep(signers, 'a', 99);
+
+    expect(ordersOf(extracted)).toEqual([
+      ['b', 1],
+      ['c', 2],
+      ['a', 3],
+    ]);
+  });
+
+  it('is a no-op when a solo recipient is dropped into an adjacent gap', () => {
+    const signers = makeSigners();
+
+    expect(ordersOf(extractRecipientToNewStep(signers, 'b', 1))).toEqual(ordersOf(signers));
+    expect(ordersOf(extractRecipientToNewStep(signers, 'b', 2))).toEqual(ordersOf(signers));
+  });
+});
+
+describe('reorderStep', () => {
+  it('moves a whole group to a new position', () => {
+    const signers = [
+      { formId: 'a', role: RecipientRole.SIGNER, signingOrder: 1 },
+      { formId: 'b', role: RecipientRole.SIGNER, signingOrder: 2 },
+      { formId: 'c', role: RecipientRole.SIGNER, signingOrder: 2 },
+      { formId: 'd', role: RecipientRole.SIGNER, signingOrder: 3 },
+    ];
+
+    const reordered = reorderStep(signers, 1, 2);
+
+    expect(ordersOf(reordered)).toEqual([
+      ['a', 1],
+      ['d', 2],
+      ['b', 3],
+      ['c', 3],
+    ]);
+  });
+
+  it('keeps a locked step number anchored while others flow around it', () => {
+    const signers = [
+      { formId: 'locked', role: RecipientRole.SIGNER, signingOrder: 1 },
+      { formId: 'b', role: RecipientRole.SIGNER, signingOrder: 2 },
+      { formId: 'c', role: RecipientRole.SIGNER, signingOrder: 3 },
+    ];
+
+    const reordered = reorderStep(signers, 1, 2, (r) => r.formId !== 'locked');
+
+    expect(ordersOf(reordered)).toEqual([
+      ['locked', 1],
+      ['c', 2],
+      ['b', 3],
+    ]);
+  });
+});
+
+describe('ungroupStep', () => {
+  it('splits a group into consecutive standalone steps preserving relative order', () => {
+    const signers = [
+      { formId: 'a', role: RecipientRole.SIGNER, signingOrder: 1 },
+      { formId: 'b', role: RecipientRole.SIGNER, signingOrder: 2 },
+      { formId: 'c', role: RecipientRole.SIGNER, signingOrder: 2 },
+      { formId: 'd', role: RecipientRole.SIGNER, signingOrder: 3 },
+    ];
+
+    const ungrouped = ungroupStep(signers, 1);
+
+    expect(ordersOf(ungrouped)).toEqual([
+      ['a', 1],
+      ['b', 2],
+      ['c', 3],
+      ['d', 4],
+    ]);
+  });
+
+  it('is a no-op on a step with a single member', () => {
+    const signers = makeSigners();
+
+    expect(ordersOf(ungroupStep(signers, 0))).toEqual(ordersOf(signers));
   });
 });

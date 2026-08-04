@@ -107,3 +107,187 @@ export const normalizeGroupedSigningOrders = <T extends GroupableRecipient>(
     ...ccRecipients.map((recipient) => ({ ...recipient, signingOrder: undefined })),
   ];
 };
+
+type EditorRecipient = GroupableRecipient & { formId: string };
+
+/**
+ * Merges all members of the source step into the target step.
+ */
+export const mergeSteps = <T extends EditorRecipient>(
+  recipients: T[],
+  sourceStepIndex: number,
+  targetStepIndex: number,
+  canUpdateRecipient?: (recipient: T) => boolean,
+): Array<T & { signingOrder?: number }> => {
+  const { steps } = groupRecipientsBySigningOrder(recipients);
+
+  const sourceStep = steps[sourceStepIndex];
+  const targetStep = steps[targetStepIndex];
+
+  if (!sourceStep || !targetStep || sourceStepIndex === targetStepIndex) {
+    return recipients;
+  }
+
+  const sourceFormIds = new Set(sourceStep.members.map((member) => member.formId));
+
+  // Source members join after the target step's existing members.
+  const remaining = recipients.filter((recipient) => !sourceFormIds.has(recipient.formId));
+  const lastMemberFormId = targetStep.members[targetStep.members.length - 1].formId;
+  const insertAfterIndex = remaining.findIndex((recipient) => recipient.formId === lastMemberFormId);
+
+  const movedMembers = sourceStep.members.map((member) => ({ ...member, signingOrder: targetStep.order }));
+
+  const updated = [
+    ...remaining.slice(0, insertAfterIndex + 1),
+    ...movedMembers,
+    ...remaining.slice(insertAfterIndex + 1),
+  ];
+
+  return normalizeGroupedSigningOrders(updated, canUpdateRecipient);
+};
+
+/**
+ * Moves a single recipient into the target step (joins the group).
+ */
+export const moveRecipientToStep = <T extends EditorRecipient>(
+  recipients: T[],
+  formId: string,
+  targetStepIndex: number,
+  canUpdateRecipient?: (recipient: T) => boolean,
+): Array<T & { signingOrder?: number }> => {
+  const { steps } = groupRecipientsBySigningOrder(recipients);
+
+  const targetStep = steps[targetStepIndex];
+  const mover = recipients.find((recipient) => recipient.formId === formId);
+
+  if (!targetStep || !mover || isCcRecipient(mover)) {
+    return recipients;
+  }
+
+  if (targetStep.members.some((member) => member.formId === formId)) {
+    return recipients;
+  }
+
+  const remaining = recipients.filter((recipient) => recipient.formId !== formId);
+  const lastMemberFormId = targetStep.members[targetStep.members.length - 1].formId;
+  const insertAfterIndex = remaining.findIndex((recipient) => recipient.formId === lastMemberFormId);
+
+  const updated = [
+    ...remaining.slice(0, insertAfterIndex + 1),
+    { ...mover, signingOrder: targetStep.order },
+    ...remaining.slice(insertAfterIndex + 1),
+  ];
+
+  return normalizeGroupedSigningOrders(updated, canUpdateRecipient);
+};
+
+/**
+ * Extracts a recipient into its own standalone step at the given gap position
+ * (gap N sits before step N; an out-of-bounds gap appends to the end).
+ */
+export const extractRecipientToNewStep = <T extends EditorRecipient>(
+  recipients: T[],
+  formId: string,
+  insertStepIndex: number,
+  canUpdateRecipient?: (recipient: T) => boolean,
+): Array<T & { signingOrder?: number }> => {
+  const { steps } = groupRecipientsBySigningOrder(recipients);
+
+  const mover = recipients.find((recipient) => recipient.formId === formId);
+
+  if (!mover || isCcRecipient(mover)) {
+    return recipients;
+  }
+
+  const currentStepIndex = steps.findIndex((step) => step.members.some((member) => member.formId === formId));
+  const isSoloStep = currentStepIndex !== -1 && steps[currentStepIndex].members.length === 1;
+
+  // Dropping a solo step into the gap directly above or below itself is a no-op.
+  if (isSoloStep && (insertStepIndex === currentStepIndex || insertStepIndex === currentStepIndex + 1)) {
+    return recipients;
+  }
+
+  const insertOrder =
+    insertStepIndex >= steps.length ? (steps[steps.length - 1]?.order ?? 0) + 1 : steps[insertStepIndex].order - 0.5;
+
+  const updated = recipients.map((recipient) =>
+    recipient.formId === formId ? { ...recipient, signingOrder: insertOrder } : recipient,
+  );
+
+  return normalizeGroupedSigningOrders(updated, canUpdateRecipient);
+};
+
+/**
+ * Moves a whole step (group) to a new position in the step sequence.
+ *
+ * Locked steps keep their members' persisted orders untouched (the sequence
+ * flows around them), and editable steps never collide onto a locked anchor —
+ * that would accidentally merge them during re-derivation.
+ */
+export const reorderStep = <T extends EditorRecipient>(
+  recipients: T[],
+  fromStepIndex: number,
+  toStepIndex: number,
+  canUpdateRecipient: (recipient: T) => boolean = () => true,
+): Array<T & { signingOrder?: number }> => {
+  const { steps, ccRecipients } = groupRecipientsBySigningOrder(recipients);
+
+  if (!steps[fromStepIndex] || fromStepIndex === toStepIndex) {
+    return recipients;
+  }
+
+  const reorderedSteps = [...steps];
+  const [movedStep] = reorderedSteps.splice(fromStepIndex, 1);
+
+  reorderedSteps.splice(Math.min(toStepIndex, reorderedSteps.length), 0, movedStep);
+
+  const isStepLocked = (step: RecipientStep<T>) => step.members.some((member) => !canUpdateRecipient(member));
+
+  const lockedAnchors = new Set(reorderedSteps.filter((step) => isStepLocked(step)).map((step) => step.order));
+
+  const updated = [
+    ...reorderedSteps.flatMap((step, index) => {
+      if (isStepLocked(step)) {
+        return step.members;
+      }
+
+      const tempOrder = lockedAnchors.has(index + 1) ? index + 1.5 : index + 1;
+
+      return step.members.map((member) => ({ ...member, signingOrder: tempOrder }));
+    }),
+    ...ccRecipients,
+  ];
+
+  return normalizeGroupedSigningOrders(updated, canUpdateRecipient);
+};
+
+/**
+ * Dissolves a group into consecutive standalone steps preserving relative order.
+ */
+export const ungroupStep = <T extends EditorRecipient>(
+  recipients: T[],
+  stepIndex: number,
+  canUpdateRecipient?: (recipient: T) => boolean,
+): Array<T & { signingOrder?: number }> => {
+  const { steps } = groupRecipientsBySigningOrder(recipients);
+
+  const step = steps[stepIndex];
+
+  if (!step || step.members.length < 2) {
+    return recipients;
+  }
+
+  const offsetByFormId = new Map(step.members.map((member, index) => [member.formId, index]));
+
+  const updated = recipients.map((recipient) => {
+    const offset = offsetByFormId.get(recipient.formId);
+
+    if (offset === undefined) {
+      return recipient;
+    }
+
+    return { ...recipient, signingOrder: step.order + offset / (step.members.length + 1) };
+  });
+
+  return normalizeGroupedSigningOrders(updated, canUpdateRecipient);
+};
