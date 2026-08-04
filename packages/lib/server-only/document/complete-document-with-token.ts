@@ -373,7 +373,6 @@ export const completeDocumentWithToken = async ({
       name: true,
       email: true,
       role: true,
-      sendStatus: true,
     },
     where: {
       envelopeId: envelope.id,
@@ -399,83 +398,86 @@ export const completeDocumentWithToken = async ({
     });
 
     if (envelope.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL) {
-      // The active group: every pending recipient sharing the lowest pending
-      // signing order. Members already activated (sendStatus SENT) are group
-      // peers who were notified earlier — activating only fresh members means
-      // a mid-group completion is a no-op and a step transition activates the
-      // whole next group at once.
+      // The next group: every pending recipient sharing the lowest pending
+      // signing order. If the completing recipient's own step is still
+      // pending (a group peer has not signed yet), the flow does not advance —
+      // the remaining peers were already activated when their step unlocked.
       const nextGroup = filterRecipientsInFirstSigningGroup(pendingRecipients);
-      const recipientsToActivate = nextGroup.filter((r) => r.sendStatus !== SendStatus.SENT);
 
-      // Dictation only applies when advancing to a single-recipient step.
-      const canDictateNextSigner =
-        Boolean(nextSigner) &&
-        Boolean(envelope.documentMeta?.allowDictateNextSigner) &&
-        nextGroup.length === 1 &&
-        recipientsToActivate.length === 1;
+      const currentRecipientOrder = recipient.signingOrder ?? Number.MAX_SAFE_INTEGER;
 
-      await prisma.$transaction(async (tx) => {
-        if (canDictateNextSigner && nextSigner) {
-          const [nextRecipient] = recipientsToActivate;
+      const hasCompletedCurrentStep = nextGroup.every(
+        (pendingRecipient) => (pendingRecipient.signingOrder ?? Number.MAX_SAFE_INTEGER) > currentRecipientOrder,
+      );
 
-          await tx.documentAuditLog.create({
-            data: createDocumentAuditLogData({
-              type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
-              envelopeId: envelope.id,
-              user: {
-                name: recipientName,
-                email: recipientEmail,
-              },
-              requestMetadata,
+      if (nextGroup.length > 0 && hasCompletedCurrentStep) {
+        // Dictation only applies when advancing to a single-recipient step.
+        const canDictateNextSigner =
+          Boolean(nextSigner) && Boolean(envelope.documentMeta?.allowDictateNextSigner) && nextGroup.length === 1;
+
+        await prisma.$transaction(async (tx) => {
+          if (canDictateNextSigner && nextSigner) {
+            const [nextRecipient] = nextGroup;
+
+            await tx.documentAuditLog.create({
+              data: createDocumentAuditLogData({
+                type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
+                envelopeId: envelope.id,
+                user: {
+                  name: recipientName,
+                  email: recipientEmail,
+                },
+                requestMetadata,
+                data: {
+                  recipientEmail: nextRecipient.email,
+                  recipientName: nextRecipient.name,
+                  recipientId: nextRecipient.id,
+                  recipientRole: nextRecipient.role,
+                  changes: [
+                    {
+                      type: RECIPIENT_DIFF_TYPE.NAME,
+                      from: nextRecipient.name,
+                      to: nextSigner.name,
+                    },
+                    {
+                      type: RECIPIENT_DIFF_TYPE.EMAIL,
+                      from: nextRecipient.email,
+                      to: nextSigner.email,
+                    },
+                  ],
+                },
+              }),
+            });
+          }
+
+          for (const nextRecipient of nextGroup) {
+            await tx.recipient.update({
+              where: { id: nextRecipient.id },
               data: {
-                recipientEmail: nextRecipient.email,
-                recipientName: nextRecipient.name,
-                recipientId: nextRecipient.id,
-                recipientRole: nextRecipient.role,
-                changes: [
-                  {
-                    type: RECIPIENT_DIFF_TYPE.NAME,
-                    from: nextRecipient.name,
-                    to: nextSigner.name,
-                  },
-                  {
-                    type: RECIPIENT_DIFF_TYPE.EMAIL,
-                    from: nextRecipient.email,
-                    to: nextSigner.email,
-                  },
-                ],
+                sendStatus: SendStatus.SENT,
+                sentAt: new Date(),
+                ...(canDictateNextSigner && nextSigner
+                  ? {
+                      name: nextSigner.name,
+                      email: nextSigner.email,
+                    }
+                  : {}),
               },
-            }),
-          });
-        }
+            });
+          }
+        });
 
-        for (const nextRecipient of recipientsToActivate) {
-          await tx.recipient.update({
-            where: { id: nextRecipient.id },
-            data: {
-              sendStatus: SendStatus.SENT,
-              sentAt: new Date(),
-              ...(canDictateNextSigner && nextSigner
-                ? {
-                    name: nextSigner.name,
-                    email: nextSigner.email,
-                  }
-                : {}),
+        for (const nextRecipient of nextGroup) {
+          await jobs.triggerJob({
+            name: 'send.signing.requested.email',
+            payload: {
+              userId: envelope.userId,
+              documentId: legacyDocumentId,
+              recipientId: nextRecipient.id,
+              requestMetadata,
             },
           });
         }
-      });
-
-      for (const nextRecipient of recipientsToActivate) {
-        await jobs.triggerJob({
-          name: 'send.signing.requested.email',
-          payload: {
-            userId: envelope.userId,
-            documentId: legacyDocumentId,
-            recipientId: nextRecipient.id,
-            requestMetadata,
-          },
-        });
       }
     }
   }
