@@ -40,6 +40,7 @@ import {
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { filterRecipientsInFirstSigningGroup } from '../../utils/recipient-groups';
 import { getRecipientsWithMissingFields } from '../../utils/recipients';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
@@ -694,7 +695,10 @@ export const createDocumentFromDirectTemplate = async ({
         orderBy: [{ signingOrder: { sort: 'asc', nulls: 'last' } }, { id: 'asc' }],
       });
 
-      const nextRecipient = pendingRecipients[0];
+      const nextGroup = filterRecipientsInFirstSigningGroup(pendingRecipients);
+
+      // Dictation only applies when the next step is a single recipient.
+      const nextRecipient = nextGroup.length === 1 ? nextGroup[0] : null;
 
       if (nextRecipient) {
         auditLogsToCreate.push(
