@@ -126,7 +126,7 @@ export const mergeSteps = <T extends EditorRecipient>(
   const targetStep = steps[targetStepIndex];
 
   if (!sourceStep || !targetStep || sourceStepIndex === targetStepIndex) {
-    return recipients;
+    return normalizeGroupedSigningOrders(recipients, canUpdateRecipient);
   }
 
   const sourceFormIds = new Set(sourceStep.members.map((member) => member.formId));
@@ -162,11 +162,11 @@ export const moveRecipientToStep = <T extends EditorRecipient>(
   const mover = recipients.find((recipient) => recipient.formId === formId);
 
   if (!targetStep || !mover || isCcRecipient(mover)) {
-    return recipients;
+    return normalizeGroupedSigningOrders(recipients, canUpdateRecipient);
   }
 
   if (targetStep.members.some((member) => member.formId === formId)) {
-    return recipients;
+    return normalizeGroupedSigningOrders(recipients, canUpdateRecipient);
   }
 
   const remaining = recipients.filter((recipient) => recipient.formId !== formId);
@@ -197,7 +197,7 @@ export const extractRecipientToNewStep = <T extends EditorRecipient>(
   const mover = recipients.find((recipient) => recipient.formId === formId);
 
   if (!mover || isCcRecipient(mover)) {
-    return recipients;
+    return normalizeGroupedSigningOrders(recipients, canUpdateRecipient);
   }
 
   const currentStepIndex = steps.findIndex((step) => step.members.some((member) => member.formId === formId));
@@ -205,7 +205,7 @@ export const extractRecipientToNewStep = <T extends EditorRecipient>(
 
   // Dropping a solo step into the gap directly above or below itself is a no-op.
   if (isSoloStep && (insertStepIndex === currentStepIndex || insertStepIndex === currentStepIndex + 1)) {
-    return recipients;
+    return normalizeGroupedSigningOrders(recipients, canUpdateRecipient);
   }
 
   const insertOrder =
@@ -234,7 +234,7 @@ export const reorderStep = <T extends EditorRecipient>(
   const { steps, ccRecipients } = groupRecipientsBySigningOrder(recipients);
 
   if (!steps[fromStepIndex] || fromStepIndex === toStepIndex) {
-    return recipients;
+    return normalizeGroupedSigningOrders(recipients, canUpdateRecipient);
   }
 
   const reorderedSteps = [...steps];
@@ -365,7 +365,7 @@ export const ungroupStep = <T extends EditorRecipient>(
   const step = steps[stepIndex];
 
   if (!step || step.members.length < 2) {
-    return recipients;
+    return normalizeGroupedSigningOrders(recipients, canUpdateRecipient);
   }
 
   const offsetByFormId = new Map(step.members.map((member, index) => [member.formId, index]));
