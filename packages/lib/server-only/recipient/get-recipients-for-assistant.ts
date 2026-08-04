@@ -23,9 +23,13 @@ export const getRecipientsForAssistant = async ({ token }: GetRecipientsForAssis
   let recipients = await prisma.recipient.findMany({
     where: {
       envelopeId: assistant.envelopeId,
-      signingOrder: {
-        gte: assistant.signingOrder ?? 0,
-      },
+      OR: [
+        // The assistant themself — they may have fields of their own.
+        { id: assistant.id },
+        // Grouped assistants only assist strictly later steps, never their
+        // own group peers.
+        { signingOrder: { gt: assistant.signingOrder ?? 0 } },
+      ],
     },
     include: {
       fields: {

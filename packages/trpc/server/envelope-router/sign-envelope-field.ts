@@ -44,10 +44,13 @@ export const signEnvelopeFieldRoute = procedure
                 signingStatus: {
                   not: SigningStatus.SIGNED,
                 },
-                signingOrder: {
-                  gte: recipient.signingOrder ?? 0,
-                },
                 envelopeId: recipient.envelopeId,
+                OR: [
+                  // The assistant's own fields.
+                  { id: recipient.id },
+                  // Fields of recipients in strictly later steps only.
+                  { signingOrder: { gt: recipient.signingOrder ?? 0 } },
+                ],
               }
             : {
                 id: recipient.id,
