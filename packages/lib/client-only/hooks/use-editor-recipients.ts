@@ -9,7 +9,8 @@ import type { UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { isCcRecipient, normalizeRecipientSigningOrders, sortRecipientsForSigningOrder } from '../../utils/recipients';
+import { normalizeGroupedSigningOrders } from '../../utils/recipient-groups';
+import { isCcRecipient, sortRecipientsForSigningOrder } from '../../utils/recipients';
 
 const LocalRecipientSchema = z.object({
   formId: z.string().min(1),
@@ -65,6 +66,24 @@ export const ZEditorRecipientsFormSchema = z
         });
       }
     });
+
+    const seenSigningOrders = new Set<number>();
+
+    data.signers.forEach((signer, index) => {
+      if (signer.role === RecipientRole.CC || typeof signer.signingOrder !== 'number') {
+        return;
+      }
+
+      if (seenSigningOrders.has(signer.signingOrder)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'CSC envelopes do not support recipient signing groups.',
+          path: ['signers', index, 'signingOrder'],
+        });
+      }
+
+      seenSigningOrders.add(signer.signingOrder);
+    });
   });
 
 export type TEditorRecipientsFormSchema = z.infer<typeof ZEditorRecipientsFormSchema>;
@@ -101,7 +120,7 @@ export const useEditorRecipients = ({ envelope }: EditorRecipientsProps): UseEdi
 
     const signers: TLocalRecipient[] =
       formRecipients.length > 0
-        ? normalizeRecipientSigningOrders(sortRecipientsForSigningOrder(formRecipients))
+        ? normalizeGroupedSigningOrders(sortRecipientsForSigningOrder(formRecipients))
         : [
             {
               formId: initialId,

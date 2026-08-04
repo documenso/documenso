@@ -1,9 +1,10 @@
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { Envelope, Field, Recipient } from '@prisma/client';
-import { RecipientRole, SigningStatus } from '@prisma/client';
+import { EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import { AppError, AppErrorCode } from '../errors/app-error';
+import type { TEditorEnvelope } from '../types/envelope-editor';
 import type { TRecipientLite } from '../types/recipient';
 import { extractLegacyIds } from '../universal/id';
 import { zEmail } from './zod';
@@ -139,6 +140,32 @@ export const canRecipientBeModified = (
   }
 
   return true;
+};
+
+/**
+ * Editor-level wrapper around `canRecipientBeModified`.
+ *
+ * Template recipients and unsaved (id-less) recipients can always be modified.
+ */
+export const canEditorRecipientBeModified = (
+  envelope: Pick<TEditorEnvelope, 'type' | 'recipients' | 'fields'>,
+  recipientId?: number,
+) => {
+  if (envelope.type === EnvelopeType.TEMPLATE) {
+    return true;
+  }
+
+  if (recipientId === undefined) {
+    return true;
+  }
+
+  const recipient = envelope.recipients.find((r) => r.id === recipientId);
+
+  if (!recipient) {
+    return false;
+  }
+
+  return canRecipientBeModified(recipient, envelope.fields);
 };
 
 /**
