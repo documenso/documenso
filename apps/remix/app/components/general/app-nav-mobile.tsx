@@ -1,7 +1,9 @@
 import LogoImage from '@documenso/assets/logo.png';
 import { authClient } from '@documenso/auth/client';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { IS_TEAM_ANALYTICS_ENABLED } from '@documenso/lib/constants/app';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
+import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
@@ -57,7 +59,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
       ];
     }
 
-    return [
+    const links = [
       {
         href: `/t/${teamUrl}/documents`,
         text: t`Documents`,
@@ -66,6 +68,20 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
         href: `/t/${teamUrl}/templates`,
         text: t`Templates`,
       },
+    ];
+
+    if (
+      currentTeam &&
+      IS_TEAM_ANALYTICS_ENABLED() &&
+      canExecuteTeamAction('MANAGE_TEAM', currentTeam.currentTeamRole)
+    ) {
+      links.push({
+        href: `/t/${currentTeam.url}/analytics`,
+        text: t`Analytics`,
+      });
+    }
+
+    links.push(
       {
         href: '/inbox',
         text: t`Inbox`,
@@ -74,7 +90,9 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
         href: '/settings/profile',
         text: t`Settings`,
       },
-    ];
+    );
+
+    return links;
   }, [currentTeam, organisations]);
 
   return (
